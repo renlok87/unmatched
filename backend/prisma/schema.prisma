@@ -203,6 +203,7 @@ model Game {
   // Relations
   players     GamePlayer[]
   state       GameState?
+  stateHistory GameStateHistory[]
   actions     GameAction[]
 
   // Индексы для оптимизации запросов
@@ -242,9 +243,10 @@ model GamePlayer {
 // GAME STATE
 // ============================================
 
+// Текущее состояние игры (только актуальное)
 model GameState {
   id              String   @id @default(cuid())
-  gameId          String   @unique
+  gameId          String   @unique  // Только одно актуальное состояние на игру
   game            Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
 
   // Полное состояние в JSONB
@@ -262,6 +264,28 @@ model GameState {
 
   @@index([gameId])
   @@index([sequenceNumber])
+}
+
+// История состояний для replay/audit
+model GameStateHistory {
+  id              String   @id @default(cuid())
+  gameId          String
+  game            Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  // Полное состояние в JSONB
+  state           Json
+
+  // Sequence number
+  sequenceNumber  Int
+
+  // Метаданные действия
+  actionType      String   // GAME_STARTED, TURN_STARTED, etc.
+  playerId        String?
+
+  createdAt       DateTime @default(now())
+
+  @@index([gameId, sequenceNumber])
+  @@index([gameId, createdAt])
 }
 
 // ============================================

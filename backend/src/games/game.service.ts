@@ -1,0 +1,693 @@
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
+import { PrismaService } from '../database/prisma.service';
+import { RedisService } from '../redis/redis.service';
+import { GameStatus, GameMode } from './dto';
+import { GameResponse } from './models';
+import { GameAccessDeniedException, MaxActiveGamesException } from './exceptions/game.exceptions';
+
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
+
+@Injectable()
+export class GameService {
+  private readonly CACHE_TTL = 300; // 5 минут
+  private readonly GAME_CACHE_PREFIX = 'game:';
+  private readonly GAMES_LIST_CACHE_PREFIX = 'games:list:';
+  private readonly MAX_ACTIVE_GAMES = 5; // Максимум активных игр на пользователя
+
+  constructor(
+    private prisma: PrismaService,
+    private redis: RedisService,
+  ) {}
+
+  /**
+   * Создать новую игру
+   */
+  async createGame(
+    dto: { mode?: GameMode; boardId?: string },
+    userId: string,
+  ): Promise<GameResponse> {
+    // Проверяем количество активных игр пользователя
+    const activeGamesCount = await this.prisma.game.count({
+      where: {
+        OR: [{ hostId: userId }, { opponentId: userId }],
+        status: { in: [GameStatus.PENDING, GameStatus.LOBBY, GameStatus.IN_PROGRESS] },
+      },
+    });
+
+    if (activeGamesCount >= this.MAX_ACTIVE_GAMES) {
+      throw new MaxActiveGamesException(activeGamesCount, this.MAX_ACTIVE_GAMES);
+    }
+
+    // Получаем дефолтную доску, если не указана
+    let boardId = dto.boardId;
+    if (!boardId) {
+      const defaultBoard = await this.prisma.board.findFirst({
+        orderBy: { createdAt: 'asc' },
+      });
+      boardId = defaultBoard?.id || 'default';
+    }
+
+    // Создаем игру в транзакции
+    const game = await this.prisma.$transaction(async (tx) => {
+      const newGame = await tx.game.create({
+        data: {
+          hostId: userId,
+          boardId,
+          mode: dto.mode || GameMode.ONE_V_ONE,
+          status: GameStatus.LOBBY,
+        },
+      });
+
+      // Добавляем хоста как игрока
+      await tx.gamePlayer.create({
+        data: {
+          gameId: newGame.id,
+          userId,
+          seatOrder: 0,
+        },
+      });
+
+      return newGame;
+    });
+
+    // Инвалидируем кеш списка игр
+    await this.invalidateGamesListCache(userId);
+
+    return await this.getGame(game.id);
+  }
+
+  /**
+   * Получить игру по ID
+   */
+  async getGame(gameId: string): Promise<GameResponse> {
+    // Сначала проверяем кеш
+    const cacheKey = `${this.GAME_CACHE_PREFIX}${gameId}`;
+    const cached = await this.redis.getJson<GameResponse>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const game = await this.prisma.game.findUnique({
+      where: { id: gameId },
+      include: {
+        host: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        opponent: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        players: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+              },
+            },
+          },
+          orderBy: {
+            seatOrder: 'asc',
+          },
+        },
+        state: true,
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Игра не найдена');
+    }
+
+    const response = this.mapToGameResponse(game);
+
+    // Кешируем результат
+    await this.redis.setJsonex(cacheKey, this.CACHE_TTL, response);
+
+    return response;
+  }
+
+  /**
+   * Проверить доступ пользователя к игре
+   * @throws GameAccessDeniedException если пользователь не участвует в игре
+   */
+  async checkGameAccess(gameId: string, userId: string): Promise<void> {
+    const game = await this.prisma.game.findUnique({
+      where: { id: gameId },
+      select: {
+        hostId: true,
+        opponentId: true,
+        status: true,
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Игра не найдена');
+    }
+
+    // Для завершённых игр разрешаем просмотр всем
+    if (game.status === GameStatus.FINISHED || game.status === GameStatus.ABORTED) {
+      return;
+    }
+
+    // Для активных игр проверяем участие
+    if (game.hostId !== userId && game.opponentId !== userId) {
+      throw new GameAccessDeniedException(gameId);
+    }
+  }
+
+  /**
+   * Проверить, что пользователь участвует в игре (строже чем checkGameAccess)
+   */
+  async requireParticipation(gameId: string, userId: string): Promise<void> {
+    const player = await this.prisma.gamePlayer.findUnique({
+      where: {
+        gameId_userId: { gameId, userId },
+      },
+    });
+
+    if (!player) {
+      throw new GameAccessDeniedException(gameId);
+    }
+  }
+
+  /**
+   * Валидация heroId
+   */
+  async validateHeroId(heroId: string): Promise<void> {
+    if (!heroId) {
+      throw new BadRequestException('Hero ID обязателен');
+    }
+
+    const hero = await this.prisma.hero.findUnique({
+      where: { id: heroId },
+    });
+
+    if (!hero) {
+      throw new NotFoundException('Герой не найден');
+    }
+  }
+
+  /**
+   * Получить список игр пользователя
+   */
+  async myGames(
+    userId: string,
+    filters?: { status?: GameStatus; limit?: number },
+  ): Promise<GameResponse[]> {
+    const cacheKey = `${this.GAMES_LIST_CACHE_PREFIX}${userId}:${filters?.status || 'all'}`;
+    const cached = await this.redis.getJson<GameResponse[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const games = await this.prisma.game.findMany({
+      where: {
+        OR: [{ hostId: userId }, { opponentId: userId }],
+        ...(filters?.status && { status: filters.status }),
+      },
+      include: {
+        host: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        opponent: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        players: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+              },
+            },
+          },
+          orderBy: {
+            seatOrder: 'asc',
+          },
+        },
+        state: true,
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      take: filters?.limit || 50,
+    });
+
+    const response = games.map((g) => this.mapToGameResponse(g));
+
+    // Кешируем на меньшее время для списков
+    await this.redis.setJsonex(cacheKey, 60, response);
+
+    return response;
+  }
+
+  /**
+   * Получить список доступных для присоединения игр
+   */
+  async availableGames(filters?: { mode?: GameMode; limit?: number }): Promise<GameResponse[]> {
+    const cacheKey = `games:available:${filters?.mode || 'all'}`;
+    const cached = await this.redis.getJson<GameResponse[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    const games = await this.prisma.game.findMany({
+      where: {
+        status: GameStatus.LOBBY,
+        opponentId: null,
+        ...(filters?.mode && { mode: filters.mode }),
+      },
+      include: {
+        host: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        opponent: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
+        players: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                avatar: true,
+              },
+            },
+          },
+          orderBy: {
+            seatOrder: 'asc',
+          },
+        },
+        state: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: filters?.limit || 20,
+    });
+
+    const response = games.map((g) => this.mapToGameResponse(g));
+
+    // Кешируем на короткое время
+    await this.redis.setJsonex(cacheKey, 30, response);
+
+    return response;
+  }
+
+  /**
+   * Присоединиться к игре
+   */
+  async joinGame(gameId: string, userId: string, heroId?: string): Promise<GameResponse> {
+    const game = await this.prisma.game.findUnique({
+      where: { id: gameId },
+      include: {
+        players: true,
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Игра не найдена');
+    }
+
+    // Проверяем статус игры
+    if (game.status !== GameStatus.LOBBY && game.status !== GameStatus.PENDING) {
+      throw new BadRequestException(
+        'Нельзя присоединиться к игре, которая уже началась или завершилась',
+      );
+    }
+
+    // Проверяем, что пользователь не является хостом
+    if (game.hostId === userId) {
+      throw new BadRequestException('Вы уже являетесь хостом этой игры');
+    }
+
+    // Проверяем, что нет opponent
+    if (game.opponentId) {
+      // Проверяем, может пользователь уже в игре
+      if (game.opponentId === userId) {
+        return await this.getGame(gameId);
+      }
+      throw new BadRequestException('Игра уже заполнена');
+    }
+
+    // Проверяем, что пользователь не уже в игре как игрок
+    const existingPlayer = game.players.find((p) => p.userId === userId);
+    if (existingPlayer) {
+      throw new BadRequestException('Вы уже участвуете в этой игре');
+    }
+
+    // Присоединяем к игре в транзакции
+    await this.prisma.$transaction(async (tx) => {
+      // Добавляем как opponent
+      await tx.game.update({
+        where: { id: gameId },
+        data: {
+          opponentId: userId,
+        },
+      });
+
+      // Добавляем запись в GamePlayer
+      await tx.gamePlayer.create({
+        data: {
+          gameId,
+          userId,
+          heroId,
+          seatOrder: 1,
+        },
+      });
+    });
+
+    // Инвалидируем кеш
+    await this.invalidateGameCache(gameId);
+    await this.invalidateGamesListCache(userId);
+    await this.invalidateAvailableGamesCache();
+
+    return await this.getGame(gameId);
+  }
+
+  /**
+   * Покинуть игру
+   */
+  async leaveGame(gameId: string, userId: string): Promise<void> {
+    const game = await this.prisma.game.findUnique({
+      where: { id: gameId },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Игра не найдена');
+    }
+
+    // Хост не может покинуть игру, он может только её прервать
+    if (game.hostId === userId) {
+      throw new BadRequestException(
+        'Хост не может покинуть игру. Используйте abortGame для прерывания.',
+      );
+    }
+
+    // Проверяем, что пользователь является opponent
+    if (game.opponentId !== userId) {
+      throw new ForbiddenException('Вы не участвуете в этой игре');
+    }
+
+    // Если игра уже началась, прерываем её
+    if (game.status === GameStatus.IN_PROGRESS) {
+      await this.abortGame(gameId, userId, 'opponent_left');
+      return;
+    }
+
+    // Удаляем opponent
+    await this.prisma.$transaction(async (tx) => {
+      await tx.game.update({
+        where: { id: gameId },
+        data: {
+          opponentId: null,
+        },
+      });
+
+      await tx.gamePlayer.deleteMany({
+        where: {
+          gameId,
+          userId,
+        },
+      });
+    });
+
+    // Инвалидируем кеш
+    await this.invalidateGameCache(gameId);
+    await this.invalidateGamesListCache(userId);
+    await this.invalidateAvailableGamesCache();
+  }
+
+  /**
+   * Начать игру
+   */
+  async startGame(gameId: string, userId: string): Promise<GameResponse> {
+    const game = await this.prisma.game.findUnique({
+      where: { id: gameId },
+      include: {
+        players: true,
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Игра не найдена');
+    }
+
+    // Только хост может начать игру
+    if (game.hostId !== userId) {
+      throw new ForbiddenException('Только хост может начать игру');
+    }
+
+    // Проверяем статус
+    if (game.status !== GameStatus.LOBBY) {
+      throw new BadRequestException('Игру можно начать только из лобби');
+    }
+
+    // Проверяем наличие opponent для режимов с несколькими игроками
+    if (game.mode !== GameMode.VS_AI && !game.opponentId) {
+      throw new BadRequestException('Для начала игры нужен opponent');
+    }
+
+    // Проверяем, что все игроки готовы
+    const allReady = game.players.every((p) => p.isReady);
+    if (!allReady) {
+      throw new BadRequestException('Не все игроки готовы');
+    }
+
+    // Обновляем игру
+    const updatedGame = await this.prisma.game.update({
+      where: { id: gameId },
+      data: {
+        status: GameStatus.IN_PROGRESS,
+        startedAt: new Date(),
+      },
+    });
+
+    // Инвалидируем кеш
+    await this.invalidateGameCache(gameId);
+    await this.invalidateGamesListCache(userId);
+    await this.invalidateAvailableGamesCache();
+
+    return await this.getGame(gameId);
+  }
+
+  /**
+   * Прервать игру
+   */
+  async abortGame(gameId: string, userId: string, reason = 'aborted'): Promise<GameResponse> {
+    const game = await this.prisma.game.findUnique({
+      where: { id: gameId },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Игра не найдена');
+    }
+
+    // Только хост или текущий игрок могут прервать игру
+    if (game.hostId !== userId && game.opponentId !== userId) {
+      throw new ForbiddenException('Вы не можете прервать эту игру');
+    }
+
+    const updatedGame = await this.prisma.game.update({
+      where: { id: gameId },
+      data: {
+        status: GameStatus.ABORTED,
+        endedAt: new Date(),
+      },
+    });
+
+    // Инвалидируем кеш
+    await this.invalidateGameCache(gameId);
+
+    return await this.getGame(gameId);
+  }
+
+  /**
+   * Обновить готовность игрока
+   */
+  async toggleReady(gameId: string, userId: string): Promise<GameResponse> {
+    const player = await this.prisma.gamePlayer.findUnique({
+      where: {
+        gameId_userId: {
+          gameId,
+          userId,
+        },
+      },
+    });
+
+    if (!player) {
+      throw new NotFoundException('Вы не участвуете в этой игре');
+    }
+
+    await this.prisma.gamePlayer.update({
+      where: { id: player.id },
+      data: {
+        isReady: !player.isReady,
+      },
+    });
+
+    await this.invalidateGameCache(gameId);
+
+    return await this.getGame(gameId);
+  }
+
+  /**
+   * Выбрать героя
+   */
+  async selectHero(gameId: string, userId: string, heroId: string): Promise<GameResponse> {
+    // Валидируем heroId
+    await this.validateHeroId(heroId);
+
+    const game = await this.prisma.game.findUnique({
+      where: { id: gameId },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Игра не найдена');
+    }
+
+    if (game.status !== GameStatus.LOBBY) {
+      throw new BadRequestException('Героя можно выбрать только в лобби');
+    }
+
+    const player = await this.prisma.gamePlayer.findUnique({
+      where: {
+        gameId_userId: {
+          gameId,
+          userId,
+        },
+      },
+    });
+
+    if (!player) {
+      throw new NotFoundException('Вы не участвуете в этой игре');
+    }
+
+    await this.prisma.gamePlayer.update({
+      where: { id: player.id },
+      data: { heroId },
+    });
+
+    await this.invalidateGameCache(gameId);
+
+    return await this.getGame(gameId);
+  }
+
+  /**
+   * Инвалидация кеша игры
+   */
+  private async invalidateGameCache(gameId: string): Promise<void> {
+    await this.redis.del(`${this.GAME_CACHE_PREFIX}${gameId}`);
+  }
+
+  /**
+   * Инвалидация кеша списка игр пользователя
+   */
+  private async invalidateGamesListCache(userId: string): Promise<void> {
+    await this.redis.del(`${this.GAMES_LIST_CACHE_PREFIX}${userId}:PENDING`);
+    await this.redis.del(`${this.GAMES_LIST_CACHE_PREFIX}${userId}:LOBBY`);
+    await this.redis.del(`${this.GAMES_LIST_CACHE_PREFIX}${userId}:IN_PROGRESS`);
+    await this.redis.del(`${this.GAMES_LIST_CACHE_PREFIX}${userId}:FINISHED`);
+    await this.redis.del(`${this.GAMES_LIST_CACHE_PREFIX}${userId}:all`);
+  }
+
+  /**
+   * Инвалидация кеша доступных игр
+   */
+  private async invalidateAvailableGamesCache(): Promise<void> {
+    await this.redis.del('games:available:ONE_V_ONE');
+    await this.redis.del('games:available:TWO_V_TWO');
+    await this.redis.del('games:available:FREE_FOR_ALL');
+    await this.redis.del('games:available:VS_AI');
+    await this.redis.del('games:available:all');
+  }
+
+  /**
+   * Маппинг Prisma модели в Response DTO
+   */
+  private mapToGameResponse(game: any): GameResponse {
+    return {
+      id: game.id,
+      status: game.status as GameStatus,
+      mode: game.mode as GameMode,
+      hostId: game.hostId,
+      host: {
+        id: game.host.id,
+        userId: game.host.id,
+        username: game.host.username,
+        avatar: game.host.avatar,
+        isReady: game.players.find((p: any) => p.userId === game.hostId)?.isReady ?? false,
+        hasPassed: false,
+        seatOrder: 0,
+        heroId: game.players.find((p: any) => p.userId === game.hostId)?.heroId ?? null,
+      },
+      opponentId: game.opponentId,
+      opponent: game.opponent
+        ? {
+            id: game.opponent.id,
+            userId: game.opponent.id,
+            username: game.opponent.username,
+            avatar: game.opponent.avatar,
+            isReady: game.players.find((p: any) => p.userId === game.opponentId)?.isReady ?? false,
+            hasPassed: false,
+            seatOrder: 1,
+            heroId: game.players.find((p: any) => p.userId === game.opponentId)?.heroId ?? null,
+          }
+        : null,
+      boardId: game.boardId,
+      boardState: game.boardState,
+      createdAt: game.createdAt,
+      updatedAt: game.updatedAt,
+      startedAt: game.startedAt,
+      endedAt: game.endedAt,
+      winnerId: game.winnerId,
+      version: game.version,
+      players: game.players.map((p: any) => ({
+        id: p.id,
+        userId: p.user.id,
+        username: p.user.username,
+        avatar: p.user.avatar,
+        heroId: p.heroId,
+        isReady: p.isReady,
+        hasPassed: p.hasPassed,
+        seatOrder: p.seatOrder,
+      })),
+      phase: game.state?.phase ? game.state.phase : null,
+      currentTurn: game.state?.turnCount ?? null,
+    };
+  }
+}

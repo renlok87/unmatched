@@ -10,6 +10,7 @@ import { GraphqlModule } from './graphql';
 import { AuthModule } from './auth';
 import { UsersModule } from './users';
 import { ContentModule } from './content';
+import { GamesModule } from './games/games.module';
 
 @Module({
   imports: [
@@ -19,16 +20,19 @@ import { ContentModule } from './content';
       envFilePath: ['.env', '.env.local', '.env.docker'],
     }),
     // Rate limiting для защиты от brute force и спама
-    ThrottlerModule.forRoot([{
-      ttl: 60000,      // 60 секунд
-      limit: 10,       // 10 запросов
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 60 секунд
+        limit: 10, // 10 запросов
+      },
+    ]),
     PrismaModule,
     RedisModule,
     GraphqlModule,
     AuthModule,
     UsersModule,
     ContentModule,
+    GamesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
