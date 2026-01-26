@@ -1,0 +1,495 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USERS & AUTH
+// ============================================
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String   // bcrypt hash
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Email verification
+  emailVerified     DateTime?
+  emailVerifiedToken String?  @unique
+
+  // Password reset
+  passwordResetToken     String?  @unique
+  passwordResetExpires   DateTime?
+
+  // Relations
+  stats        UserStats?
+  settings     UserSettings?
+  refreshTokens RefreshToken[]
+  sessions     Session[]
+  auditLogs    AuthAuditLog[]
+  gamePlayers GamePlayer[]
+  ownedGamesAsPlayer1 Game[] @relation("Player1Games")
+  ownedGamesAsPlayer2 Game[] @relation("Player2Games")
+
+  @@index([email])
+  @@index([username])
+}
+
+model UserSettings {
+  id               String  @id @default(cuid())
+  userId           String  @unique
+  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Preferences
+  theme            String  @default("dark")
+  language         String  @default("ru")
+  soundEnabled     Boolean @default(true)
+  musicEnabled     Boolean @default(true)
+
+  // Privacy
+  profileVisible   Boolean @default(true)
+  showOnlineStatus Boolean @default(true)
+}
+
+model UserStats {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Overall stats
+  gamesPlayed     Int      @default(0)
+  gamesWon        Int      @default(0)
+  gamesLost       Int      @default(0)
+  winRate         Float    @default(0)
+
+  // ELO rating
+  currentElo      Int      @default(1200)
+  peakElo         Int      @default(1200)
+
+  // Hero stats (JSONB для гибкости)
+  heroStats       Json     @default("{}")
+
+  // Time-based stats
+  lastPlayedAt    DateTime?
+  totalPlayTime   Int      @default(0) // seconds
+
+  @@index([currentElo])
+  @@index([gamesWon])
+}
+
+// ============================================
+// AUTH TOKENS & SESSIONS
+// ============================================
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique  // hashed version
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+  replacedBy String?  // id нового токена при ротации
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  deviceId   String?  // fingerprint устройства
+  deviceName String?  // User Agent
+  ipAddress  String?
+
+  refreshToken String  @unique  // hashed
+  expiresAt    DateTime
+
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model AuthAuditLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action       String   // login, logout, register, password_reset, etc.
+  success      Boolean
+  ipAddress    String?
+  userAgent    String?
+  errorMessage String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ============================================
+// GAMES
+// ============================================
+
+enum GameStatus {
+  PENDING     // Создана, ожидание игроков
+  LOBBY       // Лобби, выбор героев
+  IN_PROGRESS // Игра идёт
+  PAUSED      // Пауза
+  FINISHED    // Завершена
+  ABORTED     // Прервана
+}
+
+enum GameMode {
+  ONE_V_ONE
+  TWO_V_TWO
+  FREE_FOR_ALL
+  VS_AI
+}
+
+enum GamePhase {
+  SETUP          // Подготовка (размещение бойцов)
+  TURN_START     // Начало хода (способности в начале хода)
+  ACTION_MANEUVER // Манёвр
+  ACTION_ATTACK  // Атака
+  COMBAT         // Бой (ожидание защиты)
+  COMBAT_RESOLVE // Разрешение боя
+  TURN_END       // Конец хода
+}
+
+model Game {
+  id          String     @id @default(cuid())
+  status      GameStatus @default(PENDING)
+  mode        GameMode   @default(ONE_V_ONE)
+
+  // Host (создатель)
+  hostId      String
+  host        User       @relation("Player1Games", fields: [hostId], references: [id])
+
+  // Опционально второй игрок для 1v1
+  opponentId  String?
+  opponent    User?      @relation("Player2Games", fields: [opponentId], references: [id])
+
+  // Board
+  boardId     String
+  boardState  Json?      // состояние дверей, жетонов тумана и т.д.
+
+  // Timing
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt  // для сортировки по времени обновления
+  startedAt   DateTime?
+  endedAt     DateTime?
+
+  // Winner
+  winnerId    String?
+
+  // Version для optimistic locking
+  version     Int        @default(0)
+
+  // Relations
+  players     GamePlayer[]
+  state       GameState?
+  actions     GameAction[]
+
+  // Индексы для оптимизации запросов
+  @@index([status])
+  @@index([hostId])
+  @@index([hostId, status])  // "my games" query
+  @@index([createdAt])
+  @@index([status, createdAt]) // для листинга активных игр
+  @@index([mode, status])  // "find 1v1 games"
+  @@index([winnerId])  // "games I won" query
+  @@index([updatedAt])  // для сортировки по времени обновления
+}
+
+model GamePlayer {
+  id          String   @id @default(cuid())
+  gameId      String
+  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  // Hero selection
+  heroId      String?  // выбран в лобби
+
+  // Status
+  isReady     Boolean  @default(false)
+  hasPassed   Boolean  @default(false)
+
+  // Position за столом (для порядка ходов)
+  seatOrder   Int      @default(0)
+
+  @@unique([gameId, userId])
+  @@index([gameId])
+}
+
+// ============================================
+// GAME STATE
+// ============================================
+
+model GameState {
+  id              String   @id @default(cuid())
+  gameId          String   @unique
+  game            Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  // Полное состояние в JSONB
+  state           Json
+
+  // Sequence number для optimistic updates и реконнекта
+  sequenceNumber  Int      @default(0)
+
+  // Для оптимизации запросов
+  currentTurnPlayerId String?
+  phase           String   @default("SETUP")
+  turnCount       Int      @default(0)
+
+  updatedAt       DateTime @updatedAt
+
+  @@index([gameId])
+  @@index([sequenceNumber])
+}
+
+// ============================================
+// GAME ACTIONS (for replay/audit)
+// ============================================
+
+enum GameActionType {
+  // Game management
+  GAME_CREATED
+  GAME_JOINED
+  GAME_STARTED
+  GAME_ENDED
+  GAME_ABORTED
+
+  // Turn actions
+  TURN_STARTED
+  TURN_ENDED
+  PASSED
+
+  // Card actions
+  CARD_PLAYED
+  CARD_DISCARDED
+
+  // Movement
+  FIGHTER_MOVED
+  MANEUVER
+  PLACED  // для эффекта "поместить"
+
+  // Combat
+  ATTACK_INITIATED
+  DEFENSE_PLAYED
+  COMBAT_RESOLVED
+  EFFECT_APPLIED
+
+  // Special
+  SPECIAL_ABILITY
+  DOOR_TOGGLED  // для дверей Беовульфа
+}
+
+model GameAction {
+  id              String          @id @default(cuid())
+  gameId          String
+  game            Game            @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  type            GameActionType
+  sequenceNumber  Int
+
+  // Кто сделал действие
+  playerId        String?
+
+  // Данные действия
+  payload         Json            // { fighterId, targetId, cardId, ... }
+
+  // Для diff/state recovery
+  previousStateId String?         // ссылка на предыдущий GameState
+  newStateId     String?         // ссылка на новый GameState
+
+  timestamp       DateTime        @default(now())
+
+  @@index([gameId, sequenceNumber])
+  @@index([gameId, timestamp])
+  @@index([timestamp])  // для partitioning cleanup
+}
+
+// ============================================
+// HEROES (для Content Module)
+// ============================================
+
+model Hero {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  nameEn      String   // английское название
+  nameRu      String   // русское название
+  set         String   // выпуск (например, "Битва легенд. Том первый")
+
+  // Характеристики
+  health      Int
+  fighterType String   // HERO, MINION, HUGE
+
+  // Способность (в формате JSON для гибкости)
+  ability     Json     // { type, timing, effect, description }
+
+  // Стартовое содержание колоды
+  deckCards   Json     // [{cardId, count}, ...]
+
+  // Специфические свойства
+  properties  Json?    // { hasSidekick: true, sidekickCount: 2, ... }
+
+  // Медиа
+  imageUrl    String?
+  avatarUrl   String?
+
+  // Relations
+  cards       Card[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([set])
+}
+
+// ============================================
+// CARDS (для Content Module)
+// ============================================
+
+model Card {
+  id          String   @id @default(cuid())
+  name        String
+  nameEn      String   // английское название
+  nameRu      String   // русское название
+
+  // Тип карты
+  cardType    String   // ATTACK, DEFENSE, SCHEME, UNIVERSAL
+  subType     String?  // для уточнения (например, " Journey")
+
+  // Значения
+  attackValue Int?     // для карт атаки
+  defenseValue Int?    // для карт защиты
+  boostValue  Int?     // для усиления
+
+  // Эффекты карты (JSON для гибкости)
+  effects     Json     // [{ timing, type, value, condition, ... }]
+
+  // Дополнительная информация
+  text        String?  // описание текста карты
+  textEn      String?
+  textRu      String?
+
+  // Каким героям принадлежит
+  heroId      String
+  hero        Hero     @relation(fields: [heroId], references: [id])
+
+  // Количество в колоде героя
+  count       Int      @default(1)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([heroId])
+  @@index([cardType])
+}
+
+// ============================================
+// BOARDS (для Content Module)
+// ============================================
+
+model Board {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  nameEn      String
+  nameRu      String
+  set         String   // выпуск
+
+  // Размеры доски
+  width       Int
+  height      Int
+
+  // Ячейки доски
+  cells       Json     // [{x, y, type, zone, connections, ...}]
+
+  // Специальные свойства
+  features    Json?    // { secretPassages, doors, highGround, ... }
+
+  // Медиа
+  imageUrl    String?
+  imageUrlDark String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([set])
+}
+
+// ============================================
+// MATCHMAKING
+// ============================================
+
+model MatchmakingQueueEntry {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+
+  // Критерии поиска
+  mode        GameMode
+  heroPref    String?  // предпочтительный герой
+
+  // Rating на момент входа
+  rating      Int
+
+  // Когда зашёл в очередь (для expanding search window)
+  joinedAt    DateTime @default(now())
+
+  @@index([mode, rating])
+  @@index([joinedAt])
+}
+
+// ============================================
+// LEADERBOARDS
+// ============================================
+
+model LeaderboardEntry {
+  id          String   @id @default(cuid())
+  userId      String
+  heroId      String?  // null = overall
+
+  // Временной период
+  timeFrame   String   @default("all") // all, week, month
+
+  // Метрики
+  rank        Int
+  elo         Int
+  gamesWon    Int
+  gamesPlayed Int
+
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, heroId, timeFrame])
+  @@index([heroId, timeFrame, elo])
+}
+
+// ============================================
+// PRESENCE (опционально, можно только Redis)
+// ============================================
+
+model Presence {
+  userId          String   @id
+  status          String   @default("offline") // online, away, offline
+  lastSeenAt      DateTime @default(now())
+  currentGameId   String?
+
+  @@index([status])
+}
