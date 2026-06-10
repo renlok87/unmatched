@@ -1,8 +1,6 @@
 import React from 'react';
-import { IResourceComponentsProps, useGo, useInvalidate } from '@refinedev/core';
-import { Form, Input, InputNumber, Select, Divider, message, Typography, Space, Button, Spin, Tabs } from 'antd';
-import { useParams } from 'react-router-dom';
-import { client } from '../../providers/dataProvider';
+import { IResourceComponentsProps, useCreate, useGo } from '@refinedev/core';
+import { Form, Input, InputNumber, Select, Divider, message, Typography, Space, Button, Tabs } from 'antd';
 import { JsonEditor } from '../../components/common/JsonEditor';
 
 const { Option } = Select;
@@ -14,97 +12,15 @@ const SETS = [
   'Спецвыпуск',
 ];
 
-const GET_BOARD = `
-  query GetBoard($id: String!) {
-    adminBoard(id: $id) {
-      id
-      name
-      nameEn
-      nameRu
-      set
-      width
-      height
-      cells
-      features
-      imageUrl
-      imageUrlDark
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const UPDATE_BOARD_MUTATION = `
-  mutation UpdateBoard($id: String!, $input: UpdateBoardInput!) {
-    updateBoard(id: $id, input: $input) {
-      id
-      name
-      nameEn
-      nameRu
-      set
-      width
-      height
-      imageUrl
-      imageUrlDark
-      createdAt
-    }
-  }
-`;
-
-// JSON-поля приходят с бэкенда сериализованными строками — парсим и
-// форматируем для редактора; null/невалидное значение -> fallback.
-const toPretty = (value: unknown, fallback: string): string => {
-  if (value === null || value === undefined) return fallback;
-  try {
-    const parsed = typeof value === 'string' ? JSON.parse(value) : value;
-    return JSON.stringify(parsed, null, 2);
-  } catch {
-    return typeof value === 'string' ? value : fallback;
-  }
-};
-
-export const BoardEdit: React.FC<IResourceComponentsProps> = () => {
+export const BoardCreate: React.FC<IResourceComponentsProps> = () => {
   const [form] = Form.useForm();
+  const { mutate, mutation: {
+    isPending
+  } } = useCreate();
   const go = useGo();
-  const invalidate = useInvalidate();
-  const { id } = useParams<{ id: string }>();
-  const [boardData, setBoardData] = React.useState<any>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-
-  const [isUpdating, setIsUpdating] = React.useState(false);
 
   const [cellsValue, setCellsValue] = React.useState('[]');
   const [featuresValue, setFeaturesValue] = React.useState('{}');
-
-  // Fetch board data directly
-  React.useEffect(() => {
-    if (id) {
-      setIsLoading(true);
-      setError(null);
-
-      client.query(GET_BOARD, { id }).toPromise().then((result) => {
-        setIsLoading(false);
-
-        if (result.error) {
-          console.error('[BoardEdit] GraphQL error:', result.error);
-          setError(result.error.message || 'Failed to fetch board');
-        } else if (result.data?.adminBoard) {
-          const board = result.data.adminBoard;
-          setBoardData(board);
-          form.setFieldsValue(board);
-          setCellsValue(toPretty(board.cells, '[]'));
-          setFeaturesValue(toPretty(board.features, '{}'));
-        } else {
-          setError('No board data returned');
-        }
-      }).catch((err) => {
-        console.error('[BoardEdit] Fetch error:', err);
-        setError(err.message || 'Failed to fetch board');
-        setIsLoading(false);
-      });
-    }
-  }, [id, form]);
 
   const handleCellsChange = (value: string | undefined) => {
     setCellsValue(value || '[]');
@@ -115,12 +31,7 @@ export const BoardEdit: React.FC<IResourceComponentsProps> = () => {
   };
 
   const onFinish = (values: any) => {
-    if (!id) {
-      message.error('No board ID provided');
-      return;
-    }
-
-    // JSON-поля бэкенд принимает строками (String в UpdateBoardInput) —
+    // JSON-поля бэкенд принимает строками (String в CreateBoardInput) —
     // валидируем парсингом и отправляем компактную строку.
     let cells: string;
     let features: string;
@@ -137,31 +48,25 @@ export const BoardEdit: React.FC<IResourceComponentsProps> = () => {
       return;
     }
 
-    setIsUpdating(true);
-
-    // Direct mutation call
-    client.mutation(UPDATE_BOARD_MUTATION, {
-      id,
-      input: {
-        ...values,
-        cells,
-        features,
+    mutate(
+      {
+        resource: 'boards',
+        values: {
+          ...values,
+          cells,
+          features,
+        },
+      },
+      {
+        onSuccess: () => {
+          message.success('Board created successfully');
+          go({ to: { resource: 'boards', action: 'list' } });
+        },
+        onError: (error: any) => {
+          message.error(`Error: ${error.message}`);
+        },
       }
-    }).toPromise().then((result) => {
-      setIsUpdating(false);
-
-      if (result.error) {
-        console.error('[BoardEdit] Update error:', result.error);
-        message.error(`Error: ${result.error.message}`);
-      } else {
-        message.success('Board updated successfully');
-        invalidate({ resource: 'boards', invalidates: ['list', 'detail'] });
-      }
-    }).catch((err) => {
-      console.error('[BoardEdit] Update mutation error:', err);
-      message.error(`Error: ${err.message}`);
-      setIsUpdating(false);
-    });
+    );
   };
 
   const cellsTemplate = {
@@ -186,25 +91,9 @@ export const BoardEdit: React.FC<IResourceComponentsProps> = () => {
     setFeaturesValue(JSON.stringify(cellsTemplate.features, null, 2));
   };
 
-  if (isLoading) {
-    return <Spin size="large" style={{ display: 'block', margin: '100px auto' }} />;
-  }
-
-  if (error && !boardData) {
-    return (
-      <div style={{ padding: 24, textAlign: 'center' }}>
-        <h3>Error loading board</h3>
-        <p>{error}</p>
-        <Button onClick={() => go({ to: { resource: 'boards', action: 'list' } })}>
-          Back to List
-        </Button>
-      </div>
-    );
-  }
-
   return (
     <div style={{ padding: 24 }}>
-      <h1>Edit Board</h1>
+      <h1>Create Board</h1>
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
           label="Name"
@@ -306,7 +195,7 @@ export const BoardEdit: React.FC<IResourceComponentsProps> = () => {
 
         <Form.Item>
           <Space>
-            <Button type="primary" htmlType="submit" loading={isUpdating}>
+            <Button type="primary" htmlType="submit" loading={isPending}>
               Save
             </Button>
             <Button onClick={() => go({ to: { resource: 'boards', action: 'list' } })}>

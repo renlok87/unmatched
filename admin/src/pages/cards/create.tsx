@@ -1,6 +1,5 @@
 import React from 'react';
-import { IResourceComponentsProps, useShow, useUpdate, useGo } from '@refinedev/core';
-import { useParams } from 'react-router-dom';
+import { IResourceComponentsProps, useCreate, useGo } from '@refinedev/core';
 import { Form, Input, InputNumber, Select, Divider, message, Typography, Space, Button } from 'antd';
 import { JsonEditor } from '../../components/common/JsonEditor';
 import { client, gql } from '../../providers/dataProvider';
@@ -21,29 +20,14 @@ const GET_HEROES_OPTIONS = gql`
   }
 `;
 
-export const CardEdit: React.FC<IResourceComponentsProps> = () => {
+export const CardCreate: React.FC<IResourceComponentsProps> = () => {
   const [form] = Form.useForm();
+  const { mutate } = useCreate();
+  const [isCreating, setIsCreating] = React.useState(false);
   const go = useGo();
-  const { id } = useParams();
-  const { result: cardData } = useShow();
-  const { mutate } = useUpdate();
-  const [isMutating, setIsMutating] = React.useState(false);
 
-  const [cardType, setCardType] = React.useState<string>(cardData?.cardType || 'ATTACK');
-  const [effectsValue, setEffectsValue] = React.useState(() => {
-    if (!cardData?.effects) return '[]';
-    // Если effects уже строка (JSON), парсим и форматируем
-    if (typeof cardData.effects === 'string') {
-      try {
-        const parsed = JSON.parse(cardData.effects);
-        return JSON.stringify(parsed, null, 2);
-      } catch {
-        return cardData.effects; // Если не парсится, возвращаем как есть
-      }
-    }
-    // Если это уже объект, сериализуем
-    return JSON.stringify(cardData.effects, null, 2);
-  });
+  const [cardType, setCardType] = React.useState<string>('ATTACK');
+  const [effectsValue, setEffectsValue] = React.useState('[]');
   const [heroOptions, setHeroOptions] = React.useState<{ value: string; label: string }[]>([]);
   const [heroesLoading, setHeroesLoading] = React.useState(false);
 
@@ -69,7 +53,7 @@ export const CardEdit: React.FC<IResourceComponentsProps> = () => {
           );
         }
       } catch (error) {
-        console.error('[CardEdit] Error fetching heroes:', error);
+        console.error('[CardCreate] Error fetching heroes:', error);
       } finally {
         if (!cancelled) {
           setHeroesLoading(false);
@@ -82,28 +66,6 @@ export const CardEdit: React.FC<IResourceComponentsProps> = () => {
     };
   }, []);
 
-  React.useEffect(() => {
-    if (cardData) {
-      form.setFieldsValue(cardData);
-      setCardType(cardData.cardType || 'ATTACK');
-      // Обрабатываем effects - может быть строкой или объектом
-      if (cardData.effects) {
-        if (typeof cardData.effects === 'string') {
-          try {
-            const parsed = JSON.parse(cardData.effects);
-            setEffectsValue(JSON.stringify(parsed, null, 2));
-          } catch {
-            setEffectsValue(cardData.effects);
-          }
-        } else {
-          setEffectsValue(JSON.stringify(cardData.effects, null, 2));
-        }
-      } else {
-        setEffectsValue('[]');
-      }
-    }
-  }, [cardData, form]);
-
   const handleCardTypeChange = (value: string) => {
     setCardType(value);
   };
@@ -113,22 +75,16 @@ export const CardEdit: React.FC<IResourceComponentsProps> = () => {
   };
 
   const onFinish = (values: any) => {
-    if (!id) {
-      message.error('Card ID is missing');
-      return;
-    }
-
     try {
       // Парсим effects для валидации JSON
       const effectsParsed = JSON.parse(effectsValue);
       // Отправляем как строку JSON (как ожидает сервис)
       const effectsString = JSON.stringify(effectsParsed);
 
-      setIsMutating(true);
+      setIsCreating(true);
       mutate(
         {
           resource: 'cards',
-          id,
           values: {
             ...values,
             effects: effectsString,
@@ -136,11 +92,12 @@ export const CardEdit: React.FC<IResourceComponentsProps> = () => {
         },
         {
           onSuccess: () => {
-            message.success('Card updated successfully');
-            setIsMutating(false);
+            message.success('Card created successfully');
+            setIsCreating(false);
+            go({ to: { resource: 'cards', action: 'list' } });
           },
           onError: (error: any) => {
-            setIsMutating(false);
+            setIsCreating(false);
             message.error(`Error: ${error.message}`);
           },
         }
@@ -152,7 +109,7 @@ export const CardEdit: React.FC<IResourceComponentsProps> = () => {
 
   return (
     <div style={{ padding: 24 }}>
-      <h1>Edit Card</h1>
+      <h1>Create Card</h1>
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
           label="Name"
@@ -307,7 +264,7 @@ export const CardEdit: React.FC<IResourceComponentsProps> = () => {
 
         <Form.Item>
           <Space>
-            <Button type="primary" htmlType="submit" loading={isMutating}>
+            <Button type="primary" htmlType="submit" loading={isCreating}>
               Save
             </Button>
             <Button onClick={() => go({ to: { resource: 'cards', action: 'list' } })}>

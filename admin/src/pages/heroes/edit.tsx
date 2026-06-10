@@ -1,5 +1,5 @@
 import React from 'react';
-import { IResourceComponentsProps, useOne, useUpdate, useGo, useInvalidate } from '@refinedev/core';
+import { IResourceComponentsProps, useGo, useInvalidate } from '@refinedev/core';
 import { Form, Input, InputNumber, Select, Divider, message, Typography, Space, Button, Spin } from 'antd';
 import { useParams } from 'react-router-dom';
 import { client } from '../../providers/dataProvider';
@@ -7,14 +7,18 @@ import { JsonEditor } from '../../components/common/JsonEditor';
 
 const { Option } = Select;
 
-const SETS = [
-  'Битва легенд. Том первый',
-  'Битва легенд. Том второй',
-  'Битва легенд. Том третий',
-  'Спецвыпуск',
-];
-
 const FIGHTER_TYPES = ['HERO', 'MINION', 'HUGE'];
+
+// JSON-поля приходят строками (или объектами до пересборки бэка) — приводим к pretty-строке для редактора
+const toPrettyJson = (value: unknown, fallback: string): string => {
+  try {
+    const parsed = typeof value === 'string' ? JSON.parse(value) : value;
+    if (parsed === null || parsed === undefined) return fallback;
+    return JSON.stringify(parsed, null, 2);
+  } catch {
+    return typeof value === 'string' ? value : fallback;
+  }
+};
 
 const GET_HERO = `
   query GetHero($id: String!) {
@@ -64,7 +68,6 @@ export const HeroEdit: React.FC<IResourceComponentsProps> = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  const { mutate } = useUpdate();
   const [isUpdating, setIsUpdating] = React.useState(false);
 
   const [abilityValue, setAbilityValue] = React.useState('{}');
@@ -74,12 +77,10 @@ export const HeroEdit: React.FC<IResourceComponentsProps> = () => {
   // Fetch hero data directly
   React.useEffect(() => {
     if (id) {
-      console.log('[HeroEdit] Fetching hero with id:', id);
       setIsLoading(true);
       setError(null);
 
       client.query(GET_HERO, { id }).toPromise().then((result) => {
-        console.log('[HeroEdit] Fetch result:', result);
         setIsLoading(false);
 
         if (result.error) {
@@ -87,12 +88,11 @@ export const HeroEdit: React.FC<IResourceComponentsProps> = () => {
           setError(result.error.message || 'Failed to fetch hero');
         } else if (result.data?.adminHero) {
           const hero = result.data.adminHero;
-          console.log('[HeroEdit] Hero data:', hero);
           setHeroData(hero);
           form.setFieldsValue(hero);
-          setAbilityValue(hero.ability ? JSON.stringify(hero.ability, null, 2) : '{}');
-          setDeckCardsValue(hero.deckCards ? JSON.stringify(hero.deckCards, null, 2) : '[]');
-          setPropertiesValue(hero.properties ? JSON.stringify(hero.properties, null, 2) : '{}');
+          setAbilityValue(toPrettyJson(hero.ability, '{}'));
+          setDeckCardsValue(toPrettyJson(hero.deckCards, '[]'));
+          setPropertiesValue(toPrettyJson(hero.properties, '{}'));
         } else {
           setError('No hero data returned');
         }
@@ -116,46 +116,55 @@ export const HeroEdit: React.FC<IResourceComponentsProps> = () => {
     setPropertiesValue(value || '{}');
   };
 
+  // Валидация + компактная JSON-строка для отправки (бэкенд принимает строки)
+  const toCompactJson = (value: string, label: string): string | null => {
+    try {
+      return JSON.stringify(JSON.parse(value));
+    } catch {
+      message.error(`Invalid JSON in "${label}" field`);
+      return null;
+    }
+  };
+
   const onFinish = (values: any) => {
     if (!id) {
       message.error('No hero ID provided');
       return;
     }
 
-    try {
-      const ability = JSON.parse(abilityValue);
-      const deckCards = JSON.parse(deckCardsValue);
-      const properties = JSON.parse(propertiesValue);
+    const ability = toCompactJson(abilityValue, 'Ability');
+    if (ability === null) return;
+    const deckCards = toCompactJson(deckCardsValue, 'Deck Cards');
+    if (deckCards === null) return;
+    const properties = toCompactJson(propertiesValue, 'Properties');
+    if (properties === null) return;
 
-      setIsUpdating(true);
+    setIsUpdating(true);
 
-      // Direct mutation call
-      client.mutation(UPDATE_HERO_MUTATION, {
-        id,
-        input: {
-          ...values,
-          ability,
-          deckCards,
-          properties,
-        }
-      }).toPromise().then((result) => {
-        setIsUpdating(false);
+    // Direct mutation call
+    client.mutation(UPDATE_HERO_MUTATION, {
+      id,
+      input: {
+        ...values,
+        ability,
+        deckCards,
+        properties,
+      }
+    }).toPromise().then((result) => {
+      setIsUpdating(false);
 
-        if (result.error) {
-          console.error('[HeroEdit] Update error:', result.error);
-          message.error(`Error: ${result.error.message}`);
-        } else {
-          message.success('Hero updated successfully');
-          invalidate({ resource: 'heroes', invalidates: ['list', 'detail'] });
-        }
-      }).catch((err) => {
-        console.error('[HeroEdit] Update mutation error:', err);
-        message.error(`Error: ${err.message}`);
-        setIsUpdating(false);
-      });
-    } catch (error) {
-      message.error('Invalid JSON in one of the fields');
-    }
+      if (result.error) {
+        console.error('[HeroEdit] Update error:', result.error);
+        message.error(`Error: ${result.error.message}`);
+      } else {
+        message.success('Hero updated successfully');
+        invalidate({ resource: 'heroes', invalidates: ['list', 'detail'] });
+      }
+    }).catch((err) => {
+      console.error('[HeroEdit] Update mutation error:', err);
+      message.error(`Error: ${err.message}`);
+      setIsUpdating(false);
+    });
   };
 
   if (isLoading) {
@@ -205,15 +214,9 @@ export const HeroEdit: React.FC<IResourceComponentsProps> = () => {
         <Form.Item
           label="Set"
           name="set"
-          rules={[{ required: true, message: 'Please select a set!' }]}
+          rules={[{ required: true, message: 'Please input a set!' }]}
         >
-          <Select placeholder="Select set">
-            {SETS.map((set) => (
-              <Option key={set} value={set}>
-                {set}
-              </Option>
-            ))}
-          </Select>
+          <Input placeholder="Enter set name" />
         </Form.Item>
 
         <Form.Item

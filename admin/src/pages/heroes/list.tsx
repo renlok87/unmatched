@@ -1,17 +1,18 @@
 import { List } from '@refinedev/antd';
 import { IResourceComponentsProps } from '@refinedev/core';
-import { Table, Space, Tag, Image, Typography, Button, Modal, message } from 'antd';
-import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Table, Space, Tag, Avatar, Typography, Button, Modal, message, Input, Select } from 'antd';
+import { EyeOutlined, EditOutlined, DeleteOutlined, SearchOutlined, PictureOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { client } from '../../providers/dataProvider';
 import { gql } from 'urql';
+import { useDebounce } from '../../hooks/useDebounce';
 
 const { Text } = Typography;
 
 const GET_HEROES = gql`
-  query GetHeroes($page: Int!, $limit: Int!) {
-    heroList(page: $page, limit: $limit) {
+  query GetHeroes($page: Int!, $limit: Int!, $search: String, $sortBy: String, $sortOrder: String) {
+    heroList(page: $page, limit: $limit, search: $search, sortBy: $sortBy, sortOrder: $sortOrder) {
       items {
         id
         name
@@ -41,14 +42,22 @@ export const HeroList: React.FC<IResourceComponentsProps> = () => {
   const [heroes, setHeroes] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search);
+  const [sortBy, setSortBy] = useState<string>('createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const pageSize = 20;
 
   const fetchHeroes = async (page: number = 1) => {
     setLoading(true);
-    console.log('[HeroList] Fetching heroes, page:', page);
     try {
-      const result = await client.query(GET_HEROES, { page, limit: pageSize }).toPromise();
-      console.log('[HeroList] Result:', result);
+      const result = await client.query(GET_HEROES, {
+        page,
+        limit: pageSize,
+        search: debouncedSearch || undefined,
+        sortBy,
+        sortOrder,
+      }).toPromise();
 
       if (result.error) {
         console.error('[HeroList] GraphQL error:', result.error);
@@ -56,7 +65,6 @@ export const HeroList: React.FC<IResourceComponentsProps> = () => {
       }
 
       const data = result.data?.heroList;
-      console.log('[HeroList] Parsed data:', data);
 
       setHeroes(data?.items || []);
       setTotal(data?.total || 0);
@@ -69,12 +77,25 @@ export const HeroList: React.FC<IResourceComponentsProps> = () => {
   };
 
   useEffect(() => {
-    console.log('[HeroList] Component mounted, fetching heroes...');
     fetchHeroes(1);
-  }, []);
+  }, [debouncedSearch, sortBy, sortOrder]);
 
   const handlePageChange = (page: number) => {
     fetchHeroes(page);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleSortChange = (value: string) => {
+    if (value === sortBy) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(value);
+      setSortOrder('asc');
+    }
   };
 
   const handleDelete = (id: string, name: string) => {
@@ -86,7 +107,6 @@ export const HeroList: React.FC<IResourceComponentsProps> = () => {
       cancelText: 'Cancel',
       onOk: async () => {
         try {
-          console.log('[HeroList] Deleting hero:', id);
           const result = await client.mutation(DELETE_HERO, { id }).toPromise();
 
           if (result.error) {
@@ -107,108 +127,137 @@ export const HeroList: React.FC<IResourceComponentsProps> = () => {
 
   return (
     <List>
-      <Table
-        loading={loading}
-        dataSource={heroes}
-        rowKey="id"
-        pagination={{
-          current: currentPage,
-          pageSize: pageSize,
-          total: total,
-          onChange: handlePageChange,
-          showSizeChanger: false,
-        }}
-      >
-        <Table.Column
-          dataIndex="imageUrl"
-          title="Avatar"
-          render={(url: string) => (
-            <Image
-              src={url || '/placeholder.png'}
-              alt="Hero"
-              width={50}
-              height={50}
-              style={{ objectFit: 'cover', borderRadius: 6 }}
-              fallback="/placeholder.png"
-            />
-          )}
-        />
-        <Table.Column
-          dataIndex="name"
-          title="Name"
-          render={(text: string, record: any) => (
-            <Space direction="vertical" size={0}>
-              <Text strong>{text}</Text>
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                {record.nameEn} / {record.nameRu}
-              </Text>
-            </Space>
-          )}
-        />
-        <Table.Column
-          dataIndex="set"
-          title="Set"
-          render={(set: string) => <Tag color="blue">{set}</Tag>}
-        />
-        <Table.Column
-          dataIndex="health"
-          title="Health"
-          align="center"
-          render={(health: number) => (
-            <Tag color={health > 20 ? 'green' : health > 10 ? 'orange' : 'red'}>
-              {health} HP
-            </Tag>
-          )}
-        />
-        <Table.Column
-          dataIndex="fighterType"
-          title="Type"
-          render={(type: string) => {
-            const colors: Record<string, string> = {
-              HERO: 'purple',
-              MINION: 'blue',
-              VILLAIN: 'red',
-              HUGE: 'orange',
-            };
-            return <Tag color={colors[type] || 'default'}>{type}</Tag>;
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Space>
+          <Input
+            placeholder="Search by name or set..."
+            prefix={<SearchOutlined />}
+            value={search}
+            onChange={handleSearchChange}
+            allowClear
+            style={{ width: 300 }}
+          />
+          <Select
+            placeholder="Sort by"
+            value={sortBy}
+            onChange={handleSortChange}
+            style={{ width: 150 }}
+          >
+            <Select.Option value="name">Name</Select.Option>
+            <Select.Option value="set">Set</Select.Option>
+            <Select.Option value="health">Health</Select.Option>
+            <Select.Option value="fighterType">Type</Select.Option>
+            <Select.Option value="createdAt">Created</Select.Option>
+          </Select>
+          <Button
+            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+          >
+            {sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
+          </Button>
+        </Space>
+        <Table
+          loading={loading}
+          dataSource={heroes}
+          rowKey="id"
+          pagination={{
+            current: currentPage,
+            pageSize: pageSize,
+            total: total,
+            onChange: handlePageChange,
+            showSizeChanger: false,
           }}
-        />
-        <Table.Column
-          dataIndex="createdAt"
-          title="Created At"
-          render={(date: string) => new Date(date).toLocaleDateString()}
-        />
-        <Table.Column
-          title="Actions"
-          dataIndex="actions"
-          render={(_, record: any) => (
-            <Space>
-              <Button
-                size="small"
-                icon={<EyeOutlined />}
-                onClick={() => navigate(`/heroes/show/${record.id}`)}
-              >
-                Show
-              </Button>
-              <Button
-                size="small"
-                icon={<EditOutlined />}
-                onClick={() => navigate(`/heroes/edit/${record.id}`)}
-              >
-                Edit
-              </Button>
-              <Button
-                size="small"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => handleDelete(record.id, record.name)}
-              >
-                Delete
-              </Button>
-            </Space>
-          )}
-        />
-      </Table>
+        >
+          <Table.Column
+            dataIndex="imageUrl"
+            title="Avatar"
+            render={(url: string) => (
+              // Avatar сам показывает icon-заглушку при отсутствии/ошибке загрузки src
+              <Avatar
+                shape="square"
+                size={50}
+                src={url || undefined}
+                icon={<PictureOutlined />}
+                style={{ borderRadius: 6 }}
+              />
+            )}
+          />
+          <Table.Column
+            dataIndex="name"
+            title="Name"
+            render={(text: string, record: any) => (
+              <Space direction="vertical" size={0}>
+                <Text strong>{text}</Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  {record.nameEn} / {record.nameRu}
+                </Text>
+              </Space>
+            )}
+          />
+          <Table.Column
+            dataIndex="set"
+            title="Set"
+            render={(set: string) => <Tag color="blue">{set}</Tag>}
+          />
+          <Table.Column
+            dataIndex="health"
+            title="Health"
+            align="center"
+            render={(health: number) => (
+              <Tag color={health > 20 ? 'green' : health > 10 ? 'orange' : 'red'}>
+                {health} HP
+              </Tag>
+            )}
+          />
+          <Table.Column
+            dataIndex="fighterType"
+            title="Type"
+            render={(type: string) => {
+              const colors: Record<string, string> = {
+                HERO: 'purple',
+                MINION: 'blue',
+                VILLAIN: 'red',
+                HUGE: 'orange',
+              };
+              return <Tag color={colors[type] || 'default'}>{type}</Tag>;
+            }}
+          />
+          <Table.Column
+            dataIndex="createdAt"
+            title="Created At"
+            render={(date: string) => new Date(date).toLocaleDateString()}
+          />
+          <Table.Column
+            title="Actions"
+            dataIndex="actions"
+            render={(_, record: any) => (
+              <Space>
+                <Button
+                  size="small"
+                  icon={<EyeOutlined />}
+                  onClick={() => navigate(`/heroes/show/${record.id}`)}
+                >
+                  Show
+                </Button>
+                <Button
+                  size="small"
+                  icon={<EditOutlined />}
+                  onClick={() => navigate(`/heroes/edit/${record.id}`)}
+                >
+                  Edit
+                </Button>
+                <Button
+                  size="small"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleDelete(record.id, record.name)}
+                >
+                  Delete
+                </Button>
+              </Space>
+            )}
+          />
+        </Table>
+      </Space>
     </List>
   );
 };

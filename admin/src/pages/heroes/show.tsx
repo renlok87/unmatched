@@ -1,64 +1,15 @@
 import { Show } from '@refinedev/antd';
 import { IResourceComponentsProps, useShow } from '@refinedev/core';
 import { Typography, Space, Tag, Image, Descriptions, Divider } from 'antd';
-import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { client } from '../../providers/dataProvider';
 
 const { Title, Text } = Typography;
 
-const GET_HERO = `
-  query GetHero($id: String!) {
-    adminHero(id: $id) {
-      id
-      name
-      nameEn
-      nameRu
-      set
-      health
-      fighterType
-      ability
-      deckCards
-      properties
-      imageUrl
-      avatarUrl
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
 export const HeroShow: React.FC<IResourceComponentsProps> = () => {
-  const { query } = useShow();
-  const heroData = query?.data as any;
-  const { id } = useParams();
-  const [directData, setDirectData] = useState<any>(null);
-
-  console.log('[HeroShow] useParams id:', id);
-  console.log('[HeroShow] query:', query);
-  console.log('[HeroShow] heroData:', heroData);
-
-  // Загружаем данные напрямую, если Refine не справляется
-  useEffect(() => {
-    if (id) {
-      console.log('[HeroShow] Fetching hero directly, id:', id);
-      client.query(GET_HERO, { id }).toPromise().then((result) => {
-        console.log('[HeroShow] Direct fetch result:', result);
-        if (result.error) {
-          console.error('[HeroShow] GraphQL error:', result.error);
-        } else {
-          console.log('[HeroShow] Hero data:', result.data);
-          setDirectData(result.data?.adminHero);
-        }
-      });
-    }
-  }, [id]);
-
-  // Используем данные либо из directData, либо из heroData
-  const data = directData || heroData;
+  const { query, result } = useShow();
+  const data = result as any;
 
   return (
-    <Show>
+    <Show isLoading={query.isLoading}>
       <Space direction="vertical" style={{ width: '100%' }} size="large">
         <div>
           <Title level={3}>{data?.name || 'Hero'}</Title>
@@ -97,6 +48,49 @@ export const HeroShow: React.FC<IResourceComponentsProps> = () => {
             {data?.updatedAt ? new Date(data.updatedAt).toLocaleString() : '-'}
           </Descriptions.Item>
         </Descriptions>
+
+        {data?.cards && data.cards.length > 0 && (
+          <>
+            <Divider />
+            <div>
+              <Title level={4}>Cards ({data.cards.length})</Title>
+              <Space direction="vertical" style={{ width: '100%' }}>
+                {data.cards.map((card: any) => (
+                  <div
+                    key={card.id}
+                    style={{
+                      background: '#fafafa',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: 6,
+                      padding: 12,
+                    }}
+                  >
+                    <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text strong>{card.name}</Text>
+                        <Tag color={card.cardType === 'ATTACK' ? 'red' : card.cardType === 'DEFENSE' ? 'blue' : card.cardType === 'SCHEME' ? 'green' : 'orange'}>
+                          {card.cardType} x{card.count}
+                        </Tag>
+                      </div>
+                      {(card.attackValue || card.defenseValue || card.boostValue) && (
+                        <Text type="secondary">
+                          {card.attackValue && `⚔️ ${card.attackValue}`}
+                          {card.defenseValue && ` 🛡️ ${card.defenseValue}`}
+                          {card.boostValue && ` ⬆️ ${card.boostValue}`}
+                        </Text>
+                      )}
+                      {card.text && (
+                        <Text type="secondary" style={{ display: 'block', marginTop: 4 }}>
+                          {card.text}
+                        </Text>
+                      )}
+                    </Space>
+                  </div>
+                ))}
+              </Space>
+            </div>
+          </>
+        )}
 
         {data?.ability && (
           <>

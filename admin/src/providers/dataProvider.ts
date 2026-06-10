@@ -8,17 +8,16 @@ const getToken = () => localStorage.getItem('accessToken');
 export const client = createClient({
   url: `${BACKEND_URL}/graphql`,
   exchanges: [fetchExchange],
-  fetchOptions: () => ({
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-    },
-  }),
+  fetchOptions: () => {
+    const token = getToken();
+    return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+  },
 });
 
 // GraphQL queries для каждого ресурса
 const GET_HEROES_LIST = gql`
-  query GetHeroesList($page: Int!, $limit: Int!) {
-    heroList(page: $page, limit: $limit) {
+  query GetHeroesList($page: Int!, $limit: Int!, $search: String, $sortBy: String, $sortOrder: String) {
+    heroList(page: $page, limit: $limit, search: $search, sortBy: $sortBy, sortOrder: $sortOrder) {
       items {
         id
         name
@@ -27,7 +26,6 @@ const GET_HEROES_LIST = gql`
         set
         health
         fighterType
-        ability
         imageUrl
         avatarUrl
         createdAt
@@ -47,11 +45,18 @@ const GET_HERO = gql`
       set
       health
       fighterType
+      movement
+      color
       ability
       deckCards
       properties
+      hasTokens
+      sidekicks
+      additionalMinis
       imageUrl
       avatarUrl
+      characterCardUrl
+      miniModelUrl
       createdAt
       updatedAt
     }
@@ -59,8 +64,8 @@ const GET_HERO = gql`
 `;
 
 const GET_CARDS_LIST = gql`
-  query GetCardsList($page: Int!, $limit: Int!) {
-    cardList(page: $page, limit: $limit) {
+  query GetCardsList($page: Int!, $limit: Int!, $search: String, $sortBy: String, $sortOrder: String) {
+    cardList(page: $page, limit: $limit, search: $search, sortBy: $sortBy, sortOrder: $sortOrder) {
       items {
         id
         name
@@ -73,6 +78,8 @@ const GET_CARDS_LIST = gql`
         boostValue
         count
         heroId
+        imageUrl
+        imageUrlRu
         createdAt
       }
       total
@@ -92,12 +99,20 @@ const GET_CARD = gql`
       attackValue
       defenseValue
       boostValue
+      bannerName
       effects
       text
       textEn
       textRu
+      effectAfter
+      effectDuring
+      effectBoost
+      effectImmediately
+      effectOngoing
       heroId
       count
+      imageUrl
+      imageUrlRu
       createdAt
       updatedAt
     }
@@ -105,8 +120,8 @@ const GET_CARD = gql`
 `;
 
 const GET_BOARDS_LIST = gql`
-  query GetBoardsList($page: Int!, $limit: Int!) {
-    boardList(page: $page, limit: $limit) {
+  query GetBoardsList($page: Int!, $limit: Int!, $search: String, $sortBy: String, $sortOrder: String) {
+    boardList(page: $page, limit: $limit, search: $search, sortBy: $sortBy, sortOrder: $sortOrder) {
       items {
         id
         name
@@ -115,8 +130,6 @@ const GET_BOARDS_LIST = gql`
         set
         width
         height
-        cells
-        features
         imageUrl
         imageUrlDark
         createdAt
@@ -147,8 +160,8 @@ const GET_BOARD = gql`
 `;
 
 const GET_USERS_LIST = gql`
-  query GetUsersList($page: Int!, $limit: Int!) {
-    userList(page: $page, limit: $limit) {
+  query GetUsersList($page: Int!, $limit: Int!, $search: String, $sortBy: String, $sortOrder: String) {
+    userList(page: $page, limit: $limit, search: $search, sortBy: $sortBy, sortOrder: $sortOrder) {
       users {
         id
         username
@@ -170,13 +183,15 @@ const GET_USERS_LIST = gql`
 
 const GET_USER = gql`
   query GetUser($id: String!) {
-    user(id: $id) {
+    adminUser(id: $id) {
       id
       username
       email
       avatar
       role
       createdAt
+      updatedAt
+      deletedAt
       emailVerified
       stats {
         gamesPlayed
@@ -189,10 +204,14 @@ const GET_USER = gql`
 
 const GET_GAME = gql`
   query GetGame($id: String!) {
-    game(id: $id) {
+    adminGame(id: $id) {
       id
+      code
+      mode
       status
       createdAt
+      startedAt
+      finishedAt
       boardId
       boardName
       gamePlayers {
@@ -208,8 +227,8 @@ const GET_GAME = gql`
 `;
 
 const GET_GAMES_LIST = gql`
-  query GetGamesList($page: Int!, $limit: Int!) {
-    gameList(page: $page, limit: $limit) {
+  query GetGamesList($page: Int!, $limit: Int!, $search: String, $sortBy: String, $sortOrder: String) {
+    gameList(page: $page, limit: $limit, search: $search, sortBy: $sortBy, sortOrder: $sortOrder) {
       items {
         id
         status
@@ -273,9 +292,15 @@ const CREATE_HERO = gql`
       set
       health
       fighterType
+      movement
+      color
       ability
+      hasTokens
+      sidekicks
       imageUrl
       avatarUrl
+      characterCardUrl
+      miniModelUrl
       createdAt
     }
   }
@@ -291,9 +316,15 @@ const UPDATE_HERO = gql`
       set
       health
       fighterType
+      movement
+      color
       ability
+      hasTokens
+      sidekicks
       imageUrl
       avatarUrl
+      characterCardUrl
+      miniModelUrl
       createdAt
     }
   }
@@ -317,8 +348,11 @@ const CREATE_CARD = gql`
       attackValue
       defenseValue
       boostValue
+      bannerName
       count
       heroId
+      imageUrl
+      imageUrlRu
       createdAt
     }
   }
@@ -336,8 +370,11 @@ const UPDATE_CARD = gql`
       attackValue
       defenseValue
       boostValue
+      bannerName
       count
       heroId
+      imageUrl
+      imageUrlRu
       createdAt
     }
   }
@@ -389,33 +426,48 @@ const DELETE_BOARD = gql`
   }
 `;
 
-export const dataProvider: DataProvider = {
-  getList: async ({ resource, pagination }) => {
-    console.log(`[dataProvider] getList called for resource: ${resource}`, pagination);
+const UPDATE_USER = gql`
+  mutation UpdateUser($id: String!, $input: UpdateUserInput!) {
+    updateUser(id: $id, input: $input) {
+      id
+      username
+      email
+      role
+    }
+  }
+`;
 
+export const dataProvider: DataProvider = {
+  getList: async ({ resource, pagination, filters, sorters }) => {
     let query;
     let extractItems: (data: any) => { items: any[]; total: number };
+    let supportsSearch = false;
 
     switch (resource) {
       case 'heroes':
         query = GET_HEROES_LIST;
         extractItems = (data) => ({ items: data.heroList.items, total: data.heroList.total });
+        supportsSearch = true;
         break;
       case 'cards':
         query = GET_CARDS_LIST;
         extractItems = (data) => ({ items: data.cardList.items, total: data.cardList.total });
+        supportsSearch = true;
         break;
       case 'boards':
         query = GET_BOARDS_LIST;
         extractItems = (data) => ({ items: data.boardList.items, total: data.boardList.total });
+        supportsSearch = true;
         break;
       case 'users':
         query = GET_USERS_LIST;
         extractItems = (data) => ({ items: data.userList.users, total: data.userList.total });
+        supportsSearch = true;
         break;
       case 'games':
         query = GET_GAMES_LIST;
         extractItems = (data) => ({ items: data.gameList.items, total: data.gameList.total });
+        supportsSearch = true;
         break;
       case 'matchmakingQueue':
         query = GET_MATCHMAKING_QUEUE;
@@ -426,28 +478,47 @@ export const dataProvider: DataProvider = {
         extractItems = (data) => ({ items: data.auditLogs.items, total: data.auditLogs.total });
         break;
       default:
-        console.error(`[dataProvider] Unknown resource: ${resource}`);
-        return { data: [], total: 0 };
+        throw new Error(`No getList query found for resource: ${resource}`);
     }
 
-    const page = 1;
+    const page = pagination?.currentPage || 1;
     const perPage = pagination?.pageSize || 20;
 
-    console.log(`[dataProvider] Fetching ${resource} with page=${page}, limit=${perPage}`);
+    const variables: Record<string, unknown> =
+      resource === 'matchmakingQueue' ? {} : { page, limit: perPage };
+
+    if (supportsSearch) {
+      if (filters) {
+        for (const filter of filters) {
+          if (
+            'field' in filter &&
+            (filter.field === 'q' || filter.field === 'search' || filter.operator === 'contains') &&
+            filter.value !== undefined &&
+            filter.value !== null &&
+            filter.value !== ''
+          ) {
+            variables.search = String(filter.value);
+            break;
+          }
+        }
+      }
+
+      const sorter = sorters?.[0];
+      if (sorter) {
+        variables.sortBy = sorter.field;
+        variables.sortOrder = sorter.order;
+      }
+    }
 
     try {
-      const result = await client.query(query, { page, limit: perPage }).toPromise();
+      const result = await client.query(query, variables).toPromise();
 
       if (result.error) {
         console.error('[dataProvider] GraphQL error:', result.error);
         throw result.error;
       }
 
-      console.log(`[dataProvider] Raw response for ${resource}:`, result.data);
-
       const { items, total } = extractItems(result.data || {});
-
-      console.log(`[dataProvider] Returning ${items.length} items, total: ${total}`);
 
       return { data: items, total };
     } catch (error) {
@@ -456,9 +527,7 @@ export const dataProvider: DataProvider = {
     }
   },
 
-  getOne: async ({ resource, id, meta, resourceParams }) => {
-    console.log(`[dataProvider] getOne called for resource: ${resource}, id: ${id}`, { meta, resourceParams });
-
+  getOne: async ({ resource, id, meta }) => {
     let query;
     let dataKey: string;
 
@@ -477,11 +546,11 @@ export const dataProvider: DataProvider = {
         break;
       case 'users':
         query = GET_USER;
-        dataKey = 'user';
+        dataKey = 'adminUser';
         break;
       case 'games':
         query = GET_GAME;
-        dataKey = 'game';
+        dataKey = 'adminGame';
         break;
       default:
         throw new Error(`No getOne query found for resource: ${resource}`);
@@ -497,19 +566,11 @@ export const dataProvider: DataProvider = {
     if (!actualId && (meta as any)?.identifier) {
       actualId = (meta as any).identifier as string;
     }
-    if (!actualId && resourceParams?.id) {
-      actualId = resourceParams.id as string;
-    }
-    if (!actualId && (resourceParams as any)?.identifier) {
-      actualId = (resourceParams as any).identifier as string;
-    }
 
     if (!actualId) {
-      console.error(`[dataProvider] No ID provided for ${resource}`, { id, meta, resourceParams });
+      console.error(`[dataProvider] No ID provided for ${resource}`, { id, meta });
       throw new Error(`No ID provided for resource: ${resource}`);
     }
-
-    console.log(`[dataProvider] Using actualId: ${actualId} for ${resource}`);
 
     try {
       const result = await client.query(query, { id: actualId }).toPromise();
@@ -518,7 +579,6 @@ export const dataProvider: DataProvider = {
         throw result.error;
       }
 
-      console.log(`[dataProvider] Successfully fetched ${resource}:`, result.data?.[dataKey]);
       return { data: result.data?.[dataKey] };
     } catch (error) {
       console.error(`[dataProvider] Error fetching ${resource} with id ${actualId}:`, error);
@@ -527,8 +587,6 @@ export const dataProvider: DataProvider = {
   },
 
   create: async ({ resource, variables }) => {
-    console.log(`[dataProvider] create called for resource: ${resource}`);
-
     let query;
     let dataKey: string;
 
@@ -563,9 +621,7 @@ export const dataProvider: DataProvider = {
     }
   },
 
-  update: async ({ resource, id, variables, meta, resourceParams }) => {
-    console.log(`[dataProvider] update called for resource: ${resource}, id: ${id}`, { meta, resourceParams });
-
+  update: async ({ resource, id, variables, meta }) => {
     let query;
     let dataKey: string;
 
@@ -582,6 +638,10 @@ export const dataProvider: DataProvider = {
         query = UPDATE_BOARD;
         dataKey = 'updateBoard';
         break;
+      case 'users':
+        query = UPDATE_USER;
+        dataKey = 'updateUser';
+        break;
       default:
         throw new Error(`No update mutation found for resource: ${resource}`);
     }
@@ -589,14 +649,11 @@ export const dataProvider: DataProvider = {
     // Extract ID from various possible locations
     let actualId = id;
     if (!actualId && meta?.id) actualId = meta.id as string;
-    if (!actualId && resourceParams?.id) actualId = resourceParams.id as string;
 
     if (!actualId) {
-      console.error(`[dataProvider] No ID provided for update ${resource}`, { id, meta, resourceParams });
+      console.error(`[dataProvider] No ID provided for update ${resource}`, { id, meta });
       throw new Error(`No ID provided for update resource: ${resource}`);
     }
-
-    console.log(`[dataProvider] Using actualId: ${actualId} for update ${resource}`);
 
     try {
       const result = await client.mutation(query, { id: actualId, input: variables }).toPromise();
@@ -612,24 +669,18 @@ export const dataProvider: DataProvider = {
     }
   },
 
-  deleteOne: async ({ resource, id, meta, resourceParams }) => {
-    console.log(`[dataProvider] deleteOne called for resource: ${resource}, id: ${id}`, { meta, resourceParams });
-
+  deleteOne: async ({ resource, id, meta }) => {
     let query;
-    let dataKey: string;
 
     switch (resource) {
       case 'heroes':
         query = DELETE_HERO;
-        dataKey = 'deleteHero';
         break;
       case 'cards':
         query = DELETE_CARD;
-        dataKey = 'deleteCard';
         break;
       case 'boards':
         query = DELETE_BOARD;
-        dataKey = 'deleteBoard';
         break;
       default:
         throw new Error(`No delete mutation found for resource: ${resource}`);
@@ -638,14 +689,11 @@ export const dataProvider: DataProvider = {
     // Extract ID from various possible locations
     let actualId = id;
     if (!actualId && meta?.id) actualId = meta.id as string;
-    if (!actualId && resourceParams?.id) actualId = resourceParams.id as string;
 
     if (!actualId) {
-      console.error(`[dataProvider] No ID provided for delete ${resource}`, { id, meta, resourceParams });
+      console.error(`[dataProvider] No ID provided for delete ${resource}`, { id, meta });
       throw new Error(`No ID provided for delete resource: ${resource}`);
     }
-
-    console.log(`[dataProvider] Using actualId: ${actualId} for delete ${resource}`);
 
     try {
       const result = await client.mutation(query, { id: actualId }).toPromise();
@@ -654,7 +702,7 @@ export const dataProvider: DataProvider = {
         throw result.error;
       }
 
-      return { data: result.data?.[dataKey] };
+      return { data: { id: actualId } as any };
     } catch (error) {
       console.error(`[dataProvider] Error deleting ${resource}:`, error);
       throw error;
