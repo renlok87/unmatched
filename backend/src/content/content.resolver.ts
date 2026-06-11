@@ -1,12 +1,8 @@
 import { Resolver, Query, Args, Parent, ResolveField, Int } from '@nestjs/graphql';
 import { Public } from '../common/decorators';
-import { ContentService } from './content.service';
+import { ContentDbService } from './content-db.service';
 import { ContentMapper } from './mappers/content.mapper';
-import type {
-  HeroDefinition,
-  CardDefinition,
-  BoardDefinition,
-} from './interfaces';
+import type { HeroDefinition, CardDefinition, BoardDefinition } from './interfaces';
 import {
   HeroDto,
   CardDto,
@@ -22,14 +18,14 @@ import {
 @Resolver(() => HeroDto)
 export class HeroResolver {
   constructor(
-    private readonly contentService: ContentService,
+    private readonly contentDbService: ContentDbService,
     private readonly mapper: ContentMapper,
   ) {}
 
   @ResolveField(() => [CardDto], { name: 'cards' })
   async getCards(@Parent() hero: HeroDto): Promise<CardDto[]> {
-    const fullHero = await this.contentService.getHeroById(hero.id);
-    return fullHero.deckCards.map(c => this.mapper.toCardDto(c));
+    const fullHero = await this.contentDbService.getHeroBySlug(hero.id);
+    return fullHero.deckCards.map((c) => this.mapper.toCardDto(c));
   }
 }
 
@@ -47,7 +43,7 @@ export class BoardSpaceResolver {}
 @Resolver()
 export class ContentResolver {
   constructor(
-    private readonly contentService: ContentService,
+    private readonly contentDbService: ContentDbService,
     private readonly mapper: ContentMapper,
   ) {}
 
@@ -57,7 +53,7 @@ export class ContentResolver {
   @Query(() => [HeroDto], { name: 'heroes' })
   @Public()
   async getAllHeroes(): Promise<HeroDefinition[]> {
-    return this.contentService.getAllHeroes();
+    return this.contentDbService.getAllHeroes();
   }
 
   /**
@@ -70,7 +66,7 @@ export class ContentResolver {
     @Args('limit', { type: () => Int, nullable: true }) limit?: number,
     @Args('set', { nullable: true }) set?: string,
   ): Promise<PaginatedHeroesDto> {
-    return this.contentService.getHeroesPaginated(page || 1, limit || 10, set);
+    return this.contentDbService.getHeroesPaginated(page || 1, limit || 10, set);
   }
 
   /**
@@ -80,7 +76,7 @@ export class ContentResolver {
   @Public()
   async getHero(@Args('id') id: string): Promise<HeroDefinition | null> {
     try {
-      return await this.contentService.getHeroById(id);
+      return await this.contentDbService.getHeroBySlug(id);
     } catch {
       return null;
     }
@@ -92,7 +88,20 @@ export class ContentResolver {
   @Query(() => [CardDto], { name: 'cards' })
   @Public()
   async getCards(@Args('heroId') heroId: string): Promise<CardDefinition[]> {
-    return this.contentService.getCardsByHero(heroId);
+    return this.contentDbService.getCardsByHero(heroId);
+  }
+
+  /**
+   * Get a single card by ID (from database)
+   */
+  @Query(() => CardDto, { name: 'card', nullable: true })
+  @Public()
+  async getCard(@Args('id') id: string): Promise<CardDto | null> {
+    const cardDefinition = await this.contentDbService.getCardById(id);
+    if (!cardDefinition) {
+      return null;
+    }
+    return this.mapper.toCardDto(cardDefinition);
   }
 
   /**
@@ -101,7 +110,7 @@ export class ContentResolver {
   @Query(() => [BoardDto], { name: 'boards' })
   @Public()
   async getAllBoards(): Promise<BoardDefinition[]> {
-    return this.contentService.getAllBoards();
+    return this.contentDbService.getAllBoards();
   }
 
   /**
@@ -113,7 +122,7 @@ export class ContentResolver {
     @Args('page', { type: () => Int, nullable: true }) page?: number,
     @Args('limit', { type: () => Int, nullable: true }) limit?: number,
   ): Promise<PaginatedBoardsDto> {
-    return this.contentService.getBoardsPaginated(page || 1, limit || 10);
+    return this.contentDbService.getBoardsPaginated(page || 1, limit || 10);
   }
 
   /**
@@ -123,7 +132,7 @@ export class ContentResolver {
   @Public()
   async getBoard(@Args('id') id: string): Promise<BoardDefinition | null> {
     try {
-      return await this.contentService.getBoardById(id);
+      return await this.contentDbService.getBoardBySlug(id);
     } catch {
       return null;
     }
@@ -135,7 +144,7 @@ export class ContentResolver {
   @Query(() => String, { name: 'contentVersion' })
   @Public()
   getContentVersion(): string {
-    return this.contentService.getCurrentVersion();
+    return this.contentDbService.getCurrentVersion();
   }
 
   /**
@@ -144,7 +153,7 @@ export class ContentResolver {
   @Query(() => [String], { name: 'sets' })
   @Public()
   async getAllSets(): Promise<string[]> {
-    return this.contentService.getAllSets();
+    return this.contentDbService.getAllSets();
   }
 
   /**
@@ -153,7 +162,7 @@ export class ContentResolver {
   @Query(() => [HeroDto], { name: 'heroesBySet' })
   @Public()
   async getHeroesBySet(@Args('set') set: string): Promise<HeroDefinition[]> {
-    return this.contentService.getHeroesBySet(set);
+    return this.contentDbService.getHeroesBySet(set);
   }
 
   /**
@@ -162,7 +171,7 @@ export class ContentResolver {
   @Query(() => ContentSummaryDto, { name: 'contentSummary' })
   @Public()
   async getContentSummary() {
-    return this.contentService.getContentSummary();
+    return this.contentDbService.getContentSummary();
   }
 
   /**
@@ -171,7 +180,7 @@ export class ContentResolver {
   @Query(() => Boolean, { name: 'clearContentCache' })
   @Public()
   async clearCache(): Promise<boolean> {
-    await this.contentService.clearCache();
+    await this.contentDbService.clearCache();
     return true;
   }
 }

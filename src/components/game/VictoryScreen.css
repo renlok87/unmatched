@@ -1,0 +1,426 @@
+/* ============================================================ */
+/* VICTORY SCREEN STYLES */
+/* ============================================================ */
+
+.victory-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------
+   Background Effects
+   ------------------------------------------------------------ */
+
+.victory-screen__background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.victory-screen__gradient {
+  position: absolute;
+  inset: 0;
+  opacity: 0.9;
+  transition: opacity 0.5s ease;
+}
+
+.victory-screen__gradient--victory {
+  background: radial-gradient(circle at center, #4ecca333 0%, #1a1a2e 70%);
+}
+
+.victory-screen__gradient--defeat {
+  background: radial-gradient(circle at center, #ff6b6b33 0%, #1a1a2e 70%);
+}
+
+.victory-screen__gradient--draw {
+  background: radial-gradient(circle at center, #ffd93d33 0%, #1a1a2e 70%);
+}
+
+/* Particles */
+.victory-screen__particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.victory-screen__particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+  border-radius: 50%;
+  opacity: 0;
+  animation: particle-float 3s ease-in-out infinite;
+}
+
+.victory-screen--victory .victory-screen__particle {
+  color: #4ecca3;
+  background: radial-gradient(circle, #4ecca3 0%, transparent 70%);
+}
+
+.victory-screen--defeat .victory-screen__particle {
+  color: #ff6b6b;
+  background: radial-gradient(circle, #ff6b6b 0%, transparent 70%);
+}
+
+.victory-screen--draw .victory-screen__particle {
+  color: #ffd93d;
+  background: radial-gradient(circle, #ffd93d 0%, transparent 70%);
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(1);
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------
+   Content
+   ------------------------------------------------------------ */
+
+.victory-screen__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 3rem;
+  max-width: 600px;
+  width: 90%;
+  text-align: center;
+
+  background: rgba(26, 26, 46, 0.95);
+  border-radius: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+
+  transform: scale(0.8) translateY(20px);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity 0.4s ease;
+}
+
+.victory-screen--visible .victory-screen__content {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+.victory-screen--exiting .victory-screen__content {
+  transform: scale(0.9) translateY(-10px);
+  opacity: 0;
+}
+
+/* ------------------------------------------------------------
+   Icon
+   ------------------------------------------------------------ */
+
+.victory-screen__icon {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 0.5rem;
+}
+
+.victory-screen__svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+  animation: icon-bounce 1s ease-out;
+}
+
+@keyframes icon-bounce {
+  0% {
+    transform: scale(0) rotate(-180deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* ------------------------------------------------------------
+   Title
+   ------------------------------------------------------------ */
+
+.victory-screen__title {
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+  animation: title-glow 2s ease-in-out infinite alternate;
+}
+
+.victory-screen--victory .victory-screen__title {
+  color: #4ecca3;
+  text-shadow: 0 0 30px #4ecca380, 0 0 60px #4ecca340;
+}
+
+.victory-screen--defeat .victory-screen__title {
+  color: #ff6b6b;
+  text-shadow: 0 0 30px #ff6b6b80, 0 0 60px #ff6b6b40;
+}
+
+.victory-screen--draw .victory-screen__title {
+  color: #ffd93d;
+  text-shadow: 0 0 30px #ffd93d80, 0 0 60px #ffd93d40;
+}
+
+@keyframes title-glow {
+  from {
+    filter: brightness(1);
+  }
+  to {
+    filter: brightness(1.2);
+  }
+}
+
+/* ------------------------------------------------------------
+   Reason
+   ------------------------------------------------------------ */
+
+.victory-screen__reason {
+  font-size: 1.25rem;
+  color: #ffffff;
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* ------------------------------------------------------------
+   Winner Info
+   ------------------------------------------------------------ */
+
+.victory-screen__winner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  color: #ffffff;
+  opacity: 0.8;
+}
+
+.victory-screen__winner-label {
+  font-weight: 600;
+  color: #4ecca3;
+}
+
+/* ------------------------------------------------------------
+   Stats
+   ------------------------------------------------------------ */
+
+.victory-screen__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  width: 100%;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  animation: stats-fade-in 0.5s ease-out 0.3s both;
+}
+
+@keyframes stats-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.victory-screen__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.victory-screen__stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.victory-screen__stat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #8888aa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ------------------------------------------------------------
+   Actions
+   ------------------------------------------------------------ */
+
+.victory-screen__actions {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.victory-screen__button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.victory-screen__button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.victory-screen__button:active {
+  transform: translateY(0);
+}
+
+.victory-screen__button--primary {
+  background: linear-gradient(135deg, #4ecca3 0%, #45b893 100%);
+  color: #000;
+}
+
+.victory-screen__button--victory {
+  background: linear-gradient(135deg, #ffd93d 0%, #f5c800 100%);
+  color: #000;
+  animation: button-shine 2s ease-in-out infinite;
+}
+
+@keyframes button-shine {
+  0%, 100% {
+    box-shadow: 0 0 20px #ffd93d40;
+  }
+  50% {
+    box-shadow: 0 0 40px #ffd93d80;
+  }
+}
+
+.victory-screen__button--secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.victory-screen__button--secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.victory-screen__button-icon {
+  font-size: 1.25rem;
+}
+
+/* ------------------------------------------------------------
+   Rewards
+   ------------------------------------------------------------ */
+
+.victory-screen__rewards {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #ffd93d20 0%, #4ecca320 100%);
+  border-radius: 100px;
+  border: 1px solid rgba(255, 217, 61, 0.3);
+
+  animation: rewards-appear 0.5s ease-out 0.5s both;
+}
+
+@keyframes rewards-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.victory-screen__reward {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.victory-screen__reward-icon {
+  font-size: 1.5rem;
+  animation: reward-spin 3s linear infinite;
+}
+
+@keyframes reward-spin {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+.victory-screen__reward-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffd93d;
+}
+
+/* ------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------ */
+
+@media (max-width: 640px) {
+  .victory-screen__content {
+    padding: 2rem 1.5rem;
+    width: 95%;
+  }
+
+  .victory-screen__title {
+    font-size: 2rem;
+  }
+
+  .victory-screen__stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .victory-screen__actions {
+    flex-direction: column;
+  }
+
+  .victory-screen__rewards {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

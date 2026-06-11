@@ -1,0 +1,130 @@
+.defender-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+  position: relative;
+}
+
+.defender-view__fighter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.defender-view__avatar {
+  position: relative;
+}
+
+.defender-view__fighter-type {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  font-size: 24px;
+  background: var(--color-darker);
+  border-radius: 50%;
+  padding: 4px;
+}
+
+.defender-view__info {
+  text-align: center;
+}
+
+.defender-view__name {
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-2);
+}
+
+.defender-view__health {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  min-width: 120px;
+}
+
+.defender-view__health-bar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.defender-view__health-fill {
+  height: 100%;
+  background: var(--color-success);
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.defender-view__health-text {
+  color: var(--color-gray-400);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.defender-view__modifiers {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 32px;
+}
+
+.defender-view__modifier {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-2);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  cursor: help;
+  transition: all 0.2s ease;
+}
+
+.defender-view__modifier:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.defender-view__modifier--boost {
+  border-color: rgba(255, 193, 7, 0.4);
+  color: #ffc107;
+}
+
+.defender-view__modifier--ignoreDefense {
+  border-color: rgba(156, 39, 176, 0.4);
+  color: #9c27b0;
+}
+
+.defender-view__modifier--doubleDamage {
+  border-color: rgba(244, 67, 54, 0.4);
+  color: #f44336;
+}
+
+.defender-view__modifier--shield {
+  border-color: rgba(33, 150, 243, 0.4);
+  color: #2196f3;
+}
+
+.defender-view__damage-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .defender-view__name {
+    font-size: var(--font-size-md);
+  }
+
+  .defender-view__health {
+    min-width: 100px;
+  }
+}

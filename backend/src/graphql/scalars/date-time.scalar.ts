@@ -10,9 +10,12 @@ export class DateTimeScalar implements CustomScalar<number, Date> {
     return new Date(value); // value from client
   }
 
-  serialize(value: unknown): number {
+serialize(value: unknown): number {
     if (value instanceof Date) {
       return value.getTime(); // value sent to client
+    }
+    if (typeof value === 'string') {
+      return new Date(value).getTime();
     }
     throw new GraphQLError(`Cannot serialize value: ${typeof value}`);
   }

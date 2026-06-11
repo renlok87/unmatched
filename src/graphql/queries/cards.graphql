@@ -1,0 +1,41 @@
+query GetCards($page: Int!, $limit: Int!) {
+  cardList(page: $page, limit: $limit) {
+    items {
+      id
+      name
+      nameEn
+      nameRu
+      cardType
+      subType
+      attackValue
+      defenseValue
+      boostValue
+      count
+      heroId
+      createdAt
+    }
+    total
+  }
+}
+
+query GetCard($id: String!) {
+  card(id: $id) {
+    id
+    name
+    nameEn
+    nameRu
+    cardType
+    subType
+    attackValue
+    defenseValue
+    boostValue
+    count
+    heroId
+    createdAt
+    effects {
+      id
+      timing
+      text
+    }
+  }
+}

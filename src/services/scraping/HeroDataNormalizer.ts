@@ -2,7 +2,7 @@
  * Hero data normalizer for processing raw API data
  */
 
-import type { HeroData, CardInfo, ImageCategory } from './types.js';
+import type { HeroData, CardInfo, ImageCategory, SidekickInfo } from './types.js';
 
 /**
  * Extract all strings from object recursively
@@ -137,11 +137,17 @@ export function normalizeHeroData(slug: string, rawData: unknown): HeroData {
   // Find card cover URL
   const cardCover = urls.find(u => u.includes('/card-covers/'));
 
-  // Find model URL
-  const model = urls.find(u => u.includes('/models/') || u.includes('.glb'));
+  // Find model URL (3D)
+  const model = urls.find(u => u.includes('/models/') || u.includes('.glb') || u.includes('.gltf'));
+
+  // Find character card URL
+  const characterCard = urls.find(u => u.includes('/character-cards/'));
 
   // Try to find name
   const name = findByPattern(/^[A-Z][A-Za-z\s\-'']+\p{L}/u) || slug;
+
+  // Extract additional data from the raw SvelteKit structure
+  const additionalData = extractAdditionalHeroData(rawData);
 
   return {
     slug,
@@ -151,10 +157,149 @@ export function normalizeHeroData(slug: string, rawData: unknown): HeroData {
       mini,
       cardCover,
       model,
+      characterCard,
     },
     cards,
     images: urls,
+    ...additionalData,
   };
+}
+
+/**
+ * Extract additional hero data from the complex SvelteKit structure
+ */
+function extractAdditionalHeroData(rawData: unknown): Partial<HeroData> {
+  const result: Partial<HeroData> = {};
+
+  try {
+    // Navigate the SvelteKit structure
+    if (rawData && typeof rawData === 'object' && 'nodes' in rawData) {
+      const nodes = (rawData as any).nodes;
+      if (Array.isArray(nodes) && nodes[2] && 'data' in nodes[2]) {
+        const data = nodes[2].data as any[];
+        if (Array.isArray(data) && data[1]) {
+          const heroSchema = data[1];
+
+          // Helper function to resolve values by index
+          const resolveValue = (index: number | null | undefined): any => {
+            if (index === null || index === undefined || index < 0) return null;
+            return data[index];
+          };
+
+          // Extract movement
+          const move = resolveValue(heroSchema.move);
+          if (typeof move === 'number') {
+            result.movement = move;
+          }
+
+          // Extract color
+          const color = resolveValue(heroSchema.color);
+          if (typeof color === 'string' && color.startsWith('#')) {
+            result.color = color;
+          }
+
+          // Extract health
+          const health = resolveValue(heroSchema.startHealth);
+          if (typeof health === 'number') {
+            result.health = health;
+          }
+
+          // Extract attack type
+          const attack = resolveValue(heroSchema.attack);
+          if (typeof attack === 'string') {
+            result.attackType = attack;
+          }
+
+          // Extract special ability
+          const ability = resolveValue(heroSchema.specialAbility);
+          if (typeof ability === 'string') {
+            result.specialAbility = ability;
+          }
+
+          // Extract hasTokens
+          const hasTokens = resolveValue(heroSchema.hasTokens);
+          if (typeof hasTokens === 'boolean') {
+            result.hasTokens = hasTokens;
+          }
+
+          // Extract sidekicks
+          const sidekicks = resolveValue(heroSchema.sidekicks);
+          if (Array.isArray(sidekicks)) {
+            result.sidekicks = extractSidekicks(data, sidekicks);
+          }
+
+          // Extract additional miniatures
+          const additionalMiniImages = resolveValue(heroSchema.additionalMiniImages);
+          const additionalMiniModels = resolveValue(heroSchema.additionalMiniModels);
+
+          if (Array.isArray(additionalMiniImages) || Array.isArray(additionalMiniModels)) {
+            result.additionalMinis = {
+              images: additionalMiniImages || [],
+              models: additionalMiniModels || [],
+            };
+          }
+        }
+      }
+    }
+  } catch (error) {
+    // Silently fail for additional data
+    console.debug('Could not extract additional hero data:', error);
+  }
+
+  return result;
+}
+
+/**
+ * Extract sidekick information from the data array
+ */
+function extractSidekicks(data: any[], sidekickIndexes: any[]): SidekickInfo[] {
+  const sidekicks: SidekickInfo[] = [];
+
+  if (!Array.isArray(sidekickIndexes)) {
+    return sidekicks;
+  }
+
+  const resolveValue = (index: number | null | undefined): any => {
+    if (index === null || index === undefined || index < 0) return null;
+    return data[index];
+  };
+
+  for (const skIndex of sidekickIndexes) {
+    if (typeof skIndex !== 'number') continue;
+
+    const sidekickData = resolveValue(skIndex);
+    if (!sidekickData || typeof sidekickData !== 'object') continue;
+
+    // Check if it's already a parsed object or needs index resolution
+    let parsed: SidekickInfo | null = null;
+
+    if (typeof sidekickData.name === 'string') {
+      // Already parsed
+      parsed = {
+        name: sidekickData.name || 'Unknown',
+        health: sidekickData.startHealth || sidekickData.health || 1,
+        movement: sidekickData.move || sidekickData.movement || 1,
+        attackType: sidekickData.attack || 'melee',
+        avatarUrl: sidekickData.avatar || null,
+      };
+    } else {
+      // Needs index resolution
+      const schema = sidekickData;
+      parsed = {
+        name: resolveValue(schema.name) || 'Unknown',
+        health: resolveValue(schema.startHealth) || resolveValue(schema.health) || 1,
+        movement: resolveValue(schema.move) || resolveValue(schema.movement) || 1,
+        attackType: resolveValue(schema.attack) || 'melee',
+        avatarUrl: resolveValue(schema.avatar) || null,
+      };
+    }
+
+    if (parsed) {
+      sidekicks.push(parsed);
+    }
+  }
+
+  return sidekicks;
 }
 
 /**

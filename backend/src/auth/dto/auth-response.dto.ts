@@ -1,4 +1,11 @@
-import { Field, ObjectType, InterfaceType } from '@nestjs/graphql';
+import { Field, ObjectType, InterfaceType, registerEnumType } from '@nestjs/graphql';
+import { UserRole } from '@prisma/client';
+
+// Register UserRole enum for GraphQL
+registerEnumType(UserRole, {
+  name: 'UserRole',
+  description: 'User role in the system',
+});
 
 @InterfaceType()
 export abstract class TokensPair {
@@ -20,13 +27,16 @@ export class AuthUserResponse {
   @Field()
   username: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   avatar: string | null;
+
+  @Field(() => UserRole)
+  role: UserRole;
 
   @Field()
   createdAt: Date;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   emailVerified: Date | null;
 }
 

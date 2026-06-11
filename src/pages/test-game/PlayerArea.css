@@ -1,0 +1,210 @@
+.player-area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-4);
+  border: 2px solid var(--color-gray-700);
+  transition: all var(--transition-base);
+}
+
+.player-area.current {
+  border-color: var(--color-warning);
+  box-shadow: 0 0 24px rgba(251, 191, 36, 0.25);
+  background: rgba(251, 191, 36, 0.05);
+}
+
+.player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--spacing-2);
+  border-bottom: 1px solid var(--color-gray-700);
+}
+
+.player-name {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.turn-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-1) var(--spacing-3);
+  background: linear-gradient(135deg, var(--color-warning), var(--color-special));
+  color: var(--color-gray-900);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-full);
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 16px rgba(251, 191, 36, 0.8);
+  }
+}
+
+.player-fighters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.fighter-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-700);
+}
+
+.fighter-status.hero {
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.fighter-status.sidekick {
+  border-color: rgba(107, 114, 128, 0.3);
+}
+
+.fighter-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--color-gray-800);
+  border-radius: var(--radius-full);
+}
+
+.fighter-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.fighter-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.health-bar-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.health-bar {
+  width: 80px;
+  height: 8px;
+  background: var(--color-gray-700);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.health-fill {
+  height: 100%;
+  transition: width var(--transition-slow), background-color var(--transition-slow);
+}
+
+.health-text {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  min-width: 40px;
+}
+
+.fighter-position {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  font-family: var(--font-family-mono);
+}
+
+.player-hand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-2);
+}
+
+.hand-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hand-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.hand-stats {
+  display: flex;
+  gap: var(--spacing-3);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.deck-count,
+.discard-count {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.hand-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  min-height: 200px;
+  padding: var(--spacing-2);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-lg);
+  align-content: flex-start;
+  justify-content: center;
+}
+
+.empty-hand {
+  width: 100%;
+  text-align: center;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-8);
+  font-style: italic;
+}
+
+.player-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--spacing-2);
+  border-top: 1px solid var(--color-gray-700);
+}
+
+.actions-remaining {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.passed-badge {
+  padding: var(--spacing-1) var(--spacing-2);
+  background: var(--color-error);
+  color: var(--color-white);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-md);
+}

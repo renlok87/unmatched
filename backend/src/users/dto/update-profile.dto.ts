@@ -1,5 +1,6 @@
 import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { IsString, IsOptional, MaxLength, MinLength, Matches, IsUrl } from 'class-validator';
+import { IsString, IsOptional, MaxLength, MinLength, Matches, IsUrl, IsEnum } from 'class-validator';
+import { UserRole } from '@prisma/client';
 
 @InputType()
 export class UpdateProfileDto {
@@ -35,13 +36,16 @@ export class UserResponse {
   @Field()
   username: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   avatar: string | null;
+
+  @Field(() => UserRole)
+  role: UserRole;
 
   @Field()
   createdAt: Date;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   emailVerified: Date | null;
 }
 
@@ -56,7 +60,7 @@ export class PublicUserResponse {
   @Field()
   username: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   avatar: string | null;
 
   @Field()

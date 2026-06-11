@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unmatched Design System Preview</title>
+    <style>
+        :root {
+            /* Primary Colors */
+            --color-primary-yellow: #FFD700;
+            --color-primary-purple: #6B4C9A;
+            --color-primary-red: #DC143C;
+            --color-primary-blue: #1E3A8A;
+
+            /* Neutral Colors */
+            --color-neutral-black: #000000;
+            --color-neutral-dark-gray: #1F1F1F;
+            --color-neutral-gray: #808080;
+            --color-neutral-light-gray: #D3D3D3;
+            --color-neutral-white: #FFFFFF;
+
+            /* Semantic Colors */
+            --color-accent-energy: #FF6B35;
+            --color-accent-speed: #4ECDC4;
+            --color-accent-defense: #95E1D3;
+            --color-accent-magic: #A8DADC;
+
+            /* Faction Colors */
+            --color-faction-marvel: #DC143C;
+            --color-faction-witcher: #1E3A8A;
+            --color-faction-historical: #D2B48C;
+            --color-faction-jurassic: #228B22;
+            --color-faction-tmnt: #00A86B;
+
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+
+            /* Card Dimensions */
+            --card-width: 300px;
+            --card-height: 420px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: var(--color-neutral-white);
+            min-height: 100vh;
+            padding: var(--spacing-xl);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--color-neutral-gray);
+        }
+
+        h1 {
+            font-size: 40px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            background: linear-gradient(90deg, var(--color-primary-yellow), var(--color-primary-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--color-neutral-gray);
+            margin-top: var(--spacing-sm);
+            font-size: 14px;
+        }
+
+        /* Section Styles */
+        section {
+            margin-bottom: var(--spacing-xl);
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: var(--spacing-lg);
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--color-primary-yellow);
+            border-radius: 2px;
+        }
+
+        /* Color Palette */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .color-swatch {
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--color-neutral-dark-gray);
+        }
+
+        .color-box {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .color-info {
+            padding: var(--spacing-sm) var(--spacing-md);
+        }
+
+        .color-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .color-hex {
+            font-size: 12px;
+            color: var(--color-neutral-gray);
+            font-family: monospace;
+        }
+
+        /* Typography */
+        .typography-showcase {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .type-sample {
+            padding: var(--spacing-md);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .type-sample.font-3xl {
+            font-size: 40px;
+            font-weight: 900;
+        }
+
+        .type-sample.font-2xl {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .type-sample.font-xl {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .type-sample.font-lg {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .type-sample.font-base {
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .type-sample.font-sm {
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .type-sample.font-xs {
+            font-size: 10px;
+            font-weight: 400;
+        }
+
+        .type-label {
+            display: block;
+            font-size: 10px;
+            color: var(--color-neutral-gray);
+            margin-top: var(--spacing-xs);
+            text-transform: uppercase;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(var(--card-width), 1fr));
+            gap: var(--spacing-lg);
+            justify-items: center;
+        }
+
+        /* Action Card */
+        .card-action {
+            width: var(--card-width);
+            height: var(--card-height);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .card-action .card-top {
+            height: 60%;
+            background: linear-gradient(135deg, var(--color-primary-yellow) 0%, #FFED4E 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-action .card-faction-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            background: var(--color-primary-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .card-action .card-illustration {
+            font-size: 80px;
+            opacity: 0.3;
+        }
+
+        .card-action .card-bottom {
+            height: 40%;
+            background: var(--color-neutral-dark-gray);
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-action .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .card-action .card-effect {
+            font-size: 12px;
+            color: var(--color-neutral-gray);
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .card-action .card-value-badge {
+            position: absolute;
+            bottom: var(--spacing-md);
+            right: var(--spacing-md);
+            width: 40px;
+            height: 40px;
+            background: var(--color-neutral-black);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .card-action .card-faction-name {
+            font-size: 10px;
+            color: var(--color-neutral-gray);
+            margin-top: var(--spacing-xs);
+        }
+
+        /* Hero Card */
+        .card-hero {
+            width: var(--card-width);
+            height: var(--card-height);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .card-hero .card-bg {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--color-faction-historical) 0%, #E8DCC8 100%);
+        }
+
+        .card-hero .card-top-zone {
+            position: relative;
+            height: 15%;
+            background: rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-md);
+        }
+
+        .card-hero .card-logo {
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+        }
+
+        .card-hero .card-native-name {
+            writing-mode: vertical-rl;
+            font-size: 14px;
+            letter-spacing: 0.2em;
+        }
+
+        .card-hero .card-center-zone {
+            position: relative;
+            height: 60%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-hero .card-emblem {
+            width: 120px;
+            height: 120px;
+            background: var(--color-neutral-white);
+            border-radius: 50%;
+            border: 4px solid var(--color-primary-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .card-hero .card-bottom-zone {
+            position: relative;
+            height: 25%;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-md);
+        }
+
+        .card-hero .card-hero-name {
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .card-hero .card-hero-role {
+            font-size: 14px;
+            color: var(--color-primary-blue);
+        }
+
+        /* Faction Variants */
+        .card-hero.marvel .card-bg {
+            background: linear-gradient(135deg, var(--color-faction-marvel) 0%, #8B0000 100%);
+        }
+
+        .card-hero.witcher .card-bg {
+            background: linear-gradient(135deg, var(--color-faction-witcher) 0%, #0F172A 100%);
+        }
+
+        .card-hero.jurassic .card-bg {
+            background: linear-gradient(135deg, var(--color-faction-jurassic) 0%, #1B4D1B 100%);
+        }
+
+        /* Icons Grid */
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .icon-item {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm);
+        }
+
+        .icon-emoji {
+            font-size: 32px;
+        }
+
+        .icon-name {
+            font-size: 10px;
+            color: var(--color-neutral-gray);
+            text-align: center;
+        }
+
+        /* Assets Section */
+        .assets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .asset-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: var(--spacing-sm);
+            text-align: center;
+        }
+
+        .asset-preview {
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--color-neutral-dark-gray);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-sm);
+            overflow: hidden;
+        }
+
+        .asset-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .asset-name {
+            font-size: 11px;
+            color: var(--color-neutral-gray);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--color-neutral-gray);
+            color: var(--color-neutral-gray);
+            font-size: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: var(--spacing-md);
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            .card-action, .card-hero {
+                --card-width: 200px;
+                --card-height: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Unmatched Design System</h1>
+        <p class="subtitle">Card Game Visual Identity • 88 Heroes • Figma Ready</p>
+    </header>
+
+    <!-- Colors Section -->
+    <section id="colors">
+        <h2>🎨 Цветовая палитра</h2>
+
+        <h3 style="margin-bottom: 12px; font-size: 14px; opacity: 0.7;">Primary Colors</h3>
+        <div class="color-grid" style="margin-bottom: 24px;">
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-primary-yellow);">⚡</div>
+                <div class="color-info">
+                    <div class="color-name">Primary Yellow</div>
+                    <div class="color-hex">#FFD700</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-primary-purple);">✨</div>
+                <div class="color-info">
+                    <div class="color-name">Primary Purple</div>
+                    <div class="color-hex">#6B4C9A</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-primary-red);">⚔️</div>
+                <div class="color-info">
+                    <div class="color-name">Primary Red</div>
+                    <div class="color-hex">#DC143C</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-primary-blue);">🛡️</div>
+                <div class="color-info">
+                    <div class="color-name">Primary Blue</div>
+                    <div class="color-hex">#1E3A8A</div>
+                </div>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 12px; font-size: 14px; opacity: 0.7;">Neutral Colors</h3>
+        <div class="color-grid" style="margin-bottom: 24px;">
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-neutral-black);"></div>
+                <div class="color-info">
+                    <div class="color-name">Neutral Black</div>
+                    <div class="color-hex">#000000</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-neutral-dark-gray);"></div>
+                <div class="color-info">
+                    <div class="color-name">Dark Gray</div>
+                    <div class="color-hex">#1F1F1F</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-neutral-gray);"></div>
+                <div class="color-info">
+                    <div class="color-name">Gray</div>
+                    <div class="color-hex">#808080</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-neutral-light-gray);"></div>
+                <div class="color-info">
+                    <div class="color-name">Light Gray</div>
+                    <div class="color-hex">#D3D3D3</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-neutral-white);"></div>
+                <div class="color-info">
+                    <div class="color-name">White</div>
+                    <div class="color-hex">#FFFFFF</div>
+                </div>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 12px; font-size: 14px; opacity: 0.7;">Semantic Colors</h3>
+        <div class="color-grid" style="margin-bottom: 24px;">
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-accent-energy);">💪</div>
+                <div class="color-info">
+                    <div class="color-name">Energy</div>
+                    <div class="color-hex">#FF6B35</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-accent-speed);">💨</div>
+                <div class="color-info">
+                    <div class="color-name">Speed</div>
+                    <div class="color-hex">#4ECDC4</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-accent-defense);">🛡️</div>
+                <div class="color-info">
+                    <div class="color-name">Defense</div>
+                    <div class="color-hex">#95E1D3</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-accent-magic);">✨</div>
+                <div class="color-info">
+                    <div class="color-name">Magic</div>
+                    <div class="color-hex">#A8DADC</div>
+                </div>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 12px; font-size: 14px; opacity: 0.7;">Faction Colors</h3>
+        <div class="color-grid">
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-faction-marvel);">🦸</div>
+                <div class="color-info">
+                    <div class="color-name">Marvel</div>
+                    <div class="color-hex">#DC143C</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-faction-witcher);">⚔️</div>
+                <div class="color-info">
+                    <div class="color-name">The Witcher</div>
+                    <div class="color-hex">#1E3A8A</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-faction-historical);">⚔️</div>
+                <div class="color-info">
+                    <div class="color-name">Historical</div>
+                    <div class="color-hex">#D2B48C</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-faction-jurassic);">🦖</div>
+                <div class="color-info">
+                    <div class="color-name">Jurassic Park</div>
+                    <div class="color-hex">#228B22</div>
+                </div>
+            </div>
+            <div class="color-swatch">
+                <div class="color-box" style="background: var(--color-faction-tmnt);">🐢</div>
+                <div class="color-info">
+                    <div class="color-name">TMNT</div>
+                    <div class="color-hex">#00A86B</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Typography Section -->
+    <section id="typography">
+        <h2>✏️ Типографика</h2>
+        <div class="typography-showcase">
+            <div class="type-sample font-3xl">
+                UNMATCHED
+                <span class="type-label">Text 3XL / 900 / 40px — Основные заголовки</span>
+            </div>
+            <div class="type-sample font-2xl">
+                ODA NOBUNAGA
+                <span class="type-label">Text 2XL / 700 / 32px — Имена героев</span>
+            </div>
+            <div class="type-sample font-xl">
+                ПЕРЕЛОМНЫЙ МОМЕНТ
+                <span class="type-label">Text XL / 700 / 24px — Заголовки карточек</span>
+            </div>
+            <div class="type-sample font-lg">
+                Подзаголовок секции
+                <span class="type-label">Text LG / 500 / 18px — Подзаголовки</span>
+            </div>
+            <div class="type-sample font-base">
+                Описание эффекта карты. Во время боя: если MISS MARVEL начала ход на другой ячейке, значение этой карты равно 5.
+                <span class="type-label">Text Base / 400 / 14px — Основной текст</span>
+            </div>
+            <div class="type-sample font-sm">
+                MS.MARVEL | x3
+                <span class="type-label">Text SM / 400 / 12px — Второстепенная информация</span>
+            </div>
+            <div class="type-sample font-xs">
+                ФРАКЦИЯ • ТИП КАРТЫ
+                <span class="type-label">Text XS / 400 / 10px — Мелкие метки</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cards Section -->
+    <section id="cards">
+        <h2>🃏 Шаблоны карточек</h2>
+        <div class="cards-grid">
+            <!-- Action Card -->
+            <div class="card-action">
+                <div class="card-top">
+                    <div class="card-faction-badge">⭐</div>
+                    <div class="card-illustration">⚡</div>
+                </div>
+                <div class="card-bottom">
+                    <div class="card-title">ПЕРЕЛОМНЫЙ МОМЕНТ</div>
+                    <div class="card-effect">ВО ВРЕМЯ БОЯ: Если МИСС МАРВЕЛ начала ход на другой ячейке, значение этой карты равно 5.</div>
+                    <div class="card-faction-name">MS.MARVEL • x3</div>
+                </div>
+                <div class="card-value-badge">2</div>
+            </div>
+
+            <!-- Hero Card - Oda Nobunaga -->
+            <div class="card-hero">
+                <div class="card-bg"></div>
+                <div class="card-top-zone">
+                    <div class="card-logo">UNMATCHED</div>
+                    <div class="card-native-name">織田信長</div>
+                </div>
+                <div class="card-center-zone">
+                    <div class="card-emblem">⚔️</div>
+                </div>
+                <div class="card-bottom-zone">
+                    <div class="card-hero-name">ODA NOBUNAGA</div>
+                    <div class="card-hero-role">HONOR GUARD</div>
+                </div>
+            </div>
+
+            <!-- Hero Card - Ms. Marvel (Marvel) -->
+            <div class="card-hero marvel">
+                <div class="card-bg"></div>
+                <div class="card-top-zone">
+                    <div class="card-logo">UNMATCHED</div>
+                    <div class="card-native-name"></div>
+                </div>
+                <div class="card-center-zone">
+                    <div class="card-emblem">⚡</div>
+                </div>
+                <div class="card-bottom-zone">
+                    <div class="card-hero-name">MS. MARVEL</div>
+                    <div class="card-hero-role">ENERGY ABSORBER</div>
+                </div>
+            </div>
+
+            <!-- Hero Card - Geralt (Witcher) -->
+            <div class="card-hero witcher">
+                <div class="card-bg"></div>
+                <div class="card-top-zone">
+                    <div class="card-logo">UNMATCHED</div>
+                    <div class="card-native-name">WIEDŹMIN</div>
+                </div>
+                <div class="card-center-zone">
+                    <div class="card-emblem">🐺</div>
+                </div>
+                <div class="card-bottom-zone">
+                    <div class="card-hero-name">GERALT</div>
+                    <div class="card-hero-role">WITCHER</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Icons Section -->
+    <section id="icons">
+        <h2>🔷 Иконки и символы</h2>
+        <div class="icons-grid">
+            <div class="icon-item">
+                <span class="icon-emoji">⭐</span>
+                <span class="icon-name">Фракция</span>
+            </div>
+            <div class="icon-item">
+                <span class="icon-emoji">⚔️</span>
+                <span class="icon-name">Атака</span>
+            </div>
+            <div class="icon-item">
+                <span class="icon-emoji">🛡️</span>
+                <span class="icon-name">Защита</span>
+            </div>
+            <div class="icon-item">
+                <span class="icon-emoji">⚡</span>
+                <span class="icon-name">Энергия</span>
+            </div>
+            <div class="icon-item">
+                <span class="icon-emoji">🔥</span>
+                <span class="icon-name">Огонь</span>
+            </div>
+            <div class="icon-item">
+                <span class="icon-emoji">💨</span>
+                <span class="icon-name">Скорость</span>
+            </div>
+            <div class="icon-item">
+                <span class="icon-emoji">✨</span>
+                <span class="icon-name">Магия</span>
+            </div>
+            <div class="icon-item">
+                <span class="icon-emoji">❤️</span>
+                <span class="icon-name">Здоровье</span>
+            </div>
+            <div class="icon-item">
+                <span class="icon-emoji">🎯</span>
+                <span class="icon-name">Дальность</span>
+            </div>
+            <div class="icon-item">
+                <span class="icon-emoji">💀</span>
+                <span class="icon-name">Смерть</span>
+            </div>
+            <div class="icon-item">
+                <span class="icon-emoji">🌀</span>
+                <span class="icon-name">Поворот</span>
+            </div>
+            <div class="icon-item">
+                <span class="icon-emoji">📏</span>
+                <span class="icon-name">Дистанция</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spacing Section -->
+    <section id="spacing">
+        <h2>📐 Отступы (Spacing)</h2>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="width: 4px; height: 4px; background: var(--color-primary-yellow); border-radius: 50%;"></div>
+                <span style="font-size: 14px;">XS — 4px</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="width: 8px; height: 8px; background: var(--color-primary-yellow); border-radius: 50%;"></div>
+                <span style="font-size: 14px;">SM — 8px</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="width: 16px; height: 16px; background: var(--color-primary-yellow); border-radius: 50%;"></div>
+                <span style="font-size: 14px;">MD — 16px</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="width: 24px; height: 24px; background: var(--color-primary-yellow); border-radius: 50%;"></div>
+                <span style="font-size: 14px;">LG — 24px</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="width: 32px; height: 32px; background: var(--color-primary-yellow); border-radius: 50%;"></div>
+                <span style="font-size: 14px;">XL — 32px</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Card Dimensions -->
+    <section id="dimensions">
+        <h2>📏 Размеры карточек</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+            <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px;">
+                <div style="font-size: 12px; color: var(--color-neutral-gray); margin-bottom: 8px;">ИГРОВАЯ КАРТА / ГЕРОЙ</div>
+                <div style="font-size: 32px; font-weight: 700;">300 × 420 px</div>
+                <div style="font-size: 12px; color: var(--color-neutral-gray); margin-top: 8px;">Соотношение: 1:1.4</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px;">
+                <div style="font-size: 12px; color: var(--color-neutral-gray); margin-bottom: 8px;">АВАТАР ГЕРОЯ</div>
+                <div style="font-size: 32px; font-weight: 700;">150 × 150 px</div>
+                <div style="font-size: 12px; color: var(--color-neutral-gray); margin-top: 8px;">Соотношение: 1:1</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px;">
+                <div style="font-size: 12px; color: var(--color-neutral-gray); margin-bottom: 8px;">МИНИАТЮРА</div>
+                <div style="font-size: 32px; font-weight: 700;">100 × 100 px</div>
+                <div style="font-size: 12px; color: var(--color-neutral-gray); margin-top: 8px;">Соотношение: 1:1</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px;">
+                <div style="font-size: 12px; color: var(--color-neutral-gray); margin-bottom: 8px;">ИКОНКА</div>
+                <div style="font-size: 32px; font-weight: 700;">24 / 40 px</div>
+                <div style="font-size: 12px; color: var(--color-neutral-gray); margin-top: 8px;">Стандартные размеры</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p><strong>Unmatched Design System</strong> • Создано для Figma • 88 Героев • 5 Фракций</p>
+        <p style="margin-top: 8px;">Дата создания: 31 января 2026 • Источник: scraped-data/images</p>
+    </footer>
+</body>
+</html>

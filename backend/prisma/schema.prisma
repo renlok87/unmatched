@@ -14,14 +14,22 @@ datasource db {
 // USERS & AUTH
 // ============================================
 
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   username  String   @unique
   password  String   // bcrypt hash
   avatar    String?
+  role      UserRole @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime? // Soft delete
 
   // Email verification
   emailVerified     DateTime?
@@ -43,6 +51,8 @@ model User {
 
   @@index([email])
   @@index([username])
+  @@index([deletedAt])
+  @@index([role])
 }
 
 model UserSettings {
@@ -83,8 +93,9 @@ model UserStats {
   lastPlayedAt    DateTime?
   totalPlayTime   Int      @default(0) // seconds
 
-  @@index([currentElo])
-  @@index([gamesWon])
+  @@index([currentElo(sort: Desc)]) // для leaderboard сортировки
+  @@index([gamesWon(sort: Desc)])   // для топа по победам
+  @@index([lastPlayedAt])           // для поиска активных игроков
 }
 
 // ============================================
@@ -173,6 +184,7 @@ enum GamePhase {
 
 model Game {
   id          String     @id @default(cuid())
+  code        String?    @unique  // Код для приглашения в игру
   status      GameStatus @default(PENDING)
   mode        GameMode   @default(ONE_V_ONE)
 
@@ -188,11 +200,15 @@ model Game {
   boardId     String
   boardState  Json?      // состояние дверей, жетонов тумана и т.д.
 
+  // Идемпотентность - предотвращает дубликаты при повторных запросах
+  idempotencyKey String? @unique
+
   // Timing
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt  // для сортировки по времени обновления
   startedAt   DateTime?
   endedAt     DateTime?
+  deletedAt   DateTime?  // Soft delete
 
   // Winner
   winnerId    String?
@@ -200,21 +216,27 @@ model Game {
   // Version для optimistic locking
   version     Int        @default(0)
 
-  // Relations
+// Relations
   players     GamePlayer[]
   state       GameState?
   stateHistory GameStateHistory[]
+  snapshots   GameStateSnapshot[]
   actions     GameAction[]
+  replays     GameReplay[]
 
   // Индексы для оптимизации запросов
   @@index([status])
   @@index([hostId])
   @@index([hostId, status])  // "my games" query
+  @@index([hostId, idempotencyKey])  // idempotency check
+  @@index([opponentId, status])  // opponent games query
   @@index([createdAt])
   @@index([status, createdAt]) // для листинга активных игр
   @@index([mode, status])  // "find 1v1 games"
   @@index([winnerId])  // "games I won" query
   @@index([updatedAt])  // для сортировки по времени обновления
+  @@index([deletedAt])
+  @@index([mode, status, createdAt])  // Composite для find game
 }
 
 model GamePlayer {
@@ -237,6 +259,8 @@ model GamePlayer {
 
   @@unique([gameId, userId])
   @@index([gameId])
+  @@index([gameId, isReady]) // для поиска готовых к игре
+  @@index([userId])           // для поиска игр игрока
 }
 
 // ============================================
@@ -285,6 +309,22 @@ model GameStateHistory {
   createdAt       DateTime @default(now())
 
   @@index([gameId, sequenceNumber])
+  @@index([gameId, createdAt])
+}
+
+// Оптимизированные снимки состояния для replay
+model GameStateSnapshot {
+  id        String   @id @default(cuid())
+  gameId    String
+  game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  sequence  Int
+  fullState Json     // Полный снимок состояния
+
+  createdAt DateTime @default(now())
+
+  @@unique([gameId, sequence])
+  @@index([gameId])
   @@index([gameId, createdAt])
 }
 
@@ -347,6 +387,8 @@ model GameAction {
 
   @@index([gameId, sequenceNumber])
   @@index([gameId, timestamp])
+  @@index([gameId, type, sequenceNumber]) // для фильтрации по типу действия
+  @@index([playerId, timestamp])           // для истории действий игрока
   @@index([timestamp])  // для partitioning cleanup
 }
 
@@ -364,6 +406,8 @@ model Hero {
   // Характеристики
   health      Int
   fighterType String   // HERO, MINION, HUGE
+  movement    Int      @default(2)  // очки движения (move)
+  color       String?                // hex-код цвета героя для UI
 
   // Способность (в формате JSON для гибкости)
   ability     Json     // { type, timing, effect, description }
@@ -373,10 +417,19 @@ model Hero {
 
   // Специфические свойства
   properties  Json?    // { hasSidekick: true, sidekickCount: 2, ... }
+  hasTokens   Boolean  @default(false) // есть ли у героя токены
+
+  // Sidekicks - JSON для гибкости
+  sidekicks   Json?    // [{ name, health, movement, attackType, avatarUrl }]
+
+  // Дополнительные миниатюры (для героев с несколькими фигурками)
+  additionalMinis Json?  // [{ imageUrl, modelUrl }]
 
   // Медиа
   imageUrl    String?
   avatarUrl   String?
+  characterCardUrl String?  // изображение карты персонажа
+  miniModelUrl     String?  // URL 3D модели миниатюры (.glb)
 
   // Relations
   cards       Card[]
@@ -406,8 +459,18 @@ model Card {
   defenseValue Int?    // для карт защиты
   boostValue  Int?     // для усиления
 
+  // Banner - для кого карта (герой / помощник / любой)
+  bannerName  String?  // "Shakespeare" / "Any" / "Actor"
+
   // Эффекты карты (JSON для гибкости)
   effects     Json     // [{ timing, type, value, condition, ... }]
+
+  // Детальные эффекты по таймингам
+  effectAfter       String?  // эффект после атаки/защиты
+  effectDuring      String?  // эффект во время боя
+  effectBoost       String?  // эффект при бусте
+  effectImmediately String?  // немедленный эффект
+  effectOngoing     String?  // постоянный эффект
 
   // Дополнительная информация
   text        String?  // описание текста карты
@@ -420,6 +483,10 @@ model Card {
 
   // Количество в колоде героя
   count       Int      @default(1)
+
+  // Изображения карты
+  imageUrl    String?  // URL изображения карты (английская версия)
+  imageUrlRu  String?  // URL изображения карты (русская версия)
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -502,7 +569,37 @@ model LeaderboardEntry {
   updatedAt   DateTime @updatedAt
 
   @@unique([userId, heroId, timeFrame])
-  @@index([heroId, timeFrame, elo])
+@@index([heroId, timeFrame, elo])
+}
+
+// ============================================
+// GAME REPLAYS
+// ============================================
+
+model GameReplay {
+  id          String   @id @default(cuid())
+  gameId      String   @unique
+  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  // Сжатые данные реплея
+  data        Bytes    @db.ByteA
+
+  // Метаданные для быстрого доступа
+  duration    Int      // длительность в ходах/секундах
+  turnCount   Int      // количество ходов
+  winnerId    String?
+
+  // Избранные реплеи (TTL не применяется)
+  isFavorite  Boolean  @default(false)
+
+  // TTL для автоматической очистки
+  expiresAt   DateTime?
+
+  createdAt   DateTime @default(now())
+
+  @@index([gameId])
+  @@index([createdAt])
+  @@index([expiresAt])
 }
 
 // ============================================
@@ -517,3 +614,43 @@ model Presence {
 
   @@index([status])
 }
+
+// ============================================
+// DATABASE INDEX AUDIT NOTES
+// ============================================
+//
+// Рекомендуемые дополнительные индексы для оптимизации:
+//
+// 1. UserStats - для leaderboard queries:
+//    @@index([currentElo(desc)]) -- для сортировки по ELO
+//    @@index([gamesWon(desc)]) -- для топа по победам
+//
+// 2. GameAction - для аналитики:
+//    @@index([gameId, type, sequenceNumber]) -- для фильтрации по типу действия
+//    @@index([playerId, timestamp]) -- для истории действий игрока
+//
+// 3. GamePlayer - для поиска готовых игроков:
+//    @@index([gameId, isReady]) -- для поиска готовых к игре
+//
+// 4. Session - очистка истёкших:
+//    @@index([expiresAt]) WHERE expiresAt > now() -- partial index
+//
+// 5. RefreshToken - cleanup:
+//    @@index([expiresAt]) WHERE expiresAt > now() AND revokedAt IS NULL
+//
+// 6. Game - для списка активных игр:
+//    @@index([status, updatedAt(desc)]) WHERE status IN ('IN_PROGRESS', 'LOBBY')
+//
+// PARTITIONING (для больших объёмов данных):
+//
+// 1. GameStateHistory - partition по gameId или createdAt (месяц)
+// 2. GameAction - partition по createdAt (месяц)
+// 3. AuthAuditLog - partition по createdAt (месяц)
+//
+// CLEANUP JOBS (рекомендуемый schedule):
+//
+// 1. Ежедневно: удаление session/refreshTokens с expiresAt < now() - 7 дней
+// 2. Еженедельно: удаление AuthAuditLog старше 90 дней
+// 3. Ежемесячно: архивирование GameStateHistory в холодное хранилище
+// 4. По требованию: VACUUM ANALYZE для обновления статистики
+

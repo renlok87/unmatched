@@ -1,7 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { RatingService } from './rating.service';
-import { UserStatsResponse, LeaderboardEntryResponse, LeaderboardOptionsDto, TimeFrame } from './dto';
+import {
+  UserStatsResponse,
+  LeaderboardEntryResponse,
+  LeaderboardOptionsDto,
+  TimeFrame,
+} from './dto';
 
 interface LeaderboardQueryOptions {
   heroId?: string;
@@ -108,7 +113,8 @@ export class UserStatsService {
     const winIncrement = didWin ? 1 : 0;
     const loseIncrement = didWin ? 0 : 1;
 
-    await this.prisma.$executeRawUnsafe(`
+    await this.prisma.$executeRawUnsafe(
+      `
       UPDATE "UserStats"
       SET
         "heroStats" = COALESCE("heroStats", '{}'::jsonb) ||
@@ -130,7 +136,13 @@ export class UserStatsService {
           ),
         "totalPlayTime" = "totalPlayTime" + $4
       WHERE "userId" = $5
-    `, heroId, winIncrement, loseIncrement, playTime, userId);
+    `,
+      heroId,
+      winIncrement,
+      loseIncrement,
+      playTime,
+      userId,
+    );
   }
 
   /**

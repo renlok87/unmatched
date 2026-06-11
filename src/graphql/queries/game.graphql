@@ -1,0 +1,183 @@
+# Игровые запросы
+
+query GetGame($id: String!) {
+  game(id: $id) {
+    id
+    mode
+    status
+    hostId
+    boardId
+    winnerId
+    createdAt
+    updatedAt
+    startedAt
+    endedAt
+    phase
+    currentTurn
+    players {
+      id
+      userId
+      username
+      avatar
+      heroId
+      isReady
+      hasPassed
+      seatOrder
+    }
+  }
+}
+
+query MyGames($filters: GameFiltersDto) {
+  myGames(filters: $filters) {
+    id
+    mode
+    status
+    hostId
+    createdAt
+    phase
+    currentTurn
+    players {
+      userId
+      username
+      avatar
+      heroId
+      isReady
+    }
+  }
+}
+
+query AvailableGames($mode: String, $limit: Float) {
+  availableGames(mode: $mode, limit: $limit) {
+    id
+    mode
+    status
+    players {
+      userId
+      username
+      avatar
+      heroId
+    }
+  }
+}
+
+query GetGameState($gameId: String!) {
+  gameState(gameId: $gameId) {
+    id
+    gameId
+    state
+    sequenceNumber
+    currentTurnPlayerId
+    phase
+    turnCount
+    updatedAt
+  }
+}
+
+query GetGameSequence($gameId: String!) {
+  gameSequence(gameId: $gameId)
+}
+
+query EventsSince($gameId: String!, $sinceSequence: Float!) {
+  eventsSince(gameId: $gameId, sinceSequence: $sinceSequence) {
+    gameId
+    events {
+      sequenceNumber
+      type
+      gameId
+      payload
+      timestamp
+    }
+    lastSequence
+    hasMore
+  }
+}
+
+# Контент (герои, карты, доски)
+
+query Heroes {
+  heroes {
+    id
+    name
+    health
+    movement
+    set
+    fighterType
+    sidekickCount
+    sidekickHealth
+  }
+}
+
+query Hero($id: String!) {
+  hero(id: $id) {
+    id
+    name
+    health
+    movement
+    set
+    fighterType
+    abilities {
+      id
+      name
+      text
+      trigger
+    }
+    cards {
+      id
+      title
+      type
+      value
+      boost
+      quantity
+    }
+  }
+}
+
+query Boards {
+  boards {
+    id
+    name
+    width
+    height
+    recommendedPlayers
+    spaces {
+      position {
+        x
+        y
+      }
+      zones
+      isObstacle
+    }
+  }
+}
+
+query Board($id: String!) {
+  board(id: $id) {
+    id
+    name
+    width
+    height
+    recommendedPlayers
+    spaces {
+      position {
+        x
+        y
+      }
+      zones
+      isObstacle
+    }
+  }
+}
+
+query ContentSummary {
+  contentSummary {
+    heroesCount
+    boardsCount
+    setsCount
+    version
+    sets
+  }
+}
+
+query Sets {
+  sets
+}

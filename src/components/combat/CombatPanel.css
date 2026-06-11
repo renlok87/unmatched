@@ -1,0 +1,154 @@
+.combat-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  z-index: 9998;
+  animation: fade-in 0.3s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.combat-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-6);
+  background: linear-gradient(to bottom, var(--gradient-dark), transparent);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.combat-panel__title {
+  color: var(--color-white);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.combat-panel__arena {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--spacing-6);
+  align-items: center;
+  padding: var(--spacing-8);
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.combat-panel__vs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.combat-panel__vs-text {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-white);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.combat-panel__scores {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.combat-panel__score {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  font-family: monospace;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-md);
+  min-width: 100px;
+  text-align: center;
+}
+
+.combat-panel__score--attack {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+  border: 2px solid rgba(244, 67, 54, 0.4);
+}
+
+.combat-panel__score--defense {
+  background: rgba(33, 150, 243, 0.2);
+  color: #2196f3;
+  border: 2px solid rgba(33, 150, 243, 0.4);
+}
+
+.combat-panel__footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-6);
+  background: linear-gradient(to top, var(--gradient-dark), transparent);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.combat-panel__instruction {
+  color: var(--color-gray-400);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+}
+
+.combat-panel__status {
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+}
+
+@media (max-width: 1024px) {
+  .combat-panel__arena {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4);
+  }
+
+  .combat-panel__vs {
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .combat-panel__title {
+    font-size: var(--font-size-xl);
+  }
+
+  .combat-panel__vs-text {
+    font-size: var(--font-size-3xl);
+  }
+
+  .combat-panel__score {
+    font-size: var(--font-size-2xl);
+    min-width: 80px;
+  }
+}

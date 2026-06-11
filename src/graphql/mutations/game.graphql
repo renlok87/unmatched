@@ -1,0 +1,165 @@
+# Игровые мутации
+
+mutation CreateGame($input: CreateGameDto!) {
+  createGame(input: $input) {
+    id
+    mode
+    status
+    hostId
+    phase
+    currentTurn
+    players {
+      userId
+      username
+      heroId
+      isReady
+    }
+  }
+}
+
+mutation JoinGame($input: JoinGameDto!) {
+  joinGame(input: $input) {
+    id
+    status
+    phase
+    players {
+      userId
+      username
+      heroId
+      isReady
+    }
+  }
+}
+
+mutation LeaveGame($gameId: String!) {
+  leaveGame(gameId: $gameId)
+}
+
+mutation StartGame($gameId: String!) {
+  startGame(gameId: $gameId) {
+    id
+    status
+    phase
+    players {
+      userId
+      heroId
+    }
+  }
+}
+
+mutation AbortGame($gameId: String!) {
+  abortGame(gameId: $gameId) {
+    id
+    status
+  }
+}
+
+mutation ToggleReady($gameId: String!) {
+  toggleReady(gameId: $gameId) {
+    id
+    players {
+      userId
+      isReady
+    }
+  }
+}
+
+mutation SelectHero($gameId: String!, $heroId: String!) {
+  selectHero(gameId: $gameId, heroId: $heroId) {
+    id
+    players {
+      userId
+      heroId
+    }
+  }
+}
+
+# Gameplay мутации
+
+mutation Maneuver($input: ManeuverDto!) {
+  maneuver(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}
+
+mutation MoveFighter($input: MoveFighterDto!) {
+  moveFighter(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}
+
+mutation Attack($input: AttackDto!) {
+  attack(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}
+
+mutation PlayDefense($input: PlayDefenseDto!) {
+  playDefense(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}
+
+mutation ResolveCombat($input: ResolveCombatDto!) {
+  resolveCombat(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}
+
+mutation EndTurn($input: EndTurnDto!) {
+  endTurn(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}
+
+mutation Pass($input: PassDto!) {
+  pass(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}
+
+mutation ToggleDoor($input: ToggleDoorDto!) {
+  toggleDoor(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}

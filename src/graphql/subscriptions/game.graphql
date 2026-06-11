@@ -1,0 +1,84 @@
+# Real-time подписки для игры
+
+subscription GameStateUpdated($gameId: String!, $since: Float) {
+  gameStateUpdated(gameId: $gameId, since: $since) {
+    gameId
+    sequenceNumber
+    phase
+    turnCount
+    currentTurnPlayerId
+    players
+    fighters
+    handZones
+    boardState
+    metadata
+  }
+}
+
+subscription AttackInitiated($gameId: String!) {
+  attackInitiated(gameId: $gameId) {
+    type
+    gameId
+    sequenceNumber
+    timestamp
+    payload
+  }
+}
+
+subscription DefensePlayed($gameId: String!) {
+  defensePlayed(gameId: $gameId) {
+    type
+    gameId
+    sequenceNumber
+    timestamp
+    payload
+  }
+}
+
+subscription CombatResolved($gameId: String!) {
+  combatResolved(gameId: $gameId) {
+    type
+    gameId
+    sequenceNumber
+    timestamp
+    payload
+  }
+}
+
+subscription TurnChanged($gameId: String!) {
+  turnChanged(gameId: $gameId) {
+    playerId
+    turnCount
+    phase
+  }
+}
+
+subscription PlayerJoined($gameId: String!) {
+  playerJoined(gameId: $gameId) {
+    type
+    gameId
+    sequenceNumber
+    timestamp
+    payload
+  }
+}
+
+subscription PlayerLeft($gameId: String!) {
+  playerLeft(gameId: $gameId) {
+    type
+    gameId
+    sequenceNumber
+    timestamp
+    payload
+  }
+}
+
+subscription GameEnded($gameId: String!) {
+  gameEnded(gameId: $gameId) {
+    type
+    gameId
+    sequenceNumber
+    timestamp
+    payload
+  }
+}

@@ -1,0 +1,69 @@
+# Герои
+
+query AllHeroes {
+  heroes {
+    id
+    name
+    health
+    movement
+    set
+    fighterType
+    sidekickCount
+    sidekickHealth
+    urls {
+      avatar
+      mini
+      cardCover
+    }
+  }
+}
+
+query HeroDetails($id: String!) {
+  hero(id: $id) {
+    id
+    name
+    health
+    movement
+    set
+    fighterType
+    sidekickCount
+    sidekickHealth
+    urls {
+      avatar
+      mini
+      cardCover
+    }
+    abilities {
+      id
+      name
+      text
+      trigger
+    }
+    cards {
+      id
+      title
+      type
+      value
+      boost
+      quantity
+    }
+  }
+}
+
+query HeroesBySet($set: String!) {
+  heroesBySet(set: $set) {
+    id
+    name
+    health
+    movement
+    set
+    fighterType
+    sidekickCount
+    sidekickHealth
+    urls {
+      avatar
+      mini
+      cardCover
+    }
+  }
+}

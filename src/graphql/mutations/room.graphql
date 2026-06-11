@@ -1,0 +1,49 @@
+# Мутации комнаты
+
+mutation LeaveGame($gameId: String!) {
+  leaveGame(gameId: $gameId)
+}
+
+mutation StartGame($gameId: String!) {
+  startGame(gameId: $gameId) {
+    id
+    status
+    phase
+    players {
+      userId
+      heroId
+    }
+  }
+}
+
+mutation ToggleReady($gameId: String!) {
+  toggleReady(gameId: $gameId) {
+    id
+    players {
+      userId
+      isReady
+    }
+  }
+}
+
+mutation PlaceFighter($input: PlaceFighterDto!) {
+  moveFighter(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}
+
+mutation ConfirmPlacement($gameId: String!) {
+  maneuver(input: { gameId: $gameId }) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}

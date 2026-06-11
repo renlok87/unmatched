@@ -20,7 +20,7 @@ docker-compose --profile admin up -d
 ```
 
 Доступные сервисы:
-- PostgreSQL: `localhost:5432`
+- PostgreSQL: `localhost:5433` (внутри контейнера: 5432)
 - Redis: `localhost:6379`
 - PgAdmin: `http://localhost:5050` (admin@unmatched.local / admin)
 - Redis Commander: `http://localhost:8081`
@@ -47,6 +47,28 @@ npm run start:dev
 ```
 
 GraphQL Playground будет доступен по адресу: `http://localhost:3001/graphql`
+
+### 5. (Опционально) Заполнение БД тестовыми данными
+
+```bash
+# Применить миграции и заполнить тестовыми данными
+npm run prisma:push
+npm run prisma:seed
+
+# Или полный сброс и заполнение
+npm run prisma:reset
+```
+
+## 👤 Тестовые аккаунты
+
+После запуска seed создаются следующие тестовые пользователи:
+
+| Email | Username | Пароль |
+|-------|----------|--------|
+| `test1@unmatched.com` | TestPlayer1 | `password123` |
+| `test2@unmatched.com` | TestPlayer2 | `password123` |
+
+Все пользователи создаются с подтверждённым email и начальными настройками.
 
 ## 📁 Структура проекта
 
@@ -92,6 +114,8 @@ backend/
 | `npm run prisma:migrate` | Применение миграций |
 | `npm run prisma:push` | Push схемы в БД |
 | `npm run prisma:studio` | Prisma Studio |
+| `npm run prisma:seed` | Заполнение БД тестовыми данными |
+| `npm run prisma:reset` | Полный сброс и заполнение БД |
 
 ## 🛠️ Технологии
 

@@ -1,0 +1,32 @@
+# Комната
+
+query RoomInfo($id: String!) {
+  game(id: $id) {
+    id
+    code
+    status
+    mode
+    hostId
+    boardId
+    phase
+    createdAt
+    players {
+      id
+      userId
+      username
+      avatar
+      heroId
+      isReady
+      seatOrder
+    }
+  }
+}
+
+query ValidSpawnZones($gameId: String!, $playerId: String!) {
+  gameState(gameId: $gameId) {
+    id
+    boardState
+    players
+    fighters
+  }
+}

@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unmatched Design System - Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 50px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: #1e3a8a;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #6b4c9a;
+            padding-bottom: 10px;
+        }
+
+        /* Colors Section */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .color-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .color-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+
+        .color-swatch {
+            height: 100px;
+            width: 100%;
+        }
+
+        .color-info {
+            padding: 15px;
+            background: #f8f9fa;
+        }
+
+        .color-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #1f1f1f;
+        }
+
+        .color-hex {
+            font-family: monospace;
+            font-size: 14px;
+            color: #808080;
+        }
+
+        /* Typography Section */
+        .typography-demo {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .type-sample {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #6b4c9a;
+        }
+
+        .type-label {
+            font-size: 12px;
+            color: #808080;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .type-text {
+            margin: 0;
+        }
+
+        /* Card Templates Section */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .card-preview {
+            width: 100%;
+            max-width: 300px;
+            aspect-ratio: 300/420;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .card-top {
+            height: 60%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c61 100%);
+            overflow: hidden;
+        }
+
+        .card-top::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 70%);
+        }
+
+        .faction-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            background: #6b4c9a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .card-value {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: #1f1f1f;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .card-illustration {
+            font-size: 80px;
+            text-align: center;
+        }
+
+        .card-bottom {
+            height: 40%;
+            background: #1f1f1f;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            color: #ffd700;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .card-description {
+            color: #ffffff;
+            font-size: 12px;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #333;
+        }
+
+        .card-cost {
+            width: 30px;
+            height: 30px;
+            background: #ff6b35;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .card-faction {
+            color: #808080;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        /* Hero Card */
+        .hero-card {
+            width: 100%;
+            max-width: 300px;
+            aspect-ratio: 300/420;
+            background: linear-gradient(135deg, #d2b48c 0%, #e8dcc8 100%);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-top {
+            height: 15%;
+            background: rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+        }
+
+        .hero-logo {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
+        .hero-name-native {
+            font-size: 24px;
+            writing-mode: vertical-rl;
+            color: #1e3a8a;
+            letter-spacing: 2px;
+        }
+
+        .hero-center {
+            height: 60%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-emblem {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 4px solid #dc143c;
+        }
+
+        .hero-flame {
+            position: absolute;
+            font-size: 80px;
+            opacity: 0.3;
+        }
+
+        .hero-flame.left {
+            left: 10px;
+        }
+
+        .hero-flame.right {
+            right: 10px;
+        }
+
+        .hero-bottom {
+            height: 25%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 15px;
+            background: linear-gradient(to top, rgba(0,0,0,0.1) 0%, transparent 100%);
+        }
+
+        .hero-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f1f1f;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .hero-role {
+            font-size: 14px;
+            color: #6b4c9a;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Spacing Demo */
+        .spacing-demo {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .spacing-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .spacing-box {
+            background: #6b4c9a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .spacing-label {
+            font-size: 14px;
+            color: #1f1f1f;
+        }
+
+        /* Icons Section */
+        .icons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 20px;
+        }
+
+        .icon-card {
+            aspect-ratio: 1;
+            background: #f8f9fa;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .icon-card:hover {
+            transform: scale(1.05);
+            background: #e9ecef;
+        }
+
+        .icon-symbol {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .icon-name {
+            font-size: 12px;
+            color: #808080;
+            text-align: center;
+        }
+
+        /* Legend */
+        .legend {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .legend h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .legend p {
+            font-size: 16px;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Unmatched Design System</h1>
+        <p class="subtitle">Визуальный справочник для создания карточной игры</p>
+
+        <div class="legend">
+            <h2>📋 О проекте</h2>
+            <p>
+                Этот Design System создан на основе анализа 88 героев из игры Unmatched.
+                Он содержит все необходимые компоненты для разработки дизайна вашей карточной игры:
+                цветовую палитру, типографику, шаблоны карточек и компоненты.
+            </p>
+        </div>
+
+        <!-- Colors Section -->
+        <div class="section">
+            <h2 class="section-title">🎨 Цветовая палитра</h2>
+
+            <h3 style="margin: 20px 0 15px 0; color: #1e3a8a;">Основные цвета</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #FFD700;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Primary Yellow</div>
+                        <div class="color-hex">#FFD700</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #6B4C9A;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Primary Purple</div>
+                        <div class="color-hex">#6B4C9A</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #DC143C;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Primary Red</div>
+                        <div class="color-hex">#DC143C</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #1E3A8A;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Primary Blue</div>
+                        <div class="color-hex">#1E3A8A</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin: 30px 0 15px 0; color: #1e3a8a;">Нейтральные цвета</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #000000;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Neutral Black</div>
+                        <div class="color-hex">#000000</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #1F1F1F;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Dark Gray</div>
+                        <div class="color-hex">#1F1F1F</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #808080;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Gray</div>
+                        <div class="color-hex">#808080</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #FFFFFF; border: 1px solid #ddd;"></div>
+                    <div class="color-info">
+                        <div class="color-name">White</div>
+                        <div class="color-hex">#FFFFFF</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="margin: 30px 0 15px 0; color: #1e3a8a;">Семантические цвета</h3>
+            <div class="color-grid">
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #FF6B35;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Energy</div>
+                        <div class="color-hex">#FF6B35</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #4ECDC4;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Speed</div>
+                        <div class="color-hex">#4ECDC4</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #95E1D3;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Defense</div>
+                        <div class="color-hex">#95E1D3</div>
+                    </div>
+                </div>
+
+                <div class="color-card">
+                    <div class="color-swatch" style="background: #A8DADC;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Magic</div>
+                        <div class="color-hex">#A8DADC</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typography Section -->
+        <div class="section">
+            <h2 class="section-title">✏️ Типографика</h2>
+            <div class="typography-demo">
+                <div class="type-sample">
+                    <div class="type-label">Text 3XL (40px) — Заголовки</div>
+                    <p class="type-text" style="font-size: 40px; font-weight: 900;">UNMATCHED</p>
+                </div>
+
+                <div class="type-sample">
+                    <div class="type-label">Text 2XL (32px) — Имена героев</div>
+                    <p class="type-text" style="font-size: 32px; font-weight: 700;">ODA NOBUNAGA</p>
+                </div>
+
+                <div class="type-sample">
+                    <div class="type-label">Text XL (24px) — Заголовки карточек</div>
+                    <p class="type-text" style="font-size: 24px; font-weight: 700;">ПЕРЕЛОМНЫЙ МОМЕНТ</p>
+                </div>
+
+                <div class="type-sample">
+                    <div class="type-label">Text Base (14px) — Описание эффектов</div>
+                    <p class="type-text" style="font-size: 14px; font-weight: 400;">
+                        ВО ВРЕМЯ БОЯ: Если МИСС МАРВЕЛ начала ход на другой ячейке,
+                        значение этой карты равно 5.
+                    </p>
+                </div>
+
+                <div class="type-sample">
+                    <div class="type-label">Text SM (12px) — Второстепенная информация</div>
+                    <p class="type-text" style="font-size: 12px; font-weight: 400;">MS.MARVEL | x3</p>
+                </div>
+
+                <div class="type-sample">
+                    <div class="type-label">Text XS (10px) — Мелкие метки</div>
+                    <p class="type-text" style="font-size: 10px; font-weight: 400;">ФРАКЦИЯ</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spacing Section -->
+        <div class="section">
+            <h2 class="section-title">📐 Отступы (Spacing)</h2>
+            <div class="spacing-demo">
+                <div class="spacing-item">
+                    <div class="spacing-box" style="width: 60px; height: 60px;">60</div>
+                    <span class="spacing-label">spacing-xl (32px + отступы)</span>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-box" style="width: 40px; height: 40px;">40</div>
+                    <span class="spacing-label">spacing-lg (24px + отступы)</span>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-box" style="width: 24px; height: 24px;">24</div>
+                    <span class="spacing-label">spacing-md (16px + отступы)</span>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-box" style="width: 16px; height: 16px;">16</div>
+                    <span class="spacing-label">spacing-sm (8px + отступы)</span>
+                </div>
+                <div class="spacing-item">
+                    <div class="spacing-box" style="width: 8px; height: 8px;">8</div>
+                    <span class="spacing-label">spacing-xs (4px + отступы)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Icons Section -->
+        <div class="section">
+            <h2 class="section-title">🧩 Иконки и символы</h2>
+            <div class="icons-grid">
+                <div class="icon-card">
+                    <div class="icon-symbol">⭐</div>
+                    <div class="icon-name">Фракция</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-symbol">⚔️</div>
+                    <div class="icon-name">Атака</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-symbol">🛡️</div>
+                    <div class="icon-name">Защита</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-symbol">⚡</div>
+                    <div class="icon-name">Энергия</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-symbol">🔥</div>
+                    <div class="icon-name">Огонь</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-symbol">💨</div>
+                    <div class="icon-name">Скорость</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-symbol">✨</div>
+                    <div class="icon-name">Магия</div>
+                </div>
+                <div class="icon-card">
+                    <div class="icon-symbol">❤️</div>
+                    <div class="icon-name">Здоровье</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Templates Section -->
+        <div class="section">
+            <h2 class="section-title">🃏 Шаблоны карточек</h2>
+            <div class="cards-grid">
+                <!-- Action Card -->
+                <div>
+                    <h3 style="margin-bottom: 15px; color: #1e3a8a; text-align: center;">Игровая карта</h3>
+                    <div class="card-preview">
+                        <div class="card-top">
+                            <div class="faction-badge">⭐</div>
+                            <div class="card-value">3</div>
+                            <div class="card-illustration">🥊</div>
+                        </div>
+                        <div class="card-bottom">
+                            <div class="card-title">ПЕРЕЛОМНЫЙ МОМЕНТ</div>
+                            <div class="card-description">
+                                ВО ВРЕМЯ БОЯ: Если герой начал ход на другой ячейке, значение этой карты равно 5.
+                            </div>
+                            <div class="card-meta">
+                                <div class="card-cost">2</div>
+                                <div class="card-faction">MS.MARVEL | x3</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Card -->
+                <div>
+                    <h3 style="margin-bottom: 15px; color: #1e3a8a; text-align: center;">Карточка героя</h3>
+                    <div class="hero-card">
+                        <div class="hero-top">
+                            <div class="hero-logo">UNMATCHED</div>
+                            <div class="hero-name-native">織田信長</div>
+                        </div>
+                        <div class="hero-center">
+                            <div class="hero-flame left">🔥</div>
+                            <div class="hero-emblem">⚔️</div>
+                            <div class="hero-flame right">🔥</div>
+                        </div>
+                        <div class="hero-bottom">
+                            <div class="hero-name">ODA NOBUNAGA</div>
+                            <div class="hero-role">HONOR GUARD</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Sizes -->
+        <div class="section">
+            <h2 class="section-title">📏 Размеры карточек</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🃏</div>
+                    <h4 style="margin-bottom: 10px; color: #1e3a8a;">Игровая карта</h4>
+                    <p style="color: #808080; font-size: 14px; margin-bottom: 5px;"><strong>Размер:</strong> 300 × 420 px</p>
+                    <p style="color: #808080; font-size: 14px; margin-bottom: 5px;"><strong>Соотношение:</strong> 1:1.4</p>
+                    <p style="color: #808080; font-size: 14px;"><strong>Формат:</strong> Вертикальный</p>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">👤</div>
+                    <h4 style="margin-bottom: 10px; color: #1e3a8a;">Аватар героя</h4>
+                    <p style="color: #808080; font-size: 14px; margin-bottom: 5px;"><strong>Размер:</strong> 150 × 150 px</p>
+                    <p style="color: #808080; font-size: 14px; margin-bottom: 5px;"><strong>Соотношение:</strong> 1:1</p>
+                    <p style="color: #808080; font-size: 14px;"><strong>Формат:</strong> Квадратный</p>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🗿</div>
+                    <h4 style="margin-bottom: 10px; color: #1e3a8a;">Миниатюра</h4>
+                    <p style="color: #808080; font-size: 14px; margin-bottom: 5px;"><strong>Размер:</strong> 100 × 100 px</p>
+                    <p style="color: #808080; font-size: 14px; margin-bottom: 5px;"><strong>Соотношение:</strong> 1:1</p>
+                    <p style="color: #808080; font-size: 14px;"><strong>Формат:</strong> Квадратный</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <h2 style="margin-bottom: 20px; border-bottom-color: rgba(255,255,255,0.3);">🚀 Следующие шаги</h2>
+            <ol style="font-size: 18px; line-height: 2; margin-left: 20px;">
+                <li>Включите MCP сервер в Figma (Preferences → Enable Dev Mode MCP Server)</li>
+                <li>Создайте новый файл в Figma с названием "Unmatched Design System"</li>
+                <li>Начните с создания Local Styles (цвета и шрифты)</li>
+                <li>Создайте компоненты для шаблонов карточек</li>
+                <li>Импортируйте ассеты из папки <code>scraped-data/images</code></li>
+                <li>Соберите 3-5 примеров карточек для тестирования</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>

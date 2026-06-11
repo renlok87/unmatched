@@ -11,6 +11,8 @@ export interface CardDefinition {
   quantity: number;
   characterName: string;
   effects: CardEffect[];
+  imageUrl?: string;
+  imageUrlRu?: string;
 }
 
 /**

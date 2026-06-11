@@ -1,0 +1,105 @@
+.player-slots {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.player-slots__empty {
+  color: var(--color-gray-400);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  padding: var(--spacing-4);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+}
+
+.player-slot {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.player-slot:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.player-slot--local {
+  background: rgba(33, 150, 243, 0.1);
+  border-color: rgba(33, 150, 243, 0.3);
+}
+
+.player-slot__avatar {
+  position: relative;
+}
+
+.player-slot__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.player-slot__name {
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-1);
+}
+
+.player-slot__name--local {
+  color: #2196f3;
+}
+
+.player-slot__details {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.player-slot__hero {
+  color: var(--color-gray-400);
+  font-size: var(--font-size-sm);
+}
+
+.player-slot__hero-badge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+}
+
+.player-slot__status {
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
+}
+
+.player-slot__status--not-ready {
+  color: var(--color-warning);
+}
+
+.player-slot__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.player-slot__kick {
+  padding: var(--spacing-2);
+  color: var(--color-error);
+  background: rgba(244, 67, 54, 0.1);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.player-slot__kick:hover {
+  background: rgba(244, 67, 54, 0.2);
+}
+
+.player-slot__kick:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

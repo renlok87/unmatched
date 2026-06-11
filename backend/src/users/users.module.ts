@@ -7,12 +7,10 @@ import { UserStatsService } from './user-stats.service';
 import { RatingService } from './rating.service';
 import { PrismaModule } from '../database/prisma.module';
 import { RedisModule } from '../redis/redis.module';
+import { GamesModule } from '../games/games.module';
 
 @Module({
-  imports: [
-    PrismaModule,
-    RedisModule,
-  ],
+  imports: [PrismaModule, RedisModule, GamesModule],
   providers: [
     // Resolvers
     UsersResolver,
@@ -24,11 +22,6 @@ import { RedisModule } from '../redis/redis.module';
     UserStatsService,
     RatingService,
   ],
-  exports: [
-    UsersService,
-    ProfileService,
-    UserStatsService,
-    RatingService,
-  ],
+  exports: [UsersService, ProfileService, UserStatsService, RatingService],
 })
 export class UsersModule {}

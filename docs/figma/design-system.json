@@ -1,0 +1,206 @@
+{
+  "name": "Unmatched Design System",
+  "version": "1.0.0",
+  "description": "Design System для Unmatched Card Game с 88 героями",
+  "created": "2026-01-31",
+  "author": "Unmatched Project",
+
+  "colors": {
+    "primary": {
+      "yellow": {"hex": "#FFD700", "rgb": [255, 215, 0], "name": "Energetic"},
+      "purple": {"hex": "#6B4C9A", "rgb": [107, 76, 154], "name": "Mystical"},
+      "red": {"hex": "#DC143C", "rgb": [220, 20, 60], "name": "Combat"},
+      "blue": {"hex": "#1E3A8A", "rgb": [30, 58, 138], "name": "Tactical"}
+    },
+    "neutral": {
+      "black": {"hex": "#000000", "rgb": [0, 0, 0], "name": "Black"},
+      "darkGray": {"hex": "#1F1F1F", "rgb": [31, 31, 31], "name": "Dark Gray"},
+      "gray": {"hex": "#808080", "rgb": [128, 128, 128], "name": "Gray"},
+      "lightGray": {"hex": "#D3D3D3", "rgb": [211, 211, 211], "name": "Light Gray"},
+      "white": {"hex": "#FFFFFF", "rgb": [255, 255, 255], "name": "White"}
+    },
+    "semantic": {
+      "energy": {"hex": "#FF6B35", "rgb": [255, 107, 53], "name": "Energy"},
+      "speed": {"hex": "#4ECDC4", "rgb": [78, 205, 196], "name": "Speed"},
+      "defense": {"hex": "#95E1D3", "rgb": [149, 225, 211], "name": "Defense"},
+      "magic": {"hex": "#A8DADC", "rgb": [168, 218, 220], "name": "Magic"}
+    },
+    "factions": {
+      "marvel": {"hex": "#DC143C", "rgb": [220, 20, 60], "name": "Marvel"},
+      "witcher": {"hex": "#1E3A8A", "rgb": [30, 58, 138], "name": "The Witcher"},
+      "historical": {"hex": "#D2B48C", "rgb": [210, 180, 140], "name": "Historical"},
+      "jurassic": {"hex": "#228B22", "rgb": [34, 139, 34], "name": "Jurassic Park"},
+      "tmnt": {"hex": "#00A86B", "rgb": [0, 168, 107], "name": "Ninja Turtles"}
+    }
+  },
+
+  "typography": {
+    "fontFamily": "Inter, Arial, sans-serif",
+    "sizes": {
+      "3xl": {"size": 40, "weight": 900, "lineHeight": 1.2, "usage": "Основные заголовки"},
+      "2xl": {"size": 32, "weight": 700, "lineHeight": 1.2, "usage": "Имена героев"},
+      "xl": {"size": 24, "weight": 700, "lineHeight": 1.3, "usage": "Заголовки карточек"},
+      "lg": {"size": 18, "weight": 500, "lineHeight": 1.4, "usage": "Подзаголовки"},
+      "base": {"size": 14, "weight": 400, "lineHeight": 1.5, "usage": "Основной текст"},
+      "sm": {"size": 12, "weight": 400, "lineHeight": 1.4, "usage": "Второстепенная информация"},
+      "xs": {"size": 10, "weight": 400, "lineHeight": 1.4, "usage": "Мелкие метки"}
+    }
+  },
+
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32
+  },
+
+  "borderRadius": {
+    "none": 0,
+    "sm": 4,
+    "md": 8,
+    "lg": 12,
+    "xl": 16,
+    "full": 999
+  },
+
+  "shadows": {
+    "sm": "0 1px 2px rgba(0,0,0,0.05)",
+    "md": "0 4px 6px rgba(0,0,0,0.1)",
+    "lg": "0 10px 15px rgba(0,0,0,0.15)",
+    "xl": "0 20px 25px rgba(0,0,0,0.2)"
+  },
+
+  "card": {
+    "width": 300,
+    "height": 420,
+    "zones": {
+      "top": {"percent": 60, "description": "Иллюстрация"},
+      "bottom": {"percent": 40, "description": "Описание эффекта"}
+    }
+  },
+
+  "heroCard": {
+    "width": 300,
+    "height": 420,
+    "zones": {
+      "top": {"percent": 15, "description": "Логотип + имя"},
+      "center": {"percent": 60, "description": "Герб/Символ"},
+      "bottom": {"percent": 25, "description": "Имя + роль"}
+    }
+  },
+
+  "icons": [
+    {"id": "faction", "emoji": "⭐", "name": "Фракция", "size": 40},
+    {"id": "attack", "emoji": "⚔️", "name": "Атака", "size": 24},
+    {"id": "defense", "emoji": "🛡️", "name": "Защита", "size": 24},
+    {"id": "energy", "emoji": "⚡", "name": "Энергия", "size": 24},
+    {"id": "fire", "emoji": "🔥", "name": "Огонь", "size": 24},
+    {"id": "speed", "emoji": "💨", "name": "Скорость", "size": 24},
+    {"id": "magic", "emoji": "✨", "name": "Магия", "size": 24},
+    {"id": "health", "emoji": "❤️", "name": "Здоровье", "size": 24}
+  ],
+
+  "heroes": [
+    {
+      "id": "oda-nobunaga",
+      "name": "Oda Nobunaga",
+      "nativeName": "織田信長",
+      "role": "Honor Guard",
+      "faction": "historical",
+      "colors": ["#D2B48C", "#DC143C", "#1E3A8A"],
+      "assets": {
+        "avatar": "scraped-data/images/heroes/avatars/*oda*",
+        "cardCover": "scraped-data/images/heroes/card-covers/*oda*",
+        "mini": "scraped-data/images/heroes/minis/*oda*"
+      }
+    },
+    {
+      "id": "ms-marvel",
+      "name": "Ms. Marvel",
+      "nativeName": "",
+      "role": "Energy Absorber",
+      "faction": "marvel",
+      "colors": ["#DC143C", "#FFD700", "#6B4C9A"],
+      "assets": {
+        "avatar": "scraped-data/images/heroes/avatars/*ms-marvel*",
+        "cardCover": "scraped-data/images/heroes/card-covers/*ms-marvel*",
+        "mini": "scraped-data/images/heroes/minis/*ms-marvel*",
+        "deck": "scraped-data/images/decks/*ms-marvel*"
+      }
+    },
+    {
+      "id": "geralt",
+      "name": "Geralt of Rivia",
+      "nativeName": "Wiedźmin",
+      "role": "Witcher",
+      "faction": "witcher",
+      "colors": ["#1E3A8A", "#808080", "#FFFFFF"],
+      "assets": {
+        "avatar": "scraped-data/images/heroes/avatars/*geralt*",
+        "cardCover": "scraped-data/images/heroes/card-covers/*geralt*",
+        "mini": "scraped-data/images/heroes/minis/*geralt*"
+      }
+    },
+    {
+      "id": "sun-wukong",
+      "name": "Sun Wukong",
+      "nativeName": "孫悟空",
+      "role": "Monkey King",
+      "faction": "historical",
+      "colors": ["#FFD700", "#DC143C", "#FF6B35"],
+      "assets": {
+        "avatar": "scraped-data/images/heroes/avatars/*wukong*",
+        "cardCover": "scraped-data/images/heroes/card-covers/*wukong*",
+        "mini": "scraped-data/images/heroes/minis/*wukong*"
+      }
+    },
+    {
+      "id": "dracula",
+      "name": "Dracula",
+      "nativeName": "",
+      "role": "Dark Lord",
+      "faction": "historical",
+      "colors": ["#000000", "#DC143C", "#C0C0C0"],
+      "assets": {
+        "avatar": "scraped-data/images/heroes/avatars/*dracula*",
+        "cardCover": "scraped-data/images/heroes/card-covers/*dracula*",
+        "mini": "scraped-data/images/heroes/minis/*dracula*"
+      }
+    }
+  ],
+
+  "components": {
+    "actionCard": {
+      "name": "Card/Action",
+      "dimensions": {"width": 300, "height": 420},
+      "structure": [
+        {"id": "topZone", "height": 252, "type": "illustration"},
+        {"id": "factionBadge", "size": 40, "position": "top-left"},
+        {"id": "valueBadge", "size": 30, "position": "top-right"},
+        {"id": "bottomZone", "height": 168, "type": "description"},
+        {"id": "title", "fontSize": 16, "fontWeight": 700},
+        {"id": "effect", "fontSize": 12, "fontWeight": 400},
+        {"id": "factionName", "fontSize": 10, "position": "bottom-right"}
+      ]
+    },
+    "heroCard": {
+      "name": "Card/Hero",
+      "dimensions": {"width": 300, "height": 420},
+      "structure": [
+        {"id": "topZone", "height": 63, "type": "header"},
+        {"id": "centerZone", "height": 252, "type": "emblem"},
+        {"id": "emblem", "size": 120, "type": "circle"},
+        {"id": "bottomZone", "height": 105, "type": "info"},
+        {"id": "heroName", "fontSize": 24, "fontWeight": 700},
+        {"id": "heroRole", "fontSize": 14, "fontWeight": 400}
+      ]
+    }
+  },
+
+  "exportSettings": {
+    "print": {"format": "PDF", "scale": 3, "dpi": 300},
+    "digital": {"format": "PNG", "scale": 2, "dpi": 144},
+    "web": {"format": "SVG", "scale": 1, "dpi": 72}
+  }
+}

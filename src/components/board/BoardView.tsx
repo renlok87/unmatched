@@ -1,14 +1,28 @@
 import React from 'react';
 import { useGameStore } from '../../store/gameStore';
-import type { Position } from '../../core/models/types';
+import type { Position, GameState } from '../../core/models/types';
 import './BoardView.css';
 
 interface BoardViewProps {
   interactive?: boolean;
+  gameState?: GameState | null;
+  highlightedSpaces?: Position[];
+  onFighterSelect?: (fighterId: string) => void;
+  onSpaceClick?: (position: Position) => void;
 }
 
-export const BoardView: React.FC<BoardViewProps> = ({ interactive = true }) => {
-  const { gameState, highlightedSpaces } = useGameStore();
+export const BoardView: React.FC<BoardViewProps> = ({
+  interactive = true,
+  gameState: propsGameState,
+  highlightedSpaces: propsHighlightedSpaces,
+  onFighterSelect,
+  onSpaceClick,
+}) => {
+  const { gameState: storeGameState, highlightedSpaces: storeHighlightedSpaces, selectedFighterId } = useGameStore();
+
+  // Use props if provided, otherwise fall back to store
+  const gameState = propsGameState ?? storeGameState;
+  const highlightedSpaces = propsHighlightedSpaces ?? storeHighlightedSpaces;
 
   if (!gameState) {
     return (
@@ -28,7 +42,14 @@ export const BoardView: React.FC<BoardViewProps> = ({ interactive = true }) => {
   const handleSpaceClick = (position: Position) => {
     if (!interactive) return;
 
-    const { selectedFighterId, moveFighter } = useGameStore.getState();
+    // Use custom handler if provided
+    if (onSpaceClick) {
+      onSpaceClick(position);
+      return;
+    }
+
+    // Otherwise use store handler
+    const { moveFighter } = useGameStore.getState();
 
     if (selectedFighterId) {
       const isValid = highlightedSpaces.some(
@@ -84,6 +105,9 @@ export const BoardView: React.FC<BoardViewProps> = ({ interactive = true }) => {
         style={{
           gridTemplateColumns: `repeat(${board.width}, 1fr)`,
           gridTemplateRows: `repeat(${board.height}, 1fr)`,
+          backgroundImage: board.imageUrl ? `url(${board.imageUrl})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
         }}
       >
         {board.spaces.map((space) => {
@@ -95,8 +119,8 @@ export const BoardView: React.FC<BoardViewProps> = ({ interactive = true }) => {
               key={`${space.position.x}-${space.position.y}`}
               className={`board-space ${highlighted ? 'highlighted' : ''} ${fighter ? 'occupied' : ''}`}
               style={{
-                backgroundColor: space.zones.length === 1 ? getZoneColor(space.zones) : undefined,
-                background: space.zones.length > 1 ? getZoneColor(space.zones) : undefined,
+                backgroundColor: !board.imageUrl && space.zones.length === 1 ? getZoneColor(space.zones) : undefined,
+                background: !board.imageUrl && space.zones.length > 1 ? getZoneColor(space.zones) : undefined,
               }}
               onClick={() => handleSpaceClick(space.position)}
             >
@@ -111,10 +135,26 @@ export const BoardView: React.FC<BoardViewProps> = ({ interactive = true }) => {
                 </div>
               )}
               {fighter && (
-                <div className={`fighter-token ${fighter.type}`}>
-                  <div className="fighter-name">
-                    {fighter.type === 'hero' ? 'H' : 'S'}
-                  </div>
+                <div
+                  className={`fighter-token ${fighter.type}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onFighterSelect) {
+                      onFighterSelect(fighter.id);
+                    }
+                  }}
+                >
+                  {fighter.avatarUrl ? (
+                    <img
+                      src={fighter.avatarUrl}
+                      alt={fighter.type}
+                      className="fighter-avatar"
+                    />
+                  ) : (
+                    <div className="fighter-name">
+                      {fighter.type === 'hero' ? 'H' : 'S'}
+                    </div>
+                  )}
                   <div className="fighter-health">
                     {fighter.health}/{fighter.maxHealth}
                   </div>

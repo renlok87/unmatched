@@ -25,13 +25,7 @@ import { RedisModule } from '../redis/redis.module';
       }),
     }),
   ],
-  providers: [
-    AuthResolver,
-    AuthService,
-    JwtStrategy,
-    RefreshStrategy,
-    GqlAuthGuard,
-  ],
+  providers: [AuthResolver, AuthService, JwtStrategy, RefreshStrategy, GqlAuthGuard],
   exports: [AuthService, GqlAuthGuard],
 })
 export class AuthModule {}

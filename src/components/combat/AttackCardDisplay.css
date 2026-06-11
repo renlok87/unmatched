@@ -1,0 +1,118 @@
+.attack-card-display {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  min-width: 140px;
+  transition: all 0.3s ease;
+  animation: card-play 0.5s ease;
+}
+
+@keyframes card-play {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.attack-card-display--attack {
+  border-color: rgba(244, 67, 54, 0.4);
+  background: rgba(244, 67, 54, 0.15);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+}
+
+.attack-card-display--defense {
+  border-color: rgba(33, 150, 243, 0.4);
+  background: rgba(33, 150, 243, 0.15);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.attack-card-display--versatile {
+  border-color: rgba(156, 39, 176, 0.4);
+  background: rgba(156, 39, 176, 0.15);
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+}
+
+.attack-card-display--scheme {
+  border-color: rgba(255, 152, 0, 0.4);
+  background: rgba(255, 152, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.attack-card-display__value {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-white);
+  font-family: monospace;
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.attack-card-display__name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white);
+  text-align: center;
+  line-height: var(--line-height-relaxed);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attack-card-display__type {
+  font-size: 32px;
+  opacity: 0.8;
+}
+
+.attack-card-display__boost {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--color-success);
+  color: var(--color-white);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  animation: boost-pulse 1s ease-in-out infinite;
+}
+
+@keyframes boost-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@media (max-width: 768px) {
+  .attack-card-display {
+    min-width: 100px;
+    padding: var(--spacing-3);
+  }
+
+  .attack-card-display__value {
+    font-size: var(--font-size-3xl);
+  }
+
+  .attack-card-display__name {
+    font-size: var(--font-size-xs);
+  }
+
+  .attack-card-display__type {
+    font-size: 24px;
+  }
+}

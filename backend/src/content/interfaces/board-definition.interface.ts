@@ -9,6 +9,7 @@ export interface BoardDefinition {
   height: number;
   recommendedPlayers: number;
   spaces: BoardSpace[];
+  imageUrl?: string;
 }
 
 /**

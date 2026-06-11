@@ -13,7 +13,8 @@ import type {
   PositionDto,
   HeroUrlsDto,
 } from '../dto/content.dto';
-import { FighterType, Zone } from '../interfaces';
+import { FighterType, Zone, CardType } from '../interfaces';
+import type { Hero, Card, Board as PrismaBoard } from '@prisma/client';
 
 /**
  * Content Mapper
@@ -28,6 +29,8 @@ export class ContentMapper {
     return {
       id: hero.id,
       name: hero.name,
+      nameEn: hero.nameEn,
+      nameRu: hero.nameRu,
       health: hero.health,
       movement: hero.movement,
       set: hero.set,
@@ -42,6 +45,55 @@ export class ContentMapper {
       sidekickCount: hero.sidekickCount,
       sidekickHealth: hero.sidekickHealth,
       urls: hero.urls ? this.toHeroUrlsDto(hero.urls) : undefined,
+    };
+  }
+
+  /**
+   * Прямое преобразование Prisma модели в HeroDto (для админки)
+   */
+  prismaHeroToHeroDto(prismaHero: Hero & { cards?: Card[] }): HeroDto {
+    const cards = prismaHero.cards || [];
+    const urls = this.parseHeroUrls(prismaHero);
+
+    return {
+      id: prismaHero.name, // Используем name как ID для совместимости с существующей системой
+      name: prismaHero.name,
+      nameEn: prismaHero.nameEn || undefined,
+      nameRu: prismaHero.nameRu || undefined,
+      health: prismaHero.health,
+      movement: 3,
+      set: prismaHero.set,
+      abilities: this.parsePrismaAbility(prismaHero.ability).map((a: any, i: number) => ({
+        id: `${prismaHero.name}-ability-${i}`,
+        name: a.name || 'Ability',
+        text: a.text || a.description || '',
+        trigger: a.trigger || 'passive',
+      })),
+      cards: cards.map((c) => {
+        const cardDef = this.prismaCardToCardDefinition(c);
+        return {
+          id: cardDef.id,
+          title: cardDef.title,
+          type: cardDef.type,
+          value: cardDef.value,
+          boost: cardDef.boost,
+          quantity: cardDef.quantity,
+          characterName: cardDef.characterName,
+          effects: cardDef.effects.map((e: any, i: number) => ({
+            id: `${c.id}-effect-${i}`,
+            timing: e.timing || 'during_combat',
+            text: e.text || '',
+          })),
+        };
+      }),
+      fighterType: this.parseFighterType(prismaHero.fighterType),
+      sidekickCount: this.parseSidekickCount(prismaHero.properties),
+      sidekickHealth: this.parseSidekickHealth(prismaHero.properties),
+      urls,
+      imageUrl: prismaHero.imageUrl || undefined,
+      avatarUrl: prismaHero.avatarUrl || undefined,
+      createdAt: prismaHero.createdAt,
+      updatedAt: prismaHero.updatedAt,
     };
   }
 
@@ -73,6 +125,8 @@ export class ContentMapper {
         timing: e.timing,
         text: e.text,
       })),
+      imageUrl: card.imageUrl,
+      imageUrlRu: card.imageUrlRu,
     };
   }
 
@@ -89,6 +143,7 @@ export class ContentMapper {
       width: board.width,
       height: board.height,
       recommendedPlayers: board.recommendedPlayers,
+      imageUrl: board.imageUrl,
       spaces: board.spaces.map(s => this.toBoardSpaceDto(s)),
     };
   }
@@ -122,5 +177,245 @@ export class ContentMapper {
       setsCount: summary.setsCount,
       sets: summary.sets,
     };
+  }
+
+  // ==================== Prisma Model Mapping ====================
+
+  /**
+   * Convert Prisma Hero model to HeroDefinition
+   */
+  prismaHeroToHeroDefinition(
+    prismaHero: Hero & { cards?: Card[] },
+  ): HeroDefinition {
+    const cards = prismaHero.cards || [];
+
+    return {
+      id: prismaHero.name, // Use name as ID for compatibility
+      name: prismaHero.name,
+      nameEn: prismaHero.nameEn || undefined,
+      nameRu: prismaHero.nameRu || undefined,
+      health: prismaHero.health,
+      movement: 3, // Default value, should be stored in DB
+      set: prismaHero.set,
+      abilities: this.parsePrismaAbility(prismaHero.ability),
+      deckCards: cards.map((c) => this.prismaCardToCardDefinition(c)),
+      fighterType: this.parseFighterType(prismaHero.fighterType),
+      sidekickCount: this.parseSidekickCount(prismaHero.properties),
+      sidekickHealth: this.parseSidekickHealth(prismaHero.properties),
+      urls: this.parseHeroUrls(prismaHero),
+    };
+  }
+
+  /**
+   * Convert Prisma Card model to CardDefinition
+   */
+  prismaCardToCardDefinition(prismaCard: Card): CardDefinition {
+    const effects = this.parsePrismaEffects(prismaCard.effects);
+
+    return {
+      id: prismaCard.id,
+      title: prismaCard.name,
+      type: this.parseCardType(prismaCard.cardType),
+      value:
+        prismaCard.attackValue ??
+        prismaCard.defenseValue ??
+        prismaCard.boostValue ??
+        0,
+      boost: prismaCard.boostValue ?? 0,
+      quantity: prismaCard.count,
+      characterName: prismaCard.nameEn || prismaCard.name,
+      imageUrl: prismaCard.imageUrl || undefined,
+      imageUrlRu: prismaCard.imageUrlRu || undefined,
+      effects: effects.map((e, i) => ({
+        id: `${prismaCard.id}-effect-${i}`,
+        timing: e.timing || 'during_combat',
+        text: e.text || prismaCard.text || '',
+      })),
+    };
+  }
+
+  /**
+   * Convert Prisma Board model to BoardDefinition
+   */
+  prismaBoardToBoardDefinition(prismaBoard: PrismaBoard): BoardDefinition {
+    const cells = this.parsePrismaCells(prismaBoard.cells);
+    const spaces = cells.map((cell) => ({
+      position: { x: cell.x, y: cell.y },
+      zones: cell.zones || [],
+      isObstacle: cell.isObstacle || false,
+    }));
+
+    return {
+      id: prismaBoard.name,
+      name: prismaBoard.name,
+      width: prismaBoard.width,
+      height: prismaBoard.height,
+      recommendedPlayers: 2,
+      imageUrl: prismaBoard.imageUrl || undefined,
+      spaces,
+    };
+  }
+
+  // ==================== Prisma Parsing Helpers ====================
+
+  private parsePrismaAbility(ability: any): any[] {
+    if (!ability) return [];
+
+    let abilities: any[] = [];
+
+    if (typeof ability === 'string') {
+      try {
+        const parsed = JSON.parse(ability);
+        abilities = Array.isArray(parsed) ? parsed : [parsed];
+      } catch {
+        // Если не JSON, возвращаем пустой массив или способность из текста
+        return [{
+          id: 'default-ability',
+          name: 'Ability',
+          text: ability,
+          trigger: 'passive',
+        }];
+      }
+    } else if (Array.isArray(ability)) {
+      abilities = ability;
+    } else {
+      abilities = [ability];
+    }
+
+    // Нормализуем способности, гарантируя наличие нужных полей
+    return abilities.map((a, index) => ({
+      id: a?.id || a?.name?.toLowerCase().replace(/\s+/g, '-') || `ability-${index}`,
+      name: a?.name || a?.title || 'Ability',
+      text: a?.text || a?.description || '',
+      trigger: this.normalizeAbilityTrigger(a?.trigger) || 'passive',
+    }));
+  }
+
+  private normalizeAbilityTrigger(trigger: string): string {
+    if (!trigger) return 'passive';
+    // Конвертируем в snake_case и нижний регистр
+    const normalized = trigger
+      .toString()
+      .toUpperCase()
+      .replace(/ /g, '_');
+    // Соответствие с enum values
+    const triggerMap: Record<string, string> = {
+      'START_OF_TURN': 'start_of_turn',
+      'DURING_COMBAT': 'during_combat',
+      'PASSIVE': 'passive',
+      'WHEN_ATTACKED': 'when_attacked',
+      'WHEN_DEFENDING': 'when_defending',
+      'END_OF_TURN': 'end_of_turn',
+    };
+    return triggerMap[normalized] || normalized.toLowerCase();
+  }
+
+  private parseFighterType(type: string): FighterType {
+    if (!type) return FighterType.HERO;
+    const normalized = type.toLowerCase();
+    if (normalized === 'minion' || normalized === 'sidekick') {
+      return FighterType.SIDEKICK;
+    }
+    return FighterType.HERO;
+  }
+
+  private parseSidekickCount(properties: any): number | undefined {
+    if (!properties) return undefined;
+    if (typeof properties === 'string') {
+      try {
+        const parsed = JSON.parse(properties);
+        return parsed.sidekickCount;
+      } catch {
+        return undefined;
+      }
+    }
+    return properties.sidekickCount;
+  }
+
+  private parseSidekickHealth(properties: any): number | undefined {
+    if (!properties) return undefined;
+    if (typeof properties === 'string') {
+      try {
+        const parsed = JSON.parse(properties);
+        return parsed.sidekickHealth;
+      } catch {
+        return undefined;
+      }
+    }
+    return properties.sidekickHealth;
+  }
+
+  private parseHeroUrls(prismaHero: Hero): HeroUrls | undefined {
+    if (!prismaHero.avatarUrl) return undefined;
+
+    return {
+      avatar: prismaHero.avatarUrl,
+      mini: prismaHero.imageUrl || prismaHero.avatarUrl,
+      cardCover: prismaHero.imageUrl || prismaHero.avatarUrl,
+    };
+  }
+
+  private parsePrismaEffects(effects: any): any[] {
+    if (!effects) return [];
+
+    let parsedEffects: any[] = [];
+
+    if (typeof effects === 'string') {
+      try {
+        const parsed = JSON.parse(effects);
+        parsedEffects = Array.isArray(parsed) ? parsed : [parsed];
+      } catch {
+        return [];
+      }
+    } else if (Array.isArray(effects)) {
+      parsedEffects = effects;
+    } else {
+      parsedEffects = [effects];
+    }
+
+    // Нормализуем timing к snake_case
+    const normalizeTiming = (timing: string): string => {
+      if (!timing) return 'during_combat';
+      // Конвертируем UPPER_CASE или camelCase в snake_case
+      return timing
+        .replace(/([A-Z])/g, '_$1')
+        .toLowerCase()
+        .replace(/^_/, '')
+        .replace(/_+/g, '_');
+    };
+
+    return parsedEffects.map((e) => ({
+      ...e,
+      timing: normalizeTiming(e.timing),
+    }));
+  }
+
+  private parseCardType(type: string): CardType {
+    if (!type) return CardType.VERSATILE;
+    const typeMap: Record<string, CardType> = {
+      'attack': CardType.ATTACK,
+      'ATTACK': CardType.ATTACK,
+      'defense': CardType.DEFENSE,
+      'DEFENSE': CardType.DEFENSE,
+      'scheme': CardType.SCHEME,
+      'SCHEME': CardType.SCHEME,
+      'versatile': CardType.VERSATILE,
+      'VERSATILE': CardType.VERSATILE,
+      'universal': CardType.VERSATILE,
+      'UNIVERSAL': CardType.VERSATILE,
+    };
+    return typeMap[type] || CardType.VERSATILE;
+  }
+
+  private parsePrismaCells(cells: any): any[] {
+    if (!cells) return [];
+    if (typeof cells === 'string') {
+      try {
+        return JSON.parse(cells);
+      } catch {
+        return [];
+      }
+    }
+    return cells;
   }
 }

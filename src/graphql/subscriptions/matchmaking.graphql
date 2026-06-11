@@ -1,0 +1,10 @@
+subscription MatchFound($userId: String!) {
+  matchFound(userId: $userId) {
+    gameId
+    opponentId
+    opponentUsername
+    opponentRating
+    mode
+    expiresAt
+  }
+}

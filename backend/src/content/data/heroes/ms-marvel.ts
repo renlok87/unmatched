@@ -37,7 +37,7 @@ export const msMarvel: HeroDefinition = {
         {
           id: 'embiggen-effect',
           timing: EffectTiming.DURING_COMBAT,
-          text: "If Ms. Marvel is in more zones than the opposing fighter, the value of this card is 6 instead.",
+          text: 'If Ms. Marvel is in more zones than the opposing fighter, the value of this card is 6 instead.',
         },
       ],
     },
@@ -101,8 +101,10 @@ export const msMarvel: HeroDefinition = {
     },
   ],
   urls: {
-    avatar: 'https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/avatars/M61_bBineukElgyyqqSFu.webp',
+    avatar:
+      'https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/avatars/M61_bBineukElgyyqqSFu.webp',
     mini: 'https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/minis/w-c5wvLOZYCYK0udNG-DV.webp',
-    cardCover: 'https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/card-covers/MFiQb6grYsbNNYwR_hoh1.webp',
+    cardCover:
+      'https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/card-covers/MFiQb6grYsbNNYwR_hoh1.webp',
   },
 };

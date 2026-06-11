@@ -1,0 +1,161 @@
+.game-error-boundary {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-darker);
+  z-index: 9999;
+  padding: var(--spacing-4);
+}
+
+.game-error-boundary__content {
+  max-width: 600px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-6);
+  padding: var(--spacing-8);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  animation: slide-in 0.3s ease;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.game-error-boundary__icon {
+  font-size: 64px;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+.game-error-boundary__title {
+  color: var(--color-white);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+.game-error-boundary__message {
+  color: var(--color-gray-400);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+.game-error-boundary__details {
+  width: 100%;
+  text-align: left;
+}
+
+.game-error-boundary__summary {
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  padding: var(--spacing-2);
+  background: rgba(33, 150, 243, 0.1);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(33, 150, 243, 0.2);
+  transition: all 0.2s ease;
+}
+
+.game-error-boundary__summary:hover {
+  background: rgba(33, 150, 243, 0.15);
+  border-color: rgba(33, 150, 243, 0.3);
+}
+
+.game-error-boundary__error-info {
+  margin-top: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-md);
+  font-family: monospace;
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-300);
+  line-height: var(--line-height-relaxed);
+  overflow-x: auto;
+}
+
+.game-error-boundary__error-message,
+.game-error-boundary__stack-trace {
+  margin-bottom: var(--spacing-3);
+}
+
+.game-error-boundary__error-message:last-child,
+.game-error-boundary__stack-trace:last-child {
+  margin-bottom: 0;
+}
+
+.game-error-boundary__error-message strong,
+.game-error-boundary__stack-trace strong {
+  color: var(--color-white);
+  display: block;
+  margin-bottom: var(--spacing-2);
+}
+
+.game-error-boundary__error-message pre,
+.game-error-boundary__stack-trace pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.game-error-boundary__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  width: 100%;
+}
+
+.game-error-boundary__retry-btn,
+.game-error-boundary__reload-btn,
+.game-error-boundary__lobby-btn {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .game-error-boundary__content {
+    padding: var(--spacing-6);
+    gap: var(--spacing-4);
+  }
+
+  .game-error-boundary__icon {
+    font-size: 48px;
+  }
+
+  .game-error-boundary__title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .game-error-boundary__message {
+    font-size: var(--font-size-sm);
+  }
+}

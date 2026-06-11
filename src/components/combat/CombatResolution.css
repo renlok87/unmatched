@@ -1,0 +1,179 @@
+.combat-resolution {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fade-in 0.3s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.combat-resolution__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding: var(--spacing-8);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-xl);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  max-width: 800px;
+  width: 100%;
+  margin: var(--spacing-4);
+}
+
+.combat-resolution__title {
+  color: var(--color-white);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.combat-resolution__fighters {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--spacing-6);
+}
+
+.combat-resolution__fighter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  position: relative;
+}
+
+.combat-resolution__fighter-name {
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.combat-resolution__fighter-health {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  width: 100%;
+  max-width: 200px;
+}
+
+.combat-resolution__health-bar {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.combat-resolution__health-fill {
+  height: 100%;
+  transition: width 0.5s ease, background-color 0.5s ease;
+}
+
+.combat-resolution__health-text {
+  color: var(--color-gray-400);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+}
+
+.combat-resolution__damage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-error);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  font-family: monospace;
+  animation: damage-appear 0.5s ease;
+}
+
+@keyframes damage-appear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.combat-resolution__vs {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-white);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.combat-resolution__summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-md);
+}
+
+.combat-resolution__summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+}
+
+.combat-resolution__summary-value {
+  font-weight: var(--font-weight-bold);
+  font-family: monospace;
+  font-size: var(--font-size-lg);
+  color: var(--color-error);
+}
+
+.combat-resolution__actions {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .combat-resolution__content {
+    padding: var(--spacing-6);
+    gap: var(--spacing-4);
+  }
+
+  .combat-resolution__title {
+    font-size: var(--font-size-xl);
+  }
+
+  .combat-resolution__fighters {
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+
+  .combat-resolution__fighter-health {
+    max-width: 100%;
+  }
+
+  .combat-resolution__vs {
+    font-size: var(--font-size-2xl);
+  }
+}

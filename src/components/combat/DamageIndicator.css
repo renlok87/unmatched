@@ -1,0 +1,76 @@
+.damage-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+  z-index: 1000;
+  pointer-events: none;
+  animation: damage-flash 1s ease-out forwards;
+}
+
+@keyframes damage-flash {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -100%) scale(0.8);
+  }
+}
+
+.damage-indicator--attacker {
+  left: 25%;
+}
+
+.damage-indicator--defender {
+  left: 75%;
+}
+
+.damage-indicator__value {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-error);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  font-family: monospace;
+  line-height: 1;
+}
+
+.damage-indicator__icon {
+  font-size: 48px;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-15deg);
+  }
+  75% {
+    transform: rotate(15deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .damage-indicator__value {
+    font-size: var(--font-size-3xl);
+  }
+
+  .damage-indicator__icon {
+    font-size: 36px;
+  }
+}

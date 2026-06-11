@@ -1,0 +1,77 @@
+.combat-timer {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.combat-timer--low {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.combat-timer__svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.combat-timer__background {
+  stroke: rgba(255, 255, 255, 0.2);
+}
+
+.combat-timer__progress {
+  stroke: var(--color-primary);
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.combat-timer__progress--low {
+  stroke: var(--color-error);
+  animation: glow 1s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(244, 67, 54, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(244, 67, 54, 0.8));
+  }
+}
+
+.combat-timer__value {
+  position: relative;
+  z-index: 1;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  font-family: monospace;
+}
+
+.combat-timer--low .combat-timer__value {
+  color: var(--color-error);
+}
+
+@media (max-width: 768px) {
+  .combat-timer {
+    width: 80px;
+    height: 80px;
+  }
+
+  .combat-timer__value {
+    font-size: var(--font-size-xl);
+  }
+}

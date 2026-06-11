@@ -45,22 +45,19 @@ export const Card: React.FC<CardProps> = ({
     return labels[type];
   };
 
-  const getCardTypeColor = (type: CardType) => {
-    const colors: Record<CardType, string> = {
-      [CardType.ATTACK]: '#ef4444',
-      [CardType.DEFENSE]: '#3b82f6',
-      [CardType.VERSATILE]: '#a855f7',
-      [CardType.SCHEME]: '#eab308',
-    };
-    return colors[type];
-  };
+  const cardImage = definition.imageUrl || definition.imageUrlRu;
 
   return (
     <div
-      className={`card ${definition.type} ${isPlayable ? 'playable' : ''} ${isSelected ? 'selected' : ''}`}
+      className={`card ${definition.type.toLowerCase()} ${isPlayable ? 'playable' : ''} ${isSelected ? 'selected' : ''}`}
       onClick={isPlayable ? onClick : undefined}
-      style={{ '--card-type-color': getCardTypeColor(definition.type) } as React.CSSProperties}
     >
+      {cardImage && (
+        <div className="card-image">
+          <img src={cardImage} alt={definition.title} />
+        </div>
+      )}
+
       <div className="card-header">
         <span className="card-title">{definition.title}</span>
         {showValue && <span className="card-value">{definition.value}</span>}

@@ -91,6 +91,12 @@ export class CardDto {
 
   @Field(() => [CardEffectDto])
   effects!: CardEffectDto[];
+
+  @Field(() => String, { nullable: true })
+  imageUrl?: string;
+
+  @Field(() => String, { nullable: true })
+  imageUrlRu?: string;
 }
 
 @ObjectType('Hero')
@@ -100,6 +106,12 @@ export class HeroDto {
 
   @Field(() => String)
   name!: string;
+
+  @Field(() => String, { nullable: true })
+  nameEn?: string;
+
+  @Field(() => String, { nullable: true })
+  nameRu?: string;
 
   @Field(() => Int)
   health!: number;
@@ -127,6 +139,19 @@ export class HeroDto {
 
   @Field(() => HeroUrlsDto, { nullable: true })
   urls?: HeroUrlsDto;
+
+  // Поля для админки (совместимость с Prisma)
+  @Field(() => String, { nullable: true })
+  imageUrl?: string;
+
+  @Field(() => String, { nullable: true })
+  avatarUrl?: string;
+
+  @Field(() => Date, { nullable: true })
+  createdAt?: Date;
+
+  @Field(() => Date, { nullable: true })
+  updatedAt?: Date;
 }
 
 @ObjectType('Position')
@@ -172,6 +197,9 @@ export class BoardDto {
 
   @Field(() => [BoardSpaceDto])
   spaces!: BoardSpaceDto[];
+
+  @Field(() => String, { nullable: true })
+  imageUrl?: string;
 }
 
 @ObjectType('PaginationInfo')

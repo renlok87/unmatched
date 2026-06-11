@@ -1,0 +1,200 @@
+/**
+ * Adjacency Service
+ *
+ * Определяет соседние клетки и достижимость на доске.
+ * Используется для перемещения и поиска путей.
+ */
+
+import { Injectable, Logger } from '@nestjs/common';
+import type { BoardState, Position } from '../models';
+
+export interface AdjacentCell {
+  readonly position: Position;
+  readonly direction: Direction;
+  readonly cost: number;
+  readonly isBlocked: boolean;
+}
+
+export enum Direction {
+  NORTH = 'north',
+  SOUTH = 'south',
+  EAST = 'east',
+  WEST = 'west',
+  NORTHEAST = 'northeast',
+  NORTHWEST = 'northwest',
+  SOUTHEAST = 'southeast',
+  SOUTHWEST = 'southwest',
+}
+
+@Injectable()
+export class AdjacencyService {
+  private readonly logger = new Logger(AdjacencyService.name);
+
+  // Смещения для соседних клеток (ортогональные)
+  private readonly orthogonalOffsets: readonly { dx: number; dy: number; direction: Direction }[] =
+    [
+      { dx: 0, dy: -1, direction: Direction.NORTH },
+      { dx: 0, dy: 1, direction: Direction.SOUTH },
+      { dx: 1, dy: 0, direction: Direction.EAST },
+      { dx: -1, dy: 0, direction: Direction.WEST },
+    ];
+
+  // Смещения для диагональных соседей
+  private readonly diagonalOffsets: readonly { dx: number; dy: number; direction: Direction }[] = [
+    { dx: 1, dy: -1, direction: Direction.NORTHEAST },
+    { dx: -1, dy: -1, direction: Direction.NORTHWEST },
+    { dx: 1, dy: 1, direction: Direction.SOUTHEAST },
+    { dx: -1, dy: 1, direction: Direction.SOUTHWEST },
+  ];
+
+  /**
+   * Получить соседние клетки для позиции
+   */
+  getAdjacentCells(
+    boardState: BoardState,
+    position: Position,
+    options: { includeDiagonal?: boolean; ignoreBlocking?: boolean } = {},
+  ): readonly AdjacentCell[] {
+    const { includeDiagonal = false, ignoreBlocking = false } = options;
+
+    const offsets = includeDiagonal
+      ? [...this.orthogonalOffsets, ...this.diagonalOffsets]
+      : this.orthogonalOffsets;
+
+    return offsets
+      .map(({ dx, dy, direction }) => {
+        const adjacentPos: Position = { x: position.x + dx, y: position.y + dy };
+        const cell = this.getCell(boardState, adjacentPos);
+
+        if (!cell) {
+          return null;
+        }
+
+        const isBlocked = !ignoreBlocking && this.isCellBlocked(cell);
+        const cost = includeDiagonal && dx !== 0 && dy !== 0 ? 1.5 : 1;
+
+        return {
+          position: adjacentPos,
+          direction,
+          cost,
+          isBlocked,
+        };
+      })
+      .filter((c): c is AdjacentCell => c !== null);
+  }
+
+  /**
+   * Получить достижимые клетки (BFS)
+   */
+  getReachableCells(
+    boardState: BoardState,
+    start: Position,
+    maxCost: number,
+    options: { includeDiagonal?: boolean } = {},
+  ): Map<string, { position: Position; cost: number }> {
+    const reachable = new Map<string, { position: Position; cost: number }>();
+    const visited = new Set<string>();
+    const queue: Array<{ position: Position; cost: number }> = [{ position: start, cost: 0 }];
+
+    visited.add(this.posKey(start));
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+
+      if (current.cost > 0) {
+        reachable.set(this.posKey(current.position), {
+          position: current.position,
+          cost: current.cost,
+        });
+      }
+
+      if (current.cost >= maxCost) {
+        continue;
+      }
+
+      const adjacent = this.getAdjacentCells(boardState, current.position, options);
+
+      for (const cell of adjacent) {
+        if (cell.isBlocked) {
+          continue;
+        }
+
+        const key = this.posKey(cell.position);
+        if (visited.has(key)) {
+          continue;
+        }
+
+        visited.add(key);
+        queue.push({
+          position: cell.position,
+          cost: current.cost + cell.cost,
+        });
+      }
+    }
+
+    return reachable;
+  }
+
+  /**
+   * Проверить, заблокирована ли клетка
+   */
+  isCellBlocked(cell: BoardState['cells'][number][number]): boolean {
+    return (
+      cell.type === 'wall' || cell.type === 'obstacle' || (cell.type === 'door' && !cell.isOpen)
+    );
+  }
+
+  /**
+   * Получить клетку по позиции
+   */
+  private getCell(
+    boardState: BoardState,
+    position: Position,
+  ): BoardState['cells'][number][number] | null {
+    if (
+      position.x < 0 ||
+      position.x >= boardState.width ||
+      position.y < 0 ||
+      position.y >= boardState.height
+    ) {
+      return null;
+    }
+
+    return boardState.cells[position.y]?.[position.x];
+  }
+
+  /**
+   * Создать ключ для позиции
+   */
+  private posKey(pos: Position): string {
+    return `${pos.x}:${pos.y}`;
+  }
+
+  /**
+   * Вычислить Manhattan расстояние
+   */
+  manhattanDistance(a: Position, b: Position): number {
+    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+  }
+
+  /**
+   * Вычислить Евклидово расстояние
+   */
+  euclideanDistance(a: Position, b: Position): number {
+    return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+  }
+
+  /**
+   * Проверить, являются ли две позиции смежными
+   * Используется для проверки возможности атаки
+   *
+   * @param state - Состояние игры
+   * @param a - Первая позиция
+   * @param b - Вторая позиция
+   * @returns true если позиции смежные
+   */
+  async isAdjacent(state: any, a: Position, b: Position): Promise<boolean> {
+    const distance = this.manhattanDistance(a, b);
+    return distance === 1;
+  }
+}

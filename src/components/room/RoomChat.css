@@ -1,0 +1,122 @@
+.room-chat {
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.room-chat__title {
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+  padding: var(--spacing-4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.room-chat__messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.room-chat__messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.room-chat__messages::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.room-chat__messages::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+}
+
+.room-chat__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  color: var(--color-gray-400);
+}
+
+.room-chat__empty-icon {
+  font-size: 32px;
+  opacity: 0.5;
+}
+
+.room-chat__empty-text {
+  font-size: var(--font-size-sm);
+}
+
+.room-chat__message {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: flex-start;
+  animation: slide-in 0.3s ease;
+}
+
+.room-chat__message--system {
+  justify-content: center;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.room-chat__system-text {
+  color: var(--color-gray-400);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.05);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-sm);
+}
+
+.room-chat__message-time {
+  color: var(--color-gray-500);
+  font-size: var(--font-size-xs);
+  min-width: 50px;
+}
+
+.room-chat__message-author {
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  min-width: 80px;
+}
+
+.room-chat__message-text {
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  word-break: break-word;
+}
+
+.room-chat__input {
+  padding: var(--spacing-3);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.room-chat__input input {
+  flex: 1;
+  min-width: 0;
+}

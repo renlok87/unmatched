@@ -1,4 +1,9 @@
-import { Injectable, ConflictException, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  UnauthorizedException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
@@ -104,6 +109,7 @@ export class AuthService {
         email: result.email,
         username: result.username,
         avatar: result.avatar,
+        role: result.role,
         createdAt: result.createdAt,
         emailVerified: result.emailVerified,
       },
@@ -176,6 +182,7 @@ export class AuthService {
         email: user.email,
         username: user.username,
         avatar: user.avatar,
+        role: user.role,
         createdAt: user.createdAt,
         emailVerified: user.emailVerified,
       },
@@ -185,59 +192,70 @@ export class AuthService {
   /**
    * Обновление токенов с ротацией refresh token
    */
-  async refreshTokens(refreshToken: string) {
+async refreshTokens(refreshToken: string) {
     try {
       // 1. Проверяем валидность refresh token
       const payload = await this.jwtService.verifyAsync(refreshToken, {
         secret: this.configService.get<string>('jwt.refreshSecret') || 'default-refresh-secret',
       });
 
-      // 2. Хешируем и ищем в БД
-      const tokenHash = await bcrypt.hash(refreshToken, 10);
-
-      const storedToken = await this.prisma.refreshToken.findFirst({
+      // 2. Ищем токен в БД (все включая revoked для проверки)
+      const allTokens = await this.prisma.refreshToken.findMany({
         where: {
           userId: payload.sub,
-          revokedAt: null,
         },
         include: { user: true },
         orderBy: { createdAt: 'desc' },
       });
 
-      // Проверяем хеш токена (сравниваем с константой времени для защиты от timing attack)
+      // Проверяем хеш токена
+      let storedToken = null;
       let tokenMatch = false;
-      if (storedToken) {
-        tokenMatch = await bcrypt.compare(refreshToken, storedToken.token);
+      
+      for (const token of allTokens) {
+        if (await bcrypt.compare(refreshToken, token.token)) {
+          storedToken = token;
+          tokenMatch = true;
+          break;
+        }
       }
 
-      if (!storedToken || !tokenMatch || storedToken.revokedAt) {
+      if (!storedToken || !tokenMatch) {
         throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      // 3. Проверяем статус токена
+      if (storedToken.revokedAt) {
+        throw new UnauthorizedException('Refresh token has been revoked');
       }
 
       if (storedToken.expiresAt < new Date()) {
         throw new UnauthorizedException('Refresh token expired');
       }
 
-      // 3. Ревокуем старый токен
-      await this.prisma.refreshToken.update({
-        where: { id: storedToken.id },
-        data: { revokedAt: new Date() },
-      });
-
       // 4. Генерируем новые токены
       const tokens = await this.generateTokens(storedToken.user.id, storedToken.user.email);
 
-      // 5. Сохраняем новый refresh token
-      const newTokenHash = await bcrypt.hash(tokens.refreshToken, 10);
-      const newExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 часа
+      // 5. Ревокуем старый и создаём новый в транзакции
+      await this.prisma.$transaction(async (tx) => {
+        // Ревокуем старый токен
+        await tx.refreshToken.update({
+          where: { id: storedToken.id },
+          data: { revokedAt: new Date() },
+        });
 
-      await this.prisma.refreshToken.create({
-        data: {
-          token: newTokenHash,
-          userId: storedToken.user.id,
-          expiresAt: newExpiresAt,
-          replacedBy: storedToken.id,
-        },
+        // Создаём новый токен с тем же значением, что и tokens.refreshToken
+        const newTokenHash = await bcrypt.hash(tokens.refreshToken, 10);
+        const newExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        await tx.refreshToken.create({
+          data: {
+            token: newTokenHash,
+            userId: storedToken.user.id,
+            expiresAt: newExpiresAt,
+            replacedBy: storedToken.id,
+          },
+        });
       });
 
       // 6. Инвалидируем кеш пользователя
@@ -251,6 +269,7 @@ export class AuthService {
           email: storedToken.user.email,
           username: storedToken.user.username,
           avatar: storedToken.user.avatar,
+          role: storedToken.user.role,
           createdAt: storedToken.user.createdAt,
           emailVerified: storedToken.user.emailVerified,
         },
@@ -271,7 +290,7 @@ export class AuthService {
     if (accessToken) {
       try {
         // Декодируем токен без верификации для получения exp
-        const decoded = this.jwtService.decode(accessToken) as any;
+        const decoded = this.jwtService.decode(accessToken);
 
         if (decoded && decoded.exp) {
           // Вычисляем TTL до истечения токена
@@ -435,6 +454,7 @@ export class AuthService {
       email: user.email,
       username: user.username,
       avatar: user.avatar,
+      role: user.role,
       createdAt: user.createdAt,
       emailVerified: user.emailVerified,
     };
@@ -443,7 +463,7 @@ export class AuthService {
   /**
    * Генерация access и refresh токенов
    */
-  private async generateTokens(userId: string, email: string) {
+private async generateTokens(userId: string, email: string) {
     const payload = { sub: userId, email };
 
     // Access Token - 1 час
@@ -453,7 +473,12 @@ export class AuthService {
     });
 
     // Refresh Token - 24 часа
-    const refreshToken = await this.jwtService.signAsync(payload, {
+    // Добавляем случайный jti для обеспечения уникальности каждого токена
+    const refreshTokenPayload = {
+      ...payload,
+      jti: crypto.randomUUID(), // Уникальный ID для каждого refresh токена
+    };
+    const refreshToken = await this.jwtService.signAsync(refreshTokenPayload, {
       secret: this.configService.get<string>('jwt.refreshSecret') || 'default-refresh-secret',
       expiresIn: (this.configService.get<string>('jwt.refreshExpiresIn') || '24h') as any,
     });

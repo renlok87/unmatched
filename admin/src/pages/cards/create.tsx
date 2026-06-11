@@ -7,7 +7,7 @@ import { client, gql } from '../../providers/dataProvider';
 const { Option } = Select;
 const { TextArea } = Input;
 
-const CARD_TYPES = ['ATTACK', 'DEFENSE', 'SCHEME', 'MANEUVER'];
+const CARD_TYPES = ['ATTACK', 'DEFENSE', 'VERSATILE', 'SCHEME', 'MANEUVER'];
 
 const GET_HEROES_OPTIONS = gql`
   query GetHeroesOptions($page: Int!, $limit: Int!, $sortBy: String, $sortOrder: String) {
@@ -173,23 +173,23 @@ export const CardCreate: React.FC<IResourceComponentsProps> = () => {
           <Input placeholder="Enter banner name (e.g., Daredevil, Any, Actor)" />
         </Form.Item>
 
-        {cardType === 'ATTACK' && (
+        {(cardType === 'ATTACK' || cardType === 'VERSATILE') && (
           <Form.Item
             label="Attack Value"
             name="attackValue"
             rules={[{ required: true, message: 'Please input attack value!' }]}
           >
-            <InputNumber min={1} max={20} style={{ width: '100%' }} placeholder="Enter attack value" />
+            <InputNumber min={0} max={20} style={{ width: '100%' }} placeholder="Enter attack value" />
           </Form.Item>
         )}
 
-        {cardType === 'DEFENSE' && (
+        {(cardType === 'DEFENSE' || cardType === 'VERSATILE') && (
           <Form.Item
             label="Defense Value"
             name="defenseValue"
             rules={[{ required: true, message: 'Please input defense value!' }]}
           >
-            <InputNumber min={1} max={20} style={{ width: '100%' }} placeholder="Enter defense value" />
+            <InputNumber min={0} max={20} style={{ width: '100%' }} placeholder="Enter defense value" />
           </Form.Item>
         )}
 

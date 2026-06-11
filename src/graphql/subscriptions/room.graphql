@@ -1,0 +1,36 @@
+# Подписки на обновления комнаты
+
+subscription GameStateUpdated($gameId: String!, $since: Float) {
+  gameStateUpdated(gameId: $gameId, since: $since) {
+    gameId
+    sequenceNumber
+    phase
+    turnCount
+    currentTurnPlayerId
+    players
+    fighters
+    handZones
+    boardState
+    metadata
+  }
+}
+
+subscription PlayerJoined($gameId: String!) {
+  playerJoined(gameId: $gameId) {
+    type
+    gameId
+    sequenceNumber
+    timestamp
+    payload
+  }
+}
+
+subscription PlayerLeft($gameId: String!) {
+  playerLeft(gameId: $gameId) {
+    type
+    gameId
+    sequenceNumber
+    timestamp
+    payload
+  }
+}

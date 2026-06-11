@@ -1,0 +1,194 @@
+.friends-list {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.friends-list__header {
+  margin-bottom: var(--spacing-lg);
+}
+
+.friends-list__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.friends-list__tabs {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.friends-list__tab {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-background-tertiary);
+  border: none;
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.friends-list__tab:hover {
+  background: var(--color-background-hover);
+}
+
+.friends-list__tab--active {
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+}
+
+.friends-list__search {
+  margin-bottom: var(--spacing-lg);
+}
+
+.friends-list__content {
+  min-height: 200px;
+}
+
+.friends-list__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+}
+
+.friends-list__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  text-align: center;
+}
+
+.friends-list__section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.friends-list__section:last-child {
+  margin-bottom: 0;
+}
+
+.friends-list__section-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.friends-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.friends-list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  background: var(--color-background-tertiary);
+  border-radius: var(--border-radius-md);
+  transition: background 0.2s ease;
+}
+
+.friends-list__item:hover {
+  background: var(--color-background-hover);
+}
+
+.friends-list__user {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex: 1;
+  min-width: 0;
+}
+
+.friends-list__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.friends-list__avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
+}
+
+.friends-list__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+  flex: 1;
+}
+
+.friends-list__username {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friends-list__requests {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+  .friends-list {
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+  }
+
+  .friends-list__title {
+    font-size: var(--font-size-lg);
+  }
+
+  .friends-list__tab {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
+
+  .friends-list__item {
+    padding: var(--spacing-sm);
+  }
+
+  .friends-list__avatar,
+  .friends-list__avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    font-size: var(--font-size-md);
+  }
+
+  .friends-list__username {
+    font-size: var(--font-size-sm);
+  }
+}

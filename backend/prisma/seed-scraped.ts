@@ -363,7 +363,7 @@ async function main() {
   const heroKeys = [
     'achilles', 'alice', 'ancient-leshen', 'angel', 'annie-christmas',
     'beowulf', 'bigfoot', 'black-panther', 'black-widow', 'blackbeard',
-    'bloody-mary', 'bruce-lee', 'bullseye', 'chupacabra', 'ciri',
+    'bloody-mary', 'bruce-lee', 'buffy', 'bullseye', 'chupacabra', 'ciri',
     'cloak-dagger', 'cobble-fog', 'daredevil', 'data', 'deadpool',
     'doctor-strange', 'donatello', 'dr-jill-trent', 'dr-sattler', 'dracula',
     'elektra', 'eredin', 'geralt-of-rivia', 'ghost-rider', 'golden-bat',

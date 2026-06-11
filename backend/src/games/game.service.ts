@@ -9,6 +9,7 @@ import { RedisService } from '../redis/redis.service';
 import { GameStatus, GameMode } from './dto';
 import { GameResponse } from './models';
 import { GameAccessDeniedException, MaxActiveGamesException } from './exceptions/game.exceptions';
+import * as crypto from 'node:crypto';
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -34,7 +35,16 @@ export class GameService {
   async createGame(
     dto: { mode?: GameMode; boardId?: string },
     userId: string,
+    idempotencyKey?: string,
   ): Promise<GameResponse> {
+    // Идемпотентность: если передан ключ, проверяем, не была ли уже создана игра
+    if (idempotencyKey) {
+      const existingGame = await this.findGameByIdempotencyKey(idempotencyKey, userId);
+      if (existingGame) {
+        return await this.getGame(existingGame.id);
+      }
+    }
+
     // Проверяем количество активных игр пользователя
     const activeGamesCount = await this.prisma.game.count({
       where: {
@@ -56,6 +66,9 @@ export class GameService {
       boardId = defaultBoard?.id || 'default';
     }
 
+    // Генерируем уникальный код для приглашения
+    const code = await this.generateGameCode();
+
     // Создаем игру в транзакции
     const game = await this.prisma.$transaction(async (tx) => {
       const newGame = await tx.game.create({
@@ -64,6 +77,8 @@ export class GameService {
           boardId,
           mode: dto.mode || GameMode.ONE_V_ONE,
           status: GameStatus.LOBBY,
+          code,
+          ...(idempotencyKey && { idempotencyKey }),
         },
       });
 
@@ -83,6 +98,52 @@ export class GameService {
     await this.invalidateGamesListCache(userId);
 
     return await this.getGame(game.id);
+  }
+
+  /**
+   * Найти игру по idempotencyKey
+   */
+  private async findGameByIdempotencyKey(
+    idempotencyKey: string,
+    userId: string,
+  ): Promise<{ id: string } | null> {
+    return await this.prisma.game.findFirst({
+      where: {
+        idempotencyKey,
+        hostId: userId,
+      },
+      select: { id: true },
+    });
+  }
+
+  /**
+   * Сгенерировать уникальный короткий код для игры
+   * Формат: XXXXXX (6 символов, только заглавные буквы)
+   */
+  private async generateGameCode(): Promise<string> {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // без I, O, 0, 1 для читаемости
+    let code: string;
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    do {
+      code = Array.from({ length: 6 }, () =>
+        chars[Math.floor(Math.random() * chars.length)],
+      ).join('');
+      attempts++;
+
+      const existing = await this.prisma.game.findUnique({
+        where: { code },
+        select: { id: true },
+      });
+
+      if (!existing) {
+        return code;
+      }
+    } while (attempts < maxAttempts);
+
+    // Если не удалось сгенерировать уникальный код, используем CUID + префикс
+    return `GM-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
   }
 
   /**
@@ -401,50 +462,97 @@ export class GameService {
 
   /**
    * Покинуть игру
+   * - Если хост покидает игру и есть opponent -> opponent становится новым хостом
+   * - Если хост покидает игру и opponent нет -> игра удаляется
+   * - Если opponent покидает игру -> просто очищается opponentId
+   * - Если игра уже началась -> прерывается
    */
   async leaveGame(gameId: string, userId: string): Promise<void> {
     const game = await this.prisma.game.findUnique({
       where: { id: gameId },
+      include: {
+        players: true,
+      },
     });
 
     if (!game) {
       throw new NotFoundException('Игра не найдена');
     }
 
-    // Хост не может покинуть игру, он может только её прервать
-    if (game.hostId === userId) {
-      throw new BadRequestException(
-        'Хост не может покинуть игру. Используйте abortGame для прерывания.',
-      );
-    }
-
-    // Проверяем, что пользователь является opponent
-    if (game.opponentId !== userId) {
+    // Проверяем, что пользователь участвует в игре
+    if (game.hostId !== userId && game.opponentId !== userId) {
       throw new ForbiddenException('Вы не участвуете в этой игре');
     }
 
     // Если игра уже началась, прерываем её
     if (game.status === GameStatus.IN_PROGRESS) {
-      await this.abortGame(gameId, userId, 'opponent_left');
+      await this.abortGame(gameId, userId, 'player_left');
       return;
     }
 
-    // Удаляем opponent
-    await this.prisma.$transaction(async (tx) => {
-      await tx.game.update({
-        where: { id: gameId },
-        data: {
-          opponentId: null,
-        },
-      });
+    // Хост покидает игру
+    if (game.hostId === userId) {
+      // Если есть opponent - передаем ему хоста
+      if (game.opponentId) {
+        const newHostId = game.opponentId;
+        await this.prisma.$transaction(async (tx) => {
+          // Opponent становится новым хостом
+          await tx.game.update({
+            where: { id: gameId },
+            data: {
+              hostId: newHostId,
+              opponentId: null,
+            },
+          });
 
-      await tx.gamePlayer.deleteMany({
-        where: {
-          gameId,
-          userId,
-        },
+          // Удаляем запись старого хоста из GamePlayer
+          await tx.gamePlayer.deleteMany({
+            where: {
+              gameId,
+              userId,
+            },
+          });
+
+          // Обновляем seatOrder нового хоста
+          await tx.gamePlayer.updateMany({
+            where: {
+              gameId,
+              userId: newHostId,
+            },
+            data: {
+              seatOrder: 0,
+            },
+          });
+        });
+      } else {
+        // Если нет opponent - удаляем игру полностью
+        await this.prisma.$transaction(async (tx) => {
+          await tx.gamePlayer.deleteMany({
+            where: { gameId },
+          });
+          await tx.game.delete({
+            where: { id: gameId },
+          });
+        });
+      }
+    } else {
+      // Opponent покидает игру - просто очищаем opponentId
+      await this.prisma.$transaction(async (tx) => {
+        await tx.game.update({
+          where: { id: gameId },
+          data: {
+            opponentId: null,
+          },
+        });
+
+        await tx.gamePlayer.deleteMany({
+          where: {
+            gameId,
+            userId,
+          },
+        });
       });
-    });
+    }
 
     // Инвалидируем кеш
     await this.invalidateGameCache(gameId);
@@ -642,6 +750,7 @@ export class GameService {
   private mapToGameResponse(game: any): GameResponse {
     return {
       id: game.id,
+      code: game.code,
       status: game.status as GameStatus,
       mode: game.mode as GameMode,
       hostId: game.hostId,

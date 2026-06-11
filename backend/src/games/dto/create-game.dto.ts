@@ -1,5 +1,5 @@
-import { Field, InputType } from '@nestjs/graphql';
-import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
+import { Field, InputType, registerEnumType } from '@nestjs/graphql';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export enum GameMode {
   ONE_V_ONE = 'ONE_V_ONE',
@@ -25,7 +25,24 @@ export enum GamePhase {
   COMBAT = 'COMBAT',
   COMBAT_RESOLVE = 'COMBAT_RESOLVE',
   TURN_END = 'TURN_END',
+  GAME_OVER = 'GAME_OVER', // Игра окончена, победитель определён
 }
+
+// Register enums for GraphQL
+registerEnumType(GameMode, {
+  name: 'GameMode',
+  description: 'Game mode options',
+});
+
+registerEnumType(GameStatus, {
+  name: 'GameStatus',
+  description: 'Game status options',
+});
+
+registerEnumType(GamePhase, {
+  name: 'GamePhase',
+  description: 'Game phase options',
+});
 
 @InputType()
 export class CreateGameDto {
@@ -37,6 +54,5 @@ export class CreateGameDto {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  @IsUUID()
   boardId?: string;
 }

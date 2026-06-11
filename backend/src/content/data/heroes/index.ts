@@ -8,7 +8,7 @@ import { daredevil } from './daredevil';
  */
 export const HERO_REGISTRY: Record<string, HeroDefinition> = {
   'ms-marvel': msMarvel,
-  'daredevil': daredevil,
+  daredevil: daredevil,
 };
 
 /**
@@ -33,5 +33,5 @@ export function getAllHeroes(): HeroDefinition[] {
  * Get heroes by set
  */
 export function getHeroesBySet(set: string): HeroDefinition[] {
-  return getAllHeroes().filter(h => h.set === set);
+  return getAllHeroes().filter((h) => h.set === set);
 }

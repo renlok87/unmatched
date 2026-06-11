@@ -1,13 +1,22 @@
 import { Module } from '@nestjs/common';
 import { RedisModule } from '../redis';
+import { PrismaModule } from '../database';
 import { ContentService } from './content.service';
-import { ContentResolver, HeroResolver, CardResolver, BoardResolver, BoardSpaceResolver } from './content.resolver';
+import { ContentDbService } from './content-db.service';
+import {
+  ContentResolver,
+  HeroResolver,
+  CardResolver,
+  BoardResolver,
+  BoardSpaceResolver,
+} from './content.resolver';
 import { ContentMapper } from './mappers/content.mapper';
 
 @Module({
-  imports: [RedisModule],
+  imports: [RedisModule, PrismaModule],
   providers: [
     ContentService,
+    ContentDbService,
     ContentMapper,
     ContentResolver,
     HeroResolver,
@@ -15,6 +24,6 @@ import { ContentMapper } from './mappers/content.mapper';
     BoardResolver,
     BoardSpaceResolver,
   ],
-  exports: [ContentService, ContentMapper],
+  exports: [ContentService, ContentDbService, ContentMapper],
 })
 export class ContentModule {}

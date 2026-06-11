@@ -76,6 +76,7 @@ const GET_CARDS_LIST = gql`
         attackValue
         defenseValue
         boostValue
+        bannerName
         count
         heroId
         imageUrl

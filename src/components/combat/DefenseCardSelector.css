@@ -1,0 +1,177 @@
+.defense-card-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  padding: var(--spacing-6);
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: var(--radius-xl);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.defense-card-selector__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.defense-card-selector__title {
+  color: var(--color-white);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+.defense-card-selector__timer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+}
+
+.defense-card-selector__timer-icon {
+  font-size: var(--font-size-lg);
+}
+
+.defense-card-selector__timer-value {
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  font-family: monospace;
+}
+
+.defense-card-selector__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--spacing-3);
+  min-height: 200px;
+}
+
+.defense-card-selector__empty {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-8);
+  color: var(--color-gray-400);
+}
+
+.defense-card-selector__empty-icon {
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+.defense-card-selector__empty-text {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+.defense-card-selector__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 160px;
+  justify-content: center;
+}
+
+.defense-card-selector__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  border-color: var(--color-primary);
+}
+
+.defense-card-selector__card--defense {
+  border-color: rgba(33, 150, 243, 0.4);
+  background: rgba(33, 150, 243, 0.15);
+}
+
+.defense-card-selector__card--defense:hover {
+  border-color: #2196f3;
+  box-shadow: 0 8px 16px rgba(33, 150, 243, 0.3);
+}
+
+.defense-card-selector__card--versatile {
+  border-color: rgba(156, 39, 176, 0.4);
+  background: rgba(156, 39, 176, 0.15);
+}
+
+.defense-card-selector__card--versatile:hover {
+  border-color: #9c27b0;
+  box-shadow: 0 8px 16px rgba(156, 39, 176, 0.3);
+}
+
+.defense-card-selector__card-value {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-white);
+  font-family: monospace;
+  line-height: 1;
+}
+
+.defense-card-selector__card-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white);
+  text-align: center;
+  line-height: var(--line-height-relaxed);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.defense-card-selector__card-type {
+  font-size: 32px;
+  opacity: 0.8;
+}
+
+.defense-card-selector__actions {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--spacing-4);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .defense-card-selector {
+    padding: var(--spacing-4);
+  }
+
+  .defense-card-selector__title {
+    font-size: var(--font-size-lg);
+  }
+
+  .defense-card-selector__cards {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--spacing-2);
+  }
+
+  .defense-card-selector__card {
+    min-height: 120px;
+    padding: var(--spacing-3);
+  }
+
+  .defense-card-selector__card-value {
+    font-size: var(--font-size-3xl);
+  }
+
+  .defense-card-selector__card-name {
+    font-size: var(--font-size-xs);
+  }
+
+  .defense-card-selector__card-type {
+    font-size: 24px;
+  }
+}

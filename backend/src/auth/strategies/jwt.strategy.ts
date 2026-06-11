@@ -26,7 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
 
     // Проверяем blacklist
-    if (token && await this.redis.isBlacklisted(token)) {
+    if (token && (await this.redis.isBlacklisted(token))) {
       throw new UnauthorizedException('Token revoked');
     }
 
@@ -46,6 +46,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         email: true,
         username: true,
         avatar: true,
+        role: true,
         createdAt: true,
         emailVerified: true,
       },

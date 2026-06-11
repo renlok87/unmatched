@@ -37,6 +37,8 @@ export interface CardDefinition {
   quantity: number;     // Number of copies in deck
   effects: CardEffect[];
   characterName: string;
+  imageUrl?: string;    // URL изображения карты
+  imageUrlRu?: string; // URL изображения карты (русская версия)
 }
 
 export interface CardEffect {
@@ -74,6 +76,8 @@ export interface HeroDefinition {
   sidekickCount?: number;
   sidekickHealth?: number;
   set: string;          // Which expansion set
+  imageUrl?: string;     // URL изображения героя (card back)
+  avatarUrl?: string;    // URL аватара героя (mini)
 }
 
 export interface SpecialAbility {
@@ -101,6 +105,7 @@ export interface Fighter {
   position: Position;
   ownerId: string;       // Player ID
   isDefeated: boolean;
+  avatarUrl?: string;    // URL изображения бойца (mini)
 }
 
 export interface FighterModifier {
@@ -135,6 +140,7 @@ export interface BoardDefinition {
   height: number;
   spaces: BoardSpace[];
   recommendedPlayers: number;
+  imageUrl?: string;     // URL изображения доски
 }
 
 export interface BoardState {

@@ -10,4 +10,11 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    port: 5174,
+    strictPort: true,
+  },
+  publicDir: 'public',
+  // Добавляем статические папки для изображений
+  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.webp'],
 })

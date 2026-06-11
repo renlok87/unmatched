@@ -1,54 +1,76 @@
-import { Resolver, Query, Args } from '@nestjs/graphql';
-import { UserStatsService } from './user-stats.service';
-import { LeaderboardEntryResponse, TimeFrame } from './dto';
+import { Resolver, Query, Args, Int, ObjectType, Field } from '@nestjs/graphql';
+import { LeaderboardService } from '../games/services/leaderboard.service';
+import { TimeFrame } from './dto';
+
+@ObjectType()
+export class LeaderboardRankResponse {
+  @Field(() => Int)
+  rank: number;
+
+  @Field()
+  userId: string;
+
+  @Field(() => Int)
+  elo: number;
+
+  @Field(() => String, { nullable: true })
+  heroId?: string;
+
+  @Field()
+  timeFrame: string;
+}
 
 @Resolver('Leaderboard')
 export class LeaderboardResolver {
-  constructor(private userStatsService: UserStatsService) {}
+  constructor(private leaderboardService: LeaderboardService) {}
 
-  /**
-   * Получить таблицу лидеров
-   *
-   * @param heroId - Опциональный ID героя для фильтрации по герою
-   * @param timeFrame - Временной период (all, week, month)
-   * @param limit - Лимит записей (по умолчанию 50, максимум 100)
-   */
-  @Query(() => [LeaderboardEntryResponse], { name: 'leaderboard' })
+  @Query(() => String, { name: 'leaderboard' })
   async leaderboard(
     @Args({ name: 'heroId', type: () => String, nullable: true }) heroId?: string,
     @Args({ name: 'timeFrame', type: () => TimeFrame, nullable: true }) timeFrame?: TimeFrame,
-    @Args({ name: 'limit', type: () => Number, nullable: true }) limit?: number,
-  ): Promise<LeaderboardEntryResponse[]> {
-    return await this.userStatsService.getLeaderboard({
+    @Args({ name: 'page', type: () => Int, nullable: true }) page?: number,
+    @Args({ name: 'pageSize', type: () => Int, nullable: true }) pageSize?: number,
+  ): Promise<string> {
+    const result = await this.leaderboardService.getLeaderboard({
       heroId,
-      timeFrame,
-      limit,
+      timeFrame: (timeFrame as 'all' | 'weekly' | 'monthly') || 'all',
+      page: page || 0,
+      pageSize: pageSize || 50,
     });
+    return JSON.stringify(result);
   }
 
-  /**
-   * Получить топ игроков
-   */
-  @Query(() => [LeaderboardEntryResponse], { name: 'topPlayers' })
+  @Query(() => String, { name: 'topPlayers' })
   async topPlayers(
-    @Args({ name: 'limit', type: () => Number, nullable: true, defaultValue: 10 }) limit?: number,
-  ): Promise<LeaderboardEntryResponse[]> {
-    return await this.userStatsService.getLeaderboard({
-      limit: limit || 10,
-    });
+    @Args({ name: 'limit', type: () => Int, nullable: true, defaultValue: 10 }) limit?: number,
+    @Args({ name: 'timeFrame', type: () => String, nullable: true, defaultValue: 'all' })
+    timeFrame?: string,
+  ): Promise<string> {
+    const result = await this.leaderboardService.getTopPlayers(
+      limit || 10,
+      (timeFrame as 'all' | 'weekly' | 'monthly') || 'all',
+    );
+    return JSON.stringify(result);
   }
 
-  /**
-   * Получить топ игроков для конкретного героя
-   */
-  @Query(() => [LeaderboardEntryResponse], { name: 'topHeroes' })
-  async topHeroes(
-    @Args('heroId') heroId: string,
-    @Args({ name: 'limit', type: () => Number, nullable: true, defaultValue: 10 }) limit?: number,
-  ): Promise<LeaderboardEntryResponse[]> {
-    return await this.userStatsService.getLeaderboard({
+  @Query(() => LeaderboardRankResponse, { name: 'getPlayerRank' })
+  async getPlayerRank(
+    @Args('userId') userId: string,
+    @Args({ name: 'heroId', type: () => String, nullable: true }) heroId?: string,
+    @Args({ name: 'timeFrame', type: () => String, nullable: true, defaultValue: 'all' })
+    timeFrame?: string,
+  ): Promise<LeaderboardRankResponse> {
+    const result = await this.leaderboardService.getPlayerRank(
+      userId,
       heroId,
-      limit: limit || 10,
-    });
+      (timeFrame as 'all' | 'weekly' | 'monthly') || 'all',
+    );
+    return {
+      rank: result.rank,
+      userId: result.userId,
+      elo: result.elo,
+      heroId: result.heroId,
+      timeFrame: result.timeFrame,
+    };
   }
 }

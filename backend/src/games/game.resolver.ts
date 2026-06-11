@@ -5,7 +5,7 @@ import { GameService } from './game.service';
 import { GameStateService } from './game-state.service';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { GameResponse, GameStateResponse } from './models';
+import { GameResponse, GameStateResponse, EventsSinceResponse } from './models';
 import { CreateGameDto, GameFiltersDto, JoinGameDto, GameMode } from './dto';
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -24,7 +24,7 @@ export class GameResolver {
    */
   @Query(() => GameResponse, { nullable: true })
   @UseGuards(GqlAuthGuard)
-  async game(@Args('id') id: string, @CurrentUser() user: any): Promise<GameResponse> {
+  async game(@Args('id', { type: () => String }) id: string, @CurrentUser() user: any): Promise<GameResponse> {
     // Проверяем доступ к игре
     await this.gameService.checkGameAccess(id, user.id);
     return await this.gameService.getGame(id);
@@ -47,8 +47,8 @@ export class GameResolver {
    */
   @Query(() => [GameResponse], { name: 'availableGames' })
   async getAvailableGames(
-    @Args('mode', { nullable: true }) mode?: GameMode,
-    @Args('limit', { nullable: true }) limit?: number,
+    @Args('mode', { nullable: true, type: () => String }) mode?: GameMode,
+    @Args('limit', { nullable: true, type: () => Number }) limit?: number,
   ): Promise<GameResponse[]> {
     return await this.gameService.availableGames({ mode, limit });
   }
@@ -60,7 +60,7 @@ export class GameResolver {
   @Query(() => GameStateResponse, { nullable: true, name: 'gameState' })
   @UseGuards(GqlAuthGuard)
   async getGameState(
-    @Args('gameId') gameId: string,
+    @Args('gameId', { type: () => String }) gameId: string,
     @CurrentUser() user: any,
   ): Promise<GameStateResponse> {
     // Проверяем, что пользователь участвует в игре
@@ -74,7 +74,7 @@ export class GameResolver {
     return {
       id: `${gameId}-state`,
       gameId,
-      state: filteredState,
+      state: JSON.stringify(filteredState),
       sequenceNumber: filteredState.sequenceNumber,
       currentTurnPlayerId: filteredState.currentTurnPlayerId,
       phase: filteredState.phase,
@@ -92,9 +92,10 @@ export class GameResolver {
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   async createGame(
     @Args('input') input: CreateGameDto,
-    @CurrentUser() user: any,
+    @Args('idempotencyKey', { nullable: true }) idempotencyKey?: string,
+    @CurrentUser() user?: any,
   ): Promise<GameResponse> {
-    return await this.gameService.createGame(input, user.id);
+    return await this.gameService.createGame(input, user.id, idempotencyKey);
   }
 
   /**
@@ -117,12 +118,14 @@ export class GameResolver {
 
   /**
    * Покинуть игру
+   * - Хост: передаёт хостство opponent или удаляет игру
+   * - Opponent: просто покидает игру
    * Rate limited: 10 запросов в минуту
    */
   @Mutation(() => Boolean, { name: 'leaveGame' })
   @UseGuards(GqlAuthGuard)
   @Throttle({ default: { limit: 10, ttl: 60000 } })
-  async leaveGame(@Args('gameId') gameId: string, @CurrentUser() user: any): Promise<boolean> {
+  async leaveGame(@Args('gameId', { type: () => String }) gameId: string, @CurrentUser() user: any): Promise<boolean> {
     await this.gameService.leaveGame(gameId, user.id);
     return true;
   }
@@ -134,7 +137,7 @@ export class GameResolver {
   @Mutation(() => GameResponse, { name: 'startGame' })
   @UseGuards(GqlAuthGuard)
   @Throttle({ default: { limit: 5, ttl: 60000 } })
-  async startGame(@Args('gameId') gameId: string, @CurrentUser() user: any): Promise<GameResponse> {
+  async startGame(@Args('gameId', { type: () => String }) gameId: string, @CurrentUser() user: any): Promise<GameResponse> {
     return await this.gameService.startGame(gameId, user.id);
   }
 
@@ -145,7 +148,7 @@ export class GameResolver {
   @Mutation(() => GameResponse, { name: 'abortGame' })
   @UseGuards(GqlAuthGuard)
   @Throttle({ default: { limit: 5, ttl: 60000 } })
-  async abortGame(@Args('gameId') gameId: string, @CurrentUser() user: any): Promise<GameResponse> {
+  async abortGame(@Args('gameId', { type: () => String }) gameId: string, @CurrentUser() user: any): Promise<GameResponse> {
     return await this.gameService.abortGame(gameId, user.id);
   }
 
@@ -157,7 +160,7 @@ export class GameResolver {
   @UseGuards(GqlAuthGuard)
   @Throttle({ default: { limit: 20, ttl: 60000 } })
   async toggleReady(
-    @Args('gameId') gameId: string,
+    @Args('gameId', { type: () => String }) gameId: string,
     @CurrentUser() user: any,
   ): Promise<GameResponse> {
     return await this.gameService.toggleReady(gameId, user.id);
@@ -171,8 +174,8 @@ export class GameResolver {
   @UseGuards(GqlAuthGuard)
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   async selectHero(
-    @Args('gameId') gameId: string,
-    @Args('heroId') heroId: string,
+    @Args('gameId', { type: () => String }) gameId: string,
+    @Args('heroId', { type: () => String }) heroId: string,
     @CurrentUser() user: any,
   ): Promise<GameResponse> {
     return await this.gameService.selectHero(gameId, user.id, heroId);
@@ -183,7 +186,29 @@ export class GameResolver {
    */
   @Query(() => Number, { name: 'gameSequence', nullable: true })
   @UseGuards(GqlAuthGuard)
-  async getGameSequence(@Args('gameId') gameId: string): Promise<number> {
+  async getGameSequence(@Args('gameId', { type: () => String }) gameId: string): Promise<number> {
     return await this.gameStateService.getSequenceNumber(gameId);
+  }
+
+  /**
+   * Получить события игры с указанного sequence number (для catch-up при реконнекте)
+   */
+  @Query(() => EventsSinceResponse, { name: 'eventsSince', nullable: true })
+  @UseGuards(GqlAuthGuard)
+  async getEventsSince(
+    @Args('gameId', { type: () => String }) gameId: string,
+    @Args('sinceSequence', { type: () => Number }) sinceSequence: number,
+    @CurrentUser() user: any,
+  ): Promise<EventsSinceResponse> {
+    await this.gameService.checkGameAccess(gameId, user.id);
+
+    const events = await this.gameStateService.getEventsSince(gameId, sinceSequence);
+
+    return {
+      gameId,
+      events,
+      lastSequence: events.length > 0 ? events[events.length - 1].sequenceNumber : sinceSequence,
+      hasMore: events.length >= 100,
+    };
   }
 }

@@ -28,6 +28,7 @@ interface ParsedMap {
   description: string;
   imageUrl: string;
   setKey: string;
+  setTitle: string;
 }
 
 interface ParsedVillain {
@@ -40,6 +41,8 @@ interface ParsedVillain {
   cardBackImage: string;
   miniatureImage: string;
   setKey: string;
+  setTitle: string;
+  hasTokens: boolean;
 }
 
 interface ParsedMinion {
@@ -49,7 +52,10 @@ interface ParsedMinion {
   color: string;
   description: string;
   avatar: string;
+  cardBackImage: string;
   setKey: string;
+  setTitle: string;
+  hasTokens: boolean;
 }
 
 function parseSetsData(rawData: any): ParsedSet[] {
@@ -72,10 +78,11 @@ function parseSetsData(rawData: any): ParsedSet[] {
       if (!setData || typeof setData !== 'object') continue;
 
       const set: ParsedSet = {
-        name: resolveValue(data, setData.name) || 'Unknown',
+        // Реальные поля в sets.json — title и image (не name/imageUrl)
+        name: resolveValue(data, setData.title) || 'Unknown',
         key: resolveValue(data, setData.key) || '',
         description: resolveValue(data, setData.description) || '',
-        imageUrl: resolveValue(data, setData.imageUrl) || '',
+        imageUrl: resolveValue(data, setData.image) || '',
       };
 
       sets.push(set);
@@ -109,6 +116,7 @@ function parseMapsData(rawData: any): ParsedMap[] {
       // mapData.set — числовой индекс на объект {key, title, ...} (тоже индексы)
       const setObj = resolveValue(data, mapData.set);
       const setKey = resolveValue(data, setObj?.key) || '';
+      const setTitle = resolveValue(data, setObj?.title) || '';
 
       const map: ParsedMap = {
         name: resolveValue(data, mapData.name) || 'Unknown',
@@ -120,6 +128,7 @@ function parseMapsData(rawData: any): ParsedMap[] {
         description: resolveValue(data, mapData.description) || '',
         imageUrl: resolveValue(data, mapData.image) || '',
         setKey: setKey,
+        setTitle: setTitle,
       };
 
       maps.push(map);
@@ -153,6 +162,7 @@ function parseVillainsData(rawData: any): ParsedVillain[] {
       // villainData.set — числовой индекс на объект {key, title} (тоже индексы)
       const setObj = resolveValue(data, villainData.set);
       const setKey = resolveValue(data, setObj?.key) || '';
+      const setTitle = resolveValue(data, setObj?.title) || '';
 
       const villain: ParsedVillain = {
         name: resolveValue(data, villainData.name) || 'Unknown',
@@ -164,6 +174,10 @@ function parseVillainsData(rawData: any): ParsedVillain[] {
         cardBackImage: resolveValue(data, villainData.cardBackImage) || '',
         miniatureImage: resolveValue(data, villainData.miniatureImage) || '',
         setKey: setKey,
+        setTitle: setTitle,
+        hasTokens:
+          Boolean(resolveValue(data, villainData.hasTokens)) ||
+          (resolveValue(data, villainData.tokens) || []).length > 0,
       };
 
       villains.push(villain);
@@ -197,6 +211,7 @@ function parseMinionsData(rawData: any): ParsedMinion[] {
       // minionData.set — числовой индекс на объект {key, title} (тоже индексы)
       const setObj = resolveValue(data, minionData.set);
       const setKey = resolveValue(data, setObj?.key) || '';
+      const setTitle = resolveValue(data, setObj?.title) || '';
 
       const minion: ParsedMinion = {
         name: resolveValue(data, minionData.name) || 'Unknown',
@@ -205,7 +220,12 @@ function parseMinionsData(rawData: any): ParsedMinion[] {
         color: resolveValue(data, minionData.color) || '#000000',
         description: resolveValue(data, minionData.description) || '',
         avatar: resolveValue(data, minionData.avatar) || '',
+        cardBackImage: resolveValue(data, minionData.cardBackImage) || '',
         setKey: setKey,
+        setTitle: setTitle,
+        hasTokens:
+          Boolean(resolveValue(data, minionData.hasTokens)) ||
+          (resolveValue(data, minionData.tokens) || []).length > 0,
       };
 
       minions.push(minion);
@@ -231,43 +251,10 @@ async function importSets() {
     const parsed = JSON.parse(rawData);
     const sets = parseSetsData(parsed);
 
-    let imported = 0;
-    let skipped = 0;
-
-    for (const setData of sets) {
-      const existingSet = await prisma.board.findFirst({
-        where: { name: setData.name },
-      });
-
-      if (existingSet) {
-        skipped++;
-        continue;
-      }
-
-      await prisma.board.create({
-        data: {
-          name: setData.name,
-          nameEn: setData.name,
-          nameRu: setData.name,
-          set: setData.name,
-          width: 5,
-          height: 6,
-          cells: [],
-          features: {
-            type: 'custom',
-            description: setData.description,
-            setKey: setData.key,
-          },
-          imageUrl: setData.imageUrl,
-          imageUrlDark: setData.imageUrl,
-        },
-      });
-
-      imported++;
-      console.log(`   ✅ Импортирован сет: ${setData.name}`);
-    }
-
-    console.log(`📊 Сеты: ${imported} импортировано, ${skipped} пропущено`);
+    // Сеты НЕ сохраняются в БД: отдельной таблицы нет, а запись их в Board
+    // создавала фейковые доски (артефакт 'Unknown'). Названия сетов попадают
+    // в Hero.set / Board.set при импорте героев, злодеев и досок.
+    console.log(`📊 Сеты: распарсено ${sets.length} (в БД не сохраняются — таблицы нет)`);
   } catch (error) {
     console.error('❌ Ошибка при импорте сетов:', error);
   }
@@ -305,7 +292,7 @@ async function importMaps() {
           name: mapData.name,
           nameEn: mapData.name,
           nameRu: mapData.name,
-          set: mapData.setKey,
+          set: mapData.setTitle || mapData.setKey,
           width: mapData.width,
           height: mapData.height,
           cells: [],
@@ -363,9 +350,11 @@ async function importVillains() {
           name: villainData.name,
           nameEn: villainData.name,
           nameRu: villainData.name,
-          set: villainData.setKey,
+          set: villainData.setTitle || villainData.setKey,
           health: villainData.hp,
           fighterType: 'VILLAIN',
+          color: villainData.color,
+          hasTokens: villainData.hasTokens,
           ability: {
             type: 'VILLAIN',
             timing: 'PASSIVE',
@@ -423,9 +412,11 @@ async function importMinions() {
           name: minionData.name,
           nameEn: minionData.name,
           nameRu: minionData.name,
-          set: minionData.setKey,
+          set: minionData.setTitle || minionData.setKey,
           health: minionData.hp,
           fighterType: 'MINION',
+          color: minionData.color,
+          hasTokens: minionData.hasTokens,
           ability: {
             type: 'MINION',
             timing: 'PASSIVE',
@@ -436,7 +427,7 @@ async function importMinions() {
           properties: {
             color: minionData.color,
           },
-          imageUrl: minionData.avatar,
+          imageUrl: minionData.cardBackImage || minionData.avatar,
           avatarUrl: minionData.avatar,
         },
       });

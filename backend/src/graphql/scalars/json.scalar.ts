@@ -34,3 +34,9 @@ export class JSONScalar implements CustomScalar<any, any> {
     }
   }
 }
+
+// Класс для использования в DTO как тип
+export class GraphQLJSON {
+  // Этот класс используется только как маркер типа для GraphQL
+  private _value: any;
+}

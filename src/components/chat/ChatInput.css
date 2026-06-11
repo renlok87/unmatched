@@ -1,0 +1,115 @@
+.chat-input {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background-color: var(--color-surface-primary);
+  border-top: 1px solid var(--color-border-primary);
+}
+
+.chat-input__emote-button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background-color: var(--color-surface-tertiary);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.chat-input__emote-button:hover:not(:disabled) {
+  background-color: var(--color-surface-secondary);
+  transform: scale(1.1);
+}
+
+.chat-input__emote-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.chat-input__emote-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chat-input__field {
+  flex: 1;
+  height: 40px;
+  padding: 0 var(--spacing-md);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-surface-secondary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.chat-input__field::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.chat-input__field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.chat-input__field:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chat-input__send-button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background-color: var(--color-primary);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.chat-input__send-button:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  transform: translateX(2px);
+}
+
+.chat-input__send-button:active:not(:disabled) {
+  transform: translateX(0);
+}
+
+.chat-input__send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chat-input__send-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 768px) {
+  .chat-input {
+    padding: var(--spacing-xs);
+    gap: var(--spacing-xs);
+  }
+
+  .chat-input__emote-button,
+  .chat-input__field,
+  .chat-input__send-button {
+    height: 36px;
+  }
+
+  .chat-input__emote-button,
+  .chat-input__send-button {
+    width: 36px;
+  }
+}

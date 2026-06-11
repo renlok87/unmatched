@@ -1,0 +1,282 @@
+/**
+ * Deck Management Service Tests
+ *
+ * Unit тесты для сервиса управления колодой
+ */
+
+import { Test, TestingModule } from '@nestjs/testing';
+import { DeckManagementService } from './deck-management.service';
+import { GamePhase, GameState } from '../models/game-state.model';
+
+describe('DeckManagementService', () => {
+  let service: DeckManagementService;
+  let mockState: GameState;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [DeckManagementService],
+    }).compile();
+
+    service = module.get<DeckManagementService>(DeckManagementService);
+
+    // Создаём mock состояние
+    mockState = {
+      gameId: 'test-game-1',
+      sequenceNumber: 0,
+      phase: GamePhase.SETUP,
+      turnCount: 0,
+      currentTurnPlayerId: 'player-1',
+      players: [
+        {
+          userId: 'player-1',
+          heroId: 'daredevil',
+          health: 10,
+          maxHealth: 10,
+          fighterIds: ['fighter-1'],
+          isAlive: true,
+        },
+        {
+          userId: 'player-2',
+          heroId: 'ms-marvel',
+          health: 10,
+          maxHealth: 10,
+          fighterIds: ['fighter-2'],
+          isAlive: true,
+        },
+      ],
+      fighters: [],
+      decks: {},
+      discardPiles: {},
+      handZones: {},
+      boardState: {
+        doors: [],
+        fogOfWar: [],
+      },
+      metadata: {
+        lastActionAt: new Date(),
+        lastActionBy: 'system',
+        version: 1,
+      },
+    };
+  });
+
+  describe('initializeDeck', () => {
+    it('should create a shuffled deck for the player', async () => {
+      const result = await service.initializeDeck(mockState, 'player-1', 'daredevil');
+
+      expect(result.decks['player-1']).toBeDefined();
+      expect(result.decks['player-1'].drawPile.length).toBeGreaterThan(0);
+      expect(result.handZones['player-1']).toBeDefined();
+      expect(result.handZones['player-1'].cards).toEqual([]);
+    });
+
+    it('should create a hand zone with max size of 5', async () => {
+      const result = await service.initializeDeck(mockState, 'player-1', 'daredevil');
+
+      expect(result.handZones['player-1'].maxSize).toBe(5);
+    });
+
+    it('should create different decks for different players', async () => {
+      let result = await service.initializeDeck(mockState, 'player-1', 'daredevil');
+      result = await service.initializeDeck(result, 'player-2', 'ms-marvel');
+
+      expect(result.decks['player-1'].drawPile).not.toEqual(
+        result.decks['player-2'].drawPile,
+      );
+    });
+  });
+
+  describe('drawCards', () => {
+    beforeEach(async () => {
+      mockState = await service.initializeDeck(mockState, 'player-1', 'daredevil');
+    });
+
+    it('should draw the specified number of cards', async () => {
+      const result = await service.drawCards(mockState, 'player-1', 3);
+
+      expect(result.handZones['player-1'].cards.length).toBe(3);
+      expect(result.decks['player-1'].drawPile.length).toBe(
+        mockState.decks['player-1'].drawPile.length - 3,
+      );
+    });
+
+    it('should respect hand size limit', async () => {
+      // Пытаемся вытянуть больше карт, чем лимит руки
+      const result = await service.drawCards(mockState, 'player-1', 10);
+
+      expect(result.handZones['player-1'].cards.length).toBe(5); // max size
+    });
+
+    it('should mark drawn cards as visible', async () => {
+      const result = await service.drawCards(mockState, 'player-1', 2);
+
+      result.handZones['player-1'].cards.forEach(card => {
+        expect(card.isVisible).toBe(true);
+      });
+    });
+
+    it('should recycle deck when draw pile is empty', async () => {
+      // Вытягиваем все карты
+      let state = mockState;
+      const deckSize = state.decks['player-1'].drawPile.length;
+      state = await service.drawCards(state, 'player-1', deckSize);
+
+      // Сбрасываем все карты
+      state.handZones['player-1'].cards.forEach(async (card) => {
+        state = await service.discardCard(state, 'player-1', card.id);
+      });
+
+      // Теперь пытаемся вытянуть ещё одну - должен произойти recycle
+      expect(service.shouldRecycleDeck(state, 'player-1')).toBe(true);
+    });
+  });
+
+  describe('discardCard', () => {
+    beforeEach(async () => {
+      mockState = await service.initializeDeck(mockState, 'player-1', 'daredevil');
+      mockState = await service.drawCards(mockState, 'player-1', 3);
+    });
+
+    it('should remove card from hand', async () => {
+      const cardToDiscard = mockState.handZones['player-1'].cards[0];
+      const result = await service.discardCard(mockState, 'player-1', cardToDiscard.id);
+
+      expect(result.handZones['player-1'].cards.length).toBe(2);
+      expect(
+        result.handZones['player-1'].cards.find(c => c.id === cardToDiscard.id),
+      ).toBeUndefined();
+    });
+
+    it('should add card to discard pile', async () => {
+      const cardToDiscard = mockState.handZones['player-1'].cards[0];
+      const result = await service.discardCard(mockState, 'player-1', cardToDiscard.id);
+
+      expect(result.discardPiles['player-1']).toBeDefined();
+      expect(result.discardPiles['player-1'].length).toBe(1);
+      expect(result.discardPiles['player-1'][0].id).toBe(cardToDiscard.id);
+    });
+
+    it('should mark discarded card as not visible', async () => {
+      const cardToDiscard = mockState.handZones['player-1'].cards[0];
+      const result = await service.discardCard(mockState, 'player-1', cardToDiscard.id);
+
+      expect(result.discardPiles['player-1'][0].isVisible).toBe(false);
+    });
+  });
+
+  describe('discardRandomCard', () => {
+    beforeEach(async () => {
+      mockState = await service.initializeDeck(mockState, 'player-1', 'daredevil');
+      mockState = await service.drawCards(mockState, 'player-1', 3);
+    });
+
+    it('should discard a random card from hand', async () => {
+      const initialHandSize = mockState.handZones['player-1'].cards.length;
+      const result = await service.discardRandomCard(mockState, 'player-1');
+
+      expect(result.gameState.handZones['player-1'].cards.length).toBe(
+        initialHandSize - 1,
+      );
+      expect(result.discardedCard).toBeDefined();
+    });
+
+    it('should throw if hand is empty', async () => {
+      const emptyState = {
+        ...mockState,
+        handZones: {
+          ...mockState.handZones,
+          'player-1': { ...mockState.handZones['player-1'], cards: [] },
+        },
+      };
+
+      await expect(
+        service.discardRandomCard(emptyState, 'player-1'),
+      ).rejects.toThrow();
+    });
+  });
+
+  describe('recycleDeck', () => {
+    beforeEach(async () => {
+      mockState = await service.initializeDeck(mockState, 'player-1', 'daredevil');
+      // Вытягиваем и сбрасываем карты
+      mockState = await service.drawCards(mockState, 'player-1', 3);
+      const cardToDiscard = mockState.handZones['player-1'].cards[0];
+      mockState = await service.discardCard(mockState, 'player-1', cardToDiscard.id);
+    });
+
+    it('should shuffle discard pile into draw pile', async () => {
+      const discardPileSize = mockState.discardPiles['player-1'].length;
+      const result = await service.recycleDeck(mockState, 'player-1');
+
+      expect(result.discardPiles['player-1'].length).toBe(0);
+      expect(result.decks['player-1'].drawPile.length).toBeGreaterThan(
+        mockState.decks['player-1'].drawPile.length,
+      );
+    });
+
+    it('should clear discard pile after recycling', async () => {
+      const result = await service.recycleDeck(mockState, 'player-1');
+
+      expect(result.discardPiles['player-1']).toEqual([]);
+    });
+  });
+
+  describe('shouldRecycleDeck', () => {
+    it('should return true when draw pile is empty', async () => {
+      mockState = await service.initializeDeck(mockState, 'player-1', 'daredevil');
+      mockState = {
+        ...mockState,
+        decks: {
+          ...mockState.decks,
+          'player-1': {
+            ...mockState.decks['player-1'],
+            drawPile: [],
+          },
+        },
+      };
+
+      expect(service.shouldRecycleDeck(mockState, 'player-1')).toBe(true);
+    });
+
+    it('should return false when draw pile has cards', async () => {
+      mockState = await service.initializeDeck(mockState, 'player-1', 'daredevil');
+
+      expect(service.shouldRecycleDeck(mockState, 'player-1')).toBe(false);
+    });
+  });
+
+  describe('getHandSize', () => {
+    it('should return the number of cards in hand', async () => {
+      mockState = await service.initializeDeck(mockState, 'player-1', 'daredevil');
+      mockState = await service.drawCards(mockState, 'player-1', 3);
+
+      expect(service.getHandSize(mockState, 'player-1')).toBe(3);
+    });
+
+    it('should return 0 for non-existent hand', () => {
+      expect(service.getHandSize(mockState, 'unknown-player')).toBe(0);
+    });
+  });
+
+  describe('canDrawCard', () => {
+    beforeEach(async () => {
+      mockState = await service.initializeDeck(mockState, 'player-1', 'daredevil');
+    });
+
+    it('should return true when hand is not full', async () => {
+      mockState = await service.drawCards(mockState, 'player-1', 3);
+
+      expect(service.canDrawCard(mockState, 'player-1')).toBe(true);
+    });
+
+    it('should return false when hand is full', async () => {
+      mockState = await service.drawCards(mockState, 'player-1', 5);
+
+      expect(service.canDrawCard(mockState, 'player-1')).toBe(false);
+    });
+
+    it('should return false for non-existent hand', () => {
+      expect(service.canDrawCard(mockState, 'unknown-player')).toBe(false);
+    });
+  });
+});

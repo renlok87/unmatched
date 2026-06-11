@@ -8,15 +8,31 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "prepare": "husky"
+    "prepare": "husky",
+    "codegen": "graphql-codegen --watch",
+    "codegen:build": "graphql-codegen",
+    "docker:start": "bash scripts/start-wsl.sh",
+    "docker:stop": "bash scripts/stop-wsl.sh",
+    "docker:restart": "bash scripts/restart-wsl.sh",
+    "docker:logs": "wsl -d Ubuntu -e bash -c \"cd /mnt/c/Users/ren/WebstormProjects/unmached/unmached && docker compose logs -f\"",
+    "docker:ps": "wsl -d Ubuntu -e bash -c \"cd /mnt/c/Users/ren/WebstormProjects/unmached/unmached && docker compose ps\""
   },
   "dependencies": {
+    "@apollo/client": "^3.14.0",
+    "@types/react-router-dom": "^5.3.3",
+    "graphql": "^16.12.0",
+    "graphql-subscriptions": "^3.0.0",
+    "graphql-ws": "^6.0.7",
     "immer": "^10.1.1",
+    "phaser": "^3.90.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^7.13.0",
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^6.1.1",
+    "@graphql-codegen/client-preset": "^5.2.2",
     "@types/node": "^25.0.10",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",

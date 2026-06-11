@@ -9,10 +9,12 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 // Helper функция для получения IP адреса
 function getClientIp(context: any): string | undefined {
-  return context.req?.ip ||
+  return (
+    context.req?.ip ||
     context.req?.headers?.['x-forwarded-for']?.split(',')[0]?.trim() ||
     context.req?.headers?.['x-real-ip'] ||
-    context.req?.connection?.remoteAddress;
+    context.req?.connection?.remoteAddress
+  );
 }
 
 // Helper функция для получения User Agent
@@ -26,63 +28,46 @@ export class AuthResolver {
 
   @Mutation(() => AuthResponseDto)
   @Public()
-  @Throttle({ default: { limit: 5, ttl: 60000 } })  // 5 запросов в минуту
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 запросов в минуту
   async register(@Args('input') input: RegisterDto) {
     return this.authService.register(input);
   }
 
   @Mutation(() => AuthResponseDto)
   @Public()
-  @Throttle({ default: { limit: 10, ttl: 60000 } })  // 10 запросов в минуту
-  async login(
-    @Args('input') input: LoginDto,
-    @Context() context: any,
-  ) {
+  @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 запросов в минуту
+  async login(@Args('input') input: LoginDto, @Context() context: any) {
     const ipAddress = getClientIp(context);
     const userAgent = getUserAgent(context);
     return this.authService.login(input, ipAddress, userAgent);
   }
 
   @Mutation(() => Boolean)
-  async logout(
-    @Context() context: any,
-    @CurrentUser() user: any,
-  ) {
+  async logout(@Context() context: any, @CurrentUser() user: any) {
     const accessToken = context.req?.headers?.authorization?.replace('Bearer ', '');
     await this.authService.logout(user?.id, accessToken);
     return true;
   }
 
-  @Mutation(() => AuthResponseDto)
+@Mutation(() => AuthResponseDto)
   @Public()
-  @Throttle({ default: { limit: 3, ttl: 60000 } })  // 3 запроса в минуту (строже)
-  async refreshTokens(@Args('refreshToken') refreshToken: string) {
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 запросов в минуту (строже)
+  async refreshTokens(@Args('refreshToken', { type: () => String }) refreshToken: string) {
     return this.authService.refreshTokens(refreshToken);
   }
 
-  @Mutation(() => Boolean)
+@Mutation(() => Boolean)
   @Public()
-  @Throttle({ default: { limit: 3, ttl: 60000 } })  // 3 запроса в минуту
-  async requestPasswordReset(@Args('email') email: string) {
-    await this.authService.requestPasswordReset(email);
-    return true;
-  }
-
-  @Mutation(() => Boolean)
-  @Public()
-  @Throttle({ default: { limit: 3, ttl: 60000 } })  // 3 запроса в минуту
-  async resetPassword(
-    @Args('token') token: string,
-    @Args('newPassword') newPassword: string,
-  ) {
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 запросов в минуту
+  async resetPassword(@Args('token', { type: () => String }) token: string, @Args('newPassword', { type: () => String }) newPassword: string) {
     await this.authService.resetPassword(token, newPassword);
     return true;
   }
 
-  @Mutation(() => Boolean)
+@Mutation(() => Boolean)
   @Public()
-  @Throttle({ default: { limit: 5, ttl: 60000 } })  // 5 запросов в минуту
-  async verifyEmail(@Args('token') token: string) {
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 запросов в минуту
+  async verifyEmail(@Args('token', { type: () => String }) token: string) {
     await this.authService.verifyEmail(token);
     return true;
   }

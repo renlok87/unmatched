@@ -1,0 +1,120 @@
+.room-view {
+  min-height: 100vh;
+  background: var(--color-darker);
+  display: flex;
+  flex-direction: column;
+}
+
+.room-view__loading,
+.room-view__error {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.room-view__loading-icon {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--color-primary);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.room-view__loading-text,
+.room-view__error-text {
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+}
+
+.room-view__header {
+  padding: var(--spacing-6);
+  background: linear-gradient(to bottom, var(--gradient-dark), transparent);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.room-view__header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.room-view__title {
+  color: var(--color-white);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+
+.room-view__status {
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-2) var(--spacing-4);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+}
+
+.room-view__status--waiting {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.room-view__status--ready {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.room-view__content {
+  flex: 1;
+  padding: var(--spacing-6);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--spacing-6);
+}
+
+.room-view__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.room-view__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.room-view__actions {
+  display: flex;
+  gap: var(--spacing-3);
+  flex-wrap: wrap;
+  padding: var(--spacing-4);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .room-view__content {
+    grid-template-columns: 1fr;
+  }
+
+  .room-view__header-content {
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+}

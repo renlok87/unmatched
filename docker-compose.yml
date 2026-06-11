@@ -1,87 +1,61 @@
 services:
-  # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: unmatched-postgres
-    restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-unmatched}
-      POSTGRES_USER: ${POSTGRES_USER:-unmatched}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_USER: unmatched
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: unmatched
+      POSTGRES_HOST_AUTH_METHOD: md5
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-unmatched}"]
-      interval: 10s
+      test: [CMD-SHELL, pg_isready -U unmatched]
+      interval: 5s
       timeout: 5s
       retries: 5
-    networks:
-      - unmatched-network
 
-  # Redis Cache
   redis:
     image: redis:7-alpine
     container_name: unmatched-redis
-    restart: unless-stopped
+    ports:
+      - 6379:6379
     command: redis-server --appendonly yes
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    volumes:
-      - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
       retries: 5
-    networks:
-      - unmatched-network
 
-  # PgAdmin (опционально)
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: unmatched-pgadmin
-    restart: unless-stopped
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: unmatched-backend
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@unmatched.local}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      DATABASE_URL: postgresql://unmatched:password@postgres:5432/unmatched?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_REFRESH_SECRET: your-super-secret-refresh-token-key-change-in-production
+      PORT: 3000
+      NODE_ENV: development
+      FRONTEND_URL: http://localhost:5173
+      DISABLE_CACHE: true
     ports:
-      - "${PGADMIN_PORT:-5050}:80"
+      - 3000:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    depends_on:
-      - postgres
-    networks:
-      - unmatched-network
-    profiles:
-      - admin
-
-  # Redis Commander (опционально)
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    container_name: unmatched-redis-commander
-    restart: unless-stopped
-    environment:
-      REDIS_HOSTS: local:redis:6379
-    ports:
-      - "${REDIS_COMMANDER_PORT:-8081}:8081"
-    depends_on:
-      - redis
-    networks:
-      - unmatched-network
-    profiles:
-      - admin
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+    command: sh -c "npm rebuild bcrypt && npm run start:dev"
 
 volumes:
   postgres_data:
-    driver: local
-  redis_data:
-    driver: local
-  pgadmin_data:
-    driver: local
-
-networks:
-  unmatched-network:
-    driver: bridge
+  backend_node_modules:

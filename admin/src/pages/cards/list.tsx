@@ -23,6 +23,7 @@ const GET_CARDS = gql`
         attackValue
         defenseValue
         boostValue
+        bannerName
         count
         imageUrl
         imageUrlRu
@@ -249,6 +250,7 @@ export const CardList: React.FC<IResourceComponentsProps> = () => {
                 DEFENSE: 'blue',
                 SCHEME: 'purple',
                 MANEUVER: 'green',
+                VERSATILE: 'gold',
               };
               return <Tag color={colors[type] || 'default'}>{type}</Tag>;
             }}
@@ -264,8 +266,8 @@ export const CardList: React.FC<IResourceComponentsProps> = () => {
             dataIndex="attackValue"
             title="Attack"
             align="center"
-            render={(value: number, record: any) => {
-              if (record.cardType !== 'ATTACK') return '-';
+            render={(value: number | null) => {
+              if (value === null || value === undefined) return '-';
               return <Tag color="red">{value}</Tag>;
             }}
             sorter={true}
@@ -275,8 +277,8 @@ export const CardList: React.FC<IResourceComponentsProps> = () => {
             dataIndex="defenseValue"
             title="Defense"
             align="center"
-            render={(value: number, record: any) => {
-              if (record.cardType !== 'DEFENSE') return '-';
+            render={(value: number | null) => {
+              if (value === null || value === undefined) return '-';
               return <Tag color="blue">{value}</Tag>;
             }}
             sorter={true}
@@ -290,6 +292,11 @@ export const CardList: React.FC<IResourceComponentsProps> = () => {
               if (!value) return '-';
               return <Tag color="orange">{value}</Tag>;
             }}
+          />
+          <Table.Column
+            dataIndex="bannerName"
+            title="Banner"
+            render={(bannerName: string) => bannerName || '-'}
           />
           <Table.Column
             dataIndex="count"

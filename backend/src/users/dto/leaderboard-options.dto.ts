@@ -34,16 +34,24 @@ export class LeaderboardOptionsDto {
 }
 
 @ObjectType()
+export class LeaderboardUser {
+  @Field()
+  id: string;
+
+  @Field()
+  username: string;
+
+  @Field(() => String, { nullable: true })
+  avatar: string | null;
+}
+
+@ObjectType()
 export class LeaderboardEntryResponse {
   @Field(() => Int)
   rank: number;
 
-  @Field()
-  user: {
-    id: string;
-    username: string;
-    avatar: string | null;
-  };
+  @Field(() => LeaderboardUser)
+  user: LeaderboardUser;
 
   @Field(() => Int)
   elo: number;
@@ -53,6 +61,21 @@ export class LeaderboardEntryResponse {
 
   @Field(() => Int)
   gamesPlayed: number;
+}
+
+@ObjectType()
+export class FavoriteHero {
+  @Field()
+  id: string;
+
+  @Field()
+  name: string;
+
+  @Field()
+  nameEn: string;
+
+  @Field()
+  nameRu: string;
 }
 
 @ObjectType()
@@ -78,17 +101,12 @@ export class UserStatsResponse {
   @Field(() => Int)
   peakElo: number;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   lastPlayedAt: Date | null;
 
   @Field(() => Int)
   totalPlayTime: number;
 
-  @Field({ nullable: true })
-  favoriteHero: {
-    id: string;
-    name: string;
-    nameEn: string;
-    nameRu: string;
-  } | null;
+  @Field(() => FavoriteHero, { nullable: true })
+  favoriteHero: FavoriteHero | null;
 }

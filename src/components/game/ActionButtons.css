@@ -1,0 +1,67 @@
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+}
+
+.action-buttons__end-turn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+}
+
+.action-buttons__pass {
+  min-width: 120px;
+}
+
+.action-buttons__hotkey {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-1) var(--spacing-2);
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-sm);
+  font-family: monospace;
+  font-weight: var(--font-weight-medium);
+}
+
+.action-buttons__modal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  padding: var(--spacing-2);
+}
+
+.action-buttons__modal-text {
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+.action-buttons__modal-actions {
+  display: flex;
+  gap: var(--spacing-3);
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .action-buttons__end-turn,
+  .action-buttons__pass {
+    width: 100%;
+  }
+
+  .action-buttons__modal-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .action-buttons__modal-actions button {
+    width: 100%;
+  }
+}

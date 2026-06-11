@@ -11,10 +11,10 @@ export class GamePlayerResponse {
   @Field()
   username: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   avatar: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   heroId: string | null;
 
   @Field()

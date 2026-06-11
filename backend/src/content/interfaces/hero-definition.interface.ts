@@ -17,11 +17,14 @@ export interface HeroUrls {
 export interface HeroDefinition {
   id: string;
   name: string;
+  nameEn?: string;
+  nameRu?: string;
   health: number;
   movement: number;
   set: string;
   abilities: SpecialAbility[];
   deckCards: CardDefinition[];
+  fighterType?: FighterType;
   sidekickCount?: number;
   sidekickHealth?: number;
   // Image URLs from scraped data

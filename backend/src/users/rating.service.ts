@@ -100,11 +100,7 @@ export class RatingService {
   /**
    * Обновить рейтинг игрока после игры
    */
-  async updatePlayerRating(
-    userId: string,
-    newRating: number,
-    heroId?: string,
-  ): Promise<void> {
+  async updatePlayerRating(userId: string, newRating: number, heroId?: string): Promise<void> {
     const stats = await this.prisma.userStats.findUnique({
       where: { userId },
     });
@@ -159,9 +155,7 @@ export class RatingService {
   ): RatingChange {
     const expectedScore = this.calculateExpectedScore(playerRating, opponentRating);
     const actualScore = didWin ? 1 : 0;
-    const newRating = Math.round(
-      playerRating + this.K_FACTOR * (actualScore - expectedScore),
-    );
+    const newRating = Math.round(playerRating + this.K_FACTOR * (actualScore - expectedScore));
 
     return {
       oldRating: playerRating,

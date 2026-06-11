@@ -1,0 +1,20 @@
+query LobbyAvailableGames($mode: String, $limit: Float) {
+  availableGames(mode: $mode, limit: $limit) {
+    id
+    mode
+    status
+    host {
+      id
+      username
+      avatar
+    }
+    opponent {
+      id
+      username
+      avatar
+    }
+    boardId
+    createdAt
+    updatedAt
+  }
+}

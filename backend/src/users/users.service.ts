@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { UpdateProfileDto, ChangePasswordDto, UserResponse } from './dto';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -16,11 +17,7 @@ export class UsersService {
     private redis: RedisService,
   ) {}
 
-  /**
-   * Найти пользователя по ID
-   */
   async findById(id: string): Promise<UserResponse> {
-    // Сначала проверяем кеш
     const cached = await this.redis.getUserFromCache(id);
     if (cached) {
       return cached as UserResponse;
@@ -34,16 +31,16 @@ export class UsersService {
       throw new NotFoundException('Пользователь не найден');
     }
 
-    const userResponse: UserResponse = {
+const userResponse: UserResponse = {
       id: user.id,
       email: user.email,
       username: user.username,
       avatar: user.avatar,
+      role: user.role,
       createdAt: user.createdAt,
       emailVerified: user.emailVerified,
     };
 
-    // Кешируем результат
     await this.redis.cacheUser(id, userResponse);
 
     return userResponse;
@@ -61,11 +58,12 @@ export class UsersService {
       throw new NotFoundException('Пользователь не найден');
     }
 
-    return {
+return {
       id: user.id,
       email: user.email,
       username: user.username,
       avatar: user.avatar,
+      role: user.role,
       createdAt: user.createdAt,
       emailVerified: user.emailVerified,
     };
@@ -83,11 +81,12 @@ export class UsersService {
       throw new NotFoundException('Пользователь не найден');
     }
 
-    return {
+return {
       id: user.id,
       email: user.email,
       username: user.username,
       avatar: user.avatar,
+      role: user.role,
       createdAt: user.createdAt,
       emailVerified: user.emailVerified,
     };
@@ -96,11 +95,7 @@ export class UsersService {
   /**
    * Обновить профиль пользователя
    */
-  async updateProfile(
-    userId: string,
-    dto: UpdateProfileDto,
-  ): Promise<UserResponse> {
-    // Проверяем существование пользователя
+  async updateProfile(userId: string, dto: UpdateProfileDto): Promise<UserResponse> {
     const existingUser = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -109,7 +104,6 @@ export class UsersService {
       throw new NotFoundException('Пользователь не найден');
     }
 
-    // Если обновляем username, проверяем что он не занят
     if (dto.username && dto.username !== existingUser.username) {
       const usernameTaken = await this.prisma.user.findUnique({
         where: { username: dto.username },
@@ -120,7 +114,6 @@ export class UsersService {
       }
     }
 
-    // Обновляем профиль
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
       data: {
@@ -129,14 +122,14 @@ export class UsersService {
       },
     });
 
-    // Инвалидируем кеш
     await this.redis.invalidateUserCache(userId);
 
-    return {
+return {
       id: updatedUser.id,
       email: updatedUser.email,
       username: updatedUser.username,
       avatar: updatedUser.avatar,
+      role: updatedUser.role,
       createdAt: updatedUser.createdAt,
       emailVerified: updatedUser.emailVerified,
     };

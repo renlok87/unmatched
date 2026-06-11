@@ -44,9 +44,9 @@ export class UsersResolver {
    * Получить публичный профиль пользователя по ID
    * Email возвращается только владельцу аккаунта
    */
-  @Query(() => PublicUserResponse, { nullable: true })
+@Query(() => PublicUserResponse, { nullable: true })
   async user(
-    @Args('id') id: string,
+    @Args('id', { type: () => String }) id: string,
     @CurrentUser() currentUser?: any,
   ): Promise<PublicUserResponse> {
     const user = await this.usersService.findById(id);
@@ -75,9 +75,9 @@ export class UsersResolver {
   /**
    * Получить публичный профиль пользователя по username
    */
-  @Query(() => PublicUserResponse, { nullable: true, name: 'userByUsername' })
+@Query(() => PublicUserResponse, { nullable: true, name: 'userByUsername' })
   async userByUsername(
-    @Args('username') username: string,
+    @Args('username', { type: () => String }) username: string,
     @CurrentUser() currentUser?: any,
   ): Promise<PublicUserResponse> {
     const user = await this.usersService.findByUsername(username);
@@ -114,8 +114,8 @@ export class UsersResolver {
   /**
    * Получить публичную статистику пользователя
    */
-  @Query(() => UserStatsResponse, { nullable: true })
-  async stats(@Args('userId') userId: string): Promise<UserStatsResponse> {
+@Query(() => UserStatsResponse, { nullable: true })
+  async stats(@Args('userId', { type: () => String }) userId: string): Promise<UserStatsResponse> {
     return await this.userStatsService.getStats(userId);
   }
 
@@ -187,13 +187,10 @@ export class UsersResolver {
    * Загрузить аватар
    * Rate limited: 5 запросов в минуту
    */
-  @Mutation(() => String)
+@Mutation(() => String)
   @UseGuards(GqlAuthGuard)
   @Throttle({ default: { limit: 5, ttl: 60000 } })
-  async uploadAvatar(
-    @Args('fileUrl') fileUrl: string,
-    @CurrentUser() user: any,
-  ): Promise<string> {
+  async uploadAvatar(@Args('fileUrl', { type: () => String }) fileUrl: string, @CurrentUser() user: any): Promise<string> {
     return await this.profileService.uploadAvatar(user.id, fileUrl);
   }
 

@@ -1,0 +1,54 @@
+# Мутации для аутентификации
+
+mutation Register($input: RegisterDto!) {
+  register(input: $input) {
+    accessToken
+    refreshToken
+    user {
+      id
+      email
+      username
+    }
+  }
+}
+
+mutation Login($input: LoginDto!) {
+  login(input: $input) {
+    accessToken
+    refreshToken
+    user {
+      id
+      email
+      username
+    }
+  }
+}
+
+mutation RefreshTokens($refreshToken: String!) {
+  refreshTokens(refreshToken: $refreshToken) {
+    accessToken
+    refreshToken
+  }
+}
+
+mutation Logout {
+  logout
+}
+
+mutation UpdateProfile($input: UpdateProfileDto!) {
+  updateProfile(input: $input) {
+    id
+    username
+    avatar
+  }
+}
+
+mutation UpdateSettings($input: SettingsDto!) {
+  updateSettings(input: $input) {
+    theme
+    soundEnabled
+    musicEnabled
+    language
+    profileVisible
+  }
+}

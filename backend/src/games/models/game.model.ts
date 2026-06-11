@@ -1,13 +1,14 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, Int } from '@nestjs/graphql';
 import { GameStatus, GameMode, GamePhase } from '../dto';
 import { GamePlayerResponse } from './game-player.model';
-
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 
 @ObjectType()
 export class GameResponse {
   @Field()
   id: string;
+
+  @Field(() => String, { nullable: true })
+  code: string | null;
 
   @Field(() => GameStatus)
   status: GameStatus;
@@ -21,7 +22,7 @@ export class GameResponse {
   @Field(() => GamePlayerResponse)
   host: GamePlayerResponse;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   opponentId: string | null;
 
   @Field(() => GamePlayerResponse, { nullable: true })
@@ -30,8 +31,8 @@ export class GameResponse {
   @Field()
   boardId: string;
 
-  @Field({ nullable: true })
-  boardState: any | null;
+  @Field(() => String, { nullable: true })
+  boardState: string | null;
 
   @Field()
   createdAt: Date;
@@ -39,13 +40,13 @@ export class GameResponse {
   @Field()
   updatedAt: Date;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   startedAt: Date | null;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   endedAt: Date | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   winnerId: string | null;
 
   @Field()
@@ -57,7 +58,7 @@ export class GameResponse {
   @Field(() => GamePhase, { nullable: true })
   phase: GamePhase | null;
 
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   currentTurn: number | null;
 }
 
@@ -69,13 +70,13 @@ export class GameStateResponse {
   @Field()
   gameId: string;
 
-  @Field()
+  @Field(() => String)
   state: any;
 
   @Field()
   sequenceNumber: number;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   currentTurnPlayerId: string | null;
 
   @Field()

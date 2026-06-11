@@ -844,6 +844,9 @@ export class CardListItemDto {
   @Field(() => Int, { nullable: true })
   boostValue?: number;
 
+  @Field(() => String, { nullable: true })
+  bannerName?: string;
+
   @Field()
   count: number;
 

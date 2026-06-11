@@ -1,0 +1,20 @@
+query QueueStatus($mode: String!) {
+  queueStatus(mode: $mode) {
+    inQueue
+    mode
+    position
+    totalPlayers
+    estimatedWaitTime
+    joinedAt
+  }
+}
+
+query PenaltyInfo {
+  penaltyInfo {
+    canJoinQueue
+    declineCount
+    tempBanUntil
+    penaltyElo
+    reason
+  }
+}

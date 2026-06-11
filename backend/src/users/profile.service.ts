@@ -59,10 +59,7 @@ export class ProfileService {
   /**
    * Обновить настройки пользователя
    */
-  async updateSettings(
-    userId: string,
-    dto: SettingsDto,
-  ): Promise<UserSettingsGraphql> {
+  async updateSettings(userId: string, dto: SettingsDto): Promise<UserSettingsGraphql> {
     // Проверяем существование пользователя
     const user = await this.prisma.user.findUnique({
       where: { id: userId },

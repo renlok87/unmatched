@@ -1,0 +1,40 @@
+# Аутентификация и пользователь
+
+query Me {
+  me {
+    id
+    email
+    username
+    avatar
+    createdAt
+    settings {
+      theme
+      soundEnabled
+      musicEnabled
+      language
+      profileVisible
+    }
+  }
+}
+
+query MyStats {
+  myStats {
+    userId
+    gamesPlayed
+    gamesWon
+    gamesLost
+    winRate
+    currentElo
+    peakElo
+  }
+}
+
+query MySettings {
+  mySettings {
+    theme
+    soundEnabled
+    musicEnabled
+    language
+    profileVisible
+  }
+}

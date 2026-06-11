@@ -1,0 +1,419 @@
+/**
+ * UNMATCHED Design System - Card Styles
+ *
+ * Полная система стилей для игровых карт
+ */
+
+/* ============================================================
+   CARD BASE STYLES - Базовые стили карт
+   ============================================================ */
+
+.card {
+  width: var(--card-width);
+  min-height: var(--card-height);
+  background: var(--gradient-dark);
+  border: 2px solid var(--color-gray-700);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-3);
+  cursor: default;
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Card Type Indicator Line - Индикатор типа карты (верхняя полоса) */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--card-type-color, var(--color-gray-500));
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+/* Card Type Patterns - Паттерны для разных типов карт */
+.card.attack::before {
+  background: var(--card-attack-color);
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--card-attack-color),
+    var(--card-attack-color) 10px,
+    var(--color-primary-dark) 10px,
+    var(--color-primary-dark) 20px
+  );
+}
+
+.card.defense::before {
+  background: var(--card-defense-color);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--card-defense-color),
+    var(--card-defense-color) 10px,
+    var(--color-secondary-dark) 10px,
+    var(--color-secondary-dark) 20px
+  );
+}
+
+.card.versatile::before {
+  background: var(--card-versatile-color);
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--card-versatile-color),
+    var(--card-versatile-color) 10px,
+    var(--color-accent-dark) 10px,
+    var(--color-accent-dark) 20px
+  );
+}
+
+.card.scheme::before {
+  background: var(--card-scheme-color);
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--card-scheme-color),
+    var(--card-scheme-color) 10px,
+    var(--color-special-dark) 10px,
+    var(--color-special-dark) 20px
+  );
+}
+
+/* Card Background Gradients - Градиенты фона по типу */
+.card.attack {
+  background: var(--gradient-card-attack);
+}
+
+.card.defense {
+  background: var(--gradient-card-defense);
+}
+
+.card.versatile {
+  background: var(--gradient-card-versatile);
+}
+
+.card.scheme {
+  background: var(--gradient-card-scheme);
+}
+
+/* ============================================================
+   CARD INTERACTIVE STATES - Интерактивные состояния
+   ============================================================ */
+
+.card.playable {
+  cursor: pointer;
+  border-color: var(--color-gray-600);
+}
+
+.card.playable:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--shadow-xl), 0 0 0 2px var(--card-type-color, var(--color-gray-500));
+  border-color: var(--card-type-color, var(--color-gray-500));
+}
+
+.card.playable:active {
+  transform: translateY(-2px) scale(1.01);
+}
+
+.card.selected {
+  border-color: var(--color-warning);
+  box-shadow: var(--shadow-glow);
+  animation: card-pulse 1.5s infinite;
+}
+
+@keyframes card-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(251, 191, 36, 0.8);
+  }
+}
+
+/* ============================================================
+   CARD FACE DOWN - Рубашка карты
+   ============================================================ */
+
+.card.card-face-down {
+  background: var(--gradient-darker);
+  justify-content: center;
+  align-items: center;
+}
+
+.card.card-face-down::before {
+  background: var(--color-gray-500);
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(255, 255, 255, 0.05) 10px,
+      rgba(255, 255, 255, 0.05) 20px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 10px,
+      rgba(255, 255, 255, 0.05) 10px,
+      rgba(255, 255, 255, 0.05) 20px
+    );
+}
+
+.card-back {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-back-icon {
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.2);
+  opacity: 0.5;
+}
+
+/* ============================================================
+   CARD HEADER - Заголовок карты
+   ============================================================ */
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+  min-height: var(--card-header-height);
+}
+
+.card-title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary, var(--color-gray-50));
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  line-height: var(--line-height-tight);
+  flex: 1;
+}
+
+.card-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-text-primary, var(--color-white));
+  line-height: 1;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  min-width: 28px;
+  text-align: center;
+}
+
+/* ============================================================
+   CARD TYPE BADGE - Бейдж типа карты
+   ============================================================ */
+
+.card-type {
+  font-size: 0.6rem;
+  font-weight: var(--font-weight-bold);
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-widest);
+  display: inline-block;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================================
+   CARD EFFECTS - Эффекты карты
+   ============================================================ */
+
+.card-effects {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  flex: 1;
+}
+
+.card-effect {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-1);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-md);
+  border-left: 2px solid var(--card-type-color, var(--color-gray-500));
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.effect-timing {
+  font-weight: var(--font-weight-semibold);
+  color: var(--card-type-color, var(--color-gray-400));
+  text-transform: capitalize;
+  font-size: 0.6rem;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.effect-text {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: var(--line-height-snug);
+}
+
+/* ============================================================
+   CARD BOOST BADGE - Бейдж буста
+   ============================================================ */
+
+.card-boost {
+  position: absolute;
+  bottom: var(--spacing-2);
+  right: var(--spacing-2);
+  width: var(--card-boost-size);
+  height: var(--card-boost-size);
+  background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-special) 100%);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-900);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--color-white);
+}
+
+/* ============================================================
+   CARD CHARACTER NAME - Имя персонажа
+   ============================================================ */
+
+.card-character {
+  font-size: 0.55rem;
+  color: rgba(255, 255, 255, 0.25);
+  text-align: right;
+  margin-top: auto;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ============================================================
+   CARD SIZE VARIANTS - Варианты размеров
+   ============================================================ */
+
+.card.small {
+  width: 100px;
+  min-height: 140px;
+  padding: var(--spacing-2);
+}
+
+.card.small .card-value {
+  font-size: var(--font-size-xl);
+}
+
+.card.small .card-title {
+  font-size: 0.6rem;
+}
+
+.card.small .card-effect {
+  font-size: 0.55rem;
+}
+
+.card.large {
+  width: 180px;
+  min-height: 260px;
+  padding: var(--spacing-4);
+}
+
+.card.large .card-value {
+  font-size: var(--font-size-4xl);
+}
+
+.card.large .card-title {
+  font-size: var(--font-size-sm);
+}
+
+/* ============================================================
+   CARD SPECIAL STATES - Специальные состояния
+   ============================================================ */
+
+/* Disabled Card */
+.card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(50%);
+}
+
+/* Boosted Card */
+.card.boosted {
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+  border-color: var(--color-warning);
+}
+
+.card.boosted .card-boost {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success) 100%);
+  animation: boost-pulse 1s infinite;
+}
+
+@keyframes boost-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Preview Card (for hand hover) */
+.card.preview {
+  transform: scale(1.1) translateY(-20px);
+  z-index: 10;
+}
+
+/* ============================================================
+   CARD ANIMATIONS - Анимации карт
+   ============================================================ */
+
+@keyframes card-deal {
+  from {
+    opacity: 0;
+    transform: translateY(-100px) rotate(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
+}
+
+@keyframes card-discard {
+  from {
+    opacity: 1;
+    transform: translateX(0) rotate(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(200px) rotate(20deg);
+  }
+}
+
+@keyframes card-shuffle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-10px) rotate(-2deg);
+  }
+  75% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+.card.dealing {
+  animation: card-deal 0.4s ease-out;
+}
+
+.card.discarding {
+  animation: card-discard 0.3s ease-in forwards;
+}
+
+.card.shuffling {
+  animation: card-shuffle 0.5s ease-in-out;
+}

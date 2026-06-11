@@ -1,6 +1,7 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
+import { GameSubscriptionService } from './game-subscription.service';
 import { GamePhase } from './dto';
 import { ConcurrentModificationException } from './exceptions/game.exceptions';
 
@@ -198,6 +199,7 @@ export class GameStateService {
   constructor(
     private prisma: PrismaService,
     private redis: RedisService,
+    @Optional() private gameSubscriptionService?: GameSubscriptionService,
   ) {}
 
   /**
@@ -245,6 +247,11 @@ export class GameStateService {
 
     // Обновляем кеш
     await this.cacheState(gameId, state);
+
+    // Публикуем обновление для подписчиков (WebSocket)
+    if (this.gameSubscriptionService) {
+      await this.gameSubscriptionService.publishGameUpdate(gameId, 'STATE_UPDATED', state);
+    }
   }
 
   /**
@@ -642,5 +649,32 @@ export class GameStateService {
             : undefined,
       },
     };
+  }
+
+  /**
+   * Получить события игры с указанного sequence number (для catch-up при реконнекте)
+   */
+  async getEventsSince(gameId: string, sinceSequence: number): Promise<any[]> {
+    const actions = await this.prisma.gameAction.findMany({
+      where: {
+        gameId,
+        sequenceNumber: {
+          gt: sinceSequence,
+        },
+      },
+      orderBy: {
+        sequenceNumber: 'asc',
+      },
+      take: 100,
+    });
+
+    return actions.map((action) => ({
+      sequenceNumber: action.sequenceNumber,
+      type: action.type,
+      gameId: action.gameId,
+      playerId: action.playerId,
+      payload: action.payload,
+      timestamp: action.timestamp,
+    }));
   }
 }

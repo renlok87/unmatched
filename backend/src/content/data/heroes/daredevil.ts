@@ -107,8 +107,10 @@ export const daredevil: HeroDefinition = {
     },
   ],
   urls: {
-    avatar: 'https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/avatars/kZQUve8tqIcvmVUC-bGge.webp',
+    avatar:
+      'https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/avatars/kZQUve8tqIcvmVUC-bGge.webp',
     mini: 'https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/minis/NgBt8ama_QbEh8TaPBIUf.webp',
-    cardCover: 'https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/card-covers/B0qnKxZyoG3KLwRNvKsrG.webp',
+    cardCover:
+      'https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/card-covers/B0qnKxZyoG3KLwRNvKsrG.webp',
   },
 };

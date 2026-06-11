@@ -62,6 +62,18 @@ export interface HeroData {
   urls: HeroUrls;
   cards: CardInfo[];
   images: string[];
+  // Новые поля
+  movement?: number;
+  color?: string;
+  health?: number;
+  attackType?: string;
+  specialAbility?: string;
+  hasTokens?: boolean;
+  sidekicks?: SidekickInfo[];
+  additionalMinis?: {
+    images: string[];
+    models: string[];
+  };
 }
 
 export interface HeroUrls {
@@ -69,6 +81,15 @@ export interface HeroUrls {
   mini?: string;
   cardCover?: string;
   model?: string;
+  characterCard?: string;  // Изображение карты персонажа
+}
+
+export interface SidekickInfo {
+  name: string;
+  health: number;
+  movement: number;
+  attackType: string;
+  avatarUrl?: string;
 }
 
 export interface CardInfo {

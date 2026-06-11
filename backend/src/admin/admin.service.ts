@@ -690,6 +690,7 @@ export class AdminService {
           attackValue: true,
           defenseValue: true,
           boostValue: true,
+          bannerName: true,
           count: true,
           heroId: true,
           imageUrl: true,

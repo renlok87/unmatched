@@ -1,0 +1,33 @@
+.emote-reaction {
+  position: fixed;
+  font-size: 48px;
+  pointer-events: none;
+  z-index: 1001;
+  animation: floatUp 2s ease-out forwards;
+  animation-delay: var(--random-delay, 0s);
+}
+
+.emote-reaction__content {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 0;
+    transform: translateY(0) translateX(0) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-20px) translateX(var(--random-x, 0px)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100px) translateX(calc(var(--random-x, 0px) * 2)) scale(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .emote-reaction {
+    font-size: 36px;
+  }
+}

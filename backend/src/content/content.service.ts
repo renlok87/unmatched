@@ -1,19 +1,10 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { RedisService } from '../redis';
-import type {
-  HeroDefinition,
-  CardDefinition,
-  BoardDefinition,
-  ContentDiff,
-} from './interfaces';
+import type { HeroDefinition, CardDefinition, BoardDefinition, ContentDiff } from './interfaces';
 import { ContentMapper } from './mappers/content.mapper';
 import { getAllHeroes, getHeroDefinition, getHeroesBySet } from './data/heroes';
 import { getAllBoards, getBoardDefinition } from './data/boards';
-import type {
-  PaginatedHeroesDto,
-  PaginatedBoardsDto,
-  PaginationInfoDto,
-} from './dto/content.dto';
+import type { PaginatedHeroesDto, PaginatedBoardsDto, PaginationInfoDto } from './dto/content.dto';
 
 /**
  * Content version for cache invalidation
@@ -53,7 +44,7 @@ export class ContentService {
   private async getFromCache<T>(key: string): Promise<T | null> {
     try {
       const cached = await this.redisService.get(key);
-      return cached ? JSON.parse(cached) as T : null;
+      return cached ? (JSON.parse(cached) as T) : null;
     } catch (error) {
       this.logger.warn(`Cache get failed for key ${key}:`, error);
       return null;
@@ -111,9 +102,7 @@ export class ContentService {
     limit: number = 10,
     set?: string,
   ): Promise<PaginatedHeroesDto> {
-    const heroes = set
-      ? getHeroesBySet(set)
-      : await this.getAllHeroes();
+    const heroes = set ? getHeroesBySet(set) : await this.getAllHeroes();
 
     const total = heroes.length;
     const totalPages = Math.ceil(total / limit);
@@ -131,7 +120,7 @@ export class ContentService {
     };
 
     return {
-      items: items.map(h => this.mapper.toHeroDto(h)),
+      items: items.map((h) => this.mapper.toHeroDto(h)),
       pagination,
     };
   }
@@ -188,7 +177,7 @@ export class ContentService {
   async getCardById(cardId: string): Promise<CardDefinition | null> {
     const heroes = await this.getAllHeroes();
     for (const hero of heroes) {
-      const card = hero.deckCards.find(c => c.id === cardId);
+      const card = hero.deckCards.find((c) => c.id === cardId);
       if (card) {
         return card;
       }
@@ -216,10 +205,7 @@ export class ContentService {
   /**
    * Get paginated boards
    */
-  async getBoardsPaginated(
-    page: number = 1,
-    limit: number = 10,
-  ): Promise<PaginatedBoardsDto> {
+  async getBoardsPaginated(page: number = 1, limit: number = 10): Promise<PaginatedBoardsDto> {
     const boards = await this.getAllBoards();
 
     const total = boards.length;
@@ -238,7 +224,7 @@ export class ContentService {
     };
 
     return {
-      items: items.map(b => this.mapper.toBoardDto(b)),
+      items: items.map((b) => this.mapper.toBoardDto(b)),
       pagination,
     };
   }
@@ -289,8 +275,8 @@ export class ContentService {
       newVersion: CONTENT_VERSION,
       heroesChanged: true,
       boardsChanged: true,
-      changedHeroIds: heroes.map(h => h.id),
-      changedBoardIds: boards.map(b => b.id),
+      changedHeroIds: heroes.map((h) => h.id),
+      changedBoardIds: boards.map((b) => b.id),
     };
   }
 
@@ -307,7 +293,7 @@ export class ContentService {
     }
 
     const heroes = await this.getAllHeroes();
-    const sets = new Set(heroes.map(h => h.set));
+    const sets = new Set(heroes.map((h) => h.set));
     const sortedSets = Array.from(sets).sort();
 
     await this.setCache(cacheKey, sortedSets);

@@ -1,0 +1,222 @@
+.combat-result {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fade-in 0.5s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.combat-result__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  padding: var(--spacing-8);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-xl);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  max-width: 800px;
+  width: 100%;
+  margin: var(--spacing-4);
+  text-align: center;
+}
+
+.combat-result__icon {
+  font-size: 64px;
+  animation: bounce 1s ease;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.combat-result__title {
+  color: var(--color-white);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.combat-result__fighters {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--spacing-6);
+}
+
+.combat-result__fighter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-lg);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.combat-result__fighter--winner {
+  border-color: rgba(76, 175, 80, 0.4);
+  background: rgba(76, 175, 80, 0.1);
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+  }
+}
+
+.combat-result__fighter--defeated {
+  border-color: rgba(244, 67, 54, 0.4);
+  background: rgba(244, 67, 54, 0.1);
+  opacity: 0.7;
+}
+
+.combat-result__fighter-name {
+  color: var(--color-white);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.combat-result__fighter-health {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  width: 100%;
+  max-width: 200px;
+}
+
+.combat-result__health-bar {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.combat-result__health-fill {
+  height: 100%;
+  background: var(--color-success);
+  transition: width 0.5s ease;
+}
+
+.combat-result__fighter--defeated .combat-result__health-fill {
+  background: var(--color-error);
+}
+
+.combat-result__health-text {
+  color: var(--color-gray-400);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.combat-result__defeated {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  color: var(--color-error);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-extrabold);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  border: 3px solid var(--color-error);
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-md);
+  background: rgba(244, 67, 54, 0.2);
+}
+
+.combat-result__vs {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-white);
+  opacity: 0.5;
+}
+
+.combat-result__summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-md);
+}
+
+.combat-result__summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--color-white);
+  font-size: var(--font-size-md);
+}
+
+.combat-result__summary-value {
+  font-weight: var(--font-weight-bold);
+  font-family: monospace;
+  font-size: var(--font-size-lg);
+  color: var(--color-error);
+}
+
+.combat-result__actions {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .combat-result__content {
+    padding: var(--spacing-6);
+    gap: var(--spacing-4);
+  }
+
+  .combat-result__icon {
+    font-size: 48px;
+  }
+
+  .combat-result__title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .combat-result__fighters {
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+
+  .combat-result__fighter-health {
+    max-width: 100%;
+  }
+
+  .combat-result__vs {
+    font-size: var(--font-size-2xl);
+  }
+}
