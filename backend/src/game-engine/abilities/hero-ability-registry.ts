@@ -66,6 +66,11 @@ export interface HeroAbilityHandler {
   readonly name: string;
   readonly description: string;
 
+  /** Ability разрешает BOOST атаки/защиты картой из руки (King Arthur —
+   *  атака), даже если на играемой карте нет BOOST-эффекта */
+  readonly allowsAttackBoost?: boolean;
+  readonly allowsDefenseBoost?: boolean;
+
   /**
    * Применить модификаторы к бою
    */

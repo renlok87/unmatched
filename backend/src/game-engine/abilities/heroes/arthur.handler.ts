@@ -21,27 +21,19 @@ import { Position } from '../../models';
 export const arthurAbilityHandler: HeroAbilityHandler = {
   // Ключ = slugifyHeroName(Hero.name) — в БД герой называется 'King Arthur'
   heroId: 'king-arthur',
-  name: 'Righteous Fury',
-  description: 'Arthur всегда имеет минимум +1 к атаке',
+  name: 'Holy Avenger',
+  description:
+    'King Arthur может BOOST-ить свои атаки картой из руки (в дополнение к BOOST-эффектам карт)',
+
+  // Реальная способность Артура по правилам Unmatched: BOOST атаки.
+  // (Старый выдуманный «+1 к атаке всегда» удалён.)
+  allowsAttackBoost: true,
 
   applyCombatModifier(
     _combatState: CombatState,
-    fighter: Fighter,
-    role: CombatRole,
+    _fighter: Fighter,
+    _role: CombatRole,
   ): readonly ValueModifier[] {
-    // Артур получает бонус к атаке только когда атакует
-    if (role === 'attacker') {
-      return [
-        {
-          type: ValueModifierType.ADD,
-          value: 1,
-          source: 'hero-ability-arthur',
-          timestamp: Date.now() + 1000, // Героические способности применяются последними
-          ownerId: 'attacker',
-        },
-      ];
-    }
-
     return [];
   },
 };

@@ -18,11 +18,13 @@ import type { GameState, CombatState, HandCard, Card } from '../models';
 import {
   GamePhase,
   CardType,
+  EffectType,
   createEmptyBoardState,
   ACTIONS_PER_TURN,
   getActionsRemaining,
   getFighterAttackType,
 } from '../models';
+import { HeroAbilityRegistry } from '../abilities/hero-ability-registry';
 import {
   CardEffectExecutorService,
   type EffectResult,
@@ -118,7 +120,32 @@ export class GameActionExecutorService {
     private readonly metrics: MetricsService,
     private readonly deckManagement: DeckManagementService,
     private readonly cardEffectExecutor: CardEffectExecutorService,
+    private readonly abilityRegistry: HeroAbilityRegistry,
   ) {}
+
+  /**
+   * BOOST картой из руки разрешён, если играемая карта имеет BOOST-эффект
+   * (PLAYER_CHOICE_HAND) или ability героя разрешает (King Arthur — атака)
+   */
+  private boostAllowed(
+    playedCard: Card | undefined,
+    fighter: { heroSlug?: string; heroId: string } | undefined,
+    role: 'attack' | 'defense',
+  ): boolean {
+    const cardAllows = Boolean(
+      playedCard?.effects?.some(
+        (e) =>
+          e.type === EffectType.BOOST &&
+          (e.boostSource === 'PLAYER_CHOICE_HAND' || e.boostSource == null),
+      ),
+    );
+    if (cardAllows) return true;
+    const handler = fighter
+      ? this.abilityRegistry.getAny(fighter.heroSlug ?? fighter.heroId)
+      : undefined;
+    const h = handler as { allowsAttackBoost?: boolean; allowsDefenseBoost?: boolean } | undefined;
+    return role === 'attack' ? Boolean(h?.allowsAttackBoost) : Boolean(h?.allowsDefenseBoost);
+  }
 
   /**
    * Передать ход следующему живому игроку.
@@ -516,9 +543,33 @@ export class GameActionExecutorService {
         // найдёт карту в decks[].cards даже после сброса (cards — полный список).
         const playedCard = this.findHandCard(currentState, userId, dto.cardId);
 
+        // BOOST атаки (A7): сброс ещё одной карты → +boostValue к значению
+        let boostCard: HandCard | undefined;
+        if (dto.boostCardId) {
+          boostCard = this.findHandCard(currentState, userId, dto.boostCardId);
+          if (!boostCard) {
+            this.metrics.incrementGameAction('attack', undefined, 'error');
+            return { success: false, error: 'Boost card not in hand' };
+          }
+          if (boostCard.id === playedCard?.id) {
+            this.metrics.incrementGameAction('attack', undefined, 'error');
+            return { success: false, error: 'Нельзя BOOST-ить атаку той же картой' };
+          }
+          if (!this.boostAllowed(playedCard, attacker, 'attack')) {
+            this.metrics.incrementGameAction('attack', undefined, 'error');
+            return {
+              success: false,
+              error: 'BOOST атаки не разрешён: ни эффекта BOOST на карте, ни способности героя',
+            };
+          }
+        }
+
         let nextState = currentState;
         if (playedCard) {
           nextState = await this.deckManagement.discardCard(nextState, userId, playedCard.id);
+        }
+        if (boostCard) {
+          nextState = await this.deckManagement.discardCard(nextState, userId, boostCard.id);
         }
 
         // Сохраняем состояние боя в metadata
@@ -527,7 +578,7 @@ export class GameActionExecutorService {
           defenderId: target.ownerId,
           targetFighterId: target.id,
           attackerCardId: playedCard?.id ?? dto.cardId,
-          attackValue: playedCard?.attackValue ?? 0,
+          attackValue: (playedCard?.attackValue ?? 0) + (boostCard?.boostValue ?? 0),
           defenseValue: 0,
           startedAt: new Date(),
         };
@@ -635,16 +686,37 @@ export class GameActionExecutorService {
       // (instance id в combatInfo — см. комментарий в executeAttack)
       const playedCard = this.findHandCard(currentState, userId, dto.cardId);
 
+      // BOOST защиты (A7)
+      let boostCard: HandCard | undefined;
+      if (dto.boostCardId) {
+        boostCard = this.findHandCard(currentState, userId, dto.boostCardId);
+        if (!boostCard) {
+          return { success: false, error: 'Boost card not in hand' };
+        }
+        if (boostCard.id === playedCard?.id) {
+          return { success: false, error: 'Нельзя BOOST-ить защиту той же картой' };
+        }
+        if (!this.boostAllowed(playedCard, defendingFighter, 'defense')) {
+          return {
+            success: false,
+            error: 'BOOST защиты не разрешён: ни эффекта BOOST на карте, ни способности героя',
+          };
+        }
+      }
+
       let nextState = currentState;
       if (playedCard) {
         nextState = await this.deckManagement.discardCard(nextState, userId, playedCard.id);
+      }
+      if (boostCard) {
+        nextState = await this.deckManagement.discardCard(nextState, userId, boostCard.id);
       }
 
       // Обновляем состояние боя
       const updatedCombatInfo: CombatState = {
         ...combatInfo,
         defenderCardId: playedCard?.id ?? dto.cardId,
-        defenseValue: playedCard?.defenseValue ?? 0,
+        defenseValue: (playedCard?.defenseValue ?? 0) + (boostCard?.boostValue ?? 0),
       };
 
       const newState: GameState = {

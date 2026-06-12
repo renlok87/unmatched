@@ -75,9 +75,9 @@ const HELP_TEXT = `Команды (2 действия за ход; после 2-
   hand [p1|p2]     — рука игрока (карты с индексами c0, c1, ...)
   move <f> <x> <y>           — переместить бойца (f0/f1... или id, тратит 1 действие)
   maneuver <f> [<c>|-] <x>,<y> [...]     — манёвр: добор + движение; карта = BOOST к ходам (опц.)
-  attack <f-атакующий> <f-цель> <c>      — атака картой (тратит 1 действие, можно первым)
+  attack <f1> <f2> <c> [<boost>]         — атака картой (+BOOST-карта, тратит 1 действие)
   scheme <c>       — разыграть scheme-карту (тратит 1 действие)
-  defense <c>      — карта защиты (за защищающегося)
+  defense <c> [<boost>] — карта защиты (+BOOST-карта, за защищающегося)
   resolve          — разрешить бой
   end              — закончить ход досрочно
   pass             — пас (тратит 1 действие)
@@ -584,24 +584,32 @@ export const GameTester: React.FC = () => {
           break;
         }
         case 'attack': {
-          const [, aRef, tRef, cRef] = parts;
-          if (!aRef || !tRef || !cRef) throw new Error('attack <f-атакующий> <f-цель> <c>');
+          const [, aRef, tRef, cRef, bRef] = parts;
+          if (!aRef || !tRef || !cRef) throw new Error('attack <f-атакующий> <f-цель> <c> [<boostCard>]');
           const slot = resolveActor('attack');
           const attacker = resolveFighter(aRef);
           const target = resolveFighter(tRef);
           const card = resolveCard(slot, cRef);
-          await runAction(slot, `attack(${attacker.name} → ${target.name}, ${card.name})`, ATTACK, {
-            input: { gameId: gameIdRef.current!, attackerId: attacker.id, targetId: target.id, cardId: card.id },
+          const boost = bRef ? resolveCard(slot, bRef) : null;
+          const label = boost
+            ? `attack(${attacker.name} → ${target.name}, ${card.name} + BOOST ${boost.name})`
+            : `attack(${attacker.name} → ${target.name}, ${card.name})`;
+          await runAction(slot, label, ATTACK, {
+            input: { gameId: gameIdRef.current!, attackerId: attacker.id, targetId: target.id, cardId: card.id, boostCardId: boost?.id ?? null },
           }, 'attack');
           break;
         }
         case 'defense': {
-          const [, cRef] = parts;
-          if (!cRef) throw new Error('defense <c>');
+          const [, cRef, bRef] = parts;
+          if (!cRef) throw new Error('defense <c> [<boostCard>]');
           const slot = resolveActor('defense');
           const card = resolveCard(slot, cRef);
-          await runAction(slot, `playDefense(${card.name})`, PLAY_DEFENSE, {
-            input: { gameId: gameIdRef.current!, cardId: card.id },
+          const boost = bRef ? resolveCard(slot, bRef) : null;
+          const label = boost
+            ? `playDefense(${card.name} + BOOST ${boost.name})`
+            : `playDefense(${card.name})`;
+          await runAction(slot, label, PLAY_DEFENSE, {
+            input: { gameId: gameIdRef.current!, cardId: card.id, boostCardId: boost?.id ?? null },
           }, 'playDefense');
           break;
         }

@@ -158,6 +158,13 @@ export class AttackDto {
   @IsNotEmpty()
   @IsString()
   targetId: string;
+
+  /** BOOST атаки: сброс карты из руки → +boostValue к значению атаки.
+   *  Валидно, если играемая карта имеет BOOST-эффект или ability героя разрешает. */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  boostCardId?: string;
 }
 
 /**
@@ -174,6 +181,12 @@ export class PlayDefenseDto {
   @IsNotEmpty()
   @IsString()
   cardId: string;
+
+  /** BOOST защиты: сброс карты из руки → +boostValue к значению защиты */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  boostCardId?: string;
 }
 
 /**

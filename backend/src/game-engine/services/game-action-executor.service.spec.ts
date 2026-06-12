@@ -14,6 +14,7 @@ import { AdjacencyService } from '../engine/adjacency.service';
 import { MetricsService } from '../../metrics/metrics.service';
 import { DeckManagementService } from './deck-management.service';
 import { CardEffectExecutorService } from '../effects/card-effect-executor.service';
+import { HeroAbilityRegistry } from '../abilities/hero-ability-registry';
 import { GamePhase } from '../../games/dto';
 import type { GameState } from '../../games/game-state.service';
 import {
@@ -235,6 +236,10 @@ describe('GameActionExecutorService', () => {
               Promise.resolve({ state, appliedEffects: [], manualEffects: [] }),
             ),
           },
+        },
+        {
+          provide: HeroAbilityRegistry,
+          useValue: { getAny: jest.fn().mockReturnValue(undefined) },
         },
       ],
     }).compile();
