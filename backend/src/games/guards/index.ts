@@ -6,6 +6,7 @@ export * from './game-turn.guard';
 export {
   AttackPhaseGuard,
   ManeuverPhaseGuard,
+  ActionPhaseGuard,
   CombatPhaseGuard,
   DefensePlayGuard,
   CombatResolveGuard,

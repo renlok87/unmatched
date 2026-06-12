@@ -6,6 +6,8 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import type { GameState, Fighter, Position } from '../models';
+import { getFighterMovement, positionEqual } from '../models';
+import { AdjacencyService } from '../engine/adjacency.service';
 
 export interface ValidationResult {
   readonly valid: boolean;
@@ -29,6 +31,8 @@ export interface AttackAction {
 @Injectable()
 export class GameRulesValidator {
   private readonly logger = new Logger(GameRulesValidator.name);
+
+  constructor(private readonly adjacency: AdjacencyService) {}
 
   /**
    * Проверить валидность хода
@@ -156,11 +160,13 @@ export class GameRulesValidator {
       return { valid: false, error: 'Not your attacker', code: 'NOT_YOUR_FIGHTER' };
     }
 
-    // Проверяем фазу игры
-    if (state.phase !== 'ACTION_ATTACK') {
+    // Проверяем фазу игры: атака разрешена из любой action-фазы
+    // (экономика «2 действия за ход» — атака может быть первым действием;
+    // ACTION_ATTACK — валидная legacy-фаза старых сейвов)
+    if (state.phase !== 'ACTION_MANEUVER' && state.phase !== 'ACTION_ATTACK') {
       return {
         valid: false,
-        error: 'Can only attack during attack phase',
+        error: 'Can only attack during action phase',
         code: 'INVALID_PHASE',
       };
     }
@@ -272,11 +278,12 @@ export class GameRulesValidator {
       return { valid: false, error: 'Fighter is defeated', code: 'FIGHTER_DEFEATED' };
     }
 
-    // Проверяем фазу
-    if (state.phase !== 'ACTION_MANEUVER') {
+    // Проверяем фазу: манёвр разрешён из любой action-фазы (экономика
+    // «2 действия за ход»; ACTION_ATTACK — валидная legacy-фаза старых сейвов)
+    if (state.phase !== 'ACTION_MANEUVER' && state.phase !== 'ACTION_ATTACK') {
       return {
         valid: false,
-        error: 'Can only maneuver during ACTION_MANEUVER phase',
+        error: 'Can only maneuver during action phase',
         code: 'INVALID_PHASE',
       };
     }
@@ -301,6 +308,31 @@ export class GameRulesValidator {
       if (!this.isValidPosition(state, pos)) {
         return { valid: false, error: 'Invalid position in path', code: 'INVALID_POSITION' };
       }
+    }
+
+    // Очки движения: длина пути не больше movement бойца
+    // TODO(boost): при внедрении BOOST-карт в манёвре — allowance = movement + card.boostValue
+    const allowance = getFighterMovement(fighter);
+    if (path.length > allowance) {
+      return {
+        valid: false,
+        error: `Путь длиной ${path.length} превышает очки движения бойца (${allowance})`,
+        code: 'NOT_ENOUGH_MOVEMENT',
+      };
+    }
+
+    // Пошаговая смежность: каждый шаг — на соседнюю клетку (manhattan === 1,
+    // та же метрика, что isAdjacent в adjacency.service); заодно исключает дубли позиций
+    let prev = fighter.position;
+    for (const pos of path) {
+      if (Math.abs(pos.x - prev.x) + Math.abs(pos.y - prev.y) !== 1) {
+        return {
+          valid: false,
+          error: `Шаг (${prev.x},${prev.y})→(${pos.x},${pos.y}) не является ходом на соседнюю клетку`,
+          code: 'INVALID_STEP',
+        };
+      }
+      prev = pos;
     }
 
     return { valid: true };
@@ -333,6 +365,33 @@ export class GameRulesValidator {
       return { valid: false, error: 'Invalid target position', code: 'INVALID_POSITION' };
     }
 
+    // Перемещение в свою же клетку — no-op (дистанция 0), очки движения не тратятся
+    if (positionEqual(target, fighter.position)) {
+      return { valid: true };
+    }
+
+    // Проверка очков движения: цель должна быть достижима BFS по проходимым
+    // клеткам (4-связно, как isAdjacent), занятые живыми бойцами клетки блокируют путь
+    const allowance = getFighterMovement(fighter);
+    const blockedPositions = new Set(
+      state.fighters
+        .filter((f) => f.id !== fighterId && f.health > 0)
+        .map((f) => `${f.position.x}:${f.position.y}`),
+    );
+    const reachable = this.adjacency.getReachableCells(
+      state.boardState,
+      fighter.position,
+      allowance,
+      { blockedPositions },
+    );
+    if (!reachable.has(`${target.x}:${target.y}`)) {
+      return {
+        valid: false,
+        error: `Недостаточно очков движения: до клетки (${target.x}, ${target.y}) не добраться за ${allowance} шаг(ов) по проходимым клеткам`,
+        code: 'NOT_ENOUGH_MOVEMENT',
+      };
+    }
+
     return { valid: true };
   }
 
@@ -350,10 +409,16 @@ export class GameRulesValidator {
       return { valid: false, error: 'Card not in hand', code: 'CARD_NOT_IN_HAND' };
     }
 
-    if (card.cardType !== 'DEFENSE' && card.cardType !== 'UNIVERSAL') {
+    // VERSATILE — реальный тип из БД, играется и как атака, и как защита
+    // (UNIVERSAL — легаси-синоним, в текущих данных не встречается)
+    if (
+      card.cardType !== 'DEFENSE' &&
+      card.cardType !== 'UNIVERSAL' &&
+      card.cardType !== 'VERSATILE'
+    ) {
       return {
         valid: false,
-        error: 'Card must be DEFENSE or UNIVERSAL',
+        error: 'Card must be DEFENSE, VERSATILE or UNIVERSAL',
         code: 'INVALID_CARD_TYPE',
       };
     }

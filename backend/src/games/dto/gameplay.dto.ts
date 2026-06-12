@@ -14,7 +14,6 @@ import {
   Min,
   Max,
   IsOptional,
-  IsUUID,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { GamePhase } from './create-game.dto';
@@ -35,6 +34,17 @@ export enum GameEventType {
   MANEUVER = 'MANEUVER',
   TURN_ENDED = 'TURN_ENDED',
   CARD_PLAYED = 'CARD_PLAYED',
+  // Покрытие Prisma-enum GameActionType для eventsSince (журнал GameAction)
+  GAME_CREATED = 'GAME_CREATED',
+  GAME_JOINED = 'GAME_JOINED',
+  GAME_STARTED = 'GAME_STARTED',
+  GAME_ABORTED = 'GAME_ABORTED',
+  TURN_STARTED = 'TURN_STARTED',
+  PASSED = 'PASSED',
+  CARD_DISCARDED = 'CARD_DISCARDED',
+  PLACED = 'PLACED',
+  EFFECT_APPLIED = 'EFFECT_APPLIED',
+  SPECIAL_ABILITY = 'SPECIAL_ABILITY',
 }
 
 registerEnumType(GameEventType, {
@@ -71,7 +81,6 @@ export class PositionInput {
 export class ManeuverDto {
   @Field(() => String)
   @IsNotEmpty()
-  @IsUUID()
   gameId: string;
 
   @Field(() => String)
@@ -98,7 +107,6 @@ export class ManeuverDto {
 export class MoveFighterDto {
   @Field(() => String)
   @IsNotEmpty()
-  @IsUUID()
   gameId: string;
 
   @Field(() => String)
@@ -126,7 +134,6 @@ export class MoveFighterDto {
 export class AttackDto {
   @Field(() => String)
   @IsNotEmpty()
-  @IsUUID()
   gameId: string;
 
   @Field(() => String)
@@ -153,7 +160,23 @@ export class AttackDto {
 export class PlayDefenseDto {
   @Field(() => String)
   @IsNotEmpty()
-  @IsUUID()
+  gameId: string;
+
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
+  cardId: string;
+}
+
+/**
+ * DTO для розыгрыша scheme-карты из руки (тратит 1 действие)
+ * userId извлекается из JWT (GqlAuthGuard)
+ */
+@InputType()
+export class PlaySchemeDto {
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
   gameId: string;
 
   @Field(() => String)
@@ -169,7 +192,6 @@ export class PlayDefenseDto {
 export class ResolveCombatDto {
   @Field(() => String)
   @IsNotEmpty()
-  @IsUUID()
   gameId: string;
 }
 
@@ -180,7 +202,6 @@ export class ResolveCombatDto {
 export class EndTurnDto {
   @Field(() => String)
   @IsNotEmpty()
-  @IsUUID()
   gameId: string;
 }
 
@@ -191,7 +212,6 @@ export class EndTurnDto {
 export class PassDto {
   @Field(() => String)
   @IsNotEmpty()
-  @IsUUID()
   gameId: string;
 }
 
@@ -202,7 +222,6 @@ export class PassDto {
 export class ToggleDoorDto {
   @Field(() => String)
   @IsNotEmpty()
-  @IsUUID()
   gameId: string;
 
   @Field(() => Int)

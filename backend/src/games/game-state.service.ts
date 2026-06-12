@@ -4,6 +4,21 @@ import { RedisService } from '../redis/redis.service';
 import { GameSubscriptionService } from './game-subscription.service';
 import { GamePhase } from './dto';
 import { ConcurrentModificationException } from './exceptions/game.exceptions';
+// Единое семейство моделей состояния — engine-модели (P3: убрано дублирование
+// games/engine; раньше здесь жили параллельные интерфейсы, стыкуемые "as any")
+import type {
+  GameState,
+  GameStatePlayer,
+  GameStateMetadata,
+  Fighter,
+  FighterEffect,
+  Card,
+  DeckState,
+  HandZone,
+  HandCard,
+  BoardState,
+} from '../game-engine/models';
+import { FighterType, CardType, createEmptyBoardState } from '../game-engine/models';
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -11,111 +26,20 @@ import { ConcurrentModificationException } from './exceptions/game.exceptions';
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
-/**
- * Интерфейс игрового состояния
- * Это основная структура состояния игры
- */
-export interface GameState {
-  // Основная информация
-  gameId: string;
-  sequenceNumber: number;
-  phase: GamePhase;
-  turnCount: number;
-  currentTurnPlayerId: string;
-
-  // Игроки
-  players: GameStatePlayer[];
-
-  // Бойцы на доске
-  fighters: Fighter[];
-
-  // Колоды и сброс
-  decks: Record<string, DeckState>;
-  discardPiles: Record<string, Card[]>;
-
-  // Зоны ручек
-  handZones: Record<string, HandZone>;
-
-  // Двери и туман войны
-  boardState: BoardState;
-
-  // Метаданные
-  metadata: GameStateMetadata;
-}
-
-export interface GameStatePlayer {
-  userId: string;
-  heroId: string;
-  health: number;
-  maxHealth: number;
-  fighterIds: string[];
-  isAlive: boolean;
-}
-
-export interface Fighter {
-  id: string;
-  ownerId: string;
-  heroId: string;
-  name: string;
-  type: 'HERO' | 'MINION' | 'HUGE';
-  health: number;
-  maxHealth: number;
-  position: { x: number; y: number };
-  effects: FighterEffect[];
-  hasSidekick: boolean;
-  sidekickIds?: string[];
-}
-
-export interface FighterEffect {
-  type: string;
-  value?: number;
-  duration?: 'permanent' | 'turn' | 'round';
-  expiresAt?: number;
-  source?: string;
-}
-
-export interface DeckState {
-  cards: Card[];
-  drawPile: Card[];
-  // Карта сверху колоды (видна только владельцу)
-  topCard?: Card;
-}
-
-export interface Card {
-  id: string;
-  cardId: string;
-  name: string;
-  nameEn: string;
-  nameRu: string;
-  cardType: 'ATTACK' | 'DEFENSE' | 'SCHEME' | 'UNIVERSAL';
-  attackValue?: number;
-  defenseValue?: number;
-  boostValue?: number;
-  effects?: any[];
-}
-
-export interface HandZone {
-  cards: HandCard[];
-  maxSize: number;
-}
-
-export interface HandCard extends Card {
-  isVisible: boolean; // Видно ли другим игрокам
-}
-
-export interface BoardState {
-  doors: Record<string, boolean>; // ID двери -> открыта/закрыта
-  fog: Record<string, boolean>; // ID клетки -> туман/нет
-  tokens: Record<string, any>; // ID клетки -> жетоны
-}
-
-export interface GameStateMetadata {
-  lastActionAt: Date;
-  lastActionBy: string;
-  version: number;
-  // Опционально: compressed для оптимизации
-  compressed?: boolean;
-}
+// Re-export для существующих импортёров (resolvers, guards, services и др.)
+export type {
+  GameState,
+  GameStatePlayer,
+  GameStateMetadata,
+  Fighter,
+  FighterEffect,
+  Card,
+  DeckState,
+  HandZone,
+  HandCard,
+  BoardState,
+};
+export { FighterType, CardType };
 
 /**
  * Сериализованное состояние для передачи клиенту
@@ -130,12 +54,14 @@ export interface SerializedGameState {
   pl: SerializedPlayer[]; // players
   f: SerializedFighter[]; // fighters
   d: Record<string, SerializedDeck>; // decks
+  dp?: Readonly<Record<string, readonly Card[]>>; // discard piles
   h: Record<string, SerializedHand>; // hands
   b: SerializedBoard; // board
   m: {
     la: string; // lastActionAt
     lb: string; // lastActionBy
     v: number; // version
+    ar?: number; // actionsRemaining — оставшиеся действия в ходу (легаси-сейвы без поля → дефолт в getActionsRemaining)
   };
 }
 
@@ -144,7 +70,7 @@ export interface SerializedPlayer {
   hid: string;
   hp: number;
   mhp: number;
-  fid: string[];
+  fid: readonly string[];
   alv: boolean;
 }
 
@@ -153,18 +79,24 @@ export interface SerializedFighter {
   oid: string;
   hid: string;
   n: string;
-  ty: 'HERO' | 'MINION' | 'HUGE';
+  ty: FighterType; // Wire-формат прежний: те же строки HERO/MINION/HUGE
   hp: number;
   mhp: number;
   pos: { x: number; y: number };
-  e: any[];
+  e: readonly any[];
   hs: boolean;
-  si?: string[];
+  si?: readonly string[];
+  df?: boolean; // isDefeated — раньше терялся при save/load
+  mv?: number; // movement — очки движения (легаси-сейвы без поля → дефолт в getFighterMovement)
+  at?: string; // attackType — 'melee'|'ranged' (легаси-сейвы без поля → дефолт в getFighterAttackType)
 }
 
 export interface SerializedDeck {
   c: number; // Количество карт в колоде
   tc?: Card; // Верхняя карта (только для владельца)
+  // Полное содержимое — без него состояние терялось при load (колода обнулялась)
+  cards?: readonly Card[];
+  pile?: readonly Card[];
 }
 
 export interface SerializedHand {
@@ -180,6 +112,10 @@ export interface SerializedBoard {
   dr: Record<string, boolean>; // doors
   fg: Record<string, boolean>; // fog
   tk: Record<string, any>; // tokens
+  // Сетка клеток для game-engine (movement/adjacency читают cells[y][x])
+  cells?: readonly (readonly any[])[];
+  w?: number;
+  h?: number;
 }
 
 /**
@@ -337,17 +273,23 @@ export class GameStateService {
         e: f.effects,
         hs: f.hasSidekick,
         si: f.sidekickIds,
+        df: f.isDefeated,
+        mv: f.movement,
+        at: f.attackType,
       })),
       d: Object.entries(state.decks).reduce(
         (acc, [userId, deck]) => {
           acc[userId] = {
             c: deck.drawPile.length,
             tc: deck.topCard,
+            cards: deck.cards,
+            pile: deck.drawPile,
           };
           return acc;
         },
         {} as Record<string, SerializedDeck>,
       ),
+      dp: state.discardPiles,
       h: Object.entries(state.handZones).reduce(
         (acc, [userId, hand]) => {
           acc[userId] = {
@@ -365,11 +307,15 @@ export class GameStateService {
         dr: state.boardState.doors,
         fg: state.boardState.fog,
         tk: state.boardState.tokens,
+        cells: state.boardState.cells,
+        w: state.boardState.width,
+        h: state.boardState.height,
       },
       m: {
         la: state.metadata.lastActionAt.toISOString(),
         lb: state.metadata.lastActionBy,
         v: state.metadata.version,
+        ar: state.metadata.actionsRemaining,
       },
     };
   }
@@ -382,6 +328,11 @@ export class GameStateService {
     if (!data.v || !data.g) {
       return data as GameState;
     }
+
+    // Легаси-состояния могли быть сохранены без cells/w/h, а engine-BoardState
+    // требует их обязательно — fallback на пустую сетку 20×20
+    const hasCells = Array.isArray(data.b?.cells) && data.b.cells.length > 0;
+    const fallbackBoard = hasCells ? null : createEmptyBoardState(20, 20);
 
     return {
       gameId: data.g,
@@ -409,19 +360,24 @@ export class GameStateService {
         effects: f.e,
         hasSidekick: f.hs,
         sidekickIds: f.si,
+        isDefeated: f.df,
+        // БЕЗ дефолта: undefined прозрачно проходит, дефолтит getFighterMovement
+        movement: f.mv,
+        // БЕЗ дефолта: undefined прозрачно проходит, дефолтит getFighterAttackType
+        attackType: f.at as Fighter['attackType'],
       })),
       decks: Object.entries(data.d).reduce(
         (acc, [userId, deck]: [string, any]) => {
           acc[userId] = {
-            cards: [],
-            drawPile: [],
+            cards: deck.cards ?? [],
+            drawPile: deck.pile ?? [],
             topCard: deck.tc,
           };
           return acc;
         },
         {} as Record<string, DeckState>,
       ),
-      discardPiles: {},
+      discardPiles: data.dp ?? {},
       handZones: Object.entries(data.h).reduce(
         (acc, [userId, hand]: [string, any]) => {
           acc[userId] = {
@@ -439,11 +395,16 @@ export class GameStateService {
         doors: data.b.dr,
         fog: data.b.fg,
         tokens: data.b.tk,
+        cells: hasCells ? data.b.cells : fallbackBoard!.cells,
+        width: data.b.w ?? 20,
+        height: data.b.h ?? 20,
       },
       metadata: {
         lastActionAt: new Date(data.m.la),
         lastActionBy: data.m.lb,
         version: data.m.v,
+        // БЕЗ дефолта: undefined прозрачно проходит, дефолтит getActionsRemaining
+        actionsRemaining: data.m.ar,
       },
     };
   }
@@ -455,36 +416,48 @@ export class GameStateService {
    * - Скрывает содержимое сброса соперника
    */
   filterPrivateData(state: GameState, playerId: string): GameState {
-    const filtered = JSON.parse(JSON.stringify(state)) as GameState;
+    // Иммутабельно: собираем новые handZones/decks спредами (engine-GameState readonly)
 
     // Фильтруем руки других игроков
-    Object.entries(filtered.handZones).forEach(([userId, hand]) => {
-      if (userId !== playerId) {
-        hand.cards = hand.cards.map((card) => ({
-          ...card,
-          id: card.id,
-          cardType: card.cardType,
-          // Скрываем детали карты
-          name: '???',
-          nameEn: 'Hidden',
-          nameRu: 'Скрыто',
-          attackValue: undefined,
-          defenseValue: undefined,
-          boostValue: undefined,
-          effects: undefined,
-          isVisible: false,
-        }));
-      }
-    });
+    const handZones = Object.fromEntries(
+      Object.entries(state.handZones).map(([userId, hand]) => {
+        if (userId === playerId) {
+          return [userId, hand] as const;
+        }
+        return [
+          userId,
+          {
+            ...hand,
+            cards: hand.cards.map((card) => ({
+              ...card,
+              id: card.id,
+              cardType: card.cardType,
+              // Скрываем детали карты
+              name: '???',
+              nameEn: 'Hidden',
+              nameRu: 'Скрыто',
+              attackValue: undefined,
+              defenseValue: undefined,
+              boostValue: undefined,
+              effects: undefined,
+              text: undefined,
+              isVisible: false,
+            })),
+          },
+        ] as const;
+      }),
+    );
 
     // Фильтруем колоды других игроков
-    Object.entries(filtered.decks).forEach(([userId, deck]) => {
-      if (userId !== playerId) {
-        deck.topCard = undefined;
-      }
-    });
+    const decks = Object.fromEntries(
+      Object.entries(state.decks).map(([userId, deck]) =>
+        userId === playerId
+          ? ([userId, deck] as const)
+          : ([userId, { ...deck, topCard: undefined }] as const),
+      ),
+    );
 
-    return filtered;
+    return { ...state, handZones, decks };
   }
 
   /**
@@ -528,11 +501,8 @@ export class GameStateService {
         }),
         {},
       ),
-      boardState: {
-        doors: {},
-        fog: {},
-        tokens: {},
-      },
+      // Engine-BoardState требует cells/width/height — пустая сетка 20×20
+      boardState: createEmptyBoardState(20, 20),
       metadata: {
         lastActionAt: new Date(),
         lastActionBy: players[0]?.userId || '',
@@ -562,9 +532,16 @@ export class GameStateService {
           throw new ConcurrentModificationException(expectedSequence, currentState.sequenceNumber);
         }
 
-        const newState = updateFn(currentState);
-        newState.sequenceNumber = expectedSequence + 1;
-        newState.metadata.lastActionAt = new Date();
+        // Иммутабельно (engine-GameState readonly): один спред вместо присваиваний
+        const updated = updateFn(currentState);
+        const newState: GameState = {
+          ...updated,
+          sequenceNumber: expectedSequence + 1,
+          metadata: {
+            ...updated.metadata,
+            lastActionAt: new Date(),
+          },
+        };
 
         await this.saveState(gameId, newState);
 
@@ -673,7 +650,8 @@ export class GameStateService {
       type: action.type,
       gameId: action.gameId,
       playerId: action.playerId,
-      payload: action.payload,
+      // GameEvent.payload — String в GraphQL-схеме, Prisma отдаёт Json-объект
+      payload: action.payload != null ? JSON.stringify(action.payload) : null,
       timestamp: action.timestamp,
     }));
   }

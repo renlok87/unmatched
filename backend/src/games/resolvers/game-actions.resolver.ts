@@ -23,12 +23,15 @@ import { GameStateService, GameState } from '../game-state.service';
 import { GameSubscriptionService } from '../game-subscription.service';
 import { DistributedLockService } from '../../common/services/distributed-lock.service';
 import { CombatTimeoutService } from '../services/combat-timeout.service';
+import { GameActionService } from '../services/game-action.service';
+import { GameActionType } from '../models/game-action.model';
 import { GamePhase } from '../dto';
 import {
   ManeuverDto,
   MoveFighterDto,
   AttackDto,
   PlayDefenseDto,
+  PlaySchemeDto,
   ResolveCombatDto,
   EndTurnDto,
   PassDto,
@@ -39,8 +42,7 @@ import { BadRequestException, ConflictException } from '@nestjs/common';
 import {
   GameInProgressGuard,
   GamePlayerGuard,
-  ManeuverPhaseGuard,
-  AttackPhaseGuard,
+  ActionPhaseGuard,
   CombatPhaseGuard,
   DefensePlayGuard,
   CombatResolveGuard,
@@ -85,7 +87,38 @@ export class GameActionsResolver {
     private readonly distributedLockService: DistributedLockService,
     private readonly combatTimeoutService: CombatTimeoutService,
     private readonly actionExecutor: GameActionExecutorService,
+    private readonly gameActionService: GameActionService,
   ) {}
+
+  /**
+   * Записать игровое действие в журнал GameAction (через BullMQ-очередь).
+   * Запись best-effort: ошибка журнала НЕ должна ронять мутацию.
+   */
+  private async recordGameAction(
+    gameId: string,
+    userId: string,
+    eventType: string,
+    sequenceNumber: number,
+    actionName: string,
+    input: unknown,
+  ): Promise<void> {
+    const type = GameActionType[eventType as keyof typeof GameActionType];
+    if (!type) {
+      this.logger.warn(`No GameActionType for event ${eventType}, skip log`);
+      return;
+    }
+    try {
+      await this.gameActionService.recordAction({
+        gameId,
+        sequenceNumber,
+        type,
+        playerId: userId,
+        metadata: { action: actionName, input: JSON.parse(JSON.stringify(input ?? {})) },
+      });
+    } catch (e) {
+      this.logger.warn(`Failed to record game action ${eventType} for ${gameId}: ${e}`);
+    }
+  }
 
   /**
    * Обработка ошибок выполнения действия с логированием
@@ -151,6 +184,36 @@ export class GameActionsResolver {
             result.gameState!,
           );
 
+          // Записываем действие в журнал GameAction (для eventsSince/catch-up)
+          await this.recordGameAction(
+            dto.gameId,
+            userId,
+            eventType,
+            result.gameState!.sequenceNumber,
+            actionName,
+            dto,
+          );
+          if (result.gameState!.phase === GamePhase.GAME_OVER) {
+            // Публикуем GAME_ENDED для подписки gameEnded (никто иначе не публикует)
+            await this.gameSubscriptionService.publishGameUpdate(
+              dto.gameId,
+              'GAME_ENDED',
+              result.gameState!,
+            );
+            await this.recordGameAction(
+              dto.gameId,
+              userId,
+              'GAME_ENDED',
+              result.gameState!.sequenceNumber,
+              actionName,
+              {
+                winnerId:
+                  (result.gameState! as any).winnerId ??
+                  (result.gameState! as any).metadata?.winnerId,
+              },
+            );
+          }
+
           // Фильтруем приватные данные
           const filteredState = this.gameStateService.filterPrivateData(result.gameState!, userId);
 
@@ -175,10 +238,10 @@ export class GameActionsResolver {
 
   /**
    * Выполнить манёвр - переместить бойца по пути и сыграть карту эффектов
-   * Доступно в фазе ACTION_MANEUVER только текущему игроку
+   * Доступно в любой action-фазе текущему игроку (экономика «2 действия за ход»)
    */
-  @Mutation(() => GameMutationResult, { name: 'maneuver', description: 'Переместить бойца и сыграть карту эффектов' })
-  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ManeuverPhaseGuard)
+  @Mutation(() => GameMutationResult, { name: 'maneuver', description: 'Переместить бойца и сыграть карту эффектов (тратит 1 действие)' })
+  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ActionPhaseGuard)
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async maneuver(
     @Args('input') dto: ManeuverDto,
@@ -201,10 +264,10 @@ export class GameActionsResolver {
 
   /**
    * Переместить бойца на указанную клетку без игры карты
-   * Доступно в фазе ACTION_MANEUVER только текущему игроку
+   * Доступно в любой action-фазе текущему игроку (экономика «2 действия за ход»)
    */
-  @Mutation(() => GameMutationResult, { name: 'moveFighter', description: 'Переместить бойца на указанную клетку' })
-  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ManeuverPhaseGuard)
+  @Mutation(() => GameMutationResult, { name: 'moveFighter', description: 'Переместить бойца на указанную клетку (тратит 1 действие)' })
+  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ActionPhaseGuard)
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async moveFighter(
     @Args('input') dto: MoveFighterDto,
@@ -226,11 +289,12 @@ export class GameActionsResolver {
 
   /**
    * Объявить атаку на соседнего бойца с указанной картой
-   * Доступно в фазе ACTION_ATTACK только текущему игроку
+   * Доступно в любой action-фазе текущему игроку — атака может быть и первым
+   * действием, и дважды за ход (экономика «2 действия за ход»)
    * После атаки запускается 30-секундный таймер auto-resolve
    */
-  @Mutation(() => GameMutationResult, { name: 'attack', description: 'Объявить атаку на соседнего бойца' })
-  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, AttackPhaseGuard)
+  @Mutation(() => GameMutationResult, { name: 'attack', description: 'Объявить атаку на соседнего бойца (тратит 1 действие)' })
+  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ActionPhaseGuard)
   @Throttle({ default: { limit: 20, ttl: 60000 } })
   async attack(
     @Args('input') dto: AttackDto,
@@ -274,6 +338,32 @@ export class GameActionsResolver {
   }
 
   // ============================================
+  // PLAY SCHEME - Розыгрыш scheme-карты
+  // ============================================
+
+  /**
+   * Разыграть scheme-карту из руки текущего игрока
+   * Доступно в любой action-фазе текущему игроку (экономика «2 действия за ход»)
+   * Авто-эффекты применяются best-effort, карта всегда уходит в сброс
+   */
+  @Mutation(() => GameMutationResult, { name: 'playScheme', description: 'Разыграть scheme-карту из руки (тратит 1 действие)' })
+  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ActionPhaseGuard)
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
+  async playScheme(
+    @Args('input') dto: PlaySchemeDto,
+    @Context() context: any,
+  ): Promise<GameMutationResult> {
+    const userId = getUserId(context);
+    return this.executeMutation(
+      dto,
+      userId,
+      'playScheme',
+      (ctx) => this.actionExecutor.executePlayScheme(dto, ctx),
+      'CARD_PLAYED',
+    );
+  }
+
+  // ============================================
   // RESOLVE COMBAT - Разрешение боя
   // ============================================
 
@@ -305,10 +395,11 @@ export class GameActionsResolver {
 
   /**
    * Завершить текущий ход и передать управление следующему игроку
-   * Доступно в фазе ACTION_MANEUVER только текущему игроку
+   * Доступно в фазах ACTION_MANEUVER и ACTION_ATTACK только текущему игроку
+   * (можно завершить ход после манёвра, не объявляя атаку)
    */
   @Mutation(() => GameMutationResult, { name: 'endTurn', description: 'Завершить текущий ход' })
-  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ManeuverPhaseGuard)
+  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ActionPhaseGuard)
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async endTurn(
     @Args('input') dto: EndTurnDto,
@@ -330,10 +421,10 @@ export class GameActionsResolver {
 
   /**
    * Сбросить верхнюю карту колоды и выполнить дополнительное действие
-   * Доступно в фазе ACTION_MANEUVER только текущему игроку
+   * Доступно в фазах ACTION_MANEUVER и ACTION_ATTACK только текущему игроку
    */
   @Mutation(() => GameMutationResult, { name: 'pass', description: 'Сбросить карту и получить дополнительное действие' })
-  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ManeuverPhaseGuard)
+  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ActionPhaseGuard)
   @Throttle({ default: { limit: 20, ttl: 60000 } })
   async pass(@Args('input') dto: PassDto, @Context() context: any): Promise<GameMutationResult> {
     const userId = getUserId(context);
@@ -352,11 +443,11 @@ export class GameActionsResolver {
 
   /**
    * Открыть или закрыть дверь на указанной клетке
-   * Доступно в фазе ACTION_MANEUVER только текущему игроку
+   * Доступно в фазах ACTION_MANEUVER и ACTION_ATTACK только текущему игроку
    * Специальная способность героя (например, Bjorn)
    */
   @Mutation(() => GameMutationResult, { name: 'toggleDoor', description: 'Открыть или закрыть дверь' })
-  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ManeuverPhaseGuard)
+  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ActionPhaseGuard)
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async toggleDoor(
     @Args('input') dto: ToggleDoorDto,

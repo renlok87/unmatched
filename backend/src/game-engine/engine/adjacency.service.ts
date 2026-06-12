@@ -90,7 +90,11 @@ export class AdjacencyService {
     boardState: BoardState,
     start: Position,
     maxCost: number,
-    options: { includeDiagonal?: boolean } = {},
+    options: {
+      includeDiagonal?: boolean;
+      // Дополнительно заблокированные позиции (ключ `x:y`) — напр. занятые бойцами клетки
+      blockedPositions?: ReadonlySet<string>;
+    } = {},
   ): Map<string, { position: Position; cost: number }> {
     const reachable = new Map<string, { position: Position; cost: number }>();
     const visited = new Set<string>();
@@ -115,7 +119,7 @@ export class AdjacencyService {
       const adjacent = this.getAdjacentCells(boardState, current.position, options);
 
       for (const cell of adjacent) {
-        if (cell.isBlocked) {
+        if (cell.isBlocked || options.blockedPositions?.has(this.posKey(cell.position))) {
           continue;
         }
 
@@ -196,5 +200,19 @@ export class AdjacencyService {
   async isAdjacent(state: any, a: Position, b: Position): Promise<boolean> {
     const distance = this.manhattanDistance(a, b);
     return distance === 1;
+  }
+
+  /**
+   * Проверить, находятся ли две позиции в одной зоне доски.
+   * Используется для ranged-атак: цель в той же зоне ИЛИ смежная.
+   *
+   * КРИТИЧНО: на fallback-доске 20×20 (и легаси-сейвах без cells)
+   * все Cell.zone === undefined → возвращается false, ranged работает
+   * только по adjacency — регрессии относительно melee нет.
+   */
+  isInSameZone(state: { boardState: BoardState }, a: Position, b: Position): boolean {
+    const za = state.boardState.cells[a.y]?.[a.x]?.zone;
+    const zb = state.boardState.cells[b.y]?.[b.x]?.zone;
+    return za != null && za === zb;
   }
 }

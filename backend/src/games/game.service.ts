@@ -1,11 +1,15 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
+import { GameInitializationService } from './services/game-initialization.service';
+import { GameActionService } from './services/game-action.service';
+import { GameActionType } from './models/game-action.model';
 import { GameStatus, GameMode } from './dto';
 import { GameResponse } from './models';
 import { GameAccessDeniedException, MaxActiveGamesException } from './exceptions/game.exceptions';
@@ -19,6 +23,7 @@ import * as crypto from 'node:crypto';
 
 @Injectable()
 export class GameService {
+  private readonly logger = new Logger(GameService.name);
   private readonly CACHE_TTL = 300; // 5 минут
   private readonly GAME_CACHE_PREFIX = 'game:';
   private readonly GAMES_LIST_CACHE_PREFIX = 'games:list:';
@@ -27,7 +32,33 @@ export class GameService {
   constructor(
     private prisma: PrismaService,
     private redis: RedisService,
+    private gameInitialization: GameInitializationService,
+    private gameActionService: GameActionService,
   ) {}
+
+  /**
+   * Записать лобби-событие в журнал GameAction (best-effort, не роняет операцию)
+   */
+  private async recordLobbyAction(
+    gameId: string,
+    playerId: string,
+    type: GameActionType,
+    sequenceNumber: number,
+    metadata: Record<string, unknown> = {},
+  ): Promise<void> {
+    try {
+      await this.gameActionService.recordAction({
+        gameId,
+        sequenceNumber,
+        type,
+        playerId,
+        metadata,
+      });
+    } catch (e) {
+      // Журнал не должен влиять на основную операцию (например, Redis недоступен)
+      this.logger.warn(`Failed to record lobby action ${type} for game ${gameId}: ${e}`);
+    }
+  }
 
   /**
    * Создать новую игру
@@ -96,6 +127,12 @@ export class GameService {
 
     // Инвалидируем кеш списка игр
     await this.invalidateGamesListCache(userId);
+
+    // Журналируем создание игры (state ещё нет — seq 0)
+    await this.recordLobbyAction(game.id, userId, GameActionType.GAME_CREATED, 0, {
+      mode: dto.mode || GameMode.ONE_V_ONE,
+      boardId,
+    });
 
     return await this.getGame(game.id);
   }
@@ -452,10 +489,13 @@ export class GameService {
       });
     });
 
-    // Инвалидируем кеш
+    // Инвалидируем кеш (и списка хоста тоже — иначе он до 60с не видит оппонента)
     await this.invalidateGameCache(gameId);
-    await this.invalidateGamesListCache(userId);
+    await this.invalidateGamesListForBoth(game.hostId, userId);
     await this.invalidateAvailableGamesCache();
+
+    // Журналируем присоединение (state ещё нет — seq 0)
+    await this.recordLobbyAction(gameId, userId, GameActionType.GAME_JOINED, 0);
 
     return await this.getGame(gameId);
   }
@@ -554,9 +594,10 @@ export class GameService {
       });
     }
 
-    // Инвалидируем кеш
+    // Инвалидируем кеш (hostId/opponentId взяты из game, загруженного ДО мутации —
+    // игра могла быть удалена или хост сменился)
     await this.invalidateGameCache(gameId);
-    await this.invalidateGamesListCache(userId);
+    await this.invalidateGamesListForBoth(game.hostId, game.opponentId);
     await this.invalidateAvailableGamesCache();
   }
 
@@ -605,10 +646,30 @@ export class GameService {
       },
     });
 
-    // Инвалидируем кеш
+    // Создаём начальное игровое состояние (бойцы, колоды, руки).
+    // При ошибке откатываем статус, чтобы лобби осталось рабочим.
+    try {
+      await this.gameInitialization.initializeGameState(gameId);
+    } catch (error) {
+      await this.prisma.game.update({
+        where: { id: gameId },
+        data: { status: GameStatus.LOBBY, startedAt: null },
+      });
+      await this.invalidateGameCache(gameId);
+      throw error instanceof BadRequestException
+        ? error
+        : new BadRequestException(
+            `Не удалось инициализировать состояние игры: ${(error as Error).message}`,
+          );
+    }
+
+    // Инвалидируем кеш (списки обоих участников — у оппонента игра тоже должна стать IN_PROGRESS)
     await this.invalidateGameCache(gameId);
-    await this.invalidateGamesListCache(userId);
+    await this.invalidateGamesListForBoth(game.hostId, game.opponentId);
     await this.invalidateAvailableGamesCache();
+
+    // Журналируем старт игры (createInitialState ставит sequenceNumber: 1)
+    await this.recordLobbyAction(gameId, userId, GameActionType.GAME_STARTED, 1);
 
     return await this.getGame(gameId);
   }
@@ -638,8 +699,22 @@ export class GameService {
       },
     });
 
-    // Инвалидируем кеш
+    // Инвалидируем кеш (включая списки игр обоих участников — иначе myGames до 60с отдаёт stale статус)
     await this.invalidateGameCache(gameId);
+    await this.invalidateGamesListForBoth(game.hostId, game.opponentId);
+    await this.invalidateAvailableGamesCache();
+
+    // Журналируем прерывание игры с текущим sequence number состояния (если есть)
+    const abortSeq =
+      (
+        await this.prisma.gameState.findUnique({
+          where: { gameId },
+          select: { sequenceNumber: true },
+        })
+      )?.sequenceNumber ?? 0;
+    await this.recordLobbyAction(gameId, userId, GameActionType.GAME_ABORTED, abortSeq, {
+      reason,
+    });
 
     return await this.getGame(gameId);
   }
@@ -730,7 +805,21 @@ export class GameService {
     await this.redis.del(`${this.GAMES_LIST_CACHE_PREFIX}${userId}:LOBBY`);
     await this.redis.del(`${this.GAMES_LIST_CACHE_PREFIX}${userId}:IN_PROGRESS`);
     await this.redis.del(`${this.GAMES_LIST_CACHE_PREFIX}${userId}:FINISHED`);
+    await this.redis.del(`${this.GAMES_LIST_CACHE_PREFIX}${userId}:ABORTED`);
     await this.redis.del(`${this.GAMES_LIST_CACHE_PREFIX}${userId}:all`);
+  }
+
+  /**
+   * Инвалидация кеша списков игр обоих участников (хост + оппонент, если есть)
+   */
+  private async invalidateGamesListForBoth(
+    hostId: string,
+    opponentId: string | null,
+  ): Promise<void> {
+    await this.invalidateGamesListCache(hostId);
+    if (opponentId && opponentId !== hostId) {
+      await this.invalidateGamesListCache(opponentId);
+    }
   }
 
   /**

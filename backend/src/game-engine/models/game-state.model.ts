@@ -20,6 +20,7 @@ export enum GamePhase {
   COMBAT = 'COMBAT', // Бой (ожидание защиты)
   COMBAT_RESOLVE = 'COMBAT_RESOLVE', // Разрешение боя
   TURN_END = 'TURN_END', // Конец хода
+  GAME_OVER = 'GAME_OVER', // Игра окончена, победитель определён
 }
 
 /**
@@ -66,6 +67,21 @@ export interface GameStatePlayer {
 }
 
 /**
+ * Состояние текущего боя (атака объявлена, ждём защиту/разрешение).
+ * Живёт в metadata.combatInfo между executeAttack и executeResolveCombat.
+ */
+export interface CombatState {
+  readonly attackerId: string;
+  readonly defenderId: string;
+  readonly attackerCardId: string;
+  readonly defenderCardId?: string;
+  readonly attackValue: number;
+  readonly defenseValue: number;
+  readonly startedAt: Date;
+  readonly timeoutAt?: Date;
+}
+
+/**
  * Метаданные состояния
  */
 export interface GameStateMetadata {
@@ -73,4 +89,26 @@ export interface GameStateMetadata {
   readonly lastActionBy: string;
   readonly version: number;
   readonly compressed?: boolean; // Опционально: сжатие для оптимизации
+  // Фактический контракт executor'а/guard'ов (раньше писался через "as any"):
+  readonly combatInfo?: CombatState; // Текущий бой (между attack и resolveCombat)
+  readonly passCount?: number; // Счётчик pass-действий
+  readonly winnerId?: string; // Победитель (заполняется при GAME_OVER)
+  /** Оставшиеся действия текущего игрока в этом ходу (легаси-сейвы без поля → дефолт в getActionsRemaining) */
+  readonly actionsRemaining?: number;
+}
+
+/**
+ * Действий за ход по правилам Unmatched: ровно 2
+ * (манёвр / атака / scheme в любой комбинации, атаковать можно дважды).
+ */
+export const ACTIONS_PER_TURN = 2;
+
+/**
+ * Оставшиеся действия текущего игрока. Единственная точка дефолта
+ * (паттерн getFighterMovement): легаси-сейвы/мусор (null, NaN, отрицательное,
+ * строка) → ACTIONS_PER_TURN.
+ */
+export function getActionsRemaining(state: GameState): number {
+  const n = Number(state.metadata.actionsRemaining);
+  return Number.isInteger(n) && n >= 0 ? n : ACTIONS_PER_TURN;
 }

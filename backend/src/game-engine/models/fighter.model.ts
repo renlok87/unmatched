@@ -48,6 +48,46 @@ export interface Fighter {
   readonly hasSidekick: boolean;
   readonly sidekickIds?: readonly string[];
   readonly isDefeated?: boolean;
+  /** Очки движения за одно перемещение (опционально — легаси-сейвы без поля) */
+  readonly movement?: number;
+  /** Тип атаки бойца: melee — только смежные цели, ranged — та же зона или смежная
+   *  (опционально — легаси-сейвы без поля → melee через getFighterAttackType) */
+  readonly attackType?: 'melee' | 'ranged';
+}
+
+/**
+ * Дефолтные очки движения (Hero.movement в Prisma default 2)
+ */
+export const DEFAULT_FIGHTER_MOVEMENT = 2;
+
+/**
+ * Очки движения бойца. Единственная точка дефолта:
+ * легаси-сейвы/мусорные значения (0, null, NaN, строка) → DEFAULT_FIGHTER_MOVEMENT.
+ */
+export function getFighterMovement(f: Fighter): number {
+  const m = Number(f.movement);
+  return Number.isInteger(m) && m >= 1 ? m : DEFAULT_FIGHTER_MOVEMENT;
+}
+
+/**
+ * Канонический тип атаки в движке
+ */
+export type AttackType = 'melee' | 'ranged';
+
+/**
+ * Единый нормализатор типа атаки: данные БД/скрейпа хранят 'range',
+ * движок использует 'ranged'; любой мусор (null, melee_range, число) → 'melee'.
+ */
+export function normalizeAttackType(v: unknown): AttackType {
+  return v === 'ranged' || v === 'range' ? 'ranged' : 'melee';
+}
+
+/**
+ * Тип атаки бойца. Единственная точка дефолта:
+ * легаси-сейвы/отсутствие поля → 'melee' (поведение как до фикса).
+ */
+export function getFighterAttackType(f: Fighter): AttackType {
+  return normalizeAttackType(f.attackType);
 }
 
 /**

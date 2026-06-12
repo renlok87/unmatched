@@ -1,5 +1,10 @@
 import { Field, InputType, registerEnumType } from '@nestjs/graphql';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
+// Единый enum фаз — engine-модель (P3: убрано дублирование games/engine).
+// Все импортёры games/dto продолжают работать через этот re-export.
+import { GamePhase } from '../../game-engine/models/game-state.model';
+
+export { GamePhase };
 
 export enum GameMode {
   ONE_V_ONE = 'ONE_V_ONE',
@@ -15,17 +20,6 @@ export enum GameStatus {
   PAUSED = 'PAUSED',
   FINISHED = 'FINISHED',
   ABORTED = 'ABORTED',
-}
-
-export enum GamePhase {
-  SETUP = 'SETUP',
-  TURN_START = 'TURN_START',
-  ACTION_MANEUVER = 'ACTION_MANEUVER',
-  ACTION_ATTACK = 'ACTION_ATTACK',
-  COMBAT = 'COMBAT',
-  COMBAT_RESOLVE = 'COMBAT_RESOLVE',
-  TURN_END = 'TURN_END',
-  GAME_OVER = 'GAME_OVER', // Игра окончена, победитель определён
 }
 
 // Register enums for GraphQL

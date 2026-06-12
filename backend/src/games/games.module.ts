@@ -12,6 +12,7 @@ import { GameStateService } from './game-state.service';
 import { GameSubscriptionService } from './game-subscription.service';
 import { CombatTimeoutService } from './services/combat-timeout.service';
 import { GameActionService } from './services/game-action.service';
+import { GameInitializationService } from './services/game-initialization.service';
 import { ReplayService } from './services/replay.service';
 import { ReplayCompressorService } from './services/replay-compressor.service';
 import { LeaderboardService } from './services/leaderboard.service';
@@ -35,6 +36,7 @@ import {
   GameTurnGuard,
   AttackPhaseGuard,
   ManeuverPhaseGuard,
+  ActionPhaseGuard,
   CombatPhaseGuard,
   DefensePlayGuard,
   CombatResolveGuard,
@@ -104,6 +106,7 @@ import { GameActionType } from './models/game-action.model';
     GameSubscriptionService,
     CombatTimeoutService,
     GameActionService,
+    GameInitializationService,
     ReplayService,
     ReplayCompressorService,
     LeaderboardService,
@@ -123,6 +126,7 @@ import { GameActionType } from './models/game-action.model';
     GameTurnGuard,
     AttackPhaseGuard,
     ManeuverPhaseGuard,
+    ActionPhaseGuard,
     CombatPhaseGuard,
     DefensePlayGuard,
     CombatResolveGuard,

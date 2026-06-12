@@ -1,17 +1,17 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsString, IsUUID, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
 
 @InputType()
 export class JoinGameDto {
+  // ID — Prisma cuid, не UUID, поэтому валидируем только наличие
   @Field()
   @IsString()
-  @IsUUID()
+  @IsNotEmpty()
   gameId: string;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  @IsUUID()
   heroId?: string;
 
   @Field({ nullable: true })

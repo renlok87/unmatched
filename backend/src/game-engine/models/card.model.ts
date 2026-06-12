@@ -12,6 +12,11 @@ export enum CardType {
   DEFENSE = 'DEFENSE',
   SCHEME = 'SCHEME',
   UNIVERSAL = 'UNIVERSAL',
+  // Реальные значения Card.cardType из БД (см. prisma/seed-scraped.ts):
+  // VERSATILE играется и как атака, и как защита (value в оба поля),
+  // MANEUVER — карта движения (subType 'Movement')
+  VERSATILE = 'VERSATILE',
+  MANEUVER = 'MANEUVER',
 }
 
 /**
@@ -28,6 +33,9 @@ export interface Card {
   readonly defenseValue?: number;
   readonly boostValue?: number;
   readonly effects?: readonly CardEffect[];
+  // Текст эффекта карты из БД (Card.text) — для отображения/ручного применения
+  // в Game Tester при розыгрыше scheme-карт (авто-эффекты best-effort)
+  readonly text?: string;
 }
 
 /**

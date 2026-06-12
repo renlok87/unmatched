@@ -93,6 +93,12 @@ export class GameTurnGuard implements CanActivate {
 /**
  * Упрощённые версии guard с предустановленными фазами
  */
+
+/**
+ * @deprecated Экономика «2 действия за ход»: атака разрешена из любой
+ * action-фазы — используйте ActionPhaseGuard. Класс оставлен (зарегистрирован
+ * в games.module), не удалять без чистки модуля.
+ */
 @Injectable()
 export class AttackPhaseGuard extends GameTurnGuard {
   constructor(gameStateService: GameStateService) {
@@ -104,6 +110,11 @@ export class AttackPhaseGuard extends GameTurnGuard {
   }
 }
 
+/**
+ * @deprecated Экономика «2 действия за ход»: манёвр разрешён из любой
+ * action-фазы — используйте ActionPhaseGuard. Класс оставлен (зарегистрирован
+ * в games.module), не удалять без чистки модуля.
+ */
 @Injectable()
 export class ManeuverPhaseGuard extends GameTurnGuard {
   constructor(gameStateService: GameStateService) {
@@ -112,6 +123,23 @@ export class ManeuverPhaseGuard extends GameTurnGuard {
 
   protected getAllowedPhases(): GamePhase[] {
     return [GamePhase.ACTION_MANEUVER];
+  }
+}
+
+/**
+ * Guard для действий, доступных в любой action-фазе хода:
+ * maneuver/moveFighter/attack/endTurn/pass/toggleDoor (экономика «2 действия
+ * за ход» — порядок действий свободный). ACTION_ATTACK остаётся валидной
+ * legacy-фазой для idle-состояний, сохранённых до фикса.
+ */
+@Injectable()
+export class ActionPhaseGuard extends GameTurnGuard {
+  constructor(gameStateService: GameStateService) {
+    super(gameStateService);
+  }
+
+  protected getAllowedPhases(): GamePhase[] {
+    return [GamePhase.ACTION_MANEUVER, GamePhase.ACTION_ATTACK];
   }
 }
 
@@ -172,14 +200,14 @@ export class DefensePlayGuard extends GameTurnGuard {
     }
 
     // Проверяем, что пользователь - защищающийся игрок (не атакующий)
-    const combatInfo = (state.metadata as any)?.combatInfo;
+    const combatInfo = state.metadata.combatInfo;
     if (!combatInfo) {
       throw new BadRequestException('No combat in progress');
     }
 
     if (combatInfo.attackerId && combatInfo.defenderId) {
       // Находим владельца атакующего бойца
-      const attacker = state.fighters.find((f: any) => f.id === combatInfo.attackerId);
+      const attacker = state.fighters.find((f) => f.id === combatInfo.attackerId);
       if (attacker && attacker.ownerId === userId) {
         throw new BadRequestException('Attacker cannot play defense');
       }
@@ -238,13 +266,13 @@ export class CombatResolveGuard extends GameTurnGuard {
       );
     }
 
-    const combatInfo = (state.metadata as any)?.combatInfo;
+    const combatInfo = state.metadata.combatInfo;
     if (!combatInfo) {
       throw new BadRequestException('No combat in progress');
     }
 
     // Проверяем, что пользователь - участник боя
-    const attacker = state.fighters.find((f: any) => f.id === combatInfo.attackerId);
+    const attacker = state.fighters.find((f) => f.id === combatInfo.attackerId);
     const isAttacker = attacker?.ownerId === userId;
     const isDefender = combatInfo.defenderId === userId;
 

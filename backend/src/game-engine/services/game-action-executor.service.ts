@@ -12,19 +12,35 @@
 
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { MetricsService } from '../../metrics/metrics.service';
-import type { GameState } from '../../games/game-state.service';
-import { GamePhase } from '../../games/dto';
-import { createEmptyBoardState } from '../models';
+// P3: единые engine-модели (GameState/GamePhase/CombatState) — value-импорт
+// engine→games убран, рантайм-цикла модулей больше нет
+import type { GameState, CombatState, HandCard } from '../models';
+import {
+  GamePhase,
+  CardType,
+  createEmptyBoardState,
+  ACTIONS_PER_TURN,
+  getActionsRemaining,
+  getFighterAttackType,
+} from '../models';
+import {
+  CardEffectExecutorService,
+  type EffectResult,
+} from '../effects/card-effect-executor.service';
 import { GameRulesValidator } from '../validators/game-rules.validator';
 import { CombatResolverService } from '../engine/combat-resolver.service';
 import { MovementService } from '../engine/movement.service';
 import { ValueModifierService } from '../engine/value-modifier.service';
 import { AdjacencyService } from '../engine/adjacency.service';
+import { DeckManagementService } from './deck-management.service';
+// Residual-импорт engine→games: DTO-классы мутаций (runtime-импорт, но уже не
+// value-критичный цикл — состояние/фазы идут из ../models). Перенос DTO — вне скоупа F3.
 import {
   ManeuverDto,
   MoveFighterDto,
   AttackDto,
   PlayDefenseDto,
+  PlaySchemeDto,
   ResolveCombatDto,
   EndTurnDto,
   PassDto,
@@ -43,6 +59,10 @@ export interface ActionResult {
     readonly performedAt: Date;
     readonly performedBy: string;
     readonly sequenceNumber: number;
+    // playScheme: текст эффекта карты (для ручного применения в Game Tester)
+    readonly effectText?: string;
+    // playScheme: авто-применённые эффекты карты (best-effort, обычно пусто)
+    readonly appliedEffects?: readonly EffectResult[];
   };
 }
 
@@ -69,19 +89,8 @@ export interface InitialGameStateParams {
   readonly boardId: string;
 }
 
-/**
- * Карта состояния боя
- */
-interface CombatState {
-  readonly attackerId: string;
-  readonly defenderId: string;
-  readonly attackerCardId: string;
-  readonly defenderCardId?: string;
-  readonly attackValue: number;
-  readonly defenseValue: number;
-  readonly startedAt: Date;
-  readonly timeoutAt?: Date;
-}
+// Состояние боя (CombatState) перенесено в ../models/game-state.model —
+// единый типизированный контракт metadata.combatInfo для executor'а и guard'ов
 
 @Injectable()
 export class GameActionExecutorService {
@@ -94,7 +103,86 @@ export class GameActionExecutorService {
     private readonly valueModifier: ValueModifierService,
     private readonly adjacencyService: AdjacencyService,
     private readonly metrics: MetricsService,
+    private readonly deckManagement: DeckManagementService,
+    private readonly cardEffectExecutor: CardEffectExecutorService,
   ) {}
+
+  /**
+   * Передать ход следующему живому игроку.
+   *
+   * Фаза TURN_START исключена из продакшен-потока: ход сразу начинается
+   * с ACTION_MANEUVER + добор 1 карты следующему игроку (правила Unmatched).
+   * Используется в executeEndTurn, executeResolveCombat и consumeAction
+   * (авто-завершение хода после 2-го действия).
+   *
+   * ВАЖНО (контракт saveState): +1 к sequenceNumber только при incrementSeq=true —
+   * тогда входное состояние должно приходить БЕЗ собственного инкремента.
+   * incrementSeq=false — для вызова из consumeAction, где +1 уже сделало само действие.
+   */
+  private async advanceTurn(
+    state: GameState,
+    userId: string,
+    incrementSeq = true,
+  ): Promise<GameState> {
+    // Находим следующего живого игрока по кругу
+    const currentPlayerIndex = state.players.findIndex(
+      (p) => p.userId === state.currentTurnPlayerId,
+    );
+
+    let nextPlayerIndex = (currentPlayerIndex + 1) % state.players.length;
+    let attempts = 0;
+
+    while (!state.players[nextPlayerIndex].isAlive && attempts < state.players.length) {
+      nextPlayerIndex = (nextPlayerIndex + 1) % state.players.length;
+      attempts++;
+    }
+
+    const nextPlayerId = state.players[nextPlayerIndex].userId;
+    const isSamePlayer = nextPlayerId === state.currentTurnPlayerId;
+
+    // Добор 1 карты следующему игроку (drawCards не трогает sequenceNumber;
+    // полная рука / пустые колода+сброс обрабатываются внутри drawCards).
+    // Легаси-состояния без deck/handZone не должны блокировать передачу хода.
+    let next = state;
+    try {
+      next = await this.deckManagement.drawCards(next, nextPlayerId, 1);
+    } catch (e) {
+      this.logger.warn(`advanceTurn: draw skipped for ${nextPlayerId}: ${e}`);
+    }
+
+    return {
+      ...next,
+      phase: GamePhase.ACTION_MANEUVER,
+      currentTurnPlayerId: nextPlayerId,
+      turnCount: isSamePlayer ? state.turnCount : state.turnCount + 1,
+      sequenceNumber: incrementSeq ? state.sequenceNumber + 1 : state.sequenceNumber,
+      metadata: {
+        ...next.metadata,
+        lastActionAt: new Date(),
+        lastActionBy: userId,
+        actionsRemaining: ACTIONS_PER_TURN, // новый ход — 2 действия
+      },
+    };
+  }
+
+  /**
+   * Списать 1 действие текущего хода (экономика «2 действия за ход»).
+   *
+   * ВЫЗЫВАТЬ ПОСЛЕ того, как действие сделало свой +1 к sequenceNumber.
+   * При остатке 0 — авто-завершение хода через advanceTurn БЕЗ инкремента seq
+   * (суммарно за мутацию ровно +1, контракт saveState соблюдён).
+   */
+  private async consumeAction(state: GameState, userId: string): Promise<GameState> {
+    const remaining = getActionsRemaining(state) - 1;
+    if (remaining <= 0) {
+      return this.advanceTurn(
+        { ...state, metadata: { ...state.metadata, actionsRemaining: 0 } },
+        userId,
+        /* incrementSeq */ false,
+      );
+    }
+    return { ...state, metadata: { ...state.metadata, actionsRemaining: remaining } };
+  }
 
   /**
    * Создаёт начальное состояние игры
@@ -138,6 +226,7 @@ export class GameActionExecutorService {
         lastActionAt: new Date(),
         lastActionBy: 'system',
         version: 1,
+        actionsRemaining: ACTIONS_PER_TURN,
       },
     };
 
@@ -159,7 +248,7 @@ export class GameActionExecutorService {
         // Валидация с замером времени
         const validation = await this.metrics.measureValidation('maneuver', () =>
           this.rulesValidator.validateManeuver(
-            currentState as any,
+            currentState,
             dto.fighterId,
             dto.cardId,
             dto.path,
@@ -177,7 +266,7 @@ export class GameActionExecutorService {
 
         // Выполняем перемещение
         const movementResult = await this.movementService.executeMovement(
-          currentState as any,
+          currentState,
           dto.fighterId,
           dto.path,
         );
@@ -193,31 +282,46 @@ export class GameActionExecutorService {
         // Применяем эффекты карты
         let newState = movementResult.nextState ?? currentState;
         newState = await this.valueModifier.applyCardEffects(
-          newState as any,
+          newState,
           dto.cardId,
           dto.fighterId,
-        ) as any;
+        );
 
-        // Переход в фазу ACTION_ATTACK если ещё не там
-        const nextPhase =
-          newState.phase === GamePhase.ACTION_MANEUVER ? GamePhase.ACTION_ATTACK : newState.phase;
+        // Сыгранная карта уходит в сброс + добор 1 карты (правила Unmatched:
+        // манёвр = добор + движение). discardCard/drawCards не трогают
+        // sequenceNumber — +1 уже сделан в executeMovement.
+        const playedCard = this.findHandCard(currentState, userId, dto.cardId);
+        if (playedCard) {
+          newState = await this.deckManagement.discardCard(newState, userId, playedCard.id);
+        }
+        try {
+          newState = await this.deckManagement.drawCards(newState, userId, 1);
+        } catch (e) {
+          // Легаси-состояния без deck не должны блокировать манёвр
+          this.logger.warn(`executeManeuver: draw skipped for ${userId}: ${e}`);
+        }
 
+        // Фазу НЕ переключаем (экономика «2 действия за ход»): манёвр — одно из
+        // двух действий, после него можно манёврить/атаковать снова из той же фазы.
+        // sequenceNumber уже инкрементирован в movementService.executeMovement —
+        // повторный +1 ломал optimistic lock в saveState (existing+1 ожидается)
         newState = {
           ...newState,
-          phase: nextPhase,
-          sequenceNumber: newState.sequenceNumber + 1,
           metadata: {
             ...newState.metadata,
             lastActionAt: new Date(),
             lastActionBy: userId,
           },
-        } as any;
+        };
+
+        // Списываем 1 действие (после 2-го — авто-завершение хода без доп. +1 к seq)
+        newState = await this.consumeAction(newState, userId);
 
         this.metrics.incrementGameAction('maneuver', undefined, 'success');
 
         return {
           success: true,
-          gameState: newState as any,
+          gameState: newState,
           metadata: {
             action: 'maneuver',
             performedAt: new Date(),
@@ -251,7 +355,7 @@ export class GameActionExecutorService {
 
       // Валидация
       const validation = this.rulesValidator.validateMovement(
-        currentState as any,
+        currentState,
         dto.fighterId,
         { x: dto.x, y: dto.y },
         userId,
@@ -267,7 +371,7 @@ export class GameActionExecutorService {
       // Выполняем перемещение
       const path = [{ x: dto.x, y: dto.y }];
       const result = await this.movementService.executeMovement(
-        currentState as any,
+        currentState,
         dto.fighterId,
         path,
       );
@@ -279,19 +383,22 @@ export class GameActionExecutorService {
         };
       }
 
-      const newState = {
+      // sequenceNumber уже инкрементирован в movementService.executeMovement
+      let newState: GameState = {
         ...result.nextState!,
-        sequenceNumber: result.nextState!.sequenceNumber + 1,
         metadata: {
           ...result.nextState!.metadata,
           lastActionAt: new Date(),
           lastActionBy: userId,
         },
-      } as any;
+      };
+
+      // Списываем 1 действие (после 2-го — авто-завершение хода без доп. +1 к seq)
+      newState = await this.consumeAction(newState, userId);
 
       return {
         success: true,
-        gameState: newState as any,
+        gameState: newState,
         metadata: {
           action: 'moveFighter',
           performedAt: new Date(),
@@ -322,7 +429,7 @@ export class GameActionExecutorService {
         // Валидация с замером времени
         const validation = await this.metrics.measureValidation('attack', () =>
           this.rulesValidator.validateAttackWithParams(
-            currentState as any,
+            currentState,
             dto.attackerId,
             dto.targetId,
             dto.cardId,
@@ -347,36 +454,66 @@ export class GameActionExecutorService {
           return { success: false, error: 'Attacker or target not found' };
         }
 
-        const isAdjacent = await this.adjacencyService.isAdjacent(
-          currentState as any,
+        // Дистанция атаки: melee — только смежная цель; ranged — смежная
+        // ИЛИ в той же зоне доски (Cell.zone клеток атакующего и цели совпадают)
+        const adjacent = await this.adjacencyService.isAdjacent(
+          currentState,
           attacker.position,
           target.position,
         );
+        const attackType = getFighterAttackType(attacker);
+        let inRange = adjacent;
+        if (!inRange && attackType === 'ranged') {
+          inRange = this.adjacencyService.isInSameZone(
+            currentState,
+            attacker.position,
+            target.position,
+          );
+        }
 
-        if (!isAdjacent) {
+        if (!inRange) {
           this.metrics.incrementGameAction('attack', undefined, 'error');
-          return { success: false, error: 'Target is not adjacent to attacker' };
+          return {
+            success: false,
+            error:
+              attackType === 'ranged'
+                ? 'Ranged attack: target must be adjacent or in the same zone as attacker'
+                : 'Melee attack: target must be adjacent to attacker',
+          };
+        }
+
+        // Сыгранная карта: реальное значение атаки + сброс из руки.
+        // В combatInfo пишем instance id (`${cardId}::n`) — по нему resolveCombat
+        // найдёт карту в decks[].cards даже после сброса (cards — полный список).
+        const playedCard = this.findHandCard(currentState, userId, dto.cardId);
+
+        let nextState = currentState;
+        if (playedCard) {
+          nextState = await this.deckManagement.discardCard(nextState, userId, playedCard.id);
         }
 
         // Сохраняем состояние боя в metadata
         const combatState: CombatState = {
           attackerId: dto.attackerId,
           defenderId: target.ownerId,
-          attackerCardId: dto.cardId,
-          attackValue: this.getCardValue(currentState, dto.cardId),
+          attackerCardId: playedCard?.id ?? dto.cardId,
+          attackValue: playedCard?.attackValue ?? 0,
           defenseValue: 0,
           startedAt: new Date(),
         };
 
-        const newState: any = {
-          ...currentState,
+        const newState: GameState = {
+          ...nextState,
           phase: GamePhase.COMBAT,
           sequenceNumber: currentState.sequenceNumber + 1,
           metadata: {
-            ...currentState.metadata,
+            ...nextState.metadata,
             lastActionAt: new Date(),
             lastActionBy: userId,
             combatInfo: combatState,
+            // Атака тратит действие в момент объявления (НЕ consumeAction — ход
+            // не завершаем, бой не разрешён). Остаток смотрит executeResolveCombat.
+            actionsRemaining: Math.max(0, getActionsRemaining(currentState) - 1),
           },
         };
 
@@ -422,7 +559,7 @@ export class GameActionExecutorService {
       }
 
       // Проверяем, что пользователь - защищающийся
-      const combatInfo = (currentState.metadata as any).combatInfo as CombatState | undefined;
+      const combatInfo = currentState.metadata.combatInfo;
       if (!combatInfo) {
         return { success: false, error: 'No combat in progress' };
       }
@@ -433,7 +570,7 @@ export class GameActionExecutorService {
 
       // Валидация карты защиты
       const validation = this.rulesValidator.validateDefense(
-        currentState as any,
+        currentState,
         dto.cardId,
         userId,
       );
@@ -445,23 +582,32 @@ export class GameActionExecutorService {
         };
       }
 
+      // Сыгранная карта защиты: реальное значение + сброс из руки
+      // (instance id в combatInfo — см. комментарий в executeAttack)
+      const playedCard = this.findHandCard(currentState, userId, dto.cardId);
+
+      let nextState = currentState;
+      if (playedCard) {
+        nextState = await this.deckManagement.discardCard(nextState, userId, playedCard.id);
+      }
+
       // Обновляем состояние боя
       const updatedCombatInfo: CombatState = {
         ...combatInfo,
-        defenderCardId: dto.cardId,
-        defenseValue: this.getCardValue(currentState, dto.cardId),
+        defenderCardId: playedCard?.id ?? dto.cardId,
+        defenseValue: playedCard?.defenseValue ?? 0,
       };
 
       const newState: GameState = {
-        ...currentState,
-        phase: 'COMBAT_RESOLVE' as GamePhase,
+        ...nextState,
+        phase: GamePhase.COMBAT_RESOLVE,
         sequenceNumber: currentState.sequenceNumber + 1,
         metadata: {
-          ...currentState.metadata,
+          ...nextState.metadata,
           lastActionAt: new Date(),
           lastActionBy: userId,
           combatInfo: updatedCombatInfo,
-        } as any,
+        },
       };
 
       return {
@@ -484,6 +630,107 @@ export class GameActionExecutorService {
   }
 
   /**
+   * Разыграть scheme-карту из руки текущего игрока (тратит 1 действие).
+   *
+   * Фаза/ход закрыты ActionPhaseGuard на мутации — здесь только карта:
+   * 1. Карта должна быть в руке вызвавшего и иметь cardType SCHEME
+   *    (VERSATILE сознательно не принимаем — играется как атака/защита).
+   * 2. Авто-эффекты best-effort через CardEffectExecutorService (в БД у карт
+   *    effects почти всегда [] — ветка фактически спящая, ошибки не фатальны).
+   * 3. Карта ВСЕГДА уходит в сброс; текст эффекта едет в metadata результата
+   *    для ручного применения в Game Tester.
+   * 4. consumeAction: после 2-го действия — авто-завершение хода
+   *    (суммарно за мутацию ровно +1 к seq — контракт saveState).
+   */
+  async executePlayScheme(
+    dto: PlaySchemeDto,
+    context: ActionContext,
+  ): Promise<ActionResult> {
+    return this.metrics.measureServiceDuration('executePlayScheme', 'GameActionExecutor', async () => {
+      try {
+        const { userId, currentState } = context;
+
+        // Карта в руке (принимает и instance id `${cardId}::n`, и базовый cardId)
+        const playedCard = this.findHandCard(currentState, userId, dto.cardId);
+        if (!playedCard) {
+          this.metrics.incrementGameAction('playScheme', undefined, 'error');
+          return { success: false, error: 'Card not found in hand' };
+        }
+
+        if (playedCard.cardType !== CardType.SCHEME) {
+          this.metrics.incrementGameAction('playScheme', undefined, 'error');
+          return {
+            success: false,
+            error: `Card is not a SCHEME card (got ${playedCard.cardType})`,
+          };
+        }
+
+        // Авто-эффекты best-effort: ошибки эффектов не блокируют розыгрыш
+        let nextState: GameState = currentState;
+        let appliedEffects: readonly EffectResult[] = [];
+        if (playedCard.effects && playedCard.effects.length > 0) {
+          try {
+            const effectsResult = await this.cardEffectExecutor.executeOnPlayEffects(
+              nextState,
+              playedCard,
+              userId,
+            );
+            nextState = effectsResult.state;
+            appliedEffects = effectsResult.appliedEffects;
+          } catch (e) {
+            this.logger.warn(
+              `executePlayScheme: card effects skipped for ${playedCard.id}: ${e}`,
+            );
+          }
+        }
+
+        // Карта всегда уходит в сброс (instance id; discardCard не трогает seq)
+        nextState = await this.deckManagement.discardCard(nextState, userId, playedCard.id);
+
+        // Свой +1 к seq — у scheme нет movementService, инкрементим сами
+        let newState: GameState = {
+          ...nextState,
+          sequenceNumber: currentState.sequenceNumber + 1,
+          metadata: {
+            ...nextState.metadata,
+            lastActionAt: new Date(),
+            lastActionBy: userId,
+          },
+        };
+
+        // Списываем 1 действие (после 2-го — авто-завершение хода без доп. +1 к seq)
+        newState = await this.consumeAction(newState, userId);
+
+        this.metrics.incrementGameAction('playScheme', undefined, 'success');
+
+        return {
+          success: true,
+          gameState: newState,
+          metadata: {
+            action: 'playScheme',
+            performedAt: new Date(),
+            performedBy: userId,
+            sequenceNumber: newState.sequenceNumber,
+            // Текст эффекта — для ручного применения в тестере (fallback на имя)
+            effectText: playedCard.text ?? playedCard.name,
+            appliedEffects,
+          },
+        };
+      } catch (error) {
+        this.logger.error(
+          `Ошибка при розыгрыше scheme-карты [gameId=${context.gameId}]: ${error}`,
+          { gameId: context.gameId, userId: context.userId, dto },
+        );
+        this.metrics.incrementError('GameActionExecutor', 'executePlayScheme', error instanceof Error ? error.name : 'unknown');
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        };
+      }
+    });
+  }
+
+  /**
    * Разрешить бой
    */
   async executeResolveCombat(
@@ -500,7 +747,7 @@ export class GameActionExecutorService {
           return { success: false, error: 'Not in combat phase' };
         }
 
-        const combatInfo = (currentState.metadata as any).combatInfo as CombatState | undefined;
+        const combatInfo = currentState.metadata.combatInfo;
         if (!combatInfo) {
           this.metrics.incrementGameAction('resolveCombat', undefined, 'error');
           return { success: false, error: 'No combat in progress' };
@@ -520,7 +767,7 @@ export class GameActionExecutorService {
           attacker.heroId,
           defenderFighter.heroId,
           () => this.combatResolver.resolveCombat(
-            currentState as any,
+            currentState,
             combatInfo.attackerId,
             defenderFighter.id,
             combatInfo.attackerCardId,
@@ -529,6 +776,8 @@ export class GameActionExecutorService {
         );
 
         // Получаем урон из результата
+        // TODO: пробел типа CombatResult (нет attackerDamage/defenderDamage) —
+        // это не стыковка моделей, чинить в типе CombatResult отдельно
         const attackerDamage = (combatResult as any).attackerDamage ?? 0;
         const defenderDamage = (combatResult as any).defenderDamage ?? 0;
 
@@ -557,25 +806,55 @@ export class GameActionExecutorService {
         const alivePlayers = updatedPlayers.filter((p) => p.isAlive);
         const gameEnded = alivePlayers.length <= 1;
 
-        let nextPhase = GamePhase.ACTION_MANEUVER;
+        let newState: GameState;
         if (gameEnded) {
-          nextPhase = GamePhase.GAME_OVER;
+          newState = {
+            ...currentState,
+            phase: GamePhase.GAME_OVER,
+            sequenceNumber: currentState.sequenceNumber + 1,
+            fighters: updatedFighters,
+            players: updatedPlayers,
+            metadata: {
+              ...currentState.metadata,
+              lastActionAt: new Date(),
+              lastActionBy: userId,
+              combatInfo: undefined,
+              winnerId: alivePlayers[0]?.userId,
+            },
+          };
+        } else {
+          // Бой завершён. Действие списано при объявлении атаки (executeAttack),
+          // поэтому здесь только смотрим остаток: >0 — ход ПРОДОЛЖАЕТСЯ (атака
+          // могла быть первым действием), 0 — авто-завершение хода.
+          // Промежуточное состояние БЕЗ инкремента seq — +1 делает advanceTurn
+          // или ветка продолжения хода. Остаток/следующий игрок считаются от
+          // currentTurnPlayerId (атакующего), даже если мутацию вызвал защитник
+          // (CombatResolveGuard).
+          const intermediate: GameState = {
+            ...currentState,
+            fighters: updatedFighters,
+            players: updatedPlayers,
+            metadata: {
+              ...currentState.metadata,
+              combatInfo: undefined,
+            },
+          };
+          if (getActionsRemaining(intermediate) > 0) {
+            // У атакующего остались действия — возвращаем ему ход (свой +1 к seq)
+            newState = {
+              ...intermediate,
+              phase: GamePhase.ACTION_MANEUVER,
+              sequenceNumber: currentState.sequenceNumber + 1,
+              metadata: {
+                ...intermediate.metadata,
+                lastActionAt: new Date(),
+                lastActionBy: userId,
+              },
+            };
+          } else {
+            newState = await this.advanceTurn(intermediate, userId);
+          }
         }
-
-        const newState: any = {
-          ...currentState,
-          phase: nextPhase,
-          sequenceNumber: currentState.sequenceNumber + 1,
-          fighters: updatedFighters,
-          players: updatedPlayers,
-          metadata: {
-            ...currentState.metadata,
-            lastActionAt: new Date(),
-            lastActionBy: userId,
-            combatInfo: undefined,
-            ...(gameEnded ? { winnerId: alivePlayers[0]?.userId } : {}),
-          } as any,
-        };
 
         this.metrics.incrementGameAction('resolveCombat', undefined, 'success');
 
@@ -614,7 +893,7 @@ export class GameActionExecutorService {
       const { userId, currentState } = context;
 
       // Валидация
-      const validation = this.rulesValidator.validateEndTurn(currentState as any, userId);
+      const validation = this.rulesValidator.validateEndTurn(currentState, userId);
       if (!validation.valid) {
         return {
           success: false,
@@ -622,34 +901,9 @@ export class GameActionExecutorService {
         };
       }
 
-      // Находим следующего живого игрока
-      const currentPlayerIndex = currentState.players.findIndex(
-        (p) => p.userId === currentState.currentTurnPlayerId,
-      );
-
-      let nextPlayerIndex = (currentPlayerIndex + 1) % currentState.players.length;
-      let attempts = 0;
-
-      while (!currentState.players[nextPlayerIndex].isAlive && attempts < currentState.players.length) {
-        nextPlayerIndex = (nextPlayerIndex + 1) % currentState.players.length;
-        attempts++;
-      }
-
-      const nextPlayerId = currentState.players[nextPlayerIndex].userId;
-      const isSamePlayer = nextPlayerId === currentState.currentTurnPlayerId;
-
-      const newState: any = {
-        ...currentState,
-        phase: GamePhase.TURN_START,
-        currentTurnPlayerId: nextPlayerId,
-        turnCount: isSamePlayer ? currentState.turnCount : currentState.turnCount + 1,
-        sequenceNumber: currentState.sequenceNumber + 1,
-        metadata: {
-          ...currentState.metadata,
-          lastActionAt: new Date(),
-          lastActionBy: userId,
-        },
-      };
+      // Передаём ход следующему игроку: сразу ACTION_MANEUVER + добор карты
+      // (фаза TURN_START пропускается — см. advanceTurn)
+      const newState = await this.advanceTurn(currentState, userId);
 
       return {
         success: true,
@@ -681,7 +935,7 @@ export class GameActionExecutorService {
       const { userId, currentState } = context;
 
       // Валидация
-      const validation = this.rulesValidator.validatePass(currentState as any, userId);
+      const validation = this.rulesValidator.validatePass(currentState, userId);
       if (!validation.valid) {
         return {
           success: false,
@@ -692,16 +946,19 @@ export class GameActionExecutorService {
       // Сбрасываем верхнюю карту колоды (упрощённо - без реальной логики колоды)
       // TODO: Интегрировать с реальной логикой колоды
 
-      const newState: GameState = {
+      let newState: GameState = {
         ...currentState,
         sequenceNumber: currentState.sequenceNumber + 1,
         metadata: {
           ...currentState.metadata,
           lastActionAt: new Date(),
           lastActionBy: userId,
-          passCount: ((currentState.metadata as any).passCount || 0) + 1,
-        } as any,
+          passCount: (currentState.metadata.passCount || 0) + 1,
+        },
       };
+
+      // Pass тоже тратит 1 действие (после 2-го — авто-завершение хода)
+      newState = await this.consumeAction(newState, userId);
 
       return {
         success: true,
@@ -734,7 +991,7 @@ export class GameActionExecutorService {
 
       // Валидация
       const validation = this.rulesValidator.validateToggleDoor(
-        currentState as any,
+        currentState,
         dto.x,
         dto.y,
         userId,
@@ -787,11 +1044,13 @@ export class GameActionExecutorService {
   }
 
   /**
-   * Получить значение карты из состояния
-   * TODO: Интегрировать с реальной логикой карт
+   * Найти сыгранную карту в руке игрока.
+   * Принимает и instance id (`${cardId}::n`), и базовый cardId —
+   * тот же предикат, что в GameRulesValidator (validateAttackWithParams и др.).
    */
-  private getCardValue(state: GameState, cardId: string): number {
-    // Заглушка - в будущем получать из состояния
-    return 3;
+  private findHandCard(state: GameState, userId: string, cardId: string): HandCard | undefined {
+    return state.handZones[userId]?.cards.find(
+      (c) => c.id === cardId || c.cardId === cardId,
+    );
   }
 }
