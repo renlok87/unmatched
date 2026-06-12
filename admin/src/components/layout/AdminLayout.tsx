@@ -12,6 +12,7 @@ import {
   ThunderboltOutlined,
   FileSearchOutlined,
   LogoutOutlined,
+  ExperimentOutlined,
 } from '@ant-design/icons';
 
 const { Sider, Header, Content } = Layout;
@@ -62,6 +63,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       key: '/games',
       icon: <PlayCircleOutlined />,
       label: 'Games',
+    },
+    {
+      key: '/game-tester',
+      icon: <ExperimentOutlined />,
+      label: 'Game Tester',
     },
     {
       key: '/matchmaking',

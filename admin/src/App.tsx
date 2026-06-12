@@ -15,6 +15,7 @@ import { UserList, UserEdit, UserShow } from './pages/users';
 import { GamesList, GameShow } from './pages/games';
 import { MatchmakingList } from './pages/matchmaking';
 import { AuditLogsList } from './pages/audit-logs';
+import { GameTester } from './pages/game-tester';
 import { useIsAuthenticated } from '@refinedev/core';
 
 // Компонент для защиты маршрутов
@@ -140,6 +141,9 @@ function App() {
           {/* Games Routes */}
           <Route path="games" element={<GamesList />} />
           <Route path="games/show/:id" element={<GameShow />} />
+
+          {/* Game Tester Route */}
+          <Route path="game-tester" element={<GameTester />} />
 
           {/* Matchmaking Route */}
           <Route path="matchmaking" element={<MatchmakingList />} />
