@@ -30,6 +30,7 @@ import {
   FighterType,
   createEmptyBoardState,
   normalizeAttackType,
+  normalizeCardEffects,
   slugifyHeroName,
 } from '../../game-engine/models';
 import type { AttackType, BoardState, Cell } from '../../game-engine/models';
@@ -202,9 +203,12 @@ export class GameInitializationService {
           attackValue: card.attackValue ?? undefined,
           defenseValue: card.defenseValue ?? undefined,
           boostValue: card.boostValue ?? undefined,
-          effects: this.parseEffects(card.effects),
+          // Структурная валидация Json (мусор → UNSUPPORTED-эффект, не падаем)
+          effects: normalizeCardEffects(card.effects, card.id),
           // Текст эффекта — едет в state (рука/колода/сброс) для playScheme
           text: card.text ?? undefined,
+          // Кто может играть карту ('Any'/имя бойца) — bannerAllows-валидация
+          bannerName: card.bannerName ?? undefined,
         })),
       );
 
@@ -431,12 +435,6 @@ export class GameInitializationService {
         attackType: normalizeAttackType(sk?.attackType),
       }));
     });
-  }
-
-  private parseEffects(raw: unknown): any[] | undefined {
-    if (!raw) return undefined;
-    const value = typeof raw === 'string' ? this.tryParse(raw) : raw;
-    return Array.isArray(value) ? value : undefined;
   }
 
   private tryParse(value: string): unknown {
