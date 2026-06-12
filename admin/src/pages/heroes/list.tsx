@@ -1,6 +1,6 @@
 import { List } from '@refinedev/antd';
 import { IResourceComponentsProps } from '@refinedev/core';
-import { Table, Space, Tag, Avatar, Typography, Button, Modal, message, Input, Select } from 'antd';
+import { Table, Space, Tag, Avatar, Typography, Button, Modal, message, Input } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined, SearchOutlined, PictureOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -89,14 +89,20 @@ export const HeroList: React.FC<IResourceComponentsProps> = () => {
     setCurrentPage(1);
   };
 
-  const handleSortChange = (value: string) => {
-    if (value === sortBy) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  const handleTableChange = (_pagination: any, _filters: any, sorter: any) => {
+    const activeSorter = Array.isArray(sorter) ? sorter[0] : sorter;
+    if (activeSorter?.field && activeSorter?.order) {
+      setSortBy(String(activeSorter.field));
+      setSortOrder(activeSorter.order === 'ascend' ? 'asc' : 'desc');
     } else {
-      setSortBy(value);
-      setSortOrder('asc');
+      // Сортировка по колонке сброшена — возвращаемся к дефолту
+      setSortBy('createdAt');
+      setSortOrder('desc');
     }
   };
+
+  const columnSortOrder = (field: string): 'ascend' | 'descend' | null =>
+    sortBy === field ? (sortOrder === 'asc' ? 'ascend' : 'descend') : null;
 
   const handleDelete = (id: string, name: string) => {
     Modal.confirm({
@@ -137,28 +143,12 @@ export const HeroList: React.FC<IResourceComponentsProps> = () => {
             allowClear
             style={{ width: 300 }}
           />
-          <Select
-            placeholder="Sort by"
-            value={sortBy}
-            onChange={handleSortChange}
-            style={{ width: 150 }}
-          >
-            <Select.Option value="name">Name</Select.Option>
-            <Select.Option value="set">Set</Select.Option>
-            <Select.Option value="health">Health</Select.Option>
-            <Select.Option value="fighterType">Type</Select.Option>
-            <Select.Option value="createdAt">Created</Select.Option>
-          </Select>
-          <Button
-            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-          >
-            {sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
-          </Button>
         </Space>
         <Table
           loading={loading}
           dataSource={heroes}
           rowKey="id"
+          onChange={handleTableChange}
           pagination={{
             current: currentPage,
             pageSize: pageSize,
@@ -192,11 +182,15 @@ export const HeroList: React.FC<IResourceComponentsProps> = () => {
                 </Text>
               </Space>
             )}
+            sorter={true}
+            sortOrder={columnSortOrder('name')}
           />
           <Table.Column
             dataIndex="set"
             title="Set"
             render={(set: string) => <Tag color="blue">{set}</Tag>}
+            sorter={true}
+            sortOrder={columnSortOrder('set')}
           />
           <Table.Column
             dataIndex="health"
@@ -207,6 +201,8 @@ export const HeroList: React.FC<IResourceComponentsProps> = () => {
                 {health} HP
               </Tag>
             )}
+            sorter={true}
+            sortOrder={columnSortOrder('health')}
           />
           <Table.Column
             dataIndex="fighterType"
@@ -220,11 +216,15 @@ export const HeroList: React.FC<IResourceComponentsProps> = () => {
               };
               return <Tag color={colors[type] || 'default'}>{type}</Tag>;
             }}
+            sorter={true}
+            sortOrder={columnSortOrder('fighterType')}
           />
           <Table.Column
             dataIndex="createdAt"
             title="Created At"
             render={(date: string) => new Date(date).toLocaleDateString()}
+            sorter={true}
+            sortOrder={columnSortOrder('createdAt')}
           />
           <Table.Column
             title="Actions"

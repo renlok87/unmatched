@@ -1,6 +1,6 @@
 import { List } from '@refinedev/antd';
 import { IResourceComponentsProps } from '@refinedev/core';
-import { Table, Space, Tag, Image, Typography, Button, Modal, message, Input, Select, Avatar } from 'antd';
+import { Table, Space, Tag, Image, Typography, Button, Modal, message, Input, Avatar } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined, SearchOutlined, PictureOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -89,12 +89,20 @@ export const BoardList: React.FC<IResourceComponentsProps> = () => {
     setCurrentPage(1);
   };
 
-  const handleSortChange = (value: string) => {
-    // Select.onChange не срабатывает при выборе того же значения,
-    // направление переключается отдельной кнопкой Asc/Desc.
-    setSortBy(value);
-    setSortOrder('asc');
+  const handleTableChange = (_pagination: any, _filters: any, sorter: any) => {
+    const activeSorter = Array.isArray(sorter) ? sorter[0] : sorter;
+    if (activeSorter?.field && activeSorter?.order) {
+      setSortBy(String(activeSorter.field));
+      setSortOrder(activeSorter.order === 'ascend' ? 'asc' : 'desc');
+    } else {
+      // Сортировка по колонке сброшена — возвращаемся к дефолту
+      setSortBy('createdAt');
+      setSortOrder('desc');
+    }
   };
+
+  const columnSortOrder = (field: string): 'ascend' | 'descend' | null =>
+    sortBy === field ? (sortOrder === 'asc' ? 'ascend' : 'descend') : null;
 
   const handleDelete = (id: string, name: string) => {
     Modal.confirm({
@@ -135,28 +143,12 @@ export const BoardList: React.FC<IResourceComponentsProps> = () => {
             allowClear
             style={{ width: 300 }}
           />
-          <Select
-            placeholder="Sort by"
-            value={sortBy}
-            onChange={handleSortChange}
-            style={{ width: 150 }}
-          >
-            <Select.Option value="name">Name</Select.Option>
-            <Select.Option value="set">Set</Select.Option>
-            <Select.Option value="width">Width</Select.Option>
-            <Select.Option value="height">Height</Select.Option>
-            <Select.Option value="createdAt">Created</Select.Option>
-          </Select>
-          <Button
-            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-          >
-            {sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
-          </Button>
         </Space>
         <Table
           loading={loading}
           dataSource={boards}
           rowKey="id"
+          onChange={handleTableChange}
           pagination={{
             current: currentPage,
             pageSize: pageSize,
@@ -193,28 +185,38 @@ export const BoardList: React.FC<IResourceComponentsProps> = () => {
                 </Text>
               </Space>
             )}
+            sorter={true}
+            sortOrder={columnSortOrder('name')}
           />
           <Table.Column
             dataIndex="set"
             title="Set"
             render={(set: string) => <Tag color="blue">{set}</Tag>}
+            sorter={true}
+            sortOrder={columnSortOrder('set')}
           />
           <Table.Column
             dataIndex="width"
             title="Width"
             align="center"
             render={(width: number) => <Tag>{width} cells</Tag>}
+            sorter={true}
+            sortOrder={columnSortOrder('width')}
           />
           <Table.Column
             dataIndex="height"
             title="Height"
             align="center"
             render={(height: number) => <Tag>{height} cells</Tag>}
+            sorter={true}
+            sortOrder={columnSortOrder('height')}
           />
           <Table.Column
             dataIndex="createdAt"
             title="Created At"
             render={(date: string) => new Date(date).toLocaleDateString()}
+            sorter={true}
+            sortOrder={columnSortOrder('createdAt')}
           />
           <Table.Column
             title="Actions"

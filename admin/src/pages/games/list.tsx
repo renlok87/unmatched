@@ -106,14 +106,20 @@ export const GamesList: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const handleSortChange = (value: string) => {
-    if (value === sortBy) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  const handleTableChange = (_pagination: any, _filters: any, sorter: any) => {
+    const activeSorter = Array.isArray(sorter) ? sorter[0] : sorter;
+    if (activeSorter?.field && activeSorter?.order) {
+      setSortBy(String(activeSorter.field));
+      setSortOrder(activeSorter.order === 'ascend' ? 'asc' : 'desc');
     } else {
-      setSortBy(value);
-      setSortOrder('asc');
+      // Сортировка по колонке сброшена — возвращаемся к дефолту
+      setSortBy('createdAt');
+      setSortOrder('desc');
     }
   };
+
+  const columnSortOrder = (field: string): 'ascend' | 'descend' | null =>
+    sortBy === field ? (sortOrder === 'asc' ? 'ascend' : 'descend') : null;
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -137,6 +143,8 @@ export const GamesList: React.FC = () => {
       dataIndex: 'code',
       key: 'code',
       width: 120,
+      sorter: true,
+      sortOrder: columnSortOrder('code'),
       render: (code: string | undefined, record: GameWithPlayers) => (
         <code>{code || record.id.slice(0, 8)}</code>
       )
@@ -146,6 +154,8 @@ export const GamesList: React.FC = () => {
       dataIndex: 'mode',
       key: 'mode',
       width: 130,
+      sorter: true,
+      sortOrder: columnSortOrder('mode'),
       render: (mode: string) => <Tag color="geekblue">{mode}</Tag>
     },
     {
@@ -153,6 +163,8 @@ export const GamesList: React.FC = () => {
       dataIndex: 'status',
       key: 'status',
       width: 120,
+      sorter: true,
+      sortOrder: columnSortOrder('status'),
       render: (status: string) => (
         <Badge
           status={getStatusColor(status) as any}
@@ -186,6 +198,8 @@ export const GamesList: React.FC = () => {
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 180,
+      sorter: true,
+      sortOrder: columnSortOrder('createdAt'),
       render: (date: string) => new Date(date).toLocaleString()
     },
     {
@@ -230,28 +244,13 @@ export const GamesList: React.FC = () => {
               </Select.Option>
             ))}
           </Select>
-          <Select
-            placeholder="Sort by"
-            value={sortBy}
-            onChange={handleSortChange}
-            style={{ width: 150 }}
-          >
-            <Select.Option value="createdAt">Created</Select.Option>
-            <Select.Option value="status">Status</Select.Option>
-            <Select.Option value="code">Code</Select.Option>
-            <Select.Option value="mode">Mode</Select.Option>
-          </Select>
-          <Button
-            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-          >
-            {sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
-          </Button>
         </Space>
         <Table
           loading={loading}
           dataSource={games}
           rowKey="id"
           columns={columns}
+          onChange={handleTableChange}
           scroll={{ x: 1100 }}
           pagination={{
             current: currentPage,

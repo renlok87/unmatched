@@ -1,6 +1,6 @@
 import { List } from '@refinedev/antd';
 import { IResourceComponentsProps } from '@refinedev/core';
-import { Table, Space, Tag, Avatar, Typography, Badge, Button, Input, Select } from 'antd';
+import { Table, Space, Tag, Avatar, Typography, Badge, Button, Input } from 'antd';
 import { EyeOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -85,14 +85,20 @@ export const UserList: React.FC<IResourceComponentsProps> = () => {
     setCurrentPage(1);
   };
 
-  const handleSortChange = (value: string) => {
-    if (value === sortBy) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  const handleTableChange = (_pagination: any, _filters: any, sorter: any) => {
+    const activeSorter = Array.isArray(sorter) ? sorter[0] : sorter;
+    if (activeSorter?.field && activeSorter?.order) {
+      setSortBy(String(activeSorter.field));
+      setSortOrder(activeSorter.order === 'ascend' ? 'asc' : 'desc');
     } else {
-      setSortBy(value);
-      setSortOrder('asc');
+      // Сортировка по колонке сброшена — возвращаемся к дефолту
+      setSortBy('createdAt');
+      setSortOrder('desc');
     }
   };
+
+  const columnSortOrder = (field: string): 'ascend' | 'descend' | null =>
+    sortBy === field ? (sortOrder === 'asc' ? 'ascend' : 'descend') : null;
 
   return (
     <List>
@@ -106,27 +112,12 @@ export const UserList: React.FC<IResourceComponentsProps> = () => {
             allowClear
             style={{ width: 300 }}
           />
-          <Select
-            placeholder="Sort by"
-            value={sortBy}
-            onChange={handleSortChange}
-            style={{ width: 150 }}
-          >
-            <Select.Option value="username">Username</Select.Option>
-            <Select.Option value="email">Email</Select.Option>
-            <Select.Option value="role">Role</Select.Option>
-            <Select.Option value="createdAt">Created</Select.Option>
-          </Select>
-          <Button
-            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-          >
-            {sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
-          </Button>
         </Space>
         <Table
           loading={loading}
           dataSource={users}
           rowKey="id"
+          onChange={handleTableChange}
           pagination={{
             current: currentPage,
             pageSize: pageSize,
@@ -155,6 +146,8 @@ export const UserList: React.FC<IResourceComponentsProps> = () => {
                 </Text>
               </Space>
             )}
+            sorter={true}
+            sortOrder={columnSortOrder('username')}
           />
           <Table.Column
             dataIndex="role"
@@ -167,6 +160,8 @@ export const UserList: React.FC<IResourceComponentsProps> = () => {
               };
               return <Tag color={colors[role] || 'default'}>{role}</Tag>;
             }}
+            sorter={true}
+            sortOrder={columnSortOrder('role')}
           />
           <Table.Column
             dataIndex="stats"
@@ -189,6 +184,8 @@ export const UserList: React.FC<IResourceComponentsProps> = () => {
             dataIndex="createdAt"
             title="Created At"
             render={(date: string) => new Date(date).toLocaleDateString()}
+            sorter={true}
+            sortOrder={columnSortOrder('createdAt')}
           />
           <Table.Column
             title="Actions"

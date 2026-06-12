@@ -1,6 +1,6 @@
 import { List } from '@refinedev/antd';
 import { IResourceComponentsProps } from '@refinedev/core';
-import { Table, Space, Tag, Typography, Button, Modal, message, Input, Select, Avatar } from 'antd';
+import { Table, Space, Tag, Typography, Button, Modal, message, Input, Avatar } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined, SearchOutlined, PictureOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -126,15 +126,6 @@ export const CardList: React.FC<IResourceComponentsProps> = () => {
     setCurrentPage(1);
   };
 
-  const handleSortChange = (value: string) => {
-    if (value === sortBy) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(value);
-      setSortOrder('asc');
-    }
-  };
-
   const handleTableChange = (_pagination: any, _filters: any, sorter: any) => {
     const activeSorter = Array.isArray(sorter) ? sorter[0] : sorter;
     if (activeSorter?.field && activeSorter?.order) {
@@ -189,23 +180,6 @@ export const CardList: React.FC<IResourceComponentsProps> = () => {
             allowClear
             style={{ width: 300 }}
           />
-          <Select
-            placeholder="Sort by"
-            value={sortBy}
-            onChange={handleSortChange}
-            style={{ width: 150 }}
-          >
-            <Select.Option value="name">Name</Select.Option>
-            <Select.Option value="cardType">Type</Select.Option>
-            <Select.Option value="attackValue">Attack</Select.Option>
-            <Select.Option value="defenseValue">Defense</Select.Option>
-            <Select.Option value="createdAt">Created</Select.Option>
-          </Select>
-          <Button
-            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-          >
-            {sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
-          </Button>
         </Space>
         <Table
           loading={loading}
@@ -261,6 +235,8 @@ export const CardList: React.FC<IResourceComponentsProps> = () => {
             dataIndex="subType"
             title="Sub Type"
             render={(subType: string) => subType || '-'}
+            sorter={true}
+            sortOrder={columnSortOrder('subType')}
           />
           <Table.Column
             dataIndex="attackValue"
@@ -292,6 +268,8 @@ export const CardList: React.FC<IResourceComponentsProps> = () => {
               if (!value) return '-';
               return <Tag color="orange">{value}</Tag>;
             }}
+            sorter={true}
+            sortOrder={columnSortOrder('boostValue')}
           />
           <Table.Column
             dataIndex="bannerName"
@@ -303,6 +281,8 @@ export const CardList: React.FC<IResourceComponentsProps> = () => {
             title="Count"
             align="center"
             render={(count: number) => <Tag>{count}</Tag>}
+            sorter={true}
+            sortOrder={columnSortOrder('count')}
           />
           <Table.Column
             title="Actions"

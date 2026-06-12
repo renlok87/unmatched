@@ -57,6 +57,24 @@ const GET_HERO = gql`
       avatarUrl
       characterCardUrl
       miniModelUrl
+      cards {
+        id
+        name
+        nameEn
+        nameRu
+        cardType
+        subType
+        attackValue
+        defenseValue
+        boostValue
+        bannerName
+        count
+        text
+        textEn
+        textRu
+        imageUrl
+        imageUrlRu
+      }
       createdAt
       updatedAt
     }
