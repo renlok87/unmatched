@@ -79,13 +79,17 @@ const resolveGameEventFn =
 
     // В payload — только безопасное подмножество состояния (без рук игроков!).
     // Полное состояние клиент получает через gameStateUpdated с per-user фильтрацией.
+    // Лобби-события (PLAYER_JOINED/PLAYER_LEFT) несут компактный объект без phase —
+    // его отдаём как есть (userId/username, приватных данных там нет).
     const state = value.payload as GameState | null;
     const safePayload = state
-      ? JSON.stringify({
-          phase: state.phase,
-          turnCount: state.turnCount,
-          currentTurnPlayerId: state.currentTurnPlayerId,
-        })
+      ? state.phase != null
+        ? JSON.stringify({
+            phase: state.phase,
+            turnCount: state.turnCount,
+            currentTurnPlayerId: state.currentTurnPlayerId,
+          })
+        : JSON.stringify(state)
       : null;
 
     return {

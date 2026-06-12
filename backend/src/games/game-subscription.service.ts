@@ -11,7 +11,8 @@ import { GameState } from './game-state.service';
 export interface GameUpdateEvent {
   gameId: string;
   eventType: string;
-  gameState: GameState;
+  /** Полное состояние для игровых событий; компактный объект для лобби-событий */
+  gameState: GameState | Record<string, unknown> | null;
   sequenceNumber: number;
   timestamp: number;
   /** id инстанса-отправителя — guard от self-delivery через Redis broadcast */
@@ -28,7 +29,7 @@ export interface GamePubSubEvent {
   sequenceNumber: number;
   timestamp: number;
   eventType: string;
-  payload: GameState;
+  payload: GameState | Record<string, unknown> | null;
 }
 
 /**
@@ -171,6 +172,29 @@ export class GameSubscriptionService implements OnModuleInit, OnModuleDestroy {
     await this.publishToPubSub(event);
 
     // Публикуем в Redis для других инстансов
+    await this.redis.publish('game:updates:broadcast', JSON.stringify(event));
+  }
+
+  /**
+   * Публикация лобби-события (joinGame/leaveGame — GameState ещё нет).
+   * payload — компактный объект (userId/username), не игровое состояние.
+   */
+  async publishLobbyEvent(
+    gameId: string,
+    eventType: string,
+    payload: Record<string, unknown> | null = null,
+  ): Promise<void> {
+    const event: GameUpdateEvent = {
+      gameId,
+      eventType,
+      gameState: payload,
+      sequenceNumber: 0,
+      timestamp: Date.now(),
+      instanceId: this.instanceId,
+    };
+
+    this.notifyLocalObservers(event as GameUpdateEvent);
+    await this.publishToPubSub(event);
     await this.redis.publish('game:updates:broadcast', JSON.stringify(event));
   }
 

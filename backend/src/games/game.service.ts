@@ -9,6 +9,7 @@ import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { GameInitializationService } from './services/game-initialization.service';
 import { GameActionService } from './services/game-action.service';
+import { GameSubscriptionService } from './game-subscription.service';
 import { GameActionType } from './models/game-action.model';
 import { GameStatus, GameMode } from './dto';
 import { GameResponse } from './models';
@@ -34,7 +35,23 @@ export class GameService {
     private redis: RedisService,
     private gameInitialization: GameInitializationService,
     private gameActionService: GameActionService,
+    private gameSubscriptionService: GameSubscriptionService,
   ) {}
+
+  /**
+   * Опубликовать лобби-событие в ws-подписки (best-effort, не роняет операцию)
+   */
+  private async publishLobby(
+    gameId: string,
+    eventType: string,
+    payload: Record<string, unknown>,
+  ): Promise<void> {
+    try {
+      await this.gameSubscriptionService.publishLobbyEvent(gameId, eventType, payload);
+    } catch (e) {
+      this.logger.warn(`Failed to publish lobby event ${eventType} for game ${gameId}: ${e}`);
+    }
+  }
 
   /**
    * Записать лобби-событие в журнал GameAction (best-effort, не роняет операцию)
@@ -497,6 +514,16 @@ export class GameService {
     // Журналируем присоединение (state ещё нет — seq 0)
     await this.recordLobbyAction(gameId, userId, GameActionType.GAME_JOINED, 0);
 
+    // Уведомляем подписчиков лобби (хост видит вошедшего без поллинга)
+    const joinedUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { username: true },
+    });
+    await this.publishLobby(gameId, 'PLAYER_JOINED', {
+      userId,
+      username: joinedUser?.username,
+    });
+
     return await this.getGame(gameId);
   }
 
@@ -599,6 +626,9 @@ export class GameService {
     await this.invalidateGameCache(gameId);
     await this.invalidateGamesListForBoth(game.hostId, game.opponentId);
     await this.invalidateAvailableGamesCache();
+
+    // Уведомляем оставшегося подписчика лобби
+    await this.publishLobby(gameId, 'PLAYER_LEFT', { userId });
   }
 
   /**
@@ -715,6 +745,9 @@ export class GameService {
     await this.recordLobbyAction(gameId, userId, GameActionType.GAME_ABORTED, abortSeq, {
       reason,
     });
+
+    // Уведомляем подписчиков gameEnded (прерывание = конец игры без победителя)
+    await this.publishLobby(gameId, 'GAME_ENDED', { reason, abortedBy: userId });
 
     return await this.getGame(gameId);
   }
