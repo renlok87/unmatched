@@ -430,41 +430,72 @@ export class GameActionExecutorService {
         // карты валиден: чистые «добор 1 + движение» (правила Unmatched).
         const boostCardId = dto.boostCardId ?? dto.cardId;
 
-        // Валидация с замером времени
-        const validation = await this.metrics.measureValidation('maneuver', () =>
-          this.rulesValidator.validateManeuver(
-            currentState,
-            dto.fighterId,
-            boostCardId,
-            dto.path,
-            userId,
-          ),
-        );
-
-        if (!validation.valid) {
+        // Манёвр двигает ВСЕХ своих бойцов (C3): moves[] — несколько ходов,
+        // legacy fighterId+path — один. BOOST добавляется каждому бойцу.
+        const moves: Array<{ fighterId: string; path: Array<{ x: number; y: number }> }> =
+          dto.moves && dto.moves.length > 0
+            ? dto.moves
+            : dto.fighterId && dto.path
+              ? [{ fighterId: dto.fighterId, path: dto.path }]
+              : [];
+        if (moves.length === 0) {
           this.metrics.incrementGameAction('maneuver', undefined, 'error');
-          return {
-            success: false,
-            error: validation.error || 'Maneuver validation failed',
+          return { success: false, error: 'Манёвр без ходов: задай moves[] или fighterId+path' };
+        }
+        const uniqueFighters = new Set(moves.map((m) => m.fighterId));
+        if (uniqueFighters.size !== moves.length) {
+          this.metrics.incrementGameAction('maneuver', undefined, 'error');
+          return { success: false, error: 'Каждый боец двигается в манёвре не более одного раза' };
+        }
+
+        // Ходы применяются ПОСЛЕДОВАТЕЛЬНО: валидация каждого — на состоянии
+        // после предыдущего (освободившиеся/занятые клетки учитываются)
+        let workState: GameState = currentState;
+        for (const mv of moves) {
+          const validation = await this.metrics.measureValidation('maneuver', () =>
+            this.rulesValidator.validateManeuver(
+              workState,
+              mv.fighterId,
+              boostCardId,
+              mv.path,
+              userId,
+            ),
+          );
+          if (!validation.valid) {
+            this.metrics.incrementGameAction('maneuver', undefined, 'error');
+            return {
+              success: false,
+              error: validation.error || 'Maneuver validation failed',
+            };
+          }
+
+          // Конечная клетка пути свободна (промежуточные можно проходить)
+          const dest = mv.path[mv.path.length - 1];
+          const occupied = workState.fighters.some(
+            (f) =>
+              f.id !== mv.fighterId &&
+              f.health > 0 &&
+              f.position.x === dest.x &&
+              f.position.y === dest.y,
+          );
+          if (occupied) {
+            this.metrics.incrementGameAction('maneuver', undefined, 'error');
+            return { success: false, error: `Клетка (${dest.x}, ${dest.y}) занята` };
+          }
+
+          workState = {
+            ...workState,
+            fighters: workState.fighters.map((f) =>
+              f.id === mv.fighterId ? { ...f, position: { x: dest.x, y: dest.y } } : f,
+            ),
           };
         }
 
-        // Выполняем перемещение
-        const movementResult = await this.movementService.executeMovement(
-          currentState,
-          dto.fighterId,
-          dto.path,
-        );
-
-        if (!movementResult.success) {
-          this.metrics.incrementGameAction('maneuver', undefined, 'error');
-          return {
-            success: false,
-            error: movementResult.error || 'Movement failed',
-          };
-        }
-
-        let newState = movementResult.nextState ?? currentState;
+        // Единый +1 к seq за весь манёвр (контракт saveState)
+        let newState: GameState = {
+          ...workState,
+          sequenceNumber: currentState.sequenceNumber + 1,
+        };
 
         // BOOST-карта уходит в сброс + добор 1 карты (правила Unmatched:
         // манёвр = добор + движение). discardCard/drawCards не трогают
@@ -484,8 +515,7 @@ export class GameActionExecutorService {
 
         // Фазу НЕ переключаем (экономика «2 действия за ход»): манёвр — одно из
         // двух действий, после него можно манёврить/атаковать снова из той же фазы.
-        // sequenceNumber уже инкрементирован в movementService.executeMovement —
-        // повторный +1 ломал optimistic lock в saveState (existing+1 ожидается)
+        // Единый +1 к seq уже сделан выше (за весь мульти-ход манёвра).
         newState = {
           ...newState,
           metadata: {

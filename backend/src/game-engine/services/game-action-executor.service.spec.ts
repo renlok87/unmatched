@@ -361,7 +361,7 @@ describe('GameActionExecutorService', () => {
       expect(result.error).toBe('Fighter not found');
     });
 
-    it('should return error when movement fails', async () => {
+    it('отказ: конечная клетка пути занята другим бойцом (C3 — движение без movementService)', async () => {
       const state = createMockGameState({
         phase: GamePhase.ACTION_MANEUVER,
       });
@@ -369,9 +369,9 @@ describe('GameActionExecutorService', () => {
       const dto: ManeuverDto = {
         gameId: 'test-game-1',
         fighterId: 'fighter1',
-        cardId: 'card1',
-        path: [{ x: 5, y: 5 }, { x: 5, y: 6 }],
-      };
+        // fighter2 стоит на (6,5) — конечная клетка занята
+        path: [{ x: 6, y: 5 }],
+      } as ManeuverDto;
 
       const context: ActionContext = {
         userId: 'player1',
@@ -379,15 +379,10 @@ describe('GameActionExecutorService', () => {
         currentState: state,
       };
 
-      jest.spyOn(movementService, 'executeMovement').mockResolvedValue({
-        success: false,
-        error: 'Path blocked',
-      });
-
       const result = await service.executeManeuver(dto, context);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Path blocked');
+      expect(result.error).toContain('занята');
     });
   });
 

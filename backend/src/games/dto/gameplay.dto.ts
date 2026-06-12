@@ -77,16 +77,42 @@ export class PositionInput {
 /**
  * DTO для манёвра (перемещение + розыгрыш карты)
  */
+/** Ход одного бойца внутри манёвра (C3: манёвр двигает всех своих бойцов) */
+@InputType()
+export class ManeuverMoveInput {
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
+  fighterId: string;
+
+  @Field(() => [PositionInput])
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PositionInput)
+  path: PositionInput[];
+}
+
 @InputType()
 export class ManeuverDto {
   @Field(() => String)
   @IsNotEmpty()
   gameId: string;
 
-  @Field(() => String)
-  @IsNotEmpty()
+  /** @deprecated Legacy-одиночный режим: используй moves[] */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
   @IsString()
-  fighterId: string;
+  fighterId?: string;
+
+  /** Ходы НЕСКОЛЬКИХ бойцов одним манёвром (правила Unmatched: манёвр =
+   *  добор 1 + движение всех своих бойцов; BOOST добавляется каждому).
+   *  Если не задано — legacy fighterId+path. */
+  @Field(() => [ManeuverMoveInput], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ManeuverMoveInput)
+  moves?: ManeuverMoveInput[];
 
   /** @deprecated Legacy: без boostCardId трактуется как boost-карта.
    *  Манёвр без карты = чистые «добор 1 + движение» (правила Unmatched). */
@@ -101,11 +127,13 @@ export class ManeuverDto {
   @IsString()
   boostCardId?: string;
 
-  @Field(() => [PositionInput])
+  /** @deprecated Legacy-одиночный режим: используй moves[] */
+  @Field(() => [PositionInput], { nullable: true })
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => PositionInput)
-  path: PositionInput[];
+  path?: PositionInput[];
 }
 
 /**
