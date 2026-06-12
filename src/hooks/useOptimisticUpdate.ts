@@ -1,3 +1,8 @@
+/**
+ * @deprecated B5: optimistic-rollback заменён серверными снапшотами
+ * remoteGameStore (мутация возвращает state, эхо подписки дедуплицируется).
+ * Никем не импортируется — кандидат на удаление отдельным PR.
+ */
 import { useCallback, useRef, useEffect } from 'react';
 import { ApolloError, useApolloClient } from '@apollo/client';
 import type { DocumentNode } from 'graphql';
@@ -86,7 +91,7 @@ export function useOptimisticUpdate<TData = unknown, TVariables = Record<string,
   const client = useApolloClient();
 
   const { gameState: localGameState } = useGameStore();
-  const { serverGameState } = useRemoteGameStore();
+  const { adaptedState: serverAdaptedState } = useRemoteGameStore();
 
   // Храним состояние для отката
   const rollbackRef = useRef<RollbackState | null>(null);
@@ -143,11 +148,7 @@ export function useOptimisticUpdate<TData = unknown, TVariables = Record<string,
 
       // Сохраняем текущее состояние для возможного отката
       const previousState = localGameState || null;
-      const currentState = serverGameState
-        ? convertServerStateToLocal(serverGameState)
-        : localGameState;
-
-      void serverGameState; // помечаем как использованное для будущего использования в optimistic update
+      const currentState = serverAdaptedState ?? localGameState;
 
       if (!currentState) {
         isMutatingRef.current = false;
@@ -241,7 +242,7 @@ export function useOptimisticUpdate<TData = unknown, TVariables = Record<string,
         abortControllerRef.current = null;
       }
     },
-    [mutation, predictState, rollbackState, onSuccess, onError, localGameState, serverGameState, client]
+    [mutation, predictState, rollbackState, onSuccess, onError, localGameState, serverAdaptedState, client]
   );
 
   /**
@@ -280,15 +281,7 @@ export function useOptimisticUpdate<TData = unknown, TVariables = Record<string,
   };
 }
 
-/**
- * Вспомогательная функция для конвертации серверного состояния в локальное
- * TODO: Реализовать полную конвертацию когда будут готовы типы
- */
-function convertServerStateToLocal(_serverState: unknown): GameState | null {
-  // Временная заглушка — в реальности нужна полная конвертация
-  // ServerGameState -> GameState
-  return null;
-}
+// convertServerStateToLocal удалён: адаптация — в lib/gameStateAdapter (B2)
 
 /**
  * Hook для выполнения нескольких мутаций с optimistic updates batch

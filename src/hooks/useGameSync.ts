@@ -1,8 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { apolloClient } from '@/lib/apolloClient';
-import * as gql from '@/gql';
+import * as gql from '@/gql/graphql';
 import { useRemoteGameStore } from '@/store/remoteGameStore';
-import type { GameEvent } from '@/store/remoteGameStore';
 
 interface UseGameSyncOptions {
   /**
@@ -72,7 +71,7 @@ export function useGameSync(
   const {
     connectToGame,
     disconnect,
-    handleGameEvent,
+    handleSubscriptionState,
     setConnectionStatus,
     connectionStatus,
     syncError,
@@ -104,12 +103,15 @@ export function useGameSync(
 
     try {
       const observable = apolloClient.subscribe<{
-        gameStateUpdated: GameEvent;
+        gameStateUpdated: Parameters<typeof handleSubscriptionState>[0];
       }>({
         query: gql.GameStateUpdatedDocument,
         variables: {
           gameId,
-          since: Date.now() / 1000, // timestamp в секундах
+          // ВАЖНО: бэк сравнивает since с sequenceNumber (НЕ timestamp!) —
+          // Date.now()/1000 отфильтровывал ВСЕ события, подписка молчала.
+          // При reconnect lastSequenceNumber отсечёт уже принятые снапшоты.
+          since: useRemoteGameStore.getState().lastSequenceNumber || undefined,
         },
       });
 
@@ -123,8 +125,6 @@ export function useGameSync(
 
           if (!data?.gameStateUpdated) return;
 
-          const event = data.gameStateUpdated;
-
           // Обновляем статус соединения
           if (connectionStatus !== 'connected') {
             setConnectionStatus('connected');
@@ -132,8 +132,8 @@ export function useGameSync(
             onConnected?.(gameId);
           }
 
-          // Обрабатываем событие
-          handleGameEvent(event);
+          // Полный wire-снапшот → applyWireState (guard по seq внутри)
+          handleSubscriptionState(data.gameStateUpdated);
         },
         error: (error: unknown) => {
           // Check if component is still mounted
@@ -198,7 +198,7 @@ export function useGameSync(
     cleanup,
     setConnectionStatus,
     connectionStatus,
-    handleGameEvent,
+    handleSubscriptionState,
     onConnected,
     onDisconnected,
     onError,
@@ -277,6 +277,14 @@ export function useGameSync(
  * }
  * ```
  */
+export interface GameEvent {
+  type: string;
+  gameId: string;
+  sequenceNumber: number;
+  timestamp: number;
+  payload: unknown;
+}
+
 export function useGameEvents(
   gameId: string | null,
   eventTypes: string[] = []

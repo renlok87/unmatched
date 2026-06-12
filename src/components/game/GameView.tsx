@@ -1,57 +1,163 @@
-import { useState } from 'react';
+/**
+ * GameView — основная игровая страница (/game/:gameId) на РЕАЛЬНОМ API.
+ *
+ * Истина — сервер: remoteGameStore грузит wire-состояние, подписка
+ * gameStateUpdated доставляет полные снапшоты, действия — GraphQL-мутации.
+ * Никакой локальной игровой логики; UI лишь подсказывает доступность
+ * (фаза/чей ход/остаток действий), сервер валидирует всё сам.
+ *
+ * Управление кликами:
+ * - свой боец → выбрать (для движения/атаки)
+ * - клетка при выбранном бойце → moveFighter
+ * - своя карта: SCHEME в свой ход → playScheme; ATTACK/VERSATILE → выбрать
+ *   (затем клик по врагу = attack); DEFENSE/VERSATILE в COMBAT у защитника
+ *   → playDefense
+ * - кнопки: End Turn / Pass / Resolve (в COMBAT_RESOLVE у атакующего)
+ */
+
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGameSync } from '@/hooks/useGameSync';
-import { GameHeader } from './GameHeader';
-import { TurnIndicator } from './TurnIndicator';
-import { ActionButtons } from './ActionButtons';
-import { OpponentHandView } from './OpponentHandView';
-import { BoardView } from '@/components/board/BoardView';
-import { PhaserBoard } from '@/components/phaser';
-import { HandView } from '@/components/cards/HandView';
-import { GameControls } from '@/components/controls/GameControls';
+import { useRemoteGameStore } from '@/store/remoteGameStore';
+import { PhaserGame } from '@/phaser/PhaserGame';
+import type { PhaserGameEvent } from '@/phaser/types';
 import { GameErrorBoundary } from './GameErrorBoundary';
-import { GameChat } from '@/components/chat';
-import { VictoryScreen, useVictoryScreen } from './VictoryScreen';
 import { Modal } from '@/design-system/components/Modal';
 import { Button } from '@/design-system/components/Button';
 import './GameView.css';
-
-// Флаг для использования Phaser вместо CSS BoardView
-// TODO: Вынести в фич-тoggles или настройки пользователя
-const USE_PHASER = import.meta.env.VITE_USE_PHASER === 'true' || false;
 
 export const GameView = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
   const { isConnecting, hasError, error, connectionStatus } = useGameSync(gameId || '');
 
+  const {
+    wireState,
+    adaptedState,
+    localUserId,
+    actionError,
+    selectedFighterId,
+    selectedCardId,
+    selectFighter,
+    selectCard,
+    isMyTurn,
+    actionsRemaining,
+    amIDefender,
+    moveFighter,
+    attack,
+    playDefense,
+    playScheme,
+    resolveCombat,
+    endTurn,
+    pass,
+    leaveGame,
+    clearErrors,
+  } = useRemoteGameStore();
+
   const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  // Hook для управления экраном победы
-  const { result: victoryResult, visible: victoryVisible, show: _showVictory, hide: hideVictory } = useVictoryScreen();
+  // Автоскрытие ошибки действия через 5 сек
+  useEffect(() => {
+    if (!actionError) return;
+    const t = setTimeout(clearErrors, 5000);
+    return () => clearTimeout(t);
+  }, [actionError, clearErrors]);
 
-  const handleLeave = () => {
-    setShowLeaveModal(true);
+  const run = async (fn: () => Promise<void>) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await fn();
+    } catch {
+      // actionError уже выставлен стором
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const confirmLeave = () => {
-    navigate('/lobby');
+  const handlePhaserEvent = (event: PhaserGameEvent) => {
+    if (!wireState || !localUserId) return;
+    const phase = wireState.phase;
+
+    switch (event.type) {
+      case 'FIGHTER_CLICKED': {
+        const fighter = wireState.fighters.find((f) => f.id === event.fighterId);
+        if (!fighter) return;
+
+        if (fighter.ownerId === localUserId) {
+          // свой боец: выбрать/снять выбор
+          selectFighter(selectedFighterId === fighter.id ? null : fighter.id);
+          return;
+        }
+
+        // чужой боец: при выбранной атакующей карте и своём бойце — атака
+        const card = selectedCardId
+          ? wireState.handZones[localUserId]?.cards.find((c) => c.id === selectedCardId)
+          : undefined;
+        const myAttacker =
+          selectedFighterId ??
+          wireState.fighters.find((f) => f.ownerId === localUserId && f.type === 'HERO')?.id;
+        if (
+          card &&
+          myAttacker &&
+          isMyTurn() &&
+          actionsRemaining() > 0 &&
+          (card.cardType === 'ATTACK' || card.cardType === 'VERSATILE')
+        ) {
+          void run(() => attack(myAttacker, fighter.id, card.id));
+        }
+        return;
+      }
+
+      case 'SPACE_CLICKED': {
+        if (!selectedFighterId || !isMyTurn() || actionsRemaining() <= 0) return;
+        if (phase !== 'ACTION_MANEUVER' && phase !== 'ACTION_ATTACK') return;
+        void run(() => moveFighter(selectedFighterId, event.position.x, event.position.y));
+        return;
+      }
+
+      case 'CARD_CLICKED': {
+        const card = wireState.handZones[localUserId]?.cards.find(
+          (c) => c.id === event.cardId,
+        );
+        if (!card) return;
+
+        // защита: в COMBAT защитник играет DEFENSE/VERSATILE сразу
+        if (phase === 'COMBAT' && amIDefender()) {
+          if (card.cardType === 'DEFENSE' || card.cardType === 'VERSATILE') {
+            void run(() => playDefense(card.id));
+          }
+          return;
+        }
+
+        if (!isMyTurn() || actionsRemaining() <= 0) return;
+
+        if (card.cardType === 'SCHEME') {
+          void run(() => playScheme(card.id));
+          return;
+        }
+
+        // ATTACK/VERSATILE: выделить карту, цель выбирается кликом по врагу
+        selectCard(selectedCardId === card.id ? null : card.id);
+        return;
+      }
+
+      default:
+        return;
+    }
   };
 
-  const handleSettings = () => {
-    setShowSettingsModal(true);
+  const confirmLeave = async () => {
+    setShowLeaveModal(false);
+    try {
+      await leaveGame();
+    } finally {
+      navigate('/lobby');
+    }
   };
 
-  const handleEndTurn = () => {
-    console.log('End turn mutation will be called here');
-  };
-
-  const handlePass = () => {
-    console.log('Pass mutation will be called here');
-  };
-
-  if (isConnecting) {
+  if (isConnecting || !adaptedState) {
     return (
       <div className="game-view game-view--loading">
         <div className="game-view__loading-spinner" />
@@ -78,64 +184,115 @@ export const GameView = () => {
     );
   }
 
-  const mockTurnNumber = 1;
-  const mockRoundNumber = 1;
+  const phase = wireState?.phase ?? '';
+  const myTurn = isMyTurn();
+  const actions = actionsRemaining();
+  const combat = wireState?.metadata.combatInfo;
+  const isAttacker = Boolean(
+    combat && wireState?.fighters.find((f) => f.id === combat.attackerId)?.ownerId === localUserId,
+  );
+  const gameOver = phase === 'GAME_OVER';
+  const winnerId = wireState?.metadata.winnerId ?? null;
+  const opponent = wireState?.players.find((p) => p.userId !== localUserId);
+  const turnOwnerName =
+    adaptedState.players.find((p) => p.id === wireState?.currentTurnPlayerId)?.name ?? '';
 
   return (
     <GameErrorBoundary>
       <div className="game-view">
-        <GameHeader
-          turnNumber={mockTurnNumber}
-          roundNumber={mockRoundNumber}
-          isConnected={connectionStatus === 'connected'}
-          onSettings={handleSettings}
-          onLeave={handleLeave}
-        />
+        {/* Статус-бар */}
+        <div
+          className="game-view__statusbar"
+          style={{
+            display: 'flex',
+            gap: 16,
+            alignItems: 'center',
+            padding: '8px 16px',
+          }}
+        >
+          <strong>Ход {wireState?.turnCount}</strong>
+          <span>{myTurn ? `Ваш ход · действий: ${actions}` : `Ходит ${turnOwnerName}`}</span>
+          <span style={{ opacity: 0.6 }}>{phase}</span>
+          <span style={{ opacity: 0.6 }}>
+            {connectionStatus === 'connected' ? '🟢 online' : `🟡 ${connectionStatus}`}
+          </span>
+          <span style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+            <Button
+              variant="ghost"
+              disabled={!myTurn || busy || gameOver}
+              onClick={() => void run(pass)}
+            >
+              Пас
+            </Button>
+            <Button
+              variant="ghost"
+              disabled={!myTurn || busy || gameOver}
+              onClick={() => void run(endTurn)}
+            >
+              Конец хода
+            </Button>
+            <Button variant="danger" onClick={() => setShowLeaveModal(true)}>
+              Покинуть
+            </Button>
+          </span>
+        </div>
 
-        <div className="game-view__content">
-          <div className="game-view__top">
-            <OpponentHandView cardCount={5} />
-            <TurnIndicator
-              currentPlayer={{
-                id: '1',
-                userId: 'user1',
-                username: 'Игрок 1',
-              }}
-              isYourTurn={true}
-              timeRemaining={60}
-            />
+        {/* Ошибка действия (сервер отклонил) */}
+        {actionError && (
+          <div
+            style={{
+              background: 'rgba(220, 60, 60, 0.15)',
+              border: '1px solid rgba(220, 60, 60, 0.5)',
+              padding: '6px 16px',
+            }}
+          >
+            ⚠️ {actionError}
           </div>
+        )}
 
-          <div className="game-view__middle">
-            {USE_PHASER ? (
-              <PhaserBoard />
-            ) : (
-              <BoardView interactive={true} />
+        {/* Панель боя */}
+        {combat && !gameOver && (
+          <div
+            style={{
+              background: 'rgba(255, 165, 0, 0.12)',
+              border: '1px solid rgba(255, 165, 0, 0.4)',
+              padding: '8px 16px',
+              display: 'flex',
+              gap: 16,
+              alignItems: 'center',
+            }}
+          >
+            <strong>⚔️ Бой</strong>
+            {phase === 'COMBAT' && amIDefender() && (
+              <span>Вас атакуют! Кликните карту защиты (DEFENSE/VERSATILE) или сразу Resolve.</span>
+            )}
+            {phase === 'COMBAT' && !amIDefender() && <span>Ждём карту защитника…</span>}
+            {phase === 'COMBAT_RESOLVE' && <span>Карты сыграны — резолв боя.</span>}
+            {(isAttacker || phase === 'COMBAT_RESOLVE') && (
+              <Button variant="primary" disabled={busy} onClick={() => void run(resolveCombat)}>
+                Resolve
+              </Button>
+            )}
+            {phase === 'COMBAT' && amIDefender() && (
+              <Button variant="ghost" disabled={busy} onClick={() => void run(resolveCombat)}>
+                Без защиты
+              </Button>
             )}
           </div>
+        )}
 
-          <div className="game-view__bottom">
-            <div className="game-view__hand-section">
-              <HandView />
-            </div>
-
-            <div className="game-view__actions-section">
-              <ActionButtons
-                canEndTurn={true}
-                canPass={true}
-                onEndTurn={handleEndTurn}
-                onPass={handlePass}
-              />
-            </div>
-          </div>
-
-          <div className="game-view__controls">
-            <GameControls />
-          </div>
-
-          <div className="game-view__chat">
-            {gameId && <GameChat gameId={gameId} />}
-          </div>
+        {/* Доска (Phaser) — формат adaptedState, players[0] = локальный игрок */}
+        <div className="game-view__middle" style={{ flex: 1, minHeight: 0 }}>
+          <PhaserGame
+            gameId={adaptedState.id}
+            gameState={adaptedState}
+            selectedFighterId={selectedFighterId}
+            selectedCardId={selectedCardId}
+            highlightedSpaces={[]}
+            onGameEvent={handlePhaserEvent}
+            width={1000}
+            height={640}
+          />
         </div>
 
         <Modal
@@ -149,38 +306,29 @@ export const GameView = () => {
               <Button variant="ghost" onClick={() => setShowLeaveModal(false)}>
                 Отмена
               </Button>
-              <Button variant="danger" onClick={confirmLeave}>
+              <Button variant="danger" onClick={() => void confirmLeave()}>
                 Покинуть
               </Button>
             </div>
           </div>
         </Modal>
 
-        <Modal
-          isOpen={showSettingsModal}
-          onClose={() => setShowSettingsModal(false)}
-          title="Настройки"
-        >
-          <div className="game-view__modal-content">
-            <p>Настройки игры</p>
+        {/* Конец игры */}
+        <Modal isOpen={gameOver} onClose={() => navigate('/lobby')} title="Игра окончена">
+          <div className="game-view__modal-content" style={{ textAlign: 'center' }}>
+            <h2 style={{ fontSize: 40, margin: '8px 0' }}>
+              {winnerId === localUserId ? '🏆 Победа!' : '💀 Поражение'}
+            </h2>
+            <p>
+              {winnerId === localUserId
+                ? 'Все бойцы противника повержены.'
+                : `Победил ${opponent && winnerId === opponent.userId ? turnOwnerName || 'противник' : 'противник'}.`}
+            </p>
+            <Button variant="primary" onClick={() => navigate('/lobby')}>
+              В лобби
+            </Button>
           </div>
         </Modal>
-
-        {/* Экран победы/поражения */}
-        <VictoryScreen
-          result={victoryResult}
-          visible={victoryVisible}
-          playerName="You"
-          opponentName="Opponent"
-          onPlayAgain={() => {
-            hideVictory();
-            navigate('/matchmaking');
-          }}
-          onReturnToLobby={() => {
-            hideVictory();
-            navigate('/lobby');
-          }}
-        />
       </div>
     </GameErrorBoundary>
   );
