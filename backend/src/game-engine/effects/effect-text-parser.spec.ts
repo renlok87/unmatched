@@ -287,6 +287,18 @@ describe('effect-text-parser', () => {
       });
     });
 
+    it("Ms. Marvel: «If Ms. Marvel's space shares no zones…» → NOT_SHARES_ZONE (C1)", () => {
+      const { drafts, unsupported } = after(
+        "If Ms. Marvel's space shares no zones with the opposing fighter, draw 2 cards.",
+      );
+      expect(unsupported).toEqual([]);
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.DRAW_CARD,
+        value: 2,
+        when: { kind: 'NOT_SHARES_ZONE_WITH_OPPONENT' },
+      });
+    });
+
     it('«Winter Soldier recovers 2 health.» → HEAL NAMED', () => {
       const { drafts, unsupported } = after('Winter Soldier recovers 2 health.');
       expect(unsupported).toEqual([]);

@@ -25,9 +25,23 @@ export interface Cell {
   readonly type: 'normal' | 'wall' | 'obstacle' | 'door' | 'zone-line';
   readonly x: number;
   readonly y: number;
+  /** @deprecated Первая зона — legacy-сейвы; полный список в zones */
   readonly zone?: string;
+  /** Все зоны клетки (в Unmatched клетка может быть в 1–2 зонах;
+   *  ranged-атаки и зонные эффекты работают по ПЕРЕСЕЧЕНИЮ зон) */
+  readonly zones?: readonly string[];
   readonly isOpen?: boolean; // Для дверей
   readonly isHighGround?: boolean;
+}
+
+/**
+ * Все зоны клетки: zones, либо legacy-zone, либо пусто.
+ * Единственная точка чтения зон — мультизонность через неё.
+ */
+export function getCellZones(cell: Cell | undefined): readonly string[] {
+  if (!cell) return [];
+  if (cell.zones && cell.zones.length > 0) return cell.zones;
+  return cell.zone != null ? [cell.zone] : [];
 }
 
 /**

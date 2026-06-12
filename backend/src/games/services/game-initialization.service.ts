@@ -330,8 +330,12 @@ export class GameInitializationService {
         type: cell.isObstacle ? 'obstacle' : 'normal',
         x: cell.x,
         y: cell.y,
-        // Engine-модель хранит одну зону на клетку (Cell.zone, board.model.ts) —
-        // мультизонность zones[1..] теряется осознанно, чинится вместе с P3
+        // Мультизонность (C1): полный список зон + legacy-zone (первая)
+        // для старых сейвов; ranged/зонные эффекты работают по пересечению
+        zones:
+          Array.isArray(cell.zones) && cell.zones.length > 0
+            ? cell.zones.map(String)
+            : undefined,
         zone:
           Array.isArray(cell.zones) && cell.zones.length > 0
             ? String(cell.zones[0])

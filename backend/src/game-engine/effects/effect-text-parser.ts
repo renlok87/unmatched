@@ -24,7 +24,7 @@ import {
   EffectTarget,
 } from '../models/card.model';
 
-export const PARSER_VERSION = 1;
+export const PARSER_VERSION = 2;
 
 export interface CardEffectTexts {
   readonly immediately?: string | null;
@@ -170,6 +170,16 @@ function parseSentence(sentence: string): Draft[] | null {
 
   const lost = /^if you lost (?:the |a )?combat,?\s*(.+)$/i.exec(s);
   if (lost) return wrapWhen(lost[1], { kind: 'LOST_COMBAT' });
+
+  // Зонные условия (C1, мультизонность): «If Ms. Marvel's space shares no
+  // zones with the opposing fighter, draw 2 cards.»
+  const noZones =
+    /^if (?:[\w.' ]+?'s space|your fighter'?s? space) shares no zones? with the opposing fighter,?\s*(.+)$/i.exec(s);
+  if (noZones) return wrapWhen(noZones[1], { kind: 'NOT_SHARES_ZONE_WITH_OPPONENT' });
+
+  const sharesZone =
+    /^if (?:[\w.' ]+?'s space|your fighter'?s? space) shares (?:a|any) zones? with the opposing fighter,?\s*(.+)$/i.exec(s);
+  if (sharesZone) return wrapWhen(sharesZone[1], { kind: 'SHARES_ZONE_WITH_OPPONENT' });
 
   // CANCEL_EFFECTS
   if (/^cancel all effects on your opponent'?s card$/i.test(s)) {

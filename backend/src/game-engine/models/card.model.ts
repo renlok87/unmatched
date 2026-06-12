@@ -92,7 +92,10 @@ export type EffectConditionKind =
   | 'HEALTH_AT_MOST'
   // «started this turn in a different space» (Momentous Shift и др.)
   | 'MOVED_THIS_TURN'
-  | 'OPPONENT_IS_HERO';
+  | 'OPPONENT_IS_HERO'
+  // зонные условия (C1, мультизонность): пересечение зон клеток бойцов
+  | 'SHARES_ZONE_WITH_OPPONENT'
+  | 'NOT_SHARES_ZONE_WITH_OPPONENT';
 
 export interface EffectCondition {
   readonly kind: EffectConditionKind;

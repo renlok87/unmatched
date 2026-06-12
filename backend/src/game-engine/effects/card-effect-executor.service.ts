@@ -638,6 +638,16 @@ export class CardEffectExecutorService {
         );
         return when.kind === 'ADJACENT_TO_OPPONENT' ? adjacent : !adjacent;
       }
+      case 'SHARES_ZONE_WITH_OPPONENT':
+      case 'NOT_SHARES_ZONE_WITH_OPPONENT': {
+        // мультизонность (C1): пересечение зон клеток (Ms. Marvel
+        // «shares no zones with the opposing fighter»)
+        const self = state.fighters.find((f) => f.id === context.fighterId);
+        const opp = state.fighters.find((f) => f.id === context.opposingFighterId);
+        if (!self || !opp) return when.kind === 'NOT_SHARES_ZONE_WITH_OPPONENT';
+        const shares = this.adjacencyService.isInSameZone(state, self.position, opp.position);
+        return when.kind === 'SHARES_ZONE_WITH_OPPONENT' ? shares : !shares;
+      }
       case 'MOVED_THIS_TURN': {
         // снапшот позиций пишет advanceTurn → metadata.turnStartPositions
         const startPositions = (state.metadata as { turnStartPositions?: Record<string, { x: number; y: number }> })

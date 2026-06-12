@@ -7,6 +7,7 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import type { BoardState, Position } from '../models';
+import { getCellZones } from '../models';
 
 export interface AdjacentCell {
   readonly position: Position;
