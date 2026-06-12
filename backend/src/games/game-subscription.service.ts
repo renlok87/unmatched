@@ -1,5 +1,7 @@
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { Observable, Observer } from 'rxjs';
+import { PubSub } from 'graphql-subscriptions';
+import { randomUUID } from 'crypto';
 import { RedisService } from '../redis/redis.service';
 import { GameState } from './game-state.service';
 
@@ -12,6 +14,21 @@ export interface GameUpdateEvent {
   gameState: GameState;
   sequenceNumber: number;
   timestamp: number;
+  /** id инстанса-отправителя — guard от self-delivery через Redis broadcast */
+  instanceId?: string;
+}
+
+/**
+ * Форма события для GraphQL-подписок (PubSub.asyncIterableIterator).
+ * Совпадает с GameEventPayload в game-subscription.resolver — filter/resolve
+ * резолвера работают с этой формой без преобразований.
+ */
+export interface GamePubSubEvent {
+  gameId: string;
+  sequenceNumber: number;
+  timestamp: number;
+  eventType: string;
+  payload: GameState;
 }
 
 /**
@@ -25,6 +42,14 @@ export class GameSubscriptionService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(GameSubscriptionService.name);
   private readonly CHANNEL_PREFIX = 'game:updates:';
   private readonly activeSubscriptions = new Map<string, Set<string>>();
+
+  // PubSub для GraphQL-подписок (@Subscription через asyncIterableIterator).
+  // ВАЖНО: НЕ возвращать rxjs Observable из @Subscription — Nest заворачивает
+  // его в lastValueFrom и подписка виснет навсегда (корень бага P2).
+  private readonly pubSub = new PubSub();
+
+  // Уникальный id инстанса — отсечь собственные сообщения из Redis broadcast
+  private readonly instanceId = randomUUID();
 
   // Список callback'ов для каждой игры
   private readonly gameObservers = new Map<string, Set<Observer<GameUpdateEvent>>>();
@@ -52,7 +77,14 @@ export class GameSubscriptionService implements OnModuleInit, OnModuleDestroy {
     this.redis.subscribe('game:updates:broadcast', (message) => {
       try {
         const event = JSON.parse(message) as GameUpdateEvent;
+        // Guard от self-delivery: своё событие уже доставлено напрямую
+        // (notifyLocalObservers + pubSub в publishGameUpdate), иначе дубль
+        if (event.instanceId === this.instanceId) {
+          return;
+        }
         this.notifyLocalObservers(event);
+        // Пробрасываем событие чужого инстанса в локальный PubSub той же формой
+        void this.publishToPubSub(event);
       } catch (error) {
         this.logger.error('Failed to parse Redis pub/sub message:', error);
       }
@@ -129,13 +161,40 @@ export class GameSubscriptionService implements OnModuleInit, OnModuleDestroy {
       gameState,
       sequenceNumber: gameState.sequenceNumber,
       timestamp: Date.now(),
+      instanceId: this.instanceId,
     };
 
     // Уведомляем локальных наблюдателей
     this.notifyLocalObservers(event);
 
+    // Доставляем в GraphQL-подписки этого инстанса (asyncIterableIterator)
+    await this.publishToPubSub(event);
+
     // Публикуем в Redis для других инстансов
     await this.redis.publish('game:updates:broadcast', JSON.stringify(event));
+  }
+
+  /**
+   * Публикация события в локальный PubSub в форме GamePubSubEvent
+   * (форма ожидается filter/resolve функциями GameSubscriptionResolver)
+   */
+  private async publishToPubSub(event: GameUpdateEvent): Promise<void> {
+    const pubSubEvent: GamePubSubEvent = {
+      gameId: event.gameId,
+      sequenceNumber: event.sequenceNumber,
+      timestamp: event.timestamp,
+      eventType: event.eventType,
+      payload: event.gameState,
+    };
+    await this.pubSub.publish(`game.updates.${event.gameId}`, pubSubEvent);
+  }
+
+  /**
+   * AsyncIterator для GraphQL-подписок на события игры.
+   * Именно его (а не Observable!) нужно возвращать из @Subscription.
+   */
+  asyncIteratorForGame(gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+    return this.pubSub.asyncIterableIterator<GamePubSubEvent>(`game.updates.${gameId}`);
   }
 
   /**

@@ -9,6 +9,16 @@ export enum GameActionType {
   PASSED = 'PASSED',
   CARD_PLAYED = 'CARD_PLAYED',
   CARD_DISCARDED = 'CARD_DISCARDED',
+  // Полное зеркало Prisma-enum GameActionType (schema.prisma)
+  FIGHTER_MOVED = 'FIGHTER_MOVED',
+  MANEUVER = 'MANEUVER',
+  PLACED = 'PLACED',
+  ATTACK_INITIATED = 'ATTACK_INITIATED',
+  DEFENSE_PLAYED = 'DEFENSE_PLAYED',
+  COMBAT_RESOLVED = 'COMBAT_RESOLVED',
+  EFFECT_APPLIED = 'EFFECT_APPLIED',
+  SPECIAL_ABILITY = 'SPECIAL_ABILITY',
+  DOOR_TOGGLED = 'DOOR_TOGGLED',
 }
 
 export interface GameAction {
@@ -36,5 +46,5 @@ export interface CreateGameActionDto {
   sequenceNumber: number;
   type: GameActionType;
   playerId: string;
-  metadata: GameActionMetadata;
+  metadata: GameActionMetadata & Record<string, unknown>;
 }

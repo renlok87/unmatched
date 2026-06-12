@@ -6,12 +6,16 @@
  * - since параметр для реконнекта
  * - Специфичные события (attackInitiated, defensePlayed, combatResolved)
  * - Фильтрация приватных данных для каждого подписчика
+ *
+ * ВАЖНО: из @Subscription нужно возвращать AsyncIterator (PubSub.asyncIterableIterator),
+ * НЕ rxjs Observable — Nest заворачивает Observable в lastValueFrom и подписка
+ * виснет навсегда, не доставляя ни одного события.
  */
 
 import { Resolver, Args, Subscription } from '@nestjs/graphql';
-import { ForbiddenException } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { GameSubscriptionService, GameUpdateEvent } from '../game-subscription.service';
+import { ForbiddenException, UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from '../../auth/guards/gql-auth.guard';
+import { GameSubscriptionService, GamePubSubEvent } from '../game-subscription.service';
 import { GameStateService, GameState } from '../game-state.service';
 import {
   GameEvent,
@@ -27,12 +31,13 @@ import { GamePhase } from '../dto';
 
 /**
  * Состояние игры для публикации в подписках
+ * (форма события, которую publishGameUpdate кладёт в PubSub — GamePubSubEvent)
  */
 interface GameEventPayload {
   gameId: string;
   sequenceNumber: number;
   timestamp: number;
-  eventType: GameEventType;
+  eventType: GameEventType | string;
   payload: any;
 }
 
@@ -41,11 +46,7 @@ const resolveGameStateFn =
   (value: GameEventPayload | null, args: any, context: any): GameStateGQL | null => {
     if (!value) return null;
 
-    // Проверяем since параметр
-    if (args?.since !== undefined && value.sequenceNumber <= args.since) {
-      return null;
-    }
-
+    // Фильтрация по userId из JWT-контекста (НЕ из спуфаемого Args userId)
     const userId = getUserIdFn(context);
     const filteredState = gameStateService.filterPrivateData(value.payload, userId);
 
@@ -76,12 +77,23 @@ const resolveGameEventFn =
       };
     }
 
+    // В payload — только безопасное подмножество состояния (без рук игроков!).
+    // Полное состояние клиент получает через gameStateUpdated с per-user фильтрацией.
+    const state = value.payload as GameState | null;
+    const safePayload = state
+      ? JSON.stringify({
+          phase: state.phase,
+          turnCount: state.turnCount,
+          currentTurnPlayerId: state.currentTurnPlayerId,
+        })
+      : null;
+
     return {
-      type: value.eventType,
+      type: value.eventType as GameEventType,
       gameId: value.gameId,
       sequenceNumber: value.sequenceNumber,
       timestamp: new Date(value.timestamp),
-      payload: value.payload,
+      payload: safePayload,
     };
   };
 
@@ -131,23 +143,35 @@ export class GameSubscriptionResolver {
   /**
    * Подписка на обновления состояния игры
    * Поддерживает since параметр для реконнекта
+   *
+   * Фильтр по 'STATE_UPDATED': каждая мутация публикует ДВА события —
+   * 'STATE_UPDATED' из saveState и специфичный eventType из executeMutation;
+   * фильтр даёт ровно одно срабатывание на мутацию.
+   * Проверка since — тоже в filter (resolve с null упал бы на non-nullable типе).
    */
   @Subscription(() => GameStateGQL, {
     name: 'gameStateUpdated',
     filter: (payload: any, variables: any) => {
       if (!payload || !variables) return false;
-      return payload.gameId === variables.gameId;
+      return (
+        payload.gameId === variables.gameId &&
+        payload.eventType === 'STATE_UPDATED' &&
+        (variables.since == null || payload.sequenceNumber > variables.since)
+      );
     },
     resolve: function (this: GameSubscriptionResolver, value: any, args: any, context: any) {
       return this.resolveGameState(value || null, args, context);
     },
   })
+  @UseGuards(GqlAuthGuard)
   gameStateUpdated(
     @Args('gameId') gameId: string,
     @Args('since', { nullable: true }) since?: number,
+    // userId оставлен в сигнатуре для совместимости схемы, но ИГНОРИРУЕТСЯ:
+    // фильтрация приватных данных идёт по context.req.user.id (JWT)
     @Args('userId', { nullable: true }) userId?: string,
-  ): Observable<GameStateGQL> {
-    return this.createGameObservable(gameId, userId || '', since) as any;
+  ): AsyncIterableIterator<GamePubSubEvent> {
+    return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
   /**
@@ -165,8 +189,9 @@ export class GameSubscriptionResolver {
       return this.resolveGameEvent(value || null);
     },
   })
-  attackInitiated(@Args('gameId') gameId: string): Observable<GameEvent> {
-    return this.createGameObservable(gameId, '') as any;
+  @UseGuards(GqlAuthGuard)
+  attackInitiated(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+    return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
   /**
@@ -184,8 +209,9 @@ export class GameSubscriptionResolver {
       return this.resolveGameEvent(value || null);
     },
   })
-  defensePlayed(@Args('gameId') gameId: string): Observable<GameEvent> {
-    return this.createGameObservable(gameId, '') as any;
+  @UseGuards(GqlAuthGuard)
+  defensePlayed(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+    return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
   /**
@@ -203,31 +229,39 @@ export class GameSubscriptionResolver {
       return this.resolveGameEvent(value || null);
     },
   })
-  combatResolved(@Args('gameId') gameId: string): Observable<GameEvent> {
-    return this.createGameObservable(gameId, '') as any;
+  @UseGuards(GqlAuthGuard)
+  combatResolved(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+    return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
   /**
    * Подписка на события смены хода
+   * Никто не публикует 'TURN_CHANGED' — реальный eventType мутации endTurn
+   * это 'TURN_ENDED', принимаем оба
    */
   @Subscription(() => TurnState, {
     name: 'turnChanged',
     filter: (payload: any, variables: any) => {
       if (!payload || !variables) return false;
       return (
-        payload.gameId === variables.gameId && payload.eventType === GameEventType.TURN_CHANGED
+        payload.gameId === variables.gameId &&
+        (payload.eventType === GameEventType.TURN_ENDED ||
+          payload.eventType === GameEventType.TURN_CHANGED)
       );
     },
     resolve: function (this: GameSubscriptionResolver, value: any) {
       return this.resolveTurnState(value || null);
     },
   })
-  turnChanged(@Args('gameId') gameId: string): Observable<TurnState> {
-    return this.createGameObservable(gameId, '') as any;
+  @UseGuards(GqlAuthGuard)
+  turnChanged(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+    return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
   /**
    * Подписка на события присоединения игроков
+   * Known gap: 'PLAYER_JOINED' пока никто не публикует (joinGame происходит в лобби,
+   * где нет GameState для publishGameUpdate) — подписка не виснет, но молчит
    */
   @Subscription(() => GameEvent, {
     name: 'playerJoined',
@@ -241,12 +275,14 @@ export class GameSubscriptionResolver {
       return this.resolveGameEvent(value || null);
     },
   })
-  playerJoined(@Args('gameId') gameId: string): Observable<GameEvent> {
-    return this.createGameObservable(gameId, '') as any;
+  @UseGuards(GqlAuthGuard)
+  playerJoined(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+    return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
   /**
    * Подписка на события выхода игроков
+   * Known gap: 'PLAYER_LEFT' пока никто не публикует (см. playerJoined)
    */
   @Subscription(() => GameEvent, {
     name: 'playerLeft',
@@ -258,12 +294,14 @@ export class GameSubscriptionResolver {
       return this.resolveGameEvent(value || null);
     },
   })
-  playerLeft(@Args('gameId') gameId: string): Observable<GameEvent> {
-    return this.createGameObservable(gameId, '') as any;
+  @UseGuards(GqlAuthGuard)
+  playerLeft(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+    return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
   /**
    * Подписка на события окончания игры
+   * 'GAME_ENDED' публикуется из executeMutation при phase === GAME_OVER
    */
   @Subscription(() => GameEvent, {
     name: 'gameEnded',
@@ -275,84 +313,14 @@ export class GameSubscriptionResolver {
       return this.resolveGameEvent(value || null);
     },
   })
-  gameEnded(@Args('gameId') gameId: string): Observable<GameEvent> {
-    return this.createGameObservable(gameId, '') as any;
+  @UseGuards(GqlAuthGuard)
+  gameEnded(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+    return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
   // ============================================
   // Private Helper Methods
   // ============================================
-
-  /**
-   * Создать Observable для игровых событий
-   */
-  private createGameObservable(gameId: string, userId: string, since?: number): Observable<any> {
-    return new Observable<GameEventPayload>((subscriber) => {
-      // Получаем базовый observable от subscription service
-      const baseObservable = this.subscriptionService.subscribeToGame(
-        gameId,
-        userId,
-        (state: GameState) => {
-          // Фильтруем приватные данные для пользователя
-          return this.gameStateService.filterPrivateData(state, userId);
-        },
-      );
-
-      // Подписываемся и трансформируем события
-      const subscription = baseObservable.subscribe({
-        next: (event: GameUpdateEvent) => {
-          // Проверяем since параметр
-          if (since !== undefined && event.sequenceNumber <= since) {
-            return; // Пропускаем устаревшие события
-          }
-
-          // Определяем тип события на основе изменений в состоянии
-          const eventType = this.determineEventType(event);
-
-          subscriber.next({
-            gameId: event.gameId,
-            sequenceNumber: event.sequenceNumber,
-            timestamp: event.timestamp,
-            eventType,
-            payload: event.gameState,
-          });
-        },
-        error: (err) => subscriber.error(err),
-        complete: () => subscriber.complete(),
-      });
-
-      // Cleanup при отписке
-      return () => {
-        subscription.unsubscribe();
-      };
-    });
-  }
-
-  /**
-   * Определить тип события на основе изменений в состоянии
-   */
-  private determineEventType(event: GameUpdateEvent): GameEventType {
-    const { gameState } = event;
-    if (!gameState) {
-      return GameEventType.FIGHTER_MOVED;
-    }
-
-    const phase = gameState.phase;
-
-    // Определяем тип события по фазе и другим признакам
-    switch (phase) {
-      case GamePhase.COMBAT:
-        return GameEventType.ATTACK_INITIATED;
-      case GamePhase.COMBAT_RESOLVE:
-        return GameEventType.COMBAT_RESOLVED;
-      case GamePhase.TURN_START:
-        return GameEventType.TURN_CHANGED;
-      case GamePhase.TURN_END:
-        return GameEventType.TURN_ENDED;
-      default:
-        return GameEventType.FIGHTER_MOVED;
-    }
-  }
 
   /**
    * Получить userId из контекста

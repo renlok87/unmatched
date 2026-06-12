@@ -19,21 +19,19 @@ import depthLimit from 'graphql-depth-limit';
         subscriptions: {
           'graphql-ws': true,
         },
-        context: ({ req, connection }: { req?: any; connection?: any }) => {
-          // Обработка WebSocket соединений
-          if (connection) {
-            // Извлекаем токен из connectionParams
-            const authToken = connection.context?.token || connection.context?.Authorization;
-            return {
-              req: {
-                headers: {
-                  authorization: authToken,
-                },
-              },
-              isSubscription: true,
-            };
+        context: (ctx: any) => {
+          // graphql-ws вызывает context-фабрику с { connectionParams, extra, ... },
+          // а не с legacy { connection } из subscriptions-transport-ws
+          if (ctx?.connectionParams || ctx?.extra?.request) {
+            const p = ctx.connectionParams || {};
+            const raw = p.authorization || p.Authorization || p.token;
+            const authorization =
+              raw && !String(raw).startsWith('Bearer') ? `Bearer ${raw}` : raw;
+            // Форма req.headers.authorization — её ждут GqlAuthGuard + passport-jwt
+            return { req: { headers: { authorization } }, isSubscription: true };
           }
-          return { req, isSubscription: false };
+          // Обычный HTTP-запрос
+          return { req: ctx.req, isSubscription: false };
         },
         // Validation rules для безопасности
         validationRules: [
