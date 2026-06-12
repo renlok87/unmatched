@@ -16,6 +16,7 @@
 import { create } from 'zustand';
 import { gql as apolloGql } from '@apollo/client';
 import { apolloClient } from '@/lib/apolloClient';
+import { useAuthStore } from '@/store/authStore';
 import * as gql from '@/gql/graphql';
 import {
   adaptToLocal,
@@ -121,6 +122,11 @@ interface RemoteGameState {
   clearErrors: () => void;
 }
 
+/** id текущего юзера: authStore (источник истины) с фоллбеком на localStorage */
+function currentUserId(): string | null {
+  return useAuthStore.getState().user?.id ?? localStorage.getItem('userId');
+}
+
 const emptyRefs = (): AdapterRefs => ({ usernames: {}, heroAssets: {}, board: null });
 
 export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
@@ -143,7 +149,7 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
       syncError: null,
       isSyncing: true,
       currentGameId: gameId,
-      localUserId: localStorage.getItem('userId'),
+      localUserId: currentUserId(),
     });
 
     try {
@@ -257,7 +263,7 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
       decks: wire.decks ?? state.wireState?.decks,
       discardPiles: wire.discardPiles ?? state.wireState?.discardPiles,
     };
-    const localUserId = state.localUserId ?? localStorage.getItem('userId') ?? '';
+    const localUserId = state.localUserId ?? currentUserId() ?? '';
     set({
       wireState: merged,
       adaptedState: adaptToLocal(merged, state.refs, localUserId),

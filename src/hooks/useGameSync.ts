@@ -99,7 +99,9 @@ export function useGameSync(
 
     cleanup();
 
-    setConnectionStatus('connecting');
+    // НЕ сбрасываем статус в 'connecting': initial load уже завершился
+    // ('connected' от connectToGame), а первое событие подписки придёт
+    // только при чьём-то ходе — UI висел бы в вечном спиннере
 
     try {
       const observable = apolloClient.subscribe<{
@@ -125,8 +127,10 @@ export function useGameSync(
 
           if (!data?.gameStateUpdated) return;
 
-          // Обновляем статус соединения
-          if (connectionStatus !== 'connected') {
+          // Обновляем статус соединения (через getState — connectionStatus
+          // в deps subscribe вызывал пересоздание подписки и цикл
+          // connectToGame → ре-маунт Phaser)
+          if (useRemoteGameStore.getState().connectionStatus !== 'connected') {
             setConnectionStatus('connected');
             reconnectAttemptsRef.current = 0;
             onConnected?.(gameId);
@@ -193,11 +197,13 @@ export function useGameSync(
       const errorObj = error instanceof Error ? error : new Error(String(error));
       onError?.(errorObj);
     }
+    // ВАЖНО: НЕ добавлять connectionStatus в deps — пересоздание subscribe
+    // перезапускало главный effect (connectToGame) по кругу
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     gameId,
     cleanup,
     setConnectionStatus,
-    connectionStatus,
     handleSubscriptionState,
     onConnected,
     onDisconnected,

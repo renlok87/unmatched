@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRoomStore } from '@/store/roomStore';
 import { useHeroSelectionStore } from '@/store/heroSelectionStore';
+import { useAuthStore } from '@/store/authStore';
 import { PlayerSlots } from './PlayerSlots';
 import { ReadyStatus } from './ReadyStatus';
 import { RoomChat } from './RoomChat';
@@ -125,7 +126,7 @@ export const RoomView: React.FC = () => {
     );
   }
 
-  const currentUserId = localStorage.getItem('userId');
+  const currentUserId = useAuthStore.getState().user?.id ?? localStorage.getItem('userId');
   const currentPlayer = game.players.find((p) => p.userId === currentUserId);
   const isReady = currentPlayer?.isReady || false;
   const myHeroId = currentPlayer?.heroId ?? null;
