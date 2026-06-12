@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { gql as apolloGql } from '@apollo/client';
+import { apolloClient } from '@/lib/apolloClient';
 import { useRoomStore } from '@/store/roomStore';
-import { useHeroSelectionStore } from '@/store/heroSelectionStore';
 import { useAuthStore } from '@/store/authStore';
 import { PlayerSlots } from './PlayerSlots';
 import { ReadyStatus } from './ReadyStatus';
@@ -33,16 +34,24 @@ export const RoomView: React.FC = () => {
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
   const [selectingHeroId, setSelectingHeroId] = useState<string | null>(null);
-
-  const {
-    heroes,
-    loadHeroes,
-    selectHeroOnServer,
-  } = useHeroSelectionStore();
+  // Герои с Prisma-идентификаторами (selectHero ждёт cuid; контентный
+  // запрос `heroes` отдаёт id = ИМЯ героя и для выбора не годится)
+  const [heroes, setHeroes] = useState<Array<{ id: string; name: string }>>([]);
 
   useEffect(() => {
     mount();
-    loadHeroes();
+    apolloClient
+      .query<{ heroList: { items: Array<{ id: string; name: string }> } }>({
+        query: apolloGql`
+          query RoomHeroList {
+            heroList(limit: 200) {
+              items { id name }
+            }
+          }
+        `,
+      })
+      .then(({ data }) => setHeroes(data.heroList.items))
+      .catch((err) => console.error('Failed to load hero list:', err));
 
     if (gameId) {
       loadRoom(gameId);
@@ -70,7 +79,17 @@ export const RoomView: React.FC = () => {
     if (!gameId) return;
     setSelectingHeroId(heroId);
     try {
-      await selectHeroOnServer(gameId, heroId);
+      await apolloClient.mutate({
+        mutation: apolloGql`
+          mutation RoomSelectHero($gameId: String!, $heroId: String!) {
+            selectHero(gameId: $gameId, heroId: $heroId) {
+              id
+              players { userId heroId }
+            }
+          }
+        `,
+        variables: { gameId, heroId },
+      });
       await loadRoom(gameId);
     } catch (err) {
       console.error('Failed to select hero:', err);

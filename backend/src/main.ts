@@ -89,7 +89,11 @@ async function bootstrap() {
         res.setHeader('Access-Control-Allow-Origin', origin);
       }
       res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+      // X-Idempotency-Key шлёт фронт (roomStore setReady/selectHero)
+      res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Authorization, X-Requested-With, X-Idempotency-Key, apollo-require-preflight',
+      );
       res.setHeader('Access-Control-Allow-Credentials', 'true');
       res.sendStatus(204);
       return;
@@ -117,6 +121,14 @@ async function bootstrap() {
       }
     },
     credentials: true,
+    // Фронт шлёт X-Idempotency-Key (roomStore: setReady/selectHero) —
+    // без явного списка preflight режет запрос (Failed to fetch)
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Idempotency-Key',
+      'apollo-require-preflight',
+    ],
   });
 
   const port = process.env.PORT || 3000;
