@@ -39,53 +39,9 @@ function shuffle<T>(array: readonly T[]): T[] {
 export class DeckManagementService {
   private readonly logger = new Logger(DeckManagementService.name);
 
-  /**
-   * Инициализация колоды героя при setup
-   * @param state Текущее состояние игры
-   * @param userId ID пользователя
-   * @param heroId ID героя
-   * @returns Обновленное состояние с инициализированной колодой
-   */
-  async initializeDeck(
-    state: GameState,
-    userId: string,
-    heroId: string,
-  ): Promise<GameState> {
-    this.logger.debug(`Initializing deck for user ${userId}, hero ${heroId}`);
-
-    // В реальном коде здесь будет загрузка карт героя из БД
-    // Сейчас создаём заглушки
-    const heroCards = this.createHeroCards(heroId);
-
-    // Перетасовываем колоду
-    const shuffledDeck = shuffle(heroCards);
-
-    // Создаём состояние колоды
-    const deckState: DeckState = {
-      cards: heroCards,
-      drawPile: shuffledDeck,
-      topCard: shuffledDeck[0],
-    };
-
-    // Создаём пустую зону руки
-    const handZone: HandZone = {
-      cards: [],
-      maxSize: 5, // Стандартный лимит руки
-    };
-
-    // Обновляем состояние (создаём новый объект для иммутабельности)
-    return {
-      ...state,
-      decks: {
-        ...state.decks,
-        [userId]: deckState,
-      },
-      handZones: {
-        ...state.handZones,
-        [userId]: handZone,
-      },
-    };
-  }
+  // initializeDeck/createHeroCards удалены (A8): были заглушками с
+  // hardcoded-картами; реальные колоды раздаёт GameInitializationService
+  // из карт героя в БД (hero.cards × count)
 
   /**
    * Вытягивание указанного количества карт
@@ -328,68 +284,4 @@ export class DeckManagementService {
     return handZone.cards.length < handZone.maxSize;
   }
 
-  /**
-   * Создаёт карты героя (заглушка для разработки)
-   * В реальном коде будет загрузка из БД
-   */
-  private createHeroCards(heroId: string): Card[] {
-    const baseCards: Card[] = [
-      {
-        id: `${heroId}-card-1`,
-        cardId: 'attack-1',
-        name: 'Attack',
-        nameEn: 'Attack',
-        nameRu: 'Атака',
-        cardType: 'ATTACK' as any,
-        attackValue: 3,
-        defenseValue: 2,
-      },
-      {
-        id: `${heroId}-card-2`,
-        cardId: 'defense-1',
-        name: 'Defense',
-        nameEn: 'Defense',
-        nameRu: 'Защита',
-        cardType: 'DEFENSE' as any,
-        attackValue: 2,
-        defenseValue: 4,
-      },
-      {
-        id: `${heroId}-card-3`,
-        cardId: 'maneuver-1',
-        name: 'Maneuver',
-        nameEn: 'Maneuver',
-        nameRu: 'Манёвр',
-        cardType: 'SCHEME' as any,
-      },
-      {
-        id: `${heroId}-card-4`,
-        cardId: 'attack-2',
-        name: 'Strong Attack',
-        nameEn: 'Strong Attack',
-        nameRu: 'Сильная атака',
-        cardType: 'ATTACK' as any,
-        attackValue: 5,
-        defenseValue: 1,
-      },
-      {
-        id: `${heroId}-card-5`,
-        cardId: 'defense-2',
-        name: 'Block',
-        nameEn: 'Block',
-        nameRu: 'Блок',
-        cardType: 'DEFENSE' as any,
-        attackValue: 1,
-        defenseValue: 5,
-      },
-      // Добавляем ещё карт для полноценной колоды
-    ];
-
-    // Дублируем базовые карты для создания колоды из 12 карт
-    return [
-      ...baseCards,
-      ...baseCards.map(c => ({ ...c, id: `${c.id}-copy` })),
-      ...baseCards.slice(0, 2).map(c => ({ ...c, id: `${c.id}-copy2` })),
-    ];
-  }
 }

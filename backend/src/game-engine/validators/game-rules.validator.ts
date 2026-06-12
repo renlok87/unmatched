@@ -586,14 +586,18 @@ export class GameRulesValidator {
 
 /**
  * Матчит ли банер карты бойца: «Harpy» = «Harpy 2» (срез числового суффикса),
- * «Arthur» = «King Arthur» (банер — слово в полном имени). Регистронезависимо.
+ * «Arthur» = «King Arthur» (банер — слово в полном имени),
+ * «Harpy» = «Harpies» (нормализация числа: банеры в единственном,
+ * сайдкики в БД — во множественном). Регистронезависимо.
  */
 export function bannerAllows(banner: string, fighter: { name: string }): boolean {
-  const b = banner.trim().toLowerCase();
+  // нормализация множественного числа: harpies → harpy, wolves → wolf, dogs → dog
+  const sing = (w: string) =>
+    w.replace(/ies$/, 'y').replace(/ves$/, 'f').replace(/([^s])s$/, '$1');
+  const b = sing(banner.trim().toLowerCase());
   const full = fighter.name.trim().toLowerCase();
   const base = full.replace(/\s+\d+$/, '');
-  if (b === full || b === base) return true;
+  if (b === sing(full) || b === sing(base)) return true;
   // банер как целое слово внутри имени ('arthur' в 'king arthur')
-  const words = base.split(/\s+/);
-  return words.includes(b);
+  return base.split(/\s+/).some((w) => sing(w) === b);
 }

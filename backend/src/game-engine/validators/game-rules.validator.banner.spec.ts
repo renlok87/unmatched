@@ -50,6 +50,12 @@ describe('bannerAllows', () => {
     expect(bannerAllows('Merlin', fighter('f1', 'King Arthur'))).toBe(false);
   });
 
+  it("нормализация числа: банер 'Harpy' матчит сайдкика 'Harpies' (реальные данные БД)", () => {
+    expect(bannerAllows('Harpy', fighter('f1', 'Harpies'))).toBe(true);
+    expect(bannerAllows('Harpy', fighter('f1', 'Harpies 2'))).toBe(true);
+    expect(bannerAllows('Wolf', fighter('f1', 'Wolves'))).toBe(true);
+  });
+
   it('регистронезависимо', () => {
     expect(bannerAllows('medusa', fighter('f1', 'Medusa'))).toBe(true);
   });

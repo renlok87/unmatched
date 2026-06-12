@@ -12,6 +12,7 @@
  */
 
 import { Test, TestingModule } from '@nestjs/testing';
+import { MetricsService } from '../../metrics/metrics.service';
 import { CombatResolverService, CombatResult } from './combat-resolver.service';
 import {
   HeroAbilityRegistry,
@@ -235,6 +236,7 @@ describe('CombatResolverService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CombatResolverService,
+        { provide: MetricsService, useValue: { measureServiceDuration: jest.fn((_n, _c, fn) => fn()), measureCombat: jest.fn((_a, _d, fn) => fn()), incrementError: jest.fn() } },
         {
           provide: HeroAbilityRegistry,
           useFactory: () => createMockAbilityRegistry(),
@@ -396,6 +398,7 @@ describe('CombatResolverService', () => {
       const module: TestingModule = await Test.createTestingModule({
         providers: [
           CombatResolverService,
+          { provide: MetricsService, useValue: { measureServiceDuration: jest.fn((_n, _c, fn) => fn()), measureCombat: jest.fn((_a, _d, fn) => fn()), incrementError: jest.fn() } },
           {
             provide: HeroAbilityRegistry,
             useFactory: () => createMockAbilityRegistry(),
@@ -1100,7 +1103,9 @@ describe('CombatResolverService', () => {
         ownerId: 'test',
       };
 
-      (mockAbilityRegistry.applyCombatModifiers as jest.Mock).mockReturnValue([negativeModifier]);
+      (mockAbilityRegistry.applyCombatModifiers as jest.Mock).mockImplementation(
+        (_h: string, _c: unknown, _f: unknown, role: string) => (role === 'attacker' ? [negativeModifier] : []),
+      );
 
       const result = await service.resolveCombat(
         state,
@@ -1292,7 +1297,9 @@ describe('CombatResolverService', () => {
 
       const hugeModifier = createValueModifier(1000);
 
-      (mockAbilityRegistry.applyCombatModifiers as jest.Mock).mockReturnValue([hugeModifier]);
+      (mockAbilityRegistry.applyCombatModifiers as jest.Mock).mockImplementation(
+        (_h: string, _c: unknown, _f: unknown, role: string) => (role === 'attacker' ? [hugeModifier] : []),
+      );
 
       const result = await service.resolveCombat(
         state,

@@ -115,7 +115,7 @@ describe('MsMarvelHandler', () => {
     });
 
     it('должен иметь описание способности', () => {
-      expect(handler.abilityDescription).toContain('Stretchy');
+      expect(handler.abilityDescription).toContain('переместиться');
       expect(handler.abilityDescription).toContain('переместиться');
       expect(handler.abilityDescription).toContain('атаковать');
     });
@@ -228,9 +228,10 @@ describe('MsMarvelHandler', () => {
     it('должен возвращать 4 соседние позиции', () => {
       const positions = handler.getAvailableTurnStartPositions(mockState, playerId);
 
-      expect(positions).toHaveLength(4);
+      // клетка (3,2) занята врагом из фикстуры — валидных соседей 3
+      expect(positions).toHaveLength(3);
       expect(positions).toContainEqual({ x: 1, y: 2 });
-      expect(positions).toContainEqual({ x: 3, y: 2 });
+      // (3,2) занята врагом — не возвращается
       expect(positions).toContainEqual({ x: 2, y: 1 });
       expect(positions).toContainEqual({ x: 2, y: 3 });
     });

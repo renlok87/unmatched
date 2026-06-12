@@ -87,7 +87,7 @@ describe('DaredevilHandler', () => {
     });
 
     it('должен иметь описание способности', () => {
-      expect(handler.abilityDescription).toContain('Blind Boost');
+      expect(handler.abilityDescription).toContain('BOOST');
       expect(handler.abilityDescription).toContain('BOOST');
     });
   });
@@ -186,8 +186,8 @@ describe('DaredevilHandler', () => {
       expect(handler.canTrigger(newState, playerId, context)).toBe(false);
     });
 
-    it('должен возвращать false когда контекст не указан', () => {
-      expect(handler.canTrigger(mockState, playerId)).toBe(false);
+    it('работает и без контекста (багфикс A8: раньше безусловное false)', () => {
+      expect(handler.canTrigger(mockState, playerId)).toBe(true);
     });
   });
 

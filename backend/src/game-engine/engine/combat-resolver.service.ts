@@ -92,8 +92,9 @@ export class CombatResolverService {
       const attackModifier = this.sumValueModifiers(attackerModifiers);
       const defenseModifier = this.sumValueModifiers(defenderModifiers);
 
-      const finalAttack = baseAttackValue + attackModifier;
-      const finalDefense = baseDefenseValue + defenseModifier;
+      // Значение карты с модификаторами не может уйти в минус
+      const finalAttack = Math.max(0, baseAttackValue + attackModifier);
+      const finalDefense = Math.max(0, baseDefenseValue + defenseModifier);
 
       // Вычисляем урон
       let attackerDamage = 0;
@@ -183,6 +184,7 @@ export class CombatResolverService {
         return {
           ...fighter,
           health: newHealth,
+          isDefeated: newHealth <= 0,
         };
       }
       if (fighter.id === defenderId) {
@@ -190,6 +192,7 @@ export class CombatResolverService {
         return {
           ...fighter,
           health: newHealth,
+          isDefeated: newHealth <= 0,
         };
       }
       return fighter;
@@ -246,10 +249,14 @@ export class CombatResolverService {
         return card.attackValue;
       }
     }
-    // Ищем в колодах
+    // Ищем в колодах (полный список + стопка добора) и сбросах —
+    // сыгранные карты боя уже лежат в discardPiles
     for (const playerId of Object.keys(state.decks)) {
       const deck = state.decks[playerId];
-      const card = deck.cards.find(c => c.id === cardId);
+      const card =
+        deck.cards.find(c => c.id === cardId) ??
+        deck.drawPile.find(c => c.id === cardId) ??
+        (state.discardPiles[playerId] ?? []).find(c => c.id === cardId);
       if (card && card.attackValue !== undefined) {
         return card.attackValue;
       }
@@ -269,10 +276,13 @@ export class CombatResolverService {
         return card.defenseValue;
       }
     }
-    // Ищем в колодах
+    // Ищем в колодах (полный список + стопка добора) и сбросах
     for (const playerId of Object.keys(state.decks)) {
       const deck = state.decks[playerId];
-      const card = deck.cards.find(c => c.id === cardId);
+      const card =
+        deck.cards.find(c => c.id === cardId) ??
+        deck.drawPile.find(c => c.id === cardId) ??
+        (state.discardPiles[playerId] ?? []).find(c => c.id === cardId);
       if (card && card.defenseValue !== undefined) {
         return card.defenseValue;
       }

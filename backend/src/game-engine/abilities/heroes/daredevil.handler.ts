@@ -51,35 +51,28 @@ export class DaredevilHandler implements IHeroAbilityHandler, AbilityChecker {
    * @param context Контекст боя
    * @returns true, если условие выполнено
    */
-  canTrigger(state: GameState, playerId: string, context?: ExtendedCombatContext): boolean {
-    // Проверяем, что это бой Daredevil
-    if (context) {
-      const player = state.players.find((p) => p.userId === playerId);
-      if (!player || player.heroId !== this.heroId) {
-        return false;
-      }
-
-      // Проверяем количество карт в руке
-      const handZone = state.handZones[playerId];
-      if (!handZone) {
-        return false;
-      }
-
-      const cardCount = handZone.cards.length;
-      if (cardCount > BLIND_BOOST_MAX_CARDS) {
-        return false;
-      }
-
-      // Проверяем, что в колоде есть карты
-      const deck = state.decks[playerId];
-      if (!deck || deck.drawPile.length === 0) {
-        return false;
-      }
-
-      return true;
+  canTrigger(state: GameState, playerId: string, _context?: ExtendedCombatContext): boolean {
+    // Багфикс A8: раньше без context возвращалось безусловное false —
+    // executeBlindBoost никогда не срабатывал. Условия проверяются всегда.
+    // Герой игрока — Daredevil: боец несёт heroSlug (прод) либо players.heroId
+    // равен слагу (легаси/тесты) — принимаем оба варианта
+    const player = state.players.find((p) => p.userId === playerId);
+    const fighter = state.fighters.find(
+      (f) => f.ownerId === playerId && (f.heroSlug === this.heroId || f.heroId === this.heroId),
+    );
+    if (!fighter && player?.heroId !== this.heroId) {
+      return false;
     }
 
-    return false;
+    // Рука ≤ 2 карт (условие способности)
+    const handZone = state.handZones[playerId];
+    if (!handZone || handZone.cards.length > BLIND_BOOST_MAX_CARDS) {
+      return false;
+    }
+
+    // В колоде есть карты
+    const deck = state.decks[playerId];
+    return Boolean(deck && deck.drawPile.length > 0);
   }
 
   /**
