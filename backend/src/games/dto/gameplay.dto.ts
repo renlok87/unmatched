@@ -88,10 +88,18 @@ export class ManeuverDto {
   @IsString()
   fighterId: string;
 
-  @Field(() => String)
-  @IsNotEmpty()
+  /** @deprecated Legacy: без boostCardId трактуется как boost-карта.
+   *  Манёвр без карты = чистые «добор 1 + движение» (правила Unmatched). */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
   @IsString()
-  cardId: string;
+  cardId?: string;
+
+  /** Сброс карты из руки → +boostValue к очкам движения этого манёвра */
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  boostCardId?: string;
 
   @Field(() => [PositionInput])
   @IsArray()

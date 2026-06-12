@@ -145,34 +145,6 @@ export class ValueModifierService {
     };
   }
 
-  /**
-   * Применить эффекты карты к состоянию игры
-   * Используется в GameActionExecutorService
-   *
-   * @param state - Текущее состояние игры
-   * @param cardId - ID карты
-   * @param fighterId - ID бойца (для применения эффектов)
-   * @returns Обновлённое состояние игры
-   */
-  async applyCardEffects(
-    state: any,
-    cardId: string,
-    fighterId: string,
-  ): Promise<any> {
-    // TODO: Реализовать применение эффектов карт
-    // В текущей версии - просто возвращаем состояние
-    // В будущем будет интеграция с CardEffectExecutorService
-
-    this.logger.debug(`Applying card effects for card ${cardId} on fighter ${fighterId}`);
-
-    // Если на карте есть модификаторы, применяем их
-    // const card = this.findCardInState(state, cardId);
-    // if (card?.effects) {
-    //   for (const effect of card.effects) {
-    //     await this.applyEffect(state, effect, fighterId);
-    //   }
-    // }
-
-    return state;
-  }
+  // applyCardEffects удалён: был мёртвым стабом (возвращал state как есть);
+  // эффекты карт исполняет CardEffectExecutorService (A3/A4)
 }

@@ -74,7 +74,7 @@ const HELP_TEXT = `Команды (2 действия за ход; после 2-
   state raw        — полный JSON состояния
   hand [p1|p2]     — рука игрока (карты с индексами c0, c1, ...)
   move <f> <x> <y>           — переместить бойца (f0/f1... или id, тратит 1 действие)
-  maneuver <f> <c> <x>,<y> [<x>,<y> ...] — манёвр: карта + путь (тратит 1 действие)
+  maneuver <f> [<c>|-] <x>,<y> [...]     — манёвр: добор + движение; карта = BOOST к ходам (опц.)
   attack <f-атакующий> <f-цель> <c>      — атака картой (тратит 1 действие, можно первым)
   scheme <c>       — разыграть scheme-карту (тратит 1 действие)
   defense <c>      — карта защиты (за защищающегося)
@@ -550,20 +550,36 @@ export const GameTester: React.FC = () => {
           break;
         }
         case 'maneuver': {
-          const [, fRef, cRef, ...pathParts] = parts;
-          if (!fRef || !cRef || pathParts.length === 0) {
-            throw new Error('maneuver <f> <c> <x>,<y> [<x>,<y> ...]');
+          // maneuver <f> [<boostCard>|-] <x>,<y> ... — boost-карта опциональна
+          // ('-' или сразу путь = манёвр без карты: чистые «добор + движение»)
+          const [, fRef, second, ...rest] = parts;
+          if (!fRef || !second) {
+            throw new Error('maneuver <f> [<boostCard>|-] <x>,<y> [<x>,<y> ...]');
           }
           const slot = resolveActor('maneuver');
           const f = resolveFighter(fRef);
-          const card = resolveCard(slot, cRef);
+          const secondIsPath = second.includes(',');
+          const boostRef = secondIsPath || second === '-' ? null : second;
+          const pathParts = secondIsPath ? [second, ...rest] : rest;
+          if (pathParts.length === 0) {
+            throw new Error('maneuver: путь пуст — укажи хотя бы одну точку <x>,<y>');
+          }
+          const boostCard = boostRef ? resolveCard(slot, boostRef) : null;
           const path = pathParts.map((p) => {
             const [px, py] = p.split(',').map(Number);
             if (Number.isNaN(px) || Number.isNaN(py)) throw new Error(`Плохая точка пути: ${p}`);
             return { x: px, y: py };
           });
-          await runAction(slot, `maneuver(${f.name}, ${card.name}, путь ${pathParts.join(' ')})`, MANEUVER, {
-            input: { gameId: gameIdRef.current!, fighterId: f.id, cardId: card.id, path },
+          const label = boostCard
+            ? `maneuver(${f.name}, BOOST ${boostCard.name}, путь ${pathParts.join(' ')})`
+            : `maneuver(${f.name}, без карты, путь ${pathParts.join(' ')})`;
+          await runAction(slot, label, MANEUVER, {
+            input: {
+              gameId: gameIdRef.current!,
+              fighterId: f.id,
+              boostCardId: boostCard?.id ?? null,
+              path,
+            },
           }, 'maneuver');
           break;
         }

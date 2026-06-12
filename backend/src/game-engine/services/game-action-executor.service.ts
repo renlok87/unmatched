@@ -273,12 +273,17 @@ export class GameActionExecutorService {
       try {
         const { userId, currentState, gameId } = context;
 
+        // BOOST-карта манёвра: явный boostCardId, либо legacy cardId
+        // (старые клиенты слали cardId — трактуем как boost). Манёвр без
+        // карты валиден: чистые «добор 1 + движение» (правила Unmatched).
+        const boostCardId = dto.boostCardId ?? dto.cardId;
+
         // Валидация с замером времени
         const validation = await this.metrics.measureValidation('maneuver', () =>
           this.rulesValidator.validateManeuver(
             currentState,
             dto.fighterId,
-            dto.cardId,
+            boostCardId,
             dto.path,
             userId,
           ),
@@ -307,20 +312,16 @@ export class GameActionExecutorService {
           };
         }
 
-        // Применяем эффекты карты
         let newState = movementResult.nextState ?? currentState;
-        newState = await this.valueModifier.applyCardEffects(
-          newState,
-          dto.cardId,
-          dto.fighterId,
-        );
 
-        // Сыгранная карта уходит в сброс + добор 1 карты (правила Unmatched:
+        // BOOST-карта уходит в сброс + добор 1 карты (правила Unmatched:
         // манёвр = добор + движение). discardCard/drawCards не трогают
         // sequenceNumber — +1 уже сделан в executeMovement.
-        const playedCard = this.findHandCard(currentState, userId, dto.cardId);
-        if (playedCard) {
-          newState = await this.deckManagement.discardCard(newState, userId, playedCard.id);
+        if (boostCardId) {
+          const playedCard = this.findHandCard(currentState, userId, boostCardId);
+          if (playedCard) {
+            newState = await this.deckManagement.discardCard(newState, userId, playedCard.id);
+          }
         }
         try {
           newState = await this.deckManagement.drawCards(newState, userId, 1);

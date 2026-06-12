@@ -260,7 +260,7 @@ export class GameRulesValidator {
   validateManeuver(
     state: GameState,
     fighterId: string,
-    cardId: string,
+    boostCardId: string | undefined,
     path: readonly Position[],
     userId: string,
   ): ValidationResult {
@@ -278,6 +278,15 @@ export class GameRulesValidator {
       return { valid: false, error: 'Fighter is defeated', code: 'FIGHTER_DEFEATED' };
     }
 
+    // IMMOBILIZE («cannot leave their space this turn»)
+    if (fighter.effects.some((e) => e.type === 'immobilized')) {
+      return {
+        valid: false,
+        error: 'Боец обездвижен до конца хода (эффект карты)',
+        code: 'FIGHTER_IMMOBILIZED',
+      };
+    }
+
     // Проверяем фазу: манёвр разрешён из любой action-фазы (экономика
     // «2 действия за ход»; ACTION_ATTACK — валидная legacy-фаза старых сейвов)
     if (state.phase !== 'ACTION_MANEUVER' && state.phase !== 'ACTION_ATTACK') {
@@ -288,15 +297,19 @@ export class GameRulesValidator {
       };
     }
 
-    // Проверяем, что карта в руке
+    // BOOST-карта (опционально): обязана быть в руке, даёт +boostValue к ходам.
+    // Манёвр БЕЗ карты — валиден (правила Unmatched: добор 1 + движение).
     const hand = state.handZones[userId];
-    if (!hand) {
-      return { valid: false, error: 'Hand not found', code: 'HAND_NOT_FOUND' };
-    }
-
-    const card = hand.cards.find((c) => c.id === cardId || c.cardId === cardId);
-    if (!card) {
-      return { valid: false, error: 'Card not in hand', code: 'CARD_NOT_IN_HAND' };
+    let boostValue = 0;
+    if (boostCardId) {
+      if (!hand) {
+        return { valid: false, error: 'Hand not found', code: 'HAND_NOT_FOUND' };
+      }
+      const card = hand.cards.find((c) => c.id === boostCardId || c.cardId === boostCardId);
+      if (!card) {
+        return { valid: false, error: 'Boost card not in hand', code: 'CARD_NOT_IN_HAND' };
+      }
+      boostValue = card.boostValue ?? 0;
     }
 
     // Проверяем путь
@@ -310,9 +323,8 @@ export class GameRulesValidator {
       }
     }
 
-    // Очки движения: длина пути не больше movement бойца
-    // TODO(boost): при внедрении BOOST-карт в манёвре — allowance = movement + card.boostValue
-    const allowance = getFighterMovement(fighter);
+    // Очки движения: movement бойца + BOOST сброшенной карты
+    const allowance = getFighterMovement(fighter) + boostValue;
     if (path.length > allowance) {
       return {
         valid: false,
