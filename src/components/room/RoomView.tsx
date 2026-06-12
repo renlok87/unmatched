@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRoomStore } from '@/store/roomStore';
+import { useHeroSelectionStore } from '@/store/heroSelectionStore';
 import { PlayerSlots } from './PlayerSlots';
 import { ReadyStatus } from './ReadyStatus';
 import { RoomChat } from './RoomChat';
 import { InviteLink } from './InviteLink';
-import { FighterPlacement, type Fighter, type SpawnZone } from './FighterPlacement';
 import { GameCountdown } from './GameCountdown';
 import { Button } from '@/design-system/components/Button';
 import { Modal } from '@/design-system/components/Modal';
@@ -31,10 +31,17 @@ export const RoomView: React.FC = () => {
 
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [showCountdown, setShowCountdown] = useState(false);
-  const [placedFighters, setPlacedFighters] = useState<Record<string, string>>({});
+  const [selectingHeroId, setSelectingHeroId] = useState<string | null>(null);
+
+  const {
+    heroes,
+    loadHeroes,
+    selectHeroOnServer,
+  } = useHeroSelectionStore();
 
   useEffect(() => {
     mount();
+    loadHeroes();
 
     if (gameId) {
       loadRoom(gameId);
@@ -49,6 +56,27 @@ export const RoomView: React.FC = () => {
       };
     }
   }, [gameId]);
+
+  // Автопереход в игру: хост уходит сам после startGame, не-хост — по
+  // поллингу статуса (бэк ставит IN_PROGRESS после startGame)
+  useEffect(() => {
+    if (game?.status === 'IN_PROGRESS' && gameId) {
+      navigate(`/game/${gameId}`);
+    }
+  }, [game?.status, gameId]);
+
+  const handleSelectHero = async (heroId: string) => {
+    if (!gameId) return;
+    setSelectingHeroId(heroId);
+    try {
+      await selectHeroOnServer(gameId, heroId);
+      await loadRoom(gameId);
+    } catch (err) {
+      console.error('Failed to select hero:', err);
+    } finally {
+      setSelectingHeroId(null);
+    }
+  };
 
   const handleLeaveRoom = async () => {
     if (!gameId) return;
@@ -79,31 +107,6 @@ export const RoomView: React.FC = () => {
     }
   };
 
-  const handlePlaceFighter = (fighterId: string, zoneId: string) => {
-    setPlacedFighters((prev) => ({ ...prev, [fighterId]: zoneId }));
-  };
-
-  const handleRemoveFighter = (fighterId: string) => {
-    setPlacedFighters((prev) => {
-      const next = { ...prev };
-      delete next[fighterId];
-      return next;
-    });
-  };
-
-  const mockFighters: Fighter[] = [
-    { id: '1', name: 'Алиса', type: 'hero', health: 5, maxHealth: 5 },
-    { id: '2', name: 'Белый Кролик', type: 'sidekick', health: 2, maxHealth: 2 },
-  ];
-
-  const mockSpawnZones: SpawnZone[] = [
-    { id: 'zone1', x: 10, y: 40, width: 20, height: 20, color: 'blue', label: 'Зона 1' },
-    { id: 'zone2', x: 40, y: 40, width: 20, height: 20, color: 'green', label: 'Зона 2' },
-    { id: 'zone3', x: 70, y: 40, width: 20, height: 20, color: 'yellow', label: 'Зона 3' },
-  ];
-
-  const allFightersPlaced = mockFighters.every((f) => placedFighters[f.id]);
-
   if (loading && !game) {
     return (
       <div className="room-view room-view--loading">
@@ -125,6 +128,9 @@ export const RoomView: React.FC = () => {
   const currentUserId = localStorage.getItem('userId');
   const currentPlayer = game.players.find((p) => p.userId === currentUserId);
   const isReady = currentPlayer?.isReady || false;
+  const myHeroId = currentPlayer?.heroId ?? null;
+  const heroName = (heroId: string | null) =>
+    heroId ? heroes.find((h) => h.id === heroId)?.name ?? heroId : null;
 
   return (
     <div className="room-view">
@@ -161,25 +167,50 @@ export const RoomView: React.FC = () => {
             mode={game.mode}
             currentUserId={currentUserId}
           />
+          {/* Выбор героя: серверная мутация selectHero; расстановка бойцов
+              серверная (GameInitializationService при startGame) */}
+          <div className="room-view__hero-select">
+            <h3>
+              {myHeroId
+                ? `Ваш герой: ${heroName(myHeroId)}`
+                : 'Выберите героя'}
+            </h3>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
+                gap: 8,
+                maxHeight: 260,
+                overflowY: 'auto',
+              }}
+            >
+              {heroes.map((hero) => {
+                const takenByOther = game.players.some(
+                  (p) => p.heroId === hero.id && p.userId !== currentUserId,
+                );
+                return (
+                  <Button
+                    key={hero.id}
+                    variant={myHeroId === hero.id ? 'success' : 'ghost'}
+                    disabled={takenByOther || selectingHeroId !== null || isReady}
+                    onClick={() => handleSelectHero(hero.id)}
+                  >
+                    {selectingHeroId === hero.id ? '…' : hero.name}
+                  </Button>
+                );
+              })}
+            </div>
+            <p style={{ opacity: 0.7, marginTop: 8 }}>
+              {game.players
+                .map((p) => `${p.username}: ${heroName(p.heroId) ?? '—'}${p.isReady ? ' ✓' : ''}`)
+                .join('  ·  ')}
+            </p>
+          </div>
           <ReadyStatus
             isReady={isReady}
             onToggle={() => setReady(gameId!)}
-            disabled={loading}
+            disabled={loading || !myHeroId}
             allReady={allReady}
-          />
-          <FighterPlacement
-            fighters={mockFighters}
-            spawnZones={mockSpawnZones}
-            placedFighters={placedFighters}
-            onPlaceFighter={handlePlaceFighter}
-            onRemoveFighter={handleRemoveFighter}
-            onConfirm={() => {
-              if (allFightersPlaced) {
-                handleStartGame();
-              }
-            }}
-            isConfirmEnabled={allFightersPlaced}
-            isConfirming={loading}
           />
           <InviteLink gameCode={game.code} />
         </div>

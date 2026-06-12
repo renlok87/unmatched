@@ -163,3 +163,14 @@ mutation ToggleDoor($input: ToggleDoorDto!) {
     timestamp
   }
 }
+
+mutation PlayScheme($input: PlaySchemeDto!) {
+  playScheme(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}

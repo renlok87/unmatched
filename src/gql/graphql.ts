@@ -30,11 +30,126 @@ export enum AbilityTrigger {
   WhenDefending = 'WHEN_DEFENDING'
 }
 
+export type AdminBoard = {
+  __typename?: 'AdminBoard';
+  cells?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  features?: Maybe<Scalars['String']['output']>;
+  height: Scalars['Float']['output'];
+  id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  imageUrlDark?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  nameEn: Scalars['String']['output'];
+  nameRu: Scalars['String']['output'];
+  set: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  width: Scalars['Float']['output'];
+};
+
+export type AdminCard = {
+  __typename?: 'AdminCard';
+  attackValue?: Maybe<Scalars['Int']['output']>;
+  bannerName?: Maybe<Scalars['String']['output']>;
+  boostValue?: Maybe<Scalars['Int']['output']>;
+  cardType: Scalars['String']['output'];
+  count: Scalars['Float']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  defenseValue?: Maybe<Scalars['Int']['output']>;
+  effectAfter?: Maybe<Scalars['String']['output']>;
+  effectBoost?: Maybe<Scalars['String']['output']>;
+  effectDuring?: Maybe<Scalars['String']['output']>;
+  effectImmediately?: Maybe<Scalars['String']['output']>;
+  effectOngoing?: Maybe<Scalars['String']['output']>;
+  effects?: Maybe<Scalars['String']['output']>;
+  heroId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  imageUrlRu?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  nameEn: Scalars['String']['output'];
+  nameRu: Scalars['String']['output'];
+  subType?: Maybe<Scalars['String']['output']>;
+  text?: Maybe<Scalars['String']['output']>;
+  textEn?: Maybe<Scalars['String']['output']>;
+  textRu?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type AdminGameDto = {
+  __typename?: 'AdminGameDto';
+  boardId: Scalars['String']['output'];
+  boardName?: Maybe<Scalars['String']['output']>;
+  code?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  finishedAt?: Maybe<Scalars['DateTime']['output']>;
+  gamePlayers: Array<GamePlayerInfoDto>;
+  id: Scalars['String']['output'];
+  mode: Scalars['String']['output'];
+  startedAt?: Maybe<Scalars['DateTime']['output']>;
+  status: Scalars['String']['output'];
+};
+
+export type AdminHero = {
+  __typename?: 'AdminHero';
+  ability?: Maybe<Scalars['String']['output']>;
+  additionalMinis?: Maybe<Scalars['String']['output']>;
+  avatarUrl?: Maybe<Scalars['String']['output']>;
+  cards?: Maybe<Array<AdminCard>>;
+  characterCardUrl?: Maybe<Scalars['String']['output']>;
+  color?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  deckCards?: Maybe<Scalars['String']['output']>;
+  fighterType: Scalars['String']['output'];
+  hasTokens?: Maybe<Scalars['Boolean']['output']>;
+  health: Scalars['Float']['output'];
+  id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  miniModelUrl?: Maybe<Scalars['String']['output']>;
+  movement?: Maybe<Scalars['Int']['output']>;
+  name: Scalars['String']['output'];
+  nameEn: Scalars['String']['output'];
+  nameRu: Scalars['String']['output'];
+  properties?: Maybe<Scalars['String']['output']>;
+  set: Scalars['String']['output'];
+  sidekicks?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type AdminStatsDto = {
+  __typename?: 'AdminStatsDto';
+  totalBoards: Scalars['Float']['output'];
+  totalCards: Scalars['Float']['output'];
+  totalGames: Scalars['Float']['output'];
+  totalHeroes: Scalars['Float']['output'];
+  totalUsers: Scalars['Float']['output'];
+};
+
 export type AttackDto = {
   attackerId: Scalars['String']['input'];
+  boostCardId?: InputMaybe<Scalars['String']['input']>;
   cardId: Scalars['String']['input'];
   gameId: Scalars['String']['input'];
   targetId: Scalars['String']['input'];
+};
+
+export type AuditLogDto = {
+  __typename?: 'AuditLogDto';
+  action: Scalars['String']['output'];
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  ipAddress?: Maybe<Scalars['String']['output']>;
+  metadata?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['DateTime']['output'];
+  userAgent?: Maybe<Scalars['String']['output']>;
+  userId?: Maybe<Scalars['String']['output']>;
+};
+
+export type AuditLogsPaginatedDto = {
+  __typename?: 'AuditLogsPaginatedDto';
+  items: Array<AuditLogDto>;
+  total: Scalars['Float']['output'];
 };
 
 export type AuthResponseDto = {
@@ -51,6 +166,7 @@ export type AuthUserResponse = {
   email: Scalars['String']['output'];
   emailVerified?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['String']['output'];
+  role: UserRole;
   username: Scalars['String']['output'];
 };
 
@@ -58,10 +174,25 @@ export type Board = {
   __typename?: 'Board';
   height: Scalars['Int']['output'];
   id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   recommendedPlayers: Scalars['Int']['output'];
   spaces: Array<BoardSpace>;
   width: Scalars['Int']['output'];
+};
+
+export type BoardListItemDto = {
+  __typename?: 'BoardListItemDto';
+  createdAt: Scalars['DateTime']['output'];
+  height: Scalars['Float']['output'];
+  id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  imageUrlDark?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  nameEn: Scalars['String']['output'];
+  nameRu: Scalars['String']['output'];
+  set: Scalars['String']['output'];
+  width: Scalars['Float']['output'];
 };
 
 export type BoardSpace = {
@@ -72,12 +203,23 @@ export type BoardSpace = {
   zones: Array<Zone>;
 };
 
+export type BoardsPaginatedDto = {
+  __typename?: 'BoardsPaginatedDto';
+  items: Array<BoardListItemDto>;
+  limit: Scalars['Float']['output'];
+  page: Scalars['Float']['output'];
+  total: Scalars['Float']['output'];
+  totalPages: Scalars['Float']['output'];
+};
+
 export type Card = {
   __typename?: 'Card';
   boost: Scalars['Int']['output'];
   characterName: Scalars['String']['output'];
   effects: Array<CardEffect>;
   id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  imageUrlRu?: Maybe<Scalars['String']['output']>;
   quantity: Scalars['Int']['output'];
   title: Scalars['String']['output'];
   type: CardType;
@@ -91,6 +233,25 @@ export type CardEffect = {
   timing: EffectTiming;
 };
 
+export type CardListItemDto = {
+  __typename?: 'CardListItemDto';
+  attackValue?: Maybe<Scalars['Int']['output']>;
+  bannerName?: Maybe<Scalars['String']['output']>;
+  boostValue?: Maybe<Scalars['Int']['output']>;
+  cardType: Scalars['String']['output'];
+  count: Scalars['Float']['output'];
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  defenseValue?: Maybe<Scalars['Int']['output']>;
+  heroId: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  imageUrlRu?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  nameEn: Scalars['String']['output'];
+  nameRu: Scalars['String']['output'];
+  subType?: Maybe<Scalars['String']['output']>;
+};
+
 /** Type of a card in the game */
 export enum CardType {
   Attack = 'ATTACK',
@@ -98,6 +259,15 @@ export enum CardType {
   Scheme = 'SCHEME',
   Versatile = 'VERSATILE'
 }
+
+export type CardsPaginatedDto = {
+  __typename?: 'CardsPaginatedDto';
+  items: Array<CardListItemDto>;
+  limit: Scalars['Float']['output'];
+  page: Scalars['Float']['output'];
+  total: Scalars['Float']['output'];
+  totalPages: Scalars['Float']['output'];
+};
 
 export type ChangePasswordDto = {
   currentPassword: Scalars['String']['input'];
@@ -113,9 +283,68 @@ export type ContentSummary = {
   version: Scalars['String']['output'];
 };
 
+export type CreateBoardInput = {
+  cells: Scalars['String']['input'];
+  features?: InputMaybe<Scalars['String']['input']>;
+  height: Scalars['Int']['input'];
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
+  imageUrlDark?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  nameEn: Scalars['String']['input'];
+  nameRu: Scalars['String']['input'];
+  set: Scalars['String']['input'];
+  width: Scalars['Int']['input'];
+};
+
+export type CreateCardInput = {
+  attackValue?: InputMaybe<Scalars['Int']['input']>;
+  bannerName?: InputMaybe<Scalars['String']['input']>;
+  boostValue?: InputMaybe<Scalars['Int']['input']>;
+  cardType: Scalars['String']['input'];
+  count?: InputMaybe<Scalars['Int']['input']>;
+  defenseValue?: InputMaybe<Scalars['Int']['input']>;
+  effectAfter?: InputMaybe<Scalars['String']['input']>;
+  effectBoost?: InputMaybe<Scalars['String']['input']>;
+  effectDuring?: InputMaybe<Scalars['String']['input']>;
+  effectImmediately?: InputMaybe<Scalars['String']['input']>;
+  effectOngoing?: InputMaybe<Scalars['String']['input']>;
+  effects?: InputMaybe<Scalars['String']['input']>;
+  heroId: Scalars['String']['input'];
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
+  imageUrlRu?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  nameEn: Scalars['String']['input'];
+  nameRu: Scalars['String']['input'];
+  subType?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  textEn?: InputMaybe<Scalars['String']['input']>;
+  textRu?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type CreateGameDto = {
   boardId?: InputMaybe<Scalars['String']['input']>;
   mode?: InputMaybe<GameMode>;
+};
+
+export type CreateHeroInput = {
+  ability?: InputMaybe<Scalars['String']['input']>;
+  additionalMinis?: InputMaybe<Scalars['String']['input']>;
+  avatarUrl?: InputMaybe<Scalars['String']['input']>;
+  characterCardUrl?: InputMaybe<Scalars['String']['input']>;
+  color?: InputMaybe<Scalars['String']['input']>;
+  deckCards?: InputMaybe<Scalars['String']['input']>;
+  fighterType: Scalars['String']['input'];
+  hasTokens?: InputMaybe<Scalars['Boolean']['input']>;
+  health: Scalars['Int']['input'];
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
+  miniModelUrl?: InputMaybe<Scalars['String']['input']>;
+  movement?: InputMaybe<Scalars['Int']['input']>;
+  name: Scalars['String']['input'];
+  nameEn: Scalars['String']['input'];
+  nameRu: Scalars['String']['input'];
+  properties?: InputMaybe<Scalars['String']['input']>;
+  set: Scalars['String']['input'];
+  sidekicks?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Timing when a card effect activates */
@@ -174,17 +403,27 @@ export type GameEvent = {
 /** Типы игровых событий */
 export enum GameEventType {
   AttackInitiated = 'ATTACK_INITIATED',
+  CardDiscarded = 'CARD_DISCARDED',
   CardPlayed = 'CARD_PLAYED',
   CombatResolved = 'COMBAT_RESOLVED',
   DefensePlayed = 'DEFENSE_PLAYED',
   DoorToggled = 'DOOR_TOGGLED',
+  EffectApplied = 'EFFECT_APPLIED',
   FighterMoved = 'FIGHTER_MOVED',
+  GameAborted = 'GAME_ABORTED',
+  GameCreated = 'GAME_CREATED',
   GameEnded = 'GAME_ENDED',
+  GameJoined = 'GAME_JOINED',
+  GameStarted = 'GAME_STARTED',
   Maneuver = 'MANEUVER',
+  Passed = 'PASSED',
+  Placed = 'PLACED',
   PlayerJoined = 'PLAYER_JOINED',
   PlayerLeft = 'PLAYER_LEFT',
+  SpecialAbility = 'SPECIAL_ABILITY',
   TurnChanged = 'TURN_CHANGED',
-  TurnEnded = 'TURN_ENDED'
+  TurnEnded = 'TURN_ENDED',
+  TurnStarted = 'TURN_STARTED'
 }
 
 export type GameFiltersDto = {
@@ -192,6 +431,18 @@ export type GameFiltersDto = {
   mode?: InputMaybe<GameMode>;
   offset?: InputMaybe<Scalars['Float']['input']>;
   status?: InputMaybe<GameStatus>;
+};
+
+export type GameListItemDto = {
+  __typename?: 'GameListItemDto';
+  boardId?: Maybe<Scalars['String']['output']>;
+  boardName?: Maybe<Scalars['String']['output']>;
+  code?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  gamePlayers: Array<GamePlayerInfoDto>;
+  id: Scalars['String']['output'];
+  mode: Scalars['String']['output'];
+  status: Scalars['String']['output'];
 };
 
 /** Game mode options */
@@ -224,6 +475,16 @@ export enum GamePhase {
   TurnStart = 'TURN_START'
 }
 
+export type GamePlayerInfoDto = {
+  __typename?: 'GamePlayerInfoDto';
+  avatar?: Maybe<Scalars['String']['output']>;
+  heroId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  playerId: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  username?: Maybe<Scalars['String']['output']>;
+};
+
 export type GamePlayerResponse = {
   __typename?: 'GamePlayerResponse';
   avatar?: Maybe<Scalars['String']['output']>;
@@ -240,6 +501,7 @@ export type GameResponse = {
   __typename?: 'GameResponse';
   boardId: Scalars['String']['output'];
   boardState?: Maybe<Scalars['String']['output']>;
+  code?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   currentTurn?: Maybe<Scalars['Int']['output']>;
   endedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -294,6 +556,15 @@ export enum GameStatus {
   Pending = 'PENDING'
 }
 
+export type GamesPaginatedDto = {
+  __typename?: 'GamesPaginatedDto';
+  items: Array<GameListItemDto>;
+  limit: Scalars['Float']['output'];
+  page: Scalars['Float']['output'];
+  total: Scalars['Float']['output'];
+  totalPages: Scalars['Float']['output'];
+};
+
 export type HeartbeatInput = {
   currentGameId?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<PresenceStatus>;
@@ -308,15 +579,21 @@ export type HeartbeatResponse = {
 export type Hero = {
   __typename?: 'Hero';
   abilities: Array<HeroAbility>;
+  avatarUrl?: Maybe<Scalars['String']['output']>;
   cards: Array<Card>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
   fighterType: FighterType;
   health: Scalars['Int']['output'];
   id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
   movement: Scalars['Int']['output'];
   name: Scalars['String']['output'];
+  nameEn?: Maybe<Scalars['String']['output']>;
+  nameRu?: Maybe<Scalars['String']['output']>;
   set: Scalars['String']['output'];
   sidekickCount?: Maybe<Scalars['Int']['output']>;
   sidekickHealth?: Maybe<Scalars['Int']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
   urls?: Maybe<HeroUrls>;
 };
 
@@ -328,11 +605,35 @@ export type HeroAbility = {
   trigger: AbilityTrigger;
 };
 
+export type HeroListItemDto = {
+  __typename?: 'HeroListItemDto';
+  ability?: Maybe<Scalars['String']['output']>;
+  avatarUrl?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  fighterType: Scalars['String']['output'];
+  health: Scalars['Float']['output'];
+  id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  nameEn: Scalars['String']['output'];
+  nameRu: Scalars['String']['output'];
+  set: Scalars['String']['output'];
+};
+
 export type HeroUrls = {
   __typename?: 'HeroUrls';
   avatar: Scalars['String']['output'];
   cardCover: Scalars['String']['output'];
   mini: Scalars['String']['output'];
+};
+
+export type HeroesPaginatedDto = {
+  __typename?: 'HeroesPaginatedDto';
+  items: Array<HeroListItemDto>;
+  limit: Scalars['Float']['output'];
+  page: Scalars['Float']['output'];
+  total: Scalars['Float']['output'];
+  totalPages: Scalars['Float']['output'];
 };
 
 export type JoinGameDto = {
@@ -368,7 +669,8 @@ export type LoginDto = {
 };
 
 export type ManeuverDto = {
-  cardId: Scalars['String']['input'];
+  boostCardId?: InputMaybe<Scalars['String']['input']>;
+  cardId?: InputMaybe<Scalars['String']['input']>;
   fighterId: Scalars['String']['input'];
   gameId: Scalars['String']['input'];
   path: Array<PositionInput>;
@@ -384,6 +686,13 @@ export type MatchFoundResponse = {
   opponentUsername: Scalars['String']['output'];
 };
 
+export type MatchmakingQueueDto = {
+  __typename?: 'MatchmakingQueueDto';
+  activeQueues: Scalars['Float']['output'];
+  items: Array<QueuePlayerDto>;
+  total: Scalars['Float']['output'];
+};
+
 export type MoveFighterDto = {
   fighterId: Scalars['String']['input'];
   gameId: Scalars['String']['input'];
@@ -395,11 +704,20 @@ export type Mutation = {
   __typename?: 'Mutation';
   abortGame: GameResponse;
   acceptMatch: Scalars['Boolean']['output'];
+  /** Объявить атаку на соседнего бойца (тратит 1 действие) */
   attack: GameMutationResult;
+  banUser: Scalars['Boolean']['output'];
   changePassword: Scalars['Boolean']['output'];
+  createBoard: AdminBoard;
+  createCard: AdminCard;
   createGame: GameResponse;
+  createHero: AdminHero;
   declineMatch: Scalars['Boolean']['output'];
   deleteAccount: Scalars['Boolean']['output'];
+  deleteBoard: Scalars['Boolean']['output'];
+  deleteCard: Scalars['Boolean']['output'];
+  deleteHero: Scalars['Boolean']['output'];
+  /** Завершить текущий ход */
   endTurn: GameMutationResult;
   heartbeat: HeartbeatResponse;
   joinGame: GameResponse;
@@ -409,22 +727,34 @@ export type Mutation = {
   leaveQueue: Scalars['Boolean']['output'];
   login: AuthResponseDto;
   logout: Scalars['Boolean']['output'];
+  /** Переместить бойца и сыграть карту эффектов (тратит 1 действие) */
   maneuver: GameMutationResult;
+  /** Переместить бойца на указанную клетку (тратит 1 действие) */
   moveFighter: GameMutationResult;
+  /** Сбросить карту и получить дополнительное действие */
   pass: GameMutationResult;
+  /** Сыграть карту защиты в ответ на атаку */
   playDefense: GameMutationResult;
+  /** Разыграть scheme-карту из руки (тратит 1 действие) */
+  playScheme: GameMutationResult;
   refreshTokens: AuthResponseDto;
   register: AuthResponseDto;
   removeAvatar: Scalars['Boolean']['output'];
-  requestPasswordReset: Scalars['Boolean']['output'];
   resetPassword: Scalars['Boolean']['output'];
+  /** Разрешить бой и нанести урон */
   resolveCombat: GameMutationResult;
   selectHero: GameResponse;
   startGame: GameResponse;
+  /** Открыть или закрыть дверь */
   toggleDoor: GameMutationResult;
   toggleReady: GameResponse;
+  unbanUser: Scalars['Boolean']['output'];
+  updateBoard: AdminBoard;
+  updateCard: AdminCard;
+  updateHero: AdminHero;
   updateProfile: UserResponse;
   updateSettings: UserSettingsGraphql;
+  updateUser: UserDto;
   uploadAvatar: Scalars['String']['output'];
   verifyEmail: Scalars['Boolean']['output'];
 };
@@ -445,18 +775,54 @@ export type MutationAttackArgs = {
 };
 
 
+export type MutationBanUserArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type MutationChangePasswordArgs = {
   input: ChangePasswordDto;
 };
 
 
+export type MutationCreateBoardArgs = {
+  input: CreateBoardInput;
+};
+
+
+export type MutationCreateCardArgs = {
+  input: CreateCardInput;
+};
+
+
 export type MutationCreateGameArgs = {
+  idempotencyKey?: InputMaybe<Scalars['String']['input']>;
   input: CreateGameDto;
+};
+
+
+export type MutationCreateHeroArgs = {
+  input: CreateHeroInput;
 };
 
 
 export type MutationDeclineMatchArgs = {
   gameId: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteBoardArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteCardArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteHeroArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -515,6 +881,11 @@ export type MutationPlayDefenseArgs = {
 };
 
 
+export type MutationPlaySchemeArgs = {
+  input: PlaySchemeDto;
+};
+
+
 export type MutationRefreshTokensArgs = {
   refreshToken: Scalars['String']['input'];
 };
@@ -522,11 +893,6 @@ export type MutationRefreshTokensArgs = {
 
 export type MutationRegisterArgs = {
   input: RegisterDto;
-};
-
-
-export type MutationRequestPasswordResetArgs = {
-  email: Scalars['String']['input'];
 };
 
 
@@ -562,6 +928,29 @@ export type MutationToggleReadyArgs = {
 };
 
 
+export type MutationUnbanUserArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateBoardArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateBoardInput;
+};
+
+
+export type MutationUpdateCardArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateCardInput;
+};
+
+
+export type MutationUpdateHeroArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateHeroInput;
+};
+
+
 export type MutationUpdateProfileArgs = {
   input: UpdateProfileDto;
 };
@@ -569,6 +958,12 @@ export type MutationUpdateProfileArgs = {
 
 export type MutationUpdateSettingsArgs = {
   input: SettingsDto;
+};
+
+
+export type MutationUpdateUserArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateUserInput;
 };
 
 
@@ -608,6 +1003,15 @@ export type PaginatedHeroes = {
   pagination: PaginationInfo;
 };
 
+export type PaginatedUsersDto = {
+  __typename?: 'PaginatedUsersDto';
+  limit: Scalars['Float']['output'];
+  page: Scalars['Float']['output'];
+  total: Scalars['Float']['output'];
+  totalPages: Scalars['Float']['output'];
+  users: Array<UserListItemDto>;
+};
+
 export type PaginationInfo = {
   __typename?: 'PaginationInfo';
   hasNextPage: Scalars['Boolean']['output'];
@@ -632,6 +1036,12 @@ export type PenaltyInfoDto = {
 };
 
 export type PlayDefenseDto = {
+  boostCardId?: InputMaybe<Scalars['String']['input']>;
+  cardId: Scalars['String']['input'];
+  gameId: Scalars['String']['input'];
+};
+
+export type PlaySchemeDto = {
   cardId: Scalars['String']['input'];
   gameId: Scalars['String']['input'];
 };
@@ -673,28 +1083,45 @@ export type PublicUserResponse = {
 
 export type Query = {
   __typename?: 'Query';
+  adminBoard: AdminBoard;
+  adminCard: AdminCard;
+  adminGame: AdminGameDto;
+  adminHero: AdminHero;
+  adminStats: AdminStatsDto;
+  adminUser: UserDto;
   allQueueStatus: Scalars['String']['output'];
+  auditLogs: AuditLogsPaginatedDto;
   availableGames: Array<GameResponse>;
   board?: Maybe<Board>;
+  boardList: BoardsPaginatedDto;
   boards: Array<Board>;
+  boardsList: BoardsPaginatedDto;
   boardsPaginated: PaginatedBoards;
+  card?: Maybe<Card>;
+  cardList: CardsPaginatedDto;
   cards: Array<Card>;
+  cardsList: CardsPaginatedDto;
   clearContentCache: Scalars['Boolean']['output'];
   contentSummary: ContentSummary;
   contentVersion: Scalars['String']['output'];
   eventsSince?: Maybe<EventsSinceResponse>;
   game?: Maybe<GameResponse>;
+  gameList: GamesPaginatedDto;
   gameSequence?: Maybe<Scalars['Float']['output']>;
   gameState?: Maybe<GameStateResponse>;
+  gamesList: GamesPaginatedDto;
   getOnlineCount: Scalars['Float']['output'];
   getOnlineUsers: OnlineUsersResponse;
   getPlayerRank: LeaderboardRankResponse;
   getPresence?: Maybe<Presence>;
   hero?: Maybe<Hero>;
+  heroList: HeroesPaginatedDto;
   heroes: Array<Hero>;
   heroesBySet: Array<Hero>;
+  heroesList: HeroesPaginatedDto;
   heroesPaginated: PaginatedHeroes;
   leaderboard: Scalars['String']['output'];
+  matchmakingQueue: MatchmakingQueueDto;
   me?: Maybe<UserWithSettingsResponse>;
   metrics: Scalars['String']['output'];
   myGames: Array<GameResponse>;
@@ -707,6 +1134,40 @@ export type Query = {
   topPlayers: Scalars['String']['output'];
   user?: Maybe<PublicUserResponse>;
   userByUsername?: Maybe<PublicUserResponse>;
+  userList: PaginatedUsersDto;
+  usersList: PaginatedUsersDto;
+};
+
+
+export type QueryAdminBoardArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryAdminCardArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryAdminGameArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryAdminHeroArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryAdminUserArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryAuditLogsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -721,14 +1182,57 @@ export type QueryBoardArgs = {
 };
 
 
+export type QueryBoardListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryBoardsListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryBoardsPaginatedArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
+export type QueryCardArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryCardListArgs = {
+  heroId?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryCardsArgs = {
   heroId: Scalars['String']['input'];
+};
+
+
+export type QueryCardsListArgs = {
+  heroId?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -743,6 +1247,15 @@ export type QueryGameArgs = {
 };
 
 
+export type QueryGameListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryGameSequenceArgs = {
   gameId: Scalars['String']['input'];
 };
@@ -750,6 +1263,15 @@ export type QueryGameSequenceArgs = {
 
 export type QueryGameStateArgs = {
   gameId: Scalars['String']['input'];
+};
+
+
+export type QueryGamesListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -770,8 +1292,26 @@ export type QueryHeroArgs = {
 };
 
 
+export type QueryHeroListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryHeroesBySetArgs = {
   set: Scalars['String']['input'];
+};
+
+
+export type QueryHeroesListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -818,6 +1358,36 @@ export type QueryUserArgs = {
 
 export type QueryUserByUsernameArgs = {
   username: Scalars['String']['input'];
+};
+
+
+export type QueryUserListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryUsersListArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  sortBy?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type QueuePlayerDto = {
+  __typename?: 'QueuePlayerDto';
+  avatar?: Maybe<Scalars['String']['output']>;
+  elo: Scalars['Int']['output'];
+  id: Scalars['String']['output'];
+  joinedAt: Scalars['DateTime']['output'];
+  mode: Scalars['String']['output'];
+  position: Scalars['Int']['output'];
+  userId: Scalars['String']['output'];
+  username: Scalars['String']['output'];
 };
 
 export type QueueStatusResponse = {
@@ -935,9 +1505,103 @@ export type TurnState = {
   turnCount: Scalars['Int']['output'];
 };
 
+export type UpdateBoardInput = {
+  cells?: InputMaybe<Scalars['String']['input']>;
+  features?: InputMaybe<Scalars['String']['input']>;
+  height?: InputMaybe<Scalars['Int']['input']>;
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
+  imageUrlDark?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  nameEn?: InputMaybe<Scalars['String']['input']>;
+  nameRu?: InputMaybe<Scalars['String']['input']>;
+  set?: InputMaybe<Scalars['String']['input']>;
+  width?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateCardInput = {
+  attackValue?: InputMaybe<Scalars['Int']['input']>;
+  bannerName?: InputMaybe<Scalars['String']['input']>;
+  boostValue?: InputMaybe<Scalars['Int']['input']>;
+  cardType?: InputMaybe<Scalars['String']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  defenseValue?: InputMaybe<Scalars['Int']['input']>;
+  effectAfter?: InputMaybe<Scalars['String']['input']>;
+  effectBoost?: InputMaybe<Scalars['String']['input']>;
+  effectDuring?: InputMaybe<Scalars['String']['input']>;
+  effectImmediately?: InputMaybe<Scalars['String']['input']>;
+  effectOngoing?: InputMaybe<Scalars['String']['input']>;
+  effects?: InputMaybe<Scalars['String']['input']>;
+  heroId?: InputMaybe<Scalars['String']['input']>;
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
+  imageUrlRu?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  nameEn?: InputMaybe<Scalars['String']['input']>;
+  nameRu?: InputMaybe<Scalars['String']['input']>;
+  subType?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  textEn?: InputMaybe<Scalars['String']['input']>;
+  textRu?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateHeroInput = {
+  ability?: InputMaybe<Scalars['String']['input']>;
+  additionalMinis?: InputMaybe<Scalars['String']['input']>;
+  avatarUrl?: InputMaybe<Scalars['String']['input']>;
+  characterCardUrl?: InputMaybe<Scalars['String']['input']>;
+  color?: InputMaybe<Scalars['String']['input']>;
+  deckCards?: InputMaybe<Scalars['String']['input']>;
+  fighterType?: InputMaybe<Scalars['String']['input']>;
+  hasTokens?: InputMaybe<Scalars['Boolean']['input']>;
+  health?: InputMaybe<Scalars['Int']['input']>;
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
+  miniModelUrl?: InputMaybe<Scalars['String']['input']>;
+  movement?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  nameEn?: InputMaybe<Scalars['String']['input']>;
+  nameRu?: InputMaybe<Scalars['String']['input']>;
+  properties?: InputMaybe<Scalars['String']['input']>;
+  set?: InputMaybe<Scalars['String']['input']>;
+  sidekicks?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type UpdateProfileDto = {
   avatar?: InputMaybe<Scalars['String']['input']>;
   username?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateUserInput = {
+  avatar?: InputMaybe<Scalars['String']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<Scalars['String']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserDto = {
+  __typename?: 'UserDto';
+  avatar?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  email: Scalars['String']['output'];
+  emailVerified?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+  role: Scalars['String']['output'];
+  stats?: Maybe<UserStatsDto>;
+  updatedAt: Scalars['DateTime']['output'];
+  username: Scalars['String']['output'];
+};
+
+export type UserListItemDto = {
+  __typename?: 'UserListItemDto';
+  avatar?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  email: Scalars['String']['output'];
+  emailVerified?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+  role: Scalars['String']['output'];
+  stats?: Maybe<UserStatsDto>;
+  updatedAt: Scalars['DateTime']['output'];
+  username: Scalars['String']['output'];
 };
 
 export type UserResponse = {
@@ -947,8 +1611,16 @@ export type UserResponse = {
   email: Scalars['String']['output'];
   emailVerified?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['String']['output'];
+  role: UserRole;
   username: Scalars['String']['output'];
 };
+
+/** User role in the system */
+export enum UserRole {
+  Admin = 'ADMIN',
+  Moderator = 'MODERATOR',
+  User = 'USER'
+}
 
 export type UserSettingsGraphql = {
   __typename?: 'UserSettingsGraphql';
@@ -972,6 +1644,13 @@ export type UserSettingsResponse = {
   theme: Scalars['String']['output'];
 };
 
+export type UserStatsDto = {
+  __typename?: 'UserStatsDto';
+  currentElo?: Maybe<Scalars['Int']['output']>;
+  gamesPlayed?: Maybe<Scalars['Int']['output']>;
+  gamesWon?: Maybe<Scalars['Int']['output']>;
+};
+
 export type UserStatsResponse = {
   __typename?: 'UserStatsResponse';
   currentElo: Scalars['Int']['output'];
@@ -993,6 +1672,7 @@ export type UserWithSettingsResponse = {
   email: Scalars['String']['output'];
   emailVerified?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['String']['output'];
+  role: UserRole;
   settings?: Maybe<UserSettingsResponse>;
   username: Scalars['String']['output'];
 };
@@ -1152,6 +1832,27 @@ export type ToggleDoorMutationVariables = Exact<{
 
 export type ToggleDoorMutation = { __typename?: 'Mutation', toggleDoor: { __typename?: 'GameMutationResult', state?: string | null, sequenceNumber: number, phase: GamePhase, currentTurnPlayerId?: string | null, turnCount: number, timestamp: any } };
 
+export type PlaySchemeMutationVariables = Exact<{
+  input: PlaySchemeDto;
+}>;
+
+
+export type PlaySchemeMutation = { __typename?: 'Mutation', playScheme: { __typename?: 'GameMutationResult', state?: string | null, sequenceNumber: number, phase: GamePhase, currentTurnPlayerId?: string | null, turnCount: number, timestamp: any } };
+
+export type PlaceFighterMutationVariables = Exact<{
+  input: MoveFighterDto;
+}>;
+
+
+export type PlaceFighterMutation = { __typename?: 'Mutation', moveFighter: { __typename?: 'GameMutationResult', state?: string | null, sequenceNumber: number, phase: GamePhase, currentTurnPlayerId?: string | null, turnCount: number, timestamp: any } };
+
+export type ConfirmPlacementMutationVariables = Exact<{
+  gameId: Scalars['String']['input'];
+}>;
+
+
+export type ConfirmPlacementMutation = { __typename?: 'Mutation', pass: { __typename?: 'GameMutationResult', state?: string | null, sequenceNumber: number, phase: GamePhase, currentTurnPlayerId?: string | null, turnCount: number, timestamp: any } };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1166,6 +1867,21 @@ export type MySettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MySettingsQuery = { __typename?: 'Query', mySettings: { __typename?: 'UserSettingsGraphql', theme: string, soundEnabled: boolean, musicEnabled: boolean, language: string, profileVisible: boolean } };
+
+export type GetCardsQueryVariables = Exact<{
+  page: Scalars['Int']['input'];
+  limit: Scalars['Int']['input'];
+}>;
+
+
+export type GetCardsQuery = { __typename?: 'Query', cardList: { __typename?: 'CardsPaginatedDto', total: number, items: Array<{ __typename?: 'CardListItemDto', id: string, name: string, nameEn: string, nameRu: string, cardType: string, subType?: string | null, attackValue?: number | null, defenseValue?: number | null, boostValue?: number | null, bannerName?: string | null, count: number, heroId: string, imageUrl?: string | null, imageUrlRu?: string | null }> } };
+
+export type GetCardQueryVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type GetCardQuery = { __typename?: 'Query', card?: { __typename?: 'Card', id: string, title: string, type: CardType, value: number, boost: number, quantity: number, characterName: string, imageUrl?: string | null, imageUrlRu?: string | null, effects: Array<{ __typename?: 'CardEffect', id: string, timing: EffectTiming, text: string }> } | null };
 
 export type GetGameQueryVariables = Exact<{
   id: Scalars['String']['input'];
@@ -1221,19 +1937,19 @@ export type HeroQueryVariables = Exact<{
 }>;
 
 
-export type HeroQuery = { __typename?: 'Query', hero?: { __typename?: 'Hero', id: string, name: string, health: number, movement: number, set: string, fighterType: FighterType, abilities: Array<{ __typename?: 'HeroAbility', id: string, name: string, text: string, trigger: AbilityTrigger }>, cards: Array<{ __typename?: 'Card', id: string, title: string, type: CardType, value: number, boost: number, quantity: number }> } | null };
+export type HeroQuery = { __typename?: 'Query', hero?: { __typename?: 'Hero', id: string, name: string, health: number, movement: number, set: string, fighterType: FighterType, abilities: Array<{ __typename?: 'HeroAbility', id: string, name: string, text: string, trigger: AbilityTrigger }>, cards: Array<{ __typename?: 'Card', id: string, title: string, type: CardType, value: number, boost: number, quantity: number, imageUrl?: string | null, imageUrlRu?: string | null }> } | null };
 
 export type BoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type BoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: string, name: string, width: number, height: number, recommendedPlayers: number, spaces: Array<{ __typename?: 'BoardSpace', zones: Array<Zone>, isObstacle?: boolean | null, position: { __typename?: 'Position', x: number, y: number } }> }> };
+export type BoardsQuery = { __typename?: 'Query', boards: Array<{ __typename?: 'Board', id: string, name: string, width: number, height: number, recommendedPlayers: number, imageUrl?: string | null, spaces: Array<{ __typename?: 'BoardSpace', zones: Array<Zone>, isObstacle?: boolean | null, position: { __typename?: 'Position', x: number, y: number } }> }> };
 
 export type BoardQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type BoardQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: string, name: string, width: number, height: number, recommendedPlayers: number, spaces: Array<{ __typename?: 'BoardSpace', zones: Array<Zone>, isObstacle?: boolean | null, position: { __typename?: 'Position', x: number, y: number } }> } | null };
+export type BoardQuery = { __typename?: 'Query', board?: { __typename?: 'Board', id: string, name: string, width: number, height: number, recommendedPlayers: number, imageUrl?: string | null, spaces: Array<{ __typename?: 'BoardSpace', zones: Array<Zone>, isObstacle?: boolean | null, position: { __typename?: 'Position', x: number, y: number } }> } | null };
 
 export type ContentSummaryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1255,7 +1971,7 @@ export type HeroDetailsQueryVariables = Exact<{
 }>;
 
 
-export type HeroDetailsQuery = { __typename?: 'Query', hero?: { __typename?: 'Hero', id: string, name: string, health: number, movement: number, set: string, fighterType: FighterType, sidekickCount?: number | null, sidekickHealth?: number | null, urls?: { __typename?: 'HeroUrls', avatar: string, mini: string, cardCover: string } | null, abilities: Array<{ __typename?: 'HeroAbility', id: string, name: string, text: string, trigger: AbilityTrigger }>, cards: Array<{ __typename?: 'Card', id: string, title: string, type: CardType, value: number, boost: number, quantity: number }> } | null };
+export type HeroDetailsQuery = { __typename?: 'Query', hero?: { __typename?: 'Hero', id: string, name: string, health: number, movement: number, set: string, fighterType: FighterType, sidekickCount?: number | null, sidekickHealth?: number | null, urls?: { __typename?: 'HeroUrls', avatar: string, mini: string, cardCover: string } | null, abilities: Array<{ __typename?: 'HeroAbility', id: string, name: string, text: string, trigger: AbilityTrigger }>, cards: Array<{ __typename?: 'Card', id: string, title: string, type: CardType, value: number, boost: number, quantity: number, imageUrl?: string | null, imageUrlRu?: string | null }> } | null };
 
 export type HeroesBySetQueryVariables = Exact<{
   set: Scalars['String']['input'];
@@ -1283,6 +1999,21 @@ export type PenaltyInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type PenaltyInfoQuery = { __typename?: 'Query', penaltyInfo: { __typename?: 'PenaltyInfoDto', canJoinQueue: boolean, declineCount: number, tempBanUntil?: any | null, penaltyElo?: number | null, reason?: string | null } };
+
+export type RoomInfoQueryVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type RoomInfoQuery = { __typename?: 'Query', game?: { __typename?: 'GameResponse', id: string, code?: string | null, status: GameStatus, mode: GameMode, hostId: string, boardId: string, phase?: GamePhase | null, createdAt: any, players: Array<{ __typename?: 'GamePlayerResponse', id: string, userId: string, username: string, avatar?: string | null, heroId?: string | null, isReady: boolean, seatOrder: number }> } | null };
+
+export type ValidSpawnZonesQueryVariables = Exact<{
+  gameId: Scalars['String']['input'];
+  playerId: Scalars['String']['input'];
+}>;
+
+
+export type ValidSpawnZonesQuery = { __typename?: 'Query', gameState?: { __typename?: 'GameStateResponse', id: string, gameId: string, state: string, sequenceNumber: number, currentTurnPlayerId?: string | null, phase: string, turnCount: number, updatedAt: any } | null };
 
 export type GameStateUpdatedSubscriptionVariables = Exact<{
   gameId: Scalars['String']['input'];
@@ -1370,9 +2101,14 @@ export const ResolveCombatDocument = {"kind":"Document","definitions":[{"kind":"
 export const EndTurnDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"EndTurn"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"EndTurnDto"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"endTurn"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]} as unknown as DocumentNode<EndTurnMutation, EndTurnMutationVariables>;
 export const PassDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Pass"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PassDto"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pass"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]} as unknown as DocumentNode<PassMutation, PassMutationVariables>;
 export const ToggleDoorDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ToggleDoor"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ToggleDoorDto"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"toggleDoor"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]} as unknown as DocumentNode<ToggleDoorMutation, ToggleDoorMutationVariables>;
+export const PlaySchemeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"PlayScheme"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PlaySchemeDto"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playScheme"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]} as unknown as DocumentNode<PlaySchemeMutation, PlaySchemeMutationVariables>;
+export const PlaceFighterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"PlaceFighter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MoveFighterDto"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"moveFighter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]} as unknown as DocumentNode<PlaceFighterMutation, PlaceFighterMutationVariables>;
+export const ConfirmPlacementDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ConfirmPlacement"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pass"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]} as unknown as DocumentNode<ConfirmPlacementMutation, ConfirmPlacementMutationVariables>;
 export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"settings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"theme"}},{"kind":"Field","name":{"kind":"Name","value":"soundEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"musicEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"language"}},{"kind":"Field","name":{"kind":"Name","value":"profileVisible"}}]}}]}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;
 export const MyStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"gamesPlayed"}},{"kind":"Field","name":{"kind":"Name","value":"gamesWon"}},{"kind":"Field","name":{"kind":"Name","value":"gamesLost"}},{"kind":"Field","name":{"kind":"Name","value":"winRate"}},{"kind":"Field","name":{"kind":"Name","value":"currentElo"}},{"kind":"Field","name":{"kind":"Name","value":"peakElo"}}]}}]}}]} as unknown as DocumentNode<MyStatsQuery, MyStatsQueryVariables>;
 export const MySettingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MySettings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mySettings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"theme"}},{"kind":"Field","name":{"kind":"Name","value":"soundEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"musicEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"language"}},{"kind":"Field","name":{"kind":"Name","value":"profileVisible"}}]}}]}}]} as unknown as DocumentNode<MySettingsQuery, MySettingsQueryVariables>;
+export const GetCardsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCards"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"page"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cardList"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"page"},"value":{"kind":"Variable","name":{"kind":"Name","value":"page"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"nameEn"}},{"kind":"Field","name":{"kind":"Name","value":"nameRu"}},{"kind":"Field","name":{"kind":"Name","value":"cardType"}},{"kind":"Field","name":{"kind":"Name","value":"subType"}},{"kind":"Field","name":{"kind":"Name","value":"attackValue"}},{"kind":"Field","name":{"kind":"Name","value":"defenseValue"}},{"kind":"Field","name":{"kind":"Name","value":"boostValue"}},{"kind":"Field","name":{"kind":"Name","value":"bannerName"}},{"kind":"Field","name":{"kind":"Name","value":"count"}},{"kind":"Field","name":{"kind":"Name","value":"heroId"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrlRu"}}]}},{"kind":"Field","name":{"kind":"Name","value":"total"}}]}}]}}]} as unknown as DocumentNode<GetCardsQuery, GetCardsQueryVariables>;
+export const GetCardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCard"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"card"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"boost"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}},{"kind":"Field","name":{"kind":"Name","value":"characterName"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrlRu"}},{"kind":"Field","name":{"kind":"Name","value":"effects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"timing"}},{"kind":"Field","name":{"kind":"Name","value":"text"}}]}}]}}]}}]} as unknown as DocumentNode<GetCardQuery, GetCardQueryVariables>;
 export const GetGameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGame"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"game"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hostId"}},{"kind":"Field","name":{"kind":"Name","value":"boardId"}},{"kind":"Field","name":{"kind":"Name","value":"winnerId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"startedAt"}},{"kind":"Field","name":{"kind":"Name","value":"endedAt"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurn"}},{"kind":"Field","name":{"kind":"Name","value":"players"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"heroId"}},{"kind":"Field","name":{"kind":"Name","value":"isReady"}},{"kind":"Field","name":{"kind":"Name","value":"hasPassed"}},{"kind":"Field","name":{"kind":"Name","value":"seatOrder"}}]}}]}}]}}]} as unknown as DocumentNode<GetGameQuery, GetGameQueryVariables>;
 export const MyGamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyGames"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filters"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"GameFiltersDto"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myGames"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filters"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filters"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"hostId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurn"}},{"kind":"Field","name":{"kind":"Name","value":"players"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"heroId"}},{"kind":"Field","name":{"kind":"Name","value":"isReady"}}]}}]}}]}}]} as unknown as DocumentNode<MyGamesQuery, MyGamesQueryVariables>;
 export const AvailableGamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AvailableGames"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mode"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"availableGames"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"mode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mode"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"players"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"heroId"}}]}}]}}]}}]} as unknown as DocumentNode<AvailableGamesQuery, AvailableGamesQueryVariables>;
@@ -1380,17 +2116,19 @@ export const GetGameStateDocument = {"kind":"Document","definitions":[{"kind":"O
 export const GetGameSequenceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetGameSequence"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gameSequence"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}}]}]}}]} as unknown as DocumentNode<GetGameSequenceQuery, GetGameSequenceQueryVariables>;
 export const EventsSinceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"EventsSince"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sinceSequence"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"eventsSince"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}},{"kind":"Argument","name":{"kind":"Name","value":"sinceSequence"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sinceSequence"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gameId"}},{"kind":"Field","name":{"kind":"Name","value":"events"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"gameId"}},{"kind":"Field","name":{"kind":"Name","value":"payload"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastSequence"}},{"kind":"Field","name":{"kind":"Name","value":"hasMore"}}]}}]}}]} as unknown as DocumentNode<EventsSinceQuery, EventsSinceQueryVariables>;
 export const HeroesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Heroes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"heroes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"set"}},{"kind":"Field","name":{"kind":"Name","value":"fighterType"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickCount"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickHealth"}}]}}]}}]} as unknown as DocumentNode<HeroesQuery, HeroesQueryVariables>;
-export const HeroDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Hero"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hero"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"set"}},{"kind":"Field","name":{"kind":"Name","value":"fighterType"}},{"kind":"Field","name":{"kind":"Name","value":"abilities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"text"}},{"kind":"Field","name":{"kind":"Name","value":"trigger"}}]}},{"kind":"Field","name":{"kind":"Name","value":"cards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"boost"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}}]}}]}}]}}]} as unknown as DocumentNode<HeroQuery, HeroQueryVariables>;
-export const BoardsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Boards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"boards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"recommendedPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"spaces"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"position"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"x"}},{"kind":"Field","name":{"kind":"Name","value":"y"}}]}},{"kind":"Field","name":{"kind":"Name","value":"zones"}},{"kind":"Field","name":{"kind":"Name","value":"isObstacle"}}]}}]}}]}}]} as unknown as DocumentNode<BoardsQuery, BoardsQueryVariables>;
-export const BoardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Board"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"board"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"recommendedPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"spaces"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"position"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"x"}},{"kind":"Field","name":{"kind":"Name","value":"y"}}]}},{"kind":"Field","name":{"kind":"Name","value":"zones"}},{"kind":"Field","name":{"kind":"Name","value":"isObstacle"}}]}}]}}]}}]} as unknown as DocumentNode<BoardQuery, BoardQueryVariables>;
+export const HeroDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Hero"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hero"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"set"}},{"kind":"Field","name":{"kind":"Name","value":"fighterType"}},{"kind":"Field","name":{"kind":"Name","value":"abilities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"text"}},{"kind":"Field","name":{"kind":"Name","value":"trigger"}}]}},{"kind":"Field","name":{"kind":"Name","value":"cards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"boost"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrlRu"}}]}}]}}]}}]} as unknown as DocumentNode<HeroQuery, HeroQueryVariables>;
+export const BoardsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Boards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"boards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"recommendedPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spaces"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"position"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"x"}},{"kind":"Field","name":{"kind":"Name","value":"y"}}]}},{"kind":"Field","name":{"kind":"Name","value":"zones"}},{"kind":"Field","name":{"kind":"Name","value":"isObstacle"}}]}}]}}]}}]} as unknown as DocumentNode<BoardsQuery, BoardsQueryVariables>;
+export const BoardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Board"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"board"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"recommendedPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"spaces"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"position"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"x"}},{"kind":"Field","name":{"kind":"Name","value":"y"}}]}},{"kind":"Field","name":{"kind":"Name","value":"zones"}},{"kind":"Field","name":{"kind":"Name","value":"isObstacle"}}]}}]}}]}}]} as unknown as DocumentNode<BoardQuery, BoardQueryVariables>;
 export const ContentSummaryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ContentSummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"contentSummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"heroesCount"}},{"kind":"Field","name":{"kind":"Name","value":"boardsCount"}},{"kind":"Field","name":{"kind":"Name","value":"setsCount"}},{"kind":"Field","name":{"kind":"Name","value":"version"}},{"kind":"Field","name":{"kind":"Name","value":"sets"}}]}}]}}]} as unknown as DocumentNode<ContentSummaryQuery, ContentSummaryQueryVariables>;
 export const SetsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Sets"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sets"}}]}}]} as unknown as DocumentNode<SetsQuery, SetsQueryVariables>;
 export const AllHeroesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AllHeroes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"heroes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"set"}},{"kind":"Field","name":{"kind":"Name","value":"fighterType"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickCount"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickHealth"}},{"kind":"Field","name":{"kind":"Name","value":"urls"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"mini"}},{"kind":"Field","name":{"kind":"Name","value":"cardCover"}}]}}]}}]}}]} as unknown as DocumentNode<AllHeroesQuery, AllHeroesQueryVariables>;
-export const HeroDetailsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"HeroDetails"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hero"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"set"}},{"kind":"Field","name":{"kind":"Name","value":"fighterType"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickCount"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickHealth"}},{"kind":"Field","name":{"kind":"Name","value":"urls"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"mini"}},{"kind":"Field","name":{"kind":"Name","value":"cardCover"}}]}},{"kind":"Field","name":{"kind":"Name","value":"abilities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"text"}},{"kind":"Field","name":{"kind":"Name","value":"trigger"}}]}},{"kind":"Field","name":{"kind":"Name","value":"cards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"boost"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}}]}}]}}]}}]} as unknown as DocumentNode<HeroDetailsQuery, HeroDetailsQueryVariables>;
+export const HeroDetailsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"HeroDetails"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hero"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"set"}},{"kind":"Field","name":{"kind":"Name","value":"fighterType"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickCount"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickHealth"}},{"kind":"Field","name":{"kind":"Name","value":"urls"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"mini"}},{"kind":"Field","name":{"kind":"Name","value":"cardCover"}}]}},{"kind":"Field","name":{"kind":"Name","value":"abilities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"text"}},{"kind":"Field","name":{"kind":"Name","value":"trigger"}}]}},{"kind":"Field","name":{"kind":"Name","value":"cards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"boost"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrlRu"}}]}}]}}]}}]} as unknown as DocumentNode<HeroDetailsQuery, HeroDetailsQueryVariables>;
 export const HeroesBySetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"HeroesBySet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"heroesBySet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"set"}},{"kind":"Field","name":{"kind":"Name","value":"fighterType"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickCount"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickHealth"}},{"kind":"Field","name":{"kind":"Name","value":"urls"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"mini"}},{"kind":"Field","name":{"kind":"Name","value":"cardCover"}}]}}]}}]}}]} as unknown as DocumentNode<HeroesBySetQuery, HeroesBySetQueryVariables>;
 export const LobbyAvailableGamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"LobbyAvailableGames"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mode"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"availableGames"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"mode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mode"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}},{"kind":"Field","name":{"kind":"Name","value":"opponent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}},{"kind":"Field","name":{"kind":"Name","value":"boardId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<LobbyAvailableGamesQuery, LobbyAvailableGamesQueryVariables>;
 export const QueueStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"QueueStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"queueStatus"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"mode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mode"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inQueue"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"totalPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"estimatedWaitTime"}},{"kind":"Field","name":{"kind":"Name","value":"joinedAt"}}]}}]}}]} as unknown as DocumentNode<QueueStatusQuery, QueueStatusQueryVariables>;
 export const PenaltyInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PenaltyInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"penaltyInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"canJoinQueue"}},{"kind":"Field","name":{"kind":"Name","value":"declineCount"}},{"kind":"Field","name":{"kind":"Name","value":"tempBanUntil"}},{"kind":"Field","name":{"kind":"Name","value":"penaltyElo"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}}]}}]}}]} as unknown as DocumentNode<PenaltyInfoQuery, PenaltyInfoQueryVariables>;
+export const RoomInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"RoomInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"game"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"hostId"}},{"kind":"Field","name":{"kind":"Name","value":"boardId"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"players"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"heroId"}},{"kind":"Field","name":{"kind":"Name","value":"isReady"}},{"kind":"Field","name":{"kind":"Name","value":"seatOrder"}}]}}]}}]}}]} as unknown as DocumentNode<RoomInfoQuery, RoomInfoQueryVariables>;
+export const ValidSpawnZonesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ValidSpawnZones"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"playerId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gameState"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"gameId"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<ValidSpawnZonesQuery, ValidSpawnZonesQueryVariables>;
 export const GameStateUpdatedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"GameStateUpdated"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"since"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gameStateUpdated"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}},{"kind":"Argument","name":{"kind":"Name","value":"since"},"value":{"kind":"Variable","name":{"kind":"Name","value":"since"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"gameId"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"players"}},{"kind":"Field","name":{"kind":"Name","value":"fighters"}},{"kind":"Field","name":{"kind":"Name","value":"handZones"}},{"kind":"Field","name":{"kind":"Name","value":"boardState"}},{"kind":"Field","name":{"kind":"Name","value":"metadata"}}]}}]}}]} as unknown as DocumentNode<GameStateUpdatedSubscription, GameStateUpdatedSubscriptionVariables>;
 export const AttackInitiatedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"AttackInitiated"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"attackInitiated"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"gameId"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"payload"}}]}}]}}]} as unknown as DocumentNode<AttackInitiatedSubscription, AttackInitiatedSubscriptionVariables>;
 export const DefensePlayedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"DefensePlayed"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"defensePlayed"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"gameId"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}},{"kind":"Field","name":{"kind":"Name","value":"payload"}}]}}]}}]} as unknown as DocumentNode<DefensePlayedSubscription, DefensePlayedSubscriptionVariables>;
