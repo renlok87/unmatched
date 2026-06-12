@@ -612,6 +612,25 @@ export class GameActionExecutorService {
         };
       }
 
+      // bannerName: защитную карту играет АТАКОВАННЫЙ боец (targetFighterId
+      // из A0; легаси-сейвы без поля → первый боец защитника)
+      const defendingFighter =
+        (combatInfo.targetFighterId
+          ? currentState.fighters.find((f) => f.id === combatInfo.targetFighterId)
+          : undefined) ??
+        currentState.fighters.find((f) => f.ownerId === combatInfo.defenderId);
+      const defenseCardForBanner = this.findHandCard(currentState, userId, dto.cardId);
+      if (defendingFighter && defenseCardForBanner) {
+        const bannerCheck = this.rulesValidator.validateBanner(
+          currentState,
+          defenseCardForBanner,
+          defendingFighter,
+        );
+        if (!bannerCheck.valid) {
+          return { success: false, error: bannerCheck.error };
+        }
+      }
+
       // Сыгранная карта защиты: реальное значение + сброс из руки
       // (instance id в combatInfo — см. комментарий в executeAttack)
       const playedCard = this.findHandCard(currentState, userId, dto.cardId);
@@ -693,6 +712,23 @@ export class GameActionExecutorService {
             success: false,
             error: `Card is not a SCHEME card (got ${playedCard.cardType})`,
           };
+        }
+
+        // bannerName: именная scheme требует живого бойца с этим именем
+        const schemeOwnFighters = currentState.fighters.filter(
+          (f) => f.ownerId === userId && f.health > 0,
+        );
+        if (schemeOwnFighters.length > 0) {
+          const bannerOk = schemeOwnFighters.some(
+            (f) => this.rulesValidator.validateBanner(currentState, playedCard, f).valid,
+          );
+          if (!bannerOk) {
+            this.metrics.incrementGameAction('playScheme', undefined, 'error');
+            return {
+              success: false,
+              error: `Карту с банером «${playedCard.bannerName}» нельзя разыграть: боец не в игре`,
+            };
+          }
         }
 
         // Авто-эффекты best-effort: ошибки эффектов не блокируют розыгрыш

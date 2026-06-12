@@ -192,6 +192,24 @@ export class GameRulesValidator {
       return { valid: false, error: 'Card not in hand', code: 'CARD_NOT_IN_HAND' };
     }
 
+    // Атаковать можно только ATTACK/VERSATILE (UNIVERSAL — легаси-синоним)
+    if (
+      card.cardType !== 'ATTACK' &&
+      card.cardType !== 'VERSATILE' &&
+      card.cardType !== 'UNIVERSAL'
+    ) {
+      return {
+        valid: false,
+        error: `Картой типа ${card.cardType} нельзя атаковать`,
+        code: 'INVALID_CARD_TYPE',
+      };
+    }
+
+    // bannerName: именная карта играется только СВОИМ бойцом
+    // ('Clutching Claws' с банером Harpy — только гарпией)
+    const bannerCheck = this.validateBanner(state, card, attacker);
+    if (!bannerCheck.valid) return bannerCheck;
+
     return { valid: true };
   }
 
@@ -532,4 +550,50 @@ export class GameRulesValidator {
 
     return { valid: true };
   }
+
+  /**
+   * bannerName-валидация: именная карта играется только своим бойцом.
+   * Неизвестный банер (не матчит ни одного бойца игры — грязные данные)
+   * НЕ блокирует: warn + разрешить.
+   */
+  validateBanner(
+    state: GameState,
+    card: { bannerName?: string; name?: string },
+    fighter: Fighter,
+  ): ValidationResult {
+    const banner = card.bannerName?.trim();
+    if (!banner || banner.toLowerCase() === 'any') return { valid: true };
+
+    if (bannerAllows(banner, fighter)) return { valid: true };
+
+    // Банер вообще известен в этой игре? (опечатки/грязные данные → разрешить)
+    const known = state.fighters.some((f) => bannerAllows(banner, f));
+    if (!known) {
+      this.logger.warn(
+        `bannerName «${banner}» не матчит ни одного бойца игры — карта разрешена (грязные данные?)`,
+        { card: card.name },
+      );
+      return { valid: true };
+    }
+
+    return {
+      valid: false,
+      error: `Карту с банером «${banner}» может играть только этот боец (играет ${fighter.name})`,
+      code: 'BANNER_MISMATCH',
+    };
+  }
+}
+
+/**
+ * Матчит ли банер карты бойца: «Harpy» = «Harpy 2» (срез числового суффикса),
+ * «Arthur» = «King Arthur» (банер — слово в полном имени). Регистронезависимо.
+ */
+export function bannerAllows(banner: string, fighter: { name: string }): boolean {
+  const b = banner.trim().toLowerCase();
+  const full = fighter.name.trim().toLowerCase();
+  const base = full.replace(/\s+\d+$/, '');
+  if (b === full || b === base) return true;
+  // банер как целое слово внутри имени ('arthur' в 'king arthur')
+  const words = base.split(/\s+/);
+  return words.includes(b);
 }
