@@ -30,6 +30,7 @@ import {
   FighterType,
   createEmptyBoardState,
   normalizeAttackType,
+  slugifyHeroName,
 } from '../../game-engine/models';
 import type { AttackType, BoardState, Cell } from '../../game-engine/models';
 import type { Board } from '@prisma/client';
@@ -137,6 +138,9 @@ export class GameInitializationService {
       occupied.add(`${basePos.x}:${basePos.y}`);
       const heroFighterId = `f-${seat}-hero`;
       const sidekicks = this.parseSidekicks(hero.sidekicks);
+      // Слаг для HeroAbilityRegistry: handlers ключуются 'daredevil'/'ms-marvel',
+      // heroId — cuid. Пишем и герою, и сайдкикам (handler ищет бойцов героя)
+      const heroSlug = slugifyHeroName(hero.name);
 
       const sidekickFighters: Fighter[] = sidekicks.map((sk, i) => {
         const offset = SIDEKICK_OFFSETS[i % SIDEKICK_OFFSETS.length] ?? { x: 1, y: 1 };
@@ -160,6 +164,7 @@ export class GameInitializationService {
           movement: Number.isInteger(sk.movement) && sk.movement! >= 1 ? sk.movement : 2,
           // 'range' из БД уже нормализован в parseSidekicks → 'ranged'
           attackType: sk.attackType,
+          heroSlug,
         };
       });
 
@@ -180,6 +185,7 @@ export class GameInitializationService {
         // attackType героя лежит в Hero.properties (backfill-attack-type.ts);
         // отсутствие/мусор → 'melee' (поведение как до фикса)
         attackType: normalizeAttackType((hero.properties as any)?.attackType),
+        heroSlug,
       };
 
       fighters.push(heroFighter, ...sidekickFighters);

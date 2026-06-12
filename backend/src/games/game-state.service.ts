@@ -62,6 +62,10 @@ export interface SerializedGameState {
     lb: string; // lastActionBy
     v: number; // version
     ar?: number; // actionsRemaining — оставшиеся действия в ходу (легаси-сейвы без поля → дефолт в getActionsRemaining)
+    // Раньше ТЕРЯЛИСЬ при save/load — бой выживал только в Redis-кеше (TTL!):
+    ci?: SerializedCombatInfo; // combatInfo — текущий бой
+    pc?: number; // passCount
+    wi?: string; // winnerId
   };
 }
 
@@ -89,6 +93,20 @@ export interface SerializedFighter {
   df?: boolean; // isDefeated — раньше терялся при save/load
   mv?: number; // movement — очки движения (легаси-сейвы без поля → дефолт в getFighterMovement)
   at?: string; // attackType — 'melee'|'ranged' (легаси-сейвы без поля → дефолт в getFighterAttackType)
+  sl?: string; // heroSlug — ключ HeroAbilityRegistry (легаси-сейвы без поля → способности молчат)
+}
+
+/** Сериализованный CombatState (даты — ISO-строки) */
+export interface SerializedCombatInfo {
+  aid: string; // attackerId (fighter id)
+  did: string; // defenderId (userId защитника)
+  tf?: string; // targetFighterId — атакованный боец (легаси без поля → первый боец защитника)
+  ac: string; // attackerCardId
+  dc?: string; // defenderCardId
+  av: number; // attackValue
+  dv: number; // defenseValue
+  sa: string; // startedAt ISO
+  ta?: string; // timeoutAt ISO
 }
 
 export interface SerializedDeck {
@@ -276,6 +294,7 @@ export class GameStateService {
         df: f.isDefeated,
         mv: f.movement,
         at: f.attackType,
+        sl: f.heroSlug,
       })),
       d: Object.entries(state.decks).reduce(
         (acc, [userId, deck]) => {
@@ -316,6 +335,23 @@ export class GameStateService {
         lb: state.metadata.lastActionBy,
         v: state.metadata.version,
         ar: state.metadata.actionsRemaining,
+        ci: state.metadata.combatInfo
+          ? {
+              aid: state.metadata.combatInfo.attackerId,
+              did: state.metadata.combatInfo.defenderId,
+              tf: state.metadata.combatInfo.targetFighterId,
+              ac: state.metadata.combatInfo.attackerCardId,
+              dc: state.metadata.combatInfo.defenderCardId,
+              av: state.metadata.combatInfo.attackValue,
+              dv: state.metadata.combatInfo.defenseValue,
+              sa: new Date(state.metadata.combatInfo.startedAt).toISOString(),
+              ta: state.metadata.combatInfo.timeoutAt
+                ? new Date(state.metadata.combatInfo.timeoutAt).toISOString()
+                : undefined,
+            }
+          : undefined,
+        pc: state.metadata.passCount,
+        wi: state.metadata.winnerId,
       },
     };
   }
@@ -365,6 +401,7 @@ export class GameStateService {
         movement: f.mv,
         // БЕЗ дефолта: undefined прозрачно проходит, дефолтит getFighterAttackType
         attackType: f.at as Fighter['attackType'],
+        heroSlug: f.sl,
       })),
       decks: Object.entries(data.d).reduce(
         (acc, [userId, deck]: [string, any]) => {
@@ -405,6 +442,21 @@ export class GameStateService {
         version: data.m.v,
         // БЕЗ дефолта: undefined прозрачно проходит, дефолтит getActionsRemaining
         actionsRemaining: data.m.ar,
+        combatInfo: data.m.ci
+          ? {
+              attackerId: data.m.ci.aid,
+              defenderId: data.m.ci.did,
+              targetFighterId: data.m.ci.tf,
+              attackerCardId: data.m.ci.ac,
+              defenderCardId: data.m.ci.dc,
+              attackValue: data.m.ci.av,
+              defenseValue: data.m.ci.dv,
+              startedAt: new Date(data.m.ci.sa),
+              timeoutAt: data.m.ci.ta ? new Date(data.m.ci.ta) : undefined,
+            }
+          : undefined,
+        passCount: data.m.pc,
+        winnerId: data.m.wi,
       },
     };
   }

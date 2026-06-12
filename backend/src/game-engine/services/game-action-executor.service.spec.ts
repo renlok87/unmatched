@@ -11,6 +11,9 @@ import { CombatResolverService, CombatResult } from '../engine/combat-resolver.s
 import { MovementService, MovementResult } from '../engine/movement.service';
 import { ValueModifierService } from '../engine/value-modifier.service';
 import { AdjacencyService } from '../engine/adjacency.service';
+import { MetricsService } from '../../metrics/metrics.service';
+import { DeckManagementService } from './deck-management.service';
+import { CardEffectExecutorService } from '../effects/card-effect-executor.service';
 import { GamePhase } from '../../games/dto';
 import type { GameState } from '../../games/game-state.service';
 import {
@@ -172,7 +175,36 @@ describe('GameActionExecutorService', () => {
           provide: AdjacencyService,
           useValue: {
             isAdjacent: jest.fn().mockResolvedValue(true),
+            isInSameZone: jest.fn().mockReturnValue(false),
             manhattanDistance: jest.fn().mockReturnValue(1),
+          },
+        },
+        {
+          // Passthrough-моки: метрики просто исполняют переданный колбэк
+          provide: MetricsService,
+          useValue: {
+            measureServiceDuration: jest.fn((_n: string, _c: string, fn: () => any) => fn()),
+            measureValidation: jest.fn((_n: string, fn: () => any) => fn()),
+            measureCombat: jest.fn((_a: string, _d: string, fn: () => any) => fn()),
+            incrementGameAction: jest.fn(),
+            incrementError: jest.fn(),
+          },
+        },
+        {
+          provide: DeckManagementService,
+          useValue: {
+            // По умолчанию state не меняется — тестам важна логика executor'а
+            drawCards: jest.fn().mockImplementation((state: GameState) => Promise.resolve(state)),
+            discardCard: jest.fn().mockImplementation((state: GameState) => Promise.resolve(state)),
+            discardRandomCard: jest.fn().mockImplementation((state: GameState) => Promise.resolve(state)),
+          },
+        },
+        {
+          provide: CardEffectExecutorService,
+          useValue: {
+            executeOnPlayEffects: jest.fn().mockImplementation((state: GameState) =>
+              Promise.resolve({ state, appliedEffects: [] }),
+            ),
           },
         },
       ],
@@ -481,7 +513,8 @@ describe('GameActionExecutorService', () => {
       const result = await service.executeAttack(dto, context);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Target is not adjacent to attacker');
+      // Текст ошибки различает melee/ranged с введения attackType
+      expect(result.error).toBe('Melee attack: target must be adjacent to attacker');
     });
   });
 
@@ -506,7 +539,8 @@ describe('GameActionExecutorService', () => {
       expect(result.success).toBe(true);
       expect(result.gameState).toBeDefined();
       expect(result.metadata?.action).toBe('endTurn');
-      expect(result.gameState?.phase).toBe(GamePhase.TURN_START);
+      // advanceTurn сразу ставит ACTION_MANEUVER (TURN_START исключён из потока)
+      expect(result.gameState?.phase).toBe(GamePhase.ACTION_MANEUVER);
       expect(result.gameState?.currentTurnPlayerId).toBe('player2');
     });
 
@@ -692,6 +726,72 @@ describe('GameActionExecutorService', () => {
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('No door at (5, 5)');
+    });
+  });
+
+  describe('A0: executeResolveCombat бьёт атакованного бойца (targetFighterId)', () => {
+    // Раньше defenderFighter искался по ownerId — урон всегда получал ПЕРВЫЙ
+    // боец защитника (герой), даже если атаковали сайдкика
+    const sidekick = {
+      id: 'fighter2-sk0',
+      ownerId: 'player2',
+      heroId: 'daredevil',
+      name: 'Sidekick',
+      type: 'sidekick' as any,
+      health: 5,
+      maxHealth: 5,
+      position: { x: 7, y: 5 },
+      effects: [],
+      hasSidekick: false,
+    };
+
+    const combatState = (targetFighterId?: string) =>
+      createMockGameState({
+        phase: GamePhase.COMBAT_RESOLVE,
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 1,
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId,
+            attackerCardId: 'card-a',
+            defenderCardId: 'card-d',
+            attackValue: 4,
+            defenseValue: 1,
+            startedAt: new Date(),
+          },
+        } as any,
+        // герой защитника идёт ПЕРВЫМ в fighters — провоцируем старый баг
+        fighters: [...createMockGameState().fighters, sidekick] as any,
+      });
+
+    it('урон получает сайдкик из targetFighterId, герой защитника цел', async () => {
+      const state = combatState('fighter2-sk0');
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as any,
+        { userId: 'player1', gameId: 'test-game-1', currentState: state },
+      );
+
+      expect(result.success).toBe(true);
+      const fighters = result.gameState!.fighters;
+      expect(fighters.find((f) => f.id === 'fighter2-sk0')!.health).toBe(5 - 3);
+      expect(fighters.find((f) => f.id === 'fighter2')!.health).toBe(17);
+    });
+
+    it('легаси без targetFighterId — fallback на первого бойца защитника', async () => {
+      const state = combatState(undefined);
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as any,
+        { userId: 'player1', gameId: 'test-game-1', currentState: state },
+      );
+
+      expect(result.success).toBe(true);
+      const fighters = result.gameState!.fighters;
+      expect(fighters.find((f) => f.id === 'fighter2')!.health).toBe(17 - 3);
+      expect(fighters.find((f) => f.id === 'fighter2-sk0')!.health).toBe(5);
     });
   });
 });

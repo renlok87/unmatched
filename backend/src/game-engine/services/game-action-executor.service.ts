@@ -496,6 +496,7 @@ export class GameActionExecutorService {
         const combatState: CombatState = {
           attackerId: dto.attackerId,
           defenderId: target.ownerId,
+          targetFighterId: target.id,
           attackerCardId: playedCard?.id ?? dto.cardId,
           attackValue: playedCard?.attackValue ?? 0,
           defenseValue: 0,
@@ -753,9 +754,15 @@ export class GameActionExecutorService {
           return { success: false, error: 'No combat in progress' };
         }
 
-        // Вычисляем урон
+        // Вычисляем урон. Цель — атакованный боец из combatInfo.targetFighterId
+        // (атака по сайдкику ранит сайдкика); легаси-сейвы без поля → fallback
+        // на первого бойца защитника (старое поведение)
         const attacker = currentState.fighters.find((f) => f.id === combatInfo.attackerId);
-        const defenderFighter = currentState.fighters.find((f) => f.ownerId === combatInfo.defenderId);
+        const defenderFighter =
+          (combatInfo.targetFighterId
+            ? currentState.fighters.find((f) => f.id === combatInfo.targetFighterId)
+            : undefined) ??
+          currentState.fighters.find((f) => f.ownerId === combatInfo.defenderId);
 
         if (!attacker || !defenderFighter) {
           this.metrics.incrementGameAction('resolveCombat', undefined, 'error');

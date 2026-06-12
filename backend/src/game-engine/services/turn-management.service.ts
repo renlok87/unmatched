@@ -130,7 +130,7 @@ export class TurnManagementService {
     // Применяем способности триггера start_of_turn
     const playerFighters = state.fighters.filter((f) => f.ownerId === playerId);
     for (const fighter of playerFighters) {
-      const abilityEvents = this.abilityRegistry.triggerOnTurnStart(fighter.heroId, fighter);
+      const abilityEvents = this.abilityRegistry.triggerOnTurnStart(fighter.heroSlug ?? fighter.heroId, fighter);
       events.push(...abilityEvents);
     }
 
@@ -254,7 +254,7 @@ export class TurnManagementService {
 
     // Применяем способности триггера end_of_turn
     for (const fighter of playerFightersAlive) {
-      const abilityEvents = this.abilityRegistry.triggerOnTurnEnd(fighter.heroId, fighter);
+      const abilityEvents = this.abilityRegistry.triggerOnTurnEnd(fighter.heroSlug ?? fighter.heroId, fighter);
       events.push(...abilityEvents);
     }
 

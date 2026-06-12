@@ -19,7 +19,8 @@ import { Position } from '../../models';
  * Обработчик способности Артура
  */
 export const arthurAbilityHandler: HeroAbilityHandler = {
-  heroId: 'arthur',
+  // Ключ = slugifyHeroName(Hero.name) — в БД герой называется 'King Arthur'
+  heroId: 'king-arthur',
   name: 'Righteous Fury',
   description: 'Arthur всегда имеет минимум +1 к атаке',
 

@@ -55,12 +55,14 @@ export class CombatResolverService {
         defenseCardId,
       };
 
+      // Handlers зарегистрированы по слагам ('daredevil'), heroId — Prisma cuid:
+      // без heroSlug lookup никогда не находил handler (способности были мертвы)
       const attackerModifiers = await this.metrics.measureServiceDuration(
         'applyCombatModifiers',
         'HeroAbilityRegistry',
         () => Promise.resolve(
           this.abilityRegistry.applyCombatModifiers(
-            attacker.heroId,
+            attacker.heroSlug ?? attacker.heroId,
             registryCombatState,
             attacker,
             'attacker',
@@ -73,7 +75,7 @@ export class CombatResolverService {
         'HeroAbilityRegistry',
         () => Promise.resolve(
           this.abilityRegistry.applyCombatModifiers(
-            defender.heroId,
+            defender.heroSlug ?? defender.heroId,
             registryCombatState,
             defender,
             'defender',

@@ -73,6 +73,9 @@ export interface GameStatePlayer {
 export interface CombatState {
   readonly attackerId: string;
   readonly defenderId: string;
+  /** Атакованный боец (id из fighters). Optional — легаси-сейвы без поля:
+   *  fallback на первого бойца защитника (старое поведение). */
+  readonly targetFighterId?: string;
   readonly attackerCardId: string;
   readonly defenderCardId?: string;
   readonly attackValue: number;

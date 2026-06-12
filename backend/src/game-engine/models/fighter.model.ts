@@ -53,6 +53,10 @@ export interface Fighter {
   /** Тип атаки бойца: melee — только смежные цели, ranged — та же зона или смежная
    *  (опционально — легаси-сейвы без поля → melee через getFighterAttackType) */
   readonly attackType?: 'melee' | 'ranged';
+  /** Слаг героя для HeroAbilityRegistry (handlers регистрируются по слагам
+   *  'daredevil'/'ms-marvel', а heroId — Prisma cuid). Optional — легаси-сейвы
+   *  без поля: способности у них не срабатывают (как и раньше). */
+  readonly heroSlug?: string;
 }
 
 /**
@@ -67,6 +71,17 @@ export const DEFAULT_FIGHTER_MOVEMENT = 2;
 export function getFighterMovement(f: Fighter): number {
   const m = Number(f.movement);
   return Number.isInteger(m) && m >= 1 ? m : DEFAULT_FIGHTER_MOVEMENT;
+}
+
+/**
+ * Слаг героя для реестра способностей: 'Ms. Marvel' → 'ms-marvel',
+ * 'King Arthur' → 'king-arthur'. Единственная точка нормализации имени.
+ */
+export function slugifyHeroName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 /**

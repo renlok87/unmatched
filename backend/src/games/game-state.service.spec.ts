@@ -6,6 +6,7 @@ import { RedisService } from '../redis/redis.service';
 import { GameSubscriptionService } from './game-subscription.service';
 import { GamePhase } from './dto/create-game.dto';
 import { ConcurrentModificationException } from './exceptions/game.exceptions';
+import { CardType, FighterType, createEmptyBoardState } from '../game-engine/models';
 
 describe('GameStateService', () => {
   let service: GameStateService;
@@ -43,7 +44,7 @@ describe('GameStateService', () => {
         ownerId: 'player1',
         heroId: 'hero1',
         name: 'Fighter 1',
-        type: 'HERO',
+        type: FighterType.HERO,
         health: 100,
         maxHealth: 100,
         position: { x: 0, y: 0 },
@@ -55,7 +56,7 @@ describe('GameStateService', () => {
         ownerId: 'player2',
         heroId: 'hero2',
         name: 'Fighter 2',
-        type: 'HERO',
+        type: FighterType.HERO,
         health: 100,
         maxHealth: 100,
         position: { x: 10, y: 10 },
@@ -73,7 +74,7 @@ describe('GameStateService', () => {
           name: 'Card 1',
           nameEn: 'Card 1',
           nameRu: 'Карта 1',
-          cardType: 'ATTACK',
+          cardType: CardType.ATTACK,
         },
       },
       player2: {
@@ -85,7 +86,7 @@ describe('GameStateService', () => {
           name: 'Card 2',
           nameEn: 'Card 2',
           nameRu: 'Карта 2',
-          cardType: 'DEFENSE',
+          cardType: CardType.DEFENSE,
         },
       },
     },
@@ -99,7 +100,7 @@ describe('GameStateService', () => {
             name: 'Hand Card 1',
             nameEn: 'Hand Card 1',
             nameRu: 'Карта в руке 1',
-            cardType: 'ATTACK',
+            cardType: CardType.ATTACK,
             attackValue: 5,
             isVisible: true,
           },
@@ -114,7 +115,7 @@ describe('GameStateService', () => {
             name: 'Hand Card 2',
             nameEn: 'Hand Card 2',
             nameRu: 'Карта в руке 2',
-            cardType: 'DEFENSE',
+            cardType: CardType.DEFENSE,
             defenseValue: 3,
             isVisible: true,
           },
@@ -123,6 +124,7 @@ describe('GameStateService', () => {
       },
     },
     boardState: {
+      ...createEmptyBoardState(20, 20),
       doors: {},
       fog: {},
       tokens: {},
@@ -582,6 +584,7 @@ describe('GameStateService', () => {
       expect(redis.setJsonex).toHaveBeenCalled();
       expect(gameSubscriptionService.publishGameUpdate).toHaveBeenCalledWith(
         'game1',
+        'STATE_UPDATED',
         mockGameState,
       );
     });
@@ -626,6 +629,71 @@ describe('GameStateService', () => {
       const seqNum = await service.getSequenceNumber('nonexistent');
 
       expect(seqNum).toBe(0);
+    });
+  });
+
+  describe('A0: round-trip combatInfo/winnerId/passCount/heroSlug', () => {
+    // Раньше serialize ТЕРЯЛ combatInfo/winnerId/passCount — бой выживал
+    // только в Redis-кеше (TTL), после вылета кеша resolveCombat падал
+    // с 'No combat in progress'
+    it('combatInfo переживает serialize → deserialize', () => {
+      const startedAt = new Date('2026-06-12T10:00:00.000Z');
+      const withCombat: GameState = {
+        ...mockGameState,
+        metadata: {
+          ...mockGameState.metadata,
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId: 'fighter2-sk0',
+            attackerCardId: 'card-a::1',
+            defenderCardId: 'card-d::2',
+            attackValue: 4,
+            defenseValue: 3,
+            startedAt,
+          },
+          passCount: 1,
+          winnerId: 'player1',
+          actionsRemaining: 1,
+        },
+      };
+
+      const restored = service.deserialize(service.serialize(withCombat));
+
+      expect(restored.metadata.combatInfo).toBeDefined();
+      expect(restored.metadata.combatInfo!.attackerId).toBe('fighter1');
+      expect(restored.metadata.combatInfo!.defenderId).toBe('player2');
+      expect(restored.metadata.combatInfo!.targetFighterId).toBe('fighter2-sk0');
+      expect(restored.metadata.combatInfo!.attackerCardId).toBe('card-a::1');
+      expect(restored.metadata.combatInfo!.defenderCardId).toBe('card-d::2');
+      expect(restored.metadata.combatInfo!.attackValue).toBe(4);
+      expect(restored.metadata.combatInfo!.defenseValue).toBe(3);
+      expect(restored.metadata.combatInfo!.startedAt.toISOString()).toBe(
+        startedAt.toISOString(),
+      );
+      expect(restored.metadata.passCount).toBe(1);
+      expect(restored.metadata.winnerId).toBe('player1');
+    });
+
+    it('без боя combatInfo остаётся undefined (легаси-сейвы живы)', () => {
+      const restored = service.deserialize(service.serialize(mockGameState));
+      expect(restored.metadata.combatInfo).toBeUndefined();
+      expect(restored.metadata.winnerId).toBeUndefined();
+    });
+
+    it('heroSlug бойца переживает serialize → deserialize', () => {
+      const withSlug: GameState = {
+        ...mockGameState,
+        fighters: mockGameState.fighters.map((f, i) =>
+          i === 0 ? { ...f, heroSlug: 'ms-marvel' } : f,
+        ),
+      };
+
+      const restored = service.deserialize(service.serialize(withSlug));
+
+      expect(restored.fighters[0].heroSlug).toBe('ms-marvel');
+      // без поля — undefined прозрачно проходит (легаси)
+      expect(restored.fighters[1].heroSlug).toBeUndefined();
     });
   });
 });
