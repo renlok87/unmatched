@@ -207,6 +207,37 @@ export class PlaySchemeDto {
 }
 
 /**
+ * DTO резолва отложенного эффекта (C2): игрок выбирает бойца и клетку
+ * для MOVE/PLACE-эффекта карты (metadata.pendingEffects)
+ */
+@InputType()
+export class ResolvePendingEffectDto {
+  @Field(() => String)
+  @IsNotEmpty()
+  gameId: string;
+
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
+  effectId: string;
+
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
+  fighterId: string;
+
+  @Field(() => Int)
+  @IsInt()
+  @Min(0)
+  x: number;
+
+  @Field(() => Int)
+  @IsInt()
+  @Min(0)
+  y: number;
+}
+
+/**
  * DTO для разрешения боя
  */
 @InputType()

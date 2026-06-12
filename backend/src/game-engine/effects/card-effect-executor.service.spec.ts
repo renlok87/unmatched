@@ -287,7 +287,7 @@ describe('CardEffectExecutorService (A3)', () => {
       expect(after.state.fighters.find((f) => f.id === 'f1')!.health).toBe(12);
     });
 
-    it('MOVE/UNSUPPORTED уходят в manualEffects, состояние не трогают', async () => {
+    it('MOVE → pendingEffects (выбор игрока), UNSUPPORTED → manual; бойцы не тронуты', async () => {
       const atk = card('atk', [
         eff({ type: EffectType.MOVE, value: 3, text: 'Move your fighter up to 3 spaces.' }),
         eff({ type: EffectType.UNSUPPORTED, text: 'Something weird.' }),
@@ -300,6 +300,9 @@ describe('CardEffectExecutorService (A3)', () => {
         'Move your fighter up to 3 spaces.',
         'Something weird.',
       ]);
+      const pending = after.state.metadata.pendingEffects ?? [];
+      expect(pending).toHaveLength(1);
+      expect(pending[0]).toMatchObject({ type: 'MOVE', playerId: 'p1', value: 3 });
       expect(after.state.fighters).toEqual(state.fighters);
     });
 

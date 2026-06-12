@@ -29,7 +29,7 @@ import {
   CardEffectExecutorService,
   type EffectResult,
 } from '../effects/card-effect-executor.service';
-import { GameRulesValidator } from '../validators/game-rules.validator';
+import { GameRulesValidator, bannerAllows } from '../validators/game-rules.validator';
 import { CombatResolverService } from '../engine/combat-resolver.service';
 import { MovementService } from '../engine/movement.service';
 import { ValueModifierService } from '../engine/value-modifier.service';
@@ -216,8 +216,133 @@ export class GameActionExecutorService {
         lastActionBy: userId,
         actionsRemaining: ACTIONS_PER_TURN, // новый ход — 2 действия
         turnStartPositions,
+        // Выборы игрока протухают при ВОЗВРАТЕ хода их владельцу (полный круг):
+        // атака вторым действием создаёт pending и тут же передаёт ход —
+        // чистка «при любой передаче» стирала бы их до резолва
+        pendingEffects: (next.metadata.pendingEffects ?? []).filter(
+          (p) => p.playerId !== nextPlayerId,
+        ),
       },
     };
+  }
+
+  /**
+   * Резолв отложенного эффекта (C2): игрок выбирает бойца/клетку для
+   * MOVE/PLACE-эффекта карты (metadata.pendingEffects).
+   * Действие НЕ тратится (эффект уже оплачен картой), seq +1.
+   */
+  async executeResolvePendingEffect(
+    dto: { gameId: string; effectId: string; fighterId: string; x: number; y: number },
+    context: ActionContext,
+  ): Promise<ActionResult> {
+    try {
+      const { userId, currentState } = context;
+      const pending = (currentState.metadata.pendingEffects ?? []).find(
+        (p) => p.id === dto.effectId,
+      );
+      if (!pending) {
+        return { success: false, error: 'Отложенный эффект не найден (протух или уже резолвлен)' };
+      }
+      if (pending.playerId !== userId) {
+        return { success: false, error: 'Этот выбор принадлежит другому игроку' };
+      }
+
+      const fighter = currentState.fighters.find((f) => f.id === dto.fighterId);
+      if (!fighter || fighter.health <= 0) {
+        return { success: false, error: 'Боец не найден или повержен' };
+      }
+
+      // Чей боец двигается: свой (обычные MOVE) или противника
+      // («Place the opposing fighter…»)
+      if (pending.targetsOpponent ? fighter.ownerId === userId : fighter.ownerId !== userId) {
+        return { success: false, error: 'Эффект двигает не этого бойца' };
+      }
+
+      // Именное ограничение из текста карты («Move Daredevil…», «each Harpy»)
+      if (pending.fighterName && !bannerAllows(pending.fighterName, fighter)) {
+        return {
+          success: false,
+          error: `Эффект двигает только «${pending.fighterName}» (выбран ${fighter.name})`,
+        };
+      }
+
+      const target = { x: dto.x, y: dto.y };
+      if (
+        target.x < 0 ||
+        target.y < 0 ||
+        target.x >= currentState.boardState.width ||
+        target.y >= currentState.boardState.height
+      ) {
+        return { success: false, error: 'Клетка вне доски' };
+      }
+      const cell = currentState.boardState.cells[target.y]?.[target.x];
+      if (cell && (cell.type === 'obstacle' || cell.type === 'wall')) {
+        return { success: false, error: 'Клетка непроходима' };
+      }
+      const occupied = currentState.fighters.some(
+        (f) => f.id !== fighter.id && f.health > 0 && f.position.x === target.x && f.position.y === target.y,
+      );
+      if (occupied) {
+        return { success: false, error: 'Клетка занята' };
+      }
+
+      if (pending.type === 'MOVE') {
+        // Дистанция эффекта (не movement бойца): BFS по проходимым клеткам
+        const allowance = pending.value ?? 1;
+        const blockedPositions = new Set(
+          currentState.fighters
+            .filter((f) => f.id !== fighter.id && f.health > 0)
+            .map((f) => `${f.position.x}:${f.position.y}`),
+        );
+        const reachable = this.adjacencyService.getReachableCells(
+          currentState.boardState,
+          fighter.position,
+          allowance,
+          { blockedPositions },
+        );
+        if (!reachable.has(`${target.x}:${target.y}`)) {
+          return {
+            success: false,
+            error: `До клетки (${target.x}, ${target.y}) не добраться за ${allowance} шаг(ов)`,
+          };
+        }
+      }
+      // PLACE: любая валидная свободная клетка (зонные ограничения — позже)
+
+      const newState: GameState = {
+        ...currentState,
+        sequenceNumber: currentState.sequenceNumber + 1,
+        fighters: currentState.fighters.map((f) =>
+          f.id === fighter.id ? { ...f, position: target } : f,
+        ),
+        metadata: {
+          ...currentState.metadata,
+          lastActionAt: new Date(),
+          lastActionBy: userId,
+          pendingEffects: (currentState.metadata.pendingEffects ?? []).filter(
+            (p) => p.id !== pending.id,
+          ),
+        },
+      };
+
+      return {
+        success: true,
+        gameState: newState,
+        metadata: {
+          action: 'resolvePendingEffect',
+          performedAt: new Date(),
+          performedBy: userId,
+          sequenceNumber: newState.sequenceNumber,
+          effectText: pending.text,
+        },
+      };
+    } catch (error) {
+      this.logger.error(`Ошибка resolvePendingEffect: ${error}`);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
   }
 
   /**

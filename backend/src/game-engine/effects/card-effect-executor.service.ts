@@ -544,13 +544,30 @@ export class CardEffectExecutorService {
         return { state: next, result: ok({ targetIds: targets }) };
       }
 
-      // --- требуют выбора игрока → manualEffects (MVP, до pendingEffects) ---
+      // --- требуют выбора игрока → metadata.pendingEffects (C2):
+      // резолвятся мутацией resolvePendingEffect, протухают в advanceTurn ---
       case EffectType.MOVE:
       case EffectType.PLACE: {
         const text = effect.text ?? `${effect.type} ${value || ''}`.trim();
+        const pending = {
+          id: `${effect.id}-p${(state.metadata.pendingEffects?.length ?? 0)}`,
+          type: effect.type === EffectType.MOVE ? ('MOVE' as const) : ('PLACE' as const),
+          playerId: context.playerId,
+          value: value || undefined,
+          fighterName: effect.fighterName,
+          targetsOpponent: effect.target === EffectTarget.OPPOSING_FIGHTER,
+          text,
+        };
+        const next: GameState = {
+          ...state,
+          metadata: {
+            ...state.metadata,
+            pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+          },
+        };
         return {
-          state,
-          result: ok({ manual: true, message: text }),
+          state: next,
+          result: ok({ message: `Ожидает выбора: ${text}` }),
           manual: text,
         };
       }

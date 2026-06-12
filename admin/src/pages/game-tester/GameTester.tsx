@@ -22,7 +22,7 @@ import {
   MOVE_FIGHTER,
   PASS,
   PLAY_DEFENSE,
-  PLAY_SCHEME,
+  PLAY_SCHEME, RESOLVE_PENDING_EFFECT,
   REGISTER,
   RESOLVE_COMBAT,
   SELECT_HERO,
@@ -77,6 +77,8 @@ const HELP_TEXT = `Команды (2 действия за ход; после 2-
   maneuver <f> [<c>|-] <x>,<y> [...]     — манёвр: добор + движение; карта = BOOST к ходам (опц.)
   attack <f1> <f2> <c> [<boost>]         — атака картой (+BOOST-карта, тратит 1 действие)
   scheme <c>       — разыграть scheme-карту (тратит 1 действие)
+  pending          — список отложенных эффектов (выбор игрока)
+  peffect <id> <f> <x>,<y> — резолв отложенного MOVE/PLACE
   defense <c> [<boost>] — карта защиты (+BOOST-карта, за защищающегося)
   resolve          — разрешить бой
   end              — закончить ход досрочно
@@ -628,6 +630,31 @@ export const GameTester: React.FC = () => {
           await runAction(slot, 'resolveCombat', RESOLVE_COMBAT, {
             input: { gameId: gameIdRef.current! },
           }, 'resolveCombat');
+          break;
+        }
+        case 'pending': {
+          // список отложенных эффектов (выборов игрока) из metadata
+          const pend = (stateRef.current?.metadata?.pendingEffects ?? []) as any[];
+          if (pend.length === 0) {
+            sys('Отложенных эффектов нет');
+          } else {
+            pend.forEach((p: any) =>
+              sys(`⏳ ${p.id} [${p.type}${p.value ? ' ' + p.value : ''}] ${p.text ?? ''}`),
+            );
+          }
+          break;
+        }
+        case 'peffect': {
+          // peffect <effectId> <f> <x>,<y> — резолв отложенного MOVE/PLACE
+          const [, effId, fRef, posRef] = parts;
+          if (!effId || !fRef || !posRef) throw new Error('peffect <effectId> <f> <x>,<y>');
+          const slot = resolveActor('peffect');
+          const f = resolveFighter(fRef);
+          const [px, py] = posRef.split(',').map(Number);
+          if (Number.isNaN(px) || Number.isNaN(py)) throw new Error(`Плохая клетка: ${posRef}`);
+          await runAction(slot, `resolvePendingEffect(${effId}, ${f.name} → ${px},${py})`, RESOLVE_PENDING_EFFECT, {
+            input: { gameId: gameIdRef.current!, effectId: effId, fighterId: f.id, x: px, y: py },
+          }, 'resolvePendingEffect');
           break;
         }
         case 'end': {

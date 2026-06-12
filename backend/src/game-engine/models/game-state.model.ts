@@ -101,6 +101,30 @@ export interface GameStateMetadata {
   /** Позиции бойцов на начало хода (пишет advanceTurn) — для условия
    *  MOVED_THIS_TURN («started this turn in a different space») */
   readonly turnStartPositions?: Readonly<Record<string, { x: number; y: number }>>;
+  /** Эффекты, ждущие выбора игрока (MOVE/PLACE из карт) — резолвятся
+   *  мутацией resolvePendingEffect; протухают при передаче хода */
+  readonly pendingEffects?: readonly PendingEffect[];
+}
+
+/**
+ * Эффект карты, требующий выбора игрока (C2).
+ * Не блокирует другие действия (в Unmatched такие эффекты опциональны —
+ * «You may move…»); нерезолвленные чистятся в advanceTurn.
+ */
+export interface PendingEffect {
+  readonly id: string;
+  /** 'MOVE' (до value шагов) | 'PLACE' (любая свободная клетка) */
+  readonly type: 'MOVE' | 'PLACE';
+  /** Кому принадлежит выбор */
+  readonly playerId: string;
+  /** Дистанция для MOVE */
+  readonly value?: number;
+  /** Ограничение бойца: имя из текста карты («Move Daredevil…») */
+  readonly fighterName?: string;
+  /** Двигается боец противника («Place the opposing fighter…») */
+  readonly targetsOpponent?: boolean;
+  /** Исходный текст — для лога/тестера */
+  readonly text?: string;
 }
 
 /**

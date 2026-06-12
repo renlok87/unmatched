@@ -67,6 +67,7 @@ export interface SerializedGameState {
     pc?: number; // passCount
     wi?: string; // winnerId
     tsp?: Record<string, { x: number; y: number }>; // turnStartPositions (MOVED_THIS_TURN)
+    pe?: readonly unknown[]; // pendingEffects — выборы игрока (C2)
   };
 }
 
@@ -354,6 +355,7 @@ export class GameStateService {
         pc: state.metadata.passCount,
         wi: state.metadata.winnerId,
         tsp: state.metadata.turnStartPositions as Record<string, { x: number; y: number }> | undefined,
+        pe: state.metadata.pendingEffects,
       },
     };
   }
@@ -460,6 +462,7 @@ export class GameStateService {
         passCount: data.m.pc,
         winnerId: data.m.wi,
         turnStartPositions: data.m.tsp,
+        pendingEffects: data.m.pe,
       },
     };
   }

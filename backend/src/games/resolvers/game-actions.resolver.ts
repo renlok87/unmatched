@@ -32,6 +32,7 @@ import {
   AttackDto,
   PlayDefenseDto,
   PlaySchemeDto,
+  ResolvePendingEffectDto,
   ResolveCombatDto,
   EndTurnDto,
   PassDto,
@@ -359,6 +360,30 @@ export class GameActionsResolver {
       userId,
       'playScheme',
       (ctx) => this.actionExecutor.executePlayScheme(dto, ctx),
+      'CARD_PLAYED',
+    );
+  }
+
+  /**
+   * Резолв отложенного эффекта карты (C2): выбор бойца/клетки для
+   * MOVE/PLACE из metadata.pendingEffects. Действие не тратится.
+   */
+  @Mutation(() => GameMutationResult, {
+    name: 'resolvePendingEffect',
+    description: 'Выбор бойца/клетки для отложенного эффекта карты (MOVE/PLACE)',
+  })
+  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
+  async resolvePendingEffect(
+    @Args('input') dto: ResolvePendingEffectDto,
+    @Context() context: any,
+  ): Promise<GameMutationResult> {
+    const userId = getUserId(context);
+    return this.executeMutation(
+      dto,
+      userId,
+      'resolvePendingEffect',
+      (ctx) => this.actionExecutor.executeResolvePendingEffect(dto, ctx),
       'CARD_PLAYED',
     );
   }

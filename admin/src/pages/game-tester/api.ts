@@ -211,6 +211,12 @@ export const PLAY_SCHEME = `
   }
 `;
 
+export const RESOLVE_PENDING_EFFECT = `
+  mutation ResolvePendingEffect($input: ResolvePendingEffectDto!) {
+    resolvePendingEffect(input: $input) { ${MUTATION_RESULT} }
+  }
+`;
+
 export const TOGGLE_DOOR = `
   mutation ToggleDoor($input: ToggleDoorDto!) {
     toggleDoor(input: $input) { ${MUTATION_RESULT} }
