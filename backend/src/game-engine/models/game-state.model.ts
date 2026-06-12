@@ -98,6 +98,9 @@ export interface GameStateMetadata {
   readonly winnerId?: string; // Победитель (заполняется при GAME_OVER)
   /** Оставшиеся действия текущего игрока в этом ходу (легаси-сейвы без поля → дефолт в getActionsRemaining) */
   readonly actionsRemaining?: number;
+  /** Позиции бойцов на начало хода (пишет advanceTurn) — для условия
+   *  MOVED_THIS_TURN («started this turn in a different space») */
+  readonly turnStartPositions?: Readonly<Record<string, { x: number; y: number }>>;
 }
 
 /**

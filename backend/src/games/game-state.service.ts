@@ -66,6 +66,7 @@ export interface SerializedGameState {
     ci?: SerializedCombatInfo; // combatInfo — текущий бой
     pc?: number; // passCount
     wi?: string; // winnerId
+    tsp?: Record<string, { x: number; y: number }>; // turnStartPositions (MOVED_THIS_TURN)
   };
 }
 
@@ -352,6 +353,7 @@ export class GameStateService {
           : undefined,
         pc: state.metadata.passCount,
         wi: state.metadata.winnerId,
+        tsp: state.metadata.turnStartPositions as Record<string, { x: number; y: number }> | undefined,
       },
     };
   }
@@ -457,6 +459,7 @@ export class GameStateService {
           : undefined,
         passCount: data.m.pc,
         winnerId: data.m.wi,
+        turnStartPositions: data.m.tsp,
       },
     };
   }
