@@ -138,6 +138,9 @@ describe('GameActionExecutorService', () => {
               defenderEffectsApplied: [],
               nextState: createMockGameState(),
             } as any),
+            getHeroCombatModifiers: jest
+              .fn()
+              .mockReturnValue({ attackModifier: 0, defenseModifier: 0 }),
           },
         },
         {
@@ -203,7 +206,33 @@ describe('GameActionExecutorService', () => {
           provide: CardEffectExecutorService,
           useValue: {
             executeOnPlayEffects: jest.fn().mockImplementation((state: GameState) =>
-              Promise.resolve({ state, appliedEffects: [] }),
+              Promise.resolve({ state, appliedEffects: [], manualEffects: [] }),
+            ),
+            // Passthrough-пайплайн боя: значения из combatInfo, без эффектов
+            executeRevealEffects: jest.fn().mockImplementation((state: GameState) =>
+              Promise.resolve({
+                state,
+                appliedEffects: [],
+                manualEffects: [],
+                attackerCardCancelled: false,
+                defenderCardCancelled: false,
+              }),
+            ),
+            executeCombatEffects: jest
+              .fn()
+              .mockImplementation((state: GameState, _a: unknown, _d: unknown, combat: any) =>
+                Promise.resolve({
+                  state,
+                  finalAttack: combat.attackValue,
+                  finalDefense: combat.defenseValue,
+                  preventDamageToAttacker: false,
+                  preventDamageToDefender: false,
+                  appliedEffects: [],
+                  manualEffects: [],
+                }),
+              ),
+            executeAfterCombatEffects: jest.fn().mockImplementation((state: GameState) =>
+              Promise.resolve({ state, appliedEffects: [], manualEffects: [] }),
             ),
           },
         },

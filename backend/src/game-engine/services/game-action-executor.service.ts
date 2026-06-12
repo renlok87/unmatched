@@ -14,7 +14,7 @@ import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { MetricsService } from '../../metrics/metrics.service';
 // P3: единые engine-модели (GameState/GamePhase/CombatState) — value-импорт
 // engine→games убран, рантайм-цикла модулей больше нет
-import type { GameState, CombatState, HandCard } from '../models';
+import type { GameState, CombatState, HandCard, Card } from '../models';
 import {
   GamePhase,
   CardType,
@@ -63,6 +63,19 @@ export interface ActionResult {
     readonly effectText?: string;
     // playScheme: авто-применённые эффекты карты (best-effort, обычно пусто)
     readonly appliedEffects?: readonly EffectResult[];
+    // Эффекты, требующие ручного применения (MOVE/PLACE/UNSUPPORTED) —
+    // Game Tester печатает их в лог
+    readonly manualEffects?: readonly string[];
+    // resolveCombat: итог боя для лога
+    readonly combatSummary?: {
+      readonly finalAttack: number;
+      readonly finalDefense: number;
+      readonly attackerDamage: number;
+      readonly defenderDamage: number;
+      readonly attackerWon: boolean;
+      readonly attackerCardCancelled: boolean;
+      readonly defenderCardCancelled: boolean;
+    };
   };
 }
 
@@ -150,8 +163,22 @@ export class GameActionExecutorService {
       this.logger.warn(`advanceTurn: draw skipped for ${nextPlayerId}: ${e}`);
     }
 
+    // Эффекты «до конца хода» (immobilized и т.п.) снимаются на передаче хода
+    const fightersCleaned = next.fighters.map((f) =>
+      f.effects.some((e) => e.duration === 'turn')
+        ? { ...f, effects: f.effects.filter((e) => e.duration !== 'turn') }
+        : f,
+    );
+
+    // Снапшот позиций на начало нового хода — условие MOVED_THIS_TURN
+    // («started this turn in a different space»)
+    const turnStartPositions = Object.fromEntries(
+      fightersCleaned.map((f) => [f.id, { x: f.position.x, y: f.position.y }]),
+    );
+
     return {
       ...next,
+      fighters: fightersCleaned,
       phase: GamePhase.ACTION_MANEUVER,
       currentTurnPlayerId: nextPlayerId,
       turnCount: isSamePlayer ? state.turnCount : state.turnCount + 1,
@@ -161,6 +188,7 @@ export class GameActionExecutorService {
         lastActionAt: new Date(),
         lastActionBy: userId,
         actionsRemaining: ACTIONS_PER_TURN, // новый ход — 2 действия
+        turnStartPositions,
       },
     };
   }
@@ -754,9 +782,9 @@ export class GameActionExecutorService {
           return { success: false, error: 'No combat in progress' };
         }
 
-        // Вычисляем урон. Цель — атакованный боец из combatInfo.targetFighterId
-        // (атака по сайдкику ранит сайдкика); легаси-сейвы без поля → fallback
-        // на первого бойца защитника (старое поведение)
+        // Цель — атакованный боец из combatInfo.targetFighterId (атака по
+        // сайдкику ранит сайдкика); легаси-сейвы без поля → fallback на
+        // первого бойца защитника (старое поведение)
         const attacker = currentState.fighters.find((f) => f.id === combatInfo.attackerId);
         const defenderFighter =
           (combatInfo.targetFighterId
@@ -769,39 +797,107 @@ export class GameActionExecutorService {
           return { success: false, error: 'Combat participants not found' };
         }
 
-        // Разрешаем бой через CombatResolverService с метриками
-        const combatResult = await this.metrics.measureCombat(
-          attacker.heroId,
-          defenderFighter.heroId,
-          () => this.combatResolver.resolveCombat(
-            currentState,
-            combatInfo.attackerId,
-            defenderFighter.id,
-            combatInfo.attackerCardId,
-            combatInfo.defenderCardId,
-          ),
+        // Сыгранные карты (обе уже в сбросе — ищем везде по instance id)
+        const attackerCard = this.findCardAnywhere(currentState, combatInfo.attackerCardId);
+        const defenderCard = combatInfo.defenderCardId
+          ? this.findCardAnywhere(currentState, combatInfo.defenderCardId)
+          : null;
+
+        const combatCtx = {
+          attackerFighterId: attacker.id,
+          targetFighterId: defenderFighter.id,
+          attackerPlayerId: attacker.ownerId,
+          defenderPlayerId: combatInfo.defenderId,
+          attackCardId: combatInfo.attackerCardId,
+          defenseCardId: combatInfo.defenderCardId,
+          attackValue: combatInfo.attackValue,
+          defenseValue: combatInfo.defenseValue,
+        };
+
+        // === Пайплайн боя (правила Unmatched) ===
+        // 1. ON_REVEAL (вскрытие): атакующий → защитник, cancel-флаги
+        const reveal = await this.cardEffectExecutor.executeRevealEffects(
+          currentState,
+          attackerCard,
+          defenderCard,
+          combatCtx,
+        );
+        const cancelled = {
+          attacker: reveal.attackerCardCancelled,
+          defender: reveal.defenderCardCancelled,
+        };
+
+        // 2. DURING_COMBAT: эффекты карт → финальные значения
+        const calc = await this.cardEffectExecutor.executeCombatEffects(
+          reveal.state,
+          attackerCard,
+          defenderCard,
+          combatCtx,
+          cancelled,
         );
 
-        // Получаем урон из результата
-        // TODO: пробел типа CombatResult (нет attackerDamage/defenderDamage) —
-        // это не стыковка моделей, чинить в типе CombatResult отдельно
-        const attackerDamage = (combatResult as any).attackerDamage ?? 0;
-        const defenderDamage = (combatResult as any).defenderDamage ?? 0;
-
-        // Применяем урон
-        let updatedFighters = [...currentState.fighters];
-        updatedFighters = updatedFighters.map((f) => {
-          if (f.id === combatInfo.attackerId && attackerDamage > 0) {
-            return { ...f, health: Math.max(0, f.health - attackerDamage) };
-          }
-          if (f.id === defenderFighter.id && defenderDamage > 0) {
-            return { ...f, health: Math.max(0, f.health - defenderDamage) };
-          }
-          return f;
+        // Модификаторы способностей героев — ПОСЛЕ карточных SET/MODIFY
+        // (set value заменяет значение карты, ability добавляется поверх)
+        const heroMods = this.combatResolver.getHeroCombatModifiers(attacker, defenderFighter, {
+          attackerId: attacker.id,
+          defenderId: defenderFighter.id,
+          attackCardId: combatInfo.attackerCardId,
+          defenseCardId: combatInfo.defenderCardId,
         });
+        const finalAttack = calc.finalAttack + heroMods.attackModifier;
+        const finalDefense = calc.finalDefense + heroMods.defenseModifier;
 
-        // Проверяем условия победы/поражения
-        const updatedPlayers = currentState.players.map((p) => {
+        // 3. Урон: атака > защита → разница защитнику; иначе атакующему
+        //    (ничья — победа защитника, урона нет). PREVENT_DAMAGE гасит урон стороне.
+        let attackerDamage = 0;
+        let defenderDamage = 0;
+        if (finalAttack > finalDefense) {
+          defenderDamage = calc.preventDamageToDefender ? 0 : finalAttack - finalDefense;
+        } else if (finalDefense > finalAttack) {
+          attackerDamage = calc.preventDamageToAttacker ? 0 : finalDefense - finalAttack;
+        }
+        const attackerWon = finalAttack > finalDefense;
+
+        let workState: GameState = {
+          ...calc.state,
+          fighters: calc.state.fighters.map((f) => {
+            if (f.id === attacker.id && attackerDamage > 0) {
+              return { ...f, health: Math.max(0, f.health - attackerDamage) };
+            }
+            if (f.id === defenderFighter.id && defenderDamage > 0) {
+              return { ...f, health: Math.max(0, f.health - defenderDamage) };
+            }
+            return f;
+          }),
+        };
+
+        // 4. AFTER_COMBAT: сначала ВСЕ эффекты атакующего, затем защитника
+        const after = await this.cardEffectExecutor.executeAfterCombatEffects(
+          workState,
+          attackerCard,
+          defenderCard,
+          combatCtx,
+          { attackerWon, attackerDamage, defenderDamage },
+          cancelled,
+        );
+        workState = after.state;
+
+        const appliedEffects = [
+          ...reveal.appliedEffects,
+          ...calc.appliedEffects,
+          ...after.appliedEffects,
+        ];
+        const manualEffects = [
+          ...reveal.manualEffects,
+          ...calc.manualEffects,
+          ...after.manualEffects,
+        ];
+
+        // 5. Итоги: павшие бойцы и живость игроков (after-эффекты могли добить)
+        const updatedFighters = workState.fighters.map((f) =>
+          f.health <= 0 && !f.isDefeated ? { ...f, isDefeated: true } : f,
+        );
+        const updatedPlayers = workState.players.map((p) => {
           const playerFighters = updatedFighters.filter((f) => f.ownerId === p.userId);
           const hasAliveFighters = playerFighters.some((f) => f.health > 0);
           return {
@@ -809,6 +905,11 @@ export class GameActionExecutorService {
             isAlive: hasAliveFighters,
           };
         });
+        const resolvedState: GameState = {
+          ...workState,
+          fighters: updatedFighters,
+          players: updatedPlayers,
+        };
 
         const alivePlayers = updatedPlayers.filter((p) => p.isAlive);
         const gameEnded = alivePlayers.length <= 1;
@@ -816,13 +917,11 @@ export class GameActionExecutorService {
         let newState: GameState;
         if (gameEnded) {
           newState = {
-            ...currentState,
+            ...resolvedState,
             phase: GamePhase.GAME_OVER,
             sequenceNumber: currentState.sequenceNumber + 1,
-            fighters: updatedFighters,
-            players: updatedPlayers,
             metadata: {
-              ...currentState.metadata,
+              ...resolvedState.metadata,
               lastActionAt: new Date(),
               lastActionBy: userId,
               combatInfo: undefined,
@@ -833,16 +932,15 @@ export class GameActionExecutorService {
           // Бой завершён. Действие списано при объявлении атаки (executeAttack),
           // поэтому здесь только смотрим остаток: >0 — ход ПРОДОЛЖАЕТСЯ (атака
           // могла быть первым действием), 0 — авто-завершение хода.
+          // GAIN_ACTION/END_TURN из after-эффектов уже изменили actionsRemaining.
           // Промежуточное состояние БЕЗ инкремента seq — +1 делает advanceTurn
           // или ветка продолжения хода. Остаток/следующий игрок считаются от
           // currentTurnPlayerId (атакующего), даже если мутацию вызвал защитник
           // (CombatResolveGuard).
           const intermediate: GameState = {
-            ...currentState,
-            fighters: updatedFighters,
-            players: updatedPlayers,
+            ...resolvedState,
             metadata: {
-              ...currentState.metadata,
+              ...resolvedState.metadata,
               combatInfo: undefined,
             },
           };
@@ -873,6 +971,18 @@ export class GameActionExecutorService {
             performedAt: new Date(),
             performedBy: userId,
             sequenceNumber: newState.sequenceNumber,
+            // Лог эффектов для Game Tester: применённые + требующие рук
+            appliedEffects,
+            manualEffects,
+            combatSummary: {
+              finalAttack,
+              finalDefense,
+              attackerDamage,
+              defenderDamage,
+              attackerWon,
+              attackerCardCancelled: cancelled.attacker,
+              defenderCardCancelled: cancelled.defender,
+            },
           },
         };
       } catch (error) {
@@ -1059,5 +1169,25 @@ export class GameActionExecutorService {
     return state.handZones[userId]?.cards.find(
       (c) => c.id === cardId || c.cardId === cardId,
     );
+  }
+
+  /**
+   * Найти карту по instance id где угодно: руки, сбросы, полные списки колод.
+   * Нужен resolveCombat — сыгранные карты боя уже в сбросе.
+   */
+  private findCardAnywhere(state: GameState, cardId: string): Card | null {
+    for (const handZone of Object.values(state.handZones)) {
+      const card = handZone.cards.find((c) => c.id === cardId);
+      if (card) return card;
+    }
+    for (const pile of Object.values(state.discardPiles)) {
+      const card = pile.find((c) => c.id === cardId);
+      if (card) return card;
+    }
+    for (const deck of Object.values(state.decks)) {
+      const card = deck.cards.find((c) => c.id === cardId);
+      if (card) return card;
+    }
+    return null;
   }
 }

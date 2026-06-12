@@ -361,6 +361,15 @@ export class GameRulesValidator {
       return { valid: false, error: 'Fighter is defeated', code: 'FIGHTER_DEFEATED' };
     }
 
+    // IMMOBILIZE («cannot leave their space this turn») — снимается в advanceTurn
+    if (fighter.effects.some((e) => e.type === 'immobilized')) {
+      return {
+        valid: false,
+        error: 'Боец обездвижен до конца хода (эффект карты)',
+        code: 'FIGHTER_IMMOBILIZED',
+      };
+    }
+
     if (!this.isValidPosition(state, target)) {
       return { valid: false, error: 'Invalid target position', code: 'INVALID_POSITION' };
     }

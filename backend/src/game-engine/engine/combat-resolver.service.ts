@@ -135,6 +135,39 @@ export class CombatResolverService {
   }
 
   /**
+   * Суммарные модификаторы способностей героев для боя (для пайплайна
+   * эффектов в executeResolveCombat — урон там применяется отдельно).
+   * Lookup по heroSlug ?? heroId (см. A0).
+   */
+  getHeroCombatModifiers(
+    attackerFighter: Fighter,
+    defenderFighter: Fighter,
+    registryCombatState: {
+      attackerId: string;
+      defenderId: string;
+      attackCardId: string;
+      defenseCardId?: string;
+    },
+  ): { attackModifier: number; defenseModifier: number } {
+    const attackerModifiers = this.abilityRegistry.applyCombatModifiers(
+      attackerFighter.heroSlug ?? attackerFighter.heroId,
+      registryCombatState,
+      attackerFighter,
+      'attacker',
+    );
+    const defenderModifiers = this.abilityRegistry.applyCombatModifiers(
+      defenderFighter.heroSlug ?? defenderFighter.heroId,
+      registryCombatState,
+      defenderFighter,
+      'defender',
+    );
+    return {
+      attackModifier: this.sumValueModifiers(attackerModifiers),
+      defenseModifier: this.sumValueModifiers(defenderModifiers),
+    };
+  }
+
+  /**
    * Применяет урон к бойцам и возвращает обновлённое состояние
    */
   private applyDamage(
