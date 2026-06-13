@@ -118,14 +118,18 @@ export function useGameSync(
       });
 
       subscriptionRef.current = observable.subscribe({
-        next: (data: any) => {
+        // ВАЖНО: apolloClient.subscribe даёт FetchResult { data, errors },
+        // событие лежит в result.data.gameStateUpdated (НЕ result.gameStateUpdated —
+        // на этом realtime молча терялся: gameStateUpdated был undefined → return)
+        next: (result: any) => {
           // Check if component is still mounted
           if (!isMountedRef.current) {
             console.warn('[useGameSync] Component unmounted, ignoring event');
             return;
           }
 
-          if (!data?.gameStateUpdated) return;
+          const payload = result?.data?.gameStateUpdated ?? result?.gameStateUpdated;
+          if (!payload) return;
 
           // Обновляем статус соединения (через getState — connectionStatus
           // в deps subscribe вызывал пересоздание подписки и цикл
@@ -137,7 +141,7 @@ export function useGameSync(
           }
 
           // Полный wire-снапшот → applyWireState (guard по seq внутри)
-          handleSubscriptionState(data.gameStateUpdated);
+          handleSubscriptionState(payload);
         },
         error: (error: unknown) => {
           // Check if component is still mounted
@@ -311,16 +315,16 @@ export function useGameEvents(
     });
 
     const subscription = observable.subscribe({
-      next: (data: any) => {
+      next: (result: any) => {
         // Check if component is still mounted
         if (!isMountedRef.current) {
           console.warn('[useGameEvents] Component unmounted, ignoring event');
           return;
         }
 
-        if (!data?.gameStateUpdated) return;
-
-        const event = data.gameStateUpdated;
+        // FetchResult → result.data.gameStateUpdated (см. useGameSync)
+        const event = result?.data?.gameStateUpdated ?? result?.gameStateUpdated;
+        if (!event) return;
 
         // Фильтруем по типу событий
         if (eventTypes.length === 0 || eventTypes.includes(event.type)) {
