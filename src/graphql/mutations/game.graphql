@@ -174,3 +174,14 @@ mutation PlayScheme($input: PlaySchemeDto!) {
     timestamp
   }
 }
+
+mutation ResolvePendingEffect($input: ResolvePendingEffectDto!) {
+  resolvePendingEffect(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}

@@ -43,11 +43,13 @@ export const GameView = () => {
     isMyTurn,
     actionsRemaining,
     amIDefender,
+    myPendingEffects,
     moveFighter,
     attack,
     playDefense,
     playScheme,
     resolveCombat,
+    resolvePendingEffect,
     endTurn,
     pass,
     leaveGame,
@@ -56,6 +58,12 @@ export const GameView = () => {
 
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [busy, setBusy] = useState(false);
+  // C2: боец, выбранный для резолва отложенного эффекта (MOVE/PLACE)
+  const [pendingFighterId, setPendingFighterId] = useState<string | null>(null);
+
+  // активный отложенный эффект ЛОКАЛЬНОГО игрока (первый в очереди)
+  const pendingEffects = myPendingEffects();
+  const activePending = pendingEffects[0] ?? null;
 
   // Автоскрытие ошибки действия через 5 сек
   useEffect(() => {
@@ -76,9 +84,46 @@ export const GameView = () => {
     }
   };
 
+  // Боец подходит под отложенный эффект (грубая UI-подсказка; финал — на бэке)
+  const fighterFitsPending = (fighterOwnerId: string, fighterName: string): boolean => {
+    if (!activePending) return false;
+    const ownerOk = activePending.targetsOpponent
+      ? fighterOwnerId !== localUserId
+      : fighterOwnerId === localUserId;
+    if (!ownerOk) return false;
+    if (activePending.fighterName) {
+      const base = fighterName.replace(/\s+\d+$/, '').toLowerCase().replace(/ies$/, 'y');
+      const want = activePending.fighterName.toLowerCase().replace(/ies$/, 'y');
+      return base.includes(want) || fighterName.toLowerCase().includes(activePending.fighterName.toLowerCase());
+    }
+    return true;
+  };
+
   const handlePhaserEvent = (event: PhaserGameEvent) => {
     if (!wireState || !localUserId) return;
     const phase = wireState.phase;
+
+    // C2: режим резолва отложенного эффекта имеет приоритет — клик по
+    // подходящему бойцу выбирает его, клик по клетке завершает эффект
+    if (activePending) {
+      if (event.type === 'FIGHTER_CLICKED') {
+        const fighter = wireState.fighters.find((f) => f.id === event.fighterId);
+        if (fighter && fighterFitsPending(fighter.ownerId, fighter.name)) {
+          setPendingFighterId(pendingFighterId === fighter.id ? null : fighter.id);
+        }
+        return;
+      }
+      if (event.type === 'SPACE_CLICKED' && pendingFighterId) {
+        const fid = pendingFighterId;
+        void run(async () => {
+          await resolvePendingEffect(activePending.id, fid, event.position.x, event.position.y);
+          setPendingFighterId(null);
+        });
+        return;
+      }
+      // CARD_CLICKED и прочее в режиме pending игнорируем
+      return;
+    }
 
     switch (event.type) {
       case 'FIGHTER_CLICKED': {
@@ -281,13 +326,39 @@ export const GameView = () => {
           </div>
         )}
 
+        {/* Отложенный эффект карты (C2): выбор бойца/клетки */}
+        {activePending && !gameOver && (
+          <div
+            style={{
+              background: 'rgba(120, 90, 220, 0.16)',
+              border: '1px solid rgba(120, 90, 220, 0.5)',
+              padding: '8px 16px',
+              display: 'flex',
+              gap: 16,
+              alignItems: 'center',
+            }}
+          >
+            <strong>✨ Эффект карты</strong>
+            <span>{activePending.text ?? `${activePending.type} ${activePending.value ?? ''}`}</span>
+            <span style={{ opacity: 0.8 }}>
+              {pendingFighterId
+                ? `Боец выбран — кликните клетку (${activePending.type === 'MOVE' ? `до ${activePending.value} шагов` : 'любая свободная'})`
+                : `Кликните ${activePending.targetsOpponent ? 'бойца противника' : 'своего бойца'}${activePending.fighterName ? ` (${activePending.fighterName})` : ''}`}
+            </span>
+            {pendingEffects.length > 1 && (
+              <span style={{ opacity: 0.6 }}>ещё в очереди: {pendingEffects.length - 1}</span>
+            )}
+          </div>
+        )}
+
         {/* Доска (Phaser) — формат adaptedState, players[0] = локальный игрок */}
         <div className="game-view__middle" style={{ flex: 1, minHeight: 0 }}>
           <PhaserGame
             gameId={adaptedState.id}
             gameState={adaptedState}
-            selectedFighterId={selectedFighterId}
-            selectedCardId={selectedCardId}
+            // в режиме pending подсвечиваем выбранного для эффекта бойца
+            selectedFighterId={activePending ? pendingFighterId : selectedFighterId}
+            selectedCardId={activePending ? null : selectedCardId}
             highlightedSpaces={[]}
             onGameEvent={handlePhaserEvent}
             width={1000}

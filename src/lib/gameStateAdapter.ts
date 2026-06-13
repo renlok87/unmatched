@@ -110,7 +110,19 @@ export interface WireGameState {
     combatInfo?: WireCombatInfo;
     winnerId?: string;
     passCount?: number;
+    pendingEffects?: WirePendingEffect[];
   };
+}
+
+/** Отложенный эффект карты (C2): выбор бойца/клетки для MOVE/PLACE */
+export interface WirePendingEffect {
+  id: string;
+  type: 'MOVE' | 'PLACE';
+  playerId: string;
+  value?: number;
+  fighterName?: string;
+  targetsOpponent?: boolean;
+  text?: string;
 }
 
 /** Справочники для артов/имён (контентные запросы, кэш в remoteGameStore) */

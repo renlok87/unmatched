@@ -24,6 +24,7 @@ import {
   parseSubscriptionState,
   type AdapterRefs,
   type WireGameState,
+  type WirePendingEffect,
 } from '@/lib/gameStateAdapter';
 import type { GameState as LocalGameState, BoardDefinition } from '@/core/models/types';
 
@@ -103,6 +104,8 @@ interface RemoteGameState {
   isMyTurn: () => boolean;
   actionsRemaining: () => number;
   amIDefender: () => boolean;
+  /** Отложенные эффекты карт, ждущие выбора ЛОКАЛЬНОГО игрока (C2) */
+  myPendingEffects: () => WirePendingEffect[];
 
   // Мутации gameplay
   maneuver: (fighterId: string, path: Array<{ x: number; y: number }>, boostCardId?: string) => Promise<void>;
@@ -111,6 +114,7 @@ interface RemoteGameState {
   playDefense: (cardId: string, boostCardId?: string) => Promise<void>;
   playScheme: (cardId: string) => Promise<void>;
   resolveCombat: () => Promise<void>;
+  resolvePendingEffect: (effectId: string, fighterId: string, x: number, y: number) => Promise<void>;
   endTurn: () => Promise<void>;
   pass: () => Promise<void>;
   leaveGame: () => Promise<void>;
@@ -304,6 +308,11 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
     return Boolean(wireState?.metadata.combatInfo?.defenderId === localUserId);
   },
 
+  myPendingEffects: () => {
+    const { wireState, localUserId } = get();
+    return (wireState?.metadata.pendingEffects ?? []).filter((p) => p.playerId === localUserId);
+  },
+
   maneuver: (fighterId, path, boostCardId) =>
     runMutation(set, get, gql.ManeuverDocument, {
       input: { gameId: get().currentGameId, fighterId, boostCardId: boostCardId ?? null, path },
@@ -339,6 +348,11 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
     runMutation(set, get, gql.ResolveCombatDocument, {
       input: { gameId: get().currentGameId },
     }, 'resolveCombat'),
+
+  resolvePendingEffect: (effectId, fighterId, x, y) =>
+    runMutation(set, get, gql.ResolvePendingEffectDocument, {
+      input: { gameId: get().currentGameId, effectId, fighterId, x, y },
+    }, 'resolvePendingEffect'),
 
   endTurn: () =>
     runMutation(set, get, gql.EndTurnDocument, {
