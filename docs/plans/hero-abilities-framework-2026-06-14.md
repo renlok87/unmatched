@@ -37,6 +37,8 @@ Config v3 — per-turn флаги (3): golden-bat (+2 atk если не мане
 - Новые condition: `has-not-maneuvered-this-turn`, `has-attacked-this-turn` (combat-passive), `first-lost-combat-this-turn` (after-attack).
 - Инфра `after-defense` (триггер + `ctx.defenderPlayerId`, зеркало after-attack для defender-side) добавлена, но БЕЗ героя: реальный Spider-Man = info-reveal (complex), не draw — НЕ реализован.
 
+Config v4 — pending-move (2): новый effect-kind `{kind:'pending-move', target:'attacker'|'own-hero'|'any-own', maxSpaces}` — способность порождает MOVE `PendingEffect` (C2), резолвится общим resolvePendingEffect (executor/resolver НЕ тронуты). robin-hood (after-attack, target attacker, 2 клетки), leonardo (turn-start, target any-own, 1 клетка; MVP — только свои бойцы, реальный «any fighter» incl. enemy не модель). Покрытие 17→19 (3 хардкод + 16 config).
+
 ## Каталог 88 (для v2)
 
 70 реальных героев: clean=2, **partial=21**, complex=47. Реализовано 3 хардкод + 7 config = 10. Следующие цели:

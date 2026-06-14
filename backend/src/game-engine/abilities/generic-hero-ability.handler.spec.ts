@@ -693,4 +693,208 @@ describe('GenericHeroAbilityHandler', () => {
       expect(next.handZones['player1'].cards).toHaveLength(0);
     });
   });
+
+  // ---- 9) pending-move effect (spawns MOVE PendingEffect via C2 flow) ----
+  describe('pending-move effect', () => {
+    const afterCtx = (won: boolean): AfterCombatContext => ({
+      playerId: 'player1',
+      attackerFighterId: 'hero-fighter-1',
+      defenderFighterId: 'enemy-fighter-1',
+      won,
+      damageDealt: won ? 2 : 0,
+      firstLossThisTurn: !won,
+    });
+
+    // (a) after-attack pending-move 'attacker' → MOVE pending для атакующего бойца
+    it("after-attack 'attacker' добавляет MOVE pending с именем атакующего бойца", async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Reposition',
+        description: 'после атаки можно сдвинуть атаковавшего бойца',
+        rules: [
+          {
+            trigger: 'after-attack',
+            condition: 'always',
+            effect: { kind: 'pending-move', target: 'attacker', maxSpaces: 1 },
+          },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = makeState();
+
+      const next = await handler.onAfterCombat(state, afterCtx(true));
+
+      const pending = next.metadata.pendingEffects ?? [];
+      expect(pending).toHaveLength(1);
+      expect(pending[0]).toMatchObject({
+        type: 'MOVE',
+        playerId: 'player1',
+        value: 1,
+        fighterName: 'Test Hero', // имя бойца из ctx.attackerFighterId
+        targetsOpponent: false,
+      });
+      expect(pending[0].id).toBe('ability-test-hero-move-p0');
+      // sequenceNumber НЕ меняется (pendingEffects никогда не бампят seq)
+      expect(next.sequenceNumber).toBe(state.sequenceNumber);
+      // исходный state не мутирован
+      expect(state.metadata.pendingEffects).toBeUndefined();
+    });
+
+    // (b) turn-start pending-move 'any-own' → MOVE pending БЕЗ fighterName
+    it("turn-start 'any-own' добавляет MOVE pending без fighterName", async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Mobilize',
+        description: 'в начале хода можно сдвинуть любого своего бойца',
+        rules: [
+          {
+            trigger: 'turn-start',
+            condition: 'always',
+            effect: { kind: 'pending-move', target: 'any-own', maxSpaces: 2 },
+          },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = makeState();
+
+      const next = await handler.onTurnStart(state, 'player1');
+
+      const pending = next.metadata.pendingEffects ?? [];
+      expect(pending).toHaveLength(1);
+      expect(pending[0]).toMatchObject({
+        type: 'MOVE',
+        playerId: 'player1',
+        value: 2,
+        targetsOpponent: false,
+      });
+      expect(pending[0].fighterName).toBeUndefined(); // any own fighter
+      expect(pending[0].id).toBe('ability-test-hero-move-p0');
+    });
+
+    // turn-end pending-move 'own-hero' → MOVE pending с именем HERO-бойца
+    it("turn-end 'own-hero' добавляет MOVE pending с именем HERO-бойца", async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Retreat',
+        description: 'в конце хода можно сдвинуть своего героя',
+        rules: [
+          {
+            trigger: 'turn-end',
+            condition: 'always',
+            effect: { kind: 'pending-move', target: 'own-hero', maxSpaces: 3 },
+          },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = makeState();
+
+      const next = await handler.onTurnEnd(state, 'player1');
+
+      const pending = next.metadata.pendingEffects ?? [];
+      expect(pending).toHaveLength(1);
+      expect(pending[0]).toMatchObject({
+        type: 'MOVE',
+        playerId: 'player1',
+        value: 3,
+        fighterName: 'Test Hero', // имя HERO-бойца игрока
+        targetsOpponent: false,
+      });
+    });
+
+    // (c) condition gating — after-attack 'won-combat' только при победе
+    it("after-attack 'won-combat' pending-move создаётся только при win", async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Pursue',
+        description: 'после победы можно сдвинуть атаковавшего бойца',
+        rules: [
+          {
+            trigger: 'after-attack',
+            condition: 'won-combat',
+            effect: { kind: 'pending-move', target: 'attacker', maxSpaces: 1 },
+          },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+
+      // win → создаётся pending
+      const won = await handler.onAfterCombat(makeState(), afterCtx(true));
+      expect(won.metadata.pendingEffects ?? []).toHaveLength(1);
+
+      // loss → no-op (тот же state, без pending)
+      const lostState = makeState();
+      const lost = await handler.onAfterCombat(lostState, afterCtx(false));
+      expect(lost).toBe(lostState);
+      expect(lost.metadata.pendingEffects).toBeUndefined();
+    });
+
+    // 'attacker' target существует только для after-attack — turn-триггер его не создаёт
+    it("turn-start 'attacker' target → no-op (имеет смысл лишь для after-attack)", async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Misplaced',
+        description: "'attacker' target без after-attack контекста",
+        rules: [
+          {
+            trigger: 'turn-start',
+            condition: 'always',
+            effect: { kind: 'pending-move', target: 'attacker', maxSpaces: 1 },
+          },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = makeState();
+
+      const next = await handler.onTurnStart(state, 'player1');
+      expect(next).toBe(state);
+    });
+
+    // (d) no-op — нет pending-move правила
+    it('no-op (=== тот же state), когда нет pending-move правила', async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'NoMove',
+        description: 'нет pending-move',
+        rules: [
+          { trigger: 'turn-end', effect: { kind: 'turn-effect', draw: 1 } },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = makeState();
+
+      const nextStart = await handler.onTurnStart(state, 'player1');
+      expect(nextStart).toBe(state);
+
+      const nextAfter = await handler.onAfterCombat(state, afterCtx(true));
+      expect(nextAfter).toBe(state);
+    });
+
+    // несколько pending подряд → корректная индексация id (-p0, -p1)
+    it('инкрементирует индекс id pending при нескольких pending-move', async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'DoubleMove',
+        description: 'два pending-move в начале хода',
+        rules: [
+          {
+            trigger: 'turn-start',
+            condition: 'always',
+            effect: { kind: 'pending-move', target: 'own-hero', maxSpaces: 1 },
+          },
+          {
+            trigger: 'turn-start',
+            condition: 'always',
+            effect: { kind: 'pending-move', target: 'any-own', maxSpaces: 2 },
+          },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const next = await handler.onTurnStart(makeState(), 'player1');
+
+      const pending = next.metadata.pendingEffects ?? [];
+      expect(pending).toHaveLength(2);
+      expect(pending[0].id).toBe('ability-test-hero-move-p0');
+      expect(pending[1].id).toBe('ability-test-hero-move-p1');
+    });
+  });
 });

@@ -107,9 +107,32 @@ export interface TurnEffect {
 }
 
 /**
+ * Эффект «отложенный ход» (pending-move): способность порождает MOVE
+ * PendingEffect (C2), который игрок резолвит мутацией resolvePendingEffect
+ * (как «You may move…» с карт). Сам ход не исполняется здесь — лишь создаётся
+ * pending в metadata.pendingEffects; исполнение/резолв остаётся за общим C2.
+ *
+ * target определяет, какого бойца можно двигать:
+ *  - 'attacker' — боец, ТОЛЬКО ЧТО атаковавший (валидно ЛИШЬ для триггера
+ *                 'after-attack'; имя берётся из ctx.attackerFighterId). Для
+ *                 turn-start/turn-end этот target — no-op (нет контекста боя).
+ *  - 'own-hero' — HERO-боец действующего игрока (fighterName = имя героя).
+ *  - 'any-own'  — любой свой боец (fighterName опускается на pending).
+ * Во всех случаях targetsOpponent === false (двигается СВОЙ боец), value =
+ * maxSpaces (макс. число клеток перемещения).
+ */
+export interface PendingMoveEffect {
+  readonly kind: 'pending-move';
+  /** Кого можно двигать: атаковавшего бойца / своего героя / любого своего */
+  readonly target: 'attacker' | 'own-hero' | 'any-own';
+  /** Максимальное число клеток перемещения (value на MOVE PendingEffect) */
+  readonly maxSpaces: number;
+}
+
+/**
  * Эффект правила — дискриминируется по kind.
  */
-export type AbilityEffect = CombatModifierEffect | TurnEffect;
+export type AbilityEffect = CombatModifierEffect | TurnEffect | PendingMoveEffect;
 
 /**
  * Одно правило способности: триггер + (опц.) условие + эффект.
@@ -341,6 +364,44 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
         trigger: 'after-attack',
         condition: 'first-lost-combat-this-turn',
         effect: { kind: 'turn-effect', gainAction: 1 },
+      },
+    ],
+  },
+  {
+    // Robin Hood — «Trick Shot»-подобное репозиционирование: после своей атаки
+    // может сдвинуть атаковавшего бойца на величину до 2 клеток. Порождает MOVE
+    // PendingEffect (C2), который игрок резолвит мутацией resolvePendingEffect.
+    heroId: 'robin-hood',
+    abilityName: 'Trick Shot',
+    description:
+      'После своей атаки Robin Hood может переместить атаковавшего бойца на величину до 2 клеток ' +
+      '(независимо от исхода боя). Создаёт отложенный MOVE-эффект (C2).',
+    rules: [
+      {
+        trigger: 'after-attack',
+        condition: 'always',
+        effect: { kind: 'pending-move', target: 'attacker', maxSpaces: 2 },
+      },
+    ],
+  },
+  {
+    // Leonardo — в начале хода может сдвинуть любого бойца на величину до 1.
+    // ПРИБЛИЖЕНИЕ: печатная способность двигает ЛЮБОГО бойца, включая вражеского,
+    // но PendingEffect.targetsOpponent бинарен, а перемещение чужих фигур моделью
+    // не поддержано — MVP ограничивает выбор СВОИМИ бойцами (target 'any-own',
+    // targetsOpponent === false). Документируем это упрощение здесь.
+    heroId: 'leonardo',
+    abilityName: 'Tactical Genius',
+    description:
+      'В начале хода Leonardo может переместить любого СВОЕГО бойца на величину до 1 клетки. ' +
+      'Создаёт отложенный MOVE-эффект (C2). Примечание (приближение MVP): печатная способность ' +
+      'двигает ЛЮБОГО бойца, включая вражеского, но перемещение чужих фигур не моделируется — ' +
+      'выбор ограничен своими бойцами.',
+    rules: [
+      {
+        trigger: 'turn-start',
+        condition: 'always',
+        effect: { kind: 'pending-move', target: 'any-own', maxSpaces: 1 },
       },
     ],
   },

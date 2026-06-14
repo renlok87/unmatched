@@ -157,6 +157,8 @@ describe('ABILITY_CONFIGS — присутствие героев', () => {
     'golden-bat',
     'ancient-leshen',
     'raphael',
+    'robin-hood',
+    'leonardo',
   ];
   it.each(expected)('содержит конфиг для слага %s', (slug) => {
     expect(configFor(slug)).toBeDefined();
@@ -574,6 +576,73 @@ describe('raphael (after-attack: gainAction +1 on first lost combat this turn)',
     });
     expect(getActionsRemaining(next)).toBe(2);
     expect(next).toBe(state); // чистый no-op
+  });
+});
+
+// ===================== PENDING-MOVE ГЕРОИ =====================
+
+describe('robin-hood (after-attack: pending-move attacker, maxSpaces 2)', () => {
+  it('после атаки добавляет MOVE pending для атаковавшего бойца (value 2, fighterName=имя атакующего, playerId)', async () => {
+    const handler = handlerFor('robin-hood');
+    const state = makeState();
+
+    const next = await handler.onAfterCombat(state, afterCtx(true));
+
+    const pending = next.metadata.pendingEffects ?? [];
+    expect(pending).toHaveLength(1);
+    expect(pending[0]).toMatchObject({
+      type: 'MOVE',
+      playerId: 'player1',
+      value: 2,
+      fighterName: 'Hero', // имя бойца из ctx.attackerFighterId (makeFighter().name === 'Hero')
+      targetsOpponent: false,
+    });
+    // pendingEffects никогда не двигают seq; исходный state не мутирован
+    expect(next.sequenceNumber).toBe(state.sequenceNumber);
+    expect(state.metadata.pendingEffects).toBeUndefined();
+  });
+
+  it('после атаки добавляет MOVE pending и при проигрыше (condition always)', async () => {
+    const handler = handlerFor('robin-hood');
+    const next = await handler.onAfterCombat(makeState(), afterCtx(false));
+    expect(next.metadata.pendingEffects ?? []).toHaveLength(1);
+    expect((next.metadata.pendingEffects ?? [])[0]).toMatchObject({ value: 2, fighterName: 'Hero' });
+  });
+
+  it('turn-start ничего не делает (только after-attack правило)', async () => {
+    const handler = handlerFor('robin-hood');
+    const state = makeState();
+    const next = await handler.onTurnStart(state, 'player1');
+    expect(next).toBe(state);
+  });
+});
+
+describe('leonardo (turn-start: pending-move any-own, maxSpaces 1)', () => {
+  it('в начале хода добавляет MOVE pending без fighterName (value 1, playerId)', async () => {
+    const handler = handlerFor('leonardo');
+    const state = makeState();
+
+    const next = await handler.onTurnStart(state, 'player1');
+
+    const pending = next.metadata.pendingEffects ?? [];
+    expect(pending).toHaveLength(1);
+    expect(pending[0]).toMatchObject({
+      type: 'MOVE',
+      playerId: 'player1',
+      value: 1,
+      targetsOpponent: false,
+    });
+    // any-own → без ограничения по бойцу
+    expect(pending[0].fighterName).toBeUndefined();
+    expect(next.sequenceNumber).toBe(state.sequenceNumber);
+    expect(state.metadata.pendingEffects).toBeUndefined();
+  });
+
+  it('after-combat ничего не делает (только turn-start правило)', async () => {
+    const handler = handlerFor('leonardo');
+    const state = makeState();
+    const next = await handler.onAfterCombat(state, afterCtx(true));
+    expect(next).toBe(state);
   });
 });
 

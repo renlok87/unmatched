@@ -27,6 +27,7 @@ import {
   AbilityCondition,
   AbilityRule,
   CombatModifierEffect,
+  PendingMoveEffect,
   TurnEffect,
 } from './ability-config';
 
@@ -139,7 +140,7 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
 
     for (const rule of this.rules) {
       if (rule.trigger !== 'after-attack' && rule.trigger !== 'after-defense') continue;
-      if (rule.effect.kind !== 'turn-effect') continue;
+      if (rule.effect.kind !== 'turn-effect' && rule.effect.kind !== 'pending-move') continue;
 
       if (!this.evalAfterCombatCondition(rule.condition ?? 'always', ctx)) {
         continue;
@@ -150,6 +151,11 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
         rule.trigger === 'after-defense' ? ctx.defenderPlayerId : ctx.playerId;
       // 'after-defense' без известного защитника — нечего применять (no-op).
       if (!targetPlayerId) continue;
+
+      if (rule.effect.kind === 'pending-move') {
+        current = this.applyPendingMove(current, targetPlayerId, rule.effect, ctx);
+        continue;
+      }
 
       current = await this.applyTurnEffect(current, targetPlayerId, rule.effect as TurnEffect);
     }
@@ -173,9 +179,15 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
 
     for (const rule of this.rules) {
       if (rule.trigger !== trigger) continue;
-      if (rule.effect.kind !== 'turn-effect') continue;
+      if (rule.effect.kind !== 'turn-effect' && rule.effect.kind !== 'pending-move') continue;
 
       if (!this.evalTurnCondition(rule.condition ?? 'always', current, playerId)) {
+        continue;
+      }
+
+      if (rule.effect.kind === 'pending-move') {
+        // turn-контекст не несёт боя → target 'attacker' здесь невалиден (no-op).
+        current = this.applyPendingMove(current, playerId, rule.effect);
         continue;
       }
 
@@ -221,6 +233,74 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     }
 
     return current;
+  }
+
+  /**
+   * Порождает MOVE PendingEffect (C2) для способности и иммутабельно
+   * дописывает его в metadata.pendingEffects. Сам ход НЕ исполняется — резолв
+   * остаётся за общим C2 (мутация resolvePendingEffect; протухает в advanceTurn).
+   * Форма PendingEffect зеркалит card-effect-executor (id/type/playerId/value/
+   * fighterName/targetsOpponent/text). sequenceNumber НЕ бампим (pendingEffects
+   * никогда не двигают seq).
+   *
+   * Разрешение бойца (fighterName) по target:
+   *  - 'attacker' — имя бойца из ctx.attackerFighterId (валидно лишь при наличии
+   *                 after-combat ctx). Без ctx/бойца → no-op (тот же state).
+   *  - 'own-hero' — имя HERO-бойца игрока. Без героя → no-op.
+   *  - 'any-own'  — fighterName опускается (игрок выберет любого своего бойца).
+   */
+  private applyPendingMove(
+    state: GameState,
+    playerId: string,
+    effect: PendingMoveEffect,
+    ctx?: AfterCombatContext,
+  ): GameState {
+    let fighterName: string | undefined;
+
+    switch (effect.target) {
+      case 'attacker': {
+        // 'attacker' имеет смысл ТОЛЬКО для after-attack (нужен ctx с бойцом).
+        if (!ctx) return state;
+        const attacker = state.fighters.find((f) => f.id === ctx.attackerFighterId);
+        if (!attacker) return state;
+        fighterName = attacker.name;
+        break;
+      }
+      case 'own-hero': {
+        const hero = this.findHeroFighter(state, playerId);
+        if (!hero) return state;
+        fighterName = hero.name;
+        break;
+      }
+      case 'any-own':
+        // fighterName опускается — игрок двигает любого своего бойца.
+        fighterName = undefined;
+        break;
+      default:
+        return state;
+    }
+
+    const len = state.metadata.pendingEffects?.length ?? 0;
+    // Зеркалит форму pending из card-effect-executor (~619-637): включаем
+    // fighterName только когда он задан (executor для MOVE всегда пишет ключ,
+    // но для 'any-own' семантика — «без ограничения» → ключ опускаем).
+    const pending = {
+      id: `ability-${this.heroId}-move-p${len}`,
+      type: 'MOVE' as const,
+      playerId,
+      value: effect.maxSpaces,
+      ...(fighterName !== undefined ? { fighterName } : {}),
+      targetsOpponent: false,
+      text: `${this.abilityName} — move`,
+    };
+
+    return {
+      ...state,
+      metadata: {
+        ...state.metadata,
+        pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+      },
+    };
   }
 
   /**
