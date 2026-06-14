@@ -11,7 +11,7 @@
 
 import { GenericHeroAbilityHandler, GenericHeroAbilityDeps } from './generic-hero-ability.handler';
 import { AbilityConfig } from './ability-config';
-import { ValueModifierType, CombatState } from './hero-ability-registry';
+import { ValueModifierType, CombatState, AfterCombatContext } from './hero-ability-registry';
 import { GameState, GamePhase, getActionsRemaining } from '../models/game-state.model';
 import { Fighter, FighterType } from '../models/fighter.model';
 
@@ -337,6 +337,127 @@ describe('GenericHeroAbilityHandler', () => {
       const next = await handler.onTurnStart(state, 'player1');
       expect(deps.deck.drawCards).not.toHaveBeenCalled();
       expect(next).toBe(state);
+    });
+  });
+
+  // ---- 7) after-attack trigger ----
+  describe('onAfterCombat (after-attack trigger)', () => {
+    const afterCtx = (won: boolean): AfterCombatContext => ({
+      playerId: 'player1',
+      attackerFighterId: 'hero-fighter-1',
+      defenderFighterId: 'enemy-fighter-1',
+      won,
+      damageDealt: won ? 2 : 0,
+    });
+
+    it('after-attack always draw → добор для атакующего игрока', async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Relentless',
+        description: 'после атаки всегда добор 1',
+        rules: [
+          { trigger: 'after-attack', condition: 'always', effect: { kind: 'turn-effect', draw: 1 } },
+        ],
+      };
+      const deps = makeDeps();
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = makeState();
+
+      const next = await handler.onAfterCombat(state, afterCtx(true));
+
+      expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+      expect(next.handZones['player1'].cards).toHaveLength(1);
+    });
+
+    it("won-combat: срабатывает только когда ctx.won === true", async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Bloodlust',
+        description: 'после победы в бою — хил 3',
+        rules: [
+          { trigger: 'after-attack', condition: 'won-combat', effect: { kind: 'turn-effect', heal: 3 } },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = makeState({
+        fighters: [heroFighter({ health: 10, maxHealth: 18 }), enemyFighter()],
+      });
+
+      const after = await handler.onAfterCombat(state, afterCtx(true));
+      expect(after.fighters.find((f) => f.id === 'hero-fighter-1')!.health).toBe(13);
+    });
+
+    it('won-combat: no-op когда ctx.won === false', async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Bloodlust',
+        description: 'после победы в бою — хил 3',
+        rules: [
+          { trigger: 'after-attack', condition: 'won-combat', effect: { kind: 'turn-effect', heal: 3 } },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = makeState({
+        fighters: [heroFighter({ health: 10, maxHealth: 18 }), enemyFighter()],
+      });
+
+      const after = await handler.onAfterCombat(state, afterCtx(false));
+      expect(after).toBe(state); // полный no-op
+      expect(after.fighters.find((f) => f.id === 'hero-fighter-1')!.health).toBe(10);
+    });
+
+    it('lost-combat: срабатывает только когда ctx.won === false', async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Vengeance',
+        description: 'после проигрыша в бою — +1 действие',
+        rules: [
+          { trigger: 'after-attack', condition: 'lost-combat', effect: { kind: 'turn-effect', gainAction: 1 } },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = makeState({ metadata: { ...makeState().metadata, actionsRemaining: 2 } });
+
+      const fired = await handler.onAfterCombat(state, afterCtx(false));
+      expect(getActionsRemaining(fired)).toBe(3);
+
+      const noop = await handler.onAfterCombat(state, afterCtx(true));
+      expect(getActionsRemaining(noop)).toBe(2);
+      expect(noop).toBe(state);
+    });
+
+    it('no-op: нет after-attack правила (только turn-end)', async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'EndOnly',
+        description: 'эффект только в конце хода',
+        rules: [{ trigger: 'turn-end', effect: { kind: 'turn-effect', draw: 1 } }],
+      };
+      const deps = makeDeps();
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = makeState();
+
+      const next = await handler.onAfterCombat(state, afterCtx(true));
+      expect(next).toBe(state);
+      expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    });
+
+    it('skip: combat-only условие на after-attack правиле безопасно игнорируется', async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Misconfigured',
+        description: 'некорректное условие для after-attack',
+        rules: [
+          { trigger: 'after-attack', condition: 'attacking', effect: { kind: 'turn-effect', draw: 1 } },
+        ],
+      };
+      const deps = makeDeps();
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = makeState();
+
+      const next = await handler.onAfterCombat(state, afterCtx(true));
+      expect(next).toBe(state);
+      expect(deps.deck.drawCards).not.toHaveBeenCalled();
     });
   });
 });

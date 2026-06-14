@@ -20,6 +20,7 @@ import {
   ValueModifier,
   ValueModifierType,
   CombatState,
+  AfterCombatContext,
 } from './hero-ability-registry';
 import {
   AbilityConfig,
@@ -118,6 +119,33 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
 
   async onTurnEnd(state: GameState, playerId: string): Promise<GameState> {
     return this.applyTurnRules(state, playerId, 'turn-end');
+  }
+
+  // ===================== AFTER-ATTACK =====================
+
+  /**
+   * Эффект ПОСЛЕ резолва боя для способности АТАКУЮЩЕГО героя. Проходит по
+   * 'after-attack' правилам, проверяет after-combat условие против исхода боя
+   * (ctx.won) и применяет turn-effect к атакующему игроку (ctx.playerId) теми
+   * же примитивами, что turn-start/turn-end (draw/heal/gainAction/
+   * drawToHandSize). Чистый no-op (тот же объект state), если ни одно правило
+   * не подошло.
+   */
+  async onAfterCombat(state: GameState, ctx: AfterCombatContext): Promise<GameState> {
+    let current = state;
+
+    for (const rule of this.rules) {
+      if (rule.trigger !== 'after-attack') continue;
+      if (rule.effect.kind !== 'turn-effect') continue;
+
+      if (!this.evalAfterCombatCondition(rule.condition ?? 'always', ctx)) {
+        continue;
+      }
+
+      current = await this.applyTurnEffect(current, ctx.playerId, rule.effect as TurnEffect);
+    }
+
+    return current;
   }
 
   // ===================== ВНУТРЕННЕЕ =====================
@@ -287,6 +315,36 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       case 'defending':
       case 'self-health-below-defender':
         return false;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Условия after-attack правил. Оцениваются ТОЛЬКО против исхода боя:
+   *  - 'always'      → всегда
+   *  - 'won-combat'  → ctx.won === true
+   *  - 'lost-combat' → ctx.won === false
+   * Любое иное условие (боевое/ходовое/{handSizeEquals}) для after-attack не
+   * валидно и безопасно игнорируется (правило не срабатывает).
+   */
+  private evalAfterCombatCondition(
+    condition: AbilityCondition,
+    ctx: AfterCombatContext,
+  ): boolean {
+    if (typeof condition === 'object') {
+      // { handSizeEquals } не применимо к after-attack → no-op
+      return false;
+    }
+
+    switch (condition) {
+      case 'always':
+        return true;
+      case 'won-combat':
+        return ctx.won === true;
+      case 'lost-combat':
+        return ctx.won === false;
+      // combat-only / turn-only условия вне after-attack контекста → no-op
       default:
         return false;
     }

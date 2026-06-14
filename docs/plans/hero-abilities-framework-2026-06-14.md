@@ -24,9 +24,15 @@ Prod-геймплей идёт ТОЛЬКО через `GameActionExecutorServic
 - `generic-hero-ability.handler.ts` — `GenericHeroAbilityHandler` интерпретирует config через `getStatefulCombatModifiers`/`onTurnStart`/`onTurnEnd`. Чистый no-op (===) если правило не сработало (seq не дёргается).
 - Регистрация: цикл в `game-engine.module.ts onModuleInit` — добавить героя = ОДНА строка в `ABILITY_CONFIGS`, без новых файлов/провайдеров. Хардкод daredevil/ms-marvel/arthur сохранён.
 
-## Шипнуто (7 героев)
+## Шипнуто (14 героев = 3 хардкод + 11 config)
 
-luke-cage (+2 def always), annie-christmas (+2 atk if HP<defender), eredin (+1 both если все sidekick'и мертвы) [combat]; bloody-mary (gainAction если рука==3) [turn-start]; philippa (draw до 4), t-rex (draw 1), bigfoot (draw 1 если в зоне нет врагов) [turn-end].
+Хардкод: daredevil, ms-marvel, king-arthur.
+
+Config v1 (7): luke-cage (+2 def always), annie-christmas (+2 atk if HP<defender), eredin (+1 both если все sidekick'и мертвы) [combat]; bloody-mary (gainAction если рука==3) [turn-start]; philippa (draw до 4), t-rex (draw 1), bigfoot (draw 1 если в зоне нет врагов) [turn-end].
+
+Config v2 — after-attack (4): chupacabra (draw 1), deadpool (heal 1), michelangelo (draw 1; hand-cap-3 НЕ смоделирован), angel (draw 1 if lost-combat). Хук `after-attack` + condition `won-combat`/`lost-combat` добавлены. **Хук after-combat теперь wired**: `triggerOnAfterCombat(attacker, ctx{won,damageDealt,...})` в executeResolveCombat до advanceTurn (`onAfterCombat(state, ctx)`).
+
+SKIP: golden-bat/ancient-leshen — нужны per-turn флаги maneuvered/attacked-this-turn, которых нет (turnStartPositions = снапшот позиций, не флаг действия). Не шиплю half-working.
 
 ## Каталог 88 (для v2)
 

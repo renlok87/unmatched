@@ -281,6 +281,136 @@ describe('GameActionExecutorService — abilities wiring', () => {
     });
   });
 
+  describe('3) after-combat extended hook', () => {
+    it('onAfterCombat атакующего срабатывает после резолва (won=true), бой и ход проходят нормально', async () => {
+      // Fake extended-handler атакующего (player1 / hero-a): ставит маркер в
+      // metadata с исходом боя, читая ctx.won
+      const fakeHandler: ExtendedHeroAbilityHandler = {
+        heroId: 'hero-a',
+        abilityName: 'AfterCombat marker',
+        abilityDescription: 'ставит маркер в metadata после боя',
+        onAfterCombat: (state: GameState, ctx): Promise<GameState> =>
+          Promise.resolve({
+            ...state,
+            metadata: {
+              ...state.metadata,
+              fakeAfterCombatMarker: ctx.won ? 'won' : 'lost',
+              fakeAfterCombatDamage: ctx.damageDealt,
+              fakeAfterCombatAttacker: ctx.attackerFighterId,
+              fakeAfterCombatDefender: ctx.defenderFighterId,
+              fakeAfterCombatPlayer: ctx.playerId,
+            } as any,
+          }),
+      };
+      registry.registerExtended(fakeHandler);
+
+      // Бой: атака 5 vs защита 1 → атакующий побеждает, урон 4, ход
+      // авто-завершается (actionsRemaining=0) → переходит player2
+      const state = createMockGameState({
+        phase: GamePhase.COMBAT_RESOLVE,
+        currentTurnPlayerId: 'player1',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 0,
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId: 'fighter2',
+            attackerCardId: 'card-a',
+            defenderCardId: 'card-d',
+            attackValue: 5,
+            defenseValue: 1,
+            startedAt: new Date(),
+          },
+        } as any,
+      });
+
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        context,
+      );
+
+      expect(result.success).toBe(true);
+      // after-combat хук атакующего сработал с won=true и корректным контекстом
+      expect((result.gameState!.metadata as any).fakeAfterCombatMarker).toBe('won');
+      expect((result.gameState!.metadata as any).fakeAfterCombatDamage).toBe(4);
+      expect((result.gameState!.metadata as any).fakeAfterCombatAttacker).toBe('fighter1');
+      expect((result.gameState!.metadata as any).fakeAfterCombatDefender).toBe('fighter2');
+      expect((result.gameState!.metadata as any).fakeAfterCombatPlayer).toBe('player1');
+      // бой разрешён нормально: урон применён, combatInfo очищен
+      const defender = result.gameState!.fighters.find((f) => f.id === 'fighter2')!;
+      expect(defender.health).toBe(17 - 4);
+      expect((result.gameState!.metadata as any).combatInfo).toBeUndefined();
+      // ход авто-завершился и перешёл следующему игроку
+      expect(result.gameState!.currentTurnPlayerId).toBe('player2');
+      expect(result.gameState!.phase).toBe(GamePhase.ACTION_MANEUVER);
+    });
+
+    it('onAfterCombat получает won=false на ничьей/проигрыше атакующего', async () => {
+      const fakeHandler: ExtendedHeroAbilityHandler = {
+        heroId: 'hero-a',
+        abilityName: 'AfterCombat marker',
+        abilityDescription: 'ставит маркер в metadata после боя',
+        onAfterCombat: (state: GameState, ctx): Promise<GameState> =>
+          Promise.resolve({
+            ...state,
+            metadata: {
+              ...state.metadata,
+              fakeAfterCombatMarker: ctx.won ? 'won' : 'lost',
+            } as any,
+          }),
+      };
+      registry.registerExtended(fakeHandler);
+
+      // Ничья: атака 2 vs защита 2 → защитник побеждает (won=false), урона нет
+      const state = createMockGameState({
+        phase: GamePhase.COMBAT_RESOLVE,
+        currentTurnPlayerId: 'player1',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 1,
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId: 'fighter2',
+            attackerCardId: 'card-a',
+            defenderCardId: 'card-d',
+            attackValue: 2,
+            defenseValue: 2,
+            startedAt: new Date(),
+          },
+        } as any,
+      });
+
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        context,
+      );
+
+      expect(result.success).toBe(true);
+      expect((result.gameState!.metadata as any).fakeAfterCombatMarker).toBe('lost');
+      // атакующий не выиграл → урона защитнику нет
+      const defender = result.gameState!.fighters.find((f) => f.id === 'fighter2')!;
+      expect(defender.health).toBe(17);
+    });
+  });
+
   describe('2) turn-end extended hook', () => {
     it('onTurnEnd завершающего игрока срабатывает, ход переходит следующему', async () => {
       // Fake extended-handler завершающего игрока (player1 / hero-a)

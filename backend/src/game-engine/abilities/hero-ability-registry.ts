@@ -112,6 +112,24 @@ export interface CombatModifier {
 }
 
 /**
+ * Контекст after-combat хука (TASK): данные завершившегося боя для
+ * способности АТАКУЮЩЕГО героя. Передаётся в onAfterCombat ПОСЛЕ применения
+ * урона/флагов поражения, но ДО передачи хода (advanceTurn).
+ */
+export interface AfterCombatContext {
+  /** Владелец атакующего бойца (атакующий игрок) */
+  readonly playerId: string;
+  /** id атакующего бойца (combatInfo.attackerId) */
+  readonly attackerFighterId: string;
+  /** id атакованного бойца */
+  readonly defenderFighterId: string;
+  /** Атакующий победил (finalAttack > finalDefense; ничья → false) */
+  readonly won: boolean;
+  /** Урон, нанесённый атакующим в этом бою */
+  readonly damageDealt: number;
+}
+
+/**
  * Расширенный интерфейс обработчика способностей
  * Поддерживает работу с состоянием игры и новыми типами способностей
  */
@@ -134,6 +152,13 @@ export interface ExtendedHeroAbilityHandler {
    * Вызывается во время боя
    */
   onCombat?(state: GameState, context: CombatState & { isBlindBoostAvailable?: boolean }): Promise<GameState>;
+
+  /**
+   * Вызывается ПОСЛЕ резолва боя — для способности АТАКУЮЩЕГО героя
+   * (после применения урона/флагов поражения, ДО передачи хода). Позволяет
+   * способности отреагировать на исход боя (добор/лечение/доп. действие и т.п.).
+   */
+  onAfterCombat?(state: GameState, ctx: AfterCombatContext): Promise<GameState>;
 
   /**
    * Проверяет, может ли боец атаковать на определённой дистанции
@@ -390,6 +415,31 @@ export class HeroAbilityRegistry {
       return await handler.onTurnEnd(state, playerId);
     } catch (error) {
       this.logger.error(`Error in onTurnEnd for hero ${heroId}:`, error);
+      return state;
+    }
+  }
+
+  /**
+   * Вызвать after-combat обработчик АТАКУЮЩЕГО героя (расширенный).
+   *
+   * Зеркало triggerOnTurnEndExtended: getExtended(heroId), вызов
+   * handler.onAfterCombat если есть, try/catch → возврат исходного state.
+   * Отсутствие хука/ошибка — состояние без изменений.
+   */
+  async triggerOnAfterCombat(
+    heroId: string,
+    state: GameState,
+    ctx: AfterCombatContext,
+  ): Promise<GameState> {
+    const handler = this.getExtended(heroId);
+    if (!handler?.onAfterCombat) {
+      return state;
+    }
+
+    try {
+      return await handler.onAfterCombat(state, ctx);
+    } catch (error) {
+      this.logger.error(`Error in onAfterCombat for hero ${heroId}:`, error);
       return state;
     }
   }

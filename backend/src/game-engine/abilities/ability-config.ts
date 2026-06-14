@@ -13,8 +13,12 @@
  *  - 'combat-passive' — пассивный модификатор атаки/защиты во время боя
  *  - 'turn-start'     — эффект в начале хода игрока
  *  - 'turn-end'       — эффект в конце хода игрока
+ *  - 'after-attack'   — эффект ПОСЛЕ резолва боя, применяется к АТАКУЮЩЕМУ
+ *                       игроку (использует тот же TurnEffect: draw/heal/
+ *                       gainAction/drawToHandSize). Оценивается против исхода
+ *                       боя (AfterCombatContext) — см. won-combat/lost-combat.
  */
-export type AbilityTrigger = 'combat-passive' | 'turn-start' | 'turn-end';
+export type AbilityTrigger = 'combat-passive' | 'turn-start' | 'turn-end' | 'after-attack';
 
 /**
  * Условие срабатывания правила (декларативное, проверяется против GameState).
@@ -30,6 +34,13 @@ export type AbilityTrigger = 'combat-passive' | 'turn-start' | 'turn-end';
  *  - 'all-own-sidekicks-defeated'  — все НЕ-герои владельца повержены
  *  - { handSizeEquals: N }         — в руке игрока ровно N карт
  *  - 'no-enemy-in-own-zone'        — в зоне героя игрока нет вражеских бойцов
+ *  - 'won-combat'                  — [after-attack] атакующий победил (ctx.won)
+ *  - 'lost-combat'                 — [after-attack] атакующий НЕ победил (!ctx.won)
+ *
+ * ВАЖНО: 'won-combat'/'lost-combat' имеют смысл ТОЛЬКО для триггера
+ * 'after-attack' (оцениваются против AfterCombatContext). Для 'after-attack'
+ * валидны лишь 'always'/'won-combat'/'lost-combat'; боевые/ходовые условия на
+ * after-attack-правиле безопасно игнорируются (правило не срабатывает).
  */
 export type AbilityCondition =
   | 'always'
@@ -38,6 +49,8 @@ export type AbilityCondition =
   | 'self-health-below-defender'
   | 'all-own-sidekicks-defeated'
   | 'no-enemy-in-own-zone'
+  | 'won-combat'
+  | 'lost-combat'
   | { readonly handSizeEquals: number };
 
 /**
@@ -197,6 +210,61 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
       {
         trigger: 'turn-end',
         condition: 'no-enemy-in-own-zone',
+        effect: { kind: 'turn-effect', draw: 1 },
+      },
+    ],
+  },
+  {
+    // Chupacabra — после своей атаки добирает 1 карту (вне зависимости от исхода).
+    heroId: 'chupacabra',
+    abilityName: 'Blood Frenzy',
+    description: 'После своей атаки Chupacabra добирает 1 карту (независимо от исхода боя).',
+    rules: [
+      {
+        trigger: 'after-attack',
+        condition: 'always',
+        effect: { kind: 'turn-effect', draw: 1 },
+      },
+    ],
+  },
+  {
+    // Deadpool — после своей атаки восстанавливает 1 здоровье (регенерация).
+    heroId: 'deadpool',
+    abilityName: 'Regeneration',
+    description: 'После своей атаки Deadpool восстанавливает 1 здоровье (независимо от исхода боя).',
+    rules: [
+      {
+        trigger: 'after-attack',
+        condition: 'always',
+        effect: { kind: 'turn-effect', heal: 1 },
+      },
+    ],
+  },
+  {
+    // Michelangelo — после своей атаки добирает 1 карту.
+    // ПРИБЛИЖЕНИЕ: печатный лимит руки в 3 карты НЕ моделируется (см. notes).
+    heroId: 'michelangelo',
+    abilityName: 'Party Dude',
+    description:
+      'После своей атаки Michelangelo добирает 1 карту (независимо от исхода боя). ' +
+      'Примечание: печатный лимит руки в 3 карты не моделируется.',
+    rules: [
+      {
+        trigger: 'after-attack',
+        condition: 'always',
+        effect: { kind: 'turn-effect', draw: 1 },
+      },
+    ],
+  },
+  {
+    // Angel — после ПРОИГРАННОЙ атаки добирает 1 карту (компенсация неудачи).
+    heroId: 'angel',
+    abilityName: 'Fallen Grace',
+    description: 'Когда Angel проигрывает свою атаку (бой не выигран) — добирает 1 карту.',
+    rules: [
+      {
+        trigger: 'after-attack',
+        condition: 'lost-combat',
         effect: { kind: 'turn-effect', draw: 1 },
       },
     ],

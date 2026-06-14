@@ -28,6 +28,7 @@ import {
   HeroAbilityRegistry,
   ValueModifierType,
   type ValueModifier,
+  type AfterCombatContext,
 } from '../abilities/hero-ability-registry';
 import {
   CardEffectExecutorService,
@@ -290,6 +291,28 @@ export class GameActionExecutorService {
     }
     const slug = heroFighter.heroSlug ?? heroFighter.heroId;
     return this.abilityRegistry.triggerOnTurnEndExtended(slug, state, playerId);
+  }
+
+  /**
+   * Вызвать after-combat хук АТАКУЮЩЕГО героя (TASK, infra).
+   *
+   * Зеркало triggerHeroTurnEnd: слаг берём с АТАКУЮЩЕГО бойца
+   * (heroSlug ?? heroId) — combatInfo.attackerId, даже если боец уже повержен
+   * (объект остаётся в state.fighters с isDefeated=true). Если бойца в state
+   * вовсе нет — no-op. await extended-диспетчера triggerOnAfterCombat, замена
+   * state результатом. Для героев без хука — исходное состояние без изменений.
+   * sequenceNumber не трогаем: «прицеплено» к инкременту резолва боя.
+   */
+  private async triggerHeroAfterCombat(
+    state: GameState,
+    ctx: AfterCombatContext,
+  ): Promise<GameState> {
+    const attackerFighter = state.fighters.find((f) => f.id === ctx.attackerFighterId);
+    if (!attackerFighter) {
+      return state;
+    }
+    const slug = attackerFighter.heroSlug ?? attackerFighter.heroId;
+    return this.abilityRegistry.triggerOnAfterCombat(slug, state, ctx);
   }
 
   /**
@@ -1351,13 +1374,29 @@ export class GameActionExecutorService {
             isAlive: hasAliveFighters,
           };
         });
-        const resolvedState: GameState = {
+        let resolvedState: GameState = {
           ...workState,
           fighters: updatedFighters,
           players: updatedPlayers,
         };
 
-        const alivePlayers = updatedPlayers.filter((p) => p.isAlive);
+        // AFTER-COMBAT хук способности АТАКУЮЩЕГО героя (TASK): урон применён,
+        // флаги поражения проставлены, combat-модификаторы собраны. Бьём ДО
+        // передачи хода (advanceTurn), чтобы любой добор/лечение/доп. действие
+        // легли в ТОТ ЖЕ резолв — и независимо от того, авто-завершается ли ход.
+        // Слаг резолвится с атакующего бойца (combatInfo.attackerId) внутри
+        // helper'а — даже если боец повержен (он остаётся в state.fighters).
+        // seq отдельно НЕ бампим: «прицеплено» к инкременту резолва ниже.
+        const afterCombatCtx: AfterCombatContext = {
+          playerId: attacker.ownerId,
+          attackerFighterId: combatInfo.attackerId,
+          defenderFighterId: defenderFighter.id,
+          won: attackerWon,
+          damageDealt: defenderDamage,
+        };
+        resolvedState = await this.triggerHeroAfterCombat(resolvedState, afterCombatCtx);
+
+        const alivePlayers = resolvedState.players.filter((p) => p.isAlive);
         const gameEnded = alivePlayers.length <= 1;
 
         let newState: GameState;

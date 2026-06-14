@@ -251,6 +251,11 @@ describe('GameActionExecutorService', () => {
             triggerOnTurnEndExtended: jest
               .fn()
               .mockImplementation((_h: string, state: GameState) => Promise.resolve(state)),
+            // AFTER-COMBAT хук в executeResolveCombat (TASK) — passthrough no-op:
+            // герои тестов без onAfterCombat возвращают state без изменений
+            triggerOnAfterCombat: jest
+              .fn()
+              .mockImplementation((_h: string, state: GameState) => Promise.resolve(state)),
             // STATEFUL combat modifiers в executeResolveCombat — нет хука → []
             getStatefulCombatModifiers: jest.fn().mockReturnValue([]),
             getHeroCombatModifiers: jest

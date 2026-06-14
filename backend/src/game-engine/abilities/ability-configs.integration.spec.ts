@@ -20,6 +20,7 @@ import {
   HeroAbilityRegistry,
   ValueModifierType,
   CombatState,
+  AfterCombatContext,
 } from './hero-ability-registry';
 import { GameState, GamePhase, getActionsRemaining } from '../models/game-state.model';
 import { Fighter, FighterType } from '../models/fighter.model';
@@ -149,6 +150,10 @@ describe('ABILITY_CONFIGS — присутствие героев', () => {
     'philippa',
     't-rex',
     'bigfoot',
+    'chupacabra',
+    'deadpool',
+    'michelangelo',
+    'angel',
   ];
   it.each(expected)('содержит конфиг для слага %s', (slug) => {
     expect(configFor(slug)).toBeDefined();
@@ -341,5 +346,113 @@ describe('bigfoot (turn-end: draw 1 when no enemy in own zone)', () => {
     const next = await handler.onTurnEnd(state, 'player1');
     expect(deps.deck.drawCards).not.toHaveBeenCalled();
     expect(next).toBe(state);
+  });
+});
+
+// ===================== AFTER-ATTACK =====================
+
+/** AfterCombatContext атакующего player1 с заданным исходом боя. */
+function afterCtx(won: boolean): AfterCombatContext {
+  return {
+    playerId: 'player1',
+    attackerFighterId: 'hero-fighter-1',
+    defenderFighterId: 'enemy-fighter-1',
+    won,
+    damageDealt: won ? 2 : 0,
+  };
+}
+
+describe('chupacabra (after-attack: always draw 1)', () => {
+  it('добирает 1 карту после ПОБЕДЫ в бою', async () => {
+    const deps = makeDeps();
+    const handler = handlerFor('chupacabra', deps);
+    const state = makeState({ handZones: handOf(2) as any });
+    const next = await handler.onAfterCombat(state, afterCtx(true));
+    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+    expect(next.handZones['player1'].cards).toHaveLength(3);
+  });
+
+  it('добирает 1 карту и после ПРОИГРЫША (condition always)', async () => {
+    const deps = makeDeps();
+    const handler = handlerFor('chupacabra', deps);
+    const state = makeState({ handZones: handOf(2) as any });
+    const next = await handler.onAfterCombat(state, afterCtx(false));
+    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+    expect(next.handZones['player1'].cards).toHaveLength(3);
+  });
+});
+
+describe('deadpool (after-attack: always heal 1)', () => {
+  it('лечит 1 хп после ПОБЕДЫ в бою', async () => {
+    const handler = handlerFor('deadpool');
+    const state = makeState({
+      fighters: [
+        makeFighter({ heroSlug: 'deadpool', health: 10, maxHealth: 18 }),
+        makeFighter({ id: 'enemy-fighter-1', ownerId: 'player2', health: 12, position: { x: 9, y: 9 } }),
+      ],
+    });
+    const next = await handler.onAfterCombat(state, afterCtx(true));
+    expect(next.fighters.find((f) => f.id === 'hero-fighter-1')!.health).toBe(11);
+  });
+
+  it('лечит 1 хп и после ПРОИГРЫША (condition always)', async () => {
+    const handler = handlerFor('deadpool');
+    const state = makeState({
+      fighters: [
+        makeFighter({ heroSlug: 'deadpool', health: 10, maxHealth: 18 }),
+        makeFighter({ id: 'enemy-fighter-1', ownerId: 'player2', health: 12, position: { x: 9, y: 9 } }),
+      ],
+    });
+    const next = await handler.onAfterCombat(state, afterCtx(false));
+    expect(next.fighters.find((f) => f.id === 'hero-fighter-1')!.health).toBe(11);
+  });
+
+  it('хил не превышает maxHealth', async () => {
+    const handler = handlerFor('deadpool');
+    const state = makeState({
+      fighters: [
+        makeFighter({ heroSlug: 'deadpool', health: 18, maxHealth: 18 }),
+        makeFighter({ id: 'enemy-fighter-1', ownerId: 'player2', health: 12, position: { x: 9, y: 9 } }),
+      ],
+    });
+    const next = await handler.onAfterCombat(state, afterCtx(true));
+    expect(next.fighters.find((f) => f.id === 'hero-fighter-1')!.health).toBe(18);
+    expect(next).toBe(state); // capped → no-op (тот же объект)
+  });
+});
+
+describe('michelangelo (after-attack: always draw 1)', () => {
+  it('добирает 1 карту после боя (как при победе, так и при проигрыше)', async () => {
+    const depsWon = makeDeps();
+    const handlerWon = handlerFor('michelangelo', depsWon);
+    const nextWon = await handlerWon.onAfterCombat(makeState({ handZones: handOf(1) as any }), afterCtx(true));
+    expect(depsWon.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+    expect(nextWon.handZones['player1'].cards).toHaveLength(2);
+
+    const depsLost = makeDeps();
+    const handlerLost = handlerFor('michelangelo', depsLost);
+    const nextLost = await handlerLost.onAfterCombat(makeState({ handZones: handOf(1) as any }), afterCtx(false));
+    expect(depsLost.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+    expect(nextLost.handZones['player1'].cards).toHaveLength(2);
+  });
+});
+
+describe('angel (after-attack: draw 1 only on lost-combat)', () => {
+  it('добирает 1 карту ТОЛЬКО когда бой проигран (ctx.won === false)', async () => {
+    const deps = makeDeps();
+    const handler = handlerFor('angel', deps);
+    const state = makeState({ handZones: handOf(2) as any });
+    const next = await handler.onAfterCombat(state, afterCtx(false));
+    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+    expect(next.handZones['player1'].cards).toHaveLength(3);
+  });
+
+  it('no-op: бой выигран (ctx.won === true) — добора нет', async () => {
+    const deps = makeDeps();
+    const handler = handlerFor('angel', deps);
+    const state = makeState({ handZones: handOf(2) as any });
+    const next = await handler.onAfterCombat(state, afterCtx(true));
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    expect(next).toBe(state); // чистый no-op
   });
 });
