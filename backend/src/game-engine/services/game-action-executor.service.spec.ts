@@ -239,7 +239,17 @@ describe('GameActionExecutorService', () => {
         },
         {
           provide: HeroAbilityRegistry,
-          useValue: { getAny: jest.fn().mockReturnValue(undefined) },
+          useValue: {
+            getAny: jest.fn().mockReturnValue(undefined),
+            // TURN_START-хук в advanceTurn (TASK A) — passthrough no-op:
+            // герои тестов без onTurnStart возвращают state без изменений
+            triggerOnTurnStartExtended: jest
+              .fn()
+              .mockImplementation((_h: string, state: GameState) => Promise.resolve(state)),
+            getHeroCombatModifiers: jest
+              .fn()
+              .mockReturnValue({ attackModifier: 0, defenseModifier: 0 }),
+          },
         },
       ],
     }).compile();

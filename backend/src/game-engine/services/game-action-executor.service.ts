@@ -203,7 +203,7 @@ export class GameActionExecutorService {
       fightersCleaned.map((f) => [f.id, { x: f.position.x, y: f.position.y }]),
     );
 
-    return {
+    let started: GameState = {
       ...next,
       fighters: fightersCleaned,
       phase: GamePhase.ACTION_MANEUVER,
@@ -224,6 +224,39 @@ export class GameActionExecutorService {
         ),
       },
     };
+
+    // TURN_START-способности героя (TASK A): фаза TURN_START исключена из
+    // потока, поэтому extended-хук onTurnStart встраивается ЗДЕСЬ — в
+    // единственной точке, где у игрока реально начинается ход. Дизайн:
+    //  - продакшен-поток зовёт ТОЛЬКО extended-диспетчер (мутирует GameState);
+    //  - GameEvent[]-путь (triggerOnTurnStart) остаётся за логированием.
+    // No-op-контракт: handler без onTurnStart (или вернувший state без
+    // изменений — напр. ms-marvel, резерв) ничего не меняет и поток хода цел
+    // (фаза остаётся ACTION_MANEUVER). seq НЕ инкрементируется отдельно —
+    // мутация-хук «прицеплена» к той же передаче хода (контракт saveState).
+    started = await this.triggerHeroTurnStart(started, nextPlayerId);
+
+    return started;
+  }
+
+  /**
+   * Вызвать extended-хук onTurnStart героя текущего игрока (TASK A, infra).
+   *
+   * Слаг для реестра берём с бойца-героя игрока (heroSlug ?? heroId) — тот же
+   * предикат, что в combat/turn-end путях. Возвращает (возможно) мутированный
+   * GameState; для героев без хука — исходное состояние без изменений.
+   * sequenceNumber не трогаем: вызывающий advanceTurn уже сделал свой +1.
+   */
+  private async triggerHeroTurnStart(
+    state: GameState,
+    playerId: string,
+  ): Promise<GameState> {
+    const heroFighter = state.fighters.find((f) => f.ownerId === playerId);
+    if (!heroFighter) {
+      return state;
+    }
+    const slug = heroFighter.heroSlug ?? heroFighter.heroId;
+    return this.abilityRegistry.triggerOnTurnStartExtended(slug, state, playerId);
   }
 
   /**

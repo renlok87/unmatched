@@ -280,7 +280,12 @@ export class HeroAbilityRegistry {
   }
 
   /**
-   * Вызвать событие начала хода
+   * Вызвать событие начала хода (классический путь, ТОЛЬКО логирование).
+   *
+   * TASK A: продакшен-поток начала хода (GameActionExecutor.advanceTurn) зовёт
+   * расширенный диспетчер triggerOnTurnStartExtended (он мутирует GameState).
+   * Этот GameEvent[]-метод оставлен для логирования/совместимости и в
+   * продакшен-передаче хода больше не вызывается.
    */
   triggerOnTurnStart(heroId: string, fighter: Fighter): readonly GameEvent[] {
     const handler = this.get(heroId);
