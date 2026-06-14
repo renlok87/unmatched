@@ -468,7 +468,11 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       case 'defending':
         return role === 'defender';
       case 'self-health-below-defender': {
-        const defender = state.fighters.find((f) => f.id === context.defenderId);
+        // combatInfo.defenderId — id ИГРОКА-защитника; боец-защитник лежит в
+        // targetFighterId (атака по сайдкику ранит сайдкика). Фолбэк на
+        // defenderId — на случай caller'а, передающего id бойца напрямую.
+        const defenderFighterId = context.targetFighterId ?? context.defenderId;
+        const defender = state.fighters.find((f) => f.id === defenderFighterId);
         return defender ? fighter.health < defender.health : false;
       }
       case 'all-own-sidekicks-defeated':

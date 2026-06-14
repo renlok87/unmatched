@@ -52,7 +52,12 @@ export interface GameEvent {
  */
 export interface CombatState {
   readonly attackerId: string;
+  /** id ЗАЩИЩАЮЩЕГОСЯ ИГРОКА (combatInfo.defenderId), НЕ бойца. */
   readonly defenderId: string;
+  /** id бойца-цели атаки (combatInfo.targetFighterId) — это и есть боец-защитник
+   *  (атака по сайдкику ранит сайдкика). Для способностей, которым нужен именно
+   *  защищающийся БОЕЦ (напр. self-health-below-defender), брать его, а не defenderId. */
+  readonly targetFighterId?: string;
   readonly attackCardId?: string;
   readonly defenseCardId?: string;
   readonly round?: number;
