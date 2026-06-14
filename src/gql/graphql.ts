@@ -274,6 +274,18 @@ export type ChangePasswordDto = {
   newPassword: Scalars['String']['input'];
 };
 
+export type CleanupGamesInput = {
+  abortStuckInProgress?: InputMaybe<Scalars['Boolean']['input']>;
+  finishedOlderThanDays?: InputMaybe<Scalars['Int']['input']>;
+  stuckMinutes?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type CleanupGamesResultDto = {
+  __typename?: 'CleanupGamesResultDto';
+  aborted: Scalars['Int']['output'];
+  deleted: Scalars['Int']['output'];
+};
+
 export type ContentSummary = {
   __typename?: 'ContentSummary';
   boardsCount: Scalars['Int']['output'];
@@ -714,6 +726,7 @@ export type Mutation = {
   attack: GameMutationResult;
   banUser: Scalars['Boolean']['output'];
   changePassword: Scalars['Boolean']['output'];
+  cleanupGames: CleanupGamesResultDto;
   createBoard: AdminBoard;
   createCard: AdminCard;
   createGame: GameResponse;
@@ -752,6 +765,8 @@ export type Mutation = {
   /** Выбор бойца/клетки для отложенного эффекта карты (MOVE/PLACE) */
   resolvePendingEffect: GameMutationResult;
   selectHero: GameResponse;
+  /** Сменить стойку героя (STANCE: Alice big/small, Muhammad Ali float/sting) */
+  setStance: GameMutationResult;
   startGame: GameResponse;
   /** Открыть или закрыть дверь */
   toggleDoor: GameMutationResult;
@@ -790,6 +805,11 @@ export type MutationBanUserArgs = {
 
 export type MutationChangePasswordArgs = {
   input: ChangePasswordDto;
+};
+
+
+export type MutationCleanupGamesArgs = {
+  input?: InputMaybe<CleanupGamesInput>;
 };
 
 
@@ -923,6 +943,11 @@ export type MutationResolvePendingEffectArgs = {
 export type MutationSelectHeroArgs = {
   gameId: Scalars['String']['input'];
   heroId: Scalars['String']['input'];
+};
+
+
+export type MutationSetStanceArgs = {
+  input: SetStanceDto;
 };
 
 
@@ -1129,6 +1154,7 @@ export type Query = {
   getPresence?: Maybe<Presence>;
   hero?: Maybe<Hero>;
   heroList: HeroesPaginatedDto;
+  heroStances: Array<StanceOptionDto>;
   heroes: Array<Hero>;
   heroesBySet: Array<Hero>;
   heroesList: HeroesPaginatedDto;
@@ -1314,6 +1340,11 @@ export type QueryHeroListArgs = {
 };
 
 
+export type QueryHeroStancesArgs = {
+  heroSlug: Scalars['String']['input'];
+};
+
+
 export type QueryHeroesBySetArgs = {
   set: Scalars['String']['input'];
 };
@@ -1432,6 +1463,11 @@ export type ResolvePendingEffectDto = {
   y?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type SetStanceDto = {
+  gameId: Scalars['String']['input'];
+  stanceId: Scalars['String']['input'];
+};
+
 export type SettingsDto = {
   language?: InputMaybe<Scalars['String']['input']>;
   musicEnabled?: InputMaybe<Scalars['Boolean']['input']>;
@@ -1439,6 +1475,13 @@ export type SettingsDto = {
   showOnlineStatus?: InputMaybe<Scalars['Boolean']['input']>;
   soundEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   theme?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type StanceOptionDto = {
+  __typename?: 'StanceOptionDto';
+  id: Scalars['String']['output'];
+  isDefault: Scalars['Boolean']['output'];
+  label: Scalars['String']['output'];
 };
 
 export type Subscription = {
@@ -1875,6 +1918,13 @@ export type ResolvePendingEffectMutationVariables = Exact<{
 
 export type ResolvePendingEffectMutation = { __typename?: 'Mutation', resolvePendingEffect: { __typename?: 'GameMutationResult', state?: string | null, sequenceNumber: number, phase: GamePhase, currentTurnPlayerId?: string | null, turnCount: number, timestamp: any } };
 
+export type SetStanceMutationVariables = Exact<{
+  input: SetStanceDto;
+}>;
+
+
+export type SetStanceMutation = { __typename?: 'Mutation', setStance: { __typename?: 'GameMutationResult', state?: string | null, sequenceNumber: number, phase: GamePhase, currentTurnPlayerId?: string | null, turnCount: number, timestamp: any } };
+
 export type PlaceFighterMutationVariables = Exact<{
   input: MoveFighterDto;
 }>;
@@ -2016,6 +2066,13 @@ export type HeroesBySetQueryVariables = Exact<{
 
 export type HeroesBySetQuery = { __typename?: 'Query', heroesBySet: Array<{ __typename?: 'Hero', id: string, name: string, health: number, movement: number, set: string, fighterType: FighterType, sidekickCount?: number | null, sidekickHealth?: number | null, urls?: { __typename?: 'HeroUrls', avatar: string, mini: string, cardCover: string } | null }> };
 
+export type HeroStanceOptionsQueryVariables = Exact<{
+  heroSlug: Scalars['String']['input'];
+}>;
+
+
+export type HeroStanceOptionsQuery = { __typename?: 'Query', heroStances: Array<{ __typename?: 'StanceOptionDto', id: string, label: string, isDefault: boolean }> };
+
 export type LobbyAvailableGamesQueryVariables = Exact<{
   mode?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Float']['input']>;
@@ -2139,6 +2196,7 @@ export const PassDocument = {"kind":"Document","definitions":[{"kind":"Operation
 export const ToggleDoorDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ToggleDoor"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ToggleDoorDto"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"toggleDoor"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]} as unknown as DocumentNode<ToggleDoorMutation, ToggleDoorMutationVariables>;
 export const PlaySchemeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"PlayScheme"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PlaySchemeDto"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"playScheme"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]} as unknown as DocumentNode<PlaySchemeMutation, PlaySchemeMutationVariables>;
 export const ResolvePendingEffectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ResolvePendingEffect"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ResolvePendingEffectDto"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"resolvePendingEffect"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]} as unknown as DocumentNode<ResolvePendingEffectMutation, ResolvePendingEffectMutationVariables>;
+export const SetStanceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetStance"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SetStanceDto"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setStance"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]} as unknown as DocumentNode<SetStanceMutation, SetStanceMutationVariables>;
 export const PlaceFighterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"PlaceFighter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MoveFighterDto"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"moveFighter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]} as unknown as DocumentNode<PlaceFighterMutation, PlaceFighterMutationVariables>;
 export const ConfirmPlacementDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ConfirmPlacement"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pass"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"gameId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gameId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"sequenceNumber"}},{"kind":"Field","name":{"kind":"Name","value":"phase"}},{"kind":"Field","name":{"kind":"Name","value":"currentTurnPlayerId"}},{"kind":"Field","name":{"kind":"Name","value":"turnCount"}},{"kind":"Field","name":{"kind":"Name","value":"timestamp"}}]}}]}}]} as unknown as DocumentNode<ConfirmPlacementMutation, ConfirmPlacementMutationVariables>;
 export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"settings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"theme"}},{"kind":"Field","name":{"kind":"Name","value":"soundEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"musicEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"language"}},{"kind":"Field","name":{"kind":"Name","value":"profileVisible"}}]}}]}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;
@@ -2161,6 +2219,7 @@ export const SetsDocument = {"kind":"Document","definitions":[{"kind":"Operation
 export const AllHeroesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AllHeroes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"heroes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"set"}},{"kind":"Field","name":{"kind":"Name","value":"fighterType"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickCount"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickHealth"}},{"kind":"Field","name":{"kind":"Name","value":"urls"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"mini"}},{"kind":"Field","name":{"kind":"Name","value":"cardCover"}}]}}]}}]}}]} as unknown as DocumentNode<AllHeroesQuery, AllHeroesQueryVariables>;
 export const HeroDetailsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"HeroDetails"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hero"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"set"}},{"kind":"Field","name":{"kind":"Name","value":"fighterType"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickCount"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickHealth"}},{"kind":"Field","name":{"kind":"Name","value":"urls"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"mini"}},{"kind":"Field","name":{"kind":"Name","value":"cardCover"}}]}},{"kind":"Field","name":{"kind":"Name","value":"abilities"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"text"}},{"kind":"Field","name":{"kind":"Name","value":"trigger"}}]}},{"kind":"Field","name":{"kind":"Name","value":"cards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"boost"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrlRu"}}]}}]}}]}}]} as unknown as DocumentNode<HeroDetailsQuery, HeroDetailsQueryVariables>;
 export const HeroesBySetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"HeroesBySet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"set"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"heroesBySet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"set"},"value":{"kind":"Variable","name":{"kind":"Name","value":"set"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"set"}},{"kind":"Field","name":{"kind":"Name","value":"fighterType"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickCount"}},{"kind":"Field","name":{"kind":"Name","value":"sidekickHealth"}},{"kind":"Field","name":{"kind":"Name","value":"urls"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"mini"}},{"kind":"Field","name":{"kind":"Name","value":"cardCover"}}]}}]}}]}}]} as unknown as DocumentNode<HeroesBySetQuery, HeroesBySetQueryVariables>;
+export const HeroStanceOptionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"HeroStanceOptions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"heroSlug"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"heroStances"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"heroSlug"},"value":{"kind":"Variable","name":{"kind":"Name","value":"heroSlug"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"isDefault"}}]}}]}}]} as unknown as DocumentNode<HeroStanceOptionsQuery, HeroStanceOptionsQueryVariables>;
 export const LobbyAvailableGamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"LobbyAvailableGames"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mode"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"availableGames"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"mode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mode"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"host"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}},{"kind":"Field","name":{"kind":"Name","value":"opponent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}},{"kind":"Field","name":{"kind":"Name","value":"boardId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<LobbyAvailableGamesQuery, LobbyAvailableGamesQueryVariables>;
 export const QueueStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"QueueStatus"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"queueStatus"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"mode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mode"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inQueue"}},{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"totalPlayers"}},{"kind":"Field","name":{"kind":"Name","value":"estimatedWaitTime"}},{"kind":"Field","name":{"kind":"Name","value":"joinedAt"}}]}}]}}]} as unknown as DocumentNode<QueueStatusQuery, QueueStatusQueryVariables>;
 export const PenaltyInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PenaltyInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"penaltyInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"canJoinQueue"}},{"kind":"Field","name":{"kind":"Name","value":"declineCount"}},{"kind":"Field","name":{"kind":"Name","value":"tempBanUntil"}},{"kind":"Field","name":{"kind":"Name","value":"penaltyElo"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}}]}}]}}]} as unknown as DocumentNode<PenaltyInfoQuery, PenaltyInfoQueryVariables>;

@@ -46,6 +46,8 @@ query HeroDetails($id: String!) {
       value
       boost
       quantity
+      imageUrl
+      imageUrlRu
     }
   }
 }
@@ -65,5 +67,15 @@ query HeroesBySet($set: String!) {
       mini
       cardCover
     }
+  }
+}
+
+# STANCE: статичные опции стоек героя (id+label) из ABILITY_CONFIGS.
+# Для героев без стоек возвращает [] — HUD ничего не рендерит.
+query HeroStanceOptions($heroSlug: String!) {
+  heroStances(heroSlug: $heroSlug) {
+    id
+    label
+    isDefault
   }
 }

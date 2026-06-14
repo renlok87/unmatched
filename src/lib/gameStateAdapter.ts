@@ -111,6 +111,8 @@ export interface WireGameState {
     winnerId?: string;
     passCount?: number;
     pendingEffects?: WirePendingEffect[];
+    /** STANCE: текущая стойка героя по userId (id из AbilityConfig.stances) */
+    heroStances?: Record<string, string>;
   };
 }
 
@@ -147,6 +149,18 @@ export interface AdapterRefs {
   >;
   /** определение доски из контентного Boards (зоны/арт) */
   board: BoardDefinition | null;
+  /**
+   * STANCE: опции стоек по heroSlug (id+label+isDefault), из query heroStances.
+   * Пусто/нет ключа — у героя нет стоек (HUD ничего не рендерит).
+   */
+  stanceOptions: Record<string, StanceOption[]>;
+}
+
+/** STANCE: одна опция стойки для HUD (из query heroStances) */
+export interface StanceOption {
+  id: string;
+  label: string;
+  isDefault: boolean;
 }
 
 // ---------------------------------------------------------------------------

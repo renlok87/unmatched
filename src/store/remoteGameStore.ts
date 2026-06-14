@@ -25,6 +25,7 @@ import {
   type AdapterRefs,
   type WireGameState,
   type WirePendingEffect,
+  type StanceOption,
 } from '@/lib/gameStateAdapter';
 import type { GameState as LocalGameState, BoardDefinition } from '@/core/models/types';
 
@@ -106,6 +107,10 @@ interface RemoteGameState {
   amIDefender: () => boolean;
   /** Отложенные эффекты карт, ждущие выбора ЛОКАЛЬНОГО игрока (C2) */
   myPendingEffects: () => WirePendingEffect[];
+  /** STANCE: текущая стойка ЛОКАЛЬНОГО игрока (id) или null (нет/не выставлена) */
+  myStance: () => string | null;
+  /** STANCE: опции стоек ЛОКАЛЬНОГО героя (id+label); пусто — стоек нет */
+  myStanceOptions: () => StanceOption[];
 
   // Мутации gameplay
   maneuver: (fighterId: string, path: Array<{ x: number; y: number }>, boostCardId?: string) => Promise<void>;
@@ -117,6 +122,8 @@ interface RemoteGameState {
   resolvePendingEffect: (effectId: string, fighterId: string, x: number, y: number) => Promise<void>;
   /** CHOOSE_ONE (v3): выбрать вариант эффекта по индексу */
   resolveChooseOption: (effectId: string, optionIndex: number) => Promise<void>;
+  /** STANCE: сменить стойку ЛОКАЛЬНОГО героя (не тратит действие) */
+  setStance: (stanceId: string) => Promise<void>;
   endTurn: () => Promise<void>;
   pass: () => Promise<void>;
   leaveGame: () => Promise<void>;
@@ -133,7 +140,12 @@ function currentUserId(): string | null {
   return useAuthStore.getState().user?.id ?? localStorage.getItem('userId');
 }
 
-const emptyRefs = (): AdapterRefs => ({ usernames: {}, heroAssets: {}, board: null });
+const emptyRefs = (): AdapterRefs => ({
+  usernames: {},
+  heroAssets: {},
+  board: null,
+  stanceOptions: {},
+});
 
 export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
   currentGameId: null,
@@ -229,7 +241,33 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
         board = null; // fallback на wire-геометрию в адаптере
       }
 
-      set({ refs: { usernames, heroAssets, board } });
+      // 4. STANCE: статичные опции стоек по heroSlug всех HERO-бойцов.
+      //    Запрос @Public, дешёвый (без БД), кэшируется на герое; пустой
+      //    массив для героев без стоек — HUD ничего не рендерит.
+      const heroSlugs = [
+        ...new Set(
+          wire.fighters
+            .filter((f) => f.type === 'HERO')
+            .map((f) => f.heroSlug)
+            .filter((s): s is string => Boolean(s)),
+        ),
+      ];
+      const stanceOptions: AdapterRefs['stanceOptions'] = {};
+      await Promise.all(
+        heroSlugs.map(async (slug) => {
+          try {
+            const { data } = await apolloClient.query<gql.HeroStanceOptionsQuery>({
+              query: gql.HeroStanceOptionsDocument,
+              variables: { heroSlug: slug },
+            });
+            stanceOptions[slug] = data.heroStances ?? [];
+          } catch {
+            // отсутствие стоек не блокирует игру — HUD просто не покажет виджет
+          }
+        }),
+      );
+
+      set({ refs: { usernames, heroAssets, board, stanceOptions } });
       get().applyWireState(wire);
       set({ connectionStatus: 'connected', isSyncing: false });
     } catch (error) {
@@ -315,6 +353,28 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
     return (wireState?.metadata.pendingEffects ?? []).filter((p) => p.playerId === localUserId);
   },
 
+  myStanceOptions: () => {
+    const { wireState, localUserId, refs } = get();
+    if (!wireState || !localUserId) return [];
+    const slug = wireState.fighters.find(
+      (f) => f.ownerId === localUserId && f.type === 'HERO',
+    )?.heroSlug;
+    return (slug ? refs.stanceOptions[slug] : undefined) ?? [];
+  },
+
+  /**
+   * Текущая стойка локального игрока. Фолбэк зеркалит backend defaultStanceId():
+   * явная стойка → опция с isDefault → первая опция → null.
+   */
+  myStance: () => {
+    const { wireState, localUserId } = get();
+    const explicit =
+      localUserId && wireState ? wireState.metadata.heroStances?.[localUserId] : undefined;
+    if (explicit) return explicit;
+    const options = get().myStanceOptions();
+    return options.find((o) => o.isDefault)?.id ?? options[0]?.id ?? null;
+  },
+
   maneuver: (fighterId, path, boostCardId) =>
     runMutation(set, get, gql.ManeuverDocument, {
       input: { gameId: get().currentGameId, fighterId, boostCardId: boostCardId ?? null, path },
@@ -360,6 +420,11 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
     runMutation(set, get, gql.ResolvePendingEffectDocument, {
       input: { gameId: get().currentGameId, effectId, optionIndex },
     }, 'resolvePendingEffect'),
+
+  setStance: (stanceId) =>
+    runMutation(set, get, gql.SetStanceDocument, {
+      input: { gameId: get().currentGameId, stanceId },
+    }, 'setStance'),
 
   endTurn: () =>
     runMutation(set, get, gql.EndTurnDocument, {

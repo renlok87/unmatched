@@ -185,3 +185,15 @@ mutation ResolvePendingEffect($input: ResolvePendingEffectDto!) {
     timestamp
   }
 }
+
+# STANCE: сменить стойку героя. НЕ тратит действие.
+mutation SetStance($input: SetStanceDto!) {
+  setStance(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}

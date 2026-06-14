@@ -44,6 +44,9 @@ export const GameView = () => {
     actionsRemaining,
     amIDefender,
     myPendingEffects,
+    myStance,
+    myStanceOptions,
+    setStance,
     moveFighter,
     attack,
     playDefense,
@@ -248,6 +251,10 @@ export const GameView = () => {
   const turnOwnerName =
     adaptedState.players.find((p) => p.id === wireState?.currentTurnPlayerId)?.name ?? '';
 
+  // STANCE: виджет стоек МОЕГО героя (только если у героя есть стойки)
+  const stanceOptions = myStanceOptions();
+  const currentStanceId = myStance();
+
   return (
     <GameErrorBoundary>
       <div className="game-view">
@@ -379,6 +386,51 @@ export const GameView = () => {
             {pendingEffects.length > 1 && (
               <span style={{ opacity: 0.6 }}>ещё в очереди: {pendingEffects.length - 1}</span>
             )}
+          </div>
+        )}
+
+        {/* STANCE: стойка МОЕГО героя (показывается только если стойки есть) */}
+        {stanceOptions.length > 0 && !gameOver && (
+          <div
+            style={{
+              background: 'rgba(60, 140, 200, 0.14)',
+              border: '1px solid rgba(60, 140, 200, 0.45)',
+              padding: '8px 16px',
+              display: 'flex',
+              gap: 12,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            <strong>🥋 Стойка</strong>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+              {stanceOptions.map((opt) => {
+                const active = opt.id === currentStanceId;
+                return (
+                  <button
+                    key={opt.id}
+                    disabled={busy || active}
+                    onClick={() => void run(() => setStance(opt.id))}
+                    style={{
+                      background: active
+                        ? 'rgba(60, 140, 200, 0.65)'
+                        : 'rgba(60, 140, 200, 0.25)',
+                      border: active
+                        ? '1px solid rgba(60, 140, 200, 1)'
+                        : '1px solid rgba(60, 140, 200, 0.6)',
+                      color: '#fff',
+                      padding: '4px 12px',
+                      borderRadius: 6,
+                      fontWeight: active ? 700 : 400,
+                      cursor: busy || active ? 'default' : 'pointer',
+                      opacity: busy && !active ? 0.6 : 1,
+                    }}
+                  >
+                    {active ? `✓ ${opt.label}` : opt.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
 
