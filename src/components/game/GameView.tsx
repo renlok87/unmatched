@@ -50,6 +50,7 @@ export const GameView = () => {
     playScheme,
     resolveCombat,
     resolvePendingEffect,
+    resolveChooseOption,
     endTurn,
     pass,
     leaveGame,
@@ -102,6 +103,11 @@ export const GameView = () => {
   const handlePhaserEvent = (event: PhaserGameEvent) => {
     if (!wireState || !localUserId) return;
     const phase = wireState.phase;
+
+    // CHOOSE_ONE (v3): выбор — кнопками в баннере, клики по доске игнорируем
+    if (activePending && activePending.type === 'CHOOSE_ONE') {
+      return;
+    }
 
     // C2: режим резолва отложенного эффекта имеет приоритет — клик по
     // подходящему бойцу выбирает его, клик по клетке завершает эффект
@@ -340,11 +346,36 @@ export const GameView = () => {
           >
             <strong>✨ Эффект карты</strong>
             <span>{activePending.text ?? `${activePending.type} ${activePending.value ?? ''}`}</span>
-            <span style={{ opacity: 0.8 }}>
-              {pendingFighterId
-                ? `Боец выбран — кликните клетку (${activePending.type === 'MOVE' ? `до ${activePending.value} шагов` : 'любая свободная'})`
-                : `Кликните ${activePending.targetsOpponent ? 'бойца противника' : 'своего бойца'}${activePending.fighterName ? ` (${activePending.fighterName})` : ''}`}
-            </span>
+            {activePending.type === 'CHOOSE_ONE' ? (
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                {(activePending.options ?? []).map((opt) => (
+                  <button
+                    key={opt.index}
+                    disabled={busy}
+                    onClick={() => void run(() => resolveChooseOption(activePending.id, opt.index))}
+                    style={{
+                      background: 'rgba(120, 90, 220, 0.35)',
+                      border: '1px solid rgba(120, 90, 220, 0.7)',
+                      color: '#fff',
+                      padding: '4px 10px',
+                      borderRadius: 6,
+                      cursor: busy ? 'default' : 'pointer',
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+                {(activePending.chooseCount ?? 1) > 1 && (
+                  <span style={{ opacity: 0.7 }}>выберите {activePending.chooseCount}</span>
+                )}
+              </div>
+            ) : (
+              <span style={{ opacity: 0.8 }}>
+                {pendingFighterId
+                  ? `Боец выбран — кликните клетку (${activePending.type === 'MOVE' ? `до ${activePending.value} шагов` : 'любая свободная'})`
+                  : `Кликните ${activePending.targetsOpponent ? 'бойца противника' : 'своего бойца'}${activePending.fighterName ? ` (${activePending.fighterName})` : ''}`}
+              </span>
+            )}
             {pendingEffects.length > 1 && (
               <span style={{ opacity: 0.6 }}>ещё в очереди: {pendingEffects.length - 1}</span>
             )}

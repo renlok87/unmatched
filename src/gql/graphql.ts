@@ -1425,10 +1425,11 @@ export type ResolveCombatDto = {
 
 export type ResolvePendingEffectDto = {
   effectId: Scalars['String']['input'];
-  fighterId: Scalars['String']['input'];
+  fighterId?: InputMaybe<Scalars['String']['input']>;
   gameId: Scalars['String']['input'];
-  x: Scalars['Int']['input'];
-  y: Scalars['Int']['input'];
+  optionIndex?: InputMaybe<Scalars['Int']['input']>;
+  x?: InputMaybe<Scalars['Int']['input']>;
+  y?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type SettingsDto = {
@@ -1700,10 +1701,17 @@ export type UserWithSettingsResponse = {
 
 /** Color zones on the board */
 export enum Zone {
+  Beige = 'BEIGE',
   Blue = 'BLUE',
+  Brown = 'BROWN',
+  Gold = 'GOLD',
+  Gray = 'GRAY',
   Green = 'GREEN',
+  Orange = 'ORANGE',
+  Pink = 'PINK',
   Purple = 'PURPLE',
   Red = 'RED',
+  White = 'WHITE',
   Yellow = 'YELLOW'
 }
 

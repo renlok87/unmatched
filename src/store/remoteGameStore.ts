@@ -115,6 +115,8 @@ interface RemoteGameState {
   playScheme: (cardId: string) => Promise<void>;
   resolveCombat: () => Promise<void>;
   resolvePendingEffect: (effectId: string, fighterId: string, x: number, y: number) => Promise<void>;
+  /** CHOOSE_ONE (v3): выбрать вариант эффекта по индексу */
+  resolveChooseOption: (effectId: string, optionIndex: number) => Promise<void>;
   endTurn: () => Promise<void>;
   pass: () => Promise<void>;
   leaveGame: () => Promise<void>;
@@ -352,6 +354,11 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
   resolvePendingEffect: (effectId, fighterId, x, y) =>
     runMutation(set, get, gql.ResolvePendingEffectDocument, {
       input: { gameId: get().currentGameId, effectId, fighterId, x, y },
+    }, 'resolvePendingEffect'),
+
+  resolveChooseOption: (effectId, optionIndex) =>
+    runMutation(set, get, gql.ResolvePendingEffectDocument, {
+      input: { gameId: get().currentGameId, effectId, optionIndex },
     }, 'resolvePendingEffect'),
 
   endTurn: () =>

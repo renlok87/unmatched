@@ -114,15 +114,23 @@ export interface WireGameState {
   };
 }
 
-/** Отложенный эффект карты (C2): выбор бойца/клетки для MOVE/PLACE */
+/**
+ * Отложенный эффект карты:
+ * - MOVE/PLACE (C2): выбор бойца/клетки;
+ * - CHOOSE_ONE (v3): выбор одного из вариантов (options) по индексу.
+ */
 export interface WirePendingEffect {
   id: string;
-  type: 'MOVE' | 'PLACE';
+  type: 'MOVE' | 'PLACE' | 'CHOOSE_ONE';
   playerId: string;
   value?: number;
   fighterName?: string;
   targetsOpponent?: boolean;
   text?: string;
+  /** CHOOSE_ONE: варианты выбора (индекс + текст) */
+  options?: Array<{ index: number; label: string }>;
+  /** CHOOSE_ONE: сколько опций выбрать (default 1) */
+  chooseCount?: number;
 }
 
 /** Справочники для артов/имён (контентные запросы, кэш в remoteGameStore) */
