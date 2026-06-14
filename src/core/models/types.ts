@@ -131,7 +131,19 @@ export interface BoardSpace {
   startingPositions?: Record<string, Position>; // player ID -> position
 }
 
-export type Zone = 'blue' | 'green' | 'yellow' | 'red' | 'purple';
+export type Zone =
+  | 'blue'
+  | 'green'
+  | 'yellow'
+  | 'red'
+  | 'purple'
+  | 'brown'
+  | 'gray'
+  | 'orange'
+  | 'pink'
+  | 'white'
+  | 'gold'
+  | 'beige';
 
 export interface BoardDefinition {
   id: string;

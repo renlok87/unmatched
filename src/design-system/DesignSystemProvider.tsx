@@ -35,6 +35,13 @@ const defaultTheme: ThemeTokens = {
     yellow: '#eab308',
     red: '#ef4444',
     purple: '#a855f7',
+    brown: '#92400e',
+    gray: '#6b7280',
+    orange: '#f97316',
+    pink: '#ec4899',
+    white: '#e5e7eb',
+    gold: '#d4af37',
+    beige: '#d6c8a8',
   },
   gradients: {
     dark: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',

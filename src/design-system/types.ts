@@ -47,7 +47,19 @@ export type ColorName =
   | 'gray-800'
   | 'gray-900';
 
-export type ZoneColor = 'blue' | 'green' | 'yellow' | 'red' | 'purple';
+export type ZoneColor =
+  | 'blue'
+  | 'green'
+  | 'yellow'
+  | 'red'
+  | 'purple'
+  | 'brown'
+  | 'gray'
+  | 'orange'
+  | 'pink'
+  | 'white'
+  | 'gold'
+  | 'beige';
 
 export type GradientName =
   | 'dark'

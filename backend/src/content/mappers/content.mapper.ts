@@ -241,7 +241,7 @@ export class ContentMapper {
     const cells = this.parsePrismaCells(prismaBoard.cells);
     const spaces = cells.map((cell) => ({
       position: { x: cell.x, y: cell.y },
-      zones: cell.zones || [],
+      zones: this.normalizeZones(cell.zones),
       isObstacle: cell.isObstacle || false,
     }));
 
@@ -417,5 +417,62 @@ export class ContentMapper {
       }
     }
     return cells;
+  }
+
+  /**
+   * Алиасы zone-ключей scraped-data → базовый Zone enum.
+   * Покрывает синонимы ("violet"→purple, "grey"→gray) и опечатки источника
+   * ("biege"→beige). Варианты оттенков ("blue-dark", "green-light",
+   * "brown-ligt") сводятся к базовому цвету по токенам в normalizeZone.
+   */
+  private static readonly ZONE_ALIASES: Record<string, Zone> = {
+    blue: Zone.BLUE,
+    green: Zone.GREEN,
+    yellow: Zone.YELLOW,
+    red: Zone.RED,
+    purple: Zone.PURPLE,
+    violet: Zone.PURPLE,
+    brown: Zone.BROWN,
+    gray: Zone.GRAY,
+    grey: Zone.GRAY,
+    orange: Zone.ORANGE,
+    pink: Zone.PINK,
+    white: Zone.WHITE,
+    gold: Zone.GOLD,
+    beige: Zone.BEIGE,
+    biege: Zone.BEIGE,
+  };
+
+  /**
+   * Нормализует один zone-ключ к Zone enum или null (неизвестное → дроп).
+   * Без этого GraphQL-сериализация enum [Zone] падала на любом ключе вне
+   * enum (например "biege") и роняла ВЕСЬ boards query.
+   */
+  private normalizeZone(raw: unknown): Zone | null {
+    if (typeof raw !== 'string') return null;
+    const s = raw.toLowerCase().trim();
+    const direct = ContentMapper.ZONE_ALIASES[s];
+    if (direct) return direct;
+    // Варианты вида "blue-dark"/"dark-blue"/"brown-ligt": берём первый
+    // распознанный цветовой токен.
+    for (const token of s.split(/[-_\s]+/)) {
+      const mapped = ContentMapper.ZONE_ALIASES[token];
+      if (mapped) return mapped;
+    }
+    return null;
+  }
+
+  /**
+   * Нормализует массив zone-ключей клетки: дропает неизвестные, убирает
+   * дубликаты (после сведения вариантов к базовому цвету).
+   */
+  private normalizeZones(zones: unknown): Zone[] {
+    if (!Array.isArray(zones)) return [];
+    const out: Zone[] = [];
+    for (const z of zones) {
+      const zone = this.normalizeZone(z);
+      if (zone && !out.includes(zone)) out.push(zone);
+    }
+    return out;
   }
 }

@@ -56,6 +56,13 @@ const ZONE_COLORS: Record<Zone, number> = {
   yellow: 0xd7b84b,
   red: 0xb23a48,
   purple: 0x7b5ac8,
+  brown: 0x92400e,
+  gray: 0x6b7280,
+  orange: 0xf97316,
+  pink: 0xec4899,
+  white: 0xe5e7eb,
+  gold: 0xd4af37,
+  beige: 0xd6c8a8,
 };
 
 const HUD = {
