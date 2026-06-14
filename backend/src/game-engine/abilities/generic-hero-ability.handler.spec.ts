@@ -1080,4 +1080,199 @@ describe('GenericHeroAbilityHandler', () => {
       expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 0)).toBe(false);
     });
   });
+
+  // ---- 12) combat-modifier-per-count (Raptors-style dynamic modifier) ----
+  // +valuePer к атаке/защите за КАЖДОГО другого дружественного бойца,
+  // СМЕЖНОГО с защитником боя (countOf = own-fighters-adjacent-to-defender-excl-self).
+  describe('getStatefulCombatModifiers (combat-modifier-per-count)', () => {
+    const config: AbilityConfig = {
+      heroId: 'raptors',
+      abilityName: 'Pack Tactics',
+      description: '+1 к атаке за каждого другого своего бойца, смежного с защитником',
+      rules: [
+        {
+          trigger: 'combat-passive',
+          condition: 'attacking',
+          effect: {
+            kind: 'combat-modifier-per-count',
+            appliesTo: 'attack',
+            valuePer: 1,
+            countOf: 'own-fighters-adjacent-to-defender-excl-self',
+          },
+        },
+      ],
+    };
+
+    // combatInfo: targetFighterId — боец-защитник (на нём считаем смежность).
+    const combat: CombatState = {
+      attackerId: 'hero-fighter-1',
+      defenderId: 'player2',
+      targetFighterId: 'enemy-fighter-1',
+    };
+
+    // Защитник-боец на (5,5); два СВОИХ бойца player1 смежны с ним; герой-атакующий
+    // тоже свой, но он сам исключается из подсчёта (excl-self), даже если смежен.
+    function packState(): GameState {
+      const defender = enemyFighter({ id: 'enemy-fighter-1', position: { x: 5, y: 5 } });
+      const attacker = heroFighter({ id: 'hero-fighter-1', position: { x: 5, y: 6 } }); // смежен, но self
+      const ally1 = heroFighter({
+        id: 'raptor-1',
+        type: FighterType.MINION,
+        name: 'Raptor 1',
+        position: { x: 4, y: 5 }, // смежен с (5,5)
+      });
+      const ally2 = heroFighter({
+        id: 'raptor-2',
+        type: FighterType.MINION,
+        name: 'Raptor 2',
+        position: { x: 6, y: 5 }, // смежен с (5,5)
+      });
+      return makeState({ fighters: [attacker, defender, ally1, ally2] });
+    }
+
+    it('2 других своих бойца смежны с защитником → +2 (valuePer 1 * count 2)', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = packState();
+      const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, attacker, 'attacker');
+
+      expect(mods).toHaveLength(1);
+      expect(mods[0]).toMatchObject({
+        type: ValueModifierType.ADD,
+        value: 2,
+        ownerId: 'player1',
+        source: 'hero-ability:raptors:Pack Tactics',
+      });
+      expect(typeof mods[0].timestamp).toBe('number');
+    });
+
+    it('атакующий боец сам НЕ считается (excl-self), даже будучи смежным', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      // только атакующий смежен с защитником, союзников рядом нет
+      const defender = enemyFighter({ id: 'enemy-fighter-1', position: { x: 5, y: 5 } });
+      const attacker = heroFighter({ id: 'hero-fighter-1', position: { x: 5, y: 6 } }); // смежен (self)
+      const state = makeState({ fighters: [attacker, defender] });
+      const atk = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, atk, 'attacker');
+      expect(mods).toHaveLength(0); // self исключён → count 0 → нет модификатора
+    });
+
+    it('0 смежных своих бойцов → нет модификатора', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      // защитник один, союзники далеко (герой на (1,1), защитник на (9,9))
+      const state = makeState();
+      const atk = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, atk, 'attacker');
+      expect(mods).toHaveLength(0);
+    });
+
+    it('только СВОИ бойцы считаются; вражеские смежные не учитываются', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const defender = enemyFighter({ id: 'enemy-fighter-1', position: { x: 5, y: 5 } });
+      const attacker = heroFighter({ id: 'hero-fighter-1', position: { x: 1, y: 1 } });
+      const ownAlly = heroFighter({
+        id: 'raptor-1',
+        type: FighterType.MINION,
+        position: { x: 4, y: 5 }, // свой, смежен → считается
+      });
+      const enemyAlly = enemyFighter({
+        id: 'enemy-fighter-2',
+        position: { x: 6, y: 5 }, // вражеский, смежен → НЕ считается
+      });
+      const state = makeState({ fighters: [attacker, defender, ownAlly, enemyAlly] });
+      const atk = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, atk, 'attacker');
+      expect(mods).toHaveLength(1);
+      expect(mods[0].value).toBe(1); // только 1 свой смежный
+    });
+
+    it('повергнутые свои бойцы не считаются', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const defender = enemyFighter({ id: 'enemy-fighter-1', position: { x: 5, y: 5 } });
+      const attacker = heroFighter({ id: 'hero-fighter-1', position: { x: 1, y: 1 } });
+      const liveAlly = heroFighter({
+        id: 'raptor-1',
+        type: FighterType.MINION,
+        position: { x: 4, y: 5 },
+      });
+      const deadAlly = heroFighter({
+        id: 'raptor-2',
+        type: FighterType.MINION,
+        position: { x: 6, y: 5 },
+        isDefeated: true, // повержен → не считается
+      });
+      const state = makeState({ fighters: [attacker, defender, liveAlly, deadAlly] });
+      const atk = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, atk, 'attacker');
+      expect(mods).toHaveLength(1);
+      expect(mods[0].value).toBe(1); // только живой союзник
+    });
+
+    it('appliesTo/role: appliesTo attack не срабатывает для роли defender', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = packState();
+      const fighter = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, fighter, 'defender');
+      expect(mods).toHaveLength(0);
+    });
+
+    it('condition гейтит: attacking при роли defender → no-op даже при appliesTo both', () => {
+      const bothConfig: AbilityConfig = {
+        heroId: 'raptors',
+        abilityName: 'Pack Tactics',
+        description: 'both, но условие attacking',
+        rules: [
+          {
+            trigger: 'combat-passive',
+            condition: 'attacking',
+            effect: {
+              kind: 'combat-modifier-per-count',
+              appliesTo: 'both',
+              valuePer: 1,
+              countOf: 'own-fighters-adjacent-to-defender-excl-self',
+            },
+          },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(bothConfig, makeDeps());
+      const state = packState();
+      const fighter = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      // appliesTo both пропускает sideMatchesRole, но condition 'attacking' гейтит роль defender
+      const mods = handler.getStatefulCombatModifiers(state, combat, fighter, 'defender');
+      expect(mods).toHaveLength(0);
+    });
+
+    it('защитник-боец не найден (нет targetFighterId/defenderId матча) → no-op', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = packState();
+      const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+      // combat без targetFighterId, defenderId — id игрока, не бойца → fighter.find не найдёт
+      const badCombat: CombatState = { attackerId: 'hero-fighter-1', defenderId: 'player2' };
+
+      const mods = handler.getStatefulCombatModifiers(state, badCombat, attacker, 'attacker');
+      expect(mods).toHaveLength(0);
+    });
+
+    it('фолбэк на defenderId, когда targetFighterId отсутствует, но defenderId — id бойца', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = packState();
+      const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+      // нет targetFighterId, но defenderId напрямую указывает на бойца-защитника
+      const combatByFighter: CombatState = {
+        attackerId: 'hero-fighter-1',
+        defenderId: 'enemy-fighter-1',
+      };
+
+      const mods = handler.getStatefulCombatModifiers(state, combatByFighter, attacker, 'attacker');
+      expect(mods).toHaveLength(1);
+      expect(mods[0].value).toBe(2);
+    });
+  });
 });

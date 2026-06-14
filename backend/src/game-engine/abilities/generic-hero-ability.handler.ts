@@ -27,6 +27,7 @@ import {
   AbilityCondition,
   AbilityRule,
   CombatModifierEffect,
+  CombatModifierPerCountEffect,
   PendingMoveEffect,
   TurnDamageEffect,
   TurnEffect,
@@ -95,28 +96,91 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
 
     for (const rule of this.rules) {
       if (rule.trigger !== 'combat-passive') continue;
-      if (rule.effect.kind !== 'combat-modifier') continue;
 
-      const effect = rule.effect as CombatModifierEffect;
+      // --- Статический combat-modifier (фиксированное value) ---
+      if (rule.effect.kind === 'combat-modifier') {
+        const effect = rule.effect as CombatModifierEffect;
 
-      // Сторона: appliesTo должен совпадать с ролью бойца ('both' — всегда)
-      if (!this.sideMatchesRole(effect.appliesTo, role)) continue;
+        // Сторона: appliesTo должен совпадать с ролью бойца ('both' — всегда)
+        if (!this.sideMatchesRole(effect.appliesTo, role)) continue;
 
-      // Условие против GameState
-      if (!this.evalCombatCondition(rule.condition ?? 'always', state, context, fighter, role)) {
+        // Условие против GameState
+        if (!this.evalCombatCondition(rule.condition ?? 'always', state, context, fighter, role)) {
+          continue;
+        }
+
+        modifiers.push({
+          type: ValueModifierType.ADD,
+          value: effect.value,
+          source: `hero-ability:${this.heroId}:${this.abilityName}`,
+          ownerId: fighter.ownerId,
+          timestamp: Date.now(),
+        });
         continue;
       }
 
-      modifiers.push({
-        type: ValueModifierType.ADD,
-        value: effect.value,
-        source: `hero-ability:${this.heroId}:${this.abilityName}`,
-        ownerId: fighter.ownerId,
-        timestamp: Date.now(),
-      });
+      // --- Динамический combat-modifier-per-count (value = valuePer * count) ---
+      if (rule.effect.kind === 'combat-modifier-per-count') {
+        const effect = rule.effect as CombatModifierPerCountEffect;
+
+        // Сторона и условие гейтятся так же, как у статического модификатора.
+        if (!this.sideMatchesRole(effect.appliesTo, role)) continue;
+        if (!this.evalCombatCondition(rule.condition ?? 'always', state, context, fighter, role)) {
+          continue;
+        }
+
+        const count = this.evalCombatCount(effect.countOf, state, context, fighter);
+        const value = effect.valuePer * count;
+        // Нулевой бонус не порождает ValueModifier (count === 0 → no-op).
+        if (value === 0) continue;
+
+        modifiers.push({
+          type: ValueModifierType.ADD,
+          value,
+          source: `hero-ability:${this.heroId}:${this.abilityName}`,
+          ownerId: fighter.ownerId,
+          timestamp: Date.now(),
+        });
+        continue;
+      }
     }
 
     return modifiers;
+  }
+
+  /**
+   * Подсчёт для combat-modifier-per-count. Резолвит бойца-защитника боя как
+   * state.fighters[targetFighterId ?? defenderId] (см. CombatState: защитник-боец
+   * лежит в targetFighterId, defenderId — id ИГРОКА-защитника; фолбэк на
+   * defenderId — на случай caller'а, передающего id бойца напрямую). Если боец
+   * не найден — возвращает 0 (модификатор не выдаётся).
+   *
+   * 'own-fighters-adjacent-to-defender-excl-self' — число бойцов владельца
+   * (fighter.ownerId), НЕ повергнутых, ИСКЛЮЧАЯ самого бойца, смежных с
+   * защитником (deps.zone.manhattanDistance(pos, defenderPos) === 1).
+   */
+  private evalCombatCount(
+    countOf: CombatModifierPerCountEffect['countOf'],
+    state: GameState,
+    context: CombatState,
+    fighter: Fighter,
+  ): number {
+    const defenderFighterId = context.targetFighterId ?? context.defenderId;
+    const defender = state.fighters.find((f) => f.id === defenderFighterId);
+    if (!defender) return 0;
+
+    switch (countOf) {
+      case 'own-fighters-adjacent-to-defender-excl-self':
+        return state.fighters.filter(
+          (f) =>
+            f.ownerId === fighter.ownerId && // только свои
+            f.id !== fighter.id && // excl-self
+            f.isDefeated !== true && // живые
+            this.deps.zone.manhattanDistance(f.position, defender.position) === 1, // смежные
+        ).length;
+      default:
+        return 0;
+    }
   }
 
   // ===================== TURN-START / TURN-END =====================

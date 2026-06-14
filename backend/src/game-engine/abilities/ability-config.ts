@@ -91,6 +91,37 @@ export interface CombatModifierEffect {
 }
 
 /**
+ * ДИНАМИЧЕСКИЙ боевой модификатор: добавка к атаке/защите, чья величина
+ * МАСШТАБИРУЕТСЯ от подсчёта на доске (Raptors-style: «+1 к атаке за каждого
+ * ДРУГОГО дружественного бойца, СМЕЖНОГО с защитником»). Всегда ADD-семантика.
+ *
+ * Итоговое значение = valuePer * count, где count определяется countOf.
+ * Валиден ТОЛЬКО для триггера 'combat-passive' (как и CombatModifierEffect):
+ * считается против пары боец/контекст боя в getStatefulCombatModifiers.
+ *
+ * countOf — стратегия подсчёта:
+ *  - 'own-fighters-adjacent-to-defender-excl-self' — число бойцов, принадлежащих
+ *    fighter.ownerId (СВОИ), НЕ повергнутых, ИСКЛЮЧАЯ самого бойца (excl-self),
+ *    чья позиция СМЕЖНА с бойцом-защитником боя
+ *    (deps.zone.manhattanDistance(pos, defenderPos) === 1). Защитник-боец
+ *    резолвится как state.fighters[targetFighterId ?? defenderId]; если боец не
+ *    найден — count считается отсутствующим (модификатор не выдаётся).
+ *
+ * Модификатор выдаётся ТОЛЬКО когда count > 0 (нулевой бонус не порождает
+ * ValueModifier — чистый no-op). appliesTo vs role и condition гейтятся так же,
+ * как у обычного CombatModifierEffect.
+ */
+export interface CombatModifierPerCountEffect {
+  readonly kind: 'combat-modifier-per-count';
+  /** К чему применяется: атака, защита или обе стороны боя */
+  readonly appliesTo: 'attack' | 'defense' | 'both';
+  /** Прибавка ЗА ЕДИНИЦУ count (итог = valuePer * count, ADD) */
+  readonly valuePer: number;
+  /** Стратегия подсчёта (что именно считаем на доске) */
+  readonly countOf: 'own-fighters-adjacent-to-defender-excl-self';
+}
+
+/**
  * Эффект хода: добор/лечение/доп. действие.
  * Любое поле опционально — применяются только заданные.
  */
@@ -168,6 +199,7 @@ export interface TurnDamageEffect {
  */
 export type AbilityEffect =
   | CombatModifierEffect
+  | CombatModifierPerCountEffect
   | TurnEffect
   | PendingMoveEffect
   | TurnDamageEffect;
@@ -507,6 +539,45 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
     description: 'Can attack from up to 5 spaces away ignoring zones.',
     attackRange: 5,
     rules: [],
+  },
+  {
+    // Bruce Lee — «Be Like Water»-стиль репозиционирования: в конце хода может
+    // переместить себя (HERO-бойца) на величину до 1 клетки. Порождает MOVE
+    // PendingEffect (C2), который игрок может резолвить ИЛИ отклонить («you may»).
+    heroId: 'bruce-lee',
+    abilityName: 'Be Like Water',
+    description:
+      'В конце хода Bruce Lee может переместиться на 1 клетку. Создаёт отложенный MOVE-эффект (C2), ' +
+      'который игрок может отклонить (печатное «you may»).',
+    rules: [
+      {
+        trigger: 'turn-end',
+        condition: 'always',
+        effect: { kind: 'pending-move', target: 'own-hero', maxSpaces: 1 },
+      },
+    ],
+  },
+  {
+    // Raptors — «Pack Tactics»: +1 к атаке за каждого ДРУГОГО raptor, смежного с
+    // защитником. Все raptor'ы — свои бойцы; per-count подсчёт исключает самого
+    // атакующего raptor (excl-self) и считает только живых союзников, смежных с
+    // бойцом-защитником боя. Бонус только на стороне АТАКИ (condition attacking).
+    heroId: 'raptors',
+    abilityName: 'Pack Tactics',
+    description:
+      'Raptors получают +1 к атаке за каждого ДРУГОГО Raptor, смежного с защитником.',
+    rules: [
+      {
+        trigger: 'combat-passive',
+        condition: 'attacking',
+        effect: {
+          kind: 'combat-modifier-per-count',
+          appliesTo: 'attack',
+          valuePer: 1,
+          countOf: 'own-fighters-adjacent-to-defender-excl-self',
+        },
+      },
+    ],
   },
   // NB: триггер 'after-defense' + AfterCombatContext.defenderPlayerId — инфра
   // для defender-side способностей (зеркало 'after-attack'), пока без героя:

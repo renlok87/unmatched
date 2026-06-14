@@ -259,7 +259,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
   afterEach(() => jest.clearAllMocks());
 
   // ====================================================================
-  // САНИТИ: все 19 конфигов реально зарегистрированы под своими слагами
+  // САНИТИ: все 21 конфиг реально зарегистрированы под своими слагами
   // ====================================================================
   describe('registration', () => {
     it('каждый ABILITY_CONFIGS.heroId зарегистрирован в реестре под своим слагом', () => {
@@ -267,7 +267,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
         expect(registry.has(cfg.heroId)).toBe(true);
         expect(registry.getExtended(cfg.heroId)?.heroId).toBe(cfg.heroId);
       }
-      expect(ABILITY_CONFIGS).toHaveLength(19);
+      expect(ABILITY_CONFIGS).toHaveLength(21);
     });
   });
 

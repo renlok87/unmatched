@@ -169,6 +169,8 @@ describe('ABILITY_CONFIGS — присутствие героев', () => {
     'dracula',
     'medusa',
     'bullseye',
+    'bruce-lee',
+    'raptors',
   ];
   it.each(expected)('содержит конфиг для слага %s', (slug) => {
     expect(configFor(slug)).toBeDefined();
@@ -791,6 +793,148 @@ describe('bullseye (passive attackRange:5, rules empty)', () => {
     expect(await handler.onTurnEnd(state, 'player1')).toBe(state);
     expect(await handler.onAfterCombat(state, afterCtx(true))).toBe(state);
     expect(deps.deck.drawCards).not.toHaveBeenCalled();
+  });
+});
+
+// ===================== PENDING-MOVE own-hero (BRUCE LEE) =====================
+
+describe('bruce-lee (turn-end: pending-move own-hero, maxSpaces 1)', () => {
+  it('в конце хода добавляет MOVE pending для своего героя (value 1, fighterName=имя героя, playerId, targetsOpponent false)', async () => {
+    const handler = handlerFor('bruce-lee');
+    const state = makeState();
+
+    const next = await handler.onTurnEnd(state, 'player1');
+
+    const pending = next.metadata.pendingEffects ?? [];
+    expect(pending).toHaveLength(1);
+    expect(pending[0]).toMatchObject({
+      type: 'MOVE',
+      playerId: 'player1',
+      value: 1,
+      fighterName: 'Hero', // own-hero → имя HERO-бойца игрока (makeFighter().name === 'Hero')
+      targetsOpponent: false,
+    });
+    // pendingEffects никогда не двигают seq; исходный state не мутирован
+    expect(next.sequenceNumber).toBe(state.sequenceNumber);
+    expect(state.metadata.pendingEffects).toBeUndefined();
+  });
+
+  it('turn-start ничего не делает (только turn-end правило)', async () => {
+    const handler = handlerFor('bruce-lee');
+    const state = makeState();
+    const next = await handler.onTurnStart(state, 'player1');
+    expect(next).toBe(state);
+  });
+});
+
+// ===================== COMBAT-MODIFIER-PER-COUNT (RAPTORS) =====================
+
+describe('raptors (combat-passive: +1 attack per other own fighter adjacent to defender)', () => {
+  /**
+   * State: атакующий-raptor (hero-fighter-1, owner player1) бьёт врага
+   * (enemy-fighter-1, owner player2). adjCount союзных raptor'ов player1
+   * размещаются СМЕЖНО с защитником (manhattan distance === 1).
+   * Защитник стоит в (5,5); смежные клетки: (4,5), (6,5), (5,4), (5,6).
+   */
+  const stateWithAllies = (adjCount: number): GameState => {
+    const defenderPos = { x: 5, y: 5 };
+    const adjCells = [
+      { x: 4, y: 5 },
+      { x: 6, y: 5 },
+      { x: 5, y: 4 },
+      { x: 5, y: 6 },
+    ];
+    const allies = Array.from({ length: adjCount }, (_, i) =>
+      makeFighter({
+        id: `raptor-ally-${i}`,
+        ownerId: 'player1',
+        type: FighterType.MINION,
+        name: 'Raptor',
+        heroSlug: 'raptors',
+        position: adjCells[i],
+      }),
+    );
+    return makeState({
+      fighters: [
+        // атакующий raptor — далеко от защитника (НЕ смежен), excl-self в любом случае
+        makeFighter({ heroSlug: 'raptors', position: { x: 1, y: 1 } }),
+        ...allies,
+        makeFighter({
+          id: 'enemy-fighter-1',
+          ownerId: 'player2',
+          heroSlug: 'enemy-hero',
+          name: 'Enemy',
+          health: 12,
+          position: defenderPos,
+        }),
+      ],
+    });
+  };
+
+  const RAPTOR_COMBAT: CombatState = {
+    attackerId: 'hero-fighter-1',
+    defenderId: 'player2', // id ИГРОКА-защитника (как в проде)
+    targetFighterId: 'enemy-fighter-1', // боец-защитник
+  };
+
+  it('+2 к атаке, когда 2 ДРУГИХ своих raptor смежны с защитником', () => {
+    const handler = handlerFor('raptors');
+    const state = stateWithAllies(2);
+    const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+    const mods = handler.getStatefulCombatModifiers(state, RAPTOR_COMBAT, attacker, 'attacker');
+
+    expect(mods).toHaveLength(1);
+    expect(mods[0]).toMatchObject({ type: ValueModifierType.ADD, value: 2, ownerId: 'player1' });
+  });
+
+  it('+1 к атаке, когда ровно 1 союзный raptor смежен с защитником', () => {
+    const handler = handlerFor('raptors');
+    const state = stateWithAllies(1);
+    const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+    const mods = handler.getStatefulCombatModifiers(state, RAPTOR_COMBAT, attacker, 'attacker');
+
+    expect(mods).toHaveLength(1);
+    expect(mods[0]).toMatchObject({ type: ValueModifierType.ADD, value: 1 });
+  });
+
+  it('no-op: 0 союзных raptor смежно с защитником → модификатор не выдаётся', () => {
+    const handler = handlerFor('raptors');
+    const state = stateWithAllies(0);
+    const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+    const mods = handler.getStatefulCombatModifiers(state, RAPTOR_COMBAT, attacker, 'attacker');
+    expect(mods).toHaveLength(0);
+  });
+
+  it('атакующий raptor НЕ считает сам себя (excl-self): смежный с защитником атакующий не даёт бонуса', () => {
+    const handler = handlerFor('raptors');
+    // Атакующий raptor смежен с защитником, союзников нет → count 0 (excl-self).
+    const state = makeState({
+      fighters: [
+        makeFighter({ heroSlug: 'raptors', position: { x: 4, y: 5 } }), // смежен с (5,5)
+        makeFighter({
+          id: 'enemy-fighter-1',
+          ownerId: 'player2',
+          heroSlug: 'enemy-hero',
+          name: 'Enemy',
+          health: 12,
+          position: { x: 5, y: 5 },
+        }),
+      ],
+    });
+    const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+    const mods = handler.getStatefulCombatModifiers(state, RAPTOR_COMBAT, attacker, 'attacker');
+    expect(mods).toHaveLength(0);
+  });
+
+  it('condition attacking: защитник-raptor НЕ получает бонус (appliesTo attack гейтит роль)', () => {
+    const handler = handlerFor('raptors');
+    const state = stateWithAllies(2);
+    const fighter = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+    const mods = handler.getStatefulCombatModifiers(state, RAPTOR_COMBAT, fighter, 'defender');
+    expect(mods).toHaveLength(0);
   });
 });
 
