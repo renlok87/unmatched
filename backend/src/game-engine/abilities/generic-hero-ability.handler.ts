@@ -28,6 +28,7 @@ import {
   AbilityRule,
   CombatModifierEffect,
   PendingMoveEffect,
+  TurnDamageEffect,
   TurnEffect,
 } from './ability-config';
 
@@ -40,13 +41,19 @@ export interface GenericHeroAbilityDeps {
   readonly deck: {
     drawCards(state: GameState, userId: string, count: number): Promise<GameState>;
   };
-  /** Проверка зон для 'no-enemy-in-own-zone' (AdjacencyService.isInSameZone) */
+  /**
+   * Зоны/смежность (AdjacencyService). Модуль передаёт сюда весь
+   * AdjacencyService, поэтому достаточно объявить нужные методы:
+   *  - isInSameZone    — для 'no-enemy-in-own-zone' и turn-damage 'enemy-in-zone'
+   *  - manhattanDistance — для turn-damage 'enemy-adjacent' (смежность == 1)
+   */
   readonly zone: {
     isInSameZone(
       state: { boardState: BoardState },
       a: { x: number; y: number },
       b: { x: number; y: number },
     ): boolean;
+    manhattanDistance(a: { x: number; y: number }, b: { x: number; y: number }): number;
   };
 }
 
@@ -179,7 +186,13 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
 
     for (const rule of this.rules) {
       if (rule.trigger !== trigger) continue;
-      if (rule.effect.kind !== 'turn-effect' && rule.effect.kind !== 'pending-move') continue;
+      if (
+        rule.effect.kind !== 'turn-effect' &&
+        rule.effect.kind !== 'pending-move' &&
+        rule.effect.kind !== 'turn-damage'
+      ) {
+        continue;
+      }
 
       if (!this.evalTurnCondition(rule.condition ?? 'always', current, playerId)) {
         continue;
@@ -188,6 +201,11 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       if (rule.effect.kind === 'pending-move') {
         // turn-контекст не несёт боя → target 'attacker' здесь невалиден (no-op).
         current = this.applyPendingMove(current, playerId, rule.effect);
+        continue;
+      }
+
+      if (rule.effect.kind === 'turn-damage') {
+        current = await this.applyTurnDamage(current, playerId, rule.effect);
         continue;
       }
 
@@ -230,6 +248,70 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     // gainAction N — +N к оставшимся действиям хода
     if (typeof effect.gainAction === 'number' && effect.gainAction > 0) {
       current = this.gainActions(current, playerId, effect.gainAction);
+    }
+
+    return current;
+  }
+
+  /**
+   * Применяет turn-damage: авто-выбирает ПЕРВОГО подходящего вражеского бойца
+   * (по targetScope) и иммутабельно наносит ему value урона. При летальном
+   * исходе помечает бойца isDefeated и пересчитывает isAlive его владельца.
+   * После успешного попадания (опц.) добирает thenDraw карт действующему игроку.
+   *
+   * MVP: auto-target первого кандидата — без выбора цели / opt-out игроком.
+   * Game-over здесь НЕ ставится (это делает WIRE recheck в advanceTurn); seq
+   * не бампится. Нет цели → чистый no-op (тот же state, без добора).
+   */
+  private async applyTurnDamage(
+    state: GameState,
+    playerId: string,
+    effect: TurnDamageEffect,
+  ): Promise<GameState> {
+    const hero = this.findHeroFighter(state, playerId);
+    if (!hero) return state;
+
+    // Первый подходящий враг в порядке state.fighters.
+    const target = state.fighters.find((f) => {
+      if (f.ownerId === playerId) return false; // только вражеские
+      if (f.isDefeated === true) return false; // живые
+      if (effect.targetScope === 'enemy-in-zone') {
+        return this.deps.zone.isInSameZone(state, hero.position, f.position);
+      }
+      // 'enemy-adjacent' — смежность (Manhattan distance === 1)
+      return this.deps.zone.manhattanDistance(hero.position, f.position) === 1;
+    });
+
+    if (!target) return state; // нет цели → no-op (без добора)
+
+    const newHealth = Math.max(0, target.health - effect.value);
+    const becomesDefeated = newHealth === 0;
+
+    let current: GameState = {
+      ...state,
+      fighters: state.fighters.map((f) =>
+        f.id === target.id
+          ? { ...f, health: newHealth, ...(becomesDefeated ? { isDefeated: true } : {}) }
+          : f,
+      ),
+    };
+
+    // Пересчёт isAlive владельца повергнутого бойца (по обновлённым fighters).
+    if (becomesDefeated) {
+      const ownerStillAlive = current.fighters.some(
+        (f) => f.ownerId === target.ownerId && f.isDefeated !== true,
+      );
+      current = {
+        ...current,
+        players: current.players.map((p) =>
+          p.userId === target.ownerId ? { ...p, isAlive: ownerStillAlive } : p,
+        ),
+      };
+    }
+
+    // thenDraw — только после реального попадания.
+    if (typeof effect.thenDraw === 'number' && effect.thenDraw > 0) {
+      current = await this.deps.deck.drawCards(current, playerId, effect.thenDraw);
     }
 
     return current;

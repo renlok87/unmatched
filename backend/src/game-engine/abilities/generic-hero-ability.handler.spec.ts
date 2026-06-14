@@ -40,10 +40,15 @@ function makeDeckStub() {
   };
 }
 
-/** Stub зон: по умолчанию НИКТО не в одной зоне (no-enemy → true). */
+/** Stub зон: по умолчанию НИКТО не в одной зоне (no-enemy → true).
+ * manhattanDistance — реальный расчёт (для 'enemy-adjacent' таргетинга). */
 function makeZoneStub(sameZone = false) {
   return {
     isInSameZone: jest.fn(() => sameZone),
+    manhattanDistance: jest.fn(
+      (a: { x: number; y: number }, b: { x: number; y: number }) =>
+        Math.abs(a.x - b.x) + Math.abs(a.y - b.y),
+    ),
   };
 }
 
@@ -895,6 +900,152 @@ describe('GenericHeroAbilityHandler', () => {
       expect(pending).toHaveLength(2);
       expect(pending[0].id).toBe('ability-test-hero-move-p0');
       expect(pending[1].id).toBe('ability-test-hero-move-p1');
+    });
+  });
+
+  // ---- 10) turn-damage effect (auto-target ping, no pending/UI) ----
+  describe('turn-damage effect', () => {
+    // (a) enemy-in-zone: наносит N урона врагу В ЗОНЕ героя + thenDraw
+    it("enemy-in-zone наносит value урона врагу в зоне + добирает thenDraw", async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Aura of Decay',
+        description: 'в начале хода: урон 2 врагу в зоне + добор 1',
+        rules: [
+          {
+            trigger: 'turn-start',
+            condition: 'always',
+            effect: { kind: 'turn-damage', targetScope: 'enemy-in-zone', value: 2, thenDraw: 1 },
+          },
+        ],
+      };
+      // zone-стаб: враг В ЗОНЕ героя (isInSameZone → true)
+      const deps = makeDeps({ zone: makeZoneStub(true) });
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = makeState(); // enemy hp 12
+
+      const next = await handler.onTurnStart(state, 'player1');
+
+      const enemy = next.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+      expect(enemy.health).toBe(10); // 12 - 2
+      expect(enemy.isDefeated).toBeFalsy();
+      // thenDraw сработал (попадание было)
+      expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+      expect(next.handZones['player1'].cards).toHaveLength(1);
+      // исходный state не мутирован
+      expect(state.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
+    });
+
+    // (b) lethal: health->0 ставит isDefeated + пересчёт isAlive у владельца
+    it('летальный урон повергает врага (isDefeated) и пересчитывает isAlive владельца', async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Execute',
+        description: 'в начале хода: урон 20 врагу в зоне',
+        rules: [
+          {
+            trigger: 'turn-start',
+            condition: 'always',
+            effect: { kind: 'turn-damage', targetScope: 'enemy-in-zone', value: 20 },
+          },
+        ],
+      };
+      const deps = makeDeps({ zone: makeZoneStub(true) });
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = makeState(); // enemy hp 12, единственный боец player2
+
+      const next = await handler.onTurnStart(state, 'player1');
+
+      const enemy = next.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+      expect(enemy.health).toBe(0); // max(0, 12 - 20)
+      expect(enemy.isDefeated).toBe(true);
+      // player2 остался без живых бойцов → isAlive false
+      const player2 = next.players.find((p) => p.userId === 'player2')!;
+      expect(player2.isAlive).toBe(false);
+      // game-over здесь НЕ ставим (WIRE recheck это делает в advanceTurn)
+      expect(next.phase).toBe(GamePhase.ACTION_MANEUVER);
+      // исходный state не мутирован
+      expect(state.fighters.find((f) => f.id === 'enemy-fighter-1')!.isDefeated).toBeFalsy();
+      expect(state.players.find((p) => p.userId === 'player2')!.isAlive).toBe(true);
+    });
+
+    // (c) enemy-adjacent: бьёт ТОЛЬКО смежного врага
+    it('enemy-adjacent бьёт только смежного врага (manhattan === 1)', async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Cleave',
+        description: 'в конце хода: урон 3 смежному врагу',
+        rules: [
+          {
+            trigger: 'turn-end',
+            condition: 'always',
+            effect: { kind: 'turn-damage', targetScope: 'enemy-adjacent', value: 3 },
+          },
+        ],
+      };
+
+      // герой на (1,1); смежный враг на (2,1) → distance 1
+      const adjacentEnemy = enemyFighter({ id: 'enemy-fighter-1', position: { x: 2, y: 1 } });
+      const handlerAdj = new GenericHeroAbilityHandler(config, makeDeps());
+      const stateAdj = makeState({ fighters: [heroFighter(), adjacentEnemy] });
+
+      const nextAdj = await handlerAdj.onTurnEnd(stateAdj, 'player1');
+      expect(nextAdj.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(9); // 12 - 3
+
+      // дальний враг на (9,9) → distance > 1 → no-op
+      const farHandler = new GenericHeroAbilityHandler(config, makeDeps());
+      const stateFar = makeState(); // enemy at (9,9)
+      const nextFar = await farHandler.onTurnEnd(stateFar, 'player1');
+      expect(nextFar).toBe(stateFar);
+      expect(nextFar.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
+    });
+
+    // (d) нет подходящей цели → чистый no-op, БЕЗ добора
+    it('нет цели в зоне → === тот же state, thenDraw НЕ применяется', async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Aura of Decay',
+        description: 'урон 2 врагу в зоне + добор 1',
+        rules: [
+          {
+            trigger: 'turn-start',
+            condition: 'always',
+            effect: { kind: 'turn-damage', targetScope: 'enemy-in-zone', value: 2, thenDraw: 1 },
+          },
+        ],
+      };
+      // zone-стаб: никто НЕ в одной зоне (isInSameZone → false)
+      const deps = makeDeps({ zone: makeZoneStub(false) });
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = makeState();
+
+      const next = await handler.onTurnStart(state, 'player1');
+
+      expect(next).toBe(state); // чистый no-op
+      expect(deps.deck.drawCards).not.toHaveBeenCalled(); // thenDraw НЕ сработал
+    });
+
+    // условие гейтит turn-damage (handSizeEquals)
+    it('условие гейтит turn-damage: при несовпадении руки — no-op', async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Conditional Burn',
+        description: 'урон 2 врагу в зоне, если в руке ровно 3 карты',
+        rules: [
+          {
+            trigger: 'turn-start',
+            condition: { handSizeEquals: 3 },
+            effect: { kind: 'turn-damage', targetScope: 'enemy-in-zone', value: 2 },
+          },
+        ],
+      };
+      const deps = makeDeps({ zone: makeZoneStub(true) });
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = makeState(); // рука player1 пуста (0 != 3)
+
+      const next = await handler.onTurnStart(state, 'player1');
+      expect(next).toBe(state); // условие ложно → no-op
+      expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
     });
   });
 });

@@ -130,9 +130,47 @@ export interface PendingMoveEffect {
 }
 
 /**
+ * Эффект «урон в ход» (turn-damage): способность сама, БЕЗ участия игрока,
+ * наносит value урона ОДНОМУ авто-выбранному вражескому бойцу и (опц.) после
+ * успешного попадания добирает thenDraw карт. В отличие от pending-move здесь
+ * нет PendingEffect/UI — урон применяется напрямую в onTurnStart/onTurnEnd.
+ *
+ * Валиден ТОЛЬКО для триггеров 'turn-start' | 'turn-end' (для них есть
+ * playerId-контекст действующего игрока; вне их — игнорируется).
+ *
+ * targetScope определяет, какой враг попадает под удар:
+ *  - 'enemy-in-zone'  — вражеский боец в той же ЗОНЕ доски, что и HERO-боец
+ *                       действующего игрока (deps.zone.isInSameZone).
+ *  - 'enemy-adjacent' — вражеский боец, СМЕЖНЫЙ с HERO-бойцом действующего
+ *                       игрока (deps.zone.manhattanDistance === 1).
+ *
+ * MVP / ПРИБЛИЖЕНИЕ: auto-target — выбирается ПЕРВЫЙ подходящий враг в порядке
+ * state.fighters; выбора цели игроком и opt-out НЕТ (печатные «you may» здесь
+ * не моделируются — бьём детерминированно по первому кандидату).
+ *
+ * Семантика урона: health = max(0, health - value); при достижении 0 боец
+ * помечается isDefeated, владельцу пересчитывается isAlive. thenDraw добирается
+ * ТОЛЬКО если цель реально была найдена и получила урон; нет цели → чистый
+ * no-op (и без добора).
+ */
+export interface TurnDamageEffect {
+  readonly kind: 'turn-damage';
+  /** Область авто-выбора цели: враг в зоне героя / смежный с героем */
+  readonly targetScope: 'enemy-in-zone' | 'enemy-adjacent';
+  /** Сколько урона нанести выбранному врагу */
+  readonly value: number;
+  /** (Опц.) добрать N карт ПОСЛЕ успешного попадания (если цель найдена) */
+  readonly thenDraw?: number;
+}
+
+/**
  * Эффект правила — дискриминируется по kind.
  */
-export type AbilityEffect = CombatModifierEffect | TurnEffect | PendingMoveEffect;
+export type AbilityEffect =
+  | CombatModifierEffect
+  | TurnEffect
+  | PendingMoveEffect
+  | TurnDamageEffect;
 
 /**
  * Одно правило способности: триггер + (опц.) условие + эффект.
@@ -402,6 +440,46 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
         trigger: 'turn-start',
         condition: 'always',
         effect: { kind: 'pending-move', target: 'any-own', maxSpaces: 1 },
+      },
+    ],
+  },
+  {
+    // Dracula — «Children of the Night»-подобный укус: в начале хода может нанести
+    // 1 урон бойцу, СМЕЖНОМУ с Dracula; если урон нанесён — добирает 1 карту.
+    // ПРИБЛИЖЕНИЕ (MVP): печатное «you may» (выбор/opt-out игроком) не моделируется
+    // — авто-бьём ПЕРВОГО смежного вражеского бойца (порядок state.fighters);
+    // thenDraw срабатывает ТОЛЬКО при реальном попадании (нет цели → no-op без добора).
+    heroId: 'dracula',
+    abilityName: 'Children of the Night',
+    description:
+      'В начале хода Dracula может нанести 1 урон смежному бойцу; если урон нанесён — добрать 1 карту. ' +
+      'Примечание (приближение MVP): выбор цели/opt-out игроком не моделируется — авто-удар по первому ' +
+      'смежному врагу; добор только при реальном попадании.',
+    rules: [
+      {
+        trigger: 'turn-start',
+        condition: 'always',
+        effect: { kind: 'turn-damage', targetScope: 'enemy-adjacent', value: 1, thenDraw: 1 },
+      },
+    ],
+  },
+  {
+    // Medusa — «Petrifying Gaze»-подобный взгляд: в начале хода может нанести 1 урон
+    // вражескому бойцу в ЗОНЕ Medusa.
+    // ПРИБЛИЖЕНИЕ (MVP): печатное «you may» (выбор/opt-out игроком) не моделируется
+    // — авто-бьём ПЕРВОГО вражеского бойца в зоне героя (порядок state.fighters).
+    // Без добора (thenDraw отсутствует); нет цели в зоне → чистый no-op.
+    heroId: 'medusa',
+    abilityName: 'Petrifying Gaze',
+    description:
+      'В начале хода Medusa может нанести 1 урон вражескому бойцу в своей зоне. ' +
+      'Примечание (приближение MVP): выбор цели/opt-out игроком не моделируется — авто-удар по первому ' +
+      'врагу в зоне героя.',
+    rules: [
+      {
+        trigger: 'turn-start',
+        condition: 'always',
+        effect: { kind: 'turn-damage', targetScope: 'enemy-in-zone', value: 1 },
       },
     ],
   },

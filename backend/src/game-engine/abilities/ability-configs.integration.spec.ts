@@ -54,9 +54,16 @@ function makeDeckStub() {
   };
 }
 
-/** zone-стаб: настраиваемый ответ isInSameZone. */
+/** zone-стаб: настраиваемый ответ isInSameZone + реальный manhattanDistance
+ *  (нужен для turn-damage 'enemy-adjacent' таргетинга в deps.zone). */
 function makeZoneStub(sameZone = false) {
-  return { isInSameZone: jest.fn(() => sameZone) };
+  return {
+    isInSameZone: jest.fn(() => sameZone),
+    manhattanDistance: jest.fn(
+      (a: { x: number; y: number }, b: { x: number; y: number }) =>
+        Math.abs(a.x - b.x) + Math.abs(a.y - b.y),
+    ),
+  };
 }
 
 function makeDeps(overrides?: Partial<GenericHeroAbilityDeps>): GenericHeroAbilityDeps {
@@ -159,6 +166,8 @@ describe('ABILITY_CONFIGS — присутствие героев', () => {
     'raphael',
     'robin-hood',
     'leonardo',
+    'dracula',
+    'medusa',
   ];
   it.each(expected)('содержит конфиг для слага %s', (slug) => {
     expect(configFor(slug)).toBeDefined();
@@ -643,6 +652,99 @@ describe('leonardo (turn-start: pending-move any-own, maxSpaces 1)', () => {
     const state = makeState();
     const next = await handler.onAfterCombat(state, afterCtx(true));
     expect(next).toBe(state);
+  });
+});
+
+// ===================== TURN-DAMAGE ГЕРОИ =====================
+
+describe('dracula (turn-start: turn-damage enemy-adjacent value 1, thenDraw 1)', () => {
+  /** State: dracula-герой p1 и вражеский боец p2 на заданной позиции. */
+  const stateWithEnemyAt = (pos: { x: number; y: number }, enemyHealth = 12): GameState =>
+    makeState({
+      handZones: handOf(1) as any,
+      fighters: [
+        makeFighter({ heroSlug: 'dracula', position: { x: 1, y: 1 } }),
+        makeFighter({
+          id: 'enemy-fighter-1',
+          ownerId: 'player2',
+          heroSlug: 'enemy-hero',
+          name: 'Enemy',
+          health: enemyHealth,
+          position: pos,
+        }),
+      ],
+    });
+
+  it('бьёт смежного врага на 1 урон И добирает 1 карту', async () => {
+    const deps = makeDeps(); // реальный manhattanDistance в zone-стабе
+    const handler = handlerFor('dracula', deps);
+    // враг смежен с героем (manhattan distance === 1)
+    const state = stateWithEnemyAt({ x: 2, y: 1 });
+
+    const next = await handler.onTurnStart(state, 'player1');
+
+    // -1 урон по врагу
+    expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(11);
+    // thenDraw: ровно 1 карта действующему игроку
+    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+    expect(next.handZones['player1'].cards).toHaveLength(2);
+  });
+
+  it('no-op: смежного врага нет (враг далеко) — без урона и без добора', async () => {
+    const deps = makeDeps();
+    const handler = handlerFor('dracula', deps);
+    // враг далеко (manhattan distance > 1) → нет цели
+    const state = stateWithEnemyAt({ x: 9, y: 9 });
+
+    const next = await handler.onTurnStart(state, 'player1');
+
+    expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    expect(next).toBe(state); // чистый no-op
+  });
+});
+
+describe('medusa (turn-start: turn-damage enemy-in-zone value 1, no draw)', () => {
+  const stateWithEnemy = (): GameState =>
+    makeState({
+      handZones: handOf(1) as any,
+      fighters: [
+        makeFighter({ heroSlug: 'medusa', position: { x: 1, y: 1 } }),
+        makeFighter({
+          id: 'enemy-fighter-1',
+          ownerId: 'player2',
+          heroSlug: 'enemy-hero',
+          name: 'Enemy',
+          health: 12,
+          position: { x: 9, y: 9 },
+        }),
+      ],
+    });
+
+  it('бьёт врага в зоне героя на 1 урон (без добора)', async () => {
+    // isInSameZone === true → враг в зоне Medusa
+    const deps = makeDeps({ zone: makeZoneStub(true) });
+    const handler = handlerFor('medusa', deps);
+    const state = stateWithEnemy();
+
+    const next = await handler.onTurnStart(state, 'player1');
+
+    expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(11);
+    // medusa без thenDraw → колода не трогается
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
+  });
+
+  it('no-op: врага в зоне нет — без урона', async () => {
+    // isInSameZone === false → в зоне Medusa никого
+    const deps = makeDeps({ zone: makeZoneStub(false) });
+    const handler = handlerFor('medusa', deps);
+    const state = stateWithEnemy();
+
+    const next = await handler.onTurnStart(state, 'player1');
+
+    expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    expect(next).toBe(state); // чистый no-op
   });
 });
 

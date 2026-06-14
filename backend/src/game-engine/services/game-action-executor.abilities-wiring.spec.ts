@@ -693,4 +693,112 @@ describe('GameActionExecutorService — abilities wiring', () => {
       expect(result.gameState!.phase).toBe(GamePhase.ACTION_MANEUVER);
     });
   });
+
+  describe('5) turn-start ability deals lethal damage -> game over', () => {
+    it('onTurnStart нового игрока добивает последнего героя противника -> phase GAME_OVER + winner', async () => {
+      // Новый активный игрок после endTurn(player1) — player2 (hero-b).
+      // Его onTurnStart наносит смертельный урон герою player1 (fighter1):
+      // health=0 + isDefeated, player1.isAlive=false. advanceTurn должен
+      // ПОСЛЕ хука пере-проверить game-over и завершить игру.
+      const fakeHandler: ExtendedHeroAbilityHandler = {
+        heroId: 'hero-b',
+        abilityName: 'TurnStart lethal',
+        abilityDescription: 'добивает героя противника в начале хода',
+        onTurnStart: (state: GameState, playerId: string): Promise<GameState> => {
+          // playerId === 'player2' (новый активный); бьём чужого героя fighter1
+          expect(playerId).toBe('player2');
+          return Promise.resolve({
+            ...state,
+            fighters: state.fighters.map((f) =>
+              f.id === 'fighter1' ? { ...f, health: 0, isDefeated: true } : f,
+            ),
+            players: state.players.map((p) =>
+              p.userId === 'player1' ? { ...p, isAlive: false } : p,
+            ),
+          });
+        },
+      };
+      registry.registerExtended(fakeHandler);
+
+      const state = createMockGameState({
+        phase: GamePhase.ACTION_MANEUVER,
+        currentTurnPlayerId: 'player1',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 0,
+        } as any,
+      });
+
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      const result = await service.executeEndTurn(
+        { gameId: 'test-game-1' } as EndTurnDto,
+        context,
+      );
+
+      expect(result.success).toBe(true);
+      // turn-start способность добила последнего героя player1 -> игра окончена
+      expect(result.gameState!.phase).toBe(GamePhase.GAME_OVER);
+      // победитель — единственный живой игрок (player2)
+      expect((result.gameState!.metadata as any).winnerId).toBe('player2');
+      // факт смерти зафиксирован
+      const defeated = result.gameState!.fighters.find((f) => f.id === 'fighter1')!;
+      expect(defeated.health).toBe(0);
+      expect(defeated.isDefeated).toBe(true);
+      expect(result.gameState!.players.find((p) => p.userId === 'player1')!.isAlive).toBe(false);
+    });
+
+    it('onTurnStart без смертей оставляет ход в ACTION_MANEUVER (нет ложного game-over)', async () => {
+      // onTurnStart нового игрока (player2 / hero-b) ничего не убивает —
+      // обычный переход хода должен завершиться ACTION_MANEUVER без GAME_OVER.
+      const fakeHandler: ExtendedHeroAbilityHandler = {
+        heroId: 'hero-b',
+        abilityName: 'TurnStart harmless',
+        abilityDescription: 'лечит себя, никого не убивает',
+        onTurnStart: (state: GameState): Promise<GameState> =>
+          Promise.resolve({
+            ...state,
+            metadata: { ...state.metadata, fakeTurnStartMarker: 'ran' } as any,
+          }),
+      };
+      registry.registerExtended(fakeHandler);
+
+      const state = createMockGameState({
+        phase: GamePhase.ACTION_MANEUVER,
+        currentTurnPlayerId: 'player1',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 0,
+        } as any,
+      });
+
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      const result = await service.executeEndTurn(
+        { gameId: 'test-game-1' } as EndTurnDto,
+        context,
+      );
+
+      expect(result.success).toBe(true);
+      // хук отработал, но игра НЕ окончена
+      expect((result.gameState!.metadata as any).fakeTurnStartMarker).toBe('ran');
+      expect(result.gameState!.phase).toBe(GamePhase.ACTION_MANEUVER);
+      expect(result.gameState!.currentTurnPlayerId).toBe('player2');
+      expect((result.gameState!.metadata as any).winnerId).toBeUndefined();
+      // оба игрока живы
+      expect(result.gameState!.players.every((p) => p.isAlive)).toBe(true);
+    });
+  });
 });

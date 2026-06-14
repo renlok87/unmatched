@@ -39,6 +39,8 @@ Config v3 — per-turn флаги (3): golden-bat (+2 atk если не мане
 
 Config v4 — pending-move (2): новый effect-kind `{kind:'pending-move', target:'attacker'|'own-hero'|'any-own', maxSpaces}` — способность порождает MOVE `PendingEffect` (C2), резолвится общим resolvePendingEffect (executor/resolver НЕ тронуты). robin-hood (after-attack, target attacker, 2 клетки), leonardo (turn-start, target any-own, 1 клетка; MVP — только свои бойцы, реальный «any fighter» incl. enemy не модель). Покрытие 17→19 (3 хардкод + 16 config).
 
+Config v5 — turn-damage (2): effect-kind `{kind:'turn-damage', targetScope:'enemy-in-zone'|'enemy-adjacent', value, thenDraw?}` — onTurnStart/onTurnEnd авто-таргетит ПЕРВОГО подходящего вражеского бойца (MVP без выбора/opt-out), наносит урон (immutable, isDefeated + recompute player.isAlive при 0), опц. добор только при попадании. dracula (enemy-adjacent 1 + draw 1), medusa (enemy-in-zone 1). deps.zone расширен `manhattanDistance` (AdjacencyService уже передаётся, module не тронут). **Safety**: `checkAndApplyGameOver(state)` извлечён из executeResolveCombat + вызывается в advanceTurn ПОСЛЕ triggerHeroTurnStart (turn-start kill героя → корректный GAME_OVER). Покрытие 19→21 (3 хардкод + 18 config).
+
 ## Каталог 88 (для v2)
 
 70 реальных героев: clean=2, **partial=21**, complex=47. Реализовано 3 хардкод + 7 config = 10. Следующие цели:

@@ -256,6 +256,14 @@ export class GameActionExecutorService {
     // мутация-хук «прицеплена» к той же передаче хода (контракт saveState).
     started = await this.triggerHeroTurnStart(started, nextPlayerId);
 
+    // TURN_START-способность могла нанести смертельный урон (damage-эффект):
+    // герой противника повержен, его игрок isAlive=false. Пере-проверяем
+    // game-over ПОСЛЕ хука — иначе игра «зависла» бы в ACTION_MANEUVER при
+    // фактически побеждённом сопернике. No-op, если никто не умер (живых > 1):
+    // обычный turn-start героев без урона оставляет фазу ACTION_MANEUVER.
+    // seq НЕ бампим: «прицеплено» к той же передаче хода (+1 выше).
+    started = this.checkAndApplyGameOver(started);
+
     return started;
   }
 
@@ -548,6 +556,37 @@ export class GameActionExecutorService {
         effectText: options[optionIndex].label,
         appliedEffects: applied.appliedEffects,
         manualEffects: applied.manualEffects,
+      },
+    };
+  }
+
+  /**
+   * Пере-проверить и (при необходимости) применить конец игры.
+   *
+   * Единая точка истины правила «остался один живой игрок → игра окончена».
+   * Победитель — единственный игрок с isAlive=true (alivePlayers[0]).
+   * Реюзается двумя путями:
+   *  - резолв боя (executeResolveCombat), где after-эффекты могли добить героя;
+   *  - передача хода (advanceTurn), где turn-start способность нового игрока
+   *    может нанести смертельный урон последнему герою противника.
+   *
+   * No-op-контракт: если живых > 1 — возвращает state БЕЗ изменений (фаза/
+   * metadata не трогаются). sequenceNumber НЕ инкрементируется — game-over
+   * «прицепляется» к инкременту вызывающего действия (контракт saveState).
+   * isAlive игроков должен быть уже актуализирован вызывающим (мы лишь читаем).
+   */
+  private checkAndApplyGameOver(state: GameState): GameState {
+    const alivePlayers = state.players.filter((p) => p.isAlive);
+    if (alivePlayers.length > 1) {
+      return state;
+    }
+    return {
+      ...state,
+      phase: GamePhase.GAME_OVER,
+      metadata: {
+        ...state.metadata,
+        combatInfo: undefined,
+        winnerId: alivePlayers[0]?.userId,
       },
     };
   }
@@ -1452,21 +1491,21 @@ export class GameActionExecutorService {
         // Бьём тем же ctx, ДО передачи хода, теми же seq-правилами.
         resolvedState = await this.triggerHeroAfterDefense(resolvedState, afterCombatCtx);
 
-        const alivePlayers = resolvedState.players.filter((p) => p.isAlive);
-        const gameEnded = alivePlayers.length <= 1;
+        // Конец игры (правило «остался один живой игрок») — единый helper.
+        // checkAndApplyGameOver no-op при живых > 1 (фаза/metadata не тронуты);
+        // при game-over ставит GAME_OVER + winnerId + чистит combatInfo.
+        const afterGameOver = this.checkAndApplyGameOver(resolvedState);
+        const gameEnded = afterGameOver.phase === GamePhase.GAME_OVER;
 
         let newState: GameState;
         if (gameEnded) {
           newState = {
-            ...resolvedState,
-            phase: GamePhase.GAME_OVER,
+            ...afterGameOver,
             sequenceNumber: currentState.sequenceNumber + 1,
             metadata: {
-              ...resolvedState.metadata,
+              ...afterGameOver.metadata,
               lastActionAt: new Date(),
               lastActionBy: userId,
-              combatInfo: undefined,
-              winnerId: alivePlayers[0]?.userId,
             },
           };
         } else {
