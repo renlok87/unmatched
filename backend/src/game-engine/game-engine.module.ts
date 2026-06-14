@@ -17,6 +17,8 @@ import { ContentModule } from '../content/content.module';
 import { MetricsModule } from '../metrics/metrics.module';
 import { CardValueCacheService } from './cache/card-value-cache.service';
 import { daredevilHandler, msMarvelHandler, arthurAbilityHandler } from './abilities/heroes';
+import { ABILITY_CONFIGS } from './abilities/ability-config';
+import { GenericHeroAbilityHandler } from './abilities/generic-hero-ability.handler';
 
 /**
  * Game Engine Module
@@ -118,10 +120,25 @@ const ArthurRegistryProvider = {
   ],
 })
 export class GameEngineModule {
-  constructor(private readonly registry: HeroAbilityRegistry) {}
+  constructor(
+    private readonly registry: HeroAbilityRegistry,
+    private readonly deckManagement: DeckManagementService,
+    private readonly adjacency: AdjacencyService,
+  ) {}
 
   onModuleInit() {
-    // Регистрируем обработчики способностей героев
+    // Регистрируем обработчики способностей героев (классические — DO NOT break)
     this.registry.register(arthurAbilityHandler);
+
+    // Data-driven generic-способности: один GenericHeroAbilityHandler на каждый
+    // декларативный AbilityConfig. registerExtended → extended-карта реестра
+    // обслуживает turn-хуки И stateful combat (через getAny).
+    const deps = {
+      deck: this.deckManagement,
+      zone: this.adjacency,
+    };
+    for (const config of ABILITY_CONFIGS) {
+      this.registry.registerExtended(new GenericHeroAbilityHandler(config, deps));
+    }
   }
 }

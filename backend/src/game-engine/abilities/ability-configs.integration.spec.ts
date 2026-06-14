@@ -1,0 +1,345 @@
+/**
+ * ABILITY_CONFIGS — интеграционные тесты конкретных героев.
+ *
+ * Для КАЖДОГО зашитого в ABILITY_CONFIGS героя берём его РЕАЛЬНУЮ декларацию
+ * (по слагу), строим из неё GenericHeroAbilityHandler с реальными deps-стабами
+ * и проверяем, что способность действительно производит ожидаемый эффект против
+ * минимального GameState. Это прогон конкретных конфигов через настоящий
+ * интерпретатор (не моки логики) + проверка реального пути регистрации в
+ * HeroAbilityRegistry.
+ *
+ * Слаги героев подтверждены через slugifyHeroName(displayName):
+ *  'Luke Cage'→luke-cage, 'Annie Christmas'→annie-christmas, 'Eredin'→eredin,
+ *  'Bloody Mary'→bloody-mary, 'Philippa'→philippa, 'T. Rex'→t-rex,
+ *  'Bigfoot'→bigfoot — ровно так heroSlug проставляется на game-init.
+ */
+
+import { GenericHeroAbilityHandler, GenericHeroAbilityDeps } from './generic-hero-ability.handler';
+import { ABILITY_CONFIGS, AbilityConfig } from './ability-config';
+import {
+  HeroAbilityRegistry,
+  ValueModifierType,
+  CombatState,
+} from './hero-ability-registry';
+import { GameState, GamePhase, getActionsRemaining } from '../models/game-state.model';
+import { Fighter, FighterType } from '../models/fighter.model';
+
+// ===================== ТЕСТОВЫЕ ХЕЛПЕРЫ =====================
+
+/** Реальная декларация героя из ABILITY_CONFIGS по слагу (или undefined). */
+function configFor(slug: string): AbilityConfig | undefined {
+  return ABILITY_CONFIGS.find((c) => c.heroId === slug);
+}
+
+/** drawCards-стаб: кладёт N помеченных карт в руку игрока. */
+function makeDeckStub() {
+  return {
+    drawCards: jest.fn(
+      async (state: GameState, userId: string, count: number): Promise<GameState> => {
+        const hand = state.handZones[userId];
+        const drawn = Array.from({ length: count }, (_, i) => ({
+          id: `drawn-${userId}-${hand.cards.length + i}`,
+          isVisible: true,
+        }));
+        return {
+          ...state,
+          handZones: {
+            ...state.handZones,
+            [userId]: { ...hand, cards: [...hand.cards, ...(drawn as any)] },
+          },
+        };
+      },
+    ),
+  };
+}
+
+/** zone-стаб: настраиваемый ответ isInSameZone. */
+function makeZoneStub(sameZone = false) {
+  return { isInSameZone: jest.fn(() => sameZone) };
+}
+
+function makeDeps(overrides?: Partial<GenericHeroAbilityDeps>): GenericHeroAbilityDeps {
+  return { deck: makeDeckStub(), zone: makeZoneStub(), ...overrides };
+}
+
+/** Построить handler из РЕАЛЬНОГО конфига героя; падает, если конфиг не найден. */
+function handlerFor(slug: string, deps?: GenericHeroAbilityDeps): GenericHeroAbilityHandler {
+  const config = configFor(slug);
+  if (!config) {
+    throw new Error(`ABILITY_CONFIGS не содержит героя '${slug}'`);
+  }
+  return new GenericHeroAbilityHandler(config, deps ?? makeDeps());
+}
+
+function makeFighter(overrides?: Partial<Fighter>): Fighter {
+  return {
+    id: 'hero-fighter-1',
+    ownerId: 'player1',
+    heroId: 'cuid-1',
+    heroSlug: 'test-hero',
+    name: 'Hero',
+    type: FighterType.HERO,
+    health: 10,
+    maxHealth: 18,
+    position: { x: 1, y: 1 },
+    effects: [],
+    hasSidekick: false,
+    ...overrides,
+  };
+}
+
+function makeState(overrides?: Partial<GameState>): GameState {
+  return {
+    gameId: 'g1',
+    sequenceNumber: 1,
+    phase: GamePhase.ACTION_MANEUVER,
+    turnCount: 1,
+    currentTurnPlayerId: 'player1',
+    players: [
+      { userId: 'player1', heroId: 'cuid-1', health: 10, maxHealth: 18, fighterIds: ['hero-fighter-1'], isAlive: true },
+      { userId: 'player2', heroId: 'cuid-2', health: 12, maxHealth: 18, fighterIds: ['enemy-fighter-1'], isAlive: true },
+    ],
+    fighters: [
+      makeFighter(),
+      makeFighter({
+        id: 'enemy-fighter-1',
+        ownerId: 'player2',
+        heroId: 'cuid-2',
+        heroSlug: 'enemy-hero',
+        name: 'Enemy',
+        health: 12,
+        position: { x: 9, y: 9 },
+      }),
+    ],
+    decks: {} as any,
+    discardPiles: {} as any,
+    handZones: {
+      player1: { cards: [], maxSize: 5 },
+      player2: { cards: [], maxSize: 5 },
+    } as any,
+    boardState: { width: 10, height: 10, cells: [] } as any,
+    metadata: {
+      lastActionAt: new Date(),
+      lastActionBy: 'player1',
+      version: 1,
+      actionsRemaining: 2,
+    },
+    ...overrides,
+  };
+}
+
+/** Хелпер: рука player1 заданного размера. */
+function handOf(n: number): any {
+  return {
+    player1: { cards: Array.from({ length: n }, (_, i) => ({ id: `c${i}`, isVisible: true })), maxSize: 5 },
+    player2: { cards: [], maxSize: 5 },
+  };
+}
+
+const COMBAT: CombatState = { attackerId: 'hero-fighter-1', defenderId: 'enemy-fighter-1' };
+
+// ===================== СЛАГИ ПОПАЛИ В РЕЕСТР =====================
+
+describe('ABILITY_CONFIGS — присутствие героев', () => {
+  const expected = [
+    'luke-cage',
+    'annie-christmas',
+    'eredin',
+    'bloody-mary',
+    'philippa',
+    't-rex',
+    'bigfoot',
+  ];
+  it.each(expected)('содержит конфиг для слага %s', (slug) => {
+    expect(configFor(slug)).toBeDefined();
+  });
+
+  it('реальная регистрация в HeroAbilityRegistry проходит для всех конфигов', () => {
+    const registry = new HeroAbilityRegistry();
+    const deps = makeDeps();
+    for (const config of ABILITY_CONFIGS) {
+      registry.registerExtended(new GenericHeroAbilityHandler(config, deps));
+    }
+    for (const slug of expected) {
+      expect(registry.getExtended(slug)).toBeDefined();
+    }
+  });
+});
+
+// ===================== COMBAT-PASSIVE =====================
+
+describe('luke-cage (combat-passive: always +2 defense)', () => {
+  it('защитник получает +2 ADD к защите', () => {
+    const handler = handlerFor('luke-cage');
+    const defender = makeFighter({ heroSlug: 'luke-cage' });
+    const mods = handler.getStatefulCombatModifiers(makeState(), COMBAT, defender, 'defender');
+
+    expect(mods).toHaveLength(1);
+    expect(mods[0]).toMatchObject({ type: ValueModifierType.ADD, value: 2, ownerId: 'player1' });
+  });
+
+  it('атакующий НЕ получает модификатор (appliesTo: defense)', () => {
+    const handler = handlerFor('luke-cage');
+    const attacker = makeFighter({ heroSlug: 'luke-cage' });
+    const mods = handler.getStatefulCombatModifiers(makeState(), COMBAT, attacker, 'attacker');
+    expect(mods).toHaveLength(0);
+  });
+});
+
+describe('annie-christmas (combat-passive: +2 attack when self-health < defender)', () => {
+  it('даёт +2 к атаке, когда здоровье ниже защитника', () => {
+    const handler = handlerFor('annie-christmas');
+    // hero hp 10 < enemy hp 12
+    const attacker = makeState().fighters.find((f) => f.id === 'hero-fighter-1')!;
+    const mods = handler.getStatefulCombatModifiers(makeState(), COMBAT, attacker, 'attacker');
+
+    expect(mods).toHaveLength(1);
+    expect(mods[0]).toMatchObject({ type: ValueModifierType.ADD, value: 2 });
+  });
+
+  it('no-op: здоровье НЕ ниже защитника', () => {
+    const handler = handlerFor('annie-christmas');
+    const state = makeState({
+      fighters: [
+        makeFighter({ health: 18 }),
+        makeFighter({ id: 'enemy-fighter-1', ownerId: 'player2', health: 12, position: { x: 9, y: 9 } }),
+      ],
+    });
+    const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+    const mods = handler.getStatefulCombatModifiers(state, COMBAT, attacker, 'attacker');
+    expect(mods).toHaveLength(0);
+  });
+});
+
+describe('eredin (combat-passive: +1 both when all own sidekicks defeated)', () => {
+  /** State, где у player1 есть один НЕ-герой (sidekick) с заданным статусом. */
+  const stateWithSidekick = (defeated: boolean): GameState =>
+    makeState({
+      fighters: [
+        makeFighter({ heroSlug: 'eredin' }),
+        makeFighter({
+          id: 'sk-1',
+          ownerId: 'player1',
+          type: FighterType.MINION,
+          name: 'Red Rider',
+          isDefeated: defeated,
+        }),
+        makeFighter({ id: 'enemy-fighter-1', ownerId: 'player2', health: 12, position: { x: 9, y: 9 } }),
+      ],
+    });
+
+  it('атакующий +1, когда все сайдкики повержены', () => {
+    const handler = handlerFor('eredin');
+    const state = stateWithSidekick(true);
+    const hero = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+    const mods = handler.getStatefulCombatModifiers(state, COMBAT, hero, 'attacker');
+    expect(mods).toHaveLength(1);
+    expect(mods[0]).toMatchObject({ type: ValueModifierType.ADD, value: 1 });
+  });
+
+  it('защитник тоже +1 (appliesTo: both), когда сайдкики повержены', () => {
+    const handler = handlerFor('eredin');
+    const state = stateWithSidekick(true);
+    const hero = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+    const mods = handler.getStatefulCombatModifiers(state, COMBAT, hero, 'defender');
+    expect(mods).toHaveLength(1);
+    expect(mods[0]).toMatchObject({ value: 1 });
+  });
+
+  it('no-op: сайдкик ещё жив', () => {
+    const handler = handlerFor('eredin');
+    const state = stateWithSidekick(false);
+    const hero = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+    const mods = handler.getStatefulCombatModifiers(state, COMBAT, hero, 'attacker');
+    expect(mods).toHaveLength(0);
+  });
+});
+
+// ===================== TURN-START =====================
+
+describe('bloody-mary (turn-start: gainAction +1 when hand size == 3)', () => {
+  it('+1 действие, когда в руке ровно 3 карты', async () => {
+    const handler = handlerFor('bloody-mary');
+    const state = makeState({
+      handZones: handOf(3) as any,
+      metadata: { ...makeState().metadata, actionsRemaining: 2 },
+    });
+    const next = await handler.onTurnStart(state, 'player1');
+    expect(getActionsRemaining(next)).toBe(3);
+  });
+
+  it('no-op: в руке не 3 карты', async () => {
+    const handler = handlerFor('bloody-mary');
+    const state = makeState({
+      handZones: handOf(2) as any,
+      metadata: { ...makeState().metadata, actionsRemaining: 2 },
+    });
+    const next = await handler.onTurnStart(state, 'player1');
+    expect(getActionsRemaining(next)).toBe(2);
+    expect(next).toBe(state); // чистый no-op
+  });
+});
+
+// ===================== TURN-END =====================
+
+describe('philippa (turn-end: drawToHandSize 4)', () => {
+  it('добирает руку до 4 карт', async () => {
+    const deps = makeDeps();
+    const handler = handlerFor('philippa', deps);
+    const state = makeState({ handZones: handOf(1) as any });
+    const next = await handler.onTurnEnd(state, 'player1');
+
+    // дефицит = 4 - 1 = 3
+    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 3);
+    expect(next.handZones['player1'].cards).toHaveLength(4);
+  });
+
+  it('no-op: рука уже >= 4 (drawCards не зовётся)', async () => {
+    const deps = makeDeps();
+    const handler = handlerFor('philippa', deps);
+    const state = makeState({ handZones: handOf(4) as any });
+    const next = await handler.onTurnEnd(state, 'player1');
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    expect(next).toBe(state);
+  });
+});
+
+describe('t-rex (turn-end: draw 1)', () => {
+  it('добирает ровно 1 карту', async () => {
+    const deps = makeDeps();
+    const handler = handlerFor('t-rex', deps);
+    const state = makeState({ handZones: handOf(2) as any });
+    const next = await handler.onTurnEnd(state, 'player1');
+    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+    expect(next.handZones['player1'].cards).toHaveLength(3);
+  });
+
+  it('turn-start ничего не делает (только turn-end правило)', async () => {
+    const deps = makeDeps();
+    const handler = handlerFor('t-rex', deps);
+    const state = makeState();
+    const next = await handler.onTurnStart(state, 'player1');
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    expect(next).toBe(state);
+  });
+});
+
+describe('bigfoot (turn-end: draw 1 when no enemy in own zone)', () => {
+  it('добирает 1, когда враг НЕ в зоне героя', async () => {
+    const deps = makeDeps({ zone: makeZoneStub(false) });
+    const handler = handlerFor('bigfoot', deps);
+    const state = makeState({ handZones: handOf(1) as any });
+    const next = await handler.onTurnEnd(state, 'player1');
+    expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+    expect(next.handZones['player1'].cards).toHaveLength(2);
+  });
+
+  it('no-op: враг в зоне героя', async () => {
+    const deps = makeDeps({ zone: makeZoneStub(true) });
+    const handler = handlerFor('bigfoot', deps);
+    const state = makeState({ handZones: handOf(1) as any });
+    const next = await handler.onTurnEnd(state, 'player1');
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    expect(next).toBe(state);
+  });
+});

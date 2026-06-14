@@ -148,6 +148,22 @@ export interface ExtendedHeroAbilityHandler {
     fighter: Fighter,
     role: 'attacker' | 'defender',
   ): readonly CombatModifier[];
+
+  /**
+   * STATEFUL боевые модификаторы (доступ к GameState).
+   *
+   * В отличие от классического applyCombatModifier (CombatState+fighter+role,
+   * без GameState), этот хук получает полный GameState — способность может
+   * вычислять модификатор по условиям состояния игры (позиции, здоровье,
+   * эффекты, ход и т.п.). Суммируется по той же ADD-семантике, что и
+   * классический путь, и добавляется к итоговым атаке/защите боя.
+   */
+  getStatefulCombatModifiers?(
+    state: GameState,
+    context: CombatState,
+    fighter: Fighter,
+    role: 'attacker' | 'defender',
+  ): readonly ValueModifier[];
 }
 
 /**
@@ -417,6 +433,32 @@ export class HeroAbilityRegistry {
       return handler.getCombatModifiers(context, fighter, role);
     } catch (error) {
       this.logger.error(`Error in getCombatModifiers for hero ${heroId}:`, error);
+      return [];
+    }
+  }
+
+  /**
+   * Получить STATEFUL боевые модификаторы способности героя (с доступом к
+   * GameState). Lookup через getAny (extended ИЛИ classic); вызывает
+   * handler.getStatefulCombatModifiers, если он есть. Отсутствие хука —
+   * пустой массив; ошибка — пустой массив (как остальные диспетчеры).
+   */
+  getStatefulCombatModifiers(
+    heroId: string,
+    state: GameState,
+    combatState: CombatState,
+    fighter: Fighter,
+    role: CombatRole,
+  ): readonly ValueModifier[] {
+    const handler = this.getAny(heroId) as ExtendedHeroAbilityHandler | undefined;
+    if (!handler?.getStatefulCombatModifiers) {
+      return [];
+    }
+
+    try {
+      return handler.getStatefulCombatModifiers(state, combatState, fighter, role);
+    } catch (error) {
+      this.logger.error(`Error in getStatefulCombatModifiers for hero ${heroId}:`, error);
       return [];
     }
   }

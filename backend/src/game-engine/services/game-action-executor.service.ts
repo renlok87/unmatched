@@ -24,7 +24,11 @@ import {
   getActionsRemaining,
   getFighterAttackType,
 } from '../models';
-import { HeroAbilityRegistry } from '../abilities/hero-ability-registry';
+import {
+  HeroAbilityRegistry,
+  ValueModifierType,
+  type ValueModifier,
+} from '../abilities/hero-ability-registry';
 import {
   CardEffectExecutorService,
   type EffectResult,
@@ -164,6 +168,15 @@ export class GameActionExecutorService {
     userId: string,
     incrementSeq = true,
   ): Promise<GameState> {
+    // TURN_END-способности героя (TASK, infra): фаза TURN_END исключена из
+    // потока, поэтому extended-хук onTurnEnd встраивается ЗДЕСЬ — у
+    // ЗАВЕРШАЮЩЕГО игрока, ДО снятия duration:'turn' эффектов и ДО
+    // переключения currentTurnPlayerId. seq НЕ бампим отдельно: хук
+    // «прицеплен» к той же передаче хода (+1 ниже), контракт saveState как у
+    // turn-start. No-op для героев без onTurnEnd.
+    const endingPlayerId = state.currentTurnPlayerId;
+    state = await this.triggerHeroTurnEnd(state, endingPlayerId);
+
     // Находим следующего живого игрока по кругу
     const currentPlayerIndex = state.players.findIndex(
       (p) => p.userId === state.currentTurnPlayerId,
@@ -257,6 +270,26 @@ export class GameActionExecutorService {
     }
     const slug = heroFighter.heroSlug ?? heroFighter.heroId;
     return this.abilityRegistry.triggerOnTurnStartExtended(slug, state, playerId);
+  }
+
+  /**
+   * Вызвать extended-хук onTurnEnd героя ЗАВЕРШАЮЩЕГО игрока (TASK, infra).
+   *
+   * Зеркало triggerHeroTurnStart: слаг бойца-героя игрока (heroSlug ?? heroId),
+   * await extended-диспетчера triggerOnTurnEndExtended, замена state результатом.
+   * Для героев без хука — исходное состояние без изменений. sequenceNumber не
+   * трогаем: вызывающий advanceTurn делает свой +1 на передаче хода.
+   */
+  private async triggerHeroTurnEnd(
+    state: GameState,
+    playerId: string,
+  ): Promise<GameState> {
+    const heroFighter = state.fighters.find((f) => f.ownerId === playerId);
+    if (!heroFighter) {
+      return state;
+    }
+    const slug = heroFighter.heroSlug ?? heroFighter.heroId;
+    return this.abilityRegistry.triggerOnTurnEndExtended(slug, state, playerId);
   }
 
   /**
@@ -1232,8 +1265,33 @@ export class GameActionExecutorService {
           attackCardId: combatInfo.attackerCardId,
           defenseCardId: combatInfo.defenderCardId,
         });
-        const finalAttack = calc.finalAttack + heroMods.attackModifier;
-        const finalDefense = calc.finalDefense + heroMods.defenseModifier;
+
+        // STATEFUL-модификаторы способностей (доступ к GameState): классический
+        // applyCombatModifier видит только CombatState+fighter+role и не может
+        // оценивать условия на состоянии игры. Этот хук читает GameState.
+        // ADD-семантика та же — суммируем ТОЛЬКО ADD и добавляем поверх heroMods.
+        // Аддитивно: математику heroMods не трогаем. Slug — heroSlug ?? heroId.
+        const statefulAttack = this.sumAddModifiers(
+          this.abilityRegistry.getStatefulCombatModifiers(
+            attacker.heroSlug ?? attacker.heroId,
+            calc.state,
+            combatInfo,
+            attacker,
+            'attacker',
+          ),
+        );
+        const statefulDefense = this.sumAddModifiers(
+          this.abilityRegistry.getStatefulCombatModifiers(
+            defenderFighter.heroSlug ?? defenderFighter.heroId,
+            calc.state,
+            combatInfo,
+            defenderFighter,
+            'defender',
+          ),
+        );
+
+        const finalAttack = calc.finalAttack + heroMods.attackModifier + statefulAttack;
+        const finalDefense = calc.finalDefense + heroMods.defenseModifier + statefulDefense;
 
         // 3. Урон: атака > защита → разница защитнику; иначе атакующему
         //    (ничья — победа защитника, урона нет). PREVENT_DAMAGE гасит урон стороне.
@@ -1556,6 +1614,18 @@ export class GameActionExecutorService {
   private findHandCard(state: GameState, userId: string, cardId: string): HandCard | undefined {
     return state.handZones[userId]?.cards.find(
       (c) => c.id === cardId || c.cardId === cardId,
+    );
+  }
+
+  /**
+   * Сумма ADD-модификаторов (та же семантика, что в CombatResolverService.
+   * sumValueModifiers — приватен там, поэтому считаем здесь). SET/MULTIPLY/
+   * IGNORE сознательно игнорируются: stateful-хук аддитивен к итогам боя.
+   */
+  private sumAddModifiers(modifiers: readonly ValueModifier[]): number {
+    return modifiers.reduce(
+      (sum, m) => (m.type === ValueModifierType.ADD ? sum + m.value : sum),
+      0,
     );
   }
 

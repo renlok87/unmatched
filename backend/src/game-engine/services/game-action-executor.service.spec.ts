@@ -246,6 +246,13 @@ describe('GameActionExecutorService', () => {
             triggerOnTurnStartExtended: jest
               .fn()
               .mockImplementation((_h: string, state: GameState) => Promise.resolve(state)),
+            // TURN_END-хук в advanceTurn (abilities-wiring) — passthrough no-op:
+            // герои тестов без onTurnEnd возвращают state без изменений
+            triggerOnTurnEndExtended: jest
+              .fn()
+              .mockImplementation((_h: string, state: GameState) => Promise.resolve(state)),
+            // STATEFUL combat modifiers в executeResolveCombat — нет хука → []
+            getStatefulCombatModifiers: jest.fn().mockReturnValue([]),
             getHeroCombatModifiers: jest
               .fn()
               .mockReturnValue({ attackModifier: 0, defenseModifier: 0 }),
