@@ -26,6 +26,8 @@ import {
   AdminHeroDto,
   AdminCardDto,
   AdminBoardDto,
+  CleanupGamesInput,
+  CleanupGamesResultDto,
 } from './dto/admin.dto';
 
 /**
@@ -321,6 +323,14 @@ export class AdminResolver {
   @UseGuards(GqlAuthGuard)
   async getGame(@Args('id') id: string) {
     return await this.adminService.getGameById(id);
+  }
+
+  @Mutation(() => CleanupGamesResultDto, { name: 'cleanupGames' })
+  @UseGuards(GqlAuthGuard, AdminGuard)
+  async cleanupGames(
+    @Args('input', { nullable: true }) input?: CleanupGamesInput,
+  ): Promise<CleanupGamesResultDto> {
+    return await this.adminService.cleanupGames(input ?? {});
   }
 
   // ============================================

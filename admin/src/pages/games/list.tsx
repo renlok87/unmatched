@@ -1,7 +1,7 @@
 import React from 'react';
 import { List } from '@refinedev/antd';
-import { Table, Badge, Space, Button, Input, Select, Tag } from 'antd';
-import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { Table, Badge, Space, Button, Input, Select, Tag, Modal, message } from 'antd';
+import { EyeOutlined, SearchOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useGo } from '@refinedev/core';
 import { useState, useEffect } from 'react';
 import { client } from '../../providers/dataProvider';
@@ -25,6 +25,15 @@ const GET_GAMES = gql`
         }
       }
       total
+    }
+  }
+`;
+
+const CLEANUP_GAMES = gql`
+  mutation CleanupGames($input: CleanupGamesInput) {
+    cleanupGames(input: $input) {
+      deleted
+      aborted
     }
   }
 `;
@@ -137,6 +146,43 @@ export const GamesList: React.FC = () => {
     go({ to: { resource: 'games', action: 'show', id } });
   };
 
+  const [cleaning, setCleaning] = useState(false);
+
+  const handleCleanup = () => {
+    Modal.confirm({
+      title: 'Cleanup old games',
+      content:
+        'Delete FINISHED/ABORTED games older than 7 days and abort stuck IN_PROGRESS/PAUSED games (no activity > 60 min). PENDING/LOBBY games are never touched.',
+      okText: 'Cleanup',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        setCleaning(true);
+        try {
+          const result = await client
+            .mutation(CLEANUP_GAMES, {
+              input: { finishedOlderThanDays: 7, abortStuckInProgress: true, stuckMinutes: 60 },
+            })
+            .toPromise();
+
+          if (result.error) {
+            console.error('[GamesList] Cleanup error:', result.error);
+            message.error(`Failed to cleanup: ${result.error.message}`);
+          } else {
+            const { deleted, aborted } = result.data?.cleanupGames ?? { deleted: 0, aborted: 0 };
+            message.success(`Cleanup done: ${deleted} deleted, ${aborted} aborted`);
+            fetchGames(1);
+          }
+        } catch (error: any) {
+          console.error('[GamesList] Cleanup error:', error);
+          message.error(`Failed to cleanup: ${error.message}`);
+        } finally {
+          setCleaning(false);
+        }
+      },
+    });
+  };
+
   const columns = [
     {
       title: 'Game',
@@ -244,6 +290,14 @@ export const GamesList: React.FC = () => {
               </Select.Option>
             ))}
           </Select>
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            loading={cleaning}
+            onClick={handleCleanup}
+          >
+            Cleanup old games
+          </Button>
         </Space>
         <Table
           loading={loading}

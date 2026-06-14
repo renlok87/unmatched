@@ -709,8 +709,15 @@ describe('Admin API (e2e)', () => {
         set: 'test-set',
         width: 6,
         height: 6,
-        cells: JSON.stringify({ test: 'cells' }),
-        features: JSON.stringify({ test: 'features' }),
+        // Валидная геометрия (createBoard теперь прогоняет validateBoardGeometry):
+        // 2x2 решётка с реципрокными связями, зоны из канона.
+        cells: JSON.stringify([
+          { x: 0, y: 0, type: 'normal', zone: 'blue', connections: ['right', 'down'] },
+          { x: 1, y: 0, type: 'normal', zone: 'blue', connections: ['left', 'down'] },
+          { x: 0, y: 1, type: 'normal', zone: 'blue', connections: ['up', 'right'] },
+          { x: 1, y: 1, type: 'normal', zone: 'blue', connections: ['up', 'left'] },
+        ]),
+        features: JSON.stringify({ doors: [], secretPassages: [], highGround: [] }),
       };
 
       const createResponse = await gqlRequest(CREATE_BOARD_MUTATION, { input: createInput }, adminToken).expect(200);

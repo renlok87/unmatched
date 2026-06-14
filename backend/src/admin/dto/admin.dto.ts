@@ -985,6 +985,39 @@ export class GamesPaginatedDto {
 }
 
 // ============================================
+// GAMES CLEANUP DTOs
+// ============================================
+
+@InputType()
+export class CleanupGamesInput {
+  // Удалять FINISHED/ABORTED игры старше N дней (по умолчанию 7)
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  finishedOlderThanDays?: number;
+
+  // Прерывать застрявшие IN_PROGRESS/PAUSED игры без активности
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  abortStuckInProgress?: boolean;
+
+  // Порог неактивности (в минутах) для прерывания застрявших игр (по умолчанию 60)
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  stuckMinutes?: number;
+}
+
+@ObjectType()
+export class CleanupGamesResultDto {
+  @Field(() => Int)
+  deleted: number;
+
+  @Field(() => Int)
+  aborted: number;
+}
+
+// ============================================
 // AUDIT LOGS DTOs
 // ============================================
 

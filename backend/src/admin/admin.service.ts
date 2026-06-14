@@ -1,5 +1,11 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
+import { validateBoardGeometry } from '../content/validators/board-geometry.validator';
 import { QueueManagerService } from '../matchmaking/services/queue-manager.service';
 import {
   CreateHeroInput,
@@ -422,7 +428,48 @@ export class AdminService {
     return this.serializeBoard(board);
   }
 
+  /** Безопасный парс JSON-поля доски: невалидный JSON → 400, а не 500. */
+  private parseBoardJson(raw: string, field: 'cells' | 'features'): any {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      throw new BadRequestException(
+        `Поле доски "${field}" содержит невалидный JSON.`,
+      );
+    }
+  }
+
+  /**
+   * Прогоняет геометрию через чистый validateBoardGeometry. Жёсткие ошибки →
+   * BadRequestException (доска не сохраняется). Предупреждения (warn:) не блокируют.
+   */
+  private assertBoardGeometry(geometry: {
+    width: number;
+    height: number;
+    cells: unknown;
+    features?: unknown;
+  }): void {
+    const result = validateBoardGeometry(geometry as any);
+    if (!result.valid) {
+      const hard = result.errors.filter((e) => !e.startsWith('warn:'));
+      throw new BadRequestException(
+        `Геометрия доски невалидна: ${hard.join('; ')}`,
+      );
+    }
+  }
+
   async createBoard(input: CreateBoardInput) {
+    const cells = this.parseBoardJson(input.cells, 'cells');
+    const features = input.features
+      ? this.parseBoardJson(input.features, 'features')
+      : null;
+    this.assertBoardGeometry({
+      width: input.width,
+      height: input.height,
+      cells,
+      features,
+    });
+
     try {
       const board = await this.prisma.board.create({
         data: {
@@ -432,8 +479,8 @@ export class AdminService {
           set: input.set,
           width: input.width,
           height: input.height,
-          cells: JSON.parse(input.cells),
-          features: input.features ? JSON.parse(input.features) : null,
+          cells,
+          features,
           imageUrl: input.imageUrl,
           imageUrlDark: input.imageUrlDark,
         },
@@ -464,10 +511,26 @@ export class AdminService {
     if (input.set !== undefined) updateData.set = input.set;
     if (input.width !== undefined) updateData.width = input.width;
     if (input.height !== undefined) updateData.height = input.height;
-    if (input.cells !== undefined) updateData.cells = JSON.parse(input.cells);
-    if (input.features !== undefined) updateData.features = JSON.parse(input.features);
+    if (input.cells !== undefined)
+      updateData.cells = this.parseBoardJson(input.cells, 'cells');
+    if (input.features !== undefined)
+      updateData.features = input.features
+        ? this.parseBoardJson(input.features, 'features')
+        : null;
     if (input.imageUrl !== undefined) updateData.imageUrl = input.imageUrl;
     if (input.imageUrlDark !== undefined) updateData.imageUrlDark = input.imageUrlDark;
+
+    // Валидируем геометрию по СЛИЯНИЮ существующей доски и обновляемых полей:
+    // смена width/height может «сломать» уже сохранённые клетки.
+    this.assertBoardGeometry({
+      width: updateData.width ?? board.width,
+      height: updateData.height ?? board.height,
+      cells: (updateData.cells ?? board.cells) as unknown[],
+      features: (updateData.features ?? board.features) as
+        | Record<string, unknown>
+        | null
+        | undefined,
+    });
 
     const updated = await this.prisma.board.update({
       where: { id },
@@ -844,6 +907,54 @@ export class AdminService {
         avatar: gp.user?.avatar,
       })),
     };
+  }
+
+  /**
+   * Очистка игр админом.
+   *
+   * (a) Удаляет завершённые/прерванные (FINISHED, ABORTED) игры без активности
+   *     старше N дней (по умолчанию 7) — ориентир по updatedAt (последняя
+   *     активность), который проставлен на всех записях.
+   * (b) Опционально прерывает зависшие активные игры (IN_PROGRESS, PAUSED) без
+   *     активности дольше stuckMinutes (по умолчанию 60).
+   *
+   * БЕЗОПАСНОСТЬ: PENDING/LOBBY никогда не трогаем (за zombie PENDING отвечает
+   * GameSanityService). Возвращает { deleted, aborted }.
+   */
+  async cleanupGames(input: {
+    finishedOlderThanDays?: number;
+    abortStuckInProgress?: boolean;
+    stuckMinutes?: number;
+  }): Promise<{ deleted: number; aborted: number }> {
+    const days = input.finishedOlderThanDays ?? 7;
+    const deleteCutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+    const { count: deleted } = await this.prisma.game.deleteMany({
+      where: {
+        status: { in: [GameStatus.FINISHED, GameStatus.ABORTED] },
+        updatedAt: { lt: deleteCutoff },
+      },
+    });
+
+    let aborted = 0;
+    if (input.abortStuckInProgress) {
+      const stuckMinutes = input.stuckMinutes ?? 60;
+      const stuckCutoff = new Date(Date.now() - stuckMinutes * 60 * 1000);
+
+      const { count } = await this.prisma.game.updateMany({
+        where: {
+          status: { in: [GameStatus.IN_PROGRESS, GameStatus.PAUSED] },
+          updatedAt: { lt: stuckCutoff },
+        },
+        data: {
+          status: GameStatus.ABORTED,
+          endedAt: new Date(),
+        },
+      });
+      aborted = count;
+    }
+
+    return { deleted, aborted };
   }
 
   // ============================================
