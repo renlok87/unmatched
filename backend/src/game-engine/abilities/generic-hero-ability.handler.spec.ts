@@ -191,6 +191,92 @@ describe('GenericHeroAbilityHandler', () => {
     });
   });
 
+  // ---- 1a) combat-passive: has-not-maneuvered-this-turn ----
+  describe('getStatefulCombatModifiers (has-not-maneuvered-this-turn)', () => {
+    const config: AbilityConfig = {
+      heroId: 'test-hero',
+      abilityName: 'FreshAssault',
+      description: '+2 к атаке, если в этом ходу ещё не маневрировал',
+      rules: [
+        {
+          trigger: 'combat-passive',
+          condition: 'has-not-maneuvered-this-turn',
+          effect: { kind: 'combat-modifier', appliesTo: 'attack', value: 2 },
+        },
+      ],
+    };
+
+    const combat: CombatState = {
+      attackerId: 'hero-fighter-1',
+      defenderId: 'enemy-fighter-1',
+    };
+
+    it('срабатывает +2, когда maneuveredThisTurn falsy', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = makeState(); // metadata без maneuveredThisTurn → falsy
+      const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, attacker, 'attacker');
+
+      expect(mods).toHaveLength(1);
+      expect(mods[0]).toMatchObject({ type: ValueModifierType.ADD, value: 2, ownerId: 'player1' });
+    });
+
+    it('no-op, когда maneuveredThisTurn === true', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = makeState({
+        metadata: { ...makeState().metadata, maneuveredThisTurn: true },
+      });
+      const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, attacker, 'attacker');
+      expect(mods).toHaveLength(0);
+    });
+  });
+
+  // ---- 1b) combat-passive: has-attacked-this-turn ----
+  describe('getStatefulCombatModifiers (has-attacked-this-turn)', () => {
+    const config: AbilityConfig = {
+      heroId: 'test-hero',
+      abilityName: 'Momentum',
+      description: '+3 к атаке, если в этом ходу уже атаковал',
+      rules: [
+        {
+          trigger: 'combat-passive',
+          condition: 'has-attacked-this-turn',
+          effect: { kind: 'combat-modifier', appliesTo: 'attack', value: 3 },
+        },
+      ],
+    };
+
+    const combat: CombatState = {
+      attackerId: 'hero-fighter-1',
+      defenderId: 'enemy-fighter-1',
+    };
+
+    it('срабатывает +3, когда attackedThisTurn === true', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = makeState({
+        metadata: { ...makeState().metadata, attackedThisTurn: true },
+      });
+      const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, attacker, 'attacker');
+
+      expect(mods).toHaveLength(1);
+      expect(mods[0]).toMatchObject({ type: ValueModifierType.ADD, value: 3, ownerId: 'player1' });
+    });
+
+    it('no-op, когда attackedThisTurn falsy', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = makeState(); // metadata без attackedThisTurn → falsy
+      const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, attacker, 'attacker');
+      expect(mods).toHaveLength(0);
+    });
+  });
+
   // ---- 2) turn-start gainAction ----
   describe('onTurnStart (gainAction)', () => {
     const config: AbilityConfig = {
@@ -348,6 +434,8 @@ describe('GenericHeroAbilityHandler', () => {
       defenderFighterId: 'enemy-fighter-1',
       won,
       damageDealt: won ? 2 : 0,
+      // первый проигрыш хода (для проигранных боёв); при won — всегда false
+      firstLossThisTurn: !won,
     });
 
     it('after-attack always draw → добор для атакующего игрока', async () => {
@@ -426,6 +514,61 @@ describe('GenericHeroAbilityHandler', () => {
       expect(noop).toBe(state);
     });
 
+    it('first-lost-combat-this-turn: gainAction только при won===false && firstLossThisTurn', async () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'SecondWind',
+        description: 'при ПЕРВОМ проигрыше хода — +1 действие',
+        rules: [
+          {
+            trigger: 'after-attack',
+            condition: 'first-lost-combat-this-turn',
+            effect: { kind: 'turn-effect', gainAction: 1 },
+          },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const baseMeta = () => makeState().metadata;
+
+      // 1) won===false && firstLossThisTurn===true → срабатывает
+      const stateA = makeState({ metadata: { ...baseMeta(), actionsRemaining: 2 } });
+      const firedA = await handler.onAfterCombat(stateA, {
+        playerId: 'player1',
+        attackerFighterId: 'hero-fighter-1',
+        defenderFighterId: 'enemy-fighter-1',
+        won: false,
+        damageDealt: 0,
+        firstLossThisTurn: true,
+      });
+      expect(getActionsRemaining(firedA)).toBe(3);
+
+      // 2) won===false но НЕ первый проигрыш → no-op
+      const stateB = makeState({ metadata: { ...baseMeta(), actionsRemaining: 2 } });
+      const noopB = await handler.onAfterCombat(stateB, {
+        playerId: 'player1',
+        attackerFighterId: 'hero-fighter-1',
+        defenderFighterId: 'enemy-fighter-1',
+        won: false,
+        damageDealt: 0,
+        firstLossThisTurn: false,
+      });
+      expect(getActionsRemaining(noopB)).toBe(2);
+      expect(noopB).toBe(stateB);
+
+      // 3) won===true (firstLossThisTurn неактуально) → no-op
+      const stateC = makeState({ metadata: { ...baseMeta(), actionsRemaining: 2 } });
+      const noopC = await handler.onAfterCombat(stateC, {
+        playerId: 'player1',
+        attackerFighterId: 'hero-fighter-1',
+        defenderFighterId: 'enemy-fighter-1',
+        won: true,
+        damageDealt: 2,
+        firstLossThisTurn: false,
+      });
+      expect(getActionsRemaining(noopC)).toBe(2);
+      expect(noopC).toBe(stateC);
+    });
+
     it('no-op: нет after-attack правила (только turn-end)', async () => {
       const config: AbilityConfig = {
         heroId: 'test-hero',
@@ -458,6 +601,96 @@ describe('GenericHeroAbilityHandler', () => {
       const next = await handler.onAfterCombat(state, afterCtx(true));
       expect(next).toBe(state);
       expect(deps.deck.drawCards).not.toHaveBeenCalled();
+    });
+  });
+
+  // ---- 8) after-defense trigger (defender-side, напр. Spider-Sense) ----
+  describe('onAfterCombat (after-defense trigger)', () => {
+    // Spider-Man — защитник player1, атакует player2. Эффект → defenderPlayerId.
+    const defenseCtx = (won: boolean): AfterCombatContext => ({
+      playerId: 'player2', // атакующий
+      defenderPlayerId: 'player1', // защитник (Spider-Man) — цель эффекта
+      attackerFighterId: 'enemy-fighter-1',
+      defenderFighterId: 'hero-fighter-1',
+      won,
+      damageDealt: won ? 2 : 0,
+      firstLossThisTurn: !won,
+    });
+
+    // Атакующая-сторона ctx БЕЗ defenderPlayerId — для проверки no-op.
+    const attackerOnlyCtx = (won: boolean): AfterCombatContext => ({
+      playerId: 'player1',
+      attackerFighterId: 'hero-fighter-1',
+      defenderFighterId: 'enemy-fighter-1',
+      won,
+      damageDealt: won ? 2 : 0,
+      firstLossThisTurn: !won,
+    });
+
+    const config: AbilityConfig = {
+      heroId: 'test-hero',
+      abilityName: 'SpiderSenseLike',
+      description: 'после боя в защите — добор 1 карты',
+      rules: [
+        { trigger: 'after-defense', condition: 'always', effect: { kind: 'turn-effect', draw: 1 } },
+      ],
+    };
+
+    it('добор уходит ЗАЩИТНИКУ (ctx.defenderPlayerId), а не атакующему', async () => {
+      const deps = makeDeps();
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = makeState();
+
+      const next = await handler.onAfterCombat(state, defenseCtx(true));
+
+      expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+      expect(next.handZones['player1'].cards).toHaveLength(1);
+      expect(next.handZones['player2'].cards).toHaveLength(0);
+    });
+
+    it('срабатывает независимо от исхода боя (condition always, won===false)', async () => {
+      const deps = makeDeps();
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = makeState();
+
+      const next = await handler.onAfterCombat(state, defenseCtx(false));
+
+      expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+      expect(next.handZones['player1'].cards).toHaveLength(1);
+    });
+
+    it('no-op: after-defense правило, но ctx без defenderPlayerId → нечего применять', async () => {
+      const deps = makeDeps();
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = makeState();
+
+      // attackerOnlyCtx (атакующая-сторона) не несёт defenderPlayerId
+      const next = await handler.onAfterCombat(state, attackerOnlyCtx(true));
+
+      expect(deps.deck.drawCards).not.toHaveBeenCalled();
+      expect(next).toBe(state);
+    });
+
+    it("no-op: 'after-attack' правило НЕ срабатывает от defender-side диспетчера на defenderPlayerId", async () => {
+      // Конфиг с after-attack: эффект уходит атакующему (ctx.playerId), не защитнику.
+      const attackConfig: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'AttackerSide',
+        description: 'after-attack draw',
+        rules: [
+          { trigger: 'after-attack', condition: 'always', effect: { kind: 'turn-effect', draw: 1 } },
+        ],
+      };
+      const deps = makeDeps();
+      const handler = new GenericHeroAbilityHandler(attackConfig, deps);
+      const state = makeState();
+
+      // Даже при наличии defenderPlayerId, after-attack таргетит ctx.playerId
+      const next = await handler.onAfterCombat(state, defenseCtx(true));
+
+      expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player2', 1);
+      expect(next.handZones['player2'].cards).toHaveLength(1);
+      expect(next.handZones['player1'].cards).toHaveLength(0);
     });
   });
 });

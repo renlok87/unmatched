@@ -32,7 +32,10 @@ Config v1 (7): luke-cage (+2 def always), annie-christmas (+2 atk if HP<defender
 
 Config v2 — after-attack (4): chupacabra (draw 1), deadpool (heal 1), michelangelo (draw 1; hand-cap-3 НЕ смоделирован), angel (draw 1 if lost-combat). Хук `after-attack` + condition `won-combat`/`lost-combat` добавлены. **Хук after-combat теперь wired**: `triggerOnAfterCombat(attacker, ctx{won,damageDealt,...})` в executeResolveCombat до advanceTurn (`onAfterCombat(state, ctx)`).
 
-SKIP: golden-bat/ancient-leshen — нужны per-turn флаги maneuvered/attacked-this-turn, которых нет (turnStartPositions = снапшот позиций, не флаг действия). Не шиплю half-working.
+Config v3 — per-turn флаги (3): golden-bat (+2 atk если не маневрировал в ход), ancient-leshen (+3 atk если уже атаковал в ход; Wolves move-3 НЕ смоделирован — sidekick-стат), raphael (gainAction при ПЕРВОМ проигрыше боя в ход).
+- Добавлены флаги `metadata.maneuveredThisTurn/attackedThisTurn/lostCombatThisTurn` (set в executeManeuver/executeResolveCombat, reset в advanceTurn, персист save/load wire-ключи mt/at/lc) + `AfterCombatContext.firstLossThisTurn`.
+- Новые condition: `has-not-maneuvered-this-turn`, `has-attacked-this-turn` (combat-passive), `first-lost-combat-this-turn` (after-attack).
+- Инфра `after-defense` (триггер + `ctx.defenderPlayerId`, зеркало after-attack для defender-side) добавлена, но БЕЗ героя: реальный Spider-Man = info-reveal (complex), не draw — НЕ реализован.
 
 ## Каталог 88 (для v2)
 

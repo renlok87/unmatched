@@ -154,6 +154,9 @@ describe('ABILITY_CONFIGS — присутствие героев', () => {
     'deadpool',
     'michelangelo',
     'angel',
+    'golden-bat',
+    'ancient-leshen',
+    'raphael',
   ];
   it.each(expected)('содержит конфиг для слага %s', (slug) => {
     expect(configFor(slug)).toBeDefined();
@@ -359,6 +362,8 @@ function afterCtx(won: boolean): AfterCombatContext {
     defenderFighterId: 'enemy-fighter-1',
     won,
     damageDealt: won ? 2 : 0,
+    // первый проигрыш хода (для проигранных боёв); при won — всегда false
+    firstLossThisTurn: !won,
   };
 }
 
@@ -456,3 +461,122 @@ describe('angel (after-attack: draw 1 only on lost-combat)', () => {
     expect(next).toBe(state); // чистый no-op
   });
 });
+
+// ===================== НОВЫЕ ГЕРОИ (flag-gated) =====================
+
+describe('golden-bat (combat-passive: +2 attack when has not maneuvered this turn)', () => {
+  it('даёт +2 к атаке, когда maneuveredThisTurn falsy (манёвра в этом ходу не было)', () => {
+    const handler = handlerFor('golden-bat');
+    // makeState() без metadata.maneuveredThisTurn → falsy
+    const attacker = makeFighter({ heroSlug: 'golden-bat' });
+    const mods = handler.getStatefulCombatModifiers(makeState(), COMBAT, attacker, 'attacker');
+
+    expect(mods).toHaveLength(1);
+    expect(mods[0]).toMatchObject({ type: ValueModifierType.ADD, value: 2, ownerId: 'player1' });
+  });
+
+  it('no-op: maneuveredThisTurn === true (манёвр уже был в этом ходу)', () => {
+    const handler = handlerFor('golden-bat');
+    const state = makeState({
+      metadata: { ...makeState().metadata, maneuveredThisTurn: true },
+    });
+    const attacker = makeFighter({ heroSlug: 'golden-bat' });
+    const mods = handler.getStatefulCombatModifiers(state, COMBAT, attacker, 'attacker');
+    expect(mods).toHaveLength(0);
+  });
+
+  it('защитник НЕ получает модификатор (appliesTo: attack)', () => {
+    const handler = handlerFor('golden-bat');
+    const fighter = makeFighter({ heroSlug: 'golden-bat' });
+    const mods = handler.getStatefulCombatModifiers(makeState(), COMBAT, fighter, 'defender');
+    expect(mods).toHaveLength(0);
+  });
+});
+
+describe('ancient-leshen (combat-passive: +3 attack when already attacked this turn)', () => {
+  it('даёт +3 к атаке, когда attackedThisTurn === true', () => {
+    const handler = handlerFor('ancient-leshen');
+    const state = makeState({
+      metadata: { ...makeState().metadata, attackedThisTurn: true },
+    });
+    const attacker = makeFighter({ heroSlug: 'ancient-leshen' });
+    const mods = handler.getStatefulCombatModifiers(state, COMBAT, attacker, 'attacker');
+
+    expect(mods).toHaveLength(1);
+    expect(mods[0]).toMatchObject({ type: ValueModifierType.ADD, value: 3, ownerId: 'player1' });
+  });
+
+  it('no-op: attackedThisTurn falsy (ещё не атаковал в этом ходу)', () => {
+    const handler = handlerFor('ancient-leshen');
+    // makeState() без metadata.attackedThisTurn → falsy
+    const attacker = makeFighter({ heroSlug: 'ancient-leshen' });
+    const mods = handler.getStatefulCombatModifiers(makeState(), COMBAT, attacker, 'attacker');
+    expect(mods).toHaveLength(0);
+  });
+
+  it('защитник НЕ получает модификатор (appliesTo: attack)', () => {
+    const handler = handlerFor('ancient-leshen');
+    const state = makeState({
+      metadata: { ...makeState().metadata, attackedThisTurn: true },
+    });
+    const fighter = makeFighter({ heroSlug: 'ancient-leshen' });
+    const mods = handler.getStatefulCombatModifiers(state, COMBAT, fighter, 'defender');
+    expect(mods).toHaveLength(0);
+  });
+});
+
+describe('raphael (after-attack: gainAction +1 on first lost combat this turn)', () => {
+  it('+1 действие при ПЕРВОМ проигрыше хода (won===false && firstLossThisTurn===true)', async () => {
+    const handler = handlerFor('raphael');
+    const state = makeState({
+      metadata: { ...makeState().metadata, actionsRemaining: 2 },
+    });
+    const next = await handler.onAfterCombat(state, {
+      playerId: 'player1',
+      attackerFighterId: 'hero-fighter-1',
+      defenderFighterId: 'enemy-fighter-1',
+      won: false,
+      damageDealt: 0,
+      firstLossThisTurn: true,
+    });
+    expect(getActionsRemaining(next)).toBe(3);
+  });
+
+  it('no-op: бой выигран (ctx.won === true)', async () => {
+    const handler = handlerFor('raphael');
+    const state = makeState({
+      metadata: { ...makeState().metadata, actionsRemaining: 2 },
+    });
+    const next = await handler.onAfterCombat(state, {
+      playerId: 'player1',
+      attackerFighterId: 'hero-fighter-1',
+      defenderFighterId: 'enemy-fighter-1',
+      won: true,
+      damageDealt: 2,
+      firstLossThisTurn: false,
+    });
+    expect(getActionsRemaining(next)).toBe(2);
+    expect(next).toBe(state); // чистый no-op
+  });
+
+  it('no-op: проигрыш, но НЕ первый в этом ходу (firstLossThisTurn === false)', async () => {
+    const handler = handlerFor('raphael');
+    const state = makeState({
+      metadata: { ...makeState().metadata, actionsRemaining: 2 },
+    });
+    const next = await handler.onAfterCombat(state, {
+      playerId: 'player1',
+      attackerFighterId: 'hero-fighter-1',
+      defenderFighterId: 'enemy-fighter-1',
+      won: false,
+      damageDealt: 0,
+      firstLossThisTurn: false,
+    });
+    expect(getActionsRemaining(next)).toBe(2);
+    expect(next).toBe(state); // чистый no-op
+  });
+});
+
+// NB: 'after-defense' инфра (триггер + ctx.defenderPlayerId) покрыта synthetic-
+// тестами в generic-hero-ability.handler.spec.ts. Конкретного героя пока нет
+// (реальный Spider-Man = info-reveal, COMPLEX — не реализован).

@@ -230,6 +230,12 @@ export class GameActionExecutorService {
         lastActionBy: userId,
         actionsRemaining: ACTIONS_PER_TURN, // новый ход — 2 действия
         turnStartPositions,
+        // Per-turn флаги действий сбрасываются при передаче хода (TASK): у нового
+        // активного игрока свежий ход — ещё не манёврил, не атаковал, не проигрывал.
+        // Один общий набор флагов (за ход действует только один игрок).
+        maneuveredThisTurn: false,
+        attackedThisTurn: false,
+        lostCombatThisTurn: false,
         // Выборы игрока протухают при ВОЗВРАТЕ хода их владельцу (полный круг):
         // атака вторым действием создаёт pending и тут же передаёт ход —
         // чистка «при любой передаче» стирала бы их до резолва
@@ -312,6 +318,27 @@ export class GameActionExecutorService {
       return state;
     }
     const slug = attackerFighter.heroSlug ?? attackerFighter.heroId;
+    return this.abilityRegistry.triggerOnAfterCombat(slug, state, ctx);
+  }
+
+  /**
+   * Вызвать after-combat хук ЗАЩИЩАЮЩЕГОСЯ героя (defender-side, напр.
+   * Spider-Sense). Зеркало triggerHeroAfterCombat, но слаг берём с
+   * ЗАЩИЩАЮЩЕГОСЯ бойца (ctx.defenderFighterId). Тот же ctx (несёт
+   * defenderPlayerId — цель defender-side эффектов). Generic-handler
+   * обрабатывает 'after-defense' правила, применяя эффект к ctx.defenderPlayerId;
+   * правила 'after-attack' защитника здесь не сработают (нет смысла). Если
+   * защищающегося бойца в state нет — no-op. seq не трогаем.
+   */
+  private async triggerHeroAfterDefense(
+    state: GameState,
+    ctx: AfterCombatContext,
+  ): Promise<GameState> {
+    const defenderFighter = state.fighters.find((f) => f.id === ctx.defenderFighterId);
+    if (!defenderFighter) {
+      return state;
+    }
+    const slug = defenderFighter.heroSlug ?? defenderFighter.heroId;
     return this.abilityRegistry.triggerOnAfterCombat(slug, state, ctx);
   }
 
@@ -702,6 +729,10 @@ export class GameActionExecutorService {
             ...newState.metadata,
             lastActionAt: new Date(),
             lastActionBy: userId,
+            // Per-turn флаг (TASK): игрок сделал манёвр в этом ходу. Сбрасывается
+            // в advanceTurn при передаче хода. Ставим один раз за манёвр —
+            // даже если manёвр двигал нескольких бойцов (moves[]).
+            maneuveredThisTurn: true,
           },
         };
 
@@ -1380,6 +1411,25 @@ export class GameActionExecutorService {
           players: updatedPlayers,
         };
 
+        // Per-turn флаги действий (TASK). ВАЖНО про порядок:
+        //  - stateful combat-модификаторы ЭТОЙ атаки уже собраны выше (видели
+        //    attackedThisTurn в значении ДО этой атаки — первая атака видит
+        //    false, вторая true);
+        //  - firstLossThisTurn считаем ДО установки lostCombatThisTurn: при
+        //    проигрыше (won===false) это первый проигрыш хода, если флаг ещё
+        //    не стоял; при победе — всегда false;
+        //  - attackedThisTurn ставим в true в КОНЦЕ резолва (после сбора
+        //    модификаторов), чтобы СЛЕДУЮЩАЯ атака того же хода видела true.
+        const firstLossThisTurn = !attackerWon && !resolvedState.metadata.lostCombatThisTurn;
+        resolvedState = {
+          ...resolvedState,
+          metadata: {
+            ...resolvedState.metadata,
+            attackedThisTurn: true,
+            lostCombatThisTurn: resolvedState.metadata.lostCombatThisTurn || !attackerWon,
+          },
+        };
+
         // AFTER-COMBAT хук способности АТАКУЮЩЕГО героя (TASK): урон применён,
         // флаги поражения проставлены, combat-модификаторы собраны. Бьём ДО
         // передачи хода (advanceTurn), чтобы любой добор/лечение/доп. действие
@@ -1389,12 +1439,18 @@ export class GameActionExecutorService {
         // seq отдельно НЕ бампим: «прицеплено» к инкременту резолва ниже.
         const afterCombatCtx: AfterCombatContext = {
           playerId: attacker.ownerId,
+          defenderPlayerId: defenderFighter.ownerId,
           attackerFighterId: combatInfo.attackerId,
           defenderFighterId: defenderFighter.id,
           won: attackerWon,
           damageDealt: defenderDamage,
+          firstLossThisTurn,
         };
         resolvedState = await this.triggerHeroAfterCombat(resolvedState, afterCombatCtx);
+        // DEFENDER-side after-combat хук (напр. Spider-Sense): слаг резолвится
+        // с защищающегося бойца, эффект 'after-defense' — к ctx.defenderPlayerId.
+        // Бьём тем же ctx, ДО передачи хода, теми же seq-правилами.
+        resolvedState = await this.triggerHeroAfterDefense(resolvedState, afterCombatCtx);
 
         const alivePlayers = resolvedState.players.filter((p) => p.isAlive);
         const gameEnded = alivePlayers.length <= 1;

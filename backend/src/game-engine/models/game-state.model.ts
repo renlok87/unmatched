@@ -104,6 +104,16 @@ export interface GameStateMetadata {
   /** Эффекты, ждущие выбора игрока (MOVE/PLACE из карт) — резолвятся
    *  мутацией resolvePendingEffect; протухают при передаче хода */
   readonly pendingEffects?: readonly PendingEffect[];
+  /** Per-turn флаги действий текущего игрока (TASK): нужны combat-условиям
+   *  способностей («сделал ли манёвр / атаковал ли / первый ли проигрыш в этом
+   *  ходу»). Выставляются в executor'е, сбрасываются в advanceTurn при передаче
+   *  хода. Легаси-сейвы без полей → undefined (трактуется как false). */
+  /** Игрок выполнил MANEUVER в этом ходу (executeManeuver) */
+  readonly maneuveredThisTurn?: boolean;
+  /** Игрок завершил хотя бы одну атаку в этом ходу (конец executeResolveCombat) */
+  readonly attackedThisTurn?: boolean;
+  /** Игрок проиграл хотя бы один бой в этом ходу (executeResolveCombat, won===false) */
+  readonly lostCombatThisTurn?: boolean;
 }
 
 /**

@@ -33,7 +33,7 @@ import {
 } from '../abilities/hero-ability-registry';
 import { GamePhase } from '../models';
 import type { GameState } from '../models';
-import { ResolveCombatDto, EndTurnDto } from '../../games/dto/gameplay.dto';
+import { ResolveCombatDto, EndTurnDto, ManeuverDto } from '../../games/dto/gameplay.dto';
 
 describe('GameActionExecutorService — abilities wiring', () => {
   let service: GameActionExecutorService;
@@ -408,6 +408,249 @@ describe('GameActionExecutorService — abilities wiring', () => {
       // атакующий не выиграл → урона защитнику нет
       const defender = result.gameState!.fighters.find((f) => f.id === 'fighter2')!;
       expect(defender.health).toBe(17);
+    });
+  });
+
+  describe('4) per-turn action flags', () => {
+    it('после манёвра metadata.maneuveredThisTurn === true', async () => {
+      const state = createMockGameState({
+        phase: GamePhase.ACTION_MANEUVER,
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 2, // остаётся 1 действие после манёвра — ход не завершается
+        } as any,
+      });
+
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      const result = await service.executeManeuver(
+        {
+          gameId: 'test-game-1',
+          moves: [{ fighterId: 'fighter1', path: [{ x: 6, y: 6 }] }],
+        } as ManeuverDto,
+        context,
+      );
+
+      expect(result.success).toBe(true);
+      // ход не завершился (осталось 1 действие) → флаг манёвра выставлен
+      expect((result.gameState!.metadata as any).maneuveredThisTurn).toBe(true);
+    });
+
+    it('после передачи хода флаги сбрасываются в false для нового игрока', async () => {
+      // у player1 уже выставлены все флаги — endTurn передаёт ход player2 и сбрасывает их
+      const state = createMockGameState({
+        phase: GamePhase.ACTION_MANEUVER,
+        currentTurnPlayerId: 'player1',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 0,
+          maneuveredThisTurn: true,
+          attackedThisTurn: true,
+          lostCombatThisTurn: true,
+        } as any,
+      });
+
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      const result = await service.executeEndTurn(
+        { gameId: 'test-game-1' } as EndTurnDto,
+        context,
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.gameState!.currentTurnPlayerId).toBe('player2');
+      expect((result.gameState!.metadata as any).maneuveredThisTurn).toBe(false);
+      expect((result.gameState!.metadata as any).attackedThisTurn).toBe(false);
+      expect((result.gameState!.metadata as any).lostCombatThisTurn).toBe(false);
+    });
+
+    it('после проигранного боя ctx.firstLossThisTurn === true (первый проигрыш хода)', async () => {
+      let capturedFirstLoss: boolean | undefined;
+      const fakeHandler: ExtendedHeroAbilityHandler = {
+        heroId: 'hero-a',
+        abilityName: 'AfterCombat firstLoss capture',
+        abilityDescription: 'фиксирует ctx.firstLossThisTurn',
+        onAfterCombat: (state: GameState, ctx): Promise<GameState> => {
+          capturedFirstLoss = (ctx as any).firstLossThisTurn;
+          return Promise.resolve(state);
+        },
+      };
+      registry.registerExtended(fakeHandler);
+
+      // Проигрыш атакующего: атака 1 vs защита 3 → won=false, первый проигрыш хода
+      const state = createMockGameState({
+        phase: GamePhase.COMBAT_RESOLVE,
+        currentTurnPlayerId: 'player1',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 1,
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId: 'fighter2',
+            attackerCardId: 'card-a',
+            defenderCardId: 'card-d',
+            attackValue: 1,
+            defenseValue: 3,
+            startedAt: new Date(),
+          },
+        } as any,
+      });
+
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        context,
+      );
+
+      expect(result.success).toBe(true);
+      expect(capturedFirstLoss).toBe(true);
+      // флаг lostCombatThisTurn выставлен после боя
+      expect((result.gameState!.metadata as any).lostCombatThisTurn).toBe(true);
+    });
+
+    it('второй проигрыш того же хода: ctx.firstLossThisTurn === false', async () => {
+      let capturedFirstLoss: boolean | undefined;
+      const fakeHandler: ExtendedHeroAbilityHandler = {
+        heroId: 'hero-a',
+        abilityName: 'AfterCombat firstLoss capture',
+        abilityDescription: 'фиксирует ctx.firstLossThisTurn',
+        onAfterCombat: (state: GameState, ctx): Promise<GameState> => {
+          capturedFirstLoss = (ctx as any).firstLossThisTurn;
+          return Promise.resolve(state);
+        },
+      };
+      registry.registerExtended(fakeHandler);
+
+      // lostCombatThisTurn УЖЕ true (был проигрыш ранее в этом ходу)
+      const state = createMockGameState({
+        phase: GamePhase.COMBAT_RESOLVE,
+        currentTurnPlayerId: 'player1',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 1,
+          lostCombatThisTurn: true,
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId: 'fighter2',
+            attackerCardId: 'card-a',
+            defenderCardId: 'card-d',
+            attackValue: 1,
+            defenseValue: 3,
+            startedAt: new Date(),
+          },
+        } as any,
+      });
+
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        context,
+      );
+
+      expect(result.success).toBe(true);
+      expect(capturedFirstLoss).toBe(false);
+    });
+
+    it('второй атака того же хода видит attackedThisTurn===true на этапе сбора модификаторов', async () => {
+      // getStatefulCombatModifiers фиксирует значение attackedThisTurn НА МОМЕНТ
+      // сбора модификаторов. Первая атака должна видеть false, вторая — true.
+      const seen: Array<boolean | undefined> = [];
+      const fakeHandler: ExtendedHeroAbilityHandler = {
+        heroId: 'hero-a',
+        abilityName: 'records attackedThisTurn',
+        abilityDescription: 'фиксирует флаг атаки на этапе модификаторов',
+        getStatefulCombatModifiers: (state: GameState, _c, _f, role): readonly ValueModifier[] => {
+          if (role === 'attacker') {
+            seen.push((state.metadata as any).attackedThisTurn);
+          }
+          return [];
+        },
+      };
+      registry.registerExtended(fakeHandler);
+
+      const baseCombatInfo = {
+        attackerId: 'fighter1',
+        defenderId: 'player2',
+        targetFighterId: 'fighter2',
+        attackerCardId: 'card-a',
+        defenderCardId: 'card-d',
+        attackValue: 5,
+        defenseValue: 1,
+        startedAt: new Date(),
+      };
+
+      // Первая атака — attackedThisTurn ещё не выставлен
+      const state1 = createMockGameState({
+        phase: GamePhase.COMBAT_RESOLVE,
+        currentTurnPlayerId: 'player1',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 1, // ход продолжается
+          combatInfo: baseCombatInfo,
+        } as any,
+      });
+
+      const r1 = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        { userId: 'player1', gameId: 'test-game-1', currentState: state1 },
+      );
+      expect(r1.success).toBe(true);
+      // после первой атаки флаг выставлен в state
+      expect((r1.gameState!.metadata as any).attackedThisTurn).toBe(true);
+
+      // Вторая атака того же хода — флаг уже true на момент сбора модификаторов
+      const state2 = createMockGameState({
+        phase: GamePhase.COMBAT_RESOLVE,
+        currentTurnPlayerId: 'player1',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 1,
+          attackedThisTurn: true,
+          combatInfo: baseCombatInfo,
+        } as any,
+      });
+
+      const r2 = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        { userId: 'player1', gameId: 'test-game-1', currentState: state2 },
+      );
+      expect(r2.success).toBe(true);
+
+      // seen[0] — первая атака (false/undefined), seen[1] — вторая (true)
+      expect(seen[0]).toBeFalsy();
+      expect(seen[1]).toBe(true);
     });
   });
 

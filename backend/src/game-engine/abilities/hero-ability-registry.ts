@@ -119,6 +119,14 @@ export interface CombatModifier {
 export interface AfterCombatContext {
   /** Владелец атакующего бойца (атакующий игрок) */
   readonly playerId: string;
+  /**
+   * Владелец защищающегося бойца (защищающийся игрок). Для defender-side
+   * способностей (триггер 'after-defense', напр. Spider-Sense): turn-effect
+   * правила 'after-defense' применяются именно к этому игроку, а не к
+   * атакующему playerId. Опционально для обратной совместимости со старыми
+   * вызовами, не заполнявшими поле.
+   */
+  readonly defenderPlayerId?: string;
   /** id атакующего бойца (combatInfo.attackerId) */
   readonly attackerFighterId: string;
   /** id атакованного бойца */
@@ -127,6 +135,11 @@ export interface AfterCombatContext {
   readonly won: boolean;
   /** Урон, нанесённый атакующим в этом бою */
   readonly damageDealt: number;
+  /** Это ПЕРВЫЙ проигранный бой атакующего в текущем ходу (TASK). Считается ДО
+   *  установки lostCombatThisTurn: при won===true всегда false; при won===false —
+   *  true только если в этом ходу ещё не было проигрышей. Позволяет способности
+   *  реагировать на первый проигрыш хода (а не на каждый). */
+  readonly firstLossThisTurn: boolean;
 }
 
 /**

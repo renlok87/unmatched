@@ -17,8 +17,20 @@
  *                       игроку (использует тот же TurnEffect: draw/heal/
  *                       gainAction/drawToHandSize). Оценивается против исхода
  *                       боя (AfterCombatContext) — см. won-combat/lost-combat.
+ *  - 'after-defense'  — эффект ПОСЛЕ резолва боя, применяется к ЗАЩИЩАЮЩЕМУСЯ
+ *                       игроку (ctx.defenderPlayerId). Зеркало 'after-attack'
+ *                       для defender-side способностей (напр. Spider-Sense:
+ *                       «After an attacker reveals a card during combat with
+ *                       Spider-Man, you may draw a card»). Тот же TurnEffect и
+ *                       те же after-combat условия (won/lost), но цель —
+ *                       защитник. Если ctx.defenderPlayerId не задан — no-op.
  */
-export type AbilityTrigger = 'combat-passive' | 'turn-start' | 'turn-end' | 'after-attack';
+export type AbilityTrigger =
+  | 'combat-passive'
+  | 'turn-start'
+  | 'turn-end'
+  | 'after-attack'
+  | 'after-defense';
 
 /**
  * Условие срабатывания правила (декларативное, проверяется против GameState).
@@ -36,11 +48,22 @@ export type AbilityTrigger = 'combat-passive' | 'turn-start' | 'turn-end' | 'aft
  *  - 'no-enemy-in-own-zone'        — в зоне героя игрока нет вражеских бойцов
  *  - 'won-combat'                  — [after-attack] атакующий победил (ctx.won)
  *  - 'lost-combat'                 — [after-attack] атакующий НЕ победил (!ctx.won)
+ *  - 'has-not-maneuvered-this-turn'— [combat-passive] активный игрок ещё НЕ делал
+ *                                    манёвр в этом ходу (state.metadata.
+ *                                    maneuveredThisTurn falsy). Имеет смысл для
+ *                                    АТАКУЮЩЕГО (per-turn флаги — активного игрока).
+ *  - 'has-attacked-this-turn'      — [combat-passive] активный игрок уже завершил
+ *                                    хотя бы одну атаку в этом ходу (state.metadata.
+ *                                    attackedThisTurn). Имеет смысл для АТАКУЮЩЕГО.
+ *  - 'first-lost-combat-this-turn' — [after-attack] это ПЕРВЫЙ проигранный бой
+ *                                    атакующего в этом ходу (ctx.won===false &&
+ *                                    ctx.firstLossThisTurn).
  *
- * ВАЖНО: 'won-combat'/'lost-combat' имеют смысл ТОЛЬКО для триггера
- * 'after-attack' (оцениваются против AfterCombatContext). Для 'after-attack'
- * валидны лишь 'always'/'won-combat'/'lost-combat'; боевые/ходовые условия на
- * after-attack-правиле безопасно игнорируются (правило не срабатывает).
+ * ВАЖНО: 'won-combat'/'lost-combat'/'first-lost-combat-this-turn' имеют смысл
+ * ТОЛЬКО для триггера 'after-attack' (оцениваются против AfterCombatContext);
+ * 'has-not-maneuvered-this-turn'/'has-attacked-this-turn' — ТОЛЬКО для
+ * 'combat-passive' (читают per-turn флаги активного игрока). Несоответствующее
+ * триггеру условие безопасно игнорируется (правило не срабатывает).
  */
 export type AbilityCondition =
   | 'always'
@@ -51,6 +74,9 @@ export type AbilityCondition =
   | 'no-enemy-in-own-zone'
   | 'won-combat'
   | 'lost-combat'
+  | 'has-not-maneuvered-this-turn'
+  | 'has-attacked-this-turn'
+  | 'first-lost-combat-this-turn'
   | { readonly handSizeEquals: number };
 
 /**
@@ -117,7 +143,8 @@ export interface AbilityConfig {
  * fighter.heroSlug на game-init. Подтверждённые слаги:
  *  'Luke Cage'→luke-cage, 'Annie Christmas'→annie-christmas, 'Eredin'→eredin,
  *  'Bloody Mary'→bloody-mary, 'Philippa'→philippa, 'T. Rex'→t-rex,
- *  'Bigfoot'→bigfoot.
+ *  'Bigfoot'→bigfoot, 'Golden Bat'→golden-bat, 'Ancient Leshen'→ancient-leshen,
+ *  'Raphael'→raphael.
  */
 export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
   {
@@ -269,4 +296,56 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
       },
     ],
   },
+  {
+    // Golden Bat — «The First Superhero»: +2 к атаке, если в этом ходу ещё НЕ
+    // делал манёвр (state.metadata.maneuveredThisTurn falsy).
+    heroId: 'golden-bat',
+    abilityName: 'The First Superhero',
+    description:
+      'Если Golden Bat ещё не делал манёвр в этом ходу — его атаки получают +2.',
+    rules: [
+      {
+        trigger: 'combat-passive',
+        condition: 'has-not-maneuvered-this-turn',
+        effect: { kind: 'combat-modifier', appliesTo: 'attack', value: 2 },
+      },
+    ],
+  },
+  {
+    // Ancient Leshen — «Heart of the Forest»: +3 к атаке, если в этом ходу уже
+    // атаковал (state.metadata.attackedThisTurn).
+    // ПРИБЛИЖЕНИЕ: вторая часть способности — «Wolves move value 3» (стат
+    // сайдкика) — НЕ моделируется (см. notes).
+    heroId: 'ancient-leshen',
+    abilityName: 'Heart of the Forest',
+    description:
+      'Если Ancient Leshen уже атаковал в этом ходу — его атаки получают +3. ' +
+      'Примечание: «Wolves move value 3» (стат сайдкика) не моделируется.',
+    rules: [
+      {
+        trigger: 'combat-passive',
+        condition: 'has-attacked-this-turn',
+        effect: { kind: 'combat-modifier', appliesTo: 'attack', value: 3 },
+      },
+    ],
+  },
+  {
+    // Raphael — «Anger Issues»: при ПЕРВОМ проигрыше боя в каждом своём ходу
+    // получает +1 действие (ctx.won===false && ctx.firstLossThisTurn).
+    heroId: 'raphael',
+    abilityName: 'Anger Issues',
+    description:
+      'В каждый свой ход при первом проигрыше боя Raphael получает +1 действие.',
+    rules: [
+      {
+        trigger: 'after-attack',
+        condition: 'first-lost-combat-this-turn',
+        effect: { kind: 'turn-effect', gainAction: 1 },
+      },
+    ],
+  },
+  // NB: триггер 'after-defense' + AfterCombatContext.defenderPlayerId — инфра
+  // для defender-side способностей (зеркало 'after-attack'), пока без героя:
+  // реальный Spider-Man = info-reveal («оппонент раскрывает значение карты до
+  // защиты»), это COMPLEX-механика, не draw — намеренно НЕ реализован здесь.
 ];

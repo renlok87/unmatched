@@ -681,6 +681,31 @@ describe('GameStateService', () => {
       expect(restored.metadata.winnerId).toBeUndefined();
     });
 
+    it('per-turn action flags переживают serialize → deserialize', () => {
+      const withFlags: GameState = {
+        ...mockGameState,
+        metadata: {
+          ...mockGameState.metadata,
+          maneuveredThisTurn: true,
+          attackedThisTurn: true,
+          lostCombatThisTurn: true,
+        },
+      };
+
+      const restored = service.deserialize(service.serialize(withFlags));
+
+      expect(restored.metadata.maneuveredThisTurn).toBe(true);
+      expect(restored.metadata.attackedThisTurn).toBe(true);
+      expect(restored.metadata.lostCombatThisTurn).toBe(true);
+    });
+
+    it('без флагов per-turn остаются undefined (легаси-сейвы живы)', () => {
+      const restored = service.deserialize(service.serialize(mockGameState));
+      expect(restored.metadata.maneuveredThisTurn).toBeUndefined();
+      expect(restored.metadata.attackedThisTurn).toBeUndefined();
+      expect(restored.metadata.lostCombatThisTurn).toBeUndefined();
+    });
+
     it('heroSlug бойца переживает serialize → deserialize', () => {
       const withSlug: GameState = {
         ...mockGameState,

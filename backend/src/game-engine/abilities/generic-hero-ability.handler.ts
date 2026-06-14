@@ -124,25 +124,34 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
   // ===================== AFTER-ATTACK =====================
 
   /**
-   * Эффект ПОСЛЕ резолва боя для способности АТАКУЮЩЕГО героя. Проходит по
-   * 'after-attack' правилам, проверяет after-combat условие против исхода боя
-   * (ctx.won) и применяет turn-effect к атакующему игроку (ctx.playerId) теми
-   * же примитивами, что turn-start/turn-end (draw/heal/gainAction/
-   * drawToHandSize). Чистый no-op (тот же объект state), если ни одно правило
-   * не подошло.
+   * Эффект ПОСЛЕ резолва боя. Обслуживает ДВЕ симметричные стороны:
+   *  - 'after-attack'  — способность АТАКУЮЩЕГО героя; turn-effect применяется
+   *                      к атакующему игроку (ctx.playerId);
+   *  - 'after-defense' — способность ЗАЩИЩАЮЩЕГОСЯ героя (напр. Spider-Sense);
+   *                      turn-effect применяется к защитнику (ctx.defenderPlayerId).
+   * В обоих случаях after-combat условие проверяется против исхода боя
+   * (ctx.won) теми же примитивами, что turn-start/turn-end (draw/heal/
+   * gainAction/drawToHandSize). Чистый no-op (тот же объект state), если ни
+   * одно правило не подошло (в т.ч. 'after-defense' без ctx.defenderPlayerId).
    */
   async onAfterCombat(state: GameState, ctx: AfterCombatContext): Promise<GameState> {
     let current = state;
 
     for (const rule of this.rules) {
-      if (rule.trigger !== 'after-attack') continue;
+      if (rule.trigger !== 'after-attack' && rule.trigger !== 'after-defense') continue;
       if (rule.effect.kind !== 'turn-effect') continue;
 
       if (!this.evalAfterCombatCondition(rule.condition ?? 'always', ctx)) {
         continue;
       }
 
-      current = await this.applyTurnEffect(current, ctx.playerId, rule.effect as TurnEffect);
+      // Цель эффекта: атакующий для 'after-attack', защитник для 'after-defense'.
+      const targetPlayerId =
+        rule.trigger === 'after-defense' ? ctx.defenderPlayerId : ctx.playerId;
+      // 'after-defense' без известного защитника — нечего применять (no-op).
+      if (!targetPlayerId) continue;
+
+      current = await this.applyTurnEffect(current, targetPlayerId, rule.effect as TurnEffect);
     }
 
     return current;
@@ -286,6 +295,12 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
         return this.allOwnSidekicksDefeated(state, fighter.ownerId);
       case 'no-enemy-in-own-zone':
         return this.noEnemyInOwnZone(state, fighter.ownerId);
+      // Per-turn флаги активного игрока. combat-passive имеет смысл для
+      // АТАКУЮЩЕГО (флаги — текущего активного игрока, он же атакующий).
+      case 'has-not-maneuvered-this-turn':
+        return !state.metadata.maneuveredThisTurn;
+      case 'has-attacked-this-turn':
+        return !!state.metadata.attackedThisTurn;
       default:
         return false;
     }
@@ -322,9 +337,10 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
 
   /**
    * Условия after-attack правил. Оцениваются ТОЛЬКО против исхода боя:
-   *  - 'always'      → всегда
-   *  - 'won-combat'  → ctx.won === true
-   *  - 'lost-combat' → ctx.won === false
+   *  - 'always'                      → всегда
+   *  - 'won-combat'                  → ctx.won === true
+   *  - 'lost-combat'                 → ctx.won === false
+   *  - 'first-lost-combat-this-turn' → ctx.won === false && ctx.firstLossThisTurn
    * Любое иное условие (боевое/ходовое/{handSizeEquals}) для after-attack не
    * валидно и безопасно игнорируется (правило не срабатывает).
    */
@@ -344,6 +360,8 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
         return ctx.won === true;
       case 'lost-combat':
         return ctx.won === false;
+      case 'first-lost-combat-this-turn':
+        return ctx.won === false && ctx.firstLossThisTurn === true;
       // combat-only / turn-only условия вне after-attack контекста → no-op
       default:
         return false;

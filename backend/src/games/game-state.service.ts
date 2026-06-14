@@ -68,6 +68,11 @@ export interface SerializedGameState {
     wi?: string; // winnerId
     tsp?: Record<string, { x: number; y: number }>; // turnStartPositions (MOVED_THIS_TURN)
     pe?: readonly unknown[]; // pendingEffects — выборы игрока (C2)
+    // Per-turn флаги действий (TASK): сбрасываются в advanceTurn, читаются
+    // combat-условиями способностей. Раньше отсутствовали — round-trip обязателен.
+    mt?: boolean; // maneuveredThisTurn
+    at?: boolean; // attackedThisTurn
+    lc?: boolean; // lostCombatThisTurn
   };
 }
 
@@ -356,6 +361,10 @@ export class GameStateService {
         wi: state.metadata.winnerId,
         tsp: state.metadata.turnStartPositions as Record<string, { x: number; y: number }> | undefined,
         pe: state.metadata.pendingEffects,
+        // Per-turn флаги действий (TASK)
+        mt: state.metadata.maneuveredThisTurn,
+        at: state.metadata.attackedThisTurn,
+        lc: state.metadata.lostCombatThisTurn,
       },
     };
   }
@@ -463,6 +472,10 @@ export class GameStateService {
         winnerId: data.m.wi,
         turnStartPositions: data.m.tsp,
         pendingEffects: data.m.pe,
+        // Per-turn флаги действий (TASK): undefined прозрачно проходит (легаси)
+        maneuveredThisTurn: data.m.mt,
+        attackedThisTurn: data.m.at,
+        lostCombatThisTurn: data.m.lc,
       },
     };
   }
