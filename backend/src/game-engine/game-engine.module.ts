@@ -9,6 +9,7 @@ import { AStarService } from './movement/astar.service';
 import { PathfindingCacheService } from './movement/path-cache.service';
 import { CardEffectExecutorService } from './effects/card-effect-executor.service';
 import { GameActionExecutorService } from './services/game-action-executor.service';
+import { AiDecisionService } from './services/ai-decision.service';
 import { TurnManagementService } from './services/turn-management.service';
 import { DeckManagementService } from './services/deck-management.service';
 import { GameJobsModule } from '../game/jobs';
@@ -84,6 +85,8 @@ const ArthurRegistryProvider = {
     DeckManagementService,
     // Actions
     GameActionExecutorService,
+    // AI (VS_AI решения)
+    AiDecisionService,
     // Effects
     CardEffectExecutorService,
     // Abilities
@@ -106,6 +109,7 @@ const ArthurRegistryProvider = {
     TurnManagementService,
     DeckManagementService,
     GameActionExecutorService,
+    AiDecisionService,
     CardEffectExecutorService,
     HeroAbilityRegistry,
     AStarService,

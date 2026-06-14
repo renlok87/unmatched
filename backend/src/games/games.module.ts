@@ -17,6 +17,7 @@ import { ReplayService } from './services/replay.service';
 import { ReplayCompressorService } from './services/replay-compressor.service';
 import { LeaderboardService } from './services/leaderboard.service';
 import { StatsAggregatorService } from './services/stats-aggregator.service';
+import { AiTurnService } from './services/ai-turn.service';
 
 // Processors
 import { CombatTimeoutProcessor } from './processors/combat-timeout.processor';
@@ -111,6 +112,7 @@ import { GameActionType } from './models/game-action.model';
     ReplayCompressorService,
     LeaderboardService,
     StatsAggregatorService,
+    AiTurnService,
 
     // Processors
     CombatTimeoutProcessor,

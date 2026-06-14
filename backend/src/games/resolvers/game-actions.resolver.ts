@@ -49,6 +49,7 @@ import {
   CombatResolveGuard,
 } from '../guards';
 import { GameActionExecutorService, ActionContext } from '../../game-engine/services/game-action-executor.service';
+import { AiTurnService } from '../services/ai-turn.service';
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -89,6 +90,7 @@ export class GameActionsResolver {
     private readonly combatTimeoutService: CombatTimeoutService,
     private readonly actionExecutor: GameActionExecutorService,
     private readonly gameActionService: GameActionService,
+    private readonly aiTurnService: AiTurnService,
   ) {}
 
   /**
@@ -142,7 +144,7 @@ export class GameActionsResolver {
     eventType: string,
     scheduleAutoResolve?: boolean,
   ): Promise<GameMutationResult> {
-    return this.distributedLockService.withLockOptions(
+    const mutationResult = await this.distributedLockService.withLockOptions(
       `game:${dto.gameId}`,
       async () => {
         try {
@@ -231,6 +233,15 @@ export class GameActionsResolver {
       },
       { ttl: 10000, retryCount: 1, retryDelay: 100 },
     );
+
+    // VS_AI: после хода человека дать боту отыграть свои действия (fire-and-forget;
+    // realtime-апдейты доходят через подписку). No-op для не-VS_AI и когда боту
+    // нечего делать.
+    void this.aiTurnService
+      .maybeRunAiTurns(dto.gameId)
+      .catch((e) => this.logger.warn(`AI turn error (${dto.gameId}): ${e}`));
+
+    return mutationResult;
   }
 
   // ============================================

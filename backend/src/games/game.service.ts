@@ -29,6 +29,8 @@ export class GameService {
   private readonly GAME_CACHE_PREFIX = 'game:';
   private readonly GAMES_LIST_CACHE_PREFIX = 'games:list:';
   private readonly MAX_ACTIVE_GAMES = 5; // Максимум активных игр на пользователя
+  private readonly AI_USER_EMAIL = 'ai@unmached.local'; // системный юзер-бот (VS_AI)
+  private aiUserIdCache: string | null = null;
 
   constructor(
     private prisma: PrismaService,
@@ -635,7 +637,7 @@ export class GameService {
    * Начать игру
    */
   async startGame(gameId: string, userId: string): Promise<GameResponse> {
-    const game = await this.prisma.game.findUnique({
+    let game = await this.prisma.game.findUnique({
       where: { id: gameId },
       include: {
         players: true,
@@ -654,6 +656,16 @@ export class GameService {
     // Проверяем статус
     if (game.status !== GameStatus.LOBBY) {
       throw new BadRequestException('Игру можно начать только из лобби');
+    }
+
+    // VS_AI: автодобавление бота вторым игроком (выбор героя + ready) перед стартом
+    if (game.mode === GameMode.VS_AI && !game.opponentId) {
+      await this.setupAiOpponent(gameId);
+      game = await this.prisma.game.findUnique({
+        where: { id: gameId },
+        include: { players: true },
+      });
+      if (!game) throw new NotFoundException('Игра не найдена');
     }
 
     // Проверяем наличие opponent для режимов с несколькими игроками
@@ -702,6 +714,61 @@ export class GameService {
     await this.recordLobbyAction(gameId, userId, GameActionType.GAME_STARTED, 1);
 
     return await this.getGame(gameId);
+  }
+
+  /**
+   * id системного юзера-бота (VS_AI). Кэшируется. Бот должен быть засеян
+   * (prisma/seed-ai.ts) — иначе VS_AI-игру нельзя начать.
+   */
+  private async getAiUserId(): Promise<string> {
+    if (this.aiUserIdCache) return this.aiUserIdCache;
+    const ai = await this.prisma.user.findUnique({
+      where: { email: this.AI_USER_EMAIL },
+      select: { id: true },
+    });
+    if (!ai) {
+      throw new BadRequestException(
+        `ИИ-оппонент не сидирован (${this.AI_USER_EMAIL}) — запустите prisma/seed-ai.ts`,
+      );
+    }
+    this.aiUserIdCache = ai.id;
+    return ai.id;
+  }
+
+  /**
+   * VS_AI: добавляет бота вторым игроком — opponentId + GamePlayer(seat 1) с
+   * сильнейшим героем (только из героев с картами, иначе колода пустая) и
+   * isReady=true. «Сильнейший» = максимальный health; тай-брейк среди равных
+   * по health — произвольный (первый по итерации). Идемпотентно: если бот уже
+   * игрок — ничего не делает.
+   */
+  private async setupAiOpponent(gameId: string): Promise<void> {
+    const aiUserId = await this.getAiUserId();
+
+    const existing = await this.prisma.gamePlayer.findFirst({
+      where: { gameId, userId: aiUserId },
+      select: { id: true },
+    });
+    if (existing) return;
+
+    const heroes = await this.prisma.hero.findMany({
+      where: { cards: { some: {} } },
+      select: { id: true, health: true },
+    });
+    if (heroes.length === 0) {
+      throw new BadRequestException('Нет героев с картами для ИИ-оппонента');
+    }
+    // Сильнейший по health; при равенстве — первый (тай-брейк произвольный).
+    const heroId = heroes.reduce((best, h) => ((h.health ?? 0) > (best.health ?? 0) ? h : best)).id;
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.game.update({ where: { id: gameId }, data: { opponentId: aiUserId } });
+      await tx.gamePlayer.create({
+        data: { gameId, userId: aiUserId, heroId, seatOrder: 1, isReady: true },
+      });
+    });
+
+    this.logger.log(`VS_AI: бот добавлен в игру ${gameId} (hero ${heroId})`);
   }
 
   /**

@@ -14,6 +14,7 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { seedAiUser } from './seed-ai';
 
 const prisma = new PrismaClient();
 
@@ -323,6 +324,13 @@ async function main() {
     } catch (error) {
       console.error(`❌ Ошибка при создании ${userData.email}:`, error);
     }
+  }
+
+  // Системный AI-юзер для режима VS_AI (идемпотентный upsert).
+  try {
+    await seedAiUser();
+  } catch (error) {
+    console.error('❌ Ошибка при создании AI-юзера:', error);
   }
 
   console.log('\n🦸 Создание героев...');
