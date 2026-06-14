@@ -114,6 +114,14 @@ export interface GameStateMetadata {
   readonly attackedThisTurn?: boolean;
   /** Игрок проиграл хотя бы один бой в этом ходу (executeResolveCombat, won===false) */
   readonly lostCombatThisTurn?: boolean;
+  /**
+   * STANCE-подсистема: текущая стойка героя КАЖДОГО игрока (id стойки из
+   * AbilityConfig.stances), ключ — userId. Меняется мутацией setStance
+   * (выбор при размещении / «Change size»-карты) и авто-эффектами способностей
+   * (set-stance/cycle-stance). Легаси-сейвы без поля → undefined: handler
+   * фолбэчит на стойку с default:true (или первую в config.stances).
+   */
+  readonly heroStances?: Readonly<Record<string, string>>;
 }
 
 /**

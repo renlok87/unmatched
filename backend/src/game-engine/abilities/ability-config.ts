@@ -295,6 +295,38 @@ export interface TurnDamageEffect {
 }
 
 /**
+ * Эффект «сменить стойку» (set-stance, STANCE-подсистема): авто-смена текущей
+ * стойки ДЕЙСТВУЮЩЕГО героя (metadata.heroStances[playerId]).
+ *
+ *  - to: '<id>'   — поставить стойку с этим id (должна существовать в
+ *                   config.stances);
+ *  - to: 'toggle' — для 2-стоечных героев перейти в ДРУГУЮ стойку
+ *                   (альтернация). При >2 стойках 'toggle' эквивалентен 'next'
+ *                   (следующая по порядку с переносом).
+ *
+ * Используется с триггерами after-attack/after-defense (Muhammad Ali —
+ * «After you attack, if you won the combat, change stances» — флип gated
+ * условием won-combat) и turn-start/turn-end. Эффект применяется к стойке
+ * героя ctx.playerId (для after-*) либо playerId (для turn-*).
+ */
+export interface SetStanceEffect {
+  readonly kind: 'set-stance';
+  /** id целевой стойки ИЛИ 'toggle' (другая стойка для 2-стоечных героев) */
+  readonly to: string | 'toggle';
+}
+
+/**
+ * Эффект «следующая стойка по циклу» (cycle-stance, STANCE-подсистема):
+ * продвигает стойку героя на СЛЕДУЮЩУЮ в порядке config.stances с переносом
+ * (wrap на первую после последней). Для будущего Moon Knight (3-стоечный
+ * авто-цикл MoonKnight→Khonshu→MrKnight в конце хода). Применяется к стойке
+ * действующего игрока; обычно с триггером turn-end.
+ */
+export interface CycleStanceEffect {
+  readonly kind: 'cycle-stance';
+}
+
+/**
  * Эффект правила — дискриминируется по kind.
  */
 export type AbilityEffect =
@@ -305,7 +337,9 @@ export type AbilityEffect =
   | PendingMoveEffect
   | TurnDamageEffect
   | DiscardRandomEffect
-  | ReactiveDamageEffect;
+  | ReactiveDamageEffect
+  | SetStanceEffect
+  | CycleStanceEffect;
 
 /**
  * Одно правило способности: триггер + (опц.) условие + эффект.
@@ -315,6 +349,38 @@ export interface AbilityRule {
   /** Условие; если опущено — считается 'always' */
   readonly condition?: AbilityCondition;
   readonly effect: AbilityEffect;
+  /**
+   * (Опц., STANCE) Правило АКТИВНО только когда ТЕКУЩАЯ стойка героя равна
+   * этому id (Alice: attack-бонус — только в BIG, defense-бонус — только в
+   * SMALL). Текущая стойка читается из metadata.heroStances[ownerId] с
+   * фолбэком на стойку config.stances с default:true (или первую). Если поле
+   * не задано — правило не гейтится стойкой (срабатывает как обычно).
+   */
+  readonly whenStance?: string;
+}
+
+/**
+ * Одна стойка героя (STANCE-подсистема).
+ *
+ *  - attackRange — (опц.) пассивная дальность атаки В ЭТОЙ стойке
+ *    (Muhammad Ali FLOAT: range 2; STING — поля нет → дальняя атака запрещена).
+ *    Стойковая дальность ПЕРЕОПРЕДЕЛЯЕТ базовую config.attackRange:
+ *    canAttackAtRange читает дальность ТЕКУЩЕЙ стойки, фолбэк на config.attackRange.
+ *  - combat — (опц.) фиксированный combat-modifier, активный пока стойка текущая
+ *    (альтернатива whenStance-правилу; обе формы поддержаны).
+ */
+export interface StanceConfig {
+  readonly id: string;
+  readonly label: string;
+  /** Стойка по умолчанию при размещении (если ни одна не помечена — берётся первая) */
+  readonly default?: boolean;
+  /** Пассивная дальность атаки в этой стойке (см. canAttackAtRange) */
+  readonly attackRange?: number;
+  /** Фиксированный combat-modifier, активный пока стойка текущая */
+  readonly combat?: {
+    readonly appliesTo: 'attack' | 'defense' | 'both';
+    readonly value: number;
+  };
 }
 
 /**
@@ -339,8 +405,21 @@ export interface AbilityConfig {
    * canAttackAtRange (диспетчеризуется реестром в executeAttack как additive-
    * хук: может разрешить дальнюю атаку, но НИКОГДА не запрещает обычную). Если
    * поле не задано — canAttackAtRange всегда возвращает false (хук не влияет).
+   *
+   * STANCE: если у героя есть stances со стоечным attackRange (Ali FLOAT),
+   * canAttackAtRange читает дальность ТЕКУЩЕЙ стойки, а это поле — фолбэк для
+   * стоек без собственного attackRange.
    */
   readonly attackRange?: number;
+  /**
+   * (Опц., STANCE) Стойки героя. Если задано — герой stance-aware:
+   *  - текущая стойка хранится в metadata.heroStances[ownerId] (id из stances);
+   *  - дефолт при размещении — стойка с default:true (или первая);
+   *  - правила можно гейтить по whenStance; combat/attackRange можно вынести в
+   *    StanceConfig; смену стойки делают setStance / set-stance / cycle-stance.
+   * Примеры: Alice (big/small), Muhammad Ali (float/sting).
+   */
+  readonly stances?: readonly StanceConfig[];
 }
 
 /**
@@ -755,6 +834,74 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
       {
         trigger: 'enemy-hero-left-my-zone',
         effect: { kind: 'reactive-damage', value: 1 },
+      },
+    ],
+  },
+  {
+    // Alice (Battle of Legends Vol.1) — «Big / Small» (STANCE).
+    // Печатный текст (scraped, verbatim): «When you place Alice, choose whether
+    //   she starts the game BIG or SMALL. When Alice is BIG, add 2 to the value
+    //   of her attack cards. When Alice is SMALL, add 1 to the value of her
+    //   defense cards.»
+    // BIG: +2 к значению карт атаки Alice. SMALL: +1 к значению карт защиты.
+    // Стойка — РУЧНАЯ: выбор при размещении (setStance) и «Change size»-карты
+    // (Mad as a Hatter / Drink Me / Eat Me / …) — авто-флипа НЕТ.
+    // Слаг подтверждён через slugifyHeroName('Alice') → 'alice'.
+    heroId: 'alice',
+    abilityName: 'Big / Small',
+    description:
+      'Place BIG or SMALL. BIG: +2 to the value of Alice\'s attack cards. ' +
+      'SMALL: +1 to the value of her defense cards. Toggled manually ' +
+      '(placement choice / «Change size» cards via setStance).',
+    stances: [
+      { id: 'big', label: 'Big', default: true },
+      { id: 'small', label: 'Small' },
+    ],
+    rules: [
+      {
+        trigger: 'combat-passive',
+        whenStance: 'big',
+        effect: { kind: 'combat-modifier', appliesTo: 'attack', value: 2 },
+      },
+      {
+        trigger: 'combat-passive',
+        whenStance: 'small',
+        effect: { kind: 'combat-modifier', appliesTo: 'defense', value: 1 },
+      },
+    ],
+  },
+  {
+    // Muhammad Ali (Lee vs Ali) — «Float Like a Butterfly / Sting Like a Bee»
+    // (STANCE). Печатный текст (scraped, verbatim): «Begin the game with your
+    //   stance on Float Like a Butterfly. After you attack, if you won the
+    //   combat, change stances. FLOAT LIKE A BUTTERFLY: You can attack from 2
+    //   spaces away. STING LIKE A BEE: Add +2 to your attacks.»
+    // FLOAT: пассивная дальность атаки 2 (stance.attackRange). STING: +2 к
+    // атакам (combat-modifier, whenStance sting). Старт на FLOAT (default).
+    // АВТО-ФЛИП: после атаки, ЕСЛИ выиграл бой (won-combat) — сменить стойку
+    // (set-stance toggle), переиспользуя after-attack/won-combat машинерию.
+    // Слаг подтверждён через slugifyHeroName('Muhammad Ali') → 'muhammad-ali'.
+    heroId: 'muhammad-ali',
+    abilityName: 'Float Like a Butterfly / Sting Like a Bee',
+    description:
+      'Start on FLOAT. After you attack, if you won the combat, change stances. ' +
+      'FLOAT: may attack from up to 2 spaces away. STING: +2 to attacks.',
+    stances: [
+      { id: 'float', label: 'Float Like a Butterfly', default: true, attackRange: 2 },
+      { id: 'sting', label: 'Sting Like a Bee' },
+    ],
+    rules: [
+      {
+        // STING: +2 к атаке — только пока стойка sting
+        trigger: 'combat-passive',
+        whenStance: 'sting',
+        effect: { kind: 'combat-modifier', appliesTo: 'attack', value: 2 },
+      },
+      {
+        // Авто-флип после выигранной атаки (альтернация float↔sting)
+        trigger: 'after-attack',
+        condition: 'won-combat',
+        effect: { kind: 'set-stance', to: 'toggle' },
       },
     ],
   },

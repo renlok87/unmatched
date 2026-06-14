@@ -16,6 +16,7 @@ import { DeckManagementService } from './deck-management.service';
 import { CardEffectExecutorService } from '../effects/card-effect-executor.service';
 import { HeroAbilityRegistry } from '../abilities/hero-ability-registry';
 import { GamePhase } from '../../games/dto';
+import { getActionsRemaining } from '../models';
 import type { GameState } from '../../games/game-state.service';
 import {
   ManeuverDto,
@@ -24,6 +25,7 @@ import {
   EndTurnDto,
   PassDto,
   ToggleDoorDto,
+  SetStanceDto,
 } from '../../games/dto/gameplay.dto';
 
 describe('GameActionExecutorService', () => {
@@ -271,6 +273,10 @@ describe('GameActionExecutorService', () => {
             getHeroCombatModifiers: jest
               .fn()
               .mockReturnValue({ attackModifier: 0, defenseModifier: 0 }),
+            // STANCE: список стоек героя для валидации executeSetStance.
+            // По умолчанию у player1 (ms-marvel) нет стоек → []; тесты setStance
+            // переопределяют мок под конкретного stance-героя.
+            getStances: jest.fn().mockReturnValue([]),
           },
         },
       ],
@@ -619,9 +625,16 @@ describe('GameActionExecutorService', () => {
       expect(result.success).toBe(true);
       expect(result.error).toBeUndefined();
       expect(result.gameState!.phase).toBe(GamePhase.COMBAT);
-      // gate проверил extended-range с правильной сигнатурой (slug, attackerId, targetId, range).
-      // У fighter1 нет heroSlug → fallback на heroId ('ms-marvel'), как в проде.
-      expect(registry.canAttackAtRange).toHaveBeenCalledWith('ms-marvel', 'fighter1', 'fighter2', 3);
+      // gate проверил extended-range с правильной сигнатурой (slug, attackerId,
+      // targetId, range, stance). У fighter1 нет heroSlug → fallback на heroId
+      // ('ms-marvel'); stance — undefined (нет metadata.heroStances). Как в проде.
+      expect(registry.canAttackAtRange).toHaveBeenCalledWith(
+        'ms-marvel',
+        'fighter1',
+        'fighter2',
+        3,
+        undefined,
+      );
     });
 
     it('should REJECT a far attack when no extended-range ability (canAttackAtRange=false)', async () => {
@@ -871,6 +884,118 @@ describe('GameActionExecutorService', () => {
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('No door at (5, 5)');
+    });
+  });
+
+  describe('executeSetStance (STANCE)', () => {
+    // Состояние со stance-героем у player1 (alice). Реестр-мок возвращает
+    // её стойки через getStances.
+    const aliceState = (stance?: string) =>
+      createMockGameState({
+        phase: GamePhase.ACTION_MANEUVER,
+        fighters: [
+          {
+            id: 'fighter1',
+            ownerId: 'player1',
+            heroId: 'alice',
+            heroSlug: 'alice',
+            name: 'Alice',
+            type: 'HERO' as any,
+            health: 14,
+            maxHealth: 14,
+            position: { x: 5, y: 5 },
+            effects: [],
+            hasSidekick: false,
+          },
+          {
+            id: 'fighter2',
+            ownerId: 'player2',
+            heroId: 'daredevil',
+            heroSlug: 'daredevil',
+            name: 'Daredevil',
+            type: 'HERO' as any,
+            health: 17,
+            maxHealth: 17,
+            position: { x: 6, y: 5 },
+            effects: [],
+            hasSidekick: false,
+          },
+        ],
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 2,
+          ...(stance !== undefined ? { heroStances: { player1: stance } } : {}),
+        },
+      });
+
+    const stubStances = () => {
+      const registry = (service as any).abilityRegistry as { getStances: jest.Mock };
+      registry.getStances.mockImplementation((slug: string) =>
+        slug === 'alice' ? ['big', 'small'] : [],
+      );
+    };
+
+    it('ставит metadata.heroStances[userId] и бампит seq на 1', async () => {
+      stubStances();
+      const state = aliceState('big');
+      const dto: SetStanceDto = { gameId: 'test-game-1', stanceId: 'small' };
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      const result = await service.executeSetStance(dto, context);
+
+      expect(result.success).toBe(true);
+      expect(result.gameState!.metadata.heroStances).toEqual({ player1: 'small' });
+      expect(result.gameState!.sequenceNumber).toBe(state.sequenceNumber + 1);
+      expect(result.metadata?.action).toBe('setStance');
+    });
+
+    it('НЕ тратит действие (actionsRemaining без изменений)', async () => {
+      stubStances();
+      const state = aliceState('big');
+      const dto: SetStanceDto = { gameId: 'test-game-1', stanceId: 'small' };
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      const result = await service.executeSetStance(dto, context);
+      expect(getActionsRemaining(result.gameState!)).toBe(2);
+    });
+
+    it('отклоняет неизвестную стойку', async () => {
+      stubStances();
+      const state = aliceState('big');
+      const dto: SetStanceDto = { gameId: 'test-game-1', stanceId: 'gigantic' };
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      const result = await service.executeSetStance(dto, context);
+      expect(result.success).toBe(false);
+    });
+
+    it('отклоняет, если у игрока нет stance-героя', async () => {
+      // player2 владеет daredevil — getStances('daredevil') → []
+      stubStances();
+      const state = aliceState('big');
+      const dto: SetStanceDto = { gameId: 'test-game-1', stanceId: 'big' };
+      const context: ActionContext = {
+        userId: 'player2',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      const result = await service.executeSetStance(dto, context);
+      expect(result.success).toBe(false);
     });
   });
 

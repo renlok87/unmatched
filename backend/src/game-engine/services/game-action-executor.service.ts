@@ -1031,12 +1031,16 @@ export class GameActionExecutorService {
             target.position,
           );
           const attackerSlug = attacker.heroSlug ?? attacker.heroId;
+          // STANCE: текущая стойка атакующего — для stance-aware дальности
+          // (Muhammad Ali FLOAT: range 2; STING — нет дальней атаки).
+          const attackerStance = currentState.metadata.heroStances?.[attacker.ownerId];
           if (
             this.abilityRegistry.canAttackAtRange(
               attackerSlug,
               attacker.id,
               target.id,
               range,
+              attackerStance,
             )
           ) {
             inRange = true;
@@ -1874,6 +1878,76 @@ export class GameActionExecutorService {
       };
     } catch (error) {
       this.logger.error(`Ошибка при переключении двери: ${error}`);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
+   * Сменить стойку героя (STANCE-подсистема).
+   *
+   * Мутация-аналог toggleDoor/pass, но НЕ тратит действие (выбор стойки
+   * бесплатен — размещение / начало хода / «Change size»-карты). Валидация:
+   *  - у вызвавшего игрока есть HERO-боец (его герой);
+   *  - этот герой stance-aware (registry.getStances непустой);
+   *  - dto.stanceId существует среди стоек героя.
+   * Эффект: metadata.heroStances[userId] = stanceId, seq +1, no-op для действий.
+   */
+  async executeSetStance(
+    dto: { gameId: string; stanceId: string },
+    context: ActionContext,
+  ): Promise<ActionResult> {
+    try {
+      const { userId, currentState } = context;
+
+      // HERO-боец вызвавшего (его герой) — источник слага для реестра стоек.
+      const hero = currentState.fighters.find(
+        (f) => f.ownerId === userId && f.type === FighterType.HERO,
+      );
+      if (!hero) {
+        return { success: false, error: 'У игрока нет героя на доске' };
+      }
+
+      const slug = hero.heroSlug ?? hero.heroId;
+      const stanceIds = this.abilityRegistry.getStances(slug);
+      if (stanceIds.length === 0) {
+        return { success: false, error: 'У этого героя нет стоек' };
+      }
+      if (!stanceIds.includes(dto.stanceId)) {
+        return {
+          success: false,
+          error: `Неизвестная стойка «${dto.stanceId}» (доступны: ${stanceIds.join(', ')})`,
+        };
+      }
+
+      const newState: GameState = {
+        ...currentState,
+        sequenceNumber: currentState.sequenceNumber + 1,
+        metadata: {
+          ...currentState.metadata,
+          lastActionAt: new Date(),
+          lastActionBy: userId,
+          heroStances: {
+            ...(currentState.metadata.heroStances ?? {}),
+            [userId]: dto.stanceId,
+          },
+        },
+      };
+
+      return {
+        success: true,
+        gameState: newState,
+        metadata: {
+          action: 'setStance',
+          performedAt: new Date(),
+          performedBy: userId,
+          sequenceNumber: newState.sequenceNumber,
+        },
+      };
+    } catch (error) {
+      this.logger.error(`Ошибка при смене стойки: ${error}`);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',

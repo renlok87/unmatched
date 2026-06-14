@@ -207,9 +207,25 @@ export interface ExtendedHeroAbilityHandler {
   ): Promise<GameState>;
 
   /**
-   * Проверяет, может ли боец атаковать на определённой дистанции
+   * Проверяет, может ли боец атаковать на определённой дистанции.
+   *
+   * STANCE: опциональный 4-й параметр stance — id ТЕКУЩЕЙ стойки атакующего
+   * (для stance-aware дальности, напр. Muhammad Ali FLOAT). Аддитивно и
+   * обратносовместимо: существующие handler'ы игнорируют параметр, существующие
+   * вызовы с 3 аргументами работают как раньше.
    */
-  canAttackAtRange?(attackerId: string, defenderId: string, range: number): boolean;
+  canAttackAtRange?(
+    attackerId: string,
+    defenderId: string,
+    range: number,
+    stance?: string,
+  ): boolean;
+
+  /**
+   * STANCE: список id стоек героя (для валидации setStance). Возвращает []
+   * для не-stance героев.
+   */
+  getStanceIds?(): readonly string[];
 
   /**
    * Получить модификаторы боя
@@ -423,17 +439,41 @@ export class HeroAbilityRegistry {
    * Проверить, может ли герой атаковать на определённой дистанции
    * Использует расширенные обработчики
    */
-  canAttackAtRange(heroId: string, attackerId: string, defenderId: string, range: number): boolean {
+  canAttackAtRange(
+    heroId: string,
+    attackerId: string,
+    defenderId: string,
+    range: number,
+    stance?: string,
+  ): boolean {
     const handler = this.getExtended(heroId);
     if (!handler?.canAttackAtRange) {
       return false;
     }
 
     try {
-      return handler.canAttackAtRange(attackerId, defenderId, range);
+      return handler.canAttackAtRange(attackerId, defenderId, range, stance);
     } catch (error) {
       this.logger.error(`Error in canAttackAtRange for hero ${heroId}:`, error);
       return false;
+    }
+  }
+
+  /**
+   * STANCE: список id стоек героя (для валидации setStance в executor'е).
+   * Lookup через getExtended; getStanceIds, если есть. Отсутствие хука/ошибка —
+   * пустой массив. heroId — слаг героя.
+   */
+  getStances(heroId: string): readonly string[] {
+    const handler = this.getExtended(heroId);
+    if (!handler?.getStanceIds) {
+      return [];
+    }
+    try {
+      return handler.getStanceIds();
+    } catch (error) {
+      this.logger.error(`Error in getStanceIds for hero ${heroId}:`, error);
+      return [];
     }
   }
 

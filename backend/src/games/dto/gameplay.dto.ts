@@ -328,6 +328,25 @@ export class ToggleDoorDto {
   y: number;
 }
 
+/**
+ * DTO для смены стойки героя (STANCE-подсистема).
+ * userId извлекается из JWT (GqlAuthGuard). НЕ тратит действие (выбор стойки
+ * бесплатен: размещение / начало хода / «Change size»-карты).
+ */
+@InputType()
+export class SetStanceDto {
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
+  gameId: string;
+
+  /** id целевой стойки (из AbilityConfig.stances, напр. 'big'/'small'/'float'/'sting') */
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
+  stanceId: string;
+}
+
 // ============================================
 // Output DTOs
 // ============================================

@@ -73,6 +73,7 @@ export interface SerializedGameState {
     mt?: boolean; // maneuveredThisTurn
     at?: boolean; // attackedThisTurn
     lc?: boolean; // lostCombatThisTurn
+    hs?: Record<string, string>; // heroStances — текущая стойка героя по userId (STANCE)
   };
 }
 
@@ -365,6 +366,8 @@ export class GameStateService {
         mt: state.metadata.maneuveredThisTurn,
         at: state.metadata.attackedThisTurn,
         lc: state.metadata.lostCombatThisTurn,
+        // STANCE: текущие стойки героев по userId (легаси-сейвы без поля → undefined)
+        hs: state.metadata.heroStances as Record<string, string> | undefined,
       },
     };
   }
@@ -476,6 +479,8 @@ export class GameStateService {
         maneuveredThisTurn: data.m.mt,
         attackedThisTurn: data.m.at,
         lostCombatThisTurn: data.m.lc,
+        // STANCE: текущие стойки героев (undefined прозрачно проходит — легаси)
+        heroStances: data.m.hs,
       },
     };
   }

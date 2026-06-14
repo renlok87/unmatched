@@ -720,5 +720,27 @@ describe('GameStateService', () => {
       // без поля — undefined прозрачно проходит (легаси)
       expect(restored.fighters[1].heroSlug).toBeUndefined();
     });
+
+    it('heroStances переживают serialize → deserialize (STANCE)', () => {
+      const withStances: GameState = {
+        ...mockGameState,
+        metadata: {
+          ...mockGameState.metadata,
+          heroStances: { player1: 'sting', player2: 'big' },
+        },
+      };
+
+      const restored = service.deserialize(service.serialize(withStances));
+
+      expect(restored.metadata.heroStances).toEqual({
+        player1: 'sting',
+        player2: 'big',
+      });
+    });
+
+    it('без heroStances остаётся undefined (легаси-сейвы живы)', () => {
+      const restored = service.deserialize(service.serialize(mockGameState));
+      expect(restored.metadata.heroStances).toBeUndefined();
+    });
   });
 });

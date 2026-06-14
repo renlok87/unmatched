@@ -1784,4 +1784,314 @@ describe('GenericHeroAbilityHandler', () => {
       expect(next).toBe(state);
     });
   });
+
+  // ===================== STANCE SUBSYSTEM =====================
+  // Alice (manual toggle, stance-gated combat-modifier) + Muhammad Ali
+  // (auto-flip after-attack on won-combat, stance-gated attackRange + modifier).
+
+  describe('STANCE — stance-gated combat-modifier (Alice)', () => {
+    const aliceConfig: AbilityConfig = {
+      heroId: 'alice',
+      abilityName: 'Big / Small',
+      description: 'BIG +2 attack, SMALL +1 defense (manual toggle)',
+      stances: [
+        { id: 'big', label: 'Big', default: true },
+        { id: 'small', label: 'Small' },
+      ],
+      rules: [
+        {
+          trigger: 'combat-passive',
+          whenStance: 'big',
+          effect: { kind: 'combat-modifier', appliesTo: 'attack', value: 2 },
+        },
+        {
+          trigger: 'combat-passive',
+          whenStance: 'small',
+          effect: { kind: 'combat-modifier', appliesTo: 'defense', value: 1 },
+        },
+      ],
+    };
+
+    const combat: CombatState = {
+      attackerId: 'hero-fighter-1',
+      defenderId: 'enemy-fighter-1',
+    };
+
+    function aliceFighter(overrides?: Partial<Fighter>): Fighter {
+      return heroFighter({ heroSlug: 'alice', ...overrides });
+    }
+
+    function aliceState(stance: string | undefined): GameState {
+      return makeState({
+        fighters: [aliceFighter(), enemyFighter()],
+        metadata: {
+          ...makeState().metadata,
+          ...(stance !== undefined ? { heroStances: { player1: stance } } : {}),
+        },
+      });
+    }
+
+    it('BIG: +2 к атаке когда текущая стойка big', () => {
+      const handler = new GenericHeroAbilityHandler(aliceConfig, makeDeps());
+      const state = aliceState('big');
+      const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, attacker, 'attacker');
+
+      expect(mods).toHaveLength(1);
+      expect(mods[0]).toMatchObject({ type: ValueModifierType.ADD, value: 2, ownerId: 'player1' });
+    });
+
+    it('BIG: no-op на стороне защиты (whenStance=big, defense rule пуст)', () => {
+      const handler = new GenericHeroAbilityHandler(aliceConfig, makeDeps());
+      const state = aliceState('big');
+      const defender = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, defender, 'defender');
+      expect(mods).toHaveLength(0);
+    });
+
+    it('SMALL: +1 к защите когда текущая стойка small (атака no-op)', () => {
+      const handler = new GenericHeroAbilityHandler(aliceConfig, makeDeps());
+      const state = aliceState('small');
+      const fighter = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const atk = handler.getStatefulCombatModifiers(state, combat, fighter, 'attacker');
+      expect(atk).toHaveLength(0);
+
+      const def = handler.getStatefulCombatModifiers(state, combat, fighter, 'defender');
+      expect(def).toHaveLength(1);
+      expect(def[0]).toMatchObject({ type: ValueModifierType.ADD, value: 1, ownerId: 'player1' });
+    });
+
+    it('дефолт-стойка (нет heroStances) = default:true → big (+2 атака)', () => {
+      const handler = new GenericHeroAbilityHandler(aliceConfig, makeDeps());
+      const state = aliceState(undefined); // нет metadata.heroStances
+      const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, attacker, 'attacker');
+      expect(mods).toHaveLength(1);
+      expect(mods[0]).toMatchObject({ value: 2 });
+    });
+
+    it('whenStance гейтит правило: small-rule не срабатывает в big', () => {
+      const handler = new GenericHeroAbilityHandler(aliceConfig, makeDeps());
+      const state = aliceState('big');
+      const fighter = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      // в big только attack-правило активно; defense-правило (whenStance small) — нет
+      const def = handler.getStatefulCombatModifiers(state, combat, fighter, 'defender');
+      expect(def).toHaveLength(0);
+    });
+  });
+
+  describe('STANCE — canAttackAtRange per stance (Muhammad Ali FLOAT/STING)', () => {
+    const aliConfig: AbilityConfig = {
+      heroId: 'muhammad-ali',
+      abilityName: 'Float / Sting',
+      description: 'FLOAT range 2, STING +2 attack',
+      stances: [
+        { id: 'float', label: 'Float Like a Butterfly', default: true, attackRange: 2 },
+        { id: 'sting', label: 'Sting Like a Bee' },
+      ],
+      rules: [
+        {
+          trigger: 'combat-passive',
+          whenStance: 'sting',
+          effect: { kind: 'combat-modifier', appliesTo: 'attack', value: 2 },
+        },
+        {
+          trigger: 'after-attack',
+          condition: 'won-combat',
+          effect: { kind: 'set-stance', to: 'toggle' },
+        },
+      ],
+    };
+
+    it('FLOAT (default, нет heroStances): range<=2 разрешён, 3 — нет', () => {
+      const handler = new GenericHeroAbilityHandler(aliConfig, makeDeps());
+      // stance не передан → default float → attackRange 2
+      expect(handler.canAttackAtRange('a', 'd', 1)).toBe(true);
+      expect(handler.canAttackAtRange('a', 'd', 2)).toBe(true);
+      expect(handler.canAttackAtRange('a', 'd', 3)).toBe(false);
+    });
+
+    it('FLOAT (явная стойка): range<=2 разрешён', () => {
+      const handler = new GenericHeroAbilityHandler(aliConfig, makeDeps());
+      expect(handler.canAttackAtRange('a', 'd', 2, 'float')).toBe(true);
+    });
+
+    it('STING: дальняя атака запрещена (range 2 → false), range 1 ок', () => {
+      const handler = new GenericHeroAbilityHandler(aliConfig, makeDeps());
+      // sting не имеет attackRange и config.attackRange не задан → дальняя false
+      expect(handler.canAttackAtRange('a', 'd', 2, 'sting')).toBe(false);
+      expect(handler.canAttackAtRange('a', 'd', 1, 'sting')).toBe(false);
+    });
+
+    it('STING: +2 к атаке через getStatefulCombatModifiers', () => {
+      const handler = new GenericHeroAbilityHandler(aliConfig, makeDeps());
+      const state = makeState({
+        fighters: [heroFighter({ heroSlug: 'muhammad-ali' }), enemyFighter()],
+        metadata: { ...makeState().metadata, heroStances: { player1: 'sting' } },
+      });
+      const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+      const combat: CombatState = { attackerId: 'hero-fighter-1', defenderId: 'enemy-fighter-1' };
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, attacker, 'attacker');
+      expect(mods).toHaveLength(1);
+      expect(mods[0]).toMatchObject({ value: 2 });
+    });
+
+    it('FLOAT: НЕ даёт +2 к атаке (combat-modifier только в sting)', () => {
+      const handler = new GenericHeroAbilityHandler(aliConfig, makeDeps());
+      const state = makeState({
+        fighters: [heroFighter({ heroSlug: 'muhammad-ali' }), enemyFighter()],
+        metadata: { ...makeState().metadata, heroStances: { player1: 'float' } },
+      });
+      const attacker = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+      const combat: CombatState = { attackerId: 'hero-fighter-1', defenderId: 'enemy-fighter-1' };
+
+      const mods = handler.getStatefulCombatModifiers(state, combat, attacker, 'attacker');
+      expect(mods).toHaveLength(0);
+    });
+  });
+
+  describe('STANCE — set-stance auto-flip on after-attack won-combat (Ali)', () => {
+    const aliConfig: AbilityConfig = {
+      heroId: 'muhammad-ali',
+      abilityName: 'Float / Sting',
+      description: 'flip on won',
+      stances: [
+        { id: 'float', label: 'Float', default: true, attackRange: 2 },
+        { id: 'sting', label: 'Sting' },
+      ],
+      rules: [
+        {
+          trigger: 'after-attack',
+          condition: 'won-combat',
+          effect: { kind: 'set-stance', to: 'toggle' },
+        },
+      ],
+    };
+
+    function aliState(stance?: string): GameState {
+      return makeState({
+        fighters: [heroFighter({ heroSlug: 'muhammad-ali' }), enemyFighter()],
+        metadata: {
+          ...makeState().metadata,
+          ...(stance !== undefined ? { heroStances: { player1: stance } } : {}),
+        },
+      });
+    }
+
+    const ctx: AfterCombatContext = {
+      playerId: 'player1',
+      defenderPlayerId: 'player2',
+      attackerFighterId: 'hero-fighter-1',
+      defenderFighterId: 'enemy-fighter-1',
+      won: true,
+      damageDealt: 3,
+      firstLossThisTurn: false,
+    };
+
+    it('won-combat: float → sting (toggle)', async () => {
+      const handler = new GenericHeroAbilityHandler(aliConfig, makeDeps());
+      const state = aliState('float');
+
+      const next = await handler.onAfterCombat(state, ctx);
+      expect(next.metadata.heroStances?.player1).toBe('sting');
+    });
+
+    it('won-combat из дефолта (нет heroStances): default float → sting', async () => {
+      const handler = new GenericHeroAbilityHandler(aliConfig, makeDeps());
+      const state = aliState(undefined);
+
+      const next = await handler.onAfterCombat(state, ctx);
+      expect(next.metadata.heroStances?.player1).toBe('sting');
+    });
+
+    it('won-combat: sting → float (toggle обратно)', async () => {
+      const handler = new GenericHeroAbilityHandler(aliConfig, makeDeps());
+      const state = aliState('sting');
+
+      const next = await handler.onAfterCombat(state, ctx);
+      expect(next.metadata.heroStances?.player1).toBe('float');
+    });
+
+    it('lost-combat: НЕ флипает (condition won-combat не выполнено)', async () => {
+      const handler = new GenericHeroAbilityHandler(aliConfig, makeDeps());
+      const state = aliState('float');
+
+      const next = await handler.onAfterCombat(state, { ...ctx, won: false });
+      // no-op: стойка не меняется (heroStances не появляется / остаётся float)
+      expect(next.metadata.heroStances?.player1 ?? 'float').toBe('float');
+    });
+  });
+
+  describe('STANCE — set-stance to: explicit id + cycle-stance', () => {
+    function makeStanceState(heroId: string, stance?: string): GameState {
+      return makeState({
+        fighters: [heroFighter({ heroSlug: heroId }), enemyFighter()],
+        metadata: {
+          ...makeState().metadata,
+          ...(stance !== undefined ? { heroStances: { player1: stance } } : {}),
+        },
+      });
+    }
+
+    it('set-stance to: явный id ставит именно его', async () => {
+      const config: AbilityConfig = {
+        heroId: 'x',
+        abilityName: 'X',
+        description: '',
+        stances: [
+          { id: 'a', label: 'A', default: true },
+          { id: 'b', label: 'B' },
+        ],
+        rules: [
+          {
+            trigger: 'after-attack',
+            condition: 'always',
+            effect: { kind: 'set-stance', to: 'b' },
+          },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const ctx: AfterCombatContext = {
+        playerId: 'player1',
+        defenderPlayerId: 'player2',
+        attackerFighterId: 'hero-fighter-1',
+        defenderFighterId: 'enemy-fighter-1',
+        won: false,
+        damageDealt: 0,
+        firstLossThisTurn: false,
+      };
+
+      const next = await handler.onAfterCombat(makeStanceState('x', 'a'), ctx);
+      expect(next.metadata.heroStances?.player1).toBe('b');
+    });
+
+    it('cycle-stance в onTurnEnd: 3-стойковый цикл с переносом (wrap)', async () => {
+      const config: AbilityConfig = {
+        heroId: 'moon-knight',
+        abilityName: 'Identities',
+        description: '',
+        stances: [
+          { id: 's1', label: 'S1', default: true },
+          { id: 's2', label: 'S2' },
+          { id: 's3', label: 'S3' },
+        ],
+        rules: [
+          { trigger: 'turn-end', condition: 'always', effect: { kind: 'cycle-stance' } },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+
+      const afterS1 = await handler.onTurnEnd(makeStanceState('moon-knight', 's1'), 'player1');
+      expect(afterS1.metadata.heroStances?.player1).toBe('s2');
+
+      const afterS3 = await handler.onTurnEnd(makeStanceState('moon-knight', 's3'), 'player1');
+      expect(afterS3.metadata.heroStances?.player1).toBe('s1'); // wrap
+    });
+  });
 });

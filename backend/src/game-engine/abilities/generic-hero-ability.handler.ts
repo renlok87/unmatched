@@ -29,9 +29,12 @@ import {
   AuraCombatModifierEffect,
   CombatModifierEffect,
   CombatModifierPerCountEffect,
+  CycleStanceEffect,
   DiscardRandomEffect,
   PendingMoveEffect,
   ReactiveDamageEffect,
+  SetStanceEffect,
+  StanceConfig,
   TurnDamageEffect,
   TurnEffect,
 } from './ability-config';
@@ -70,6 +73,8 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
   readonly abilityDescription: string;
 
   private readonly rules: readonly AbilityRule[];
+  /** Стойки героя (STANCE); пусто, если герой не stance-aware. */
+  private readonly stances: readonly StanceConfig[];
 
   constructor(
     private readonly config: AbilityConfig,
@@ -79,6 +84,91 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     this.abilityName = config.abilityName;
     this.abilityDescription = config.description;
     this.rules = config.rules;
+    this.stances = config.stances ?? [];
+  }
+
+  // ===================== STANCE (общее) =====================
+
+  /** Список id стоек героя (для валидации setStance в executor'е). Пусто, если
+   *  герой не stance-aware. */
+  getStanceIds(): readonly string[] {
+    return this.stances.map((s) => s.id);
+  }
+
+  /** Стойка по умолчанию: помеченная default:true, иначе первая. undefined для
+   *  не-stance героев. */
+  private defaultStanceId(): string | undefined {
+    if (this.stances.length === 0) return undefined;
+    return (this.stances.find((s) => s.default) ?? this.stances[0]).id;
+  }
+
+  /** Текущая стойка героя владельца: metadata.heroStances[ownerId] с фолбэком на
+   *  дефолтную. undefined для не-stance героев или неизвестного владельца. */
+  private currentStanceId(state: GameState, ownerId: string): string | undefined {
+    const explicit = state.metadata.heroStances?.[ownerId];
+    if (explicit !== undefined) return explicit;
+    return this.defaultStanceId();
+  }
+
+  /** StanceConfig текущей стойки владельца (или undefined). */
+  private currentStance(state: GameState, ownerId: string): StanceConfig | undefined {
+    const id = this.currentStanceId(state, ownerId);
+    return id !== undefined ? this.stances.find((s) => s.id === id) : undefined;
+  }
+
+  /**
+   * Иммутабельно ставит стойку героя игрока в metadata.heroStances[playerId].
+   * Поддерживает явный id и 'toggle' (другая стойка для 2-стоечных; при >2 —
+   * следующая по циклу). Неизвестный id / отсутствие стоек → no-op (тот же state).
+   */
+  private setStanceForPlayer(state: GameState, playerId: string, to: string): GameState {
+    if (this.stances.length === 0) return state;
+
+    let targetId: string | undefined;
+    if (to === 'toggle') {
+      const cur = this.currentStanceId(state, playerId);
+      const idx = this.stances.findIndex((s) => s.id === cur);
+      const base = idx >= 0 ? idx : 0;
+      targetId = this.stances[(base + 1) % this.stances.length].id;
+    } else {
+      targetId = this.stances.find((s) => s.id === to)?.id;
+    }
+    if (targetId === undefined) return state; // неизвестная стойка → no-op
+
+    return {
+      ...state,
+      metadata: {
+        ...state.metadata,
+        heroStances: {
+          ...(state.metadata.heroStances ?? {}),
+          [playerId]: targetId,
+        },
+      },
+    };
+  }
+
+  /** Продвинуть стойку героя игрока на следующую по циклу (wrap). No-op для
+   *  не-stance героев. */
+  private cycleStanceForPlayer(state: GameState, playerId: string): GameState {
+    if (this.stances.length === 0) return state;
+    const cur = this.currentStanceId(state, playerId);
+    const idx = this.stances.findIndex((s) => s.id === cur);
+    const base = idx >= 0 ? idx : 0;
+    const nextId = this.stances[(base + 1) % this.stances.length].id;
+    return {
+      ...state,
+      metadata: {
+        ...state.metadata,
+        heroStances: { ...(state.metadata.heroStances ?? {}), [playerId]: nextId },
+      },
+    };
+  }
+
+  /** Правило АКТИВНО по стойке: либо whenStance не задан, либо равен текущей
+   *  стойке владельца. */
+  private stanceRuleActive(rule: AbilityRule, state: GameState, ownerId: string): boolean {
+    if (rule.whenStance === undefined) return true;
+    return this.currentStanceId(state, ownerId) === rule.whenStance;
   }
 
   // ===================== COMBAT (stateful) =====================
@@ -97,8 +187,23 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
   ): readonly ValueModifier[] {
     const modifiers: ValueModifier[] = [];
 
+    // STANCE: combat-modifier текущей стойки (StanceConfig.combat) — выдаётся
+    // независимо от правил, пока стойка текущая. Сторона гейтится appliesTo.
+    const stance = this.currentStance(state, fighter.ownerId);
+    if (stance?.combat && this.sideMatchesRole(stance.combat.appliesTo, role)) {
+      modifiers.push({
+        type: ValueModifierType.ADD,
+        value: stance.combat.value,
+        source: `hero-ability:${this.heroId}:${this.abilityName}:stance:${stance.id}`,
+        ownerId: fighter.ownerId,
+        timestamp: Date.now(),
+      });
+    }
+
     for (const rule of this.rules) {
       if (rule.trigger !== 'combat-passive') continue;
+      // STANCE: правило с whenStance активно только в своей стойке.
+      if (!this.stanceRuleActive(rule, state, fighter.ownerId)) continue;
 
       // --- Статический combat-modifier (фиксированное value) ---
       if (rule.effect.kind === 'combat-modifier') {
@@ -286,7 +391,13 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
 
     for (const rule of this.rules) {
       if (rule.trigger !== 'after-attack' && rule.trigger !== 'after-defense') continue;
-      if (rule.effect.kind !== 'turn-effect' && rule.effect.kind !== 'pending-move') continue;
+      if (
+        rule.effect.kind !== 'turn-effect' &&
+        rule.effect.kind !== 'pending-move' &&
+        rule.effect.kind !== 'set-stance'
+      ) {
+        continue;
+      }
 
       if (!this.evalAfterCombatCondition(rule.condition ?? 'always', ctx, current)) {
         continue;
@@ -298,8 +409,21 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       // 'after-defense' без известного защитника — нечего применять (no-op).
       if (!targetPlayerId) continue;
 
+      // STANCE: правило с whenStance активно только в своей стойке цели.
+      if (!this.stanceRuleActive(rule, current, targetPlayerId)) continue;
+
       if (rule.effect.kind === 'pending-move') {
         current = this.applyPendingMove(current, targetPlayerId, rule.effect, ctx);
+        continue;
+      }
+
+      if (rule.effect.kind === 'set-stance') {
+        // Авто-флип/смена стойки (Muhammad Ali: флип после выигранной атаки).
+        current = this.setStanceForPlayer(
+          current,
+          targetPlayerId,
+          (rule.effect as SetStanceEffect).to,
+        );
         continue;
       }
 
@@ -499,9 +623,26 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
    * attackerId/defenderId не используются (дальность — пассивное свойство
    * героя, не зависит от конкретной пары бойцов), но входят в сигнатуру
    * ExtendedHeroAbilityHandler.canAttackAtRange.
+   *
+   * STANCE: опциональный 4-й параметр stance — id ТЕКУЩЕЙ стойки атакующего
+   * (executor резолвит его из metadata.heroStances). Если у стойки задан
+   * attackRange (Ali FLOAT: 2) — используем ЕГО (стойка переопределяет базу);
+   * иначе фолбэк на config.attackRange. Если stance не передан (легаси-вызовы
+   * с 3 аргументами) — берётся дефолтная стойка героя (или config.attackRange
+   * для не-stance героев). У стойки без attackRange (Ali STING) дальняя атака
+   * запрещена, ЕСЛИ нет базового config.attackRange.
    */
-  canAttackAtRange(_attackerId: string, _defenderId: string, range: number): boolean {
-    return this.config.attackRange != null && range <= this.config.attackRange;
+  canAttackAtRange(
+    _attackerId: string,
+    _defenderId: string,
+    range: number,
+    stance?: string,
+  ): boolean {
+    const stanceId = stance ?? this.defaultStanceId();
+    const stanceCfg =
+      stanceId !== undefined ? this.stances.find((s) => s.id === stanceId) : undefined;
+    const effectiveRange = stanceCfg?.attackRange ?? this.config.attackRange;
+    return effectiveRange != null && range <= effectiveRange;
   }
 
   // ===================== ВНУТРЕННЕЕ =====================
@@ -523,7 +664,9 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       if (
         rule.effect.kind !== 'turn-effect' &&
         rule.effect.kind !== 'pending-move' &&
-        rule.effect.kind !== 'turn-damage'
+        rule.effect.kind !== 'turn-damage' &&
+        rule.effect.kind !== 'set-stance' &&
+        rule.effect.kind !== 'cycle-stance'
       ) {
         continue;
       }
@@ -531,6 +674,9 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       if (!this.evalTurnCondition(rule.condition ?? 'always', current, playerId)) {
         continue;
       }
+
+      // STANCE: правило с whenStance активно только в своей стойке.
+      if (!this.stanceRuleActive(rule, current, playerId)) continue;
 
       if (rule.effect.kind === 'pending-move') {
         // turn-контекст не несёт боя → target 'attacker' здесь невалиден (no-op).
@@ -540,6 +686,19 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
 
       if (rule.effect.kind === 'turn-damage') {
         current = await this.applyTurnDamage(current, playerId, rule.effect);
+        continue;
+      }
+
+      if (rule.effect.kind === 'set-stance') {
+        current = this.setStanceForPlayer(current, playerId, (rule.effect as SetStanceEffect).to);
+        continue;
+      }
+
+      if (rule.effect.kind === 'cycle-stance') {
+        // Авто-цикл стоек (будущий Moon Knight: 3-стоечный цикл в конце хода).
+        const _cycle = rule.effect as CycleStanceEffect;
+        void _cycle;
+        current = this.cycleStanceForPlayer(current, playerId);
         continue;
       }
 

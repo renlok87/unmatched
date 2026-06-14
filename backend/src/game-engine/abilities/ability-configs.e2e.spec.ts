@@ -259,7 +259,8 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
   afterEach(() => jest.clearAllMocks());
 
   // ====================================================================
-  // САНИТИ: все 24 конфига реально зарегистрированы под своими слагами
+  // САНИТИ: все 26 конфигов реально зарегистрированы под своими слагами
+  // (24 базовых + 2 STANCE-героя: alice, muhammad-ali)
   // ====================================================================
   describe('registration', () => {
     it('каждый ABILITY_CONFIGS.heroId зарегистрирован в реестре под своим слагом', () => {
@@ -267,7 +268,161 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
         expect(registry.has(cfg.heroId)).toBe(true);
         expect(registry.getExtended(cfg.heroId)?.heroId).toBe(cfg.heroId);
       }
-      expect(ABILITY_CONFIGS).toHaveLength(24);
+      expect(ABILITY_CONFIGS).toHaveLength(26);
+    });
+  });
+
+  // ====================================================================
+  // STANCE — Alice + Muhammad Ali через РЕАЛЬНЫЙ registry + executor
+  // ====================================================================
+  describe('STANCE (real registry + executor)', () => {
+    const stanceCombatState = (
+      stances: Record<string, string> | undefined,
+      combat: { attackValue: number; defenseValue: number },
+      extra?: Partial<GameState>,
+    ): GameState =>
+      createMockGameState({
+        phase: GamePhase.COMBAT_RESOLVE,
+        currentTurnPlayerId: 'player1',
+        ...(extra ?? {}),
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 1,
+          ...(stances ? { heroStances: stances } : {}),
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId: 'fighter2',
+            attackerCardId: 'card-a',
+            defenderCardId: 'card-d',
+            attackValue: combat.attackValue,
+            defenseValue: combat.defenseValue,
+            startedAt: new Date(),
+          },
+        } as any,
+      });
+
+    it('alice BIG (attacker): +2 к атаке (whenStance big)', async () => {
+      let state = stanceCombatState({ player1: 'big' }, { attackValue: 4, defenseValue: 1 });
+      state = withHeroSlug(state, 'fighter1', 'alice');
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        ctxFor('player1', state),
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.metadata?.combatSummary?.finalAttack).toBe(6); // 4 + 2
+    });
+
+    it('alice SMALL (defender): +1 к защите (whenStance small)', async () => {
+      // Alice на ЗАЩИТНИКЕ (fighter2), стойка small → +1 защиты.
+      let state = stanceCombatState({ player2: 'small' }, { attackValue: 5, defenseValue: 1 });
+      state = withHeroSlug(state, 'fighter2', 'alice');
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        ctxFor('player1', state),
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.metadata?.combatSummary?.finalDefense).toBe(2); // 1 + 1
+    });
+
+    it('alice дефолт-стойка (нет heroStances) = big → +2 атака', async () => {
+      let state = stanceCombatState(undefined, { attackValue: 4, defenseValue: 1 });
+      state = withHeroSlug(state, 'fighter1', 'alice');
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        ctxFor('player1', state),
+      );
+
+      expect(result.metadata?.combatSummary?.finalAttack).toBe(6);
+    });
+
+    it('muhammad-ali STING (attacker): +2 к атаке', async () => {
+      let state = stanceCombatState({ player1: 'sting' }, { attackValue: 3, defenseValue: 1 });
+      state = withHeroSlug(state, 'fighter1', 'muhammad-ali');
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        ctxFor('player1', state),
+      );
+
+      expect(result.metadata?.combatSummary?.finalAttack).toBe(5); // 3 + 2
+    });
+
+    it('muhammad-ali FLOAT (default): НЕТ +2 к атаке + авто-флип float→sting при победе', async () => {
+      // FLOAT (default, нет heroStances): combat-modifier не даёт +2.
+      // Бой выигран (atk 6 > def 1) → after-attack won-combat → флип на sting.
+      let state = stanceCombatState(undefined, { attackValue: 6, defenseValue: 1 });
+      state = withHeroSlug(state, 'fighter1', 'muhammad-ali');
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        ctxFor('player1', state),
+      );
+
+      expect(result.success).toBe(true);
+      // FLOAT: атака без +2 (combat-modifier только в sting)
+      expect(result.metadata?.combatSummary?.finalAttack).toBe(6);
+      expect(result.metadata?.combatSummary?.attackerWon).toBe(true);
+      // авто-флип: стойка player1 теперь sting
+      expect(result.gameState!.metadata.heroStances?.player1).toBe('sting');
+    });
+
+    it('muhammad-ali: проигранный бой НЕ флипает стойку', async () => {
+      // atk 1 < def 5 → бой проигран → стойка остаётся float (флипа нет).
+      let state = stanceCombatState({ player1: 'float' }, { attackValue: 1, defenseValue: 5 });
+      state = withHeroSlug(state, 'fighter1', 'muhammad-ali');
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        ctxFor('player1', state),
+      );
+
+      expect(result.metadata?.combatSummary?.attackerWon).toBe(false);
+      expect(result.gameState!.metadata.heroStances?.player1 ?? 'float').toBe('float');
+    });
+
+    it('executeSetStance (real registry getStances): alice big → small', async () => {
+      let state = createMockGameState({ phase: GamePhase.ACTION_MANEUVER });
+      state = withHeroSlug(state, 'fighter1', 'alice');
+
+      const result = await service.executeSetStance(
+        { gameId: 'test-game-1', stanceId: 'small' },
+        ctxFor('player1', state),
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.gameState!.metadata.heroStances?.player1).toBe('small');
+      expect(result.gameState!.sequenceNumber).toBe(state.sequenceNumber + 1);
+    });
+
+    it('executeSetStance отклоняет неизвестную стойку для alice', async () => {
+      let state = createMockGameState({ phase: GamePhase.ACTION_MANEUVER });
+      state = withHeroSlug(state, 'fighter1', 'alice');
+
+      const result = await service.executeSetStance(
+        { gameId: 'test-game-1', stanceId: 'gigantic' },
+        ctxFor('player1', state),
+      );
+
+      expect(result.success).toBe(false);
+    });
+
+    it('executeSetStance отклоняет героя без стоек (hero-a)', async () => {
+      const state = createMockGameState({ phase: GamePhase.ACTION_MANEUVER });
+      // fighter1 heroSlug 'hero-a' — не зарегистрирован как stance-герой.
+      const result = await service.executeSetStance(
+        { gameId: 'test-game-1', stanceId: 'big' },
+        ctxFor('player1', state),
+      );
+
+      expect(result.success).toBe(false);
     });
   });
 

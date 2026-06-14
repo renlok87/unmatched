@@ -37,6 +37,7 @@ import {
   EndTurnDto,
   PassDto,
   ToggleDoorDto,
+  SetStanceDto,
   GameMutationResult,
 } from '../dto/gameplay.dto';
 import { BadRequestException, ConflictException } from '@nestjs/common';
@@ -496,6 +497,35 @@ export class GameActionsResolver {
       'toggleDoor',
       (ctx) => this.actionExecutor.executeToggleDoor(dto, ctx),
       'DOOR_TOGGLED',
+    );
+  }
+
+  // ============================================
+  // SET STANCE - Сменить стойку героя (STANCE)
+  // ============================================
+
+  /**
+   * Сменить стойку героя (Alice big/small, Muhammad Ali float/sting и т.п.).
+   * Доступно в action-фазах текущему игроку (выбор при размещении / начале хода
+   * / «Change size»-карты). НЕ тратит действие (выбор стойки бесплатен).
+   */
+  @Mutation(() => GameMutationResult, {
+    name: 'setStance',
+    description: 'Сменить стойку героя (STANCE: Alice big/small, Muhammad Ali float/sting)',
+  })
+  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ActionPhaseGuard)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
+  async setStance(
+    @Args('input') dto: SetStanceDto,
+    @Context() context: any,
+  ): Promise<GameMutationResult> {
+    const userId = getUserId(context);
+    return this.executeMutation(
+      dto,
+      userId,
+      'setStance',
+      (ctx) => this.actionExecutor.executeSetStance(dto, ctx),
+      'SPECIAL_ABILITY',
     );
   }
 }
