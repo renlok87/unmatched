@@ -4,9 +4,12 @@ import { Throttle } from '@nestjs/throttler';
 import { GameService } from './game.service';
 import { GameStateService } from './game-state.service';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
+import { Public } from '../common/decorators';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { GameResponse, GameStateResponse, EventsSinceResponse } from './models';
 import { CreateGameDto, GameFiltersDto, JoinGameDto, GameMode } from './dto';
+import { StanceOptionDto } from './dto/gameplay.dto';
+import { ABILITY_CONFIGS } from '../game-engine/abilities/ability-config';
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
@@ -81,6 +84,28 @@ export class GameResolver {
       turnCount: filteredState.turnCount,
       updatedAt: filteredState.metadata.lastActionAt,
     };
+  }
+
+  /**
+   * Получить опции стоек героя (STANCE-подсистема).
+   *
+   * Статичный per-hero справочник {id,label,isDefault}, читаемый напрямую из
+   * ABILITY_CONFIGS (game-engine) — НЕ из БД и НЕ из game-state payload.
+   * Стойки статичны для героя, поэтому это одноразовый запрос по heroSlug
+   * (кэшируется на клиенте), а не bloat каждого снапшота состояния.
+   *
+   * Для героев без стоек возвращает [] (HUD ничего не рендерит).
+   * @Public — как и content-запросы (heroes/cards), не требует авторизации.
+   */
+  @Query(() => [StanceOptionDto], { name: 'heroStances' })
+  @Public()
+  heroStances(@Args('heroSlug', { type: () => String }) heroSlug: string): StanceOptionDto[] {
+    const config = ABILITY_CONFIGS.find((c) => c.heroId === heroSlug);
+    return (config?.stances ?? []).map((s) => ({
+      id: s.id,
+      label: s.label,
+      isDefault: !!s.default,
+    }));
   }
 
   /**

@@ -352,6 +352,28 @@ export class SetStanceDto {
 // ============================================
 
 /**
+ * Одна стойка героя для клиента (STANCE-подсистема).
+ *
+ * Статичный per-hero справочник опций стоек, читаемый напрямую из
+ * ABILITY_CONFIGS (game-engine). Возвращается query `heroStances(heroSlug)`.
+ * Для героев без стоек query вернёт пустой массив (HUD ничего не рендерит).
+ */
+@ObjectType()
+export class StanceOptionDto {
+  /** id стойки (из AbilityConfig.stances, напр. 'big'/'small'/'float'/'sting') */
+  @Field(() => String)
+  id: string;
+
+  /** Человекочитаемая метка для кнопки в HUD (напр. 'Big', 'Float Like a Butterfly') */
+  @Field(() => String)
+  label: string;
+
+  /** Стойка по умолчанию при размещении (если ни одна не помечена — первая опция) */
+  @Field(() => Boolean)
+  isDefault: boolean;
+}
+
+/**
  * Типы событий для turn changed
  */
 @ObjectType()
