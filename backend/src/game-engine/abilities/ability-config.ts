@@ -194,6 +194,18 @@ export interface AbilityConfig {
   readonly abilityName: string;
   readonly description: string;
   readonly rules: readonly AbilityRule[];
+  /**
+   * (Опц.) ПАССИВНАЯ дальность атаки: максимальная Manhattan-дистанция, на
+   * которой герой может атаковать цель, ИГНОРИРУЯ зональные ограничения боя
+   * (напр. Ms. Marvel «растяжимые конечности» — может бить на расстоянии до 2).
+   *
+   * Это СВОЙСТВО конфига (не AbilityRule): дальность — характеристика бойца, а
+   * не триггерный эффект. Реализуется через GenericHeroAbilityHandler.
+   * canAttackAtRange (диспетчеризуется реестром в executeAttack как additive-
+   * хук: может разрешить дальнюю атаку, но НИКОГДА не запрещает обычную). Если
+   * поле не задано — canAttackAtRange всегда возвращает false (хук не влияет).
+   */
+  readonly attackRange?: number;
 }
 
 /**
@@ -276,10 +288,12 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
     ],
   },
   {
-    // T. Rex — добор 1 карты в конце хода.
+    // T. Rex — добор 1 карты в конце хода + пассивная дальность атаки 2
+    // (Large fighter, attacks up to 2 spaces) через config.attackRange.
     heroId: 't-rex',
     abilityName: 'Reckless Lunge',
-    description: 'В конце хода T. Rex добирает 1 карту.',
+    description: 'Large fighter, attacks up to 2 spaces. В конце хода T. Rex добирает 1 карту.',
+    attackRange: 2,
     rules: [
       {
         trigger: 'turn-end',
@@ -482,6 +496,17 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
         effect: { kind: 'turn-damage', targetScope: 'enemy-in-zone', value: 1 },
       },
     ],
+  },
+  {
+    // Bullseye — пассивная дальнобойность: может атаковать на расстоянии до 5
+    // клеток, игнорируя зональные ограничения. Других простых combat/turn
+    // эффектов у Bullseye здесь не моделируется, поэтому rules пуст —
+    // способность целиком выражена через config.attackRange (canAttackAtRange).
+    heroId: 'bullseye',
+    abilityName: 'Bullseye',
+    description: 'Can attack from up to 5 spaces away ignoring zones.',
+    attackRange: 5,
+    rules: [],
   },
   // NB: триггер 'after-defense' + AfterCombatContext.defenderPlayerId — инфра
   // для defender-side способностей (зеркало 'after-attack'), пока без героя:

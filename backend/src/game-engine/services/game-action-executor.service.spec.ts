@@ -241,6 +241,9 @@ describe('GameActionExecutorService', () => {
           provide: HeroAbilityRegistry,
           useValue: {
             getAny: jest.fn().mockReturnValue(undefined),
+            // Extended-range gate в executeAttack — по умолчанию нет способности
+            // (false), обычные melee/ranged-правила сохраняются
+            canAttackAtRange: jest.fn().mockReturnValue(false),
             // TURN_START-хук в advanceTurn (TASK A) — passthrough no-op:
             // герои тестов без onTurnStart возвращают state без изменений
             triggerOnTurnStartExtended: jest
@@ -565,6 +568,90 @@ describe('GameActionExecutorService', () => {
 
       expect(result.success).toBe(false);
       // Текст ошибки различает melee/ranged с введения attackType
+      expect(result.error).toBe('Melee attack: target must be adjacent to attacker');
+    });
+
+    it('should ALLOW attack on a far target when hero has extended-range ability (registry.canAttackAtRange)', async () => {
+      // Цель НЕ смежна и НЕ в одной зоне (обычный melee достать не может),
+      // но способность героя разрешает дистанцию 3 → атака должна пройти.
+      const state = createMockGameState({
+        phase: GamePhase.ACTION_ATTACK,
+        handZones: {
+          player1: {
+            cards: [{ id: 'card1', cardId: 'card1', cardType: 'ATTACK' as any, value: 3 } as any],
+            maxSize: 5,
+          },
+          player2: { cards: [], maxSize: 5 },
+        },
+      });
+
+      const dto: AttackDto = {
+        gameId: 'test-game-1',
+        attackerId: 'fighter1',
+        targetId: 'fighter2',
+        cardId: 'card1',
+      };
+
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      // Цель далеко: не смежна, не в зоне, дистанция = 3
+      jest.spyOn(adjacencyService, 'isAdjacent').mockResolvedValue(false);
+      jest.spyOn(adjacencyService, 'isInSameZone').mockReturnValue(false);
+      jest.spyOn(adjacencyService, 'manhattanDistance').mockReturnValue(3);
+
+      // Способность героя разрешает дистанцию <= 3
+      const registry = (service as any).abilityRegistry as { canAttackAtRange: jest.Mock };
+      registry.canAttackAtRange.mockReturnValue(true);
+
+      const result = await service.executeAttack(dto, context);
+
+      expect(result.success).toBe(true);
+      expect(result.error).toBeUndefined();
+      expect(result.gameState!.phase).toBe(GamePhase.COMBAT);
+      // gate проверил extended-range с правильной сигнатурой (slug, attackerId, targetId, range).
+      // У fighter1 нет heroSlug → fallback на heroId ('ms-marvel'), как в проде.
+      expect(registry.canAttackAtRange).toHaveBeenCalledWith('ms-marvel', 'fighter1', 'fighter2', 3);
+    });
+
+    it('should REJECT a far attack when no extended-range ability (canAttackAtRange=false)', async () => {
+      // Поведение по умолчанию сохранено: способности нет → далёкая melee-атака
+      // отклоняется как и раньше.
+      const state = createMockGameState({
+        phase: GamePhase.ACTION_ATTACK,
+        handZones: {
+          player1: {
+            cards: [{ id: 'card1', cardId: 'card1', cardType: 'ATTACK' as any, value: 3 } as any],
+            maxSize: 5,
+          },
+          player2: { cards: [], maxSize: 5 },
+        },
+      });
+
+      const dto: AttackDto = {
+        gameId: 'test-game-1',
+        attackerId: 'fighter1',
+        targetId: 'fighter2',
+        cardId: 'card1',
+      };
+
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      jest.spyOn(adjacencyService, 'isAdjacent').mockResolvedValue(false);
+      jest.spyOn(adjacencyService, 'isInSameZone').mockReturnValue(false);
+      const registry = (service as any).abilityRegistry as { canAttackAtRange: jest.Mock };
+      registry.canAttackAtRange.mockReturnValue(false);
+
+      const result = await service.executeAttack(dto, context);
+
+      expect(result.success).toBe(false);
       expect(result.error).toBe('Melee attack: target must be adjacent to attacker');
     });
   });

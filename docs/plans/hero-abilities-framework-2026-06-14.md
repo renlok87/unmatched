@@ -41,6 +41,8 @@ Config v4 — pending-move (2): новый effect-kind `{kind:'pending-move', ta
 
 Config v5 — turn-damage (2): effect-kind `{kind:'turn-damage', targetScope:'enemy-in-zone'|'enemy-adjacent', value, thenDraw?}` — onTurnStart/onTurnEnd авто-таргетит ПЕРВОГО подходящего вражеского бойца (MVP без выбора/opt-out), наносит урон (immutable, isDefeated + recompute player.isAlive при 0), опц. добор только при попадании. dracula (enemy-adjacent 1 + draw 1), medusa (enemy-in-zone 1). deps.zone расширен `manhattanDistance` (AdjacencyService уже передаётся, module не тронут). **Safety**: `checkAndApplyGameOver(state)` извлечён из executeResolveCombat + вызывается в advanceTurn ПОСЛЕ triggerHeroTurnStart (turn-start kill героя → корректный GAME_OVER). Покрытие 19→21 (3 хардкод + 18 config).
 
+Config v6 — attackRange (2): wiring `canAttackAtRange` (был МЁРТВЫЙ хук!) в executeAttack — если обычная melee/ranged-проверка не пускает, консультируется `registry.canAttackAtRange(slug, ..., manhattanRange)`; additive-only (false→true, не наоборот). Config-поле `AbilityConfig.attackRange?:number`; `GenericHeroAbilityHandler.canAttackAtRange` = range ≤ attackRange. Герои: t-rex (range 2), bullseye (range 5; rules:[] — только range). **Бонус**: хардкод-способность Ms.Marvel (range≤2) теперь реально enforced в проде (была dead). Покрытие 21→22 (3 хардкод + 19 config).
+
 ## Каталог 88 (для v2)
 
 70 реальных героев: clean=2, **partial=21**, complex=47. Реализовано 3 хардкод + 7 config = 10. Следующие цели:

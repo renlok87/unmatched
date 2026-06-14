@@ -170,6 +170,24 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     return current;
   }
 
+  // ===================== ПАССИВНАЯ ДАЛЬНОСТЬ АТАКИ =====================
+
+  /**
+   * Пассивная дальность атаки (декларативный config.attackRange). Реестр
+   * диспетчеризует этот хук в executeAttack как ADDITIVE-only: он может
+   * РАЗРЕШИТЬ дальнюю атаку (range <= attackRange), но НИКОГДА не запрещает
+   * обычную (melee/ranged) — те гейты остаются в силе.
+   *
+   * Семантика: true ⟺ config.attackRange задан И range не превышает его.
+   * Если attackRange не задан — всегда false (хук не влияет на бой).
+   * attackerId/defenderId не используются (дальность — пассивное свойство
+   * героя, не зависит от конкретной пары бойцов), но входят в сигнатуру
+   * ExtendedHeroAbilityHandler.canAttackAtRange.
+   */
+  canAttackAtRange(_attackerId: string, _defenderId: string, range: number): boolean {
+    return this.config.attackRange != null && range <= this.config.attackRange;
+  }
+
   // ===================== ВНУТРЕННЕЕ =====================
 
   /**

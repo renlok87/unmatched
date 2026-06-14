@@ -33,7 +33,7 @@ import {
 } from '../abilities/hero-ability-registry';
 import { GamePhase } from '../models';
 import type { GameState } from '../models';
-import { ResolveCombatDto, EndTurnDto, ManeuverDto } from '../../games/dto/gameplay.dto';
+import { ResolveCombatDto, EndTurnDto, ManeuverDto, AttackDto } from '../../games/dto/gameplay.dto';
 
 describe('GameActionExecutorService — abilities wiring', () => {
   let service: GameActionExecutorService;
@@ -151,6 +151,10 @@ describe('GameActionExecutorService — abilities wiring', () => {
           useValue: {
             isAdjacent: jest.fn().mockResolvedValue(true),
             isInSameZone: jest.fn().mockReturnValue(false),
+            // Реальная манхэттенская дистанция — нужна для extended-range gate
+            manhattanDistance: jest.fn((a: { x: number; y: number }, b: { x: number; y: number }) =>
+              Math.abs(a.x - b.x) + Math.abs(a.y - b.y),
+            ),
           },
         },
         {
@@ -799,6 +803,104 @@ describe('GameActionExecutorService — abilities wiring', () => {
       expect((result.gameState!.metadata as any).winnerId).toBeUndefined();
       // оба игрока живы
       expect(result.gameState!.players.every((p) => p.isAlive)).toBe(true);
+    });
+  });
+
+  describe('6) extended attack range via registry.canAttackAtRange', () => {
+    /**
+     * Бойцы НЕ смежны и НЕ в одной зоне — обычный melee-герой атаковать не может.
+     * AdjacencyService.isAdjacent → false, isInSameZone → false; дистанция = 3.
+     * Атакующий fighter1 (5,5), цель fighter2 (8,5) → manhattan = 3.
+     */
+    const placeFarApart = (state: GameState): GameState =>
+      ({
+        ...state,
+        fighters: state.fighters.map((f) =>
+          f.id === 'fighter1'
+            ? { ...f, position: { x: 5, y: 5 } }
+            : f.id === 'fighter2'
+              ? { ...f, position: { x: 8, y: 5 } }
+              : f,
+        ),
+      }) as GameState;
+
+    const attackState = (): GameState =>
+      placeFarApart(
+        createMockGameState({
+          phase: GamePhase.ACTION_MANEUVER,
+          currentTurnPlayerId: 'player1',
+          metadata: {
+            lastActionAt: new Date(),
+            lastActionBy: 'player1',
+            version: 1,
+            actionsRemaining: 2,
+          } as any,
+        }),
+      );
+
+    const attackDto: AttackDto = {
+      gameId: 'test-game-1',
+      attackerId: 'fighter1',
+      targetId: 'fighter2',
+      cardId: 'card-a',
+    } as AttackDto;
+
+    beforeEach(() => {
+      const adjacency = (service as any).adjacencyService;
+      adjacency.isAdjacent.mockResolvedValue(false);
+      adjacency.isInSameZone.mockReturnValue(false);
+    });
+
+    it('герой с extended-range способностью (canAttackAtRange range<=3) АТАКУЕТ далёкую цель', async () => {
+      // hero-a умеет бить на дистанцию <= 3
+      const rangedHandler: ExtendedHeroAbilityHandler = {
+        heroId: 'hero-a',
+        abilityName: 'Extended range 3',
+        abilityDescription: 'может атаковать на дистанции до 3 клеток',
+        canAttackAtRange: (_attackerId: string, _defenderId: string, range: number): boolean =>
+          range <= 3,
+      };
+      registry.registerExtended(rangedHandler);
+
+      const result = await service.executeAttack(attackDto, {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: attackState(),
+      });
+
+      // Бой объявлен: нет ошибки «out of range», фаза COMBAT, combatInfo выставлен
+      expect(result.success).toBe(true);
+      expect(result.error).toBeUndefined();
+      expect(result.gameState!.phase).toBe(GamePhase.COMBAT);
+      expect((result.gameState!.metadata as any).combatInfo?.attackerId).toBe('fighter1');
+      expect((result.gameState!.metadata as any).combatInfo?.targetFighterId).toBe('fighter2');
+    });
+
+    it('обычный герой БЕЗ range-способности НЕ может атаковать далёкую цель (поведение сохранено)', async () => {
+      // Никаких extended-handlers для hero-a не зарегистрировано
+      const result = await service.executeAttack(attackDto, {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: attackState(),
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.error).toMatch(/adjacent/i);
+      expect(result.gameState).toBeUndefined();
+    });
+
+    it('смежная melee-атака по-прежнему работает (extended gate ничего не ломает)', async () => {
+      const adjacency = (service as any).adjacencyService;
+      adjacency.isAdjacent.mockResolvedValue(true);
+
+      const result = await service.executeAttack(attackDto, {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: attackState(),
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.gameState!.phase).toBe(GamePhase.COMBAT);
     });
   });
 });

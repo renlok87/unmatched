@@ -1048,4 +1048,36 @@ describe('GenericHeroAbilityHandler', () => {
       expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
     });
   });
+
+  // ---- 11) canAttackAtRange (declarative passive attack-range) ----
+  describe('canAttackAtRange (passive attackRange config field)', () => {
+    it('config с attackRange:2 → true для range 1 и 2, false для 3', () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'Reach',
+        description: 'может атаковать на расстоянии до 2 клеток',
+        attackRange: 2,
+        rules: [],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+
+      expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 1)).toBe(true);
+      expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 2)).toBe(true);
+      expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 3)).toBe(false);
+    });
+
+    it('config без attackRange → всегда false', () => {
+      const config: AbilityConfig = {
+        heroId: 'test-hero',
+        abilityName: 'NoReach',
+        description: 'нет пассивной дальности атаки',
+        rules: [],
+      };
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+
+      expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 1)).toBe(false);
+      expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 2)).toBe(false);
+      expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 0)).toBe(false);
+    });
+  });
 });

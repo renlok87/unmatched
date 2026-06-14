@@ -168,6 +168,7 @@ describe('ABILITY_CONFIGS — присутствие героев', () => {
     'leonardo',
     'dracula',
     'medusa',
+    'bullseye',
   ];
   it.each(expected)('содержит конфиг для слага %s', (slug) => {
     expect(configFor(slug)).toBeDefined();
@@ -340,6 +341,18 @@ describe('t-rex (turn-end: draw 1)', () => {
     const next = await handler.onTurnStart(state, 'player1');
     expect(deps.deck.drawCards).not.toHaveBeenCalled();
     expect(next).toBe(state);
+  });
+
+  // passive attackRange:2 — large fighter, attacks up to 2 spaces
+  it('config объявляет attackRange === 2', () => {
+    expect(configFor('t-rex')!.attackRange).toBe(2);
+  });
+
+  it('canAttackAtRange: true для range 2, false для range 3', () => {
+    const handler = handlerFor('t-rex');
+    expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 1)).toBe(true);
+    expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 2)).toBe(true);
+    expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 3)).toBe(false);
   });
 });
 
@@ -745,6 +758,39 @@ describe('medusa (turn-start: turn-damage enemy-in-zone value 1, no draw)', () =
     expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
     expect(deps.deck.drawCards).not.toHaveBeenCalled();
     expect(next).toBe(state); // чистый no-op
+  });
+});
+
+// ===================== PASSIVE ATTACK-RANGE ГЕРОИ =====================
+
+describe('bullseye (passive attackRange:5, rules empty)', () => {
+  it('config объявляет attackRange === 5 и пустые rules', () => {
+    const config = configFor('bullseye')!;
+    expect(config.attackRange).toBe(5);
+    expect(config.rules).toEqual([]);
+  });
+
+  it('регистрируется в HeroAbilityRegistry несмотря на пустые rules', () => {
+    const registry = new HeroAbilityRegistry();
+    registry.registerExtended(new GenericHeroAbilityHandler(configFor('bullseye')!, makeDeps()));
+    expect(registry.getExtended('bullseye')).toBeDefined();
+  });
+
+  it('canAttackAtRange: true для range 5, false для range 6', () => {
+    const handler = handlerFor('bullseye');
+    expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 1)).toBe(true);
+    expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 5)).toBe(true);
+    expect(handler.canAttackAtRange('hero-fighter-1', 'enemy-fighter-1', 6)).toBe(false);
+  });
+
+  it('пустые rules → turn/after-combat хуки no-op (тот же state)', async () => {
+    const deps = makeDeps();
+    const handler = handlerFor('bullseye', deps);
+    const state = makeState();
+    expect(await handler.onTurnStart(state, 'player1')).toBe(state);
+    expect(await handler.onTurnEnd(state, 'player1')).toBe(state);
+    expect(await handler.onAfterCombat(state, afterCtx(true))).toBe(state);
+    expect(deps.deck.drawCards).not.toHaveBeenCalled();
   });
 });
 

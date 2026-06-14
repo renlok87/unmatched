@@ -932,6 +932,27 @@ export class GameActionExecutorService {
           );
         }
 
+        // Extended-range способность героя (например Ms. Marvel, range<=2):
+        // если обычные melee/ranged-правила цель НЕ достают — спрашиваем реестр.
+        // Хук ТОЛЬКО добавляет разрешение, никогда не отнимает уже выданное.
+        if (!inRange) {
+          const range = this.adjacencyService.manhattanDistance(
+            attacker.position,
+            target.position,
+          );
+          const attackerSlug = attacker.heroSlug ?? attacker.heroId;
+          if (
+            this.abilityRegistry.canAttackAtRange(
+              attackerSlug,
+              attacker.id,
+              target.id,
+              range,
+            )
+          ) {
+            inRange = true;
+          }
+        }
+
         if (!inRange) {
           this.metrics.incrementGameAction('attack', undefined, 'error');
           return {
