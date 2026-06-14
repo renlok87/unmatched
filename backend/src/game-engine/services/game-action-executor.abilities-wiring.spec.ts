@@ -285,6 +285,81 @@ describe('GameActionExecutorService — abilities wiring', () => {
     });
   });
 
+  describe('1a) aura combat modifiers (granter buffs OTHER fighter in its zone)', () => {
+    it('союзник в зоне ауры-героя получает +1 к атаке во время своего боя', async () => {
+      // hero-b — герой-ГРАНИТЕЛЬ ауры (player2). Атакует, однако, fighter1 (player1).
+      // Чтобы проверить аурный путь, делаем гранителя в зоне beneficiary и
+      // регистрируем aura-handler НА hero-a (атакующий fighter1) — нет, аура
+      // исходит от ДРУГОГО героя, поэтому регистрируем на отдельном heroId.
+      // Сценарий: атакует fighter1 (hero-a, player1). Союзник-гранитель ауры
+      // того же игрока (player1) стоит в зоне fighter1 и даёт ему +1.
+      const auraHandler: ExtendedHeroAbilityHandler = {
+        heroId: 'aura-hero',
+        abilityName: 'Aura +1',
+        abilityDescription: 'баффает других союзников в своей зоне',
+        getAuraCombatModifiers: (
+          _state: GameState,
+          beneficiary,
+          _role,
+        ): readonly ValueModifier[] => {
+          // Гранитель баффает любого beneficiary player1, кроме себя.
+          if (beneficiary.ownerId === 'player1' && beneficiary.id !== 'aura-fighter') {
+            return [
+              {
+                type: ValueModifierType.ADD,
+                value: 1,
+                source: 'aura-hero:Aura +1',
+                timestamp: Date.now(),
+                ownerId: 'player1',
+              },
+            ];
+          }
+          return [];
+        },
+      };
+      registry.registerExtended(auraHandler);
+
+      // Бой: атака 4 vs защита 1 → база урона 3; +1 aura → урон 4
+      const baseState = createMockGameState({
+        phase: GamePhase.COMBAT_RESOLVE,
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 1,
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId: 'fighter2',
+            attackerCardId: 'card-a',
+            defenderCardId: 'card-d',
+            attackValue: 4,
+            defenseValue: 1,
+            startedAt: new Date(),
+          },
+        } as any,
+      });
+
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: baseState,
+      };
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        context,
+      );
+
+      expect(result.success).toBe(true);
+      // finalAttack = 4 + 1(aura для fighter1) = 5, finalDefense = 1 → defenderDamage = 4
+      expect(result.metadata?.combatSummary?.finalAttack).toBe(5);
+      expect(result.metadata?.combatSummary?.defenderDamage).toBe(4);
+      const defender = result.gameState!.fighters.find((f) => f.id === 'fighter2')!;
+      expect(defender.health).toBe(17 - 4);
+    });
+  });
+
   describe('3) after-combat extended hook', () => {
     it('onAfterCombat атакующего срабатывает после резолва (won=true), бой и ход проходят нормально', async () => {
       // Fake extended-handler атакующего (player1 / hero-a): ставит маркер в

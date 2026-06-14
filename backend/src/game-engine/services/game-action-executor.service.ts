@@ -19,6 +19,7 @@ import {
   GamePhase,
   CardType,
   EffectType,
+  FighterType,
   createEmptyBoardState,
   ACTIONS_PER_TURN,
   getActionsRemaining,
@@ -348,6 +349,34 @@ export class GameActionExecutorService {
     }
     const slug = defenderFighter.heroSlug ?? defenderFighter.heroId;
     return this.abilityRegistry.triggerOnAfterCombat(slug, state, ctx);
+  }
+
+  /**
+   * Вызвать on-defeat хук героя ВЛАДЕЛЬЦА повергнутого бойца (TASK, РЕАНИМАЦИЯ).
+   *
+   * Зеркало triggerHeroAfterCombat: боец-герой ищется по ownerId повергнутого
+   * бойца (HERO-боец владельца), слаг = ownerHeroFighter.heroSlug ?? heroId —
+   * чтобы герой мог отреагировать на гибель своего САЙДКИКА (у сайдкика свой
+   * heroSlug, поэтому слаг берём именно с HERO-бойца владельца). Если бойца в
+   * state нет или у владельца нет HERO-бойца — no-op. seq не трогаем:
+   * «прицеплено» к инкременту резолва боя.
+   */
+  private async triggerHeroFighterDefeated(
+    state: GameState,
+    defeatedFighterId: string,
+  ): Promise<GameState> {
+    const fallen = state.fighters.find((f) => f.id === defeatedFighterId);
+    if (!fallen) {
+      return state;
+    }
+    const ownerHero = state.fighters.find(
+      (f) => f.ownerId === fallen.ownerId && f.type === FighterType.HERO,
+    );
+    if (!ownerHero) {
+      return state;
+    }
+    const slug = ownerHero.heroSlug ?? ownerHero.heroId;
+    return this.abilityRegistry.triggerOnFighterDefeated(slug, state, fallen);
   }
 
   /**
@@ -1404,8 +1433,21 @@ export class GameActionExecutorService {
           ),
         );
 
-        const finalAttack = calc.finalAttack + heroMods.attackModifier + statefulAttack;
-        const finalDefense = calc.finalDefense + heroMods.defenseModifier + statefulDefense;
+        // АУРНЫЕ модификаторы (Oda-style): аура исходит от ДРУГОГО героя
+        // (гранителя), а не от героя бойца боя — поэтому консультируем ВСЕ
+        // зарегистрированные handler'ы для каждого бойца-бенефициара.
+        // Аддитивно: математику heroMods/stateful не трогаем.
+        const auraAttack = this.sumAddModifiers(
+          this.abilityRegistry.getAuraCombatModifiers(calc.state, attacker, 'attacker'),
+        );
+        const auraDefense = this.sumAddModifiers(
+          this.abilityRegistry.getAuraCombatModifiers(calc.state, defenderFighter, 'defender'),
+        );
+
+        const finalAttack =
+          calc.finalAttack + heroMods.attackModifier + statefulAttack + auraAttack;
+        const finalDefense =
+          calc.finalDefense + heroMods.defenseModifier + statefulDefense + auraDefense;
 
         // 3. Урон: атака > защита → разница защитнику; иначе атакующему
         //    (ничья — победа защитника, урона нет). PREVENT_DAMAGE гасит урон стороне.
@@ -1454,8 +1496,16 @@ export class GameActionExecutorService {
         ];
 
         // 5. Итоги: павшие бойцы и живость игроков (after-эффекты могли добить)
+        // Снимок id повергнутых ДО этого боя — чтобы вычислить НОВО-павших
+        // (для on-defeat хука: дёргаем только тех, кто пал ИМЕННО в этом бою).
+        const defeatedBefore = new Set(
+          workState.fighters.filter((f) => f.isDefeated === true).map((f) => f.id),
+        );
         const updatedFighters = workState.fighters.map((f) =>
           f.health <= 0 && !f.isDefeated ? { ...f, isDefeated: true } : f,
+        );
+        const newlyDefeated = updatedFighters.filter(
+          (f) => f.isDefeated === true && !defeatedBefore.has(f.id),
         );
         const updatedPlayers = workState.players.map((p) => {
           const playerFighters = updatedFighters.filter((f) => f.ownerId === p.userId);
@@ -1511,6 +1561,15 @@ export class GameActionExecutorService {
         // с защищающегося бойца, эффект 'after-defense' — к ctx.defenderPlayerId.
         // Бьём тем же ctx, ДО передачи хода, теми же seq-правилами.
         resolvedState = await this.triggerHeroAfterDefense(resolvedState, afterCombatCtx);
+
+        // ON-DEFEAT хук (TASK, РЕАНИМАЦИЯ): для каждого НОВО-павшего бойца дёргаем
+        // onFighterDefeated героя ВЛАДЕЛЬЦА бойца — чтобы он отреагировал на гибель
+        // своего сайдкика (Achilles → discard 2). Бьём ПОСЛЕ after-combat хуков и
+        // установки isDefeated, но ДО game-over/передачи хода. seq не бампим:
+        // «прицеплено» к инкременту резолва. No-op для героев без хука.
+        for (const fallen of newlyDefeated) {
+          resolvedState = await this.triggerHeroFighterDefeated(resolvedState, fallen.id);
+        }
 
         // Конец игры (правило «остался один живой игрок») — единый helper.
         // checkAndApplyGameOver no-op при живых > 1 (фаза/metadata не тронуты);

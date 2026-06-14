@@ -171,6 +171,8 @@ describe('ABILITY_CONFIGS — присутствие героев', () => {
     'bullseye',
     'bruce-lee',
     'raptors',
+    'oda-nobunaga',
+    'achilles',
   ];
   it.each(expected)('содержит конфиг для слага %s', (slug) => {
     expect(configFor(slug)).toBeDefined();
@@ -935,6 +937,206 @@ describe('raptors (combat-passive: +1 attack per other own fighter adjacent to d
     const fighter = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
     const mods = handler.getStatefulCombatModifiers(state, RAPTOR_COMBAT, fighter, 'defender');
     expect(mods).toHaveLength(0);
+  });
+});
+
+// ===================== AURA (ODA NOBUNAGA) =====================
+
+describe('oda-nobunaga (aura-combat-modifier: +1 другим союзникам в зоне Oda)', () => {
+  /** Oda-гранитель (HERO, player1) + союзный сайдкик player1 + враг. */
+  const auraState = (sameZone: boolean): GameState =>
+    makeState({
+      fighters: [
+        makeFighter({ id: 'oda-hero', heroSlug: 'oda-nobunaga', name: 'Oda Nobunaga', position: { x: 5, y: 5 } }),
+        makeFighter({
+          id: 'ally-1',
+          ownerId: 'player1',
+          type: FighterType.MINION,
+          heroSlug: 'some-sidekick',
+          name: 'Ashigaru',
+          position: sameZone ? { x: 5, y: 6 } : { x: 1, y: 1 },
+        }),
+        makeFighter({ id: 'enemy-fighter-1', ownerId: 'player2', heroSlug: 'enemy-hero', name: 'Enemy', position: { x: 9, y: 9 } }),
+      ],
+    });
+
+  const AURA_COMBAT: CombatState = {
+    attackerId: 'ally-1',
+    defenderId: 'player2',
+    targetFighterId: 'enemy-fighter-1',
+  };
+
+  it('config: aura-combat-modifier appliesTo both, value 1, scope allies-in-my-zone', () => {
+    const config = configFor('oda-nobunaga')!;
+    expect(config.rules).toHaveLength(1);
+    expect(config.rules[0]).toMatchObject({
+      trigger: 'combat-passive',
+      condition: 'always',
+      effect: { kind: 'aura-combat-modifier', appliesTo: 'both', value: 1, scope: 'allies-in-my-zone' },
+    });
+  });
+
+  it('грантит +1 союзнику в зоне Oda (его атака)', () => {
+    const handler = handlerFor('oda-nobunaga', makeDeps({ zone: makeZoneStub(true) }));
+    const state = auraState(true);
+    const ally = state.fighters.find((f) => f.id === 'ally-1')!;
+
+    const mods = handler.getAuraCombatModifiers(state, ally, 'attacker');
+    expect(mods).toHaveLength(1);
+    expect(mods[0]).toMatchObject({ type: ValueModifierType.ADD, value: 1, ownerId: 'player1' });
+  });
+
+  it('НЕ баффает самого Oda', () => {
+    const handler = handlerFor('oda-nobunaga', makeDeps({ zone: makeZoneStub(true) }));
+    const state = auraState(true);
+    const oda = state.fighters.find((f) => f.id === 'oda-hero')!;
+
+    const mods = handler.getAuraCombatModifiers(state, oda, 'attacker');
+    expect(mods).toHaveLength(0);
+  });
+
+  it('no-op: союзник вне зоны Oda', () => {
+    const handler = handlerFor('oda-nobunaga', makeDeps({ zone: makeZoneStub(false) }));
+    const state = auraState(false);
+    const ally = state.fighters.find((f) => f.id === 'ally-1')!;
+
+    const mods = handler.getAuraCombatModifiers(state, ally, 'attacker');
+    expect(mods).toHaveLength(0);
+  });
+
+  it('getStatefulCombatModifiers (own-handler путь) НЕ выдаёт aura-модификатор', () => {
+    // aura идёт только через getAuraCombatModifiers — обычный own-handler путь
+    // не должен выдавать combat-modifier из aura-правила.
+    const handler = handlerFor('oda-nobunaga', makeDeps({ zone: makeZoneStub(true) }));
+    const state = auraState(true);
+    const ally = state.fighters.find((f) => f.id === 'ally-1')!;
+
+    const mods = handler.getStatefulCombatModifiers(state, AURA_COMBAT, ally, 'attacker');
+    expect(mods).toHaveLength(0);
+  });
+});
+
+// ===================== ACHILLES (sidekick-defeated + compound condition) =====================
+
+describe('achilles (sidekick-defeated discard + all-sidekicks-defeated combat/after-attack)', () => {
+  /** State, где у player1 есть HERO (achilles) + сайдкик Patroclus заданного статуса. */
+  const stateWithSidekick = (defeated: boolean, handCount = 0): GameState =>
+    makeState({
+      handZones: {
+        player1: { cards: Array.from({ length: handCount }, (_, i) => ({ id: `c${i}`, isVisible: true })), maxSize: 5 },
+        player2: { cards: [], maxSize: 5 },
+      } as any,
+      discardPiles: { player1: [], player2: [] } as any,
+      fighters: [
+        makeFighter({ heroSlug: 'achilles' }),
+        makeFighter({
+          id: 'sidekick-1',
+          ownerId: 'player1',
+          type: FighterType.MINION,
+          name: 'Patroclus',
+          isDefeated: defeated,
+          position: { x: 2, y: 2 },
+        }),
+        makeFighter({ id: 'enemy-fighter-1', ownerId: 'player2', health: 12, position: { x: 9, y: 9 } }),
+      ],
+    });
+
+  it('config: три правила (combat-modifier +2 attack / after-attack draw / sidekick-defeated discard 2)', () => {
+    const config = configFor('achilles')!;
+    expect(config.rules).toHaveLength(3);
+    expect(config.rules).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          trigger: 'combat-passive',
+          condition: 'all-own-sidekicks-defeated',
+          effect: { kind: 'combat-modifier', appliesTo: 'attack', value: 2 },
+        }),
+        expect.objectContaining({
+          trigger: 'after-attack',
+          condition: 'won-combat-and-all-sidekicks-defeated',
+          effect: { kind: 'turn-effect', draw: 1 },
+        }),
+        expect.objectContaining({
+          trigger: 'sidekick-defeated',
+          effect: { kind: 'discard-random', count: 2 },
+        }),
+      ]),
+    );
+  });
+
+  it('combat-passive: +2 к атаке только когда сайдкик (Patroclus) повержен', () => {
+    const handler = handlerFor('achilles');
+
+    const live = stateWithSidekick(false);
+    const heroLive = live.fighters.find((f) => f.id === 'hero-fighter-1')!;
+    expect(handler.getStatefulCombatModifiers(live, COMBAT, heroLive, 'attacker')).toHaveLength(0);
+
+    const dead = stateWithSidekick(true);
+    const heroDead = dead.fighters.find((f) => f.id === 'hero-fighter-1')!;
+    const mods = handler.getStatefulCombatModifiers(dead, COMBAT, heroDead, 'attacker');
+    expect(mods).toHaveLength(1);
+    expect(mods[0]).toMatchObject({ type: ValueModifierType.ADD, value: 2, ownerId: 'player1' });
+  });
+
+  it('after-attack draw: только при ПОБЕДЕ И повергнутом сайдкике', async () => {
+    // win + сайдкик повержен → добор
+    const depsWon = makeDeps();
+    const handlerWon = handlerFor('achilles', depsWon);
+    const nextWon = await handlerWon.onAfterCombat(stateWithSidekick(true), {
+      playerId: 'player1',
+      attackerFighterId: 'hero-fighter-1',
+      defenderFighterId: 'enemy-fighter-1',
+      won: true,
+      damageDealt: 2,
+      firstLossThisTurn: false,
+    });
+    expect(depsWon.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+
+    // win, но сайдкик жив → no-op
+    const depsLive = makeDeps();
+    const handlerLive = handlerFor('achilles', depsLive);
+    const nextLive = await handlerLive.onAfterCombat(stateWithSidekick(false), {
+      playerId: 'player1',
+      attackerFighterId: 'hero-fighter-1',
+      defenderFighterId: 'enemy-fighter-1',
+      won: true,
+      damageDealt: 2,
+      firstLossThisTurn: false,
+    });
+    expect(depsLive.deck.drawCards).not.toHaveBeenCalled();
+    expect(nextLive).toBe(nextLive);
+
+    // сайдкик повержен, но бой проигран → no-op
+    const depsLost = makeDeps();
+    const handlerLost = handlerFor('achilles', depsLost);
+    await handlerLost.onAfterCombat(stateWithSidekick(true), {
+      playerId: 'player1',
+      attackerFighterId: 'hero-fighter-1',
+      defenderFighterId: 'enemy-fighter-1',
+      won: false,
+      damageDealt: 0,
+      firstLossThisTurn: true,
+    });
+    expect(depsLost.deck.drawCards).not.toHaveBeenCalled();
+  });
+
+  it('onFighterDefeated: при гибели Patroclus сбрасывает 2 карты из руки Achilles', async () => {
+    const handler = handlerFor('achilles');
+    const state = stateWithSidekick(true, 4);
+    const patroclus = state.fighters.find((f) => f.id === 'sidekick-1')!;
+
+    const next = await handler.onFighterDefeated(state, patroclus);
+    expect(next.handZones['player1'].cards).toHaveLength(2); // 4 - 2
+    expect(next.discardPiles['player1']).toHaveLength(2);
+  });
+
+  it('onFighterDefeated: no-op при гибели вражеского бойца', async () => {
+    const handler = handlerFor('achilles');
+    const state = stateWithSidekick(true, 4);
+    const enemy = state.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+
+    const next = await handler.onFighterDefeated(state, enemy);
+    expect(next).toBe(state);
   });
 });
 

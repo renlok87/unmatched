@@ -259,7 +259,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
   afterEach(() => jest.clearAllMocks());
 
   // ====================================================================
-  // САНИТИ: все 21 конфиг реально зарегистрированы под своими слагами
+  // САНИТИ: все 22 конфига реально зарегистрированы под своими слагами
   // ====================================================================
   describe('registration', () => {
     it('каждый ABILITY_CONFIGS.heroId зарегистрирован в реестре под своим слагом', () => {
@@ -267,7 +267,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
         expect(registry.has(cfg.heroId)).toBe(true);
         expect(registry.getExtended(cfg.heroId)?.heroId).toBe(cfg.heroId);
       }
-      expect(ABILITY_CONFIGS).toHaveLength(21);
+      expect(ABILITY_CONFIGS).toHaveLength(23);
     });
   });
 
@@ -436,6 +436,59 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
 
       expect(result.success).toBe(true);
       expect(result.metadata?.combatSummary?.finalAttack).toBe(7); // 4 + 3
+    });
+
+    // АУРА (Oda Nobunaga): атакующий боец-raptor-like (fighter1, player1)
+    // делит зону с Oda-героем (отдельный боец player1) → +1 к атаке через
+    // АУРНЫЙ путь (getAuraCombatModifiers, аура исходит от ДРУГОГО героя).
+    it('oda-nobunaga (aura): союзный боец в зоне Oda получает +1 к атаке', async () => {
+      const adjacency = (service as any).adjacencyService;
+      adjacency.isInSameZone.mockReturnValue(true); // fighter1 в зоне Oda
+
+      // fighter1 — атакующий raptor-like боец (НЕ сам Oda); Oda — отдельный
+      // HERO-боец player1 с heroSlug oda-nobunaga, делящий зону.
+      let state = combatState({}, { attackValue: 4, defenseValue: 1 });
+      state = {
+        ...state,
+        fighters: [
+          ...state.fighters,
+          {
+            id: 'oda-hero',
+            ownerId: 'player1',
+            heroId: 'cuid-hero-a',
+            heroSlug: 'oda-nobunaga',
+            name: 'Oda Nobunaga',
+            type: FighterType.HERO,
+            health: 16,
+            maxHealth: 16,
+            position: { x: 5, y: 5 },
+            effects: [],
+            hasSidekick: false,
+          } as any,
+        ],
+      } as GameState;
+
+      const result = await service.executeResolveCombat({ gameId: 'test-game-1' } as ResolveCombatDto, ctxFor('player1', state));
+
+      expect(result.success).toBe(true);
+      // finalAttack = 4 + 1(aura) = 5
+      expect(result.metadata?.combatSummary?.finalAttack).toBe(5);
+      const defender = result.gameState!.fighters.find((f) => f.id === 'fighter2')!;
+      expect(defender.health).toBe(17 - 4); // урон 5 - 1 = 4
+    });
+
+    it('oda-nobunaga (aura negative): сам Oda не получает свою ауру', async () => {
+      const adjacency = (service as any).adjacencyService;
+      adjacency.isInSameZone.mockReturnValue(true);
+
+      // fighter1 САМ является Oda — гранитель не баффает себя.
+      let state = combatState({}, { attackValue: 4, defenseValue: 1 });
+      state = withHeroSlug(state, 'fighter1', 'oda-nobunaga');
+
+      const result = await service.executeResolveCombat({ gameId: 'test-game-1' } as ResolveCombatDto, ctxFor('player1', state));
+
+      expect(result.success).toBe(true);
+      expect(result.metadata?.combatSummary?.finalAttack).toBe(4); // без +1
     });
   });
 
@@ -817,6 +870,113 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
 
       expect(result.success).toBe(false);
       expect(result.gameState).toBeUndefined();
+    });
+  });
+
+  // ====================================================================
+  // onFighterDefeated WIRING (achilles): когда сайдкик Achilles повержен в бою,
+  // executor дёргает onFighterDefeated владельца → рука Achilles сжимается на 2.
+  // ====================================================================
+  describe('onFighterDefeated wiring (achilles sidekick discard via executeResolveCombat)', () => {
+    /**
+     * Бой: атакует hero-b (player2, fighter2) по сайдкику Achilles (player1).
+     * Сайдкик — Patroclus (fighter3, owner player1, NON-HERO), 1 hp; атака 5 vs
+     * защита 0 → урон 5 → сайдкик повержен. Достаточно живого achilles-героя у
+     * player1, чтобы player1.isAlive остался true (игра не кончилась → проверяем
+     * именно discard, а не game-over ветку). achilles-герой — fighter1 player1.
+     */
+    const buildState = (handCount: number): GameState => {
+      const base = createMockGameState({
+        phase: GamePhase.COMBAT_RESOLVE,
+        currentTurnPlayerId: 'player2',
+        handZones: {
+          player1: {
+            cards: Array.from({ length: handCount }, (_, i) => ({ id: `ac${i}`, isVisible: true })),
+            maxSize: 5,
+          },
+          player2: { cards: [], maxSize: 5 },
+        } as any,
+        discardPiles: { player1: [], player2: [] } as any,
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player2',
+          version: 1,
+          actionsRemaining: 1, // ход НЕ авто-завершается (next turn-start не палит)
+          combatInfo: {
+            attackerId: 'fighter2',
+            defenderId: 'player1',
+            targetFighterId: 'fighter3', // бьём сайдкика Patroclus
+            attackerCardId: 'card-a',
+            defenderCardId: 'card-d',
+            attackValue: 5,
+            defenseValue: 0,
+            startedAt: new Date(),
+          },
+        } as any,
+      });
+      // fighter1 — герой Achilles (player1); добавляем сайдкика Patroclus (fighter3).
+      let s = withHeroSlug(base, 'fighter1', 'achilles');
+      s = {
+        ...s,
+        fighters: [
+          ...s.fighters,
+          {
+            id: 'fighter3',
+            ownerId: 'player1',
+            heroId: 'cuid-hero-a',
+            heroSlug: 'patroclus',
+            name: 'Patroclus',
+            type: FighterType.MINION,
+            health: 1,
+            maxHealth: 4,
+            position: { x: 7, y: 5 },
+            effects: [],
+            hasSidekick: false,
+          } as any,
+        ],
+      } as GameState;
+      return s;
+    };
+
+    it('гибель сайдкика Achilles в бою → рука Achilles (player1) сжимается на 2', async () => {
+      const state = buildState(4);
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        ctxFor('player2', state),
+      );
+
+      expect(result.success).toBe(true);
+      // сайдкик повержен
+      const patroclus = result.gameState!.fighters.find((f) => f.id === 'fighter3')!;
+      expect(patroclus.health).toBe(0);
+      expect(patroclus.isDefeated).toBe(true);
+      // player1 ещё жив (achilles-герой fighter1 цел) → не game-over
+      expect(result.gameState!.players.find((p) => p.userId === 'player1')!.isAlive).toBe(true);
+      // onFighterDefeated achilles сбросил 2 карты из руки player1
+      expect(result.gameState!.handZones['player1'].cards).toHaveLength(2); // 4 - 2
+      expect(result.gameState!.discardPiles['player1']).toHaveLength(2);
+    });
+
+    it('no-op: бой без гибели бойца не трогает руку Achilles', async () => {
+      // атака 0 vs защита 0 → урона нет, сайдкик жив, discard не срабатывает
+      let state = buildState(4);
+      state = {
+        ...state,
+        metadata: {
+          ...state.metadata,
+          combatInfo: { ...(state.metadata as any).combatInfo, attackValue: 0 },
+        } as any,
+      };
+
+      const result = await service.executeResolveCombat(
+        { gameId: 'test-game-1' } as ResolveCombatDto,
+        ctxFor('player2', state),
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.gameState!.fighters.find((f) => f.id === 'fighter3')!.health).toBe(1);
+      expect(result.gameState!.handZones['player1'].cards).toHaveLength(4); // не тронута
     });
   });
 });

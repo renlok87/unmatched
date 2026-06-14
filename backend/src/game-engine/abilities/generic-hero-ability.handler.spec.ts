@@ -1275,4 +1275,334 @@ describe('GenericHeroAbilityHandler', () => {
       expect(mods[0].value).toBe(2);
     });
   });
+
+  // ---- 13) getAuraCombatModifiers (aura-combat-modifier) ----
+  // Герой-АУРА (Oda-style) баффает ДРУГИХ дружественных бойцов, делящих его
+  // зону, во время ИХ боя. Аура исходит ОТ этого handler'а, а beneficiary —
+  // отдельный боец (не сам герой-гранитель).
+  describe('getAuraCombatModifiers (aura-combat-modifier)', () => {
+    const config: AbilityConfig = {
+      heroId: 'oda-nobunaga',
+      abilityName: 'Banner of the Demon King',
+      description: '+1 другим дружественным бойцам в зоне Oda',
+      rules: [
+        {
+          trigger: 'combat-passive',
+          condition: 'always',
+          effect: {
+            kind: 'aura-combat-modifier',
+            appliesTo: 'both',
+            value: 1,
+            scope: 'allies-in-my-zone',
+          },
+        },
+      ],
+    };
+
+    // Герой-гранитель ауры (Oda) — HERO-боец player1, heroSlug === config.heroId.
+    function granterHero(overrides?: Partial<Fighter>): Fighter {
+      return heroFighter({
+        id: 'oda-hero',
+        ownerId: 'player1',
+        heroSlug: 'oda-nobunaga',
+        name: 'Oda Nobunaga',
+        position: { x: 5, y: 5 },
+        ...overrides,
+      });
+    }
+
+    // Союзный сайдкик player1 — потенциальный beneficiary ауры.
+    function allyFighter(overrides?: Partial<Fighter>): Fighter {
+      return heroFighter({
+        id: 'ally-1',
+        ownerId: 'player1',
+        type: FighterType.MINION,
+        heroSlug: 'some-sidekick',
+        name: 'Ashigaru',
+        position: { x: 5, y: 6 },
+        ...overrides,
+      });
+    }
+
+    it('грантит +1 союзнику в зоне Oda во время его атаки', () => {
+      // zone-стаб: все в одной зоне (isInSameZone → true)
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: makeZoneStub(true) }));
+      const ally = allyFighter();
+      const state = makeState({ fighters: [granterHero(), ally, enemyFighter()] });
+
+      const mods = handler.getAuraCombatModifiers(state, ally, 'attacker');
+
+      expect(mods).toHaveLength(1);
+      expect(mods[0]).toMatchObject({
+        type: ValueModifierType.ADD,
+        value: 1,
+        ownerId: 'player1',
+        source: 'hero-ability:oda-nobunaga:Banner of the Demon King',
+      });
+      expect(typeof mods[0].timestamp).toBe('number');
+    });
+
+    it('грантит +1 союзнику в зоне Oda и во время его защиты (appliesTo both)', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: makeZoneStub(true) }));
+      const ally = allyFighter();
+      const state = makeState({ fighters: [granterHero(), ally, enemyFighter()] });
+
+      const mods = handler.getAuraCombatModifiers(state, ally, 'defender');
+      expect(mods).toHaveLength(1);
+      expect(mods[0].value).toBe(1);
+    });
+
+    it('НЕ баффает самого Oda (гранитель не получает свою ауру)', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: makeZoneStub(true) }));
+      const granter = granterHero();
+      const state = makeState({ fighters: [granter, allyFighter(), enemyFighter()] });
+
+      // beneficiary === сам герой-гранитель → исключается
+      const mods = handler.getAuraCombatModifiers(state, granter, 'attacker');
+      expect(mods).toHaveLength(0);
+    });
+
+    it('НЕ баффает союзника ВНЕ зоны Oda (isInSameZone → false)', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: makeZoneStub(false) }));
+      const ally = allyFighter({ position: { x: 1, y: 1 } });
+      const state = makeState({ fighters: [granterHero(), ally, enemyFighter()] });
+
+      const mods = handler.getAuraCombatModifiers(state, ally, 'attacker');
+      expect(mods).toHaveLength(0);
+    });
+
+    it('НЕ баффает вражеского бойца (другой ownerId), даже если он в той же зоне', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: makeZoneStub(true) }));
+      const enemy = enemyFighter({ id: 'enemy-fighter-1' });
+      const state = makeState({ fighters: [granterHero(), allyFighter(), enemy] });
+
+      const mods = handler.getAuraCombatModifiers(state, enemy, 'attacker');
+      expect(mods).toHaveLength(0);
+    });
+
+    it('no-op, когда герой-гранитель повержен (isDefeated)', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: makeZoneStub(true) }));
+      const ally = allyFighter();
+      const state = makeState({
+        fighters: [granterHero({ isDefeated: true }), ally, enemyFighter()],
+      });
+
+      const mods = handler.getAuraCombatModifiers(state, ally, 'attacker');
+      expect(mods).toHaveLength(0);
+    });
+
+    it('no-op, когда герой-гранитель отсутствует на доске', () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: makeZoneStub(true) }));
+      const ally = allyFighter();
+      // нет HERO-бойца с heroSlug oda-nobunaga
+      const state = makeState({ fighters: [ally, enemyFighter()] });
+
+      const mods = handler.getAuraCombatModifiers(state, ally, 'attacker');
+      expect(mods).toHaveLength(0);
+    });
+
+    it('no-op для handler без aura-правил (обычный combat-modifier)', () => {
+      const plain: AbilityConfig = {
+        heroId: 'luke-cage',
+        abilityName: 'Skin Like Titanium',
+        description: '+2 защита',
+        rules: [
+          {
+            trigger: 'combat-passive',
+            condition: 'always',
+            effect: { kind: 'combat-modifier', appliesTo: 'defense', value: 2 },
+          },
+        ],
+      };
+      const handler = new GenericHeroAbilityHandler(plain, makeDeps({ zone: makeZoneStub(true) }));
+      const ally = allyFighter();
+      const state = makeState({ fighters: [granterHero(), ally, enemyFighter()] });
+
+      const mods = handler.getAuraCombatModifiers(state, ally, 'attacker');
+      expect(mods).toHaveLength(0);
+    });
+  });
+
+  // ---- 14) onFighterDefeated (sidekick-defeated → discard-random) ----
+  // Когда сайдкик ЭТОГО героя повержен — сбросить N карт из руки владельца.
+  describe('onFighterDefeated (sidekick-defeated → discard-random)', () => {
+    const config: AbilityConfig = {
+      heroId: 'achilles',
+      abilityName: 'Grief and Rage',
+      description: 'когда сайдкик повержен — сбросить 2 карты',
+      rules: [
+        {
+          trigger: 'sidekick-defeated',
+          effect: { kind: 'discard-random', count: 2 },
+        },
+      ],
+    };
+
+    /** State, где у player1 есть HERO (achilles) + сайдкик; рука заданного размера. */
+    const stateWithHand = (handCount: number): GameState =>
+      makeState({
+        fighters: [
+          heroFighter({ heroSlug: 'achilles' }),
+          heroFighter({
+            id: 'sidekick-1',
+            ownerId: 'player1',
+            type: FighterType.MINION,
+            name: 'Patroclus',
+            heroSlug: 'patroclus',
+            position: { x: 2, y: 2 },
+          }),
+          enemyFighter(),
+        ],
+        handZones: {
+          player1: {
+            cards: Array.from({ length: handCount }, (_, i) => ({ id: `c${i}`, isVisible: true })),
+            maxSize: 5,
+          },
+          player2: { cards: [], maxSize: 5 },
+        } as any,
+        discardPiles: { player1: [], player2: [] } as any,
+      });
+
+    it('сбрасывает 2 карты из руки владельца, когда повержен СВОЙ сайдкик', async () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = stateWithHand(4);
+      const sidekick = state.fighters.find((f) => f.id === 'sidekick-1')!;
+
+      const next = await handler.onFighterDefeated(state, sidekick);
+
+      expect(next.handZones['player1'].cards).toHaveLength(2); // 4 - 2
+      // карты ушли в сброс (count добавлен в discardPile)
+      expect(next.discardPiles['player1']).toHaveLength(2);
+      // исходный state не мутирован
+      expect(state.handZones['player1'].cards).toHaveLength(4);
+    });
+
+    it('сбрасывает столько, сколько есть, если в руке меньше count', async () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = stateWithHand(1);
+      const sidekick = state.fighters.find((f) => f.id === 'sidekick-1')!;
+
+      const next = await handler.onFighterDefeated(state, sidekick);
+      expect(next.handZones['player1'].cards).toHaveLength(0);
+      expect(next.discardPiles['player1']).toHaveLength(1);
+    });
+
+    it('no-op: повержен ВРАЖЕСКИЙ боец (не наш сайдкик)', async () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = stateWithHand(4);
+      const enemy = state.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+
+      const next = await handler.onFighterDefeated(state, enemy);
+      expect(next).toBe(state); // чистый no-op
+      expect(next.handZones['player1'].cards).toHaveLength(4);
+    });
+
+    it('no-op: повержен HERO-боец владельца (не сайдкик)', async () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = stateWithHand(4);
+      const hero = state.fighters.find((f) => f.id === 'hero-fighter-1')!;
+
+      const next = await handler.onFighterDefeated(state, hero);
+      expect(next).toBe(state);
+      expect(next.handZones['player1'].cards).toHaveLength(4);
+    });
+
+    it('no-op: handler без sidekick-defeated правила', async () => {
+      const plain: AbilityConfig = {
+        heroId: 'achilles',
+        abilityName: 'NoReact',
+        description: 'нет реакции на смерть сайдкика',
+        rules: [{ trigger: 'turn-end', effect: { kind: 'turn-effect', draw: 1 } }],
+      };
+      const handler = new GenericHeroAbilityHandler(plain, makeDeps());
+      const state = stateWithHand(4);
+      const sidekick = state.fighters.find((f) => f.id === 'sidekick-1')!;
+
+      const next = await handler.onFighterDefeated(state, sidekick);
+      expect(next).toBe(state);
+    });
+
+    it('no-op: пустая рука → нечего сбрасывать (тот же state)', async () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps());
+      const state = stateWithHand(0);
+      const sidekick = state.fighters.find((f) => f.id === 'sidekick-1')!;
+
+      const next = await handler.onFighterDefeated(state, sidekick);
+      expect(next).toBe(state);
+    });
+  });
+
+  // ---- 15) after-attack: won-combat-and-all-sidekicks-defeated ----
+  // Эффект срабатывает ТОЛЬКО когда ctx.won === true И все сайдкики
+  // действующего героя (ctx.playerId) повержены.
+  describe('onAfterCombat (won-combat-and-all-sidekicks-defeated)', () => {
+    const config: AbilityConfig = {
+      heroId: 'achilles',
+      abilityName: 'Avenging Strike',
+      description: 'после победы, если все сайдкики повержены — добор 1',
+      rules: [
+        {
+          trigger: 'after-attack',
+          condition: 'won-combat-and-all-sidekicks-defeated',
+          effect: { kind: 'turn-effect', draw: 1 },
+        },
+      ],
+    };
+
+    const afterCtx = (won: boolean): AfterCombatContext => ({
+      playerId: 'player1',
+      attackerFighterId: 'hero-fighter-1',
+      defenderFighterId: 'enemy-fighter-1',
+      won,
+      damageDealt: won ? 2 : 0,
+      firstLossThisTurn: !won,
+    });
+
+    /** State с сайдкиком player1 заданного статуса (defeated?). */
+    const stateWithSidekick = (defeated: boolean): GameState =>
+      makeState({
+        fighters: [
+          heroFighter({ heroSlug: 'achilles' }),
+          heroFighter({
+            id: 'sidekick-1',
+            ownerId: 'player1',
+            type: FighterType.MINION,
+            name: 'Patroclus',
+            isDefeated: defeated,
+            position: { x: 2, y: 2 },
+          }),
+          enemyFighter(),
+        ],
+      });
+
+    it('добор, когда won && все сайдкики повержены', async () => {
+      const deps = makeDeps();
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = stateWithSidekick(true);
+
+      const next = await handler.onAfterCombat(state, afterCtx(true));
+      expect(deps.deck.drawCards).toHaveBeenCalledWith(expect.anything(), 'player1', 1);
+      expect(next.handZones['player1'].cards).toHaveLength(1);
+    });
+
+    it('no-op: won, но сайдкик ещё жив', async () => {
+      const deps = makeDeps();
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = stateWithSidekick(false);
+
+      const next = await handler.onAfterCombat(state, afterCtx(true));
+      expect(deps.deck.drawCards).not.toHaveBeenCalled();
+      expect(next).toBe(state);
+    });
+
+    it('no-op: все сайдкики повержены, но бой ПРОИГРАН (won===false)', async () => {
+      const deps = makeDeps();
+      const handler = new GenericHeroAbilityHandler(config, deps);
+      const state = stateWithSidekick(true);
+
+      const next = await handler.onAfterCombat(state, afterCtx(false));
+      expect(deps.deck.drawCards).not.toHaveBeenCalled();
+      expect(next).toBe(state);
+    });
+  });
 });

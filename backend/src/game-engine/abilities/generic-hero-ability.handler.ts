@@ -26,8 +26,10 @@ import {
   AbilityConfig,
   AbilityCondition,
   AbilityRule,
+  AuraCombatModifierEffect,
   CombatModifierEffect,
   CombatModifierPerCountEffect,
+  DiscardRandomEffect,
   PendingMoveEffect,
   TurnDamageEffect,
   TurnEffect,
@@ -183,6 +185,78 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     }
   }
 
+  // ===================== AURA (combat-modifier от ДРУГОГО героя) =====================
+
+  /**
+   * АУРНЫЕ боевые модификаторы (Oda-style). В отличие от
+   * getStatefulCombatModifiers (который консультирует own-handler КОНКРЕТНОГО
+   * бойца боя), этот хук вызывается реестром для КАЖДОГО зарегистрированного
+   * героя с бойцом-БЕНЕФИЦИАРОМ: если ЭТОТ handler — герой-гранитель ауры, и
+   * beneficiary удовлетворяет условиям ауры, он получает ADD-модификатор во
+   * время СВОЕГО боя.
+   *
+   * Для каждого 'combat-passive' правила с effect.kind === 'aura-combat-modifier':
+   *  - находим HERO-бойца ЭТОГО handler'а (FighterType.HERO, ownerId ===
+   *    beneficiary.ownerId, heroSlug === this.heroId) — герой-гранитель;
+   *  - требуем: гранитель существует, жив (!isDefeated);
+   *  - beneficiary.id !== granterHeroFighter.id (гранитель НЕ баффает сам себя);
+   *  - beneficiary.ownerId === ownerId гранителя (только СВОИ — гарантировано
+   *    выбором гранителя по beneficiary.ownerId, но проверяем явно);
+   *  - deps.zone.isInSameZone(state, granterPos, beneficiaryPos) (общая зона);
+   *  - appliesTo совпадает с ролью бенефициара (sideMatchesRole; 'both' — всегда).
+   * При выполнении всех условий — ADD value (НЕ использует контекст защитника
+   * боя; баффает именно бойца-бенефициара). Иначе — пусто (чистый no-op).
+   */
+  getAuraCombatModifiers(
+    state: GameState,
+    beneficiary: Fighter,
+    role: 'attacker' | 'defender',
+  ): readonly ValueModifier[] {
+    const modifiers: ValueModifier[] = [];
+
+    for (const rule of this.rules) {
+      if (rule.trigger !== 'combat-passive') continue;
+      if (rule.effect.kind !== 'aura-combat-modifier') continue;
+
+      const effect = rule.effect as AuraCombatModifierEffect;
+
+      // Сторона боя бенефициара ('both' — всегда).
+      if (!this.sideMatchesRole(effect.appliesTo, role)) continue;
+
+      // Герой-гранитель ауры = HERO-боец ЭТОГО handler'а у владельца бенефициара.
+      const granter = state.fighters.find(
+        (f) =>
+          f.type === FighterType.HERO &&
+          f.ownerId === beneficiary.ownerId &&
+          f.heroSlug === this.heroId,
+      );
+      // Гранитель должен существовать и быть живым.
+      if (!granter || granter.isDefeated === true) continue;
+      // Гранитель НЕ баффает сам себя.
+      if (beneficiary.id === granter.id) continue;
+      // Только СВОИ бойцы (явная проверка, хотя granter уже выбран по ownerId).
+      if (beneficiary.ownerId !== granter.ownerId) continue;
+      // scope 'allies-in-my-zone' — бенефициар делит зону гранителя.
+      if (effect.scope === 'allies-in-my-zone') {
+        if (!this.deps.zone.isInSameZone(state, granter.position, beneficiary.position)) {
+          continue;
+        }
+      } else {
+        continue;
+      }
+
+      modifiers.push({
+        type: ValueModifierType.ADD,
+        value: effect.value,
+        source: `hero-ability:${this.heroId}:${this.abilityName}`,
+        ownerId: beneficiary.ownerId,
+        timestamp: Date.now(),
+      });
+    }
+
+    return modifiers;
+  }
+
   // ===================== TURN-START / TURN-END =====================
 
   async onTurnStart(state: GameState, playerId: string): Promise<GameState> {
@@ -213,7 +287,7 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       if (rule.trigger !== 'after-attack' && rule.trigger !== 'after-defense') continue;
       if (rule.effect.kind !== 'turn-effect' && rule.effect.kind !== 'pending-move') continue;
 
-      if (!this.evalAfterCombatCondition(rule.condition ?? 'always', ctx)) {
+      if (!this.evalAfterCombatCondition(rule.condition ?? 'always', ctx, current)) {
         continue;
       }
 
@@ -232,6 +306,86 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     }
 
     return current;
+  }
+
+  // ===================== ON-DEFEAT (РЕАНИМИРОВАННЫЙ on-defeat хук) =====================
+
+  /**
+   * Реакция на гибель бойца (триггер 'sidekick-defeated'). Дёргается executor'ом
+   * для героя ВЛАДЕЛЬЦА повергнутого бойца ПОСЛЕ установки isDefeated.
+   *
+   * Для правил trigger === 'sidekick-defeated' с effect.kind === 'discard-random':
+   * срабатывает ТОЛЬКО если defeatedFighter — НЕ-HERO боец владельца ЭТОГО героя
+   * (т.е. наш сайдкик). Тогда иммутабельно сбрасывает count карт из руки владельца
+   * (детерминированно — первые count; уходят в discardPile, если он есть).
+   * Чистый no-op (тот же state) во всех прочих случаях: чужой/HERO-боец, нет
+   * 'sidekick-defeated' правила, пустая рука.
+   */
+  async onFighterDefeated(state: GameState, defeatedFighter: Fighter): Promise<GameState> {
+    let current = state;
+
+    for (const rule of this.rules) {
+      if (rule.trigger !== 'sidekick-defeated') continue;
+      if (rule.effect.kind !== 'discard-random') continue;
+
+      // Реагируем только на гибель СВОЕГО сайдкика (НЕ-HERO боец нашего владельца).
+      if (defeatedFighter.type === FighterType.HERO) continue;
+      const granter = this.findHeroFighter(current, defeatedFighter.ownerId);
+      // Боец-владелец должен иметь HERO-бойца ИМЕННО ЭТОГО героя (слаг совпадает).
+      if (!granter || (granter.heroSlug ?? granter.heroId) !== this.heroId) continue;
+
+      current = this.discardCardsFromHand(
+        current,
+        defeatedFighter.ownerId,
+        (rule.effect as DiscardRandomEffect).count,
+      );
+    }
+
+    return current;
+  }
+
+  /**
+   * Иммутабельно сбрасывает первые `count` карт из руки игрока (детерминированный
+   * стенд-ин для «random»). Карты уходят в discardPiles[playerId] (если структура
+   * есть), иначе просто удаляются из руки. Пустая рука / count<=0 → чистый no-op
+   * (тот же объект state).
+   */
+  private discardCardsFromHand(
+    state: GameState,
+    playerId: string,
+    count: number,
+  ): GameState {
+    if (count <= 0) return state;
+
+    const hand = state.handZones[playerId];
+    const cards = hand?.cards ?? [];
+    if (cards.length === 0) return state;
+
+    const toDiscard = cards.slice(0, count);
+    const remaining = cards.slice(toDiscard.length);
+
+    const newState: GameState = {
+      ...state,
+      handZones: {
+        ...state.handZones,
+        [playerId]: { ...hand, cards: remaining },
+      },
+    };
+
+    // discardPiles может отсутствовать у легаси-состояний — пишем только если
+    // структура присутствует (move to discard pile if one exists).
+    if (state.discardPiles) {
+      const currentDiscard = state.discardPiles[playerId] ?? [];
+      return {
+        ...newState,
+        discardPiles: {
+          ...state.discardPiles,
+          [playerId]: [...currentDiscard, ...toDiscard.map((c) => ({ ...c, isVisible: false }))],
+        },
+      };
+    }
+
+    return newState;
   }
 
   // ===================== ПАССИВНАЯ ДАЛЬНОСТЬ АТАКИ =====================
@@ -584,17 +738,21 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
   }
 
   /**
-   * Условия after-attack правил. Оцениваются ТОЛЬКО против исхода боя:
+   * Условия after-attack правил. Оцениваются против исхода боя (+ при компаунд-
+   * условии — против GameState):
    *  - 'always'                      → всегда
    *  - 'won-combat'                  → ctx.won === true
    *  - 'lost-combat'                 → ctx.won === false
    *  - 'first-lost-combat-this-turn' → ctx.won === false && ctx.firstLossThisTurn
+   *  - 'won-combat-and-all-sidekicks-defeated' → ctx.won === true И все сайдкики
+   *    действующего героя (ctx.playerId) повержены (allOwnSidekicksDefeated).
    * Любое иное условие (боевое/ходовое/{handSizeEquals}) для after-attack не
    * валидно и безопасно игнорируется (правило не срабатывает).
    */
   private evalAfterCombatCondition(
     condition: AbilityCondition,
     ctx: AfterCombatContext,
+    state: GameState,
   ): boolean {
     if (typeof condition === 'object') {
       // { handSizeEquals } не применимо к after-attack → no-op
@@ -610,6 +768,8 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
         return ctx.won === false;
       case 'first-lost-combat-this-turn':
         return ctx.won === false && ctx.firstLossThisTurn === true;
+      case 'won-combat-and-all-sidekicks-defeated':
+        return ctx.won === true && this.allOwnSidekicksDefeated(state, ctx.playerId);
       // combat-only / turn-only условия вне after-attack контекста → no-op
       default:
         return false;

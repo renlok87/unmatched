@@ -24,13 +24,21 @@
  *                       Spider-Man, you may draw a card»). Тот же TurnEffect и
  *                       те же after-combat условия (won/lost), но цель —
  *                       защитник. Если ctx.defenderPlayerId не задан — no-op.
+ *  - 'sidekick-defeated' — реакция на гибель СВОЕГО сайдкика (Achilles-style:
+ *                       «When Patroclus is defeated, discard 2 random cards»).
+ *                       Диспетчеризуется через РЕАНИМИРОВАННЫЙ on-defeat хук:
+ *                       executor дёргает onFighterDefeated владельца повергнутого
+ *                       бойца ПОСЛЕ установки isDefeated, но ДО game-over/передачи
+ *                       хода. Handler реагирует, только если defeatedFighter —
+ *                       НЕ-HERO боец владельца ЭТОГО героя (свой сайдкик).
  */
 export type AbilityTrigger =
   | 'combat-passive'
   | 'turn-start'
   | 'turn-end'
   | 'after-attack'
-  | 'after-defense';
+  | 'after-defense'
+  | 'sidekick-defeated';
 
 /**
  * Условие срабатывания правила (декларативное, проверяется против GameState).
@@ -58,6 +66,11 @@ export type AbilityTrigger =
  *  - 'first-lost-combat-this-turn' — [after-attack] это ПЕРВЫЙ проигранный бой
  *                                    атакующего в этом ходу (ctx.won===false &&
  *                                    ctx.firstLossThisTurn).
+ *  - 'won-combat-and-all-sidekicks-defeated' — [after-attack] КОМПАУНД-условие
+ *                                    (Achilles-style): атакующий победил
+ *                                    (ctx.won===true) И все сайдкики действующего
+ *                                    героя (ctx.playerId) повержены
+ *                                    (all-own-sidekicks-defeated против ctx.playerId).
  *
  * ВАЖНО: 'won-combat'/'lost-combat'/'first-lost-combat-this-turn' имеют смысл
  * ТОЛЬКО для триггера 'after-attack' (оцениваются против AfterCombatContext);
@@ -77,6 +90,7 @@ export type AbilityCondition =
   | 'has-not-maneuvered-this-turn'
   | 'has-attacked-this-turn'
   | 'first-lost-combat-this-turn'
+  | 'won-combat-and-all-sidekicks-defeated'
   | { readonly handSizeEquals: number };
 
 /**
@@ -122,6 +136,39 @@ export interface CombatModifierPerCountEffect {
 }
 
 /**
+ * АУРНЫЙ боевой модификатор (Oda-style): герой-ГРАНИТЕЛЬ ауры баффает ДРУГИХ
+ * дружественных бойцов, делящих ЕГО зону, во время ИХ боя.
+ *
+ * ВАЖНО — отличие от CombatModifierEffect: обычный combat-modifier консультирует
+ * own-handler КОНКРЕТНОГО бойца боя (его собственного героя). Аура же исходит от
+ * ДРУГОГО героя (гранителя), поэтому она диспетчеризуется отдельным путём
+ * (HeroAbilityRegistry.getAuraCombatModifiers + GenericHeroAbilityHandler.
+ * getAuraCombatModifiers), который консультирует ВСЕХ зарегистрированных героев,
+ * а не только героя бойца-бенефициара.
+ *
+ * Семантика: модификатор применяется к ДРУГИМ бойцам гранителя
+ * (ИСКЛЮЧАЯ самого HERO-бойца гранителя), которые делят зону HERO-бойца
+ * гранителя (deps.zone.isInSameZone), во время боя ЭТИХ бойцов (бенефициаров).
+ * appliesTo гейтит сторону боя бенефициара (attack/defense/both). Всегда
+ * ADD-семантика. Используется с триггером 'combat-passive' (это правило
+ * героя-ГРАНИТЕЛЯ ауры). НЕ использует контекст защитника боя — баффает именно
+ * бойца-бенефициара.
+ *
+ * scope — область действия ауры:
+ *  - 'allies-in-my-zone' — дружественные бойцы (тот же ownerId, что у HERO-бойца
+ *    гранителя), ИСКЛЮЧАЯ самого HERO-бойца гранителя, делящие его зону.
+ */
+export interface AuraCombatModifierEffect {
+  readonly kind: 'aura-combat-modifier';
+  /** К чему применяется у бенефициара: атака, защита или обе стороны боя */
+  readonly appliesTo: 'attack' | 'defense' | 'both';
+  /** Величина (ADD) */
+  readonly value: number;
+  /** Область действия ауры (кого баффает гранитель) */
+  readonly scope: 'allies-in-my-zone';
+}
+
+/**
  * Эффект хода: добор/лечение/доп. действие.
  * Любое поле опционально — применяются только заданные.
  */
@@ -135,6 +182,26 @@ export interface TurnEffect {
   readonly heal?: number;
   /** Прибавить N к оставшимся действиям хода */
   readonly gainAction?: number;
+}
+
+/**
+ * Эффект «сброс карт» (discard-random): способность сбрасывает N карт из руки
+ * ДЕЙСТВУЮЩЕГО игрока (Achilles-style: «discard 2 random cards» при гибели
+ * Patroclus). Карты уходят в discardPile владельца (если он есть), иначе просто
+ * удаляются из руки.
+ *
+ * ПРИБЛИЖЕНИЕ / ДЕТЕРМИНИЗМ: печатное «random» НЕ моделируется случайным выбором
+ * (нет источника энтропии в движке и нет выбора игроком) — детерминированно
+ * сбрасываем ПЕРВЫЕ count карт руки. Если в руке меньше count — сбрасываем
+ * сколько есть (пустая рука → чистый no-op).
+ *
+ * Используется с триггером 'sidekick-defeated' (handler гейтит: defeatedFighter —
+ * свой НЕ-HERO боец).
+ */
+export interface DiscardRandomEffect {
+  readonly kind: 'discard-random';
+  /** Сколько карт сбросить из руки (детерминированный стенд-ин для «random») */
+  readonly count: number;
 }
 
 /**
@@ -200,9 +267,11 @@ export interface TurnDamageEffect {
 export type AbilityEffect =
   | CombatModifierEffect
   | CombatModifierPerCountEffect
+  | AuraCombatModifierEffect
   | TurnEffect
   | PendingMoveEffect
-  | TurnDamageEffect;
+  | TurnDamageEffect
+  | DiscardRandomEffect;
 
 /**
  * Одно правило способности: триггер + (опц.) условие + эффект.
@@ -576,6 +645,63 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
           valuePer: 1,
           countOf: 'own-fighters-adjacent-to-defender-excl-self',
         },
+      },
+    ],
+  },
+  {
+    // Oda Nobunaga — аура-командир: ДРУГИЕ дружественные бойцы в зоне Oda
+    // получают +1 к значению своих боевых карт (атака и защита). Сам Oda бонус
+    // НЕ получает. Реализуется через aura-combat-modifier (отдельный путь
+    // диспетчеризации getAuraCombatModifiers — аура исходит от ДРУГОГО героя,
+    // не от собственного героя бойца-бенефициара).
+    // Слаг подтверждён через slugifyHeroName('Oda Nobunaga') → 'oda-nobunaga'.
+    heroId: 'oda-nobunaga',
+    abilityName: 'Banner of the Demon King',
+    description:
+      'Other friendly fighters in Oda\'s zone add +1 to the value of their combat cards; ' +
+      'Oda himself does not benefit.',
+    rules: [
+      {
+        trigger: 'combat-passive',
+        condition: 'always',
+        effect: {
+          kind: 'aura-combat-modifier',
+          appliesTo: 'both',
+          value: 1,
+          scope: 'allies-in-my-zone',
+        },
+      },
+    ],
+  },
+  {
+    // Achilles — «Grief of Achilles»: пока Patroclus (единственный сайдкик)
+    // повержен — +2 к атаке Achilles; при ПОБЕДЕ в бою (когда сайдкик повержен)
+    // добор 1 карты. В момент гибели Patroclus — сброс 2 карт из руки Achilles
+    // (детерминированный стенд-ин для «discard 2 random cards»).
+    // Печатный текст: «When Patroclus is defeated, discard 2 random cards.
+    //   While Patroclus is defeated: +2 to the value of all Achilles' attacks;
+    //   if Achilles wins combat, draw 1 card.»
+    // Слаг подтверждён через slugifyHeroName('Achilles') → 'achilles'.
+    heroId: 'achilles',
+    abilityName: 'Grief of Achilles',
+    description:
+      "While Patroclus is defeated: +2 to all Achilles' attacks; if Achilles wins combat, draw 1 card. " +
+      'When Patroclus is defeated, discard 2 cards. ' +
+      'Примечание (приближение MVP): «random» сброс детерминирован — сбрасываются первые 2 карты руки.',
+    rules: [
+      {
+        trigger: 'combat-passive',
+        condition: 'all-own-sidekicks-defeated',
+        effect: { kind: 'combat-modifier', appliesTo: 'attack', value: 2 },
+      },
+      {
+        trigger: 'after-attack',
+        condition: 'won-combat-and-all-sidekicks-defeated',
+        effect: { kind: 'turn-effect', draw: 1 },
+      },
+      {
+        trigger: 'sidekick-defeated',
+        effect: { kind: 'discard-random', count: 2 },
       },
     ],
   },

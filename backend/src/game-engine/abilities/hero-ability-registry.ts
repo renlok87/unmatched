@@ -179,6 +179,17 @@ export interface ExtendedHeroAbilityHandler {
   onAfterCombat?(state: GameState, ctx: AfterCombatContext): Promise<GameState>;
 
   /**
+   * Вызывается, когда боец помечен повергнутым (РЕАНИМИРОВАННЫЙ on-defeat хук).
+   * В отличие от мёртвого классического onDefeat(fighter): GameEvent[] (никогда
+   * не вызывался в проде), этот EXTENDED-хук мутирует GameState и реально
+   * дёргается executor'ом после установки isDefeated (ДО game-over/передачи
+   * хода). Диспетчеризуется на героя ВЛАДЕЛЬЦА повергнутого бойца, чтобы герой
+   * мог отреагировать на гибель своего сайдкика (Achilles → discard 2). Чистый
+   * no-op для героев без реакции (тот же state).
+   */
+  onFighterDefeated?(state: GameState, defeatedFighter: Fighter): Promise<GameState>;
+
+  /**
    * Проверяет, может ли боец атаковать на определённой дистанции
    */
   canAttackAtRange?(attackerId: string, defenderId: string, range: number): boolean;
@@ -205,6 +216,20 @@ export interface ExtendedHeroAbilityHandler {
     state: GameState,
     context: CombatState,
     fighter: Fighter,
+    role: 'attacker' | 'defender',
+  ): readonly ValueModifier[];
+
+  /**
+   * АУРНЫЕ боевые модификаторы (Oda-style): ЭТОТ герой как ГРАНИТЕЛЬ ауры
+   * баффает ДРУГОГО дружественного бойца (beneficiary), делящего его зону, во
+   * время боя бенефициара. В отличие от getStatefulCombatModifiers (own-handler
+   * бойца боя), этот хук консультирует КАЖДОГО зарегистрированного героя — аура
+   * исходит от героя, ОТЛИЧНОГО от героя бенефициара. ADD-семантика, как у
+   * остальных combat-модификаторов.
+   */
+  getAuraCombatModifiers?(
+    state: GameState,
+    beneficiary: Fighter,
     role: 'attacker' | 'defender',
   ): readonly ValueModifier[];
 }
@@ -463,6 +488,32 @@ export class HeroAbilityRegistry {
   }
 
   /**
+   * Вызвать on-defeat хук героя (расширенный, РЕАНИМИРОВАННЫЙ).
+   *
+   * Зеркало triggerOnAfterCombat: getExtended(heroId), вызов
+   * handler.onFighterDefeated если есть, try/catch → возврат исходного state.
+   * heroId — слаг героя ВЛАДЕЛЬЦА повергнутого бойца (executor резолвит его с
+   * HERO-бойца владельца). Отсутствие хука/ошибка — состояние без изменений.
+   */
+  async triggerOnFighterDefeated(
+    heroId: string,
+    state: GameState,
+    defeatedFighter: Fighter,
+  ): Promise<GameState> {
+    const handler = this.getExtended(heroId);
+    if (!handler?.onFighterDefeated) {
+      return state;
+    }
+
+    try {
+      return await handler.onFighterDefeated(state, defeatedFighter);
+    } catch (error) {
+      this.logger.error(`Error in onFighterDefeated for hero ${heroId}:`, error);
+      return state;
+    }
+  }
+
+  /**
    * Вызвать обработчик боя (расширенный)
    */
   async triggerOnCombat(
@@ -529,5 +580,39 @@ export class HeroAbilityRegistry {
       this.logger.error(`Error in getStatefulCombatModifiers for hero ${heroId}:`, error);
       return [];
     }
+  }
+
+  /**
+   * Получить АУРНЫЕ боевые модификаторы для бойца-БЕНЕФИЦИАРА (с доступом к
+   * GameState). В отличие от getStatefulCombatModifiers (lookup по героя
+   * КОНКРЕТНОГО бойца), аура исходит от ДРУГОГО героя-гранителя — поэтому
+   * консультируем ВСЕ зарегистрированные extended-handler'ы и конкатенируем их
+   * вклад. try/catch на каждом handler'е (ошибка одного не валит остальных).
+   * Отсутствие хука у handler'а — пропуск. ADD-семантика, как у остальных.
+   */
+  getAuraCombatModifiers(
+    state: GameState,
+    beneficiary: Fighter,
+    role: CombatRole,
+  ): readonly ValueModifier[] {
+    const modifiers: ValueModifier[] = [];
+
+    for (const handler of this.extendedHandlers.values()) {
+      if (!handler.getAuraCombatModifiers) continue;
+
+      try {
+        const mods = handler.getAuraCombatModifiers(state, beneficiary, role);
+        if (mods && mods.length > 0) {
+          modifiers.push(...mods);
+        }
+      } catch (error) {
+        this.logger.error(
+          `Error in getAuraCombatModifiers for hero ${handler.heroId}:`,
+          error,
+        );
+      }
+    }
+
+    return modifiers;
   }
 }
