@@ -173,6 +173,7 @@ describe('ABILITY_CONFIGS — присутствие героев', () => {
     'raptors',
     'oda-nobunaga',
     'achilles',
+    'tomoe-gozen',
   ];
   it.each(expected)('содержит конфиг для слага %s', (slug) => {
     expect(configFor(slug)).toBeDefined();
@@ -1137,6 +1138,67 @@ describe('achilles (sidekick-defeated discard + all-sidekicks-defeated combat/af
 
     const next = await handler.onFighterDefeated(state, enemy);
     expect(next).toBe(state);
+  });
+});
+
+// ===================== TOMOE GOZEN (enemy-hero-left-my-zone → reactive-damage) =====================
+
+describe('tomoe-gozen (enemy-hero-left-my-zone: 1 урон вражескому герою, покинувшему зону)', () => {
+  /** zone-стаб: зона Tomoe — клетки x<=2; всё x>2 — снаружи. */
+  const zoneByX = () => ({
+    isInSameZone: jest.fn(
+      (_s: unknown, a: { x: number; y: number }, b: { x: number; y: number }) =>
+        a.x <= 2 && b.x <= 2,
+    ),
+    manhattanDistance: jest.fn(
+      (a: { x: number; y: number }, b: { x: number; y: number }) =>
+        Math.abs(a.x - b.x) + Math.abs(a.y - b.y),
+    ),
+  });
+
+  /** Tomoe-герой (player1) в (1,1) + вражеский герой (player2) в заданной позиции. */
+  const tomoeState = (enemyPos: { x: number; y: number }): GameState =>
+    makeState({
+      fighters: [
+        makeFighter({ heroSlug: 'tomoe-gozen', position: { x: 1, y: 1 } }),
+        makeFighter({
+          id: 'enemy-fighter-1',
+          ownerId: 'player2',
+          heroSlug: 'enemy-hero',
+          name: 'Enemy',
+          type: FighterType.HERO,
+          health: 12,
+          position: enemyPos,
+        }),
+      ],
+    });
+
+  it('config: одно правило enemy-hero-left-my-zone / reactive-damage value 1', () => {
+    const config = configFor('tomoe-gozen')!;
+    expect(config.rules).toHaveLength(1);
+    expect(config.rules[0]).toMatchObject({
+      trigger: 'enemy-hero-left-my-zone',
+      effect: { kind: 'reactive-damage', value: 1 },
+    });
+  });
+
+  it('наносит 1 урон вражескому герою, покинувшему зону Tomoe', async () => {
+    const handler = handlerFor('tomoe-gozen', makeDeps({ zone: zoneByX() }));
+    const state = tomoeState({ x: 2, y: 1 }); // ∈ зоне
+    const moved = state.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+
+    const next = await handler.onFighterMoved(state, moved, { x: 2, y: 1 }, { x: 5, y: 1 });
+    expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(11);
+  });
+
+  it('no-op: враг остался в зоне (не покинул)', async () => {
+    const handler = handlerFor('tomoe-gozen', makeDeps({ zone: zoneByX() }));
+    const state = tomoeState({ x: 2, y: 1 });
+    const moved = state.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+
+    const next = await handler.onFighterMoved(state, moved, { x: 2, y: 1 }, { x: 1, y: 2 });
+    expect(next).toBe(state);
+    expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
   });
 });
 

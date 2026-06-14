@@ -190,6 +190,23 @@ export interface ExtendedHeroAbilityHandler {
   onFighterDefeated?(state: GameState, defeatedFighter: Fighter): Promise<GameState>;
 
   /**
+   * РЕАКТИВНЫЙ on-move хук (РЕАНИМИРОВАННЫЙ): вызывается ПОСЛЕ того, как боец
+   * переместился (позиция изменилась). В отличие от мёртвого классического
+   * onMove(fighter,from,to): GameEvent[] (никогда не вызывался в проде), этот
+   * EXTENDED-хук мутирует GameState и реально дёргается executor'ом проходом по
+   * диффу позиций ПОСЛЕ применения движения. Кросс-героевый/реактивный:
+   * реагирующий герой ОТЛИЧЕН от двигающегося — диспетчер консультирует КАЖДЫЙ
+   * зарегистрированный handler (как getAuraCombatModifiers), а не handler
+   * двигающегося бойца. Чистый no-op для героев без реакции (тот же state).
+   */
+  onFighterMoved?(
+    state: GameState,
+    movedFighter: Fighter,
+    fromPos: Position,
+    toPos: Position,
+  ): Promise<GameState>;
+
+  /**
    * Проверяет, может ли боец атаковать на определённой дистанции
    */
   canAttackAtRange?(attackerId: string, defenderId: string, range: number): boolean;
@@ -511,6 +528,41 @@ export class HeroAbilityRegistry {
       this.logger.error(`Error in onFighterDefeated for hero ${heroId}:`, error);
       return state;
     }
+  }
+
+  /**
+   * Вызвать РЕАКТИВНЫЙ on-move хук (расширенный, РЕАНИМИРОВАННЫЙ).
+   *
+   * Кросс-героевый реактив: реагирующий герой ОТЛИЧЕН от двигающегося —
+   * поэтому, как и getAuraCombatModifiers, консультируем ВСЕ зарегистрированные
+   * extended-handler'ы (а не handler двигающегося бойца). Каждый handler.
+   * onFighterMoved? await'ится ПО ОЧЕРЕДИ, протягивая (возможно мутированный)
+   * state через всю цепочку. try/catch на КАЖДОМ handler'е (ошибка одного не
+   * рвёт цепочку — остальные всё равно отрабатывают на текущем state).
+   * Отсутствие хука у handler'а — пропуск. Возвращает финальный state.
+   */
+  async triggerOnFighterMoved(
+    state: GameState,
+    movedFighter: Fighter,
+    fromPos: Position,
+    toPos: Position,
+  ): Promise<GameState> {
+    let next = state;
+
+    for (const handler of this.extendedHandlers.values()) {
+      if (!handler.onFighterMoved) continue;
+
+      try {
+        next = await handler.onFighterMoved(next, movedFighter, fromPos, toPos);
+      } catch (error) {
+        this.logger.error(
+          `Error in onFighterMoved for hero ${handler.heroId}:`,
+          error,
+        );
+      }
+    }
+
+    return next;
   }
 
   /**

@@ -31,6 +31,16 @@
  *                       бойца ПОСЛЕ установки isDefeated, но ДО game-over/передачи
  *                       хода. Handler реагирует, только если defeatedFighter —
  *                       НЕ-HERO боец владельца ЭТОГО героя (свой сайдкик).
+ *  - 'enemy-hero-left-my-zone' — РЕАКТИВНЫЙ кросс-героевый триггер (Tomoe-style:
+ *                       «When an opposing hero leaves Tomoe Gozen's zone, deal 1
+ *                       damage to that hero»). Диспетчеризуется через
+ *                       РЕАНИМИРОВАННЫЙ on-move хук: executor проходит по диффу
+ *                       позиций ПОСЛЕ перемещения и дёргает onFighterMoved у
+ *                       КАЖДОГО зарегистрированного героя (реагирует ГЕРОЙ,
+ *                       ОТЛИЧНЫЙ от двигающегося). Handler реагирует, только если
+ *                       сдвинувшийся боец — вражеский HERO, который БЫЛ в зоне
+ *                       этого героя (fromPos) и ПОКИНУЛ её (toPos вне зоны).
+ *                       Используется с эффектом reactive-damage.
  */
 export type AbilityTrigger =
   | 'combat-passive'
@@ -38,7 +48,8 @@ export type AbilityTrigger =
   | 'turn-end'
   | 'after-attack'
   | 'after-defense'
-  | 'sidekick-defeated';
+  | 'sidekick-defeated'
+  | 'enemy-hero-left-my-zone';
 
 /**
  * Условие срабатывания правила (декларативное, проверяется против GameState).
@@ -205,6 +216,28 @@ export interface DiscardRandomEffect {
 }
 
 /**
+ * Эффект «реактивный урон» (reactive-damage): способность наносит value урона
+ * бойцу, КОТОРЫЙ ТОЛЬКО ЧТО ПЕРЕМЕСТИЛСЯ и тем самым активировал триггер
+ * (Tomoe-style: «When an opposing hero leaves Tomoe Gozen's zone, deal 1 damage
+ * to that hero»). В отличие от turn-damage (которое САМО авто-выбирает цель в
+ * зоне/смежно с героем в turn-start/turn-end), здесь цель ЗАДАНА извне —
+ * движком — это movedFighter, переданный в onFighterMoved.
+ *
+ * Валиден ТОЛЬКО для триггера 'enemy-hero-left-my-zone' (handler гейтит: цель —
+ * вражеский HERO, который ПОКИНУЛ зону героя-владельца способности).
+ *
+ * Семантика урона зеркалит turn-damage: health = max(0, health - value); при
+ * достижении 0 боец помечается isDefeated, владельцу пересчитывается isAlive.
+ * Game-over здесь НЕ ставится — это делает WIRE recheck (applyMoveReactions →
+ * checkAndApplyGameOver) ПОСЛЕ всех on-move реакций; seq не бампится.
+ */
+export interface ReactiveDamageEffect {
+  readonly kind: 'reactive-damage';
+  /** Сколько урона нанести сдвинувшемуся бойцу, активировавшему триггер */
+  readonly value: number;
+}
+
+/**
  * Эффект «отложенный ход» (pending-move): способность порождает MOVE
  * PendingEffect (C2), который игрок резолвит мутацией resolvePendingEffect
  * (как «You may move…» с карт). Сам ход не исполняется здесь — лишь создаётся
@@ -271,7 +304,8 @@ export type AbilityEffect =
   | TurnEffect
   | PendingMoveEffect
   | TurnDamageEffect
-  | DiscardRandomEffect;
+  | DiscardRandomEffect
+  | ReactiveDamageEffect;
 
 /**
  * Одно правило способности: триггер + (опц.) условие + эффект.
@@ -702,6 +736,25 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
       {
         trigger: 'sidekick-defeated',
         effect: { kind: 'discard-random', count: 2 },
+      },
+    ],
+  },
+  {
+    // Tomoe Gozen — «Unwavering Resolve»-подобный заслон: когда вражеский герой
+    // ПОКИДАЕТ зону Tomoe, она наносит ему 1 урон. Реактивный кросс-героевый
+    // триггер (enemy-hero-left-my-zone): диспетчеризуется через on-move хук
+    // (onFighterMoved) — реагирует Tomoe, а двигается вражеский герой.
+    // Печатный текст: «When an opposing hero leaves Tomoe Gozen's zone, deal 1
+    //   damage to that hero.»
+    // Слаг подтверждён через slugifyHeroName('Tomoe Gozen') → 'tomoe-gozen'.
+    heroId: 'tomoe-gozen',
+    abilityName: 'Unwavering Resolve',
+    description:
+      "When an opposing hero leaves Tomoe Gozen's zone, deal 1 damage to that hero.",
+    rules: [
+      {
+        trigger: 'enemy-hero-left-my-zone',
+        effect: { kind: 'reactive-damage', value: 1 },
       },
     ],
   },

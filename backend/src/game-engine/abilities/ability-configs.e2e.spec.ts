@@ -37,7 +37,7 @@ import { ABILITY_CONFIGS } from './ability-config';
 import { daredevilHandler, msMarvelHandler, arthurAbilityHandler } from './heroes';
 import { FighterType, GamePhase } from '../models';
 import type { GameState } from '../models';
-import { ResolveCombatDto, EndTurnDto, AttackDto } from '../../games/dto/gameplay.dto';
+import { ResolveCombatDto, EndTurnDto, AttackDto, ManeuverDto } from '../../games/dto/gameplay.dto';
 
 describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', () => {
   let service: GameActionExecutorService;
@@ -259,7 +259,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
   afterEach(() => jest.clearAllMocks());
 
   // ====================================================================
-  // САНИТИ: все 22 конфига реально зарегистрированы под своими слагами
+  // САНИТИ: все 24 конфига реально зарегистрированы под своими слагами
   // ====================================================================
   describe('registration', () => {
     it('каждый ABILITY_CONFIGS.heroId зарегистрирован в реестре под своим слагом', () => {
@@ -267,7 +267,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
         expect(registry.has(cfg.heroId)).toBe(true);
         expect(registry.getExtended(cfg.heroId)?.heroId).toBe(cfg.heroId);
       }
-      expect(ABILITY_CONFIGS).toHaveLength(23);
+      expect(ABILITY_CONFIGS).toHaveLength(24);
     });
   });
 
@@ -977,6 +977,87 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
       expect(result.success).toBe(true);
       expect(result.gameState!.fighters.find((f) => f.id === 'fighter3')!.health).toBe(1);
       expect(result.gameState!.handZones['player1'].cards).toHaveLength(4); // не тронута
+    });
+  });
+
+  // ====================================================================
+  // onFighterMoved WIRING (tomoe-gozen): когда вражеский герой ПОКИДАЕТ зону
+  // Tomoe в ходе манёвра, executor диффает позиции и дёргает onFighterMoved
+  // Tomoe (реактор ≠ двигающийся) → вражеский герой получает 1 урон.
+  // ====================================================================
+  describe('onFighterMoved wiring (tomoe-gozen reactive damage via executeManeuver)', () => {
+    /**
+     * Tomoe — fighter1 (player1) в (5,5). Вражеский герой fighter2 (player2)
+     * стартует в (6,5) ∈ зоне Tomoe и манёвром уходит в (10,5) — вне зоны.
+     * Мокаем isInSameZone так, что «зона Tomoe» = клетки с x <= 7: тогда
+     * fromPos(6,5) ∈ зоне, toPos(10,5) вне → триггер срабатывает.
+     */
+    it('вражеский герой, покинувший зону Tomoe в манёвре, получает 1 урон', async () => {
+      const adjacency = (service as any).adjacencyService;
+      // isInSameZone(state, reactorPos, otherPos): «в зоне» ⟺ обе точки x<=7.
+      adjacency.isInSameZone.mockImplementation(
+        (_s: unknown, a: { x: number; y: number }, b: { x: number; y: number }) =>
+          a.x <= 7 && b.x <= 7,
+      );
+
+      let state = createMockGameState({
+        phase: GamePhase.ACTION_MANEUVER,
+        currentTurnPlayerId: 'player2',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player2',
+          version: 1,
+          actionsRemaining: 2, // ход не завершается — реакция не путается с turn-start
+        } as any,
+      });
+      // fighter1 = Tomoe (player1); fighter2 = вражеский герой (player2), оба HERO.
+      state = withHeroSlug(state, 'fighter1', 'tomoe-gozen');
+
+      // fighter2 двигается (6,5) -> (10,5): покидает зону Tomoe.
+      const result = await service.executeManeuver(
+        {
+          gameId: 'test-game-1',
+          moves: [{ fighterId: 'fighter2', path: [{ x: 10, y: 5 }] }],
+        } as ManeuverDto,
+        ctxFor('player2', state),
+      );
+
+      expect(result.success).toBe(true);
+      const enemyHero = result.gameState!.fighters.find((f) => f.id === 'fighter2')!;
+      expect(enemyHero.position).toEqual({ x: 10, y: 5 }); // движение прошло
+      expect(enemyHero.health).toBe(17 - 1); // реактивный урон Tomoe
+    });
+
+    it('negative: враг остался В зоне Tomoe → урона нет', async () => {
+      const adjacency = (service as any).adjacencyService;
+      // «в зоне» ⟺ обе точки x<=7: и from(6,5), и to(7,5) ∈ зоне → не покинул.
+      adjacency.isInSameZone.mockImplementation(
+        (_s: unknown, a: { x: number; y: number }, b: { x: number; y: number }) =>
+          a.x <= 7 && b.x <= 7,
+      );
+
+      let state = createMockGameState({
+        phase: GamePhase.ACTION_MANEUVER,
+        currentTurnPlayerId: 'player2',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player2',
+          version: 1,
+          actionsRemaining: 2,
+        } as any,
+      });
+      state = withHeroSlug(state, 'fighter1', 'tomoe-gozen');
+
+      const result = await service.executeManeuver(
+        {
+          gameId: 'test-game-1',
+          moves: [{ fighterId: 'fighter2', path: [{ x: 7, y: 5 }] }],
+        } as ManeuverDto,
+        ctxFor('player2', state),
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.gameState!.fighters.find((f) => f.id === 'fighter2')!.health).toBe(17); // без урона
     });
   });
 });

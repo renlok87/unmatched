@@ -380,6 +380,51 @@ export class GameActionExecutorService {
   }
 
   /**
+   * Применить РЕАКТИВНЫЕ on-move хуки героев после перемещения бойцов
+   * (РЕАНИМИРОВАННЫЙ on-move через дифф позиций).
+   *
+   * Диффит позиции бойцов между stateBefore и stateAfter: для каждого бойца,
+   * присутствующего в ОБОИХ состояниях, чья позиция изменилась (x или y) И
+   * который НЕ повержен (в состоянии ПОСЛЕ), дёргает кросс-героевый
+   * triggerOnFighterMoved (реагирует ДРУГОЙ герой, не двигающийся), протягивая
+   * state через каждого сдвинувшегося бойца. ПОСЛЕ всех движений — единый
+   * checkAndApplyGameOver (реактивный пинг мог добить героя). seq отдельно НЕ
+   * бампим: «прицеплено» к инкременту вызывающего движения. No-op, если никто
+   * не сдвинулся или ни один герой не реагирует.
+   */
+  private async applyMoveReactions(
+    stateBefore: GameState,
+    stateAfter: GameState,
+  ): Promise<GameState> {
+    // Снимок позиций ДО движения по id бойца
+    const beforePos = new Map(
+      stateBefore.fighters.map((f) => [f.id, { x: f.position.x, y: f.position.y }]),
+    );
+
+    let next = stateAfter;
+    // Список сдвинувшихся фиксируем по stateAfter (актуальные позиции/флаги)
+    const movedIds = stateAfter.fighters
+      .filter((f) => {
+        const from = beforePos.get(f.id);
+        if (!from) return false; // боец появился — не «движение»
+        if (f.isDefeated) return false; // повержен — не реагируем на его движение
+        return from.x !== f.position.x || from.y !== f.position.y;
+      })
+      .map((f) => f.id);
+
+    for (const id of movedIds) {
+      const moved = next.fighters.find((f) => f.id === id);
+      if (!moved) continue; // мог исчезнуть из-за реакции предыдущего бойца
+      const from = beforePos.get(id)!;
+      const to = { x: moved.position.x, y: moved.position.y };
+      next = await this.abilityRegistry.triggerOnFighterMoved(next, moved, from, to);
+    }
+
+    // Реактивный пинг мог нанести смертельный урон — пере-проверяем game-over.
+    return this.checkAndApplyGameOver(next);
+  }
+
+  /**
    * Резолв отложенного эффекта (C2): игрок выбирает бойца/клетку для
    * MOVE/PLACE-эффекта карты (metadata.pendingEffects).
    * Действие НЕ тратится (эффект уже оплачен картой), seq +1.
@@ -479,7 +524,7 @@ export class GameActionExecutorService {
       }
       // PLACE: любая валидная свободная клетка (зонные ограничения — позже)
 
-      const newState: GameState = {
+      let newState: GameState = {
         ...currentState,
         sequenceNumber: currentState.sequenceNumber + 1,
         fighters: currentState.fighters.map((f) =>
@@ -494,6 +539,11 @@ export class GameActionExecutorService {
           ),
         },
       };
+
+      // РЕАКТИВНЫЕ on-move хуки (РЕАНИМАЦИЯ): MOVE/PLACE-эффект сдвинул бойца —
+      // диффим позиции (currentState ДО vs newState ПОСЛЕ) и даём ДРУГИМ героям
+      // отреагировать. seq НЕ бампим: «прицеплено» к +1 резолва эффекта выше.
+      newState = await this.applyMoveReactions(currentState, newState);
 
       return {
         success: true,
@@ -772,6 +822,12 @@ export class GameActionExecutorService {
           sequenceNumber: currentState.sequenceNumber + 1,
         };
 
+        // РЕАКТИВНЫЕ on-move хуки (РЕАНИМАЦИЯ): диффим позиции (currentState ДО
+        // мутации vs newState ПОСЛЕ) и даём ДРУГИМ героям отреагировать на
+        // сдвинувшихся бойцов. seq отдельно НЕ бампим — «прицеплено» к +1
+        // манёвра выше. No-op, если никто не реагирует.
+        newState = await this.applyMoveReactions(currentState, newState);
+
         // BOOST-карта уходит в сброс + добор 1 карты (правила Unmatched:
         // манёвр = добор + движение). discardCard/drawCards не трогают
         // sequenceNumber — +1 уже сделан в executeMovement.
@@ -882,6 +938,11 @@ export class GameActionExecutorService {
           lastActionBy: userId,
         },
       };
+
+      // РЕАКТИВНЫЕ on-move хуки (РЕАНИМАЦИЯ): диффим позиции (currentState ДО vs
+      // newState ПОСЛЕ движения) — ДРУГИЕ герои могут отреагировать на сдвиг.
+      // seq НЕ бампим: «прицеплено» к +1 из movementService. No-op без реакции.
+      newState = await this.applyMoveReactions(currentState, newState);
 
       // Списываем 1 действие (после 2-го — авто-завершение хода без доп. +1 к seq)
       newState = await this.consumeAction(newState, userId);

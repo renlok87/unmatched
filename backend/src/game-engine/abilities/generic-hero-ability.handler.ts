@@ -31,6 +31,7 @@ import {
   CombatModifierPerCountEffect,
   DiscardRandomEffect,
   PendingMoveEffect,
+  ReactiveDamageEffect,
   TurnDamageEffect,
   TurnEffect,
 } from './ability-config';
@@ -339,6 +340,103 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
         defeatedFighter.ownerId,
         (rule.effect as DiscardRandomEffect).count,
       );
+    }
+
+    return current;
+  }
+
+  // ===================== ON-MOVE (РЕАКТИВНЫЙ on-move хук) =====================
+
+  /**
+   * РЕАКТИВНЫЙ on-move хук (Tomoe-style). Дёргается executor'ом для КАЖДОГО
+   * зарегистрированного героя проходом по диффу позиций ПОСЛЕ перемещения
+   * (реагирующий герой ОТЛИЧЕН от двигающегося — кросс-героевый реактив).
+   *
+   * Для правил trigger === 'enemy-hero-left-my-zone' с effect.kind ===
+   * 'reactive-damage':
+   *  - находим HERO-бойца ЭТОГО handler'а (FighterType.HERO, heroSlug ===
+   *    this.heroId) — герой-реактор; требуем: существует И жив (!isDefeated);
+   *  - реагируем ТОЛЬКО если сдвинувшийся боец:
+   *      • вражеский (movedFighter.ownerId !== реактор.ownerId),
+   *      • это HERO (movedFighter.type === FighterType.HERO — «opposing hero»),
+   *      • БЫЛ в зоне реактора (deps.zone.isInSameZone(state, реакторPos, fromPos)),
+   *      • ПОКИНУЛ её (deps.zone.isInSameZone(state, реакторPos, toPos) === false);
+   *  - тогда наносим value урона movedFighter иммутабельно (health = max(0,
+   *    health - value); при 0 → isDefeated + пересчёт isAlive владельца).
+   * Game-over здесь НЕ ставим — WIRE recheck (applyMoveReactions) пере-проверит.
+   * Чистый no-op (тот же объект state) во всех прочих случаях.
+   */
+  async onFighterMoved(
+    state: GameState,
+    movedFighter: Fighter,
+    fromPos: { x: number; y: number },
+    toPos: { x: number; y: number },
+  ): Promise<GameState> {
+    let current = state;
+
+    for (const rule of this.rules) {
+      if (rule.trigger !== 'enemy-hero-left-my-zone') continue;
+      if (rule.effect.kind !== 'reactive-damage') continue;
+
+      // Сдвинувшийся боец должен быть вражеским HERO («opposing hero»).
+      if (movedFighter.type !== FighterType.HERO) continue;
+
+      // Герой-реактор = HERO-боец ЭТОГО handler'а (по слагу). Должен существовать и жить.
+      const reactor = current.fighters.find(
+        (f) => f.type === FighterType.HERO && (f.heroSlug ?? f.heroId) === this.heroId,
+      );
+      if (!reactor || reactor.isDefeated === true) continue;
+
+      // Вражеский: владелец сдвинувшегося != владельцу реактора.
+      if (movedFighter.ownerId === reactor.ownerId) continue;
+
+      // БЫЛ в зоне реактора (fromPos) И ПОКИНУЛ её (toPos вне зоны).
+      const wasInZone = this.deps.zone.isInSameZone(current, reactor.position, fromPos);
+      const stillInZone = this.deps.zone.isInSameZone(current, reactor.position, toPos);
+      if (!wasInZone || stillInZone) continue;
+
+      current = this.applyReactiveDamage(
+        current,
+        movedFighter.id,
+        (rule.effect as ReactiveDamageEffect).value,
+      );
+    }
+
+    return current;
+  }
+
+  /**
+   * Иммутабельно наносит `value` урона бойцу `targetId` (зеркалит turn-damage):
+   * health = max(0, health - value); при 0 ставит isDefeated и пересчитывает
+   * isAlive владельца по обновлённым fighters. Game-over НЕ ставит. Если боец не
+   * найден — чистый no-op (тот же объект state).
+   */
+  private applyReactiveDamage(state: GameState, targetId: string, value: number): GameState {
+    const target = state.fighters.find((f) => f.id === targetId);
+    if (!target) return state;
+
+    const newHealth = Math.max(0, target.health - value);
+    const becomesDefeated = newHealth === 0;
+
+    let current: GameState = {
+      ...state,
+      fighters: state.fighters.map((f) =>
+        f.id === target.id
+          ? { ...f, health: newHealth, ...(becomesDefeated ? { isDefeated: true } : {}) }
+          : f,
+      ),
+    };
+
+    if (becomesDefeated) {
+      const ownerStillAlive = current.fighters.some(
+        (f) => f.ownerId === target.ownerId && f.isDefeated !== true,
+      );
+      current = {
+        ...current,
+        players: current.players.map((p) =>
+          p.userId === target.ownerId ? { ...p, isAlive: ownerStillAlive } : p,
+        ),
+      };
     }
 
     return current;

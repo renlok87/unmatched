@@ -1605,4 +1605,183 @@ describe('GenericHeroAbilityHandler', () => {
       expect(next).toBe(state);
     });
   });
+
+  // ---- 16) onFighterMoved (enemy-hero-left-my-zone → reactive-damage) ----
+  // Tomoe-style: когда вражеский ГЕРОЙ покидает зону этого героя — наносит ему
+  // value урона. Реактивный кросс-героевый хук: реактор (этот герой) отличен от
+  // двигающегося (вражеский герой).
+  describe('onFighterMoved (enemy-hero-left-my-zone → reactive-damage)', () => {
+    const config: AbilityConfig = {
+      heroId: 'tomoe-gozen',
+      abilityName: 'Unwavering Resolve',
+      description: 'когда вражеский герой покидает зону Tomoe — 1 урон',
+      rules: [
+        {
+          trigger: 'enemy-hero-left-my-zone',
+          effect: { kind: 'reactive-damage', value: 1 },
+        },
+      ],
+    };
+
+    /**
+     * Zone-стаб с явной картой зон: возвращает true, если ОБЕ точки попадают в
+     * одну «зону» по предикату. Здесь зона Tomoe — клетки с x <= 2; всё, что
+     * x > 2 — снаружи. Tomoe (реактор) стоит в (1,1) ∈ зоне.
+     */
+    const zoneByX = () => ({
+      isInSameZone: jest.fn(
+        (_s: unknown, a: { x: number; y: number }, b: { x: number; y: number }) =>
+          a.x <= 2 && b.x <= 2,
+      ),
+      manhattanDistance: jest.fn(
+        (a: { x: number; y: number }, b: { x: number; y: number }) =>
+          Math.abs(a.x - b.x) + Math.abs(a.y - b.y),
+      ),
+    });
+
+    /** State: Tomoe-герой (player1) в (1,1) + вражеский герой (player2). */
+    const tomoeState = (enemyOverrides?: Partial<Fighter>): GameState =>
+      makeState({
+        fighters: [
+          heroFighter({ heroSlug: 'tomoe-gozen', position: { x: 1, y: 1 } }),
+          enemyFighter({ id: 'enemy-fighter-1', position: { x: 2, y: 1 }, ...enemyOverrides }),
+        ],
+      });
+
+    it('наносит 1 урон вражескому герою, ПОКИНУВШЕМУ зону Tomoe', async () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: zoneByX() }));
+      const state = tomoeState(); // enemy hp 12 в (2,1) ∈ зоне
+      const moved = state.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+
+      // (2,1) ∈ зоне → (5,1) вне зоны: ПОКИНУЛ
+      const next = await handler.onFighterMoved(state, moved, { x: 2, y: 1 }, { x: 5, y: 1 });
+
+      expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(11); // 12 - 1
+      // исходный state не мутирован
+      expect(state.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
+    });
+
+    it('no-op: враг ОСТАЛСЯ в зоне Tomoe (from в зоне И to в зоне)', async () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: zoneByX() }));
+      const state = tomoeState();
+      const moved = state.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+
+      // (2,1) ∈ зоне → (1,2) тоже ∈ зоне (x<=2): не покидал
+      const next = await handler.onFighterMoved(state, moved, { x: 2, y: 1 }, { x: 1, y: 2 });
+
+      expect(next).toBe(state); // чистый no-op
+      expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
+    });
+
+    it('no-op: враг ВОШЁЛ в зону (from вне зоны → to в зоне), а не покинул', async () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: zoneByX() }));
+      const state = tomoeState({ position: { x: 5, y: 1 } });
+      const moved = state.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+
+      // (5,1) вне зоны → (2,1) ∈ зоне: вошёл, не покинул
+      const next = await handler.onFighterMoved(state, moved, { x: 5, y: 1 }, { x: 2, y: 1 });
+
+      expect(next).toBe(state);
+      expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
+    });
+
+    it('no-op: сдвинувшийся боец — вражеский САЙДКИК (не HERO)', async () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: zoneByX() }));
+      const state = makeState({
+        fighters: [
+          heroFighter({ heroSlug: 'tomoe-gozen', position: { x: 1, y: 1 } }),
+          enemyFighter({
+            id: 'enemy-fighter-1',
+            type: FighterType.MINION,
+            position: { x: 2, y: 1 },
+          }),
+        ],
+      });
+      const moved = state.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+
+      // покидает зону, но это сайдкик — реакции нет (триггер только на opposing HERO)
+      const next = await handler.onFighterMoved(state, moved, { x: 2, y: 1 }, { x: 5, y: 1 });
+
+      expect(next).toBe(state);
+      expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
+    });
+
+    it('no-op: сдвинувшийся боец — СВОЙ герой (тот же владелец, что и Tomoe)', async () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: zoneByX() }));
+      // свой второй HERO player1 покидает зону Tomoe — реакции нет (не вражеский)
+      const state = makeState({
+        fighters: [
+          heroFighter({ id: 'hero-fighter-1', heroSlug: 'tomoe-gozen', position: { x: 1, y: 1 } }),
+          heroFighter({
+            id: 'own-hero-2',
+            ownerId: 'player1',
+            heroSlug: 'some-ally-hero',
+            name: 'Ally Hero',
+            health: 12,
+            position: { x: 2, y: 1 },
+          }),
+        ],
+      });
+      const moved = state.fighters.find((f) => f.id === 'own-hero-2')!;
+
+      const next = await handler.onFighterMoved(state, moved, { x: 2, y: 1 }, { x: 5, y: 1 });
+
+      expect(next).toBe(state);
+      expect(next.fighters.find((f) => f.id === 'own-hero-2')!.health).toBe(12);
+    });
+
+    it('no-op: герой-реактор (Tomoe) повержен', async () => {
+      const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: zoneByX() }));
+      const state = makeState({
+        fighters: [
+          heroFighter({ heroSlug: 'tomoe-gozen', position: { x: 1, y: 1 }, isDefeated: true }),
+          enemyFighter({ id: 'enemy-fighter-1', position: { x: 2, y: 1 } }),
+        ],
+      });
+      const moved = state.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+
+      const next = await handler.onFighterMoved(state, moved, { x: 2, y: 1 }, { x: 5, y: 1 });
+
+      expect(next).toBe(state);
+      expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
+    });
+
+    it('летальный реактивный урон: health→0 ставит isDefeated + пересчёт isAlive владельца', async () => {
+      const config1: AbilityConfig = {
+        heroId: 'tomoe-gozen',
+        abilityName: 'Unwavering Resolve',
+        description: 'урон 1 покинувшему зону врагу',
+        rules: [{ trigger: 'enemy-hero-left-my-zone', effect: { kind: 'reactive-damage', value: 1 } }],
+      };
+      const handler = new GenericHeroAbilityHandler(config1, makeDeps({ zone: zoneByX() }));
+      // вражеский герой с 1 hp — единственный боец player2
+      const state = tomoeState({ health: 1 });
+      const moved = state.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+
+      const next = await handler.onFighterMoved(state, moved, { x: 2, y: 1 }, { x: 5, y: 1 });
+
+      const enemy = next.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+      expect(enemy.health).toBe(0);
+      expect(enemy.isDefeated).toBe(true);
+      // player2 без живых бойцов → isAlive false
+      expect(next.players.find((p) => p.userId === 'player2')!.isAlive).toBe(false);
+      // game-over НЕ ставим (WIRE recheck это делает)
+      expect(next.phase).toBe(GamePhase.ACTION_MANEUVER);
+    });
+
+    it('no-op: handler без enemy-hero-left-my-zone правила (другой триггер)', async () => {
+      const plain: AbilityConfig = {
+        heroId: 'tomoe-gozen',
+        abilityName: 'NoReact',
+        description: 'нет on-move реакции',
+        rules: [{ trigger: 'turn-end', effect: { kind: 'turn-effect', draw: 1 } }],
+      };
+      const handler = new GenericHeroAbilityHandler(plain, makeDeps({ zone: zoneByX() }));
+      const state = tomoeState();
+      const moved = state.fighters.find((f) => f.id === 'enemy-fighter-1')!;
+
+      const next = await handler.onFighterMoved(state, moved, { x: 2, y: 1 }, { x: 5, y: 1 });
+      expect(next).toBe(state);
+    });
+  });
 });

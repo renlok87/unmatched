@@ -881,6 +881,161 @@ describe('GameActionExecutorService — abilities wiring', () => {
     });
   });
 
+  describe('7) on-move reactive hook (onFighterMoved cross-hero reactive)', () => {
+    /**
+     * Реактивная способность ДРУГОГО героя (не двигающегося): когда вражеский
+     * боец перемещается, герой реагирует — здесь наносит урон сдвинувшемуся.
+     * Проверяем, что executeManeuver диффает позиции и дёргает onFighterMoved.
+     */
+    it('onFighterMoved реагирующего героя срабатывает при манёвре вражеского бойца', async () => {
+      const captured: Array<{ id: string; from: { x: number; y: number }; to: { x: number; y: number } }> = [];
+      // hero-b (player2) реагирует на движение чужого бойца (fighter1) — бьёт его на 3
+      const reactiveHandler: ExtendedHeroAbilityHandler = {
+        heroId: 'hero-b',
+        abilityName: 'Reactive on-move damage',
+        abilityDescription: 'бьёт вражеского бойца, когда тот двигается',
+        onFighterMoved: (
+          state: GameState,
+          movedFighter,
+          fromPos,
+          toPos,
+        ): Promise<GameState> => {
+          // Реагируем только на ЧУЖОГО (player1) бойца
+          if (movedFighter.ownerId !== 'player2') {
+            captured.push({ id: movedFighter.id, from: fromPos, to: toPos });
+            return Promise.resolve({
+              ...state,
+              fighters: state.fighters.map((f) =>
+                f.id === movedFighter.id ? { ...f, health: Math.max(0, f.health - 3) } : f,
+              ),
+            });
+          }
+          return Promise.resolve(state);
+        },
+      };
+      registry.registerExtended(reactiveHandler);
+
+      const state = createMockGameState({
+        phase: GamePhase.ACTION_MANEUVER,
+        currentTurnPlayerId: 'player1',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 2, // ход не завершается — реакция не путается с turn-start
+        } as any,
+      });
+
+      const context: ActionContext = {
+        userId: 'player1',
+        gameId: 'test-game-1',
+        currentState: state,
+      };
+
+      // fighter1 (5,5) -> (5,7): движение детектится диффом
+      const result = await service.executeManeuver(
+        {
+          gameId: 'test-game-1',
+          moves: [{ fighterId: 'fighter1', path: [{ x: 5, y: 6 }, { x: 5, y: 7 }] }],
+        } as ManeuverDto,
+        context,
+      );
+
+      expect(result.success).toBe(true);
+      // движение прошло
+      const moved = result.gameState!.fighters.find((f) => f.id === 'fighter1')!;
+      expect(moved.position).toEqual({ x: 5, y: 7 });
+      // реакция сработала: онук получил from/to и нанёс 3 урона
+      expect(captured).toHaveLength(1);
+      expect(captured[0].id).toBe('fighter1');
+      expect(captured[0].from).toEqual({ x: 5, y: 5 });
+      expect(captured[0].to).toEqual({ x: 5, y: 7 });
+      expect(moved.health).toBe(14 - 3);
+    });
+
+    it('no-op: без зарегистрированной реакции манёвр проходит и состояние бойцов цело', async () => {
+      // никаких onFighterMoved-хендлеров не регистрируем
+      const state = createMockGameState({
+        phase: GamePhase.ACTION_MANEUVER,
+        currentTurnPlayerId: 'player1',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 2,
+        } as any,
+      });
+
+      const result = await service.executeManeuver(
+        {
+          gameId: 'test-game-1',
+          moves: [{ fighterId: 'fighter1', path: [{ x: 5, y: 6 }] }],
+        } as ManeuverDto,
+        { userId: 'player1', gameId: 'test-game-1', currentState: state },
+      );
+
+      expect(result.success).toBe(true);
+      const moved = result.gameState!.fighters.find((f) => f.id === 'fighter1')!;
+      expect(moved.position).toEqual({ x: 5, y: 6 });
+      // здоровья не тронуты
+      expect(moved.health).toBe(14);
+      expect(result.gameState!.fighters.find((f) => f.id === 'fighter2')!.health).toBe(17);
+      // игра не закончилась
+      expect(result.gameState!.phase).not.toBe(GamePhase.GAME_OVER);
+    });
+
+    it('реактивный смертельный удар по движению добивает героя -> GAME_OVER через recheck', async () => {
+      // hero-b реагирует на движение fighter1 (последний герой player1) ЛЕТАЛЬНО
+      const lethalReactive: ExtendedHeroAbilityHandler = {
+        heroId: 'hero-b',
+        abilityName: 'Reactive lethal on-move',
+        abilityDescription: 'добивает вражеского героя при его движении',
+        onFighterMoved: (state: GameState, movedFighter): Promise<GameState> => {
+          if (movedFighter.ownerId !== 'player2') {
+            return Promise.resolve({
+              ...state,
+              fighters: state.fighters.map((f) =>
+                f.id === movedFighter.id ? { ...f, health: 0, isDefeated: true } : f,
+              ),
+              players: state.players.map((p) =>
+                p.userId === movedFighter.ownerId ? { ...p, isAlive: false } : p,
+              ),
+            });
+          }
+          return Promise.resolve(state);
+        },
+      };
+      registry.registerExtended(lethalReactive);
+
+      const state = createMockGameState({
+        phase: GamePhase.ACTION_MANEUVER,
+        currentTurnPlayerId: 'player1',
+        metadata: {
+          lastActionAt: new Date(),
+          lastActionBy: 'player1',
+          version: 1,
+          actionsRemaining: 2,
+        } as any,
+      });
+
+      const result = await service.executeManeuver(
+        {
+          gameId: 'test-game-1',
+          moves: [{ fighterId: 'fighter1', path: [{ x: 5, y: 6 }] }],
+        } as ManeuverDto,
+        { userId: 'player1', gameId: 'test-game-1', currentState: state },
+      );
+
+      expect(result.success).toBe(true);
+      // реактивный удар добил последнего героя player1 -> игра окончена
+      expect(result.gameState!.phase).toBe(GamePhase.GAME_OVER);
+      expect((result.gameState!.metadata as any).winnerId).toBe('player2');
+      const fallen = result.gameState!.fighters.find((f) => f.id === 'fighter1')!;
+      expect(fallen.health).toBe(0);
+      expect(fallen.isDefeated).toBe(true);
+    });
+  });
+
   describe('6) extended attack range via registry.canAttackAtRange', () => {
     /**
      * Бойцы НЕ смежны и НЕ в одной зоне — обычный melee-герой атаковать не может.

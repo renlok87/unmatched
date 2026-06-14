@@ -263,6 +263,11 @@ describe('GameActionExecutorService', () => {
             getStatefulCombatModifiers: jest.fn().mockReturnValue([]),
             // AURA combat modifiers в executeResolveCombat — нет ауры → []
             getAuraCombatModifiers: jest.fn().mockReturnValue([]),
+            // РЕАКТИВНЫЙ on-move хук в applyMoveReactions — passthrough no-op:
+            // герои тестов без onFighterMoved возвращают state без изменений
+            triggerOnFighterMoved: jest
+              .fn()
+              .mockImplementation((state: GameState) => Promise.resolve(state)),
             getHeroCombatModifiers: jest
               .fn()
               .mockReturnValue({ attackModifier: 0, defenseModifier: 0 }),
