@@ -24,7 +24,7 @@ import {
   EffectTarget,
 } from '../models/card.model';
 
-export const PARSER_VERSION = 6;
+export const PARSER_VERSION = 7;
 
 export interface CardEffectTexts {
   readonly immediately?: string | null;
@@ -125,6 +125,15 @@ export function parseFieldText(
     for (const opt of choose.optionDrafts ?? []) {
       if (opt.drafts.some((d) => d.type === EffectType.UNSUPPORTED)) unsupported.push(opt.label);
     }
+    return { drafts, unsupported };
+  }
+
+  // --- «Do both: - … - …» — плоская последовательность под-эффектов (НЕ выбор).
+  //     Список буллетов пересекает границы предложений → раньше splitSentences. ---
+  const both = matchDoBoth(text);
+  if (both) {
+    both.drafts.forEach((draft) => drafts.push({ draft, text }));
+    unsupported.push(...both.unsupported);
     return { drafts, unsupported };
   }
 
@@ -234,12 +243,83 @@ function matchChooseOne(text: string): Draft | null {
 }
 
 // ---------------------------------------------------------------------------
+// «Do both: - … - …» — плоская последовательность (НЕ выбор)
+// ---------------------------------------------------------------------------
+
+/**
+ * Распознаёт «Do both: -опция -опция» — оба под-эффекта применяются (в отличие
+ * от CHOOSE_ONE). Каждый буллет разбирается рекурсивно через parseSentence;
+ * нераспознанный → UNSUPPORTED-draft (плюс в отчёт покрытия).
+ *
+ * Допустимы префиксы перед «do both» («Choose one effect. If …, do both: …»):
+ * берём хвост после «do both:» — список под-эффектов.
+ */
+function matchDoBoth(
+  text: string,
+): { drafts: Draft[]; unsupported: string[] } | null {
+  const m = /\bdo both\s*:\s*(.+)$/i.exec(text);
+  if (!m) return null;
+
+  const labels = m[1]
+    .split(/\s*[-•]\s*/)
+    .map((s) => s.replace(/,\s*$/, '').trim())
+    .filter((s) => s.length > 0);
+  if (labels.length < 2) return null;
+
+  const drafts: Draft[] = [];
+  const unsupported: string[] = [];
+  for (const label of labels) {
+    const parsed = parseSentence(label);
+    if (parsed) {
+      drafts.push(...parsed);
+    } else {
+      drafts.push({ type: EffectType.UNSUPPORTED });
+      unsupported.push(label);
+    }
+  }
+  return { drafts, unsupported };
+}
+
+// ---------------------------------------------------------------------------
 // По-предложенные матчеры
 // ---------------------------------------------------------------------------
 
 /** null — не распознано */
 function parseSentence(sentence: string): Draft[] | null {
   const s = sentence.trim().replace(/\.+$/, '');
+
+  // «… unless 🪙[ 🪙]» (Blackbeard): эффект происходит, ЕСЛИ оппонент НЕ платит
+  // дублоны. Платёжной механики нет → базовый эффект как optional (оппонент
+  // может негировать). Отщепляем хвост «unless …», базу разбираем рекурсивно.
+  const unless = /^(.+?)\s+unless\b.*$/i.exec(s);
+  if (unless) {
+    const base = parseSentence(unless[1]);
+    if (!base) return null; // незнакомая база — UNSUPPORTED целиком (не регресс)
+    return base.map((d) => ({ ...d, optional: true }));
+  }
+
+  // Именованный боец смежен с врагом → лечение: «If <Name> is adjacent to an
+  // opposing fighter, <he|she|they> recovers N health.» / «… your fighter …».
+  const adjHeal =
+    /^if ([\w.' ]+?) is adjacent to an opposing fighter,?\s*(?:he|she|they|it|your fighter)?\s*recovers? (\d+) health$/i.exec(
+      s,
+    );
+  if (adjHeal) {
+    const who = adjHeal[1].trim();
+    const when: EffectCondition = { kind: 'ADJACENT_TO_OPPONENT' };
+    if (/^your fighter$/i.test(who)) {
+      return [{ type: EffectType.HEAL, value: Number(adjHeal[2]), target: EffectTarget.SELF, when }];
+    }
+    return [
+      {
+        type: EffectType.HEAL,
+        value: Number(adjHeal[2]),
+        target: EffectTarget.NAMED_FIGHTER,
+        fighterName: who,
+        when,
+      },
+    ];
+  }
 
   // Обёртки-условия: рекурсивный разбор остатка
   const won = /^if you won the combat,?\s*(.+)$/i.exec(s);
@@ -257,6 +337,14 @@ function parseSentence(sentence: string): Draft[] | null {
   const sharesZone =
     /^if (?:[\w.' ]+?'s space|your fighter'?s? space) shares (?:a|any) zones? with the opposing fighter,?\s*(.+)$/i.exec(s);
   if (sharesZone) return wrapWhen(sharesZone[1], { kind: 'SHARES_ZONE_WITH_OPPONENT' });
+
+  // «X and Y» — плоская последовательность двух под-эффектов в одном
+  // предложении («draw 1 card and gain 1 action»). Дробим по ПЕРВОМУ « and »;
+  // принимаем ТОЛЬКО если ОБА куска распознаны как самостоятельные эффекты,
+  // иначе откатываемся к одиночным матчерам (не ломаем «… up to N spaces»,
+  // «… and choose …» и пр., где вторая половина не парсится сама по себе).
+  const andSeq = parseAndSequence(s);
+  if (andSeq) return andSeq;
 
   // CANCEL_EFFECTS
   if (/^cancel all effects on your opponent'?s card$/i.test(s)) {
@@ -430,6 +518,31 @@ function parseSentence(sentence: string): Draft[] | null {
     return [{ type: EffectType.END_TURN }];
   }
 
+  return null;
+}
+
+/**
+ * «X and Y» → [X-эффекты, Y-эффекты] при условии, что ОБА куска парсятся.
+ * Перебираем все позиции « and » (слева направо), берём первую, где обе
+ * половины распознаны. Это «do both»-семантика внутри одного предложения.
+ * Без « and » или если ни одно разбиение не даёт двух валидных частей → null.
+ */
+function parseAndSequence(s: string): Draft[] | null {
+  // быстрый выход: нет « and » — нечего дробить
+  if (!/\band\b/i.test(s)) return null;
+  const parts = s.split(/\s+and\s+/i);
+  if (parts.length < 2) return null;
+
+  // перебираем точки разреза: левая = первые k частей, правая = остаток
+  for (let k = 1; k < parts.length; k++) {
+    const left = parts.slice(0, k).join(' and ');
+    const right = parts.slice(k).join(' and ');
+    const l = parseSentence(left);
+    if (!l) continue;
+    const r = parseSentence(right);
+    if (!r) continue;
+    return [...l, ...r];
+  }
   return null;
 }
 

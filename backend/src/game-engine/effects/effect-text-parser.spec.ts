@@ -234,14 +234,19 @@ describe('effect-text-parser', () => {
       });
     });
 
-    it('«Gain 1 action.» / «Gain 1 action unless 🪙» (второе — UNSUPPORTED)', () => {
+    it('«Gain 1 action.» / «Gain 1 action unless 🪙» (второе — optional, parser v7)', () => {
       const ok = after('Gain 1 action.');
       expect(ok.unsupported).toEqual([]);
       expect(ok.drafts[0].draft).toMatchObject({ type: EffectType.GAIN_ACTION, value: 1 });
 
-      const bad = after('Gain 1 action unless 🪙');
-      expect(bad.unsupported).toHaveLength(1);
-      expect(bad.drafts[0].draft.type).toBe(EffectType.UNSUPPORTED);
+      // v7: «unless 🪙» больше НЕ UNSUPPORTED — базовый эффект как optional
+      const opt = after('Gain 1 action unless 🪙');
+      expect(opt.unsupported).toEqual([]);
+      expect(opt.drafts[0].draft).toMatchObject({
+        type: EffectType.GAIN_ACTION,
+        value: 1,
+        optional: true,
+      });
     });
 
     it('«The opposing fighter cannot leave their space this turn.»', () => {
@@ -517,7 +522,7 @@ describe('effect-text-parser', () => {
       expect(drafts.every((x) => x.draft.type !== EffectType.CHOOSE_ONE)).toBe(true);
     });
 
-    it('finalize: parseCardEffectTexts → options[] с id/label/effects + parserVersion 6', () => {
+    it('finalize: parseCardEffectTexts → options[] с id/label/effects + parserVersion', () => {
       const { effects } = parseCardEffectTexts(
         { after: 'Choose one: -Jill Trent recovers 1 health, -Draw 1 card' },
         'card-choose',
@@ -525,7 +530,7 @@ describe('effect-text-parser', () => {
       expect(effects).toHaveLength(1);
       const e = effects[0];
       expect(e.type).toBe(EffectType.CHOOSE_ONE);
-      expect(e.parserVersion).toBe(6);
+      expect(e.parserVersion).toBe(PARSER_VERSION);
       expect(e.timing).toBe(EffectTiming.AFTER_COMBAT);
       expect(e.options).toHaveLength(2);
       expect(e.options![0].label).toBe('Jill Trent recovers 1 health');
@@ -537,6 +542,141 @@ describe('effect-text-parser', () => {
       // вложенные эффекты опций тоже получают id и метаданные парсера
       expect(e.options![0].effects[0].id).toBe('card-choose-after-0-opt0-0');
       expect(e.options![1].effects[0]).toMatchObject({ type: EffectType.DRAW_CARD, value: 1 });
+    });
+  });
+
+  // ------------------------------------------------- «… unless …» (parser v7)
+  // Blackbeard-механика: эффект происходит, ЕСЛИ оппонент НЕ заплатит дублоны
+  // (unless 🪙). Платёжной механики в движке нет → моделируем как базовый
+  // эффект с optional:true (оппонент может негировать). Лучше, чем UNSUPPORTED.
+  describe('«… unless …» (v7)', () => {
+    it('«Gain 1 action unless 🪙» → GAIN_ACTION optional (не UNSUPPORTED)', () => {
+      const { drafts, unsupported } = after('Gain 1 action unless 🪙');
+      expect(unsupported).toEqual([]);
+      expect(drafts).toHaveLength(1);
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.GAIN_ACTION,
+        value: 1,
+        optional: true,
+      });
+    });
+
+    it('«Your opponent discards 1 random card unless 🪙» → OPPONENT_DISCARD optional', () => {
+      const { drafts, unsupported } = after('Your opponent discards 1 random card unless 🪙');
+      expect(unsupported).toEqual([]);
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.OPPONENT_DISCARD,
+        value: 1,
+        optional: true,
+      });
+    });
+
+    it('«Deal 3 damage to the opposing fighter unless 🪙 🪙» → DAMAGE optional', () => {
+      const { drafts, unsupported } = after(
+        'Deal 3 damage to the opposing fighter unless 🪙 🪙',
+      );
+      expect(unsupported).toEqual([]);
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.DAMAGE,
+        value: 3,
+        target: EffectTarget.OPPOSING_FIGHTER,
+        optional: true,
+      });
+    });
+
+    it('«… unless …» с нераспознаваемым базовым эффектом → UNSUPPORTED (не регресс)', () => {
+      const { drafts, unsupported } = after('Conjure a storm unless 🪙');
+      expect(drafts).toHaveLength(1);
+      expect(drafts[0].draft.type).toBe(EffectType.UNSUPPORTED);
+      expect(unsupported).toHaveLength(1);
+    });
+  });
+
+  // ------------------------------------------------- «Do both:» / «X and Y» (v7)
+  // Плоская последовательность под-эффектов (НЕ выбор). «Do both:» с буллетами
+  // и инлайновое «X and Y» внутри предложения.
+  describe('«Do both:» / «X and Y» (v7)', () => {
+    it('«Do both: - draw 1 card - gain 1 action» → [DRAW, GAIN_ACTION]', () => {
+      const { drafts, unsupported } = after('Do both: - draw 1 card - gain 1 action');
+      expect(unsupported).toEqual([]);
+      expect(drafts).toHaveLength(2);
+      expect(drafts[0].draft).toMatchObject({ type: EffectType.DRAW_CARD, value: 1 });
+      expect(drafts[1].draft).toMatchObject({ type: EffectType.GAIN_ACTION, value: 1 });
+    });
+
+    it('«Do both: -your opponent discards 1 card -draw 1 card» → [OPP_DISCARD, DRAW]', () => {
+      const { drafts, unsupported } = after(
+        'Do both: -your opponent discards 1 card -draw 1 card',
+      );
+      expect(unsupported).toEqual([]);
+      expect(drafts).toHaveLength(2);
+      expect(drafts[0].draft).toMatchObject({ type: EffectType.OPPONENT_DISCARD, value: 1 });
+      expect(drafts[1].draft).toMatchObject({ type: EffectType.DRAW_CARD, value: 1 });
+    });
+
+    it('«draw 1 card and gain 1 action» (инлайн and) → [DRAW, GAIN_ACTION]', () => {
+      const { drafts, unsupported } = after('Draw 1 card and gain 1 action.');
+      expect(unsupported).toEqual([]);
+      expect(drafts).toHaveLength(2);
+      expect(drafts[0].draft).toMatchObject({ type: EffectType.DRAW_CARD, value: 1 });
+      expect(drafts[1].draft).toMatchObject({ type: EffectType.GAIN_ACTION, value: 1 });
+    });
+
+    it('«If you lost the combat, draw 1 card and gain 1 action.» → оба под WON/LOST', () => {
+      const { drafts, unsupported } = after(
+        'If you lost the combat, draw 1 card and gain 1 action.',
+      );
+      expect(unsupported).toEqual([]);
+      expect(drafts).toHaveLength(2);
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.DRAW_CARD,
+        value: 1,
+        when: { kind: 'LOST_COMBAT' },
+      });
+      expect(drafts[1].draft).toMatchObject({
+        type: EffectType.GAIN_ACTION,
+        value: 1,
+        when: { kind: 'LOST_COMBAT' },
+      });
+    });
+
+    it('«X and Y» где Y не распознан → НЕ дробим, отдаём как одно (не регресс одиночек)', () => {
+      // одиночный «and» внутри уже распознанного эффекта не должен ломаться:
+      // «Move your fighter up to 3 spaces» содержит … но без второго глагола.
+      const { drafts } = after('Move your fighter up to 3 spaces.');
+      expect(drafts).toHaveLength(1);
+      expect(drafts[0].draft).toMatchObject({ type: EffectType.MOVE, value: 3 });
+    });
+  });
+
+  // ------------------------------------------------- Named-fighter adjacency (v7)
+  describe('named-fighter adjacency heal (v7)', () => {
+    it('«If Blackbeard is adjacent to an opposing fighter, he recovers 2 health.» → HEAL NAMED + ADJACENT', () => {
+      const { drafts, unsupported } = after(
+        'If Blackbeard is adjacent to an opposing fighter, he recovers 2 health.',
+      );
+      expect(unsupported).toEqual([]);
+      expect(drafts).toHaveLength(1);
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.HEAL,
+        value: 2,
+        target: EffectTarget.NAMED_FIGHTER,
+        fighterName: 'Blackbeard',
+        when: { kind: 'ADJACENT_TO_OPPONENT' },
+      });
+    });
+
+    it('«If your fighter is adjacent to an opposing fighter, recover 1 health.» → HEAL SELF + ADJACENT', () => {
+      const { drafts, unsupported } = after(
+        'If your fighter is adjacent to an opposing fighter, recover 1 health.',
+      );
+      expect(unsupported).toEqual([]);
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.HEAL,
+        value: 1,
+        target: EffectTarget.SELF,
+        when: { kind: 'ADJACENT_TO_OPPONENT' },
+      });
     });
   });
 });
