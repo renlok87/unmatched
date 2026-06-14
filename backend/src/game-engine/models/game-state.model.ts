@@ -6,7 +6,7 @@
  */
 
 import type { Fighter } from './fighter.model';
-import type { Card, DeckState, HandZone } from './card.model';
+import type { Card, CardEffect, DeckState, HandZone } from './card.model';
 import type { BoardState } from './board.model';
 
 /**
@@ -113,8 +113,11 @@ export interface GameStateMetadata {
  */
 export interface PendingEffect {
   readonly id: string;
-  /** 'MOVE' (до value шагов) | 'PLACE' (любая свободная клетка) */
-  readonly type: 'MOVE' | 'PLACE';
+  /**
+   * 'MOVE' (до value шагов) | 'PLACE' (любая свободная клетка) |
+   * 'CHOOSE_ONE' (игрок выбирает chooseCount опций из options)
+   */
+  readonly type: 'MOVE' | 'PLACE' | 'CHOOSE_ONE';
   /** Кому принадлежит выбор */
   readonly playerId: string;
   /** Дистанция для MOVE */
@@ -125,6 +128,16 @@ export interface PendingEffect {
   readonly targetsOpponent?: boolean;
   /** Исходный текст — для лога/тестера */
   readonly text?: string;
+
+  // --- CHOOSE_ONE («Choose one: …») ---
+  /** Варианты выбора для UI: индекс + текст опции */
+  readonly options?: ReadonlyArray<{ readonly index: number; readonly label: string }>;
+  /** Сколько опций выбрать (default 1; «choose 2 different effects» = 2) */
+  readonly chooseCount?: number;
+  /** Эффекты каждой опции (параллельно options) — исполняются при резолве */
+  readonly optionEffects?: ReadonlyArray<readonly CardEffect[]>;
+  /** Карта-источник CHOOSE_ONE — контекст для исполнения эффектов опции */
+  readonly card?: Card;
 }
 
 /**

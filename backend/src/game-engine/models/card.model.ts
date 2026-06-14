@@ -67,6 +67,10 @@ export interface CardEffect {
   readonly boostSource?: BoostSource;
   /** BLIND BOOST — карта вскрывается с верха колоды (Daredevil) */
   readonly blind?: boolean;
+  /** Варианты выбора для type CHOOSE_ONE («Choose one: …») */
+  readonly options?: ChooseOption[];
+  /** Сколько опций выбирает игрок для CHOOSE_ONE (default 1; «choose 2 different effects» = 2) */
+  readonly chooseCount?: number;
   /** Исходное предложение текста — для лога/manualEffects */
   readonly text?: string;
   /** Происхождение: парсер не перезаписывает manual при повторном backfill */
@@ -100,6 +104,16 @@ export type EffectConditionKind =
 export interface EffectCondition {
   readonly kind: EffectConditionKind;
   readonly value?: number;
+}
+
+/**
+ * Один вариант выбора для CHOOSE_ONE.
+ * label — исходный текст опции (для UI/лога); effects — разобранные парсером
+ * эффекты опции (UNSUPPORTED, если текст не распознан — игра не блокируется).
+ */
+export interface ChooseOption {
+  readonly label: string;
+  readonly effects: CardEffect[];
 }
 
 /**
@@ -165,6 +179,8 @@ export enum EffectType {
   // «Prevent all damage»
   PREVENT_DAMAGE = 'PREVENT_DAMAGE',
   END_TURN = 'END_TURN',
+  // «Choose one: …» — игрок выбирает chooseCount опций из options (интерактивно)
+  CHOOSE_ONE = 'CHOOSE_ONE',
   // маркер нераспознанного текста: не исполняется, едет в manualEffects + warn
   UNSUPPORTED = 'UNSUPPORTED',
 }

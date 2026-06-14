@@ -208,6 +208,19 @@ describe('effect-text-parser', () => {
     });
   });
 
+  // ------------------------------------------------- MOVE без «up to»
+  describe('MOVE без «up to» (точное число клеток)', () => {
+    it('«Move Jill Trent 1 space» → MOVE NAMED value 1', () => {
+      const { drafts } = after('Move Jill Trent 1 space');
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.MOVE,
+        value: 1,
+        target: EffectTarget.NAMED_FIGHTER,
+        fighterName: 'Jill Trent',
+      });
+    });
+  });
+
   // ------------------------------------------------- Частые паттерны базы
   describe('частые паттерны по всей базе', () => {
     it('«If you won the combat, return this card to your hand.»', () => {
@@ -349,6 +362,181 @@ describe('effect-text-parser', () => {
     it('пустые поля → пусто', () => {
       const { effects } = parseCardEffectTexts({}, 'card-3');
       expect(effects).toEqual([]);
+    });
+  });
+
+  // ------------------------------------------------- CHOOSE_ONE (парсер v3)
+  describe('CHOOSE_ONE (v3)', () => {
+    it('Utility Belt: «Choose one: -…, -…, -…» → 3 опции, label сохранён', () => {
+      const { drafts } = after(
+        'Choose one: -Jill Trent recovers 1 health, -Move Jill Trent 1 space, -Draw 1 card',
+      );
+      expect(drafts).toHaveLength(1);
+      const d = drafts[0].draft;
+      expect(d.type).toBe(EffectType.CHOOSE_ONE);
+      expect(d.chooseCount).toBe(1);
+      expect(d.optionDrafts).toHaveLength(3);
+      expect(d.optionDrafts!.map((o) => o.label)).toEqual([
+        'Jill Trent recovers 1 health',
+        'Move Jill Trent 1 space',
+        'Draw 1 card',
+      ]);
+      // распознанные под-эффекты
+      expect(d.optionDrafts![0].drafts[0]).toMatchObject({
+        type: EffectType.HEAL,
+        value: 1,
+        target: EffectTarget.NAMED_FIGHTER,
+        fighterName: 'Jill Trent',
+      });
+      // «Move … 1 space» без «up to N» — теперь распознаётся (parser v4)
+      expect(d.optionDrafts![1].drafts[0]).toMatchObject({
+        type: EffectType.MOVE,
+        value: 1,
+      });
+      expect(d.optionDrafts![2].drafts[0]).toMatchObject({
+        type: EffectType.DRAW_CARD,
+        value: 1,
+      });
+    });
+
+    it('Technodrome: «Choose one:» с переносами строк → CANCEL_EFFECTS + UNSUPPORTED', () => {
+      const { drafts } = parseFieldText(
+        "Choose one:\n- cancel all effects on your opponent's card\n- activate a machine",
+        EffectTiming.ON_REVEAL,
+      );
+      const d = drafts[0].draft;
+      expect(d.type).toBe(EffectType.CHOOSE_ONE);
+      expect(d.optionDrafts).toHaveLength(2);
+      expect(d.optionDrafts![0].drafts[0].type).toBe(EffectType.CANCEL_EFFECTS);
+      expect(d.optionDrafts![1].drafts[0].type).toBe(EffectType.UNSUPPORTED);
+    });
+
+    it('Shapershifter: «Choose one effect:» (during) → 2 опции, gain action распознан', () => {
+      const { drafts } = during(
+        "Choose one effect:\n- add +1 to this card's value for each card in your opponent's hand\n- gain 1 action",
+      );
+      const d = drafts[0].draft;
+      expect(d.type).toBe(EffectType.CHOOSE_ONE);
+      expect(d.optionDrafts).toHaveLength(2);
+      expect(d.optionDrafts![1].drafts[0]).toMatchObject({
+        type: EffectType.GAIN_ACTION,
+        value: 1,
+      });
+    });
+
+    it('Looking Glass: «Choose 2 different effects:» → chooseCount 2, 3 опции', () => {
+      const { drafts } = after(
+        'Choose 2 different effects: - draw 2 cards - Alice recovers 3 health - place Alice in any other space',
+      );
+      const d = drafts[0].draft;
+      expect(d.type).toBe(EffectType.CHOOSE_ONE);
+      expect(d.chooseCount).toBe(2);
+      expect(d.optionDrafts).toHaveLength(3);
+      expect(d.optionDrafts![0].drafts[0]).toMatchObject({ type: EffectType.DRAW_CARD, value: 2 });
+      expect(d.optionDrafts![1].drafts[0]).toMatchObject({
+        type: EffectType.HEAL,
+        value: 3,
+        fighterName: 'Alice',
+      });
+      // «place Alice in any other space» теперь PLACE (parser v5)
+      expect(d.optionDrafts![2].drafts[0]).toMatchObject({
+        type: EffectType.PLACE,
+        target: EffectTarget.NAMED_FIGHTER,
+        fighterName: 'Alice',
+      });
+    });
+
+    it('PLACE «in any other space» → PLACE (не UNSUPPORTED, parser v5)', () => {
+      const { drafts } = after('place Alice in any other space');
+      expect(drafts).toHaveLength(1);
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.PLACE,
+        target: EffectTarget.NAMED_FIGHTER,
+        fighterName: 'Alice',
+      });
+    });
+
+    it('PLACE «in any space» (без other) не сломан', () => {
+      const { drafts } = after('place your fighter in any space');
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.PLACE,
+        target: EffectTarget.SELF,
+      });
+    });
+
+    it('Lurking: «Draw 1 card and choose 1 effect: - … - …» → [DRAW, CHOOSE_ONE]', () => {
+      const { drafts } = after(
+        'Draw 1 card and choose 1 effect: - move Invisible Man to a space with a fog token - move 1 fog token up to 3 spaces',
+      );
+      expect(drafts).toHaveLength(2);
+      expect(drafts[0].draft).toMatchObject({ type: EffectType.DRAW_CARD, value: 1 });
+      const choose = drafts[1].draft;
+      expect(choose.type).toBe(EffectType.CHOOSE_ONE);
+      expect(choose.chooseCount).toBe(1);
+      expect(choose.optionDrafts).toHaveLength(2);
+    });
+
+    it('НЕ матчит «Choose one of the fighters …» (выбор цели, не альтернатив)', () => {
+      const { drafts } = after(
+        'Choose one of the fighters in the combat and move them up to 2 spaces.',
+      );
+      expect(drafts[0].draft.type).not.toBe(EffectType.CHOOSE_ONE);
+    });
+
+    it('«Choose one of the fighters in the combat and move them up to 2 spaces.» → MOVE value 2 (parser v6)', () => {
+      const { drafts, unsupported } = after(
+        'Choose one of the fighters in the combat and move them up to 2 spaces.',
+      );
+      expect(unsupported).toEqual([]);
+      expect(drafts).toHaveLength(1);
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.MOVE,
+        value: 2,
+        target: EffectTarget.SELF,
+      });
+    });
+
+    it('«If you won the combat, choose one of the fighters … move them up to 2 spaces.» → MOVE value 2 + WON_COMBAT', () => {
+      const { drafts, unsupported } = after(
+        'If you won the combat, choose one of the fighters in the combat and move them up to 2 spaces.',
+      );
+      expect(unsupported).toEqual([]);
+      expect(drafts).toHaveLength(1);
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.MOVE,
+        value: 2,
+        target: EffectTarget.SELF,
+        when: { kind: 'WON_COMBAT' },
+      });
+    });
+
+    it('НЕ матчит «… do both: …» (Shrink — оба эффекта, не выбор)', () => {
+      const { drafts } = after(
+        'Choose one effect. If Ms. Marvel\'s space shares no zones with the opposing fighter, do both: - your opponent discards 1 card - move the opposing fighter up to 3 spaces',
+      );
+      expect(drafts.every((x) => x.draft.type !== EffectType.CHOOSE_ONE)).toBe(true);
+    });
+
+    it('finalize: parseCardEffectTexts → options[] с id/label/effects + parserVersion 6', () => {
+      const { effects } = parseCardEffectTexts(
+        { after: 'Choose one: -Jill Trent recovers 1 health, -Draw 1 card' },
+        'card-choose',
+      );
+      expect(effects).toHaveLength(1);
+      const e = effects[0];
+      expect(e.type).toBe(EffectType.CHOOSE_ONE);
+      expect(e.parserVersion).toBe(6);
+      expect(e.timing).toBe(EffectTiming.AFTER_COMBAT);
+      expect(e.options).toHaveLength(2);
+      expect(e.options![0].label).toBe('Jill Trent recovers 1 health');
+      expect(e.options![0].effects[0]).toMatchObject({
+        type: EffectType.HEAL,
+        value: 1,
+        timing: EffectTiming.AFTER_COMBAT,
+      });
+      // вложенные эффекты опций тоже получают id и метаданные парсера
+      expect(e.options![0].effects[0].id).toBe('card-choose-after-0-opt0-0');
+      expect(e.options![1].effects[0]).toMatchObject({ type: EffectType.DRAW_CARD, value: 1 });
     });
   });
 });

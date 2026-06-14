@@ -14,7 +14,7 @@ import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { MetricsService } from '../../metrics/metrics.service';
 // P3: единые engine-модели (GameState/GamePhase/CombatState) — value-импорт
 // engine→games убран, рантайм-цикла модулей больше нет
-import type { GameState, CombatState, HandCard, Card } from '../models';
+import type { GameState, CombatState, HandCard, Card, PendingEffect } from '../models';
 import {
   GamePhase,
   CardType,
@@ -232,7 +232,14 @@ export class GameActionExecutorService {
    * Действие НЕ тратится (эффект уже оплачен картой), seq +1.
    */
   async executeResolvePendingEffect(
-    dto: { gameId: string; effectId: string; fighterId: string; x: number; y: number },
+    dto: {
+      gameId: string;
+      effectId: string;
+      fighterId?: string;
+      x?: number;
+      y?: number;
+      optionIndex?: number;
+    },
     context: ActionContext,
   ): Promise<ActionResult> {
     try {
@@ -245,6 +252,16 @@ export class GameActionExecutorService {
       }
       if (pending.playerId !== userId) {
         return { success: false, error: 'Этот выбор принадлежит другому игроку' };
+      }
+
+      // --- CHOOSE_ONE: исполняем эффекты выбранной опции (без бойца/клетки) ---
+      if (pending.type === 'CHOOSE_ONE') {
+        return this.resolveChooseOne(pending, dto.optionIndex, userId, currentState);
+      }
+
+      // MOVE/PLACE требуют бойца и клетку
+      if (!dto.fighterId || dto.x === undefined || dto.y === undefined) {
+        return { success: false, error: 'MOVE/PLACE требует fighterId, x, y' };
       }
 
       const fighter = currentState.fighters.find((f) => f.id === dto.fighterId);
@@ -343,6 +360,80 @@ export class GameActionExecutorService {
         error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
+  }
+
+  /**
+   * Резолв CHOOSE_ONE: исполняет эффекты выбранной опции через
+   * cardEffectExecutor (вне боя). При chooseCount > 1 («choose 2 different
+   * effects») pending остаётся с оставшимися опциями (выбранная удалена —
+   * «different»). Действие НЕ тратится, seq +1.
+   */
+  private async resolveChooseOne(
+    pending: PendingEffect,
+    optionIndex: number | undefined,
+    userId: string,
+    currentState: GameState,
+  ): Promise<ActionResult> {
+    const options = pending.options ?? [];
+    if (optionIndex === undefined || optionIndex < 0 || optionIndex >= options.length) {
+      return {
+        success: false,
+        error: `Нужен валидный optionIndex (0..${Math.max(0, options.length - 1)})`,
+      };
+    }
+
+    const chosenEffects = pending.optionEffects?.[optionIndex] ?? [];
+    const applied = await this.cardEffectExecutor.executeChosenEffects(
+      currentState,
+      chosenEffects,
+      userId,
+      pending.card,
+    );
+
+    const remainingCount = (pending.chooseCount ?? 1) - 1;
+    const restPending: PendingEffect[] =
+      remainingCount > 0
+        ? [
+            {
+              ...pending,
+              chooseCount: remainingCount,
+              options: options
+                .filter((_, i) => i !== optionIndex)
+                .map((o, i) => ({ index: i, label: o.label })),
+              optionEffects: (pending.optionEffects ?? []).filter((_, i) => i !== optionIndex),
+            },
+          ]
+        : [];
+
+    const newState: GameState = {
+      ...applied.state,
+      sequenceNumber: currentState.sequenceNumber + 1,
+      metadata: {
+        ...applied.state.metadata,
+        lastActionAt: new Date(),
+        lastActionBy: userId,
+        // выполненный CHOOSE_ONE убираем; вложенные pending (MOVE/PLACE из
+        // опции) и остаток chooseCount сохраняем
+        pendingEffects: [
+          ...(applied.state.metadata.pendingEffects ?? []).filter((p) => p.id !== pending.id),
+          ...restPending,
+        ],
+      },
+    };
+
+    return {
+      success: true,
+      gameState: newState,
+      metadata: {
+        action: 'resolvePendingEffect',
+        performedAt: new Date(),
+        performedBy: userId,
+        sequenceNumber: newState.sequenceNumber,
+        effectText: options[optionIndex].label,
+        appliedEffects: applied.appliedEffects,
+        manualEffects: applied.manualEffects,
+      },
+    };
   }
 
   /**

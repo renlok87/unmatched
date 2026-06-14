@@ -363,6 +363,41 @@ export class CardEffectExecutorService {
   }
 
   // =========================================================================
+  // CHOOSE_ONE: исполнение эффектов выбранной игроком опции (вне боя)
+  // =========================================================================
+
+  /**
+   * Применяет эффекты ОДНОЙ выбранной опции CHOOSE_ONE (резолв
+   * resolvePendingEffect). Контекст — не боевой ({playerId, card, fighter});
+   * комбо-зависимые эффекты (DAMAGE по сопернику и т.п.) к моменту выбора уже
+   * вне боя и уходят в manualEffects — распознанные опции (HEAL/DRAW/GAIN_ACTION)
+   * исполняются полностью. Вложенный MOVE/PLACE породит новый pendingEffect.
+   */
+  async executeChosenEffects(
+    state: GameState,
+    effects: readonly CardEffect[],
+    playerId: string,
+    card?: Card,
+  ): Promise<OnPlayResult> {
+    let currentState = state;
+    const appliedEffects: EffectResult[] = [];
+    const manualEffects: string[] = [];
+    const fighter = currentState.fighters.find((f) => f.ownerId === playerId && !f.isDefeated);
+    const ctxCard = card ?? ({ id: 'choose-one', effects: [] } as unknown as Card);
+
+    for (const effect of effects) {
+      const context: EffectContext = { playerId, card: ctxCard, fighterId: fighter?.id };
+      if (!(await this.passesWhen(currentState, effect, context))) continue;
+      const outcome = await this.applyOneEffect(currentState, effect, context);
+      currentState = outcome.state;
+      appliedEffects.push(outcome.result);
+      if (outcome.manual) manualEffects.push(outcome.manual);
+    }
+
+    return { state: currentState, appliedEffects, manualEffects };
+  }
+
+  // =========================================================================
   // TURN_START / TURN_END (карты в руке игрока)
   // =========================================================================
 
@@ -542,6 +577,43 @@ export class CardEffectExecutorService {
           };
         }
         return { state: next, result: ok({ targetIds: targets }) };
+      }
+
+      // --- CHOOSE_ONE: «Choose one: …» → pendingEffect с вариантами;
+      //     резолвится resolvePendingEffect(optionIndex) → executeChosenEffects ---
+      case EffectType.CHOOSE_ONE: {
+        const options = effect.options ?? [];
+        const text = effect.text ?? 'Choose one';
+        if (options.length === 0) {
+          // нет распознанных опций — в manualEffects (как UNSUPPORTED)
+          return {
+            state,
+            result: { success: false, effectId: effect.id, targetIds: [], manual: true, message: text },
+            manual: text,
+          };
+        }
+        const pending = {
+          id: `${effect.id}-p${state.metadata.pendingEffects?.length ?? 0}`,
+          type: 'CHOOSE_ONE' as const,
+          playerId: context.playerId,
+          chooseCount: effect.chooseCount ?? 1,
+          options: options.map((o, i) => ({ index: i, label: o.label })),
+          optionEffects: options.map((o) => o.effects),
+          card: context.card,
+          text,
+        };
+        const next: GameState = {
+          ...state,
+          metadata: {
+            ...state.metadata,
+            pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+          },
+        };
+        return {
+          state: next,
+          result: ok({ message: `Ожидает выбора: ${text}` }),
+          manual: text,
+        };
       }
 
       // --- требуют выбора игрока → metadata.pendingEffects (C2):

@@ -24,7 +24,7 @@ import {
   EffectTarget,
 } from '../models/card.model';
 
-export const PARSER_VERSION = 2;
+export const PARSER_VERSION = 6;
 
 export interface CardEffectTexts {
   readonly immediately?: string | null;
@@ -40,8 +40,15 @@ export interface ParseResult {
   readonly unsupported: string[];
 }
 
+/** Опция CHOOSE_ONE на стадии драфта (effects ещё не финализированы) */
+type OptionDraft = { label: string; drafts: Draft[] };
+
 /** Промежуточный эффект без id/text/source — их доклеивает finalize */
-type Draft = Omit<CardEffect, 'id' | 'timing'> & { timing?: EffectTiming };
+type Draft = Omit<CardEffect, 'id' | 'timing' | 'options'> & {
+  timing?: EffectTiming;
+  /** Внутреннее поле парсера: опции CHOOSE_ONE до finalize (→ options) */
+  optionDrafts?: OptionDraft[];
+};
 
 // ---------------------------------------------------------------------------
 // Публичный API
@@ -91,6 +98,35 @@ export function parseFieldText(
   const text = clean(raw);
   const drafts: Array<{ draft: Draft; text: string }> = [];
   const unsupported: string[] = [];
+
+  // --- Lurking-форма: заголовок CHOOSE_ONE НЕ в начале —
+  //     «Draw N cards and choose 1 effect: - … - …». Отщепляем DRAW,
+  //     остаток («choose …») отдаём matchChooseOne. ---
+  const lurking = /^draw (\d+|one|two|three) cards? and (choose .+)$/i.exec(text);
+  if (lurking) {
+    const chooseTail = matchChooseOne(lurking[2]);
+    if (chooseTail) {
+      drafts.push({ draft: { type: EffectType.DRAW_CARD, value: toNumber(lurking[1]) }, text });
+      drafts.push({ draft: chooseTail, text });
+      for (const opt of chooseTail.optionDrafts ?? []) {
+        if (opt.drafts.some((d) => d.type === EffectType.UNSUPPORTED)) unsupported.push(opt.label);
+      }
+      return { drafts, unsupported };
+    }
+    // choose не распознан — продолжаем обычным путём
+  }
+
+  // --- CHOOSE_ONE: «Choose one: …» со списком альтернатив (раньше compound,
+  //     т.к. опции пересекают границы предложений) ---
+  const choose = matchChooseOne(text);
+  if (choose) {
+    drafts.push({ draft: choose, text });
+    // нераспознанные опции — в отчёт покрытия (помогает докручивать под-матчеры)
+    for (const opt of choose.optionDrafts ?? []) {
+      if (opt.drafts.some((d) => d.type === EffectType.UNSUPPORTED)) unsupported.push(opt.label);
+    }
+    return { drafts, unsupported };
+  }
 
   // --- Компаунд-матчеры по полному тексту (несколько предложений = один смысл) ---
   const compound = matchCompound(text);
@@ -157,6 +193,47 @@ function matchCompound(text: string): Draft[] | null {
 }
 
 // ---------------------------------------------------------------------------
+// CHOOSE_ONE — «Choose one[ effect][:|.] - опция - опция …»
+// ---------------------------------------------------------------------------
+
+/**
+ * Распознаёт карты-«Choose one» с маркированным списком альтернативных
+ * эффектов (Utility Belt, Technodrome, Riposte, Shapershifter, Looking Glass).
+ * Каждая опция разбирается рекурсивно через parseSentence; нераспознанная →
+ * UNSUPPORTED (label сохраняется для UI/лога).
+ *
+ * НЕ матчит: «Choose one of the fighters …» (выбор ЦЕЛИ, не альтернатив) и
+ * «… do both: …» (Shrink — оба эффекта, не выбор).
+ */
+function matchChooseOne(text: string): Draft | null {
+  if (/\bdo both\b/i.test(text)) return null;
+  // «Choose one:» | «Choose one effect:» | «Choose 2 different effects:»
+  const m =
+    /^choose (?:(one|two|three|\d+) (?:different )?effects?|(one))\s*[:.]\s*(.+)$/i.exec(text);
+  if (!m) return null;
+
+  const count = m[1] ? toNumber(m[1]) : 1;
+  const remainder = m[3];
+
+  // Опции разделены буллетами «-» / «•» (после clean переносы строк → пробелы);
+  // у некоторых карт перед дефисом стоит запятая (Utility Belt).
+  const labels = remainder
+    .split(/\s*[-•]\s*/)
+    .map((s) => s.replace(/,\s*$/, '').trim())
+    .filter((s) => s.length > 0);
+
+  // Меньше двух опций — это не список выбора, отдаём на обычный разбор.
+  if (labels.length < 2) return null;
+
+  const optionDrafts: OptionDraft[] = labels.map((label) => ({
+    label,
+    drafts: parseSentence(label) ?? [{ type: EffectType.UNSUPPORTED }],
+  }));
+
+  return { type: EffectType.CHOOSE_ONE, chooseCount: count, optionDrafts };
+}
+
+// ---------------------------------------------------------------------------
 // По-предложенные матчеры
 // ---------------------------------------------------------------------------
 
@@ -211,8 +288,43 @@ function parseSentence(sentence: string): Draft[] | null {
     ];
   }
 
-  // PLACE (manualEffects)
-  const place = /^(you may )?place (.+?) in any space\b.*$/i.exec(s);
+  // MOVE без «up to» — точное число клеток («Move Jill Trent 1 space»).
+  // ВАЖНО: проверяется ПОСЛЕ «up to»-матчера, иначе «up to 3 spaces»
+  // ложно срабатывает здесь как «3 spaces».
+  const moveExact = /^(you may )?move (.+?) (\d+) spaces?\b.*$/i.exec(s);
+  if (moveExact) {
+    return [
+      {
+        type: EffectType.MOVE,
+        value: Number(moveExact[3]),
+        optional: Boolean(moveExact[1]),
+        ...parseFighterRef(moveExact[2]),
+      },
+    ];
+  }
+
+  // «Choose one of the fighters in the combat and move them up to N spaces»
+  // (Skirmish ~20 копий, Into Darkness, Leap Away, Infinity Mirror) — выбор
+  // ЦЕЛИ + перемещение, не буллет-список → matchChooseOne его не ловит.
+  // MVP: target SELF (двигается свой боец, не любой из боя). Опц. префикс
+  // «if you won the combat» → when WON_COMBAT.
+  const chooseFighterMove =
+    /^(if you won the combat,?\s*)?choose one of the fighters in the combat and move (?:them|it) up to (\d+) spaces?$/i.exec(
+      s,
+    );
+  if (chooseFighterMove) {
+    const draft: Draft = {
+      type: EffectType.MOVE,
+      value: Number(chooseFighterMove[2]),
+      optional: false,
+      target: EffectTarget.SELF,
+      ...(chooseFighterMove[1] ? { when: { kind: 'WON_COMBAT' } as EffectCondition } : {}),
+    };
+    return [draft];
+  }
+
+  // PLACE (manualEffects) — «in any space» и «in any other space» (Looking Glass)
+  const place = /^(you may )?place (.+?) in any( other)? spaces?\b.*$/i.exec(s);
   if (place) {
     return [{ type: EffectType.PLACE, optional: Boolean(place[1]), ...parseFighterRef(place[2]) }];
   }
@@ -406,12 +518,29 @@ function finalize(
   field: string,
   index: number,
 ): CardEffect {
-  return {
-    ...draft,
+  const { optionDrafts, ...rest } = draft;
+  const resolvedTiming = draft.timing ?? timing;
+  const base: CardEffect = {
+    ...rest,
     id: `${cardId}-${field}-${index}`,
-    timing: draft.timing ?? timing,
+    timing: resolvedTiming,
     text,
     source: 'parser',
     parserVersion: PARSER_VERSION,
   };
+
+  // CHOOSE_ONE: финализируем опции (наследуют тайминг родителя)
+  if (optionDrafts) {
+    return {
+      ...base,
+      options: optionDrafts.map((opt, o) => ({
+        label: opt.label,
+        effects: opt.drafts.map((d, i) =>
+          finalize(d, resolvedTiming, opt.label, cardId, `${field}-${index}-opt${o}`, i),
+        ),
+      })),
+    };
+  }
+
+  return base;
 }

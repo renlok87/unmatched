@@ -235,8 +235,10 @@ export class PlaySchemeDto {
 }
 
 /**
- * DTO резолва отложенного эффекта (C2): игрок выбирает бойца и клетку
- * для MOVE/PLACE-эффекта карты (metadata.pendingEffects)
+ * DTO резолва отложенного эффекта (C2/v3):
+ * - MOVE/PLACE: игрок выбирает бойца (fighterId) и клетку (x, y);
+ * - CHOOSE_ONE: игрок выбирает вариант (optionIndex), fighter/клетка не нужны.
+ * Поля fighterId/x/y optional — обязательность проверяется по типу pending.
  */
 @InputType()
 export class ResolvePendingEffectDto {
@@ -249,20 +251,29 @@ export class ResolvePendingEffectDto {
   @IsString()
   effectId: string;
 
-  @Field(() => String)
-  @IsNotEmpty()
+  @Field(() => String, { nullable: true })
+  @IsOptional()
   @IsString()
-  fighterId: string;
+  fighterId?: string;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
   @IsInt()
   @Min(0)
-  x: number;
+  x?: number;
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
   @IsInt()
   @Min(0)
-  y: number;
+  y?: number;
+
+  /** CHOOSE_ONE: индекс выбранной опции (из pending.options) */
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  optionIndex?: number;
 }
 
 /**

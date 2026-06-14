@@ -328,4 +328,85 @@ describe('CardEffectExecutorService (A3)', () => {
       expect(result.manualEffects).toEqual(['Move Daredevil up to 4 spaces.']);
     });
   });
+
+  describe('CHOOSE_ONE (v3)', () => {
+    const chooseEffect = (chooseCount = 1) =>
+      eff({
+        type: EffectType.CHOOSE_ONE,
+        chooseCount,
+        text: 'Choose one',
+        options: [
+          { label: 'Draw 1 card', effects: [eff({ type: EffectType.DRAW_CARD, value: 1 })] },
+          {
+            label: 'Recover 2 health',
+            effects: [eff({ type: EffectType.HEAL, value: 2, target: EffectTarget.SELF })],
+          },
+        ],
+      });
+
+    it('CHOOSE_ONE → pendingEffect c options/optionEffects/chooseCount; бойцы не тронуты', async () => {
+      const state = makeState();
+      const after = await service.executeAfterCombatEffects(
+        state,
+        card('atk', [chooseEffect()]),
+        null,
+        combat,
+        { attackerWon: true, attackerDamage: 0, defenderDamage: 1 },
+      );
+      const pending = after.state.metadata.pendingEffects ?? [];
+      expect(pending).toHaveLength(1);
+      expect(pending[0]).toMatchObject({ type: 'CHOOSE_ONE', playerId: 'p1', chooseCount: 1 });
+      expect(pending[0].options).toEqual([
+        { index: 0, label: 'Draw 1 card' },
+        { index: 1, label: 'Recover 2 health' },
+      ]);
+      expect(pending[0].optionEffects).toHaveLength(2);
+      // эффект отложен — текст в manualEffects, бойцы не изменены
+      expect(after.manualEffects).toContain('Choose one');
+      expect(after.state.fighters).toEqual(state.fighters);
+    });
+
+    it('CHOOSE_ONE без распознанных опций → manual (как UNSUPPORTED)', async () => {
+      const empty = eff({ type: EffectType.CHOOSE_ONE, text: 'Choose one', options: [] });
+      const after = await service.executeAfterCombatEffects(
+        makeState(),
+        card('atk', [empty]),
+        null,
+        combat,
+        { attackerWon: true, attackerDamage: 0, defenderDamage: 1 },
+      );
+      expect(after.state.metadata.pendingEffects ?? []).toHaveLength(0);
+      expect(after.manualEffects).toContain('Choose one');
+    });
+
+    it('executeChosenEffects: опция DRAW добирает карту', async () => {
+      const res = await service.executeChosenEffects(
+        makeState(),
+        [eff({ type: EffectType.DRAW_CARD, value: 1 })],
+        'p1',
+      );
+      expect(res.state.handZones.p1.cards).toHaveLength(1);
+    });
+
+    it('executeChosenEffects: опция GAIN_ACTION добавляет действие', async () => {
+      const res = await service.executeChosenEffects(
+        makeState(),
+        [eff({ type: EffectType.GAIN_ACTION, value: 1 })],
+        'p1',
+      );
+      // makeState: actionsRemaining 1 → +1 = 2
+      expect(res.state.metadata.actionsRemaining).toBe(2);
+    });
+
+    it('executeChosenEffects: вложенный MOVE порождает pendingEffect', async () => {
+      const res = await service.executeChosenEffects(
+        makeState(),
+        [eff({ type: EffectType.MOVE, value: 2, text: 'Move your fighter up to 2 spaces.' })],
+        'p1',
+      );
+      const pending = res.state.metadata.pendingEffects ?? [];
+      expect(pending).toHaveLength(1);
+      expect(pending[0]).toMatchObject({ type: 'MOVE', playerId: 'p1', value: 2 });
+    });
+  });
 });
