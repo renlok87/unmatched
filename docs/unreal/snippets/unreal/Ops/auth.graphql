@@ -1,0 +1,153 @@
+# =============================================================================
+# unreal/Ops/auth.graphql — документы операций аутентификации и профиля.
+#
+# Единственный источник документов операций UE-клиента (ADR §3.7). Каждый документ
+# помечен служебным заголовком, который читает gen-ops.mjs (см. Tools/README.md):
+#   # auth: none | optional | required   — режим EUmAuthMode (ADR §4.1, R1 §2.14)
+#   # throttle: <limit>/<windowSec>      — объявленный @Throttle (R1 §2.7-2.8, §2.11)
+#   # bucket: <имя>                      — бакет FUmRateLimiter (ADR §4.1)
+# Комментарии в документы UmOps.gen.h не попадают (gen-ops печатает print(ast)).
+#
+# Факты контракта: типы аргументов и полей — по сгенерированной схеме веб-клиента
+# src/gql/graphql.ts (Mutation root :721-780, args :786-1017) и R1 §2.7-2.8.
+# Все операции — HTTP POST /graphql (R1 §1 п.1); подписок здесь нет.
+# =============================================================================
+
+# --- Login -------------------------------------------------------------------
+# auth: none
+# throttle: 10/60
+# bucket: login
+# R1 §2.7: login(input: LoginDto!) — @Public; «Неверный email или пароль» → UNAUTHENTICATED
+# (классифицируется как Validation, а не Auth — ADR §5.3). Выбираем полный AuthUserResponse
+# (R1 §2.7, auth-response.dto.ts:19-53): id — единственный источник userId до запроса me.
+mutation Login($input: LoginDto!) {
+  login(input: $input) {
+    accessToken
+    refreshToken
+    user {
+      id
+      email
+      username
+      avatar
+      role
+      createdAt
+      emailVerified
+    }
+  }
+}
+
+# --- Register ----------------------------------------------------------------
+# auth: none
+# throttle: 5/60
+# bucket: register
+# R1 §2.7: register(input: RegisterDto!) — email (IsEmail), username 3-20 [a-zA-Z0-9_], password ≥ 8;
+# конфликт email/username → INTERNAL_SERVER_ERROR + extensions.status 409 (класс Conflict, ADR §5.3).
+mutation Register($input: RegisterDto!) {
+  register(input: $input) {
+    accessToken
+    refreshToken
+    user {
+      id
+      email
+      username
+      avatar
+      role
+      createdAt
+      emailVerified
+    }
+  }
+}
+
+# --- RefreshTokens -----------------------------------------------------------
+# auth: none
+# throttle: 3/60
+# bucket: refreshTokens
+# R1 §2.6, §2.7: refreshTokens(refreshToken: String!) — @Public, ротация refresh-токена;
+# любая ошибка → SessionLost (ADR §5.3). user { id } — для сверки userId после ротации
+# (К3 Приложение A). Веб-клиент запрашивает только accessToken/refreshToken (R1 §2.8).
+mutation RefreshTokens($refreshToken: String!) {
+  refreshTokens(refreshToken: $refreshToken) {
+    accessToken
+    refreshToken
+    user {
+      id
+    }
+  }
+}
+
+# --- Logout ------------------------------------------------------------------
+# auth: required
+# R1 §2.7, §4.9: guard на сервере отсутствует, поэтому клиент вызывает logout ТОЛЬКО
+# при валидном access-токене (ADR §5.5, предпосылка B5); локальная очистка — всегда.
+mutation Logout {
+  logout
+}
+
+# --- Me ----------------------------------------------------------------------
+# auth: required
+# R1 §2.8: me → UserWithSettingsResponse (nullable); GqlAuthGuard; me.id — единственный
+# источник userId в UUmAuthSubsystem (ADR §4.1). settings — UserSettingsResponse (7 полей).
+query Me {
+  me {
+    id
+    email
+    username
+    avatar
+    role
+    createdAt
+    emailVerified
+    settings {
+      id
+      theme
+      language
+      soundEnabled
+      musicEnabled
+      profileVisible
+      showOnlineStatus
+    }
+  }
+}
+
+# --- UpdateSettings ----------------------------------------------------------
+# auth: required
+# throttle: 10/60
+# bucket: updateSettings
+# R1 §2.8: updateSettings(input: SettingsDto!) — theme ∈ light|dark|auto, language ∈ ru|en;
+# optional-поля ОПУСКАЮТСЯ билдером FUmInputs::Settings (forbidNonWhitelisted, R1 §2.3).
+mutation UpdateSettings($input: SettingsDto!) {
+  updateSettings(input: $input) {
+    id
+    theme
+    language
+    soundEnabled
+    musicEnabled
+    profileVisible
+    showOnlineStatus
+  }
+}
+
+# --- UpdateProfile -----------------------------------------------------------
+# auth: required
+# throttle: 5/60
+# bucket: updateProfile
+# R1 §2.8: updateProfile(input: UpdateProfileDto!) — username? (3-20), avatar? (IsUrl ≤ 500).
+# Тип входа — UpdateProfileDto (веб-клиент ошибочно использует UpdateProfileInput — R7 §2.4.2).
+mutation UpdateProfile($input: UpdateProfileDto!) {
+  updateProfile(input: $input) {
+    id
+    username
+    avatar
+    role
+    createdAt
+  }
+}
+
+# --- ChangePassword ----------------------------------------------------------
+# auth: required
+# throttle: 3/60
+# bucket: changePassword
+# R1 §2.8: «Неверный текущий пароль» → UNAUTHENTICATED; для этой операции класс Validation,
+# refresh-цикл НЕ запускается (ADR §5.3, строка 3).
+mutation ChangePassword($input: ChangePasswordDto!) {
+  changePassword(input: $input)
+}

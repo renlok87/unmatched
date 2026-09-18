@@ -1,0 +1,98 @@
+# =============================================================================
+# unreal/Ops/subscriptions.graphql — подписки (graphql-transport-ws, ADR §4.1 FUmGraphQLWsClient).
+#
+# Контракт: R3 §2.12 (таблица подписок, payload-типы), R2 §2.6, R1 §2.4 (протокол);
+# схема src/gql/graphql.ts (Subscription root :1487-1499, SubscriptionGameStateUpdatedArgs
+# :1522-1526 — since: Float, SubscriptionMatchFoundArgs — userId: String!).
+#
+# Auth: токен фиксируется в connection_init на всё время сокета (ADR §5.3) — после refresh
+# обязателен ReconnectWebSocket. Ошибка auth приходит на конкретный subscribe как next{errors}
+# + complete либо error, без extensions.code (ADR §1.3 п.2). Заголовок «auth: required»
+# означает «connection_init с токеном обязателен».
+#
+# Не включены (ADR §7 «Отвергнутые альтернативы»): attackInitiated, defensePlayed,
+# combatResolved, turnChanged (payload только { phase, turnCount, currentTurnPlayerId };
+# turnChanged молчит при авто-передаче — R4 §3.3), presenceUpdated (не AsyncIterator — R2 §4.4).
+# =============================================================================
+
+# --- GameStateUpdated --------------------------------------------------------
+# auth: required
+# R3 §2.12: gameStateUpdated(gameId: String!, since: Float) → GameState. Аргумент userId схемы
+# ИГНОРИРУЕТСЯ бэком (фильтр по JWT) — не передаём. Фильтр: eventType STATE_UPDATED &&
+# (since == null || sequenceNumber > since); ровно одно событие на мутацию.
+# Payload: пять СТРОКОВЫХ JSON-полей players/fighters/handZones/boardState/metadata БЕЗ
+# decks/discardPiles (ADR §1.1, §5.2 → bDecksStale + рефетч; B8). currentTurnPlayerId: String!
+# (non-null; при null — next{errors} + RefetchState, F24; B7). Эхо подписки может обогнать
+# HTTP-ответ мутации (ADR §1.3 п.8). При переподписке после connection_ack — since = LastSeq.
+subscription GameStateUpdated($gameId: String!, $since: Float) {
+  gameStateUpdated(gameId: $gameId, since: $since) {
+    gameId
+    sequenceNumber
+    phase
+    turnCount
+    currentTurnPlayerId
+    players
+    fighters
+    handZones
+    boardState
+    metadata
+  }
+}
+
+# --- GameEnded ---------------------------------------------------------------
+# auth: required
+# R3 §2.12: gameEnded(gameId: String!) → GameEvent; публикуется при phase === GAME_OVER из
+# executeMutation и из ИИ-хода. Дедупликация по ключу (gameId, "GAME_ENDED", seq) — ADR §5.2.
+# payload — JSON-строка { action, input: { winnerId } } (R3 §2.5).
+subscription GameEnded($gameId: String!) {
+  gameEnded(gameId: $gameId) {
+    type
+    gameId
+    sequenceNumber
+    timestamp
+    payload
+  }
+}
+
+# --- PlayerJoined ------------------------------------------------------------
+# auth: required
+# R2 §2.6, ADR §5.5: playerJoined(gameId: String!) публикуется (комментарии резолвера устарели);
+# payload — компактный { userId, username }. Подписка в комнате ДО startGame + поллинг GetGame 3 с.
+subscription PlayerJoined($gameId: String!) {
+  playerJoined(gameId: $gameId) {
+    type
+    gameId
+    sequenceNumber
+    timestamp
+    payload
+  }
+}
+
+# --- PlayerLeft --------------------------------------------------------------
+# auth: required
+# R2 §2.6: playerLeft(gameId: String!) → GameEvent; payload { userId, username } или { reason }.
+subscription PlayerLeft($gameId: String!) {
+  playerLeft(gameId: $gameId) {
+    type
+    gameId
+    sequenceNumber
+    timestamp
+    payload
+  }
+}
+
+# --- MatchFound --------------------------------------------------------------
+# auth: optional
+# R2 §2.8: matchFound(userId: String!) — без guard; тип аргумента String!, НЕ ID! (веб-клиент
+# использует ID! — INVALID, R7 §2.4.3). Фильтр player1Id/player2Id === userId; resolve
+# подставляет данные СОПЕРНИКА. expiresAt — DateTime (epoch-ms). v2, за флагом (B13).
+subscription MatchFound($userId: String!) {
+  matchFound(userId: $userId) {
+    gameId
+    opponentId
+    opponentUsername
+    opponentRating
+    mode
+    expiresAt
+  }
+}

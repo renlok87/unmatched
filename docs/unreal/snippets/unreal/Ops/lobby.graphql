@@ -1,0 +1,163 @@
+# =============================================================================
+# unreal/Ops/lobby.graphql — лобби и комната (Game / GamePlayer, без gameplay).
+#
+# Контракт: R3 §2.5-2.6 (queries/mutations игры), R2 §2.4-2.5, схема src/gql/graphql.ts
+# (GameResponse :512-533, GamePlayerResponse :500-510, MutationCreateGameArgs :826-830,
+# MutationJoinGameArgs :867-869 — БЕЗ idempotencyKey). Формат заголовков — см. auth.graphql.
+#
+# Скаляры (R3 §2.4, ADR §1.3 п.4): availableGames.limit — Float; GameResponse.version — Float;
+# GamePlayerResponse.seatOrder — Float; DateTime — epoch-миллисекунды.
+# =============================================================================
+
+# Общий набор полей GameResponse (К3 Приложение A «GameFields»; R3 §2.5).
+# host.id / opponent.id = User.id; players[].id = id GamePlayer, players[].userId = User.id (ADR §4.2).
+fragment UmGameFields on GameResponse {
+  id
+  code
+  status
+  mode
+  hostId
+  opponentId
+  boardId
+  createdAt
+  updatedAt
+  startedAt
+  endedAt
+  winnerId
+  version
+  phase
+  currentTurn
+  host {
+    id
+    userId
+    username
+    avatar
+  }
+  opponent {
+    id
+    userId
+    username
+    avatar
+  }
+  players {
+    id
+    userId
+    username
+    avatar
+    heroId
+    isReady
+    hasPassed
+    seatOrder
+  }
+}
+
+# --- AvailableGames ----------------------------------------------------------
+# auth: optional
+# R3 §2.5: availableGames(mode: String, limit: Float) — guard отсутствует (публичная);
+# возвращает только LOBBY без opponent (R2 §2.4). Токен отправляется, если есть (Optional).
+query AvailableGames($mode: String, $limit: Float) {
+  availableGames(mode: $mode, limit: $limit) {
+    ...UmGameFields
+  }
+}
+
+# --- MyGames -----------------------------------------------------------------
+# auth: required
+# R3 §2.5: myGames(filters: GameFiltersDto) — реально работают только status/limit (R2 §2.4).
+# Нужен для вкладки «Мои игры» и освобождения слота из 5 активных игр (ADR §5.5, B11).
+query MyGames($filters: GameFiltersDto) {
+  myGames(filters: $filters) {
+    ...UmGameFields
+  }
+}
+
+# --- GetGame -----------------------------------------------------------------
+# auth: required
+# R3 §2.5: game(id: String!) → GameResponse (nullable); checkGameAccess — участники.
+# В комнате поллится каждые 3 с до startGame (ADR §5.5), т.к. событий на isReady/heroId нет (R2 §3.8).
+query GetGame($id: String!) {
+  game(id: $id) {
+    ...UmGameFields
+  }
+}
+
+# --- CreateGame --------------------------------------------------------------
+# auth: required
+# throttle: 10/60
+# bucket: createGame
+# R3 §2.6, R1 §2.12: createGame(input: CreateGameDto!, idempotencyKey: String) — единственная
+# операция с idempotencyKey (ADR §1.3 п.11, §5.4): FGuid::NewGuid() на каждый клик, повтор при
+# сетевой ошибке — тот же ключ. input.boardId — Prisma cuid из boardList (ADR §1.3 п.10).
+mutation CreateGame($input: CreateGameDto!, $idempotencyKey: String) {
+  createGame(input: $input, idempotencyKey: $idempotencyKey) {
+    ...UmGameFields
+  }
+}
+
+# --- JoinGame ----------------------------------------------------------------
+# auth: required
+# throttle: 15/60
+# bucket: joinGame
+# R1 §2.12, R2 §3.26: idempotencyKey у joinGame в схеме НЕТ (веб-клиент шлёт — получает
+# GRAPHQL_VALIDATION_FAILED). input — только { gameId } (asOpponent/heroId опускаются, ADR §5.4).
+mutation JoinGame($input: JoinGameDto!) {
+  joinGame(input: $input) {
+    ...UmGameFields
+  }
+}
+
+# --- LeaveGame ---------------------------------------------------------------
+# auth: required
+# R3 §2.6: leaveGame(gameId: String!) → Boolean!. Обязателен из WBP_GameOver (ADR §5.5, B11);
+# ошибка «Игра не найдена» после leaveGame хостом без соперника игнорируется (R2 §3.14).
+mutation LeaveGame($gameId: String!) {
+  leaveGame(gameId: $gameId)
+}
+
+# --- StartGame ---------------------------------------------------------------
+# auth: required
+# throttle: 5/60
+# bucket: startGame
+# R3 §2.6: startGame(gameId: String!) — инициализирует engine-состояние; первое STATE_UPDATED
+# seq 1 — сигнал старта для гостя (R2 §3.9).
+mutation StartGame($gameId: String!) {
+  startGame(gameId: $gameId) {
+    ...UmGameFields
+  }
+}
+
+# --- AbortGame ---------------------------------------------------------------
+# auth: required
+# throttle: 5/60
+# bucket: abortGame
+# R3 §2.6: abortGame(gameId: String!) → GameResponse!. Используется e2e-прибиранием активных
+# игр (R6 §2.6) и «Мои игры».
+mutation AbortGame($gameId: String!) {
+  abortGame(gameId: $gameId) {
+    ...UmGameFields
+  }
+}
+
+# --- ToggleReady -------------------------------------------------------------
+# auth: required
+# throttle: 20/60
+# bucket: toggleReady
+# R2 §3.11, ADR §5.4: не идемпотентна — клиентский in-flight guard; заголовок X-Idempotency-Key
+# сервер не читает (R1 §2.12). Состояние — из players[].isReady ответа.
+mutation ToggleReady($gameId: String!) {
+  toggleReady(gameId: $gameId) {
+    ...UmGameFields
+  }
+}
+
+# --- SelectHero --------------------------------------------------------------
+# auth: required
+# throttle: 10/60
+# bucket: selectHero
+# R3 §2.6, R6 §2.4: selectHero(gameId: String!, heroId: String!) — heroId ТОЛЬКО Prisma cuid из
+# heroList (публичные heroes/hero отдают id = name). Маппинг — UUmContentSubsystem::IdMap (ADR §4.5).
+mutation SelectHero($gameId: String!, $heroId: String!) {
+  selectHero(gameId: $gameId, heroId: $heroId) {
+    ...UmGameFields
+  }
+}

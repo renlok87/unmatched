@@ -1,0 +1,201 @@
+# =============================================================================
+# unreal/Ops/game.graphql — игровое состояние и 11 gameplay-мутаций.
+#
+# Контракт: R3 §2.5 (gameState/gameSequence/eventsSince), §2.7 (input-DTO), §2.8
+# (GameMutationResult); схема src/gql/graphql.ts (GameMutationResult :468-476,
+# GameStateResponse :549-559, QueryEventsSinceArgs :1278-1281 — sinceSequence: Float!).
+# Формат заголовков — см. auth.graphql. Все операции — Required (R1 §2.14).
+#
+# Скаляры (R3 §2.4): GameStateResponse.sequenceNumber/turnCount — Float (→ double в DTO);
+# GameMutationResult.sequenceNumber/turnCount — Int; timestamp — DateTime = epoch-ms;
+# gameSequence — Float (0, если состояния нет); eventsSince.sinceSequence — Float!.
+# =============================================================================
+
+# Единый ответ gameplay-мутаций (R3 §2.8; gameplay.dto.ts:437-458). state — JSON-строка
+# ПОЛНОГО отфильтрованного GameState (с decks/discardPiles) — ADR §5.2 «Mutation»-источник.
+fragment UmMutationResultFields on GameMutationResult {
+  state
+  sequenceNumber
+  timestamp
+  phase
+  currentTurnPlayerId
+  turnCount
+}
+
+# --- GetGameState ------------------------------------------------------------
+# auth: required
+# R3 §2.5: gameState(gameId: String!) → GameStateResponse (nullable); requireParticipation;
+# state = JSON.stringify(filterPrivateData(state, userId)); updatedAt = metadata.lastActionAt.
+# Источник «Query» для FUmGameSnapshotStore (ADR §5.2) и RefetchState().
+query GetGameState($gameId: String!) {
+  gameState(gameId: $gameId) {
+    id
+    gameId
+    state
+    sequenceNumber
+    currentTurnPlayerId
+    phase
+    turnCount
+    updatedAt
+  }
+}
+
+# --- GameSequence ------------------------------------------------------------
+# auth: required
+# R3 §2.5: gameSequence(gameId: String!) → Float (nullable). Реконнект: если > LastSeq →
+# GetGameState → ForceReplace (ADR §5.2).
+query GameSequence($gameId: String!) {
+  gameSequence(gameId: $gameId)
+}
+
+# --- EventsSince -------------------------------------------------------------
+# auth: required
+# R3 §2.5, §4.10: журнал без состояния, без ходов ИИ и auto-resolve, пишется асинхронно —
+# для восстановления НЕ используется; читается один раз при входе для WBP_ActionLog (ADR §5.2).
+# payload — JSON-строка { action, input }.
+query EventsSince($gameId: String!, $sinceSequence: Float!) {
+  eventsSince(gameId: $gameId, sinceSequence: $sinceSequence) {
+    gameId
+    lastSequence
+    hasMore
+    events {
+      type
+      gameId
+      sequenceNumber
+      timestamp
+      payload
+    }
+  }
+}
+
+# --- Maneuver ----------------------------------------------------------------
+# auth: required
+# throttle: 30/60
+# bucket: maneuver
+# R3 §2.7.3, §4.13: ManeuverDto { gameId!, moves?[{fighterId!, path![{x!,y!}]}], boostCardId?,
+# fighterId?/cardId?/path? (legacy) }. FUmInputs::Maneuver шлёт ТОЛЬКО moves[] (+ boostCardId).
+# Тратит 1 действие; при 0 действий — авто-advanceTurn в той же мутации (R4 §3.3).
+mutation Maneuver($input: ManeuverDto!) {
+  maneuver(input: $input) {
+    ...UmMutationResultFields
+  }
+}
+
+# --- MoveFighter -------------------------------------------------------------
+# auth: required
+# throttle: 30/60
+# bucket: moveFighter
+# R3 §2.7.4: MoveFighterDto { gameId!, fighterId!, x: Int!, y: Int! } (0..19). «Быстрый ход»
+# (ADR §8 п.4); основной путь движения — Maneuver.
+mutation MoveFighter($input: MoveFighterDto!) {
+  moveFighter(input: $input) {
+    ...UmMutationResultFields
+  }
+}
+
+# --- Attack ------------------------------------------------------------------
+# auth: required
+# throttle: 20/60
+# bucket: attack
+# R3 §2.7.5, R4 §2.7.1: AttackDto { gameId!, attackerId! (боец), targetId! (боец), cardId!,
+# boostCardId? }. Действие списывается при объявлении; фаза → COMBAT; таймер защиты 30 с
+# локально от combatInfo.startedAt (ADR §1.3 п.5-6).
+mutation Attack($input: AttackDto!) {
+  attack(input: $input) {
+    ...UmMutationResultFields
+  }
+}
+
+# --- PlayDefense -------------------------------------------------------------
+# auth: required
+# throttle: 20/60
+# bucket: playDefense
+# R3 §2.7.6: PlayDefenseDto { gameId!, cardId!, boostCardId? } — только защитник в COMBAT
+# (DefensePlayGuard); фаза → COMBAT_RESOLVE.
+mutation PlayDefense($input: PlayDefenseDto!) {
+  playDefense(input: $input) {
+    ...UmMutationResultFields
+  }
+}
+
+# --- PlayScheme --------------------------------------------------------------
+# auth: required
+# throttle: 20/60
+# bucket: playScheme
+# R3 §2.7.8: PlaySchemeDto { gameId!, cardId! }; тратит 1 действие.
+mutation PlayScheme($input: PlaySchemeDto!) {
+  playScheme(input: $input) {
+    ...UmMutationResultFields
+  }
+}
+
+# --- ResolvePendingEffect ----------------------------------------------------
+# auth: required
+# throttle: 30/60
+# bucket: resolvePendingEffect
+# R3 §2.7.9, §4.12: ResolvePendingEffectDto { gameId!, effectId!, fighterId?, x?: Int, y?: Int,
+# optionIndex?: Int }. Без фазового guard — клиент блокирует в COMBAT (ADR §5.5, G19; B10).
+mutation ResolvePendingEffect($input: ResolvePendingEffectDto!) {
+  resolvePendingEffect(input: $input) {
+    ...UmMutationResultFields
+  }
+}
+
+# --- ResolveCombat -----------------------------------------------------------
+# auth: required
+# throttle: 20/60
+# bucket: resolveCombat
+# R3 §2.7.7, R4 §2.8: ResolveCombatDto { gameId! }. Auto-resolve по таймауту урона не наносит —
+# атакующий авто-резолвит через 1,5 с в COMBAT_RESOLVE, защитник — кнопка через 5 с (ADR §5.5, B6).
+mutation ResolveCombat($input: ResolveCombatDto!) {
+  resolveCombat(input: $input) {
+    ...UmMutationResultFields
+  }
+}
+
+# --- EndTurn -----------------------------------------------------------------
+# auth: required
+# throttle: 30/60
+# bucket: endTurn
+# R3 §2.7.10: EndTurnDto { gameId! }; advanceTurn → ACTION_MANEUVER следующего игрока.
+mutation EndTurn($input: EndTurnDto!) {
+  endTurn(input: $input) {
+    ...UmMutationResultFields
+  }
+}
+
+# --- Pass --------------------------------------------------------------------
+# auth: required
+# throttle: 20/60
+# bucket: pass
+# R3 §2.7.10, R4 §4.8: PassDto { gameId! }; тратит действие, карту НЕ сбрасывает
+# (подпись «Пропустить действие», ADR §5.5).
+mutation Pass($input: PassDto!) {
+  pass(input: $input) {
+    ...UmMutationResultFields
+  }
+}
+
+# --- ToggleDoor --------------------------------------------------------------
+# auth: required
+# throttle: 30/60
+# bucket: toggleDoor
+# R3 §2.7.11, R4 §2.6.6: ToggleDoorDto { gameId!, x: Int!, y: Int! } — мёртвая механика;
+# доступна только из dev-консоли um.toggledoor (ADR §4.8).
+mutation ToggleDoor($input: ToggleDoorDto!) {
+  toggleDoor(input: $input) {
+    ...UmMutationResultFields
+  }
+}
+
+# --- SetStance ---------------------------------------------------------------
+# auth: required
+# throttle: 30/60
+# bucket: setStance
+# R3 §2.7.12, R4 §2.13: SetStanceDto { gameId!, stanceId! }; ActionPhaseGuard; действие НЕ
+# тратится; seq+1; событие SPECIAL_ABILITY. Список стоек — HeroStances (content.graphql).
+mutation SetStance($input: SetStanceDto!) {
+  setStance(input: $input) {
+    ...UmMutationResultFields
+  }
+}

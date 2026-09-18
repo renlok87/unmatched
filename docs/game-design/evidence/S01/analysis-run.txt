@@ -1,0 +1,279 @@
+{
+  "kind": "observed-baseline-not-rules-conformance",
+  "content": {
+    "medusa": {
+      "records": 11,
+      "instances": 30,
+      "hand": 5
+    },
+    "king-arthur": {
+      "records": 16,
+      "instances": 30,
+      "hand": 5
+    }
+  },
+  "board": {
+    "width": 5,
+    "height": 6,
+    "cells": 30,
+    "zones": [
+      "blue",
+      "red"
+    ],
+    "multizoneCells": 0,
+    "explicitAdjacencyInPayload": false,
+    "startingMarkersInPayload": false,
+    "controlPoints": [
+      {
+        "cell": [
+          0,
+          0
+        ],
+        "world": [
+          -200.0,
+          -250.0,
+          0
+        ]
+      },
+      {
+        "cell": [
+          4,
+          5
+        ],
+        "world": [
+          200.0,
+          250.0,
+          0
+        ]
+      },
+      {
+        "cell": [
+          2,
+          2
+        ],
+        "world": [
+          0.0,
+          -50.0,
+          0
+        ]
+      },
+      {
+        "cell": [
+          2,
+          3
+        ],
+        "world": [
+          0.0,
+          50.0,
+          0
+        ]
+      }
+    ],
+    "finalArtGate": "OPEN: grid confirmed; tactical graph and start regions not approved"
+  },
+  "states": {
+    "start": {
+      "sequence": 1,
+      "turn": "player-1",
+      "actions": 2,
+      "hands": {
+        "player-1": 5,
+        "player-2": 5
+      },
+      "drawPiles": {
+        "player-1": 25,
+        "player-2": 25
+      },
+      "discardPiles": {
+        "player-1": 0,
+        "player-2": 0
+      },
+      "hp": {
+        "f-0-hero": 16,
+        "f-0-sk0": 1,
+        "f-0-sk1": 1,
+        "f-0-sk2": 1,
+        "f-1-hero": 18,
+        "f-1-sk0": 7
+      }
+    },
+    "pass1": {
+      "sequence": 2,
+      "turn": "player-1",
+      "actions": 1,
+      "hands": {
+        "player-1": 5,
+        "player-2": 5
+      },
+      "drawPiles": {
+        "player-1": 25,
+        "player-2": 25
+      },
+      "discardPiles": {
+        "player-1": 0,
+        "player-2": 0
+      },
+      "hp": {
+        "f-0-hero": 16,
+        "f-0-sk0": 1,
+        "f-0-sk1": 1,
+        "f-0-sk2": 1,
+        "f-1-hero": 18,
+        "f-1-sk0": 7
+      }
+    },
+    "pass2": {
+      "sequence": 3,
+      "turn": "player-2",
+      "actions": 2,
+      "hands": {
+        "player-1": 5,
+        "player-2": 6
+      },
+      "drawPiles": {
+        "player-1": 25,
+        "player-2": 24
+      },
+      "discardPiles": {
+        "player-1": 0,
+        "player-2": 0
+      },
+      "hp": {
+        "f-0-hero": 16,
+        "f-0-sk0": 1,
+        "f-0-sk1": 1,
+        "f-0-sk2": 1,
+        "f-1-hero": 18,
+        "f-1-sk0": 7
+      }
+    }
+  },
+  "handMaxSize": {
+    "player-1": 7,
+    "player-2": 7
+  },
+  "cardTypes": [
+    "ATTACK",
+    "SCHEME",
+    "VERSATILE"
+  ],
+  "instanceMutation": {
+    "selectedInstance": "cmq7d7b4b00ruwi74zyil05so::0",
+    "removedFromHand": true,
+    "foundInDiscard": true
+  },
+  "gaze": {
+    "before": [
+      {
+        "id": "f-0-hero",
+        "hp": 16
+      },
+      {
+        "id": "f-0-sk0",
+        "hp": 1
+      },
+      {
+        "id": "f-0-sk1",
+        "hp": 1
+      },
+      {
+        "id": "f-0-sk2",
+        "hp": 1
+      },
+      {
+        "id": "f-1-hero",
+        "hp": 18
+      },
+      {
+        "id": "f-1-sk0",
+        "hp": 7
+      }
+    ],
+    "after": [
+      {
+        "id": "f-0-hero",
+        "hp": 16
+      },
+      {
+        "id": "f-0-sk0",
+        "hp": 1
+      },
+      {
+        "id": "f-0-sk1",
+        "hp": 1
+      },
+      {
+        "id": "f-0-sk2",
+        "hp": 1
+      },
+      {
+        "id": "f-1-hero",
+        "hp": 17
+      },
+      {
+        "id": "f-1-sk0",
+        "hp": 7
+      }
+    ],
+    "pending": []
+  },
+  "timeoutAtInWsMetadata": false,
+  "timeoutAtInCombatInfo": false,
+  "wsCombatInfo": {
+    "attackerId": "f-0-hero",
+    "defenderId": "player-2",
+    "targetFighterId": "f-1-sk0",
+    "attackerCardId": "cmq7d7b4b00ruwi74zyil05so::0",
+    "attackValue": 3,
+    "defenseValue": 0,
+    "startedAt": "2026-09-18T08:11:18.938Z"
+  },
+  "timeout": {
+    "elapsedMs": 32023,
+    "attackSequence": 3,
+    "afterSequence": 4,
+    "phase": "COMBAT_RESOLVE",
+    "hp": [
+      {
+        "id": "f-0-hero",
+        "hp": 16
+      },
+      {
+        "id": "f-0-sk0",
+        "hp": 1
+      },
+      {
+        "id": "f-0-sk1",
+        "hp": 1
+      },
+      {
+        "id": "f-0-sk2",
+        "hp": 1
+      },
+      {
+        "id": "f-1-hero",
+        "hp": 18
+      },
+      {
+        "id": "f-1-sk0",
+        "hp": 7
+      }
+    ],
+    "clientsClosed": true
+  },
+  "arthurMovement": {
+    "catalog": 3,
+    "content": 2,
+    "fighter": 2
+  },
+  "schemaSha256": "1928ab5a366862b5a6c57899aa9a1ebc24df9a389d298cb3cc57663eb63aaeb9",
+  "checksPassed": [
+    "30 unique coordinates",
+    "6 non-overlapping fighters",
+    "27 records / 60 unique deck instances",
+    "instance counts match live content",
+    "selected attack instance moved from hand to discard",
+    "both WS attack projections",
+    "4 world-cell round trips"
+  ]
+}

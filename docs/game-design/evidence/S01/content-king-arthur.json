@@ -1,0 +1,494 @@
+{
+  "id": "cmq7d7b1000njwi74a536w55r",
+  "name": "King Arthur",
+  "health": 18,
+  "movement": 2,
+  "fighterType": "HERO",
+  "ability": {
+    "type": "CUSTOM",
+    "effect": "When King Arthur attacks, you may BOOST that attack, Play the BOOST card, face down, along with your attack card.\nIf your opponent cancels the effects on your attack card, the BOOST is discarded without effect.",
+    "timing": "PASSIVE",
+    "description": "When King Arthur attacks, you may BOOST that attack, Play the BOOST card, face down, along with your attack card.\nIf your opponent cancels the effects on your attack card, the BOOST is discarded without effect."
+  },
+  "sidekicks": [
+    {
+      "name": "Merlin",
+      "health": "7",
+      "movement": "2",
+      "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/4Rl9Oq9N82zhatbTShnXn.webp",
+      "attackType": "range"
+    }
+  ],
+  "updatedAt": 1781184963115,
+  "cards": [
+    {
+      "id": "cmq7d7b1300nnwi74p39wjkd3",
+      "name": "The Aid of Morgana",
+      "nameEn": "The Aid of Morgana",
+      "nameRu": "The Aid of Morgana",
+      "cardType": "ATTACK",
+      "count": 1,
+      "attackValue": 4,
+      "defenseValue": null,
+      "boostValue": 2,
+      "bannerName": "Arthur",
+      "textEn": "",
+      "textRu": "",
+      "effects": [
+        {
+          "id": "cmq7d7b1300nnwi74p39wjkd3-after-0",
+          "text": "Draw 2 cards.",
+          "type": "DRAW_CARD",
+          "value": 2,
+          "source": "parser",
+          "timing": "AFTER_COMBAT",
+          "parserVersion": 6
+        }
+      ],
+      "effectImmediately": null,
+      "effectDuring": null,
+      "effectAfter": " Draw 2 cards.",
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1500nrwi74c9su6mck",
+      "name": "Excalibur",
+      "nameEn": "Excalibur",
+      "nameRu": "Excalibur",
+      "cardType": "ATTACK",
+      "count": 1,
+      "attackValue": 6,
+      "defenseValue": null,
+      "boostValue": 3,
+      "bannerName": "Arthur",
+      "textEn": "",
+      "textRu": "",
+      "effects": [],
+      "effectImmediately": null,
+      "effectDuring": null,
+      "effectAfter": null,
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1c00o1wi74sjfulnr0",
+      "name": "Swift Strike",
+      "nameEn": "Swift Strike",
+      "nameRu": "Swift Strike",
+      "cardType": "ATTACK",
+      "count": 2,
+      "attackValue": 3,
+      "defenseValue": null,
+      "boostValue": 2,
+      "bannerName": "Any",
+      "textEn": "",
+      "textRu": "",
+      "effects": [
+        {
+          "id": "cmq7d7b1c00o1wi74sjfulnr0-after-0",
+          "text": "Move your fighter up to 4 spaces.",
+          "type": "MOVE",
+          "value": 4,
+          "source": "parser",
+          "target": "SELF",
+          "timing": "AFTER_COMBAT",
+          "optional": true,
+          "parserVersion": 6
+        }
+      ],
+      "effectImmediately": null,
+      "effectDuring": null,
+      "effectAfter": " Move your fighter up to 4 spaces.",
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1d00o3wi74u7ne4qdf",
+      "name": "Aid the Chosen One",
+      "nameEn": "Aid the Chosen One",
+      "nameRu": "Aid the Chosen One",
+      "cardType": "ATTACK",
+      "count": 1,
+      "attackValue": 4,
+      "defenseValue": null,
+      "boostValue": 2,
+      "bannerName": "Merlin",
+      "textEn": "",
+      "textRu": "",
+      "effects": [
+        {
+          "id": "cmq7d7b1d00o3wi74u7ne4qdf-after-0",
+          "text": "If you won the combat, draw 2 cards.",
+          "type": "DRAW_CARD",
+          "when": {
+            "kind": "WON_COMBAT"
+          },
+          "value": 2,
+          "source": "parser",
+          "timing": "AFTER_COMBAT",
+          "parserVersion": 6
+        }
+      ],
+      "effectImmediately": null,
+      "effectDuring": null,
+      "effectAfter": " If you won the combat, draw 2 cards.",
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1f00o7wi74xncb0b27",
+      "name": "Feint",
+      "nameEn": "Feint",
+      "nameRu": "Feint",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "attackValue": 2,
+      "defenseValue": 2,
+      "boostValue": 1,
+      "bannerName": "Any",
+      "textEn": "",
+      "textRu": "",
+      "effects": [
+        {
+          "id": "cmq7d7b1f00o7wi74xncb0b27-immediately-0",
+          "text": "Cancel all effects on your opponent's card.",
+          "type": "CANCEL_EFFECTS",
+          "source": "parser",
+          "timing": "ON_REVEAL",
+          "parserVersion": 6
+        }
+      ],
+      "effectImmediately": "Cancel all effects on your opponent's card.",
+      "effectDuring": null,
+      "effectAfter": null,
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1m00ofwi74vwkm9hl6",
+      "name": "The Holy Grail",
+      "nameEn": "The Holy Grail",
+      "nameRu": "The Holy Grail",
+      "cardType": "DEFENSE",
+      "count": 1,
+      "attackValue": null,
+      "defenseValue": 1,
+      "boostValue": 2,
+      "bannerName": "Arthur",
+      "textEn": "",
+      "textRu": "",
+      "effects": [
+        {
+          "id": "cmq7d7b1m00ofwi74vwkm9hl6-after-0",
+          "text": "If King Arthur has 4 or less health but is not defeated, set his health to 8.",
+          "type": "UNSUPPORTED",
+          "source": "parser",
+          "timing": "AFTER_COMBAT",
+          "parserVersion": 6
+        }
+      ],
+      "effectImmediately": null,
+      "effectDuring": null,
+      "effectAfter": " If King Arthur has 4 or less health but is not defeated, set his health to 8.",
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1200nlwi7478o7hbwh",
+      "name": "The Lady of the Lake",
+      "nameEn": "The Lady of the Lake",
+      "nameRu": "The Lady of the Lake",
+      "cardType": "SCHEME",
+      "count": 1,
+      "attackValue": null,
+      "defenseValue": null,
+      "boostValue": 2,
+      "bannerName": "Arthur",
+      "textEn": "Search your deck and discard pile for the EXCALIBUR card. Add it to your hand. If you searched your deck, shuffle it.",
+      "textRu": "Search your deck and discard pile for the EXCALIBUR card. Add it to your hand. If you searched your deck, shuffle it.",
+      "effects": [],
+      "effectImmediately": null,
+      "effectDuring": null,
+      "effectAfter": null,
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1400npwi74590doe7a",
+      "name": "Prophecy",
+      "nameEn": "Prophecy",
+      "nameRu": "Prophecy",
+      "cardType": "SCHEME",
+      "count": 1,
+      "attackValue": null,
+      "defenseValue": null,
+      "boostValue": 2,
+      "bannerName": "Merlin",
+      "textEn": "Look at the top 4 cards of your deck. Add 2 of them to your hand and put the other 2 back on top of your deck, in any order.",
+      "textRu": "Look at the top 4 cards of your deck. Add 2 of them to your hand and put the other 2 back on top of your deck, in any order.",
+      "effects": [],
+      "effectImmediately": null,
+      "effectDuring": null,
+      "effectAfter": null,
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1900nxwi74vztxx4wk",
+      "name": "Command the Storms",
+      "nameEn": "Command the Storms",
+      "nameRu": "Command the Storms",
+      "cardType": "SCHEME",
+      "count": 2,
+      "attackValue": null,
+      "defenseValue": null,
+      "boostValue": 2,
+      "bannerName": "Merlin",
+      "textEn": "Move each fighter up to 3 spaces. (This includes opposing fighters.)",
+      "textRu": "Move each fighter up to 3 spaces. (This includes opposing fighters.)",
+      "effects": [],
+      "effectImmediately": null,
+      "effectDuring": null,
+      "effectAfter": null,
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1h00o9wi7467rrgo3a",
+      "name": "Noble Sacrifice",
+      "nameEn": "Noble Sacrifice",
+      "nameRu": "Noble Sacrifice",
+      "cardType": "ATTACK",
+      "count": 3,
+      "attackValue": 2,
+      "defenseValue": null,
+      "boostValue": 3,
+      "bannerName": "Arthur",
+      "textEn": "",
+      "textRu": "",
+      "effects": [
+        {
+          "id": "cmq7d7b1h00o9wi7467rrgo3a-during-0",
+          "text": "You may BOOST this attack.",
+          "type": "BOOST",
+          "source": "parser",
+          "timing": "DURING_COMBAT",
+          "optional": true,
+          "boostSource": "PLAYER_CHOICE_HAND",
+          "parserVersion": 6
+        }
+      ],
+      "effectImmediately": null,
+      "effectDuring": " You may BOOST this attack. (This is in addition to any boost from King Arthur's special ability.)",
+      "effectAfter": null,
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1j00obwi74q7vqenip",
+      "name": "Restless Spirits",
+      "nameEn": "Restless Spirits",
+      "nameRu": "Restless Spirits",
+      "cardType": "SCHEME",
+      "count": 1,
+      "attackValue": null,
+      "defenseValue": null,
+      "boostValue": 2,
+      "bannerName": "Merlin",
+      "textEn": "Choose any space in Merlin's zone. Deal 2 damage to each opposing fighter in that space and in one adjacent space. If at least one fighter is defeated this way, draw 1 card.",
+      "textRu": "Choose any space in Merlin's zone. Deal 2 damage to each opposing fighter in that space and in one adjacent space. If at least one fighter is defeated this way, draw 1 card.",
+      "effects": [],
+      "effectImmediately": null,
+      "effectDuring": null,
+      "effectAfter": null,
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1800nvwi74inar4yez",
+      "name": "Bewilderment",
+      "nameEn": "Bewilderment",
+      "nameRu": "Bewilderment",
+      "cardType": "DEFENSE",
+      "count": 2,
+      "attackValue": null,
+      "defenseValue": 0,
+      "boostValue": 2,
+      "bannerName": "Merlin",
+      "textEn": "",
+      "textRu": "",
+      "effects": [
+        {
+          "id": "cmq7d7b1800nvwi74inar4yez-during-0",
+          "text": "Prevent all damage",
+          "type": "PREVENT_DAMAGE",
+          "source": "parser",
+          "timing": "DURING_COMBAT",
+          "parserVersion": 6
+        },
+        {
+          "id": "cmq7d7b1800nvwi74inar4yez-after-1",
+          "text": "You may place your fighter in any space.",
+          "type": "PLACE",
+          "source": "parser",
+          "target": "SELF",
+          "timing": "AFTER_COMBAT",
+          "optional": true,
+          "parserVersion": 6
+        }
+      ],
+      "effectImmediately": null,
+      "effectDuring": " Prevent all damage\n",
+      "effectAfter": " You may place your fighter in any space.",
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1e00o5wi74xmy8zb0v",
+      "name": "Divine Intervention",
+      "nameEn": "Divine Intervention",
+      "nameRu": "Divine Intervention",
+      "cardType": "VERSATILE",
+      "count": 2,
+      "attackValue": 3,
+      "defenseValue": 3,
+      "boostValue": 2,
+      "bannerName": "Arthur",
+      "textEn": "",
+      "textRu": "",
+      "effects": [
+        {
+          "id": "cmq7d7b1e00o5wi74xmy8zb0v-after-0",
+          "text": "Move King Arthur up to 5 spaces.",
+          "type": "MOVE",
+          "value": 5,
+          "source": "parser",
+          "target": "NAMED_FIGHTER",
+          "timing": "AFTER_COMBAT",
+          "optional": true,
+          "fighterName": "King Arthur",
+          "parserVersion": 6
+        }
+      ],
+      "effectImmediately": null,
+      "effectDuring": null,
+      "effectAfter": " Move King Arthur up to 5 spaces.",
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1600ntwi74rhopnl5u",
+      "name": "Momentous Shift",
+      "nameEn": "Momentous Shift",
+      "nameRu": "Momentous Shift",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "attackValue": 3,
+      "defenseValue": 3,
+      "boostValue": 1,
+      "bannerName": "Any",
+      "textEn": "",
+      "textRu": "",
+      "effects": [
+        {
+          "id": "cmq7d7b1600ntwi74rhopnl5u-during-0",
+          "text": "If your fighter started this turn in a different space, this card's value is 5 instead.",
+          "type": "SET_VALUE",
+          "when": {
+            "kind": "MOVED_THIS_TURN"
+          },
+          "value": 5,
+          "source": "parser",
+          "timing": "DURING_COMBAT",
+          "parserVersion": 6
+        }
+      ],
+      "effectImmediately": null,
+      "effectDuring": "If your fighter started this turn in a different space, this card's value is 5 instead.",
+      "effectAfter": null,
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1l00odwi74c2cay62t",
+      "name": "Skirmish",
+      "nameEn": "Skirmish",
+      "nameRu": "Skirmish",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "attackValue": 4,
+      "defenseValue": 4,
+      "boostValue": 1,
+      "bannerName": "Any",
+      "textEn": "",
+      "textRu": "",
+      "effects": [
+        {
+          "id": "cmq7d7b1l00odwi74c2cay62t-after-0",
+          "text": "If you won the combat, choose one of the fighters in the combat and move them up to 2 spaces.",
+          "type": "MOVE",
+          "when": {
+            "kind": "WON_COMBAT"
+          },
+          "value": 2,
+          "source": "parser",
+          "target": "SELF",
+          "timing": "AFTER_COMBAT",
+          "optional": false,
+          "parserVersion": 6
+        }
+      ],
+      "effectImmediately": null,
+      "effectDuring": null,
+      "effectAfter": "If you won the combat, choose one of the fighters in the combat and move them up to 2 spaces.",
+      "effectBoost": null,
+      "effectOngoing": null
+    },
+    {
+      "id": "cmq7d7b1a00nzwi74x16qbctg",
+      "name": "Regroup",
+      "nameEn": "Regroup",
+      "nameRu": "Regroup",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "attackValue": 1,
+      "defenseValue": 1,
+      "boostValue": 1,
+      "bannerName": "Any",
+      "textEn": "",
+      "textRu": "",
+      "effects": [
+        {
+          "id": "cmq7d7b1a00nzwi74x16qbctg-after-0",
+          "text": "Draw 1 card. If you won the combat, draw 2 cards instead.",
+          "type": "DRAW_CARD",
+          "when": {
+            "kind": "LOST_COMBAT"
+          },
+          "value": 1,
+          "source": "parser",
+          "timing": "AFTER_COMBAT",
+          "parserVersion": 6
+        },
+        {
+          "id": "cmq7d7b1a00nzwi74x16qbctg-after-1",
+          "text": "Draw 1 card. If you won the combat, draw 2 cards instead.",
+          "type": "DRAW_CARD",
+          "when": {
+            "kind": "WON_COMBAT"
+          },
+          "value": 2,
+          "source": "parser",
+          "timing": "AFTER_COMBAT",
+          "parserVersion": 6
+        }
+      ],
+      "effectImmediately": null,
+      "effectDuring": null,
+      "effectAfter": "Draw 1 card. If you won the combat, draw 2 cards instead.",
+      "effectBoost": null,
+      "effectOngoing": null
+    }
+  ]
+}

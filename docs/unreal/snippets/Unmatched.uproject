@@ -1,0 +1,98 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.8",
+  "Category": "Game",
+  "Description": "Unmatched digital client (server-authoritative GraphQL client). Source: docs/unreal/01-architecture-decision.md §3.1 (JSON has no comments; rationale for every plugin is in ADR §3.1 and R8 §2.6-2.7, §2.10, §2.13; MCP/Toolsets in 00-mcp-verification.md:5,58,60).",
+  "Modules": [
+    {
+      "Name": "UmNet",
+      "Type": "Runtime",
+      "LoadingPhase": "PreDefault"
+    },
+    {
+      "Name": "UmModel",
+      "Type": "Runtime",
+      "LoadingPhase": "PreDefault"
+    },
+    {
+      "Name": "UmClient",
+      "Type": "Runtime",
+      "LoadingPhase": "Default",
+      "AdditionalDependencies": [
+        "Engine",
+        "CoreUObject",
+        "UMG",
+        "CommonUI",
+        "UmNet",
+        "UmModel"
+      ]
+    },
+    {
+      "Name": "UmEditor",
+      "Type": "Editor",
+      "LoadingPhase": "PostEngineInit"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "CommonUI",
+      "Enabled": true
+    },
+    {
+      "Name": "EnhancedInput",
+      "Enabled": true
+    },
+    {
+      "Name": "PlatformCrypto",
+      "Enabled": true
+    },
+    {
+      "Name": "ModelContextProtocol",
+      "Enabled": true,
+      "TargetAllowList": [
+        "Editor"
+      ]
+    },
+    {
+      "Name": "AllToolsets",
+      "Enabled": true,
+      "TargetAllowList": [
+        "Editor"
+      ]
+    },
+    {
+      "Name": "LiveCodingToolset",
+      "Enabled": true,
+      "TargetAllowList": [
+        "Editor"
+      ]
+    },
+    {
+      "Name": "FunctionalTestingEditor",
+      "Enabled": true,
+      "TargetAllowList": [
+        "Editor"
+      ]
+    },
+    {
+      "Name": "Paper2D",
+      "Enabled": false
+    },
+    {
+      "Name": "ModelViewViewModel",
+      "Enabled": false
+    },
+    {
+      "Name": "GameFeatures",
+      "Enabled": false
+    },
+    {
+      "Name": "DataRegistry",
+      "Enabled": false
+    },
+    {
+      "Name": "GameplayAbilities",
+      "Enabled": false
+    }
+  ]
+}

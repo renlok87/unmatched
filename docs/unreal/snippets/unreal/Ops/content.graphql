@@ -1,0 +1,234 @@
+# =============================================================================
+# unreal/Ops/content.graphql — контент (герои, карты, доски, стойки) и id-map.
+#
+# Контракт: R5 §2.2 (публичные контентные query, все @Public), R6 §2.4 (heroList/boardList —
+# admin-резолвер под JWT любого игрока, единственный источник Prisma cuid), R3 §2.5 (heroStances);
+# схема src/gql/graphql.ts (Hero :591-610, Card :215-227, Board :173-182, HeroListItemDto,
+# BoardListItemDto, PaginatedHeroes/PaginationInfo). Формат заголовков — см. auth.graphql.
+#
+# Ограничения ADR §5.4: heroes { cards } НЕ запрашивается (N+1, R5 §2.11 п.4); самая глубокая
+# выборка — hero { cards { effects { … } } } (depth ≤ 7). Card.effects[].timing НЕ запрашивается:
+# сериализуется вне enum (R5 §4.1, предпосылка B17).
+# =============================================================================
+
+# --- HeroContent -------------------------------------------------------------
+# auth: none
+# R5 §2.2: hero(id: String!) — id = cuid ИЛИ имя (case-insensitive) ПОСЛЕ коммита правки
+# getHeroBySlug (R6 §2.8, B2); до коммита клиент передаёт Fighter.name (ADR §5.5).
+# urls.* — абсолютные Supabase-URL; cards[].imageUrl/imageUrlRu — Supabase или /assets/… (R5 §2.12).
+# fighterType в этом пути всегда HERO (R5 §2.2 — mapper:43). Перезапрашивается при входе в партию (R6 §4.4).
+query HeroContent($id: String!) {
+  hero(id: $id) {
+    id
+    name
+    nameEn
+    nameRu
+    health
+    movement
+    set
+    fighterType
+    sidekickCount
+    sidekickHealth
+    avatarUrl
+    imageUrl
+    updatedAt
+    urls {
+      avatar
+      mini
+      cardCover
+    }
+    abilities {
+      id
+      name
+      text
+      trigger
+    }
+    cards {
+      id
+      title
+      type
+      value
+      boost
+      quantity
+      characterName
+      imageUrl
+      imageUrlRu
+      effects {
+        id
+        text
+      }
+    }
+  }
+}
+
+# --- Heroes ------------------------------------------------------------------
+# auth: none
+# R5 §2.2: heroes → [Hero!]! через prismaHeroToHeroDto (fighterType реальный; фантом-сайдкик
+# «Unknown» — R5 §4.5, B19). Без cards (N+1). Для каталога героев в WBP_HeroPicker.
+query Heroes {
+  heroes {
+    id
+    name
+    nameEn
+    nameRu
+    health
+    movement
+    set
+    fighterType
+    sidekickCount
+    sidekickHealth
+    avatarUrl
+    imageUrl
+    updatedAt
+    urls {
+      avatar
+      mini
+      cardCover
+    }
+  }
+}
+
+# --- HeroesPaginated ---------------------------------------------------------
+# auth: none
+# R5 §2.2: heroesPaginated(page?, limit?, set?) → PaginatedHeroes { items, pagination }.
+# Используется export-content.mjs (ADR §3.7) для постраничного обхода без cards.
+query HeroesPaginated($page: Int, $limit: Int, $set: String) {
+  heroesPaginated(page: $page, limit: $limit, set: $set) {
+    items {
+      id
+      name
+      nameEn
+      nameRu
+      set
+      health
+      fighterType
+      updatedAt
+      urls {
+        avatar
+        mini
+        cardCover
+      }
+    }
+    pagination {
+      total
+      page
+      limit
+      totalPages
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
+
+# --- Boards ------------------------------------------------------------------
+# auth: none
+# R5 §2.2: boards → [Board!]!; id = name (R6 §2.4). Геометрия партии берётся ТОЛЬКО из
+# boardState состояния (ADR §4.7); spaces нужны для превью доски в WBP_CreateGameDialog.
+query Boards {
+  boards {
+    id
+    name
+    width
+    height
+    recommendedPlayers
+    imageUrl
+    spaces {
+      position {
+        x
+        y
+      }
+      zones
+      isObstacle
+    }
+  }
+}
+
+# --- Board -------------------------------------------------------------------
+# auth: none
+# R5 §2.2: board(id: String!) — по имени, insensitive; дефолт cobble-city (R5 §2.2).
+query Board($id: String!) {
+  board(id: $id) {
+    id
+    name
+    width
+    height
+    recommendedPlayers
+    imageUrl
+    spaces {
+      position {
+        x
+        y
+      }
+      zones
+      isObstacle
+    }
+  }
+}
+
+# --- ContentSummary ----------------------------------------------------------
+# auth: none
+# R5 §2.2, R6 §2.5: ключ инвалидации FUmContentCache = heroesCount + boardsCount + max(updatedAt)
+# + TTL 1 ч (version — константа 2.0.0, как сигнал изменений непригодна).
+query ContentSummary {
+  contentSummary {
+    version
+    heroesCount
+    boardsCount
+    setsCount
+    sets
+  }
+}
+
+# --- HeroStances -------------------------------------------------------------
+# auth: none
+# R3 §2.5, R4 §2.13: heroStances(heroSlug: String!) → [StanceOptionDto!]! из ABILITY_CONFIGS;
+# heroSlug = Fighter.heroSlug (slugifyHeroName); непусто только у alice/muhammad-ali (R3 §4.18).
+query HeroStances($heroSlug: String!) {
+  heroStances(heroSlug: $heroSlug) {
+    id
+    label
+    isDefault
+  }
+}
+
+# --- HeroIdMap ---------------------------------------------------------------
+# auth: required
+# R6 §2.4: heroList(page, limit, search, sortBy, sortOrder) → HeroesPaginatedDto — admin-резолвер,
+# доступен под JWT любого игрока; items[].id — Prisma cuid для selectHero (ADR §1.3 п.10).
+# Вызывается один раз после логина (UUmContentSubsystem::IdMap, ADR §4.5). ≈84 героя в БД (R6 §2.9).
+query HeroIdMap {
+  heroList(page: 1, limit: 300, sortBy: "name", sortOrder: "asc") {
+    total
+    items {
+      id
+      name
+      nameEn
+      nameRu
+      set
+      health
+      fighterType
+      avatarUrl
+      imageUrl
+    }
+  }
+}
+
+# --- BoardIdMap --------------------------------------------------------------
+# auth: required
+# R6 §2.4: boardList(...) → BoardsPaginatedDto; items[].id — Prisma cuid для createGame.boardId.
+# width/height — Float в этом DTO (BoardListItemDto). ≈30 досок (R6 §2.9).
+query BoardIdMap {
+  boardList(page: 1, limit: 100, sortBy: "name", sortOrder: "asc") {
+    total
+    items {
+      id
+      name
+      nameEn
+      nameRu
+      set
+      width
+      height
+      imageUrl
+    }
+  }
+}

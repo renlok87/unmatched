@@ -1,0 +1,104 @@
+# =============================================================================
+# unreal/Ops/matchmaking.graphql — матчмейкинг и presence.
+#
+# СТАТУС: v2, за флагами bMatchmakingEnabled=false / bPresenceEnabled=false (ADR §3.5, §5.5,
+# предпосылка B13): по коду guard'ов нет, user.userId vs id, GamePlayer при матче не создаются,
+# presenceUpdated не AsyncIterator (R2 §4.1-4.4). Документы валидируются против схемы уже сейчас,
+# чтобы контракт был зафиксирован; в рантайме не вызываются до B13.
+#
+# Контракт: R2 §2.8 (матчмейкинг), §2.9 (presence); схема src/gql/graphql.ts
+# (MutationJoinQueueArgs :872-874, MutationLeaveQueueArgs :882-884 — БЕЗ idempotencyKey;
+# JoinQueueDto { mode: GameMode!, heroPref? }; leaveQueue/queueStatus.mode — String!).
+# Формат заголовков — см. auth.graphql.
+# =============================================================================
+
+# --- JoinQueue ---------------------------------------------------------------
+# auth: required
+# throttle: 5/60
+# bucket: joinQueue
+# R2 §2.8, R1 §2.12: joinQueue(input: JoinQueueDto!) — idempotencyKey в схеме НЕТ (веб-клиент
+# шлёт — INVALID, R7 §2.4.2). Под distributed-lock mm:join:<userId>; повтор безопасен.
+mutation JoinQueue($input: JoinQueueDto!) {
+  joinQueue(input: $input) {
+    inQueue
+    mode
+    position
+    totalPlayers
+    estimatedWaitTime
+    joinedAt
+  }
+}
+
+# --- LeaveQueue --------------------------------------------------------------
+# auth: required
+# R2 §2.8: leaveQueue(mode: String!) → Boolean! — mode строкой (не GameMode); без idempotencyKey.
+mutation LeaveQueue($mode: String!) {
+  leaveQueue(mode: $mode)
+}
+
+# --- LeaveAllQueues ----------------------------------------------------------
+# auth: required
+# R2 §2.8: leaveAllQueues → Boolean! (true, если удалён хотя бы из одного режима); без аргументов.
+mutation LeaveAllQueues {
+  leaveAllQueues
+}
+
+# --- QueueStatus -------------------------------------------------------------
+# auth: required
+# R2 §2.8: queueStatus(mode: String!) — guard отсутствует, но ожидается req.user; joinedAt никогда
+# не заполняется; estimatedWaitTime = position × 5 с.
+query QueueStatus($mode: String!) {
+  queueStatus(mode: $mode) {
+    inQueue
+    mode
+    position
+    totalPlayers
+    estimatedWaitTime
+    joinedAt
+  }
+}
+
+# --- PenaltyInfo -------------------------------------------------------------
+# auth: required
+# R2 §2.8: penaltyInfo → PenaltyInfoDto { canJoinQueue declineCount tempBanUntil penaltyElo reason }.
+query PenaltyInfo {
+  penaltyInfo {
+    canJoinQueue
+    declineCount
+    tempBanUntil
+    penaltyElo
+    reason
+  }
+}
+
+# --- AcceptMatch -------------------------------------------------------------
+# auth: required
+# R2 §2.8: acceptMatch(gameId: String!) → Boolean! (true = оба приняли, игра уже LOBBY).
+# Ошибки: «Match confirmation has expired» (NotFound), «Cannot accept match» (Forbidden).
+mutation AcceptMatch($gameId: String!) {
+  acceptMatch(gameId: $gameId)
+}
+
+# --- DeclineMatch ------------------------------------------------------------
+# auth: required
+# R2 §2.8: declineMatch(gameId: String!) → Boolean!; всегда записывает penalty.
+mutation DeclineMatch($gameId: String!) {
+  declineMatch(gameId: $gameId)
+}
+
+# --- Heartbeat ---------------------------------------------------------------
+# auth: required
+# R2 §2.9: heartbeat(input: HeartbeatInput!) — input ОБЯЗАТЕЛЕН ({ status?: PresenceStatus,
+# currentGameId? }); TTL presence 300 с; guard отсутствует (читает user.userId — B13).
+# Presence.lastSeenAt — Float (epoch-ms). Выключено до B13 (bPresenceEnabled=false).
+mutation Heartbeat($input: HeartbeatInput!) {
+  heartbeat(input: $input) {
+    ttl
+    presence {
+      userId
+      status
+      currentGameId
+      lastSeenAt
+    }
+  }
+}

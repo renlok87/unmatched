@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "oracleId": "GD-002",
+  "frozenAt": "2026-09-18",
+  "scope": "Unmatched 1v1; Medusa versus King Arthur",
+  "authority": {
+    "coreRules": {
+      "publisher": "Restoration Games",
+      "title": "Unmatched: Battle of Legends, Volume One — Rules",
+      "url": "https://restorationgames.com/wp-content/uploads/2019/07/UM-Battle_of_Legends_vol1_Rules-two-page.pdf",
+      "copyrightYear": 2019,
+      "retrievedAt": "2026-09-18",
+      "pdfPages": 9,
+      "bytes": 10116591,
+      "printedPagesUsed": [5, 8, 9, 10, 11, 12, 13, 14]
+    },
+    "publisherMirror": "https://iellogames.com/wp-content/uploads/2021/02/Unmatched-BoL-1_Rulebook_EN_Light.pdf",
+    "componentSnapshots": [
+      "docs/game-design/evidence/S01/content-medusa.json",
+      "docs/game-design/evidence/S01/content-king-arthur.json"
+    ],
+    "policy": "Backend observations are evidence about implementation, never rule authority."
+  },
+  "cases": [
+    {
+      "id": "S02-COMBAT-01",
+      "ruleIds": ["R-08"],
+      "given": {"attackerHp": 10, "defenderHp": 10, "attackValue": 2, "defenseValue": 5, "cardEffects": []},
+      "when": "resolveCombat",
+      "expect": {"attackerHp": 10, "defenderHp": 10, "combatWinner": "defender"},
+      "source": {"document": "official-rulebook", "printedPages": [12, 13]},
+      "trace": ["ACC-001", "GD-006", "GD-009"]
+    },
+    {
+      "id": "S02-COMBAT-02",
+      "ruleIds": ["R-09"],
+      "given": {"attackerHp": 10, "defenderHp": 10, "attackValue": 4, "defenseValue": 4, "cardEffects": []},
+      "when": "resolveCombat",
+      "expect": {"attackerHp": 10, "defenderHp": 10, "combatWinner": "defender"},
+      "source": {"document": "official-rulebook", "printedPages": [12, 13]},
+      "trace": ["ACC-001", "GD-006", "GD-009"]
+    },
+    {
+      "id": "S02-COMBAT-03",
+      "ruleIds": ["R-09"],
+      "given": {"attackValue": 2, "defenseValue": 5, "afterCombatEffectDamage": 2},
+      "when": "resolveCombatAndAfterEffects",
+      "expect": {"attackDamage": 0, "effectDamage": 2, "combatWinner": "defender"},
+      "source": {"document": "official-rulebook", "printedPages": [12, 13]},
+      "trace": ["ACC-001", "GD-006", "GD-009"]
+    },
+    {
+      "id": "S02-ORDER-01",
+      "ruleIds": ["R-10"],
+      "given": {"attackerAfterEffect": "damage-adjacent-target", "defenderAfterEffect": "move-attacker-two-spaces", "targetInitiallyAdjacent": true},
+      "when": "resolveAfterCombat",
+      "expect": {"effectOrder": ["defender", "attacker"], "targetReevaluatedAfterDefenderEffect": true, "attackerEffectDamage": 0},
+      "source": {"document": "official-rulebook-combat-example", "printedPages": [12, 13]},
+      "trace": ["ACC-007", "GD-008", "GD-009"]
+    },
+    {
+      "id": "S02-GAMEOVER-01",
+      "ruleIds": ["R-11"],
+      "given": {"defendingHero": "King Arthur", "heroHp": 1, "livingSidekicks": ["Merlin"], "incomingDamage": 1},
+      "when": "applyDamage",
+      "expect": {"phase": "GAME_OVER", "loser": "King Arthur player", "remainingEffectsStarted": false, "newActionsAllowed": false},
+      "source": {"document": "official-rulebook", "printedPages": [5, 14]},
+      "trace": ["ACC-002", "GD-007", "GD-009"]
+    },
+    {
+      "id": "S02-GAMEOVER-02",
+      "ruleIds": ["R-12"],
+      "given": {"heroHp": 5, "sidekick": "Merlin", "sidekickHp": 1, "incomingDamage": 1},
+      "when": "applyDamage",
+      "expect": {"sidekickDefeated": true, "phase": "ACTIVE", "gameOver": false},
+      "source": {"document": "official-rulebook", "printedPages": [14]},
+      "trace": ["ACC-002", "GD-007", "GD-009"]
+    },
+    {
+      "id": "S02-FEINT-01",
+      "ruleIds": ["R-13"],
+      "given": {"attackPrintedValue": 4, "attackCardHasEffects": true, "defenseCard": "Feint"},
+      "when": "revealCombatCards",
+      "expect": {"attackCardEffectsCancelled": true, "attackValue": 4},
+      "source": {"document": "official-rulebook-and-component-text", "printedPages": [12]},
+      "trace": ["ACC-001", "ACC-007", "GD-008", "GD-009"]
+    },
+    {
+      "id": "S02-ARTHUR-01",
+      "ruleIds": ["R-15", "R-16"],
+      "given": {"activeFighter": "King Arthur", "abilityBoostChosen": true, "defenseCard": "Feint"},
+      "when": "revealCombatCards",
+      "expect": {"abilityBoostDiscarded": true, "abilityBoostAddedValue": 0, "attackPrintedValuePreserved": true},
+      "source": {"document": "king-arthur-character-card", "printedPages": [12, 13], "snapshot": "content-king-arthur.json"},
+      "trace": ["ACC-007", "ACC-016", "GD-008", "GD-017"]
+    },
+    {
+      "id": "S03-TURN-01",
+      "ruleIds": ["R-01"],
+      "given": {"actionsRemaining": 1, "ordinaryCardEffectEndsTurn": false},
+      "when": "requestEndTurn",
+      "expect": {"accepted": false, "actionsRemaining": 1, "cardsDrawnForTurnTransition": 0},
+      "source": {"document": "official-rulebook", "printedPages": [8]},
+      "trace": ["ACC-003", "GD-010"]
+    },
+    {
+      "id": "S03-MANEUVER-01",
+      "ruleIds": ["R-02"],
+      "given": {"topCard": "known-instance-A", "plannedMoves": []},
+      "when": "takeManeuver",
+      "expect": {"drawnInstances": ["known-instance-A"], "zeroMovementAccepted": true, "actionsSpent": 1},
+      "source": {"document": "official-rulebook", "printedPages": [9]},
+      "trace": ["ACC-006", "GD-013"]
+    },
+    {
+      "id": "S03-MANEUVER-02",
+      "ruleIds": ["R-02", "R-03"],
+      "given": {"topCard": "known-instance-A", "topCardBoost": 3, "baseMove": 2},
+      "when": "drawThenChooseKnownInstanceAsMovementBoost",
+      "expect": {"choiceOccursAfterDraw": true, "boostCard": "known-instance-A", "maximumMove": 5, "drawCount": 1, "actionsSpent": 1},
+      "source": {"document": "official-rulebook", "printedPages": [9, 10]},
+      "trace": ["ACC-006", "GD-013"]
+    },
+    {
+      "id": "S03-EXHAUSTION-01",
+      "ruleIds": ["R-04"],
+      "given": {"drawPileCount": 0, "discardPileCount": 5, "ownFighters": [{"id": "hero", "hp": 5}, {"id": "sidekick", "hp": 3}], "drawRequested": 1},
+      "when": "drawCard",
+      "expect": {"cardsDrawn": 0, "discardReshuffled": false, "fighterHp": {"hero": 3, "sidekick": 1}},
+      "source": {"document": "official-rulebook", "printedPages": [9]},
+      "trace": ["ACC-004", "GD-011"]
+    },
+    {
+      "id": "S03-EXHAUSTION-02",
+      "ruleIds": ["R-05", "R-11"],
+      "given": {"drawPileCount": 0, "heroHp": 3, "sidekickHp": 5, "drawRequested": 2},
+      "when": "drawCardsSequentially",
+      "expect": {"firstMissingDraw": {"heroHp": 1, "sidekickHp": 3}, "secondMissingDraw": {"heroHp": 0, "sidekickHp": 1}, "phase": "GAME_OVER", "furtherResolutionStopped": true},
+      "source": {"document": "official-rulebook", "printedPages": [9, 14]},
+      "trace": ["ACC-002", "ACC-004", "GD-007", "GD-011"]
+    },
+    {
+      "id": "S03-HANDLIMIT-01",
+      "ruleIds": ["R-06"],
+      "given": {"handCountAtTurnStart": 7, "maneuverDrawCount": 1, "secondActionNeedsDrawnCard": true},
+      "when": "completeTurn",
+      "expect": {"handCountDuringTurn": 8, "drawnCardAvailableForSecondAction": true, "endTurnDiscardChoiceRequired": true, "finalHandCount": 7},
+      "source": {"document": "official-rulebook", "printedPages": [8, 9]},
+      "trace": ["ACC-005", "GD-012"]
+    },
+    {
+      "id": "ABILITY-MEDUSA-01",
+      "ruleIds": ["R-14"],
+      "given": {"turnOwner": "Medusa", "legalTargetsInMedusaZone": ["King Arthur", "Merlin"]},
+      "when": "resolveTurnStartAbility",
+      "expect": {"choiceOwner": "Medusa player", "options": ["King Arthur", "Merlin"], "declineAllowed": true, "damageToChosenTarget": 1, "automaticFirstTarget": false},
+      "source": {"document": "medusa-character-card", "printedPages": [5], "snapshot": "content-medusa.json"},
+      "trace": ["ACC-016", "GD-017"]
+    },
+    {
+      "id": "ABILITY-MEDUSA-02",
+      "ruleIds": ["R-14"],
+      "given": {"turnOwner": "Medusa", "legalTargetsInMedusaZone": []},
+      "when": "resolveTurnStartAbility",
+      "expect": {"damageApplied": 0, "pendingChoiceCreated": false, "turnCanContinue": true},
+      "source": {"document": "medusa-character-card", "printedPages": [5], "snapshot": "content-medusa.json"},
+      "trace": ["ACC-016", "GD-017"]
+    },
+    {
+      "id": "ABILITY-ARTHUR-01",
+      "ruleIds": ["R-15"],
+      "variants": [
+        {"activeFighter": "King Arthur", "expectAbilityBoostAllowed": true},
+        {"activeFighter": "Merlin", "expectAbilityBoostAllowed": false}
+      ],
+      "when": "declareAttack",
+      "expect": {"boostChosenWithAttackCard": true, "boostHiddenUntilReveal": true},
+      "source": {"document": "king-arthur-character-card", "printedPages": [12, 13], "snapshot": "content-king-arthur.json"},
+      "trace": ["ACC-016", "GD-017"]
+    }
+  ]
+}

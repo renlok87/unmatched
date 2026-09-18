@@ -128,3 +128,15 @@ Usage notes:
 <!-- SKILLS_TABLE_END -->
 
 </skills_system>
+
+## Integration workflow
+
+User instruction (2026-09-18): after completing and verifying each worktree/task,
+commit its changes and integrate them into the single target branch `fix/admin-panel`
+in the original project checkout. Start follow-up sessions from that updated branch.
+Do not leave completed work only on separate `codex/*` branches.
+
+Preserve unrelated working-tree changes. If untracked files overlap incoming files,
+compare them and keep verified local backups before integrating; never reset, clean,
+blindly stash the entire project, or overwrite unrelated user work.
+Local integration is authorized; remote pushes are not implied by this instruction.
