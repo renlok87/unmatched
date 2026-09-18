@@ -705,6 +705,12 @@ describe('GameActionExecutorService', () => {
     it('should skip dead players when finding next player', async () => {
       const state = createMockGameState({
         phase: GamePhase.ACTION_MANEUVER,
+        fighters: [
+          ...createMockGameState().fighters.map(f => f.ownerId === 'player2'
+            ? { ...f, health: 0, isDefeated: true } : f),
+          { ...createMockGameState().fighters[0], id: 'fighter3', ownerId: 'player3',
+            heroId: 'bruce-lee', health: 15, maxHealth: 15 },
+        ],
         players: [
           {
             userId: 'player1',

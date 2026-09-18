@@ -195,7 +195,7 @@ describe('CardEffectExecutorService (A3)', () => {
   });
 
   describe('ON_REVEAL / CANCEL_EFFECTS', () => {
-    it('Feint атакующего отменяет карту защитника; защитник не отменяет в ответ', async () => {
+    it('Feint защитника отменяет карту атакующего до его Feint', async () => {
       const atk = card('atk', [
         eff({ type: EffectType.CANCEL_EFFECTS, timing: EffectTiming.ON_REVEAL }),
       ]);
@@ -203,8 +203,160 @@ describe('CardEffectExecutorService (A3)', () => {
         eff({ type: EffectType.CANCEL_EFFECTS, timing: EffectTiming.ON_REVEAL }),
       ], { cardType: CardType.DEFENSE });
       const reveal = await service.executeRevealEffects(makeState(), atk, def, combat);
-      expect(reveal.defenderCardCancelled).toBe(true);
-      expect(reveal.attackerCardCancelled).toBe(false);
+      expect(reveal.defenderCardCancelled).toBe(false);
+      expect(reveal.attackerCardCancelled).toBe(true);
+    });
+  });
+
+  describe('S02 defender-first and terminal resolution', () => {
+    const result = { attackerWon: false, attackerDamage: 0, defenderDamage: 0 };
+
+    it.each([EffectTiming.ON_REVEAL, EffectTiming.DURING_COMBAT])(
+      '%s preserves selected cancellation/prevention and combat context through resume', async (timing) => {
+        const atk = card('atk', [eff({ type: EffectType.DRAW_CARD, timing, value: 1 })]);
+        const def = card('def', [eff({ type: EffectType.CHOOSE_ONE, timing, options: [{
+          label: 'Protect', effects: [eff({ timing,
+            type: timing === EffectTiming.ON_REVEAL ? EffectType.CANCEL_EFFECTS : EffectType.PREVENT_DAMAGE,
+          })],
+        }] })]);
+        const paused = timing === EffectTiming.ON_REVEAL
+          ? await service.executeRevealEffects(makeState(), atk, def, combat)
+          : await service.executeCombatEffects(makeState(), atk, def, combat);
+        const pending = paused.state.metadata.pendingEffects![0];
+        const selected = await service.executeChosenEffects({
+          ...paused.state, metadata: { ...paused.state.metadata, pendingEffects: [] },
+        }, pending.optionEffects![0], pending.playerId, pending.card, pending.effectContext);
+        const resumed = await service.resumeCombatEffects(selected.state);
+        expect(resumed.attackerCardCancelled).toBe(timing === EffectTiming.ON_REVEAL);
+        expect(resumed.preventDamageToDefender).toBe(timing === EffectTiming.DURING_COMBAT);
+        expect(resumed.state.handZones.p1.cards).toHaveLength(timing === EffectTiming.ON_REVEAL ? 0 : 1);
+      },
+    );
+
+    it('during resume preserves previous modifiers and prevent without executing them twice', async () => {
+      const def = card('def', [
+        eff({ timing: EffectTiming.DURING_COMBAT, type: EffectType.MODIFY_VALUE, value: 3 }),
+        eff({ timing: EffectTiming.DURING_COMBAT, type: EffectType.PREVENT_DAMAGE }),
+        eff({ timing: EffectTiming.DURING_COMBAT, type: EffectType.MOVE, value: 1 }),
+      ]);
+      const paused = await service.executeCombatEffects(makeState(), null, def, combat);
+      expect(paused.finalDefense).toBe(5);
+      expect(paused.state.metadata.pendingEffects![0].fighterIds).toEqual(['f2']);
+      const resumed = await service.resumeCombatEffects({
+        ...paused.state, metadata: { ...paused.state.metadata, pendingEffects: [] },
+      });
+      expect(resumed.finalDefense).toBe(5);
+      expect(resumed.preventDamageToDefender).toBe(true);
+      expect(resumed.appliedEffects).toHaveLength(0);
+    });
+
+    it.each([EffectTiming.ON_REVEAL, EffectTiming.DURING_COMBAT, EffectTiming.AFTER_COMBAT])(
+      '%s pauses at defender movement and reevaluates attacker targets after resume', async (timing) => {
+        const atk = card('atk', [eff({ type: EffectType.DAMAGE, timing, value: 2,
+          target: EffectTarget.ENEMIES_ADJACENT_TO_SELF })]);
+        const def = card('def', [eff({ type: EffectType.MOVE, timing, value: 2, target: EffectTarget.SELF })]);
+        const state = makeState();
+        const paused = timing === EffectTiming.ON_REVEAL
+          ? await service.executeRevealEffects(state, atk, def, combat)
+          : timing === EffectTiming.DURING_COMBAT
+            ? await service.executeCombatEffects(state, atk, def, combat)
+            : await service.executeAfterCombatEffects(state, atk, def, combat, result);
+        expect(paused.state.fighters[1].health).toBe(10);
+        expect(paused.appliedEffects).toHaveLength(1);
+        // JSON round-trip represents the persisted continuation; movement is applied by the action executor.
+        const moved = JSON.parse(JSON.stringify(paused.state)) as GameState;
+        const resumed = await service.resumeCombatEffects({
+          ...moved,
+          fighters: moved.fighters.map((f) => f.id === 'f2' ? { ...f, position: { x: 4, y: 1 } } : f),
+          metadata: { ...moved.metadata, pendingEffects: [] },
+        });
+        expect(resumed.stage).toBe(timing);
+        expect(resumed.paused).toBe(false);
+        expect(resumed.state.fighters[1].health).toBe(10);
+        expect(resumed.appliedEffects[0].success).toBe(false);
+        expect(resumed.state.metadata.combatEffectContinuation).toBeUndefined();
+      },
+    );
+
+    it.each([EffectTiming.ON_REVEAL, EffectTiming.DURING_COMBAT, EffectTiming.AFTER_COMBAT])(
+      '%s resolves defender damage before checking attacker health condition', async (timing) => {
+        const atk = card('atk', [eff({ type: EffectType.DRAW_CARD, timing, value: 1,
+          when: { kind: 'HEALTH_AT_MOST', value: 8 } })]);
+        const def = card('def', [eff({ type: EffectType.DAMAGE, timing, value: 2,
+          target: EffectTarget.OPPOSING_FIGHTER })]);
+        const state = makeState();
+        const resolved = timing === EffectTiming.ON_REVEAL
+          ? await service.executeRevealEffects(state, atk, def, combat)
+          : timing === EffectTiming.DURING_COMBAT
+            ? await service.executeCombatEffects(state, atk, def, combat)
+            : await service.executeAfterCombatEffects(state, atk, def, combat, result);
+        expect(resolved.state.fighters[0].health).toBe(8);
+        expect(resolved.state.handZones.p1.cards).toHaveLength(1);
+        expect(resolved.appliedEffects.map((e) => e.effectId)).toEqual([
+          def.effects![0].id, atk.effects![0].id,
+        ]);
+      },
+    );
+
+    it('Feint cancels every attacker timing while preserving printed attack', async () => {
+      const atk = card('atk', [
+        eff({ type: EffectType.DAMAGE, timing: EffectTiming.ON_REVEAL, value: 2, target: EffectTarget.OPPOSING_FIGHTER }),
+        eff({ type: EffectType.SET_VALUE, timing: EffectTiming.DURING_COMBAT, value: 99 }),
+        eff({ type: EffectType.DRAW_CARD, value: 1 }),
+      ]);
+      const def = card('def', [eff({ type: EffectType.CANCEL_EFFECTS, timing: EffectTiming.ON_REVEAL })]);
+      const reveal = await service.executeRevealEffects(makeState(), atk, def, combat);
+      const cancelled = { attacker: reveal.attackerCardCancelled, defender: reveal.defenderCardCancelled };
+      const calc = await service.executeCombatEffects(reveal.state, atk, def, combat, cancelled);
+      const after = await service.executeAfterCombatEffects(calc.state, atk, def, combat, result, cancelled);
+      expect(calc.finalAttack).toBe(combat.attackValue);
+      expect(after.state.fighters[1].health).toBe(10);
+      expect(after.state.handZones.p1.cards).toHaveLength(0);
+    });
+
+    it('hero lethal stops remaining defender effects and attacker effects immediately', async () => {
+      const atk = card('atk', [eff({ type: EffectType.DAMAGE, value: 99, target: EffectTarget.OPPOSING_FIGHTER })]);
+      const def = card('def', [
+        eff({ type: EffectType.DAMAGE, value: 10, target: EffectTarget.OPPOSING_FIGHTER }),
+        eff({ type: EffectType.DRAW_CARD, value: 1 }),
+      ]);
+      const after = await service.executeAfterCombatEffects(makeState(), atk, def, combat, result);
+      expect(after.state.phase).toBe(GamePhase.GAME_OVER);
+      expect(after.state.fighters[1].health).toBe(10);
+      expect(after.state.handZones.p2.cards).toHaveLength(1);
+      expect(after.appliedEffects).toHaveLength(1);
+    });
+
+    it('defeated sidekick still draws, but cannot heal itself or attack from its old position', async () => {
+      const state = makeState();
+      const sidekick = { ...state.fighters[0], id: 's1', type: FighterType.MINION, health: 0, isDefeated: true };
+      const atk = card('atk', [
+        eff({ type: EffectType.HEAL, value: 2, target: EffectTarget.SELF }),
+        eff({ type: EffectType.DAMAGE, value: 2, target: EffectTarget.ENEMIES_ADJACENT_TO_SELF }),
+        eff({ type: EffectType.MOVE, value: 2, target: EffectTarget.SELF }),
+        eff({ type: EffectType.DRAW_CARD, value: 1 }),
+      ]);
+      const after = await service.executeAfterCombatEffects(
+        { ...state, fighters: [...state.fighters, sidekick] }, atk, null,
+        { ...combat, attackerFighterId: 's1' }, result,
+      );
+      expect(after.state.phase).toBe(GamePhase.COMBAT_RESOLVE);
+      expect(after.state.fighters.find((f) => f.id === 's1')!.health).toBe(0);
+      expect(after.state.fighters[1].health).toBe(10);
+      expect(after.state.handZones.p1.cards).toHaveLength(1);
+      expect(after.state.metadata.pendingEffects ?? []).toHaveLength(0);
+    });
+
+    it('scheme lethal does not run subsequent gain-action or draw effects', async () => {
+      const scheme = card('scheme', [
+        eff({ type: EffectType.DAMAGE, timing: EffectTiming.ON_PLAY, value: 10, target: EffectTarget.ALL_ENEMIES }),
+        eff({ type: EffectType.DRAW_CARD, timing: EffectTiming.ON_PLAY, value: 1 }),
+        eff({ type: EffectType.GAIN_ACTION, timing: EffectTiming.ON_PLAY, value: 2 }),
+      ]);
+      const after = await service.executeOnPlayEffects(makeState(), scheme, 'p1');
+      expect(after.state.phase).toBe(GamePhase.GAME_OVER);
+      expect(after.state.handZones.p1.cards).toHaveLength(0);
+      expect(after.appliedEffects).toHaveLength(1);
     });
   });
 
@@ -298,12 +450,15 @@ describe('CardEffectExecutorService (A3)', () => {
       });
       expect(after.manualEffects).toEqual([
         'Move your fighter up to 3 spaces.',
-        'Something weird.',
       ]);
       const pending = after.state.metadata.pendingEffects ?? [];
       expect(pending).toHaveLength(1);
       expect(pending[0]).toMatchObject({ type: 'MOVE', playerId: 'p1', value: 3 });
       expect(after.state.fighters).toEqual(state.fighters);
+      const resumed = await service.resumeCombatEffects({
+        ...after.state, metadata: { ...after.state.metadata, pendingEffects: [] },
+      });
+      expect(resumed.manualEffects).toEqual(['Something weird.']);
     });
 
     it('when DECK_EMPTY: эффект не работает при непустой колоде', async () => {

@@ -1,0 +1,123 @@
+{
+  "date": "2026-09-18",
+  "baseCommit": "c8957e4a1aa0baada079ccdb2b84545b19dca1e9",
+  "scope": "in-process gameplay, serializer/publication tests; no live HTTP/WS/UE run",
+  "jest": {
+    "numPassedTests": 624,
+    "numFailedTests": 0,
+    "numPassedTestSuites": 20,
+    "numFailedTestSuites": 0
+  },
+  "suites": [
+    {
+      "path": "backend/src/games/game-state.service.spec.ts",
+      "passed": 51
+    },
+    {
+      "path": "backend/src/game-engine/services/s02-combat.spec.ts",
+      "passed": 18
+    },
+    {
+      "path": "backend/src/game-engine/services/s02-terminal.spec.ts",
+      "passed": 5
+    },
+    {
+      "path": "backend/src/game-engine/abilities/ability-configs.e2e.spec.ts",
+      "passed": 45
+    },
+    {
+      "path": "backend/src/game-engine/abilities/generic-hero-ability.handler.spec.ts",
+      "passed": 89
+    },
+    {
+      "path": "backend/src/game-engine/services/game-action-executor.service.spec.ts",
+      "passed": 25
+    },
+    {
+      "path": "backend/src/game-engine/services/turn-management.service.spec.ts",
+      "passed": 44
+    },
+    {
+      "path": "backend/src/game-engine/engine/combat-resolver.service.spec.ts",
+      "passed": 51
+    },
+    {
+      "path": "backend/src/game-engine/effects/card-effect-executor.service.spec.ts",
+      "passed": 34
+    },
+    {
+      "path": "backend/src/game-engine/abilities/ability-configs.integration.spec.ts",
+      "passed": 92
+    },
+    {
+      "path": "backend/src/game-engine/services/game-action-executor.abilities-wiring.spec.ts",
+      "passed": 18
+    },
+    {
+      "path": "backend/src/game-engine/abilities/turn-start-wiring.spec.ts",
+      "passed": 2
+    },
+    {
+      "path": "backend/src/game-engine/services/deck-management.service.spec.ts",
+      "passed": 18
+    },
+    {
+      "path": "backend/src/game-engine/services/ai-decision.service.spec.ts",
+      "passed": 14
+    },
+    {
+      "path": "backend/src/game-engine/abilities/heroes/ms-marvel.handler.spec.ts",
+      "passed": 26
+    },
+    {
+      "path": "backend/src/game-engine/abilities/heroes/daredevil.handler.spec.ts",
+      "passed": 21
+    },
+    {
+      "path": "backend/src/game-engine/validators/game-rules.validator.banner.spec.ts",
+      "passed": 7
+    },
+    {
+      "path": "backend/src/game-engine/models/fighter.model.spec.ts",
+      "passed": 3
+    },
+    {
+      "path": "backend/src/game-engine/effects/effect-text-parser.spec.ts",
+      "passed": 54
+    },
+    {
+      "path": "backend/src/game-engine/models/card.model.spec.ts",
+      "passed": 7
+    }
+  ],
+  "build": "npm run build: tsc --noEmit && nest build; exit 0",
+  "offlineChecks": [
+    "S01 verify_capture passed",
+    "S01 verify_cleanup passed",
+    "S01 verify_artifacts passed using existing UE artifact root 2b4f",
+    "validate_package passed after S02 status/evidence update"
+  ],
+  "changedSourceSha256": {
+    "backend/src/game-engine/abilities/generic-hero-ability.handler.spec.ts": "7aae68da1587077b194eabcfb013d81c910690ba082051e407ec209703d53263",
+    "backend/src/game-engine/abilities/generic-hero-ability.handler.ts": "e6bf05224c86ab30c2644f0dc0b4f53eaa7f5a18f3c17d660d86aee9c090c5b3",
+    "backend/src/game-engine/abilities/hero-ability-registry.ts": "2feaaf12dc17fcc679141307700bb1576b0797c6636ad07b2f5f97a129b60be5",
+    "backend/src/game-engine/effects/card-effect-executor.service.spec.ts": "5e48b247e243154d1820910a348ee03e7015930b01055aeb338642d5d3ac0b26",
+    "backend/src/game-engine/effects/card-effect-executor.service.ts": "db328d6a0ddc104088091fb11df7e040f2101ee6c19ed2270dc77f0ee9ba2989",
+    "backend/src/game-engine/engine/combat-progress.ts": "df3be2cb7811ac893c54092dcf27ab8b27b0dcd59146cfee6fc616763746a497",
+    "backend/src/game-engine/engine/combat-resolver.service.spec.ts": "ff27d942f7f121ef7302aea00ff1e80029953604d2a9815f679881a850b922cd",
+    "backend/src/game-engine/engine/combat-resolver.service.ts": "18f3fbf44bdb78166e16d2bae4b816269f0cb77bd8be524065184c7d7aa15397",
+    "backend/src/game-engine/engine/terminal-state.ts": "281507270972bb37a76e9597a7eca93394725acca75524fb717d5a0bdf242765",
+    "backend/src/game-engine/models/game-state.model.ts": "bb872294bf34676180499fb5f3da2e1325eb4fb15ccc5a7a90d6d6883a65517c",
+    "backend/src/game-engine/services/deck-management.service.ts": "bc65e3a24a97a13ff704911237f50ba4c104515ffafed35c8d0d834b950f23c8",
+    "backend/src/game-engine/services/game-action-executor.service.spec.ts": "1b7a709b96cf176109385267d165a1002fec455e8f06d01922e69948d401eb06",
+    "backend/src/game-engine/services/game-action-executor.service.ts": "5505fa66f315ea9e74b40e1394968999245cc71d8c2bb44cb3e12fc33bb85f3d",
+    "backend/src/game-engine/services/s02-combat.spec.ts": "550dd88837cabb29ec44447956a0e25f2c755f260349173fc519654777c90574",
+    "backend/src/game-engine/services/s02-terminal.spec.ts": "17b948cee1a03d3ac23b863f1fc2c7b2454036719db79d813ec1270486ef8433",
+    "backend/src/games/game-state.service.spec.ts": "cd9e0f86628cabe7f32873abe07bb438143a229837c70bb8a5b320735282e2ea",
+    "backend/src/games/game-state.service.ts": "f4f5b8934cf160b6fd708e8e8bbb0969fab49756bb6fb9e411a1e2fcbeaae2df",
+    "backend/src/games/game-subscription.service.ts": "1d075b256b24983e64878b1aa14131ef3355d57a6901db9fa4c65fc2f2f41109",
+    "tools/s01/verify_artifacts.py": "f7d9e6eb349c8649caafc29a3997bbf8a135d010d403d5364b7b3931d06fd36e",
+    "tools/s02/run_harness.ps1": "93dc11ca7b264a1818fe05d8a96ec8f86fde115764bc47da3eb270ef031ffd98"
+  },
+  "sourceHashEncoding": "SHA256 of Git index blob bytes (normalized repository line endings)"
+}

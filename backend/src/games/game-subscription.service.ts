@@ -156,10 +156,13 @@ export class GameSubscriptionService implements OnModuleInit, OnModuleDestroy {
    * Отправляет обновление всем подписчикам (локальным и через Redis)
    */
   async publishGameUpdate(gameId: string, eventType: string, gameState: GameState): Promise<void> {
+    // Persist continuation internally, but never publish the server execution queue.
+    const { combatEffectContinuation, combatResolutionProgress, ...publicMetadata } = gameState.metadata;
+    const publicState = { ...gameState, metadata: publicMetadata };
     const event: GameUpdateEvent = {
       gameId,
       eventType,
-      gameState,
+      gameState: publicState,
       sequenceNumber: gameState.sequenceNumber,
       timestamp: Date.now(),
       instanceId: this.instanceId,

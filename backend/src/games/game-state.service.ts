@@ -64,6 +64,8 @@ export interface SerializedGameState {
     ar?: number; // actionsRemaining — оставшиеся действия в ходу (легаси-сейвы без поля → дефолт в getActionsRemaining)
     // Раньше ТЕРЯЛИСЬ при save/load — бой выживал только в Redis-кеше (TTL!):
     ci?: SerializedCombatInfo; // combatInfo — текущий бой
+    cc?: GameStateMetadata['combatEffectContinuation'];
+    cp?: GameStateMetadata['combatResolutionProgress'];
     pc?: number; // passCount
     wi?: string; // winnerId
     tsp?: Record<string, { x: number; y: number }>; // turnStartPositions (MOVED_THIS_TURN)
@@ -362,6 +364,8 @@ export class GameStateService {
         wi: state.metadata.winnerId,
         tsp: state.metadata.turnStartPositions as Record<string, { x: number; y: number }> | undefined,
         pe: state.metadata.pendingEffects,
+        cc: state.metadata.combatEffectContinuation,
+        cp: state.metadata.combatResolutionProgress,
         // Per-turn флаги действий (TASK)
         mt: state.metadata.maneuveredThisTurn,
         at: state.metadata.attackedThisTurn,
@@ -475,6 +479,8 @@ export class GameStateService {
         winnerId: data.m.wi,
         turnStartPositions: data.m.tsp,
         pendingEffects: data.m.pe,
+        combatEffectContinuation: data.m.cc,
+        combatResolutionProgress: data.m.cp,
         // Per-turn флаги действий (TASK): undefined прозрачно проходит (легаси)
         maneuveredThisTurn: data.m.mt,
         attackedThisTurn: data.m.at,
@@ -533,7 +539,9 @@ export class GameStateService {
       ),
     );
 
-    return { ...state, handZones, decks };
+    // Execution queues are server-only; player choices remain in pendingEffects.
+    const { combatEffectContinuation, combatResolutionProgress, ...publicMetadata } = state.metadata;
+    return { ...state, handZones, decks, metadata: publicMetadata };
   }
 
   /**

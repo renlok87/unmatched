@@ -962,8 +962,8 @@ describe('GenericHeroAbilityHandler', () => {
       // player2 остался без живых бойцов → isAlive false
       const player2 = next.players.find((p) => p.userId === 'player2')!;
       expect(player2.isAlive).toBe(false);
-      // game-over здесь НЕ ставим (WIRE recheck это делает в advanceTurn)
-      expect(next.phase).toBe(GamePhase.ACTION_MANEUVER);
+      // Hero defeat is terminal at the damage boundary.
+      expect(next.phase).toBe(GamePhase.GAME_OVER);
       // исходный state не мутирован
       expect(state.fighters.find((f) => f.id === 'enemy-fighter-1')!.isDefeated).toBeFalsy();
       expect(state.players.find((p) => p.userId === 'player2')!.isAlive).toBe(true);
@@ -1734,7 +1734,7 @@ describe('GenericHeroAbilityHandler', () => {
       const handler = new GenericHeroAbilityHandler(config, makeDeps({ zone: zoneByX() }));
       const state = makeState({
         fighters: [
-          heroFighter({ heroSlug: 'tomoe-gozen', position: { x: 1, y: 1 }, isDefeated: true }),
+          heroFighter({ heroSlug: 'tomoe-gozen', position: { x: 1, y: 1 }, health: 0, isDefeated: true }),
           enemyFighter({ id: 'enemy-fighter-1', position: { x: 2, y: 1 } }),
         ],
       });
@@ -1742,7 +1742,8 @@ describe('GenericHeroAbilityHandler', () => {
 
       const next = await handler.onFighterMoved(state, moved, { x: 2, y: 1 }, { x: 5, y: 1 });
 
-      expect(next).toBe(state);
+      expect(next.phase).toBe(GamePhase.GAME_OVER);
+      expect(next.metadata.winnerId).toBe('player2');
       expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
     });
 
@@ -1765,8 +1766,8 @@ describe('GenericHeroAbilityHandler', () => {
       expect(enemy.isDefeated).toBe(true);
       // player2 без живых бойцов → isAlive false
       expect(next.players.find((p) => p.userId === 'player2')!.isAlive).toBe(false);
-      // game-over НЕ ставим (WIRE recheck это делает)
-      expect(next.phase).toBe(GamePhase.ACTION_MANEUVER);
+      // Hero defeat is terminal at the damage boundary.
+      expect(next.phase).toBe(GamePhase.GAME_OVER);
     });
 
     it('no-op: handler без enemy-hero-left-my-zone правила (другой триггер)', async () => {

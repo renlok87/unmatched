@@ -1,6 +1,9 @@
 """Offline acceptance checks for the S01 evidence and local packaged artifact."""
-import csv, hashlib, json, pathlib, re
+import argparse, csv, hashlib, json, pathlib, re
 root=pathlib.Path(__file__).resolve().parents[2]
+parser=argparse.ArgumentParser()
+parser.add_argument('--ue-artifact-root', type=pathlib.Path, default=root, help='Repository checkout containing the existing S01 packaged EXE')
+args=parser.parse_args()
 evidence=root/'docs/game-design/evidence/S01'
 def load(path):return json.loads(path.read_text(encoding='utf-8-sig'))
 tasks=load(evidence/'tasks.json')
@@ -18,7 +21,7 @@ assert imported['cells']==30 and imported['fighters']==6
 assert all(abs(hi-lo-100)<.1 for lo,hi in zip(imported['min'],imported['max']))
 assert abs(imported['min'][2])<.1 and imported['material_slots']==1
 manifest=load(evidence/'ue/build-manifest.json')
-exe=root/manifest['packagedExecutable']
+exe=args.ue_artifact_root/manifest['packagedExecutable']
 assert exe.is_file(), 'Rebuild with tools/s01/ue_build.ps1 to validate local executable'
 assert exe.stat().st_size==manifest['executableBytes']
 with exe.open('rb') as stream:
@@ -37,9 +40,12 @@ for p in [root/'docs/game-design/README.md',root/'docs/game-design/13-sprint-pla
           evidence/'README.md',evidence/'rules-oracle.md']:
     for target in re.findall(r'\]\(([^)]+)\)',p.read_text(encoding='utf-8-sig')):
         if '://' not in target and not target.startswith('#'):
-            assert (p.parent/target.split('#')[0]).exists(), (p.name,target)
+            linked=(p.parent/target.split('#')[0]).resolve()
+            artifact_dir=(root/'unreal/Unmatched/Artifacts/S01').resolve()
+            external_artifact=linked.is_relative_to(artifact_dir) and (args.ue_artifact_root/linked.relative_to(root)).is_file()
+            assert linked.exists() or external_artifact, (p.name,target)
 with (root/'docs/game-design/14-sprint-backlog.csv').open(encoding='utf-8-sig') as f:
     rows=list(csv.DictReader(f))
-assert [r['id'] for r in rows if r['status']=='done']==list(tasks)
-assert all(r['status']=='planned' for r in rows if r['id'] not in tasks)
-print('PASS: task evidence references; live/UE geometry projection hash; imported cube bounds/pivot/material; EXE size/SHA256; standalone runtime markers; optional live outputs present; links; exactly GD-001..005 done.')
+assert {r['id'] for r in rows if r['status']=='done'} >= set(tasks)
+assert all(r['status']=='done' for r in rows if r['id'] in tasks)
+print('PASS: task evidence references; live/UE geometry projection hash; imported cube bounds/pivot/material; EXE size/SHA256; standalone runtime markers; optional live outputs present; links; GD-001..005 remain done (later sprint statuses checked by package validator).')

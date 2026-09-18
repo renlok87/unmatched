@@ -7,10 +7,13 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { MetricsService } from '../../metrics/metrics.service';
-import type { GameState, Fighter } from '../models';
+import { GamePhase, type GameState, type Fighter } from '../models';
+import { applyTerminalState } from './terminal-state';
 import { HeroAbilityRegistry, type ValueModifier } from '../abilities/hero-ability-registry';
 
 export interface CombatResult {
+  /** Owner of the fighter that won this combat (not necessarily the duel). */
+  readonly winnerId: string;
   readonly attackerDamage: number;
   readonly defenderDamage: number;
   readonly attackerEffectsApplied: readonly string[];
@@ -36,8 +39,12 @@ export class CombatResolverService {
     defenderId: string,
     attackCardId: string,
     defenseCardId?: string,
+    options: { preventDamageToDefender?: boolean } = {},
   ): Promise<CombatResult> {
     return this.metrics.measureServiceDuration('resolveCombat', 'CombatResolver', async () => {
+      if (applyTerminalState(state).phase === GamePhase.GAME_OVER) {
+        throw new Error('Game is over');
+      }
       // Получаем бойцов
       const attacker = state.fighters.find((f) => f.id === attackerId);
       const defender = state.fighters.find((f) => f.id === defenderId);
@@ -96,15 +103,12 @@ export class CombatResolverService {
       const finalAttack = Math.max(0, baseAttackValue + attackModifier);
       const finalDefense = Math.max(0, baseDefenseValue + defenseModifier);
 
-      // Вычисляем урон
-      let attackerDamage = 0;
-      let defenderDamage = 0;
-
-      if (finalAttack > finalDefense) {
-        defenderDamage = finalAttack - finalDefense;
-      } else if (finalDefense > finalAttack) {
-        attackerDamage = finalDefense - finalAttack;
-      }
+      // Defense never inflicts counterdamage; only damage dealt by the attack wins combat.
+      const attackerDamage = 0;
+      const defenderDamage = options.preventDamageToDefender
+        ? 0
+        : Math.max(0, finalAttack - finalDefense);
+      const winnerId = defenderDamage > 0 ? attacker.ownerId : defender.ownerId;
 
       // Структурированное логирование результата
       this.logger.debug(
@@ -126,6 +130,7 @@ export class CombatResolverService {
       const nextState = this.applyDamage(state, attackerId, defenderId, attackerDamage, defenderDamage);
 
       return {
+        winnerId,
         attackerDamage,
         defenderDamage,
         attackerEffectsApplied: attackerModifiers.map(m => m.source),
@@ -198,34 +203,27 @@ export class CombatResolverService {
       return fighter;
     });
 
-    // Обновляем статус проигравших игроков
-    const updatedPlayers = state.players.map(player => {
-      const playerFighters = updatedFighters.filter(f => f.ownerId === player.userId);
-      const allDefeated = playerFighters.every(f => f.health === 0);
-      return {
-        ...player,
-        isAlive: !allDefeated,
-      };
-    });
-
-    return {
+    return applyTerminalState({
       ...state,
       fighters: updatedFighters,
-      players: updatedPlayers,
       sequenceNumber: state.sequenceNumber + 1,
       metadata: {
         ...state.metadata,
         lastActionAt: new Date(),
         lastActionBy: attackerId,
       },
-    };
+    });
   }
 
   /**
    * Проверяет условие окончания игры
    */
   checkGameOver(state: GameState): { isOver: boolean; winnerId?: string } {
-    const alivePlayers = state.players.filter(p => p.isAlive);
+    const checked = applyTerminalState(state);
+    if (checked.phase === GamePhase.GAME_OVER) {
+      return { isOver: true, winnerId: checked.metadata.winnerId };
+    }
+    const alivePlayers = checked.players.filter(p => p.isAlive);
 
     if (alivePlayers.length <= 1) {
       return {

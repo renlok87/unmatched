@@ -41,6 +41,8 @@ import { MovementService } from '../engine/movement.service';
 import { ValueModifierService } from '../engine/value-modifier.service';
 import { AdjacencyService } from '../engine/adjacency.service';
 import { DeckManagementService } from './deck-management.service';
+import { applyTerminalState } from '../engine/terminal-state';
+import type { CombatResolutionProgress } from '../engine/combat-progress';
 // Residual-импорт engine→games: DTO-классы мутаций (runtime-импорт, но уже не
 // value-критичный цикл — состояние/фазы идут из ../models). Перенос DTO — вне скоупа F3.
 import {
@@ -178,6 +180,10 @@ export class GameActionExecutorService {
     // turn-start. No-op для героев без onTurnEnd.
     const endingPlayerId = state.currentTurnPlayerId;
     state = await this.triggerHeroTurnEnd(state, endingPlayerId);
+    state = applyTerminalState(state);
+    if (state.phase === GamePhase.GAME_OVER) {
+      return { ...state, sequenceNumber: state.sequenceNumber + (incrementSeq ? 1 : 0) };
+    }
 
     // Находим следующего живого игрока по кругу
     const currentPlayerIndex = state.players.findIndex(
@@ -203,6 +209,11 @@ export class GameActionExecutorService {
       next = await this.deckManagement.drawCards(next, nextPlayerId, 1);
     } catch (e) {
       this.logger.warn(`advanceTurn: draw skipped for ${nextPlayerId}: ${e}`);
+    }
+
+    next = applyTerminalState(next);
+    if (next.phase === GamePhase.GAME_OVER) {
+      return { ...next, sequenceNumber: state.sequenceNumber + (incrementSeq ? 1 : 0) };
     }
 
     // Эффекты «до конца хода» (immobilized и т.п.) снимаются на передаче хода
@@ -413,6 +424,8 @@ export class GameActionExecutorService {
       .map((f) => f.id);
 
     for (const id of movedIds) {
+      next = applyTerminalState(next);
+      if (next.phase === GamePhase.GAME_OVER) break;
       const moved = next.fighters.find((f) => f.id === id);
       if (!moved) continue; // мог исчезнуть из-за реакции предыдущего бойца
       const from = beforePos.get(id)!;
@@ -440,6 +453,9 @@ export class GameActionExecutorService {
     },
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
+      return { success: false, error: 'Game is already over' };
+    }
     try {
       const { userId, currentState } = context;
       const pending = (currentState.metadata.pendingEffects ?? []).find(
@@ -447,6 +463,9 @@ export class GameActionExecutorService {
       );
       if (!pending) {
         return { success: false, error: 'Отложенный эффект не найден (протух или уже резолвлен)' };
+      }
+      if (currentState.metadata.combatResolutionProgress && currentState.metadata.pendingEffects?.[0]?.id !== pending.id) {
+        return { success: false, error: 'Resolve the first pending combat effect first' };
       }
       if (pending.playerId !== userId) {
         return { success: false, error: 'Этот выбор принадлежит другому игроку' };
@@ -463,6 +482,9 @@ export class GameActionExecutorService {
       }
 
       const fighter = currentState.fighters.find((f) => f.id === dto.fighterId);
+      if (pending.fighterIds && !pending.fighterIds.includes(dto.fighterId)) {
+        return { success: false, error: 'This fighter is not a target of the pending effect' };
+      }
       if (!fighter || fighter.health <= 0) {
         return { success: false, error: 'Боец не найден или повержен' };
       }
@@ -544,6 +566,12 @@ export class GameActionExecutorService {
       // диффим позиции (currentState ДО vs newState ПОСЛЕ) и даём ДРУГИМ героям
       // отреагировать. seq НЕ бампим: «прицеплено» к +1 резолва эффекта выше.
       newState = await this.applyMoveReactions(currentState, newState);
+      if (newState.phase !== GamePhase.GAME_OVER && newState.metadata.combatResolutionProgress &&
+          !(newState.metadata.pendingEffects?.length)) {
+        return this.executeResolveCombat({ gameId: context.gameId }, {
+          ...context, currentState: { ...newState, sequenceNumber: currentState.sequenceNumber },
+        });
+      }
 
       return {
         success: true,
@@ -591,6 +619,7 @@ export class GameActionExecutorService {
       chosenEffects,
       userId,
       pending.card,
+      pending.effectContext,
     );
 
     const remainingCount = (pending.chooseCount ?? 1) - 1;
@@ -608,7 +637,7 @@ export class GameActionExecutorService {
           ]
         : [];
 
-    const newState: GameState = {
+    let newState: GameState = {
       ...applied.state,
       sequenceNumber: currentState.sequenceNumber + 1,
       metadata: {
@@ -617,12 +646,33 @@ export class GameActionExecutorService {
         lastActionBy: userId,
         // выполненный CHOOSE_ONE убираем; вложенные pending (MOVE/PLACE из
         // опции) и остаток chooseCount сохраняем
-        pendingEffects: [
+        pendingEffects: applied.state.phase === GamePhase.GAME_OVER ? [] : [
           ...(applied.state.metadata.pendingEffects ?? []).filter((p) => p.id !== pending.id),
           ...restPending,
         ],
       },
     };
+
+    const combatProgress = newState.metadata.combatResolutionProgress;
+    const stage = newState.metadata.combatEffectContinuation?.stage;
+    if (combatProgress && stage) {
+      const field = stage === 'ON_REVEAL' ? 'reveal' : stage === 'DURING_COMBAT' ? 'calculation' : 'after';
+      const saved = combatProgress[field];
+      if (saved) newState = { ...newState, metadata: { ...newState.metadata,
+        combatResolutionProgress: { ...combatProgress, [field]: {
+          ...saved, appliedEffects: [...saved.appliedEffects, ...applied.appliedEffects],
+          manualEffects: [...saved.manualEffects, ...applied.manualEffects],
+        } },
+      } };
+    }
+
+    if (newState.phase !== GamePhase.GAME_OVER && newState.metadata.combatResolutionProgress &&
+        !(newState.metadata.pendingEffects?.length)) {
+      return this.executeResolveCombat({ gameId: currentState.gameId }, {
+        userId, gameId: currentState.gameId,
+        currentState: { ...newState, sequenceNumber: currentState.sequenceNumber },
+      });
+    }
 
     return {
       success: true,
@@ -639,35 +689,9 @@ export class GameActionExecutorService {
     };
   }
 
-  /**
-   * Пере-проверить и (при необходимости) применить конец игры.
-   *
-   * Единая точка истины правила «остался один живой игрок → игра окончена».
-   * Победитель — единственный игрок с isAlive=true (alivePlayers[0]).
-   * Реюзается двумя путями:
-   *  - резолв боя (executeResolveCombat), где after-эффекты могли добить героя;
-   *  - передача хода (advanceTurn), где turn-start способность нового игрока
-   *    может нанести смертельный урон последнему герою противника.
-   *
-   * No-op-контракт: если живых > 1 — возвращает state БЕЗ изменений (фаза/
-   * metadata не трогаются). sequenceNumber НЕ инкрементируется — game-over
-   * «прицепляется» к инкременту вызывающего действия (контракт saveState).
-   * isAlive игроков должен быть уже актуализирован вызывающим (мы лишь читаем).
-   */
+  /** Shared hero-based terminal boundary; does not advance sequence. */
   private checkAndApplyGameOver(state: GameState): GameState {
-    const alivePlayers = state.players.filter((p) => p.isAlive);
-    if (alivePlayers.length > 1) {
-      return state;
-    }
-    return {
-      ...state,
-      phase: GamePhase.GAME_OVER,
-      metadata: {
-        ...state.metadata,
-        combatInfo: undefined,
-        winnerId: alivePlayers[0]?.userId,
-      },
-    };
+    return applyTerminalState(state);
   }
 
   /**
@@ -678,6 +702,8 @@ export class GameActionExecutorService {
    * (суммарно за мутацию ровно +1, контракт saveState соблюдён).
    */
   private async consumeAction(state: GameState, userId: string): Promise<GameState> {
+    state = applyTerminalState(state);
+    if (state.phase === GamePhase.GAME_OVER) return state;
     const remaining = getActionsRemaining(state) - 1;
     if (remaining <= 0) {
       return this.advanceTurn(
@@ -746,6 +772,12 @@ export class GameActionExecutorService {
     dto: ManeuverDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.combatResolutionProgress) {
+      return { success: false, error: 'Resolve the pending combat effect first' };
+    }
+    if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
+      return { success: false, error: 'Game is already over' };
+    }
     return this.metrics.measureServiceDuration('executeManeuver', 'GameActionExecutor', async () => {
       try {
         const { userId, currentState, gameId } = context;
@@ -831,7 +863,7 @@ export class GameActionExecutorService {
         // BOOST-карта уходит в сброс + добор 1 карты (правила Unmatched:
         // манёвр = добор + движение). discardCard/drawCards не трогают
         // sequenceNumber — +1 уже сделан в executeMovement.
-        if (boostCardId) {
+        if (newState.phase !== GamePhase.GAME_OVER && boostCardId) {
           const playedCard = this.findHandCard(currentState, userId, boostCardId);
           if (playedCard) {
             newState = await this.deckManagement.discardCard(newState, userId, playedCard.id);
@@ -896,6 +928,12 @@ export class GameActionExecutorService {
     dto: MoveFighterDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.combatResolutionProgress) {
+      return { success: false, error: 'Resolve the pending combat effect first' };
+    }
+    if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
+      return { success: false, error: 'Game is already over' };
+    }
     try {
       const { userId, currentState } = context;
 
@@ -973,6 +1011,12 @@ export class GameActionExecutorService {
     dto: AttackDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.combatResolutionProgress) {
+      return { success: false, error: 'Resolve the pending combat effect first' };
+    }
+    if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
+      return { success: false, error: 'Game is already over' };
+    }
     return this.metrics.measureServiceDuration('executeAttack', 'GameActionExecutor', async () => {
       try {
         const { userId, currentState, gameId } = context;
@@ -1151,6 +1195,12 @@ export class GameActionExecutorService {
     dto: PlayDefenseDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.combatResolutionProgress) {
+      return { success: false, error: 'Resolve the pending combat effect first' };
+    }
+    if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
+      return { success: false, error: 'Game is already over' };
+    }
     try {
       const { userId, currentState } = context;
 
@@ -1287,6 +1337,12 @@ export class GameActionExecutorService {
     dto: PlaySchemeDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.combatResolutionProgress) {
+      return { success: false, error: 'Resolve the pending combat effect first' };
+    }
+    if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
+      return { success: false, error: 'Game is already over' };
+    }
     return this.metrics.measureServiceDuration('executePlayScheme', 'GameActionExecutor', async () => {
       try {
         const { userId, currentState } = context;
@@ -1395,9 +1451,33 @@ export class GameActionExecutorService {
     dto: ResolveCombatDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
+      return { success: false, error: 'Game is already over' };
+    }
     return this.metrics.measureServiceDuration('executeResolveCombat', 'GameActionExecutor', async () => {
       try {
         const { userId, currentState, gameId } = context;
+        if (currentState.metadata.combatResolutionProgress && currentState.metadata.pendingEffects?.length) {
+          return { success: false, error: 'Resolve the pending combat effect first' };
+        }
+        const progress: CombatResolutionProgress = {
+          defeatedBefore: currentState.fighters.filter(f => f.isDefeated).map(f => f.id),
+          ...currentState.metadata.combatResolutionProgress,
+        };
+        const pause = (state: GameState): ActionResult => ({
+          success: true,
+          gameState: { ...state, phase: GamePhase.COMBAT_RESOLVE,
+            sequenceNumber: currentState.sequenceNumber + 1,
+            metadata: { ...state.metadata, combatResolutionProgress: progress,
+              lastActionAt: new Date(), lastActionBy: userId } },
+          metadata: { action: 'resolveCombat', performedAt: new Date(), performedBy: userId,
+            sequenceNumber: currentState.sequenceNumber + 1 },
+        });
+        const withoutState = <T extends { state: GameState }>(result: T): Omit<T, 'state'> => {
+          const { state: _state, ...rest } = result;
+          return rest;
+        };
+
 
         // Проверяем фазу
         if (currentState.phase !== GamePhase.COMBAT && currentState.phase !== GamePhase.COMBAT_RESOLVE) {
@@ -1444,26 +1524,44 @@ export class GameActionExecutorService {
         };
 
         // === Пайплайн боя (правила Unmatched) ===
-        // 1. ON_REVEAL (вскрытие): атакующий → защитник, cancel-флаги
-        const reveal = await this.cardEffectExecutor.executeRevealEffects(
-          currentState,
-          attackerCard,
-          defenderCard,
-          combatCtx,
-        );
+        // 1. ON_REVEAL (вскрытие): защитник → атакующий, cancel-флаги
+        const savedReveal = progress.reveal;
+        let reveal = savedReveal
+          ? savedReveal.paused
+            ? await this.cardEffectExecutor.resumeCombatEffects(currentState)
+            : { ...savedReveal, state: currentState }
+          : await this.cardEffectExecutor.executeRevealEffects(currentState, attackerCard, defenderCard, combatCtx);
+        if (savedReveal?.paused) {
+          reveal = { ...reveal, appliedEffects: [...savedReveal.appliedEffects, ...reveal.appliedEffects],
+            manualEffects: [...savedReveal.manualEffects, ...reveal.manualEffects] };
+        }
+        progress.reveal = withoutState(reveal);
+        if (reveal.paused) return pause(reveal.state);
         const cancelled = {
           attacker: reveal.attackerCardCancelled,
           defender: reveal.defenderCardCancelled,
         };
 
         // 2. DURING_COMBAT: эффекты карт → финальные значения
-        const calc = await this.cardEffectExecutor.executeCombatEffects(
-          reveal.state,
-          attackerCard,
-          defenderCard,
-          combatCtx,
-          cancelled,
-        );
+        const savedCalculation = progress.calculation;
+        let calc = savedCalculation
+          ? savedCalculation.paused
+            ? await this.cardEffectExecutor.resumeCombatEffects(reveal.state)
+            : { ...savedCalculation, state: reveal.state }
+          : await this.cardEffectExecutor.executeCombatEffects(reveal.state, attackerCard, defenderCard, {
+              ...combatCtx,
+              attackValue: cancelled.attacker ? (attackerCard?.attackValue ?? combatCtx.attackValue) : combatCtx.attackValue,
+              defenseValue: cancelled.defender ? (defenderCard?.defenseValue ?? combatCtx.defenseValue) : combatCtx.defenseValue,
+            }, cancelled);
+        if (savedCalculation?.paused) {
+          calc = { ...calc, appliedEffects: [...savedCalculation.appliedEffects, ...calc.appliedEffects],
+            manualEffects: [...savedCalculation.manualEffects, ...calc.manualEffects] };
+        }
+        progress.calculation = withoutState(calc);
+        if (calc.paused) return pause(calc.state);
+        if ('attackerCardCancelled' in calc) cancelled.attacker = calc.attackerCardCancelled === true;
+        if ('defenderCardCancelled' in calc) cancelled.defender = calc.defenderCardCancelled === true;
+
 
         // Модификаторы способностей героев — ПОСЛЕ карточных SET/MODIFY
         // (set value заменяет значение карты, ability добавляется поверх)
@@ -1509,25 +1607,22 @@ export class GameActionExecutorService {
           this.abilityRegistry.getAuraCombatModifiers(calc.state, defenderFighter, 'defender'),
         );
 
-        const finalAttack =
-          calc.finalAttack + heroMods.attackModifier + statefulAttack + auraAttack;
-        const finalDefense =
-          calc.finalDefense + heroMods.defenseModifier + statefulDefense + auraDefense;
+        const finalAttack = progress.damage?.finalAttack ??
+          Math.max(0, calc.finalAttack + heroMods.attackModifier + statefulAttack + auraAttack);
+        const finalDefense = progress.damage?.finalDefense ??
+          Math.max(0, calc.finalDefense + heroMods.defenseModifier + statefulDefense + auraDefense);
 
-        // 3. Урон: атака > защита → разница защитнику; иначе атакующему
-        //    (ничья — победа защитника, урона нет). PREVENT_DAMAGE гасит урон стороне.
-        let attackerDamage = 0;
-        let defenderDamage = 0;
-        if (finalAttack > finalDefense) {
-          defenderDamage = calc.preventDamageToDefender ? 0 : finalAttack - finalDefense;
-        } else if (finalDefense > finalAttack) {
-          attackerDamage = calc.preventDamageToAttacker ? 0 : finalDefense - finalAttack;
-        }
-        const attackerWon = finalAttack > finalDefense;
+        // Only the attack deals combat damage; prevention determines the winner.
+        const attackerDamage = 0;
+        const participantsAlive = [attacker.id, defenderFighter.id].every(id =>
+          calc.state.fighters.some(f => f.id === id && f.health > 0 && !f.isDefeated));
+        const defenderDamage = progress.damage?.defenderDamage ?? (calc.state.phase === GamePhase.GAME_OVER || !participantsAlive || calc.preventDamageToDefender
+          ? 0 : Math.max(0, finalAttack - finalDefense));
+        const attackerWon = defenderDamage > 0;
 
         let workState: GameState = {
           ...calc.state,
-          fighters: calc.state.fighters.map((f) => {
+          fighters: progress.damage ? calc.state.fighters : calc.state.fighters.map((f) => {
             if (f.id === attacker.id && attackerDamage > 0) {
               return { ...f, health: Math.max(0, f.health - attackerDamage) };
             }
@@ -1538,15 +1633,23 @@ export class GameActionExecutorService {
           }),
         };
 
-        // 4. AFTER_COMBAT: сначала ВСЕ эффекты атакующего, затем защитника
-        const after = await this.cardEffectExecutor.executeAfterCombatEffects(
-          workState,
-          attackerCard,
-          defenderCard,
-          combatCtx,
-          { attackerWon, attackerDamage, defenderDamage },
-          cancelled,
-        );
+        workState = applyTerminalState(workState);
+        progress.damage = { finalAttack, finalDefense, attackerDamage, defenderDamage, attackerWon };
+
+        // 4. AFTER_COMBAT: defender first, unless the duel has ended.
+        const savedAfter = progress.after;
+        let after = workState.phase === GamePhase.GAME_OVER
+          ? { state: workState, appliedEffects: [], manualEffects: [], paused: false }
+          : savedAfter?.paused
+            ? await this.cardEffectExecutor.resumeCombatEffects(workState)
+            : await this.cardEffectExecutor.executeAfterCombatEffects(workState, attackerCard, defenderCard,
+                combatCtx, { attackerWon, attackerDamage, defenderDamage }, cancelled);
+        if (savedAfter?.paused) {
+          after = { ...after, appliedEffects: [...savedAfter.appliedEffects, ...after.appliedEffects],
+            manualEffects: [...savedAfter.manualEffects, ...after.manualEffects] };
+        }
+        progress.after = withoutState(after);
+        if (after.paused) return pause(after.state);
         workState = after.state;
 
         const appliedEffects = [
@@ -1564,7 +1667,7 @@ export class GameActionExecutorService {
         // Снимок id повергнутых ДО этого боя — чтобы вычислить НОВО-павших
         // (для on-defeat хука: дёргаем только тех, кто пал ИМЕННО в этом бою).
         const defeatedBefore = new Set(
-          workState.fighters.filter((f) => f.isDefeated === true).map((f) => f.id),
+          progress.defeatedBefore,
         );
         const updatedFighters = workState.fighters.map((f) =>
           f.health <= 0 && !f.isDefeated ? { ...f, isDefeated: true } : f,
@@ -1572,19 +1675,7 @@ export class GameActionExecutorService {
         const newlyDefeated = updatedFighters.filter(
           (f) => f.isDefeated === true && !defeatedBefore.has(f.id),
         );
-        const updatedPlayers = workState.players.map((p) => {
-          const playerFighters = updatedFighters.filter((f) => f.ownerId === p.userId);
-          const hasAliveFighters = playerFighters.some((f) => f.health > 0);
-          return {
-            ...p,
-            isAlive: hasAliveFighters,
-          };
-        });
-        let resolvedState: GameState = {
-          ...workState,
-          fighters: updatedFighters,
-          players: updatedPlayers,
-        };
+        let resolvedState = applyTerminalState({ ...workState, fighters: updatedFighters });
 
         // Per-turn флаги действий (TASK). ВАЖНО про порядок:
         //  - stateful combat-модификаторы ЭТОЙ атаки уже собраны выше (видели
@@ -1605,7 +1696,7 @@ export class GameActionExecutorService {
           },
         };
 
-        // AFTER-COMBAT хук способности АТАКУЮЩЕГО героя (TASK): урон применён,
+        // AFTER-COMBAT хуки способностей: защитник первым; урон применён,
         // флаги поражения проставлены, combat-модификаторы собраны. Бьём ДО
         // передачи хода (advanceTurn), чтобы любой добор/лечение/доп. действие
         // легли в ТОТ ЖЕ резолв — и независимо от того, авто-завершается ли ход.
@@ -1621,11 +1712,14 @@ export class GameActionExecutorService {
           damageDealt: defenderDamage,
           firstLossThisTurn,
         };
-        resolvedState = await this.triggerHeroAfterCombat(resolvedState, afterCombatCtx);
-        // DEFENDER-side after-combat хук (напр. Spider-Sense): слаг резолвится
-        // с защищающегося бойца, эффект 'after-defense' — к ctx.defenderPlayerId.
+        if (resolvedState.phase !== GamePhase.GAME_OVER) {
+          resolvedState = applyTerminalState(await this.triggerHeroAfterDefense(resolvedState, afterCombatCtx));
+        }
+        // Затем after-attack хук атакующего героя.
         // Бьём тем же ctx, ДО передачи хода, теми же seq-правилами.
-        resolvedState = await this.triggerHeroAfterDefense(resolvedState, afterCombatCtx);
+        if (resolvedState.phase !== GamePhase.GAME_OVER) {
+          resolvedState = applyTerminalState(await this.triggerHeroAfterCombat(resolvedState, afterCombatCtx));
+        }
 
         // ON-DEFEAT хук (TASK, РЕАНИМАЦИЯ): для каждого НОВО-павшего бойца дёргаем
         // onFighterDefeated героя ВЛАДЕЛЬЦА бойца — чтобы он отреагировал на гибель
@@ -1633,7 +1727,8 @@ export class GameActionExecutorService {
         // установки isDefeated, но ДО game-over/передачи хода. seq не бампим:
         // «прицеплено» к инкременту резолва. No-op для героев без хука.
         for (const fallen of newlyDefeated) {
-          resolvedState = await this.triggerHeroFighterDefeated(resolvedState, fallen.id);
+          if (resolvedState.phase === GamePhase.GAME_OVER) break;
+          resolvedState = applyTerminalState(await this.triggerHeroFighterDefeated(resolvedState, fallen.id));
         }
 
         // Конец игры (правило «остался один живой игрок») — единый helper.
@@ -1667,6 +1762,8 @@ export class GameActionExecutorService {
             metadata: {
               ...resolvedState.metadata,
               combatInfo: undefined,
+              combatResolutionProgress: undefined,
+              combatEffectContinuation: undefined,
             },
           };
           if (getActionsRemaining(intermediate) > 0) {
@@ -1731,6 +1828,12 @@ export class GameActionExecutorService {
     dto: EndTurnDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.combatResolutionProgress) {
+      return { success: false, error: 'Resolve the pending combat effect first' };
+    }
+    if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
+      return { success: false, error: 'Game is already over' };
+    }
     try {
       const { userId, currentState } = context;
 
@@ -1773,6 +1876,12 @@ export class GameActionExecutorService {
     dto: PassDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.combatResolutionProgress) {
+      return { success: false, error: 'Resolve the pending combat effect first' };
+    }
+    if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
+      return { success: false, error: 'Game is already over' };
+    }
     try {
       const { userId, currentState } = context;
 
@@ -1828,6 +1937,12 @@ export class GameActionExecutorService {
     dto: ToggleDoorDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.combatResolutionProgress) {
+      return { success: false, error: 'Resolve the pending combat effect first' };
+    }
+    if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
+      return { success: false, error: 'Game is already over' };
+    }
     try {
       const { userId, currentState } = context;
 
@@ -1899,6 +2014,12 @@ export class GameActionExecutorService {
     dto: { gameId: string; stanceId: string },
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.combatResolutionProgress) {
+      return { success: false, error: 'Resolve the pending combat effect first' };
+    }
+    if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
+      return { success: false, error: 'Game is already over' };
+    }
     try {
       const { userId, currentState } = context;
 

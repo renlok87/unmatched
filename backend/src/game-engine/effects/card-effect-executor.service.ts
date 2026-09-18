@@ -13,13 +13,15 @@
  *   не блокирует игру: текст уезжает в manualEffects для ручного применения
  *   (Game Tester), warn-лог + метрика.
  * - CANCEL_EFFECTS: отменённая карта не исполняет ни reveal-, ни during-,
- *   ни after-эффекты; её ПЕЧАТНОЕ значение сохраняется; отменённый защитник
+ *   ни after-эффекты; её ПЕЧАТНОЕ значение сохраняется; отменённый атакующий
  *   не отменяет в ответ (его reveal уже не исполняется).
  */
 
 import { Injectable, Logger } from '@nestjs/common';
 import { MetricsService } from '../../metrics/metrics.service';
-import type { GameState, Card } from '../models';
+import type { GameState, Card, CombatContext, EffectContext, CombatEffectContinuation } from '../models';
+import { GamePhase } from '../models';
+import { applyTerminalState } from '../engine/terminal-state';
 import {
   CardEffect,
   EffectCondition,
@@ -44,41 +46,11 @@ export interface EffectResult {
   readonly manual?: boolean;
 }
 
-/**
- * Контекст боя для эффектов. Бойцы и игроки — РАЗНЫЕ id:
- * attackerFighterId/targetFighterId — из fighters, *PlayerId — userId.
- */
-export interface CombatContext {
-  readonly attackerFighterId: string;
-  readonly targetFighterId: string;
-  readonly attackerPlayerId: string;
-  readonly defenderPlayerId: string;
-  readonly attackCardId: string;
-  readonly defenseCardId?: string;
-  readonly attackValue: number;
-  readonly defenseValue: number;
-}
-
-/**
- * Контекст выполнения эффекта (одна сторона)
- */
-export interface EffectContext {
-  readonly playerId: string;
-  readonly card: Card;
-  /** Боец, который играет карту (атакующий или цель атаки) */
-  readonly fighterId?: string;
-  /** Боец-противник в бою */
-  readonly opposingFighterId?: string;
-  readonly combat?: CombatContext;
-  /** Исход боя (известен только в AFTER_COMBAT): победила ли ЭТА сторона */
-  readonly wonCombat?: boolean;
-  /** Урон, нанесённый/полученный этой стороной (для count DAMAGE_*) */
-  readonly damageDealt?: number;
-  readonly damageTaken?: number;
-}
+export type { CombatContext, EffectContext } from '../models';
 
 /** Результат стадии ON_REVEAL */
 export interface RevealResult {
+  readonly paused?: boolean;
   readonly state: GameState;
   readonly appliedEffects: readonly EffectResult[];
   readonly manualEffects: readonly string[];
@@ -88,6 +60,7 @@ export interface RevealResult {
 
 /** Результат стадии DURING_COMBAT */
 export interface CombatCalculation {
+  readonly paused?: boolean;
   readonly state: GameState;
   readonly finalAttack: number;
   readonly finalDefense: number;
@@ -99,6 +72,7 @@ export interface CombatCalculation {
 
 /** Результат стадии AFTER_COMBAT */
 export interface AfterCombatResult {
+  readonly paused?: boolean;
   readonly state: GameState;
   readonly appliedEffects: readonly EffectResult[];
   readonly manualEffects: readonly string[];
@@ -108,6 +82,11 @@ export interface OnPlayResult {
   readonly state: GameState;
   readonly appliedEffects: readonly EffectResult[];
   readonly manualEffects: readonly string[];
+}
+
+export interface CombatStageResumeResult extends RevealResult, CombatCalculation, AfterCombatResult {
+  readonly stage: CombatEffectContinuation['stage'];
+  readonly paused: boolean;
 }
 
 /** Внутренний результат применения одного эффекта */
@@ -132,70 +111,16 @@ export class CardEffectExecutorService {
     private readonly deckManagement: DeckManagementService,
   ) {}
 
-  // =========================================================================
-  // Стадия 1: ON_REVEAL (вскрытие карт) — сначала атакующий, затем защитник
-  // =========================================================================
-
   async executeRevealEffects(
     state: GameState,
     attackerCard: Card | null,
     defenderCard: Card | null,
     combat: CombatContext,
   ): Promise<RevealResult> {
-    let currentState = state;
-    const appliedEffects: EffectResult[] = [];
-    const manualEffects: string[] = [];
-    let attackerCardCancelled = false;
-    let defenderCardCancelled = false;
-
-    const sides: Array<{ card: Card | null; ctx: EffectContext; isAttacker: boolean }> = [
-      {
-        card: attackerCard,
-        isAttacker: true,
-        ctx: this.combatSideContext(attackerCard, combat, 'attacker'),
-      },
-      {
-        card: defenderCard,
-        isAttacker: false,
-        ctx: this.combatSideContext(defenderCard, combat, 'defender'),
-      },
-    ];
-
-    for (const side of sides) {
-      if (!side.card) continue;
-      // Отменённая карта не исполняет reveal (защитник, отменённый атакующим,
-      // НЕ отменяет в ответ)
-      if (side.isAttacker ? attackerCardCancelled : defenderCardCancelled) continue;
-
-      const effects = (side.card.effects ?? []).filter(
-        (e) => e.timing === EffectTiming.ON_REVEAL,
-      );
-      for (const effect of effects) {
-        if (!(await this.passesWhen(currentState, effect, side.ctx))) continue;
-        const outcome = await this.applyOneEffect(currentState, effect, side.ctx);
-        currentState = outcome.state;
-        appliedEffects.push(outcome.result);
-        if (outcome.manual) manualEffects.push(outcome.manual);
-        if (outcome.cancelOpposingCard) {
-          if (side.isAttacker) defenderCardCancelled = true;
-          else attackerCardCancelled = true;
-        }
-      }
-    }
-
-    return {
-      state: currentState,
-      appliedEffects,
-      manualEffects,
-      attackerCardCancelled,
-      defenderCardCancelled,
-    };
+    return this.runCombatQueue(state, this.createCombatQueue(
+      'ON_REVEAL', attackerCard, defenderCard, combat,
+    ));
   }
-
-  // =========================================================================
-  // Стадия 2: DURING_COMBAT — финальные значения атаки/защиты
-  // Порядок внутри стороны: SET_VALUE → MODIFY_* → VALUE_PER_COUNT → BOOST
-  // =========================================================================
 
   async executeCombatEffects(
     state: GameState,
@@ -204,88 +129,12 @@ export class CardEffectExecutorService {
     combat: CombatContext,
     cancelled: { attacker: boolean; defender: boolean } = { attacker: false, defender: false },
   ): Promise<CombatCalculation> {
-    return this.metrics.measureServiceDuration(
-      'executeCombatEffects',
-      'CardEffectExecutor',
-      async () => {
-        let currentState = state;
-        const appliedEffects: EffectResult[] = [];
-        const manualEffects: string[] = [];
-        let preventDamageToAttacker = false;
-        let preventDamageToDefender = false;
-
-        const compute = async (
-          card: Card | null,
-          base: number,
-          role: 'attacker' | 'defender',
-          isCancelled: boolean,
-        ): Promise<number> => {
-          if (!card || isCancelled) return base; // печатное значение сохраняется
-          const ctx = this.combatSideContext(card, combat, role);
-          const effects = (card.effects ?? []).filter(
-            (e) => e.timing === EffectTiming.DURING_COMBAT,
-          );
-
-          // 1) SET_VALUE (последний выигрывает), 2) MODIFY, 3) PER_COUNT, 4) прочее
-          const order = (e: CardEffect): number =>
-            e.type === EffectType.SET_VALUE
-              ? 0
-              : e.type === EffectType.MODIFY_VALUE ||
-                  e.type === EffectType.MODIFY_ATTACK ||
-                  e.type === EffectType.MODIFY_DEFENSE
-                ? 1
-                : e.type === EffectType.VALUE_PER_COUNT
-                  ? 2
-                  : 3;
-          const sorted = [...effects].sort((a, b) => order(a) - order(b));
-
-          let value = base;
-          for (const effect of sorted) {
-            if (!(await this.passesWhen(currentState, effect, ctx))) continue;
-            const outcome = await this.applyOneEffect(currentState, effect, ctx);
-            currentState = outcome.state;
-            appliedEffects.push(outcome.result);
-            if (outcome.manual) manualEffects.push(outcome.manual);
-            if (outcome.setValue !== undefined) value = outcome.setValue;
-            if (outcome.valueDelta) value += outcome.valueDelta;
-            if (outcome.preventDamage) {
-              if (role === 'attacker') preventDamageToAttacker = true;
-              else preventDamageToDefender = true;
-            }
-          }
-          return value;
-        };
-
-        const finalAttack = await compute(
-          attackerCard,
-          combat.attackValue,
-          'attacker',
-          cancelled.attacker,
-        );
-        const finalDefense = await compute(
-          defenderCard,
-          combat.defenseValue,
-          'defender',
-          cancelled.defender,
-        );
-
-        return {
-          state: currentState,
-          finalAttack,
-          finalDefense,
-          preventDamageToAttacker,
-          preventDamageToDefender,
-          appliedEffects,
-          manualEffects,
-        };
-      },
+    return this.metrics.measureServiceDuration('executeCombatEffects', 'CardEffectExecutor', () =>
+      this.runCombatQueue(state, this.createCombatQueue(
+        'DURING_COMBAT', attackerCard, defenderCard, combat, cancelled,
+      )),
     );
   }
-
-  // =========================================================================
-  // Стадия 4: AFTER_COMBAT — сначала ВСЕ эффекты атакующего, затем защитника
-  // (правило Unmatched). Ничья = победа защитника.
-  // =========================================================================
 
   async executeAfterCombatEffects(
     state: GameState,
@@ -295,39 +144,107 @@ export class CardEffectExecutorService {
     outcome: { attackerWon: boolean; attackerDamage: number; defenderDamage: number },
     cancelled: { attacker: boolean; defender: boolean } = { attacker: false, defender: false },
   ): Promise<AfterCombatResult> {
-    let currentState = state;
+    return this.runCombatQueue(state, this.createCombatQueue(
+      'AFTER_COMBAT', attackerCard, defenderCard, combat, cancelled, outcome,
+    ));
+  }
+
+  /** Continue only after the action executor has applied/declined the pending choice. */
+  async resumeCombatEffects(state: GameState): Promise<CombatStageResumeResult> {
+    const continuation = state.metadata.combatEffectContinuation;
+    if (!continuation) throw new Error('No combat effect continuation');
+    if (state.metadata.pendingEffects?.length) throw new Error('Combat choice is still pending');
+    return this.runCombatQueue(state, continuation);
+  }
+
+  private createCombatQueue(
+    stage: CombatEffectContinuation['stage'],
+    attackerCard: Card | null,
+    defenderCard: Card | null,
+    combat: CombatContext,
+    cancelled = { attacker: false, defender: false },
+    outcome?: { attackerWon: boolean; attackerDamage: number; defenderDamage: number },
+  ): CombatEffectContinuation {
+    // Defender first at every timing. Retain card order within each side, except
+    // the established numeric modifier precedence during combat.
+    const remaining: CombatEffectContinuation['remaining'][number][] = [];
+    for (const role of ['defender', 'attacker'] as const) {
+      const card = role === 'attacker' ? attackerCard : defenderCard;
+      if (!card) continue;
+      const isAttacker = role === 'attacker';
+      const context: EffectContext = {
+        ...this.combatSideContext(card, combat, role),
+        ...(outcome ? {
+          wonCombat: isAttacker ? outcome.attackerWon : !outcome.attackerWon,
+          damageDealt: isAttacker ? outcome.defenderDamage : outcome.attackerDamage,
+          damageTaken: isAttacker ? outcome.attackerDamage : outcome.defenderDamage,
+        } : {}),
+      };
+      const effects = (card.effects ?? []).filter(e => e.timing === stage);
+      if (stage === 'DURING_COMBAT') {
+        const order = (e: CardEffect): number => e.type === EffectType.SET_VALUE ? 0
+          : [EffectType.MODIFY_VALUE, EffectType.MODIFY_ATTACK, EffectType.MODIFY_DEFENSE].includes(e.type) ? 1
+            : e.type === EffectType.VALUE_PER_COUNT ? 2 : 3;
+        effects.sort((a, b) => order(a) - order(b));
+      }
+      remaining.push(...effects.map(effect => ({ effect, context, isAttacker })));
+    }
+    return { stage, remaining, attackerCardCancelled: cancelled.attacker,
+      defenderCardCancelled: cancelled.defender, finalAttack: combat.attackValue,
+      finalDefense: combat.defenseValue, preventDamageToAttacker: false, preventDamageToDefender: false };
+  }
+
+  private async runCombatQueue(state: GameState, queue: CombatEffectContinuation): Promise<CombatStageResumeResult> {
+    let currentState = applyTerminalState({
+      ...state, metadata: { ...state.metadata, combatEffectContinuation: undefined },
+    });
     const appliedEffects: EffectResult[] = [];
     const manualEffects: string[] = [];
-
-    const sides: Array<{ card: Card | null; role: 'attacker' | 'defender'; isCancelled: boolean }> =
-      [
-        { card: attackerCard, role: 'attacker', isCancelled: cancelled.attacker },
-        { card: defenderCard, role: 'defender', isCancelled: cancelled.defender },
-      ];
-
-    for (const side of sides) {
-      if (!side.card || side.isCancelled) continue;
-      const won = side.role === 'attacker' ? outcome.attackerWon : !outcome.attackerWon;
-      const ctx: EffectContext = {
-        ...this.combatSideContext(side.card, combat, side.role),
-        wonCombat: won,
-        damageDealt: side.role === 'attacker' ? outcome.defenderDamage : outcome.attackerDamage,
-        damageTaken: side.role === 'attacker' ? outcome.attackerDamage : outcome.defenderDamage,
-      };
-
-      const effects = (side.card.effects ?? []).filter(
-        (e) => e.timing === EffectTiming.AFTER_COMBAT,
-      );
-      for (const effect of effects) {
-        if (!(await this.passesWhen(currentState, effect, ctx))) continue;
-        const applied = await this.applyOneEffect(currentState, effect, ctx);
-        currentState = applied.state;
-        appliedEffects.push(applied.result);
-        if (applied.manual) manualEffects.push(applied.manual);
+    let progress = { ...queue, remaining: [] as CombatEffectContinuation['remaining'][number][] };
+    let paused = false;
+    for (let index = 0; index < queue.remaining.length; index++) {
+      if (currentState.phase === GamePhase.GAME_OVER) break;
+      const { effect, context, isAttacker } = queue.remaining[index];
+      if (isAttacker ? progress.attackerCardCancelled : progress.defenderCardCancelled) continue;
+      if (!(await this.passesWhen(currentState, effect, context))) continue;
+      const pendingBefore = currentState.metadata.pendingEffects?.length ?? 0;
+      const outcome = await this.applyOneEffect(currentState, effect, context);
+      currentState = applyTerminalState(outcome.state);
+      appliedEffects.push(outcome.result);
+      if (outcome.manual) manualEffects.push(outcome.manual);
+      progress = { ...this.updateCombatProgress(progress, outcome, isAttacker), remaining: progress.remaining };
+      if (currentState.phase !== GamePhase.GAME_OVER &&
+          (currentState.metadata.pendingEffects?.length ?? 0) > pendingBefore) {
+        // Even an empty remainder pauses: the choice precedes the next combat stage.
+        progress = { ...progress, remaining: queue.remaining.slice(index + 1) };
+        currentState = { ...currentState, metadata: {
+          ...currentState.metadata, combatEffectContinuation: progress,
+        } };
+        paused = true;
+        break;
       }
     }
+    return { ...progress, state: currentState, appliedEffects, manualEffects, paused };
+  }
 
-    return { state: currentState, appliedEffects, manualEffects };
+  private updateCombatProgress(
+    queue: CombatEffectContinuation, outcome: ApplyOutcome, isAttacker: boolean,
+  ): CombatEffectContinuation {
+    const next = { ...queue };
+    if (outcome.cancelOpposingCard) {
+      if (isAttacker) next.defenderCardCancelled = true;
+      else next.attackerCardCancelled = true;
+    }
+    if (queue.stage === 'DURING_COMBAT') {
+      const field = isAttacker ? 'finalAttack' : 'finalDefense';
+      if (outcome.setValue !== undefined) next[field] = outcome.setValue;
+      if (outcome.valueDelta) next[field] += outcome.valueDelta;
+      if (outcome.preventDamage) {
+        if (isAttacker) next.preventDamageToAttacker = true;
+        else next.preventDamageToDefender = true;
+      }
+    }
+    return next;
   }
 
   // =========================================================================
@@ -345,16 +262,17 @@ export class CardEffectExecutorService {
       (e) => e.timing === EffectTiming.ON_PLAY || e.timing === EffectTiming.AFTER_COMBAT,
     );
 
-    let currentState = state;
+    let currentState = applyTerminalState(state);
     const appliedEffects: EffectResult[] = [];
     const manualEffects: string[] = [];
     const fighter = currentState.fighters.find((f) => f.ownerId === playerId && !f.isDefeated);
 
     for (const effect of onPlayEffects) {
+      if (currentState.phase === GamePhase.GAME_OVER) break;
       const context: EffectContext = { playerId, card, fighterId: fighter?.id };
       if (!(await this.passesWhen(currentState, effect, context))) continue;
       const outcome = await this.applyOneEffect(currentState, effect, context);
-      currentState = outcome.state;
+      currentState = applyTerminalState(outcome.state);
       appliedEffects.push(outcome.result);
       if (outcome.manual) manualEffects.push(outcome.manual);
     }
@@ -368,30 +286,44 @@ export class CardEffectExecutorService {
 
   /**
    * Применяет эффекты ОДНОЙ выбранной опции CHOOSE_ONE (резолв
-   * resolvePendingEffect). Контекст — не боевой ({playerId, card, fighter});
-   * комбо-зависимые эффекты (DAMAGE по сопернику и т.п.) к моменту выбора уже
-   * вне боя и уходят в manualEffects — распознанные опции (HEAL/DRAW/GAIN_ACTION)
-   * исполняются полностью. Вложенный MOVE/PLACE породит новый pendingEffect.
+   * resolvePendingEffect). Combat choices preserve their original participants,
+   * cancellation and numeric flags. Nested choices pause the remaining effects.
    */
   async executeChosenEffects(
     state: GameState,
     effects: readonly CardEffect[],
     playerId: string,
     card?: Card,
+    contextOverride?: EffectContext,
   ): Promise<OnPlayResult> {
-    let currentState = state;
+    let currentState = applyTerminalState(state);
     const appliedEffects: EffectResult[] = [];
     const manualEffects: string[] = [];
     const fighter = currentState.fighters.find((f) => f.ownerId === playerId && !f.isDefeated);
     const ctxCard = card ?? ({ id: 'choose-one', effects: [] } as unknown as Card);
 
-    for (const effect of effects) {
-      const context: EffectContext = { playerId, card: ctxCard, fighterId: fighter?.id };
+    for (let index = 0; index < effects.length; index++) {
+      const effect = effects[index];
+      if (currentState.phase === GamePhase.GAME_OVER) break;
+      const context: EffectContext = contextOverride ?? { playerId, card: ctxCard, fighterId: fighter?.id };
       if (!(await this.passesWhen(currentState, effect, context))) continue;
+      const pendingBefore = currentState.metadata.pendingEffects?.length ?? 0;
       const outcome = await this.applyOneEffect(currentState, effect, context);
-      currentState = outcome.state;
+      currentState = applyTerminalState(outcome.state);
       appliedEffects.push(outcome.result);
       if (outcome.manual) manualEffects.push(outcome.manual);
+      const continuation = currentState.metadata.combatEffectContinuation;
+      if (continuation && context.combat && currentState.phase !== GamePhase.GAME_OVER) {
+        const isAttacker = context.playerId === context.combat.attackerPlayerId;
+        let progress = this.updateCombatProgress(continuation, outcome, isAttacker);
+        const paused = (currentState.metadata.pendingEffects?.length ?? 0) > pendingBefore;
+        if (paused) progress = { ...progress, remaining: [
+          ...effects.slice(index + 1).map(effect => ({ effect, context, isAttacker })),
+          ...progress.remaining,
+        ] };
+        currentState = { ...currentState, metadata: { ...currentState.metadata, combatEffectContinuation: progress } };
+        if (paused) break;
+      }
     }
 
     return { state: currentState, appliedEffects, manualEffects };
@@ -417,14 +349,16 @@ export class CardEffectExecutorService {
     const handZone = state.handZones[playerId];
     if (!handZone) return state;
 
-    let currentState = state;
+    let currentState = applyTerminalState(state);
     for (const card of handZone.cards) {
+      if (currentState.phase === GamePhase.GAME_OVER) break;
       const effects = (card.effects ?? []).filter((e) => e.timing === timing);
       for (const effect of effects) {
+        if (currentState.phase === GamePhase.GAME_OVER) break;
         const context: EffectContext = { playerId, card };
         if (!(await this.passesWhen(currentState, effect, context))) continue;
         const outcome = await this.applyOneEffect(currentState, effect, context);
-        currentState = outcome.state;
+        currentState = applyTerminalState(outcome.state);
       }
     }
     return currentState;
@@ -600,6 +534,7 @@ export class CardEffectExecutorService {
           options: options.map((o, i) => ({ index: i, label: o.label })),
           optionEffects: options.map((o) => o.effects),
           card: context.card,
+          effectContext: context.combat ? context : undefined,
           text,
         };
         const next: GameState = {
@@ -620,11 +555,18 @@ export class CardEffectExecutorService {
       // резолвятся мутацией resolvePendingEffect, протухают в advanceTurn ---
       case EffectType.MOVE:
       case EffectType.PLACE: {
+        const fighterIds = await this.resolveTargets(state, effect, context);
+        // A defeated combatant cannot move or provide an old board position.
+        // PLACE may explicitly return a defeated sidekick, so keep its own flow.
+        if (effect.type === EffectType.MOVE && fighterIds.length === 0) {
+          return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'No valid targets' } };
+        }
         const text = effect.text ?? `${effect.type} ${value || ''}`.trim();
         const pending = {
           id: `${effect.id}-p${(state.metadata.pendingEffects?.length ?? 0)}`,
           type: effect.type === EffectType.MOVE ? ('MOVE' as const) : ('PLACE' as const),
           playerId: context.playerId,
+          fighterIds: context.combat && fighterIds.length ? fighterIds : undefined,
           value: value || undefined,
           fighterName: effect.fighterName,
           targetsOpponent: effect.target === EffectTarget.OPPOSING_FIGHTER,
@@ -717,8 +659,8 @@ export class CardEffectExecutorService {
       }
       case 'ADJACENT_TO_OPPONENT':
       case 'NOT_ADJACENT_TO_OPPONENT': {
-        const self = state.fighters.find((f) => f.id === context.fighterId);
-        const opp = state.fighters.find((f) => f.id === context.opposingFighterId);
+        const self = state.fighters.find((f) => f.id === context.fighterId && !f.isDefeated && f.health > 0);
+        const opp = state.fighters.find((f) => f.id === context.opposingFighterId && !f.isDefeated && f.health > 0);
         if (!self || !opp) return when.kind === 'NOT_ADJACENT_TO_OPPONENT';
         const adjacent = await this.adjacencyService.isAdjacent(
           state,
@@ -731,8 +673,8 @@ export class CardEffectExecutorService {
       case 'NOT_SHARES_ZONE_WITH_OPPONENT': {
         // мультизонность (C1): пересечение зон клеток (Ms. Marvel
         // «shares no zones with the opposing fighter»)
-        const self = state.fighters.find((f) => f.id === context.fighterId);
-        const opp = state.fighters.find((f) => f.id === context.opposingFighterId);
+        const self = state.fighters.find((f) => f.id === context.fighterId && !f.isDefeated && f.health > 0);
+        const opp = state.fighters.find((f) => f.id === context.opposingFighterId && !f.isDefeated && f.health > 0);
         if (!self || !opp) return when.kind === 'NOT_SHARES_ZONE_WITH_OPPONENT';
         const shares = this.adjacencyService.isInSameZone(state, self.position, opp.position);
         return when.kind === 'SHARES_ZONE_WITH_OPPONENT' ? shares : !shares;
@@ -747,7 +689,7 @@ export class CardEffectExecutorService {
         return start != null && (start.x !== fighter.position.x || start.y !== fighter.position.y);
       }
       case 'OPPONENT_IS_HERO': {
-        const opp = state.fighters.find((f) => f.id === context.opposingFighterId);
+        const opp = state.fighters.find((f) => f.id === context.opposingFighterId && !f.isDefeated && f.health > 0);
         return opp?.type === 'HERO';
       }
       default:
@@ -779,7 +721,7 @@ export class CardEffectExecutorService {
       case 'CARDS_IN_HAND':
         return state.handZones[context.playerId]?.cards.length ?? 0;
       case 'FRIENDLY_ADJACENT_TO_OPPONENT': {
-        const opp = state.fighters.find((f) => f.id === context.opposingFighterId);
+        const opp = state.fighters.find((f) => f.id === context.opposingFighterId && !f.isDefeated && f.health > 0);
         if (!opp) return 0;
         let count = 0;
         for (const f of state.fighters) {
@@ -818,10 +760,12 @@ export class CardEffectExecutorService {
     context: EffectContext,
   ): Promise<string[]> {
     const target = effect.target ?? EffectTarget.SELF;
+    const liveTarget = (id?: string): string[] =>
+      state.fighters.some((f) => f.id === id && !f.isDefeated && f.health > 0) ? [id!] : [];
 
     switch (target) {
       case EffectTarget.SELF: {
-        if (context.fighterId) return [context.fighterId];
+        if (context.fighterId) return liveTarget(context.fighterId);
         const fighter = state.fighters.find(
           (f) => f.ownerId === context.playerId && !f.isDefeated && f.health > 0,
         );
@@ -829,13 +773,13 @@ export class CardEffectExecutorService {
       }
 
       case EffectTarget.OPPOSING_FIGHTER:
-        return context.opposingFighterId ? [context.opposingFighterId] : [];
+        return liveTarget(context.opposingFighterId);
 
       case EffectTarget.ATTACKER:
-        return context.combat ? [context.combat.attackerFighterId] : [];
+        return liveTarget(context.combat?.attackerFighterId);
 
       case EffectTarget.DEFENDER:
-        return context.combat ? [context.combat.targetFighterId] : [];
+        return liveTarget(context.combat?.targetFighterId);
 
       case EffectTarget.ALL_ENEMIES:
         return state.fighters
@@ -848,7 +792,7 @@ export class CardEffectExecutorService {
           .map((f) => f.id);
 
       case EffectTarget.ENEMIES_ADJACENT_TO_SELF: {
-        const self = state.fighters.find((f) => f.id === context.fighterId);
+        const self = state.fighters.find((f) => f.id === context.fighterId && !f.isDefeated && f.health > 0);
         if (!self) return [];
         const result: string[] = [];
         for (const f of state.fighters) {
@@ -867,9 +811,10 @@ export class CardEffectExecutorService {
           ? state.fighters.find(
               (f) =>
                 f.ownerId === context.playerId &&
+                !f.isDefeated && f.health > 0 &&
                 this.nameMatches(f.name, effect.fighterName!),
             )
-          : state.fighters.find((f) => f.id === context.fighterId);
+          : state.fighters.find((f) => f.id === context.fighterId && !f.isDefeated && f.health > 0);
         if (!anchor) return [];
         const candidates: string[] = [];
         for (const f of state.fighters) {

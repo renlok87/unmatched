@@ -9,7 +9,8 @@
  */
 
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { GameState } from '../models/game-state.model';
+import { GameState, GamePhase } from '../models/game-state.model';
+import { applyTerminalState } from '../engine/terminal-state';
 import { Card, HandCard, DeckState, HandZone } from '../models/card.model';
 
 /**
@@ -55,6 +56,8 @@ export class DeckManagementService {
     userId: string,
     count: number,
   ): Promise<GameState> {
+    state = applyTerminalState(state);
+    if (state.phase === GamePhase.GAME_OVER) return state;
     this.logger.debug(`Drawing ${count} cards for user ${userId}`);
 
     let deck = state.decks[userId];
@@ -76,18 +79,16 @@ export class DeckManagementService {
         break;
       }
 
-      // Проверяем, нужно ли перетасовать сброс в колоду
+      // Every missing draw is one simultaneous exhaustion damage packet.
+      // Never recycle the discard pile. Stop before another draw after hero defeat.
       if (currentDrawPile.length === 0) {
-        this.logger.debug('Draw pile empty, recycling discard pile');
-        const recycleResult = await this.recycleDeck(state, userId);
-        state = recycleResult;
-        deck = state.decks[userId];
-        currentDrawPile = [...deck.drawPile];
-
-        if (currentDrawPile.length === 0) {
-          this.logger.debug('No cards to draw after recycling');
-          break;
-        }
+        state = applyTerminalState({
+          ...state,
+          fighters: state.fighters.map(f => f.ownerId === userId && f.health > 0 && !f.isDefeated
+            ? { ...f, health: Math.max(0, f.health - 2) } : f),
+        });
+        if (state.phase === GamePhase.GAME_OVER) break;
+        continue;
       }
 
       // Вытягиваем карту

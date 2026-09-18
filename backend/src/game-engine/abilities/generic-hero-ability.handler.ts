@@ -11,7 +11,8 @@
  */
 
 import type { GameState } from '../models/game-state.model';
-import { getActionsRemaining } from '../models/game-state.model';
+import { getActionsRemaining, GamePhase } from '../models/game-state.model';
+import { applyTerminalState } from '../engine/terminal-state';
 import type { Fighter } from '../models/fighter.model';
 import { FighterType } from '../models/fighter.model';
 import type { BoardState } from '../models/board.model';
@@ -390,6 +391,8 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     let current = state;
 
     for (const rule of this.rules) {
+      current = applyTerminalState(current);
+      if (current.phase === GamePhase.GAME_OVER) break;
       if (rule.trigger !== 'after-attack' && rule.trigger !== 'after-defense') continue;
       if (
         rule.effect.kind !== 'turn-effect' &&
@@ -450,6 +453,8 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     let current = state;
 
     for (const rule of this.rules) {
+      current = applyTerminalState(current);
+      if (current.phase === GamePhase.GAME_OVER) break;
       if (rule.trigger !== 'sidekick-defeated') continue;
       if (rule.effect.kind !== 'discard-random') continue;
 
@@ -499,6 +504,8 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     let current = state;
 
     for (const rule of this.rules) {
+      current = applyTerminalState(current);
+      if (current.phase === GamePhase.GAME_OVER) break;
       if (rule.trigger !== 'enemy-hero-left-my-zone') continue;
       if (rule.effect.kind !== 'reactive-damage') continue;
 
@@ -551,17 +558,7 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       ),
     };
 
-    if (becomesDefeated) {
-      const ownerStillAlive = current.fighters.some(
-        (f) => f.ownerId === target.ownerId && f.isDefeated !== true,
-      );
-      current = {
-        ...current,
-        players: current.players.map((p) =>
-          p.userId === target.ownerId ? { ...p, isAlive: ownerStillAlive } : p,
-        ),
-      };
-    }
+    current = applyTerminalState(current);
 
     return current;
   }
@@ -660,6 +657,8 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     let current = state;
 
     for (const rule of this.rules) {
+      current = applyTerminalState(current);
+      if (current.phase === GamePhase.GAME_OVER) break;
       if (rule.trigger !== trigger) continue;
       if (
         rule.effect.kind !== 'turn-effect' &&
@@ -724,6 +723,9 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       current = await this.deps.deck.drawCards(current, playerId, effect.draw);
     }
 
+    current = applyTerminalState(current);
+    if (current.phase === GamePhase.GAME_OVER) return current;
+
     // drawToHandSize N — добираем по дефициту (drawCards сам стопнется на пустой колоде)
     if (typeof effect.drawToHandSize === 'number') {
       const handSize = current.handZones[playerId]?.cards.length ?? 0;
@@ -732,6 +734,9 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
         current = await this.deps.deck.drawCards(current, playerId, deficit);
       }
     }
+
+    current = applyTerminalState(current);
+    if (current.phase === GamePhase.GAME_OVER) return current;
 
     // heal N — иммутабельный bump здоровья героя (min(maxHealth, health+N))
     if (typeof effect.heal === 'number' && effect.heal > 0) {
@@ -789,18 +794,9 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       ),
     };
 
-    // Пересчёт isAlive владельца повергнутого бойца (по обновлённым fighters).
-    if (becomesDefeated) {
-      const ownerStillAlive = current.fighters.some(
-        (f) => f.ownerId === target.ownerId && f.isDefeated !== true,
-      );
-      current = {
-        ...current,
-        players: current.players.map((p) =>
-          p.userId === target.ownerId ? { ...p, isAlive: ownerStillAlive } : p,
-        ),
-      };
-    }
+    current = applyTerminalState(current);
+
+    if (current.phase === GamePhase.GAME_OVER) return current;
 
     // thenDraw — только после реального попадания.
     if (typeof effect.thenDraw === 'number' && effect.thenDraw > 0) {

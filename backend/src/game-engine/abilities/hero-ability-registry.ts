@@ -6,7 +6,8 @@
  */
 
 import { Injectable, Logger } from '@nestjs/common';
-import { Fighter, Position } from '../models';
+import { Fighter, Position, GamePhase } from '../models';
+import { applyTerminalState } from '../engine/terminal-state';
 import type { GameState } from '../models/game-state.model';
 
 // Реэкспорт для использования в handler'ах
@@ -590,6 +591,8 @@ export class HeroAbilityRegistry {
     let next = state;
 
     for (const handler of this.extendedHandlers.values()) {
+      next = applyTerminalState(next);
+      if (next.phase === GamePhase.GAME_OVER) break;
       if (!handler.onFighterMoved) continue;
 
       try {
@@ -602,7 +605,7 @@ export class HeroAbilityRegistry {
       }
     }
 
-    return next;
+    return applyTerminalState(next);
   }
 
   /**

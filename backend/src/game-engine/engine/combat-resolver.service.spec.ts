@@ -303,7 +303,7 @@ describe('CombatResolverService', () => {
       expect(result.nextState.fighters.find((f) => f.id === 'fighter-2')?.health).toBe(8); // 10 - 2
     });
 
-    it('должен вычислить урон атакующему когда защита больше атаки', async () => {
+    it('не наносит ответный урон когда защита больше атаки', async () => {
       const attackCard = createMockCard('atk-1', { attackValue: 3 });
       const defenseCard = createMockCard('def-1', { defenseValue: 5, cardType: CardType.DEFENSE });
       const state = createGameStateWithCards(attackCard, defenseCard);
@@ -316,9 +316,9 @@ describe('CombatResolverService', () => {
         defenseCard.id,
       );
 
-      expect(result.attackerDamage).toBe(2); // 5 - 3 = 2
+      expect(result.attackerDamage).toBe(0);
       expect(result.defenderDamage).toBe(0);
-      expect(result.nextState.fighters.find((f) => f.id === 'fighter-1')?.health).toBe(8); // 10 - 2
+      expect(result.nextState.fighters.find((f) => f.id === 'fighter-1')?.health).toBe(10);
     });
 
     it('должен вернуть нулевой урон когда атака равна защите', async () => {
@@ -458,7 +458,7 @@ describe('CombatResolverService', () => {
         defenseCard.id,
       );
 
-      // 5 (атака) - (2 + 3) (защита с модификатором) = 0 урона, 2 урона атакующему
+      // 5 (атака) - (2 + 3) (защита с модификатором) = 0 урона
       expect(result.attackerDamage).toBe(0);
       expect(result.defenderDamage).toBe(0);
       expect(result.defenderEffectsApplied).toHaveLength(1);
@@ -664,7 +664,68 @@ describe('CombatResolverService', () => {
   // UNIT TESTS: ПРОВЕРКА ОКОНЧАНИЯ ИГРЫ
   // ===========================================================================
 
+  describe('S02 combat winner', () => {
+    it.each([
+      { attack: 2, defense: 5, prevent: false, damage: 0, winner: 'player-2' },
+      { attack: 4, defense: 4, prevent: false, damage: 0, winner: 'player-2' },
+      { attack: 5, defense: 2, prevent: false, damage: 3, winner: 'player-1' },
+      { attack: 5, defense: 2, prevent: true, damage: 0, winner: 'player-2' },
+    ])('attack $attack / defense $defense / prevent $prevent => $winner', async ({ attack, defense, prevent, damage, winner }) => {
+      const attackCard = createMockCard('attack', { attackValue: attack });
+      const defenseCard = createMockCard('defense', { defenseValue: defense });
+      const state = createGameStateWithCards(attackCard, defenseCard);
+      const result = await service.resolveCombat(state, 'fighter-1', 'fighter-2',
+        attackCard.id, defenseCard.id, { preventDamageToDefender: prevent });
+      expect(result.attackerDamage).toBe(0);
+      expect(result.defenderDamage).toBe(damage);
+      expect(result.winnerId).toBe(winner);
+      expect(result.nextState.fighters.map(f => f.health)).toEqual([10, 10 - damage]);
+    });
+  });
+
+  describe('S02 hero defeat', () => {
+    it('ends the duel when the hero dies with a living sidekick', async () => {
+      const attackCard = createMockCard('lethal', { attackValue: 10 });
+      const base = createGameStateWithCards(attackCard);
+      const state = { ...base, fighters: [...base.fighters, {
+        ...base.fighters[1], id: 'sidekick', type: FighterType.MINION, health: 5,
+      }] };
+      const result = await service.resolveCombat(state, 'fighter-1', 'fighter-2', attackCard.id);
+      expect(result.nextState.phase).toBe(GamePhase.GAME_OVER);
+      expect(result.nextState.metadata.winnerId).toBe('player-1');
+      expect(result.nextState.players[1].isAlive).toBe(false);
+      expect(result.nextState.fighters.find(f => f.id === 'sidekick')?.health).toBe(5);
+      expect(state.fighters[1].health).toBe(10);
+    });
+
+    it('keeps the duel alive when only a sidekick dies', async () => {
+      const attackCard = createMockCard('lethal', { attackValue: 10 });
+      const base = createGameStateWithCards(attackCard);
+      const state = { ...base, fighters: [...base.fighters, {
+        ...base.fighters[1], id: 'sidekick', type: FighterType.MINION, health: 5,
+      }] };
+      const result = await service.resolveCombat(state, 'fighter-1', 'sidekick', attackCard.id);
+      expect(result.nextState.phase).not.toBe(GamePhase.GAME_OVER);
+      expect(result.nextState.players[1].isAlive).toBe(true);
+      expect(result.nextState.fighters.find(f => f.id === 'sidekick')?.health).toBe(0);
+    });
+
+    it('rejects combat after the duel has ended', async () => {
+      const state = createMockGameState({ phase: GamePhase.GAME_OVER });
+      await expect(service.resolveCombat(state, 'fighter-1', 'fighter-2', 'attack'))
+        .rejects.toThrow('Game is over');
+      expect(mockAbilityRegistry.applyCombatModifiers).not.toHaveBeenCalled();
+    });
+  });
+
   describe('checkGameOver', () => {
+    it('detects a defeated hero even when the stored player flag is stale', () => {
+      const base = createMockGameState();
+      const state = { ...base, fighters: base.fighters.map(f =>
+        f.id === 'fighter-2' ? { ...f, health: 0 } : f) };
+      expect(service.checkGameOver(state)).toEqual({ isOver: true, winnerId: 'player-1' });
+    });
+
     it('должен вернуть isOver: false когда больше 1 живого игрока', () => {
       const state = createMockGameState();
       const result = service.checkGameOver(state);
@@ -695,7 +756,10 @@ describe('CombatResolverService', () => {
         ],
       });
 
-      const result = service.checkGameOver(state);
+      // Player flags mirror the authoritative hero HP in a valid fixture.
+      const result = service.checkGameOver({ ...state, fighters: state.fighters.map(f => ({
+        ...f, health: state.players.find(p => p.userId === f.ownerId)?.isAlive ? f.health : 0,
+      })) });
 
       expect(result.isOver).toBe(true);
       expect(result.winnerId).toBe('player-1');
@@ -723,7 +787,10 @@ describe('CombatResolverService', () => {
         ],
       });
 
-      const result = service.checkGameOver(state);
+      // Player flags mirror the authoritative hero HP in a valid fixture.
+      const result = service.checkGameOver({ ...state, fighters: state.fighters.map(f => ({
+        ...f, health: state.players.find(p => p.userId === f.ownerId)?.isAlive ? f.health : 0,
+      })) });
 
       expect(result.isOver).toBe(true);
       expect(result.winnerId).toBeUndefined();

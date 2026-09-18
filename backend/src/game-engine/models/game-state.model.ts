@@ -8,6 +8,7 @@
 import type { Fighter } from './fighter.model';
 import type { Card, CardEffect, DeckState, HandZone } from './card.model';
 import type { BoardState } from './board.model';
+import type { CombatResolutionProgress } from '../engine/combat-progress';
 
 /**
  * Фазы игры
@@ -85,6 +86,51 @@ export interface CombatState {
 }
 
 /**
+ * Контекст боя для эффектов. Бойцы и игроки — РАЗНЫЕ id:
+ * attackerFighterId/targetFighterId — из fighters, *PlayerId — userId.
+ */
+export interface CombatContext {
+  readonly attackerFighterId: string;
+  readonly targetFighterId: string;
+  readonly attackerPlayerId: string;
+  readonly defenderPlayerId: string;
+  readonly attackCardId: string;
+  readonly defenseCardId?: string;
+  readonly attackValue: number;
+  readonly defenseValue: number;
+}
+
+/**
+ * Контекст выполнения эффекта (одна сторона)
+ */
+export interface EffectContext {
+  readonly playerId: string;
+  readonly card: Card;
+  /** Боец, который играет карту (атакующий или цель атаки) */
+  readonly fighterId?: string;
+  /** Боец-противник в бою */
+  readonly opposingFighterId?: string;
+  readonly combat?: CombatContext;
+  /** Исход боя (известен только в AFTER_COMBAT): победила ли ЭТА сторона */
+  readonly wonCombat?: boolean;
+  /** Урон, нанесённый/полученный этой стороной (для count DAMAGE_*) */
+  readonly damageDealt?: number;
+  readonly damageTaken?: number;
+}
+
+/** A serializable, ordered combat stage paused for a player choice. */
+export interface CombatEffectContinuation {
+  readonly stage: 'ON_REVEAL' | 'DURING_COMBAT' | 'AFTER_COMBAT';
+  readonly remaining: readonly { effect: CardEffect; context: EffectContext; isAttacker: boolean }[];
+  readonly attackerCardCancelled: boolean;
+  readonly defenderCardCancelled: boolean;
+  readonly finalAttack: number;
+  readonly finalDefense: number;
+  readonly preventDamageToAttacker: boolean;
+  readonly preventDamageToDefender: boolean;
+}
+
+/**
  * Метаданные состояния
  */
 export interface GameStateMetadata {
@@ -93,6 +139,8 @@ export interface GameStateMetadata {
   readonly version: number;
   readonly compressed?: boolean; // Опционально: сжатие для оптимизации
   // Фактический контракт executor'а/guard'ов (раньше писался через "as any"):
+  readonly combatResolutionProgress?: CombatResolutionProgress;
+  readonly combatEffectContinuation?: CombatEffectContinuation;
   readonly combatInfo?: CombatState; // Текущий бой (между attack и resolveCombat)
   readonly passCount?: number; // Счётчик pass-действий
   readonly winnerId?: string; // Победитель (заполняется при GAME_OVER)
@@ -126,11 +174,14 @@ export interface GameStateMetadata {
 
 /**
  * Эффект карты, требующий выбора игрока (C2).
- * Не блокирует другие действия (в Unmatched такие эффекты опциональны —
- * «You may move…»); нерезолвленные чистятся в advanceTurn.
+ * During combat the pending choice blocks the remaining combat chain and actions.
+ * Other legacy pending effects retain their existing turn-expiry behavior.
  */
 export interface PendingEffect {
   readonly id: string;
+  /** Combat choices retain exact participants and effect context across resume. */
+  readonly fighterIds?: readonly string[];
+  readonly effectContext?: EffectContext;
   /**
    * 'MOVE' (до value шагов) | 'PLACE' (любая свободная клетка) |
    * 'CHOOSE_ONE' (игрок выбирает chooseCount опций из options)

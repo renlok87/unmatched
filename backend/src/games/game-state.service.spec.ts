@@ -6,7 +6,7 @@ import { RedisService } from '../redis/redis.service';
 import { GameSubscriptionService } from './game-subscription.service';
 import { GamePhase } from './dto/create-game.dto';
 import { ConcurrentModificationException } from './exceptions/game.exceptions';
-import { CardType, FighterType, createEmptyBoardState } from '../game-engine/models';
+import { CardType, FighterType, EffectType, EffectTiming, createEmptyBoardState } from '../game-engine/models';
 
 describe('GameStateService', () => {
   let service: GameStateService;
@@ -629,6 +629,92 @@ describe('GameStateService', () => {
       const seqNum = await service.getSequenceNumber('nonexistent');
 
       expect(seqNum).toBe(0);
+    });
+  });
+
+  describe('S02 paused combat persistence', () => {
+    const pausedState = (): GameState => ({
+      ...mockGameState,
+      phase: GamePhase.COMBAT_RESOLVE,
+      metadata: {
+        ...mockGameState.metadata,
+        pendingEffects: [{ id: 'choice-1', type: 'MOVE', playerId: 'player2', value: 2 }],
+        combatEffectContinuation: {
+          stage: 'AFTER_COMBAT', attackerCardCancelled: true, defenderCardCancelled: false,
+          finalAttack: 5, finalDefense: 3, preventDamageToAttacker: false, preventDamageToDefender: true,
+          remaining: [{
+            effect: { id: 'draw', type: EffectType.DRAW_CARD, timing: EffectTiming.AFTER_COMBAT, value: 1 },
+            isAttacker: false,
+            context: {
+              playerId: 'player2', fighterId: 'fighter2', opposingFighterId: 'fighter1',
+              card: { id: 'defense::1', cardId: 'defense', name: 'Defense', nameEn: 'Defense', nameRu: 'Защита', cardType: CardType.DEFENSE, effects: [] },
+              wonCombat: true, damageDealt: 0, damageTaken: 0,
+              combat: { attackerFighterId: 'fighter1', targetFighterId: 'fighter2',
+                attackerPlayerId: 'player1', defenderPlayerId: 'player2', attackCardId: 'attack::1',
+                defenseCardId: 'defense::1', attackValue: 5, defenseValue: 3 },
+            },
+          }],
+        },
+        combatResolutionProgress: {
+          defeatedBefore: ['sidekick1'],
+          reveal: { attackerCardCancelled: true, defenderCardCancelled: false, appliedEffects: [], manualEffects: [] },
+          damage: { finalAttack: 5, finalDefense: 3, attackerDamage: 0, defenderDamage: 0, attackerWon: false },
+          after: { appliedEffects: [], manualEffects: [], paused: true },
+        },
+      },
+    });
+
+    it('retains ordered contexts, cancellation, numerical outcomes and progress through stored JSON', () => {
+      const state = pausedState();
+      const restored = service.deserialize(JSON.parse(JSON.stringify(service.serialize(state))));
+      expect(restored.phase).toBe(GamePhase.COMBAT_RESOLVE);
+      expect(restored.metadata.combatEffectContinuation).toEqual(state.metadata.combatEffectContinuation);
+      expect(restored.metadata.combatResolutionProgress).toEqual(state.metadata.combatResolutionProgress);
+      expect(restored.metadata.pendingEffects).toEqual(state.metadata.pendingEffects);
+    });
+
+    it('does not expose internal continuation payloads in player-filtered state', () => {
+      const state = pausedState();
+      const filtered = service.filterPrivateData(state, 'player1');
+      expect(filtered.metadata.combatEffectContinuation).toBeUndefined();
+      expect(filtered.metadata.combatResolutionProgress).toBeUndefined();
+      expect(filtered.metadata.pendingEffects).toEqual(state.metadata.pendingEffects);
+      expect(state.metadata.combatEffectContinuation).toBeDefined();
+    });
+
+    it('persists the complete server continuation to the database and cache', async () => {
+      const state = pausedState();
+      const upsert = jest.fn().mockResolvedValue({});
+      jest.spyOn(prisma, '$transaction').mockImplementation(async (callback: any) => callback({
+        gameState: { findUnique: jest.fn().mockResolvedValue(null), upsert },
+        game: { update: jest.fn().mockResolvedValue({}) },
+      }));
+      await service.saveState(state.gameId, state);
+      const stored = service.deserialize(JSON.parse(JSON.stringify(upsert.mock.calls[0][0].create.state)));
+      expect(stored.metadata.combatEffectContinuation).toEqual(state.metadata.combatEffectContinuation);
+      expect(stored.metadata.combatResolutionProgress).toEqual(state.metadata.combatResolutionProgress);
+      const cached = (redis.setJsonex as jest.Mock).mock.calls[0][2];
+      expect(cached.metadata.combatEffectContinuation).toEqual(state.metadata.combatEffectContinuation);
+      expect(cached.metadata.combatResolutionProgress).toEqual(state.metadata.combatResolutionProgress);
+    });
+
+    it('omits server continuation from every subscription publication without changing saved state', async () => {
+      const state = pausedState();
+      const publish = jest.fn().mockResolvedValue(1);
+      const subscriptions = new GameSubscriptionService({ publish } as unknown as RedisService);
+      await subscriptions.publishGameUpdate(state.gameId, 'STATE_UPDATED', state);
+      const event = JSON.parse(publish.mock.calls[0][1]);
+      expect(event.gameState.metadata.combatEffectContinuation).toBeUndefined();
+      expect(event.gameState.metadata.combatResolutionProgress).toBeUndefined();
+      expect(event.gameState.metadata.pendingEffects).toEqual(state.metadata.pendingEffects);
+      expect(state.metadata.combatEffectContinuation).toBeDefined();
+      expect(state.metadata.combatResolutionProgress).toBeDefined();
+    });
+
+    it('accepts legacy saves without continuation fields', () => {
+      const restored = service.deserialize(JSON.parse(JSON.stringify(service.serialize(mockGameState))));
+      expect(restored.metadata.combatEffectContinuation).toBeUndefined();
+      expect(restored.metadata.combatResolutionProgress).toBeUndefined();
     });
   });
 
