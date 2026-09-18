@@ -45,7 +45,8 @@ export class DeckManagementService {
   // из карт героя в БД (hero.cards × count)
 
   /**
-   * Вытягивание указанного количества карт
+   * Вытягивание указанного количества карт. Лимит руки применяется только
+   * в конце хода: он не отменяет добор или урон от истощения.
    * @param state Текущее состояние
    * @param userId ID пользователя
    * @param count Количество карт для вытягивания
@@ -60,25 +61,17 @@ export class DeckManagementService {
     if (state.phase === GamePhase.GAME_OVER) return state;
     this.logger.debug(`Drawing ${count} cards for user ${userId}`);
 
-    let deck = state.decks[userId];
+    const deck = state.decks[userId];
     const handZone = state.handZones[userId];
 
     if (!deck || !handZone) {
       throw new NotFoundException(`Deck or hand zone not found for user ${userId}`);
     }
 
-    let currentDrawPile = [...deck.drawPile];
-    let currentHand = [...handZone.cards];
-    let deckState = { ...deck };
-    const drawnCards: Card[] = [];
+    const currentDrawPile = [...deck.drawPile];
+    const currentHand = [...handZone.cards];
 
     for (let i = 0; i < count; i++) {
-      // Проверяем лимит руки
-      if (currentHand.length >= handZone.maxSize) {
-        this.logger.debug(`Hand is full (${currentHand.length}/${handZone.maxSize})`);
-        break;
-      }
-
       // Every missing draw is one simultaneous exhaustion damage packet.
       // Never recycle the discard pile. Stop before another draw after hero defeat.
       if (currentDrawPile.length === 0) {
@@ -93,7 +86,6 @@ export class DeckManagementService {
 
       // Вытягиваем карту
       const card = currentDrawPile.shift()!;
-      drawnCards.push(card);
 
       // Добавляем в руку (видимая для владельца)
       currentHand.push({
@@ -103,8 +95,8 @@ export class DeckManagementService {
     }
 
     // Обновляем состояние колоды
-    deckState = {
-      ...deckState,
+    const deckState: DeckState = {
+      ...deck,
       drawPile: currentDrawPile,
       topCard: currentDrawPile[0],
     };
@@ -277,12 +269,12 @@ export class DeckManagementService {
   }
 
   /**
-   * Проверка, может ли игрок вытянуть ещё карту
+   * Проверка возможности выполнить требуемый добор. Пустая колода
+   * разрешена: drawCards применит истощение; полная рука не ограничивает добор.
    */
   canDrawCard(state: GameState, userId: string): boolean {
-    const handZone = state.handZones[userId];
-    if (!handZone) return false;
-    return handZone.cards.length < handZone.maxSize;
+    return Boolean(state.handZones[userId] && state.decks[userId]) &&
+      applyTerminalState(state).phase !== GamePhase.GAME_OVER;
   }
 
 }

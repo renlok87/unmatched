@@ -429,6 +429,28 @@ describe('CardEffectExecutorService (A3)', () => {
       expect(after.state.handZones.p1.cards.map((c) => c.id)).toContain('atk');
     });
 
+    it('RETURN_TO_HAND возвращает восьмую карту до проверки лимита в конце хода', async () => {
+      const atk = card('atk', [
+        eff({ type: EffectType.RETURN_TO_HAND, when: { kind: 'WON_COMBAT' } }),
+      ]);
+      const hand = Array.from({ length: 7 }, (_, i) => ({ ...card(`hand-${i}`, []), isVisible: true }));
+      const discarded = card('other-discard', []);
+      const state = makeState({
+        handZones: { ...makeState().handZones, p1: { cards: hand, maxSize: 7 } },
+        discardPiles: { p1: [discarded, atk], p2: [] },
+      });
+
+      const after = await service.executeAfterCombatEffects(state, atk, null, combat, {
+        attackerWon: true, attackerDamage: 0, defenderDamage: 1,
+      });
+
+      expect(after.state.handZones.p1.cards).toEqual([...hand, { ...atk, isVisible: true }]);
+      expect(after.state.discardPiles.p1).toEqual([discarded]);
+      expect(after.state.sequenceNumber).toBe(state.sequenceNumber);
+      expect(state.handZones.p1.cards).toHaveLength(7);
+      expect(state.discardPiles.p1).toEqual([discarded, atk]);
+    });
+
     it('HEAL не превышает maxHealth', async () => {
       const atk = card('atk', [
         eff({ type: EffectType.HEAL, value: 99, target: EffectTarget.SELF }),

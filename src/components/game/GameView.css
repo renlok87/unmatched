@@ -193,3 +193,88 @@
     width: 100%;
   }
 }
+
+.game-view__statusbar {
+  flex-wrap: wrap;
+}
+
+.game-view__resource-panel {
+  margin: 8px 16px;
+  padding: 16px;
+  border: 1px solid rgba(225, 173, 78, 0.55);
+  border-left: 4px solid #e1ad4e;
+  background: rgba(225, 173, 78, 0.08);
+  color: var(--color-white);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 14px;
+}
+
+.game-view__resource-heading {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.game-view__resource-heading span,
+.game-view__resource-panel p {
+  opacity: 0.8;
+  margin: 0;
+}
+
+.game-view__resource-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 100%;
+}
+
+.game-view__resource-field select {
+  background: #171b25;
+  color: #fff;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  max-width: 100%;
+}
+
+.game-view__maneuver-routes {
+  flex-basis: 100%;
+  margin: 0;
+  padding-left: 22px;
+}
+
+.game-view__maneuver-routes li {
+  margin: 6px 0;
+}
+
+.game-view__discard-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.game-view__discard-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+}
+
+.game-view__discard-card:has(input:checked) {
+  border-color: #e1ad4e;
+  background: rgba(225, 173, 78, 0.14);
+}
+
+.game-view__discard-card small {
+  display: block;
+  opacity: 0.7;
+  margin-top: 4px;
+}

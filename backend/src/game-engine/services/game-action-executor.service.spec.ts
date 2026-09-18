@@ -333,6 +333,8 @@ describe('GameActionExecutorService', () => {
     it('should execute maneuver successfully', async () => {
       const state = createMockGameState({
         phase: GamePhase.ACTION_MANEUVER,
+        metadata: { ...createMockGameState().metadata, actionsRemaining: 1,
+          pendingManeuver: { id: 'maneuver-1', playerId: 'player1' } },
         handZones: {
           player1: {
             cards: [{ id: 'card1', cardId: 'card1', cardType: 'ATTACK' as any, value: 2 } as any],
@@ -344,9 +346,10 @@ describe('GameActionExecutorService', () => {
 
       const dto: ManeuverDto = {
         gameId: 'test-game-1',
+        maneuverId: 'maneuver-1',
         fighterId: 'fighter1',
         cardId: 'card1',
-        path: [{ x: 5, y: 5 }, { x: 5, y: 6 }],
+        path: [{ x: 5, y: 6 }],
       };
 
       const context: ActionContext = {
@@ -372,13 +375,15 @@ describe('GameActionExecutorService', () => {
     it('should return error when validation fails', async () => {
       const state = createMockGameState({
         phase: GamePhase.ACTION_MANEUVER,
+        metadata: { ...createMockGameState().metadata, actionsRemaining: 1,
+          pendingManeuver: { id: 'maneuver-1', playerId: 'player1' } },
       });
 
       const dto: ManeuverDto = {
         gameId: 'test-game-1',
+        maneuverId: 'maneuver-1',
         fighterId: 'fighter1',
-        cardId: 'card1',
-        path: [{ x: 5, y: 5 }, { x: 5, y: 6 }],
+        path: [{ x: 5, y: 6 }],
       };
 
       const context: ActionContext = {
@@ -402,10 +407,13 @@ describe('GameActionExecutorService', () => {
     it('отказ: конечная клетка пути занята другим бойцом (C3 — движение без movementService)', async () => {
       const state = createMockGameState({
         phase: GamePhase.ACTION_MANEUVER,
+        metadata: { ...createMockGameState().metadata, actionsRemaining: 1,
+          pendingManeuver: { id: 'maneuver-1', playerId: 'player1' } },
       });
 
       const dto: ManeuverDto = {
         gameId: 'test-game-1',
+        maneuverId: 'maneuver-1',
         fighterId: 'fighter1',
         // fighter2 стоит на (6,5) — конечная клетка занята
         path: [{ x: 6, y: 5 }],
@@ -425,7 +433,7 @@ describe('GameActionExecutorService', () => {
   });
 
   describe('executeMoveFighter', () => {
-    it('should execute move fighter successfully', async () => {
+    it('rejects movement that would bypass the mandatory maneuver draw', async () => {
       const state = createMockGameState({
         phase: GamePhase.ACTION_MANEUVER,
       });
@@ -443,28 +451,26 @@ describe('GameActionExecutorService', () => {
         currentState: state,
       };
 
+      const before = JSON.stringify(state);
       const result = await service.executeMoveFighter(dto, context);
 
-      expect(result.success).toBe(true);
-      expect(result.gameState).toBeDefined();
-      expect(result.metadata?.action).toBe('moveFighter');
-      expect(movementService.executeMovement).toHaveBeenCalledWith(
-        state as any,
-        'fighter1',
-        [{ x: 5, y: 6 }],
-      );
+      expect(result.success).toBe(false);
+      expect(result.gameState).toBeUndefined();
+      expect(JSON.stringify(state)).toBe(before);
+      expect(movementService.executeMovement).not.toHaveBeenCalled();
     });
 
-    it('should return error when validation fails', async () => {
+    it('preserves fighter ownership validation in the staged maneuver replacement', async () => {
       const state = createMockGameState({
         phase: GamePhase.ACTION_MANEUVER,
+        metadata: { ...createMockGameState().metadata, actionsRemaining: 1,
+          pendingManeuver: { id: 'maneuver-1', playerId: 'player1' } },
       });
 
-      const dto: MoveFighterDto = {
+      const dto: ManeuverDto = {
         gameId: 'test-game-1',
-        fighterId: 'fighter1',
-        x: 5,
-        y: 6,
+        maneuverId: 'maneuver-1',
+        moves: [{ fighterId: 'fighter2', path: [{ x: 6, y: 6 }] }],
       };
 
       const context: ActionContext = {
@@ -473,13 +479,13 @@ describe('GameActionExecutorService', () => {
         currentState: state,
       };
 
-      jest.spyOn(rulesValidator, 'validateMovement').mockReturnValue({
+      jest.spyOn(rulesValidator, 'validateManeuver').mockReturnValue({
         valid: false,
         error: 'Not your fighter',
         code: 'NOT_YOUR_FIGHTER',
       });
 
-      const result = await service.executeMoveFighter(dto, context);
+      const result = await service.executeManeuver(dto, context);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Not your fighter');
@@ -680,6 +686,7 @@ describe('GameActionExecutorService', () => {
     it('should execute end turn successfully', async () => {
       const state = createMockGameState({
         phase: GamePhase.ACTION_MANEUVER,
+        metadata: { ...createMockGameState().metadata, actionsRemaining: 0 },
       });
 
       const dto: EndTurnDto = {
@@ -705,6 +712,7 @@ describe('GameActionExecutorService', () => {
     it('should skip dead players when finding next player', async () => {
       const state = createMockGameState({
         phase: GamePhase.ACTION_MANEUVER,
+        metadata: { ...createMockGameState().metadata, actionsRemaining: 0 },
         fighters: [
           ...createMockGameState().fighters.map(f => f.ownerId === 'player2'
             ? { ...f, health: 0, isDefeated: true } : f),
@@ -758,6 +766,7 @@ describe('GameActionExecutorService', () => {
     it('should return error when validation fails', async () => {
       const state = createMockGameState({
         phase: GamePhase.ACTION_MANEUVER,
+        metadata: { ...createMockGameState().metadata, actionsRemaining: 0 },
       });
 
       const dto: EndTurnDto = {
@@ -784,9 +793,10 @@ describe('GameActionExecutorService', () => {
   });
 
   describe('executePass', () => {
-    it('should execute pass successfully', async () => {
+    it.each([2, 1, 0])('rejects free pass with %i actions without changing resources', async (actionsRemaining) => {
       const state = createMockGameState({
         phase: GamePhase.ACTION_MANEUVER,
+        metadata: { ...createMockGameState().metadata, actionsRemaining },
       });
 
       const dto: PassDto = {
@@ -799,38 +809,12 @@ describe('GameActionExecutorService', () => {
         currentState: state,
       };
 
-      const result = await service.executePass(dto, context);
-
-      expect(result.success).toBe(true);
-      expect(result.gameState).toBeDefined();
-      expect(result.metadata?.action).toBe('pass');
-    });
-
-    it('should return error when validation fails', async () => {
-      const state = createMockGameState({
-        phase: GamePhase.ACTION_MANEUVER,
-      });
-
-      const dto: PassDto = {
-        gameId: 'test-game-1',
-      };
-
-      const context: ActionContext = {
-        userId: 'player1',
-        gameId: 'test-game-1',
-        currentState: state,
-      };
-
-      jest.spyOn(rulesValidator, 'validatePass').mockReturnValue({
-        valid: false,
-        error: 'Already passed',
-        code: 'ALREADY_PASSED',
-      });
-
+      const before = JSON.stringify(state);
       const result = await service.executePass(dto, context);
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Already passed');
+      expect(result.gameState).toBeUndefined();
+      expect(JSON.stringify(state)).toBe(before);
     });
   });
 

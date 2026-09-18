@@ -175,6 +175,18 @@ export const MANEUVER = `
   }
 `;
 
+export const BEGIN_MANEUVER = `
+  mutation BeginManeuver($input: BeginManeuverDto!) {
+    beginManeuver(input: $input) { ${MUTATION_RESULT} }
+  }
+`;
+
+export const DISCARD_TO_LIMIT = `
+  mutation DiscardToLimit($input: DiscardToLimitDto!) {
+    discardToLimit(input: $input) { ${MUTATION_RESULT} }
+  }
+`;
+
 export const ATTACK = `
   mutation Attack($input: AttackDto!) {
     attack(input: $input) { ${MUTATION_RESULT} }

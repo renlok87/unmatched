@@ -10,6 +10,8 @@ import {
   IsString,
   IsInt,
   IsArray,
+  ArrayNotEmpty,
+  ArrayUnique,
   ValidateNested,
   Min,
   Max,
@@ -93,10 +95,30 @@ export class ManeuverMoveInput {
 }
 
 @InputType()
+export class BeginManeuverDto {
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
+  gameId: string;
+
+  /** Prevent a retried begin request from drawing again after completion. */
+  @Field(() => Int)
+  @IsInt()
+  @Min(0)
+  expectedSequenceNumber: number;
+}
+
+@InputType()
 export class ManeuverDto {
   @Field(() => String)
   @IsNotEmpty()
   gameId: string;
+
+  /** Identity returned by beginManeuver; completes that already-drawn action. */
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
+  maneuverId: string;
 
   /** @deprecated Legacy-одиночный режим: используй moves[] */
   @Field(() => String, { nullable: true })
@@ -134,6 +156,28 @@ export class ManeuverDto {
   @ValidateNested({ each: true })
   @Type(() => PositionInput)
   path?: PositionInput[];
+}
+
+@InputType()
+export class DiscardToLimitDto {
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
+  gameId: string;
+
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
+  pendingId: string;
+
+  /** Exact card instance IDs, never catalog card IDs. */
+  @Field(() => [String])
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayUnique()
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  cardIds: string[];
 }
 
 /**

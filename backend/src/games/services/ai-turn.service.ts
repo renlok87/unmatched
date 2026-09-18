@@ -116,10 +116,24 @@ export class AiTurnService {
       case 'maneuver':
         return {
           result: await this.executor.executeManeuver(
-            { gameId, fighterId: action.fighterId, path: action.path, boostCardId: null } as any,
+            { gameId, maneuverId: action.maneuverId, moves: action.moves, boostCardId: action.boostCardId },
             ctx,
           ),
-          eventType: 'FIGHTER_MOVED',
+          eventType: 'MANEUVER',
+        };
+      case 'beginManeuver':
+        return {
+          result: await this.executor.executeBeginManeuver(
+            { gameId, expectedSequenceNumber: action.expectedSequenceNumber }, ctx,
+          ),
+          eventType: 'MANEUVER',
+        };
+      case 'discardToLimit':
+        return {
+          result: await this.executor.executeDiscardToLimit(
+            { gameId, pendingId: action.pendingId, cardIds: action.cardIds }, ctx,
+          ),
+          eventType: 'CARD_DISCARDED',
         };
       case 'resolveChoose':
         return {

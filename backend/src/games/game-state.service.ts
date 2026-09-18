@@ -70,6 +70,8 @@ export interface SerializedGameState {
     wi?: string; // winnerId
     tsp?: Record<string, { x: number; y: number }>; // turnStartPositions (MOVED_THIS_TURN)
     pe?: readonly unknown[]; // pendingEffects — выборы игрока (C2)
+    pm?: GameStateMetadata['pendingManeuver'];
+    phd?: GameStateMetadata['pendingHandDiscard'];
     // Per-turn флаги действий (TASK): сбрасываются в advanceTurn, читаются
     // combat-условиями способностей. Раньше отсутствовали — round-trip обязателен.
     mt?: boolean; // maneuveredThisTurn
@@ -364,6 +366,8 @@ export class GameStateService {
         wi: state.metadata.winnerId,
         tsp: state.metadata.turnStartPositions as Record<string, { x: number; y: number }> | undefined,
         pe: state.metadata.pendingEffects,
+        pm: state.metadata.pendingManeuver,
+        phd: state.metadata.pendingHandDiscard,
         cc: state.metadata.combatEffectContinuation,
         cp: state.metadata.combatResolutionProgress,
         // Per-turn флаги действий (TASK)
@@ -479,6 +483,8 @@ export class GameStateService {
         winnerId: data.m.wi,
         turnStartPositions: data.m.tsp,
         pendingEffects: data.m.pe,
+        pendingManeuver: data.m.pm,
+        pendingHandDiscard: data.m.phd,
         combatEffectContinuation: data.m.cc,
         combatResolutionProgress: data.m.cp,
         // Per-turn флаги действий (TASK): undefined прозрачно проходит (легаси)
@@ -494,11 +500,19 @@ export class GameStateService {
   /**
    * Отфильтровать приватные данные для конкретного игрока
    * - Скрывает карты в руке соперника
-   * - Скрывает верхнюю карту колоды соперника
-   * - Скрывает содержимое сброса соперника
+   * - Скрывает порядок и верхнюю карту обеих колод, сохраняя их размеры
    */
   filterPrivateData(state: GameState, playerId: string): GameState {
     // Иммутабельно: собираем новые handZones/decks спредами (engine-GameState readonly)
+    // An allowlist avoids leaking instance/catalog IDs, type, banner or future fields.
+    const hiddenCard = (_card: Card, index: number): Card => ({
+      id: `hidden-${index}`,
+      cardId: 'hidden',
+      name: '???',
+      nameEn: 'Hidden',
+      nameRu: 'Скрыто',
+      cardType: CardType.UNIVERSAL,
+    });
 
     // Фильтруем руки других игроков
     const handZones = Object.fromEntries(
@@ -510,19 +524,8 @@ export class GameStateService {
           userId,
           {
             ...hand,
-            cards: hand.cards.map((card) => ({
-              ...card,
-              id: card.id,
-              cardType: card.cardType,
-              // Скрываем детали карты
-              name: '???',
-              nameEn: 'Hidden',
-              nameRu: 'Скрыто',
-              attackValue: undefined,
-              defenseValue: undefined,
-              boostValue: undefined,
-              effects: undefined,
-              text: undefined,
+            cards: hand.cards.map((card, index) => ({
+              ...hiddenCard(card, index),
               isVisible: false,
             })),
           },
@@ -530,12 +533,16 @@ export class GameStateService {
       }),
     );
 
-    // Фильтруем колоды других игроков
+    // Even the owner cannot know the next card before beginning a maneuver.
+    // Keep array lengths for existing clients; placeholders contain no card identity.
     const decks = Object.fromEntries(
       Object.entries(state.decks).map(([userId, deck]) =>
-        userId === playerId
-          ? ([userId, deck] as const)
-          : ([userId, { ...deck, topCard: undefined }] as const),
+        [userId, {
+          ...deck,
+          cards: deck.cards.map(hiddenCard),
+          drawPile: deck.drawPile.map(hiddenCard),
+          topCard: undefined,
+        }] as const,
       ),
     );
 
@@ -581,7 +588,7 @@ export class GameStateService {
       handZones: playerIds.reduce(
         (acc, uid) => ({
           ...acc,
-          [uid]: { cards: [], maxSize: 5 },
+          [uid]: { cards: [], maxSize: 7 },
         }),
         {},
       ),

@@ -71,20 +71,65 @@ describe('AiDecisionService', () => {
     expect(svc.decide(st, AI)).toMatchObject({ kind: 'attack', cardId: 'atk' });
   });
 
-  it('ход бота, враг далеко → manoeuvre на всю дальность движения к врагу', () => {
-    const d = svc.decide(makeState(), AI);
+  it('begins maneuver before choosing movement from the post-draw hand', () => {
+    expect(svc.decide(makeState(), AI)).toEqual({ kind: 'beginManeuver', expectedSequenceNumber: 1 });
+  });
+
+  it('completes a pending maneuver with a contiguous path even after spending the last action', () => {
+    const st = makeState({ metadata: { actionsRemaining: 0, pendingManeuver: { id: 'm1', playerId: AI } } as any });
+    const d = svc.decide(st, AI);
     expect(d?.kind).toBe('maneuver');
     if (d?.kind === 'maneuver') {
-      expect(d.fighterId).toBe('a1');
+      expect(d.maneuverId).toBe('m1');
+      expect(d.moves[0].fighterId).toBe('a1');
       const start = { x: 5, y: 5 };
       const enemy = { x: 0, y: 0 };
-      const cell = d.path[0];
+      const path = d.moves[0].path;
+      const cell = path[path.length - 1];
       // клетка СТРОГО ближе к врагу, чем старт…
       expect(manhattan(cell, enemy)).toBeLessThan(manhattan(start, enemy));
       // …и в пределах movement (дефолт 2): BFS-стоимость от старта ≤ 2
       expect(manhattan(cell, start)).toBeGreaterThanOrEqual(1);
       expect(manhattan(cell, start)).toBeLessThanOrEqual(2);
+      let previous = start;
+      for (const next of path) {
+        expect(manhattan(previous, next)).toBe(1);
+        previous = next;
+      }
     }
+  });
+
+  it('finishes pending maneuver before attacking with the newly drawn card', () => {
+    const st = makeState({
+      fighters: [fighter('h1', HUMAN, 0, 0), fighter('a1', AI, 1, 0)],
+      handZones: { [AI]: { cards: [card('drawn', CardType.ATTACK, { attackValue: 5 })], maxSize: 7 } },
+      metadata: { actionsRemaining: 1, pendingManeuver: { id: 'm1', playerId: AI } } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'maneuver', maneuverId: 'm1', moves: [] });
+  });
+
+  it('uses draw-only maneuver when immobilized instead of forbidden early endTurn', () => {
+    const st = makeState({
+      fighters: [fighter('h1', HUMAN, 0, 0), fighter('a1', AI, 5, 5, { effects: [{ type: 'immobilized' }] })],
+      metadata: { actionsRemaining: 1, pendingManeuver: { id: 'm1', playerId: AI } } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'maneuver', maneuverId: 'm1', moves: [] });
+  });
+
+  it('discards the requested number of distinct owned instances before ending the turn', () => {
+    const cards = Array.from({ length: 9 }, (_, i) => card(`copy-${i + 1}`, CardType.ATTACK, { cardId: 'shared' }));
+    const st = makeState({
+      phase: GamePhase.TURN_END,
+      handZones: { [AI]: { cards, maxSize: 7 }, [HUMAN]: { cards: [card('foreign', CardType.ATTACK)], maxSize: 7 } },
+      metadata: { actionsRemaining: 0, pendingHandDiscard: { id: 'd1', playerId: AI, count: 2 } } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'discardToLimit', pendingId: 'd1', cardIds: ['copy-1', 'copy-2'] });
+    expect(st.handZones[AI].cards).toEqual(cards);
+  });
+
+  it.each(['pendingManeuver', 'pendingHandDiscard'])('waits while the human owns %s', (field) => {
+    const st = makeState({ metadata: { actionsRemaining: 2, [field]: { id: 'choice', playerId: HUMAN, count: 1 } } as any });
+    expect(svc.decide(st, AI)).toBeNull();
   });
 
   it('actionsRemaining 0 → endTurn', () => {

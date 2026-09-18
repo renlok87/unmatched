@@ -99,10 +99,11 @@ describe('DeckManagementService', () => {
       );
     });
 
-    it('should respect hand size limit', async () => {
+    it('should allow draws beyond the end-of-turn hand size limit', async () => {
       const result = await service.drawCards(mockState, 'player-1', 10);
 
-      expect(result.handZones['player-1'].cards.length).toBe(5); // max size
+      expect(result.handZones['player-1'].cards.length).toBe(10);
+      expect(result.decks['player-1'].drawPile.length).toBe(5);
     });
 
     it('should mark drawn cards as visible', async () => {
@@ -255,10 +256,10 @@ describe('DeckManagementService', () => {
       expect(service.canDrawCard(mockState, 'player-1')).toBe(true);
     });
 
-    it('should return false when hand is full', async () => {
+    it('should permit a required draw when hand is full', async () => {
       mockState = await service.drawCards(mockState, 'player-1', 5);
 
-      expect(service.canDrawCard(mockState, 'player-1')).toBe(false);
+      expect(service.canDrawCard(mockState, 'player-1')).toBe(true);
     });
 
     it('should return false for non-existent hand', () => {

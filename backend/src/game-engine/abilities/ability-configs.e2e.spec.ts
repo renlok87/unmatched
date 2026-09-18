@@ -42,8 +42,16 @@ import { ResolveCombatDto, EndTurnDto, AttackDto, ManeuverDto } from '../../game
 describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', () => {
   let service: GameActionExecutorService;
   let registry: HeroAbilityRegistry;
+  async function maneuver(dto: Omit<ManeuverDto, 'maneuverId'>, context: ActionContext) {
+    const begun = await service.executeBeginManeuver(
+      { gameId: context.gameId, expectedSequenceNumber: context.currentState.sequenceNumber }, context,
+    );
+    expect(begun.success).toBe(true);
+    return service.executeManeuver({ ...dto, maneuverId: begun.gameState!.metadata.pendingManeuver!.id },
+      { ...context, currentState: begun.gameState! });
+  }
   // Наблюдаемый drawCards: один и тот же мок обслуживает И deps.deck handler'ов,
-  // И deckManagement самого executor'а (advanceTurn добор следующему игроку).
+  // И deckManagement самого executor'а (добор в начале манёвра).
   let drawCards: jest.Mock;
 
   /**
@@ -162,6 +170,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
         {
           provide: GameRulesValidator,
           useValue: {
+            canPlayerAct: jest.fn().mockReturnValue({ valid: true }),
             validateManeuver: jest.fn().mockReturnValue({ valid: true }),
             validateMovement: jest.fn().mockReturnValue({ valid: true }),
             validateAttackWithParams: jest.fn().mockReturnValue({ valid: true }),
@@ -710,8 +719,8 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
       expect(result.success).toBe(true);
       const victim = result.gameState!.fighters.find((f) => f.id === 'fighter1')!;
       expect(victim.health).toBe(14 - 1); // укус 1
-      // добор: advanceTurn(+1 player2) + thenDraw(+1 player2) = 2 карты в руке player2
-      expect(result.gameState!.handZones.player2.cards.length).toBe(2);
+      // Единственный добор — thenDraw способности; передача хода карт не добавляет.
+      expect(result.gameState!.handZones.player2.cards.length).toBe(1);
     });
 
     it('medusa (turn-damage врагу В ЗОНЕ 1 — при isInSameZone=true)', async () => {
@@ -1167,12 +1176,13 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
       });
       // fighter1 = Tomoe (player1); fighter2 = вражеский герой (player2), оба HERO.
       state = withHeroSlug(state, 'fighter1', 'tomoe-gozen');
+      state = { ...state, fighters: state.fighters.map(f => f.id === 'fighter2' ? { ...f, movement: 4 } : f) };
 
       // fighter2 двигается (6,5) -> (10,5): покидает зону Tomoe.
-      const result = await service.executeManeuver(
+      const result = await maneuver(
         {
           gameId: 'test-game-1',
-          moves: [{ fighterId: 'fighter2', path: [{ x: 10, y: 5 }] }],
+          moves: [{ fighterId: 'fighter2', path: [{ x: 7, y: 5 }, { x: 8, y: 5 }, { x: 9, y: 5 }, { x: 10, y: 5 }] }],
         } as ManeuverDto,
         ctxFor('player2', state),
       );
@@ -1203,7 +1213,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
       });
       state = withHeroSlug(state, 'fighter1', 'tomoe-gozen');
 
-      const result = await service.executeManeuver(
+      const result = await maneuver(
         {
           gameId: 'test-game-1',
           moves: [{ fighterId: 'fighter2', path: [{ x: 7, y: 5 }] }],

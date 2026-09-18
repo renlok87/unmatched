@@ -1,0 +1,80 @@
+{
+  "scope": "Production GameView/store in Edge; captured transport responses; Phaser replaced by board-event adapter",
+  "checks": [
+    "begin then zero movement",
+    "persisted pending then fresh-card boost and five path steps",
+    "persisted excess discard by instance"
+  ],
+  "requests": [
+    {
+      "name": "BeginManeuver",
+      "variables": {
+        "input": {
+          "gameId": "s03-transport-reconnect",
+          "expectedSequenceNumber": 10
+        }
+      }
+    },
+    {
+      "name": "CompleteManeuver",
+      "variables": {
+        "input": {
+          "gameId": "s03-transport-reconnect",
+          "maneuverId": "maneuver:1:10",
+          "moves": [],
+          "boostCardId": null
+        }
+      }
+    },
+    {
+      "name": "CompleteManeuver",
+      "variables": {
+        "input": {
+          "gameId": "s03-transport-boost",
+          "maneuverId": "maneuver:1:10",
+          "moves": [
+            {
+              "fighterId": "a",
+              "path": [
+                {
+                  "x": 1,
+                  "y": 0
+                },
+                {
+                  "x": 2,
+                  "y": 0
+                },
+                {
+                  "x": 3,
+                  "y": 0
+                },
+                {
+                  "x": 4,
+                  "y": 0
+                },
+                {
+                  "x": 5,
+                  "y": 0
+                }
+              ]
+            }
+          ],
+          "boostCardId": "a-new"
+        }
+      }
+    },
+    {
+      "name": "DiscardToLimit",
+      "variables": {
+        "input": {
+          "gameId": "s03-transport-discard",
+          "pendingId": "discard:1:12",
+          "cardIds": [
+            "h1"
+          ]
+        }
+      }
+    }
+  ],
+  "pageErrors": []
+}

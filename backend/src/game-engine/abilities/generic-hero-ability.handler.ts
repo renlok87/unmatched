@@ -726,7 +726,8 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
     current = applyTerminalState(current);
     if (current.phase === GamePhase.GAME_OVER) return current;
 
-    // drawToHandSize N — добираем по дефициту (drawCards сам стопнется на пустой колоде)
+    // drawToHandSize N — добираем по дефициту; drawCards применяет истощение
+    // за каждую недостающую карту и останавливается при гибели героя.
     if (typeof effect.drawToHandSize === 'number') {
       const handSize = current.handZones[playerId]?.cards.length ?? 0;
       const deficit = effect.drawToHandSize - handSize;

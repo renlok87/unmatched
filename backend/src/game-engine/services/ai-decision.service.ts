@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { GameState, Fighter, Card, PendingEffect } from '../models';
+import type { GameState, Fighter, Card, PendingEffect, Position } from '../models';
 import { CardType, GamePhase, getActionsRemaining, getFighterMovement } from '../models';
 import { AdjacencyService } from '../engine/adjacency.service';
 import { bannerAllows } from '../validators/game-rules.validator';
@@ -9,11 +9,9 @@ import { bannerAllows } from '../validators/game-rules.validator';
  * по GameState + id бота возвращает следующее действие либо null («боту нечего
  * делать — ход за человеком»). Исполняет действие AiTurnService.
  *
- * Приоритет: отложенные эффекты бота → защита в бою → ход (атака при досягаемости,
- * иначе манёвр к ближайшему врагу на ВСЮ дальность movement, иначе конец хода).
- * Манёвр идёт BFS-достижимостью (AdjacencyService): за одно действие бот проходит
- * несколько клеток к врагу. path может быть одноэлементным — executor валидирует
- * длину пути собственным BFS ≤ movement.
+ * Сначала завершает серверные выборы. Манёвр начинается добором; путь выбирается
+ * по сохранённому состоянию после добора и содержит все соседние шаги BFS.
+ * Если двигаться некуда, завершает манёвр без движения.
  */
 export type AiAction =
   | { kind: 'resolveChoose'; effectId: string; optionIndex: number }
@@ -21,7 +19,9 @@ export type AiAction =
   | { kind: 'defense'; cardId: string }
   | { kind: 'resolveCombat' }
   | { kind: 'attack'; attackerId: string; targetId: string; cardId: string }
-  | { kind: 'maneuver'; fighterId: string; path: Array<{ x: number; y: number }> }
+  | { kind: 'beginManeuver'; expectedSequenceNumber: number }
+  | { kind: 'maneuver'; maneuverId: string; moves: Array<{ fighterId: string; path: Position[] }>; boostCardId?: string }
+  | { kind: 'discardToLimit'; pendingId: string; cardIds: string[] }
   | { kind: 'endTurn' };
 
 @Injectable()
@@ -30,6 +30,23 @@ export class AiDecisionService {
 
   decide(state: GameState, aiUserId: string): AiAction | null {
     if (state.phase === GamePhase.GAME_OVER) return null;
+
+    const discard = state.metadata.pendingHandDiscard;
+    if (discard) {
+      if (discard.playerId !== aiUserId) return null;
+      return { kind: 'discardToLimit', pendingId: discard.id,
+        cardIds: this.hand(state, aiUserId).slice(0, discard.count).map(card => card.id) };
+    }
+    const maneuver = state.metadata.pendingManeuver;
+    if (maneuver) {
+      if (maneuver.playerId !== aiUserId) return null;
+      const hero = this.aiHero(state, aiUserId);
+      const enemy = hero ? this.nearestEnemy(state, aiUserId, hero) : null;
+      const path = hero && enemy && !hero.effects.some(effect => effect.type === 'immobilized')
+        ? this.pathToward(state, hero, enemy, getFighterMovement(hero)) : [];
+      return { kind: 'maneuver', maneuverId: maneuver.id,
+        moves: hero && path.length ? [{ fighterId: hero.id, path }] : [] };
+    }
 
     // 1. Отложенные эффекты бота — резолвим до прочих действий
     const pending = (state.metadata.pendingEffects ?? []).filter((p) => p.playerId === aiUserId);
@@ -63,9 +80,9 @@ export class AiDecisionService {
     if (getActionsRemaining(state) <= 0) return { kind: 'endTurn' };
 
     const heroF = this.aiHero(state, aiUserId);
-    if (!heroF) return { kind: 'endTurn' };
+    if (!heroF) return null;
     const enemy = this.nearestEnemy(state, aiUserId, heroF);
-    if (!enemy) return { kind: 'endTurn' };
+    if (!enemy) return null;
 
     // Атака при досягаемости: melee — смежно, ranged — смежно или одна зона
     const adjacent = this.manhattan(heroF.position, enemy.position) === 1;
@@ -75,11 +92,7 @@ export class AiDecisionService {
       if (atk) return { kind: 'attack', attackerId: heroF.id, targetId: enemy.id, cardId: atk.id };
     }
 
-    // Иначе манёвр к врагу на всю дальность movement
-    const step = this.stepToward(state, heroF, enemy, getFighterMovement(heroF));
-    if (step) return { kind: 'maneuver', fighterId: heroF.id, path: [step] };
-
-    return { kind: 'endTurn' };
+    return { kind: 'beginManeuver', expectedSequenceNumber: state.sequenceNumber };
   }
 
   // ---------- Отложенные эффекты ----------
@@ -210,7 +223,12 @@ export class AiDecisionService {
     enemy: Fighter,
     maxCost: number,
   ): { x: number; y: number } | null {
-    if (maxCost < 1) return null;
+    const path = this.pathToward(state, mine, enemy, maxCost);
+    return path.length ? path[path.length - 1] : null;
+  }
+
+  private pathToward(state: GameState, mine: Fighter, enemy: Fighter, maxCost: number): Position[] {
+    if (maxCost < 1) return [];
 
     const blockedPositions = new Set(
       this.living(state)
@@ -218,23 +236,24 @@ export class AiDecisionService {
         .map((f) => `${f.position.x}:${f.position.y}`),
     );
 
-    const reachable = this.adjacency.getReachableCells(
-      state.boardState,
-      mine.position,
-      maxCost,
-      { blockedPositions },
-    );
-
-    const startDist = this.manhattan(mine.position, enemy.position);
-    let best: { x: number; y: number } | null = null;
-    let bestDist = startDist;
-
-    for (const { position, cost } of reachable.values()) {
-      if (cost < 1) continue;
-      const dist = this.manhattan(position, enemy.position);
-      if (dist < bestDist) {
-        bestDist = dist;
-        best = { x: position.x, y: position.y };
+    const queue: Array<{ position: Position; path: Position[] }> = [{ position: mine.position, path: [] }];
+    const visited = new Set([`${mine.position.x}:${mine.position.y}`]);
+    let best: Position[] = [];
+    let bestDist = this.manhattan(mine.position, enemy.position);
+    for (let index = 0; index < queue.length; index++) {
+      const current = queue[index];
+      if (current.path.length >= maxCost) continue;
+      for (const cell of this.adjacency.getAdjacentCells(state.boardState, current.position)) {
+        const key = `${cell.position.x}:${cell.position.y}`;
+        if (cell.isBlocked || blockedPositions.has(key) || visited.has(key)) continue;
+        visited.add(key);
+        const path = [...current.path, cell.position];
+        queue.push({ position: cell.position, path });
+        const distance = this.manhattan(cell.position, enemy.position);
+        if (distance < bestDist) {
+          bestDist = distance;
+          best = path;
+        }
       }
     }
 

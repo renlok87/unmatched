@@ -27,7 +27,9 @@ import { GameActionService } from '../services/game-action.service';
 import { GameActionType } from '../models/game-action.model';
 import { GamePhase } from '../dto';
 import {
+  BeginManeuverDto,
   ManeuverDto,
+  DiscardToLimitDto,
   MoveFighterDto,
   AttackDto,
   PlayDefenseDto,
@@ -246,14 +248,27 @@ export class GameActionsResolver {
   }
 
   // ============================================
-  // MANEUVER - Перемещение + розыгрыш карты
+  // MANEUVER - Обязательный добор, затем выбор BOOST и движения
   // ============================================
 
   /**
-   * Выполнить манёвр - переместить бойца по пути и сыграть карту эффектов
-   * Доступно в любой action-фазе текущему игроку (экономика «2 действия за ход»)
+   * Начать манёвр: добрать карту и зарезервировать одно действие.
+   * Возвращённый pendingManeuver.id нужен для завершения после выбора движения.
    */
-  @Mutation(() => GameMutationResult, { name: 'maneuver', description: 'Переместить бойца и сыграть карту эффектов (тратит 1 действие)' })
+  @Mutation(() => GameMutationResult, { name: 'beginManeuver', description: 'Начать манёвр: добрать карту и потратить одно действие' })
+  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ActionPhaseGuard)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
+  async beginManeuver(
+    @Args('input') dto: BeginManeuverDto,
+    @Context() context: any,
+  ): Promise<GameMutationResult> {
+    const userId = getUserId(context);
+    return this.executeMutation(dto, userId, 'beginManeuver',
+      (ctx) => this.actionExecutor.executeBeginManeuver(dto, ctx), 'MANEUVER');
+  }
+
+  /** Завершить начатый манёвр; moves: [] оставляет всех бойцов на месте. */
+  @Mutation(() => GameMutationResult, { name: 'maneuver', description: 'Завершить начатый манёвр: необязательные BOOST и перемещения без повторного добора' })
   @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ActionPhaseGuard)
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async maneuver(
@@ -271,15 +286,28 @@ export class GameActionsResolver {
     );
   }
 
+  /** TURN_END belongs to the ending player until the exact excess is discarded. */
+  @Mutation(() => GameMutationResult, { name: 'discardToLimit', description: 'Выбрать лишние карты для сброса в конце хода' })
+  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
+  async discardToLimit(
+    @Args('input') dto: DiscardToLimitDto,
+    @Context() context: any,
+  ): Promise<GameMutationResult> {
+    const userId = getUserId(context);
+    return this.executeMutation(dto, userId, 'discardToLimit',
+      (ctx) => this.actionExecutor.executeDiscardToLimit(dto, ctx), 'CARD_DISCARDED');
+  }
+
   // ============================================
   // MOVE FIGHTER - Простое перемещение
   // ============================================
 
   /**
-   * Переместить бойца на указанную клетку без игры карты
-   * Доступно в любой action-фазе текущему игроку (экономика «2 действия за ход»)
+   * Совместимый endpoint отклоняет перемещение, обходящее обязательный добор.
+   * Движение выполняется при завершении начатого манёвра.
    */
-  @Mutation(() => GameMutationResult, { name: 'moveFighter', description: 'Переместить бойца на указанную клетку (тратит 1 действие)' })
+  @Mutation(() => GameMutationResult, { name: 'moveFighter', description: 'Прямое перемещение без манёвра запрещено', deprecationReason: 'Используйте beginManeuver, затем maneuver' })
   @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ActionPhaseGuard)
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   async moveFighter(
@@ -460,7 +488,7 @@ export class GameActionsResolver {
    * Сбросить верхнюю карту колоды и выполнить дополнительное действие
    * Доступно в фазах ACTION_MANEUVER и ACTION_ATTACK только текущему игроку
    */
-  @Mutation(() => GameMutationResult, { name: 'pass', description: 'Сбросить карту и получить дополнительное действие' })
+  @Mutation(() => GameMutationResult, { name: 'pass', description: 'Свободный пропуск действия запрещён правилами', deprecationReason: 'Выполните maneuver, attack или playScheme' })
   @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard, ActionPhaseGuard)
   @Throttle({ default: { limit: 20, ttl: 60000 } })
   async pass(@Args('input') dto: PassDto, @Context() context: any): Promise<GameMutationResult> {

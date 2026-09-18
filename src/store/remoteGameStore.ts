@@ -19,6 +19,11 @@ import { apolloClient } from '@/lib/apolloClient';
 import { useAuthStore } from '@/store/authStore';
 import * as gql from '@/gql/graphql';
 import {
+  BeginManeuverDocument, CompleteManeuverDocument, DiscardToLimitDocument,
+  type BeginManeuverVariables, type CompleteManeuverVariables, type DiscardToLimitVariables,
+} from '@/graphql/turnResources';
+import type { ManeuverMove } from '@/components/game/turnResourceChoices';
+import {
   adaptToLocal,
   parseWireState,
   parseSubscriptionState,
@@ -113,8 +118,9 @@ interface RemoteGameState {
   myStanceOptions: () => StanceOption[];
 
   // Мутации gameplay
-  maneuver: (fighterId: string, path: Array<{ x: number; y: number }>, boostCardId?: string) => Promise<void>;
-  moveFighter: (fighterId: string, x: number, y: number) => Promise<void>;
+  beginManeuver: () => Promise<void>;
+  completeManeuver: (maneuverId: string, moves: ManeuverMove[], boostCardId?: string) => Promise<void>;
+  discardToLimit: (pendingId: string, cardIds: string[]) => Promise<void>;
   attack: (attackerId: string, targetId: string, cardId: string, boostCardId?: string) => Promise<void>;
   playDefense: (cardId: string, boostCardId?: string) => Promise<void>;
   playScheme: (cardId: string) => Promise<void>;
@@ -125,7 +131,6 @@ interface RemoteGameState {
   /** STANCE: сменить стойку ЛОКАЛЬНОГО героя (не тратит действие) */
   setStance: (stanceId: string) => Promise<void>;
   endTurn: () => Promise<void>;
-  pass: () => Promise<void>;
   leaveGame: () => Promise<void>;
 
   // UI selection
@@ -375,15 +380,28 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
     return options.find((o) => o.isDefault)?.id ?? options[0]?.id ?? null;
   },
 
-  maneuver: (fighterId, path, boostCardId) =>
-    runMutation(set, get, gql.ManeuverDocument, {
-      input: { gameId: get().currentGameId, fighterId, boostCardId: boostCardId ?? null, path },
-    }, 'maneuver'),
+  beginManeuver: async () => {
+    const { currentGameId, wireState } = get();
+    if (!currentGameId || !wireState) throw new Error('Игра не загружена');
+    const variables: BeginManeuverVariables = {
+      input: { gameId: currentGameId, expectedSequenceNumber: wireState.sequenceNumber },
+    };
+    await runMutation(set, get, BeginManeuverDocument, variables, 'beginManeuver');
+  },
 
-  moveFighter: (fighterId, x, y) =>
-    runMutation(set, get, gql.MoveFighterDocument, {
-      input: { gameId: get().currentGameId, fighterId, x, y },
-    }, 'moveFighter'),
+  completeManeuver: async (maneuverId, moves, boostCardId) => {
+    const gameId = get().currentGameId;
+    if (!gameId) throw new Error('Игра не загружена');
+    const variables: CompleteManeuverVariables = { input: { gameId, maneuverId, moves, boostCardId: boostCardId ?? null } };
+    await runMutation(set, get, CompleteManeuverDocument, variables, 'maneuver');
+  },
+
+  discardToLimit: async (pendingId, cardIds) => {
+    const gameId = get().currentGameId;
+    if (!gameId) throw new Error('Игра не загружена');
+    const variables: DiscardToLimitVariables = { input: { gameId, pendingId, cardIds } };
+    await runMutation(set, get, DiscardToLimitDocument, variables, 'discardToLimit');
+  },
 
   attack: (attackerId, targetId, cardId, boostCardId) =>
     runMutation(set, get, gql.AttackDocument, {
@@ -431,11 +449,6 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
       input: { gameId: get().currentGameId },
     }, 'endTurn'),
 
-  pass: () =>
-    runMutation(set, get, gql.PassDocument, {
-      input: { gameId: get().currentGameId },
-    }, 'pass'),
-
   leaveGame: async () => {
     const gameId = get().currentGameId;
     if (!gameId) return;
@@ -464,7 +477,7 @@ async function runMutation(
   set: (partial: Partial<RemoteGameState>) => void,
   get: () => RemoteGameState,
   document: unknown,
-  variables: Record<string, unknown>,
+  variables: object,
   name: string,
 ): Promise<void> {
   set({ actionError: null });
@@ -482,7 +495,7 @@ async function runMutation(
   } catch (error) {
     const message = error instanceof Error ? error.message : `Action ${name} failed`;
     set({ actionError: message });
-    if (/Concurrent modification|sequence/i.test(message)) {
+    if (/Concurrent modification|sequence|State changed|No matching|Begin maneuver first/i.test(message)) {
       await get().refetchState().catch(() => undefined);
     }
     throw error;

@@ -6,7 +6,7 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import type { GameState, Fighter, Position } from '../models';
-import { getFighterMovement, positionEqual } from '../models';
+import { getFighterMovement, positionEqual, getActionsRemaining } from '../models';
 import { AdjacencyService } from '../engine/adjacency.service';
 
 export interface ValidationResult {
@@ -487,35 +487,20 @@ export class GameRulesValidator {
       };
     }
 
+    if (getActionsRemaining(state) > 0 || state.metadata.pendingManeuver || state.metadata.pendingHandDiscard) {
+      return { valid: false, error: 'Complete the mandatory actions and choices first', code: 'ACTIONS_REMAINING' };
+    }
+
     return { valid: true };
   }
 
   /**
    * Проверить валидность пасса
    */
-  validatePass(state: GameState, userId: string): ValidationResult {
-    const canAct = this.canPlayerAct(state, userId);
-    if (!canAct.valid) {
-      return canAct;
-    }
-
-    if (
-      state.phase !== 'ACTION_MANEUVER' &&
-      state.phase !== 'ACTION_ATTACK'
-    ) {
-      return {
-        valid: false,
-        error: 'Cannot pass in current phase',
-        code: 'INVALID_PHASE',
-      };
-    }
-
-    return { valid: true };
+  validatePass(_state: GameState, _userId: string): ValidationResult {
+    return { valid: false, error: 'Passing is not a legal action', code: 'PASS_NOT_ALLOWED' };
   }
 
-  /**
-   * Проверить валидность переключения двери
-   */
   validateToggleDoor(
     state: GameState,
     x: number,

@@ -1,0 +1,870 @@
+{
+  "scope": "Real localhost HTTP GraphQL and graphql-ws; production resolvers/executor/state serializer/filter/subscriptions; synthetic auth, in-memory JSON database/cache, local lock, no AI/queue/UE.",
+  "http": [
+    {
+      "stage": "begin-draw-only",
+      "viewer": "a",
+      "request": {
+        "operation": "beginManeuver",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-reconnect",
+            "expectedSequenceNumber": 10
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "beginManeuver": {
+            "state": "{\"gameId\":\"s03-transport-reconnect\",\"sequenceNumber\":11,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.704Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"}}}",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "begin-view",
+      "viewer": "a",
+      "request": {
+        "operation": "gameState",
+        "variables": {
+          "gameId": "s03-transport-reconnect"
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "gameState": {
+            "state": "{\"gameId\":\"s03-transport-reconnect\",\"sequenceNumber\":11,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.704Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"}}}",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "begin-view",
+      "viewer": "b",
+      "request": {
+        "operation": "gameState",
+        "variables": {
+          "gameId": "s03-transport-reconnect"
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "gameState": {
+            "state": "{\"gameId\":\"s03-transport-reconnect\",\"sequenceNumber\":11,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.704Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"}}}",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "reconnect-db-snapshot",
+      "viewer": "a",
+      "request": {
+        "operation": "gameState",
+        "variables": {
+          "gameId": "s03-transport-reconnect"
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "gameState": {
+            "state": "{\"gameId\":\"s03-transport-reconnect\",\"sequenceNumber\":11,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true,\"v\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.704Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"},\"maneuveredThisTurn\":true}}",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "reconnect-other-snapshot",
+      "viewer": "b",
+      "request": {
+        "operation": "gameState",
+        "variables": {
+          "gameId": "s03-transport-reconnect"
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "gameState": {
+            "state": "{\"gameId\":\"s03-transport-reconnect\",\"sequenceNumber\":11,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.704Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"},\"maneuveredThisTurn\":true}}",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "pending-begin-replay",
+      "viewer": "a",
+      "request": {
+        "operation": "beginManeuver",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-reconnect",
+            "expectedSequenceNumber": 10
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "errors": [
+          {
+            "message": "Cannot begin maneuver in current state",
+            "locations": [
+              {
+                "line": 1,
+                "column": 45
+              }
+            ],
+            "path": [
+              "beginManeuver"
+            ],
+            "extensions": {
+              "code": "BAD_REQUEST",
+              "originalError": {
+                "message": "Cannot begin maneuver in current state",
+                "error": "Bad Request",
+                "statusCode": 400
+              }
+            }
+          }
+        ],
+        "data": null
+      }
+    },
+    {
+      "stage": "complete-draw-only",
+      "viewer": "a",
+      "request": {
+        "operation": "maneuver",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-reconnect",
+            "maneuverId": "maneuver:1:10",
+            "moves": []
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "maneuver": {
+            "state": "{\"gameId\":\"s03-transport-reconnect\",\"sequenceNumber\":12,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true,\"v\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.768Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true}}",
+            "sequenceNumber": 12,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "completed-replay",
+      "viewer": "a",
+      "request": {
+        "operation": "maneuver",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-reconnect",
+            "maneuverId": "maneuver:1:10",
+            "moves": []
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "errors": [
+          {
+            "message": "Begin maneuver first, then resolve its matching choice",
+            "locations": [
+              {
+                "line": 1,
+                "column": 43
+              }
+            ],
+            "path": [
+              "maneuver"
+            ],
+            "extensions": {
+              "code": "BAD_REQUEST",
+              "originalError": {
+                "message": "Begin maneuver first, then resolve its matching choice",
+                "error": "Bad Request",
+                "statusCode": 400
+              }
+            }
+          }
+        ],
+        "data": null
+      }
+    },
+    {
+      "stage": "stale-begin-replay",
+      "viewer": "a",
+      "request": {
+        "operation": "beginManeuver",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-reconnect",
+            "expectedSequenceNumber": 10
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "errors": [
+          {
+            "message": "State changed; reload before beginning maneuver",
+            "locations": [
+              {
+                "line": 1,
+                "column": 45
+              }
+            ],
+            "path": [
+              "beginManeuver"
+            ],
+            "extensions": {
+              "code": "BAD_REQUEST",
+              "originalError": {
+                "message": "State changed; reload before beginning maneuver",
+                "error": "Bad Request",
+                "statusCode": 400
+              }
+            }
+          }
+        ],
+        "data": null
+      }
+    },
+    {
+      "stage": "after-replays",
+      "viewer": "a",
+      "request": {
+        "operation": "gameState",
+        "variables": {
+          "gameId": "s03-transport-reconnect"
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "gameState": {
+            "state": "{\"gameId\":\"s03-transport-reconnect\",\"sequenceNumber\":12,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true,\"v\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.768Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true}}",
+            "sequenceNumber": 12,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "begin-boost",
+      "viewer": "a",
+      "request": {
+        "operation": "beginManeuver",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-boost",
+            "expectedSequenceNumber": 10
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "beginManeuver": {
+            "state": "{\"gameId\":\"s03-transport-boost\",\"sequenceNumber\":11,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.812Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"}}}",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "complete-new-card-boost",
+      "viewer": "a",
+      "request": {
+        "operation": "maneuver",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-boost",
+            "maneuverId": "maneuver:1:10",
+            "boostCardId": "a-new",
+            "moves": [
+              {
+                "fighterId": "a",
+                "path": [
+                  {
+                    "x": 1,
+                    "y": 0
+                  },
+                  {
+                    "x": 2,
+                    "y": 0
+                  },
+                  {
+                    "x": 3,
+                    "y": 0
+                  },
+                  {
+                    "x": 4,
+                    "y": 0
+                  },
+                  {
+                    "x": 5,
+                    "y": 0
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "maneuver": {
+            "state": "{\"gameId\":\"s03-transport-boost\",\"sequenceNumber\":12,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":5,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":false}],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.829Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true}}",
+            "sequenceNumber": 12,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "begin-eight-card-hand",
+      "viewer": "a",
+      "request": {
+        "operation": "beginManeuver",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-discard",
+            "expectedSequenceNumber": 10
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "beginManeuver": {
+            "state": "{\"gameId\":\"s03-transport-discard\",\"sequenceNumber\":11,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"h0\",\"cardId\":\"definition\",\"name\":\"h0\",\"nameEn\":\"h0\",\"nameRu\":\"h0\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h1\",\"cardId\":\"definition\",\"name\":\"h1\",\"nameEn\":\"h1\",\"nameRu\":\"h1\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h2\",\"cardId\":\"definition\",\"name\":\"h2\",\"nameEn\":\"h2\",\"nameRu\":\"h2\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h3\",\"cardId\":\"definition\",\"name\":\"h3\",\"nameEn\":\"h3\",\"nameRu\":\"h3\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h4\",\"cardId\":\"definition\",\"name\":\"h4\",\"nameEn\":\"h4\",\"nameRu\":\"h4\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h5\",\"cardId\":\"definition\",\"name\":\"h5\",\"nameEn\":\"h5\",\"nameRu\":\"h5\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h6\",\"cardId\":\"definition\",\"name\":\"h6\",\"nameEn\":\"h6\",\"nameRu\":\"h6\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.843Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":0,\"maneuveredThisTurn\":true,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"}}}",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "await-end-turn-discard",
+      "viewer": "a",
+      "request": {
+        "operation": "maneuver",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-discard",
+            "maneuverId": "maneuver:1:10",
+            "moves": []
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "maneuver": {
+            "state": "{\"gameId\":\"s03-transport-discard\",\"sequenceNumber\":12,\"phase\":\"TURN_END\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"h0\",\"cardId\":\"definition\",\"name\":\"h0\",\"nameEn\":\"h0\",\"nameRu\":\"h0\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h1\",\"cardId\":\"definition\",\"name\":\"h1\",\"nameEn\":\"h1\",\"nameRu\":\"h1\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h2\",\"cardId\":\"definition\",\"name\":\"h2\",\"nameEn\":\"h2\",\"nameRu\":\"h2\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h3\",\"cardId\":\"definition\",\"name\":\"h3\",\"nameEn\":\"h3\",\"nameRu\":\"h3\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h4\",\"cardId\":\"definition\",\"name\":\"h4\",\"nameEn\":\"h4\",\"nameRu\":\"h4\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h5\",\"cardId\":\"definition\",\"name\":\"h5\",\"nameEn\":\"h5\",\"nameRu\":\"h5\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h6\",\"cardId\":\"definition\",\"name\":\"h6\",\"nameEn\":\"h6\",\"nameRu\":\"h6\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.858Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":0,\"maneuveredThisTurn\":true,\"pendingHandDiscard\":{\"id\":\"discard:1:12\",\"playerId\":\"a\",\"count\":1}}}",
+            "sequenceNumber": 12,
+            "phase": "TURN_END",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "discard-db-snapshot",
+      "viewer": "a",
+      "request": {
+        "operation": "gameState",
+        "variables": {
+          "gameId": "s03-transport-discard"
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "gameState": {
+            "state": "{\"gameId\":\"s03-transport-discard\",\"sequenceNumber\":12,\"phase\":\"TURN_END\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"h0\",\"cardId\":\"definition\",\"name\":\"h0\",\"nameEn\":\"h0\",\"nameRu\":\"h0\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h1\",\"cardId\":\"definition\",\"name\":\"h1\",\"nameEn\":\"h1\",\"nameRu\":\"h1\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h2\",\"cardId\":\"definition\",\"name\":\"h2\",\"nameEn\":\"h2\",\"nameRu\":\"h2\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h3\",\"cardId\":\"definition\",\"name\":\"h3\",\"nameEn\":\"h3\",\"nameRu\":\"h3\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h4\",\"cardId\":\"definition\",\"name\":\"h4\",\"nameEn\":\"h4\",\"nameRu\":\"h4\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h5\",\"cardId\":\"definition\",\"name\":\"h5\",\"nameEn\":\"h5\",\"nameRu\":\"h5\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h6\",\"cardId\":\"definition\",\"name\":\"h6\",\"nameEn\":\"h6\",\"nameRu\":\"h6\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true,\"v\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.858Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":0,\"pendingHandDiscard\":{\"id\":\"discard:1:12\",\"playerId\":\"a\",\"count\":1},\"maneuveredThisTurn\":true}}",
+            "sequenceNumber": 12,
+            "phase": "TURN_END",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "discard-other-snapshot",
+      "viewer": "b",
+      "request": {
+        "operation": "gameState",
+        "variables": {
+          "gameId": "s03-transport-discard"
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "gameState": {
+            "state": "{\"gameId\":\"s03-transport-discard\",\"sequenceNumber\":12,\"phase\":\"TURN_END\",\"turnCount\":1,\"currentTurnPlayerId\":\"a\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-2\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-3\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-4\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-5\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-6\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-7\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.858Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":0,\"pendingHandDiscard\":{\"id\":\"discard:1:12\",\"playerId\":\"a\",\"count\":1},\"maneuveredThisTurn\":true}}",
+            "sequenceNumber": 12,
+            "phase": "TURN_END",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": "foreign-discard-rejected",
+      "viewer": "b",
+      "request": {
+        "operation": "discardToLimit",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-discard",
+            "pendingId": "discard:1:12",
+            "cardIds": [
+              "h2"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "errors": [
+          {
+            "message": "No matching discard choice for this player",
+            "locations": [
+              {
+                "line": 1,
+                "column": 48
+              }
+            ],
+            "path": [
+              "discardToLimit"
+            ],
+            "extensions": {
+              "code": "BAD_REQUEST",
+              "originalError": {
+                "message": "No matching discard choice for this player",
+                "error": "Bad Request",
+                "statusCode": 400
+              }
+            }
+          }
+        ],
+        "data": null
+      }
+    },
+    {
+      "stage": "catalog-discard-rejected",
+      "viewer": "a",
+      "request": {
+        "operation": "discardToLimit",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-discard",
+            "pendingId": "discard:1:12",
+            "cardIds": [
+              "definition"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "errors": [
+          {
+            "message": "Choose exactly the excess card instances from your hand",
+            "locations": [
+              {
+                "line": 1,
+                "column": 48
+              }
+            ],
+            "path": [
+              "discardToLimit"
+            ],
+            "extensions": {
+              "code": "BAD_REQUEST",
+              "originalError": {
+                "message": "Choose exactly the excess card instances from your hand",
+                "error": "Bad Request",
+                "statusCode": 400
+              }
+            }
+          }
+        ],
+        "data": null
+      }
+    },
+    {
+      "stage": "owner-selects-discard",
+      "viewer": "a",
+      "request": {
+        "operation": "discardToLimit",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-discard",
+            "pendingId": "discard:1:12",
+            "cardIds": [
+              "h2"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "discardToLimit": {
+            "state": "{\"gameId\":\"s03-transport-discard\",\"sequenceNumber\":13,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":2,\"currentTurnPlayerId\":\"b\",\"players\":[{\"userId\":\"a\",\"heroId\":\"a\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"a\"],\"isAlive\":true},{\"userId\":\"b\",\"heroId\":\"b\",\"health\":10,\"maxHealth\":10,\"fighterIds\":[\"b\"],\"isAlive\":true}],\"fighters\":[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}],\"decks\":{\"a\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]},\"b\":{\"cards\":[],\"drawPile\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\"}]}},\"discardPiles\":{\"a\":[{\"id\":\"h2\",\"cardId\":\"definition\",\"name\":\"h2\",\"nameEn\":\"h2\",\"nameRu\":\"h2\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":false,\"v\":true}],\"b\":[]},\"handZones\":{\"a\":{\"cards\":[{\"id\":\"h0\",\"cardId\":\"definition\",\"name\":\"h0\",\"nameEn\":\"h0\",\"nameRu\":\"h0\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h1\",\"cardId\":\"definition\",\"name\":\"h1\",\"nameEn\":\"h1\",\"nameRu\":\"h1\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h3\",\"cardId\":\"definition\",\"name\":\"h3\",\"nameEn\":\"h3\",\"nameRu\":\"h3\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h4\",\"cardId\":\"definition\",\"name\":\"h4\",\"nameEn\":\"h4\",\"nameRu\":\"h4\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h5\",\"cardId\":\"definition\",\"name\":\"h5\",\"nameEn\":\"h5\",\"nameRu\":\"h5\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h6\",\"cardId\":\"definition\",\"name\":\"h6\",\"nameEn\":\"h6\",\"nameRu\":\"h6\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true,\"v\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}},\"boardState\":{\"doors\":{},\"fog\":{},\"tokens\":{},\"cells\":[[{\"x\":0,\"y\":0,\"type\":\"normal\"},{\"x\":1,\"y\":0,\"type\":\"normal\"},{\"x\":2,\"y\":0,\"type\":\"normal\"},{\"x\":3,\"y\":0,\"type\":\"normal\"},{\"x\":4,\"y\":0,\"type\":\"normal\"},{\"x\":5,\"y\":0,\"type\":\"normal\"},{\"x\":6,\"y\":0,\"type\":\"normal\"},{\"x\":7,\"y\":0,\"type\":\"normal\"}],[{\"x\":0,\"y\":1,\"type\":\"normal\"},{\"x\":1,\"y\":1,\"type\":\"normal\"},{\"x\":2,\"y\":1,\"type\":\"normal\"},{\"x\":3,\"y\":1,\"type\":\"normal\"},{\"x\":4,\"y\":1,\"type\":\"normal\"},{\"x\":5,\"y\":1,\"type\":\"normal\"},{\"x\":6,\"y\":1,\"type\":\"normal\"},{\"x\":7,\"y\":1,\"type\":\"normal\"}]],\"width\":8,\"height\":2},\"metadata\":{\"lastActionAt\":\"2026-09-18T09:37:51.937Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":2,\"maneuveredThisTurn\":false,\"turnStartPositions\":{\"a\":{\"x\":0,\"y\":0},\"b\":{\"x\":7,\"y\":0},\"helper\":{\"x\":0,\"y\":1}},\"attackedThisTurn\":false,\"lostCombatThisTurn\":false,\"pendingEffects\":[]}}",
+            "sequenceNumber": 13,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "b",
+            "turnCount": 2
+          }
+        }
+      }
+    },
+    {
+      "stage": "discard-replay-rejected",
+      "viewer": "a",
+      "request": {
+        "operation": "discardToLimit",
+        "variables": {
+          "input": {
+            "gameId": "s03-transport-discard",
+            "pendingId": "discard:1:12",
+            "cardIds": [
+              "h2"
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "response": {
+        "errors": [
+          {
+            "message": "No matching discard choice for this player",
+            "locations": [
+              {
+                "line": 1,
+                "column": 48
+              }
+            ],
+            "path": [
+              "discardToLimit"
+            ],
+            "extensions": {
+              "code": "BAD_REQUEST",
+              "originalError": {
+                "message": "No matching discard choice for this player",
+                "error": "Bad Request",
+                "statusCode": 400
+              }
+            }
+          }
+        ],
+        "data": null
+      }
+    }
+  ],
+  "ws": [
+    {
+      "viewer": "a",
+      "gameId": "s03-transport-reconnect",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-reconnect",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1,
+            "handZones": "{\"a\":{\"cards\":[{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.704Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"}}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "b",
+      "gameId": "s03-transport-reconnect",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-reconnect",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1,
+            "handZones": "{\"a\":{\"cards\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.704Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"}}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "b",
+      "gameId": "s03-transport-reconnect",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-reconnect",
+            "sequenceNumber": 12,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1,
+            "handZones": "{\"a\":{\"cards\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.768Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "a",
+      "gameId": "s03-transport-reconnect",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-reconnect",
+            "sequenceNumber": 12,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1,
+            "handZones": "{\"a\":{\"cards\":[{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true,\"v\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.768Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "a",
+      "gameId": "s03-transport-boost",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-boost",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1,
+            "handZones": "{\"a\":{\"cards\":[{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.812Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"}}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "b",
+      "gameId": "s03-transport-boost",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-boost",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1,
+            "handZones": "{\"a\":{\"cards\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.812Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"}}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "a",
+      "gameId": "s03-transport-boost",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-boost",
+            "sequenceNumber": 12,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1,
+            "handZones": "{\"a\":{\"cards\":[],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":5,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.829Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "b",
+      "gameId": "s03-transport-boost",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-boost",
+            "sequenceNumber": 12,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1,
+            "handZones": "{\"a\":{\"cards\":[],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":5,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.829Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":1,\"maneuveredThisTurn\":true}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "a",
+      "gameId": "s03-transport-discard",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-discard",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1,
+            "handZones": "{\"a\":{\"cards\":[{\"id\":\"h0\",\"cardId\":\"definition\",\"name\":\"h0\",\"nameEn\":\"h0\",\"nameRu\":\"h0\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h1\",\"cardId\":\"definition\",\"name\":\"h1\",\"nameEn\":\"h1\",\"nameRu\":\"h1\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h2\",\"cardId\":\"definition\",\"name\":\"h2\",\"nameEn\":\"h2\",\"nameRu\":\"h2\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h3\",\"cardId\":\"definition\",\"name\":\"h3\",\"nameEn\":\"h3\",\"nameRu\":\"h3\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h4\",\"cardId\":\"definition\",\"name\":\"h4\",\"nameEn\":\"h4\",\"nameRu\":\"h4\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h5\",\"cardId\":\"definition\",\"name\":\"h5\",\"nameEn\":\"h5\",\"nameRu\":\"h5\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h6\",\"cardId\":\"definition\",\"name\":\"h6\",\"nameEn\":\"h6\",\"nameRu\":\"h6\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.843Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":0,\"maneuveredThisTurn\":true,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"}}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "b",
+      "gameId": "s03-transport-discard",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-discard",
+            "sequenceNumber": 11,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1,
+            "handZones": "{\"a\":{\"cards\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-2\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-3\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-4\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-5\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-6\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-7\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.843Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":0,\"maneuveredThisTurn\":true,\"pendingManeuver\":{\"id\":\"maneuver:1:10\",\"playerId\":\"a\"}}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "a",
+      "gameId": "s03-transport-discard",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-discard",
+            "sequenceNumber": 12,
+            "phase": "TURN_END",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1,
+            "handZones": "{\"a\":{\"cards\":[{\"id\":\"h0\",\"cardId\":\"definition\",\"name\":\"h0\",\"nameEn\":\"h0\",\"nameRu\":\"h0\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h1\",\"cardId\":\"definition\",\"name\":\"h1\",\"nameEn\":\"h1\",\"nameRu\":\"h1\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h2\",\"cardId\":\"definition\",\"name\":\"h2\",\"nameEn\":\"h2\",\"nameRu\":\"h2\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h3\",\"cardId\":\"definition\",\"name\":\"h3\",\"nameEn\":\"h3\",\"nameRu\":\"h3\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h4\",\"cardId\":\"definition\",\"name\":\"h4\",\"nameEn\":\"h4\",\"nameRu\":\"h4\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h5\",\"cardId\":\"definition\",\"name\":\"h5\",\"nameEn\":\"h5\",\"nameRu\":\"h5\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h6\",\"cardId\":\"definition\",\"name\":\"h6\",\"nameEn\":\"h6\",\"nameRu\":\"h6\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.858Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":0,\"maneuveredThisTurn\":true,\"pendingHandDiscard\":{\"id\":\"discard:1:12\",\"playerId\":\"a\",\"count\":1}}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "b",
+      "gameId": "s03-transport-discard",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-discard",
+            "sequenceNumber": 12,
+            "phase": "TURN_END",
+            "currentTurnPlayerId": "a",
+            "turnCount": 1,
+            "handZones": "{\"a\":{\"cards\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-2\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-3\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-4\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-5\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-6\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-7\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.858Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":0,\"maneuveredThisTurn\":true,\"pendingHandDiscard\":{\"id\":\"discard:1:12\",\"playerId\":\"a\",\"count\":1}}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "a",
+      "gameId": "s03-transport-discard",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-discard",
+            "sequenceNumber": 13,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "b",
+            "turnCount": 2,
+            "handZones": "{\"a\":{\"cards\":[{\"id\":\"h0\",\"cardId\":\"definition\",\"name\":\"h0\",\"nameEn\":\"h0\",\"nameRu\":\"h0\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h1\",\"cardId\":\"definition\",\"name\":\"h1\",\"nameEn\":\"h1\",\"nameRu\":\"h1\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h3\",\"cardId\":\"definition\",\"name\":\"h3\",\"nameEn\":\"h3\",\"nameRu\":\"h3\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h4\",\"cardId\":\"definition\",\"name\":\"h4\",\"nameEn\":\"h4\",\"nameRu\":\"h4\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h5\",\"cardId\":\"definition\",\"name\":\"h5\",\"nameEn\":\"h5\",\"nameRu\":\"h5\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"h6\",\"cardId\":\"definition\",\"name\":\"h6\",\"nameEn\":\"h6\",\"nameRu\":\"h6\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"isVisible\":true,\"v\":true},{\"id\":\"a-new\",\"cardId\":\"secret-drawn-definition\",\"name\":\"a-new\",\"nameEn\":\"a-new\",\"nameRu\":\"a-new\",\"cardType\":\"VERSATILE\",\"boostValue\":3,\"effects\":[],\"bannerName\":\"secret-drawn-banner\",\"text\":\"secret-drawn-text\",\"isVisible\":true,\"v\":true}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.937Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":2,\"maneuveredThisTurn\":false,\"turnStartPositions\":{\"a\":{\"x\":0,\"y\":0},\"b\":{\"x\":7,\"y\":0},\"helper\":{\"x\":0,\"y\":1}},\"attackedThisTurn\":false,\"lostCombatThisTurn\":false,\"pendingEffects\":[]}"
+          }
+        }
+      }
+    },
+    {
+      "viewer": "b",
+      "gameId": "s03-transport-discard",
+      "payload": {
+        "data": {
+          "gameStateUpdated": {
+            "gameId": "s03-transport-discard",
+            "sequenceNumber": 13,
+            "phase": "ACTION_MANEUVER",
+            "currentTurnPlayerId": "b",
+            "turnCount": 2,
+            "handZones": "{\"a\":{\"cards\":[{\"id\":\"hidden-0\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-1\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-2\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-3\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-4\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-5\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false},{\"id\":\"hidden-6\",\"cardId\":\"hidden\",\"name\":\"???\",\"nameEn\":\"Hidden\",\"nameRu\":\"Скрыто\",\"cardType\":\"UNIVERSAL\",\"isVisible\":false}],\"maxSize\":7},\"b\":{\"cards\":[],\"maxSize\":7}}",
+            "fighters": "[{\"id\":\"a\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"a\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"b\",\"ownerId\":\"b\",\"heroId\":\"b\",\"name\":\"b\",\"type\":\"HERO\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":7,\"y\":0},\"effects\":[],\"hasSidekick\":false,\"movement\":2},{\"id\":\"helper\",\"ownerId\":\"a\",\"heroId\":\"a\",\"name\":\"helper\",\"type\":\"MINION\",\"health\":10,\"maxHealth\":10,\"position\":{\"x\":0,\"y\":1},\"effects\":[],\"hasSidekick\":false,\"movement\":2}]",
+            "metadata": "{\"lastActionAt\":\"2026-09-18T09:37:51.937Z\",\"lastActionBy\":\"a\",\"version\":1,\"actionsRemaining\":2,\"maneuveredThisTurn\":false,\"turnStartPositions\":{\"a\":{\"x\":0,\"y\":0},\"b\":{\"x\":7,\"y\":0},\"helper\":{\"x\":0,\"y\":1}},\"attackedThisTurn\":false,\"lostCombatThisTurn\":false,\"pendingEffects\":[]}"
+          }
+        }
+      }
+    }
+  ],
+  "checks": [
+    "HTTP/WS draw-only, both viewers, cache eviction, reconnect and replay rejection",
+    "HTTP/WS newly drawn BOOST, one draw and one action",
+    "HTTP/WS end-turn discard, DB reload, owner/exact-instance validation and replay rejection"
+  ]
+}

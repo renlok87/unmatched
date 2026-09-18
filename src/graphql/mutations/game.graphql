@@ -76,6 +76,28 @@ mutation SelectHero($gameId: String!, $heroId: String!) {
 
 # Gameplay мутации
 
+mutation BeginManeuver($input: BeginManeuverDto!) {
+  beginManeuver(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}
+
+mutation DiscardToLimit($input: DiscardToLimitDto!) {
+  discardToLimit(input: $input) {
+    state
+    sequenceNumber
+    phase
+    currentTurnPlayerId
+    turnCount
+    timestamp
+  }
+}
+
 mutation Maneuver($input: ManeuverDto!) {
   maneuver(input: $input) {
     state

@@ -8,11 +8,11 @@
  *
  * Управление кликами:
  * - свой боец → выбрать (для движения/атаки)
- * - клетка при выбранном бойце → moveFighter
+ * - после обязательного добора манёвра: выбрать BOOST и пути бойцов, подтвердить
  * - своя карта: SCHEME в свой ход → playScheme; ATTACK/VERSATILE → выбрать
  *   (затем клик по врагу = attack); DEFENSE/VERSATILE в COMBAT у защитника
  *   → playDefense
- * - кнопки: End Turn / Pass / Resolve (в COMBAT_RESOLVE у атакующего)
+ * - лишние карты в конце хода выбираются по экземплярам до передачи хода
  */
 
 import { useEffect, useState } from 'react';
@@ -24,6 +24,7 @@ import type { PhaserGameEvent } from '@/phaser/types';
 import { GameErrorBoundary } from './GameErrorBoundary';
 import { Modal } from '@/design-system/components/Modal';
 import { Button } from '@/design-system/components/Button';
+import { appendManeuverStep, resourceControls, toggleDiscardInstance, type ManeuverMove } from './turnResourceChoices';
 import './GameView.css';
 
 export const GameView = () => {
@@ -47,7 +48,9 @@ export const GameView = () => {
     myStance,
     myStanceOptions,
     setStance,
-    moveFighter,
+    beginManeuver,
+    completeManeuver,
+    discardToLimit,
     attack,
     playDefense,
     playScheme,
@@ -55,7 +58,6 @@ export const GameView = () => {
     resolvePendingEffect,
     resolveChooseOption,
     endTurn,
-    pass,
     leaveGame,
     clearErrors,
   } = useRemoteGameStore();
@@ -64,6 +66,19 @@ export const GameView = () => {
   const [busy, setBusy] = useState(false);
   // C2: боец, выбранный для резолва отложенного эффекта (MOVE/PLACE)
   const [pendingFighterId, setPendingFighterId] = useState<string | null>(null);
+  const [maneuverMoves, setManeuverMoves] = useState<ManeuverMove[]>([]);
+  const [maneuverBoost, setManeuverBoost] = useState('');
+  const [discardIds, setDiscardIds] = useState<string[]>([]);
+  const controls = resourceControls(wireState, localUserId);
+  const hand = localUserId ? wireState?.handZones[localUserId]?.cards ?? [] : [];
+  const ownFighters = wireState?.fighters.filter(f => f.ownerId === localUserId && f.health > 0 && !f.isDefeated) ?? [];
+
+  // The server persists the choice itself. Local plans may be reselected after reload.
+  useEffect(() => {
+    setManeuverMoves([]);
+    setManeuverBoost('');
+    setDiscardIds([]);
+  }, [controls.maneuver?.id, controls.discard?.id]);
 
   // активный отложенный эффект ЛОКАЛЬНОГО игрока (первый в очереди)
   const pendingEffects = myPendingEffects();
@@ -104,8 +119,29 @@ export const GameView = () => {
   };
 
   const handlePhaserEvent = (event: PhaserGameEvent) => {
-    if (!wireState || !localUserId) return;
+    if (!wireState || !localUserId || busy || wireState.phase === 'GAME_OVER') return;
     const phase = wireState.phase;
+
+    if (controls.discard) {
+      if (event.type === 'CARD_CLICKED' && hand.some(card => card.id === event.cardId)) {
+        setDiscardIds(ids => toggleDiscardInstance(ids, event.cardId, controls.discard!.count));
+      }
+      return;
+    }
+
+    if (controls.maneuver) {
+      if (event.type === 'FIGHTER_CLICKED') {
+        const fighter = ownFighters.find(f => f.id === event.fighterId);
+        if (fighter) selectFighter(fighter.id);
+      } else if (event.type === 'CARD_CLICKED' && hand.some(card => card.id === event.cardId)) {
+        setManeuverBoost(id => id === event.cardId ? '' : event.cardId);
+      } else if (event.type === 'SPACE_CLICKED' && selectedFighterId) {
+        setManeuverMoves(moves => appendManeuverStep(moves, selectedFighterId, event.position));
+      }
+      return;
+    }
+
+    if (wireState.metadata.pendingManeuver || wireState.metadata.pendingHandDiscard) return;
 
     // CHOOSE_ONE (v3): выбор — кнопками в баннере, клики по доске игнорируем
     if (activePending && activePending.type === 'CHOOSE_ONE') {
@@ -155,8 +191,7 @@ export const GameView = () => {
         if (
           card &&
           myAttacker &&
-          isMyTurn() &&
-          actionsRemaining() > 0 &&
+          controls.canAct &&
           (card.cardType === 'ATTACK' || card.cardType === 'VERSATILE')
         ) {
           void run(() => attack(myAttacker, fighter.id, card.id));
@@ -165,9 +200,7 @@ export const GameView = () => {
       }
 
       case 'SPACE_CLICKED': {
-        if (!selectedFighterId || !isMyTurn() || actionsRemaining() <= 0) return;
-        if (phase !== 'ACTION_MANEUVER' && phase !== 'ACTION_ATTACK') return;
-        void run(() => moveFighter(selectedFighterId, event.position.x, event.position.y));
+        // Movement is planned only after beginManeuver has delivered its draw.
         return;
       }
 
@@ -185,7 +218,7 @@ export const GameView = () => {
           return;
         }
 
-        if (!isMyTurn() || actionsRemaining() <= 0) return;
+        if (!controls.canAct) return;
 
         if (card.cardType === 'SCHEME') {
           void run(() => playScheme(card.id));
@@ -275,25 +308,103 @@ export const GameView = () => {
             {connectionStatus === 'connected' ? '🟢 online' : `🟡 ${connectionStatus}`}
           </span>
           <span style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-            <Button
-              variant="ghost"
-              disabled={!myTurn || busy || gameOver}
-              onClick={() => void run(pass)}
-            >
-              Пас
-            </Button>
-            <Button
-              variant="ghost"
-              disabled={!myTurn || busy || gameOver}
-              onClick={() => void run(endTurn)}
-            >
-              Конец хода
-            </Button>
+            {controls.canBegin && (
+              <Button variant="primary" disabled={busy} onClick={() => void run(beginManeuver)}>
+                Начать манёвр
+              </Button>
+            )}
+            {controls.canEnd && (
+              <Button variant="ghost" disabled={busy} onClick={() => void run(endTurn)}>
+                Конец хода
+              </Button>
+            )}
             <Button variant="danger" onClick={() => setShowLeaveModal(true)}>
               Покинуть
             </Button>
           </span>
         </div>
+
+        {controls.maneuver && (
+          <section className="game-view__resource-panel" aria-label="Выбор манёвра">
+            <div className="game-view__resource-heading">
+              <strong>Манёвр · добор выполнен</strong>
+              <span>Выберите усиление и пути бойцов. Можно остаться на месте.</span>
+            </div>
+            <label className="game-view__resource-field">
+              Усиление манёвра
+              <select aria-label="Усиление манёвра" value={maneuverBoost} disabled={busy}
+                onChange={event => setManeuverBoost(event.target.value)}>
+                <option value="">Без усиления</option>
+                {hand.map((card, index) => (
+                  <option key={card.id} value={card.id}>
+                    {index + 1}. {card.nameRu || card.name} · BOOST +{card.boostValue ?? 0}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="game-view__resource-field">
+              Боец для движения
+              <select aria-label="Боец для движения" value={selectedFighterId ?? ''} disabled={busy}
+                onChange={event => selectFighter(event.target.value || null)}>
+                <option value="">Выберите бойца</option>
+                {ownFighters.map(fighter => (
+                  <option key={fighter.id} value={fighter.id}>
+                    {fighter.name} · ({fighter.position.x}, {fighter.position.y}) · движение {fighter.movement ?? 2}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p>Кликните клетки пути по порядку, затем выберите следующего бойца. Движение применяется в указанном порядке.</p>
+            {maneuverMoves.length > 0 && (
+              <ol className="game-view__maneuver-routes">
+                {maneuverMoves.map(move => (
+                  <li key={move.fighterId}>
+                    <span><strong>{ownFighters.find(f => f.id === move.fighterId)?.name}</strong>: {move.path.map(p => `(${p.x}, ${p.y})`).join(' → ')}</span>
+                    <Button variant="ghost" disabled={busy} onClick={() => setManeuverMoves(moves =>
+                      moves.flatMap(m => m.fighterId !== move.fighterId ? [m] : m.path.length > 1 ? [{ ...m, path: m.path.slice(0, -1) }] : []))}>
+                      Убрать шаг
+                    </Button>
+                    <Button variant="ghost" disabled={busy} onClick={() => setManeuverMoves(moves => moves.filter(m => m.fighterId !== move.fighterId))}>
+                      Очистить путь
+                    </Button>
+                  </li>
+                ))}
+              </ol>
+            )}
+            <Button variant="primary" disabled={busy} onClick={() => void run(() =>
+              completeManeuver(controls.maneuver!.id, maneuverMoves, maneuverBoost || undefined))}>
+              {maneuverMoves.length ? 'Подтвердить манёвр' : 'Завершить без движения'}
+            </Button>
+          </section>
+        )}
+
+        {controls.discard && (
+          <section className="game-view__resource-panel" aria-label="Сброс в конце хода">
+            <div className="game-view__resource-heading">
+              <strong>Сбросьте лишние карты</strong>
+              <span>Выбрано {discardIds.length} из {controls.discard.count}. После сброса ход перейдёт сопернику.</span>
+            </div>
+            <div className="game-view__discard-cards">
+              {hand.map((card, index) => (
+                <label key={card.id} className="game-view__discard-card">
+                  <input type="checkbox" value={card.id} checked={discardIds.includes(card.id)}
+                    disabled={busy || (!discardIds.includes(card.id) && discardIds.length >= controls.discard!.count)}
+                    onChange={() => setDiscardIds(ids => toggleDiscardInstance(ids, card.id, controls.discard!.count))} />
+                  <span>{index + 1}. {card.nameRu || card.name}<small>BOOST {card.boostValue ?? 0}</small></span>
+                </label>
+              ))}
+            </div>
+            <Button variant="primary" disabled={busy || discardIds.length !== controls.discard.count}
+              onClick={() => void run(() => discardToLimit(controls.discard!.id, discardIds))}>
+              Сбросить выбранные карты
+            </Button>
+          </section>
+        )}
+
+        {!gameOver && !controls.maneuver && !controls.discard &&
+          (wireState?.metadata.pendingManeuver || wireState?.metadata.pendingHandDiscard) && (
+            <div className="game-view__resource-panel" role="status">Соперник завершает выбор.</div>
+          )}
 
         {/* Ошибка действия (сервер отклонил) */}
         {actionError && (
@@ -409,7 +520,7 @@ export const GameView = () => {
                 return (
                   <button
                     key={opt.id}
-                    disabled={busy || active}
+                    disabled={busy || active || Boolean(wireState?.metadata.pendingManeuver || wireState?.metadata.pendingHandDiscard)}
                     onClick={() => void run(() => setStance(opt.id))}
                     style={{
                       background: active
@@ -439,10 +550,6 @@ export const GameView = () => {
           <PhaserGame
             gameId={adaptedState.id}
             gameState={adaptedState}
-            // в режиме pending подсвечиваем выбранного для эффекта бойца
-            selectedFighterId={activePending ? pendingFighterId : selectedFighterId}
-            selectedCardId={activePending ? null : selectedCardId}
-            highlightedSpaces={[]}
             onGameEvent={handlePhaserEvent}
             width={1000}
             height={640}
@@ -475,7 +582,7 @@ export const GameView = () => {
             </h2>
             <p>
               {winnerId === localUserId
-                ? 'Все бойцы противника повержены.'
+                ? 'Герой противника повержен.'
                 : `Победил ${opponent && winnerId === opponent.userId ? turnOwnerName || 'противник' : 'противник'}.`}
             </p>
             <Button variant="primary" onClick={() => navigate('/lobby')}>

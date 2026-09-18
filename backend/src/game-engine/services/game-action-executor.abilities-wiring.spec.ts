@@ -39,6 +39,15 @@ describe('GameActionExecutorService — abilities wiring', () => {
   let service: GameActionExecutorService;
   let registry: HeroAbilityRegistry;
 
+  async function maneuver(dto: Omit<ManeuverDto, 'maneuverId'>, context: ActionContext) {
+    const begun = await service.executeBeginManeuver(
+      { gameId: context.gameId, expectedSequenceNumber: context.currentState.sequenceNumber }, context,
+    );
+    expect(begun.success).toBe(true);
+    return service.executeManeuver({ ...dto, maneuverId: begun.gameState!.metadata.pendingManeuver!.id },
+      { ...context, currentState: begun.gameState! });
+  }
+
   /** Базовое тестовое состояние с двумя героями (слаги hero-a / hero-b) */
   const createMockGameState = (overrides?: Partial<GameState>): GameState =>
     ({
@@ -129,6 +138,7 @@ describe('GameActionExecutorService — abilities wiring', () => {
         {
           provide: GameRulesValidator,
           useValue: {
+            canPlayerAct: jest.fn().mockReturnValue({ valid: true }),
             validateManeuver: jest.fn().mockReturnValue({ valid: true }),
             validateMovement: jest.fn().mockReturnValue({ valid: true }),
             validateAttackWithParams: jest.fn().mockReturnValue({ valid: true }),
@@ -508,10 +518,10 @@ describe('GameActionExecutorService — abilities wiring', () => {
         currentState: state,
       };
 
-      const result = await service.executeManeuver(
+      const result = await maneuver(
         {
           gameId: 'test-game-1',
-          moves: [{ fighterId: 'fighter1', path: [{ x: 6, y: 6 }] }],
+          moves: [{ fighterId: 'fighter1', path: [{ x: 5, y: 6 }, { x: 6, y: 6 }] }],
         } as ManeuverDto,
         context,
       );
@@ -752,7 +762,8 @@ describe('GameActionExecutorService — abilities wiring', () => {
       };
       registry.registerExtended(fakeHandler);
 
-      const state = createMockGameState({ phase: GamePhase.ACTION_MANEUVER });
+      const state = createMockGameState({ phase: GamePhase.ACTION_MANEUVER,
+        metadata: { ...createMockGameState().metadata, actionsRemaining: 0 } });
       const context: ActionContext = {
         userId: 'player1',
         gameId: 'test-game-1',
@@ -933,7 +944,7 @@ describe('GameActionExecutorService — abilities wiring', () => {
       };
 
       // fighter1 (5,5) -> (5,7): движение детектится диффом
-      const result = await service.executeManeuver(
+      const result = await maneuver(
         {
           gameId: 'test-game-1',
           moves: [{ fighterId: 'fighter1', path: [{ x: 5, y: 6 }, { x: 5, y: 7 }] }],
@@ -966,7 +977,7 @@ describe('GameActionExecutorService — abilities wiring', () => {
         } as any,
       });
 
-      const result = await service.executeManeuver(
+      const result = await maneuver(
         {
           gameId: 'test-game-1',
           moves: [{ fighterId: 'fighter1', path: [{ x: 5, y: 6 }] }],
@@ -1018,7 +1029,7 @@ describe('GameActionExecutorService — abilities wiring', () => {
         } as any,
       });
 
-      const result = await service.executeManeuver(
+      const result = await maneuver(
         {
           gameId: 'test-game-1',
           moves: [{ fighterId: 'fighter1', path: [{ x: 5, y: 6 }] }],

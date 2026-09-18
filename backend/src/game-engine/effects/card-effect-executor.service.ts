@@ -992,7 +992,7 @@ export class CardEffectExecutorService {
     };
   }
 
-  /** Вернуть ЭТУ карту из сброса в руку (если влезает) */
+  /** Вернуть ЭТУ карту из сброса в руку; лимит руки проверяется в конце хода. */
   private applyReturnToHand(
     state: GameState,
     effect: CardEffect,
@@ -1006,12 +1006,6 @@ export class CardEffectExecutorService {
       return {
         state,
         result: { success: false, effectId: effect.id, targetIds: [], message: 'Карта не в сбросе' },
-      };
-    }
-    if (hand.cards.length >= hand.maxSize) {
-      return {
-        state,
-        result: { success: false, effectId: effect.id, targetIds: [], message: 'Рука полна' },
       };
     }
     const card = pile[idx];

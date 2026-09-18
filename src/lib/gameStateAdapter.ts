@@ -111,6 +111,8 @@ export interface WireGameState {
     winnerId?: string;
     passCount?: number;
     pendingEffects?: WirePendingEffect[];
+    pendingManeuver?: { id: string; playerId: string };
+    pendingHandDiscard?: { id: string; playerId: string; count: number };
     /** STANCE: текущая стойка героя по userId (id из AbilityConfig.stances) */
     heroStances?: Record<string, string>;
   };

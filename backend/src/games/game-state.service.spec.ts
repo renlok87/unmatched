@@ -335,10 +335,10 @@ describe('GameStateService', () => {
       expect(filtered.handZones.player2.cards[0].isVisible).toBe(false);
     });
 
-    it('should hide other players deck top cards', () => {
+    it('should hide deck top cards from both players', () => {
       const filtered = service.filterPrivateData(mockGameState, 'player1');
 
-      expect(filtered.decks.player1.topCard).toBeDefined();
+      expect(filtered.decks.player1.topCard).toBeUndefined();
       expect(filtered.decks.player2.topCard).toBeUndefined();
     });
 
@@ -347,6 +347,81 @@ describe('GameStateService', () => {
 
       expect(filtered.handZones.player1.cards[0].name).toBe('Hand Card 1');
       expect(filtered.handZones.player1.cards[0].attackValue).toBe(5);
+    });
+
+    it('uses a masked allowlist for opponent hands, excluding identity, type and extra private fields', () => {
+      const secret = { ...mockGameState.handZones.player2.cards[0], id: 'private-instance', cardId: 'private-definition',
+        cardType: CardType.SCHEME, bannerName: 'private-banner', text: 'private-text', futurePrivateField: 'private-extra' };
+      const state = { ...mockGameState, handZones: { ...mockGameState.handZones,
+        player2: { ...mockGameState.handZones.player2, cards: [secret] } } };
+      const filtered = service.filterPrivateData(state, 'player1');
+      const hand = JSON.stringify(filtered.handZones.player2);
+      for (const forbidden of ['private-instance', 'private-definition', 'SCHEME', 'private-banner', 'private-text', 'private-extra']) {
+        expect(hand).not.toContain(forbidden);
+      }
+      expect(filtered.handZones.player2.cards).toHaveLength(1);
+      expect(filtered.handZones.player2.cards[0].isVisible).toBe(false);
+      expect(service.filterPrivateData(state, 'player2').handZones.player2.cards[0]).toEqual(secret);
+      expect(state.handZones.player2.cards[0]).toEqual(secret);
+    });
+  });
+
+  describe('S03 resumable resource choices', () => {
+    const pendingStates = () => [
+      { ...mockGameState, phase: GamePhase.ACTION_MANEUVER,
+        metadata: { ...mockGameState.metadata, actionsRemaining: 0,
+          pendingManeuver: { id: 'maneuver-42', playerId: 'player1' } } },
+      { ...mockGameState, phase: GamePhase.TURN_END,
+        metadata: { ...mockGameState.metadata, actionsRemaining: 0,
+          pendingHandDiscard: { id: 'discard-43', playerId: 'player1', count: 2 } } },
+    ];
+
+    it.each([0, 1])('restores pending stage %s after database reload and exposes its identity', async (index) => {
+      const state = pendingStates()[index];
+      const upsert = jest.fn().mockResolvedValue({});
+      jest.spyOn(prisma, '$transaction').mockImplementation(async (callback: any) => callback({
+        gameState: { findUnique: jest.fn().mockResolvedValue(null), upsert },
+        game: { update: jest.fn().mockResolvedValue({}) },
+      }));
+      await service.saveState(state.gameId, state);
+      const stored = JSON.parse(JSON.stringify(upsert.mock.calls[0][0].create.state));
+      jest.spyOn(redis, 'getJson').mockResolvedValue(null);
+      jest.spyOn(prisma.gameState, 'findUnique').mockResolvedValue({ state: stored } as any);
+      const restored = await service.loadState(state.gameId);
+      expect(restored.phase).toBe(state.phase);
+      expect(restored.metadata.actionsRemaining).toBe(0);
+      for (const field of ['pendingManeuver', 'pendingHandDiscard']) {
+        expect((restored.metadata as any)[field]).toEqual((state.metadata as any)[field]);
+        expect((service.filterPrivateData(restored, 'player1').metadata as any)[field])
+          .toEqual((state.metadata as any)[field]);
+        expect((redis.setJsonex as jest.Mock).mock.calls[0][2].metadata[field])
+          .toEqual((state.metadata as any)[field]);
+      }
+    });
+
+    it('does not expose either deck order or unrevealed instance IDs to either player', () => {
+      const secretCard = { ...mockGameState.decks.player1.topCard!, id: 'future-instance', cardId: 'future-card' };
+      const state = { ...mockGameState, decks: Object.fromEntries(['player1', 'player2'].map(id =>
+        [id, { cards: [secretCard], drawPile: [secretCard, secretCard], topCard: secretCard }])) };
+      const original = JSON.stringify(state);
+      for (const viewer of ['player1', 'player2']) {
+        const filtered = service.filterPrivateData(state, viewer);
+        for (const deck of Object.values(filtered.decks)) {
+          expect(deck.topCard).toBeUndefined();
+          expect(deck.drawPile).toHaveLength(2);
+          expect(JSON.stringify(deck)).not.toContain('future-instance');
+          expect(JSON.stringify(deck)).not.toContain('future-card');
+          expect(JSON.stringify(deck)).not.toContain('Card 1');
+        }
+        expect(filtered.handZones[viewer]).toEqual(state.handZones[viewer]);
+      }
+      expect(JSON.stringify(state)).toBe(original);
+    });
+
+    it('accepts legacy snapshots without pending resource choices', () => {
+      const restored = service.deserialize(JSON.parse(JSON.stringify(service.serialize(mockGameState))));
+      expect((restored.metadata as any).pendingManeuver).toBeUndefined();
+      expect((restored.metadata as any).pendingHandDiscard).toBeUndefined();
     });
   });
 
@@ -469,8 +544,8 @@ describe('GameStateService', () => {
       expect(initialState.decks).toHaveProperty('player2');
       expect(initialState.handZones).toHaveProperty('player1');
       expect(initialState.handZones).toHaveProperty('player2');
-      expect(initialState.handZones.player1.maxSize).toBe(5);
-      expect(initialState.handZones.player2.maxSize).toBe(5);
+      expect(initialState.handZones.player1.maxSize).toBe(7);
+      expect(initialState.handZones.player2.maxSize).toBe(7);
     });
 
     it('should handle empty players list', async () => {

@@ -7,11 +7,14 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { Button, Input, Select, Space, Tag, Typography, message } from 'antd';
+import { parseManeuverCompletion } from './turn-resource-commands';
 import {
   ABORT_GAME,
   ATTACK,
   BOARD_OPTIONS,
+  BEGIN_MANEUVER,
   CREATE_GAME,
+  DISCARD_TO_LIMIT,
   END_TURN,
   GAME_STATE,
   GqlError,
@@ -19,8 +22,6 @@ import {
   JOIN_GAME,
   LOGIN,
   MANEUVER,
-  MOVE_FIGHTER,
-  PASS,
   PLAY_DEFENSE,
   PLAY_SCHEME, RESOLVE_PENDING_EFFECT,
   REGISTER,
@@ -73,16 +74,17 @@ const HELP_TEXT = `Команды (2 действия за ход; после 2-
   state            — краткое состояние игры
   state raw        — полный JSON состояния
   hand [p1|p2]     — рука игрока (карты с индексами c0, c1, ...)
-  move <f> <x> <y>           — переместить бойца (f0/f1... или id, тратит 1 действие)
-  maneuver <f> [<c>|-] <x>,<y> [...]     — манёвр: добор + движение; карта = BOOST к ходам (опц.)
+  maneuver         — начать манёвр: потратить действие, добрать карту; затем посмотри hand
+  maneuver done <c|-> [f0 x,y x,y ; f1 x,y] — выбрать BOOST и завершить начатый манёвр
+  maneuver done -  — завершить без движения и без BOOST
+  discard <c> [...] — выбрать ровно лишние экземпляры при сбросе в конце хода
   attack <f1> <f2> <c> [<boost>]         — атака картой (+BOOST-карта, тратит 1 действие)
   scheme <c>       — разыграть scheme-карту (тратит 1 действие)
   pending          — список отложенных эффектов (выбор игрока)
   peffect <id> <f> <x>,<y> — резолв отложенного MOVE/PLACE
   defense <c> [<boost>] — карта защиты (+BOOST-карта, за защищающегося)
   resolve          — разрешить бой
-  end              — закончить ход досрочно
-  pass             — пас (тратит 1 действие)
+  end              — завершить ход, только если действий и ожидающих выборов не осталось
   door <x> <y>     — открыть/закрыть дверь
   abort            — прервать игру
   help             — эта справка
@@ -276,6 +278,10 @@ export const GameTester: React.FC = () => {
         `  ⚔ БОЙ: ${combat.attackerId} → ${combat.defenderId}, атака ${combat.attackValue ?? '?'}${combat.defenseValue != null ? `, защита ${combat.defenseValue}` : ', защита не сыграна'}`,
       );
     }
+    const maneuver = state.metadata?.pendingManeuver;
+    if (maneuver) lines.push(`  ⏳ Манёвр ${maneuver.id}: карта уже добрана. hand → maneuver done <c|-> [пути]`);
+    const discard = state.metadata?.pendingHandDiscard;
+    if (discard) lines.push(`  ⏳ Сброс ${discard.id}: выберите ${discard.count} карт командой discard <c> [...]`);
     return lines.join('\n');
   };
 
@@ -541,48 +547,42 @@ export const GameTester: React.FC = () => {
           }
           break;
         }
-        case 'move': {
-          const [, fRef, x, y] = parts;
-          if (!fRef || x == null || y == null) throw new Error('move <f> <x> <y>');
-          const slot = resolveActor('move');
-          const f = resolveFighter(fRef);
-          await runAction(slot, `moveFighter(${f.name} → ${x},${y})`, MOVE_FIGHTER, {
-            input: { gameId: gameIdRef.current!, fighterId: f.id, x: Number(x), y: Number(y) },
-          }, 'moveFighter');
+        case 'move':
+          throw new Error('Начните maneuver, затем выберите путь через maneuver done <c|-> f0 x,y ...');
+        case 'maneuver': {
+          const slot = resolveActor('maneuver');
+          if (parts.length === 1) {
+            const state = stateRef.current;
+            if (!state) throw new Error('Сначала загрузите state');
+            await runAction(slot, 'beginManeuver', BEGIN_MANEUVER, {
+              input: { gameId: gameIdRef.current!, expectedSequenceNumber: state.sequenceNumber },
+            }, 'beginManeuver');
+            const cards = handsRef.current[slot.key] || [];
+            push(slot.key, 'block', `Рука после добора:\n${cards.map((card, index) => '  ' + cardLabel(card, index)).join('\n')}`);
+            break;
+          }
+          if (parts[1]?.toLowerCase() !== 'done') throw new Error('Сначала maneuver, затем maneuver done <c|-> [f0 x,y ... ; f1 x,y ...]');
+          const pending = stateRef.current?.metadata?.pendingManeuver;
+          if (!pending || pending.playerId !== slot.userId) throw new Error('Нет начатого манёвра этого игрока');
+          const choice = parseManeuverCompletion(parts.slice(2).join(' '));
+          const boostCard = choice.boostRef ? resolveCard(slot, choice.boostRef) : null;
+          const moves = choice.moves.map(move => ({ fighterId: resolveFighter(move.fighterRef).id, path: move.path }));
+          await runAction(slot, `maneuver complete (${moves.length} бойцов, BOOST ${boostCard?.name ?? 'нет'})`, MANEUVER, {
+            input: { gameId: gameIdRef.current!, maneuverId: pending.id, boostCardId: boostCard?.id ?? null, moves },
+          }, 'maneuver');
           break;
         }
-        case 'maneuver': {
-          // maneuver <f> [<boostCard>|-] <x>,<y> ... — boost-карта опциональна
-          // ('-' или сразу путь = манёвр без карты: чистые «добор + движение»)
-          const [, fRef, second, ...rest] = parts;
-          if (!fRef || !second) {
-            throw new Error('maneuver <f> [<boostCard>|-] <x>,<y> [<x>,<y> ...]');
+        case 'discard': {
+          const slot = resolveActor('discard');
+          const pending = stateRef.current?.metadata?.pendingHandDiscard;
+          if (!pending || pending.playerId !== slot.userId) throw new Error('Нет ожидающего сброса этого игрока');
+          const cardIds = parts.slice(1).map(ref => resolveCard(slot, ref).id as string);
+          if (cardIds.length !== pending.count || new Set(cardIds).size !== pending.count) {
+            throw new Error(`Выберите ровно ${pending.count} разных экземпляров карт`);
           }
-          const slot = resolveActor('maneuver');
-          const f = resolveFighter(fRef);
-          const secondIsPath = second.includes(',');
-          const boostRef = secondIsPath || second === '-' ? null : second;
-          const pathParts = secondIsPath ? [second, ...rest] : rest;
-          if (pathParts.length === 0) {
-            throw new Error('maneuver: путь пуст — укажи хотя бы одну точку <x>,<y>');
-          }
-          const boostCard = boostRef ? resolveCard(slot, boostRef) : null;
-          const path = pathParts.map((p) => {
-            const [px, py] = p.split(',').map(Number);
-            if (Number.isNaN(px) || Number.isNaN(py)) throw new Error(`Плохая точка пути: ${p}`);
-            return { x: px, y: py };
-          });
-          const label = boostCard
-            ? `maneuver(${f.name}, BOOST ${boostCard.name}, путь ${pathParts.join(' ')})`
-            : `maneuver(${f.name}, без карты, путь ${pathParts.join(' ')})`;
-          await runAction(slot, label, MANEUVER, {
-            input: {
-              gameId: gameIdRef.current!,
-              fighterId: f.id,
-              boostCardId: boostCard?.id ?? null,
-              path,
-            },
-          }, 'maneuver');
+          await runAction(slot, 'discardToLimit', DISCARD_TO_LIMIT, {
+            input: { gameId: gameIdRef.current!, pendingId: pending.id, cardIds },
+          }, 'discardToLimit');
           break;
         }
         case 'attack': {
@@ -635,7 +635,10 @@ export const GameTester: React.FC = () => {
         case 'pending': {
           // список отложенных эффектов (выборов игрока) из metadata
           const pend = (stateRef.current?.metadata?.pendingEffects ?? []) as any[];
-          if (pend.length === 0) {
+          const metadata = stateRef.current?.metadata;
+          if (metadata?.pendingManeuver) sys(`Манёвр: ${metadata.pendingManeuver.id}. Завершение: maneuver done <c|-> [пути]`);
+          if (metadata?.pendingHandDiscard) sys(`Сбросьте ${metadata.pendingHandDiscard.count} карт: discard <c> [...]`);
+          if (pend.length === 0 && !metadata?.pendingManeuver && !metadata?.pendingHandDiscard) {
             sys('Отложенных эффектов нет');
           } else {
             pend.forEach((p: any) =>
@@ -658,13 +661,12 @@ export const GameTester: React.FC = () => {
           break;
         }
         case 'end': {
+          const metadata = stateRef.current?.metadata;
+          if ((metadata?.actionsRemaining ?? 2) > 0 || metadata?.pendingManeuver || metadata?.pendingHandDiscard || metadata?.pendingEffects?.length) {
+            throw new Error('Сначала выполните все действия и ожидающие выборы');
+          }
           const slot = resolveActor('end');
           await runAction(slot, 'endTurn', END_TURN, { input: { gameId: gameIdRef.current! } }, 'endTurn');
-          break;
-        }
-        case 'pass': {
-          const slot = resolveActor('pass');
-          await runAction(slot, 'pass', PASS, { input: { gameId: gameIdRef.current! } }, 'pass');
           break;
         }
         case 'door': {
@@ -690,7 +692,7 @@ export const GameTester: React.FC = () => {
     } catch (e: any) {
       if (!(e instanceof GqlError)) {
         // GqlError уже залогирован в step/runAction
-        if (!String(e?.logged) /* локальные ошибки парсинга */) err('SYS', e.message || String(e));
+        if (!e?.logged) err('SYS', e.message || String(e));
       }
     } finally {
       setBusy(false);
@@ -767,8 +769,19 @@ export const GameTester: React.FC = () => {
           />
           <Button onClick={() => void execCommand('state')} disabled={busy || !game}>Состояние</Button>
           <Button onClick={() => void execCommand('hand')} disabled={busy || !game}>Руки</Button>
-          <Button onClick={() => void execCommand('end')} disabled={busy || !game}>End Turn</Button>
-          <Button onClick={() => void execCommand('pass')} disabled={busy || !game}>Pass</Button>
+          {['ACTION_MANEUVER', 'ACTION_ATTACK'].includes(stateRef.current?.phase) &&
+            !stateRef.current?.metadata?.pendingManeuver && !stateRef.current?.metadata?.pendingHandDiscard &&
+            !stateRef.current?.metadata?.pendingEffects?.length && (stateRef.current?.metadata?.actionsRemaining ?? 0) > 0 && (
+              <Button onClick={() => void execCommand('maneuver')} disabled={busy || !game}>Начать манёвр</Button>
+            )}
+          {stateRef.current?.metadata?.pendingManeuver && (
+            <Button onClick={() => void execCommand('maneuver done -')} disabled={busy || !game}>Завершить без движения</Button>
+          )}
+          {['ACTION_MANEUVER', 'ACTION_ATTACK', 'TURN_END'].includes(stateRef.current?.phase) &&
+            stateRef.current?.metadata?.actionsRemaining === 0 && !stateRef.current?.metadata?.pendingManeuver &&
+            !stateRef.current?.metadata?.pendingHandDiscard && !stateRef.current?.metadata?.pendingEffects?.length && (
+              <Button onClick={() => void execCommand('end')} disabled={busy || !game}>End Turn</Button>
+            )}
           <Button onClick={() => void execCommand('resolve')} disabled={busy || !game}>Resolve</Button>
           <Button danger onClick={() => void execCommand('abort')} disabled={busy || !game}>Abort</Button>
           <Button onClick={() => push('SYS', 'block', HELP_TEXT)}>Help</Button>

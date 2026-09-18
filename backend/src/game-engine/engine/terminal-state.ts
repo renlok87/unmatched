@@ -22,7 +22,7 @@ export function applyTerminalState(state: GameState): GameState {
     ...(ended ? {
       phase: GamePhase.GAME_OVER,
       metadata: { ...state.metadata, winnerId: alive[0]?.userId,
-        combatInfo: undefined, pendingEffects: [],
+        combatInfo: undefined, pendingEffects: [], pendingManeuver: undefined, pendingHandDiscard: undefined,
         combatResolutionProgress: undefined, combatEffectContinuation: undefined },
     } : {}),
   };

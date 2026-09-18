@@ -117,7 +117,7 @@ describe('TURN_START ability wiring (advanceTurn → triggerOnTurnStartExtended)
         lastActionAt: new Date(),
         lastActionBy: 'player1',
         version: 1,
-        actionsRemaining: 2,
+        actionsRemaining: 0,
       },
       ...overrides,
     }) as any;

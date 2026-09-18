@@ -159,7 +159,7 @@ export class GameActionExecutorService {
    * Передать ход следующему живому игроку.
    *
    * Фаза TURN_START исключена из продакшен-потока: ход сразу начинается
-   * с ACTION_MANEUVER + добор 1 карты следующему игроку (правила Unmatched).
+   * с ACTION_MANEUVER без автоматического добора карты.
    * Используется в executeEndTurn, executeResolveCombat и consumeAction
    * (авто-завершение хода после 2-го действия).
    *
@@ -171,18 +171,30 @@ export class GameActionExecutorService {
     state: GameState,
     userId: string,
     incrementSeq = true,
+    endEffectsApplied = false,
   ): Promise<GameState> {
-    // TURN_END-способности героя (TASK, infra): фаза TURN_END исключена из
-    // потока, поэтому extended-хук onTurnEnd встраивается ЗДЕСЬ — у
+    // TURN_END-способности героя выполняются перед возможным выбором сброса,
+    // поэтому extended-хук onTurnEnd встраивается ЗДЕСЬ — у
     // ЗАВЕРШАЮЩЕГО игрока, ДО снятия duration:'turn' эффектов и ДО
     // переключения currentTurnPlayerId. seq НЕ бампим отдельно: хук
     // «прицеплен» к той же передаче хода (+1 ниже), контракт saveState как у
     // turn-start. No-op для героев без onTurnEnd.
     const endingPlayerId = state.currentTurnPlayerId;
-    state = await this.triggerHeroTurnEnd(state, endingPlayerId);
+    if (!endEffectsApplied) state = await this.triggerHeroTurnEnd(state, endingPlayerId);
     state = applyTerminalState(state);
     if (state.phase === GamePhase.GAME_OVER) {
       return { ...state, sequenceNumber: state.sequenceNumber + (incrementSeq ? 1 : 0) };
+    }
+
+    // Seven is an end-of-turn limit, never a draw limit. Keep the turn until
+    // its owner selects exact instances; resume without replaying end effects.
+    const excess = (state.handZones[endingPlayerId]?.cards.length ?? 0) - 7;
+    if (excess > 0) {
+      return { ...state, phase: GamePhase.TURN_END,
+        sequenceNumber: state.sequenceNumber + (incrementSeq ? 1 : 0),
+        metadata: { ...state.metadata, actionsRemaining: 0,
+          pendingHandDiscard: { id: `discard:${state.turnCount}:${state.sequenceNumber}`, playerId: endingPlayerId, count: excess },
+          lastActionAt: new Date(), lastActionBy: userId } };
     }
 
     // Находим следующего живого игрока по кругу
@@ -201,20 +213,8 @@ export class GameActionExecutorService {
     const nextPlayerId = state.players[nextPlayerIndex].userId;
     const isSamePlayer = nextPlayerId === state.currentTurnPlayerId;
 
-    // Добор 1 карты следующему игроку (drawCards не трогает sequenceNumber;
-    // полная рука / пустые колода+сброс обрабатываются внутри drawCards).
-    // Легаси-состояния без deck/handZone не должны блокировать передачу хода.
-    let next = state;
-    try {
-      next = await this.deckManagement.drawCards(next, nextPlayerId, 1);
-    } catch (e) {
-      this.logger.warn(`advanceTurn: draw skipped for ${nextPlayerId}: ${e}`);
-    }
-
-    next = applyTerminalState(next);
-    if (next.phase === GamePhase.GAME_OVER) {
-      return { ...next, sequenceNumber: state.sequenceNumber + (incrementSeq ? 1 : 0) };
-    }
+    // Turn transfer itself never draws. Explicit hero hooks still may draw.
+    const next = state;
 
     // Эффекты «до конца хода» (immobilized и т.п.) снимаются на передаче хода
     const fightersCleaned = next.fighters.map((f) =>
@@ -241,6 +241,8 @@ export class GameActionExecutorService {
         lastActionAt: new Date(),
         lastActionBy: userId,
         actionsRemaining: ACTIONS_PER_TURN, // новый ход — 2 действия
+        pendingManeuver: undefined,
+        pendingHandDiscard: undefined,
         turnStartPositions,
         // Per-turn флаги действий сбрасываются при передаче хода (TASK): у нового
         // активного игрока свежий ход — ещё не манёврил, не атаковал, не проигрывал.
@@ -453,6 +455,9 @@ export class GameActionExecutorService {
     },
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
+      return { success: false, error: 'Resolve the pending resource choice first' };
+    }
     if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
       return { success: false, error: 'Game is already over' };
     }
@@ -765,9 +770,54 @@ export class GameActionExecutorService {
     return state;
   }
 
-  /**
-   * Выполнить манёвр (перемещение + розыгрыш карты)
-   */
+  /** Begin a maneuver atomically: spend one action and draw before any decision. */
+  async executeBeginManeuver(
+    dto: { gameId: string; expectedSequenceNumber: number }, context: ActionContext,
+  ): Promise<ActionResult> {
+    const { currentState: state, userId } = context;
+    const validation = this.rulesValidator.canPlayerAct(state, userId);
+    if (!validation.valid) return { success: false, error: validation.error };
+    if (applyTerminalState(state).phase === GamePhase.GAME_OVER ||
+        ![GamePhase.ACTION_MANEUVER, GamePhase.ACTION_ATTACK].includes(state.phase) ||
+        state.metadata.combatResolutionProgress || state.metadata.pendingManeuver || state.metadata.pendingHandDiscard ||
+        getActionsRemaining(state) <= 0) return { success: false, error: 'Cannot begin maneuver in current state' };
+    if (!Number.isInteger(dto.expectedSequenceNumber) || dto.expectedSequenceNumber !== state.sequenceNumber) {
+      return { success: false, error: 'State changed; reload before beginning maneuver' };
+    }
+    try {
+      let next = await this.deckManagement.drawCards({ ...state, metadata: { ...state.metadata,
+        actionsRemaining: getActionsRemaining(state) - 1, maneuveredThisTurn: true } }, userId, 1);
+      next = { ...next, sequenceNumber: state.sequenceNumber + 1,
+        metadata: { ...next.metadata, lastActionAt: new Date(), lastActionBy: userId,
+          pendingManeuver: next.phase === GamePhase.GAME_OVER ? undefined :
+            { id: `maneuver:${state.turnCount}:${state.sequenceNumber}`, playerId: userId } } };
+      return { success: true, gameState: next };
+    } catch (e) { return { success: false, error: e instanceof Error ? e.message : 'Maneuver draw failed' }; }
+  }
+
+  /** Resolve the exact excess instances, then resume the already-started turn end. */
+  async executeDiscardToLimit(
+    dto: { gameId: string; pendingId: string; cardIds: string[] }, context: ActionContext,
+  ): Promise<ActionResult> {
+    const { currentState: state, userId } = context;
+    const pending = state.metadata.pendingHandDiscard;
+    if (state.phase !== GamePhase.TURN_END || !pending || pending.id !== dto.pendingId ||
+        pending.playerId !== userId || state.currentTurnPlayerId !== userId) {
+      return { success: false, error: 'No matching discard choice for this player' };
+    }
+    const cards = state.handZones[userId]?.cards ?? [];
+    if (!Array.isArray(dto.cardIds) || dto.cardIds.length !== pending.count ||
+        new Set(dto.cardIds).size !== pending.count || cards.length - 7 !== pending.count ||
+        dto.cardIds.some(id => !cards.some(c => c.id === id))) {
+      return { success: false, error: 'Choose exactly the excess card instances from your hand' };
+    }
+    let next = state;
+    for (const id of dto.cardIds) next = await this.deckManagement.discardCard(next, userId, id);
+    next = { ...next, metadata: { ...next.metadata, pendingHandDiscard: undefined } };
+    return { success: true, gameState: await this.advanceTurn(next, userId, true, true) };
+  }
+
+  /** Complete the persisted maneuver without another draw or action charge. */
   async executeManeuver(
     dto: ManeuverDto,
     context: ActionContext,
@@ -781,11 +831,19 @@ export class GameActionExecutorService {
     return this.metrics.measureServiceDuration('executeManeuver', 'GameActionExecutor', async () => {
       try {
         const { userId, currentState, gameId } = context;
+        const pending = currentState.metadata.pendingManeuver;
+        if (!pending || pending.id !== dto.maneuverId || pending.playerId !== userId ||
+            currentState.currentTurnPlayerId !== userId || currentState.metadata.pendingHandDiscard) {
+          return { success: false, error: 'Begin maneuver first, then resolve its matching choice' };
+        }
 
         // BOOST-карта манёвра: явный boostCardId, либо legacy cardId
         // (старые клиенты слали cardId — трактуем как boost). Манёвр без
         // карты валиден: чистые «добор 1 + движение» (правила Unmatched).
         const boostCardId = dto.boostCardId ?? dto.cardId;
+        if (boostCardId && !currentState.handZones[userId]?.cards.some(c => c.id === boostCardId)) {
+          return { success: false, error: 'Boost must be a card instance in your hand' };
+        }
 
         // Манёвр двигает ВСЕХ своих бойцов (C3): moves[] — несколько ходов,
         // legacy fighterId+path — один. BOOST добавляется каждому бойцу.
@@ -795,10 +853,6 @@ export class GameActionExecutorService {
             : dto.fighterId && dto.path
               ? [{ fighterId: dto.fighterId, path: dto.path }]
               : [];
-        if (moves.length === 0) {
-          this.metrics.incrementGameAction('maneuver', undefined, 'error');
-          return { success: false, error: 'Манёвр без ходов: задай moves[] или fighterId+path' };
-        }
         const uniqueFighters = new Set(moves.map((m) => m.fighterId));
         if (uniqueFighters.size !== moves.length) {
           this.metrics.incrementGameAction('maneuver', undefined, 'error');
@@ -854,27 +908,16 @@ export class GameActionExecutorService {
           sequenceNumber: currentState.sequenceNumber + 1,
         };
 
+        if (boostCardId) {
+          newState = await this.deckManagement.discardCard(newState, userId, boostCardId);
+        }
+
         // РЕАКТИВНЫЕ on-move хуки (РЕАНИМАЦИЯ): диффим позиции (currentState ДО
         // мутации vs newState ПОСЛЕ) и даём ДРУГИМ героям отреагировать на
         // сдвинувшихся бойцов. seq отдельно НЕ бампим — «прицеплено» к +1
         // манёвра выше. No-op, если никто не реагирует.
         newState = await this.applyMoveReactions(currentState, newState);
 
-        // BOOST-карта уходит в сброс + добор 1 карты (правила Unmatched:
-        // манёвр = добор + движение). discardCard/drawCards не трогают
-        // sequenceNumber — +1 уже сделан в executeMovement.
-        if (newState.phase !== GamePhase.GAME_OVER && boostCardId) {
-          const playedCard = this.findHandCard(currentState, userId, boostCardId);
-          if (playedCard) {
-            newState = await this.deckManagement.discardCard(newState, userId, playedCard.id);
-          }
-        }
-        try {
-          newState = await this.deckManagement.drawCards(newState, userId, 1);
-        } catch (e) {
-          // Легаси-состояния без deck не должны блокировать манёвр
-          this.logger.warn(`executeManeuver: draw skipped for ${userId}: ${e}`);
-        }
 
         // Фазу НЕ переключаем (экономика «2 действия за ход»): манёвр — одно из
         // двух действий, после него можно манёврить/атаковать снова из той же фазы.
@@ -889,11 +932,14 @@ export class GameActionExecutorService {
             // в advanceTurn при передаче хода. Ставим один раз за манёвр —
             // даже если manёвр двигал нескольких бойцов (moves[]).
             maneuveredThisTurn: true,
+            pendingManeuver: undefined,
           },
         };
 
-        // Списываем 1 действие (после 2-го — авто-завершение хода без доп. +1 к seq)
-        newState = await this.consumeAction(newState, userId);
+        // Действие уже списано на begin; последний манёвр завершает ход после выбора.
+        if (newState.phase !== GamePhase.GAME_OVER && getActionsRemaining(newState) === 0) {
+          newState = await this.advanceTurn(newState, userId, false);
+        }
 
         this.metrics.incrementGameAction('maneuver', undefined, 'success');
 
@@ -922,86 +968,16 @@ export class GameActionExecutorService {
   }
 
   /**
-   * Выполнить простое перемещение бойца
+   * Legacy endpoint: ordinary movement requires the persisted maneuver flow.
    */
   async executeMoveFighter(
     dto: MoveFighterDto,
     context: ActionContext,
   ): Promise<ActionResult> {
-    if (context.currentState.metadata.combatResolutionProgress) {
-      return { success: false, error: 'Resolve the pending combat effect first' };
-    }
     if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
       return { success: false, error: 'Game is already over' };
     }
-    try {
-      const { userId, currentState } = context;
-
-      // Валидация
-      const validation = this.rulesValidator.validateMovement(
-        currentState,
-        dto.fighterId,
-        { x: dto.x, y: dto.y },
-        userId,
-      );
-
-      if (!validation.valid) {
-        return {
-          success: false,
-          error: validation.error || 'Movement validation failed',
-        };
-      }
-
-      // Выполняем перемещение
-      const path = [{ x: dto.x, y: dto.y }];
-      const result = await this.movementService.executeMovement(
-        currentState,
-        dto.fighterId,
-        path,
-      );
-
-      if (!result.success) {
-        return {
-          success: false,
-          error: result.error || 'Movement failed',
-        };
-      }
-
-      // sequenceNumber уже инкрементирован в movementService.executeMovement
-      let newState: GameState = {
-        ...result.nextState!,
-        metadata: {
-          ...result.nextState!.metadata,
-          lastActionAt: new Date(),
-          lastActionBy: userId,
-        },
-      };
-
-      // РЕАКТИВНЫЕ on-move хуки (РЕАНИМАЦИЯ): диффим позиции (currentState ДО vs
-      // newState ПОСЛЕ движения) — ДРУГИЕ герои могут отреагировать на сдвиг.
-      // seq НЕ бампим: «прицеплено» к +1 из movementService. No-op без реакции.
-      newState = await this.applyMoveReactions(currentState, newState);
-
-      // Списываем 1 действие (после 2-го — авто-завершение хода без доп. +1 к seq)
-      newState = await this.consumeAction(newState, userId);
-
-      return {
-        success: true,
-        gameState: newState,
-        metadata: {
-          action: 'moveFighter',
-          performedAt: new Date(),
-          performedBy: userId,
-          sequenceNumber: newState.sequenceNumber,
-        },
-      };
-    } catch (error) {
-      this.logger.error(`Ошибка при перемещении бойца: ${error}`);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
+    return { success: false, error: 'Use beginManeuver and maneuver to move fighters' };
   }
 
   /**
@@ -1011,11 +987,19 @@ export class GameActionExecutorService {
     dto: AttackDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
+      return { success: false, error: 'Resolve the pending resource choice first' };
+    }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };
     }
     if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
       return { success: false, error: 'Game is already over' };
+    }
+    const actionState = context.currentState;
+    if (actionState.currentTurnPlayerId !== context.userId || getActionsRemaining(actionState) <= 0 ||
+        ![GamePhase.ACTION_MANEUVER, GamePhase.ACTION_ATTACK].includes(actionState.phase)) {
+      return { success: false, error: 'No action available for this player in the current phase' };
     }
     return this.metrics.measureServiceDuration('executeAttack', 'GameActionExecutor', async () => {
       try {
@@ -1195,6 +1179,9 @@ export class GameActionExecutorService {
     dto: PlayDefenseDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
+      return { success: false, error: 'Resolve the pending resource choice first' };
+    }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };
     }
@@ -1337,11 +1324,19 @@ export class GameActionExecutorService {
     dto: PlaySchemeDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
+      return { success: false, error: 'Resolve the pending resource choice first' };
+    }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };
     }
     if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
       return { success: false, error: 'Game is already over' };
+    }
+    const actionState = context.currentState;
+    if (actionState.currentTurnPlayerId !== context.userId || getActionsRemaining(actionState) <= 0 ||
+        ![GamePhase.ACTION_MANEUVER, GamePhase.ACTION_ATTACK].includes(actionState.phase)) {
+      return { success: false, error: 'No action available for this player in the current phase' };
     }
     return this.metrics.measureServiceDuration('executePlayScheme', 'GameActionExecutor', async () => {
       try {
@@ -1451,6 +1446,9 @@ export class GameActionExecutorService {
     dto: ResolveCombatDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
+      return { success: false, error: 'Resolve the pending resource choice first' };
+    }
     if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
       return { success: false, error: 'Game is already over' };
     }
@@ -1828,6 +1826,9 @@ export class GameActionExecutorService {
     dto: EndTurnDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
+      return { success: false, error: 'Resolve the pending resource choice first' };
+    }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };
     }
@@ -1846,7 +1847,7 @@ export class GameActionExecutorService {
         };
       }
 
-      // Передаём ход следующему игроку: сразу ACTION_MANEUVER + добор карты
+      // Передаём ход следующему игроку: сразу ACTION_MANEUVER без добора карты
       // (фаза TURN_START пропускается — см. advanceTurn)
       const newState = await this.advanceTurn(currentState, userId);
 
@@ -1870,64 +1871,16 @@ export class GameActionExecutorService {
   }
 
   /**
-   * Выполнить pass (сброс карты + дополнительное действие)
+   * Legacy endpoint: passing cannot replace a mandatory action.
    */
   async executePass(
     dto: PassDto,
     context: ActionContext,
   ): Promise<ActionResult> {
-    if (context.currentState.metadata.combatResolutionProgress) {
-      return { success: false, error: 'Resolve the pending combat effect first' };
-    }
     if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
       return { success: false, error: 'Game is already over' };
     }
-    try {
-      const { userId, currentState } = context;
-
-      // Валидация
-      const validation = this.rulesValidator.validatePass(currentState, userId);
-      if (!validation.valid) {
-        return {
-          success: false,
-          error: validation.error || 'Pass validation failed',
-        };
-      }
-
-      // Сбрасываем верхнюю карту колоды (упрощённо - без реальной логики колоды)
-      // TODO: Интегрировать с реальной логикой колоды
-
-      let newState: GameState = {
-        ...currentState,
-        sequenceNumber: currentState.sequenceNumber + 1,
-        metadata: {
-          ...currentState.metadata,
-          lastActionAt: new Date(),
-          lastActionBy: userId,
-          passCount: (currentState.metadata.passCount || 0) + 1,
-        },
-      };
-
-      // Pass тоже тратит 1 действие (после 2-го — авто-завершение хода)
-      newState = await this.consumeAction(newState, userId);
-
-      return {
-        success: true,
-        gameState: newState,
-        metadata: {
-          action: 'pass',
-          performedAt: new Date(),
-          performedBy: userId,
-          sequenceNumber: newState.sequenceNumber,
-        },
-      };
-    } catch (error) {
-      this.logger.error(`Ошибка при выполнении pass: ${error}`);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
-    }
+    return { success: false, error: 'Passing is not a legal action; use maneuver even without movement' };
   }
 
   /**
@@ -1937,6 +1890,9 @@ export class GameActionExecutorService {
     dto: ToggleDoorDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
+      return { success: false, error: 'Resolve the pending resource choice first' };
+    }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };
     }
@@ -2014,6 +1970,9 @@ export class GameActionExecutorService {
     dto: { gameId: string; stanceId: string },
     context: ActionContext,
   ): Promise<ActionResult> {
+    if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
+      return { success: false, error: 'Resolve the pending resource choice first' };
+    }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };
     }

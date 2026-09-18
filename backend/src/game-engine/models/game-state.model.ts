@@ -134,6 +134,10 @@ export interface CombatEffectContinuation {
  * Метаданные состояния
  */
 export interface GameStateMetadata {
+  /** Maneuver has drawn and spent its action; movement/boost still await the owner. */
+  readonly pendingManeuver?: { readonly id: string; readonly playerId: string };
+  /** End-turn effects have completed; selected excess instances must be discarded. */
+  readonly pendingHandDiscard?: { readonly id: string; readonly playerId: string; readonly count: number };
   readonly lastActionAt: Date;
   readonly lastActionBy: string;
   readonly version: number;
