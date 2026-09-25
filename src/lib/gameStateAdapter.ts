@@ -135,6 +135,8 @@ export interface WirePendingEffect {
   options?: Array<{ index: number; label: string }>;
   /** CHOOSE_ONE: сколько опций выбрать (default 1) */
   chooseCount?: number;
+  /** GD-018: «You may …» — выбор можно отклонить (кнопка «Отказаться») */
+  optional?: boolean;
 }
 
 /** Справочники для артов/имён (контентные запросы, кэш в remoteGameStore) */

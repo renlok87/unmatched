@@ -16,6 +16,7 @@ import { bannerAllows } from '../validators/game-rules.validator';
 export type AiAction =
   | { kind: 'resolveChoose'; effectId: string; optionIndex: number }
   | { kind: 'resolveMove'; effectId: string; fighterId: string; x: number; y: number }
+  | { kind: 'declinePending'; effectId: string }
   | { kind: 'defense'; cardId: string }
   | { kind: 'resolveCombat' }
   | { kind: 'attack'; attackerId: string; targetId: string; cardId: string }
@@ -48,11 +49,17 @@ export class AiDecisionService {
         moves: hero && path.length ? [{ fighterId: hero.id, path }] : [] };
     }
 
-    // 1. Отложенные эффекты бота — резолвим до прочих действий
-    const pending = (state.metadata.pendingEffects ?? []).filter((p) => p.playerId === aiUserId);
-    if (pending.length > 0) {
-      const dec = this.decidePending(state, aiUserId, pending[0]);
+    // 1. GD-018: голова ГЛОБАЛЬНОЙ очереди выборов — строго по порядку;
+    // чужой выбор бот не скипает (null = ждём человека). Свой optional-выбор
+    // без полезного решения бот отклоняет; mandatory должен быть резолвнут.
+    const queue = state.metadata.pendingEffects ?? [];
+    if (queue.length > 0) {
+      const head = queue[0];
+      if (head.playerId !== aiUserId) return null;
+      const dec = this.decidePending(state, aiUserId, head);
       if (dec) return dec;
+      if (head.optional) return { kind: 'declinePending', effectId: head.id };
+      return null;
     }
 
     // 2. Бой
@@ -130,8 +137,17 @@ export class AiDecisionService {
     // не дальше pending.value (если задан); иначе — полный movement бойца
     const maxCost = typeof p.value === 'number' && p.value > 0 ? p.value : getFighterMovement(fighter);
     const step = enemy ? this.stepToward(state, fighter, enemy, maxCost) : null;
-    const target = step ?? { x: fighter.position.x, y: fighter.position.y };
-    return { kind: 'resolveMove', effectId: p.id, fighterId: fighter.id, x: target.x, y: target.y };
+    if (step) {
+      return { kind: 'resolveMove', effectId: p.id, fighterId: fighter.id, x: step.x, y: step.y };
+    }
+    // Улучшающего шага нет (враг смежен / бот заперт). Optional-эфект отклоняем
+    // (null → declinePending в decide); mandatory резолвим нулевым шагом —
+    // «up to N» включает 0, очередь не strand'ится.
+    if (p.optional) return null;
+    return {
+      kind: 'resolveMove', effectId: p.id, fighterId: fighter.id,
+      x: fighter.position.x, y: fighter.position.y,
+    };
   }
 
   // ---------- Карты ----------

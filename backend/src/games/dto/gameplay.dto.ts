@@ -321,6 +321,22 @@ export class ResolvePendingEffectDto {
 }
 
 /**
+ * DTO для отказа от OPTIONAL-выбора (GD-018, ACC-008).
+ * Разрешён только голове очереди, владельцу, только optional-выборы.
+ */
+@InputType()
+export class DeclinePendingEffectDto {
+  @Field(() => String)
+  @IsNotEmpty()
+  gameId: string;
+
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
+  effectId: string;
+}
+
+/**
  * DTO для разрешения боя
  */
 @InputType()

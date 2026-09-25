@@ -679,13 +679,49 @@ export class GameService {
       throw new BadRequestException('Не все игроки готовы');
     }
 
-    // Обновляем игру
-    const updatedGame = await this.prisma.game.update({
-      where: { id: gameId },
-      data: {
-        status: GameStatus.IN_PROGRESS,
-        startedAt: new Date(),
-      },
+    // GD-016: страховка от гонки выбора — матч не стартует с дубликатом героя
+    const heroIds = game.players.map((p) => p.heroId);
+    if (heroIds.some((id) => !id)) {
+      throw new BadRequestException('Каждый игрок должен выбрать героя');
+    }
+    if (new Set(heroIds).size !== heroIds.length) {
+      throw new BadRequestException('Два игрока не могут играть одного героя');
+    }
+
+    // Атомарный LOBBY→IN_PROGRESS переход: строка игры лочится FOR UPDATE,
+    // статус/готовность/состав перепроверяются по данным ПОД локом —
+    // конкурентный selectHero (или второй startGame) сериализуется с этим
+    // блоком, стартовавший матч уже не мутируется выбором героя.
+    await this.prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "Game" WHERE id = ${gameId} FOR UPDATE`;
+      const locked = await tx.game.findUnique({
+        where: { id: gameId },
+        select: { status: true },
+      });
+      if (!locked || locked.status !== GameStatus.LOBBY) {
+        throw new BadRequestException('Игру можно начать только из лобби');
+      }
+      const roster = await tx.gamePlayer.findMany({
+        where: { gameId },
+        orderBy: { seatOrder: 'asc' },
+      });
+      if (!roster.every((p) => p.isReady)) {
+        throw new BadRequestException('Не все игроки готовы');
+      }
+      const lockedHeroIds = roster.map((p) => p.heroId);
+      if (lockedHeroIds.some((id) => !id)) {
+        throw new BadRequestException('Каждый игрок должен выбрать героя');
+      }
+      if (new Set(lockedHeroIds).size !== lockedHeroIds.length) {
+        throw new BadRequestException('Два игрока не могут играть одного героя');
+      }
+      await tx.game.update({
+        where: { id: gameId },
+        data: {
+          status: GameStatus.IN_PROGRESS,
+          startedAt: new Date(),
+        },
+      });
     });
 
     // Создаём начальное игровое состояние (бойцы, колоды, руки).
@@ -880,9 +916,29 @@ export class GameService {
       throw new NotFoundException('Вы не участвуете в этой игре');
     }
 
-    await this.prisma.gamePlayer.update({
-      where: { id: player.id },
-      data: { heroId },
+    // GD-016: состав без дубликатов — проверка и запись атомарны в транзакции.
+    // Строка игры лочится SELECT … FOR UPDATE: конкурентные selectHero и
+    // startGame одной игры сериализуются (READ COMMITTED достаточно —
+    // check-then-act целиком под локом), иначе две транзакции читают ростер
+    // до коммита соперника и оба выбора проходят.
+    await this.prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM "Game" WHERE id = ${gameId} FOR UPDATE`;
+      const locked = await tx.game.findUnique({
+        where: { id: gameId },
+        select: { status: true },
+      });
+      if (!locked || locked.status !== GameStatus.LOBBY) {
+        throw new BadRequestException('Героя можно выбрать только в лобби');
+      }
+      const roster = await tx.gamePlayer.findMany({ where: { gameId } });
+      const rival = roster.find((p) => p.userId !== userId && p.heroId === heroId);
+      if (rival) {
+        throw new BadRequestException('Герой уже выбран другим игроком этой игры');
+      }
+      await tx.gamePlayer.update({
+        where: { id: player.id },
+        data: { heroId },
+      });
     });
 
     await this.invalidateGameCache(gameId);

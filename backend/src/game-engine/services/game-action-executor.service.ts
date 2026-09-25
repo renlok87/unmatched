@@ -38,7 +38,7 @@ import {
 import { GameRulesValidator, bannerAllows } from '../validators/game-rules.validator';
 import { CombatResolverService } from '../engine/combat-resolver.service';
 import { MovementService } from '../engine/movement.service';
-import { isLivingFighter } from '../movement/traversal';
+import { isCellPassable, isLivingFighter } from '../movement/traversal';
 import { ValueModifierService } from '../engine/value-modifier.service';
 import { AdjacencyService } from '../engine/adjacency.service';
 import { DeckManagementService } from './deck-management.service';
@@ -168,12 +168,68 @@ export class GameActionExecutorService {
    * тогда входное состояние должно приходить БЕЗ собственного инкремента.
    * incrementSeq=false — для вызова из consumeAction, где +1 уже сделало само действие.
    */
+  /** GD-018: отложить передачу хода — очередь выборов ещё открыта. */
+  private deferTurnEnd(
+    state: GameState,
+    incrementSeq: boolean,
+    endEffectsApplied: boolean,
+  ): GameState {
+    return {
+      ...state,
+      sequenceNumber: state.sequenceNumber + (incrementSeq ? 1 : 0),
+      metadata: {
+        ...state.metadata,
+        actionsRemaining: 0,
+        pendingTurnEnd: { playerId: state.currentTurnPlayerId, endEffectsApplied },
+      },
+    };
+  }
+
+  /**
+   * GD-018: общая точка дренирования после resolve/decline последнего выбора.
+   * Очередь пуста →
+   *  a) бой на паузе (combatResolutionProgress) → ре-вход в executeResolveCombat
+   *     (seq базового резолва уже учтён через baseSeq);
+   *  b) отложенная передача хода (pendingTurnEnd) → advanceTurn с
+   *     incrementSeq=false (+1 уже сделала сама мутация резолва) и
+   *     endEffectsApplied из marker'а (не повторять TURN_END-хуки);
+   *  c) иначе — состояние как есть (ход продолжается).
+   */
+  private async drainAfterChoice(
+    resolved: GameState,
+    userId: string,
+    gameId: string,
+    baseSeq: number,
+  ): Promise<GameState> {
+    if (resolved.phase === GamePhase.GAME_OVER) return resolved;
+    if ((resolved.metadata.pendingEffects?.length ?? 0) > 0) return resolved;
+    if (resolved.metadata.combatResolutionProgress) {
+      const resumed = await this.executeResolveCombat({ gameId }, {
+        userId, gameId, currentState: { ...resolved, sequenceNumber: baseSeq },
+      });
+      return resumed.success ? resumed.gameState! : resolved;
+    }
+    if (resolved.metadata.pendingTurnEnd) {
+      return this.advanceTurn(resolved, userId,
+        /* incrementSeq */ false,
+        resolved.metadata.pendingTurnEnd.endEffectsApplied ?? true);
+    }
+    return resolved;
+  }
+
   private async advanceTurn(
     state: GameState,
     userId: string,
     incrementSeq = true,
     endEffectsApplied = false,
   ): Promise<GameState> {
+    // GD-018 (ACC-008): открытая очередь выборов блокирует передачу хода —
+    // истечение круга НЕ заменяет решение. Откладываем передачу через
+    // persisted-marker pendingTurnEnd; hooks ещё не выполнялись.
+    if ((state.metadata.pendingEffects?.length ?? 0) > 0) {
+      return this.deferTurnEnd(state, incrementSeq, false);
+    }
+
     // TURN_END-способности героя выполняются перед возможным выбором сброса,
     // поэтому extended-хук onTurnEnd встраивается ЗДЕСЬ — у
     // ЗАВЕРШАЮЩЕГО игрока, ДО снятия duration:'turn' эффектов и ДО
@@ -185,6 +241,12 @@ export class GameActionExecutorService {
     state = applyTerminalState(state);
     if (state.phase === GamePhase.GAME_OVER) {
       return { ...state, sequenceNumber: state.sequenceNumber + (incrementSeq ? 1 : 0) };
+    }
+
+    // GD-018: TURN_END-хук сам создал выборы — передача снова отложена,
+    // но хуки уже выполнены (не повторять при возобновлении).
+    if ((state.metadata.pendingEffects?.length ?? 0) > 0) {
+      return this.deferTurnEnd(state, incrementSeq, true);
     }
 
     // Seven is an end-of-turn limit, never a draw limit. Keep the turn until
@@ -251,12 +313,10 @@ export class GameActionExecutorService {
         maneuveredThisTurn: false,
         attackedThisTurn: false,
         lostCombatThisTurn: false,
-        // Выборы игрока протухают при ВОЗВРАТЕ хода их владельцу (полный круг):
-        // атака вторым действием создаёт pending и тут же передаёт ход —
-        // чистка «при любой передаче» стирала бы их до резолва
-        pendingEffects: (next.metadata.pendingEffects ?? []).filter(
-          (p) => p.playerId !== nextPlayerId,
-        ),
+        // GD-018: отложенная передача выполнена — marker снят. Выборы больше
+        // не протухают при передаче/возврате хода (удалённый circle-expiry
+        // фильтр молча заменял решение игрока).
+        pendingTurnEnd: undefined,
       },
     };
 
@@ -470,8 +530,10 @@ export class GameActionExecutorService {
       if (!pending) {
         return { success: false, error: 'Отложенный эффект не найден (протух или уже резолвлен)' };
       }
-      if (currentState.metadata.combatResolutionProgress && currentState.metadata.pendingEffects?.[0]?.id !== pending.id) {
-        return { success: false, error: 'Resolve the first pending combat effect first' };
+      // GD-018: голова очереди — ВСЕГДА (не только в бою): выборы
+      // выполняются строго последовательно, out-of-order отклоняется.
+      if (currentState.metadata.pendingEffects?.[0]?.id !== pending.id) {
+        return { success: false, error: 'Resolve the first pending choice first' };
       }
       if (pending.playerId !== userId) {
         return { success: false, error: 'Этот выбор принадлежит другому игроку' };
@@ -519,36 +581,43 @@ export class GameActionExecutorService {
         return { success: false, error: 'Клетка вне доски' };
       }
       const cell = currentState.boardState.cells[target.y]?.[target.x];
-      if (cell && (cell.type === 'obstacle' || cell.type === 'wall')) {
+      // GD-015-семантика isCellPassable: стены/препятствия/закрытые двери И
+      // дыры сетки (undefined внутри границ) — непроходимы для MOVE/PLACE.
+      if (!isCellPassable(cell)) {
         return { success: false, error: 'Клетка непроходима' };
       }
       const occupied = currentState.fighters.some(
-        (f) => f.id !== fighter.id && f.health > 0 && f.position.x === target.x && f.position.y === target.y,
+        (f) => f.id !== fighter.id && isLivingFighter(f) && f.position.x === target.x && f.position.y === target.y,
       );
       if (occupied) {
         return { success: false, error: 'Клетка занята' };
       }
 
       if (pending.type === 'MOVE') {
-        // Дистанция эффекта (не movement бойца): союзники проходимы,
-        // враги блокируют путь, занятое назначение уже проверено выше.
-        const allowance = pending.value ?? 1;
-        const blockedPositions = new Set(
-          currentState.fighters
-            .filter((f) => f.id !== fighter.id && isLivingFighter(f) && f.ownerId !== fighter.ownerId)
-            .map((f) => `${f.position.x}:${f.position.y}`),
-        );
-        const reachable = this.adjacencyService.getReachableCells(
-          currentState.boardState,
-          fighter.position,
-          allowance,
-          { blockedPositions },
-        );
-        if (!reachable.has(`${target.x}:${target.y}`)) {
-          return {
-            success: false,
-            error: `До клетки (${target.x}, ${target.y}) не добраться за ${allowance} шаг(ов)`,
-          };
+        // Нулевой шаг легален для «up to N»: остаться на месте — валидный
+        // резолв (mandatory-MOVE без достижимых свободных клеток не strand'ит).
+        const staysInPlace = target.x === fighter.position.x && target.y === fighter.position.y;
+        if (!staysInPlace) {
+          // Дистанция эффекта (не movement бойца): союзники проходимы,
+          // враги блокируют путь, занятое назначение уже проверено выше.
+          const allowance = pending.value ?? 1;
+          const blockedPositions = new Set(
+            currentState.fighters
+              .filter((f) => f.id !== fighter.id && isLivingFighter(f) && f.ownerId !== fighter.ownerId)
+              .map((f) => `${f.position.x}:${f.position.y}`),
+          );
+          const reachable = this.adjacencyService.getReachableCells(
+            currentState.boardState,
+            fighter.position,
+            allowance,
+            { blockedPositions },
+          );
+          if (!reachable.has(`${target.x}:${target.y}`)) {
+            return {
+              success: false,
+              error: `До клетки (${target.x}, ${target.y}) не добраться за ${allowance} шаг(ов)`,
+            };
+          }
         }
       }
       // PLACE: любая валидная свободная клетка (зонные ограничения — позже)
@@ -573,12 +642,7 @@ export class GameActionExecutorService {
       // диффим позиции (currentState ДО vs newState ПОСЛЕ) и даём ДРУГИМ героям
       // отреагировать. seq НЕ бампим: «прицеплено» к +1 резолва эффекта выше.
       newState = await this.applyMoveReactions(currentState, newState);
-      if (newState.phase !== GamePhase.GAME_OVER && newState.metadata.combatResolutionProgress &&
-          !(newState.metadata.pendingEffects?.length)) {
-        return this.executeResolveCombat({ gameId: context.gameId }, {
-          ...context, currentState: { ...newState, sequenceNumber: currentState.sequenceNumber },
-        });
-      }
+      newState = await this.drainAfterChoice(newState, userId, context.gameId, currentState.sequenceNumber);
 
       return {
         success: true,
@@ -598,6 +662,66 @@ export class GameActionExecutorService {
         error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
+  }
+
+  /**
+   * GD-018 (ACC-008): отказ от OPTIONAL-выбора («You may …»).
+   * Только голова очереди, только владелец, только optional — mandatory
+   * отклонить нельзя. Убирает выбор, seq +1, затем общая точка дренирования
+   * (продолжение боя / отложенная передача хода).
+   */
+  async executeDeclinePendingEffect(
+    dto: { gameId: string; effectId: string },
+    context: ActionContext,
+  ): Promise<ActionResult> {
+    const { currentState, userId } = context;
+    if (currentState.metadata.pendingManeuver || currentState.metadata.pendingHandDiscard) {
+      return { success: false, error: 'Resolve the pending resource choice first' };
+    }
+    if (applyTerminalState(currentState).phase === GamePhase.GAME_OVER) {
+      return { success: false, error: 'Game is already over' };
+    }
+    const pending = (currentState.metadata.pendingEffects ?? []).find(
+      (p) => p.id === dto.effectId,
+    );
+    if (!pending) {
+      return { success: false, error: 'Отложенный эффект не найден (протух или уже резолвлен)' };
+    }
+    if (currentState.metadata.pendingEffects?.[0]?.id !== pending.id) {
+      return { success: false, error: 'Resolve the first pending choice first' };
+    }
+    if (pending.playerId !== userId) {
+      return { success: false, error: 'Этот выбор принадлежит другому игроку' };
+    }
+    if (!pending.optional) {
+      return { success: false, error: 'Этот выбор обязателен — его нельзя отклонить' };
+    }
+
+    let newState: GameState = {
+      ...currentState,
+      sequenceNumber: currentState.sequenceNumber + 1,
+      metadata: {
+        ...currentState.metadata,
+        lastActionAt: new Date(),
+        lastActionBy: userId,
+        pendingEffects: (currentState.metadata.pendingEffects ?? []).filter(
+          (p) => p.id !== pending.id,
+        ),
+      },
+    };
+    newState = await this.drainAfterChoice(newState, userId, context.gameId, currentState.sequenceNumber);
+
+    return {
+      success: true,
+      gameState: newState,
+      metadata: {
+        action: 'declinePendingEffect',
+        performedAt: new Date(),
+        performedBy: userId,
+        sequenceNumber: newState.sequenceNumber,
+        effectText: pending.text,
+      },
+    };
   }
 
   /**
@@ -673,13 +797,7 @@ export class GameActionExecutorService {
       } };
     }
 
-    if (newState.phase !== GamePhase.GAME_OVER && newState.metadata.combatResolutionProgress &&
-        !(newState.metadata.pendingEffects?.length)) {
-      return this.executeResolveCombat({ gameId: currentState.gameId }, {
-        userId, gameId: currentState.gameId,
-        currentState: { ...newState, sequenceNumber: currentState.sequenceNumber },
-      });
-    }
+    newState = await this.drainAfterChoice(newState, userId, currentState.gameId, currentState.sequenceNumber);
 
     return {
       success: true,
@@ -782,6 +900,7 @@ export class GameActionExecutorService {
     if (applyTerminalState(state).phase === GamePhase.GAME_OVER ||
         ![GamePhase.ACTION_MANEUVER, GamePhase.ACTION_ATTACK].includes(state.phase) ||
         state.metadata.combatResolutionProgress || state.metadata.pendingManeuver || state.metadata.pendingHandDiscard ||
+        (state.metadata.pendingEffects?.length ?? 0) > 0 ||
         getActionsRemaining(state) <= 0) return { success: false, error: 'Cannot begin maneuver in current state' };
     if (!Number.isInteger(dto.expectedSequenceNumber) || dto.expectedSequenceNumber !== state.sequenceNumber) {
       return { success: false, error: 'State changed; reload before beginning maneuver' };
@@ -824,6 +943,9 @@ export class GameActionExecutorService {
     dto: ManeuverDto,
     context: ActionContext,
   ): Promise<ActionResult> {
+    if ((context.currentState.metadata.pendingEffects?.length ?? 0) > 0) {
+      return { success: false, error: 'Resolve the pending choice first' };
+    }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };
     }
@@ -992,6 +1114,9 @@ export class GameActionExecutorService {
   ): Promise<ActionResult> {
     if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
       return { success: false, error: 'Resolve the pending resource choice first' };
+    }
+    if ((context.currentState.metadata.pendingEffects?.length ?? 0) > 0) {
+      return { success: false, error: 'Resolve the pending choice first' };
     }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };
@@ -1185,6 +1310,9 @@ export class GameActionExecutorService {
     if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
       return { success: false, error: 'Resolve the pending resource choice first' };
     }
+    if ((context.currentState.metadata.pendingEffects?.length ?? 0) > 0) {
+      return { success: false, error: 'Resolve the pending choice first' };
+    }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };
     }
@@ -1330,6 +1458,9 @@ export class GameActionExecutorService {
     if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
       return { success: false, error: 'Resolve the pending resource choice first' };
     }
+    if ((context.currentState.metadata.pendingEffects?.length ?? 0) > 0) {
+      return { success: false, error: 'Resolve the pending choice first' };
+    }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };
     }
@@ -1451,6 +1582,9 @@ export class GameActionExecutorService {
   ): Promise<ActionResult> {
     if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
       return { success: false, error: 'Resolve the pending resource choice first' };
+    }
+    if ((context.currentState.metadata.pendingEffects?.length ?? 0) > 0) {
+      return { success: false, error: 'Resolve the pending choice first' };
     }
     if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
       return { success: false, error: 'Game is already over' };
@@ -1832,6 +1966,9 @@ export class GameActionExecutorService {
     if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
       return { success: false, error: 'Resolve the pending resource choice first' };
     }
+    if ((context.currentState.metadata.pendingEffects?.length ?? 0) > 0) {
+      return { success: false, error: 'Resolve the pending choice first' };
+    }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };
     }
@@ -1895,6 +2032,9 @@ export class GameActionExecutorService {
   ): Promise<ActionResult> {
     if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
       return { success: false, error: 'Resolve the pending resource choice first' };
+    }
+    if ((context.currentState.metadata.pendingEffects?.length ?? 0) > 0) {
+      return { success: false, error: 'Resolve the pending choice first' };
     }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };
@@ -1975,6 +2115,9 @@ export class GameActionExecutorService {
   ): Promise<ActionResult> {
     if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
       return { success: false, error: 'Resolve the pending resource choice first' };
+    }
+    if ((context.currentState.metadata.pendingEffects?.length ?? 0) > 0) {
+      return { success: false, error: 'Resolve the pending choice first' };
     }
     if (context.currentState.metadata.combatResolutionProgress) {
       return { success: false, error: 'Resolve the pending combat effect first' };

@@ -535,6 +535,7 @@ export class CardEffectExecutorService {
           optionEffects: options.map((o) => o.effects),
           card: context.card,
           effectContext: context.combat ? context : undefined,
+          optional: effect.optional,
           text,
         };
         const next: GameState = {
@@ -570,6 +571,7 @@ export class CardEffectExecutorService {
           value: value || undefined,
           fighterName: effect.fighterName,
           targetsOpponent: effect.target === EffectTarget.OPPOSING_FIGHTER,
+          optional: effect.optional,
           text,
         };
         const next: GameState = {

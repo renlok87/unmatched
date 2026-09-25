@@ -78,6 +78,8 @@ export interface SerializedGameState {
     at?: boolean; // attackedThisTurn
     lc?: boolean; // lostCombatThisTurn
     hs?: Record<string, string>; // heroStances — текущая стойка героя по userId (STANCE)
+    fp?: string; // firstPlayerId — явный первый игрок матча (GD-016)
+    pte?: GameStateMetadata['pendingTurnEnd']; // GD-018: отложенная передача хода
   };
 }
 
@@ -376,6 +378,10 @@ export class GameStateService {
         lc: state.metadata.lostCombatThisTurn,
         // STANCE: текущие стойки героев по userId (легаси-сейвы без поля → undefined)
         hs: state.metadata.heroStances as Record<string, string> | undefined,
+        // GD-016: явный первый игрок матча (легаси-сейвы без поля → undefined)
+        fp: state.metadata.firstPlayerId,
+        // GD-018: отложенная передача хода (легаси-сейвы без поля → undefined)
+        pte: state.metadata.pendingTurnEnd,
       },
     };
   }
@@ -493,6 +499,10 @@ export class GameStateService {
         lostCombatThisTurn: data.m.lc,
         // STANCE: текущие стойки героев (undefined прозрачно проходит — легаси)
         heroStances: data.m.hs,
+        // GD-016: явный первый игрок (undefined прозрачно проходит — легаси)
+        firstPlayerId: data.m.fp,
+        // GD-018: отложенная передача хода (легаси-сейвы без поля → undefined)
+        pendingTurnEnd: data.m.pte,
       },
     };
   }

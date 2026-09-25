@@ -35,6 +35,7 @@ import {
   PlayDefenseDto,
   PlaySchemeDto,
   ResolvePendingEffectDto,
+  DeclinePendingEffectDto,
   ResolveCombatDto,
   EndTurnDto,
   PassDto,
@@ -424,6 +425,30 @@ export class GameActionsResolver {
       userId,
       'resolvePendingEffect',
       (ctx) => this.actionExecutor.executeResolvePendingEffect(dto, ctx),
+      'CARD_PLAYED',
+    );
+  }
+
+  /**
+   * GD-018 (ACC-008): отказ от OPTIONAL-выбора («You may …»). Только голова
+   * очереди, только владелец, только optional — mandatory отклонить нельзя.
+   */
+  @Mutation(() => GameMutationResult, {
+    name: 'declinePendingEffect',
+    description: 'Отказаться от optional-выбора (только «You may …», только голова очереди)',
+  })
+  @UseGuards(GqlAuthGuard, GameInProgressGuard, GamePlayerGuard)
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
+  async declinePendingEffect(
+    @Args('input') dto: DeclinePendingEffectDto,
+    @Context() context: any,
+  ): Promise<GameMutationResult> {
+    const userId = getUserId(context);
+    return this.executeMutation(
+      dto,
+      userId,
+      'declinePendingEffect',
+      (ctx) => this.actionExecutor.executeDeclinePendingEffect(dto, ctx),
       'CARD_PLAYED',
     );
   }

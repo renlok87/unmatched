@@ -19,7 +19,7 @@ import { apolloClient } from '@/lib/apolloClient';
 import { useAuthStore } from '@/store/authStore';
 import * as gql from '@/gql/graphql';
 import {
-  BeginManeuverDocument, CompleteManeuverDocument, DiscardToLimitDocument,
+  BeginManeuverDocument, CompleteManeuverDocument, DiscardToLimitDocument, DeclinePendingEffectDocument,
   type BeginManeuverVariables, type CompleteManeuverVariables, type DiscardToLimitVariables,
 } from '@/graphql/turnResources';
 import type { ManeuverMove } from '@/components/game/turnResourceChoices';
@@ -126,6 +126,8 @@ interface RemoteGameState {
   playScheme: (cardId: string) => Promise<void>;
   resolveCombat: () => Promise<void>;
   resolvePendingEffect: (effectId: string, fighterId: string, x: number, y: number) => Promise<void>;
+  /** GD-018: отказ от optional-выбора («You may …») — только голова очереди */
+  declinePendingEffect: (effectId: string) => Promise<void>;
   /** CHOOSE_ONE (v3): выбрать вариант эффекта по индексу */
   resolveChooseOption: (effectId: string, optionIndex: number) => Promise<void>;
   /** STANCE: сменить стойку ЛОКАЛЬНОГО героя (не тратит действие) */
@@ -355,7 +357,10 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
 
   myPendingEffects: () => {
     const { wireState, localUserId } = get();
-    return (wireState?.metadata.pendingEffects ?? []).filter((p) => p.playerId === localUserId);
+    // GD-018: сервер исполняет строго голову ГЛОБАЛЬНОЙ очереди — пока
+    // голова чужая, локальному игроку резолвить нечего (ждём).
+    const queue = wireState?.metadata.pendingEffects ?? [];
+    return queue.length > 0 && queue[0].playerId === localUserId ? queue : [];
   },
 
   myStanceOptions: () => {
@@ -438,6 +443,11 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
     runMutation(set, get, gql.ResolvePendingEffectDocument, {
       input: { gameId: get().currentGameId, effectId, optionIndex },
     }, 'resolvePendingEffect'),
+
+  declinePendingEffect: (effectId) =>
+    runMutation(set, get, DeclinePendingEffectDocument, {
+      input: { gameId: get().currentGameId, effectId },
+    }, 'declinePendingEffect'),
 
   setStance: (stanceId) =>
     runMutation(set, get, gql.SetStanceDocument, {

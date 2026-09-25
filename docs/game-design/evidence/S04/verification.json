@@ -15,7 +15,7 @@
   },
   "s03Frontend": {
     "command": "node node_modules/vitest/vitest.mjs run src/store/remoteGameStore.s03.test.ts src/components/game/GameView.s03.test.tsx src/components/game/turnResourceChoices.test.ts",
-    "passed": 12,
+    "passed": 13,
     "failed": 0
   },
   "gd015": {
@@ -211,12 +211,190 @@
       }
     ]
   },
+  "gd016": {
+    "status": "verified",
+    "baseRevision": "57156a7",
+    "suites": [
+      {
+        "file": "backend/src/games/services/s04-start-selection.spec.ts",
+        "checks": [
+          {
+            "name": "rejects a hero already taken by the other lobby player",
+            "status": "passed"
+          },
+          {
+            "name": "lets only one of two concurrent selections of the same hero through",
+            "status": "passed"
+          },
+          {
+            "name": "refuses to start a duplicated hero composition and stays in LOBBY",
+            "status": "passed"
+          },
+          {
+            "name": "both seed orientations produce zone-legal distinct setups (it.each)",
+            "status": "passed"
+          },
+          {
+            "name": "keeps firstPlayerId and positions through compact state serialization",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "backend/src/games/resolvers/s04-lobby-transport.spec.ts",
+        "checks": [
+          {
+            "name": "runs create/join/select/ready/start through HTTP and exposes the legal server setup",
+            "status": "passed"
+          },
+          {
+            "name": "serializes two racing HTTP selections of one hero into a single winner",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "backend/src/games/services/s04-concurrency-postgres.spec.ts",
+        "note": "fixture-free: real PostgreSQL, real Prisma, production GameService",
+        "checks": [
+          {
+            "name": "unlocked READ COMMITTED check-then-act race (old shape) — duplicate deterministically reproduced",
+            "status": "passed"
+          },
+          {
+            "name": "FOR UPDATE + status re-check rejects exactly one racer under the same interleaving",
+            "status": "passed"
+          },
+          {
+            "name": "production GameService: concurrent same-hero selectHero keeps exactly one winner every round",
+            "status": "passed"
+          },
+          {
+            "name": "production GameService: reselect vs startGame never duplicates and never mutates a started match",
+            "status": "passed"
+          },
+          {
+            "name": "production GameService: reselect vs toggleReady stays consistent",
+            "status": "passed"
+          }
+        ]
+      }
+    ]
+  },
+  "gd018": {
+    "status": "verified",
+    "baseRevision": "57156a7",
+    "suites": [
+      {
+        "file": "backend/src/game-engine/services/s04-pending-queue.spec.ts",
+        "checks": [
+          {
+            "name": "enforces the head of the queue and ownership outside combat",
+            "status": "passed"
+          },
+          {
+            "name": "rejects invalid MOVE targets without mutation",
+            "status": "passed"
+          },
+          {
+            "name": "declines only an optional choice owned by the caller at the head",
+            "status": "passed"
+          },
+          {
+            "name": "blocks attack, scheme, maneuver, end-turn, door and stance while the queue is open",
+            "status": "passed"
+          },
+          {
+            "name": "defers the turn transfer until the chain drains, then transfers exactly once",
+            "status": "passed"
+          },
+          {
+            "name": "endTurn is rejected while the queue is open and never transfers",
+            "status": "passed"
+          },
+          {
+            "name": "keeps the queue, optional flags and pendingTurnEnd through save/load",
+            "status": "passed"
+          },
+          {
+            "name": "combat timeout never fabricates a queue decision",
+            "status": "passed"
+          },
+          {
+            "name": "accepts a zero-step MOVE: up to N includes staying in place",
+            "status": "passed"
+          },
+          {
+            "name": "resolves a mandatory MOVE when NO reachable free cell exists (no strand)",
+            "status": "passed"
+          },
+          {
+            "name": "rejects PLACE into a board hole and onto blocked cells without mutation",
+            "status": "passed"
+          },
+          {
+            "name": "a defeated-but-alive fighter does not block the endpoint (living-fighter predicate)",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "backend/src/game-engine/services/s04-ai-queue.spec.ts",
+        "checks": [
+          {
+            "name": "never skips a foreign head of the queue",
+            "status": "passed"
+          },
+          {
+            "name": "resolves its own mandatory MOVE head toward the enemy",
+            "status": "passed"
+          },
+          {
+            "name": "declines its own optional head when no useful decision exists",
+            "status": "passed"
+          },
+          {
+            "name": "keeps waiting on an undecided mandatory head instead of fabricating",
+            "status": "passed"
+          },
+          {
+            "name": "drains a two-choice chain and completes the deferred transfer once",
+            "status": "passed"
+          },
+          {
+            "name": "declines an optional MOVE head when already adjacent (no improving step)",
+            "status": "passed"
+          },
+          {
+            "name": "resolves a mandatory MOVE head adjacent to the enemy with a legal zero step",
+            "status": "passed"
+          },
+          {
+            "name": "declines an optional head even with a distant enemy when no step improves",
+            "status": "passed"
+          },
+          {
+            "name": "full drain with adjacent fighters: zero-step mandatory + declined optional, transfer once",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "backend/src/games/resolvers/s04-pending-transport.spec.ts",
+        "checks": [
+          {
+            "name": "drains the seeded chain over HTTP/WS with strict order and one transfer",
+            "status": "passed"
+          }
+        ]
+      }
+    ]
+  },
   "fullBackend": {
-    "command": "node backend/node_modules/jest/bin/jest.js --config backend/package.json --runInBand --silent",
-    "suites": 49,
-    "passed": 931,
+    "command": "npx jest (cwd: backend)",
+    "suites": 55,
+    "passed": 966,
     "failed": 3,
-    "exitCode": 1,
     "failures": [
       "AuthService refreshTokens should rotate refresh token successfully",
       "AuthService refreshTokens should throw UnauthorizedException for expired token",
@@ -232,6 +410,55 @@
       "nest build"
     ]
   },
+  "adminBuild": {
+    "command": "npm run build (cwd: admin)",
+    "exitCode": 0
+  },
+  "adversarialCorrections": {
+    "report": "adversarial-review-2026-09-25.md (дословная копия отчёта + ответ)",
+    "status": "fixed and verified",
+    "findings": {
+      "P1-1": {
+        "finding": "selectHero $transaction без isolationLevel: под READ COMMITTED две конкурентные транзакции читали ростер до коммита соперника — дубль в production Postgres; serializeTx-фикстуры маскировали",
+        "fix": "SELECT … FOR UPDATE по строке игры + перепроверка LOBBY внутри транзакции (selectHero); LOBBY→IN_PROGRESS, готовность, состав и дубль-чек в одной транзакции под тем же локом (startGame)",
+        "proof": "детерминированный барьер-тест старой формы на реальном PostgreSQL зафиксировал дубль до фикса; после фикса — ровно один отклонён; продакшн GameService 15 раундов гонки + 10 раундов reselect-vs-start + 5 раундов reselect-vs-ready через реальный Prisma"
+      },
+      "P1-2": {
+        "finding": "AI fallback «на месте» отклонялся сервером (getReachableCells не включает старт) → вечный strand VS_AI после смежной атаки с optional MOVE",
+        "fix": "сервер принимает нулевой шаг MOVE («up to N» включает 0); AI: нет улучшающего шага → optional decline / mandatory нулевой шаг",
+        "proof": "decide-тесты dist=1 (optional → declinePending, mandatory → zero-step), запертый optional, полный drain AiTurnService со смежными бойцами (одна передача), executor mandatory-MOVE на доске 2x1 без достижимых свободных клеток; mandatory-decline по-прежнему отклоняется сервером"
+      },
+      "P2-1": {
+        "finding": "PLACE в дыру сетки (undefined-клетка внутри границ) проходил bounds+occupied",
+        "fix": "единый isCellPassable: дыры/стены/препятствия/закрытые двери отклоняются для MOVE и PLACE без мутации",
+        "proof": "PLACE в дыру и на obstacle — «Клетка непроходима», gameState не возвращён"
+      },
+      "P2-2": {
+        "finding": "occupied-чек endpoint по f.health > 0 рассинхронен с isLivingFighter в blockedPositions: isDefeated && health>0 блокировал endpoint, но не путь",
+        "fix": "occupied-чек на isLivingFighter",
+        "proof": "MOVE на клетку бойца isDefeated && health=3 проходит"
+      },
+      "P2-3": {
+        "finding": "GameView «ещё в очереди: N-1» считал чужие хвосты глобальной очереди",
+        "fix": "счёт только элементов с playerId === localUserId",
+        "proof": "очередь [свой, чужой, свой] рендерит «ещё в очереди: 1», не 2"
+      }
+    }
+  },
+  "postgresConcurrency": {
+    "suite": "backend/src/games/services/s04-concurrency-postgres.spec.ts",
+    "database": "одноразовый контейнер codex-s04-postgres, 127.0.0.1:55432, s04_test, trust; схема применена prisma db push --skip-generate только в эту БД; production-credential/.env не используются",
+    "command": "npx jest s04-concurrency-postgres (cwd: backend); skip при недоступной БД",
+    "passed": 5,
+    "failed": 0,
+    "checks": [
+      "unlocked READ COMMITTED check-then-act race (old selectHero shape, barrier) — duplicate deterministically reproduced (before-proof)",
+      "FOR UPDATE + status re-check under the same interleaving — exactly one loser, unique roster, LOBBY (after-proof)",
+      "production GameService.selectHero: 15 rounds of concurrent same-hero Promise.all — exactly one winner each round",
+      "reselect vs startGame: 10 rounds — roster always unique, started match never mutated, status consistent with start outcome",
+      "reselect vs toggleReady: 5 rounds — roster unique, LOBBY preserved"
+    ]
+  },
   "review": {
     "regressionsReproducedBeforeFix": [
       "Enemy traversal accepted by maneuver",
@@ -242,10 +469,25 @@
       "Absent board synthesized",
       "Teleporting explicit movement accepted",
       "Closed door accepted by explicit movement",
-      "Pending MOVE blocked allied intermediate fighter"
+      "Pending MOVE blocked allied intermediate fighter",
+      "Second-pass adversarial (2026-09-25): unlocked selectHero race duplicated roster on real PostgreSQL (deterministic barrier test)",
+      "Second-pass adversarial (2026-09-25): adjacent optional-MOVE head rejected by server → AI strand (executor + decide tests red before fix)",
+      "Second-pass adversarial (2026-09-25): PLACE into grid hole accepted; defeated-alive fighter blocked endpoint; GameView counted foreign queue tails"
     ],
-    "scope": "Independent coordinator review and tests; fixes applied before full backend/build validation",
-    "remaining": "Legacy MovementService.moveFighter does not mutate state; production maneuver uses GameActionExecutorService and is verified. GD-016, GD-018, UI/UE integration and full ACC-017 remain open."
+    "scope": "Independent coordinator review and tests; fixes applied before full backend/build validation. Second adversarial pass (adversarial-review-2026-09-25.md): findings P1-1/P1-2/P2-1/P2-2/P2-3 all confirmed against code, fixed, regression-proven where practical",
+    "remaining": "Full ACC-017/ACC-008 require card coverage and UE integration. Nonblocking lobby races assigned to GD-029; stay-in-place UI clarity to GD-035. Legacy MovementService.moveFighter is unused by verified production maneuver.",
+    "closure": {
+      "date": "2026-09-25",
+      "reviewer": "Independent GLM-5.3",
+      "report": "correction-review-2026-09-25.md",
+      "verdict": "All five blocking/correctness findings fixed and independently verified; S04 closed within documented scope",
+      "checks": {
+        "postgres": 5,
+        "queueAndAi": 21,
+        "transportAndSelection": 9,
+        "gameView": 4
+      }
+    }
   },
   "delegation": [
     {
@@ -265,5 +507,13 @@
       "turns": 78,
       "permissionDenials": 0
     }
-  ]
+  ],
+  "coordinatorFinal": {
+    "namedS04Suites": 9,
+    "passed": 61,
+    "failed": 0,
+    "skipped": 0,
+    "postgresIncluded": true,
+    "notes": "Final focused run after windowsHide-only harness correction. Full backend coverage remains 966 pass / 3 baseline auth failures."
+  }
 }

@@ -229,6 +229,12 @@ export const RESOLVE_PENDING_EFFECT = `
   }
 `;
 
+export const DECLINE_PENDING_EFFECT = `
+  mutation DeclinePendingEffect($input: DeclinePendingEffectDto!) {
+    declinePendingEffect(input: $input) { ${MUTATION_RESULT} }
+  }
+`;
+
 export const TOGGLE_DOOR = `
   mutation ToggleDoor($input: ToggleDoorDto!) {
     toggleDoor(input: $input) { ${MUTATION_RESULT} }

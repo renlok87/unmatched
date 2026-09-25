@@ -23,6 +23,7 @@ import {
   LOGIN,
   MANEUVER,
   PLAY_DEFENSE,
+  DECLINE_PENDING_EFFECT,
   PLAY_SCHEME, RESOLVE_PENDING_EFFECT,
   REGISTER,
   RESOLVE_COMBAT,
@@ -82,6 +83,7 @@ const HELP_TEXT = `Команды (2 действия за ход; после 2-
   scheme <c>       — разыграть scheme-карту (тратит 1 действие)
   pending          — список отложенных эффектов (выбор игрока)
   peffect <id> <f> <x>,<y> — резолв отложенного MOVE/PLACE
+  pdecline <id>     — отклонить опциональный отложенный эффект
   defense <c> [<boost>] — карта защиты (+BOOST-карта, за защищающегося)
   resolve          — разрешить бой
   end              — завершить ход, только если действий и ожидающих выборов не осталось
@@ -642,7 +644,7 @@ export const GameTester: React.FC = () => {
             sys('Отложенных эффектов нет');
           } else {
             pend.forEach((p: any) =>
-              sys(`⏳ ${p.id} [${p.type}${p.value ? ' ' + p.value : ''}] ${p.text ?? ''}`),
+              sys(`⏳ ${p.id} [${p.type}${p.value ? ' ' + p.value : ''}${p.optional ? ' optional' : ''}] ${p.text ?? ''}`),
             );
           }
           break;
@@ -658,6 +660,16 @@ export const GameTester: React.FC = () => {
           await runAction(slot, `resolvePendingEffect(${effId}, ${f.name} → ${px},${py})`, RESOLVE_PENDING_EFFECT, {
             input: { gameId: gameIdRef.current!, effectId: effId, fighterId: f.id, x: px, y: py },
           }, 'resolvePendingEffect');
+          break;
+        }
+        case 'pdecline': {
+          // pdecline <effectId> — отклонить опциональный отложенный эффект
+          const [, effId] = parts;
+          if (!effId) throw new Error('pdecline <effectId>');
+          const slot = resolveActor('pdecline');
+          await runAction(slot, `declinePendingEffect(${effId})`, DECLINE_PENDING_EFFECT, {
+            input: { gameId: gameIdRef.current!, effectId: effId },
+          }, 'declinePendingEffect');
           break;
         }
         case 'end': {

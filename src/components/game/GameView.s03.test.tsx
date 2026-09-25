@@ -59,4 +59,17 @@ describe('S03 remote game controls', () => {
     expect(html).not.toContain('Начать манёвр');
     expect(html).not.toContain('Конец хода');
   });
+
+  it('counts only OWN remaining choices in the pending queue (foreign tails are not mine)', () => {
+    const queue = [
+      { id: 'pe1', type: 'MOVE', playerId: 'a', value: 1 },
+      { id: 'pe2', type: 'MOVE', playerId: 'b', value: 1 },
+      { id: 'pe3', type: 'MOVE', playerId: 'a', value: 1, optional: true },
+    ] as const;
+    setState({ actionsRemaining: 0, pendingEffects: [...queue] } as any);
+    view.state = { ...view.state, myPendingEffects: () => [...queue] };
+    const html = renderToStaticMarkup(<GameView />);
+    expect(html).toContain('ещё в очереди: 1');
+    expect(html).not.toContain('ещё в очереди: 2');
+  });
 });

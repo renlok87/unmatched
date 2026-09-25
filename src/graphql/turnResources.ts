@@ -5,6 +5,7 @@ interface StateResult { state: string; sequenceNumber: number }
 export interface BeginManeuverVariables { input: { gameId: string; expectedSequenceNumber: number } }
 export interface CompleteManeuverVariables { input: { gameId: string; maneuverId: string; moves: ManeuverMove[]; boostCardId?: string | null } }
 export interface DiscardToLimitVariables { input: { gameId: string; pendingId: string; cardIds: string[] } }
+export interface DeclinePendingEffectVariables { input: { gameId: string; effectId: string } }
 
 // Typed operations live here until the shared generated schema is refreshed.
 export const BeginManeuverDocument: TypedDocumentNode<{ beginManeuver: StateResult }, BeginManeuverVariables> = gql`
@@ -20,5 +21,10 @@ export const CompleteManeuverDocument: TypedDocumentNode<{ maneuver: StateResult
 export const DiscardToLimitDocument: TypedDocumentNode<{ discardToLimit: StateResult }, DiscardToLimitVariables> = gql`
   mutation DiscardToLimit($input: DiscardToLimitDto!) {
     discardToLimit(input: $input) { state sequenceNumber phase currentTurnPlayerId turnCount timestamp }
+  }
+`;
+export const DeclinePendingEffectDocument: TypedDocumentNode<{ declinePendingEffect: StateResult }, DeclinePendingEffectVariables> = gql`
+  mutation DeclinePendingEffect($input: DeclinePendingEffectDto!) {
+    declinePendingEffect(input: $input) { state sequenceNumber phase currentTurnPlayerId turnCount timestamp }
   }
 `;

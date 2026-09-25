@@ -151,6 +151,13 @@ export class AiTurnService {
           ),
           eventType: 'CARD_PLAYED',
         };
+      case 'declinePending':
+        return {
+          result: await this.executor.executeDeclinePendingEffect(
+            { gameId, effectId: action.effectId }, ctx,
+          ),
+          eventType: 'CARD_PLAYED',
+        };
       case 'endTurn':
         return {
           result: await this.executor.executeEndTurn({ gameId } as any, ctx),

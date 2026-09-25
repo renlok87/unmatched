@@ -29,6 +29,7 @@ import {
   CardType,
   FighterType,
   createEmptyBoardState,
+  getCellZones,
   normalizeAttackType,
   normalizeCardEffects,
   slugifyHeroName,
@@ -44,15 +45,6 @@ const FALLBACK_BOARD_SIZE = 20;
 /** Sanity-границы сетки: отсекают пиксельные координаты (картинки 400×230 и т.п.) */
 const MIN_GRID_SIZE = 2;
 const MAX_GRID_SIZE = 50;
-
-/** Смещения для размещения sidekick'ов вокруг героя */
-const SIDEKICK_OFFSETS: { x: number; y: number }[] = [
-  { x: 1, y: 0 },
-  { x: 0, y: 1 },
-  { x: 1, y: 1 },
-  { x: -1, y: 0 },
-  { x: 0, y: -1 },
-];
 
 function shuffle<T>(array: readonly T[]): T[] {
   const result = [...array];
@@ -144,11 +136,9 @@ export class GameInitializationService {
       const heroSlug = slugifyHeroName(hero.name);
 
       const sidekickFighters: Fighter[] = sidekicks.map((sk, i) => {
-        const offset = SIDEKICK_OFFSETS[i % SIDEKICK_OFFSETS.length] ?? { x: 1, y: 1 };
-        const position = this.findFreeCell(boardState, occupied, {
-          x: clampCoord(basePos.x + offset.x, boardState.width - 1),
-          y: clampCoord(basePos.y + offset.y, boardState.height - 1),
-        });
+        // GD-016: легальная серверная расстановка — сайдкик на отдельной
+        // свободной клетке, разделяющей хотя бы одну зону с героем
+        const position = this.findSidekickCell(boardState, occupied, basePos);
         occupied.add(`${position.x}:${position.y}`);
         return {
           id: `f-${seat}-sk${i}`,
@@ -254,6 +244,8 @@ export class GameInitializationService {
         lastActionBy: 'system',
         version: 1,
         actionsRemaining: ACTIONS_PER_TURN,
+        // GD-016: явный первый игрок матча — seatOrder 0, виден клиентам
+        firstPlayerId: players[0].userId,
       },
     };
 
@@ -376,6 +368,48 @@ export class GameInitializationService {
       x: clampCoord(p.x, w - 1),
       y: clampCoord(p.y, h - 1),
     }));
+  }
+
+  /**
+   * GD-016: клетка для сайдкика — отдельная свободная проходимая клетка,
+   * разделяющая хотя бы одну зону с клеткой героя (скан по возрастанию
+   * манхэттен-дистанции от героя). Доски без зон у клетки героя (нет zone-
+   * данных) не имеют зонного ограничения → прежний proximity-fallback
+   * (findFreeCell от героя). Деградация: если во всей зоне героя нет свободных
+   * клеток — тоже proximity-fallback + warn (расстановка не должна ронять старт).
+   */
+  private findSidekickCell(
+    boardState: BoardState,
+    occupied: ReadonlySet<string>,
+    heroPos: { x: number; y: number },
+  ): { x: number; y: number } {
+    const heroZones = new Set(getCellZones(boardState.cells[heroPos.y]?.[heroPos.x]));
+    if (heroZones.size > 0) {
+      const isFree = (x: number, y: number): boolean => {
+        if (x < 0 || y < 0 || x >= boardState.width || y >= boardState.height) return false;
+        if (occupied.has(`${x}:${y}`)) return false;
+        const cell = boardState.cells[y]?.[x];
+        return !cell || (cell.type !== 'obstacle' && cell.type !== 'wall');
+      };
+      const sharesZone = (x: number, y: number): boolean =>
+        getCellZones(boardState.cells[y]?.[x]).some((z) => heroZones.has(z));
+
+      const maxDist = boardState.width + boardState.height;
+      for (let d = 1; d <= maxDist; d++) {
+        for (let dx = d; dx >= -d; dx--) {
+          const dy = d - Math.abs(dx);
+          for (const sign of dy === 0 ? [1] : [1, -1]) {
+            const x = heroPos.x + dx;
+            const y = heroPos.y + sign * dy;
+            if (isFree(x, y) && sharesZone(x, y)) return { x, y };
+          }
+        }
+      }
+      this.logger.warn(
+        `findSidekickCell: у героя (${heroPos.x},${heroPos.y}) нет свободной клетки его зоны — proximity-fallback`,
+      );
+    }
+    return this.findFreeCell(boardState, occupied, heroPos);
   }
 
   /**

@@ -174,6 +174,13 @@ export interface GameStateMetadata {
    * фолбэчит на стойку с default:true (или первую в config.stances).
    */
   readonly heroStances?: Readonly<Record<string, string>>;
+  /** Явный первый игрок матча (GD-016): ставится при инициализации,
+   *  не меняется после; currentTurnPlayerId двигается по ходу игры. */
+  readonly firstPlayerId?: string;
+  /** GD-018: передача хода отложена до дренирования очереди выборов
+   *  (pendingEffects). endEffectsApplied — были ли уже выполнены TURN_END-хуки
+   *  завершающего игрока (true — не повторять при возобновлении). */
+  readonly pendingTurnEnd?: { readonly playerId: string; readonly endEffectsApplied?: boolean };
 }
 
 /**
@@ -211,6 +218,9 @@ export interface PendingEffect {
   readonly optionEffects?: ReadonlyArray<readonly CardEffect[]>;
   /** Карта-источник CHOOSE_ONE — контекст для исполнения эффектов опции */
   readonly card?: Card;
+  /** GD-018: «You may …» — выбор можно отклонить (declinePendingEffect).
+   *  Mandatory-выборы отклонять нельзя. */
+  readonly optional?: boolean;
 }
 
 /**

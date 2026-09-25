@@ -15,5 +15,24 @@
       "README.md",
       "verification.json"
     ]
+  },
+  "GD-016": {
+    "status": "done",
+    "acceptanceScope": "Concurrent hero selection serialized via SELECT ... FOR UPDATE on the game row with in-transaction LOBBY re-check (selectHero) and atomic LOBBY->IN_PROGRESS transition under the same lock (startGame); proven on real PostgreSQL (disposable container, production GameService via real Prisma: deterministic before/after race proof, 15 race rounds, 10 reselect-vs-start rounds, 5 reselect-vs-ready rounds) — fixture serializeTx suites are unit-level only and not claimed as production-isolation proof. Zone-legal automatic setup places sidekicks on separate free cells sharing the hero zone for both seed orientations; firstPlayerId persisted in compact state. Player-chosen start zone and UE hit-test remain outside this task; full ACC-017 not closed.",
+    "artifacts": [
+      "README.md",
+      "board-contract.json",
+      "verification.json",
+      "adversarial-review-2026-09-25.md"
+    ]
+  },
+  "GD-018": {
+    "status": "done",
+    "acceptanceScope": "Strict sequential pendingEffects queue: head+owner enforced, invalid/foreign/out-of-order/replayed rejected without mutation, decline restricted to optional (mandatory decline rejected — mandatory choices are never silently discarded), combat continuation and staged maneuver preserved, second action and turn transfer deferred until drain (single transfer, +1 seq per mutation), combat timeout never fabricates queue decisions, persistence roundtrip. Zero-step MOVE is a legal resolve for 'up to N' (covers mandatory MOVE with no reachable free cell for any client); AI declines optional heads with no improving step (adjacent/blocked) and resolves mandatory heads with a zero step — full AiTurnService drain with adjacent fighters transfers exactly once; AI coverage of choice classes (CHOOSE_ONE/MOVE/PLACE) is engine-level, not an HTTP e2e VS_AI match. PLACE/MOVE reject grid holes, blocked cells and living fighters uniformly (isCellPassable, isLivingFighter). declinePendingEffect exposed to web client (own-only queue counter) and admin tester.",
+    "artifacts": [
+      "README.md",
+      "verification.json",
+      "adversarial-review-2026-09-25.md"
+    ]
   }
 }

@@ -57,6 +57,7 @@ export const GameView = () => {
     resolveCombat,
     resolvePendingEffect,
     resolveChooseOption,
+    declinePendingEffect,
     endTurn,
     leaveGame,
     clearErrors,
@@ -83,6 +84,8 @@ export const GameView = () => {
   // активный отложенный эффект ЛОКАЛЬНОГО игрока (первый в очереди)
   const pendingEffects = myPendingEffects();
   const activePending = pendingEffects[0] ?? null;
+  // хвост глобальной очереди может быть чужим — считаем только СВОИ выборы
+  const myQueueLeft = pendingEffects.filter(p => p.playerId === localUserId).length - 1;
 
   // Автоскрытие ошибки действия через 5 сек
   useEffect(() => {
@@ -494,8 +497,13 @@ export const GameView = () => {
                   : `Кликните ${activePending.targetsOpponent ? 'бойца противника' : 'своего бойца'}${activePending.fighterName ? ` (${activePending.fighterName})` : ''}`}
               </span>
             )}
-            {pendingEffects.length > 1 && (
-              <span style={{ opacity: 0.6 }}>ещё в очереди: {pendingEffects.length - 1}</span>
+            {activePending.optional && (
+              <Button variant="ghost" disabled={busy} onClick={() => void run(() => declinePendingEffect(activePending.id))}>
+                Отказаться
+              </Button>
+            )}
+            {myQueueLeft > 0 && (
+              <span style={{ opacity: 0.6 }}>ещё в очереди: {myQueueLeft}</span>
             )}
           </div>
         )}
