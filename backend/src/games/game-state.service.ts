@@ -2,7 +2,7 @@ import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common'
 import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { GameSubscriptionService } from './game-subscription.service';
-import { GamePhase } from './dto';
+import { GamePhase, GameEvent, GameEventType } from './dto';
 import { ConcurrentModificationException } from './exceptions/game.exceptions';
 // Единое семейство моделей состояния — engine-модели (P3: убрано дублирование
 // games/engine; раньше здесь жили параллельные интерфейсы, стыкуемые "as any")
@@ -468,7 +468,7 @@ export class GameStateService {
         doors: data.b.dr,
         fog: data.b.fg,
         tokens: data.b.tk,
-        cells: hasCells ? data.b.cells : fallbackBoard!.cells,
+        cells: hasCells ? data.b.cells : fallbackBoard.cells,
         width: data.b.w ?? 20,
         height: data.b.h ?? 20,
       },
@@ -578,7 +578,9 @@ export class GameStateService {
     );
 
     // Execution queues are server-only; player choices remain in pendingEffects.
-    const { combatEffectContinuation, combatResolutionProgress, ...publicMetadata } = state.metadata;
+    const publicMetadata = { ...state.metadata };
+    delete publicMetadata.combatEffectContinuation;
+    delete publicMetadata.combatResolutionProgress;
 
     // S06 (GD-021, Prophecy): карты, снятые с верха колоды в DECK_TOP_PICK,
     // видны ТОЛЬКО владельцу выбора; соперник получает счётчик без личин.
@@ -854,7 +856,11 @@ export class GameStateService {
    * eventsSince — журнал событий, а НЕ replay состояния (см. сетевой
    * контракт GD-027): full snapshot — отдельный gameState-запрос.
    */
-  async getEventsSince(gameId: string, sinceSequence: number, viewerId?: string): Promise<any[]> {
+  async getEventsSince(
+    gameId: string,
+    sinceSequence: number,
+    viewerId?: string,
+  ): Promise<(GameEvent & { playerId: string | null })[]> {
     const actions = await this.prisma.gameAction.findMany({
       where: {
         gameId,
@@ -876,7 +882,8 @@ export class GameStateService {
       }
       return {
         sequenceNumber: action.sequenceNumber,
-        type: action.type,
+        // Prisma GameActionType и DTO GameEventType — зеркальные строковые enum'ы
+        type: action.type as GameEventType,
         gameId: action.gameId,
         playerId: action.playerId,
         // GameEvent.payload — String в GraphQL-схеме, Prisma отдаёт Json-объект

@@ -1,0 +1,45 @@
+{
+  "kind": "auth-failure",
+  "httpStatus": 200,
+  "raw": {
+    "errors": [
+      {
+        "message": "Неавторизованный доступ",
+        "code": "UNAUTHENTICATED",
+        "path": [
+          "gameState"
+        ],
+        "locations": [
+          {
+            "line": 1,
+            "column": 30
+          }
+        ],
+        "extensions": {
+          "code": "UNAUTHENTICATED",
+          "stacktrace": [
+            "UnauthorizedException: Неавторизованный доступ",
+            "    at GqlAuthGuard.handleRequest (C:\\Users\\ren\\.codex\\worktrees\\s08-ue-vertical\\unmached\\backend\\dist\\src\\auth\\guards\\gql-auth.guard.js:39:26)",
+            "    at C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\backend\\node_modules\\@nestjs\\passport\\dist\\auth.guard.js:44:124",
+            "    at C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\backend\\node_modules\\@nestjs\\passport\\dist\\auth.guard.js:83:24",
+            "    at allFailed (C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\backend\\node_modules\\passport\\lib\\middleware\\authenticate.js:110:18)",
+            "    at attempt (C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\backend\\node_modules\\passport\\lib\\middleware\\authenticate.js:183:28)",
+            "    at strategy.fail (C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\backend\\node_modules\\passport\\lib\\middleware\\authenticate.js:314:9)",
+            "    at C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\backend\\node_modules\\passport-jwt\\lib\\strategy.js:106:33",
+            "    at module.exports [as verify] (C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\backend\\node_modules\\jsonwebtoken\\verify.js:70:12)",
+            "    at module.exports [as JwtVerifier] (C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\backend\\node_modules\\passport-jwt\\lib\\verify_jwt.js:4:16)",
+            "    at C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\backend\\node_modules\\passport-jwt\\lib\\strategy.js:104:25"
+          ],
+          "originalError": {
+            "message": "Неавторизованный доступ",
+            "error": "Unauthorized",
+            "statusCode": 401
+          }
+        }
+      }
+    ],
+    "data": {
+      "gameState": null
+    }
+  }
+}

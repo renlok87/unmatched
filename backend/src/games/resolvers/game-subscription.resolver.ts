@@ -41,6 +41,12 @@ interface GameEventPayload {
   payload: any;
 }
 
+/** Структурный вид GQL-контекста для извлечения userId из JWT. */
+interface SubscriptionAuthContext {
+  req?: { user?: { id?: string } };
+  user?: { id?: string };
+}
+
 const resolveGameStateFn =
   (gameStateService: GameStateService, getUserIdFn: (context: any) => string) =>
   (value: GameEventPayload | null, args: any, context: any): GameStateGQL | null => {
@@ -162,6 +168,23 @@ export class GameSubscriptionResolver {
   }
 
   /**
+   * S08: повторная авторизация В МОМЕНТ доставки. requireParticipant доказал
+   * участие только при подписке; игрок, покинувший лобби (leaveGame/замена),
+   * не должен получать ПОСЛЕДУЮЩЕЕ состояние. Apollo driver вызывает filter
+   * через filterFn.call(instanceRef, payload, variables, context) — то есть
+   * с JWT-контекстом конкретного подписчика на каждое опубликованное событие.
+   * Ошибка проверки (DB-сбой) безопасно трактуется как «не доставлять».
+   */
+  private async isDeliveryAuthorized(gameId: string, context: any): Promise<boolean> {
+    try {
+      const userId = this.getUserId(context);
+      return await this.gameStateService.isParticipant(gameId, userId);
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * GD-027 (ACC-011/012): connection barrier. Подписка на gameStateUpdated
    * стартует с текущим снапшотом состояния: окно между HTTP-запросом
    * gameState и установкой WS-подписки закрывается сервером — событие,
@@ -194,6 +217,11 @@ export class GameSubscriptionResolver {
       releaseReturnWaiter = resolve;
     });
     let firstUpstreamStarted = false;
+    // Независимо от того, вернул ли первый next() барьер-снапшот, прочитанное
+    // firstUpstream надо ОТДАТЬ клиенту: событие, опубликованное между
+    // регистрацией подписки и построением снапшота, уже изъято из PubSub и
+    // будет молча проглочено, если второй next() снова дёрнет upstream.next().
+    let firstUpstream: Promise<IteratorResult<GamePubSubEvent>> | null = null;
 
     const iterator: AsyncIterableIterator<GamePubSubEvent> = {
       [Symbol.asyncIterator]: () => iterator,
@@ -202,10 +230,11 @@ export class GameSubscriptionResolver {
         if (!firstUpstreamStarted) {
           firstUpstreamStarted = true;
           // Регистрирует PubSub-подписку немедленно (см. комментарий выше).
-          const firstUpstream = upstream.next();
+          const firstPromise = upstream.next();
           // Гонка не отменяет сам firstUpstream — глушим возможный поздний
           // отказ, чтобы не получить unhandled rejection.
-          firstUpstream.catch(() => undefined);
+          firstPromise.catch(() => undefined);
+          firstUpstream = firstPromise;
           let state: GameState | null = null;
           try {
             state = await this.gameStateService.loadState(gameId);
@@ -233,8 +262,14 @@ export class GameSubscriptionResolver {
               },
             };
           }
+          // Барьер-снапшот не понадобился (state актуален): fallthrough —
+          // firstUpstream потребляется блоком ниже в ЭТОМ же вызове.
+        }
+        if (firstUpstream !== null) {
+          const pending = firstUpstream;
+          firstUpstream = null;
           if (returned) return DONE;
-          const first = await Promise.race([firstUpstream, returnWaiter]);
+          const first = await Promise.race([pending, returnWaiter]);
           if (first === 'returned') return DONE;
           return first.done ? DONE : { done: false, value: first.value };
         }
@@ -277,13 +312,21 @@ export class GameSubscriptionResolver {
    */
   @Subscription(() => GameStateGQL, {
     name: 'gameStateUpdated',
-    filter: (payload: any, variables: any) => {
+    filter: async function (
+      this: GameSubscriptionResolver,
+      payload: any,
+      variables: any,
+      context: any,
+    ) {
       if (!payload || !variables) return false;
-      return (
-        payload.gameId === variables.gameId &&
-        payload.eventType === 'STATE_UPDATED' &&
-        (variables.since == null || payload.sequenceNumber > variables.since)
-      );
+      if (
+        payload.gameId !== variables.gameId ||
+        payload.eventType !== 'STATE_UPDATED' ||
+        (variables.since != null && payload.sequenceNumber <= variables.since)
+      ) {
+        return false;
+      }
+      return this.isDeliveryAuthorized(payload.gameId, context);
     },
     resolve: function (this: GameSubscriptionResolver, value: any, args: any, context: any) {
       return this.resolveGameState(value || null, args, context);
@@ -308,11 +351,12 @@ export class GameSubscriptionResolver {
    */
   @Subscription(() => GameEvent, {
     name: 'attackInitiated',
-    filter: (payload: any, variables: any) => {
+    filter: async function (this: GameSubscriptionResolver, payload: any, variables: any, context: any) {
       if (!payload || !variables) return false;
-      return (
-        payload.gameId === variables.gameId && payload.eventType === GameEventType.ATTACK_INITIATED
-      );
+      if (payload.gameId !== variables.gameId || payload.eventType !== GameEventType.ATTACK_INITIATED) {
+        return false;
+      }
+      return this.isDeliveryAuthorized(payload.gameId, context);
     },
     resolve: function (this: GameSubscriptionResolver, value: any) {
       return this.resolveGameEvent(value || null);
@@ -332,11 +376,12 @@ export class GameSubscriptionResolver {
    */
   @Subscription(() => GameEvent, {
     name: 'defensePlayed',
-    filter: (payload: any, variables: any) => {
+    filter: async function (this: GameSubscriptionResolver, payload: any, variables: any, context: any) {
       if (!payload || !variables) return false;
-      return (
-        payload.gameId === variables.gameId && payload.eventType === GameEventType.DEFENSE_PLAYED
-      );
+      if (payload.gameId !== variables.gameId || payload.eventType !== GameEventType.DEFENSE_PLAYED) {
+        return false;
+      }
+      return this.isDeliveryAuthorized(payload.gameId, context);
     },
     resolve: function (this: GameSubscriptionResolver, value: any) {
       return this.resolveGameEvent(value || null);
@@ -356,11 +401,12 @@ export class GameSubscriptionResolver {
    */
   @Subscription(() => GameEvent, {
     name: 'combatResolved',
-    filter: (payload: any, variables: any) => {
+    filter: async function (this: GameSubscriptionResolver, payload: any, variables: any, context: any) {
       if (!payload || !variables) return false;
-      return (
-        payload.gameId === variables.gameId && payload.eventType === GameEventType.COMBAT_RESOLVED
-      );
+      if (payload.gameId !== variables.gameId || payload.eventType !== GameEventType.COMBAT_RESOLVED) {
+        return false;
+      }
+      return this.isDeliveryAuthorized(payload.gameId, context);
     },
     resolve: function (this: GameSubscriptionResolver, value: any) {
       return this.resolveGameEvent(value || null);
@@ -382,13 +428,16 @@ export class GameSubscriptionResolver {
    */
   @Subscription(() => TurnState, {
     name: 'turnChanged',
-    filter: (payload: any, variables: any) => {
+    filter: async function (this: GameSubscriptionResolver, payload: any, variables: any, context: any) {
       if (!payload || !variables) return false;
-      return (
-        payload.gameId === variables.gameId &&
-        (payload.eventType === GameEventType.TURN_ENDED ||
-          payload.eventType === GameEventType.TURN_CHANGED)
-      );
+      if (
+        payload.gameId !== variables.gameId ||
+        (payload.eventType !== GameEventType.TURN_ENDED &&
+          payload.eventType !== GameEventType.TURN_CHANGED)
+      ) {
+        return false;
+      }
+      return this.isDeliveryAuthorized(payload.gameId, context);
     },
     resolve: function (this: GameSubscriptionResolver, value: any) {
       return this.resolveTurnState(value || null);
@@ -410,11 +459,12 @@ export class GameSubscriptionResolver {
    */
   @Subscription(() => GameEvent, {
     name: 'playerJoined',
-    filter: (payload: any, variables: any) => {
+    filter: async function (this: GameSubscriptionResolver, payload: any, variables: any, context: any) {
       if (!payload || !variables) return false;
-      return (
-        payload.gameId === variables.gameId && payload.eventType === GameEventType.PLAYER_JOINED
-      );
+      if (payload.gameId !== variables.gameId || payload.eventType !== GameEventType.PLAYER_JOINED) {
+        return false;
+      }
+      return this.isDeliveryAuthorized(payload.gameId, context);
     },
     resolve: function (this: GameSubscriptionResolver, value: any) {
       return this.resolveGameEvent(value || null);
@@ -435,9 +485,12 @@ export class GameSubscriptionResolver {
    */
   @Subscription(() => GameEvent, {
     name: 'playerLeft',
-    filter: (payload: any, variables: any) => {
+    filter: async function (this: GameSubscriptionResolver, payload: any, variables: any, context: any) {
       if (!payload || !variables) return false;
-      return payload.gameId === variables.gameId && payload.eventType === GameEventType.PLAYER_LEFT;
+      if (payload.gameId !== variables.gameId || payload.eventType !== GameEventType.PLAYER_LEFT) {
+        return false;
+      }
+      return this.isDeliveryAuthorized(payload.gameId, context);
     },
     resolve: function (this: GameSubscriptionResolver, value: any) {
       return this.resolveGameEvent(value || null);
@@ -458,9 +511,12 @@ export class GameSubscriptionResolver {
    */
   @Subscription(() => GameEvent, {
     name: 'gameEnded',
-    filter: (payload: any, variables: any) => {
+    filter: async function (this: GameSubscriptionResolver, payload: any, variables: any, context: any) {
       if (!payload || !variables) return false;
-      return payload.gameId === variables.gameId && payload.eventType === GameEventType.GAME_ENDED;
+      if (payload.gameId !== variables.gameId || payload.eventType !== GameEventType.GAME_ENDED) {
+        return false;
+      }
+      return this.isDeliveryAuthorized(payload.gameId, context);
     },
     resolve: function (this: GameSubscriptionResolver, value: any) {
       return this.resolveGameEvent(value || null);
@@ -482,7 +538,7 @@ export class GameSubscriptionResolver {
   /**
    * Получить userId из контекста
    */
-  private getUserId(context: any): string {
+  private getUserId(context: SubscriptionAuthContext): string {
     const userId = context?.req?.user?.id || context?.user?.id;
 
     if (!userId) {

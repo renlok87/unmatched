@@ -50,13 +50,14 @@ import { AdminModule } from './admin/admin.module';
         },
       }),
     }),
-    // Rate limiting для защиты от brute force и спама
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000, // 60 секунд
-        limit: 10, // 10 запросов
-      },
-    ]),
+    // Rate limiting для защиты от brute force и спама.
+    // Единственная регистрация в приложении: THROTTLER:MODULE_OPTIONS —
+    // статический токен, второй ThrottlerModule.forRoot перезаписал бы его.
+    // setHeaders: false — GraphQL-контекст не несёт express-res.
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: 60000, limit: 10 }],
+      setHeaders: false,
+    }),
     PrismaModule,
     RedisModule,
     GraphqlModule,

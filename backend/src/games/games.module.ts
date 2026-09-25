@@ -23,9 +23,6 @@ import { AiTurnService } from './services/ai-turn.service';
 import { CombatTimeoutProcessor } from './processors/combat-timeout.processor';
 import { GameActionProcessor } from './processors/game-action.processor';
 
-// DTO
-import { ReplayData } from './models/replay.model';
-
 // Validators
 import { GameRulesValidator } from '../game-engine/validators/game-rules.validator';
 
@@ -41,6 +38,7 @@ import {
   CombatPhaseGuard,
   DefensePlayGuard,
   CombatResolveGuard,
+  GqlThrottlerGuard,
 } from './guards';
 
 // Modules
@@ -49,7 +47,6 @@ import { RedisModule } from '../redis/redis.module';
 import { CommonModule } from '../common/common.module';
 import { AuditModule } from '../audit/audit.module';
 import { GameEngineModule } from '../game-engine/game-engine.module';
-import { GameActionType } from './models/game-action.model';
 
 /**
  * GamesModule
@@ -94,6 +91,12 @@ import { GameActionType } from './models/game-action.model';
         },
       },
     }),
+    // ThrottlerModule НЕ регистрируется здесь повторно:
+    // THROTTLER:MODULE_OPTIONS — статический токен, второй forRoot в дереве
+    // модулей перезаписывает опции (AppModule-уровень выигрывает DI) и guard
+    // получает чужой конфиг. Единственная регистрация — в AppModule с
+    // setHeaders: false (GraphQL-контекст без express-res). Лимиты на
+    // резолверах задаёт @Throttle.
   ],
   providers: [
     // Resolvers
@@ -132,6 +135,7 @@ import { GameActionType } from './models/game-action.model';
     CombatPhaseGuard,
     DefensePlayGuard,
     CombatResolveGuard,
+    GqlThrottlerGuard,
   ],
   exports: [
     GameService,

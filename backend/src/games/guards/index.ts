@@ -1,6 +1,7 @@
 export * from './game-status.guard';
 export * from './game-player.guard';
 export * from './game-turn.guard';
+export * from './gql-throttler.guard';
 
 // Re-export phase guards from game-turn.guard
 export {
