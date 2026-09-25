@@ -1,0 +1,611 @@
+{
+  "task": "GD-019",
+  "parserVersion": 8,
+  "sources": [
+    "docs/game-design/evidence/S01/content-medusa.json",
+    "docs/game-design/evidence/S01/content-king-arthur.json"
+  ],
+  "totals": {
+    "records": 27,
+    "copies": 60,
+    "medusaRecords": 11,
+    "kingArthurRecords": 16,
+    "byStatus": {
+      "SUPPORTED": 20,
+      "PARTIAL": 1,
+      "UNSUPPORTED": 5,
+      "BLANK": 1
+    }
+  },
+  "records": [
+    {
+      "hero": "Medusa",
+      "contentKey": "cmq7d7b4200rcwi74qgawzf62",
+      "name": "A Momentary Glance",
+      "cardType": "SCHEME",
+      "count": 2,
+      "printedText": "Deal 2 damage to any one fighter in Medusa's zone.",
+      "parsedEffects": [
+        {
+          "type": "DAMAGE",
+          "value": 2,
+          "target": "ANY_FIGHTER_IN_ZONE",
+          "fighterName": "Medusa",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 8
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "Medusa",
+      "contentKey": "cmq7d7b4500riwi74bl62p4i9",
+      "name": "Hiss and Slither",
+      "cardType": "DEFENSE",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "OPPONENT_DISCARD",
+          "value": 1,
+          "target": "OPPONENT_PLAYER",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "Medusa",
+      "contentKey": "cmq7d7b4900rqwi74i9w0rdh8",
+      "name": "The Hounds of Mighty Zeus",
+      "cardType": "VERSATILE",
+      "count": 2,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "MOVE",
+          "value": 3,
+          "target": "NAMED_FIGHTER",
+          "fighterName": "Harpy",
+          "optional": true,
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "Medusa",
+      "contentKey": "cmq7d7b4b00ruwi74zyil05so",
+      "name": "Dash",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "MOVE",
+          "value": 3,
+          "target": "SELF",
+          "optional": true,
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "Medusa",
+      "contentKey": "cmq7d7b4300rewi741e13yzrw",
+      "name": "Winged Frenzy",
+      "cardType": "SCHEME",
+      "count": 2,
+      "printedText": "Move each of your fighters up to 3 spaces. You may move them through spaces containing opposing fighters. Then, return a defeated Harpy (if any) to any space in Medusa's zone.",
+      "parsedEffects": [
+        {
+          "type": "MOVE",
+          "value": 3,
+          "target": "EACH_OWN_FIGHTER",
+          "canPassThroughEnemies": true,
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 8
+        },
+        {
+          "type": "RETURN_DEFEATED",
+          "fighterName": "Harpy",
+          "zoneFighterName": "Medusa",
+          "optional": true,
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 8
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "2 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "Medusa",
+      "contentKey": "cmq7d7b4400rgwi74xj2ntnbf",
+      "name": "Gaze of Stone",
+      "cardType": "ATTACK",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "DAMAGE",
+          "value": 8,
+          "target": "OPPOSING_FIGHTER",
+          "when": "WON_COMBAT",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "Medusa",
+      "contentKey": "cmq7d7b4700rmwi74ftlf3uc9",
+      "name": "Regroup",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "DRAW_CARD",
+          "value": 1,
+          "when": "LOST_COMBAT",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        },
+        {
+          "type": "DRAW_CARD",
+          "value": 2,
+          "when": "WON_COMBAT",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "2 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "Medusa",
+      "contentKey": "cmq7d7b4100rawi746oxx1hsf",
+      "name": "Second Shot",
+      "cardType": "ATTACK",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "BOOST",
+          "optional": true,
+          "timing": "DURING_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "Medusa",
+      "contentKey": "cmq7d7b4800rowi74iywm5i8b",
+      "name": "Snipe",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "DRAW_CARD",
+          "value": 1,
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "Medusa",
+      "contentKey": "cmq7d7b4a00rswi74n7aizlpd",
+      "name": "Clutching Claws",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "OPPONENT_DISCARD",
+          "value": 1,
+          "target": "OPPONENT_PLAYER",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "Medusa",
+      "contentKey": "cmq7d7b4600rkwi74cc951hd4",
+      "name": "Feint",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "CANCEL_EFFECTS",
+          "timing": "ON_REVEAL",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1300nnwi74p39wjkd3",
+      "name": "The Aid of Morgana",
+      "cardType": "ATTACK",
+      "count": 1,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "DRAW_CARD",
+          "value": 2,
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1500nrwi74c9su6mck",
+      "name": "Excalibur",
+      "cardType": "ATTACK",
+      "count": 1,
+      "printedText": "",
+      "parsedEffects": [],
+      "status": "BLANK",
+      "notes": "нет печатного текста и эффектов"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1c00o1wi74sjfulnr0",
+      "name": "Swift Strike",
+      "cardType": "ATTACK",
+      "count": 2,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "MOVE",
+          "value": 4,
+          "target": "SELF",
+          "optional": true,
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1d00o3wi74u7ne4qdf",
+      "name": "Aid the Chosen One",
+      "cardType": "ATTACK",
+      "count": 1,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "DRAW_CARD",
+          "value": 2,
+          "when": "WON_COMBAT",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1f00o7wi74xncb0b27",
+      "name": "Feint",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "CANCEL_EFFECTS",
+          "timing": "ON_REVEAL",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1m00ofwi74vwkm9hl6",
+      "name": "The Holy Grail",
+      "cardType": "DEFENSE",
+      "count": 1,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "UNSUPPORTED",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "UNSUPPORTED",
+      "notes": "1 из 1 эффектов UNSUPPORTED — не реализовано"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1200nlwi7478o7hbwh",
+      "name": "The Lady of the Lake",
+      "cardType": "SCHEME",
+      "count": 1,
+      "printedText": "Search your deck and discard pile for the EXCALIBUR card. Add it to your hand. If you searched your deck, shuffle it.",
+      "parsedEffects": [
+        {
+          "type": "UNSUPPORTED",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 8
+        },
+        {
+          "type": "UNSUPPORTED",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 8
+        },
+        {
+          "type": "UNSUPPORTED",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 8
+        }
+      ],
+      "status": "UNSUPPORTED",
+      "notes": "3 из 3 эффектов UNSUPPORTED — не реализовано"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1400npwi74590doe7a",
+      "name": "Prophecy",
+      "cardType": "SCHEME",
+      "count": 1,
+      "printedText": "Look at the top 4 cards of your deck. Add 2 of them to your hand and put the other 2 back on top of your deck, in any order.",
+      "parsedEffects": [
+        {
+          "type": "UNSUPPORTED",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 8
+        },
+        {
+          "type": "UNSUPPORTED",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 8
+        }
+      ],
+      "status": "UNSUPPORTED",
+      "notes": "2 из 2 эффектов UNSUPPORTED — не реализовано"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1900nxwi74vztxx4wk",
+      "name": "Command the Storms",
+      "cardType": "SCHEME",
+      "count": 2,
+      "printedText": "Move each fighter up to 3 spaces. (This includes opposing fighters.)",
+      "parsedEffects": [
+        {
+          "type": "MOVE",
+          "value": 3,
+          "target": "NAMED_FIGHTER",
+          "fighterName": "fighter",
+          "optional": true,
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 8
+        }
+      ],
+      "status": "UNSUPPORTED",
+      "notes": "parsed MOVE NAMED_FIGHTER 'fighter' не матчит бойцов (each fighter incl. opposing не реализован)"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1h00o9wi7467rrgo3a",
+      "name": "Noble Sacrifice",
+      "cardType": "ATTACK",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "BOOST",
+          "optional": true,
+          "timing": "DURING_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1j00obwi74q7vqenip",
+      "name": "Restless Spirits",
+      "cardType": "SCHEME",
+      "count": 1,
+      "printedText": "Choose any space in Merlin's zone. Deal 2 damage to each opposing fighter in that space and in one adjacent space. If at least one fighter is defeated this way, draw 1 card.",
+      "parsedEffects": [
+        {
+          "type": "UNSUPPORTED",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 8
+        },
+        {
+          "type": "UNSUPPORTED",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 8
+        },
+        {
+          "type": "UNSUPPORTED",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 8
+        }
+      ],
+      "status": "UNSUPPORTED",
+      "notes": "3 из 3 эффектов UNSUPPORTED — не реализовано"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1800nvwi74inar4yez",
+      "name": "Bewilderment",
+      "cardType": "DEFENSE",
+      "count": 2,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "PREVENT_DAMAGE",
+          "timing": "DURING_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        },
+        {
+          "type": "PLACE",
+          "target": "SELF",
+          "optional": true,
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "2 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1e00o5wi74xmy8zb0v",
+      "name": "Divine Intervention",
+      "cardType": "VERSATILE",
+      "count": 2,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "MOVE",
+          "value": 5,
+          "target": "NAMED_FIGHTER",
+          "fighterName": "King Arthur",
+          "optional": true,
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1600ntwi74rhopnl5u",
+      "name": "Momentous Shift",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "SET_VALUE",
+          "value": 5,
+          "when": "MOVED_THIS_TURN",
+          "timing": "DURING_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "1 эффект(ов) исполняются движком"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1l00odwi74c2cay62t",
+      "name": "Skirmish",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "MOVE",
+          "value": 2,
+          "target": "SELF",
+          "when": "WON_COMBAT",
+          "optional": false,
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "PARTIAL",
+      "notes": "MOVE only-SELF: выбор бойца боя («choose one of the fighters») не моделируется"
+    },
+    {
+      "hero": "King Arthur",
+      "contentKey": "cmq7d7b1a00nzwi74x16qbctg",
+      "name": "Regroup",
+      "cardType": "VERSATILE",
+      "count": 3,
+      "printedText": "",
+      "parsedEffects": [
+        {
+          "type": "DRAW_CARD",
+          "value": 1,
+          "when": "LOST_COMBAT",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        },
+        {
+          "type": "DRAW_CARD",
+          "value": 2,
+          "when": "WON_COMBAT",
+          "timing": "AFTER_COMBAT",
+          "source": "parser",
+          "parserVersion": 6
+        }
+      ],
+      "status": "SUPPORTED",
+      "notes": "2 эффект(ов) исполняются движком"
+    }
+  ]
+}

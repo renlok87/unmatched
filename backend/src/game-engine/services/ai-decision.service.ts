@@ -3,6 +3,7 @@ import type { GameState, Fighter, Card, PendingEffect, Position } from '../model
 import { CardType, GamePhase, getActionsRemaining, getFighterMovement } from '../models';
 import { AdjacencyService } from '../engine/adjacency.service';
 import { bannerAllows } from '../validators/game-rules.validator';
+import { fighterNameMatches } from '../effects/card-effect-executor.service';
 
 /**
  * Решение ИИ-оппонента (VS_AI). Чистая greedy-эвристика без сайд-эффектов:
@@ -16,6 +17,9 @@ import { bannerAllows } from '../validators/game-rules.validator';
 export type AiAction =
   | { kind: 'resolveChoose'; effectId: string; optionIndex: number }
   | { kind: 'resolveMove'; effectId: string; fighterId: string; x: number; y: number }
+  | { kind: 'resolveTarget'; effectId: string; fighterId: string }
+  | { kind: 'resolveDiscard'; effectId: string; cardIds: string[] }
+  | { kind: 'resolveBoost'; effectId: string; cardIds: string[] }
   | { kind: 'declinePending'; effectId: string }
   | { kind: 'defense'; cardId: string }
   | { kind: 'resolveCombat' }
@@ -121,6 +125,72 @@ export class AiDecisionService {
       return { kind: 'resolveChoose', effectId: p.id, optionIndex: best.index };
     }
 
+    // TARGET_FIGHTER (S05): прямая цель урона (A Momentary Glance / Medusa).
+    // Ревалидация: живые цели из p.targetFighterIds; выгоднее добить слабого
+    // (min HP). Нет живых целей у optional → null (decline); mandatory → первая.
+    if (p.type === 'TARGET_FIGHTER') {
+      const alive = (p.targetFighterIds ?? [])
+        .map((id) => state.fighters.find((f) => f.id === id))
+        .filter((f): f is Fighter => !!f && f.health > 0 && !f.isDefeated);
+      if (alive.length === 0) return null;
+      const target = alive.reduce((a, b) => (a.health <= b.health ? a : b));
+      return { kind: 'resolveTarget', effectId: p.id, fighterId: target.id };
+    }
+
+    // DISCARD_CARDS (S05, Hiss and Slither / Clutching Claws): сбрасывающий
+    // выбирает карту сам (печатный текст без «random»). Эвристика — сбросить
+    // наименее ценную: минимальный boostValue, при равенстве — раньше в руке.
+    if (p.type === 'DISCARD_CARDS') {
+      const hand = this.hand(state, aiUserId);
+      const count = Math.min(p.value ?? 1, hand.length);
+      if (count === 0) return null;
+      const worst = [...hand]
+        .map((card, index) => ({ card, index }))
+        .sort((a, b) => (a.card.boostValue ?? 0) - (b.card.boostValue ?? 0) || a.index - b.index)
+        .slice(0, count)
+        .map(({ card }) => card.id);
+      return { kind: 'resolveDiscard', effectId: p.id, cardIds: worst };
+    }
+
+    // BOOST_CHOICE (S05, Second Shot / Noble Sacrifice): optional буст боя
+    // ПОСЛЕ reveal. Значения уже открыты: бустим МИНИмальной картой, которая
+    // меняет исход (атаке нужно суммарно > защиты; защите достаточно >=).
+    // Исход уже благоприятен или подходящей карты нет → null (decline).
+    if (p.type === 'BOOST_CHOICE') {
+      const ci = state.metadata.combatInfo;
+      if (!ci) return null;
+      const hand = this.hand(state, aiUserId);
+      if (hand.length === 0) return null;
+      const attackerOwner = state.fighters.find((f) => f.id === ci.attackerId)?.ownerId;
+      const isAttackerSide = attackerOwner === aiUserId;
+      const attackTotal = ci.attackValue + (ci.boostValue ?? 0);
+      const need = isAttackerSide
+        ? ci.defenseValue - attackTotal + 1
+        : attackTotal - ci.defenseValue;
+      if (need <= 0) return null;
+      const candidates = hand
+        .map((card, index) => ({ card, index }))
+        .filter(({ card }) => (card.boostValue ?? 0) >= need)
+        .sort((a, b) => (a.card.boostValue ?? 0) - (b.card.boostValue ?? 0) || a.index - b.index);
+      if (candidates.length === 0) return null;
+      return { kind: 'resolveBoost', effectId: p.id, cardIds: [candidates[0].card.id] };
+    }
+
+    // Revive-PLACE (S05, Winged Frenzy): вернуть поверженного бойца из
+    // p.fighterIds в зону p.zoneFighterName. Клетка — свободная, в зоне
+    // anchor-бойца (ближайшая к anchor по Manhattan).
+    if (p.type === 'PLACE' && p.restoreFullHealth === true) {
+      const revivee = (p.fighterIds ?? [])
+        .map((id) => state.fighters.find((f) => f.id === id))
+        .find((f) => !!f);
+      if (!revivee || !p.zoneFighterName) return null;
+      const anchor = state.fighters.find((f) => fighterNameMatches(f.name, p.zoneFighterName!));
+      if (!anchor) return null;
+      const cell = this.freeCellInZone(state, anchor);
+      if (!cell) return null;
+      return { kind: 'resolveMove', effectId: p.id, fighterId: revivee.id, x: cell.x, y: cell.y };
+    }
+
     // MOVE/PLACE: выбираем бойца и валидную клетку (шаг к врагу, иначе на месте)
     const ownHero = this.aiHero(state, aiUserId);
     const moveOpponent = p.targetsOpponent === true;
@@ -218,6 +288,24 @@ export class AiDecisionService {
 
   private manhattan(a: { x: number; y: number }, b: { x: number; y: number }): number {
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+  }
+
+  /** Свободная клетка в зоне anchor-бойца, ближайшая к нему (для revive-PLACE).
+   *  Свободная = проходимая и без живых бойцов. */
+  private freeCellInZone(state: GameState, anchor: Fighter): { x: number; y: number } | null {
+    const occupied = new Set(
+      this.living(state).map((f) => `${f.position.x}:${f.position.y}`),
+    );
+    let best: { x: number; y: number; d: number } | null = null;
+    for (let y = 0; y < state.boardState.height; y++) {
+      for (let x = 0; x < state.boardState.width; x++) {
+        if (occupied.has(`${x}:${y}`)) continue;
+        if (!this.adjacency.isInSameZone(state, anchor.position, { x, y })) continue;
+        const d = this.manhattan(anchor.position, { x, y });
+        if (!best || d < best.d) best = { x, y, d };
+      }
+    }
+    return best ? { x: best.x, y: best.y } : null;
   }
 
   private shareZone(state: GameState, a: Fighter, b: Fighter): boolean {

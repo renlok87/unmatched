@@ -156,8 +156,11 @@ export class GameSubscriptionService implements OnModuleInit, OnModuleDestroy {
    * Отправляет обновление всем подписчикам (локальным и через Redis)
    */
   async publishGameUpdate(gameId: string, eventType: string, gameState: GameState): Promise<void> {
-    // Persist continuation internally, but never publish the server execution queue.
-    const { combatEffectContinuation, combatResolutionProgress, ...publicMetadata } = gameState.metadata;
+    // Strip only the server execution queue. combatResolutionProgress MUST stay:
+    // per-player filterPrivateData in the subscription resolver reads it as the
+    // reveal flag (post-reveal pauses are public, rulebook p.12-13) and strips
+    // it afterwards. Direct observers of this service are server-internal only.
+    const { combatEffectContinuation, ...publicMetadata } = gameState.metadata;
     const publicState = { ...gameState, metadata: publicMetadata };
     const event: GameUpdateEvent = {
       gameId,

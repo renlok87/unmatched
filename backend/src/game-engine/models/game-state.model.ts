@@ -79,7 +79,20 @@ export interface CombatState {
   readonly targetFighterId?: string;
   readonly attackerCardId: string;
   readonly defenderCardId?: string;
+  /** ТОЛЬКО печатное значение атакующей карты (без boost). Легаси-сейвы,
+   *  писавшие printed+boost сюда, остаются корректными для расчёта: boost
+   *  передаётся отдельно и по умолчанию 0. */
   readonly attackValue: number;
+  /** Сумма boost значений (карта-BOOST + ability boost Arthur). Скрыто от
+   *  защитника до reveal (filterPrivateData); отменённая карта (Feint, R-16)
+   *  не добавляет его к расчёту. Карта-BOOST доигрывается в combatInfo на
+   *  резолве BOOST_CHOICE (rulebook p.12-13: выбор ПОСЛЕ reveal). */
+  readonly boostValue?: number;
+  /** Instance id карты, израсходованной как BOOST-эффект карты (Second Shot);
+   *  заполняется на резолве BOOST_CHOICE, НЕ при объявлении атаки */
+  readonly cardBoostCardId?: string;
+  /** Instance id карты ability-буста Arthur (отдельный слот от cardBoostCardId) */
+  readonly abilityBoostCardId?: string;
   readonly defenseValue: number;
   readonly startedAt: Date;
   readonly timeoutAt?: Date;
@@ -195,17 +208,33 @@ export interface PendingEffect {
   readonly effectContext?: EffectContext;
   /**
    * 'MOVE' (до value шагов) | 'PLACE' (любая свободная клетка) |
-   * 'CHOOSE_ONE' (игрок выбирает chooseCount опций из options)
+   * 'CHOOSE_ONE' (игрок выбирает chooseCount опций из options) |
+   * 'TARGET_FIGHTER' (выбор бойца-цели из targetFighterIds; damage применяется сразу) |
+   * 'DISCARD_CARDS' (владелец выбора сбрасывает ровно value своих карт из руки;
+   * печатный сброс БЕЗ слова «random» — карту выбирает сбрасывающий, не движок) |
+   * 'BOOST_CHOICE' (S05: optional BOOST this attack/defense — «You may BOOST…»
+   * карты эффекта; владелец СВОЕЙ руки выбирает ОДНУ карту как буст ПОСЛЕ
+   * reveal, в паузе DURING_COMBAT; резолв — cardIds[0], отказ — decline)
    */
-  readonly type: 'MOVE' | 'PLACE' | 'CHOOSE_ONE';
+  readonly type: 'MOVE' | 'PLACE' | 'CHOOSE_ONE' | 'TARGET_FIGHTER' | 'DISCARD_CARDS' | 'BOOST_CHOICE';
   /** Кому принадлежит выбор */
   readonly playerId: string;
-  /** Дистанция для MOVE */
+  /** Дистанция для MOVE; количество карт для DISCARD_CARDS */
   readonly value?: number;
   /** Ограничение бойца: имя из текста карты («Move Daredevil…») */
   readonly fighterName?: string;
   /** Двигается боец противника («Place the opposing fighter…») */
   readonly targetsOpponent?: boolean;
+  /** TARGET_FIGHTER: допустимые цели (живые бойцы, revalidated на резолве) */
+  readonly targetFighterIds?: readonly string[];
+  /** TARGET_FIGHTER: урон выбранной цели */
+  readonly damage?: number;
+  /** MOVE: путь может проходить через врагов (Winged Frenzy) */
+  readonly canPassThroughEnemies?: boolean;
+  /** PLACE: клетка обязана делить зону с этим бойцом (return Harpy в зону Medusa) */
+  readonly zoneFighterName?: string;
+  /** PLACE: revive — боец может быть defeated, возвращается с maxHealth */
+  readonly restoreFullHealth?: boolean;
   /** Исходный текст — для лога/тестера */
   readonly text?: string;
 

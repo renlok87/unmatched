@@ -43,6 +43,28 @@ describe('effect-text-parser', () => {
       });
     });
 
+    it('random-различие (S05-фикс): «random cards» БЕЗ boost-фразы — НЕ выбор сбрасывающего', () => {
+      // Чистый random-сброс (без «Add its BOOST value…») движком не исполняется
+      // → UNSUPPORTED; ловил бы misclassification как OPPONENT_DISCARD-выбор.
+      const plain = after('Your opponent discards 2 random cards.');
+      expect(plain.drafts).toHaveLength(1);
+      expect(plain.drafts[0].draft.type).toBe(EffectType.UNSUPPORTED);
+      expect(plain.unsupported).toHaveLength(1);
+
+      // множественный НЕ-random — по-прежнему выбор (value 2)
+      const multi = after('Your opponent discards 2 cards.');
+      expect(multi.unsupported).toEqual([]);
+      expect(multi.drafts[0].draft).toMatchObject({ type: EffectType.OPPONENT_DISCARD, value: 2 });
+
+      // random + boost-фраза — компаунд BOOST OPPONENT_RANDOM_HAND (не тронут)
+      const compound = during('Your opponent discards 1 random card. Add its BOOST value to this card\'s value.');
+      expect(compound.unsupported).toEqual([]);
+      expect(compound.drafts[0].draft).toMatchObject({
+        type: EffectType.BOOST,
+        boostSource: 'OPPONENT_RANDOM_HAND',
+      });
+    });
+
     it('Regroup (компаунд): «Draw 1 card. If you won the combat, draw 2 cards instead.»', () => {
       const { drafts, unsupported } = after(
         'Draw 1 card. If you won the combat, draw 2 cards instead.',
@@ -561,14 +583,14 @@ describe('effect-text-parser', () => {
       });
     });
 
-    it('«Your opponent discards 1 random card unless 🪙» → OPPONENT_DISCARD optional', () => {
+    it('«Your opponent discards 1 random card unless 🪙» → UNSUPPORTED: random-база не выбор (S05-фикс)', () => {
+      // Раньше «random» игнорировался и текст превращался в OPPONENT_DISCARD —
+      // ВЫБОР сбрасывающего. Random-сброс двигком отдельно не исполняется →
+      // честный UNSUPPORTED (misclassification-фикс, будущие карты).
       const { drafts, unsupported } = after('Your opponent discards 1 random card unless 🪙');
-      expect(unsupported).toEqual([]);
-      expect(drafts[0].draft).toMatchObject({
-        type: EffectType.OPPONENT_DISCARD,
-        value: 1,
-        optional: true,
-      });
+      expect(drafts).toHaveLength(1);
+      expect(drafts[0].draft.type).toBe(EffectType.UNSUPPORTED);
+      expect(unsupported).toHaveLength(1);
     });
 
     it('«Deal 3 damage to the opposing fighter unless 🪙 🪙» → DAMAGE optional', () => {

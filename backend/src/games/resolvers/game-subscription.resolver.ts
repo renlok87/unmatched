@@ -59,6 +59,9 @@ const resolveGameStateFn =
       players: JSON.stringify(filteredState.players),
       fighters: JSON.stringify(filteredState.fighters),
       handZones: JSON.stringify(filteredState.handZones),
+      // S05: discardPiles несут reveal-личины committed-карт боя (правила
+      // p.12-13: обе карты открыты после reveal, включая паузы BOOST_CHOICE)
+      discardPiles: JSON.stringify(filteredState.discardPiles ?? {}),
       boardState: JSON.stringify(filteredState.boardState),
       metadata: JSON.stringify(filteredState.metadata),
     };

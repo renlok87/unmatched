@@ -327,6 +327,27 @@ export interface CycleStanceEffect {
 }
 
 /**
+ * Эффект «выбор цели урона» (pending-target-damage, S05): способность в начале
+ * хода ПОРОЖДАЕТ optional TARGET_FIGHTER PendingEffect — игрок сам выбирает
+ * врага ИЗ легальных целей или отклоняет выбор (declinePendingEffect, «you may»).
+ *
+ * В отличие от turn-damage (авто-выбор первого врага, нет UI) здесь НЕТ
+ * авто-таргета: цели сериализуются в pending.targetFighterIds (ревалидация на
+ * резолве), optional=true — отказ легален. GD-017/R-14: Medusa «At the start of
+ * your turn, you may deal 1 damage to an opposing fighter in Medusa's zone.»
+ *
+ * Валиден ТОЛЬКО для триггера 'turn-start'. Нет легальных целей → чистый no-op
+ * (pending не создаётся — игрок не «зависает» на пустом выборе).
+ */
+export interface PendingTargetDamageEffect {
+  readonly kind: 'pending-target-damage';
+  /** Область выбора цели: вражеский боец в зоне героя действующего игрока */
+  readonly targetScope: 'enemy-in-zone';
+  /** Сколько урона нанести выбранному врагу */
+  readonly value: number;
+}
+
+/**
  * Эффект правила — дискриминируется по kind.
  */
 export type AbilityEffect =
@@ -336,6 +357,7 @@ export type AbilityEffect =
   | TurnEffect
   | PendingMoveEffect
   | TurnDamageEffect
+  | PendingTargetDamageEffect
   | DiscardRandomEffect
   | ReactiveDamageEffect
   | SetStanceEffect
@@ -692,22 +714,26 @@ export const ABILITY_CONFIGS: readonly AbilityConfig[] = [
     ],
   },
   {
-    // Medusa — «Petrifying Gaze»-подобный взгляд: в начале хода может нанести 1 урон
-    // вражескому бойцу в ЗОНЕ Medusa.
-    // ПРИБЛИЖЕНИЕ (MVP): печатное «you may» (выбор/opt-out игроком) не моделируется
-    // — авто-бьём ПЕРВОГО вражеского бойца в зоне героя (порядок state.fighters).
-    // Без добора (thenDraw отсутствует); нет цели в зоне → чистый no-op.
+    // Medusa — старт-хода урон: в начале хода может нанести 1 урон вражескому
+    // бойцу в ЗОНЕ Medusa (R-14, GD-017).
+    // S05: печать «you may» моделируется честно — optional TARGET_FIGHTER
+    // pending (owner-bound, decline разрешён, auto-target НЕТ). Цели — живые
+    // вражеские бойцы в зоне Medusa; ревалидация на резолве. Нет легальных
+    // целей в зоне → pending не создаётся (no-op).
+    // abilityName — ВНУТРЕННИЙ provisional-лейбл: в захвате (content-medusa.json)
+    // у способности НЕТ поля name, канонического имени не существует.
+    // NB: King Arthur (allowsAttackBoost) живёт ОТДЕЛЬНЫМ classic-handler'ом
+    // arthurAbilityHandler (heroes/arthur.handler.ts) — не дублируем здесь.
     heroId: 'medusa',
-    abilityName: 'Petrifying Gaze',
+    abilityName: 'Medusa turn-start damage (provisional)',
     description:
-      'В начале хода Medusa может нанести 1 урон вражескому бойцу в своей зоне. ' +
-      'Примечание (приближение MVP): выбор цели/opt-out игроком не моделируется — авто-удар по первому ' +
-      'врагу в зоне героя.',
+      'At the start of your turn, you may deal 1 damage to an opposing fighter in Medusa\'s zone. ' +
+      '(S05: интерактивный выбор цели или отказ — pending TARGET_FIGHTER, без auto-target.)',
     rules: [
       {
         trigger: 'turn-start',
         condition: 'always',
-        effect: { kind: 'turn-damage', targetScope: 'enemy-in-zone', value: 1 },
+        effect: { kind: 'pending-target-damage', targetScope: 'enemy-in-zone', value: 1 },
       },
     ],
   },

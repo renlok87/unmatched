@@ -773,17 +773,30 @@ describe('GameStateService', () => {
       expect(cached.metadata.combatResolutionProgress).toEqual(state.metadata.combatResolutionProgress);
     });
 
-    it('omits server continuation from every subscription publication without changing saved state', async () => {
+    it('strips the execution queue but keeps the reveal flag for per-player subscription filtering', async () => {
       const state = pausedState();
       const publish = jest.fn().mockResolvedValue(1);
       const subscriptions = new GameSubscriptionService({ publish } as unknown as RedisService);
       await subscriptions.publishGameUpdate(state.gameId, 'STATE_UPDATED', state);
       const event = JSON.parse(publish.mock.calls[0][1]);
+      // Очередь исполнения не публикуется никогда
       expect(event.gameState.metadata.combatEffectContinuation).toBeUndefined();
-      expect(event.gameState.metadata.combatResolutionProgress).toBeUndefined();
       expect(event.gameState.metadata.pendingEffects).toEqual(state.metadata.pendingEffects);
+      // S05: combatResolutionProgress ДОЛЖЕН дожить до per-player
+      // filterPrivateData в резолвере подписки — это флаг «reveal уже был»
+      // (пост-reveal паузы публичны, rulebook p.12-13); сама фильтрация ниже
+      expect(event.gameState.metadata.combatResolutionProgress).toEqual(state.metadata.combatResolutionProgress);
       expect(state.metadata.combatEffectContinuation).toBeDefined();
       expect(state.metadata.combatResolutionProgress).toBeDefined();
+
+      // Per-player фильтр резолвера: прогресс вырезан, обе стороны видят
+      // reveal-личины (pausedState = пост-reveal пауза AFTER_COMBAT)
+      for (const viewer of ['player1', 'player2'] as const) {
+        const filtered = service.filterPrivateData(event.gameState, viewer);
+        expect(filtered.metadata.combatResolutionProgress).toBeUndefined();
+        expect(filtered.metadata.combatEffectContinuation).toBeUndefined();
+        expect(filtered.metadata.pendingEffects).toEqual(state.metadata.pendingEffects);
+      }
     });
 
     it('accepts legacy saves without continuation fields', () => {
@@ -840,6 +853,411 @@ describe('GameStateService', () => {
       const restored = service.deserialize(service.serialize(mockGameState));
       expect(restored.metadata.combatInfo).toBeUndefined();
       expect(restored.metadata.winnerId).toBeUndefined();
+    });
+
+    it('GD-017: boost-слоты (bv/cbc/abc) переживают serialize → deserialize', () => {
+      const withBoost: GameState = {
+        ...mockGameState,
+        metadata: {
+          ...mockGameState.metadata,
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId: 'fighter2',
+            attackerCardId: 'card-a::1',
+            attackValue: 3,
+            boostValue: 3,
+            cardBoostCardId: 'boost::1',
+            abilityBoostCardId: 'ab::2',
+            defenseValue: 0,
+            startedAt: new Date(0),
+          },
+        },
+      };
+      const restored = service.deserialize(service.serialize(withBoost));
+      expect(restored.metadata.combatInfo!.boostValue).toBe(3);
+      expect(restored.metadata.combatInfo!.cardBoostCardId).toBe('boost::1');
+      expect(restored.metadata.combatInfo!.abilityBoostCardId).toBe('ab::2');
+    });
+
+    it('GD-017/R-15: в фазе COMBAT boost-слоты видны только атакатору (face-down)', () => {
+      const withBoost: GameState = {
+        ...mockGameState,
+        phase: GamePhase.COMBAT,
+        metadata: {
+          ...mockGameState.metadata,
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId: 'fighter2',
+            attackerCardId: 'card-a::1',
+            attackValue: 3,
+            boostValue: 3,
+            cardBoostCardId: 'boost::1',
+            abilityBoostCardId: 'ab::2',
+            defenseValue: 0,
+            startedAt: new Date(0),
+          },
+        },
+      };
+
+      const attackerView = service.filterPrivateData(withBoost, 'player1');
+      expect(attackerView.metadata.combatInfo!.boostValue).toBe(3);
+      expect(attackerView.metadata.combatInfo!.abilityBoostCardId).toBe('ab::2');
+
+      const defenderView = service.filterPrivateData(withBoost, 'player2');
+      expect(defenderView.metadata.combatInfo!.boostValue).toBeUndefined();
+      expect(defenderView.metadata.combatInfo!.cardBoostCardId).toBeUndefined();
+      expect(defenderView.metadata.combatInfo!.abilityBoostCardId).toBeUndefined();
+      // печатное значение и участники боя видны обоим
+      expect(defenderView.metadata.combatInfo!.attackValue).toBe(3);
+      expect(defenderView.metadata.combatInfo!.attackerId).toBe('fighter1');
+      // входное состояние не мутировано
+      expect(withBoost.metadata.combatInfo!.boostValue).toBe(3);
+    });
+
+    it('GD-017: вне фазы COMBAT boost-слоты не вырезаются (бой вскрыт)', () => {
+      const resolved: GameState = {
+        ...mockGameState,
+        phase: GamePhase.ACTION_MANEUVER,
+        metadata: {
+          ...mockGameState.metadata,
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId: 'fighter2',
+            attackerCardId: 'card-a::1',
+            attackValue: 3,
+            boostValue: 3,
+            cardBoostCardId: 'boost::1',
+            abilityBoostCardId: 'ab::2',
+            defenseValue: 2,
+            startedAt: new Date(0),
+          },
+        },
+      };
+      const view = service.filterPrivateData(resolved, 'player2');
+      expect(view.metadata.combatInfo!.boostValue).toBe(3);
+      expect(view.metadata.combatInfo!.abilityBoostCardId).toBe('ab::2');
+    });
+
+    it('GD-020: до reveal committed-карты боя скрыты из discardPiles для другого игрока (COMBAT)', () => {
+      const inCombat: GameState = {
+        ...mockGameState,
+        phase: GamePhase.COMBAT,
+        discardPiles: {
+          player1: [
+            { id: 'card-a::1', cardId: 'card-a', name: 'Attack', nameEn: 'Attack', nameRu: 'Attack', cardType: CardType.ATTACK },
+            { id: 'old::0', cardId: 'old', name: 'Old Scheme', nameEn: 'Old Scheme', nameRu: 'Old Scheme', cardType: CardType.SCHEME },
+          ],
+          player2: [],
+        },
+        metadata: {
+          ...mockGameState.metadata,
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId: 'fighter2',
+            attackerCardId: 'card-a::1',
+            attackValue: 3,
+            boostValue: 4,
+            cardBoostCardId: 'boost::1',
+            defenseValue: 0,
+            startedAt: new Date(0),
+          },
+        },
+      };
+
+      // Защитник не видит личину committed attack/boost карт (плейсхолдеры),
+      // но видит факт коммита (длина) и свой ДОбоевый сброс атакатора.
+      const defenderView = service.filterPrivateData(inCombat, 'player2');
+      const pile = defenderView.discardPiles.player1;
+      expect(pile).toHaveLength(2);
+      expect(pile.map((c) => c.id)).toEqual(['hidden-0', 'old::0']);
+      expect(pile[0].name).toBe('???');
+      expect(defenderView.metadata.combatInfo!.boostValue).toBeUndefined();
+
+      // Атакатор видит свои committed-карты полностью
+      const attackerView = service.filterPrivateData(inCombat, 'player1');
+      expect(attackerView.discardPiles.player1.map((c) => c.id)).toEqual(['card-a::1', 'old::0']);
+      expect(attackerView.metadata.combatInfo!.boostValue).toBe(4);
+
+      // Входное состояние не мутировано
+      expect(inCombat.discardPiles.player1[0].name).toBe('Attack');
+    });
+
+    it('GD-020: COMBAT_RESOLVE — защитная карта скрыта от атакатора до reveal', () => {
+      const defended: GameState = {
+        ...mockGameState,
+        phase: GamePhase.COMBAT_RESOLVE,
+        discardPiles: {
+          player1: [{ id: 'card-a::1', cardId: 'card-a', name: 'Attack', nameEn: 'Attack', nameRu: 'Attack', cardType: CardType.ATTACK }],
+          player2: [{ id: 'def::1', cardId: 'def', name: 'Defense', nameEn: 'Defense', nameRu: 'Defense', cardType: CardType.DEFENSE }],
+        },
+        metadata: {
+          ...mockGameState.metadata,
+          combatInfo: {
+            attackerId: 'fighter1',
+            defenderId: 'player2',
+            targetFighterId: 'fighter2',
+            attackerCardId: 'card-a::1',
+            attackValue: 3,
+            defenseValue: 2,
+            defenderCardId: 'def::1',
+            startedAt: new Date(0),
+          },
+        },
+      };
+
+      const attackerView = service.filterPrivateData(defended, 'player1');
+      expect(attackerView.discardPiles.player2.map((c) => c.id)).toEqual(['hidden-0']);
+      expect(attackerView.metadata.combatInfo!.boostValue).toBeUndefined();
+
+      // Защитник видит свою карту
+      const defenderView = service.filterPrivateData(defended, 'player2');
+      expect(defenderView.discardPiles.player2.map((c) => c.id)).toEqual(['def::1']);
+    });
+
+    it('GD-020: после боя (combatInfo снят) сброс виден обоим полностью', () => {
+      const resolved: GameState = {
+        ...mockGameState,
+        phase: GamePhase.ACTION_MANEUVER,
+        discardPiles: {
+          player1: [{ id: 'card-a::1', cardId: 'card-a', name: 'Attack', nameEn: 'Attack', nameRu: 'Attack', cardType: CardType.ATTACK }],
+          player2: [],
+        },
+        metadata: { ...mockGameState.metadata },
+      };
+      const view = service.filterPrivateData(resolved, 'player2');
+      expect(view.discardPiles.player1.map((c) => c.id)).toEqual(['card-a::1']);
+    });
+
+    // S05 P2-1: обе карты вскрываются ВМЕСТЕ до DURING_COMBAT-выборов
+    // (rulebook BoL Vol.1, p.12-13) — reveal = запуск executeResolveCombat,
+    // серверный маркер = живой combatResolutionProgress.
+    describe('S05: reveal-видимость пост-reveal пауз (rulebook p.12-13)', () => {
+      const attackCard = { id: 'card-a::1', cardId: 'card-a', name: 'Attack', nameEn: 'Attack', nameRu: 'Атака', cardType: CardType.ATTACK };
+      const abilityBoostCard = { id: 'ab::2', cardId: 'ab', name: 'Excalibur', nameEn: 'Excalibur', nameRu: 'Экскалибур', cardType: CardType.VERSATILE };
+      const defenseCard = { id: 'def::1', cardId: 'def', name: 'Defense', nameEn: 'Defense', nameRu: 'Защита', cardType: CardType.DEFENSE };
+      const oldScheme = { id: 'old::0', cardId: 'old', name: 'Old Scheme', nameEn: 'Old Scheme', nameRu: 'Old Scheme', cardType: CardType.SCHEME };
+
+      const combatBase = {
+        attackerId: 'fighter1',
+        defenderId: 'player2',
+        targetFighterId: 'fighter2',
+        attackerCardId: 'card-a::1',
+        defenderCardId: 'def::1',
+        attackValue: 3,
+        boostValue: 3,
+        abilityBoostCardId: 'ab::2',
+        defenseValue: 2,
+        startedAt: new Date(0),
+      };
+
+      const pausedDiscardPiles = () => ({
+        player1: [attackCard, abilityBoostCard, oldScheme],
+        player2: [defenseCard],
+      });
+
+      const handZonesWithBoostCandidate = () => ({
+        player1: {
+          cards: [
+            { id: 'hand1', cardId: 'hand1', name: 'Hand Card 1', nameEn: 'Hand Card 1', nameRu: 'Карта в руке 1', cardType: CardType.ATTACK, attackValue: 5, isVisible: true },
+            { id: 'boost-cand::9', cardId: 'ss', name: 'Second Shot', nameEn: 'Second Shot', nameRu: 'Second Shot', cardType: CardType.SCHEME, isVisible: true },
+          ],
+          maxSize: 5,
+        },
+        player2: { ...mockGameState.handZones.player2 },
+      });
+
+      const boostChoicePending = [
+        { id: 'e5-boost-9', type: 'BOOST_CHOICE' as const, playerId: 'player1', optional: true, text: 'You may BOOST this attack' },
+      ];
+
+      it('после атаки / до защиты (COMBAT, reveal не начался): committed-карты скрыты, факт коммита виден', () => {
+        const state: GameState = {
+          ...mockGameState,
+          phase: GamePhase.COMBAT,
+          discardPiles: { player1: [attackCard, abilityBoostCard, oldScheme], player2: [] },
+          metadata: { ...mockGameState.metadata,
+            combatInfo: { ...combatBase, defenderCardId: undefined, defenseValue: 0 } },
+        };
+
+        const defenderView = service.filterPrivateData(state, 'player2');
+        const pile = defenderView.discardPiles.player1;
+        expect(pile).toHaveLength(3);
+        expect(pile.map((c) => c.id)).toEqual(['hidden-0', 'hidden-1', 'old::0']);
+        expect(pile[0].name).toBe('???');
+        expect(defenderView.metadata.combatInfo!.boostValue).toBeUndefined();
+        expect(defenderView.metadata.combatInfo!.abilityBoostCardId).toBeUndefined();
+
+        const attackerView = service.filterPrivateData(state, 'player1');
+        expect(attackerView.discardPiles.player1.map((c) => c.id)).toEqual(['card-a::1', 'ab::2', 'old::0']);
+        expect(attackerView.metadata.combatInfo!.boostValue).toBe(3);
+      });
+
+      it('после защиты / до reveal (COMBAT_RESOLVE без прогресса): обе committed-личины скрыты от соперника', () => {
+        const state: GameState = {
+          ...mockGameState,
+          phase: GamePhase.COMBAT_RESOLVE,
+          discardPiles: pausedDiscardPiles(),
+          metadata: { ...mockGameState.metadata, combatInfo: { ...combatBase } },
+        };
+
+        const attackerView = service.filterPrivateData(state, 'player1');
+        expect(attackerView.discardPiles.player2.map((c) => c.id)).toEqual(['hidden-0']);
+        expect(attackerView.discardPiles.player1.map((c) => c.id)).toEqual(['card-a::1', 'ab::2', 'old::0']);
+
+        const defenderView = service.filterPrivateData(state, 'player2');
+        expect(defenderView.discardPiles.player1.map((c) => c.id)).toEqual(['hidden-0', 'hidden-1', 'old::0']);
+        expect(defenderView.discardPiles.player2.map((c) => c.id)).toEqual(['def::1']);
+        expect(defenderView.metadata.combatInfo!.boostValue).toBeUndefined();
+      });
+
+      it('пауза BOOST_CHOICE после reveal: обе личины + committed Arthur-boost открыты ОБОИМ, руки не текут', () => {
+        const state: GameState = {
+          ...mockGameState,
+          phase: GamePhase.COMBAT_RESOLVE,
+          discardPiles: pausedDiscardPiles(),
+          handZones: handZonesWithBoostCandidate(),
+          metadata: {
+            ...mockGameState.metadata,
+            combatInfo: { ...combatBase },
+            pendingEffects: boostChoicePending,
+            combatResolutionProgress: {
+              defeatedBefore: [],
+              reveal: { attackerCardCancelled: false, defenderCardCancelled: false, appliedEffects: [], manualEffects: [] },
+              calculation: { paused: true, finalAttack: 6, finalDefense: 2, attackerCardCancelled: false, defenderCardCancelled: false, preventDamageToAttacker: false, preventDamageToDefender: false, appliedEffects: [], manualEffects: [] },
+            },
+          } as GameState['metadata'],
+        };
+
+        for (const viewer of ['player1', 'player2'] as const) {
+          const view = service.filterPrivateData(state, viewer);
+          // Личины committed-карт боя открыты обоим (reveal уже был)
+          expect(view.discardPiles.player1.map((c) => c.id)).toEqual(['card-a::1', 'ab::2', 'old::0']);
+          expect(view.discardPiles.player1[1].name).toBe('Excalibur');
+          expect(view.discardPiles.player2.map((c) => c.id)).toEqual(['def::1']);
+          // boost-поля combatInfo открыты обоим после reveal
+          expect(view.metadata.combatInfo!.boostValue).toBe(3);
+          expect(view.metadata.combatInfo!.abilityBoostCardId).toBe('ab::2');
+          // внутренний прогресс вырезан; выбор игрока сохранён
+          expect(view.metadata.combatResolutionProgress).toBeUndefined();
+          expect(view.metadata.pendingEffects).toEqual(boostChoicePending);
+          // рука соперника — плейсхолдеры, личина boost-кандидата не течёт
+          const other = viewer === 'player1' ? 'player2' : 'player1';
+          const otherHand = view.handZones[other].cards;
+          expect(otherHand.every((c) => c.name === '???')).toBe(true);
+          const otherHandJson = JSON.stringify(view.handZones[other]);
+          expect(otherHandJson).not.toContain('boost-cand::9');
+          expect(otherHandJson).not.toContain('Second Shot');
+        }
+      });
+
+      it('пауза defender DURING-выбора (reveal.paused): те же открытые личины обоим', () => {
+        const state: GameState = {
+          ...mockGameState,
+          phase: GamePhase.COMBAT_RESOLVE,
+          discardPiles: pausedDiscardPiles(),
+          metadata: {
+            ...mockGameState.metadata,
+            combatInfo: { ...combatBase },
+            pendingEffects: [{ id: 'm1-move-9', type: 'MOVE' as const, playerId: 'player2', value: 2 }],
+            combatResolutionProgress: {
+              defeatedBefore: [],
+              reveal: { paused: true, attackerCardCancelled: false, defenderCardCancelled: false, appliedEffects: [], manualEffects: [] },
+            },
+          } as GameState['metadata'],
+        };
+
+        for (const viewer of ['player1', 'player2'] as const) {
+          const view = service.filterPrivateData(state, viewer);
+          expect(view.discardPiles.player1.map((c) => c.id)).toEqual(['card-a::1', 'ab::2', 'old::0']);
+          expect(view.discardPiles.player2.map((c) => c.id)).toEqual(['def::1']);
+          expect(view.metadata.combatInfo!.boostValue).toBe(3);
+        }
+      });
+
+      it('после выбора boost-карты (cardBoostCardId закоммичен, резолв ещё на паузе): личина и значение видны обоим', () => {
+        const state: GameState = {
+          ...mockGameState,
+          phase: GamePhase.COMBAT_RESOLVE,
+          discardPiles: {
+            player1: [attackCard, abilityBoostCard, { id: 'boost::1', cardId: 'ss', name: 'Second Shot', nameEn: 'Second Shot', nameRu: 'Second Shot', cardType: CardType.SCHEME }],
+            player2: [defenseCard],
+          },
+          metadata: {
+            ...mockGameState.metadata,
+            combatInfo: { ...combatBase, boostValue: 4, cardBoostCardId: 'boost::1' },
+            combatResolutionProgress: {
+              defeatedBefore: [],
+              reveal: { attackerCardCancelled: false, defenderCardCancelled: false, appliedEffects: [], manualEffects: [] },
+              calculation: { paused: true, finalAttack: 7, finalDefense: 2, attackerCardCancelled: false, defenderCardCancelled: false, preventDamageToAttacker: false, preventDamageToDefender: false, appliedEffects: [], manualEffects: [] },
+            },
+          } as GameState['metadata'],
+        };
+
+        for (const viewer of ['player1', 'player2'] as const) {
+          const view = service.filterPrivateData(state, viewer);
+          expect(view.discardPiles.player1.map((c) => c.id)).toEqual(['card-a::1', 'ab::2', 'boost::1']);
+          expect(view.metadata.combatInfo!.boostValue).toBe(4);
+          expect(view.metadata.combatInfo!.cardBoostCardId).toBe('boost::1');
+        }
+      });
+
+      it('paused reveal-флаг переживает serialize → deserialize, видимость не меняется', () => {
+        const state: GameState = {
+          ...mockGameState,
+          phase: GamePhase.COMBAT_RESOLVE,
+          discardPiles: pausedDiscardPiles(),
+          handZones: handZonesWithBoostCandidate(),
+          metadata: {
+            ...mockGameState.metadata,
+            combatInfo: { ...combatBase },
+            pendingEffects: boostChoicePending,
+            combatResolutionProgress: {
+              defeatedBefore: [],
+              reveal: { paused: true, attackerCardCancelled: false, defenderCardCancelled: false, appliedEffects: [], manualEffects: [] },
+            },
+          } as GameState['metadata'],
+        };
+
+        const restored = service.deserialize(JSON.parse(JSON.stringify(service.serialize(state))));
+        expect(restored.metadata.combatResolutionProgress?.reveal?.paused).toBe(true);
+
+        for (const viewer of ['player1', 'player2'] as const) {
+          const direct = service.filterPrivateData(state, viewer);
+          const afterRoundtrip = service.filterPrivateData(restored, viewer);
+          expect(afterRoundtrip.discardPiles.player1.map((c) => c.id))
+            .toEqual(direct.discardPiles.player1.map((c) => c.id));
+          expect(afterRoundtrip.discardPiles.player2.map((c) => c.id))
+            .toEqual(direct.discardPiles.player2.map((c) => c.id));
+          expect(afterRoundtrip.metadata.combatInfo!.boostValue).toBe(3);
+          expect(afterRoundtrip.metadata.combatResolutionProgress).toBeUndefined();
+        }
+      });
+    });
+
+    it('GD-020: DISCARD_CARDS pending переживает serialize → deserialize', () => {
+      const withDiscardPending: GameState = {
+        ...mockGameState,
+        metadata: {
+          ...mockGameState.metadata,
+          pendingEffects: [
+            {
+              id: 'discard-choice-e1-12',
+              type: 'DISCARD_CARDS',
+              playerId: 'player1',
+              value: 1,
+              text: 'Your opponent discards 1 card.',
+            },
+          ],
+        },
+      } as GameState;
+      const restored = service.deserialize(service.serialize(withDiscardPending));
+      expect(restored.metadata.pendingEffects).toEqual([
+        { id: 'discard-choice-e1-12', type: 'DISCARD_CARDS', playerId: 'player1', value: 1, text: 'Your opponent discards 1 card.' },
+      ]);
     });
 
     it('per-turn action flags переживают serialize → deserialize', () => {

@@ -77,7 +77,11 @@ async function main() {
         card.effectBoost?.trim() ||
         card.effectOngoing?.trim(),
     );
-    if (!hasTexts) continue;
+    // S05 (GD-019): SCHEME-карты, у которых эффект напечатан только общим
+    // текстом (Card.text = textEn), а effect*-поля пусты — парсим fullText
+    // как fallback (раньше такие карты молча получали effects [] = no-op).
+    const fullTextFallback = card.cardType === 'SCHEME' && Boolean(card.text?.trim());
+    if (!hasTexts && !fullTextFallback) continue;
     report.withTexts++;
 
     // Ручные эффекты — приоритет: сохраняем, парсер дополняет только их отсутствие
@@ -95,6 +99,7 @@ async function main() {
         after: card.effectAfter,
         boost: card.effectBoost,
         ongoing: card.effectOngoing,
+        fullText: fullTextFallback ? card.text : undefined,
       },
       card.id,
     );

@@ -19,7 +19,7 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { MetricsService } from '../../metrics/metrics.service';
-import type { GameState, Card, CombatContext, EffectContext, CombatEffectContinuation } from '../models';
+import type { GameState, Card, CombatContext, EffectContext, CombatEffectContinuation, PendingEffect } from '../models';
 import { GamePhase } from '../models';
 import { applyTerminalState } from '../engine/terminal-state';
 import {
@@ -44,6 +44,27 @@ export interface EffectResult {
   readonly message?: string;
   /** Эффект требует ручного применения (MOVE/PLACE/UNSUPPORTED) */
   readonly manual?: boolean;
+}
+
+/**
+ * Матчинг имени бойца против имени из текста карты/способности.
+ *  - «Harpy 2» (клон сайдкика) матчит «Harpy»;
+ *  - «Harpies» (имя сайдкика в каталоге) матчит «Harpy» (единственное число
+ *    из текста карты) — нормализация множественного числа: ies→y, s/es→;
+ *  - регистронезависимо.
+ */
+export function fighterNameMatches(fighterName: string, effectName: string): boolean {
+  const stem = (s: string): string => {
+    const base = s.replace(/\s+\d+$/, '').trim().toLowerCase();
+    if (/ies$/.test(base)) return base.replace(/ies$/, 'y');
+    if (/es$/.test(base)) return base.replace(/es$/, '');
+    if (/s$/.test(base)) return base.replace(/s$/, '');
+    return base;
+  };
+  const f = fighterName.trim().toLowerCase();
+  const e = effectName.trim().toLowerCase();
+  const fBase = fighterName.replace(/\s+\d+$/, '').trim().toLowerCase();
+  return fBase === e || f === e || stem(fighterName) === stem(effectName);
 }
 
 export type { CombatContext, EffectContext } from '../models';
@@ -407,16 +428,44 @@ export class CardEffectExecutorService {
       }
 
       case EffectType.BOOST: {
-        // PLAYER_CHOICE_HAND обрабатывается мутацией (boostCardId, A7) — здесь
-        // только авто-источники
+        // Авто-источники: блинд-буст и random-буст оппонента
         if (effect.boostSource === 'SELF_DECK_TOP') {
           return this.applyDeckTopBoost(state, effect, context);
         }
         if (effect.boostSource === 'OPPONENT_RANDOM_HAND') {
           return this.applyOpponentRandomBoost(state, effect, context);
         }
-        // PLAYER_CHOICE_HAND: ничего не делаем (выбор игрока в мутации)
-        return { state, result: ok({ message: 'BOOST: выбор карты — через boostCardId' }) };
+        // PLAYER_CHOICE_HAND («You may BOOST this attack/defense», Second Shot /
+        // Noble Sacrifice): карта НЕ коммитится при объявлении — выбор
+        // происходит ЗДЕСЬ, на стадии DURING_COMBAT после reveal и отмены
+        // Feint (rulebook Battle of Legends Vol.1, p.12-13). Пауза боевой
+        // цепочки через pendingEffects; резолв — resolvePendingEffect(cardIds).
+        if (!context.combat) {
+          return { state, result: ok({ message: 'BOOST вне боя не поддерживается' }) };
+        }
+        const hand = state.handZones[context.playerId]?.cards ?? [];
+        if (hand.length === 0) {
+          // «You may …» — пустая рука = легальный no-op, выбора нет
+          return { state, result: ok({ message: 'Рука пуста — BOOST недоступен' }) };
+        }
+        const pending: PendingEffect = {
+          id: `${effect.id}-boost-${state.sequenceNumber}`,
+          type: 'BOOST_CHOICE',
+          playerId: context.playerId,
+          optional: true,
+          text: effect.text ?? 'You may BOOST this attack',
+        };
+        const next: GameState = {
+          ...state,
+          metadata: {
+            ...state.metadata,
+            pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+          },
+        };
+        return {
+          state: next,
+          result: ok({ targetIds: [context.playerId], message: 'Ожидает выбора BOOST-карты (после reveal)' }),
+        };
       }
 
       case EffectType.CANCEL_EFFECTS:
@@ -431,6 +480,33 @@ export class CardEffectExecutorService {
 
       // --- изменения состояния ---
       case EffectType.DAMAGE: {
+        // «any one fighter in X's zone» (A Momentary Glance): цель выбирает
+        // владелец из ВСЕХ живых бойцов зоны X (свои и враги) — TARGET_FIGHTER.
+        if (effect.target === EffectTarget.ANY_FIGHTER_IN_ZONE) {
+          const zoneTargets = this.fightersInZoneOf(state, effect.fighterName ?? '');
+          if (zoneTargets.length === 0) {
+            return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'No valid targets' } };
+          }
+          const pending = {
+            id: `${effect.id}-p${state.metadata.pendingEffects?.length ?? 0}`,
+            type: 'TARGET_FIGHTER' as const,
+            playerId: context.playerId,
+            targetFighterIds: zoneTargets,
+            damage: value,
+            text: effect.text ?? `Deal ${value} damage to any one fighter in ${effect.fighterName}'s zone`,
+          };
+          const next: GameState = {
+            ...state,
+            metadata: {
+              ...state.metadata,
+              pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+            },
+          };
+          return {
+            state: next,
+            result: ok({ targetIds: zoneTargets, message: `Ожидает выбора цели: ${pending.text}` }),
+          };
+        }
         const targets = await this.resolveTargets(state, effect, context);
         if (targets.length === 0) {
           return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'No valid targets' } };
@@ -465,8 +541,40 @@ export class CardEffectExecutorService {
         if (!opponentId) {
           return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'No opponent' } };
         }
-        const next = await this.discardRandomCards(state, opponentId, value || 1);
-        return { state: next, result: ok({ targetIds: [opponentId], valueApplied: value || 1 }) };
+        // Печатный текст без слова «random» («Your opponent discards 1 card.»):
+        // сбрасывающий ОППОНЕНТ выбирает карту сам (правила Unmatched — выбор
+        // карт всегда за владельцем руки, если явно не сказано «random»).
+        // Карты с «random» парсятся в BOOST/OPPONENT_RANDOM_HAND, сюда не попадают.
+        const count = value || 1;
+        const hand = state.handZones[opponentId]?.cards ?? [];
+        if (hand.length === 0) {
+          // Пустая рука — легальный no-op (сбрасывать нечего)
+          return {
+            state,
+            result: ok({ targetIds: [opponentId], valueApplied: 0, message: 'У оппонента пустая рука — сброс не выполняется' }),
+          };
+        }
+        const pending: PendingEffect = {
+          id: `discard-choice-${effect.id}-${state.sequenceNumber}`,
+          type: 'DISCARD_CARDS',
+          playerId: opponentId,
+          value: count,
+          text: effect.text,
+        };
+        const next: GameState = {
+          ...state,
+          metadata: {
+            ...state.metadata,
+            pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+          },
+        };
+        // Рост pendingEffects в runCombatQueue/executeChosenEffects паузит
+        // боевую цепочку (combatEffectContinuation); резолв выбора продолжит
+        // её через drainAfterChoice → resumeCombatEffects.
+        return {
+          state: next,
+          result: ok({ targetIds: [opponentId], valueApplied: count, message: `Оппонент выбирает ${count} карт(у) для сброса` }),
+        };
       }
 
       case EffectType.GAIN_ACTION: {
@@ -563,6 +671,40 @@ export class CardEffectExecutorService {
           return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'No valid targets' } };
         }
         const text = effect.text ?? `${effect.type} ${value || ''}`.trim();
+
+        // «Move each of your fighters…» / «Move each Harpy…»: EACH — отдельное
+        // решение на каждого живого бойца, строго последовательно (голова
+        // очереди). Нулевой шаг легален — очередь не strand'ится.
+        const isEach =
+          effect.type === EffectType.MOVE &&
+          (effect.target === EffectTarget.EACH_OWN_FIGHTER ||
+            (effect.target === EffectTarget.NAMED_FIGHTER && Boolean(effect.fighterName)));
+        if (isEach && fighterIds.length > 0) {
+          const pendings = fighterIds.map((fid, i) => ({
+            id: `${effect.id}-p${(state.metadata.pendingEffects?.length ?? 0) + i}`,
+            type: 'MOVE' as const,
+            playerId: context.playerId,
+            fighterIds: [fid],
+            value: value || undefined,
+            fighterName: effect.target === EffectTarget.NAMED_FIGHTER ? effect.fighterName : undefined,
+            targetsOpponent: false,
+            optional: effect.optional,
+            canPassThroughEnemies: effect.canPassThroughEnemies === true,
+            text,
+          }));
+          const next: GameState = {
+            ...state,
+            metadata: {
+              ...state.metadata,
+              pendingEffects: [...(state.metadata.pendingEffects ?? []), ...pendings],
+            },
+          };
+          return {
+            state: next,
+            result: ok({ targetIds: fighterIds, message: `Ожидает выбора: ${text} (×${pendings.length})` }),
+          };
+        }
+
         const pending = {
           id: `${effect.id}-p${(state.metadata.pendingEffects?.length ?? 0)}`,
           type: effect.type === EffectType.MOVE ? ('MOVE' as const) : ('PLACE' as const),
@@ -572,6 +714,46 @@ export class CardEffectExecutorService {
           fighterName: effect.fighterName,
           targetsOpponent: effect.target === EffectTarget.OPPOSING_FIGHTER,
           optional: effect.optional,
+          canPassThroughEnemies: effect.canPassThroughEnemies === true,
+          text,
+        };
+        const next: GameState = {
+          ...state,
+          metadata: {
+            ...state.metadata,
+            pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+          },
+        };
+        return {
+          state: next,
+          result: ok({ message: `Ожидает выбора: ${text}` }),
+          manual: text,
+        };
+      }
+
+      // «Then, return a defeated Harpy (if any) to any space in Medusa's zone»
+      // (Winged Frenzy): побеждённые бойцы владельца с этим именем; есть —
+      // optional PLACE-pending (revive, full health, зона named-бойца), нет —
+      // skip («if any»).
+      case EffectType.RETURN_DEFEATED: {
+        const candidates = state.fighters.filter(
+          (f) =>
+            f.ownerId === context.playerId &&
+            f.isDefeated === true &&
+            this.nameMatches(f.name, effect.fighterName ?? ''),
+        );
+        if (candidates.length === 0) {
+          return { state, result: ok({ message: 'Нет поверженных бойцов для возврата' }) };
+        }
+        const text = effect.text ?? `Return a defeated ${effect.fighterName}`;
+        const pending = {
+          id: `${effect.id}-p${(state.metadata.pendingEffects?.length ?? 0)}`,
+          type: 'PLACE' as const,
+          playerId: context.playerId,
+          fighterIds: candidates.map((f) => f.id),
+          zoneFighterName: effect.zoneFighterName,
+          restoreFullHealth: true,
+          optional: true,
           text,
         };
         const next: GameState = {
@@ -847,6 +1029,12 @@ export class CardEffectExecutorService {
           .map((f) => f.id);
       }
 
+      case EffectTarget.EACH_OWN_FIGHTER: {
+        return state.fighters
+          .filter((f) => f.ownerId === context.playerId && !f.isDefeated && f.health > 0)
+          .map((f) => f.id);
+      }
+
       case EffectTarget.OPPONENT_PLAYER: {
         const opp = this.opponentPlayerId(state, context);
         return opp ? [opp] : [];
@@ -857,10 +1045,23 @@ export class CardEffectExecutorService {
     }
   }
 
-  /** «Harpy 2» матчит «Harpy»; регистронезависимо */
+  /** «Harpy 2» матчит «Harpy»; «Harpies» матчит «Harpy» (мн. число); регистронезависимо */
   private nameMatches(fighterName: string, effectName: string): boolean {
-    const base = fighterName.replace(/\s+\d+$/, '').trim().toLowerCase();
-    return base === effectName.trim().toLowerCase() || fighterName.trim().toLowerCase() === effectName.trim().toLowerCase();
+    return fighterNameMatches(fighterName, effectName);
+  }
+
+  /**
+   * Живые бойцы в зоне бойца с именем fighterName (пересечение зон клеток).
+   * Якорь-боец ищется по имени независимо от isDefeated — «Medusa's zone»
+   * остаётся определённой, пока Медуза стоит на доске. Нет якоря → пусто.
+   */
+  private fightersInZoneOf(state: GameState, fighterName: string): string[] {
+    const anchor = state.fighters.find((f) => this.nameMatches(f.name, fighterName));
+    if (!anchor) return [];
+    return state.fighters
+      .filter((f) => !f.isDefeated && f.health > 0)
+      .filter((f) => this.adjacencyService.isInSameZone(state, anchor.position, f.position))
+      .map((f) => f.id);
   }
 
   private opponentPlayerId(state: GameState, context: EffectContext): string | null {

@@ -722,7 +722,7 @@ describe('dracula (turn-start: turn-damage enemy-adjacent value 1, thenDraw 1)',
   });
 });
 
-describe('medusa (turn-start: turn-damage enemy-in-zone value 1, no draw)', () => {
+describe('medusa (turn-start: pending-target-damage enemy-in-zone value 1, GD-017)', () => {
   const stateWithEnemy = (): GameState =>
     makeState({
       handZones: handOf(1) as any,
@@ -739,7 +739,7 @@ describe('medusa (turn-start: turn-damage enemy-in-zone value 1, no draw)', () =
       ],
     });
 
-  it('бьёт врага в зоне героя на 1 урон (без добора)', async () => {
+  it('создаёт optional TARGET_FIGHTER pending с врагом в зоне (без auto-target)', async () => {
     // isInSameZone === true → враг в зоне Medusa
     const deps = makeDeps({ zone: makeZoneStub(true) });
     const handler = handlerFor('medusa', deps);
@@ -747,12 +747,20 @@ describe('medusa (turn-start: turn-damage enemy-in-zone value 1, no draw)', () =
 
     const next = await handler.onTurnStart(state, 'player1');
 
-    expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(11);
-    // medusa без thenDraw → колода не трогается
+    // S05/GD-017: урон НЕ наносится автоматически — игрок выбирает цель или
+    // отклоняет; выбор сериализуется как optional TARGET_FIGHTER pending.
+    expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
+    const pending = next.metadata.pendingEffects ?? [];
+    expect(pending).toHaveLength(1);
+    expect(pending[0].type).toBe('TARGET_FIGHTER');
+    expect(pending[0].playerId).toBe('player1');
+    expect(pending[0].optional).toBe(true);
+    expect(pending[0].damage).toBe(1);
+    expect(pending[0].targetFighterIds).toEqual(['enemy-fighter-1']);
     expect(deps.deck.drawCards).not.toHaveBeenCalled();
   });
 
-  it('no-op: врага в зоне нет — без урона', async () => {
+  it('no-op: врага в зоне нет — pending не создаётся', async () => {
     // isInSameZone === false → в зоне Medusa никого
     const deps = makeDeps({ zone: makeZoneStub(false) });
     const handler = handlerFor('medusa', deps);
@@ -761,7 +769,6 @@ describe('medusa (turn-start: turn-damage enemy-in-zone value 1, no draw)', () =
     const next = await handler.onTurnStart(state, 'player1');
 
     expect(next.fighters.find((f) => f.id === 'enemy-fighter-1')!.health).toBe(12);
-    expect(deps.deck.drawCards).not.toHaveBeenCalled();
     expect(next).toBe(state); // чистый no-op
   });
 });

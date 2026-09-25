@@ -151,6 +151,31 @@ export class AiTurnService {
           ),
           eventType: 'CARD_PLAYED',
         };
+      case 'resolveTarget':
+        return {
+          result: await this.executor.executeResolvePendingEffect(
+            { gameId, effectId: action.effectId, fighterId: action.fighterId },
+            ctx,
+          ),
+          eventType: 'CARD_PLAYED',
+        };
+      case 'resolveDiscard':
+        return {
+          result: await this.executor.executeResolvePendingEffect(
+            { gameId, effectId: action.effectId, cardIds: action.cardIds },
+            ctx,
+          ),
+          eventType: 'CARD_DISCARDED',
+        };
+      case 'resolveBoost':
+        // BOOST_CHOICE (S05): карта-буст уходит в сброс, значение — в бой
+        return {
+          result: await this.executor.executeResolvePendingEffect(
+            { gameId, effectId: action.effectId, cardIds: action.cardIds },
+            ctx,
+          ),
+          eventType: 'CARD_DISCARDED',
+        };
       case 'declinePending':
         return {
           result: await this.executor.executeDeclinePendingEffect(

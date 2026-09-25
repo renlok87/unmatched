@@ -1,0 +1,78 @@
+{
+ "sprint": "S05",
+ "track": "server/cards",
+ "date": "2026-09-25",
+ "branch": "codex/s05-abilities-medusa",
+ "base": "1ca2231",
+ "commands": [
+  {
+   "cmd": "npx jest (backend, full suite)",
+   "result": "PASS: 59 suites, 1048 tests passed, 3 failed — the 3 are the pre-existing known auth.service.spec failures (baseline 966/3; +82 new tests vs base, 0 new failures)"
+  },
+  {
+   "cmd": "npx jest --runTestsByPath src/game-engine/services/s05-medusa-cards.spec.ts",
+   "result": "PASS 29/29 (GD-020: all 11 Medusa cards through the REAL executor incl. Feint/Dash/Regroup/Snipe real combat runs and Hiss/Clutching opponent-CHOICE discard: exact choice, empty-hand no-op, foreign/stale/replay/decline rejected, combat pause+resume, no hand-contents leak in pending; Second Shot rewritten for post-reveal BOOST_CHOICE: boost/decline/Feint-no-cost)"
+  },
+  {
+   "cmd": "npx jest --runTestsByPath src/game-engine/services/s05-boost-timing.spec.ts",
+   "result": "PASS 11/11 (rulebook p.12-13 timing: Noble Sacrifice boost-after-reveal + decline; Feint cancels card BOOST (no choice, no cost) while Arthur ability card still discarded; Arthur ability + Noble Sacrifice independent; defender DURING effect resolves before BOOST_CHOICE; empty hand no-op; atomic foreign/not-in-hand/two-cards/replay rejection; privacy pre/post reveal; serialize roundtrip; AI min-sufficient boost; Medusa Second Shot via capture)"
+  },
+  {
+   "cmd": "npx jest --runTestsByPath src/game-engine/effects/card-effect-executor.service.spec.ts",
+   "result": "PASS 36/36 (OPPONENT_DISCARD now asserts persisted DISCARD_CARDS pending + empty-hand no-op; random semantics removed)"
+  },
+  {
+   "cmd": "npx jest --runTestsByPath src/game-engine/effects/s05-registry.spec.ts",
+   "result": "PASS 8/8 (GD-019 registry; regenerates s05-card-registry.json — Hiss and Slither / Clutching Claws SUPPORTED now backed by correct choice semantics + executor tests)"
+  },
+  {
+   "cmd": "npx jest --runTestsByPath src/game-engine/services/s05-hero-abilities.spec.ts",
+   "result": "PASS 10/10 (unchanged; Medusa pending text no longer carries invented ability name)"
+  },
+  {
+   "cmd": "npx jest --runTestsByPath src/game-engine/services/ai-decision.service.spec.ts src/games/services/ai-turn.service.spec.ts",
+   "result": "PASS 33/33 (AI DISCARD_CARDS: discards min-boostValue card; foreign pending → wait)"
+  },
+  {
+   "cmd": "npx jest --runTestsByPath src/games/game-state.service.spec.ts",
+   "result": "PASS 69/69 (incl. discardPiles pre-reveal redaction COMBAT+COMBAT_RESOLVE both directions, post-combat visibility, DISCARD_CARDS serialize round-trip; NEW post-reveal visibility per rulebook p.12-13: BOOST_CHOICE/DURING pause reveals both committed identities + committed boost fields to BOTH players with hands still masked, boost-selection visibility, paused reveal flag survives serialize roundtrip, WS payload keeps combatResolutionProgress as the reveal flag for per-player filtering)"
+  },
+  {
+   "cmd": "npx tsc --noEmit -p tsconfig.build.json (backend) + npm run build",
+   "result": "clean; dist built"
+  },
+  {
+   "cmd": "admin: npx tsc -b",
+   "result": "clean"
+  },
+  {
+   "cmd": "vitest run src/store/remoteGameStore.s03.test.ts src/components/game/GameView.s03.test.tsx src/components/game/turnResourceChoices.test.ts",
+   "result": "PASS 13/13 (frontend baseline preserved; DISCARD_CARDS cardIds param added to store/adapter/GameView)"
+  }
+ ],
+ "knownIssues": [
+  {
+   "issue": "root npx vite build fails: src/phaser/scenes/GameScene.ts imports ../assets/gameAssetManifest which exists only as an untracked user-owned file in the original checkout (pre-existing at base 1ca2231; see frontend-baseline-comparison.md: 255 diagnostics at base, 255 after S05, zero added under virtual manifest)",
+   "impact": "frontend production bundle unbuildable at base; unit/test surface unaffected (13/13); left to owning track"
+  },
+  {
+   "issue": "defense-card BOOST_CHOICE is implemented generically (side resolved from combatInfo.attackerId owner) but no captured S05 card exercises it; covered only indirectly by continuation field logic",
+   "impact": "when a defense card with printed BOOST effect is captured in a later sprint, add a dedicated spec run"
+  },
+  {
+   "issue": "combatInfo.defenseValue (defender printed+boost sum) remains visible to attacker pre-reveal — pre-existing channel outside S05 scope",
+   "impact": "documented honestly; full privacy gated on S07"
+  }
+ ],
+ "deltas": {
+  "newSuites": [
+   "backend/src/game-engine/effects/s05-registry.spec.ts",
+   "backend/src/game-engine/services/s05-medusa-cards.spec.ts",
+   "backend/src/game-engine/services/s05-hero-abilities.spec.ts",
+   "backend/src/game-engine/services/s05-boost-timing.spec.ts"
+  ],
+  "backendTests": "966 → 1048 pass (+82), known auth failures unchanged at 3",
+  "frontendTests": "13 → 13 pass",
+  "reviewFixes": "P1 opponent-discard owner choice (pending DISCARD_CARDS + serialization + web/AI/admin adapters + tests); P2 discardPiles pre-reveal redaction; P2 provisional ability names (no canonical name in captures); P2 real-executor tests for Feint/Dash/Regroup/Snipe/Hiss/Clutching; P0 boost timing corrected to rulebook p.12-13 (BOOST_CHOICE pending after reveal — replaces false commit-at-declaration claim; boostCardId removed from attack/playDefense DTO+adapters); parser `(random )?` distinction fixed with narrow regressions; P2-1 post-reveal visibility (combatResolutionProgress = reveal flag: identities + committed boosts public to both during BOOST_CHOICE/DURING pauses, WS keeps the flag for per-player filterPrivateData, GameView renders revealed names via discardPiles, subscription payload carries discardPiles); P3 dead continuation-guard removed in resolveBoostChoice; P3 admin peffect card multi-card syntax for DISCARD_CARDS value>1"
+ }
+}

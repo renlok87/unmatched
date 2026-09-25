@@ -392,13 +392,33 @@ describe('CardEffectExecutorService (A3)', () => {
       expect(won.state.fighters.find((f) => f.id === 'f2')!.health).toBe(2);
     });
 
-    it('OPPONENT_DISCARD сбрасывает случайную карту оппонента', async () => {
+    it('OPPONENT_DISCARD (без «random») — сбрасывающий ОППОНЕНТ выбирает карту: pending DISCARD_CARDS', async () => {
       const atk = card('atk', [eff({ type: EffectType.OPPONENT_DISCARD, value: 1 })]);
       const after = await service.executeAfterCombatEffects(makeState(), atk, null, combat, {
         attackerWon: true, attackerDamage: 0, defenderDamage: 1,
       });
-      expect(after.state.handZones.p2.cards).toHaveLength(0);
-      expect(after.state.discardPiles.p2).toHaveLength(1);
+      // Рука НЕ тронута движком: карту выберет владелец выбора (p2) через
+      // resolvePendingEffect(cardIds) — движок не решает за игрока.
+      expect(after.state.handZones.p2.cards).toHaveLength(1);
+      expect(after.state.discardPiles.p2).toHaveLength(0);
+      expect(after.state.metadata.pendingEffects).toEqual([
+        expect.objectContaining({ type: 'DISCARD_CARDS', playerId: 'p2', value: 1 }),
+      ]);
+      // очередь паузит остаток боевой цепочки
+      expect(after.paused).toBe(true);
+    });
+
+    it('OPPONENT_DISCARD: пустая рука оппонента — чистый no-op без pending', async () => {
+      const atk = card('atk', [eff({ type: EffectType.OPPONENT_DISCARD, value: 1 })]);
+      const empty: GameState = {
+        ...makeState(),
+        handZones: { ...makeState().handZones, p2: { cards: [], maxSize: 5 } },
+      };
+      const after = await service.executeAfterCombatEffects(empty, atk, null, combat, {
+        attackerWon: true, attackerDamage: 0, defenderDamage: 1,
+      });
+      expect(after.state.metadata.pendingEffects ?? []).toHaveLength(0);
+      expect(after.paused).toBeFalsy();
     });
 
     it('GAIN_ACTION увеличивает actionsRemaining, END_TURN обнуляет', async () => {

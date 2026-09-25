@@ -723,7 +723,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
       expect(result.gameState!.handZones.player2.cards.length).toBe(1);
     });
 
-    it('medusa (turn-damage врагу В ЗОНЕ 1 — при isInSameZone=true)', async () => {
+    it('medusa (GD-017: optional TARGET_FIGHTER pending врагу В ЗОНЕ — при isInSameZone=true)', async () => {
       const adjacency = (service as any).adjacencyService;
       adjacency.isInSameZone.mockReturnValue(true);
       let state = endTurnState();
@@ -732,11 +732,17 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
       const result = await service.executeEndTurn({ gameId: 'test-game-1' } as EndTurnDto, ctxFor('player1', state));
 
       expect(result.success).toBe(true);
+      // S05: авто-урона НЕТ — выбор сериализуется как optional pending;
+      // урон нанесёт resolvePendingEffect (см. s05-hero-abilities.spec.ts).
       const victim = result.gameState!.fighters.find((f) => f.id === 'fighter1')!;
-      expect(victim.health).toBe(14 - 1);
+      expect(victim.health).toBe(14);
+      const pendings = result.gameState!.metadata.pendingEffects ?? [];
+      expect(pendings).toHaveLength(1);
+      expect(pendings[0].type).toBe('TARGET_FIGHTER');
+      expect(pendings[0].targetFighterIds).toContain('fighter1');
     });
 
-    it('medusa (negative): isInSameZone=false → нет цели → no-op (урон не нанесён)', async () => {
+    it('medusa (negative): isInSameZone=false → нет цели → no-op (pending не создаётся)', async () => {
       // default isInSameZone=false → в зоне нет врага.
       let state = endTurnState();
       state = withHeroSlug(state, 'fighter2', 'medusa');
@@ -746,6 +752,7 @@ describe('ABILITY_CONFIGS — real registry + real executor (consolidation)', ()
       expect(result.success).toBe(true);
       const victim = result.gameState!.fighters.find((f) => f.id === 'fighter1')!;
       expect(victim.health).toBe(14); // без урона
+      expect(result.gameState!.metadata.pendingEffects ?? []).toHaveLength(0);
     });
   });
 

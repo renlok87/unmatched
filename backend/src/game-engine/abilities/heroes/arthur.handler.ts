@@ -1,8 +1,8 @@
 /**
  * Arthur Hero Ability Handler
  *
- * Способность Артура: "Righteous Fury"
- * Arthur всегда имеет минимум +1 к атаке.
+ * Способность King Arthur (R-15/R-16): «When King Arthur attacks, you may
+ * BOOST that attack…» — see description below.
  */
 
 import {
@@ -21,12 +21,18 @@ import { Position } from '../../models';
 export const arthurAbilityHandler: HeroAbilityHandler = {
   // Ключ = slugifyHeroName(Hero.name) — в БД герой называется 'King Arthur'
   heroId: 'king-arthur',
-  name: 'Holy Avenger',
+  // PROVISIONAL label: в захвате (content-king-arthur.json) у способности НЕТ
+  // поля name — только текст. Имя не каноническое, игроку не предъявляется.
+  name: 'King Arthur attack boost (provisional)',
   description:
-    'King Arthur может BOOST-ить свои атаки картой из руки (в дополнение к BOOST-эффектам карт)',
+    'When King Arthur attacks, you may BOOST that attack. Play the BOOST card, face down, along with ' +
+    'your attack card. If your opponent cancels the effects on your attack card, the BOOST is discarded ' +
+    'without effect. (GD-017/R-15/R-16: бустятся только атаки King Arthur — никогда Merlin и не защита.)',
 
   // Реальная способность Артура по правилам Unmatched: BOOST атаки.
   // (Старый выдуманный «+1 к атаке всегда» удалён.)
+  // Р-16: отменённый атакой Feint'ом boost не добавляется к значению —
+  // см. executeResolveCombat (cancelled → печатное значение карты).
   allowsAttackBoost: true,
 
   applyCombatModifier(

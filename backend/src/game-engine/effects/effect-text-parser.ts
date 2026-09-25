@@ -24,7 +24,7 @@ import {
   EffectTarget,
 } from '../models/card.model';
 
-export const PARSER_VERSION = 7;
+export const PARSER_VERSION = 8;
 
 export interface CardEffectTexts {
   readonly immediately?: string | null;
@@ -32,6 +32,13 @@ export interface CardEffectTexts {
   readonly after?: string | null;
   readonly boost?: string | null;
   readonly ongoing?: string | null;
+  /** S05 (GD-019): ПОЛНЫЙ печатный текст SCHEME-карты (Prisma Card.text) —
+   *  fallback для карт, у которых ВСЕ effect*-поля пусты, а эффект напечатан
+   *  только общим текстом (A Momentary Glance, Winged Frenzy, …). Парсится
+   *  с AFTER_COMBAT («после розыгрыша») — тот же тайминг, что effectAfter:
+   *  executeOnPlayEffects исполняет его при playScheme. Игнорируется, если
+   *  хоть один effect*-слот непуст (защита от дублей эффектов). */
+  readonly fullText?: string | null;
 }
 
 export interface ParseResult {
@@ -83,6 +90,18 @@ export function parseCardEffectTexts(texts: CardEffectTexts, cardId: string): Pa
     const parsed = parseFieldText(raw, timing);
     parsed.drafts.forEach((d, i) =>
       effects.push(finalize(d.draft, timing, d.text, cardId, field, seq + i)),
+    );
+    unsupported.push(...parsed.unsupported);
+  }
+
+  // S05 (GD-019): SCHEME fullText-fallback — только если ВСЕ effect*-слоты
+  // пусты (никаких эффектов не собрано). Тайминг AFTER_COMBAT = «после
+  // розыгрыша», его исполняет executeOnPlayEffects при playScheme.
+  if (effects.length === 0 && texts.fullText && texts.fullText.trim()) {
+    const seq = 0;
+    const parsed = parseFieldText(texts.fullText, EffectTiming.AFTER_COMBAT);
+    parsed.drafts.forEach((d, i) =>
+      effects.push(finalize(d.draft, EffectTiming.AFTER_COMBAT, d.text, cardId, 'fullText', seq + i)),
     );
     unsupported.push(...parsed.unsupported);
   }
@@ -169,6 +188,31 @@ function matchCompound(text: string): Draft[] | null {
     return [
       { type: EffectType.DRAW_CARD, value: 1, when: { kind: 'LOST_COMBAT' } },
       { type: EffectType.DRAW_CARD, value: 2, when: { kind: 'WON_COMBAT' } },
+    ];
+  }
+
+  // Winged Frenzy (S05): «Move each of your fighters up to 3 spaces. You may
+  // move them through spaces containing opposing fighters. Then, return a
+  // defeated Harpy (if any) to any space in Medusa's zone.»
+  // (скобочные пояснения — включая «(if any)» — уже вырезаны clean())
+  const frenzy =
+    /^move each of your fighters up to (\d+) spaces?\.\s*you may move them through spaces containing opposing fighters\.\s*then, return a defeated ([\w.' ]+?) to any space in ([\w.' ]+?)'s zone\.?$/i.exec(
+      text,
+    );
+  if (frenzy) {
+    return [
+      {
+        type: EffectType.MOVE,
+        value: Number(frenzy[1]),
+        target: EffectTarget.EACH_OWN_FIGHTER,
+        canPassThroughEnemies: true,
+      },
+      {
+        type: EffectType.RETURN_DEFEATED,
+        fighterName: frenzy[2].trim(),
+        zoneFighterName: frenzy[3].trim(),
+        optional: true,
+      },
     ];
   }
 
@@ -465,10 +509,13 @@ function parseSentence(sentence: string): Draft[] | null {
     return [{ type: EffectType.BOOST, boostSource: 'PLAYER_CHOICE_HAND', optional: true }];
   }
 
-  // OPPONENT_DISCARD
-  const oppDiscard = /^your opponent discards (\d+) (random )?cards?$/i.exec(s);
+  // OPPONENT_DISCARD — только БЕЗ «random»: сбрасывающий оппонент выбирает
+  // карту сам (persisted DISCARD_CARDS, выбор владельца руки). Вариант «random»
+  // с добором значения («…Add its BOOST value…») — отдельный компаунд BOOST
+  // (OPPONENT_RANDOM_HAND) выше; чистый «discards N random cards» без второй
+  // фразы движком не исполняется → честный UNSUPPORTED, а не выбор игрока.
+  const oppDiscard = /^your opponent discards (\d+) cards?$/i.exec(s);
   if (oppDiscard) {
-    // не-random выбор оппонента в MVP исполняется как random + warn
     return [
       {
         type: EffectType.OPPONENT_DISCARD,
@@ -562,6 +609,12 @@ function parseDamageTarget(
   if (/^each opposing fighter adjacent to your fighter$/i.test(p)) {
     return { target: EffectTarget.ENEMIES_ADJACENT_TO_SELF };
   }
+  // A Momentary Glance (S05): «any one fighter in Medusa's zone» — все живые
+  // бойцы (включая своих) в зоне именованного бойца; цель выбирает владелец.
+  const inZone = /^any one fighter in ([\w.' ]+?)'s zone$/i.exec(p);
+  if (inZone) {
+    return { target: EffectTarget.ANY_FIGHTER_IN_ZONE, fighterName: inZone[1].trim() };
+  }
   // «a fighter adjacent to Daredevil» — смежный с именованным бойцом;
   // MVP: трактуем как ADJACENT_ENEMY (выбор цели — manualEffects/warn)
   const adjNamed = /^an? fighter adjacent to ([A-Z][\w.' ]*)$/i.exec(p);
@@ -578,6 +631,8 @@ function parseFighterRef(phrase: string): Pick<Draft, 'target' | 'fighterName'> 
     return { target: EffectTarget.SELF };
   }
   if (/^the opposing fighter$/i.test(p)) return { target: EffectTarget.OPPOSING_FIGHTER };
+  // «each of your fighters» (Winged Frenzy) — не NAMED_FIGHTER-мусор
+  if (/^each of your fighters$/i.test(p)) return { target: EffectTarget.EACH_OWN_FIGHTER };
   const each = /^each ([A-Z][\w.' ]*)$/i.exec(p);
   if (each) return { target: EffectTarget.NAMED_FIGHTER, fighterName: each[1].trim() };
   return { target: EffectTarget.NAMED_FIGHTER, fighterName: p };

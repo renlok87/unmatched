@@ -234,4 +234,160 @@ describe('AiDecisionService', () => {
       expect(manhattan(cell, start)).toBeLessThanOrEqual(3);
     }
   });
+
+  it('S05 TARGET_FIGHTER pending бота → resolveTarget слабейшей живой цели', () => {
+    const st = makeState({
+      fighters: [
+        fighter('h1', HUMAN, 0, 0),
+        fighter('h2', HUMAN, 1, 0, { type: FighterType.MINION, health: 2 }),
+        fighter('a1', AI, 5, 5),
+      ],
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe3', type: 'TARGET_FIGHTER', playerId: AI,
+          targetFighterIds: ['h1', 'h2', 'h3dead'], damage: 2 }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'resolveTarget', effectId: 'pe3', fighterId: 'h2' });
+  });
+
+  it('S05 DISCARD_CARDS pending бота → resolveDiscard наименее ценной карты (min boostValue)', () => {
+    const st = makeState({
+      handZones: {
+        [AI]: { cards: [
+          card('good', CardType.VERSATILE, { boostValue: 5 }),
+          card('worst', CardType.VERSATILE, { boostValue: 1 }),
+          card('mid', CardType.ATTACK, { boostValue: 3 }),
+        ], maxSize: 7 },
+        [HUMAN]: { cards: [card('foreign', CardType.ATTACK, { boostValue: 0 })], maxSize: 7 },
+      },
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe5', type: 'DISCARD_CARDS', playerId: AI, value: 1 }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'resolveDiscard', effectId: 'pe5', cardIds: ['worst'] });
+  });
+
+  it('S05 DISCARD_CARDS: чужой выбор (человек сбрасывает) → бот ждёт (null)', () => {
+    const st = makeState({
+      handZones: {
+        [AI]: { cards: [card('a', CardType.ATTACK)], maxSize: 7 },
+        [HUMAN]: { cards: [card('h', CardType.ATTACK)], maxSize: 7 },
+      },
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe6', type: 'DISCARD_CARDS', playerId: HUMAN, value: 1 }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toBeNull();
+  });
+
+  it('S05 BOOST_CHOICE: атака бота проигрывает → бустит МИНИмальной достаточной картой', () => {
+    const st = makeState({
+      handZones: {
+        [AI]: { cards: [
+          card('big', CardType.VERSATILE, { boostValue: 6 }),
+          card('exact', CardType.VERSATILE, { boostValue: 4 }),
+          card('small', CardType.VERSATILE, { boostValue: 1 }),
+        ], maxSize: 7 },
+        [HUMAN]: { cards: [], maxSize: 7 },
+      },
+      metadata: {
+        actionsRemaining: 2,
+        combatInfo: { attackerId: 'a1', defenderId: HUMAN, attackerCardId: 'atk',
+          attackValue: 2, defenseValue: 5 } as any,
+        pendingEffects: [{ id: 'pe7', type: 'BOOST_CHOICE', playerId: AI, optional: true }],
+      } as any,
+    });
+    // нужно ≥ 4: выбирает ровно 4, не 6
+    expect(svc.decide(st, AI)).toEqual({ kind: 'resolveBoost', effectId: 'pe7', cardIds: ['exact'] });
+  });
+
+  it('S05 BOOST_CHOICE: исход уже благоприятен → declinePending (карту не тратим)', () => {
+    const st = makeState({
+      handZones: { [AI]: { cards: [card('big', CardType.VERSATILE, { boostValue: 6 })], maxSize: 7 }, [HUMAN]: { cards: [], maxSize: 7 } },
+      metadata: {
+        actionsRemaining: 2,
+        combatInfo: { attackerId: 'a1', defenderId: HUMAN, attackerCardId: 'atk',
+          attackValue: 3, defenseValue: 0 } as any,
+        pendingEffects: [{ id: 'pe8', type: 'BOOST_CHOICE', playerId: AI, optional: true }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'declinePending', effectId: 'pe8' });
+  });
+
+  it('S05 BOOST_CHOICE: ни одна карта не меняет исход → declinePending', () => {
+    const st = makeState({
+      handZones: { [AI]: { cards: [card('small', CardType.VERSATILE, { boostValue: 1 })], maxSize: 7 }, [HUMAN]: { cards: [], maxSize: 7 } },
+      metadata: {
+        actionsRemaining: 2,
+        combatInfo: { attackerId: 'a1', defenderId: HUMAN, attackerCardId: 'atk',
+          attackValue: 2, defenseValue: 6 } as any,
+        pendingEffects: [{ id: 'pe9', type: 'BOOST_CHOICE', playerId: AI, optional: true }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'declinePending', effectId: 'pe9' });
+  });
+
+  it('S05 TARGET_FIGHTER: все цели мертвы → null → decline (очередь не виснет)', () => {
+    const st = makeState({
+      fighters: [
+        fighter('h1', HUMAN, 0, 0, { health: 0, isDefeated: true }),
+        fighter('a1', AI, 5, 5),
+      ],
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe4', type: 'TARGET_FIGHTER', playerId: AI,
+          targetFighterIds: ['h1'], damage: 2, optional: true }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'declinePending', effectId: 'pe4' });
+  });
+
+  it('S05 revive-PLACE: бот возвращает поверженную Harpy в зону Medusa на свободную клетку', () => {
+    const cells = Array.from({ length: 4 }, (_, y) =>
+      Array.from({ length: 8 }, (_, x) => ({ x, y, type: 'normal', zones: x <= 3 ? ['west'] : ['east'] })));
+    const st = makeState({
+      boardState: { width: 8, height: 4, cells, doors: {}, fog: {}, tokens: {} } as any,
+      fighters: [
+        fighter('medusa', AI, 2, 0, { name: 'Medusa' }),
+        fighter('harpy2', AI, 1, 0, { name: 'Harpies 2', type: FighterType.MINION, health: 0, isDefeated: true, position: { x: -1, y: -1 } }),
+        fighter('h1', HUMAN, 6, 0),
+      ],
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe5', type: 'PLACE', playerId: AI, fighterIds: ['harpy2'],
+          zoneFighterName: 'Medusa', restoreFullHealth: true }],
+      } as any,
+    });
+    const d = svc.decide(st, AI);
+    expect(d?.kind).toBe('resolveMove');
+    if (d?.kind === 'resolveMove') {
+      expect(d.fighterId).toBe('harpy2');
+      // клетка в зоне Medusa (west: x ≤ 3), свободна от живых бойцов
+      expect(d.x).toBeLessThanOrEqual(3);
+      const occupied = new Set(st.fighters.filter((f) => f.health > 0).map((f) => `${f.position.x},${f.position.y}`));
+      expect(occupied.has(`${d.x},${d.y}`)).toBe(false);
+    }
+  });
+
+  it('S05 revive-PLACE: зона полностью занята живыми → null → decline (не зависает)', () => {
+    const cells = Array.from({ length: 1 }, (_, y) =>
+      Array.from({ length: 2 }, (_, x) => ({ x, y, type: 'normal', zones: x === 0 ? ['west'] : ['east'] })));
+    const st = makeState({
+      boardState: { width: 2, height: 1, cells, doors: {}, fog: {}, tokens: {} } as any,
+      fighters: [
+        fighter('medusa', AI, 0, 0, { name: 'Medusa' }),
+        fighter('harpy2', AI, 0, 0, { name: 'Harpies 2', type: FighterType.MINION, health: 0, isDefeated: true }),
+        fighter('h1', HUMAN, 1, 0),
+      ],
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe6', type: 'PLACE', playerId: AI, fighterIds: ['harpy2'],
+          zoneFighterName: 'Medusa', restoreFullHealth: true }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toBeNull();
+  });
 });

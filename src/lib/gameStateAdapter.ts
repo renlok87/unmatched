@@ -11,8 +11,9 @@
  *    currentTurnPlayerId, players[], fighters[], decks{}, discardPiles{},
  *    handZones{}, boardState{}, metadata{} }.
  * 2. Подписка gameStateUpdated → те же данные, но players/fighters/handZones/
- *    boardState/metadata — ПЯТЬ отдельных JSON-строк, и БЕЗ decks/discardPiles
- *    (мержатся из предыдущего снапшота в remoteGameStore).
+ *    discardPiles/boardState/metadata — ШЕСТЬ отдельных JSON-строк, и БЕЗ decks
+ *    (мержится из предыдущего снапшота в remoteGameStore). discardPiles несут
+ *    reveal-личины committed-карт боя (S05, rulebook p.12-13).
  *
  * Контракт для GameScene: ЛОКАЛЬНЫЙ игрок всегда players[0] (сцена рисует
  * index 0 нижней панелью и его руку).
@@ -86,6 +87,12 @@ export interface WireCombatInfo {
   defenderCardId?: string;
   attackValue: number;
   defenseValue: number;
+  /** Суммарный boost (ability Arthur при объявлении + карта-BOOST, чей выбор
+   *  идёт после reveal через BOOST_CHOICE); скрыт от НЕ-атакатора, пока бой
+   *  не завершён (бэк вырезает в filterPrivateData) */
+  boostValue?: number;
+  cardBoostCardId?: string;
+  abilityBoostCardId?: string;
 }
 
 export interface WireGameState {
@@ -121,11 +128,16 @@ export interface WireGameState {
 /**
  * Отложенный эффект карты:
  * - MOVE/PLACE (C2): выбор бойца/клетки;
- * - CHOOSE_ONE (v3): выбор одного из вариантов (options) по индексу.
+ * - CHOOSE_ONE (v3): выбор одного из вариантов (options) по индексу;
+ * - TARGET_FIGHTER (S05): выбор цели прямого урона без клетки (клик по бойцу);
+ * - DISCARD_CARDS (S05): владелец выбора сбрасывает value своих карт из руки
+ *   (печатный сброс без «random» — карту выбирает сбрасывающий);
+ * - BOOST_CHOICE (S05): optional буст боя («You may BOOST this attack»)
+ *   ПОСЛЕ reveal — клик по ОДНОЙ своей карте или «Отказаться».
  */
 export interface WirePendingEffect {
   id: string;
-  type: 'MOVE' | 'PLACE' | 'CHOOSE_ONE';
+  type: 'MOVE' | 'PLACE' | 'CHOOSE_ONE' | 'TARGET_FIGHTER' | 'DISCARD_CARDS' | 'BOOST_CHOICE';
   playerId: string;
   value?: number;
   fighterName?: string;
@@ -137,6 +149,18 @@ export interface WirePendingEffect {
   chooseCount?: number;
   /** GD-018: «You may …» — выбор можно отклонить (кнопка «Отказаться») */
   optional?: boolean;
+  /** TARGET_FIGHTER: допустимые цели (валидация — на бэке) */
+  targetFighterIds?: string[];
+  /** TARGET_FIGHTER: урон по выбранной цели */
+  damage?: number;
+  /** MOVE: движение сквозь врагов разрешено (Winged Frenzy) */
+  canPassThroughEnemies?: boolean;
+  /** PLACE: клетка должна лежать в зоне этого бойца (revive Harpy) */
+  zoneFighterName?: string;
+  /** PLACE: вернуть ПОВЕРЖЁННОГО бойца с полным HP (Winged Frenzy) */
+  restoreFullHealth?: boolean;
+  /** MOVE/PLACE: список допустимых бойцов (валидация — на бэке) */
+  fighterIds?: string[];
 }
 
 /** Справочники для артов/имён (контентные запросы, кэш в remoteGameStore) */
@@ -176,7 +200,7 @@ export function parseWireState(stateJson: string): WireGameState {
   return JSON.parse(stateJson) as WireGameState;
 }
 
-/** Событие подписки gameStateUpdated: 5 отдельных JSON-полей */
+/** Событие подписки gameStateUpdated: отдельные JSON-поля */
 export function parseSubscriptionState(payload: {
   gameId: string;
   sequenceNumber: number;
@@ -186,6 +210,7 @@ export function parseSubscriptionState(payload: {
   players: string;
   fighters: string;
   handZones: string;
+  discardPiles?: string | null;
   boardState: string;
   metadata: string;
 }): WireGameState {
@@ -198,9 +223,11 @@ export function parseSubscriptionState(payload: {
     players: JSON.parse(payload.players),
     fighters: JSON.parse(payload.fighters),
     handZones: JSON.parse(payload.handZones),
+    // S05: discardPiles несут reveal-личины committed-карт боя ( nullable у
+    // легаси-резолверов); decks подписка по-прежнему не несёт — merge в store
+    discardPiles: payload.discardPiles != null ? JSON.parse(payload.discardPiles) : undefined,
     boardState: JSON.parse(payload.boardState),
     metadata: JSON.parse(payload.metadata),
-    // decks/discardPiles в подписке отсутствуют — merge в remoteGameStore
   };
 }
 

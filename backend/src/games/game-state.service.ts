@@ -117,7 +117,10 @@ export interface SerializedCombatInfo {
   tf?: string; // targetFighterId — атакованный боец (легаси без поля → первый боец защитника)
   ac: string; // attackerCardId
   dc?: string; // defenderCardId
-  av: number; // attackValue
+  av: number; // attackValue — ТОЛЬКО печатное значение атакующей карты
+  bv?: number; // boostValue — сумма boost (face-down до reveal; см. filterPrivateData)
+  cbc?: string; // cardBoostCardId — instance id карты-BOOST (Second Shot)
+  abc?: string; // abilityBoostCardId — instance id ability-boost карты (Arthur)
   dv: number; // defenseValue
   sa: string; // startedAt ISO
   ta?: string; // timeoutAt ISO
@@ -357,6 +360,9 @@ export class GameStateService {
               ac: state.metadata.combatInfo.attackerCardId,
               dc: state.metadata.combatInfo.defenderCardId,
               av: state.metadata.combatInfo.attackValue,
+              bv: state.metadata.combatInfo.boostValue,
+              cbc: state.metadata.combatInfo.cardBoostCardId,
+              abc: state.metadata.combatInfo.abilityBoostCardId,
               dv: state.metadata.combatInfo.defenseValue,
               sa: new Date(state.metadata.combatInfo.startedAt).toISOString(),
               ta: state.metadata.combatInfo.timeoutAt
@@ -480,6 +486,9 @@ export class GameStateService {
               attackerCardId: data.m.ci.ac,
               defenderCardId: data.m.ci.dc,
               attackValue: data.m.ci.av,
+              boostValue: data.m.ci.bv,
+              cardBoostCardId: data.m.ci.cbc,
+              abilityBoostCardId: data.m.ci.abc,
               defenseValue: data.m.ci.dv,
               startedAt: new Date(data.m.ci.sa),
               timeoutAt: data.m.ci.ta ? new Date(data.m.ci.ta) : undefined,
@@ -558,7 +567,73 @@ export class GameStateService {
 
     // Execution queues are server-only; player choices remain in pendingEffects.
     const { combatEffectContinuation, combatResolutionProgress, ...publicMetadata } = state.metadata;
-    return { ...state, handZones, decks, metadata: publicMetadata };
+
+    // GD-017 (R-15) + GD-020: до reveal (executeResolveCombat) бой скрыт.
+    // Физическая игра: committed-карты лежат лицом вниз — факт коммита виден,
+    // ЛИЧИНА нет. Reveal = запуск executeResolveCombat: обе карты вскрываются
+    // ВМЕСТЕ до DURING_COMBAT-выборов (rulebook BoL Vol.1, p.12-13), поэтому
+    // паузы ПОСЛЕ reveal (BOOST_CHOICE, during-эффекты) уже не секрет —
+    // источник истины: живой combatResolutionProgress (пишется первым же
+    // pause() внутри резолва; после завершения боя очищается вместе с
+    // combatInfo). Скрываем, пока reveal не начался: phase COMBAT (защитник
+    // выбирает карту) или COMBAT_RESOLVE без прогресса (защита сыграна,
+    // резолв не запущен):
+    // 1) boost-поля combatInfo — от не-атакатора;
+    // 2) committed-карты в discardPiles ВЛАДЕЛЬЦА карт — от другого игрока
+    //    (атакующая+boost-карты от защитника; защитная карта от атакатора).
+    const combatInfo = publicMetadata.combatInfo;
+    const combatHidden =
+      !!combatInfo &&
+      !state.metadata.combatResolutionProgress &&
+      (state.phase === GamePhase.COMBAT || state.phase === GamePhase.COMBAT_RESOLVE);
+
+    let discardPiles = state.discardPiles;
+    if (combatInfo && combatHidden) {
+      const attackerOwner = state.fighters.find((f) => f.id === combatInfo.attackerId)?.ownerId;
+      const committedByOwner = new Map<string, ReadonlySet<string>>();
+      if (attackerOwner) {
+        committedByOwner.set(
+          attackerOwner,
+          new Set(
+            [combatInfo.attackerCardId, combatInfo.cardBoostCardId, combatInfo.abilityBoostCardId].filter(
+              (id): id is string => !!id,
+            ),
+          ),
+        );
+      }
+      if (combatInfo.defenderCardId) {
+        const existing = committedByOwner.get(combatInfo.defenderId) ?? new Set<string>();
+        committedByOwner.set(
+          combatInfo.defenderId,
+          new Set([...existing, combatInfo.defenderCardId]),
+        );
+      }
+      discardPiles = Object.fromEntries(
+        Object.entries(state.discardPiles).map(([owner, pile]) => {
+          const committed = committedByOwner.get(owner);
+          // Владелец видит свои committed-карты; чужие — скрыты плейсхолдером
+          // (длина сохранена, личины нет).
+          if (!committed || committed.size === 0 || owner === playerId) {
+            return [owner, pile] as const;
+          }
+          return [
+            owner,
+            pile.map((card, index) => (committed.has(card.id) ? hiddenCard(card, index) : card)),
+          ] as const;
+        }),
+      );
+
+      if (combatInfo.boostValue !== undefined && attackerOwner !== playerId) {
+        publicMetadata.combatInfo = {
+          ...combatInfo,
+          boostValue: undefined,
+          cardBoostCardId: undefined,
+          abilityBoostCardId: undefined,
+        };
+      }
+    }
+
+    return { ...state, handZones, decks, discardPiles, metadata: publicMetadata };
   }
 
   /**

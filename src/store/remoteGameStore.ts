@@ -121,11 +121,11 @@ interface RemoteGameState {
   beginManeuver: () => Promise<void>;
   completeManeuver: (maneuverId: string, moves: ManeuverMove[], boostCardId?: string) => Promise<void>;
   discardToLimit: (pendingId: string, cardIds: string[]) => Promise<void>;
-  attack: (attackerId: string, targetId: string, cardId: string, boostCardId?: string) => Promise<void>;
-  playDefense: (cardId: string, boostCardId?: string) => Promise<void>;
+  attack: (attackerId: string, targetId: string, cardId: string, abilityBoostCardId?: string) => Promise<void>;
+  playDefense: (cardId: string) => Promise<void>;
   playScheme: (cardId: string) => Promise<void>;
   resolveCombat: () => Promise<void>;
-  resolvePendingEffect: (effectId: string, fighterId: string, x: number, y: number) => Promise<void>;
+  resolvePendingEffect: (effectId: string, fighterId?: string, x?: number, y?: number, cardIds?: string[]) => Promise<void>;
   /** GD-018: отказ от optional-выбора («You may …») — только голова очереди */
   declinePendingEffect: (effectId: string) => Promise<void>;
   /** CHOOSE_ONE (v3): выбрать вариант эффекта по индексу */
@@ -408,20 +408,24 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
     await runMutation(set, get, DiscardToLimitDocument, variables, 'discardToLimit');
   },
 
-  attack: (attackerId, targetId, cardId, boostCardId) =>
+  attack: (attackerId, targetId, cardId, abilityBoostCardId) =>
     runMutation(set, get, gql.AttackDocument, {
       input: {
         gameId: get().currentGameId,
         attackerId,
         targetId,
         cardId,
-        boostCardId: boostCardId ?? null,
+        // GD-017: ability-BOOST (Arthur) — face-down карта сверх атакующей,
+        // коммитится при объявлении (R-15). BOOST-эффект самой карты
+        // («You may BOOST this attack») выбирается ПОСЛЕ reveal через
+        // BOOST_CHOICE pending — сюда не подаётся (rulebook p.12-13).
+        abilityBoostCardId: abilityBoostCardId ?? null,
       },
     }, 'attack'),
 
-  playDefense: (cardId, boostCardId) =>
+  playDefense: (cardId) =>
     runMutation(set, get, gql.PlayDefenseDocument, {
-      input: { gameId: get().currentGameId, cardId, boostCardId: boostCardId ?? null },
+      input: { gameId: get().currentGameId, cardId },
     }, 'playDefense'),
 
   playScheme: (cardId) =>
@@ -434,9 +438,15 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
       input: { gameId: get().currentGameId },
     }, 'resolveCombat'),
 
-  resolvePendingEffect: (effectId, fighterId, x, y) =>
+  resolvePendingEffect: (effectId, fighterId, x, y, cardIds) =>
     runMutation(set, get, gql.ResolvePendingEffectDocument, {
-      input: { gameId: get().currentGameId, effectId, fighterId, x, y },
+      // x/y опциональны: TARGET_FIGHTER (S05) резолвится одним кликом по бойцу;
+      // cardIds — DISCARD_CARDS (выбор сбрасывающего, S05)
+      input: {
+        gameId: get().currentGameId, effectId,
+        fighterId: fighterId ?? null, x: x ?? null, y: y ?? null,
+        cardIds: cardIds ?? null,
+      },
     }, 'resolvePendingEffect'),
 
   resolveChooseOption: (effectId, optionIndex) =>

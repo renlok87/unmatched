@@ -231,12 +231,16 @@ export class AttackDto {
   @IsString()
   targetId: string;
 
-  /** BOOST атаки: сброс карты из руки → +boostValue к значению атаки.
-   *  Валидно, если играемая карта имеет BOOST-эффект или ability героя разрешает. */
+  /** Ability-BOOST атаки (GD-017, Arthur): ВТОРАЯ карта face-down поверх
+   *  атакующей, коммитится при объявлении как напечатано (R-15). Разрешено
+   *  ТОЛЬКО если ability атакующего героя даёт allowsAttackBoost (King Arthur
+   *  — никогда Merlin). BOOST-эффект самой карты («You may BOOST this
+   *  attack», Second Shot) сюда НЕ подаётся: выбор карты происходит после
+   *  reveal через BOOST_CHOICE pending (rulebook p.12-13). */
   @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
-  boostCardId?: string;
+  abilityBoostCardId?: string;
 }
 
 /**
@@ -253,12 +257,6 @@ export class PlayDefenseDto {
   @IsNotEmpty()
   @IsString()
   cardId: string;
-
-  /** BOOST защиты: сброс карты из руки → +boostValue к значению защиты */
-  @Field(() => String, { nullable: true })
-  @IsOptional()
-  @IsString()
-  boostCardId?: string;
 }
 
 /**
@@ -281,8 +279,9 @@ export class PlaySchemeDto {
 /**
  * DTO резолва отложенного эффекта (C2/v3):
  * - MOVE/PLACE: игрок выбирает бойца (fighterId) и клетку (x, y);
- * - CHOOSE_ONE: игрок выбирает вариант (optionIndex), fighter/клетка не нужны.
- * Поля fighterId/x/y optional — обязательность проверяется по типу pending.
+ * - CHOOSE_ONE: игрок выбирает вариант (optionIndex), fighter/клетка не нужны;
+ * - DISCARD_CARDS: игрок выбирает карты своей руки (cardIds).
+ * Поля fighterId/x/y/optionIndex/cardIds optional — обязательность проверяется по типу pending.
  */
 @InputType()
 export class ResolvePendingEffectDto {
@@ -318,6 +317,13 @@ export class ResolvePendingEffectDto {
   @IsInt()
   @Min(0)
   optionIndex?: number;
+
+  /** DISCARD_CARDS: instance id карт из руки владельца выбора (ровно value шт.) */
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  cardIds?: string[];
 }
 
 /**
@@ -542,6 +548,10 @@ export class GameState {
 
   @Field(() => String, { nullable: true })
   handZones: string | null;
+
+  /** S05: reveal-личины committed-карт боя — discardPiles (JSON), per-player отфильтрован */
+  @Field(() => String, { nullable: true })
+  discardPiles: string | null;
 
   @Field(() => String, { nullable: true })
   boardState: string | null;

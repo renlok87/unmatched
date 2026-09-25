@@ -33,6 +33,7 @@ import {
   CycleStanceEffect,
   DiscardRandomEffect,
   PendingMoveEffect,
+  PendingTargetDamageEffect,
   ReactiveDamageEffect,
   SetStanceEffect,
   StanceConfig,
@@ -664,6 +665,7 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
         rule.effect.kind !== 'turn-effect' &&
         rule.effect.kind !== 'pending-move' &&
         rule.effect.kind !== 'turn-damage' &&
+        rule.effect.kind !== 'pending-target-damage' &&
         rule.effect.kind !== 'set-stance' &&
         rule.effect.kind !== 'cycle-stance'
       ) {
@@ -685,6 +687,11 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
 
       if (rule.effect.kind === 'turn-damage') {
         current = await this.applyTurnDamage(current, playerId, rule.effect);
+        continue;
+      }
+
+      if (rule.effect.kind === 'pending-target-damage') {
+        current = this.applyPendingTargetDamage(current, playerId, rule.effect);
         continue;
       }
 
@@ -864,6 +871,60 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       ...(fighterName !== undefined ? { fighterName } : {}),
       targetsOpponent: false,
       text: `${this.abilityName} — move`,
+    };
+
+    return {
+      ...state,
+      metadata: {
+        ...state.metadata,
+        pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+      },
+    };
+  }
+
+  /**
+   * Порождает optional TARGET_FIGHTER PendingEffect (S05, GD-017/R-14):
+   * Medusa «At the start of your turn, you may deal 1 damage to an opposing
+   * fighter in Medusa's zone.» Цели — ВСЕ живые вражеские бойцы в зоне HERO-
+   * бойца действующего игрока (деп. zone.isInSameZone); их id сериализуются в
+   * targetFighterIds (ревалидация живости — на резолве в executor'е).
+   *
+   * optional=true → отказ (declinePendingEffect) легален («you may»).
+   * Нет легальных целей → чистый no-op: pending НЕ создаётся (игрок не
+   * «зависает» на пустом выборе, ход не блокируется). seq не бампим
+   * (pendingEffects никогда не двигают seq).
+   */
+  private applyPendingTargetDamage(
+    state: GameState,
+    playerId: string,
+    effect: PendingTargetDamageEffect,
+  ): GameState {
+    if (effect.targetScope !== 'enemy-in-zone') return state;
+    const hero = this.findHeroFighter(state, playerId);
+    if (!hero) return state;
+
+    const targets = state.fighters
+      .filter(
+        (f) =>
+          f.ownerId !== playerId && // только вражеские
+          f.isDefeated !== true && // живые
+          this.deps.zone.isInSameZone(state, hero.position, f.position),
+      )
+      .map((f) => f.id);
+
+    if (targets.length === 0) return state; // нет целей → no-op, pending не создаём
+
+    const len = state.metadata.pendingEffects?.length ?? 0;
+    const pending = {
+      id: `ability-${this.heroId}-target-p${len}`,
+      type: 'TARGET_FIGHTER' as const,
+      playerId,
+      targetFighterIds: targets,
+      damage: effect.value,
+      optional: true,
+      // Только печатный текст — в захвате у способности НЕТ имени (поле name
+      // отсутствует), выдумывать каноническое имя не предъявляем игроку.
+      text: `deal ${effect.value} damage to an opposing fighter in ${hero.name}'s zone`,
     };
 
     return {

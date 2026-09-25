@@ -67,6 +67,11 @@ export interface CardEffect {
   readonly boostSource?: BoostSource;
   /** BLIND BOOST — карта вскрывается с верха колоды (Daredevil) */
   readonly blind?: boolean;
+  /** MOVE: путь может проходить через клетки врагов (Winged Frenzy);
+   *  конечная клетка всё равно обязана быть свободной */
+  readonly canPassThroughEnemies?: boolean;
+  /** RETURN_DEFEATED / pending: зона бойца с этим именем ограничивает выбор клетки */
+  readonly zoneFighterName?: string;
   /** Варианты выбора для type CHOOSE_ONE («Choose one: …») */
   readonly options?: ChooseOption[];
   /** Сколько опций выбирает игрок для CHOOSE_ONE (default 1; «choose 2 different effects» = 2) */
@@ -181,6 +186,9 @@ export enum EffectType {
   END_TURN = 'END_TURN',
   // «Choose one: …» — игрок выбирает chooseCount опций из options (интерактивно)
   CHOOSE_ONE = 'CHOOSE_ONE',
+  // «return a defeated <Name> to any space in X's zone» — возврат побеждённого
+  // сайдкика в зону X (PLACE-pending с restoreFullHealth)
+  RETURN_DEFEATED = 'RETURN_DEFEATED',
   // маркер нераспознанного текста: не исполняется, едет в manualEffects + warn
   UNSUPPORTED = 'UNSUPPORTED',
 }
@@ -219,6 +227,10 @@ export enum EffectTarget {
   NAMED_FIGHTER = 'NAMED_FIGHTER',
   // игрок-оппонент (для OPPONENT_DISCARD)
   OPPONENT_PLAYER = 'OPPONENT_PLAYER',
+  // «Move each of your fighters…» — все живые свои бойцы (последовательно)
+  EACH_OWN_FIGHTER = 'EACH_OWN_FIGHTER',
+  // «any one fighter in X's zone» — выбор цели из всех живых бойцов зоны X
+  ANY_FIGHTER_IN_ZONE = 'ANY_FIGHTER_IN_ZONE',
 }
 
 /**

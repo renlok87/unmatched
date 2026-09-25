@@ -34,7 +34,8 @@ import {
   normalizeCardEffects,
   slugifyHeroName,
 } from '../../game-engine/models';
-import type { AttackType, BoardState, Cell } from '../../game-engine/models';
+import type { AttackType, BoardState, CardEffect, Cell } from '../../game-engine/models';
+import { parseCardEffectTexts } from '../../game-engine/effects/effect-text-parser';
 import type { Board } from '@prisma/client';
 
 const STARTING_HAND_SIZE = 5;
@@ -193,8 +194,12 @@ export class GameInitializationService {
           attackValue: card.attackValue ?? undefined,
           defenseValue: card.defenseValue ?? undefined,
           boostValue: card.boostValue ?? undefined,
-          // Структурная валидация Json (мусор → UNSUPPORTED-эффект, не падаем)
-          effects: normalizeCardEffects(card.effects, card.id),
+          // Структурная валидация Json (мусор → UNSUPPORTED-эффект, не падаем).
+          // S05 (GD-019): SCHEME-карты с пустым effects, но печатным текстом
+          // (Card.text = textEn: A Momentary Glance, Winged Frenzy, …) —
+          // парсим fullText на инжесте, чтобы матч не играл их как молчаливый
+          // no-op без бэкфилла БД.
+          effects: this.resolveCardEffects(card),
           // Текст эффекта — едет в state (рука/колода/сброс) для playScheme
           text: card.text ?? undefined,
           // Кто может играть карту ('Any'/имя бойца) — bannerAllows-валидация
@@ -256,6 +261,30 @@ export class GameInitializationService {
     );
 
     return state;
+  }
+
+  /**
+   * S05 (GD-019): эффекты карты при инжесте колоды.
+   * Структурная валидация Json (normalizeCardEffects: мусор → UNSUPPORTED).
+   * Fallback: SCHEME-карта с ПУСТЫМ effects, но непустым печатным текстом
+   * (Card.text = textEn: A Momentary Glance, Winged Frenzy, …) — парсим
+   * fullText, чтобы матч исполнял эффект без ожидания backfill БД.
+   * Нераспознанный текст честно даёт UNSUPPORTED (не молчаливый no-op).
+   */
+  private resolveCardEffects(card: {
+    id: string;
+    cardType: string;
+    effects: unknown;
+    text?: string | null;
+  }): CardEffect[] {
+    const effects = normalizeCardEffects(card.effects, card.id);
+    if (effects.length > 0) return effects;
+    if (card.cardType !== 'SCHEME' || !card.text?.trim()) return [];
+    const { effects: parsed } = parseCardEffectTexts(
+      { fullText: card.text },
+      card.id,
+    );
+    return parsed;
   }
 
   /**

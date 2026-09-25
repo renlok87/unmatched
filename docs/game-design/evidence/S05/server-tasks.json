@@ -1,0 +1,102 @@
+{
+  "sprint": "S05",
+  "track": "server/cards",
+  "owner": "GLM-5.3 (server)",
+  "date": "2026-09-25",
+  "branch": "codex/s05-abilities-medusa",
+  "base": "1ca2231",
+  "tasks": [
+    {
+      "id": "GD-017",
+      "title": "Medusa ability + Arthur ability-BOOST (R-15/R-16)",
+      "status": "DONE",
+      "summary": "Medusa turn-start «deal 1 damage to an opposing fighter in Medusa's zone» (no ability name field in capture) — optional owner-bound TARGET_FIGHTER pending, no auto-target, decline allowed. Arthur ability (no canonical name in capture; internal provisional label): attack-only face-down ability-BOOST committed at declaration per printed R-15 (attackValue stays printed; boostValue starts from the ability card, card BOOST adds later via post-reveal BOOST_CHOICE); Feint (CANCEL_EFFECTS) discards the ability boost without effect (R-16) while printed value remains; boost slots hidden from the non-attacker during COMBAT (filterPrivateData) and survive serialize (bv/cbc/abc).",
+      "code": [
+        "backend/src/game-engine/abilities/ability-config.ts",
+        "backend/src/game-engine/abilities/generic-hero-ability.handler.ts",
+        "backend/src/game-engine/abilities/heroes/arthur.handler.ts",
+        "backend/src/game-engine/services/game-action-executor.service.ts",
+        "backend/src/games/dto/gameplay.dto.ts",
+        "backend/src/games/game-state.service.ts"
+      ],
+      "tests": [
+        "backend/src/game-engine/services/s05-hero-abilities.spec.ts (10)",
+        "backend/src/games/game-state.service.spec.ts (+3 visibility/round-trip)",
+        "backend/src/game-engine/abilities/ability-configs.integration.spec.ts (medusa pending)",
+        "backend/src/game-engine/abilities/ability-configs.e2e.spec.ts (medusa via executeEndTurn)"
+      ]
+    },
+    {
+      "id": "GD-017b",
+      "title": "Card BOOST timing correction (Second Shot / Noble Sacrifice, rulebook p.12-13)",
+      "status": "DONE",
+      "summary": "Official rulebook p.12-13: both players choose cards → simultaneous reveal → IMMEDIATELY effects → DURING_COMBAT effects (defender first). Second Shot / Noble Sacrifice print «DURING COMBAT: You may BOOST this attack» → choice happens AFTER reveal and Feint cancellation, NOT at declaration. Prior implementation committed the boost card in executeAttack — wrong (R-15 «along with your attack card» applies only to the Arthur ability). Now: executeAttack/playDefense drop boostCardId (no card leaves hand, no second-card disclosure to defender); BOOST effect PLAYER_CHOICE_HAND creates persisted owner-bound optional BOOST_CHOICE pending on the DURING_COMBAT stage; combat chain pauses (no damage calc / no after-combat) until resolvePendingEffect(cardIds — exactly one own hand card, atomic revalidation: foreign/not-in-hand/two-cards/stale/replay rejected) or declinePendingEffect; chosen card discarded, its boostValue added to combatEffectContinuation finalAttack/finalDefense (side from combatInfo.attackerId owner) and combatInfo boostValue/cardBoostCardId. Feint cancels the BOOST effect entirely (no choice, no cost); Arthur ability card stays committed at declaration (R-15) and is lost on Feint without value (R-16) — two independent boosts. Empty hand → legal no-op. AI: min-sufficient card or decline. Serialization roundtrip preserved.",
+      "code": [
+        "backend/src/game-engine/models/game-state.model.ts",
+        "backend/src/game-engine/effects/card-effect-executor.service.ts",
+        "backend/src/game-engine/services/game-action-executor.service.ts",
+        "backend/src/game-engine/effects/effect-text-parser.ts",
+        "backend/src/games/dto/gameplay.dto.ts",
+        "backend/src/game-engine/services/ai-decision.service.ts",
+        "backend/src/games/services/ai-turn.service.ts",
+        "src/gql/graphql.ts",
+        "src/store/remoteGameStore.ts",
+        "src/lib/gameStateAdapter.ts",
+        "src/components/game/GameView.tsx",
+        "admin/src/pages/game-tester/GameTester.tsx"
+      ],
+      "tests": [
+        "backend/src/game-engine/services/s05-boost-timing.spec.ts (11)",
+        "backend/src/game-engine/services/s05-medusa-cards.spec.ts (+2 Second Shot rewrite)",
+        "backend/src/game-engine/effects/effect-text-parser.spec.ts (random-distinction)"
+      ]
+    },
+    {
+      "id": "GD-019",
+      "title": "Executable registry of all 27 S05 deck-card records (60 copies)",
+      "status": "DONE",
+      "summary": "Frozen S01 captures (content-medusa.json 11 records / 30 copies, content-king-arthur.json 16 records / 30 copies) driven through the production ingest (normalizeCardEffects + SCHEME textEn fullText fallback, mirrors GameInitializationService.resolveCardEffects and prisma/backfill-card-effects.ts). Honest statuses: 20 SUPPORTED, 1 PARTIAL (Skirmish), 5 UNSUPPORTED (Holy Grail, Lady of the Lake, Prophecy, Command the Storms, Restless Spirits), 1 BLANK (Excalibur — proven truly blank). Shared titles (Feint, Regroup) stay separate content-keyed records. No silent empty-effects no-ops remain: all 6 textEn-only schemes now parse via the v8 fullText slot (AFTER_COMBAT timing).",
+      "code": [
+        "backend/src/game-engine/effects/effect-text-parser.ts (fullText slot, v8)",
+        "backend/src/games/services/game-initialization.service.ts (resolveCardEffects)",
+        "backend/prisma/backfill-card-effects.ts"
+      ],
+      "tests": [
+        "backend/src/game-engine/effects/s05-registry.spec.ts (8)"
+      ],
+      "evidence": "docs/game-design/evidence/S05/s05-card-registry.json"
+    },
+    {
+      "id": "GD-020",
+      "title": "All 11 Medusa records: positive/negative/edge fixtures through the real executor",
+      "status": "DONE",
+      "summary": "A Momentary Glance (targets = every living fighter in Medusa zone incl. own + Medusa herself; revalidation of dead/moved targets; mandatory cannot be declined), Winged Frenzy (sequential MOVE per living own fighter with pass-through enemies, occupied endpoint still illegal; optional revive-PLACE of the SAME defeated Harpy at full health inside Medusa zone only), The Hounds (sequential pending per LIVING Harpy), Gaze of Stone (WON → 8 extra damage; LOST → none), Second Shot (card BOOST AFTER reveal via BOOST_CHOICE pending per rulebook p.12-13: boost card stays in hand at declaration, chosen post-reveal card is discarded into combatInfo boostValue, printed attackValue intact; Feint cancels the choice entirely), Feint (real combat: defender reveal cancels attacker card effects, printed value kept), Dash (real combat → optional MOVE 3, resolve or decline), Regroup (real combat: WON → draw 2, LOST → draw 1), Snipe (real combat → draw 1), Hiss and Slither / Clutching Claws (printed opponent discard WITHOUT random: persisted owner-bound DISCARD_CARDS pending, exact-card choice, empty hand no-op, foreign/stale/replay/decline rejected, combat chain pauses and resumes, no hand contents leak). All 11 through the real executor.",
+      "code": [
+        "backend/src/game-engine/services/game-action-executor.service.ts (TARGET_FIGHTER resolve, pass-through, revive, zone check)",
+        "backend/src/game-engine/effects/card-effect-executor.service.ts (RETURN_DEFEATED, EACH_OWN_FIGHTER, fighterNameMatches export)"
+      ],
+      "tests": [
+        "backend/src/game-engine/services/s05-medusa-cards.spec.ts (27)"
+      ]
+    },
+    {
+      "id": "GD-017/020-adapters",
+      "title": "Production API + web/AI adapters consume the new choice types",
+      "status": "DONE",
+      "summary": "AI: decidePending TARGET_FIGHTER (min-HP living target; all dead → declinePending) and revive-PLACE (free cell in the anchor's zone; full zone → decline) — matches never hang. Web: WirePendingEffect +TARGET_FIGHTER/targetFighterIds/damage/canPassThroughEnemies/zoneFighterName/restoreFullHealth/fighterIds; WireCombatInfo +boostValue/cardBoostCardId/abilityBoostCardId; remoteGameStore attack(…, abilityBoostCardId) and resolvePendingEffect with optional x/y; GameView one-click target resolution, revive flow (defeated fighter → zone cell), Arthur ability-BOOST card selection + hint banner; post-reveal BOOST_CHOICE (see GD-017b): AI min-sufficient boost/decline + resolveBoost dispatch, GameView click-one-own-card or generic «Отказаться», GameTester 'peffect <id> card <c>'; admin GameTester 'peffect <id> <f>' (no cell) and 'attack … [abilityBoostCard]'.",
+      "code": [
+        "backend/src/game-engine/services/ai-decision.service.ts",
+        "backend/src/games/services/ai-turn.service.ts (resolveTarget dispatch)",
+        "src/lib/gameStateAdapter.ts",
+        "src/store/remoteGameStore.ts",
+        "src/components/game/GameView.tsx",
+        "src/gql/graphql.ts (AttackDto.abilityBoostCardId — matches live schema)",
+        "admin/src/pages/game-tester/GameTester.tsx"
+      ],
+      "tests": [
+        "backend/src/game-engine/services/ai-decision.service.spec.ts (+4 → 24)",
+        "src vitest 13 pass"
+      ]
+    }
+  ]
+}

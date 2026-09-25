@@ -67,12 +67,22 @@ export const GameView = () => {
   const [busy, setBusy] = useState(false);
   // C2: боец, выбранный для резолва отложенного эффекта (MOVE/PLACE)
   const [pendingFighterId, setPendingFighterId] = useState<string | null>(null);
+  // S05 DISCARD_CARDS: выбранные для сброса карты (value > 1)
+  const [discardChoiceIds, setDiscardChoiceIds] = useState<string[]>([]);
+  // GD-017: ability-BOOST карта (Arthur) поверх выбранной атакующей
+  const [abilityBoostId, setAbilityBoostId] = useState('');
   const [maneuverMoves, setManeuverMoves] = useState<ManeuverMove[]>([]);
   const [maneuverBoost, setManeuverBoost] = useState('');
   const [discardIds, setDiscardIds] = useState<string[]>([]);
   const controls = resourceControls(wireState, localUserId);
   const hand = localUserId ? wireState?.handZones[localUserId]?.cards ?? [] : [];
   const ownFighters = wireState?.fighters.filter(f => f.ownerId === localUserId && f.health > 0 && !f.isDefeated) ?? [];
+  // GD-017/R-15: ability-BOOST разрешён только атакам САМОГО King Arthur
+  const arthurFighterId = localUserId
+    ? wireState?.fighters.find(
+        f => f.ownerId === localUserId && f.type === 'HERO' && f.heroSlug === 'king-arthur',
+      )?.id
+    : undefined;
 
   // The server persists the choice itself. Local plans may be reselected after reload.
   useEffect(() => {
@@ -80,6 +90,10 @@ export const GameView = () => {
     setManeuverBoost('');
     setDiscardIds([]);
   }, [controls.maneuver?.id, controls.discard?.id]);
+
+  useEffect(() => {
+    setDiscardChoiceIds([]);
+  }, [myPendingEffects()[0]?.id]);
 
   // активный отложенный эффект ЛОКАЛЬНОГО игрока (первый в очереди)
   const pendingEffects = myPendingEffects();
@@ -107,16 +121,25 @@ export const GameView = () => {
   };
 
   // Боец подходит под отложенный эффект (грубая UI-подсказка; финал — на бэке)
-  const fighterFitsPending = (fighterOwnerId: string, fighterName: string): boolean => {
+  const fighterFitsPending = (fighter: {
+    id: string;
+    ownerId: string;
+    name: string;
+    isDefeated?: boolean;
+  }): boolean => {
     if (!activePending) return false;
+    // S05 revive-PLACE (Winged Frenzy): выбираем ПОВЕРЖЁННОГО бойца из списка
+    if (activePending.restoreFullHealth === true) {
+      return activePending.fighterIds?.includes(fighter.id) ?? fighter.ownerId === localUserId;
+    }
     const ownerOk = activePending.targetsOpponent
-      ? fighterOwnerId !== localUserId
-      : fighterOwnerId === localUserId;
+      ? fighter.ownerId !== localUserId
+      : fighter.ownerId === localUserId;
     if (!ownerOk) return false;
     if (activePending.fighterName) {
-      const base = fighterName.replace(/\s+\d+$/, '').toLowerCase().replace(/ies$/, 'y');
+      const base = fighter.name.replace(/\s+\d+$/, '').toLowerCase().replace(/ies$/, 'y');
       const want = activePending.fighterName.toLowerCase().replace(/ies$/, 'y');
-      return base.includes(want) || fighterName.toLowerCase().includes(activePending.fighterName.toLowerCase());
+      return base.includes(want) || fighter.name.toLowerCase().includes(activePending.fighterName.toLowerCase());
     }
     return true;
   };
@@ -154,9 +177,39 @@ export const GameView = () => {
     // C2: режим резолва отложенного эффекта имеет приоритет — клик по
     // подходящему бойцу выбирает его, клик по клетке завершает эффект
     if (activePending) {
+      // S05 BOOST_CHOICE: optional буст боя ПОСЛЕ reveal («You may BOOST this
+      // attack») — клик по ОДНОЙ своей карте немедленно резолвит выбор
+      if (activePending.type === 'BOOST_CHOICE') {
+        if (event.type === 'CARD_CLICKED' && hand.some(card => card.id === event.cardId)) {
+          void run(() => resolvePendingEffect(activePending.id, undefined, undefined, undefined, [event.cardId]));
+        }
+        return;
+      }
+      // S05 DISCARD_CARDS: сбрасывающий выбирает карту(ы) своей руки кликом
+      if (activePending.type === 'DISCARD_CARDS') {
+        if (event.type === 'CARD_CLICKED' && hand.some(card => card.id === event.cardId)) {
+          const need = activePending.value ?? 1;
+          if (need === 1) {
+            void run(() => resolvePendingEffect(activePending.id, undefined, undefined, undefined, [event.cardId]));
+          } else {
+            setDiscardChoiceIds(ids => toggleDiscardInstance(ids, event.cardId, need));
+          }
+        }
+        return;
+      }
+      // S05 TARGET_FIGHTER: цель урона БЕЗ клетки — один клик по бойцу
+      if (activePending.type === 'TARGET_FIGHTER') {
+        if (event.type === 'FIGHTER_CLICKED') {
+          const fighter = wireState.fighters.find((f) => f.id === event.fighterId);
+          if (fighter && activePending.targetFighterIds?.includes(fighter.id)) {
+            void run(() => resolvePendingEffect(activePending.id, fighter.id));
+          }
+        }
+        return;
+      }
       if (event.type === 'FIGHTER_CLICKED') {
         const fighter = wireState.fighters.find((f) => f.id === event.fighterId);
-        if (fighter && fighterFitsPending(fighter.ownerId, fighter.name)) {
+        if (fighter && fighterFitsPending(fighter)) {
           setPendingFighterId(pendingFighterId === fighter.id ? null : fighter.id);
         }
         return;
@@ -197,7 +250,13 @@ export const GameView = () => {
           controls.canAct &&
           (card.cardType === 'ATTACK' || card.cardType === 'VERSATILE')
         ) {
-          void run(() => attack(myAttacker, fighter.id, card.id));
+          // GD-017: ability-BOOST играется вместе с атакой ТОЛЬКО самого героя
+          const abilityBoost =
+            myAttacker === arthurFighterId && abilityBoostId ? abilityBoostId : undefined;
+          void run(async () => {
+            await attack(myAttacker, fighter.id, card.id, abilityBoost);
+            setAbilityBoostId('');
+          });
         }
         return;
       }
@@ -228,7 +287,19 @@ export const GameView = () => {
           return;
         }
 
-        // ATTACK/VERSATILE: выделить карту, цель выбирается кликом по врагу
+        // ATTACK/VERSATILE: выделить карту, цель выбирается кликом по врагу.
+        // GD-017: при уже выбранной атакующей карте у King Arthur клик по
+        // ДРУГОЙ карте тогглит ability-BOOST (face-down вместе с атакой).
+        if (
+          selectedCardId &&
+          selectedCardId !== card.id &&
+          arthurFighterId &&
+          (selectedFighterId ?? arthurFighterId) === arthurFighterId
+        ) {
+          setAbilityBoostId(id => (id === card.id ? '' : card.id));
+          return;
+        }
+        if (selectedCardId === card.id) setAbilityBoostId('');
         selectCard(selectedCardId === card.id ? null : card.id);
         return;
       }
@@ -281,6 +352,17 @@ export const GameView = () => {
   const isAttacker = Boolean(
     combat && wireState?.fighters.find((f) => f.id === combat.attackerId)?.ownerId === localUserId,
   );
+  // S05 reveal (rulebook p.12-13): committed-карты боя лежат в discardPiles;
+  // после reveal сервер отдаёт личины обоим — до reveal чужая карта приходит
+  // плейсхолдером (lookup по instance id не находит её) → '???'.
+  const committedCardName = (instanceId?: string): string | null => {
+    if (!instanceId || !wireState?.discardPiles) return null;
+    for (const pile of Object.values(wireState.discardPiles)) {
+      const card = pile.find((c) => c.id === instanceId);
+      if (card) return card.nameRu || card.name;
+    }
+    return null;
+  };
   const gameOver = phase === 'GAME_OVER';
   const winnerId = wireState?.metadata.winnerId ?? null;
   const opponent = wireState?.players.find((p) => p.userId !== localUserId);
@@ -422,6 +504,23 @@ export const GameView = () => {
           </div>
         )}
 
+        {/* GD-017: ability-BOOST (King Arthur) при выбранной атакующей карте */}
+        {selectedCardId && arthurFighterId && !gameOver && !controls.maneuver && !controls.discard && !activePending && (
+          <div
+            style={{
+              background: 'rgba(220, 180, 60, 0.14)',
+              border: '1px solid rgba(220, 180, 60, 0.45)',
+              padding: '6px 16px',
+            }}
+          >
+            ⚔️ ability-BOOST:{' '}
+            {abilityBoostId
+              ? 'карта выбрана (клик по другой карте — сменить, по ней же — убрать).'
+              : 'кликните вторую карту руки — она уйдёт face-down (+BOOST) вместе с атакой King Arthur.'}{' '}
+            Затем кликните врага.
+          </div>
+        )}
+
         {/* Панель боя */}
         {combat && !gameOver && (
           <div
@@ -439,7 +538,19 @@ export const GameView = () => {
               <span>Вас атакуют! Кликните карту защиты (DEFENSE/VERSATILE) или сразу Resolve.</span>
             )}
             {phase === 'COMBAT' && !amIDefender() && <span>Ждём карту защитника…</span>}
-            {phase === 'COMBAT_RESOLVE' && <span>Карты сыграны — резолв боя.</span>}
+            {phase === 'COMBAT_RESOLVE' && (
+              <span>
+                Карты сыграны — резолв боя.{' '}
+                <strong>
+                  {committedCardName(combat!.attackerCardId) ?? '???'} {combat!.attackValue}
+                  {typeof combat!.boostValue === 'number' ? ` (+${combat!.boostValue} BOOST)` : ''}
+                  {' vs '}
+                  {combat!.defenderCardId
+                    ? `${committedCardName(combat!.defenderCardId) ?? '???'} ${combat!.defenseValue}`
+                    : 'без защиты'}
+                </strong>
+              </span>
+            )}
             {(isAttacker || phase === 'COMBAT_RESOLVE') && (
               <Button variant="primary" disabled={busy} onClick={() => void run(resolveCombat)}>
                 Resolve
@@ -490,11 +601,37 @@ export const GameView = () => {
                   <span style={{ opacity: 0.7 }}>выберите {activePending.chooseCount}</span>
                 )}
               </div>
+            ) : activePending.type === 'TARGET_FIGHTER' ? (
+              <span style={{ opacity: 0.8 }}>
+                {`Кликните цель — ${activePending.damage ?? 1} урон (любой боец из списка эффекта)`}
+              </span>
+            ) : activePending.type === 'BOOST_CHOICE' ? (
+              <span style={{ opacity: 0.8 }}>
+                Буст боя: кликните карту в своей руке (её BOOST добавится к значению) или откажитесь
+              </span>
+            ) : activePending.type === 'DISCARD_CARDS' ? (
+              <span style={{ opacity: 0.8, display: 'flex', gap: 8, alignItems: 'center' }}>
+                {`Сброс: кликните ${(activePending.value ?? 1) === 1 ? 'карту' : `${activePending.value ?? 1} карты`} в своей руке`}
+                {(activePending.value ?? 1) > 1 && discardChoiceIds.length === (activePending.value ?? 1) && (
+                  <Button
+                    variant="primary"
+                    disabled={busy}
+                    onClick={() => void run(async () => {
+                      await resolvePendingEffect(activePending.id, undefined, undefined, undefined, discardChoiceIds);
+                      setDiscardChoiceIds([]);
+                    })}
+                  >
+                    Сбросить
+                  </Button>
+                )}
+              </span>
             ) : (
               <span style={{ opacity: 0.8 }}>
                 {pendingFighterId
-                  ? `Боец выбран — кликните клетку (${activePending.type === 'MOVE' ? `до ${activePending.value} шагов` : 'любая свободная'})`
-                  : `Кликните ${activePending.targetsOpponent ? 'бойца противника' : 'своего бойца'}${activePending.fighterName ? ` (${activePending.fighterName})` : ''}`}
+                  ? `Боец выбран — кликните клетку (${activePending.type === 'MOVE' ? `до ${activePending.value} шагов` : 'любая свободная'}${activePending.zoneFighterName ? ` в зоне ${activePending.zoneFighterName}` : ''})`
+                  : activePending.restoreFullHealth
+                    ? `Кликните ПОВЕРЖЁННОГО бойца${activePending.fighterName ? ` (${activePending.fighterName})` : ''} — вернётся с полным здоровьем`
+                    : `Кликните ${activePending.targetsOpponent ? 'бойца противника' : 'своего бойца'}${activePending.fighterName ? ` (${activePending.fighterName})` : ''}`}
               </span>
             )}
             {activePending.optional && (

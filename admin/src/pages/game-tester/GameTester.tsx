@@ -79,12 +79,12 @@ const HELP_TEXT = `Команды (2 действия за ход; после 2-
   maneuver done <c|-> [f0 x,y x,y ; f1 x,y] — выбрать BOOST и завершить начатый манёвр
   maneuver done -  — завершить без движения и без BOOST
   discard <c> [...] — выбрать ровно лишние экземпляры при сбросе в конце хода
-  attack <f1> <f2> <c> [<boost>]         — атака картой (+BOOST-карта, тратит 1 действие)
+  attack <f1> <f2> <c> [<ab>]  — атака (+ability-BOOST Arthur, коммит при объявлении)
   scheme <c>       — разыграть scheme-карту (тратит 1 действие)
   pending          — список отложенных эффектов (выбор игрока)
-  peffect <id> <f> <x>,<y> — резолв отложенного MOVE/PLACE
+  peffect <id> <f> <x>,<y> — резолв отложенного MOVE/PLACE; peffect <id> <f> — TARGET_FIGHTER; peffect <id> card <c0> [<c1> ...] — DISCARD_CARDS (сколько требует value) / BOOST_CHOICE — ровно одна (карта-буст боя ПОСЛЕ reveal)
   pdecline <id>     — отклонить опциональный отложенный эффект
-  defense <c> [<boost>] — карта защиты (+BOOST-карта, за защищающегося)
+  defense <c>      — карта защиты (BOOST-эффект карты защиты, как у атаки, выбирается после reveal)
   resolve          — разрешить бой
   end              — завершить ход, только если действий и ожидающих выборов не осталось
   door <x> <y>     — открыть/закрыть дверь
@@ -588,32 +588,37 @@ export const GameTester: React.FC = () => {
           break;
         }
         case 'attack': {
-          const [, aRef, tRef, cRef, bRef] = parts;
-          if (!aRef || !tRef || !cRef) throw new Error('attack <f-атакующий> <f-цель> <c> [<boostCard>]');
+          // attack <f-атакующий> <f-цель> <c> [<abilityBoostCard>]
+          // Карточный BOOST («You may BOOST this attack») НЕ подаётся сюда:
+          // после reveal движок сам предложит BOOST_CHOICE (peffect/pdecline).
+          const [, aRef, tRef, cRef, abRef] = parts;
+          if (!aRef || !tRef || !cRef) throw new Error('attack <f-атакующий> <f-цель> <c> [<abilityBoostCard>]');
           const slot = resolveActor('attack');
           const attacker = resolveFighter(aRef);
           const target = resolveFighter(tRef);
           const card = resolveCard(slot, cRef);
-          const boost = bRef ? resolveCard(slot, bRef) : null;
-          const label = boost
-            ? `attack(${attacker.name} → ${target.name}, ${card.name} + BOOST ${boost.name})`
-            : `attack(${attacker.name} → ${target.name}, ${card.name})`;
+          // GD-017: ability-BOOST (face-down) — только allowsAttackBoost герой
+          const abilityBoost = abRef ? resolveCard(slot, abRef) : null;
+          const boosts = [abilityBoost && `ability-BOOST ${abilityBoost.name}`].filter(Boolean).join(' + ');
+          const label = `attack(${attacker.name} → ${target.name}, ${card.name}${boosts ? ' + ' + boosts : ''})`;
           await runAction(slot, label, ATTACK, {
-            input: { gameId: gameIdRef.current!, attackerId: attacker.id, targetId: target.id, cardId: card.id, boostCardId: boost?.id ?? null },
+            input: {
+              gameId: gameIdRef.current!,
+              attackerId: attacker.id,
+              targetId: target.id,
+              cardId: card.id,
+              abilityBoostCardId: abilityBoost?.id ?? null,
+            },
           }, 'attack');
           break;
         }
         case 'defense': {
-          const [, cRef, bRef] = parts;
-          if (!cRef) throw new Error('defense <c> [<boostCard>]');
+          const [, cRef] = parts;
+          if (!cRef) throw new Error('defense <c>');
           const slot = resolveActor('defense');
           const card = resolveCard(slot, cRef);
-          const boost = bRef ? resolveCard(slot, bRef) : null;
-          const label = boost
-            ? `playDefense(${card.name} + BOOST ${boost.name})`
-            : `playDefense(${card.name})`;
-          await runAction(slot, label, PLAY_DEFENSE, {
-            input: { gameId: gameIdRef.current!, cardId: card.id, boostCardId: boost?.id ?? null },
+          await runAction(slot, `playDefense(${card.name})`, PLAY_DEFENSE, {
+            input: { gameId: gameIdRef.current!, cardId: card.id },
           }, 'playDefense');
           break;
         }
@@ -650,11 +655,30 @@ export const GameTester: React.FC = () => {
           break;
         }
         case 'peffect': {
-          // peffect <effectId> <f> <x>,<y> — резолв отложенного MOVE/PLACE
+          // peffect <effectId> <f> <x>,<y>       — резолв отложенного MOVE/PLACE
+          // peffect <effectId> <f>               — резолв TARGET_FIGHTER (без клетки)
+          // peffect <effectId> card <c0> [...]   — резолв DISCARD_CARDS (все карты
+          //                                        выбора: сколько требует pending.value)
+          //                                        / BOOST_CHOICE (ровно одна)
           const [, effId, fRef, posRef] = parts;
-          if (!effId || !fRef || !posRef) throw new Error('peffect <effectId> <f> <x>,<y>');
+          if (!effId || !fRef) throw new Error('peffect <effectId> <f> [x,y] | card <c0> [...]');
           const slot = resolveActor('peffect');
+          if (fRef === 'card') {
+            const refs = parts.slice(3);
+            if (refs.length === 0) throw new Error('peffect <effectId> card <c0> [<c1> ...]');
+            const cards = refs.map((ref) => resolveCard(slot, ref));
+            await runAction(slot, `resolvePendingEffect(${effId}, card ${cards.map((c) => c.id).join(', ')})`, RESOLVE_PENDING_EFFECT, {
+              input: { gameId: gameIdRef.current!, effectId: effId, cardIds: cards.map((c) => c.id) },
+            }, 'resolvePendingEffect');
+            break;
+          }
           const f = resolveFighter(fRef);
+          if (!posRef) {
+            await runAction(slot, `resolvePendingEffect(${effId}, ${f.name})`, RESOLVE_PENDING_EFFECT, {
+              input: { gameId: gameIdRef.current!, effectId: effId, fighterId: f.id },
+            }, 'resolvePendingEffect');
+            break;
+          }
           const [px, py] = posRef.split(',').map(Number);
           if (Number.isNaN(px) || Number.isNaN(py)) throw new Error(`Плохая клетка: ${posRef}`);
           await runAction(slot, `resolvePendingEffect(${effId}, ${f.name} → ${px},${py})`, RESOLVE_PENDING_EFFECT, {

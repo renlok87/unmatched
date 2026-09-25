@@ -18,7 +18,6 @@ import type { GameState, CombatState, HandCard, Card, PendingEffect } from '../m
 import {
   GamePhase,
   CardType,
-  EffectType,
   FighterType,
   createEmptyBoardState,
   ACTIONS_PER_TURN,
@@ -33,6 +32,7 @@ import {
 } from '../abilities/hero-ability-registry';
 import {
   CardEffectExecutorService,
+  fighterNameMatches,
   type EffectResult,
 } from '../effects/card-effect-executor.service';
 import { GameRulesValidator, bannerAllows } from '../validators/game-rules.validator';
@@ -133,27 +133,21 @@ export class GameActionExecutorService {
   ) {}
 
   /**
-   * BOOST картой из руки разрешён, если играемая карта имеет BOOST-эффект
-   * (PLAYER_CHOICE_HAND) или ability героя разрешает (King Arthur — атака)
+   * Способность героя разрешает BOOST атаки (R-15: King Arthur) — только если
+   * играющий боец является HERO-бойцом этого героя (heroSlug/heroId совпадает
+   * с ключом handler'а). Атака сайдкика (Merlin) способность не активирует.
    */
-  private boostAllowed(
-    playedCard: Card | undefined,
-    fighter: { heroSlug?: string; heroId: string } | undefined,
-    role: 'attack' | 'defense',
+  private abilityBoostAllowed(
+    fighter: { heroSlug?: string; heroId: string; type?: string } | undefined,
   ): boolean {
-    const cardAllows = Boolean(
-      playedCard?.effects?.some(
-        (e) =>
-          e.type === EffectType.BOOST &&
-          (e.boostSource === 'PLAYER_CHOICE_HAND' || e.boostSource == null),
-      ),
-    );
-    if (cardAllows) return true;
-    const handler = fighter
-      ? this.abilityRegistry.getAny(fighter.heroSlug ?? fighter.heroId)
-      : undefined;
-    const h = handler as { allowsAttackBoost?: boolean; allowsDefenseBoost?: boolean } | undefined;
-    return role === 'attack' ? Boolean(h?.allowsAttackBoost) : Boolean(h?.allowsDefenseBoost);
+    if (!fighter) return false;
+    const slug = fighter.heroSlug ?? fighter.heroId;
+    const handler = this.abilityRegistry.getAny(slug) as
+      | { allowsAttackBoost?: boolean; heroId?: string }
+      | undefined;
+    if (!handler?.allowsAttackBoost) return false;
+    if (fighter.type !== undefined && fighter.type !== 'HERO') return false;
+    return handler.heroId === slug;
   }
 
   /**
@@ -513,6 +507,7 @@ export class GameActionExecutorService {
       x?: number;
       y?: number;
       optionIndex?: number;
+      cardIds?: string[];
     },
     context: ActionContext,
   ): Promise<ActionResult> {
@@ -544,6 +539,27 @@ export class GameActionExecutorService {
         return this.resolveChooseOne(pending, dto.optionIndex, userId, currentState);
       }
 
+      // --- TARGET_FIGHTER (S05): выбор цели для прямого урона («any one
+      //     fighter in X's zone», способность Medusa). Клетка не нужна. ---
+      if (pending.type === 'TARGET_FIGHTER') {
+        return this.resolveTargetFighter(pending, dto.fighterId, userId, currentState, context.gameId);
+      }
+
+      // --- DISCARD_CARDS (S05, Hiss and Slither / Clutching Claws): печатный
+      //     сброс без «random» — карту выбирает СБРАСЫВАЮЩИЙ (владелец выбора).
+      //     Ровно value instance id из СВОЕЙ руки; mandatory (decline запрещён). ---
+      if (pending.type === 'DISCARD_CARDS') {
+        return this.resolveDiscardCards(pending, dto.cardIds, userId, currentState, context.gameId);
+      }
+
+      // --- BOOST_CHOICE (S05, Second Shot / Noble Sacrifice): optional буст
+      //     боя картой из руки ПОСЛЕ reveal. Ровно ОДНА своя карта; её
+      //     boostValue добавляется в боевую цепочку (DURING_COMBAT) и
+      //     combatInfo; отказ — declinePendingEffect. ---
+      if (pending.type === 'BOOST_CHOICE') {
+        return this.resolveBoostChoice(pending, dto.cardIds, userId, currentState, context.gameId);
+      }
+
       // MOVE/PLACE требуют бойца и клетку
       if (!dto.fighterId || dto.x === undefined || dto.y === undefined) {
         return { success: false, error: 'MOVE/PLACE требует fighterId, x, y' };
@@ -553,7 +569,9 @@ export class GameActionExecutorService {
       if (pending.fighterIds && !pending.fighterIds.includes(dto.fighterId)) {
         return { success: false, error: 'This fighter is not a target of the pending effect' };
       }
-      if (!fighter || fighter.health <= 0) {
+      // Revive-PLACE (Winged Frenzy: return a defeated Harpy) возвращает
+      // ПОВЕРЖЕННОГО бойца — defeated разрешён ровно для этого pending-типа.
+      if (!fighter || (fighter.health <= 0 && pending.restoreFullHealth !== true) || (fighter.isDefeated && pending.restoreFullHealth !== true)) {
         return { success: false, error: 'Боец не найден или повержен' };
       }
 
@@ -600,12 +618,16 @@ export class GameActionExecutorService {
         if (!staysInPlace) {
           // Дистанция эффекта (не movement бойца): союзники проходимы,
           // враги блокируют путь, занятое назначение уже проверено выше.
+          // Winged Frenzy: canPassThroughEnemies — враги НЕ блокируют путь
+          // (проход сквозь них разрешён), конечная клетка всё равно свободна.
           const allowance = pending.value ?? 1;
-          const blockedPositions = new Set(
-            currentState.fighters
-              .filter((f) => f.id !== fighter.id && isLivingFighter(f) && f.ownerId !== fighter.ownerId)
-              .map((f) => `${f.position.x}:${f.position.y}`),
-          );
+          const blockedPositions = pending.canPassThroughEnemies
+            ? new Set<string>()
+            : new Set(
+                currentState.fighters
+                  .filter((f) => f.id !== fighter.id && isLivingFighter(f) && f.ownerId !== fighter.ownerId)
+                  .map((f) => `${f.position.x}:${f.position.y}`),
+              );
           const reachable = this.adjacencyService.getReachableCells(
             currentState.boardState,
             fighter.position,
@@ -620,13 +642,29 @@ export class GameActionExecutorService {
           }
         }
       }
-      // PLACE: любая валидная свободная клетка (зонные ограничения — позже)
+      // PLACE: любая валидная свободная клетка. Зонное ограничение
+      // (Winged Frenzy: «to any space in Medusa's zone») — клетка обязана
+      // делить зону с указанным бойцом.
+      if (pending.zoneFighterName) {
+        const zoneAnchor = currentState.fighters.find((f) =>
+          fighterNameMatches(f.name, pending.zoneFighterName!),
+        );
+        if (!zoneAnchor || !this.adjacencyService.isInSameZone(currentState, zoneAnchor.position, target)) {
+          return { success: false, error: `Клетка должна быть в зоне «${pending.zoneFighterName}»` };
+        }
+      }
 
       let newState: GameState = {
         ...currentState,
         sequenceNumber: currentState.sequenceNumber + 1,
         fighters: currentState.fighters.map((f) =>
-          f.id === fighter.id ? { ...f, position: target } : f,
+          f.id === fighter.id
+            ? pending.restoreFullHealth === true && f.isDefeated
+              // Revive (return a defeated Harpy): identity сохраняется,
+              // здоровье восстанавливается до maxHealth.
+              ? { ...f, position: target, health: f.maxHealth, isDefeated: false }
+              : { ...f, position: target }
+            : f,
         ),
         metadata: {
           ...currentState.metadata,
@@ -814,9 +852,251 @@ export class GameActionExecutorService {
     };
   }
 
+  /**
+   * Резолв TARGET_FIGHTER (S05): выбор цели для прямого урона — «any one
+   * fighter in X's zone» (A Momentary Glance), способность Medusa.
+   * Цель РЕВАЛИДИРУЕТСЯ на резолве (могла пасть между созданием и выбором).
+   * Урон применяется иммутабельно, terminal-состояние пересчитывается,
+   * pending снимается, затем drainAfterChoice.
+   */
+  private async resolveTargetFighter(
+    pending: PendingEffect,
+    fighterId: string | undefined,
+    userId: string,
+    currentState: GameState,
+    gameId: string,
+  ): Promise<ActionResult> {
+    if (!fighterId) {
+      return { success: false, error: 'Нужен fighterId — цель урона' };
+    }
+    // РеVALIDATION: список целей и жива ли цель СЕЙЧАС
+    if (pending.targetFighterIds && !pending.targetFighterIds.includes(fighterId)) {
+      return { success: false, error: 'Боец не входит в допустимые цели' };
+    }
+    const target = currentState.fighters.find((f) => f.id === fighterId);
+    if (!target || !isLivingFighter(target)) {
+      return { success: false, error: 'Цель не найдена или повержена' };
+    }
+    const damage = pending.damage ?? 0;
+
+    let newState: GameState = applyTerminalState({
+      ...currentState,
+      sequenceNumber: currentState.sequenceNumber + 1,
+      fighters: currentState.fighters.map((f) => {
+        if (f.id !== fighterId) return f;
+        const health = Math.max(0, f.health - damage);
+        return { ...f, health, isDefeated: health <= 0 ? true : f.isDefeated };
+      }),
+      metadata: {
+        ...currentState.metadata,
+        lastActionAt: new Date(),
+        lastActionBy: userId,
+        pendingEffects: (currentState.metadata.pendingEffects ?? []).filter(
+          (p) => p.id !== pending.id,
+        ),
+      },
+    });
+
+    newState = await this.drainAfterChoice(newState, userId, gameId, currentState.sequenceNumber);
+
+    return {
+      success: true,
+      gameState: newState,
+      metadata: {
+        action: 'resolvePendingEffect',
+        performedAt: new Date(),
+        performedBy: userId,
+        sequenceNumber: newState.sequenceNumber,
+        effectText: pending.text,
+        appliedEffects: [
+          {
+            success: true,
+            effectId: pending.id,
+            targetIds: [fighterId],
+            valueApplied: damage,
+            message: `DAMAGE ${damage} → ${target.name}`,
+          },
+        ],
+      },
+    };
+  }
+
   /** Shared hero-based terminal boundary; does not advance sequence. */
   private checkAndApplyGameOver(state: GameState): GameState {
     return applyTerminalState(state);
+  }
+
+  /**
+   * Резолв DISCARD_CARDS (S05): владелец выбора («Your opponent discards 1
+   * card.» — сбрасывающий оппонент) называет ровно value instance id из СВОЕЙ
+   * руки. Карты уходят в его сброс, pending снимается, seq +1, боевая цепочка
+   * (если выбор родился в AFTER_COMBAT) продолжается через drainAfterChoice.
+   */
+  private async resolveDiscardCards(
+    pending: PendingEffect,
+    cardIds: string[] | undefined,
+    userId: string,
+    currentState: GameState,
+    gameId: string,
+  ): Promise<ActionResult> {
+    const count = pending.value ?? 1;
+    const hand = currentState.handZones[userId]?.cards ?? [];
+    if (
+      !Array.isArray(cardIds) ||
+      cardIds.length !== count ||
+      new Set(cardIds).size !== count ||
+      cardIds.some((id) => !hand.some((c) => c.id === id))
+    ) {
+      return {
+        success: false,
+        error: `Выберите ровно ${count} карты (по instance id) из своей руки`,
+      };
+    }
+
+    let next = currentState;
+    for (const id of cardIds) {
+      next = await this.deckManagement.discardCard(next, userId, id);
+    }
+
+    let newState: GameState = {
+      ...next,
+      sequenceNumber: currentState.sequenceNumber + 1,
+      metadata: {
+        ...next.metadata,
+        lastActionAt: new Date(),
+        lastActionBy: userId,
+        pendingEffects: (next.metadata.pendingEffects ?? []).filter(
+          (p) => p.id !== pending.id,
+        ),
+      },
+    };
+
+    newState = await this.drainAfterChoice(newState, userId, gameId, currentState.sequenceNumber);
+
+    return {
+      success: true,
+      gameState: newState,
+      metadata: {
+        action: 'resolvePendingEffect',
+        performedAt: new Date(),
+        performedBy: userId,
+        sequenceNumber: newState.sequenceNumber,
+        effectText: pending.text,
+        appliedEffects: [
+          {
+            success: true,
+            effectId: pending.id,
+            targetIds: [userId],
+            valueApplied: count,
+            message: `DISCARD ${count} (выбор сбрасывающего)`,
+          },
+        ],
+      },
+    };
+  }
+
+  /**
+   * Резолв BOOST_CHOICE (S05): optional буст боя («You may BOOST this
+   * attack/defense», Second Shot / Noble Sacrifice) — владелец называет ровно
+   * ОДНУ карту СВОЕЙ руки. Ревалидация атомарна (валидация ДО мутаций):
+   * чужая карта / не из руки / не одна → отказ без изменений состояния.
+   * Применение: карта → в сброс владельца; её boostValue — в
+   * combatEffectContinuation (finalAttack атакующего / finalDefense
+   * защитника — сторона по combatInfo) и в combatInfo (boostValue +
+   * cardBoostCardId). pending снимается, seq +1, приостановленный расчёт
+   * урона продолжается через drainAfterChoice.
+   */
+  private async resolveBoostChoice(
+    pending: PendingEffect,
+    cardIds: string[] | undefined,
+    userId: string,
+    currentState: GameState,
+    gameId: string,
+  ): Promise<ActionResult> {
+    const combatInfo = currentState.metadata.combatInfo;
+    const continuation = currentState.metadata.combatEffectContinuation;
+    if (!combatInfo) {
+      return { success: false, error: 'Нет боя — BOOST-выбор протух' };
+    }
+    const hand = currentState.handZones[userId]?.cards ?? [];
+    if (
+      !Array.isArray(cardIds) ||
+      cardIds.length !== 1 ||
+      new Set(cardIds).size !== 1 ||
+      !hand.some((c) => c.id === cardIds[0])
+    ) {
+      return { success: false, error: 'Выберите ровно одну карту (instance id) из своей руки' };
+    }
+    const card = hand.find((c) => c.id === cardIds[0])!;
+    const boost = card.boostValue ?? 0;
+
+    let next = await this.deckManagement.discardCard(currentState, userId, card.id);
+
+    // Сторона выбора: владелец атакующего бойца бустит attack, иначе defense.
+    // BOOST_CHOICE рождается только в paused-стадии боевой цепочки, поэтому
+    // continuation для живого выбора гарантированно существует (guard убран).
+    const attackerOwner = currentState.fighters.find((f) => f.id === combatInfo.attackerId)?.ownerId;
+    const isAttackerSide = attackerOwner === userId;
+
+    const field = isAttackerSide ? 'finalAttack' : 'finalDefense';
+    next = {
+      ...next,
+      metadata: {
+        ...next.metadata,
+        combatEffectContinuation: {
+          ...continuation!,
+          [field]: continuation![field] + boost,
+        },
+      },
+    };
+
+    next = {
+      ...next,
+      metadata: {
+        ...next.metadata,
+        combatInfo: {
+          ...next.metadata.combatInfo!,
+          boostValue: (next.metadata.combatInfo!.boostValue ?? 0) + boost,
+          cardBoostCardId: card.id,
+        },
+      },
+    };
+
+    let newState: GameState = {
+      ...next,
+      sequenceNumber: currentState.sequenceNumber + 1,
+      metadata: {
+        ...next.metadata,
+        lastActionAt: new Date(),
+        lastActionBy: userId,
+        pendingEffects: (next.metadata.pendingEffects ?? []).filter(
+          (p) => p.id !== pending.id,
+        ),
+      },
+    };
+
+    newState = await this.drainAfterChoice(newState, userId, gameId, currentState.sequenceNumber);
+
+    return {
+      success: true,
+      gameState: newState,
+      metadata: {
+        action: 'resolvePendingEffect',
+        performedAt: new Date(),
+        performedBy: userId,
+        sequenceNumber: newState.sequenceNumber,
+        effectText: pending.text,
+        appliedEffects: [
+          {
+            success: true,
+            effectId: pending.id,
+            targetIds: [userId],
+            valueApplied: boost,
+            message: `BOOST +${boost} («${card.name}» ${isAttackerSide ? '→ атака' : 'защита'})`,
+          },
+        ],
+      },
+    };
   }
 
   /**
@@ -1219,23 +1499,29 @@ export class GameActionExecutorService {
         // найдёт карту в decks[].cards даже после сброса (cards — полный список).
         const playedCard = this.findHandCard(currentState, userId, dto.cardId);
 
-        // BOOST атаки (A7): сброс ещё одной карты → +boostValue к значению
-        let boostCard: HandCard | undefined;
-        if (dto.boostCardId) {
-          boostCard = this.findHandCard(currentState, userId, dto.boostCardId);
-          if (!boostCard) {
+        // BOOST-эффект КАРТЫ («You may BOOST this attack», Second Shot /
+        // Noble Sacrifice) НЕ коммитится здесь: по rulebook (Battle of Legends
+        // Vol.1, p.12-13) выбор карты происходит после reveal обеих карт и
+        // отмены Feint — движок создаёт BOOST_CHOICE pending на стадии
+        // DURING_COMBAT (card-effect-executor). Защитник до reveal не видит
+        // даже факта второй карты. Способность Arthur (R-15) — наоборот,
+        // печатным текстом коммитится вместе с атакой, face-down.
+        let abilityBoostCard: HandCard | undefined;
+        if (dto.abilityBoostCardId) {
+          abilityBoostCard = this.findHandCard(currentState, userId, dto.abilityBoostCardId);
+          if (!abilityBoostCard) {
             this.metrics.incrementGameAction('attack', undefined, 'error');
-            return { success: false, error: 'Boost card not in hand' };
+            return { success: false, error: 'Ability boost card not in hand' };
           }
-          if (boostCard.id === playedCard?.id) {
+          if (abilityBoostCard.id === playedCard?.id) {
             this.metrics.incrementGameAction('attack', undefined, 'error');
             return { success: false, error: 'Нельзя BOOST-ить атаку той же картой' };
           }
-          if (!this.boostAllowed(playedCard, attacker, 'attack')) {
+          if (!this.abilityBoostAllowed(attacker)) {
             this.metrics.incrementGameAction('attack', undefined, 'error');
             return {
               success: false,
-              error: 'BOOST атаки не разрешён: ни эффекта BOOST на карте, ни способности героя',
+              error: 'Способность героя не разрешает BOOST этой атаки (только атака самого героя)',
             };
           }
         }
@@ -1244,17 +1530,22 @@ export class GameActionExecutorService {
         if (playedCard) {
           nextState = await this.deckManagement.discardCard(nextState, userId, playedCard.id);
         }
-        if (boostCard) {
-          nextState = await this.deckManagement.discardCard(nextState, userId, boostCard.id);
+        if (abilityBoostCard) {
+          nextState = await this.deckManagement.discardCard(nextState, userId, abilityBoostCard.id);
         }
 
-        // Сохраняем состояние боя в metadata
+        // Сохраняем состояние боя в metadata: attackValue — ТОЛЬКО печатное
+        // значение; ability boost Arthur — отдельно в boostValue (карта-BOOST
+        // добавит своё значение позже, на резолве BOOST_CHOICE).
+        // Отмена эффектов карты (Feint, R-16) не прибавит boost к расчёту.
         const combatState: CombatState = {
           attackerId: dto.attackerId,
           defenderId: target.ownerId,
           targetFighterId: target.id,
           attackerCardId: playedCard?.id ?? dto.cardId,
-          attackValue: (playedCard?.attackValue ?? 0) + (boostCard?.boostValue ?? 0),
+          attackValue: playedCard?.attackValue ?? 0,
+          boostValue: abilityBoostCard?.boostValue ?? 0,
+          abilityBoostCardId: abilityBoostCard?.id,
           defenseValue: 0,
           startedAt: new Date(),
         };
@@ -1371,40 +1662,22 @@ export class GameActionExecutorService {
       }
 
       // Сыгранная карта защиты: реальное значение + сброс из руки
-      // (instance id в combatInfo — см. комментарий в executeAttack)
+      // (instance id в combatInfo — см. комментарий в executeAttack).
+      // BOOST-эффект карты защиты («You may BOOST this defense») здесь НЕ
+      // коммитится — как и у атаки, выбор идёт после reveal через
+      // BOOST_CHOICE pending на стадии DURING_COMBAT (rulebook p.12-13).
       const playedCard = this.findHandCard(currentState, userId, dto.cardId);
-
-      // BOOST защиты (A7)
-      let boostCard: HandCard | undefined;
-      if (dto.boostCardId) {
-        boostCard = this.findHandCard(currentState, userId, dto.boostCardId);
-        if (!boostCard) {
-          return { success: false, error: 'Boost card not in hand' };
-        }
-        if (boostCard.id === playedCard?.id) {
-          return { success: false, error: 'Нельзя BOOST-ить защиту той же картой' };
-        }
-        if (!this.boostAllowed(playedCard, defendingFighter, 'defense')) {
-          return {
-            success: false,
-            error: 'BOOST защиты не разрешён: ни эффекта BOOST на карте, ни способности героя',
-          };
-        }
-      }
 
       let nextState = currentState;
       if (playedCard) {
         nextState = await this.deckManagement.discardCard(nextState, userId, playedCard.id);
-      }
-      if (boostCard) {
-        nextState = await this.deckManagement.discardCard(nextState, userId, boostCard.id);
       }
 
       // Обновляем состояние боя
       const updatedCombatInfo: CombatState = {
         ...combatInfo,
         defenderCardId: playedCard?.id ?? dto.cardId,
-        defenseValue: (playedCard?.defenseValue ?? 0) + (boostCard?.boostValue ?? 0),
+        defenseValue: playedCard?.defenseValue ?? 0,
       };
 
       const newState: GameState = {
@@ -1685,7 +1958,11 @@ export class GameActionExecutorService {
             : { ...savedCalculation, state: reveal.state }
           : await this.cardEffectExecutor.executeCombatEffects(reveal.state, attackerCard, defenderCard, {
               ...combatCtx,
-              attackValue: cancelled.attacker ? (attackerCard?.attackValue ?? combatCtx.attackValue) : combatCtx.attackValue,
+              // R-16: отменённая карта (Feint) сохраняет печатное значение, но
+              // boost (карта + способность Arthur) сбрасывается без эффекта.
+              attackValue: cancelled.attacker
+                ? (attackerCard?.attackValue ?? combatCtx.attackValue)
+                : combatCtx.attackValue + (combatInfo.boostValue ?? 0),
               defenseValue: cancelled.defender ? (defenderCard?.defenseValue ?? combatCtx.defenseValue) : combatCtx.defenseValue,
             }, cancelled);
         if (savedCalculation?.paused) {
