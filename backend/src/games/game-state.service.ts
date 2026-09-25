@@ -468,7 +468,7 @@ export class GameStateService {
         doors: data.b.dr,
         fog: data.b.fg,
         tokens: data.b.tk,
-        cells: hasCells ? data.b.cells : fallbackBoard!.cells,
+        cells: hasCells ? data.b.cells : fallbackBoard.cells,
         width: data.b.w ?? 20,
         height: data.b.h ?? 20,
       },
@@ -578,7 +578,9 @@ export class GameStateService {
     );
 
     // Execution queues are server-only; player choices remain in pendingEffects.
-    const { combatEffectContinuation, combatResolutionProgress, ...publicMetadata } = state.metadata;
+    const publicMetadata = { ...state.metadata };
+    delete publicMetadata.combatEffectContinuation;
+    delete publicMetadata.combatResolutionProgress;
 
     // S06 (GD-021, Prophecy): карты, снятые с верха колоды в DECK_TOP_PICK,
     // видны ТОЛЬКО владельцу выбора; соперник получает счётчик без личин.
