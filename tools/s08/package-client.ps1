@@ -39,7 +39,7 @@ $argList = @(
   "-project=$Uproject",
   '-noP4', '-platform=Win64', '-clientconfig=Development',
   '-cook', '-stage', '-pak', '-package', '-compressed', '-build',
-  '-nocompileeditor', '-unattended', '-nosplash',
+  '-unattended', '-nosplash',
   '-AdditionalCookerArgs=-ini:EditorPerProjectUserSettings:[/Script/ModelContextProtocolEngine.ModelContextProtocolSettings]:bAutoStartServer=False'
 )
 $p = Start-Process -FilePath $Uat -ArgumentList $argList -WindowStyle Hidden -PassThru -Wait -RedirectStandardOutput $Log -RedirectStandardError "$Log.err"

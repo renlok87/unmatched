@@ -41,6 +41,12 @@ interface GameEventPayload {
   payload: any;
 }
 
+/** Структурный вид GQL-контекста для извлечения userId из JWT. */
+interface SubscriptionAuthContext {
+  req?: { user?: { id?: string } };
+  user?: { id?: string };
+}
+
 const resolveGameStateFn =
   (gameStateService: GameStateService, getUserIdFn: (context: any) => string) =>
   (value: GameEventPayload | null, args: any, context: any): GameStateGQL | null => {
@@ -259,7 +265,7 @@ export class GameSubscriptionResolver {
           // Барьер-снапшот не понадобился (state актуален): fallthrough —
           // firstUpstream потребляется блоком ниже в ЭТОМ же вызове.
         }
-        if (firstUpstream) {
+        if (firstUpstream !== null) {
           const pending = firstUpstream;
           firstUpstream = null;
           if (returned) return DONE;
@@ -532,7 +538,7 @@ export class GameSubscriptionResolver {
   /**
    * Получить userId из контекста
    */
-  private getUserId(context: any): string {
+  private getUserId(context: SubscriptionAuthContext): string {
     const userId = context?.req?.user?.id || context?.user?.id;
 
     if (!userId) {
