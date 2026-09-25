@@ -13,6 +13,7 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { Position, positionEqual, positionDistance } from '../models';
+import { isCellPassable, isFreeEndpoint, isInBoardBounds, isTraversable } from './traversal';
 
 /**
  * Результат A* поиска
@@ -55,6 +56,21 @@ export class AStarService {
     end: Position,
     maxCost: number,
   ): AStarResult {
+    // Старт и цель: целочисленные клетки в границах реальной доски
+    if (!isInBoardBounds(state?.boardState, start) || !isInBoardBounds(state?.boardState, end)) {
+      return { path: [], cost: 0, exists: false };
+    }
+    if (!isCellPassable(state?.boardState?.cells?.[start.y]?.[start.x])) {
+      return { path: [], cost: 0, exists: false };
+    }
+    // Цель проходима и свободна от живых бойцов
+    if (!isCellPassable(state?.boardState?.cells?.[end.y]?.[end.x])) {
+      return { path: [], cost: 0, exists: false };
+    }
+    if (!isFreeEndpoint(state, fighterId, end)) {
+      return { path: [], cost: 0, exists: false };
+    }
+
     const openSet: AStarNode[] = [];
     const closedSet = new Set<string>();
     const cameFrom = new Map<string, Position>();
@@ -164,9 +180,8 @@ export class AStarService {
   }
 
   /**
-   * Получить соседние клетки
-   *
-   * TODO: Интегрировать с AdjacencyService для проверки проходимости
+   * Получить соседние клетки: границы реальной доски, стены/закрытые двери
+   * и живые враги блокируют шаг; живые союзники проходимы (GD-015)
    */
   private getNeighbors(state: any, fighterId: string, pos: Position): Position[] {
     const neighbors: Position[] = [];
@@ -180,11 +195,16 @@ export class AStarService {
     for (const dir of directions) {
       const newPos = { x: pos.x + dir.dx, y: pos.y + dir.dy };
 
-      // Базовая проверка границ
-      if (newPos.x >= 0 && newPos.x <= 11 && newPos.y >= 0 && newPos.y <= 7) {
-        // TODO: Проверить проходимость через AdjacencyService
-        neighbors.push(newPos);
+      if (!isInBoardBounds(state?.boardState, newPos)) {
+        continue;
       }
+      if (!isCellPassable(state?.boardState?.cells?.[newPos.y]?.[newPos.x])) {
+        continue;
+      }
+      if (!isTraversable(state, fighterId, newPos)) {
+        continue;
+      }
+      neighbors.push(newPos);
     }
 
     return neighbors;

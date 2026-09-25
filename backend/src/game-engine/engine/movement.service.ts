@@ -8,6 +8,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { GameState, Fighter, Position } from '../models';
 import { AStarService, PathCacheService } from '../movement';
+import { isCellPassable, isFreeEndpoint, isTraversable } from '../movement/traversal';
 
 export interface MovementResult {
   readonly success: boolean;
@@ -88,7 +89,8 @@ export class MovementService {
   }
 
   /**
-   * Найти путь между двумя позициями
+   * Найти путь между двумя позициями.
+   * Путь A* включает стартовую клетку; правила прохождения — см. traversal.ts
    */
   async findPath(
     state: GameState,
@@ -97,43 +99,68 @@ export class MovementService {
     end: Position,
     options: MovementOptions = {},
   ): Promise<{ path?: readonly Position[]; cost: number; error?: string }> {
-    // Проверяем кэш достижимых позиций
     const maxDistance = options.maxCost ?? 10;
-    const cachedPositions = this.pathCache.get(fighterId, start, maxDistance);
-
-    // Если есть кэш, проверяем достижима ли конечная точка
-    if (cachedPositions) {
-      const isReachable = cachedPositions.some((p) => p.x === end.x && p.y === end.y);
-      if (isReachable) {
-        // TODO: Построить путь из кешированных позиций
-        return { path: [start, end], cost: maxDistance };
-      }
-    }
-
-    // Используем A* для поиска пути
-    const result = this.astar.findPath(state, fighterId, start, end, maxDistance);
-
-    // Кешируем достижимые позиции из start
-    if (cachedPositions === null) {
-      // TODO: Вычислить и закешировать достижимые позиции
-      this.pathCache.set(fighterId, start, maxDistance, result.path ?? []);
-    }
-
-    return result;
+    return this.astar.findPath(state, fighterId, start, end, maxDistance);
   }
 
   /**
-   * Получить допустимые позиции для перемещения
+   * Получить допустимые позиции для перемещения (BFS, 4-связно).
+   * Живые враги блокируют прохождение, живые союзники проходимы, но ни на
+   * какого живого бойца нельзя закончить путь; побеждённые не блокируют.
    */
   getValidMoveTargets(state: GameState, fighterId: string, maxCost: number): readonly Position[] {
     const fighter = state.fighters.find((f) => f.id === fighterId);
 
-    if (!fighter) {
+    if (!fighter || maxCost < 1) {
       return [];
     }
 
-    // TODO: Реализовать BFS для поиска всех достижимых позиций
-    return [];
+    const targets: Position[] = [];
+    const visited = new Set<string>([this.posKey(fighter.position)]);
+    const queue: Array<{ position: Position; cost: number }> = [
+      { position: fighter.position, cost: 0 },
+    ];
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      if (current.cost >= maxCost) {
+        continue;
+      }
+
+      for (const neighbor of this.orthogonalNeighbors(current.position)) {
+        const key = this.posKey(neighbor);
+        if (visited.has(key)) {
+          continue;
+        }
+        const cell = state.boardState.cells[neighbor.y]?.[neighbor.x];
+        if (!cell || !isCellPassable(cell)) {
+          continue;
+        }
+        if (!isTraversable(state, fighterId, neighbor)) {
+          continue;
+        }
+        visited.add(key);
+        queue.push({ position: neighbor, cost: current.cost + 1 });
+        if (isFreeEndpoint(state, fighterId, neighbor)) {
+          targets.push(neighbor);
+        }
+      }
+    }
+
+    return targets;
+  }
+
+  private orthogonalNeighbors(pos: Position): Position[] {
+    return [
+      { x: pos.x, y: pos.y - 1 },
+      { x: pos.x + 1, y: pos.y },
+      { x: pos.x, y: pos.y + 1 },
+      { x: pos.x - 1, y: pos.y },
+    ];
+  }
+
+  private posKey(pos: Position): string {
+    return `${pos.x}:${pos.y}`;
   }
 
   /**
@@ -148,13 +175,9 @@ export class MovementService {
       return false;
     }
 
-    // Проверяем препятствия
+    // Проверяем препятствия: стены, закрытые двери, отсутствующие клетки
     const cell = state.boardState.cells[pos.y]?.[pos.x];
-    if (!cell || cell.type === 'wall' || cell.type === 'obstacle') {
-      return false;
-    }
-
-    return true;
+    return isCellPassable(cell);
   }
 
   /**
@@ -188,21 +211,43 @@ export class MovementService {
       return { success: false, error: 'Path is empty' };
     }
 
-    // Проверяем валидность каждой позиции в пути
-    for (const pos of path) {
+    // Проверяем валидность каждой позиции в пути. Путь без телепортов:
+    // каждый шаг — на соседнюю клетку (manhattan === 1). Путь в конвенции
+    // AStar может начинаться со стартовой клетки бойца — её пропускаем.
+    let prev = fighter.position;
+    for (let i = 0; i < path.length; i++) {
+      const pos = path[i];
       if (!this.isValidPosition(state, pos)) {
         return { success: false, error: `Invalid position in path: (${pos.x}, ${pos.y})` };
       }
 
-      // Проверяем что целевая позиция не занята (кроме стартовой)
-      if (pos.x !== fighter.position.x || pos.y !== fighter.position.y) {
-        const occupied = state.fighters.some(
-          (f) => f.id !== fighterId && f.position.x === pos.x && f.position.y === pos.y && f.health > 0,
-        );
-        if (occupied) {
+      if (i === 0 && pos.x === fighter.position.x && pos.y === fighter.position.y) {
+        prev = pos;
+        continue;
+      }
+
+      if (Math.abs(pos.x - prev.x) + Math.abs(pos.y - prev.y) !== 1) {
+        return {
+          success: false,
+          error: `Step (${prev.x},${prev.y})→(${pos.x},${pos.y}) is not a move to an adjacent cell`,
+        };
+      }
+
+      const isLast = i === path.length - 1;
+      if (isLast) {
+        // Конечная клетка не может содержать никакого живого бойца
+        if (!isFreeEndpoint(state, fighterId, pos)) {
           return { success: false, error: `Position occupied: (${pos.x}, ${pos.y})` };
         }
+      } else if (!isTraversable(state, fighterId, pos)) {
+        // Промежуточная клетка: живой враг блокирует проход (союзник — нет)
+        return {
+          success: false,
+          error: `Path blocked by enemy fighter at: (${pos.x}, ${pos.y})`,
+        };
       }
+
+      prev = pos;
     }
 
     // Создаём обновлённое состояние

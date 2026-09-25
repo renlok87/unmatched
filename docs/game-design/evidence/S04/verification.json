@@ -1,0 +1,269 @@
+{
+  "date": "2026-09-25",
+  "baseRevision": "e133a5f2bc482ce4b49c42a966981db31d688bd7",
+  "scope": "Local production services with fixture storage/catalog; no deployed DB, UE or full ACC-017 claim",
+  "baseline": {
+    "note": "Before GD-015 code changes; includes five newly added GD-014 contract checks",
+    "suites": 46,
+    "passed": 894,
+    "failed": 3,
+    "failures": [
+      "AuthService refreshTokens should rotate refresh token successfully",
+      "AuthService refreshTokens should throw UnauthorizedException for expired token",
+      "AuthService validateUser should return user without password for valid credentials"
+    ]
+  },
+  "s03Frontend": {
+    "command": "node node_modules/vitest/vitest.mjs run src/store/remoteGameStore.s03.test.ts src/components/game/GameView.s03.test.tsx src/components/game/turnResourceChoices.test.ts",
+    "passed": 12,
+    "failed": 0
+  },
+  "gd015": {
+    "status": "verified",
+    "suites": [
+      {
+        "file": "backend/src/games/services/s04-path-boundary.spec.ts",
+        "checks": [
+          {
+            "name": "GD-015 independent path boundary review does not treat missing cells inside the bounding rectangle as playable",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015 independent path boundary review rejects fractional coordinates even when start equals end",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015 independent path boundary review rejects a start outside the board instead of stepping into the board",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015 independent path boundary review does not invent a board when BoardState is missing",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015 independent path boundary review direct path execution rejects teleporting without mutating the input",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015 independent path boundary review both explicit maneuver and direct execution reject a closed door",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015 independent path boundary review pending MOVE applies the same path rule through owner a",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015 independent path boundary review pending MOVE applies the same path rule through owner b",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "backend/src/games/services/s04-board-contract.spec.ts",
+        "checks": [
+          {
+            "name": "GD-014: versioned Cobble City runtime contract pins the source capture by hash, dimensions and all cells",
+            "status": "passed"
+          },
+          {
+            "name": "GD-014: versioned Cobble City runtime contract reproduces distinct start slots for medusa-first",
+            "status": "passed"
+          },
+          {
+            "name": "GD-014: versioned Cobble City runtime contract reproduces distinct start slots for arthur-first",
+            "status": "passed"
+          },
+          {
+            "name": "GD-014: versioned Cobble City runtime contract enumerates every production adjacency and zone, not just the bounding box",
+            "status": "passed"
+          },
+          {
+            "name": "GD-014: versioned Cobble City runtime contract defines explicit forward/inverse world coordinate controls for the future UE consumer",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "backend/src/game-engine/movement/movement-rules.spec.ts",
+        "checks": [
+          {
+            "name": "GD-015: AStarService pathfinding rules uses real board bounds instead of hardcoded 12x8",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: AStarService pathfinding rules respects walls and closed doors",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: AStarService pathfinding rules may traverse living allies but not living enemies",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: AStarService pathfinding rules defeated fighters never block",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: AStarService pathfinding rules may not end on any living fighter",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: AStarService pathfinding rules returned path includes the start cell (documented convention)",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: MovementService rules executeMovement passes through a living ally",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: MovementService rules executeMovement refuses to traverse a living enemy or end on any living fighter",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: MovementService rules executeMovement treats defeated fighters as passable",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: MovementService rules findPath returns honest path cost without fake cache shortcuts",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: MovementService rules getValidMoveTargets excludes occupied endpoints but allows paths through allies",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: validator movement rules validateMovement traverses allies, blocks enemies and occupied endpoints",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: validator movement rules validateManeuver blocks enemy traversal and occupied endpoints",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: AdjacencyService.isInSameZone uses zones[] with legacy fallback matches via secondary zone intersection",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: AdjacencyService.isInSameZone uses zones[] with legacy fallback matches via legacy zone field",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: AdjacencyService.isInSameZone uses zones[] with legacy fallback false for disjoint zones and zoneless cells",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "backend/src/game-engine/services/s04-gd015-movement-ranged.spec.ts",
+        "checks": [
+          {
+            "name": "GD-015: movement path rules via production executor maneuver path may traverse a living allied fighter",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: movement path rules via production executor maneuver path through a living enemy fails atomically",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: movement path rules via production executor maneuver may not end on a living fighter: enemy on endpoint",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: movement path rules via production executor maneuver may not end on a living fighter: ally on endpoint",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: movement path rules via production executor defeated fighters do not block path or endpoint",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: movement path rules via production executor rejects a path longer than movement allowance",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: movement path rules via production executor rejects a path through a wall cell and non-step paths",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: ranged attacks vs board zones via production executor ranged attack succeeds on adjacent target across disjoint zones",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: ranged attacks vs board zones via production executor ranged attack succeeds at distance via secondary zone intersection",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: ranged attacks vs board zones via production executor ranged attack succeeds via legacy single zone field",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: ranged attacks vs board zones via production executor ranged attack fails on distant target in disjoint zones",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: ranged attacks vs board zones via production executor melee attack stays adjacency-only even in a shared zone",
+            "status": "passed"
+          },
+          {
+            "name": "GD-015: AI path consistency with movement rules AI maneuver path traverses a living ally and never ends on an occupied cell",
+            "status": "passed"
+          }
+        ]
+      }
+    ]
+  },
+  "fullBackend": {
+    "command": "node backend/node_modules/jest/bin/jest.js --config backend/package.json --runInBand --silent",
+    "suites": 49,
+    "passed": 931,
+    "failed": 3,
+    "exitCode": 1,
+    "failures": [
+      "AuthService refreshTokens should rotate refresh token successfully",
+      "AuthService refreshTokens should throw UnauthorizedException for expired token",
+      "AuthService validateUser should return user without password for valid credentials"
+    ],
+    "newFailures": []
+  },
+  "build": {
+    "command": "npm run build (cwd: backend)",
+    "exitCode": 0,
+    "checks": [
+      "tsc --noEmit",
+      "nest build"
+    ]
+  },
+  "review": {
+    "regressionsReproducedBeforeFix": [
+      "Enemy traversal accepted by maneuver",
+      "Secondary zone ignored by ranged attack",
+      "Hardcoded AStar board bounds",
+      "Missing cells treated as traversable",
+      "Fractional and out-of-board start accepted",
+      "Absent board synthesized",
+      "Teleporting explicit movement accepted",
+      "Closed door accepted by explicit movement",
+      "Pending MOVE blocked allied intermediate fighter"
+    ],
+    "scope": "Independent coordinator review and tests; fixes applied before full backend/build validation",
+    "remaining": "Legacy MovementService.moveFighter does not mutate state; production maneuver uses GameActionExecutorService and is verified. GD-016, GD-018, UI/UE integration and full ACC-017 remain open."
+  },
+  "delegation": [
+    {
+      "role": "investigation",
+      "requestedModel": "haiku",
+      "routedModel": "glm-5.3-flashx",
+      "durationMs": 161148,
+      "turns": 39,
+      "permissionDenials": 0
+    },
+    {
+      "role": "implementation",
+      "requestedModel": "claude-sonnet-4-6",
+      "requestedEffort": "max",
+      "routedModel": "glm-5.3",
+      "durationMs": 606792,
+      "turns": 78,
+      "permissionDenials": 0
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "GD-010": {
+    "status": "done",
+    "acceptanceScope": "Two mandatory actions; no free pass, early endTurn or implicit turn-start draw. Explicit END_TURN/GAIN_ACTION retained. Implemented in e133a5f; backend and frontend regressions rerun during S04.",
+    "artifacts": ["README.md", "backend-verification.json", "../S04/verification.json"]
+  },
+  "GD-011": {
+    "status": "done",
+    "acceptanceScope": "Shared draw contract, no discard recycling, two damage per missing draw to living friendly fighters, immediate terminal check. Server harness scope.",
+    "artifacts": ["README.md", "backend-verification.json", "../S04/verification.json"]
+  },
+  "GD-012": {
+    "status": "done",
+    "acceptanceScope": "Owner selects excess instance IDs after turn-end effects; foreign/duplicate/replayed choices rejected; compact persistence and HTTP/WS fixtures. No full S07 privacy/recovery claim.",
+    "artifacts": ["README.md", "TRANSPORT.md", "transport-results.json", "../S04/verification.json"]
+  },
+  "GD-013": {
+    "status": "done",
+    "acceptanceScope": "Persisted begin/complete maneuver: fresh card available for boost, zero or multiple moves, one action/draw, matching choice identity and reconnect snapshot. No deployed/UE claim.",
+    "artifacts": ["README.md", "TRANSPORT.md", "transport-results.json", "ui-verification.json", "../S04/verification.json"]
+  }
+}

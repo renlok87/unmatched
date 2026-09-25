@@ -8,6 +8,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import type { GameState, Fighter, Position } from '../models';
 import { getFighterMovement, positionEqual, getActionsRemaining } from '../models';
 import { AdjacencyService } from '../engine/adjacency.service';
+import { isCellPassable, isFreeEndpoint, isLivingFighter, isTraversable } from '../movement/traversal';
 
 export interface ValidationResult {
   readonly valid: boolean;
@@ -69,10 +70,13 @@ export class GameRulesValidator {
       return { valid: false, error: 'Invalid target position', code: 'INVALID_POSITION' };
     }
 
-    // Проверяем, что целевая клетка не занята
+    // Проверяем, что целевая клетка не занята живым бойцом
     const occupied = state.fighters.some(
       (f) =>
-        f.id !== action.fighterId && f.position.x === action.to.x && f.position.y === action.to.y,
+        f.id !== action.fighterId &&
+        isLivingFighter(f) &&
+        f.position.x === action.to.x &&
+        f.position.y === action.to.y,
     );
     if (occupied) {
       return { valid: false, error: 'Target position is occupied', code: 'POSITION_OCCUPIED' };
@@ -241,11 +245,7 @@ export class GameRulesValidator {
     }
 
     const cell = state.boardState.cells[pos.y]?.[pos.x];
-    if (!cell || cell.type === 'wall' || cell.type === 'obstacle') {
-      return false;
-    }
-
-    return true;
+    return isCellPassable(cell);
   }
 
   /**
@@ -352,7 +352,7 @@ export class GameRulesValidator {
     }
 
     // Пошаговая смежность: каждый шаг — на соседнюю клетку (manhattan === 1,
-    // та же метрика, что isAdjacent в adjacency.service); заодно исключает дубли позиций
+    // та же метрика, что isAdjacent в adjacency.service); заодно исключает дубли позиции
     let prev = fighter.position;
     for (const pos of path) {
       if (Math.abs(pos.x - prev.x) + Math.abs(pos.y - prev.y) !== 1) {
@@ -363,6 +363,32 @@ export class GameRulesValidator {
         };
       }
       prev = pos;
+    }
+
+    // Занятость пути (GD-015): живой враг на промежуточной клетке блокирует
+    // проход (союзник — нет), конечная клетка не может содержать никакого
+    // другого живого бойца; побеждённые бойцы никого не блокируют
+    for (const pos of path) {
+      if (pos.x === fighter.position.x && pos.y === fighter.position.y) {
+        continue;
+      }
+      if (!isTraversable(state, fighterId, pos)) {
+        return {
+          valid: false,
+          error: `Путь проходит через живого противника на клетке (${pos.x}, ${pos.y})`,
+          code: 'PATH_BLOCKED_BY_ENEMY',
+        };
+      }
+    }
+    const dest = path[path.length - 1];
+    if (dest.x !== fighter.position.x || dest.y !== fighter.position.y) {
+      if (!isFreeEndpoint(state, fighterId, dest)) {
+        return {
+          valid: false,
+          error: 'Target position is occupied',
+          code: 'POSITION_OCCUPIED',
+        };
+      }
     }
 
     return { valid: true };
@@ -409,12 +435,23 @@ export class GameRulesValidator {
       return { valid: true };
     }
 
+    // Конечная клетка не может содержать никакого другого живого бойца
+    if (!isFreeEndpoint(state, fighterId, target)) {
+      return { valid: false, error: 'Target position is occupied', code: 'POSITION_OCCUPIED' };
+    }
+
     // Проверка очков движения: цель должна быть достижима BFS по проходимым
-    // клеткам (4-связно, как isAdjacent), занятые живыми бойцами клетки блокируют путь
+    // клеткам (4-связно, как isAdjacent); живые ВРАГИ блокируют прохождение,
+    // живые союзники проходимы насквозь (GD-015), побеждённые не блокируют
     const allowance = getFighterMovement(fighter);
     const blockedPositions = new Set(
       state.fighters
-        .filter((f) => f.id !== fighterId && f.health > 0)
+        .filter(
+          (f) =>
+            f.id !== fighterId &&
+            isLivingFighter(f) &&
+            f.ownerId !== fighter.ownerId,
+        )
         .map((f) => `${f.position.x}:${f.position.y}`),
     );
     const reachable = this.adjacency.getReachableCells(

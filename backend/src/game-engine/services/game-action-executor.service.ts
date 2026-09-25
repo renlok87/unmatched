@@ -38,6 +38,7 @@ import {
 import { GameRulesValidator, bannerAllows } from '../validators/game-rules.validator';
 import { CombatResolverService } from '../engine/combat-resolver.service';
 import { MovementService } from '../engine/movement.service';
+import { isLivingFighter } from '../movement/traversal';
 import { ValueModifierService } from '../engine/value-modifier.service';
 import { AdjacencyService } from '../engine/adjacency.service';
 import { DeckManagementService } from './deck-management.service';
@@ -529,11 +530,12 @@ export class GameActionExecutorService {
       }
 
       if (pending.type === 'MOVE') {
-        // Дистанция эффекта (не movement бойца): BFS по проходимым клеткам
+        // Дистанция эффекта (не movement бойца): союзники проходимы,
+        // враги блокируют путь, занятое назначение уже проверено выше.
         const allowance = pending.value ?? 1;
         const blockedPositions = new Set(
           currentState.fighters
-            .filter((f) => f.id !== fighter.id && f.health > 0)
+            .filter((f) => f.id !== fighter.id && isLivingFighter(f) && f.ownerId !== fighter.ownerId)
             .map((f) => `${f.position.x}:${f.position.y}`),
         );
         const reachable = this.adjacencyService.getReachableCells(
@@ -880,12 +882,13 @@ export class GameActionExecutorService {
             };
           }
 
-          // Конечная клетка пути свободна (промежуточные можно проходить)
+          // Конечная клетка пути свободна от живых бойцов (промежуточные
+          // можно проходить; правила занятости — movement/traversal.ts)
           const dest = mv.path[mv.path.length - 1];
           const occupied = workState.fighters.some(
             (f) =>
               f.id !== mv.fighterId &&
-              f.health > 0 &&
+              isLivingFighter(f) &&
               f.position.x === dest.x &&
               f.position.y === dest.y,
           );

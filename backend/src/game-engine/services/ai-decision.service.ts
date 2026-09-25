@@ -205,17 +205,15 @@ export class AiDecisionService {
   }
 
   private shareZone(state: GameState, a: Fighter, b: Fighter): boolean {
-    const za = state.boardState.cells?.[a.position.y]?.[a.position.x];
-    const zb = state.boardState.cells?.[b.position.y]?.[b.position.x];
-    const zonesA = (za as any)?.zones ?? ((za as any)?.zone ? [(za as any).zone] : []);
-    const zonesB = (zb as any)?.zones ?? ((zb as any)?.zone ? [(zb as any).zone] : []);
-    return zonesA.some((z: string) => zonesB.includes(z));
+    return this.adjacency.isInSameZone(state, a.position, b.position);
   }
 
   /**
-   * Достижимая (BFS, до maxCost очков) клетка, СТРОГО ближе к врагу по манхэттену,
-   * чем текущая позиция бойца, или null. Препятствия и чужие живые бойцы блокируют
-   * путь (blockedPositions). Среди достижимых выбираем минимизирующую манхэттен.
+   * BFS-путь до maxCost очков, СТРОГО приближающий к врагу по манхэттену.
+   * Живые враги блокируют прохождение (blockedPositions), живые союзники
+   * проходимы насквозь, но путь не может ЗАКАНЧИВАТЬСЯ на занятой клетке;
+   * побеждённые бойцы никого не блокируют (GD-015). Среди достижимых
+   * выбираем свободную клетку с минимальным манхэттеном до врага.
    */
   private stepToward(
     state: GameState,
@@ -230,10 +228,14 @@ export class AiDecisionService {
   private pathToward(state: GameState, mine: Fighter, enemy: Fighter, maxCost: number): Position[] {
     if (maxCost < 1) return [];
 
+    // Прохождение блокируют только живые ВРАГИ; союзники проходимы насквозь
     const blockedPositions = new Set(
       this.living(state)
-        .filter((f) => f.id !== mine.id)
+        .filter((f) => f.id !== mine.id && f.ownerId !== mine.ownerId)
         .map((f) => `${f.position.x}:${f.position.y}`),
+    );
+    const livingPositions = new Set(
+      this.living(state).map((f) => `${f.position.x}:${f.position.y}`),
     );
 
     const queue: Array<{ position: Position; path: Position[] }> = [{ position: mine.position, path: [] }];
@@ -250,7 +252,8 @@ export class AiDecisionService {
         const path = [...current.path, cell.position];
         queue.push({ position: cell.position, path });
         const distance = this.manhattan(cell.position, enemy.position);
-        if (distance < bestDist) {
+        // Финал пути — только на свободной клетке (не на живом бойце)
+        if (distance < bestDist && !livingPositions.has(key)) {
           bestDist = distance;
           best = path;
         }

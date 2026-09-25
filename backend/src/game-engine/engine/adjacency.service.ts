@@ -204,16 +204,17 @@ export class AdjacencyService {
   }
 
   /**
-   * Проверить, находятся ли две позиции в одной зоне доски.
-   * Используется для ranged-атак: цель в той же зоне ИЛИ смежная.
+   * Проверить, пересекаются ли зоны двух клеток доски.
+   * Используется для ranged-атак: цель в пересекающейся зоне ИЛИ смежная.
    *
-   * КРИТИЧНО: на fallback-доске 20×20 (и легаси-сейвах без cells)
-   * все Cell.zone === undefined → возвращается false, ranged работает
-   * только по adjacency — регрессии относительно melee нет.
+   * Мультизонность: клетка может состоять в 1–2 зонах (Cell.zones) —
+   * сравнение ПО ПЕРЕСЕЧЕНИЮ списков; legacy-сейвы с одиночным Cell.zone
+   * покрываются fallback'ом внутри getCellZones. На доске без зон
+   * (все zones пусты) возвращается false — ranged работает только по adjacency.
    */
   isInSameZone(state: { boardState: BoardState }, a: Position, b: Position): boolean {
-    const za = state.boardState.cells[a.y]?.[a.x]?.zone;
-    const zb = state.boardState.cells[b.y]?.[b.x]?.zone;
-    return za != null && za === zb;
+    const zonesA = getCellZones(state.boardState.cells[a.y]?.[a.x]);
+    const zonesB = getCellZones(state.boardState.cells[b.y]?.[b.x]);
+    return zonesA.length > 0 && zonesA.some((z) => zonesB.includes(z));
   }
 }
