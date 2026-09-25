@@ -303,11 +303,15 @@ export const useRemoteGameStore = create<RemoteGameState>((set, get) => ({
    * Единая точка применения wire-снапшота (query/mutation/subscription).
    * Каждое событие — ПОЛНЫЙ снапшот: guard по seq + merge decks/discardPiles
    * (подписка их не несёт). Дельты/eventsSince не нужны.
+   * ACC-011 (S07): снапшот ТОГО ЖЕ seq (перестановка HTTP↔WS, барьер-дубликат,
+   * эхо подписки после ответа мутации) применяется идемпотентно — decks/
+   * discardPiles из полного источника не теряются и не «освежаются» пустыми;
+   * снапшот СТАРШЕ последнего события отбрасывается (не откатывает state).
    */
   applyWireState: (wire: WireGameState) => {
     const state = get();
-    if (wire.sequenceNumber <= state.lastSequenceNumber && state.wireState) {
-      return; // эхо подписки после ответа мутации / устаревший снапшот
+    if (wire.sequenceNumber < state.lastSequenceNumber && state.wireState) {
+      return; // устаревший снапшот после более нового события
     }
     const merged: WireGameState = {
       ...wire,

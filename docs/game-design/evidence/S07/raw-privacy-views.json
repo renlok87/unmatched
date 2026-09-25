@@ -1,0 +1,689 @@
+{
+  "note": "COMBAT_RESOLVE до reveal (защита сыграна, резолв не запущен) — production filterPrivateData",
+  "attackerView_preReveal": {
+    "gameId": "g1",
+    "sequenceNumber": 12,
+    "phase": "COMBAT_RESOLVE",
+    "turnCount": 1,
+    "currentTurnPlayerId": "a",
+    "players": [
+      {
+        "userId": "a",
+        "heroId": "a",
+        "health": 10,
+        "maxHealth": 10,
+        "fighterIds": [
+          "a"
+        ],
+        "isAlive": true
+      },
+      {
+        "userId": "b",
+        "heroId": "b",
+        "health": 10,
+        "maxHealth": 10,
+        "fighterIds": [
+          "b"
+        ],
+        "isAlive": true
+      }
+    ],
+    "fighters": [
+      {
+        "id": "fA",
+        "ownerId": "a",
+        "heroId": "ha",
+        "name": "HeroA",
+        "type": "HERO",
+        "health": 10,
+        "maxHealth": 10,
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "effects": [],
+        "hasSidekick": false,
+        "attackType": "melee"
+      },
+      {
+        "id": "fB",
+        "ownerId": "b",
+        "heroId": "hb",
+        "name": "HeroB",
+        "type": "HERO",
+        "health": 10,
+        "maxHealth": 10,
+        "position": {
+          "x": 1,
+          "y": 0
+        },
+        "effects": [],
+        "hasSidekick": false,
+        "attackType": "melee"
+      }
+    ],
+    "decks": {
+      "a": {
+        "cards": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          }
+        ],
+        "drawPile": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          },
+          {
+            "id": "hidden-1",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          }
+        ]
+      },
+      "b": {
+        "cards": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          }
+        ],
+        "drawPile": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          }
+        ]
+      }
+    },
+    "discardPiles": {
+      "a": [
+        {
+          "id": "a-old-public",
+          "cardId": "cat-old-a",
+          "name": "Old Feint",
+          "nameEn": "Old Feint",
+          "nameRu": "Старый финт",
+          "cardType": "SCHEME",
+          "effects": []
+        },
+        {
+          "id": "atk-1",
+          "cardId": "cat-atk",
+          "name": "Spike Growth",
+          "nameEn": "Spike Growth",
+          "nameRu": "Шипы",
+          "cardType": "VERSATILE",
+          "attackValue": 4,
+          "effects": [],
+          "isVisible": false
+        }
+      ],
+      "b": [
+        {
+          "id": "b-old-public",
+          "cardId": "cat-old-b",
+          "name": "Old Scheme",
+          "nameEn": "Old Scheme",
+          "nameRu": "Старый план",
+          "cardType": "SCHEME",
+          "effects": []
+        },
+        {
+          "id": "hidden-1",
+          "cardId": "hidden",
+          "name": "???",
+          "nameEn": "Hidden",
+          "nameRu": "Скрыто",
+          "cardType": "UNIVERSAL"
+        }
+      ]
+    },
+    "handZones": {
+      "a": {
+        "cards": [],
+        "maxSize": 7
+      },
+      "b": {
+        "cards": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL",
+            "isVisible": false
+          }
+        ],
+        "maxSize": 7
+      }
+    },
+    "boardState": {
+      "width": 4,
+      "height": 1,
+      "cells": [
+        [
+          {
+            "x": 0,
+            "y": 0,
+            "type": "normal"
+          },
+          {
+            "x": 1,
+            "y": 0,
+            "type": "normal"
+          },
+          {
+            "x": 2,
+            "y": 0,
+            "type": "normal"
+          },
+          {
+            "x": 3,
+            "y": 0,
+            "type": "normal"
+          }
+        ]
+      ],
+      "doors": {},
+      "fog": {},
+      "tokens": {}
+    },
+    "metadata": {
+      "lastActionAt": "2026-09-25T11:29:48.133Z",
+      "lastActionBy": "b",
+      "version": 1,
+      "actionsRemaining": 1,
+      "combatInfo": {
+        "attackerId": "fA",
+        "defenderId": "b",
+        "targetFighterId": "fB",
+        "attackerCardId": "atk-1",
+        "attackValue": 4,
+        "boostValue": 0,
+        "startedAt": "2026-09-25T11:29:48.133Z",
+        "timeoutAt": "2026-09-25T11:29:58.133Z"
+      }
+    }
+  },
+  "defenderView_preReveal": {
+    "gameId": "g1",
+    "sequenceNumber": 12,
+    "phase": "COMBAT_RESOLVE",
+    "turnCount": 1,
+    "currentTurnPlayerId": "a",
+    "players": [
+      {
+        "userId": "a",
+        "heroId": "a",
+        "health": 10,
+        "maxHealth": 10,
+        "fighterIds": [
+          "a"
+        ],
+        "isAlive": true
+      },
+      {
+        "userId": "b",
+        "heroId": "b",
+        "health": 10,
+        "maxHealth": 10,
+        "fighterIds": [
+          "b"
+        ],
+        "isAlive": true
+      }
+    ],
+    "fighters": [
+      {
+        "id": "fA",
+        "ownerId": "a",
+        "heroId": "ha",
+        "name": "HeroA",
+        "type": "HERO",
+        "health": 10,
+        "maxHealth": 10,
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "effects": [],
+        "hasSidekick": false,
+        "attackType": "melee"
+      },
+      {
+        "id": "fB",
+        "ownerId": "b",
+        "heroId": "hb",
+        "name": "HeroB",
+        "type": "HERO",
+        "health": 10,
+        "maxHealth": 10,
+        "position": {
+          "x": 1,
+          "y": 0
+        },
+        "effects": [],
+        "hasSidekick": false,
+        "attackType": "melee"
+      }
+    ],
+    "decks": {
+      "a": {
+        "cards": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          }
+        ],
+        "drawPile": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          },
+          {
+            "id": "hidden-1",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          }
+        ]
+      },
+      "b": {
+        "cards": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          }
+        ],
+        "drawPile": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          }
+        ]
+      }
+    },
+    "discardPiles": {
+      "a": [
+        {
+          "id": "a-old-public",
+          "cardId": "cat-old-a",
+          "name": "Old Feint",
+          "nameEn": "Old Feint",
+          "nameRu": "Старый финт",
+          "cardType": "SCHEME",
+          "effects": []
+        },
+        {
+          "id": "hidden-1",
+          "cardId": "hidden",
+          "name": "???",
+          "nameEn": "Hidden",
+          "nameRu": "Скрыто",
+          "cardType": "UNIVERSAL"
+        }
+      ],
+      "b": [
+        {
+          "id": "b-old-public",
+          "cardId": "cat-old-b",
+          "name": "Old Scheme",
+          "nameEn": "Old Scheme",
+          "nameRu": "Старый план",
+          "cardType": "SCHEME",
+          "effects": []
+        },
+        {
+          "id": "def-1",
+          "cardId": "cat-def",
+          "name": "Shadow Slip",
+          "nameEn": "Shadow Slip",
+          "nameRu": "Тень",
+          "cardType": "VERSATILE",
+          "defenseValue": 2,
+          "effects": [],
+          "isVisible": false
+        }
+      ]
+    },
+    "handZones": {
+      "a": {
+        "cards": [],
+        "maxSize": 7
+      },
+      "b": {
+        "cards": [
+          {
+            "id": "b-secret-1",
+            "cardId": "cat-scheme",
+            "name": "Secret Scheme",
+            "nameEn": "Secret Scheme",
+            "nameRu": "Секрет",
+            "cardType": "SCHEME",
+            "effects": [],
+            "isVisible": true
+          }
+        ],
+        "maxSize": 7
+      }
+    },
+    "boardState": {
+      "width": 4,
+      "height": 1,
+      "cells": [
+        [
+          {
+            "x": 0,
+            "y": 0,
+            "type": "normal"
+          },
+          {
+            "x": 1,
+            "y": 0,
+            "type": "normal"
+          },
+          {
+            "x": 2,
+            "y": 0,
+            "type": "normal"
+          },
+          {
+            "x": 3,
+            "y": 0,
+            "type": "normal"
+          }
+        ]
+      ],
+      "doors": {},
+      "fog": {},
+      "tokens": {}
+    },
+    "metadata": {
+      "lastActionAt": "2026-09-25T11:29:48.133Z",
+      "lastActionBy": "b",
+      "version": 1,
+      "actionsRemaining": 1,
+      "combatInfo": {
+        "attackerId": "fA",
+        "defenderId": "b",
+        "targetFighterId": "fB",
+        "defenseValue": 2,
+        "startedAt": "2026-09-25T11:29:48.133Z",
+        "timeoutAt": "2026-09-25T11:29:58.133Z",
+        "defenderCardId": "def-1"
+      }
+    }
+  },
+  "attackerView_postReveal": {
+    "gameId": "g1",
+    "sequenceNumber": 12,
+    "phase": "COMBAT_RESOLVE",
+    "turnCount": 1,
+    "currentTurnPlayerId": "a",
+    "players": [
+      {
+        "userId": "a",
+        "heroId": "a",
+        "health": 10,
+        "maxHealth": 10,
+        "fighterIds": [
+          "a"
+        ],
+        "isAlive": true
+      },
+      {
+        "userId": "b",
+        "heroId": "b",
+        "health": 10,
+        "maxHealth": 10,
+        "fighterIds": [
+          "b"
+        ],
+        "isAlive": true
+      }
+    ],
+    "fighters": [
+      {
+        "id": "fA",
+        "ownerId": "a",
+        "heroId": "ha",
+        "name": "HeroA",
+        "type": "HERO",
+        "health": 10,
+        "maxHealth": 10,
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "effects": [],
+        "hasSidekick": false,
+        "attackType": "melee"
+      },
+      {
+        "id": "fB",
+        "ownerId": "b",
+        "heroId": "hb",
+        "name": "HeroB",
+        "type": "HERO",
+        "health": 10,
+        "maxHealth": 10,
+        "position": {
+          "x": 1,
+          "y": 0
+        },
+        "effects": [],
+        "hasSidekick": false,
+        "attackType": "melee"
+      }
+    ],
+    "decks": {
+      "a": {
+        "cards": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          }
+        ],
+        "drawPile": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          },
+          {
+            "id": "hidden-1",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          }
+        ]
+      },
+      "b": {
+        "cards": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          }
+        ],
+        "drawPile": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL"
+          }
+        ]
+      }
+    },
+    "discardPiles": {
+      "a": [
+        {
+          "id": "a-old-public",
+          "cardId": "cat-old-a",
+          "name": "Old Feint",
+          "nameEn": "Old Feint",
+          "nameRu": "Старый финт",
+          "cardType": "SCHEME",
+          "effects": []
+        },
+        {
+          "id": "atk-1",
+          "cardId": "cat-atk",
+          "name": "Spike Growth",
+          "nameEn": "Spike Growth",
+          "nameRu": "Шипы",
+          "cardType": "VERSATILE",
+          "attackValue": 4,
+          "effects": [],
+          "isVisible": false
+        }
+      ],
+      "b": [
+        {
+          "id": "b-old-public",
+          "cardId": "cat-old-b",
+          "name": "Old Scheme",
+          "nameEn": "Old Scheme",
+          "nameRu": "Старый план",
+          "cardType": "SCHEME",
+          "effects": []
+        },
+        {
+          "id": "def-1",
+          "cardId": "cat-def",
+          "name": "Shadow Slip",
+          "nameEn": "Shadow Slip",
+          "nameRu": "Тень",
+          "cardType": "VERSATILE",
+          "defenseValue": 2,
+          "effects": [],
+          "isVisible": false
+        }
+      ]
+    },
+    "handZones": {
+      "a": {
+        "cards": [],
+        "maxSize": 7
+      },
+      "b": {
+        "cards": [
+          {
+            "id": "hidden-0",
+            "cardId": "hidden",
+            "name": "???",
+            "nameEn": "Hidden",
+            "nameRu": "Скрыто",
+            "cardType": "UNIVERSAL",
+            "isVisible": false
+          }
+        ],
+        "maxSize": 7
+      }
+    },
+    "boardState": {
+      "width": 4,
+      "height": 1,
+      "cells": [
+        [
+          {
+            "x": 0,
+            "y": 0,
+            "type": "normal"
+          },
+          {
+            "x": 1,
+            "y": 0,
+            "type": "normal"
+          },
+          {
+            "x": 2,
+            "y": 0,
+            "type": "normal"
+          },
+          {
+            "x": 3,
+            "y": 0,
+            "type": "normal"
+          }
+        ]
+      ],
+      "doors": {},
+      "fog": {},
+      "tokens": {}
+    },
+    "metadata": {
+      "lastActionAt": "2026-09-25T11:29:48.133Z",
+      "lastActionBy": "b",
+      "version": 1,
+      "actionsRemaining": 1,
+      "combatInfo": {
+        "attackerId": "fA",
+        "defenderId": "b",
+        "targetFighterId": "fB",
+        "attackerCardId": "atk-1",
+        "attackValue": 4,
+        "boostValue": 0,
+        "defenseValue": 2,
+        "startedAt": "2026-09-25T11:29:48.133Z",
+        "timeoutAt": "2026-09-25T11:29:58.133Z",
+        "defenderCardId": "def-1"
+      }
+    }
+  }
+}

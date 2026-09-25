@@ -12,8 +12,8 @@
  * виснет навсегда, не доставляя ни одного события.
  */
 
-import { Resolver, Args, Subscription } from '@nestjs/graphql';
-import { ForbiddenException, UseGuards } from '@nestjs/common';
+import { Resolver, Args, Subscription, Context } from '@nestjs/graphql';
+import { ForbiddenException, Logger, NotFoundException, UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../../auth/guards/gql-auth.guard';
 import { GameSubscriptionService, GamePubSubEvent } from '../game-subscription.service';
 import { GameStateService, GameState } from '../game-state.service';
@@ -126,6 +126,8 @@ const resolveTurnStateFn =
 
 @Resolver(() => GameStateGQL)
 export class GameSubscriptionResolver {
+  private readonly logger = new Logger(GameSubscriptionResolver.name);
+
   private resolveGameState!: (
     value: GameEventPayload | null,
     args: any,
@@ -148,6 +150,122 @@ export class GameSubscriptionResolver {
   }
 
   /**
+   * GD-025/ACC-009: гейт участия — неучастник (spectator) не получает
+   * НИКАКОГО игрового состояния, включая события.
+   */
+  private async requireParticipant(gameId: string, context: any): Promise<string> {
+    const userId = this.getUserId(context);
+    if (!(await this.gameStateService.isParticipant(gameId, userId))) {
+      throw new ForbiddenException('Not a game participant');
+    }
+    return userId;
+  }
+
+  /**
+   * GD-027 (ACC-011/012): connection barrier. Подписка на gameStateUpdated
+   * стартует с текущим снапшотом состояния: окно между HTTP-запросом
+   * gameState и установкой WS-подписки закрывается сервером — событие,
+   * произошедшее «между», придёт либо барьер-снапшотом (уже с новым seq),
+   * либо live-событием после него. Дубликат невозможен: клиент применяет
+   * снапшоты строго по возрастанию sequenceNumber.
+   */
+  // PubSubAsyncIterableIterator подписывается лениво (subscribeAll на первом
+  // next()) — события, опубликованные ДО первого next(), терялись бы. Поэтому
+  // upstream.next() дёргается ДО await loadState: подписка регистрируется
+  // немедленно, а барьер-снапшот строится параллельно.
+  //
+  // Реализация — ручной async iterator (НЕ async generator): генератор,
+  // зависший в await firstUpstream, не входит в finally до settlement
+  // in-flight next(), а PubSub-итератор не отменяет его при return() —
+  // ранняя отписка при тишине держала бы underlying-подписку до первого
+  // события. Здесь ожидание firstUpstream гонкуется с сигналом отписки:
+  // return() немедленно отпускает upstream и завершает ожидающий next().
+  private withSnapshotBarrier(
+    gameId: string,
+    since: number | null | undefined,
+    upstream: AsyncIterableIterator<GamePubSubEvent>,
+  ): AsyncIterableIterator<GamePubSubEvent> {
+    const DONE: IteratorResult<GamePubSubEvent> = { done: true, value: undefined };
+    let returned = false;
+    let releaseReturnWaiter: ((value: 'returned') => void) | undefined;
+    // Резолвится ровно один раз — первым return()/throw(); ждущий firstUpstream
+    // next() видит его в Promise.race и завершается done без ожидания PubSub.
+    const returnWaiter = new Promise<'returned'>((resolve) => {
+      releaseReturnWaiter = resolve;
+    });
+    let firstUpstreamStarted = false;
+
+    const iterator: AsyncIterableIterator<GamePubSubEvent> = {
+      [Symbol.asyncIterator]: () => iterator,
+      next: async (): Promise<IteratorResult<GamePubSubEvent>> => {
+        if (returned) return DONE;
+        if (!firstUpstreamStarted) {
+          firstUpstreamStarted = true;
+          // Регистрирует PubSub-подписку немедленно (см. комментарий выше).
+          const firstUpstream = upstream.next();
+          // Гонка не отменяет сам firstUpstream — глушим возможный поздний
+          // отказ, чтобы не получить unhandled rejection.
+          firstUpstream.catch(() => undefined);
+          let state: GameState | null = null;
+          try {
+            state = await this.gameStateService.loadState(gameId);
+          } catch (e) {
+            if (e instanceof NotFoundException) {
+              // Лобби-фаза: состояние ещё не создано — отдаём только live-события
+              this.logger.debug(`Barrier snapshot skipped (lobby phase) for ${gameId}`);
+            } else {
+              // Genuine outage (DB/Redis): логируем и пробрасываем — молчаливый
+              // live-only поток лгал бы клиенту о свежести состояния.
+              this.logger.error(`Barrier snapshot failed for ${gameId}: ${e}`);
+              await upstream.return?.().catch(() => undefined);
+              throw e;
+            }
+          }
+          if (state && (since == null || state.sequenceNumber > since)) {
+            return {
+              done: false,
+              value: {
+                gameId,
+                sequenceNumber: state.sequenceNumber,
+                timestamp: Date.now(),
+                eventType: 'STATE_UPDATED',
+                payload: state,
+              },
+            };
+          }
+          if (returned) return DONE;
+          const first = await Promise.race([firstUpstream, returnWaiter]);
+          if (first === 'returned') return DONE;
+          return first.done ? DONE : { done: false, value: first.value };
+        }
+        const next = await upstream.next();
+        return next.done ? DONE : { done: false, value: next.value };
+      },
+      return: async (value?: any): Promise<IteratorResult<GamePubSubEvent>> => {
+        returned = true;
+        releaseReturnWaiter?.('returned');
+        try {
+          await upstream.return?.();
+        } catch (e) {
+          this.logger.warn(`Barrier upstream unsubscribe failed for ${gameId}: ${e}`);
+        }
+        return { done: true, value };
+      },
+      throw: async (error?: any): Promise<IteratorResult<GamePubSubEvent>> => {
+        returned = true;
+        releaseReturnWaiter?.('returned');
+        try {
+          await upstream.throw?.(error);
+        } catch {
+          // upstream сам обработал/не имеет throw — подписка уже снята
+        }
+        return DONE;
+      },
+    };
+    return iterator;
+  }
+
+  /**
    * Подписка на обновления состояния игры
    * Поддерживает since параметр для реконнекта
    *
@@ -155,6 +273,7 @@ export class GameSubscriptionResolver {
    * 'STATE_UPDATED' из saveState и специфичный eventType из executeMutation;
    * фильтр даёт ровно одно срабатывание на мутацию.
    * Проверка since — тоже в filter (resolve с null упал бы на non-nullable типе).
+   * since НЕ обещает replay пропущенных событий: фильтруются только future.
    */
   @Subscription(() => GameStateGQL, {
     name: 'gameStateUpdated',
@@ -171,14 +290,17 @@ export class GameSubscriptionResolver {
     },
   })
   @UseGuards(GqlAuthGuard)
-  gameStateUpdated(
+  async gameStateUpdated(
     @Args('gameId') gameId: string,
     @Args('since', { nullable: true }) since?: number,
     // userId оставлен в сигнатуре для совместимости схемы, но ИГНОРИРУЕТСЯ:
     // фильтрация приватных данных идёт по context.req.user.id (JWT)
     @Args('userId', { nullable: true }) userId?: string,
-  ): AsyncIterableIterator<GamePubSubEvent> {
-    return this.subscriptionService.asyncIteratorForGame(gameId);
+    @Context() context?: any,
+  ): Promise<AsyncIterableIterator<GamePubSubEvent>> {
+    await this.requireParticipant(gameId, context);
+    const upstream = this.subscriptionService.asyncIteratorForGame(gameId);
+    return this.withSnapshotBarrier(gameId, since, upstream);
   }
 
   /**
@@ -197,7 +319,11 @@ export class GameSubscriptionResolver {
     },
   })
   @UseGuards(GqlAuthGuard)
-  attackInitiated(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+  async attackInitiated(
+    @Args('gameId') gameId: string,
+    @Context() context: any,
+  ): Promise<AsyncIterableIterator<GamePubSubEvent>> {
+    await this.requireParticipant(gameId, context);
     return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
@@ -217,7 +343,11 @@ export class GameSubscriptionResolver {
     },
   })
   @UseGuards(GqlAuthGuard)
-  defensePlayed(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+  async defensePlayed(
+    @Args('gameId') gameId: string,
+    @Context() context: any,
+  ): Promise<AsyncIterableIterator<GamePubSubEvent>> {
+    await this.requireParticipant(gameId, context);
     return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
@@ -237,7 +367,11 @@ export class GameSubscriptionResolver {
     },
   })
   @UseGuards(GqlAuthGuard)
-  combatResolved(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+  async combatResolved(
+    @Args('gameId') gameId: string,
+    @Context() context: any,
+  ): Promise<AsyncIterableIterator<GamePubSubEvent>> {
+    await this.requireParticipant(gameId, context);
     return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
@@ -261,7 +395,11 @@ export class GameSubscriptionResolver {
     },
   })
   @UseGuards(GqlAuthGuard)
-  turnChanged(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+  async turnChanged(
+    @Args('gameId') gameId: string,
+    @Context() context: any,
+  ): Promise<AsyncIterableIterator<GamePubSubEvent>> {
+    await this.requireParticipant(gameId, context);
     return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
@@ -283,7 +421,11 @@ export class GameSubscriptionResolver {
     },
   })
   @UseGuards(GqlAuthGuard)
-  playerJoined(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+  async playerJoined(
+    @Args('gameId') gameId: string,
+    @Context() context: any,
+  ): Promise<AsyncIterableIterator<GamePubSubEvent>> {
+    await this.requireParticipant(gameId, context);
     return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
@@ -302,7 +444,11 @@ export class GameSubscriptionResolver {
     },
   })
   @UseGuards(GqlAuthGuard)
-  playerLeft(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+  async playerLeft(
+    @Args('gameId') gameId: string,
+    @Context() context: any,
+  ): Promise<AsyncIterableIterator<GamePubSubEvent>> {
+    await this.requireParticipant(gameId, context);
     return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 
@@ -321,7 +467,11 @@ export class GameSubscriptionResolver {
     },
   })
   @UseGuards(GqlAuthGuard)
-  gameEnded(@Args('gameId') gameId: string): AsyncIterableIterator<GamePubSubEvent> {
+  async gameEnded(
+    @Args('gameId') gameId: string,
+    @Context() context: any,
+  ): Promise<AsyncIterableIterator<GamePubSubEvent>> {
+    await this.requireParticipant(gameId, context);
     return this.subscriptionService.asyncIteratorForGame(gameId);
   }
 

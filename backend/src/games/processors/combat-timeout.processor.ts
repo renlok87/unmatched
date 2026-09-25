@@ -8,24 +8,13 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { CombatTimeoutService } from '../services/combat-timeout.service';
+import {
+  CombatTimeoutService,
+  type AutoResolveJobData,
+  type AutoResolveResult,
+} from '../services/combat-timeout.service';
 
-/**
- * Данные для задачи auto-resolve
- */
-export interface AutoResolveJobData {
-  gameId: string;
-  attackSequenceNumber: number;
-}
-
-/**
- * Результат auto-resolve
- */
-export interface AutoResolveResult {
-  success: boolean;
-  resolvedSequenceNumber: number;
-  reason: string;
-}
+export type { AutoResolveJobData, AutoResolveResult };
 
 /**
  * Processor для очереди combat-timeout
@@ -51,6 +40,7 @@ export class CombatTimeoutProcessor extends WorkerHost {
       const result = await this.combatTimeoutService.processAutoResolve({
         gameId,
         attackSequenceNumber,
+        stage: (job.data as AutoResolveJobData).stage ?? 'DEFENSE',
       });
 
       this.logger.debug(`Auto-resolve completed for game ${gameId}: ${result.reason}`);

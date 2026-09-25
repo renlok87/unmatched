@@ -11,6 +11,15 @@ import type { BoardState } from './board.model';
 import type { CombatResolutionProgress } from '../engine/combat-progress';
 
 /**
+ * GD-026: серверные дедлайны боя (секунды). Единственный источник значений
+ * для executor'а (combatInfo.timeoutAt), планировщика BullMQ и recovery.
+ * timeoutAt в combatInfo — дедлайн ТЕКУЩЕЙ стадии: COMBAT = окно защиты,
+ * COMBAT_RESOLVE = окно ручного резолва после защиты.
+ */
+export const DEFENSE_TIMEOUT_SECONDS = 30;
+export const RESOLVE_TIMEOUT_SECONDS = 10;
+
+/**
  * Фазы игры
  */
 export enum GamePhase {

@@ -173,7 +173,7 @@ describe('S05 rulebook p.12-13: карточный BOOST — выбор ПОСЛ
     expect(afterAttack.handZones.a.cards.map((c) => c.id)).toContain('boost::0');
     expect(afterAttack.metadata.combatInfo!.cardBoostCardId).toBeUndefined();
 
-    const resolved = await executor.executeResolveCombat({ gameId: 's05b' } as any, ctx(afterAttack, 'a'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05b' } as any, ctx(afterAttack, 'b'));
     expect(resolved.success).toBe(true);
     const pending = head(resolved.gameState!);
     expect(pending.type).toBe('BOOST_CHOICE');
@@ -195,7 +195,7 @@ describe('S05 rulebook p.12-13: карточный BOOST — выбор ПОСЛ
   it('decline: урон от печатного значения, карта-буст остаётся в руке', async () => {
     const state = boostState([arthurCard('Noble Sacrifice'), filler('boost::0', 4)]);
     const afterAttack = await attackResolve(state.handZones.a.cards[0].id, state);
-    const resolved = await executor.executeResolveCombat({ gameId: 's05b' } as any, ctx(afterAttack, 'a'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05b' } as any, ctx(afterAttack, 'b'));
     const pending = head(resolved.gameState!);
     expect(pending.type).toBe('BOOST_CHOICE');
 
@@ -322,7 +322,7 @@ describe('S05 rulebook p.12-13: карточный BOOST — выбор ПОСЛ
   it('negative: чужой игрок / карта не из руки / не голова очереди / replay — атомарные отказы', async () => {
     const state = boostState([arthurCard('Noble Sacrifice'), filler('boost::0', 4), filler('other::0', 1)]);
     const afterAttack = await attackResolve(state.handZones.a.cards[0].id, state);
-    const resolved = await executor.executeResolveCombat({ gameId: 's05b' } as any, ctx(afterAttack, 'a'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05b' } as any, ctx(afterAttack, 'b'));
     const pending = head(resolved.gameState!);
 
     // чужой игрок не резолвит чужой выбор
@@ -365,7 +365,7 @@ describe('S05 rulebook p.12-13: карточный BOOST — выбор ПОСЛ
     // в сбросе атакатора только атакующая карта — второй карты НЕ ЗАЯВЛЕНО
     expect(afterAttack.discardPiles.a).toHaveLength(1);
 
-    const resolved = await executor.executeResolveCombat({ gameId: 's05b' } as any, ctx(afterAttack, 'a'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05b' } as any, ctx(afterAttack, 'b'));
     const pending = head(resolved.gameState!);
     // pending не содержит содержимого руки атакующего
     expect(JSON.stringify(pending)).not.toContain('boost::0');
@@ -382,7 +382,7 @@ describe('S05 rulebook p.12-13: карточный BOOST — выбор ПОСЛ
   it('serialization: пауза BOOST_CHOICE переживает serialize/deserialize и дорешивает бой', async () => {
     const state = boostState([arthurCard('Noble Sacrifice'), filler('boost::0', 4)]);
     const afterAttack = await attackResolve(state.handZones.a.cards[0].id, state);
-    const resolved = await executor.executeResolveCombat({ gameId: 's05b' } as any, ctx(afterAttack, 'a'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05b' } as any, ctx(afterAttack, 'b'));
     const pending = head(resolved.gameState!);
     expect(pending.type).toBe('BOOST_CHOICE');
 
@@ -423,7 +423,7 @@ describe('S05 rulebook p.12-13: карточный BOOST — выбор ПОСЛ
     // optional → decide() возвращает declinePending (карту не тратим)
     const wonState = boostState([arthurCard('Noble Sacrifice'), strong]);
     const afterAttack2 = await attackResolve(wonState.handZones.a.cards[0].id, wonState);
-    const resolved2 = await executor.executeResolveCombat({ gameId: 's05b' } as any, ctx(afterAttack2, 'a'));
+    const resolved2 = await executor.executeResolveCombat({ gameId: 's05b' } as any, ctx(afterAttack2, 'b'));
     const pending2 = head(resolved2.gameState!);
     expect(ai.decide(resolved2.gameState!, 'a')).toEqual({ kind: 'declinePending', effectId: pending2.id });
     // optional → decide() сам возвращает declinePending
@@ -461,7 +461,7 @@ describe('S05: Second Shot (Medusa) — тот же тайминг через р
     const attack = await executor.executeAttack(
       { gameId: 's05sm', attackerId: 'medusa', targetId: 'bhero', cardId: 'shot::0' } as any, ctx(state, 'm'));
     expect(attack.success).toBe(true);
-    const resolved = await executor.executeResolveCombat({ gameId: 's05sm' } as any, ctx(attack.gameState!, 'm'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05sm' } as any, ctx(attack.gameState!, 'b'));
     const pending = head(resolved.gameState!);
     expect(pending.type).toBe('BOOST_CHOICE');
     expect(pending.playerId).toBe('m');

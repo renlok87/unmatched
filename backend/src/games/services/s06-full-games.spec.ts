@@ -349,8 +349,9 @@ export async function runFullGame(opts: {
           }
         }
         lastAction = 'resolveCombat';
-        await exec(attacker, 'resolveCombat', () => executor.executeResolveCombat(
-          { gameId: 'g1' }, { userId: attacker, gameId: 'g1', currentState: state } as any));
+        // S07-контракт: резолв из COMBAT стартует ЗАЩИТНИК (пас «Без защиты»)
+        await exec(defender, 'resolveCombat', () => executor.executeResolveCombat(
+          { gameId: 'g1' }, { userId: defender, gameId: 'g1', currentState: state } as any));
         continue;
       }
 

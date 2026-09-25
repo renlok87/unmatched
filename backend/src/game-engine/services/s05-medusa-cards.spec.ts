@@ -280,7 +280,7 @@ describe('GD-020: The Hounds of Mighty Zeus (VERSATILE x2)', () => {
       { gameId: 's05m', attackerId: 'harpy1', targetId: 'bhero', cardId: 'hounds::0' } as any, ctx(state));
     expect(attack.success).toBe(true);
     // у защитника пустая рука — защита невозможна; резолвим бой напрямую
-    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'm'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'b'));
     expect(resolved.success).toBe(true);
     const after = resolved.gameState!;
     const moves = (after.metadata.pendingEffects ?? []).filter((p) => p.type === 'MOVE');
@@ -299,7 +299,7 @@ describe('GD-020: The Hounds of Mighty Zeus (VERSATILE x2)', () => {
     const attack = await executor.executeAttack(
       { gameId: 's05m', attackerId: 'harpy1', targetId: 'bhero', cardId: 'hounds::0' } as any, ctx(fewer));
     expect(attack.success).toBe(true);
-    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'm'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'b'));
     const moves = (resolved.gameState!.metadata.pendingEffects ?? []).filter((p) => p.type === 'MOVE');
     expect(moves.map((p) => p.fighterIds![0])).toEqual(['harpy1']);
   });
@@ -312,7 +312,7 @@ describe('GD-020: Gaze of Stone / Second Shot / Feint (combat cards)', () => {
       { gameId: 's05m', attackerId: 'medusa', targetId: 'bhero', cardId: 'gaze::0' } as any, ctx(state));
     expect(attack.success).toBe(true);
     // защита не сыграна (пустая рука b) → резолв: attack 2 vs defense 0 → победа
-    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'm'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'b'));
     expect(resolved.success).toBe(true);
     const bhero = resolved.gameState!.fighters.find((f) => f.id === 'bhero')!;
     // 12 - (2-0 боевой урон) - 8 (Gaze) = 2
@@ -358,7 +358,7 @@ describe('GD-020: Gaze of Stone / Second Shot / Feint (combat cards)', () => {
     expect(afterAttack.metadata.combatInfo!.boostValue ?? 0).toBe(0);
 
     // резолв: reveal прошёл → DURING_COMBAT создаёт BOOST_CHOICE и ПАУЗИТ бой
-    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(afterAttack));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(afterAttack, 'b'));
     expect(resolved.success).toBe(true);
     const pending = head(resolved.gameState!);
     expect(pending.type).toBe('BOOST_CHOICE');
@@ -384,7 +384,7 @@ describe('GD-020: Gaze of Stone / Second Shot / Feint (combat cards)', () => {
     ]);
     const attack = await executor.executeAttack(
       { gameId: 's05m', attackerId: 'medusa', targetId: 'bhero', cardId: 'shot::0' } as any, ctx(hand));
-    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'b'));
     const pending = head(resolved.gameState!);
     expect(pending.type).toBe('BOOST_CHOICE');
     const declined = await executor.executeDeclinePendingEffect(
@@ -445,7 +445,7 @@ describe('GD-020: Dash / Regroup / Snipe — real combat execution', () => {
     const attack = await executor.executeAttack(
       { gameId: 's05m', attackerId: 'medusa', targetId: 'bhero', cardId: 'dash::0' } as any, ctx(state));
     expect(attack.success).toBe(true);
-    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'm'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'b'));
     expect(resolved.success).toBe(true);
     const pending = head(resolved.gameState!);
     // «Move your fighter up to 3 spaces.» — optional («You may»-семантика текста Dash)
@@ -469,7 +469,7 @@ describe('GD-020: Dash / Regroup / Snipe — real combat execution', () => {
     const state = inHand(medusaState(), { ...medusaCard('Dash'), id: 'dash::0' });
     const attack = await executor.executeAttack(
       { gameId: 's05m', attackerId: 'medusa', targetId: 'bhero', cardId: 'dash::0' } as any, ctx(state));
-    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'm'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'b'));
     const declined = await executor.executeDeclinePendingEffect(
       { gameId: 's05m', effectId: head(resolved.gameState!).id }, ctx(resolved.gameState!));
     expect(declined.success).toBe(true);
@@ -483,7 +483,7 @@ describe('GD-020: Dash / Regroup / Snipe — real combat execution', () => {
     const state = withDraw(inHand(medusaState(), { ...medusaCard('Regroup'), id: 'regroup::0' }), [d1, d2]);
     const attack = await executor.executeAttack(
       { gameId: 's05m', attackerId: 'medusa', targetId: 'bhero', cardId: 'regroup::0' } as any, ctx(state));
-    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'm'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'b'));
     expect(resolved.success).toBe(true);
     // attack 1 vs defense 0 → 1 damage → WON; «If you won the combat, draw 2»
     expect(resolved.gameState!.fighters.find((f) => f.id === 'bhero')!.health).toBe(11);
@@ -513,7 +513,7 @@ describe('GD-020: Dash / Regroup / Snipe — real combat execution', () => {
     const state = withDraw(inHand(medusaState(), { ...medusaCard('Snipe'), id: 'snipe::0' }), [d1]);
     const attack = await executor.executeAttack(
       { gameId: 's05m', attackerId: 'medusa', targetId: 'bhero', cardId: 'snipe::0' } as any, ctx(state));
-    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'm'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'b'));
     expect(resolved.success).toBe(true);
     expect(resolved.gameState!.handZones.m.cards.map((c) => c.id)).toEqual(['draw1::0']);
     expect(resolved.gameState!.decks.m.drawPile).toHaveLength(0);
@@ -629,7 +629,7 @@ describe('GD-020: Hiss and Slither / Clutching Claws — opponent-CHOICE discard
     const attack = await executor.executeAttack(
       { gameId: 's05m', attackerId: 'harpy1', targetId: 'bhero', cardId: 'claw::0' } as any, ctx(state));
     expect(attack.success).toBe(true);
-    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'm'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's05m' } as any, ctx(attack.gameState!, 'b'));
     expect(resolved.success).toBe(true);
     const pending = head(resolved.gameState!);
     expect(pending.type).toBe('DISCARD_CARDS');

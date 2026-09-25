@@ -909,8 +909,10 @@ describe('GameStateService', () => {
       expect(defenderView.metadata.combatInfo!.boostValue).toBeUndefined();
       expect(defenderView.metadata.combatInfo!.cardBoostCardId).toBeUndefined();
       expect(defenderView.metadata.combatInfo!.abilityBoostCardId).toBeUndefined();
-      // печатное значение и участники боя видны обоим
-      expect(defenderView.metadata.combatInfo!.attackValue).toBe(3);
+      // GD-025 (S07): до reveal значение и личина атакующей карты скрыты
+      // от защитника; участники боя видны обоим
+      expect(defenderView.metadata.combatInfo!.attackValue).toBeUndefined();
+      expect(defenderView.metadata.combatInfo!.attackerCardId).toBeUndefined();
       expect(defenderView.metadata.combatInfo!.attackerId).toBe('fighter1');
       // входное состояние не мутировано
       expect(withBoost.metadata.combatInfo!.boostValue).toBe(3);

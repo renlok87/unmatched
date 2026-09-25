@@ -1,0 +1,18 @@
+{
+  "note": "gameStateUpdated: первое событие = барьер-снапшот (STATE_UPDATED); затем live-события мутаций",
+  "barrierSnapshot": {
+    "gameId": "g1",
+    "sequenceNumber": 10,
+    "timestamp": 0,
+    "eventType": "STATE_UPDATED",
+    "payload": "(тот же viewer-projected state, что и query gameState)"
+  },
+  "liveEvent_example": {
+    "gameId": "g1",
+    "sequenceNumber": 11,
+    "timestamp": 0,
+    "eventType": "STATE_UPDATED",
+    "payload": "(viewer-projected state seq 11)"
+  },
+  "filter": "gameId === variables.gameId && eventType === STATE_UPDATED && (since == null || sequenceNumber > since)"
+}

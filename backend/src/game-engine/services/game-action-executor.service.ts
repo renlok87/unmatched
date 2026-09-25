@@ -21,6 +21,8 @@ import {
   FighterType,
   createEmptyBoardState,
   ACTIONS_PER_TURN,
+  DEFENSE_TIMEOUT_SECONDS,
+  RESOLVE_TIMEOUT_SECONDS,
   getActionsRemaining,
   getFighterAttackType,
 } from '../models';
@@ -97,6 +99,9 @@ export interface ActionContext {
   readonly userId: string;
   readonly gameId: string;
   readonly currentState: GameState;
+  /** GD-026: системный вызов (серверный таймаут боя) — обходит запрет
+   *  раннего резолва, но требует истёкшего combatInfo.timeoutAt. */
+  readonly systemInitiator?: boolean;
 }
 
 /**
@@ -778,6 +783,152 @@ export class GameActionExecutorService {
         effectText: pending.text,
       },
     };
+  }
+
+  /**
+   * GD-026: детерминированный легальный DTO для обязательного выбора, когда
+   * владелец офлайн и истёк дедлайн стадии. Только данные для
+   * executeResolvePendingEffect — применение идёт ПРОИЗВОДСТВЕННЫМ
+   * резолвером (никаких собственных эффектов). null = безопасного
+   * авто-резолва нет (выбор остаётся за игроком).
+   *
+   * Политика по типам (детерминизм и приватность):
+   * - CHOOSE_ONE → optionIndex 0 (первая опция);
+   * - TARGET_FIGHTER → первый живой боец из допустимых целей (порядок
+   *   targetFighterIds, иначе порядок fighters);
+   * - DISCARD_CARDS → первые value карт руки владельца в хранимом порядке
+   *   (сброс публичен по правилам, порядок колоды не раскрывается);
+   * - DECK_TOP_PICK PICK → первые value из revealedCards (порядок reveal);
+   *   ORDER → тождественная перестановка (порядок колоды не меняется и
+   *   не раскрывается);
+   * - MOVE → нулевой шаг (остаться на месте — легальный резолв «up to N»);
+   * - PLACE / CHOOSE_SPACE → первая свободная проходимая клетка в
+   *   row-major-порядке, удовлетворяющая зонным/смежным ограничениям
+   *   (занятая доска без легальной клетки → null);
+   * - BOOST_CHOICE mandatory → null: выбор карты из руки за игрока
+   *   небезопасен (боевые решения не делаются сервером сверх правил).
+   */
+  async buildSystemPendingFallback(
+    pending: PendingEffect,
+    state: GameState,
+  ): Promise<{
+    fighterId?: string;
+    x?: number;
+    y?: number;
+    optionIndex?: number;
+    cardIds?: string[];
+  } | null> {
+    switch (pending.type) {
+      case 'CHOOSE_ONE': {
+        if (!(pending.options?.length)) return null;
+        return { optionIndex: 0 };
+      }
+      case 'TARGET_FIGHTER': {
+        const candidates = pending.targetFighterIds
+          ? state.fighters.filter((f) => pending.targetFighterIds!.includes(f.id))
+          : [...state.fighters];
+        const target = candidates.find((f) => isLivingFighter(f));
+        return target ? { fighterId: target.id } : null;
+      }
+      case 'DISCARD_CARDS': {
+        const need = pending.value ?? 1;
+        const hand = state.handZones[pending.playerId]?.cards ?? [];
+        if (hand.length < need) return null;
+        return { cardIds: hand.slice(0, need).map((c) => c.id) };
+      }
+      case 'BOOST_CHOICE': {
+        return null;
+      }
+      case 'DECK_TOP_PICK': {
+        const revealed = pending.revealedCards ?? [];
+        if ((pending.mode ?? 'PICK') === 'PICK') {
+          const need = pending.value ?? 2;
+          if (revealed.length < need) return null;
+          return { cardIds: revealed.slice(0, need).map((c) => c.id) };
+        }
+        return { cardIds: revealed.map((c) => c.id) };
+      }
+      case 'CHOOSE_SPACE': {
+        if (pending.stage !== 2) {
+          const anchor = state.fighters.find((f) =>
+            fighterNameMatches(f.name, pending.zoneFighterName ?? ''),
+          );
+          if (!anchor) return null;
+          const cell = await this.firstFreePassableCell(state, (pos) =>
+            this.adjacencyService.isInSameZone(state, anchor.position, pos),
+          );
+          return cell ? { x: cell.x, y: cell.y } : null;
+        }
+        const anchor = pending.anchor!;
+        const cell = await this.firstFreePassableCell(state, (pos) =>
+          this.adjacencyService.isAdjacent(state, anchor, pos),
+        );
+        return cell ? { x: cell.x, y: cell.y } : null;
+      }
+      case 'MOVE':
+      case 'PLACE': {
+        const fighter = this.pickFallbackFighter(pending, state);
+        if (!fighter) return null;
+        if (pending.type === 'MOVE') {
+          // Нулевой шаг легален для «up to N» и не требует свободных клеток.
+          return { fighterId: fighter.id, x: fighter.position.x, y: fighter.position.y };
+        }
+        const zoneAnchor = pending.zoneFighterName
+          ? state.fighters.find((f) =>
+              fighterNameMatches(f.name, pending.zoneFighterName),
+            )
+          : undefined;
+        if (pending.zoneFighterName && !zoneAnchor) return null;
+        const cell = await this.firstFreePassableCell(state, (pos) =>
+          zoneAnchor
+            ? this.adjacencyService.isInSameZone(state, zoneAnchor.position, pos)
+            : Promise.resolve(true),
+        );
+        return cell ? { fighterId: fighter.id, x: cell.x, y: cell.y } : null;
+      }
+      default:
+        return null;
+    }
+  }
+
+  /** Первый боец, проходящий OWNERSHIP/banner/живость-валидацию резолвера. */
+  private pickFallbackFighter(pending: PendingEffect, state: GameState) {
+    const candidates = pending.fighterIds
+      ? state.fighters.filter((f) => pending.fighterIds!.includes(f.id))
+      : [...state.fighters];
+    for (const f of candidates) {
+      const dead = f.health <= 0 || f.isDefeated;
+      if (dead && pending.restoreFullHealth !== true) continue;
+      if (
+        !pending.anyOwner &&
+        (pending.targetsOpponent ? f.ownerId === pending.playerId : f.ownerId !== pending.playerId)
+      ) {
+        continue;
+      }
+      if (pending.fighterName && !bannerAllows(pending.fighterName, f)) continue;
+      return f;
+    }
+    return undefined;
+  }
+
+  /** Row-major-скан первой проходимой свободной клетки под предикат. */
+  private async firstFreePassableCell(
+    state: GameState,
+    predicate: (pos: { x: number; y: number }) => boolean | Promise<boolean>,
+  ): Promise<{ x: number; y: number } | null> {
+    for (let y = 0; y < state.boardState.height; y++) {
+      for (let x = 0; x < state.boardState.width; x++) {
+        const cell = state.boardState.cells[y]?.[x];
+        if (!isCellPassable(cell)) continue;
+        const occupied = state.fighters.some(
+          (f) => isLivingFighter(f) && f.position.x === x && f.position.y === y,
+        );
+        if (occupied) continue;
+        if (!(await predicate({ x, y }))) continue;
+        return { x, y };
+      }
+    }
+    return null;
   }
 
   /**
@@ -1863,6 +2014,9 @@ export class GameActionExecutorService {
           abilityBoostCardId: abilityBoostCard?.id,
           defenseValue: 0,
           startedAt: new Date(),
+          // GD-026: персистентный дедлайн окна защиты — планировщик BullMQ
+          // и recovery после рестарта читают его, а не process-local таймер
+          timeoutAt: new Date(Date.now() + DEFENSE_TIMEOUT_SECONDS * 1000),
         };
 
         const newState: GameState = {
@@ -1943,6 +2097,14 @@ export class GameActionExecutorService {
         return { success: false, error: 'Only defender can play defense' };
       }
 
+      // GD-026: дедлайн окна защиты серверно-авторитетен (combatInfo.timeoutAt).
+      // Если срок истёк — auto-resolve job вот-вот применит исход; опоздавшая
+      // защита не должна продлевать окно (ноль локального таймера не даёт
+      // права на просроченную защиту).
+      if (combatInfo.timeoutAt && combatInfo.timeoutAt.getTime() <= Date.now()) {
+        return { success: false, error: 'Defense window has expired' };
+      }
+
       // Валидация карты защиты
       const validation = this.rulesValidator.validateDefense(
         currentState,
@@ -1993,6 +2155,11 @@ export class GameActionExecutorService {
         ...combatInfo,
         defenderCardId: playedCard?.id ?? dto.cardId,
         defenseValue: playedCard?.defenseValue ?? 0,
+        // GD-026: после защиты наступает окно ручного резолва — таймаут
+        // перепланируется (CombatTimeoutService в резолвере), а дедлайн
+        // новой стадии персистится здесь. Оба клиента могут отключиться:
+        // сервер завершит бой по истечении этого окна.
+        timeoutAt: new Date(Date.now() + RESOLVE_TIMEOUT_SECONDS * 1000),
       };
 
       const newState: GameState = {
@@ -2212,6 +2379,23 @@ export class GameActionExecutorService {
         if (!combatInfo) {
           this.metrics.incrementGameAction('resolveCombat', undefined, 'error');
           return { success: false, error: 'No combat in progress' };
+        }
+
+        // GD-026 (ACC-010): ранний резолв запрещён. В фазе COMBAT окно защиты
+        // ещё открыто — резолв доступен ТОЛЬКО самому защитнику (легальный
+        // «Без защиты»); атакующий не может закрыть окно кнопкой. Системный
+        // вызов (серверный таймаут) требует истёкшего дедлайна ТЕКУЩЕЙ стадии
+        // (защиты или ручного резолва после защиты).
+        if (context.systemInitiator) {
+          const deadline = combatInfo.timeoutAt?.getTime() ?? Number.NaN;
+          if (!(deadline <= Date.now())) {
+            return { success: false, error: 'Combat stage deadline has not expired yet' };
+          }
+        } else if (currentState.phase === GamePhase.COMBAT && combatInfo.defenderId !== userId) {
+          return {
+            success: false,
+            error: 'Defender has not responded yet; wait for defense or timeout',
+          };
         }
 
         // Цель — атакованный боец из combatInfo.targetFighterId (атака по

@@ -517,6 +517,18 @@ export class GameStateService {
   }
 
   /**
+   * GD-025/ACC-009: является ли viewer участником игры (GamePlayer).
+   * Единственная проверка для гейта «spectator не получает состояние».
+   */
+  async isParticipant(gameId: string, userId: string): Promise<boolean> {
+    const player = await this.prisma.gamePlayer.findUnique({
+      where: { gameId_userId: { gameId, userId } },
+      select: { id: true },
+    });
+    return player !== null;
+  }
+
+  /**
    * Отфильтровать приватные данные для конкретного игрока
    * - Скрывает карты в руке соперника
    * - Скрывает порядок и верхнюю карту обеих колод, сохраняя их размеры
@@ -641,6 +653,26 @@ export class GameStateService {
           abilityBoostCardId: undefined,
         };
       }
+
+      // GD-025 (ACC-009, «hidden defense»): до reveal обе committed-карты
+      // лежат лицом вниз — их ПЕЧАТНЫЕ ЗНАЧЕНИЯ и instance-id не видны
+      // другой стороне. attackValue/attackerCardId — только владельцу
+      // атакующей карты; defenseValue/defenderCardId — только защитнику.
+      // После reveal (combatResolutionProgress записан первым pause()
+      // резолва) значения публичны, как в физической игре (p.12-13).
+      const projectedCombat = publicMetadata.combatInfo ?? combatInfo;
+      const isAttackOwner = attackerOwner === playerId;
+      const isDefender = combatInfo.defenderId === playerId;
+      const hiddenCombat: Record<string, unknown> = { ...projectedCombat };
+      if (!isAttackOwner) {
+        hiddenCombat.attackValue = undefined;
+        hiddenCombat.attackerCardId = undefined;
+      }
+      if (!isDefender && combatInfo.defenderCardId) {
+        hiddenCombat.defenseValue = undefined;
+        hiddenCombat.defenderCardId = undefined;
+      }
+      publicMetadata.combatInfo = hiddenCombat as unknown as GameStateMetadata['combatInfo'];
     }
 
     return { ...state, handZones, decks, discardPiles, metadata: publicMetadata };
@@ -815,9 +847,14 @@ export class GameStateService {
   }
 
   /**
-   * Получить события игры с указанного sequence number (для catch-up при реконнекте)
+   * Получить события игры с указанного sequence number (для catch-up при реконнекте).
+   * GD-025 (ACC-009): журнал хранит server-side метаданные (включая input
+   * мутаций с instance-id карт) — в ответ уходит только viewer-безопасное
+   * подмножество: input остаётся лишь у СОБСТВЕННЫХ действий зрителя.
+   * eventsSince — журнал событий, а НЕ replay состояния (см. сетевой
+   * контракт GD-027): full snapshot — отдельный gameState-запрос.
    */
-  async getEventsSince(gameId: string, sinceSequence: number): Promise<any[]> {
+  async getEventsSince(gameId: string, sinceSequence: number, viewerId?: string): Promise<any[]> {
     const actions = await this.prisma.gameAction.findMany({
       where: {
         gameId,
@@ -831,14 +868,21 @@ export class GameStateService {
       take: 100,
     });
 
-    return actions.map((action) => ({
-      sequenceNumber: action.sequenceNumber,
-      type: action.type,
-      gameId: action.gameId,
-      playerId: action.playerId,
-      // GameEvent.payload — String в GraphQL-схеме, Prisma отдаёт Json-объект
-      payload: action.payload != null ? JSON.stringify(action.payload) : null,
-      timestamp: action.timestamp,
-    }));
+    return actions.map((action) => {
+      const stored = (action.payload ?? {}) as Record<string, unknown>;
+      const safePayload: Record<string, unknown> = { action: stored.action };
+      if (viewerId && action.playerId === viewerId && stored.input != null) {
+        safePayload.input = stored.input;
+      }
+      return {
+        sequenceNumber: action.sequenceNumber,
+        type: action.type,
+        gameId: action.gameId,
+        playerId: action.playerId,
+        // GameEvent.payload — String в GraphQL-схеме, Prisma отдаёт Json-объект
+        payload: JSON.stringify(safePayload),
+        timestamp: action.timestamp,
+      };
+    });
   }
 }

@@ -368,9 +368,6 @@ export const GameView = () => {
   const myTurn = isMyTurn();
   const actions = actionsRemaining();
   const combat = wireState?.metadata.combatInfo;
-  const isAttacker = Boolean(
-    combat && wireState?.fighters.find((f) => f.id === combat.attackerId)?.ownerId === localUserId,
-  );
   // S05 reveal (rulebook p.12-13): committed-карты боя лежат в discardPiles;
   // после reveal сервер отдаёт личины обоим — до reveal чужая карта приходит
   // плейсхолдером (lookup по instance id не находит её) → '???'.
@@ -570,7 +567,9 @@ export const GameView = () => {
                 </strong>
               </span>
             )}
-            {(isAttacker || phase === 'COMBAT_RESOLVE') && (
+            {/* GD-026: в COMBAT резолв доступен только защитнику («Без защиты»);
+                атакующий ждёт карту защиты или серверный таймаут */}
+            {phase === 'COMBAT_RESOLVE' && (
               <Button variant="primary" disabled={busy} onClick={() => void run(resolveCombat)}>
                 Resolve
               </Button>

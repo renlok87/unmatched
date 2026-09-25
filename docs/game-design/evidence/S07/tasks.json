@@ -1,0 +1,82 @@
+{
+  "sprint": "S07",
+  "scope": "GD-025, GD-026, GD-027",
+  "contractVersion": "unmatched-net/1",
+  "tasks": {
+    "GD-025": {
+      "title": "Единая авторитетная viewer-aware projection",
+      "status": "done",
+      "verified": [
+        "filterPrivateData — единственная projection: HTTP query/mutation, WS resolve, барьер-снапшот",
+        "до reveal: чужие значения/личины combat-карт вырезаны (attackValue/attackerCardId, defenseValue/defenderCardId), raw-JSON ассерты",
+        "порядок колод/личины drawPile скрыты обеим сторонам (только count), topCard отсутствует",
+        "чужая рука — плейсхолдеры hidden-* без личин; публичный discard открыт обоим (ACC-018)",
+        "spectator: все 8 подписок + eventsSince за requireParticipant → ForbiddenException('Not a game participant')",
+        "eventsSince: payload {action}, input только автору действия",
+        "raw persisted/Redis state не отдаётся никому",
+        "никаких test-only обходов: покрыто production-путями"
+      ],
+      "tests": "src/games/services/s07-privacy-projection.spec.ts (6/6), src/games/game-state.service.spec.ts GD-017/R-15 обновлён под контракт до-reveal"
+    },
+    "GD-026": {
+      "title": "Серверный defense timeout и финализация боя",
+      "status": "done",
+      "verified": [
+        "executeAttack персистит combatInfo.timeoutAt (DEFENSE_TIMEOUT_SECONDS=30), защита переписывает на RESOLVE_TIMEOUT_SECONDS=10",
+        "processAutoResolve → ТОТ ЖЕ executeResolveCombat (systemInitiator): один исход, один seq-инкремент, одна audit (reason defense-timeout|resolve-timeout)",
+        "ранний системный резолв отклонён (дедлайн не истёк); атакующий в COMBAT отклонён ('Defender has not responded yet')",
+        "поздняя джоба после защиты — no-op ('Deadline not reached' / 'No combat in progress')",
+        "конкуренция defense/timeout/resolve/retry — распределённый lock game:<id> (фикс двойного префикса withLock→withLockOptions)",
+        "recoverScheduledWork: истёкшие дедлайны финализируются, будущие без джобы перепланируются, легаси без timeoutAt — дедлайн от startedAt",
+        "часы инъектируемы (service.now), без sleep-пелей и fake timers",
+        "P1 mid-combat drain: истёкший дедлайн при непустой очереди выборов — серверная прогрессия через production pending-резолверы (executeDeclinePendingEffect / executeResolvePendingEffect); optional → auto-decline, mandatory → детерминированный фолбэк (16-network-contract.md §6.1); каждый шаг легален, +1 seq, STATE_UPDATED, audit без id карт; финал — один исход/одна audit",
+        "P1 второго ревью (исправлено): multi-step CHOOSE_ONE chooseCount>1 сохраняет id/длину очереди — прогресс дрейна теперь по кортежу (id, chooseCount, options, stage, mode, revealedCards); 2-step CHOOSE_ONE RED→GREEN production-тест: один исход/audit, строгий seq, без дублей эффектов, без id карт в аудите",
+        "покрытие док-таблицы §6.1 фолбэков: CHOOSE_ONE (multi-step), TARGET_FIGHTER, PLACE, CHOOSE_SPACE stage1→stage2 и stage2 — production-резолверами (тесты)",
+        "P2 honest round cap: исчерпание 8 раундов при открытом бое — success:false без COMBAT_RESOLVED/audit исхода, состояние открыто, sweep продолжает; контролируемая executor-последовательность 8+ пауз + recovery-прогон с ровно одной финализацией (тесты)",
+        "periodic recovery sweep (60 c, onModuleInit/onModuleDestroy): transient enqueue-failure после персистентной атаки/защиты чинится без рестарта процесса — sweep перепланирует по персистентному дедлайну (тест)",
+        "блокеры дрейна не повреждают очередь: mandatory BOOST_CHOICE без безопасного фолбэка → success:false 'Cannot auto-resolve pending choice', очередь/фаза нетронуты (тест)",
+        "restart/retry/offline: recoverScheduledWork доводит сериализованный запаузенный BOOST-бой; повтор джобы после дрейна — no-op (тесты)",
+        "P2 race: stage-специфичные job id combat:scheduled:<gameId>:<stage> — RESOLVE-планирование не теряется при активной DEFENSE-джобе; cancelAutoResolve снимает обе стадии (тесты)"
+      ],
+      "knownLimitations": [
+        "mandatory DISCARD_CARDS при руке короче value — легального резолва нет ни у игрока, ни у сервера (движковый гэп вне GD-026-скоупа); дрейн честно блокируется, очередь нетронута",
+        "PLACE/CHOOSE_SPACE при полном отсутствии свободных легальных клеток — блокер (вырожденная доска)",
+        "round-cap (8 раундов) на живой нагрузке не встречается в текущем контенте — подтверждён контролируемой executor-последовательностью"
+      ],
+      "tests": "src/games/services/s07-combat-timeout.spec.ts (28/28), src/game-engine/services/s04-pending-queue.spec.ts GD-018×GD-026 nonempty-queue (восстановлен)"
+    },
+    "GD-027": {
+      "title": "Snapshot/WS/since recovery-контракт",
+      "status": "done",
+      "verified": [
+        "контракт задокументирован: docs/game-design/16-network-contract.md (unmatched-net/1): snapshot vs partial projection, since-семантика, barrier, privacy-матрица, клиентские обязательства",
+        "connection barrier: подписка стартует с барьер-снапшота (seq > since), окно HTTP↔WS закрыто; фикс ленивой subscribeAll — upstream.next() до loadState",
+        "P2 второго ревью (исправлено): ранняя отписка до резолва firstUpstream — ручной async-iterator, return() немедленно отпускает underlying-подписку, висящий next() завершается гонкой с сигналом отписки (тест)",
+        "P2 второго ревью (исправлено): loadState в барьере — NotFound (лобби-фаза) → live-only поток; genuine outage (DB/Redis) → лог + проброс + освобождение upstream, молчаливое проглатывание убрано (тест)",
+        "since НЕ обещает replay (future-only фильтр + снапшот свежести)",
+        "reconnect: pending-defense / resolve / game-over фазы переживают serialize/deserialize",
+        "sequenceNumber строго +1 по цепочке мутация→таймаут-резолв",
+        "клиент ACC-011: equal-seq merge (guard < вместо <=), перестановки HTTP↔WS, старый снапшот не откатывает, gap не блокирует, эхо не дублирует",
+        "UI: Resolve только в COMBAT_RESOLVE, «Без защиты» — у защитника в COMBAT"
+      ],
+      "tests": "src/games/resolvers/s07-recovery-contract.spec.ts (10/10), src/store/remoteGameStore.s07.test.ts (6/6)"
+    }
+  },
+  "breakingChange": {
+    "what": "executeResolveCombat в фазе COMBAT: только защитник (пас); раньше мог атакующий",
+    "why": "GD-026: окно защиты нельзя закрыть досрочно",
+    "migrated": ["s05-boost-timing", "s05-medusa-cards", "s06-arthur-cards", "s06-full-games", "s04-pending-queue — вызовы переведены на защитника"]
+  },
+  "gatesNotDone": [
+    "живой WS-прогон против docker-сервера (нет видимых окон в спринте)",
+    "мульти-инстанс pub/sub (2 backend-процесса)",
+    "auth.service.spec.ts — 3 известных базлайн-падения"
+  ],
+  "regression": {
+    "backend": "65 suites / 64 passed; tests 1147 passed / 3 failed (auth baseline)",
+    "frontendVitest": "5 files / 25 passed",
+    "backendTsc": "0 ошибок",
+    "adminTsc": "0 ошибок",
+    "frontendTsc": "baseline 258 / current 258 / added 0 — frontend-type-comparison.json (CompilerHost-оверлей на 19de668 с тем же виртуальным пользовательским манифестом; пересчитано в корректирующем проходе, абсолютный счёт 258 из-за slightly другой подписи виртуального стаба — сравнимы baseline vs current одним методом); прежняя формулировка «256 vs 255, +1 легаси-дрейф» была ошибкой методики сравнения и отозвана"
+  }
+}

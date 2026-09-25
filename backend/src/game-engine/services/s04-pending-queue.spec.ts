@@ -7,7 +7,6 @@ import { GameState, GamePhase, PendingEffect } from '../models';
 import { CardType, EffectType, EffectTiming } from '../models';
 import { s03Fixture, s03Engine } from '../../test/fixtures/s03-engine.fixture';
 import { GameStateService } from '../../games/game-state.service';
-import { CombatTimeoutService } from '../../games/services/combat-timeout.service';
 
 const { executor } = s03Engine();
 const ctx = (state: GameState, userId = 'a') =>
@@ -246,14 +245,61 @@ describe('GD-018: sequential pending queue', () => {
     expect(onto.gameState!.fighters.find(f => f.id === 'a')!.position).toEqual({ x: 1, y: 0 });
   });
 
-  it('combat timeout never fabricates a queue decision', async () => {
-    const state = { ...withQueue(), phase: GamePhase.COMBAT };
-    const service = new CombatTimeoutService({} as any,
-      { loadState: async () => state, saveState: async () => undefined } as any,
-      { withLock: (_k: string, run: () => any) => run() } as any);
-    const result = await (service as any).performAutoResolve(state);
-    expect(result.phase).toBe(GamePhase.COMBAT_RESOLVE);
-    expect(result.metadata.pendingEffects).toEqual(state.metadata.pendingEffects);
-    expect(result.metadata.pendingTurnEnd).toBeUndefined();
+  it('system resolve never bypasses a NONEMPTY pending queue (GD-018 × GD-026)', async () => {
+    // реальный путь: атака картой без effects → бой запаузен на mandatory
+    // MOVE → истёкший дедлайн. Системный executeResolveCombat отклонён,
+    // очередь НЕ тронута и НЕ сфабрикована: единственная легальная
+    // прогрессия — production pending-резолвер (в бою его дергает
+    // CombatTimeoutService.drainTimedOutPendingChoices с детерминированным
+    // фолбэком).
+    const atk = { id: 'atk-plain', cardId: 'cat-atk', name: 'Plain', nameEn: 'Plain', nameRu: 'Простая',
+      cardType: CardType.VERSATILE, attackValue: 4, effects: [] } as any;
+    const base = s03Fixture();
+    const state: GameState = {
+      ...base,
+      fighters: base.fighters.map(f => f.id === 'b' ? { ...f, position: { x: 1, y: 0 } } : f),
+      handZones: { a: { cards: [atk], maxSize: 7 }, b: { cards: [], maxSize: 7 } },
+      metadata: { ...base.metadata, pendingEffects: [] },
+    };
+    const attacked = await executor.executeAttack(
+      { gameId: state.gameId, attackerId: 'a', targetId: 'b', cardId: 'atk-plain' } as any,
+      ctx(state));
+    expect(attacked.success).toBe(true);
+    const queue = [
+      { id: 'pe-move', type: 'MOVE', playerId: 'a', value: 1, optional: false } as PendingEffect,
+    ];
+    const paused: GameState = {
+      ...attacked.gameState!,
+      phase: GamePhase.COMBAT_RESOLVE,
+      metadata: { ...attacked.gameState!.metadata,
+        combatInfo: { ...attacked.gameState!.metadata.combatInfo!, timeoutAt: new Date(Date.now() - 1000) },
+        combatResolutionProgress: { defeatedBefore: [] } as any,
+        pendingEffects: queue },
+    };
+    // системный резолв с непустой очередью — отказ, состояние нетронуто
+    const rejected = await executor.executeResolveCombat(
+      { gameId: state.gameId } as any,
+      { userId: 'b', gameId: state.gameId, currentState: paused, systemInitiator: true });
+    expect(rejected.success).toBe(false);
+    expect(rejected.error).toBe('Resolve the pending choice first');
+    expect(paused.metadata.pendingEffects).toHaveLength(1);
+    expect(paused.metadata.pendingEffects![0].id).toBe('pe-move');
+    expect(paused.sequenceNumber).toBe(attacked.gameState!.sequenceNumber);
+
+    // детерминированный системный фолбэк для mandatory MOVE — нулевой шаг
+    // (остаться на месте — легальный резолв «up to N»); применяется
+    // production-резолвером и легально двигает очередь
+    const fallback = await executor.buildSystemPendingFallback(queue[0], paused);
+    expect(fallback).toEqual({ fighterId: 'a', x: 0, y: 0 });
+    const drained = await executor.executeResolvePendingEffect(
+      { gameId: state.gameId, effectId: 'pe-move', ...fallback! }, ctx(paused));
+    expect(drained.success).toBe(true);
+    expect(drained.gameState!.metadata.pendingEffects ?? []).toHaveLength(0);
+    expect(drained.gameState!.metadata.pendingTurnEnd).toBeUndefined();
+    // боец остался на месте (нулевая дистанция — валидный резолв)
+    expect(drained.gameState!.fighters.find(f => f.id === 'a')!.position).toEqual({ x: 0, y: 0 });
+    // входное состояние не мутировано
+    expect(attacked.gameState!.metadata.pendingEffects ?? []).toHaveLength(0);
+    expect(paused.metadata.pendingEffects).toHaveLength(1);
   });
 });

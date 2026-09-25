@@ -216,7 +216,9 @@ export class GameResolver {
   }
 
   /**
-   * Получить события игры с указанного sequence number (для catch-up при реконнекте)
+   * Получить события игры с указанного sequence number (для catch-up при реконнекте).
+   * GD-025: только участники — checkGameAccess пускал бы любого
+   * авторизованного к журналу завершённых игр.
    */
   @Query(() => EventsSinceResponse, { name: 'eventsSince', nullable: true })
   @UseGuards(GqlAuthGuard)
@@ -225,9 +227,9 @@ export class GameResolver {
     @Args('sinceSequence', { type: () => Number }) sinceSequence: number,
     @CurrentUser() user: any,
   ): Promise<EventsSinceResponse> {
-    await this.gameService.checkGameAccess(gameId, user.id);
+    await this.gameService.requireParticipation(gameId, user.id);
 
-    const events = await this.gameStateService.getEventsSince(gameId, sinceSequence);
+    const events = await this.gameStateService.getEventsSince(gameId, sinceSequence, user.id);
 
     return {
       gameId,

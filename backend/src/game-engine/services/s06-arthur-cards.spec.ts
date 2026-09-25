@@ -557,7 +557,7 @@ describe('GD-023: Skirmish (VERSATILE x2) — combat fighter choice', () => {
     const attack = await executor.executeAttack(
       { gameId: 's06a', attackerId: 'arthur', targetId: 'bhero', cardId: state.handZones.a.cards[0].id } as any, ctx(state));
     expect(attack.success).toBe(true);
-    const resolved = await executor.executeResolveCombat({ gameId: 's06a' } as any, ctx(attack.gameState!, 'a'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's06a' } as any, ctx(attack.gameState!, 'b'));
     expect(resolved.success).toBe(true);
     const pending = head(resolved.gameState!);
     expect(pending.type).toBe('MOVE');
@@ -597,7 +597,7 @@ describe('GD-023: Skirmish (VERSATILE x2) — combat fighter choice', () => {
     const state = inHand(arthurState({ bheroAt: { x: 4, y: 0 } }), skirmish);
     const attack = await executor.executeAttack(
       { gameId: 's06a', attackerId: 'arthur', targetId: 'bhero', cardId: state.handZones.a.cards[0].id } as any, ctx(state));
-    const resolved = await executor.executeResolveCombat({ gameId: 's06a' } as any, ctx(attack.gameState!, 'a'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's06a' } as any, ctx(attack.gameState!, 'b'));
     const pending = head(resolved.gameState!);
     const outsider = await executor.executeResolvePendingEffect(
       { gameId: 's06a', effectId: pending.id, fighterId: 'merlin', x: 6, y: 0 }, ctx(resolved.gameState!));
@@ -677,7 +677,7 @@ describe('GD-023: прочие Arthur-записи — production runtime (compa
     const attack = await executor.executeAttack(
       { gameId: 's06a', attackerId: 'arthur', targetId: 'bhero', cardId: state.handZones.a.cards[0].id } as any, ctx(state));
     expect(attack.success).toBe(true);
-    const resolved = await executor.executeResolveCombat({ gameId: 's06a' } as any, ctx(attack.gameState!, 'a'));
+    const resolved = await executor.executeResolveCombat({ gameId: 's06a' } as any, ctx(attack.gameState!, 'b'));
     expect(resolved.success).toBe(true);
     return resolved.gameState!;
   };
@@ -720,7 +720,7 @@ describe('GD-023: прочие Arthur-записи — production runtime (compa
     const wonAttack = await executor.executeAttack(
       { gameId: 's06a', attackerId: 'merlin', targetId: 'bhero', cardId: wonState.handZones.a.cards[0].id } as any, ctx(wonState));
     expect(wonAttack.success).toBe(true);
-    const won = await executor.executeResolveCombat({ gameId: 's06a' } as any, ctx(wonAttack.gameState!, 'a'));
+    const won = await executor.executeResolveCombat({ gameId: 's06a' } as any, ctx(wonAttack.gameState!, 'b'));
     expect(won.success).toBe(true);
     expect(won.gameState!.handZones.a.cards.map((c) => c.id).sort()).toEqual(['w1::0', 'w2::0']);
 

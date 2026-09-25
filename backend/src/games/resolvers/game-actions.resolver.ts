@@ -53,6 +53,7 @@ import {
   CombatResolveGuard,
 } from '../guards';
 import { GameActionExecutorService, ActionContext } from '../../game-engine/services/game-action-executor.service';
+import { DEFENSE_TIMEOUT_SECONDS, RESOLVE_TIMEOUT_SECONDS } from '../../game-engine/models';
 import { AiTurnService } from '../services/ai-turn.service';
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -172,15 +173,32 @@ export class GameActionsResolver {
           // Сохраняем состояние
           await this.gameStateService.saveState(dto.gameId, result.gameState!);
 
-          // Запланировать auto-resolve если требуется (для атаки)
+          // GD-026: планирование серверных дедлайнов боя.
           if (scheduleAutoResolve) {
+            // Атака: дедлайн окна защиты персистен в combatInfo.timeoutAt —
+            // джоба дёргается ровно к нему (не process-local таймер).
+            const ci = result.gameState!.metadata.combatInfo;
+            const delayMs = ci?.timeoutAt
+              ? Math.max(0, new Date(ci.timeoutAt).getTime() - Date.now())
+              : DEFENSE_TIMEOUT_SECONDS * 1000;
             await this.combatTimeoutService.scheduleAutoResolve(
               dto.gameId,
-              30,
+              Math.max(1, Math.ceil(delayMs / 1000)),
               result.gameState!.sequenceNumber,
+              'DEFENSE',
             );
-          } else if (eventType === 'DEFENSE_PLAYED' || eventType === 'COMBAT_RESOLVED') {
-            // Отменяем scheduled auto-resolve для защиты и разрешения боя
+          } else if (eventType === 'DEFENSE_PLAYED') {
+            // Защита сыграна: окно ручного резолва. Оба клиента могут
+            // отключиться — сервер всё равно завершит бой (тот же
+            // idempotent-путь executeResolveCombat).
+            await this.combatTimeoutService.scheduleAutoResolve(
+              dto.gameId,
+              RESOLVE_TIMEOUT_SECONDS,
+              result.gameState!.sequenceNumber,
+              'RESOLVE',
+            );
+          } else if (eventType === 'COMBAT_RESOLVED') {
+            // Бой разрешён вручную — отмена scheduled auto-resolve
             await this.combatTimeoutService.cancelAutoResolve(dto.gameId);
           }
 

@@ -113,6 +113,9 @@ export function useGameSync(
           // ВАЖНО: бэк сравнивает since с sequenceNumber (НЕ timestamp!) —
           // Date.now()/1000 отфильтровывал ВСЕ события, подписка молчала.
           // При reconnect lastSequenceNumber отсечёт уже принятые снапшоты.
+          // GD-027: сервер дополнительно шлёт барьер-снапшот при установке
+          // подписки (seq > since) — окно между HTTP-запросом состояния и
+          // подпиской закрыто; дубликат отбрасывает guard по seq в сторе.
           since: useRemoteGameStore.getState().lastSequenceNumber || undefined,
         },
       });
