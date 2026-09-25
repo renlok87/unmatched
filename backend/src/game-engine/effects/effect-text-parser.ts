@@ -24,7 +24,7 @@ import {
   EffectTarget,
 } from '../models/card.model';
 
-export const PARSER_VERSION = 8;
+export const PARSER_VERSION = 9;
 
 export interface CardEffectTexts {
   readonly immediately?: string | null;
@@ -60,6 +60,30 @@ type Draft = Omit<CardEffect, 'id' | 'timing' | 'options'> & {
 // ---------------------------------------------------------------------------
 // Публичный API
 // ---------------------------------------------------------------------------
+
+/**
+ * S06: рантайм-апгрейд устаревших parser-эффектов из БД.
+ * Зеркалит идемпотентность prisma/backfill-card-effects.ts: parser-эффекты
+ * перегенерируются при росте parserVersion, source:'manual' не трогается.
+ * Замена происходит ТОЛЬКО если повторный разбор ПОЛНОСТЬЮ распознан (без
+ * UNSUPPORTED) — регрессия старого разбора невозможна. Используется
+ * GameInitializationService.resolveCardEffects и тестами (одинаковый ingest).
+ */
+export function upgradeStaleParserEffects(
+  existing: readonly CardEffect[],
+  texts: CardEffectTexts,
+  cardId: string,
+): CardEffect[] {
+  if (existing.length === 0) return [...existing];
+  if (existing.some((e) => e.source === 'manual')) return [...existing];
+  const stale = existing.every((e) => (e.parserVersion ?? 0) < PARSER_VERSION);
+  if (!stale) return [...existing];
+  const reparsed = parseCardEffectTexts(texts, cardId).effects;
+  if (reparsed.length === 0 || reparsed.some((e) => e.type === EffectType.UNSUPPORTED)) {
+    return [...existing];
+  }
+  return reparsed;
+}
 
 export function parseCardEffectTexts(texts: CardEffectTexts, cardId: string): ParseResult {
   const effects: CardEffect[] = [];
@@ -232,6 +256,59 @@ function matchCompound(text: string): Draft[] | null {
     )
   ) {
     return [{ type: EffectType.BOOST, boostSource: 'OPPONENT_RANDOM_HAND' }];
+  }
+
+  // The Lady of the Lake (S06 GD-021): «Search your deck and discard pile for
+  // the EXCALIBUR card. Add it to your hand. If you searched your deck,
+  // shuffle it.» — авто-эффект без выбора игрока; колода мешается всегда
+  // (она просматривается независимо от того, где найдена карта).
+  const search =
+    /^search your deck and discard pile for the ([\w' ]+?) card\.\s*add it to your hand\.\s*if you searched your deck, shuffle it\.?$/i.exec(
+      text,
+    );
+  if (search) {
+    return [
+      {
+        type: EffectType.SEARCH_ADD_TO_HAND,
+        searchCardName: search[1].trim(),
+        value: 1,
+      },
+    ];
+  }
+
+  // Prophecy (S06 GD-021): «Look at the top 4 cards of your deck. Add 2 of
+  // them to your hand and put the other 2 back on top of your deck, in any
+  // order.» — «the other N» выводим из view-pick (печатные числа согласованы).
+  const prophecy =
+    /^look at the top (\d+) cards? of your deck\.\s*add (\d+) of them to your hand and put the other (\d+) back on top of your deck,? in any order\.?$/i.exec(
+      text,
+    );
+  if (prophecy && Number(prophecy[1]) - Number(prophecy[2]) === Number(prophecy[3])) {
+    return [
+      {
+        type: EffectType.DECK_TOP_PICK,
+        viewCount: Number(prophecy[1]),
+        pickCount: Number(prophecy[2]),
+      },
+    ];
+  }
+
+  // Restless Spirits (S06 GD-022): «Choose any space in Merlin's zone. Deal 2
+  // damage to each opposing fighter in that space and in one adjacent space.
+  // If at least one fighter is defeated this way, draw 1 card.»
+  const restless =
+    /^choose any space in ([\w.' ]+?)'s zone\.\s*deal (\d+) damage to each opposing fighter in that space and in one adjacent space\.\s*if at least one fighter is defeated this way, draw (\d+) cards?\.?$/i.exec(
+      text,
+    );
+  if (restless) {
+    return [
+      {
+        type: EffectType.ZONE_AREA_DAMAGE,
+        zoneFighterName: restless[1].trim(),
+        value: Number(restless[2]),
+        drawIfDefeated: Number(restless[3]),
+      },
+    ];
   }
 
   // «...value of this card is equal to the number of cards in your hand...»
@@ -407,7 +484,7 @@ function parseSentence(sentence: string): Draft[] | null {
     return [{ type: EffectType.DAMAGE, value: Number(dmg[1]), ...target }];
   }
 
-  // MOVE (исполнение в MVP — manualEffects: требует выбора игрока)
+  // MOVE → pendingEffects (выбор игрока резолвится resolvePendingEffect)
   const move = /^(you may )?move (.+?) up to (\d+) spaces?\b.*$/i.exec(s);
   if (move) {
     return [
@@ -438,8 +515,9 @@ function parseSentence(sentence: string): Draft[] | null {
   // «Choose one of the fighters in the combat and move them up to N spaces»
   // (Skirmish ~20 копий, Into Darkness, Leap Away, Infinity Mirror) — выбор
   // ЦЕЛИ + перемещение, не буллет-список → matchChooseOne его не ловит.
-  // MVP: target SELF (двигается свой боец, не любой из боя). Опц. префикс
-  // «if you won the combat» → when WON_COMBAT.
+  // S06 (GD-023): COMBAT_FIGHTER — владелец выбирает ЛЮБОГО живого участника
+  // боя (своего или чужого), не только своего бойца. Опц. префикс «if you won
+  // the combat» → when WON_COMBAT.
   const chooseFighterMove =
     /^(if you won the combat,?\s*)?choose one of the fighters in the combat and move (?:them|it) up to (\d+) spaces?$/i.exec(
       s,
@@ -449,13 +527,30 @@ function parseSentence(sentence: string): Draft[] | null {
       type: EffectType.MOVE,
       value: Number(chooseFighterMove[2]),
       optional: false,
-      target: EffectTarget.SELF,
+      target: EffectTarget.COMBAT_FIGHTER,
       ...(chooseFighterMove[1] ? { when: { kind: 'WON_COMBAT' } as EffectCondition } : {}),
     };
     return [draft];
   }
 
-  // PLACE (manualEffects) — «in any space» и «in any other space» (Looking Glass)
+  // The Holy Grail (S06 GD-022): «If King Arthur has 4 or less health but is
+  // not defeated, set his health to 8.» — точная УСТАНОВКА значения (не heal).
+  const setHealth =
+    /^if ([\w.' ]+?) has (\d+) or less health but is not defeated, set (?:his|her|their|its) health to (\d+)\.?$/i.exec(
+      s,
+    );
+  if (setHealth) {
+    return [
+      {
+        type: EffectType.SET_HEALTH,
+        fighterName: setHealth[1].trim(),
+        threshold: Number(setHealth[2]),
+        value: Number(setHealth[3]),
+      },
+    ];
+  }
+
+  // PLACE → pendingEffects — «in any space» и «in any other space» (Looking Glass)
   const place = /^(you may )?place (.+?) in any( other)? spaces?\b.*$/i.exec(s);
   if (place) {
     return [{ type: EffectType.PLACE, optional: Boolean(place[1]), ...parseFighterRef(place[2]) }];
@@ -633,6 +728,9 @@ function parseFighterRef(phrase: string): Pick<Draft, 'target' | 'fighterName'> 
   if (/^the opposing fighter$/i.test(p)) return { target: EffectTarget.OPPOSING_FIGHTER };
   // «each of your fighters» (Winged Frenzy) — не NAMED_FIGHTER-мусор
   if (/^each of your fighters$/i.test(p)) return { target: EffectTarget.EACH_OWN_FIGHTER };
+  // «each fighter» (Command the Storms, GD-022) — ВСЕ живые бойцы, включая
+  // чужих; НЕ NAMED_FIGHTER 'fighter' (не матчит никого)
+  if (/^each fighter$/i.test(p)) return { target: EffectTarget.EACH_FIGHTER };
   const each = /^each ([A-Z][\w.' ]*)$/i.exec(p);
   if (each) return { target: EffectTarget.NAMED_FIGHTER, fighterName: each[1].trim() };
   return { target: EffectTarget.NAMED_FIGHTER, fighterName: p };

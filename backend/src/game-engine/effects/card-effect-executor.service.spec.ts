@@ -490,9 +490,8 @@ describe('CardEffectExecutorService (A3)', () => {
       const after = await service.executeAfterCombatEffects(state, atk, null, combat, {
         attackerWon: true, attackerDamage: 0, defenderDamage: 1,
       });
-      expect(after.manualEffects).toEqual([
-        'Move your fighter up to 3 spaces.',
-      ]);
+      // легитимный MOVE-pending ≠ manual: аудит ручных эффектов пуст
+      expect(after.manualEffects).toEqual([]);
       const pending = after.state.metadata.pendingEffects ?? [];
       expect(pending).toHaveLength(1);
       expect(pending[0]).toMatchObject({ type: 'MOVE', playerId: 'p1', value: 3 });
@@ -515,14 +514,18 @@ describe('CardEffectExecutorService (A3)', () => {
   });
 
   describe('executeOnPlayEffects (scheme)', () => {
-    it('исполняет AFTER_COMBAT-тексты scheme-карты и собирает manualEffects', async () => {
+    it('исполняет AFTER_COMBAT-тексты scheme-карты; MOVE → pending, не manual', async () => {
       const scheme = card('sch', [
         eff({ type: EffectType.DRAW_CARD, value: 1 }),
         eff({ type: EffectType.MOVE, value: 4, text: 'Move Daredevil up to 4 spaces.' }),
       ], { cardType: CardType.SCHEME });
       const result = await service.executeOnPlayEffects(makeState(), scheme, 'p1');
       expect(result.state.handZones.p1.cards).toHaveLength(1);
-      expect(result.manualEffects).toEqual(['Move Daredevil up to 4 spaces.']);
+      const pending = result.state.metadata.pendingEffects ?? [];
+      expect(pending).toHaveLength(1);
+      expect(pending[0]).toMatchObject({ type: 'MOVE', playerId: 'p1', value: 4 });
+      // легитимный pending ≠ manual-эффект
+      expect(result.manualEffects).toEqual([]);
     });
   });
 
@@ -558,8 +561,8 @@ describe('CardEffectExecutorService (A3)', () => {
         { index: 1, label: 'Recover 2 health' },
       ]);
       expect(pending[0].optionEffects).toHaveLength(2);
-      // эффект отложен — текст в manualEffects, бойцы не изменены
-      expect(after.manualEffects).toContain('Choose one');
+      // эффект отложен в легитимный pending — НЕ manual; бойцы не изменены
+      expect(after.manualEffects).toEqual([]);
       expect(after.state.fighters).toEqual(state.fighters);
     });
 
@@ -604,6 +607,82 @@ describe('CardEffectExecutorService (A3)', () => {
       const pending = res.state.metadata.pendingEffects ?? [];
       expect(pending).toHaveLength(1);
       expect(pending[0]).toMatchObject({ type: 'MOVE', playerId: 'p1', value: 2 });
+    });
+  });
+
+  // P2-2 (корректировка): ветки, создающие РЕАЛОБЫЧНЫЙ executable pending
+  // (CHOOSE_ONE с опциями, фолбэк MOVE/PLACE, RETURN_DEFEATED), не должны
+  // попадать в manualEffects аудита как «неисполненные». Manual — только
+  // UNSUPPORTED-семантика (нет опций / нераспознанный текст).
+  describe('легитимные pending ≠ manualEffects (аудит P2-2)', () => {
+    it('CHOOSE_ONE: резолв опции (путь production resolveChooseOne) применяет эффект — manualEffects пуст', async () => {
+      const choose = eff({
+        type: EffectType.CHOOSE_ONE,
+        chooseCount: 1,
+        text: 'Choose one',
+        options: [
+          { label: 'Draw 1 card', effects: [eff({ type: EffectType.DRAW_CARD, value: 1 })] },
+        ],
+      });
+      const after = await service.executeAfterCombatEffects(
+        makeState(),
+        card('atk', [choose]),
+        null,
+        combat,
+        { attackerWon: true, attackerDamage: 0, defenderDamage: 1 },
+      );
+      const pending = (after.state.metadata.pendingEffects ?? [])[0];
+      expect(pending?.type).toBe('CHOOSE_ONE');
+      // резолв: ровно то, что делает resolveChooseOne в game-action-executor
+      const chosen = await service.executeChosenEffects(
+        { ...after.state, metadata: { ...after.state.metadata, pendingEffects: [] } },
+        pending.optionEffects![0],
+        'p1',
+        pending.card,
+        pending.effectContext,
+      );
+      expect(chosen.state.handZones.p1.cards).toHaveLength(1); // «Draw 1 card»
+      expect(chosen.state.metadata.pendingEffects ?? []).toHaveLength(0);
+      expect(chosen.manualEffects).toEqual([]);
+    });
+
+    it('RETURN_DEFEATED → optional PLACE-pending (revive), аудит manualEffects пуст', async () => {
+      const defeated = {
+        id: 'f1b', ownerId: 'p1', heroId: 'h1', name: 'Harpy', type: FighterType.MINION,
+        health: 0, maxHealth: 1, isDefeated: true, position: { x: 0, y: 1 }, effects: [], hasSidekick: false,
+      };
+      const state = makeState({ fighters: [...makeState().fighters, defeated] });
+      const atk = card('atk', [
+        eff({
+          type: EffectType.RETURN_DEFEATED,
+          fighterName: 'Harpy',
+          zoneFighterName: 'Hero One',
+          text: "Then, return a defeated Harpy (if any) to any space in Medusa's zone",
+        }),
+      ]);
+      const after = await service.executeAfterCombatEffects(state, atk, null, combat, {
+        attackerWon: true, attackerDamage: 0, defenderDamage: 1,
+      });
+      const pending = after.state.metadata.pendingEffects ?? [];
+      expect(pending).toHaveLength(1);
+      expect(pending[0]).toMatchObject({
+        type: 'PLACE', playerId: 'p1', fighterIds: ['f1b'],
+        zoneFighterName: 'Hero One', restoreFullHealth: true, optional: true,
+      });
+      expect(after.manualEffects).toEqual([]);
+      // боец не тронут до легитимного резолва (резолв — s05-medusa GD-020)
+      expect(after.state.fighters.find((f) => f.id === 'f1b')!.isDefeated).toBe(true);
+    });
+
+    it('RETURN_DEFEATED: нет поверженных («if any») → skip без pending и без manual', async () => {
+      const atk = card('atk', [
+        eff({ type: EffectType.RETURN_DEFEATED, fighterName: 'Harpy', text: 'Return a defeated Harpy' }),
+      ]);
+      const after = await service.executeAfterCombatEffects(makeState(), atk, null, combat, {
+        attackerWon: true, attackerDamage: 0, defenderDamage: 1,
+      });
+      expect(after.state.metadata.pendingEffects ?? []).toHaveLength(0);
+      expect(after.manualEffects).toEqual([]);
     });
   });
 });

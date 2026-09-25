@@ -372,6 +372,172 @@ describe('AiDecisionService', () => {
     }
   });
 
+  it('S06 CHOOSE_SPACE stage 1: клетка в зоне named-бойца с максимумом врагов', () => {
+    const cells = Array.from({ length: 4 }, (_, y) =>
+      Array.from({ length: 8 }, (_, x) => ({ x, y, type: 'normal', zones: x <= 3 ? ['west'] : ['east'] })));
+    const st = makeState({
+      boardState: { width: 8, height: 4, cells, doors: {}, fog: {}, tokens: {} } as any,
+      fighters: [
+        fighter('merlin', AI, 2, 1, { name: 'Merlin' }),
+        fighter('h1', HUMAN, 0, 1, { type: FighterType.MINION }),
+        fighter('h2', HUMAN, 0, 1, { type: FighterType.MINION }),
+        fighter('h3', HUMAN, 2, 0),
+      ],
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe10', type: 'CHOOSE_SPACE', stage: 1, playerId: AI,
+          zoneFighterName: 'Merlin', damage: 2 }],
+      } as any,
+    });
+    // west (x ≤ 3): (0,1) держит ДВУХ врагов — максимум; (2,0) одного; пустые 0
+    expect(svc.decide(st, AI)).toEqual({ kind: 'resolveSpace', effectId: 'pe10', x: 0, y: 1 });
+  });
+
+  it('S06 CHOOSE_SPACE stage 2: смежная anchor клетка с максимумом целей (+anchor-бонус)', () => {
+    const cells = Array.from({ length: 4 }, (_, y) =>
+      Array.from({ length: 8 }, (_, x) => ({ x, y, type: 'normal', zones: x <= 3 ? ['west'] : ['east'] })));
+    const st = makeState({
+      boardState: { width: 8, height: 4, cells, doors: {}, fog: {}, tokens: {} } as any,
+      fighters: [
+        fighter('a1', AI, 5, 5),
+        fighter('h1', HUMAN, 4, 1),
+        fighter('h2', HUMAN, 3, 1),
+      ],
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe11', type: 'CHOOSE_SPACE', stage: 2, playerId: AI,
+          anchor: { x: 3, y: 1 }, damage: 2 }],
+      } as any,
+    });
+    // смежные к anchor (3,1): (2,1),(4,1),(3,0),(3,2).
+    // enemies(anchor)=1 (h2) → база 1 у всех; (4,1) добавляет h1 → максимум 2
+    expect(svc.decide(st, AI)).toEqual({ kind: 'resolveSpace', effectId: 'pe11', x: 4, y: 1 });
+  });
+
+  it('S06 CHOOSE_SPACE stage 1: wall/obstacle/closed door непроходимы — выбирается легальная клетка, а не максимум на блокере', () => {
+    const cells = Array.from({ length: 4 }, (_, y) =>
+      Array.from({ length: 8 }, (_, x) => ({ x, y, type: 'normal', zones: x <= 3 ? ['west'] : ['east'] })));
+    // блокеры с врагами: стена (2 врага — глобальный максимум), препятствие и
+    // закрытая дверь (по 1); легальный максимум — (2,0) с h3
+    cells[1][0] = { x: 0, y: 1, type: 'wall', zones: ['west'] } as any;
+    cells[0][1] = { x: 1, y: 0, type: 'obstacle', zones: ['west'] } as any;
+    cells[2][3] = { x: 3, y: 2, type: 'door', isOpen: false, zones: ['west'] } as any;
+    const st = makeState({
+      boardState: { width: 8, height: 4, cells, doors: {}, fog: {}, tokens: {} } as any,
+      fighters: [
+        fighter('merlin', AI, 2, 1, { name: 'Merlin' }),
+        fighter('h1', HUMAN, 0, 1, { type: FighterType.MINION }),
+        fighter('h2', HUMAN, 0, 1, { type: FighterType.MINION }),
+        fighter('h4', HUMAN, 1, 0, { type: FighterType.MINION }),
+        fighter('h5', HUMAN, 3, 2, { type: FighterType.MINION }),
+        fighter('h3', HUMAN, 2, 0),
+      ],
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe15', type: 'CHOOSE_SPACE', stage: 1, playerId: AI,
+          zoneFighterName: 'Merlin', damage: 2 }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'resolveSpace', effectId: 'pe15', x: 2, y: 0 });
+  });
+
+  it('S06 CHOOSE_SPACE stage 1: в зоне нет ни одной проходимой клетки → null (нет resolveSpace в блокер)', () => {
+    const cells = Array.from({ length: 4 }, (_, y) =>
+      Array.from({ length: 8 }, (_, x) =>
+        ({ x, y, type: x <= 3 ? 'wall' : 'normal', zones: x <= 3 ? ['west'] : ['east'] })));
+    const st = makeState({
+      boardState: { width: 8, height: 4, cells, doors: {}, fog: {}, tokens: {} } as any,
+      fighters: [
+        fighter('merlin', AI, 2, 1, { name: 'Merlin' }),
+        fighter('h1', HUMAN, 0, 1, { type: FighterType.MINION }),
+      ],
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe16', type: 'CHOOSE_SPACE', stage: 1, playerId: AI,
+          zoneFighterName: 'Merlin', damage: 2 }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toBeNull();
+  });
+
+  it('S06 CHOOSE_SPACE stage 2: смежный блокер (закрытая дверь) пропускается — берётся легальная альтернатива', () => {
+    const cells = Array.from({ length: 4 }, (_, y) =>
+      Array.from({ length: 8 }, (_, x) => ({ x, y, type: 'normal', zones: x <= 3 ? ['west'] : ['east'] })));
+    cells[1][4] = { x: 4, y: 1, type: 'door', isOpen: false, zones: ['east'] } as any;
+    const st = makeState({
+      boardState: { width: 8, height: 4, cells, doors: {}, fog: {}, tokens: {} } as any,
+      fighters: [
+        fighter('a1', AI, 5, 5),
+        fighter('h1', HUMAN, 4, 1),
+        fighter('h2', HUMAN, 3, 1),
+      ],
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe17', type: 'CHOOSE_SPACE', stage: 2, playerId: AI,
+          anchor: { x: 3, y: 1 }, damage: 2 }],
+      } as any,
+    });
+    // (4,1) — закрытая дверь с h1, пропускается; остаются (3,0),(3,2),(2,1)
+    // с базой 1 (h2 на anchor); первый по порядку обхода — (3,0)
+    expect(svc.decide(st, AI)).toEqual({ kind: 'resolveSpace', effectId: 'pe17', x: 3, y: 0 });
+  });
+
+  it('S06 CHOOSE_SPACE stage 2: все смежные клетки блокированы → null', () => {
+    const cells = Array.from({ length: 4 }, (_, y) =>
+      Array.from({ length: 8 }, (_, x) => ({ x, y, type: 'normal', zones: x <= 3 ? ['west'] : ['east'] })));
+    cells[0][3] = { x: 3, y: 0, type: 'wall', zones: ['west'] } as any;
+    cells[2][3] = { x: 3, y: 2, type: 'obstacle', zones: ['west'] } as any;
+    cells[1][4] = { x: 4, y: 1, type: 'door', isOpen: false, zones: ['east'] } as any;
+    cells[1][2] = { x: 2, y: 1, type: 'wall', zones: ['west'] } as any;
+    const st = makeState({
+      boardState: { width: 8, height: 4, cells, doors: {}, fog: {}, tokens: {} } as any,
+      fighters: [
+        fighter('a1', AI, 5, 5),
+        fighter('h1', HUMAN, 0, 0),
+      ],
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe18', type: 'CHOOSE_SPACE', stage: 2, playerId: AI,
+          anchor: { x: 3, y: 1 }, damage: 2 }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toBeNull();
+  });
+
+  it('S06 DECK_TOP_PICK (PICK): первые value открытых карт, детерминированно', () => {
+    const st = makeState({
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe12', type: 'DECK_TOP_PICK', mode: 'PICK', playerId: AI,
+          value: 2, revealedCards: [card('p1', CardType.SCHEME), card('p2', CardType.SCHEME),
+            card('p3', CardType.SCHEME), card('p4', CardType.SCHEME)] }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'resolveDeckPick', effectId: 'pe12', cardIds: ['p1', 'p2'] });
+  });
+
+  it('S06 DECK_TOP_PICK (ORDER): полный порядок возврата как есть', () => {
+    const st = makeState({
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe13', type: 'DECK_TOP_PICK', mode: 'ORDER', playerId: AI,
+          value: 2, revealedCards: [card('p4', CardType.SCHEME), card('p2', CardType.SCHEME)] }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'resolveDeckPick', effectId: 'pe13', cardIds: ['p4', 'p2'] });
+  });
+
+  it('S06 DECK_TOP_PICK: пусто раскрыто → declinePending (очередь не виснет)', () => {
+    const st = makeState({
+      metadata: {
+        actionsRemaining: 2,
+        pendingEffects: [{ id: 'pe14', type: 'DECK_TOP_PICK', mode: 'PICK', playerId: AI,
+          value: 2, revealedCards: [], optional: true }],
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'declinePending', effectId: 'pe14' });
+  });
+
   it('S05 revive-PLACE: зона полностью занята живыми → null → decline (не зависает)', () => {
     const cells = Array.from({ length: 1 }, (_, y) =>
       Array.from({ length: 2 }, (_, x) => ({ x, y, type: 'normal', zones: x === 0 ? ['west'] : ['east'] })));

@@ -9,9 +9,11 @@
  * Контракты:
  * - Эффекты НИКОГДА не меняют sequenceNumber — ровно +1 на мутацию делает
  *   executor действия (game-action-executor).
- * - Нераспознанное/неподдержанное (UNSUPPORTED, MOVE/PLACE с выбором игрока)
- *   не блокирует игру: текст уезжает в manualEffects для ручного применения
- *   (Game Tester), warn-лог + метрика.
+ * - В manualEffects едет ТОЛЬКО реально неподдержанное (UNSUPPORTED,
+ *   CHOOSE_ONE без опций): текст для ручного применения (Game Tester),
+ *   warn-лог + метрика. Легитимные pendingEffects (MOVE/PLACE/CHOOSE_ONE/
+ *   RETURN_DEFEATED/…) резолвятся мутацией resolvePendingEffect и в
+ *   manualEffects НЕ попадают.
  * - CANCEL_EFFECTS: отменённая карта не исполняет ни reveal-, ни during-,
  *   ни after-эффекты; её ПЕЧАТНОЕ значение сохраняется; отменённый атакующий
  *   не отменяет в ответ (его reveal уже не исполняется).
@@ -42,7 +44,7 @@ export interface EffectResult {
   readonly targetIds: readonly string[];
   readonly valueApplied?: number;
   readonly message?: string;
-  /** Эффект требует ручного применения (MOVE/PLACE/UNSUPPORTED) */
+  /** Эффект требует ручного применения (только UNSUPPORTED-семантика) */
   readonly manual?: boolean;
 }
 
@@ -653,10 +655,11 @@ export class CardEffectExecutorService {
             pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
           },
         };
+        // Легитимный pending (резолв optionIndex → executeChosenEffects) —
+        // НЕ manual: аудит manualEffects только для неподдержанного.
         return {
           state: next,
           result: ok({ message: `Ожидает выбора: ${text}` }),
-          manual: text,
         };
       }
 
@@ -675,23 +678,30 @@ export class CardEffectExecutorService {
         // «Move each of your fighters…» / «Move each Harpy…»: EACH — отдельное
         // решение на каждого живого бойца, строго последовательно (голова
         // очереди). Нулевой шаг легален — очередь не strand'ится.
+        // S06 (GD-022, Command the Storms): EACH_FIGHTER — все живые бойцы
+        // ОБЕИХ сторон; владелец эффекта двигает и чужих (targetsOpponent по
+        // фактическому владельцу бойца; «up to» → optional, 0 шагов легален).
         const isEach =
           effect.type === EffectType.MOVE &&
           (effect.target === EffectTarget.EACH_OWN_FIGHTER ||
+            effect.target === EffectTarget.EACH_FIGHTER ||
             (effect.target === EffectTarget.NAMED_FIGHTER && Boolean(effect.fighterName)));
         if (isEach && fighterIds.length > 0) {
-          const pendings = fighterIds.map((fid, i) => ({
-            id: `${effect.id}-p${(state.metadata.pendingEffects?.length ?? 0) + i}`,
-            type: 'MOVE' as const,
-            playerId: context.playerId,
-            fighterIds: [fid],
-            value: value || undefined,
-            fighterName: effect.target === EffectTarget.NAMED_FIGHTER ? effect.fighterName : undefined,
-            targetsOpponent: false,
-            optional: effect.optional,
-            canPassThroughEnemies: effect.canPassThroughEnemies === true,
-            text,
-          }));
+          const pendings = fighterIds.map((fid, i) => {
+            const fighter = state.fighters.find((f) => f.id === fid);
+            return {
+              id: `${effect.id}-p${(state.metadata.pendingEffects?.length ?? 0) + i}`,
+              type: 'MOVE' as const,
+              playerId: context.playerId,
+              fighterIds: [fid],
+              value: value || undefined,
+              fighterName: effect.target === EffectTarget.NAMED_FIGHTER ? effect.fighterName : undefined,
+              targetsOpponent: fighter ? fighter.ownerId !== context.playerId : false,
+              optional: effect.target === EffectTarget.EACH_FIGHTER ? true : effect.optional,
+              canPassThroughEnemies: effect.canPassThroughEnemies === true,
+              text,
+            };
+          });
           const next: GameState = {
             ...state,
             metadata: {
@@ -702,6 +712,41 @@ export class CardEffectExecutorService {
           return {
             state: next,
             result: ok({ targetIds: fighterIds, message: `Ожидает выбора: ${text} (×${pendings.length})` }),
+          };
+        }
+
+        // Skirmish (GD-023): «choose one of the fighters in the combat» —
+        // ОДИН pending с выбором ЛЮБОГО живого участника боя (anyOwner).
+        if (effect.type === EffectType.MOVE && effect.target === EffectTarget.COMBAT_FIGHTER) {
+          const participants = context.combat
+            ? [context.combat.attackerFighterId, context.combat.targetFighterId]
+            : [];
+          const living = participants.filter((id) =>
+            state.fighters.some((f) => f.id === id && !f.isDefeated && f.health > 0),
+          );
+          if (living.length === 0) {
+            return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'Нет живых участников боя' } };
+          }
+          const pending = {
+            id: `${effect.id}-p${(state.metadata.pendingEffects?.length ?? 0)}`,
+            type: 'MOVE' as const,
+            playerId: context.playerId,
+            fighterIds: living,
+            value: value || undefined,
+            anyOwner: true,
+            optional: effect.optional,
+            text,
+          };
+          const next: GameState = {
+            ...state,
+            metadata: {
+              ...state.metadata,
+              pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+            },
+          };
+          return {
+            state: next,
+            result: ok({ targetIds: living, message: `Ожидает выбора: ${text}` }),
           };
         }
 
@@ -724,10 +769,10 @@ export class CardEffectExecutorService {
             pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
           },
         };
+        // Легитимный pending (резолв fighterId+x+y) — НЕ manual.
         return {
           state: next,
           result: ok({ message: `Ожидает выбора: ${text}` }),
-          manual: text,
         };
       }
 
@@ -763,11 +808,179 @@ export class CardEffectExecutorService {
             pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
           },
         };
+        // Легитимный optional revive-pending (резолв/decline как PLACE) — НЕ manual.
         return {
           state: next,
           result: ok({ message: `Ожидает выбора: ${text}` }),
-          manual: text,
         };
+      }
+
+      // The Lady of the Lake (GD-021): «Search your deck and discard pile for
+      // the EXCALIBUR card. Add it to your hand. If you searched your deck,
+      // shuffle it.» — выбора игрока НЕТ: авто-поиск в СВОИХ зонах. Колода
+      // просматривается всегда → всегда shuffle (порядок после — неизвестен
+      // даже владельцу). Excalibur единственна (count 1); детерминированный
+      // порядок зон: discard, затем drawPile.
+      case EffectType.SEARCH_ADD_TO_HAND: {
+        const want = effect.searchCardName ?? '';
+        if (!want) {
+          return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'Не задано имя искомой карты' } };
+        }
+        const playerId = context.playerId;
+        const hand = state.handZones[playerId];
+        const deck = state.decks[playerId];
+        if (!hand || !deck) {
+          return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'Нет колоды/руки у владельца' } };
+        }
+        // Печатный текст капсит имя («the EXCALIBUR card») — сравнение
+        // регистронезависимо, иначе карта «Excalibur» не находится.
+        const matches = (c: Card): boolean =>
+          (c.nameEn ?? c.name).toUpperCase() === want.toUpperCase() ||
+          c.name.toUpperCase() === want.toUpperCase();
+        const pile = state.discardPiles[playerId] ?? [];
+        const inDiscardIdx = pile.findIndex(matches);
+        let next: GameState = state;
+        let foundIn: 'discard' | 'drawPile' | null = null;
+        if (inDiscardIdx !== -1) {
+          const card = pile[inDiscardIdx];
+          next = {
+            ...next,
+            discardPiles: {
+              ...next.discardPiles,
+              [playerId]: pile.filter((_, i) => i !== inDiscardIdx),
+            },
+            handZones: {
+              ...next.handZones,
+              [playerId]: { ...hand, cards: [...hand.cards, { ...card, isVisible: true }] },
+            },
+          };
+          foundIn = 'discard';
+        } else {
+          const drawIdx = deck.drawPile.findIndex(matches);
+          if (drawIdx !== -1) {
+            const card = deck.drawPile[drawIdx];
+            const remaining = deck.drawPile.filter((_, i) => i !== drawIdx);
+            next = {
+              ...next,
+              decks: { ...next.decks, [playerId]: { ...deck, drawPile: remaining, topCard: remaining[0] } },
+              handZones: {
+                ...next.handZones,
+                [playerId]: { ...hand, cards: [...hand.cards, { ...card, isVisible: true }] },
+              },
+            };
+            foundIn = 'drawPile';
+          }
+        }
+        // Deck searched → shuffle it (order unknown to everyone afterwards).
+        const shuffled = this.shuffleDrawPile(next.decks[playerId].drawPile);
+        next = {
+          ...next,
+          decks: {
+            ...next.decks,
+            [playerId]: { ...next.decks[playerId], drawPile: shuffled, topCard: shuffled[0] },
+          },
+        };
+        const message = foundIn
+          ? `«${want}» найдена в ${foundIn === 'discard' ? 'сбросе' : 'колоде'} и добавлена в руку; колода перемешана`
+          : `«${want}» не найдена (колода/сброс); колода перемешана`;
+        return { state: next, result: ok({ targetIds: [playerId], message }) };
+      }
+
+      // Prophecy (GD-021): «Look at the top 4 cards… Add 2… other 2 back on
+      // top, in any order.» — снимаем верхние min(view, pile) карт в pending
+      // (атомарно: колода уже без них), выбор 2 + порядок возврата — владелец.
+      // Малый остаток: берём что есть; pickCount = min(pick, revealed).
+      case EffectType.DECK_TOP_PICK: {
+        const playerId = context.playerId;
+        const hand = state.handZones[playerId];
+        const deck = state.decks[playerId];
+        if (!hand || !deck) {
+          return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'Нет колоды/руки у владельца' } };
+        }
+        const view = Math.min(effect.viewCount ?? 4, deck.drawPile.length);
+        if (view === 0) {
+          // Колода пуста: смотреть нечего. Это НЕ требуемый добор — истощение
+          // не применяется (R-04 касается required draws).
+          return { state, result: ok({ targetIds: [playerId], valueApplied: 0, message: 'Колода пуста — смотреть нечего' }) };
+        }
+        const revealed = deck.drawPile.slice(0, view);
+        const restPile = deck.drawPile.slice(view);
+        const pending: PendingEffect = {
+          id: `${effect.id}-p${state.metadata.pendingEffects?.length ?? 0}`,
+          type: 'DECK_TOP_PICK',
+          mode: 'PICK',
+          playerId,
+          value: Math.min(effect.pickCount ?? 2, view),
+          revealedCards: revealed,
+          text: effect.text ?? `Look at the top ${view} cards of your deck`,
+        };
+        const next: GameState = {
+          ...state,
+          decks: { ...state.decks, [playerId]: { ...deck, drawPile: restPile, topCard: restPile[0] } },
+          metadata: {
+            ...state.metadata,
+            pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+          },
+        };
+        return {
+          state: next,
+          result: ok({ targetIds: [playerId], message: `Ожидает выбора ${pending.value} из ${view} карт` }),
+        };
+      }
+
+      // Restless Spirits (GD-022): двухстадийный выбор клетки — pending
+      // CHOOSE_SPACE; урон/добор применяются на резолве stage 2 (executor).
+      case EffectType.ZONE_AREA_DAMAGE: {
+        const anchor = state.fighters.find((f) =>
+          this.nameMatches(f.name, effect.zoneFighterName ?? ''),
+        );
+        if (!anchor) {
+          return { state, result: { success: false, effectId: effect.id, targetIds: [], message: `Боец «${effect.zoneFighterName}» не на доске — зона не определена` } };
+        }
+        const pending: PendingEffect = {
+          id: `${effect.id}-p${state.metadata.pendingEffects?.length ?? 0}`,
+          type: 'CHOOSE_SPACE',
+          stage: 1,
+          playerId: context.playerId,
+          zoneFighterName: effect.zoneFighterName,
+          damage: value,
+          drawIfDefeated: effect.drawIfDefeated,
+          text: effect.text ?? `Choose any space in ${effect.zoneFighterName}'s zone`,
+        };
+        const next: GameState = {
+          ...state,
+          metadata: {
+            ...state.metadata,
+            pendingEffects: [...(state.metadata.pendingEffects ?? []), pending],
+          },
+        };
+        return { state: next, result: ok({ targetIds: [context.playerId], message: `Ожидает выбора: ${pending.text}` }) };
+      }
+
+      // The Holy Grail (GD-022): «If King Arthur has 4 or less health but is
+      // not defeated, set his health to 8.» — УСТАНОВКА, не heal: hp <= 4 →
+      // ровно 8; выше порога/повержён — без изменений.
+      case EffectType.SET_HEALTH: {
+        const target = state.fighters.find((f) =>
+          this.nameMatches(f.name, effect.fighterName ?? ''),
+        );
+        if (!target) {
+          return { state, result: { success: false, effectId: effect.id, targetIds: [], message: `Боец «${effect.fighterName}» не найден` } };
+        }
+        const threshold = effect.threshold ?? 0;
+        if (target.isDefeated || target.health <= 0) {
+          return { state, result: ok({ targetIds: [target.id], message: `«${target.name}» повержён — здоровье не устанавливается` }) };
+        }
+        if (target.health > threshold) {
+          return { state, result: ok({ targetIds: [target.id], valueApplied: 0, message: `HP ${target.health} > ${threshold} — без изменений` }) };
+        }
+        const next: GameState = {
+          ...state,
+          fighters: state.fighters.map((f) =>
+            f.id === target.id ? { ...f, health: value } : f,
+          ),
+        };
+        return { state: next, result: ok({ targetIds: [target.id], valueApplied: value, message: `HP установлен: ${value}` }) };
       }
 
       case EffectType.UNSUPPORTED:
@@ -1035,6 +1248,20 @@ export class CardEffectExecutorService {
           .map((f) => f.id);
       }
 
+      // Command the Storms (GD-022): ВСЕ живые бойцы, обе стороны
+      case EffectTarget.EACH_FIGHTER: {
+        return state.fighters
+          .filter((f) => !f.isDefeated && f.health > 0)
+          .map((f) => f.id);
+      }
+
+      // Skirmish (GD-023): живые участники текущего боя
+      case EffectTarget.COMBAT_FIGHTER: {
+        if (!context.combat) return [];
+        return [context.combat.attackerFighterId, context.combat.targetFighterId]
+          .filter((id) => state.fighters.some((f) => f.id === id && !f.isDefeated && f.health > 0));
+      }
+
       case EffectTarget.OPPONENT_PLAYER: {
         const opp = this.opponentPlayerId(state, context);
         return opp ? [opp] : [];
@@ -1109,6 +1336,16 @@ export class CardEffectExecutorService {
         f.id === fighterId ? { ...f, health: Math.min(f.maxHealth, f.health + amount) } : f,
       ),
     };
+  }
+
+  /** Fisher-Yates (тот же алгоритм, что DeckManagementService.shuffle) */
+  private shuffleDrawPile<T>(pile: readonly T[]): T[] {
+    const result = [...pile];
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
   }
 
   /** BLIND BOOST: сброс верха СВОЕЙ колоды, += его boostValue */

@@ -69,6 +69,9 @@ export const GameView = () => {
   const [pendingFighterId, setPendingFighterId] = useState<string | null>(null);
   // S05 DISCARD_CARDS: выбранные для сброса карты (value > 1)
   const [discardChoiceIds, setDiscardChoiceIds] = useState<string[]>([]);
+  // S06 DECK_TOP_PICK (Prophecy): выбранные revealed-карты (PICK — множество,
+  // ORDER — последовательность кликов)
+  const [deckPickIds, setDeckPickIds] = useState<string[]>([]);
   // GD-017: ability-BOOST карта (Arthur) поверх выбранной атакующей
   const [abilityBoostId, setAbilityBoostId] = useState('');
   const [maneuverMoves, setManeuverMoves] = useState<ManeuverMove[]>([]);
@@ -93,6 +96,7 @@ export const GameView = () => {
 
   useEffect(() => {
     setDiscardChoiceIds([]);
+    setDeckPickIds([]);
   }, [myPendingEffects()[0]?.id]);
 
   // активный отложенный эффект ЛОКАЛЬНОГО игрока (первый в очереди)
@@ -205,6 +209,21 @@ export const GameView = () => {
             void run(() => resolvePendingEffect(activePending.id, fighter.id));
           }
         }
+        return;
+      }
+      // S06 CHOOSE_SPACE (Restless Spirits): выбор клетки БЕЗ бойца — клик по
+      // клетке резолвит стадию (зона named-бойца / смежная с anchor)
+      if (activePending.type === 'CHOOSE_SPACE') {
+        if (event.type === 'SPACE_CLICKED') {
+          void run(() =>
+            resolvePendingEffect(activePending.id, undefined, event.position.x, event.position.y),
+          );
+        }
+        return;
+      }
+      // S06 DECK_TOP_PICK (Prophecy): revealed-карты лежат в pending, не в
+      // руке — выбор кнопками баннера, клики по доске/руке игнорируем
+      if (activePending.type === 'DECK_TOP_PICK') {
         return;
       }
       if (event.type === 'FIGHTER_CLICKED') {
@@ -625,6 +644,65 @@ export const GameView = () => {
                   </Button>
                 )}
               </span>
+            ) : activePending.type === 'CHOOSE_SPACE' ? (
+              <span style={{ opacity: 0.8 }}>
+                {activePending.stage === 2
+                  ? `Кликните клетку, смежную с (${activePending.anchor?.x}, ${activePending.anchor?.y}) — урон обеим клеткам${activePending.drawIfDefeated ? ' + добор за поверженных' : ''}`
+                  : `Кликните любую клетку в зоне «${activePending.zoneFighterName}»`}
+              </span>
+            ) : activePending.type === 'DECK_TOP_PICK' ? (
+              (() => {
+                const revealed = activePending.revealedCards ?? [];
+                const ordering = activePending.mode !== 'ORDER';
+                const need = ordering ? Math.min(activePending.value ?? revealed.length, revealed.length) : revealed.length;
+                const toggle = (cardId: string) => {
+                  setDeckPickIds(ids =>
+                    ordering
+                      ? toggleDiscardInstance(ids, cardId, need)
+                      : ids.includes(cardId) ? ids : [...ids, cardId],
+                  );
+                };
+                return (
+                  <span style={{ opacity: 0.8, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                    {ordering
+                      ? `Возьмите ${need} ${need === 1 ? 'карту' : 'карты'} в руку:`
+                      : `Порядок возврата наверх колоды (клик по порядку):`}
+                    {revealed.map(card => {
+                      const at = deckPickIds.indexOf(card.id);
+                      return (
+                        <button
+                          key={card.id}
+                          disabled={busy || (!ordering && at >= 0)}
+                          onClick={() => toggle(card.id)}
+                          style={{
+                            background: at >= 0 ? 'rgba(120, 90, 220, 0.6)' : 'rgba(120, 90, 220, 0.25)',
+                            border: '1px solid rgba(120, 90, 220, 0.7)',
+                            color: '#fff',
+                            padding: '4px 10px',
+                            borderRadius: 6,
+                            cursor: busy || (!ordering && at >= 0) ? 'default' : 'pointer',
+                          }}
+                        >
+                          {card.nameRu || card.name}
+                          {at >= 0 ? ` · #${at + 1}` : ''}
+                        </button>
+                      );
+                    })}
+                    {deckPickIds.length === need && need > 0 && (
+                      <Button
+                        variant="primary"
+                        disabled={busy}
+                        onClick={() => void run(async () => {
+                          await resolvePendingEffect(activePending.id, undefined, undefined, undefined, deckPickIds);
+                          setDeckPickIds([]);
+                        })}
+                      >
+                        {ordering ? `Взять ${need}` : 'Вернуть в колоду'}
+                      </Button>
+                    )}
+                  </span>
+                );
+              })()
             ) : (
               <span style={{ opacity: 0.8 }}>
                 {pendingFighterId

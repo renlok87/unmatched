@@ -133,11 +133,15 @@ export interface WireGameState {
  * - DISCARD_CARDS (S05): владелец выбора сбрасывает value своих карт из руки
  *   (печатный сброс без «random» — карту выбирает сбрасывающий);
  * - BOOST_CHOICE (S05): optional буст боя («You may BOOST this attack»)
- *   ПОСЛЕ reveal — клик по ОДНОЙ своей карте или «Отказаться».
+ *   ПОСЛЕ reveal — клик по ОДНОЙ своей карте или «Отказаться»;
+ * - CHOOSE_SPACE (S06, Restless Spirits): двухстадийный выбор клетки —
+ *   stage 1 любая клетка зоны named-бойца, stage 2 смежная с anchor;
+ * - DECK_TOP_PICK (S06, Prophecy): PICK value открытых карт в руку,
+ *   ORDER — порядок возврата остатка наверх колоды.
  */
 export interface WirePendingEffect {
   id: string;
-  type: 'MOVE' | 'PLACE' | 'CHOOSE_ONE' | 'TARGET_FIGHTER' | 'DISCARD_CARDS' | 'BOOST_CHOICE';
+  type: 'MOVE' | 'PLACE' | 'CHOOSE_ONE' | 'TARGET_FIGHTER' | 'DISCARD_CARDS' | 'BOOST_CHOICE' | 'CHOOSE_SPACE' | 'DECK_TOP_PICK';
   playerId: string;
   value?: number;
   fighterName?: string;
@@ -155,12 +159,26 @@ export interface WirePendingEffect {
   damage?: number;
   /** MOVE: движение сквозь врагов разрешено (Winged Frenzy) */
   canPassThroughEnemies?: boolean;
-  /** PLACE: клетка должна лежать в зоне этого бойца (revive Harpy) */
+  /** PLACE/CHOOSE_SPACE: клетка должна лежать в зоне этого бойца */
   zoneFighterName?: string;
   /** PLACE: вернуть ПОВЕРЖЁННОГО бойца с полным HP (Winged Frenzy) */
   restoreFullHealth?: boolean;
   /** MOVE/PLACE: список допустимых бойцов (валидация — на бэке) */
   fighterIds?: string[];
+  /** CHOOSE_SPACE: стадия — 1 клетка зоны named-бойца, 2 смежная с anchor */
+  stage?: number;
+  /** CHOOSE_SPACE stage 2: якорная клетка (Restless Spirits) */
+  anchor?: WirePosition;
+  /** CHOOSE_SPACE: добор карты за каждого поверженного уроном */
+  drawIfDefeated?: boolean;
+  /** DECK_TOP_PICK: 'PICK' — взять value карт в руку; 'ORDER' — вернуть
+   *  остаток наверх колоды в выбранном порядке */
+  mode?: 'PICK' | 'ORDER';
+  /** DECK_TOP_PICK: открытые карты. Только для ВЛАДЕЛЬЦА выбора — бэк
+   *  вырезает их чужому игроку (privacy), оставляя revealedCount */
+  revealedCards?: WireCard[];
+  /** DECK_TOP_PICK: сколько карт открыто (видно всем, карты — только себе) */
+  revealedCount?: number;
 }
 
 /** Справочники для артов/имён (контентные запросы, кэш в remoteGameStore) */

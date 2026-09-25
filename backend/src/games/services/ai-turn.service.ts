@@ -176,6 +176,24 @@ export class AiTurnService {
           ),
           eventType: 'CARD_DISCARDED',
         };
+      case 'resolveSpace':
+        // CHOOSE_SPACE (S06, Restless Spirits): клетка без бойца
+        return {
+          result: await this.executor.executeResolvePendingEffect(
+            { gameId, effectId: action.effectId, x: action.x, y: action.y },
+            ctx,
+          ),
+          eventType: 'CARD_PLAYED',
+        };
+      case 'resolveDeckPick':
+        // DECK_TOP_PICK (S06, Prophecy): PICK 2 в руку / ORDER порядок возврата
+        return {
+          result: await this.executor.executeResolvePendingEffect(
+            { gameId, effectId: action.effectId, cardIds: action.cardIds },
+            ctx,
+          ),
+          eventType: 'CARD_PLAYED',
+        };
       case 'declinePending':
         return {
           result: await this.executor.executeDeclinePendingEffect(

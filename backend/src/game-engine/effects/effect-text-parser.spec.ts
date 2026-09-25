@@ -6,7 +6,7 @@
  */
 
 import { EffectTiming, EffectType, EffectTarget } from '../models/card.model';
-import { parseCardEffectTexts, parseFieldText, PARSER_VERSION } from './effect-text-parser';
+import { parseCardEffectTexts, parseFieldText, upgradeStaleParserEffects, PARSER_VERSION } from './effect-text-parser';
 
 const after = (text: string) => parseFieldText(text, EffectTiming.AFTER_COMBAT);
 const during = (text: string) => parseFieldText(text, EffectTiming.DURING_COMBAT);
@@ -510,7 +510,7 @@ describe('effect-text-parser', () => {
       expect(drafts[0].draft.type).not.toBe(EffectType.CHOOSE_ONE);
     });
 
-    it('«Choose one of the fighters in the combat and move them up to 2 spaces.» → MOVE value 2 (parser v6)', () => {
+    it('«Choose one of the fighters in the combat and move them up to 2 spaces.» → MOVE value 2 COMBAT_FIGHTER (S06)', () => {
       const { drafts, unsupported } = after(
         'Choose one of the fighters in the combat and move them up to 2 spaces.',
       );
@@ -519,11 +519,11 @@ describe('effect-text-parser', () => {
       expect(drafts[0].draft).toMatchObject({
         type: EffectType.MOVE,
         value: 2,
-        target: EffectTarget.SELF,
+        target: EffectTarget.COMBAT_FIGHTER,
       });
     });
 
-    it('«If you won the combat, choose one of the fighters … move them up to 2 spaces.» → MOVE value 2 + WON_COMBAT', () => {
+    it('«If you won the combat, choose one of the fighters … move them up to 2 spaces.» → MOVE value 2 COMBAT_FIGHTER + WON_COMBAT', () => {
       const { drafts, unsupported } = after(
         'If you won the combat, choose one of the fighters in the combat and move them up to 2 spaces.',
       );
@@ -532,7 +532,7 @@ describe('effect-text-parser', () => {
       expect(drafts[0].draft).toMatchObject({
         type: EffectType.MOVE,
         value: 2,
-        target: EffectTarget.SELF,
+        target: EffectTarget.COMBAT_FIGHTER,
         when: { kind: 'WON_COMBAT' },
       });
     });
@@ -699,6 +699,127 @@ describe('effect-text-parser', () => {
         target: EffectTarget.SELF,
         when: { kind: 'ADJACENT_TO_OPPONENT' },
       });
+    });
+  });
+
+  describe('S06 GD-021..023 (v9): Arthur schemes', () => {
+    it('The Lady of the Lake → SEARCH_ADD_TO_HAND (fullText compound)', () => {
+      const { effects, unsupported } = parseCardEffectTexts(
+        {
+          fullText:
+            "Search your deck and discard pile for the EXCALIBUR card. Add it to your hand. If you searched your deck, shuffle it.",
+        },
+        'lady',
+      );
+      expect(unsupported).toEqual([]);
+      expect(effects).toHaveLength(1);
+      expect(effects[0]).toMatchObject({
+        type: EffectType.SEARCH_ADD_TO_HAND,
+        searchCardName: 'EXCALIBUR',
+        timing: EffectTiming.AFTER_COMBAT,
+        parserVersion: PARSER_VERSION,
+      });
+    });
+
+    it('Prophecy → DECK_TOP_PICK view 4 / pick 2 (согласование «the other 2»)', () => {
+      const { effects, unsupported } = parseCardEffectTexts(
+        {
+          fullText:
+            'Look at the top 4 cards of your deck. Add 2 of them to your hand and put the other 2 back on top of your deck, in any order.',
+        },
+        'prophecy',
+      );
+      expect(unsupported).toEqual([]);
+      expect(effects).toHaveLength(1);
+      expect(effects[0]).toMatchObject({
+        type: EffectType.DECK_TOP_PICK,
+        viewCount: 4,
+        pickCount: 2,
+      });
+      // Рассинхронизированные числа (4/2/3) НЕ матчатся — защита от опечаток
+      const bad = parseCardEffectTexts(
+        {
+          fullText:
+            'Look at the top 4 cards of your deck. Add 2 of them to your hand and put the other 3 back on top of your deck, in any order.',
+        },
+        'prophecy-bad',
+      );
+      expect(bad.effects.some((e) => e.type === EffectType.UNSUPPORTED)).toBe(true);
+    });
+
+    it('Command the Storms → MOVE EACH_FIGHTER 3 («each fighter», скобка вырезана)', () => {
+      const { drafts, unsupported } = after('Move each fighter up to 3 spaces.');
+      expect(unsupported).toEqual([]);
+      expect(drafts).toHaveLength(1);
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.MOVE,
+        value: 3,
+        target: EffectTarget.EACH_FIGHTER,
+        optional: true,
+      });
+    });
+
+    it('Restless Spirits → ZONE_AREA_DAMAGE (fullText compound)', () => {
+      const { effects, unsupported } = parseCardEffectTexts(
+        {
+          fullText:
+            "Choose any space in Merlin's zone. Deal 2 damage to each opposing fighter in that space and in one adjacent space. If at least one fighter is defeated this way, draw 1 card.",
+        },
+        'restless',
+      );
+      expect(unsupported).toEqual([]);
+      expect(effects).toHaveLength(1);
+      expect(effects[0]).toMatchObject({
+        type: EffectType.ZONE_AREA_DAMAGE,
+        zoneFighterName: 'Merlin',
+        value: 2,
+        drawIfDefeated: 1,
+      });
+    });
+
+    it('The Holy Grail → SET_HEALTH threshold 4 → value 8', () => {
+      const { drafts, unsupported } = after(
+        'If King Arthur has 4 or less health but is not defeated, set his health to 8.',
+      );
+      expect(unsupported).toEqual([]);
+      expect(drafts).toHaveLength(1);
+      expect(drafts[0].draft).toMatchObject({
+        type: EffectType.SET_HEALTH,
+        fighterName: 'King Arthur',
+        threshold: 4,
+        value: 8,
+      });
+    });
+
+    it('upgradeStaleParserEffects: v6-UNSUPPORTED апгрейдится, manual не трогается, регресс исключён', () => {
+      // Holy Grail v6 из БД: UNSUPPORTED + текст effectAfter
+      const stale = [{ id: 'x', type: EffectType.UNSUPPORTED, timing: EffectTiming.AFTER_COMBAT, source: 'parser' as const, parserVersion: 6 }];
+      const upgraded = upgradeStaleParserEffects(
+        stale,
+        { after: 'If King Arthur has 4 or less health but is not defeated, set his health to 8.' },
+        'x',
+      );
+      expect(upgraded[0].type).toBe(EffectType.SET_HEALTH);
+
+      // manual — приоритет, не перезаписывается
+      const manual = [{ id: 'x', type: EffectType.UNSUPPORTED, timing: EffectTiming.AFTER_COMBAT, source: 'manual' as const }];
+      const keptManual = upgradeStaleParserEffects(
+        manual,
+        { after: 'If King Arthur has 4 or less health but is not defeated, set his health to 8.' },
+        'x',
+      );
+      expect(keptManual).toEqual(manual);
+      expect(keptManual[0].source).toBe('manual');
+
+      // нераспознанный при повторном разборе — остаётся старый (не хуже)
+      const stillBad = [{ id: 'y', type: EffectType.UNSUPPORTED, timing: EffectTiming.AFTER_COMBAT, source: 'parser' as const, parserVersion: 6 }];
+      expect(
+        upgradeStaleParserEffects(stillBad, { after: 'Totally unknown effect wording.' }, 'y')[0].type,
+      ).toBe(EffectType.UNSUPPORTED);
+
+      // свежий parserVersion — не апгрейдится
+      const fresh = [{ id: 'z', type: EffectType.SET_HEALTH, timing: EffectTiming.AFTER_COMBAT, source: 'parser' as const, parserVersion: PARSER_VERSION }];
+      expect(upgradeStaleParserEffects(fresh, { after: 'anything' }, 'z')).toEqual(fresh);
     });
   });
 });

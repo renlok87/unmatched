@@ -214,9 +214,16 @@ export interface PendingEffect {
    * печатный сброс БЕЗ слова «random» — карту выбирает сбрасывающий, не движок) |
    * 'BOOST_CHOICE' (S05: optional BOOST this attack/defense — «You may BOOST…»
    * карты эффекта; владелец СВОЕЙ руки выбирает ОДНУ карту как буст ПОСЛЕ
-   * reveal, в паузе DURING_COMBAT; резолв — cardIds[0], отказ — decline)
+   * reveal, в паузе DURING_COMBAT; резолв — cardIds[0], отказ — decline) |
+   * 'CHOOSE_SPACE' (S06 GD-022, Restless Spirits: stage 1 — клетка в зоне
+   * zoneFighterName; stage 2 — клетка, смежная с anchor; затем damage урона
+   * каждому вражескому бойцу обеих клеток + условный добор drawIfDefeated) |
+   * 'DECK_TOP_PICK' (S06 GD-021, Prophecy: mode 'PICK' — cardIds ровно
+   * pickCount из revealedCards уходят в руку; mode 'ORDER' — cardIds задают
+   * порядок возврата остатка НАВЕРХ колоды; revealedCards видны ТОЛЬКО
+   * владельцу выбора — filterPrivateData прячет их от соперника)
    */
-  readonly type: 'MOVE' | 'PLACE' | 'CHOOSE_ONE' | 'TARGET_FIGHTER' | 'DISCARD_CARDS' | 'BOOST_CHOICE';
+  readonly type: 'MOVE' | 'PLACE' | 'CHOOSE_ONE' | 'TARGET_FIGHTER' | 'DISCARD_CARDS' | 'BOOST_CHOICE' | 'CHOOSE_SPACE' | 'DECK_TOP_PICK';
   /** Кому принадлежит выбор */
   readonly playerId: string;
   /** Дистанция для MOVE; количество карт для DISCARD_CARDS */
@@ -235,6 +242,21 @@ export interface PendingEffect {
   readonly zoneFighterName?: string;
   /** PLACE: revive — боец может быть defeated, возвращается с maxHealth */
   readonly restoreFullHealth?: boolean;
+  /** MOVE (Skirmish): разрешён ЛЮБОЙ боец из fighterIds — свой или чужой
+   *  («choose one of the fighters in the combat»); ownership-check выключен */
+  readonly anyOwner?: boolean;
+  /** CHOOSE_SPACE: стадия 1 (клетка в зоне) | 2 (клетка, смежная с anchor) */
+  readonly stage?: 1 | 2;
+  /** CHOOSE_SPACE stage 2: выбранная в stage 1 клетка-якорь смежности */
+  readonly anchor?: { readonly x: number; readonly y: number };
+  /** CHOOSE_SPACE: условный добор при ≥1 повержённом уроном эффекта */
+  readonly drawIfDefeated?: number;
+  /** DECK_TOP_PICK: карты, снятые с верха колоды (только для владельца выбора) */
+  readonly revealedCards?: readonly Card[];
+  /** DECK_TOP_PICK: сколько карт открыто — ВИДНО сопернику (без личин) */
+  readonly revealedCount?: number;
+  /** DECK_TOP_PICK: стадия выбора — PICK (взять в руку) | ORDER (порядок возврата) */
+  readonly mode?: 'PICK' | 'ORDER';
   /** Исходный текст — для лога/тестера */
   readonly text?: string;
 

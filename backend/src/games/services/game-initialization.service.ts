@@ -35,7 +35,7 @@ import {
   slugifyHeroName,
 } from '../../game-engine/models';
 import type { AttackType, BoardState, CardEffect, Cell } from '../../game-engine/models';
-import { parseCardEffectTexts } from '../../game-engine/effects/effect-text-parser';
+import { parseCardEffectTexts, upgradeStaleParserEffects } from '../../game-engine/effects/effect-text-parser';
 import type { Board } from '@prisma/client';
 
 const STARTING_HAND_SIZE = 5;
@@ -270,20 +270,39 @@ export class GameInitializationService {
    * (Card.text = textEn: A Momentary Glance, Winged Frenzy, …) — парсим
    * fullText, чтобы матч исполнял эффект без ожидания backfill БД.
    * Нераспознанный текст честно даёт UNSUPPORTED (не молчаливый no-op).
+   * S06: устаревшие parser-эффекты (parserVersion < текущей) апгрейдятся
+   * повторным разбором (upgradeStaleParserEffects) — как backfill, но без
+   * ожидания деплоя; замена только при ПОЛНОМ распознании.
    */
   private resolveCardEffects(card: {
     id: string;
     cardType: string;
     effects: unknown;
     text?: string | null;
+    effectImmediately?: string | null;
+    effectDuring?: string | null;
+    effectAfter?: string | null;
+    effectBoost?: string | null;
+    effectOngoing?: string | null;
   }): CardEffect[] {
     const effects = normalizeCardEffects(card.effects, card.id);
-    if (effects.length > 0) return effects;
-    if (card.cardType !== 'SCHEME' || !card.text?.trim()) return [];
-    const { effects: parsed } = parseCardEffectTexts(
-      { fullText: card.text },
-      card.id,
-    );
+    const fullText = card.cardType === 'SCHEME' && card.text?.trim() ? card.text : undefined;
+    if (effects.length > 0) {
+      return upgradeStaleParserEffects(
+        effects,
+        {
+          immediately: card.effectImmediately,
+          during: card.effectDuring,
+          after: card.effectAfter,
+          boost: card.effectBoost,
+          ongoing: card.effectOngoing,
+          fullText,
+        },
+        card.id,
+      );
+    }
+    if (!fullText) return [];
+    const { effects: parsed } = parseCardEffectTexts({ fullText }, card.id);
     return parsed;
   }
 

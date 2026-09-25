@@ -560,6 +560,21 @@ export class GameActionExecutorService {
         return this.resolveBoostChoice(pending, dto.cardIds, userId, currentState, context.gameId);
       }
 
+      // --- CHOOSE_SPACE (S06, Restless Spirits): stage 1 — клетка в зоне
+      //     zoneFighterName; stage 2 — клетка, смежная с anchor; после stage 2
+      //     — урон damage каждому вражескому бойцу обеих клеток + условный
+      //     добор drawIfDefeated при ≥1 повержённом. ---
+      if (pending.type === 'CHOOSE_SPACE') {
+        return this.resolveChooseSpace(pending, dto.x, dto.y, userId, currentState, context.gameId);
+      }
+
+      // --- DECK_TOP_PICK (S06, Prophecy): PICK — взять ровно value карт из
+      //     revealedCards в руку; ORDER — задать порядок возврата остатка
+      //     НАВЕРХ колоды. Ревалидация: только карты из revealedCards. ---
+      if (pending.type === 'DECK_TOP_PICK') {
+        return this.resolveDeckTopPick(pending, dto.cardIds, userId, currentState, context.gameId);
+      }
+
       // MOVE/PLACE требуют бойца и клетку
       if (!dto.fighterId || dto.x === undefined || dto.y === undefined) {
         return { success: false, error: 'MOVE/PLACE требует fighterId, x, y' };
@@ -576,8 +591,11 @@ export class GameActionExecutorService {
       }
 
       // Чей боец двигается: свой (обычные MOVE) или противника
-      // («Place the opposing fighter…»)
-      if (pending.targetsOpponent ? fighter.ownerId === userId : fighter.ownerId !== userId) {
+      // («Place the opposing fighter…»). Skirmish (anyOwner): ЛЮБОЙ боец из
+      // списка эффекта — свой или чужой («choose one of the fighters in the
+      // combat»); проверка владельца выключена.
+      if (!pending.anyOwner &&
+          (pending.targetsOpponent ? fighter.ownerId === userId : fighter.ownerId !== userId)) {
         return { success: false, error: 'Эффект двигает не этого бойца' };
       }
 
@@ -1095,6 +1113,303 @@ export class GameActionExecutorService {
             message: `BOOST +${boost} («${card.name}» ${isAttackerSide ? '→ атака' : 'защита'})`,
           },
         ],
+      },
+    };
+  }
+
+  /**
+   * Резолв CHOOSE_SPACE (S06 GD-022, Restless Spirits): stage 1 — клетка в
+   * зоне named-бойца (ревалидация: якорь жив на доске, клетка в зоне);
+   * выбрав, pending заменяется на stage 2 (клетка, смежная с anchor).
+   * Stage 2 применяет damage каждому живому ВРАЖЕСКОМУ (относительно
+   * владельца эффекта) бойцу в обеих клетках; при ≥1 повержённом этим
+   * уроном — добор drawIfDefeated (истощение — внутри drawCards, R-04/R-05).
+   * terminal-состояние пересчитывается, seq +1, drainAfterChoice.
+   */
+  private async resolveChooseSpace(
+    pending: PendingEffect,
+    x: number | undefined,
+    y: number | undefined,
+    userId: string,
+    currentState: GameState,
+    gameId: string,
+  ): Promise<ActionResult> {
+    if (x === undefined || y === undefined) {
+      return { success: false, error: 'CHOOSE_SPACE требует x, y' };
+    }
+    const target = { x, y };
+    if (
+      target.x < 0 || target.y < 0 ||
+      target.x >= currentState.boardState.width || target.y >= currentState.boardState.height
+    ) {
+      return { success: false, error: 'Клетка вне доски' };
+    }
+    const cell = currentState.boardState.cells[target.y]?.[target.x];
+    if (!isCellPassable(cell)) {
+      return { success: false, error: 'Клетка непроходима' };
+    }
+
+    if (pending.stage !== 2) {
+      // --- Stage 1: клетка в зоне named-бойца ---
+      const zoneAnchor = currentState.fighters.find((f) =>
+        fighterNameMatches(f.name, pending.zoneFighterName ?? ''),
+      );
+      if (!zoneAnchor || !this.adjacencyService.isInSameZone(currentState, zoneAnchor.position, target)) {
+        return { success: false, error: `Клетка должна быть в зоне «${pending.zoneFighterName}»` };
+      }
+      // Замена головы очереди на stage 2 (одна мутация = +1 seq)
+      const nextPending: PendingEffect = {
+        ...pending,
+        stage: 2,
+        anchor: target,
+        zoneFighterName: undefined,
+        text: `${pending.text} — теперь выберите смежную клетку`,
+      };
+      const newState: GameState = {
+        ...currentState,
+        sequenceNumber: currentState.sequenceNumber + 1,
+        metadata: {
+          ...currentState.metadata,
+          lastActionAt: new Date(),
+          lastActionBy: userId,
+          pendingEffects: [
+            nextPending,
+            ...(currentState.metadata.pendingEffects ?? []).slice(1),
+          ],
+        },
+      };
+      return {
+        success: true,
+        gameState: newState,
+        metadata: {
+          action: 'resolvePendingEffect',
+          performedAt: new Date(),
+          performedBy: userId,
+          sequenceNumber: newState.sequenceNumber,
+          effectText: pending.text,
+          appliedEffects: [{
+            success: true, effectId: pending.id, targetIds: [userId],
+            message: `Выбрана клетка (${target.x}, ${target.y})`,
+          }],
+        },
+      };
+    }
+
+    // --- Stage 2: клетка, смежная с anchor; урон по обеим клеткам ---
+    const anchor = pending.anchor!;
+    if (!await this.adjacencyService.isAdjacent(currentState, anchor, target)) {
+      return { success: false, error: 'Клетка должна быть смежной с выбранной ранее' };
+    }
+    const damage = pending.damage ?? 0;
+    const cells = new Set([`${anchor.x}:${anchor.y}`, `${target.x}:${target.y}`]);
+    const targets = currentState.fighters.filter(
+      (f) =>
+        f.ownerId !== userId && !f.isDefeated && f.health > 0 &&
+        cells.has(`${f.position.x}:${f.position.y}`),
+    );
+
+    const defeatedBefore = new Set(
+      currentState.fighters.filter((f) => f.isDefeated).map((f) => f.id),
+    );
+    let nextState: GameState = applyTerminalState({
+      ...currentState,
+      fighters: currentState.fighters.map((f) =>
+        targets.some((t) => t.id === f.id)
+          ? (() => {
+              const health = Math.max(0, f.health - damage);
+              return { ...f, health, isDefeated: health <= 0 ? true : f.isDefeated };
+            })()
+          : f,
+      ),
+      metadata: {
+        ...currentState.metadata,
+        lastActionAt: new Date(),
+        lastActionBy: userId,
+        pendingEffects: (currentState.metadata.pendingEffects ?? []).filter(
+          (p) => p.id !== pending.id,
+        ),
+      },
+    });
+    // Повержённые ИМЕННО этим уроном (не добор от чужих поверженных ранее)
+    const defeatedByEffect = nextState.fighters.some(
+      (f) => !defeatedBefore.has(f.id) && f.isDefeated && targets.some((t) => t.id === f.id),
+    );
+    const applied = [{
+      success: true, effectId: pending.id,
+      targetIds: targets.map((t) => t.id),
+      valueApplied: damage,
+      message: targets.length
+        ? `ZONE_AREA_DAMAGE ${damage} → ${targets.map((t) => t.name).join(', ')}`
+        : 'В выбранных клетках нет вражеских бойцов',
+    }];
+    if (defeatedByEffect && (pending.drawIfDefeated ?? 0) > 0) {
+      nextState = await this.deckManagement.drawCards(nextState, userId, pending.drawIfDefeated ?? 1);
+      applied.push({
+        success: true, effectId: `${pending.id}-draw`, targetIds: [userId],
+        valueApplied: pending.drawIfDefeated,
+        message: `Повержен боец — добор ${pending.drawIfDefeated}`,
+      });
+    }
+    nextState = applyTerminalState(nextState);
+    nextState = await this.drainAfterChoice(nextState, userId, gameId, currentState.sequenceNumber);
+
+    return {
+      success: true,
+      gameState: nextState,
+      metadata: {
+        action: 'resolvePendingEffect',
+        performedAt: new Date(),
+        performedBy: userId,
+        sequenceNumber: nextState.sequenceNumber,
+        effectText: pending.text,
+        appliedEffects: applied,
+      },
+    };
+  }
+
+  /**
+   * Резолв DECK_TOP_PICK (S06 GD-021, Prophecy).
+   * mode PICK: cardIds — ровно value instance id из revealedCards → в руку;
+   * остаток >1 → новая голова очереди mode ORDER (порядок возврата наверх),
+   * иначе остаток (0/1 карта) возвращается как есть.
+   * mode ORDER: cardIds — перестановка ВСЕГО revealedCards (top→bottom);
+   * колода = ordered + прежний drawPile. Ревалидация строгая, мутации
+   * атомарны (после всех проверок), seq +1, drainAfterChoice.
+   */
+  private async resolveDeckTopPick(
+    pending: PendingEffect,
+    cardIds: string[] | undefined,
+    userId: string,
+    currentState: GameState,
+    gameId: string,
+  ): Promise<ActionResult> {
+    const revealed = pending.revealedCards ?? [];
+    const pick = (pending.mode ?? 'PICK') === 'PICK';
+    const need = pick ? (pending.value ?? 2) : revealed.length;
+    if (
+      !Array.isArray(cardIds) ||
+      cardIds.length !== need ||
+      new Set(cardIds).size !== need ||
+      cardIds.some((id) => !revealed.some((c) => c.id === id))
+    ) {
+      return {
+        success: false,
+        error: pick
+          ? `Выберите ровно ${need} карт(у) из открытых (instance id)`
+          : `Задайте порядок ВСЕХ ${need} оставшихся карт (top→bottom)`,
+      };
+    }
+    const hand = currentState.handZones[userId];
+    const deck = currentState.decks[userId];
+    if (!hand || !deck) {
+      return { success: false, error: 'Нет колоды/руки у владельца выбора' };
+    }
+
+    if (pick) {
+      const picked = cardIds.map((id) => revealed.find((c) => c.id === id)!);
+      const rest = revealed.filter((c) => !cardIds.includes(c.id));
+      let next: GameState;
+      if (rest.length > 1) {
+        // ORDER-стадия: остаток ждёт порядок возврата (новая голова очереди)
+        const orderPending: PendingEffect = {
+          ...pending,
+          id: `${pending.id}-order`,
+          mode: 'ORDER',
+          value: rest.length,
+          revealedCards: rest,
+          text: `Верните ${rest.length} карты на верх колоды в любом порядке`,
+        };
+        next = {
+          ...currentState,
+          handZones: {
+            ...currentState.handZones,
+            [userId]: { ...hand, cards: [...hand.cards, ...picked.map((c) => ({ ...c, isVisible: true }))] },
+          },
+          sequenceNumber: currentState.sequenceNumber + 1,
+          metadata: {
+            ...currentState.metadata,
+            lastActionAt: new Date(),
+            lastActionBy: userId,
+            pendingEffects: [
+              orderPending,
+              ...(currentState.metadata.pendingEffects ?? []).slice(1),
+            ],
+          },
+        };
+      } else {
+        // 0/1 остаток: порядок тривиален — сразу наверх
+        next = {
+          ...currentState,
+          handZones: {
+            ...currentState.handZones,
+            [userId]: { ...hand, cards: [...hand.cards, ...picked.map((c) => ({ ...c, isVisible: true }))] },
+          },
+          decks: {
+            ...currentState.decks,
+            [userId]: { ...deck, drawPile: [...rest, ...deck.drawPile], topCard: rest[0] ?? deck.drawPile[0] },
+          },
+          sequenceNumber: currentState.sequenceNumber + 1,
+          metadata: {
+            ...currentState.metadata,
+            lastActionAt: new Date(),
+            lastActionBy: userId,
+            pendingEffects: (currentState.metadata.pendingEffects ?? []).filter(
+              (p) => p.id !== pending.id,
+            ),
+          },
+        };
+      }
+      next = await this.drainAfterChoice(next, userId, gameId, currentState.sequenceNumber);
+      return {
+        success: true,
+        gameState: next,
+        metadata: {
+          action: 'resolvePendingEffect',
+          performedAt: new Date(),
+          performedBy: userId,
+          sequenceNumber: next.sequenceNumber,
+          effectText: pending.text,
+          appliedEffects: [{
+            success: true, effectId: pending.id, targetIds: [userId],
+            valueApplied: cardIds.length,
+            message: `В руку: ${picked.map((c) => c.name).join(', ')}`,
+          }],
+        },
+      };
+    }
+
+    // ORDER: cardIds — полный порядок остатка (top→bottom)
+    const ordered = cardIds.map((id) => revealed.find((c) => c.id === id)!);
+    const next: GameState = {
+      ...currentState,
+      decks: {
+        ...currentState.decks,
+        [userId]: { ...deck, drawPile: [...ordered, ...deck.drawPile], topCard: ordered[0] },
+      },
+      sequenceNumber: currentState.sequenceNumber + 1,
+      metadata: {
+        ...currentState.metadata,
+        lastActionAt: new Date(),
+        lastActionBy: userId,
+        pendingEffects: (currentState.metadata.pendingEffects ?? []).filter(
+          (p) => p.id !== pending.id,
+        ),
+      },
+    };
+    const drained = await this.drainAfterChoice(next, userId, gameId, currentState.sequenceNumber);
+    return {
+      success: true,
+      gameState: drained,
+      metadata: {
+        action: 'resolvePendingEffect',
+        performedAt: new Date(),
+        performedBy: userId,
+        sequenceNumber: drained.sequenceNumber,
+        effectText: pending.text,
+        appliedEffects: [{
+          success: true, effectId: pending.id, targetIds: [userId],
+          message: `Наверх колоды: ${ordered.map((c) => c.name).join(' → ')}`,
+        }],
       },
     };
   }

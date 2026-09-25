@@ -1,0 +1,541 @@
+{
+  "label": "game2",
+  "seed": 1337,
+  "heroes": {
+    "u1": "King Arthur",
+    "u2": "Medusa"
+  },
+  "first": "u2",
+  "engine": "GameService.startGame → GameActionExecutorService (scripted deterministic policy)",
+  "rng": "LCG seed (Math.random override; вся перетасовка детерминирована)",
+  "result": {
+    "phase": "GAME_OVER",
+    "winnerId": "u1",
+    "turns": 14,
+    "sequenceNumber": 72,
+    "heroHp": {
+      "u2": 0,
+      "u1": 4
+    },
+    "deckSizes": {
+      "u1": {
+        "draw": 14,
+        "hand": 3,
+        "discard": 13
+      },
+      "u2": {
+        "draw": 17,
+        "hand": 4,
+        "discard": 9
+      }
+    }
+  },
+  "steps": 72,
+  "hpByTurn": [],
+  "transcript": [
+    {
+      "step": 0,
+      "seq": 2,
+      "actor": "u2",
+      "action": "attack f-0-hero->f-1-hero Gaze of Stone",
+      "ok": true
+    },
+    {
+      "step": 1,
+      "seq": 3,
+      "actor": "f-0-hero",
+      "action": "resolveCombat",
+      "ok": true
+    },
+    {
+      "step": 2,
+      "seq": 4,
+      "actor": "u2",
+      "action": "attack f-0-sk0->f-1-sk0 Clutching Claws",
+      "ok": true
+    },
+    {
+      "step": 3,
+      "seq": 5,
+      "actor": "f-0-sk0",
+      "action": "resolveCombat",
+      "ok": true
+    },
+    {
+      "step": 4,
+      "seq": 6,
+      "actor": "u1",
+      "action": "resolveDiscard 1",
+      "ok": true
+    },
+    {
+      "step": 5,
+      "seq": 7,
+      "actor": "u1",
+      "action": "attack f-1-hero->f-0-hero The Aid of Morgana",
+      "ok": true
+    },
+    {
+      "step": 6,
+      "seq": 8,
+      "actor": "u2",
+      "action": "defense Hiss and Slither",
+      "ok": true
+    },
+    {
+      "step": 7,
+      "seq": 9,
+      "actor": "f-1-hero",
+      "action": "resolveCombat",
+      "ok": true
+    },
+    {
+      "step": 8,
+      "seq": 10,
+      "actor": "u1",
+      "action": "resolveDiscard 1",
+      "ok": true
+    },
+    {
+      "step": 9,
+      "seq": 11,
+      "actor": "u1",
+      "action": "attack f-1-hero->f-0-hero Excalibur",
+      "ok": true
+    },
+    {
+      "step": 10,
+      "seq": 12,
+      "actor": "f-1-hero",
+      "action": "resolveCombat",
+      "ok": true
+    },
+    {
+      "step": 11,
+      "seq": 13,
+      "actor": "u2",
+      "action": "scheme A Momentary Glance",
+      "ok": true
+    },
+    {
+      "step": 12,
+      "seq": 14,
+      "actor": "u2",
+      "action": "resolveTarget f-0-hero",
+      "ok": true
+    },
+    {
+      "step": 13,
+      "seq": 15,
+      "actor": "u2",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 14,
+      "seq": 16,
+      "actor": "u2",
+      "action": "maneuver moves=1",
+      "ok": true
+    },
+    {
+      "step": 15,
+      "seq": 17,
+      "actor": "u1",
+      "action": "scheme Restless Spirits",
+      "ok": true
+    },
+    {
+      "step": 16,
+      "seq": 18,
+      "actor": "u1",
+      "action": "chooseSpace1 3,3",
+      "ok": true
+    },
+    {
+      "step": 17,
+      "seq": 18,
+      "actor": "u1",
+      "action": "chooseSpace2 4,3",
+      "ok": true
+    },
+    {
+      "step": 18,
+      "seq": 19,
+      "actor": "u1",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 19,
+      "seq": 20,
+      "actor": "u1",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 20,
+      "seq": 21,
+      "actor": "u2",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 21,
+      "seq": 22,
+      "actor": "u2",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 22,
+      "seq": 23,
+      "actor": "u2",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 23,
+      "seq": 24,
+      "actor": "u2",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 24,
+      "seq": 25,
+      "actor": "u1",
+      "action": "scheme Prophecy",
+      "ok": true
+    },
+    {
+      "step": 25,
+      "seq": 26,
+      "actor": "u1",
+      "action": "resolveDeckPick 2",
+      "ok": true
+    },
+    {
+      "step": 26,
+      "seq": 27,
+      "actor": "u1",
+      "action": "resolveDeckOrder 2",
+      "ok": true
+    },
+    {
+      "step": 27,
+      "seq": 28,
+      "actor": "u1",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 28,
+      "seq": 29,
+      "actor": "u1",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 29,
+      "seq": 30,
+      "actor": "u2",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 30,
+      "seq": 31,
+      "actor": "u2",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 31,
+      "seq": 32,
+      "actor": "u2",
+      "action": "scheme A Momentary Glance",
+      "ok": true
+    },
+    {
+      "step": 32,
+      "seq": 33,
+      "actor": "u2",
+      "action": "resolveTarget f-0-hero",
+      "ok": true
+    },
+    {
+      "step": 33,
+      "seq": 34,
+      "actor": "u1",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 34,
+      "seq": 35,
+      "actor": "u1",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 35,
+      "seq": 36,
+      "actor": "u1",
+      "action": "attack f-1-hero->f-0-hero Divine Intervention",
+      "ok": true
+    },
+    {
+      "step": 36,
+      "seq": 37,
+      "actor": "f-1-hero",
+      "action": "resolveCombat",
+      "ok": true
+    },
+    {
+      "step": 37,
+      "seq": 38,
+      "actor": "u1",
+      "action": "resolveMove f-1-hero stay",
+      "ok": true
+    },
+    {
+      "step": 38,
+      "seq": 39,
+      "actor": "u2",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 39,
+      "seq": 40,
+      "actor": "u2",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 40,
+      "seq": 41,
+      "actor": "u2",
+      "action": "attack f-0-sk0->f-1-sk0 The Hounds of Mighty Zeus",
+      "ok": true
+    },
+    {
+      "step": 41,
+      "seq": 42,
+      "actor": "u1",
+      "action": "defense Bewilderment",
+      "ok": true
+    },
+    {
+      "step": 42,
+      "seq": 43,
+      "actor": "f-0-sk0",
+      "action": "resolveCombat",
+      "ok": true
+    },
+    {
+      "step": 43,
+      "seq": 44,
+      "actor": "u1",
+      "action": "resolveMove f-1-sk0 stay",
+      "ok": true
+    },
+    {
+      "step": 44,
+      "seq": 45,
+      "actor": "u2",
+      "action": "resolveMove f-0-sk0 stay",
+      "ok": true
+    },
+    {
+      "step": 45,
+      "seq": 46,
+      "actor": "u2",
+      "action": "resolveMove f-0-sk1 stay",
+      "ok": true
+    },
+    {
+      "step": 46,
+      "seq": 47,
+      "actor": "u2",
+      "action": "resolveMove f-0-sk2 stay",
+      "ok": true
+    },
+    {
+      "step": 47,
+      "seq": 48,
+      "actor": "u1",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 48,
+      "seq": 49,
+      "actor": "u1",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 49,
+      "seq": 50,
+      "actor": "u1",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 50,
+      "seq": 51,
+      "actor": "u1",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 51,
+      "seq": 52,
+      "actor": "u2",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 52,
+      "seq": 53,
+      "actor": "u2",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 53,
+      "seq": 54,
+      "actor": "u2",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 54,
+      "seq": 55,
+      "actor": "u2",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 55,
+      "seq": 56,
+      "actor": "u1",
+      "action": "attack f-1-hero->f-0-hero Noble Sacrifice",
+      "ok": true
+    },
+    {
+      "step": 56,
+      "seq": 57,
+      "actor": "u2",
+      "action": "defense Hiss and Slither",
+      "ok": true
+    },
+    {
+      "step": 57,
+      "seq": 58,
+      "actor": "f-1-hero",
+      "action": "resolveCombat",
+      "ok": true
+    },
+    {
+      "step": 58,
+      "seq": 59,
+      "actor": "u1",
+      "action": "resolveBoost cmq7d7b1f00o7wi74xncb0b27::1",
+      "ok": true
+    },
+    {
+      "step": 59,
+      "seq": 60,
+      "actor": "u1",
+      "action": "resolveDiscard 1",
+      "ok": true
+    },
+    {
+      "step": 60,
+      "seq": 61,
+      "actor": "u1",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 61,
+      "seq": 62,
+      "actor": "u1",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 62,
+      "seq": 63,
+      "actor": "u2",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 63,
+      "seq": 64,
+      "actor": "u2",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 64,
+      "seq": 65,
+      "actor": "u2",
+      "action": "attack f-0-hero->f-1-hero Second Shot",
+      "ok": true
+    },
+    {
+      "step": 65,
+      "seq": 66,
+      "actor": "f-0-hero",
+      "action": "resolveCombat",
+      "ok": true
+    },
+    {
+      "step": 66,
+      "seq": 67,
+      "actor": "u2",
+      "action": "resolveBoost cmq7d7b4800rowi74iywm5i8b::0",
+      "ok": true
+    },
+    {
+      "step": 67,
+      "seq": 68,
+      "actor": "u1",
+      "action": "beginManeuver",
+      "ok": true
+    },
+    {
+      "step": 68,
+      "seq": 69,
+      "actor": "u1",
+      "action": "maneuver moves=0",
+      "ok": true
+    },
+    {
+      "step": 69,
+      "seq": 70,
+      "actor": "u1",
+      "action": "attack f-1-hero->f-0-hero Noble Sacrifice",
+      "ok": true
+    },
+    {
+      "step": 70,
+      "seq": 71,
+      "actor": "f-1-hero",
+      "action": "resolveCombat",
+      "ok": true
+    },
+    {
+      "step": 71,
+      "seq": 72,
+      "actor": "u1",
+      "action": "resolveBoost cmq7d7b1c00o1wi74sjfulnr0::0",
+      "ok": true
+    }
+  ]
+}

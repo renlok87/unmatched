@@ -568,6 +568,16 @@ export class GameStateService {
     // Execution queues are server-only; player choices remain in pendingEffects.
     const { combatEffectContinuation, combatResolutionProgress, ...publicMetadata } = state.metadata;
 
+    // S06 (GD-021, Prophecy): карты, снятые с верха колоды в DECK_TOP_PICK,
+    // видны ТОЛЬКО владельцу выбора; соперник получает счётчик без личин.
+    if (publicMetadata.pendingEffects?.some((p) => p.revealedCards?.length)) {
+      publicMetadata.pendingEffects = publicMetadata.pendingEffects.map((p) =>
+        p.revealedCards && p.playerId !== playerId
+          ? { ...p, revealedCards: undefined, revealedCount: p.revealedCards.length }
+          : p,
+      );
+    }
+
     // GD-017 (R-15) + GD-020: до reveal (executeResolveCombat) бой скрыт.
     // Физическая игра: committed-карты лежат лицом вниз — факт коммита виден,
     // ЛИЧИНА нет. Reveal = запуск executeResolveCombat: обе карты вскрываются

@@ -8,7 +8,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { normalizeCardEffects } from '../models';
-import { parseCardEffectTexts, PARSER_VERSION } from './effect-text-parser';
+import { parseCardEffectTexts, upgradeStaleParserEffects, PARSER_VERSION } from './effect-text-parser';
 import { CardEffect, EffectType } from '../models';
 
 interface CaptureCard {
@@ -52,9 +52,23 @@ const countsRef = JSON.parse(
 /** Production ingest (mirrors GameInitializationService.resolveCardEffects). */
 function ingestEffects(card: CaptureCard): CardEffect[] {
   const effects = normalizeCardEffects(card.effects, card.id);
-  if (effects.length > 0) return effects;
-  if (card.cardType !== 'SCHEME' || !card.textEn.trim()) return [];
-  return parseCardEffectTexts({ fullText: card.textEn }, card.id).effects;
+  const fullText = card.cardType === 'SCHEME' && card.textEn.trim() ? card.textEn : undefined;
+  if (effects.length > 0) {
+    return upgradeStaleParserEffects(
+      effects,
+      {
+        immediately: card.effectImmediately,
+        during: card.effectDuring,
+        after: card.effectAfter,
+        boost: card.effectBoost,
+        ongoing: card.effectOngoing,
+        fullText,
+      },
+      card.id,
+    );
+  }
+  if (!fullText) return [];
+  return parseCardEffectTexts({ fullText }, card.id).effects;
 }
 
 /** Honest support classification of parsed effects. */
@@ -64,18 +78,6 @@ function classify(card: CaptureCard, effects: CardEffect[]): { status: SupportSt
   if (effects.length === 0 && !card.textEn.trim()) return { status: 'BLANK', notes: 'нет печатного текста и эффектов' };
   if (unsupported > 0) {
     return { status: 'UNSUPPORTED', notes: `${unsupported} из ${effects.length} эффектов UNSUPPORTED — не реализовано` };
-  }
-  // Известные ловушки: parsed-эффект, который не может сработать в рантайме.
-  // Command the Storms: «Move each fighter (including opposing)» парсится как
-  // NAMED_FIGHTER 'fighter' — не матчит ни одного бойца (двигать врагов не
-  // реализовано) => честный UNSUPPORTED, а не SUPPORTED.
-  if (effects.some((e) => e.type === EffectType.MOVE && e.fighterName === 'fighter')) {
-    return { status: 'UNSUPPORTED', notes: "parsed MOVE NAMED_FIGHTER 'fighter' не матчит бойцов (each fighter incl. opposing не реализован)" };
-  }
-  // Skirmish: «choose one of the fighters in the combat» парсится как SELF —
-  // выбор бойца боя не моделируется (двигается только свой).
-  if (effects.some((e) => e.when?.kind === 'WON_COMBAT' && e.type === EffectType.MOVE)) {
-    return { status: 'PARTIAL', notes: 'MOVE only-SELF: выбор бойца боя («choose one of the fighters») не моделируется' };
   }
   return { status: 'SUPPORTED', notes: `${effects.length} эффект(ов) исполняются движком` };
 }
@@ -92,7 +94,10 @@ function buildRegistry(): RegistryEntry[] {
   return entries;
 }
 
-/** Frozen expectation: literal printed text → actual support (GD-019 table).
+/** Frozen expectation: literal printed text → actual support (GD-019 table,
+ *  актуализировано S06/parser v9: Arthur-схемы и Skirmish получили реальные
+ *  исполнители — GD-021..023; история S05-статусов зафиксирована в
+ *  evidence/S05/s05-card-registry.json).
  *  Keyed by `hero/name` — shared titles (Feint, Regroup) are SEPARATE records
  *  per hero, never normalized away. */
 const EXPECTED: Record<string, SupportStatus> = {
@@ -108,22 +113,22 @@ const EXPECTED: Record<string, SupportStatus> = {
   'Medusa/Snipe': 'SUPPORTED',
   'Medusa/Clutching Claws': 'SUPPORTED',
   'Medusa/Feint': 'SUPPORTED',
-  // --- King Arthur (16) — GD-021/022 scope остаётся вне S05, статусы честные ---
+  // --- King Arthur (16) — GD-021..023 закрыли оставшиеся записи ---
   'King Arthur/The Aid of Morgana': 'SUPPORTED',
   'King Arthur/Excalibur': 'BLANK', // подтверждённо пустая: нет text/effects/effect*-полей
   'King Arthur/Swift Strike': 'SUPPORTED',
   'King Arthur/Aid the Chosen One': 'SUPPORTED',
   'King Arthur/Feint': 'SUPPORTED',
-  'King Arthur/The Holy Grail': 'UNSUPPORTED', // set-health-if-low — не реализовано
-  'King Arthur/The Lady of the Lake': 'UNSUPPORTED', // search deck/discard — не реализовано
-  'King Arthur/Prophecy': 'UNSUPPORTED', // look top 4 / pick 2 — не реализовано
-  'King Arthur/Command the Storms': 'UNSUPPORTED', // each fighter incl. opposing — не реализовано
+  'King Arthur/The Holy Grail': 'SUPPORTED', // GD-022: SET_HEALTH threshold 4 → 8
+  'King Arthur/The Lady of the Lake': 'SUPPORTED', // GD-021: SEARCH_ADD_TO_HAND + shuffle
+  'King Arthur/Prophecy': 'SUPPORTED', // GD-021: DECK_TOP_PICK 4/2 + ORDER
+  'King Arthur/Command the Storms': 'SUPPORTED', // GD-022: EACH_FIGHTER sequential queue
   'King Arthur/Noble Sacrifice': 'SUPPORTED',
-  'King Arthur/Restless Spirits': 'UNSUPPORTED', // area damage по выбранной клетке — не реализовано
+  'King Arthur/Restless Spirits': 'SUPPORTED', // GD-022: ZONE_AREA_DAMAGE two-stage CHOOSE_SPACE
   'King Arthur/Bewilderment': 'SUPPORTED',
   'King Arthur/Divine Intervention': 'SUPPORTED',
   'King Arthur/Momentous Shift': 'SUPPORTED',
-  'King Arthur/Skirmish': 'PARTIAL', // выбор бойца боя не моделируется (SELF only)
+  'King Arthur/Skirmish': 'SUPPORTED', // GD-023: COMBAT_FIGHTER choice (свой или чужой)
   'King Arthur/Regroup': 'SUPPORTED',
 };
 
@@ -155,7 +160,7 @@ describe('GD-019: S05 card registry (frozen captures → production ingest)', ()
     expect(mismatched.map((e) => `${e.hero}/${e.name}: ${e.status} != ${EXPECTED[`${e.hero}/${e.name}`]}`)).toEqual([]);
   });
 
-  it('S05 fixes unblocked the two Medusa textEn schemes; Arthur gaps stay UNSUPPORTED', () => {
+  it('S05 fixes unblocked the two Medusa textEn schemes; S06 v9 parses all Arthur schemes', () => {
     const glance = ingestEffects(medusa.cards.find((c) => c.name === 'A Momentary Glance')!);
     expect(glance).toHaveLength(1);
     expect(glance[0].type).toBe(EffectType.DAMAGE);
@@ -171,17 +176,37 @@ describe('GD-019: S05 card registry (frozen captures → production ingest)', ()
     expect(frenzy[1].zoneFighterName).toBe('Medusa');
     expect(frenzy[1].optional).toBe(true);
 
-    // Arthur textEn schemes remain honestly UNSUPPORTED (no silent no-op claim).
-    // Lady of the Lake / Prophecy / Restless Spirits → UNSUPPORTED-тип из парсера;
-    // Command the Storms → parsed MOVE, но 'fighter' не матчит никого (см. classify).
-    for (const name of ['The Lady of the Lake', 'Prophecy', 'Restless Spirits']) {
-      const card = arthur.cards.find((c) => c.name === name)!;
-      const effects = ingestEffects(card);
-      expect(effects.some((e) => e.type === EffectType.UNSUPPORTED)).toBe(true);
-    }
+    // S06 (GD-021..023): все Arthur-записи парсятся в реальные исполнимые типы.
+    const lady = ingestEffects(arthur.cards.find((c) => c.name === 'The Lady of the Lake')!);
+    expect(lady.map((e) => e.type)).toEqual([EffectType.SEARCH_ADD_TO_HAND]);
+    expect(lady[0].searchCardName).toBe('EXCALIBUR');
+
+    const prophecy = ingestEffects(arthur.cards.find((c) => c.name === 'Prophecy')!);
+    expect(prophecy.map((e) => e.type)).toEqual([EffectType.DECK_TOP_PICK]);
+    expect(prophecy[0].viewCount).toBe(4);
+    expect(prophecy[0].pickCount).toBe(2);
+
     const storms = ingestEffects(arthur.cards.find((c) => c.name === 'Command the Storms')!);
     expect(storms[0].type).toBe(EffectType.MOVE);
-    expect(storms[0].fighterName).toBe('fighter');
+    expect(storms[0].target).toBe('EACH_FIGHTER');
+    expect(storms[0].value).toBe(3);
+
+    const restless = ingestEffects(arthur.cards.find((c) => c.name === 'Restless Spirits')!);
+    expect(restless.map((e) => e.type)).toEqual([EffectType.ZONE_AREA_DAMAGE]);
+    expect(restless[0].zoneFighterName).toBe('Merlin');
+    expect(restless[0].value).toBe(2);
+    expect(restless[0].drawIfDefeated).toBe(1);
+
+    const grail = ingestEffects(arthur.cards.find((c) => c.name === 'The Holy Grail')!);
+    expect(grail.map((e) => e.type)).toEqual([EffectType.SET_HEALTH]);
+    expect(grail[0].fighterName).toBe('King Arthur');
+    expect(grail[0].threshold).toBe(4);
+    expect(grail[0].value).toBe(8);
+
+    const skirmish = ingestEffects(arthur.cards.find((c) => c.name === 'Skirmish')!);
+    expect(skirmish[0].type).toBe(EffectType.MOVE);
+    expect(skirmish[0].target).toBe('COMBAT_FIGHTER');
+    expect(skirmish[0].value).toBe(2);
   });
 
   it('Excalibur is TRULY blank: no printed text, no effect fields, no parse output', () => {
@@ -233,66 +258,7 @@ describe('GD-019: S05 card registry (frozen captures → production ingest)', ()
     console.log(['GD-019 registry (parser v' + PARSER_VERSION + '):', ...registry.map(line)].join('\n'));
   });
 
-  it('writes the machine-readable registry to evidence (s05-card-registry.json)', () => {
-    const outDir = path.resolve(__dirname, '../../../..', 'docs/game-design/evidence/S05');
-    fs.mkdirSync(outDir, { recursive: true });
-    const records = registry.map((entry) => {
-      const source = entry.hero === 'Medusa' ? medusa : arthur;
-      const card = source.cards.find((c) => c.name === entry.name)!;
-      return {
-        hero: entry.hero,
-        contentKey: card.id,
-        name: entry.name,
-        cardType: card.cardType,
-        count: entry.count,
-        printedText: card.textEn.trim(),
-        parsedEffects: ingestEffects(card).map((e) => ({
-          type: e.type,
-          value: e.value,
-          target: e.target,
-          fighterName: e.fighterName,
-          zoneFighterName: e.zoneFighterName,
-          when: e.when?.kind,
-          optional: e.optional,
-          canPassThroughEnemies: e.canPassThroughEnemies,
-          timing: e.timing,
-          source: e.source,
-          parserVersion: e.parserVersion,
-        })),
-        status: entry.status,
-        notes: entry.notes,
-      };
-    });
-    const byStatus = (status: SupportStatus) => registry.filter((e) => e.status === status).length;
-    fs.writeFileSync(
-      path.join(outDir, 's05-card-registry.json'),
-      JSON.stringify(
-        {
-          task: 'GD-019',
-          parserVersion: PARSER_VERSION,
-          sources: [
-            'docs/game-design/evidence/S01/content-medusa.json',
-            'docs/game-design/evidence/S01/content-king-arthur.json',
-          ],
-          totals: {
-            records: registry.length,
-            copies: registry.reduce((s, e) => s + e.count, 0),
-            medusaRecords: registry.filter((e) => e.hero === 'Medusa').length,
-            kingArthurRecords: registry.filter((e) => e.hero === 'King Arthur').length,
-            byStatus: {
-              SUPPORTED: byStatus('SUPPORTED'),
-              PARTIAL: byStatus('PARTIAL'),
-              UNSUPPORTED: byStatus('UNSUPPORTED'),
-              BLANK: byStatus('BLANK'),
-            },
-          },
-          records,
-        },
-        null,
-        2,
-      ) + '\n',
-      'utf8',
-    );
-    expect(fs.existsSync(path.join(outDir, 's05-card-registry.json'))).toBe(true);
-  });
+  // S06: machine-readable registry пишется в evidence/S06/s06-card-registry.json
+  // (см. s06-registry.spec.ts); замороженный S05-снимок статусов остаётся
+  // в evidence/S05/s05-card-registry.json и не перезаписывается.
 });

@@ -76,6 +76,16 @@ export interface CardEffect {
   readonly options?: ChooseOption[];
   /** Сколько опций выбирает игрок для CHOOSE_ONE (default 1; «choose 2 different effects» = 2) */
   readonly chooseCount?: number;
+  /** SEARCH_ADD_TO_HAND: имя искомой карты ('Excalibur') */
+  readonly searchCardName?: string;
+  /** DECK_TOP_PICK: сколько карт сверху показать (Prophecy = 4) */
+  readonly viewCount?: number;
+  /** DECK_TOP_PICK: сколько из показанных взять в руку (Prophecy = 2) */
+  readonly pickCount?: number;
+  /** SET_HEALTH: порог здоровья для условия («4 or less health») */
+  readonly threshold?: number;
+  /** ZONE_AREA_DAMAGE: условный добор при ≥1 повержённом («draw 1 card») */
+  readonly drawIfDefeated?: number;
   /** Исходное предложение текста — для лога/manualEffects */
   readonly text?: string;
   /** Происхождение: парсер не перезаписывает manual при повторном backfill */
@@ -189,6 +199,19 @@ export enum EffectType {
   // «return a defeated <Name> to any space in X's zone» — возврат побеждённого
   // сайдкика в зону X (PLACE-pending с restoreFullHealth)
   RETURN_DEFEATED = 'RETURN_DEFEATED',
+  // S06 (GD-021, The Lady of the Lake): «Search your deck and discard pile for
+  // the EXCALIBUR card. Add it to your hand. If you searched your deck,
+  // shuffle it.» — авто-поиск по имени карты в своих зонах (выбора игрока нет)
+  SEARCH_ADD_TO_HAND = 'SEARCH_ADD_TO_HAND',
+  // S06 (GD-021, Prophecy): «Look at the top 4 cards… Add 2… put the other 2
+  // back on top, in any order» — persisted DECK_TOP_PICK-выбор владельца
+  DECK_TOP_PICK = 'DECK_TOP_PICK',
+  // S06 (GD-022, Restless Spirits): выбор клетки в зоне + смежной клетки,
+  // урон каждым вражеским бойцам обеих, условный добор
+  ZONE_AREA_DAMAGE = 'ZONE_AREA_DAMAGE',
+  // S06 (GD-022, The Holy Grail): «If King Arthur has 4 or less health but is
+  // not defeated, set his health to 8» — точная установка (НЕ heal)
+  SET_HEALTH = 'SET_HEALTH',
   // маркер нераспознанного текста: не исполняется, едет в manualEffects + warn
   UNSUPPORTED = 'UNSUPPORTED',
 }
@@ -231,6 +254,12 @@ export enum EffectTarget {
   EACH_OWN_FIGHTER = 'EACH_OWN_FIGHTER',
   // «any one fighter in X's zone» — выбор цели из всех живых бойцов зоны X
   ANY_FIGHTER_IN_ZONE = 'ANY_FIGHTER_IN_ZONE',
+  // S06 (GD-022, Command the Storms): «Move each fighter…» — ВСЕ живые бойцы
+  // (свои и чужие), последовательная очередь перемещений за владельцем эффекта
+  EACH_FIGHTER = 'EACH_FIGHTER',
+  // S06 (GD-023, Skirmish): «choose one of the fighters in the combat» —
+  // любой живой участник текущего боя (атакующий или защитник)
+  COMBAT_FIGHTER = 'COMBAT_FIGHTER',
 }
 
 /**

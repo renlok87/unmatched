@@ -8,6 +8,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Input, Select, Space, Tag, Typography, message } from 'antd';
 import { parseManeuverCompletion } from './turn-resource-commands';
+import { buildPendingResolve } from './pendingCommand';
 import {
   ABORT_GAME,
   ATTACK,
@@ -82,7 +83,7 @@ const HELP_TEXT = `Команды (2 действия за ход; после 2-
   attack <f1> <f2> <c> [<ab>]  — атака (+ability-BOOST Arthur, коммит при объявлении)
   scheme <c>       — разыграть scheme-карту (тратит 1 действие)
   pending          — список отложенных эффектов (выбор игрока)
-  peffect <id> <f> <x>,<y> — резолв отложенного MOVE/PLACE; peffect <id> <f> — TARGET_FIGHTER; peffect <id> card <c0> [<c1> ...] — DISCARD_CARDS (сколько требует value) / BOOST_CHOICE — ровно одна (карта-буст боя ПОСЛЕ reveal)
+  peffect <id> <f> <x>,<y> — резолв отложенного MOVE/PLACE; peffect <id> <f> — TARGET_FIGHTER; peffect <id> <x>,<y> — CHOOSE_SPACE (клетка без бойца); peffect <id> card <c0> [<c1> ...] — DISCARD_CARDS (сколько требует value) / BOOST_CHOICE — ровно одна (карта-буст боя ПОСЛЕ reveal) / DECK_TOP_PICK (PICK — value карт, ORDER — полный порядок)
   pdecline <id>     — отклонить опциональный отложенный эффект
   defense <c>      — карта защиты (BOOST-эффект карты защиты, как у атаки, выбирается после reveal)
   resolve          — разрешить бой
@@ -648,41 +649,34 @@ export const GameTester: React.FC = () => {
           if (pend.length === 0 && !metadata?.pendingManeuver && !metadata?.pendingHandDiscard) {
             sys('Отложенных эффектов нет');
           } else {
-            pend.forEach((p: any) =>
-              sys(`⏳ ${p.id} [${p.type}${p.value ? ' ' + p.value : ''}${p.optional ? ' optional' : ''}] ${p.text ?? ''}`),
-            );
+            pend.forEach((p: any) => {
+              const revealed = p.revealedCards?.length
+                ? ` · revealed: ${p.revealedCards.map((c: any, i: number) => `c${i}=${c.name}`).join(', ')}`
+                : p.revealedCount ? ` · revealed: ${p.revealedCount} карт (скрыты)` : '';
+              sys(`⏳ ${p.id} [${p.type}${p.value ? ' ' + p.value : ''}${p.optional ? ' optional' : ''}] ${p.text ?? ''}${revealed}`);
+            });
           }
           break;
         }
         case 'peffect': {
-          // peffect <effectId> <f> <x>,<y>       — резолв отложенного MOVE/PLACE
-          // peffect <effectId> <f>               — резолв TARGET_FIGHTER (без клетки)
-          // peffect <effectId> card <c0> [...]   — резолв DISCARD_CARDS (все карты
-          //                                        выбора: сколько требует pending.value)
-          //                                        / BOOST_CHOICE (ровно одна)
-          const [, effId, fRef, posRef] = parts;
-          if (!effId || !fRef) throw new Error('peffect <effectId> <f> [x,y] | card <c0> [...]');
+          // peffect <effectId> <x>,<y>          — резолв CHOOSE_SPACE (клетка без
+          //                                       бойца: зона named-бойца / смежная)
+          // peffect <effectId> <f> <x>,<y>      — резолв отложенного MOVE/PLACE
+          // peffect <effectId> <f>              — резолв TARGET_FIGHTER (без клетки)
+          // peffect <effectId> card <c0> [...]  — резолв DISCARD_CARDS (карты руки,
+          //                                       сколько требует pending.value) /
+          //                                       BOOST_CHOICE (ровно одна) /
+          //                                       DECK_TOP_PICK (PICK — value карт,
+          //                                       ORDER — полный порядок возврата;
+          //                                       refs индексируют revealedCards)
           const slot = resolveActor('peffect');
-          if (fRef === 'card') {
-            const refs = parts.slice(3);
-            if (refs.length === 0) throw new Error('peffect <effectId> card <c0> [<c1> ...]');
-            const cards = refs.map((ref) => resolveCard(slot, ref));
-            await runAction(slot, `resolvePendingEffect(${effId}, card ${cards.map((c) => c.id).join(', ')})`, RESOLVE_PENDING_EFFECT, {
-              input: { gameId: gameIdRef.current!, effectId: effId, cardIds: cards.map((c) => c.id) },
-            }, 'resolvePendingEffect');
-            break;
-          }
-          const f = resolveFighter(fRef);
-          if (!posRef) {
-            await runAction(slot, `resolvePendingEffect(${effId}, ${f.name})`, RESOLVE_PENDING_EFFECT, {
-              input: { gameId: gameIdRef.current!, effectId: effId, fighterId: f.id },
-            }, 'resolvePendingEffect');
-            break;
-          }
-          const [px, py] = posRef.split(',').map(Number);
-          if (Number.isNaN(px) || Number.isNaN(py)) throw new Error(`Плохая клетка: ${posRef}`);
-          await runAction(slot, `resolvePendingEffect(${effId}, ${f.name} → ${px},${py})`, RESOLVE_PENDING_EFFECT, {
-            input: { gameId: gameIdRef.current!, effectId: effId, fighterId: f.id, x: px, y: py },
+          const built = buildPendingResolve(parts, {
+            pendingEffects: (stateRef.current?.metadata?.pendingEffects ?? []) as any[],
+            resolveCard: (ref: string) => resolveCard(slot, ref),
+            resolveFighter,
+          });
+          await runAction(slot, built.label, RESOLVE_PENDING_EFFECT, {
+            input: { gameId: gameIdRef.current!, ...built.input },
           }, 'resolvePendingEffect');
           break;
         }

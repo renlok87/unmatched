@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { GameState, Fighter, Card, PendingEffect, Position } from '../models';
 import { CardType, GamePhase, getActionsRemaining, getFighterMovement } from '../models';
 import { AdjacencyService } from '../engine/adjacency.service';
+import { isCellPassable } from '../movement/traversal';
 import { bannerAllows } from '../validators/game-rules.validator';
 import { fighterNameMatches } from '../effects/card-effect-executor.service';
 
@@ -20,6 +21,8 @@ export type AiAction =
   | { kind: 'resolveTarget'; effectId: string; fighterId: string }
   | { kind: 'resolveDiscard'; effectId: string; cardIds: string[] }
   | { kind: 'resolveBoost'; effectId: string; cardIds: string[] }
+  | { kind: 'resolveSpace'; effectId: string; x: number; y: number }
+  | { kind: 'resolveDeckPick'; effectId: string; cardIds: string[] }
   | { kind: 'declinePending'; effectId: string }
   | { kind: 'defense'; cardId: string }
   | { kind: 'resolveCombat' }
@@ -174,6 +177,51 @@ export class AiDecisionService {
         .sort((a, b) => (a.card.boostValue ?? 0) - (b.card.boostValue ?? 0) || a.index - b.index);
       if (candidates.length === 0) return null;
       return { kind: 'resolveBoost', effectId: p.id, cardIds: [candidates[0].card.id] };
+    }
+
+    // CHOOSE_SPACE (S06, Restless Spirits): stage 1 — проходимая клетка в зоне
+    // named-бойца с максимумом вражеских целей (детерминированный тай-брейк:
+    // min y, min x); stage 2 — смежная с anchor клетка с максимумом целей.
+    if (p.type === 'CHOOSE_SPACE') {
+      const enemies = (pos: { x: number; y: number }) =>
+        this.living(state).filter(
+          (f) => f.ownerId !== aiUserId && f.position.x === pos.x && f.position.y === pos.y,
+        ).length;
+      const passable = (x: number, y: number) => isCellPassable(state.boardState.cells[y]?.[x]);
+      let best: { x: number; y: number; score: number } | null = null;
+      if (p.stage !== 2) {
+        const anchor = p.zoneFighterName
+          ? state.fighters.find((f) => fighterNameMatches(f.name, p.zoneFighterName!))
+          : null;
+        if (!anchor) return null;
+        for (let y = 0; y < state.boardState.height; y++) {
+          for (let x = 0; x < state.boardState.width; x++) {
+            if (!passable(x, y)) continue;
+            if (!this.adjacency.isInSameZone(state, anchor.position, { x, y })) continue;
+            const score = enemies({ x, y });
+            if (!best || score > best.score) best = { x, y, score };
+          }
+        }
+      } else {
+        const anchor = p.anchor!;
+        for (const cell of this.adjacency.getAdjacentCells(state.boardState, anchor)) {
+          const { x, y } = cell.position;
+          if (!isCellPassable(state.boardState.cells[y]?.[x])) continue;
+          const score = enemies(cell.position) + enemies(anchor);
+          if (!best || score > best.score) best = { x, y, score };
+        }
+      }
+      if (!best) return null;
+      return { kind: 'resolveSpace', effectId: p.id, x: best.x, y: best.y };
+    }
+
+    // DECK_TOP_PICK (S06, Prophecy): PICK — первые value открытых карт
+    // (детерминированно); ORDER — исходный порядок возврата как есть.
+    if (p.type === 'DECK_TOP_PICK') {
+      const revealed = p.revealedCards ?? [];
+      if (revealed.length === 0) return null;
+      const count = (p.mode ?? 'PICK') === 'PICK' ? Math.min(p.value ?? 2, revealed.length) : revealed.length;
+      return { kind: 'resolveDeckPick', effectId: p.id, cardIds: revealed.slice(0, count).map((c) => c.id) };
     }
 
     // Revive-PLACE (S05, Winged Frenzy): вернуть поверженного бойца из
