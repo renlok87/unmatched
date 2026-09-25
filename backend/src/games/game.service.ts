@@ -157,6 +157,32 @@ export class GameService {
   }
 
   /**
+   * GD-029: безопасный code→gameId resolution для входа в приватную комнату
+   * по отображаемому коду. Возвращает игру ТОЛЬКО если она в LOBBY и ещё не
+   * заполнена; несуществующий/занятый/стартовавший код неотличимы (null) —
+   * комната не раскрывается. Дальнейший доступ гейтится joinGame как обычно.
+   */
+  async getGameByCode(code: string): Promise<GameResponse | null> {
+    const game = await this.prisma.game.findUnique({
+      where: { code },
+      include: {
+        host: { select: { id: true, username: true, avatar: true } },
+        opponent: { select: { id: true, username: true, avatar: true } },
+        players: {
+          include: { user: { select: { id: true, username: true, avatar: true } } },
+          orderBy: { seatOrder: 'asc' },
+        },
+        state: true,
+      },
+    });
+
+    if (!game || game.status !== GameStatus.LOBBY || game.opponentId) {
+      return null;
+    }
+    return this.mapToGameResponse(game);
+  }
+
+  /**
    * Найти игру по idempotencyKey
    */
   private async findGameByIdempotencyKey(

@@ -41,6 +41,7 @@ import {
   CombatPhaseGuard,
   DefensePlayGuard,
   CombatResolveGuard,
+  GqlThrottlerGuard,
 } from './guards';
 
 // Modules
@@ -94,6 +95,12 @@ import { GameActionType } from './models/game-action.model';
         },
       },
     }),
+    // ThrottlerModule НЕ регистрируется здесь повторно:
+    // THROTTLER:MODULE_OPTIONS — статический токен, второй forRoot в дереве
+    // модулей перезаписывает опции (AppModule-уровень выигрывает DI) и guard
+    // получает чужой конфиг. Единственная регистрация — в AppModule с
+    // setHeaders: false (GraphQL-контекст без express-res). Лимиты на
+    // резолверах задаёт @Throttle.
   ],
   providers: [
     // Resolvers
@@ -132,6 +139,7 @@ import { GameActionType } from './models/game-action.model';
     CombatPhaseGuard,
     DefensePlayGuard,
     CombatResolveGuard,
+    GqlThrottlerGuard,
   ],
   exports: [
     GameService,

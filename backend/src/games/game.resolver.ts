@@ -4,6 +4,7 @@ import { Throttle } from '@nestjs/throttler';
 import { GameService } from './game.service';
 import { GameStateService } from './game-state.service';
 import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
+import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
 import { Public } from '../common/decorators';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { GameResponse, GameStateResponse, EventsSinceResponse } from './models';
@@ -43,6 +44,22 @@ export class GameResolver {
     @Args('filters', { nullable: true }) filters?: GameFiltersDto,
   ): Promise<GameResponse[]> {
     return await this.gameService.myGames(user.id, filters);
+  }
+
+  /**
+   * GD-029: вход в приватную комнату по отображаемому коду.
+   * joinGame принимает gameId, а лобби-запросы отдают только свои/публичные
+   * списки — этот scoped-запрос закрывает разрыв code→gameId, не строя
+   * предположений о кеше availableGames. Отдаёт только LOBBY-игры со
+   * свободным местом; прочие коды неотличимы от несуществующих.
+   */
+  @Query(() => GameResponse, { nullable: true, name: 'gameByCode' })
+  @UseGuards(GqlAuthGuard, GqlThrottlerGuard)
+  @Throttle({ default: { limit: 15, ttl: 60000 } })
+  async gameByCode(
+    @Args('code', { type: () => String }) code: string,
+  ): Promise<GameResponse | null> {
+    return await this.gameService.getGameByCode(code);
   }
 
   /**

@@ -1,0 +1,40 @@
+{
+  "kind": "graphql-error",
+  "httpStatus": 200,
+  "raw": {
+    "errors": [
+      {
+        "message": "You do not have access to game no-such-game",
+        "code": "INTERNAL_SERVER_ERROR",
+        "path": [
+          "gameState"
+        ],
+        "locations": [
+          {
+            "line": 1,
+            "column": 11
+          }
+        ],
+        "extensions": {
+          "code": "INTERNAL_SERVER_ERROR",
+          "stacktrace": [
+            "GameAccessDeniedException: You do not have access to game no-such-game",
+            "    at GameService.requireParticipation (C:\\Users\\ren\\.codex\\worktrees\\s08-ue-vertical\\unmached\\backend\\dist\\src\\games\\game.service.js:263:19)",
+            "    at async GameResolver.getGameState (C:\\Users\\ren\\.codex\\worktrees\\s08-ue-vertical\\unmached\\backend\\dist\\src\\games\\game.resolver.js:48:9)",
+            "    at async target (C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\backend\\node_modules\\@nestjs\\core\\helpers\\external-context-creator.js:74:28)",
+            "    at async Object.gameState (C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\backend\\node_modules\\@nestjs\\core\\helpers\\external-proxy.js:9:24)"
+          ],
+          "status": 409,
+          "originalError": {
+            "message": "You do not have access to game no-such-game",
+            "error": "Conflict",
+            "statusCode": 409
+          }
+        }
+      }
+    ],
+    "data": {
+      "gameState": null
+    }
+  }
+}
