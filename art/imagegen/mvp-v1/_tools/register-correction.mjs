@@ -1,0 +1,33 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const [jobPath, source, review] = process.argv.slice(2);
+if (!jobPath || !source || !review) throw new Error('Usage: register-correction.mjs JOB_JSON SOURCE_PNG REVIEW');
+const job = JSON.parse(fs.readFileSync(jobPath, 'utf8').replace(/^\uFEFF/, ''));
+const manifestPath = path.join(root, 'manifest.json');
+const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+const inside = relative => {
+  const absolute = path.resolve(root, relative);
+  if (!absolute.startsWith(root + path.sep)) throw new Error('Path outside package');
+  return absolute;
+};
+if (!manifest.assets.some(a => a.id === job.assetId)) throw new Error('Unknown parent');
+if (!fs.existsSync(inside(job.promptPath))) throw new Error('Missing prompt');
+const data = fs.readFileSync(source);
+if (!data.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))) throw new Error('Not PNG');
+const sha256 = crypto.createHash('sha256').update(data).digest('hex');
+const destination = inside(job.path);
+if (fs.existsSync(destination) && crypto.createHash('sha256').update(fs.readFileSync(destination)).digest('hex') !== sha256) throw new Error('Never overwrite an original; choose a new version');
+fs.mkdirSync(path.dirname(destination), {recursive:true});
+fs.copyFileSync(source, destination);
+const record = { ...job, sourcePath:path.resolve(source), width:data.readUInt32BE(16), height:data.readUInt32BE(20), alpha:[4,6].includes(data[25]), bytes:data.length, sha256, status:'generated-reviewed', review:{result:'proposal; acceptance separately recorded',notes:review} };
+manifest.correctionDeliverables ??= [];
+const index = manifest.correctionDeliverables.findIndex(r => r.path === record.path);
+if (index < 0) manifest.correctionDeliverables.push(record); else manifest.correctionDeliverables[index] = record;
+manifest.correction = {...manifest.correction, brief:'CORRECTION-BRIEF.md', status:'in-progress', generatedFiles:manifest.correctionDeliverables.length};
+fs.writeFileSync(manifestPath + '.new', JSON.stringify(manifest,null,2)+'\n');
+fs.renameSync(manifestPath + '.new', manifestPath);
+console.log(JSON.stringify({path:record.path,width:record.width,height:record.height,sha256,generatedFiles:manifest.correction.generatedFiles}));
