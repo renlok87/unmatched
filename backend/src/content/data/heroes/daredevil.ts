@@ -81,6 +81,8 @@ export const daredevil: HeroDefinition = {
       boost: 2,
       quantity: 3,
       characterName: 'DAREDEVIL',
+      imageUrl: '/assets/decks/daredevil/grappling-hook.webp',
+      imageUrlRu: '/assets/decks/daredevil/ru/grappling-hook-ru.webp',
       effects: [
         {
           id: 'grappling-hook-effect',

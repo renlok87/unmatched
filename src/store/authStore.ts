@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { apolloClient } from '@/lib/apolloClient';
-import * as gql from '@/gql';
+import * as gql from '@/gql/graphql';
 import * as tokenStorage from '@/lib/token-storage';
 
 /**

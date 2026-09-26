@@ -153,12 +153,20 @@ export const HeroCreate: React.FC<IResourceComponentsProps> = () => {
 
         <Divider />
 
-        <Form.Item label="Image URL" name="imageUrl">
-          <Input placeholder="Enter image URL" />
+        <Form.Item label="Card Back URL" name="imageUrl">
+          <Input placeholder="Enter card back image URL" />
         </Form.Item>
 
         <Form.Item label="Avatar URL" name="avatarUrl">
           <Input placeholder="Enter avatar URL" />
+        </Form.Item>
+
+        <Form.Item label="Character Card URL" name="characterCardUrl">
+          <Input placeholder="Enter character card image URL" />
+        </Form.Item>
+
+        <Form.Item label="Mini Model URL" name="miniModelUrl">
+          <Input placeholder="Enter mini model URL" />
         </Form.Item>
 
         <Form.Item>

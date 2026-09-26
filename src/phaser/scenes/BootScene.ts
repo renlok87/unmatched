@@ -1,8 +1,5 @@
-// ============================================================
-// BOOT SCENE - Предзагрузка активов
-// ============================================================
-
 import Phaser from 'phaser';
+import { GAME_IMAGE_ASSETS } from '../assets/gameAssetManifest';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -11,153 +8,57 @@ export class BootScene extends Phaser.Scene {
 
   preload(): void {
     this.createLoadScreen();
+    this.loadHeroAssets();
 
-    // Загружаем базовые графические активы (placeholders)
-    this.loadPlaceholderAssets();
-
-    // Загружаем активы для игрового поля
-    this.loadBoardAssets();
-
-    // Загружаем активы для бойцов
-    this.loadFighterAssets();
-
-    // Загружаем активы для карт
-    this.loadCardAssets();
-
-    // Загружаем UI элементы
-    this.loadUIAssets();
-
-    // Отображаем прогресс загрузки
     this.load.on('progress', this.updateLoadProgress, this);
     this.load.on('complete', this.onLoadComplete, this);
   }
 
   create(): void {
-    // Создаём глобальные события для коммуникации между сценами
     this.setupGlobalEvents();
-
-    // Переходим к главной сцене игры
-    this.scene.start('GameScene', { scene: 'UIScene' });
+    this.scene.start('GameScene');
   }
 
-  /**
-   * Создаёт экран загрузки с прогресс баром
-   */
   private createLoadScreen(): void {
-    const width = this.cameras.main.width;
-    const height = this.cameras.main.height;
+    const { width, height } = this.cameras.main;
 
-    // Фон
-    this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a2e);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x121522);
 
-    // Текст загрузки
-    const loadingText = this.add.text(width / 2, height / 2 - 50, 'Загрузка...', {
-      fontSize: '32px',
-      color: '#ffffff',
+    const loadingText = this.add.text(width / 2, height / 2 - 48, 'Loading...', {
+      fontSize: '28px',
+      color: '#f7f0d2',
+      fontStyle: 'bold',
     });
     loadingText.setOrigin(0.5);
 
-    // Прогресс бар фон
-    const progressBarBg = this.add.rectangle(width / 2, height / 2, 400, 30, 0x333333);
+    const progressBarBg = this.add.rectangle(width / 2, height / 2, 360, 18, 0x252a3a);
     progressBarBg.setOrigin(0.5);
 
-    // Прогресс бар
-    this.registry.set('progressBar', this.add.rectangle(
-      width / 2 - 200,
-      height / 2,
-      0,
-      30,
-      0x4ecca3
-    ));
-    this.registry.get('progressBar').setOrigin(0, 0.5);
+    const progressBar = this.add.rectangle(width / 2 - 180, height / 2, 0, 18, 0xd7b84b);
+    progressBar.setOrigin(0, 0.5);
+    this.registry.set('progressBar', progressBar);
   }
 
-  /**
-   * Обновляет прогресс бар загрузки
-   */
   private updateLoadProgress(progress: number): void {
-    const progressBar = this.registry.get('progressBar');
+    const progressBar = this.registry.get('progressBar') as Phaser.GameObjects.Rectangle | undefined;
     if (progressBar) {
-      progressBar.width = 400 * progress;
+      progressBar.width = 360 * progress;
     }
   }
 
-  /**
-   * Вызывается при завершении загрузки
-   */
   private onLoadComplete(): void {
-    console.log('Асеты загружены');
+    console.log('Phaser assets loaded');
   }
 
-  /**
-   * Загружает placeholder активы для разработки
-   */
-  private loadPlaceholderAssets(): void {
-    // Фон игрового поля
-    this.load.image('board-bg', 'assets/phaser/board-placeholder.png');
-
-    // Placeholder для бойцов
-    this.load.image('fighter-placeholder', 'assets/phaser/fighter-placeholder.png');
-
-    // Placeholder для карт
-    this.load.image('card-placeholder', 'assets/phaser/card-placeholder.png');
-    this.load.image('card-back', 'assets/phaser/card-back-placeholder.png');
-
-    // Placeholder для зон на поле
-    this.load.image('zone-blue', 'assets/phaser/zones/blue.png');
-    this.load.image('zone-green', 'assets/phaser/zones/green.png');
-    this.load.image('zone-yellow', 'assets/phaser/zones/yellow.png');
-    this.load.image('zone-red', 'assets/phaser/zones/red.png');
-    this.load.image('zone-purple', 'assets/phaser/zones/purple.png');
+  private loadHeroAssets(): void {
+    GAME_IMAGE_ASSETS.forEach(asset => {
+      this.load.image(asset.key, asset.path);
+    });
   }
 
-  /**
-   * Загружает активы для игрового поля
-   */
-  private loadBoardAssets(): void {
-    // TODO: Загрузка реальных спрайтов для полей
-    // this.load.image('board-forum', 'assets/boards/forum.png');
-    // this.load.image('board-cornfield', 'assets/boards/cornfield.png');
-  }
-
-  /**
-   * Загружает активы для бойцов
-   */
-  private loadFighterAssets(): void {
-    // TODO: Загрузка спрайтов для героев
-    // this.load.spritesheet('ms-marvel', 'assets/fighters/ms-marvel.png', {
-    //   frameWidth: 64,
-    //   frameHeight: 64,
-    // });
-    // this.load.spritesheet('daredevil', 'assets/fighters/daredevil.png', {
-    //   frameWidth: 64,
-    //   frameHeight: 64,
-    // });
-  }
-
-  /**
-   * Загружает активы для карт
-   */
-  private loadCardAssets(): void {
-    // TODO: Загрузка изображений карт
-    // this.load.image('card-rapid-punch', 'assets/cards/ms-marvel/rapid-punch.png');
-  }
-
-  /**
-   * Загружает UI элементы
-   */
-  private loadUIAssets(): void {
-    // TODO: Загрузка UI спрайтов
-    // Кнопки, иконки, индикаторы и т.д.
-  }
-
-  /**
-   * Настраивает глобальные события для коммуникации
-   */
   private setupGlobalEvents(): void {
-    // События от React к Phaser
     this.game.events.on('react-to-phaser', (event: unknown) => {
-      console.log('BootScene: событие от React', event);
+      console.log('BootScene: react-to-phaser', event);
     });
   }
 }

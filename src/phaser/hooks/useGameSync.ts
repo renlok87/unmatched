@@ -4,8 +4,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { ApolloClient } from '@apollo/client';
-import * as gql from '@/gql';
-import type { GameStateUpdate, GameEvent, TurnUpdate } from '../network/SubscriptionHandler';
+import * as gql from '@/gql/graphql';
 
 // ------------------------------------------------------------
 // Типы для хука
@@ -242,7 +241,7 @@ export function useGameState(options: UseGameStateOptions): UseGameStateReturn {
             return;
           }
 
-          const eventData = data?.[key];
+          const eventData = (data as Record<string, unknown> | undefined)?.[key];
           if (eventData) {
             console.log(`[useGameState] Событие ${key}:`, eventData);
             // TODO: Диспатчить события в store
@@ -319,6 +318,7 @@ export function useGameState(options: UseGameStateOptions): UseGameStateReturn {
       const stateData = typeof data.gameState.state === 'string'
         ? JSON.parse(data.gameState.state)
         : data.gameState.state;
+      void stateData;
 
       lastSequenceRef.current = data.gameState.sequenceNumber;
 

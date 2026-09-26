@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { apolloClient } from '@/lib/apolloClient';
 import { gql } from '@apollo/client';
-import type { GameResponse, GameMode, GameStatus } from '@/gql';
+import type { GameResponse, GameMode, GameStatus } from '@/gql/graphql';
 
 const AVAILABLE_GAMES_QUERY = gql`
   query AvailableGames($mode: String) {
@@ -126,9 +126,24 @@ export const useLobbyStore = create<LobbyState>((set, get) => ({
 
       set({ games: result.data?.availableGames || [], loading: false, _abortController: null });
     } catch (error) {
-      // Check if error was due to abort
-      if (error instanceof Error && error.name === 'AbortError') {
+      // Abort (unmount / новый fetch отменяет старый) — НЕ ошибка, баннер не
+      // показываем. apolloClient.query оборачивает AbortError в ApolloError
+      // (.name='ApolloError', а сам abort — в .networkError), поэтому проверяем
+      // обе формы + текст сообщения.
+      const e = error as { name?: string; message?: string; networkError?: { name?: string } };
+      const isAbort =
+        e?.name === 'AbortError' ||
+        e?.networkError?.name === 'AbortError' ||
+        /\baborted?\b/i.test(e?.message ?? '');
+      if (isAbort) {
         console.log('[LobbyStore] Fetch games operation aborted');
+        // Если этот fetch — ПОСЛЕДНИЙ (его controller всё ещё текущий, т.е. его
+        // не вытеснил новый fetch), снимаем loading — иначе экран залипает на
+        // «Загрузка игр…» (abort при unmount в dev StrictMode оставлял loading=true).
+        // Если controller уже сменился — новый fetch владеет loading, не трогаем.
+        if (get()._abortController === abortController) {
+          set({ loading: false, _abortController: null });
+        }
         return;
       }
 

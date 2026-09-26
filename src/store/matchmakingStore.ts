@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { apolloClient } from '@/lib/apolloClient';
 import { gql } from '@apollo/client';
-import type { GameMode, MatchFoundResponse, QueueStatusResponse, PenaltyInfoDto } from '@/gql';
+import type { GameMode, MatchFoundResponse, QueueStatusResponse, PenaltyInfoDto } from '@/gql/graphql';
 
 const JOIN_QUEUE_MUTATION = gql`
   mutation JoinQueue($input: JoinQueueDto!, $idempotencyKey: String!) {

@@ -295,6 +295,9 @@ async function importHero(heroKey: string) {
           properties: {
             hasSidekick: hero.hasSidekicks,
             sidekickCount: hero.sidekicks?.length || 0,
+            // Тип атаки героя как в scraped ('melee'|'range'|'melee_range') —
+            // движок нормализует через normalizeAttackType (range → ranged)
+            attackType: hero.attack,
           },
           hasTokens: hero.hasTokens,
           sidekicks: hero.sidekicks || [],

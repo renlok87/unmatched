@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useLobbyStore } from '@/store/lobbyStore';
 import { GameCard } from './GameCard';
-import type { GameMode, GameStatus } from '@/gql';
+import type { GameMode, GameStatus } from '@/gql/graphql';
 
 interface GameListProps {
   modeFilter?: GameMode;

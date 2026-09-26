@@ -4,8 +4,8 @@ import { Button } from '@/design-system/components/Button';
 import { useLobbyStore } from '@/store/lobbyStore';
 import { apolloClient } from '@/lib/apolloClient';
 import { gql } from '@apollo/client';
-import { GameMode } from '@/gql';
-import type { Board } from '@/gql';
+import { GameMode } from '@/gql/graphql';
+import type { Board } from '@/gql/graphql';
 
 const BOARDS_QUERY = gql`
   query Boards {

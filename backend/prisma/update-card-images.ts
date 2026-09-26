@@ -79,11 +79,11 @@ function parseDeckData(data: any[]): ParsedCard[] {
         boostValue: resolveValue(data, cardSchema.boostValue) || null,
         copies: resolveValue(data, item.copies) || item.copies || 1,
         effect: resolveValue(data, cardSchema.effect) || null,
-        image: resolveValue(data, cardSchema.image) || null,
+        image: resolveValue(data, item.image) || null,
       };
 
       // Извлекаем русское изображение из i18n
-      const i18nData = resolveValue(data, cardSchema.i18n);
+      const i18nData = resolveValue(data, item.i18n);
       if (i18nData && typeof i18nData === 'object' && i18nData.ru !== undefined) {
         const ruIndex = i18nData.ru;
         if (typeof ruIndex === 'number') {

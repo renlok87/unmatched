@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/design-system/components/Button';
 import { Badge } from '@/design-system/components/Badge';
 import { Avatar } from '@/design-system/components/Avatar';
-import type { MatchFoundResponse } from '@/gql';
+import type { MatchFoundResponse } from '@/gql/graphql';
 
 interface MatchFoundProps {
   match: MatchFoundResponse | null;

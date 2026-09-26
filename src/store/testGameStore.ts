@@ -1,13 +1,11 @@
 import { create } from 'zustand';
+import { gql as apolloGql } from '@apollo/client';
 import { apolloClient } from '@/lib/apolloClient';
 import {
   HeroesDocument,
-  HeroDocument,
-  BoardsDocument,
-  type HeroQuery,
   type HeroesQuery,
-  type BoardsQuery,
 } from '@/gql/graphql';
+import { CardType, FighterType } from '@/core/models/types';
 import type {
   GameState,
   Player,
@@ -19,6 +17,64 @@ import type {
   Position,
   GamePhase,
 } from '@/core/models/types';
+
+const HERO_WITH_ASSETS_QUERY = apolloGql`
+  query HeroWithAssets($id: String!) {
+    hero(id: $id) {
+      id
+      name
+      health
+      movement
+      set
+      fighterType
+      sidekickCount
+      sidekickHealth
+      urls {
+        avatar
+        mini
+        cardCover
+      }
+      avatarUrl
+      abilities {
+        id
+        name
+        text
+        trigger
+      }
+      cards {
+        id
+        title
+        type
+        value
+        boost
+        quantity
+        imageUrl
+        imageUrlRu
+      }
+    }
+  }
+`;
+
+const BOARDS_WITH_ASSETS_QUERY = apolloGql`
+  query BoardsWithAssets {
+    boards {
+      id
+      name
+      width
+      height
+      recommendedPlayers
+      imageUrl
+      spaces {
+        position {
+          x
+          y
+        }
+        zones
+        isObstacle
+      }
+    }
+  }
+`;
 
 // ============================================================
 // TYPES FROM API
@@ -47,6 +103,20 @@ interface ApiHeroWithCards extends ApiHero {
   cards?: ApiCard[];
 }
 
+interface ApiBoard {
+  id: string;
+  name: string;
+  width: number;
+  height: number;
+  recommendedPlayers: number;
+  imageUrl?: string | null;
+  spaces: Array<{
+    position: Position;
+    zones: Array<'blue' | 'green' | 'yellow' | 'red' | 'purple'>;
+    isObstacle?: boolean | null;
+  }>;
+}
+
 interface ApiHeroAbility {
   id: string;
   name: string;
@@ -69,13 +139,13 @@ interface ApiCard {
 // MAPPERS: GraphQL -> Internal Types
 // ============================================================
 
-function mapCardType(cardType: string): import('@/core/models/types').CardType {
+function mapCardType(cardType: string): CardType {
   const type = cardType.toLowerCase();
-  if (type === 'attack') return 'attack' as const;
-  if (type === 'defense') return 'defense' as const;
-  if (type === 'versatile') return 'versatile' as const;
-  if (type === 'scheme') return 'scheme' as const;
-  return 'attack' as const;
+  if (type === 'attack') return CardType.ATTACK;
+  if (type === 'defense') return CardType.DEFENSE;
+  if (type === 'versatile') return CardType.VERSATILE;
+  if (type === 'scheme') return CardType.SCHEME;
+  return CardType.ATTACK;
 }
 
 function createCardDefinition(card: ApiCard, characterName: string): CardDefinition {
@@ -105,7 +175,7 @@ function createCardInstance(
   };
 }
 
-function createDeck(heroData: HeroQuery['hero'], ownerId: string): {
+function createDeck(heroData: ApiHeroWithCards, ownerId: string): {
   deck: CardInstance[];
   definitions: CardDefinition[];
 } {
@@ -134,7 +204,7 @@ function createDeck(heroData: HeroQuery['hero'], ownerId: string): {
 }
 
 function createFighter(
-  heroData: HeroQuery['hero'],
+  heroData: ApiHeroWithCards,
   ownerId: string,
   position: Position,
   sidekickNumber = 0
@@ -143,7 +213,7 @@ function createFighter(
   return {
     id: isSidekick ? `${ownerId}-sidekick-${sidekickNumber}` : `${ownerId}-hero`,
     definitionId: heroData.id || '',
-    type: isSidekick ? 'sidekick' : 'hero',
+    type: isSidekick ? FighterType.SIDEKICK : FighterType.HERO,
     health: isSidekick
       ? (heroData.sidekickHealth || 5)
       : (heroData.health || 14),
@@ -158,7 +228,7 @@ function createFighter(
 }
 
 function createPlayer(
-  heroData: HeroQuery['hero'],
+  heroData: ApiHeroWithCards,
   playerId: string,
   playerName: string,
   position: Position
@@ -196,7 +266,7 @@ function createPlayer(
   };
 }
 
-function mapBoardFromGraphQL(board: BoardsQuery['boards'][0]): BoardDefinition {
+function mapBoardFromGraphQL(board: ApiBoard): BoardDefinition {
   return {
     id: board.id || 'unknown',
     name: board.name || 'Unknown Board',
@@ -213,9 +283,9 @@ function mapBoardFromGraphQL(board: BoardsQuery['boards'][0]): BoardDefinition {
 }
 
 function createMockGameState(
-  hero1Data: HeroQuery['hero'],
-  hero2Data: HeroQuery['hero'],
-  boardData: BoardsQuery['boards'][0]
+  hero1Data: ApiHeroWithCards,
+  hero2Data: ApiHeroWithCards,
+  boardData: ApiBoard
 ): GameState {
   const boardDef = mapBoardFromGraphQL(boardData);
 
@@ -274,8 +344,8 @@ interface TestGameStoreState {
 
   // Available data
   allHeroes: HeroesQuery['heroes'];
-  heroDetails: Map<string, HeroQuery['hero']>;
-  allBoards: BoardsQuery['boards'];
+  heroDetails: Map<string, ApiHeroWithCards>;
+  allBoards: ApiBoard[];
 
   // Game state
   gameState: GameState | null;
@@ -347,10 +417,10 @@ export const useTestGameStore = create<TestGameStoreState>((set, get) => ({
 
     try {
       const { data } = await apolloClient.query({
-        query: HeroDocument,
+        query: HERO_WITH_ASSETS_QUERY,
         variables: { id: heroId },
         fetchPolicy: 'network-only',
-      });
+      }) as { data?: { hero?: ApiHeroWithCards | null } };
 
       if (data?.hero) {
         set((state) => {
@@ -368,9 +438,9 @@ export const useTestGameStore = create<TestGameStoreState>((set, get) => ({
   loadBoards: async () => {
     try {
       const { data } = await apolloClient.query({
-        query: BoardsDocument,
+        query: BOARDS_WITH_ASSETS_QUERY,
         fetchPolicy: 'network-only',
-      });
+      }) as { data?: { boards?: ApiBoard[] } };
 
       if (data?.boards) {
         set({ allBoards: data.boards });
@@ -626,7 +696,7 @@ export const useTestGameStore = create<TestGameStoreState>((set, get) => ({
 // UTILITIES
 // ============================================================
 
-function createMockBoard(): BoardsQuery['boards'][0] {
+function createMockBoard(): ApiBoard {
   const zones: Array<'blue' | 'green' | 'yellow' | 'red' | 'purple'> = ['blue', 'green', 'yellow', 'red', 'purple'];
   const width = 6;
   const height = 4;
@@ -653,6 +723,7 @@ function createMockBoard(): BoardsQuery['boards'][0] {
     width,
     height,
     recommendedPlayers: 2,
+    imageUrl: '/assets/boards/hells-kitchen.webp',
     spaces,
-  } as BoardsQuery['boards'][0];
+  };
 }

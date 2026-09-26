@@ -4,7 +4,7 @@
 
 import { useCallback, useMemo } from 'react';
 import { ApolloClient } from '@apollo/client';
-import * as gql from '@/gql';
+import * as gql from '@/gql/graphql';
 import type { Position } from '@/core/models/types';
 
 // ------------------------------------------------------------
@@ -214,7 +214,7 @@ async function executeMutation<T>(
 export function useGameActions(
   options: UseGameActionsOptions
 ): UseGameActionsReturn {
-  const { client, gameId, playerId, optimisticUpdates = false, onSuccess, onError } = options;
+  const { client, gameId, playerId: _playerId, optimisticUpdates: _optimisticUpdates = false, onSuccess, onError } = options;
 
   // Отслеживаем последнее действие
   const state = useMemo(() => ({

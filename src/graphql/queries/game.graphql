@@ -128,6 +128,8 @@ query Hero($id: String!) {
       value
       boost
       quantity
+      imageUrl
+      imageUrlRu
     }
   }
 }
@@ -139,6 +141,7 @@ query Boards {
     width
     height
     recommendedPlayers
+    imageUrl
     spaces {
       position {
         x
@@ -157,6 +160,7 @@ query Board($id: String!) {
     width
     height
     recommendedPlayers
+    imageUrl
     spaces {
       position {
         x

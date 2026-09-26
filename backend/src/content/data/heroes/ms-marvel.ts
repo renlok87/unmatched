@@ -33,6 +33,8 @@ export const msMarvel: HeroDefinition = {
       boost: 3,
       quantity: 3,
       characterName: 'MS. MARVEL',
+      imageUrl: '/assets/decks/ms-marvel/embiggen.webp',
+      imageUrlRu: '/assets/decks/ms-marvel/ru/embiggen-ru.webp',
       effects: [
         {
           id: 'embiggen-effect',
@@ -49,6 +51,8 @@ export const msMarvel: HeroDefinition = {
       boost: 2,
       quantity: 3,
       characterName: 'MS. MARVEL',
+      imageUrl: '/assets/decks/ms-marvel/big-wind-up.webp',
+      imageUrlRu: '/assets/decks/ms-marvel/ru/big-wind-up-ru.webp',
       effects: [
         {
           id: 'big-wind-up-boost',
@@ -65,6 +69,8 @@ export const msMarvel: HeroDefinition = {
       boost: 2,
       quantity: 3,
       characterName: 'MS. MARVEL',
+      imageUrl: '/assets/decks/ms-marvel/easy-peasy.webp',
+      imageUrlRu: '/assets/decks/ms-marvel/ru/easy-peasy-ru.webp',
       effects: [
         {
           id: 'easy-peasy-draw',
@@ -81,6 +87,8 @@ export const msMarvel: HeroDefinition = {
       boost: 1,
       quantity: 3,
       characterName: 'MS. MARVEL',
+      imageUrl: '/assets/decks/ms-marvel/feint.webp',
+      imageUrlRu: '/assets/decks/ms-marvel/ru/feint-ru.webp',
       effects: [
         {
           id: 'feint-cancel',

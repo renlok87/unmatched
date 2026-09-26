@@ -1,0 +1,40 @@
+const { chromium } = require('../backend/node_modules/playwright');
+const fs = require('node:fs');
+const path = require('node:path');
+(async () => {
+  const out = path.resolve(__dirname, 'design-brief-inspection');
+  fs.mkdirSync(out, { recursive: true });
+  const browser = await chromium.launch({ headless: true, channel: 'msedge' });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+  await page.goto('http://localhost:5480');
+  await page.waitForLoadState('networkidle');
+  console.log('LOGIN', (await page.locator('body').innerText()).slice(0, 300));
+  await page.getByRole('button', { name: 'Sign In', exact: true }).click();
+  await page.waitForURL('http://localhost:5480/');
+  await page.waitForLoadState('networkidle');
+  const report = { checkedAt: new Date().toISOString(), pages: [], errors };
+  for (const route of ['/', '/heroes', '/cards', '/boards', '/game-tester']) {
+    await page.goto('http://localhost:5480' + route);
+    await page.waitForLoadState('networkidle');
+    const name = route === '/' ? 'dashboard' : route.slice(1);
+    const body = await page.locator('body').innerText();
+    const links = await page.locator('a[href]').evaluateAll(nodes => nodes.map(n => ({ text: n.innerText, href: n.getAttribute('href') })));
+    await page.screenshot({ path: path.join(out, name + '.png'), fullPage: true });
+    report.pages.push({ route, body, links });
+    console.log(name, body.slice(0, 3000));
+  }
+  const token = await page.evaluate(() => localStorage.getItem('accessToken'));
+  const { getIntrospectionQuery, buildClientSchema, printSchema } = require('../backend/node_modules/graphql');
+  const response = await fetch('http://localhost:3000/graphql', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: JSON.stringify({ query: getIntrospectionQuery() }) });
+  const payload = await response.json();
+  if (payload.data) fs.writeFileSync(path.join(out, 'schema.graphql'), printSchema(buildClientSchema(payload.data)));
+  else console.log('SCHEMA_ERROR', payload.errors?.map(e=>e.message));
+  const health = await fetch('http://localhost:3000/health');
+  report.health = { status: health.status, body: await health.json() };
+  fs.writeFileSync(path.join(out, 'report.json'), JSON.stringify(report, null, 2));
+  console.log('HEALTH', JSON.stringify(report.health));
+  console.log('PAGE_ERRORS', JSON.stringify(errors));
+  await browser.close();
+})().catch(e => { console.error(e); process.exit(1); });

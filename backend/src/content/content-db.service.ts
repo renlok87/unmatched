@@ -182,7 +182,9 @@ export class ContentDbService {
 
     const hero = await this.prisma.hero.findFirst({
       where: {
-        OR: [{ name: { equals: slug, mode: 'insensitive' } }],
+        // Принимаем и cuid-id, и имя: публичный query hero(id) шлёт id из БД,
+        // поиск только по name возвращал null для валидных id
+        OR: [{ id: slug }, { name: { equals: slug, mode: 'insensitive' } }],
       },
       include: { cards: true },
     });
@@ -223,7 +225,7 @@ export class ContentDbService {
    * Get all cards for a specific hero from database
    */
   async getCardsByHero(heroId: string): Promise<CardDefinition[]> {
-    const hero = await this.getHeroById(heroId);
+    const hero = await this.getHeroBySlug(heroId);
     return hero.deckCards;
   }
 

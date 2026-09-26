@@ -3,6 +3,7 @@ param(
   [string]$Api = "http://localhost:3100/graphql",
   [string]$EvidenceDir = "",
   [int]$RunSeconds = 120,
+  [ValidateRange(1, 60)][int]$ClientFps = 30,
   [int]$JoinerDropWsAfter = 12,
   [int]$HostManeuverAfter = 25,
   # Offline probe of the scoped-cleanup state machine only (no backend, no
@@ -90,6 +91,9 @@ function Start-S08Client([string[]]$CliArgs, [string]$Email, [string]$Password, 
   foreach ($arg in $CliArgs) {
     if ($arg -match '\s') { $psi.Arguments += '"' + $arg + '" ' } else { $psi.Arguments += $arg + ' ' }
   }
+  # Both offscreen clients render continuously; cap each independently.
+  # Keep the quotes around the value so UE receives the full console command.
+  $psi.Arguments += ('-ExecCmds="t.MaxFPS {0}" ' -f $ClientFps)
   $psi.EnvironmentVariables['S08_EMAIL'] = $Email
   $psi.EnvironmentVariables['S08_PASSWORD'] = $Password
   if ($RoomCode) { $psi.EnvironmentVariables['S08_ROOM_CODE'] = $RoomCode }

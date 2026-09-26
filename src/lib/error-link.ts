@@ -63,6 +63,17 @@ export const errorLink = onError(({ graphQLErrors, networkError, operation, forw
 
   // Обработка сетевых ошибок
   if (networkError) {
+    // AbortError — намеренная отмена запроса (unmount компонента / новый запрос
+    // отменяет предыдущий), а НЕ реальная сетевая ошибка. Не шумим в консоль и
+    // не запускаем refresh-flow. В dev React StrictMode двойной mount/unmount
+    // массово рвёт in-flight fetch'и — без этого фильтра консоль залита красным.
+    const isAbort =
+      networkError.name === 'AbortError' ||
+      /\baborted?\b/i.test(networkError.message ?? '');
+    if (isAbort) {
+      return;
+    }
+
     console.error('Network error:', networkError);
 
     // Если это 401, тоже пробуем refresh

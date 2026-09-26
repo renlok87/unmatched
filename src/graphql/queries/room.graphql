@@ -25,8 +25,12 @@ query RoomInfo($id: String!) {
 query ValidSpawnZones($gameId: String!, $playerId: String!) {
   gameState(gameId: $gameId) {
     id
-    boardState
-    players
-    fighters
+    gameId
+    state
+    sequenceNumber
+    currentTurnPlayerId
+    phase
+    turnCount
+    updatedAt
   }
 }

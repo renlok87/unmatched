@@ -3,7 +3,7 @@
 // ============================================================
 
 import { apolloClient } from '@/lib/apolloClient';
-import * as gql from '@/gql';
+import * as gql from '@/gql/graphql';
 import type { Position } from '@/core/models/types';
 
 // ------------------------------------------------------------

@@ -4,7 +4,7 @@ import { useMatchmakingStore } from '@/store/matchmakingStore';
 import { QueueStatus } from '@/components/matchmaking/QueueStatus';
 import { MatchFound } from '@/components/matchmaking/MatchFound';
 import { Button } from '@/design-system/components/Button';
-import type { GameMode } from '@/gql';
+import type { GameMode } from '@/gql/graphql';
 
 export const MatchmakingView: React.FC = () => {
   const navigate = useNavigate();

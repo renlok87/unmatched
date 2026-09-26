@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/design-system/components/Button';
 import { Avatar } from '@/design-system/components/Avatar';
 import { Badge } from '@/design-system/components/Badge';
-import type { GameResponse, GameStatus, GameMode } from '@/gql';
+import type { GameResponse, GameStatus, GameMode } from '@/gql/graphql';
 
 interface GameCardProps {
   game: GameResponse;

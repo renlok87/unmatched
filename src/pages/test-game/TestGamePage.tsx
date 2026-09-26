@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { PhaserGame } from '@/phaser';
+import type { PhaserGameEvent } from '@/phaser/types';
+import { GameEngine } from '@/core/engine/GameEngine';
+import { getDefaultBoardId } from '@/core/data/boards';
 import { useTestGameStore } from '@/store/testGameStore';
-import { BoardView } from '@/components/board/BoardView';
 import { PlayerArea } from './PlayerArea';
 import { TestGameControls } from './TestGameControls';
 import { TestGameLanding } from './TestGameLanding';
@@ -21,25 +24,34 @@ export const TestGamePage: React.FC = () => {
     highlightedSpaces,
   } = useTestGameStore();
 
-  const [showDebugBoard, setShowDebugBoard] = useState(true);
-
-  useEffect(() => {
-    console.log('TestGamePage mounted');
-    loadHeroes();
-    loadBoards();
+  const [showGameScene, setShowGameScene] = useState(true);
+  const demoGameState = useMemo(() => {
+    const engine = new GameEngine();
+    return engine.initializeGame({
+      players: [
+        { id: 'player1', name: 'Ms. Marvel', heroId: 'ms-marvel' },
+        { id: 'player2', name: 'Daredevil', heroId: 'daredevil' },
+      ],
+      boardId: getDefaultBoardId(),
+    });
   }, []);
 
-  // Debug logging
   useEffect(() => {
-    console.log('TestGamePage state:', { isLoading, error, gameState: !!gameState, allHeroesLength: allHeroes?.length });
+    loadHeroes();
+    loadBoards();
+  }, [loadHeroes, loadBoards]);
+
+  useEffect(() => {
+    console.log('TestGamePage state:', {
+      isLoading,
+      error,
+      gameState: Boolean(gameState),
+      allHeroesLength: allHeroes?.length,
+    });
   }, [isLoading, error, gameState, allHeroes]);
 
   const handleCardClick = (cardId: string) => {
-    if (selectedCardId === cardId) {
-      selectCard(null);
-    } else {
-      selectCard(cardId);
-    }
+    selectCard(selectedCardId === cardId ? null : cardId);
   };
 
   const handleFighterSelect = (fighterId: string) => {
@@ -47,17 +59,53 @@ export const TestGamePage: React.FC = () => {
   };
 
   const handleSpaceClick = (position: { x: number; y: number }) => {
-    if (selectedFighterId && highlightedSpaces.some((s) => s.x === position.x && s.y === position.y)) {
+    if (selectedFighterId && highlightedSpaces.some(space => space.x === position.x && space.y === position.y)) {
       useTestGameStore.getState().moveFighter(selectedFighterId, position);
     }
   };
 
-  // Debug: show what's happening
+  const handlePhaserEvent = (event: PhaserGameEvent) => {
+    switch (event.type) {
+      case 'FIGHTER_CLICKED':
+        handleFighterSelect(event.fighterId);
+        break;
+      case 'SPACE_CLICKED':
+        handleSpaceClick(event.position);
+        break;
+      case 'CARD_CLICKED':
+        handleCardClick(event.cardId);
+        break;
+      default:
+        break;
+    }
+  };
+
   if (error) {
     return (
-      <div className="test-game-page" style={{ padding: '20px', color: 'white' }}>
-        <h2>Ошибка: {error}</h2>
-        <button onClick={loadHeroes}>Попробовать снова</button>
+      <div className="test-game-page">
+        <header className="test-game-header">
+          <div className="header-content">
+            <h1 className="page-title">Test Game</h1>
+            <button onClick={loadHeroes} className="btn btn-ghost btn-sm">Retry API</button>
+          </div>
+        </header>
+
+        <div className="test-game__fallback">
+          <p className="error-text">API unavailable: {error}. Showing local Phaser demo.</p>
+          <div className="board-wrapper">
+            <PhaserGame
+              gameId={demoGameState.id}
+              gameState={demoGameState}
+              selectedFighterId={selectedFighterId}
+              selectedCardId={selectedCardId}
+              highlightedSpaces={highlightedSpaces}
+              onGameEvent={handlePhaserEvent}
+              width={800}
+              height={600}
+              className="test-game__phaser-scene"
+            />
+          </div>
+        </div>
       </div>
     );
   }
@@ -65,7 +113,7 @@ export const TestGamePage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="test-game-page" style={{ padding: '20px', color: 'white' }}>
-        <p>Загрузка данных о героях...</p>
+        <p>Loading hero data...</p>
       </div>
     );
   }
@@ -83,13 +131,13 @@ export const TestGamePage: React.FC = () => {
     <div className="test-game-page">
       <header className="test-game-header">
         <div className="header-content">
-          <h1 className="page-title">🎮 Тестовая игра Unmatched</h1>
+          <h1 className="page-title">Test Game</h1>
           <div className="header-actions">
             <button
-              onClick={() => setShowDebugBoard(!showDebugBoard)}
+              onClick={() => setShowGameScene(!showGameScene)}
               className="btn btn-ghost btn-sm"
             >
-              {showDebugBoard ? 'Скрыть' : 'Показать'} доску
+              {showGameScene ? 'Hide' : 'Show'} Phaser
             </button>
           </div>
         </div>
@@ -97,14 +145,18 @@ export const TestGamePage: React.FC = () => {
 
       <div className="test-game__main">
         <div className="test-game__board-section">
-          {showDebugBoard && (
+          {showGameScene && (
             <div className="board-wrapper">
-              <BoardView
-                interactive={true}
+              <PhaserGame
+                gameId={gameState.id}
                 gameState={gameState}
+                selectedFighterId={selectedFighterId}
+                selectedCardId={selectedCardId}
                 highlightedSpaces={highlightedSpaces}
-                onFighterSelect={handleFighterSelect}
-                onSpaceClick={handleSpaceClick}
+                onGameEvent={handlePhaserEvent}
+                width={800}
+                height={600}
+                className="test-game__phaser-scene"
               />
             </div>
           )}
@@ -138,9 +190,7 @@ export const TestGamePage: React.FC = () => {
       </div>
 
       <footer className="test-game-footer">
-        <span className="footer-text">
-          Тестовая страница для отладки игрового интерфейса
-        </span>
+        <span className="footer-text">Test page for the Phaser game scene.</span>
       </footer>
     </div>
   );

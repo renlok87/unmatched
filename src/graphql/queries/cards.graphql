@@ -10,9 +10,11 @@ query GetCards($page: Int!, $limit: Int!) {
       attackValue
       defenseValue
       boostValue
+      bannerName
       count
       heroId
-      createdAt
+      imageUrl
+      imageUrlRu
     }
     total
   }
@@ -21,17 +23,14 @@ query GetCards($page: Int!, $limit: Int!) {
 query GetCard($id: String!) {
   card(id: $id) {
     id
-    name
-    nameEn
-    nameRu
-    cardType
-    subType
-    attackValue
-    defenseValue
-    boostValue
-    count
-    heroId
-    createdAt
+    title
+    type
+    value
+    boost
+    quantity
+    characterName
+    imageUrl
+    imageUrlRu
     effects {
       id
       timing

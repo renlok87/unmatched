@@ -1,0 +1,1161 @@
+"""Trigger condition for a hero ability"""
+enum AbilityTrigger {
+  DURING_COMBAT
+  END_OF_TURN
+  PASSIVE
+  START_OF_TURN
+  WHEN_ATTACKED
+  WHEN_DEFENDING
+}
+
+type AdminBoard {
+  cells: String
+  createdAt: DateTime!
+  features: String
+  height: Float!
+  id: String!
+  imageUrl: String
+  imageUrlDark: String
+  name: String!
+  nameEn: String!
+  nameRu: String!
+  set: String!
+  updatedAt: DateTime!
+  width: Float!
+}
+
+type AdminCard {
+  attackValue: Int
+  bannerName: String
+  boostValue: Int
+  cardType: String!
+  count: Float!
+  createdAt: DateTime!
+  defenseValue: Int
+  effectAfter: String
+  effectBoost: String
+  effectDuring: String
+  effectImmediately: String
+  effectOngoing: String
+  effects: String
+  heroId: String!
+  id: String!
+  imageUrl: String
+  imageUrlRu: String
+  name: String!
+  nameEn: String!
+  nameRu: String!
+  subType: String
+  text: String
+  textEn: String
+  textRu: String
+  updatedAt: DateTime!
+}
+
+type AdminGameDto {
+  boardId: String!
+  boardName: String
+  code: String
+  createdAt: DateTime!
+  finishedAt: DateTime
+  gamePlayers: [GamePlayerInfoDto!]!
+  id: String!
+  mode: String!
+  startedAt: DateTime
+  status: String!
+}
+
+type AdminHero {
+  ability: String
+  additionalMinis: String
+  avatarUrl: String
+  cards: [AdminCard!]
+  characterCardUrl: String
+  color: String
+  createdAt: DateTime!
+  deckCards: String
+  fighterType: String!
+  hasTokens: Boolean
+  health: Float!
+  id: String!
+  imageUrl: String
+  miniModelUrl: String
+  movement: Int
+  name: String!
+  nameEn: String!
+  nameRu: String!
+  properties: String
+  set: String!
+  sidekicks: String
+  updatedAt: DateTime!
+}
+
+type AdminStatsDto {
+  totalBoards: Float!
+  totalCards: Float!
+  totalGames: Float!
+  totalHeroes: Float!
+  totalUsers: Float!
+}
+
+input AttackDto {
+  attackerId: String!
+  boostCardId: String
+  cardId: String!
+  gameId: String!
+  targetId: String!
+}
+
+type AuditLogDto {
+  action: String!
+  errorMessage: String
+  id: String!
+  ipAddress: String
+  metadata: String
+  success: Boolean!
+  timestamp: DateTime!
+  userAgent: String
+  userId: String
+}
+
+type AuditLogsPaginatedDto {
+  items: [AuditLogDto!]!
+  total: Float!
+}
+
+type AuthResponseDto {
+  accessToken: String!
+  refreshToken: String!
+  user: AuthUserResponse!
+}
+
+type AuthUserResponse {
+  avatar: String
+  createdAt: DateTime!
+  email: String!
+  emailVerified: DateTime
+  id: String!
+  role: UserRole!
+  username: String!
+}
+
+type Board {
+  height: Int!
+  id: String!
+  imageUrl: String
+  name: String!
+  recommendedPlayers: Int!
+  spaces: [BoardSpace!]!
+  width: Int!
+}
+
+type BoardListItemDto {
+  createdAt: DateTime!
+  height: Float!
+  id: String!
+  imageUrl: String
+  imageUrlDark: String
+  name: String!
+  nameEn: String!
+  nameRu: String!
+  set: String!
+  width: Float!
+}
+
+type BoardSpace {
+  isObstacle: Boolean
+  position: Position!
+  startingPositionsJson: String
+  zones: [Zone!]!
+}
+
+type BoardsPaginatedDto {
+  items: [BoardListItemDto!]!
+  limit: Float!
+  page: Float!
+  total: Float!
+  totalPages: Float!
+}
+
+type Card {
+  boost: Int!
+  characterName: String!
+  effects: [CardEffect!]!
+  id: String!
+  imageUrl: String
+  imageUrlRu: String
+  quantity: Int!
+  title: String!
+  type: CardType!
+  value: Int!
+}
+
+type CardEffect {
+  id: String!
+  text: String!
+  timing: EffectTiming!
+}
+
+type CardListItemDto {
+  attackValue: Int
+  bannerName: String
+  boostValue: Int
+  cardType: String!
+  count: Float!
+  createdAt: DateTime
+  defenseValue: Int
+  heroId: String!
+  id: String!
+  imageUrl: String
+  imageUrlRu: String
+  name: String!
+  nameEn: String!
+  nameRu: String!
+  subType: String
+}
+
+"""Type of a card in the game"""
+enum CardType {
+  ATTACK
+  DEFENSE
+  SCHEME
+  VERSATILE
+}
+
+type CardsPaginatedDto {
+  items: [CardListItemDto!]!
+  limit: Float!
+  page: Float!
+  total: Float!
+  totalPages: Float!
+}
+
+input ChangePasswordDto {
+  currentPassword: String!
+  newPassword: String!
+}
+
+input CleanupGamesInput {
+  abortStuckInProgress: Boolean
+  finishedOlderThanDays: Int
+  stuckMinutes: Int
+}
+
+type CleanupGamesResultDto {
+  aborted: Int!
+  deleted: Int!
+}
+
+type ContentSummary {
+  boardsCount: Int!
+  heroesCount: Int!
+  sets: [String!]!
+  setsCount: Int!
+  version: String!
+}
+
+input CreateBoardInput {
+  cells: String!
+  features: String
+  height: Int!
+  imageUrl: String
+  imageUrlDark: String
+  name: String!
+  nameEn: String!
+  nameRu: String!
+  set: String!
+  width: Int!
+}
+
+input CreateCardInput {
+  attackValue: Int
+  bannerName: String
+  boostValue: Int
+  cardType: String!
+  count: Int
+  defenseValue: Int
+  effectAfter: String
+  effectBoost: String
+  effectDuring: String
+  effectImmediately: String
+  effectOngoing: String
+  effects: String
+  heroId: String!
+  imageUrl: String
+  imageUrlRu: String
+  name: String!
+  nameEn: String!
+  nameRu: String!
+  subType: String
+  text: String
+  textEn: String
+  textRu: String
+}
+
+input CreateGameDto {
+  boardId: String
+  mode: GameMode
+}
+
+input CreateHeroInput {
+  ability: String
+  additionalMinis: String
+  avatarUrl: String
+  characterCardUrl: String
+  color: String
+  deckCards: String
+  fighterType: String!
+  hasTokens: Boolean
+  health: Int!
+  imageUrl: String
+  miniModelUrl: String
+  movement: Int
+  name: String!
+  nameEn: String!
+  nameRu: String!
+  properties: String
+  set: String!
+  sidekicks: String
+}
+
+"""Date custom scalar type"""
+scalar DateTime
+
+"""Timing when a card effect activates"""
+enum EffectTiming {
+  AFTER_COMBAT
+  DURING_COMBAT
+  END_OF_TURN
+  IMMEDIATELY
+  START_OF_TURN
+  WHEN_ATTACKED
+  WHEN_DEFENDING
+  WHEN_PLAYED
+}
+
+input EndTurnDto {
+  gameId: String!
+}
+
+type EventsSinceResponse {
+  events: [GameEvent!]!
+  gameId: String!
+  hasMore: Boolean!
+  lastSequence: Int!
+}
+
+type FavoriteHero {
+  id: String!
+  name: String!
+  nameEn: String!
+  nameRu: String!
+}
+
+"""Type of a fighter in the game"""
+enum FighterType {
+  HERO
+  SIDEKICK
+}
+
+type GameEdge {
+  cursor: String!
+  node: GameResponse
+}
+
+type GameEvent {
+  gameId: String!
+  payload: String
+  sequenceNumber: Int!
+  timestamp: DateTime!
+  type: GameEventType!
+}
+
+"""Типы игровых событий"""
+enum GameEventType {
+  ATTACK_INITIATED
+  CARD_DISCARDED
+  CARD_PLAYED
+  COMBAT_RESOLVED
+  DEFENSE_PLAYED
+  DOOR_TOGGLED
+  EFFECT_APPLIED
+  FIGHTER_MOVED
+  GAME_ABORTED
+  GAME_CREATED
+  GAME_ENDED
+  GAME_JOINED
+  GAME_STARTED
+  MANEUVER
+  PASSED
+  PLACED
+  PLAYER_JOINED
+  PLAYER_LEFT
+  SPECIAL_ABILITY
+  TURN_CHANGED
+  TURN_ENDED
+  TURN_STARTED
+}
+
+input GameFiltersDto {
+  limit: Float
+  mode: GameMode
+  offset: Float
+  status: GameStatus
+}
+
+type GameListItemDto {
+  boardId: String
+  boardName: String
+  code: String
+  createdAt: DateTime!
+  gamePlayers: [GamePlayerInfoDto!]!
+  id: String!
+  mode: String!
+  status: String!
+}
+
+"""Game mode options"""
+enum GameMode {
+  FREE_FOR_ALL
+  ONE_V_ONE
+  TWO_V_TWO
+  VS_AI
+}
+
+type GameMutationResult {
+  currentTurnPlayerId: String
+  phase: GamePhase!
+  sequenceNumber: Int!
+  state: String
+  timestamp: DateTime!
+  turnCount: Int!
+}
+
+"""Game phase options"""
+enum GamePhase {
+  ACTION_ATTACK
+  ACTION_MANEUVER
+  COMBAT
+  COMBAT_RESOLVE
+  GAME_OVER
+  SETUP
+  TURN_END
+  TURN_START
+}
+
+type GamePlayerInfoDto {
+  avatar: String
+  heroId: String
+  id: String!
+  playerId: String!
+  status: String!
+  username: String
+}
+
+type GamePlayerResponse {
+  avatar: String
+  hasPassed: Boolean!
+  heroId: String
+  id: String!
+  isReady: Boolean!
+  seatOrder: Float!
+  userId: String!
+  username: String!
+}
+
+type GameResponse {
+  boardId: String!
+  boardState: String
+  code: String
+  createdAt: DateTime!
+  currentTurn: Int
+  endedAt: DateTime
+  host: GamePlayerResponse!
+  hostId: String!
+  id: String!
+  mode: GameMode!
+  opponent: GamePlayerResponse
+  opponentId: String
+  phase: GamePhase
+  players: [GamePlayerResponse!]!
+  startedAt: DateTime
+  status: GameStatus!
+  updatedAt: DateTime!
+  version: Float!
+  winnerId: String
+}
+
+type GameState {
+  boardState: String
+  currentTurnPlayerId: String!
+  fighters: String
+  gameId: String!
+  handZones: String
+  metadata: String
+  phase: GamePhase!
+  players: String
+  sequenceNumber: Int!
+  turnCount: Int!
+}
+
+type GameStateResponse {
+  currentTurnPlayerId: String
+  gameId: String!
+  id: String!
+  phase: String!
+  sequenceNumber: Float!
+  state: String!
+  turnCount: Float!
+  updatedAt: DateTime!
+}
+
+"""Game status options"""
+enum GameStatus {
+  ABORTED
+  FINISHED
+  IN_PROGRESS
+  LOBBY
+  PAUSED
+  PENDING
+}
+
+type GamesPaginatedDto {
+  items: [GameListItemDto!]!
+  limit: Float!
+  page: Float!
+  total: Float!
+  totalPages: Float!
+}
+
+input HeartbeatInput {
+  currentGameId: String
+  status: PresenceStatus = ONLINE
+}
+
+type HeartbeatResponse {
+  presence: Presence!
+  ttl: Float!
+}
+
+type Hero {
+  abilities: [HeroAbility!]!
+  avatarUrl: String
+  cards: [Card!]!
+  createdAt: DateTime
+  fighterType: FighterType!
+  health: Int!
+  id: String!
+  imageUrl: String
+  movement: Int!
+  name: String!
+  nameEn: String
+  nameRu: String
+  set: String!
+  sidekickCount: Int
+  sidekickHealth: Int
+  updatedAt: DateTime
+  urls: HeroUrls
+}
+
+type HeroAbility {
+  id: String!
+  name: String!
+  text: String!
+  trigger: AbilityTrigger!
+}
+
+type HeroListItemDto {
+  ability: String
+  avatarUrl: String
+  createdAt: DateTime!
+  fighterType: String!
+  health: Float!
+  id: String!
+  imageUrl: String
+  name: String!
+  nameEn: String!
+  nameRu: String!
+  set: String!
+}
+
+type HeroUrls {
+  avatar: String!
+  cardCover: String!
+  mini: String!
+}
+
+type HeroesPaginatedDto {
+  items: [HeroListItemDto!]!
+  limit: Float!
+  page: Float!
+  total: Float!
+  totalPages: Float!
+}
+
+"""JSON custom scalar type"""
+scalar JSON
+
+input JoinGameDto {
+  asOpponent: Boolean
+  gameId: String!
+  heroId: String
+}
+
+input JoinQueueDto {
+  heroPref: String
+  mode: GameMode!
+}
+
+type LeaderboardRankResponse {
+  elo: Int!
+  heroId: String
+  rank: Int!
+  timeFrame: String!
+  userId: String!
+}
+
+type LeaderboardUser {
+  avatar: String
+  id: String!
+  username: String!
+}
+
+input LoginDto {
+  email: String!
+  password: String!
+}
+
+input ManeuverDto {
+  boostCardId: String
+  cardId: String
+  fighterId: String
+  gameId: String!
+  moves: [ManeuverMoveInput!]
+  path: [PositionInput!]
+}
+
+input ManeuverMoveInput {
+  fighterId: String!
+  path: [PositionInput!]!
+}
+
+type MatchFoundResponse {
+  expiresAt: DateTime!
+  gameId: String!
+  mode: String!
+  opponentId: String!
+  opponentRating: Int!
+  opponentUsername: String!
+}
+
+type MatchmakingQueueDto {
+  activeQueues: Float!
+  items: [QueuePlayerDto!]!
+  total: Float!
+}
+
+input MoveFighterDto {
+  fighterId: String!
+  gameId: String!
+  x: Int!
+  y: Int!
+}
+
+type Mutation {
+  abortGame(gameId: String!): GameResponse!
+  acceptMatch(gameId: String!): Boolean!
+
+  """Объявить атаку на соседнего бойца (тратит 1 действие)"""
+  attack(input: AttackDto!): GameMutationResult!
+  banUser(id: String!): Boolean!
+  changePassword(input: ChangePasswordDto!): Boolean!
+  cleanupGames(input: CleanupGamesInput): CleanupGamesResultDto!
+  createBoard(input: CreateBoardInput!): AdminBoard!
+  createCard(input: CreateCardInput!): AdminCard!
+  createGame(idempotencyKey: String, input: CreateGameDto!): GameResponse!
+  createHero(input: CreateHeroInput!): AdminHero!
+  declineMatch(gameId: String!): Boolean!
+  deleteAccount: Boolean!
+  deleteBoard(id: String!): Boolean!
+  deleteCard(id: String!): Boolean!
+  deleteHero(id: String!): Boolean!
+
+  """Завершить текущий ход"""
+  endTurn(input: EndTurnDto!): GameMutationResult!
+  heartbeat(input: HeartbeatInput!): HeartbeatResponse!
+  joinGame(input: JoinGameDto!): GameResponse!
+  joinQueue(input: JoinQueueDto!): QueueStatusResponse!
+  leaveAllQueues: Boolean!
+  leaveGame(gameId: String!): Boolean!
+  leaveQueue(mode: String!): Boolean!
+  login(input: LoginDto!): AuthResponseDto!
+  logout: Boolean!
+
+  """Переместить бойца и сыграть карту эффектов (тратит 1 действие)"""
+  maneuver(input: ManeuverDto!): GameMutationResult!
+
+  """Переместить бойца на указанную клетку (тратит 1 действие)"""
+  moveFighter(input: MoveFighterDto!): GameMutationResult!
+
+  """Сбросить карту и получить дополнительное действие"""
+  pass(input: PassDto!): GameMutationResult!
+
+  """Сыграть карту защиты в ответ на атаку"""
+  playDefense(input: PlayDefenseDto!): GameMutationResult!
+
+  """Разыграть scheme-карту из руки (тратит 1 действие)"""
+  playScheme(input: PlaySchemeDto!): GameMutationResult!
+  refreshTokens(refreshToken: String!): AuthResponseDto!
+  register(input: RegisterDto!): AuthResponseDto!
+  removeAvatar: Boolean!
+  resetPassword(newPassword: String!, token: String!): Boolean!
+
+  """Разрешить бой и нанести урон"""
+  resolveCombat(input: ResolveCombatDto!): GameMutationResult!
+
+  """Выбор бойца/клетки для отложенного эффекта карты (MOVE/PLACE)"""
+  resolvePendingEffect(input: ResolvePendingEffectDto!): GameMutationResult!
+  selectHero(gameId: String!, heroId: String!): GameResponse!
+
+  """
+  Сменить стойку героя (STANCE: Alice big/small, Muhammad Ali float/sting)
+  """
+  setStance(input: SetStanceDto!): GameMutationResult!
+  startGame(gameId: String!): GameResponse!
+
+  """Открыть или закрыть дверь"""
+  toggleDoor(input: ToggleDoorDto!): GameMutationResult!
+  toggleReady(gameId: String!): GameResponse!
+  unbanUser(id: String!): Boolean!
+  updateBoard(id: String!, input: UpdateBoardInput!): AdminBoard!
+  updateCard(id: String!, input: UpdateCardInput!): AdminCard!
+  updateHero(id: String!, input: UpdateHeroInput!): AdminHero!
+  updateProfile(input: UpdateProfileDto!): UserResponse!
+  updateSettings(input: SettingsDto!): UserSettingsGraphql!
+  updateUser(id: String!, input: UpdateUserInput!): UserDto!
+  uploadAvatar(fileUrl: String!): String!
+  verifyEmail(token: String!): Boolean!
+}
+
+type OnlineUsersResponse {
+  count: Float!
+  userIds: [String!]!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  totalCount: Float!
+}
+
+type PaginatedBoards {
+  items: [Board!]!
+  pagination: PaginationInfo!
+}
+
+type PaginatedHeroes {
+  items: [Hero!]!
+  pagination: PaginationInfo!
+}
+
+type PaginatedUsersDto {
+  limit: Float!
+  page: Float!
+  total: Float!
+  totalPages: Float!
+  users: [UserListItemDto!]!
+}
+
+type PaginationInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  limit: Int!
+  page: Int!
+  total: Int!
+  totalPages: Int!
+}
+
+input PassDto {
+  gameId: String!
+}
+
+type PenaltyInfoDto {
+  canJoinQueue: Boolean!
+  declineCount: Int!
+  penaltyElo: Int
+  reason: String
+  tempBanUntil: DateTime
+}
+
+input PlayDefenseDto {
+  boostCardId: String
+  cardId: String!
+  gameId: String!
+}
+
+input PlaySchemeDto {
+  cardId: String!
+  gameId: String!
+}
+
+type Position {
+  x: Int!
+  y: Int!
+}
+
+input PositionInput {
+  x: Int!
+  y: Int!
+}
+
+type Presence {
+  currentGameId: String
+  lastSeenAt: Float!
+  status: PresenceStatus!
+  userId: String!
+}
+
+"""Status of user presence"""
+enum PresenceStatus {
+  INGAME
+  INQUEUE
+  OFFLINE
+  ONLINE
+}
+
+type PublicUserResponse {
+  avatar: String
+  createdAt: DateTime!
+  id: String!
+  username: String!
+}
+
+type Query {
+  adminBoard(id: String!): AdminBoard!
+  adminCard(id: String!): AdminCard!
+  adminGame(id: String!): AdminGameDto!
+  adminHero(id: String!): AdminHero!
+  adminStats: AdminStatsDto!
+  adminUser(id: String!): UserDto!
+  allQueueStatus: String!
+  auditLogs(limit: Int, page: Int, userId: String): AuditLogsPaginatedDto!
+  availableGames(limit: Float, mode: String): [GameResponse!]!
+  board(id: String!): Board
+  boardList(limit: Int, page: Int, search: String, sortBy: String, sortOrder: String): BoardsPaginatedDto!
+  boards: [Board!]!
+  boardsList(limit: Int, page: Int, search: String, sortBy: String, sortOrder: String): BoardsPaginatedDto!
+  boardsPaginated(limit: Int, page: Int): PaginatedBoards!
+  card(id: String!): Card
+  cardList(heroId: String, limit: Int, page: Int, search: String, sortBy: String, sortOrder: String): CardsPaginatedDto!
+  cards(heroId: String!): [Card!]!
+  cardsList(heroId: String, limit: Int, page: Int, search: String, sortBy: String, sortOrder: String): CardsPaginatedDto!
+  clearContentCache: Boolean!
+  contentSummary: ContentSummary!
+  contentVersion: String!
+  eventsSince(gameId: String!, sinceSequence: Float!): EventsSinceResponse
+  game(id: String!): GameResponse
+  gameList(limit: Int, page: Int, search: String, sortBy: String, sortOrder: String): GamesPaginatedDto!
+  gameSequence(gameId: String!): Float
+  gameState(gameId: String!): GameStateResponse
+  gamesList(limit: Int, page: Int, search: String, sortBy: String, sortOrder: String): GamesPaginatedDto!
+  getOnlineCount: Float!
+  getOnlineUsers: OnlineUsersResponse!
+  getPlayerRank(heroId: String, timeFrame: String = "all", userId: String!): LeaderboardRankResponse!
+  getPresence(userId: String!): Presence
+  hero(id: String!): Hero
+  heroList(limit: Int, page: Int, search: String, sortBy: String, sortOrder: String): HeroesPaginatedDto!
+  heroStances(heroSlug: String!): [StanceOptionDto!]!
+  heroes: [Hero!]!
+  heroesBySet(set: String!): [Hero!]!
+  heroesList(limit: Int, page: Int, search: String, sortBy: String, sortOrder: String): HeroesPaginatedDto!
+  heroesPaginated(limit: Int, page: Int, set: String): PaginatedHeroes!
+  leaderboard(heroId: String, page: Int, pageSize: Int, timeFrame: TimeFrame): String!
+  matchmakingQueue: MatchmakingQueueDto!
+  me: UserWithSettingsResponse
+  metrics: String!
+  myGames(filters: GameFiltersDto): [GameResponse!]!
+  mySettings: UserSettingsGraphql!
+  myStats: UserStatsResponse!
+  penaltyInfo: PenaltyInfoDto!
+  queueStatus(mode: String!): QueueStatusResponse!
+  sets: [String!]!
+  stats(userId: String!): UserStatsResponse
+  topPlayers(limit: Int = 10, timeFrame: String = "all"): String!
+  user(id: String!): PublicUserResponse
+  userByUsername(username: String!): PublicUserResponse
+  userList(limit: Int, page: Int, search: String, sortBy: String, sortOrder: String): PaginatedUsersDto!
+  usersList(limit: Int, page: Int, search: String, sortBy: String, sortOrder: String): PaginatedUsersDto!
+}
+
+type QueuePlayerDto {
+  avatar: String
+  elo: Int!
+  id: String!
+  joinedAt: DateTime!
+  mode: String!
+  position: Int!
+  userId: String!
+  username: String!
+}
+
+type QueueStatusResponse {
+  estimatedWaitTime: Int!
+  inQueue: Boolean!
+  joinedAt: DateTime
+  mode: String
+  position: Int
+  totalPlayers: Int!
+}
+
+input RegisterDto {
+  email: String!
+  password: String!
+  username: String!
+}
+
+input ResolveCombatDto {
+  gameId: String!
+}
+
+input ResolvePendingEffectDto {
+  effectId: String!
+  fighterId: String
+  gameId: String!
+  optionIndex: Int
+  x: Int
+  y: Int
+}
+
+input SetStanceDto {
+  gameId: String!
+  stanceId: String!
+}
+
+input SettingsDto {
+  language: String
+  musicEnabled: Boolean
+  profileVisible: Boolean
+  showOnlineStatus: Boolean
+  soundEnabled: Boolean
+  theme: String
+}
+
+type StanceOptionDto {
+  id: String!
+  isDefault: Boolean!
+  label: String!
+}
+
+type Subscription {
+  attackInitiated(gameId: String!): GameEvent!
+  combatResolved(gameId: String!): GameEvent!
+  defensePlayed(gameId: String!): GameEvent!
+  gameEnded(gameId: String!): GameEvent!
+  gameStateUpdated(gameId: String!, since: Float, userId: String): GameState!
+  matchFound(userId: String!): MatchFoundResponse!
+  playerJoined(gameId: String!): GameEvent!
+  playerLeft(gameId: String!): GameEvent!
+  presenceUpdated(userIds: [String!]): Presence!
+  turnChanged(gameId: String!): TurnState!
+}
+
+"""Временной период для статистики"""
+enum TimeFrame {
+  ALL
+  MONTH
+  WEEK
+}
+
+input ToggleDoorDto {
+  gameId: String!
+  x: Int!
+  y: Int!
+}
+
+type TurnState {
+  phase: GamePhase!
+  playerId: String!
+  turnCount: Int!
+}
+
+input UpdateBoardInput {
+  cells: String
+  features: String
+  height: Int
+  imageUrl: String
+  imageUrlDark: String
+  name: String
+  nameEn: String
+  nameRu: String
+  set: String
+  width: Int
+}
+
+input UpdateCardInput {
+  attackValue: Int
+  bannerName: String
+  boostValue: Int
+  cardType: String
+  count: Int
+  defenseValue: Int
+  effectAfter: String
+  effectBoost: String
+  effectDuring: String
+  effectImmediately: String
+  effectOngoing: String
+  effects: String
+  heroId: String
+  imageUrl: String
+  imageUrlRu: String
+  name: String
+  nameEn: String
+  nameRu: String
+  subType: String
+  text: String
+  textEn: String
+  textRu: String
+}
+
+input UpdateHeroInput {
+  ability: String
+  additionalMinis: String
+  avatarUrl: String
+  characterCardUrl: String
+  color: String
+  deckCards: String
+  fighterType: String
+  hasTokens: Boolean
+  health: Int
+  imageUrl: String
+  miniModelUrl: String
+  movement: Int
+  name: String
+  nameEn: String
+  nameRu: String
+  properties: String
+  set: String
+  sidekicks: String
+}
+
+input UpdateProfileDto {
+  avatar: String
+  username: String
+}
+
+input UpdateUserInput {
+  avatar: String
+  email: String
+  role: String
+  username: String
+}
+
+type UserDto {
+  avatar: String
+  createdAt: DateTime!
+  deletedAt: DateTime
+  email: String!
+  emailVerified: DateTime
+  id: String!
+  role: String!
+  stats: UserStatsDto
+  updatedAt: DateTime!
+  username: String!
+}
+
+type UserListItemDto {
+  avatar: String
+  createdAt: DateTime!
+  deletedAt: DateTime
+  email: String!
+  emailVerified: DateTime
+  id: String!
+  role: String!
+  stats: UserStatsDto
+  updatedAt: DateTime!
+  username: String!
+}
+
+type UserResponse {
+  avatar: String
+  createdAt: DateTime!
+  email: String!
+  emailVerified: DateTime
+  id: String!
+  role: UserRole!
+  username: String!
+}
+
+"""User role in the system"""
+enum UserRole {
+  ADMIN
+  MODERATOR
+  USER
+}
+
+type UserSettingsGraphql {
+  id: String!
+  language: String!
+  musicEnabled: Boolean!
+  profileVisible: Boolean!
+  showOnlineStatus: Boolean!
+  soundEnabled: Boolean!
+  theme: String!
+}
+
+type UserSettingsResponse {
+  id: String!
+  language: String!
+  musicEnabled: Boolean!
+  profileVisible: Boolean!
+  showOnlineStatus: Boolean!
+  soundEnabled: Boolean!
+  theme: String!
+}
+
+type UserStatsDto {
+  currentElo: Int
+  gamesPlayed: Int
+  gamesWon: Int
+}
+
+type UserStatsResponse {
+  currentElo: Int!
+  favoriteHero: FavoriteHero
+  gamesLost: Int!
+  gamesPlayed: Int!
+  gamesWon: Int!
+  lastPlayedAt: DateTime
+  peakElo: Int!
+  totalPlayTime: Int!
+  userId: String!
+  winRate: Float!
+}
+
+type UserWithSettingsResponse {
+  avatar: String
+  createdAt: DateTime!
+  email: String!
+  emailVerified: DateTime
+  id: String!
+  role: UserRole!
+  settings: UserSettingsResponse
+  username: String!
+}
+
+"""Color zones on the board"""
+enum Zone {
+  BEIGE
+  BLUE
+  BROWN
+  GOLD
+  GRAY
+  GREEN
+  ORANGE
+  PINK
+  PURPLE
+  RED
+  WHITE
+  YELLOW
+}

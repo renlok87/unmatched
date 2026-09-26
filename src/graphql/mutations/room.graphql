@@ -26,7 +26,7 @@ mutation ToggleReady($gameId: String!) {
   }
 }
 
-mutation PlaceFighter($input: PlaceFighterDto!) {
+mutation PlaceFighter($input: MoveFighterDto!) {
   moveFighter(input: $input) {
     state
     sequenceNumber
@@ -38,7 +38,7 @@ mutation PlaceFighter($input: PlaceFighterDto!) {
 }
 
 mutation ConfirmPlacement($gameId: String!) {
-  maneuver(input: { gameId: $gameId }) {
+  pass(input: { gameId: $gameId }) {
     state
     sequenceNumber
     phase

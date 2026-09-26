@@ -3,8 +3,8 @@
  */
 
 import { useQuery, useMutation, useSubscription } from '@apollo/client';
-import { GetGameDocument, GameStateUpdatedDocument, CreateGameDocument, JoinGameDocument, ToggleReadyDocument, GameMode } from '@/gql';
-import type { GetGameQuery, CreateGameMutationVariables, JoinGameMutationVariables, ToggleReadyMutationVariables } from '@/gql';
+import { GetGameDocument, GameStateUpdatedDocument, CreateGameDocument, JoinGameDocument, ToggleReadyDocument, GameMode } from '@/gql/graphql';
+import type { GetGameQuery, CreateGameMutationVariables, JoinGameMutationVariables, ToggleReadyMutationVariables } from '@/gql/graphql';
 
 interface ApolloExampleProps {
   gameId: string;

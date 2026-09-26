@@ -1,0 +1,20 @@
+sandbox_mode = "danger-full-access"
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+ENABLE_TOOL_SEARCH = "true"
+CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"
+
+[mcp_servers.figma-desktop]
+url = "http://127.0.0.1:3845/mcp"
+
+[mcp_servers.postgresql]
+command = "npx"
+args = [
+    "-y",
+    "@modelcontextprotocol/server-postgres",
+]
+
+[mcp_servers.postgresql.env]
+POSTGRES_CONNECTION_STRING = "postgresql://user:password@localhost:5432/dbname"

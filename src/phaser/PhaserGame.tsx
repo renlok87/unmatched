@@ -2,10 +2,10 @@
 // PHASER GAME - React компонент обёртка для Phaser
 // ============================================================
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import Phaser from 'phaser';
 import type { GameState } from '../core/models/types';
-import type { PhaserGameEvent, ReactToPhaserEvent, PhaserGameState } from './types';
+import type { PhaserGameEvent, ReactToPhaserEvent } from './types';
 import { GameScene } from './scenes/GameScene';
 import { BootScene } from './scenes/BootScene';
 import { UIScene } from './scenes/UIScene';
@@ -19,6 +19,15 @@ interface PhaserGameProps {
 
   /** Callback для отправки событий в React */
   onGameEvent?: (event: PhaserGameEvent) => void;
+
+  /** Selected fighter id from React UI */
+  selectedFighterId?: string | null;
+
+  /** Selected card id from React UI */
+  selectedCardId?: string | null;
+
+  /** Spaces highlighted by React/game logic */
+  highlightedSpaces?: Array<{ x: number; y: number }>;
 
   /** CSS класс для контейнера */
   className?: string;
@@ -34,12 +43,31 @@ export const PhaserGame: React.FC<PhaserGameProps> = ({
   gameId,
   gameState,
   onGameEvent,
+  selectedFighterId = null,
+  selectedCardId = null,
+  highlightedSpaces = [],
   className = '',
   width = 800,
   height = 600,
 }) => {
   const gameRef = useRef<Phaser.Game | null>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [renderScale, setRenderScale] = useState(1);
+  const latestGameStateRef = useRef<GameState | null>(gameState ?? null);
+  const latestSelectedFighterRef = useRef<string | null>(selectedFighterId);
+  const latestSelectedCardRef = useRef<string | null>(selectedCardId);
+  const latestHighlightedSpacesRef = useRef(highlightedSpaces);
+
+  /**
+   * Отправляет события из React в Phaser
+   */
+  const sendEventToPhaser = useCallback((event: ReactToPhaserEvent) => {
+    if (!gameRef.current) return;
+
+    console.log('PhaserGame: отправка события в Phaser', event);
+    gameRef.current.events.emit('react-to-phaser', event);
+  }, []);
 
   /**
    * Обрабатывает события из Phaser и отправляет в React
@@ -47,9 +75,30 @@ export const PhaserGame: React.FC<PhaserGameProps> = ({
   const handleGameEvent = useCallback(
     (event: PhaserGameEvent) => {
       console.log('PhaserGame: событие из Phaser', event);
+      if (event.type === 'PHASER_READY') {
+        const latestState = latestGameStateRef.current;
+        if (latestState) {
+          sendEventToPhaser({ type: 'UPDATE_STATE', state: latestState });
+        }
+
+        sendEventToPhaser({
+          type: 'SELECT_FIGHTER',
+          fighterId: latestSelectedFighterRef.current,
+        });
+
+        sendEventToPhaser({
+          type: 'SELECT_CARD',
+          cardId: latestSelectedCardRef.current,
+        });
+
+        sendEventToPhaser({
+          type: 'HIGHLIGHT_SPACES',
+          spaces: latestHighlightedSpacesRef.current,
+        });
+      }
       onGameEvent?.(event);
     },
-    [onGameEvent]
+    [onGameEvent, sendEventToPhaser]
   );
 
   /**
@@ -62,6 +111,8 @@ export const PhaserGame: React.FC<PhaserGameProps> = ({
 
     console.log('PhaserGame: инициализация');
 
+    const gameScene = new GameScene(handleGameEvent);
+
     // Создаём конфигурацию Phaser
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,
@@ -69,13 +120,10 @@ export const PhaserGame: React.FC<PhaserGameProps> = ({
       height,
       parent: containerRef.current,
       backgroundColor: '#1a1a2e',
-      scene: [BootScene, () => new GameScene(handleGameEvent), UIScene],
+      scene: [BootScene, gameScene, UIScene],
       scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-      },
-      physics: {
-        default: null, // Не используем физику для карточной игры
       },
       render: {
         pixelArt: false,
@@ -99,20 +147,41 @@ export const PhaserGame: React.FC<PhaserGameProps> = ({
     };
   }, [width, height, handleGameEvent]);
 
-  /**
-   * Отправляет события из React в Phaser
-   */
-  const sendEventToPhaser = useCallback((event: ReactToPhaserEvent) => {
-    if (!gameRef.current) return;
+  useEffect(() => {
+    const updateScale = () => {
+      const parentWidth = shellRef.current?.parentElement?.clientWidth ?? width;
+      const viewportWidth =
+        typeof window !== 'undefined' ? Math.max(window.innerWidth - 32, 1) : width;
+      const availableWidth = Math.min(parentWidth, viewportWidth);
+      const nextScale = Math.min(1, availableWidth / width);
+      setRenderScale(Number.isFinite(nextScale) && nextScale > 0 ? nextScale : 1);
+    };
 
-    console.log('PhaserGame: отправка события в Phaser', event);
-    gameRef.current.events.emit('react-to-phaser', event);
-  }, []);
+    updateScale();
+
+    const parent = shellRef.current?.parentElement;
+    const resizeObserver =
+      typeof ResizeObserver !== 'undefined' && parent
+        ? new ResizeObserver(updateScale)
+        : null;
+
+    if (resizeObserver && parent) {
+      resizeObserver.observe(parent);
+    } else {
+      window.addEventListener('resize', updateScale);
+    }
+
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', updateScale);
+    };
+  }, [width]);
 
   /**
    * Обновляет состояние игры в Phaser при изменении пропсов
    */
   useEffect(() => {
+    latestGameStateRef.current = gameState ?? null;
     if (!gameRef.current || !gameState) return;
 
     sendEventToPhaser({
@@ -120,6 +189,36 @@ export const PhaserGame: React.FC<PhaserGameProps> = ({
       state: gameState,
     });
   }, [gameState, sendEventToPhaser]);
+
+  useEffect(() => {
+    latestSelectedFighterRef.current = selectedFighterId;
+    if (!gameRef.current) return;
+
+    sendEventToPhaser({
+      type: 'SELECT_FIGHTER',
+      fighterId: selectedFighterId,
+    });
+  }, [selectedFighterId, sendEventToPhaser]);
+
+  useEffect(() => {
+    latestSelectedCardRef.current = selectedCardId;
+    if (!gameRef.current) return;
+
+    sendEventToPhaser({
+      type: 'SELECT_CARD',
+      cardId: selectedCardId,
+    });
+  }, [selectedCardId, sendEventToPhaser]);
+
+  useEffect(() => {
+    latestHighlightedSpacesRef.current = highlightedSpaces;
+    if (!gameRef.current) return;
+
+    sendEventToPhaser({
+      type: 'HIGHLIGHT_SPACES',
+      spaces: highlightedSpaces,
+    });
+  }, [highlightedSpaces, sendEventToPhaser]);
 
   /**
    * Предоставляет API для управления игрой извне
@@ -136,15 +235,30 @@ export const PhaserGame: React.FC<PhaserGameProps> = ({
 
   return (
     <div
-      ref={containerRef}
-      className={`phaser-game-container ${className}`}
+      ref={shellRef}
+      className={`phaser-game-shell ${className}`}
       style={{
-        width: `${width}px`,
-        height: `${height}px`,
+        width: `${width * renderScale}px`,
+        maxWidth: '100%',
+        height: `${height * renderScale}px`,
         position: 'relative',
       }}
       data-game-id={gameId}
-    />
+    >
+      <div
+        ref={containerRef}
+        className="phaser-game-container"
+        style={{
+          width: `${width}px`,
+          height: `${height}px`,
+          transform: `scale(${renderScale})`,
+          transformOrigin: 'top left',
+          position: 'absolute',
+          inset: 0,
+        }}
+        data-game-id={gameId}
+      />
+    </div>
   );
 };
 

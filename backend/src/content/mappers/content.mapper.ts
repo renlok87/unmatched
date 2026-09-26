@@ -79,6 +79,8 @@ export class ContentMapper {
           boost: cardDef.boost,
           quantity: cardDef.quantity,
           characterName: cardDef.characterName,
+          imageUrl: cardDef.imageUrl,
+          imageUrlRu: cardDef.imageUrlRu,
           effects: cardDef.effects.map((e: any, i: number) => ({
             id: `${c.id}-effect-${i}`,
             timing: e.timing || 'during_combat',

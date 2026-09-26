@@ -140,3 +140,20 @@ Preserve unrelated working-tree changes. If untracked files overlap incoming fil
 compare them and keep verified local backups before integrating; never reset, clean,
 blindly stash the entire project, or overwrite unrelated user work.
 Local integration is authorized; remote pushes are not implied by this instruction.
+
+## Unreal GPU load
+
+The live Unreal project is `unreal/Unmatched`. Keep its normal packaged-client
+default at 60 FPS (`Config/DefaultGameUserSettings.ini`, `FrameRateLimit=60`)
+so ACC-022's 1080p/60 FPS performance target remains testable. Existing saved
+GameUserSettings can override this default; inspect the effective FPS.
+For the S08 two-client offscreen demo, cap **each** process at 30 FPS using
+`tools/s08/run-phase2-demo.ps1` (`-ClientFps 30` by default). `-RenderOffScreen`
+only hides the windows; it does not avoid GPU rendering. Check effective FPS
+and GPU frame time in a packaged Development build and record GPU utilization
+for both clients together before claiming an improvement.
+
+Do not use `r.DynamicRes.TargetedGPUHeadRoomPercentage` as a GPU-usage limit
+while the project uses DX11 (`DefaultGraphicsRHI_DX11`). UE's Windows dynamic
+resolution support requires DX12 or Vulkan; even there, this setting is a
+per-process frame-time target, not a hard cap on the combined GPU percentage.

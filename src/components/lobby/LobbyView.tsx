@@ -5,7 +5,7 @@ import { useAuthStore } from '@/store/authStore';
 import { GameList } from './GameList';
 import { CreateGameDialog } from './CreateGameDialog';
 import { Button } from '@/design-system/components/Button';
-import { GameMode, GameStatus } from '@/gql';
+import { GameMode, GameStatus } from '@/gql/graphql';
 
 export const LobbyView: React.FC = () => {
   const navigate = useNavigate();

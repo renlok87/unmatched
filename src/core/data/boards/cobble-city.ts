@@ -17,6 +17,7 @@ export const cobbleCity: BoardDefinition = {
   width: 6,
   height: 4,
   recommendedPlayers: 2,
+  imageUrl: '/assets/boards/hells-kitchen.webp',
   spaces: [
     // Row 0
     { position: { x: 0, y: 0 }, zones: ['blue' as Zone] },

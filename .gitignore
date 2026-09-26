@@ -57,3 +57,13 @@ blender/S05/blender-error.txt
 blender/S05/blender-output.txt
 blender/S05/s05-assets.blend1
 .task-s01-backup/
+
+# Local browser profiles and process handles from UI verification.
+/tmp/hud-verify/cdp-profile-*/
+/tmp/hud-verify/chrome-*/
+/tmp/hud-verify/edge-*/
+/tmp/hud-verify/*.pid
+/tmp/hud-verify/*.jobid
+
+# Database migrations are required to restore the project.
+!backend/prisma/migrations/*/migration.sql
