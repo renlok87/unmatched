@@ -12,7 +12,8 @@ ROOT=Path(__file__).resolve().parents[1]
 REPO=ROOT.parents[2]
 def read(name): return json.loads((ROOT/name).read_text(encoding='utf8'))
 def digest(path): return hashlib.sha256(path.read_bytes()).hexdigest()
-def main():
+def main(revision='v3'):
+    baseline='5328354' if revision=='v4' else 'eb4c682'
     m=read('manifest.json'); errors=[]; seen={}
     records=m['assets']+m['correctionDeliverables']+m['derivedDeliverables']+m['auditPreviews']
     for a in m['assets']:
@@ -32,7 +33,7 @@ def main():
         seen[r['path']]=r
     pngs={p.relative_to(ROOT).as_posix() for p in ROOT.rglob('*.png')}
     if pngs!=set(seen): errors.append('PNG inventory difference '+str(sorted(pngs^set(seen))))
-    tree=subprocess.check_output(['git','ls-tree','-r','eb4c682','--','art/imagegen/mvp-v1'],cwd=REPO,text=True)
+    tree=subprocess.check_output(['git','ls-tree','-r',baseline,'--','art/imagegen/mvp-v1'],cwd=REPO,text=True)
     originals=[]
     for line in tree.splitlines():
         header,name=line.split('\t',1)
@@ -42,7 +43,10 @@ def main():
     for (old,name),now in zip(originals,hashes):
         if old!=now: errors.append('Changed original '+name)
     stats=[]
-    for r in read('normalized-v3.json')['outputs']:
+    view_records=read('normalized-'+revision+'.json')['outputs']
+    if revision=='v4':
+        view_records += [r for r in read('normalized-v3.json')['outputs'] if r['assetId']=='REF-HARPY']
+    for r in view_records:
         a=np.asarray(Image.open(ROOT/r['path']).convert('RGB'),dtype=float)
         mask=np.max(np.abs(a-128),axis=2)>15
         ys,xs=np.nonzero(mask); box=[int(xs.min()),int(ys.min()),int(xs.max()),int(ys.max())]
@@ -52,8 +56,8 @@ def main():
             'heightPx':box[3]-box[1]+1,'minimumMarginPx':min(box[0],box[1],1023-box[2],1023-box[3]),
             'baseline':box[3],'baseWidthPx':int(max(widths)),
             'borderLuminanceStd':float((border@np.array([.2126,.7152,.0722])).std()),
-            'previousHeightPx':r['measurement']['previousHeightPx'],'scaleXY':r['parameters']['scaleXY']}
-        if row['heightPx']!=r['measurement']['outputHeightPx']: errors.append('Recorded height '+r['path'])
+            'previousHeightPx':r.get('measurement',{}).get('previousHeightPx'),'scaleXY':r['parameters']['scaleXY']}
+        if 'measurement' in r and row['heightPx']!=r['measurement']['outputHeightPx']: errors.append('Recorded height '+r['path'])
         if row['minimumMarginPx']<102 or row['borderLuminanceStd']>=3: errors.append('Margin/background '+r['path'])
         if a.shape!=(1024,1024,3): errors.append('Output canvas '+r['path'])
         stats.append(row)
@@ -93,17 +97,38 @@ def main():
                     if not url.scheme and not url.netloc and url.path: links.append(unquote(url.path))
     Links().feed((ROOT/'index.html').read_text(encoding='utf8'))
     for link in links:
+        # This invocation creates its own report below; write failures raise normally.
+        if link=='correction-'+revision+'-verification.json': continue
         if not (ROOT/link).is_file(): errors.append('Catalog link '+link)
     report={'status':'pass' if not errors else 'fail',
         'scope':'Technical checks only. Visual occlusion reviewed separately; four-view 3D consistency remains open.',
-        'uniquePngMetadataChecked':len(seen),'baselineCommit':'eb4c682','originalPngsUnchanged':len(originals),
+        'revision':revision,'uniquePngMetadataChecked':len(seen),'baselineCommit':baseline,'originalPngsUnchanged':len(originals),
         'normalizedViews':stats,'harpyHeightSpreadPx':hrange,'harpyBaselineSpreadPx':brange,'harpyBaseWidthSpreadPx':wrange,
         'measurementConvention':'max RGB distance from #808080 > 15; inclusive bounds, height=maxY-minY+1',
         'woodSeams':seams,'seamAxes':'X compares left/right border columns; Y compares top/bottom border rows. Ratio is RGB edge mean difference divided by interior neighbor mean difference.',
         'woodSeamAcceptance':'failed; manual repair required, unchanged in v3',
         'selectedAlpha':alpha,'catalogLocalLinksChecked':len(links),'errors':errors}
-    (ROOT/'correction-v3-verification.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+    if revision=='v4':
+        landmarks=[]
+        for name,ref,new,rois,kind in [
+            ('Arthur','characters/ref-king-arthur-v5-left.png','characters/ref-king-arthur-v7-right.png',[(350,210,425,310),(575,210,650,310)],'blade'),
+            ('Merlin','characters/ref-merlin-v3-right.png','characters/ref-merlin-v5-left.png',[(440,100,585,175),(440,100,585,175)],'crystal')]:
+            centers=[]
+            for path,roi in zip([ref,new],rois):
+                x0,y0,x1,y1=roi; a=np.asarray(Image.open(ROOT/path).convert('RGB'),dtype=float)[y0:y1,x0:x1]
+                mask=(a.min(axis=2)>150)&(np.ptp(a,axis=2)<40) if kind=='blade' else (a[:,:,2]-a[:,:,0]>12)&(a[:,:,0]<160)
+                _,xx=np.nonzero(mask); centers.append(float(np.median(xx+x0)))
+            landmarks.append({'character':name,'reference':ref,'candidate':new,'regionXYXY':rois,'landmark':kind,
+                'referenceMedianX':centers[0],'mirroredReferenceXAbout512':1024-centers[0],'candidateMedianX':centers[1],
+                'residualPx':centers[1]-(1024-centers[0]),
+                'method':'Median X in manually selected ROI; blade minRGB>150 and RGB range<40, crystal B-R>12 and R<160.',
+                'acceptance':'Diagnostic only; shading and silhouette differ. Does not prove identical 3D placement.'})
+        report['profileLandmarks']=landmarks
+    (ROOT/('correction-'+revision+'-verification.json')).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
     print(json.dumps({k:report[k] for k in ['status','uniquePngMetadataChecked','originalPngsUnchanged','harpyHeightSpreadPx','harpyBaselineSpreadPx','harpyBaseWidthSpreadPx','catalogLocalLinksChecked','errors']}))
     raise SystemExit(bool(errors))
 
-if __name__=='__main__': main()
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser(); parser.add_argument('--revision',choices=['v3','v4'],default='v3')
+    main(parser.parse_args().revision)

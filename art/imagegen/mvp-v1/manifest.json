@@ -332,8 +332,8 @@
       "approval": "proposal",
       "generationTool": "imagegen source; scripted technical derivation",
       "review": {
-        "result": "proposal; three-view selection in generation-inputs.json",
-        "notes": "Дальняя кисть с мечом скрыта, ближняя рука пустая. Меч сместился за голову: новый right исключён из набора для 3D до согласования положения оружия."
+        "result": "revised profile candidate; see three-view input set",
+        "notes": "Right v7: меч снова впереди груди, как в left v5. Дальняя верхняя часть руки скрыта корпусом; кисть видна за передним контуром груди. Ближняя рука пустая. Точное совпадение геометрии и четырёхвидовая приёмка остаются открытыми."
       },
       "width": 1024,
       "height": 1024,
@@ -515,6 +515,108 @@
         {
           "assetId": "REF-KING-ARTHUR",
           "role": "right",
+          "version": 7,
+          "path": "characters/ref-king-arthur-v7-right.png",
+          "source": "characters/ref-king-arthur-v7-right-raw.png",
+          "sourceSha256": "dc3ed5516abf995db089fec220029ec65d8ab86d01da02b3545287deabb5c4d7",
+          "replaces": "characters/ref-king-arthur-v6-right.png",
+          "sha256": "92f09fa9c4c5f05a9a15cabe2160ff796d474b72771f66e9cf4712a1f9b45740",
+          "width": 1024,
+          "height": 1024,
+          "alpha": false,
+          "bytes": 228117,
+          "method": "Boundary-connected background extraction; isotropic Lanczos fit by base width with height limit; #808080 composite",
+          "parameters": {
+            "sourceBounds": [
+              384,
+              142,
+              870,
+              1124
+            ],
+            "sourceBaseWidthPx": 486,
+            "sourceBaseCenterX": 626.5,
+            "sourceBackgroundRgb": [
+              127.0,
+              126.0,
+              126.0
+            ],
+            "targetBaseWidthPx": 399.3698366954851,
+            "scaleXY": [
+              0.8209876543209876,
+              0.8217922606924644
+            ],
+            "pasteXY": [
+              313,
+              111
+            ],
+            "baseline": 918,
+            "backgroundTolerance": 12,
+            "minimumComponentPixels": 24
+          },
+          "promptPath": "prompts/ref-king-arthur-v7-right.txt",
+          "status": "generated-reviewed",
+          "approval": "proposal",
+          "generationTool": "imagegen source; scripted technical derivation",
+          "useFor3D": "candidate-requires-review",
+          "review": {
+            "result": "revised occlusion and anterior/posterior placement reviewed; human acceptance pending",
+            "notes": "Right v7: меч снова впереди груди, как в left v5. Дальняя верхняя часть руки скрыта корпусом; кисть видна за передним контуром груди. Ближняя рука пустая. Точное совпадение геометрии и четырёхвидовая приёмка остаются открытыми."
+          }
+        }
+      ],
+      "viewHistory": [
+        {
+          "assetId": "REF-KING-ARTHUR",
+          "role": "right",
+          "version": 5,
+          "path": "characters/ref-king-arthur-v5-right.png",
+          "source": "characters/ref-king-arthur-v4-right.png",
+          "sourceSha256": "fb06c65799b9854c157def850e56a553029b14ef8e5bd1a19b4dde4caf4e8f72",
+          "sha256": "6ddb8f23f6fc35654b025f8ef3ea3a76f93ecc37d5fef37c4760eb622c954db0",
+          "width": 1024,
+          "height": 1024,
+          "alpha": false,
+          "bytes": 223111,
+          "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+          "parameters": {
+            "backgroundTolerance": 12,
+            "minimumComponentPixels": 24,
+            "sourceBackgroundRgb": [
+              126,
+              125,
+              125
+            ],
+            "sourceBounds": [
+              371,
+              82,
+              883,
+              1123
+            ],
+            "sourceBaseWidthPx": 512,
+            "sourceBaseCenterX": 626.5,
+            "targetBaseWidthPx": 399.3698366954851,
+            "scale": 0.7800192122958693,
+            "translation": [
+              23.317963496637844,
+              42.0384245917387
+            ],
+            "baseline": 918,
+            "baseDiameterUu": 30
+          },
+          "promptPath": "prompts/ref-king-arthur-v4-right.txt",
+          "status": "generated-reviewed",
+          "approval": "proposal",
+          "generationTool": "imagegen source; scripted technical derivation",
+          "review": {
+            "result": "proposal; see acceptance report",
+            "notes": "Four distinct views, simple badge, smooth armor, crown and upright right-hand sword. Canvas/base/background calibrated; exact cross-view anatomy and thin-part thickness remain review gates."
+          },
+          "supersededBy": "characters/ref-king-arthur-v6-right.png",
+          "revision": "correction-v3"
+        },
+        {
+          "assetId": "REF-KING-ARTHUR",
+          "role": "right",
           "path": "characters/ref-king-arthur-v6-right.png",
           "source": "characters/ref-king-arthur-v6-right-raw.png",
           "sourceSha256": "5886288fdd5b0e01b8280c1de65270fe372d5e213581686eb65d32dc8d583ce5",
@@ -570,58 +672,10 @@
             "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
             "notes": "Дальняя кисть с мечом скрыта, ближняя рука пустая. Меч сместился за голову: новый right исключён из набора для 3D до согласования положения оружия."
           },
-          "useFor3D": "candidate-requires-review"
-        }
-      ],
-      "viewHistory": [
-        {
-          "assetId": "REF-KING-ARTHUR",
-          "role": "right",
-          "version": 5,
-          "path": "characters/ref-king-arthur-v5-right.png",
-          "source": "characters/ref-king-arthur-v4-right.png",
-          "sourceSha256": "fb06c65799b9854c157def850e56a553029b14ef8e5bd1a19b4dde4caf4e8f72",
-          "sha256": "6ddb8f23f6fc35654b025f8ef3ea3a76f93ecc37d5fef37c4760eb622c954db0",
-          "width": 1024,
-          "height": 1024,
-          "alpha": false,
-          "bytes": 223111,
-          "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
-          "parameters": {
-            "backgroundTolerance": 12,
-            "minimumComponentPixels": 24,
-            "sourceBackgroundRgb": [
-              126,
-              125,
-              125
-            ],
-            "sourceBounds": [
-              371,
-              82,
-              883,
-              1123
-            ],
-            "sourceBaseWidthPx": 512,
-            "sourceBaseCenterX": 626.5,
-            "targetBaseWidthPx": 399.3698366954851,
-            "scale": 0.7800192122958693,
-            "translation": [
-              23.317963496637844,
-              42.0384245917387
-            ],
-            "baseline": 918,
-            "baseDiameterUu": 30
-          },
-          "promptPath": "prompts/ref-king-arthur-v4-right.txt",
-          "status": "generated-reviewed",
-          "approval": "proposal",
-          "generationTool": "imagegen source; scripted technical derivation",
-          "review": {
-            "result": "proposal; see acceptance report",
-            "notes": "Four distinct views, simple badge, smooth armor, crown and upright right-hand sword. Canvas/base/background calibrated; exact cross-view anatomy and thin-part thickness remain review gates."
-          },
-          "supersededBy": "characters/ref-king-arthur-v6-right.png",
-          "revision": "correction-v3"
+          "useFor3D": "candidate-requires-review",
+          "supersededBy": "characters/ref-king-arthur-v7-right.png",
+          "revision": "correction-v4",
+          "acceptance": "rejected by user: weapon placement inconsistent/ambiguous"
         }
       ],
       "generationInputs": "generation-inputs.json"
@@ -638,8 +692,8 @@
       "approval": "proposal",
       "generationTool": "imagegen source; scripted technical derivation",
       "review": {
-        "result": "proposal; three-view selection in generation-inputs.json",
-        "notes": "Дальняя кисть и середина посоха скрыты одеждой. Кристалл сместился над капюшоном: новый left исключён из набора для 3D до согласования положения посоха."
+        "result": "revised profile candidate; see three-view input set",
+        "notes": "Left v5: посох уходит за капюшон/плечо; дальняя кисть и средняя часть стержня закрыты одеждой. Ближняя рука у пояса пустая. Новый профиль просмотрен рядом с right v3; точное совпадение геометрии и четырёхвидовая приёмка остаются открытыми."
       },
       "sourcePath": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\imagegen\\mvp-v1\\characters\\ref-merlin-v2-front.png",
       "width": 1024,
@@ -727,62 +781,53 @@
         {
           "assetId": "REF-MERLIN",
           "role": "left",
-          "path": "characters/ref-merlin-v4-left.png",
-          "source": "characters/ref-merlin-v4-left-raw.png",
-          "sourceSha256": "e717916ef0497568ef64eaf4958e0ea05729f92932c388e74430cdf2d54a1071",
-          "replaces": "characters/ref-merlin-v3-left.png",
-          "sha256": "e40e9f78e62522ff470f07390a35d8844e0cbf904b66f98835afbec5a0e9b3a1",
+          "version": 5,
+          "path": "characters/ref-merlin-v5-left.png",
+          "source": "characters/ref-merlin-v5-left-raw.png",
+          "sourceSha256": "e138b6850e35eee25d7ed3e2b6f1efd116fad10a79b9641e4023f5e91b9d16ee",
+          "replaces": "characters/ref-merlin-v4-left.png",
+          "sha256": "918379c99499abca9295b23be8d83aad4df1f5f7093ac2fd82864ec2c1907038",
           "width": 1024,
           "height": 1024,
           "alpha": false,
-          "bytes": 212064,
-          "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+          "bytes": 213251,
+          "method": "Boundary-connected background extraction; isotropic Lanczos fit by base width with height limit; #808080 composite",
           "parameters": {
             "sourceBounds": [
-              387,
-              117,
-              869,
+              390,
+              132,
+              864,
               1124
             ],
-            "detectedSourceBaseWidth": 482,
-            "targetBaseWidth": 393.1497005988024,
+            "sourceBaseWidthPx": 474,
+            "sourceBaseCenterX": 626.5,
+            "sourceBackgroundRgb": [
+              128.0,
+              127.0,
+              127.0
+            ],
+            "targetBaseWidthPx": 393.1497005988024,
             "scaleXY": [
-              0.8049792531120332,
-              0.8043694141012909
+              0.8164556962025317,
+              0.8165322580645161
             ],
             "pasteXY": [
-              318,
+              319,
               108
             ],
-            "targetSilhouetteHeight": null,
-            "baseline": 918
+            "baseline": 918,
+            "backgroundTolerance": 12,
+            "minimumComponentPixels": 24
           },
-          "measurement": {
-            "threshold": "max RGB distance from128 >15, inclusive bounds",
-            "previousBounds": [
-              316,
-              111,
-              708,
-              917
-            ],
-            "previousHeightPx": 807,
-            "outputBounds": [
-              318,
-              108,
-              705,
-              917
-            ],
-            "outputHeightPx": 810
-          },
-          "promptPath": "prompts/ref-merlin-v4-left.txt",
+          "promptPath": "prompts/ref-merlin-v5-left.txt",
           "status": "generated-reviewed",
           "approval": "proposal",
           "generationTool": "imagegen source; scripted technical derivation",
+          "useFor3D": "candidate-requires-review",
           "review": {
-            "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
-            "notes": "Дальняя кисть и середина посоха скрыты одеждой. Кристалл сместился над капюшоном: новый left исключён из набора для 3D до согласования положения посоха."
-          },
-          "useFor3D": "candidate-requires-review"
+            "result": "revised occlusion and anterior/posterior placement reviewed; human acceptance pending",
+            "notes": "Left v5: посох уходит за капюшон/плечо; дальняя кисть и средняя часть стержня закрыты одеждой. Ближняя рука у пояса пустая. Новый профиль просмотрен рядом с right v3; точное совпадение геометрии и четырёхвидовая приёмка остаются открытыми."
+          }
         },
         {
           "assetId": "REF-MERLIN",
@@ -928,6 +973,69 @@
           },
           "supersededBy": "characters/ref-merlin-v4-left.png",
           "revision": "correction-v3"
+        },
+        {
+          "assetId": "REF-MERLIN",
+          "role": "left",
+          "path": "characters/ref-merlin-v4-left.png",
+          "source": "characters/ref-merlin-v4-left-raw.png",
+          "sourceSha256": "e717916ef0497568ef64eaf4958e0ea05729f92932c388e74430cdf2d54a1071",
+          "replaces": "characters/ref-merlin-v3-left.png",
+          "sha256": "e40e9f78e62522ff470f07390a35d8844e0cbf904b66f98835afbec5a0e9b3a1",
+          "width": 1024,
+          "height": 1024,
+          "alpha": false,
+          "bytes": 212064,
+          "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+          "parameters": {
+            "sourceBounds": [
+              387,
+              117,
+              869,
+              1124
+            ],
+            "detectedSourceBaseWidth": 482,
+            "targetBaseWidth": 393.1497005988024,
+            "scaleXY": [
+              0.8049792531120332,
+              0.8043694141012909
+            ],
+            "pasteXY": [
+              318,
+              108
+            ],
+            "targetSilhouetteHeight": null,
+            "baseline": 918
+          },
+          "measurement": {
+            "threshold": "max RGB distance from128 >15, inclusive bounds",
+            "previousBounds": [
+              316,
+              111,
+              708,
+              917
+            ],
+            "previousHeightPx": 807,
+            "outputBounds": [
+              318,
+              108,
+              705,
+              917
+            ],
+            "outputHeightPx": 810
+          },
+          "promptPath": "prompts/ref-merlin-v4-left.txt",
+          "status": "generated-reviewed",
+          "approval": "proposal",
+          "generationTool": "imagegen source; scripted technical derivation",
+          "review": {
+            "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+            "notes": "Дальняя кисть и середина посоха скрыты одеждой. Кристалл сместился над капюшоном: новый left исключён из набора для 3D до согласования положения посоха."
+          },
+          "useFor3D": "candidate-requires-review",
+          "supersededBy": "characters/ref-merlin-v5-left.png",
+          "revision": "correction-v4",
+          "acceptance": "rejected by user: weapon placement inconsistent/ambiguous"
         }
       ],
       "generationInputs": "generation-inputs.json"
@@ -1154,7 +1262,7 @@
             "targetBaseWidth": 240.27850304612707,
             "scaleXY": [
               0.9974358974358974,
-              1.0
+              1
             ],
             "pasteXY": [
               124,
@@ -8431,21 +8539,67 @@
         "result": "proposal; acceptance separately recorded",
         "notes": "Near right ankle now bare; far left ankle band not visible. Wing pose retained; height normalization follows."
       }
+    },
+    {
+      "assetId": "REF-KING-ARTHUR",
+      "role": "right",
+      "version": 7,
+      "path": "characters/ref-king-arthur-v7-right-raw.png",
+      "promptPath": "prompts/ref-king-arthur-v7-right.txt",
+      "refs": [
+        "C:/Users/ren/WebstormProjects/unmached/unmached/art/imagegen/mvp-v1/characters/ref-king-arthur-v6-right.png",
+        "C:/Users/ren/WebstormProjects/unmached/unmached/art/imagegen/mvp-v1/characters/ref-king-arthur-v5-left.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Image1 is EDIT TARGET, Arthur facing IMAGE RIGHT. Image2 is the opposite-facing LEFT PROFILE reference of the SAME fixed 3D pose. Correct only the sword and FAR RIGHT ARM in image1 so their front-to-back position matches image2 under opposite orthographic projection. Preserve image1 face, crown, near EMPTY LEFT ARM hanging at thigh, chest armor, red cloak, legs, base, camera, gray background and style. Do not mirror the entire image. Sword must be IN FRONT OF THE CHEST AND FACE in body coordinates, i.e. IMAGE RIGHT of the torso in this target, NEVER behind the head or back. At 1024 output with base centered x512: blade center x630, tip y132, crossguard center x630 y400, upright grip down to y500. These anchor positions mirror image2 sword about x512, with the same base at y918. Completely remove the erroneous blade behind the head at x450 and reconstruct that small background/hidden cloak region. Near left arm stays empty and relaxed down. The anatomical right sword arm is the FAR ARM: shoulder and upper arm must be hidden behind opaque torso; only a short distal forearm and sword-gripping fist may emerge in the open gray area immediately IN FRONT OF the chest silhouette, at IMAGE RIGHT x595-653, y420-467. This is physically necessary because the grip in image2 projects forward of the body. Do NOT put the far arm on top of the visible near shoulder, breastplate, or near left forearm. Allow the far fist to be visible only where it projects OUTSIDE the body silhouette, never pasted across the chest. Preserve original sword length, straight blade, bronze guard and pommel from image2. Single strict orthographic profile, 1024x1024, plain #808080, no shadows, no text, no collage. Identical overall height, base width and baseline to image2. No extra weapons.",
+      "sourcePath": "C:\\Users\\ren\\.codex\\generated_images\\01a0db1a-35e7-7962-a3a8-cfbdf2373bae\\exec-06763f55-0ca3-4d2a-99b2-06e7cfec7cd2.png",
+      "width": 1254,
+      "height": 1254,
+      "alpha": false,
+      "bytes": 1144434,
+      "sha256": "dc3ed5516abf995db089fec220029ec65d8ab86d01da02b3545287deabb5c4d7",
+      "status": "generated-reviewed",
+      "review": {
+        "result": "proposal; acceptance separately recorded",
+        "notes": "Sword restored in front of chest; far upper arm occluded, fist emerges beyond body outline; near arm empty. Compare normalized pair before approval."
+      }
+    },
+    {
+      "assetId": "REF-MERLIN",
+      "role": "left",
+      "version": 5,
+      "path": "characters/ref-merlin-v5-left-raw.png",
+      "promptPath": "prompts/ref-merlin-v5-left.txt",
+      "refs": [
+        "C:/Users/ren/WebstormProjects/unmached/unmached/art/imagegen/mvp-v1/characters/ref-merlin-v4-left.png",
+        "C:/Users/ren/WebstormProjects/unmached/unmached/art/imagegen/mvp-v1/characters/ref-merlin-v3-right.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Image1 is EDIT TARGET: Merlin strict profile facing IMAGE LEFT. Image2 is opposite RIGHT PROFILE reference of exactly the SAME fixed 3D pose. Correct only the far-side staff position and its occlusion in image1. Preserve body, hood outline, face, beard, NEAR EMPTY LEFT HAND bent low at waist, robe, legs, base, camera and design. Do not mirror the image. Staff remains in anatomical RIGHT HAND on FAR SIDE. Match the longitudinal staff location of image2 under opposite orthographic projection, mirrored about center of base. At a 1024x1024 canvas, base center x512: crystal center x518 with its top y110; upper staff shaft center x518; foot contact x512 y820. Current image1 crystal is too far IMAGE LEFT/forward (around x480): shift it roughly 35-40 pixels IMAGE RIGHT, toward the rear half of the hood silhouette. Do not move it in front of the face or chest. Hide entire far gripping right hand, far forearm and shaft between y205 and y805 behind the opaque hood/shoulder/robe. Do not paint a gripping fist or wooden stripe on the near robe or sleeve. Show only the crystal and short upper wood from y110 to the hood top; optionally at most a short staff foot below the robe in its correct x512 position, not across the robe. Foreground hood and shoulder silhouette must clearly cover the shaft where it enters behind them. Crystal stays exactly same height and design as image2. Empty near hand at waist must remain visibly separate from staff position, not appear gripping it. Strict orthographic 1024x1024 single profile, uniform #808080 background, no cast shadow, no labels, no collage, same baseline y918 and base width about393px. Keep indigo hood, short braided white beard, Celtic trim, unchanged anatomy.",
+      "sourcePath": "C:\\Users\\ren\\.codex\\generated_images\\01a0db1a-35e7-7962-a3a8-cfbdf2373bae\\exec-e9db3cfd-a4c2-4715-948c-7a9bc9ec4f04.png",
+      "width": 1254,
+      "height": 1254,
+      "alpha": false,
+      "bytes": 1127194,
+      "sha256": "e138b6850e35eee25d7ed3e2b6f1efd116fad10a79b9641e4023f5e91b9d16ee",
+      "status": "generated-reviewed",
+      "review": {
+        "result": "proposal; acceptance separately recorded",
+        "notes": "Staff upper section moved behind hood, far hand and middle shaft hidden, near waist hand empty. Compare normalized pair before approval."
+      }
     }
   ],
   "correction": {
     "brief": "CORRECTION-BRIEF.md",
     "handoffCommit": "571ea46",
     "status": "delivered-with-open-acceptance-gates",
-    "generatedFiles": 45,
+    "generatedFiles": 47,
     "normalizedModelViews": 29,
     "materialMaps": 36,
     "flipbookCandidates": 5,
-    "previewFiles": 27,
+    "previewFiles": 28,
     "originalsPreserved": true,
     "normalizationAuthorization": "User approved scripted normalization, preserving originals.",
     "verification": "correction-verification.json",
-    "acceptanceReport": "PRODUCTION-NOTES.md#коррекция-v3",
+    "acceptanceReport": "PRODUCTION-NOTES.md#коррекция-v4",
     "openGates": [
       "Four-view weapon placement and 3D anatomy consistency; Harpy wing alignment",
       "Old-wood seams: D2048 wrap X 2.515, wrap Y 3.832; manual offset/clone",
@@ -8696,6 +8850,15 @@
       "alpha": false,
       "bytes": 786659,
       "sha256": "746030dcb932b125b6a6565e7fe9b8722a96a9ba1c101edab8096e996eb84d2d",
+      "kind": "technical-review-preview"
+    },
+    {
+      "path": "side-profiles-v4-preview.png",
+      "width": 1536,
+      "height": 1088,
+      "alpha": false,
+      "bytes": 402704,
+      "sha256": "801d8e07b1cf4aea0ddee44aff49882257e600bd115a39cfce936124b90e0569",
       "kind": "technical-review-preview"
     }
   ],
@@ -12878,7 +13041,7 @@
         "targetBaseWidth": 240.27850304612707,
         "scaleXY": [
           0.9974358974358974,
-          1.0
+          1
         ],
         "pasteXY": [
           124,
@@ -12973,6 +13136,108 @@
         "notes": "На right ближняя правая нога без браслета; дальний левый браслет скрыт. Высота четырёх видов 479–480 px после независимого масштаба Y; позы крыльев ещё требуют согласования в Blender."
       },
       "useFor3D": "candidate-requires-review"
+    },
+    {
+      "assetId": "REF-KING-ARTHUR",
+      "role": "right",
+      "version": 7,
+      "path": "characters/ref-king-arthur-v7-right.png",
+      "source": "characters/ref-king-arthur-v7-right-raw.png",
+      "sourceSha256": "dc3ed5516abf995db089fec220029ec65d8ab86d01da02b3545287deabb5c4d7",
+      "replaces": "characters/ref-king-arthur-v6-right.png",
+      "sha256": "92f09fa9c4c5f05a9a15cabe2160ff796d474b72771f66e9cf4712a1f9b45740",
+      "width": 1024,
+      "height": 1024,
+      "alpha": false,
+      "bytes": 228117,
+      "method": "Boundary-connected background extraction; isotropic Lanczos fit by base width with height limit; #808080 composite",
+      "parameters": {
+        "sourceBounds": [
+          384,
+          142,
+          870,
+          1124
+        ],
+        "sourceBaseWidthPx": 486,
+        "sourceBaseCenterX": 626.5,
+        "sourceBackgroundRgb": [
+          127.0,
+          126.0,
+          126.0
+        ],
+        "targetBaseWidthPx": 399.3698366954851,
+        "scaleXY": [
+          0.8209876543209876,
+          0.8217922606924644
+        ],
+        "pasteXY": [
+          313,
+          111
+        ],
+        "baseline": 918,
+        "backgroundTolerance": 12,
+        "minimumComponentPixels": 24
+      },
+      "promptPath": "prompts/ref-king-arthur-v7-right.txt",
+      "status": "generated-reviewed",
+      "approval": "proposal",
+      "generationTool": "imagegen source; scripted technical derivation",
+      "useFor3D": "candidate-requires-review",
+      "review": {
+        "result": "revised occlusion and anterior/posterior placement reviewed; human acceptance pending",
+        "notes": "Right v7: меч снова впереди груди, как в left v5. Дальняя верхняя часть руки скрыта корпусом; кисть видна за передним контуром груди. Ближняя рука пустая. Точное совпадение геометрии и четырёхвидовая приёмка остаются открытыми."
+      }
+    },
+    {
+      "assetId": "REF-MERLIN",
+      "role": "left",
+      "version": 5,
+      "path": "characters/ref-merlin-v5-left.png",
+      "source": "characters/ref-merlin-v5-left-raw.png",
+      "sourceSha256": "e138b6850e35eee25d7ed3e2b6f1efd116fad10a79b9641e4023f5e91b9d16ee",
+      "replaces": "characters/ref-merlin-v4-left.png",
+      "sha256": "918379c99499abca9295b23be8d83aad4df1f5f7093ac2fd82864ec2c1907038",
+      "width": 1024,
+      "height": 1024,
+      "alpha": false,
+      "bytes": 213251,
+      "method": "Boundary-connected background extraction; isotropic Lanczos fit by base width with height limit; #808080 composite",
+      "parameters": {
+        "sourceBounds": [
+          390,
+          132,
+          864,
+          1124
+        ],
+        "sourceBaseWidthPx": 474,
+        "sourceBaseCenterX": 626.5,
+        "sourceBackgroundRgb": [
+          128.0,
+          127.0,
+          127.0
+        ],
+        "targetBaseWidthPx": 393.1497005988024,
+        "scaleXY": [
+          0.8164556962025317,
+          0.8165322580645161
+        ],
+        "pasteXY": [
+          319,
+          108
+        ],
+        "baseline": 918,
+        "backgroundTolerance": 12,
+        "minimumComponentPixels": 24
+      },
+      "promptPath": "prompts/ref-merlin-v5-left.txt",
+      "status": "generated-reviewed",
+      "approval": "proposal",
+      "generationTool": "imagegen source; scripted technical derivation",
+      "useFor3D": "candidate-requires-review",
+      "review": {
+        "result": "revised occlusion and anterior/posterior placement reviewed; human acceptance pending",
+        "notes": "Left v5: посох уходит за капюшон/плечо; дальняя кисть и средняя часть стержня закрыты одеждой. Ближняя рука у пояса пустая. Новый профиль просмотрен рядом с right v3; точное совпадение геометрии и четырёхвидовая приёмка остаются открытыми."
+      }
     }
   ],
   "correctionV3": {
@@ -12991,5 +13256,18 @@
     "generationInputs": "generation-inputs.json",
     "acceptanceReport": "PRODUCTION-NOTES.md#коррекция-v3",
     "fourView3DAcceptance": "open; use explicit three-view selections until corrected profiles are accepted"
+  },
+  "correctionV4": {
+    "status": "revised-candidates-delivered; human acceptance pending",
+    "rawSideEdits": 2,
+    "normalizedFiles": 2,
+    "originalPngsPreservedFrom": "5328354",
+    "normalization": "normalized-v4.json",
+    "verification": "correction-v4-verification.json",
+    "preview": "side-profiles-v4-preview.png",
+    "generationInputs": "generation-inputs.json",
+    "acceptanceReport": "PRODUCTION-NOTES.md#коррекция-v4",
+    "scope": "Arthur/right v7 and Merlin/left v5; Harpy v5 and all other images unchanged",
+    "fourView3DAcceptance": "not granted; previous three-view selections remain recommended"
   }
 }
