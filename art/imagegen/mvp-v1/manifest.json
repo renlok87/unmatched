@@ -26,8 +26,8 @@
       "approval": "proposal",
       "generationTool": "imagegen source; scripted technical derivation",
       "review": {
-        "result": "proposal; see acceptance report",
-        "notes": "Seven visible snake heads in each view, left-hand bow, consistent quiver concept. Canvas/base/background calibrated. Exact snake root correspondence, bow orientation and final string thickness require 3D reconciliation."
+        "result": "proposal; three-view selection in generation-inputs.json",
+        "notes": "Дальняя кисть и середина лука перекрыты телом, ближняя рука пустая, видно 7 голов змей. Новый right остаётся кандидатом: плоскость лука согласовать на модели."
       },
       "sourcePath": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\imagegen\\mvp-v1\\characters\\ref-medusa-v3-front.png",
       "width": 1024,
@@ -209,6 +209,68 @@
         {
           "assetId": "REF-MEDUSA",
           "role": "right",
+          "path": "characters/ref-medusa-v6-right.png",
+          "source": "characters/ref-medusa-v6-right-raw.png",
+          "sourceSha256": "3c2782fc9b7888f74a374ad29e2cfa2e8d6d59b4fe86e784e4b407914e46768f",
+          "replaces": "characters/ref-medusa-v5-right.png",
+          "sha256": "43a68653a2fdda1fcd27873fe19b901149bce8fc2eec09528e740f87ee897ce5",
+          "width": 1024,
+          "height": 1024,
+          "alpha": false,
+          "bytes": 252989,
+          "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+          "parameters": {
+            "sourceBounds": [
+              390,
+              137,
+              865,
+              1124
+            ],
+            "detectedSourceBaseWidth": 475,
+            "targetBaseWidth": 389.05263157894734,
+            "scaleXY": [
+              0.8189473684210526,
+              0.8186423505572442
+            ],
+            "pasteXY": [
+              318,
+              110
+            ],
+            "targetSilhouetteHeight": null,
+            "baseline": 918
+          },
+          "measurement": {
+            "threshold": "max RGB distance from128 >15, inclusive bounds",
+            "previousBounds": [
+              318,
+              112,
+              706,
+              917
+            ],
+            "previousHeightPx": 806,
+            "outputBounds": [
+              318,
+              110,
+              706,
+              917
+            ],
+            "outputHeightPx": 808
+          },
+          "promptPath": "prompts/ref-medusa-v6-right.txt",
+          "status": "generated-reviewed",
+          "approval": "proposal",
+          "generationTool": "imagegen source; scripted technical derivation",
+          "review": {
+            "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+            "notes": "Дальняя кисть и середина лука перекрыты телом, ближняя рука пустая, видно 7 голов змей. Новый right остаётся кандидатом: плоскость лука согласовать на модели."
+          },
+          "useFor3D": "candidate-requires-review"
+        }
+      ],
+      "viewHistory": [
+        {
+          "assetId": "REF-MEDUSA",
+          "role": "right",
           "version": 5,
           "path": "characters/ref-medusa-v5-right.png",
           "source": "characters/ref-medusa-v4-right.png",
@@ -251,9 +313,12 @@
           "review": {
             "result": "proposal; see acceptance report",
             "notes": "Seven visible snake heads in each view, left-hand bow, consistent quiver concept. Canvas/base/background calibrated. Exact snake root correspondence, bow orientation and final string thickness require 3D reconciliation."
-          }
+          },
+          "supersededBy": "characters/ref-medusa-v6-right.png",
+          "revision": "correction-v3"
         }
-      ]
+      ],
+      "generationInputs": "generation-inputs.json"
     },
     {
       "id": "REF-KING-ARTHUR",
@@ -267,8 +332,8 @@
       "approval": "proposal",
       "generationTool": "imagegen source; scripted technical derivation",
       "review": {
-        "result": "proposal; see acceptance report",
-        "notes": "Four distinct views, simple badge, smooth armor, crown and upright right-hand sword. Canvas/base/background calibrated; exact cross-view anatomy and thin-part thickness remain review gates."
+        "result": "proposal; three-view selection in generation-inputs.json",
+        "notes": "Дальняя кисть с мечом скрыта, ближняя рука пустая. Меч сместился за голову: новый right исключён из набора для 3D до согласования положения оружия."
       },
       "width": 1024,
       "height": 1024,
@@ -450,6 +515,68 @@
         {
           "assetId": "REF-KING-ARTHUR",
           "role": "right",
+          "path": "characters/ref-king-arthur-v6-right.png",
+          "source": "characters/ref-king-arthur-v6-right-raw.png",
+          "sourceSha256": "5886288fdd5b0e01b8280c1de65270fe372d5e213581686eb65d32dc8d583ce5",
+          "replaces": "characters/ref-king-arthur-v5-right.png",
+          "sha256": "24578c2b5767df52d27227447716668121f8b579e9e6779e7102e235c38b84a2",
+          "width": 1024,
+          "height": 1024,
+          "alpha": false,
+          "bytes": 208888,
+          "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+          "parameters": {
+            "sourceBounds": [
+              383,
+              126,
+              873,
+              1124
+            ],
+            "detectedSourceBaseWidth": 490,
+            "targetBaseWidth": 399.3698366954851,
+            "scaleXY": [
+              0.8122448979591836,
+              0.811623246492986
+            ],
+            "pasteXY": [
+              313,
+              108
+            ],
+            "targetSilhouetteHeight": null,
+            "baseline": 918
+          },
+          "measurement": {
+            "threshold": "max RGB distance from128 >15, inclusive bounds",
+            "previousBounds": [
+              312,
+              106,
+              711,
+              917
+            ],
+            "previousHeightPx": 812,
+            "outputBounds": [
+              313,
+              108,
+              710,
+              917
+            ],
+            "outputHeightPx": 810
+          },
+          "promptPath": "prompts/ref-king-arthur-v6-right.txt",
+          "status": "generated-reviewed",
+          "approval": "proposal",
+          "generationTool": "imagegen source; scripted technical derivation",
+          "review": {
+            "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+            "notes": "Дальняя кисть с мечом скрыта, ближняя рука пустая. Меч сместился за голову: новый right исключён из набора для 3D до согласования положения оружия."
+          },
+          "useFor3D": "candidate-requires-review"
+        }
+      ],
+      "viewHistory": [
+        {
+          "assetId": "REF-KING-ARTHUR",
+          "role": "right",
           "version": 5,
           "path": "characters/ref-king-arthur-v5-right.png",
           "source": "characters/ref-king-arthur-v4-right.png",
@@ -492,9 +619,12 @@
           "review": {
             "result": "proposal; see acceptance report",
             "notes": "Four distinct views, simple badge, smooth armor, crown and upright right-hand sword. Canvas/base/background calibrated; exact cross-view anatomy and thin-part thickness remain review gates."
-          }
+          },
+          "supersededBy": "characters/ref-king-arthur-v6-right.png",
+          "revision": "correction-v3"
         }
-      ]
+      ],
+      "generationInputs": "generation-inputs.json"
     },
     {
       "id": "REF-MERLIN",
@@ -508,8 +638,8 @@
       "approval": "proposal",
       "generationTool": "imagegen source; scripted technical derivation",
       "review": {
-        "result": "proposal; see acceptance report",
-        "notes": "Indigo hood, short braided beard, Celtic trim, crystal on knotted staff; no broad-brim hat or forked staff. Human identity review and staff thickness remain open."
+        "result": "proposal; three-view selection in generation-inputs.json",
+        "notes": "Дальняя кисть и середина посоха скрыты одеждой. Кристалл сместился над капюшоном: новый left исключён из набора для 3D до согласования положения посоха."
       },
       "sourcePath": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\imagegen\\mvp-v1\\characters\\ref-merlin-v2-front.png",
       "width": 1024,
@@ -597,49 +727,62 @@
         {
           "assetId": "REF-MERLIN",
           "role": "left",
-          "version": 3,
-          "path": "characters/ref-merlin-v3-left.png",
-          "source": "characters/ref-merlin-v2-left.png",
-          "sourceSha256": "1ea8360b5e53e09b7e3dc9854e41ce571b6bda2c098cc5a79a9169ad41428ea7",
-          "sha256": "31a7c02051b1493ea5254badb03f15a4429016a7d9a9e25503201f7d71269adb",
+          "path": "characters/ref-merlin-v4-left.png",
+          "source": "characters/ref-merlin-v4-left-raw.png",
+          "sourceSha256": "e717916ef0497568ef64eaf4958e0ea05729f92932c388e74430cdf2d54a1071",
+          "replaces": "characters/ref-merlin-v3-left.png",
+          "sha256": "e40e9f78e62522ff470f07390a35d8844e0cbf904b66f98835afbec5a0e9b3a1",
           "width": 1024,
           "height": 1024,
           "alpha": false,
-          "bytes": 246982,
-          "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+          "bytes": 212064,
+          "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
           "parameters": {
-            "backgroundTolerance": 12,
-            "minimumComponentPixels": 24,
-            "sourceBackgroundRgb": [
-              118,
-              117,
-              117
-            ],
             "sourceBounds": [
-              344,
-              37,
-              911,
-              1200
+              387,
+              117,
+              869,
+              1124
             ],
-            "sourceBaseWidthPx": 567,
-            "sourceBaseCenterX": 627,
-            "targetBaseWidthPx": 393.1497005988024,
-            "scale": 0.6933857153418032,
-            "translation": [
-              77.2471564806894,
-              85.93714158983619
+            "detectedSourceBaseWidth": 482,
+            "targetBaseWidth": 393.1497005988024,
+            "scaleXY": [
+              0.8049792531120332,
+              0.8043694141012909
             ],
-            "baseline": 918,
-            "baseDiameterUu": 24
+            "pasteXY": [
+              318,
+              108
+            ],
+            "targetSilhouetteHeight": null,
+            "baseline": 918
           },
-          "promptPath": "prompts/ref-merlin-v2-left.txt",
+          "measurement": {
+            "threshold": "max RGB distance from128 >15, inclusive bounds",
+            "previousBounds": [
+              316,
+              111,
+              708,
+              917
+            ],
+            "previousHeightPx": 807,
+            "outputBounds": [
+              318,
+              108,
+              705,
+              917
+            ],
+            "outputHeightPx": 810
+          },
+          "promptPath": "prompts/ref-merlin-v4-left.txt",
           "status": "generated-reviewed",
           "approval": "proposal",
           "generationTool": "imagegen source; scripted technical derivation",
           "review": {
-            "result": "proposal; see acceptance report",
-            "notes": "Indigo hood, short braided beard, Celtic trim, crystal on knotted staff; no broad-brim hat or forked staff. Human identity review and staff thickness remain open."
-          }
+            "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+            "notes": "Дальняя кисть и середина посоха скрыты одеждой. Кристалл сместился над капюшоном: новый left исключён из набора для 3D до согласования положения посоха."
+          },
+          "useFor3D": "candidate-requires-review"
         },
         {
           "assetId": "REF-MERLIN",
@@ -735,7 +878,59 @@
             "notes": "Indigo hood, short braided beard, Celtic trim, crystal on knotted staff; no broad-brim hat or forked staff. Human identity review and staff thickness remain open."
           }
         }
-      ]
+      ],
+      "viewHistory": [
+        {
+          "assetId": "REF-MERLIN",
+          "role": "left",
+          "version": 3,
+          "path": "characters/ref-merlin-v3-left.png",
+          "source": "characters/ref-merlin-v2-left.png",
+          "sourceSha256": "1ea8360b5e53e09b7e3dc9854e41ce571b6bda2c098cc5a79a9169ad41428ea7",
+          "sha256": "31a7c02051b1493ea5254badb03f15a4429016a7d9a9e25503201f7d71269adb",
+          "width": 1024,
+          "height": 1024,
+          "alpha": false,
+          "bytes": 246982,
+          "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+          "parameters": {
+            "backgroundTolerance": 12,
+            "minimumComponentPixels": 24,
+            "sourceBackgroundRgb": [
+              118,
+              117,
+              117
+            ],
+            "sourceBounds": [
+              344,
+              37,
+              911,
+              1200
+            ],
+            "sourceBaseWidthPx": 567,
+            "sourceBaseCenterX": 627,
+            "targetBaseWidthPx": 393.1497005988024,
+            "scale": 0.6933857153418032,
+            "translation": [
+              77.2471564806894,
+              85.93714158983619
+            ],
+            "baseline": 918,
+            "baseDiameterUu": 24
+          },
+          "promptPath": "prompts/ref-merlin-v2-left.txt",
+          "status": "generated-reviewed",
+          "approval": "proposal",
+          "generationTool": "imagegen source; scripted technical derivation",
+          "review": {
+            "result": "proposal; see acceptance report",
+            "notes": "Indigo hood, short braided beard, Celtic trim, crystal on knotted staff; no broad-brim hat or forked staff. Human identity review and staff thickness remain open."
+          },
+          "supersededBy": "characters/ref-merlin-v4-left.png",
+          "revision": "correction-v3"
+        }
+      ],
+      "generationInputs": "generation-inputs.json"
     },
     {
       "id": "REF-HARPY",
@@ -744,20 +939,20 @@
       "requirement": "17 §4; 04 §3; D-06/D-11",
       "kind": "modeling-reference",
       "status": "generated-reviewed",
-      "path": "characters/ref-harpy-v4-front.png",
+      "path": "characters/ref-harpy-v5-front.png",
       "promptPath": "prompts/ref-harpy-v3-front.txt",
       "approval": "proposal",
       "generationTool": "imagegen source; scripted technical derivation",
       "review": {
-        "result": "proposal; see acceptance report",
-        "notes": "Crouched, wider than tall, large feather groups, left ankle band. Canvas/base/background calibrated; wing pose and feather correspondence require 3D reconciliation."
+        "result": "proposal; three-view selection in generation-inputs.json",
+        "notes": "На right ближняя правая нога без браслета; дальний левый браслет скрыт. Высота четырёх видов 479–480 px после независимого масштаба Y; позы крыльев ещё требуют согласования в Blender."
       },
-      "sourcePath": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\imagegen\\mvp-v1\\characters\\ref-harpy-v3-front.png",
+      "sourcePath": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\imagegen\\mvp-v1\\characters\\ref-harpy-v4-front.png",
       "width": 1024,
       "height": 1024,
       "alpha": false,
-      "bytes": 310515,
-      "sha256": "c4529a80fced6917874becfa3c3053996e46988ec732c8e2c29025c2b5ad6ced",
+      "bytes": 305393,
+      "sha256": "0a27b796aebe2b859baac4c249913bf804d8de1f9bc02688f971ba9183250e4c",
       "previousVersions": [
         {
           "id": "REF-HARPY",
@@ -780,14 +975,283 @@
           "alpha": false,
           "bytes": 1861376,
           "sha256": "cbbf48f187270a314a3aa745744f65f66ac34ef8f989bb42e8a28557ac0a8c12"
+        },
+        {
+          "id": "REF-HARPY",
+          "group": "characters",
+          "name": "Harpy: modeling reference sheet",
+          "requirement": "17 §4; 04 §3; D-06/D-11",
+          "kind": "modeling-reference",
+          "status": "generated-reviewed",
+          "path": "characters/ref-harpy-v4-front.png",
+          "promptPath": "prompts/ref-harpy-v3-front.txt",
+          "approval": "proposal",
+          "generationTool": "imagegen source; scripted technical derivation",
+          "review": {
+            "result": "proposal; see acceptance report",
+            "notes": "Crouched, wider than tall, large feather groups, left ankle band. Canvas/base/background calibrated; wing pose and feather correspondence require 3D reconciliation."
+          },
+          "sourcePath": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\imagegen\\mvp-v1\\characters\\ref-harpy-v3-front.png",
+          "width": 1024,
+          "height": 1024,
+          "alpha": false,
+          "bytes": 310515,
+          "sha256": "c4529a80fced6917874becfa3c3053996e46988ec732c8e2c29025c2b5ad6ced",
+          "derivation": {
+            "script": "_tools/normalize-views.py",
+            "source": "characters/ref-harpy-v3-front.png",
+            "sourceSha256": "89fab3c7df06dfc5e1fc94f22b37494f47a451cf735bcb4b488fc71934dae535"
+          }
         }
       ],
       "derivation": {
-        "script": "_tools/normalize-views.py",
-        "source": "characters/ref-harpy-v3-front.png",
-        "sourceSha256": "89fab3c7df06dfc5e1fc94f22b37494f47a451cf735bcb4b488fc71934dae535"
+        "script": "_tools/normalize-v3.py",
+        "source": "characters/ref-harpy-v4-front.png",
+        "sourceSha256": "c4529a80fced6917874becfa3c3053996e46988ec732c8e2c29025c2b5ad6ced"
       },
       "views": [
+        {
+          "assetId": "REF-HARPY",
+          "role": "front",
+          "path": "characters/ref-harpy-v5-front.png",
+          "source": "characters/ref-harpy-v4-front.png",
+          "sourceSha256": "c4529a80fced6917874becfa3c3053996e46988ec732c8e2c29025c2b5ad6ced",
+          "replaces": "characters/ref-harpy-v4-front.png",
+          "sha256": "0a27b796aebe2b859baac4c249913bf804d8de1f9bc02688f971ba9183250e4c",
+          "width": 1024,
+          "height": 1024,
+          "alpha": false,
+          "bytes": 305393,
+          "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+          "parameters": {
+            "sourceBounds": [
+              107,
+              420,
+              918,
+              918
+            ],
+            "detectedSourceBaseWidth": 241,
+            "targetBaseWidth": 240.27850304612707,
+            "scaleXY": [
+              0.9975339087546239,
+              0.963855421686747
+            ],
+            "pasteXY": [
+              108,
+              438
+            ],
+            "targetSilhouetteHeight": 480,
+            "baseline": 918
+          },
+          "measurement": {
+            "threshold": "max RGB distance from128 >15, inclusive bounds",
+            "previousBounds": [
+              107,
+              420,
+              917,
+              917
+            ],
+            "previousHeightPx": 498,
+            "outputBounds": [
+              108,
+              438,
+              915,
+              917
+            ],
+            "outputHeightPx": 480
+          },
+          "promptPath": "prompts/ref-harpy-v3-front.txt",
+          "status": "generated-reviewed",
+          "approval": "proposal",
+          "generationTool": "imagegen source; scripted technical derivation",
+          "review": {
+            "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+            "notes": "На right ближняя правая нога без браслета; дальний левый браслет скрыт. Высота четырёх видов 479–480 px после независимого масштаба Y; позы крыльев ещё требуют согласования в Blender."
+          },
+          "useFor3D": "recommended-with-Blender-wing-alignment"
+        },
+        {
+          "assetId": "REF-HARPY",
+          "role": "left",
+          "path": "characters/ref-harpy-v5-left.png",
+          "source": "characters/ref-harpy-v4-left.png",
+          "sourceSha256": "0e677ea1c538b97e734388a3d1275f4214c6d1230d8e41d5b12a90bce450b3ff",
+          "replaces": "characters/ref-harpy-v4-left.png",
+          "sha256": "cc347722811849932bef3e0371852e50d7e0adfa159d5f175d6db48f719bdc6f",
+          "width": 1024,
+          "height": 1024,
+          "alpha": false,
+          "bytes": 192407,
+          "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+          "parameters": {
+            "sourceBounds": [
+              359,
+              442,
+              808,
+              918
+            ],
+            "detectedSourceBaseWidth": 240,
+            "targetBaseWidth": 240.27850304612707,
+            "scaleXY": [
+              1.0022271714922049,
+              1.0084033613445378
+            ],
+            "pasteXY": [
+              359,
+              438
+            ],
+            "targetSilhouetteHeight": 480,
+            "baseline": 918
+          },
+          "measurement": {
+            "threshold": "max RGB distance from128 >15, inclusive bounds",
+            "previousBounds": [
+              360,
+              443,
+              807,
+              917
+            ],
+            "previousHeightPx": 475,
+            "outputBounds": [
+              359,
+              439,
+              808,
+              917
+            ],
+            "outputHeightPx": 479
+          },
+          "promptPath": "prompts/ref-harpy-v3-left.txt",
+          "status": "generated-reviewed",
+          "approval": "proposal",
+          "generationTool": "imagegen source; scripted technical derivation",
+          "review": {
+            "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+            "notes": "На right ближняя правая нога без браслета; дальний левый браслет скрыт. Высота четырёх видов 479–480 px после независимого масштаба Y; позы крыльев ещё требуют согласования в Blender."
+          },
+          "useFor3D": "recommended-with-Blender-wing-alignment"
+        },
+        {
+          "assetId": "REF-HARPY",
+          "role": "back",
+          "path": "characters/ref-harpy-v5-back.png",
+          "source": "characters/ref-harpy-v4-back.png",
+          "sourceSha256": "599301458f4a0b1a362c5622c64c16346ebc0b4181d1521b023289255bfef318",
+          "replaces": "characters/ref-harpy-v4-back.png",
+          "sha256": "bcb59c7c3ce126c931372d72bda4c657635fba01ea7059f56eabab7a2d67c789",
+          "width": 1024,
+          "height": 1024,
+          "alpha": false,
+          "bytes": 289590,
+          "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+          "parameters": {
+            "sourceBounds": [
+              123,
+              438,
+              903,
+              918
+            ],
+            "detectedSourceBaseWidth": 241,
+            "targetBaseWidth": 240.27850304612707,
+            "scaleXY": [
+              0.9974358974358974,
+              1.0
+            ],
+            "pasteXY": [
+              124,
+              438
+            ],
+            "targetSilhouetteHeight": 480,
+            "baseline": 918
+          },
+          "measurement": {
+            "threshold": "max RGB distance from128 >15, inclusive bounds",
+            "previousBounds": [
+              123,
+              438,
+              902,
+              917
+            ],
+            "previousHeightPx": 480,
+            "outputBounds": [
+              124,
+              438,
+              901,
+              917
+            ],
+            "outputHeightPx": 480
+          },
+          "promptPath": "prompts/ref-harpy-v3-back.txt",
+          "status": "generated-reviewed",
+          "approval": "proposal",
+          "generationTool": "imagegen source; scripted technical derivation",
+          "review": {
+            "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+            "notes": "На right ближняя правая нога без браслета; дальний левый браслет скрыт. Высота четырёх видов 479–480 px после независимого масштаба Y; позы крыльев ещё требуют согласования в Blender."
+          },
+          "useFor3D": "recommended-with-Blender-wing-alignment"
+        },
+        {
+          "assetId": "REF-HARPY",
+          "role": "right",
+          "path": "characters/ref-harpy-v5-right.png",
+          "source": "characters/ref-harpy-v5-right-raw.png",
+          "sourceSha256": "4bbf39640aa12ca6d81c8b0d41188dcab03c80f4fe60ff4303836816c2c96b85",
+          "replaces": "characters/ref-harpy-v4-right.png",
+          "sha256": "d6a1e7ca18e2eb81f4e84631f375e46465495f1e447369f44a902e70b271eb1d",
+          "width": 1024,
+          "height": 1024,
+          "alpha": false,
+          "bytes": 186825,
+          "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+          "parameters": {
+            "sourceBounds": [
+              320,
+              567,
+              855,
+              1125
+            ],
+            "detectedSourceBaseWidth": 295,
+            "targetBaseWidth": 240.27850304612707,
+            "scaleXY": [
+              0.8149532710280374,
+              0.8602150537634409
+            ],
+            "pasteXY": [
+              262,
+              438
+            ],
+            "targetSilhouetteHeight": 480,
+            "baseline": 918
+          },
+          "measurement": {
+            "threshold": "max RGB distance from128 >15, inclusive bounds",
+            "previousBounds": [
+              261,
+              463,
+              697,
+              917
+            ],
+            "previousHeightPx": 455,
+            "outputBounds": [
+              262,
+              438,
+              697,
+              917
+            ],
+            "outputHeightPx": 480
+          },
+          "promptPath": "prompts/ref-harpy-v5-right.txt",
+          "status": "generated-reviewed",
+          "approval": "proposal",
+          "generationTool": "imagegen source; scripted technical derivation",
+          "review": {
+            "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+            "notes": "На right ближняя правая нога без браслета; дальний левый браслет скрыт. Высота четырёх видов 479–480 px после независимого масштаба Y; позы крыльев ещё требуют согласования в Blender."
+          },
+          "useFor3D": "candidate-requires-review"
+        }
+      ],
+      "viewHistory": [
         {
           "assetId": "REF-HARPY",
           "role": "front",
@@ -833,7 +1297,9 @@
           "review": {
             "result": "proposal; see acceptance report",
             "notes": "Crouched, wider than tall, large feather groups, left ankle band. Canvas/base/background calibrated; wing pose and feather correspondence require 3D reconciliation."
-          }
+          },
+          "supersededBy": "characters/ref-harpy-v5-front.png",
+          "revision": "correction-v3"
         },
         {
           "assetId": "REF-HARPY",
@@ -880,7 +1346,9 @@
           "review": {
             "result": "proposal; see acceptance report",
             "notes": "Crouched, wider than tall, large feather groups, left ankle band. Canvas/base/background calibrated; wing pose and feather correspondence require 3D reconciliation."
-          }
+          },
+          "supersededBy": "characters/ref-harpy-v5-left.png",
+          "revision": "correction-v3"
         },
         {
           "assetId": "REF-HARPY",
@@ -927,7 +1395,9 @@
           "review": {
             "result": "proposal; see acceptance report",
             "notes": "Crouched, wider than tall, large feather groups, left ankle band. Canvas/base/background calibrated; wing pose and feather correspondence require 3D reconciliation."
-          }
+          },
+          "supersededBy": "characters/ref-harpy-v5-back.png",
+          "revision": "correction-v3"
         },
         {
           "assetId": "REF-HARPY",
@@ -974,9 +1444,12 @@
           "review": {
             "result": "proposal; see acceptance report",
             "notes": "Crouched, wider than tall, large feather groups, left ankle band. Canvas/base/background calibrated; wing pose and feather correspondence require 3D reconciliation."
-          }
+          },
+          "supersededBy": "characters/ref-harpy-v5-right.png",
+          "revision": "correction-v3"
         }
-      ]
+      ],
+      "generationInputs": "generation-inputs.json"
     },
     {
       "id": "REF-PLACEHOLDER-MANNEQUIN",
@@ -7963,21 +8436,22 @@
   "correction": {
     "brief": "CORRECTION-BRIEF.md",
     "handoffCommit": "571ea46",
-    "status": "in-progress",
+    "status": "delivered-with-open-acceptance-gates",
     "generatedFiles": 45,
     "normalizedModelViews": 29,
     "materialMaps": 36,
     "flipbookCandidates": 5,
-    "previewFiles": 26,
+    "previewFiles": 27,
     "originalsPreserved": true,
-    "normalizationAuthorization": "User: Да, нормализовать скриптом, оригиналы сохранить",
+    "normalizationAuthorization": "User approved scripted normalization, preserving originals.",
     "verification": "correction-verification.json",
-    "acceptanceReport": "PRODUCTION-NOTES.md#коррекция-v2",
+    "acceptanceReport": "PRODUCTION-NOTES.md#коррекция-v3",
     "openGates": [
-      "Exact cross-view3D consistency and thin parts; human Merlin review",
-      "Wood horizontal tiling seam; UE material response",
-      "Flipbook temporal consistency; death-ash raw crop boundary; Niagara authoring",
-      "Rodin/Blender/UE production and GD-058"
+      "Four-view weapon placement and 3D anatomy consistency; Harpy wing alignment",
+      "Old-wood seams: D2048 wrap X 2.515, wrap Y 3.832; manual offset/clone",
+      "Manual board/top/frame by S04 and miniature bases by 04",
+      "VFX frames are particle textures; animation must be authored in Niagara",
+      "Blender/UE production and GD-058"
     ]
   },
   "auditPreviews": [
@@ -8213,6 +8687,15 @@
       "alpha": false,
       "bytes": 437282,
       "sha256": "7b36eb70fe13b1d157115f8e8912cfbb2b61a3b5f2a233ce6e0b919da11751e1",
+      "kind": "technical-review-preview"
+    },
+    {
+      "path": "normalized-views-v3-preview.png",
+      "width": 1536,
+      "height": 1632,
+      "alpha": false,
+      "bytes": 786659,
+      "sha256": "746030dcb932b125b6a6565e7fe9b8722a96a9ba1c101edab8096e996eb84d2d",
       "kind": "technical-review-preview"
     }
   ],
@@ -12070,6 +12553,443 @@
         "result": "candidate; temporal acceptance not passed",
         "notes": "Sixteen generated frames, technical padding verified separately. Frame shape/anchor drift remains; Niagara/manual animation required."
       }
+    },
+    {
+      "assetId": "REF-KING-ARTHUR",
+      "role": "right",
+      "path": "characters/ref-king-arthur-v6-right.png",
+      "source": "characters/ref-king-arthur-v6-right-raw.png",
+      "sourceSha256": "5886288fdd5b0e01b8280c1de65270fe372d5e213581686eb65d32dc8d583ce5",
+      "replaces": "characters/ref-king-arthur-v5-right.png",
+      "sha256": "24578c2b5767df52d27227447716668121f8b579e9e6779e7102e235c38b84a2",
+      "width": 1024,
+      "height": 1024,
+      "alpha": false,
+      "bytes": 208888,
+      "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+      "parameters": {
+        "sourceBounds": [
+          383,
+          126,
+          873,
+          1124
+        ],
+        "detectedSourceBaseWidth": 490,
+        "targetBaseWidth": 399.3698366954851,
+        "scaleXY": [
+          0.8122448979591836,
+          0.811623246492986
+        ],
+        "pasteXY": [
+          313,
+          108
+        ],
+        "targetSilhouetteHeight": null,
+        "baseline": 918
+      },
+      "measurement": {
+        "threshold": "max RGB distance from128 >15, inclusive bounds",
+        "previousBounds": [
+          312,
+          106,
+          711,
+          917
+        ],
+        "previousHeightPx": 812,
+        "outputBounds": [
+          313,
+          108,
+          710,
+          917
+        ],
+        "outputHeightPx": 810
+      },
+      "promptPath": "prompts/ref-king-arthur-v6-right.txt",
+      "status": "generated-reviewed",
+      "approval": "proposal",
+      "generationTool": "imagegen source; scripted technical derivation",
+      "review": {
+        "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+        "notes": "Дальняя кисть с мечом скрыта, ближняя рука пустая. Меч сместился за голову: новый right исключён из набора для 3D до согласования положения оружия."
+      },
+      "useFor3D": "candidate-requires-review"
+    },
+    {
+      "assetId": "REF-MERLIN",
+      "role": "left",
+      "path": "characters/ref-merlin-v4-left.png",
+      "source": "characters/ref-merlin-v4-left-raw.png",
+      "sourceSha256": "e717916ef0497568ef64eaf4958e0ea05729f92932c388e74430cdf2d54a1071",
+      "replaces": "characters/ref-merlin-v3-left.png",
+      "sha256": "e40e9f78e62522ff470f07390a35d8844e0cbf904b66f98835afbec5a0e9b3a1",
+      "width": 1024,
+      "height": 1024,
+      "alpha": false,
+      "bytes": 212064,
+      "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+      "parameters": {
+        "sourceBounds": [
+          387,
+          117,
+          869,
+          1124
+        ],
+        "detectedSourceBaseWidth": 482,
+        "targetBaseWidth": 393.1497005988024,
+        "scaleXY": [
+          0.8049792531120332,
+          0.8043694141012909
+        ],
+        "pasteXY": [
+          318,
+          108
+        ],
+        "targetSilhouetteHeight": null,
+        "baseline": 918
+      },
+      "measurement": {
+        "threshold": "max RGB distance from128 >15, inclusive bounds",
+        "previousBounds": [
+          316,
+          111,
+          708,
+          917
+        ],
+        "previousHeightPx": 807,
+        "outputBounds": [
+          318,
+          108,
+          705,
+          917
+        ],
+        "outputHeightPx": 810
+      },
+      "promptPath": "prompts/ref-merlin-v4-left.txt",
+      "status": "generated-reviewed",
+      "approval": "proposal",
+      "generationTool": "imagegen source; scripted technical derivation",
+      "review": {
+        "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+        "notes": "Дальняя кисть и середина посоха скрыты одеждой. Кристалл сместился над капюшоном: новый left исключён из набора для 3D до согласования положения посоха."
+      },
+      "useFor3D": "candidate-requires-review"
+    },
+    {
+      "assetId": "REF-MEDUSA",
+      "role": "right",
+      "path": "characters/ref-medusa-v6-right.png",
+      "source": "characters/ref-medusa-v6-right-raw.png",
+      "sourceSha256": "3c2782fc9b7888f74a374ad29e2cfa2e8d6d59b4fe86e784e4b407914e46768f",
+      "replaces": "characters/ref-medusa-v5-right.png",
+      "sha256": "43a68653a2fdda1fcd27873fe19b901149bce8fc2eec09528e740f87ee897ce5",
+      "width": 1024,
+      "height": 1024,
+      "alpha": false,
+      "bytes": 252989,
+      "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+      "parameters": {
+        "sourceBounds": [
+          390,
+          137,
+          865,
+          1124
+        ],
+        "detectedSourceBaseWidth": 475,
+        "targetBaseWidth": 389.05263157894734,
+        "scaleXY": [
+          0.8189473684210526,
+          0.8186423505572442
+        ],
+        "pasteXY": [
+          318,
+          110
+        ],
+        "targetSilhouetteHeight": null,
+        "baseline": 918
+      },
+      "measurement": {
+        "threshold": "max RGB distance from128 >15, inclusive bounds",
+        "previousBounds": [
+          318,
+          112,
+          706,
+          917
+        ],
+        "previousHeightPx": 806,
+        "outputBounds": [
+          318,
+          110,
+          706,
+          917
+        ],
+        "outputHeightPx": 808
+      },
+      "promptPath": "prompts/ref-medusa-v6-right.txt",
+      "status": "generated-reviewed",
+      "approval": "proposal",
+      "generationTool": "imagegen source; scripted technical derivation",
+      "review": {
+        "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+        "notes": "Дальняя кисть и середина лука перекрыты телом, ближняя рука пустая, видно 7 голов змей. Новый right остаётся кандидатом: плоскость лука согласовать на модели."
+      },
+      "useFor3D": "candidate-requires-review"
+    },
+    {
+      "assetId": "REF-HARPY",
+      "role": "front",
+      "path": "characters/ref-harpy-v5-front.png",
+      "source": "characters/ref-harpy-v4-front.png",
+      "sourceSha256": "c4529a80fced6917874becfa3c3053996e46988ec732c8e2c29025c2b5ad6ced",
+      "replaces": "characters/ref-harpy-v4-front.png",
+      "sha256": "0a27b796aebe2b859baac4c249913bf804d8de1f9bc02688f971ba9183250e4c",
+      "width": 1024,
+      "height": 1024,
+      "alpha": false,
+      "bytes": 305393,
+      "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+      "parameters": {
+        "sourceBounds": [
+          107,
+          420,
+          918,
+          918
+        ],
+        "detectedSourceBaseWidth": 241,
+        "targetBaseWidth": 240.27850304612707,
+        "scaleXY": [
+          0.9975339087546239,
+          0.963855421686747
+        ],
+        "pasteXY": [
+          108,
+          438
+        ],
+        "targetSilhouetteHeight": 480,
+        "baseline": 918
+      },
+      "measurement": {
+        "threshold": "max RGB distance from128 >15, inclusive bounds",
+        "previousBounds": [
+          107,
+          420,
+          917,
+          917
+        ],
+        "previousHeightPx": 498,
+        "outputBounds": [
+          108,
+          438,
+          915,
+          917
+        ],
+        "outputHeightPx": 480
+      },
+      "promptPath": "prompts/ref-harpy-v3-front.txt",
+      "status": "generated-reviewed",
+      "approval": "proposal",
+      "generationTool": "imagegen source; scripted technical derivation",
+      "review": {
+        "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+        "notes": "На right ближняя правая нога без браслета; дальний левый браслет скрыт. Высота четырёх видов 479–480 px после независимого масштаба Y; позы крыльев ещё требуют согласования в Blender."
+      },
+      "useFor3D": "recommended-with-Blender-wing-alignment"
+    },
+    {
+      "assetId": "REF-HARPY",
+      "role": "left",
+      "path": "characters/ref-harpy-v5-left.png",
+      "source": "characters/ref-harpy-v4-left.png",
+      "sourceSha256": "0e677ea1c538b97e734388a3d1275f4214c6d1230d8e41d5b12a90bce450b3ff",
+      "replaces": "characters/ref-harpy-v4-left.png",
+      "sha256": "cc347722811849932bef3e0371852e50d7e0adfa159d5f175d6db48f719bdc6f",
+      "width": 1024,
+      "height": 1024,
+      "alpha": false,
+      "bytes": 192407,
+      "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+      "parameters": {
+        "sourceBounds": [
+          359,
+          442,
+          808,
+          918
+        ],
+        "detectedSourceBaseWidth": 240,
+        "targetBaseWidth": 240.27850304612707,
+        "scaleXY": [
+          1.0022271714922049,
+          1.0084033613445378
+        ],
+        "pasteXY": [
+          359,
+          438
+        ],
+        "targetSilhouetteHeight": 480,
+        "baseline": 918
+      },
+      "measurement": {
+        "threshold": "max RGB distance from128 >15, inclusive bounds",
+        "previousBounds": [
+          360,
+          443,
+          807,
+          917
+        ],
+        "previousHeightPx": 475,
+        "outputBounds": [
+          359,
+          439,
+          808,
+          917
+        ],
+        "outputHeightPx": 479
+      },
+      "promptPath": "prompts/ref-harpy-v3-left.txt",
+      "status": "generated-reviewed",
+      "approval": "proposal",
+      "generationTool": "imagegen source; scripted technical derivation",
+      "review": {
+        "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+        "notes": "На right ближняя правая нога без браслета; дальний левый браслет скрыт. Высота четырёх видов 479–480 px после независимого масштаба Y; позы крыльев ещё требуют согласования в Blender."
+      },
+      "useFor3D": "recommended-with-Blender-wing-alignment"
+    },
+    {
+      "assetId": "REF-HARPY",
+      "role": "back",
+      "path": "characters/ref-harpy-v5-back.png",
+      "source": "characters/ref-harpy-v4-back.png",
+      "sourceSha256": "599301458f4a0b1a362c5622c64c16346ebc0b4181d1521b023289255bfef318",
+      "replaces": "characters/ref-harpy-v4-back.png",
+      "sha256": "bcb59c7c3ce126c931372d72bda4c657635fba01ea7059f56eabab7a2d67c789",
+      "width": 1024,
+      "height": 1024,
+      "alpha": false,
+      "bytes": 289590,
+      "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+      "parameters": {
+        "sourceBounds": [
+          123,
+          438,
+          903,
+          918
+        ],
+        "detectedSourceBaseWidth": 241,
+        "targetBaseWidth": 240.27850304612707,
+        "scaleXY": [
+          0.9974358974358974,
+          1.0
+        ],
+        "pasteXY": [
+          124,
+          438
+        ],
+        "targetSilhouetteHeight": 480,
+        "baseline": 918
+      },
+      "measurement": {
+        "threshold": "max RGB distance from128 >15, inclusive bounds",
+        "previousBounds": [
+          123,
+          438,
+          902,
+          917
+        ],
+        "previousHeightPx": 480,
+        "outputBounds": [
+          124,
+          438,
+          901,
+          917
+        ],
+        "outputHeightPx": 480
+      },
+      "promptPath": "prompts/ref-harpy-v3-back.txt",
+      "status": "generated-reviewed",
+      "approval": "proposal",
+      "generationTool": "imagegen source; scripted technical derivation",
+      "review": {
+        "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+        "notes": "На right ближняя правая нога без браслета; дальний левый браслет скрыт. Высота четырёх видов 479–480 px после независимого масштаба Y; позы крыльев ещё требуют согласования в Blender."
+      },
+      "useFor3D": "recommended-with-Blender-wing-alignment"
+    },
+    {
+      "assetId": "REF-HARPY",
+      "role": "right",
+      "path": "characters/ref-harpy-v5-right.png",
+      "source": "characters/ref-harpy-v5-right-raw.png",
+      "sourceSha256": "4bbf39640aa12ca6d81c8b0d41188dcab03c80f4fe60ff4303836816c2c96b85",
+      "replaces": "characters/ref-harpy-v4-right.png",
+      "sha256": "d6a1e7ca18e2eb81f4e84631f375e46465495f1e447369f44a902e70b271eb1d",
+      "width": 1024,
+      "height": 1024,
+      "alpha": false,
+      "bytes": 186825,
+      "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+      "parameters": {
+        "sourceBounds": [
+          320,
+          567,
+          855,
+          1125
+        ],
+        "detectedSourceBaseWidth": 295,
+        "targetBaseWidth": 240.27850304612707,
+        "scaleXY": [
+          0.8149532710280374,
+          0.8602150537634409
+        ],
+        "pasteXY": [
+          262,
+          438
+        ],
+        "targetSilhouetteHeight": 480,
+        "baseline": 918
+      },
+      "measurement": {
+        "threshold": "max RGB distance from128 >15, inclusive bounds",
+        "previousBounds": [
+          261,
+          463,
+          697,
+          917
+        ],
+        "previousHeightPx": 455,
+        "outputBounds": [
+          262,
+          438,
+          697,
+          917
+        ],
+        "outputHeightPx": 480
+      },
+      "promptPath": "prompts/ref-harpy-v5-right.txt",
+      "status": "generated-reviewed",
+      "approval": "proposal",
+      "generationTool": "imagegen source; scripted technical derivation",
+      "review": {
+        "result": "occlusion/2D normalization reviewed; four-view 3D acceptance open",
+        "notes": "На right ближняя правая нога без браслета; дальний левый браслет скрыт. Высота четырёх видов 479–480 px после независимого масштаба Y; позы крыльев ещё требуют согласования в Blender."
+      },
+      "useFor3D": "candidate-requires-review"
     }
-  ]
+  ],
+  "correctionV3": {
+    "status": "delivered-with-open-acceptance-gates",
+    "rawSideEdits": 4,
+    "normalizedFiles": 7,
+    "harpyTargetHeightPx": 480,
+    "harpyMeasuredHeightRangePx": [
+      479,
+      480
+    ],
+    "originalPngsPreservedFrom": "eb4c682",
+    "normalization": "normalized-v3.json",
+    "verification": "correction-v3-verification.json",
+    "preview": "normalized-views-v3-preview.png",
+    "generationInputs": "generation-inputs.json",
+    "acceptanceReport": "PRODUCTION-NOTES.md#коррекция-v3",
+    "fourView3DAcceptance": "open; use explicit three-view selections until corrected profiles are accepted"
+  }
 }

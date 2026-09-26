@@ -34,8 +34,6 @@ def main():
         if prior['path']!=r['path']:
             put(a.setdefault('viewHistory',[]),{**copy.deepcopy(prior),'supersededBy':r['path'],'revision':'correction-v3'})
         a['views']=[r if v['role']==r['role'] else v for v in a['views']]
-        a['review']={'result':'proposal; three-view selection in generation-inputs.json','notes':notes[a['id']]}
-        a['generationInputs']='generation-inputs.json'
         if a['id']=='REF-HARPY' and r['role']=='front':
             if a['path']!=r['path']:
                 prior_primary={k:copy.deepcopy(v) for k,v in a.items() if k not in ['views','viewHistory','previousVersions','exports','flipbooks','generationInputs']}
@@ -43,6 +41,11 @@ def main():
             for key in ['path','width','height','alpha','bytes','sha256','promptPath']: a[key]=r[key]
             a['sourcePath']=str(ROOT/r['source'])
             a['derivation']={'script':'_tools/normalize-v3.py','source':r['source'],'sourceSha256':r['sourceSha256']}
+            for archived in a.get('previousVersions',[]):
+                if archived['path']==r['replaces']:
+                    archived['review']=copy.deepcopy(sources[r['replaces']]['review'])
+        a['review']={'result':'proposal; three-view selection in generation-inputs.json','notes':notes[a['id']]}
+        a['generationInputs']='generation-inputs.json'
     p=ROOT/'normalized-views-v3-preview.png'; im=Image.open(p)
     put(m['auditPreviews'],{'path':p.name,'width':im.width,'height':im.height,'alpha':False,'bytes':p.stat().st_size,
         'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'kind':'technical-review-preview'})
