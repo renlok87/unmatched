@@ -20,19 +20,29 @@ if USE_PRODUCTION and not SKELETAL:
 FRONT_ONLY = os.environ.get("ART004_FACE_FRONT_ONLY", "0") == "1"
 FACE_SLOT = os.environ.get("ART004_FACE_SLOT", "0") == "1"
 RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "0") == "1"
+NORMAL_IMPORT = os.environ.get("ART004_FACE_NORMAL_IMPORT", "import")
+if NORMAL_IMPORT not in {"import", "compute"} or (NORMAL_IMPORT != "import" and not RESTORE_NORMALS):
+    raise ValueError("ART004_FACE_NORMAL_IMPORT must be import or compute on restored-normal skeletal probe")
 if FACE_SLOT and (FRONT_ONLY or USE_PRODUCTION or not SKELETAL):
     raise ValueError("Face-slot probe needs a separate skeletal test import")
-if RESTORE_NORMALS and (FACE_SLOT or FRONT_ONLY or USE_PRODUCTION or not SKELETAL):
+if RESTORE_NORMALS and (FRONT_ONLY or USE_PRODUCTION or not SKELETAL):
     raise ValueError("Restored normals need a separate full-flip skeletal test import")
 FLIP_HEAD = os.environ.get("ART004_FACE_FLIP_HEAD", "0") == "1"
 CLEAR_NORMALS = FLIP_HEAD and os.environ.get("ART004_FACE_CLEAR_NORMALS", "0") == "1"
-FBX = ROOT / "unreal/Unmatched/Artifacts/ART004Face" / (
-    ("SK_Medusa_FaceSlot.fbx" if FACE_SLOT else (
-        "SK_Medusa_FaceFixNormals.fbx" if RESTORE_NORMALS else (
-            "SK_Medusa_FaceFrontOnly.fbx" if FRONT_ONLY else "SK_Medusa_FaceFix.fbx"))) if SKELETAL else (
-        "SM_Medusa_FlippedHeadRecalc.fbx" if CLEAR_NORMALS else (
-            "SM_Medusa_FlippedHead.fbx" if FLIP_HEAD else "SM_Medusa_FrozenIdle.fbx")))
 TWO_SIDED = os.environ.get("ART004_FACE_TWO_SIDED", "0") == "1"
+if FACE_SLOT and RESTORE_NORMALS and TWO_SIDED:
+    raise ValueError("Corrected face-slot geometry should use a one-sided probe")
+if SKELETAL:
+    name = ("SK_Medusa_FaceFixNormalsSlot" if FACE_SLOT and RESTORE_NORMALS else
+            "SK_Medusa_FaceSlot" if FACE_SLOT else
+            "SK_Medusa_FaceFixNormals" if RESTORE_NORMALS else
+            "SK_Medusa_FaceFrontOnly" if FRONT_ONLY else "SK_Medusa_FaceFix")
+else:
+    name = ("SM_Medusa_FlippedHeadRecalc" if CLEAR_NORMALS else
+            "SM_Medusa_FlippedHead" if FLIP_HEAD else "SM_Medusa_FrozenIdle")
+FBX = ROOT / "unreal/Unmatched/Artifacts/ART004Face" / (name + ".fbx")
+if FACE_SLOT and RESTORE_NORMALS:
+    FBX = ROOT / "blender/ASSET-MEDUSA-001/variants/face-section-v1/SK_Medusa_FaceSection_v1.fbx"
 UNLIT = os.environ.get("ART004_FACE_UNLIT", "0") == "1"
 UNLIT_SINGLE = UNLIT and os.environ.get("ART004_FACE_UNLIT_SINGLE", "0") == "1"
 NO_NORMAL = os.environ.get("ART004_FACE_NO_NORMAL", "0") == "1"
@@ -69,12 +79,15 @@ if REPOSITION_AMBIENT and not (-500 <= AMBIENT_Y <= 500 and 100 <= AMBIENT_Z <= 
     raise ValueError("Diagnostic ambient position or scale is out of range")
 MATERIAL_MODE = ("unlit-single" if UNLIT_SINGLE else "unlit") if UNLIT else (
     "no-normal" if NO_NORMAL else ("twosided" if TWO_SIDED else "static"))
-MODE = (("skeletal-production-" if USE_PRODUCTION else (
-    "skeletal-faceslot-" if FACE_SLOT else (
-        "skeletal-restorednormals-" if RESTORE_NORMALS else (
-            "skeletal-frontonly-" if FRONT_ONLY else "skeletal-")))) if SKELETAL else (
-    "flippedhead-recalc-" if CLEAR_NORMALS else (
-        "flippedhead-" if FLIP_HEAD else ""))) + MATERIAL_MODE + (
+if SKELETAL:
+    mesh_mode = ("skeletal-production-" if USE_PRODUCTION else
+                 "skeletal-restorednormals-faceslot-" if FACE_SLOT and RESTORE_NORMALS else
+                 "skeletal-faceslot-" if FACE_SLOT else
+                 "skeletal-restorednormals-" if RESTORE_NORMALS else
+                 "skeletal-frontonly-" if FRONT_ONLY else "skeletal-")
+else:
+    mesh_mode = "flippedhead-recalc-" if CLEAR_NORMALS else "flippedhead-" if FLIP_HEAD else ""
+MODE = mesh_mode + MATERIAL_MODE + (
             "-noshadow" if NO_SHADOW else "") + (
             f"-localfill{round(LOCAL_FILL_INTENSITY):03d}" if LOCAL_FILL else
             "-frontfill" if FRONT_FILL else "") + (
@@ -84,16 +97,15 @@ MODE = (("skeletal-production-" if USE_PRODUCTION else (
             f"-frontambient-y{round(AMBIENT_Y)}-z{round(AMBIENT_Z)}-s{round(AMBIENT_SCALE * 100)}"
             if REPOSITION_AMBIENT else "") + (
             "-" + VIEW if VIEW != "front" else "") + (
+            "-computenormals" if NORMAL_IMPORT == "compute" else "") + (
             "-" + LIGHT_PROFILE if LIGHT_PROFILE != "cobble" else "")
 OUTPUT = ROOT / f"docs/game-design/evidence/ART-004/medusa-frozen-{MODE}-ue-editor-2026-09-28.png"
 REPORT = ROOT / f"unreal/Unmatched/Artifacts/ART004Face/ue-{MODE}-report.json"
 LEVEL = LEVELS[LIGHT_PROFILE]
 DEST = "/Game/ArtTests/ART004Face/Meshes"
-NAME = ("SK_Medusa_FaceSlot" if FACE_SLOT else (
-    "SK_Medusa_FaceFixNormals" if RESTORE_NORMALS else (
-        "SK_Medusa_FaceFrontOnly" if FRONT_ONLY else "SK_Medusa_FaceFix"))) if SKELETAL else (
-    "SM_Medusa_FlippedHeadRecalc" if CLEAR_NORMALS else (
-        "SM_Medusa_FlippedHead" if FLIP_HEAD else "SM_Medusa_FrozenIdle"))
+NAME = name
+if NORMAL_IMPORT == "compute":
+    NAME += "_ComputeNormals"
 MATERIAL = "/Game/ART004/Medusa/Materials/MI_Medusa_Blue"
 
 
@@ -139,7 +151,7 @@ def comparison_material():
         mel.recompile_material(material)
         u.EditorAssetLibrary.save_loaded_asset(material)
         return material
-    if not TWO_SIDED and not FACE_AMBIENT:
+    if not TWO_SIDED and not FACE_AMBIENT and not FACE_LIFT and not FACE_FLAT_NORMAL:
         material = u.load_asset(MATERIAL)
         if not material:
             raise RuntimeError("Missing imported Medusa material: " + MATERIAL)
@@ -230,7 +242,8 @@ def import_mesh():
         options.skeletal_mesh_import_data.import_uniform_scale = 1.0
         if RESTORE_NORMALS:
             options.skeletal_mesh_import_data.normal_import_method = (
-                u.FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS_AND_TANGENTS)
+                u.FBXNormalImportMethod.FBXNIM_COMPUTE_NORMALS if NORMAL_IMPORT == "compute"
+                else u.FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS_AND_TANGENTS)
     else:
         options.static_mesh_import_data.combine_meshes = True
         options.static_mesh_import_data.import_uniform_scale = 1.0
@@ -244,8 +257,8 @@ def import_mesh():
         materials = mesh.get_editor_property("materials")
         slots = len(materials)
         if FACE_SLOT:
-            if slots != 2 or not TWO_SIDED:
-                raise RuntimeError("Face-slot test requires two mesh slots and two-sided probe")
+            if slots != 2 or TWO_SIDED == RESTORE_NORMALS:
+                raise RuntimeError("Face-slot test requires two slots and matching winding/culling")
             normal = u.load_asset(MATERIAL)
             if not normal:
                 raise RuntimeError("Missing original one-sided Medusa material")
@@ -298,6 +311,7 @@ class CaptureJob:
                     "front_only": FRONT_ONLY,
                     "face_slot": FACE_SLOT,
                     "restore_normals": RESTORE_NORMALS,
+                    "normal_import": NORMAL_IMPORT,
                     "flipped_head": FLIP_HEAD,
                     "clear_custom_normals": CLEAR_NORMALS,
                     "no_shadow": NO_SHADOW,
