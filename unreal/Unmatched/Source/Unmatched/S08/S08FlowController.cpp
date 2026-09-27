@@ -154,6 +154,14 @@ void FS08FlowController::Login(const FString& Email, const FString& Password) {
     TeardownGameStateStream();
     Room = FS08RoomState();
     Trace(TEXT("LOGIN identity change: previous match and stream torn down"));
+  } else {
+    // S10 review P1(4): no live stream/room, but room reads or mutations of
+    // the PREVIOUS identity may still be in flight (e.g. a pending myGames).
+    // Bump the match generation so their deferred answers fail the
+    // request-identity gate - a late A answer must not install A's room for
+    // B's fresh session - and drop any stale room view the same way.
+    ++MatchGeneration;
+    Room = FS08RoomState();
   }
   const int32 Gen = AuthGeneration;
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
@@ -501,7 +509,9 @@ void FS08FlowController::TeardownGameStateStream() {
   bWsAwaitingBarrierFrame = false;
   bWsBarrierFrame = false;
   bStreamReconciled = false;
+  bGameStateOpLive = false;
   MutationRecoveryPendingChoiceId.Reset();
+  bMutationRecoveryPendingChoiceIsDiscard = false;
   Applied = FS08Snapshot();
   SeqGuard = FS08SeqGuard();
   DecksSeq = 0;
@@ -547,6 +557,7 @@ void FS08FlowController::HandleOperationEnded(const FString& OpId, const FString
   // Stale notification: the op was already replaced by a recovery resubscribe.
   if (GameStateOpId != OpId) return;
   GameStateOpId.Reset();
+  bGameStateOpLive = false;
   // P1(3): the subscription just died - the stream is not ready until the
   // resubscribe below succeeds AND a fresh barrier body reconciles it.
   bStreamReconciled = false;
@@ -604,7 +615,8 @@ bool FS08FlowController::IsOutcomeUnknown(const TArray<FS08GraphQLError>& Errors
 }
 
 void FS08FlowController::EnterMutationRecovery(const FString& Reason,
-                                               const FString& PendingChoiceId) {
+                                               const FString& PendingChoiceId,
+                                               bool bPendingIsDiscard) {
   if (bMutationRecoveryActive) return;
   bMutationRecoveryActive = true;
   MutationRecoveryAttempts = 0;
@@ -617,17 +629,20 @@ void FS08FlowController::EnterMutationRecovery(const FString& Reason,
   // P2(8): a lost pending-choice/discard command holds until THAT choice is
   // settled - a bare seq advance can be an unrelated event.
   MutationRecoveryPendingChoiceId = PendingChoiceId;
+  bMutationRecoveryPendingChoiceIsDiscard = bPendingIsDiscard;
   Trace(Reason +
         TEXT(" - outcome unknown: input locked, refetching authoritative state (no resend)"));
   AttemptMutationRecoveryRefetch();
 }
 
 void FS08FlowController::HandleMutationParseFailure(const FString& Tag,
-                                                    const FString& PendingChoiceId) {
+                                                    const FString& PendingChoiceId,
+                                                    bool bPendingIsDiscard) {
   // S10 review P1(2): an HTTP 200 whose body cannot be parsed arrived AFTER
   // the server answered - the commit state is unknown. Recover through the
   // authoritative refetch; a manual resend could repeat the spend.
-  EnterMutationRecovery(Tag + TEXT(" parse error: outcome unknown"), PendingChoiceId);
+  EnterMutationRecovery(Tag + TEXT(" parse error: outcome unknown"), PendingChoiceId,
+                        bPendingIsDiscard);
 }
 
 void FS08FlowController::HandleMutationRecoveryReadFailed() {
@@ -783,6 +798,7 @@ void FS08FlowController::EnterSessionExpired(const FString& Why) {
   GameStateOpId.Reset();
   WsReconnectCountdown = -1.0f;
   bStreamReconciled = false;
+  bGameStateOpLive = false;
   bWsAwaitingBarrierFrame = false;
   Trace(TEXT("SESSION expired: ") + Why + TEXT(" - sign in again"));
   OnFlowError.Broadcast(FS08GraphQLError{TEXT("SESSION_EXPIRED"),
@@ -804,6 +820,7 @@ void FS08FlowController::RecreateWsAfterAuthRotation() {
   if (WsReconnectCountdown < 0.0f) WsReconnectCountdown = 0.5f;
   bWsReconnectAckPending = true;
   bStreamReconciled = false;
+  bGameStateOpLive = false;
   Trace(TEXT("AUTH: socket dropped - WS recreation armed with the rotated token"));
 }
 
@@ -939,6 +956,7 @@ void FS08FlowController::ScheduleWsReconnect(const FString& Reason) {
   // The dead FS08GraphqlWs object is destroyed on the next retry boundary
   // (TickConnectivity), never from inside its own close delegate.
   GameStateOpId.Reset();
+  bGameStateOpLive = false;
   bStreamReconciled = false; // P1(3): reconnect owes a fresh reconciliation
   if (WsReconnectCountdown >= 0.0f) return; // already armed
   static constexpr float MaxBackoffSeconds = 15.0f;
@@ -967,6 +985,7 @@ void FS08FlowController::TickConnectivity(float DeltaSeconds) {
   // A zombie subscribe id (registered by a dying socket between the close
   // and this reset) must never block the fresh handshake's resubscribe.
   GameStateOpId.Reset();
+  bGameStateOpLive = false;
   bWsReconnectAckPending = true;
   MakeWs();
 }
@@ -983,12 +1002,22 @@ void FS08FlowController::SubscribeAfterSnapshot(int32 Since) {
   if (!GameStateOpId.IsEmpty() || !Ws.IsValid() || !Ws->IsAcked()) return;
   const FString SubGameId = Room.GameId;
   const int32 SubGen = MatchGeneration;
+  // Sol6 review P1(3) liveness probe: the server emits its barrier snapshot
+  // only while state.seq > since, so a subscribe at exactly the current seq
+  // would never deliver a frame and the operation could not prove itself
+  // live (a quiet game would deadlock the input gate). Asking for one seq
+  // less forces the barrier snapshot; its duplicate collapses in the seq
+  // guard and its cues are suppressed by the barrier slot.
+  const int32 ProbeSince = FMath::Max(0, Since - 1);
   // P1(2): the first 'next' this fresh subscription delivers is the server's
-  // barrier snapshot (state at subscribe time) when the state moved past
-  // `since` - it is a reconciliation body, its diff fires no cues.
+  // barrier snapshot (state at subscribe time) - a reconciliation body, its
+  // diff fires no cues.
   bWsAwaitingBarrierFrame = true;
+  // The NEW operation id is only locally registered here: it is not live
+  // until the server accepts it (first delivered frame) - see bGameStateOpLive.
+  bGameStateOpLive = false;
   GameStateOpId = Ws->SubscribeGameStateUpdated(
-      Room.GameId, Since,
+      Room.GameId, ProbeSince,
       [this, SubGameId, SubGen](const FS08Snapshot& Snapshot) {
         // A frame from a subscription registered for a previous match
         // incarnation (same socket reused across a room change without a
@@ -1000,6 +1029,9 @@ void FS08FlowController::SubscribeAfterSnapshot(int32 Since) {
         // A delivered snapshot proves the recovered operation works - the
         // bounded operation-level recovery counter starts over.
         OpRecoveryAttempts = 0;
+        // Sol6 review P1(3): a delivered frame proves the server ACCEPTED
+        // this subscription - the operation is live.
+        bGameStateOpLive = true;
         // P1(2): consume the barrier slot on the first delivered frame.
         const bool bFirstFrame = bWsAwaitingBarrierFrame;
         bWsAwaitingBarrierFrame = false;
@@ -1089,10 +1121,13 @@ void FS08FlowController::FetchGameState() {
                                 Decision == ES08SeqDecision::Apply ? TEXT("apply")
                                                                    : TEXT("merge")));
           SubscribeAfterSnapshot(Snapshot.SequenceNumber);
-          // P1(2): this fresh HTTP read reconciles the channel - a later WS
-          // frame is a live transition (or a same-or-older duplicate that
-          // merges anyway), not the barrier slot of a fresh subscription.
-          bWsAwaitingBarrierFrame = false;
+          // Sol6 review P1(2): this HTTP read must NOT clear the first-WS-
+          // frame barrier slot. Read-first/WS-second order: the read applies
+          // seq 10, the subscription's opening snapshot is the server's
+          // barrier body at seq 11 - treating it as a live transition would
+          // replay an old CUE. The slot closes only on the first delivered
+          // WS frame (or a teardown); a same-or-older duplicate merges in
+          // the seq guard afterwards.
         } else {
           Trace(TEXT("STATE parse error: ") + Error.Message);
           // P1(4): an unreadable HTTP 200 recovery read is a FAILED read for
@@ -1283,30 +1318,63 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
   if (bMutationRecoveryActive) {
     bool bFreshResult = bMutationRecoveryFreshRead || !bMutationRecoveryHasBaseline ||
                         Snapshot.SequenceNumber > MutationRecoveryBaselineSeq;
-    // P2(8): when the lost command was resolving a pending choice, fresh is
-    // not enough - the choice must be SETTLED (its id gone from the queue).
-    // An unrelated event bumps the seq while the head stays open; releasing
-    // on it would unlock input against an unresolved server wait.
+    // P2(8) + Sol6 review P1(1)/P2(4): when the lost command was resolving a
+    // pending choice, fresh is not enough - the body must PROVE the choice
+    // settled, and it proves that BY CHOICE KIND. A pendingEffects resolve
+    // settles on a strictly valid pendingEffects array lacking the id (a
+    // malformed entry like [null] leaves the whole queue unverifiable);
+    // a discardToLimit settles through pendingHandDiscard - a different open
+    // discard id, or the field absent from a COMPLETE full state (the
+    // backend removes it as undefined once resolved). A PARTIAL body (a WS
+    // event without the field) proves nothing: the applied store keeps the
+    // stale metadata through merge semantics, so "absent" must read as
+    // "unknown", never "gone" - releasing on it would allow a double submit.
     if (bFreshResult && !MutationRecoveryPendingChoiceId.IsEmpty()) {
+      const bool bValidMeta = Snapshot.Metadata.IsValid() &&
+                              Snapshot.Metadata->AsObject().IsValid();
       bool bStillOpen = false;
-      TArray<FS08PendingEffect> PendingQueue;
-      if (FS08Contracts::PendingEffects(Snapshot, PendingQueue)) {
-        for (const FS08PendingEffect& Effect : PendingQueue) {
-          if (Effect.Id == MutationRecoveryPendingChoiceId) {
+      bool bSettledProof = false;
+      if (bMutationRecoveryPendingChoiceIsDiscard) {
+        FS08PendingHandDiscard Discard;
+        bool bFieldPresent = false;
+        if (FS08Contracts::PendingHandDiscardStrict(Snapshot, Discard, bFieldPresent)) {
+          // Only one discard choice can be open at a time: a different id
+          // means ours was authoritatively closed (or replaced).
+          if (Discard.Id == MutationRecoveryPendingChoiceId) {
             bStillOpen = true;
-            break;
+          } else {
+            bSettledProof = true;
           }
+        } else if (!bFieldPresent && bBarrierHttpBody && bValidMeta) {
+          // Release on absence ONLY: the key is truly gone from a complete
+          // authoritative body. A present-but-invalid field (null, wrong
+          // type, object without an id) is unverifiable, not settled.
+          bSettledProof = true;
         }
-      }
-      FS08PendingHandDiscard Discard;
-      if (!bStillOpen && FS08Contracts::PendingHandDiscard(Snapshot, Discard) &&
-          Discard.Id == MutationRecoveryPendingChoiceId) {
-        bStillOpen = true;
+      } else {
+        TArray<FS08PendingEffect> PendingQueue;
+        bool bArrayPresent = false;
+        if (FS08Contracts::PendingEffectsStrict(Snapshot, PendingQueue, bArrayPresent)) {
+          for (const FS08PendingEffect& Effect : PendingQueue) {
+            if (Effect.Id == MutationRecoveryPendingChoiceId) {
+              bStillOpen = true;
+              break;
+            }
+          }
+          if (!bStillOpen) bSettledProof = true;
+        } else if (!bArrayPresent && bBarrierHttpBody && bValidMeta) {
+          bSettledProof = true;
+        }
       }
       if (bStillOpen) {
         bFreshResult = false;
         Trace(FString::Printf(
             TEXT("RECOVERY held: pending choice %s is still open at seq %d"),
+            *MutationRecoveryPendingChoiceId, Snapshot.SequenceNumber));
+      } else if (!bSettledProof) {
+        bFreshResult = false;
+        Trace(FString::Printf(
+            TEXT("RECOVERY held: pending choice %s unverifiable at seq %d (no valid pending metadata - stale metadata is not proof)"),
             *MutationRecoveryPendingChoiceId, Snapshot.SequenceNumber));
       }
     }
@@ -1314,6 +1382,7 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
       bMutationRecoveryActive = false;
       MutationRecoveryRetryCountdown = -1.0f;
       MutationRecoveryPendingChoiceId.Reset();
+      bMutationRecoveryPendingChoiceIsDiscard = false;
       Trace(FString::Printf(TEXT("RECOVERY complete: authoritative state at seq %d"),
                             Snapshot.SequenceNumber));
     } else if (MutationRecoveryPendingChoiceId.IsEmpty()) {
@@ -1713,7 +1782,8 @@ bool FS08FlowController::DiscardToLimit(const FString& PendingId,
             // GD-037: the command MAY have been applied - never resend it;
             // the locked recovery refetch converges on the server truth.
             // P2(8): the lock holds until THIS discard choice settles.
-            EnterMutationRecovery(TEXT("DISCARD failed: outcome unknown"), PendingId);
+            EnterMutationRecovery(TEXT("DISCARD failed: outcome unknown"), PendingId,
+                                  /*bPendingIsDiscard=*/true);
             return;
           }
           Trace(TEXT("DISCARD failed: ") +
@@ -1729,7 +1799,7 @@ bool FS08FlowController::DiscardToLimit(const FString& PendingId,
         if (!FS08Contracts::ParseMutationResult(RawBody, TEXT("discardToLimit"),
                                                 Snapshot, Error)) {
           Trace(TEXT("DISCARD parse error: ") + Error.Message);
-          HandleMutationParseFailure(TEXT("DISCARD"), PendingId);
+          HandleMutationParseFailure(TEXT("DISCARD"), PendingId, /*bPendingIsDiscard=*/true);
           return;
         }
         ApplyMatchSnapshot(Snapshot);
@@ -1798,7 +1868,13 @@ bool FS08FlowController::RunCombatMutation(const FString& Tag, const TCHAR* Fiel
         bManeuverInFlight = false;
         if (!bOk) {
           if (IsAuthError(Errors) && !bSessionExpired) {
+            // P2(5): 401 ANSWERED the command (definitely not applied):
+            // refresh once, then converge through the authoritative read -
+            // the command itself is never replayed.
             Trace(Tag + TEXT(" auth rejected - refreshing; the command is not sent again"));
+            // P1(5): definitive rejection - a local draft waiting on this
+            // command (S09AUTO AttackDraft) must reset, never park forever.
+            OnCommandRejected.Broadcast(Tag, Errors.Num() ? Errors[0].Message : FString());
             if (TryRefreshAuth()) return;
             if (bSessionExpired) return;
           }
@@ -1811,6 +1887,9 @@ bool FS08FlowController::RunCombatMutation(const FString& Tag, const TCHAR* Fiel
           }
           Trace(Tag + TEXT(" failed: ") +
                 (Errors.Num() ? Errors[0].Message : TEXT("?")));
+          // Answered GraphQL/4xx rejection: definitely not applied - notify
+          // the draft holders, then surface the error as before.
+          OnCommandRejected.Broadcast(Tag, Errors.Num() ? Errors[0].Message : FString());
           OnFlowError.Broadcast(Errors.Num() ? Errors[0]
                                              : FS08GraphQLError{TEXT("TRANSPORT"),
                                                                 Tag + TEXT(" failed"),

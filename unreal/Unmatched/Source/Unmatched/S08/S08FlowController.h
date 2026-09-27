@@ -74,6 +74,9 @@ public:
   DECLARE_MULTICAST_DELEGATE_OneParam(FOnTrace, const FString&);
   DECLARE_MULTICAST_DELEGATE_TwoParams(FOnApplied, const FS08Snapshot&, ES08SeqDecision);
   DECLARE_MULTICAST_DELEGATE_OneParam(FOnCues, const TArray<FS08Cue>&);
+  /** Tag is the trace tag of the command ("ATTACK", "PEND resolve", ...). */
+  DECLARE_MULTICAST_DELEGATE_TwoParams(FOnCommandRejected, const FString& /*Tag*/,
+                                       const FString& /*Reason*/);
 
   FOnStage OnStage;
   FOnRoom OnRoom;
@@ -85,6 +88,15 @@ public:
   /** Fires once per authoritative event (seq transition) - never for a
    *  same-seq merge, so HTTP+WS duplicates cannot double-fire cues. */
   FOnCues OnCues;
+  /** S10 review P1(5): fired when a DISPATCHED gameplay command was
+   *  DEFINITIVELY rejected by the server (a 401-answered auth rejection or a
+   *  GraphQL/4xx rejection - the command is provably NOT applied). NEVER
+   *  fired for an unknown outcome (lost/5xx/unparseable answers): those arm
+   *  the recovery lock instead, and a resend of the same command is out of
+   *  the question. A driver holding a local draft for the command (e.g.
+   *  S09AUTO's AttackDraft) uses this to reset that draft so its next
+   *  decision happens against fresh authoritative state. */
+  FOnCommandRejected OnCommandRejected;
 
   /** Public content heroes (id/name/health/sidekickCount) for the pick UI. */
   const TArray<FS08HeroEntry>& GetHeroes() const { return Heroes; }
@@ -110,6 +122,11 @@ public:
   /** GD-038 (ACC-021): true once the session is dead (refresh failed/expired
    *  and no credential is held) - the UI must route to login. */
   bool IsSessionExpired() const { return bSessionExpired; }
+#if WITH_AUTOMATION_TESTS
+  /** Test seam: has the CURRENT operation ever delivered a frame? (S10
+   *  review P1(3): the input gate requires a proven-live operation.) */
+  bool IsGameStateOpLiveForTest() const { return bGameStateOpLive; }
+#endif
 
   /** GD-031 action gate (consistent with the phase1 critical-field gate):
    *  returns an empty string when a gameplay command may be issued. */
@@ -163,13 +180,17 @@ public:
   bool IsStreamAttached() const { return Ws.IsValid(); }
   /** GD-037/S10: true only while a live, READY state stream exists - the
    *  gameplay-command gate and the reconnect banner both key off this. An
-   *  acked socket alone does not count (S10 review P1(3)): the state
-   *  subscription must be live AND reconciled - the first barrier body
-   *  (HTTP gameState read or delivered WS snapshot) proved the channel
-   *  carries current server truth. A subscribe that keeps failing leaves the
-   *  gate closed even though connection_ack succeeded. */
+   *  acked socket alone does not count (S10 review P1(3)), and neither does
+   *  a LOCALLY registered operation id awaiting server acceptance (Sol6
+   *  review P1(3)): the state subscription must be PROVEN live (it has
+   *  delivered at least one frame) AND reconciled - a barrier body (HTTP
+   *  gameState read or delivered WS snapshot) proved the channel carries
+   *  current server truth. A subscribe that keeps failing - or whose error
+   *  lands after the read reconciled - leaves the gate closed even though
+   *  connection_ack succeeded. */
   bool IsStreamReady() const {
-    return Ws.IsValid() && Ws->IsAcked() && !GameStateOpId.IsEmpty() && bStreamReconciled;
+    return Ws.IsValid() && Ws->IsAcked() && !GameStateOpId.IsEmpty() && bGameStateOpLive &&
+           bStreamReconciled;
   }
 
   /** Applies an incoming snapshot through the seq guard and critical-field
@@ -359,8 +380,11 @@ private:
    *  (no resend of the lost command, ever). PendingChoiceId (when non-empty)
    *  is a pending-queue id the lost command was resolving: the lock then
    *  holds until THAT choice is provably settled (gone from the pending
-   *  queue), not merely until any seq advance. */
-  void EnterMutationRecovery(const FString& Reason, const FString& PendingChoiceId);
+   *  queue), not merely until any seq advance. bPendingIsDiscard marks a
+   *  discardToLimit choice (settled through pendingHandDiscard / a complete
+   *  full state) vs a pendingEffects resolve. */
+  void EnterMutationRecovery(const FString& Reason, const FString& PendingChoiceId,
+                             bool bPendingIsDiscard = false);
   /** One bounded refetch attempt while recovery is armed; arms the backoff
    *  timer on failure inside FetchGameState's failure path. */
   void AttemptMutationRecoveryRefetch();
@@ -371,7 +395,8 @@ private:
   /** Shared parse-failure tail of every gameplay mutation: an unreadable HTTP
    *  200 body after the request reached the server is an outcome-UNKNOWN
    *  answer (the server may have committed) - recovery, never a resend. */
-  void HandleMutationParseFailure(const FString& Tag, const FString& PendingChoiceId);
+  void HandleMutationParseFailure(const FString& Tag, const FString& PendingChoiceId,
+                                  bool bPendingIsDiscard = false);
   // ---- GD-038: authorization recovery (ACC-021) ----
   static bool IsAuthError(const TArray<FS08GraphQLError>& Errors);
   static bool IsRateLimited(const TArray<FS08GraphQLError>& Errors);
@@ -460,6 +485,11 @@ private:
   // holds until this id disappears from metadata.pendingEffects (or the
   // pendingHandDiscard for a discard command).
   FString MutationRecoveryPendingChoiceId;
+  // Sol6 review P1(1): settle by choice KIND. A discardToLimit choice is
+  // settled by the pendingHandDiscard projection (a complete full state may
+  // omit the field once resolved); a pendingEffects resolve is settled by a
+  // strictly valid pendingEffects array lacking the id.
+  bool bMutationRecoveryPendingChoiceIsDiscard = false;
   // S10 review P1(3): a body from the HTTP gameState barrier (reconnect or
   // recovery refetch) is a reconciliation read, never a live transition -
   // its diff fires NO cues regardless of gap size (a contiguous local+1
@@ -476,6 +506,13 @@ private:
   // first applied/merged barrier body or delivered WS snapshot, reset by
   // every teardown/reconnect/operation-end/auth-rotation.
   bool bStreamReconciled = false;
+  // Sol6 review P1(3): the operation named by GameStateOpId has DELIVERED at
+  // least one frame (the server accepted the subscribe). A locally
+  // registered id is NOT live yet: its replacement subscribe may still be
+  // answered by an operation error, and a read that lands in between must
+  // not open the input gate. Set on the first frame of the current op;
+  // cleared with every GameStateOpId reset/replacement.
+  bool bGameStateOpLive = false;
   // GD-038 auth state: the refresh token is held in memory only (never
   // traced); a failed/expired refresh is terminal for the session.
   FString RefreshToken;

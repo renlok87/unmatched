@@ -28,6 +28,64 @@ class SHorizontalBox;
 class AS08BoardActor;
 class ACameraActor;
 
+/** Bounded auto-send accounting for one command head (S10 review P1(1)):
+ *  attempts are counted ONLY when the command actually left the client - a
+ *  gate-blocked tick (stream reconnecting, recovery lock held) consumes no
+ *  budget, so a temporarily disconnected head is not silently exhausted and
+ *  permanently held. An Observe() with a changed key starts a fresh window
+ *  (per pending head / per turn). Pure state machine - unit-testable
+ *  without a world. */
+struct FS09AutoSendBudget {
+  explicit FS09AutoSendBudget(int32 InMax) : Max(InMax) {}
+  /** Fresh window when the head key changed (new head / new turn). */
+  void Observe(const FString& Key) {
+    if (Key != CurrentKey) {
+      CurrentKey = Key;
+      Sends = 0;
+    }
+  }
+  bool Exhausted() const { return Sends >= Max; }
+  /** Count one ACTUAL dispatch - callers invoke this only on a confirmed
+   *  send (or a definitive server rejection of one), never on a gate block. */
+  void CountSend() { ++Sends; }
+  int32 Sends = 0;
+  const int32 Max;
+private:
+  FString CurrentKey;
+};
+
+/** Sol6 review P2(5): the EXACT draft transitions the S09AUTO driver
+ *  performs, extracted as pure functions so the production paths (RunS09Auto
+ *  / the OnCommandRejected handler) and their tests cannot diverge. No
+ *  world, no UI - state in, state out. */
+struct FS09AutoDraftTransitions {
+  /** RunS09Auto pending auto-answer: the bounded budget counts ONLY an
+   *  actual dispatch. A gate-blocked tick (recovery lock held / stream
+   *  reconnecting) consumes nothing and the draft stays intact for a later
+   *  tick - a temporarily blocked head is never silently exhausted.
+   *  Pass-through of bDispatched (the caller traces "picked" on true). */
+  static bool PendingAutoAnswer(bool bDispatched, FS09AutoSendBudget& Budget) {
+    if (bDispatched) Budget.CountSend();
+    return bDispatched;
+  }
+  /** Definitive server rejection of a DISPATCHED attack (OnCommandRejected -
+   *  the server answered, so the command is provably NOT applied; unknown
+   *  outcomes never route here, they arm the controller's recovery lock
+   *  instead): close the draft, count one bounded retry, hold the next
+   *  attempt for a second. Returns the new NextCommandAt. */
+  static float AttackDraftRejected(ES09CommandMode& Mode, FString& AttackerId,
+                                   FString& TargetId, FString& CardId,
+                                   FS09AutoSendBudget& Budget, float Elapsed) {
+    Mode = ES09CommandMode::None;
+    AttackerId.Reset();
+    TargetId.Reset();
+    CardId.Reset();
+    Budget.CountSend();
+    return Elapsed + 1.0f;
+  }
+};
+
+
 UCLASS()
 class AS08FlowGameMode : public AGameModeBase {
   GENERATED_BODY()
@@ -233,12 +291,17 @@ private:
   // Rate-limited diagnostics (a stranded mandatory head used to emit one
   // trace line per tick - 98k lines / 9.7 MB in the GD-035 capture).
   FString S09PendingWaitTraceKey; // head id already logged as unanswerable
-  // Bounded auto-answers per pending head: once S09PendingAutoMaxSends server
-  // commands left the SAME head open (server reject / lost mutation), the
-  // driver stops re-answering it - one diagnostic, the stuck head stays
-  // visibly blocked instead of flooding the trace with retries.
-  FString S09PendingAutoKey;
-  int32 S09PendingAutoSends = 0;
+  // Bounded auto-answers per pending head: once
+  // that many ACTUALLY DISPATCHED server commands left the SAME head open
+  // (server reject / lost mutation), the driver stops re-answering it - one
+  // diagnostic, the stuck head stays visibly blocked instead of flooding the
+  // trace with retries. Gate-blocked ticks consume no budget (P1(1)).
+  FS09AutoSendBudget S09PendingAutoBudget{3};
+  // S10 review P1(5): bounded attack retries per turn - every definitive
+  // server rejection of a dispatched attack (e.g. the 401-answered case)
+  // closes the AttackDraft and counts here; a fresh turn re-opens the window.
+  FS09AutoSendBudget S09AttackAutoBudget{3};
+  FString S09AttackRejectTraceKey; // turn already traced as retry-exhausted
   FString S09RevealTraceKey;      // combat target+seq already traced revealed
   FString S09PendingRevealTraceKey;  // same, for the owner PENDING panel's revealed line
   FString S09ResolveBlockedTraceKey; // pending head already traced as blocking resolve

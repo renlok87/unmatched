@@ -61,11 +61,21 @@ void FS08GraphqlWs::Close() {
 }
 
 void FS08GraphqlWs::SendMessage(const TSharedRef<FJsonObject>& Message) {
-  if (!Socket.IsValid() || !Socket->IsConnected()) return;
   FString Serialized;
   TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Serialized);
   FJsonSerializer::Serialize(Message, Writer);
+#if WITH_AUTOMATION_TESTS
+  SentFramesForTest.Add(Serialized);
+#endif
+  if (!Socket.IsValid() || !Socket->IsConnected()) return;
   Socket->Send(Serialized);
+}
+
+void FS08GraphqlWs::SendComplete(const FString& OperationId) {
+  TSharedRef<FJsonObject> Complete = MakeShared<FJsonObject>();
+  Complete->SetStringField(TEXT("id"), OperationId);
+  Complete->SetStringField(TEXT("type"), TEXT("complete"));
+  SendMessage(Complete);
 }
 
 FString FS08GraphqlWs::SubscribeGameStateUpdated(const FString& GameId, int32 Since,
@@ -95,10 +105,7 @@ FString FS08GraphqlWs::SubscribeGameStateUpdated(const FString& GameId, int32 Si
 void FS08GraphqlWs::Unsubscribe(const FString& OperationId) {
   if (!Pending.Contains(OperationId)) return;
   Pending.Remove(OperationId);
-  TSharedRef<FJsonObject> Complete = MakeShared<FJsonObject>();
-  Complete->SetStringField(TEXT("id"), OperationId);
-  Complete->SetStringField(TEXT("type"), TEXT("complete"));
-  SendMessage(Complete);
+  SendComplete(OperationId);
 }
 
 void FS08GraphqlWs::HandleMessage(const FString& Raw) {
@@ -135,6 +142,18 @@ void FS08GraphqlWs::HandleMessage(const FString& Raw) {
   if (!Handler) return; // complete/next after unsubscribe
 
   if (Type == TEXT("next")) {
+    // S10 review P1(3): every terminal-ish failure of a 'next' frame (errors[]
+    // alongside/instead of data, data.gameStateUpdated absent/null, or an
+    // event that fails contract parsing) ENDS the operation exactly like an
+    // 'error' frame: the id is unregistered here and the owner is notified
+    // through OnOperationEnded so it can invalidate its ready state and run
+    // the bounded refetch/resubscribe. Leaving the operation registered (the
+    // old OnError-only path) reported the failure but kept a dead id "live"
+    // forever - no resubscribe, stream readiness never re-validated.
+    // The server still holds the rejected subscription open (a 'next' frame
+    // is not a terminal server frame): a best-effort 'complete' is sent
+    // BEFORE the local removal so the dead operation cannot keep streaming
+    // server-side while the owner resubscribes with a fresh id.
     const TSharedPtr<FJsonObject>* Payload = nullptr;
     Message->TryGetObjectField(TEXT("payload"), Payload);
     // Partial failure: 'next' can carry errors[] alongside (or instead of)
@@ -144,9 +163,10 @@ void FS08GraphqlWs::HandleMessage(const FString& Raw) {
       if ((*Payload)->TryGetArrayField(TEXT("errors"), NextErrors) && NextErrors &&
           NextErrors->Num() > 0) {
         const FString Reason = JoinErrorMessages(*NextErrors);
-        Handler->OnError({TEXT("PROTOCOL"),
-                          Reason.IsEmpty() ? TEXT("gameStateUpdated 'next' failed") : Reason,
-                          FString()});
+        SendComplete(Id);
+        Pending.Remove(Id);
+        OnOperationEnded.Broadcast(
+            Id, Reason.IsEmpty() ? TEXT("gameStateUpdated 'next' failed") : Reason);
         return;
       }
     }
@@ -160,13 +180,18 @@ void FS08GraphqlWs::HandleMessage(const FString& Raw) {
         if (FS08Contracts::ParseGameStateUpdated(Event->ToSharedRef(), Snapshot, Error)) {
           Handler->OnSnapshot(Snapshot);
         } else {
-          Handler->OnError(Error);
+          SendComplete(Id);
+          Pending.Remove(Id);
+          OnOperationEnded.Broadcast(Id, Error.Message.IsEmpty()
+                                             ? TEXT("gameStateUpdated event failed to parse")
+                                             : Error.Message);
         }
         return;
       }
     }
-    Handler->OnError({TEXT("PARSE"), TEXT("gameStateUpdated 'next' payload has unexpected shape"),
-                      FString()});
+    SendComplete(Id);
+    Pending.Remove(Id);
+    OnOperationEnded.Broadcast(Id, TEXT("gameStateUpdated 'next' payload has unexpected shape"));
     return;
   }
   if (Type == TEXT("error")) {

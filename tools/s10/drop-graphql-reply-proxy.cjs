@@ -39,14 +39,17 @@ function operationField(body) {
 
 const server = http.createServer((downstreamReq, downstreamRes) => {
   // A drop is only real when the CLIENT could observe it: if the downstream
-  // socket is already gone (client abort/timeout), destroying the response
+  // side is already gone (client abort/timeout), destroying the response
   // proves nothing about the client. The event is skipped and the one-shot
-  // drop budget is preserved for a request that is still watching. NOTE: the
-  // request/response STREAMS emit 'close' after a fully-read body too - only
-  // the SOCKET closing means the connection is gone.
+  // drop budget is preserved for a request that is still watching. Listen on
+  // the per-request RESPONSE, never on the shared keep-alive socket: a
+  // socket-level 'close' listener per request accumulated past Node's
+  // 10-listener cap during long keep-alive duels (MaxListenersExceededWarning).
+  // The response 'close' also fires after a fully-delivered reply, which is
+  // harmless: downstreamGone is only consulted below BEFORE the reply is
+  // written (no yield between the check and the destroy).
   let downstreamGone = false;
-  const downstreamSocket = downstreamRes.socket || downstreamReq.socket;
-  if (downstreamSocket) downstreamSocket.on('close', () => { downstreamGone = true; });
+  downstreamRes.on('close', () => { downstreamGone = true; });
   downstreamRes.on('error', () => { downstreamGone = true; });
   const chunks = [];
   let bytes = 0;

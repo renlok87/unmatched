@@ -290,6 +290,15 @@ bool FS10AuthRateLimitTest::RunTest(const FString&) {
     FS08Contracts::TryParseJsonValue(
         TEXT("{\"cells\":[[0,0],[1,0]]}"), Baseline.BoardState, Problem);
     Flow.ApplySnapshot(Baseline);
+    // Sol6 review P1(3): the operation must deliver a frame before the
+    // command gate opens (merge at the baseline seq, no state change).
+    Flow.InjectWsFrameForTest(
+        TEXT("{\"type\":\"next\",\"id\":\"s08-1\",\"payload\":{\"data\":{\"gameStateUpdated\":")
+        TEXT("{\"sequenceNumber\":10,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":1,")
+        TEXT("\"currentTurnPlayerId\":\"p-host\",")
+        TEXT("\"players\":\"[{\\\"userId\\\":\\\"p-host\\\"},{\\\"userId\\\":\\\"p-guest\\\"}]\",")
+        TEXT("\"fighters\":\"[{\\\"id\\\":\\\"f1\\\"},{\\\"id\\\":\\\"f2\\\"}]\",")
+        TEXT("\"handZones\":\"{\\\"p-host\\\":[],\\\"p-guest\\\":[]}\"}}}}"));
     Flow.QueueHttpResultForTest(false, {RateLimited()});
     Flow.BeginManeuver();
     TestEqual("one mutation send", Flow.GetTestHttpSendCountForTest(), 1);
@@ -551,6 +560,87 @@ bool FS10RefreshOverlapSingleFlightTest::RunTest(const FString&) {
   TestFalse("flag cleared by B's answer", Flow.IsRefreshInFlightForTest());
   TestEqual("B's rotation installed", Flow.GetAccessTokenForTest(), TEXT("access-B2"));
   Flow.DeliverQueuedHttpForTest(); // B's retried poll ok
+  return true;
+}
+
+// ---- S10 review P1(4): a relogin while a myGames read is PENDING must not
+// let the OLD identity's late answer install its room for the new session ----
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS10ReloginPendingMyGamesTest,
+    "Unmatched.S10.Auth.relogin invalidates a pending myGames recovery read",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS10ReloginPendingMyGamesTest::RunTest(const FString&) {
+  FS08FlowController Flow(FString(), TEXT("ws://test.invalid"));
+  FAuthCapture Cap;
+  Cap.Bind(Flow);
+
+  // login A ok -> EnterLobby (myGames in flight, answer held) -> login B.
+  Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
+      TEXT("{\"data\":{\"login\":{\"accessToken\":\"access-A\",")
+      TEXT("\"refreshToken\":\"refresh-A\",\"user\":{\"id\":\"p-a\",")
+      TEXT("\"username\":\"a\"}}}}"));
+  Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
+      TEXT("{\"data\":{\"myGames\":[{\"id\":\"g-A\",\"code\":\"AAA111\",")
+      TEXT("\"status\":\"LOBBY\",\"mode\":\"ONE_V_ONE\",\"hostId\":\"p-a\",")
+      TEXT("\"boardId\":\"b-1\",\"players\":[]}]}}"));
+  Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true, LoginOkBodyB);
+
+  Flow.Login(TEXT("a@example.com"), TEXT("pw"));
+  Flow.DeliverQueuedHttpForTest(); // A installed (stage Login)
+  Flow.EnterLobby();              // myGames dispatched for identity A (held)
+  Flow.Login(TEXT("b@example.com"), TEXT("pw")); // identity change bumps MatchGeneration
+  // Deferred queue is now [0]=A's myGames, [1]=B's login (the head removal
+  // above shifted the indices - deliver by position, not by queueing order).
+  Flow.DeliverQueuedHttpForTest(1); // login B installs identity B
+
+  // A's late myGames answer arrives: it must be DROPPED - not recovered as
+  // B's room (the exact P1(4) inversion: A's lobby response installing a
+  // room for B).
+  Flow.DeliverQueuedHttpForTest(0);
+  TestTrue("stale myGames dropped", Cap.SawTrace(TEXT("MYGAMES stale answer ignored")));
+  TestEqual("no room installed for B", Flow.GetRoom().GameId, TEXT(""));
+  TestFalse("no recovery trace for A's room", Cap.SawTrace(TEXT("RECOVER room=")));
+  TestNotEqual("stage not Room", Flow.GetStage(), ES08Stage::Room);
+  TestEqual("identity still B", Flow.GetUserId(), TEXT("p-b"));
+
+  // B's own lobby read later works on a clean slate (its own generation).
+  Flow.QueueHttpResultForTest(true, {}, false,
+      TEXT("{\"data\":{\"myGames\":[]}}"));
+  Flow.EnterLobby();
+  TestTrue("fresh lobby for B", Flow.GetStage() == ES08Stage::Lobby ||
+                                Flow.GetStage() == ES08Stage::Login);
+  return true;
+}
+
+// ---- S10 review P1(4): a delayed room MUTATION answer for identity A must
+// not rewrite the room state of identity B's session ---------------------------
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS10ReloginPendingRoomMutationTest,
+    "Unmatched.S10.Auth.relogin invalidates pending room mutation callbacks",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS10ReloginPendingRoomMutationTest::RunTest(const FString&) {
+  FS08FlowController Flow(FString(), TEXT("ws://test.invalid"));
+  FAuthCapture Cap;
+  Cap.Bind(Flow);
+  Flow.SetAuthForTest(TEXT("access-A"), TEXT("refresh-A"));
+  Flow.SetRoomForTest(TEXT("g-A"), ES08Stage::Room);
+
+  // A's toggleReady is in flight when the player re-logs in as B.
+  Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
+      TEXT("{\"data\":{\"toggleReady\":{\"id\":\"g-A\",\"code\":\"AAA111\",")
+      TEXT("\"status\":\"LOBBY\",\"mode\":\"ONE_V_ONE\",\"hostId\":\"p-a\",")
+      TEXT("\"boardId\":\"b-1\",\"players\":[]}}}"));
+  Flow.ToggleReady(); // dispatched for room g-A at the old generation
+  // The harness consumes results FIFO PER DISPATCH: queue B's login answer
+  // BEFORE Login() so the login request consumes it (not the empty FIFO).
+  Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true, LoginOkBodyB);
+  Flow.Login(TEXT("b@example.com"), TEXT("pw")); // identity change clears the room
+  TestTrue("room cleared on the identity change", Flow.GetRoom().GameId.IsEmpty());
+
+  Flow.DeliverQueuedHttpForTest(1); // login B installs ([0]=toggleReady, [1]=login)
+  Flow.DeliverQueuedHttpForTest(0); // A's late toggleReady answer arrives
+
+  TestTrue("stale room mutation dropped", Cap.SawTrace(TEXT("READY stale answer room=g-A ignored")));
+  TestEqual("A's room did not resurrect", Flow.GetRoom().GameId, TEXT(""));
+  TestEqual("identity still B", Flow.GetUserId(), TEXT("p-b"));
   return true;
 }
 

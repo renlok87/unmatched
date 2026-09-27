@@ -191,6 +191,16 @@ public:
   static bool PendingHandDiscard(const FS08Snapshot& Snapshot,
                                  FS08PendingHandDiscard& OutPending);
 
+  /** Settlement-grade read of metadata.pendingHandDiscard. Returns true only
+   *  when the field is present AND decodes to an object with an id.
+   *  bOutFieldPresent distinguishes "no field key" (a COMPLETE authoritative
+   *  body proves resolution by absence) from a present-but-malformed value
+   *  (null, wrong type, object without an id) which is UNVERIFIABLE and must
+   *  never release a lost-choice lock. */
+  static bool PendingHandDiscardStrict(const FS08Snapshot& Snapshot,
+                                       FS08PendingHandDiscard& OutPending,
+                                       bool& bOutFieldPresent);
+
   /** GD-034: metadata.combatInfo. False when no combat window is open. Field
    *  presence mirrors the viewer projection (see FS08CombatInfo). */
   static bool CombatInfo(const FS08Snapshot& Snapshot, FS08CombatInfo& Out);
@@ -199,6 +209,17 @@ public:
    *  being waited on). False when the queue is absent/empty. */
   static bool PendingEffects(const FS08Snapshot& Snapshot,
                              TArray<FS08PendingEffect>& OutEffects);
+
+  /** S10 review P2(4): settlement-grade read of the pendingEffects queue.
+   *  Returns true only when the "pendingEffects" ARRAY is present AND every
+   *  entry decodes to a pending effect with an id - a malformed entry (e.g.
+   *  [null]) leaves the queue UNVERIFIABLE (never "empty"), so a lost-choice
+   *  lock can never release on it. bOutArrayPresent distinguishes "no array
+   *  key" (a complete body proves resolution by absence) from a present but
+   *  non-array (null) or malformed array. */
+  static bool PendingEffectsStrict(const FS08Snapshot& Snapshot,
+                                   TArray<FS08PendingEffect>& OutEffects,
+                                   bool& bOutArrayPresent);
 
   /** GD-032 privacy: a hand/discard entry is a server-side hidden
    *  placeholder (viewer may not learn its identity). Such cards carry no

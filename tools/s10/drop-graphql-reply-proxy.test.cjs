@@ -181,3 +181,72 @@ test('no drop event when downstream already closed; later live request still dro
     await new Promise((resolve) => upstream.close(resolve));
   }
 });
+
+// S10 review P2(proxy): per-request liveness used to be tracked with a
+// 'close' listener on the SHARED keep-alive socket, so a long duel over one
+// connection piled up listeners past Node's 10-listener cap and warned
+// (MaxListenersExceededWarning observed in the live duel). The proxy must
+// stay warning-free over many requests on one keep-alive socket.
+test('no MaxListenersExceededWarning over many keep-alive requests on one socket', { timeout: 15000 }, async () => {
+  const upgradedSockets = new Set();
+  const upstream = http.createServer((req, res) => {
+    req.resume();
+    req.on('end', () => {
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ data: { __typename: 'Query' } }));
+    });
+  });
+  upstream.on('upgrade', (_req, socket) => {
+    upgradedSockets.add(socket);
+    socket.on('close', () => upgradedSockets.delete(socket));
+    socket.write('HTTP/1.1 101 Switching Protocols\r\nConnection: Upgrade\r\nUpgrade: websocket\r\n\r\n');
+    socket.on('error', () => {});
+  });
+  const targetPort = await listen(upstream);
+  const proxyPort = await availablePort();
+  const proxy = spawn(process.execPath, [path.join(__dirname, 'drop-graphql-reply-proxy.cjs')], {
+    env: { ...process.env, S10_TARGET_PORT: String(targetPort),
+      S10_LISTEN_PORT: String(proxyPort), S10_DROP_FIELD: 'attack' },
+    windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const stderr = [];
+  try {
+    await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('proxy did not listen')), 3000);
+      proxy.stdout.on('data', (chunk) => {
+        if (chunk.toString('utf8').includes('"event":"listening"')) {
+          clearTimeout(timer); resolve();
+        }
+      });
+      proxy.stderr.on('data', (chunk) => stderr.push(chunk.toString('utf8')));
+      proxy.on('exit', (code) => { clearTimeout(timer); reject(new Error(`proxy exited ${code}`)); });
+    });
+    const agent = new http.Agent({ keepAlive: true, maxSockets: 1 });
+    const query = 'query { __typename }';
+    for (let i = 0; i < 20; i++) {
+      const reply = await new Promise((resolve, reject) => {
+        const body = JSON.stringify({ query });
+        const req = http.request({ hostname: '127.0.0.1', port: proxyPort, path: '/graphql', method: 'POST',
+          agent,
+          headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) } },
+        (res) => {
+          const chunks = [];
+          res.on('data', (chunk) => chunks.push(chunk));
+          res.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+        });
+        req.on('error', reject);
+        req.end(body);
+      });
+      assert.equal(JSON.parse(reply).data.__typename, 'Query', `reply ${i} passed through`);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 150)); // let the stderr pipe flush
+    const joined = stderr.join('');
+    assert.equal(joined.includes('MaxListenersExceededWarning'), false,
+      `proxy warned about listener accumulation: ${joined.trim()}`);
+    agent.destroy();
+  } finally {
+    proxy.kill();
+    for (const socket of upgradedSockets) socket.destroy();
+    await new Promise((resolve) => upstream.close(resolve));
+  }
+});

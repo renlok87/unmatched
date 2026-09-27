@@ -101,6 +101,20 @@ FString BeginManeuverEchoBody(int32 Seq, const TCHAR* Phase) {
       *State, Seq, Phase);
 }
 
+/** Sol6 review P1(3): first delivered frame on the current op - proves the
+ *  operation live (the command gate opens only after it). Merge at the
+ *  baseline seq: no state change, no cues. */
+void ProveOpLiveFrame(FS08FlowController& Flow, int32 Seq, const TCHAR* OpId) {
+  Flow.InjectWsFrameForTest(FString::Printf(
+      TEXT("{\"type\":\"next\",\"id\":\"%s\",\"payload\":{\"data\":{\"gameStateUpdated\":")
+      TEXT("{\"sequenceNumber\":%d,\"phase\":\"ACTION_MANEUVER\",\"turnCount\":1,")
+      TEXT("\"currentTurnPlayerId\":\"p-host\",")
+      TEXT("\"players\":\"[{\\\"userId\\\":\\\"p-host\\\"},{\\\"userId\\\":\\\"p-guest\\\"}]\",")
+      TEXT("\"fighters\":\"[{\\\"id\\\":\\\"f1\\\"},{\\\"id\\\":\\\"f2\\\"}]\",")
+      TEXT("\"handZones\":\"{\\\"p-host\\\":[],\\\"p-guest\\\":[]}\"}}}}"),
+      OpId, Seq));
+}
+
 /** Viewer-valid started snapshot (passes ValidateCriticalFields for the
  *  given viewer when CurrentTurnPlayerId is theirs). */
 FS08Snapshot ValidStartedSnapshot(int32 Seq, const TCHAR* Phase, const TCHAR* TurnPlayerId) {
@@ -292,6 +306,7 @@ bool FS08LateManeuverEchoAfterNewMatchTest::RunTest(const FString&) {
   Flow.SetRoomForTest(TEXT("g-1"), ES08Stage::Started);
   Flow.AttachStreamHarnessForTest(TEXT("g-1")); // S10: commands need a live stream
   Flow.ApplySnapshot(ValidStartedSnapshot(5, TEXT("ACTION_MANEUVER"), HostId));
+  ProveOpLiveFrame(Flow, 5, TEXT("s08-1")); // Sol6 P1(3): op must prove live
   Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
                               BeginManeuverEchoBody(9, TEXT("ACTION_ATTACK")));
   Flow.BeginManeuver();
@@ -304,6 +319,7 @@ bool FS08LateManeuverEchoAfterNewMatchTest::RunTest(const FString&) {
   Flow.SetRoomForTest(TEXT("g-2"), ES08Stage::Started);
   Flow.AttachStreamHarnessForTest(TEXT("g-2"));
   Flow.ApplySnapshot(ValidStartedSnapshot(1, TEXT("ACTION_MANEUVER"), HostId));
+  ProveOpLiveFrame(Flow, 1, TEXT("s08-1")); // fresh harness socket: ids restart
   Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
                               BeginManeuverEchoBody(2, TEXT("ACTION_MANEUVER")));
   Flow.BeginManeuver();
@@ -338,6 +354,7 @@ bool FS08LegitDeferredManeuverAnswerAppliesTest::RunTest(const FString&) {
   Flow.SetRoomForTest(TEXT("g-1"), ES08Stage::Started);
   Flow.AttachStreamHarnessForTest(TEXT("g-1")); // S10: commands need a live stream
   Flow.ApplySnapshot(ValidStartedSnapshot(1, TEXT("ACTION_MANEUVER"), HostId));
+  ProveOpLiveFrame(Flow, 1, TEXT("s08-1")); // Sol6 P1(3): op must prove live
 
   Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
                               BeginManeuverEchoBody(2, TEXT("ACTION_MANEUVER")));

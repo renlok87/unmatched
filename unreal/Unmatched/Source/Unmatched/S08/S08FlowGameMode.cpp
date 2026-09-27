@@ -84,6 +84,23 @@ void AS08FlowGameMode::BeginPlay() {
     FS08Trace::Write(TEXT("RESULT lobby-return failed: ") + Error.Code);
     RefreshHud();
   });
+  Flow->OnCommandRejected.AddLambda([this](const FString& Tag, const FString& /*Reason*/) {
+    // S10 review P1(5): a definitively rejected attack (the server ANSWERED -
+    // e.g. the 401-then-refresh path - so the command is provably not
+    // applied) must not leave the AttackDraft parked: S09AUTO returned on
+    // every tick at the line below the plan while mode stayed AttackDraft.
+    // Close the draft and count the bounded per-turn retry; the next tick
+    // re-decides against fresh authoritative state.
+    if (Tag != TEXT("ATTACK")) return;
+    if (CommandUi.Mode != ES09CommandMode::AttackDraft) return;
+    NextCommandAt = FS09AutoDraftTransitions::AttackDraftRejected(
+        CommandUi.Mode, CommandUi.AttackAttackerId, CommandUi.AttackTargetId,
+        CommandUi.AttackCardId, S09AttackAutoBudget, Elapsed);
+    FS08Trace::Write(FString::Printf(
+        TEXT("S09AUTO attack rejected by the server (%d/%d retries this turn) - draft reset; the command is never blindly resent"),
+        S09AttackAutoBudget.Sends, S09AttackAutoBudget.Max));
+    RefreshHud();
+  });
   Flow->OnTrace.AddLambda([this](const FString& Line) {
     TraceLines.Add(Line);
     if (TraceLines.Num() > 200) TraceLines.RemoveAt(0, TraceLines.Num() - 200);
@@ -1425,8 +1442,6 @@ void AS08FlowGameMode::HandleHudKeys() {
 // ---- GD-033 auto drive -----------------------------------------------------
 
 namespace {
-// Bounded automatic answers per pending head (see S09PendingAutoSends).
-constexpr int32 S09PendingAutoMaxSends = 3;
 // One orthogonal step for FighterId into a reachable neighbor cell; returns
 // false when no neighbor is legal (blocked board edge case).
 bool StepOneCell(FS09CommandUi& Ui, const FS08Snapshot& Snap, const FS08BoardModel& Board,
@@ -1600,8 +1615,7 @@ void AS08FlowGameMode::RunS09Auto() {
   // - without this reset three SUCCESSFUL cycles of one id tripped the
   // "stayed open" hold and actually stranded the fresh head (S09 10:29 run).
   if (CommandUi.Mode != ES09CommandMode::PendingChoice) {
-    S09PendingAutoKey.Reset();
-    S09PendingAutoSends = 0;
+    S09PendingAutoBudget.Observe(FString());
   }
   if (CommandUi.Mode == ES09CommandMode::CombatDefense) {
     // Bounded UI-capture wait (GD-034): hold for the file up to 12s after the
@@ -1862,26 +1876,31 @@ void AS08FlowGameMode::RunS09Auto() {
     }
     if (bPicked) {
       // Bounded retries: the SAME head still being open after several
-      // authoritative sends means the server keeps rejecting the answer (or
-      // the mutation is lost) - stop, log ONCE, let the head stay visibly
-      // blocked for the report instead of flooding retries.
-      if (S09PendingAutoKey != CommandUi.PendingChoice.Id) {
-        S09PendingAutoKey = CommandUi.PendingChoice.Id;
-        S09PendingAutoSends = 0;
-      }
-      if (++S09PendingAutoSends > S09PendingAutoMaxSends) {
+      // ACTUALLY DISPATCHED answers means the server keeps rejecting the
+      // answer (or the mutation is lost) - stop, log ONCE, let the head stay
+      // visibly blocked for the report instead of flooding retries.
+      // S10 review P1(1): the budget is consumed ONLY on a real dispatch - a
+      // gate-blocked tick (stream reconnecting, recovery lock) leaves the
+      // budget intact, so four blocked ticks can no longer permanently hold
+      // a head that was never answered.
+      S09PendingAutoBudget.Observe(CommandUi.PendingChoice.Id);
+      if (S09PendingAutoBudget.Exhausted()) {
         if (S09PendingWaitTraceKey != CommandUi.PendingChoice.Id) {
           S09PendingWaitTraceKey = CommandUi.PendingChoice.Id;
           FS08Trace::Write(FString::Printf(
-              TEXT("S09AUTO pending head %s stayed open after %d auto-answers (type=%s) - holding (bounded)"),
-              *CommandUi.PendingChoice.Id, S09PendingAutoMaxSends, *Type));
+              TEXT("S09AUTO pending head %s stayed open after %d dispatched auto-answers (type=%s) - holding (bounded)"),
+              *CommandUi.PendingChoice.Id, S09PendingAutoBudget.Max, *Type));
         }
         return;
       }
-      FS08Trace::Write(FString::Printf(
-          TEXT("S09AUTO pending picked (type=%s stage=%d)"), *Type,
-          CommandUi.PendingChoice.Stage));
-      ConfirmCombat();
+      if (FS09AutoDraftTransitions::PendingAutoAnswer(ConfirmCombat(),
+                                                     S09PendingAutoBudget)) {
+        FS08Trace::Write(FString::Printf(
+            TEXT("S09AUTO pending picked (type=%s stage=%d)"), *Type,
+            CommandUi.PendingChoice.Stage));
+      }
+      // Gate-blocked send: no attempt counted, no mode change, no "sent"
+      // trace - the pick stays intact and the next tick retries.
     } else if (CommandUi.PendingChoice.bOptional) {
       // Same once-per-head rate limit as the stuck branch: a rejected decline
       // used to re-log on every tick until the server deadline closed it.
@@ -1908,8 +1927,23 @@ void AS08FlowGameMode::RunS09Auto() {
   if (HasPlan(TEXT("attack")) && Hud.bViewerTurn && CommandUi.Mode == ES09CommandMode::None &&
       (Snap.Phase == TEXT("ACTION_MANEUVER") || Snap.Phase == TEXT("ACTION_ATTACK")) &&
       FS08Contracts::PendingManeuverId(Snap).IsEmpty() && Hud.ActionsRemaining > 0) {
+    // S10 review P1(5): bounded per-turn attack retries. Every definitive
+    // server rejection of a dispatched attack (OnCommandRejected -> the
+    // handler below) closes the draft and counts here; a fresh turn opens a
+    // new window. Exhausted = skip attacks this turn, fall through to the
+    // maneuver plan (the duel keeps progressing, no retry flood).
+    const FString AttackBudgetKey = FString::Printf(TEXT("turn-%d"), Snap.TurnCount);
+    S09AttackAutoBudget.Observe(AttackBudgetKey);
     FString Reason;
-    if (CommandUi.CanOpenAttackDraft(Snap, Reason)) {
+    const bool bAttackBudgetLeft = !S09AttackAutoBudget.Exhausted();
+    if (!bAttackBudgetLeft) {
+      if (S09AttackRejectTraceKey != AttackBudgetKey) {
+        S09AttackRejectTraceKey = AttackBudgetKey;
+        FS08Trace::Write(FString::Printf(
+            TEXT("S09AUTO attack retries exhausted for turn %d (%d definitive rejections) - falling through to maneuvers"),
+            Snap.TurnCount, S09AttackAutoBudget.Max));
+      }
+    } else if (CommandUi.CanOpenAttackDraft(Snap, Reason)) {
       // P1 regression (packaged run 2026-09-27 14:42:59, seq1 stall): the
       // driver used to enter the draft while the controller's command gate was
       // still closed, log "ATTACK sent", flip the mode and stall the seat for

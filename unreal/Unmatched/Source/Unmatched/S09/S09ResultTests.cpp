@@ -102,6 +102,32 @@ bool FixtureViewerIds(const FS08Snapshot& Snapshot, FString& OutFirst, FString& 
   OutSecond = (*P1)->GetStringField(TEXT("userId"));
   return !OutFirst.IsEmpty() && !OutSecond.IsEmpty();
 }
+
+/** Minimal graphql-transport-ws 'next' frame for the harness-registered
+ *  operation (s08-1). Carries ONLY the baseline scalars: the delivered frame
+ *  proves the operation live (Sol6 review P1(3) bGameStateOpLive) while the
+ *  equal seq collapses in the seq guard as a merge. Projections are
+ *  deliberately absent - an event that shipped dummy players/handZones would
+ *  overwrite the applied fixture state and fail critical-field validation. */
+FString BarrierNextFrame(const FS08Snapshot& Baseline) {
+  TSharedRef<FJsonObject> Frame = MakeShared<FJsonObject>();
+  Frame->SetStringField(TEXT("type"), TEXT("next"));
+  Frame->SetStringField(TEXT("id"), TEXT("s08-1"));
+  TSharedRef<FJsonObject> Payload = MakeShared<FJsonObject>();
+  TSharedRef<FJsonObject> Data = MakeShared<FJsonObject>();
+  TSharedRef<FJsonObject> Event = MakeShared<FJsonObject>();
+  Event->SetNumberField(TEXT("sequenceNumber"), Baseline.SequenceNumber);
+  Event->SetStringField(TEXT("phase"), Baseline.Phase);
+  Event->SetNumberField(TEXT("turnCount"), Baseline.TurnCount);
+  Event->SetStringField(TEXT("currentTurnPlayerId"), Baseline.CurrentTurnPlayerId);
+  Data->SetObjectField(TEXT("gameStateUpdated"), Event);
+  Payload->SetObjectField(TEXT("data"), Data);
+  Frame->SetObjectField(TEXT("payload"), Payload);
+  FString Out;
+  auto Writer = TJsonWriterFactory<>::Create(&Out);
+  FJsonSerializer::Serialize(Frame, Writer);
+  return Out;
+}
 } // namespace
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09ResultWinnerParseTest,
@@ -302,6 +328,17 @@ bool FS09EndTurnPhaseGateTest::RunTest(const FString&) {
   Flow.OnTrace.AddLambda([&Traces](const FString& Line) { Traces.Add(Line); });
   Flow.AttachStreamHarnessForTest(TEXT("gate-game"));
 
+  // Sol6 review P1(3): the gameplay gate demands a PROVEN-live operation -
+  // the harness subscribe alone leaves IsStreamReady closed, so every endTurn
+  // below would be blocked as "stream reconnecting" before the phase logic.
+  // Baseline the fixture body, then deliver the subscription's first 'next'
+  // for op s08-1 at the SAME seq/phase/turn owner (a barrier merge).
+  TestFalse("harness alone does not open the endTurn gate", Flow.IsStreamReady());
+  Flow.ApplySnapshot(Base);
+  Flow.InjectWsFrameForTest(BarrierNextFrame(Flow.GetAppliedSnapshot()));
+  TestTrue("first delivered frame proves the stream live", Flow.IsStreamReady());
+  TestEqual("no HTTP leg sent yet", Flow.GetTestHttpSendCountForTest(), 0);
+
   // Server network guard (game-turn.guard ActionEconomy) accepts endTurn ONLY
   // in ACTION_MANEUVER/ACTION_ATTACK. The S09 duel run 2026-09-26 sent 8
   // endTurn mutations from COMBAT/COMBAT_RESOLVE and burned authoritative
@@ -320,6 +357,8 @@ bool FS09EndTurnPhaseGateTest::RunTest(const FString&) {
     TestTrue(FString::Printf(TEXT("endTurn blocked in %s"), Phase), bBlocked);
     TestFalse(FString::Printf(TEXT("no mutation left the client in %s"), Phase),
               Flow.IsManeuverInFlight());
+    TestEqual(FString::Printf(TEXT("no HTTP leg spent in %s"), Phase),
+              Flow.GetTestHttpSendCountForTest(), 0);
   };
   PhaseBlocked(TEXT("COMBAT"));
   PhaseBlocked(TEXT("COMBAT_RESOLVE"));
@@ -336,11 +375,12 @@ bool FS09EndTurnPhaseGateTest::RunTest(const FString&) {
     Snap.SequenceNumber = Flow.GetAppliedSnapshot().SequenceNumber + 1;
     Flow.ApplySnapshot(Snap);
     Traces.Reset();
-    Flow.EndTurn();
+    TestTrue("endTurn dispatched", Flow.EndTurn());
     TestFalse("endTurn not blocked in ACTION_MANEUVER",
               Traces.ContainsByPredicate([](const FString& Line) {
                 return Line.Contains(TEXT("ENDTURN blocked"));
               }));
+    TestEqual("legal phase: exactly one HTTP leg", Flow.GetTestHttpSendCountForTest(), 1);
     TestTrue("endTurn leg in flight (send allowed)", Flow.IsManeuverInFlight());
   }
   return true;

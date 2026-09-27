@@ -29,7 +29,9 @@ public:
   FOnWsClosed OnClosedTransport;
 
   /** Fired when the server ends a TRACKED operation: a subscription-level
-   *  'error' or 'complete' frame while the socket itself stays open. The
+   *  'error' or 'complete' frame, or a 'next' frame that cannot yield a
+   *  snapshot (errors[] instead of data, data.gameStateUpdated absent/null,
+   *  contract-parse failure) - while the socket itself stays open. The
    *  operation id is already unregistered (Pending removed) - a resubscribe
    *  on this socket must use a NEW id. Not fired for transport closes (see
    *  OnClosedTransport) or for frames of already-unregistered ids. */
@@ -61,11 +63,16 @@ public:
   /** Test seams: drive the protocol state machine without a socket. */
   void ForceAckedForTest() { bAcked = true; }
   void InjectServerFrameForTest(const FString& Raw) { HandleMessage(Raw); }
+  /** Every outgoing frame (subscribe/complete/pong), including the ones a
+   *  socket-less harness produces - proves client->server traffic. */
+  const TArray<FString>& GetSentFramesForTest() const { return SentFramesForTest; }
 #endif
 
 private:
   void SendMessage(const TSharedRef<FJsonObject>& Message);
   void HandleMessage(const FString& Raw);
+  /** Best-effort graphql-transport-ws "complete" for an operation id. */
+  void SendComplete(const FString& OperationId);
   /** "message" fields from a GraphQL errors[] array, joined with '; '.
    *  Tolerates missing/non-object entries (partial errors). */
   static FString JoinErrorMessages(const TArray<TSharedPtr<FJsonValue>>& Errors);
@@ -80,4 +87,7 @@ private:
   TMap<FString, FPending> Pending;
   int32 NextOperationId = 0;
   bool bAcked = false;
+#if WITH_AUTOMATION_TESTS
+  TArray<FString> SentFramesForTest;
+#endif
 };

@@ -5,10 +5,14 @@ param(
   [int]$RunSeconds = 480,
   [string]$ShotMode = "request",
   [string]$EnvFile = "",
-  # Fail fast when both seats are subscribed but no fresh 'SNAPSHOT applied'
-  # line appears for this many seconds (the 2026-09-27 packaged run stalled
-  # silently at seq 1 for the full timeout). 0 disables the watchdog.
-  [int]$StallSeconds = 90
+  # Fail fast when a seat is subscribed but no fresh 'SNAPSHOT applied' line
+  # appears for it (per seat) for this many seconds (the 2026-09-27 packaged
+  # run stalled silently at seq 1 for the full timeout). 0 disables it.
+  [int]$StallSeconds = 90,
+  # Script-level probe of the per-seat watchdog logic only (no clients, no
+  # exe, no credentials): runs synthetic trace states and exits non-zero on a
+  # wrong verdict.
+  [switch]$ProbeWatchdog
 )
 # GD-036 two-client packaged FULL-DUEL demo against the S09 worktree-local
 # backend. Both clients play the whole duel through the S09AUTO driver
@@ -44,6 +48,119 @@ $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 if (-not $Exe) { $Exe = Join-Path $RepoRoot 'unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched.exe' }
 if (-not $EvidenceDir) { $EvidenceDir = Join-Path $RepoRoot 'docs\game-design\evidence\S09\run' }
+
+# Per-seat stall watchdog state and evaluation (S10 review P2: the old
+# any-seat arming/disarming violated the two-seat contract - a watchdog armed
+# by ONE seat's subscription was silenced by the OTHER seat's progress or
+# terminal line, letting a dead seat ride along to the full timeout).
+function New-SeatWatchdogState {
+  return @{ subscribed = $false; terminal = $false; lastSeq = -1;
+            lastProgressUtc = [DateTime]::UtcNow }
+}
+
+function Update-SeatWatchdog {
+  # Mutates $State in place from one poll's trace text; returns $true when
+  # THIS seat is stalled (subscribed, not terminal, no fresh 'SNAPSHOT
+  # applied seq=' for $StallSeconds).
+  param([hashtable]$State, [string]$Text, [datetime]$NowUtc, [int]$StallSeconds)
+  if ($Text.Contains('RESULT seq=')) { $State.terminal = $true; return $false }
+  if ($State.terminal) { return $false }
+  if (-not $State.subscribed) {
+    if ($Text.Contains('SUBSCRIBED gameStateUpdated')) {
+      $State.subscribed = $true
+      $State.lastProgressUtc = $NowUtc
+    }
+    return $false
+  }
+  $maxSeq = -1
+  foreach ($m in [regex]::Matches($Text, 'SNAPSHOT applied seq=(\d+)')) {
+    $s = [int]$m.Groups[1].Value
+    if ($s -gt $maxSeq) { $maxSeq = $s }
+  }
+  if ($maxSeq -gt $State.lastSeq) {
+    $State.lastSeq = $maxSeq
+    $State.lastProgressUtc = $NowUtc
+    return $false
+  }
+  return (($NowUtc - $State.lastProgressUtc).TotalSeconds -gt $StallSeconds)
+}
+
+function Invoke-WatchdogProbe {
+  # Script-level proof of the per-seat contract without clients. Exit code
+  # carries the verdict; output documents each scenario.
+  $failures = 0
+
+  # 1) One seat streaming, the other subscribed-but-stale: the STALE seat
+  #    must trip even though the other one keeps making progress (the old
+  #    any-seat progress reset masked exactly this).
+  $healthy = New-SeatWatchdogState
+  $dead = New-SeatWatchdogState
+  $t0 = [DateTime]::UtcNow
+  $healthyText = 'SUBSCRIBED gameStateUpdated since=0'
+  $deadText = 'SUBSCRIBED gameStateUpdated since=0'
+  foreach ($seat in @($healthy, $dead)) { [void](Update-SeatWatchdog $seat $deadText $t0 90) }
+  for ($i = 1; $i -le 6; $i++) {
+    $now = $t0.AddSeconds(20 * $i)
+    $healthyText += "`nSNAPSHOT applied seq=$i"
+    $h = Update-SeatWatchdog $healthy $healthyText $now 90
+    $d = Update-SeatWatchdog $dead $deadText $now 90
+    if ($i -le 4 -and ($h -or $d)) {
+      Write-Output "PROBE1 FAIL: false stall at step $i (healthy=$h dead=$d)"; $failures++
+      break
+    }
+    if ($i -ge 5 -and -not $d) {
+      Write-Output "PROBE1 FAIL: dead seat (subscribed, seq never advanced past 0, >90s) was NOT flagged at step $i"; $failures++
+      break
+    }
+    if ($i -ge 5 -and $h) {
+      Write-Output "PROBE1 FAIL: healthy seat flagged at step $i"; $failures++
+      break
+    }
+  }
+  if ($failures -eq 0) { Write-Output 'PROBE1 ok: stalled seat trips while the streaming seat does not (per-seat progress)' }
+
+  # 2) A seat's OWN terminal line disarms only THAT seat: the terminal seat
+  #    goes silent forever without tripping; the live seat still trips on its
+  #    own stall.
+  $terminal = New-SeatWatchdogState
+  $live = New-SeatWatchdogState
+  $t0 = [DateTime]::UtcNow
+  $terminalText = "SUBSCRIBED gameStateUpdated since=0`nSNAPSHOT applied seq=9`n RESULT seq=9 outcome=VICTORY winner=X"
+  $liveText = 'SUBSCRIBED gameStateUpdated since=0'
+  foreach ($seat in @($terminal, $live)) { [void](Update-SeatWatchdog $seat 'SUBSCRIBED gameStateUpdated since=0' $t0 90) }
+  $tripped = $false
+  for ($i = 1; $i -le 6; $i++) {
+    $now = $t0.AddSeconds(20 * $i)
+    if (Update-SeatWatchdog $terminal $terminalText $now 90) {
+      Write-Output 'PROBE2 FAIL: TERMINAL seat tripped after its own RESULT line (must disarm per seat)'; $failures++
+      break
+    }
+    if (Update-SeatWatchdog $live $liveText $now 90) { $tripped = $true }
+  }
+  if (-not $tripped) {
+    Write-Output 'PROBE2 FAIL: live seat never tripped after 120s of no progress'; $failures++
+  } elseif ($failures -eq 0) {
+    Write-Output 'PROBE2 ok: terminal disarm is per seat; the quiet live seat still trips'
+  }
+
+  # 3) Unsubscribed seat never trips (subscription is the arming condition).
+  $cold = New-SeatWatchdogState
+  $t0 = [DateTime]::UtcNow
+  $tripped = $false
+  for ($i = 1; $i -le 6; $i++) {
+    if (Update-SeatWatchdog $cold 'BOOT' $t0.AddSeconds(20 * $i) 90) { $tripped = $true }
+  }
+  if ($tripped) { Write-Output 'PROBE3 FAIL: unsubscribed seat tripped'; $failures++ }
+  elseif ($failures -eq 0) { Write-Output 'PROBE3 ok: no subscription -> no arming' }
+
+  if ($failures -gt 0) { throw "watchdog probe failed ($failures failure(s))" }
+  Write-Output 'watchdog probe: all per-seat scenarios verified'
+}
+
+if ($ProbeWatchdog) {
+  Invoke-WatchdogProbe
+  exit 0
+}
 
 function Set-StagedResolution([string]$ExePath, [int]$W, [int]$H) {
   $gsDir = Join-Path (Split-Path -Parent $ExePath) 'Unmatched\Saved\Config\Windows'
@@ -376,13 +493,18 @@ function Invoke-DuelDemo {
     $pollHeaders = @{ authorization = "Bearer $tokenA" }
     $pollQuery = @{ query = 'query G($id: String!) { game(id: $id) { id status } }'; variables = @{ id = $Script:ThisRunGameId } } | ConvertTo-Json -Depth 5
     $Script:StatusSeen = New-Object System.Collections.Generic.List[string]
-    # Stall watchdog: once BOTH seats subscribed, the applied seq must keep
-    # advancing (any duel turn moves at least one seat's snapshot). Once
-    # 'RESULT seq=' exists on a seat the duel is over and its result tail may
-    # legitimately go quiet - the watchdog disarms per seat then.
+    # Per-seat stall watchdog (S10 review P2): a seat's stream must keep
+    # advancing once THAT seat subscribed; its own 'RESULT seq=' disarms only
+    # it (the result tail may go quiet). The other seat's progress or terminal
+    # line must never mask a dead seat - the 2026-09-27 run stalled like this
+    # at seq 1 on one seat until the full timeout. -ProbeWatchdog probes this
+    # logic without clients.
+    $seatWatchdogs = @{
+      host    = New-SeatWatchdogState
+      joiner  = New-SeatWatchdogState
+    }
+    $seatTraces = @{ host = $hostTrace; joiner = $joinTrace }
     $watchdogArmed = $StallSeconds -gt 0
-    $lastSeq = -1
-    $lastProgressUtc = [DateTime]::UtcNow
     while (-not $hostProc.HasExited) {
       [void]$hostProc.WaitForExit(500)
       try {
@@ -394,26 +516,11 @@ function Invoke-DuelDemo {
         }
       } catch {}
       if ($watchdogArmed -and (Test-Path -LiteralPath $hostTrace) -and (Test-Path -LiteralPath $joinTrace)) {
-        $maxSeq = -1
-        $anySubscribed = $false
-        $anyFinished = $false
-        foreach ($p in @($hostTrace, $joinTrace)) {
-          $text = Get-Content -LiteralPath $p -Raw
-          if ($text.Contains('SUBSCRIBED gameStateUpdated')) { $anySubscribed = $true }
-          if ($text.Contains('RESULT seq=')) { $anyFinished = $true }
-          foreach ($m in [regex]::Matches($text, 'SNAPSHOT applied seq=(\d+)')) {
-            $s = [int]$m.Groups[1].Value
-            if ($s -gt $maxSeq) { $maxSeq = $s }
-          }
-        }
-        if ($anyFinished) {
-          $watchdogArmed = $false # terminal tail: silence is expected
-        } elseif ($anySubscribed) {
-          if ($maxSeq -gt $lastSeq) {
-            $lastSeq = $maxSeq
-            $lastProgressUtc = [DateTime]::UtcNow
-          } elseif ((([DateTime]::UtcNow) - $lastProgressUtc).TotalSeconds -gt $StallSeconds) {
-            throw "stalled stream: both seats subscribed but no new 'SNAPSHOT applied seq=' for $StallSeconds s (last max seq=$lastSeq; the 2026-09-27 run stalled like this at seq 1 until the timeout)"
+        $nowUtc = [DateTime]::UtcNow
+        foreach ($seatName in @('host', 'joiner')) {
+          $text = Get-Content -LiteralPath $seatTraces[$seatName] -Raw
+          if (Update-SeatWatchdog -State $seatWatchdogs[$seatName] -Text $text -NowUtc $nowUtc -StallSeconds $StallSeconds) {
+            throw "stalled stream on the $seatName seat: subscribed but no new 'SNAPSHOT applied seq=' for $StallSeconds s (last max seq=$($seatWatchdogs[$seatName].lastSeq); the other seat's progress must not mask this)"
           }
         }
       }

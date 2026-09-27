@@ -11,6 +11,10 @@
 #include "S09HudModel.h"
 #include "../S08/S08BoardModel.h"
 #include "../S08/S08Contracts.h"
+#include "../S08/S08FlowController.h"
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonWriter.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/CommandLine.h"
 #include "Misc/FileHelper.h"
@@ -79,6 +83,32 @@ void WithPendingDiscard(FS08Snapshot& Snapshot, const FString& PlayerId, int32 C
   Pending->SetNumberField(TEXT("count"), Count);
   Meta->SetObjectField(TEXT("pendingHandDiscard"), Pending);
   Snapshot.Metadata = MakeShared<FJsonValueObject>(Meta);
+}
+
+/** Minimal graphql-transport-ws 'next' frame for the harness-registered
+ *  operation (s08-1). Carries ONLY the baseline scalars: the delivered frame
+ *  proves the operation live (Sol6 review P1(3) bGameStateOpLive) while the
+ *  equal seq collapses in the seq guard as a merge. Projections are
+ *  deliberately absent - an event that shipped dummy players/handZones would
+ *  overwrite the applied fixture state and fail critical-field validation. */
+FString BarrierNextFrame(const FS08Snapshot& Baseline) {
+  TSharedRef<FJsonObject> Frame = MakeShared<FJsonObject>();
+  Frame->SetStringField(TEXT("type"), TEXT("next"));
+  Frame->SetStringField(TEXT("id"), TEXT("s08-1"));
+  TSharedRef<FJsonObject> Payload = MakeShared<FJsonObject>();
+  TSharedRef<FJsonObject> Data = MakeShared<FJsonObject>();
+  TSharedRef<FJsonObject> Event = MakeShared<FJsonObject>();
+  Event->SetNumberField(TEXT("sequenceNumber"), Baseline.SequenceNumber);
+  Event->SetStringField(TEXT("phase"), Baseline.Phase);
+  Event->SetNumberField(TEXT("turnCount"), Baseline.TurnCount);
+  Event->SetStringField(TEXT("currentTurnPlayerId"), Baseline.CurrentTurnPlayerId);
+  Data->SetObjectField(TEXT("gameStateUpdated"), Event);
+  Payload->SetObjectField(TEXT("data"), Data);
+  Frame->SetObjectField(TEXT("payload"), Payload);
+  FString Out;
+  auto Writer = TJsonWriterFactory<>::Create(&Out);
+  FJsonSerializer::Serialize(Frame, Writer);
+  return Out;
 }
 
 const FS08BoardFighter* OwnHero(const FS09Fixture& F) {
@@ -552,11 +582,23 @@ bool FS09DoubleFireGateTest::RunTest(const FString&) {
     return N;
   };
 
+  // Sol6 review P1(3): the gameplay gate demands a PROVEN-live operation -
+  // the harness subscribe alone leaves IsStreamReady closed, so the duplicate
+  // assertions below could never run. Deliver the subscription's first
+  // 'next' for op s08-1 at the SAME seq/phase/turn owner as the applied
+  // baseline (a barrier merge: no state change).
+  TestFalse("harness alone does not open the command gate", Flow.IsStreamReady());
+  Flow.InjectWsFrameForTest(BarrierNextFrame(Flow.GetAppliedSnapshot()));
+  TestTrue("first delivered frame proves the stream live", Flow.IsStreamReady());
+  TestEqual("no HTTP leg sent yet", Flow.GetTestHttpSendCountForTest(), 0);
+
   const TArray<FString> Cards = {TEXT("card::1"), TEXT("card::2")};
-  Flow.DiscardToLimit(TEXT("discard:1:9"), Cards);
+  TestTrue("first discard dispatched", Flow.DiscardToLimit(TEXT("discard:1:9"), Cards));
   TestEqual("first discard passes the gate (no block)", Count(TEXT("DISCARD blocked")), 0);
+  TestEqual("first discard: exactly one HTTP leg", Flow.GetTestHttpSendCountForTest(), 1);
   TestTrue("discard leg is in flight", Flow.IsManeuverInFlight());
   Flow.DiscardToLimit(TEXT("discard:1:9"), Cards);
+  TestEqual("duplicate discard: no extra HTTP leg", Flow.GetTestHttpSendCountForTest(), 1);
   TestEqual("double Enter blocked exactly once",
             Count(TEXT("DISCARD blocked: a command is already in flight")), 1);
   TestEqual("no other block reason invented", Count(TEXT("DISCARD blocked")), 1);
@@ -571,11 +613,17 @@ bool FS09DoubleFireGateTest::RunTest(const FString&) {
   Flow2.OnTrace.AddLambda([&Traces](const FString& Line) { Traces.Add(Line); });
   Flow2.AttachStreamHarnessForTest(TEXT("gate-game"));
   Flow2.ApplySnapshot(ManeuverSnap);
+  TestFalse("harness alone does not open the submit gate", Flow2.IsStreamReady());
+  Flow2.InjectWsFrameForTest(BarrierNextFrame(Flow2.GetAppliedSnapshot()));
+  TestTrue("first delivered frame proves the submit stream live", Flow2.IsStreamReady());
+  TestEqual("no HTTP leg sent yet (submit controller)", Flow2.GetTestHttpSendCountForTest(), 0);
   const TArray<FS08ManeuverMove> NoMoves;
-  Flow2.SubmitManeuver(TEXT("maneuver-1"), NoMoves);
+  TestTrue("first submit dispatched", Flow2.SubmitManeuver(TEXT("maneuver-1"), NoMoves));
   TestEqual("first submit passes the gate", Count(TEXT("MANEUVER submit blocked")), 0);
+  TestEqual("first submit: exactly one HTTP leg", Flow2.GetTestHttpSendCountForTest(), 1);
   TestTrue("submit leg is in flight", Flow2.IsManeuverInFlight());
   Flow2.SubmitManeuver(TEXT("maneuver-1"), NoMoves);
+  TestEqual("duplicate confirm: no extra HTTP leg", Flow2.GetTestHttpSendCountForTest(), 1);
   TestEqual("double confirm blocked exactly once",
             Count(TEXT("MANEUVER submit blocked: a command is already in flight")), 1);
   return true;

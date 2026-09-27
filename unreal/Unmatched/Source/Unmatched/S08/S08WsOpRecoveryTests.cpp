@@ -168,6 +168,124 @@ bool FS08WsCompleteFrameTest::RunTest(const FString&) {
   return true;
 }
 
+// ---- S10 review: a REJECTED 'next' must stop the server-side subscription ----
+// The WS layer ends the LOCAL operation for every 'next' frame that cannot
+// yield a snapshot (errors[], null/unexpected shape, contract-parse failure),
+// but a 'next' frame is NOT terminal for the server: the subscription it
+// belongs to keeps streaming. Without an explicit client 'complete' the dead
+// operation survives server-side forever while the owner resubscribes with a
+// fresh id - two live subscriptions for one client. The socket-less harness
+// records every outgoing frame, so the test proves the 'complete' left.
+namespace {
+// Outgoing frames serialize pretty-printed: match by content pair, not layout.
+int32 CountSentFrames(const FS08GraphqlWs& Ws, const TCHAR* Needle) {
+  int32 Count = 0;
+  for (const FString& Frame : Ws.GetSentFramesForTest()) {
+    if (Frame.Contains(Needle)) ++Count;
+  }
+  return Count;
+}
+int32 CountCompletesFor(const FS08GraphqlWs& Ws, const FString& OpId) {
+  const FString IdNeedle = TEXT("\"") + OpId + TEXT("\"");
+  int32 Count = 0;
+  for (const FString& Frame : Ws.GetSentFramesForTest()) {
+    if (Frame.Contains(IdNeedle) && Frame.Contains(TEXT("complete"))) ++Count;
+  }
+  return Count;
+}
+} // namespace
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08WsRejectedNextSendsCompleteTest,
+    "Unmatched.S08.WsOp.rejected next frame sends complete for the dead operation",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08WsRejectedNextSendsCompleteTest::RunTest(const FString&) {
+  FS08GraphqlWs Ws(TEXT("ws://test.invalid"), FString());
+  Ws.ForceAckedForTest();
+
+  const TSharedPtr<FJsonObject> Event = WsNextPayloadFromFixture();
+  if (!Event.IsValid()) {
+    AddError("fixture 07 failed to parse");
+    return true;
+  }
+  // Contract-parse failure shape: valid JSON object, missing sequenceNumber.
+  TSharedRef<FJsonObject> Unparsable = MakeShared<FJsonObject>(*Event);
+  Unparsable->RemoveField(TEXT("sequenceNumber"));
+
+  int32 Snapshots = 0;
+  int32 Errors = 0;
+  TArray<FString> EndedIds;
+  Ws.OnOperationEnded.AddLambda([&](const FString& Id, const FString&) { EndedIds.Add(Id); });
+
+  // (a) null gameStateUpdated (unexpected shape): complete for THAT id.
+  {
+    const FString Op = Ws.SubscribeGameStateUpdated(
+        TEXT("g1"), 0, [&](const FS08Snapshot&) { ++Snapshots; },
+        [&](const FS08GraphQLError&) { ++Errors; });
+    Ws.InjectServerFrameForTest(
+        TEXT("{\"type\":\"next\",\"id\":\"") + Op +
+        TEXT("\",\"payload\":{\"data\":{\"gameStateUpdated\":null}}}"));
+    TestEqual("null next ends the operation", EndedIds.Num(), 1);
+    TestEqual("complete sent for the null-next id", CountCompletesFor(Ws, Op), 1);
+  }
+  // (b) errors[] 'next': complete for that id.
+  {
+    const FString Op = Ws.SubscribeGameStateUpdated(
+        TEXT("g1"), 0, [&](const FS08Snapshot&) { ++Snapshots; },
+        [&](const FS08GraphQLError&) { ++Errors; });
+    Ws.InjectServerFrameForTest(
+        TEXT("{\"type\":\"next\",\"id\":\"") + Op +
+        TEXT("\",\"payload\":{\"errors\":[{\"message\":\"resolver blew up\"}]}}"));
+    TestEqual("errors next ends the operation", EndedIds.Num(), 2);
+    TestEqual("complete sent for the errors-next id", CountCompletesFor(Ws, Op), 1);
+  }
+  // (c) contract-parse failure inside data.gameStateUpdated: complete for that id.
+  {
+    const FString Op = Ws.SubscribeGameStateUpdated(
+        TEXT("g1"), 0, [&](const FS08Snapshot&) { ++Snapshots; },
+        [&](const FS08GraphQLError&) { ++Errors; });
+    Ws.InjectServerFrameForTest(MakeNextFrame(Op, Unparsable));
+    TestEqual("unparsable event ends the operation", EndedIds.Num(), 3);
+    TestEqual("complete sent for the unparsable-next id", CountCompletesFor(Ws, Op), 1);
+  }
+
+  // (d) Semantic guards: a VALID 'next' delivers and sends NO complete; a
+  // server 'error'/'complete' frame is ALREADY terminal server-side - echoing
+  // our own complete back would risk a loop, so none is sent.
+  {
+    const FString Op = Ws.SubscribeGameStateUpdated(
+        TEXT("g1"), 0, [&](const FS08Snapshot&) { ++Snapshots; },
+        [&](const FS08GraphQLError&) { ++Errors; });
+    const int32 CompleteBefore = CountSentFrames(Ws, TEXT("complete"));
+    Ws.InjectServerFrameForTest(MakeNextFrame(Op, Event));
+    TestEqual("valid next delivered", Snapshots, 1);
+    TestEqual("valid next sends no complete",
+              CountSentFrames(Ws, TEXT("complete")), CompleteBefore);
+
+    Ws.InjectServerFrameForTest(
+        TEXT("{\"type\":\"error\",\"id\":\"") + Op +
+        TEXT("\",\"payload\":[{\"message\":\"rejected\"}]}"));
+    TestEqual("server error needs no client complete",
+              CountSentFrames(Ws, TEXT("complete")), CompleteBefore);
+
+    const FString Op2 = Ws.SubscribeGameStateUpdated(
+        TEXT("g1"), 0, [&](const FS08Snapshot&) { ++Snapshots; },
+        [&](const FS08GraphQLError&) { ++Errors; });
+    Ws.InjectServerFrameForTest(TEXT("{\"type\":\"complete\",\"id\":\"") + Op2 + TEXT("\"}"));
+    TestEqual("server complete needs no client complete",
+              CountSentFrames(Ws, TEXT("complete")), CompleteBefore);
+  }
+
+  // (e) Unsubscribe still sends exactly one complete for the operation.
+  {
+    const FString Op = Ws.SubscribeGameStateUpdated(
+        TEXT("g1"), 0, [&](const FS08Snapshot&) { ++Snapshots; },
+        [&](const FS08GraphQLError&) { ++Errors; });
+    Ws.Unsubscribe(Op);
+    TestEqual("unsubscribe complete sent once", CountCompletesFor(Ws, Op), 1);
+  }
+  return true;
+}
+
 // ---- WS + flow level: malformed (unparseable) server frame -------------------
 // A frame that fails the crash-safe pre-scan has NO readable operation id.
 // The WS layer used to only log a warning and return - the flow controller
