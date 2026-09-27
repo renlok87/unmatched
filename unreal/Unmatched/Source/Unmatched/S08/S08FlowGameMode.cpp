@@ -66,7 +66,14 @@ void AS08FlowGameMode::BeginPlay() {
   Flow->OnRoom.AddLambda([this](const FS08RoomState&) { RefreshUi(); });
   Flow->OnFlowError.AddLambda([this](const FS08GraphQLError& Error) {
     TraceLines.Add(TEXT("[error] ") + Error.Code + TEXT(": ") + Error.Message);
+    // GD-038 (ACC-021): an expired session routes the player back to the
+    // login screen - visible, no automatic retry anywhere.
+    if (Error.Code == TEXT("SESSION_EXPIRED")) {
+      Toast = TEXT("session expired - sign in again (F10 panel)");
+      ToastUntil = Elapsed + 10.0f;
+    }
     RefreshUi();
+    RefreshHud();
   });
   Flow->OnLeaveFailed.AddLambda([this](const FS08GraphQLError& Error) {
     if (!bS09LobbyReturnSent) return;
@@ -739,8 +746,15 @@ void AS08FlowGameMode::TryManeuverTo(int32 CellX, int32 CellY) {
   if (PendingId.IsEmpty()) {
     ManeuverTargetX = CellX;       // remembered for the submit leg
     ManeuverTargetY = CellY;
-    bAwaitManeuverFinish = true;
-    Flow->BeginManeuver();         // submit leg runs from Tick once pending exists
+    // P1 regression: a blocked begin (stream not ready/recovery lock) must
+    // not leave the await flag armed - the submit leg would never fire.
+    bAwaitManeuverFinish = Flow->BeginManeuver();
+    if (!bAwaitManeuverFinish) {
+      ManeuverTargetX = ManeuverTargetY = -1;
+      Toast = TEXT("maneuver blocked - see trace; the state stream is not ready yet");
+      ToastUntil = Elapsed + 3.0f;
+      RefreshHud();
+    }
     return;
   }
   FinishPendingManeuver(CellX, CellY);
@@ -768,7 +782,12 @@ void AS08FlowGameMode::FinishPendingManeuver(int32 CellX, int32 CellY) {
     return;
   }
   Moves.Add(Move);
-  Flow->SubmitManeuver(PendingId, Moves);
+  if (!Flow->SubmitManeuver(PendingId, Moves)) {
+    bAwaitManeuverFinish = false;
+    Toast = TEXT("maneuver not sent - command gate blocked it (see trace)");
+    ToastUntil = Elapsed + 3.0f;
+    RefreshHud();
+  }
 }
 
 // ---- GD-033 command handlers ---------------------------------------------
@@ -929,9 +948,12 @@ void AS08FlowGameMode::BeginManeuverCommand() {
     RefreshHud();
     return;
   }
-  Toast = TEXT("begin maneuver sent (server draws 1 card)");
+  if (Flow->BeginManeuver()) {
+    Toast = TEXT("begin maneuver sent (server draws 1 card)");
+  } else {
+    Toast = TEXT("begin maneuver not sent - command gate blocked it (see trace)");
+  }
   ToastUntil = Elapsed + 3.0f;
-  Flow->BeginManeuver();
   RefreshHud();
 }
 
@@ -953,8 +975,11 @@ void AS08FlowGameMode::ConfirmDraft() {
     if (S09FirstConfirmSeq < 0) {
       S09FirstConfirmSeq = Flow->GetAppliedSnapshot().SequenceNumber;
     }
-    Flow->SubmitManeuver(Command.ManeuverId, Command.Moves, Command.BoostCardId);
-    NextCommandAt = Elapsed + 1.2f;
+    if (Flow->SubmitManeuver(Command.ManeuverId, Command.Moves, Command.BoostCardId)) {
+      NextCommandAt = Elapsed + 1.2f;
+    } else {
+      Toast = TEXT("maneuver confirm not sent - command gate blocked it (see trace)");
+    }
     RefreshHud();
     return;
   }
@@ -970,8 +995,11 @@ void AS08FlowGameMode::ConfirmDraft() {
     FS08Trace::Write(FString::Printf(TEXT("DISCARD-CONFIRM pending=%s count=%d ids=%s"),
                                      *Command.PendingId, Command.CardInstanceIds.Num(),
                                      *FString::Join(Command.CardInstanceIds, TEXT(","))));
-    Flow->DiscardToLimit(Command.PendingId, Command.CardInstanceIds);
-    NextCommandAt = Elapsed + 1.2f;
+    if (Flow->DiscardToLimit(Command.PendingId, Command.CardInstanceIds)) {
+      NextCommandAt = Elapsed + 1.2f;
+    } else {
+      Toast = TEXT("discard not sent - command gate blocked it (see trace)");
+    }
     RefreshHud();
     return;
   }
@@ -1020,10 +1048,11 @@ void AS08FlowGameMode::EndTurnCommand() {
     // an authoritative 'Invalid phase' rejection (8 in the S09 11:47 run).
     Toast = FString::Printf(TEXT("end turn waits for an action phase (now %s)"),
                             *Snap.Phase);
-  } else {
+  } else if (Flow->EndTurn()) {
     FS08Trace::Write(TEXT("ENDTURN sent"));
-    Flow->EndTurn();
     Toast = TEXT("end turn sent");
+  } else {
+    Toast = TEXT("end turn not sent - command gate blocked it (see trace)");
   }
   ToastUntil = Elapsed + 3.0f;
   RefreshHud();
@@ -1064,9 +1093,12 @@ void AS08FlowGameMode::NoDefenseCommand() {
     RefreshHud();
     return;
   }
-  FS08Trace::Write(TEXT("NO-DEFENSE sent (defender closes the window)"));
-  Flow->ResolveCombat();
-  Toast = TEXT("no defense - resolving");
+  if (Flow->ResolveCombat()) {
+    FS08Trace::Write(TEXT("NO-DEFENSE sent (defender closes the window)"));
+    Toast = TEXT("no defense - resolving");
+  } else {
+    Toast = TEXT("no defense not sent - command gate blocked it (see trace)");
+  }
   ToastUntil = Elapsed + 3.0f;
   RefreshHud();
 }
@@ -1080,9 +1112,12 @@ void AS08FlowGameMode::ResolveCombatCommand() {
     RefreshHud();
     return;
   }
-  FS08Trace::Write(TEXT("RESOLVE sent"));
-  Flow->ResolveCombat();
-  Toast = TEXT("resolve sent");
+  if (Flow->ResolveCombat()) {
+    FS08Trace::Write(TEXT("RESOLVE sent"));
+    Toast = TEXT("resolve sent");
+  } else {
+    Toast = TEXT("resolve not sent - command gate blocked it (see trace)");
+  }
   ToastUntil = Elapsed + 3.0f;
   RefreshHud();
 }
@@ -1107,10 +1142,13 @@ void AS08FlowGameMode::DeclinePendingChoiceCommand() {
     RefreshHud();
     return;
   }
-  FS08Trace::Write(FString::Printf(TEXT("PEND-DECLINE sent type=%s"),
-                                   *CommandUi.PendingChoice.Type));
-  Flow->DeclinePendingEffect(Command.EffectId);
-  Toast = TEXT("boost declined");
+  if (Flow->DeclinePendingEffect(Command.EffectId)) {
+    FS08Trace::Write(FString::Printf(TEXT("PEND-DECLINE sent type=%s"),
+                                     *CommandUi.PendingChoice.Type));
+    Toast = TEXT("boost declined");
+  } else {
+    Toast = TEXT("decline not sent - command gate blocked it (see trace)");
+  }
   ToastUntil = Elapsed + 3.0f;
   RefreshHud();
 }
@@ -1166,17 +1204,22 @@ void AS08FlowGameMode::ConfirmSchemeCommand() {
     RefreshHud();
     return;
   }
-  FS08Trace::Write(TEXT("SCHEME sent"));
-  Flow->PlayScheme(InstanceId);
-  CommandUi.Mode = ES09CommandMode::None;
-  CommandUi.SchemeCardId.Reset();
-  Toast = TEXT("scheme sent");
+  if (Flow->PlayScheme(InstanceId)) {
+    FS08Trace::Write(TEXT("SCHEME sent"));
+    CommandUi.Mode = ES09CommandMode::None;
+    CommandUi.SchemeCardId.Reset();
+    Toast = TEXT("scheme sent");
+  } else {
+    // Keep the picker open with the pick intact: the command was NOT sent, so
+    // closing would silently eat the player's choice.
+    Toast = TEXT("scheme not sent - command gate blocked it (see trace)");
+  }
   ToastUntil = Elapsed + 3.0f;
   RefreshHud();
 }
 
-void AS08FlowGameMode::ConfirmCombat() {
-  if (!Flow.IsValid()) return;
+bool AS08FlowGameMode::ConfirmCombat() {
+  if (!Flow.IsValid()) return false;
   const FS08Snapshot& Snap = EffectiveSnapshot();
   FString Reason;
   if (CommandUi.Mode == ES09CommandMode::AttackDraft) {
@@ -1185,15 +1228,22 @@ void AS08FlowGameMode::ConfirmCombat() {
       Toast = TEXT("attack rejected: ") + Reason;
       ToastUntil = Elapsed + 3.0f;
       RefreshHud();
-      return;
+      return false;
     }
-    FS08Trace::Write(TEXT("ATTACK sent"));
-    Flow->Attack(Command.AttackerFighterId, Command.CardInstanceId,
-                 Command.TargetFighterId);
-    Toast = TEXT("attack sent");
+    // P1 regression (packaged run 2026-09-27): "ATTACK sent" must mean the
+    // controller actually dispatched it - a gate-blocked attack used to log
+    // "sent", flip the mode and stall the seat forever at seq1.
+    const bool bSent = Flow->Attack(Command.AttackerFighterId, Command.CardInstanceId,
+                                    Command.TargetFighterId);
+    if (bSent) {
+      FS08Trace::Write(TEXT("ATTACK sent"));
+      Toast = TEXT("attack sent");
+    } else {
+      Toast = TEXT("attack not sent - command gate blocked it (see trace)");
+    }
     ToastUntil = Elapsed + 3.0f;
     RefreshHud();
-    return;
+    return bSent;
   }
   if (CommandUi.Mode == ES09CommandMode::CombatDefense) {
     FS09DefenseCommand Command;
@@ -1201,14 +1251,18 @@ void AS08FlowGameMode::ConfirmCombat() {
       Toast = TEXT("defense rejected: ") + Reason;
       ToastUntil = Elapsed + 3.0f;
       RefreshHud();
-      return;
+      return false;
     }
-    FS08Trace::Write(TEXT("DEFENSE sent"));
-    Flow->PlayDefense(Command.CardInstanceId);
-    Toast = TEXT("defense sent");
+    const bool bSent = Flow->PlayDefense(Command.CardInstanceId);
+    if (bSent) {
+      FS08Trace::Write(TEXT("DEFENSE sent"));
+      Toast = TEXT("defense sent");
+    } else {
+      Toast = TEXT("defense not sent - command gate blocked it (see trace)");
+    }
     ToastUntil = Elapsed + 3.0f;
     RefreshHud();
-    return;
+    return bSent;
   }
   if (CommandUi.Mode == ES09CommandMode::PendingChoice) {
     FS09PendingChoiceCommand Command;
@@ -1216,18 +1270,22 @@ void AS08FlowGameMode::ConfirmCombat() {
       Toast = TEXT("choice rejected: ") + Reason;
       ToastUntil = Elapsed + 3.0f;
       RefreshHud();
-      return;
+      return false;
     }
-    FS08Trace::Write(FString::Printf(TEXT("PEND-RESOLVE sent type=%s stage=%d id=%s"),
-                                     *CommandUi.PendingChoice.Type, CommandUi.PendingChoice.Stage,
-                                     *Command.EffectId));
-    Flow->ResolvePendingEffect(Command.EffectId, Command.FighterId, Command.bHasCell,
-                               Command.CellX, Command.CellY, Command.OptionIndex >= 0,
-                               Command.OptionIndex, Command.CardIds);
-    Toast = TEXT("choice sent");
+    const bool bSent = Flow->ResolvePendingEffect(
+        Command.EffectId, Command.FighterId, Command.bHasCell, Command.CellX, Command.CellY,
+        Command.OptionIndex >= 0, Command.OptionIndex, Command.CardIds);
+    if (bSent) {
+      FS08Trace::Write(FString::Printf(TEXT("PEND-RESOLVE sent type=%s stage=%d id=%s"),
+                                       *CommandUi.PendingChoice.Type,
+                                       CommandUi.PendingChoice.Stage, *Command.EffectId));
+      Toast = TEXT("choice sent");
+    } else {
+      Toast = TEXT("choice not sent - command gate blocked it (see trace)");
+    }
     ToastUntil = Elapsed + 3.0f;
     RefreshHud();
-    return;
+    return bSent;
   }
   if (CommandUi.Mode == ES09CommandMode::CombatResolve) {
     ResolveCombatCommand();
@@ -1235,6 +1293,7 @@ void AS08FlowGameMode::ConfirmCombat() {
   if (CommandUi.Mode == ES09CommandMode::SchemeChoice) {
     ConfirmSchemeCommand();
   }
+  return false;
 }
 
 void AS08FlowGameMode::HandleHudKeys() {
@@ -1851,6 +1910,22 @@ void AS08FlowGameMode::RunS09Auto() {
       FS08Contracts::PendingManeuverId(Snap).IsEmpty() && Hud.ActionsRemaining > 0) {
     FString Reason;
     if (CommandUi.CanOpenAttackDraft(Snap, Reason)) {
+      // P1 regression (packaged run 2026-09-27 14:42:59, seq1 stall): the
+      // driver used to enter the draft while the controller's command gate was
+      // still closed, log "ATTACK sent", flip the mode and stall the seat for
+      // the rest of the run. Entering the draft requires the gate OPEN.
+      FString GateReason;
+      if (!Flow->CanIssueCombatCommand(GateReason)) {
+        const FString WaitKey = TEXT("stream-gate-closed");
+        if (S09PendingWaitTraceKey != WaitKey) {
+          S09PendingWaitTraceKey = WaitKey;
+          FS08Trace::Write(FString::Printf(
+              TEXT("S09AUTO attack deferred - command gate closed (%s); retrying when the stream is ready"),
+              *GateReason));
+        }
+        return;
+      }
+      S09PendingWaitTraceKey.Reset();
       CommandUi.Mode = ES09CommandMode::AttackDraft;
       const FS09PlayerPanel* Own = Hud.ViewerPanel();
       const FS09CardView* Chosen = nullptr;
@@ -1914,7 +1989,16 @@ void AS08FlowGameMode::RunS09Auto() {
         FS08Trace::Write(FString::Printf(
             TEXT("S09AUTO attack (attacker=%s target-set card-set)"),
             *CommandUi.AttackAttackerId));
-        ConfirmCombat();
+        if (!ConfirmCombat()) {
+          // Gate closed between the pre-entry check and the confirm (e.g. the
+          // stream died mid-pick): back out of the draft and retry later
+          // instead of parking in mode=AttackDraft forever.
+          CommandUi.Mode = ES09CommandMode::None;
+          CommandUi.AttackAttackerId.Reset();
+          CommandUi.AttackTargetId.Reset();
+          CommandUi.AttackCardId.Reset();
+          NextCommandAt = Elapsed + 1.0f;
+        }
       } else {
         // No legal pair: close the draft and fall through to maneuvering.
         CommandUi.Mode = ES09CommandMode::None;
@@ -1951,9 +2035,12 @@ void AS08FlowGameMode::RunS09Auto() {
         if (!Fallback) Fallback = &Card;
       }
       if (Fallback) {
-        FS08Trace::Write(TEXT("S09AUTO scheme"));
-        Flow->PlayScheme(Fallback->InstanceId);
-        NextCommandAt = Elapsed + 1.2f;
+        if (Flow->PlayScheme(Fallback->InstanceId)) {
+          FS08Trace::Write(TEXT("S09AUTO scheme"));
+          NextCommandAt = Elapsed + 1.2f;
+        }
+        // Blocked scheme: no advance, no log - the next tick retries once the
+        // command gate reopens (the controller already traces the block).
         return;
       }
     }
@@ -3256,6 +3343,24 @@ void AS08FlowGameMode::RefreshHud() {
                                               : TEXT("RETURN TO LOBBY (L)")))
                   .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]];
     return;
+  }
+
+  // ---- GD-037 (ACC-012): reconnect / lost-response recovery overlay. Input
+  // is already locked by the controller gates; the banner states WHY. ----
+  if (Flow.IsValid() &&
+      (Flow->IsAwaitingStateRecovery() ||
+       (Flow->GetStage() == ES08Stage::Started && !Flow->IsStreamReady()))) {
+    CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 6)
+        [SNew(SBorder)
+             .BorderBackgroundColor(FLinearColor(0.55f, 0.35f, 0.1f, 0.9f))
+             .Padding(8)
+               [SNew(STextBlock)
+                    .Text(FText::FromString(
+                        Flow->IsAwaitingStateRecovery()
+                            ? TEXT("RECONNECTING: restoring authoritative state - input locked")
+                            : TEXT("RECONNECTING: re-establishing the live stream - input locked")))
+                    .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))
+                    .ColorAndOpacity(FSlateColor(FLinearColor::White))]];
   }
 
   // ---- own hand strip (exact instance ids - GD-032) ----

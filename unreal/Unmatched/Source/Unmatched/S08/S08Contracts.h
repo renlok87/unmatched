@@ -13,9 +13,12 @@
 
 /** Actionable client-facing error extracted from a GraphQL response. */
 struct UNMATCHED_API FS08GraphQLError {
-  FString Code;    // extensions.code or "GRAPHQL" / "TRANSPORT" / "PARSE"
+  FString Code;    // extensions.code or "GRAPHQL" / "TRANSPORT" / "PARSE" /
+                   // "AUTH" / "RATE_LIMIT" / "SESSION_EXPIRED"
   FString Message; // human-readable, safe to show (backend sanitizes)
   FString Path;    // dotted response path when present
+  int32 HttpStatus = 0; // raw HTTP status when the response was not 200
+                        // (0 = no HTTP answer at all / transport loss)
 };
 
 /** Snapshot of a viewer-projected game state (HTTP query gameState and WS
@@ -148,9 +151,12 @@ struct UNMATCHED_API FS08SeqGuard {
 class UNMATCHED_API FS08Contracts {
 public:
   // ---- Auth ----
+  /** AuthResponseDto parser shared by login and refreshTokens (FieldName
+   *  picks the data.<Field> payload; both return the same shape). */
   static bool ParseAuthResponse(const FString& Body, FString& OutAccessToken,
                                 FString& OutRefreshToken, FString& OutUserId,
-                                FString& OutUsername, FS08GraphQLError& OutError);
+                                FString& OutUsername, FS08GraphQLError& OutError,
+                                const TCHAR* FieldName = TEXT("login"));
 
   // ---- HTTP query gameState(gameId) ----
   // Returns false with OutError on GraphQL errors[], malformed body or

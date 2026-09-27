@@ -38,9 +38,17 @@ void FS08GraphqlClient::Execute(const FString& Query, const TSharedPtr<FJsonObje
         const int32 StatusCode = Response->GetResponseCode();
         const FString Body = Response->GetContentAsString();
         if (StatusCode != 200) {
+          // GD-038: the HTTP status is part of the error contract - 401 (the
+          // guard rejected the token) and 429 (throttled) drive the auth /
+          // no-blind-retry recovery paths in the controller; 5xx means the
+          // request outcome is UNKNOWN (a mutation may have been applied).
+          const TCHAR* Code = StatusCode == 401   ? TEXT("AUTH")
+                              : StatusCode == 429 ? TEXT("RATE_LIMIT")
+                                                  : TEXT("TRANSPORT");
           TArray<FS08GraphQLError> Errors;
-          Errors.Add({TEXT("TRANSPORT"),
-                      FString::Printf(TEXT("HTTP %d from server"), StatusCode), FString()});
+          Errors.Add({Code,
+                      FString::Printf(TEXT("HTTP %d from server"), StatusCode), FString(),
+                      StatusCode});
           OnDone(false, Errors, nullptr, Body);
           return;
         }

@@ -4,7 +4,11 @@ param(
   [string]$EvidenceDir = "",
   [int]$RunSeconds = 480,
   [string]$ShotMode = "request",
-  [string]$EnvFile = ""
+  [string]$EnvFile = "",
+  # Fail fast when both seats are subscribed but no fresh 'SNAPSHOT applied'
+  # line appears for this many seconds (the 2026-09-27 packaged run stalled
+  # silently at seq 1 for the full timeout). 0 disables the watchdog.
+  [int]$StallSeconds = 90
 )
 # GD-036 two-client packaged FULL-DUEL demo against the S09 worktree-local
 # backend. Both clients play the whole duel through the S09AUTO driver
@@ -372,6 +376,13 @@ function Invoke-DuelDemo {
     $pollHeaders = @{ authorization = "Bearer $tokenA" }
     $pollQuery = @{ query = 'query G($id: String!) { game(id: $id) { id status } }'; variables = @{ id = $Script:ThisRunGameId } } | ConvertTo-Json -Depth 5
     $Script:StatusSeen = New-Object System.Collections.Generic.List[string]
+    # Stall watchdog: once BOTH seats subscribed, the applied seq must keep
+    # advancing (any duel turn moves at least one seat's snapshot). Once
+    # 'RESULT seq=' exists on a seat the duel is over and its result tail may
+    # legitimately go quiet - the watchdog disarms per seat then.
+    $watchdogArmed = $StallSeconds -gt 0
+    $lastSeq = -1
+    $lastProgressUtc = [DateTime]::UtcNow
     while (-not $hostProc.HasExited) {
       [void]$hostProc.WaitForExit(500)
       try {
@@ -382,6 +393,30 @@ function Invoke-DuelDemo {
           }
         }
       } catch {}
+      if ($watchdogArmed -and (Test-Path -LiteralPath $hostTrace) -and (Test-Path -LiteralPath $joinTrace)) {
+        $maxSeq = -1
+        $anySubscribed = $false
+        $anyFinished = $false
+        foreach ($p in @($hostTrace, $joinTrace)) {
+          $text = Get-Content -LiteralPath $p -Raw
+          if ($text.Contains('SUBSCRIBED gameStateUpdated')) { $anySubscribed = $true }
+          if ($text.Contains('RESULT seq=')) { $anyFinished = $true }
+          foreach ($m in [regex]::Matches($text, 'SNAPSHOT applied seq=(\d+)')) {
+            $s = [int]$m.Groups[1].Value
+            if ($s -gt $maxSeq) { $maxSeq = $s }
+          }
+        }
+        if ($anyFinished) {
+          $watchdogArmed = $false # terminal tail: silence is expected
+        } elseif ($anySubscribed) {
+          if ($maxSeq -gt $lastSeq) {
+            $lastSeq = $maxSeq
+            $lastProgressUtc = [DateTime]::UtcNow
+          } elseif ((([DateTime]::UtcNow) - $lastProgressUtc).TotalSeconds -gt $StallSeconds) {
+            throw "stalled stream: both seats subscribed but no new 'SNAPSHOT applied seq=' for $StallSeconds s (last max seq=$lastSeq; the 2026-09-27 run stalled like this at seq 1 until the timeout)"
+          }
+        }
+      }
     }
     $joinProc.WaitForExit()
     Write-Output "both clients exited; server statuses observed: [$($Script:StatusSeen -join ' -> ')]"

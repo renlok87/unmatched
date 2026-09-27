@@ -47,9 +47,12 @@ void FS08GraphqlWs::Connect() {
 }
 
 void FS08GraphqlWs::Close() {
-  if (!Socket.IsValid()) return;
+  // The ack state dies with the close even without a live transport (a
+  // force-acked test harness has no Socket): IsStreamReady() must observe
+  // the drop immediately, not only after a close handshake.
   bAcked = false;
   Pending.Reset();
+  if (!Socket.IsValid()) return;
   // Unconditional: Close() on a socket whose connect is still in flight
   // cancels it. Gating on IsConnected() lets a dropped socket complete its
   // handshake afterwards and ack as a zombie - its OnAcked would subscribe

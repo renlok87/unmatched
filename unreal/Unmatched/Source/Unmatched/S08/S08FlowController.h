@@ -103,6 +103,14 @@ public:
   bool IsInputBlocked() const { return !CriticalProblems.IsEmpty(); }
   const TArray<FString>& GetCriticalProblems() const { return CriticalProblems; }
 
+  /** GD-037 (ACC-012): true while a gameplay command's outcome is unknown
+   *  (lost mutation response) and the client waits for the authoritative
+   *  state. Gameplay input is locked - a resend could repeat the spend. */
+  bool IsAwaitingStateRecovery() const { return bMutationRecoveryActive; }
+  /** GD-038 (ACC-021): true once the session is dead (refresh failed/expired
+   *  and no credential is held) - the UI must route to login. */
+  bool IsSessionExpired() const { return bSessionExpired; }
+
   /** GD-031 action gate (consistent with the phase1 critical-field gate):
    *  returns an empty string when a gameplay command may be issued. */
   bool CanIssueGameplayCommand(FString& OutReason) const;
@@ -123,6 +131,11 @@ public:
   bool CanIssueEndTurn(FString& OutReason) const;
   /** True while a beginManeuver/maneuver pair is between its two HTTP legs. */
   bool IsManeuverInFlight() const { return bManeuverInFlight; }
+#if WITH_AUTOMATION_TESTS
+  /** Test seam: true once a barrier body reconciled the live stream (see
+   *  IsStreamReady). */
+  bool IsStreamReconciledForTest() const { return bStreamReconciled; }
+#endif
 
   // ---- BOOT -> LOGIN ----
   void Login(const FString& Email, const FString& Password);
@@ -148,6 +161,16 @@ public:
   /** Test hook: simulate an abrupt transport loss of the live stream. */
   void DropWsForTest();
   bool IsStreamAttached() const { return Ws.IsValid(); }
+  /** GD-037/S10: true only while a live, READY state stream exists - the
+   *  gameplay-command gate and the reconnect banner both key off this. An
+   *  acked socket alone does not count (S10 review P1(3)): the state
+   *  subscription must be live AND reconciled - the first barrier body
+   *  (HTTP gameState read or delivered WS snapshot) proved the channel
+   *  carries current server truth. A subscribe that keeps failing leaves the
+   *  gate closed even though connection_ack succeeded. */
+  bool IsStreamReady() const {
+    return Ws.IsValid() && Ws->IsAcked() && !GameStateOpId.IsEmpty() && bStreamReconciled;
+  }
 
   /** Applies an incoming snapshot through the seq guard and critical-field
    *  validation. Returns the decision taken (Ignore/Merge/Apply). */
@@ -163,6 +186,29 @@ public:
   }
   bool HasGameStateOpForTest() const { return !GameStateOpId.IsEmpty(); }
   int32 GetOpRecoveryAttemptsForTest() const { return OpRecoveryAttempts; }
+  /** GD-037/038 test seams. */
+  bool IsMutationRecoveryActiveForTest() const { return bMutationRecoveryActive; }
+  int32 GetMutationRecoveryAttemptsForTest() const { return MutationRecoveryAttempts; }
+  /** Pending-choice id the recovery lock is currently holding on (P2(8)). */
+  const FString& GetMutationRecoveryPendingChoiceIdForTest() const {
+    return MutationRecoveryPendingChoiceId;
+  }
+  int32 GetTestHttpSendCountForTest() const { return TestHttpSendCount; }
+  void SetAuthForTest(const FString& InAccessToken, const FString& InRefreshToken) {
+    Http.SetAccessToken(InAccessToken);
+    RefreshToken = InRefreshToken;
+    bSessionExpired = false;
+  }
+  FString GetAccessTokenForTest() const { return Http.GetAccessToken(); }
+  int32 GetRefreshCountForTest() const { return RefreshCount; }
+  bool IsRefreshInFlightForTest() const { return bRefreshInFlight; }
+  bool IsSessionExpiredForTest() const { return bSessionExpired; }
+  int32 GetWsGenerationForTest() const { return WsGeneration; }
+  /** Test seam: drive the WS transport-close path (4403/4408/...) without a
+   *  socket - same handler the OnClosedTransport delegate binds. */
+  void HandleWsClosedForTest(int32 StatusCode, const FString& Reason) {
+    OnWsTransportClosed(StatusCode, Reason);
+  }
   /** Offline HTTP harness: the next controller-issued Execute path resolves
    *  with this queued result instead of the network. InRawBody (optional) is
    *  parsed into the Data object AND passed through as the raw body, so room
@@ -173,8 +219,10 @@ public:
   void QueueHttpResultForTest(bool bOk, TArray<FS08GraphQLError> InErrors = {},
                               bool bDeferDelivery = false,
                               const FString& InRawBody = FString());
-  /** Delivers a deferred harness result (see QueueHttpResultForTest). */
-  void DeliverQueuedHttpForTest();
+  /** Delivers a deferred harness result (see QueueHttpResultForTest). Index
+   *  defaults to FIFO head; an explicit index lets a test deliver answers OUT
+   *  OF ORDER (e.g. an older request's reply landing after a newer one). */
+  void DeliverQueuedHttpForTest(int32 Index = 0);
   /** Seeds room id + stage so leave paths can be driven without a login. */
   void SetRoomForTest(const FString& GameId, ES08Stage InStage);
   /** Match generation as observed by the guard logic (see MatchGeneration). */
@@ -182,46 +230,52 @@ public:
 #endif
 
   // ---- GD-031 gameplay commands (routed through the same store) ----
+  // Every command returns TRUE only when it was actually dispatched: a gate
+  // block (stream not ready, recovery lock, wrong turn, in flight) returns
+  // false WITHOUT a send. Callers that advance a local state machine on the
+  // answer (S09AUTO) must do so ONLY on true - a false left unobserved
+  // stalled the packaged duel at seq 1 (the mode logged "sent", the
+  // controller dropped the command, no snapshot ever came).
   /** beginManeuver(expectedSequenceNumber = local seq). On success the store
    *  holds the pending maneuver id (see PendingManeuverId()). */
-  void BeginManeuver();
+  bool BeginManeuver();
   /** Completes the open maneuver: one move per fighter, orthogonal steps.
    *  GD-033: optional BoostCardId - an exact hand instance id (the card drawn
    *  by beginManeuver is a legal boost: ACC-006/R-03). Empty = no boost. */
-  void SubmitManeuver(const FString& ManeuverId, const TArray<FS08ManeuverMove>& Moves,
+  bool SubmitManeuver(const FString& ManeuverId, const TArray<FS08ManeuverMove>& Moves,
                       const FString& BoostCardId = FString());
   /** GD-033: endTurn - legal only when actionsRemaining == 0 and no pending
    *  choice (server rejects otherwise; error surfaces through OnFlowError). */
-  void EndTurn();
+  bool EndTurn();
   /** GD-033: discardToLimit - EXACT pending.count own hand instance ids of
    *  the open TURN_END discard choice. */
-  void DiscardToLimit(const FString& PendingId, const TArray<FString>& CardInstanceIds);
+  bool DiscardToLimit(const FString& PendingId, const TArray<FString>& CardInstanceIds);
 
   // ---- GD-034 combat commands (same store: every echo routes through
   //      ApplySnapshot; the WS duplicate of the same seq merges) ----
   /** attack(attackerId, cardId, targetId) - cardId is the hand INSTANCE id.
    *  Legal for the turn owner in ACTION_* with melee adjacency (server
    *  authoritative; local UI gates mirror it). */
-  void Attack(const FString& AttackerFighterId, const FString& CardInstanceId,
+  bool Attack(const FString& AttackerFighterId, const FString& CardInstanceId,
               const FString& TargetFighterId);
   /** playDefense(cardId) - defender-only during COMBAT (server deadline
    *  applies; the local UI blocks an expired window). */
-  void PlayDefense(const FString& CardInstanceId);
+  bool PlayDefense(const FString& CardInstanceId);
   /** playScheme(cardId) - turn owner in ACTION_*. */
-  void PlayScheme(const FString& CardInstanceId);
+  bool PlayScheme(const FString& CardInstanceId);
   /** resolveCombat(): defender "no defense" in COMBAT; ANY participant in
    *  COMBAT_RESOLVE (server rejects everyone else). */
-  void ResolveCombat();
+  bool ResolveCombat();
   /** GD-035 pending-queue-head resolve. Payload per server
    *  ResolvePendingEffectDto: MOVE/PLACE need FighterId+bHasCell(x,y);
    *  CHOOSE_SPACE bHasCell only; TARGET_FIGHTER FighterId only; CHOOSE_ONE
    *  bHasOption index; DISCARD_CARDS/BOOST_CHOICE/DECK_TOP_PICK exact
    *  CardIds (ORDER = full top->bottom order). declinePendingEffect stays
    *  optional-only. */
-  void ResolvePendingEffect(const FString& EffectId, const FString& FighterId,
+  bool ResolvePendingEffect(const FString& EffectId, const FString& FighterId,
                             bool bHasCell, int32 X, int32 Y, bool bHasOption,
                             int32 OptionIndex, const TArray<FString>& CardIds);
-  void DeclinePendingEffect(const FString& EffectId);
+  bool DeclinePendingEffect(const FString& EffectId);
 
   /** GD-032 freshness: seq of the last body that actually carried the
    *  projection (0 = never seen). WS events omit decks, so counts go
@@ -241,9 +295,10 @@ private:
   /** Shared executor for the GD-034 combat mutations: in-flight flag, error
    *  broadcast, GameMutationResult parse, ApplySnapshot routing, trace tag.
    *  Traces carry NO card/opponent values (privacy: published logs stay
-   *  reveal-free). */
-  void RunCombatMutation(const FString& Tag, const TCHAR* Field, const FString& Mutation,
-                         const TSharedRef<FJsonObject>& Variables);
+   *  reveal-free). Returns true only when the mutation was dispatched. */
+  bool RunCombatMutation(const FString& Tag, const TCHAR* Field, const FString& Mutation,
+                         const TSharedRef<FJsonObject>& Variables,
+                         const FString& PendingChoiceId = FString());
   void SetStage(ES08Stage NewStage);
   /** Room-entry gate (recovery/create/join): while Stage == Started the
    *  membership and the state stream belong to the live match - replacing the
@@ -295,6 +350,55 @@ private:
    *  subscription (if any) is treated as poisoned and driven through the
    *  same BOUNDED refetch+resubscribe path - never a silent stale-seq hang. */
   void HandleStreamPoisoned(const FString& Reason);
+  // ---- GD-037: lost mutation response recovery (ACC-012) ----
+  /** True when the failure means the server may STILL have applied the
+   *  command (no HTTP answer, or a 5xx after the request reached it). A
+   *  GraphQL rejection is a definitive NOT-applied answer instead. */
+  static bool IsOutcomeUnknown(const TArray<FS08GraphQLError>& Errors);
+  /** Locks gameplay input and starts the bounded authoritative-state refetch
+   *  (no resend of the lost command, ever). PendingChoiceId (when non-empty)
+   *  is a pending-queue id the lost command was resolving: the lock then
+   *  holds until THAT choice is provably settled (gone from the pending
+   *  queue), not merely until any seq advance. */
+  void EnterMutationRecovery(const FString& Reason, const FString& PendingChoiceId);
+  /** One bounded refetch attempt while recovery is armed; arms the backoff
+   *  timer on failure inside FetchGameState's failure path. */
+  void AttemptMutationRecoveryRefetch();
+  /** Bounded failure tail of a recovery read (transport loss, 5xx or an
+   *  unparseable HTTP 200): re-arms the backoff ladder, or surfaces the
+   *  visible exhaustion error while the input lock stays. */
+  void HandleMutationRecoveryReadFailed();
+  /** Shared parse-failure tail of every gameplay mutation: an unreadable HTTP
+   *  200 body after the request reached the server is an outcome-UNKNOWN
+   *  answer (the server may have committed) - recovery, never a resend. */
+  void HandleMutationParseFailure(const FString& Tag, const FString& PendingChoiceId);
+  // ---- GD-038: authorization recovery (ACC-021) ----
+  static bool IsAuthError(const TArray<FS08GraphQLError>& Errors);
+  static bool IsRateLimited(const TArray<FS08GraphQLError>& Errors);
+  /** Single-flight refreshTokens call. Rotates the token pair, arms the WS
+   *  recreation (the live socket was authenticated with the dead token) and
+   *  retries the triggering READ once. Returns false when the session is
+   *  already dead (the caller must not retry). */
+  bool TryRefreshAuth();
+  /** Terminal: clears both tokens, broadcasts SESSION_EXPIRED and routes the
+   *  flow to the login screen. No further automatic request is issued. */
+  void EnterSessionExpired(const FString& Why);
+  /** Drops the live socket and arms the fast reconnect so the next
+   *  MakeWs() authenticates with the rotated token (GD-038: WS recreation
+   *  after refresh). */
+  void RecreateWsAfterAuthRotation();
+  /** WS transport close routing: 4403 goes through the refresh path (a
+   *  dead token must not loop reconnects), other codes reconnect boundedly.
+   *  The server-supplied Reason is REDACTED before any trace line: only the
+   *  numeric code and a fixed description are ever logged (canary-tested). */
+  void OnWsTransportClosed(int32 StatusCode, const FString& Reason);
+  /** Fixed, client-side description of a WS close code. Never derived from
+   *  server-controlled text. */
+  static const TCHAR* WsCloseDescription(int32 StatusCode);
+  /** Central HTTP send (harness-aware): every controller request goes
+   *  through here so tests can count real sends. */
+  void SendHttp(const FString& Query, const TSharedPtr<FJsonObject>& Variables,
+                FS08GraphqlClient::FResult&& OnDone);
   /** Cues for one authoritative transition (old vs new fighters), by id. */
   static void ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& OldFighters,
                           const TSharedPtr<FJsonValue>& NewFighters,
@@ -332,6 +436,63 @@ private:
   // an error/complete loop (e.g. server rejecting the query) from spinning.
   static constexpr int32 MaxOpRecoveryAttempts = 3;
   int32 OpRecoveryAttempts = 0;
+  // GD-037 lost-response recovery: while active, gameplay commands are
+  // locked and the authoritative state is refetched on a bounded backoff
+  // ladder (the lost command is NEVER resent - the server may have applied
+  // it). Any applied/merged body (HTTP refetch or live WS) releases the lock.
+  static constexpr int32 MaxMutationRecoveryAttempts = 5;
+  bool bMutationRecoveryActive = false;
+  int32 MutationRecoveryAttempts = 0;
+  float MutationRecoveryRetryCountdown = -1.0f; // <0 = disarmed
+  float MutationRecoveryBackoff = 1.0f;
+  // S10 review P1(1): the lock releases ONLY on a verified fresh result.
+  // Baseline = the local seq at arm time; a same-or-lower-seq WS body is a
+  // pre-command state (or its replay) and must NOT unlock. An HTTP gameState
+  // read dispatched while the lock is held is fresh by construction and may
+  // unlock at ANY seq (it proves the current server state, including
+  // "the command was never applied").
+  int32 MutationRecoveryBaselineSeq = 0;
+  bool bMutationRecoveryHasBaseline = false;
+  bool bMutationRecoveryFreshRead = false; // set around the HTTP-barrier apply
+  // S10 review P2(8): when the lost command was resolving a pending-queue
+  // head (or a discard-to-limit choice), a bare seq advance proves nothing -
+  // an UNRELATED event moves the seq while the choice stays open. The lock
+  // holds until this id disappears from metadata.pendingEffects (or the
+  // pendingHandDiscard for a discard command).
+  FString MutationRecoveryPendingChoiceId;
+  // S10 review P1(3): a body from the HTTP gameState barrier (reconnect or
+  // recovery refetch) is a reconciliation read, never a live transition -
+  // its diff fires NO cues regardless of gap size (a contiguous local+1
+  // barrier body would otherwise emit a stale CUE).
+  bool bBarrierHttpBody = false;
+  // S10 review P1(2): the FIRST 'next' a fresh gameStateUpdated subscription
+  // delivers is the server's barrier snapshot (current state at subscribe
+  // time), not a live transition - its diff fires no cues either. The slot
+  // closes on the first delivered frame or on a fresh HTTP reconciliation
+  // read that landed after the subscribe; later frames are live again.
+  bool bWsAwaitingBarrierFrame = false;
+  bool bWsBarrierFrame = false; // set around the first WS frame's apply
+  // S10 review P1(3): reconciliation proof for IsStreamReady - set by the
+  // first applied/merged barrier body or delivered WS snapshot, reset by
+  // every teardown/reconnect/operation-end/auth-rotation.
+  bool bStreamReconciled = false;
+  // GD-038 auth state: the refresh token is held in memory only (never
+  // traced); a failed/expired refresh is terminal for the session.
+  FString RefreshToken;
+  bool bRefreshInFlight = false;
+  bool bSessionExpired = false;
+  // S10 review P1(4): bumped on every identity/session change (login,
+  // session expiry). Refresh callbacks capture it at dispatch; a deferred
+  // answer from the PREVIOUS identity is dropped instead of installing its
+  // tokens over the new session.
+  int32 AuthGeneration = 0;
+  int32 RefreshCount = 0;      // refreshTokens calls issued this session
+  int32 RefreshStreak = 0;     // refreshes without a successful response in
+                               // between; >= 2 means rotation is not taking
+  int32 WsGeneration = 0;      // MakeWs() invocations (WS recreation proof)
+#if WITH_AUTOMATION_TESTS
+  int32 TestHttpSendCount = 0; // real SendHttp calls (harness + network)
+#endif
 
 #if WITH_AUTOMATION_TESTS
   // Offline HTTP harness state (see QueueHttpResultForTest). A deferred
@@ -348,8 +509,10 @@ private:
     FQueuedHttpResult Result;
     FS08GraphqlClient::FResult OnDone;
   };
-  bool bHttpResultQueued = false;
-  FQueuedHttpResult QueuedHttp;
+  // FIFO of pre-seeded answers: several results may be queued BEFORE the
+  // request that consumes the first one is issued (e.g. poll 401 -> refresh
+  // ok -> retried poll); a single slot would silently drop all but the last.
+  TArray<FQueuedHttpResult> QueuedHttpFifo;
   TArray<FDeferredHttp> DeferredHttpQueue;
   /** Runs OnDone on the queued result; false = no harness result, use HTTP. */
   bool DispatchQueuedHttpForTest(FS08GraphqlClient::FResult&& OnDone);

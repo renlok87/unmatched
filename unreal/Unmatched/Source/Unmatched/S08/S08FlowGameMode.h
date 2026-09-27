@@ -86,7 +86,11 @@ private:
    *  rejects a stale/dead selection (never substitutes another card). */
   void ConfirmSchemeCommand();
   /** Enter dispatch by the open combat mode (attack/defense/boost confirm). */
-  void ConfirmCombat();
+  /** @return true when the command was actually dispatched (S09AUTO uses the
+   * false case to back out of the draft instead of parking in it - the P1
+   * regression where "ATTACK sent" was logged while the controller had
+   * dropped the command). */
+  bool ConfirmCombat();
   /** Detects the combat-closed transition and freezes LastCombatResult. */
   void TrackCombatResult(const FS08Snapshot& Snapshot, ES08SeqDecision Decision);
   void RunS09Auto();

@@ -290,6 +290,7 @@ bool FS08LateManeuverEchoAfterNewMatchTest::RunTest(const FString&) {
   // Match 1 (g-1): valid started state at seq 5, beginManeuver dispatched,
   // its seq-9 echo held back (deferred FIFO entry 1).
   Flow.SetRoomForTest(TEXT("g-1"), ES08Stage::Started);
+  Flow.AttachStreamHarnessForTest(TEXT("g-1")); // S10: commands need a live stream
   Flow.ApplySnapshot(ValidStartedSnapshot(5, TEXT("ACTION_MANEUVER"), HostId));
   Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,
                               BeginManeuverEchoBody(9, TEXT("ACTION_ATTACK")));
@@ -335,6 +336,7 @@ bool FS08LegitDeferredManeuverAnswerAppliesTest::RunTest(const FString&) {
   Cap.Bind(Flow);
 
   Flow.SetRoomForTest(TEXT("g-1"), ES08Stage::Started);
+  Flow.AttachStreamHarnessForTest(TEXT("g-1")); // S10: commands need a live stream
   Flow.ApplySnapshot(ValidStartedSnapshot(1, TEXT("ACTION_MANEUVER"), HostId));
 
   Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true,

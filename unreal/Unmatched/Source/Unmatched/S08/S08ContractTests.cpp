@@ -276,6 +276,62 @@ bool FS08AuthFailureTest::RunTest(const FString&) {
   return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ErrorCodePlacementTest,
+    "Unmatched.S08.error code placement normalized (extensions, top-level, status)", EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ErrorCodePlacementTest::RunTest(const FString&) {
+  auto Extract = [this](const TCHAR* Body, FS08GraphQLError& Out) {
+    TSharedPtr<FJsonObject> Root;
+    FString Problem;
+    if (!FS08Contracts::TryParseJsonObject(Body, Root, Problem)) {
+      AddError(FString::Printf(TEXT("body is not JSON (%s)"), *Problem));
+      return false;
+    }
+    TArray<FS08GraphQLError> Errors;
+    if (!FS08Contracts::ExtractGraphQLErrors(Root.ToSharedRef(), Errors) || Errors.Num() == 0) {
+      AddError(TEXT("no errors[] extracted"));
+      return false;
+    }
+    Out = Errors[0];
+    return true;
+  };
+  // (a) extensions.code (the backend's primary 401 shape on HTTP 200).
+  {
+    FS08GraphQLError E;
+    TestTrue("extensions.code body extracted",
+             Extract(TEXT("{\"errors\":[{\"message\":\"Unauthorized\",")
+                         TEXT("\"extensions\":{\"code\":\"UNAUTHENTICATED\"}}]}"), E));
+    TestEqual("extensions.code wins", E.Code, TEXT("UNAUTHENTICATED"));
+    TestEqual("no status -> 0", E.HttpStatus, 0);
+  }
+  // (b) TOP-LEVEL code (some backend paths) + extensions.statusCode.
+  {
+    FS08GraphQLError E;
+    TestTrue("top-level code body extracted",
+             Extract(TEXT("{\"errors\":[{\"message\":\"Too many requests\",")
+                         TEXT("\"code\":\"TOO_MANY_REQUESTS\",")
+                         TEXT("\"extensions\":{\"statusCode\":429}}]}"), E));
+    TestEqual("top-level code kept", E.Code, TEXT("TOO_MANY_REQUESTS"));
+    TestEqual("statusCode lifts HttpStatus", E.HttpStatus, 429);
+  }
+  // (c) extensions.status variant + message-only fallback.
+  {
+    FS08GraphQLError E;
+    TestTrue("status variant extracted",
+             Extract(TEXT("{\"errors\":[{\"message\":\"x\",")
+                         TEXT("\"extensions\":{\"code\":\"FORBIDDEN\",\"status\":403}}]}"), E));
+    TestEqual("code from extensions", E.Code, TEXT("FORBIDDEN"));
+    TestEqual("status lifts HttpStatus", E.HttpStatus, 403);
+  }
+  {
+    FS08GraphQLError E;
+    TestTrue("message-only extracted",
+             Extract(TEXT("{\"errors\":[{\"message\":\"boom\"}]}"), E));
+    TestEqual("fallback code GRAPHQL", E.Code, TEXT("GRAPHQL"));
+    TestEqual("fallback status 0", E.HttpStatus, 0);
+  }
+  return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08SeqGuardTest,
     "Unmatched.S08.seq guard semantics (< ignore, == merge, > apply)", EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08SeqGuardTest::RunTest(const FString&) {

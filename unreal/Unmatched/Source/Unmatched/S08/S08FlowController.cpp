@@ -59,6 +59,13 @@ static const TCHAR* GameStateQuery =
     TEXT("query GS($gameId: String!) { gameState(gameId: $gameId) {")
     TEXT(" id gameId state sequenceNumber phase turnCount currentTurnPlayerId updatedAt } }");
 
+// GD-038: rotate the access/refresh pair. The refresh token travels only in
+// the request variables - never in a trace line or a URL.
+static const TCHAR* RefreshTokensMutation =
+    TEXT("mutation RT($refreshToken: String!) {")
+    TEXT(" refreshTokens(refreshToken: $refreshToken) {")
+    TEXT(" accessToken refreshToken user { id username } } }");
+
 FS08FlowController::FS08FlowController(FString HttpUrl, FString WsUrlIn, FString InViewerId)
     : Http(MoveTemp(HttpUrl)), WsUrl(MoveTemp(WsUrlIn)), UserId(MoveTemp(InViewerId)) {
   // One stable key per client session: createGame retries (double click,
@@ -75,7 +82,7 @@ static const TCHAR* HeroesQuery =
 void FS08FlowController::FetchHeroes() {
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetNumberField(TEXT("limit"), 200);
-  Http.Execute(HeroesQuery, Variables,
+  SendHttp(HeroesQuery, Variables,
                [this](bool bOk, const TArray<FS08GraphQLError>& Errors,
                       TSharedPtr<FJsonObject> Data, const FString&) {
                  if (!bOk) {
@@ -125,15 +132,45 @@ bool FS08FlowController::CanApplyRoomEntryAnswer(const TCHAR* Action) {
 
 void FS08FlowController::Trace(const FString& Line) { OnTrace.Broadcast(Line); }
 
+void FS08FlowController::SendHttp(const FString& Query, const TSharedPtr<FJsonObject>& Variables,
+                                  FS08GraphqlClient::FResult&& OnDone) {
+#if WITH_AUTOMATION_TESTS
+  ++TestHttpSendCount;
+  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
+#endif
+  Http.Execute(Query, Variables, MoveTemp(OnDone));
+}
+
 void FS08FlowController::Login(const FString& Email, const FString& Password) {
+  // Identity change: any refresh still in flight for the PREVIOUS session is
+  // void - its deferred answer is dropped by the generation gate below.
+  ++AuthGeneration;
+  bRefreshInFlight = false;
+  // S10 review P1(6): a relogin while a match is live must tear the previous
+  // identity's match down BEFORE B's session installs - a surviving old
+  // socket/room/op id would block B's subscribe and strand the server-side
+  // membership of A's room (same accepted-leave teardown path).
+  if (Stage == ES08Stage::Started || Ws.IsValid() || !Room.GameId.IsEmpty()) {
+    TeardownGameStateStream();
+    Room = FS08RoomState();
+    Trace(TEXT("LOGIN identity change: previous match and stream torn down"));
+  }
+  const int32 Gen = AuthGeneration;
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   TSharedRef<FJsonObject> Input = MakeShared<FJsonObject>();
   Input->SetStringField(TEXT("email"), Email);
   Input->SetStringField(TEXT("password"), Password);
   Variables->SetObjectField(TEXT("input"), Input);
-  Http.Execute(LoginQuery, Variables,
-               [this](bool bOk, const TArray<FS08GraphQLError>& Errors,
+  SendHttp(LoginQuery, Variables,
+               [this, Gen](bool bOk, const TArray<FS08GraphQLError>& Errors,
                       TSharedPtr<FJsonObject> Data, const FString& RawBody) {
+                 // S10 review P1(5): concurrent logins - the deferred answer
+                 // of an OLDER attempt must never install its tokens/user over
+                 // the NEWER session (both success and failure are gated).
+                 if (AuthGeneration != Gen) {
+                   Trace(TEXT("LOGIN stale answer ignored: the session identity changed while the login was in flight"));
+                   return;
+                 }
                  FString AccessToken, RefreshToken, UserId, Username;
                  FS08GraphQLError Error;
                  // Two-stage: contract parser handles the login envelope.
@@ -142,6 +179,9 @@ void FS08FlowController::Login(const FString& Email, const FString& Password) {
                    this->UserId = UserId;
                    this->Username = Username;
                    Http.SetAccessToken(AccessToken);
+                   this->RefreshToken = RefreshToken;
+                   bSessionExpired = false;
+                   RefreshStreak = 0;
                    Trace(TEXT("LOGIN ok user=") + Username);
                    SetStage(ES08Stage::Login);
                  } else {
@@ -193,10 +233,7 @@ void FS08FlowController::EnterLobby() {
         Trace(TEXT("LOBBY fresh (no rooms)"));
         SetStage(ES08Stage::Lobby);
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
-#endif
-  Http.Execute(MyGamesQuery, Variables, MoveTemp(OnDone));
+SendHttp(MyGamesQuery, Variables, MoveTemp(OnDone));
 }
 
 void FS08FlowController::CreateRoom(const FString& Mode) {
@@ -225,10 +262,7 @@ void FS08FlowController::CreateRoom(const FString& Mode) {
         }
         HandleRoomResponse(Data, TEXT("createGame"));
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
-#endif
-  Http.Execute(CreateGameMutation, Variables, MoveTemp(OnDone));
+SendHttp(CreateGameMutation, Variables, MoveTemp(OnDone));
 }
 
 void FS08FlowController::JoinRoomByCode(const FString& Code) {
@@ -291,10 +325,7 @@ void FS08FlowController::JoinRoomByCode(const FString& Code) {
                            }
                            HandleRoomResponse(Data2, TEXT("joinGame"));
                          };
-#if WITH_AUTOMATION_TESTS
-                     if (DispatchQueuedHttpForTest(MoveTemp(OnJoinDone))) return;
-#endif
-                     Http.Execute(JoinGameMutation, JoinVars, MoveTemp(OnJoinDone));
+SendHttp(JoinGameMutation, JoinVars, MoveTemp(OnJoinDone));
                      return;
                    }
                    {
@@ -313,10 +344,7 @@ void FS08FlowController::JoinRoomByCode(const FString& Code) {
                    OnFlowError.Broadcast(Error);
                  }
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnLookupDone))) return;
-#endif
-  Http.Execute(GameByCodeQuery, Variables, MoveTemp(OnLookupDone));
+SendHttp(GameByCodeQuery, Variables, MoveTemp(OnLookupDone));
 }
 
 void FS08FlowController::SelectHero(const FString& HeroId) {
@@ -340,10 +368,7 @@ void FS08FlowController::SelectHero(const FString& HeroId) {
         }
         HandleRoomResponse(Data, TEXT("selectHero"));
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
-#endif
-  Http.Execute(SelectHeroMutation, Variables, MoveTemp(OnDone));
+SendHttp(SelectHeroMutation, Variables, MoveTemp(OnDone));
 }
 
 void FS08FlowController::ToggleReady() {
@@ -366,10 +391,7 @@ void FS08FlowController::ToggleReady() {
         }
         HandleRoomResponse(Data, TEXT("toggleReady"));
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
-#endif
-  Http.Execute(ToggleReadyMutation, Variables, MoveTemp(OnDone));
+SendHttp(ToggleReadyMutation, Variables, MoveTemp(OnDone));
 }
 
 void FS08FlowController::StartGame() {
@@ -397,10 +419,7 @@ void FS08FlowController::StartGame() {
           AttachGameStateStream();
         }
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
-#endif
-  Http.Execute(StartGameMutation, Variables, MoveTemp(OnDone));
+SendHttp(StartGameMutation, Variables, MoveTemp(OnDone));
 }
 
 void FS08FlowController::LeaveRoom() {
@@ -441,13 +460,14 @@ void FS08FlowController::LeaveRoom() {
         SetStage(ES08Stage::Lobby);
         TeardownGameStateStream();
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnLeaveDone))) return;
-#endif
-  Http.Execute(LeaveGameMutation, Variables, MoveTemp(OnLeaveDone));
+SendHttp(LeaveGameMutation, Variables, MoveTemp(OnLeaveDone));
 }
 
 void FS08FlowController::MakeWs() {
+  ++WsGeneration;
+  // P1(3): a fresh socket starts unreconciled - ready only after ack +
+  // subscribe + the first barrier body (see IsStreamReady).
+  bStreamReconciled = false;
   Ws = MakeUnique<FS08GraphqlWs>(WsUrl, Http.GetAccessToken());
   BindWsHandlers();
   Ws->Connect();
@@ -470,6 +490,18 @@ void FS08FlowController::TeardownGameStateStream() {
   bWsReconnectAckPending = false;
   OpRecoveryAttempts = 0;
   bManeuverInFlight = false;
+  bMutationRecoveryActive = false; // the lost command belonged to this match
+  MutationRecoveryAttempts = 0;
+  MutationRecoveryRetryCountdown = -1.0f;
+  MutationRecoveryBackoff = 1.0f;
+  MutationRecoveryBaselineSeq = 0;
+  bMutationRecoveryHasBaseline = false;
+  bMutationRecoveryFreshRead = false;
+  bBarrierHttpBody = false;
+  bWsAwaitingBarrierFrame = false;
+  bWsBarrierFrame = false;
+  bStreamReconciled = false;
+  MutationRecoveryPendingChoiceId.Reset();
   Applied = FS08Snapshot();
   SeqGuard = FS08SeqGuard();
   DecksSeq = 0;
@@ -501,9 +533,7 @@ void FS08FlowController::BindWsHandlers() {
     }
   });
   Ws->OnClosedTransport.AddLambda([this](int32 StatusCode, const FString& Reason) {
-    if (Stage == ES08Stage::Started) {
-      ScheduleWsReconnect(FString::Printf(TEXT("code %d %s"), StatusCode, *Reason));
-    }
+    OnWsTransportClosed(StatusCode, Reason);
   });
   Ws->OnOperationEnded.AddLambda([this](const FString& OpId, const FString& Reason) {
     HandleOperationEnded(OpId, Reason);
@@ -517,6 +547,9 @@ void FS08FlowController::HandleOperationEnded(const FString& OpId, const FString
   // Stale notification: the op was already replaced by a recovery resubscribe.
   if (GameStateOpId != OpId) return;
   GameStateOpId.Reset();
+  // P1(3): the subscription just died - the stream is not ready until the
+  // resubscribe below succeeds AND a fresh barrier body reconciles it.
+  bStreamReconciled = false;
   if (Stage != ES08Stage::Started) return;
   if (OpRecoveryAttempts >= MaxOpRecoveryAttempts) {
     // Bounded: an error/complete loop (server keeps rejecting the operation)
@@ -553,6 +586,273 @@ void FS08FlowController::HandleStreamPoisoned(const FString& Reason) {
   HandleOperationEnded(PoisonedId, Reason);
 }
 
+// ---- GD-037: lost mutation response recovery (ACC-012) ----------------------
+
+bool FS08FlowController::IsOutcomeUnknown(const TArray<FS08GraphQLError>& Errors) {
+  // No HTTP answer at all (HttpStatus == 0), or a 5xx after the request
+  // reached the server: the mutation may have been applied. A 4xx or a
+  // GraphQL errors[] body is a definitive answered rejection. A PARSE
+  // failure on an HTTP 200 (truncated/malformed body AFTER the server
+  // answered) is also outcome-unknown: the commit state is unreadable.
+  if (Errors.Num() == 0) return false;
+  const int32 Status = Errors[0].HttpStatus;
+  const FString& Code = Errors[0].Code;
+  if (Code == TEXT("TRANSPORT") && Status == 0) return true;
+  if (Code == TEXT("PARSE")) return true;
+  if (Status >= 500) return true;
+  return false;
+}
+
+void FS08FlowController::EnterMutationRecovery(const FString& Reason,
+                                               const FString& PendingChoiceId) {
+  if (bMutationRecoveryActive) return;
+  bMutationRecoveryActive = true;
+  MutationRecoveryAttempts = 0;
+  MutationRecoveryBackoff = 1.0f;
+  // P1(1): the unlock baseline. Only a body FRESHER than this (an HTTP read
+  // dispatched under the lock, or a WS seq strictly past the baseline) may
+  // release it - a same-seq pre-command WS snapshot must not.
+  MutationRecoveryBaselineSeq = SeqGuard.Local;
+  bMutationRecoveryHasBaseline = SeqGuard.HasLocal;
+  // P2(8): a lost pending-choice/discard command holds until THAT choice is
+  // settled - a bare seq advance can be an unrelated event.
+  MutationRecoveryPendingChoiceId = PendingChoiceId;
+  Trace(Reason +
+        TEXT(" - outcome unknown: input locked, refetching authoritative state (no resend)"));
+  AttemptMutationRecoveryRefetch();
+}
+
+void FS08FlowController::HandleMutationParseFailure(const FString& Tag,
+                                                    const FString& PendingChoiceId) {
+  // S10 review P1(2): an HTTP 200 whose body cannot be parsed arrived AFTER
+  // the server answered - the commit state is unknown. Recover through the
+  // authoritative refetch; a manual resend could repeat the spend.
+  EnterMutationRecovery(Tag + TEXT(" parse error: outcome unknown"), PendingChoiceId);
+}
+
+void FS08FlowController::HandleMutationRecoveryReadFailed() {
+  // S10 review P1(4): shared bounded tail for a FAILED recovery read (no
+  // HTTP answer, 5xx, or an HTTP 200 body that cannot be parsed). The old
+  // parse-error path broadcast the error but never re-armed the ladder -
+  // the mutation lock then held forever with zero retries left ticking.
+  if (!bMutationRecoveryActive) return;
+  if (MutationRecoveryAttempts >= MaxMutationRecoveryAttempts) {
+    MutationRecoveryRetryCountdown = -1.0f;
+    Trace(TEXT("STATE recovery exhausted - manual action required; input stays locked"));
+    OnFlowError.Broadcast(FS08GraphQLError{
+        TEXT("PROTOCOL"), TEXT("could not restore the game state after a lost response"),
+        FString()});
+    return;
+  }
+  MutationRecoveryRetryCountdown = MutationRecoveryBackoff;
+  MutationRecoveryBackoff = FMath::Min(MutationRecoveryBackoff * 2.0f, 15.0f);
+  Trace(FString::Printf(TEXT("RECOVERY refetch failed - retry in %.0fs"),
+                        MutationRecoveryRetryCountdown));
+}
+
+void FS08FlowController::AttemptMutationRecoveryRefetch() {
+  if (!bMutationRecoveryActive) return;
+  if (MutationRecoveryAttempts >= MaxMutationRecoveryAttempts) {
+    MutationRecoveryRetryCountdown = -1.0f;
+    return;
+  }
+  ++MutationRecoveryAttempts;
+  MutationRecoveryRetryCountdown = -1.0f; // re-armed by the failure path
+  Trace(FString::Printf(TEXT("RECOVERY refetch %d/%d"), MutationRecoveryAttempts,
+                        MaxMutationRecoveryAttempts));
+  FetchGameState();
+}
+
+// ---- GD-038: authorization recovery (ACC-021) -------------------------------
+
+bool FS08FlowController::IsAuthError(const TArray<FS08GraphQLError>& Errors) {
+  // S10 review P1(1): classify against the shapes the BACKEND actually sends
+  // (verified live, evidence/S08 + backend e2e): HTTP 200 GraphQL errors[]
+  // carry extensions.code = UNAUTHENTICATED (Nest 401), and the throttler
+  // uses TOO_MANY_REQUESTS. The legacy AUTH/UNAUTHORIZED spellings and the
+  // web-client's AUTH_TOKEN_EXPIRED/AUTH_INVALID_TOKEN set stay recognized.
+  for (const FS08GraphQLError& Error : Errors) {
+    if (Error.HttpStatus == 401) return true;
+    if (Error.Code == TEXT("AUTH") || Error.Code == TEXT("UNAUTHORIZED") ||
+        Error.Code == TEXT("UNAUTHENTICATED") || Error.Code == TEXT("AUTH_TOKEN_EXPIRED") ||
+        Error.Code == TEXT("AUTH_INVALID_TOKEN")) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool FS08FlowController::IsRateLimited(const TArray<FS08GraphQLError>& Errors) {
+  for (const FS08GraphQLError& Error : Errors) {
+    if (Error.HttpStatus == 429) return true;
+    if (Error.Code == TEXT("RATE_LIMIT") || Error.Code == TEXT("TOO_MANY_REQUESTS")) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool FS08FlowController::TryRefreshAuth() {
+  if (bSessionExpired) return false;
+  if (bRefreshInFlight) return true; // single flight; the caller drops
+  if (RefreshToken.IsEmpty()) {
+    EnterSessionExpired(TEXT("no refresh token is held"));
+    return false;
+  }
+  if (RefreshStreak >= 2) {
+    // A freshly rotated token was rejected again - rotation is not taking
+    // effect; looping refreshes would hammer the auth endpoint.
+    EnterSessionExpired(TEXT("the rotated token was rejected again"));
+    return false;
+  }
+  bRefreshInFlight = true;
+  ++RefreshCount;
+  const int32 Gen = AuthGeneration;
+  TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
+  Variables->SetStringField(TEXT("refreshToken"), RefreshToken);
+  SendHttp(RefreshTokensMutation, Variables,
+           [this, Gen](bool bOk, const TArray<FS08GraphQLError>& Errors,
+                  TSharedPtr<FJsonObject>, const FString& RawBody) {
+             // S10 review P2(7): generation check FIRST. A stale callback
+             // (its identity was replaced mid-flight by a relogin) must not
+             // clear bRefreshInFlight either - a NEWER refresh may be in
+             // flight under the current identity, and clearing the flag here
+             // would let a second concurrent refresh slip through the
+             // single-flight gate.
+             if (AuthGeneration != Gen) {
+               Trace(TEXT("AUTH refresh answer dropped: the session identity changed while the refresh was in flight"));
+               return;
+             }
+             bRefreshInFlight = false;
+             if (bSessionExpired) return;
+             FString AccessToken, RefreshToken, UserId, Username;
+             FS08GraphQLError Error;
+             if (bOk && FS08Contracts::ParseAuthResponse(
+                            RawBody, AccessToken, RefreshToken, UserId, Username, Error,
+                            TEXT("refreshTokens"))) {
+               // P1(4): belt-and-braces identity check - a refresh answer for
+               // a DIFFERENT user than the signed-in one is anomalous and is
+               // never allowed to rotate the token pair.
+               if (!UserId.IsEmpty() && !this->UserId.IsEmpty() && UserId != this->UserId) {
+                 Trace(TEXT("AUTH refresh answer dropped: returned user differs from the signed-in identity"));
+                 return;
+               }
+               Http.SetAccessToken(AccessToken);
+               if (!RefreshToken.IsEmpty()) this->RefreshToken = RefreshToken;
+               ++RefreshStreak;
+               Trace(TEXT("AUTH refreshed - token pair rotated; WS will be recreated"));
+               RecreateWsAfterAuthRotation();
+               // Retry the triggering READ exactly once with the new token
+               // (never a gameplay mutation - its outcome may be applied).
+               if (Stage == ES08Stage::Started) {
+                 FetchGameState();
+               } else if (Stage == ES08Stage::Room) {
+                 PollRoom();
+               }
+               return;
+             }
+             if (IsRateLimited(Errors)) {
+               // 429 is "later", not "expired": surface it, never auto-retry.
+               Trace(TEXT("AUTH refresh rate limited - no automatic retry"));
+               OnFlowError.Broadcast(Errors.Num() ? Errors[0]
+                                                  : FS08GraphQLError{TEXT("RATE_LIMIT"),
+                                                                     TEXT("refresh throttled"),
+                                                                     FString()});
+               return;
+             }
+             EnterSessionExpired(Errors.Num() ? Errors[0].Message
+                                              : FString(TEXT("token refresh failed")));
+           });
+  return true;
+}
+
+void FS08FlowController::EnterSessionExpired(const FString& Why) {
+  if (bSessionExpired) return;
+  bSessionExpired = true;
+  ++AuthGeneration; // a refresh still in flight belongs to the dead session
+  Http.SetAccessToken(FString());
+  RefreshToken.Reset();
+  bMutationRecoveryActive = false;
+  MutationRecoveryRetryCountdown = -1.0f;
+  // The socket was authenticated with the dead token: drop it and disarm the
+  // reconnect ladder (it would loop with 4403s forever).
+  if (Ws.IsValid()) {
+    if (!GameStateOpId.IsEmpty()) Ws->Unsubscribe(GameStateOpId);
+    Ws.Reset();
+  }
+  GameStateOpId.Reset();
+  WsReconnectCountdown = -1.0f;
+  bStreamReconciled = false;
+  bWsAwaitingBarrierFrame = false;
+  Trace(TEXT("SESSION expired: ") + Why + TEXT(" - sign in again"));
+  OnFlowError.Broadcast(FS08GraphQLError{TEXT("SESSION_EXPIRED"),
+                                         TEXT("Session expired - sign in again"), FString()});
+  SetStage(ES08Stage::Failed);
+}
+
+void FS08FlowController::RecreateWsAfterAuthRotation() {
+  if (Stage != ES08Stage::Started) return;
+  // The live socket was authenticated with the (now rotated-away) token:
+  // rebuild it so connection_init carries the fresh one. The armed reconnect
+  // reuses the existing ack path (subscribe from local seq + barrier fetch).
+  if (Ws.IsValid()) {
+    if (!GameStateOpId.IsEmpty()) Ws->Unsubscribe(GameStateOpId);
+    Ws.Reset();
+  }
+  GameStateOpId.Reset();
+  WsReconnectBackoff = 1.0f;
+  if (WsReconnectCountdown < 0.0f) WsReconnectCountdown = 0.5f;
+  bWsReconnectAckPending = true;
+  bStreamReconciled = false;
+  Trace(TEXT("AUTH: socket dropped - WS recreation armed with the rotated token"));
+}
+
+void FS08FlowController::OnWsTransportClosed(int32 StatusCode, const FString& Reason) {
+  if (bSessionExpired) return;
+  // The close reason string is server-controlled text: it never reaches a
+  // trace line. Only the numeric code and a fixed client-side description
+  // are logged (S10 review P2(8), canary-tested).
+  if (StatusCode == 4403) {
+    // graphql-ws "Forbidden": connection_init auth was rejected. Reconnecting
+    // with the same dead token would loop 4403s - go through the refresh path
+    // instead (rotation arms the socket recreation itself).
+    Trace(FString::Printf(TEXT("WS closed %d (auth rejected) - refreshing the token"),
+                          StatusCode));
+    if (TryRefreshAuth()) return;
+    if (bSessionExpired) return; // terminal; nothing left to reconnect with
+  }
+  if (StatusCode == 4408 || StatusCode == 4409) {
+    Trace(FString::Printf(TEXT("WS closed %d (graphql-ws control close: %s)"), StatusCode,
+                          WsCloseDescription(StatusCode)));
+  } else {
+    // Any other code still owes the trace line its numeric code (canary-
+    // tested: the server-controlled reason text never appears).
+    Trace(FString::Printf(TEXT("WS closed %d (%s)"), StatusCode,
+                          WsCloseDescription(StatusCode)));
+  }
+  if (Stage == ES08Stage::Started) {
+    ScheduleWsReconnect(FString::Printf(TEXT("code %d (%s)"), StatusCode,
+                                        WsCloseDescription(StatusCode)));
+  }
+}
+
+const TCHAR* FS08FlowController::WsCloseDescription(int32 StatusCode) {
+  switch (StatusCode) {
+    case -1:   return TEXT("connection failed");
+    case 1000: return TEXT("normal closure");
+    case 1001: return TEXT("going away");
+    case 1006: return TEXT("abnormal closure");
+    case 1011: return TEXT("server error");
+    case 4400: return TEXT("invalid message");
+    case 4401: return TEXT("unauthorized: connection_init required");
+    case 4403: return TEXT("forbidden: connection_init rejected");
+    case 4408: return TEXT("connection acknowledgement timeout");
+    case 4409: return TEXT("subscriber already exists");
+    case 4429: return TEXT("too many initialisation requests");
+    default:   return TEXT("closed");
+  }
+}
+
 #if WITH_AUTOMATION_TESTS
 /** Queued harness body -> the "data" object a real response would carry
  *  (room responses read Data; mutation echoes read the raw body). */
@@ -584,14 +884,13 @@ void FS08FlowController::QueueHttpResultForTest(bool bOk,
                                                 TArray<FS08GraphQLError> InErrors,
                                                 bool bDeferDelivery,
                                                 const FString& InRawBody) {
-  bHttpResultQueued = true;
-  QueuedHttp = FQueuedHttpResult{bOk, bDeferDelivery, MoveTemp(InErrors), InRawBody};
+  QueuedHttpFifo.Add(FQueuedHttpResult{bOk, bDeferDelivery, MoveTemp(InErrors), InRawBody});
 }
 
-void FS08FlowController::DeliverQueuedHttpForTest() {
-  if (DeferredHttpQueue.Num() == 0) return;
-  FDeferredHttp Entry = MoveTemp(DeferredHttpQueue[0]);
-  DeferredHttpQueue.RemoveAt(0);
+void FS08FlowController::DeliverQueuedHttpForTest(int32 Index) {
+  if (Index < 0 || Index >= DeferredHttpQueue.Num()) return;
+  FDeferredHttp Entry = MoveTemp(DeferredHttpQueue[Index]);
+  DeferredHttpQueue.RemoveAt(Index);
   InvokeQueuedHttpForTest(Entry.Result, MoveTemp(Entry.OnDone));
 }
 
@@ -609,16 +908,17 @@ void FS08FlowController::SetRoomForTest(const FString& GameId, ES08Stage InStage
 }
 
 bool FS08FlowController::DispatchQueuedHttpForTest(FS08GraphqlClient::FResult&& OnDone) {
-  if (!bHttpResultQueued) return false;
-  bHttpResultQueued = false;
-  if (QueuedHttp.bDeferred) {
+  if (QueuedHttpFifo.Num() == 0) return false;
+  FQueuedHttpResult Result = MoveTemp(QueuedHttpFifo[0]);
+  QueuedHttpFifo.RemoveAt(0);
+  if (Result.bDeferred) {
     FDeferredHttp Entry;
-    Entry.Result = MoveTemp(QueuedHttp);
+    Entry.Result = MoveTemp(Result);
     Entry.OnDone = MoveTemp(OnDone);
     DeferredHttpQueue.Add(MoveTemp(Entry));
     return true; // answer held back until DeliverQueuedHttpForTest()
   }
-  InvokeQueuedHttpForTest(QueuedHttp, MoveTemp(OnDone));
+  InvokeQueuedHttpForTest(Result, MoveTemp(OnDone));
   return true;
 }
 #endif
@@ -639,6 +939,7 @@ void FS08FlowController::ScheduleWsReconnect(const FString& Reason) {
   // The dead FS08GraphqlWs object is destroyed on the next retry boundary
   // (TickConnectivity), never from inside its own close delegate.
   GameStateOpId.Reset();
+  bStreamReconciled = false; // P1(3): reconnect owes a fresh reconciliation
   if (WsReconnectCountdown >= 0.0f) return; // already armed
   static constexpr float MaxBackoffSeconds = 15.0f;
   WsReconnectCountdown = WsReconnectBackoff;
@@ -648,6 +949,15 @@ void FS08FlowController::ScheduleWsReconnect(const FString& Reason) {
 }
 
 void FS08FlowController::TickConnectivity(float DeltaSeconds) {
+  // GD-037: the lost-response recovery ladder ticks independently of the WS
+  // transport ladder (a dead HTTP path must not wait for a socket cycle).
+  if (MutationRecoveryRetryCountdown >= 0.0f) {
+    MutationRecoveryRetryCountdown -= DeltaSeconds;
+    if (MutationRecoveryRetryCountdown <= 0.0f) {
+      MutationRecoveryRetryCountdown = -1.0f;
+      AttemptMutationRecoveryRefetch();
+    }
+  }
   if (WsReconnectCountdown < 0.0f) return;
   WsReconnectCountdown -= DeltaSeconds;
   if (WsReconnectCountdown > 0.0f) return;
@@ -673,6 +983,10 @@ void FS08FlowController::SubscribeAfterSnapshot(int32 Since) {
   if (!GameStateOpId.IsEmpty() || !Ws.IsValid() || !Ws->IsAcked()) return;
   const FString SubGameId = Room.GameId;
   const int32 SubGen = MatchGeneration;
+  // P1(2): the first 'next' this fresh subscription delivers is the server's
+  // barrier snapshot (state at subscribe time) when the state moved past
+  // `since` - it is a reconciliation body, its diff fires no cues.
+  bWsAwaitingBarrierFrame = true;
   GameStateOpId = Ws->SubscribeGameStateUpdated(
       Room.GameId, Since,
       [this, SubGameId, SubGen](const FS08Snapshot& Snapshot) {
@@ -686,7 +1000,15 @@ void FS08FlowController::SubscribeAfterSnapshot(int32 Since) {
         // A delivered snapshot proves the recovered operation works - the
         // bounded operation-level recovery counter starts over.
         OpRecoveryAttempts = 0;
+        // P1(2): consume the barrier slot on the first delivered frame.
+        const bool bFirstFrame = bWsAwaitingBarrierFrame;
+        bWsAwaitingBarrierFrame = false;
+        bWsBarrierFrame = bFirstFrame;
         const ES08SeqDecision Decision = ApplyMatchSnapshot(Snapshot);
+        bWsBarrierFrame = false;
+        // P1(3): a delivered frame proves the live subscription carries
+        // server truth - the stream is reconciled.
+        bStreamReconciled = true;
         if (Decision == ES08SeqDecision::Ignore) return;
         Trace(FString::Printf(TEXT("WS seq=%d phase=%s (%s)"), Snapshot.SequenceNumber,
                               *Snapshot.Phase,
@@ -706,8 +1028,12 @@ void FS08FlowController::FetchGameState() {
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
   const FString GameId = Room.GameId;
   const int32 Gen = MatchGeneration;
+  // A read dispatched while the recovery lock is held is FRESH evidence by
+  // construction when its answer arrives (P1(1)); one dispatched before the
+  // lock armed is not, and must not unlock at a same-seq body.
+  const bool bRecoveryArmedAtDispatch = bMutationRecoveryActive;
   FS08GraphqlClient::FResult OnDone =
-      [this, GameId, Gen](bool bOk, const TArray<FS08GraphQLError>& Errors,
+      [this, GameId, Gen, bRecoveryArmedAtDispatch](bool bOk, const TArray<FS08GraphQLError>& Errors,
                           TSharedPtr<FJsonObject> Data, const FString& RawBody) {
         // Stale answer: the match was left (or another room joined, or the
         // same id re-joined) before the fetch resolved - it must not
@@ -721,7 +1047,31 @@ void FS08FlowController::FetchGameState() {
             Trace(TEXT("STATE: not started yet (lobby)"));
             return;
           }
+          // GD-038: a rejected access token triggers ONE refresh; the rotated
+          // token also re-runs this fetch (reads may retry - never mutations).
+          if (IsAuthError(Errors) && !bSessionExpired) {
+            Trace(TEXT("STATE auth rejected - refreshing the session"));
+            if (TryRefreshAuth()) return;
+            if (bSessionExpired) return;
+          }
+          // GD-038: 429 is "try later": surface once, never auto-retry (and
+          // disarm the GD-037 recovery ladder so it cannot hammer the limit).
+          if (IsRateLimited(Errors)) {
+            MutationRecoveryRetryCountdown = -1.0f;
+            Trace(TEXT("STATE rate limited - no automatic retry"));
+            OnFlowError.Broadcast(Errors[0]);
+            return;
+          }
           Trace(TEXT("STATE failed: ") + (Errors.Num() ? Errors[0].Message : TEXT("?")));
+          // GD-037: a lost recovery refetch retries on the bounded backoff
+          // ladder; the bound exhausted surfaces a visible error and KEEPS
+          // the input lock (any command would be a blind resend). While the
+          // lock is held it owns the error surface - the transient read
+          // failure is not broadcast as a flow error.
+          if (bMutationRecoveryActive) {
+            HandleMutationRecoveryReadFailed();
+            return;
+          }
           OnFlowError.Broadcast(Errors.Num() ? Errors[0]
                                              : FS08GraphQLError{TEXT("TRANSPORT"), TEXT("state failed"), FString()});
           return;
@@ -730,20 +1080,32 @@ void FS08FlowController::FetchGameState() {
         FString RawState;
         FS08GraphQLError Error;
         if (FS08Contracts::ParseGameStateQuery(RawBody, Snapshot, RawState, Error)) {
+          bBarrierHttpBody = true;            // reconciliation read: no cues
+          bMutationRecoveryFreshRead = bRecoveryArmedAtDispatch; // fresh evidence (P1(1))
           const ES08SeqDecision Decision = ApplyMatchSnapshot(Snapshot);
+          bMutationRecoveryFreshRead = false;
+          bBarrierHttpBody = false;
           Trace(FString::Printf(TEXT("STATE seq=%d -> %s"), Snapshot.SequenceNumber,
                                 Decision == ES08SeqDecision::Apply ? TEXT("apply")
                                                                    : TEXT("merge")));
           SubscribeAfterSnapshot(Snapshot.SequenceNumber);
+          // P1(2): this fresh HTTP read reconciles the channel - a later WS
+          // frame is a live transition (or a same-or-older duplicate that
+          // merges anyway), not the barrier slot of a fresh subscription.
+          bWsAwaitingBarrierFrame = false;
         } else {
           Trace(TEXT("STATE parse error: ") + Error.Message);
+          // P1(4): an unreadable HTTP 200 recovery read is a FAILED read for
+          // the lock's purposes: bounded retry ladder, visible exhaustion
+          // error, lock stays - never a silent dead end.
+          if (bMutationRecoveryActive) {
+            HandleMutationRecoveryReadFailed();
+            return;
+          }
           OnFlowError.Broadcast(Error);
         }
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
-#endif
-  Http.Execute(GameStateQuery, Variables, MoveTemp(OnDone));
+SendHttp(GameStateQuery, Variables, MoveTemp(OnDone));
 }
 
 void FS08FlowController::PollRoom() {
@@ -763,15 +1125,24 @@ void FS08FlowController::PollRoom() {
           return;
         }
         if (!bOk) {
+          // GD-038: room reads share the auth recovery path (one refresh, no
+          // blind retry of anything).
+          if (IsAuthError(Errors) && !bSessionExpired) {
+            Trace(TEXT("POLL auth rejected - refreshing the session"));
+            if (TryRefreshAuth()) return;
+            if (bSessionExpired) return;
+          }
+          if (IsRateLimited(Errors)) {
+            Trace(TEXT("POLL rate limited - no automatic retry"));
+            OnFlowError.Broadcast(Errors[0]);
+            return;
+          }
           Trace(TEXT("POLL failed: ") + (Errors.Num() ? Errors[0].Message : TEXT("?")));
           return;
         }
         HandleRoomResponse(Data, TEXT("game"));
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
-#endif
-  Http.Execute(GameQuery, Variables, MoveTemp(OnDone));
+SendHttp(GameQuery, Variables, MoveTemp(OnDone));
 }
 
 bool FS08FlowController::CanIssueGameplayCommand(FString& OutReason) const {
@@ -787,6 +1158,14 @@ bool FS08FlowController::CanIssueGameplayCommand(FString& OutReason) const {
   }
   if (Stage != ES08Stage::Started) {
     OutReason = TEXT("match is not started");
+    return false;
+  }
+  if (!IsStreamReady()) {
+    OutReason = TEXT("live stream is reconnecting - commands wait until the state stream is back");
+    return false;
+  }
+  if (bMutationRecoveryActive) {
+    OutReason = TEXT("restoring authoritative state after a lost response - commands are locked");
     return false;
   }
   if (!IsMyTurn()) {
@@ -869,13 +1248,81 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
                           SeqGuard.Local));
     return Decision;
   }
-  // Cues are derived ONLY from an authoritative transition (seq > local):
-  // a same-seq merge may enrich panel data but must never re-fire
-  // presentation effects (ACC-011: duplicate HTTP+WS -> one visual event).
+  // Cues are derived ONLY from a CONTIGUOUS authoritative transition
+  // (incoming == local + 1): a same-seq merge may enrich panel data but must
+  // never re-fire presentation effects (ACC-011: duplicate HTTP+WS -> one
+  // visual event), and a GAP (reconnect barrier snapshot spanning missed
+  // events) carries no intermediate transitions - diffing across it would
+  // fabricate stale animations (ACC-012: old CUEs are not replayed).
   TArray<FS08Cue> Cues;
   if (Decision == ES08SeqDecision::Apply) {
-    ComputeCues(Snapshot.SequenceNumber, Applied.Fighters, Snapshot.Fighters, Cues);
+    if (bBarrierHttpBody || bWsBarrierFrame) {
+      // P1(3)/P1(2): an HTTP gameState body (reconnect barrier or recovery
+      // refetch) AND the first WS frame of a fresh subscription (the server's
+      // barrier snapshot at subscribe time) are reconciliation reads, not
+      // live transitions - their diffs fire NO cues at ANY gap size,
+      // contiguous included (local 10 -> barrier 11 must not animate).
+      if (SeqGuard.HasLocal) {
+        Trace(FString::Printf(TEXT("SEQ %d barrier body: cues suppressed"),
+                              Snapshot.SequenceNumber));
+      }
+    } else if (SeqGuard.HasLocal && Snapshot.SequenceNumber == SeqGuard.Local + 1) {
+      ComputeCues(Snapshot.SequenceNumber, Applied.Fighters, Snapshot.Fighters, Cues);
+    } else if (SeqGuard.HasLocal) {
+      Trace(FString::Printf(TEXT("SEQ %d gap from %d: cues suppressed"), Snapshot.SequenceNumber,
+                            SeqGuard.Local));
+    }
   }
+  // P1(3): an applied/merged body reconciles the store with server truth.
+  bStreamReconciled = true;
+  // S10 review P1(1): the GD-037 lost-response lock releases ONLY on a
+  // verified fresh result - an HTTP gameState read dispatched while the lock
+  // was held (fresh by construction, any seq) or a WS body strictly past the
+  // baseline captured at arm time. A same-or-older-seq WS snapshot is the
+  // pre-command state and keeps the lock.
+  if (bMutationRecoveryActive) {
+    bool bFreshResult = bMutationRecoveryFreshRead || !bMutationRecoveryHasBaseline ||
+                        Snapshot.SequenceNumber > MutationRecoveryBaselineSeq;
+    // P2(8): when the lost command was resolving a pending choice, fresh is
+    // not enough - the choice must be SETTLED (its id gone from the queue).
+    // An unrelated event bumps the seq while the head stays open; releasing
+    // on it would unlock input against an unresolved server wait.
+    if (bFreshResult && !MutationRecoveryPendingChoiceId.IsEmpty()) {
+      bool bStillOpen = false;
+      TArray<FS08PendingEffect> PendingQueue;
+      if (FS08Contracts::PendingEffects(Snapshot, PendingQueue)) {
+        for (const FS08PendingEffect& Effect : PendingQueue) {
+          if (Effect.Id == MutationRecoveryPendingChoiceId) {
+            bStillOpen = true;
+            break;
+          }
+        }
+      }
+      FS08PendingHandDiscard Discard;
+      if (!bStillOpen && FS08Contracts::PendingHandDiscard(Snapshot, Discard) &&
+          Discard.Id == MutationRecoveryPendingChoiceId) {
+        bStillOpen = true;
+      }
+      if (bStillOpen) {
+        bFreshResult = false;
+        Trace(FString::Printf(
+            TEXT("RECOVERY held: pending choice %s is still open at seq %d"),
+            *MutationRecoveryPendingChoiceId, Snapshot.SequenceNumber));
+      }
+    }
+    if (bFreshResult) {
+      bMutationRecoveryActive = false;
+      MutationRecoveryRetryCountdown = -1.0f;
+      MutationRecoveryPendingChoiceId.Reset();
+      Trace(FString::Printf(TEXT("RECOVERY complete: authoritative state at seq %d"),
+                            Snapshot.SequenceNumber));
+    } else if (MutationRecoveryPendingChoiceId.IsEmpty()) {
+      Trace(FString::Printf(
+          TEXT("RECOVERY held: seq %d is not fresher than the locked baseline %d"),
+          Snapshot.SequenceNumber, MutationRecoveryBaselineSeq));
+    }
+  }
+  RefreshStreak = 0;
   // Merge semantics: absent fields keep their local copies (never null out).
   if (Snapshot.Players.IsValid()) Applied.Players = Snapshot.Players;
   if (Snapshot.Fighters.IsValid()) Applied.Fighters = Snapshot.Fighters;
@@ -913,6 +1360,7 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
 
 void FS08FlowController::HandleRoomResponse(TSharedPtr<FJsonObject> Data, const FString& Field) {
   if (!Data.IsValid()) return;
+  RefreshStreak = 0; // a successful response proves the current token works
   const TSharedPtr<FJsonObject>* Game = nullptr;
   if (Data->TryGetObjectField(Field, Game) && Game && Game->IsValid()) {
     ParseRoomFrom(*Game);
@@ -996,11 +1444,11 @@ static const TCHAR* DiscardToLimitMutation =
     TEXT("                       cardIds: $cardIds }) {")
     TEXT(" state sequenceNumber phase turnCount currentTurnPlayerId } }");
 
-void FS08FlowController::BeginManeuver() {
+bool FS08FlowController::BeginManeuver() {
   FString Reason;
   if (!CanIssueGameplayCommand(Reason)) {
     Trace(TEXT("MANEUVER begin blocked: ") + Reason);
-    return;
+    return false;
   }
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
@@ -1020,6 +1468,20 @@ void FS08FlowController::BeginManeuver() {
         }
         bManeuverInFlight = false;
         if (!bOk) {
+          if (IsAuthError(Errors) && !bSessionExpired) {
+            // P2(5): 401 ANSWERED the command (definitely not applied):
+            // refresh once, then converge through the authoritative read -
+            // the command itself is never replayed.
+            Trace(TEXT("MANEUVER begin auth rejected - refreshing; the command is not resent"));
+            if (TryRefreshAuth()) return;
+            if (bSessionExpired) return;
+          }
+          if (IsOutcomeUnknown(Errors)) {
+            // GD-037: the command MAY have been applied - never resend it;
+            // the locked recovery refetch converges on the server truth.
+            EnterMutationRecovery(TEXT("MANEUVER begin failed: outcome unknown"), FString());
+            return;
+          }
           Trace(TEXT("MANEUVER begin failed: ") +
                 (Errors.Num() ? Errors[0].Message : TEXT("?")));
           OnFlowError.Broadcast(Errors.Num() ? Errors[0]
@@ -1033,7 +1495,7 @@ void FS08FlowController::BeginManeuver() {
         if (!FS08Contracts::ParseMutationResult(RawBody, TEXT("beginManeuver"),
                                                 Snapshot, Error)) {
           Trace(TEXT("MANEUVER begin parse error: ") + Error.Message);
-          OnFlowError.Broadcast(Error);
+          HandleMutationParseFailure(TEXT("MANEUVER begin"), FString());
           return;
         }
         const ES08SeqDecision Decision = ApplyMatchSnapshot(Snapshot);
@@ -1044,13 +1506,11 @@ void FS08FlowController::BeginManeuver() {
                                                                  : TEXT("merge"),
                               *PendingId));
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
-#endif
-  Http.Execute(BeginManeuverMutation, Variables, MoveTemp(OnDone));
+SendHttp(BeginManeuverMutation, Variables, MoveTemp(OnDone));
+  return true;
 }
 
-void FS08FlowController::SubmitManeuver(const FString& ManeuverId,
+bool FS08FlowController::SubmitManeuver(const FString& ManeuverId,
                                         const TArray<FS08ManeuverMove>& Moves,
                                         const FString& BoostCardId) {
   // Maneuver completion happens on the mover's own turn; the gate's
@@ -1059,12 +1519,12 @@ void FS08FlowController::SubmitManeuver(const FString& ManeuverId,
   FString Reason;
   if (!CanIssueGameplayCommand(Reason)) {
     Trace(TEXT("MANEUVER submit blocked: ") + Reason);
-    return;
+    return false;
   }
   // ACC-006: zero moves is a legal maneuver completion (draw + no movement).
   if (ManeuverId.IsEmpty()) {
     Trace(TEXT("MANEUVER submit blocked: no pending maneuver"));
-    return;
+    return false;
   }
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
@@ -1101,6 +1561,17 @@ void FS08FlowController::SubmitManeuver(const FString& ManeuverId,
         }
         bManeuverInFlight = false;
         if (!bOk) {
+          if (IsAuthError(Errors) && !bSessionExpired) {
+            Trace(TEXT("MANEUVER auth rejected - refreshing; the command is not resent"));
+            if (TryRefreshAuth()) return;
+            if (bSessionExpired) return;
+          }
+          if (IsOutcomeUnknown(Errors)) {
+            // GD-037: the command MAY have been applied - never resend it;
+            // the locked recovery refetch converges on the server truth.
+            EnterMutationRecovery(TEXT("MANEUVER failed: outcome unknown"), FString());
+            return;
+          }
           Trace(TEXT("MANEUVER failed: ") +
                 (Errors.Num() ? Errors[0].Message : TEXT("?")));
           OnFlowError.Broadcast(Errors.Num() ? Errors[0]
@@ -1114,7 +1585,7 @@ void FS08FlowController::SubmitManeuver(const FString& ManeuverId,
         if (!FS08Contracts::ParseMutationResult(RawBody, TEXT("maneuver"),
                                                 Snapshot, Error)) {
           Trace(TEXT("MANEUVER parse error: ") + Error.Message);
-          OnFlowError.Broadcast(Error);
+          HandleMutationParseFailure(TEXT("MANEUVER"), FString());
           return;
         }
         const ES08SeqDecision Decision = ApplyMatchSnapshot(Snapshot);
@@ -1127,10 +1598,8 @@ void FS08FlowController::SubmitManeuver(const FString& ManeuverId,
         // The move was accepted; the same seq will also arrive over
         // the WS stream and collapse in the seq guard (merge).
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
-#endif
-  Http.Execute(ManeuverMutation, Variables, MoveTemp(OnDone));
+SendHttp(ManeuverMutation, Variables, MoveTemp(OnDone));
+  return true;
 }
 
 bool FS08FlowController::CanIssueEndTurn(FString& OutReason) const {
@@ -1143,11 +1612,11 @@ bool FS08FlowController::CanIssueEndTurn(FString& OutReason) const {
   return true;
 }
 
-void FS08FlowController::EndTurn() {
+bool FS08FlowController::EndTurn() {
   FString Reason;
   if (!CanIssueEndTurn(Reason)) {
     Trace(TEXT("ENDTURN blocked: ") + Reason);
-    return;
+    return false;
   }
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
@@ -1163,6 +1632,17 @@ void FS08FlowController::EndTurn() {
         }
         bManeuverInFlight = false;
         if (!bOk) {
+          if (IsAuthError(Errors) && !bSessionExpired) {
+            Trace(TEXT("ENDTURN auth rejected - refreshing; the command is not resent"));
+            if (TryRefreshAuth()) return;
+            if (bSessionExpired) return;
+          }
+          if (IsOutcomeUnknown(Errors)) {
+            // GD-037: the command MAY have been applied - never resend it;
+            // the locked recovery refetch converges on the server truth.
+            EnterMutationRecovery(TEXT("ENDTURN failed: outcome unknown"), FString());
+            return;
+          }
           Trace(TEXT("ENDTURN failed: ") +
                 (Errors.Num() ? Errors[0].Message : TEXT("?")));
           OnFlowError.Broadcast(Errors.Num() ? Errors[0]
@@ -1176,20 +1656,18 @@ void FS08FlowController::EndTurn() {
         if (!FS08Contracts::ParseMutationResult(RawBody, TEXT("endTurn"),
                                                 Snapshot, Error)) {
           Trace(TEXT("ENDTURN parse error: ") + Error.Message);
-          OnFlowError.Broadcast(Error);
+          HandleMutationParseFailure(TEXT("ENDTURN"), FString());
           return;
         }
         ApplyMatchSnapshot(Snapshot);
         Trace(FString::Printf(TEXT("ENDTURN done seq=%d phase=%s"),
                               Snapshot.SequenceNumber, *Snapshot.Phase));
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
-#endif
-  Http.Execute(EndTurnMutation, Variables, MoveTemp(OnDone));
+SendHttp(EndTurnMutation, Variables, MoveTemp(OnDone));
+  return true;
 }
 
-void FS08FlowController::DiscardToLimit(const FString& PendingId,
+bool FS08FlowController::DiscardToLimit(const FString& PendingId,
                                         const TArray<FString>& CardInstanceIds) {
   // No-turn-owner gate (like the combat commands): the TURN_END discard can
   // open after the turn already flipped to the opponent, so IsMyTurn() must
@@ -1199,11 +1677,11 @@ void FS08FlowController::DiscardToLimit(const FString& PendingId,
   FString Reason;
   if (!CanIssueCombatCommand(Reason)) {
     Trace(TEXT("DISCARD blocked: ") + Reason);
-    return;
+    return false;
   }
   if (PendingId.IsEmpty() || CardInstanceIds.IsEmpty()) {
     Trace(TEXT("DISCARD blocked: no pending choice or no cards"));
-    return;
+    return false;
   }
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
@@ -1218,7 +1696,7 @@ void FS08FlowController::DiscardToLimit(const FString& PendingId,
   bManeuverInFlight = true;
   const int32 Count = CardInstanceIds.Num();
   FS08GraphqlClient::FResult OnDone =
-      [this, GameId, Gen, Count](bool bOk, const TArray<FS08GraphQLError>& Errors,
+      [this, GameId, Gen, Count, PendingId](bool bOk, const TArray<FS08GraphQLError>& Errors,
                                  TSharedPtr<FJsonObject>, const FString& RawBody) {
         if (!IsSameMatchRequest(GameId, Gen)) {
           Trace(FString::Printf(TEXT("DISCARD stale answer room=%s ignored"), *GameId));
@@ -1226,6 +1704,18 @@ void FS08FlowController::DiscardToLimit(const FString& PendingId,
         }
         bManeuverInFlight = false;
         if (!bOk) {
+          if (IsAuthError(Errors) && !bSessionExpired) {
+            Trace(TEXT("DISCARD auth rejected - refreshing; the command is not resent"));
+            if (TryRefreshAuth()) return;
+            if (bSessionExpired) return;
+          }
+          if (IsOutcomeUnknown(Errors)) {
+            // GD-037: the command MAY have been applied - never resend it;
+            // the locked recovery refetch converges on the server truth.
+            // P2(8): the lock holds until THIS discard choice settles.
+            EnterMutationRecovery(TEXT("DISCARD failed: outcome unknown"), PendingId);
+            return;
+          }
           Trace(TEXT("DISCARD failed: ") +
                 (Errors.Num() ? Errors[0].Message : TEXT("?")));
           OnFlowError.Broadcast(Errors.Num() ? Errors[0]
@@ -1239,17 +1729,15 @@ void FS08FlowController::DiscardToLimit(const FString& PendingId,
         if (!FS08Contracts::ParseMutationResult(RawBody, TEXT("discardToLimit"),
                                                 Snapshot, Error)) {
           Trace(TEXT("DISCARD parse error: ") + Error.Message);
-          OnFlowError.Broadcast(Error);
+          HandleMutationParseFailure(TEXT("DISCARD"), PendingId);
           return;
         }
         ApplyMatchSnapshot(Snapshot);
         Trace(FString::Printf(TEXT("DISCARD done seq=%d phase=%s count=%d"),
                               Snapshot.SequenceNumber, *Snapshot.Phase, Count));
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
-#endif
-  Http.Execute(DiscardToLimitMutation, Variables, MoveTemp(OnDone));
+SendHttp(DiscardToLimitMutation, Variables, MoveTemp(OnDone));
+  return true;
 }
 
 // ---- GD-034 combat commands -------------------------------------------------
@@ -1292,14 +1780,16 @@ static const TCHAR* DeclinePendingEffectMutation =
     TEXT(" declinePendingEffect(input: { gameId: $gameId, effectId: $effectId }) {")
     TEXT(" state sequenceNumber phase turnCount currentTurnPlayerId } }");
 
-void FS08FlowController::RunCombatMutation(const FString& Tag, const TCHAR* Field,
+bool FS08FlowController::RunCombatMutation(const FString& Tag, const TCHAR* Field,
                                            const FString& Mutation,
-                                           const TSharedRef<FJsonObject>& Variables) {
+                                           const TSharedRef<FJsonObject>& Variables,
+                                           const FString& PendingChoiceId) {
   const FString GameId = Room.GameId;
   const int32 Gen = MatchGeneration;
   bManeuverInFlight = true;
   FS08GraphqlClient::FResult OnDone =
-      [this, Tag, Field, GameId, Gen](bool bOk, const TArray<FS08GraphQLError>& Errors,
+      [this, Tag, Field, GameId, Gen, PendingChoiceId](bool bOk,
+                                      const TArray<FS08GraphQLError>& Errors,
                                       TSharedPtr<FJsonObject>, const FString& RawBody) {
         if (!IsSameMatchRequest(GameId, Gen)) {
           Trace(FString::Printf(TEXT("%s stale answer room=%s ignored"), *Tag, *GameId));
@@ -1307,6 +1797,18 @@ void FS08FlowController::RunCombatMutation(const FString& Tag, const TCHAR* Fiel
         }
         bManeuverInFlight = false;
         if (!bOk) {
+          if (IsAuthError(Errors) && !bSessionExpired) {
+            Trace(Tag + TEXT(" auth rejected - refreshing; the command is not sent again"));
+            if (TryRefreshAuth()) return;
+            if (bSessionExpired) return;
+          }
+          if (IsOutcomeUnknown(Errors)) {
+            // GD-037: the command MAY have been applied - never resend it;
+            // the locked recovery refetch converges on the server truth.
+            // P2(8): a pending-head resolve holds until THAT head settles.
+            EnterMutationRecovery(Tag + TEXT(" failed: outcome unknown"), PendingChoiceId);
+            return;
+          }
           Trace(Tag + TEXT(" failed: ") +
                 (Errors.Num() ? Errors[0].Message : TEXT("?")));
           OnFlowError.Broadcast(Errors.Num() ? Errors[0]
@@ -1319,7 +1821,7 @@ void FS08FlowController::RunCombatMutation(const FString& Tag, const TCHAR* Fiel
         FS08GraphQLError Error;
         if (!FS08Contracts::ParseMutationResult(RawBody, Field, Snapshot, Error)) {
           Trace(Tag + TEXT(" parse error: ") + Error.Message);
-          OnFlowError.Broadcast(Error);
+          HandleMutationParseFailure(Tag, PendingChoiceId);
           return;
         }
         const ES08SeqDecision Decision = ApplyMatchSnapshot(Snapshot);
@@ -1332,10 +1834,8 @@ void FS08FlowController::RunCombatMutation(const FString& Tag, const TCHAR* Fiel
                                                                  : TEXT("merge"),
                               *Snapshot.Phase));
       };
-#if WITH_AUTOMATION_TESTS
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
-#endif
-  Http.Execute(Mutation, Variables, MoveTemp(OnDone));
+SendHttp(Mutation, Variables, MoveTemp(OnDone));
+  return true;
 }
 
 bool FS08FlowController::CanIssueCombatCommand(FString& OutReason) const {
@@ -1353,6 +1853,14 @@ bool FS08FlowController::CanIssueCombatCommand(FString& OutReason) const {
     OutReason = TEXT("match is not started");
     return false;
   }
+  if (!IsStreamReady()) {
+    OutReason = TEXT("live stream is reconnecting - commands wait until the state stream is back");
+    return false;
+  }
+  if (bMutationRecoveryActive) {
+    OutReason = TEXT("restoring authoritative state after a lost response - commands are locked");
+    return false;
+  }
   // DELIBERATELY no turn-owner check: the defender acts in the attacker's
   // COMBAT window and any participant may resolve in COMBAT_RESOLVE. Role
   // legality is server-authoritative; the local UI gates mirror it.
@@ -1363,64 +1871,66 @@ bool FS08FlowController::CanIssueCombatCommand(FString& OutReason) const {
   return true;
 }
 
-void FS08FlowController::Attack(const FString& AttackerFighterId,
+bool FS08FlowController::Attack(const FString& AttackerFighterId,
                                 const FString& CardInstanceId,
                                 const FString& TargetFighterId) {
   FString Reason;
   if (!CanIssueGameplayCommand(Reason)) {
     Trace(TEXT("ATTACK blocked: ") + Reason);
-    return;
+    return false;
   }
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
   Variables->SetStringField(TEXT("attackerId"), AttackerFighterId);
   Variables->SetStringField(TEXT("cardId"), CardInstanceId);
   Variables->SetStringField(TEXT("targetId"), TargetFighterId);
-  RunCombatMutation(TEXT("ATTACK"), TEXT("attack"), AttackMutation, Variables);
+  return RunCombatMutation(TEXT("ATTACK"), TEXT("attack"), AttackMutation, Variables);
 }
 
-void FS08FlowController::PlayDefense(const FString& CardInstanceId) {
+bool FS08FlowController::PlayDefense(const FString& CardInstanceId) {
   FString Reason;
   if (!CanIssueCombatCommand(Reason)) {
     Trace(TEXT("DEFENSE blocked: ") + Reason);
-    return;
+    return false;
   }
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
   Variables->SetStringField(TEXT("cardId"), CardInstanceId);
-  RunCombatMutation(TEXT("DEFENSE"), TEXT("playDefense"), PlayDefenseMutation, Variables);
+  return RunCombatMutation(TEXT("DEFENSE"), TEXT("playDefense"), PlayDefenseMutation,
+                           Variables);
 }
 
-void FS08FlowController::PlayScheme(const FString& CardInstanceId) {
+bool FS08FlowController::PlayScheme(const FString& CardInstanceId) {
   FString Reason;
   if (!CanIssueGameplayCommand(Reason)) {
     Trace(TEXT("SCHEME blocked: ") + Reason);
-    return;
+    return false;
   }
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
   Variables->SetStringField(TEXT("cardId"), CardInstanceId);
-  RunCombatMutation(TEXT("SCHEME"), TEXT("playScheme"), PlaySchemeMutation, Variables);
+  return RunCombatMutation(TEXT("SCHEME"), TEXT("playScheme"), PlaySchemeMutation, Variables);
 }
 
-void FS08FlowController::ResolveCombat() {
+bool FS08FlowController::ResolveCombat() {
   FString Reason;
   if (!CanIssueCombatCommand(Reason)) {
     Trace(TEXT("RESOLVE blocked: ") + Reason);
-    return;
+    return false;
   }
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
-  RunCombatMutation(TEXT("RESOLVE"), TEXT("resolveCombat"), ResolveCombatMutation, Variables);
+  return RunCombatMutation(TEXT("RESOLVE"), TEXT("resolveCombat"), ResolveCombatMutation,
+                           Variables);
 }
 
-void FS08FlowController::ResolvePendingEffect(
+bool FS08FlowController::ResolvePendingEffect(
     const FString& EffectId, const FString& FighterId, bool bHasCell, int32 X, int32 Y,
     bool bHasOption, int32 OptionIndex, const TArray<FString>& CardIds) {
   FString Reason;
   if (!CanIssueCombatCommand(Reason)) {
     Trace(TEXT("PEND resolve blocked: ") + Reason);
-    return;
+    return false;
   }
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
@@ -1451,19 +1961,19 @@ void FS08FlowController::ResolvePendingEffect(
     }
     Variables->SetArrayField(TEXT("cardIds"), Ids);
   }
-  RunCombatMutation(TEXT("PEND resolve"), TEXT("resolvePendingEffect"),
-                    ResolvePendingEffectMutation, Variables);
+  return RunCombatMutation(TEXT("PEND resolve"), TEXT("resolvePendingEffect"),
+                           ResolvePendingEffectMutation, Variables, EffectId);
 }
 
-void FS08FlowController::DeclinePendingEffect(const FString& EffectId) {
+bool FS08FlowController::DeclinePendingEffect(const FString& EffectId) {
   FString Reason;
   if (!CanIssueCombatCommand(Reason)) {
     Trace(TEXT("PEND decline blocked: ") + Reason);
-    return;
+    return false;
   }
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
   Variables->SetStringField(TEXT("effectId"), EffectId);
-  RunCombatMutation(TEXT("PEND decline"), TEXT("declinePendingEffect"),
-                    DeclinePendingEffectMutation, Variables);
+  return RunCombatMutation(TEXT("PEND decline"), TEXT("declinePendingEffect"),
+                           DeclinePendingEffectMutation, Variables, EffectId);
 }

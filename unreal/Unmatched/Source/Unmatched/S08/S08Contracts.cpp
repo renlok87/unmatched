@@ -259,9 +259,23 @@ bool FS08Contracts::ExtractGraphQLErrors(const TSharedRef<FJsonObject> Root,
     if (!Value.IsValid() || !Value->TryGetObject(ErrorObj) || !ErrorObj->IsValid()) continue;
     FS08GraphQLError Error;
     (*ErrorObj)->TryGetStringField(TEXT("message"), Error.Message);
+    // S10 review P1(1): the backend places the machine code in
+    // extensions.code, but other shapes exist in the wild (code directly on
+    // the error object; extensions.status/statusCode carrying the HTTP code
+    // for a 200-wrapped GraphQL error). All placements are normalized here so
+    // the controller classifies on Code/HttpStatus alone.
+    (*ErrorObj)->TryGetStringField(TEXT("code"), Error.Code);
     const TSharedPtr<FJsonObject>* Extensions = nullptr;
     if ((*ErrorObj)->TryGetObjectField(TEXT("extensions"), Extensions) && Extensions->IsValid()) {
-      (*Extensions)->TryGetStringField(TEXT("code"), Error.Code);
+      if (Error.Code.IsEmpty()) {
+        (*Extensions)->TryGetStringField(TEXT("code"), Error.Code);
+      }
+      double ExtStatus = 0.0;
+      if (Error.HttpStatus == 0 &&
+          ((*Extensions)->TryGetNumberField(TEXT("status"), ExtStatus) ||
+           (*Extensions)->TryGetNumberField(TEXT("statusCode"), ExtStatus))) {
+        Error.HttpStatus = static_cast<int32>(ExtStatus);
+      }
     }
     const TArray<TSharedPtr<FJsonValue>>* Path = nullptr;
     if ((*ErrorObj)->TryGetArrayField(TEXT("path"), Path) && Path) {
@@ -362,12 +376,13 @@ bool FS08Contracts::ReadIntLike(const TSharedRef<FJsonObject> Object, const FStr
 
 bool FS08Contracts::ParseAuthResponse(const FString& Body, FString& OutAccessToken,
                                       FString& OutRefreshToken, FString& OutUserId,
-                                      FString& OutUsername, FS08GraphQLError& OutError) {
+                                      FString& OutUsername, FS08GraphQLError& OutError,
+                                      const TCHAR* FieldName) {
   TSharedPtr<FJsonObject> Root;
   FString Problem;
   if (!ParseJsonString(Body, Root, Problem)) {
     OutError = {TEXT("PARSE"),
-                FString::Printf(TEXT("Login response is not valid JSON (%s)"), *Problem),
+                FString::Printf(TEXT("Auth response is not valid JSON (%s)"), *Problem),
                 FString()};
     return false;
   }
@@ -378,12 +393,14 @@ bool FS08Contracts::ParseAuthResponse(const FString& Body, FString& OutAccessTok
   }
   const TSharedPtr<FJsonObject>* Data = nullptr;
   if (!Root->TryGetObjectField(TEXT("data"), Data) || !Data->IsValid()) {
-    OutError = {TEXT("PARSE"), TEXT("Login response has no data object"), FString()};
+    OutError = {TEXT("PARSE"), TEXT("Auth response has no data object"), FString()};
     return false;
   }
   const TSharedPtr<FJsonObject>* Login = nullptr;
-  if (!(*Data)->TryGetObjectField(TEXT("login"), Login) || !Login->IsValid()) {
-    OutError = {TEXT("PARSE"), TEXT("Login response has no login payload"), FString()};
+  if (!(*Data)->TryGetObjectField(FieldName, Login) || !Login->IsValid()) {
+    OutError = {TEXT("PARSE"),
+                FString::Printf(TEXT("Auth response has no %s payload"), FieldName),
+                FString()};
     return false;
   }
   const TSharedRef<FJsonObject> LoginRef = Login->ToSharedRef();
@@ -391,7 +408,8 @@ bool FS08Contracts::ParseAuthResponse(const FString& Body, FString& OutAccessTok
   FString Token;
   ReadStringPresence(LoginRef, TEXT("accessToken"), Token, Present);
   if (!Present || Token.IsEmpty()) {
-    OutError = {TEXT("PARSE"), TEXT("Login response missing accessToken"), TEXT("login.accessToken")};
+    OutError = {TEXT("PARSE"), TEXT("Auth response missing accessToken"),
+                FString(FieldName) + TEXT(".accessToken")};
     return false;
   }
   OutAccessToken = Token;
