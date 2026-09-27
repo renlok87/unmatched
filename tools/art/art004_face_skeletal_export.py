@@ -20,12 +20,17 @@ ATLAS = ROOT / "blender/ASSET-MEDUSA-001/atlas-report.json"
 OUTPUT = ROOT / "unreal/Unmatched/Artifacts/ART004Face/SK_Medusa_FaceFix.fbx"
 FRONT_ONLY = os.environ.get("ART004_FACE_FRONT_ONLY", "0") == "1"
 FACE_SLOT = os.environ.get("ART004_FACE_SLOT", "0") == "1"
+RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "0") == "1"
 if FRONT_ONLY and FACE_SLOT:
     raise ValueError("Choose either front-only winding or separate face slot")
+if RESTORE_NORMALS and (FRONT_ONLY or FACE_SLOT):
+    raise ValueError("Restored normals require the complete face winding probe")
 if FRONT_ONLY:
     OUTPUT = OUTPUT.with_name("SK_Medusa_FaceFrontOnly.fbx")
 if FACE_SLOT:
     OUTPUT = OUTPUT.with_name("SK_Medusa_FaceSlot.fbx")
+if RESTORE_NORMALS:
+    OUTPUT = OUTPUT.with_name("SK_Medusa_FaceFixNormals.fbx")
 
 
 def face_indices(mesh):
@@ -59,6 +64,10 @@ def flip_face(mesh):
                     mesh.polygons[index].normal.y > .1}
                 if FRONT_ONLY else part)
     assert selected, "No front-facing polygons selected"
+    source_vertices = {poly.index: frozenset(poly.vertices) for poly in mesh.polygons}
+    source_normals = {(poly.index, mesh.loops[loop].vertex_index):
+                      mesh.corner_normals[loop].vector.copy()
+                      for poly in mesh.polygons for loop in poly.loop_indices}
     editable = bmesh.new()
     editable.from_mesh(mesh)
     editable.faces.index_update()
@@ -67,10 +76,22 @@ def flip_face(mesh):
             face.normal_flip()
     editable.to_mesh(mesh)
     editable.free()
+    assert all(frozenset(poly.vertices) == source_vertices[poly.index]
+               for poly in mesh.polygons), "BMesh reordered polygons"
     custom = mesh.attributes.get("custom_normal")
-    if custom:
+    if custom and not RESTORE_NORMALS:
         mesh.attributes.remove(custom)
     mesh.update()
+    if RESTORE_NORMALS:
+        normals = [None] * len(mesh.loops)
+        for poly in mesh.polygons:
+            for loop in poly.loop_indices:
+                normal = source_normals[(poly.index, mesh.loops[loop].vertex_index)].copy()
+                if poly.index in selected:
+                    normal.negate()
+                normals[loop] = normal
+        mesh.normals_split_custom_set(normals)
+        mesh.update()
     return len(selected), mid_y
 
 
@@ -128,7 +149,8 @@ def main():
     patch_fbx_units(OUTPUT)
     report = {"input": str(BLEND), "output": str(OUTPUT),
               "face_part": "tripo_part_10", "front_only": FRONT_ONLY,
-              "face_slot": FACE_SLOT, "face_slot_polygons": 587 if FACE_SLOT else 0,
+              "face_slot": FACE_SLOT, "restore_normals": RESTORE_NORMALS,
+              "face_slot_polygons": 587 if FACE_SLOT else 0,
               "front_mid_y_m": mid_y, "flipped_faces": flipped,
               "body_triangles": sum(len(p.vertices) - 2 for p in body.data.polygons),
               "bow_triangles": sum(len(p.vertices) - 2 for p in bow.data.polygons),

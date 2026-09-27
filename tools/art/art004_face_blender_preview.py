@@ -18,10 +18,16 @@ ATLAS = ROOT / "blender/ASSET-MEDUSA-001/atlas-report.json"
 OUTPUT = ROOT / "docs/game-design/evidence/ART-004/medusa-facefix-blender-front-2026-09-28.png"
 KEEP_NORMALS = os.environ.get("ART004_FACE_KEEP_NORMALS", "0") == "1"
 DISABLE_NORMAL_MAP = os.environ.get("ART004_FACE_DISABLE_NORMAL_MAP", "0") == "1"
+RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "")
+if RESTORE_NORMALS not in {"", "original", "inverted"}:
+    raise ValueError("ART004_FACE_RESTORE_NORMALS must be original or inverted")
 if KEEP_NORMALS:
     OUTPUT = OUTPUT.with_name("medusa-facefix-blender-front-keepnormals-2026-09-28.png")
 if DISABLE_NORMAL_MAP:
     OUTPUT = OUTPUT.with_name("medusa-facefix-blender-front-nonormalmap-2026-09-28.png")
+if RESTORE_NORMALS:
+    OUTPUT = OUTPUT.with_name(
+        f"medusa-facefix-blender-front-restored-{RESTORE_NORMALS}-2026-09-28.png")
 
 
 def main():
@@ -40,6 +46,10 @@ def main():
                        v_min <= uv[loop].uv.y <= v_max
                        for loop in poly.loop_indices)}
     assert len(selected) == 587, len(selected)
+    source_vertices = {poly.index: frozenset(poly.vertices) for poly in mesh.polygons}
+    source_normals = {(poly.index, mesh.loops[loop].vertex_index):
+                      mesh.corner_normals[loop].vector.copy()
+                      for poly in mesh.polygons for loop in poly.loop_indices}
     editable = bmesh.new()
     editable.from_mesh(mesh)
     editable.faces.index_update()
@@ -48,10 +58,22 @@ def main():
             face.normal_flip()
     editable.to_mesh(mesh)
     editable.free()
+    assert all(frozenset(poly.vertices) == source_vertices[poly.index]
+               for poly in mesh.polygons), "BMesh reordered polygons"
     custom = mesh.attributes.get("custom_normal")
-    if custom and not KEEP_NORMALS:
+    if custom and not KEEP_NORMALS and not RESTORE_NORMALS:
         mesh.attributes.remove(custom)
     mesh.update()
+    if RESTORE_NORMALS:
+        normals = [None] * len(mesh.loops)
+        for poly in mesh.polygons:
+            for loop in poly.loop_indices:
+                vector = source_normals[(poly.index, mesh.loops[loop].vertex_index)].copy()
+                if poly.index in selected and RESTORE_NORMALS == "inverted":
+                    vector.negate()
+                normals[loop] = vector
+        mesh.normals_split_custom_set(normals)
+        mesh.update()
     if DISABLE_NORMAL_MAP:
         material = bpy.data.materials["M_Medusa_Atlas"]
         normal_nodes = [node for node in material.node_tree.nodes if node.type == "NORMAL_MAP"]

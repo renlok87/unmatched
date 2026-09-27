@@ -19,13 +19,17 @@ if USE_PRODUCTION and not SKELETAL:
     raise ValueError("ART004_FACE_USE_PRODUCTION requires skeletal probe")
 FRONT_ONLY = os.environ.get("ART004_FACE_FRONT_ONLY", "0") == "1"
 FACE_SLOT = os.environ.get("ART004_FACE_SLOT", "0") == "1"
+RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "0") == "1"
 if FACE_SLOT and (FRONT_ONLY or USE_PRODUCTION or not SKELETAL):
     raise ValueError("Face-slot probe needs a separate skeletal test import")
+if RESTORE_NORMALS and (FACE_SLOT or FRONT_ONLY or USE_PRODUCTION or not SKELETAL):
+    raise ValueError("Restored normals need a separate full-flip skeletal test import")
 FLIP_HEAD = os.environ.get("ART004_FACE_FLIP_HEAD", "0") == "1"
 CLEAR_NORMALS = FLIP_HEAD and os.environ.get("ART004_FACE_CLEAR_NORMALS", "0") == "1"
 FBX = ROOT / "unreal/Unmatched/Artifacts/ART004Face" / (
     ("SK_Medusa_FaceSlot.fbx" if FACE_SLOT else (
-        "SK_Medusa_FaceFrontOnly.fbx" if FRONT_ONLY else "SK_Medusa_FaceFix.fbx")) if SKELETAL else (
+        "SK_Medusa_FaceFixNormals.fbx" if RESTORE_NORMALS else (
+            "SK_Medusa_FaceFrontOnly.fbx" if FRONT_ONLY else "SK_Medusa_FaceFix.fbx"))) if SKELETAL else (
         "SM_Medusa_FlippedHeadRecalc.fbx" if CLEAR_NORMALS else (
             "SM_Medusa_FlippedHead.fbx" if FLIP_HEAD else "SM_Medusa_FrozenIdle.fbx")))
 TWO_SIDED = os.environ.get("ART004_FACE_TWO_SIDED", "0") == "1"
@@ -33,8 +37,12 @@ UNLIT = os.environ.get("ART004_FACE_UNLIT", "0") == "1"
 UNLIT_SINGLE = UNLIT and os.environ.get("ART004_FACE_UNLIT_SINGLE", "0") == "1"
 NO_NORMAL = os.environ.get("ART004_FACE_NO_NORMAL", "0") == "1"
 FACE_LIFT = float(os.environ.get("ART004_FACE_LIFT", "0"))
-if not 0 <= FACE_LIFT <= .2:
-    raise ValueError("ART004_FACE_LIFT is a diagnostic factor from 0 to .2")
+if not 0 <= FACE_LIFT <= 1:
+    raise ValueError("ART004_FACE_LIFT is a diagnostic factor from 0 to 1")
+FACE_AMBIENT = float(os.environ.get("ART004_FACE_AMBIENT", "0"))
+if not 0 <= FACE_AMBIENT <= .2 or (FACE_AMBIENT and FACE_LIFT):
+    raise ValueError("ART004_FACE_AMBIENT is 0..0.2 and excludes FACE_LIFT")
+FACE_FLAT_NORMAL = os.environ.get("ART004_FACE_FLAT_NORMAL", "0") == "1"
 NO_SHADOW = os.environ.get("ART004_FACE_NO_SHADOW", "0") == "1"
 FRONT_FILL = os.environ.get("ART004_FACE_FRONT_FILL", "0") == "1"
 LOCAL_FILL = FRONT_FILL and os.environ.get("ART004_FACE_LOCAL_FILL", "0") == "1"
@@ -42,8 +50,8 @@ LOCAL_FILL_INTENSITY = float(os.environ.get("ART004_FACE_LOCAL_INTENSITY", "40")
 if LOCAL_FILL and not 0 < LOCAL_FILL_INTENSITY <= 100:
     raise ValueError("Local fill intensity is a diagnostic value in (0, 100]")
 VIEW = os.environ.get("ART004_FACE_VIEW", "front")
-if VIEW not in {"front", "rear"}:
-    raise ValueError("ART004_FACE_VIEW must be front or rear")
+if VIEW not in {"front", "rear", "k1"}:
+    raise ValueError("ART004_FACE_VIEW must be front, rear, or k1")
 LIGHT_PROFILE = os.environ.get("ART004_FACE_LIGHT_PROFILE", "cobble")
 LEVELS = {
     "cobble": "/Game/ArtTests/ART005H/L_ART005H_CornerReview",
@@ -52,25 +60,38 @@ LEVELS = {
 }
 if LIGHT_PROFILE not in LEVELS:
     raise ValueError("ART004_FACE_LIGHT_PROFILE must be cobble, forest-probe, or paddock-probe")
+REPOSITION_AMBIENT = os.environ.get("ART004_FACE_REPOSITION_AMBIENT", "0") == "1"
+AMBIENT_Y = float(os.environ.get("ART004_FACE_AMBIENT_Y", "300"))
+AMBIENT_Z = float(os.environ.get("ART004_FACE_AMBIENT_Z", "350"))
+AMBIENT_SCALE = float(os.environ.get("ART004_FACE_AMBIENT_SCALE", "1"))
+if REPOSITION_AMBIENT and not (-500 <= AMBIENT_Y <= 500 and 100 <= AMBIENT_Z <= 800
+                               and .1 <= AMBIENT_SCALE <= 2):
+    raise ValueError("Diagnostic ambient position or scale is out of range")
 MATERIAL_MODE = ("unlit-single" if UNLIT_SINGLE else "unlit") if UNLIT else (
     "no-normal" if NO_NORMAL else ("twosided" if TWO_SIDED else "static"))
 MODE = (("skeletal-production-" if USE_PRODUCTION else (
     "skeletal-faceslot-" if FACE_SLOT else (
-        "skeletal-frontonly-" if FRONT_ONLY else "skeletal-"))) if SKELETAL else (
+        "skeletal-restorednormals-" if RESTORE_NORMALS else (
+            "skeletal-frontonly-" if FRONT_ONLY else "skeletal-")))) if SKELETAL else (
     "flippedhead-recalc-" if CLEAR_NORMALS else (
         "flippedhead-" if FLIP_HEAD else ""))) + MATERIAL_MODE + (
             "-noshadow" if NO_SHADOW else "") + (
             f"-localfill{round(LOCAL_FILL_INTENSITY):03d}" if LOCAL_FILL else
             "-frontfill" if FRONT_FILL else "") + (
             f"-lift{round(FACE_LIFT * 1000):03d}" if FACE_LIFT else "") + (
-            "-rear" if VIEW == "rear" else "") + (
+            f"-ambient{round(FACE_AMBIENT * 1000):03d}" if FACE_AMBIENT else "") + (
+            "-flatnormal" if FACE_FLAT_NORMAL else "") + (
+            f"-frontambient-y{round(AMBIENT_Y)}-z{round(AMBIENT_Z)}-s{round(AMBIENT_SCALE * 100)}"
+            if REPOSITION_AMBIENT else "") + (
+            "-" + VIEW if VIEW != "front" else "") + (
             "-" + LIGHT_PROFILE if LIGHT_PROFILE != "cobble" else "")
 OUTPUT = ROOT / f"docs/game-design/evidence/ART-004/medusa-frozen-{MODE}-ue-editor-2026-09-28.png"
 REPORT = ROOT / f"unreal/Unmatched/Artifacts/ART004Face/ue-{MODE}-report.json"
 LEVEL = LEVELS[LIGHT_PROFILE]
 DEST = "/Game/ArtTests/ART004Face/Meshes"
 NAME = ("SK_Medusa_FaceSlot" if FACE_SLOT else (
-    "SK_Medusa_FaceFrontOnly" if FRONT_ONLY else "SK_Medusa_FaceFix")) if SKELETAL else (
+    "SK_Medusa_FaceFixNormals" if RESTORE_NORMALS else (
+        "SK_Medusa_FaceFrontOnly" if FRONT_ONLY else "SK_Medusa_FaceFix"))) if SKELETAL else (
     "SM_Medusa_FlippedHeadRecalc" if CLEAR_NORMALS else (
         "SM_Medusa_FlippedHead" if FLIP_HEAD else "SM_Medusa_FrozenIdle"))
 MATERIAL = "/Game/ART004/Medusa/Materials/MI_Medusa_Blue"
@@ -118,22 +139,30 @@ def comparison_material():
         mel.recompile_material(material)
         u.EditorAssetLibrary.save_loaded_asset(material)
         return material
-    if not TWO_SIDED:
+    if not TWO_SIDED and not FACE_AMBIENT:
         material = u.load_asset(MATERIAL)
         if not material:
             raise RuntimeError("Missing imported Medusa material: " + MATERIAL)
         return material
     source = "/Game/ART004/Medusa/Materials/M_Medusa_Atlas"
     path = "/Game/ArtTests/ART004Face/Materials"
-    suffix = f"Lift{round(FACE_LIFT * 1000):03d}" if FACE_LIFT else ""
-    parent_path = path + "/M_Medusa_TwoSided" + suffix + "Probe"
+    suffix = (f"Lift{round(FACE_LIFT * 1000):03d}" if FACE_LIFT else "") + (
+        f"Ambient{round(FACE_AMBIENT * 1000):03d}" if FACE_AMBIENT else "") + (
+        "FlatNormal" if FACE_FLAT_NORMAL else "")
+    parent_path = path + "/M_Medusa_" + ("TwoSided" if TWO_SIDED else "SingleSided") + suffix + "Probe"
     parent = u.load_asset(parent_path)
     created = not parent
     if not parent:
         parent = u.EditorAssetLibrary.duplicate_asset(source, parent_path)
     if not parent:
         raise RuntimeError("Cannot duplicate Medusa parent material")
-    parent.set_editor_property("two_sided", True)
+    parent.set_editor_property("two_sided", TWO_SIDED)
+    if FACE_FLAT_NORMAL and created:
+        flat = u.MaterialEditingLibrary.create_material_expression(
+            parent, u.MaterialExpressionConstant3Vector, -450, 760)
+        flat.set_editor_property("constant", u.LinearColor(0, 0, 1, 1))
+        u.MaterialEditingLibrary.connect_material_property(
+            flat, "", u.MaterialProperty.MP_NORMAL)
     if FACE_LIFT and created:
         mel = u.MaterialEditingLibrary
         texture = u.load_asset("/Game/ART004/Medusa/Textures/T_Medusa_BC")
@@ -147,13 +176,21 @@ def comparison_material():
         mel.connect_material_expressions(sample, "RGB", multiply, "A")
         mel.connect_material_expressions(factor, "", multiply, "B")
         mel.connect_material_property(multiply, "", u.MaterialProperty.MP_EMISSIVE_COLOR)
+    if FACE_AMBIENT and created:
+        ambient = u.MaterialEditingLibrary.create_material_expression(
+            parent, u.MaterialExpressionConstant3Vector, -450, 1000)
+        ambient.set_editor_property("constant", u.LinearColor(
+            FACE_AMBIENT, FACE_AMBIENT, FACE_AMBIENT, 1))
+        u.MaterialEditingLibrary.connect_material_property(
+            ambient, "", u.MaterialProperty.MP_EMISSIVE_COLOR)
     u.MaterialEditingLibrary.recompile_material(parent)
     u.EditorAssetLibrary.save_loaded_asset(parent)
-    instance_path = path + "/MI_Medusa_TwoSided" + suffix + "BlueProbe"
+    instance_name = "MI_Medusa_" + ("TwoSided" if TWO_SIDED else "SingleSided") + suffix + "BlueProbe"
+    instance_path = path + "/" + instance_name
     instance = u.load_asset(instance_path)
     if not instance:
         instance = u.AssetToolsHelpers.get_asset_tools().create_asset(
-            "MI_Medusa_TwoSided" + suffix + "BlueProbe", path, u.MaterialInstanceConstant,
+            instance_name, path, u.MaterialInstanceConstant,
             u.MaterialInstanceConstantFactoryNew())
     if not instance:
         raise RuntimeError("Cannot create two-sided test instance")
@@ -191,6 +228,9 @@ def import_mesh():
     if SKELETAL:
         options.import_animations = False
         options.skeletal_mesh_import_data.import_uniform_scale = 1.0
+        if RESTORE_NORMALS:
+            options.skeletal_mesh_import_data.normal_import_method = (
+                u.FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS_AND_TANGENTS)
     else:
         options.static_mesh_import_data.combine_meshes = True
         options.static_mesh_import_data.import_uniform_scale = 1.0
@@ -257,6 +297,7 @@ class CaptureJob:
                     "use_production": USE_PRODUCTION,
                     "front_only": FRONT_ONLY,
                     "face_slot": FACE_SLOT,
+                    "restore_normals": RESTORE_NORMALS,
                     "flipped_head": FLIP_HEAD,
                     "clear_custom_normals": CLEAR_NORMALS,
                     "no_shadow": NO_SHADOW,
@@ -264,9 +305,14 @@ class CaptureJob:
                     "local_fill": LOCAL_FILL,
                     "local_fill_intensity": LOCAL_FILL_INTENSITY if LOCAL_FILL else None,
                     "face_lift": FACE_LIFT,
+                    "face_ambient": FACE_AMBIENT,
+                    "face_flat_normal": FACE_FLAT_NORMAL,
+                    "reposition_ambient": REPOSITION_AMBIENT,
+                    "ambient_probe": [AMBIENT_Y, AMBIENT_Z, AMBIENT_SCALE]
+                    if REPOSITION_AMBIENT else None,
                     "output": str(OUTPUT), "scene_saved": False,
                     "camera_location": list(self.camera_location),
-                    "camera_target": [0, -50, 29], "fov": 35,
+                    "camera_target": list(self.camera_target), "fov": 35,
                 }, indent=2) + "\n", encoding="utf-8")
                 u.log("ART004_FACE_STATIC_UE_CAPTURE_COMPLETE " + str(OUTPUT))
                 self.finish()
@@ -284,6 +330,14 @@ class CaptureJob:
         u.SystemLibrary.execute_console_command(self.world, "r.DefaultFeature.AutoExposure 0")
         u.SystemLibrary.execute_console_command(self.world, "r.EyeAdaptationQuality 0")
         actors = u.get_editor_subsystem(u.EditorActorSubsystem).get_all_level_actors()
+        if REPOSITION_AMBIENT:
+            ambient = [actor for actor in actors if actor.get_actor_label() ==
+                       "ART005 neutral readability fill - review only"]
+            if len(ambient) != 1:
+                raise RuntimeError("Expected one neutral ambient fill actor")
+            ambient[0].set_actor_location(u.Vector(0, AMBIENT_Y, AMBIENT_Z), False, False)
+            current = ambient[0].light_component.get_editor_property("intensity")
+            ambient[0].light_component.set_editor_property("intensity", current * AMBIENT_SCALE)
         figures = [actor for actor in actors
                    if actor.get_actor_label() == "ART004 Medusa - animation review"]
         if len(figures) != 1:
@@ -316,9 +370,13 @@ class CaptureJob:
             fill.light_component.set_editor_property("attenuation_radius", 140.0 if LOCAL_FILL else 330.0)
             fill.light_component.set_editor_property("cast_shadows", False)
             fill.light_component.set_editor_property("mobility", u.ComponentMobility.MOVABLE)
-        self.camera_location = (-70, 105, 105) if VIEW == "front" else (70, -205, 105)
+        self.camera_location = {
+            "front": (-70, 105, 105), "rear": (70, -205, 105),
+            "k1": (0, -1032.4, 1474.4),
+        }[VIEW]
+        self.camera_target = (0, 0, 0) if VIEW == "k1" else (0, -50, 29)
         origin = u.Vector(*self.camera_location)
-        target = u.Vector(0, -50, 29)
+        target = u.Vector(*self.camera_target)
         camera = u.EditorLevelLibrary.spawn_actor_from_class(
             u.SceneCapture2D, origin, u.MathLibrary.find_look_at_rotation(origin, target))
         camera.set_actor_label("ART004 temporary static capture")
