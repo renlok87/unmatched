@@ -1,0 +1,140 @@
+{
+  "stage": "UE 5.8.2 import and editor verification",
+  "checks": {
+    "cube_100uu": {
+      "ok": true,
+      "detail": "dims=[100.0, 100.0, 100.0]"
+    },
+    "cube_bottom_pivot": {
+      "ok": true,
+      "detail": "min=[-50.0, -50.0, 0.0]"
+    },
+    "arrow_plus_x_top_z": {
+      "ok": true,
+      "detail": "bounds={'min': [-0.0, -16.0, 0.0], 'max': [100.0, 16.0, 10.0], 'dims': [100.0, 32.0, 10.0]}"
+    },
+    "mannequin_50uu": {
+      "ok": true,
+      "detail": "dims=[24.0, 24.0, 50.0]"
+    },
+    "mannequin_bottom_pivot": {
+      "ok": true,
+      "detail": "min=[-12.0, -12.0, 0.0]"
+    },
+    "teamcolor_material": {
+      "ok": true,
+      "detail": "slots=1 material=/Game/ArtTests/ART001/Materials/M_ART001_TeamColor.M_ART001_TeamColor"
+    },
+    "selection_collision": {
+      "ok": true,
+      "detail": "shapes=1 trace=hit"
+    },
+    "skeleton_orientation": {
+      "ok": true,
+      "detail": "bones=['root', 'hips', 'spine', 'leg_upper_L', 'leg_upper_R', 'leg_lower_R', 'foot_R', 'leg_lower_L', 'foot_L', 'head', 'arm_upper_L', 'arm_upper_R', 'arm_lower_R', 'hand_R', 'weapon', 'arm_lower_L', 'hand_L']"
+    },
+    "root_motion_plus_x": {
+      "ok": true,
+      "detail": "delta=[100.0, 0.0, 0.0] duration=1.2083s"
+    },
+    "normal_map_contract": {
+      "ok": true,
+      "detail": "{'compression': '<TextureCompressionSettings.TC_NORMALMAP: 1>', 'srgb': False, 'flip_green': False}"
+    }
+  },
+  "measurements": {
+    "cube_dimensions_uu": [
+      100.0,
+      100.0,
+      100.0
+    ],
+    "cube_min_uu": [
+      -50.0,
+      -50.0,
+      0.0
+    ],
+    "arrow_bounds_uu": {
+      "min": [
+        -0.0,
+        -16.0,
+        0.0
+      ],
+      "max": [
+        100.0,
+        16.0,
+        10.0
+      ],
+      "dims": [
+        100.0,
+        32.0,
+        10.0
+      ]
+    },
+    "mannequin_dimensions_uu": [
+      24.0,
+      24.0,
+      50.0
+    ],
+    "mannequin_min_uu": [
+      -12.0,
+      -12.0,
+      0.0
+    ],
+    "material": {
+      "slots": 1,
+      "TeamColor": [
+        0.16,
+        0.48,
+        0.95
+      ]
+    },
+    "collision": {
+      "simple_shapes": 1,
+      "trace_hit": true,
+      "trace": "hit"
+    },
+    "skeleton": {
+      "bones": [
+        "root",
+        "hips",
+        "spine",
+        "leg_upper_L",
+        "leg_upper_R",
+        "leg_lower_R",
+        "foot_R",
+        "leg_lower_L",
+        "foot_L",
+        "head",
+        "arm_upper_L",
+        "arm_upper_R",
+        "arm_lower_R",
+        "hand_R",
+        "weapon",
+        "arm_lower_L",
+        "hand_L"
+      ],
+      "count": 17
+    },
+    "root_motion_delta_uu": [
+      100.0,
+      0.0,
+      0.0
+    ],
+    "animation_seconds": 1.2083333730697632,
+    "normal_texture": {
+      "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>",
+      "srgb": false,
+      "flip_green": false
+    }
+  },
+  "assets": {
+    "cube": "/Game/ArtTests/ART001/Meshes/SM_ART001_Cube.SM_ART001_Cube",
+    "arrow": "/Game/ArtTests/ART001/Meshes/SM_ART001_Arrow.SM_ART001_Arrow",
+    "mannequin": "/Game/ArtTests/ART001/Meshes/SM_ART001_Mannequin.SM_ART001_Mannequin",
+    "skeletal": "/Game/ArtTests/ART001/Meshes/SK_ART001_Mannequin.SK_ART001_Mannequin",
+    "animation": "/Game/ArtTests/ART001/Animations/AM_ART001_RootMotion_Anim.AM_ART001_RootMotion_Anim",
+    "material": "/Game/ArtTests/ART001/Materials/M_ART001_TeamColor.M_ART001_TeamColor",
+    "normal_texture": "/Game/ArtTests/ART001/Textures/T_ART001_Normal_DX.T_ART001_Normal_DX",
+    "level": "/Game/ArtTests/ART001/L_ART001_Check"
+  }
+}
