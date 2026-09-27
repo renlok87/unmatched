@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Доска задач — Unmatched</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="toolbar">
+      <h1>Доска задач</h1>
+      <span id="conn" class="conn offline" title="Соединение с сервером"
+        >офлайн</span
+      >
+      <span id="error" class="error" hidden></span>
+      <div class="spacer"></div>
+      <input
+        id="search"
+        type="search"
+        placeholder="Поиск по id или названию…"
+        autocomplete="off"
+      />
+      <select id="type-filter" title="Тип"></select>
+      <select id="milestone-filter" title="Этап"></select>
+      <span id="total" class="total" title="Видно задач / всего"></span>
+    </header>
+    <main id="board">
+      <section class="column" data-status="planned">
+        <header class="column-head">
+          <h2>Planned</h2>
+          <span class="count"></span>
+        </header>
+        <div class="cards"></div>
+      </section>
+      <section class="column" data-status="in_progress">
+        <header class="column-head">
+          <h2>In Progress</h2>
+          <span class="count"></span>
+        </header>
+        <div class="cards"></div>
+      </section>
+      <section class="column" data-status="blocked">
+        <header class="column-head">
+          <h2>Blocked</h2>
+          <span class="count"></span>
+        </header>
+        <div class="cards"></div>
+      </section>
+      <section class="column" data-status="done">
+        <header class="column-head">
+          <h2>Done</h2>
+          <span class="count"></span>
+        </header>
+        <div class="cards"></div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
