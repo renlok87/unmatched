@@ -225,6 +225,9 @@ public:
   bool IsRefreshInFlightForTest() const { return bRefreshInFlight; }
   bool IsSessionExpiredForTest() const { return bSessionExpired; }
   int32 GetWsGenerationForTest() const { return WsGeneration; }
+  /** S10/GD-039 test seam: the idempotency key the next createGame intent
+   *  would carry (rotation proofs live here, see CreateRoom). */
+  const FString& GetIdempotencyKeyForTest() const { return IdempotencyKey; }
   /** Test seam: drive the WS transport-close path (4403/4408/...) without a
    *  socket - same handler the OnClosedTransport delegate binds. */
   void HandleWsClosedForTest(int32 StatusCode, const FString& Reason) {
@@ -307,9 +310,35 @@ public:
   /** Lobby freshness via game(id) re-query (named subscriptions have no
    *  snapshot barrier, so they cannot carry room state). */
   void PollRoom();
-  /** True while the lobby/room view needs game(id) re-query polling. */
+  /** True while the lobby/room view needs game(id) re-query polling.
+   *  S10/GD-040: ALSO true while a match is live - the room row (not a stale
+   *  snapshot or a named CUE) is the only authoritative source for the
+   *  IN_PROGRESS -> ABORTED/FINISHED transition; the poll stops once a
+   *  terminal status is installed. */
   bool WantsPolling() const {
-    return Stage == ES08Stage::Room && Room.Status == TEXT("LOBBY");
+    if (Stage == ES08Stage::Room && Room.Status == TEXT("LOBBY")) return true;
+    return Stage == ES08Stage::Started &&
+           (Room.Status == TEXT("IN_PROGRESS") || Room.Status == TEXT("PAUSED"));
+  }
+  /** S10/GD-040: the authoritative room row is terminal (FINISHED or ABORTED).
+   *  A live match blocks all gameplay input once this holds; only LeaveRoom
+   *  remains. */
+  bool IsRoomTerminal() const {
+    return Room.Status == TEXT("FINISHED") || Room.Status == TEXT("ABORTED");
+  }
+  /** S10/GD-040: the room row says the match was INTERRUPTED (ABORTED) - never
+   *  a victory/defeat verdict, and never inferred from a snapshot/CUE. */
+  bool IsRoomAborted() const { return Room.Status == TEXT("ABORTED"); }
+  /** S10/GD-039: VS_AI room - the second seat is the server bot (room
+   *  metadata), added by the server on startGame. */
+  bool IsVsAiRoom() const { return Room.Mode == TEXT("VS_AI"); }
+  /** S10/GD-039: true while the server bot holds the turn of a live VS_AI
+   *  match - drives the waiting indicator from the AUTHORITATIVE state
+   *  (applied turn owner), never a fixed timer. */
+  bool IsBotActing() const {
+    return Stage == ES08Stage::Started && IsVsAiRoom() && !IsRoomTerminal() &&
+           Applied.Phase != TEXT("GAME_OVER") && !UserId.IsEmpty() &&
+           !Applied.CurrentTurnPlayerId.IsEmpty() && Applied.CurrentTurnPlayerId != UserId;
   }
 
 private:
@@ -435,6 +464,21 @@ private:
   FString UserId;
   FString Username;
   FString IdempotencyKey;   // stable across create retries in this session
+  // S10/GD-039: room id the CURRENT key's create intent already resolved to.
+  // Non-empty => that intent is complete; the NEXT CreateRoom call is a NEW
+  // intent and rotates the key first (two successive rooms get distinct keys).
+  // A create with no resolved room yet (lost answer, answered failure) keeps
+  // the key - a retry of the SAME intent redelivers the SAME room - UNLESS the
+  // intent was SUPERSEDED (below): then its answer is stale-dropped and a
+  // further create is logically NEW.
+  FString CreateKeyRoomId;
+  // S10 review M1: MatchGeneration at the CURRENT key's last createGame
+  // dispatch. When the live generation has moved past it (a concurrent JOIN /
+  // accepted leave won the race), that intent's answer can never be applied -
+  // the stale gates drop it - and a retry under the SAME key would make the
+  // server redeliver the ABANDONED room for the new intent. INDEX_NONE = no
+  // dispatch is outstanding for this key.
+  int32 CreateKeyDispatchGen = INDEX_NONE;
   FString GameStateOpId;
   ES08Stage Stage = ES08Stage::Boot;
   FS08RoomState Room;

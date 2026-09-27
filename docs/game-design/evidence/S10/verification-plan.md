@@ -71,6 +71,15 @@ Exact runs (2026-09-27, Development editor build): `Unmatched.S10` 20/20
 pass, `Unmatched.S08` 44/44 pass, `Unmatched.S09` 44/44 pass; node proxy
 tests 2/2 pass. These are module gates only.
 
+Post-review client gate (2026-09-27): `Unmatched.S10` 50/50,
+`Unmatched.S08` 46/46, and `Unmatched.S09` 44/44 pass. The reviewed
+Development package builds with `-MaxParallelActions=4` and
+`-NoHotReloadFromIDE`; packaged VS_AI result and abort runs are recorded in
+[`vsai-20260927-190850`](run/vsai-20260927-190850/manifest.json) and
+[`vsai-abort-20260927-190951`](run/vsai-abort-20260927-190951/manifest.json).
+These prove the client-side result/interruption screens and clean lobby, but
+do not replace the separate GD-041 human playtest or target-GPU measurement.
+
 ## Live packaged proof requirement
 
 The packaged two-client commit/drop/reconcile gate must observe BOTH: (a) a

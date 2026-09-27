@@ -1,0 +1,88 @@
+{
+  "stamp": "20260927-190951",
+  "verdict": "S10/GD-040: packaged ABORTED live acceptance over the authoritative S10 backend - a hidden one-client VS_AI match was observed in LOBBY with exactly one human seat, then went live IN_PROGRESS with exactly 2 seats where seat 1 is the REAL seeded bot (username AI Bot from backend/prisma/seed-ai.ts; seat-1 id matched the row opponentId and the public userByUsername AI Bot lookup - no weaker foreign-id claim), then an external HOST-AUTHORIZED abortGame for THIS exact room (id+code+mode+host+status pre-validated) flipped the authoritative row to ABORTED (endedAt set, winnerId null). The client ran its -S10AbortProof drive over the fresh interruption row: the ordered exactly-once proof tail (interruption marker -> aborted-screen shot -> ONE client leaveGame -> aborted-lobby shot -> complete) is in the trace, the leave was accepted by the server (LEFT room=<this room id> after the leave was sent; myGames lists no active room), NO gameplay command was sent after the interruption marker (input disabled), and NO result screen/markers ever appeared (no invented VICTORY/DEFEAT; row never FINISHED). Both proof shots are CLIENT-CAPTURED and pixel-gated: s10-aborted-screen.png carries the #FF6414 interruption panel marker with all result/lobby panel markers absent, s10-aborted-lobby.png carries the #40C8FF clean-lobby panel marker with duel/result/interruption markers absent and the visual gameplay-region bright-pixel gate passed (the board was torn down by the stage transition). The client exited ITSELF after the proof tail; the runner issued NO server-side leaveGame. Frame cap: per-process console command t.MaxFPS 30 (effective FPS NOT measured, no GPU claim; packaged 60 FPS default untouched)",
+  "mode": "VS_AI",
+  "scenario": "ABORTED",
+  "serverRow": {
+    "id": "cmujway7q00r2wiyk7p4m2sv3",
+    "status": "ABORTED",
+    "mode": "VS_AI",
+    "winnerId": null,
+    "endedAt": "1790518231088",
+    "seats": 2
+  },
+  "botIdentity": {
+    "username": "AI Bot",
+    "seatOrder": 1,
+    "opponentIdMatchedSeat1": true,
+    "userByUsernameIdMatch": true
+  },
+  "abortProof": {
+    "tailOrderedExactlyOnce": true,
+    "clientLeaveAccepted": true,
+    "screenShot": "human\\s10-aborted-screen.png (#FF6414 interruption marker present, result/lobby markers absent)",
+    "lobbyShot": "human\\s10-aborted-lobby.png (#40C8FF lobby panel present, duel/result/interruption markers absent, bright-pixel gate passed)",
+    "runnerServerLeave": "none (the client leaveGame is the single leave)"
+  },
+  "coverage": {
+    "attack": true,
+    "combatResult": true
+  },
+  "files": [
+    {
+      "name": "vsai-abort-client.trace.log",
+      "bytes": 71426,
+      "sha256": "7c59c421dd5cb31c5c4bea4ad737747c186bb63e2627d70c54ab1d78c32a5c66"
+    },
+    {
+      "name": "vsai-abort-client.compact.log",
+      "bytes": 24439,
+      "sha256": "adbe7be185b28dd9d63b406ce8ed8bf12efed3805c0163c44871e7285fce1e51"
+    },
+    {
+      "name": "human\\s09-combat-result.png",
+      "bytes": 500806,
+      "sha256": "385b40ed30ae0208d42fea800316ac7db1e93ef87f700d24dc30d7cf8281a016"
+    },
+    {
+      "name": "human\\s09-discard-open.png",
+      "bytes": 494151,
+      "sha256": "302a130875fc11432f9204c851bc1ffca63a5a9b317afdda9b0a7e5b6e0a5b9c"
+    },
+    {
+      "name": "human\\s09-hud-after-first-maneuver.png",
+      "bytes": 495451,
+      "sha256": "4a9b357be9baea8833346a946e408368b2476729fb76dc89480725caf520192e"
+    },
+    {
+      "name": "human\\s09-maneuver-draft-open.png",
+      "bytes": 497715,
+      "sha256": "41d08903793aab88861e88b34ee06e275be90c20f8423fd10c85fcab5a212e0c"
+    },
+    {
+      "name": "human\\s09-pending-BOOST_CHOICE.png",
+      "bytes": 496475,
+      "sha256": "30bd3802f75373c835fe20e7928cd6e65658180af5691a2063c4fb2c7d8a4802"
+    },
+    {
+      "name": "human\\s09-pending-MOVE.png",
+      "bytes": 481208,
+      "sha256": "945f00a2fd5d2ecee43d10bfb36ed17216ff37f7c1f53b23fa88ece530661cb2"
+    },
+    {
+      "name": "human\\s09-pending-TARGET_FIGHTER.png",
+      "bytes": 496685,
+      "sha256": "6b4af8fa2c1b02d4bcfec79fd8f12bd062b98ba247246a3874e6890b2ddd6cbf"
+    },
+    {
+      "name": "human\\s10-aborted-lobby.png",
+      "bytes": 32429,
+      "sha256": "7528c0d11e31b470c60419d4c4fb8c1232a0e00bebaaa5a39697b3ca555f40ae"
+    },
+    {
+      "name": "human\\s10-aborted-screen.png",
+      "bytes": 488020,
+      "sha256": "3b2a691a7faa175f0adb7773a040e90b18fd303f5d5d3012b48040bd32a66183"
+    }
+  ]
+}

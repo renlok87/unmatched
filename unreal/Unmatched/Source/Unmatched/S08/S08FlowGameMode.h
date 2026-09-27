@@ -86,6 +86,41 @@ struct FS09AutoDraftTransitions {
 };
 
 
+/** S10/GD-040: the EXACT step order the opt-in packaged ABORTED-proof drive
+ *  (-S10AbortProof) performs, extracted as a pure function so the drive and
+ *  its test cannot diverge. Without the flag NOTHING ever leaves Idle (no
+ *  auto path touches the normal UI). The single leaveGame fires only AFTER
+ *  the interrupted-screen evidence settled, the lobby shot only once the
+ *  post-leave Lobby stage arrived, and completion only after that shot
+ *  settled. No world, no UI, no screenshots - step state in, step out. */
+struct FS10AbortProofTransitions {
+  enum class EStep { Idle, ScreenShotWait, LeaveOnce, LobbyShotWait, Complete };
+  /** @param bAbortProofEnabled the -S10AbortProof CLI opt-in.
+   *  @param bAbortedLive authoritative ABORTED room row on the live match
+   *  (Stage Started) - the only thing that can wake the drive.
+   *  @param bInLobby post-leave Lobby stage (this drive's own leave).
+   *  @param bEvidenceSettled the current shot's file exists (or its bounded
+   *  wait expired - "proceeding without the shot" is a settled state too). */
+  static EStep Advance(EStep Step, bool bAbortProofEnabled, bool bAbortedLive,
+                       bool bInLobby, bool bEvidenceSettled) {
+    if (!bAbortProofEnabled) return EStep::Idle;
+    switch (Step) {
+      case EStep::Idle:
+        return bAbortedLive ? EStep::ScreenShotWait : EStep::Idle;
+      case EStep::ScreenShotWait:
+        return bAbortedLive && bEvidenceSettled ? EStep::LeaveOnce : EStep::ScreenShotWait;
+      case EStep::LeaveOnce:
+        return bInLobby && !bAbortedLive ? EStep::LobbyShotWait : EStep::LeaveOnce;
+      case EStep::LobbyShotWait:
+        return bEvidenceSettled ? EStep::Complete : EStep::LobbyShotWait;
+      case EStep::Complete:
+        return EStep::Complete;
+    }
+    return EStep::Idle;
+  }
+};
+
+
 UCLASS()
 class AS08FlowGameMode : public AGameModeBase {
   GENERATED_BODY()
@@ -100,6 +135,12 @@ public:
    *  text for a public face, a single faceless line for a placeholder. Pure
    *  (no UI state) so the privacy of the hidden branch is unit-testable. */
   static void BuildInspectorLines(const FS09CardView& Card, TArray<FString>& OutLines);
+  /** S10/GD-040: a terminal screen owns the keyboard - the GAME_OVER result
+   *  panel or the live-room ABORTED interruption panel (both promise "L or
+   *  Enter returns you to the lobby"). Every gameplay binding is dead there,
+   *  and L/Enter must map to the lobby return instead of sinking into the
+   *  gameplay key handler. Pure, unit-testable without a world. */
+  static bool TerminalScreenOwnsKeys(ES08Stage Stage, bool bGameOver, bool bRoomAborted);
 
 private:
   void BuildUi();
@@ -158,6 +199,10 @@ private:
   void ReturnToLobbyCommand();
   /** S09AUTO tail: result shot -> leaveGame -> lobby shot -> early exit. */
   void DriveS09ResultFlow();
+  /** S10/GD-040 opt-in (-S10AbortProof) packaged ABORTED proof: interruption
+   *  screen shot -> ONE leaveGame -> lobby shot -> clean early exit. Dormant
+   *  without the flag; never sends a gameplay command after the abort. */
+  void RunS10AbortProof();
   /** Public name of a committed combat card instance (own/opponent discard
    *  piles, both already revealed to this seat); falls back to a placeholder
    *  that leaks no identity. Used by the resolve AND pending panels. */
@@ -209,6 +254,9 @@ private:
   TWeakPtr<class SBorder> ToastHudBorder;
   TSharedPtr<class SConstraintCanvas> HudCanvas; // root of the HUD overlay
   TWeakPtr<SEditableTextBox> LobbyCodeBox; // HUD lobby panel join-code field
+  // S10/GD-039: the visible lobby mode control (checkbox pair) - the next
+  // createGame carries this mode; VS_AI starts one human + the server bot.
+  FString LobbyCreateMode = TEXT("ONE_V_ONE");
   // Capture mechanism: "request" = FScreenshotRequest(bShowUI=true) [default],
   // "slate" = FSlateApplication::TakeScreenshot of the HUD canvas widget.
   FString S09ShotMode;
@@ -326,6 +374,20 @@ private:
   float LobbyShotNotBeforeElapsed = -1.0f;
   bool bS09DuelComplete = false;       // result+lobby evidence done -> exit
   int32 S09ResultTraceSeq = -1;        // dedupe: one RESULT trace line per seq
+  // ---- S10/GD-040 packaged ABORTED proof drive (opt-in -S10AbortProof) ----
+  bool bS10AbortProof = false;
+  FS10AbortProofTransitions::EStep S10AbortProofStep =
+      FS10AbortProofTransitions::EStep::Idle;
+  bool bS10AbortScreenShotTaken = false; // one s10-aborted-screen.png request
+  FString S10AbortScreenShotPath;
+  float S10AbortScreenShotAtElapsed = -1.0f; // bounded 12s wait for that file
+  float S10AbortPanelBuiltAtElapsed = -1.0f; // interruption-panel paint settle
+  bool bS10AbortLeaveSent = false;        // one leaveGame - the only post-abort send
+  bool bS10AbortLobbyShotTaken = false;   // one s10-aborted-lobby.png request
+  FString S10AbortLobbyShotPath;
+  float S10AbortLobbyShotAtElapsed = -1.0f;
+  float S10AbortLobbyNotBeforeElapsed = -1.0f; // toast cleared + settle beat
+  bool bS10AbortProofComplete = false;    // early exit fired exactly once
   // -S09HudProbe=<dir>: backend-less packaged probe - renders the fixture-04
   // HUD states and captures UI-inclusive shots + a Slate key-input check.
   bool bS09Probe = false;
@@ -370,6 +432,7 @@ private:
   bool bAutoManeuverDone = false;
   bool bSawCue = false; // joiner evidence shot trigger: an authoritative event arrived
   FString AutoEmail, AutoPassword, AutoCode, AutoHeroId, AutoShotPath;
+  FString AutoCreateMode = TEXT("ONE_V_ONE"); // -S08Mode=VS_AI drives the auto create
   float AutoExitAfter = 0.0f;
   float AutoDropWsAfter = 0.0f; // >0: drop the live WS at this elapsed time
   bool bWsDroppedForTest = false;

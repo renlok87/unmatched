@@ -1,0 +1,92 @@
+{
+  "stamp": "20260927-190850",
+  "verdict": "S10/GD-039: one-client packaged VS_AI live acceptance over the authoritative S10 backend - hidden client created a VS_AI room (one human seat in LOBBY, hosted by this run; any foreign join fails), the server bot took the second seat at startGame (row reached IN_PROGRESS with exactly 2 seats: seat 1 username AI Bot, opponentId matching that seat, id cross-checked against userByUsername(AI Bot), and the SAME bot id re-verified on the post-exit FINISHED row), the human driver played attack+scheme while the bot answered, the server-written GAME_OVER rendered a COMPLETE result screen (element markers present, gameplay markers absent), leaveGame returned the client to a CLEAN lobby (panel marker, no in-duel markers, zero bright gameplay-region pixels), the row is authoritative FINISHED with the trace outcome cross-checked against server winnerId (no invented result), never ABORTED, and the driver exited early (measured exit time < RunSeconds) instead of burning the timeout. Frame cap: per-process console command t.MaxFPS 30 (effective FPS NOT measured, no GPU claim; packaged 60 FPS default untouched)",
+  "mode": "VS_AI",
+  "outcome": "VICTORY",
+  "winnerHero": "Medusa",
+  "winnerSeat": "human",
+  "serverStatuses": [
+    "LOBBY",
+    "IN_PROGRESS",
+    "FINISHED"
+  ],
+  "serverRow": {
+    "id": "cmujw9n5i00knwiykzpia24q6",
+    "status": "FINISHED",
+    "mode": "VS_AI",
+    "seats": 2,
+    "botSeat": {
+      "present": true,
+      "username": "AI Bot",
+      "seatOrder": 1,
+      "idMatchesUserByUsername": true
+    },
+    "winnerIdRedacted": true,
+    "endedAt": "1790518176059"
+  },
+  "coverage": {
+    "attack": true,
+    "combatResult": true,
+    "scheme": true
+  },
+  "convergence": {
+    "clientMaxSeq": 101.0
+  },
+  "files": [
+    {
+      "name": "vsai-client.trace.log",
+      "bytes": 96374,
+      "sha256": "ef1d9f541739d2e2047d5b8c620e76cb70890d38404864ec249310202fb24b78"
+    },
+    {
+      "name": "vsai-client.compact.log",
+      "bytes": 32564,
+      "sha256": "3569cd70d5ff7cf79ffda7243265b65a531a3b37e0113c56928af722713d992a"
+    },
+    {
+      "name": "human\\s09-combat-result.png",
+      "bytes": 500003,
+      "sha256": "95fc5098263162ace6a4454d3214ed46fa92565e56d753974fb3394c1daae0e4"
+    },
+    {
+      "name": "human\\s09-discard-open.png",
+      "bytes": 495681,
+      "sha256": "5a751ea39947d44b6895b3eca65884d641e53d39fd092bd0cea500ca9727504b"
+    },
+    {
+      "name": "human\\s09-hud-after-first-maneuver.png",
+      "bytes": 493912,
+      "sha256": "ebf16979c019a698f9127dfffa0c353938e977c841aac003188466fcf7d25c38"
+    },
+    {
+      "name": "human\\s09-lobby-return.png",
+      "bytes": 31839,
+      "sha256": "f7a0edaae754697fd26f5f516fe9eb2c022869ccfc8d6928c5d3308be25d0128"
+    },
+    {
+      "name": "human\\s09-maneuver-draft-open.png",
+      "bytes": 493302,
+      "sha256": "c672d5949a4a2eae87ebb57fc461bdb53c9ca5fa8cc15abf2bcdebf0288c9cdd"
+    },
+    {
+      "name": "human\\s09-pending-BOOST_CHOICE.png",
+      "bytes": 497448,
+      "sha256": "31f23f24059b974d6970aedb9f092579efc24b387ef26b6212dab2e8fffdb263"
+    },
+    {
+      "name": "human\\s09-pending-MOVE.png",
+      "bytes": 479683,
+      "sha256": "4d2f18866323cfd114ff2a37ee58ed04a5d30ff3e46b7a054b9e9a1186038b22"
+    },
+    {
+      "name": "human\\s09-pending-TARGET_FIGHTER.png",
+      "bytes": 494039,
+      "sha256": "65c8041b2fd163bdff07f1efa4297ea3edc70cae2da4d36fa20ca87fdc1cbac5"
+    },
+    {
+      "name": "human\\s09-result-screen.png",
+      "bytes": 480530,
+      "sha256": "3a3fc4dc928c14878030c29d039560c79827d7718fcd9b8f22f9c7290d08cc18"
+    }
+  ]
+}

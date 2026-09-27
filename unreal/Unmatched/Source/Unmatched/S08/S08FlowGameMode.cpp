@@ -23,6 +23,7 @@
 #include "S08TraceLog.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Input/SButton.h"
+#include "Widgets/Input/SCheckBox.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Layout/SScrollBox.h"
 #include "Widgets/Layout/SSeparator.h"
@@ -63,7 +64,13 @@ void AS08FlowGameMode::BeginPlay() {
     PrevFlowStage = Stage;
     RefreshUi();
   });
-  Flow->OnRoom.AddLambda([this](const FS08RoomState&) { RefreshUi(); });
+  Flow->OnRoom.AddLambda([this](const FS08RoomState& Room) {
+    RefreshUi();
+    // S10/GD-040: a terminal room row while the match is LIVE re-renders the
+    // HUD even without a fresh snapshot - the interruption screen (ABORTED)
+    // or the settled result screen must appear immediately.
+    if (Flow.IsValid() && Flow->GetStage() == ES08Stage::Started) RefreshHud();
+  });
   Flow->OnFlowError.AddLambda([this](const FS08GraphQLError& Error) {
     TraceLines.Add(TEXT("[error] ") + Error.Code + TEXT(": ") + Error.Message);
     // GD-038 (ACC-021): an expired session routes the player back to the
@@ -134,12 +141,24 @@ void AS08FlowGameMode::BeginPlay() {
   FParse::Value(FCommandLine::Get(), TEXT("S08DropWsAfter="), AutoDropWsAfter);
   FParse::Value(FCommandLine::Get(), TEXT("S08ManeuverAfter="), AutoManeuverAfter);
   FParse::Value(FCommandLine::Get(), TEXT("S08ExitAfter="), AutoExitAfter);
+  // S10/GD-039: the auto host create mode (-S08Mode=VS_AI drives the packaged
+  // one-client VS_AI gate; anything else stays ONE_V_ONE).
+  {
+    FString Mode;
+    FParse::Value(FCommandLine::Get(), TEXT("S08Mode="), Mode);
+    if (Mode == TEXT("VS_AI")) AutoCreateMode = TEXT("VS_AI");
+  }
   // GD-033 demo drive: -S09Flow (host plan: zero-move, step, multi-fighter,
   // end turn, discard) / -S09Flow + -S09FlowBoost (joiner plan: boost the
   // freshly drawn card). -S09ShotDir=<abs> writes numbered evidence shots.
   bAutoS09 = FParse::Param(FCommandLine::Get(), TEXT("S09Flow"));
   bAutoS09Boost = FParse::Param(FCommandLine::Get(), TEXT("S09FlowBoost"));
   FParse::Value(FCommandLine::Get(), TEXT("S09ShotDir="), S09ShotDir);
+  // S10/GD-040 opt-in packaged proof harness: -S10AbortProof arms the
+  // interruption evidence drive (screen shot -> ONE leaveGame -> lobby shot
+  // -> clean early exit). Without the flag the drive stays fully dormant -
+  // the normal UI path never changes.
+  bS10AbortProof = FParse::Param(FCommandLine::Get(), TEXT("S10AbortProof"));
   // GD-034 combat plan ('+'-separated tokens, works with -S09Flow; ',' is a
   // UE command-line value separator and truncates FParse::Value):
   //   attack    approach + attack with the first legal pair
@@ -163,6 +182,9 @@ void AS08FlowGameMode::BeginPlay() {
   if (bAutoS09 || bAutoS09Boost) {
     FS08Trace::Write(FString::Printf(TEXT("S09AUTO config flow=%d boost=%d shotDir=%s"),
                                      bAutoS09 ? 1 : 0, bAutoS09Boost ? 1 : 0, *S09ShotDir));
+  }
+  if (bS10AbortProof) {
+    FS08Trace::Write(TEXT("S10ABORTPROOF armed (opt-in packaged ABORTED harness)"));
   }
   if (bS09Probe) {
     FS08Trace::Write(FString::Printf(TEXT("S09PROBE start dir=%s shotMode=%s"),
@@ -197,7 +219,7 @@ void AS08FlowGameMode::AutoAdvance() {
       // (operator passes -S08Code when starting the second client).
       Flow->FetchHeroes();
       if (bAutoCreate) {
-        Flow->CreateRoom(TEXT("ONE_V_ONE"));
+        Flow->CreateRoom(AutoCreateMode);
         AutoStep = 1;
       } else if (!AutoCode.IsEmpty()) {
         Flow->JoinRoomByCode(AutoCode);
@@ -220,13 +242,26 @@ void AS08FlowGameMode::AutoAdvance() {
         Flow->ToggleReady();
         ++AutoStep;
       } else if (AutoStep == 3 && Room.IsHost(Flow->GetUserId())) {
-        const bool AllReady = Room.Players.Num() == 2 &&
-                              Room.Players[0].bIsReady && Room.Players[1].bIsReady;
-        const bool BothHeroes = Room.Players.Num() == 2 && !Room.Players[0].HeroId.IsEmpty() &&
-                                !Room.Players[1].HeroId.IsEmpty();
-        if (AllReady && BothHeroes) {
-          Flow->StartGame();
-          ++AutoStep;
+        // S10/GD-039: a VS_AI room starts from ONE ready human seat - the
+        // server bot takes the second seat inside startGame, so waiting for a
+        // second human would never fire. PvP keeps the two-ready gate.
+        if (Room.Mode == TEXT("VS_AI")) {
+          const bool HumanReady =
+              Room.Players.Num() == 1 && Room.Players[0].bIsReady &&
+              !Room.Players[0].HeroId.IsEmpty();
+          if (HumanReady) {
+            Flow->StartGame();
+            ++AutoStep;
+          }
+        } else {
+          const bool AllReady = Room.Players.Num() == 2 &&
+                                Room.Players[0].bIsReady && Room.Players[1].bIsReady;
+          const bool BothHeroes = Room.Players.Num() == 2 && !Room.Players[0].HeroId.IsEmpty() &&
+                                  !Room.Players[1].HeroId.IsEmpty();
+          if (AllReady && BothHeroes) {
+            Flow->StartGame();
+            ++AutoStep;
+          }
         }
       }
       break;
@@ -956,6 +991,11 @@ void AS08FlowGameMode::BuildInspectorLines(const FS09CardView& Card,
                                    : TEXT("text: ") + Card.Text);
 }
 
+bool AS08FlowGameMode::TerminalScreenOwnsKeys(ES08Stage Stage, bool bGameOver,
+                                              bool bRoomAborted) {
+  return Stage == ES08Stage::Started && (bGameOver || bRoomAborted);
+}
+
 void AS08FlowGameMode::BeginManeuverCommand() {
   if (!Flow.IsValid()) return;
   FString Reason;
@@ -1327,9 +1367,12 @@ void AS08FlowGameMode::HandleHudKeys() {
     return;
   }
 
-  // GD-036: the result screen owns the keyboard - every gameplay binding is
-  // dead after GAME_OVER; L/Enter is the only live action (lobby return).
-  if (!bS09Probe && Hud.bGameOver) {
+  // GD-036 + S10/GD-040: a terminal screen owns the keyboard - the result
+  // panel (GAME_OVER) AND the interrupted-room panel (authoritative ABORTED
+  // row): every gameplay binding is dead there; L/Enter is the only live
+  // action (lobby return), exactly as both panels promise.
+  if (!bS09Probe && TerminalScreenOwnsKeys(Flow->GetStage(), Hud.bGameOver,
+                                           Flow->IsRoomAborted())) {
     if (PC->WasInputKeyJustPressed(EKeys::L) ||
         PC->WasInputKeyJustPressed(EKeys::Enter)) {
       ReturnToLobbyCommand();
@@ -1559,8 +1602,151 @@ void AS08FlowGameMode::DriveS09ResultFlow() {
   FPlatformMisc::RequestExit(false);
 }
 
+// ---- S10/GD-040 packaged ABORTED proof (opt-in -S10AbortProof) -------------
+
+void AS08FlowGameMode::RunS10AbortProof() {
+  // Dormant without the explicit CLI opt-in: the normal UI path (manual
+  // L/Enter on the interruption screen) is untouched.
+  if (!bS10AbortProof || !Flow.IsValid()) return;
+  using EStep = FS10AbortProofTransitions::EStep;
+  const ES08Stage Stage = Flow->GetStage();
+  // Live = the authoritative ABORTED room row on the live match; tail = the
+  // Lobby reached by THIS drive's own leave (a manual leave never arms it).
+  const bool bAbortedLive = Stage == ES08Stage::Started && Flow->IsRoomAborted();
+  const bool bInLobby = Stage == ES08Stage::Lobby && bS10AbortLeaveSent;
+
+  switch (S10AbortProofStep) {
+    case EStep::Idle:
+      if (!bAbortedLive) return; // dormant until the interruption row lands
+      S10AbortPanelBuiltAtElapsed = Elapsed;
+      S10AbortProofStep = FS10AbortProofTransitions::Advance(
+          S10AbortProofStep, /*bAbortProofEnabled=*/true, bAbortedLive, bInLobby, false);
+      FS08Trace::Write(TEXT(
+          "S10ABORTPROOF authoritative ABORTED row - interruption screen (no victory/defeat is declared)"));
+      return;
+    case EStep::ScreenShotWait: {
+      if (S09ShotDir.IsEmpty()) {
+        // No evidence dir: skip the capture, still leave exactly once.
+        S10AbortProofStep = FS10AbortProofTransitions::Advance(
+            S10AbortProofStep, true, bAbortedLive, bInLobby, /*bEvidenceSettled=*/true);
+        return;
+      }
+      if (!bS10AbortScreenShotTaken) {
+        // Let the interruption panel paint many frames first (the 11:47
+        // mid-paint lesson from the result screen).
+        if (S10AbortPanelBuiltAtElapsed < 0.0f) S10AbortPanelBuiltAtElapsed = Elapsed;
+        if (Elapsed < S10AbortPanelBuiltAtElapsed + 2.0f) return;
+        bS10AbortScreenShotTaken = true;
+        S10AbortScreenShotPath = S09ShotDir / TEXT("s10-aborted-screen.png");
+        S10AbortScreenShotAtElapsed = Elapsed;
+        FS08Trace::Write(TEXT("S10ABORTPROOF aborted-screen shot (interruption panel painted)"));
+        TakeEvidenceShot(S10AbortScreenShotPath);
+        return;
+      }
+      bool bSettled = true;
+      if (!S10AbortScreenShotPath.IsEmpty() &&
+          !FPaths::FileExists(S10AbortScreenShotPath)) {
+        if (S10AbortScreenShotAtElapsed < 0.0f) S10AbortScreenShotAtElapsed = Elapsed;
+        bSettled = Elapsed >= S10AbortScreenShotAtElapsed + 12.0f;
+        if (bSettled) {
+          FS08Trace::Write(TEXT(
+              "S10ABORTPROOF screen shot file never appeared - proceeding WITHOUT the shot"));
+          S10AbortScreenShotPath.Reset();
+        }
+      }
+      if (bSettled) {
+        S10AbortProofStep = FS10AbortProofTransitions::Advance(
+            S10AbortProofStep, true, bAbortedLive, bInLobby, /*bEvidenceSettled=*/true);
+      }
+      return;
+    }
+    case EStep::LeaveOnce:
+      if (!bS10AbortLeaveSent) {
+        if (!bAbortedLive) return; // manual interference left Started - stay put
+        bS10AbortLeaveSent = true;
+        bS09LobbyReturnSent = true; // share the one-send guard + OnLeaveFailed
+        FS08Trace::Write(TEXT(
+            "S10ABORTPROOF leave sent (one leaveGame - the ONLY command after the abort)"));
+        Flow->LeaveRoom();
+        return;
+      }
+      // A failed auto leave needs an explicit manual retry - never a second
+      // auto send (the shared guard blocked it; OnLeaveFailed traced the loss).
+      if (bS09AutoLeaveRetryBlocked) {
+        if (!bS10AbortProofComplete) {
+          bS10AbortProofComplete = true;
+          FS08Trace::Write(TEXT(
+              "S10ABORTPROOF leave FAILED - manual retry required; ending without the lobby proof"));
+          FPlatformMisc::RequestExit(false);
+        }
+        return;
+      }
+      if (!bInLobby) return; // leaveGame reply drives the stage to Lobby
+      S10AbortLobbyNotBeforeElapsed = FMath::Max(Elapsed + 2.0f, ToastUntil + 1.0f);
+      S10AbortProofStep = FS10AbortProofTransitions::Advance(
+          S10AbortProofStep, true, bAbortedLive, bInLobby, false);
+      return;
+    case EStep::LobbyShotWait: {
+      if (S09ShotDir.IsEmpty()) {
+        S10AbortProofStep = FS10AbortProofTransitions::Advance(
+            S10AbortProofStep, true, bAbortedLive, bInLobby, /*bEvidenceSettled=*/true);
+        break; // straight to the clean exit
+      }
+      if (!bS10AbortLobbyShotTaken) {
+        // Capture only after the 'returning to the lobby' toast CLEARED and
+        // Slate settled - the shot must show the clean lobby panel, not the
+        // transition overlay (same gate as the S09 lobby shot).
+        if (S10AbortLobbyNotBeforeElapsed < 0.0f) {
+          S10AbortLobbyNotBeforeElapsed = FMath::Max(Elapsed + 2.0f, ToastUntil + 1.0f);
+        }
+        if (Elapsed < S10AbortLobbyNotBeforeElapsed) return;
+        bS10AbortLobbyShotTaken = true;
+        S10AbortLobbyShotPath = S09ShotDir / TEXT("s10-aborted-lobby.png");
+        S10AbortLobbyShotAtElapsed = Elapsed;
+        FS08Trace::Write(TEXT(
+            "S10ABORTPROOF aborted-lobby shot (board torn down by the stage transition)"));
+        TakeEvidenceShot(S10AbortLobbyShotPath);
+        return;
+      }
+      bool bSettled = true;
+      if (!S10AbortLobbyShotPath.IsEmpty() &&
+          !FPaths::FileExists(S10AbortLobbyShotPath)) {
+        if (S10AbortLobbyShotAtElapsed < 0.0f) S10AbortLobbyShotAtElapsed = Elapsed;
+        bSettled = Elapsed >= S10AbortLobbyShotAtElapsed + 12.0f;
+        if (bSettled) {
+          FS08Trace::Write(TEXT(
+              "S10ABORTPROOF lobby shot file never appeared - proceeding WITHOUT the shot"));
+          S10AbortLobbyShotPath.Reset();
+        }
+      }
+      if (bSettled) {
+        S10AbortProofStep = FS10AbortProofTransitions::Advance(
+            S10AbortProofStep, true, bAbortedLive, bInLobby, /*bEvidenceSettled=*/true);
+      } else {
+        return;
+      }
+      break;
+    }
+    case EStep::Complete:
+      return;
+  }
+  // Lobby evidence settled: exit cleanly once (nothing left to wait for).
+  if (S10AbortProofStep == EStep::Complete && !bS10AbortProofComplete) {
+    bS10AbortProofComplete = true;
+    FS08Trace::Write(TEXT(
+        "S10ABORTPROOF complete (ABORTED screen -> one leaveGame -> clean lobby) - exiting"));
+    FPlatformMisc::RequestExit(false);
+  }
+}
+
 void AS08FlowGameMode::RunS09Auto() {
   if (!bAutoS09 || !Flow.IsValid()) return;
+  // S10/GD-040 opt-in: the -S10AbortProof drive owns the WHOLE post-abort
+  // tail. Without this carve-out the S09 result tail would fire from the
+  // Lobby (the abort leave sets bS09LobbyReturnSent via the shared guard) and
+  // shoot/exit its GAME_OVER flow over an interrupted match - an abort must
+  // never drive the result path.
+  if (bS10AbortProof && (Flow->IsRoomAborted() || bS10AbortLeaveSent)) return;
   // GD-036: the result tail must keep ticking AFTER the lobby return - the
   // leaveGame reply flips the stage to Lobby, and without this carve-out the
   // driver dies at its first stage gate with the lobby shot never taken and
@@ -1568,6 +1754,12 @@ void AS08FlowGameMode::RunS09Auto() {
   const ES08Stage S09AutoStage = Flow->GetStage();
   const bool bTerminalTail = S09AutoStage == ES08Stage::Lobby && bS09LobbyReturnSent;
   if (S09AutoStage != ES08Stage::Started && !bTerminalTail) return;
+  // S10/GD-040: the interrupted-room screen holds no gameplay for the driver
+  // - every command gate rejects with the interruption reason, and the
+  // per-tick decision tail flooded the log with repeated "blocked" traces in
+  // the live ABORTED run. Leave (the only live action) is never a blind
+  // gameplay send.
+  if (S09AutoStage == ES08Stage::Started && Flow->IsRoomAborted()) return;
   if (Flow->IsManeuverInFlight()) return;
   if (Elapsed < NextCommandAt) return;
   // Hold every follow-up command until the requested combat-result shot hit
@@ -2723,6 +2915,9 @@ void AS08FlowGameMode::RunS09HudProbe() {
 
 void AS08FlowGameMode::RunAutoManeuver() {
   if (!Flow.IsValid() || !BoardActor) return;
+  // S10/GD-040: never attempt a maneuver in an interrupted room - the gate
+  // would reject it every poll tick (blocked-trace spam in the live run).
+  if (Flow->IsRoomAborted()) return;
   // Pick the own hero; move one orthogonal step to a legal adjacent cell.
   const FS08BoardFighter* Hero = nullptr;
   for (const FS08BoardFighter& Entry : Fighters) {
@@ -2865,6 +3060,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   if (Flow.IsValid()) CommandUi.bCommandInFlight = Flow->IsManeuverInFlight();
   TakeS09Shots();
   RunS09Auto();
+  RunS10AbortProof();
   if (bS09Probe) RunS09HudProbe();
   // GD-034: the server deadline countdown must tick without a new snapshot.
   if (CommandUi.Mode == ES09CommandMode::CombatDefense ||
@@ -2958,15 +3154,62 @@ void AS08FlowGameMode::BuildUi() {
   // Room entry stays dead while a match is live (Stage Started, incl. the
   // F10 operator overlay): replacing the room without an accepted LeaveRoom
   // would strand the old WS subscription. LEAVE ROOM is the only live exit.
-  Root->AddSlot().AutoHeight().Padding(4)
-      [SNew(SButton).Text(FText::FromString(TEXT("CREATE ROOM (ONE_V_ONE)")))
-           .IsEnabled_Lambda([this]() {
-             return !Flow.IsValid() || Flow->GetStage() != ES08Stage::Started;
-           })
-           .OnClicked_Lambda([this]() {
-             if (Flow.IsValid()) Flow->CreateRoom(TEXT("ONE_V_ONE"));
-             return FReply::Handled();
-           })];
+  // S10/GD-039: visible mode control - ONE_V_ONE (human pair) vs VS_AI (the
+  // server bot takes the second seat on startGame).
+  {
+    TSharedRef<SHorizontalBox> ModeRow = SNew(SHorizontalBox);
+    ModeRow->AddSlot().AutoWidth().Padding(0, 0, 8, 0)
+        [SNew(STextBlock).Text(FText::FromString(TEXT("mode:")))];
+    ModeRow->AddSlot().AutoWidth().Padding(0, 0, 10, 0)
+        [SNew(SCheckBox)
+             .IsChecked_Lambda([this]() {
+               return LobbyCreateMode == TEXT("ONE_V_ONE") ? ECheckBoxState::Checked
+                                                           : ECheckBoxState::Unchecked;
+             })
+             .OnCheckStateChanged_Lambda([this](ECheckBoxState) {
+               LobbyCreateMode = TEXT("ONE_V_ONE");
+               RefreshUi();
+             })
+             .Content()[SNew(STextBlock).Text(FText::FromString(TEXT("ONE_V_ONE")))]];
+    ModeRow->AddSlot().AutoWidth()
+        [SNew(SCheckBox)
+             .IsChecked_Lambda([this]() {
+               return LobbyCreateMode == TEXT("VS_AI") ? ECheckBoxState::Checked
+                                                       : ECheckBoxState::Unchecked;
+             })
+             .OnCheckStateChanged_Lambda([this](ECheckBoxState) {
+               LobbyCreateMode = TEXT("VS_AI");
+               RefreshUi();
+             })
+             .Content()[SNew(STextBlock).Text(FText::FromString(TEXT("VS_AI (bot)")))]];
+    ModeRow->AddSlot().AutoWidth().Padding(10, 0, 0, 0)
+        [SNew(STextBlock)
+             .Text_Lambda([this]() {
+               return FText::FromString(LobbyCreateMode == TEXT("VS_AI")
+                                            ? FString(TEXT(
+                                                  "VS_AI: you start alone - the server bot joins on start"))
+                                            : FString());
+             })];
+    Root->AddSlot().AutoHeight().Padding(4)[ModeRow];
+  }
+  {
+    TSharedRef<SHorizontalBox> CreateRow = SNew(SHorizontalBox);
+    CreateRow->AddSlot().AutoWidth()
+        [SNew(SButton).Text(FText::FromString(TEXT("CREATE ROOM")))
+             .IsEnabled_Lambda([this]() {
+               return !Flow.IsValid() || Flow->GetStage() != ES08Stage::Started;
+             })
+             .OnClicked_Lambda([this]() {
+               if (Flow.IsValid()) Flow->CreateRoom(LobbyCreateMode);
+               return FReply::Handled();
+             })];
+    CreateRow->AddSlot().AutoWidth().Padding(10, 2, 0, 0)
+        [SNew(STextBlock)
+             .Text_Lambda([this]() {
+               return FText::FromString(TEXT("creates: ") + LobbyCreateMode);
+             })];
+    Root->AddSlot().AutoHeight().Padding(4)[CreateRow];
+  }
   TSharedRef<SEditableTextBox> CodeRef = SNew(SEditableTextBox);
   CodeBox = CodeRef;
   Root->AddSlot().AutoHeight()
@@ -3232,6 +3475,11 @@ constexpr FLinearColor GS09ResolveBlockedMarker(FColor(255, 64, 176, 255)); // #
 // S09 UX: the explicit scheme-picker panel (#A020FF) - each RGB channel is
 // >= 32 away from every marker above (pixel gates use +/-16 tolerance).
 constexpr FLinearColor GS09SchemeMarker(FColor(160, 32, 255, 255));      // #A020FF
+// S10/GD-040: the live-room ABORTED interruption screen (#FF6414) - distinct
+// from the #FFD700 result screen so an interrupted match can never be gated
+// (or mistaken) for a victory; every channel stays > 16 from all markers
+// above (closest is the #FF8000 attack marker: dG=28, dB=20).
+constexpr FLinearColor GS10InterruptMarker(FColor(255, 100, 20, 255));   // #FF6414
 } // namespace
 
 void AS08FlowGameMode::BuildLobbyPanel() {
@@ -3251,12 +3499,49 @@ void AS08FlowGameMode::BuildLobbyPanel() {
       [SNew(STextBlock).Text(FText::FromString(FString::Printf(
            TEXT("signed in as %s"), *Flow->GetUsername())))
            .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))];
+  // S10/GD-039: the same visible mode control as the legacy panel.
+  {
+    TSharedRef<SHorizontalBox> ModeRow = SNew(SHorizontalBox);
+    ModeRow->AddSlot().AutoWidth().Padding(0, 0, 8, 0)
+        [SNew(STextBlock).Text(FText::FromString(TEXT("mode:")))];
+    ModeRow->AddSlot().AutoWidth().Padding(0, 0, 10, 0)
+        [SNew(SCheckBox)
+             .IsChecked_Lambda([this]() {
+               return LobbyCreateMode == TEXT("ONE_V_ONE") ? ECheckBoxState::Checked
+                                                           : ECheckBoxState::Unchecked;
+             })
+             .OnCheckStateChanged_Lambda([this](ECheckBoxState) {
+               LobbyCreateMode = TEXT("ONE_V_ONE");
+             })
+             .Content()[SNew(STextBlock).Text(FText::FromString(TEXT("ONE_V_ONE")))]];
+    ModeRow->AddSlot().AutoWidth()
+        [SNew(SCheckBox)
+             .IsChecked_Lambda([this]() {
+               return LobbyCreateMode == TEXT("VS_AI") ? ECheckBoxState::Checked
+                                                       : ECheckBoxState::Unchecked;
+             })
+             .OnCheckStateChanged_Lambda([this](ECheckBoxState) {
+               LobbyCreateMode = TEXT("VS_AI");
+             })
+             .Content()[SNew(STextBlock).Text(FText::FromString(TEXT("VS_AI (bot)")))]];
+    CommandBox->AddSlot().AutoHeight().Padding(0, 2)[ModeRow];
+  }
   CommandBox->AddSlot().AutoHeight().Padding(0, 2)
-      [SNew(SButton).Text(FText::FromString(TEXT("CREATE ROOM (ONE_V_ONE)")))
+      [SNew(SButton).Text(FText::FromString(TEXT("CREATE ROOM")))
            .OnClicked_Lambda([this]() {
-             if (Flow.IsValid()) Flow->CreateRoom(TEXT("ONE_V_ONE"));
+             if (Flow.IsValid()) Flow->CreateRoom(LobbyCreateMode);
              return FReply::Handled();
            })];
+  CommandBox->AddSlot().AutoHeight().Padding(0, 2)
+      [SNew(STextBlock)
+           .Text_Lambda([this]() {
+             return FText::FromString(TEXT("creates: ") + LobbyCreateMode +
+                                      (LobbyCreateMode == TEXT("VS_AI")
+                                           ? TEXT(" - the server bot joins on start")
+                                           : TEXT("")));
+           })
+           .Font(FCoreStyle::GetDefaultFontStyle("Regular", 12))
+           .ColorAndOpacity(FSlateColor(FLinearColor(0.7f, 0.7f, 0.7f, 1.0f)))];
   TSharedRef<SHorizontalBox> JoinRow = SNew(SHorizontalBox);
   TSharedRef<SEditableTextBox> CodeRef = SNew(SEditableTextBox)
       .HintText(FText::FromString(TEXT("room code")));
@@ -3363,6 +3648,43 @@ void AS08FlowGameMode::RefreshHud() {
                             Hud.SequenceNumber, Hud.TurnCount));
     AddLine(TEXT("gameplay input is disabled; L or Enter returns you to the lobby"));
     AddMarker(GS09ResultButtonMarker);
+    CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
+        [SNew(SButton)
+             .ContentPadding(FMargin(14, 8))
+             .IsEnabled(!bS09LobbyReturnSent)
+             .OnClicked_Lambda([this]() {
+               ReturnToLobbyCommand();
+               return FReply::Handled();
+             })
+             [SNew(STextBlock)
+                  .Text(FText::FromString(bS09LobbyReturnSent
+                                              ? TEXT("RETURNING TO LOBBY...")
+                                              : TEXT("RETURN TO LOBBY (L)")))
+                  .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]];
+    return;
+  }
+
+  // ---- S10/GD-040: live-room ABORTED interruption screen. Driven ONLY by
+  // the authoritative room row (a fresh game(id)/mutation answer - never a
+  // snapshot, never a CUE): an interruption is NOT a victory/defeat verdict,
+  // the controller gates already block gameplay input, and the leave action
+  // remains the only live exit. Rendered above every draft/waiting state. ----
+  if (Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && Flow->IsRoomAborted()) {
+    CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 4)
+        [SNew(SBox).WidthOverride(220).HeightOverride(14)
+             [SNew(SColorBlock).Color(GS10InterruptMarker)]];
+    CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 2)
+        [SNew(STextBlock).Text(FText::FromString(TEXT("MATCH INTERRUPTED")))
+             .Font(FCoreStyle::GetDefaultFontStyle("Bold", 16))
+             .ColorAndOpacity(FSlateColor(FLinearColor(1.0f, 0.62f, 0.12f, 1.0f)))];
+    CommandBox->AddSlot().AutoHeight()
+        [SNew(STextBlock).Text(FText::FromString(
+             TEXT("the room was aborted - no winner is declared (this is not a defeat)")))
+             .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))];
+    CommandBox->AddSlot().AutoHeight()
+        [SNew(STextBlock).Text(FText::FromString(
+             TEXT("gameplay input is disabled; L or Enter returns you to the lobby")))
+             .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))];
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SButton)
              .ContentPadding(FMargin(14, 8))
@@ -4124,6 +4446,11 @@ void AS08FlowGameMode::RefreshHud() {
                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))]]];
   } else {
     AddHeader(TEXT("OPPONENT'S TURN"), FLinearColor(1.0f, 0.8f, 0.6f, 1.0f));
+    if (Flow.IsValid() && Flow->IsBotActing()) {
+      // S10/GD-039: the waiting indicator follows the AUTHORITATIVE turn
+      // owner (applied snapshot), never a fixed timer.
+      AddLine(TEXT("VS_AI: the server bot is acting - waiting for its move"));
+    }
     AddLine(FString::Printf(TEXT("seq=%d - waiting for the authoritative stream"),
                             Hud.SequenceNumber));
   }

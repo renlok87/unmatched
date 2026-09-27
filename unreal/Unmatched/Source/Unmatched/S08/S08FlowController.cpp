@@ -246,17 +246,35 @@ SendHttp(MyGamesQuery, Variables, MoveTemp(OnDone));
 
 void FS08FlowController::CreateRoom(const FString& Mode) {
   if (!CanEnterRoomFlow(TEXT("CREATE"))) return;
+  // S10/GD-039: createGame retries of ONE intent reuse its key (a lost answer
+  // redelivers the SAME room); a create AFTER this key already resolved to a
+  // room is a NEW intent - rotate so two successive rooms get distinct ids.
+  // S10 review M1: a key whose dispatch generation the live MatchGeneration
+  // has moved past is equally spent - its in-flight answer (success or none)
+  // is stale-dropped, so it can never resolve for THIS controller. Reusing it
+  // would let the server redeliver the ABANDONED room for a logically new
+  // create. A lost answer at an UNCHANGED generation keeps the key.
+  if (!CreateKeyRoomId.IsEmpty() ||
+      (CreateKeyDispatchGen != INDEX_NONE && CreateKeyDispatchGen != MatchGeneration)) {
+    IdempotencyKey = TEXT("s08-") + FGuid::NewGuid().ToString(EGuidFormats::Digits);
+    CreateKeyRoomId.Reset();
+    Trace(TEXT("CREATE new intent: idempotency key rotated"));
+  }
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   TSharedRef<FJsonObject> Input = MakeShared<FJsonObject>();
   Input->SetStringField(TEXT("mode"), Mode.IsEmpty() ? TEXT("ONE_V_ONE") : Mode);
   Variables->SetObjectField(TEXT("input"), Input);
   Variables->SetStringField(TEXT("idempotencyKey"), IdempotencyKey);
   const int32 Gen = MatchGeneration;
+  CreateKeyDispatchGen = Gen; // M1: pins the retry/stale boundary (see above)
   FS08GraphqlClient::FResult OnDone =
       [this, Gen](bool bOk, const TArray<FS08GraphQLError>& Errors,
                   TSharedPtr<FJsonObject> Data, const FString&) {
         // Stale answer: the player already left/joined elsewhere before the
         // create resolved - the created room must not clobber the newer one.
+        // The key is spent either way: the NEXT CreateRoom rotates it (the
+        // dispatch-generation check in CreateRoom, M1) instead of redelivering
+        // the abandoned room for the new intent.
         if (MatchGeneration != Gen) {
           Trace(TEXT("CREATE stale answer ignored"));
           return;
@@ -269,6 +287,9 @@ void FS08FlowController::CreateRoom(const FString& Mode) {
           return;
         }
         HandleRoomResponse(Data, TEXT("createGame"));
+        // The intent resolved to this room: the NEXT CreateRoom rotates the
+        // key, a retry of this one (none - it already answered) cannot.
+        if (!Room.GameId.IsEmpty()) CreateKeyRoomId = Room.GameId;
       };
 SendHttp(CreateGameMutation, Variables, MoveTemp(OnDone));
 }
@@ -422,10 +443,12 @@ void FS08FlowController::StartGame() {
                                              : FS08GraphQLError{TEXT("TRANSPORT"), TEXT("start failed"), FString()});
           return;
         }
+        // No attach here: HandleRoomResponse already attaches on the
+        // Room -> IN_PROGRESS transition (the same path the guest's poll
+        // uses), and by the time this line runs that attach has flipped the
+        // stage to Started - a second AttachGameStateStream would only issue
+        // a duplicate gameState fetch over the already-live stream.
         HandleRoomResponse(Data, TEXT("startGame"));
-        if (Room.Status == TEXT("IN_PROGRESS")) {
-          AttachGameStateStream();
-        }
       };
 SendHttp(StartGameMutation, Variables, MoveTemp(OnDone));
 }
@@ -941,6 +964,12 @@ bool FS08FlowController::DispatchQueuedHttpForTest(FS08GraphqlClient::FResult&& 
 #endif
 
 void FS08FlowController::AttachGameStateStream() {
+  // Stage FIRST: the barrier fetch below can resolve synchronously (offline
+  // harness), and its snapshot must pass ApplyMatchSnapshot's Started gate -
+  // on a live network the answer arrives later and the old order was safe,
+  // but the Room->IN_PROGRESS host/guest path with a synchronous harness
+  // dropped the barrier body ("match no longer live").
+  SetStage(ES08Stage::Started);
   // Barrier protocol (unmatched-net/1 section 4): the ORDER of HTTP snapshot
   // and WS subscribe does not need to be strict - the subscription is opened
   // with since = local seq and the server delivers a barrier snapshot when
@@ -949,7 +978,6 @@ void FS08FlowController::AttachGameStateStream() {
   if (!Ws.IsValid()) {
     MakeWs();
   }
-  SetStage(ES08Stage::Started);
 }
 
 void FS08FlowController::ScheduleWsReconnect(const FString& Reason) {
@@ -1182,6 +1210,16 @@ SendHttp(GameQuery, Variables, MoveTemp(OnDone));
 
 bool FS08FlowController::CanIssueGameplayCommand(FString& OutReason) const {
   OutReason.Reset();
+  if (Stage == ES08Stage::Started && IsRoomAborted()) {
+    // S10/GD-040: the room row (not a snapshot/CUE) proved the match was
+    // interrupted - every gameplay command must stop; only leave remains.
+    OutReason = TEXT("the match was interrupted (room aborted) - gameplay input is disabled");
+    return false;
+  }
+  if (IsRoomTerminal()) {
+    OutReason = TEXT("the duel is over - gameplay input is disabled on the result screen");
+    return false;
+  }
   if (Applied.Phase == TEXT("GAME_OVER")) {
     OutReason = TEXT("the duel is over - gameplay input is disabled on the result screen");
     return false;
@@ -1443,6 +1481,49 @@ void FS08FlowController::HandleRoomResponse(TSharedPtr<FJsonObject> Data, const 
     // no snapshot barrier); it attaches the same stream the host uses.
     if (Stage == ES08Stage::Room && Room.Status == TEXT("IN_PROGRESS")) {
       AttachGameStateStream();
+    }
+    // S10/GD-040: a terminal room row installed while the match is LIVE is
+    // authoritative (fresh poll/mutation answer - every caller sits behind the
+    // stale gates, and a named CUE or an old snapshot never routes here).
+    // ABORTED: an interruption, never a verdict - gameplay input blocks via
+    // IsRoomTerminal() and only LeaveRoom remains. FINISHED: if the terminal
+    // GAME_OVER snapshot has not arrived yet (the stream may have died), one
+    // fresh HTTP read delivers the authoritative phase + winner.
+    if (Stage == ES08Stage::Started) {
+      if (IsRoomAborted()) {
+        Trace(TEXT("ROOM aborted: the live match was interrupted - input disabled, leave remains"));
+        if (Ws.IsValid() && !GameStateOpId.IsEmpty()) {
+          // The room is dead server-side; stop the subscription so a dead
+          // stream cannot spin the bounded operation recovery while the
+          // interruption screen waits for the leave.
+          Ws->Unsubscribe(GameStateOpId);
+          GameStateOpId.Reset();
+          bGameStateOpLive = false;
+          bStreamReconciled = false;
+        }
+        // The dead room must not keep any timer alive either: a WS reconnect
+        // armed by an earlier transport loss would reconnect and resubscribe
+        // to a room that no longer serves state (a spurious error loop), and
+        // the GD-037 mutation-recovery ladder would keep refetching a dead
+        // game and broadcast its failures over the interruption screen.
+        // Cancel both ladders; the request-identity/stale gates stay intact
+        // so late answers for this match still drop at the usual places.
+        WsReconnectCountdown = -1.0f;
+        bWsReconnectAckPending = false;
+        OpRecoveryAttempts = 0;
+        bMutationRecoveryActive = false;
+        MutationRecoveryAttempts = 0;
+        MutationRecoveryRetryCountdown = -1.0f;
+        MutationRecoveryBackoff = 1.0f;
+        MutationRecoveryBaselineSeq = 0;
+        bMutationRecoveryHasBaseline = false;
+        MutationRecoveryPendingChoiceId.Reset();
+        bMutationRecoveryPendingChoiceIsDiscard = false;
+        bManeuverInFlight = false;
+      } else if (Room.Status == TEXT("FINISHED") && Applied.Phase != TEXT("GAME_OVER")) {
+        Trace(TEXT("ROOM finished without a local GAME_OVER body - refetching state"));
+        FetchGameState();
+      }
     }
   }
 }
@@ -1919,6 +2000,14 @@ SendHttp(Mutation, Variables, MoveTemp(OnDone));
 
 bool FS08FlowController::CanIssueCombatCommand(FString& OutReason) const {
   OutReason.Reset();
+  if (Stage == ES08Stage::Started && IsRoomAborted()) {
+    OutReason = TEXT("the match was interrupted (room aborted) - gameplay input is disabled");
+    return false;
+  }
+  if (IsRoomTerminal()) {
+    OutReason = TEXT("the duel is over - gameplay input is disabled on the result screen");
+    return false;
+  }
   if (Applied.Phase == TEXT("GAME_OVER")) {
     OutReason = TEXT("the duel is over - gameplay input is disabled on the result screen");
     return false;
