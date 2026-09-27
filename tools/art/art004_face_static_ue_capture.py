@@ -1,0 +1,247 @@
+"""Compare a frozen Blender Medusa pose with the UE skeletal import in ART005H.
+
+This probe imports into ignored /Game/ArtTests and moves the existing skeletal
+actor only in memory. It never saves or modifies the ART005H level.
+"""
+
+import json
+import os
+import traceback
+from pathlib import Path
+
+import unreal as u
+
+
+ROOT = Path(__file__).resolve().parents[2]
+SKELETAL = os.environ.get("ART004_FACE_SKELETAL", "0") == "1"
+FLIP_HEAD = os.environ.get("ART004_FACE_FLIP_HEAD", "0") == "1"
+CLEAR_NORMALS = FLIP_HEAD and os.environ.get("ART004_FACE_CLEAR_NORMALS", "0") == "1"
+FBX = ROOT / "unreal/Unmatched/Artifacts/ART004Face" / (
+    "SK_Medusa_FaceFix.fbx" if SKELETAL else (
+        "SM_Medusa_FlippedHeadRecalc.fbx" if CLEAR_NORMALS else (
+            "SM_Medusa_FlippedHead.fbx" if FLIP_HEAD else "SM_Medusa_FrozenIdle.fbx")))
+TWO_SIDED = os.environ.get("ART004_FACE_TWO_SIDED", "0") == "1"
+UNLIT = os.environ.get("ART004_FACE_UNLIT", "0") == "1"
+UNLIT_SINGLE = UNLIT and os.environ.get("ART004_FACE_UNLIT_SINGLE", "0") == "1"
+NO_NORMAL = os.environ.get("ART004_FACE_NO_NORMAL", "0") == "1"
+MATERIAL_MODE = ("unlit-single" if UNLIT_SINGLE else "unlit") if UNLIT else (
+    "no-normal" if NO_NORMAL else ("twosided" if TWO_SIDED else "static"))
+MODE = ("skeletal-" if SKELETAL else (
+    "flippedhead-recalc-" if CLEAR_NORMALS else (
+        "flippedhead-" if FLIP_HEAD else ""))) + MATERIAL_MODE
+OUTPUT = ROOT / f"docs/game-design/evidence/ART-004/medusa-frozen-{MODE}-ue-editor-2026-09-28.png"
+REPORT = ROOT / f"unreal/Unmatched/Artifacts/ART004Face/ue-{MODE}-report.json"
+LEVEL = "/Game/ArtTests/ART005H/L_ART005H_CornerReview"
+DEST = "/Game/ArtTests/ART004Face/Meshes"
+NAME = "SK_Medusa_FaceFix" if SKELETAL else (
+    "SM_Medusa_FlippedHeadRecalc" if CLEAR_NORMALS else (
+        "SM_Medusa_FlippedHead" if FLIP_HEAD else "SM_Medusa_FrozenIdle"))
+MATERIAL = "/Game/ART004/Medusa/Materials/MI_Medusa_Blue"
+
+
+def comparison_material():
+    if NO_NORMAL:
+        path = "/Game/ArtTests/ART004Face/Materials"
+        material = u.load_asset(path + "/M_Medusa_NoNormalProbe")
+        if not material:
+            material = u.AssetToolsHelpers.get_asset_tools().create_asset(
+                "M_Medusa_NoNormalProbe", path, u.Material, u.MaterialFactoryNew())
+        texture = u.load_asset("/Game/ART004/Medusa/Textures/T_Medusa_BC")
+        if not material or not texture:
+            raise RuntimeError("Missing no-normal material or imported BaseColor texture")
+        material.set_editor_property("two_sided", False)
+        mel = u.MaterialEditingLibrary
+        mel.delete_all_material_expressions(material)
+        sample = mel.create_material_expression(material, u.MaterialExpressionTextureSample, -300, 0)
+        sample.set_editor_property("texture", texture)
+        mel.connect_material_property(sample, "RGB", u.MaterialProperty.MP_BASE_COLOR)
+        rough = mel.create_material_expression(material, u.MaterialExpressionConstant, -300, 180)
+        rough.set_editor_property("r", .8)
+        mel.connect_material_property(rough, "", u.MaterialProperty.MP_ROUGHNESS)
+        mel.recompile_material(material)
+        u.EditorAssetLibrary.save_loaded_asset(material)
+        return material
+    if UNLIT:
+        path = "/Game/ArtTests/ART004Face/Materials"
+        name = "M_Medusa_UnlitSingleProbe" if UNLIT_SINGLE else "M_Medusa_UnlitProbe"
+        material = u.load_asset(path + "/" + name)
+        if not material:
+            material = u.AssetToolsHelpers.get_asset_tools().create_asset(
+                name, path, u.Material, u.MaterialFactoryNew())
+        texture = u.load_asset("/Game/ART004/Medusa/Textures/T_Medusa_BC")
+        if not material or not texture:
+            raise RuntimeError("Missing unlit material or imported BaseColor texture")
+        material.set_editor_property("two_sided", not UNLIT_SINGLE)
+        material.set_editor_property("shading_model", u.MaterialShadingModel.MSM_UNLIT)
+        mel = u.MaterialEditingLibrary
+        mel.delete_all_material_expressions(material)
+        sample = mel.create_material_expression(material, u.MaterialExpressionTextureSample, -300, 0)
+        sample.set_editor_property("texture", texture)
+        mel.connect_material_property(sample, "RGB", u.MaterialProperty.MP_EMISSIVE_COLOR)
+        mel.recompile_material(material)
+        u.EditorAssetLibrary.save_loaded_asset(material)
+        return material
+    if not TWO_SIDED:
+        material = u.load_asset(MATERIAL)
+        if not material:
+            raise RuntimeError("Missing imported Medusa material: " + MATERIAL)
+        return material
+    source = "/Game/ART004/Medusa/Materials/M_Medusa_Atlas"
+    path = "/Game/ArtTests/ART004Face/Materials"
+    parent_path = path + "/M_Medusa_TwoSidedProbe"
+    parent = u.load_asset(parent_path)
+    if not parent:
+        parent = u.EditorAssetLibrary.duplicate_asset(source, parent_path)
+    if not parent:
+        raise RuntimeError("Cannot duplicate Medusa parent material")
+    parent.set_editor_property("two_sided", True)
+    u.MaterialEditingLibrary.recompile_material(parent)
+    u.EditorAssetLibrary.save_loaded_asset(parent)
+    instance_path = path + "/MI_Medusa_TwoSidedBlueProbe"
+    instance = u.load_asset(instance_path)
+    if not instance:
+        instance = u.AssetToolsHelpers.get_asset_tools().create_asset(
+            "MI_Medusa_TwoSidedBlueProbe", path, u.MaterialInstanceConstant,
+            u.MaterialInstanceConstantFactoryNew())
+    if not instance:
+        raise RuntimeError("Cannot create two-sided test instance")
+    u.MaterialEditingLibrary.set_material_instance_parent(instance, parent)
+    u.MaterialEditingLibrary.set_material_instance_vector_parameter_value(
+        instance, "TeamColor", u.LinearColor(.72, .85, 1.0, 1.0))
+    u.EditorAssetLibrary.save_loaded_asset(instance)
+    return instance
+
+
+def import_mesh():
+    if not FBX.is_file():
+        raise RuntimeError("Run art004_face_static_export.py in Blender first")
+    task = u.AssetImportTask()
+    task.filename = str(FBX)
+    task.destination_path = DEST
+    task.destination_name = NAME
+    task.automated = True
+    task.replace_existing = True
+    task.save = True
+    options = u.FbxImportUI()
+    options.import_mesh = True
+    options.import_as_skeletal = SKELETAL
+    options.mesh_type_to_import = (u.FBXImportType.FBXIT_SKELETAL_MESH if SKELETAL
+                                   else u.FBXImportType.FBXIT_STATIC_MESH)
+    options.import_materials = False
+    options.import_textures = False
+    if SKELETAL:
+        options.import_animations = False
+        options.skeletal_mesh_import_data.import_uniform_scale = 1.0
+    else:
+        options.static_mesh_import_data.combine_meshes = True
+        options.static_mesh_import_data.import_uniform_scale = 1.0
+    task.options = options
+    u.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
+    mesh = u.load_asset(DEST + "/" + NAME)
+    if not mesh:
+        raise RuntimeError("Diagnostic import failed: " + str(FBX))
+    material = comparison_material()
+    if SKELETAL:
+        materials = mesh.get_editor_property("materials")
+        slots = len(materials)
+        for slot in materials:
+            slot.set_editor_property("material_interface", material)
+        mesh.set_editor_property("materials", materials)
+    else:
+        slots = len(mesh.get_editor_property("static_materials"))
+        for index in range(slots):
+            mesh.set_material(index, material)
+    u.EditorAssetLibrary.save_loaded_asset(mesh)
+    return mesh, slots, material
+
+
+class CaptureJob:
+    def __init__(self):
+        self.frame = 0
+        self.handle = None
+
+    def finish(self):
+        if self.handle is not None:
+            u.unregister_slate_post_tick_callback(self.handle)
+            self.handle = None
+        u.EditorPythonScripting.set_keep_python_script_alive(False)
+
+    def tick(self, _delta_seconds):
+        try:
+            self.frame += 1
+            if self.frame == 90:
+                self.capture.capture_scene()
+            elif self.frame == 96:
+                u.RenderingLibrary.export_render_target(self.world, self.target,
+                                                        str(OUTPUT.parent), OUTPUT.name)
+                if not OUTPUT.is_file() or OUTPUT.stat().st_size == 0:
+                    raise RuntimeError("Static comparison PNG missing")
+                REPORT.parent.mkdir(parents=True, exist_ok=True)
+                REPORT.write_text(json.dumps({
+                    "level": LEVEL, "mesh": self.mesh.get_path_name(),
+                    "material": self.material.get_path_name(), "material_slots": self.slots,
+                    "two_sided": TWO_SIDED or (UNLIT and not UNLIT_SINGLE),
+                    "unlit": UNLIT, "no_normal": NO_NORMAL,
+                    "skeletal": SKELETAL,
+                    "flipped_head": FLIP_HEAD,
+                    "clear_custom_normals": CLEAR_NORMALS,
+                    "output": str(OUTPUT), "scene_saved": False,
+                    "camera_location": [-70, 105, 105],
+                    "camera_target": [0, -50, 29], "fov": 35,
+                }, indent=2) + "\n", encoding="utf-8")
+                u.log("ART004_FACE_STATIC_UE_CAPTURE_COMPLETE " + str(OUTPUT))
+                self.finish()
+        except Exception:
+            u.log_error("ART004_FACE_STATIC_UE_CAPTURE_FAILED\n" + traceback.format_exc())
+            self.finish()
+
+    def start(self):
+        OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+        self.mesh, self.slots, self.material = import_mesh()
+        if not u.get_editor_subsystem(u.LevelEditorSubsystem).load_level(LEVEL):
+            raise RuntimeError("Missing review level " + LEVEL)
+        self.world = u.EditorLevelLibrary.get_editor_world()
+        u.SystemLibrary.execute_console_command(self.world, "t.MaxFPS 30")
+        u.SystemLibrary.execute_console_command(self.world, "r.DefaultFeature.AutoExposure 0")
+        u.SystemLibrary.execute_console_command(self.world, "r.EyeAdaptationQuality 0")
+        actors = u.get_editor_subsystem(u.EditorActorSubsystem).get_all_level_actors()
+        figures = [actor for actor in actors
+                   if actor.get_actor_label() == "ART004 Medusa - animation review"]
+        if len(figures) != 1:
+            raise RuntimeError("Expected one Medusa, found " + str(len(figures)))
+        location = figures[0].get_actor_location()
+        figures[0].set_actor_location(u.Vector(10000, 10000, 0), False, False)
+        if SKELETAL:
+            probe_actor = u.EditorLevelLibrary.spawn_actor_from_class(
+                u.SkeletalMeshActor, location, u.Rotator(0, 0, 0))
+            probe_actor.set_actor_label("ART004 temporary skeletal face probe")
+            probe_actor.skeletal_mesh_component.set_editor_property("skeletal_mesh", self.mesh)
+            for index in range(self.slots):
+                probe_actor.skeletal_mesh_component.set_material(index, self.material)
+        else:
+            probe_actor = u.EditorLevelLibrary.spawn_actor_from_class(
+                u.StaticMeshActor, location, u.Rotator(0, 0, 0))
+            probe_actor.set_actor_label("ART004 temporary frozen-body probe")
+            probe_actor.static_mesh_component.set_static_mesh(self.mesh)
+        origin = u.Vector(-70, 105, 105)
+        target = u.Vector(0, -50, 29)
+        camera = u.EditorLevelLibrary.spawn_actor_from_class(
+            u.SceneCapture2D, origin, u.MathLibrary.find_look_at_rotation(origin, target))
+        camera.set_actor_label("ART004 temporary static capture")
+        self.target = u.TextureRenderTarget2D()
+        self.target.set_editor_property("render_target_format", u.TextureRenderTargetFormat.RTF_RGBA8)
+        self.target.set_editor_property("size_x", 1920)
+        self.target.set_editor_property("size_y", 1080)
+        self.capture = camera.capture_component2d
+        self.capture.set_editor_property("texture_target", self.target)
+        self.capture.set_editor_property("capture_source", u.SceneCaptureSource.SCS_FINAL_COLOR_LDR)
+        self.capture.set_editor_property("fov_angle", 35.0)
+        self.capture.set_editor_property("capture_every_frame", False)
+        self.capture.set_editor_property("capture_on_movement", False)
+        u.EditorPythonScripting.set_keep_python_script_alive(True)
+        self.handle = u.register_slate_post_tick_callback(self.tick)
+        u.log("ART004_FACE_STATIC_UE_CAPTURE_WAITING")
+
+
+JOB = CaptureJob()
+JOB.start()
