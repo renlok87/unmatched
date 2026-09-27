@@ -1,0 +1,92 @@
+{
+  "status": "pass",
+  "engine": "Unreal Engine 5.8.2",
+  "mesh": "/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TargetRing",
+  "level": "/Game/ArtTests/ARTMarkers/L_ARTMarkers_HitTest",
+  "method": "Editor-world vertical line_trace_single, visibility channel, trace_complex=False, isolated StaticMeshActor",
+  "convex_hulls": 4,
+  "cases": {
+    "arc_0": {
+      "xy_uu": [
+        15.5563,
+        15.5563
+      ],
+      "expected_hit": true,
+      "actual_hit": true,
+      "pass": true
+    },
+    "arc_1": {
+      "xy_uu": [
+        -15.5563,
+        15.5563
+      ],
+      "expected_hit": true,
+      "actual_hit": true,
+      "pass": true
+    },
+    "arc_2": {
+      "xy_uu": [
+        -15.5563,
+        -15.5563
+      ],
+      "expected_hit": true,
+      "actual_hit": true,
+      "pass": true
+    },
+    "arc_3": {
+      "xy_uu": [
+        15.5563,
+        -15.5563
+      ],
+      "expected_hit": true,
+      "actual_hit": true,
+      "pass": true
+    },
+    "gap_0": {
+      "xy_uu": [
+        22.0,
+        0.0
+      ],
+      "expected_hit": false,
+      "actual_hit": false,
+      "pass": true
+    },
+    "gap_1": {
+      "xy_uu": [
+        0.0,
+        22.0
+      ],
+      "expected_hit": false,
+      "actual_hit": false,
+      "pass": true
+    },
+    "gap_2": {
+      "xy_uu": [
+        -22.0,
+        0.0
+      ],
+      "expected_hit": false,
+      "actual_hit": false,
+      "pass": true
+    },
+    "gap_3": {
+      "xy_uu": [
+        -0.0,
+        -22.0
+      ],
+      "expected_hit": false,
+      "actual_hit": false,
+      "pass": true
+    },
+    "center": {
+      "xy_uu": [
+        0.0,
+        0.0
+      ],
+      "expected_hit": false,
+      "actual_hit": false,
+      "pass": true
+    }
+  },
+  "limits": "Editor collision probe only; not in-game mouse picking, HUD, board zones or packaged build"
+}
