@@ -141,6 +141,20 @@ compare them and keep verified local backups before integrating; never reset, cl
 blindly stash the entire project, or overwrite unrelated user work.
 Local integration is authorized; remote pushes are not implied by this instruction.
 
+## Agent and process lifecycle
+
+Keep only the sessions needed for the current task. Do not launch a large pool of
+parallel subagents, terminals, Unreal clients, or build processes. Prefer one GLM
+development session at a time; use another session only when independent parallel
+work has a clear benefit, and close it as soon as its task ends. Run background
+commands without opening visible console windows when possible.
+
+At the end of each task or test run, check for processes it started and stop any
+that are no longer needed. Before stopping a process, verify its command line,
+parent, executable path, and relation to this run; never kill processes by name
+alone. Do not close the user's Unreal Editor or Codex-owned MCP services. Keep a
+shared development service running only while current work needs it.
+
 ## Unreal GPU load
 
 The live Unreal project is `unreal/Unmatched`. Keep its normal packaged-client
