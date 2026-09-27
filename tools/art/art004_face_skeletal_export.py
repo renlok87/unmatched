@@ -1,10 +1,11 @@
-"""Export an isolated Medusa skeletal candidate with corrected face winding.
+"""Export an isolated Medusa skeletal face probe.
 
 This reads the committed .blend and writes only to ignored Artifacts. Existing
 production FBXs, .blend, and clips are not changed.
 """
 
 import json
+import os
 import struct
 from pathlib import Path
 
@@ -17,6 +18,14 @@ ROOT = Path(__file__).resolve().parents[2]
 BLEND = ROOT / "blender/ASSET-MEDUSA-001/medusa.blend"
 ATLAS = ROOT / "blender/ASSET-MEDUSA-001/atlas-report.json"
 OUTPUT = ROOT / "unreal/Unmatched/Artifacts/ART004Face/SK_Medusa_FaceFix.fbx"
+FRONT_ONLY = os.environ.get("ART004_FACE_FRONT_ONLY", "0") == "1"
+FACE_SLOT = os.environ.get("ART004_FACE_SLOT", "0") == "1"
+if FRONT_ONLY and FACE_SLOT:
+    raise ValueError("Choose either front-only winding or separate face slot")
+if FRONT_ONLY:
+    OUTPUT = OUTPUT.with_name("SK_Medusa_FaceFrontOnly.fbx")
+if FACE_SLOT:
+    OUTPUT = OUTPUT.with_name("SK_Medusa_FaceSlot.fbx")
 
 
 def face_indices(mesh):
@@ -33,8 +42,23 @@ def face_indices(mesh):
 
 
 def flip_face(mesh):
-    selected = face_indices(mesh)
-    assert len(selected) == 587, len(selected)
+    part = face_indices(mesh)
+    assert len(part) == 587, len(part)
+    if FACE_SLOT:
+        face_material = mesh.materials[0].copy()
+        face_material.name = "M_Medusa_Face_TwoSidedProbe"
+        mesh.materials.append(face_material)
+        for index in part:
+            mesh.polygons[index].material_index = 1
+        mesh.update()
+        return 0, None
+    y_values = [mesh.polygons[index].center.y for index in part]
+    mid_y = (min(y_values) + max(y_values)) / 2
+    selected = ({index for index in part
+                 if mesh.polygons[index].center.y < mid_y and
+                    mesh.polygons[index].normal.y > .1}
+                if FRONT_ONLY else part)
+    assert selected, "No front-facing polygons selected"
     editable = bmesh.new()
     editable.from_mesh(mesh)
     editable.faces.index_update()
@@ -47,7 +71,7 @@ def flip_face(mesh):
     if custom:
         mesh.attributes.remove(custom)
     mesh.update()
-    return len(selected)
+    return len(selected), mid_y
 
 
 def patch_fbx_units(path):
@@ -71,7 +95,7 @@ def main():
     arm = bpy.data.objects["SKEL_Medusa"]
     body = bpy.data.objects["SK_Medusa_Body"]
     bow = bpy.data.objects["SK_Medusa_Bow"]
-    flipped = flip_face(body.data)
+    flipped, mid_y = flip_face(body.data)
     arm.animation_data.action = None
     for bone in arm.pose.bones:
         bone.location = (0, 0, 0)
@@ -103,7 +127,9 @@ def main():
     )
     patch_fbx_units(OUTPUT)
     report = {"input": str(BLEND), "output": str(OUTPUT),
-              "face_part": "tripo_part_10", "flipped_faces": flipped,
+              "face_part": "tripo_part_10", "front_only": FRONT_ONLY,
+              "face_slot": FACE_SLOT, "face_slot_polygons": 587 if FACE_SLOT else 0,
+              "front_mid_y_m": mid_y, "flipped_faces": flipped,
               "body_triangles": sum(len(p.vertices) - 2 for p in body.data.polygons),
               "bow_triangles": sum(len(p.vertices) - 2 for p in bow.data.polygons),
               "bones": len(arm.data.bones), "material_slots": len(body.data.materials)}
