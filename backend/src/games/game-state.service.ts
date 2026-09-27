@@ -1128,24 +1128,86 @@ export class GameStateService {
    * подмножество: input остаётся лишь у СОБСТВЕННЫХ действий зрителя.
    * eventsSince — журнал событий, а НЕ replay состояния (см. сетевой
    * контракт GD-027): full snapshot — отдельный gameState-запрос.
+   *
+   * GD-039/S10 (пагинация): терминальные записи делят один sequenceNumber
+   * (мутация + GAME_ENDED — у человека в game-actions.resolver, у бота в
+   * AiTurnService.recordJournal). Курсор клиента — `gt: lastSequence`, поэтому
+   * резать boundary-группу нельзя: обрезанная строка того же seq терялась бы
+   * навсегда. Страница ДОПОЛНЯЕТСЯ до полной группы boundary-seq
+   * (complete-boundary batch): клиент получает всю группу, следующий запрос
+   * `gt: lastSequence` пропускает её целиком — без потерь и дублей. Порядок
+   * полный — (sequenceNumber, GAME_ENDED-last, timestamp, id) —
+   * детерминирован между выборками; страница может превысить 100 на хвост
+   * boundary-группы.
+   *
+   * Residual (S10, явный): запись журнала пишется асинхронно ПОСЛЕ коммита
+   * состояния (GameActionProcessor/AiTurnService.recordJournal) и может
+   * закоммититься позже, чем клиентский курсор eventsSince уже прошёл её seq
+   * — complete-boundary не покрывает такие ПЕРЕКРЁСТНЫЕ с выборкой поздние
+   * записи. Журнал — НЕ replay состояния (16-network-contract.md §3):
+   * свежесть гарантирует snapshot (gameState/барьер), а не журнал; записи с
+   * seq <= применённого клиентом sequenceNumber не должны проигрывать CUE.
    */
+  private static readonly JOURNAL_PAGE_SIZE = 100;
+
+  /** Полный порядок выдачи журнала: (sequenceNumber, GAME_ENDED-last,
+   *  timestamp, id). Приоритет терминала внутри группы seq: терминальная
+   *  пара делит seq, и при равных timestamp порядок решал случайный UUID —
+   *  GAME_ENDED мог встать ПЕРЕД своим действием. Приоритет выше timestamp:
+   *  GAME_ENDED строго последним в группе независимо от фиксации времени на
+   *  enqueue. Курсор клиента — seq (`gt: lastSequence`), а complete-boundary
+   *  отдаёт группу целиком, поэтому внутристраничный порядок не влияет на
+   *  границы страниц. */
+  private static compareJournalRows(
+    a: { sequenceNumber: number; timestamp: Date; id: string; type: string },
+    b: { sequenceNumber: number; timestamp: Date; id: string; type: string },
+  ): number {
+    if (a.sequenceNumber !== b.sequenceNumber) {
+      return a.sequenceNumber - b.sequenceNumber;
+    }
+    const terminalRank = (type: string) => (type === 'GAME_ENDED' ? 1 : 0);
+    const rankDiff = terminalRank(a.type) - terminalRank(b.type);
+    if (rankDiff !== 0) return rankDiff;
+    const tsDiff = a.timestamp.getTime() - b.timestamp.getTime();
+    if (tsDiff !== 0) return tsDiff;
+    return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+  }
+
   async getEventsSince(
     gameId: string,
     sinceSequence: number,
     viewerId?: string,
   ): Promise<(GameEvent & { playerId: string | null })[]> {
-    const actions = await this.prisma.gameAction.findMany({
+    const journalOrder = [
+      { sequenceNumber: 'asc' },
+      { timestamp: 'asc' },
+      { id: 'asc' },
+    ] as const;
+    let actions = await this.prisma.gameAction.findMany({
       where: {
         gameId,
         sequenceNumber: {
           gt: sinceSequence,
         },
       },
-      orderBy: {
-        sequenceNumber: 'asc',
-      },
-      take: 100,
+      orderBy: [...journalOrder],
+      take: GameStateService.JOURNAL_PAGE_SIZE,
     });
+    if (actions.length === GameStateService.JOURNAL_PAGE_SIZE) {
+      const boundarySeq = actions[actions.length - 1].sequenceNumber;
+      const boundary = await this.prisma.gameAction.findMany({
+        where: { gameId, sequenceNumber: boundarySeq },
+        orderBy: [...journalOrder],
+      });
+      actions = [
+        ...actions.filter((a) => a.sequenceNumber < boundarySeq),
+        ...boundary,
+      ];
+    }
+    // Порядок выдачи ≠ порядку take-выборки: DB-orderBy (seq, timestamp, id)
+    // детерминирует ГРАНИЦУ take, а полный порядок (terminal-last) наводится
+    // здесь — comparator выше.
+    actions.sort(GameStateService.compareJournalRows);
 
     return actions.map((action) => {
       const stored = (action.payload ?? {}) as Record<string, unknown>;

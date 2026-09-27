@@ -77,7 +77,9 @@ export class AiDecisionService {
       // бот-защитник: один раз играем лучшую защиту, затем резолвим
       if (ci.defenderId === aiUserId) {
         if (ci.defenderCardId) return { kind: 'resolveCombat' };
-        const def = this.bestDefenseCard(state, aiUserId);
+        // баннер защиты проверяется по АТАКОВАННОМУ бойцу (атака по сайдкику
+        // ранит его) — герой бота здесь незаконен, executor отвергнет карту
+        const def = this.bestDefenseCard(state, aiUserId, ci.targetFighterId);
         return def ? { kind: 'defense', cardId: def.id } : { kind: 'resolveCombat' };
       }
       // бот-атакующий: резолвим, как только человек сыграл защиту (иначе ждём)
@@ -239,15 +241,15 @@ export class AiDecisionService {
       return { kind: 'resolveMove', effectId: p.id, fighterId: revivee.id, x: cell.x, y: cell.y };
     }
 
-    // MOVE/PLACE: выбираем бойца и валидную клетку (шаг к врагу, иначе на месте)
-    const ownHero = this.aiHero(state, aiUserId);
-    const moveOpponent = p.targetsOpponent === true;
-    const fighter = moveOpponent
-      ? this.nearestEnemy(state, aiUserId, ownHero ?? state.fighters[0])
-      : ownHero ?? this.living(state).find((f) => f.ownerId === aiUserId);
+    // MOVE/PLACE: боец обязан проходить валидацию executor'а (fighterIds,
+    // ownership по targetsOpponent/anyOwner, fighterName) — иначе mandatory-выбор
+    // strand'ит очередь и матч виснет. Кандидаты фильтруются теми же правилами.
+    const candidates = this.movableFighters(state, aiUserId, p);
+    if (candidates.length === 0) return null;
+    const fighter = this.pickMovableFighter(state, aiUserId, candidates);
     if (!fighter) return null;
 
-    if (moveOpponent) {
+    if (p.targetsOpponent === true) {
       // двигаем врага — на месте (нейтрально), лишь бы очистить pending
       return { kind: 'resolveMove', effectId: p.id, fighterId: fighter.id, x: fighter.position.x, y: fighter.position.y };
     }
@@ -295,8 +297,12 @@ export class AiDecisionService {
     }, null);
   }
 
-  private bestDefenseCard(state: GameState, uid: string): Card | null {
-    const fighter = this.aiHero(state, uid);
+  private bestDefenseCard(state: GameState, uid: string, targetFighterId?: string): Card | null {
+    // targetFighterId (combatInfo) — атакованный боец-защитник; фолбэк на
+    // героя бота для состояний без явного таргета
+    const fighter =
+      (targetFighterId && state.fighters.find((f) => f.id === targetFighterId)) ||
+      this.aiHero(state, uid);
     const cards = this.hand(state, uid).filter(
       (c) =>
         (c.cardType === CardType.DEFENSE || c.cardType === CardType.VERSATILE) &&
@@ -316,6 +322,40 @@ export class AiDecisionService {
   }
 
   // ---------- Бойцы / геометрия ----------
+
+  /** Кандидаты MOVE/PLACE: живые бойцы из fighterIds (или все живые),
+   *  проходящие ownership (targetsOpponent/anyOwner) и fighterName-банер. */
+  private movableFighters(state: GameState, uid: string, p: PendingEffect): Fighter[] {
+    const pool = p.fighterIds
+      ? p.fighterIds
+          .map((id) => state.fighters.find((f) => f.id === id))
+          .filter((f): f is Fighter => !!f)
+      : this.living(state);
+    return pool.filter((f) => {
+      if (f.health <= 0 || f.isDefeated) return false;
+      if (!p.anyOwner) {
+        const allowedOwner = p.targetsOpponent === true ? f.ownerId !== uid : f.ownerId === uid;
+        if (!allowedOwner) return false;
+      }
+      if (p.fighterName && !bannerAllows(p.fighterName, f)) return false;
+      return true;
+    });
+  }
+
+  /** Детерминированный выбор: свой герой → свой другой боец → ближайший к
+   *  своему бойцу кандидат (targetsOpponent/anyOwner без своих бойцов в списке). */
+  private pickMovableFighter(state: GameState, uid: string, candidates: Fighter[]): Fighter | null {
+    const own = candidates.filter((f) => f.ownerId === uid);
+    if (own.length > 0) {
+      return own.find((f) => f.type === ('HERO' as Fighter['type'])) ?? own[0];
+    }
+    const anchor =
+      this.aiHero(state, uid) ?? this.living(state).find((f) => f.ownerId === uid) ?? state.fighters[0];
+    if (!anchor) return candidates[0] ?? null;
+    return candidates.reduce((a, b) =>
+      this.manhattan(anchor.position, a.position) <= this.manhattan(anchor.position, b.position) ? a : b,
+    );
+  }
 
   private living(state: GameState): Fighter[] {
     return state.fighters.filter((f) => f.health > 0 && !f.isDefeated);

@@ -11,7 +11,7 @@
  *   и перепланирует/дофинализирует их по персистентному дедлайну.
  */
 
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit, Optional } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit, Optional, Inject, forwardRef } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Job, Queue } from 'bullmq';
 import { PrismaService } from '../../database/prisma.service';
@@ -22,6 +22,7 @@ import { GameActionExecutorService } from '../../game-engine/services/game-actio
 import { GameSubscriptionService } from '../game-subscription.service';
 import { GameActionService } from './game-action.service';
 import { GameActionType } from '../models/game-action.model';
+import { AiTurnService } from './ai-turn.service';
 
 /**
  * Конфигурация timeout'а для боя
@@ -78,6 +79,11 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
     private readonly actionExecutor: GameActionExecutorService,
     @Optional() private readonly gameSubscriptionService?: GameSubscriptionService,
     @Optional() private readonly gameActionService?: GameActionService,
+    // forwardRef: AiTurnService планирует боевые дедлайны бота через нас,
+    // а мы после авто-резолва дёргаем его дрейн — иначе circular DI
+    @Optional()
+    @Inject(forwardRef(() => AiTurnService))
+    private readonly aiTurnService?: AiTurnService,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -357,7 +363,7 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
     // Тот же ключ блокировки, что и у executeMutation (withLockOptions сам
     // НЕ добавляет префикс, а withLock добавляет — раньше получался
     // game:game:<id> и таймаут не сериализовался с мутациями).
-    return await this.distributedLockService.withLockOptions(`game:${gameId}`, async () => {
+    const result = await this.distributedLockService.withLockOptions(`game:${gameId}`, async () => {
       let state: GameState;
       try {
         state = await this.gameStateService.loadState(gameId);
@@ -494,6 +500,15 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
 
       return { success: true, resolvedSequenceNumber: current.sequenceNumber, reason };
     });
+
+    // GD-039 (ACC-019): таймаут финализировал бой, но ход атакующего VS_AI
+    // продолжается (остались действия/выборы). Без триггера матч виснет:
+    // человек в чужой фазе легальных мутаций не имеет, а executeMutation
+    // дергает дрейн только после СВОЕЙ успешной мутации. Лок уже снят.
+    if (result.success) {
+      await this.aiTurnService?.maybeRunAiTurns(gameId);
+    }
+    return result;
   }
 
   /**

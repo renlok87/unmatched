@@ -8,6 +8,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { CombatTimeoutService } from './combat-timeout.service';
+import { AiTurnService } from './ai-turn.service';
+import { AiDecisionService } from '../../game-engine/services/ai-decision.service';
+import { AdjacencyService } from '../../game-engine/engine/adjacency.service';
 import { GameStateService } from '../game-state.service';
 import { GamePhase, CardType, FighterType, EffectType, EffectTiming } from '../../game-engine/models';
 import { normalizeCardEffects } from '../../game-engine/models';
@@ -38,7 +41,7 @@ function fixture(): GameState {
   } as any;
 }
 
-function makeHarness(executorOverride?: Record<string, unknown>) {
+function makeHarness(executorOverride?: Record<string, unknown>, aiTurnOverride?: { maybeRunAiTurns: jest.Mock }) {
   const { executor } = s03Engine();
   const states = new Map<string, GameState>();
   const saved: GameState[] = [];
@@ -104,8 +107,9 @@ function makeHarness(executorOverride?: Record<string, unknown>) {
     (executorOverride ?? executor) as any,
     { publishGameUpdate: async (gameId: string, eventType: string, st: GameState) => published.push({ gameId, eventType, seq: st.sequenceNumber }) } as any,
     { recordAction: async (dto: any) => { audits.push(dto); return 'id'; } } as any,
+    aiTurnOverride as any,
   );
-  return { executor, service, states, saved, audits, queueAdds, published, gameStateService, jobs, queue };
+  return { executor, service, states, saved, audits, queueAdds, published, gameStateService, jobs, queue, lock, gameStateServiceRef: gameStateService };
 }
 
 async function attack(h: ReturnType<typeof makeHarness>, cardId = 'atk-1'): Promise<GameState> {
@@ -201,6 +205,79 @@ describe('S07 GD-026 server-side defense timeout', () => {
     // аудит: исход + GAME_ENDED с победителем (catch-up через eventsSince)
     expect(harn.audits.map((a) => a.type)).toEqual(['COMBAT_RESOLVED', 'GAME_ENDED']);
     expect(harn.audits[1].metadata).toMatchObject({ action: 'autoResolve', reason: 'defense-timeout', winnerId: 'a' });
+  });
+
+  it('GD-039: успешный auto-resolve триггерит дрейн бота (VS_AI) — ход атакующего продолжается', async () => {
+    // Бот атаковал, человек не защитился → таймаут финализирует бой, но у
+    // бота осталось действие: БЕЗ триггера матч виснет (мутаций человека нет).
+    const aiTurn = { maybeRunAiTurns: jest.fn().mockResolvedValue(undefined) };
+    const local = makeHarness(undefined, aiTurn);
+    local.states.set('g1', fixture());
+    const before = await attack(local);
+    expireDeadline(local);
+
+    const result = await local.service.processAutoResolve({ gameId: 'g1', attackSequenceNumber: before.sequenceNumber, stage: 'DEFENSE' });
+
+    expect(result.success).toBe(true);
+    expect(aiTurn.maybeRunAiTurns).toHaveBeenCalledWith('g1');
+  });
+
+  /** GD-039 Sol6: атака БОТА обязана получать собственную джобу дедлайна —
+   *  путь человека (game-actions.resolver) тут не участвует. Человек-защитник
+   *  отключился: джоба, поставленная самим ботом, финализирует бой. */
+  it('GD-039 Sol6: бот-атака планирует джобу дедлайна; человек офлайн → она финализирует бой и дергает дрейн', async () => {
+    const aiTurn = { maybeRunAiTurns: jest.fn().mockResolvedValue(undefined) };
+    const local = makeHarness(undefined, aiTurn);
+    local.states.set('g1', fixture());
+    const adjacency = new AdjacencyService();
+    const botTurn = new AiTurnService(
+      { game: { findUnique: async () => ({ mode: 'VS_AI', status: 'IN_PROGRESS', opponentId: 'a' }) } } as any,
+      local.lock,
+      local.gameStateServiceRef,
+      { publishGameUpdate: async () => {} } as any,
+      local.executor,
+      new AiDecisionService(adjacency),
+      local.service,
+    );
+
+    await botTurn.maybeRunAiTurns('g1'); // смежные бойцы + атак-карта в руке: бот атакует
+
+    const st = local.states.get('g1')!;
+    expect(st.phase).toBe(GamePhase.COMBAT);
+    expect(st.metadata.combatInfo?.defenderId).toBe('b'); // человек-защитник
+    // САМА атака бота поставила джобу DEFENSE-стадии (~30с)
+    const jobAdds = local.queueAdds.filter((add: any) => add.data.stage === 'DEFENSE');
+    expect(jobAdds).toHaveLength(1);
+    expect(jobAdds[0].opts.delay).toBeGreaterThanOrEqual(29_000);
+    expect(jobAdds[0].opts.delay).toBeLessThanOrEqual(30_000);
+    expect(local.jobs.has('combat-scheduled-g1-DEFENSE')).toBe(true);
+
+    // человек отключился: дедлайн истёк, worker дергает processor
+    expireDeadline(local);
+    const result = await local.service.processAutoResolve(jobAdds[0].data);
+
+    expect(result.success).toBe(true);
+    expect(result.reason).toBe('defense-timeout');
+    const after = local.states.get('g1')!;
+    expect(after.metadata.combatInfo).toBeUndefined();
+    expect(after.phase).toBe(GamePhase.ACTION_MANEUVER); // у бота-атакующего осталось действие
+    expect(after.sequenceNumber).toBe(st.sequenceNumber + 1);
+    expect(after.fighters.find((f) => f.id === 'fB')!.health).toBe(6);
+    expect(aiTurn.maybeRunAiTurns).toHaveBeenCalledWith('g1');
+  });
+
+  it('GD-039: неистёкший дедлайн НЕ дергает дрейн бота', async () => {
+    const aiTurn = { maybeRunAiTurns: jest.fn().mockResolvedValue(undefined) };
+    const local = makeHarness(undefined, aiTurn);
+    local.states.set('g1', fixture());
+    await attack(local);
+    futureDeadline(local);
+
+    const result = await local.service.processAutoResolve({ gameId: 'g1', attackSequenceNumber: 0, stage: 'DEFENSE' });
+
+    expect(result.success).toBe(false);
+    expect(result.reason).toBe('Deadline not reached');
+    expect(aiTurn.maybeRunAiTurns).not.toHaveBeenCalled();
   });
 
   it('поздняя джоба после защиты безвредна: deadline стадии резолва не истёк', async () => {

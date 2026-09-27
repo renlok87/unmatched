@@ -4,12 +4,14 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  Optional,
 } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { GameInitializationService } from './services/game-initialization.service';
 import { GameActionService } from './services/game-action.service';
 import { GameSubscriptionService } from './game-subscription.service';
+import { AiTurnService } from './services/ai-turn.service';
 import { GameActionType } from './models/game-action.model';
 import { GameStatus, GameMode } from './dto';
 import { GameResponse } from './models';
@@ -38,6 +40,7 @@ export class GameService {
     private gameInitialization: GameInitializationService,
     private gameActionService: GameActionService,
     private gameSubscriptionService: GameSubscriptionService,
+    @Optional() private readonly aiTurnService?: AiTurnService,
   ) {}
 
   /**
@@ -766,6 +769,15 @@ export class GameService {
 
     // Журналируем старт игры (createInitialState ставит sequenceNumber: 1)
     await this.recordLobbyAction(gameId, userId, GameActionType.GAME_STARTED, 1);
+
+    // GD-039 (ACC-019): бот должен уметь стартовать с любого сидa — если
+    // первым ходит бот (или его ждёт обязательный выбор), дрейним немедленно.
+    // Fire-and-forget: no-op, когда ход человека.
+    if (game.mode === GameMode.VS_AI) {
+      void this.aiTurnService?.maybeRunAiTurns(gameId).catch((e) =>
+        this.logger.warn(`AI turn error after start (${gameId}): ${e}`),
+      );
+    }
 
     return await this.getGame(gameId);
   }

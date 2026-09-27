@@ -180,6 +180,73 @@ describe('AiDecisionService', () => {
     expect(svc.decide(st, AI)).toEqual({ kind: 'resolveCombat' });
   });
 
+  // GD-039: баннер защиты проверяется по АТАКОВАННОМУ бойцу
+  // (combatInfo.targetFighterId), а не по герою бота.
+  const medusaFighters = () => [
+    fighter('h1', HUMAN, 1, 0),
+    fighter('medusa', AI, 0, 0, { name: 'Medusa' }),
+    fighter('harpies', AI, 0, 1, { name: 'Harpies', type: FighterType.MINION, movement: 2 }),
+  ];
+
+  it('GD-039: атака по Harpy-сайдкику → защита с баннером Medusa НЕ легальна, играет Harpy-карту', () => {
+    const st = makeState({
+      phase: GamePhase.COMBAT,
+      fighters: medusaFighters(),
+      handZones: {
+        [AI]: { cards: [
+          card('medusa-high', CardType.DEFENSE, { bannerName: 'Medusa', defenseValue: 3 }),
+          card('harpy-low', CardType.VERSATILE, { bannerName: 'Harpy', defenseValue: 2 }),
+        ], maxSize: 7 },
+        [HUMAN]: { cards: [], maxSize: 7 },
+      },
+      metadata: {
+        combatInfo: { attackerId: 'h1', defenderId: AI, targetFighterId: 'harpies' },
+        actionsRemaining: 2,
+      } as any,
+    });
+    // текущий код берёт баннер героя бота (Medusa) → выбирает medusa-high,
+    // executor его отвергнет (BANNER_MISMATCH) и матч зависнет
+    expect(svc.decide(st, AI)).toEqual({ kind: 'defense', cardId: 'harpy-low' });
+  });
+
+  it('GD-039: атака по Harpy — легальна Any-карта, когда Medusa-only карт нет', () => {
+    const st = makeState({
+      phase: GamePhase.COMBAT,
+      fighters: medusaFighters(),
+      handZones: {
+        [AI]: { cards: [
+          card('medusa-high', CardType.DEFENSE, { bannerName: 'Medusa', defenseValue: 3 }),
+          card('any-low', CardType.DEFENSE, { bannerName: 'Any', defenseValue: 2 }),
+        ], maxSize: 7 },
+        [HUMAN]: { cards: [], maxSize: 7 },
+      },
+      metadata: {
+        combatInfo: { attackerId: 'h1', defenderId: AI, targetFighterId: 'harpies' },
+        actionsRemaining: 2,
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'defense', cardId: 'any-low' });
+  });
+
+  it('GD-039: атака по самому Medusa → Medusa-баннер по-прежнему легален', () => {
+    const st = makeState({
+      phase: GamePhase.COMBAT,
+      fighters: medusaFighters(),
+      handZones: {
+        [AI]: { cards: [
+          card('medusa-high', CardType.DEFENSE, { bannerName: 'Medusa', defenseValue: 3 }),
+          card('harpy-low', CardType.VERSATILE, { bannerName: 'Harpy', defenseValue: 2 }),
+        ], maxSize: 7 },
+        [HUMAN]: { cards: [], maxSize: 7 },
+      },
+      metadata: {
+        combatInfo: { attackerId: 'h1', defenderId: AI, targetFighterId: 'medusa' },
+        actionsRemaining: 2,
+      } as any,
+    });
+    expect(svc.decide(st, AI)).toEqual({ kind: 'defense', cardId: 'medusa-high' });
+  });
+
   it('бой, бот-защитник без карт защиты → resolveCombat (без защиты)', () => {
     const st = makeState({
       phase: GamePhase.COMBAT,
@@ -536,6 +603,79 @@ describe('AiDecisionService', () => {
       } as any,
     });
     expect(svc.decide(st, AI)).toEqual({ kind: 'declinePending', effectId: 'pe14' });
+  });
+
+  describe('GD-039: fighter-selection pending (fighterIds / fighterName / anyOwner / targetsOpponent)', () => {
+    // Боец для резолва обязан проходить валидацию executor'а
+    // (fighterIds, ownership, fighterName) — иначе mandatory-MOVE strand'ит
+    // очередь и матч виснет.
+
+    it('MOVE anyOwner (Skirmish): fighterIds не содержит aiHero → выбран свой боец ИЗ списка', () => {
+      const st = makeState({
+        fighters: [
+          fighter('h1', HUMAN, 0, 0),
+          fighter('a1', AI, 9, 9),
+          fighter('a2', AI, 4, 4, { type: FighterType.MINION, movement: 2 }),
+        ],
+        metadata: {
+          actionsRemaining: 2,
+          pendingEffects: [{ id: 'skirmish', type: 'MOVE', playerId: AI, anyOwner: true,
+            fighterIds: ['h1', 'a2'], value: 2 }],
+        } as any,
+      });
+      const d = svc.decide(st, AI);
+      expect(d?.kind).toBe('resolveMove');
+      if (d?.kind === 'resolveMove') {
+        expect(['h1', 'a2']).toContain(d.fighterId);
+        expect(d.fighterId).not.toBe('a1'); // aiHero не входит в fighterIds
+        expect(d.fighterId).toBe('a2'); // предпочитаем своего бойца
+        expect(manhattan({ x: d.x, y: d.y }, { x: 0, y: 0 })).toBeLessThan(manhattan({ x: 4, y: 4 }, { x: 0, y: 0 }));
+      }
+    });
+
+    it('MOVE targetsOpponent: fighterIds называет НЕ ближайшего врага → двигается он', () => {
+      const st = makeState({
+        fighters: [
+          fighter('h1', HUMAN, 1, 1),
+          fighter('h2', HUMAN, 5, 5),
+          fighter('a1', AI, 0, 0),
+        ],
+        metadata: {
+          actionsRemaining: 2,
+          pendingEffects: [{ id: 'push', type: 'MOVE', playerId: AI, targetsOpponent: true,
+            fighterIds: ['h2'], value: 2 }],
+        } as any,
+      });
+      const d = svc.decide(st, AI);
+      expect(d?.kind).toBe('resolveMove');
+      if (d?.kind === 'resolveMove') {
+        expect(d.fighterId).toBe('h2'); // не h1 (ближайший, но вне fighterIds)
+        // нейтральный резолв: враг остаётся на месте
+        expect(d.x).toBe(5);
+        expect(d.y).toBe(5);
+      }
+    });
+
+    it('MOVE с fighterName-ограничением: выбран боец, чьё имя матчится', () => {
+      const st = makeState({
+        fighters: [
+          fighter('h1', HUMAN, 0, 0),
+          fighter('a1', AI, 3, 3, { name: 'Medusa' }),
+          fighter('a2', AI, 4, 4, { name: 'Daredevil 1', type: FighterType.MINION, movement: 2 }),
+        ],
+        metadata: {
+          actionsRemaining: 2,
+          pendingEffects: [{ id: 'named', type: 'MOVE', playerId: AI,
+            fighterIds: ['a1', 'a2'], fighterName: 'Daredevil', value: 2 }],
+        } as any,
+      });
+      const d = svc.decide(st, AI);
+      expect(d?.kind).toBe('resolveMove');
+      if (d?.kind === 'resolveMove') {
+        expect(d.fighterId).toBe('a2');
+        expect(manhattan({ x: d.x, y: d.y }, { x: 0, y: 0 })).toBeLessThan(manhattan({ x: 4, y: 4 }, { x: 0, y: 0 }));
+      }
+    });
   });
 
   it('S05 revive-PLACE: зона полностью занята живыми → null → decline (не зависает)', () => {

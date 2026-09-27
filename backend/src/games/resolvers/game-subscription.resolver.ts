@@ -13,10 +13,11 @@
  */
 
 import { Resolver, Args, Subscription, Context } from '@nestjs/graphql';
-import { ForbiddenException, Logger, NotFoundException, UseGuards } from '@nestjs/common';
+import { ForbiddenException, Logger, NotFoundException, Optional, UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../../auth/guards/gql-auth.guard';
 import { GameSubscriptionService, GamePubSubEvent } from '../game-subscription.service';
 import { GameStateService, GameState } from '../game-state.service';
+import { AiTurnService } from '../services/ai-turn.service';
 import {
   GameEvent,
   TurnState,
@@ -145,6 +146,7 @@ export class GameSubscriptionResolver {
   constructor(
     private readonly subscriptionService: GameSubscriptionService,
     private readonly gameStateService: GameStateService,
+    @Optional() private readonly aiTurnService?: AiTurnService,
   ) {
     this.resolveGameState = resolveGameStateFn(this.gameStateService, (context) =>
       this.getUserId(context),
@@ -342,6 +344,10 @@ export class GameSubscriptionResolver {
     @Context() context?: any,
   ): Promise<AsyncIterableIterator<GamePubSubEvent>> {
     await this.requireParticipant(gameId, context);
+    // GD-039 (ACC-019): (re)connect возобновляет прерванный дрейн бота VS_AI
+    // (рестарт процесса/очереди во время хода бота). Fire-and-forget, no-op
+    // вне VS_AI и когда боту нечего делать; maybeRunAiTurns сам не бросает.
+    void this.aiTurnService?.maybeRunAiTurns(gameId);
     const upstream = this.subscriptionService.asyncIteratorForGame(gameId);
     return this.withSnapshotBarrier(gameId, since, upstream);
   }

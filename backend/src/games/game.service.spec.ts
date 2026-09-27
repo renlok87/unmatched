@@ -11,6 +11,7 @@ import { RedisService } from '../redis/redis.service';
 import { GameInitializationService } from './services/game-initialization.service';
 import { GameActionService } from './services/game-action.service';
 import { GameSubscriptionService } from './game-subscription.service';
+import { AiTurnService } from './services/ai-turn.service';
 import type { GameResponse } from './models';
 
 const fullRow = (overrides: Record<string, unknown> = {}) => ({
@@ -245,5 +246,101 @@ describe('GameService myGames: авторитетный Postgres, list-кеш в
     expect(result[0].status).toBe('IN_PROGRESS');
     expect(redis.getJson).not.toHaveBeenCalled();
     expect(redis.setJsonex).not.toHaveBeenCalled();
+  });
+});
+
+/** GD-039: старт VS_AI обязан дать боту отыграть, если ход (или выбор) его —
+ *  иначе при боте-первом матч виснет до действия человека, а человек в чужой
+ *  фазе легальных мутаций не имеет. Триггер — fire-and-forget drain. */
+describe('GameService startGame: VS_AI триггерит дрейн бота', () => {
+  const lobbyRow = (mode: string) => ({
+    id: 'g1',
+    code: 'ABCDEF',
+    status: 'LOBBY',
+    mode,
+    hostId: 'host',
+    opponentId: mode === 'VS_AI' ? 'ai' : 'opp',
+    boardId: 'board1',
+    players: [
+      { id: 'p1', userId: 'host', heroId: 'h1', isReady: true, seatOrder: 0 },
+      { id: 'p2', userId: mode === 'VS_AI' ? 'ai' : 'opp', heroId: 'h2', isReady: true, seatOrder: 1 },
+    ],
+  });
+
+  async function buildService() {
+    const aiTurn = { maybeRunAiTurns: jest.fn().mockResolvedValue(undefined) };
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        GameService,
+        {
+          provide: PrismaService,
+          useValue: {
+            game: {
+              findUnique: jest.fn(),
+              update: jest.fn(),
+              updateMany: jest.fn().mockResolvedValue({ count: 0 }),
+            },
+            gamePlayer: { findUnique: jest.fn(), findMany: jest.fn() },
+            $transaction: jest.fn(),
+            $queryRaw: jest.fn().mockResolvedValue([]),
+          },
+        },
+        {
+          provide: RedisService,
+          useValue: { getJson: jest.fn().mockResolvedValue(null), setJsonex: jest.fn(), del: jest.fn() },
+        },
+        { provide: GameInitializationService, useValue: { initializeGameState: jest.fn().mockResolvedValue(undefined) } },
+        { provide: GameActionService, useValue: { recordAction: jest.fn().mockResolvedValue('id') } },
+        { provide: GameSubscriptionService, useValue: { publishLobbyEvent: jest.fn() } },
+        { provide: AiTurnService, useValue: aiTurn },
+      ],
+    }).compile();
+    return { service: module.get(GameService), aiTurn, prisma: module.get(PrismaService), redis: module.get(RedisService) };
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('успешный старт VS_AI → maybeRunAiTurns(g1) вызван', async () => {
+    const { service, aiTurn, prisma } = await buildService();
+    (prisma.game.findUnique as jest.Mock)
+      // 1: начальный include-read (лобби, все готовы); статус внутри транзакции
+      //    читается через tx (см. $transaction-мок ниже)
+      .mockResolvedValueOnce(lobbyRow('VS_AI'))
+      // 2: getGame после старта — полный include-read
+      .mockResolvedValueOnce(fullRow({ status: 'IN_PROGRESS', endedAt: null, winnerId: null, mode: 'VS_AI' }));
+    (prisma.$transaction as jest.Mock).mockImplementation(async (run: (tx: unknown) => unknown) =>
+      run({
+        $queryRaw: async () => [],
+        game: { findUnique: async () => ({ status: 'LOBBY' }), update: async () => ({}) },
+        gamePlayer: { findMany: async () => lobbyRow('VS_AI').players },
+      }),
+    );
+    (prisma.gamePlayer.findMany as jest.Mock).mockResolvedValue(lobbyRow('VS_AI').players);
+
+    const result = await service.startGame('g1', 'host');
+
+    expect(result.status).toBe('IN_PROGRESS');
+    expect(aiTurn.maybeRunAiTurns).toHaveBeenCalledWith('g1');
+  });
+
+  it('обычный ONE_V_ONE старт → дрейн бота НЕ вызван', async () => {
+    const { service, aiTurn, prisma } = await buildService();
+    (prisma.game.findUnique as jest.Mock)
+      .mockResolvedValueOnce(lobbyRow('ONE_V_ONE'))
+      .mockResolvedValueOnce(fullRow());
+    (prisma.$transaction as jest.Mock).mockImplementation(async (run: (tx: unknown) => unknown) =>
+      run({
+        $queryRaw: async () => [],
+        game: { findUnique: async () => ({ status: 'LOBBY' }), update: async () => ({}) },
+        gamePlayer: { findMany: async () => lobbyRow('ONE_V_ONE').players },
+      }),
+    );
+    (prisma.gamePlayer.findMany as jest.Mock).mockResolvedValue(lobbyRow('ONE_V_ONE').players);
+
+    await service.startGame('g1', 'host');
+
+    expect(aiTurn.maybeRunAiTurns).not.toHaveBeenCalled();
   });
 });
