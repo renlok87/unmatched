@@ -19,15 +19,19 @@ OUTPUT = ROOT / "docs/game-design/evidence/ART-004/medusa-facefix-blender-front-
 KEEP_NORMALS = os.environ.get("ART004_FACE_KEEP_NORMALS", "0") == "1"
 DISABLE_NORMAL_MAP = os.environ.get("ART004_FACE_DISABLE_NORMAL_MAP", "0") == "1"
 RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "")
+FACE_SLOT = os.environ.get("ART004_FACE_SLOT", "0") == "1"
 if RESTORE_NORMALS not in {"", "original", "inverted"}:
     raise ValueError("ART004_FACE_RESTORE_NORMALS must be original or inverted")
+if FACE_SLOT and RESTORE_NORMALS != "inverted":
+    raise ValueError("Face-slot preview requires inverted restored normals")
 if KEEP_NORMALS:
     OUTPUT = OUTPUT.with_name("medusa-facefix-blender-front-keepnormals-2026-09-28.png")
 if DISABLE_NORMAL_MAP:
     OUTPUT = OUTPUT.with_name("medusa-facefix-blender-front-nonormalmap-2026-09-28.png")
 if RESTORE_NORMALS:
     OUTPUT = OUTPUT.with_name(
-        f"medusa-facefix-blender-front-restored-{RESTORE_NORMALS}-2026-09-28.png")
+        f"medusa-facefix-blender-front-restored-{RESTORE_NORMALS}"
+        f"{'-slot' if FACE_SLOT else ''}-2026-09-28.png")
 
 
 def main():
@@ -73,6 +77,13 @@ def main():
                     vector.negate()
                 normals[loop] = vector
         mesh.normals_split_custom_set(normals)
+        mesh.update()
+    if FACE_SLOT:
+        face_material = mesh.materials[0].copy()
+        face_material.name = "M_Medusa_Face_CorrectedProbe"
+        mesh.materials.append(face_material)
+        for index in selected:
+            mesh.polygons[index].material_index = 1
         mesh.update()
     if DISABLE_NORMAL_MAP:
         material = bpy.data.materials["M_Medusa_Atlas"]

@@ -23,14 +23,15 @@ FACE_SLOT = os.environ.get("ART004_FACE_SLOT", "0") == "1"
 RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "0") == "1"
 if FRONT_ONLY and FACE_SLOT:
     raise ValueError("Choose either front-only winding or separate face slot")
-if RESTORE_NORMALS and (FRONT_ONLY or FACE_SLOT):
+if RESTORE_NORMALS and FRONT_ONLY:
     raise ValueError("Restored normals require the complete face winding probe")
 if FRONT_ONLY:
     OUTPUT = OUTPUT.with_name("SK_Medusa_FaceFrontOnly.fbx")
 if FACE_SLOT:
     OUTPUT = OUTPUT.with_name("SK_Medusa_FaceSlot.fbx")
 if RESTORE_NORMALS:
-    OUTPUT = OUTPUT.with_name("SK_Medusa_FaceFixNormals.fbx")
+    OUTPUT = OUTPUT.with_name("SK_Medusa_FaceFixNormalsSlot.fbx" if FACE_SLOT else
+                              "SK_Medusa_FaceFixNormals.fbx")
 
 
 def face_indices(mesh):
@@ -49,7 +50,7 @@ def face_indices(mesh):
 def flip_face(mesh):
     part = face_indices(mesh)
     assert len(part) == 587, len(part)
-    if FACE_SLOT:
+    if FACE_SLOT and not RESTORE_NORMALS:
         face_material = mesh.materials[0].copy()
         face_material.name = "M_Medusa_Face_TwoSidedProbe"
         mesh.materials.append(face_material)
@@ -91,6 +92,13 @@ def flip_face(mesh):
                     normal.negate()
                 normals[loop] = normal
         mesh.normals_split_custom_set(normals)
+        mesh.update()
+    if FACE_SLOT:
+        face_material = mesh.materials[0].copy()
+        face_material.name = "M_Medusa_Face_CorrectedProbe"
+        mesh.materials.append(face_material)
+        for index in part:
+            mesh.polygons[index].material_index = 1
         mesh.update()
     return len(selected), mid_y
 
