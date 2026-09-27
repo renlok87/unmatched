@@ -1,6 +1,6 @@
 # ART-005 · B atlas v1 для Cobble City
 
-**Статус: кандидат покрытия, не принятый материал UE.** После [проверки GD-058](../../../../docs/game-design/evidence/GD-058/acceptance-review-2026-09-27.md) подготовлена отдельная проба, устраняющая видимое повторение одного и того же фрагмента камня на всех 30 клетках. Исходный `cobble-city-probe.blend`, прежние FBX и UE-кадр не перезаписаны.
+**Статус: кандидат покрытия, технически импортирован в UE, художественно не принят.** После [проверки GD-058](../../../../docs/game-design/evidence/GD-058/acceptance-review-2026-09-27.md) подготовлена отдельная проба, устраняющая видимое повторение одного и того же фрагмента камня на всех 30 клетках. Исходный `cobble-city-probe.blend`, прежние FBX и UE-кадр не перезаписаны.
 
 - [Новый обзорный рендер Blender](board-surface-k1-atlas-B-v1.png) — Cycles CPU, 960×540, 12 samples. На нём нет фигур, зонного слоя и HUD; это просмотр материала, не K1-приёмка.
 - [Проба с шестью серыми фигурками](board-six-figures-k1-atlas-B-v1.png) — Cycles CPU, 1280×720, 16 samples. [Сцена с блок-аутами](cobble-city-atlas-B-six-blockouts.blend) и [отчёт](six-blockouts-report.json) используют шесть позиций и 101 объект из ART-003; эта копия не экспортируется как игровая доска. Грубые силуэты видны на камне, временные цифры Harpy 1/2/3 читаются. Таблички перекрывают часть крыльев, поэтому их нельзя считать финальным игровым маркером; зоны, подсветка выбора и HUD отсутствуют.
@@ -11,6 +11,7 @@
 - [Скрипт построения](../../../_tools/build_art005_board_atlas_probe.py) изменяет только UV0 тридцати декоративных плиток и изображение stone Base Color в отдельной копии `.blend`. Сохранённая сцена повторно открыта в Blender 5.2.2; все 30 UV-прямоугольников различны, внешний PNG найден.
 - [Скрипт FBX-экспорта](../../../_tools/export_art005_board_atlas_probe.py) использует тот же проверенный пресет, что и прежняя проба, и не перезаписывает её файлы.
 - [Скрипт пробы с фигурками](../../../_tools/render_art005_atlas_with_blockouts.py) добавляет только блок-ауты. Он переносит их `Object Color` в Cycles через `Object Info`: без этого ART-003-фигуры и цифровые метки ошибочно рендерились белыми, потому что оригинальная сцена использовала Workbench. Сохранённый `.blend` открыт повторно: 101 объект и внешний atlas доступны.
+- [Отдельный импорт UE](ue-import-report.json) и [два сравнительных кадра K1](ue-art-review-2026-09-27.md): копия прежнего уровня `ART005B` сохранила 30 hit surfaces, 15/15 обзорных зон и шесть блок-аутов. [Исходный кадр](ue-art005b-k1.png) и [кадр с временным затемнением камня 0,70](ue-art005b-k1-toned.png) показывают устранённый повтор; крупные светлые пятна камня всё ещё мешают иерархии с миниатюрами. Это редакторная проба, не принятие материала ART-005/GD-058.
 
 Прежний стенд наносил разные четверти одного рисунка на каждую плитку и поэтому повторялся на K1. Здесь каждая плитка получает собственную область **одного** изображения по мировым координатам: `U=(X+2.5)/5`, `V=(Y+3)/6`. Игровые hit surfaces и `boardState.cells[].zones` остаются независимыми от декоративного меша. Новый atlas не обязан стыковаться сам с собой при тайлинге, потому что по полю применяется один раз. Каменные формы в новом рендере неповторяющиеся; окончательную читаемость с фигурками, зонной обводкой и светом требуется доказать в UE.
 
@@ -20,7 +21,7 @@
 
 Сохранён только выбранный stone-кандидат. Дополнительная попытка imagegen исправить старое дерево **отвергнута**: после одинакового уменьшения до 1024² отношение скачка на границе к среднему соседнему скачку оказалось X/Y `1.636/3.056` против `1.448/2.289` у старого файла. Это не улучшение бесшовности; в репозитории остаётся прежняя wood-карта. Метод замера: среднее `abs(RGB_edge_A−RGB_edge_B)` / среднее `abs(RGB_neighbor_A−RGB_neighbor_B)`, отдельно по X и Y.
 
-Ограничения перед ART-005/GD-058: атлас 1254², то есть примерно 251×209 исходных пикселей на клетку, и может оказаться недостаточно чётким в K2. Под него не изготовлены согласованные normal/ORM; карты старого повторяемого diffuse к нему **не подходят**. Шесть фигур здесь только серые блок-ауты Blender, без производственной Medusa. Новый вариант не импортирован в UE и не проверен с зонами, HUD, в grayscale/deuteranopia, на другом освещённом поле или на целевом D-07. Ни камера, ни палитра, ни геометрия финальной доски этим пробным рендером не утверждены.
+Ограничения перед ART-005/GD-058: атлас 1254², то есть примерно 251×209 исходных пикселей на клетку, и может оказаться недостаточно чётким в K2. Под него не изготовлены согласованные normal/ORM; карты старого повторяемого diffuse к нему **не подходят**. Шесть фигур в UE-пробе — серые блок-ауты, без производственной Medusa. Новый вариант технически импортирован, но не проверен с игровыми зонами и HUD, в grayscale/deuteranopia, на другом освещённом поле или на целевом D-07. Ни камера, ни палитра, ни геометрия финальной доски этими пробными кадрами не утверждены.
 
 Повторить из корня проекта без изменения старого стенда:
 
@@ -28,6 +29,9 @@
 & 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --factory-startup --python blender/_tools/build_art005_board_atlas_probe.py
 & 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --factory-startup --python blender/_tools/export_art005_board_atlas_probe.py
 & 'C:/Program Files/Blender Foundation/Blender 5.2/blender.exe' --background --factory-startup --python blender/_tools/render_art005_atlas_with_blockouts.py
+$repo = 'C:/Users/ren/WebstormProjects/unmached/unmached'
+& 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe' "$repo/unreal/Unmatched/Unmatched.uproject" -run=pythonscript "-script=$repo/tools/art/art005b_import_verify.py" -unattended -nosplash -nullrhi -DisablePlugins=Tripo3DUEBridge '-ini:Engine:[ConsoleVariables]:Interchange.FeatureFlags.Import.FBX=False'
+& 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/UnrealEditor-Cmd.exe' "$repo/unreal/Unmatched/Unmatched.uproject" "-ExecutePythonScript=$repo/tools/art/art005b_capture.py" -unattended -nosplash -RenderOffScreen -DisablePlugins=Tripo3DUEBridge '-ini:Engine:[ConsoleVariables]:Interchange.FeatureFlags.Import.FBX=False'
 ```
 
 Абсолютные пути для агента:
@@ -36,3 +40,5 @@
 - `C:/Users/ren/WebstormProjects/unmached/unmached/blender/ASSET-BOARD-COBBLE-001/variants/B-atlas-v1/cobble-city-atlas-B-v1.blend`
 - `C:/Users/ren/WebstormProjects/unmached/unmached/blender/ASSET-BOARD-COBBLE-001/textures/T_ART005_CobbleBoardAtlas_B_v1.png`
 - `C:/Users/ren/WebstormProjects/unmached/unmached/blender/ASSET-BOARD-COBBLE-001/variants/B-atlas-v1/export/SM_ART005_BoardCobbleAtlasB_v1.fbx`
+- `C:/Users/ren/WebstormProjects/unmached/unmached/blender/ASSET-BOARD-COBBLE-001/variants/B-atlas-v1/ue-art-review-2026-09-27.md`
+- `C:/Users/ren/WebstormProjects/unmached/unmached/blender/ASSET-BOARD-COBBLE-001/variants/B-atlas-v1/ue-art005b-k1-toned.png`
