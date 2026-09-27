@@ -20,6 +20,7 @@ if USE_PRODUCTION and not SKELETAL:
 FRONT_ONLY = os.environ.get("ART004_FACE_FRONT_ONLY", "0") == "1"
 FACE_SLOT = os.environ.get("ART004_FACE_SLOT", "0") == "1"
 RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "0") == "1"
+NECK_BACK = os.environ.get("ART004_FACE_NECK_BACK", "0") == "1"
 NORMAL_IMPORT = os.environ.get("ART004_FACE_NORMAL_IMPORT", "import")
 if NORMAL_IMPORT not in {"import", "compute"} or (NORMAL_IMPORT != "import" and not RESTORE_NORMALS):
     raise ValueError("ART004_FACE_NORMAL_IMPORT must be import or compute on restored-normal skeletal probe")
@@ -27,13 +28,16 @@ if FACE_SLOT and (FRONT_ONLY or USE_PRODUCTION or not SKELETAL):
     raise ValueError("Face-slot probe needs a separate skeletal test import")
 if RESTORE_NORMALS and (FRONT_ONLY or USE_PRODUCTION or not SKELETAL):
     raise ValueError("Restored normals need a separate full-flip skeletal test import")
+if NECK_BACK and not (FACE_SLOT and RESTORE_NORMALS and SKELETAL):
+    raise ValueError("Rear-neck correction requires restored normals and the face slot")
 FLIP_HEAD = os.environ.get("ART004_FACE_FLIP_HEAD", "0") == "1"
 CLEAR_NORMALS = FLIP_HEAD and os.environ.get("ART004_FACE_CLEAR_NORMALS", "0") == "1"
 TWO_SIDED = os.environ.get("ART004_FACE_TWO_SIDED", "0") == "1"
 if FACE_SLOT and RESTORE_NORMALS and TWO_SIDED:
     raise ValueError("Corrected face-slot geometry should use a one-sided probe")
 if SKELETAL:
-    name = ("SK_Medusa_FaceFixNormalsSlot" if FACE_SLOT and RESTORE_NORMALS else
+    name = ("SK_Medusa_FaceFixNormalsSlotNeck" if NECK_BACK else
+            "SK_Medusa_FaceFixNormalsSlot" if FACE_SLOT and RESTORE_NORMALS else
             "SK_Medusa_FaceSlot" if FACE_SLOT else
             "SK_Medusa_FaceFixNormals" if RESTORE_NORMALS else
             "SK_Medusa_FaceFrontOnly" if FRONT_ONLY else "SK_Medusa_FaceFix")
@@ -41,10 +45,15 @@ else:
     name = ("SM_Medusa_FlippedHeadRecalc" if CLEAR_NORMALS else
             "SM_Medusa_FlippedHead" if FLIP_HEAD else "SM_Medusa_FrozenIdle")
 FBX = ROOT / "unreal/Unmatched/Artifacts/ART004Face" / (name + ".fbx")
-if FACE_SLOT and RESTORE_NORMALS:
+if NECK_BACK:
+    FBX = ROOT / "blender/ASSET-MEDUSA-001/variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx"
+elif FACE_SLOT and RESTORE_NORMALS:
     FBX = ROOT / "blender/ASSET-MEDUSA-001/variants/face-section-v1/SK_Medusa_FaceSection_v1.fbx"
 UNLIT = os.environ.get("ART004_FACE_UNLIT", "0") == "1"
 UNLIT_SINGLE = UNLIT and os.environ.get("ART004_FACE_UNLIT_SINGLE", "0") == "1"
+UNLIT_ALL = os.environ.get("ART004_FACE_UNLIT_ALL", "0") == "1"
+if UNLIT_ALL and not (FACE_SLOT and RESTORE_NORMALS and UNLIT_SINGLE):
+    raise ValueError("One-sided unlit-all probe requires corrected two-slot skeletal mesh")
 NO_NORMAL = os.environ.get("ART004_FACE_NO_NORMAL", "0") == "1"
 FACE_LIFT = float(os.environ.get("ART004_FACE_LIFT", "0"))
 if not 0 <= FACE_LIFT <= 1:
@@ -77,10 +86,11 @@ AMBIENT_SCALE = float(os.environ.get("ART004_FACE_AMBIENT_SCALE", "1"))
 if REPOSITION_AMBIENT and not (-500 <= AMBIENT_Y <= 500 and 100 <= AMBIENT_Z <= 800
                                and .1 <= AMBIENT_SCALE <= 2):
     raise ValueError("Diagnostic ambient position or scale is out of range")
-MATERIAL_MODE = ("unlit-single" if UNLIT_SINGLE else "unlit") if UNLIT else (
+MATERIAL_MODE = ("unlit-all" if UNLIT_ALL else "unlit-single" if UNLIT_SINGLE else "unlit") if UNLIT else (
     "no-normal" if NO_NORMAL else ("twosided" if TWO_SIDED else "static"))
 if SKELETAL:
     mesh_mode = ("skeletal-production-" if USE_PRODUCTION else
+                 "skeletal-restorednormals-faceslot-neck-" if NECK_BACK else
                  "skeletal-restorednormals-faceslot-" if FACE_SLOT and RESTORE_NORMALS else
                  "skeletal-faceslot-" if FACE_SLOT else
                  "skeletal-restorednormals-" if RESTORE_NORMALS else
@@ -109,6 +119,30 @@ if NORMAL_IMPORT == "compute":
 MATERIAL = "/Game/ART004/Medusa/Materials/MI_Medusa_Blue"
 
 
+def basecolor_texture():
+    texture = u.load_asset("/Game/ART004/Medusa/Textures/T_Medusa_BC")
+    if texture:
+        return texture
+    path = "/Game/ArtTests/ART004Face/Textures"
+    name = "T_Medusa_BC_Probe"
+    texture = u.load_asset(path + "/" + name)
+    if not texture:
+        task = u.AssetImportTask()
+        task.filename = str(ROOT / "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_BC.png")
+        task.destination_path = path
+        task.destination_name = name
+        task.automated = True
+        task.replace_existing = True
+        task.save = True
+        u.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
+        texture = u.load_asset(path + "/" + name)
+    if not texture:
+        raise RuntimeError("Cannot import diagnostic Medusa BaseColor")
+    texture.set_editor_property("srgb", True)
+    u.EditorAssetLibrary.save_loaded_asset(texture)
+    return texture
+
+
 def comparison_material():
     if NO_NORMAL:
         path = "/Game/ArtTests/ART004Face/Materials"
@@ -116,7 +150,7 @@ def comparison_material():
         if not material:
             material = u.AssetToolsHelpers.get_asset_tools().create_asset(
                 "M_Medusa_NoNormalProbe", path, u.Material, u.MaterialFactoryNew())
-        texture = u.load_asset("/Game/ART004/Medusa/Textures/T_Medusa_BC")
+        texture = basecolor_texture()
         if not material or not texture:
             raise RuntimeError("Missing no-normal material or imported BaseColor texture")
         material.set_editor_property("two_sided", False)
@@ -138,7 +172,7 @@ def comparison_material():
         if not material:
             material = u.AssetToolsHelpers.get_asset_tools().create_asset(
                 name, path, u.Material, u.MaterialFactoryNew())
-        texture = u.load_asset("/Game/ART004/Medusa/Textures/T_Medusa_BC")
+        texture = basecolor_texture()
         if not material or not texture:
             raise RuntimeError("Missing unlit material or imported BaseColor texture")
         material.set_editor_property("two_sided", not UNLIT_SINGLE)
@@ -177,7 +211,7 @@ def comparison_material():
             flat, "", u.MaterialProperty.MP_NORMAL)
     if FACE_LIFT and created:
         mel = u.MaterialEditingLibrary
-        texture = u.load_asset("/Game/ART004/Medusa/Textures/T_Medusa_BC")
+        texture = basecolor_texture()
         if not texture:
             raise RuntimeError("Missing Medusa BaseColor for face lift")
         sample = mel.create_material_expression(parent, u.MaterialExpressionTextureSample, -450, 900)
@@ -259,10 +293,13 @@ def import_mesh():
         if FACE_SLOT:
             if slots != 2 or TWO_SIDED == RESTORE_NORMALS:
                 raise RuntimeError("Face-slot test requires two slots and matching winding/culling")
-            normal = u.load_asset(MATERIAL)
-            if not normal:
-                raise RuntimeError("Missing original one-sided Medusa material")
-            assigned = [normal, material]
+            if UNLIT_ALL:
+                assigned = [material] * slots
+            else:
+                normal = u.load_asset(MATERIAL)
+                if not normal:
+                    raise RuntimeError("Missing original one-sided Medusa material")
+                assigned = [normal, material]
         else:
             assigned = [material] * slots
         for slot, assigned_material in zip(materials, assigned):
@@ -305,11 +342,12 @@ class CaptureJob:
                     "materials": [material.get_path_name() for material in self.materials],
                     "material_slots": self.slots,
                     "two_sided": TWO_SIDED or (UNLIT and not UNLIT_SINGLE),
-                    "unlit": UNLIT, "no_normal": NO_NORMAL,
+                    "unlit": UNLIT, "unlit_all": UNLIT_ALL, "no_normal": NO_NORMAL,
                     "skeletal": SKELETAL,
                     "use_production": USE_PRODUCTION,
                     "front_only": FRONT_ONLY,
                     "face_slot": FACE_SLOT,
+                    "neck_back": NECK_BACK,
                     "restore_normals": RESTORE_NORMALS,
                     "normal_import": NORMAL_IMPORT,
                     "flipped_head": FLIP_HEAD,

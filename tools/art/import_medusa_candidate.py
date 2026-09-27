@@ -1,6 +1,7 @@
 """Import and verify the Tripo/Blender Medusa candidate in isolated /Game/ART004/Medusa."""
 
 import json
+import os
 from pathlib import Path
 
 import unreal as u
@@ -250,6 +251,15 @@ def main():
     material = build_material(base, normal, orm)
     team_instance("MI_Medusa_Blue", material, (.72, .85, 1.0, 1))
     team_instance("MI_Medusa_Red", material, (1.0, .76, .70, 1))
+    if os.environ.get("ART004_MATERIAL_ONLY", "0") == "1":
+        evidence = ROOT / "unreal/Unmatched/Artifacts/ART004Face/material-only-result.json"
+        evidence.parent.mkdir(parents=True, exist_ok=True)
+        evidence.write_text(json.dumps({"status": "materials_only",
+                                        "material": material.get_path_name(),
+                                        "animations_imported": False}, indent=2) + "\n",
+                            encoding="utf-8")
+        print("ART004_MEDUSA_MATERIAL_ONLY_COMPLETE")
+        return
     mesh, skeleton = import_skeletal(material)
     base_mesh = import_base(material)
     bounds = mesh.get_bounds()

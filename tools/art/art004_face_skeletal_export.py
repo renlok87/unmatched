@@ -21,10 +21,13 @@ OUTPUT = ROOT / "unreal/Unmatched/Artifacts/ART004Face/SK_Medusa_FaceFix.fbx"
 FRONT_ONLY = os.environ.get("ART004_FACE_FRONT_ONLY", "0") == "1"
 FACE_SLOT = os.environ.get("ART004_FACE_SLOT", "0") == "1"
 RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "0") == "1"
+NECK_BACK = os.environ.get("ART004_FACE_NECK_BACK", "0") == "1"
 if FRONT_ONLY and FACE_SLOT:
     raise ValueError("Choose either front-only winding or separate face slot")
 if RESTORE_NORMALS and FRONT_ONLY:
     raise ValueError("Restored normals require the complete face winding probe")
+if NECK_BACK and not (FACE_SLOT and RESTORE_NORMALS):
+    raise ValueError("Rear-neck correction requires restored normals and the face slot")
 if FRONT_ONLY:
     OUTPUT = OUTPUT.with_name("SK_Medusa_FaceFrontOnly.fbx")
 if FACE_SLOT:
@@ -32,10 +35,12 @@ if FACE_SLOT:
 if RESTORE_NORMALS:
     OUTPUT = OUTPUT.with_name("SK_Medusa_FaceFixNormalsSlot.fbx" if FACE_SLOT else
                               "SK_Medusa_FaceFixNormals.fbx")
+if NECK_BACK:
+    OUTPUT = OUTPUT.with_name("SK_Medusa_FaceFixNormalsSlotNeck.fbx")
 
 
-def face_indices(mesh):
-    cell = json.loads(ATLAS.read_text())["cells"]["tripo_part_10"]
+def part_indices(mesh, part_name):
+    cell = json.loads(ATLAS.read_text())["cells"][part_name]
     u_min = (cell["x"] + cell["inset"]) / 2048
     u_max = (cell["x"] + cell["cell"] - cell["inset"]) / 2048
     v_min = 1 - (cell["y_top"] + cell["cell"] - cell["inset"]) / 2048
@@ -48,8 +53,12 @@ def face_indices(mesh):
 
 
 def flip_face(mesh):
-    part = face_indices(mesh)
+    part = part_indices(mesh, "tripo_part_10")
     assert len(part) == 587, len(part)
+    neck = part_indices(mesh, "tripo_part_14") if NECK_BACK else set()
+    if NECK_BACK:
+        assert len(neck) == 480, len(neck)
+        assert not (part & neck), "Atlas parts overlap"
     if FACE_SLOT and not RESTORE_NORMALS:
         face_material = mesh.materials[0].copy()
         face_material.name = "M_Medusa_Face_TwoSidedProbe"
@@ -57,13 +66,14 @@ def flip_face(mesh):
         for index in part:
             mesh.polygons[index].material_index = 1
         mesh.update()
-        return 0, None
+        return 0, None, 0
     y_values = [mesh.polygons[index].center.y for index in part]
     mid_y = (min(y_values) + max(y_values)) / 2
     selected = ({index for index in part
                  if mesh.polygons[index].center.y < mid_y and
                     mesh.polygons[index].normal.y > .1}
-                if FRONT_ONLY else part)
+                if FRONT_ONLY else set(part))
+    selected |= neck
     assert selected, "No front-facing polygons selected"
     source_vertices = {poly.index: frozenset(poly.vertices) for poly in mesh.polygons}
     source_normals = {(poly.index, mesh.loops[loop].vertex_index):
@@ -100,7 +110,7 @@ def flip_face(mesh):
         for index in part:
             mesh.polygons[index].material_index = 1
         mesh.update()
-    return len(selected), mid_y
+    return len(selected), mid_y, len(neck)
 
 
 def patch_fbx_units(path):
@@ -124,7 +134,7 @@ def main():
     arm = bpy.data.objects["SKEL_Medusa"]
     body = bpy.data.objects["SK_Medusa_Body"]
     bow = bpy.data.objects["SK_Medusa_Bow"]
-    flipped, mid_y = flip_face(body.data)
+    flipped, mid_y, neck_count = flip_face(body.data)
     arm.animation_data.action = None
     for bone in arm.pose.bones:
         bone.location = (0, 0, 0)
@@ -159,6 +169,7 @@ def main():
               "face_part": "tripo_part_10", "front_only": FRONT_ONLY,
               "face_slot": FACE_SLOT, "restore_normals": RESTORE_NORMALS,
               "face_slot_polygons": 587 if FACE_SLOT else 0,
+              "neck_back_polygons": neck_count,
               "front_mid_y_m": mid_y, "flipped_faces": flipped,
               "body_triangles": sum(len(p.vertices) - 2 for p in body.data.polygons),
               "bow_triangles": sum(len(p.vertices) - 2 for p in bow.data.polygons),
