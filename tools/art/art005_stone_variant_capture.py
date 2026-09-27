@@ -9,11 +9,19 @@ import unreal as u
 
 ROOT = Path(__file__).resolve().parents[2]
 VARIANT = os.environ.get("ART005_STONE_VARIANT", "v3")
-if VARIANT not in ("v3", "v4"):
+if VARIANT not in ("v3", "v4", "woodUV", "woodPaint"):
     raise RuntimeError(f"Unsupported ART005_STONE_VARIANT: {VARIANT}")
-SUFFIX = {"v3": "D", "v4": "E"}[VARIANT]
-OUTPUT = ROOT / f"docs/game-design/evidence/ART-005/stone-{VARIANT}-combined-k1-editor-2026-09-28.png"
-LEVEL = f"/Game/ArtTests/ART005{SUFFIX}/L_ART005{SUFFIX}_Stone{VARIANT.upper()}Review"
+SUFFIX = {"v3": "D", "v4": "E", "woodUV": "F", "woodPaint": "G"}[VARIANT]
+VIEW = os.environ.get("ART005_CAPTURE_VIEW", "k1")
+if VIEW not in ("k1", "wood-detail"):
+    raise RuntimeError(f"Unsupported ART005_CAPTURE_VIEW: {VIEW}")
+OUTPUT = ROOT / f"docs/game-design/evidence/ART-005/stone-{VARIANT}-combined-{VIEW}-editor-2026-09-28.png"
+LEVEL = {
+    "v3": "/Game/ArtTests/ART005D/L_ART005D_StoneV3Review",
+    "v4": "/Game/ArtTests/ART005E/L_ART005E_StoneV4Review",
+    "woodUV": "/Game/ArtTests/ART005F/L_ART005F_WoodUVReview",
+    "woodPaint": "/Game/ArtTests/ART005G/L_ART005G_WoodPaintReview",
+}[VARIANT]
 
 
 class CaptureJob:
@@ -51,8 +59,13 @@ class CaptureJob:
         u.SystemLibrary.execute_console_command(self.world, "t.MaxFPS 30")
         u.SystemLibrary.execute_console_command(self.world, "r.DefaultFeature.AutoExposure 0")
         u.SystemLibrary.execute_console_command(self.world, "r.EyeAdaptationQuality 0")
-        camera_location = u.Vector(0, -1032.4, 1474.4)
-        rotation = u.MathLibrary.find_look_at_rotation(camera_location, u.Vector(0, 0, 0))
+        if VIEW == "k1":
+            camera_location = u.Vector(0, -1032.4, 1474.4)
+            camera_target = u.Vector(0, 0, 0)
+        else:
+            camera_target = u.Vector(-250, -300, 0)
+            camera_location = camera_target + u.Vector(0, -1032.4, 1474.4) * 0.35
+        rotation = u.MathLibrary.find_look_at_rotation(camera_location, camera_target)
         actor = u.EditorLevelLibrary.spawn_actor_from_class(u.SceneCapture2D, camera_location, rotation)
         actor.set_actor_label(f"ART005{SUFFIX} Temporary Capture K1")
         self.target = u.TextureRenderTarget2D()
