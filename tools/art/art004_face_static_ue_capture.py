@@ -5,6 +5,7 @@ actor only in memory. It never saves or modifies the ART005H level.
 """
 
 import json
+import math
 import os
 import traceback
 from pathlib import Path
@@ -69,8 +70,14 @@ LOCAL_FILL_INTENSITY = float(os.environ.get("ART004_FACE_LOCAL_INTENSITY", "40")
 if LOCAL_FILL and not 0 < LOCAL_FILL_INTENSITY <= 100:
     raise ValueError("Local fill intensity is a diagnostic value in (0, 100]")
 VIEW = os.environ.get("ART004_FACE_VIEW", "front")
-if VIEW not in {"front", "rear", "k1"}:
-    raise ValueError("ART004_FACE_VIEW must be front, rear, or k1")
+if VIEW not in {"front", "rear", "k1", "d10-k1", "d10-k2"}:
+    raise ValueError("ART004_FACE_VIEW must be front, rear, k1, d10-k1, or d10-k2")
+ADD_BASE = os.environ.get("ART004_FACE_ADD_BASE", "0") == "1"
+if ADD_BASE and not (SKELETAL and NECK_BACK):
+    raise ValueError("The isolated base composition requires the v2 skeletal candidate")
+D10_DISTANCE = float(os.environ.get("ART004_FACE_D10_DISTANCE", "550"))
+if not 200 <= D10_DISTANCE <= 1000:
+    raise ValueError("ART004_FACE_D10_DISTANCE must be 200..1000 uu")
 LIGHT_PROFILE = os.environ.get("ART004_FACE_LIGHT_PROFILE", "cobble")
 LEVELS = {
     "cobble": "/Game/ArtTests/ART005H/L_ART005H_CornerReview",
@@ -107,6 +114,8 @@ MODE = mesh_mode + MATERIAL_MODE + (
             f"-frontambient-y{round(AMBIENT_Y)}-z{round(AMBIENT_Z)}-s{round(AMBIENT_SCALE * 100)}"
             if REPOSITION_AMBIENT else "") + (
             "-" + VIEW if VIEW != "front" else "") + (
+            "-base" if ADD_BASE else "") + (
+            f"-d{round(D10_DISTANCE)}" if VIEW == "d10-k2" else "") + (
             "-computenormals" if NORMAL_IMPORT == "compute" else "") + (
             "-" + LIGHT_PROFILE if LIGHT_PROFILE != "cobble" else "")
 OUTPUT = ROOT / f"docs/game-design/evidence/ART-004/medusa-frozen-{MODE}-ue-editor-2026-09-28.png"
@@ -314,6 +323,43 @@ def import_mesh():
     return mesh, slots, assigned
 
 
+def import_isolated_base():
+    source = ROOT / "blender/ASSET-MEDUSA-001/export/SM_Medusa_Base.fbx"
+    if not source.is_file():
+        raise RuntimeError("Missing original separate Medusa base FBX")
+    task = u.AssetImportTask()
+    task.filename = str(source)
+    task.destination_path = DEST
+    task.destination_name = "SM_Medusa_Base_FaceProbe"
+    task.automated = True
+    task.replace_existing = True
+    task.save = True
+    options = u.FbxImportUI()
+    options.import_mesh = True
+    options.import_as_skeletal = False
+    options.mesh_type_to_import = u.FBXImportType.FBXIT_STATIC_MESH
+    options.import_materials = False
+    options.import_textures = False
+    options.static_mesh_import_data.combine_meshes = True
+    options.static_mesh_import_data.auto_generate_collision = False
+    task.options = options
+    u.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
+    mesh = u.load_asset(DEST + "/SM_Medusa_Base_FaceProbe")
+    if not mesh:
+        raise RuntimeError("Isolated Medusa base import failed")
+    bounds = mesh.get_bounding_box()
+    size = (bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y,
+            bounds.max.z - bounds.min.z)
+    if any(abs(value - expected) > .5 for value, expected in zip(size, (30, 30, 6))):
+        raise RuntimeError(f"Unexpected separate Medusa base dimensions: {size}")
+    material = u.load_asset(MATERIAL)
+    if not material:
+        raise RuntimeError("Missing original Medusa material for base")
+    mesh.set_material(0, material)
+    u.EditorAssetLibrary.save_loaded_asset(mesh)
+    return mesh, size
+
+
 class CaptureJob:
     def __init__(self):
         self.frame = 0
@@ -365,6 +411,10 @@ class CaptureJob:
                     "output": str(OUTPUT), "scene_saved": False,
                     "camera_location": list(self.camera_location),
                     "camera_target": list(self.camera_target), "fov": 35,
+                    "add_base": ADD_BASE,
+                    "base_mesh": self.base_mesh.get_path_name() if ADD_BASE else None,
+                    "base_dimensions_uu": list(self.base_dimensions) if ADD_BASE else None,
+                    "d10_distance_uu": D10_DISTANCE if VIEW == "d10-k2" else None,
                 }, indent=2) + "\n", encoding="utf-8")
                 u.log("ART004_FACE_STATIC_UE_CAPTURE_COMPLETE " + str(OUTPUT))
                 self.finish()
@@ -396,6 +446,13 @@ class CaptureJob:
             raise RuntimeError("Expected one Medusa, found " + str(len(figures)))
         location = figures[0].get_actor_location()
         figures[0].set_actor_location(u.Vector(10000, 10000, 0), False, False)
+        if ADD_BASE:
+            self.base_mesh, self.base_dimensions = import_isolated_base()
+            base_actor = u.EditorLevelLibrary.spawn_actor_from_class(
+                u.StaticMeshActor, location, u.Rotator(0, 0, 0))
+            base_actor.set_actor_label("ART004 temporary separate base - v2 composition")
+            base_actor.static_mesh_component.set_static_mesh(self.base_mesh)
+            base_actor.static_mesh_component.set_collision_profile_name("NoCollision")
         if SKELETAL:
             probe_actor = u.EditorLevelLibrary.spawn_actor_from_class(
                 u.SkeletalMeshActor, location, u.Rotator(0, 0, 0))
@@ -425,8 +482,22 @@ class CaptureJob:
         self.camera_location = {
             "front": (-70, 105, 105), "rear": (70, -205, 105),
             "k1": (0, -1032.4, 1474.4),
-        }[VIEW]
+        }.get(VIEW)
         self.camera_target = (0, 0, 0) if VIEW == "k1" else (0, -50, 29)
+        if VIEW == "d10-k1":
+            half_h = math.tan(math.radians(35 / 2))
+            half_v = half_h / (16 / 9)
+            need_v = (300 * math.sin(math.radians(55)) + 60) / half_v
+            need_h = (250 + 60) / half_h
+            distance = max(need_v, need_h) * 1.12
+            self.camera_location = (0, distance * math.cos(math.radians(55)),
+                                    distance * math.sin(math.radians(55)))
+            self.camera_target = (0, 0, 0)
+        elif VIEW == "d10-k2":
+            self.camera_location = (location.x,
+                                    location.y + D10_DISTANCE * math.cos(math.radians(55)),
+                                    29 + D10_DISTANCE * math.sin(math.radians(55)))
+            self.camera_target = (location.x, location.y, 29)
         origin = u.Vector(*self.camera_location)
         target = u.Vector(*self.camera_target)
         camera = u.EditorLevelLibrary.spawn_actor_from_class(
