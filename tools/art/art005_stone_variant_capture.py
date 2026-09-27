@@ -14,7 +14,7 @@ if VARIANT not in ("v3", "v4", "woodUV", "woodPaint", "corner", "forestProbe", "
 SUFFIX = {"v3": "D", "v4": "E", "woodUV": "F", "woodPaint": "G", "corner": "H",
           "forestProbe": "I", "paddockProbe": "I"}[VARIANT]
 VIEW = os.environ.get("ART005_CAPTURE_VIEW", "k1")
-if VIEW not in ("k1", "wood-detail"):
+if VIEW not in ("k1", "wood-detail", "medusa-close", "medusa-inspect", "medusa-threequarter", "medusa-threequarter-left", "medusa-front-left"):
     raise RuntimeError(f"Unsupported ART005_CAPTURE_VIEW: {VIEW}")
 OUTPUT = ROOT / f"docs/game-design/evidence/ART-005/stone-{VARIANT}-combined-{VIEW}-editor-2026-09-28.png"
 LEVEL = {
@@ -66,12 +66,27 @@ class CaptureJob:
         if VIEW == "k1":
             camera_location = u.Vector(0, -1032.4, 1474.4)
             camera_target = u.Vector(0, 0, 0)
-        else:
+        elif VIEW == "wood-detail":
             camera_target = u.Vector(-250, -300, 0)
             camera_location = camera_target + u.Vector(0, -1032.4, 1474.4) * 0.35
+        elif VIEW == "medusa-close":
+            camera_location = u.Vector(125, 190, 145)
+            camera_target = u.Vector(0, -50, 29)
+        elif VIEW == "medusa-inspect":
+            camera_location = u.Vector(75, 20, 180)
+            camera_target = u.Vector(0, -50, 30)
+        elif VIEW == "medusa-threequarter":
+            camera_location = u.Vector(140, 80, 105)
+            camera_target = u.Vector(0, -50, 29)
+        elif VIEW == "medusa-threequarter-left":
+            camera_location = u.Vector(-140, 80, 105)
+            camera_target = u.Vector(0, -50, 29)
+        else:
+            camera_location = u.Vector(-70, 105, 105)
+            camera_target = u.Vector(0, -50, 29)
         rotation = u.MathLibrary.find_look_at_rotation(camera_location, camera_target)
         actor = u.EditorLevelLibrary.spawn_actor_from_class(u.SceneCapture2D, camera_location, rotation)
-        actor.set_actor_label(f"ART005{SUFFIX} Temporary Capture K1")
+        actor.set_actor_label(f"ART005{SUFFIX} Temporary Capture {VIEW}")
         self.target = u.TextureRenderTarget2D()
         self.target.set_editor_property("render_target_format", u.TextureRenderTargetFormat.RTF_RGBA8)
         self.target.set_editor_property("size_x", 1920)
