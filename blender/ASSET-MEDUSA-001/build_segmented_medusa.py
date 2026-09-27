@@ -296,7 +296,7 @@ def setup_preview():
     camera_data.type = "ORTHO"
     camera_data.ortho_scale = .72
     bpy.context.scene.camera = camera
-    for name, location, energy in (("Key", (-.65, -.5, .9), 220), ("Fill", (.65, -.2, .7), 130)):
+    for name, location, energy in (("Key", (-.65, -.5, .9), 45), ("Fill", (.65, -.2, .7), 12)):
         data = bpy.data.lights.new(name, "AREA")
         data.energy = energy
         data.shape = "DISK"

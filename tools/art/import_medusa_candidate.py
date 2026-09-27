@@ -164,16 +164,24 @@ def import_base(material):
 
 
 def make_socket(mesh, name, bone, offset):
-    for index in range(mesh.num_sockets()):
-        existing = mesh.get_socket_by_index(index)
-        if str(existing.get_name()) == name:
-            sock = existing
-            break
-    else:
-        sock = u.SkeletalMeshSocket(outer=mesh, name=name)
-        mesh.add_socket(sock)
+    sock = u.SkeletalMeshSocket(outer=mesh, name=name)
     sock.set_socket_parent(mesh, bone)
     sock.set_socket_local_transform(u.Transform(u.Vector(*offset), u.Rotator(0, 0, 0), u.Vector(1, 1, 1)))
+    mesh.add_socket(sock)
+    old_name = str(sock.get_editor_property("socket_name"))
+    check("rename_socket_" + name, mesh.rename_socket(old_name, name), old_name + " -> " + name)
+    u.EditorAssetLibrary.save_loaded_asset(mesh)
+
+
+def reset_candidate_sockets(mesh):
+    # This isolated asset owns only the two sockets below. UE's legacy FBX
+    # reimport duplicates sockets; rebuild the exact pair on every run.
+    while mesh.num_sockets():
+        before = mesh.num_sockets()
+        socket = mesh.get_socket_by_index(0)
+        name = str(socket.get_editor_property("socket_name"))
+        check("remove_socket_" + str(before), mesh.remove_socket(name) and
+              mesh.num_sockets() < before, name)
     u.EditorAssetLibrary.save_loaded_asset(mesh)
 
 
@@ -266,10 +274,14 @@ def main():
                        "leg_lower_L", "foot_L", "leg_upper_R", "leg_lower_R", "foot_R"))
     actual = bone_names(mesh)
     check("bones_17", actual == expected, str(actual))
+    reset_candidate_sockets(mesh)
     make_socket(mesh, "Weapon", "weapon", (0, 0, 0))
     make_socket(mesh, "Head", "head", (0, 0, 4))
-    check("sockets", {str(mesh.get_socket_by_index(i).get_name()) for i in range(mesh.num_sockets())}
-          >= {"Weapon", "Head"}, str(mesh.num_sockets()))
+    sockets = {str(mesh.get_socket_by_index(i).get_editor_property("socket_name")):
+               str(mesh.get_socket_by_index(i).get_editor_property("bone_name"))
+               for i in range(mesh.num_sockets())}
+    check("sockets", mesh.num_sockets() == 2 and sockets == {"Weapon": "weapon", "Head": "head"},
+          str(sockets))
     REPORT["clips"] = {}
     for clip in ("Idle", "LungeAttack", "HitReact", "DeathSettle"):
         name = "AM_Medusa_" + clip
