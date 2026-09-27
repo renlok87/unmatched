@@ -489,6 +489,7 @@ bool FS08Contracts::DecodeInnerState(const TSharedRef<FJsonObject> Inner,
   if (!DecodeJsonStringField(Inner, TEXT("fighters"), OutSnapshot.Fighters, Present, OutError)) return false;
   if (!DecodeJsonStringField(Inner, TEXT("handZones"), OutSnapshot.HandZones, Present, OutError)) return false;
   if (!DecodeJsonStringField(Inner, TEXT("discardPiles"), OutSnapshot.DiscardPiles, Present, OutError)) return false;
+  if (!DecodeJsonStringField(Inner, TEXT("decks"), OutSnapshot.Decks, Present, OutError)) return false;
   if (!DecodeJsonStringField(Inner, TEXT("boardState"), OutSnapshot.BoardState, Present, OutError)) return false;
   if (!DecodeJsonStringField(Inner, TEXT("metadata"), OutSnapshot.Metadata, Present, OutError)) return false;
   return true;
@@ -565,6 +566,210 @@ FString FS08Contracts::PendingManeuverId(const FS08Snapshot& Snapshot) {
   return (*Pending)->GetStringField(TEXT("id"));
 }
 
+bool FS08Contracts::PendingHandDiscard(const FS08Snapshot& Snapshot,
+                                       FS08PendingHandDiscard& OutPending) {
+  OutPending = FS08PendingHandDiscard();
+  if (!Snapshot.Metadata.IsValid()) return false;
+  const TSharedPtr<FJsonObject> Meta = Snapshot.Metadata->AsObject();
+  if (!Meta.IsValid()) return false;
+  const TSharedPtr<FJsonObject>* Pending = nullptr;
+  if (!Meta->TryGetObjectField(TEXT("pendingHandDiscard"), Pending) || !Pending->IsValid()) {
+    return false;
+  }
+  OutPending.Id = (*Pending)->GetStringField(TEXT("id"));
+  OutPending.PlayerId = (*Pending)->GetStringField(TEXT("playerId"));
+  bool Present = false;
+  int32 Count = 0;
+  if (ReadIntLike(Pending->ToSharedRef(), TEXT("count"), Count, Present) && Present) {
+    OutPending.Count = Count;
+  }
+  return !OutPending.Id.IsEmpty();
+}
+
+double FS08CombatInfo::SecondsUntilDeadline() const {
+  if (!bHasTimeoutAt) return -1.0; // no parseable deadline: treat as closed
+  return (TimeoutAt - FDateTime::UtcNow()).GetTotalSeconds();
+}
+
+bool FS08Contracts::CombatInfo(const FS08Snapshot& Snapshot, FS08CombatInfo& Out) {
+  Out = FS08CombatInfo();
+  if (!Snapshot.Metadata.IsValid()) return false;
+  const TSharedPtr<FJsonObject> Meta = Snapshot.Metadata->AsObject();
+  if (!Meta.IsValid()) return false;
+  const TSharedPtr<FJsonObject>* Combat = nullptr;
+  if (!Meta->TryGetObjectField(TEXT("combatInfo"), Combat) || !Combat->IsValid()) {
+    return false;
+  }
+  const TSharedRef<FJsonObject> C = Combat->ToSharedRef();
+  Out.bPresent = true;
+  Out.AttackerId = C->GetStringField(TEXT("attackerId"));
+  Out.DefenderId = C->GetStringField(TEXT("defenderId"));
+  Out.TargetFighterId = C->GetStringField(TEXT("targetFighterId"));
+  Out.AttackerCardId = C->GetStringField(TEXT("attackerCardId"));
+  Out.DefenderCardId = C->GetStringField(TEXT("defenderCardId"));
+  Out.CardBoostCardId = C->GetStringField(TEXT("cardBoostCardId"));
+  Out.AbilityBoostCardId = C->GetStringField(TEXT("abilityBoostCardId"));
+  Out.bHasAttackerCard = C->HasField(TEXT("attackerCardId")) && !Out.AttackerCardId.IsEmpty();
+  Out.bHasDefenderCard = C->HasField(TEXT("defenderCardId")) && !Out.DefenderCardId.IsEmpty();
+  Out.bHasCardBoostCardId =
+      C->HasField(TEXT("cardBoostCardId")) && !Out.CardBoostCardId.IsEmpty();
+  Out.bHasAbilityBoostCardId =
+      C->HasField(TEXT("abilityBoostCardId")) && !Out.AbilityBoostCardId.IsEmpty();
+  bool Present = false;
+  int32 Value = 0;
+  if (ReadIntLike(C, TEXT("attackValue"), Value, Present) && Present) {
+    Out.bHasAttackValue = true;
+    Out.AttackValue = Value;
+  }
+  if (ReadIntLike(C, TEXT("defenseValue"), Value, Present) && Present) {
+    Out.bHasDefenseValue = true;
+    Out.DefenseValue = Value;
+  }
+  if (ReadIntLike(C, TEXT("boostValue"), Value, Present) && Present) {
+    Out.bHasBoostValue = true;
+    Out.BoostValue = Value;
+  }
+  // ISO 8601 with fractional seconds + 'Z' (NestJS Date serialization).
+  auto ParseIso = [](const FString& Text, FDateTime& OutTime) {
+    FString Normalized = Text;
+    int32 DotIndex = INDEX_NONE;
+    if (Normalized.FindChar(TEXT('.'), DotIndex)) {
+      // Trim the fraction to UE's expected 3 fractional digits, keep the tail.
+      const int32 FractionStart = DotIndex + 1;
+      int32 FractionEnd = FractionStart;
+      while (FractionEnd < Normalized.Len() &&
+             Normalized[FractionEnd] >= TEXT('0') && Normalized[FractionEnd] <= TEXT('9')) {
+        ++FractionEnd;
+      }
+      const int32 FractionLen = FractionEnd - FractionStart;
+      if (FractionLen > 3) {
+        Normalized = Normalized.Left(FractionStart + 3) + Normalized.RightChop(FractionEnd);
+      }
+    }
+    return FDateTime::ParseIso8601(*Normalized, OutTime);
+  };
+  FString Started = C->GetStringField(TEXT("startedAt"));
+  if (!Started.IsEmpty() && ParseIso(Started, Out.StartedAt)) Out.bHasStartedAt = true;
+  FString Timeout = C->GetStringField(TEXT("timeoutAt"));
+  if (!Timeout.IsEmpty() && ParseIso(Timeout, Out.TimeoutAt)) Out.bHasTimeoutAt = true;
+  // Reveal = the opponent's committed identity is visible in THIS body:
+  // both committed cards present regardless of which seat is viewing.
+  Out.bRevealed = Out.bHasAttackerCard && Out.bHasDefenderCard;
+  return true;
+}
+
+bool FS08Contracts::PendingEffects(const FS08Snapshot& Snapshot,
+                                   TArray<FS08PendingEffect>& OutEffects) {
+  OutEffects.Reset();
+  if (!Snapshot.Metadata.IsValid()) return false;
+  const TSharedPtr<FJsonObject> Meta = Snapshot.Metadata->AsObject();
+  if (!Meta.IsValid()) return false;
+  const TArray<TSharedPtr<FJsonValue>>* Effects = nullptr;
+  if (!Meta->TryGetArrayField(TEXT("pendingEffects"), Effects) || !Effects) return false;
+  for (const TSharedPtr<FJsonValue>& Value : *Effects) {
+    const TSharedPtr<FJsonObject>* Effect = nullptr;
+    if (!Value.IsValid() || !Value->TryGetObject(Effect) || !Effect->IsValid()) continue;
+    const TSharedRef<FJsonObject> Obj = Effect->ToSharedRef();
+    FS08PendingEffect Entry;
+    Entry.Id = Obj->GetStringField(TEXT("id"));
+    Entry.PlayerId = Obj->GetStringField(TEXT("playerId"));
+    Entry.Type = Obj->GetStringField(TEXT("type"));
+    bool bFlag = false;
+    if (Obj->TryGetBoolField(TEXT("optional"), bFlag)) Entry.bOptional = bFlag;
+    int32 Number = 0;
+    bool bPresent = false;
+    if (ReadIntLike(Obj, TEXT("value"), Number, bPresent) && bPresent) {
+      Entry.Value = Number;
+      Entry.bHasValue = true;
+    }
+    Entry.FighterName = Obj->GetStringField(TEXT("fighterName"));
+    if (Obj->TryGetBoolField(TEXT("targetsOpponent"), bFlag)) Entry.bTargetsOpponent = bFlag;
+    if (Obj->TryGetBoolField(TEXT("canPassThroughEnemies"), bFlag)) Entry.bCanPassThroughEnemies = bFlag;
+    if (Obj->TryGetBoolField(TEXT("restoreFullHealth"), bFlag)) Entry.bRestoreFullHealth = bFlag;
+    if (Obj->TryGetBoolField(TEXT("anyOwner"), bFlag)) Entry.bAnyOwner = bFlag;
+    Entry.ZoneFighterName = Obj->GetStringField(TEXT("zoneFighterName"));
+    Entry.Mode = Obj->GetStringField(TEXT("mode"));
+    Entry.Text = Obj->GetStringField(TEXT("text"));
+    if (ReadIntLike(Obj, TEXT("damage"), Number, bPresent) && bPresent) {
+      Entry.Damage = Number;
+      Entry.bHasDamage = true;
+    }
+    if (ReadIntLike(Obj, TEXT("stage"), Number, bPresent) && bPresent) {
+      Entry.Stage = Number;
+    }
+    if (ReadIntLike(Obj, TEXT("drawIfDefeated"), Number, bPresent) && bPresent) {
+      Entry.DrawIfDefeated = Number;
+    }
+    if (ReadIntLike(Obj, TEXT("revealedCount"), Number, bPresent) && bPresent) {
+      Entry.RevealedCount = Number;
+      Entry.bHasRevealedCount = true;
+    }
+    if (ReadIntLike(Obj, TEXT("chooseCount"), Number, bPresent) && bPresent && Number >= 1) {
+      Entry.ChooseCount = Number;
+    }
+    const TSharedPtr<FJsonObject>* Anchor = nullptr;
+    if (Obj->TryGetObjectField(TEXT("anchor"), Anchor) && Anchor->IsValid()) {
+      bool bCoord = false;
+      if (ReadIntLike(Anchor->ToSharedRef(), TEXT("x"), Entry.AnchorX, bCoord) && bCoord) {
+        if (ReadIntLike(Anchor->ToSharedRef(), TEXT("y"), Entry.AnchorY, bCoord) && bCoord) {
+          Entry.bHasAnchor = true;
+        }
+      }
+    }
+    const TArray<TSharedPtr<FJsonValue>>* Ids = nullptr;
+    if (Obj->TryGetArrayField(TEXT("fighterIds"), Ids) && Ids) {
+      for (const TSharedPtr<FJsonValue>& Id : *Ids) {
+        const FString Parsed = Id.IsValid() ? Id->AsString() : FString();
+        if (!Parsed.IsEmpty()) Entry.FighterIds.Add(Parsed);
+      }
+    }
+    if (Obj->TryGetArrayField(TEXT("targetFighterIds"), Ids) && Ids) {
+      for (const TSharedPtr<FJsonValue>& Id : *Ids) {
+        const FString Parsed = Id.IsValid() ? Id->AsString() : FString();
+        if (!Parsed.IsEmpty()) Entry.TargetFighterIds.Add(Parsed);
+      }
+    }
+    const TArray<TSharedPtr<FJsonValue>>* Options = nullptr;
+    if (Obj->TryGetArrayField(TEXT("options"), Options) && Options) {
+      for (const TSharedPtr<FJsonValue>& Option : *Options) {
+        const TSharedPtr<FJsonObject>* OptionObj = nullptr;
+        if (!Option.IsValid() || !Option->TryGetObject(OptionObj) || !OptionObj->IsValid()) {
+          continue;
+        }
+        FS08PendingOption Parsed;
+        bool bIndex = false;
+        if (ReadIntLike(OptionObj->ToSharedRef(), TEXT("index"), Parsed.Index, bIndex) && bIndex) {
+          Parsed.Label = (*OptionObj)->GetStringField(TEXT("label"));
+          Entry.Options.Add(MoveTemp(Parsed));
+        }
+      }
+    }
+    // Owner-only projection (the opponent's copy has no revealedCards).
+    const TSharedPtr<FJsonValue> Cards = Obj->TryGetField(TEXT("revealedCards"));
+    if (Cards.IsValid() && !Cards->IsNull() && Cards->Type == EJson::Array) {
+      Entry.RevealedCards = Cards;
+    }
+    if (!Entry.Id.IsEmpty()) OutEffects.Add(MoveTemp(Entry));
+  }
+  return OutEffects.Num() > 0;
+}
+
+bool FS08Contracts::IsHiddenCardId(const FString& InstanceId) {
+  // Server placeholder convention (GameStateService.filterPrivateData):
+  // id `hidden-<index>`, cardId `hidden`, name `???`.
+  return InstanceId.StartsWith(TEXT("hidden-")) || InstanceId == TEXT("hidden");
+}
+
+bool FS08Contracts::IsHiddenCard(const TSharedPtr<FJsonValue>& CardValue) {
+  const TSharedPtr<FJsonObject>* Card = nullptr;
+  if (!CardValue.IsValid() || !CardValue->TryGetObject(Card) || !Card->IsValid()) {
+    return false;
+  }
+  if (IsHiddenCardId((*Card)->GetStringField(TEXT("id")))) return true;
+  if ((*Card)->GetStringField(TEXT("cardId")) == TEXT("hidden")) return true;
+  return false;
+}
+
 bool FS08Contracts::ParseGameStateUpdated(const TSharedRef<FJsonObject> Data,
                                           FS08Snapshot& OutSnapshot, FS08GraphQLError& OutError) {
   bool Present = false;
@@ -586,6 +791,9 @@ bool FS08Contracts::ParseGameStateUpdated(const TSharedRef<FJsonObject> Data,
   if (!DecodeJsonStringField(Data, TEXT("fighters"), OutSnapshot.Fighters, Present, OutError)) return false;
   if (!DecodeJsonStringField(Data, TEXT("handZones"), OutSnapshot.HandZones, Present, OutError)) return false;
   if (!DecodeJsonStringField(Data, TEXT("discardPiles"), OutSnapshot.DiscardPiles, Present, OutError)) return false;
+  // Live WS events omit decks (merge keeps the last counts); decoding here
+  // anyway makes a future contract addition backward-compatible for free.
+  if (!DecodeJsonStringField(Data, TEXT("decks"), OutSnapshot.Decks, Present, OutError)) return false;
   if (!DecodeJsonStringField(Data, TEXT("boardState"), OutSnapshot.BoardState, Present, OutError)) return false;
   if (!DecodeJsonStringField(Data, TEXT("metadata"), OutSnapshot.Metadata, Present, OutError)) return false;
   return true;

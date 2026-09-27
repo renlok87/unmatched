@@ -1,0 +1,75 @@
+staged GameUserSettings -> 1280x720 (windowed, no FrameRateLimit - cap is per-process t.MaxFPS): C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched\Saved\Config\Windows\GameUserSettings.ini
+heroA=cmuhgvgke00skwi9glfew6898 heroB=cmuhgvghu00oawi9gv9ehihmg
+staging: C:\Users\ren\AppData\Local\Temp\s09-duel-20260927-123959-39052
+stats before: host played=2 won=2 elo=1231; joiner played=2 won=0 elo=1169
+host pid=3416
+room created by this run (code redacted from output; id=cmujidkgp012pwiz81ba8lji2)
+joiner pid=46440
+both clients exited; server statuses observed: [LOBBY -> IN_PROGRESS -> FINISHED]
+outcomes: host=VICTORY joiner=DEFEAT
+duel coverage: attack=True defense=True noDefense=False resolve=True scheme=True pendingResolved=True combatResult=True
+result shots: host=328510B joiner=324469B; lobby shots: host=29263B joiner=29255B
+host result shot markers: header=680 outcome=835 support=668 button=668 (gameplay markers all-zero)
+joiner result shot markers: header=680 outcome=835 support=668 button=668 (gameplay markers all-zero)
+host lobby shot: clean lobby panel (lobbypanel=600), no in-duel markers, gameplay region bright pixels=0 (<=50)
+joiner lobby shot: clean lobby panel (lobbypanel=600), no in-duel markers, gameplay region bright pixels=0 (<=50)
+server row gate: post-leave authoritative row: FINISHED, winner=host seat, both seats present, endedAt set (FINISHED also observed live: True) (statuses observed during run: LOBBY -> IN_PROGRESS -> FINISHED)
+stats after: host played=3 won=3 elo=1244; joiner played=3 won=0 elo=1156; changed=True
+stats gate: winner/loser counters and ELO match the terminal outcome
+convergence: host maxSeq=163 joiner maxSeq=163
+published evidence run dir: C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\docs\game-design\evidence\S09\run\duel-20260927-123959 (pointer: latest-duel.json)
+--- host trace (duel tail) ---
+
+2026.09.27-07.41.29 S09AUTO drive mode=6 plan=[attack+scheme] phase=ACTION_MANEUVER turn=cmuhntivg0000wib0anhqyswc
+2026.09.27-07.41.29 S09AUTO own turn #13 (turnCount=27)
+2026.09.27-07.41.29 S09AUTO pending picked (type=TARGET_FIGHTER stage=0)
+2026.09.27-07.41.29 S09AUTO drive mode=0 plan=[attack+scheme] phase=ACTION_MANEUVER turn=cmuhntivg0000wib0anhqyswc
+2026.09.27-07.41.29 S09AUTO drive mode=1 plan=[attack+scheme] phase=ACTION_MANEUVER turn=cmuhntivg0000wib0anhqyswc
+2026.09.27-07.41.30 S09AUTO drive mode=0 plan=[attack+scheme] phase=ACTION_MANEUVER turn=cmuhntivg0000wib0anhqyswc
+2026.09.27-07.41.30 S09AUTO attack (attacker=f-0-hero target-set card-set)
+2026.09.27-07.41.31 S09AUTO drive mode=5 plan=[attack+scheme] phase=COMBAT_RESOLVE turn=cmuhntivg0000wib0anhqyswc
+2026.09.27-07.41.31 COMBAT-RESULT seq=158 damage=0 role=attacked
+2026.09.27-07.41.31 S09AUTO drive mode=0 plan=[attack+scheme] phase=ACTION_MANEUVER turn=cmuhntiwu0001wib0z281rpa8
+2026.09.27-07.41.32 S09AUTO drive mode=6 plan=[attack+scheme] phase=ACTION_MANEUVER turn=cmuhntivg0000wib0anhqyswc
+2026.09.27-07.41.32 S09AUTO own turn #14 (turnCount=29)
+2026.09.27-07.41.32 S09AUTO pending picked (type=TARGET_FIGHTER stage=0)
+2026.09.27-07.41.32 RESULT seq=163 outcome=VICTORY winner=Medusa
+2026.09.27-07.41.34 S09AUTO result-screen shot
+2026.09.27-07.41.34 SHOT requested: FScreenshotRequest(bShowUI) -> C:\Users\ren\AppData\Local\Temp\s09-duel-20260927-12
+3959-39052\host/s09-result-screen.png
+2026.09.27-07.41.34 RESULT lobby-return sent (leaveGame)
+2026.09.27-07.41.34 LEFT room=cmujidkgp012pwiz81ba8lji2
+2026.09.27-07.41.38 S09AUTO lobby-return shot
+2026.09.27-07.41.38 S09AUTO duel flow complete (GAME_OVER -> result shown -> lobby return) - exiting
+--- joiner trace (duel tail) ---
+2026.09.27-07.41.30 S09AUTO drive mode=0 plan=[defend+resolve+scheme] phase=ACTION_MANEUVER turn=cmuhntivg0000wib0anhqy
+swc
+2026.09.27-07.41.30 S09AUTO drive mode=4 plan=[defend+resolve+scheme] phase=COMBAT turn=cmuhntivg0000wib0anhqyswc
+2026.09.27-07.41.30 S09AUTO defense card picked
+2026.09.27-07.41.31 S09AUTO drive mode=5 plan=[defend+resolve+scheme] phase=COMBAT_RESOLVE turn=cmuhntivg0000wib0anhqys
+wc
+2026.09.27-07.41.31 S09AUTO resolve
+2026.09.27-07.41.31 S09AUTO drive mode=6 plan=[defend+resolve+scheme] phase=COMBAT_RESOLVE turn=cmuhntivg0000wib0anhqys
+wc
+2026.09.27-07.41.31 S09AUTO pending picked (type=MOVE stage=0)
+2026.09.27-07.41.31 COMBAT-RESULT seq=158 damage=0 role=defended
+2026.09.27-07.41.31 S09AUTO drive mode=0 plan=[defend+resolve+scheme] phase=ACTION_MANEUVER turn=cmuhntiwu0001wib0z281r
+pa8
+2026.09.27-07.41.31 S09AUTO own turn #13 (turnCount=28)
+2026.09.27-07.41.31 S09AUTO drive mode=1 plan=[defend+resolve+scheme] phase=ACTION_MANEUVER turn=cmuhntiwu0001wib0z281r
+pa8
+2026.09.27-07.41.32 S09AUTO drive mode=0 plan=[defend+resolve+scheme] phase=ACTION_MANEUVER turn=cmuhntiwu0001wib0z281r
+pa8
+2026.09.27-07.41.32 S09AUTO drive mode=1 plan=[defend+resolve+scheme] phase=ACTION_MANEUVER turn=cmuhntiwu0001wib0z281r
+pa8
+2026.09.27-07.41.32 RESULT seq=163 outcome=DEFEAT winner=Medusa
+2026.09.27-07.41.34 S09AUTO result-screen shot
+2026.09.27-07.41.34 SHOT requested: FScreenshotRequest(bShowUI) -> C:\Users\ren\AppData\Local\Temp\s09-duel-20260927-12
+3959-39052\joiner/s09-result-screen.png
+2026.09.27-07.41.34 RESULT lobby-return sent (leaveGame)
+2026.09.27-07.41.34 LEFT room=cmujidkgp012pwiz81ba8lji2
+2026.09.27-07.41.38 S09AUTO lobby-return shot
+2026.09.27-07.41.39 S09AUTO duel flow complete (GAME_OVER -> result shown -> lobby return) - exiting
+cleanup: game cmujidkgp012pwiz81ba8lji2 is FINISHED - duel completed on its own, no abort (hostId may have been transferred by leaveGame)
+
+

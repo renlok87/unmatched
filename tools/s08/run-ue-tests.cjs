@@ -9,6 +9,7 @@ const repeat = process.argv[4] ? parseInt(process.argv[4], 10) : 1;
 const root = path.resolve(__dirname, '../..');
 const uproject = path.join(root, 'unreal', 'Unmatched', 'Unmatched.uproject');
 const fixtures = path.join(root, 'docs', 'game-design', 'evidence', 'S08', 'fixtures');
+const s09Fixtures = path.join(root, 'docs', 'game-design', 'evidence', 'S09', 'fixtures');
 const ueRoot = process.env.UE_ROOT || 'C:\\Program Files\\Epic Games\\UE_5.8';
 const exe = path.join(ueRoot, 'Engine', 'Binaries', 'Win64', 'UnrealEditor-Cmd.exe');
 for (let run = 1; run <= repeat; run++) {
@@ -17,6 +18,7 @@ for (let run = 1; run <= repeat; run++) {
     `-ExecCmds=Automation RunTests ${filter}; Quit`,
     '-unattended', '-nosplash', '-nullrhi', '-nullaudio',
     `-S08Fixtures=${fixtures}`,
+    `-S09Fixtures=${s09Fixtures}`,
     '-log',
   ];
   if (logPath) args.push(`-abslog=${logPath}`);

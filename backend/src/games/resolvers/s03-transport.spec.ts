@@ -22,6 +22,7 @@ import { CombatTimeoutService } from '../services/combat-timeout.service';
 import { GameActionService } from '../services/game-action.service';
 import { AiTurnService } from '../services/ai-turn.service';
 import { GqlAuthGuard } from '../../auth/guards/gql-auth.guard';
+import { GqlThrottlerGuard } from '../guards/gql-throttler.guard';
 import { GameActionExecutorService } from '../../game-engine/services/game-action-executor.service';
 import { GameState, GamePhase } from '../../game-engine/models';
 import { s03Fixture, s03Engine } from '../../test/fixtures/s03-engine.fixture';
@@ -61,6 +62,7 @@ describe('S03 real HTTP/WS resource lifecycle', () => {
   let states: GameStateService;
   let subscriptions: GameSubscriptionService;
   const rows = new Map<string, any>();
+  const games = new Map<string, { status: string; version: number }>();
   const cache = new Map<string, any>();
   const evidence: { http: any[]; ws: any[]; checks: string[] } = { http: [], ws: [], checks: [] };
   const clients = new Set<Client>();
@@ -83,8 +85,17 @@ describe('S03 real HTTP/WS resource lifecycle', () => {
     };
     const prisma = {
       gameState: gameStateTable,
-      game: { findUnique: async ({ where }: any) => rows.has(where.id) ? { status: 'IN_PROGRESS' } : null,
-        update: async () => ({}) },
+      game: {
+        findUnique: async ({ where }: any) => games.get(where.id) ?? null,
+        updateMany: async ({ where, data }: any) => {
+          const game = games.get(where.id);
+          if (!game || (where.status && !(typeof where.status === 'string'
+            ? game.status === where.status : where.status.in?.includes(game.status)))) return { count: 0 };
+          games.set(where.id, { ...game, ...data });
+          return { count: 1 };
+        },
+        update: async () => ({}),
+      },
       gamePlayer: { findUnique: async ({ where }: any) =>
         rows.has(where.gameId_userId.gameId) && ['a', 'b'].includes(where.gameId_userId.userId) ? {} : null },
       $transaction: async (run: (tx: unknown) => unknown) => run(prisma),
@@ -121,7 +132,11 @@ describe('S03 real HTTP/WS resource lifecycle', () => {
       if (!['a', 'b'].includes(userId)) return false;
       req.user = { id: userId };
       return true;
-    } }).compile();
+    } })
+      // Harness-only: ThrottlerModule is absent from this fixture module, so the
+      // resolver-level GqlThrottlerGuard would fail on missing THROTTLER:MODULE_OPTIONS.
+      .overrideGuard(GqlThrottlerGuard).useValue({ canActivate: () => true })
+      .compile();
     app = module.createNestApplication();
     app.useLogger(false);
     app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
@@ -164,6 +179,7 @@ describe('S03 real HTTP/WS resource lifecycle', () => {
       a: { ...base.decks.a, drawPile: base.decks.a.drawPile.map((card, i) => i === 0
         ? { ...card, cardId: 'secret-drawn-definition', bannerName: 'secret-drawn-banner', text: 'secret-drawn-text' } : card) } } };
     rows.set(gameId, { gameId, sequenceNumber: state.sequenceNumber, state: json(states.serialize(state)) });
+    games.set(gameId, { status: 'IN_PROGRESS', version: state.sequenceNumber });
     cache.delete(`gamestate:${gameId}`);
     return state;
   }

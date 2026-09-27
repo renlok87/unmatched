@@ -1,0 +1,31 @@
+
+> backend@0.0.1 test
+> jest --runInBand src/games/s09-terminal-postgres.spec.ts
+
+[Nest] 43520  - 27.09.2026, 12:56:48     LOG [GameStateService] Game s09-game-b00a384f-c53c-46e8-b53d-5ebc3ea47ea9: stats updated — winner s09-host-6ffc1577-b305-40d9-88f4-9d4468770f4a 1200 -> 1216, loser s09-opponent-6ffc1577-b305-40d9-88f4-9d4468770f4a 1200 -> 1184
+[Nest] 43520  - 27.09.2026, 12:56:48     LOG [GameStateService] Game s09-game-f97d70a2-1145-4dd3-8fd1-fa33c91bf284: draw stats updated — s09-host-6ffc1577-b305-40d9-88f4-9d4468770f4a 1200 -> 1200, s09-opponent-6ffc1577-b305-40d9-88f4-9d4468770f4a 1200 -> 1200
+[Nest] 43520  - 27.09.2026, 12:56:48     LOG [GameStateService] Game s09-game-1c458037-d054-4b34-9502-15572ddd477a: draw stats updated — s09-host-6ffc1577-b305-40d9-88f4-9d4468770f4a 1400 -> 1387, s09-opponent-6ffc1577-b305-40d9-88f4-9d4468770f4a 1000 -> 1013
+[Nest] 43520  - 27.09.2026, 12:56:48     LOG [GameStateService] Game s09-game-e29cd573-2eed-4b3a-bca9-32033cf51581: stats updated — winner s09-host-6ffc1577-b305-40d9-88f4-9d4468770f4a 1200 -> 1216, loser s09-opponent-6ffc1577-b305-40d9-88f4-9d4468770f4a 1200 -> 1184
+[Nest] 43520  - 27.09.2026, 12:56:48     LOG [GameStateService] Game s09-game-babbed45-5205-41bb-9129-79e9f0788f87: stats updated — winner s09-third-c8ba4c0a-f6d9-4ef6-911c-19658ffcefa2 1200 -> 1216, loser s09-host-6ffc1577-b305-40d9-88f4-9d4468770f4a 1200 -> 1184
+[Nest] 43520  - 27.09.2026, 12:56:48     LOG [GameStateService] Game s09-game-da6b5a59-29ea-4d62-90dd-1e55f735a723: stats updated — winner s09-host-6ffc1577-b305-40d9-88f4-9d4468770f4a 1184 -> 1201, loser s09-opponent-6ffc1577-b305-40d9-88f4-9d4468770f4a 1200 -> 1183
+[Nest] 43520  - 27.09.2026, 12:56:48     LOG [GameStateService] Game s09-game-bd545c0e-88fd-4e47-8eb4-b85784e70fa3: stats updated — winner s09-opponent-6ffc1577-b305-40d9-88f4-9d4468770f4a 1200 -> 1216, loser s09-host-6ffc1577-b305-40d9-88f4-9d4468770f4a 1200 -> 1184
+[Nest] 43520  - 27.09.2026, 12:56:48     LOG [GameStateService] Game s09-game-3a45edde-00c1-451e-bb62-c6fe16803bcd: stats updated — winner s09-host-6ffc1577-b305-40d9-88f4-9d4468770f4a 1184 -> 1201, loser s09-opponent-6ffc1577-b305-40d9-88f4-9d4468770f4a 1216 -> 1199
+[Nest] 43520  - 27.09.2026, 12:56:48     LOG [GameStateService] Game s09-game-da667cdd-3131-4bf2-9537-aed846791f82: stats updated — winner s09-host-6ffc1577-b305-40d9-88f4-9d4468770f4a 1201 -> 1217, loser s09-opponent-6ffc1577-b305-40d9-88f4-9d4468770f4a 1199 -> 1183
+[Nest] 43520  - 27.09.2026, 12:56:48    WARN [GameStateService] Game state publication failed after commit: Error: simulated Redis delivery failure
+PASS src/games/s09-terminal-postgres.spec.ts
+  S09 terminal transitions on PostgreSQL
+    √ applies both seats stats exactly once on finish (idempotent retry) (95 ms)
+    √ applies draw stats to both players exactly once on finish (winnerId absent) (23 ms)
+    √ converges ELO and raises peakElo on a draw between unequal ratings (22 ms)
+    √ serializes concurrent terminal saves of one game into a single stats update (21 ms)
+    √ keeps concurrent finishes of two games sharing a player consistent (FOR UPDATE) (76 ms)
+    √ rolls back FINISHED without stats when terminal state mismatches the persisted composition (20 ms)
+    √ completes opposite-winner concurrent first finishes of one pair without deadlock (66 ms)
+    √ commits FINISHED before delivery and rejects abort from another connection while delivery is paused (25 ms)
+    √ rejects GAME_OVER before persisting state when abort commits first (15 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       9 passed, 9 total
+Snapshots:   0 total
+Time:        2.712 s
+Ran all test suites matching src/games/s09-terminal-postgres.spec.ts.

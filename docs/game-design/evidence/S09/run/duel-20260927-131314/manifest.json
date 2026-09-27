@@ -1,0 +1,218 @@
+{
+    "stamp":  "20260927-131314",
+    "verdict":  "GD-036: full two-client packaged PvP duel over the authoritative server - sign-in, room join, placement, maneuvers, attack/defense resolves, card effects and pending answers, then the server-written GAME_OVER rendered a COMPLETE result screen on BOTH seats (one VICTORY, one DEFEAT; header+outcome+support+button element markers all present after a UI-settle delay, gameplay markers absent, stale gameplay action toast cleared at the terminal apply, no Invalid-phase rejection loop in the traces), leaveGame returned both clients to a CLEAN lobby (board/fighters torn down at the stage change, user-facing room-entry panel, fresh lobby shots with no in-duel markers AND zero bright pixels in the gameplay region - the visual gate added after the 2026-09-27 stale-fighter miss), the server row is authoritative FINISHED after both seats left (winnerId matching the presented VICTORY seat, both seats present, endedAt set; never ABORTED), and the driver exited early instead of burning the timeout. Frame cap: per-process console command t.MaxFPS 30 (effective FPS NOT measured, no GPU claim). Stats: terminal save transaction updates both players; winner/loser counters and exact ELO are gated",
+    "hostOutcome":  "VICTORY",
+    "joinerOutcome":  "DEFEAT",
+    "serverStatuses":  [
+                           "LOBBY",
+                           "IN_PROGRESS",
+                           "FINISHED"
+                       ],
+    "serverVerdict":  "post-leave authoritative row: FINISHED, winner=host seat, both seats present, endedAt set (FINISHED also observed live: True)",
+    "serverRow":  {
+                      "id":  "cmujjkc1y000lwil83t79dvk7",
+                      "status":  "FINISHED",
+                      "winnerSeat":  "host",
+                      "winnerIdRedacted":  true,
+                      "seats":  2,
+                      "endedAt":  "1790496866996"
+                  },
+    "statsSample":  {
+                        "note":  "terminal save transaction updates UserStats; winner/loser counters and exact ELO are gated",
+                        "changed":  true,
+                        "hostBefore":  {
+                                           "gamesPlayed":  3,
+                                           "gamesWon":  3,
+                                           "gamesLost":  0,
+                                           "currentElo":  1244
+                                       },
+                        "hostAfter":  {
+                                          "gamesPlayed":  4,
+                                          "gamesWon":  4,
+                                          "gamesLost":  0,
+                                          "currentElo":  1256
+                                      },
+                        "joinerBefore":  {
+                                             "gamesPlayed":  3,
+                                             "gamesWon":  0,
+                                             "gamesLost":  3,
+                                             "currentElo":  1156
+                                         },
+                        "joinerAfter":  {
+                                            "gamesPlayed":  4,
+                                            "gamesWon":  0,
+                                            "gamesLost":  4,
+                                            "currentElo":  1144
+                                        }
+                    },
+    "coverage":  {
+                     "attack":  true,
+                     "defense":  true,
+                     "noDefense":  true,
+                     "resolve":  true,
+                     "scheme":  true,
+                     "pendingResolved":  true,
+                     "combatResult":  true
+                 },
+    "convergence":  {
+                        "hostMaxSeq":  109,
+                        "joinerMaxSeq":  109
+                    },
+    "files":  [
+                  {
+                      "name":  "duel-client-host.trace.log",
+                      "bytes":  101667,
+                      "sha256":  "108bf163ed1e2820e78d645cb7df37a745eaf256f9f67dea5dd5ee9e9166ed28"
+                  },
+                  {
+                      "name":  "duel-client-joiner.trace.log",
+                      "bytes":  120432,
+                      "sha256":  "fcb3a44fd83c67268852edf0df63b6ce0592049bb5c844e1c650a5e3c6576e4f"
+                  },
+                  {
+                      "name":  "duel-client-host.compact.log",
+                      "bytes":  34814,
+                      "sha256":  "3a1f8c3ebcf245e55ba73e0887c2331f5d9d16d87797cf7a7bdc7d4f1cda6b3e"
+                  },
+                  {
+                      "name":  "duel-client-joiner.compact.log",
+                      "bytes":  41851,
+                      "sha256":  "3e444e4f46a604462ae23aa5805b6de91ee7d0abc8f7111cb4031fd5ea7ee132"
+                  },
+                  {
+                      "name":  "joiner\\s09-combat-defense-open.png",
+                      "bytes":  355140,
+                      "sha256":  "c11f91142199f5878b8599dc030b024c641e9cd9d0971fcaea4035cc9e64a761"
+                  },
+                  {
+                      "name":  "joiner\\s09-combat-resolve-revealed.png",
+                      "bytes":  347347,
+                      "sha256":  "8199222ca23fadc53611c2f30e77c6a1e075b34ba736f24d2154327dd6a6db7e"
+                  },
+                  {
+                      "name":  "host\\s09-combat-resolve-revealed.png",
+                      "bytes":  356962,
+                      "sha256":  "ca419315408363bc39fa32f2e2aee83b4394c7e708b450eba5aac3aafaf12814"
+                  },
+                  {
+                      "name":  "joiner\\s09-combat-resolve-window.png",
+                      "bytes":  346373,
+                      "sha256":  "44a877595061873250b93d2cea7ded043a0c2f7ddc12b2cccd12da80858027f0"
+                  },
+                  {
+                      "name":  "host\\s09-combat-result.png",
+                      "bytes":  350374,
+                      "sha256":  "7c4d856f6d3a9857bd7bf6008c5f69316d6e7abb8f8fdd829f7628b762c0f03c"
+                  },
+                  {
+                      "name":  "joiner\\s09-combat-result.png",
+                      "bytes":  340852,
+                      "sha256":  "f1e7bd35d991fd509f1b55290559f8e7846815beb74a0508f20faea1533a8c11"
+                  },
+                  {
+                      "name":  "joiner\\s09-discard-open.png",
+                      "bytes":  349607,
+                      "sha256":  "8f623c99684b9b68476985852f39fadf7b52f53f3ffac2462d65e8ae20777c45"
+                  },
+                  {
+                      "name":  "host\\s09-discard-open.png",
+                      "bytes":  350669,
+                      "sha256":  "b13a8f76120ba3e5d5fb145fa98aab77651f6f918026d0cfa65687625035c0c0"
+                  },
+                  {
+                      "name":  "joiner\\s09-hud-after-first-maneuver.png",
+                      "bytes":  347014,
+                      "sha256":  "e6a07656e0c3a8501414ce2233a9383c2962fe186de78a6c34bfcd8f7f4c2fc6"
+                  },
+                  {
+                      "name":  "host\\s09-hud-after-first-maneuver.png",
+                      "bytes":  347183,
+                      "sha256":  "46cbf6ed82390d42a5e4ce8664aab00cd701d52f4b69a9b325ce3405491af7a5"
+                  },
+                  {
+                      "name":  "host\\s09-lobby-return.png",
+                      "bytes":  29263,
+                      "sha256":  "2a10774be164d1855a6100e7926c6aa803aee480a7448ba0e7d7ff638b04c2db"
+                  },
+                  {
+                      "name":  "joiner\\s09-lobby-return.png",
+                      "bytes":  29255,
+                      "sha256":  "5358afea72840811ac7ad642e096a22b1aa4077db6c85f59d5364d5873b435ab"
+                  },
+                  {
+                      "name":  "host\\s09-maneuver-draft-open.png",
+                      "bytes":  342855,
+                      "sha256":  "8ab4d9419fc3eed2f0ff78037d2be413ead3fd615a2c5de4505ae71ea8622de3"
+                  },
+                  {
+                      "name":  "joiner\\s09-maneuver-draft-open.png",
+                      "bytes":  342752,
+                      "sha256":  "fe34c33b96df04904851d343d23d5865d02e7476c3d46b231fcd5cf05b0acd68"
+                  },
+                  {
+                      "name":  "host\\s09-pending-BOOST_CHOICE.png",
+                      "bytes":  351847,
+                      "sha256":  "cdf7afabb42a8813d1a95153e0b34775d44013037cf9515a8f48a2b6ffe73ea2"
+                  },
+                  {
+                      "name":  "joiner\\s09-pending-CHOOSE_SPACE.png",
+                      "bytes":  333434,
+                      "sha256":  "6047bac0de930d1a42ea67eedfa57ea19ce477a3fa7ac5179e0fdae44dc5b902"
+                  },
+                  {
+                      "name":  "joiner\\s09-pending-CHOOSE_SPACE-s2.png",
+                      "bytes":  337813,
+                      "sha256":  "c106a049875c729aaa8c6ee7a9ff0455171c183af88acf4e0c4a7beab7e29b16"
+                  },
+                  {
+                      "name":  "joiner\\s09-pending-DECK_TOP_PICK-ORDER.png",
+                      "bytes":  352273,
+                      "sha256":  "964a121ad77a096fbf4f8aa3a832ce5aa573cb33d7e1a8734c1e12e34693548f"
+                  },
+                  {
+                      "name":  "joiner\\s09-pending-DECK_TOP_PICK-PICK.png",
+                      "bytes":  327820,
+                      "sha256":  "20e32d0ccb69b5059e0223782320e8b50afca7a70f804f9232cf9fdc78d80022"
+                  },
+                  {
+                      "name":  "host\\s09-pending-MOVE.png",
+                      "bytes":  339476,
+                      "sha256":  "9a44032bd93213a57e41c7754d1bdb3f3a57ee7e9533dcbec6a6c4ff526640c9"
+                  },
+                  {
+                      "name":  "joiner\\s09-pending-MOVE.png",
+                      "bytes":  347777,
+                      "sha256":  "d3d328aad0b2fec4040a379efe75ca855b6798bfe486c530c623c045c1f0eded"
+                  },
+                  {
+                      "name":  "host\\s09-pending-TARGET_FIGHTER.png",
+                      "bytes":  353452,
+                      "sha256":  "6c8d1b52251b928e6123840a76e480170cebe95333ec5350317f466cc0c7f2fa"
+                  },
+                  {
+                      "name":  "joiner\\s09-resolve-blocked-BOOST_CHOICE.png",
+                      "bytes":  355167,
+                      "sha256":  "f7e780761a0fe9abe632b0dff805d483f0d01c22c1f352c00799f249eccad9da"
+                  },
+                  {
+                      "name":  "joiner\\s09-resolve-blocked-MOVE.png",
+                      "bytes":  357298,
+                      "sha256":  "69d55555b1d35b87f52c5cc671d6d5b06d3ea74abecfcf3921a72789928cbadc"
+                  },
+                  {
+                      "name":  "host\\s09-resolve-blocked-MOVE.png",
+                      "bytes":  357785,
+                      "sha256":  "b7c637b340c4ed3b12d3c5cb5eb4bd563cad9d513be496cd450805333044b153"
+                  },
+                  {
+                      "name":  "joiner\\s09-result-screen.png",
+                      "bytes":  332015,
+                      "sha256":  "f55e9e8fc3dd0d010d6245a08b9165c5ad92b851632b89197d8c97176bfc9f04"
+                  },
+                  {
+                      "name":  "host\\s09-result-screen.png",
+                      "bytes":  332602,
+                      "sha256":  "1f23a48317fcda45fca7a1b75a45388dce02bc0c96a58cc0fe12d0cc59ac7e95"
+                  }
+              ]
+}

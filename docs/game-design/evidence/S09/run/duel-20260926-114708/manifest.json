@@ -1,0 +1,156 @@
+{
+    "stamp":  "20260926-114708",
+    "verdict":  "GD-036: full two-client packaged PvP duel over the authoritative server - sign-in, room join, placement, maneuvers, attack/defense resolves, card effects and pending answers (CHOOSE_SPACE stage1->stage2, TARGET_FIGHTER, BOOST_CHOICE, MOVE), then the server-written GAME_OVER rendered a result screen on BOTH seats (one VICTORY, one DEFEAT; #FFD700 marker, gameplay markers absent), leaveGame returned both clients to the lobby (fresh lobby shots, no in-duel markers; serverVerdict records the FINISHED-observation nuance - ABORTED was never observed), and the driver exited early instead of burning the timeout",
+    "hostOutcome":  "VICTORY",
+    "joinerOutcome":  "DEFEAT",
+    "serverStatuses":  [
+                           "LOBBY",
+                           "IN_PROGRESS"
+                       ],
+    "serverVerdict":  "FINISHED sample missed (row deleted by the standard post-leave cleanup before a poll landed); ABORTED never observed; victory is server-authoritative through the GAME_OVER projection both clients traced",
+    "coverage":  {
+                     "attack":  true,
+                     "defense":  true,
+                     "noDefense":  true,
+                     "resolve":  true,
+                     "scheme":  false,
+                     "pendingResolved":  true,
+                     "combatResult":  true
+                 },
+    "convergence":  {
+                        "hostMaxSeq":  168,
+                        "joinerMaxSeq":  168
+                    },
+    "files":  [
+                  {
+                      "name":  "duel-client-host.trace.log",
+                      "bytes":  153183,
+                      "sha256":  "01742eb19e32346aa1e92946a18ccf17a0072792ee83effc7da02e3d274dc0ae"
+                  },
+                  {
+                      "name":  "duel-client-joiner.trace.log",
+                      "bytes":  162299,
+                      "sha256":  "719341a5097b6287666d2f3924763c7bee4661400e5a8ac5bc99bb57076a70b0"
+                  },
+                  {
+                      "name":  "duel-client-host.compact.log",
+                      "bytes":  52894,
+                      "sha256":  "0d039b41f5c91330eb04cccc4a000743e22927755c80562f162c682e39a87919"
+                  },
+                  {
+                      "name":  "duel-client-joiner.compact.log",
+                      "bytes":  51139,
+                      "sha256":  "809e1457e10d7e3fedd1053f79acdac12b2f4638936a906561b4dfeedd5d89a9"
+                  },
+                  {
+                      "name":  "joiner\\s09-combat-defense-open.png",
+                      "bytes":  350465,
+                      "sha256":  "c52b0d82912cfa8970ff6b1574384ad40c9b424716861b878d3e785e601cc017"
+                  },
+                  {
+                      "name":  "joiner\\s09-combat-resolve-revealed.png",
+                      "bytes":  355916,
+                      "sha256":  "8d95c73f4462b175c0c8776a36c5dbff9b2180db4639534686485c630a3ff952"
+                  },
+                  {
+                      "name":  "joiner\\s09-combat-resolve-window.png",
+                      "bytes":  352767,
+                      "sha256":  "aba0c3549a2a00c099686668f334b41ad165abda18b59f0d333e9f009abccb39"
+                  },
+                  {
+                      "name":  "joiner\\s09-combat-result.png",
+                      "bytes":  350328,
+                      "sha256":  "1870971d2f5a83de7b3fee03da21000c57e6c357352af8a1cf7e0d1b9bb74661"
+                  },
+                  {
+                      "name":  "host\\s09-combat-result.png",
+                      "bytes":  356583,
+                      "sha256":  "a6ba4f57f36cef72f220b394ba73b89bc5a9ab27be607dd1068b3f4bab129347"
+                  },
+                  {
+                      "name":  "host\\s09-discard-open.png",
+                      "bytes":  354869,
+                      "sha256":  "315e9c9d5536571ff7ec3515c58e11c6f331efaddbaa3a2563424555a0117a63"
+                  },
+                  {
+                      "name":  "joiner\\s09-discard-open.png",
+                      "bytes":  351557,
+                      "sha256":  "7649c3b66d52bd068d0373f6d6687135a7e0fc911665b4e0054db9942734e9fb"
+                  },
+                  {
+                      "name":  "host\\s09-hud-after-first-maneuver.png",
+                      "bytes":  342992,
+                      "sha256":  "03027246bbb553475d158a4da24e70e2fd6d23ae9eb33a757454af4ecfb2e11f"
+                  },
+                  {
+                      "name":  "joiner\\s09-hud-after-first-maneuver.png",
+                      "bytes":  337449,
+                      "sha256":  "d106a9f6e1f02682c803d1153e1a5b02d42d8eaa3772ad990bf8e389b9e3b200"
+                  },
+                  {
+                      "name":  "joiner\\s09-lobby-return.png",
+                      "bytes":  362695,
+                      "sha256":  "257f1fac4cb071b2f7e165db133cbc8abc1adab22772d777c7ce535f05fa4d75"
+                  },
+                  {
+                      "name":  "host\\s09-lobby-return.png",
+                      "bytes":  362081,
+                      "sha256":  "ba50090faa6b0caf02f4a816df4c8dd461b31a38394c823946dcfabd5e574b21"
+                  },
+                  {
+                      "name":  "joiner\\s09-maneuver-draft-open.png",
+                      "bytes":  345709,
+                      "sha256":  "90388e80a6983533945dade86b8f58548ba4f2ae441c7503aa3f48d5818360d8"
+                  },
+                  {
+                      "name":  "host\\s09-maneuver-draft-open.png",
+                      "bytes":  348796,
+                      "sha256":  "1b7165da7064822ecc7120bd163973a38e7761b2a9b0d4aa154588b443ada537"
+                  },
+                  {
+                      "name":  "host\\s09-pending-BOOST_CHOICE.png",
+                      "bytes":  356315,
+                      "sha256":  "99a773ac00519ac7ba4278279940d1d818e8e9f2a9731bbd884c3e1692eefa9d"
+                  },
+                  {
+                      "name":  "joiner\\s09-pending-CHOOSE_SPACE.png",
+                      "bytes":  337583,
+                      "sha256":  "b8ede49e5c54f76d94ef4d0b732b6a8577e4ce229eeb2ae8f784438c2e2fbf02"
+                  },
+                  {
+                      "name":  "joiner\\s09-pending-CHOOSE_SPACE-s2.png",
+                      "bytes":  342252,
+                      "sha256":  "1c5d708b5d5f9a7d212fbed88ea8369a79853cc4ed39a056a2efac9f16fb82f9"
+                  },
+                  {
+                      "name":  "host\\s09-pending-MOVE.png",
+                      "bytes":  335753,
+                      "sha256":  "ffddab353348b0ba3992fdab291d75b851c77c1fe60f4a9822d1f2de7fec1c14"
+                  },
+                  {
+                      "name":  "joiner\\s09-pending-MOVE.png",
+                      "bytes":  357869,
+                      "sha256":  "b303b5c15df1a0b93efacf29a7bdd1c35c2821bffe5efa2ed8d714cd62baed59"
+                  },
+                  {
+                      "name":  "host\\s09-pending-TARGET_FIGHTER.png",
+                      "bytes":  349298,
+                      "sha256":  "4e9e8d9ee93117f39abc9d048d965d7217a252ba175d3af8760845abe46bc643"
+                  },
+                  {
+                      "name":  "joiner\\s09-resolve-blocked-BOOST_CHOICE.png",
+                      "bytes":  354416,
+                      "sha256":  "324f39d37ad137a7b5220fe89cf8083499187c4da9222925fa69af1b22e3104b"
+                  },
+                  {
+                      "name":  "joiner\\s09-result-screen.png",
+                      "bytes":  327626,
+                      "sha256":  "cc8e6cfe76159991839beaeba081e340a2350648c48ba281364d91379164aa07"
+                  },
+                  {
+                      "name":  "host\\s09-result-screen.png",
+                      "bytes":  327869,
+                      "sha256":  "f89762d2c171d50a09d93fa234545c33de7faf8b0ee386c5fbad58071cd9ee1c"
+                  }
+              ]
+}

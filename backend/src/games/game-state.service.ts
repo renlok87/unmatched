@@ -1,8 +1,10 @@
-import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
+import { RatingService } from '../users/rating.service';
 import { GameSubscriptionService } from './game-subscription.service';
-import { GamePhase, GameEvent, GameEventType } from './dto';
+import { GamePhase, GameEvent, GameEventType, GameStatus } from './dto';
 import { ConcurrentModificationException } from './exceptions/game.exceptions';
 // Единое семейство моделей состояния — engine-модели (P3: убрано дублирование
 // games/engine; раньше здесь жили параллельные интерфейсы, стыкуемые "as any")
@@ -171,6 +173,10 @@ export class GameStateService {
     private prisma: PrismaService,
     private redis: RedisService,
     @Optional() private gameSubscriptionService?: GameSubscriptionService,
+    // ELO-формула для applyFinishStats; чистый stateless-сервис. @Optional:
+    // тест-модули собирают GameStateService без users-провайдеров — тогда
+    // работает дефолтный инстанс (Nest передаёт undefined → default вступает)
+    @Optional() private ratingService: RatingService = new RatingService(prisma),
   ) {}
 
   /**
@@ -180,11 +186,29 @@ export class GameStateService {
     const serialized = this.serialize(state);
 
     await this.prisma.$transaction(async (tx) => {
+      // startGame commits IN_PROGRESS before its initial save. Claim that row
+      // for every phase so an action/timeout cannot persist after an abort or
+      // a finish. The conditional write serializes with abortGame's update.
+      const isTerminal = state.phase === GamePhase.GAME_OVER;
+      const transition = await tx.game.updateMany({
+        where: { id: gameId, status: GameStatus.IN_PROGRESS },
+        data: isTerminal
+          ? {
+              status: GameStatus.FINISHED,
+              winnerId: state.metadata.winnerId ?? null,
+              endedAt: new Date(),
+              version: state.sequenceNumber,
+            }
+          : { version: state.sequenceNumber },
+      });
+      if (transition.count !== 1) {
+        throw new ConflictException('Only an in-progress game can save state');
+      }
+
       // Проверяем текущий sequence number для optimistic locking
       const existing = await tx.gameState.findUnique({
         where: { gameId },
       });
-
       if (existing && existing.sequenceNumber !== state.sequenceNumber - 1) {
         throw new ConcurrentModificationException(existing.sequenceNumber, state.sequenceNumber);
       }
@@ -209,20 +233,238 @@ export class GameStateService {
         },
       });
 
-      // Обновляем version в Game
-      await tx.game.update({
-        where: { id: gameId },
-        data: { version: state.sequenceNumber },
-      });
+      // Статистика (gamesPlayed/won/lost + ELO) применяется в той же
+      // транзакции, что и переход IN_PROGRESS → FINISHED: ровно один вызов
+      // проходит условный updateMany выше, поэтому победа начисляется ровно
+      // один раз, а гонка с abortGame откатывает статус и статистику вместе.
+      if (isTerminal) {
+        await this.applyFinishStats(tx, gameId, state);
+      }
     });
 
-    // Обновляем кеш
-    await this.cacheState(gameId, state);
-
-    // Публикуем обновление для подписчиков (WebSocket)
-    if (this.gameSubscriptionService) {
-      await this.gameSubscriptionService.publishGameUpdate(gameId, 'STATE_UPDATED', state);
+    // Once committed, a later action may already have advanced the row.
+    // Supersession is a delivery decision, never a failed mutation.
+    if (!(await this.isCurrentSavedState(gameId, state))) {
+      this.logger.debug(`Skipping superseded state ${gameId} seq ${state.sequenceNumber}`);
+      return;
     }
+
+    // Terminal writes invalidate the cached game response and both myGames
+    // lists; otherwise game(id) can show IN_PROGRESS/winner null for 5 minutes.
+    if (state.phase === GamePhase.GAME_OVER) {
+      const keys = [
+        `game:${gameId}`,
+        ...state.players.flatMap((p) => [
+          `games:list:${p.userId}:all`,
+          `games:list:${p.userId}:PENDING`,
+          `games:list:${p.userId}:LOBBY`,
+          `games:list:${p.userId}:IN_PROGRESS`,
+          `games:list:${p.userId}:FINISHED`,
+          `games:list:${p.userId}:ABORTED`,
+        ]),
+      ];
+      // Per-key eviction: transient Redis failure on one key must not abandon
+      // the remaining deletes (getGame re-checks terminal status, but list
+      // caches rely solely on these). Failures stay logged, never swallowed.
+      for (const key of keys) {
+        try {
+          await this.redis.del(key);
+        } catch (e) {
+          this.logger.warn(`Game cache invalidation failed for ${key}: ${e}`);
+        }
+      }
+    }
+
+    // The terminal FINISHED transition committed with the state above. Abort
+    // cannot change FINISHED, so GAME_OVER remains authoritative while this
+    // external delivery runs. Keep Redis/WS outside a database transaction.
+    try {
+      await this.cacheState(gameId, state);
+    } catch (error) {
+      this.logger.warn(`Game state cache write failed after commit: ${error}`);
+    }
+    if (!(await this.isCurrentSavedState(gameId, state))) {
+      this.logger.debug(`Skipping superseded state publication ${gameId} seq ${state.sequenceNumber}`);
+      return;
+    }
+    if (this.gameSubscriptionService) {
+      try {
+        await this.gameSubscriptionService.publishGameUpdate(gameId, 'STATE_UPDATED', state);
+      } catch (error) {
+        this.logger.warn(`Game state publication failed after commit: ${error}`);
+      }
+    }
+    // A nonterminal event may be delivered after abort's seq-0 GAME_ENDED.
+    // This read records the race; it cannot retract an event already sent.
+    if (state.phase !== GamePhase.GAME_OVER) {
+      if (!(await this.isCurrentSavedState(gameId, state))) {
+        this.logger.warn(`State ${gameId} seq ${state.sequenceNumber} was superseded during publication`);
+      }
+    }
+  }
+
+  private async isCurrentSavedState(gameId: string, state: GameState): Promise<boolean> {
+    try {
+      const game = await this.prisma.game.findUnique({
+        where: { id: gameId },
+        select: { status: true, version: true },
+      });
+      const expectedStatus = state.phase === GamePhase.GAME_OVER
+        ? GameStatus.FINISHED
+        : GameStatus.IN_PROGRESS;
+      return game?.status === expectedStatus && game.version === state.sequenceNumber;
+    } catch (error) {
+      this.logger.warn(`Game status check failed after state commit: ${error}`);
+      return false;
+    }
+  }
+
+  /**
+   * GD-036 (stats): терминальная партия обновляет статистику обоих игроков
+   * внутри транзакции финиша. Состав state.players/winnerId сверяется с
+   * persisted Game (hostId/opponentId): на рассинхроне транзакция откатывается
+   * целиком — FINISHED не фиксируется, статистика посторонним не начисляется.
+   * Ничья (winnerId отсутствует) при корректном составе начисляет gamesPlayed/
+   * lastPlayedAt/winRate обоим и сдвигает ELO на S=0.5 (RatingService считает
+   * только победу/поражение, поэтому draw-формула локальна и переиспользует
+   * его K-фактор): при равных рейтингах изменение нулевое, при неравных —
+   * рейтинги сходятся.
+   */
+  private async applyFinishStats(
+    tx: Prisma.TransactionClient,
+    gameId: string,
+    state: GameState,
+  ): Promise<void> {
+    const winnerId = state.metadata.winnerId;
+
+    // Транзакция уже перекрыла строку game условным updateMany выше, поэтому
+    // host/opponent стабильны под проверкой.
+    const game = await tx.game.findUnique({
+      where: { id: gameId },
+      select: { hostId: true, opponentId: true },
+    });
+    const persisted = game?.opponentId && game.opponentId !== game.hostId
+      ? [game.hostId, game.opponentId]
+      : null;
+    const stateIds = state.players.map((p) => p.userId);
+    const compositionMatches =
+      !!persisted &&
+      stateIds.length === 2 &&
+      new Set(stateIds).size === 2 &&
+      persisted.every((id) => stateIds.includes(id));
+    if (!compositionMatches || (!!winnerId && !persisted!.includes(winnerId))) {
+      throw new ConflictException(
+        `Terminal state of game ${gameId} does not match persisted participants ` +
+          `(state: [${stateIds.join(', ')}], winner: ${winnerId ?? 'draw'}, ` +
+          `game: [${persisted?.join(', ') ?? 'incomplete duel'}])`,
+      );
+    }
+    // Вставка строго в отсортированном порядке: одновременные первые финиши
+    // двух игр одной пары (включая ничьи с противоположными победителями)
+    // вставляют одни и те же строки в одном порядке — цикл ожидания на
+    // unique(userId) невозможен. skipDuplicates (ON CONFLICT DO NOTHING):
+    // конкурентный upsert падал бы на unique(userId) в READ COMMITTED
+    const seatIds = [...stateIds].sort();
+    await tx.userStats.createMany({
+      data: seatIds.map((userId) => ({ userId })),
+      skipDuplicates: true,
+    });
+
+    // FOR UPDATE в детерминированном порядке сериализует одновременные
+    // финиши разных игр одного игрока: оба считают ELO от актуального снимка
+    const locked = await tx.$queryRaw<
+      { userId: string; gamesPlayed: number; gamesWon: number; gamesLost: number; currentElo: number; peakElo: number }[]
+    >(Prisma.sql`
+      SELECT "userId", "gamesPlayed", "gamesWon", "gamesLost", "currentElo", "peakElo"
+      FROM "UserStats"
+      WHERE "userId" IN (${seatIds[0]}, ${seatIds[1]})
+      ORDER BY "userId"
+      FOR UPDATE
+    `);
+    const statsById = new Map(locked.map((s) => [s.userId, s]));
+
+    if (!winnerId) {
+      const firstStats = statsById.get(seatIds[0]);
+      const secondStats = statsById.get(seatIds[1]);
+      if (!firstStats || !secondStats) {
+        throw new Error(`UserStats rows missing after upsert for game ${gameId}`);
+      }
+      const ratings = this.calculateDrawRatings(firstStats.currentElo, secondStats.currentElo);
+      for (const [stats, newElo] of [
+        [firstStats, ratings.first],
+        [secondStats, ratings.second],
+      ] as const) {
+        await tx.userStats.update({
+          where: { userId: stats.userId },
+          data: {
+            gamesPlayed: stats.gamesPlayed + 1,
+            winRate: this.winRatePercent(stats.gamesWon, stats.gamesPlayed + 1),
+            currentElo: newElo,
+            peakElo: Math.max(stats.peakElo, newElo),
+            lastPlayedAt: new Date(),
+          },
+        });
+      }
+      this.logger.log(
+        `Game ${gameId}: draw stats updated — ${firstStats.userId} ${firstStats.currentElo} -> ${ratings.first}, ` +
+          `${secondStats.userId} ${secondStats.currentElo} -> ${ratings.second}`,
+      );
+      return;
+    }
+    const loserId = stateIds.find((id) => id !== winnerId)!;
+    const winnerStats = statsById.get(winnerId);
+    const loserStats = statsById.get(loserId);
+    if (!winnerStats || !loserStats) {
+      throw new Error(`UserStats rows missing after upsert for game ${gameId}`);
+    }
+    const ratings = this.ratingService.calculateNewRatings(
+      winnerStats.currentElo,
+      loserStats.currentElo,
+    );
+
+    await tx.userStats.update({
+      where: { userId: winnerId },
+      data: {
+        gamesPlayed: winnerStats.gamesPlayed + 1,
+        gamesWon: winnerStats.gamesWon + 1,
+        winRate: this.winRatePercent(winnerStats.gamesWon + 1, winnerStats.gamesPlayed + 1),
+        currentElo: ratings.winner,
+        peakElo: Math.max(winnerStats.peakElo, ratings.winner),
+        lastPlayedAt: new Date(),
+      },
+    });
+    await tx.userStats.update({
+      where: { userId: loserId },
+      data: {
+        gamesPlayed: loserStats.gamesPlayed + 1,
+        gamesLost: loserStats.gamesLost + 1,
+        winRate: this.winRatePercent(loserStats.gamesWon, loserStats.gamesPlayed + 1),
+        currentElo: ratings.loser,
+        lastPlayedAt: new Date(),
+      },
+    });
+    this.logger.log(
+      `Game ${gameId}: stats updated — winner ${winnerId} ${winnerStats.currentElo} -> ${ratings.winner}, loser ${loserId} ${loserStats.currentElo} -> ${ratings.loser}`,
+    );
+  }
+
+  private winRatePercent(won: number, total: number): number {
+    if (total === 0) return 0;
+    return Math.round((won / total) * 100 * 100) / 100;
+  }
+
+  /**
+   * ELO при ничьей (Sa = 0.5 у обоих) — та же формула и K-фактор, что у
+   * RatingService.calculateNewRatings; там draw-случая нет. Равные рейтинги
+   * не меняются, неравные сходятся.
+   */
+  private calculateDrawRatings(firstElo: number, secondElo: number): { first: number; second: number } {
+    const k = this.ratingService.getKFactor();
+    const firstExpected = 1 / (1 + Math.pow(10, (secondElo - firstElo) / 400));
+    return {
+      first: Math.round(firstElo + k * (0.5 - firstExpected)),
+      second: Math.round(secondElo + k * (0.5 - (1 - firstExpected))),
+    };
   }
 
   /**
@@ -261,11 +503,42 @@ export class GameStateService {
 
   /**
    * Получить состояние из кеша Redis
+   *
+   * Redis сериализует через JSON: Date-поля (metadata.lastActionAt,
+   * combatInfo.startedAt/timeoutAt) возвращаются ISO-строками. Executor и
+   * guard'ы зовут .getTime() напрямую — без revival здесь cache-hit ронял
+   * playDefense/resolveCombat ('timeoutAt.getTime is not a function').
+   * DB-путь оживляет через deserialize; кеш-путь обязан быть эквивалентен.
    */
   async getCachedState(gameId: string): Promise<GameState | null> {
     const cacheKey = `${this.STATE_CACHE_PREFIX}${gameId}`;
     const cached = await this.redis.getJson<GameState>(cacheKey);
-    return cached;
+    if (!cached) return null;
+    const game = await this.prisma.game.findUnique({
+      where: { id: gameId },
+      select: { status: true, version: true },
+    });
+    const expectedStatus = cached.phase === GamePhase.GAME_OVER
+      ? GameStatus.FINISHED
+      : GameStatus.IN_PROGRESS;
+    if (game?.status !== expectedStatus || game.version !== cached.sequenceNumber) {
+      return null;
+    }
+    const ci = cached.metadata?.combatInfo;
+    return {
+      ...cached,
+      metadata: {
+        ...cached.metadata,
+        lastActionAt: new Date(cached.metadata.lastActionAt),
+        combatInfo: ci
+          ? {
+              ...ci,
+              startedAt: new Date(ci.startedAt),
+              ...(ci.timeoutAt ? { timeoutAt: new Date(ci.timeoutAt) } : {}),
+            }
+          : undefined,
+      },
+    };
   }
 
   /**

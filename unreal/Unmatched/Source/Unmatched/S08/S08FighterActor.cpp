@@ -1,6 +1,8 @@
 #include "S08FighterActor.h"
+#include "Camera/PlayerCameraManager.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "Materials/MaterialInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "UObject/ConstructorHelpers.h"
@@ -52,12 +54,20 @@ AS08FighterActor::AS08FighterActor() {
   Label->SetTextRenderColor(FColor::White);
   Label->SetWorldSize(26);
   Label->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+  HpLabel = CreateDefaultSubobject<UTextRenderComponent>(TEXT("HpLabel"));
+  HpLabel->SetupAttachment(RootComponent);
+  HpLabel->SetHorizontalAlignment(EHTA_Center);
+  HpLabel->SetTextRenderColor(FColor::White);
+  HpLabel->SetWorldSize(26);
+  HpLabel->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AS08FighterActor::BeginPlay() {
   Super::BeginPlay();
   // Text faces the camera (+Y side, camera yaw -90 looks along -Y).
   Label->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
+  HpLabel->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
   if (UMaterialInterface* Solid = LoadSolidMaterial()) {
     Ring->SetMaterial(0, UMaterialInstanceDynamic::Create(Solid, this));
   }
@@ -89,23 +99,44 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   }
 
   // Shape distinction: hero = tall box, minion = short box.
+  // Labels are two stacked single-line renders (TextRender cannot wrap):
+  // name on top, HP below. The old one-line "Name [H] HP/HP" was ~2.3 cells
+  // wide at world size 26 and overlapped neighbouring fighters' labels.
   if (Fighter.bIsHero) {
     Body->SetWorldScale3D(FVector(0.6f, 0.6f, 1.2f));
     Body->SetRelativeLocation(FVector(0, 0, 60.0f));
-    Label->SetRelativeLocation(FVector(0, 0, 140.0f));
+    Label->SetRelativeLocation(FVector(0, 0, 170.0f));
+    HpLabel->SetRelativeLocation(FVector(0, 0, 136.0f));
   } else {
     Body->SetWorldScale3D(FVector(0.5f, 0.5f, 0.5f));
     Body->SetRelativeLocation(FVector(0, 0, 25.0f));
-    Label->SetRelativeLocation(FVector(0, 0, 80.0f));
+    Label->SetRelativeLocation(FVector(0, 0, 102.0f));
+    HpLabel->SetRelativeLocation(FVector(0, 0, 68.0f));
   }
   Base->SetWorldScale3D(FVector(0.9f, 0.9f, 0.06f));
   Base->SetRelativeLocation(FVector(0, 0, 3.0f));
   Ring->SetWorldScale3D(FVector(1.15f, 1.15f, 0.04f));
   Ring->SetRelativeLocation(FVector(0, 0, 1.0f));
 
-  Label->SetText(FText::FromString(FString::Printf(
-      TEXT("%s%s %d/%d"), *Fighter.Label, Fighter.bIsHero ? TEXT(" [H]") : TEXT(""),
-      Fighter.Health, Fighter.MaxHealth)));
+  // SetupCameraForBoard pulls the camera back to fit bigger boards, which
+  // shrinks on-screen text; grow both lines back with the camera distance
+  // (2200 uu = the 5x7 reference distance). Caps keep each line inside the
+  // 100-uu cell: 0.58 ~ average glyph width as a fraction of world size.
+  float BoardScale = 1.0f;
+  if (const UWorld* World = GetWorld()) {
+    if (const APlayerController* PC = World->GetFirstPlayerController()) {
+      if (const APlayerCameraManager* Cam = PC->PlayerCameraManager) {
+        BoardScale = FMath::Clamp(Cam->GetCameraLocation().Size() / 2200.0f, 1.0f, 1.4f);
+      }
+    }
+  }
+  const float NameFit = 84.0f / (FMath::Max(1, Fighter.Label.Len()) * 0.58f);
+  Label->SetWorldSize(FMath::Min(18.0f, NameFit) * FMath::Min(BoardScale, 1.2f));
+  HpLabel->SetWorldSize(22.0f * BoardScale);
+
+  Label->SetText(FText::FromString(Fighter.Label));
+  HpLabel->SetText(FText::FromString(
+      FString::Printf(TEXT("%d/%d"), Fighter.Health, Fighter.MaxHealth)));
 
   // Death (isDefeated/health<=0): instant hide, no animations (grey slice).
   SetActorHiddenInGame(!Fighter.IsAlive());

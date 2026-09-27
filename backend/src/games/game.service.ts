@@ -231,12 +231,29 @@ export class GameService {
   /**
    * Получить игру по ID
    */
-  async getGame(gameId: string): Promise<GameResponse> {
+  async getGame(gameId: string, bypassCache = false): Promise<GameResponse> {
     // Сначала проверяем кеш
     const cacheKey = `${this.GAME_CACHE_PREFIX}${gameId}`;
-    const cached = await this.redis.getJson<GameResponse>(cacheKey);
+    const cached = bypassCache ? null : await this.redis.getJson<GameResponse>(cacheKey);
     if (cached) {
-      return cached;
+      // Терминальные строки иммутабельны — кеш авторитетен. Живой статус
+      // сверяется с БД (как getCachedState в GameStateService): терминальная
+      // инвалидация в saveState может не пройти (сбой Redis), и закоммиченный
+      // FINISHED не должен отдаваться как IN_PROGRESS до истечения TTL.
+      if (cached.status === GameStatus.FINISHED || cached.status === GameStatus.ABORTED) {
+        return cached;
+      }
+      const row = await this.prisma.game.findUnique({
+        where: { id: gameId },
+        select: { status: true, version: true },
+      });
+      if (!row) {
+        throw new NotFoundException('Игра не найдена');
+      }
+      if (row.status === cached.status && row.version === cached.version) {
+        return cached;
+      }
+      // Кеш просрочен (терминальный переход/сдвиг version) — перечитываем ниже.
     }
 
     const game = await this.prisma.game.findUnique({
@@ -281,7 +298,11 @@ export class GameService {
     const response = this.mapToGameResponse(game);
 
     // Кешируем результат
-    await this.redis.setJsonex(cacheKey, this.CACHE_TTL, response);
+    try {
+      await this.redis.setJsonex(cacheKey, this.CACHE_TTL, response);
+    } catch (error) {
+      this.logger.warn(`Game cache write failed for ${gameId}: ${error}`);
+    }
 
     return response;
   }
@@ -354,12 +375,12 @@ export class GameService {
     userId: string,
     filters?: { status?: GameStatus; limit?: number },
   ): Promise<GameResponse[]> {
-    const cacheKey = `${this.GAMES_LIST_CACHE_PREFIX}${userId}:${filters?.status || 'all'}`;
-    const cached = await this.redis.getJson<GameResponse[]>(cacheKey);
-    if (cached) {
-      return cached;
-    }
-
+    // Списки всегда читаются из авторитетного Postgres — list-кеш не читается
+    // и не пишется. Сверка элементов кеша с БД не видит появления НОВЫХ членов:
+    // пустой закешированный список (например, [] по фильтру FINISHED) считался
+    // бы свежим и скрывал только что завершённый матч, если терминальная
+    // инвалидация Redis в saveState не прошла. Legacy-инвалидация ключей
+    // games:list:* остаётся в saveState/мутациях для старых записей.
     const games = await this.prisma.game.findMany({
       where: {
         OR: [{ hostId: userId }, { opponentId: userId }],
@@ -403,9 +424,6 @@ export class GameService {
     });
 
     const response = games.map((g) => this.mapToGameResponse(g));
-
-    // Кешируем на меньшее время для списков
-    await this.redis.setJsonex(cacheKey, 60, response);
 
     return response;
   }
@@ -563,96 +581,68 @@ export class GameService {
    * - Если игра уже началась -> прерывается
    */
   async leaveGame(gameId: string, userId: string): Promise<void> {
-    const game = await this.prisma.game.findUnique({
-      where: { id: gameId },
-      include: {
-        players: true,
-      },
+    const outcome = await this.prisma.$transaction(async (tx) => {
+      // Match startGame's row lock: never remove a roster after the match starts
+      // or finishes between an unlocked read and the lobby mutation.
+      await tx.$queryRaw`SELECT id FROM "Game" WHERE id = ${gameId} FOR UPDATE`;
+      const game = await tx.game.findUnique({
+        where: { id: gameId },
+        select: { hostId: true, opponentId: true, status: true },
+      });
+      if (!game) throw new NotFoundException('Игра не найдена');
+      if (game.hostId !== userId && game.opponentId !== userId) {
+        throw new ForbiddenException('Вы не участвуете в этой игре');
+      }
+
+      const participants = { hostId: game.hostId, opponentId: game.opponentId };
+      if (game.status === GameStatus.FINISHED || game.status === GameStatus.ABORTED) {
+        return { kind: 'terminal' as const, ...participants };
+      }
+      if (game.status === GameStatus.IN_PROGRESS) {
+        return { kind: 'abort' as const, ...participants };
+      }
+
+      if (game.hostId === userId) {
+        if (game.opponentId) {
+          await tx.game.update({
+            where: { id: gameId },
+            data: { hostId: game.opponentId, opponentId: null },
+          });
+          await tx.gamePlayer.deleteMany({ where: { gameId, userId } });
+          await tx.gamePlayer.updateMany({
+            where: { gameId, userId: game.opponentId },
+            data: { seatOrder: 0 },
+          });
+        } else {
+          await tx.gamePlayer.deleteMany({ where: { gameId } });
+          await tx.game.delete({ where: { id: gameId } });
+        }
+      } else {
+        await tx.game.update({ where: { id: gameId }, data: { opponentId: null } });
+        await tx.gamePlayer.deleteMany({ where: { gameId, userId } });
+      }
+      return { kind: 'left' as const, ...participants };
     });
 
-    if (!game) {
-      throw new NotFoundException('Игра не найдена');
-    }
-
-    // Проверяем, что пользователь участвует в игре
-    if (game.hostId !== userId && game.opponentId !== userId) {
-      throw new ForbiddenException('Вы не участвуете в этой игре');
-    }
-
-    // Если игра уже началась, прерываем её
-    if (game.status === GameStatus.IN_PROGRESS) {
-      await this.abortGame(gameId, userId, 'player_left');
+    // Leaving a terminal game only navigates the client away; its result and
+    // both seats remain available for history and recovery.
+    if (outcome.kind === 'terminal') return;
+    if (outcome.kind === 'abort') {
+      try {
+        await this.abortGame(gameId, userId, 'player_left');
+      } catch (error) {
+        // A finishing action may win after we release the row lock.
+        if (!(error instanceof BadRequestException)) throw error;
+        const current = await this.prisma.game.findUnique({ where: { id: gameId } });
+        if (current?.status !== GameStatus.FINISHED && current?.status !== GameStatus.ABORTED) {
+          throw error;
+        }
+      }
       return;
     }
 
-    // Хост покидает игру
-    if (game.hostId === userId) {
-      // Если есть opponent - передаем ему хоста
-      if (game.opponentId) {
-        const newHostId = game.opponentId;
-        await this.prisma.$transaction(async (tx) => {
-          // Opponent становится новым хостом
-          await tx.game.update({
-            where: { id: gameId },
-            data: {
-              hostId: newHostId,
-              opponentId: null,
-            },
-          });
-
-          // Удаляем запись старого хоста из GamePlayer
-          await tx.gamePlayer.deleteMany({
-            where: {
-              gameId,
-              userId,
-            },
-          });
-
-          // Обновляем seatOrder нового хоста
-          await tx.gamePlayer.updateMany({
-            where: {
-              gameId,
-              userId: newHostId,
-            },
-            data: {
-              seatOrder: 0,
-            },
-          });
-        });
-      } else {
-        // Если нет opponent - удаляем игру полностью
-        await this.prisma.$transaction(async (tx) => {
-          await tx.gamePlayer.deleteMany({
-            where: { gameId },
-          });
-          await tx.game.delete({
-            where: { id: gameId },
-          });
-        });
-      }
-    } else {
-      // Opponent покидает игру - просто очищаем opponentId
-      await this.prisma.$transaction(async (tx) => {
-        await tx.game.update({
-          where: { id: gameId },
-          data: {
-            opponentId: null,
-          },
-        });
-
-        await tx.gamePlayer.deleteMany({
-          where: {
-            gameId,
-            userId,
-          },
-        });
-      });
-    }
-
-    // Инвалидируем кеш (hostId/opponentId взяты из game, загруженного ДО мутации —
-    // игра могла быть удалена или хост сменился)
     await this.invalidateGameCache(gameId);
-    await this.invalidateGamesListForBoth(game.hostId, game.opponentId);
+    await this.invalidateGamesListForBoth(outcome.hostId, outcome.opponentId);
     await this.invalidateAvailableGamesCache();
 
     // Уведомляем оставшегося подписчика лобби
@@ -755,11 +745,13 @@ export class GameService {
     try {
       await this.gameInitialization.initializeGameState(gameId);
     } catch (error) {
-      await this.prisma.game.update({
-        where: { id: gameId },
+      // Initialization can lose a race to abort/finish. Only roll back the
+      // IN_PROGRESS transition that still belongs to this start attempt.
+      const rollback = await this.prisma.game.updateMany({
+        where: { id: gameId, status: GameStatus.IN_PROGRESS },
         data: { status: GameStatus.LOBBY, startedAt: null },
       });
-      await this.invalidateGameCache(gameId);
+      if (rollback.count === 1) await this.invalidateGameCache(gameId);
       throw error instanceof BadRequestException
         ? error
         : new BadRequestException(
@@ -850,27 +842,51 @@ export class GameService {
       throw new ForbiddenException('Вы не можете прервать эту игру');
     }
 
-    const updatedGame = await this.prisma.game.update({
-      where: { id: gameId },
+    if (game.status === GameStatus.FINISHED || game.status === GameStatus.ABORTED) {
+      throw new BadRequestException('Завершённую игру нельзя прервать');
+    }
+
+    // A conditional write serializes with saveState's FINISHED transition.
+    // A stale read cannot overwrite a result committed by another request.
+    const transition = await this.prisma.game.updateMany({
+      where: {
+        id: gameId,
+        status: { in: [GameStatus.PENDING, GameStatus.LOBBY, GameStatus.IN_PROGRESS, GameStatus.PAUSED] },
+      },
       data: {
         status: GameStatus.ABORTED,
         endedAt: new Date(),
       },
     });
+    if (transition.count !== 1) {
+      throw new BadRequestException('Завершённую игру нельзя прервать');
+    }
 
     // Инвалидируем кеш (включая списки игр обоих участников — иначе myGames до 60с отдаёт stale статус)
-    await this.invalidateGameCache(gameId);
-    await this.invalidateGamesListForBoth(game.hostId, game.opponentId);
-    await this.invalidateAvailableGamesCache();
+    const invalidations = await Promise.allSettled([
+      this.invalidateGameCache(gameId),
+      this.redis.del(`gamestate:${gameId}`),
+      this.invalidateGamesListForBoth(game.hostId, game.opponentId),
+      this.invalidateAvailableGamesCache(),
+    ]);
+    for (const result of invalidations) {
+      if (result.status === 'rejected') {
+        this.logger.warn(`Game cache invalidation failed after abort: ${result.reason}`);
+      }
+    }
 
     // Журналируем прерывание игры с текущим sequence number состояния (если есть)
-    const abortSeq =
-      (
+    let abortSeq = 0;
+    try {
+      abortSeq = (
         await this.prisma.gameState.findUnique({
           where: { gameId },
           select: { sequenceNumber: true },
         })
       )?.sequenceNumber ?? 0;
+    } catch (error) {
+      this.logger.warn(`Could not read abort sequence for ${gameId}: ${error}`);
+    }
     await this.recordLobbyAction(gameId, userId, GameActionType.GAME_ABORTED, abortSeq, {
       reason,
     });
@@ -878,7 +894,7 @@ export class GameService {
     // Уведомляем подписчиков gameEnded (прерывание = конец игры без победителя)
     await this.publishLobby(gameId, 'GAME_ENDED', { reason, abortedBy: userId });
 
-    return await this.getGame(gameId);
+    return await this.getGame(gameId, true);
   }
 
   /**

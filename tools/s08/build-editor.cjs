@@ -13,6 +13,6 @@ const r = spawnSync('cmd.exe', ['/d', '/c', cmdLine], {
 });
 const out = (r.stdout || '') + (r.stderr || '');
 const lines = out.split(/\r?\n/).filter((l) => l.trim().length > 0);
-console.log(lines.slice(-60).join('\n'));
+console.log(lines.slice(-220).join('\n'));
 console.log('EXIT=' + r.status);
 if (r.status !== 0) process.exitCode = 1;

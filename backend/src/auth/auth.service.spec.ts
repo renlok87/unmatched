@@ -58,6 +58,7 @@ describe('AuthService', () => {
               create: jest.fn(),
               updateMany: jest.fn(),
               findFirst: jest.fn(),
+              findMany: jest.fn(),
               update: jest.fn(),
             },
             $transaction: jest.fn(),
@@ -361,9 +362,17 @@ describe('AuthService', () => {
         replacedBy: null,
       };
 
-      jest.spyOn(prisma.refreshToken, 'findFirst').mockResolvedValue(storedToken as any);
-      jest.spyOn(prisma.refreshToken, 'update').mockResolvedValue({} as any);
-      jest.spyOn(prisma.refreshToken, 'create').mockResolvedValue({} as any);
+      jest.spyOn(prisma.refreshToken, 'findMany').mockResolvedValue([storedToken] as any);
+
+      const txRefreshUpdate = jest.fn().mockResolvedValue({});
+      const txRefreshCreate = jest.fn().mockResolvedValue({});
+      const transactionMock = jest.fn().mockImplementation(async (callback) =>
+        callback({
+          refreshToken: { update: txRefreshUpdate, create: txRefreshCreate },
+        } as any),
+      );
+      jest.spyOn(prisma, '$transaction').mockImplementation(transactionMock);
+
       jest.spyOn(redis, 'invalidateUserCache').mockResolvedValue(undefined);
 
       jest
@@ -375,10 +384,22 @@ describe('AuthService', () => {
 
       expect(result.accessToken).toBe('new-access');
       expect(result.refreshToken).toBe('new-refresh');
-      expect(prisma.refreshToken.update).toHaveBeenCalledWith({
+      expect(result.user.id).toBe('user1');
+      expect(mockedBcrypt.compare).toHaveBeenCalledWith(refreshToken, 'hashed');
+      expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+      expect(txRefreshUpdate).toHaveBeenCalledWith({
         where: { id: 'token1' },
         data: { revokedAt: expect.any(Date) },
       });
+      expect(txRefreshCreate).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          token: 'hashed-token',
+          userId: 'user1',
+          replacedBy: 'token1',
+          expiresAt: expect.any(Date),
+        }),
+      });
+      expect(redis.invalidateUserCache).toHaveBeenCalledWith('user1');
     });
 
     it('should throw UnauthorizedException for invalid token', async () => {
@@ -406,7 +427,7 @@ describe('AuthService', () => {
         replacedBy: null,
       };
 
-      jest.spyOn(prisma.refreshToken, 'findFirst').mockResolvedValue(storedToken as any);
+      jest.spyOn(prisma.refreshToken, 'findMany').mockResolvedValue([storedToken] as any);
 
       await expect(service.refreshTokens(refreshToken)).rejects.toThrow(UnauthorizedException);
       await expect(service.refreshTokens(refreshToken)).rejects.toThrow('Refresh token expired');
@@ -531,6 +552,7 @@ describe('AuthService', () => {
         email: mockUser.email,
         username: mockUser.username,
         avatar: mockUser.avatar,
+        role: mockUser.role,
         createdAt: mockUser.createdAt,
         emailVerified: mockUser.emailVerified,
       });

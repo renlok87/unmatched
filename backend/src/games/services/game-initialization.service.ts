@@ -100,6 +100,9 @@ export class GameInitializationService {
     const decks: Record<string, DeckState> = {};
     const discardPiles: Record<string, Card[]> = {};
     const handZones: Record<string, HandZone> = {};
+    // A catalog card can appear in both players' decks in a mirror match.
+    // Allocate copy numbers for the entire game, not separately per player.
+    const nextCardCopy = new Map<string, number>();
 
     // Стартовые углы от фактических размеров доски + занятые клетки
     const startPositions = this.computeStartPositions(boardState);
@@ -183,9 +186,12 @@ export class GameInitializationService {
       fighters.push(heroFighter, ...sidekickFighters);
 
       // --- Колода: реальные карты героя, развёрнутые по count ---
-      const deckCards: Card[] = hero.cards.flatMap((card) =>
-        Array.from({ length: Math.max(1, card.count) }, (_, copy) => ({
-          id: `${card.id}::${copy}`,
+      const deckCards: Card[] = hero.cards.flatMap((card) => {
+        const count = Math.max(1, card.count);
+        const firstCopy = nextCardCopy.get(card.id) ?? 0;
+        nextCardCopy.set(card.id, firstCopy + count);
+        return Array.from({ length: count }, (_, copy) => ({
+          id: `${card.id}::${firstCopy + copy}`,
           cardId: card.id,
           name: card.name,
           nameEn: card.nameEn,
@@ -204,8 +210,8 @@ export class GameInitializationService {
           text: card.text ?? undefined,
           // Кто может играть карту ('Any'/имя бойца) — bannerAllows-валидация
           bannerName: card.bannerName ?? undefined,
-        })),
-      );
+        }));
+      });
 
       const drawPile = shuffle(deckCards);
       const hand: HandCard[] = drawPile
@@ -269,6 +275,9 @@ export class GameInitializationService {
    * Fallback: SCHEME-карта с ПУСТЫМ effects, но непустым печатным текстом
    * (Card.text = textEn: A Momentary Glance, Winged Frenzy, …) — парсим
    * fullText, чтобы матч исполнял эффект без ожидания backfill БД.
+   * S09: DEFENSE/VERSATILE-карты с ПУСТЫМ effects и печатным effectAfter
+   * (Hiss and Slither, Clutching Claws: «Your opponent discards 1 card») —
+   * парсим after-текст (AFTER_COMBAT), как SCHEME fullText.
    * Нераспознанный текст честно даёт UNSUPPORTED (не молчаливый no-op).
    * S06: устаревшие parser-эффекты (parserVersion < текущей) апгрейдятся
    * повторным разбором (upgradeStaleParserEffects) — как backfill, но без
@@ -287,6 +296,18 @@ export class GameInitializationService {
   }): CardEffect[] {
     const effects = normalizeCardEffects(card.effects, card.id);
     const fullText = card.cardType === 'SCHEME' && card.text?.trim() ? card.text : undefined;
+    // ATTACK-карты несут боевой текст в effectDuring («You may BOOST this
+    // attack», Second Shot / Noble Sacrifice): без этого fallback их эффекты
+    // терялись и сервер никогда не ставил пост-reveal BOOST_CHOICE паузу.
+    const duringText =
+        card.cardType === 'ATTACK' && card.effectDuring?.trim() ? card.effectDuring : undefined;
+    // DEFENSE/VERSATILE-карты несут пост-эффект боя в effectAfter (Hiss and
+    // Slither / Clutching Claws: «Your opponent discards 1 card») — парсим
+    // на инжесте, иначе DISCARD_CARDS-хеды никогда не ставятся в рантайме.
+    const afterText =
+        (card.cardType === 'DEFENSE' || card.cardType === 'VERSATILE') && card.effectAfter?.trim()
+          ? card.effectAfter
+          : undefined;
     if (effects.length > 0) {
       return upgradeStaleParserEffects(
         effects,
@@ -301,8 +322,11 @@ export class GameInitializationService {
         card.id,
       );
     }
-    if (!fullText) return [];
-    const { effects: parsed } = parseCardEffectTexts({ fullText }, card.id);
+    if (!fullText && !duringText && !afterText) return [];
+    const { effects: parsed } = parseCardEffectTexts(
+      { fullText, during: duringText, after: afterText },
+      card.id,
+    );
     return parsed;
   }
 

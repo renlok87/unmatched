@@ -93,6 +93,13 @@ describe('S08 GD-029: code resolution and duplicate-create guard', () => {
           games.set(where.id, { ...game, ...data, updatedAt: new Date() });
           return games.get(where.id);
         },
+        updateMany: async ({ where, data }: any) => {
+          const game = games.get(where.id);
+          if (!game || (where.status && !(typeof where.status === 'string'
+            ? game.status === where.status : where.status.in?.includes(game.status)))) return { count: 0 };
+          games.set(where.id, { ...game, ...data, updatedAt: new Date() });
+          return { count: 1 };
+        },
       },
       gamePlayer: {
         findUnique: async ({ where }: any) =>

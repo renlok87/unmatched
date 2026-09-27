@@ -74,12 +74,20 @@ function makeHarness(executorOverride?: Record<string, unknown>) {
   const lock: any = { withLockOptions: async (_k: string, fn: () => Promise<unknown>) => fn() };
   const queue: any = {
     getJob: async (jobId: string) => jobs.get(jobId) ?? null,
+    getJobs: async (statuses: string[]) => {
+      const result = [];
+      for (const job of jobs.values()) {
+        if (statuses.includes(await job.getState())) result.push(job);
+      }
+      return result;
+    },
     add: async (_name: string, data: any, opts: any) => {
       queueAdds.push({ data, opts });
       if (!jobs.has(opts.jobId)) {
         const jobId = opts.jobId;
         jobs.set(jobId, {
           id: jobId, data, delay: opts.delay, timestamp: Date.now(),
+          getState: async () => 'delayed',
           remove: async () => { jobs.delete(jobId); },
         });
       }
@@ -165,6 +173,34 @@ describe('S07 GD-026 server-side defense timeout', () => {
     expect(harn.audits[0].type).toBe('COMBAT_RESOLVED');
     expect(harn.audits[0].metadata.reason).toBe('defense-timeout');
     expect(harn.published.map(p => p.eventType)).toEqual(['COMBAT_RESOLVED']);
+  });
+
+  it('timeout побеждает последнего бойца → COMBAT_RESOLVED + GAME_ENDED (gameEnded-подписка видит итог)', async () => {
+    const harn = h;
+    // защитник при 4 hp: атака 4 без защиты роняет последнего героя
+    const st = harn.states.get('g1')!;
+    harn.states.set('g1', {
+      ...st,
+      fighters: st.fighters.map((f) => (f.id === 'fB' ? { ...f, health: 4 } : f)),
+    });
+
+    const before = await attack(harn);
+    expireDeadline(harn);
+
+    const result = await harn.service.processAutoResolve({ gameId: 'g1', attackSequenceNumber: before.sequenceNumber, stage: 'DEFENSE' });
+    expect(result.success).toBe(true);
+    expect(result.reason).toBe('defense-timeout');
+
+    const after = harn.states.get('g1')!;
+    expect(after.phase).toBe(GamePhase.GAME_OVER);
+    expect(after.metadata.winnerId).toBe('a');
+    // GAME_ENDED идёт сразу после COMBAT_RESOLVED с итоговым состоянием —
+    // тот же порядок, что у ручного пути в game-actions.resolver
+    expect(harn.published.map((p) => p.eventType)).toEqual(['COMBAT_RESOLVED', 'GAME_ENDED']);
+    expect(harn.published[1].seq).toBe(after.sequenceNumber);
+    // аудит: исход + GAME_ENDED с победителем (catch-up через eventsSince)
+    expect(harn.audits.map((a) => a.type)).toEqual(['COMBAT_RESOLVED', 'GAME_ENDED']);
+    expect(harn.audits[1].metadata).toMatchObject({ action: 'autoResolve', reason: 'defense-timeout', winnerId: 'a' });
   });
 
   it('поздняя джоба после защиты безвредна: deadline стадии резолва не истёк', async () => {
@@ -810,21 +846,21 @@ describe('S07 GD-026 P2: stage-специфичные job id (race защиты 
     // DEFENSE-джоба активирована воркером: remove() бросает, add со старым
     // общим id молча вернул бы её — RESOLVE-дедлайн оказывался бы потерян
     const activeDefense = {
-      id: 'combat:scheduled:g1:DEFENSE',
+      id: 'combat-scheduled-g1-DEFENSE',
       data: { gameId: 'g1', stage: 'DEFENSE' },
       remove: async () => { throw new Error('Active job cannot be removed'); },
     };
-    h.jobs.set('combat:scheduled:g1:DEFENSE', activeDefense);
+    h.jobs.set('combat-scheduled-g1-DEFENSE', activeDefense);
 
     await h.service.scheduleAutoResolve('g1', 10, 12, 'RESOLVE');
 
     // RESOLVE-джоба реально добавлена с собственным id
-    const resolveJob = h.jobs.get('combat:scheduled:g1:RESOLVE');
+    const resolveJob = h.jobs.get('combat-scheduled-g1-RESOLVE');
     expect(resolveJob).toBeDefined();
     expect(resolveJob.data.stage).toBe('RESOLVE');
-    expect(h.queueAdds.at(-1)!.opts.jobId).toBe('combat:scheduled:g1:RESOLVE');
+    expect(h.queueAdds.at(-1)!.opts.jobId).toBe('combat-scheduled-g1-RESOLVE');
     // DEFENSE-джоба не потеряна и не заменена
-    expect(h.jobs.get('combat:scheduled:g1:DEFENSE')).toBe(activeDefense);
+    expect(h.jobs.get('combat-scheduled-g1-DEFENSE')).toBe(activeDefense);
   });
 
   it('защита в момент срабатывания DEFENSE-джобы, оба офлайн → RESOLVE доводит бой, ровно один исход', async () => {
@@ -854,8 +890,8 @@ describe('S07 GD-026 P2: stage-специфичные job id (race защиты 
 
     await h.service.cancelAutoResolve('g1');
     expect(await h.service.hasScheduledAutoResolve('g1')).toBe(false);
-    expect(h.jobs.get('combat:scheduled:g1:DEFENSE')).toBeUndefined();
-    expect(h.jobs.get('combat:scheduled:g1:RESOLVE')).toBeUndefined();
+    expect(h.jobs.get('combat-scheduled-g1-DEFENSE')).toBeUndefined();
+    expect(h.jobs.get('combat-scheduled-g1-RESOLVE')).toBeUndefined();
   });
 });
 
@@ -987,6 +1023,113 @@ describe('S07 GD-026 P2: enqueue-failure и periodic recovery sweep', () => {
     h = makeHarness();
   });
 
+  function persistFutureCombat(phase: GamePhase, sequenceNumber = 10) {
+    const state: GameState = {
+      ...fixture(), sequenceNumber, phase,
+      metadata: {
+        ...fixture().metadata,
+        combatInfo: {
+          attackerId: 'fA', defenderId: 'b', targetFighterId: 'fB', attackerCardId: 'atk-1',
+          attackValue: 4, defenseValue: phase === GamePhase.COMBAT ? 0 : 2,
+          startedAt: new Date(), timeoutAt: new Date(Date.now() + 5000),
+        } as any,
+      },
+    };
+    h.states.set('g1', state);
+    (h.service as any).prisma.gameState.findMany = async () => [{
+      gameId: 'g1', state: h.gameStateService.serialize(state as any), sequenceNumber,
+    }];
+  }
+
+  it('recovers current DEFENSE after enqueue failure despite a completed old RESOLVE job', async () => {
+    persistFutureCombat(GamePhase.COMBAT);
+    h.jobs.set('combat-scheduled-g1-RESOLVE', {
+      data: { gameId: 'g1', stage: 'RESOLVE', attackSequenceNumber: 8 },
+      getState: async () => 'completed',
+    });
+    const originalAdd = h.queue.add;
+    h.queue.add = async () => { throw new Error('ECONNREFUSED redis'); };
+    await expect(h.service.scheduleAutoResolve('g1', 5, 10, 'DEFENSE')).rejects.toThrow('ECONNREFUSED');
+    h.queue.add = originalAdd;
+
+    expect(await h.service.recoverScheduledWork()).toEqual({ recovered: 0, rescheduled: 1 });
+    expect(h.jobs.get('combat-scheduled-g1-DEFENSE')?.data).toEqual({
+      gameId: 'g1', stage: 'DEFENSE', attackSequenceNumber: 10,
+    });
+    expect(await h.service.recoverScheduledWork()).toEqual({ recovered: 0, rescheduled: 0 });
+  });
+
+  it.each(['waiting', 'failed'] as const)('replaces a %s same-stage job from an earlier attack', async (status) => {
+    persistFutureCombat(GamePhase.COMBAT, 12);
+    const jobId = 'combat-scheduled-g1-DEFENSE';
+    h.jobs.set(jobId, {
+      data: { gameId: 'g1', stage: 'DEFENSE', attackSequenceNumber: 10 },
+      getState: async () => status,
+      remove: async () => { h.jobs.delete(jobId); },
+    });
+
+    expect(await h.service.recoverScheduledWork()).toEqual({ recovered: 0, rescheduled: 1 });
+    expect(h.jobs.get(jobId)?.data.attackSequenceNumber).toBe(12);
+  });
+
+  it('uses a sequence id when an active old same-stage job cannot be removed', async () => {
+    persistFutureCombat(GamePhase.COMBAT, 12);
+    h.jobs.set('combat-scheduled-g1-DEFENSE', {
+      data: { gameId: 'g1', stage: 'DEFENSE', attackSequenceNumber: 10 },
+      getState: async () => 'active',
+      remove: async () => { throw new Error('Active job cannot be removed'); },
+    });
+
+    expect(await h.service.recoverScheduledWork()).toEqual({ recovered: 0, rescheduled: 1 });
+    expect(h.jobs.get('combat-scheduled-g1-DEFENSE-12')?.data.attackSequenceNumber).toBe(12);
+    expect(await h.service.recoverScheduledWork()).toEqual({ recovered: 0, rescheduled: 0 });
+  });
+
+  it('cancels a sequence fallback while leaving the old active job untouched', async () => {
+    persistFutureCombat(GamePhase.COMBAT, 12);
+    const baseId = 'combat-scheduled-g1-DEFENSE';
+    const fallbackId = 'combat-scheduled-g1-DEFENSE-12';
+    const oldActive = {
+      id: baseId,
+      data: { gameId: 'g1', stage: 'DEFENSE', attackSequenceNumber: 10 },
+      getState: async () => 'active',
+      remove: jest.fn(async () => { throw new Error('Active job cannot be removed'); }),
+    };
+    h.jobs.set(baseId, oldActive);
+    const otherId = 'combat-scheduled-g2-DEFENSE';
+    const otherPending = {
+      id: otherId,
+      data: { gameId: 'g2', stage: 'DEFENSE', attackSequenceNumber: 3 },
+      getState: async () => 'delayed',
+      remove: jest.fn(async () => { h.jobs.delete(otherId); }),
+    };
+    h.jobs.set(otherId, otherPending);
+    await h.service.scheduleAutoResolve('g1', 5, 12, 'DEFENSE');
+    expect(h.jobs.get(fallbackId)?.data.attackSequenceNumber).toBe(12);
+    expect(await h.service.hasScheduledAutoResolve('g1')).toBe(true);
+    expect(await h.service.getTimeUntilResolve('g1')).not.toBeNull();
+
+    await h.service.cancelAutoResolve('g1');
+
+    expect(h.jobs.has(fallbackId)).toBe(false);
+    expect(h.jobs.get(baseId)).toBe(oldActive);
+    expect(h.jobs.get(otherId)).toBe(otherPending);
+    expect(oldActive.remove).toHaveBeenCalledTimes(1); // only scheduling attempted removal
+    expect(otherPending.remove).not.toHaveBeenCalled();
+    expect(await h.service.hasScheduledAutoResolve('g1')).toBe(false);
+    expect(await h.service.getTimeUntilResolve('g1')).toBeNull();
+  });
+
+  it('reports a current active job as scheduled without treating an old active job as current', async () => {
+    persistFutureCombat(GamePhase.COMBAT, 12);
+    h.jobs.set('combat-scheduled-g1-DEFENSE', {
+      id: 'combat-scheduled-g1-DEFENSE',
+      data: { gameId: 'g1', stage: 'DEFENSE', attackSequenceNumber: 12 },
+      getState: async () => 'active',
+    });
+    expect(await h.service.hasScheduledAutoResolve('g1')).toBe(true);
+  });
+
   it('enqueue-failure честно репортится; sweep перепланирует после восстановления очереди БЕЗ рестарта', async () => {
     // бой с будущим дедлайном (атака персистена состояние, очередь легла)
     h.states.set('g1', {
@@ -1021,7 +1164,7 @@ describe('S07 GD-026 P2: enqueue-failure и periodic recovery sweep', () => {
     const add = h.queueAdds.at(-1)!;
     expect(add.opts.delay).toBe(5000);
     expect(add.data.stage).toBe('DEFENSE');
-    expect(h.jobs.get('combat:scheduled:g1:DEFENSE')).toBeDefined();
+    expect(h.jobs.get('combat-scheduled-g1-DEFENSE')).toBeDefined();
   });
 
   it('onModuleInit ставит periodic sweep (60 c), onModuleDestroy снимает таймер', async () => {
@@ -1036,5 +1179,93 @@ describe('S07 GD-026 P2: enqueue-failure и periodic recovery sweep', () => {
 
     setIntervalSpy.mockRestore();
     clearIntervalSpy.mockRestore();
+  });
+});
+
+// --- P2: post-commit CUE-публикации независимы (16-network-contract §4) ---
+// gameEnded — lossy named-CUE: авторитетный исход = закоммиченное состояние
+// (gameStateUpdated-барьер + HTTP). Redis publish может бросить ПОСЛЕ
+// локального deliver уже закоммиченного резолва — это не должно проваливать
+// джобу, обрывать оставшиеся CUE/аудиты или плодить второй терминальный исход.
+
+describe('S07 GD-026 P2: post-commit CUE — best-effort и независимы', () => {
+  it('publish COMBAT_RESOLVED бросает после коммита → GAME_ENDED всё равно попытан, аудиты записаны, результат success, retry безвреден', async () => {
+    const h = makeHarness();
+    h.states.set('g1', fixture());
+    // защитник при 4 hp: таймаут-атака 4 роняет последнего героя → GAME_OVER
+    const st = h.states.get('g1')!;
+    h.states.set('g1', {
+      ...st,
+      fighters: st.fighters.map((f) => (f.id === 'fB' ? { ...f, health: 4 } : f)),
+    });
+    const before = await attack(h);
+    expireDeadline(h);
+
+    const attempts: string[] = [];
+    (h.service as any).gameSubscriptionService = {
+      publishGameUpdate: async (gameId: string, eventType: string, s: GameState) => {
+        attempts.push(eventType);
+        if (eventType === 'COMBAT_RESOLVED') {
+          // Redis publish бросил после локального deliver — состояние закоммичено
+          throw new Error('ECONNRESET after local delivery');
+        }
+        h.published.push({ gameId, eventType, seq: s.sequenceNumber });
+      },
+    };
+
+    const result = await h.service.processAutoResolve({ gameId: 'g1', attackSequenceNumber: before.sequenceNumber, stage: 'DEFENSE' });
+
+    // закоммиченный FINISHED не репортится как провал джобы
+    expect(result.success).toBe(true);
+    expect(result.reason).toBe('defense-timeout');
+
+    // авторитетный исход доступен через снапшот/query: GAME_OVER + победитель
+    const committed = await h.gameStateService.loadState('g1');
+    expect(committed.phase).toBe(GamePhase.GAME_OVER);
+    expect(committed.metadata.winnerId).toBe('a');
+
+    // второй CUE попытан несмотря на отказ первого; успешный доставлен
+    expect(attempts).toEqual(['COMBAT_RESOLVED', 'GAME_ENDED']);
+    expect(h.published.map((p) => p.eventType)).toEqual(['GAME_ENDED']);
+    expect(h.published[0].seq).toBe(committed.sequenceNumber);
+
+    // аудиты независимы от публикации: исход + GAME_ENDED записаны
+    expect(h.audits.map((a) => a.type)).toEqual(['COMBAT_RESOLVED', 'GAME_ENDED']);
+    expect(h.audits[1].metadata).toMatchObject({ action: 'autoResolve', reason: 'defense-timeout', winnerId: 'a' });
+
+    // retry той же джобы — no-op: терминальный исход не дублируется
+    const retry = await h.service.processAutoResolve({ gameId: 'g1', attackSequenceNumber: before.sequenceNumber, stage: 'DEFENSE' });
+    expect(retry.success).toBe(false);
+    expect(retry.reason).toBe('No combat in progress');
+    expect(attempts.filter((e) => e === 'COMBAT_RESOLVED')).toHaveLength(1);
+    expect(h.audits.filter((a) => a.type === 'COMBAT_RESOLVED')).toHaveLength(1);
+    expect((await h.gameStateService.loadState('g1')).sequenceNumber).toBe(committed.sequenceNumber);
+  });
+
+  it('publish GAME_ENDED тоже бросает → исход всё равно success: закоммиченное состояние авторитетно', async () => {
+    const h = makeHarness();
+    h.states.set('g1', fixture());
+    const st = h.states.get('g1')!;
+    h.states.set('g1', {
+      ...st,
+      fighters: st.fighters.map((f) => (f.id === 'fB' ? { ...f, health: 4 } : f)),
+    });
+    const before = await attack(h);
+    expireDeadline(h);
+
+    (h.service as any).gameSubscriptionService = {
+      publishGameUpdate: async () => {
+        throw new Error('ECONNRESET after local delivery');
+      },
+    };
+
+    const result = await h.service.processAutoResolve({ gameId: 'g1', attackSequenceNumber: before.sequenceNumber, stage: 'DEFENSE' });
+    expect(result.success).toBe(true);
+
+    const committed = await h.gameStateService.loadState('g1');
+    expect(committed.phase).toBe(GamePhase.GAME_OVER);
+    expect(committed.metadata.winnerId).toBe('a');
+    // аудиты всё равно записаны — публикация не владеет исходом
+    expect(h.audits.map((a) => a.type)).toEqual(['COMBAT_RESOLVED', 'GAME_ENDED']);
   });
 });

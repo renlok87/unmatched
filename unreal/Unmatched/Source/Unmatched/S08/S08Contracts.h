@@ -35,8 +35,103 @@ struct UNMATCHED_API FS08Snapshot {
   TSharedPtr<FJsonValue> Fighters;
   TSharedPtr<FJsonValue> HandZones;
   TSharedPtr<FJsonValue> DiscardPiles; // S05: reveal faces of committed combat cards
+  // GD-032: deck projections. The HTTP gameState query and every mutation
+  // echo carry `decks` (hidden placeholders, array LENGTH = live count); the
+  // WS gameStateUpdated event does NOT (unmatched-net/1 section 2 - merge,
+  // never replace: an event without decks keeps the last known counts and
+  // the HUD marks them stale until the next full body arrives).
+  TSharedPtr<FJsonValue> Decks;
   TSharedPtr<FJsonValue> BoardState;
   TSharedPtr<FJsonValue> Metadata;
+};
+
+/** GD-033: TURN_END discard-to-limit choice (metadata.pendingHandDiscard). */
+struct UNMATCHED_API FS08PendingHandDiscard {
+  FString Id;
+  FString PlayerId;
+  int32 Count = 0; // EXACT number of own hand instances to discard
+};
+
+/** GD-034: metadata.combatInfo - the authoritative combat window. Presence of
+ *  a value field is itself the privacy contract (filterPrivateData cuts the
+ *  opponent's committed value/card before reveal): bHasAttackValue is TRUE
+ *  only for the attacker (or after reveal), bHasDefenderCard only for the
+ *  defender (or after reveal). Clients must render from these flags, never
+ *  guess a missing value. */
+struct UNMATCHED_API FS08CombatInfo {
+  bool bPresent = false;
+  FString AttackerId;      // attacking fighter id
+  FString DefenderId;      // DEFENDING USER id (target's owner)
+  FString TargetFighterId; // attacked fighter id
+  bool bHasAttackerCard = false;
+  FString AttackerCardId;
+  bool bHasDefenderCard = false;
+  FString DefenderCardId;
+  bool bHasAttackValue = false;
+  int32 AttackValue = 0;
+  bool bHasDefenseValue = false;
+  int32 DefenseValue = 0;
+  bool bHasBoostValue = false;
+  int32 BoostValue = 0;
+  bool bHasCardBoostCardId = false;
+  FString CardBoostCardId;
+  bool bHasAbilityBoostCardId = false;
+  FString AbilityBoostCardId;
+  FDateTime StartedAt;  // server wall clock (ISO 8601)
+  bool bHasStartedAt = false;
+  FDateTime TimeoutAt;  // server-authoritative stage deadline (ISO 8601)
+  bool bHasTimeoutAt = false;
+
+  /** Seconds until the deadline (negative when expired). Falls back to a
+   *  conservative closed window when the timestamp never parsed. */
+  double SecondsUntilDeadline() const;
+  /** Reveal (both cards visible) = opponent's committed identity arrived. */
+  bool bRevealed = false;
+};
+
+/** GD-035: one labeled option of a CHOOSE_ONE pending (server options[]). */
+struct UNMATCHED_API FS08PendingOption {
+  int32 Index = -1;
+  FString Label;
+};
+
+/** GD-034/035: one metadata.pendingEffects queue entry (head = the choice
+ *  the server is waiting on). Mirrors backend PendingEffect
+ *  (game-state.model.ts): every field is optional on the wire and parsed
+ *  defensively - a malformed entry degrades to its defaults and is only
+ *  dropped when the id is missing. Privacy (ACC-018/GameStateService
+ *  filterPrivateData): revealedCards ships ONLY in the owner's projection -
+ *  the opponent's entry carries RevealedCount instead; this struct never
+ *  decodes card faces, it keeps the raw array for the owner-side UI. */
+struct UNMATCHED_API FS08PendingEffect {
+  FString Id;
+  FString PlayerId;
+  FString Type; // MOVE | PLACE | CHOOSE_ONE | TARGET_FIGHTER | DISCARD_CARDS | BOOST_CHOICE | CHOOSE_SPACE | DECK_TOP_PICK
+  bool bOptional = false; // true ONLY when the server sends optional:true ("You may …")
+  // MOVE distance / DISCARD_CARDS exact count / DECK_TOP_PICK pick count
+  int32 Value = 0;
+  bool bHasValue = false;
+  FString FighterName;            // MOVE/PLACE banner restriction from card text
+  bool bTargetsOpponent = false;  // PLACE moves the OPPONENT's fighter
+  TArray<FString> FighterIds;     // fighters the effect may move/target
+  TArray<FString> TargetFighterIds; // TARGET_FIGHTER legal damage targets
+  int32 Damage = 0;
+  bool bHasDamage = false;
+  bool bCanPassThroughEnemies = false; // MOVE: enemies do not block the path
+  FString ZoneFighterName;        // PLACE/CHOOSE_SPACE stage 1: cell must share this fighter's zone
+  bool bRestoreFullHealth = false; // PLACE revive (defeated fighter allowed)
+  bool bAnyOwner = false;         // MOVE (Skirmish): any fighter of the effect list
+  int32 Stage = 0;                // CHOOSE_SPACE: 1 | 2 (0 = absent)
+  bool bHasAnchor = false;        // CHOOSE_SPACE stage 2 anchor of adjacency
+  int32 AnchorX = 0, AnchorY = 0;
+  int32 DrawIfDefeated = 0;       // CHOOSE_SPACE conditional draw
+  int32 RevealedCount = 0;        // DECK_TOP_PICK: how many are revealed (opponent view)
+  bool bHasRevealedCount = false;
+  FString Mode;                   // DECK_TOP_PICK: "PICK" | "ORDER"
+  FString Text;                   // source card text (log/UI prompt)
+  TArray<FS08PendingOption> Options; // CHOOSE_ONE labeled options
+  int32 ChooseCount = 1;          // CHOOSE_ONE remaining picks (multi-step)
+  TSharedPtr<FJsonValue> RevealedCards; // owner-only raw array (never for the opponent)
 };
 
 enum class ES08SeqDecision : uint8 { Ignore, Merge, Apply };
@@ -84,6 +179,26 @@ public:
   /** pendingManeuver id from the decoded metadata projection ('' when the
    *  state has no open maneuver choice). */
   static FString PendingManeuverId(const FS08Snapshot& Snapshot);
+
+  /** GD-033: pendingHandDiscard from the metadata projection. False when the
+   *  state carries no open discard-to-limit choice. */
+  static bool PendingHandDiscard(const FS08Snapshot& Snapshot,
+                                 FS08PendingHandDiscard& OutPending);
+
+  /** GD-034: metadata.combatInfo. False when no combat window is open. Field
+   *  presence mirrors the viewer projection (see FS08CombatInfo). */
+  static bool CombatInfo(const FS08Snapshot& Snapshot, FS08CombatInfo& Out);
+
+  /** GD-034: metadata.pendingEffects queue (server order; [0] is the choice
+   *  being waited on). False when the queue is absent/empty. */
+  static bool PendingEffects(const FS08Snapshot& Snapshot,
+                             TArray<FS08PendingEffect>& OutEffects);
+
+  /** GD-032 privacy: a hand/discard entry is a server-side hidden
+   *  placeholder (viewer may not learn its identity). Such cards carry no
+   *  face into any HUD list, inspector or trace line - count only. */
+  static bool IsHiddenCard(const TSharedPtr<FJsonValue>& CardValue);
+  static bool IsHiddenCardId(const FString& InstanceId);
 
   // ---- Critical-field validation (unmatched-net/1: incomplete state must
   //      BLOCK input instead of guessing). Returns the list of problems. ----

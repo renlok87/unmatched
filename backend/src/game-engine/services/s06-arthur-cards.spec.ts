@@ -416,6 +416,7 @@ describe('GD-022: Restless Spirits (SCHEME x2) — two-stage zone/adjacent area 
     const d1 = filler('d1::0');
     const state = aDraw(inHand(arthurState({ bminAt: { x: 5, y: 1 }, bminHp: 1 }), arthurCard('Restless Spirits')), [d1]);
     let cur = await playRestless(state);
+    const seqAfterPlay = cur.sequenceNumber;
     const pending = head(cur);
     expect(pending.type).toBe('CHOOSE_SPACE');
     expect(pending.stage).toBe(1);
@@ -447,6 +448,11 @@ describe('GD-022: Restless Spirits (SCHEME x2) — two-stage zone/adjacent area 
       { gameId: 's06a', effectId: s2pending.id, x: 4, y: 1 }, ctx(cur));
     expect(s2.success).toBe(true);
     const after = s2.gameState!;
+    // saveState-контракт «одна мутация = +1 seq»: stage 2 когда-то не бампил
+    // seq → optimistic-проверка saveState роняла живой резолв
+    // («Expected N, got N», S09 pending demo)
+    expect(cur.sequenceNumber).toBe(seqAfterPlay + 1); // stage 1
+    expect(after.sequenceNumber).toBe(cur.sequenceNumber + 1); // stage 2
     // bmin в anchor-клетке: 1 − 2 → повержен; своих/чужих вне клеток не задело
     const bmin = after.fighters.find((f) => f.id === 'bmin')!;
     expect(bmin.health).toBe(0);

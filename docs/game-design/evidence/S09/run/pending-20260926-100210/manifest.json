@@ -1,0 +1,33 @@
+{
+    "stamp":  "20260926-100210",
+    "verdict":  "GD-035 P1: live two-client pending-choice demo - viewer-owned queue heads opened over the authoritative server and were answered via resolvePendingEffect/declinePendingEffect; first-head UI shot gated on the pending marker #4080FF with all other state markers absent; privacy-clean traces; seq convergence",
+    "pendingPicked":  [
+                          "CHOOSE_SPACE",
+                          "MOVE",
+                          "TARGET_FIGHTER"
+                      ],
+    "pendingDeclined":  [
+
+                        ],
+    "gapObserved":  [
+
+                    ],
+    "gapNote":  "stuck types are mandatory heads with no legal pick (board zone data was backfilled after the S09 first run: boards now carry zones, so a stuck head is a fresh finding to report) - reported, not client-side faked",
+    "files":  [
+                  {
+                      "name":  "pending-client-host.trace.log",
+                      "bytes":  87054,
+                      "sha256":  "77042741f306ff625fa1af3b63d0c55481143def5626a22da8b6b06fa684ee1c"
+                  },
+                  {
+                      "name":  "pending-client-joiner.trace.log",
+                      "bytes":  88905,
+                      "sha256":  "d08f88632b639ee558df4cd4ea7f4c67dd19f99d6f920ba86ad30d7b6b353043"
+                  },
+                  {
+                      "name":  "host\\s09-pending-TARGET_FIGHTER.png",
+                      "bytes":  347166,
+                      "sha256":  "2bbc10d63496e59eb4a3d08341802c92c320812f3ffd8faab740569973337f25"
+                  }
+              ]
+}

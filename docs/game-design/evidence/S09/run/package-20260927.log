@@ -1,0 +1,856 @@
+Running AutomationTool...
+Using bundled DotNet SDK version: 10.0 win-x64
+Starting AutomationTool...
+Parsing command line: BuildCookRun -project=C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject -noP4 -platform=Win64 -clientconfig=Development -cook -stage -pak -package -compressed -build -unattended -nosplash -AdditionalCookerArgs=-ini:EditorPerProjectUserSettings:[/Script/ModelContextProtocolEngine.ModelContextProtocolSettings]:bAutoStartServer=False
+Initializing script modules...
+Total script module initialization time: 0.14 s.
+Using C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe
+Executing commands...
+Setting up ProjectParams for C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject
+********** BUILD COMMAND STARTED **********
+Running: C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\ThirdParty\DotNet\10.0\win-x64\dotnet.exe "C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll" -Target="UnmatchedEditor Win64 Development -Project=C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject" -Target="Unmatched Win64 Development -Project=C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject  -remoteini=\"C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\"  -skipdeploy " -log="C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\UBA-UnmatchedEditor-Win64-Development.txt"
+Log file: C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\UBA-UnmatchedEditor-Win64-Development.txt
+Invalidating makefile for Unmatched (source file added)
+UHT compiled-in object format Default
+Building UnmatchedEditor and Unmatched...
+===== Toolchain Information =====
+UnmatchedEditor Win64 Development:
+  Using ISPC compiler (C:\Program Files\Epic Games\UE_5.8\Engine\Source\ThirdParty\Intel\ISPC\bin\Windows\ispc.exe)
+    Intel(r) Implicit SPMD Program Compiler (Intel(r) ISPC), 1.24.0 (build commit  @ 20250404, LLVM 18.1.2)
+  Using Visual Studio 14.44.35228 toolchain (C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+Unmatched Win64 Development:
+  Using ISPC compiler (C:\Program Files\Epic Games\UE_5.8\Engine\Source\ThirdParty\Intel\ISPC\bin\Windows\ispc.exe)
+    Intel(r) Implicit SPMD Program Compiler (Intel(r) ISPC), 1.24.0 (build commit  @ 20250404, LLVM 18.1.2)
+  Using Visual Studio 14.44.35228 toolchain (C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+=================================
+Determining max actions to execute in parallel (24 physical cores, 32 logical cores)
+  Executing up to 24 processes, one per physical core
+Using Unreal Build Accelerator local executor to run 12 action(s)
+UbaServer - Listening on 0.0.0.0:1345
+  CPU 24 physical cores, 32 logical cores
+  Memory 63.76 GB physical, 34.06 GB/67.76 GB committed
+  UBA Storage capacity 40 GB
+** For Unmatched-Win64-Development **
+[1/12] Compile [x64] S08FighterActor.cpp
+[2/12] Compile [x64] S08BoardActor.cpp
+C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Source\Unmatched\S08\S08BoardActor.cpp(109,18): warning C4996: 'UInstancedStaticMeshComponent::AddInstanceWorldSpace': Use AddInstance or AddInstances with bWorldSpace set to true. - Please update your code to the new API before upgrading to the next release, otherwise your project will no longer compile.
+  UnderlayTiles->AddInstanceWorldSpace(FTransform(
+                 ^
+C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Source\Unmatched\S08\S08BoardActor.cpp(126,15): warning C4996: 'UInstancedStaticMeshComponent::AddInstanceWorldSpace': Use AddInstance or AddInstances with bWorldSpace set to true. - Please update your code to the new API before upgrading to the next release, otherwise your project will no longer compile.
+      Target->AddInstanceWorldSpace(Instance);
+              ^
+[3/12] Compile [x64] Module.Unmatched.gen.cpp
+[4/12] Compile [x64] S09SchemeUiTests.cpp
+[5/12] Compile [x64] S09ResultTests.cpp
+[6/12] Compile [x64] S09ManeuverFlowTests.cpp
+[7/12] Compile [x64] S09CombatTests.cpp
+[8/12] Compile [x64] S09PendingTests.cpp
+[9/12] Compile [x64] S09ManeuverUi.cpp
+[10/12] Compile [x64] S08FlowGameMode.cpp
+[11/12] Link [x64] Unmatched.exe
+   Создается библиотека C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Binaries\Win64\Unmatched.lib и объект C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Binaries\Win64\Unmatched.exp
+[12/12] WriteMetadata Unmatched.target [NoUba]
+
+Total time in Unreal Build Accelerator local executor: 11.92 seconds
+Output binary: C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe
+Output binary: C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Binaries\Win64\Unmatched.exe
+
+Result: Succeeded
+Total execution time: 13.83 seconds
+Trace written to file C:\Users\ren\AppData\Local\UnrealBuildTool\Trace.uba with size 8.8kb
+Took 14,08s to run dotnet.exe, ExitCode=0
+No build products were made
+Build command time: 14.10 s
+********** BUILD COMMAND COMPLETED **********
+********** COOK COMMAND STARTED **********
+Running UnrealEditor Cook for project C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject
+Commandlet log file is C:\Program Files\Epic Games\UE_5.8\Engine\Programs\AutomationTool\Saved\Cook-2026.09.27-11.24.11.txt
+Running: C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor-Cmd.exe "C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject" -run=Cook  -TargetPlatform=Windows  -unversioned -fileopenlog -abslog="C:\Program Files\Epic Games\UE_5.8\Engine\Programs\AutomationTool\Saved\Cook-2026.09.27-11.24.11.txt" -stdout -CrashForUAT -unattended -NoLogTimes
+LogInit: Display: Running engine for game: Unmatched
+LogCore: Display: Requested channels: 'cpu,gpu,frame,log,bookmark,screenshot,region'
+LogTrace: Display: Control listening on port 1985
+LogCsvProfiler: Display: Metadata set : platform="Windows"
+LogCsvProfiler: Display: Metadata set : config="Development"
+LogCsvProfiler: Display: Metadata set : buildversion="++UE5+Release-5.8-CL-56702186"
+LogCsvProfiler: Display: Metadata set : engineversion="5.8.2-56702186+++UE5+Release-5.8"
+LogCsvProfiler: Display: Metadata set : enginereleaseversion="5.8.2"
+LogCsvProfiler: Display: Metadata set : os="Windows 11 (25H2) [10.0.26200.9445] "
+LogCsvProfiler: Display: Metadata set : cpu="GenuineIntel|13th Gen Intel(R) Core(TM) i9-13900F"
+LogCsvProfiler: Display: Metadata set : pgoenabled="0"
+LogCsvProfiler: Display: Metadata set : pgoprofilingenabled="0"
+LogCsvProfiler: Display: Metadata set : ltoenabled="0"
+LogCsvProfiler: Display: Metadata set : asan="0"
+LogCsvProfiler: Display: Metadata set : mergedmodules="0"
+LogCsvProfiler: Display: Metadata set : compacttset="0"
+LogCsvProfiler: Display: Metadata set : commandline="" C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject -run=Cook -TargetPlatform=Windows -unversioned -fileopenlog -abslog="C:\Program Files\Epic Games\UE_5.8\Engine\Programs\AutomationTool\Saved\Cook-2026.09.27-11.24.11.txt" -stdout -CrashForUAT -unattended -NoLogTimes""
+LogCsvProfiler: Display: Metadata set : loginid="bdf62188417f62e5bd98c59d03298926"
+LogCsvProfiler: Display: Metadata set : llm="0"
+LogCsvProfiler: Display: Metadata set : zenstreaming="0"
+LogCsvProfiler: Display: Metadata set : systemresolution.resx="1280"
+LogCsvProfiler: Display: Metadata set : systemresolution.resy="720"
+LogAudio: Display: Audio Device Manager not initializing due to all audio being disabled. If this is not intentional, please check command line arguments for "-nosound".
+LogAssetRegistry: Display: FindShardedCacheFiles: 1 via .ref, 0 via migration fallback, 1 total
+LogAssetRegistry: Display: CleanupOrphanedCacheFiles (PreLoad): 1 .ref files found, 1 referenced binaries
+LogAssetRegistry: Display: CleanupOrphanedCacheFiles: 1 total binaries, 1 referenced (kept), 0 old-style pre-migration (kept), 0 orphans deleted, 0 orphans locked (kept)
+LogAssetRegistry: Display: LoadCacheFiles: loading 1 cache files, memory-mapping=enabled
+LogConfig: Display: Loading IOS ini files took 0.04 seconds
+LogConfig: Display: Loading Android ini files took 0.04 seconds
+LogConfig: Display: Loading Mac ini files took 0.04 seconds
+LogConfig: Display: Loading VulkanPC ini files took 0.05 seconds
+Running UnrealBuildTool: dotnet "..\..\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll" -Mode=ValidatePlatforms -OutputSDKs  -AllPlatforms  -project="C:/Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Unmatched.uproject" -log="C:/Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/Logs/AutoSDKInfo.txt" -verbose -timestamps
+LogConfig: Display: Loading Unix ini files took 0.05 seconds
+LogConfig: Display: Loading Windows ini files took 0.06 seconds
+LogConfig: Display: Loading VisionOS ini files took 0.06 seconds
+LogConfig: Display: Loading TVOS ini files took 0.06 seconds
+LogConfig: Display: Loading Linux ini files took 0.06 seconds
+LogAssetRegistry: Display: Asset registry cache read as 118.7 MiB from ../../../../../../Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Intermediate/CachedAssetRegistry/CachedAssetRegistry_0_129BABC2494D707E67EDD9A1F4752B49.bin (memory-mapped=yes)
+Log file: C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Logs\AutoSDKInfo.txt
+RenderDocPlugin: Display: RenderDoc plugin will not be loaded. Use '-AttachRenderDoc' on the cmd line or enable 'renderdoc.AutoAttach' in the plugin settings.
+LogAnalytics: Display: Provider StudioTelemetry.Provider.Log is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.CSV is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.Horde is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.Log is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.CSV is disabled for this application
+LogAnalytics: Display: Provider StudioTelemetry.Provider.Horde is disabled for this application
+LogAsyncCompilation: Display: MemorySharingInfo: UsedMemory=400MiB, MaxMemoryAvailable=69387MiB
+##PlatformValidate: Win64 VALID 10.0.22621.0
+##PlatformValidate: Mac INVALID 26.1.1
+##PlatformValidate: IOS INVALID 26.1.1
+##PlatformValidate: Android INVALID r27c
+##PlatformValidate: Linux INVALID v26_clang-20.1.8-rockylinux8
+##PlatformValidate: LinuxArm64 INVALID <UNKNOWN>
+##PlatformValidate: TVOS INVALID 26.1.1
+##PlatformValidate: VisionOS INVALID <UNKNOWN>
+Unable to find required SDK version 'MainVersion' for platform LinuxArm64. Check your SDK.json files
+Unable to find required SDK version 'MainVersion' for platform VisionOS. Check your SDK.json files
+Trace written to file C:\Users\ren\AppData\Local\UnrealBuildTool\Trace.uba with size 321b
+LogStreaming: Display: AsyncLoading2 - Created: Async Loading Thread: false, Async Post Load: false, Multithreaded: false
+LogHAL: Display: Platform has ~ 64 GB [68463390720 / 68719476736 / 64], which maps to Largest [LargestMinGB=32, LargerMinGB=12, DefaultMinGB=8, SmallerMinGB=6, SmallestMinGB=0)
+LogCsvProfiler: Display: Metadata set : extradevelopmentmemorymb="0"
+LogObj: Display: Attempting to load config data for Default__DownlinkBandwidthManagerConfig before the Class has been constructed/registered/linked (likely during module loading or early startup). This will result in the load silently failing and should be fixed.
+LogTextureFormatASTC: Display: ASTCEnc version 5.0.1 library loaded
+LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatASTC
+LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatDXT
+LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatETC2
+LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatIntelISPCTexComp
+LogTextureFormatOodle: Display: Oodle Texture TFO init; latest sdk version = 2.9.16
+LogTextureFormatOodle: Display: Oodle Texture loading DLL: oo2tex_win64_2.9.16.dll
+LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatOodle
+LogTextureFormatManager: Display: Loaded Base TextureFormat: TextureFormatUncompressed
+LogTargetPlatformManager: Display: Failed to SetupSDK for platform 'Android'
+LogTargetPlatformManager: Display: Failed to SetupSDK for platform 'IOS'
+LogTargetPlatformManager: Display: Failed to SetupSDK for platform 'Linux'
+LogTargetPlatformManager: Display: Failed to SetupSDK for platform 'Mac'
+LogTargetPlatformManager: Display: Failed to SetupSDK for platform 'TVOS'
+LogTargetPlatformManager: Display: Loaded TargetPlatform 'Windows'
+LogTargetPlatformManager: Display: Loaded TargetPlatform 'WindowsEditor'
+LogTargetPlatformManager: Display: Loaded TargetPlatform 'WindowsServer'
+LogTargetPlatformManager: Display: Loaded TargetPlatform 'WindowsClient'
+LogTargetPlatformManager: Display: Building Assets For Windows
+LogAudioDebug: Display: Lib vorbis DLL was dynamically loaded.
+LogObj: Display: Attempting to load config data for Default__SlateThemeManager before the Class has been constructed/registered/linked (likely during module loading or early startup). This will result in the load silently failing and should be fixed.
+LogCsvProfiler: Display: Metadata set : verbatimrhiname="Null"
+LogCsvProfiler: Display: Metadata set : rhiname="Null"
+LogCsvProfiler: Display: Metadata set : rhifeaturelevel="SM6"
+LogCsvProfiler: Display: Metadata set : shaderplatform="PCD3D_SM6"
+LogCsvProfiler: Display: Metadata set : gpu=""
+LogCsvProfiler: Display: Metadata set : gpudriver=""
+LogDerivedDataCache: Display: ../../../Engine/DerivedDataCache/Compressed.ddp: Opened pak cache for reading. (1679 MiB)
+LogZenServiceInstance: Display: Launching zen utility 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/zen.exe service status'.
+LogZenServiceInstance: Display: Writing plugin version info to 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zen_plugin_versions.json'
+LogZenServiceInstance: Display: Read zen version cache file from 'C:/Users/ren/AppData/Local/UnrealEngine/5.8/Saved/Zen/zen.version', version: '5.8.13-202605190912-windows-x64-release-094f62c2'
+LogZenServiceInstance: Display: Read zen version cache file from 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zen.version', version: '5.8.13-202605190912-windows-x64-release-094f62c2'
+LogZenServiceInstance: Display: Installed service at 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zenserver.exe' is up to date
+LogZenServiceInstance: Display: Launching executable 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zenserver.exe', working dir 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install', data dir 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Data', args '--port 8558 --data-dir C:\Users\ren\AppData\Local\UnrealEngine\Common\Zen\Data --http asio --gc-cache-duration-seconds 1209600 --gc-interval-seconds 21600 --gc-low-diskspace-threshold 2147483648 --cache-bucket-limit-overwrites --quiet --restrict-content-types --allow-external-oidctoken-exe=false --plugins-config "C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zen_plugins_v1.json" --security-config-path "C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/security-config.json" --owner-pid 42368  --child-id Zen_42368_Startup'
+LogZenServiceInstance: Display: Unreal Zen Storage Server HTTP service at http://[::1]:8558 status: OK!.
+LogDerivedDataCache: Display: ZenLocal: Using ZenServer HTTP service at [::1] with namespace ue.ddc. Status: OK!.
+LogDerivedDataCache: Display: C:/Users/ren/AppData/Local/UnrealEngine/Common/DerivedDataCache: Performance: Latency=0.12ms. RandomReadSpeed=297.02MBs, RandomWriteSpeed=125.79MBs. Assigned SpeedClass 'Local'
+LogUbaHorde: Display: UBA/Horde Configuration [Uba.Provider.Horde]: Not Enabled
+LogShaderCompilers: Display: No distributed shader compiler controller found
+LogShaderCompilers: Display: Using 29 local workers for shader compilation
+LogShaderCompilers: Display: Compiling shader autogen file: ../../../../../../Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Intermediate/ShaderAutogen/PCD3D_SM6/AutogenShaderHeaders.ush
+LogShaderCompilers: Display: Autogen file is unchanged, skipping write.
+LogEditorDomain: Display: EditorDomain is Disabled
+LogAssetRegistry: Display: AssetDataGatherer spent 0.000s loading caches from ../../../../../../Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Intermediate/CachedAssetRegistry.
+LogDeviceProfileManager: Display: Deviceprofile LinuxArm64Editor not found.
+LogDeviceProfileManager: Display: Deviceprofile LinuxArm64 not found.
+LogCsvProfiler: Display: Metadata set : deviceprofile="WindowsEditor"
+LogStreaming: Display: FlushAsyncLoading(1): 1 QueuedPackages, 0 AsyncPackages
+LogTextureEncodingSettings: Display: Texture Encode Speed: Final (cook).
+LogTextureEncodingSettings: Display: Oodle Texture Encode Speed settings: Fast: RDO Off Lambda=0, Effort=Normal Final: RDO Off Lambda=0, Effort=Normal
+LogTextureEncodingSettings: Display: Shared linear texture encoding: Disabled
+LogMeshReduction: Display: Using QuadricMeshReduction for automatic static mesh reduction
+LogMeshReduction: Display: Using SkeletalMeshReduction for automatic skeletal mesh reduction
+LogMeshReduction: Display: Using ProxyLODMeshReduction for automatic mesh merging
+LogMeshReduction: Display: No distributed automatic mesh merging module available
+LogShaderCompilers: Display: Compiling shader autogen file: ../../../../../../Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Intermediate/ShaderAutogen/PCD3D_SM5/AutogenShaderHeaders.ush
+LogShaderCompilers: Display: Autogen file is unchanged, skipping write.
+LogVirtualization: Display: VirtualizationSystem name found in ini file: None
+LogVirtualization: Display: FNullVirtualizationSystem mounted, virtualization will be disabled
+LogWorldPartition: Display: FWorldPartitionClassDescRegistry::Initialize started...
+LogWorldPartition: Display: FWorldPartitionClassDescRegistry::Initialize took 1.471 ms
+LogMetaSound: Display: MetaSound Page Target Initialized to 'Default'
+LogAudio: Display: Registering Engine Module Parameter Interfaces...
+LogSemanticSearch: Display: No codebook found, creating flat index
+LogAudioCaptureCore: Display: No Audio Capture implementations found. Audio input will be silent.
+LogAudioCaptureCore: Display: No Audio Capture implementations found. Audio input will be silent.
+LogToolsetRegistry: Display: Registering Toolset ToolsetRegistry.AgentSkillToolset
+LogGameFeatures: Display: Total built in plugin load time 0.0007s
+LogCsvProfiler: Display: Metadata set : largeworldcoordinates="1"
+LogCsvProfiler: Display: Metadata set : raytracing="0"
+LogToolsetRegistry: Display: Registering Toolset DataflowAgent.DataflowAgentToolset
+LogToolsetRegistry: Display: Registering Toolset AutomationTestToolset.AutomationTestToolset
+LogToolsetRegistry: Display: Registering Toolset GameplayTagsToolset.GameplayTagsToolset
+LogToolsetRegistry: Display: Registering Toolset ConfigSettingsToolset.ConfigSettingsToolset
+LogToolsetRegistry: Display: Registering Toolset GASToolsets.GameplayCueToolset
+LogToolsetRegistry: Display: Registering Toolset GASToolsets.AttributeSetToolset
+LogToolsetRegistry: Display: Registering Toolset GASToolsets.AbilitySystemInspectorToolset
+LogToolsetRegistry: Display: Registering Toolset NiagaraToolsets.NiagaraToolset_Info
+LogToolsetRegistry: Display: Registering Toolset NiagaraToolsets.NiagaraToolset_Component
+LogToolsetRegistry: Display: Registering Toolset NiagaraToolsets.NiagaraToolset_Blueprint
+LogToolsetRegistry: Display: Registering Toolset NiagaraToolsets.NiagaraToolset_System
+LogToolsetRegistry: Display: Registering Toolset NiagaraToolsets.NiagaraToolset_Assets
+LogToolsetRegistry: Display: Registering Toolset DataRegistryToolset.DataRegistryTools
+LogToolsetRegistry: Display: Registering Toolset PluginToolset.PluginToolset
+LogToolsetRegistry: Display: Registering Toolset PhysicsToolsets.PhysicsAssetToolset
+LogToolsetRegistry: Display: Registering Toolset GameFeaturesToolset.GameFeaturesToolset
+LogToolsetRegistry: Display: Registering Toolset SemanticSearchToolset.SemanticSearchToolset
+LogToolsetRegistry: Display: Registering Toolset SlateInspectorToolset.SlateInspectorToolset
+LogToolsetRegistry: Display: Registering Toolset PCGToolset.PCGToolset
+LogToolsetRegistry: Display: Registering Toolset PCGToolset.PCGSpatialToolset
+LogToolsetRegistry: Display: Registering Toolset WorldConditionsToolset.WorldConditionTools
+LogToolsetRegistry: Display: Registering Toolset EditorToolset.EditorAppToolset
+LogToolsetRegistry: Display: Registering Toolset EditorToolset.LogsToolset
+LogToolsetRegistry: Display: Registering Toolset UMGToolSet.UMGToolSet
+LogCook: Display: CookProcessCount=1. CookMultiprocess is disabled and the cooker is running as a single process.
+LogCook: Display: CookSettings for Memory:
+	MemoryMaxUsedVirtual 0MiB
+	MemoryMaxUsedPhysical 0MiB
+	MemoryMinFreeVirtual 2048MiB
+	MemoryMinFreePhysical 2048MiB
+	MemoryTriggerGCAtPressureLevel None
+	SoftGCMemoryUseTrigger disabled
+	SoftGCTimeBudgetTrigger enabled (0.05 budget, 30s min period)
+LogCook: Display: SkipOnlyEditorOnly is enabled, unsolicited packages will not be cooked unless they are referenced from the cooked version of the instigator package.
+LogCook: Display: ---- Pre Content Initialisation: End ----
+LogCook: Display: ---- Post Content Initialisation: Start ----
+LogEditorDomain: Display: Cycle detected in parents of class /Script/RigVMDeveloper.RigVMUnitNode. Allow flags for editordomain and incremental cooking will be invalid.
+LogZenStore: Display: Establishing oplog 'Unmatched.f29147c9/EditorDomain'
+LogZenStore: Display: Zen project 'Unmatched.f29147c9' already exists
+LogZenStore: Display: Zen oplog 'Unmatched.f29147c9/EditorDomain' already exists
+LogCook: Display: Waiting for Asset Registry
+LogAssetRegistry: Display: Starting OnFilesLoaded.Broadcast
+LogAssetRegistry: Display: Completed OnFilesLoaded.Broadcast: 0.010s
+LogAssetRegistry: Display: Asset registry cache written as 118.7 MiB to ../../../../../../Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Intermediate/CachedAssetRegistry/CachedAssetRegistry_*.ref
+LogAssetRegistry: Display: CleanupOrphanedCacheFiles (PostWrite): 1 .ref files found, 1 referenced binaries
+LogAssetRegistry: Display:   CachedAssetRegistry_0_129BABC2494D707E67EDD9A1F4752B49.bin: deleted (orphaned, unreferenced by any .ref)
+LogAssetRegistry: Display: CleanupOrphanedCacheFiles: 2 total binaries, 1 referenced (kept), 0 old-style pre-migration (kept), 1 orphans deleted, 0 orphans locked (kept)
+LogAssetRegistry: Display: CleanupOrphanedCacheFiles (PostWrite): 1 .ref files found, 1 referenced binaries
+LogAssetRegistry: Display: CleanupOrphanedCacheFiles: 1 total binaries, 1 referenced (kept), 0 old-style pre-migration (kept), 0 orphans deleted, 0 orphans locked (kept)
+LogCook: Display: INCREMENTAL COOK DEPENDENCIES: Enabled. Incremental Cook Dependencies are enabled in Editor.ini:[CookSettings]:LegacyIterative=false.
+LogZenStore: Display: Establishing oplog 'Unmatched.f29147c9/Windows'
+LogZenStore: Display: Zen project 'Unmatched.f29147c9' already exists
+LogStorageServerPlatformFile: Display: Found 'C:/Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/Cooked/Windows/ue.projectstore'
+LogStorageServerPlatformFile: Display: Using connection settings from ue.projectstore: HostAddrs='[::1]+172.26.224.1+192.168.2.7+172.21.64.1' and HostPort='8558'
+LogStorageServerPlatformFile: Display: Found 'C:/Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/Cooked/Windows/ue.projectstore'
+LogStorageServerPlatformFile: Display: Using password authentication from ue.projectstore
+LogStorageServerPlatformFile: Display: Using settings from ue.projectstore: ServerProject='Unmatched.f29147c9' and ServerPlatform='Windows'
+LogStorageServerConnection: Display: Creating zen store connection to [::1]:8558 ("::1").
+LogStorageServerConnection: Display: Zen store connection established to [::1]:8558.
+LogCook: Display: CalculateGlobalDependenciesHash(Windows):
+LogCook: Display: 	FGuid CookIncrementalVersion = ffa12fdc-c822-1fe2-7757-627a12f1d3a7
+LogCook: Display: 	[Editor]:CookSettings.ProjectCookIncrementalVersion = 00000000-0000-0000-0000-000000000000
+LogCook: Display: 	[Engine]:Core.System.CanStripEditorOnlyExportsAndImports = True
+LogCook: Display: 	[Engine]:Core.System.CanSkipEditorReferencedPackagesWhenCooking = False
+LogCook: Display: 	CanUseUnversionedPropertySerialization = True
+LogCook: Display: 	[Editor]:CookSettings.AutomaticOptionalInclusionAssetType = /Script/Niagara.NiagaraScript, /Script/Niagara.NiagaraEmitter, /Script/Niagara.NiagaraSystem, /Script/NiagaraEditor.NiagaraParameterDefinitions, /Script/Niagara.NiagaraEffectType, /Script/Niagara.NiagaraValidationRuleSet, /Script/OptimusCore.OptimusDeformer
+LogCook: Display: 	IsCookFlagSet(ECookInitializationFlags::Unversioned) = True
+LogCook: Display: 	FCoreRedirects::AppendHashOfGlobalRedirects = 4628a73979b5807a7df2c30e3569e387562ac9ef3eeffbdc79d1b1e9658a3bdc
+LogCook: Display: 	GlobalDependenciesHash(Windows) = 659d861afcb9b60e9000b513ff7a40f8737689c6dd7cff988b7fe71be46841f9
+LogCook: Display: FULL COOK: Incremental Cooks are disabled by default in Editor.ini:[CookSettings]:CookIncrementalDefaultIncremental=false, and commandline did not specify -forcerecook=false. Deleting previously cooked packages for platform Windows and recooking all packages discovered in the current cook.
+LogZenStore: Display: Deleting oplog 'Unmatched.f29147c9/Windows' if it exists
+LogZenStoreWriter: Display: Deleting C:/Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/Cooked/Windows/...
+LogZenStore: Display: Zen oplog 'Unmatched.f29147c9/Windows' created
+LogCook: Display: Sandbox cleanup took 0.019 seconds for platforms Windows
+LogCook: Display: Compiling global changed shaders for platform 'Windows'
+LogShaderLibrary: Display:
+LogShaderLibrary: Display: Shader Library 'Global' (PCD3D_SM5-PCD3D_SM5) Stats:
+LogShaderLibrary: Display: =================
+LogShaderLibrary: Display: Assets: 1, Unique Shadermaps: 345 (34500.00%)
+LogShaderLibrary: Display: Total Shaders: 3940, Unique Shaders: 3926 (99.64%)
+LogShaderLibrary: Display: Total Shader Size: 11.61mb, Unique Shaders Size: 11.61mb (99.96%)
+LogShaderLibrary: Display: === Extended info:
+LogShaderLibrary: Display: Minimum number of shaders in shadermap: 1
+LogShaderLibrary: Display: Median number of shaders in shadermap: 3
+LogShaderLibrary: Display: Maximum number of shaders in shadermap: 309
+LogShaderLibrary: Display: Number of shadermaps referencing top 10 most shared shaders:
+LogShaderLibrary: Display:     3, 3, 3, 2, 2, 2, 2, 2, 2, 2
+LogShaderLibrary: Display: Unique shaders itemization (sorted by compressed size):
+LogShaderLibrary: Display: SF_Pixel: 1751 shaders (44.60%), compressed size: 6.68 MB (3.91 KB avg per shader), uncompressed size: 31.68 MB (18.53 KB avg per shader)
+LogShaderLibrary: Display: SF_Compute: 2058 shaders (52.42%), compressed size: 4.85 MB (2.41 KB avg per shader), uncompressed size: 19.56 MB (9.73 KB avg per shader)
+LogShaderLibrary: Display: SF_Vertex: 115 shaders (2.93%), compressed size: 0.07 MB (0.61 KB avg per shader), uncompressed size: 0.15 MB (1.31 KB avg per shader)
+LogShaderLibrary: Display: SF_Geometry: 2 shaders (0.05%), compressed size: 0.00 MB (0.49 KB avg per shader), uncompressed size: 0.00 MB (1.55 KB avg per shader)
+LogShaderLibrary: Display: Textual dump saved to '../../../../../../Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/Shaders/PCD3D_SM5-PCD3D_SM5/ShaderDebug-Global-PCD3D_SM5-PCD3D_SM5/Dump.txt'
+LogShaderLibrary: Display: =================
+LogCook: Display: Discovering localized assets for cultures: en
+LogCook: Display: Found 0 localized assets
+LogCook: Display: ---- Post Content Initialisation: End ----
+LogCook: Display: Cooked packages 0 Packages Remain 484 Total 484
+LogCook: Display: Cook Diagnostics: OpenFileHandles=274, VirtualMemory=1573MiB, VirtualMemoryAvailable=34933MiB
+LogCook: Display: Garbage collection triggered (Soft). Triggered by conditions:
+  CookSettings.SoftGCTimeTrigger: Periodic triggering of SoftGC: No duration data.
+LogCookCommandlet: Display: GarbageCollection... (Periodic GC)
+LogCook: Display: Cooked packages 376 Packages Remain 186 Total 562
+LogTextureFormatOodle: Display: Oodle Texture loading DLL: oo2tex_win64_2.9.11.dll
+LogTextureFormatOodle: Display: Oodle Texture loading DLL: oo2tex_win64_2.9.12.dll
+LogTextureFormatOodle: Display: Oodle Texture loading DLL: oo2tex_win64_2.9.15.dll
+LogTextureFormatOodle: Display: Oodle Texture loading DLL: oo2tex_win64_2.9.13.dll
+LogCook: Display: Cooked packages 562 Packages Remain 0 Total 562
+LogCook: Display: Cook Diagnostics: OpenFileHandles=4770, VirtualMemory=2112MiB, VirtualMemoryAvailable=34276MiB
+LogCook: Display: ---- Finalisation: Start ----
+LogCook: Display: CookArtifact 'C:/Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/Cooked/Windows/Unmatched/Metadata/ValidationCookArtifact.json' saved.
+LogAssetRegistryGenerator: Display: Saving asset registry v24.
+LogAssetRegistryGenerator: Display: Generated development asset registry C:/Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/Cooked/Windows/Unmatched/Metadata/DevelopmentAssetRegistry.bin num assets 565, size is 442.93kb, XxHash64[LE] = 0xF1AC2A67C6588677, waited on hash 0.00 seconds
+LogAssetRegistryGenerator: Display: Generated asset registry num assets 558, size is 158.98kb
+LogShaderLibrary: Display:
+LogShaderLibrary: Display: Shader Library 'Unmatched' (PCD3D_SM5-PCD3D_SM5) Stats:
+LogShaderLibrary: Display: =================
+LogShaderLibrary: Display: Assets: 107, Unique Shadermaps: 103 (96.26%)
+LogShaderLibrary: Display: Total Shaders: 1887, Unique Shaders: 1260 (66.77%)
+LogShaderLibrary: Display: Total Shader Size: 4.88mb, Unique Shaders Size: 3.49mb (71.50%)
+LogShaderLibrary: Display: === Extended info:
+LogShaderLibrary: Display: Minimum number of shaders in shadermap: 1
+LogShaderLibrary: Display: Median number of shaders in shadermap: 10
+LogShaderLibrary: Display: Maximum number of shaders in shadermap: 476
+LogShaderLibrary: Display: Number of shadermaps referencing top 10 most shared shaders:
+LogShaderLibrary: Display:     19, 18, 17, 16, 16, 16, 15, 15, 15, 10
+LogShaderLibrary: Display: Unique shaders itemization (sorted by compressed size):
+LogShaderLibrary: Display: SF_Pixel: 734 shaders (58.25%), compressed size: 2.19 MB (3.05 KB avg per shader), uncompressed size: 7.97 MB (11.12 KB avg per shader)
+LogShaderLibrary: Display: SF_Vertex: 477 shaders (37.86%), compressed size: 1.21 MB (2.59 KB avg per shader), uncompressed size: 3.65 MB (7.83 KB avg per shader)
+LogShaderLibrary: Display: SF_Compute: 49 shaders (3.89%), compressed size: 0.10 MB (2.06 KB avg per shader), uncompressed size: 0.36 MB (7.47 KB avg per shader)
+LogShaderLibrary: Display: Textual dump saved to '../../../../../../Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/Shaders/PCD3D_SM5-PCD3D_SM5/ShaderDebug-Unmatched-PCD3D_SM5-PCD3D_SM5/Dump.txt'
+LogShaderLibrary: Display: =================
+LogCook: Display: Dependent plugin "SteamShared" referenced by "EOS Shared" wasn't found in enabled plugins list when creating cook metadata file... skipping
+LogCook: Display: Dependent plugin "UAF" referenced by "IK Rig" wasn't found in enabled plugins list when creating cook metadata file... skipping
+LogCook: Display: Dependent plugin "UAFAnimGraph" referenced by "IK Rig" wasn't found in enabled plugins list when creating cook metadata file... skipping
+LogCook: Display: Finalize package store(s)...
+LogZenStoreWriter: Display: Flushing...
+LogZenStoreWriter: Display: Saving Zen filesystem manifest 'C:/Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/Cooked/Windows/Unmatched/Metadata/zenfs.manifest'
+LogZenStoreWriter: Display: Output:	50550 Public runtime script objects
+LogCook: Display: Cook by the book total time in tick 2.668083s total time 4.535239
+LogCook: Display: Peak Used virtual 2192 MiB Peak Used physical 2290 MiB
+LogCook: Display: Packages Cooked: 555, Packages Incrementally Skipped: 0, Packages Skipped by Platform: 7, Total Packages: 562
+LogCookStats: Display: Hierarchy Timer Information:
+LogCookStats: Display:   Root: 0.000s (0)
+LogCookStats: Display:     CleanSandbox: 0.019s (1)
+LogCookStats: Display:     CollectFilesToCook: 0.004s (1)
+LogCookStats: Display:       CookModificationDelegate: 0.000s (1)
+LogCookStats: Display:     GenerateLongPackageName: 0.000s (1)
+LogCookStats: Display:     TickMainCookLoop: 2.668s (2)
+LogCookStats: Display:       PumpPollables: 0.000s (2)
+LogCookStats: Display:       PumpRequests: 0.013s (18)
+LogCookStats: Display:       LoadPackageForCooking: 0.791s (3694)
+LogCookStats: Display:       ValidateSourcePackage: 0.000s (562)
+LogCookStats: Display:       SavingPackages: 1.736s (66)
+LogCookStats: Display:         PollPendingCookedPlatformDatas: 0.053s (1948)
+LogCookStats: Display:         PrepareSave: 0.074s (1442)
+LogCookStats: Display:         PrecachePlatformDataForNextPackage: 0.171s (561)
+LogCookStats: Display:           PrepareSave: 0.171s (695)
+LogCookStats: Display:         SaveCookedPackage: 1.428s (562)
+LogCookStats: Display:           GEditorSavePackage: 1.328s (562)
+LogCookStats: Display:             VerifyCanCookPackage: 0.001s (555)
+LogCookStats: Display:           TargetDomainDependencies: 0.064s (562)
+LogCookStats: Display:         ClearAllCachedCookedPlatformData: 0.006s (562)
+LogCookStats: Display:       PostLoadPackageFixup: 0.000s (4)
+LogCookStats: Display:       WaitForAsync: 0.048s (5118)
+LogCookStats: Display:     CookByTheBookFinished: 0.208s (1)
+LogCookStats: Display:       SavingCurrentIniSettings: 0.024s (1)
+LogCookStats: Display:         ProcessingAccessedStrings: 0.002s (1)
+LogCookStats: Display:       ChunkGeneration: 0.008s (1)
+LogCookStats: Display:       FinishPopulateShaderLibrary: 0.000s (1)
+LogCookStats: Display:       CalculateReferencedSet: 0.000s (1)
+LogCookStats: Display:       CookArtifacts.UpdateOplogPackages: 0.002s (1)
+LogCookStats: Display:       PruneShaderLibrary: 0.000s (1)
+LogCookStats: Display:       GeneratorPreSave: 0.000s (1)
+LogCookStats: Display:       BuildChunkManifest: 0.008s (1)
+LogCookStats: Display:         FixupPackageDependenciesForChunks: 0.004s (1)
+LogCookStats: Display:       SaveManifests: 0.000s (1)
+LogCookStats: Display:       SaveAssetRegistry: 0.018s (1)
+LogCookStats: Display:       WriteCookerOpenOrder: 0.001s (1)
+LogCookStats: Display:       WriteCookMetadata: 0.000s (1)
+LogCookStats: Display:       WriteReferencedSet: 0.000s (1)
+LogCookStats: Display:       FinalizePackageStore: 0.132s (1)
+LogCookStats: Display: Misc Cook Stats
+LogCookStats: Display: ===============
+LogCookStats: Display: Validation
+LogCookStats: Display:     Stats=[]
+LogCookStats: Display: Niagara
+LogCookStats: Display:     NiagaraScriptTranslationCount=0
+LogCookStats: Display:     NiagaraCpuScriptCompileCount=0
+LogCookStats: Display:     NiagaraCpuScriptDdcCacheHitCount=0
+LogCookStats: Display:     NiagaraCpuScriptDdcCacheMissCount=0
+LogCookStats: Display:     NiagaraGpuScriptCompileCount=0
+LogCookStats: Display:     NiagaraGpuScriptDdcCacheHitCount=0
+LogCookStats: Display:     NiagaraGpuScriptDdcCacheMissCount=0
+LogCookStats: Display:     NiagaraSystemWaitForCompilationCompleteTime=0.000000
+LogCookStats: Display: ComputeKernelShader.Misc
+LogCookStats: Display:     ShadersCompiled=0
+LogCookStats: Display: NiagaraShader.Misc
+LogCookStats: Display:     ShadersCompiled=0
+LogCookStats: Display: ShaderCompiler
+LogCookStats: Display:     BlockingTimeSec=0.000057
+LogCookStats: Display:     AsyncCompileTimeSec=0.000000
+LogCookStats: Display:     GlobalBeginCompileShaderTimeSec=0.000000
+LogCookStats: Display:     GlobalBeginCompileShaderCalls=0
+LogCookStats: Display:     ProcessAsyncResultsTimeSec=0.000062
+LogCookStats: Display: GlobalShader.Misc
+LogCookStats: Display:     ShadersCompiled=0
+LogCookStats: Display: Material
+LogCookStats: Display:     FinishCacheShadersSec=0.052672
+LogCookStats: Display: Cook.Profile.Params
+LogCookStats: Display:     CookProject=Unmatched
+LogCookStats: Display:     CookCultures=
+LogCookStats: Display:     CookLabel=
+LogCookStats: Display:     TargetPlatforms=Windows
+LogCookStats: Display:     IsCookAll=false
+LogCookStats: Display:     IsCookOnTheFly=false
+LogCookStats: Display:     IsIncrementalCook=false
+LogCookStats: Display:     IsIterativeCook=false
+LogCookStats: Display:     IsFastCook=false
+LogCookStats: Display:     IsUnversioned=true
+LogCookStats: Display: CookOnTheFlyServer.Package.Load
+LogCookStats: Display:     NumRequestedLoads=3317
+LogCookStats: Display:     NumPackagesLoaded=3377
+LogCookStats: Display:     NumInlineLoads=60
+LogCookStats: Display: CookOnTheFlyServer.Package.Save
+LogCookStats: Display:     NumPackagesIncrementallySkipped=0
+LogCookStats: Display: CookOnTheFlyServer.QueueSize
+LogCookStats: Display:     PeakRequest=561
+LogCookStats: Display:     PeakLoad=40
+LogCookStats: Display:     PeakSave=82
+LogCookStats: Display: Package.Load
+LogCookStats: Display:     LoadPackageTimeSec=0.913449
+LogCookStats: Display: Package.Save
+LogCookStats: Display:     NumPackagesSaved=562
+LogCookStats: Display:     SavePackageTimeSec=1.313270
+LogCookStats: Display:     TagPackageExportsPresaveTimeSec=0.000000
+LogCookStats: Display:     TagPackageExportsTimeSec=0.000000
+LogCookStats: Display:     FullyLoadLoadersTimeSec=0.000000
+LogCookStats: Display:     ResetLoadersTimeSec=0.000000
+LogCookStats: Display:     TagPackageExportsGetObjectsWithOuter=0.000000
+LogCookStats: Display:     TagPackageExportsGetObjectsWithMarks=0.000000
+LogCookStats: Display:     SerializeImportsTimeSec=0.000000
+LogCookStats: Display:     SortExportsSeekfreeInnerTimeSec=0.000000
+LogCookStats: Display:     SerializeExportsTimeSec=0.000000
+LogCookStats: Display:     SerializeBulkDataTimeSec=0.001850
+LogCookStats: Display:     AsyncWriteTimeSec=0.000000
+LogCookStats: Display:     MBWritten=0.000000
+LogCookStats: Display: Package.DifferentPackagesSizeMBPerAsset
+LogCookStats: Display: Package.NumberOfDifferencesInPackagesPerAsset
+LogCookStats: Display: Package.PackageDifferencesSizeMBPerAsset
+LogCookStats: Display: Package.DiffTotal
+LogCookStats: Display:     NumberOfDifferentPackages=0
+LogCookStats: Display:     DifferentPackagesSizeMB=0.000000
+LogCookStats: Display:     NumberOfDifferencesInPackages=0
+LogCookStats: Display:     PackageDifferencesSizeMB=0.000000
+LogCookStats: Display: UnversionedProperties
+LogCookStats: Display:     SavedStructs=0
+LogCookStats: Display:     SavedMB=0
+LogCookStats: Display:     EquivalentTaggedMB=0
+LogCookStats: Display:     CompressionRatio=-nan(ind)
+LogCookStats: Display:     BitfieldWasteKB=0
+LogCookStats: Display:
+LogCookStats: Display: Cook Profile
+LogCookStats: Display: ============
+LogCookStats: Display:  0.CookWallTimeSec=10.833524
+LogCookStats: Display:  0. 0.StartupWallTimeSec=6.163516
+LogCookStats: Display:  0. 1.CookProcessingTime=4.670008
+LogCookStats: Display:  0. 1. 1.StartCookByTheBookTimeSec=1.772231
+LogCookStats: Display:  0. 1. 1. 0.BlockOnAssetRegistryTimeSec=0.983615
+LogCookStats: Display:  0. 1. 1. 1.GameCookModificationDelegateTimeSec=0.000021
+LogCookStats: Display:  0. 1. 2.TickCookOnTheSideTimeSec=0.105597
+LogCookStats: Display:  0. 1. 2. 0.TickCookOnTheSideLoadPackagesTimeSec=0.791084
+LogCookStats: Display:  0. 1. 2. 1.TickCookOnTheSideSaveCookedPackageTimeSec=1.427785
+LogCookStats: Display:  0. 1. 2. 1. 0.TickCookOnTheSideResolveRedirectorsTimeSec=0.000000
+LogCookStats: Display:  0. 1. 2. 2.TickCookOnTheSidePrepareSaveTimeSec=0.245195
+LogCookStats: Display:  0. 1. 3.TickLoopGCTimeSec=0.019203
+LogCookStats: Display:  0. 1. 4.TickLoopRecompileShaderRequestsTimeSec=0.000000
+LogCookStats: Display:  0. 1. 5.TickLoopShaderProcessAsyncResultsTimeSec=0.000003
+LogCookStats: Display:  0. 1. 6.TickLoopProcessDeferredCommandsTimeSec=0.000001
+LogCookStats: Display:  0. 1. 7.TickLoopTickCommandletStatsTimeSec=0.000000
+LogCookStats: Display:  0. 1. 8.TickLoopFlushRenderingCommandsTimeSec=0.000086
+LogCookStats: Display:  0. 1. 9.ShaderFlushTimeSec=0.000000
+LogCookStats: Display:  0. 1. 10.ValidationTimeSec=0.000068
+LogCookStats: Display:
+LogCookStats: Display: DDC Summary Stats
+LogCookStats: Display: =================
+LogCookStats: Display: BackEnd         = Installed
+LogCookStats: Display: HasLocalCache   =      true
+LogCookStats: Display: HasSharedCache  =     false
+LogCookStats: Display: HasCloudCache   =     false
+LogCookStats: Display: HasZenCache     =      true
+LogCookStats: Display: TotalGetHits    =      4069
+LogCookStats: Display: TotalGetMisses  =         0
+LogCookStats: Display: TotalGets       =      4069
+LogCookStats: Display: TotalGetHitPct  =  1.000000
+LogCookStats: Display: GetMissPct      =  0.000000
+LogCookStats: Display: TotalPutHits    =         0
+LogCookStats: Display: TotalPutMisses  =         0
+LogCookStats: Display: TotalPuts       =         0
+LogCookStats: Display: TotalPutHitPct  =  0.000000
+LogCookStats: Display: PutMissPct      =  0.000000
+LogCookStats: Display: LocalGetHits    =      3267
+LogCookStats: Display: LocalGetMisses  =         0
+LogCookStats: Display: LocalGetTotal   =      3267
+LogCookStats: Display: LocalGetHitPct  =  1.000000
+LogCookStats: Display: SharedGetHits   =         0
+LogCookStats: Display: SharedGetTotal  =         0
+LogCookStats: Display: SharedGetHitPct =  0.000000
+LogCookStats: Display: ZenLocalGetHits =      3267
+LogCookStats: Display: ZenLocalGetTotal=      3267
+LogCookStats: Display: ZenLocalGetHitPct=  1.000000
+LogCookStats: Display: ZenRemoteGetHits=         0
+LogCookStats: Display: ZenRemoteGetTotal=         0
+LogCookStats: Display: ZenRemoteGetHitPct=  0.000000
+LogCookStats: Display: ZenRemoteReadSpeed=  0.000000
+LogCookStats: Display: ZenRemoteWriteSpeed=  0.000000
+LogCookStats: Display: ZenRemoteLatency=  0.000000
+LogCookStats: Display: CloudGetHits    =         0
+LogCookStats: Display: CloudGetTotal   =         0
+LogCookStats: Display: CloudGetHitPct  =  0.000000
+LogCookStats: Display: LocalLatency    =  0.108011
+LogCookStats: Display: LocalReadSpeed  = 11.978723
+LogCookStats: Display: LocalWriteSpeed =  0.000000
+LogCookStats: Display: SharedLatency   =  0.000000
+LogCookStats: Display: SharedReadSpeed =  0.000000
+LogCookStats: Display: SharedWriteSpeed=  0.000000
+LogCookStats: Display: CloudLatency    =  0.000000
+LogCookStats: Display: CloudReadSpeed  =  0.000000
+LogCookStats: Display: CloudWriteSpeed =  0.000000
+LogCookStats: Display:
+LogCookStats: Display: DDC Resource Stats
+LogCookStats: Display: =======================================================================================================
+LogCookStats: Display: Asset Type                          Total Time (Sec)  GameThread Time (Sec)  Assets Built  MB Processed
+LogCookStats: Display: ----------------------------------  ----------------  ---------------------  ------------  ------------
+LogCookStats: Display: BulkDataList                                    0.92                   0.00             0          0.57
+LogCookStats: Display: Texture                                         0.11                   0.00             0          8.82
+LogCookStats: Display: MaterialShader                                  0.09                   0.04             0          5.84
+LogCookStats: Display: GlobalShader                                    0.03                   0.03             0         11.85
+LogCookStats: Display: STREAMEDAUDIO                                   0.01                   0.00             0          0.09
+LogCookStats: Display: StaticMesh                                      0.01                   0.00             0          0.91
+LogCookStats: Display: CardRepresentation                              0.01                   0.00             0          0.02
+LogCookStats: Display: NavCollision                                    0.00                   0.00             0          0.04
+LogCookStats: Display: AnimationSequence                               0.00                   0.00             0          0.00
+LogCookStats: Display: SkeletalMesh                                    0.00                   0.00             0          0.56
+LogCookStats: Display: Audio                                           0.00                   0.00             0          0.08
+LogCookStats: Display: BodySetup                                       0.00                   0.00             0          0.31
+LogCookStats: Display: CKERSM                                          0.00                   0.00             0          0.05
+LogCookStats: Display:
+LogCookStats: Display: Accumulated DDC Resource Stats Per Asset Type
+LogCookStats: Display: =======================================================================================================
+LogCookStats: Display: AnimationSequence                               0.00                   0.00             0          0.00
+LogCookStats: Display: Audio                                           0.00                   0.00             0          0.08
+LogCookStats: Display: CardRepresentation                              0.01                   0.00             0          0.02
+LogCookStats: Display: DistanceField                                   0.00                   0.00             0          0.00
+LogCookStats: Display: MaterialShader                                  0.09                   0.04             0          5.84
+LogCookStats: Display: MaterialTranslation                             0.00                   0.00             0          0.00
+LogCookStats: Display: NiagaraScript                                   0.00                   0.00             0          0.00
+LogCookStats: Display: SkeletalMesh                                    0.00                   0.00             0          0.56
+LogCookStats: Display: StaticMesh                                      0.01                   0.00             0          0.91
+LogCookStats: Display: Texture                                         0.11                   0.00             0          8.82
+LogCookStats: Display: Other                                           0.96                   0.03             0         12.91
+LogPackageBuildDependencyTracker: Display: Package Accesses (275 referencing packages with a total of 1947 unique accesses)
+LogConfigBuildDependencyTracker: Display: Config Accesses (318 referencing packages with a total of 667 unique accesses). 1751 unique accesses that were not associated with a package.
+LogCook: Display: ---- Finalisation: End ----
+LogCook: Display: Done!
+LogSavePackage: Display: Took 0.000366s to verify the EDL loading graph.
+LogInit: Display:
+LogInit: Display: Success - 0 error(s), 0 warning(s)
+LogInit: Display:
+
+Execution of commandlet took:  4.67 seconds, PeakPhysMemoryMB=2290 MB, PeakVirtMemoryMB=2192 MB
+LogToolsetRegistry: Display: Unregistering Toolset ToolsetRegistry.AgentSkillToolset
+LogToolsetRegistry: Display: Unregistering Toolset AutomationTestToolset.AutomationTestToolset
+LogToolsetRegistry: Display: Unregistering Toolset SlateInspectorToolset.SlateInspectorToolset
+LogAssetRegistry: Display: CleanupOrphanedCacheFiles (PostWrite): 1 .ref files found, 1 referenced binaries
+LogAssetRegistry: Display: CleanupOrphanedCacheFiles: 1 total binaries, 1 referenced (kept), 0 old-style pre-migration (kept), 0 orphans deleted, 0 orphans locked (kept)
+LogStreaming: Display: ============ Loader Stats ============
+LogStreaming: Display: Unique Partial Flushes: 0
+LogStreaming: Display: ============ Loader Stats End ============
+LogShaderCompilers: Display: Exiting ShaderCompilingThread
+Took 12,44s to run UnrealEditor-Cmd.exe, ExitCode=0
+Cook command time: 12.51 s
+********** COOK COMMAND COMPLETED **********
+********** STAGE COMMAND STARTED **********
+Creating Staging Manifest...
+Patching bootstrap executable; C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Intermediate\Staging\Unmatched.exe
+Begin update resource 'C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Intermediate\Staging\Unmatched.exe' (0)
+Add resource 101, length 104 (True)
+Add resource 1, length 1996 (True)
+Add resource 2, length 2447 (True)
+Add resource 3, length 2535 (True)
+Add resource 4, length 3037 (True)
+Add resource 5, length 3244 (True)
+Add resource 6, length 3531 (True)
+Add resource 7, length 6931 (True)
+Add resource 201, length 78 (True)
+Add resource 202, length 20 (True)
+Add resource 205, length 2 (True)
+End update resource (True/0)
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Localization\Keywords.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Localization\Category.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Localization\Editor.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Localization\Engine.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BasePakFileRules.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseEditor.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseLightmass.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Windows\WindowsEditorSettings.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Windows\WindowsEditorPerProjectUserSettings.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseSourceControlSettings.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseEditorSettings.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseEditorKeyBindings.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Localization\PortableObjectImport.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Localization\PortableObjectExport.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Localization\RepairData.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Localization\PropertyNames.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Localization\ToolTips.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Localization\WordCount.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseUnrealInsightsSettings.ini
+Excluding config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseEditorPerProjectUserSettings.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseEngine.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Windows\BaseWindowsGame.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Windows\BaseWindowsEngine.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\VulkanPC\DataDrivenPlatformInfo.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseCompat.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Base.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Windows\WindowsInput.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Windows\WindowsGame.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\ConsoleVariables.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\ConfigRedirects.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseGameUserSettings.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseGame.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Windows\BaseWindowsInput.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Layouts\UE4ClassicLayout.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Layouts\DefaultLayout.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\PluginBase.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseInstallBundle.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseDeviceProfiles.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseScalability.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseRuntimeOptions.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseMaterialExpressions.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseInput.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\BaseHardware.ini
+Including config file C:\Program Files\Epic Games\UE_5.8\Engine\Config\Windows\DataDrivenPlatformInfo.ini
+Excluding config file C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Config\DefaultEditorPerProjectUserSettings.ini
+Including config file C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Config\DefaultGameUserSettings.ini
+Including config file C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Config\DefaultEngine.ini
+Including config file C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Config\DefaultInput.ini
+Including config file C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Config\DefaultGame.ini
+Reading oplog from Zen...
+Running UnrealPak with arguments: "C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject" IoStore -StartZenServerForStage -SponsorProcessID=47536 -ProjectStore="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows\ue.projectstore" -unattended
+Running: C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealPak.exe "C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject" IoStore -StartZenServerForStage -SponsorProcessID=47536 -ProjectStore="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows\ue.projectstore" -unattended
+LogStreaming: Display: AsyncLoading2 - Created: Async Loading Thread: false, Async Post Load: false, Multithreaded: false
+LogPakFile: Display: ProjectDir: ../../../../../../Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/
+LogIoStore: Display: ==================== IoStore Utils ====================
+LogIoStore: Display: Using command line for crypto configuration
+LogZenServiceInstance: Display: Launching zen utility 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/zen.exe service status'.
+LogZenServiceInstance: Display: Writing plugin version info to 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zen_plugin_versions.json'
+LogZenServiceInstance: Display: Read zen version cache file from 'C:/Users/ren/AppData/Local/UnrealEngine/5.8/Saved/Zen/zen.version', version: '5.8.13-202605190912-windows-x64-release-094f62c2'
+LogZenServiceInstance: Display: Read zen version cache file from 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zen.version', version: '5.8.13-202605190912-windows-x64-release-094f62c2'
+LogZenServiceInstance: Display: Installed service at 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zenserver.exe' is up to date
+LogZenServiceInstance: Display: Launching executable 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zenserver.exe', working dir 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install', data dir 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Data', args '--port 8558 --data-dir C:\Users\ren\AppData\Local\UnrealEngine\Common\Zen\Data --http asio --gc-cache-duration-seconds 1209600 --gc-interval-seconds 21600 --gc-low-diskspace-threshold 2147483648 --cache-bucket-limit-overwrites --quiet --restrict-content-types --allow-external-oidctoken-exe=false --plugins-config "C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zen_plugins_v1.json" --security-config-path "C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/security-config.json" --owner-pid 42956  --child-id Zen_42956_Startup'
+LogZenServiceInstance: Display: Unreal Zen Storage Server HTTP service at http://[::1]:8558 status: OK!.
+LogZenServiceInstance: Display: Unreal Zen Storage Server HTTP service at http://[::1]:8558 status: OK!.
+LogPakFile: Display: UnrealPak executed in 3.807411 seconds
+Took 4,01s to run UnrealPak.exe, ExitCode=0
+Reading oplog from http://[::1]:8558/prj/Unmatched.f29147c9/oplog/Windows/entries?trim_by_referencedset=true
+Parsed 557 package entries from oplog.
+Cleaning Stage Directory: C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\StagedBuilds\Windows
+Creating pak using staging manifest.
+DumpManifest: C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\PrePak_Windows_NonUFSFiles.txt, NumItems: 34
+DumpManifest: C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\PrePak_Windows_NonUFSFilesDebug.txt, NumItems: 6
+DumpManifest: C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\PrePak_Windows_UFSFiles.txt, NumItems: 2366
+No matching platform for PakFileRules for Section ExcludeContentForMobile : Windows
+Using 0 pak order files:
+Running UnrealPak with arguments: "C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject"  -cryptokeys="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows\Unmatched\Metadata\Crypto.json" -unattended -patchpaddingalign=2048 -compressionformats=Oodle -compresslevel=4 -compressmethod=Kraken  -ProjectStore="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows\ue.projectstore" -platform=Windows  -CreateMultiple="C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\PakCommands.txt"
+Running: C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealPak.exe "C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject"  -cryptokeys="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows\Unmatched\Metadata\Crypto.json" -unattended -patchpaddingalign=2048 -compressionformats=Oodle -compresslevel=4 -compressmethod=Kraken  -ProjectStore="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows\ue.projectstore" -platform=Windows  -CreateMultiple="C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\PakCommands.txt"
+OodleDataCompression: Display: Oodle v2.9.16 format for pak/iostore with method=Kraken, level=4=Normal
+LogStreaming: Display: AsyncLoading2 - Created: Async Loading Thread: false, Async Post Load: false, Multithreaded: false
+LogPakFile: Display: ProjectDir: ../../../../../../Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/
+LogPakFile: Display: Parsing crypto keys from a crypto key cache file
+LogPakFile: Display: CompressionFormats in priority order: Oodle, Zlib
+LogZenServiceInstance: Display: Launching zen utility 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/zen.exe service status'.
+LogZenServiceInstance: Display: Writing plugin version info to 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zen_plugin_versions.json'
+LogZenServiceInstance: Display: Read zen version cache file from 'C:/Users/ren/AppData/Local/UnrealEngine/5.8/Saved/Zen/zen.version', version: '5.8.13-202605190912-windows-x64-release-094f62c2'
+LogZenServiceInstance: Display: Read zen version cache file from 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zen.version', version: '5.8.13-202605190912-windows-x64-release-094f62c2'
+LogZenServiceInstance: Display: Installed service at 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zenserver.exe' is up to date
+LogZenServiceInstance: Display: Unreal Zen Storage Server HTTP service at http://[::1]:8558 status: OK!.
+LogZenStore: Display: Opening oplog Unmatched.f29147c9 / Windows
+LogIoStore: Display: Fetched 558 oplog items from Zen in 0.54 seconds
+LogIoStore: Display: Parsed 558 oplog items 0.01 seconds, 3447 chunks
+LogIoStore: Display: Loaded 590 chunk hashes from Zen in 0.00 seconds, 590 hashes updated in 0.00 seconds
+LogPakFile: Display: Oodle enabled on 'NoPluginCompression' files
+LogPakFile: Display: Loading response file C:\Program Files\Epic Games\UE_5.8\Engine\Programs\AutomationTool\Saved\ResponseFiles\PakList_Unmatched-Windows.txt
+LogPakFile: Display: Added 1774 entries to add to pak file.
+LogPakFile: Display: Collecting files to add to pak file...
+LogPakFile: Display: Collected 1774 files in 0.00s.
+LogPakFile: Display: Creating pak C:/Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched/Content/Paks/Unmatched-Windows.pak.
+LogPakFile: Display: Created pak file: C:/Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched/Content/Paks/Unmatched-Windows.pak
+LogPakFile: Display: CompressionFormat 0 [Oodle] : 402 files, 24089755 -> 9208236 bytes
+LogPakFile: Display: CompressionFormat 2 [None] : 1372 files, 808929 -> 808929 bytes
+LogPakFile: Display: Added 1774 files, 10701424 bytes total
+LogPakFile: Display: PrimaryIndex size: 24390 bytes
+LogPakFile: Display: PathHashIndex size: 58388 bytes
+LogPakFile: Display: FullDirectoryIndex size: 61050 bytes
+LogPakFile: Display: Compression summary: 38.22% of original size. Compressed Size 9208236 bytes, Original Size 24089755 bytes.
+LogPakFile: Display: Encryption - DISABLED
+LogPakFile: Display:
+LogPakFile: Display: Writer and Compression Threads exited.
+LogPakFile: Display: UnrealPak executed in 0.647593 seconds
+Took 0,84s to run UnrealPak.exe, ExitCode=0
+Running UnrealPak with arguments: "C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject" C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject -CreateGlobalContainer="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched\Content\Paks\global.utoc" -ProjectStore="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows\ue.projectstore" -CookedDirectory="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows" -Commands="C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\IoStoreCommands.txt" -patchpaddingalign=2048 -compressionformats=Oodle -compresslevel=4 -compressmethod=Kraken   -cryptokeys="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows\Unmatched\Metadata\Crypto.json" -compressionMinBytesSaved=1024 -compressionMinPercentSaved=5 -WriteBackMetadataToAssetRegistry=Disabled -platform=Windows  -unattended
+Running: C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealPak.exe "C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject" C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Unmatched.uproject -CreateGlobalContainer="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched\Content\Paks\global.utoc" -ProjectStore="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows\ue.projectstore" -CookedDirectory="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows" -Commands="C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\IoStoreCommands.txt" -patchpaddingalign=2048 -compressionformats=Oodle -compresslevel=4 -compressmethod=Kraken   -cryptokeys="C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows\Unmatched\Metadata\Crypto.json" -compressionMinBytesSaved=1024 -compressionMinPercentSaved=5 -WriteBackMetadataToAssetRegistry=Disabled -platform=Windows  -unattended
+OodleDataCompression: Display: Oodle v2.9.16 format for pak/iostore with method=Kraken, level=4=Normal
+LogStreaming: Display: AsyncLoading2 - Created: Async Loading Thread: false, Async Post Load: false, Multithreaded: false
+LogPakFile: Display: ProjectDir: ../../../../../../Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/
+LogIoStore: Display: ==================== IoStore Utils ====================
+LogIoStore: Display: Parsing crypto keys from a crypto key cache file 'C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows\Unmatched\Metadata\Crypto.json'
+LogIoStore: Display: Container signing - DISABLED
+LogIoStore: Display: Directory index - ENABLED
+LogIoStore: Display: Using compression format 'Oodle'
+LogConfig: Display: Read in platform Windows ini files took 0.03 seconds
+LogIoStore: Display: Using memory mapping alignment '16384'
+LogIoStore: Display: Using compression block size '65536'
+LogIoStore: Display: Using compression block alignment '2048'
+LogIoStore: Display: Using compression min bytes saved '1024'
+LogIoStore: Display: Using compression min percent saved '5'
+LogIoStore: Display: Using max partition size '0'
+LogIoStore: Display: Not using DDC for compression
+LogIoStore: Display: Container metadata disabled
+LogIoStore: Display: Using command list file: 'C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\IoStoreCommands.txt'
+LogIoStore: Display: Selected Oodle level 4 (Normal) from command line for shaders
+LogZenServiceInstance: Display: Launching zen utility 'C:/Program Files/Epic Games/UE_5.8/Engine/Binaries/Win64/zen.exe service status'.
+LogZenServiceInstance: Display: Writing plugin version info to 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zen_plugin_versions.json'
+LogZenServiceInstance: Display: Read zen version cache file from 'C:/Users/ren/AppData/Local/UnrealEngine/5.8/Saved/Zen/zen.version', version: '5.8.13-202605190912-windows-x64-release-094f62c2'
+LogZenServiceInstance: Display: Read zen version cache file from 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zen.version', version: '5.8.13-202605190912-windows-x64-release-094f62c2'
+LogZenServiceInstance: Display: Installed service at 'C:/Users/ren/AppData/Local/UnrealEngine/Common/Zen/Install/zenserver.exe' is up to date
+LogZenServiceInstance: Display: Unreal Zen Storage Server HTTP service at http://[::1]:8558 status: OK!.
+LogZenStore: Display: Opening oplog Unmatched.f29147c9 / Windows
+LogIoStore: Display: Fetched 558 oplog items from Zen in 0.74 seconds
+LogIoStore: Display: Parsed 558 oplog items 0.00 seconds, 3447 chunks
+LogIoStore: Display: Loaded 590 chunk hashes from Zen in 0.00 seconds, 590 hashes updated in 0.00 seconds
+LogIoStore: Display: Searching for cooked assets in folder 'C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\Cooked\Windows'
+LogIoStore: Display: Found '4' files
+LogIoStore: Display: Creating container targets...
+LogIoStore: Display: Processing shader libraries, compressing with Oodle Mermaid, level 4 (Normal)
+LogIoStore: Display: Shader library chunk override is disabled
+LogShaderLibrary: Display: Created IoStoreShaderArchive header: shaders grouped in 172 groups (75 of them didn't need new indices), average uncompressed size 72983 bytes, min 502 bytes, max 953692 bytes (r.ShaderCodeLibrary.MaxShaderGroupSize=1048576)
+LogIoStore: Display: Unmatched-PCD3D_SM5(PCD3D_SM5): Recompressed 1260 shaders as 172 groups. Library size changed from 3575 KB (3.43 : 1 ratio) to 1482 KB (8.27 : 1 ratio), 41.47% of previous.
+LogIoStore: Display: Save IoStoreShaderCodeArchive 'Unmatched-PCD3D_SM5-PCD3D_SM5' with ChunkId '6b7f1091bacba9d000000008' for target file 'C:/Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/Cooked/Windows/Unmatched/Content/ShaderArchive-Unmatched-PCD3D_SM5-PCD3D_SM5.ushaderbytecode'
+LogShaderLibrary: Display: Created IoStoreShaderArchive header: shaders grouped in 382 groups (158 of them didn't need new indices), average uncompressed size 141073 bytes, min 249 bytes, max 1038208 bytes (r.ShaderCodeLibrary.MaxShaderGroupSize=1048576)
+LogIoStore: Display: Global-PCD3D_SM5(PCD3D_SM5): Recompressed 3926 shaders as 382 groups. Library size changed from 11885 KB (4.43 : 1 ratio) to 5220 KB (10.08 : 1 ratio), 43.93% of previous.
+LogIoStore: Display: Save IoStoreShaderCodeArchive 'Global-PCD3D_SM5-PCD3D_SM5' with ChunkId 'c3fad98e7ca0cc3100000008' for target file 'C:/Users/ren/.codex/worktrees/glm-s09-hud-flow/unmached/unreal/Unmatched/Saved/Cooked/Windows/Unmatched/Content/ShaderArchive-Global-PCD3D_SM5-PCD3D_SM5.ushaderbytecode'
+LogIoStore: Display: Shaders processed in 0.06 seconds
+LogIoStore: Display: Initialized WriteRequestManager with MaxConcurrentSourceReads=16 (32 cores), MaxSourceBufferMemory=3072MiB
+LogIoStore: Display: Processing redirects...
+LogIoStore: Display: Creating disk layout...
+LogIoStore: Display: Ordered 555 packages using fallback bundle order
+LogIoStore: Display: Disabled WriteRequestManager memory throttling, MaxConcurrentSourceReads=16 (32 cores)
+LogIoStore: Display: Writing container(s)...
+LogIoStore: Display: Writing and compressing took 0.13 seconds, writes to disk took 0.07 seconds for 127,109,760 bytes @ 1,708,152,273 bytes per second.
+LogIoStore: Display: global: Found perfect hashmap for 1 items.
+LogIoStore: Display: Unmatched-Windows: Found perfect hashmap for 1147 items.
+LogIoStore: Display: Finalize took 0.0 seconds for 2 writers to write 129,415 bytes, 44,781,862 bytes per second
+LogIoStore: Display: Writing tocs... [Physical: 641 MiB, Virtual: 3453 MiB]
+LogIoStore: Display: 590 / 1,148 hashes were loaded from the hash database, by type:
+LogIoStore: Display:     ExportBundleData           555
+LogIoStore: Display:     BulkData                   35
+LogIoStore: Display: 590 / 1,148 chunks attempted to compress, by type:
+LogIoStore: Display:     ExportBundleData           555 / 555
+LogIoStore: Display:     BulkData                   35 / 35
+LogIoStore: Display:     ScriptObjects              0 / 1
+LogIoStore: Display:     ContainerHeader            0 / 1
+LogIoStore: Display:     ShaderCodeLibrary          0 / 2
+LogIoStore: Display:     ShaderCode                 0 / 554
+LogIoStore: Display: Source bytes read:
+LogIoStore: Display:     Zen:                        164,405,997
+LogIoStore: Display:         ExportBundleData        156,655,273 bytes over 555 reads
+LogIoStore: Display:         BulkData                  7,750,724 bytes over 35 reads
+LogIoStore: Display:     Loose File:                           0
+LogIoStore: Display:     Memory:                      14,026,396
+LogIoStore: Display:         ShaderCodeLibrary           297,288 bytes over 4 reads
+LogIoStore: Display:         ShaderCode               13,729,108 bytes over 1,108 reads
+LogIoStore: Display: Calculating stats...
+LogIoStore: Display:
+LogIoStore: Display: Container Summary
+LogIoStore: Display: ==================
+LogIoStore: Display:
+LogIoStore: Display:            Container      Flags      Chunk(s) #       TOC (KiB)       Raw Size (MiB)           Size (MiB)
+LogIoStore: Display: ---------------------------------------------------------------------------------------------------------
+LogIoStore: Display:               global  -/-/-/-/-               1            0.79                 3.18                 3.18 -
+LogIoStore: Display:    Unmatched-Windows  C/-/-/I/-            1147          125.59               164.11               118.04 (28.07% Oodle)
+LogIoStore: Display: ---------------------------------------------------------------------------------------------------------
+LogIoStore: Display:                Total                       1148          126.38               167.29               121.22
+LogIoStore: Display:
+LogIoStore: Display: ** Flags: (C)ompressed / (E)ncrypted / (S)igned) / (I)ndexed) / (O)nDemand **
+LogIoStore: Display:
+LogIoStore: Display: Compression block padding:     0.61 MiB
+LogIoStore: Display:
+LogIoStore: Display: Container Directory Index
+LogIoStore: Display: ==========================
+LogIoStore: Display:
+LogIoStore: Display:            Container      Size (KiB)
+LogIoStore: Display: ------------------------------------
+LogIoStore: Display:               global            0.00
+LogIoStore: Display:    Unmatched-Windows           29.33
+LogIoStore: Display:
+LogIoStore: Display: Container Patch Report
+LogIoStore: Display: ========================
+LogIoStore: Display:
+LogIoStore: Display:            Container          Total #       Modified #          Added #   Modified (MiB)      Added (MiB)
+LogIoStore: Display: ---------------------------------------------------------------------------------------------------------
+LogIoStore: Display:               global                1                0                0             0.00             0.00
+LogIoStore: Display:    Unmatched-Windows             1147                0             1147             0.00           117.43
+LogIoStore: Display: ---------------------------------------------------------------------------------------------------------
+LogIoStore: Display:
+LogIoStore: Display: PackageStore
+LogIoStore: Display: =============
+LogIoStore: Display:
+LogIoStore: Display:            Container      Size (KiB)      Packages #     Localized #
+LogIoStore: Display: --------------------------------------------------------------------
+LogIoStore: Display:    Unmatched-Windows              14             555               0
+LogIoStore: Display: --------------------------------------------------------------------
+LogIoStore: Display:                Total              14             555               0
+LogIoStore: Display:
+LogIoStore: Display:
+LogIoStore: Display: Input:       555 Packages
+LogIoStore: Display: Input:         0   B UExp
+LogIoStore: Display: Input:    149.40 MiB UAsset
+LogIoStore: Display: Input:      7.39 MiB UBulk
+LogIoStore: Display: Input:      5.10 MiB for 382 Global shaders
+LogIoStore: Display: Input:    312.20 KiB for 84 Shared shaders
+LogIoStore: Display: Input:         0   B for 0 Unique shaders
+LogIoStore: Display: Input:      1.14 MiB for 88 Inline shaders
+LogIoStore: Display:
+LogIoStore: Display: Output:      604 Imported package entries
+LogIoStore: Display: Output:      325 Packages without imports
+LogIoStore: Display: Output:        0 Public runtime script objects
+LogIoStore: Display: Output:     3.18 MiB InitialLoadData
+LogIoStore: Display:
+LogIoStore: Display: Success
+LogPakFile: Display: UnrealPak executed in 1.019070 seconds
+Took 1,23s to run UnrealPak.exe, ExitCode=0
+DumpManifest: C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\FinalCopyWin64_UFSFiles.txt, NumItems: 2367
+DumpManifest: C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\FinalCopyWin64_NonUFSFiles.txt, NumItems: 34
+DumpManifest: C:\Users\ren\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.8\FinalCopyWin64_NonUFSFilesDebug.txt, NumItems: 6
+Copying NonUFSFiles to staging directory: C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\StagedBuilds\Windows
+Copying DebugFiles to staging directory: C:\Users\ren\.codex\worktrees\glm-s09-hud-flow\unmached\unreal\Unmatched\Saved\StagedBuilds\Windows
+Stage command time: 33.38 s
+********** STAGE COMMAND COMPLETED **********
+********** PACKAGE COMMAND STARTED **********
+Package command time: 0.00 s
+********** PACKAGE COMMAND COMPLETED **********
+BuildCookRun time: 60.71 s
+BUILD SUCCESSFUL
+AutomationTool executed for 0h 1m 1s
+AutomationTool exiting with ExitCode=0 (Success)

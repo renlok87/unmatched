@@ -13,7 +13,7 @@
 
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit, Optional } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
+import { Job, Queue } from 'bullmq';
 import { PrismaService } from '../../database/prisma.service';
 import { GameStateService, GameState } from '../game-state.service';
 import { DistributedLockService } from '../../common/services/distributed-lock.service';
@@ -58,7 +58,11 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
   private static readonly DEFAULT_DEFENSE_TIMEOUT = DEFENSE_TIMEOUT_SECONDS;
   private static readonly DEFAULT_RESOLVE_TIMEOUT = RESOLVE_TIMEOUT_SECONDS;
   private static readonly RECOVERY_SWEEP_INTERVAL_MS = 60_000;
-  private readonly SCHEDULED_JOB_PREFIX = 'combat:scheduled:';
+  // BullMQ forbids ':' in custom job ids ('Custom Id cannot contain :'),
+  // which made every attack fail at scheduleAutoResolve against a live
+  // queue (S07 specs ran on a mocked queue and missed it). cuid gameIds and
+  // the stage token contain no '-', so the id stays unambiguous.
+  private readonly SCHEDULED_JOB_PREFIX = 'combat-scheduled-';
   private recoveryTimer: ReturnType<typeof setInterval> | null = null;
 
   /** Часы сервиса. Публичное поле для clock-injectable тестов (GD-026):
@@ -132,19 +136,20 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
       }
       const deadline = this.deadlineOf(state);
       const remainingMs = deadline - this.now().getTime();
+      const stage = state.phase === GamePhase.COMBAT ? 'DEFENSE' : 'RESOLVE';
       if (remainingMs <= 0) {
         const result = await this.processAutoResolve({
           gameId: row.gameId,
           attackSequenceNumber: state.sequenceNumber,
-          stage: state.phase === GamePhase.COMBAT ? 'DEFENSE' : 'RESOLVE',
+          stage,
         });
         if (result.success) recovered++;
-      } else if (!(await this.hasScheduledAutoResolve(row.gameId))) {
+      } else if (!(await this.hasCurrentScheduledWork(row.gameId, stage, state.sequenceNumber))) {
         await this.scheduleAutoResolve(
           row.gameId,
           Math.ceil(remainingMs / 1000),
           state.sequenceNumber,
-          state.phase === GamePhase.COMBAT ? 'DEFENSE' : 'RESOLVE',
+          stage,
         );
         rescheduled++;
       }
@@ -169,14 +174,14 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
   /**
    * Запланировать auto-resolve через N секунд
    *
-   * JobId — stage-специфичный (`combat:scheduled:<gameId>:<stage>`).
+   * JobId — stage-специфичный (`combat-scheduled-<gameId>-<stage>`).
    * Общий id на обе стадии создавал race: remove() АКТИВНОЙ джобы
    * предыдущей стадии бросает, а BullMQ add с существующим jobId молча
    * возвращает старую джобу — RESOLVE-дедлайн оказывался не запланирован.
-   * Теперь: защита планирует `:RESOLVE` независимо от `:DEFENSE`; устаревшая
+   * Теперь: защита планирует `-RESOLVE` независимо от `-DEFENSE`; устаревшая
    * джоба своей стадии (waiting/delayed) снимается перед перепланированием;
-   * remove() активной джобы СВОЕЙ стадии безвреден — она уже исполняется и
-   * прочитает персистентный deadline из состояния, а не свой delay.
+   * если старую активную джобу снять нельзя, текущая атака получает отдельный
+   * id с sequenceNumber.
    */
   async scheduleAutoResolve(
     gameId: string,
@@ -204,65 +209,141 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
       stage,
     };
 
-    await this.combatTimeoutQueue.add('auto-resolve', jobData, {
+    const options = {
       jobId,
       delay: delaySeconds * 1000,
       attempts: 3,
       backoff: { type: 'exponential', delay: 1000 },
       removeOnComplete: { count: 10 },
       removeOnFail: { count: 50 },
-    });
+    };
+    const scheduled = await this.combatTimeoutQueue.add('auto-resolve', jobData, options);
+
+    // BullMQ silently returns the old job when its id is still occupied (most
+    // notably by an active job, which remove() cannot remove). Give this
+    // attack its own id so a previous attack cannot swallow the new deadline.
+    if (!(await this.isCurrentPendingJob(scheduled, gameId, stage, jobData.attackSequenceNumber))) {
+      const sequenceJobId = this.sequenceJobIdFor(gameId, stage, jobData.attackSequenceNumber);
+      const previous = await this.combatTimeoutQueue.getJob(sequenceJobId);
+      if (previous) {
+        if (await this.isCurrentPendingJob(previous, gameId, stage, jobData.attackSequenceNumber)) return;
+        await previous.remove();
+      }
+      const fallback = await this.combatTimeoutQueue.add('auto-resolve', jobData, { ...options, jobId: sequenceJobId });
+      if (!(await this.isCurrentPendingJob(fallback, gameId, stage, jobData.attackSequenceNumber))) {
+        throw new Error(`Could not schedule current ${stage} timeout for ${gameId}`);
+      }
+    }
 
     this.logger.debug(`Scheduled auto-resolve (${stage}) for game ${gameId} in ${delaySeconds}s`);
   }
 
   async cancelAutoResolve(gameId: string): Promise<void> {
-    for (const stage of ['DEFENSE', 'RESOLVE'] as const) {
-      const jobId = this.jobIdFor(gameId, stage);
+    // The current timeout may have a sequence id when an older active job
+    // occupies the base id. Query pending jobs so cancellation also finds
+    // that fallback after a service restart; active jobs are left to finish.
+    let jobs: Job<AutoResolveJobData>[];
+    try {
+      jobs = await this.pendingScheduledJobs(gameId);
+    } catch (e) {
+      this.logger.warn(`Could not list scheduled jobs for ${gameId}: ${e}`);
+      return;
+    }
+    for (const job of jobs) {
       try {
-        const job = await this.combatTimeoutQueue.getJob(jobId);
-        if (job) {
-          await job.remove();
-          this.logger.debug(`Cancelled auto-resolve (${stage}) for game ${gameId}`);
-        }
+        await job.remove();
+        this.logger.debug(`Cancelled auto-resolve (${job.data.stage}) for game ${gameId}`);
       } catch {
-        // Активную джобу снять нельзя — она no-op-нется по фазе/дедлайну
+        // The worker may have activated it between listing and removal.
       }
     }
   }
 
   async hasScheduledAutoResolve(gameId: string): Promise<boolean> {
-    for (const stage of ['DEFENSE', 'RESOLVE'] as const) {
-      try {
-        const job = await this.combatTimeoutQueue.getJob(this.jobIdFor(gameId, stage));
-        if (job) return true;
-      } catch {
-        // очередь недоступна — считаем незапланированным (recovery перепланирует)
-      }
+    try {
+      if ((await this.pendingScheduledJobs(gameId)).length > 0) return true;
+      // An active job counts only if it belongs to the current combat. An
+      // active job from an earlier attack may remain after cancellation.
+      const state = await this.gameStateService.loadState(gameId);
+      if (!state.metadata.combatInfo) return false;
+      if (state.phase !== GamePhase.COMBAT && state.phase !== GamePhase.COMBAT_RESOLVE) return false;
+      const stage = state.phase === GamePhase.COMBAT ? 'DEFENSE' : 'RESOLVE';
+      return await this.hasCurrentScheduledWork(gameId, stage, state.sequenceNumber);
+    } catch {
+      // Queue or state unavailable; recovery uses the persisted state directly.
+      return false;
     }
-    return false;
   }
 
   async getTimeUntilResolve(gameId: string): Promise<number | null> {
     let best: number | null = null;
-    for (const stage of ['DEFENSE', 'RESOLVE'] as const) {
-      try {
-        const job = await this.combatTimeoutQueue.getJob(this.jobIdFor(gameId, stage));
-        if (!job) continue;
+    try {
+      for (const job of await this.pendingScheduledJobs(gameId)) {
         const delay = job.delay;
         if (!delay) continue;
         const processedOn = job.processedOn || job.timestamp;
         const remaining = Math.max(0, processedOn + delay - Date.now());
         if (best === null || remaining < best) best = remaining;
-      } catch {
-        // ignore
       }
+    } catch {
+      // очередь недоступна
     }
     return best;
   }
 
   private jobIdFor(gameId: string, stage: 'DEFENSE' | 'RESOLVE'): string {
-    return `${this.SCHEDULED_JOB_PREFIX}${gameId}:${stage}`;
+    return `${this.SCHEDULED_JOB_PREFIX}${gameId}-${stage}`;
+  }
+
+  private sequenceJobIdFor(gameId: string, stage: 'DEFENSE' | 'RESOLVE', sequence: number): string {
+    return `${this.jobIdFor(gameId, stage)}-${sequence}`;
+  }
+
+  private isScheduledJobForGame(job: Job<AutoResolveJobData>, gameId: string): boolean {
+    const stage = job.data?.stage;
+    if (job.data?.gameId !== gameId || (stage !== 'DEFENSE' && stage !== 'RESOLVE')) return false;
+    const baseId = this.jobIdFor(gameId, stage);
+    if (job.id === baseId) return true;
+    const prefix = `${baseId}-`;
+    return job.id?.startsWith(prefix) === true &&
+      job.id.slice(prefix.length) === String(job.data.attackSequenceNumber);
+  }
+
+  private async pendingScheduledJobs(gameId: string): Promise<Job<AutoResolveJobData>[]> {
+    const jobs = await this.combatTimeoutQueue.getJobs(['waiting', 'delayed']);
+    const matching: Job<AutoResolveJobData>[] = [];
+    for (const job of jobs) {
+      if (!this.isScheduledJobForGame(job, gameId)) continue;
+      const status = await job.getState();
+      if (status === 'waiting' || status === 'delayed') matching.push(job);
+    }
+    return matching;
+  }
+
+  private async isCurrentPendingJob(
+    job: Job<AutoResolveJobData> | null | undefined,
+    gameId: string,
+    stage: 'DEFENSE' | 'RESOLVE',
+    sequence: number,
+  ): Promise<boolean> {
+    if (
+      !job || job.data.gameId !== gameId || job.data.stage !== stage ||
+      job.data.attackSequenceNumber !== sequence
+    ) return false;
+    const status = await job.getState();
+    return status === 'waiting' || status === 'delayed' || status === 'active';
+  }
+
+  private async hasCurrentScheduledWork(
+    gameId: string,
+    stage: 'DEFENSE' | 'RESOLVE',
+    sequence: number,
+  ): Promise<boolean> {
+    for (const jobId of [this.jobIdFor(gameId, stage), this.sequenceJobIdFor(gameId, stage, sequence)]) {
+      const job = await this.combatTimeoutQueue.getJob(jobId);
+      if (await this.isCurrentPendingJob(job, gameId, stage, sequence)) return true;
+    }
+    return false;
   }
 
   /**
@@ -370,7 +451,7 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
           current.phase === GamePhase.COMBAT_RESOLVE &&
           (current.metadata.pendingEffects?.length ?? 0) > 0
         ) {
-          await this.gameSubscriptionService?.publishGameUpdate(gameId, 'STATE_UPDATED', current);
+          await this.publishCue(gameId, 'STATE_UPDATED', current);
           continue;
         }
         break;
@@ -395,8 +476,19 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
         };
       }
 
-      await this.gameSubscriptionService?.publishGameUpdate(gameId, 'COMBAT_RESOLVED', current);
+      await this.publishCue(gameId, 'COMBAT_RESOLVED', current);
       await this.recordAudit(gameId, combatInfo.defenderId, current.sequenceNumber, reason);
+      if (current.phase === GamePhase.GAME_OVER) {
+        // Финальный удар нанесён таймаутом: saveState уже закоммитил FINISHED —
+        // авторитетный исход несут gameStateUpdated-барьер и HTTP query,
+        // а не gameEnded: это lossy named-CUE (16-network-contract §4). CUE и
+        // аудиты — best-effort и независимы: отказ COMBAT_RESOLVED не отменяет
+        // попытку GAME_ENDED и не проваливает закоммиченный результат.
+        await this.publishCue(gameId, 'GAME_ENDED', current);
+        await this.recordAudit(gameId, combatInfo.defenderId, current.sequenceNumber, reason, GameActionType.GAME_ENDED, {
+          winnerId: current.metadata.winnerId,
+        });
+      }
 
       this.logger.log(`Auto-resolved combat for game ${gameId} (${reason}), seq=${current.sequenceNumber}`);
 
@@ -475,7 +567,7 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
       }
       state = result.gameState;
       await this.gameStateService.saveState(gameId, state);
-      await this.gameSubscriptionService?.publishGameUpdate(gameId, 'STATE_UPDATED', state);
+      await this.publishCue(gameId, 'STATE_UPDATED', state);
       await this.recordChoiceAudit(gameId, actor, state.sequenceNumber, reason, head);
     }
     return { ok: false, blocker: 'pending choice chain exceeded 32 steps' };
@@ -509,21 +601,36 @@ export class CombatTimeoutService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  /** Named-CUE после коммита saveState — best-effort и независимы. Redis
+   * publish может бросить уже после локального deliver: закоммиченный
+   * результат не репортится как провал джобы, последующие CUE/аудиты
+   * всё равно попытаны (COMBAT_RESOLVED упал → GAME_ENDED не теряется). */
+  private async publishCue(gameId: string, eventType: string, state: GameState): Promise<void> {
+    if (!this.gameSubscriptionService) return;
+    try {
+      await this.gameSubscriptionService.publishGameUpdate(gameId, eventType, state);
+    } catch (e) {
+      this.logger.warn(`Failed to publish ${eventType} for game ${gameId}: ${e}`);
+    }
+  }
+
   /** Журнал исхода таймаута — best-effort, тем же типом что ручной резолв. */
   private async recordAudit(
     gameId: string,
     playerId: string,
     sequenceNumber: number,
     reason: string,
+    type: GameActionType = GameActionType.COMBAT_RESOLVED,
+    extraMetadata: Record<string, unknown> = {},
   ): Promise<void> {
     if (!this.gameActionService) return;
     try {
       await this.gameActionService.recordAction({
         gameId,
         sequenceNumber,
-        type: GameActionType.COMBAT_RESOLVED,
+        type,
         playerId,
-        metadata: { action: 'autoResolve', reason },
+        metadata: { action: 'autoResolve', reason, ...extraMetadata },
       });
     } catch (e) {
       this.logger.warn(`Failed to record auto-resolve audit for ${gameId}: ${e}`);

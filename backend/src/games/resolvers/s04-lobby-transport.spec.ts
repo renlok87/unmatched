@@ -19,6 +19,7 @@ import { RedisService } from '../../redis/redis.service';
 import { GameSubscriptionService } from '../game-subscription.service';
 import { GameActionService } from '../services/game-action.service';
 import { GqlAuthGuard } from '../../auth/guards/gql-auth.guard';
+import { GqlThrottlerGuard } from '../guards/gql-throttler.guard';
 import { getCellZones } from '../../game-engine/models';
 
 const root = resolve(__dirname, '../../../..');
@@ -104,6 +105,13 @@ describe('GD-016: lobby hero selection over real HTTP transport', () => {
           games.set(where.id, { ...game, ...data, updatedAt: new Date() });
           return games.get(where.id);
         },
+        updateMany: async ({ where, data }: any) => {
+          const game = games.get(where.id);
+          if (!game || (where.status && !(typeof where.status === 'string'
+            ? game.status === where.status : where.status.in?.includes(game.status)))) return { count: 0 };
+          games.set(where.id, { ...game, ...data, updatedAt: new Date() });
+          return { count: 1 };
+        },
       },
       gamePlayer: {
         findUnique: async ({ where }: any) =>
@@ -166,7 +174,11 @@ describe('GD-016: lobby hero selection over real HTTP transport', () => {
       if (!['a', 'b'].includes(userId)) return false;
       req.user = { id: userId };
       return true;
-    } }).compile();
+    } })
+      // Harness-only: ThrottlerModule is absent from this fixture module, so the
+      // resolver-level GqlThrottlerGuard would fail on missing THROTTLER:MODULE_OPTIONS.
+      .overrideGuard(GqlThrottlerGuard).useValue({ canActivate: () => true })
+      .compile();
     app = module.createNestApplication();
     app.useLogger(false);
     app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));

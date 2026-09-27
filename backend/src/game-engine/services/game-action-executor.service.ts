@@ -1364,6 +1364,10 @@ export class GameActionExecutorService {
     );
     let nextState: GameState = applyTerminalState({
       ...currentState,
+      // Одна мутация = +1 seq (как stage 1 и все прочие резолвы головы):
+      // без инкремента saveState падает на optimistic-проверке
+      // «existing !== state - 1» («Expected N, got N»).
+      sequenceNumber: currentState.sequenceNumber + 1,
       fighters: currentState.fighters.map((f) =>
         targets.some((t) => t.id === f.id)
           ? (() => {

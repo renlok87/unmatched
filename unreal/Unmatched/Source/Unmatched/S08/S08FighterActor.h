@@ -41,6 +41,9 @@ private:
   TObjectPtr<UTextRenderComponent> Label;
 
   UPROPERTY()
+  TObjectPtr<UTextRenderComponent> HpLabel;
+
+  UPROPERTY()
   TObjectPtr<UStaticMeshComponent> Ring;
 
   FS08BoardFighter Fighter;

@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { GameStateService, GameState, SerializedGameState } from './game-state.service';
 import { PrismaService } from '../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
+import { RatingService } from '../users/rating.service';
 import { GameSubscriptionService } from './game-subscription.service';
 import { GamePhase } from './dto/create-game.dto';
 import { ConcurrentModificationException } from './exceptions/game.exceptions';
@@ -164,6 +165,7 @@ describe('GameStateService', () => {
             },
             game: {
               update: jest.fn(),
+              findUnique: jest.fn().mockResolvedValue({ status: 'IN_PROGRESS', version: 1 }),
             },
             gamePlayer: {
               findMany: jest.fn(),
@@ -186,6 +188,8 @@ describe('GameStateService', () => {
             publishGameUpdate: jest.fn(),
           },
         },
+        // Реальная ELO-формула: calculateNewRatings чистый, prisma не трогается
+        RatingService,
       ],
     }).compile();
 
@@ -381,7 +385,7 @@ describe('GameStateService', () => {
       const upsert = jest.fn().mockResolvedValue({});
       jest.spyOn(prisma, '$transaction').mockImplementation(async (callback: any) => callback({
         gameState: { findUnique: jest.fn().mockResolvedValue(null), upsert },
-        game: { update: jest.fn().mockResolvedValue({}) },
+        game: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
       }));
       await service.saveState(state.gameId, state);
       const stored = JSON.parse(JSON.stringify(upsert.mock.calls[0][0].create.state));
@@ -422,6 +426,284 @@ describe('GameStateService', () => {
       const restored = service.deserialize(JSON.parse(JSON.stringify(service.serialize(mockGameState))));
       expect((restored.metadata as any).pendingManeuver).toBeUndefined();
       expect((restored.metadata as any).pendingHandDiscard).toBeUndefined();
+    });
+  });
+
+  describe('GD-036 terminal state marks the Game row FINISHED', () => {
+    const statsRows = () => [
+      { userId: 'player1', gamesPlayed: 4, gamesWon: 2, gamesLost: 2, currentElo: 1400, peakElo: 1450 },
+      { userId: 'player2', gamesPlayed: 3, gamesWon: 1, gamesLost: 2, currentElo: 1300, peakElo: 1350 },
+    ];
+
+    const saveWithMocks = async (
+      state: any,
+      extra: { rows?: any[]; expectConflict?: boolean } = {},
+    ) => {
+      const updateMany = jest.fn().mockResolvedValue({ count: 1 });
+      const statsUpdate = jest.fn();
+      const statsCreateMany = jest.fn();
+      const queryRaw = jest.fn().mockResolvedValue(extra.rows ?? statsRows());
+      jest.spyOn(prisma.game, 'findUnique').mockResolvedValue({
+        status: state.phase === GamePhase.GAME_OVER ? 'FINISHED' : 'IN_PROGRESS',
+        version: state.sequenceNumber,
+      } as any);
+      jest.spyOn(prisma, '$transaction').mockImplementation(async (callback: any) => callback({
+        gameState: { findUnique: jest.fn().mockResolvedValue(null), upsert: jest.fn() },
+        game: { updateMany, findUnique: jest.fn().mockResolvedValue({ hostId: 'player1', opponentId: 'player2' }) },
+        userStats: { createMany: statsCreateMany, update: statsUpdate },
+        $queryRaw: queryRaw,
+      }));
+      (redis.del as jest.Mock).mockClear();
+      if (extra.expectConflict) {
+        await expect(service.saveState(state.gameId, state)).rejects.toThrow(ConflictException);
+      } else {
+        await service.saveState(state.gameId, state);
+      }
+      return { updateMany, statsUpdate, statsCreateMany, queryRaw };
+    };
+
+    it('marks an in-progress game FINISHED with winnerId/endedAt', async () => {
+      const state = {
+        ...mockGameState,
+        phase: GamePhase.GAME_OVER,
+        metadata: { ...mockGameState.metadata, winnerId: 'player2' },
+      };
+      const { updateMany } = await saveWithMocks(state);
+      expect(updateMany).toHaveBeenCalledTimes(1);
+      const args = updateMany.mock.calls[0][0];
+      expect(args.where).toEqual({ id: state.gameId, status: 'IN_PROGRESS' });
+      expect(args.data.status).toBe('FINISHED');
+      expect(args.data.winnerId).toBe('player2');
+      expect(args.data.endedAt).toBeInstanceOf(Date);
+      expect(args.data.version).toBe(state.sequenceNumber);
+      // myGames cache invalidated for BOTH participants
+      const delKeys = (redis.del as jest.Mock).mock.calls.map((c: any[]) => c[0]);
+      expect(delKeys).toContain(`game:${state.gameId}`);
+      expect(delKeys).toContain('games:list:player1:IN_PROGRESS');
+      expect(delKeys).toContain('games:list:player2:all');
+    });
+
+    it('continues evicting the remaining cache keys when one del fails', async () => {
+      const state = {
+        ...mockGameState,
+        phase: GamePhase.GAME_OVER,
+        metadata: { ...mockGameState.metadata, winnerId: 'player1' },
+      };
+      // первый ключ (game:game1) падает Redis-сбоем — остальные 12 обязаны
+      // быть попытаны, а не брошены: getGame перечитает терминальный статус,
+      // но списки myGames чинятся только этими del
+      const delSpy = jest.spyOn(redis, 'del')
+        .mockRejectedValueOnce(new Error('ECONNREFUSED'))
+        .mockResolvedValue(1);
+      await saveWithMocks(state);
+
+      const delKeys = delSpy.mock.calls.map((c: any[]) => c[0]);
+      expect(delKeys).toHaveLength(13);
+      expect(delKeys).toContain('game:game1');
+      expect(delKeys).toContain('games:list:player2:FINISHED');
+      expect(delKeys).toContain('games:list:player1:all');
+    });
+
+    it('only finishes a terminal state while live states update version', async () => {
+      const over = {
+        ...mockGameState,
+        phase: GamePhase.GAME_OVER,
+        metadata: { ...mockGameState.metadata, winnerId: 'player1' },
+      };
+      const terminal = await saveWithMocks(over);
+      // Only an IN_PROGRESS row can become FINISHED; ABORTED is excluded too.
+      expect(terminal.updateMany.mock.calls[0][0].where.status).toBe('IN_PROGRESS');
+      expect(terminal.updateMany.mock.calls[0][0].data.status).toBe('FINISHED');
+
+      const live = await saveWithMocks({ ...mockGameState, phase: GamePhase.ACTION_MANEUVER });
+      expect(live.updateMany.mock.calls[0][0]).toEqual({
+        where: { id: mockGameState.gameId, status: 'IN_PROGRESS' },
+        data: { version: mockGameState.sequenceNumber },
+      });
+      expect(live.statsUpdate).not.toHaveBeenCalled();
+    });
+
+    describe('GD-036 finish updates both players stats exactly once (incl. ELO)', () => {
+      it('applies winner/loser stats inside the finish transaction', async () => {
+        const state = {
+          ...mockGameState,
+          phase: GamePhase.GAME_OVER,
+          metadata: { ...mockGameState.metadata, winnerId: 'player1' },
+        };
+        // 1400 vs 1300 (RatingService, K=32): winner +11.52 -> 1412, loser -11.52 -> 1288
+        const { statsUpdate, statsCreateMany, queryRaw } = await saveWithMocks(state);
+
+        // Missing rows are created atomically (ON CONFLICT DO NOTHING)
+        expect(statsCreateMany).toHaveBeenCalledWith({
+          data: [{ userId: 'player1' }, { userId: 'player2' }],
+          skipDuplicates: true,
+        });
+        // Both rows locked FOR UPDATE in deterministic order before the read
+        const rawSql = String(queryRaw.mock.calls[0][0].sql);
+        expect(rawSql).toContain('FOR UPDATE');
+        expect(rawSql).toContain('ORDER BY');
+
+        expect(statsUpdate).toHaveBeenCalledTimes(2);
+        const winnerUpdate = statsUpdate.mock.calls[0][0];
+        expect(winnerUpdate.where).toEqual({ userId: 'player1' });
+        expect(winnerUpdate.data).toMatchObject({
+          gamesPlayed: 5,
+          gamesWon: 3,
+          winRate: 60,
+          currentElo: 1412,
+          peakElo: 1450,
+          lastPlayedAt: expect.any(Date),
+        });
+        const loserUpdate = statsUpdate.mock.calls[1][0];
+        expect(loserUpdate.where).toEqual({ userId: 'player2' });
+        expect(loserUpdate.data).toMatchObject({
+          gamesPlayed: 4,
+          gamesLost: 3,
+          winRate: 25,
+          currentElo: 1288,
+          lastPlayedAt: expect.any(Date),
+        });
+        // Проигравший не поднимает peakElo
+        expect(loserUpdate.data.peakElo).toBeUndefined();
+      });
+
+      it('raises peakElo past the previous peak for the winner', async () => {
+        const state = {
+          ...mockGameState,
+          phase: GamePhase.GAME_OVER,
+          metadata: { ...mockGameState.metadata, winnerId: 'player1' },
+        };
+        const rows = statsRows();
+        rows[0] = { ...rows[0], currentElo: 1440, peakElo: 1444 };
+        // 1440 vs 1300: E=0.6911 -> +9.88 -> 1450 > peak 1444
+        const { statsUpdate } = await saveWithMocks(state, { rows });
+        expect(statsUpdate.mock.calls[0][0].data.peakElo).toBe(1450);
+      });
+
+      it('is idempotent: a second terminal save conflicts before touching stats', async () => {
+        const state = {
+          ...mockGameState,
+          phase: GamePhase.GAME_OVER,
+          metadata: { ...mockGameState.metadata, winnerId: 'player1' },
+        };
+        const gameStateUpsert = jest.fn();
+        const statsUpdate = jest.fn();
+        jest.spyOn(prisma, '$transaction').mockImplementation(async (callback: any) => callback({
+          gameState: { findUnique: jest.fn().mockResolvedValue(null), upsert: gameStateUpsert },
+          game: { updateMany: jest.fn().mockResolvedValue({ count: 0 }) },
+          userStats: { createMany: jest.fn(), update: statsUpdate },
+          $queryRaw: jest.fn(),
+        }));
+        await expect(service.saveState(state.gameId, state)).rejects.toThrow(ConflictException);
+        expect(statsUpdate).not.toHaveBeenCalled();
+        expect(gameStateUpsert).not.toHaveBeenCalled();
+      });
+
+      it('applies draw stats to both seats without win/loss counters', async () => {
+        const state = {
+          ...mockGameState,
+          phase: GamePhase.GAME_OVER,
+          metadata: { ...mockGameState.metadata, winnerId: undefined },
+        };
+        // 1400 vs 1300, S=0.5 (K=32): -4.48 -> 1396 / +4.48 -> 1304
+        const { statsUpdate, statsCreateMany, queryRaw } = await saveWithMocks(state);
+
+        expect(statsCreateMany).toHaveBeenCalledWith({
+          data: [{ userId: 'player1' }, { userId: 'player2' }],
+          skipDuplicates: true,
+        });
+        const rawSql = String(queryRaw.mock.calls[0][0].sql);
+        expect(rawSql).toContain('FOR UPDATE');
+
+        expect(statsUpdate).toHaveBeenCalledTimes(2);
+        const firstUpdate = statsUpdate.mock.calls[0][0];
+        expect(firstUpdate.where).toEqual({ userId: 'player1' });
+        expect(firstUpdate.data).toMatchObject({
+          gamesPlayed: 5,
+          winRate: 40,
+          currentElo: 1396,
+          peakElo: 1450,
+          lastPlayedAt: expect.any(Date),
+        });
+        expect(firstUpdate.data).not.toHaveProperty('gamesWon');
+        expect(firstUpdate.data).not.toHaveProperty('gamesLost');
+        const secondUpdate = statsUpdate.mock.calls[1][0];
+        expect(secondUpdate.where).toEqual({ userId: 'player2' });
+        expect(secondUpdate.data).toMatchObject({
+          gamesPlayed: 4,
+          winRate: 25,
+          currentElo: 1304,
+          peakElo: 1350,
+        });
+        // Снимок всё равно сохранён
+        expect(prisma.$transaction).toHaveBeenCalled();
+      });
+
+      it('keeps ELO unchanged and raises peakElo on a favorable draw', async () => {
+        const state = {
+          ...mockGameState,
+          phase: GamePhase.GAME_OVER,
+          metadata: { ...mockGameState.metadata, winnerId: undefined },
+        };
+        const rows = statsRows();
+        rows[0] = { ...rows[0], currentElo: 1300, peakElo: 1300 };
+        // Равные рейтинги: S=0.5 при E=0.5 -> нулевой сдвиг
+        const equalRatings = await saveWithMocks(state, {
+          rows: [rows[0], { ...rows[1], currentElo: 1300, peakElo: 1250 }],
+        });
+        expect(equalRatings.statsUpdate.mock.calls[0][0].data.currentElo).toBe(1300);
+        expect(equalRatings.statsUpdate.mock.calls[0][0].data.peakElo).toBe(1300);
+        // Благоприятная ничья поднимает peakElo: 1000 vs 1300 -> +11 -> 1011
+        const favorable = await saveWithMocks(state, {
+          rows: [
+            { ...rows[0], currentElo: 1000, peakElo: 1000 },
+            { ...rows[1], currentElo: 1300, peakElo: 1300 },
+          ],
+        });
+        expect(favorable.statsUpdate.mock.calls[0][0].data).toMatchObject({
+          currentElo: 1011,
+          peakElo: 1011,
+        });
+      });
+
+      it('rolls back FINISHED when the winner is not a persisted participant', async () => {
+        const state = {
+          ...mockGameState,
+          phase: GamePhase.GAME_OVER,
+          metadata: { ...mockGameState.metadata, winnerId: 'intruder' },
+        };
+        const { statsUpdate, statsCreateMany } = await saveWithMocks(state, { expectConflict: true });
+        expect(statsUpdate).not.toHaveBeenCalled();
+        expect(statsCreateMany).not.toHaveBeenCalled();
+      });
+
+      it('rolls back FINISHED for a non-duel player list', async () => {
+        const state = {
+          ...mockGameState,
+          phase: GamePhase.GAME_OVER,
+          players: [mockGameState.players[0]],
+          metadata: { ...mockGameState.metadata, winnerId: 'player1' },
+        };
+        const { statsUpdate, statsCreateMany } = await saveWithMocks(state, { expectConflict: true });
+        expect(statsUpdate).not.toHaveBeenCalled();
+        expect(statsCreateMany).not.toHaveBeenCalled();
+      });
+
+      it('rolls back FINISHED when state players disagree with the persisted Game composition', async () => {
+        const state = {
+          ...mockGameState,
+          phase: GamePhase.GAME_OVER,
+          players: [
+            mockGameState.players[0],
+            { ...mockGameState.players[1], userId: 'player3' },
+          ],
+          metadata: { ...mockGameState.metadata, winnerId: 'player1' },
+        };
+        const { statsUpdate, statsCreateMany, queryRaw } = await saveWithMocks(state, { expectConflict: true });
+        expect(statsUpdate).not.toHaveBeenCalled();
+        expect(statsCreateMany).not.toHaveBeenCalled();
+        expect(queryRaw).not.toHaveBeenCalled();
+      });
     });
   });
 
@@ -508,6 +790,63 @@ describe('GameStateService', () => {
 
       expect(redis.getJson).toHaveBeenCalledWith('gamestate:game1');
       expect(cached).toEqual(mockGameState);
+    });
+
+    it('bypasses an older cached snapshot after a newer game version commits', async () => {
+      jest.spyOn(redis, 'getJson').mockResolvedValue(mockGameState);
+      jest.spyOn(prisma.game, 'findUnique').mockResolvedValue({
+        status: 'IN_PROGRESS', version: mockGameState.sequenceNumber + 1,
+      } as any);
+
+      await expect(service.getCachedState('game1')).resolves.toBeNull();
+      expect(redis.del).not.toHaveBeenCalled();
+    });
+
+    // S09 regression: Redis сериализует состояние через JSON, поэтому на
+    // cache-hit Date-поля приходят ISO-строками. Executor/guard'ы зовут
+    // .getTime() напрямую ('timeoutAt.getTime is not a function' ронял
+    // playDefense/resolveCombat в live-игре); кеш-путь обязан оживлять
+    // даты так же, как DB-путь через deserialize.
+    it('revives Date fields from a JSON-roundtripped cache hit', async () => {
+      const startedAt = new Date('2026-01-01T00:00:00.000Z');
+      const timeoutAt = new Date('2026-01-01T00:00:30.000Z');
+      const roundtripped = JSON.parse(
+        JSON.stringify({
+          ...mockGameState,
+          metadata: {
+            ...mockGameState.metadata,
+            lastActionAt: startedAt,
+            combatInfo: {
+              attackerId: 'fighter1',
+              defenderId: 'player2',
+              targetFighterId: 'fighter2',
+              startedAt,
+              timeoutAt,
+            },
+          },
+        }),
+      );
+      expect(typeof roundtripped.metadata.lastActionAt).toBe('string');
+
+      jest.spyOn(redis, 'getJson').mockResolvedValue(roundtripped);
+
+      const cached = await service.getCachedState('game1');
+
+      expect(cached).not.toBeNull();
+      expect(cached!.metadata.lastActionAt).toBeInstanceOf(Date);
+      expect(cached!.metadata.lastActionAt.getTime()).toBe(startedAt.getTime());
+      expect(cached!.metadata.combatInfo!.startedAt).toBeInstanceOf(Date);
+      expect(cached!.metadata.combatInfo!.startedAt.getTime()).toBe(startedAt.getTime());
+      expect(cached!.metadata.combatInfo!.timeoutAt).toBeInstanceOf(Date);
+      expect(cached!.metadata.combatInfo!.timeoutAt!.getTime()).toBe(timeoutAt.getTime());
+    });
+
+    it('keeps combatInfo undefined on a cache hit without combat', async () => {
+      jest.spyOn(redis, 'getJson').mockResolvedValue(mockGameState);
+
+      const cached = await service.getCachedState('game1');
+
+      expect(cached!.metadata.combatInfo).toBeUndefined();
     });
 
     it('should return null when cache miss', async () => {
@@ -635,20 +974,20 @@ describe('GameStateService', () => {
   });
 
   describe('saveState', () => {
-    it('should save state with optimistic locking', async () => {
+    it('accepts the initial nonterminal save once startGame has set IN_PROGRESS', async () => {
       jest.spyOn(prisma.gameState, 'findUnique').mockResolvedValue(null);
       jest.spyOn(prisma.gameState, 'upsert').mockResolvedValue({} as any);
-      jest.spyOn(prisma.game, 'update').mockResolvedValue({} as any);
       jest.spyOn(redis, 'setJsonex').mockResolvedValue('OK');
       jest.spyOn(gameSubscriptionService, 'publishGameUpdate').mockResolvedValue(undefined);
 
+      const guardedUpdate = jest.fn().mockResolvedValue({ count: 1 });
       const transactionMock = jest.fn().mockImplementation(async (callback) => {
         return callback({
           gameState: {
             findUnique: jest.fn().mockResolvedValue(null),
             upsert: jest.fn().mockResolvedValue({} as any),
           },
-          game: { update: jest.fn().mockResolvedValue({} as any) },
+          game: { updateMany: guardedUpdate },
         });
       });
       jest.spyOn(prisma, '$transaction').mockImplementation(transactionMock);
@@ -656,6 +995,10 @@ describe('GameStateService', () => {
       await service.saveState('game1', mockGameState);
 
       expect(prisma.$transaction).toHaveBeenCalled();
+      expect(guardedUpdate).toHaveBeenCalledWith({
+        where: { id: 'game1', status: 'IN_PROGRESS' },
+        data: { version: mockGameState.sequenceNumber },
+      });
       expect(redis.setJsonex).toHaveBeenCalled();
       expect(gameSubscriptionService.publishGameUpdate).toHaveBeenCalledWith(
         'game1',
@@ -676,7 +1019,7 @@ describe('GameStateService', () => {
             findUnique: jest.fn().mockResolvedValue(existingState as any),
             upsert: jest.fn().mockResolvedValue({} as any),
           },
-          game: { update: jest.fn().mockResolvedValue({} as any) },
+          game: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
         });
       });
       jest.spyOn(prisma, '$transaction').mockImplementation(transactionMock);
@@ -762,7 +1105,7 @@ describe('GameStateService', () => {
       const upsert = jest.fn().mockResolvedValue({});
       jest.spyOn(prisma, '$transaction').mockImplementation(async (callback: any) => callback({
         gameState: { findUnique: jest.fn().mockResolvedValue(null), upsert },
-        game: { update: jest.fn().mockResolvedValue({}) },
+        game: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
       }));
       await service.saveState(state.gameId, state);
       const stored = service.deserialize(JSON.parse(JSON.stringify(upsert.mock.calls[0][0].create.state)));

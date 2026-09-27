@@ -56,6 +56,11 @@ void AS08BoardActor::BeginPlay() {
   }
 }
 
+void AS08BoardActor::EndPlay(const EEndPlayReason::Type Reason) {
+  ClearChildren();
+  Super::EndPlay(Reason);
+}
+
 AS08FighterActor* AS08BoardActor::FindFighterActor(const FString& FighterId) const {
   for (AS08FighterActor* Actor : FighterActors) {
     if (Actor && Actor->GetFighterId() == FighterId) return Actor;
