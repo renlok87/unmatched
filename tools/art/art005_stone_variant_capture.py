@@ -9,9 +9,10 @@ import unreal as u
 
 ROOT = Path(__file__).resolve().parents[2]
 VARIANT = os.environ.get("ART005_STONE_VARIANT", "v3")
-if VARIANT not in ("v3", "v4", "woodUV", "woodPaint", "corner"):
+if VARIANT not in ("v3", "v4", "woodUV", "woodPaint", "corner", "forestProbe", "paddockProbe"):
     raise RuntimeError(f"Unsupported ART005_STONE_VARIANT: {VARIANT}")
-SUFFIX = {"v3": "D", "v4": "E", "woodUV": "F", "woodPaint": "G", "corner": "H"}[VARIANT]
+SUFFIX = {"v3": "D", "v4": "E", "woodUV": "F", "woodPaint": "G", "corner": "H",
+          "forestProbe": "I", "paddockProbe": "I"}[VARIANT]
 VIEW = os.environ.get("ART005_CAPTURE_VIEW", "k1")
 if VIEW not in ("k1", "wood-detail"):
     raise RuntimeError(f"Unsupported ART005_CAPTURE_VIEW: {VIEW}")
@@ -22,6 +23,8 @@ LEVEL = {
     "woodUV": "/Game/ArtTests/ART005F/L_ART005F_WoodUVReview",
     "woodPaint": "/Game/ArtTests/ART005G/L_ART005G_WoodPaintReview",
     "corner": "/Game/ArtTests/ART005H/L_ART005H_CornerReview",
+    "forestProbe": "/Game/ArtTests/ART005I/L_ART005I_ForestReferenceLight",
+    "paddockProbe": "/Game/ArtTests/ART005I/L_ART005I_PaddockReferenceLight",
 }[VARIANT]
 
 

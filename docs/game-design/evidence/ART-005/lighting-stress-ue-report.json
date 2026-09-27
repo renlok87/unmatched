@@ -1,0 +1,147 @@
+{
+  "status": "editor_lighting_stress_fixture_only_not_other_board_reconstruction",
+  "source_level": "/Game/ArtTests/ART005H/L_ART005H_CornerReview",
+  "reference_concept": "docs/game-design/evidence/ART-002/lighting-real-map-conditions-concept.png",
+  "profiles": {
+    "forest": {
+      "level": "/Game/ArtTests/ART005I/L_ART005I_ForestReferenceLight",
+      "reference": "Sherwood Forest: foliage-filtered cool green with restrained warm patches; only a color-condition reference",
+      "light_settings_proposed": {
+        "key": {
+          "intensity": 4.0,
+          "color_linear": [
+            0.73,
+            0.82,
+            0.74
+          ]
+        },
+        "ambient": {
+          "intensity": 950.0,
+          "color_linear": [
+            0.88,
+            0.94,
+            0.88
+          ]
+        },
+        "warm": {
+          "intensity": 150.0,
+          "color_linear": [
+            1.0,
+            0.62,
+            0.32
+          ],
+          "radius_uu": 430.0
+        },
+        "secondary": {
+          "position_uu": [
+            -180,
+            125,
+            230
+          ],
+          "intensity": 110.0,
+          "color_linear": [
+            1.0,
+            0.67,
+            0.35
+          ],
+          "radius_uu": 330.0
+        }
+      },
+      "counts_after_reload": {
+        "hit_surfaces": 30,
+        "blue_zone_review": 15,
+        "red_zone_review": 15,
+        "gray_figures": 5,
+        "medusa": 1,
+        "markers": 3,
+        "corners": 4,
+        "extra_lights": 1
+      },
+      "light_intensities_after_reload": {
+        "key": {
+          "intensity": 4.0
+        },
+        "ambient": {
+          "intensity": 950.0
+        },
+        "warm": {
+          "intensity": 150.0
+        },
+        "secondary": {
+          "intensity": 110.0
+        }
+      }
+    },
+    "paddock": {
+      "level": "/Game/ArtTests/ART005I/L_ART005I_PaddockReferenceLight",
+      "reference": "T. Rex Paddock: blue-indigo nocturnal color with restrained cyan rim and one warm practical; not map geometry",
+      "light_settings_proposed": {
+        "key": {
+          "intensity": 3.5,
+          "color_linear": [
+            0.62,
+            0.69,
+            0.88
+          ]
+        },
+        "ambient": {
+          "intensity": 1150.0,
+          "color_linear": [
+            0.84,
+            0.88,
+            0.96
+          ]
+        },
+        "warm": {
+          "intensity": 130.0,
+          "color_linear": [
+            1.0,
+            0.59,
+            0.3
+          ],
+          "radius_uu": 430.0
+        },
+        "secondary": {
+          "position_uu": [
+            -210,
+            110,
+            250
+          ],
+          "intensity": 85.0,
+          "color_linear": [
+            0.55,
+            0.8,
+            1.0
+          ],
+          "radius_uu": 420.0
+        }
+      },
+      "counts_after_reload": {
+        "hit_surfaces": 30,
+        "blue_zone_review": 15,
+        "red_zone_review": 15,
+        "gray_figures": 5,
+        "medusa": 1,
+        "markers": 3,
+        "corners": 4,
+        "extra_lights": 1
+      },
+      "light_intensities_after_reload": {
+        "key": {
+          "intensity": 3.5
+        },
+        "ambient": {
+          "intensity": 1150.0
+        },
+        "warm": {
+          "intensity": 130.0
+        },
+        "secondary": {
+          "intensity": 85.0
+        }
+      }
+    }
+  },
+  "fixed_factors": "Same S04 Cobble 5x6 board mesh/materials, four modular corners, figures, markers and K1 camera; only lights differ.",
+  "limits": "No Sherwood/T. Rex boardState, map surface or accepted lighting coordinates. No live HUD, K2/K3, color-vision review or packaged D-07 FPS."
+}
