@@ -6,6 +6,7 @@
 #include "Components/DirectionalLightComponent.h"
 #include "Components/PointLightComponent.h"
 #include "Components/SceneComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/PointLight.h"
 #include "Engine/SkeletalMesh.h"
@@ -186,7 +187,44 @@ void AS08BoardActor::SetCombatFocus(const FString& AttackerId,
   }
 }
 
+void AS08BoardActor::ShowDamageNumber(const FString& FighterId, int32 Damage,
+                                     int32 SequenceNumber) {
+  if (!bArtActive || Damage <= 0) return;
+  const FS08BoardFighter* Target = Fighters.FindByPredicate(
+      [&](const FS08BoardFighter& Fighter) { return Fighter.Id == FighterId; });
+  if (!Target) return;
+
+  if (TWeakObjectPtr<AActor>* Old = DamageNumbers.Find(FighterId)) {
+    if (Old->IsValid()) Old->Get()->Destroy();
+  }
+  const FVector Position = BoardModel.CellToWorld(Target->X, Target->Y) +
+      FVector(Target->X == BoardModel.Width - 1 ? -20.0f : 20.0f,
+              40.0f, Target->bIsHero ? 105.0f : 83.0f);
+  AActor* Number = GetWorld()->SpawnActor<AActor>(AActor::StaticClass(),
+                                                  Position, FRotator::ZeroRotator);
+  if (!Number) return;
+  UTextRenderComponent* Text = NewObject<UTextRenderComponent>(Number, TEXT("DamageNumber"));
+  Number->SetRootComponent(Text);
+  Text->SetText(FText::FromString(FString::Printf(TEXT("-%d"), Damage)));
+  Text->SetHorizontalAlignment(EHTA_Center);
+  Text->SetWorldSize(25.0f);
+  Text->SetTextRenderColor(FColor(255, 224, 175));
+  Text->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  Text->RegisterComponent();
+  Number->SetActorLocation(Position);
+  Number->SetActorRotation(FRotator(0.0f, 90.0f, 0.0f));
+  Number->SetLifeSpan(0.9f);
+  DamageNumbers.Add(FighterId, Number);
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW damage-number fighter=%s amount=%d seq=%d cell=(%d,%d)"),
+      *FighterId, Damage, SequenceNumber, Target->X, Target->Y));
+}
+
 void AS08BoardActor::ClearChildren() {
+  for (const TPair<FString, TWeakObjectPtr<AActor>>& Entry : DamageNumbers) {
+    if (Entry.Value.IsValid()) Entry.Value.Get()->Destroy();
+  }
+  DamageNumbers.Reset();
   for (AActor* Child : HighlightTiles) {
     if (Child) Child->Destroy();
   }

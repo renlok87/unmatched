@@ -41,6 +41,8 @@ public:
   void SetFighterLabelZoomRatio(float DistanceRatio, bool bOnlySelected);
   /** Apply local attack-draft or authoritative combat focus by fighter ID. */
   void SetCombatFocus(const FString& AttackerId, const FString& TargetId);
+  /** CUE-011 fallback: one 900ms damage number at the affected cell. */
+  void ShowDamageNumber(const FString& FighterId, int32 Damage, int32 SequenceNumber);
 
   /** TASK-022 selection ring + reachable-cell highlights. */
   void SetSelectedFighter(const FString& FighterId, const TSet<uint64>& Reachable);
@@ -105,6 +107,7 @@ private:
 
   UPROPERTY()
   TArray<TObjectPtr<AS08FighterActor>> FighterActors;
+  TMap<FString, TWeakObjectPtr<AActor>> DamageNumbers;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;
