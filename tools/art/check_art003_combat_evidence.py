@@ -50,6 +50,8 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("run_dir", type=Path)
     parser.add_argument("--git-staged", action="store_true")
+    parser.add_argument("--write-report", action="store_true",
+                        help="Save validation.json; default verification is read-only")
     args = parser.parse_args()
     root = args.run_dir.resolve()
     manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
@@ -95,7 +97,8 @@ def main() -> None:
         "visual_review": "manual; see acceptance report",
         "full_K3_or_GD058": "open",
     }
-    (root / "validation.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    if args.write_report:
+        (root / "validation.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(result, indent=2))
 
 
