@@ -1,0 +1,448 @@
+{
+  "schema": "unmatched.art-pipeline.prop-report/1",
+  "task": "P1.5 «Один статический пропс»",
+  "date": "2026-09-28",
+  "asset_id": "ASSET-DECOR-KIT-001.BARREL",
+  "ue_name_planned": "SM_Decor_Barrel",
+  "status": "измерено",
+  "status_scale": [
+    "предложено",
+    "измерено",
+    "технически импортировано",
+    "художественно принято"
+  ],
+  "not_claimed": [
+    "технически импортировано (UE не запускался)",
+    "художественно принято"
+  ],
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  },
+  "selection": {
+    "ref": "REF-BARREL v3 (docs/art-pipeline/imagegen-inputs/manifest.json)",
+    "reason": "осесимметричный объект; front/side почти ортографичны, высота 810 px у обоих, обручи на одной высоте; ручная проверка CONSISTENCY-REVIEW#ref-barrel; у фонаря сторона петель/защёлки в боковых видах не подтверждена",
+    "tripo_slots_used": {
+      "front": "art/imagegen/mvp-v1/environment/ref-barrel-v3-front.png",
+      "left": "art/imagegen/mvp-v1/environment/ref-barrel-v3-side.png",
+      "right": null,
+      "back": null
+    },
+    "human_reference_only": [
+      "ref-barrel-v3-top.png",
+      "ref-barrel-v3-three-quarter.png"
+    ]
+  },
+  "tripo": {
+    "service": "tripo-studio (Chrome пользователя, отдельная вкладка, закрыта после работы; очередь загрузок общая с P1.6)",
+    "task_id": "3f7a258f-d41c-4720-b31a-cb1573604670",
+    "mode": "multi-view (HD модель), не batch",
+    "model_ui_label": "H3.1 - Макс.кач.",
+    "privacy": "Приватный",
+    "settings": {
+      "texture": "2K",
+      "pbr": true,
+      "remove_lighting": true,
+      "topology": "Triangle",
+      "polygon_count": 4000,
+      "texture_8k": false,
+      "generate_parts": false
+    },
+    "operations": [
+      {
+        "op": "generate",
+        "history": "2026-09-28 11:15:37 «Из нескольких видов в модель»",
+        "quoted": 45,
+        "debit": 45
+      },
+      {
+        "op": "smart-uv",
+        "history": "нет записи",
+        "quoted": 20,
+        "debit": 0,
+        "note": "бесплатная проба (x2 -> x1)"
+      },
+      {
+        "op": "texture 2K, remove lighting",
+        "history": "2026-09-28 11:24:38 «Генерация текстур»",
+        "quoted": 10,
+        "debit": 10
+      },
+      {
+        "op": "pbr",
+        "history": "2026-09-28 11:28:01 «Генерация PBR»",
+        "quoted": 5,
+        "debit": 5
+      },
+      {
+        "op": "export GLB x3",
+        "debit": 0
+      }
+    ],
+    "credits": {
+      "unit": "studio-credits",
+      "spent_by_this_task": 60,
+      "limit": 100,
+      "balance_before": 25045,
+      "balance_after": 24945,
+      "other_debits_in_window": [
+        "2026-09-28 11:18:01 Риггинг -20",
+        "2026-09-28 11:26:52 Риггинг -20"
+      ],
+      "other_debits_owner": "P1.6 (art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/run.json: риг UE5 Mannequin на b6253e58 и d562f057), не эта задача; в P1 ошибочно приписаны T4 (T4 сообщает 0 вызовов Tripo)",
+      "note": "в снимке истории 11:33 нет других −5, кроме PBR этой задачи 11:28:01; арифметика 60 из 100 не меняется"
+    },
+    "studio_settings_restored": "4K, 2 000 000 полигонов (Studio сохраняет настройки генерации для аккаунта)",
+    "evidence": "docs/art-pipeline/evidence/p15-barrel-2026-09-28/tripo-run.json"
+  },
+  "sources": {
+    "dir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source (read-only)",
+    "files": {
+      "decor-barrel-tripo-h31-3f7a258f-source.glb": {
+        "sha256": "7c81e9944f64390d1f0581c29b0bbc26884cf396603cf629575c1a37c2443782",
+        "bytes": 2937712,
+        "stage": "generate: 3837 tris, 2557 verts, BC+RM+N 2K, UV fill 61.1 %"
+      },
+      "decor-barrel-tripo-3f7a258f-smartuv-tex2k.glb": {
+        "sha256": "2937d45f2d218820053640981e355f821cd1d4ffc2486780f1c56506467db438",
+        "bytes": 4378264,
+        "stage": "Smart UV + texture 2K: BC+N, без RM"
+      },
+      "decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr.glb": {
+        "sha256": "b336bf62ae9cd1518e741d0814824c4e3f5e5d1e4b3a1838a33f72ec59632fc4",
+        "bytes": 6903704,
+        "stage": "+ PBR: BC+RM+N 2K, 3837 tris, 2494 verts; основной вход кандидата"
+      }
+    },
+    "spec": "art/pipeline-candidates/ASSET-DECOR-KIT-001/source-specs/tripo-3f7a258f.json",
+    "registered_with": "tools/tripo-pipeline/tripo_pipeline.py register-source (в P1 повтор = no-op)",
+    "textures": {
+      "dir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/textures (8 файлов, ~13,5 МБ)",
+      "in_git": false,
+      "reason": "байтовые копии картинок, встроенных в source/*.glb; решение оркестратора — не коммитить",
+      "ignored_by": "art/pipeline-candidates/ASSET-DECOR-KIT-001/.gitignore (*/source/textures/)",
+      "restore": "python art/pipeline-candidates/ASSET-DECOR-KIT-001/source-specs/restore_embedded_textures.py",
+      "restore_check": "картинка GLB с тем же именем пишется байт в байт и сверяется с expected_sha256 из spec; проверено восстановлением во временный каталог (8/8 побайтно равны)",
+      "note": "spec регистрирует и текстуры: в чистом клоне восстановить до команд tripo_pipeline.py на этом run"
+    },
+    "downloads_incident": {
+      "what": "Save-As-диалоги трёх загрузок GLB в общем Chrome не были завершены или отменены. В 11:31:50 байтовая копия h31 (decor-barrel-tripo-h31-3f7a258f-source.glb, sha 7c81e994…) оказалась в чужом каталоге art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/source/; P1.6 пометил её как foreign",
+      "likely_mechanism": "незавершённый Save-As этой задачи завершён из сессии P1.6 (правдоподобно, не доказано); судьба двух других .tmp не установлена",
+      "state_2026-09-28_12:15": "в C:/Users/ren/Downloads .tmp нет; в tripo-rig-20260928-p16/source/ бочки уже нет (удаляла не эта задача)",
+      "impact": "для P1.5 потерь нет: source/*.glb скопированы и сверены до инцидента",
+      "rule": "одна загрузка Tripo за раз; свой Save-диалог завершать или отменять до передачи браузера",
+      "evidence": "docs/art-pipeline/evidence/p15-barrel-2026-09-28/tripo-run.json (downloads.incident, corrections)"
+    }
+  },
+  "pipeline_passthrough": {
+    "run_dir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline",
+    "stages": {
+      "preflight": "completed",
+      "import": "completed",
+      "verify": "completed",
+      "export": "completed"
+    },
+    "rerun": "preflight revalidated, остальные skipped",
+    "fbx": "SM_Decor_Barrel_TripoPassthrough.fbx (исходный масштаб Tripo 80.5 x 80.7 x 98.0 uu; технический passthrough, не игровой ассет)",
+    "network": {
+      "tripo_calls": 0,
+      "paid_tasks_created": 0
+    },
+    "evidence_pin": "pipeline/manifest.json зафиксировал tripo-run.json версии P1 (sha 0a55165a…); после поправок повтор register-source в этом run-каталоге даёт конфликт — воспроизводить в новом run-каталоге; run не пересоздан, так как в нём же зафиксирован imagegen-inputs/manifest.json, который правит P0",
+    "tool_version": "0.3.0 (текущий CLI 0.4.0)",
+    "snapshot_status": "снимок регистрации: пара manifest.json ↔ tripo-run.json внутренне не согласована (0a55165a… в manifest, 1fdc2981… на диске); spec не менялся (spec_sha256 228b9f09… совпадает)",
+    "measured_on_copies_2026-09-28": {
+      "register_source_current_tripo_run": "конфликт, exit 3 (source already registered with different content)",
+      "register_source_p1_tripo_run_0a55165a": "no-op, exit 0 (зеркало вне репозитория, --repo-root)",
+      "run_in_place_cli_0_4_0": "preflight executed, import/verify skipped, export executed: перезаписаны export/SM_Decor_Barrel_TripoPassthrough.fbx (f9c9042a… → ee656a70…), reports/preflight.json, reports/export-report.json, manifest.json, journal.jsonl"
+    },
+    "do_not": "на закоммиченном pipeline/ не выполнять run/resume/preflight/export с CLI ≠ 0.3.0 и register-source: первое перезапишет снимок, второе упадёт с конфликтом; status только читает",
+    "decision_for_orchestrator": "оставить снимок как есть / пересоздать run после работ P0 над CLI / вернуть tripo-run.json к байтам P1 и вынести поправки в отдельный файл errata"
+  },
+  "candidate": {
+    "script": "tools/tripo-pipeline/blender/static_prop_candidate.py",
+    "params": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/candidate-params.json",
+    "report": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/candidate-report.json",
+    "fbx_readback": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/fbx-readback.json",
+    "blender": "5.2.2 LTS headless (--factory-startup)",
+    "geometry": {
+      "triangles": 3790,
+      "triangles_p1": 3837,
+      "vertices_stored": 2424,
+      "vertices_welded": 1897,
+      "shells": 1,
+      "loose": 0,
+      "degenerate": 0,
+      "welded_boundary_edges": 0,
+      "welded_non_manifold_edges": 0,
+      "inconsistent_winding_faces": 0,
+      "p1_state": {
+        "welded_boundary_edges": 1,
+        "welded_non_manifold_edges": 2,
+        "inconsistent_winding_faces": 1
+      },
+      "defect_location": "складка («ямка») на плоскости крышки, ≈4,5 см от оси (≈50 % радиуса крышки 8,2–8,75 см), четверть со стороны пробки (−Y) и слева (−X) в .blend, центр по площади (−1,6; −4,2) см, высота 25,7–25,9 см; до масштаба (−0,076…−0,044; −0,177…−0,149; 0,970–0,977) м. P1 ошибочно описал её как «край крышки спереди-слева»",
+      "defect_composition": "42 треугольника в 12 крошечных UV-островах (щепка v<0,02, анизотропия 60, AO≈0) + тент на 2 см под плоскость (1 открытое, 2 неманифолдных ребра) + 21 грань вниз на верхней плоскости + 2 треугольника острова крышки с перевёрнутым UV (складка 59 px @2K)",
+      "defect_visible_p1": "тёмная точка в preview top (≈412,560) и game-3q-55deg (≈352,318); P1 её не упомянул",
+      "defect_origin": "генерация Tripo: у h31-GLB (до Smart UV) те же 1/2/1",
+      "repair": {
+        "method": "удаление диска на плоскости крышки, сварка края, плоская ограниченная триангуляция Делоне (без новых вершин)",
+        "disc_prescale_m": {
+          "centre_xy": [
+            -0.057,
+            -0.163
+          ],
+          "radius": 0.03,
+          "z_min": 0.95
+        },
+        "fold_faces_detected": 46,
+        "faces_deleted": 51,
+        "intact_lid_faces_deleted": 5,
+        "rim_vertices": 6,
+        "fill_triangles": 4,
+        "fill_uv": "UV вершин края из острова крышки; 0 перевёрнутых; новых островов нет",
+        "rim_z_range_mm_prescale": 1.007,
+        "normals": "нормали углов Tripo сохранены векторами до ремонта и записаны обратно; заплата — нормаль вершины края; макс. отклонение 0,034°",
+        "gate": "прогон падает, если найденная грань складки вне диска или после ремонта остаются открытые/неманифолдные рёбра или несогласованные грани"
+      },
+      "fbx_readback_topology_welded_1um": {
+        "open_edges": 0,
+        "non_manifold_edges": 0,
+        "faces_with_inconsistent_winding": 0
+      },
+      "visual_after_repair": "точка исчезла: мин. яркость кропа 33–34 → 81–82 (медиана 85–86); разница >30 только в пределах точки в top/game-3q, в front/side нет",
+      "corner_normals": {
+        "into_surface_p1": 119,
+        "into_surface_now": 80,
+        "note": "39 ушли с удалённым диском; 80 оставшихся — на 70 узких гранях пазов между клёпками (1,4 % площади), сглаживание Tripo; не исправлялось"
+      },
+      "cleanup_removed": {
+        "loose_vertices": 0,
+        "wire_edges": 0,
+        "degenerate_faces": 0
+      }
+    },
+    "scale_pivot_axes": {
+      "target_height_uu_proposed": 26.0,
+      "uniform_scale": 0.265378,
+      "dimensions_uu": [
+        21.417,
+        21.355,
+        26.0
+      ],
+      "diameter_to_height": 0.824,
+      "proposed_04": "Ø22 x 26 uu (ПРЕДЛОЖЕНИЕ, не бюджет); измеренный диаметр 21.4 uu",
+      "pivot": "центр основания (0,0,0), низ на Z=0",
+      "front": "пробка: в .blend −84,2° от +X (≈−Y), в FBX после поворота UM_FBX_v1 +90° Z на +X (FBX read-back 5,8° от +X)"
+    },
+    "uv0": {
+      "raster": "1K; те же метрики на 2K — candidate-report.json uv0.raster_metrics",
+      "islands": 36,
+      "coverage": 0.7556,
+      "out_of_0_1": 0,
+      "flipped_uv_tris": 0,
+      "overlap_px_between_islands": 0,
+      "overlap_px_inside_islands_strict": {
+        "1k": 0,
+        "2k": 0
+      },
+      "stretch_area_ratio_p05_p50_p95": [
+        0.839,
+        1.0,
+        1.141
+      ],
+      "anisotropy_p50_p95_max": [
+        1.036,
+        1.185,
+        9.553
+      ],
+      "min_island_centre_distance_px": {
+        "1k": 3.0,
+        "2k": 5.0
+      },
+      "island_pairs_centre_distance_lt_4px_1k": 18,
+      "island_pairs_centre_distance_lt_8px_1k": 64,
+      "gutter_4neighbour_p1_metric_1k": {
+        "min_px": 3,
+        "pairs_lt_4px": 34
+      },
+      "texel_density_px_per_uu_at_1k": 18.5,
+      "p1_without_repair": {
+        "islands": 48,
+        "coverage": 0.7566,
+        "flipped_uv_tris": 2,
+        "overlap_px_between_islands": 0,
+        "overlap_px_inside_islands_strict": {
+          "1k": 18,
+          "2k": 59
+        },
+        "anisotropy_max": 60.285,
+        "min_island_centre_distance_px": {
+          "1k": 3.0,
+          "2k": 5.0
+        },
+        "island_pairs_centre_distance_lt_4px_1k": 23,
+        "gutter_4neighbour_1k": {
+          "min_px": 3,
+          "pairs_lt_4px": 40
+        },
+        "note": "P1 писал «0 px перекрытия» — верно только между островами; внутри острова крышки складка 59 px @2K от 2 перевёрнутых треугольников",
+        "reproduce": "candidate-params.json с geometry_repair=null, require_closed_manifold=false и другим out_dir"
+      },
+      "before_smart_uv": {
+        "islands": 47,
+        "coverage": 0.6107,
+        "overlap_px_between_islands": 0,
+        "overlap_px_inside_islands_strict": 0,
+        "flipped": 0,
+        "stretch_area_ratio_p05_p50_p95": [
+          0.467,
+          0.805,
+          2.013
+        ],
+        "anisotropy_p50_p95_max": [
+          1.277,
+          2.307,
+          10.471
+        ],
+        "min_island_centre_distance_px": {
+          "1k": 6.0,
+          "2k": ">8"
+        },
+        "gutter_4neighbour_1k": {
+          "min_px": 5,
+          "pairs_lt_4px": 0
+        },
+        "reproduce": "static_prop_candidate.py -- reports/candidate-params-h31.json"
+      },
+      "gutter_mip_risk": {
+        "status": "не исправлено, задокументировано",
+        "min_distance_below_1_texel_at_mip": {
+          "pairs_lt_4px": 2,
+          "pairs_lt_8px": 3
+        },
+        "screen_estimate": "оценка по камере 03 §2 (ПРЕДЛОЖЕНИЕ: FOV 35°, ≈12 м, зум до 1,6×): К-1 ≈256 px/м → мип ≈2,9–3,7; К-2 ≈410 px/м → мип ≈2,2–3",
+        "effect": "на игровых дистанциях края ближайших островов смешиваются с соседним (≤1 экранного пикселя), заметнее всего дерево/металл",
+        "mitigation_present": "паддинг: N 32 px @2K, AO поле 8 px, BC/RM — паддинг Tripo",
+        "2k_helps": false,
+        "fix_option": "перепаковка с отступом ≥8 px @1K и группировкой по материалу + перенос текстур; решать по кадрам К-1/К-2"
+      }
+    },
+    "material": {
+      "slots": 1,
+      "name": "M_Decor_Barrel",
+      "teamcolor": "не применимо: декор L3 не принадлежит команде (04 §3.7)"
+    },
+    "textures": {
+      "size": "1024 (из 2K Tripo, box 2x2; BC усреднён в линейном свете)",
+      "T_Decor_Barrel_BC.png": {
+        "colorspace": "sRGB",
+        "png_color_chunks": [
+          "cHRM",
+          "gAMA",
+          "sRGB"
+        ],
+        "sha256": "393b0b50d431d94909f4e24d4d0271dd603a7ee53816be747740f7d4a49afde1",
+        "changed_vs_p1": false
+      },
+      "T_Decor_Barrel_N.png": {
+        "colorspace": "Linear задаётся при импорте (UE TC_Normalmap, flip green выкл)",
+        "png_color_chunks": [],
+        "convention": "DirectX (G инвертирован из glTF/OpenGL)",
+        "padding": "фон Tripo (15,5 % текселей 2K) заполнен ростом островов на 32 px 2K, остаток 2,6 % плоской нормалью",
+        "sha256": "33f91b4db86fa7e31ead30466a4ba9328d9fcf22d160ec6ba445ed3826fb2c17",
+        "changed_vs_p1": "только удалены чанки sRGB/gAMA/cHRM; пиксели идентичны"
+      },
+      "T_Decor_Barrel_ORM.png": {
+        "colorspace": "Linear задаётся при импорте (UE TC_Masks, sRGB=false)",
+        "png_color_chunks": [],
+        "R": "AO, перезапечён на отремонтированной сетке: Cycles 64 spp, 3 см (p05 0,641, p50 1,0; <0,05: 85 текселей в пазах, в P1 681)",
+        "G": "roughness Tripo PBR (среднее 0,903)",
+        "B": "metallic Tripo PBR (среднее 0,123; 14 % текселей > 0,5 — обручи)",
+        "sha256": "9a66a5581ba08573952d82aafd1987edaf8d890e2bf3a12761db571df98b875c",
+        "changed_vs_p1": "R в районе щепки и заплаты; G/B идентичны; чанки удалены"
+      },
+      "png_color_chunks_note": "Blender пишет sRGB/gAMA/cHRM в каждый 8-битный PNG; из N/ORM удалены, но PNG без чанков многие программы тоже читают как sRGB — опираться на настройку импорта"
+    },
+    "export": {
+      "fbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/SM_Decor_Barrel.fbx",
+      "sha256": "80153e4c9ccb759ba09d0f255e6066ebee3ba152652cad7c81f8e6c90b91855b",
+      "bytes": 140044,
+      "sha256_p1": "c4727c33eb457e3e7a1f06fc77f3493af5e9a6d4f1007e51393ea292a63cc7d9",
+      "preset": "blender/_tools/presets/UM_FBX_v1.json",
+      "textures_embedded": false,
+      "texture_path_in_fbx": "T_Decor_Barrel_BC.png (относительный; абсолютных путей нет)",
+      "um_fbx_v1_conforms": true,
+      "um_fbx_v1_check": "candidate-report.json export.um_fbx_v1_conformance (построчно по 04 §1/§1.1)",
+      "p1_deviations_fixed": [
+        "object_types только MESH → ARMATURE+MESH (арматуры нет)",
+        "path_mode STRIP → AUTO (путь тот же)",
+        "use_tspace=True (касательные) → не экспортируются, как в batch_export.py"
+      ],
+      "already_conforming_in_p1": "оси −Y/Z, +90° Z, данные ×100, UnitScaleFactor 1.0, FBX_SCALE_UNITS, треугольники, Face, pivot, единицы",
+      "deterministic": "два прогона в разные каталоги: одинаковые SHA-256 FBX, трёх PNG и UV-раскладки; отчёты равны кроме out_dir. Повторено после удаления repo_root из params: прогоны из C:/tmp (params без repo_root и с относительным repo_root) и в репозитории дали те же SHA FBX/BC/N/ORM/UV-раскладки; превью EEVEE отличаются от прежних не более чем на 1/255"
+    },
+    "checks": {
+      "single_mesh": true,
+      "triangles_preserved": true,
+      "one_material_slot": true,
+      "uv0_present": true,
+      "no_armature": true,
+      "height_matches_target_1pct": true,
+      "base_at_zero": true,
+      "centred_xy": true,
+      "source_unchanged": true,
+      "um_fbx_v1_conforms": true,
+      "closed_manifold_consistent_winding": true
+    },
+    "script_sha256_lf": "6f703427539511afe37740035e55db1bcddbbb92bd2092bfedddc076b7b3d18b",
+    "script_sha256_lf_note": "sha256 текста скрипта с CRLF → LF (равен blob в git); не зависит от core.autocrlf и checkout; проверка: tr -d '\\r' < tools/tripo-pipeline/blender/static_prop_candidate.py | sha256sum",
+    "params_repo_root": "в candidate-params*.json нет repo_root: корень репозитория берётся по расположению скрипта (tools/tripo-pipeline/blender/ → три уровня вверх); относительный repo_root считается от папки params.json, абсолютный используется как есть",
+    "params_before_smart_uv": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/candidate-params-h31.json",
+    "report_before_smart_uv": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/before-smartuv/reports/candidate-report.json"
+  },
+  "visual_check": {
+    "method": "PNG просмотрены инструментом Read (рендер сработал): preview/*.png, UV-раскладка, BC/N/ORM; превью сравнены попиксельно с копией P1",
+    "observed": "силуэт, доски, пробка и два обруча совпадают с референсом; тёмная точка на крышке (видна в P1 в top и game-3q) исчезла; щепки внизу UV-раскладки нет; крышка из двух досок получена Tripo без вида сверху; художественная оценка не проводилась"
+  },
+  "open_issues": [
+    "Зазоры UV: мин. 3 px @1K (18 пар < 4 px) — ниже 1 текселя на мипе 2; на игровых дистанциях (мип ≈2–3,7) края ближайших островов смешиваются; 2K не помогает; решать по кадрам К-1/К-2.",
+    "80 углов с нормалью внутрь поверхности в пазах между клёпками (сглаживание Tripo, 1,4 % площади).",
+    "Крышка додумана Tripo: вида сверху в multi-view нет; место складки закрыто плоской заплатой из текстуры крышки.",
+    "glTF Tripo помечен doubleSided=true; в UE материал должен остаться односторонним.",
+    "Размер Ø22 x 26 uu — предложение 04; измерено 21,4 x 26 uu.",
+    "Экспорт одним файлом на объект: AD-CNF-19 не решён."
+  ],
+  "deferred_to_ue_stage": [
+    "tripo_pipeline --backend mcp ue-import для pipeline-прогона в /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel (только при свободном UE; в чистом клоне сначала restore_embedded_textures.py)",
+    "импорт export/SM_Decor_Barrel.fbx как StaticMesh, масштаб 1.0, без коллизии, без генерации материалов",
+    "импорт трёх PNG: BC sRGB, N как TC_Normalmap без flip green, ORM как TC_Masks sRGB=false (Linear задаётся здесь, не в PNG)",
+    "MI от M_DioramaMaster (или временный M_), односторонний, TeamColor нейтральный",
+    "проверить в UE: 1 слот, 3790 tris LOD0, 21,4 x 21,4 x 26 uu +-1 %, pivot на основании, пробка к +X, нет дублей Name_1",
+    "кадры K-1/K-2 в контрольной сцене для художественной проверки; отдельно швы островов (мипы) и пазы (нормали)"
+  ],
+  "external_cost": "60 Studio-кредитов (45 + 10 + 5; Smart UV бесплатно по пробе); покупок нет. Исправления P1.5-fix: 0 (только headless Blender)",
+  "revision": "P1.5-fix: исправления по проверке P1 (Fable + верификатор)",
+  "changes_after_p1_review": [
+    "складка на плоскости крышки исправлена в кандидате (удалён диск R=3 см до масштаба, плоская заплата 4 tris); описание места исправлено",
+    "нормали/UV/AO перепроверены после ремонта; добавлены метрики перекрытия внутри островов и евклидова зазора; риск мипов задокументирован",
+    "N/ORM: PNG-чанки sRGB/gAMA/cHRM удалены; Linear задаётся при импорте",
+    "экспорт сверен с 04 §1/§1.1 UM_FBX_v1; Object Types, Path Mode и экспорт касательных приведены к пресету",
+    "колонка «До Smart UV» воспроизводима: reports/candidate-params-h31.json",
+    "владелец «Риггинг −20» ×2 = P1.6 (не T4); инцидент Save-диалога Chrome и исчезнувшие .tmp описаны",
+    "source/textures/ не в git; восстановление из GLB скриптом со сверкой SHA-256"
+  ],
+  "changes_after_manifest_review": [
+    "из candidate-params.json и candidate-params-h31.json убран абсолютный repo_root; скрипт находит корень по своему расположению, копию params можно класть куда угодно",
+    "sha скрипта в candidate-report.json записывается как script_sha256_lf (текст с LF) и совпадает в любом checkout; сам скрипт переведён на LF",
+    "описано, что pipeline/ — снимок CLI 0.3.0, и какие команды на нём нельзя выполнять; варианты решения — для оркестратора",
+    "candidate-report.json (оба) перезаписаны прогоном в репозитории; FBX, BC/N/ORM и UV-раскладка побайтно не изменились"
+  ],
+  "p1_artifacts_replaced": {
+    "backup_outside_repo": "C:/tmp/p15fix/backup-p1/",
+    "fbx_sha256": "c4727c33eb457e3e7a1f06fc77f3493af5e9a6d4f1007e51393ea292a63cc7d9",
+    "n_sha256": "d1b6281080551f1d8c5a418b50b051f136f0b62692090d7d5ae52e07f6916000",
+    "orm_sha256": "d2603369d8350e9e86c1826e6f12056b69bd7f30ff2b9ec9e64c8734e5fc4081"
+  }
+}

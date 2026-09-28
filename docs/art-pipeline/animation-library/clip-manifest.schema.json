@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "unmatched.animation-clip-manifest/1",
+  "title": "Unmatched — манифест библиотеки анимаций",
+  "description": "Один элемент clips[] = один слот клипа персонажа. Статусы строго: proposed (предложено) -> draft_test (черновой тестовый файл) -> measured (измерено валидатором) -> technically_imported (технически импортировано в UE) -> artistically_accepted (художественно принято, только с актом). rejected — проверено и отклонено.",
+  "type": "object",
+  "required": ["schema", "revision", "rig_contract", "clips"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "unmatched.animation-clip-manifest/1"},
+    "revision": {"type": "string"},
+    "rig_contract": {"type": "string", "description": "путь к rig-contract.json"},
+    "notes": {"type": "array", "items": {"type": "string"}},
+    "clips": {"type": "array", "items": {"$ref": "#/$defs/clip"}}
+  },
+  "$defs": {
+    "status": {"enum": ["proposed", "draft_test", "measured", "technically_imported", "artistically_accepted", "rejected"]},
+    "file": {
+      "type": "object",
+      "required": ["path", "exists"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {"type": "string"},
+        "exists": {"type": "boolean"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "format": {"enum": ["fbx", "bvh", "glb", "blend", "npz", "uasset"]}
+      }
+    },
+    "clip": {
+      "type": "object",
+      "required": ["id", "character", "asset_id", "clip", "role", "cue", "source", "license",
+                   "fps", "duration_s", "loop", "root_motion", "skeleton", "status", "validation"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Z]{3,4}-[A-Za-z]+(-[A-Za-z0-9]+)*$"},
+        "character": {"enum": ["Medusa", "Harpy", "Arthur", "Merlin"]},
+        "asset_id": {"type": "string"},
+        "clip": {"enum": ["Idle", "LungeAttack", "HitReact", "DeathSettle"]},
+        "role": {"enum": ["production", "test"], "description": "test — файлы только для проверки пайплайна"},
+        "required_mvp": {"type": "boolean", "description": "false — условный слот (например HAR-HitReact до AD-CNF-30, бриф 18 стр. 10) или тестовая запись; причина — в notes"},
+        "cue": {
+          "type": "array", "minItems": 1,
+          "items": {"type": "string", "pattern": "^(CUE-0[0-9]{2}|state:[A-Za-z]+)$"}
+        },
+        "source": {
+          "type": "object",
+          "required": ["type"],
+          "additionalProperties": false,
+          "properties": {
+            "type": {"enum": ["none", "blender_keyframed", "tripo_preset", "tripo_text_to_motion", "video_to_motion", "mocap_library", "manual_cascadeur"]},
+            "tool": {"type": "string"},
+            "task_id": {"type": "string"},
+            "reference": {"type": "string"},
+            "files": {"type": "array", "items": {"$ref": "#/$defs/file"}}
+          }
+        },
+        "license": {
+          "type": "object",
+          "required": ["terms", "commercial_use"],
+          "additionalProperties": false,
+          "properties": {
+            "holder": {"type": "string"},
+            "terms": {"type": "string"},
+            "commercial_use": {"enum": ["yes", "no", "unverified", "n/a"]},
+            "evidence": {"type": "string"}
+          }
+        },
+        "fps": {"type": "object", "required": ["target"], "additionalProperties": false,
+                "properties": {"target": {"type": "number"}, "measured": {"type": ["number", "null"]}}},
+        "duration_s": {"type": "object", "required": ["target"], "additionalProperties": false,
+                       "properties": {"target": {"type": ["number", "string"]}, "target_status": {"enum": ["proposal", "normative", "open"]},
+                                      "measured": {"type": ["number", "null"]}}},
+        "loop": {"type": "boolean"},
+        "root_motion": {"enum": ["in_place", "root_motion"]},
+        "skeleton": {"type": "object", "required": ["contract_key", "version"], "additionalProperties": false,
+                     "properties": {"contract_key": {"type": "string"}, "version": {"type": "string"},
+                                    "retarget_map": {"type": "string"}}},
+        "ue": {"type": "object", "additionalProperties": false,
+               "properties": {"target_path": {"type": "string"}, "status": {"$ref": "#/$defs/status"}, "evidence": {"type": "string"}}},
+        "status": {"$ref": "#/$defs/status"},
+        "acceptance_evidence": {"type": "string"},
+        "validation": {"type": "object", "required": ["result"], "additionalProperties": false,
+                       "properties": {"result": {"enum": ["not_run", "pass", "fail"]}, "report": {"type": "string"},
+                                      "fails": {"type": "array", "items": {"type": "string"}},
+                                      "warnings": {"type": "array", "items": {"type": "string"}}, "date": {"type": "string"}}},
+        "notes": {"type": "string"}
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"const": "artistically_accepted"}}},
+         "then": {"required": ["acceptance_evidence"]}},
+        {"if": {"properties": {"role": {"const": "test"}}},
+         "then": {"properties": {"status": {"not": {"const": "artistically_accepted"}}}}}
+      ]
+    }
+  }
+}

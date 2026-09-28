@@ -1,0 +1,96 @@
+{
+  "schema": "unmatched.tripo-run/1",
+  "run_id": "tripo-rig-20260928-p16",
+  "task": "P1.6 Риг и библиотека анимаций — проверка авторига Tripo на Medusa",
+  "date": "2026-09-28",
+  "studio": "https://studio.tripo3d.ai (вкладка агента в Chrome пользователя; приватность «Приватный» наследуется от исходных заданий)",
+  "credit_limit": 100,
+  "credits_spent_by_this_run": 40,
+  "credits_note": "Исправлено 2026-09-28 по сверке P1.6 с P1.5: 40 = два авторига UE5 Mannequin по 20 (история Studio «Риггинг −20» 11:18:01 и 11:26:52 — записаны в docs/art-pipeline/prop-barrel-report.md). Переход 24 950 → 24 945 по истории Studio (11:28:01) — PBR задачи P1.5, а не пресет. Итог окна 25 045 → 24 945 = 100 = 60 (P1.5) + 40 (P1.6). Отдельного списания за пресет «стоя_отдых» в балансе не видно, его цена не подтверждена (на карточке не показана). Прежние «45» и «пресет 5 кредитов» не подтверждены.",
+  "balance_note": "Баланс общий с параллельными агентами (P1.5 и др.); дельты сверены по моменту каждой операции.",
+  "balance_observed": [
+    {
+      "time": "11:13",
+      "value": 25045,
+      "note": "начало сессии; в evidence ART-004 было 25 065 — 20 кредитов ушли на риг Mixamo, уже бывший в истории b6253e58 (происхождение в этой сессии не установлено)"
+    },
+    {
+      "time": "11:18",
+      "value": 25000,
+      "note": "до запуска рига; -45 — генерация бочки параллельным агентом P1.5"
+    },
+    {
+      "time": "11:21",
+      "value": 24980,
+      "note": "после рига UE5 Mannequin на b6253e58 (-20, эта задача; в истории Studio «Риггинг −20» 11:18:01)"
+    },
+    {
+      "time": "11:26",
+      "value": 24970,
+      "note": "до рига d562f057 (-10 — параллельный агент)"
+    },
+    {
+      "time": "11:27",
+      "value": 24950,
+      "note": "после рига UE5 Mannequin на d562f057 (-20, эта задача; в истории Studio «Риггинг −20» 11:26:52)"
+    },
+    {
+      "time": "11:31",
+      "value": 24945,
+      "note": "-5 — PBR параллельной задачи P1.5 (история Studio 11:28:01), а не пресет «стоя_отдых»: пресет запущен кликом по карточке без показанной цены, отдельного списания за него не видно"
+    }
+  ],
+  "operations": [
+    {
+      "op": "inspect_existing_rig",
+      "task_id": "b6253e58-5875-4321-867a-fad5c2d413e1",
+      "preset": "Mixamo (выбран в форме; имена костей в экспорте UE-подобные)",
+      "credits": 0,
+      "export": "FBX/Blender, 4k, Compact UV выкл",
+      "file": "source/b6253e58-rig-mixamo-existing-fbx-blender.zip"
+    },
+    {
+      "op": "auto_rig",
+      "task_id": "b6253e58-5875-4321-867a-fad5c2d413e1",
+      "type": "Гуманоид",
+      "preset": "UE5 Mannequin",
+      "button_price": 20,
+      "credits": 20,
+      "warning": "«Не готово к автоматическому риггингу» → «Всё равно выполнить риггинг»",
+      "export": "FBX/Blender, 4k, Compact UV выкл",
+      "file": "source/b6253e58-rig-ue5-forced-p16-fbx-blender.zip"
+    },
+    {
+      "op": "auto_rig",
+      "task_id": "d562f057-1455-4663-8cd8-bb738175111d",
+      "input": "Quad-ретопология 10 485 faces (единый меш)",
+      "type": "Гуманоид",
+      "preset": "UE5 Mannequin",
+      "button_price": 20,
+      "credits": 20,
+      "warning": "то же предупреждение, принудительный запуск",
+      "export": "GLB, 4k",
+      "file": "source/d562f057-rig-ue5-forced-p16.glb",
+      "download_note": "Save-диалог Chrome был занят чужим скачиванием; GLB скопирован из завершённого временного файла Chrome (длина glTF-заголовка = размеру файла)"
+    },
+    {
+      "op": "animation_preset",
+      "task_id": "d562f057-1455-4663-8cd8-bb738175111d",
+      "preset": "стоя_отдых (standing_relax)",
+      "credits": null,
+      "export": "FBX/Blender, 1 анимация, Animação no Lugar (in place) вкл",
+      "file": "source/d562f057-ue5-forced-anim-preset-stoya-otdyh-inplace-fbx-blender.zip",
+      "credits_note": "цена не подтверждена: на карточке не показана, отдельного списания в балансе нет (см. credits_note)"
+    }
+  ],
+  "files": {
+    "source/b6253e58-rig-mixamo-existing-fbx-blender.zip": "bf612b085d43fa85de3004e8471a0fc11c8a2f453d46aa51bb933e9567b34c4e",
+    "source/b6253e58-rig-ue5-forced-p16-fbx-blender.zip": "6582c49c5c6b3663f49a2ad67bac9d8576f7083de06936a02fea235f5c9ad8a1",
+    "source/d562f057-rig-ue5-forced-p16.glb": "78f9c95930fb97760172e41cd49192a760afc891cda783e263229524b4df901f",
+    "source/d562f057-ue5-forced-anim-preset-stoya-otdyh-inplace-fbx-blender.zip": "15f994e79cb3db0ea6ad52994a4771907dfa3697e7599e19d7edb2d7ea471e4b"
+  },
+  "foreign_files_removed": {
+    "source/decor-barrel-tripo-h31-3f7a258f-source.glb": "убран из каталога 2026-09-28: побайтная копия (sha256 7c81e9944f64390d1f0581c29b0bbc26884cf396603cf629575c1a37c2443782, cmp — идентичны) файла P1.5 art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-h31-3f7a258f-source.glb; попал сюда через общий Save-диалог Chrome"
+  },
+  "verdict": "Авториг Tripo на позе миниатюры Medusa технически отдаёт скелет UE5-типа, но деформации неприемлемы во всех трёх рёбрах проверки: кости ног попадают в корону змей, голова — в корпус, L/R перепутаны, подставка и лук взвешены на кости тела. Статус: измерено; отклонено для производства."
+}

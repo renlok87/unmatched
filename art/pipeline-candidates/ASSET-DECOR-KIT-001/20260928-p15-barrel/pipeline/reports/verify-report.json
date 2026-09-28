@@ -1,0 +1,128 @@
+{
+  "checks": {
+    "armatures_as_expected": {
+      "expected": 0,
+      "measured": 0,
+      "passed": true
+    },
+    "blender_mesh_count_equals_glb": {
+      "expected": 1,
+      "measured": 1,
+      "passed": true
+    },
+    "blender_triangle_loss_within_tolerance": {
+      "expected": "<= 0.100% of GLB triangles",
+      "measured": {
+        "blender": 3837,
+        "glb": 3837,
+        "lost": 0,
+        "per_mesh_delta": {}
+      },
+      "note": "Blender glTF importer can drop degenerate/duplicate triangles; listed per mesh",
+      "passed": true
+    },
+    "bounds_non_degenerate": {
+      "measured": [
+        0.804718,
+        0.807037,
+        0.979736
+      ],
+      "passed": true
+    },
+    "evidence_glb_materials": {
+      "expected": 1,
+      "measured": 1,
+      "note": "expected value copied from Tripo evidence JSON",
+      "passed": true
+    },
+    "evidence_glb_mesh_count": {
+      "expected": 1,
+      "measured": 1,
+      "note": "expected value copied from Tripo evidence JSON",
+      "passed": true
+    },
+    "evidence_glb_skins": {
+      "expected": 0,
+      "measured": 0,
+      "note": "expected value copied from Tripo evidence JSON",
+      "passed": true
+    },
+    "evidence_glb_triangles": {
+      "expected": 3837,
+      "measured": 3837,
+      "note": "expected value copied from Tripo evidence JSON",
+      "passed": true
+    },
+    "import_report_matches_source": {
+      "measured": "b336bf62ae9cd1518e741d0814824c4e3f5e5d1e4b3a1838a33f72ec59632fc4",
+      "passed": true
+    },
+    "source_unchanged": {
+      "measured": "b336bf62ae9cd1518e741d0814824c4e3f5e5d1e4b3a1838a33f72ec59632fc4",
+      "passed": true
+    },
+    "uv0_on_every_mesh": {
+      "measured": {
+        "meshes_without_uv": []
+      },
+      "passed": true
+    }
+  },
+  "diagnostics": {
+    "bounds_source_units": {
+      "dimensions": [
+        0.804718,
+        0.807037,
+        0.979736
+      ],
+      "max": [
+        0.402359,
+        0.403519,
+        0.979736
+      ],
+      "min": [
+        -0.402359,
+        -0.403519,
+        0.0
+      ]
+    },
+    "degenerate_faces_total": 0,
+    "weld_1e-7_per_mesh": {
+      "tripo_node_eda72a47-8d18-4031-9e06-2c061ab998d8": {
+        "boundary_edges": 1,
+        "non_manifold_edges": 3,
+        "vertices": 1912
+      }
+    }
+  },
+  "glb_structure": {
+    "animations": 0,
+    "generator": "Tripo",
+    "images": 3,
+    "materials": 1,
+    "mesh_count": 1,
+    "primitive_modes": [
+      4
+    ],
+    "skins": 0,
+    "triangles": 3837
+  },
+  "logic": "verify/1",
+  "not_checked": [
+    "budgets: numbers are measured only; budgets stay proposals until GD-058 is decided",
+    "art acceptance, silhouette, lighting: art track",
+    "rig, sockets, animation, UE import: later candidate stages"
+  ],
+  "passed": true,
+  "source": {
+    "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr.glb",
+    "role": "smartuv-tex2k-pbr-glb",
+    "sha256": "b336bf62ae9cd1518e741d0814824c4e3f5e5d1e4b3a1838a33f72ec59632fc4",
+    "source_id": "tripo-3f7a258f"
+  },
+  "stage": "verify",
+  "status": "measured",
+  "warnings": [
+    "open/non-manifold edges after diagnostic weld in 1 mesh(es); informational"
+  ]
+}

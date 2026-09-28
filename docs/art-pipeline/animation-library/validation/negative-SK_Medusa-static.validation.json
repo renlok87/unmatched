@@ -1,0 +1,39 @@
+{
+ "schema": "unmatched.clip-validation/1",
+ "clip": "blender/ASSET-MEDUSA-001/export/SK_Medusa.fbx",
+ "clip_bytes": 1165452,
+ "contract": "docs/art-pipeline/rig/rig-contract.json",
+ "skeleton": "UM_HUMANOID_17_v1",
+ "blender": "5.2.2 LTS",
+ "checks": [
+  {
+   "check": "import",
+   "status": "pass"
+  },
+  {
+   "check": "single_armature",
+   "status": "pass",
+   "value": "SKEL_Medusa"
+  },
+  {
+   "check": "armature_object_name",
+   "status": "warn",
+   "value": "SKEL_Medusa",
+   "expected": "SKEL_UM_Humanoid",
+   "note": "старое имя существующих тестовых ассетов; несовместимо с общим UE Skeleton"
+  },
+  {
+   "check": "action",
+   "status": "fail",
+   "detail": "у арматуры нет действия"
+  }
+ ],
+ "bones": {},
+ "result": "fail",
+ "fails": [
+  "action"
+ ],
+ "warnings": [
+  "armature_object_name"
+ ]
+}

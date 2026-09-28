@@ -1,0 +1,85 @@
+{
+  "blender": "5.2.2 LTS",
+  "checks": {
+    "blender_roundtrip_ratio_is_1": true,
+    "mesh_count_preserved": true,
+    "no_armature_expected": true,
+    "triangles_preserved": true,
+    "uv_present_on_all_meshes": true
+  },
+  "expected_ue_dimensions_uu_at_import_scale_1": [
+    80.4718,
+    80.7037,
+    97.9736
+  ],
+  "fbx": {
+    "bytes": 4393020,
+    "file": "SM_Decor_Barrel_TripoPassthrough.fbx",
+    "settings": {
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "creation_time_pinned": "2000-01-01T00:00:00",
+      "embed_textures": true,
+      "texture_paths": "relative names only; bytes embedded",
+      "unit_scale_factor_after_patch": 1.0
+    },
+    "sha256": "f9c9042a656aa0e6151f5f2722d92439f33cfeb102ebf3c7395fb5e596f5e108"
+  },
+  "note": "technical passthrough; not a game asset and not art-accepted",
+  "passed": true,
+  "roundtrip_dimension_ratio": [
+    1.0,
+    1.0,
+    1.0
+  ],
+  "roundtrip_reimport": {
+    "armatures": 0,
+    "bounds_dimensions": [
+      0.804718,
+      0.807037,
+      0.979736
+    ],
+    "bounds_min": [
+      -0.402359,
+      -0.403519,
+      0.0
+    ],
+    "images": [
+      "decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_basecolor.jpg.001",
+      "decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_normal.png.001"
+    ],
+    "material_count": 1,
+    "mesh_count": 1,
+    "triangles_total": 3837,
+    "uv_layers_min": 1
+  },
+  "scene_before_export": {
+    "armatures": 0,
+    "bounds_dimensions": [
+      0.804718,
+      0.807037,
+      0.979736
+    ],
+    "bounds_min": [
+      -0.402359,
+      -0.403519,
+      0.0
+    ],
+    "images": [
+      "decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_basecolor.jpg",
+      "decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_normal.png",
+      "decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_rm.png"
+    ],
+    "material_count": 1,
+    "mesh_count": 1,
+    "triangles_total": 3837,
+    "uv_layers_min": 1
+  },
+  "stage": "export",
+  "texture_transport": {
+    "images_after_roundtrip": 2,
+    "images_before_export": 3,
+    "note": "Blender FBX writer embeds only textures wired to supported Principled inputs; glTF metallic/roughness via Separate Color is not transported. Informational: BC/N/ORM packing is a later candidate stage, not part of this passthrough."
+  }
+}

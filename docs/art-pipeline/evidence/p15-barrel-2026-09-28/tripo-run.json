@@ -1,0 +1,247 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "P1.5 static prop (barrel)",
+  "asset_id": "ASSET-DECOR-KIT-001.BARREL",
+  "date": "2026-09-28",
+  "service": "tripo-studio",
+  "account_plan_ui": "Max",
+  "access": "Claude in Chrome, own tab; the tabs of the parallel P1.6 rigging run (tripo-rig-20260928-p16, tasks b6253e58/d562f057) were not touched. The Chrome download/Save-As queue was shared with P1.6, see downloads.incident",
+  "task_id": "3f7a258f-d41c-4720-b31a-cb1573604670",
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/3f7a258f-d41c-4720-b31a-cb1573604670",
+  "generation": {
+    "mode": "multi-view",
+    "ui": "HD модель, режим «несколько видов» (не batch)",
+    "model_ui_label": "H3.1 - Макс.кач. Ожидание дольше",
+    "views": {
+      "front": {
+        "path": "art/imagegen/mvp-v1/environment/ref-barrel-v3-front.png",
+        "sha256": "0253587543f27a3159b93879dc4e77870d711a6ad8fed4695bf9106aed340129"
+      },
+      "left": {
+        "path": "art/imagegen/mvp-v1/environment/ref-barrel-v3-side.png",
+        "sha256": "f78baae79e13f0a6c1a4707a66600ca936b3cb613dd6e63623f6b551ee64f038"
+      },
+      "right": null,
+      "back": null
+    },
+    "slot_mapping_source": "docs/art-pipeline/imagegen-inputs/manifest.json REF-BARREL.propTripoSlotProposal (front<-front, left<-side)",
+    "settings": {
+      "privacy": "Приватный",
+      "generate_parts": false,
+      "texture_8k": false,
+      "ultra_mesh_quality": true,
+      "texture": true,
+      "texture_quality": "2K",
+      "remove_lighting": true,
+      "pbr": true,
+      "topology": "Triangle",
+      "polygon_count": 4000,
+      "ai_completion": "not shown in multi-view mode"
+    },
+    "studio_settings_note": "Studio persists these settings for the account; defaults seen before the run: 4K, 2 000 000 polygons (restored after the run)"
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "ui": "Из нескольких видов в модель",
+      "history_time": "2026-09-28 11:15:37",
+      "quoted": 45,
+      "observed_debit": 45,
+      "balance_before": 25045,
+      "balance_after": 25000,
+      "result": {
+        "faces_ui": 3837,
+        "vertices_ui": 2557,
+        "topology_ui": "Triangle"
+      }
+    },
+    {
+      "op": "export",
+      "format": "GLB",
+      "texture_resolution": "2k (current)",
+      "file": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-h31-3f7a258f-source.glb",
+      "debit": 0,
+      "note": "no history entry for export"
+    },
+    {
+      "op": "smart-uv",
+      "ui": "Smart UV, «Развернуть UV»",
+      "quoted": 20,
+      "charged_price_shown": 0,
+      "trial": "Пробная версия x2 -> x1",
+      "observed_debit": 0,
+      "history_entry": "none",
+      "result": {
+        "uv_fill_ui": "75.7% (before 61.1%)",
+        "vertices_ui": 2494,
+        "faces_ui": 3837
+      },
+      "note": "Smart UV removes the texture; saved as a new model state of the same task"
+    },
+    {
+      "op": "texture",
+      "ui": "Генератор текстур, несколько видов (те же front/left)",
+      "settings": {
+        "texture_resolution": "2K",
+        "remove_lighting": true
+      },
+      "history_time": "2026-09-28 11:24:38",
+      "quoted": 10,
+      "observed_debit": 10,
+      "balance_before": 24980,
+      "balance_after": 24970,
+      "note": "4K was quoted 30; the 8K trial was not used"
+    },
+    {
+      "op": "export",
+      "format": "GLB",
+      "texture_resolution": "2k (current)",
+      "file": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-3f7a258f-smartuv-tex2k.glb",
+      "debit": 0
+    },
+    {
+      "op": "pbr",
+      "ui": "Генератор PBR",
+      "history_time": "2026-09-28 11:28:01",
+      "quoted": 5,
+      "observed_debit": 5,
+      "balance_before": 24950,
+      "balance_after": 24945
+    },
+    {
+      "op": "export",
+      "format": "GLB",
+      "texture_resolution": "2k (current)",
+      "file": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr.glb",
+      "debit": 0
+    }
+  ],
+  "credits": {
+    "unit": "studio-credits",
+    "this_task_total_observed": 60,
+    "limit": 100,
+    "balance_ui_start": 25045,
+    "balance_ui_end_of_tripo_work": 24945,
+    "unattributed_to_this_task": [
+      {
+        "history": "2026-09-28 11:18:01 Риггинг -20",
+        "owner": "P1.6 (art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/run.json): rig UE5 Mannequin, task b6253e58"
+      },
+      {
+        "history": "2026-09-28 11:26:52 Риггинг -20",
+        "owner": "P1.6 (tripo-rig-20260928-p16/run.json): rig UE5 Mannequin, task d562f057"
+      }
+    ],
+    "history_snapshot_2026-09-28_11:33": [
+      [
+        "2026-09-28 11:28:01",
+        "Генерация PBR",
+        -5
+      ],
+      [
+        "2026-09-28 11:26:52",
+        "Риггинг",
+        -20
+      ],
+      [
+        "2026-09-28 11:24:38",
+        "Генерация текстур",
+        -10
+      ],
+      [
+        "2026-09-28 11:18:01",
+        "Риггинг",
+        -20
+      ],
+      [
+        "2026-09-28 11:15:37",
+        "Из нескольких видов в модель",
+        -45
+      ],
+      [
+        "2026-09-27 23:35:19",
+        "Риггинг",
+        -20
+      ],
+      [
+        "2026-09-27 22:52:32",
+        "Ретопология",
+        -40
+      ],
+      [
+        "2026-09-27 22:37:00",
+        "Ретопология",
+        -40
+      ],
+      [
+        "2026-09-27 22:23:24",
+        "Из нескольких видов в модель",
+        -55
+      ],
+      [
+        "2026-09-27 18:14:14",
+        "Пополнение кредитов",
+        25000
+      ],
+      [
+        "2026-09-27 18:05:33",
+        "Пополнение кредитов",
+        200
+      ]
+    ],
+    "unattributed_note": "Corrected after the P1 review: the first version attributed both debits to T4, but T4 reports 0 Tripo calls and P1.6 claims them. The 11:33 history snapshot below has no other -5 entry besides this task's PBR at 11:28:01. This task's arithmetic is unchanged: 60 of 100."
+  },
+  "downloads": {
+    "method": "Studio «Экспорт» -> GLB in the shared Chrome profile. Chrome did not finish the Save-As step and left each file as <guid>.tmp in C:/Users/ren/Downloads. Before copying, the GLB header length was checked against the file size and all chunks were walked. The Save-As dialogs were neither completed nor cancelled before the session ended",
+    "files": {
+      "h31": {
+        "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-h31-3f7a258f-source.glb",
+        "sha256": "7c81e9944f64390d1f0581c29b0bbc26884cf396603cf629575c1a37c2443782",
+        "bytes": 2937712
+      },
+      "suv": {
+        "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-3f7a258f-smartuv-tex2k.glb",
+        "sha256": "2937d45f2d218820053640981e355f821cd1d4ffc2486780f1c56506467db438",
+        "bytes": 4378264
+      },
+      "pbr": {
+        "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr.glb",
+        "sha256": "b336bf62ae9cd1518e741d0814824c4e3f5e5d1e4b3a1838a33f72ec59632fc4",
+        "bytes": 6903704
+      }
+    },
+    "tmp_names": {
+      "h31": "8f9064d1-404e-4bfb-b489-1063b7e38422.tmp",
+      "suv": "8ead5263-ad5a-4c9a-bea1-415b90d99490.tmp",
+      "pbr": "04dda04c-9d6c-4512-95e5-024979f1161c.tmp"
+    },
+    "incident": {
+      "what": "A byte-identical copy of the h31 download (decor-barrel-tripo-h31-3f7a258f-source.glb, sha256 7c81e9944f64390d1f0581c29b0bbc26884cf396603cf629575c1a37c2443782) appeared at 11:31:50 in art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/source/. That directory belongs to another run. The file name had been typed into the Tripo export dialog by this task, and P1.6's run.json lists the file under foreign_files, noting that the Chrome Save dialog was occupied by another download",
+      "likely_mechanism": "This task's h31 Save-As was left open in the shared Chrome. It was then finished from P1.6's session into P1.6's directory, and Chrome moved the .tmp there under the given name. The P1 review rated this as plausible but not proven. What happened to the other two .tmp files is not established",
+      "state_at_p1_review": "no .tmp files in C:/Users/ren/Downloads; the foreign copy was present in tripo-rig-20260928-p16/source/",
+      "state_2026-09-28_12:15": "no .tmp in C:/Users/ren/Downloads; tripo-rig-20260928-p16/source/ no longer contains the barrel GLB. It was not removed by this task: removal was left to the owner of ASSET-MEDUSA-001 through the orchestrator",
+      "impact": "No loss for this task: source/*.glb had already been copied and verified (sha256 matches spec and registry). The parallel run did receive a foreign file",
+      "rule_for_next_runs": "One Tripo download at a time in a shared Chrome. Finish or cancel your own Save-As dialog before handing the browser over or ending the session"
+    }
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  },
+  "corrections": [
+    {
+      "date": "2026-09-28",
+      "by": "P1.5 fix pass after the P1 review",
+      "changed": [
+        "access",
+        "credits.unattributed_to_this_task[*].owner",
+        "credits.unattributed_note",
+        "downloads.method",
+        "downloads.incident"
+      ],
+      "unchanged": "prices, debits, balances, history snapshot, file paths and hashes",
+      "note": "The tripo_pipeline run art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline/manifest.json pinned this file at registration as sha256 0a55165a87e9cd350889c24ca67cfda47d5173a34b5b8ad9a1d9b3a3606eca10 (the pre-correction version). Repeating register-source in that run dir now stops with a conflict. Reproduce in a fresh run dir instead"
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+ "schema": "unmatched.clip-validation-summary/1",
+ "cases": [
+  {
+   "case": "AM_Medusa_Idle",
+   "clip": "blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx",
+   "exit": 0,
+   "result": "pass",
+   "fails": [],
+   "warnings": [
+    "armature_object_name",
+    "visible_pose_change"
+   ],
+   "expected_exit": 0,
+   "expected_warnings": [
+    "visible_pose_change"
+   ],
+   "expectation_met": true,
+   "fps": 24.0,
+   "duration_s": 2.3333,
+   "reference_height": 0.51193
+  },
+  {
+   "case": "AM_Medusa_LungeAttack",
+   "clip": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx",
+   "exit": 0,
+   "result": "pass",
+   "fails": [],
+   "warnings": [
+    "armature_object_name"
+   ],
+   "expected_exit": 0,
+   "expected_warnings": [],
+   "expectation_met": true,
+   "fps": 24.0,
+   "duration_s": 0.5833,
+   "reference_height": 0.51193
+  },
+  {
+   "case": "AM_Medusa_HitReact",
+   "clip": "blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx",
+   "exit": 0,
+   "result": "pass",
+   "fails": [],
+   "warnings": [
+    "armature_object_name"
+   ],
+   "expected_exit": 0,
+   "expected_warnings": [],
+   "expectation_met": true,
+   "fps": 24.0,
+   "duration_s": 0.375,
+   "reference_height": 0.51193
+  },
+  {
+   "case": "AM_Medusa_DeathSettle",
+   "clip": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx",
+   "exit": 0,
+   "result": "pass",
+   "fails": [],
+   "warnings": [
+    "armature_object_name"
+   ],
+   "expected_exit": 0,
+   "expected_warnings": [],
+   "expectation_met": true,
+   "fps": 24.0,
+   "duration_s": 0.875,
+   "reference_height": 0.51193
+  },
+  {
+   "case": "bvh-roundtrip-AM_Medusa_LungeAttack",
+   "clip": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/fixtures/AM_Medusa_LungeAttack.bvh",
+   "exit": 0,
+   "result": "pass",
+   "fails": [],
+   "warnings": [],
+   "expected_exit": 0,
+   "expected_warnings": [],
+   "expectation_met": true,
+   "fps": 23.9998,
+   "duration_s": 0.5833,
+   "reference_height": 51.08991
+  },
+  {
+   "case": "glb-roundtrip-AM_Medusa_LungeAttack",
+   "clip": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/fixtures/AM_Medusa_LungeAttack.glb",
+   "exit": 0,
+   "result": "pass",
+   "fails": [],
+   "warnings": [
+    "armature_object_name"
+   ],
+   "expected_exit": 0,
+   "expected_warnings": [],
+   "expectation_met": true,
+   "fps": 24.0,
+   "duration_s": 0.5833,
+   "reference_height": 0.51193
+  },
+  {
+   "case": "tripo-preset-stoya-otdyh-d562",
+   "clip": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/fixtures/tripo-preset-stoya-otdyh-d562/tripo_convert_93b4445d-b871-4057-a0d7-1317f45a1548.fbx",
+   "exit": 0,
+   "result": "pass",
+   "fails": [],
+   "warnings": [],
+   "expected_exit": 0,
+   "expected_warnings": [],
+   "expectation_met": true,
+   "fps": 24.0,
+   "duration_s": 17.5833,
+   "reference_height": 0.9894
+  },
+  {
+   "case": "negative-SK_Medusa-static",
+   "clip": "blender/ASSET-MEDUSA-001/export/SK_Medusa.fbx",
+   "exit": 1,
+   "result": "fail",
+   "fails": [
+    "action"
+   ],
+   "warnings": [
+    "armature_object_name"
+   ],
+   "expected_exit": 1,
+   "expected_warnings": [],
+   "expectation_met": true,
+   "fps": null,
+   "duration_s": null,
+   "reference_height": null
+  },
+  {
+   "case": "negative-tripo-preset-direct-contract",
+   "clip": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/fixtures/tripo-preset-stoya-otdyh-d562/tripo_convert_93b4445d-b871-4057-a0d7-1317f45a1548.fbx",
+   "exit": 1,
+   "result": "fail",
+   "fails": [
+    "armature_object_name",
+    "skeleton_contract"
+   ],
+   "warnings": [],
+   "expected_exit": 1,
+   "expected_warnings": [],
+   "expectation_met": true,
+   "fps": 24.0,
+   "duration_s": 17.5833,
+   "reference_height": 0.9894
+  }
+ ],
+ "glb_cross_check": {
+  "result": "pass",
+  "height_rel_diff": 0.0,
+  "peak_rel_diff": 0.02652,
+  "glb_reference_meshes": [
+   "SK_Medusa_Body",
+   "SK_Medusa_Bow"
+  ],
+  "glb_bone_length_plausible": "pass",
+  "glb_reference_height": 0.51193,
+  "fbx_reference_height": 0.51193,
+  "glb_peak": 0.10571,
+  "fbx_peak": 0.10859,
+  "tolerances": {
+   "height_rel": 0.02,
+   "peak_rel": 0.25
+  }
+ },
+ "result": "pass"
+}

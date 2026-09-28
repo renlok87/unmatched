@@ -1,0 +1,12 @@
+# P1.5 barrel candidate: transient files (the parent .gitignore only matches */*/work/ etc.)
+*/work/
+*/pipeline/work/
+*/pipeline/.staging/
+*/pipeline/run.lock
+*.blend1
+# Tripo embedded textures: byte copies of the images inside source/*.glb (~13.5 MB, no new information).
+# Restore: python art/pipeline-candidates/ASSET-DECOR-KIT-001/source-specs/restore_embedded_textures.py
+*/source/textures/
+# Before-Smart-UV measurement run (reports/candidate-params-h31.json): only its report is kept.
+*/reports/before-smartuv/*
+!*/reports/before-smartuv/reports/

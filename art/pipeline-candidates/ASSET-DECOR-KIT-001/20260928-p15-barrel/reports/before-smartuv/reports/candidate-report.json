@@ -1,0 +1,567 @@
+{
+  "schema": "unmatched.tripo-pipeline.static-prop-candidate/1",
+  "status": "measured",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  },
+  "blender_version": "5.2.2 LTS",
+  "script_sha256_lf": "6f703427539511afe37740035e55db1bcddbbb92bd2092bfedddc076b7b3d18b",
+  "params": {
+    "_purpose": "Measurement-only run of the generation GLB before Smart UV (column 'До Smart UV' in docs/art-pipeline/prop-barrel-report.md). Not a candidate: no geometry repair, no AO bake; only reports/before-smartuv/reports/candidate-report.json is kept in git.",
+    "source_glb": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-h31-3f7a258f-source.glb",
+    "out_dir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/before-smartuv",
+    "asset_name": "SM_Decor_Barrel",
+    "texture_prefix": "T_Decor_Barrel",
+    "material_name": "M_Decor_Barrel",
+    "target_height_m": 0.26,
+    "texture_size": 1024,
+    "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+    "bake_ao": false,
+    "geometry_repair": null,
+    "require_closed_manifold": false
+  },
+  "source": {
+    "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-h31-3f7a258f-source.glb",
+    "sha256": "7c81e9944f64390d1f0581c29b0bbc26884cf396603cf629575c1a37c2443782",
+    "bytes": 2937712,
+    "gltf_generator": "Tripo"
+  },
+  "import": {
+    "mesh_objects": 1,
+    "triangles": 3837,
+    "materials": [
+      "tripo_material_eda72a47-8d18-4031-9e06-2c061ab998d8"
+    ],
+    "images": [
+      {
+        "name": "decor-barrel-tripo-h31-3f7a258f-source_basecolor.jpg",
+        "size": [
+          2048,
+          2048
+        ],
+        "colorspace": "sRGB"
+      },
+      {
+        "name": "decor-barrel-tripo-h31-3f7a258f-source_normal.png",
+        "size": [
+          2048,
+          2048
+        ],
+        "colorspace": "Non-Color"
+      },
+      {
+        "name": "decor-barrel-tripo-h31-3f7a258f-source_rm.jpg",
+        "size": [
+          2048,
+          2048
+        ],
+        "colorspace": "Non-Color"
+      }
+    ],
+    "bounds_min_m": [
+      -0.402359,
+      -0.403519,
+      0.0
+    ],
+    "bounds_max_m": [
+      0.402359,
+      0.403519,
+      0.979736
+    ],
+    "dimensions_m": [
+      0.804718,
+      0.807037,
+      0.979736
+    ]
+  },
+  "geometry": {
+    "before_cleanup": {
+      "vertices_as_stored": 2557,
+      "vertices_welded_1e-6m": 1912,
+      "faces": 3837,
+      "triangles": 3837,
+      "welded_boundary_edges": 1,
+      "welded_non_manifold_edges": 2,
+      "wire_edges": 0,
+      "loose_vertices": 0,
+      "degenerate_faces_area_lt_1e-12": 0,
+      "faces_with_inconsistent_winding": 1,
+      "connected_shells": 1,
+      "signed_volume_m3": 0.413434531,
+      "raw_vertex_count_before_weld": 2557
+    },
+    "removed": {
+      "loose_vertices": 0,
+      "wire_edges": 0,
+      "degenerate_faces": 0
+    },
+    "repair": null,
+    "winding_faces_reversed": 0,
+    "winding_note": "1 face(s) flagged next to non-manifold edges; reversing did not reduce the count, kept as delivered by Tripo",
+    "after_cleanup": {
+      "vertices_as_stored": 2557,
+      "vertices_welded_1e-6m": 1912,
+      "faces": 3837,
+      "triangles": 3837,
+      "welded_boundary_edges": 1,
+      "welded_non_manifold_edges": 2,
+      "wire_edges": 0,
+      "loose_vertices": 0,
+      "degenerate_faces_area_lt_1e-12": 0,
+      "faces_with_inconsistent_winding": 1,
+      "connected_shells": 1,
+      "signed_volume_m3": 0.413434531,
+      "raw_vertex_count_before_weld": 2557
+    },
+    "flagged_face_centres_m_prescale": [
+      [
+        -0.0763,
+        -0.1487,
+        0.9701
+      ]
+    ],
+    "open_or_non_manifold_edge_midpoints_m_prescale": [
+      [
+        -0.0868,
+        -0.1406,
+        0.9764
+      ],
+      [
+        -0.0484,
+        -0.1542,
+        0.9671
+      ],
+      [
+        -0.0939,
+        -0.1514,
+        0.9669
+      ]
+    ],
+    "corner_normals_before": {
+      "has_custom_normals": true,
+      "corners_pointing_into_surface": 120,
+      "corner_vs_face_normal_angle_deg_p50_p99_max": [
+        16.81,
+        90.31,
+        177.52
+      ]
+    },
+    "corner_normals_after": {
+      "has_custom_normals": true,
+      "corners_pointing_into_surface": 120,
+      "corner_vs_face_normal_angle_deg_p50_p99_max": [
+        16.81,
+        90.31,
+        177.52
+      ]
+    },
+    "closed_manifold_consistent_after": false
+  },
+  "orientation": {
+    "dimensions_before_scale_m": [
+      0.804718,
+      0.807037,
+      0.979736
+    ],
+    "z_is_tallest_axis": true
+  },
+  "scale_pivot": {
+    "uniform_scale_applied": 0.265378,
+    "target_height_m_proposed": 0.26,
+    "dimensions_m": [
+      0.213554,
+      0.21417,
+      0.26
+    ],
+    "bounds_min_m": [
+      -0.106777,
+      -0.107085,
+      0.0
+    ],
+    "bounds_max_m": [
+      0.106777,
+      0.107085,
+      0.26
+    ],
+    "pivot": "object origin = (0,0,0) = centre of bounding box footprint at base (min Z)",
+    "diameter_to_height_ratio": 0.8237
+  },
+  "textures": {
+    "source_images": {
+      "basecolor": "decor-barrel-tripo-h31-3f7a258f-source_basecolor.jpg",
+      "metallic_roughness": "decor-barrel-tripo-h31-3f7a258f-source_rm.jpg",
+      "normal": "decor-barrel-tripo-h31-3f7a258f-source_normal.png",
+      "occlusion": null,
+      "factors": {
+        "metallic": 1.0,
+        "roughness": 1.0,
+        "basecolor": [
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    "source_size_px": 2048,
+    "target_size_px": 1024,
+    "downscale": "box 2x2 (BC in linear light)",
+    "outputs": {
+      "BC": {
+        "path": "T_Decor_Barrel_BC.png",
+        "colorspace": "sRGB",
+        "png_color_chunks": [
+          "cHRM",
+          "gAMA",
+          "sRGB"
+        ],
+        "sha256": "bbf94eb2fa462c7a48f9ee4feba016755a237c23de56bb5d93f6d6ee083e0f70"
+      },
+      "N": {
+        "path": "T_Decor_Barrel_N.png",
+        "colorspace": "Linear (Non-Color)",
+        "convention": "DirectX (G flipped from glTF OpenGL)",
+        "png_color_chunks": [],
+        "note": "Linear is an import setting (UE: sRGB off); no sRGB/gAMA/cHRM/iCCP chunk in the file",
+        "sha256": "bc38a56e7b1c4194ee3e54117bf0ea63b7918934c8d59308ddc9ef76e4e27fd9"
+      },
+      "ORM": {
+        "path": "T_Decor_Barrel_ORM.png",
+        "colorspace": "Linear (Non-Color)",
+        "channels": {
+          "R": "1.0 (no AO)",
+          "G": "roughness from glTF metallicRoughness.G",
+          "B": "metallic from glTF metallicRoughness.B"
+        },
+        "png_color_chunks": [],
+        "note": "Linear is an import setting (UE: sRGB off); no sRGB/gAMA/cHRM/iCCP chunk in the file",
+        "sha256": "36f5d8fd8e99c4886e1a37e70d76f952ea388ba336ab00a3941f1e45f925253b"
+      }
+    },
+    "ao_bake": null,
+    "normal_padding": {
+      "background_fraction_source": 0.0,
+      "dilated_px_at_source": 32,
+      "flat_filled_fraction_source": 0.0
+    },
+    "channel_stats": {
+      "roughness_mean": 0.869,
+      "metallic_mean": 0.174,
+      "metallic_fraction_gt_0.5": 0.1194,
+      "normal_mean_rgb_dx": [
+        0.499,
+        0.501,
+        0.999
+      ]
+    },
+    "teamcolor": "not applicable: decor L3 is not team-owned (04 3.7); M_DioramaMaster TeamColor left at neutral in UE"
+  },
+  "uv0": {
+    "uv_layers": [
+      "UVMap"
+    ],
+    "raster_size_px": 1024,
+    "islands": 47,
+    "triangles_out_of_0_1": 0,
+    "uv_bounds": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "uv_area_used_fraction": 0.6105,
+    "raster_coverage_fraction": 0.6107,
+    "overlap_pixels_between_islands": 0,
+    "overlap_fraction_of_covered": 0.0,
+    "overlap_pixels_inside_islands_strict": 0,
+    "flipped_uv_triangles_vs_island_majority": 0,
+    "zero_area_uv_triangles": 0,
+    "texel_density_px_per_m_at_raster": 1662.3,
+    "stretch_area_ratio_p05_p50_p95": [
+      0.467,
+      0.805,
+      2.013
+    ],
+    "stretch_anisotropy_sigma_max_over_min_p50_p95_max": [
+      1.277,
+      2.307,
+      10.471
+    ],
+    "stretch_sigma_max_norm_p95": 1.696,
+    "stretch_sigma_min_norm_p05": 0.501,
+    "min_gutter_px_estimate": 5,
+    "island_pairs_closer_than_4px": 0,
+    "note": "min_gutter_px_estimate / island_pairs_closer_than_4px: 4-neighbour growth at raster_size_px (odd/even estimate +-1 px). raster_metrics: Euclidean distance between centres of pixels of different islands (another metric, counts differ), plus strict in-island overlap from flipped UV triangles; at raster_size_px and 2x.",
+    "raster_metrics": [
+      {
+        "raster_size_px": 1024,
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 0,
+        "raster_coverage_fraction": 0.6107,
+        "min_island_centre_distance_px": 6.0,
+        "island_pairs_centre_distance_lt_4px": 0,
+        "island_pairs_centre_distance_lt_8px": 51,
+        "mip_where_min_distance_drops_below_1_texel": 3
+      },
+      {
+        "raster_size_px": 2048,
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 0,
+        "raster_coverage_fraction": 0.6106,
+        "min_island_centre_distance_px": ">8",
+        "island_pairs_centre_distance_lt_4px": 0,
+        "island_pairs_centre_distance_lt_8px": 0,
+        "mip_where_min_distance_drops_below_1_texel": null
+      }
+    ]
+  },
+  "material_slots": 1,
+  "material_names": [
+    "M_Decor_Barrel"
+  ],
+  "export": {
+    "fbx": "SM_Decor_Barrel.fbx",
+    "sha256": "e73872a49fb7fd888a651095d7a04ce265b20aae25f3617658b2d6d003b378e2",
+    "bytes": 142604,
+    "preset": "UM_FBX_v1.json",
+    "settings": {
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "export_space_rotation_z_degrees": 90.0,
+      "temporary_data_scale": 100.0,
+      "patch_fbx_unit_scale_to": 1.0,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "use_triangles": true,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "AUTO"
+    },
+    "exporter_kwargs": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bake_space_transform": false,
+      "embed_textures": false,
+      "mesh_smooth_type": "FACE",
+      "object_types": [
+        "ARMATURE",
+        "MESH"
+      ],
+      "path_mode": "AUTO",
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "use_custom_props": false,
+      "use_mesh_edges": false,
+      "use_selection": true,
+      "use_triangles": true
+    },
+    "textures_embedded": false,
+    "texture_paths": "relative to the FBX (absolute checkout path is never written)",
+    "um_fbx_v1_conformance": [
+      {
+        "setting": "Forward / Up (04 1.1)",
+        "standard": [
+          "-Y",
+          "Z"
+        ],
+        "used": [
+          "-Y",
+          "Z"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Apply Scalings (04 1.1)",
+        "standard": "FBX_SCALE_UNITS",
+        "used": "FBX_SCALE_UNITS",
+        "conforms": true
+      },
+      {
+        "setting": "Apply Unit (04 1.1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Apply Transform (04 1.1)",
+        "standard": false,
+        "used": false,
+        "conforms": true
+      },
+      {
+        "setting": "Triangulate Faces (04 1.1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Smoothing (04 1.1)",
+        "standard": "FACE",
+        "used": "FACE",
+        "conforms": true
+      },
+      {
+        "setting": "Object Types (04 1.1)",
+        "standard": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "used": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Loose Edges / Custom Properties (04 1.1)",
+        "standard": [
+          false,
+          false
+        ],
+        "used": [
+          false,
+          false
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Leaf bones / bone axes (04 1.1, preset)",
+        "standard": [
+          false,
+          "Y",
+          "X"
+        ],
+        "used": [
+          false,
+          "Y",
+          "X"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Bake Animation (04 1.1: skeletal clips only)",
+        "standard": false,
+        "used": false,
+        "conforms": true
+      },
+      {
+        "setting": "Path Mode, textures not embedded (04 1.1)",
+        "standard": [
+          "AUTO",
+          false
+        ],
+        "used": [
+          "AUTO",
+          false
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+        "standard": [
+          90.0,
+          100.0,
+          1.0
+        ],
+        "used": [
+          90.0,
+          100.0,
+          1.0
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+        "standard": [
+          "METRIC",
+          1.0
+        ],
+        "used": [
+          "METRIC",
+          1.0
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Transforms applied: object matrix identity (04 1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Pivot: base centre, min Z = 0 (04 1, decor: centre of base)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Front (bung) along -Y in .blend (04 1: face -Y -> +X in UE)",
+        "standard": -90.0,
+        "used": -84.2,
+        "conforms": true
+      }
+    ],
+    "um_fbx_v1_conforms": true,
+    "front_direction_deg_in_blend_ccw_from_plus_x": -84.2
+  },
+  "previews": {
+    "front": "SM_Decor_Barrel_front.png",
+    "side": "SM_Decor_Barrel_side.png",
+    "game-3q-55deg": "SM_Decor_Barrel_game-3q-55deg.png",
+    "top": "SM_Decor_Barrel_top.png"
+  },
+  "roundtrip": {
+    "mesh_objects": 1,
+    "object_names": [
+      "SM_Decor_Barrel"
+    ],
+    "triangles": 3837,
+    "expected_triangles": 3837,
+    "material_slots": 1,
+    "uv_layers": 1,
+    "armatures": 0,
+    "dimensions_blender_m": [
+      0.21417,
+      0.213554,
+      0.26
+    ],
+    "bounds_min_blender_m": [
+      -0.107085,
+      -0.106777,
+      0.0
+    ],
+    "object_scale": [
+      0.01,
+      0.01,
+      0.01
+    ],
+    "note": "Blender reads UnitScaleFactor 1.0 as cm and scales x0.01, so metres here = UE uu/100",
+    "expected_ue_dimensions_uu_at_import_scale_1": [
+      21.417,
+      21.355,
+      26.0
+    ],
+    "dimensions_uu": [
+      21.417,
+      21.355,
+      26.0
+    ]
+  },
+  "checks": {
+    "single_mesh": true,
+    "triangles_preserved": true,
+    "one_material_slot": true,
+    "uv0_present": true,
+    "no_armature": true,
+    "height_matches_target_1pct": true,
+    "base_at_zero": true,
+    "centred_xy": true,
+    "source_unchanged": true,
+    "um_fbx_v1_conforms": true
+  },
+  "checks_passed": true
+}

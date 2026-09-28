@@ -1,0 +1,474 @@
+{
+ "source": "blender/ASSET-MEDUSA-001/export/SK_Medusa.fbx",
+ "source_bytes": 1165452,
+ "scene_fps": 24.0,
+ "unit_scale": 1.0,
+ "armatures": [
+  {
+   "object": "SKEL_Medusa",
+   "parent_object": null,
+   "location": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "rotation_euler_deg": [
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.01,
+    0.01,
+    0.01
+   ],
+   "bone_count": 17,
+   "root_bones": [
+    "root"
+   ],
+   "bones": [
+    {
+     "name": "root",
+     "parent": null,
+     "head": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "tail": [
+      0.0,
+      0.0,
+      0.18
+     ],
+     "length": 0.18,
+     "use_deform": true,
+     "children": [
+      "hips"
+     ]
+    },
+    {
+     "name": "hips",
+     "parent": "root",
+     "head": [
+      0.0,
+      0.0,
+      0.18
+     ],
+     "tail": [
+      0.0,
+      0.0,
+      0.2227
+     ],
+     "length": 0.04275,
+     "use_deform": true,
+     "children": [
+      "spine",
+      "leg_upper.L",
+      "leg_upper.R"
+     ]
+    },
+    {
+     "name": "spine",
+     "parent": "hips",
+     "head": [
+      0.0,
+      0.0,
+      0.245
+     ],
+     "tail": [
+      0.0,
+      0.0,
+      0.3709
+     ],
+     "length": 0.1259,
+     "use_deform": true,
+     "children": [
+      "head",
+      "arm_upper.L",
+      "arm_upper.R"
+     ]
+    },
+    {
+     "name": "head",
+     "parent": "spine",
+     "head": [
+      0.0,
+      0.0,
+      0.385
+     ],
+     "tail": [
+      0.0,
+      0.0,
+      0.5109
+     ],
+     "length": 0.1259,
+     "use_deform": true,
+     "children": []
+    },
+    {
+     "name": "arm_upper.L",
+     "parent": "spine",
+     "head": [
+      0.045,
+      0.0,
+      0.355
+     ],
+     "tail": [
+      0.068,
+      -0.013,
+      0.305
+     ],
+     "length": 0.05655,
+     "use_deform": true,
+     "children": [
+      "arm_lower.L"
+     ]
+    },
+    {
+     "name": "arm_lower.L",
+     "parent": "arm_upper.L",
+     "head": [
+      0.068,
+      -0.013,
+      0.305
+     ],
+     "tail": [
+      0.1,
+      -0.045,
+      0.29
+     ],
+     "length": 0.04768,
+     "use_deform": true,
+     "children": [
+      "hand.L"
+     ]
+    },
+    {
+     "name": "hand.L",
+     "parent": "arm_lower.L",
+     "head": [
+      0.1,
+      -0.045,
+      0.29
+     ],
+     "tail": [
+      0.112,
+      -0.06,
+      0.275
+     ],
+     "length": 0.02437,
+     "use_deform": true,
+     "children": [
+      "weapon"
+     ]
+    },
+    {
+     "name": "weapon",
+     "parent": "hand.L",
+     "head": [
+      0.112,
+      -0.06,
+      0.275
+     ],
+     "tail": [
+      0.1364,
+      -0.06,
+      0.275
+     ],
+     "length": 0.02437,
+     "use_deform": true,
+     "children": []
+    },
+    {
+     "name": "arm_upper.R",
+     "parent": "spine",
+     "head": [
+      -0.045,
+      -0.0,
+      0.355
+     ],
+     "tail": [
+      -0.068,
+      -0.018,
+      0.305
+     ],
+     "length": 0.05791,
+     "use_deform": true,
+     "children": [
+      "arm_lower.R"
+     ]
+    },
+    {
+     "name": "arm_lower.R",
+     "parent": "arm_upper.R",
+     "head": [
+      -0.068,
+      -0.018,
+      0.305
+     ],
+     "tail": [
+      -0.05,
+      -0.045,
+      0.305
+     ],
+     "length": 0.03245,
+     "use_deform": true,
+     "children": [
+      "hand.R"
+     ]
+    },
+    {
+     "name": "hand.R",
+     "parent": "arm_lower.R",
+     "head": [
+      -0.05,
+      -0.045,
+      0.305
+     ],
+     "tail": [
+      -0.032,
+      -0.06,
+      0.2825
+     ],
+     "length": 0.03245,
+     "use_deform": true,
+     "children": []
+    },
+    {
+     "name": "leg_upper.L",
+     "parent": "hips",
+     "head": [
+      0.03,
+      0.0,
+      0.19
+     ],
+     "tail": [
+      0.038,
+      -0.012,
+      0.12
+     ],
+     "length": 0.07147,
+     "use_deform": true,
+     "children": [
+      "leg_lower.L"
+     ]
+    },
+    {
+     "name": "leg_lower.L",
+     "parent": "leg_upper.L",
+     "head": [
+      0.038,
+      -0.012,
+      0.12
+     ],
+     "tail": [
+      0.04,
+      -0.015,
+      0.065
+     ],
+     "length": 0.05512,
+     "use_deform": true,
+     "children": [
+      "foot.L"
+     ]
+    },
+    {
+     "name": "foot.L",
+     "parent": "leg_lower.L",
+     "head": [
+      0.04,
+      -0.015,
+      0.065
+     ],
+     "tail": [
+      0.04,
+      -0.0609,
+      0.0344
+     ],
+     "length": 0.05512,
+     "use_deform": true,
+     "children": []
+    },
+    {
+     "name": "leg_upper.R",
+     "parent": "hips",
+     "head": [
+      -0.03,
+      -0.0,
+      0.19
+     ],
+     "tail": [
+      -0.038,
+      -0.012,
+      0.12
+     ],
+     "length": 0.07147,
+     "use_deform": true,
+     "children": [
+      "leg_lower.R"
+     ]
+    },
+    {
+     "name": "leg_lower.R",
+     "parent": "leg_upper.R",
+     "head": [
+      -0.038,
+      -0.012,
+      0.12
+     ],
+     "tail": [
+      -0.04,
+      -0.015,
+      0.065
+     ],
+     "length": 0.05512,
+     "use_deform": true,
+     "children": [
+      "foot.R"
+     ]
+    },
+    {
+     "name": "foot.R",
+     "parent": "leg_lower.R",
+     "head": [
+      -0.04,
+      -0.015,
+      0.065
+     ],
+     "tail": [
+      -0.04,
+      -0.0609,
+      0.0344
+     ],
+     "length": 0.05512,
+     "use_deform": true,
+     "children": []
+    }
+   ],
+   "animation_action": null
+  }
+ ],
+ "meshes": [
+  {
+   "object": "SK_Medusa_Bow",
+   "parent": "SKEL_Medusa",
+   "parent_type": "OBJECT",
+   "parent_bone": null,
+   "armature_modifiers": [
+    "SKEL_Medusa"
+   ],
+   "vertices": 1469,
+   "tris": 1197,
+   "materials": [
+    "M_Medusa_Atlas"
+   ],
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertex_groups": 1,
+   "influences_histogram": {
+    "1": 1469
+   },
+   "max_influences": 1,
+   "unweighted_vertices": 0,
+   "top_groups_share": [
+    [
+     "weapon",
+     1.0
+    ]
+   ],
+   "bbox_min": [
+    0.0706,
+    -0.1141,
+    0.1287
+   ],
+   "bbox_max": [
+    0.1571,
+    -0.0217,
+    0.5065
+   ]
+  },
+  {
+   "object": "SK_Medusa_Body",
+   "parent": "SKEL_Medusa",
+   "parent_type": "OBJECT",
+   "parent_bone": null,
+   "armature_modifiers": [
+    "SKEL_Medusa"
+   ],
+   "vertices": 22206,
+   "tris": 18199,
+   "materials": [
+    "M_Medusa_Atlas"
+   ],
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertex_groups": 15,
+   "influences_histogram": {
+    "1": 18954,
+    "2": 3252
+   },
+   "max_influences": 2,
+   "unweighted_vertices": 0,
+   "top_groups_share": [
+    [
+     "hips",
+     0.3163
+    ],
+    [
+     "head",
+     0.2857
+    ],
+    [
+     "spine",
+     0.0995
+    ],
+    [
+     "foot.L",
+     0.0408
+    ],
+    [
+     "foot.R",
+     0.0401
+    ],
+    [
+     "hand.R",
+     0.0337
+    ],
+    [
+     "hand.L",
+     0.0322
+    ],
+    [
+     "arm_lower.R",
+     0.032
+    ]
+   ],
+   "bbox_min": [
+    -0.1303,
+    -0.0845,
+    0.0381
+   ],
+   "bbox_max": [
+    0.1291,
+    0.0968,
+    0.55
+   ]
+  }
+ ],
+ "actions": [],
+ "overall_bbox": {
+  "min": [
+   -0.1303,
+   -0.1141,
+   0.0381
+  ],
+  "max": [
+   0.1571,
+   0.0968,
+   0.55
+  ],
+  "height": 0.5119
+ }
+}

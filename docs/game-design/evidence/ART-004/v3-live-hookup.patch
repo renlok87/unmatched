@@ -1,0 +1,225 @@
+diff --git a/tools/s08/package-client.ps1 b/tools/s08/package-client.ps1
+index edfaf9f..bb50e9b 100644
+--- a/tools/s08/package-client.ps1
++++ b/tools/s08/package-client.ps1
+@@ -1,5 +1,8 @@
+ param(
+-  [string]$Log = (Join-Path ([System.IO.Path]::GetTempPath()) 's08-uat.log')
++  [string]$Log = (Join-Path ([System.IO.Path]::GetTempPath()) 's08-uat.log'),
++  # Cook+stage the already built game binary. Use when an editor with Live
++  # Coding blocks the UnmatchedEditor build step of BuildCookRun -build.
++  [switch]$SkipBuild
+ )
+ # Hidden RunUAT package (Development, cook+stage+pak).
+ $ErrorActionPreference = 'Stop'
+@@ -34,11 +37,27 @@ if ($LASTEXITCODE -eq 0) {
+   Write-Output 'WARN: unreal/Unmatched/Content/S08 is gitignored; these binaries must be force-added at commit time or clean-checkout packaging will fail the gate above'
+ }
+ 
++# -skipbuild stages Binaries\Win64\Unmatched.exe as it is. A game target built
++# with UBT -NoLiveCoding compiles WITH_LIVE_CODING=0 (so WITH_RELOAD=0 in a
++# monolithic game) against the installed engine's precompiled UnrealGame
++# objects built with WITH_RELOAD=1. The packaged client can then crash in UObject
++# class registration before the map loads, as the ART-004 v3 live run did (2026-09-28).
++if ($SkipBuild) {
++  $gameDefs = Join-Path $ProjectDir 'Intermediate\Build\Win64\x64\Unmatched\Development'
++  $defs = @(Get-ChildItem -LiteralPath $gameDefs -Recurse -Filter 'SharedDefinitions.*.h' -ErrorAction SilentlyContinue)
++  if ($defs.Count -eq 0) { throw "no game-target SharedDefinitions under $gameDefs; build the Unmatched game target before -SkipBuild" }
++  $noLive = @($defs | Select-String -SimpleMatch '#define WITH_LIVE_CODING 0' -List)
++  if ($noLive.Count -gt 0) {
++    throw "game target was built with -NoLiveCoding ($($noLive[0].Path)); rebuild Unmatched Win64 Development without -NoLiveCoding"
++  }
++}
++
+ $argList = @(
+   'BuildCookRun',
+   "-project=$Uproject",
+   '-noP4', '-platform=Win64', '-clientconfig=Development',
+-  '-cook', '-stage', '-pak', '-package', '-compressed', '-build',
++  '-cook', '-stage', '-pak', '-package', '-compressed',
++  $(if ($SkipBuild) { '-skipbuild' } else { '-build' }),
+   '-unattended', '-nosplash',
+   '-AdditionalCookerArgs=-ini:EditorPerProjectUserSettings:[/Script/ModelContextProtocolEngine.ModelContextProtocolSettings]:bAutoStartServer=False'
+ )
+diff --git a/tools/s08/run-phase2-demo.ps1 b/tools/s08/run-phase2-demo.ps1
+index 35954fd..3248938 100644
+--- a/tools/s08/run-phase2-demo.ps1
++++ b/tools/s08/run-phase2-demo.ps1
+@@ -12,6 +12,9 @@ param(
+   # Optional K2 review: zoom toward the selected host hero while the joiner
+   # stays at K1. 1.6 is the written proposal; larger values are diagnostic.
+   [double]$ArtPreviewFocusZoom = 0,
++  # Opt-in ART-004 comparison: which isolated /Game/ArtPreview Medusa candidate
++  # both clients load in the same live board/HUD path. Production is untouched.
++  [ValidateSet('face-neck-v2', 'head-tilt-v3')][string]$ArtPreviewMedusaVariant = 'face-neck-v2',
+   # Offline probe of the scoped-cleanup state machine only (no backend, no
+   # clients): drives Stop-ThisRunGame against a mocked Invoke-RestMethod that
+   # returns scripted HTTP-200 responses (including errors[]) and asserts the
+@@ -55,6 +58,13 @@ $ErrorActionPreference = 'Stop'
+ if ($ArtPreviewFocusZoom -gt 0 -and (-not $ArtPreviewBoardId -or $ArtPreviewFocusZoom -le 1)) {
+   throw 'ArtPreviewFocusZoom requires ArtPreviewBoardId and a zoom greater than 1'
+ }
++if ($ArtPreviewMedusaVariant -ne 'face-neck-v2' -and -not $ArtPreviewBoardId) {
++  throw 'ArtPreviewMedusaVariant requires ArtPreviewBoardId'
++}
++$ExpectedMedusaMesh = @{
++  'face-neck-v2' = 'SK_Medusa_FaceNeck_v2Candidate'
++  'head-tilt-v3' = 'SK_Medusa_HeadTilt_v3Candidate'
++}[$ArtPreviewMedusaVariant]
+ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+ if (-not $Exe) { $Exe = Join-Path $RepoRoot 'unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched.exe' }
+ if (-not $EvidenceDir) { $EvidenceDir = Join-Path $RepoRoot 'docs\game-design\evidence\S08\run' }
+@@ -318,6 +328,7 @@ function Invoke-Phase2Demo {
+ 
+   $common = @("-windowed", "-resx=1920", "-resy=1080", "-RenderOffScreen", "log=GrepLog", "-ForceAbandonSequences", "-S08Api=$Api")
+   if ($ArtPreviewBoardId) { $common += @('-ArtPreview', '-ForceRes') }
++  if ($ArtPreviewMedusaVariant -ne 'face-neck-v2') { $common += "-ArtPreviewMedusaVariant=$ArtPreviewMedusaVariant" }
+   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
+     "-S08Auto", "-S08Create",
+     "-S08HeroId=$heroA", "-S08Trace=$hostTrace", "-S08Shot=$hostShot",
+@@ -410,6 +421,23 @@ function Invoke-Phase2Demo {
+         throw "shot for ${Who} predates its client process (stale file): $Path"
+       }
+     }
++    # A missing trace file means that client exited before
++    # AS08FlowGameMode::BeginPlay opened it (e.g. the ART-004 v3 startup crash
++    # in UObject class registration); the board id is not the cause then.
++    # The backend stores any boardId string but silently falls back to an empty
++    # 20x20 grid when no Board row has that id (e.g. the content slug
++    # 'cobble-city'). Then the art board and its shot gate never activate;
++    # report that cause instead of a generic missing shot.
++    if ($ArtPreviewBoardId) {
++      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
++        if (-not (Test-Path -LiteralPath $pair[1])) {
++          throw "$($pair[0]) trace missing: $($pair[1]). The client likely crashed before AS08FlowGameMode::BeginPlay; copy $(Join-Path (Split-Path -Parent $Exe) 'Unmatched\Saved\Logs')\Unmatched*.log before the next package step wipes it"
++        }
++        if (-not (Select-String -LiteralPath $pair[1] -SimpleMatch -Pattern 'BOARD 5x6' -Quiet)) {
++          throw "$($pair[0]) trace has no 'BOARD 5x6': ArtPreviewBoardId=$ArtPreviewBoardId is not the 5x6 Cobble review board"
++        }
++      }
++    }
+     Assert-FreshShot $hostShot $hostStartUtc 'host'
+     Assert-FreshShot $joinShot $joinStartUtc 'joiner'
+ 
+@@ -434,6 +462,10 @@ function Invoke-Phase2Demo {
+         'ARTPREVIEW Cobble assets ready', 'ARTPREVIEW Cobble active 5x6 zones=30 blue=15 red=15 blueMarks=15 redMarks=45',
+         'ARTPREVIEW Cobble probe lights key=4.5 fill=700 warm=85',
+         'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1') 'joiner'
++      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
++        Assert-Trace $pair[1] @("ARTPREVIEW medusa candidate variant=$ArtPreviewMedusaVariant",
++          "visual=1 mesh=$ExpectedMedusaMesh", 'boardValid=1', 'HUD seq=') "$($pair[0]) Medusa candidate"
++      }
+       if ($ArtPreviewFocusZoom -gt 0) {
+         Assert-Trace $hostTrace @('ARTPREVIEW camera focus requested zoom=') 'host K2'
+       }
+@@ -444,7 +476,7 @@ function Invoke-Phase2Demo {
+     }
+     if ($ArtPreviewBoardId) {
+       [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'),
+-        (([ordered]@{ boardId = $ArtPreviewBoardId; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = 30; joinerLiveZones = 30; hostFocusZoom = $ArtPreviewFocusZoom }) | ConvertTo-Json), $Utf8NoBom)
++        (([ordered]@{ boardId = $ArtPreviewBoardId; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = 30; joinerLiveZones = 30; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant }) | ConvertTo-Json), $Utf8NoBom)
+     }
+ 
+     # ProjectWorldLocationToScreen can return true even for offscreen pixels.
+diff --git a/unreal/Unmatched/Source/Unmatched/S08/S08ArtPreviewMedusa.h b/unreal/Unmatched/Source/Unmatched/S08/S08ArtPreviewMedusa.h
+new file mode 100644
+index 0000000..36d2da0
+--- /dev/null
++++ b/unreal/Unmatched/Source/Unmatched/S08/S08ArtPreviewMedusa.h
+@@ -0,0 +1,31 @@
++// ART-004 opt-in live review: which isolated Medusa candidate the packaged
++// -ArtPreview path loads. Only /Game/ArtPreview/Medusa candidates are listed;
++// the production /Game/ART004 Medusa and SK_Medusa are never referenced here.
++// Without -ArtPreviewMedusaVariant= the v2 candidate stays in use. An unknown
++// value yields no mesh: the Cobble art board then stays grey, the ArtPreview
++// evidence shot never fires and the run fails loudly instead of silently
++// showing v2 under a v3 label.
++#pragma once
++
++#include "CoreMinimal.h"
++#include "Misc/CommandLine.h"
++#include "Misc/Parse.h"
++
++struct FS08MedusaCandidate {
++  const TCHAR* Variant = TEXT("unknown");
++  const TCHAR* MeshPath = nullptr;
++};
++
++inline FS08MedusaCandidate S08SelectMedusaCandidate() {
++  FString Requested;
++  FParse::Value(FCommandLine::Get(), TEXT("ArtPreviewMedusaVariant="), Requested);
++  if (Requested.IsEmpty() || Requested == TEXT("face-neck-v2")) {
++    return {TEXT("face-neck-v2"),
++            TEXT("/Game/ArtPreview/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate")};
++  }
++  if (Requested == TEXT("head-tilt-v3")) {
++    return {TEXT("head-tilt-v3"),
++            TEXT("/Game/ArtPreview/Medusa/Meshes/SK_Medusa_HeadTilt_v3Candidate")};
++  }
++  return {};
++}
+diff --git a/unreal/Unmatched/Source/Unmatched/S08/S08BoardActor.cpp b/unreal/Unmatched/Source/Unmatched/S08/S08BoardActor.cpp
+index cdc0ac4..e7963ed 100644
+--- a/unreal/Unmatched/Source/Unmatched/S08/S08BoardActor.cpp
++++ b/unreal/Unmatched/Source/Unmatched/S08/S08BoardActor.cpp
+@@ -1,4 +1,5 @@
+ #include "S08BoardActor.h"
++#include "S08ArtPreviewMedusa.h"
+ #include "S08FighterActor.h"
+ #include "S08TraceLog.h"
+ #include "Components/InstancedStaticMeshComponent.h"
+@@ -119,8 +120,10 @@ void AS08BoardActor::BeginPlay() {
+       TEXT("/Game/ArtTests/ART005/Materials/M_ART005_RedSection_Review"));
+   UMaterialInterface* Glyph = LoadObject<UMaterialInterface>(nullptr,
+       TEXT("/Game/ArtTests/ART005/Materials/M_ART005_ZoneGlyph_Review"));
+-  USkeletalMesh* Medusa = LoadObject<USkeletalMesh>(nullptr,
+-      TEXT("/Game/ArtPreview/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate"));
++  const FS08MedusaCandidate MedusaCandidate = S08SelectMedusaCandidate();
++  USkeletalMesh* Medusa = MedusaCandidate.MeshPath
++      ? LoadObject<USkeletalMesh>(nullptr, MedusaCandidate.MeshPath)
++      : nullptr;
+   UStaticMesh* Pedestal = LoadObject<UStaticMesh>(nullptr,
+       TEXT("/Game/ArtPreview/Medusa/Meshes/SM_Medusa_Base_v2Candidate"));
+   UMaterialInterface* TeamBlue = LoadObject<UMaterialInterface>(nullptr,
+@@ -130,6 +133,9 @@ void AS08BoardActor::BeginPlay() {
+   if (!Board || !Corner || !Stone || !Wood || !Iron || !Blue || !Red || !Glyph ||
+       !Medusa || !Medusa->GetSkeleton() || !Pedestal || !TeamBlue || !TeamRed) {
+     UE_LOG(LogTemp, Warning, TEXT("ARTPREVIEW Cobble assets missing; keeping grey board"));
++    FS08Trace::Write(FString::Printf(
++        TEXT("ARTPREVIEW Cobble assets missing medusaVariant=%s medusa=%d; keeping grey board"),
++        MedusaCandidate.Variant, Medusa && Medusa->GetSkeleton() ? 1 : 0));
+     return;
+   }
+   const int32 StoneSlot = Board->GetMaterialIndex(TEXT("M_ART005_Stone_AtlasB_Provisional"));
+@@ -150,6 +156,8 @@ void AS08BoardActor::BeginPlay() {
+   bArtAssetsReady = true;
+   UE_LOG(LogTemp, Display, TEXT("ARTPREVIEW Cobble assets ready"));
+   FS08Trace::Write(TEXT("ARTPREVIEW Cobble assets ready"));
++  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW medusa candidate variant=%s mesh=%s"),
++                                   MedusaCandidate.Variant, *Medusa->GetName()));
+ }
+ 
+ void AS08BoardActor::EndPlay(const EEndPlayReason::Type Reason) {
+diff --git a/unreal/Unmatched/Source/Unmatched/S08/S08FighterActor.cpp b/unreal/Unmatched/Source/Unmatched/S08/S08FighterActor.cpp
+index f4b5672..219f45b 100644
+--- a/unreal/Unmatched/Source/Unmatched/S08/S08FighterActor.cpp
++++ b/unreal/Unmatched/Source/Unmatched/S08/S08FighterActor.cpp
+@@ -1,4 +1,5 @@
+ #include "S08FighterActor.h"
++#include "S08ArtPreviewMedusa.h"
+ #include "S08TraceLog.h"
+ #include "Camera/PlayerCameraManager.h"
+ #include "Components/StaticMeshComponent.h"
+@@ -142,8 +143,10 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
+   const bool bMedusaCandidate = bArtPreview && Fighter.bIsHero &&
+       Fighter.Name.Equals(TEXT("Medusa"), ESearchCase::IgnoreCase);
+   if (bMedusaCandidate) {
+-    USkeletalMesh* Mesh = LoadObject<USkeletalMesh>(nullptr,
+-        TEXT("/Game/ArtPreview/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate"));
++    const FS08MedusaCandidate MedusaCandidate = S08SelectMedusaCandidate();
++    USkeletalMesh* Mesh = MedusaCandidate.MeshPath
++        ? LoadObject<USkeletalMesh>(nullptr, MedusaCandidate.MeshPath)
++        : nullptr;
+     UStaticMesh* Pedestal = LoadObject<UStaticMesh>(nullptr,
+         TEXT("/Game/ArtPreview/Medusa/Meshes/SM_Medusa_Base_v2Candidate"));
+     UMaterialInterface* TeamMaterial = LoadObject<UMaterialInterface>(nullptr,

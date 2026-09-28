@@ -1,0 +1,697 @@
+{
+  "schemaVersion": 2,
+  "assetId": "ASSET-MEDUSA-001",
+  "route": "P1.6: модель → видео-референс → скелетный клип → ретаргет (манифест покрывает только шаг «видео-референс»)",
+  "created": "2026-09-28",
+  "revisions": [
+    {
+      "date": "2026-09-28",
+      "what": "первая версия (исполнитель VID, P1)"
+    },
+    {
+      "date": "2026-09-28",
+      "what": "исправления по ревью P1 (VID): «размах N px» вместо «±N px»; выбросы DeathSettle 56–59; статус визуальной оценки пригодности; модель — «дешевейшая из опрошенных»; balanceStart переименован; LungeAttack — отказ от yaw всего клипа; скрипты и сырые ответы SYNTX перенесены в репо"
+    }
+  ],
+  "language": "ru",
+  "statusVocabulary": [
+    "предложено",
+    "измерено",
+    "технически импортировано",
+    "художественно принято"
+  ],
+  "overallStatus": "референсы, не анимация. Ни один ролик не является клипом, не импортирован в Blender/UE и не принят художественно.",
+  "cueSource": "docs/game-design/18-animation-production-brief.md §5 (MED-Idle, MED-LungeAttack, MED-HitReact, MED-DeathSettle; порядок производства Idle → LungeAttack → HitReact → DeathSettle — АВТОР-рекомендация брифа)",
+  "inputChoice": {
+    "chosen": "art/imagegen/mvp-v1/characters/ref-medusa-v5-front.png",
+    "sha256": "252f94b965aa049f5395534b066271d2ef9cfe6755a8c1ddf4bc9801187a78c9",
+    "why": "рекомендованный фронтальный ref в docs/art-pipeline/asset-registry.json (sha совпадает); 1024×1024, фигура крупно, полный рост с подставкой, ровный серый фон, лук в левой руке. Нейтральный Blender-рендер (blender/ASSET-MEDUSA-001/preview/rig-idle.png) отклонён: фигура занимает около половины кадра, кисти и лук мельче, что хуже для image-to-video и трекинга.",
+    "uploadedTo": "хранилище SYNTX пользователя (hidden), file uuid 5f0a9f6d-3aa3-41b6-88af-3bb8996eff31",
+    "uploadRecord": "art/animation-refs/ASSET-MEDUSA-001/syntx-session/fileobj.json"
+  },
+  "modelChoice": {
+    "chosen": "Kling 2.5, kling_image2video, mode standart, 5 с, без звука",
+    "costPer5s": 6,
+    "why": "самая низкая цена среди опрошенных моделей: 6 токенов за 5 с, наравне с Kling 2.1 std и Seedance 1.0 Pro-Fast 480p; выбор между равными по цене замером не подкреплён. Неподвижность камеры задана промптом (camera_movement=null) и измерена на пробном ролике.",
+    "bodyStabilityComparison": {
+      "status": "предложено / не измерено",
+      "text": "утверждение «по стабильности тела Kling 2.5 std равен только Seedance 1.0 Pro-Fast 480p» не проверялось ни одной генерацией или тестом"
+    },
+    "priceQuotes": {
+      "status": "получено запросом get-model-info до запуска (через tools/art/syntx_video_refs/patch.cjs); ответы не сохранены. Верификатор 2026-09-28 перепроверил: Kling 2.5 std 5 с = 6, Seedance 1.0 Pro-Fast 480p = 6, Kling 2.6 std = 14. Цена Kling 2.5 std подтверждена и списанием: дельта баланса по каждому ролику = 6",
+      "table": "токены SYNTX за 5–6 с: Kling 2.5/2.1 std 6, Kling 2.6 std 14, Kling 3.0-turbo 25, Kling 2.5 hd 17, Seedance 1.0 Pro-Fast 480p 6 / 720p 10, Seedance 1.0 Pro 720p 11, Seedance 1.5 Pro 720p 7.5, Hailuo 2.3 Fast 768p 6 с 9, Hailuo 2.3 14, Hailuo-02 14, Wan 2.6 i2v Flash 720P 10, Wan 2.6 i2v 35, Wan 2.7 i2v 30, Grok i2v 480p 6 с 12, Veo 3.1 Lite 13, Runway Gen-4 Turbo 14, Gen-4.5 i2v 14"
+    },
+    "notPriced": {
+      "notable": [
+        "seedance-2.0",
+        "seedance-2.5",
+        "hailuo-3.0",
+        "kling_o1_image2video"
+      ],
+      "notableNote": "активные модели с входом-изображением, более новые версии опрошенных семейств; цены не запрашивались",
+      "allImageInputWithoutPriceRecord": [
+        "hailuo-minimax",
+        "hailuo-01",
+        "hailuo-01-live",
+        "hailuo-01-live-character",
+        "hailuo-01-director",
+        "hailuo-3.0",
+        "kling_keyframes",
+        "kling_elements",
+        "kling_o1_image2video",
+        "kling_o1_video2video",
+        "kling_motion_control",
+        "4genfirstframeimage",
+        "text2video-4.5",
+        "seedance-2.5",
+        "seedance-2.0",
+        "veo3",
+        "veo_omni",
+        "veo3fast",
+        "wan_27_videoedit",
+        "wan_27_r2v",
+        "wan_26_r2v_flash",
+        "wan_26_r2v",
+        "wan_25_i2v_preview"
+      ],
+      "allNote": "все активные модели снимка каталога, принимающие изображение, для которых нет записи цены; часть из них не i2v в строгом смысле (v2v, r2v, video edit, keyframes). «Grok i2v» в таблице не различает grok_i2v и grok_15_i2v, поэтому обе в список не включены",
+      "catalogSnapshot": "art/animation-refs/ASSET-MEDUSA-001/syntx-session/models_*.json (list-models SYNTX, 2026-09-28)"
+    },
+    "trial": "первым сгенерирован MED-LungeAttack (самый сложный: лук, обе руки); камера по подставке неподвижна (размах центра обода 3.5 px, нижнего края 0 px), поэтому остальные три запущены с теми же параметрами"
+  },
+  "budget": {
+    "limitSyntxTokens": 120,
+    "spentSyntxTokens": 24.0,
+    "spentStatus": "измерено: сумма дельт balance_before/after по четырём успешным генерациям",
+    "balanceBeforeFirstSuccessfulGeneration": 685.5,
+    "balanceBeforeFirstSuccessfulGenerationSource": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/syntx/balance_before.json (записан в 11:27:12 +05 по времени scratch-файла, перед генерацией MED-LungeAttack)",
+    "balanceAtTaskStart": null,
+    "balanceAtTaskStartNote": "не записан: чат SYNTX создан в 06:16:06Z (11:16 +05, art/animation-refs/ASSET-MEDUSA-001/syntx-session/chat.json), первая запись баланса — только в 11:27:12 +05, после отклонённых запросов",
+    "balanceEnd": 661.5,
+    "clipLimit": 4,
+    "clipsGenerated": 4,
+    "failedRequests": {
+      "count": 3,
+      "countSource": "отчёт исполнителя; ответы 422 не сохранены",
+      "reason": "API 422 (формат settings.file_urls) до генерации",
+      "chargeStatus": "отсутствие списания не подтверждено записью баланса: баланс до этих запросов не записан"
+    },
+    "note": "Покупок нет. Дельта баланса по каждому успешному запуску = 6 и совпадает с ценой get-model-info."
+  },
+  "measurementMethod": "tools/art/analyze_video_ref.py: ffmpeg-декодирование всех кадров во временную папку (удаляется после чтения) → numpy; фон = медиана углов кадра 0; маска фигуры max|RGB−фон|>28; подставка = пиксели яркости <80 в нижних 25% кадра, ширина и центр по строке обода на 8 px выше нижнего тёмного края; стабильность фона = MAD краевой полосы 6% против кадра 0; motion_mad = средняя |Δ| соседних кадров; *_range_px = размах (max − min). Измерены только камера, фон, рамка силуэта и энергия движения. Пригодность для video-to-motion, видимость конечностей и поведение трекера — визуальная оценка по контакт-листам и ключевым кадрам (Read, PNG отрисовался) и прогноз; pose-трекинг не запускался.",
+  "reproducibility": {
+    "scripts": {
+      "generate": "tools/art/syntx_video_refs/gen.sh (реальный запуск тратит ≈6 токенов SYNTX; DRY_RUN=1 — только req.json, без трат)",
+      "priceQuote": "tools/art/syntx_video_refs/patch.cjs (добавляет version/native_audio в get_model_info)",
+      "importRawResponses": "tools/art/syntx_video_refs/import_runs.py (копирует сырые ответы из scratch с заменой id аккаунта на REDACTED)",
+      "manifest": "tools/art/syntx_video_refs/build_manifest.py",
+      "measurements": "tools/art/analyze_video_ref.py"
+    },
+    "rawResponses": "art/animation-refs/ASSET-MEDUSA-001/MED-<Cue>/syntx/ и art/animation-refs/ASSET-MEDUSA-001/syntx-session/",
+    "commands": [
+      "цена (бесплатно): SYNTX_EXTRA_Q='{\"version\":\"2.5\",\"native_audio\":\"false\"}' NODE_OPTIONS='--require tools/art/syntx_video_refs/patch.cjs' node <syntx_mcp.cjs> get-model-info '{\"ai_name\":\"kling\",\"model_type\":\"kling_image2video\",\"mode\":\"standart\",\"video_duration\":5}'",
+      "генерация (тратит ≈6 токенов): SYNTX_CHAT_ID=<uuid чата> SYNTX_FILEOBJ=<объект upload-files вне репо> bash tools/art/syntx_video_refs/gen.sh LungeAttack art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/prompt.txt",
+      "проверка запроса без трат: DRY_RUN=1 SYNTX_WORK=<scratch> SYNTX_FILEOBJ=art/animation-refs/ASSET-MEDUSA-001/syntx-session/fileobj.json SYNTX_CHAT_ID=5ac4e224-2019-46c2-b4a2-8d5804835b0e bash tools/art/syntx_video_refs/gen.sh <Cue> art/animation-refs/ASSET-MEDUSA-001/MED-<Cue>/prompt.txt — req.json совпадает с MED-<Cue>/syntx/req.json",
+      "сырые ответы → репо: python tools/art/syntx_video_refs/import_runs.py --src <scratch>",
+      "замеры (в папке cue): python ../../../../tools/art/analyze_video_ref.py MED-<Cue>_kling25_ref.mp4 analysis.json",
+      "ключевой кадр: ffmpeg -i <clip>.mp4 -vf \"select=eq(n\\,48)\" -vsync 0 -frames:v 1 keyframes/f048.png",
+      "контакт-лист: ffmpeg -i <clip>.mp4 -vf \"fps=2,scale=320:-1,tile=5x2\" -frames:v 1 contact-sheet-2fps.png",
+      "манифест: python tools/art/syntx_video_refs/build_manifest.py"
+    ]
+  },
+  "clips": [
+    {
+      "cue": "MED-LungeAttack",
+      "cueRef": "CUE-008 (600 мс), бриф 18 §5 MED-LungeAttack",
+      "generationOrder": 1,
+      "status": "референс, не анимация",
+      "suitabilityVideoToMotion": {
+        "verdict": "пригоден как референс верха тела (лучший из четырёх); направление выстрела расходится с брифом 18 §5 (см. briefDeviation)",
+        "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+        "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения камеры/фона/силуэта из analysis.json"
+      },
+      "service": "SYNTX (syntx.ai) → Kling",
+      "aiName": "kling",
+      "modelType": "kling_image2video",
+      "parameters": {
+        "version": "2.5",
+        "mode": "standart",
+        "video_duration": 5,
+        "native_audio": false,
+        "aspect_ratio": "1:1",
+        "temperature": 0.5,
+        "multi_shots": false,
+        "camera_movement": null
+      },
+      "syntxChatUuid": "5ac4e224-2019-46c2-b4a2-8d5804835b0e",
+      "syntxTaskId": "86819644-3b9e-4d1e-9e1d-ca21f8669c90",
+      "syntxRaw": {
+        "dir": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/syntx/",
+        "files": [
+          "req.json",
+          "gen.json",
+          "wait.json",
+          "result.json",
+          "balance_before.json",
+          "balance_after.json"
+        ],
+        "note": "сырые ответы SYNTX MCP; id аккаунта (поля user_id/owner_id/author_id и сегмент user_<id> в URL хранилища) заменён на REDACTED; md5 mp4 = хэш в имени выходного файла result.json.url"
+      },
+      "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of Medusa come to life, standing on her round black base, entire body and base always visible in frame. She holds the bow in her left hand (on the right side of the image). She turns her torso slightly toward the right side of the frame, raises the bow with her left arm extended, draws the bowstring back to her cheek with her right hand, holds aim for a moment, releases the arrow with a small forward lean of the torso, then lowers the bow and returns to her calm standing pose. Feet stay planted on the base, no stepping, no walking. Snake hair moves only with her head. Plain neutral gray studio background, even soft lighting, clean silhouette, no motion blur, no extra limbs, no extra characters.",
+      "promptFile": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/prompt.txt",
+      "input": {
+        "path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-front.png",
+        "sha256": "252f94b965aa049f5395534b066271d2ef9cfe6755a8c1ddf4bc9801187a78c9",
+        "uploadedHashMd5": "a2eb4dbcda2411a1d78b348288fef07c"
+      },
+      "output": {
+        "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/MED-LungeAttack_kling25_ref.mp4",
+        "sha256": "4a1b29936ec8b698982c105a8bc7a9caf7c6a5c074be36488a001e9616758338",
+        "bytes": 2896604,
+        "codec": "h264",
+        "durationSec": 5.041667,
+        "fps": "24/1",
+        "frames": 121,
+        "resolution": "960x960"
+      },
+      "keyframes": [
+        {
+          "frame": 0,
+          "timeSec": 0.0,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/keyframes/f000.png",
+          "sha256": "0c4b3b5d7b79b5009e016bb2ffc4eb3fc2b2be30838f3d8eff412988bbf8a1ec"
+        },
+        {
+          "frame": 24,
+          "timeSec": 1.0,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/keyframes/f024.png",
+          "sha256": "c3f3b10a260e7250299cac3e42d4c360b1b0fdf154952702c2a54e67fc59a8f8"
+        },
+        {
+          "frame": 48,
+          "timeSec": 2.0,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/keyframes/f048.png",
+          "sha256": "e6c625365d0f9baa2ab9f4141e76f4b2475b126237db6b5033d462df522d1799"
+        },
+        {
+          "frame": 88,
+          "timeSec": 3.667,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/keyframes/f088.png",
+          "sha256": "e0b67fb099259cddc7dc874d00e146200f39f42a88f3b7f8607b06432d5aea38"
+        },
+        {
+          "frame": 94,
+          "timeSec": 3.917,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/keyframes/f094.png",
+          "sha256": "85f0896e265696aabb687a4ff61b149f25e4662eb0e19732a82527a57b1e9b64"
+        },
+        {
+          "frame": 120,
+          "timeSec": 5.0,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/keyframes/f120.png",
+          "sha256": "b4e36afefdb0d27d815ae463d46bc7e097a8b2e9072a824a25b91c42f818d0b7"
+        }
+      ],
+      "contactSheet": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/contact-sheet-2fps.png",
+      "measurements": {
+        "status": "измерено",
+        "file": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/analysis.json",
+        "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+        "border_mad_max": 2.819,
+        "base_center_x_range_px": 3.5,
+        "base_bottom_y_range_px": 0.0,
+        "base_width_range_px": 3.0,
+        "fg_touches_edge_frames": [],
+        "fg_bbox_union": [
+          296,
+          28,
+          937,
+          860
+        ],
+        "motion_mad_max": 3.293,
+        "motion_peak_frames": [
+          40,
+          38,
+          39,
+          42,
+          41
+        ]
+      },
+      "motionSummary": "разворот торса вправо по кадру (к ¾), подъём лука, натяжение (кадры ~0–51), удержание прицела (~54–88), выпуск между 88 и 94 (стрела исчезает, полёта нет), возврат в стойку (~93–120)",
+      "assessment": {
+        "status": "оценка по кадрам (визуально); числа взяты из measurements",
+        "camera": "стабильна: нижний край подставки — размах 0 px, центр обода — размах 3.5 px, ширина обода — размах 3 px (≤1% от медианы 361 px); фон MAD ≤2.8; силуэт в кадре (union bbox x 296–937 из 960, края не касается)",
+        "limbs": "обе руки читаемы в плоскости кадра; тянущая (правая) рука у подбородка, локоть в сторону; стопы на подставке, шагов нет",
+        "bow": "лук в левой руке весь ролик; стрела возникает без извлечения из колчана; тетива появляется и меняет толщину (артефакт генерации)",
+        "artifacts": "змеиная корона перерисовывается; ролик 5 с против цели 0.50–0.60 с, нужен ретайминг и выборка фаз",
+        "videoToMotion": "прогноз (pose-трекинг не запускался): подходит для пробы video-to-motion верха тела — камера неподвижна (измерено), руки не перекрыты телом, фон ровный; риск — хитон скрывает колени и таз"
+      },
+      "cost": {
+        "syntxTokens": 6.0,
+        "quotedBeforeRun": 6,
+        "balanceBefore": 685.5,
+        "balanceAfter": 679.5,
+        "source": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/syntx/balance_before.json, art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/syntx/balance_after.json"
+      },
+      "briefDeviation": {
+        "status": "оценка по кадрам (визуально)",
+        "brief": "бриф 18 §5 MED-LungeAttack: «выпад-„выстрел“ из лука вперёд», фаза (3) — «микровыпад корпусом вперёд»; стартовая и финальная поза — Idle-стойка",
+        "clip": "выстрел направлен вправо по кадру, а не вперёд на камеру — сознательно в промпте (руки в плоскости кадра для трекинга); кадры 0 и 120 — фронтальная Idle-стойка",
+        "forwardLeanAtRelease": "не подтверждён: на ключевых кадрах f088 и f094 положение головы и торса визуально не меняется; наклон по глубине во фронтальной проекции не оценить; не измерялось",
+        "rejected": "поворот всего клипа по yaw к оси «вперёд» не подходит: он развернул бы боком и Idle-стойку в кадрах 0 и 120 и сломал бы переход Idle → Attack → Idle",
+        "options": {
+          "status": "предложено",
+          "items": [
+            "переносить только верх тела (позвоночник, плечи, руки) с коррекцией ориентации к оси «вперёд»; таз и ноги оставить в Idle-стойке",
+            "либо одна регенерация (≈6 токенов SYNTX) в ¾ с выстрелом по оси камеры, чтобы совпасть с брифом"
+          ]
+        }
+      }
+    },
+    {
+      "cue": "MED-Idle",
+      "cueRef": "нет CUE (фоновое состояние; бриф 18 §5 MED-Idle, CUE-017 только пауза)",
+      "generationOrder": 2,
+      "status": "референс, не анимация",
+      "suitabilityVideoToMotion": {
+        "verdict": "ограниченно пригоден",
+        "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+        "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения камеры/фона/силуэта из analysis.json"
+      },
+      "service": "SYNTX (syntx.ai) → Kling",
+      "aiName": "kling",
+      "modelType": "kling_image2video",
+      "parameters": {
+        "version": "2.5",
+        "mode": "standart",
+        "video_duration": 5,
+        "native_audio": false,
+        "aspect_ratio": "1:1",
+        "temperature": 0.5,
+        "multi_shots": false,
+        "camera_movement": null
+      },
+      "syntxChatUuid": "5ac4e224-2019-46c2-b4a2-8d5804835b0e",
+      "syntxTaskId": "d8fb42c3-a800-4f12-aca1-81b5fd76ed2a",
+      "syntxRaw": {
+        "dir": "art/animation-refs/ASSET-MEDUSA-001/MED-Idle/syntx/",
+        "files": [
+          "req.json",
+          "gen.json",
+          "wait.json",
+          "result.json",
+          "balance_before.json",
+          "balance_after.json"
+        ],
+        "note": "сырые ответы SYNTX MCP; id аккаунта (поля user_id/owner_id/author_id и сегмент user_<id> в URL хранилища) заменён на REDACTED; md5 mp4 = хэш в имени выходного файла result.json.url"
+      },
+      "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of Medusa come to life, standing on her round black base, entire body and base always visible in frame. She stands in a calm relaxed archer's stance holding the bow lowered in her left hand (on the right side of the image). She breathes slowly: the chest rises and falls gently, shoulders lift slightly, the head makes a small slow turn and returns to looking forward. Subtle, calm, looping idle motion, the pose at the end matches the pose at the start. Feet stay planted on the base, no stepping, no walking, no big gestures. Snake hair moves only with her head. Plain neutral gray studio background, even soft lighting, clean silhouette, no motion blur, no extra limbs, no extra characters.",
+      "promptFile": "art/animation-refs/ASSET-MEDUSA-001/MED-Idle/prompt.txt",
+      "input": {
+        "path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-front.png",
+        "sha256": "252f94b965aa049f5395534b066271d2ef9cfe6755a8c1ddf4bc9801187a78c9",
+        "uploadedHashMd5": "a2eb4dbcda2411a1d78b348288fef07c"
+      },
+      "output": {
+        "path": "art/animation-refs/ASSET-MEDUSA-001/MED-Idle/MED-Idle_kling25_ref.mp4",
+        "sha256": "abedd6c2030aa3cb12c05ae19c0dd4eea37e64b42ac15365f83385e66878fe45",
+        "bytes": 2217628,
+        "codec": "h264",
+        "durationSec": 5.041667,
+        "fps": "24/1",
+        "frames": 121,
+        "resolution": "960x960"
+      },
+      "keyframes": [
+        {
+          "frame": 0,
+          "timeSec": 0.0,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-Idle/keyframes/f000.png",
+          "sha256": "4384f912e5a9a8b7d3b56254ee4501156835cd91faa4c861e8363f2f8dafa6c6"
+        },
+        {
+          "frame": 30,
+          "timeSec": 1.25,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-Idle/keyframes/f030.png",
+          "sha256": "86d4b9538e969a46f6c0ffab81efd6750244ffb17c527e1ba4430a497110ae2b"
+        },
+        {
+          "frame": 60,
+          "timeSec": 2.5,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-Idle/keyframes/f060.png",
+          "sha256": "d286b3780382b781e83d612a5624385009a907a19940d02886c1abaff10cea69"
+        },
+        {
+          "frame": 90,
+          "timeSec": 3.75,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-Idle/keyframes/f090.png",
+          "sha256": "03a8a1c71a3fcd9a1b6419a460bd584e4d20321643bab62205ea567086d5cd00"
+        },
+        {
+          "frame": 120,
+          "timeSec": 5.0,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-Idle/keyframes/f120.png",
+          "sha256": "329afba8f48b749552d1d69c89a6564aa597f0ad4b728e00e262ae8f5502e242"
+        }
+      ],
+      "contactSheet": "art/animation-refs/ASSET-MEDUSA-001/MED-Idle/contact-sheet-2fps.png",
+      "measurements": {
+        "status": "измерено",
+        "file": "art/animation-refs/ASSET-MEDUSA-001/MED-Idle/analysis.json",
+        "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+        "border_mad_max": 2.313,
+        "base_center_x_range_px": 5.5,
+        "base_bottom_y_range_px": 0.0,
+        "base_width_range_px": 2.0,
+        "fg_touches_edge_frames": [],
+        "fg_bbox_union": [
+          298,
+          108,
+          741,
+          859
+        ],
+        "motion_mad_max": 0.815,
+        "motion_peak_frames": [
+          102,
+          33,
+          32,
+          34,
+          2
+        ]
+      },
+      "motionSummary": "лёгкое дыхание и микроповорот головы; амплитуда очень мала (motion_mad_max 0.815, самый низкий из четырёх)",
+      "assessment": {
+        "status": "оценка по кадрам (визуально); числа взяты из measurements",
+        "camera": "стабильна: нижний край подставки неподвижен (размах 0 px), центр обода — размах 5.5 px (вероятно, подол у обода), фон по краям MAD ≤2.3",
+        "limbs": "все конечности видны весь ролик; ноги частично закрыты хитоном (видны через разрез и поножи)",
+        "bow": "лук в левой руке (справа в кадре) весь ролик, форма стабильна",
+        "artifacts": "змеиная корона перерисована относительно входа (число и размер змей плавают); цикл не замкнут: MAD первый/последний кадр 7.66",
+        "videoToMotion": "прогноз (pose-трекинг не запускался): движение, вероятно, ниже шума монокулярной оценки позы; годится как референс амплитуды и тайминга дыхания, не как источник кривых. Idle дешевле ставить руками по брифу"
+      },
+      "cost": {
+        "syntxTokens": 6.0,
+        "quotedBeforeRun": 6,
+        "balanceBefore": 679.5,
+        "balanceAfter": 673.5,
+        "source": "art/animation-refs/ASSET-MEDUSA-001/MED-Idle/syntx/balance_before.json, art/animation-refs/ASSET-MEDUSA-001/MED-Idle/syntx/balance_after.json"
+      }
+    },
+    {
+      "cue": "MED-HitReact",
+      "cueRef": "CUE-011 (900 мс), бриф 18 §5 MED-HitReact",
+      "generationOrder": 3,
+      "status": "референс, не анимация",
+      "suitabilityVideoToMotion": {
+        "verdict": "непригоден для video-to-motion без повторной генерации",
+        "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+        "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения камеры/фона/силуэта из analysis.json"
+      },
+      "service": "SYNTX (syntx.ai) → Kling",
+      "aiName": "kling",
+      "modelType": "kling_image2video",
+      "parameters": {
+        "version": "2.5",
+        "mode": "standart",
+        "video_duration": 5,
+        "native_audio": false,
+        "aspect_ratio": "1:1",
+        "temperature": 0.5,
+        "multi_shots": false,
+        "camera_movement": null
+      },
+      "syntxChatUuid": "5ac4e224-2019-46c2-b4a2-8d5804835b0e",
+      "syntxTaskId": "6327554e-d48f-405a-8440-5318a766569e",
+      "syntxRaw": {
+        "dir": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/syntx/",
+        "files": [
+          "req.json",
+          "gen.json",
+          "wait.json",
+          "result.json",
+          "balance_before.json",
+          "balance_after.json"
+        ],
+        "note": "сырые ответы SYNTX MCP; id аккаунта (поля user_id/owner_id/author_id и сегмент user_<id> в URL хранилища) заменён на REDACTED; md5 mp4 = хэш в имени выходного файла result.json.url"
+      },
+      "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of Medusa come to life, standing on her round black base, entire body and base always visible in frame. She holds the bow in her left hand (on the right side of the image). After a brief moment she is suddenly struck in the chest by an invisible blow: she flinches sharply, torso jerks backward, shoulders and head snap up and back, arms react, a short hold, then she recovers and settles back into her calm standing pose and stays still. The bow stays firmly gripped in her left hand the whole time. Feet stay planted on the base, no stepping back, no falling. Snake hair moves only with her head. Plain neutral gray studio background, even soft lighting, clean silhouette, no blood, no projectiles, no motion blur, no extra limbs, no extra characters.",
+      "promptFile": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/prompt.txt",
+      "input": {
+        "path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-front.png",
+        "sha256": "252f94b965aa049f5395534b066271d2ef9cfe6755a8c1ddf4bc9801187a78c9",
+        "uploadedHashMd5": "a2eb4dbcda2411a1d78b348288fef07c"
+      },
+      "output": {
+        "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/MED-HitReact_kling25_ref.mp4",
+        "sha256": "224b0b20f3901cb8d9bf8b09043cda3fd0cac2d08cb2f3df6cf35c0aaaebd044",
+        "bytes": 2327202,
+        "codec": "h264",
+        "durationSec": 5.041667,
+        "fps": "24/1",
+        "frames": 121,
+        "resolution": "960x960"
+      },
+      "keyframes": [
+        {
+          "frame": 0,
+          "timeSec": 0.0,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/keyframes/f000.png",
+          "sha256": "ea79cfeaacc94f8b95bb658d9f67f441a735988eaee84bd3059ce0db1c3bf3f9"
+        },
+        {
+          "frame": 14,
+          "timeSec": 0.583,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/keyframes/f014.png",
+          "sha256": "04dcf6177fd0bfffbe42763654ad189ccf089942665c3367ab1063ddaee916dc"
+        },
+        {
+          "frame": 19,
+          "timeSec": 0.792,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/keyframes/f019.png",
+          "sha256": "ebd8c04c3948e86cfd11e9e9449af493de2794ddc63e88a387ae135e752e2ad7"
+        },
+        {
+          "frame": 26,
+          "timeSec": 1.083,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/keyframes/f026.png",
+          "sha256": "d33620eb6921fe899e7d2bcf86179e5a4f0159037f0d11102f949eea7b6400b7"
+        },
+        {
+          "frame": 34,
+          "timeSec": 1.417,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/keyframes/f034.png",
+          "sha256": "5c13a1f0d9b445148bdeb925152af8696d2bcbf1ec926bc4dfba254f45a00969"
+        },
+        {
+          "frame": 120,
+          "timeSec": 5.0,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/keyframes/f120.png",
+          "sha256": "5b2b6adbe53d950bb1ab44f12e450541252212f15cc0fcf266cf904849cfd544"
+        }
+      ],
+      "contactSheet": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/contact-sheet-2fps.png",
+      "measurements": {
+        "status": "измерено",
+        "file": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/analysis.json",
+        "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+        "border_mad_max": 5.843,
+        "base_center_x_range_px": 9.5,
+        "base_bottom_y_range_px": 1.0,
+        "base_width_range_px": 18.0,
+        "fg_touches_edge_frames": [
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          25,
+          26
+        ],
+        "fg_bbox_union": [
+          130,
+          0,
+          959,
+          859
+        ],
+        "motion_mad_max": 6.477,
+        "motion_peak_frames": [
+          19,
+          20,
+          18,
+          29,
+          31
+        ]
+      },
+      "motionSummary": "вздрагивание: голова и плечи вверх-назад, руки чуть в стороны (кадры ~12–34), второй мягкий откат ~43–64, затем покой",
+      "assessment": {
+        "status": "оценка по кадрам (визуально); числа взяты из measurements",
+        "camera": "стабильна по подставке (нижний край — размах 1 px, центр обода — размах 9.5 px), но фон по краям MAD до 5.8 из-за эффектов",
+        "limbs": "в пиковые кадры удара (12–26) торс и правая рука перекрыты посторонним объектом и красным лучом/брызгами",
+        "bow": "лук в левой руке, не выпадает",
+        "artifacts": "модель дорисовала снаряд/кулак, входящий справа из-за края кадра (кадры 12–21 и 25–26 касаются края), красный луч, радиальные «брызги» и красное пятно-рану на груди до конца ролика, вопреки «no blood, no projectiles» в промпте; сама амплитуда вздрагивания мала",
+        "videoToMotion": "прогноз (pose-трекинг не запускался): ключевые кадры удара заслонены, в фазе пика трекер позы, вероятно, даст мусор; повтор предложен ниже и не выполнен из-за лимита «не больше 4 роликов»"
+      },
+      "cost": {
+        "syntxTokens": 6.0,
+        "quotedBeforeRun": 6,
+        "balanceBefore": 673.5,
+        "balanceAfter": 667.5,
+        "source": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/syntx/balance_before.json, art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/syntx/balance_after.json"
+      },
+      "retryProposal": {
+        "status": "предложено",
+        "why": "формулировка «struck by an invisible blow», вероятно, спровоцировала снаряд и VFX",
+        "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of Medusa come to life, standing on her round black base, entire body and base always visible in frame. She holds the bow in her left hand (on the right side of the image). After one second she flinches in pain: her torso recoils backward, shoulders hunch up, head tilts back, then she recovers into her calm standing pose and stays still. Nothing touches her, nothing enters the frame. No visual effects, no particles, no blood, no wounds, no projectiles. Feet stay planted on the base. Plain neutral gray studio background, even soft lighting.",
+        "expectedCostSyntxTokens": 6
+      }
+    },
+    {
+      "cue": "MED-DeathSettle",
+      "cueRef": "CUE-013 (950 мс), бриф 18 §5 MED-DeathSettle",
+      "generationOrder": 4,
+      "status": "референс, не анимация",
+      "suitabilityVideoToMotion": {
+        "verdict": "ограниченно пригоден (только фаза до кадра ~44)",
+        "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+        "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения камеры/фона/силуэта из analysis.json"
+      },
+      "service": "SYNTX (syntx.ai) → Kling",
+      "aiName": "kling",
+      "modelType": "kling_image2video",
+      "parameters": {
+        "version": "2.5",
+        "mode": "standart",
+        "video_duration": 5,
+        "native_audio": false,
+        "aspect_ratio": "1:1",
+        "temperature": 0.5,
+        "multi_shots": false,
+        "camera_movement": null
+      },
+      "syntxChatUuid": "5ac4e224-2019-46c2-b4a2-8d5804835b0e",
+      "syntxTaskId": "6ed7a3ea-be6b-4cd4-a584-06a10d5e78bb",
+      "syntxRaw": {
+        "dir": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/syntx/",
+        "files": [
+          "req.json",
+          "gen.json",
+          "wait.json",
+          "result.json",
+          "balance_before.json",
+          "balance_after.json"
+        ],
+        "note": "сырые ответы SYNTX MCP; id аккаунта (поля user_id/owner_id/author_id и сегмент user_<id> в URL хранилища) заменён на REDACTED; md5 mp4 = хэш в имени выходного файла result.json.url"
+      },
+      "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of Medusa come to life, standing on her round black base, entire body and base always visible in frame. She holds the bow in her left hand (on the right side of the image). She is defeated: her strength fails, her knees buckle, her hips drop, she slowly sinks down and collapses onto the round base in place, torso and head fold forward and down, the snake crown droops, the arm with the bow lowers with her, and she ends lying still, crumpled on top of the base. She stays centered on the base, does not step or fall off the base. The bow stays in her left hand. Plain neutral gray studio background, even soft lighting, clean silhouette, no blood, no motion blur, no extra limbs, no extra characters.",
+      "promptFile": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/prompt.txt",
+      "input": {
+        "path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-front.png",
+        "sha256": "252f94b965aa049f5395534b066271d2ef9cfe6755a8c1ddf4bc9801187a78c9",
+        "uploadedHashMd5": "a2eb4dbcda2411a1d78b348288fef07c"
+      },
+      "output": {
+        "path": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/MED-DeathSettle_kling25_ref.mp4",
+        "sha256": "3c3d15071726fa8593fddc25a1c1c732166a69a82ef7fcd58e928fab48124dc9",
+        "bytes": 2018125,
+        "codec": "h264",
+        "durationSec": 5.041667,
+        "fps": "24/1",
+        "frames": 121,
+        "resolution": "960x960"
+      },
+      "keyframes": [
+        {
+          "frame": 0,
+          "timeSec": 0.0,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/keyframes/f000.png",
+          "sha256": "33b05808f3d13ecabaddaeaa98dadb1ecb410b6bb4010791d35f89e19eaf6668"
+        },
+        {
+          "frame": 24,
+          "timeSec": 1.0,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/keyframes/f024.png",
+          "sha256": "8da03978bdb7d7ed9b7b5f25afaf44850003e5ea06394d226fb8da4a8719734e"
+        },
+        {
+          "frame": 36,
+          "timeSec": 1.5,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/keyframes/f036.png",
+          "sha256": "cd3618a9d736e5e2d709cd68e2e6f320d3ba6d13d879894bfbdba9af1e444237"
+        },
+        {
+          "frame": 44,
+          "timeSec": 1.833,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/keyframes/f044.png",
+          "sha256": "490f0afa43979ecc0cf7363a985a68c017b481b37af6727c24617dc61cc82bd4"
+        },
+        {
+          "frame": 56,
+          "timeSec": 2.333,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/keyframes/f056.png",
+          "sha256": "4b58b18e00701103fb58b9e35bd0e64ed34d909223d821ad8e4853129ddb628a"
+        },
+        {
+          "frame": 120,
+          "timeSec": 5.0,
+          "path": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/keyframes/f120.png",
+          "sha256": "e4215a20882644027cda7677aa2b8d3f233e594669e971f0d762a8696e12aeee"
+        }
+      ],
+      "contactSheet": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/contact-sheet-2fps.png",
+      "measurements": {
+        "status": "измерено",
+        "file": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/analysis.json",
+        "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+        "border_mad_max": 1.743,
+        "base_center_x_range_px": 49.5,
+        "base_bottom_y_range_px": 7.0,
+        "base_width_range_px": 110.0,
+        "fg_touches_edge_frames": [],
+        "fg_bbox_union": [
+          298,
+          108,
+          763,
+          866
+        ],
+        "motion_mad_max": 5.866,
+        "motion_peak_frames": [
+          39,
+          40,
+          38,
+          41,
+          37
+        ]
+      },
+      "motionSummary": "подгиб коленей и присед (~22–44), обрушение вперёд на подставку (~44–60, пик движения кадры 37–41), затем неподвижная низкая поза (~64–120)",
+      "assessment": {
+        "status": "оценка по кадрам (визуально); числа взяты из measurements",
+        "camera": "стабильна: левый край обода подставки 299–301 px и нижний край 859–860 px во всех кадрах, кроме 56–59 (лук свисает под обод: левый край 358/358/340/327 px, нижний 866/866/865/864 px — строка обода отсчитывается от самого нижнего тёмного пикселя, которым там становится лук); метрики центра и ширины обода (размах 49.5 / 110 px) искажены телом и луком, лёгшими на обод, это не движение камеры",
+        "limbs": "до присяда (~кадр 44) конечности читаемы; в финальной позе тело свёрнуто к камере, руки и ноги под корпусом, основная видимая масса — змеиная корона",
+        "bow": "лук остаётся у левой руки, но в финале деформирован (перекручен, похож на арбалет), это артефакт",
+        "artifacts": "падение вперёд, к камере: глубина, вероятно, неоднозначна для монокулярного трекинга (прогноз); голова и змеи в финале заметно крупнее, чем в стойке (нарушение пропорций); часть тела и лук свисают за обод справа",
+        "videoToMotion": "прогноз (pose-трекинг не запускался): фазу «потеря опоры → присед» можно брать как референс тайминга; складывание и укладку делать только ручной ключевой анимацией"
+      },
+      "cost": {
+        "syntxTokens": 6.0,
+        "quotedBeforeRun": 6,
+        "balanceBefore": 667.5,
+        "balanceAfter": 661.5,
+        "source": "art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/syntx/balance_before.json, art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle/syntx/balance_after.json"
+      }
+    }
+  ],
+  "nextSteps": {
+    "status": "предложено",
+    "items": [
+      "Проба video-to-motion только на MED-LungeAttack и только для верха тела (позвоночник, плечи, руки) с коррекцией ориентации к оси «вперёд»; поворот всего клипа по yaw отклонён (briefDeviation). Сервис не выбран, выбор и стоимость фиксировать отдельно.",
+      "MED-LungeAttack: альтернатива — одна регенерация (≈6 токенов) в ¾ с выстрелом по оси камеры, чтобы совпасть с брифом 18 §5.",
+      "MED-HitReact: одна повторная генерация по retryProposal (≈6 токенов), если лимит «4 ролика» будет снят.",
+      "MED-Idle и фазу укладки MED-DeathSettle ставить ключевой анимацией в Blender по брифу; видео использовать как референс тайминга.",
+      "Ретаргет на риг Medusa и ретайминг под окна CUE не начаты; «технически импортировано» и «художественно принято» не заявляются."
+    ]
+  }
+}

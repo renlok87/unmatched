@@ -1,0 +1,1109 @@
+{
+ "schema": "unmatched.animation-clip-manifest/1",
+ "revision": "p16-2026-09-28",
+ "rig_contract": "docs/art-pipeline/rig/rig-contract.json",
+ "notes": [
+  "16 production-слотов = 4 клипа D-11 x 4 персонажа (бриф 18 §4): 15 безусловных, HAR-HitReact условен до AD-CNF-30 (required_mvp=false); ни один не заполнен",
+  "длительности — ПРЕДЛОЖЕНИЕ/ОТКРЫТО (AD-OPEN-46); FPS 24 измерен на S05/ART004",
+  "test-записи не могут стать artistically_accepted (правило схемы)"
+ ],
+ "clips": [
+  {
+   "id": "MED-Idle",
+   "character": "Medusa",
+   "asset_id": "ASSET-MEDUSA-001",
+   "clip": "Idle",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "state:Idle",
+    "CUE-017"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": "2-3 (loop)",
+    "target_status": "proposal",
+    "measured": null
+   },
+   "loop": true,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-MEDUSA-001/Animation/AM_Medusa_Idle",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "MED-LungeAttack",
+   "character": "Medusa",
+   "asset_id": "ASSET-MEDUSA-001",
+   "clip": "LungeAttack",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-008"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": 0.6,
+    "target_status": "proposal",
+    "measured": null
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-MEDUSA-001/Animation/AM_Medusa_LungeAttack",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "MED-HitReact",
+   "character": "Medusa",
+   "asset_id": "ASSET-MEDUSA-001",
+   "clip": "HitReact",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-011"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": "0.4 (04) vs 0.9 (CUE-011)",
+    "target_status": "open",
+    "measured": null
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-MEDUSA-001/Animation/AM_Medusa_HitReact",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "MED-DeathSettle",
+   "character": "Medusa",
+   "asset_id": "ASSET-MEDUSA-001",
+   "clip": "DeathSettle",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-013"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": "0.9 (04), <=0.95 (CUE-013)",
+    "target_status": "open",
+    "measured": null
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-MEDUSA-001/Animation/AM_Medusa_DeathSettle",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "HAR-Idle",
+   "character": "Harpy",
+   "asset_id": "ASSET-HARPY-001",
+   "clip": "Idle",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "state:Idle",
+    "CUE-017"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": "2-3 (loop)",
+    "target_status": "proposal",
+    "measured": null
+   },
+   "loop": true,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-HARPY-001/Animation/AM_Harpy_Idle",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "HAR-LungeAttack",
+   "character": "Harpy",
+   "asset_id": "ASSET-HARPY-001",
+   "clip": "LungeAttack",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-008"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": 0.6,
+    "target_status": "proposal",
+    "measured": null
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-HARPY-001/Animation/AM_Harpy_LungeAttack",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "HAR-HitReact",
+   "character": "Harpy",
+   "asset_id": "ASSET-HARPY-001",
+   "clip": "HitReact",
+   "role": "production",
+   "required_mvp": false,
+   "cue": [
+    "CUE-011"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": "0.4 (04) vs 0.9 (CUE-011)",
+    "target_status": "open",
+    "measured": null
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-HARPY-001/Animation/AM_Harpy_HitReact",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет; условно до AD-CNF-30 (бриф 18, стр. 10; Т2№7): при HP 1 HitReact почти недостижим, автор может сократить набор Harpy до смерть+idle"
+  },
+  {
+   "id": "HAR-DeathSettle",
+   "character": "Harpy",
+   "asset_id": "ASSET-HARPY-001",
+   "clip": "DeathSettle",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-013"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": "0.9 (04), <=0.95 (CUE-013)",
+    "target_status": "open",
+    "measured": null
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-HARPY-001/Animation/AM_Harpy_DeathSettle",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "ARTH-Idle",
+   "character": "Arthur",
+   "asset_id": "ASSET-KING-ARTHUR-001",
+   "clip": "Idle",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "state:Idle",
+    "CUE-017"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": "2-3 (loop)",
+    "target_status": "proposal",
+    "measured": null
+   },
+   "loop": true,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-KING-ARTHUR-001/Animation/AM_Arthur_Idle",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "ARTH-LungeAttack",
+   "character": "Arthur",
+   "asset_id": "ASSET-KING-ARTHUR-001",
+   "clip": "LungeAttack",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-008"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": 0.6,
+    "target_status": "proposal",
+    "measured": null
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-KING-ARTHUR-001/Animation/AM_Arthur_LungeAttack",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "ARTH-HitReact",
+   "character": "Arthur",
+   "asset_id": "ASSET-KING-ARTHUR-001",
+   "clip": "HitReact",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-011"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": "0.4 (04) vs 0.9 (CUE-011)",
+    "target_status": "open",
+    "measured": null
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-KING-ARTHUR-001/Animation/AM_Arthur_HitReact",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "ARTH-DeathSettle",
+   "character": "Arthur",
+   "asset_id": "ASSET-KING-ARTHUR-001",
+   "clip": "DeathSettle",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-013"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": "0.9 (04), <=0.95 (CUE-013)",
+    "target_status": "open",
+    "measured": null
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-KING-ARTHUR-001/Animation/AM_Arthur_DeathSettle",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "MER-Idle",
+   "character": "Merlin",
+   "asset_id": "ASSET-MERLIN-001",
+   "clip": "Idle",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "state:Idle",
+    "CUE-017"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": "2-3 (loop)",
+    "target_status": "proposal",
+    "measured": null
+   },
+   "loop": true,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-MERLIN-001/Animation/AM_Merlin_Idle",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "MER-LungeAttack",
+   "character": "Merlin",
+   "asset_id": "ASSET-MERLIN-001",
+   "clip": "LungeAttack",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-008"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": 0.6,
+    "target_status": "proposal",
+    "measured": null
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-MERLIN-001/Animation/AM_Merlin_LungeAttack",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "MER-HitReact",
+   "character": "Merlin",
+   "asset_id": "ASSET-MERLIN-001",
+   "clip": "HitReact",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-011"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": "0.4 (04) vs 0.9 (CUE-011)",
+    "target_status": "open",
+    "measured": null
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-MERLIN-001/Animation/AM_Merlin_HitReact",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "MER-DeathSettle",
+   "character": "Merlin",
+   "asset_id": "ASSET-MERLIN-001",
+   "clip": "DeathSettle",
+   "role": "production",
+   "required_mvp": true,
+   "cue": [
+    "CUE-013"
+   ],
+   "source": {
+    "type": "none"
+   },
+   "license": {
+    "terms": "нет файла",
+    "commercial_use": "n/a"
+   },
+   "fps": {
+    "target": 24,
+    "measured": null
+   },
+   "duration_s": {
+    "target": "0.9 (04), <=0.95 (CUE-013)",
+    "target_status": "open",
+    "measured": null
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/PipelineCandidates/ASSET-MERLIN-001/Animation/AM_Merlin_DeathSettle",
+    "status": "proposed"
+   },
+   "status": "proposed",
+   "validation": {
+    "result": "not_run"
+   },
+   "notes": "слот брифа 18; производственного клипа нет"
+  },
+  {
+   "id": "MED-Idle-draft",
+   "character": "Medusa",
+   "asset_id": "ASSET-MEDUSA-001",
+   "clip": "Idle",
+   "role": "test",
+   "required_mvp": false,
+   "cue": [
+    "state:Idle",
+    "CUE-017"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2",
+    "reference": "blender/ASSET-MEDUSA-001/build_segmented_medusa.py#actions_for",
+    "files": [
+     {
+      "path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "03085e87b313d4be9d6102af3d348871b33d30b58304a5f4dcee883caab52105"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": "2-3 (loop)",
+    "target_status": "proposal",
+    "measured": 2.3333
+   },
+   "loop": true,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/ART004/Medusa/Animation/AM_Medusa_Idle",
+    "status": "technically_imported",
+    "evidence": "blender/ASSET-MEDUSA-001/ue-import-result.json"
+   },
+   "status": "draft_test",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation/AM_Medusa_Idle.validation.json",
+    "fails": [],
+    "warnings": [
+     "armature_object_name",
+     "visible_pose_change"
+    ],
+    "date": "2026-09-28"
+   },
+   "notes": "черновой клип ART-004 (2-3 кости); только тестовый файл пайплайна, художественно не принят; работа над анимациями остановлена до пайплайна с видео-референсами"
+  },
+  {
+   "id": "MED-LungeAttack-draft",
+   "character": "Medusa",
+   "asset_id": "ASSET-MEDUSA-001",
+   "clip": "LungeAttack",
+   "role": "test",
+   "required_mvp": false,
+   "cue": [
+    "CUE-008"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2",
+    "reference": "blender/ASSET-MEDUSA-001/build_segmented_medusa.py#actions_for",
+    "files": [
+     {
+      "path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "b985af983166f62d320c95bdc88cbcfba1f897a6c0abcaf87bcf748f994338a8"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": 0.6,
+    "target_status": "proposal",
+    "measured": 0.5833
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/ART004/Medusa/Animation/AM_Medusa_LungeAttack",
+    "status": "technically_imported",
+    "evidence": "blender/ASSET-MEDUSA-001/ue-import-result.json"
+   },
+   "status": "draft_test",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation/AM_Medusa_LungeAttack.validation.json",
+    "fails": [],
+    "warnings": [
+     "armature_object_name"
+    ],
+    "date": "2026-09-28"
+   },
+   "notes": "черновой клип ART-004 (2-3 кости); только тестовый файл пайплайна, художественно не принят; работа над анимациями остановлена до пайплайна с видео-референсами"
+  },
+  {
+   "id": "MED-HitReact-draft",
+   "character": "Medusa",
+   "asset_id": "ASSET-MEDUSA-001",
+   "clip": "HitReact",
+   "role": "test",
+   "required_mvp": false,
+   "cue": [
+    "CUE-011"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2",
+    "reference": "blender/ASSET-MEDUSA-001/build_segmented_medusa.py#actions_for",
+    "files": [
+     {
+      "path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "606b998af967508ee0ddd000e3083b49e135bf9765ce14a313339aa054105af2"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": "0.4 (04) vs 0.9 (CUE-011)",
+    "target_status": "open",
+    "measured": 0.375
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/ART004/Medusa/Animation/AM_Medusa_HitReact",
+    "status": "technically_imported",
+    "evidence": "blender/ASSET-MEDUSA-001/ue-import-result.json"
+   },
+   "status": "draft_test",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation/AM_Medusa_HitReact.validation.json",
+    "fails": [],
+    "warnings": [
+     "armature_object_name"
+    ],
+    "date": "2026-09-28"
+   },
+   "notes": "черновой клип ART-004 (2-3 кости); только тестовый файл пайплайна, художественно не принят; работа над анимациями остановлена до пайплайна с видео-референсами"
+  },
+  {
+   "id": "MED-DeathSettle-draft",
+   "character": "Medusa",
+   "asset_id": "ASSET-MEDUSA-001",
+   "clip": "DeathSettle",
+   "role": "test",
+   "required_mvp": false,
+   "cue": [
+    "CUE-013"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2",
+    "reference": "blender/ASSET-MEDUSA-001/build_segmented_medusa.py#actions_for",
+    "files": [
+     {
+      "path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "278052b4f48dab53df574646d902ab04259985b1aafffca02bd171f8c544e00f"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": "0.9 (04), <=0.95 (CUE-013)",
+    "target_status": "open",
+    "measured": 0.875
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "target_path": "/Game/ART004/Medusa/Animation/AM_Medusa_DeathSettle",
+    "status": "technically_imported",
+    "evidence": "blender/ASSET-MEDUSA-001/ue-import-result.json"
+   },
+   "status": "draft_test",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation/AM_Medusa_DeathSettle.validation.json",
+    "fails": [],
+    "warnings": [
+     "armature_object_name"
+    ],
+    "date": "2026-09-28"
+   },
+   "notes": "черновой клип ART-004 (2-3 кости); только тестовый файл пайплайна, художественно не принят; работа над анимациями остановлена до пайплайна с видео-референсами"
+  },
+  {
+   "id": "MED-Idle-tripo-preset-test",
+   "character": "Medusa",
+   "asset_id": "ASSET-MEDUSA-001",
+   "clip": "Idle",
+   "role": "test",
+   "required_mvp": false,
+   "cue": [
+    "state:Idle"
+   ],
+   "source": {
+    "type": "tripo_preset",
+    "tool": "Tripo Studio, пресет «стоя_отдых», Animate in place",
+    "task_id": "d562f057-1455-4663-8cd8-bb738175111d",
+    "reference": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/README.md",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/source/d562f057-ue5-forced-anim-preset-stoya-otdyh-inplace-fbx-blender.zip",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "15f994e79cb3db0ea6ad52994a4771907dfa3697e7599e19d7edb2d7ea471e4b"
+     },
+     {
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/fixtures/tripo-preset-stoya-otdyh-d562/tripo_convert_93b4445d-b871-4057-a0d7-1317f45a1548.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "8bf9b3af990ca2d0f43305477b3e1432d0cc6acfd44f52392d21334fcfe3c560"
+     }
+    ]
+   },
+   "license": {
+    "holder": "пользователь (платный план Tripo Studio)",
+    "terms": "Tripo Studio, приватность «Приватный»; права на результат по платному плану — по docs/research/2026-09-27-animation-audit/services.md, не перепроверено юристом",
+    "commercial_use": "unverified",
+    "evidence": "docs/research/2026-09-27-animation-audit/services.md"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": "2-3 (loop)",
+    "target_status": "proposal",
+    "measured": 17.5833
+   },
+   "loop": true,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28",
+    "retarget_map": "tripo_ue5_mannequin_to_um17"
+   },
+   "ue": {
+    "status": "proposed"
+   },
+   "status": "rejected",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation/tripo-preset-stoya-otdyh-d562.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-28"
+   },
+   "notes": "технические проверки валидатора проходят, но риг под клипом сломан (принудительный авториг Tripo на позе миниатюры): голова, лук и плащ разрываются; длительность 17,6 с вместо 2-3 с"
+  },
+  {
+   "id": "MED-LungeAttack-bvh-fixture",
+   "character": "Medusa",
+   "asset_id": "ASSET-MEDUSA-001",
+   "clip": "LungeAttack",
+   "role": "test",
+   "required_mvp": false,
+   "cue": [
+    "CUE-008"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2 export_anim.bvh (Z-up)",
+    "reference": "docs/art-pipeline/animation-library/VALIDATION.md",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/fixtures/AM_Medusa_LungeAttack.bvh",
+      "exists": true,
+      "format": "bvh",
+      "sha256": "5dbe3c213836521395b0ca58c3e2375dfe13ed1cab57ff4ec8c79db770bbf014"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 23.9998
+   },
+   "duration_s": {
+    "target": 0.6,
+    "target_status": "proposal",
+    "measured": 0.5833
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "status": "proposed"
+   },
+   "status": "draft_test",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation/bvh-roundtrip-AM_Medusa_LungeAttack.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-28"
+   },
+   "notes": "BVH-фикстура для проверки ветки BVH валидатора (round-trip из FBX, make_fixtures.py bvh); не клип для игры"
+  },
+  {
+   "id": "MED-LungeAttack-glb-fixture",
+   "character": "Medusa",
+   "asset_id": "ASSET-MEDUSA-001",
+   "clip": "LungeAttack",
+   "role": "test",
+   "required_mvp": false,
+   "cue": [
+    "CUE-008"
+   ],
+   "source": {
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2 export_scene.gltf (GLB, без картинок и материалов)",
+    "reference": "tools/tripo-pipeline/anim/make_fixtures.py",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/fixtures/AM_Medusa_LungeAttack.glb",
+      "exists": true,
+      "format": "glb",
+      "sha256": "8204d33ca1c18299f5ae4e590f028cddd28198b7e43c6b1bee08621017c54bdf"
+     }
+    ]
+   },
+   "license": {
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
+   },
+   "fps": {
+    "target": 24,
+    "measured": 24.0
+   },
+   "duration_s": {
+    "target": 0.6,
+    "target_status": "proposal",
+    "measured": 0.5833
+   },
+   "loop": false,
+   "root_motion": "in_place",
+   "skeleton": {
+    "contract_key": "UM_HUMANOID_17_v1",
+    "version": "p16-2026-09-28"
+   },
+   "ue": {
+    "status": "proposed"
+   },
+   "status": "draft_test",
+   "validation": {
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation/glb-roundtrip-AM_Medusa_LungeAttack.validation.json",
+    "fails": [],
+    "warnings": [
+     "armature_object_name"
+    ],
+    "date": "2026-09-28"
+   },
+   "notes": "GLB-фикстура ветки GLB валидатора (round-trip из FBX, make_fixtures.py glb); run_p16_validation.py сверяет рост и пик сдвига с FBX; не клип для игры"
+  }
+ ]
+}
