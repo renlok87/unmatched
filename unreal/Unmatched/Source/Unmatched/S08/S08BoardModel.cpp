@@ -250,6 +250,23 @@ bool FS08BoardModel::DecodeFighters(const TSharedPtr<FJsonValue>& FightersValue,
     FS08Contracts::ReadIntLike(Fighter, TEXT("maxHealth"), Entry.MaxHealth, Present);
     FS08Contracts::ReadIntLike(Fighter, TEXT("movement"), Entry.Movement, Present);
     Entry.AttackType = Fighter->GetStringField(TEXT("attackType"));
+    const TArray<TSharedPtr<FJsonValue>>* EffectValues = nullptr;
+    if (Fighter->TryGetArrayField(TEXT("effects"), EffectValues) && EffectValues) {
+      for (const TSharedPtr<FJsonValue>& Effect : *EffectValues) {
+        if (!Effect.IsValid()) continue;
+        FString Name;
+        const TSharedPtr<FJsonObject>* EffectObject = nullptr;
+        if (Effect->TryGetString(Name)) {
+        } else if (Effect->TryGetObject(EffectObject) && EffectObject->IsValid()) {
+          if (!(*EffectObject)->TryGetStringField(TEXT("type"), Name) &&
+              !(*EffectObject)->TryGetStringField(TEXT("name"), Name)) {
+            (*EffectObject)->TryGetStringField(TEXT("id"), Name);
+          }
+        }
+        Name.TrimStartAndEndInline();
+        if (!Name.IsEmpty()) Entry.Effects.Add(Name);
+      }
+    }
     const TSharedPtr<FJsonObject>* Position = nullptr;
     if (Fighter->TryGetObjectField(TEXT("position"), Position) && Position->IsValid()) {
       const TSharedRef<FJsonObject> Pos = Position->ToSharedRef();

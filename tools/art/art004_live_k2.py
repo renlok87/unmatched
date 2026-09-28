@@ -564,6 +564,9 @@ def cmd_run(a) -> int:
         cmd += ["-ArtPreviewFocusZoom", str(a.zoom)]
     if a.variant != "none":
         cmd += ["-ArtPreviewMedusaVariant", a.variant]
+    # T2.2: extra run-phase2-demo.ps1 parameters, one token per occurrence
+    # (--demo-arg=-ArtPreviewAllMedusa --demo-arg=-ArtPreviewIconSize --demo-arg=24).
+    cmd += list(a.demo_arg or [])
     record = {"schema": "unmatched.art004-live-run/1", "label": a.label, "startedLocal": now_local(),
               "argv": [c if not c.startswith(str(REPO)) else rel(Path(c)) for c in cmd],
               "credentials": "S08_DEMO_* from backend/.env injected into the child environment only (not argv)",
@@ -2060,6 +2063,8 @@ def main(argv=None) -> int:
     r.add_argument("--build-record")
     r.add_argument("--package-record")
     r.add_argument("--expect-crash", action="store_true")
+    r.add_argument("--demo-arg", action="append", default=[],
+                   help="extra run-phase2-demo.ps1 token per occurrence (use --demo-arg=-Flag)")
     g = sub.add_parser("baseline")
     g.add_argument("--out", required=True)
     g.add_argument("--seconds", type=int, default=20)

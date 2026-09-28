@@ -1,0 +1,67 @@
+{
+  "schema": "unmatched.t22-ue-tests/1",
+  "label": "final-S08.ArtHud",
+  "filter": "Unmatched.S08.ArtHud",
+  "startedLocal": "2026-09-28T18:00:59+05:00",
+  "durationS": 14.9,
+  "exitCode": 0,
+  "log": "docs/game-design/evidence/ART-004/hud-input-t22/tests/tests-final-S08.ArtHud.log",
+  "editorDll": {
+    "sha256": "59b79fde3f10aafd89d18bc22c5e9d111ed6d3b25b589d725ba7697cf6bda98b"
+  },
+  "found": [
+    9
+  ],
+  "results": [
+    {
+      "result": "Success",
+      "name": "2x, flag zoom clamps",
+      "path": "Unmatched.S08.ArtHud.Zoom Space returns to the overview, follow-selection starts at 1.2x, flag zoom clamps"
+    },
+    {
+      "result": "Success",
+      "name": "Capsule the live Medusa candidate is clickable on the sculpt, not above it",
+      "path": "Unmatched.S08.ArtHud.Capsule the live Medusa candidate is clickable on the sculpt, not above it"
+    },
+    {
+      "result": "Success",
+      "name": "Damage numbers are accepted once per (fighter, seq)",
+      "path": "Unmatched.S08.ArtHud.Damage numbers are accepted once per (fighter, seq)"
+    },
+    {
+      "result": "Success",
+      "name": "Flags input plan, icon size 24/32/48, all-Medusa eligibility, plate statuses",
+      "path": "Unmatched.S08.ArtHud.Flags input plan, icon size 24/32/48, all-Medusa eligibility, plate statuses"
+    },
+    {
+      "result": "Success",
+      "name": "Plate overlap rule equals qa010 on the fixture camera (clear 0, overlap 1 = cell (3,1))",
+      "path": "Unmatched.S08.ArtHud.Plate overlap rule equals qa010 on the fixture camera (clear 0, overlap 1 = cell (3,1))"
+    },
+    {
+      "result": "Success",
+      "name": "Plate placement avoids destination cells and soft obstacles, reports the least bad fallback",
+      "path": "Unmatched.S08.ArtHud.Plate placement avoids destination cells and soft obstacles, reports the least bad fallback"
+    },
+    {
+      "result": "Success",
+      "name": "Trace SHOT reachable/plate/icon lines match the qa010 parser format",
+      "path": "Unmatched.S08.ArtHud.Trace SHOT reachable/plate/icon lines match the qa010 parser format"
+    },
+    {
+      "result": "Success",
+      "name": "Zoom animation lasts exactly the configured 150-250 ms and is monotonic",
+      "path": "Unmatched.S08.ArtHud.Zoom animation lasts exactly the configured 150-250 ms and is monotonic"
+    },
+    {
+      "result": "Success",
+      "name": "Zoom wheel steps, near/far clamps and the traced limit",
+      "path": "Unmatched.S08.ArtHud.Zoom wheel steps, near/far clamps and the traced limit"
+    }
+  ],
+  "passed": 9,
+  "failed": [],
+  "errorLines": [],
+  "startupNoiseErrorLines": 17,
+  "command": "UnrealEditor-Cmd <art uproject> -ExecCmds=\"Automation RunTests <filter>; Quit\" -unattended -nosplash -nullrhi -nullaudio (MCP auto-start off)"
+}

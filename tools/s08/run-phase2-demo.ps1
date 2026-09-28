@@ -27,6 +27,20 @@ param(
   # per-frame FrameTime/GameThreadTime/RenderThreadTime and per-pass GPU busy
   # times in <stage>/Unmatched/Saved/Profiling/CSV. 0 = off.
   [ValidateRange(0, 100000)][int]$ClientCsvFrames = 0,
+  # ART-004 stage 3 T2.2 (all opt-in, ArtPreviewBoardId only):
+  # every live fighter of BOTH clients carries the Medusa candidate (team MI,
+  # hero/sidekick scale) - the six-copies review; asserted as six
+  # 'ARTPREVIEW allMedusa copy ... visual=1 mesh=' lines per client.
+  [switch]$ArtPreviewAllMedusa,
+  # Host-only flag input emulation after its evidence shot ('+'-separated:
+  # wheelin, wheelout, space, clickhero, clickabove, clickcell, token*N). Every
+  # step is traced 'INPUT ... src=flag'; real OS input is T4.3.
+  [string]$ArtPreviewInputPlan = '',
+  # Host-only exact-size HUD combat icon (24/32/48 px); 0 = client default 32.
+  [ValidateSet(0, 24, 32, 48)][int]$ArtPreviewIconSize = 0,
+  # Host-only icon probe: the host's nearest enemy carries the combat icon
+  # without a combat (src=flag), so QA-010 can measure it on a K2 frame.
+  [switch]$ArtPreviewIconProbe,
   # Offline probe of the scoped-cleanup state machine only (no backend, no
   # clients): drives Stop-ThisRunGame against a mocked Invoke-RestMethod that
   # returns scripted HTTP-200 responses (including errors[]) and asserts the
@@ -81,6 +95,12 @@ if (($ArtPreviewMedusaVariant -ne 'face-neck-v2' -or $MedusaVariantExplicit) -an
 # so a content slug such as 'cobble-city' is refused up front.
 if ($ArtPreviewBoardId -and $ArtPreviewBoardId -cnotmatch '^c[a-z0-9]{24}$') {
   throw "ArtPreviewBoardId '$ArtPreviewBoardId' is not a Board row id (cuid); content slugs such as 'cobble-city' are refused. Use the Board row id of the 5x6 Cobble review board (cmuhgs4b2001mwik4f2b2xtf8)."
+}
+if (($ArtPreviewAllMedusa -or $ArtPreviewInputPlan -or $ArtPreviewIconSize -gt 0 -or $ArtPreviewIconProbe) -and -not $ArtPreviewBoardId) {
+  throw 'ArtPreviewAllMedusa / ArtPreviewInputPlan / ArtPreviewIconSize / ArtPreviewIconProbe require ArtPreviewBoardId'
+}
+if ($ArtPreviewInputPlan -and $ArtPreviewInputPlan -notmatch '^[A-Za-z]+(\*[0-9]+)?(\+[A-Za-z]+(\*[0-9]+)?)*$') {
+  throw "ArtPreviewInputPlan '$ArtPreviewInputPlan' is not a '+'-separated token list"
 }
 if ($ArtPreviewBoardId -and $RunSeconds -lt ($ArtPreviewShotAfter + 10)) {
   throw "RunSeconds=$RunSeconds must be at least ArtPreviewShotAfter+10 ($($ArtPreviewShotAfter + 10))"
@@ -358,6 +378,7 @@ function Invoke-Phase2Demo {
   if ($ArtPreviewBoardId) { $common += @('-ArtPreview', '-ForceRes') }
   if ($ArtPreviewMedusaVariant -ne 'face-neck-v2' -or $MedusaVariantExplicit) { $common += "-ArtPreviewMedusaVariant=$ArtPreviewMedusaVariant" }
   if ($ClientPerf) { $common += '-S08Perf' }
+  if ($ArtPreviewAllMedusa) { $common += '-ArtPreviewAllMedusa' }
   if ($ClientCsvFrames -gt 0) { $common += @("-csvCaptureFrames=$ClientCsvFrames", '-csvGpuStats') }
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create",
@@ -368,6 +389,9 @@ function Invoke-Phase2Demo {
     if ($ArtPreviewFocusZoom -gt 0) {
       $hostArgs += ('-ArtPreviewFocusZoom={0}' -f $ArtPreviewFocusZoom.ToString('0.###', [Globalization.CultureInfo]::InvariantCulture))
     }
+    if ($ArtPreviewInputPlan) { $hostArgs += "-ArtPreviewInputPlan=$ArtPreviewInputPlan" }
+    if ($ArtPreviewIconSize -gt 0) { $hostArgs += "-ArtPreviewIconSize=$ArtPreviewIconSize" }
+    if ($ArtPreviewIconProbe) { $hostArgs += '-ArtPreviewIconProbe' }
   } else {
     $hostArgs += @('-S08Maneuver', "-S08ManeuverAfter=$HostManeuverAfter")
   }
@@ -499,6 +523,41 @@ function Invoke-Phase2Demo {
           "SHOT head fighter=", "socket=Head mesh=$ExpectedMedusaMesh") "$($pair[0]) Medusa candidate"
         if ($ClientPerf) { Assert-Trace $pair[1] @('PERF config', 'PERF summary scope=started') "$($pair[0]) perf" }
       }
+      # ART-004 T2.2: zoom config, flag-marked input and the QA-010 selection/
+      # plate lines. The plate must cover no destination cell of the selection
+      # (client-side count; tools/art/qa010 plate re-checks the same bbox).
+      Assert-Trace $hostTrace @('CAMERA config overview=', 'INPUT select src=flag') 'host T2.2'
+      if ($ArtPreviewFocusZoom -gt 0) {
+        Assert-Trace $hostTrace @('INPUT zoom src=flag', 'CAMERA focus src=flag', 'SHOT selection fighter=',
+          'SHOT reachable fighter=', 'SHOT plate fighter=', 'PLATE fighter=') 'host T2.2 plate'
+        $plateLine = Select-String -LiteralPath $hostTrace -Pattern 'SHOT plate fighter=\S+ bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\) overlapReachable=(\d+) .* geom=(\w+)' | Select-Object -Last 1
+        if (-not $plateLine) { throw 'host SHOT plate line missing or malformed' }
+        if ($plateLine.Matches[0].Groups[6].Value -ne 'painted') { throw "host SHOT plate geometry is not painted: $($plateLine.Line)" }
+        if ([int]$plateLine.Matches[0].Groups[5].Value -ne 0) { throw "host plate covers destination cells: $($plateLine.Line)" }
+      }
+      if ($ArtPreviewAllMedusa) {
+        foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+          $copies = @(Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW allMedusa copy fighter=(\S+) hero=\d team=\w+ visual=1 mesh=' + [regex]::Escape($ExpectedMedusaMesh) + ' ') |
+            ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique)
+          if ($copies.Count -ne 6) { throw "$($pair[0]) trace shows $($copies.Count)/6 Medusa copies with visual=1 mesh=$ExpectedMedusaMesh" }
+          Assert-Trace $pair[1] @('ARTPREVIEW allMedusa copies=6 visual=6') "$($pair[0]) all-Medusa"
+        }
+      }
+      if ($ArtPreviewInputPlan) {
+        Assert-Trace $hostTrace @('INPUT plan src=flag steps=', 'INPUT plan done src=flag') 'host input plan'
+        $clicks = @(Select-String -LiteralPath $hostTrace -Pattern 'INPUT click button=left src=flag step=(\w+) .* match=(\d)')
+        foreach ($c in $clicks) {
+          if ($c.Matches[0].Groups[2].Value -ne '1') { throw "flag click did not hit its expected target: $($c.Line)" }
+        }
+        if ($ArtPreviewInputPlan -match 'wheel') { Assert-Trace $hostTrace @('INPUT wheel dir=', 'CAMERA wheel dir=') 'host wheel' }
+        if ($ArtPreviewInputPlan -match 'space') { Assert-Trace $hostTrace @('INPUT space src=flag', 'CAMERA space src=flag') 'host Space' }
+        if (Select-String -LiteralPath $hostTrace -Pattern 'INPUT (wheel|space|click) .*src=os' -Quiet) {
+          throw 'host trace carries src=os input in an offscreen flag run'
+        }
+      }
+      if ($ArtPreviewIconProbe) {
+        Assert-Trace $hostTrace @('ARTPREVIEW icon probe src=flag', 'SHOT icon fighter=') 'host icon probe'
+      }
       if ($ArtPreviewFocusZoom -gt 0) {
         Assert-Trace $hostTrace @('ARTPREVIEW camera focus requested zoom=', 'CAMERA settled') 'host K2'
         # The evidence shot must be taken after the focus zoom arrived.
@@ -513,7 +572,7 @@ function Invoke-Phase2Demo {
     }
     if ($ArtPreviewBoardId) {
       [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'),
-        (([ordered]@{ boardId = $ArtPreviewBoardId; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = 30; joinerLiveZones = 30; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf }) | ConvertTo-Json), $Utf8NoBom)
+        (([ordered]@{ boardId = $ArtPreviewBoardId; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = 30; joinerLiveZones = 30; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe }) | ConvertTo-Json), $Utf8NoBom)
     }
 
     # ProjectWorldLocationToScreen can return true even for offscreen pixels.

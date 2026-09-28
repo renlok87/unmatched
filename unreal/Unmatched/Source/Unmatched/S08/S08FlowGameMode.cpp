@@ -36,6 +36,10 @@
 #include "Layout/Visibility.h"
 #include "Styling/CoreStyle.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/TextRenderComponent.h"
+#include "Engine/Texture2D.h"
+#include "Widgets/Images/SImage.h"
+#include "Widgets/SOverlay.h"
 #include "DynamicRHI.h"
 #include "Engine/SkeletalMesh.h"
 #include "GameFramework/GameUserSettings.h"
@@ -262,6 +266,8 @@ void AS08FlowGameMode::BeginPlay() {
   FParse::Value(FCommandLine::Get(), TEXT("S09ShotMode="), S09ShotMode);
 
   FS08Trace::Open();
+  for (const FString& Line : ArtHud.PendingTrace) FS08Trace::Write(Line);
+  ArtHud.PendingTrace.Reset();
   if (bAutoS09 || bAutoS09Boost) {
     FS08Trace::Write(FString::Printf(TEXT("S09AUTO config flow=%d boost=%d shotDir=%s"),
                                      bAutoS09 ? 1 : 0, bAutoS09Boost ? 1 : 0, *S09ShotDir));
@@ -642,11 +648,13 @@ void AS08FlowGameMode::SetupCameraForBoard() {
   const float NeedH = (ExtentX + 60.0f) / HalfH;
   const float Distance = FMath::Max(NeedV, NeedH) * 1.12f;
   const FVector Location(0.0f, Distance * CosPitch, Distance * SinPitch);
-  CameraOverviewDistance = Distance;
-  CameraCurrentDistance = Distance;
-  CameraTargetDistance = Distance;
-  CameraCurrentFocus = FVector::ZeroVector;
-  CameraTargetFocus = FVector::ZeroVector;
+  // ART-004 T2.2: zoom parameters from one config (defaults <- game ini
+  // [Unmatched.Camera] <- -S08Camera*= overrides), traced once per board.
+  CameraZoom.Config = FS08CameraZoomConfig();
+  CameraZoom.Config.ApplyIni(GGameIni);
+  CameraZoom.Config.ApplyCommandLine(FCommandLine::Get());
+  CameraZoom.Config.Sanitize();
+  CameraZoom.Reset(Distance);
 
   if (!BoardCamera) {
     FActorSpawnParameters Params;
@@ -665,50 +673,48 @@ void AS08FlowGameMode::SetupCameraForBoard() {
                                        Distance, Location.X, Location.Y, Location.Z);
   TraceLines.Add(Line);
   FS08Trace::Write(Line);
+  FS08Trace::Write(FString::Printf(
+      TEXT("CAMERA config overview=%.1f nearest=%.1f farthest=%.1f zoomRange=%.2f-%.2f %s"),
+      CameraZoom.Overview, CameraZoom.MinDistance(), CameraZoom.MaxDistance(),
+      CameraZoom.ZoomOf(CameraZoom.MaxDistance()), CameraZoom.ZoomOf(CameraZoom.MinDistance()),
+      *CameraZoom.Config.Describe()));
 }
 
 void AS08FlowGameMode::UpdateBoardCamera(float DeltaSeconds) {
-  if (!BoardCamera || CameraOverviewDistance <= 0.0f) return;
+  if (!BoardCamera || !CameraZoom.IsReady()) return;
   auto* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
   if (PC && Flow.IsValid() && Flow->GetStage() == ES08Stage::Started &&
       !Hud.bGameOver) {
     // D-10: wheel changes distance only; the perspective, pitch and yaw stay
-    // fixed. These bounds are a visual probe pending the K1/K2 gate (Q-302).
-    if (PC->WasInputKeyJustPressed(EKeys::MouseScrollUp)) {
-      CameraTargetDistance = FMath::Max(300.0f, CameraTargetDistance / 1.25f);
-    }
-    if (PC->WasInputKeyJustPressed(EKeys::MouseScrollDown)) {
-      CameraTargetDistance = FMath::Min(CameraOverviewDistance / 0.65f,
-                                        CameraTargetDistance * 1.25f);
-    }
-    if (PC->WasInputKeyJustPressed(EKeys::SpaceBar)) {
-      CameraTargetDistance = CameraOverviewDistance;
-    }
+    // fixed. Limits/step/animation come from FS08CameraZoomConfig (Q-302
+    // proposals); every OS event is traced INPUT ... src=os + CAMERA ....
+    if (PC->WasInputKeyJustPressed(EKeys::MouseScrollUp)) ApplyWheel(+1, ES08InputSource::Os);
+    if (PC->WasInputKeyJustPressed(EKeys::MouseScrollDown)) ApplyWheel(-1, ES08InputSource::Os);
+    if (PC->WasInputKeyJustPressed(EKeys::SpaceBar)) ApplySpace(ES08InputSource::Os);
   }
-  CameraTargetFocus = FVector::ZeroVector;
-  if (CameraTargetDistance <= CameraOverviewDistance / 1.2f) {
+  // Follow-selection from FollowFromZoom (03 §2: >= 1.2x of the overview).
+  FVector FocusTarget = FVector::ZeroVector;
+  if (CameraZoom.WantsFollow()) {
     const FString& FocusId = !CommandUi.SelectedFighterId.IsEmpty()
                                  ? CommandUi.SelectedFighterId
                                  : SelectedFighterId;
     for (const FS08BoardFighter& Entry : Fighters) {
       if (Entry.Id == FocusId && Entry.IsAlive()) {
-        CameraTargetFocus = BoardModel.CellToWorld(Entry.X, Entry.Y) +
-                            FVector(0.0f, 0.0f, 28.0f);
+        FocusTarget = BoardModel.CellToWorld(Entry.X, Entry.Y) +
+                      FVector(0.0f, 0.0f, 28.0f);
         break;
       }
     }
   }
-  CameraCurrentDistance = FMath::FInterpTo(
-      CameraCurrentDistance, CameraTargetDistance, DeltaSeconds, 8.0f);
-  CameraCurrentFocus = FMath::VInterpTo(
-      CameraCurrentFocus, CameraTargetFocus, DeltaSeconds, 8.0f);
+  CameraZoom.SetFocusTarget(FocusTarget);
+  CameraZoom.Tick(DeltaSeconds);
   const float Pitch = FMath::DegreesToRadians(55.0f);
   BoardCamera->SetActorLocationAndRotation(
-      CameraCurrentFocus + FVector(0.0f, CameraCurrentDistance * FMath::Cos(Pitch),
-                                   CameraCurrentDistance * FMath::Sin(Pitch)),
+      CameraZoom.CurrentFocus + FVector(0.0f, CameraZoom.Current * FMath::Cos(Pitch),
+                                        CameraZoom.Current * FMath::Sin(Pitch)),
       FRotator(-55.0f, -90.0f, 0.0f));
   if (BoardActor) {
-    const float Ratio = CameraCurrentDistance / CameraOverviewDistance;
+    const float Ratio = CameraZoom.Current / CameraZoom.Overview;
     BoardActor->SetFighterLabelZoomRatio(
         Ratio, Ratio < 0.4f &&
                    (!SelectedFighterId.IsEmpty() ||
@@ -766,6 +772,11 @@ void AS08FlowGameMode::HandleClick() {
 
   // GD-036: no board input after the terminal state.
   if (Hud.bGameOver) return;
+
+  // ART-004 T2.2: every real click is traced (src=os) with its hit result
+  // before the unchanged handlers below act on it.
+  if (PC->WasInputKeyJustPressed(EKeys::LeftMouseButton)) TraceOsClick(EKeys::LeftMouseButton);
+  if (PC->WasInputKeyJustPressed(EKeys::RightMouseButton)) TraceOsClick(EKeys::RightMouseButton);
 
   if (PC->WasInputKeyJustPressed(EKeys::RightMouseButton)) {
     if (CommandUi.Mode == ES09CommandMode::ManeuverDraft &&
@@ -3189,15 +3200,15 @@ void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
     // visible skeletal art figure, so K2 crops are reproducible from the
     // trace (crop centre = Head, head height = |proj(Head+6uu) - proj(Head-6uu)|).
     if (BoardActor && BoardActor->IsArtActive()) {
-      const float DistErrPct = CameraTargetDistance > 0.0f
-          ? 100.0f * FMath::Abs(CameraCurrentDistance - CameraTargetDistance) / CameraTargetDistance
+      const float DistErrPct = CameraZoom.Target > 0.0f
+          ? 100.0f * FMath::Abs(CameraZoom.Current - CameraZoom.Target) / CameraZoom.Target
           : -1.0f;
-      const float FocusErr = FVector::Dist(CameraCurrentFocus, CameraTargetFocus);
+      const float FocusErr = FVector::Dist(CameraZoom.CurrentFocus, CameraZoom.TargetFocus);
       FS08Trace::Write(FString::Printf(
           TEXT("SHOT camera dist=%.1f target=%.1f overview=%.1f errPct=%.3f focusErr=%.2f settled=%d zoom=%.2f"),
-          CameraCurrentDistance, CameraTargetDistance, CameraOverviewDistance, DistErrPct,
+          CameraZoom.Current, CameraZoom.Target, CameraZoom.Overview, DistErrPct,
           FocusErr, (DistErrPct >= 0.0f && DistErrPct < 1.0f && FocusErr < 1.0f) ? 1 : 0,
-          CameraCurrentDistance > 0.0f ? CameraOverviewDistance / CameraCurrentDistance : 0.0f));
+          CameraZoom.ZoomOf(CameraZoom.Current)));
       for (const FS08BoardFighter& F : Fighters) {
         const AS08FighterActor* Actor = BoardActor->FindFighterActor(F.Id);
         const USkeletalMeshComponent* Skel =
@@ -3219,6 +3230,10 @@ void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
             FVector2D::Distance(TopScreen, BottomScreen), (bHead && bTop && bBottom) ? 1 : 0));
       }
     }
+    // ART-004 T2.2 / QA-010: selection, plate, icon, compact-label and
+    // damage-number boxes of THIS frame in viewport pixels (format:
+    // docs/art-pipeline/qa010/README.md "Новая трасса").
+    WriteArtHudShotLines();
   }
   // UI-INCLUSIVE evidence capture (GD-032/033): the old SceneCapture and
   // HighResShot paths render the 3D scene only - Slate HUD widgets never
@@ -3374,32 +3389,45 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
             TEXT("ARTPREVIEW selection ownHero=1 selected=%d fighter=%s reachable=%d fighterId=%s"),
             SelectedFighterId == Entry.Id ? 1 : 0, *Entry.Name,
             ReachableCells.Num(), *Entry.Id));
-        if (ArtPreviewFocusZoom > 0.0f && CameraOverviewDistance > 0.0f) {
-          CameraTargetDistance = FMath::Clamp(
-              CameraOverviewDistance / ArtPreviewFocusZoom, 300.0f,
-              CameraOverviewDistance);
+        // The flag selection is input emulation, not a user click (E4).
+        FS08Trace::Write(FString::Printf(TEXT("INPUT select src=flag fighter=%s flag=ArtPreviewSelectOwnHero"),
+                                         *Entry.Id));
+        if (ArtPreviewFocusZoom > 0.0f && CameraZoom.IsReady()) {
+          const FS08ZoomStep Step = CameraZoom.FocusZoom(ArtPreviewFocusZoom);
           FS08Trace::Write(FString::Printf(
               TEXT("ARTPREVIEW camera focus requested zoom=%.2f overview=%.0f target=%.0f"),
-              ArtPreviewFocusZoom, CameraOverviewDistance, CameraTargetDistance));
+              ArtPreviewFocusZoom, CameraZoom.Overview, CameraZoom.Target));
+          FS08Trace::Write(FString::Printf(TEXT("INPUT zoom src=flag zoom=%.2f flag=ArtPreviewFocusZoom"),
+                                           ArtPreviewFocusZoom));
+          FS08Trace::Write(FString::Printf(
+              TEXT("CAMERA focus src=flag from=%.1f to=%.1f requested=%.1f zoom=%.2f clamp=%d limit=%s animMs=%.0f"),
+              Step.From, Step.To, Step.Requested, CameraZoom.ZoomOf(Step.To), Step.bClamped ? 1 : 0,
+              S08ZoomLimitName(Step.Limit), Step.Seconds * 1000.0f));
+          if (Step.bClamped) {
+            FS08Trace::Write(FString::Printf(
+                TEXT("CAMERA clamp limit=%s src=flag dist=%.1f requested=%.1f zoom=%.2f"),
+                S08ZoomLimitName(Step.Limit), Step.To, Step.Requested, CameraZoom.ZoomOf(Step.To)));
+          }
         }
         break;
       }
     }
   }
   UpdateBoardCamera(DeltaSeconds);
+  UpdateArtHud(DeltaSeconds);
   // ART-004 T1.1 K2 gate: log once when the requested focus zoom has arrived
   // (|distance - target| < 1 % of the target and the focus point within 1 uu).
   if (bArtPreviewDidSelectOwnHero && ArtPreviewFocusZoom > 0.0f &&
-      !GS08ArtProbe.bCameraSettledLogged && CameraTargetDistance > 0.0f) {
-    const float DistErrPct = 100.0f * FMath::Abs(CameraCurrentDistance - CameraTargetDistance) /
-                             CameraTargetDistance;
-    const float FocusErr = FVector::Dist(CameraCurrentFocus, CameraTargetFocus);
+      !GS08ArtProbe.bCameraSettledLogged && CameraZoom.Target > 0.0f) {
+    const float DistErrPct = 100.0f * FMath::Abs(CameraZoom.Current - CameraZoom.Target) /
+                             CameraZoom.Target;
+    const float FocusErr = FVector::Dist(CameraZoom.CurrentFocus, CameraZoom.TargetFocus);
     if (DistErrPct < 1.0f && FocusErr < 1.0f) {
       GS08ArtProbe.bCameraSettledLogged = true;
       FS08Trace::Write(FString::Printf(
           TEXT("CAMERA settled elapsed=%.2f dist=%.1f target=%.1f errPct=%.3f focusErr=%.2f focus=(%.0f,%.0f,%.0f)"),
-          Elapsed, CameraCurrentDistance, CameraTargetDistance, DistErrPct, FocusErr,
-          CameraCurrentFocus.X, CameraCurrentFocus.Y, CameraCurrentFocus.Z));
+          Elapsed, CameraZoom.Current, CameraZoom.Target, DistErrPct, FocusErr,
+          CameraZoom.CurrentFocus.X, CameraZoom.CurrentFocus.Y, CameraZoom.CurrentFocus.Z));
     }
   }
   // Cobble's opening six figures can occupy every orthogonal square around
@@ -3710,12 +3738,18 @@ void AS08FlowGameMode::BuildHudWidgets() {
   if (!GEngine || !GEngine->GameViewport) return;
   TSharedRef<SConstraintCanvas> Canvas = SNew(SConstraintCanvas);
   HudCanvas = Canvas;
+  // ART-004 T2.2 world-anchored layer first: the plate and the combat icon
+  // paint below the HUD panels (they are placed around them anyway).
+  BuildArtHudWidgets(Canvas);
+  TSharedPtr<SBorder> CommandPanelBorder;
+  TSharedPtr<SBorder> SidePanelBorder;
+  TSharedPtr<SBorder> HandPanelBorder;
 
   Canvas->AddSlot()
       .Anchors(FAnchors(0.0f, 0.0f))
       .Alignment(FVector2D(0.0f, 0.0f))
       .AutoSize(true)
-      [SNew(SBorder)
+      [SAssignNew(CommandPanelBorder, SBorder)
            .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
            .BorderBackgroundColor(FSlateColor(FLinearColor(0.012f, 0.016f, 0.035f, 0.88f)))
            .Padding(10.0f)
@@ -3726,7 +3760,7 @@ void AS08FlowGameMode::BuildHudWidgets() {
       .Anchors(FAnchors(1.0f, 0.0f))
       .Alignment(FVector2D(1.0f, 0.0f))
       .AutoSize(true)
-      [SNew(SBorder)
+      [SAssignNew(SidePanelBorder, SBorder)
            .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
            .BorderBackgroundColor(FSlateColor(FLinearColor(0.012f, 0.016f, 0.035f, 0.88f)))
            .Padding(10.0f)
@@ -3755,12 +3789,15 @@ void AS08FlowGameMode::BuildHudWidgets() {
       .Anchors(FAnchors(0.5f, 1.0f))
       .Alignment(FVector2D(0.5f, 1.0f))
       .AutoSize(true)
-      [SNew(SBorder)
+      [SAssignNew(HandPanelBorder, SBorder)
            .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
            .BorderBackgroundColor(FSlateColor(FLinearColor(0.012f, 0.016f, 0.035f, 0.88f)))
            .Padding(10.0f)
            [SNew(SVerticalBox) +
            SVerticalBox::Slot().AutoHeight()[SAssignNew(HandBox, SVerticalBox)]]];
+  ArtHud.CommandPanel = CommandPanelBorder;
+  ArtHud.SidePanel = SidePanelBorder;
+  ArtHud.HandPanel = HandPanelBorder;
 
   Canvas->AddSlot()
       .Anchors(FAnchors(0.5f, 1.0f))
@@ -4877,6 +4914,773 @@ void AS08FlowGameMode::RefreshUi() {
           [SNew(STextBlock).Text(FText::FromString(Line))
                .Font(FCoreStyle::GetDefaultFontStyle("Mono", 8))
                .ColorAndOpacity(FSlateColor(FLinearColor(0.7f, 0.7f, 0.7f)))];
+    }
+  }
+}
+
+// ---- ART-004 stage 3 T2.2: art HUD, zoom input and QA-010 traces -----------
+//
+// Everything below is active only on the live Cobble art board
+// (BoardActor->IsArtActive(), i.e. -ArtPreview on the 5x6 review board);
+// the grey S08/S09 paths never build a plate or an icon. Colors that a pixel
+// gate may look for are sRGB bytes through FLinearColor(FColor(...)) (memory
+// ue-pipeline-traps 9): SColorBlock/SBorder tints are linear and the back
+// buffer converts back, so the PNG carries exactly these bytes.
+
+namespace {
+// Plate marker strip #C8A0FF: every channel set differs from all S09/S10 HUD
+// markers by > 32 in at least one channel (nearest #A020FF: dR = 40).
+const FLinearColor GS08PlateMarker(FColor(200, 160, 255, 255));
+const FLinearColor GS08PlateBackground(FColor(22, 26, 40, 255));
+const FLinearColor GS08PlateName(FColor(242, 236, 222, 255));
+const FLinearColor GS08PlateOwnChip(FColor(70, 120, 200, 255));
+const FLinearColor GS08PlateEnemyChip(FColor(200, 70, 60, 255));
+const FLinearColor GS08PlateHpBack(FColor(70, 30, 30, 255));
+const FLinearColor GS08PlateHpFill(FColor(80, 190, 100, 255));
+const FLinearColor GS08PlateStatus(FColor(200, 204, 220, 255));
+constexpr float GS08PlateWidthSu = 172.0f;
+constexpr float GS08PlateHeightSu = 54.0f;
+constexpr float GS08PlateHpBarSu = 96.0f;
+
+// Gap between two screen rectangles (0 when they touch or overlap).
+float S08RectGap(const FS08ScreenRect& A, const FS08ScreenRect& B) {
+  const float Dx = FMath::Max(0.0f, FMath::Max(A.X0 - B.X1, B.X0 - A.X1));
+  const float Dy = FMath::Max(0.0f, FMath::Max(A.Y0 - B.Y1, B.Y0 - A.Y1));
+  return FMath::Sqrt(Dx * Dx + Dy * Dy);
+}
+}  // namespace
+
+void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& Canvas) {
+  // BuildUi runs before BeginPlay opens the trace file: these lines are kept
+  // in ArtHud.PendingTrace and flushed right after FS08Trace::Open().
+  const TCHAR* Cmd = FCommandLine::Get();
+  const bool bArtPreview = FParse::Param(Cmd, TEXT("ArtPreview"));
+  ArtHud.bEnabled = bArtPreview && !FParse::Param(Cmd, TEXT("ArtPreviewNoPlate"));
+  ArtHud.bIconProbe = bArtPreview && FParse::Param(Cmd, TEXT("ArtPreviewIconProbe"));
+  FString SizeText;
+  FParse::Value(Cmd, TEXT("ArtPreviewIconSize="), SizeText);
+  ArtHud.IconSize = S08ParseIconSize(SizeText, 32);
+  if (ArtHud.IconSize == 0) {
+    ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD icon size '%s' refused (24/32/48 only) - using 32"), *SizeText));
+    ArtHud.IconSize = 32;
+  }
+  // Exact-size combat icon textures (no mips, UI group): a 1254 px concept
+  // drawn at 24 px without mips aliases badly, so each size is its own
+  // pre-filtered texture (tools/art/art004_hud_icon_import.py).
+  if (bArtPreview) {
+    const FString Path = FString::Printf(TEXT("/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_Attack_%d"),
+                                         ArtHud.IconSize);
+    UTexture2D* Texture = LoadObject<UTexture2D>(nullptr, *Path);
+    ArtHud.bIconTextureReady = Texture != nullptr;
+    if (Texture) {
+      ArtHudAssets.Add(Texture);
+      ArtHud.IconBrush.SetResourceObject(Texture);
+      ArtHud.IconBrush.ImageSize = FVector2D(ArtHud.IconSize, ArtHud.IconSize);
+      ArtHud.IconBrush.DrawAs = ESlateBrushDrawType::Image;
+      ArtHud.IconBrush.Tiling = ESlateBrushTileType::NoTile;
+    }
+    ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD icon texture size=%d ready=%d path=%s texture=%dx%d probe=%d plate=%d"),
+                                     ArtHud.IconSize, Texture ? 1 : 0, *Path,
+                                     Texture ? Texture->GetSizeX() : 0, Texture ? Texture->GetSizeY() : 0,
+                                     ArtHud.bIconProbe ? 1 : 0, ArtHud.bEnabled ? 1 : 0));
+    FString PlanText;
+    if (FParse::Value(Cmd, TEXT("ArtPreviewInputPlan="), PlanText) && !PlanText.IsEmpty()) {
+      FString Error;
+      if (S08ParseInputPlan(PlanText, ArtHud.Plan, Error)) {
+        // BuildUi runs before BeginPlay parses -ArtPreviewShotAfter: read it here.
+        float ShotAfter = -1.0f;
+        FParse::Value(Cmd, TEXT("ArtPreviewShotAfter="), ShotAfter);
+        float After = ShotAfter >= 0.0f ? ShotAfter + 1.5f : 30.0f;
+        FParse::Value(Cmd, TEXT("ArtPreviewInputAfter="), After);
+        float StepSeconds = 0.35f;
+        FParse::Value(Cmd, TEXT("ArtPreviewInputStep="), StepSeconds);
+        ArtHud.PlanStartAt = After;
+        ArtHud.PlanStepSeconds = FMath::Clamp(StepSeconds, 0.05f, 5.0f);
+        ArtHud.PendingTrace.Add(FString::Printf(TEXT("INPUT plan src=flag steps=%d after=%.2f step=%.2f plan=%s"),
+                                         ArtHud.Plan.Num(), ArtHud.PlanStartAt, ArtHud.PlanStepSeconds,
+                                         *PlanText));
+      } else {
+        ArtHud.PendingTrace.Add(FString::Printf(TEXT("INPUT plan src=flag REFUSED: %s"), *Error));
+      }
+    }
+  }
+
+  Canvas->AddSlot()
+      .Anchors(FAnchors(0.0f, 0.0f))
+      .Alignment(FVector2D(0.0f, 0.0f))
+      .AutoSize(false)
+      .Offset(FMargin(0.0f, 0.0f, GS08PlateWidthSu, GS08PlateHeightSu))
+      .Expose(ArtHud.PlateSlot)
+      [SAssignNew(ArtHud.PlateBorder, SBorder)
+           .Visibility(EVisibility::Collapsed)
+           .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
+           .BorderBackgroundColor(FSlateColor(GS08PlateBackground))
+           .Padding(0.0f)
+           [SNew(SVerticalBox) +
+            SVerticalBox::Slot().AutoHeight()
+                [SNew(SBox).HeightOverride(3.0f)[SNew(SColorBlock).Color(GS08PlateMarker)]] +
+            SVerticalBox::Slot().AutoHeight().Padding(6.0f, 2.0f, 6.0f, 0.0f)
+                [SNew(SHorizontalBox) +
+                 SHorizontalBox::Slot().FillWidth(1.0f).VAlign(VAlign_Center)
+                     [SAssignNew(ArtHud.PlateName, STextBlock)
+                          .Font(FCoreStyle::GetDefaultFontStyle("Bold", 12))
+                          .ColorAndOpacity(FSlateColor(GS08PlateName))] +
+                 SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
+                     [SAssignNew(ArtHud.PlateTeamChip, SBorder)
+                          .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
+                          .BorderBackgroundColor(FSlateColor(GS08PlateOwnChip))
+                          .Padding(FMargin(4.0f, 0.0f))
+                          [SAssignNew(ArtHud.PlateTeamText, STextBlock)
+                               .Font(FCoreStyle::GetDefaultFontStyle("Bold", 8))
+                               .ColorAndOpacity(FSlateColor(GS08PlateName))]]] +
+            SVerticalBox::Slot().AutoHeight().Padding(6.0f, 2.0f, 6.0f, 0.0f)
+                [SNew(SHorizontalBox) +
+                 SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
+                     [SNew(SBox).WidthOverride(GS08PlateHpBarSu).HeightOverride(7.0f)
+                          [SNew(SOverlay) +
+                           SOverlay::Slot()[SNew(SColorBlock).Color(GS08PlateHpBack)] +
+                           SOverlay::Slot().HAlign(HAlign_Left)
+                               [SAssignNew(ArtHud.PlateHpFill, SBox).WidthOverride(GS08PlateHpBarSu)
+                                    [SNew(SColorBlock).Color(GS08PlateHpFill)]]]] +
+                 SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center).Padding(6.0f, 0.0f, 0.0f, 0.0f)
+                     [SAssignNew(ArtHud.PlateHp, STextBlock)
+                          .Font(FCoreStyle::GetDefaultFontStyle("Bold", 10))
+                          .ColorAndOpacity(FSlateColor(GS08PlateName))]] +
+            SVerticalBox::Slot().AutoHeight().Padding(6.0f, 2.0f, 6.0f, 2.0f)
+                [SAssignNew(ArtHud.PlateStatusText, STextBlock)
+                     .Font(FCoreStyle::GetDefaultFontStyle("Regular", 8))
+                     .ColorAndOpacity(FSlateColor(GS08PlateStatus))]]];
+
+  Canvas->AddSlot()
+      .Anchors(FAnchors(0.0f, 0.0f))
+      .Alignment(FVector2D(0.0f, 0.0f))
+      .AutoSize(false)
+      .Offset(FMargin(0.0f, 0.0f, ArtHud.IconSize, ArtHud.IconSize))
+      .Expose(ArtHud.IconSlot)
+      [SAssignNew(ArtHud.Icon, SImage)
+           .Visibility(EVisibility::Collapsed)
+           .Image(&ArtHud.IconBrush)];
+}
+
+float AS08FlowGameMode::HudPixelsPerUnit() const {
+  if (!HudCanvas.IsValid() || !GEngine || !GEngine->GameViewport) return 0.0f;
+  FVector2D ViewportPx(0.0, 0.0);
+  GEngine->GameViewport->GetViewportSize(ViewportPx);
+  const FVector2D Local = HudCanvas->GetPaintSpaceGeometry().GetLocalSize();
+  if (ViewportPx.X <= 0.0 || Local.X <= 0.0) return 0.0f;
+  return static_cast<float>(ViewportPx.X / Local.X);
+}
+
+bool AS08FlowGameMode::WidgetViewportRect(const TSharedPtr<SWidget>& Widget, FS08ScreenRect& OutRect) const {
+  OutRect = FS08ScreenRect();
+  if (!Widget.IsValid() || !HudCanvas.IsValid() || !GEngine || !GEngine->GameViewport) return false;
+  if (Widget->GetVisibility() == EVisibility::Collapsed) return false;
+  FVector2D ViewportPx(0.0, 0.0);
+  GEngine->GameViewport->GetViewportSize(ViewportPx);
+  const FGeometry& CanvasGeo = HudCanvas->GetPaintSpaceGeometry();
+  const FVector2D CanvasAbs = CanvasGeo.GetAbsoluteSize();
+  if (CanvasAbs.X <= 0.0 || ViewportPx.X <= 0.0) return false;
+  const double PxPerAbs = ViewportPx.X / CanvasAbs.X;
+  const FGeometry& Geo = Widget->GetPaintSpaceGeometry();
+  const FVector2D Pos = (Geo.GetAbsolutePosition() - CanvasGeo.GetAbsolutePosition()) * PxPerAbs;
+  const FVector2D Size = Geo.GetAbsoluteSize() * PxPerAbs;
+  OutRect = FS08ScreenRect(static_cast<float>(Pos.X), static_cast<float>(Pos.Y),
+                           static_cast<float>(Pos.X + Size.X), static_cast<float>(Pos.Y + Size.Y));
+  return true;
+}
+
+bool AS08FlowGameMode::ProjectToViewport(const FVector& World, FVector2D& OutScreen) const {
+  const APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  return PC && PC->ProjectWorldLocationToScreen(World, OutScreen, true);
+}
+
+const FS08BoardFighter* AS08FlowGameMode::FindFighter(const FString& FighterId) const {
+  if (FighterId.IsEmpty()) return nullptr;
+  for (const FS08BoardFighter& Entry : Fighters) {
+    if (Entry.Id == FighterId) return &Entry;
+  }
+  return nullptr;
+}
+
+bool AS08FlowGameMode::FigureScreenRect(const FString& FighterId, FS08ScreenRect& OutRect) const {
+  const FS08BoardFighter* Fighter = FindFighter(FighterId);
+  if (!Fighter || !Fighter->IsAlive() || !BoardActor) return false;
+  const AS08FighterActor* Actor = BoardActor->FindFighterActor(FighterId);
+  const float Height = Actor ? Actor->GetFigureHeightUU() : 60.0f;
+  const float Radius = (Actor && Actor->HasArtFigure()) ? (Fighter->bIsHero ? 20.0f : 16.0f) : 30.0f;
+  const FVector Base = BoardModel.CellToWorld(Fighter->X, Fighter->Y);
+  TArray<FVector2D> Points;
+  for (const float Z : {0.0f, Height}) {
+    for (const float Dx : {-Radius, Radius}) {
+      for (const float Dy : {-Radius, Radius}) {
+        FVector2D Screen;
+        if (!ProjectToViewport(Base + FVector(Dx, Dy, Z), Screen)) return false;
+        Points.Add(Screen);
+      }
+    }
+  }
+  OutRect = FS08ScreenRect::FromPoints(Points);
+  return true;
+}
+
+void AS08FlowGameMode::CurrentSelection(FString& OutFighterId, TSet<uint64>& OutLegalCells) const {
+  OutFighterId.Reset();
+  OutLegalCells.Reset();
+  if (CommandUi.Mode == ES09CommandMode::PendingChoice &&
+      (!CommandUi.PendingFighterId.IsEmpty() || CommandUi.PendingCells.Num() > 0)) {
+    OutFighterId = CommandUi.PendingFighterId;
+    OutLegalCells = CommandUi.PendingCells;
+  } else if (CommandUi.Mode == ES09CommandMode::ManeuverDraft && !CommandUi.SelectedFighterId.IsEmpty()) {
+    OutFighterId = CommandUi.SelectedFighterId;
+    OutLegalCells = CommandUi.ReachableCells;
+  } else if (!SelectedFighterId.IsEmpty()) {
+    OutFighterId = SelectedFighterId;
+    OutLegalCells = ReachableCells;
+  }
+}
+
+TArray<FS08CellQuad> AS08FlowGameMode::ProjectCells(const TArray<FIntPoint>& Cells) const {
+  TArray<FS08CellQuad> Out;
+  const float Half = FS08BoardModel::CellSizeUU * 0.5f;
+  for (const FIntPoint& Cell : Cells) {
+    const FVector C = BoardModel.CellToWorld(Cell.X, Cell.Y);
+    FS08CellQuad Quad;
+    Quad.Cell = Cell;
+    bool bOk = true;
+    for (const FVector2D& Corner : {FVector2D(-Half, -Half), FVector2D(Half, -Half), FVector2D(Half, Half),
+                                    FVector2D(-Half, Half)}) {
+      FVector2D Screen;
+      if (!ProjectToViewport(C + FVector(Corner.X, Corner.Y, 0.0f), Screen)) {
+        bOk = false;
+        break;
+      }
+      Quad.Screen.Add(Screen);
+    }
+    if (bOk) Out.Add(MoveTemp(Quad));
+  }
+  return Out;
+}
+
+FString AS08FlowGameMode::PlateFighterIdNow() const {
+  FString Selected;
+  TSet<uint64> Legal;
+  CurrentSelection(Selected, Legal);
+  if (!Selected.IsEmpty()) return Selected;
+  return ArtHud.HoveredFighterId;
+}
+
+void AS08FlowGameMode::ApplyWheel(int32 Direction, ES08InputSource Source) {
+  if (!CameraZoom.IsReady()) return;
+  const TCHAR* Dir = Direction > 0 ? TEXT("in") : TEXT("out");
+  const FS08ZoomStep Step = CameraZoom.Wheel(Direction);
+  FS08Trace::Write(FString::Printf(TEXT("INPUT wheel dir=%s src=%s"), Dir, S08InputSourceName(Source)));
+  FS08Trace::Write(FString::Printf(
+      TEXT("CAMERA wheel dir=%s src=%s from=%.1f to=%.1f requested=%.1f zoom=%.2f clamp=%d limit=%s animMs=%.0f follow=%d"),
+      Dir, S08InputSourceName(Source), Step.From, Step.To, Step.Requested, CameraZoom.ZoomOf(Step.To),
+      Step.bClamped ? 1 : 0, S08ZoomLimitName(Step.Limit), Step.Seconds * 1000.0f,
+      CameraZoom.WantsFollow() ? 1 : 0));
+  if (Step.bClamped) {
+    FS08Trace::Write(FString::Printf(
+        TEXT("CAMERA clamp limit=%s src=%s dist=%.1f requested=%.1f zoom=%.2f range=%.2f-%.2f"),
+        S08ZoomLimitName(Step.Limit), S08InputSourceName(Source), Step.To, Step.Requested,
+        CameraZoom.ZoomOf(Step.To), CameraZoom.ZoomOf(CameraZoom.MaxDistance()),
+        CameraZoom.ZoomOf(CameraZoom.MinDistance())));
+  }
+}
+
+void AS08FlowGameMode::ApplySpace(ES08InputSource Source) {
+  if (!CameraZoom.IsReady()) return;
+  const FS08ZoomStep Step = CameraZoom.ReturnToOverview();
+  FS08Trace::Write(FString::Printf(TEXT("INPUT space src=%s"), S08InputSourceName(Source)));
+  FS08Trace::Write(FString::Printf(
+      TEXT("CAMERA space src=%s from=%.1f to=%.1f zoom=%.2f animMs=%.0f follow=%d"),
+      S08InputSourceName(Source), Step.From, Step.To, CameraZoom.ZoomOf(Step.To), Step.Seconds * 1000.0f,
+      CameraZoom.WantsFollow() ? 1 : 0));
+}
+
+void AS08FlowGameMode::TraceOsClick(const FKey& Button) {
+  APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  if (!PC || !BoardActor) return;
+  float MouseX = -1.0f, MouseY = -1.0f;
+  const bool bMouse = PC->GetMousePosition(MouseX, MouseY);
+  FHitResult Hit;
+  const bool bHit = PC->GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+  const AS08FighterActor* FighterActor = bHit ? Cast<AS08FighterActor>(Hit.GetActor()) : nullptr;
+  int32 CellX = -1, CellY = -1;
+  const bool bCell = bHit && !FighterActor && BoardActor->WorldToCell(Hit.ImpactPoint, CellX, CellY);
+  FS08Trace::Write(FString::Printf(
+      TEXT("INPUT click button=%s src=os screen=(%.0f,%.0f) mouse=%d hit=%d actor=%s comp=%s fighter=%s cell=(%d,%d) mode=%d dispatch=1"),
+      Button == EKeys::LeftMouseButton ? TEXT("left") : TEXT("right"), MouseX, MouseY, bMouse ? 1 : 0,
+      bHit ? 1 : 0, Hit.GetActor() ? *Hit.GetActor()->GetName() : TEXT("none"),
+      Hit.GetComponent() ? *Hit.GetComponent()->GetName() : TEXT("none"),
+      FighterActor ? *FighterActor->GetFighterId() : TEXT("none"), bCell ? CellX : -1, bCell ? CellY : -1,
+      static_cast<int32>(CommandUi.Mode)));
+}
+
+void AS08FlowGameMode::UpdateHover() {
+  APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  if (!PC || !BoardActor || !BoardActor->IsArtActive()) return;
+  float X = 0.0f, Y = 0.0f;
+  if (!PC->GetMousePosition(X, Y)) return;
+  // Offscreen evidence clients never move the OS cursor: only a cursor that
+  // actually moved counts as hover, so K1/K2 frames stay deterministic.
+  if (ArtHud.FirstMouse.X < 0.0) ArtHud.FirstMouse = FVector2D(X, Y);
+  if (!ArtHud.bMouseMoved && !FVector2D(X, Y).Equals(ArtHud.FirstMouse, 0.5)) ArtHud.bMouseMoved = true;
+  if (!ArtHud.bMouseMoved) return;
+  FHitResult Hit;
+  FString Id;
+  if (PC->GetHitResultAtScreenPosition(FVector2D(X, Y), ECC_Visibility, false, Hit)) {
+    if (const AS08FighterActor* Actor = Cast<AS08FighterActor>(Hit.GetActor())) Id = Actor->GetFighterId();
+  }
+  if (Id != ArtHud.HoveredFighterId) {
+    ArtHud.HoveredFighterId = Id;
+    FS08Trace::Write(FString::Printf(TEXT("INPUT hover src=os screen=(%.0f,%.0f) fighter=%s"), X, Y,
+                                     Id.IsEmpty() ? TEXT("none") : *Id));
+  }
+}
+
+void AS08FlowGameMode::UpdateArtHud(float DeltaSeconds) {
+  const bool bBoard = BoardActor && BoardActor->IsArtActive() && Flow.IsValid() &&
+                      Flow->GetStage() == ES08Stage::Started;
+  const bool bActive = ArtHud.bEnabled && bBoard && !Hud.bGameOver;
+  if (bBoard && !ArtHud.bConfigTraced && CameraZoom.IsReady()) {
+    ArtHud.bConfigTraced = true;
+    FS08Trace::Write(FString::Printf(TEXT("HUD art layer plate=%d iconSize=%d iconTexture=%d iconProbe=%d plan=%d"),
+                                     ArtHud.bEnabled ? 1 : 0, ArtHud.IconSize, ArtHud.bIconTextureReady ? 1 : 0,
+                                     ArtHud.bIconProbe ? 1 : 0, ArtHud.Plan.Num()));
+  }
+  if (bBoard) {
+    RunArtPreviewInputPlan();
+    UpdateHover();
+  }
+  UpdateCombatIcon(bActive);
+  UpdatePlate(bActive);
+  if (BoardActor) {
+    BoardActor->SetLabelPresentation(bActive && ArtHud.bPlateVisible ? ArtHud.PlateFighterId : FString());
+  }
+}
+
+void AS08FlowGameMode::UpdateCombatIcon(bool bActive) {
+  if (!ArtHud.Icon.IsValid() || !ArtHud.IconSlot) return;
+  FString Target;
+  FString Source;
+  if (bActive && BoardActor) {
+    if (!BoardActor->GetCombatTargetId().IsEmpty()) {
+      Target = BoardActor->GetCombatTargetId();
+      Source = TEXT("combat");
+    } else if (ArtHud.bIconProbe) {
+      // Flag probe (src=flag): the nearest living enemy of the viewer's hero
+      // carries the icon so K2 frames can measure it at 24/32/48 px without a
+      // combat. It is not a server state and never sends a command.
+      const FS08BoardFighter* OwnHero = nullptr;
+      for (const FS08BoardFighter& F : Fighters) {
+        if (F.OwnerId == Flow->GetUserId() && F.bIsHero && F.IsAlive()) OwnHero = &F;
+      }
+      int32 BestDist = MAX_int32;
+      for (const FS08BoardFighter& F : Fighters) {
+        if (!F.IsAlive() || F.OwnerId == Flow->GetUserId()) continue;
+        const int32 Dist = OwnHero ? FMath::Abs(F.X - OwnHero->X) + FMath::Abs(F.Y - OwnHero->Y) : 0;
+        if (Dist < BestDist) {
+          BestDist = Dist;
+          Target = F.Id;
+        }
+      }
+      Source = TEXT("flag");
+    }
+  }
+  if (BoardActor) BoardActor->SetScreenIconMode(bActive && ArtHud.bIconTextureReady);
+  FS08ScreenRect Figure;
+  const float Ppu = HudPixelsPerUnit();
+  if (Target.IsEmpty() || !ArtHud.bIconTextureReady || Ppu <= 0.0f || !FigureScreenRect(Target, Figure)) {
+    if (ArtHud.bIconVisible) {
+      ArtHud.Icon->SetVisibility(EVisibility::Collapsed);
+      ArtHud.bIconVisible = false;
+      FS08Trace::Write(FString::Printf(TEXT("HUD icon hidden fighter=%s"), *ArtHud.IconFighterId));
+      ArtHud.IconFighterId.Reset();
+    }
+    return;
+  }
+  // N px square, whole pixels, centred above the figure top (the plate is
+  // placed around it afterwards).
+  FVector2D ViewportPx(0.0, 0.0);
+  GEngine->GameViewport->GetViewportSize(ViewportPx);
+  const float N = static_cast<float>(ArtHud.IconSize);
+  float X0 = FMath::RoundToFloat(static_cast<float>(Figure.Center().X) - N * 0.5f);
+  float Y0 = FMath::RoundToFloat(Figure.Y0 - 6.0f - N);
+  X0 = FMath::Clamp(X0, 0.0f, FMath::Max(0.0f, static_cast<float>(ViewportPx.X) - N));
+  Y0 = FMath::Clamp(Y0, 0.0f, FMath::Max(0.0f, static_cast<float>(ViewportPx.Y) - N));
+  // Keep the target's own name/HP label readable: an icon that would sit on
+  // it moves just above the label (the K3 overview frames of 2026-09-28).
+  bool bLabelAvoid = false;
+  if (const AS08FighterActor* TargetActor = BoardActor ? BoardActor->FindFighterActor(Target) : nullptr) {
+    FBox LabelBox;
+    if (TargetActor->GetVisibleLabelBox(LabelBox)) {
+      TArray<FVector2D> Corners;
+      for (int32 C = 0; C < 8; ++C) {
+        FVector2D S;
+        const FVector P((C & 1) ? LabelBox.Max.X : LabelBox.Min.X, (C & 2) ? LabelBox.Max.Y : LabelBox.Min.Y,
+                        (C & 4) ? LabelBox.Max.Z : LabelBox.Min.Z);
+        if (ProjectToViewport(P, S)) Corners.Add(S);
+      }
+      const FS08ScreenRect Label = Corners.Num() == 8 ? FS08ScreenRect::FromPoints(Corners) : FS08ScreenRect();
+      if (!Label.IsEmpty() && FS08ScreenRect(X0, Y0, X0 + N, Y0 + N).Expand(2.0f).IntersectionArea(Label) > 0.0) {
+        Y0 = FMath::Clamp(FMath::RoundToFloat(Label.Y0 - 4.0f - N), 0.0f,
+                          FMath::Max(0.0f, static_cast<float>(ViewportPx.Y) - N));
+        bLabelAvoid = true;
+      }
+    }
+  }
+  // The HUD panels paint over this layer: an icon under the hand strip (a
+  // target near the bottom edge at K2 5x) moves just above/below the panel.
+  bool bHudAvoid = false;
+  for (const TWeakPtr<SWidget>& Panel : {ArtHud.CommandPanel, ArtHud.SidePanel, ArtHud.HandPanel}) {
+    FS08ScreenRect P;
+    if (!WidgetViewportRect(Panel.Pin(), P) || P.IsEmpty()) continue;
+    if (FS08ScreenRect(X0, Y0, X0 + N, Y0 + N).Expand(2.0f).IntersectionArea(P) <= 0.0) continue;
+    Y0 = P.Center().Y > ViewportPx.Y * 0.5 ? P.Y0 - 4.0f - N : P.Y1 + 4.0f;
+    Y0 = FMath::Clamp(Y0, 0.0f, FMath::Max(0.0f, static_cast<float>(ViewportPx.Y) - N));
+    bHudAvoid = true;
+  }
+  const FS08ScreenRect Rect(X0, Y0, X0 + N, Y0 + N);
+  ArtHud.IconSlot->SetOffset(FMargin(X0 / Ppu, Y0 / Ppu, N / Ppu, N / Ppu));
+  ArtHud.IconBrush.ImageSize = FVector2D(N / Ppu, N / Ppu);
+  if (!ArtHud.bIconVisible) ArtHud.Icon->SetVisibility(EVisibility::HitTestInvisible);
+  const bool bChanged = !ArtHud.bIconVisible || ArtHud.IconFighterId != Target ||
+                        !FMath::IsNearlyEqual(ArtHud.IconPlanned.X0, Rect.X0) ||
+                        !FMath::IsNearlyEqual(ArtHud.IconPlanned.Y0, Rect.Y0);
+  const bool bTargetChanged = ArtHud.IconFighterId != Target;
+  ArtHud.bIconVisible = true;
+  ArtHud.IconFighterId = Target;
+  ArtHud.IconSource = Source;
+  ArtHud.IconPlanned = Rect;
+  if (bTargetChanged && Source == TEXT("flag")) {
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW icon probe src=flag target=%s size=%d"), *Target,
+                                     ArtHud.IconSize));
+  }
+  if (bChanged && CameraZoom.IsSettled()) {
+    FS08Trace::Write(FString::Printf(TEXT("ICON fighter=%s bbox=%s size=%d src=%s labelAvoid=%d hudAvoid=%d"),
+                                     *Target, *S08ArtHud::FormatRect(Rect), ArtHud.IconSize, *Source,
+                                     bLabelAvoid ? 1 : 0, bHudAvoid ? 1 : 0));
+  }
+}
+
+void AS08FlowGameMode::UpdatePlate(bool bActive) {
+  if (!ArtHud.PlateBorder.IsValid() || !ArtHud.PlateSlot) return;
+  const FString Id = bActive ? PlateFighterIdNow() : FString();
+  const FS08BoardFighter* Fighter = FindFighter(Id);
+  const float Ppu = HudPixelsPerUnit();
+  FS08ScreenRect Anchor;
+  if (!Fighter || !Fighter->IsAlive() || Ppu <= 0.0f || !FigureScreenRect(Id, Anchor)) {
+    if (ArtHud.bPlateVisible) {
+      ArtHud.PlateBorder->SetVisibility(EVisibility::Collapsed);
+      ArtHud.bPlateVisible = false;
+      FS08Trace::Write(FString::Printf(TEXT("PLATE hidden fighter=%s"), *ArtHud.PlateFighterId));
+      ArtHud.PlateFighterId.Reset();
+      ArtHud.PlateLastTraced.Reset();
+      ArtHud.PlateSignature.Reset();
+    }
+    ArtHud.PlateStableFrames = 0;
+    return;
+  }
+  // ---- content (rebuilt only when the data changes)
+  const bool bOwn = Flow.IsValid() && Fighter->OwnerId == Flow->GetUserId();
+  const FString AttackerId = CommandUi.Combat.bPresent ? CommandUi.Combat.AttackerId : CommandUi.AttackAttackerId;
+  const FString TargetId = BoardActor ? BoardActor->GetCombatTargetId() : FString();
+  const TArray<FString> Statuses = S08PlateStatuses(Fighter->bIsHero, bOwn, Fighter->AttackType,
+                                                    Fighter->Id == AttackerId, Fighter->Id == TargetId,
+                                                    Fighter->Effects);
+  const FString PlateStatusLine = FString::Join(Statuses, TEXT("  |  "));
+  const FString ContentKey = FString::Printf(TEXT("%s|%s|%d|%d|%d|%s"), *Fighter->Id, *Fighter->Label,
+                                             Fighter->Health, Fighter->MaxHealth, bOwn ? 1 : 0, *PlateStatusLine);
+  if (ContentKey != ArtHud.PlateContentKey) {
+    ArtHud.PlateContentKey = ContentKey;
+    ArtHud.PlateName->SetText(FText::FromString(Fighter->Label));
+    ArtHud.PlateHp->SetText(FText::FromString(FString::Printf(TEXT("HP %d/%d"), Fighter->Health,
+                                                              Fighter->MaxHealth)));
+    const float Frac = Fighter->MaxHealth > 0
+        ? FMath::Clamp(static_cast<float>(Fighter->Health) / Fighter->MaxHealth, 0.0f, 1.0f) : 0.0f;
+    ArtHud.PlateHpFill->SetWidthOverride(FOptionalSize(FMath::Max(1.0f, GS08PlateHpBarSu * Frac)));
+    ArtHud.PlateTeamText->SetText(FText::FromString(bOwn ? TEXT("YOURS") : TEXT("ENEMY")));
+    ArtHud.PlateTeamChip->SetBorderBackgroundColor(FSlateColor(bOwn ? GS08PlateOwnChip : GS08PlateEnemyChip));
+    ArtHud.PlateStatusText->SetText(FText::FromString(PlateStatusLine));
+    FS08Trace::Write(FString::Printf(TEXT("HUD plate content fighter=%s name=%s hp=%d/%d team=%s statuses=%s"),
+                                     *Fighter->Id, *Fighter->Label, Fighter->Health, Fighter->MaxHealth,
+                                     bOwn ? TEXT("own") : TEXT("enemy"), *PlateStatusLine));
+  }
+  // ---- placement: never over a destination cell of the current selection
+  FString SelectedId;
+  TSet<uint64> Legal;
+  CurrentSelection(SelectedId, Legal);
+  FIntPoint OwnCell(-1, -1);
+  if (const FS08BoardFighter* Selected = FindFighter(SelectedId)) OwnCell = FIntPoint(Selected->X, Selected->Y);
+  const TArray<FIntPoint> Destinations = S08ArtHud::DestinationCells(Legal, OwnCell);
+  S08ArtHud::FPlacementInput In;
+  FVector2D ViewportPx(0.0, 0.0);
+  GEngine->GameViewport->GetViewportSize(ViewportPx);
+  In.Viewport = ViewportPx;
+  In.PlateSize = FVector2D(FMath::RoundToFloat(GS08PlateWidthSu * Ppu), FMath::RoundToFloat(GS08PlateHeightSu * Ppu));
+  In.Anchor = Anchor;
+  In.Forbidden = ProjectCells(Destinations);
+  // Soft obstacles: every visible figure (incl. the owner), labels, the combat
+  // icon, live damage numbers and the HUD panels.
+  for (const FS08BoardFighter& F : Fighters) {
+    FS08ScreenRect R;
+    if (F.IsAlive() && FigureScreenRect(F.Id, R)) In.Soft.Add(R);
+    if (const AS08FighterActor* Actor = BoardActor ? BoardActor->FindFighterActor(F.Id) : nullptr) {
+      FBox Box;
+      if (F.Id != Id && Actor->GetVisibleLabelBox(Box)) {
+        TArray<FVector2D> Corners;
+        for (int32 C = 0; C < 8; ++C) {
+          FVector2D S;
+          const FVector P((C & 1) ? Box.Max.X : Box.Min.X, (C & 2) ? Box.Max.Y : Box.Min.Y,
+                          (C & 4) ? Box.Max.Z : Box.Min.Z);
+          if (ProjectToViewport(P, S)) Corners.Add(S);
+        }
+        if (Corners.Num() == 8) In.Soft.Add(FS08ScreenRect::FromPoints(Corners));
+      }
+    }
+  }
+  if (ArtHud.bIconVisible) In.Soft.Add(ArtHud.IconPlanned);
+  for (const FString& DamageId : BoardActor->GetActiveDamageNumberIds()) {
+    FBox Box;
+    if (!BoardActor->GetDamageNumberWorldBox(DamageId, Box)) continue;
+    TArray<FVector2D> Corners;
+    for (int32 C = 0; C < 8; ++C) {
+      FVector2D S;
+      const FVector P((C & 1) ? Box.Max.X : Box.Min.X, (C & 2) ? Box.Max.Y : Box.Min.Y,
+                      (C & 4) ? Box.Max.Z : Box.Min.Z);
+      if (ProjectToViewport(P, S)) Corners.Add(S);
+    }
+    if (Corners.Num() == 8) In.Soft.Add(FS08ScreenRect::FromPoints(Corners));
+  }
+  for (const TWeakPtr<SWidget>& Panel : {ArtHud.CommandPanel, ArtHud.SidePanel, ArtHud.HandPanel}) {
+    FS08ScreenRect R;
+    if (WidgetViewportRect(Panel.Pin(), R) && !R.IsEmpty()) In.Soft.Add(R);
+  }
+  // The search only reruns when an input moved by a pixel (camera tween,
+  // selection, figures, HUD panels); otherwise the last placement stands.
+  FString Signature = FString::Printf(TEXT("%s|%s|%.0fx%.0f|%d|"), *Id, *S08ArtHud::FormatRect(Anchor),
+                                      In.PlateSize.X, In.PlateSize.Y, In.Forbidden.Num());
+  for (const FS08CellQuad& Q : In.Forbidden) {
+    for (const FVector2D& P : Q.Screen) Signature += FString::Printf(TEXT("%.0f,%.0f;"), P.X, P.Y);
+  }
+  for (const FS08ScreenRect& R : In.Soft) Signature += S08ArtHud::FormatRect(R);
+  if (Signature != ArtHud.PlateSignature || !ArtHud.bPlateVisible) {
+    ArtHud.PlateSignature = Signature;
+    ArtHud.PlateResult = S08ArtHud::ChoosePlateRect(In);
+  }
+  const S08ArtHud::FPlacementResult& Result = ArtHud.PlateResult;
+  const FS08ScreenRect& Rect = Result.Rect;
+  const bool bMoved = !ArtHud.bPlateVisible || ArtHud.PlateFighterId != Id ||
+                      !FMath::IsNearlyEqual(ArtHud.PlatePlanned.X0, Rect.X0, 0.5f) ||
+                      !FMath::IsNearlyEqual(ArtHud.PlatePlanned.Y0, Rect.Y0, 0.5f);
+  ArtHud.PlateSlot->SetOffset(FMargin(Rect.X0 / Ppu, Rect.Y0 / Ppu, GS08PlateWidthSu, GS08PlateHeightSu));
+  if (!ArtHud.bPlateVisible) ArtHud.PlateBorder->SetVisibility(EVisibility::HitTestInvisible);
+  ArtHud.bPlateVisible = true;
+  ArtHud.PlateFighterId = Id;
+  ArtHud.PlatePlanned = Rect;
+  ArtHud.PlateAnchor = Anchor;
+  ArtHud.PlateCandidate = Result.Candidate;
+  ArtHud.PlateForbiddenPlanned = Result.ForbiddenOverlaps;
+  ArtHud.PlateStableFrames = bMoved ? 0 : ArtHud.PlateStableFrames + 1;
+  // Standalone PLATE line (qa010 accepts it as the latest state): only once
+  // the camera settled and the placement changed; the exact overlap uses the
+  // un-grown rect, i.e. the same rule qa010 `plate` applies.
+  if (CameraZoom.IsSettled()) {
+    const int32 Overlap = S08ArtHud::CountOverlaps(Rect, In.Forbidden, S08ArtHud::OverlapEpsilonPx2);
+    const FString Line = FString::Printf(
+        TEXT("PLATE fighter=%s bbox=%s overlapReachable=%d placement=%s ring=%d gap=%.0f selection=%s destinations=%d clean=%d softPx2=%.0f tested=%d"),
+        *Id, *S08ArtHud::FormatRect(Rect), Overlap, *Result.Candidate, Result.Ring, S08RectGap(Rect, Anchor),
+        SelectedId.IsEmpty() ? TEXT("none") : *SelectedId, Destinations.Num(), Result.bClean ? 1 : 0,
+        Result.SoftArea, Result.Tested);
+    if (Line != ArtHud.PlateLastTraced) {
+      ArtHud.PlateLastTraced = Line;
+      FS08Trace::Write(Line);
+    }
+  }
+}
+
+void AS08FlowGameMode::RunArtPreviewInputPlan() {
+  if (ArtHud.Plan.Num() == 0 || ArtHud.bPlanDone || ArtHud.PlanStartAt < 0.0f) return;
+  if (!CameraZoom.IsReady() || Elapsed < ArtHud.PlanStartAt || Elapsed < ArtHud.PlanNextAt) return;
+  // Never before this client's evidence shot: the K2 frame stays the flag
+  // selection + focus zoom frame of T1.1.
+  if (ArtPreviewShotAfter >= 0.0f && !AutoShotPath.IsEmpty() && !bShotTaken) return;
+  const ES08InputStep Step = ArtHud.Plan[ArtHud.PlanIndex++];
+  FS08Trace::Write(FString::Printf(TEXT("INPUT step src=flag index=%d/%d step=%s"), ArtHud.PlanIndex,
+                                   ArtHud.Plan.Num(), S08InputStepName(Step)));
+  EmulateInputStep(Step);
+  ArtHud.PlanNextAt = Elapsed + ArtHud.PlanStepSeconds;
+  if (ArtHud.PlanIndex >= ArtHud.Plan.Num()) {
+    ArtHud.bPlanDone = true;
+    FS08Trace::Write(FString::Printf(TEXT("INPUT plan done src=flag steps=%d zoom=%.2f dist=%.1f"),
+                                     ArtHud.Plan.Num(), CameraZoom.ZoomOf(CameraZoom.Target), CameraZoom.Target));
+  }
+}
+
+void AS08FlowGameMode::EmulateInputStep(ES08InputStep Step) {
+  APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  if (!PC || !BoardActor || !Flow.IsValid()) return;
+  switch (Step) {
+    case ES08InputStep::WheelIn: ApplyWheel(+1, ES08InputSource::Flag); return;
+    case ES08InputStep::WheelOut: ApplyWheel(-1, ES08InputSource::Flag); return;
+    case ES08InputStep::Space: ApplySpace(ES08InputSource::Flag); return;
+    default: break;
+  }
+  // Clicks: a screen point from the same projection the SHOT lines use, then
+  // the visibility hit test GetHitResultUnderCursor performs for a real
+  // click. Local effects only (own-fighter selection); cells are dry-run.
+  const FS08BoardFighter* Hero = nullptr;
+  for (const FS08BoardFighter& F : Fighters) {
+    if (F.OwnerId == Flow->GetUserId() && F.bIsHero && F.IsAlive()) Hero = &F;
+  }
+  FVector World = FVector::ZeroVector;
+  FString Expect = TEXT("none");
+  if (Step == ES08InputStep::ClickCell) {
+    FString SelectedId;
+    TSet<uint64> Legal;
+    CurrentSelection(SelectedId, Legal);
+    FIntPoint Own(-1, -1);
+    if (const FS08BoardFighter* Selected = FindFighter(SelectedId)) Own = FIntPoint(Selected->X, Selected->Y);
+    const TArray<FIntPoint> Destinations = S08ArtHud::DestinationCells(Legal, Own);
+    if (Destinations.Num() == 0) {
+      FS08Trace::Write(TEXT("INPUT click button=left src=flag step=clickcell skipped=no-destination"));
+      return;
+    }
+    // The destination nearest to the screen centre (it is on screen at K2).
+    FVector2D Best(0, 0);
+    float BestD = MAX_flt;
+    FVector2D ViewportPx(0.0, 0.0);
+    GEngine->GameViewport->GetViewportSize(ViewportPx);
+    for (const FIntPoint& Cell : Destinations) {
+      FVector2D S;
+      const FVector W = BoardModel.CellToWorld(Cell.X, Cell.Y);
+      if (!ProjectToViewport(W, S)) continue;
+      const float D = static_cast<float>(FVector2D::Distance(S, ViewportPx * 0.5));
+      if (D < BestD) {
+        BestD = D;
+        World = W;
+        Expect = FString::Printf(TEXT("cell(%d,%d)"), Cell.X, Cell.Y);
+      }
+    }
+  } else if (Hero) {
+    const AS08FighterActor* Actor = BoardActor->FindFighterActor(Hero->Id);
+    const float Height = Actor ? Actor->GetFigureHeightUU() : 60.0f;
+    World = BoardModel.CellToWorld(Hero->X, Hero->Y) +
+            FVector(0.0f, 0.0f, Step == ES08InputStep::ClickHero ? Height * 0.5f : Height + 35.0f);
+    Expect = Step == ES08InputStep::ClickHero ? Hero->Id : FString::Printf(TEXT("not:%s"), *Hero->Id);
+  } else {
+    FS08Trace::Write(FString::Printf(TEXT("INPUT click button=left src=flag step=%s skipped=no-own-hero"),
+                                     S08InputStepName(Step)));
+    return;
+  }
+  FVector2D Screen;
+  if (!ProjectToViewport(World, Screen)) {
+    FS08Trace::Write(FString::Printf(TEXT("INPUT click button=left src=flag step=%s skipped=not-projected"),
+                                     S08InputStepName(Step)));
+    return;
+  }
+  FHitResult Hit;
+  const bool bHit = PC->GetHitResultAtScreenPosition(Screen, ECC_Visibility, false, Hit);
+  const AS08FighterActor* FighterActor = bHit ? Cast<AS08FighterActor>(Hit.GetActor()) : nullptr;
+  int32 CellX = -1, CellY = -1;
+  const bool bCell = bHit && !FighterActor && BoardActor->WorldToCell(Hit.ImpactPoint, CellX, CellY);
+  FString SelectedId;
+  TSet<uint64> Legal;
+  CurrentSelection(SelectedId, Legal);
+  const bool bReachable = bCell && Legal.Contains(FS08BoardModel::CellKey(CellX, CellY));
+  const FString HitFighter = FighterActor ? FighterActor->GetFighterId() : FString(TEXT("none"));
+  bool bMatch = false;
+  if (Step == ES08InputStep::ClickHero) bMatch = Hero && HitFighter == Hero->Id;
+  else if (Step == ES08InputStep::ClickAbove) bMatch = Hero && HitFighter != Hero->Id;
+  else bMatch = bCell && Expect == FString::Printf(TEXT("cell(%d,%d)"), CellX, CellY);
+  bool bSelected = false;
+  if (FighterActor && FighterActor->GetFighter().OwnerId == Flow->GetUserId() &&
+      CommandUi.Mode == ES09CommandMode::None) {
+    SelectFighter(FighterActor->GetFighterId());  // local selection, no server command
+    bSelected = true;
+  }
+  FS08Trace::Write(FString::Printf(
+      TEXT("INPUT click button=left src=flag step=%s screen=(%.0f,%.0f) hit=%d actor=%s comp=%s fighter=%s cell=(%d,%d) reachable=%d expect=%s match=%d dispatch=0 selected=%d"),
+      S08InputStepName(Step), Screen.X, Screen.Y, bHit ? 1 : 0,
+      Hit.GetActor() ? *Hit.GetActor()->GetName() : TEXT("none"),
+      Hit.GetComponent() ? *Hit.GetComponent()->GetName() : TEXT("none"), *HitFighter,
+      bCell ? CellX : -1, bCell ? CellY : -1, bReachable ? 1 : 0, *Expect, bMatch ? 1 : 0, bSelected ? 1 : 0));
+}
+
+void AS08FlowGameMode::WriteArtHudShotLines() {
+  if (!BoardActor || !BoardActor->IsArtActive()) return;
+  FString SelectedId;
+  TSet<uint64> Legal;
+  CurrentSelection(SelectedId, Legal);
+  FIntPoint OwnCell(-1, -1);
+  if (const FS08BoardFighter* Selected = FindFighter(SelectedId)) OwnCell = FIntPoint(Selected->X, Selected->Y);
+  const TArray<FIntPoint> Destinations = S08ArtHud::DestinationCells(Legal, OwnCell);
+  if (!SelectedId.IsEmpty() || ArtHud.bPlateVisible) {
+    FS08Trace::Write(FString::Printf(
+        TEXT("SHOT selection fighter=%s ownCell=(%d,%d) legal=%d destinations=%d ownCellExcluded=%d plateFighter=%s"),
+        SelectedId.IsEmpty() ? TEXT("none") : *SelectedId, OwnCell.X, OwnCell.Y, Legal.Num(), Destinations.Num(),
+        Legal.Contains(FS08BoardModel::CellKey(OwnCell.X, OwnCell.Y)) ? 1 : 0,
+        ArtHud.bPlateVisible ? *ArtHud.PlateFighterId : TEXT("none")));
+    FS08Trace::Write(FString::Printf(TEXT("SHOT reachable fighter=%s n=%d cells=%s"),
+                                     SelectedId.IsEmpty() ? TEXT("none") : *SelectedId, Destinations.Num(),
+                                     *S08ArtHud::FormatCells(Destinations)));
+  }
+  if (ArtHud.bPlateVisible) {
+    // Painted geometry of the last frame; a plate that has not been painted
+    // at its current place yet is written as a zero box (qa010: trace error,
+    // never a pass).
+    FS08ScreenRect Painted;
+    const bool bPainted = ArtHud.PlateStableFrames >= 2 && WidgetViewportRect(ArtHud.PlateBorder, Painted) &&
+                          !Painted.IsEmpty();
+    const FS08ScreenRect Used = bPainted ? Painted : FS08ScreenRect();
+    const int32 Overlap = S08ArtHud::CountOverlaps(Used, ProjectCells(Destinations), S08ArtHud::OverlapEpsilonPx2);
+    FS08Trace::Write(FString::Printf(
+        TEXT("SHOT plate fighter=%s bbox=%s overlapReachable=%d placement=%s gap=%.0f anchor=%s planned=%s geom=%s stableFrames=%d"),
+        *ArtHud.PlateFighterId, *S08ArtHud::FormatRect(Used), Overlap, *ArtHud.PlateCandidate,
+        S08RectGap(ArtHud.PlatePlanned, ArtHud.PlateAnchor), *S08ArtHud::FormatRect(ArtHud.PlateAnchor),
+        *S08ArtHud::FormatRect(ArtHud.PlatePlanned), bPainted ? TEXT("painted") : TEXT("unpainted"),
+        ArtHud.PlateStableFrames));
+  }
+  if (ArtHud.bIconVisible) {
+    FS08ScreenRect Painted;
+    const bool bPainted = WidgetViewportRect(ArtHud.Icon, Painted) && !Painted.IsEmpty();
+    FS08Trace::Write(FString::Printf(TEXT("SHOT icon fighter=%s bbox=%s size=%d src=%s planned=%s geom=%s"),
+                                     *ArtHud.IconFighterId, *S08ArtHud::FormatRect(bPainted ? Painted : ArtHud.IconPlanned),
+                                     ArtHud.IconSize, *ArtHud.IconSource, *S08ArtHud::FormatRect(ArtHud.IconPlanned),
+                                     bPainted ? TEXT("painted") : TEXT("planned")));
+  }
+  for (const FS08BoardFighter& F : Fighters) {
+    const AS08FighterActor* Actor = BoardActor->FindFighterActor(F.Id);
+    FBox Box;
+    if (!Actor || !F.IsAlive() || !Actor->GetVisibleLabelBox(Box)) continue;
+    TArray<FVector2D> Corners;
+    for (int32 C = 0; C < 8; ++C) {
+      FVector2D S;
+      const FVector P((C & 1) ? Box.Max.X : Box.Min.X, (C & 2) ? Box.Max.Y : Box.Min.Y,
+                      (C & 4) ? Box.Max.Z : Box.Min.Z);
+      if (ProjectToViewport(P, S)) Corners.Add(S);
+    }
+    if (Corners.Num() != 8) continue;
+    const ES08FighterLabelMode Mode = Actor->GetLabelMode();
+    FS08Trace::Write(FString::Printf(TEXT("SHOT label fighter=%s mode=%s bbox=%s"), *F.Id,
+                                     Mode == ES08FighterLabelMode::Compact ? TEXT("compact")
+                                     : Mode == ES08FighterLabelMode::Hidden ? TEXT("hidden") : TEXT("full"),
+                                     *S08ArtHud::FormatRect(FS08ScreenRect::FromPoints(Corners))));
+  }
+  for (const FString& DamageId : BoardActor->GetActiveDamageNumberIds()) {
+    FBox Box;
+    if (!BoardActor->GetDamageNumberWorldBox(DamageId, Box)) continue;
+    TArray<FVector2D> Corners;
+    for (int32 C = 0; C < 8; ++C) {
+      FVector2D S;
+      const FVector P((C & 1) ? Box.Max.X : Box.Min.X, (C & 2) ? Box.Max.Y : Box.Min.Y,
+                      (C & 4) ? Box.Max.Z : Box.Min.Z);
+      if (ProjectToViewport(P, S)) Corners.Add(S);
+    }
+    if (Corners.Num() == 8) {
+      FS08Trace::Write(FString::Printf(TEXT("SHOT damage fighter=%s bbox=%s"), *DamageId,
+                                       *S08ArtHud::FormatRect(FS08ScreenRect::FromPoints(Corners))));
     }
   }
 }

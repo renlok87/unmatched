@@ -17,11 +17,13 @@
 #include "GameFramework/GameModeBase.h"
 #include "S08FlowController.h"
 #include "S08BoardModel.h"
+#include "S08ArtHud.h"
 #include "../S09/S09HudModel.h"
 #include "../S09/S09ManeuverUi.h"
 #include "S08FlowGameMode.generated.h"
 
 class SEditableTextBox;
+class SConstraintCanvas;
 class STextBlock;
 class SVerticalBox;
 class SHorizontalBox;
@@ -231,6 +233,33 @@ private:
   // ---- demo drive ----
   void RunAutoManeuver();
   void TakeEvidenceShot(const FString& InPath);
+  // ---- ART-004 stage 3 T2.2: art HUD (plate, compact labels, exact-size
+  // combat icon), zoom config and INPUT/CAMERA/PLATE/SHOT traces ----
+  void BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& Canvas);
+  void UpdateArtHud(float DeltaSeconds);
+  void UpdateHover();
+  void UpdateCombatIcon(bool bActive);
+  void UpdatePlate(bool bActive);
+  void ApplyWheel(int32 Direction, ES08InputSource Source);
+  void ApplySpace(ES08InputSource Source);
+  void TraceOsClick(const FKey& Button);
+  void RunArtPreviewInputPlan();
+  void EmulateInputStep(ES08InputStep Step);
+  void WriteArtHudShotLines();
+  /** Viewport-pixel projection (same call as the SHOT fighter lines). */
+  bool ProjectToViewport(const FVector& World, FVector2D& OutScreen) const;
+  /** On-screen box of a fighter's visible figure (base disc to figure top). */
+  bool FigureScreenRect(const FString& FighterId, FS08ScreenRect& OutRect) const;
+  /** The current selection whose destination cells the plate must not cover:
+   *  pending draft > maneuver draft > plain board selection. */
+  void CurrentSelection(FString& OutFighterId, TSet<uint64>& OutLegalCells) const;
+  TArray<FS08CellQuad> ProjectCells(const TArray<FIntPoint>& Cells) const;
+  /** Painted geometry of a HUD widget in viewport pixels. */
+  bool WidgetViewportRect(const TSharedPtr<SWidget>& Widget, FS08ScreenRect& OutRect) const;
+  /** Viewport pixels per HUD canvas slate unit (1.0 at 1920x1080). */
+  float HudPixelsPerUnit() const;
+  FString PlateFighterIdNow() const;
+  const FS08BoardFighter* FindFighter(const FString& FighterId) const;
 
   TUniquePtr<FS08FlowController> Flow;
   TWeakPtr<SEditableTextBox> EmailBox;
@@ -416,11 +445,13 @@ private:
   UPROPERTY()
   TObjectPtr<ACameraActor> BoardCamera;
 
-  float CameraOverviewDistance = 0.0f;
-  float CameraCurrentDistance = 0.0f;
-  float CameraTargetDistance = 0.0f;
-  FVector CameraCurrentFocus = FVector::ZeroVector;
-  FVector CameraTargetFocus = FVector::ZeroVector;
+  // D-10 wheel/Space/flag zoom (distance + follow focus); parameters in
+  // FS08CameraZoomConfig (ART-004 T2.2 - values are Q-302 proposals).
+  FS08CameraZoom CameraZoom;
+  FS08ArtHudRuntime ArtHud;
+  // Keeps the exact-size combat icon textures alive while the brush uses them.
+  UPROPERTY()
+  TArray<TObjectPtr<UObject>> ArtHudAssets;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

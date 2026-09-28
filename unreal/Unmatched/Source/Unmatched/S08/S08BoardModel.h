@@ -40,6 +40,9 @@ struct UNMATCHED_API FS08BoardFighter {
   int32 Movement = 0;
   FString AttackType;
   FString Label; // display label: 'Medusa', 'Harpies 2', ...
+  // Public fighter effects from the projection (`effects[]`: a string, or an
+  // object's type/name/id). Plate status chips only (ART-004 T2.2).
+  TArray<FString> Effects;
   bool IsAlive() const { return Health > 0 && X >= 0; }
 };
 

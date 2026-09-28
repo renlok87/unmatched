@@ -8,6 +8,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "S08BoardModel.h"
+#include "S08ArtHud.h"
 #include "S08BoardActor.generated.h"
 
 class UInstancedStaticMeshComponent;
@@ -39,9 +40,21 @@ public:
   const TArray<FS08BoardFighter>& GetFighters() const { return Fighters; }
   AS08FighterActor* FindFighterActor(const FString& FighterId) const;
   void SetFighterLabelZoomRatio(float DistanceRatio, bool bOnlySelected);
+  /** ART-004 T2.2: the plate owner hides its world labels, every other
+   *  fighter shows one compact line; empty id = the classic full labels. */
+  void SetLabelPresentation(const FString& PlateFighterId);
+  /** ART-004 T2.2: the exact-size HUD icon replaces the world billboard. */
+  void SetScreenIconMode(bool bScreen);
+  const FString& GetCombatTargetId() const { return CombatTargetId; }
+  /** World box of a live damage number (false when none is showing). */
+  bool GetDamageNumberWorldBox(const FString& FighterId, FBox& OutBox) const;
+  /** Fighter ids with a damage number currently alive. */
+  TArray<FString> GetActiveDamageNumberIds() const;
   /** Apply local attack-draft or authoritative combat focus by fighter ID. */
   void SetCombatFocus(const FString& AttackerId, const FString& TargetId);
-  /** CUE-011 fallback: one 900ms damage number at the affected cell. */
+  /** CUE-011 fallback: one 900ms damage number at the affected cell,
+   *  exactly once per (fighter, authoritative seq) - a repeated cue for the
+   *  same seq (reapply, reconnect replay) is traced and ignored (T2.2). */
   void ShowDamageNumber(const FString& FighterId, int32 Damage, int32 SequenceNumber);
 
   /** TASK-022 selection ring + reachable-cell highlights. */
@@ -108,6 +121,10 @@ private:
   UPROPERTY()
   TArray<TObjectPtr<AS08FighterActor>> FighterActors;
   TMap<FString, TWeakObjectPtr<AActor>> DamageNumbers;
+  FS08SeqDedupe DamageDedupe;
+  FString LabelPlateFighterId;
+  bool bScreenIconMode = false;
+  bool bAllMedusaSummaryTraced = false;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

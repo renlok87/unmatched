@@ -1,0 +1,89 @@
+heroA=cmuhgvgke00skwi9glfew6898 heroB=cmuhgvghu00oawi9gv9ehihmg
+staging: C:\Users\ren\AppData\Local\Temp\s08-phase2-20260928-180453-48972
+host pid=44196
+room created by this run (code redacted from output; id=cmul9f8xg00h1wiuk77oiag79)
+art-preview boardId verified against the authoritative game row
+joiner pid=24884
+both clients exited
+convergence: host max applied seq=1 joiner max applied seq=1
+{
+  "pass": true,
+  "reasons": [],
+  "measurements": {
+    "resolution": [
+      1920,
+      1080
+    ],
+    "frame_nonblack_fraction": 0.93,
+    "board_nonblack_fraction": 0.9488,
+    "board_luma_stddev": 48.28,
+    "top_hud_nonblack_fraction": 0.9999,
+    "hand_nonblack_fraction": 0.9868
+  }
+}
+{
+  "pass": true,
+  "reasons": [],
+  "measurements": {
+    "resolution": [
+      1920,
+      1080
+    ],
+    "frame_nonblack_fraction": 0.4412,
+    "board_nonblack_fraction": 1.0,
+    "board_luma_stddev": 15.14,
+    "top_hud_nonblack_fraction": 0.4035,
+    "hand_nonblack_fraction": 0.9873
+  }
+}
+published evidence run dir: C:\Users\ren\.codex\worktrees\art-foundation\unmached\docs\game-design\evidence\ART-004\hud-input-t22\k2-5x\run-20260928-180453 (pointer: latest.json)
+ART PREVIEW K2 PROBE: host selected hero in frame at the requested zoom; joiner K1 has six fighters in frame. Visual art review remains separate.
+NOTE: the pixel gate checks a lit textured board and HUD regions; it does not prove K1 readability or color-blind access.
+--- host trace (tail) ---
+2026.09.28-13.05.33 CAMERA clamp limit=near src=flag dist=300.0 requested=247.1 zoom=6.44 range=0.65-6.44
+2026.09.28-13.05.33 PLATE fighter=f-0-hero bbox=(1194,497,1366,551) overlapReachable=0 placement=right ring=0 gap=6 selection=f-0-hero destinations=13 clean=1 softPx2=0 tested=342
+2026.09.28-13.05.33 PLATE fighter=f-0-hero bbox=(1195,497,1367,551) overlapReachable=0 placement=right ring=0 gap=6 selection=f-0-hero destinations=13 clean=1 softPx2=0 tested=342
+2026.09.28-13.05.33 INPUT step src=flag index=5/6 step=wheelout
+2026.09.28-13.05.33 INPUT wheel dir=out src=flag
+2026.09.28-13.05.33 CAMERA wheel dir=out src=flag from=300.0 to=375.0 requested=375.0 zoom=5.15 clamp=0 limit=none animMs=200 follow=1
+2026.09.28-13.05.33 game -> room=cmul9f8xg00h1wiuk77oiag79 code=<redacted> status=IN_PROGRESS
+2026.09.28-13.05.34 PLATE fighter=f-0-hero bbox=(1147,506,1319,560) overlapReachable=0 placement=right ring=0 gap=6 selection=f-0-hero destinations=13 clean=1 softPx2=0 tested=288
+2026.09.28-13.05.34 PLATE fighter=f-0-hero bbox=(1144,494,1316,548) overlapReachable=0 placement=right ring=0 gap=6 selection=f-0-hero destinations=13 clean=1 softPx2=0 tested=284
+2026.09.28-13.05.34 INPUT step src=flag index=6/6 step=space
+2026.09.28-13.05.34 INPUT space src=flag
+2026.09.28-13.05.34 CAMERA space src=flag from=375.0 to=1930.8 zoom=1.00 animMs=300 follow=0
+2026.09.28-13.05.34 INPUT plan done src=flag steps=6 zoom=1.00 dist=1930.8
+2026.09.28-13.05.34 ICON fighter=f-1-hero bbox=(936,468,984,516) size=48 src=flag labelAvoid=1 hudAvoid=0
+2026.09.28-13.05.34 PLATE fighter=f-0-hero bbox=(997,638,1169,692) overlapReachable=0 placement=below ring=16 gap=134 selection=f-0-hero destinations=13 clean=1 softPx2=0 tested=2924
+2026.09.28-13.05.34 ICON fighter=f-1-hero bbox=(936,467,984,515) size=48 src=flag labelAvoid=1 hudAvoid=0
+2026.09.28-13.05.34 PLATE fighter=f-0-hero bbox=(886,636,1058,690) overlapReachable=0 placement=below ring=16 gap=134 selection=f-0-hero destinations=13 clean=1 softPx2=0 tested=2924
+2026.09.28-13.05.34 PERF window t=35.1-40.1 frames=143 fps=28.54 frameMs avg=35.04 p50=33.33 p95=33.34 p99=33.38 max=277.59 hitches50=1 gpuMs avg=34.50 p50=33.34 p95=35.88 gameMs avg=3.29 p95=3.73 renderMs avg=2.33 p95=2.95
+2026.09.28-13.05.36 game -> room=cmul9f8xg00h1wiuk77oiag79 code=<redacted> status=IN_PROGRESS
+2026.09.28-13.05.39 game -> room=cmul9f8xg00h1wiuk77oiag79 code=<redacted> status=IN_PROGRESS
+2026.09.28-13.05.39 PERF window t=40.1-45.1 frames=150 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.37 max=33.41 hitches50=0 gpuMs avg=32.92 p50=33.32 p95=34.69 gameMs avg=1.46 p95=1.92 renderMs avg=2.44 p95=3.41
+2026.09.28-13.05.42 game -> room=cmul9f8xg00h1wiuk77oiag79 code=<redacted> status=IN_PROGRESS
+2026.09.28-13.05.44 PERF summary scope=afterWarmup warmup=5 elapsed=50.0 frames=1344 fps=29.84 frameMs avg=33.52 p50=33.33 p95=33.33 p99=33.35 max=277.59 hitches50=1 gpuMs avg=32.63 p50=33.32 p95=34.69 gameMs avg=1.47 p95=1.73 renderMs avg=2.18 p95=2.92
+2026.09.28-13.05.44 PERF summary scope=started elapsed=50.0 frames=950 fps=29.77 frameMs avg=33.59 p50=33.33 p95=33.33 p99=33.35 max=277.59 hitches50=1 gpuMs avg=32.53 p50=33.31 p95=34.77 gameMs avg=1.58 p95=1.81 renderMs avg=2.36 p95=3.03
+2026.09.28-13.05.44 --- S08 trace close ---
+--- joiner trace (tail) ---
+2026.09.28-13.05.36 SHOT fighter f-1-sk0 pos=(3,3) world=(100,50,0) screen=(1120,606) projected=1 alive=1
+2026.09.28-13.05.36 SHOT camera dist=1930.8 target=1930.8 overview=1930.8 errPct=0.000 focusErr=0.00 settled=1 zoom=1.00
+2026.09.28-13.05.36 SHOT head fighter=f-0-hero socket=Head mesh=SK_Medusa_FaceNeck_v2Candidate world=(0.0,-46.0,38.5) screen=(960.0,445.5) top=(960.0,439.8) bottom=(960.0,451.2) headPx=11.4 projected=1
+2026.09.28-13.05.36 SHOT label fighter=f-0-hero mode=full bbox=(916,381,1004,414)
+2026.09.28-13.05.36 SHOT label fighter=f-0-sk0 mode=full bbox=(1072,399,1169,428)
+2026.09.28-13.05.36 SHOT label fighter=f-0-sk1 mode=full bbox=(914,276,1006,305)
+2026.09.28-13.05.36 SHOT label fighter=f-0-sk2 mode=full bbox=(751,399,848,428)
+2026.09.28-13.05.36 SHOT label fighter=f-1-hero mode=full bbox=(913,517,1007,545)
+2026.09.28-13.05.36 SHOT label fighter=f-1-sk0 mode=full bbox=(1088,529,1162,558)
+2026.09.28-13.05.36 SHOT requested: FScreenshotRequest(bShowUI) -> C:\Users\ren\AppData\Local\Temp\s08-phase2-20260928-180453-48972\phase2-board-joiner-1920x1080.png
+2026.09.28-13.05.36 game -> room=cmul9f8xg00h1wiuk77oiag79 code=<redacted> status=IN_PROGRESS
+2026.09.28-13.05.39 game -> room=cmul9f8xg00h1wiuk77oiag79 code=<redacted> status=IN_PROGRESS
+2026.09.28-13.05.40 PERF window t=35.1-40.2 frames=148 fps=29.45 frameMs avg=33.96 p50=33.33 p95=33.33 p99=33.35 max=125.33 hitches50=1 gpuMs avg=30.90 p50=33.26 p95=34.33 gameMs avg=1.85 p95=1.47 renderMs avg=2.41 p95=3.05
+2026.09.28-13.05.42 game -> room=cmul9f8xg00h1wiuk77oiag79 code=<redacted> status=IN_PROGRESS
+2026.09.28-13.05.45 game -> room=cmul9f8xg00h1wiuk77oiag79 code=<redacted> status=IN_PROGRESS
+2026.09.28-13.05.45 PERF window t=40.2-45.2 frames=150 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.38 max=33.40 hitches50=0 gpuMs avg=29.98 p50=33.32 p95=34.37 gameMs avg=1.13 p95=1.38 renderMs avg=2.31 p95=2.70
+2026.09.28-13.05.48 game -> room=cmul9f8xg00h1wiuk77oiag79 code=<redacted> status=IN_PROGRESS
+2026.09.28-13.05.50 PERF summary scope=afterWarmup warmup=5 elapsed=50.0 frames=1349 fps=29.94 frameMs avg=33.40 p50=33.33 p95=33.33 p99=33.34 max=125.33 hitches50=1 gpuMs avg=30.35 p50=33.29 p95=34.55 gameMs avg=1.25 p95=1.46 renderMs avg=2.27 p95=2.83
+2026.09.28-13.05.50 PERF summary scope=started elapsed=50.0 frames=1047 fps=29.92 frameMs avg=33.42 p50=33.33 p95=33.33 p99=33.34 max=125.33 hitches50=1 gpuMs avg=29.73 p50=33.28 p95=34.56 gameMs avg=1.26 p95=1.39 renderMs avg=2.38 p95=2.87
+2026.09.28-13.05.50 --- S08 trace close ---
+cleanup: aborted THIS run's game id=cmul9f8xg00h1wiuk77oiag79 status=ABORTED (verified)
