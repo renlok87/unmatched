@@ -13,6 +13,8 @@ import {
   FileSearchOutlined,
   LogoutOutlined,
   ExperimentOutlined,
+  PictureOutlined,
+  LoginOutlined,
 } from '@ant-design/icons';
 
 const { Sider, Header, Content } = Layout;
@@ -24,13 +26,19 @@ interface UserIdentity {
 
 interface AdminLayoutProps {
   children?: React.ReactNode;
+  /**
+   * Публичный режим для страниц без бэкенд-логина (Арт-хаб): не запрашивает
+   * identity (не ходит в бэкенд и не трогает токены), вместо меню пользователя
+   * показывает кнопку входа.
+   */
+  publicMode?: boolean;
 }
 
-export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, publicMode = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { mutate: logout } = useLogout();
-  const { data: user } = useGetIdentity<UserIdentity>();
+  const { data: user } = useGetIdentity<UserIdentity>({ queryOptions: { enabled: !publicMode } });
   const [collapsed, setCollapsed] = React.useState(false);
 
   const menuItems = [
@@ -78,6 +86,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       key: '/audit-logs',
       icon: <FileSearchOutlined />,
       label: 'Audit Logs',
+    },
+    {
+      key: '/art-hub',
+      icon: <PictureOutlined />,
+      label: 'Арт-хаб',
     },
   ];
 
@@ -154,12 +167,18 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             Admin Panel
           </h1>
           <Space>
-            <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-              <Button type="text" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Avatar icon={<UserOutlined />} />
-                <span>{user?.username || 'User'}</span>
+            {publicMode ? (
+              <Button type="text" icon={<LoginOutlined />} onClick={() => navigate('/login')}>
+                Вход в админку
               </Button>
-            </Dropdown>
+            ) : (
+              <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+                <Button type="text" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Avatar icon={<UserOutlined />} />
+                  <span>{user?.username || 'User'}</span>
+                </Button>
+              </Dropdown>
+            )}
           </Space>
         </Header>
         <Content

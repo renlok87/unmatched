@@ -16,6 +16,7 @@ import { GamesList, GameShow } from './pages/games';
 import { MatchmakingList } from './pages/matchmaking';
 import { AuditLogsList } from './pages/audit-logs';
 import { GameTester } from './pages/game-tester';
+import { ArtHubPage } from './pages/art-hub';
 import { useIsAuthenticated } from '@refinedev/core';
 
 // Компонент для защиты маршрутов
@@ -31,6 +32,18 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   }
 
   return <>{children}</>;
+};
+
+// Публичная обёртка (без ProtectedRoute): только для страниц, которые не ходят в бэкенд.
+// «Арт-хаб» читает локальные файлы репо через dev-эндпоинт Vite /__art-hub и не
+// использует GraphQL/токены, поэтому бэкенд-логин ему не нужен. publicMode отключает
+// запрос identity в лейауте, чтобы страница не трогала токены и бэкенд.
+const PublicLayoutWrapper: React.FC = () => {
+  return (
+    <AdminLayout publicMode>
+      <Outlet />
+    </AdminLayout>
+  );
 };
 
 // Компонент-обёртка для лейаута с Outlet для детей
@@ -111,6 +124,11 @@ function App() {
       <UnsavedChangesNotifier />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+
+        {/* Арт-хаб: публичный dev-маршрут вне ProtectedRoute (только чтение локальных файлов) */}
+        <Route element={<PublicLayoutWrapper />}>
+          <Route path="/art-hub" element={<ArtHubPage />} />
+        </Route>
 
         <Route path="/" element={<LayoutWrapper />}>
           <Route index element={<DashboardPage />} />

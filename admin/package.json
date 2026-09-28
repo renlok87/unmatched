@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "node kill-port.js && vite --port 5480",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "art-hub:snapshot": "vite-node art-hub/cli.ts",
+    "typecheck:art-hub": "tsc -p art-hub/tsconfig.json"
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
@@ -21,6 +24,7 @@
     "react-dom": "^18.2.0",
     "react-router": "^7.13.0",
     "react-router-dom": "^7.13.0",
+    "three": "^0.186.1",
     "urql": "^4.0.0"
   },
   "devDependencies": {
@@ -28,6 +32,7 @@
     "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "@types/three": "^0.186.0",
     "@vitejs/plugin-react": "^4.2.0",
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.0",
