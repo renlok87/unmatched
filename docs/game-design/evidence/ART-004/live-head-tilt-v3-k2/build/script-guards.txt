@@ -1,0 +1,26 @@
+# run-phase2-demo.ps1 argument guards (T1.1), 2026-09-28T15:24:22+0500
+
+## slug refused: -ArtPreviewBoardId cobble-city -RunSeconds 50
+ArtPreviewBoardId 'cobble-city' is not a Board row id (cuid); content slugs such as 'cobble-city' are refused. Use the 
+Board row id of the 5x6 Cobble review board (cmuhgs4b2001mwik4f2b2xtf8).
+exit=1
+
+## RunSeconds < ShotAfter+10 refused: -ArtPreviewBoardId cmuhgs4b2001mwik4f2b2xtf8 -ArtPreviewShotAfter 36 -RunSeconds 45
+RunSeconds=45 must be at least ArtPreviewShotAfter+10 (46)
+
+## explicit variant without board refused: -ArtPreviewMedusaVariant face-neck-v2
+ArtPreviewMedusaVariant requires ArtPreviewBoardId
+
+## cleanup probe
+PROBE PASS  success: validated ownership + ABORTED abort passes
+PROBE PASS  HTTP-200 errors[] on the game lookup fails the cleanup
+PROBE PASS  HTTP-200 errors[] on abortGame fails the cleanup
+PROBE PASS  HTTP-200 errors[] on login fails the cleanup
+PROBE PASS  non-terminal abort status is caught by the re-query
+PROBE PASS  abortGame answering for a foreign game id fails the cleanup
+CLEANUP PROBE OK: 6/6 cases
+exit=0
+
+## harness refuses a non-review board id
+REFUSED: board id 'cobble-city' is not the 5x6 Cobble review Board row cmuhgs4b2001mwik4f2b2xtf8
+exit=2

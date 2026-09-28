@@ -35,6 +35,83 @@
 #include "Widgets/Text/STextBlock.h"
 #include "Layout/Visibility.h"
 #include "Styling/CoreStyle.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "DynamicRHI.h"
+#include "Engine/SkeletalMesh.h"
+#include "GameFramework/GameUserSettings.h"
+#include "HAL/IConsoleManager.h"
+#include "Misc/App.h"
+#include "RenderTimer.h"
+
+namespace {
+// ART-004 T1.1 (stage 3) opt-in live K2 measurements: per-client frame timing
+// (-S08Perf), the camera-settled gate and the Head-socket projection at shot
+// time. The state is file-local on purpose: no UCLASS header or reflection
+// changes, so the generated registration code stays identical to the builds
+// diagnosed in v3-live-hookup-diagnosis-2026-09-28.md (WITH_RELOAD A/B).
+struct FS08ArtProbeState {
+  bool bPerfInit = false;
+  bool bPerf = false;
+  bool bPerfConfigLogged = false;
+  bool bPerfSummaryLogged = false;
+  bool bCameraSettledLogged = false;
+  float WindowStart = 0.0f;
+  TArray<float> WindowFrameMs, WindowGpuMs, WindowGameMs, WindowRenderMs;
+  TArray<float> RunFrameMs, RunGpuMs, RunGameMs, RunRenderMs;
+  TArray<float> StartedFrameMs, StartedGpuMs, StartedGameMs, StartedRenderMs;
+};
+FS08ArtProbeState GS08ArtProbe;
+constexpr float GS08PerfWarmupSeconds = 5.0f;
+constexpr float GS08PerfWindowSeconds = 5.0f;
+
+float S08PerfPercentile(TArray<float> Values, float Fraction) {
+  if (Values.Num() == 0) return 0.0f;
+  Values.Sort();
+  const int32 Index = FMath::Clamp(FMath::CeilToInt(Fraction * Values.Num()) - 1, 0,
+                                   Values.Num() - 1);
+  return Values[Index];
+}
+
+float S08PerfMean(const TArray<float>& Values) {
+  if (Values.Num() == 0) return 0.0f;
+  double Sum = 0.0;
+  for (const float V : Values) Sum += V;
+  return static_cast<float>(Sum / Values.Num());
+}
+
+FString S08PerfStats(const TArray<float>& FrameMs, const TArray<float>& GpuMs,
+                     const TArray<float>& GameMs, const TArray<float>& RenderMs) {
+  const float MeanFrame = S08PerfMean(FrameMs);
+  int32 Hitches = 0;
+  float MaxFrame = 0.0f;
+  for (const float V : FrameMs) {
+    if (V > 50.0f) ++Hitches;
+    MaxFrame = FMath::Max(MaxFrame, V);
+  }
+  return FString::Printf(
+      TEXT("frames=%d fps=%.2f frameMs avg=%.2f p50=%.2f p95=%.2f p99=%.2f max=%.2f hitches50=%d ")
+      TEXT("gpuMs avg=%.2f p50=%.2f p95=%.2f gameMs avg=%.2f p95=%.2f renderMs avg=%.2f p95=%.2f"),
+      FrameMs.Num(), MeanFrame > 0.0f ? 1000.0f / MeanFrame : 0.0f, MeanFrame,
+      S08PerfPercentile(FrameMs, 0.50f), S08PerfPercentile(FrameMs, 0.95f),
+      S08PerfPercentile(FrameMs, 0.99f), MaxFrame, Hitches, S08PerfMean(GpuMs),
+      S08PerfPercentile(GpuMs, 0.50f), S08PerfPercentile(GpuMs, 0.95f), S08PerfMean(GameMs),
+      S08PerfPercentile(GameMs, 0.95f), S08PerfMean(RenderMs),
+      S08PerfPercentile(RenderMs, 0.95f));
+}
+
+void S08WritePerfConfig() {
+  const IConsoleVariable* MaxFps =
+      IConsoleManager::Get().FindConsoleVariable(TEXT("t.MaxFPS"));
+  const IConsoleVariable* VSync = IConsoleManager::Get().FindConsoleVariable(TEXT("r.VSync"));
+  const UGameUserSettings* Settings = GEngine ? GEngine->GetGameUserSettings() : nullptr;
+  FS08Trace::Write(FString::Printf(
+      TEXT("PERF config tMaxFPS=%.1f frameRateLimit=%.1f vsync=%d smoothFrameRate=%d fixedFrameRate=%d rhi=%s"),
+      MaxFps ? MaxFps->GetFloat() : -1.0f, Settings ? Settings->GetFrameRateLimit() : -1.0f,
+      VSync ? VSync->GetInt() : -1, GEngine && GEngine->bSmoothFrameRate ? 1 : 0,
+      GEngine && GEngine->bUseFixedFrameRate ? 1 : 0,
+      GDynamicRHI ? GDynamicRHI->GetName() : TEXT("none")));
+}
+} // namespace
 
 AS08FlowGameMode::AS08FlowGameMode() {
   PrimaryActorTick.bCanEverTick = true;
@@ -3108,6 +3185,40 @@ void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
             bProjected ? 1 : 0, F.IsAlive() ? 1 : 0));
       }
     }
+    // ART-004 T1.1: camera state and the Head-socket projection of every
+    // visible skeletal art figure, so K2 crops are reproducible from the
+    // trace (crop centre = Head, head height = |proj(Head+6uu) - proj(Head-6uu)|).
+    if (BoardActor && BoardActor->IsArtActive()) {
+      const float DistErrPct = CameraTargetDistance > 0.0f
+          ? 100.0f * FMath::Abs(CameraCurrentDistance - CameraTargetDistance) / CameraTargetDistance
+          : -1.0f;
+      const float FocusErr = FVector::Dist(CameraCurrentFocus, CameraTargetFocus);
+      FS08Trace::Write(FString::Printf(
+          TEXT("SHOT camera dist=%.1f target=%.1f overview=%.1f errPct=%.3f focusErr=%.2f settled=%d zoom=%.2f"),
+          CameraCurrentDistance, CameraTargetDistance, CameraOverviewDistance, DistErrPct,
+          FocusErr, (DistErrPct >= 0.0f && DistErrPct < 1.0f && FocusErr < 1.0f) ? 1 : 0,
+          CameraCurrentDistance > 0.0f ? CameraOverviewDistance / CameraCurrentDistance : 0.0f));
+      for (const FS08BoardFighter& F : Fighters) {
+        const AS08FighterActor* Actor = BoardActor->FindFighterActor(F.Id);
+        const USkeletalMeshComponent* Skel =
+            Actor ? Actor->FindComponentByClass<USkeletalMeshComponent>() : nullptr;
+        if (!Skel || !Skel->IsVisible() || !Skel->GetSkeletalMeshAsset() ||
+            !Skel->DoesSocketExist(TEXT("Head"))) {
+          continue;
+        }
+        const FVector Head = Skel->GetSocketLocation(TEXT("Head"));
+        FVector2D HeadScreen(0, 0), TopScreen(0, 0), BottomScreen(0, 0);
+        const bool bHead = PC->ProjectWorldLocationToScreen(Head, HeadScreen, true);
+        const bool bTop = PC->ProjectWorldLocationToScreen(Head + FVector(0, 0, 6), TopScreen, true);
+        const bool bBottom =
+            PC->ProjectWorldLocationToScreen(Head - FVector(0, 0, 6), BottomScreen, true);
+        FS08Trace::Write(FString::Printf(
+            TEXT("SHOT head fighter=%s socket=Head mesh=%s world=(%.1f,%.1f,%.1f) screen=(%.1f,%.1f) top=(%.1f,%.1f) bottom=(%.1f,%.1f) headPx=%.1f projected=%d"),
+            *F.Id, *Skel->GetSkeletalMeshAsset()->GetName(), Head.X, Head.Y, Head.Z,
+            HeadScreen.X, HeadScreen.Y, TopScreen.X, TopScreen.Y, BottomScreen.X, BottomScreen.Y,
+            FVector2D::Distance(TopScreen, BottomScreen), (bHead && bTop && bBottom) ? 1 : 0));
+      }
+    }
   }
   // UI-INCLUSIVE evidence capture (GD-032/033): the old SceneCapture and
   // HighResShot paths render the 3D scene only - Slate HUD widgets never
@@ -3148,6 +3259,52 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   Super::Tick(DeltaSeconds);
   Elapsed += DeltaSeconds;
   PollAccumulator += DeltaSeconds;
+  // ART-004 T1.1 opt-in frame timing (-S08Perf). FApp::GetDeltaTime() is the
+  // real frame interval (it includes the t.MaxFPS wait), so fps is the
+  // effective rate; GPU/game/render thread times are the same engine globals
+  // the CSV profiler records (GPUTime, GameThreadTime, RenderThreadTime).
+  if (!GS08ArtProbe.bPerfInit) {
+    GS08ArtProbe.bPerfInit = true;
+    GS08ArtProbe.bPerf = FParse::Param(FCommandLine::Get(), TEXT("S08Perf"));
+    GS08ArtProbe.WindowStart = Elapsed;
+  }
+  if (GS08ArtProbe.bPerf) {
+    const float FrameMs = static_cast<float>(FApp::GetDeltaTime() * 1000.0);
+    const float GpuMs = static_cast<float>(FPlatformTime::ToMilliseconds(RHIGetGPUFrameCycles()));
+    const float GameMs = static_cast<float>(FPlatformTime::ToMilliseconds(GGameThreadTime));
+    const float RenderMs = static_cast<float>(FPlatformTime::ToMilliseconds(GRenderThreadTime));
+    GS08ArtProbe.WindowFrameMs.Add(FrameMs);
+    GS08ArtProbe.WindowGpuMs.Add(GpuMs);
+    GS08ArtProbe.WindowGameMs.Add(GameMs);
+    GS08ArtProbe.WindowRenderMs.Add(RenderMs);
+    if (Elapsed >= GS08PerfWarmupSeconds) {
+      GS08ArtProbe.RunFrameMs.Add(FrameMs);
+      GS08ArtProbe.RunGpuMs.Add(GpuMs);
+      GS08ArtProbe.RunGameMs.Add(GameMs);
+      GS08ArtProbe.RunRenderMs.Add(RenderMs);
+    }
+    if (Flow.IsValid() && Flow->GetStage() == ES08Stage::Started) {
+      GS08ArtProbe.StartedFrameMs.Add(FrameMs);
+      GS08ArtProbe.StartedGpuMs.Add(GpuMs);
+      GS08ArtProbe.StartedGameMs.Add(GameMs);
+      GS08ArtProbe.StartedRenderMs.Add(RenderMs);
+    }
+    if (Elapsed - GS08ArtProbe.WindowStart >= GS08PerfWindowSeconds) {
+      if (!GS08ArtProbe.bPerfConfigLogged) {
+        GS08ArtProbe.bPerfConfigLogged = true;
+        S08WritePerfConfig();
+      }
+      FS08Trace::Write(FString::Printf(
+          TEXT("PERF window t=%.1f-%.1f %s"), GS08ArtProbe.WindowStart, Elapsed,
+          *S08PerfStats(GS08ArtProbe.WindowFrameMs, GS08ArtProbe.WindowGpuMs,
+                        GS08ArtProbe.WindowGameMs, GS08ArtProbe.WindowRenderMs)));
+      GS08ArtProbe.WindowStart = Elapsed;
+      GS08ArtProbe.WindowFrameMs.Reset();
+      GS08ArtProbe.WindowGpuMs.Reset();
+      GS08ArtProbe.WindowGameMs.Reset();
+      GS08ArtProbe.WindowRenderMs.Reset();
+    }
+  }
   if (Flow.IsValid()) {
     // GD-028 recovery: bounded-backoff WS reconnect (idle when attached).
     Flow->TickConnectivity(DeltaSeconds);
@@ -3230,6 +3387,21 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
     }
   }
   UpdateBoardCamera(DeltaSeconds);
+  // ART-004 T1.1 K2 gate: log once when the requested focus zoom has arrived
+  // (|distance - target| < 1 % of the target and the focus point within 1 uu).
+  if (bArtPreviewDidSelectOwnHero && ArtPreviewFocusZoom > 0.0f &&
+      !GS08ArtProbe.bCameraSettledLogged && CameraTargetDistance > 0.0f) {
+    const float DistErrPct = 100.0f * FMath::Abs(CameraCurrentDistance - CameraTargetDistance) /
+                             CameraTargetDistance;
+    const float FocusErr = FVector::Dist(CameraCurrentFocus, CameraTargetFocus);
+    if (DistErrPct < 1.0f && FocusErr < 1.0f) {
+      GS08ArtProbe.bCameraSettledLogged = true;
+      FS08Trace::Write(FString::Printf(
+          TEXT("CAMERA settled elapsed=%.2f dist=%.1f target=%.1f errPct=%.3f focusErr=%.2f focus=(%.0f,%.0f,%.0f)"),
+          Elapsed, CameraCurrentDistance, CameraTargetDistance, DistErrPct, FocusErr,
+          CameraCurrentFocus.X, CameraCurrentFocus.Y, CameraCurrentFocus.Z));
+    }
+  }
   // Cobble's opening six figures can occupy every orthogonal square around
   // Medusa. Capture the authoritative, HUD-inclusive settled board even when
   // the historical one-step S08 demo has no legal move on this map.
@@ -3259,6 +3431,19 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   }
   if (AutoExitAfter > 0.0f && Elapsed > AutoExitAfter) {
     UE_LOG(LogTemp, Display, TEXT("S08_FLOW_COMPLETE elapsed=%f"), Elapsed);
+    if (GS08ArtProbe.bPerf && !GS08ArtProbe.bPerfSummaryLogged) {
+      GS08ArtProbe.bPerfSummaryLogged = true;
+      if (!GS08ArtProbe.bPerfConfigLogged) S08WritePerfConfig();
+      FS08Trace::Write(FString::Printf(
+          TEXT("PERF summary scope=afterWarmup warmup=%.0f elapsed=%.1f %s"),
+          GS08PerfWarmupSeconds, Elapsed,
+          *S08PerfStats(GS08ArtProbe.RunFrameMs, GS08ArtProbe.RunGpuMs,
+                        GS08ArtProbe.RunGameMs, GS08ArtProbe.RunRenderMs)));
+      FS08Trace::Write(FString::Printf(
+          TEXT("PERF summary scope=started elapsed=%.1f %s"), Elapsed,
+          *S08PerfStats(GS08ArtProbe.StartedFrameMs, GS08ArtProbe.StartedGpuMs,
+                        GS08ArtProbe.StartedGameMs, GS08ArtProbe.StartedRenderMs)));
+    }
     FS08Trace::Close();
     FGenericPlatformMisc::RequestExit(false);
   }

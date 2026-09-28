@@ -1,4 +1,5 @@
 #include "S08BoardActor.h"
+#include "S08ArtPreviewMedusa.h"
 #include "S08FighterActor.h"
 #include "S08TraceLog.h"
 #include "Components/InstancedStaticMeshComponent.h"
@@ -119,8 +120,10 @@ void AS08BoardActor::BeginPlay() {
       TEXT("/Game/ArtTests/ART005/Materials/M_ART005_RedSection_Review"));
   UMaterialInterface* Glyph = LoadObject<UMaterialInterface>(nullptr,
       TEXT("/Game/ArtTests/ART005/Materials/M_ART005_ZoneGlyph_Review"));
-  USkeletalMesh* Medusa = LoadObject<USkeletalMesh>(nullptr,
-      TEXT("/Game/ArtPreview/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate"));
+  const FS08MedusaCandidate MedusaCandidate = S08SelectMedusaCandidate();
+  USkeletalMesh* Medusa = MedusaCandidate.MeshPath
+      ? LoadObject<USkeletalMesh>(nullptr, MedusaCandidate.MeshPath)
+      : nullptr;
   UStaticMesh* Pedestal = LoadObject<UStaticMesh>(nullptr,
       TEXT("/Game/ArtPreview/Medusa/Meshes/SM_Medusa_Base_v2Candidate"));
   UMaterialInterface* TeamBlue = LoadObject<UMaterialInterface>(nullptr,
@@ -130,6 +133,10 @@ void AS08BoardActor::BeginPlay() {
   if (!Board || !Corner || !Stone || !Wood || !Iron || !Blue || !Red || !Glyph ||
       !Medusa || !Medusa->GetSkeleton() || !Pedestal || !TeamBlue || !TeamRed) {
     UE_LOG(LogTemp, Warning, TEXT("ARTPREVIEW Cobble assets missing; keeping grey board"));
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW Cobble assets missing medusaVariant=%s requested=%s medusa=%d; keeping grey board"),
+        MedusaCandidate.Variant, *MedusaCandidate.Requested,
+        Medusa && Medusa->GetSkeleton() ? 1 : 0));
     return;
   }
   const int32 StoneSlot = Board->GetMaterialIndex(TEXT("M_ART005_Stone_AtlasB_Provisional"));
@@ -150,6 +157,9 @@ void AS08BoardActor::BeginPlay() {
   bArtAssetsReady = true;
   UE_LOG(LogTemp, Display, TEXT("ARTPREVIEW Cobble assets ready"));
   FS08Trace::Write(TEXT("ARTPREVIEW Cobble assets ready"));
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW medusa candidate variant=%s mesh=%s requested=%s"),
+                                   MedusaCandidate.Variant, *Medusa->GetName(),
+                                   *MedusaCandidate.Requested));
 }
 
 void AS08BoardActor::EndPlay(const EEndPlayReason::Type Reason) {

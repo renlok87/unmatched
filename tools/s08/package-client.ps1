@@ -1,5 +1,8 @@
 param(
-  [string]$Log = (Join-Path ([System.IO.Path]::GetTempPath()) 's08-uat.log')
+  [string]$Log = (Join-Path ([System.IO.Path]::GetTempPath()) 's08-uat.log'),
+  # Cook+stage the already built game binary. Use when an editor with Live
+  # Coding blocks the UnmatchedEditor build step of BuildCookRun -build.
+  [switch]$SkipBuild
 )
 # Hidden RunUAT package (Development, cook+stage+pak).
 $ErrorActionPreference = 'Stop'
@@ -34,11 +37,27 @@ if ($LASTEXITCODE -eq 0) {
   Write-Output 'WARN: unreal/Unmatched/Content/S08 is gitignored; these binaries must be force-added at commit time or clean-checkout packaging will fail the gate above'
 }
 
+# -skipbuild stages Binaries\Win64\Unmatched.exe as it is. A game target built
+# with UBT -NoLiveCoding compiles WITH_LIVE_CODING=0 (so WITH_RELOAD=0 in a
+# monolithic game) against the installed engine's precompiled UnrealGame
+# objects built with WITH_RELOAD=1. The packaged client can then crash in UObject
+# class registration before the map loads, as the ART-004 v3 live run did (2026-09-28).
+if ($SkipBuild) {
+  $gameDefs = Join-Path $ProjectDir 'Intermediate\Build\Win64\x64\Unmatched\Development'
+  $defs = @(Get-ChildItem -LiteralPath $gameDefs -Recurse -Filter 'SharedDefinitions.*.h' -ErrorAction SilentlyContinue)
+  if ($defs.Count -eq 0) { throw "no game-target SharedDefinitions under $gameDefs; build the Unmatched game target before -SkipBuild" }
+  $noLive = @($defs | Select-String -SimpleMatch '#define WITH_LIVE_CODING 0' -List)
+  if ($noLive.Count -gt 0) {
+    throw "game target was built with -NoLiveCoding ($($noLive[0].Path)); rebuild Unmatched Win64 Development without -NoLiveCoding"
+  }
+}
+
 $argList = @(
   'BuildCookRun',
   "-project=$Uproject",
   '-noP4', '-platform=Win64', '-clientconfig=Development',
-  '-cook', '-stage', '-pak', '-package', '-compressed', '-build',
+  '-cook', '-stage', '-pak', '-package', '-compressed',
+  $(if ($SkipBuild) { '-skipbuild' } else { '-build' }),
   '-unattended', '-nosplash',
   '-AdditionalCookerArgs=-ini:EditorPerProjectUserSettings:[/Script/ModelContextProtocolEngine.ModelContextProtocolSettings]:bAutoStartServer=False'
 )
