@@ -1,0 +1,52 @@
+{
+  "command": "plate",
+  "tool": "qa010-tools 1.1.0",
+  "trace": "docs/game-design/evidence/ART-004/live-k2-label-probe-1p6/run-20260928-064001/phase2-client-host.trace.log",
+  "frame": {
+    "path": "docs/game-design/evidence/ART-004/live-k2-label-probe-1p6/run-20260928-064001/phase2-board-host-1920x1080.png",
+    "sha256": "8a6965143617bae3d63f9c78b75713b0136c42853ea4cca7f1ce1de78dd5d457",
+    "matches_shot": true
+  },
+  "shot": "phase2-board-host-1920x1080.png",
+  "shot_index": 0,
+  "projection": {
+    "mode": "trace",
+    "camera_pos": [
+      0.0,
+      642.0,
+      1017.0
+    ],
+    "camera_rot": [
+      -55.0,
+      -90.0,
+      0.0
+    ],
+    "hfov_deg": 35.0,
+    "viewport": [
+      1920,
+      1080
+    ],
+    "validation_pairs": 6,
+    "residual_max_px_trace_camera": 1.508,
+    "residual_max_px_used_camera": 1.508,
+    "tolerance_px": 2.0,
+    "ok": true,
+    "reason": "ok"
+  },
+  "status": "requires_new_trace",
+  "reason": "trace has no plate / reachable for this shot; требуется новая трасса",
+  "required_lines": {
+    "plate": "SHOT plate fighter=<fighterId> bbox=(x0,y0,x1,y1) [overlapReachable=<N>]",
+    "reachable": "SHOT reachable fighter=<fighterId> n=<N> cells=(x,y)(x,y)..."
+  },
+  "existing_hint": {
+    "existing_selection_line": {
+      "line": 38,
+      "own_hero": 1,
+      "selected": 1,
+      "fighter_name": "Medusa",
+      "reachable_count": 14,
+      "fighter_id": "f-0-hero"
+    }
+  }
+}

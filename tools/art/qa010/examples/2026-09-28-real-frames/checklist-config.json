@@ -1,0 +1,37 @@
+{
+  "title": "QA-010 чек-лист — ПРИМЕР работы инструментов на кадрах 2026-09-28 (не приёмка)",
+  "generated_utc": "2026-09-28T08:30:00Z",
+  "run": {
+    "назначение": "демонстрация T1.3 (этап 3): инструменты на существующих packaged-live кадрах; не QA-010 и не GD-058",
+    "K2_зум": "1,6× (Given QA-010); 5× — только в project-k2-5x.json как проверка подгонки камеры",
+    "sha256_exe": "не проверялся в примере",
+    "производные": "C:/tmp/qa010-examples/derived (не коммитятся; хеши в derive-manifest.json)"
+  },
+  "frames": {
+    "K1": {"path": "docs/game-design/evidence/ART-003/live-selection-run/run-20260928-061853/phase2-board-host-1920x1080.png"},
+    "K2": {"path": "docs/game-design/evidence/ART-004/live-k2-label-probe-1p6/run-20260928-064001/phase2-board-host-1920x1080.png"},
+    "K3": {"path": "docs/game-design/evidence/ART-003/live-combat-icon-damage-run/combat-20260928-073145/joiner/s09-combat-resolve-revealed.png"}
+  },
+  "results": [
+    {"k": "K1..K3", "path": "derive-manifest.json"},
+    {"k": "K1..K3", "path": "luma-frames.json"},
+    {"k": "K1", "path": "project-k1.json"},
+    {"k": "K1", "path": "c9-k1.json"},
+    {"k": "K2", "path": "plate-k2-1p6.json"},
+    {"k": "K3", "path": "icon-k3.json"}
+  ],
+  "manual": {},
+  "elements": [
+    {"frame": "K1", "id": "facade", "status": "отложено", "reason": "в кадре примера фасада нет"},
+    {"frame": "K1", "id": "lantern", "status": "отложено", "reason": "в кадре примера фонаря нет"},
+    {"frame": "K1", "id": "tray_darkness", "status": "есть", "reason": "деревянная рамка-поднос и чёрный фон; рваного края нет"},
+    {"frame": "K1", "id": "zone_pictograms", "status": "отложено", "reason": "временные зонные глифы (акт GD-058 2026-09-28)"},
+    {"frame": "K1", "id": "hud", "status": "есть", "reason": "панели сверху, рука снизу"},
+    {"frame": "K1", "id": "six_fighters", "status": "есть", "reason": "Medusa + 5 серых блок-аутов; трасса FIGHTERS n=6"},
+    {"frame": "K2", "id": "plate", "status": "отложено", "reason": "полной плашки имя/HP/статус нет (акт GD-058 2026-09-28); трассы PLATE нет"},
+    {"frame": "K3", "id": "poses", "status": "отложено", "reason": "анимации остановлены решением пользователя (акт GD-058)"},
+    {"frame": "K3", "id": "inspector_2d", "status": "отложено", "reason": "инспектор с 2D-артом не снят (акт ART-003 2026-09-28)"},
+    {"frame": "K3", "id": "target_frame_icon", "status": "есть", "reason": "четыре дуги + пробная пиктограмма (акт ART-003 2026-09-28)"},
+    {"frame": "K3", "id": "damage_result", "status": "есть", "reason": "число урона на соседнем кадре s09-damage-number.png"}
+  ]
+}

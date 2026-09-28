@@ -1,0 +1,107 @@
+{
+  "command": "luma",
+  "tool": "qa010-tools 1.1.0",
+  "stride": 1,
+  "definition": "Rec.709 luma on 8-bit sRGB; percentile = sorted[floor(n*q)] as tools/s05/s05_frame_measure.ps1",
+  "frames": [
+    {
+      "path": "docs/game-design/evidence/ART-003/live-selection-run/run-20260928-061853/phase2-board-host-1920x1080.png",
+      "sha256": "39261d05c22e786583da13be7de13964a3b811b0b3e7642749f7a1744b54743b",
+      "size": [
+        1920,
+        1080
+      ],
+      "stats": {
+        "pixels": 2073600,
+        "luma_mean": 35.474,
+        "luma_p50": 0.0,
+        "luma_p90": 92.004,
+        "luma_min": 0.0,
+        "luma_max": 255.0,
+        "dark_under_30_pct": 55.159,
+        "bright_over_150_pct": 1.692,
+        "rel_luminance_mean": 0.043354
+      },
+      "regions": {
+        "board": {
+          "spec": "board=trace-cells:all",
+          "proxy": false,
+          "note": "30 projected cells from trace",
+          "stats": {
+            "pixels": 622450,
+            "luma_mean": 86.212,
+            "luma_p50": 83.213,
+            "luma_p90": 106.715,
+            "luma_min": 1.213,
+            "luma_max": 242.0,
+            "dark_under_30_pct": 1.01,
+            "bright_over_150_pct": 2.816,
+            "rel_luminance_mean": 0.105928
+          }
+        },
+        "tray_proxy": {
+          "spec": "tray_proxy=trace-ring:0.05,0.35",
+          "proxy": true,
+          "note": "board-ring proxy (not a stencil layer mask)",
+          "stats": {
+            "pixels": 149022,
+            "luma_mean": 55.493,
+            "luma_p50": 61.97,
+            "luma_p90": 97.928,
+            "luma_min": 0.0,
+            "luma_max": 192.0,
+            "dark_under_30_pct": 18.396,
+            "bright_over_150_pct": 2.194,
+            "rel_luminance_mean": 0.056965
+          }
+        },
+        "hud_top_left": {
+          "spec": "hud_top_left=bbox:0,0,610,140",
+          "proxy": false,
+          "note": "",
+          "stats": {
+            "pixels": 85400,
+            "luma_mean": 45.671,
+            "luma_p50": 30.164,
+            "luma_p90": 56.0,
+            "luma_min": 0.0,
+            "luma_max": 255.0,
+            "dark_under_30_pct": 4.044,
+            "bright_over_150_pct": 5.204,
+            "rel_luminance_mean": 0.055335
+          }
+        }
+      },
+      "trace": {
+        "trace": "docs/game-design/evidence/ART-003/live-selection-run/run-20260928-061853/phase2-client-host.trace.log",
+        "shot": "phase2-board-host-1920x1080.png",
+        "shot_index": 0,
+        "shot_matches_frame": true,
+        "projection": {
+          "mode": "trace",
+          "camera_pos": [
+            0.0,
+            1107.0,
+            1582.0
+          ],
+          "camera_rot": [
+            -55.0,
+            -90.0,
+            0.0
+          ],
+          "hfov_deg": 35.0,
+          "viewport": [
+            1920,
+            1080
+          ],
+          "validation_pairs": 6,
+          "residual_max_px_trace_camera": 1.342,
+          "residual_max_px_used_camera": 1.342,
+          "tolerance_px": 2.0,
+          "ok": true,
+          "reason": "ok"
+        }
+      }
+    }
+  ]
+}

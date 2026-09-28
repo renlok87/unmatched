@@ -1,0 +1,76 @@
+{
+  "command": "derive",
+  "tool": "qa010-tools 1.1.0",
+  "method": {
+    "gray": "Rec.709 luma Y' = 0.2126R'+0.7152G'+0.0722B' on 8-bit sRGB values, round half up, replicated to RGB",
+    "deuteranopia": "Machado, Oliveira, Fernandes 2009, severity 1.0; IEC 61966-2-1 sRGB decode -> matrix on linear RGB -> clip [0,1] -> sRGB encode -> round half up",
+    "matrix": [
+      [
+        0.367322,
+        0.860646,
+        -0.227968
+      ],
+      [
+        0.280085,
+        0.672501,
+        0.047413
+      ],
+      [
+        -0.01182,
+        0.04294,
+        0.968881
+      ]
+    ],
+    "alpha": "ignored (not composited)"
+  },
+  "entries": [
+    {
+      "input": "docs/game-design/evidence/ART-003/live-selection-run/run-20260928-061853/phase2-board-host-1920x1080.png",
+      "input_sha256": "39261d05c22e786583da13be7de13964a3b811b0b3e7642749f7a1744b54743b",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/qa010-examples/derived/run-20260928-061853/phase2-board-host-1920x1080.gray.png",
+        "sha256": "21cddbe1f3b1624cb6fe2ff619f4985e8a8f950012aa08da22cd903345465b7c"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/qa010-examples/derived/run-20260928-061853/phase2-board-host-1920x1080.deuteranopia.png",
+        "sha256": "39fac29f374bd096550a0e5bf96f1bcbbb823e110d71bebdf041c3a4d077c2f5"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/ART-004/live-k2-label-probe-1p6/run-20260928-064001/phase2-board-host-1920x1080.png",
+      "input_sha256": "8a6965143617bae3d63f9c78b75713b0136c42853ea4cca7f1ce1de78dd5d457",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/qa010-examples/derived/run-20260928-064001/phase2-board-host-1920x1080.gray.png",
+        "sha256": "78fb2f189a3a216cb294c343f7a0f5f8892830c5a08eae35cca8a604cca674e1"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/qa010-examples/derived/run-20260928-064001/phase2-board-host-1920x1080.deuteranopia.png",
+        "sha256": "538edd8179166ac6ebadc0c7ade2718ed3e2967ebc7f919161781a80eb1b1ef6"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/ART-003/live-combat-icon-damage-run/combat-20260928-073145/joiner/s09-combat-resolve-revealed.png",
+      "input_sha256": "7aa09c19a62a779dd1bafbd366d3edf70dee7716f7018dfb50384e1a142952b8",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/qa010-examples/derived/s09-combat-resolve-revealed.gray.png",
+        "sha256": "f066079f444d9f12848d0bdb64f1c84f2a924771c483a4cbb1efb77864b50c9f"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/qa010-examples/derived/s09-combat-resolve-revealed.deuteranopia.png",
+        "sha256": "d93ea431858f6c417112a9f77d1ad9d65dcba3e2cc462c23524de585202c3483"
+      }
+    }
+  ]
+}

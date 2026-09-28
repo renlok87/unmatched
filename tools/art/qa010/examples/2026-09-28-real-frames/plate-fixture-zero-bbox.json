@@ -1,0 +1,50 @@
+{
+  "command": "plate",
+  "tool": "qa010-tools 1.1.0",
+  "trace": "tools/art/qa010/fixtures/new-trace-k2-plate.trace.txt",
+  "shot": "k2-plate-zero-bbox.png",
+  "shot_index": 7,
+  "projection": {
+    "mode": "trace",
+    "camera_pos": [
+      0.0,
+      642.0,
+      1017.0
+    ],
+    "camera_rot": [
+      -55.0,
+      -90.0,
+      0.0
+    ],
+    "hfov_deg": 35.0,
+    "viewport": [
+      1920,
+      1080
+    ],
+    "validation_pairs": 6,
+    "residual_max_px_trace_camera": 1.508,
+    "residual_max_px_used_camera": 1.508,
+    "tolerance_px": 2.0,
+    "ok": true,
+    "reason": "ok"
+  },
+  "status": "insufficient_input",
+  "reason": "plate bbox [0.0, 0.0, 0.0, 0.0] has zero area (trace:shot-block@line75): свёрнутый или не размеченный виджет — ошибка трассы или кадра, не pass",
+  "plate": {
+    "bbox": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "source": "trace:shot-block@line75",
+    "area_px2": 0.0,
+    "visible_area_px2": 0.0
+  },
+  "checked_cells": {
+    "source": "trace:shot-block@line74",
+    "count": 14,
+    "visible": 14,
+    "offscreen": []
+  }
+}
