@@ -57,5 +57,7 @@ private:
   UPROPERTY()
   TObjectPtr<UStaticMeshComponent> ArtPlaceholder;
 
+  bool bArtSelectionRingLoaded = false;
+
   FS08BoardFighter Fighter;
 };

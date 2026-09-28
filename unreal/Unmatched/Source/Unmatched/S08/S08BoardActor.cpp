@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/DirectionalLightComponent.h"
 #include "Components/PointLightComponent.h"
+#include "Components/SceneComponent.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/PointLight.h"
 #include "Engine/SkeletalMesh.h"
@@ -387,35 +388,74 @@ void AS08BoardActor::SetSelectedFighter(const FString& FighterId,
 
   UMaterialInterface* Solid = LoadObject<UMaterialInterface>(
       nullptr, TEXT("/Game/S08/M_S08_Solid.M_S08_Solid"));
+  const FS08BoardFighter* Selected = nullptr;
+  for (const FS08BoardFighter& Fighter : Fighters) {
+    if (Fighter.Id == FighterId) {
+      Selected = &Fighter;
+      break;
+    }
+  }
+  int32 ArtOutlineCells = 0;
+  bool bArtOutlinePositionsCorrect = true;
   for (const uint64 Key : ReachableCells) {
     const int32 X = static_cast<int32>(Key >> 32);
     const int32 Y = static_cast<int32>(Key & 0xFFFFFFFF);
+    const bool bOwnCell = Selected && Selected->X == X && Selected->Y == Y;
+    // The authored ring already marks the selected unit; avoid covering its
+    // sculpt and name with a second cell overlay in the art review.
+    if (bArtActive && bOwnCell) continue;
+    const FVector CellCenter = BoardModel.CellToWorld(X, Y);
     AActor* Tile = GetWorld()->SpawnActor<AActor>(AActor::StaticClass(),
-                                                  BoardModel.CellToWorld(X, Y),
+                                                  CellCenter,
                                                   FRotator::ZeroRotator);
     if (!Tile) continue;
-    UStaticMeshComponent* Mesh =
-        NewObject<UStaticMeshComponent>(Tile, TEXT("Highlight"));
-    Mesh->SetStaticMesh(BlockerTiles->GetStaticMesh());
-    Mesh->SetWorldScale3D(FVector(0.85f, 0.85f, 0.02f));
-    Mesh->SetRelativeLocation(FVector(0, 0, 1.5f));
-    Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    // AActor has no root of its own. Without one, attaching the mesh after
+    // SpawnActor collapses all highlights to the world origin.
+    USceneComponent* Root = NewObject<USceneComponent>(Tile, TEXT("HighlightRoot"));
+    Tile->SetRootComponent(Root);
+    Root->RegisterComponent();
+    Tile->SetActorLocation(CellCenter);
+    if (bArtActive) {
+      ++ArtOutlineCells;
+      bArtOutlinePositionsCorrect &= Tile->GetActorLocation().Equals(CellCenter, 0.01f);
+    }
+    UMaterialInstanceDynamic* Mid = nullptr;
     if (Solid) {
-      UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Solid, Tile);
-      // The mover's own cell (zero-step legal resolve) gets a neutral tint.
-      const FS08BoardFighter* Selected = nullptr;
-      for (const FS08BoardFighter& Fighter : Fighters) {
-        if (Fighter.Id == FighterId) Selected = &Fighter;
-      }
-      const bool bOwnCell = Selected && Selected->X == X && Selected->Y == Y;
+      Mid = UMaterialInstanceDynamic::Create(Solid, Tile);
       Mid->SetVectorParameterValue(TEXT("Tint"),
                                    bOwnCell ? FLinearColor(0.5f, 0.5f, 0.55f)
-                                            : FLinearColor(0.15f, 0.9f, 0.3f));
-      Mesh->SetMaterial(0, Mid);
+                                            : FLinearColor(0.12f, 0.65f, 0.22f));
     }
-    Tile->SetRootComponent(Mesh);
-    Mesh->RegisterComponent();
+    auto AddHighlightPart = [&](const FVector& Position, const FVector& Scale) {
+      UStaticMeshComponent* Mesh = NewObject<UStaticMeshComponent>(Tile);
+      Mesh->SetupAttachment(Root);
+      Mesh->SetStaticMesh(BlockerTiles->GetStaticMesh());
+      Mesh->SetRelativeLocation(Position);
+      Mesh->SetRelativeScale3D(Scale);
+      Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+      if (Mid) Mesh->SetMaterial(0, Mid);
+      Mesh->RegisterComponent();
+    };
+    if (bArtActive) {
+      // Two diagonal L-shaped corner ticks keep cobble, labels and occupied
+      // fighters visible. Their shape differs from the zone diamond/bars.
+      for (int32 Corner = 0; Corner < 2; ++Corner) {
+        const float Sign = Corner == 0 ? -1.0f : 1.0f;
+        AddHighlightPart(FVector(Sign * 29.0f, Sign * 38.0f, 1.8f),
+                         FVector(0.18f, 0.03f, 0.005f));
+        AddHighlightPart(FVector(Sign * 38.0f, Sign * 29.0f, 1.8f),
+                         FVector(0.03f, 0.18f, 0.005f));
+      }
+    } else {
+      AddHighlightPart(FVector(0, 0, 1.5f),
+                       FVector(0.85f, 0.85f, 0.02f));
+    }
     HighlightTiles.Add(Tile);
+  }
+  if (bArtActive) {
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW reachable corners cells=%d placed=%d"),
+        ArtOutlineCells, bArtOutlinePositionsCorrect ? 1 : 0));
   }
 }
 

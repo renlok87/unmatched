@@ -4,10 +4,13 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMesh.h"
+#include "Engine/StaticMesh.h"
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Materials/MaterialInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "UObject/ConstructorHelpers.h"
 
 namespace {
@@ -83,6 +86,13 @@ AS08FighterActor::AS08FighterActor() {
 
 void AS08FighterActor::BeginPlay() {
   Super::BeginPlay();
+  if (FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) {
+    if (UStaticMesh* ArtRing = LoadObject<UStaticMesh>(nullptr,
+            TEXT("/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_SelectionRing"))) {
+      Ring->SetStaticMesh(ArtRing);
+      bArtSelectionRingLoaded = true;
+    }
+  }
   // Text faces the camera (+Y side, camera yaw -90 looks along -Y).
   Label->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
   HpLabel->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
@@ -202,8 +212,14 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
     const float FigureScale = Fighter.bIsHero ? 1.0f : 0.78f;
     Base->SetWorldScale3D(FVector(.4f * FigureScale, .4f * FigureScale, .02f));
     Base->SetRelativeLocation(FVector(0, 0, -1.0f));
-    Ring->SetWorldScale3D(FVector(.47f * FigureScale, .47f * FigureScale, .02f));
-    Ring->SetRelativeLocation(FVector(0, 0, .5f));
+    if (bArtSelectionRingLoaded) {
+      // The authored mesh is already Ø40 uu and hollow, with its own Z offset.
+      Ring->SetWorldScale3D(FVector(FigureScale));
+      Ring->SetRelativeLocation(FVector::ZeroVector);
+    } else {
+      Ring->SetWorldScale3D(FVector(.47f * FigureScale, .47f * FigureScale, .02f));
+      Ring->SetRelativeLocation(FVector(0, 0, .5f));
+    }
     Label->SetRelativeLocation(FVector(0, 0, Fighter.bIsHero ? 82.0f : 65.0f));
     HpLabel->SetRelativeLocation(FVector(0, 0, Fighter.bIsHero ? 66.0f : 52.0f));
   }
@@ -235,4 +251,9 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
 
 void AS08FighterActor::SetSelected(bool bSelected) {
   Ring->SetVisibility(bSelected);
+  if (bSelected && bArtSelectionRingLoaded) {
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW selection ring shown fighter=%s mesh=%s"),
+        *Fighter.Name, *Ring->GetStaticMesh()->GetName()));
+  }
 }

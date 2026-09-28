@@ -143,6 +143,8 @@ void AS08FlowGameMode::BeginPlay() {
   FParse::Value(FCommandLine::Get(), TEXT("S08ExitAfter="), AutoExitAfter);
   if (FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) {
     FParse::Value(FCommandLine::Get(), TEXT("ArtPreviewShotAfter="), ArtPreviewShotAfter);
+    bArtPreviewSelectOwnHero = FParse::Param(
+        FCommandLine::Get(), TEXT("ArtPreviewSelectOwnHero"));
   }
   // S10/GD-039: the auto host create mode (-S08Mode=VS_AI drives the packaged
   // one-client VS_AI gate; anything else stays ONE_V_ONE).
@@ -3082,6 +3084,25 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   if (IllegalUntil > 0.0f && Elapsed > IllegalUntil) {
     IllegalUntil = 0.0f;
     if (BoardActor) BoardActor->HideIllegalCell();
+  }
+  // An opt-in visual probe uses the same local selection path as a click,
+  // without sending a gameplay mutation. The packaged screenshot then shows
+  // the authored selection-ring mesh against the live board and HUD.
+  if (bArtPreviewSelectOwnHero && !bArtPreviewDidSelectOwnHero &&
+      ArtPreviewShotAfter >= 2.0f && Elapsed >= ArtPreviewShotAfter - 2.0f &&
+      BoardActor && BoardActor->IsArtActive() && Flow.IsValid() &&
+      Flow->GetStage() == ES08Stage::Started) {
+    for (const FS08BoardFighter& Entry : Fighters) {
+      if (Entry.OwnerId == Flow->GetUserId() && Entry.bIsHero && Entry.IsAlive()) {
+        SelectFighter(Entry.Id);
+        bArtPreviewDidSelectOwnHero = true;
+        FS08Trace::Write(FString::Printf(
+            TEXT("ARTPREVIEW selection ownHero=1 selected=%d fighter=%s reachable=%d"),
+            SelectedFighterId == Entry.Id ? 1 : 0, *Entry.Name,
+            ReachableCells.Num()));
+        break;
+      }
+    }
   }
   // Cobble's opening six figures can occupy every orthogonal square around
   // Medusa. Capture the authoritative, HUD-inclusive settled board even when
