@@ -1,0 +1,91 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-b6253e58",
+  "asset_id": "ASSET-MEDUSA-001",
+  "service": "tripo-studio",
+  "task_id": "b6253e58-5875-4321-867a-fad5c2d413e1",
+  "parent_task_id": "d562f057-1455-4663-8cd8-bb738175111d",
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/segmentation/b6253e58-5875-4321-867a-fad5c2d413e1",
+  "date": "2026-09-27",
+  "model_version": {
+    "ui_label": "clone of H3.1 Triangle original (d562f057)",
+    "backend": null
+  },
+  "generation": null,
+  "operations": [
+    {
+      "op": "segment",
+      "mode": "Balanced",
+      "evidence": "docs/game-design/evidence/ART-004/tripo-production-20260927/segment-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 40,
+        "trial_quoted": 0,
+        "observed_debit": 0,
+        "balance_before": 25105,
+        "balance_after": 25105
+      },
+      "note": "Quad models are rejected by Segment; run on the Triangle original clone"
+    },
+    {
+      "op": "retopology",
+      "settings": {
+        "topology": "Quad",
+        "smart_mesh": "P1.0 on",
+        "target_polygons": 10000
+      },
+      "evidence": "docs/game-design/evidence/ART-004/tripo-production-20260927/segmented-retopo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 40,
+        "observed_debit": 40,
+        "balance_before": 25105,
+        "balance_after": 25065
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "segmented-15-glb",
+      "path": "blender/ASSET-MEDUSA-001/tripo-source/b6253e58/medusa-segmented-15.glb",
+      "expected_sha256": "64febfeb270274e0b9bf96132e5865a0c5f6e18a74785a92daa1a5348665933e",
+      "expected_bytes": 64178024,
+      "produced_by": "segment",
+      "origin": "Studio GLB export, 4k Current texture tier, unmodified"
+    },
+    {
+      "role": "segmented-retopo-glb",
+      "path": "blender/ASSET-MEDUSA-001/tripo-source/b6253e58/medusa-segmented-retopo.glb",
+      "expected_sha256": "0400f2b44f80b14005e03d997b83453e7d35e54f8ddd537b5dbf7770c0792e56",
+      "expected_bytes": 3329072,
+      "produced_by": "retopology",
+      "origin": "Studio GLB export, unmodified"
+    }
+  ],
+  "expectations": {
+    "segmented-15-glb": {
+      "glb_mesh_count": 15,
+      "glb_triangles": 1883819,
+      "glb_materials": 15,
+      "glb_images": 45,
+      "glb_skins": 0
+    },
+    "segmented-retopo-glb": {
+      "glb_mesh_count": 15,
+      "glb_triangles": 21177,
+      "glb_materials": 15,
+      "glb_images": 45,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "docs/game-design/evidence/ART-004/tripo-production-20260927/segment-run.json",
+    "docs/game-design/evidence/ART-004/tripo-production-20260927/segmented-retopo-run.json",
+    "docs/game-design/evidence/ART-004/tripo-production-20260927/README.md"
+  ],
+  "notes": [
+    "Credits are Studio credits of the observed account; not API credits, not USD.",
+    "accepted_game_asset=false in evidence; the existing Blender candidate (blender/ASSET-MEDUSA-001) is built from segmented-retopo-glb and is not touched here."
+  ]
+}

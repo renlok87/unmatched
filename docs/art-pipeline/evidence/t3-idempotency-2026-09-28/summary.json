@@ -1,0 +1,85 @@
+{
+ "schema": "unmatched.tripo-pipeline.t3-evidence/1",
+ "date": "2026-09-28",
+ "status": "измерено (технический прогон каркаса; не художественная приёмка)",
+ "tool_version": "0.2.0",
+ "backend_used": "headless (blender -b, Blender 5.2.2 LTS); live Blender/UE не использовались",
+ "run_dir": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold",
+ "sources_registered": {
+  "tripo-b6253e58": {
+   "task_id": "b6253e58-5875-4321-867a-fad5c2d413e1",
+   "service": "tripo-studio",
+   "historical_credits_observed": {
+    "studio-credits": 40
+   },
+   "files": {
+    "segmented-15-glb": "64febfeb270274e0b9bf96132e5865a0c5f6e18a74785a92daa1a5348665933e",
+    "segmented-retopo-glb": "0400f2b44f80b14005e03d997b83453e7d35e54f8ddd537b5dbf7770c0792e56"
+   }
+  },
+  "tripo-d562f057": {
+   "task_id": "d562f057-1455-4663-8cd8-bb738175111d",
+   "service": "tripo-studio",
+   "historical_credits_observed": {
+    "studio-credits": 95
+   },
+   "files": {
+    "retopo-10k-glb": "2edb3f50ecac8582de8ad68179105b13644fa8c7fa75760c5bb344f06bdb5a7d",
+    "source-glb": "618fba23ecfa6fc46db44d855bcbcf0efddbe2fb38409178608c70fa96fe0918",
+    "source-texture-basecolor": "4ec7543bc6bc74da9e214a9817c643c6795efa03dd2e9c72e7f5239f94b28557",
+    "source-texture-normal": "90cc33ce118de61bfa60c73ca06ada12beb8f63772448db613934c4df1460a90",
+    "source-texture-rm": "ab97ab8febf9f7077b43b7f24c9b7933bced7717999dd492c3cfe2da49a88c6f"
+   }
+  }
+ },
+ "external_cost_this_run": {
+  "tripo_calls": 0,
+  "paid_tasks_created": 0,
+  "studio_credits": 0,
+  "api_credits": 0,
+  "usd": 0
+ },
+ "transitions": {
+  "snapshot-0-before-v0.2.0 -> snapshot-1-after-first-run": {
+   "export/ASSET-MEDUSA-001_segmented-retopo-glb.fbx": "bytes changed",
+   "logs/export.log": "bytes changed",
+   "logs/import.log": "bytes changed",
+   "manifest.json": "bytes changed",
+   "reports/export-report.json": "bytes changed",
+   "reports/preflight.json": "bytes changed",
+   "work/ASSET-MEDUSA-001_segmented-retopo-glb.blend": "bytes changed"
+  },
+  "snapshot-1-after-first-run -> snapshot-2-after-second-run": {},
+  "snapshot-2-after-second-run -> snapshot-3-after-interrupt-resume": {
+   "logs/export.log": "bytes changed",
+   "logs/import.log": "bytes changed",
+   "manifest.json": "bytes changed",
+   "work/ASSET-MEDUSA-001_segmented-retopo-glb.blend": "bytes changed"
+  },
+  "snapshot-3-after-interrupt-resume -> snapshot-4-after-run-post-resume": {}
+ },
+ "exports_index": [
+  {
+   "sha256": "46f506f5db486e8978dd2455384ec3257af828994e4837ab18fa6152b84e7082",
+   "bytes": 1488380,
+   "superseded_by": "749b72c6faab9a24f32106fcc328fc6dc5d466894fb5ae50e25842ae890c54a8",
+   "written_at": "2026-09-28T04:55:41+00:00"
+  },
+  {
+   "sha256": "749b72c6faab9a24f32106fcc328fc6dc5d466894fb5ae50e25842ae890c54a8",
+   "bytes": 1485132,
+   "superseded_by": null,
+   "written_at": "2026-09-28T05:21:46+00:00"
+  }
+ ],
+ "current_fbx_sha256": "749b72c6faab9a24f32106fcc328fc6dc5d466894fb5ae50e25842ae890c54a8",
+ "tripo_source_untouched": true,
+ "notes": [
+  "snapshot-0 -> snapshot-1: first run of tool 0.2.0 on the run dir created by 0.1.0; import/export scripts changed (isolation modes), so both stages re-executed. import-report.json kept identical bytes (verify skipped); the FBX bytes changed once (new export flow), the old export entry is marked superseded, not duplicated.",
+  "snapshot-1 -> snapshot-2: second identical run; no file rewritten (all stages skipped, preflight revalidated).",
+  "snapshot-2 -> snapshot-3: `run --force import --interrupt-at import` (exit 75, stage left 'running', lock left behind), plain `run` refused with exit 5, `resume` re-executed import and export; FBX and all reports 'unchanged' by hash, only the non-deterministic work .blend (gitignored), logs and manifest counters changed; exports index still has one current entry.",
+  "snapshot-3 -> snapshot-4: run after resume is a no-op.",
+  "prepare-generation --dry-run with the exact Medusa v5 front/left/back inputs and H3.1 label was refused (exit 3) as a duplicate of Tripo task d562f057: no paid task can be prepared twice by accident.",
+  "ue-import with --backend headless was refused (exit 2); the UE stage is verified only with --backend mcp (T4)."
+ ]
+}

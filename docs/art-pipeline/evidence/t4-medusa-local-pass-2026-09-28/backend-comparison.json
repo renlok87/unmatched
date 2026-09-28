@@ -1,0 +1,110 @@
+{
+ "atlas_equals_committed_blender_asset_textures": {
+  "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_BC.png": true,
+  "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_N.png": true,
+  "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_N_OpenGL.png": true,
+  "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_ORM.png": true
+ },
+ "blender": {
+  "headless": {
+   "backend": "headless",
+   "blender": "5.2.2 LTS",
+   "describe": {
+    "backend": "headless",
+    "command": [
+     "blender.exe"
+    ],
+    "isolation": "process"
+   }
+  },
+  "mcp": {
+   "backend": "mcp",
+   "blender": "5.2.2 LTS",
+   "describe": {
+    "backend": "mcp",
+    "client": "blender_mcp.py",
+    "endpoint": "127.0.0.1:9876 (blender-mcp addon)",
+    "isolation": "live"
+   }
+  }
+ },
+ "build_report_note": "only isolation_note differs (live vs process); every measured value is identical",
+ "build_report_top_level_keys_that_differ": [
+  "isolation_note"
+ ],
+ "files": {
+  "export/SK_Medusa_Candidate.fbx": {
+   "headless": "8e83019a05b9cfcfb4ced34442bea2834a58347842fb551afa83d35b4fd19bcc",
+   "identical": true,
+   "mcp": "8e83019a05b9cfcfb4ced34442bea2834a58347842fb551afa83d35b4fd19bcc"
+  },
+  "export/SM_Medusa_Base_Candidate.fbx": {
+   "headless": "63816adc63f020054956c1c3d4a9ae5d3f5a28c439db87f601e6a7a191102285",
+   "identical": true,
+   "mcp": "63816adc63f020054956c1c3d4a9ae5d3f5a28c439db87f601e6a7a191102285"
+  },
+  "reports/atlas-report.json": {
+   "headless": "a598ea3dafb026fe0d1dc3a0d8807b4c1f5fdd2cc38dd4ee65e0b0bca9c06730",
+   "identical": true,
+   "mcp": "a598ea3dafb026fe0d1dc3a0d8807b4c1f5fdd2cc38dd4ee65e0b0bca9c06730"
+  },
+  "reports/build-report.json": {
+   "headless": "78e25e5aac24e66d37e0ad7e546cbc3d69b6da62b39850b39a092b4f3186d99e",
+   "identical": false,
+   "mcp": "501161d0ac6a852ba5b0c233e1eb2e6be6efafe7907c0f661776e473d876afd3"
+  },
+  "reports/import-report.json": {
+   "headless": "ba4140a1b83c43a7a3fd13e7b5a7da016a399b7d6deaa1797f82226d5427c85a",
+   "identical": true,
+   "mcp": "ba4140a1b83c43a7a3fd13e7b5a7da016a399b7d6deaa1797f82226d5427c85a"
+  },
+  "reports/verify-report.json": {
+   "headless": "f8b4bae1d1d926826d567b27fcc4e05515dd1de6cb737a96fbe2283f927309f2",
+   "identical": true,
+   "mcp": "f8b4bae1d1d926826d567b27fcc4e05515dd1de6cb737a96fbe2283f927309f2"
+  },
+  "textures/T_Medusa_Candidate_Atlas_BC.png": {
+   "headless": "6b5fd7649a733101fb67f9831fa55f9bc703a9ad3912e9a574ec8685bc969fd9",
+   "identical": true,
+   "mcp": "6b5fd7649a733101fb67f9831fa55f9bc703a9ad3912e9a574ec8685bc969fd9"
+  },
+  "textures/T_Medusa_Candidate_Atlas_N.png": {
+   "headless": "8ad31dda8480506736a5886e93b29425cce2836514a105dd27242fe41ffd36d4",
+   "identical": true,
+   "mcp": "8ad31dda8480506736a5886e93b29425cce2836514a105dd27242fe41ffd36d4"
+  },
+  "textures/T_Medusa_Candidate_Atlas_N_OpenGL.png": {
+   "headless": "f893bbae9148c7805ae20a1103903f38cc6209c347c8d81ab419a514c059f2e3",
+   "identical": true,
+   "mcp": "f893bbae9148c7805ae20a1103903f38cc6209c347c8d81ab419a514c059f2e3"
+  },
+  "textures/T_Medusa_Candidate_Atlas_ORM.png": {
+   "headless": "c75702470f8cfff0575338ac7c8b56eacb99f8c44edcff234d9a0a2df29269ab",
+   "identical": true,
+   "mcp": "c75702470f8cfff0575338ac7c8b56eacb99f8c44edcff234d9a0a2df29269ab"
+  }
+ },
+ "runs": {
+  "headless": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-headless-compare",
+  "mcp": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-local-pass"
+ },
+ "stage_backends": {
+  "headless": {
+   "atlas": "headless",
+   "build": "headless",
+   "import": "headless",
+   "preflight": "headless",
+   "verify": "headless"
+  },
+  "mcp": {
+   "atlas": "mcp",
+   "build": "mcp",
+   "import": "mcp",
+   "preflight": "mcp",
+   "ue-import": "mcp",
+   "verify": "mcp"
+  }
+ },
+ "status": "measured",
+ "what": "Blender stages of the same skeletal-candidate run config executed once through the live Blender (blender-mcp, isolation live) and once as separate headless blender -b processes"
+}

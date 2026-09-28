@@ -1,0 +1,102 @@
+$ python tools/tripo-pipeline/tripo_pipeline.py init --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold --asset-id ASSET-MEDUSA-001 --primary-source tripo-b6253e58 --primary-role segmented-retopo-glb
+init: already initialised, no change
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py register-source --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold --spec art/pipeline-candidates/ASSET-MEDUSA-001/source-specs/tripo-d562f057.json
+register-source: tripo-d562f057 already registered with identical content; no change
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py register-source --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold --spec art/pipeline-candidates/ASSET-MEDUSA-001/source-specs/tripo-b6253e58.json
+register-source: tripo-b6253e58 already registered with identical content; no change
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py snapshot --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold --out docs/art-pipeline/evidence/t3-idempotency-2026-09-28/snapshot-0-before-v0.2.0.json
+snapshot: 9 files -> C:\Users\ren\WebstormProjects\unmached\unmached\docs\art-pipeline\evidence\t3-idempotency-2026-09-28\snapshot-0-before-v0.2.0.json
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py run --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold
+  preflight executed
+  import    executed
+  verify    skipped
+  export    executed
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py snapshot --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold --out docs/art-pipeline/evidence/t3-idempotency-2026-09-28/snapshot-1-after-first-run.json
+snapshot: 9 files -> C:\Users\ren\WebstormProjects\unmached\unmached\docs\art-pipeline\evidence\t3-idempotency-2026-09-28\snapshot-1-after-first-run.json
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py run --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold
+  preflight revalidated
+  import    skipped
+  verify    skipped
+  export    skipped
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py snapshot --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold --out docs/art-pipeline/evidence/t3-idempotency-2026-09-28/snapshot-2-after-second-run.json
+snapshot: 9 files -> C:\Users\ren\WebstormProjects\unmached\unmached\docs\art-pipeline\evidence\t3-idempotency-2026-09-28\snapshot-2-after-second-run.json
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py run --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold --force import --interrupt-at import
+[exit 75]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py status --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold
+run 20260928-t3-scaffold  asset ASSET-MEDUSA-001  tool 0.1.0
+source tripo-b6253e58  task b6253e58-5875-4321-867a-fad5c2d413e1  tripo-studio  credits(historical) {'studio-credits': 40}
+source tripo-d562f057  task d562f057-1455-4663-8cd8-bb738175111d  tripo-studio  credits(historical) {'studio-credits': 95}
+stage preflight completed   attempts=2
+stage import    running     attempts=3
+stage verify    completed   attempts=2
+stage export    completed   attempts=3
+export export/ASSET-MEDUSA-001_segmented-retopo-glb.fbx 46f506f5db48 (superseded)
+export export/ASSET-MEDUSA-001_segmented-retopo-glb.fbx 749b72c6faab
+network: tripo_calls=0 paid_tasks_created=0
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py run --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold
+ERROR: interrupted stage(s) ['import'] from a previous process; use resume
+[exit 5]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py resume --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold
+resume: first unfinished stage = import
+  preflight revalidated
+  import    executed
+  verify    skipped
+  export    executed
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py snapshot --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold --out docs/art-pipeline/evidence/t3-idempotency-2026-09-28/snapshot-3-after-interrupt-resume.json
+snapshot: 9 files -> C:\Users\ren\WebstormProjects\unmached\unmached\docs\art-pipeline\evidence\t3-idempotency-2026-09-28\snapshot-3-after-interrupt-resume.json
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py run --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold
+  preflight revalidated
+  import    skipped
+  verify    skipped
+  export    skipped
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py snapshot --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold --out docs/art-pipeline/evidence/t3-idempotency-2026-09-28/snapshot-4-after-run-post-resume.json
+snapshot: 9 files -> C:\Users\ren\WebstormProjects\unmached\unmached\docs\art-pipeline\evidence\t3-idempotency-2026-09-28\snapshot-4-after-run-post-resume.json
+[exit 0]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py prepare-generation --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold --dry-run --service tripo-studio --mode multi-view --model-label H3.1 - Макс.кач. Ожидание дольше --view front=art/imagegen/mvp-v1/characters/ref-medusa-v5-front.png --view left=art/imagegen/mvp-v1/characters/ref-medusa-v5-left.png --view back=art/imagegen/mvp-v1/characters/ref-medusa-v5-back.png
+ERROR: identical inputs/mode/model were already generated as ['d562f057-1455-4663-8cd8-bb738175111d']; a new paid task would duplicate it (use --allow-duplicate only with an explicit reason)
+[exit 3]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py ue-import --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold
+ERROR: stage ue-import needs --backend mcp (live UnrealEditor via unreal_mcp.py). Headless UE import is not part of this scaffold: UnrealEditor-Cmd must not run on the project while the user's editor has it open.
+[exit 2]
+
+$ python tools/tripo-pipeline/tripo_pipeline.py status --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold
+run 20260928-t3-scaffold  asset ASSET-MEDUSA-001  tool 0.1.0
+source tripo-b6253e58  task b6253e58-5875-4321-867a-fad5c2d413e1  tripo-studio  credits(historical) {'studio-credits': 40}
+source tripo-d562f057  task d562f057-1455-4663-8cd8-bb738175111d  tripo-studio  credits(historical) {'studio-credits': 95}
+stage preflight completed   attempts=2
+stage import    completed   attempts=4
+stage verify    completed   attempts=2
+stage export    completed   attempts=4
+export export/ASSET-MEDUSA-001_segmented-retopo-glb.fbx 46f506f5db48 (superseded)
+export export/ASSET-MEDUSA-001_segmented-retopo-glb.fbx 749b72c6faab
+network: tripo_calls=0 paid_tasks_created=0
+[exit 0]
+

@@ -1,0 +1,68 @@
+# T4 · Medusa через полный локальный путь пайплайна (2026-09-28)
+# Рабочий каталог: C:/Users/ren/WebstormProjects/unmached/unmached (ветка fix/admin-panel, без коммитов).
+# Оболочка: Git Bash. MSYS_NO_PATHCONV=1 обязателен для аргументов /Game/... (иначе Git Bash
+# превращает их в C:/Program Files/Git/Game/...; стадия ue-import такую папку отвергает с кодом 2).
+# Живые приложения запущены оркестратором: Blender 5.2.2 GUI с blender-mcp (127.0.0.1:9876, PID 33220)
+# и UnrealEditor 5.8 с unreal/Unmatched (MCP 127.0.0.1:8123, PID 19540). UnrealEditor-Cmd не запускался.
+# Внешняя стоимость: 0 (вызовов Tripo 0, платных задач 0).
+
+export MSYS_NO_PATHCONV=1
+T="python tools/tripo-pipeline/tripo_pipeline.py"
+R=art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-local-pass
+R2=art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-headless-compare
+S=art/pipeline-candidates/ASSET-MEDUSA-001/source-specs
+P=art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal.json
+E=docs/art-pipeline/evidence/t4-medusa-local-pass-2026-09-28
+
+# 1. Прогон через живой Blender (MCP)                                        -> exit 0
+$T init --run-dir $R --asset-id ASSET-MEDUSA-001 --primary-source tripo-b6253e58 \
+   --primary-role segmented-retopo-glb --profile skeletal-candidate --build-profile $P
+$T register-source --run-dir $R --spec $S/tripo-d562f057.json      # 95 Studio-кредитов исторически, этот вызов 0
+$T register-source --run-dir $R --spec $S/tripo-b6253e58.json      # 40 Studio-кредитов исторически, этот вызов 0
+$T --backend mcp run --run-dir $R                                   # preflight/import/verify/atlas/build executed (12,6 с)
+
+# 2. Импорт в живой UE (MCP)
+$T --backend mcp ue-import --run-dir $R --ue-folder /Game/PipelineCandidates/Medusa/T4LocalPass
+#    -> exit 1: ue-import failed: base_triangles (UE 1778 против Blender 1780).
+#       Причина: 2 вырожденных треугольника подставки (площадь 1,3e-7 и 1,4e-6 см2) UE удаляет при сборке меша;
+#       производственный /Game/ART004/.../SM_Medusa_Base и v2-review тоже имеют 1778 (проверено get_triangle_count).
+#       Исправление: build считает near_degenerate_triangles (< 1e-4 см2), ue-import ожидает 1780 - 2.
+$T --backend mcp run --run-dir $R                                   # build executed (FBX тот же), ue-import executed:
+#       удалены 9 своих ассетов неудачной попытки, импортированы 9 заново, все 17 проверок pass -> exit 0
+$T snapshot --run-dir $R --out $E/snapshot-1-after-first-successful-ue-import.json
+python tools/tripo-pipeline/review/ue_listing.py /Game/PipelineCandidates/Medusa/T4LocalPass $E/ue-listing-1-after-import.json
+
+# 3. Повторный запуск без изменений                                       -> exit 0
+$T --backend mcp run --run-dir $R        # preflight revalidated, остальное skipped (ue-import: проверка ассетов в редакторе)
+$T snapshot --run-dir $R --out $E/snapshot-2-after-noop-run.json    # равен snapshot-1
+
+# 4. Принудительный повторный импорт в UE                                 -> exit 0 (2 мин 20 с)
+$T --backend mcp ue-import --run-dir $R --force
+$T snapshot --run-dir $R --out $E/snapshot-3-after-forced-reimport.json
+python tools/tripo-pipeline/review/ue_listing.py /Game/PipelineCandidates/Medusa/T4LocalPass $E/ue-listing-2-after-forced-reimport.json
+#    ue-listing-1 == ue-listing-2 (9 ассетов, сокеты Weapon/Head по одному), ue-import-report.json байт в байт прежний.
+
+# 5. Контрольный headless-прогон Blender-стадий                           -> exit 0 (17,2 с)
+$T init --run-dir $R2 --asset-id ASSET-MEDUSA-001 --primary-source tripo-b6253e58 \
+   --primary-role segmented-retopo-glb --profile skeletal-candidate --build-profile $P
+$T register-source --run-dir $R2 --spec $S/tripo-d562f057.json
+$T register-source --run-dir $R2 --spec $S/tripo-b6253e58.json
+$T --backend headless run --run-dir $R2
+#    сравнение: $E/backend-comparison.json (FBX, 4 PNG и 3 отчёта байт в байт; build-report отличается только isolation_note)
+
+# 6. Редакторные кадры (не стадия пайплайна)
+python tools/tripo-pipeline/review/capture_blender_review.py --run-dir $R --out $E/editor-frames --max-size 1600
+python tools/tripo-pipeline/review/capture_ue_review.py --run-dir $R --out $E/editor-frames
+#    UE: временный уровень /Game/ArtTests/ART004/L_ART004_MedusaAnimationReview, актёры удалены,
+#    открыт снова /Game/S08/S08Arena, dirty=false у обоих уровней (editor-frames/ue-frames.json).
+#    Позже (P0-исправление, 2026-09-28): 22 PNG переведены в JPEG 1200 px, q92, Pillow LANCZOS (20,9 МБ -> 2,2 МБ),
+#    как в capture_ue_axes.save_frame; sha256/байты/разрешение исходных PNG — png_before_jpeg в editor-frames/*-frames.json.
+
+# 7. Тесты                                                                -> 51/51 OK (139,8 с)
+python -m unittest discover -s tools/tripo-pipeline/tests
+
+# ue_listing.py — только чтение: find_assets, list_folders, get_socket_names, get_material_slots (через unreal_mcp.py);
+# его вывод сохранён в ue-listing-*.json. Scratch-проверки MCP в /Game/PipelineCandidates/_T4Scratch удалены.
+# ue-listing-1/2 сняты предварительной копией этого скрипта (C:/tmp/t4/ue_listing.py, те же вызовы MCP,
+# другие имена полей: sockets/material_slots/siblings_in_parent на верхнем уровне); ue-listing-3-final.json —
+# скриптом из репозитория после всех шагов. Списки ассетов во всех трёх файлах совпадают.

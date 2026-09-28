@@ -1,0 +1,1044 @@
+{
+ "schema": "unmatched.art-pipeline.local-pass-report/2",
+ "task": "T4 / P0.4 — существующая Medusa через полный локальный путь пайплайна; исправлено после P0-ревью (экспорт по UM_FBX_v1, лицо +X)",
+ "asset_id": "ASSET-MEDUSA-001",
+ "date": "2026-09-28",
+ "overall_status": "technically_imported",
+ "status_legend": {
+  "proposed": "предложено — норматив или параметр без проверки",
+  "measured": "измерено — число получено инструментом",
+  "technically_imported": "технически импортировано — файл записан/прочитан, контракты проверены",
+  "art_accepted": "художественно принято — решение арт-трека; этот отчёт его НЕ ставит"
+ },
+ "claims": {
+  "art_accepted": false,
+  "game_ready": false,
+  "budgets_declared": false,
+  "replaces_production_asset": false,
+  "replaces_art_track_candidate_v2_v3": false,
+  "animations_accepted": false
+ },
+ "result_values": {
+  "pass": "контракт проверен и выполнен",
+  "fail": "контракт проверен и не выполнен",
+  "not_checked": "не проверялось в T4 (причина указана)",
+  "informational": "измерено, без критерия pass/fail"
+ },
+ "contract_counts": {
+  "pass": 23,
+  "informational": 1,
+  "not_checked": 6
+ },
+ "revision": {
+  "after": "P0 review: Fable synthesis §1 (T4), verifier vb (major: face axis)",
+  "decision": "axes standard = 04-blender-production.md §1 + preset UM_FBX_v1 (orchestrator decision)",
+  "fixes": [
+   "profile skeletal-candidate exports with UM_FBX_v1 (+90 deg Z, Triangulate); new run with face +X measured in UE",
+   "T4 axis result re-described as a deviation from the verified preset, handoff: fix Medusa export/assets, not 04",
+   "31 (not 32) build checks in the T4 run; 35 in the new run",
+   "'committed' -> stored in the run directory, untracked until integration",
+   "Triangulate: on, no geometry change (polygons = triangles)",
+   "geometry: informational, open/non-manifold edges listed per part",
+   "UE axis reference: /Game/ART004/Medusa/Meshes/SK_Medusa_Atlas",
+   "config.ue records the real import flags (false/false) for skeletal-candidate",
+   "deviation from M_DioramaMaster recorded",
+   "live transcript of import_file on an existing name saved"
+  ]
+ },
+ "current_run": {
+  "run_dir": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1",
+  "tool": "tools/tripo-pipeline/tripo_pipeline.py 0.4.0",
+  "build_profile": {
+   "path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal-um-fbx-v1.json",
+   "sha256": "ff075d75b1907f43381399d5fd5cf7efdb2a02a2edd7e152bc0270de648f2906",
+   "id": "medusa-segmented-skeletal/2",
+   "status": "proposed"
+  },
+  "fbx_preset": {
+   "name": "UM_FBX_v1",
+   "path": "blender/_tools/presets/UM_FBX_v1.json",
+   "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+   "version": "1.0.0"
+  },
+  "export_settings": {
+   "export_space_rotation_z_degrees": 90.0,
+   "use_triangles": true,
+   "axis_forward": "-Y",
+   "axis_up": "Z",
+   "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+   "path_mode": "STRIP",
+   "deviations_from_preset": {
+    "bake_anim": "off: the candidate FBX carries no clips",
+    "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+   }
+  },
+  "outputs": {
+   "export/SK_Medusa_Candidate.fbx": {
+    "sha256": "35809386bff7716ab8c354970d0683a45ff1f055a2679fd1144d01ccbef47625",
+    "bytes": 1166444
+   },
+   "export/SM_Medusa_Base_Candidate.fbx": {
+    "sha256": "de5ebcac44b23b5335a3a7b7802420802c3738f8958fab104fa0b044d87a0983",
+    "bytes": 79324
+   },
+   "reports/atlas-report.json": {
+    "sha256": "832769c38bc55385a2230c080f40d49dbabd3e0553691c6d84f57ba56823b241",
+    "bytes": 7501
+   },
+   "reports/build-report.json": {
+    "sha256": "698cbe08ef0fa258fa360f8f7cb6dba8289c1030bd6c929f8396a4843e662e53",
+    "bytes": 46464
+   },
+   "textures/T_Medusa_Candidate_Atlas_BC.png": {
+    "sha256": "6b5fd7649a733101fb67f9831fa55f9bc703a9ad3912e9a574ec8685bc969fd9",
+    "bytes": 3321735
+   },
+   "textures/T_Medusa_Candidate_Atlas_N.png": {
+    "sha256": "8ad31dda8480506736a5886e93b29425cce2836514a105dd27242fe41ffd36d4",
+    "bytes": 3472265
+   },
+   "textures/T_Medusa_Candidate_Atlas_N_OpenGL.png": {
+    "sha256": "f893bbae9148c7805ae20a1103903f38cc6209c347c8d81ab419a514c059f2e3",
+    "bytes": 3465090
+   },
+   "textures/T_Medusa_Candidate_Atlas_ORM.png": {
+    "sha256": "c75702470f8cfff0575338ac7c8b56eacb99f8c44edcff234d9a0a2df29269ab",
+    "bytes": 3006714
+   }
+  },
+  "ue_folder": "/Game/PipelineCandidates/Medusa/T4UmFbxV1",
+  "ue_assets": [
+   "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Materials/MI_Medusa_Candidate_Blue",
+   "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Materials/MI_Medusa_Candidate_Red",
+   "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Materials/M_Medusa_Candidate_Atlas",
+   "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Meshes/SK_Medusa_Candidate",
+   "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Meshes/SK_Medusa_Candidate_Skeleton",
+   "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Meshes/SM_Medusa_Base_Candidate",
+   "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Textures/T_Medusa_Candidate_BC",
+   "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Textures/T_Medusa_Candidate_N",
+   "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Textures/T_Medusa_Candidate_ORM"
+  ],
+  "build_checks": {
+   "passed": 35,
+   "total": 35
+  },
+  "ue_checks": {
+   "passed": 19,
+   "total": 19
+  },
+  "evidence_dir": "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28"
+ },
+ "historical_runs": [
+  {
+   "run_dir": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-local-pass",
+   "tool": "0.3.0",
+   "build_profile": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal.json (/1, unchanged)",
+   "skeletal_fbx": {
+    "path": "export/SK_Medusa_Candidate.fbx",
+    "sha256": "8e83019a05b9cfcfb4ced34442bea2834a58347842fb551afa83d35b4fd19bcc",
+    "bytes": 1169548
+   },
+   "base_fbx": {
+    "path": "export/SM_Medusa_Base_Candidate.fbx",
+    "sha256": "63816adc63f020054956c1c3d4a9ae5d3f5a28c439db87f601e6a7a191102285",
+    "bytes": 79340
+   },
+   "build_checks": {
+    "passed": 31,
+    "total": 31
+   },
+   "ue_checks": {
+    "passed": 17,
+    "total": 17
+   },
+   "face_in_ue": "+Y",
+   "reading": "deviation from the verified preset UM_FBX_v1 / 04 §1 (no +90 deg rotation, no Triangulate), not a failure against a proposal; same deviation as production and v2",
+   "manifest_note": "config.ue says import_materials/import_textures=true; the candidate path used false/false (reports/ue-mcp-calls.json). Not rewritten to stay consistent with its snapshot evidence.",
+   "ue_folder": "/Game/PipelineCandidates/Medusa/T4LocalPass",
+   "evidence_dir": "docs/art-pipeline/evidence/t4-medusa-local-pass-2026-09-28",
+   "editor_frames_storage": "22 frames stored as JPEG 1200 px, Pillow LANCZOS, quality 92 (2.2 MB), converted on 2026-09-28 from the 1600 px PNG frames (20.9 MB) the same way as capture_ue_axes.save_frame; the PNG files are not in the repository, their sha256/bytes/px are kept per frame in editor-frames/{blender,ue}-frames.json (png_before_jpeg)",
+   "status": "technically_imported, superseded by the current run for axes"
+  }
+ ],
+ "known_deviation_for_art_task_2": {
+  "what": "production SK_Medusa / /Game/ART004/Medusa/Meshes/SK_Medusa_Atlas, v2 and v3 face +Y in UE",
+  "standard": "04 §1: face +X (UM_FBX_v1, ART-001 PASS)",
+  "measured_by": [
+   "T4 axis map (+Y)",
+   "current run: unique map production -> candidate carries +Y onto +X",
+   "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/editor-frames/ue-axes-pair-from-plus-x.jpg"
+  ],
+  "game_code_depends_on_it": "unreal/Unmatched/Source/Unmatched/S08/S08FighterActor.cpp:159-160 sets yaw 0/180 for a +Y-facing mesh",
+  "options": [
+   "(a) re-export Medusa assets with UM_FBX_v1 and change the S08FighterActor yaw by +90 deg",
+   "(b) keep +Y consciously and document the in-game rotation as an accepted deviation"
+  ],
+  "frame_production_yaw_minus_90": "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/editor-frames/ue-axes-pair-from-plus-x-production-yaw-minus-90.jpg",
+  "decision": "user (Fable synthesis §4); 04 is not to be changed"
+ },
+ "inputs": {
+  "tripo_sources": [
+   {
+    "source_id": "tripo-b6253e58",
+    "service": "tripo-studio",
+    "task_id": "b6253e58-5875-4321-867a-fad5c2d413e1",
+    "role_used": "segmented-retopo-glb",
+    "path": "blender/ASSET-MEDUSA-001/tripo-source/b6253e58/medusa-segmented-retopo.glb",
+    "sha256": "0400f2b44f80b14005e03d997b83453e7d35e54f8ddd537b5dbf7770c0792e56",
+    "hash_check": "matches_evidence",
+    "historical_studio_credits": 40
+   },
+   {
+    "source_id": "tripo-d562f057",
+    "service": "tripo-studio",
+    "task_id": "d562f057-1455-4663-8cd8-bb738175111d",
+    "role_used": "registered only (parent task; its textures are not used — the segmented GLB carries its own 45 images)",
+    "historical_studio_credits": 95
+   }
+  ],
+  "build_profile": {
+   "path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal-um-fbx-v1.json",
+   "sha256": "ff075d75b1907f43381399d5fd5cf7efdb2a02a2edd7e152bc0270de648f2906",
+   "status": "proposed"
+  },
+  "read_only_references": {
+   "v2_fbx": {
+    "path": "blender/ASSET-MEDUSA-001/variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx",
+    "sha256": "bd125c6bbeb2559b28f6fc4908a1790e0d05fd572b128bd9188c2daeea046592"
+   },
+   "production_base_fbx": {
+    "path": "blender/ASSET-MEDUSA-001/export/SM_Medusa_Base.fbx",
+    "sha256": "a49bfbbfe6e51856aebcd9d3e7cc9a45bc142f0ff110830f446a28c76997ba4f"
+   },
+   "committed_atlas": "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_{BC,N,N_OpenGL,ORM}.png",
+   "ue_v2_review_asset_for_axes": "/Game/ArtTests/ART004_V3Review/Meshes/SK_Medusa_V2Review",
+   "ue_reference_for_axes": "/Game/ART004/Medusa/Meshes/SK_Medusa_Atlas",
+   "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json"
+  }
+ },
+ "tools": {
+  "pipeline": "tools/tripo-pipeline/tripo_pipeline.py 0.4.0 (profile skeletal-candidate: preflight -> import -> verify -> atlas -> build -> ue-import; FBX preset UM_FBX_v1)",
+  "blender": "Blender 5.2.2 LTS — live GUI via blender-mcp (127.0.0.1:9876) for the main run; separate blender -b for the comparison run",
+  "unreal": "UnrealEditor 5.8 (live, project unreal/Unmatched) via ModelContextProtocol 127.0.0.1:8123; UnrealEditor-Cmd was NOT started (forbidden while the live editor holds the project)",
+  "python_atlas": "Python 3.13.4, Pillow 12.1.0, numpy 2.4.0",
+  "review": "review/capture_ue_axes.py (face-slot darkening from 4 directions + pair frames), review/ue_already_exists_probe.py (transcript), review/ue_listing.py"
+ },
+ "external_cost": {
+  "tripo_calls": 0,
+  "paid_tasks_created": 0,
+  "studio_credits": 0,
+  "api_credits": 0,
+  "usd": 0,
+  "historical_spend_recorded_only": {
+   "studio_credits": 135
+  }
+ },
+ "contracts": [
+  {
+   "id": "geometry_triangles",
+   "result": "pass",
+   "status": "measured",
+   "check": "triangle counts preserved through Blender import, build, FBX round trip (Tripo segmented retopology reused as is; its quality is not assessed here)",
+   "measured": {
+    "glb_triangles": 21177,
+    "blender_import_triangles": 21176,
+    "lost_in_glb_import": "1 (tripo_part_3, within 0.1 %)",
+    "candidate": {
+     "SK_Medusa_Body": 18199,
+     "SK_Medusa_Bow": 1197,
+     "SM_Medusa_Base": 1780,
+     "sum": 21176
+    },
+    "vertices": {
+     "SK_Medusa_Body": 22206,
+     "SK_Medusa_Bow": 1469,
+     "SM_Medusa_Base": 1141
+    },
+    "near_degenerate_triangles_below_1e-4_cm2": {
+     "SK_Medusa_Body": 2,
+     "SK_Medusa_Bow": 0,
+     "SM_Medusa_Base": 2
+    }
+   },
+   "note": "the pipeline does not produce its own retopology; geometry equals the v2 candidate (see reference_v2_parity)",
+   "evidence": [
+    "reports/verify-report.json",
+    "reports/build-report.json#checks.triangles_as_profile",
+    "#checks.roundtrip_triangles_preserved"
+   ]
+  },
+  {
+   "id": "tripo_topology_open_edges",
+   "result": "informational",
+   "status": "measured",
+   "check": "boundary / non-manifold edges per part after a diagnostic weld at 1e-7 (verify warning)",
+   "measured": {
+    "boundary_edges_total": 1063,
+    "non_manifold_edges_total": 1081,
+    "per_part_boundary_non_manifold": {
+     "tripo_part_0": [
+      271,
+      275
+     ],
+     "tripo_part_1": [
+      75,
+      75
+     ],
+     "tripo_part_2": [
+      72,
+      72
+     ],
+     "tripo_part_3": [
+      93,
+      94
+     ],
+     "tripo_part_4": [
+      52,
+      55
+     ],
+     "tripo_part_5": [
+      56,
+      56
+     ],
+     "tripo_part_6": [
+      78,
+      79
+     ],
+     "tripo_part_7": [
+      33,
+      40
+     ],
+     "tripo_part_8": [
+      45,
+      45
+     ],
+     "tripo_part_9": [
+      48,
+      48
+     ],
+     "tripo_part_10": [
+      75,
+      76
+     ],
+     "tripo_part_11": [
+      33,
+      33
+     ],
+     "tripo_part_12": [
+      42,
+      42
+     ],
+     "tripo_part_13": [
+      41,
+      41
+     ],
+     "tripo_part_14": [
+      49,
+      50
+     ]
+    }
+   },
+   "note": "every one of the 15 parts has open edges; with a one-sided material open borders can show gaps (art track). Replaces the T4 wording 'geometry and retopology: pass'.",
+   "evidence": [
+    "reports/verify-report.json#diagnostics.weld_1e-7_per_mesh"
+   ]
+  },
+  {
+   "id": "normals_winding_face_neck",
+   "result": "pass",
+   "status": "measured",
+   "check": "ray-escape orientation score per part (+1 outward, -1 inside-out) before/after the fix and after FBX round trip; fix = winding flip + negated custom corner normals (art004 RESTORE_NORMALS method)",
+   "measured": {
+    "tripo_part_10_face": {
+     "source": -0.9782,
+     "candidate": 0.9782,
+     "roundtrip": 0.9782,
+     "polygons": 587
+    },
+    "tripo_part_14_rear_neck": {
+     "source": -1.0,
+     "candidate": 1.0,
+     "roundtrip": 1.0,
+     "polygons": 480
+    },
+    "face_mean_normal_blender": [
+     0.0007,
+     -0.4006,
+     0.0466
+    ]
+   },
+   "evidence": [
+    "reports/build-report.json#orientation",
+    "editor-frames/blender-front-head-*-culling.jpg",
+    "editor-frames/blender-rear-neck-*-culling.jpg",
+    "editor-frames/ue-front-face-*.jpg",
+    "editor-frames/ue-rear-neck-*.jpg"
+   ]
+  },
+  {
+   "id": "normals_winding_other_parts",
+   "result": "pass",
+   "status": "measured",
+   "check": "same score on all 15 parts; any part below -0.5 must be listed in the profile and fixed",
+   "measured": {
+    "inside_out_in_source": {
+     "tripo_part_8 (left arm/bracer, bow side)": -0.9997,
+     "tripo_part_13 (right hand)": -0.997
+    },
+    "after_fix_min_score_all_parts": 0.9782,
+    "flipped_polygons_total": 2249
+   },
+   "note": "NEW FINDING: parts 8 and 13 are inside-out in the Tripo GLB and — measured by the same score on the FBX files — in production SK_Medusa.fbx (-1.0 / -0.997), v2 (-1.0 / -0.997) and v3 (-1.0 / -0.997); v2/v3 fixed only 10 and 14. Visible with one-sided materials: broken right hand at the belt, hollow bow forearm from behind",
+   "evidence": [
+    "editor-frames/blender-front-arms-source-culling.jpg",
+    "editor-frames/blender-front-arms-candidate-culling.jpg",
+    "editor-frames/blender-rear-bow-arm-source-culling.jpg",
+    "editor-frames/blender-rear-bow-arm-candidate-culling.jpg",
+    "editor-frames/ue-front-arms-compare.jpg",
+    "editor-frames/ue-front-arms-candidate.jpg",
+    "editor-frames/ue-rear-bow-arm-compare.jpg",
+    "editor-frames/ue-rear-bow-arm-candidate.jpg",
+    "evidence/t4-medusa-local-pass-2026-09-28/fbx-orientation-comparison.json"
+   ]
+  },
+  {
+   "id": "corner_normals_after_export_rotation",
+   "result": "pass",
+   "status": "measured",
+   "check": "corner normals equal the unrotated v2 reference (|dot| > 0.999) after undoing the UM_FBX_v1 rotation; negated only on the parts whose winding the candidate fixes",
+   "measured": {
+    "negated_parts": [
+     "tripo_part_13",
+     "tripo_part_8"
+    ],
+    "other_by_mesh": {
+     "base": {
+      "tripo_part_2": 5
+     },
+     "body": {
+      "tripo_part_0": 1
+     },
+     "bow": {}
+    },
+    "other_detail": {
+     "base": [
+      {
+       "area_cm2": 0.493273049,
+       "dot": 0.9026,
+       "part": "tripo_part_2",
+       "polygon": 310,
+       "touches_near_degenerate": true
+      },
+      {
+       "area_cm2": 0.701015233,
+       "dot": 0.9026,
+       "part": "tripo_part_2",
+       "polygon": 311,
+       "touches_near_degenerate": true
+      },
+      {
+       "area_cm2": 0.484712153,
+       "dot": 0.9026,
+       "part": "tripo_part_2",
+       "polygon": 676,
+       "touches_near_degenerate": true
+      },
+      {
+       "area_cm2": 0.522705614,
+       "dot": 0.9026,
+       "part": "tripo_part_2",
+       "polygon": 677,
+       "touches_near_degenerate": true
+      },
+      {
+       "area_cm2": 1.672e-06,
+       "dot": 0.9026,
+       "part": "tripo_part_2",
+       "polygon": 903,
+       "touches_near_degenerate": true
+      }
+     ],
+     "body": [
+      {
+       "area_cm2": 4.9e-08,
+       "dot": -0.7765,
+       "part": "tripo_part_0",
+       "polygon": 3870,
+       "touches_near_degenerate": true
+      }
+     ],
+     "bow": []
+    }
+   },
+   "note": "exception: corners at vertices of near-degenerate triangles (numerically undefined sliver normal); not caused by Triangulate (measured with use_triangles=false: same 6 corners)",
+   "evidence": [
+    "reports/build-report.json#checks.reference_corner_normals_rotated_consistently"
+   ]
+  },
+  {
+   "id": "uv0",
+   "result": "pass",
+   "status": "measured",
+   "check": "one UV layer (UVMap) per mesh, all UVs in [0,1], every corner inside its part's atlas cell minus gutter, raster overlap per part at 2048 px",
+   "measured": {
+    "uv_layers": "UVMap on body, bow, base (after round trip too)",
+    "corners_outside_own_cell": 0,
+    "gutter_px_between_parts": 8,
+    "raster_overlap_texels": 171,
+    "raster_covered_texels": 2124080,
+    "overlap_ratio": 8.1e-05,
+    "max_part_overlap_ratio": {
+     "tripo_part_7": 0.0012
+    },
+    "texel_density_px_per_cm": {
+     "min": 14.78,
+     "max": 25.92
+    }
+   },
+   "note": "overlap and density are informational measurements, not norms; intra-part island padding is Tripo's own layout (not checked)",
+   "evidence": [
+    "reports/build-report.json#uv",
+    "reports/atlas-report.json"
+   ]
+  },
+  {
+   "id": "textures_bc_normal_orm",
+   "result": "pass",
+   "status": "measured",
+   "check": "2048 px atlas; BC sRGB; Normal DirectX (= OpenGL with inverted G); ORM = AO/Roughness/Metallic linear; UE texture settings",
+   "measured": {
+    "atlas_bytes_identical_to_committed_blender_asset": true,
+    "normal_dx_equals_gl_inverted_g": true,
+    "normal_unit_length_fraction": 0.9962,
+    "orm_r_ao": "constant 255 (Tripo has no AO map)",
+    "blender_colorspace": {
+     "BC": "sRGB",
+     "N_OpenGL": "Non-Color",
+     "ORM": "Non-Color"
+    },
+    "ue": {
+     "T_Medusa_Candidate_BC": {
+      "SRGB": true,
+      "CompressionSettings": "TC_Default",
+      "size": [
+       2048,
+       2048
+      ]
+     },
+     "T_Medusa_Candidate_N": {
+      "SRGB": false,
+      "CompressionSettings": "TC_Normalmap",
+      "bFlipGreenChannel": false,
+      "size": [
+       2048,
+       2048
+      ]
+     },
+     "T_Medusa_Candidate_ORM": {
+      "SRGB": false,
+      "CompressionSettings": "TC_Masks",
+      "size": [
+       2048,
+       2048
+      ]
+     }
+    }
+   },
+   "evidence": [
+    "reports/atlas-report.json",
+    "reports/ue-import-report.json#measured.textures"
+   ]
+  },
+  {
+   "id": "material_teamcolor",
+   "result": "pass",
+   "status": "technically_imported",
+   "check": "M_Medusa_Candidate_Atlas: BaseColor = BC x TeamColor, Normal = N.RGB, AO/Roughness/Metallic = ORM.R/G/B, used with skeletal mesh, opaque, one-sided; two MIs with TeamColor",
+   "measured": {
+    "MI_Medusa_Candidate_Blue": [
+     0.72,
+     0.85,
+     1.0,
+     1.0
+    ],
+    "MI_Medusa_Candidate_Red": [
+     1.0,
+     0.76,
+     0.7,
+     1.0
+    ],
+    "TwoSided": false
+   },
+   "note": "own M_Medusa_Candidate_Atlas like the production M_Medusa_Atlas; deviation from the shared master material M_DioramaMaster (04 §1) recorded, decision pending",
+   "evidence": [
+    "reports/ue-import-report.json#measured.material"
+   ]
+  },
+  {
+   "id": "material_slots",
+   "result": "pass",
+   "status": "measured",
+   "check": "skeletal slots = Blender round trip (atlas + face slot as in v2), base 1 slot, every slot gets the default team MI",
+   "measured": {
+    "skeletal": [
+     "M_Medusa_Atlas",
+     "M_Medusa_Face"
+    ],
+    "base": [
+     "M_Medusa_Atlas"
+    ],
+    "skeletal_sections_lod0": 2
+   },
+   "compared_with_proposal": "<= 3 slots (04 §1, ПРЕДЛОЖЕНИЕ) — within",
+   "evidence": [
+    "reports/ue-import-report.json#checks.skeletal_material_slots"
+   ]
+  },
+  {
+   "id": "scale",
+   "result": "pass",
+   "status": "measured",
+   "check": "figure incl. base 0.55 m -> 55 uu at import scale 1.0 (FBX_SCALE_UNITS + UnitScaleFactor 1.0); base 30 x 30 x 6 uu",
+   "measured": {
+    "blender_height_m": 0.55,
+    "ue_skeletal_top_uu": 55.0,
+    "ue_skeletal_bottom_uu": 3.8074,
+    "ue_base_uu": [
+     30.0,
+     30.0,
+     6.0
+    ],
+    "blender_roundtrip_scale_ratio": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "tripo_source_scale_factor": 0.56105904
+   },
+   "compared_with_proposal": "height 50–55 uu, base Ø30 x 6 (04 §3.1, ПРЕДЛОЖЕНИЕ) — within; not a budget",
+   "evidence": [
+    "reports/build-report.json#checks.height_m",
+    "reports/ue-import-report.json#checks.skeletal_top_at_figure_height"
+   ]
+  },
+  {
+   "id": "axes_um_fbx_v1",
+   "result": "pass",
+   "status": "measured",
+   "check": "face points +X in UE — standard 04-blender-production.md §1 'Оси' + preset UM_FBX_v1 (ART-001 PASS)",
+   "measured": {
+    "blender_authored_face_mean_normal": [
+     0.0007,
+     -0.4006,
+     0.0466
+    ],
+    "fbx_export_frame_face_mean_normal": [
+     0.4006,
+     0.0007,
+     0.0466
+    ],
+    "ue_axis_map_from_bounds": [
+     {
+      "blender_front_minus_y_becomes": "+X",
+      "map": "ue(x,y)=(+0x-1y, -1x+0y)",
+      "max_error_uu": 0.0004
+     }
+    ],
+    "ue_bounds_equal_prediction": true,
+    "ue_skeletal_bounds_uu": {
+     "max": [
+      11.4149,
+      13.0348,
+      55.0
+     ],
+     "min": [
+      -9.6803,
+      -15.7143,
+      3.8074
+     ]
+    },
+    "reference_map_production_onto_candidate": [
+     {
+      "map": "b(x,y)=(+0x+1y, -1x+0y)",
+      "maps_axis": {
+       "+X": "-Y",
+       "+Y": "+X",
+       "-X": "+Y",
+       "-Y": "-X"
+      },
+      "max_error_uu": 0.0
+     }
+    ],
+    "reference_front_lands_on": [
+     "+X"
+    ],
+    "face_slot_pixels_by_camera_direction": {
+     "+X": 8715,
+     "+Y": 961,
+     "-X": 0,
+     "-Y": 4070
+    },
+    "bow_side_in_ue": "-Y (left hand)"
+   },
+   "evidence": [
+    "reports/build-report.json#axes",
+    "reports/ue-import-report.json#checks.front_axis_as_fbx_preset",
+    "#checks.reference_front_lands_on_candidate_front",
+    "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/editor-frames/ue-axes-frames.json"
+   ]
+  },
+  {
+   "id": "pivot_root",
+   "result": "pass",
+   "status": "measured",
+   "check": "armature object and root bone at the origin; base pivot at the centre of its bottom; skeletal origin = base bottom centre",
+   "measured": {
+    "root_head_m": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "base_min_uu": [
+     -15,
+     -15,
+     0
+    ],
+    "base_max_uu": [
+     15,
+     15,
+     6
+    ]
+   },
+   "evidence": [
+    "reports/build-report.json#checks.pivot_root_at_origin",
+    "#checks.base_footprint_and_pivot",
+    "reports/ue-import-report.json#checks.base_footprint_pivot"
+   ]
+  },
+  {
+   "id": "separate_bow_and_base",
+   "result": "pass",
+   "status": "measured",
+   "check": "bow = separate mesh bound 100 % to bone `weapon`; base = separate StaticMesh FBX/asset without armature",
+   "measured": {
+    "bow_bones_used": {
+     "weapon": 1469
+    },
+    "base_armatures": 0,
+    "ue_base_class": "StaticMesh"
+   },
+   "evidence": [
+    "reports/build-report.json#checks.bow_bound_only_to_weapon",
+    "#checks.roundtrip_one_armature"
+   ]
+  },
+  {
+   "id": "bones",
+   "result": "pass",
+   "status": "measured",
+   "check": "17 profile bones with hierarchy and rest heads after round trip (<= 1e-4 m); UE hierarchy",
+   "measured": {
+    "blender_bones": 17,
+    "ue_bones": 18,
+    "ue_bone0": "SKEL_Medusa",
+    "root_parent_in_ue": "SKEL_Medusa"
+   },
+   "note": "FINDING: the legacy FBX importer turns the Blender armature object into bone 0 (18 bones); identical to production /Game/ART004 and v2. Earlier '17 bones' reports counted the subtree from root",
+   "evidence": [
+    "reports/build-report.json#checks.roundtrip_bone_hierarchy_and_rest_positions",
+    "reports/ue-import-report.json#checks.bone0_is_armature_object_node"
+   ]
+  },
+  {
+   "id": "weights",
+   "result": "pass",
+   "status": "measured",
+   "check": "every vertex weighted, <= 2 influences (rules copied from build_segmented_medusa.py)",
+   "measured": {
+    "body_max_influences": 2,
+    "bow_max_influences": 1,
+    "unweighted": 0
+   },
+   "note": "deformation quality in motion NOT checked (no clips in this pass)",
+   "evidence": [
+    "reports/build-report.json#weights"
+   ]
+  },
+  {
+   "id": "sockets_weapon_head",
+   "result": "pass",
+   "status": "technically_imported",
+   "check": "exactly one Weapon (bone weapon, 0/0/0) and one Head (bone head, 0/0/4 uu) after import and forced re-import",
+   "measured": {
+    "sockets": [
+     "Weapon",
+     "Head"
+    ]
+   },
+   "note": "socket offsets are bone-local; bones are rotated rigidly with the mesh (EditBone.transform roll=True), so the offsets keep their place relative to the figure",
+   "evidence": [
+    "reports/ue-import-report.json#checks.sockets_weapon_head",
+    "evidence/.../ue-listing-3-final.json"
+   ]
+  },
+  {
+   "id": "fbx_triangulate_preset",
+   "result": "pass",
+   "status": "measured",
+   "check": "04 §1.1 Triangulate = on (preset use_triangles=true) changes no geometry",
+   "measured": {
+    "SK_Medusa_Body": [
+     18199,
+     18199
+    ],
+    "SK_Medusa_Bow": [
+     1197,
+     1197
+    ],
+    "SM_Medusa_Base": [
+     1780,
+     1780
+    ]
+   },
+   "note": "the Tripo retopology is already all triangles; replaces the wrong T4 line 'exported as quads'"
+  },
+  {
+   "id": "fbx_export_determinism",
+   "result": "pass",
+   "status": "measured",
+   "check": "mcp (live Blender) vs headless blender -b: same bytes",
+   "measured": {
+    "export/SK_Medusa_Candidate.fbx": true,
+    "export/SM_Medusa_Base_Candidate.fbx": true,
+    "textures/T_Medusa_Candidate_Atlas_BC.png": true,
+    "textures/T_Medusa_Candidate_Atlas_N.png": true,
+    "textures/T_Medusa_Candidate_Atlas_N_OpenGL.png": true,
+    "textures/T_Medusa_Candidate_Atlas_ORM.png": true,
+    "reports/import-report.json": true,
+    "reports/verify-report.json": true,
+    "reports/atlas-report.json": true,
+    "reports/build-report.json": false
+   },
+   "note": "build report differs only in ['isolation_note']",
+   "evidence": [
+    "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/backend-comparison.json"
+   ]
+  },
+  {
+   "id": "ue_import",
+   "result": "pass",
+   "status": "technically_imported",
+   "check": "9 planned assets of the right classes, nothing else in the folder, saved",
+   "measured": {
+    "assets": 9,
+    "mcp_calls": 137,
+    "checks_passed": 19,
+    "checks_total": 19,
+    "tool_name_style": "short"
+   }
+  },
+  {
+   "id": "ue_reimport_no_duplicates",
+   "result": "pass",
+   "status": "technically_imported",
+   "check": "no-op run skips the UE stage after probing the editor; forced re-import deletes only its own assets and recreates the same 9",
+   "measured": {
+    "noop_run_snapshot_equal": true,
+    "listing_after_import": 9,
+    "listing_after_forced_reimport": 9,
+    "identical_listing": true,
+    "numbered_duplicates": 0,
+    "sockets_after_reimport": [
+     "Weapon",
+     "Head"
+    ],
+    "ue_import_report_after_reimport": "equal except previous_assets_deleted"
+   },
+   "evidence": [
+    "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/snapshot-2-after-run-with-ue-config.json",
+    "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/snapshot-3-after-noop-run.json",
+    "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/ue-listing-1-after-import.json",
+    "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/ue-listing-2-after-forced-reimport.json",
+    "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/ue-import-report-1-import.json",
+    "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/ue-import-report-2-forced-reimport.json"
+   ]
+  },
+  {
+   "id": "ue_import_on_taken_name",
+   "result": "pass",
+   "status": "measured",
+   "check": "live UE 5.8 MCP import_file on an existing name: refused, no Name_1",
+   "measured": {
+    "first_import_error": false,
+    "second_import_error": true,
+    "second_import_message": "import_asset: SM_ImportProbe at /Game/PipelineCandidates/_T4UmFbxV1ImportProbe already exists",
+    "assets_after_second_import": [
+     "/Game/PipelineCandidates/_T4UmFbxV1ImportProbe/SM_ImportProbe"
+    ],
+    "numbered_duplicate_created": false,
+    "scratch_folder_removed": true
+   },
+   "evidence": [
+    "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/ue-import-already-exists-transcript.json"
+   ]
+  },
+  {
+   "id": "ue_triangle_counts",
+   "result": "pass",
+   "status": "measured",
+   "check": "base LOD0 triangles = Blender 1780 minus 2 near-degenerate slivers that UE's mesh build removes",
+   "measured": {
+    "base_ue": 1778,
+    "base_blender": 1780,
+    "production_and_v2_base_in_ue": 1778
+   },
+   "note": "first ue-import attempt failed on this check (expected 1780) — fixed by measuring degenerate triangles in build",
+   "evidence": [
+    "reports/ue-import-report.json#checks.base_triangles"
+   ]
+  },
+  {
+   "id": "ue_skeletal_triangle_count",
+   "result": "not_checked",
+   "reason": "SkeletalMeshTools has no triangle-count tool; UE LOD0 vertices 23731 and 2 sections recorded; Blender round trip is authoritative"
+  },
+  {
+   "id": "reference_v2_parity",
+   "result": "pass",
+   "status": "measured",
+   "check": "Blender re-import of candidate FBX vs face-section-neck-v2 FBX: positions (1e-4 m), UV (1e-5), material index per polygon, bones",
+   "measured": {
+    "unmatched_polygons": 0,
+    "bones_identical": true,
+    "winding_differs_only_in": {
+     "tripo_part_8": 575,
+     "tripo_part_13": 607
+    },
+    "corner_normals_negated_only_in": {
+     "tripo_part_8": 1725,
+     "tripo_part_13": 1821
+    },
+    "base_vs_production_base": "0 unmatched"
+   },
+   "evidence": [
+    "reports/build-report.json#reference_comparison"
+   ],
+   "note": "comparison runs in the authored frame after undoing the export rotation"
+  },
+  {
+   "id": "isolation_of_protected_assets",
+   "result": "pass",
+   "status": "measured",
+   "check": "no tracked git changes; Content/ART004, ArtPreview, ArtTests/ART004* files unchanged; production assets not dirty; live Blender and UE restored",
+   "measured": {
+    "ue_production_dirty": {
+     "/Game/ART004/Medusa/Meshes/SK_Medusa_Atlas": false,
+     "/Game/ART004/Medusa/Meshes/SM_Medusa_Base": false,
+     "/Game/ART004/Medusa/Materials/M_Medusa_Atlas": false
+    },
+    "ue_level_after": "/Game/S08/S08Arena",
+    "ue_level_dirty_after": false,
+    "scratch_folders_removed": [
+     "/Game/PipelineCandidates/_T4UmFbxV1ImportProbe",
+     "/Game/PipelineCandidates/_T4UmFbxV1AxesProbe"
+    ],
+    "live_blender_after": "scenes ['Scene'], is_dirty false, same datablock counts as before the run"
+   }
+  },
+  {
+   "id": "headless_unreal_editor_cmd_import",
+   "result": "not_checked",
+   "reason": "forbidden while the user's UnrealEditor holds unreal/Unmatched; replaced by the live MCP import in the same isolated folder"
+  },
+  {
+   "id": "animation_clips_and_deformation",
+   "result": "not_checked",
+   "reason": "out of scope for T4; clips are draft probes and not built by this pipeline"
+  },
+  {
+   "id": "art_acceptance_k1_k2_k3_hud_boardstate_packaged",
+   "result": "not_checked",
+   "reason": "art track; only editor frames were taken"
+  },
+  {
+   "id": "selection_collision_capsule",
+   "result": "not_checked",
+   "reason": "04 §3.1 UCP_ capsule is a proposal; not part of this import"
+  },
+  {
+   "id": "shared_master_material",
+   "result": "not_checked",
+   "status": "proposed",
+   "check": "04 §1: one shared master material M_DioramaMaster",
+   "measured": null,
+   "note": "deviation recorded: own M_Medusa_Candidate_Atlas (like production); decision pending (Fable §4)"
+  }
+ ],
+ "findings": [
+  {
+   "id": "F0",
+   "severity": "standard deviation (art task 2)",
+   "text": "production Medusa (SK_Medusa_Atlas), v2 and v3 face +Y in UE; 04 §1 / UM_FBX_v1 require +X; the UM_FBX_v1 candidate faces +X (measured)"
+  },
+  {
+   "id": "F1",
+   "severity": "visible close up",
+   "text": "tripo_part_8 (bow arm/bracer) and tripo_part_13 (right hand) are inside-out in the Tripo GLB and in production, v2 and v3 FBX (measured, fbx-orientation-comparison.json); fixed in this candidate only"
+  },
+  {
+   "id": "F2",
+   "severity": "rig contract",
+   "text": "UE skeleton = 18 bones, bone 0 = armature object node SKEL_Medusa (same in production and v2); root motion reads bone 0"
+  },
+  {
+   "id": "F4",
+   "severity": "cosmetic/log",
+   "text": "2 near-degenerate triangles in the base (UE drops them: 1778) and 2 in the body (MikkTSpace 'zero-length normal' display message on the skeletal build)"
+  },
+  {
+   "id": "F5",
+   "severity": "information",
+   "text": "ORM.R (AO) is a constant 1.0: Tripo provides no occlusion"
+  },
+  {
+   "id": "F6",
+   "severity": "log noise",
+   "text": "FBX keeps texture file names (path_mode STRIP); UE FBXImport logs texture name-conflict renames (_ncl1_1) although import_materials=false; no extra assets are created"
+  },
+  {
+   "id": "F7",
+   "severity": "information",
+   "text": "texel density differs 1.75x between parts (14.8–25.9 px/cm), inherited from Tripo per-part texture sizes"
+  },
+  {
+   "id": "F8",
+   "severity": "open observation",
+   "text": "small dark triangle on the candidate's bow forearm near the bracer in the UE rear close-up (editor-frames/ue-rear-bow-arm-candidate.jpg); not visible in the Blender frame; not investigated"
+  },
+  {
+   "id": "F9",
+   "severity": "tooling",
+   "text": "unreal_mcp.py truncates output at 200 000 characters, so CaptureViewport images need a direct HTTP client (review/capture_ue_review.py); Git Bash converts /Game/... arguments unless MSYS_NO_PATHCONV=1"
+  },
+  {
+   "id": "F10",
+   "severity": "information",
+   "text": "every part has open/non-manifold edges after a 1e-7 weld (1063 boundary / 1081 non-manifold); Tripo topology accepted as is"
+  },
+  {
+   "id": "F11",
+   "severity": "information",
+   "text": "after the export rotation 6 corner normals next to near-degenerate triangles differ from v2 (numerically undefined sliver normals); not caused by Triangulate"
+  },
+  {
+   "id": "F12",
+   "severity": "rig contract",
+   "text": "bones are rotated with EditBone.transform(roll=True) (rigid rest pose); ART-001 batch_export moves only head/tail — P1.6 has to pick one convention"
+  },
+  {
+   "id": "F13",
+   "severity": "decision pending",
+   "text": "own material M_Medusa_Candidate_Atlas instead of the shared M_DioramaMaster (04 §1)"
+  }
+ ]
+}

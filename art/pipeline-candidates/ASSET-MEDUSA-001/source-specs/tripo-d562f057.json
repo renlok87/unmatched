@@ -1,0 +1,132 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-d562f057",
+  "asset_id": "ASSET-MEDUSA-001",
+  "service": "tripo-studio",
+  "task_id": "d562f057-1455-4663-8cd8-bb738175111d",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/d562f057-1455-4663-8cd8-bb738175111d",
+  "date": "2026-09-27",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач. Ожидание дольше",
+    "backend": null,
+    "documented_api_version_not_verified_for_studio": "v3.1-20260211"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-front.png",
+        "sha256": "252f94b965aa049f5395534b066271d2ef9cfe6755a8c1ddf4bc9801187a78c9"
+      },
+      "left": {
+        "path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-left.png",
+        "sha256": "6d27f4d2090ac660ebcb53810c8fade2d794c5f2fa614944415499ad88c4635c"
+      },
+      "back": {
+        "path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-back.png",
+        "sha256": "3b328a54002b2ea953a1390d616ac14ac8498a155bcbfbd825d83c28afec5c1d"
+      },
+      "right": null
+    },
+    "input_manifest": "docs/game-design/evidence/ART-004/tripo-medusa-inputs.json",
+    "settings": {
+      "output": "geometry and texture",
+      "texture_8k": false,
+      "generate_parts": false,
+      "privacy": "private",
+      "seed": null
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "multi-view HD model",
+      "evidence": "docs/game-design/evidence/ART-004/tripo-pilot-20260927/run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 55,
+        "observed_debit": 55,
+        "balance_before": 25200,
+        "balance_after": 25145
+      }
+    },
+    {
+      "op": "retopology",
+      "settings": {
+        "topology": "Quad",
+        "smart_mesh": "P1.0 on",
+        "target_polygons": 10000
+      },
+      "evidence": "docs/game-design/evidence/ART-004/tripo-production-20260927/retopo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 40,
+        "observed_debit": 40,
+        "balance_before": 25145,
+        "balance_after": 25105
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "source-glb",
+      "path": "blender/ASSET-MEDUSA-001/tripo-source/d562f057/medusa-source.glb",
+      "expected_sha256": "618fba23ecfa6fc46db44d855bcbcf0efddbe2fb38409178608c70fa96fe0918",
+      "expected_bytes": 62717236,
+      "produced_by": "generate",
+      "origin": "Studio GLB download, unmodified"
+    },
+    {
+      "role": "retopo-10k-glb",
+      "path": "blender/ASSET-MEDUSA-001/tripo-source/d562f057/medusa-retopo-10k.glb",
+      "expected_sha256": "2edb3f50ecac8582de8ad68179105b13644fa8c7fa75760c5bb344f06bdb5a7d",
+      "expected_bytes": 11839916,
+      "produced_by": "retopology",
+      "origin": "Studio GLB export, 4K texture tier, unmodified"
+    },
+    {
+      "role": "source-texture-basecolor",
+      "path": "blender/ASSET-MEDUSA-001/tripo-source/d562f057/textures/medusa-tripo-h31-d562f057-source_basecolor.jpg",
+      "produced_by": "generate",
+      "origin": "extracted from source GLB without re-encoding (pilot README)"
+    },
+    {
+      "role": "source-texture-normal",
+      "path": "blender/ASSET-MEDUSA-001/tripo-source/d562f057/textures/medusa-tripo-h31-d562f057-source_normal.png",
+      "produced_by": "generate",
+      "origin": "extracted from source GLB without re-encoding (pilot README)"
+    },
+    {
+      "role": "source-texture-rm",
+      "path": "blender/ASSET-MEDUSA-001/tripo-source/d562f057/textures/medusa-tripo-h31-d562f057-source_rm.jpg",
+      "produced_by": "generate",
+      "origin": "extracted from source GLB without re-encoding (pilot README)"
+    }
+  ],
+  "expectations": {
+    "source-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 1883819,
+      "glb_materials": 1,
+      "glb_skins": 0
+    },
+    "retopo-10k-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 19486,
+      "glb_materials": 1,
+      "glb_skins": 0
+    }
+  },
+  "evidence": [
+    "docs/game-design/evidence/ART-004/tripo-pilot-20260927/run.json",
+    "docs/game-design/evidence/ART-004/tripo-pilot-20260927/README.md",
+    "docs/game-design/evidence/ART-004/tripo-production-20260927/retopo-run.json",
+    "docs/game-design/evidence/ART-004/tripo-production-20260927/README.md",
+    "docs/game-design/evidence/ART-004/tripo-medusa-inputs.json"
+  ],
+  "notes": [
+    "Credits are Studio credits of the observed account; not API credits, not USD.",
+    "game_ready=false in evidence; this registration does not change any acceptance status."
+  ]
+}
