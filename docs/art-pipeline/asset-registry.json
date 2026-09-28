@@ -1,0 +1,1098 @@
+{
+  "schemaVersion": 1,
+  "registryId": "unmatched-mvp-3d-asset-registry",
+  "snapshotDate": "2026-09-28",
+  "language": "ru",
+  "purpose": "Машиночитаемый реестр обязательных 3D-ассетов MVP: источники, стадия, владение файлами, следующий шаг, блокер, критерий готовности. Реестр пайплайна; не заменяет нормативный 06-asset-manifest.csv и не меняет статусы бэклога.",
+  "validator": "tools/tripo-pipeline/validate_registry.py",
+  "baseline": {
+    "mainCheckout": {
+      "root": "repo",
+      "branch": "fix/admin-panel",
+      "commit": "c43826d",
+      "tree": "7aed58c3f62982d09d9f00b551242d4992fdcda7",
+      "untrackedForeignFiles": [
+        ".zcode/",
+        ".zcodeignore",
+        "blender/ASSET-MEDUSA-001/{animation-api-inspect.json,build-output.txt,build_tripo_medusa.py,component-api-inspect.json,inspect_segmented_blender.py,medusa.blend1,pose-api-inspect.json,socket-inspect.json,verify-output.txt}",
+        "blender/ASSET-MEDUSA-001/export/*.fbm/",
+        "blender/ASSET-MEDUSA-001/preview/{light-probe-35-20.png,light-probe-45-12.png,rig-idle.png,ue-review/}",
+        "blender/ASSET-MEDUSA-001/textures/{T_Medusa_BC.jpg,T_Medusa_N.jpg,T_Medusa_RM.png}",
+        "tools/art/{art004_capture.py,art004_inspect_component.py,art004_inspect_pose_api.py,inspect_medusa_animation_api.py,inspect_medusa_sockets.py}"
+      ],
+      "note": "Чужие неотслеживаемые файлы. Пайплайн их не читает как источники, не изменяет и не удаляет.",
+      "untrackedAfterT1": [
+        "docs/game-design/evidence/ART-004/{v3-live-hookup-diagnosis-2026-09-28.md,v3-live-hookup.patch} (арт-трек, диагностика падения live-запуска v3)",
+        "tools/art/analyze_video_ref.py (появился 12:09, владелец не установлен)"
+      ],
+      "untrackedAfterT1Note": "Срез обновлён 2026-09-28 ~12:10 после P0 (T3/T4/A1). Собственные неотслеживаемые каталоги пайплайна (docs/art-pipeline/, tools/tripo-pipeline/, art/pipeline-candidates/) и каталоги параллельного P1 (art/animation-refs/ и др.) сюда не входят."
+    },
+    "artWorktree": {
+      "root": "art-worktree",
+      "absolutePath": "C:/Users/ren/.codex/worktrees/art-foundation/unmached",
+      "branch": "codex/medusa-shading-probe",
+      "commit": "3950132",
+      "tree": "7aed58c3f62982d09d9f00b551242d4992fdcda7",
+      "treeEqualsMain": true,
+      "uncommitted": [
+        "blender/ASSET-MEDUSA-001/variants/head-tilt-v3/SK_Medusa_HeadTilt_v3.fbx",
+        "blender/ASSET-MEDUSA-001/variants/head-tilt-v3/README.md",
+        "docs/game-design/evidence/ART-004/head-tilt-v3-game-import-report.json",
+        "tools/art/art004_face_skeletal_export.py (M)",
+        "tools/art/art004_face_static_ue_capture.py (M)",
+        "tools/art/art004_import_v2_game_candidate.py (M)",
+        "docs/game-design/evidence/ART-004/README.md (M, A1: +2 строки)",
+        "docs/game-design/evidence/GD-058/acceptance-review-2026-09-28.md (M, A1: +2 строки)",
+        "docs/game-design/evidence/ART-004/head-tilt-v3-self-acceptance-2026-09-28.md (A1)",
+        "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/ (A1; после сокращения ≈14 МБ: 14 466 696 байт, 69 файлов, было ~54 МБ)",
+        "tools/art/art004_head_tilt_v3_mcp_review/, tools/art/art004_head_tilt_v3_measure.py, tools/art/art004_head_tilt_v3_followup.py (A1)",
+        "unreal/Unmatched/Content/ArtPreview/Medusa/Meshes/SK_Medusa_HeadTilt_v3Candidate{,_Skeleton}.uasset (Content/ в .gitignore; в git не попадёт без force-add)"
+      ],
+      "note": "Деревья коммитов совпадают; отличие только в незакоммиченных v3-файлах (+76/-11 в трёх скриптах) и файлах проверки A1 (включая по +2 строки в README ART-004 и акте GD-058). Интеграцию делает оркестратор после ревью diff."
+    },
+    "gitignoredButLocal": [
+      "unreal/Unmatched/Content/ (кроме принудительно добавленных /Game/ArtPreview/Medusa/*, /Game/ArtTests/ART003|ART005*|ARTMarkers/*, /Game/S01|S05|S08/*)",
+      "unreal/Unmatched/Content/PipelineCandidates/ (9 uasset T4; воспроизводятся tripo_pipeline.py ue-import)",
+      "unreal/Unmatched/Content/ArtTests/ART004_V3Review/ (5 временных uasset A1; судьба — решение пользователя)",
+      "art/pipeline-candidates/*/*/work/ (art/pipeline-candidates/.gitignore) и */*/logs/*.log (корневое правило *.log)",
+      "unreal/Unmatched/Artifacts/",
+      "scraped-data/"
+    ]
+  },
+  "vocabularies": {
+    "status": {
+      "не начато": "Нет ни файлов, ни проверяемых измерений производственного ассета.",
+      "предложено": "Есть только карточка/бриф/референсы; числа — ПРЕДЛОЖЕНИЕ (04 §1, 17 §7.6) до GD-058.",
+      "измерено": "Есть реальный файл и численный отчёт (Blender/скрипт), но нет подтверждённого импорта в UE.",
+      "технически импортировано": "Импорт в UE подтверждён отчётом скрипта; художественная/игровая приёмка не проведена.",
+      "художественно принято": "Есть акт приёмки с решением «принято»; требует acceptanceEvidence: файл docs/game-design/evidence/(ART|GD)-NNN/…/*.md в главном checkout (root repo, expect exists) со строкой «Решение: принято» (жирный шрифт допускается)."
+    },
+    "statusRules": [
+      "Порядок статусов: не начато < предложено < измерено < технически импортировано < художественно принято.",
+      "Дочерняя запись (parent = id записи реестра) не может быть выше родителя по этому порядку.",
+      "Слой (layers[]) не может иметь статус «художественно принято»: приёмка записывается на уровне записи через acceptanceEvidence.",
+      "Решение арт-трека по слою (например «доработать v3.1») записывается в поле decision слоя; статус слоя остаётся техническим."
+    ],
+    "stage": [
+      "planned",
+      "reference-images",
+      "blockout",
+      "tripo-source",
+      "blender-candidate",
+      "ue-editor-import",
+      "ue-editor-frames",
+      "live-packaged-probe"
+    ],
+    "owner": {
+      "art-chat": "Арт-трек и его рабочая копия: blender/ASSET-*, blender/A01, tools/art/*, evidence/ART-00x, /Game/ART004, /Game/ArtPreview, /Game/ArtTests. Пайплайн только читает.",
+      "pipeline": "Пайплайн-трек: tools/tripo-pipeline/, docs/art-pipeline/, art/pipeline-candidates/<ASSET-ID>/<run-id>/, /Game/PipelineCandidates/*.",
+      "shared": "Общие входы/нормативы: docs/game-design/*.md|csv (владелец — автор/пользователь), art/imagegen/mvp-v1/ (только чтение для обоих треков), blender/_shared, blender/_tools, исторический blender/S05.",
+      "user-untracked": "Чужие неотслеживаемые файлы в главном checkout; не трогать."
+    },
+    "pathRoots": {
+      "repo": "Главный checkout C:/Users/ren/WebstormProjects/unmached/unmached",
+      "art-worktree": "Рабочая копия арт-чата C:/Users/ren/.codex/worktrees/art-foundation/unmached"
+    },
+    "pathKinds": {
+      "file": "Файл или каталог относительно root.",
+      "ue-asset": "/Game/<...> → <root>/unreal/Unmatched/Content/<...>(.uasset|.umap|/)."
+    },
+    "pathExpect": {
+      "exists": "Путь обязан существовать; иначе ошибка валидатора.",
+      "planned": "Целевой путь по 04/06; может отсутствовать. Появление фиксируется как info."
+    }
+  },
+  "sharedDependencies": [
+    {
+      "id": "M-DIORAMA-MASTER",
+      "note": "Мастер-материал BaseColor/Normal/ORM/TeamColor/Emissive (06). В UE пока только S05-версия и локальные M_Medusa_Atlas/M_ART005*. Не 3D-меш; в реестр ассетов не входит.",
+      "paths": [
+        {"path": "/Game/S05/M_DioramaMaster", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "S05 historical master"}
+      ]
+    },
+    {
+      "id": "RIG-TEMPLATE",
+      "note": "Шаблон скелета 04 §1; вход для P1.6.",
+      "paths": [
+        {"path": "blender/_shared/rig_template.blend", "root": "repo", "kind": "file", "expect": "exists", "role": "rig template"}
+      ]
+    },
+    {
+      "id": "FBX-PRESET-UM_FBX_v1",
+      "note": "Пресет экспорта; ловушка FBX_SCALE_UNITS + import_uniform_scale=100 (ue-pipeline-traps).",
+      "paths": [
+        {"path": "blender/_tools/presets/UM_FBX_v1.json", "root": "repo", "kind": "file", "expect": "exists", "role": "fbx preset"},
+        {"path": "docs/game-design/evidence/ART-001/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "import contract evidence"}
+      ]
+    },
+    {
+      "id": "BOARD-CONTRACT-S04",
+      "note": "Серверная сетка Cobble City 5x6/30 клеток, клетка 100 uu. Клетки/зоны сцены берутся из boardState, не из изображений доски.",
+      "paths": [
+        {"path": "docs/game-design/evidence/S04/board-contract.json", "root": "repo", "kind": "file", "expect": "exists", "role": "board contract", "sha256": "98e05a492321036cbb87c1af8ca788daa85a3df82fe174f3e39b54ed441d4336"}
+      ]
+    }
+  ],
+  "excludedFromRegistry": [
+    {"ids": "ASSET-CARDART-* (27 строк 06)", "reason": "2D-арт карт, не 3D; ждут sync-card-assets.mjs."},
+    {"ids": "UI-* (10 строк 06)", "reason": "2D UI-семейства (ART-011)."},
+    {"ids": "M-HIGHLIGHT-GAMELAYER, M-CARD-PLANE", "reason": "Материалы, не меши; учитываются при импорте маркеров/карт."},
+    {"ids": "VFX/звук CUE-001..018", "reason": "ART-010; не 3D-модели."},
+    {"ids": "Новые герои/карты", "reason": "Вне MVP по 00 D-03 и 17 §1.2."}
+  ],
+  "assets": [
+    {
+      "id": "ASSET-MEDUSA-001",
+      "name": "Medusa (герой)",
+      "category": "hero",
+      "contentKey": "medusa",
+      "manifest06Row": "ASSET-MEDUSA-001",
+      "backlog": ["ART-004", "GD-058"],
+      "parent": null,
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "art-chat", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": {"path": "art/imagegen/mvp-v1/generation-inputs.json", "root": "repo", "kind": "file", "expect": "exists", "role": "selection manifest"},
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-front.png", "root": "repo", "kind": "file", "expect": "exists", "role": "front", "sha256": "252f94b965aa049f5395534b066271d2ef9cfe6755a8c1ddf4bc9801187a78c9"},
+          {"path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-left.png", "root": "repo", "kind": "file", "expect": "exists", "role": "left", "sha256": "6d27f4d2090ac660ebcb53810c8fade2d794c5f2fa614944415499ad88c4635c"},
+          {"path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-back.png", "root": "repo", "kind": "file", "expect": "exists", "role": "back", "sha256": "3b328a54002b2ea953a1390d616ac14ac8498a155bcbfbd825d83c28afec5c1d"}
+        ],
+        "excludedCandidates": [
+          {"path": "art/imagegen/mvp-v1/characters/ref-medusa-v6-right.png", "root": "repo", "kind": "file", "expect": "exists", "role": "right (не рекомендован)", "sha256": "43a68653a2fdda1fcd27873fe19b901149bce8fc2eec09528e740f87ee897ce5"}
+        ],
+        "note": "Тройка v5 front/left/back использована в оплаченном пилоте (слот right пуст). Реестр входов пилота: evidence/ART-004/tripo-medusa-inputs.json."
+      },
+      "source3d": [
+        {"path": "blender/ASSET-MEDUSA-001/tripo-source/d562f057/medusa-source.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "Tripo H3.1 multi-view оригинал, task d562f057, 1 883 819 tris, 55 Studio-кредитов", "sha256": "618fba23ecfa6fc46db44d855bcbcf0efddbe2fb38409178608c70fa96fe0918"},
+        {"path": "blender/ASSET-MEDUSA-001/tripo-source/d562f057/medusa-retopo-10k.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "Tripo Quad retopo 10 485 faces, 40 Studio-кредитов (не используется кандидатом)", "sha256": "2edb3f50ecac8582de8ad68179105b13644fa8c7fa75760c5bb344f06bdb5a7d"},
+        {"path": "blender/ASSET-MEDUSA-001/tripo-source/b6253e58/medusa-segmented-15.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "Tripo Segment Balanced, 15 частей, клон b6253e58, бесплатно", "sha256": "64febfeb270274e0b9bf96132e5865a0c5f6e18a74785a92daa1a5348665933e"},
+        {"path": "blender/ASSET-MEDUSA-001/tripo-source/b6253e58/medusa-segmented-retopo.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "Tripo segmented retopo 21 177 tris, 40 Studio-кредитов — вход Blender-кандидата", "sha256": "0400f2b44f80b14005e03d997b83453e7d35e54f8ddd537b5dbf7770c0792e56"},
+        {"path": "blender/ASSET-MEDUSA-001/tripo-source/d562f057/textures", "root": "repo", "kind": "file", "expect": "exists", "role": "Tripo 4K BC/Normal/RM оригиналы"},
+        {"path": "scraped-data/images/heroes/models/3eR7yPmdggV_bbHII_HIq.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "скрап-референс формы (D-06), gitignored, лицензия не проверена"}
+      ],
+      "layers": [
+        {
+          "layer": "tripo-sources",
+          "stage": "tripo-source",
+          "status": "измерено",
+          "owner": "art-chat",
+          "paths": [
+            {"path": "docs/game-design/evidence/ART-004/tripo-pilot-20260927/run.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest пилота"},
+            {"path": "docs/game-design/evidence/ART-004/tripo-production-20260927/retopo-run.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest retopo"},
+            {"path": "docs/game-design/evidence/ART-004/tripo-production-20260927/segment-run.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest segment"},
+            {"path": "docs/game-design/evidence/ART-004/tripo-production-20260927/segmented-retopo-run.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest segmented retopo"}
+          ],
+          "note": "Итого 135 Studio-кредитов (55+40+40); Studio-кредиты ≠ API-кредиты ≠ USD. Повторные платные генерации запрещены."
+        },
+        {
+          "layer": "blender-candidate /Game/ART004",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "art-chat",
+          "paths": [
+            {"path": "blender/ASSET-MEDUSA-001/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "описание кандидата"},
+            {"path": "blender/ASSET-MEDUSA-001/medusa.blend", "root": "repo", "kind": "file", "expect": "exists", "role": "blend"},
+            {"path": "blender/ASSET-MEDUSA-001/build_segmented_medusa.py", "root": "repo", "kind": "file", "expect": "exists", "role": "build script"},
+            {"path": "blender/ASSET-MEDUSA-001/export/SK_Medusa.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "производственный FBX (не заменён)", "sha256": "fb9772eaaffd591a221b50b1a6dec17a25a33712449d3c0e95f10ff9a87242aa"},
+            {"path": "blender/ASSET-MEDUSA-001/export/SM_Medusa_Base.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "подставка Ø30×6 uu", "sha256": "a49bfbbfe6e51856aebcd9d3e7cc9a45bc142f0ff110830f446a28c76997ba4f"},
+            {"path": "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_BC.png", "root": "repo", "kind": "file", "expect": "exists", "role": "2K BC"},
+            {"path": "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_N.png", "root": "repo", "kind": "file", "expect": "exists", "role": "2K Normal DirectX"},
+            {"path": "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_ORM.png", "root": "repo", "kind": "file", "expect": "exists", "role": "2K ORM"},
+            {"path": "blender/ASSET-MEDUSA-001/ue-import-result.json", "root": "repo", "kind": "file", "expect": "exists", "role": "UE import report"},
+            {"path": "tools/art/import_medusa_candidate.py", "root": "repo", "kind": "file", "expect": "exists", "role": "UE import script"},
+            {"path": "/Game/ART004/Medusa/Meshes/SK_Medusa_Atlas", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE skeletal mesh (gitignored, воспроизводится скриптом)"}
+          ],
+          "note": "Измерено: 21 176 tris (тело 18 199, лук 1 197, база 1 780; UE отбрасывает 2 почти вырожденных треугольника базы → 1 778), 55 uu, сокеты Weapon/Head, 1 слот на меш. Кости: 17 костей рига (поддерево root) + кость 0 SKEL_Medusa (узел объекта арматуры), всего 18 в UE (измерено через UE MCP SkeletalMeshTools.get_bone_names; прежнее «17» считало только поддерево root). Для root motion это существенно: UE читает кость 0. В SK_Medusa.fbx вывернуты части tripo_part_8 (рука с луком и наруч) и tripo_part_13 (правая кисть) — измерено T4 на FBX. Лицо в UE смотрит в +Y: отклонение от проверенного пресета UM_FBX_v1 / 04 §1 (ART-001 PASS: −Y Blender → +X UE). Числа не являются бюджетом."
+        },
+        {
+          "layer": "visual-candidate v2 /Game/ArtPreview",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "art-chat",
+          "paths": [
+            {"path": "blender/ASSET-MEDUSA-001/variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "v2 FBX", "sha256": "bd125c6bbeb2559b28f6fc4908a1790e0d05fd572b128bd9188c2daeea046592"},
+            {"path": "blender/ASSET-MEDUSA-001/variants/face-section-neck-v2/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "описание v2"},
+            {"path": "docs/game-design/evidence/ART-004/v2-game-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "UE import report v2"},
+            {"path": "tools/art/art004_import_v2_game_candidate.py", "root": "repo", "kind": "file", "expect": "exists", "role": "import script v2"},
+            {"path": "/Game/ArtPreview/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE v2 (принудительно отслеживается в git)"},
+            {"path": "docs/game-design/evidence/ART-004/live-k2-zoom-comparison-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "живой packaged K2 1.6x/5x"}
+          ],
+          "note": "2 слота на теле (лицевой + основной, один PBR). Живой K1/K2 — технические пробы, художественно не приняты. После A1 v2 остаётся изолированным игровым кандидатом. Как и в SK_Medusa.fbx: 18 костей в UE (кость 0 = SKEL_Medusa), вывернуты части 8 и 13 (измерено T4), лицо +Y."
+        },
+        {
+          "layer": "visual-candidate v3 head-tilt (арт-worktree, не интегрирован; A1: доработать v3.1)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "decision": "доработать v3.1 (акт A1 2026-09-28): v3 не принят как статический кандидат, v2 остаётся изолированным игровым кандидатом",
+          "owner": "art-chat",
+          "paths": [
+            {"path": "blender/ASSET-MEDUSA-001/variants/head-tilt-v3/SK_Medusa_HeadTilt_v3.fbx", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "v3 FBX (незакоммичен)", "sha256": "b9cea0fe05071b07732b8d72ecc75b074c366bc665679c378cd4e397e1f822a2"},
+            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-game-import-report.json", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "UE import report v3 (незакоммичен)"},
+            {"path": "/Game/ArtPreview/Medusa/Meshes/SK_Medusa_HeadTilt_v3Candidate", "root": "art-worktree", "kind": "ue-asset", "expect": "exists", "role": "UE v3 в Content/ арт-worktree (gitignored; при интеграции нужен force-add, как у 9 uasset v2, или повторный импорт ART004_GAME_VARIANT=head-tilt-v3 tools/art/art004_import_v2_game_candidate.py)"},
+            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-self-acceptance-2026-09-28.md", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "акт A1: решение «доработать (v3.1)» (незакоммичен)"},
+            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/head-tilt-v3-review-measurements.json", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "машинные измерения A1 (незакоммичен)"},
+            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/ue-mcp-live/ue-mcp-cobble-d10-k2-d300-v3.png", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "полный кадр K2 v3 из живого UE MCP-вьюпорта A1: Cobble, спереди, 300 uu, 1920×1080; оставлен при сокращении каталога пробы A1 (незакоммичен)"},
+            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/compare-ue-k2-front-three-lights.png", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "сравнение v2/v3 в K2 спереди при трёх светах (A1, UE MCP; незакоммичен)"},
+            {"path": "unreal/Unmatched/Artifacts/ART004Face/medusa-skeletal-restorednormals-faceslot-neck-static-frontambient-y100-z500-s100-d10-k2-base-d300-headtiltprobe.png", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "исходный CLI-кадр K2 v3 арт-чата (SceneCapture, gitignored Artifacts). Копию в ue-cli-headtiltprobe/ A1 удалила при сокращении каталога пробы; SHA-256 записан в head-tilt-v3-review-measurements.json → probe_dir_pruning_2026-09-28. С кадрами MCP не смешивать", "sha256": "b06e86f02824060f9ad8475d5ed9e6d99f42a7b906195d3b3886d21a8236d1b4"},
+            {"path": "unreal/Unmatched/Artifacts/ART004Face/headtilt-live-flag-experiment.patch", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "отменённый эксперимент live-подключения (gitignored)"}
+          ],
+          "note": "Измерено/технически импортировано, художественно не принято. A1 (живые Blender MCP и UE MCP, только редакторные кадры): лицо в K2 300 uu читается лучше (видимые пиксели черт лица 809 → 1 242, +54 %; рост суммы градиента в основном от площади маски, средний градиент +4…8 %). Дефекты v3: P1 — сквозной просвет у основания шеи спереди 23 → 82 мм²; P2 — зазор корона–колчан 1,07 → 0,31 см; P2 — кость head не повёрнута, сокет Head расходится с головой на 1,04 см. Предложено для v3.1: плавный переход угла z 38,5 → 42 см, зазор корона–колчан ≥ 1,0 см, решение по кости head/сокету Head в контракте рига P1.6. Живой packaged K2 с v3 не выполнен: оба запуска упали при старте клиента до загрузки карты; вероятная причина — флаг сборки -NoLiveCoding, не ассет v3 (диагностика арт-трека по следам, A/B не проводился). Временные ревью-ассеты A1 /Game/ArtTests/ART004_V3Review (5 uasset, главный checkout, gitignored) в пути не внесены: их судьба — решение пользователя. Каталог пробы A1 сокращён с ~54 до ≈14 МБ (14 466 696 байт, 69 файлов): оставлены кадры K2 Cobble из UE MCP, сравнения, ID-рендеры Blender и JSON; удалённые файлы с SHA-256 перечислены в head-tilt-v3-review-measurements.json → probe_dir_pruning_2026-09-28."
+        },
+        {
+          "layer": "pipeline-scaffold T3 (passthrough)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest T3"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold/export/ASSET-MEDUSA-001_segmented-retopo-glb.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "passthrough FBX (headless Blender)"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffold/reports/export-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "export report"},
+            {"path": "docs/art-pipeline/evidence/t3-idempotency-2026-09-28/summary.json", "root": "repo", "kind": "file", "expect": "exists", "role": "идемпотентность прогона T3"}
+          ],
+          "note": "Каркас инструмента: экспорт headless без UE-импорта. FBX этого прогона экспортирован без пресета UM_FBX_v1 (нет +90° Z и triangulate); путь passthrough вживую в UE не проверялся. Не кандидат в игру."
+        },
+        {
+          "layer": "pipeline-candidate T4 /Game/PipelineCandidates/Medusa/T4LocalPass",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль сборки skeletal-candidate (числа — предложение)"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-local-pass/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest T4"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-local-pass/export/SK_Medusa_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "скелетный FBX кандидата", "sha256": "8e83019a05b9cfcfb4ced34442bea2834a58347842fb551afa83d35b4fd19bcc"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-local-pass/export/SM_Medusa_Base_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "подставка 30×30×6 uu", "sha256": "63816adc63f020054956c1c3d4a9ae5d3f5a28c439db87f601e6a7a191102285"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-local-pass/textures", "root": "repo", "kind": "file", "expect": "exists", "role": "атлас 2K BC/N/N_OpenGL/ORM (байт в байт = blender/ASSET-MEDUSA-001/textures)"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-local-pass/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "build report"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-local-pass/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "UE import report (MCP)"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-headless-compare/export/SK_Medusa_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "контрольный headless-прогон, байт в байт = MCP-прогон", "sha256": "8e83019a05b9cfcfb4ced34442bea2834a58347842fb551afa83d35b4fd19bcc"},
+            {"path": "/Game/PipelineCandidates/Medusa/T4LocalPass/Meshes/SK_Medusa_Candidate", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE skeletal mesh кандидата (gitignored, воспроизводится ue-import)"},
+            {"path": "/Game/PipelineCandidates/Medusa/T4LocalPass/Meshes/SM_Medusa_Base_Candidate", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE подставка кандидата (gitignored)"},
+            {"path": "docs/art-pipeline/medusa-local-pass-report.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт T4"},
+            {"path": "docs/art-pipeline/medusa-local-pass-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт T4 (json, контракты)"},
+            {"path": "docs/art-pipeline/evidence/t4-medusa-local-pass-2026-09-28/fbx-orientation-comparison.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вывернутые части 8/13 в SK_Medusa.fbx, v2, v3"},
+            {"path": "docs/art-pipeline/evidence/t4-medusa-local-pass-2026-09-28/commands.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "команды и коды выхода"}
+          ],
+          "note": "Технически импортировано; не художественная приёмка, не игровой ассет, не бюджет, не замена SK_Medusa, /Game/ART004 и /Game/ArtPreview. Измерено T4: тело 18 199 / лук 1 197 / подставка 1 780 tris (в UE 1 778), верх 55,0 uu, подставка 30×30×6 uu, 2 слота на теле, сокеты Weapon и Head ровно по одному, в UE 18 костей (кость 0 = SKEL_Medusa + 17 костей профиля). Исправлены вывернутые части 8 и 13 (в SK_Medusa.fbx, v2 и v3 не исправлены). Импорт и ue-import --force: те же 9 ассетов, без дублей. Отклонения: лицо в UE +Y — экспорт без поворота +90° Z проверенного пресета UM_FBX_v1 / 04 §1 (ART-001 PASS); собственный M_Medusa_Candidate_Atlas вместо M_DioramaMaster. Открытые и неманифолдные рёбра Tripo по частям (verify, информационно) не оценивались. Run-каталог untracked до интеграции; work/ и logs/*.log игнорируются git; uasset в gitignored Content/."
+        },
+        {
+          "layer": "draft-animation-clips",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "art-chat",
+          "paths": [
+            {"path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "черновой клип"},
+            {"path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "черновой клип"},
+            {"path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "черновой клип"},
+            {"path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "черновой клип"},
+            {"path": "blender/ASSET-MEDUSA-001/ue-animation-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "численная проверка движения костей и root"}
+          ],
+          "note": "Черновые; анимационная работа остановлена до пайплайна «модель → видео-референс → скелетный клип → ретаргет». Только тестовые файлы."
+        }
+      ],
+      "manifest06": {
+        "verificationStatusIn06": "planned",
+        "drift": "06 указывает «модель с нуля (D-06)», sourceHash пуст, unrealAssetPath /Game/Meshes/SK/SK_Medusa не существует; фактически — Tripo-источники, кандидаты арт-трека в /Game/ART004 и /Game/ArtPreview и кандидат пайплайна в /Game/PipelineCandidates/Medusa/T4LocalPass.",
+        "proposedChange": "Предложение владельцу 06 (не применено): sourceReference → Tripo d562f057/b6253e58 + ссылки на run.json; sourceHash → sha256 SK_Medusa.fbx; verificationStatus planned → imported (технически), без verified до GD-058."
+      },
+      "nextStep": "A1 и T4 выполнены (v3 → доработать v3.1; кандидат T4 технически импортирован). Дальше: арт-трек — v3.1 (плавный переход угла шеи, зазор корона–колчан ≥ 1,0 см, решение о переносе исправления частей 8/13); P1.6 — контракт рига с костью 0 = SKEL_Medusa и решением по кости head/сокету Head; A2 — подтвердить причину падения live-запуска v3 (A/B по -NoLiveCoding), затем packaged K2 с HUD и boardState.",
+      "blocker": "Художественный контраст лица и читаемость короны на игровом K2 не решены; v3 не принят (просвет шеи, зазор корона–колчан, сокет Head) и не интегрирован; причина падения live-запуска v3 диагностирована только по следам (вероятно -NoLiveCoding, A/B не выполнен); предел зума не утверждён; ось лица +Y у всех импортов Medusa против проверенного пресета UM_FBX_v1 / 04 §1 (+X) — нужно решение пользователя: исправлять экспорт/ассеты Medusa или сознательно принять +Y.",
+      "doneCriteria": "Художественный акт ART-004: K1/K2/K3 в живой packaged-сцене с HUD и boardState, лицо/корона/лук/кисти читаемы на рабочем зуме, сокеты Weapon/Head соответствуют кости, нулевой нежелательный root motion, QA-009/010 заполнены; затем решение GD-058.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ART-004/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "ART-004 evidence index"},
+        {"path": "docs/game-design/evidence/ART-004/crown-spread-self-acceptance-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отклонённая корона (не повторять)"},
+        {"path": "docs/game-design/evidence/GD-058/acceptance-review-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "GD-058 не принят"},
+        {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-self-acceptance-2026-09-28.md", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "акт A1: v3 → доработать v3.1 (незакоммичен)"},
+        {"path": "docs/art-pipeline/medusa-local-pass-report.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт T4: кандидат пайплайна технически импортирован"},
+        {"path": "docs/art-pipeline/imagegen-inputs/CONSISTENCY-REVIEW.md", "root": "repo", "kind": "file", "expect": "exists", "role": "проверка входов ImageGen T2 (#ref-medusa)"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-MEDUSA-001.WEAPON-BOW",
+      "name": "Лук Medusa (оружие)",
+      "category": "weapon",
+      "contentKey": "medusa",
+      "manifest06Row": "ASSET-MEDUSA-001",
+      "backlog": ["ART-004"],
+      "parent": "ASSET-MEDUSA-001",
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "ue-editor-import",
+      "ownership": {"existingFiles": "art-chat", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {"selectionManifest": null, "recommended": [], "excludedCandidates": [], "note": "Лук виден на тех же видах Medusa v5; отдельных референсов оружия нет."},
+      "source3d": [
+        {"path": "blender/ASSET-MEDUSA-001/tripo-source/b6253e58/medusa-segmented-retopo.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "часть сегментации Tripo"}
+      ],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "Отдельной строки нет; по 04 §3.1 — 2-й меш в SK_Medusa.fbx.", "proposedChange": "Нет; остаётся компонентом строки героя."},
+      "nextStep": "T4 выполнен технически: в кандидате пайплайна лук — отдельный меш 1 197 tris, 100 % на кости weapon, сокет Weapon ровно один и после ue-import --force. A1: лук и сокет Weapon в v3 не изменились. Дальше — читаемость лука на K1/K2 в живой packaged-сцене (арт-трек) и следование за костью weapon в клипах.",
+      "blocker": "Читаемость лука на K2 при рабочем зуме не принята; положение дальней кисти на референсах не доказано; рука с луком и наручем (tripo_part_8) вывернута в SK_Medusa.fbx, v2 и v3 (исправлено только в кандидате T4).",
+      "doneCriteria": "Лук читается на K1/K2, следует за костью weapon в клипах без клиппинга, сокет Weapon на месте после повторного импорта.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "blender/ASSET-MEDUSA-001/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "измерение 1 197 tris лука"},
+        {"path": "docs/art-pipeline/medusa-local-pass-report.md", "root": "repo", "kind": "file", "expect": "exists", "role": "T4: раздельный лук, сокет Weapon, повторный импорт"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-MEDUSA-001.ACCESSORIES",
+      "name": "Змеиная корона, колчан, накидка Medusa (аксессуары в теле)",
+      "category": "accessory",
+      "contentKey": "medusa",
+      "manifest06Row": "ASSET-MEDUSA-001",
+      "backlog": ["ART-004"],
+      "parent": "ASSET-MEDUSA-001",
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "ue-editor-frames",
+      "ownership": {"existingFiles": "art-chat", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {"selectionManifest": null, "recommended": [], "excludedCandidates": [], "note": "Те же виды Medusa v5; на right v6 видно семь змей."},
+      "source3d": [
+        {"path": "blender/ASSET-MEDUSA-001/tripo-source/b6253e58/medusa-segmented-15.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "сегменты короны/колчана"}
+      ],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "Отдельной строки нет.", "proposedChange": "Нет."},
+      "nextStep": "A1 выполнен: наклон головы v3 разредил корону спереди, но сократил зазор корона–колчан 1,07 → 0,31 см (в черновом HitReact кадр 4 — 40 пересекающихся пар) и уплотнил задний силуэт. Дальше в v3.1: вернуть зазор корона–колчан ≥ 1,0 см; различимость семи голов вести как открытый художественный вопрос (карточка 04 требует читаемую «корону», не детальных змей), без расширения на 28 %.",
+      "blocker": "Корона-веер отклонена; v3 не принят; критерий читаемости короны на K2 не согласован (семь голов сливаются, но 04 требует только читаемую корону).",
+      "doneCriteria": "Корона читается на игровом K2 как «змеиная корона» (04, карточка Medusa); зазор корона–колчан без пересечений в клипах; задний силуэт без щелей/пересечений при трёх условиях света.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ART-004/crown-spread-self-acceptance-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отклонение расширения короны"},
+        {"path": "docs/game-design/evidence/ART-004/v2-base-d10-composition-self-acceptance-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "семь голов не разделяются"},
+        {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-self-acceptance-2026-09-28.md", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "A1: корона спереди/сзади, зазор корона–колчан (незакоммичен)"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-KING-ARTHUR-001",
+      "name": "King Arthur (герой)",
+      "category": "hero",
+      "contentKey": "king-arthur",
+      "manifest06Row": "ASSET-KING-ARTHUR-001",
+      "backlog": ["ART-006", "ART-003"],
+      "parent": null,
+      "instances": 1,
+      "status": "предложено",
+      "stage": "reference-images",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": {"path": "art/imagegen/mvp-v1/generation-inputs.json", "root": "repo", "kind": "file", "expect": "exists", "role": "selection manifest"},
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-front.png", "root": "repo", "kind": "file", "expect": "exists", "role": "front", "sha256": "1467861455c6e7a011edca9e879982f088c5839ad39d2a4fadf94b1ab253f9a2"},
+          {"path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-left.png", "root": "repo", "kind": "file", "expect": "exists", "role": "left", "sha256": "f9799f034c5003514503952c9a8f005e5c19c216a9b108e80fc52b4ae2045fc3"},
+          {"path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-back.png", "root": "repo", "kind": "file", "expect": "exists", "role": "back", "sha256": "febe34fa79e74381ff2434ab264e6fe11c35b4b4d49a9d63f19ed123050f90f7"}
+        ],
+        "excludedCandidates": [
+          {"path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v7-right.png", "root": "repo", "kind": "file", "expect": "exists", "role": "right-кандидат (ожидает приёмки)", "sha256": "92f09fa9c4c5f05a9a15cabe2160ff796d474b72771f66e9cf4712a1f9b45740"},
+          {"path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v6-right.png", "root": "repo", "kind": "file", "expect": "exists", "role": "right v6 — отклонён пользователем (меч за головой)"}
+        ],
+        "note": "v5 right существует, но не входит в рекомендованную тройку. Проверка входов T2 (docs/art-pipeline/imagegen-inputs/manifest.json, CONSISTENCY-REVIEW.md#ref-king-arthur): тройка v5 пригодна как вход (предложено), автопроверки без FAIL; слоты Tripo front/left/back; не A/T-поза, риск слипания левой руки и плаща."
+      },
+      "source3d": [
+        {"path": "blender/A01/export/SM_ART003_Arthur.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "серый блок-аут ART-003 (габарит/силуэт)"},
+        {"path": "scraped-data/images/heroes/models/xfdrwhmlwG_bbpcMBbfbv.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "скрап-референс формы (D-06), gitignored"}
+      ],
+      "layers": [
+        {
+          "layer": "art003-blockout",
+          "stage": "blockout",
+          "status": "технически импортировано",
+          "owner": "art-chat",
+          "paths": [
+            {"path": "blender/A01/silhouette_blockouts.blend", "root": "repo", "kind": "file", "expect": "exists", "role": "blend блок-аутов"},
+            {"path": "/Game/ArtTests/ART003/Meshes/SM_ART003_Arthur", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE блок-аут"}
+          ],
+          "note": "Блок-аут — только габарит и силуэт; не производственная модель."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения по статусу; путь /Game/Meshes/SK/SK_KingArthur — плановый.", "proposedChange": "Нет."},
+      "nextStep": "T2 выполнен (manifest входов и ручная оценка v5-тройки, перерисовка не нужна). Дальше: решение по right v7 (арт); пробная Tripo-генерация — только с отдельным разрешением расходов. Производство — после GD-058 (ART-006).",
+      "blocker": "ART-006 зависит от GD-058 и GD-024; Tripo-генерация не запускается в этом прогоне (стоимость 0).",
+      "doneCriteria": "Карточка ASSET-KING-ARTHUR-001 выполнена: mesh/rig/4 клипа/source/export; силуэт отличается от Merlin; импортный отчёт заполнен; художественный акт.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ART-003/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "силуэты ART-003"}
+      ],
+      "plannedPaths": [
+        {"path": "blender/ASSET-KING-ARTHUR-001", "root": "repo", "kind": "file", "expect": "planned", "role": "производственный каталог по 04 §3.3"},
+        {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001", "root": "repo", "kind": "file", "expect": "planned", "role": "кандидат пайплайна"}
+      ]
+    },
+    {
+      "id": "ASSET-KING-ARTHUR-001.WEAPON-SWORD",
+      "name": "Меч Excalibur (оружие Arthur)",
+      "category": "weapon",
+      "contentKey": "king-arthur",
+      "manifest06Row": "ASSET-KING-ARTHUR-001",
+      "backlog": ["ART-006"],
+      "parent": "ASSET-KING-ARTHUR-001",
+      "instances": 1,
+      "status": "предложено",
+      "stage": "reference-images",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {"selectionManifest": null, "recommended": [], "excludedCandidates": [], "note": "Меч на видах Arthur v5; положение в right v7 расходится на ~14 px (2D-диагностика, не геометрия)."},
+      "source3d": [],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "Отдельной строки нет; по 04 §3.3 — 2-й меш, сокет Weapon (VFX Holy Avenger).", "proposedChange": "Нет."},
+      "nextStep": "Согласовать положение меча в 3D при производстве Arthur; сокет Weapon по контракту рига P1.6.",
+      "blocker": "Зависит от ASSET-KING-ARTHUR-001.",
+      "doneCriteria": "Отдельный меш, сокет Weapon, читаемая диагональ меча на K1.",
+      "acceptanceEvidence": [],
+      "evidence": [],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-KING-ARTHUR-001.ACCESSORIES",
+      "name": "Корона/шлем и плащ Arthur",
+      "category": "accessory",
+      "contentKey": "king-arthur",
+      "manifest06Row": "ASSET-KING-ARTHUR-001",
+      "backlog": ["ART-006"],
+      "parent": "ASSET-KING-ARTHUR-001",
+      "instances": 1,
+      "status": "предложено",
+      "stage": "reference-images",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {"selectionManifest": null, "recommended": [], "excludedCandidates": [], "note": "На видах Arthur v5."},
+      "source3d": [],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "Отдельной строки нет.", "proposedChange": "Нет."},
+      "nextStep": "Плащ — отдельные кости/веса по контракту рига P1.6.",
+      "blocker": "Зависит от ASSET-KING-ARTHUR-001 и контракта рига плаща.",
+      "doneCriteria": "Плащ без клиппинга в клипах; корона читается на K1.",
+      "acceptanceEvidence": [],
+      "evidence": [],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-MERLIN-001",
+      "name": "Merlin (помощник Arthur)",
+      "category": "sidekick",
+      "contentKey": "king-arthur-sidekick-merlin",
+      "manifest06Row": "ASSET-MERLIN-001",
+      "backlog": ["ART-007", "ART-003"],
+      "parent": null,
+      "instances": 1,
+      "status": "предложено",
+      "stage": "reference-images",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": {"path": "art/imagegen/mvp-v1/generation-inputs.json", "root": "repo", "kind": "file", "expect": "exists", "role": "selection manifest"},
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-front.png", "root": "repo", "kind": "file", "expect": "exists", "role": "front", "sha256": "cdd344e012d02abbecf232a7c1c0e332a29501794455e1f4320830083705e109"},
+          {"path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-right.png", "root": "repo", "kind": "file", "expect": "exists", "role": "right", "sha256": "839bffe4ac47d805778cd3cf5241976bb18fb854249ef12f0ed5166d2220d678"},
+          {"path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-back.png", "root": "repo", "kind": "file", "expect": "exists", "role": "back", "sha256": "e859071fe3fbc9180c2c0b7af4eba855f91354e14f9e264fe8ef6869a4942d63"}
+        ],
+        "excludedCandidates": [
+          {"path": "art/imagegen/mvp-v1/characters/ref-merlin-v5-left.png", "root": "repo", "kind": "file", "expect": "exists", "role": "left-кандидат (ожидает приёмки)", "sha256": "918379c99499abca9295b23be8d83aad4df1f5f7093ac2fd82864ec2c1907038"},
+          {"path": "art/imagegen/mvp-v1/characters/ref-merlin-v4-left.png", "root": "repo", "kind": "file", "expect": "exists", "role": "left v4 — отклонён (посох неоднозначен)"}
+        ],
+        "note": "Merlin — единственный комплект с right вместо left; v5 front/back не существуют. Скрап-.glb Merlin нет. Проверка входов T2 (imagegen-inputs/manifest.json, CONSISTENCY-REVIEW.md#ref-merlin): тройка v3 пригодна (предложено); нормализация использовала подставку Ø24 (04 §3.4), а 04 §3.8 задаёт Base_Sidekick Ø22 — противоречие внутри 04, решает владелец."
+      },
+      "source3d": [
+        {"path": "blender/A01/export/SM_ART003_Merlin.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "серый блок-аут ART-003"}
+      ],
+      "layers": [
+        {
+          "layer": "art003-blockout",
+          "stage": "blockout",
+          "status": "технически импортировано",
+          "owner": "art-chat",
+          "paths": [
+            {"path": "/Game/ArtTests/ART003/Meshes/SM_ART003_Merlin", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE блок-аут"}
+          ],
+          "note": "Только габарит/силуэт."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения.", "proposedChange": "Нет."},
+      "nextStep": "T2 выполнен (manifest входов front/right/back и ручная оценка, перерисовка не нужна). Дальше: решение по left v5 и по диаметру подставки Ø22/Ø24; пробная Tripo-генерация — только с отдельным разрешением расходов. Производство — ART-007 после GD-058.",
+      "blocker": "ART-007 зависит от GD-058 и GD-024; не блокирует ранний визуальный gate.",
+      "doneCriteria": "Карточка ASSET-MERLIN-001: mesh/rig/4 клипа/source/export; читаемый посох и сокеты; размеры в принятом бюджете.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ART-003/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "силуэты ART-003"}
+      ],
+      "plannedPaths": [
+        {"path": "blender/ASSET-MERLIN-001", "root": "repo", "kind": "file", "expect": "planned", "role": "производственный каталог по 04 §3.4"},
+        {"path": "art/pipeline-candidates/ASSET-MERLIN-001", "root": "repo", "kind": "file", "expect": "planned", "role": "кандидат пайплайна"}
+      ]
+    },
+    {
+      "id": "ASSET-MERLIN-001.WEAPON-STAFF",
+      "name": "Посох с кристаллом Merlin (оружие) и колпак",
+      "category": "weapon",
+      "contentKey": "king-arthur-sidekick-merlin",
+      "manifest06Row": "ASSET-MERLIN-001",
+      "backlog": ["ART-007"],
+      "parent": "ASSET-MERLIN-001",
+      "instances": 1,
+      "status": "предложено",
+      "stage": "reference-images",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {"selectionManifest": null, "recommended": [], "excludedCandidates": [], "note": "На видах Merlin v3; путь скрытого посоха в left v5 по PNG не подтверждается."},
+      "source3d": [],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "Отдельной строки нет; по 04 §3.4 — 2-й меш.", "proposedChange": "Нет."},
+      "nextStep": "Согласовать полный путь посоха в 3D; сокет Weapon.",
+      "blocker": "Зависит от ASSET-MERLIN-001.",
+      "doneCriteria": "Посох выше фигурки на голову, читается на K1, сокет Weapon.",
+      "acceptanceEvidence": [],
+      "evidence": [],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-HARPY-001",
+      "name": "Harpy (помощник Medusa), один тип — три экземпляра",
+      "category": "sidekick",
+      "contentKey": "medusa-sidekick-harpy",
+      "manifest06Row": "ASSET-HARPY-001",
+      "backlog": ["ART-008", "ART-003"],
+      "parent": null,
+      "instances": 3,
+      "status": "предложено",
+      "stage": "reference-images",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": {"path": "art/imagegen/mvp-v1/generation-inputs.json", "root": "repo", "kind": "file", "expect": "exists", "role": "selection manifest"},
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-front.png", "root": "repo", "kind": "file", "expect": "exists", "role": "front", "sha256": "0a27b796aebe2b859baac4c249913bf804d8de1f9bc02688f971ba9183250e4c"},
+          {"path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-left.png", "root": "repo", "kind": "file", "expect": "exists", "role": "left", "sha256": "cc347722811849932bef3e0371852e50d7e0adfa159d5f175d6db48f719bdc6f"},
+          {"path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-back.png", "root": "repo", "kind": "file", "expect": "exists", "role": "back", "sha256": "bcb59c7c3ce126c931372d72bda4c657635fba01ea7059f56eabab7a2d67c789"}
+        ],
+        "excludedCandidates": [
+          {"path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-right.png", "root": "repo", "kind": "file", "expect": "exists", "role": "right — дополнительный кандидат, крылья выровнять в Blender", "sha256": "d6a1e7ca18e2eb81f4e84631f375e46465495f1e447369f44a902e70b271eb1d"}
+        ],
+        "note": "Выбор v5 front/left/back согласован: PRODUCTION-NOTES, раздел «Наборы для дальнейшего производства» (строка 125), и generation-inputs.json (revision correction-v4). Строка 29 PRODUCTION-NOTES относится к исторической секции «Коррекция v2» (тогда v4) и расхождением не является. Скрап-.glb гарпии нет. Проверка входов T2 (imagegen-inputs/manifest.json, CONSISTENCY-REVIEW.md#ref-harpy): WARN — при нормализации v3 front сжат по Y на 3,6 % при X ≈ 1,0 (сплющен по вертикали ~3,5 %); главный риск multi-view — двоение крыльев; высота ≈44 uu с подставкой — ручная оценка с допущением Ø22, скриптом не измерена."
+      },
+      "source3d": [
+        {"path": "blender/A01/export/SM_ART003_Harpy.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "серый блок-аут ART-003"}
+      ],
+      "layers": [
+        {
+          "layer": "art003-blockout",
+          "stage": "blockout",
+          "status": "технически импортировано",
+          "owner": "art-chat",
+          "paths": [
+            {"path": "/Game/ArtTests/ART003/Meshes/SM_ART003_Harpy", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE блок-аут"}
+          ],
+          "note": "Номера трёх гарпий временные (ART-003)."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения.", "proposedChange": "Нет."},
+      "nextStep": "T2 выполнен (manifest входов v5 и ручная оценка; дефектных видов нет). Дальше: пробная Tripo-генерация — только с отдельным разрешением расходов; при двоении крыльев — ImageGen left-профиль по промпту из CONSISTENCY-REVIEW.md или ручные крылья; контракт рига крыльев в P1.6. Производство — ART-008 после GD-058.",
+      "blocker": "ART-008 зависит от GD-058 и GD-024; формат номера экземпляра не определён (AD-OPEN-06); набор клипов Harpy не определён (AD-CNF-30).",
+      "doneCriteria": "Одна модель на три экземпляра; номера/маркеры различают экземпляры; смерть и возвращение (Winged Frenzy) не ломают маркеры; размах ≤ 80 uu; коллизия проверена.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ART-003/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "силуэты ART-003"}
+      ],
+      "plannedPaths": [
+        {"path": "blender/ASSET-HARPY-001", "root": "repo", "kind": "file", "expect": "planned", "role": "производственный каталог по 04 §3.2"},
+        {"path": "art/pipeline-candidates/ASSET-HARPY-001", "root": "repo", "kind": "file", "expect": "planned", "role": "кандидат пайплайна"}
+      ]
+    },
+    {
+      "id": "ASSET-HARPY-001.ACCESSORIES",
+      "name": "Крылья, браслет на лодыжке, номер экземпляра Harpy",
+      "category": "accessory",
+      "contentKey": "medusa-sidekick-harpy",
+      "manifest06Row": "ASSET-HARPY-001",
+      "backlog": ["ART-008", "ART-003"],
+      "parent": "ASSET-HARPY-001",
+      "instances": 3,
+      "status": "предложено",
+      "stage": "reference-images",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {"selectionManifest": null, "recommended": [], "excludedCandidates": [], "note": "Браслет на дальней ноге не виден в right v5."},
+      "source3d": [],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "Номер экземпляра не имеет строки в 06 (UI или маркер — не решено).", "proposedChange": "Нет; решение AD-OPEN-06 за автором."},
+      "nextStep": "Решить носитель номера (маркер подставки vs HUD) в арт-треке; крылья — кости по контракту рига.",
+      "blocker": "AD-OPEN-06.",
+      "doneCriteria": "Три экземпляра различимы на K1 без цвета.",
+      "acceptanceEvidence": [],
+      "evidence": [],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-MARKERS-001.BASES",
+      "name": "Подставки команд SM_Base_Hero/Sidekick_P1/P2",
+      "category": "base",
+      "contentKey": null,
+      "manifest06Row": "ASSET-MARKERS-001",
+      "backlog": ["ART-003", "GD-058"],
+      "parent": "ASSET-MARKERS-001",
+      "instances": 4,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "art-chat", "nextCandidates": "art-chat", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/markers/ref-base-hero-p1.png", "root": "repo", "kind": "file", "expect": "exists", "role": "визуальный референс (толщину с PNG не переносить)"},
+          {"path": "art/imagegen/mvp-v1/markers/ref-base-hero-p2.png", "root": "repo", "kind": "file", "expect": "exists", "role": "визуальный референс"},
+          {"path": "art/imagegen/mvp-v1/markers/ref-base-sidekick-p1.png", "root": "repo", "kind": "file", "expect": "exists", "role": "визуальный референс"},
+          {"path": "art/imagegen/mvp-v1/markers/ref-base-sidekick-p2.png", "root": "repo", "kind": "file", "expect": "exists", "role": "визуальный референс"}
+        ],
+        "excludedCandidates": [],
+        "note": "Моделируются вручную по 04 §3.8 (Ø30×6 и Ø22×5 uu), не через Tripo."
+      },
+      "source3d": [
+        {"path": "blender/ASSET-MARKERS-001/markers.blend", "root": "repo", "kind": "file", "expect": "exists", "role": "параметрический blend"},
+        {"path": "blender/ASSET-MARKERS-001/build_markers.py", "root": "repo", "kind": "file", "expect": "exists", "role": "build script"}
+      ],
+      "layers": [
+        {
+          "layer": "markers-probe-v1",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "art-chat",
+          "paths": [
+            {"path": "blender/ASSET-MARKERS-001/export/SM_Base_Hero_P1.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX"},
+            {"path": "blender/ASSET-MARKERS-001/export/SM_Base_Sidekick_P2.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX"},
+            {"path": "blender/ASSET-MARKERS-001/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "UE import report"},
+            {"path": "/Game/ArtTests/ARTMarkers/Meshes/SM_Base_Hero_P1", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE"}
+          ],
+          "note": "576 tris каждая (измерено)."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "in_progress", "drift": "Совпадает (probe-v1, sourceHash заполнен).", "proposedChange": "Нет."},
+      "nextStep": "Решить дублирование: у Medusa собственная SM_Medusa_Base Ø30×6 внутри кандидата vs командные SM_Base_Hero_P1/P2 из кита — зафиксировать одну схему в контракте импорта.",
+      "blocker": "Палитра команд и финальная статусная иконка не приняты (GD-058).",
+      "doneCriteria": "Одна схема подставок для всех фигурок; профиль команды читается в градациях серого на K1; нет z-fighting с доской.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "blender/ASSET-MARKERS-001/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "описание кита"},
+        {"path": "docs/game-design/evidence/ART-005/zone-markers-packaged-review-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "живой packaged K1 с командными основаниями"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-MARKERS-001.RINGS",
+      "name": "Кольца выбора/цели и маркер статуса",
+      "category": "marker",
+      "contentKey": null,
+      "manifest06Row": "ASSET-MARKERS-001",
+      "backlog": ["ART-003"],
+      "parent": "ASSET-MARKERS-001",
+      "instances": 3,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "art-chat", "nextCandidates": "art-chat", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/markers/marker-selection-p1.png", "root": "repo", "kind": "file", "expect": "exists", "role": "визуальный референс"},
+          {"path": "art/imagegen/mvp-v1/markers/marker-target.png", "root": "repo", "kind": "file", "expect": "exists", "role": "визуальный референс"},
+          {"path": "art/imagegen/mvp-v1/markers/marker-status.png", "root": "repo", "kind": "file", "expect": "exists", "role": "визуальный референс"}
+        ],
+        "excludedCandidates": [],
+        "note": "Параметрические меши; Tripo не нужен."
+      },
+      "source3d": [
+        {"path": "blender/ASSET-MARKERS-001/export/SM_Marker_TargetRing.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX прицела с 4 UCX"},
+        {"path": "blender/ASSET-MARKERS-001/export/SM_Marker_SelectionRing.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX"},
+        {"path": "blender/ASSET-MARKERS-001/export/SM_Marker_Status.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX"}
+      ],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "in_progress", "drift": "Совпадает.", "proposedChange": "Нет."},
+      "nextStep": "Реальный клик мышью по кольцу цели и проверка 24 px иконки в K3 (арт-трек).",
+      "blocker": "Реальный ввод не проверен; статусная иконка — концепт.",
+      "doneCriteria": "Клик по кольцу цели работает в packaged; маркеры видимы на минимальных настройках; читаемы в grayscale.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ART-003/live-combat-target-acceptance-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "техническая привязка прицела к бою"},
+        {"path": "blender/ASSET-MARKERS-001/ue-hit-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "UE hit test"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-BOARD-COBBLE-001",
+      "name": "Доска Cobble City (игровое поле 5×6)",
+      "category": "board",
+      "contentKey": "cobble-city",
+      "manifest06Row": "ASSET-BOARD-COBBLE-001",
+      "backlog": ["ART-005", "ART-009", "GD-058"],
+      "parent": null,
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "art-chat", "nextCandidates": "art-chat", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/environment/ref-board-cobble-v4.png", "root": "repo", "kind": "file", "expect": "exists", "role": "top (только настроение; клетки — из boardState)", "sha256": "c8488e7b850d8be71981a9f6a2189da9074a44f7b87bd65528209b65e8537ac2"},
+          {"path": "art/imagegen/mvp-v1/environment/ref-board-cobble-v3-side.png", "root": "repo", "kind": "file", "expect": "exists", "role": "side", "sha256": "e3df61127c0a228866d1527423f45457431f68fbcde5053de4f4c2b2803ba77f"}
+        ],
+        "excludedCandidates": [],
+        "note": "Геометрия поля — из S04 board-contract, не из изображений. Tripo для поля не применяется."
+      },
+      "source3d": [
+        {"path": "blender/ASSET-BOARD-COBBLE-001/variants/B-atlas-v4-woodUV/export/SM_ART005_BoardStoneV4_WoodUV.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "рабочий кандидат stone v4 + wood UV", "sha256": "445f514ac9b6a5899746c8c6db64cd25a793b5ed3fa505303cf27d296df030c2"},
+        {"path": "blender/ASSET-BOARD-COBBLE-001/variants/B-atlas-v4-woodUV/cobble-city-stone-v4-wood-uv.blend", "root": "repo", "kind": "file", "expect": "exists", "role": "blend"},
+        {"path": "blender/ASSET-BOARD-COBBLE-001/textures/T_ART005_CobbleBoardAtlas_B_v4_candidate.png", "root": "repo", "kind": "file", "expect": "exists", "role": "рабочий BaseColor камня v4"},
+        {"path": "blender/ASSET-BOARD-COBBLE-001/textures/T_ART005_WoodFrame_B_v1_candidate.png", "root": "repo", "kind": "file", "expect": "exists", "role": "BaseColor дерева-кандидат"}
+      ],
+      "layers": [
+        {
+          "layer": "art005-editor-probes",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "art-chat",
+          "paths": [
+            {"path": "/Game/ArtTests/ART005F/Meshes/SM_ART005_BoardStoneV4_WoodUV", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE меш (отслеживается)"},
+            {"path": "docs/game-design/evidence/ART-005/stone-v4-self-acceptance-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "камень v4 — рабочий BaseColor"},
+            {"path": "docs/game-design/evidence/ART-005/wood-frame-review-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "дерево UV"},
+            {"path": "docs/game-design/evidence/ART-005/lighting-stress-review-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "два световых профиля (не реальные карты)"}
+          ],
+          "note": "Компоненты — рабочие технические кандидаты; нет полного BC/N/ORM камня/дерева."
+        },
+        {
+          "layer": "live-packaged-k1",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "art-chat",
+          "paths": [
+            {"path": "docs/game-design/evidence/ART-005/zone-markers-packaged-review-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "30 зон из boardState в packaged K1"}
+          ],
+          "note": "Красные/синие игровые зоны — не секции освещения."
+        }
+      ],
+      "manifest06": {
+        "verificationStatusIn06": "blocked",
+        "drift": "06 держит blocked с причиной «6x4 vs 5x6», снятой GD-014/S04 (AD-CNF-36); фактически ART-005 ведёт редакторные и packaged-пробы.",
+        "proposedChange": "Предложение владельцу 06 (не применено): verificationStatus blocked → in_progress; sourceReference → S04 board-contract.json; не «принят»."
+      },
+      "nextStep": "Арт-трек: Cobble City и минимум две реальные карты с разными световыми секциями; полный BC/N/ORM камня/дерева; реальный клик по клетке.",
+      "blocker": "GD-058 открыт; финальная доска — AD-OPEN-36; нет согласованного полного PBR.",
+      "doneCriteria": "ART-005/ART-009: игровые зоны и hit surfaces отделены от декора; участок совпадает с версией геометрии S04; материалы и треугольники в измеренном и принятом бюджете; K1–K3 приняты.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ART-005/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "ART-005 evidence index"}
+      ],
+      "plannedPaths": [
+        {"path": "blender/ASSET-BOARD-COBBLE-001/cobble-city.blend", "root": "repo", "kind": "file", "expect": "planned", "role": "производственный blend по 06"}
+      ]
+    },
+    {
+      "id": "ASSET-BOARD-COBBLE-001.CORNER-BRACKET",
+      "name": "Модульные угловые накладки рамки (модульное окружение)",
+      "category": "modular-environment",
+      "contentKey": "cobble-city",
+      "manifest06Row": "ASSET-BOARD-COBBLE-001",
+      "backlog": ["ART-005"],
+      "parent": "ASSET-BOARD-COBBLE-001",
+      "instances": 4,
+      "status": "технически импортировано",
+      "stage": "ue-editor-frames",
+      "ownership": {"existingFiles": "art-chat", "nextCandidates": "art-chat", "acceptance": "art-chat"},
+      "sourceImages": {"selectionManifest": null, "recommended": [], "excludedCandidates": [], "note": "Процедурная деталь, референсов ImageGen нет."},
+      "source3d": [
+        {"path": "blender/ASSET-BOARD-COBBLE-001/variants/corner-bracket-v1/export/SM_ART005_CornerBracket_v1.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX 76 tris", "sha256": "e6574c17b5a6337db7b8bd32cce5882fb5d089002617bd25d0120cf0ab897bfc"},
+        {"path": "blender/_tools/build_art005_corner_bracket.py", "root": "repo", "kind": "file", "expect": "exists", "role": "build script"}
+      ],
+      "layers": [
+        {
+          "layer": "art005h-editor",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "art-chat",
+          "paths": [
+            {"path": "/Game/ArtTests/ART005H/Meshes/SM_ART005_CornerBracket_v1", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE"},
+            {"path": "docs/game-design/evidence/ART-005/corner-bracket-review-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "редакторная самопроверка"}
+          ],
+          "note": "Материал/заклёпки черновые."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "blocked", "drift": "Отдельной строки нет; входит в доску.", "proposedChange": "Нет."},
+      "nextStep": "Финальный материал накладок вместе с PBR рамки.",
+      "blocker": "Финальные размеры доски и палитра открыты.",
+      "doneCriteria": "Накладки не перекрывают клетки; материал принят вместе с доской.",
+      "acceptanceEvidence": [],
+      "evidence": [],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-TABLE-BASE-001",
+      "name": "Основание-поднос диорамы",
+      "category": "diorama-base",
+      "contentKey": null,
+      "manifest06Row": "ASSET-TABLE-BASE-001",
+      "backlog": ["ART-009"],
+      "parent": null,
+      "instances": 1,
+      "status": "предложено",
+      "stage": "reference-images",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": {"path": "art/imagegen/mvp-v1/generation-inputs.json", "root": "repo", "kind": "file", "expect": "exists", "role": "selection manifest (REF-TABLE-BASE)"},
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/environment/ref-table-base-v3-three-quarter.png", "root": "repo", "kind": "file", "expect": "exists", "role": "three-quarter", "sha256": "f75c85e9fa9c7d6298dd93ff6d52d1b038a2f7c23e9d1b19fbddf151e3199d8a"},
+          {"path": "art/imagegen/mvp-v1/environment/ref-table-base-v3-front.png", "root": "repo", "kind": "file", "expect": "exists", "role": "front", "sha256": "b16fb858a6459ff6264f405f1984c43b9e39a8cef0300aa2d113e79ce078e9fc"},
+          {"path": "art/imagegen/mvp-v1/environment/ref-table-base-v3-side.png", "root": "repo", "kind": "file", "expect": "exists", "role": "side", "sha256": "18f904d67a42c3b9515db51c8de78d966363ea64f5e612241cc3ae70ba286018"}
+        ],
+        "excludedCandidates": [],
+        "note": "Генерировать можно только скальный низ; верх и рамку — вручную по S04 (5×6). T2 (imagegen-inputs/manifest.json → sets[REF-TABLE-BASE].propTripoSlotProposal, предложено): front ← front, left ← side, three-quarter — только референс для человека. WARN: серая кромка скалы близка к фону #808080 (18 % / 12,8 % внутренней кромки front/side) — риск среза при удалении фона в Tripo."
+      },
+      "source3d": [
+        {"path": "blender/S05/export/SM_S05_TableBase.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "S05 блок-аут, 252 tris, 612.6×714.5×40 uu (исторический)"}
+      ],
+      "layers": [
+        {
+          "layer": "s05-blockout",
+          "stage": "blockout",
+          "status": "технически импортировано",
+          "owner": "shared",
+          "paths": [
+            {"path": "/Game/S05/Meshes/SM_S05_TableBase", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE S05"}
+          ],
+          "note": "Исторический S05; не производственный ассет. Проба ART-005 имеет свой foundation-меш внутри доски."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения.", "proposedChange": "Нет."},
+      "nextStep": "После фиксации габарита доски: пакет входов для скального низа (Tripo — только при отдельном разрешении расходов), верх/рамка вручную.",
+      "blocker": "Габарит финальной доски (AD-OPEN-36); внутреннее противоречие слотов 04 §3.6 (AD-CNF-18).",
+      "doneCriteria": "На K1 за краем нет читаемых объектов; нет z-fighting с доской; кайма 40–60 uu (предложено).",
+      "acceptanceEvidence": [],
+      "evidence": [],
+      "plannedPaths": [
+        {"path": "blender/ASSET-TABLE-BASE-001", "root": "repo", "kind": "file", "expect": "planned", "role": "производственный каталог по 04 §3.6"}
+      ]
+    },
+    {
+      "id": "ASSET-DECOR-KIT-001.BARREL",
+      "name": "Бочка (пропс, пилот P1.5)",
+      "category": "prop",
+      "contentKey": null,
+      "manifest06Row": "ASSET-DECOR-KIT-001",
+      "backlog": ["ART-009"],
+      "parent": "ASSET-DECOR-KIT-001",
+      "instances": 1,
+      "status": "измерено",
+      "stage": "blender-candidate",
+      "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": {"path": "art/imagegen/mvp-v1/generation-inputs.json", "root": "repo", "kind": "file", "expect": "exists", "role": "selection manifest (REF-BARREL)"},
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/environment/ref-barrel-v3-front.png", "root": "repo", "kind": "file", "expect": "exists", "role": "front", "sha256": "0253587543f27a3159b93879dc4e77870d711a6ad8fed4695bf9106aed340129"},
+          {"path": "art/imagegen/mvp-v1/environment/ref-barrel-v3-side.png", "root": "repo", "kind": "file", "expect": "exists", "role": "side", "sha256": "f78baae79e13f0a6c1a4707a66600ca936b3cb613dd6e63623f6b551ee64f038"},
+          {"path": "art/imagegen/mvp-v1/environment/ref-barrel-v3-top.png", "root": "repo", "kind": "file", "expect": "exists", "role": "top", "sha256": "2f6a19639f79a6e76b7cb2bb13011498466419c34cc902ac8d9440696d8d6f6e"},
+          {"path": "art/imagegen/mvp-v1/environment/ref-barrel-v3-three-quarter.png", "root": "repo", "kind": "file", "expect": "exists", "role": "three-quarter", "sha256": "09c67c971c788e380195ab08051cd7f5061f600d21ab72bc37eebead2909e8a7"}
+        ],
+        "excludedCandidates": [],
+        "note": "P1.5: в Tripo multi-view поданы front<-front и left<-side (task 3f7a258f); top/three-quarter — только человеческий референс."
+      },
+      "source3d": [
+        {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-h31-3f7a258f-source.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "Tripo H3.1 multi-view, task 3f7a258f, 3837 tris, 45 Studio-кредитов", "sha256": "7c81e9944f64390d1f0581c29b0bbc26884cf396603cf629575c1a37c2443782"},
+        {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-3f7a258f-smartuv-tex2k.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "Smart UV (проба, 0) + текстура 2K (10 Studio-кредитов)", "sha256": "2937d45f2d218820053640981e355f821cd1d4ffc2486780f1c56506467db438"},
+        {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "+ PBR (5 Studio-кредитов); основной вход кандидата", "sha256": "b336bf62ae9cd1518e741d0814824c4e3f5e5d1e4b3a1838a33f72ec59632fc4"}
+      ],
+      "layers": [
+        {
+          "layer": "tripo-sources",
+          "stage": "tripo-source",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/source-specs/tripo-3f7a258f.json", "root": "repo", "kind": "file", "expect": "exists", "role": "source spec"},
+            {"path": "docs/art-pipeline/evidence/p15-barrel-2026-09-28/tripo-run.json", "root": "repo", "kind": "file", "expect": "exists", "role": "Studio: цены, списания, баланс"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest tripo_pipeline (passthrough)"}
+          ],
+          "note": "Итого 60 Studio-кредитов (45+10+5; Smart UV по бесплатной пробе). Studio-кредиты ≠ API-кредиты ≠ USD."
+        },
+        {
+          "layer": "blender-candidate SM_Decor_Barrel",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/tripo-pipeline/blender/static_prop_candidate.py", "root": "repo", "kind": "file", "expect": "exists", "role": "build script"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/SM_Decor_Barrel.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX UM_FBX_v1", "sha256": "80153e4c9ccb759ba09d0f255e6066ebee3ba152652cad7c81f8e6c90b91855b"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_BC.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K BC sRGB", "sha256": "393b0b50d431d94909f4e24d4d0271dd603a7ee53816be747740f7d4a49afde1"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_N.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K Normal DirectX", "sha256": "33f91b4db86fa7e31ead30466a4ba9328d9fcf22d160ec6ba445ed3826fb2c17"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_ORM.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K ORM (AO bake)", "sha256": "9a66a5581ba08573952d82aafd1987edaf8d890e2bf3a12761db571df98b875c"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/candidate-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "измерения кандидата"},
+            {"path": "/Game/PipelineCandidates/DecorBarrel", "root": "repo", "kind": "ue-asset", "expect": "planned", "role": "UE-импорт отложен"}
+          ],
+          "note": "Измерено: 3837 tris, 21,4×21,4×26 uu, 1 слот, UV0 48 островов/75,7 %, 0 перекрытий, зазор ≈3 px на 1K. Край крышки: 1 открытое + 2 неманифолдных ребра (не исправлено). Числа не являются бюджетом."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "06 предлагает один SM_Decor.fbx, 04 — файл на объект (AD-CNF-19).", "proposedChange": "Нет; для кандидатов пайплайна — файл на объект."},
+      "nextStep": "UE-этап: импорт SM_Decor_Barrel + BC/N/ORM в /Game/PipelineCandidates при свободном UE, затем кадры K-1/K-2 для арт-проверки.",
+      "blocker": "Живой UE занят T4 (UnrealEditor-Cmd запрещён); художественная проверка не проводилась.",
+      "doneCriteria": "Ø22×26 uu (предложено), ≤2 слота, 1K, без коллизии; UE-импорт без дублей; художественная проверка в контрольной сцене.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/art-pipeline/prop-barrel-report.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт P1.5"},
+        {"path": "docs/art-pipeline/prop-barrel-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт P1.5 (json)"}
+      ],
+      "plannedPaths": [
+        {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001", "root": "repo", "kind": "file", "expect": "planned", "role": "кандидат пайплайна P1.5"}
+      ]
+    },
+    {
+      "id": "ASSET-DECOR-KIT-001.LANTERN",
+      "name": "Фонарь",
+      "category": "prop",
+      "contentKey": null,
+      "manifest06Row": "ASSET-DECOR-KIT-001",
+      "backlog": ["ART-009"],
+      "parent": "ASSET-DECOR-KIT-001",
+      "instances": 1,
+      "status": "предложено",
+      "stage": "reference-images",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": {"path": "art/imagegen/mvp-v1/generation-inputs.json", "root": "repo", "kind": "file", "expect": "exists", "role": "selection manifest (REF-LANTERN)"},
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-front.png", "root": "repo", "kind": "file", "expect": "exists", "role": "front", "sha256": "710a17b99813347eff59f7a204457221b18d2d34239f8026e89118b303080a58"},
+          {"path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-left.png", "root": "repo", "kind": "file", "expect": "exists", "role": "left", "sha256": "01c870d8e0d701a4bba258590b9afd2580422dc7ec586f6206611a1350f0d7be"},
+          {"path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-back.png", "root": "repo", "kind": "file", "expect": "exists", "role": "back", "sha256": "69f256cc8023929d4ba58ad70264dc5bb0def611e5f13bcbbc0d840402210682"},
+          {"path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-right.png", "root": "repo", "kind": "file", "expect": "exists", "role": "right", "sha256": "48caa2b52b2f4b7328facba1654b8ec3f4abfead77f15c1051bfdeca349af55f"}
+        ],
+        "excludedCandidates": [],
+        "note": "Фурнитура дверцы дрейфует между боковыми видами. T2 (imagegen-inputs/manifest.json → sets[REF-LANTERN].propTripoSlotProposal, предложено): подавать только front + back, боковые слоты Tripo оставить пустыми. Открытый вопрос: в left у переднего ребра видны петли, в right — защёлка, то есть боковые файлы, вероятно, названы по противоположному соглашению сторон, чем у персонажей (не доказано; нужна ручная проверка стороны петель/защёлки)."
+      },
+      "source3d": [
+        {"path": "blender/S05/export/SM_S05_Lantern.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "S05 блок-аут 11×11×94 uu, 128 tris (исторический)"}
+      ],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "AD-CNF-19 (один FBX vs файл на объект).", "proposedChange": "Нет."},
+      "nextStep": "После пилота бочки; человеку подтвердить сторону петель/защёлки на боковых видах, затем решить раскладку слотов; фурнитуру согласовать на меше.",
+      "blocker": "ART-009 после GD-058; гейт высоты 90–100 vs 90–110 uu (AD-CNF-56).",
+      "doneCriteria": "90–110 uu (предложено), тёплый point без теней не мешает читаемости клеток.",
+      "acceptanceEvidence": [],
+      "evidence": [],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-DECOR-KIT-001.FACADES",
+      "name": "Фасады A/B/C (модульное окружение)",
+      "category": "modular-environment",
+      "contentKey": null,
+      "manifest06Row": "ASSET-DECOR-KIT-001",
+      "backlog": ["ART-009"],
+      "parent": "ASSET-DECOR-KIT-001",
+      "instances": 3,
+      "status": "предложено",
+      "stage": "reference-images",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/environment/ref-facade-a.png", "root": "repo", "kind": "file", "expect": "exists", "role": "коллаж", "sha256": "2454c4fea890bc3e55d3983b7aa8e4d68ee9e0983250e3dec921fbd37964b5ef"},
+          {"path": "art/imagegen/mvp-v1/environment/ref-facade-b.png", "root": "repo", "kind": "file", "expect": "exists", "role": "коллаж", "sha256": "c8e6279b2ca6c0de412b76d0f08b85906bf1c32d49aa18d37d7ca952a567b112"},
+          {"path": "art/imagegen/mvp-v1/environment/ref-facade-c.png", "root": "repo", "kind": "file", "expect": "exists", "role": "коллаж", "sha256": "004562349398af166c317ed9145fa456376d07561f5d489f684b7311985611be"}
+        ],
+        "excludedCandidates": [],
+        "note": "Коллажи, не четыре ортографических вида; фон/масштаб не приняты. Для Tripo непригодны без новых видов."
+      },
+      "source3d": [
+        {"path": "blender/S05/export/SM_S05_Facade.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "S05 блок-аут, 16 tris (исторический)"}
+      ],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "AD-CNF-19; сторона размещения — AD-CNF-08.", "proposedChange": "Нет."},
+      "nextStep": "Решить, нужны ли фасады в раннем gate; при необходимости — вручную как плоские кулисы.",
+      "blocker": "Нет ортографических видов; ART-009 после GD-058.",
+      "doneCriteria": "Плоские кулисы ≤120 uu на дальней стороне; fade при зуме; не закрывают клетки.",
+      "acceptanceEvidence": [],
+      "evidence": [],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-DECOR-KIT-001.CRATE",
+      "name": "Ящик",
+      "category": "prop",
+      "contentKey": null,
+      "manifest06Row": "ASSET-DECOR-KIT-001",
+      "backlog": ["ART-009"],
+      "parent": "ASSET-DECOR-KIT-001",
+      "instances": 1,
+      "status": "предложено",
+      "stage": "reference-images",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/environment/ref-crate.png", "root": "repo", "kind": "file", "expect": "exists", "role": "коллаж", "sha256": "c00523e78d62d013ecc745295d104094c626031e3be0e5af2e4a9d87c625f440"}
+        ],
+        "excludedCandidates": [],
+        "note": "Один коллаж без отдельных видов."
+      },
+      "source3d": [],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "AD-CNF-19.", "proposedChange": "Нет."},
+      "nextStep": "Простая ручная модель 25 uu; низкий приоритет (декор сокращается первым).",
+      "blocker": "ART-009 после GD-058.",
+      "doneCriteria": "25 uu (предложено), ≤2 слота, 1K, без коллизии.",
+      "acceptanceEvidence": [],
+      "evidence": [],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-PROPS-CARDS-001",
+      "name": "Физические карты на диораме (CardFace/CardBack)",
+      "category": "prop",
+      "contentKey": null,
+      "manifest06Row": "ASSET-PROPS-CARDS-001",
+      "backlog": ["ART-009"],
+      "parent": null,
+      "instances": 2,
+      "status": "предложено",
+      "stage": "blockout",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "art-chat", "acceptance": "art-chat"},
+      "sourceImages": {"selectionManifest": null, "recommended": [], "excludedCandidates": [], "note": "2D-арты карт не синхронизированы (cardArt blocked)."},
+      "source3d": [
+        {"path": "blender/S05/export/SM_S05_CardQuad.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "S05 заглушка 62×86 uu, 24 tris"}
+      ],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "AD-CNF-18 (бюджет), AD-CNF-19 (экспорт).", "proposedChange": "Нет."},
+      "nextStep": "Ждёт макета HUD 02 и синка cardArt; Tripo не применяется.",
+      "blocker": "AD-OPEN-28; cardArt не синхронизирован.",
+      "doneCriteria": "Плоскости 60×84 uu (предложено), арт читаем, клетки не перекрыты.",
+      "acceptanceEvidence": [],
+      "evidence": [],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-PLACEHOLDER-MANNEQUIN",
+      "name": "Серый манекен (fallback фигурок)",
+      "category": "fallback",
+      "contentKey": null,
+      "manifest06Row": "ASSET-PLACEHOLDER-MANNEQUIN",
+      "backlog": [],
+      "parent": null,
+      "instances": 1,
+      "status": "предложено",
+      "stage": "blockout",
+      "ownership": {"existingFiles": "shared", "nextCandidates": "art-chat", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [
+          {"path": "art/imagegen/mvp-v1/characters/ref-placeholder-mannequin.png", "root": "repo", "kind": "file", "expect": "exists", "role": "референс", "sha256": "f446c993e913df457621878f0afb615f624e86f9190e9f9442e217351b7f853a"}
+        ],
+        "excludedCandidates": [],
+        "note": "Параметрический ассет; Tripo не нужен."
+      },
+      "source3d": [
+        {"path": "blender/S05/export/SM_S05_Mannequin.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "S05 манекен 1228 tris (исторический)"}
+      ],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения.", "proposedChange": "Нет."},
+      "nextStep": "Не блокирует ранний gate; выполнить при интеграции fallback в клиент.",
+      "blocker": "Нет.",
+      "doneCriteria": "Подмена фигурки манекеном — партия играется, fallback логируется.",
+      "acceptanceEvidence": [],
+      "evidence": [],
+      "plannedPaths": [
+        {"path": "blender/ASSET-PLACEHOLDER-MANNEQUIN", "root": "repo", "kind": "file", "expect": "planned", "role": "каталог по 04 §3.10"}
+      ]
+    }
+  ]
+}

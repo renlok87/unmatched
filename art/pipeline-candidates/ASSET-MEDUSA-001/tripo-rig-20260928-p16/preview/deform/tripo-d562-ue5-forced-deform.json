@@ -1,0 +1,155 @@
+{
+ "source": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/source/d562f057-rig-ue5-forced-p16.glb",
+ "label": "tripo-d562-ue5-forced",
+ "family": "ue_like",
+ "family_bone_hits": 7,
+ "height": 0.98679,
+ "bbox_min": [
+  -0.2851,
+  -0.0589,
+  -0.0022
+ ],
+ "bbox_max": [
+  0.2832,
+  0.4186,
+  0.9846
+ ],
+ "tests": [
+  {
+   "test": "head_turn",
+   "bone": "head",
+   "axis": "Z",
+   "deg": 35,
+   "moved_vertices": 9746,
+   "centroid_z_norm": 0.266,
+   "centroid_x_norm": -0.002,
+   "expect": {
+    "z_norm_min": 0.7
+   },
+   "status": "wrong_region",
+   "top_meshes_moved_share": [
+    [
+     "tripo_node_f1bc5931-b053-4596-ac97-c7f374055899",
+     0.4218
+    ]
+   ]
+  },
+  {
+   "test": "spine_bend_fwd",
+   "bone": "spine_02",
+   "axis": "X",
+   "deg": 25,
+   "moved_vertices": 18165,
+   "centroid_z_norm": 0.424,
+   "centroid_x_norm": 0.131,
+   "expect": {
+    "z_norm_min": 0.45
+   },
+   "status": "wrong_region",
+   "top_meshes_moved_share": [
+    [
+     "tripo_node_f1bc5931-b053-4596-ac97-c7f374055899",
+     0.7861
+    ]
+   ]
+  },
+  {
+   "test": "arm_l_raise",
+   "bone": "upperarm_l",
+   "axis": "Y",
+   "deg": -45,
+   "moved_vertices": 5218,
+   "centroid_z_norm": 0.584,
+   "centroid_x_norm": -0.072,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_min": 0.15
+   },
+   "status": "wrong_region",
+   "top_meshes_moved_share": [
+    [
+     "tripo_node_f1bc5931-b053-4596-ac97-c7f374055899",
+     0.2258
+    ]
+   ]
+  },
+  {
+   "test": "arm_r_raise",
+   "bone": "upperarm_r",
+   "axis": "Y",
+   "deg": 45,
+   "moved_vertices": 5792,
+   "centroid_z_norm": 0.488,
+   "centroid_x_norm": 0.44,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_max": -0.15
+   },
+   "status": "wrong_region",
+   "top_meshes_moved_share": [
+    [
+     "tripo_node_f1bc5931-b053-4596-ac97-c7f374055899",
+     0.2507
+    ]
+   ]
+  },
+  {
+   "test": "forearm_l_bend",
+   "bone": "lowerarm_l",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 2123,
+   "centroid_z_norm": 0.757,
+   "centroid_x_norm": 0.074,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_min": 0.2
+   },
+   "status": "wrong_region",
+   "top_meshes_moved_share": [
+    [
+     "tripo_node_f1bc5931-b053-4596-ac97-c7f374055899",
+     0.0919
+    ]
+   ]
+  },
+  {
+   "test": "thigh_l_flex",
+   "bone": "thigh_l",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 5999,
+   "centroid_z_norm": 0.828,
+   "centroid_x_norm": 0.43,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "wrong_region",
+   "top_meshes_moved_share": [
+    [
+     "tripo_node_f1bc5931-b053-4596-ac97-c7f374055899",
+     0.2596
+    ]
+   ]
+  },
+  {
+   "test": "thigh_r_flex",
+   "bone": "thigh_r",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 4559,
+   "centroid_z_norm": 0.83,
+   "centroid_x_norm": 0.543,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "wrong_region",
+   "top_meshes_moved_share": [
+    [
+     "tripo_node_f1bc5931-b053-4596-ac97-c7f374055899",
+     0.1973
+    ]
+   ]
+  }
+ ]
+}

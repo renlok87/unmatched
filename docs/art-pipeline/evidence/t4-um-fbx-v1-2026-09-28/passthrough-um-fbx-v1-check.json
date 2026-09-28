@@ -1,0 +1,51 @@
+{
+ "what": "passthrough profile (export_fbx.py, tool 0.4.0) on the real Medusa segmented GLB, headless, temporary run outside the repo (deleted afterwards)",
+ "passed": true,
+ "checks": {
+  "blender_roundtrip_ratio_is_1": true,
+  "export_frame_rotated_as_preset": true,
+  "mesh_count_preserved": true,
+  "no_armature_expected": true,
+  "triangles_preserved": true,
+  "uv_present_on_all_meshes": true
+ },
+ "fbx": {
+  "sha256": "dcbf724e8adbb25a93c2a901ebc48754b3b0ccbdd551639a8c45dbe2fd322484",
+  "bytes": 1482908
+ },
+ "settings": {
+  "export_space_rotation_z_degrees": 90.0,
+  "use_triangles": true,
+  "axis_forward": "-Y",
+  "axis_up": "Z",
+  "deviations_from_preset": {
+   "path_mode": "COPY + embed instead of AUTO: the passthrough carries Tripo's own textures inside the FBX"
+  }
+ },
+ "scene_before_export_dimensions_m": [
+  0.560165,
+  0.485724,
+  0.980289
+ ],
+ "roundtrip_export_frame_dimensions_m": [
+  0.485724,
+  0.560165,
+  0.980289
+ ],
+ "expected_ue_dimensions_uu_at_import_scale_1": [
+  48.5724,
+  56.0165,
+  98.0289
+ ],
+ "roundtrip_triangles": 21176,
+ "t3_scaffold_run_for_comparison": {
+  "fbx_sha256": "749b72c6faab9a24f32106fcc328fc6dc5d466894fb5ae50e25842ae890c54a8",
+  "tool": "0.2.0, before UM_FBX_v1 (no rotation, no triangulate)",
+  "expected_ue_dimensions_uu_at_import_scale_1": [
+   56.0165,
+   48.5724,
+   98.0289
+  ]
+ },
+ "ue_import": "not run: the passthrough path has never been imported into the live UE"
+}

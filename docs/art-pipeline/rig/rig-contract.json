@@ -1,0 +1,149 @@
+{
+  "schema": "unmatched.rig-contract/1",
+  "revision": "p16-2026-09-28",
+  "status": "предложено",
+  "status_note": "Контракт предложен по итогам P1.6. Базовый скелет измерен на кандидате ASSET-MEDUSA-001 (Blender 5.2.2, UE 5.8 /Game/ART004). Художественно не принят; числа проб не являются бюджетами.",
+  "source_of_truth": {
+    "measured_rig": "blender/ASSET-MEDUSA-001/export/SK_Medusa.fbx",
+    "builder": "blender/ASSET-MEDUSA-001/build_segmented_medusa.py#make_armature",
+    "ue_import": "tools/art/import_medusa_candidate.py",
+    "brief": "docs/game-design/18-animation-production-brief.md#9"
+  },
+  "skeletons": {
+    "UM_HUMANOID_17_v1": {
+      "applies_to": ["ASSET-MEDUSA-001", "Arthur (planned)", "Merlin (planned)", "Harpy (planned, arms = wings)"],
+      "blender_units": "1 unit = 1 m, Z-up, лицом к -Y",
+      "armature_object": {
+        "name": "SKEL_UM_Humanoid",
+        "status": "предложено",
+        "rule": "одно фиксированное имя объекта арматуры для всех персонажей скелета UM_HUMANOID_17_v1 (Medusa, Arthur, Merlin, Harpy). Legacy FBX-импортёр UE делает из этого объекта кость 0 — носитель root motion; разные имена (SKEL_Medusa, SKEL_Arthur) дали бы разную кость 0 и сломали бы общий UE Skeleton и ретаргет. Версия скелета в имя не входит.",
+        "ue_bone_index": 0,
+        "legacy_names": ["SKEL_Medusa", "SKEL_S05_Medusa", "SKEL_S05_Mannequin"],
+        "legacy_note": "существующие тестовые ассеты: SKEL_Medusa (ART004 SK_Medusa.fbx и 4 клипа, кандидат T4 — кость 0 в UE = SKEL_Medusa, medusa-local-pass-report.md находка 2), SKEL_S05_* (S05, docs/research/2026-09-27-animation-audit/inventory.md). validate_clip.py даёт для них WARN, для любого другого имени FAIL. Переименование — при следующей пересборке, не в этой задаче",
+        "check": "validate_clip.py armature_object_name (для BVH и клипов с --retarget-map — info)"
+      },
+      "bones": [
+        {"name": "root", "parent": null, "role": "опорная кость на полу, pose-ключи = 0"},
+        {"name": "hips", "parent": "root"},
+        {"name": "spine", "parent": "hips"},
+        {"name": "head", "parent": "spine"},
+        {"name": "arm_upper.L", "parent": "spine"},
+        {"name": "arm_lower.L", "parent": "arm_upper.L"},
+        {"name": "hand.L", "parent": "arm_lower.L"},
+        {"name": "arm_upper.R", "parent": "spine"},
+        {"name": "arm_lower.R", "parent": "arm_upper.R"},
+        {"name": "hand.R", "parent": "arm_lower.R"},
+        {"name": "leg_upper.L", "parent": "hips"},
+        {"name": "leg_lower.L", "parent": "leg_upper.L"},
+        {"name": "foot.L", "parent": "leg_lower.L"},
+        {"name": "leg_upper.R", "parent": "hips"},
+        {"name": "leg_lower.R", "parent": "leg_upper.R"},
+        {"name": "foot.R", "parent": "leg_lower.R"},
+        {"name": "weapon", "parent": "hand.L", "parent_by_character": {"Medusa": "hand.L", "Arthur": "hand.R", "Merlin": "hand.R", "Harpy": null}}
+      ],
+      "side_convention": ".L = левая сторона персонажа = +X в Blender при взгляде персонажа в -Y (у Medusa сторона лука)",
+      "ue_names": "импортёр UE заменяет '.' на '_' (arm_upper.L -> arm_upper_L); узел объекта арматуры (armature_object.name) становится костью 0, итого 18 костей в UE: кость 0 -> root -> ...",
+      "rest_pose": "поза миниатюры, в которой смоделирован меш (bind pose = rest pose); не T/A-поза. Клипы авторятся относительно неё; внешние T/A-клипы требуют позы ретаргета",
+      "bone_scale": 1.0,
+      "max_influences": 4,
+      "measured_influences_medusa": 2,
+      "leaf_bones": false
+    }
+  },
+  "optional_extensions": {
+    "crown_snakes": {
+      "status": "предложено, не реализовано",
+      "rule": "база: вершины змей 100 % на head (жёсткая корона). Расширение: не более 4 листовых костей crown_snake.NN (родитель head) только если клип требует вторичного движения змей; ключи поворота ≤ 15°.",
+      "ue_note": "лишние листовые кости добавляются в общий UE Skeleton без поломки чужих клипов; клипы других персонажей их не анимируют"
+    },
+    "cloak": {
+      "status": "предложено, не реализовано",
+      "rule": "база: плащ/юбка взвешены плавно между hips и leg_upper.L/R (до 4 влияний). Расширение: cloth_front, cloth_back (родитель hips) — ключевые кости вторичного движения, без физики.",
+      "ue_note": "физика ткани (Chaos Cloth) вне D-11 и не входит в контракт"
+    },
+    "harpy_wings": {
+      "status": "предложено, не реализовано",
+      "rule": "крылья = arm_upper/arm_lower/hand.(L|R) базового скелета (04 §Harpy, бриф §9). Расширение: wing_tip.L/R (родитель hand.L/R) для складывания кончика. Отдельной цепочки перьев нет.",
+      "ue_note": "общий скелет с гуманоидами сохраняется, но гуманоидные клипы на Harpy не переносятся — авторить отдельно"
+    }
+  },
+  "root_motion": {
+    "carrier": "объект арматуры в Blender (имя — skeletons.*.armature_object.name; становится костью 0 в UE legacy FBX); pose-кость root не ключуется",
+    "policy_default": "in_place",
+    "in_place_tolerance_of_height": 0.005,
+    "evidence": "memory ue-pipeline-traps п.2; brief §12; ue-animation-report.json root_delta_uu=0"
+  },
+  "axes": {
+    "blender": {"up": "Z", "forward": "-Y"},
+    "fbx_export": {"axis_forward": "-Y", "axis_up": "Z", "primary_bone_axis": "Y", "secondary_bone_axis": "X"},
+    "ue_standard": "+X: стандарт UM_FBX_v1 (04-blender-production.md §1, строка «Оси»: лицо -Y в Blender -> +X в UE; стрелка ART-001 PASS). Решение оркестратора 2026-09-28: стандарт — 04 §1",
+    "ue_measured_medusa": "+Y: скелетный Medusa ART004 и кандидат T4 (ue(x,y,z) = blender(x,-y,z); medusa-local-pass-report.md, «Оси»). Это отклонение от стандарта, а не альтернативная норма",
+    "deviation": "причина расхождения ART-001 (+X, статичная стрелка) и ART004/T4 (+Y, скелетный меш) не установлена; разобрать на UE-этапе. Blender-сторона (лицо -Y, FBX Forward -Y / Up Z) и скелет не меняются; способ приведения к +X (опция импорта или поворот компонента) — проверить на UE-этапе"
+  },
+  "export_fbx": {
+    "apply_unit_scale": true,
+    "apply_scale_options": "FBX_SCALE_UNITS",
+    "add_leaf_bones": false,
+    "bake_anim": true,
+    "bake_anim_use_nla_strips": false,
+    "bake_anim_use_all_actions": false,
+    "bake_anim_force_startend_keying": true,
+    "mesh_smooth_type": "FACE",
+    "one_fbx_per_clip_with_mesh_node": true,
+    "post_export_patch": {
+      "UnitScaleFactor": 1.0,
+      "how": "patch_fbx_units() в blender/ASSET-MEDUSA-001/build_segmented_medusa.py после каждого export_fbx (SK и клипы); профиль T4: data_scale 100, unit_scale_factor_patched 1.0",
+      "status": "измерено (ART004, T4)"
+    }
+  },
+  "ue_import": {
+    "importer": "legacy FBX (Interchange.FeatureFlags.Import.FBX=False)",
+    "import_uniform_scale": 1.0,
+    "import_uniform_scale_status": "измерено для текущего профиля экспорта ART004/T4 (FBX_SCALE_UNITS + UnitScaleFactor=1.0)",
+    "import_uniform_scale_evidence": "tools/art/import_medusa_candidate.py: skeletal_mesh_import_data и static_mesh_import_data.import_uniform_scale = 1.0 (import_skeletal, import_base); для клипов (import_clip) масштаб не задаётся — значение по умолчанию. Результат: верх SK 55,0 uu (blender/ASSET-MEDUSA-001/ue-import-result.json height_55uu), root_delta_uu = 0 у 4 клипов (ue-animation-report.json); T4: «Коэффициент round-trip 1,0»",
+    "import_uniform_scale_conflict": "память S05 (ue-pipeline-traps п.3): FBX_SCALE_UNITS + import_uniform_scale=100 — другой профиль (без патча UnitScaleFactor). Конфликтует с измеренным ART004/T4; не применять, проверить на UE-этапе. Ручной Scale при импорте — дефект (04 §1)",
+    "animation_import_options_verified": "только то, что задаёт import_medusa_candidate.py import_clip; animation_length и прочие опции не проверялись",
+    "skeleton_asset": "общий Skeleton на персонажа; общий на гуманоидов — не доказано (бриф §9 п.3)",
+    "sockets": [
+      {"name": "Weapon", "bone": "weapon", "offset": [0, 0, 0], "note": "ART004 кандидат; в S05 сокет стоял на hand_L (0,2,0)"},
+      {"name": "Head", "bone": "head", "offset": [0, 0, 4], "note": "ART004 кандидат; в S05 (0,0,8)"}
+    ]
+  },
+  "clips": {
+    "fps": 24,
+    "fps_note": "измерено S05/ART004; в брифе FPS — PROPOSAL (AD-OPEN-46)",
+    "duration_tolerance_s": 0.05,
+    "min_visible_pose_change_of_height": 0.02,
+    "visible_pose_change_mode": "warn",
+    "visible_pose_change_note": "порог 2 % роста — предложение, не откалиброван; ниже порога validate_clip.py даёт WARN до калибровки по визуальному просмотру (K2/K3) или порогов по типу клипа (Idle — лёгкое дыхание)",
+    "loop_seam_tolerance_of_height": 0.005
+  },
+  "retarget_maps": {
+    "tripo_ue5_mannequin_to_um17": {
+      "status": "составлено по именам; на Medusa не проверено — авториг Tripo дал неверный скелет",
+      "root": "root", "pelvis": "hips", "spine_03": "spine", "head": "head",
+      "upperarm_l": "arm_upper.L", "lowerarm_l": "arm_lower.L", "hand_l": "hand.L",
+      "upperarm_r": "arm_upper.R", "lowerarm_r": "arm_lower.R", "hand_r": "hand.R",
+      "thigh_l": "leg_upper.L", "calf_l": "leg_lower.L", "foot_l": "foot.L",
+      "thigh_r": "leg_upper.R", "calf_r": "leg_lower.R", "foot_r": "foot.R",
+      "collapse_to_parent": ["spine_01", "spine_02", "neck_01", "clavicle_l", "clavicle_r", "*_twist_*", "ball_l", "ball_r", "fingers"]
+    },
+    "mixamo_to_um17": {
+      "status": "предложено, не проверено",
+      "mixamorig:Hips": "hips", "mixamorig:Spine2": "spine", "mixamorig:Head": "head",
+      "mixamorig:LeftArm": "arm_upper.L", "mixamorig:LeftForeArm": "arm_lower.L", "mixamorig:LeftHand": "hand.L",
+      "mixamorig:RightArm": "arm_upper.R", "mixamorig:RightForeArm": "arm_lower.R", "mixamorig:RightHand": "hand.R",
+      "mixamorig:LeftUpLeg": "leg_upper.L", "mixamorig:LeftLeg": "leg_lower.L", "mixamorig:LeftFoot": "foot.L",
+      "mixamorig:RightUpLeg": "leg_upper.R", "mixamorig:RightLeg": "leg_lower.R", "mixamorig:RightFoot": "foot.R"
+    },
+    "smpl_to_um17": {
+      "status": "предложено, не проверено",
+      "pelvis": "hips", "spine3": "spine", "head": "head", "collapse_to_parent": ["spine1", "spine2", "neck", "left_collar", "right_collar", "jaw", "hands/fingers"],
+      "left_shoulder": "arm_upper.L", "left_elbow": "arm_lower.L", "left_wrist": "hand.L",
+      "right_shoulder": "arm_upper.R", "right_elbow": "arm_lower.R", "right_wrist": "hand.R",
+      "left_hip": "leg_upper.L", "left_knee": "leg_lower.L", "left_ankle": "foot.L",
+      "right_hip": "leg_upper.R", "right_knee": "leg_lower.R", "right_ankle": "foot.R",
+      "note": "SMPL: сторона left = левая сторона персонажа; y-up; 30 fps у большинства экспортов; root translation из pelvis переносить в объект арматуры или обнулять (in_place)"
+    }
+  }
+}

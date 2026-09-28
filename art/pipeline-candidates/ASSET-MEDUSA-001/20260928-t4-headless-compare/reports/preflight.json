@@ -1,0 +1,112 @@
+{
+  "backend": "headless",
+  "checks": {
+    "atlas_python_deps": {
+      "measured": {
+        "numpy": "2.4.0",
+        "ok": true,
+        "pillow": "12.1.0",
+        "python": "3.13.4"
+      },
+      "passed": true
+    },
+    "backend_known": {
+      "measured": {
+        "backend": "headless",
+        "command": [
+          "blender.exe"
+        ],
+        "isolation": "process"
+      },
+      "passed": true
+    },
+    "blender_runnable": {
+      "backend": "headless",
+      "measured": "5.2.2 LTS",
+      "passed": true
+    },
+    "blender_stage_scripts_present": {
+      "passed": true,
+      "scripts": {
+        "build": "2e0fc9cb8b25bf81b65ca3cc758a653256d8d094dfea39b50c7ce418105cc1d2",
+        "export": "717a50b5c5aae52530e4956483f2131a2935f29bf9efd98edf5327013e209aab",
+        "import": "b908a5bed1300cbbad452e42cb26a856012c9fadff73c0541bc256c7b1b3bdd6"
+      }
+    },
+    "build_profile_role_is_primary": {
+      "expected": "segmented-retopo-glb",
+      "measured": "segmented-retopo-glb",
+      "passed": true
+    },
+    "build_profile_valid": {
+      "measured": {
+        "id": "medusa-segmented-skeletal/1",
+        "path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal.json",
+        "sha256": "5673476428e7644dad84838fca63d18ab39d5cedc81961b164be61c898fe031a"
+      },
+      "passed": true
+    },
+    "candidate_scripts_present": {
+      "passed": true,
+      "scripts": {
+        "atlas": "86301d1cc1f2582fd7791e0d9a9539d4fb231c2791c9f3bca23120ebd6f3c4a2"
+      }
+    },
+    "originals_outside_run_dir": {
+      "offenders": [],
+      "passed": true
+    },
+    "primary_source_registered": {
+      "measured": "tripo-b6253e58:segmented-retopo-glb",
+      "passed": true
+    },
+    "profile": {
+      "measured": "skeletal-candidate",
+      "passed": true,
+      "required": false
+    },
+    "python_version": {
+      "measured": "3.13",
+      "passed": true
+    },
+    "repo_root_is_git_checkout": {
+      "passed": true
+    },
+    "source_files_present": {
+      "missing": [],
+      "passed": true
+    },
+    "source_files_unchanged_since_registration": {
+      "changed": [],
+      "passed": true,
+      "verified": 7
+    },
+    "sources_registered": {
+      "measured": [
+        "tripo-b6253e58",
+        "tripo-d562f057"
+      ],
+      "passed": true
+    },
+    "tool_has_no_network_imports": {
+      "measured": [],
+      "passed": true
+    },
+    "unreal_editor_cmd_present": {
+      "measured": true,
+      "note": "informational; this scaffold never launches UnrealEditor-Cmd",
+      "passed": true,
+      "required": false
+    }
+  },
+  "network": {
+    "paid_tasks_created": 0,
+    "tripo_calls": 0
+  },
+  "passed": true,
+  "stage": "preflight",
+  "tool": {
+    "name": "tripo-pipeline",
+    "version": "0.3.0"
+  }
+}

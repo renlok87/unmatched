@@ -1,0 +1,316 @@
+{
+  "algorithm": "pack_segmented_atlas.py port (quadtree cells, LANCZOS resize, edge bleed)",
+  "cells": {
+    "tripo_part_0": {
+      "cell": 1024,
+      "inset": 4,
+      "x": 0,
+      "y_top": 0
+    },
+    "tripo_part_1": {
+      "cell": 512,
+      "inset": 4,
+      "x": 0,
+      "y_top": 1024
+    },
+    "tripo_part_10": {
+      "cell": 256,
+      "inset": 4,
+      "x": 1792,
+      "y_top": 1280
+    },
+    "tripo_part_11": {
+      "cell": 256,
+      "inset": 4,
+      "x": 1024,
+      "y_top": 1536
+    },
+    "tripo_part_12": {
+      "cell": 128,
+      "inset": 4,
+      "x": 1280,
+      "y_top": 1536
+    },
+    "tripo_part_13": {
+      "cell": 128,
+      "inset": 4,
+      "x": 1408,
+      "y_top": 1536
+    },
+    "tripo_part_14": {
+      "cell": 64,
+      "inset": 4,
+      "x": 1280,
+      "y_top": 1664
+    },
+    "tripo_part_2": {
+      "cell": 1024,
+      "inset": 4,
+      "x": 1024,
+      "y_top": 0
+    },
+    "tripo_part_3": {
+      "cell": 512,
+      "inset": 4,
+      "x": 512,
+      "y_top": 1024
+    },
+    "tripo_part_4": {
+      "cell": 512,
+      "inset": 4,
+      "x": 0,
+      "y_top": 1536
+    },
+    "tripo_part_5": {
+      "cell": 512,
+      "inset": 4,
+      "x": 512,
+      "y_top": 1536
+    },
+    "tripo_part_6": {
+      "cell": 512,
+      "inset": 4,
+      "x": 1024,
+      "y_top": 1024
+    },
+    "tripo_part_7": {
+      "cell": 256,
+      "inset": 4,
+      "x": 1536,
+      "y_top": 1024
+    },
+    "tripo_part_8": {
+      "cell": 256,
+      "inset": 4,
+      "x": 1792,
+      "y_top": 1024
+    },
+    "tripo_part_9": {
+      "cell": 256,
+      "inset": 4,
+      "x": 1536,
+      "y_top": 1280
+    }
+  },
+  "checks": {
+    "cell_coverage_of_atlas": {
+      "measured": 0.8994,
+      "note": "informational",
+      "passed": true
+    },
+    "cells_do_not_overlap": {
+      "measured": 0,
+      "passed": true
+    },
+    "cells_inside_atlas": {
+      "measured": 2048,
+      "passed": true
+    },
+    "gutter_px_between_parts": {
+      "measured": 8,
+      "note": "each cell keeps an edge-bleed inset on all sides: >= 2*inset px between islands of different parts",
+      "passed": true
+    },
+    "normal_directx_is_opengl_with_inverted_green": {
+      "measured": "G_dx == 255 - G_gl; R, B equal",
+      "passed": true
+    },
+    "normal_vectors_unit_length_in_cells": {
+      "measured": 0.9962,
+      "note": "fraction of texels inside part cells with |n| in (0.8, 1.2)",
+      "passed": true
+    },
+    "orm_metallic_range_in_cells": {
+      "measured": [
+        0,
+        255
+      ],
+      "note": "informational",
+      "passed": true
+    },
+    "orm_occlusion_channel_filled": {
+      "measured": 255,
+      "passed": true
+    },
+    "orm_roughness_range_in_cells": {
+      "measured": [
+        0,
+        255
+      ],
+      "note": "informational",
+      "passed": true
+    },
+    "part_count": {
+      "measured": 15,
+      "passed": true
+    },
+    "source_unchanged": {
+      "measured": "0400f2b44f80b14005e03d997b83453e7d35e54f8ddd537b5dbf7770c0792e56",
+      "passed": true
+    }
+  },
+  "conventions": {
+    "BC": "sRGB colour; Tripo baseColorFactor 0.800 multiplied in",
+    "N": "linear; DirectX (-Y) \u2014 for UE (flip_green_channel = false)",
+    "N_OpenGL": "linear; OpenGL (+Y) \u2014 Blender preview only",
+    "ORM": "linear; R = occlusion (filled 255, Tripo has none), G = roughness, B = metallic"
+  },
+  "files": {
+    "BC": {
+      "bytes": 3321735,
+      "file": "T_Medusa_Candidate_Atlas_BC.png",
+      "mode": "RGB",
+      "pixels": [
+        2048,
+        2048
+      ],
+      "sha256": "6b5fd7649a733101fb67f9831fa55f9bc703a9ad3912e9a574ec8685bc969fd9"
+    },
+    "N": {
+      "bytes": 3472265,
+      "file": "T_Medusa_Candidate_Atlas_N.png",
+      "mode": "RGB",
+      "pixels": [
+        2048,
+        2048
+      ],
+      "sha256": "8ad31dda8480506736a5886e93b29425cce2836514a105dd27242fe41ffd36d4"
+    },
+    "N_OpenGL": {
+      "bytes": 3465090,
+      "file": "T_Medusa_Candidate_Atlas_N_OpenGL.png",
+      "mode": "RGB",
+      "pixels": [
+        2048,
+        2048
+      ],
+      "sha256": "f893bbae9148c7805ae20a1103903f38cc6209c347c8d81ab419a514c059f2e3"
+    },
+    "ORM": {
+      "bytes": 3006714,
+      "file": "T_Medusa_Candidate_Atlas_ORM.png",
+      "mode": "RGB",
+      "pixels": [
+        2048,
+        2048
+      ],
+      "sha256": "c75702470f8cfff0575338ac7c8b56eacb99f8c44edcff234d9a0a2df29269ab"
+    }
+  },
+  "gutter_px": 4,
+  "passed": true,
+  "profile": "medusa-segmented-skeletal/1",
+  "reference_comparison": {
+    "BC": {
+      "bytes_identical": true,
+      "path": "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_BC.png",
+      "pixels_identical": true,
+      "present": true,
+      "sha256": "6b5fd7649a733101fb67f9831fa55f9bc703a9ad3912e9a574ec8685bc969fd9"
+    },
+    "N": {
+      "bytes_identical": true,
+      "path": "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_N.png",
+      "pixels_identical": true,
+      "present": true,
+      "sha256": "8ad31dda8480506736a5886e93b29425cce2836514a105dd27242fe41ffd36d4"
+    },
+    "N_OpenGL": {
+      "bytes_identical": true,
+      "path": "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_N_OpenGL.png",
+      "pixels_identical": true,
+      "present": true,
+      "sha256": "f893bbae9148c7805ae20a1103903f38cc6209c347c8d81ab419a514c059f2e3"
+    },
+    "ORM": {
+      "bytes_identical": true,
+      "path": "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_ORM.png",
+      "pixels_identical": true,
+      "present": true,
+      "sha256": "c75702470f8cfff0575338ac7c8b56eacb99f8c44edcff234d9a0a2df29269ab"
+    }
+  },
+  "size": 2048,
+  "source": {
+    "file": "medusa-segmented-retopo.glb",
+    "sha256": "0400f2b44f80b14005e03d997b83453e7d35e54f8ddd537b5dbf7770c0792e56"
+  },
+  "source_textures": {
+    "tripo_part_0": {
+      "base_px": 1024,
+      "normal_px": 512,
+      "rm_px": 512
+    },
+    "tripo_part_1": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_10": {
+      "base_px": 256,
+      "normal_px": 128,
+      "rm_px": 128
+    },
+    "tripo_part_11": {
+      "base_px": 256,
+      "normal_px": 128,
+      "rm_px": 128
+    },
+    "tripo_part_12": {
+      "base_px": 128,
+      "normal_px": 64,
+      "rm_px": 64
+    },
+    "tripo_part_13": {
+      "base_px": 128,
+      "normal_px": 64,
+      "rm_px": 64
+    },
+    "tripo_part_14": {
+      "base_px": 64,
+      "normal_px": 32,
+      "rm_px": 32
+    },
+    "tripo_part_2": {
+      "base_px": 1024,
+      "normal_px": 512,
+      "rm_px": 512
+    },
+    "tripo_part_3": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_4": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_5": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_6": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_7": {
+      "base_px": 256,
+      "normal_px": 128,
+      "rm_px": 128
+    },
+    "tripo_part_8": {
+      "base_px": 256,
+      "normal_px": 128,
+      "rm_px": 128
+    },
+    "tripo_part_9": {
+      "base_px": 256,
+      "normal_px": 128,
+      "rm_px": 128
+    }
+  },
+  "stage": "atlas"
+}

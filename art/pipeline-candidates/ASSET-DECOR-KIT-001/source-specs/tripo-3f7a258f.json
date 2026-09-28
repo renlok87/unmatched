@@ -1,0 +1,204 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-3f7a258f",
+  "asset_id": "ASSET-DECOR-KIT-001.BARREL",
+  "service": "tripo-studio",
+  "task_id": "3f7a258f-d41c-4720-b31a-cb1573604670",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/3f7a258f-d41c-4720-b31a-cb1573604670",
+  "date": "2026-09-28",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач. Ожидание дольше",
+    "backend": null
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/mvp-v1/environment/ref-barrel-v3-front.png",
+        "sha256": "0253587543f27a3159b93879dc4e77870d711a6ad8fed4695bf9106aed340129"
+      },
+      "left": {
+        "path": "art/imagegen/mvp-v1/environment/ref-barrel-v3-side.png",
+        "sha256": "f78baae79e13f0a6c1a4707a66600ca936b3cb613dd6e63623f6b551ee64f038"
+      },
+      "right": null,
+      "back": null
+    },
+    "input_manifest": "docs/art-pipeline/imagegen-inputs/manifest.json",
+    "settings": {
+      "output": "geometry and texture",
+      "texture_quality": "2K",
+      "texture_8k": false,
+      "generate_parts": false,
+      "privacy": "private",
+      "topology": "triangle",
+      "polygon_count": 4000,
+      "remove_lighting": true,
+      "pbr": true,
+      "seed": null
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "multi-view HD model",
+      "evidence": "docs/art-pipeline/evidence/p15-barrel-2026-09-28/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 45,
+        "observed_debit": 45,
+        "balance_before": 25045,
+        "balance_after": 25000
+      }
+    },
+    {
+      "op": "smart-uv",
+      "evidence": "docs/art-pipeline/evidence/p15-barrel-2026-09-28/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 20,
+        "observed_debit": 0,
+        "note": "free trial (x2 -> x1)"
+      }
+    },
+    {
+      "op": "texture",
+      "settings": {
+        "multi_view": "front+left",
+        "resolution": "2K",
+        "remove_lighting": true
+      },
+      "evidence": "docs/art-pipeline/evidence/p15-barrel-2026-09-28/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 10,
+        "observed_debit": 10,
+        "balance_before": 24980,
+        "balance_after": 24970
+      }
+    },
+    {
+      "op": "pbr",
+      "evidence": "docs/art-pipeline/evidence/p15-barrel-2026-09-28/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5,
+        "balance_before": 24950,
+        "balance_after": 24945
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "source-glb",
+      "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-h31-3f7a258f-source.glb",
+      "expected_sha256": "7c81e9944f64390d1f0581c29b0bbc26884cf396603cf629575c1a37c2443782",
+      "expected_bytes": 2937712,
+      "produced_by": "generate",
+      "origin": "Studio GLB export 2k, unmodified"
+    },
+    {
+      "role": "smartuv-tex2k-glb",
+      "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-3f7a258f-smartuv-tex2k.glb",
+      "expected_sha256": "2937d45f2d218820053640981e355f821cd1d4ffc2486780f1c56506467db438",
+      "expected_bytes": 4378264,
+      "produced_by": "texture",
+      "origin": "Studio GLB export after Smart UV + texture 2K, unmodified"
+    },
+    {
+      "role": "smartuv-tex2k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr.glb",
+      "expected_sha256": "b336bf62ae9cd1518e741d0814824c4e3f5e5d1e4b3a1838a33f72ec59632fc4",
+      "expected_bytes": 6903704,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export after PBR, unmodified"
+    },
+    {
+      "role": "texture-3f7a258f-smartuv-tex2k-pbr_basecolor",
+      "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/textures/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_basecolor.jpg",
+      "expected_sha256": "c6fc3fdc5604bc44c541ad2799740b822891d31d363c1491d72f89c1a469b1d3",
+      "produced_by": "export",
+      "origin": "extracted from the GLB without re-encoding"
+    },
+    {
+      "role": "texture-3f7a258f-smartuv-tex2k-pbr_normal",
+      "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/textures/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_normal.png",
+      "expected_sha256": "4964dfb7732aec0503287246c1557f16283c031b7f93045d1c4a505d44fa0dad",
+      "produced_by": "export",
+      "origin": "extracted from the GLB without re-encoding"
+    },
+    {
+      "role": "texture-3f7a258f-smartuv-tex2k-pbr_rm",
+      "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/textures/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_rm.png",
+      "expected_sha256": "1c351bff9cb92a814cb830873aab85938f7a1ff3b832517dcccd8e3aaed0fce6",
+      "produced_by": "export",
+      "origin": "extracted from the GLB without re-encoding"
+    },
+    {
+      "role": "texture-3f7a258f-smartuv-tex2k_basecolor",
+      "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/textures/decor-barrel-tripo-3f7a258f-smartuv-tex2k_basecolor.jpg",
+      "expected_sha256": "c6fc3fdc5604bc44c541ad2799740b822891d31d363c1491d72f89c1a469b1d3",
+      "produced_by": "export",
+      "origin": "extracted from the GLB without re-encoding"
+    },
+    {
+      "role": "texture-3f7a258f-smartuv-tex2k_normal",
+      "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/textures/decor-barrel-tripo-3f7a258f-smartuv-tex2k_normal.png",
+      "expected_sha256": "4964dfb7732aec0503287246c1557f16283c031b7f93045d1c4a505d44fa0dad",
+      "produced_by": "export",
+      "origin": "extracted from the GLB without re-encoding"
+    },
+    {
+      "role": "texture-h31-3f7a258f-source_basecolor",
+      "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/textures/decor-barrel-tripo-h31-3f7a258f-source_basecolor.jpg",
+      "expected_sha256": "6393424262bfcfd60e2019ce7a52ff67f7d2d746c57d928c6455085949c2443b",
+      "produced_by": "export",
+      "origin": "extracted from the GLB without re-encoding"
+    },
+    {
+      "role": "texture-h31-3f7a258f-source_normal",
+      "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/textures/decor-barrel-tripo-h31-3f7a258f-source_normal.png",
+      "expected_sha256": "eaaabfa9870d738b575f7274265b3031f716324b366a021853d355ff82eed2cf",
+      "produced_by": "export",
+      "origin": "extracted from the GLB without re-encoding"
+    },
+    {
+      "role": "texture-h31-3f7a258f-source_rm",
+      "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/source/textures/decor-barrel-tripo-h31-3f7a258f-source_rm.jpg",
+      "expected_sha256": "4b82a6cc34bc30266325836b499dd83bf77dec57709ba00c068f3e56314ae6c4",
+      "produced_by": "export",
+      "origin": "extracted from the GLB without re-encoding"
+    }
+  ],
+  "expectations": {
+    "source-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 3837,
+      "glb_materials": 1,
+      "glb_skins": 0
+    },
+    "smartuv-tex2k-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 3837,
+      "glb_materials": 1,
+      "glb_skins": 0
+    },
+    "smartuv-tex2k-pbr-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 3837,
+      "glb_materials": 1,
+      "glb_skins": 0
+    }
+  },
+  "evidence": [
+    "docs/art-pipeline/evidence/p15-barrel-2026-09-28/tripo-run.json",
+    "docs/art-pipeline/imagegen-inputs/manifest.json"
+  ],
+  "notes": [
+    "Credits are Studio credits of the observed account; not API credits, not USD.",
+    "Smart UV used a free trial; the quoted price is recorded separately.",
+    "game_ready=false; registration does not change any acceptance status."
+  ]
+}

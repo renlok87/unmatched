@@ -1,0 +1,38 @@
+{
+ "files": {
+  "production_SK_Medusa": "blender/ASSET-MEDUSA-001/export/SK_Medusa.fbx",
+  "t4_candidate": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-local-pass/export/SK_Medusa_Candidate.fbx",
+  "v2_face_section_neck": "blender/ASSET-MEDUSA-001/variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx",
+  "v3_head_tilt_artworktree": "C:/Users/ren/.codex/worktrees/art-foundation/unmached/blender/ASSET-MEDUSA-001/variants/head-tilt-v3/SK_Medusa_HeadTilt_v3.fbx (uncommitted art-chat file, read only)"
+ },
+ "method": "ray-escape orientation score per atlas part (+1 outward, -1 inside-out) on the body mesh after Blender FBX import; run in the live Blender via blender-mcp exec (temporary scenes, removed afterwards)",
+ "reading": "parts 8 (bow arm/bracer) and 13 (right hand) are inside-out in production, v2 and v3; only the T4 candidate has all four parts outward",
+ "scores": {
+  "production_SK_Medusa": {
+   "tripo_part_10": -0.978,
+   "tripo_part_13": -0.997,
+   "tripo_part_14": -1.0,
+   "tripo_part_8": -1.0
+  },
+  "t4_candidate": {
+   "tripo_part_10": 0.978,
+   "tripo_part_13": 0.997,
+   "tripo_part_14": 1.0,
+   "tripo_part_8": 1.0
+  },
+  "v2_face_section_neck": {
+   "tripo_part_10": 0.978,
+   "tripo_part_13": -0.997,
+   "tripo_part_14": 1.0,
+   "tripo_part_8": -1.0
+  },
+  "v3_head_tilt_artworktree": {
+   "tripo_part_10": 0.966,
+   "tripo_part_13": -0.997,
+   "tripo_part_14": 0.928,
+   "tripo_part_8": -1.0
+  }
+ },
+ "script": "fbx-orientation-probe.py (sent with C:/Users/ren/.claude/mcp-servers/clients/blender_mcp.py exec)",
+ "status": "measured"
+}

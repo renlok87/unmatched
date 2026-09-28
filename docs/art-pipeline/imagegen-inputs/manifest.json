@@ -1,0 +1,1457 @@
+{
+  "schema": "unmatched.tripo-pipeline.imagegen-inputs/1",
+  "status": "measured; reference selection only, no Tripo upload or generation performed by this manifest",
+  "selectionSource": "art/imagegen/mvp-v1/generation-inputs.json",
+  "selectionRevision": "correction-v4",
+  "tripoSlotConvention": "role name == Tripo Studio multi-view slot name (front/left/right/back). Confirmed only for the Medusa pilot d562f057 (front/left/back, right empty); not re-verified for other characters.",
+  "notes": [
+    "Normalization of canvas/base width/baseline does not prove geometric consistency between views.",
+    "Medusa right slot intentionally empty: v5/v6 right are not in the recommended 3D set (PRODUCTION-NOTES, ART-004 pilot).",
+    "Prop roles side/top/three-quarter have no Tripo multi-view slot; tripoSlot is null until a mapping is decided."
+  ],
+  "sets": [
+    {
+      "refId": "REF-MEDUSA",
+      "assetKey": "ASSET-MEDUSA-001",
+      "kind": "hero",
+      "recommendedTripoSlots": {
+        "back": "art/imagegen/mvp-v1/characters/ref-medusa-v5-back.png",
+        "front": "art/imagegen/mvp-v1/characters/ref-medusa-v5-front.png",
+        "left": "art/imagegen/mvp-v1/characters/ref-medusa-v5-left.png"
+      },
+      "emptyTripoSlots": [
+        "right"
+      ],
+      "recommendedViews": [
+        "art/imagegen/mvp-v1/characters/ref-medusa-v5-back.png",
+        "art/imagegen/mvp-v1/characters/ref-medusa-v5-front.png",
+        "art/imagegen/mvp-v1/characters/ref-medusa-v5-left.png"
+      ],
+      "candidateViews": [
+        "art/imagegen/mvp-v1/characters/ref-medusa-v6-right.png"
+      ],
+      "supersededViews": [
+        "art/imagegen/mvp-v1/characters/ref-medusa-v5-right.png"
+      ],
+      "selectionNote": "Дальняя кисть и середина лука перекрыты телом, ближняя рука пустая, видно 7 голов змей. Новый right остаётся кандидатом: плоскость лука согласовать на модели.",
+      "propTripoSlotProposal": null,
+      "manualReview": "docs/art-pipeline/imagegen-inputs/CONSISTENCY-REVIEW.md#ref-medusa"
+    },
+    {
+      "refId": "REF-KING-ARTHUR",
+      "assetKey": "ASSET-KING-ARTHUR-001",
+      "kind": "hero",
+      "recommendedTripoSlots": {
+        "back": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-back.png",
+        "front": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-front.png",
+        "left": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-left.png"
+      },
+      "emptyTripoSlots": [
+        "right"
+      ],
+      "recommendedViews": [
+        "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-back.png",
+        "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-front.png",
+        "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-left.png"
+      ],
+      "candidateViews": [
+        "art/imagegen/mvp-v1/characters/ref-king-arthur-v7-right.png"
+      ],
+      "supersededViews": [
+        "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-right.png",
+        "art/imagegen/mvp-v1/characters/ref-king-arthur-v6-right.png"
+      ],
+      "selectionNote": "Right v7: меч снова впереди груди, как в left v5. Дальняя верхняя часть руки скрыта корпусом; кисть видна за передним контуром груди. Ближняя рука пустая. Точное совпадение геометрии и четырёхвидовая приёмка остаются открытыми.",
+      "propTripoSlotProposal": null,
+      "manualReview": "docs/art-pipeline/imagegen-inputs/CONSISTENCY-REVIEW.md#ref-king-arthur"
+    },
+    {
+      "refId": "REF-MERLIN",
+      "assetKey": "ASSET-MERLIN-001",
+      "kind": "sidekick",
+      "recommendedTripoSlots": {
+        "back": "art/imagegen/mvp-v1/characters/ref-merlin-v3-back.png",
+        "front": "art/imagegen/mvp-v1/characters/ref-merlin-v3-front.png",
+        "right": "art/imagegen/mvp-v1/characters/ref-merlin-v3-right.png"
+      },
+      "emptyTripoSlots": [
+        "left"
+      ],
+      "recommendedViews": [
+        "art/imagegen/mvp-v1/characters/ref-merlin-v3-back.png",
+        "art/imagegen/mvp-v1/characters/ref-merlin-v3-front.png",
+        "art/imagegen/mvp-v1/characters/ref-merlin-v3-right.png"
+      ],
+      "candidateViews": [
+        "art/imagegen/mvp-v1/characters/ref-merlin-v5-left.png"
+      ],
+      "supersededViews": [
+        "art/imagegen/mvp-v1/characters/ref-merlin-v3-left.png",
+        "art/imagegen/mvp-v1/characters/ref-merlin-v4-left.png"
+      ],
+      "selectionNote": "Left v5: посох уходит за капюшон/плечо; дальняя кисть и средняя часть стержня закрыты одеждой. Ближняя рука у пояса пустая. Новый профиль просмотрен рядом с right v3; точное совпадение геометрии и четырёхвидовая приёмка остаются открытыми.",
+      "propTripoSlotProposal": null,
+      "manualReview": "docs/art-pipeline/imagegen-inputs/CONSISTENCY-REVIEW.md#ref-merlin"
+    },
+    {
+      "refId": "REF-HARPY",
+      "assetKey": "ASSET-HARPY-001",
+      "kind": "sidekick",
+      "recommendedTripoSlots": {
+        "back": "art/imagegen/mvp-v1/characters/ref-harpy-v5-back.png",
+        "front": "art/imagegen/mvp-v1/characters/ref-harpy-v5-front.png",
+        "left": "art/imagegen/mvp-v1/characters/ref-harpy-v5-left.png"
+      },
+      "emptyTripoSlots": [
+        "right"
+      ],
+      "recommendedViews": [
+        "art/imagegen/mvp-v1/characters/ref-harpy-v5-back.png",
+        "art/imagegen/mvp-v1/characters/ref-harpy-v5-front.png",
+        "art/imagegen/mvp-v1/characters/ref-harpy-v5-left.png"
+      ],
+      "candidateViews": [
+        "art/imagegen/mvp-v1/characters/ref-harpy-v5-right.png"
+      ],
+      "supersededViews": [
+        "art/imagegen/mvp-v1/characters/ref-harpy-v4-back.png",
+        "art/imagegen/mvp-v1/characters/ref-harpy-v4-front.png",
+        "art/imagegen/mvp-v1/characters/ref-harpy-v4-left.png",
+        "art/imagegen/mvp-v1/characters/ref-harpy-v4-right.png"
+      ],
+      "selectionNote": "На right ближняя правая нога без браслета; дальний левый браслет скрыт. Высота четырёх видов 479–480 px после независимого масштаба Y; позы крыльев ещё требуют согласования в Blender.",
+      "propTripoSlotProposal": null,
+      "manualReview": "docs/art-pipeline/imagegen-inputs/CONSISTENCY-REVIEW.md#ref-harpy"
+    },
+    {
+      "refId": "REF-BARREL",
+      "assetKey": "ASSET-DECOR-KIT-001",
+      "kind": "prop:SM_Decor_Barrel",
+      "recommendedTripoSlots": {},
+      "emptyTripoSlots": null,
+      "recommendedViews": [
+        "art/imagegen/mvp-v1/environment/ref-barrel-v3-front.png",
+        "art/imagegen/mvp-v1/environment/ref-barrel-v3-side.png",
+        "art/imagegen/mvp-v1/environment/ref-barrel-v3-three-quarter.png",
+        "art/imagegen/mvp-v1/environment/ref-barrel-v3-top.png"
+      ],
+      "candidateViews": [],
+      "supersededViews": [],
+      "selectionNote": "Usable visual references; reconcile fittings in Blender.",
+      "propTripoSlotProposal": {
+        "status": "proposed",
+        "front": "ref-barrel-v3-front.png",
+        "left": "ref-barrel-v3-side.png",
+        "note": "rotationally symmetric; bung only on front; top/three-quarter = human reference only"
+      },
+      "manualReview": "docs/art-pipeline/imagegen-inputs/CONSISTENCY-REVIEW.md#ref-barrel"
+    },
+    {
+      "refId": "REF-LANTERN",
+      "assetKey": "ASSET-DECOR-KIT-001",
+      "kind": "prop:SM_Decor_Lantern",
+      "recommendedTripoSlots": {},
+      "emptyTripoSlots": null,
+      "recommendedViews": [
+        "art/imagegen/mvp-v1/environment/ref-lantern-v3-back.png",
+        "art/imagegen/mvp-v1/environment/ref-lantern-v3-front.png",
+        "art/imagegen/mvp-v1/environment/ref-lantern-v3-left.png",
+        "art/imagegen/mvp-v1/environment/ref-lantern-v3-right.png"
+      ],
+      "candidateViews": [],
+      "supersededViews": [],
+      "selectionNote": "Usable visual references; reconcile fittings in Blender.",
+      "propTripoSlotProposal": {
+        "status": "proposed",
+        "front": "ref-lantern-v3-front.png",
+        "back": "ref-lantern-v3-back.png",
+        "note": "side files left/right appear to use the opposite side convention to the characters (door hinges vs latch); side slots empty until resolved by a human"
+      },
+      "manualReview": "docs/art-pipeline/imagegen-inputs/CONSISTENCY-REVIEW.md#ref-lantern"
+    },
+    {
+      "refId": "REF-TABLE-BASE",
+      "assetKey": "ASSET-TABLE-BASE-001",
+      "kind": "decor",
+      "recommendedTripoSlots": {},
+      "emptyTripoSlots": null,
+      "recommendedViews": [
+        "art/imagegen/mvp-v1/environment/ref-table-base-v3-front.png",
+        "art/imagegen/mvp-v1/environment/ref-table-base-v3-side.png",
+        "art/imagegen/mvp-v1/environment/ref-table-base-v3-three-quarter.png"
+      ],
+      "candidateViews": [],
+      "supersededViews": [],
+      "selectionNote": "Rock underside only; top and frame modeled manually from S04.",
+      "propTripoSlotProposal": {
+        "status": "proposed",
+        "front": "ref-table-base-v3-front.png",
+        "left": "ref-table-base-v3-side.png",
+        "note": "rock underside only; top/frame modeled manually (S04 board contract)"
+      },
+      "manualReview": "docs/art-pipeline/imagegen-inputs/CONSISTENCY-REVIEW.md#ref-table-base"
+    }
+  ],
+  "views": [
+    {
+      "refId": "REF-HARPY",
+      "assetKey": "ASSET-HARPY-001",
+      "kind": "sidekick",
+      "role": "back",
+      "tripoSlot": "back",
+      "version": 4,
+      "status": "superseded",
+      "supersededBy": "characters/ref-harpy-v5-back.png",
+      "path": "art/imagegen/mvp-v1/characters/ref-harpy-v4-back.png",
+      "sha256Recorded": "599301458f4a0b1a362c5622c64c16346ebc0b4181d1521b023289255bfef318",
+      "sha256Selection": null,
+      "source": "art/imagegen/mvp-v1/characters/ref-harpy-v3-back.png",
+      "sourceSha256Recorded": "28c1e52b141532e267f97e8c02353a0ee99ddfef3f59825d6589b82576cc06e7",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 240.27850304612707,
+        "baseDiameterUu": 22,
+        "scaleXY": [
+          0.6674402862392419,
+          0.6674402862392419
+        ],
+        "baseline": 918
+      },
+      "sha256": "599301458f4a0b1a362c5622c64c16346ebc0b4181d1521b023289255bfef318",
+      "bytes": 290711,
+      "sourceSha256Actual": "28c1e52b141532e267f97e8c02353a0ee99ddfef3f59825d6589b82576cc06e7",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-HARPY",
+      "assetKey": "ASSET-HARPY-001",
+      "kind": "sidekick",
+      "role": "front",
+      "tripoSlot": "front",
+      "version": 4,
+      "status": "superseded",
+      "supersededBy": "characters/ref-harpy-v5-front.png",
+      "path": "art/imagegen/mvp-v1/characters/ref-harpy-v4-front.png",
+      "sha256Recorded": "c4529a80fced6917874becfa3c3053996e46988ec732c8e2c29025c2b5ad6ced",
+      "sha256Selection": null,
+      "source": "art/imagegen/mvp-v1/characters/ref-harpy-v3-front.png",
+      "sourceSha256Recorded": "89fab3c7df06dfc5e1fc94f22b37494f47a451cf735bcb4b488fc71934dae535",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 240.27850304612707,
+        "baseDiameterUu": 22,
+        "scaleXY": [
+          0.7067014795474326,
+          0.7067014795474326
+        ],
+        "baseline": 918
+      },
+      "sha256": "c4529a80fced6917874becfa3c3053996e46988ec732c8e2c29025c2b5ad6ced",
+      "bytes": 310515,
+      "sourceSha256Actual": "89fab3c7df06dfc5e1fc94f22b37494f47a451cf735bcb4b488fc71934dae535",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-HARPY",
+      "assetKey": "ASSET-HARPY-001",
+      "kind": "sidekick",
+      "role": "left",
+      "tripoSlot": "left",
+      "version": 4,
+      "status": "superseded",
+      "supersededBy": "characters/ref-harpy-v5-left.png",
+      "path": "art/imagegen/mvp-v1/characters/ref-harpy-v4-left.png",
+      "sha256Recorded": "0e677ea1c538b97e734388a3d1275f4214c6d1230d8e41d5b12a90bce450b3ff",
+      "sha256Selection": null,
+      "source": "art/imagegen/mvp-v1/characters/ref-harpy-v3-left.png",
+      "sourceSha256Recorded": "f37b8a2309058260dbff8f97342f98c28f34b5163bd48dad6d1af9b50fea43a5",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 240.27850304612707,
+        "baseDiameterUu": 22,
+        "scaleXY": [
+          0.6257252683492892,
+          0.6257252683492892
+        ],
+        "baseline": 918
+      },
+      "sha256": "0e677ea1c538b97e734388a3d1275f4214c6d1230d8e41d5b12a90bce450b3ff",
+      "bytes": 187772,
+      "sourceSha256Actual": "f37b8a2309058260dbff8f97342f98c28f34b5163bd48dad6d1af9b50fea43a5",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-HARPY",
+      "assetKey": "ASSET-HARPY-001",
+      "kind": "sidekick",
+      "role": "right",
+      "tripoSlot": "right",
+      "version": 4,
+      "status": "superseded",
+      "supersededBy": "characters/ref-harpy-v5-right.png",
+      "path": "art/imagegen/mvp-v1/characters/ref-harpy-v4-right.png",
+      "sha256Recorded": "b22fe4593ad187484255e4715bed868ac72eb8c19bdd854b5c9e174a37ca8502",
+      "sha256Selection": null,
+      "source": "art/imagegen/mvp-v1/characters/ref-harpy-v3-right.png",
+      "sourceSha256Recorded": "877396e80707bc879b69ee1f4749331017539dac61ef8fb4acec7c93bcca5b2d",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 240.27850304612707,
+        "baseDiameterUu": 22,
+        "scaleXY": [
+          0.5832002501119589,
+          0.5832002501119589
+        ],
+        "baseline": 918
+      },
+      "sha256": "b22fe4593ad187484255e4715bed868ac72eb8c19bdd854b5c9e174a37ca8502",
+      "bytes": 176114,
+      "sourceSha256Actual": "877396e80707bc879b69ee1f4749331017539dac61ef8fb4acec7c93bcca5b2d",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-HARPY",
+      "assetKey": "ASSET-HARPY-001",
+      "kind": "sidekick",
+      "role": "back",
+      "tripoSlot": "back",
+      "version": 5,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-back.png",
+      "sha256Recorded": "bcb59c7c3ce126c931372d72bda4c657635fba01ea7059f56eabab7a2d67c789",
+      "sha256Selection": "bcb59c7c3ce126c931372d72bda4c657635fba01ea7059f56eabab7a2d67c789",
+      "source": "art/imagegen/mvp-v1/characters/ref-harpy-v4-back.png",
+      "sourceSha256Recorded": "599301458f4a0b1a362c5622c64c16346ebc0b4181d1521b023289255bfef318",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-v3.json",
+      "normalization": {
+        "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+        "targetBaseWidthPx": 240.27850304612707,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.9974358974358974,
+          1.0
+        ],
+        "baseline": 918
+      },
+      "sha256": "bcb59c7c3ce126c931372d72bda4c657635fba01ea7059f56eabab7a2d67c789",
+      "bytes": 289590,
+      "sourceSha256Actual": "599301458f4a0b1a362c5622c64c16346ebc0b4181d1521b023289255bfef318",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-HARPY",
+      "assetKey": "ASSET-HARPY-001",
+      "kind": "sidekick",
+      "role": "front",
+      "tripoSlot": "front",
+      "version": 5,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-front.png",
+      "sha256Recorded": "0a27b796aebe2b859baac4c249913bf804d8de1f9bc02688f971ba9183250e4c",
+      "sha256Selection": "0a27b796aebe2b859baac4c249913bf804d8de1f9bc02688f971ba9183250e4c",
+      "source": "art/imagegen/mvp-v1/characters/ref-harpy-v4-front.png",
+      "sourceSha256Recorded": "c4529a80fced6917874becfa3c3053996e46988ec732c8e2c29025c2b5ad6ced",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-v3.json",
+      "normalization": {
+        "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+        "targetBaseWidthPx": 240.27850304612707,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.9975339087546239,
+          0.963855421686747
+        ],
+        "baseline": 918
+      },
+      "sha256": "0a27b796aebe2b859baac4c249913bf804d8de1f9bc02688f971ba9183250e4c",
+      "bytes": 305393,
+      "sourceSha256Actual": "c4529a80fced6917874becfa3c3053996e46988ec732c8e2c29025c2b5ad6ced",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-HARPY",
+      "assetKey": "ASSET-HARPY-001",
+      "kind": "sidekick",
+      "role": "left",
+      "tripoSlot": "left",
+      "version": 5,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-left.png",
+      "sha256Recorded": "cc347722811849932bef3e0371852e50d7e0adfa159d5f175d6db48f719bdc6f",
+      "sha256Selection": "cc347722811849932bef3e0371852e50d7e0adfa159d5f175d6db48f719bdc6f",
+      "source": "art/imagegen/mvp-v1/characters/ref-harpy-v4-left.png",
+      "sourceSha256Recorded": "0e677ea1c538b97e734388a3d1275f4214c6d1230d8e41d5b12a90bce450b3ff",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-v3.json",
+      "normalization": {
+        "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+        "targetBaseWidthPx": 240.27850304612707,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          1.0022271714922049,
+          1.0084033613445378
+        ],
+        "baseline": 918
+      },
+      "sha256": "cc347722811849932bef3e0371852e50d7e0adfa159d5f175d6db48f719bdc6f",
+      "bytes": 192407,
+      "sourceSha256Actual": "0e677ea1c538b97e734388a3d1275f4214c6d1230d8e41d5b12a90bce450b3ff",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-HARPY",
+      "assetKey": "ASSET-HARPY-001",
+      "kind": "sidekick",
+      "role": "right",
+      "tripoSlot": "right",
+      "version": 5,
+      "status": "candidate-excluded",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-right.png",
+      "sha256Recorded": "d6a1e7ca18e2eb81f4e84631f375e46465495f1e447369f44a902e70b271eb1d",
+      "sha256Selection": "d6a1e7ca18e2eb81f4e84631f375e46465495f1e447369f44a902e70b271eb1d",
+      "source": "art/imagegen/mvp-v1/characters/ref-harpy-v5-right-raw.png",
+      "sourceSha256Recorded": "4bbf39640aa12ca6d81c8b0d41188dcab03c80f4fe60ff4303836816c2c96b85",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-v3.json",
+      "normalization": {
+        "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+        "targetBaseWidthPx": 240.27850304612707,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.8149532710280374,
+          0.8602150537634409
+        ],
+        "baseline": 918
+      },
+      "sha256": "d6a1e7ca18e2eb81f4e84631f375e46465495f1e447369f44a902e70b271eb1d",
+      "bytes": 186825,
+      "sourceSha256Actual": "4bbf39640aa12ca6d81c8b0d41188dcab03c80f4fe60ff4303836816c2c96b85",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-KING-ARTHUR",
+      "assetKey": "ASSET-KING-ARTHUR-001",
+      "kind": "hero",
+      "role": "back",
+      "tripoSlot": "back",
+      "version": 5,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-back.png",
+      "sha256Recorded": "febe34fa79e74381ff2434ab264e6fe11c35b4b4d49a9d63f19ed123050f90f7",
+      "sha256Selection": "febe34fa79e74381ff2434ab264e6fe11c35b4b4d49a9d63f19ed123050f90f7",
+      "source": "art/imagegen/mvp-v1/characters/ref-king-arthur-v4-back.png",
+      "sourceSha256Recorded": "0f42a6583f77095def46da7969dfb190243d930027aae7f74b09b8996e40d570",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 399.3698366954851,
+        "baseDiameterUu": 30,
+        "scaleXY": [
+          0.7769841180846013,
+          0.7769841180846013
+        ],
+        "baseline": 918
+      },
+      "sha256": "febe34fa79e74381ff2434ab264e6fe11c35b4b4d49a9d63f19ed123050f90f7",
+      "bytes": 276320,
+      "sourceSha256Actual": "0f42a6583f77095def46da7969dfb190243d930027aae7f74b09b8996e40d570",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-KING-ARTHUR",
+      "assetKey": "ASSET-KING-ARTHUR-001",
+      "kind": "hero",
+      "role": "front",
+      "tripoSlot": "front",
+      "version": 5,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-front.png",
+      "sha256Recorded": "1467861455c6e7a011edca9e879982f088c5839ad39d2a4fadf94b1ab253f9a2",
+      "sha256Selection": "1467861455c6e7a011edca9e879982f088c5839ad39d2a4fadf94b1ab253f9a2",
+      "source": "art/imagegen/mvp-v1/characters/ref-king-arthur-v4-front.png",
+      "sourceSha256Recorded": "afe0434ffded962d5e23991d2638e94849bd10f632d00a2acfa8f2607b866716",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 399.3698366954851,
+        "baseDiameterUu": 30,
+        "scaleXY": [
+          0.7784987070087429,
+          0.7784987070087429
+        ],
+        "baseline": 918
+      },
+      "sha256": "1467861455c6e7a011edca9e879982f088c5839ad39d2a4fadf94b1ab253f9a2",
+      "bytes": 335833,
+      "sourceSha256Actual": "afe0434ffded962d5e23991d2638e94849bd10f632d00a2acfa8f2607b866716",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-KING-ARTHUR",
+      "assetKey": "ASSET-KING-ARTHUR-001",
+      "kind": "hero",
+      "role": "left",
+      "tripoSlot": "left",
+      "version": 5,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-left.png",
+      "sha256Recorded": "f9799f034c5003514503952c9a8f005e5c19c216a9b108e80fc52b4ae2045fc3",
+      "sha256Selection": "f9799f034c5003514503952c9a8f005e5c19c216a9b108e80fc52b4ae2045fc3",
+      "source": "art/imagegen/mvp-v1/characters/ref-king-arthur-v4-left.png",
+      "sourceSha256Recorded": "946f482d698f3b9d8a58187b46a2d6839d1907db79d70b3f17684c79ec1af925",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 399.3698366954851,
+        "baseDiameterUu": 30,
+        "scaleXY": [
+          0.7563822664687218,
+          0.7563822664687218
+        ],
+        "baseline": 918
+      },
+      "sha256": "f9799f034c5003514503952c9a8f005e5c19c216a9b108e80fc52b4ae2045fc3",
+      "bytes": 231139,
+      "sourceSha256Actual": "946f482d698f3b9d8a58187b46a2d6839d1907db79d70b3f17684c79ec1af925",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-KING-ARTHUR",
+      "assetKey": "ASSET-KING-ARTHUR-001",
+      "kind": "hero",
+      "role": "right",
+      "tripoSlot": "right",
+      "version": 5,
+      "status": "superseded",
+      "supersededBy": "characters/ref-king-arthur-v6-right.png",
+      "path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-right.png",
+      "sha256Recorded": "6ddb8f23f6fc35654b025f8ef3ea3a76f93ecc37d5fef37c4760eb622c954db0",
+      "sha256Selection": null,
+      "source": "art/imagegen/mvp-v1/characters/ref-king-arthur-v4-right.png",
+      "sourceSha256Recorded": "fb06c65799b9854c157def850e56a553029b14ef8e5bd1a19b4dde4caf4e8f72",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 399.3698366954851,
+        "baseDiameterUu": 30,
+        "scaleXY": [
+          0.7800192122958693,
+          0.7800192122958693
+        ],
+        "baseline": 918
+      },
+      "sha256": "6ddb8f23f6fc35654b025f8ef3ea3a76f93ecc37d5fef37c4760eb622c954db0",
+      "bytes": 223111,
+      "sourceSha256Actual": "fb06c65799b9854c157def850e56a553029b14ef8e5bd1a19b4dde4caf4e8f72",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-KING-ARTHUR",
+      "assetKey": "ASSET-KING-ARTHUR-001",
+      "kind": "hero",
+      "role": "right",
+      "tripoSlot": "right",
+      "version": 6,
+      "status": "superseded",
+      "supersededBy": "characters/ref-king-arthur-v7-right.png",
+      "path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v6-right.png",
+      "sha256Recorded": "24578c2b5767df52d27227447716668121f8b579e9e6779e7102e235c38b84a2",
+      "sha256Selection": null,
+      "source": "art/imagegen/mvp-v1/characters/ref-king-arthur-v6-right-raw.png",
+      "sourceSha256Recorded": "5886288fdd5b0e01b8280c1de65270fe372d5e213581686eb65d32dc8d583ce5",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-v3.json",
+      "normalization": {
+        "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+        "targetBaseWidthPx": 399.3698366954851,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.8122448979591836,
+          0.811623246492986
+        ],
+        "baseline": 918
+      },
+      "sha256": "24578c2b5767df52d27227447716668121f8b579e9e6779e7102e235c38b84a2",
+      "bytes": 208888,
+      "sourceSha256Actual": "5886288fdd5b0e01b8280c1de65270fe372d5e213581686eb65d32dc8d583ce5",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-KING-ARTHUR",
+      "assetKey": "ASSET-KING-ARTHUR-001",
+      "kind": "hero",
+      "role": "right",
+      "tripoSlot": "right",
+      "version": 7,
+      "status": "candidate-excluded",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v7-right.png",
+      "sha256Recorded": "92f09fa9c4c5f05a9a15cabe2160ff796d474b72771f66e9cf4712a1f9b45740",
+      "sha256Selection": "92f09fa9c4c5f05a9a15cabe2160ff796d474b72771f66e9cf4712a1f9b45740",
+      "source": "art/imagegen/mvp-v1/characters/ref-king-arthur-v7-right-raw.png",
+      "sourceSha256Recorded": "dc3ed5516abf995db089fec220029ec65d8ab86d01da02b3545287deabb5c4d7",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-v4.json",
+      "normalization": {
+        "method": "Boundary-connected background extraction; isotropic Lanczos fit by base width with height limit; #808080 composite",
+        "targetBaseWidthPx": 399.3698366954851,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.8209876543209876,
+          0.8217922606924644
+        ],
+        "baseline": 918
+      },
+      "sha256": "92f09fa9c4c5f05a9a15cabe2160ff796d474b72771f66e9cf4712a1f9b45740",
+      "bytes": 228117,
+      "sourceSha256Actual": "dc3ed5516abf995db089fec220029ec65d8ab86d01da02b3545287deabb5c4d7",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-MEDUSA",
+      "assetKey": "ASSET-MEDUSA-001",
+      "kind": "hero",
+      "role": "back",
+      "tripoSlot": "back",
+      "version": 5,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-back.png",
+      "sha256Recorded": "3b328a54002b2ea953a1390d616ac14ac8498a155bcbfbd825d83c28afec5c1d",
+      "sha256Selection": "3b328a54002b2ea953a1390d616ac14ac8498a155bcbfbd825d83c28afec5c1d",
+      "source": "art/imagegen/mvp-v1/characters/ref-medusa-v3-back.png",
+      "sourceSha256Recorded": "40f97f4303da78151210e9cb1f97aa136a3d579bf697fe81e9b5bf2133431588",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 389.05263157894734,
+        "baseDiameterUu": 30,
+        "scaleXY": [
+          0.7138580395943988,
+          0.7138580395943988
+        ],
+        "baseline": 918
+      },
+      "sha256": "3b328a54002b2ea953a1390d616ac14ac8498a155bcbfbd825d83c28afec5c1d",
+      "bytes": 349082,
+      "sourceSha256Actual": "40f97f4303da78151210e9cb1f97aa136a3d579bf697fe81e9b5bf2133431588",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-MEDUSA",
+      "assetKey": "ASSET-MEDUSA-001",
+      "kind": "hero",
+      "role": "front",
+      "tripoSlot": "front",
+      "version": 5,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-front.png",
+      "sha256Recorded": "252f94b965aa049f5395534b066271d2ef9cfe6755a8c1ddf4bc9801187a78c9",
+      "sha256Selection": "252f94b965aa049f5395534b066271d2ef9cfe6755a8c1ddf4bc9801187a78c9",
+      "source": "art/imagegen/mvp-v1/characters/ref-medusa-v3-front.png",
+      "sourceSha256Recorded": "107eef5c49f0d082bdf491c7cc302f36aa1d7ca94b59d43155ca8e2256579f58",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 389.05263157894734,
+        "baseDiameterUu": 30,
+        "scaleXY": [
+          0.7125506072874493,
+          0.7125506072874493
+        ],
+        "baseline": 918
+      },
+      "sha256": "252f94b965aa049f5395534b066271d2ef9cfe6755a8c1ddf4bc9801187a78c9",
+      "bytes": 376013,
+      "sourceSha256Actual": "107eef5c49f0d082bdf491c7cc302f36aa1d7ca94b59d43155ca8e2256579f58",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-MEDUSA",
+      "assetKey": "ASSET-MEDUSA-001",
+      "kind": "hero",
+      "role": "left",
+      "tripoSlot": "left",
+      "version": 5,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-left.png",
+      "sha256Recorded": "6d27f4d2090ac660ebcb53810c8fade2d794c5f2fa614944415499ad88c4635c",
+      "sha256Selection": "6d27f4d2090ac660ebcb53810c8fade2d794c5f2fa614944415499ad88c4635c",
+      "source": "art/imagegen/mvp-v1/characters/ref-medusa-v4-left.png",
+      "sourceSha256Recorded": "16823723cb6f7efdf09a16c81c35886444561b83f581430011cf2b0f711703b1",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 389.05263157894734,
+        "baseDiameterUu": 30,
+        "scaleXY": [
+          0.7368421052631579,
+          0.7368421052631579
+        ],
+        "baseline": 918
+      },
+      "sha256": "6d27f4d2090ac660ebcb53810c8fade2d794c5f2fa614944415499ad88c4635c",
+      "bytes": 270997,
+      "sourceSha256Actual": "16823723cb6f7efdf09a16c81c35886444561b83f581430011cf2b0f711703b1",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-MEDUSA",
+      "assetKey": "ASSET-MEDUSA-001",
+      "kind": "hero",
+      "role": "right",
+      "tripoSlot": "right",
+      "version": 5,
+      "status": "superseded",
+      "supersededBy": "characters/ref-medusa-v6-right.png",
+      "path": "art/imagegen/mvp-v1/characters/ref-medusa-v5-right.png",
+      "sha256Recorded": "4c0f9c9f39a14964d019eaec8c2ee3f5b11f3ed7ddf3826818b17d0291edfd2f",
+      "sha256Selection": null,
+      "source": "art/imagegen/mvp-v1/characters/ref-medusa-v4-right.png",
+      "sourceSha256Recorded": "5eaa9b3bb123450b4ecb352548f8b0b8b8f0378c8b93da76590ffa6a2b2476e8",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 389.05263157894734,
+        "baseDiameterUu": 30,
+        "scaleXY": [
+          0.7125506072874493,
+          0.7125506072874493
+        ],
+        "baseline": 918
+      },
+      "sha256": "4c0f9c9f39a14964d019eaec8c2ee3f5b11f3ed7ddf3826818b17d0291edfd2f",
+      "bytes": 273756,
+      "sourceSha256Actual": "5eaa9b3bb123450b4ecb352548f8b0b8b8f0378c8b93da76590ffa6a2b2476e8",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-MEDUSA",
+      "assetKey": "ASSET-MEDUSA-001",
+      "kind": "hero",
+      "role": "right",
+      "tripoSlot": "right",
+      "version": 6,
+      "status": "candidate-excluded",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-medusa-v6-right.png",
+      "sha256Recorded": "43a68653a2fdda1fcd27873fe19b901149bce8fc2eec09528e740f87ee897ce5",
+      "sha256Selection": "43a68653a2fdda1fcd27873fe19b901149bce8fc2eec09528e740f87ee897ce5",
+      "source": "art/imagegen/mvp-v1/characters/ref-medusa-v6-right-raw.png",
+      "sourceSha256Recorded": "3c2782fc9b7888f74a374ad29e2cfa2e8d6d59b4fe86e784e4b407914e46768f",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-v3.json",
+      "normalization": {
+        "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+        "targetBaseWidthPx": 389.05263157894734,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.8189473684210526,
+          0.8186423505572442
+        ],
+        "baseline": 918
+      },
+      "sha256": "43a68653a2fdda1fcd27873fe19b901149bce8fc2eec09528e740f87ee897ce5",
+      "bytes": 252989,
+      "sourceSha256Actual": "3c2782fc9b7888f74a374ad29e2cfa2e8d6d59b4fe86e784e4b407914e46768f",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-MERLIN",
+      "assetKey": "ASSET-MERLIN-001",
+      "kind": "sidekick",
+      "role": "back",
+      "tripoSlot": "back",
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-back.png",
+      "sha256Recorded": "e859071fe3fbc9180c2c0b7af4eba855f91354e14f9e264fe8ef6869a4942d63",
+      "sha256Selection": "e859071fe3fbc9180c2c0b7af4eba855f91354e14f9e264fe8ef6869a4942d63",
+      "source": "art/imagegen/mvp-v1/characters/ref-merlin-v2-back.png",
+      "sourceSha256Recorded": "33d5504395c6537f8e3b4792824210e08108313df282240fe71a72109ee62be1",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 393.1497005988024,
+        "baseDiameterUu": 24,
+        "scaleXY": [
+          0.6946107784431137,
+          0.6946107784431137
+        ],
+        "baseline": 918
+      },
+      "sha256": "e859071fe3fbc9180c2c0b7af4eba855f91354e14f9e264fe8ef6869a4942d63",
+      "bytes": 260805,
+      "sourceSha256Actual": "33d5504395c6537f8e3b4792824210e08108313df282240fe71a72109ee62be1",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-MERLIN",
+      "assetKey": "ASSET-MERLIN-001",
+      "kind": "sidekick",
+      "role": "front",
+      "tripoSlot": "front",
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-front.png",
+      "sha256Recorded": "cdd344e012d02abbecf232a7c1c0e332a29501794455e1f4320830083705e109",
+      "sha256Selection": "cdd344e012d02abbecf232a7c1c0e332a29501794455e1f4320830083705e109",
+      "source": "art/imagegen/mvp-v1/characters/ref-merlin-v2-front.png",
+      "sourceSha256Recorded": "9381050ac4470f948b25fa2f1bfb70f8fefeee61e41fc1a4759a53eab581d64e",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 393.1497005988024,
+        "baseDiameterUu": 24,
+        "scaleXY": [
+          0.6933857153418032,
+          0.6933857153418032
+        ],
+        "baseline": 918
+      },
+      "sha256": "cdd344e012d02abbecf232a7c1c0e332a29501794455e1f4320830083705e109",
+      "bytes": 323173,
+      "sourceSha256Actual": "9381050ac4470f948b25fa2f1bfb70f8fefeee61e41fc1a4759a53eab581d64e",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-MERLIN",
+      "assetKey": "ASSET-MERLIN-001",
+      "kind": "sidekick",
+      "role": "left",
+      "tripoSlot": "left",
+      "version": 3,
+      "status": "superseded",
+      "supersededBy": "characters/ref-merlin-v4-left.png",
+      "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-left.png",
+      "sha256Recorded": "31a7c02051b1493ea5254badb03f15a4429016a7d9a9e25503201f7d71269adb",
+      "sha256Selection": null,
+      "source": "art/imagegen/mvp-v1/characters/ref-merlin-v2-left.png",
+      "sourceSha256Recorded": "1ea8360b5e53e09b7e3dc9854e41ce571b6bda2c098cc5a79a9169ad41428ea7",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 393.1497005988024,
+        "baseDiameterUu": 24,
+        "scaleXY": [
+          0.6933857153418032,
+          0.6933857153418032
+        ],
+        "baseline": 918
+      },
+      "sha256": "31a7c02051b1493ea5254badb03f15a4429016a7d9a9e25503201f7d71269adb",
+      "bytes": 246982,
+      "sourceSha256Actual": "1ea8360b5e53e09b7e3dc9854e41ce571b6bda2c098cc5a79a9169ad41428ea7",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-MERLIN",
+      "assetKey": "ASSET-MERLIN-001",
+      "kind": "sidekick",
+      "role": "right",
+      "tripoSlot": "right",
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-right.png",
+      "sha256Recorded": "839bffe4ac47d805778cd3cf5241976bb18fb854249ef12f0ed5166d2220d678",
+      "sha256Selection": "839bffe4ac47d805778cd3cf5241976bb18fb854249ef12f0ed5166d2220d678",
+      "source": "art/imagegen/mvp-v1/characters/ref-merlin-v2-right.png",
+      "sourceSha256Recorded": "600122fcdbc7e9d5edf5ead797f3f5c4ff27f5a1f129bb76edd79ddf4950d097",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-views.json",
+      "normalization": {
+        "method": "boundary-connected gray removal; isotropic scaling by detected base diameter; 2x bicubic affine + Lanczos; composite #808080",
+        "targetBaseWidthPx": 393.1497005988024,
+        "baseDiameterUu": 24,
+        "scaleXY": [
+          0.6921649658429619,
+          0.6921649658429619
+        ],
+        "baseline": 918
+      },
+      "sha256": "839bffe4ac47d805778cd3cf5241976bb18fb854249ef12f0ed5166d2220d678",
+      "bytes": 231698,
+      "sourceSha256Actual": "600122fcdbc7e9d5edf5ead797f3f5c4ff27f5a1f129bb76edd79ddf4950d097",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-MERLIN",
+      "assetKey": "ASSET-MERLIN-001",
+      "kind": "sidekick",
+      "role": "left",
+      "tripoSlot": "left",
+      "version": 4,
+      "status": "superseded",
+      "supersededBy": "characters/ref-merlin-v5-left.png",
+      "path": "art/imagegen/mvp-v1/characters/ref-merlin-v4-left.png",
+      "sha256Recorded": "e40e9f78e62522ff470f07390a35d8844e0cbf904b66f98835afbec5a0e9b3a1",
+      "sha256Selection": null,
+      "source": "art/imagegen/mvp-v1/characters/ref-merlin-v4-left-raw.png",
+      "sourceSha256Recorded": "e717916ef0497568ef64eaf4958e0ea05729f92932c388e74430cdf2d54a1071",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-v3.json",
+      "normalization": {
+        "method": "boundary background segmentation, Lanczos fit, solid#808080 canvas",
+        "targetBaseWidthPx": 393.1497005988024,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.8049792531120332,
+          0.8043694141012909
+        ],
+        "baseline": 918
+      },
+      "sha256": "e40e9f78e62522ff470f07390a35d8844e0cbf904b66f98835afbec5a0e9b3a1",
+      "bytes": 212064,
+      "sourceSha256Actual": "e717916ef0497568ef64eaf4958e0ea05729f92932c388e74430cdf2d54a1071",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-MERLIN",
+      "assetKey": "ASSET-MERLIN-001",
+      "kind": "sidekick",
+      "role": "left",
+      "tripoSlot": "left",
+      "version": 5,
+      "status": "candidate-excluded",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/characters/ref-merlin-v5-left.png",
+      "sha256Recorded": "918379c99499abca9295b23be8d83aad4df1f5f7093ac2fd82864ec2c1907038",
+      "sha256Selection": "918379c99499abca9295b23be8d83aad4df1f5f7093ac2fd82864ec2c1907038",
+      "source": "art/imagegen/mvp-v1/characters/ref-merlin-v5-left-raw.png",
+      "sourceSha256Recorded": "e138b6850e35eee25d7ed3e2b6f1efd116fad10a79b9641e4023f5e91b9d16ee",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-v4.json",
+      "normalization": {
+        "method": "Boundary-connected background extraction; isotropic Lanczos fit by base width with height limit; #808080 composite",
+        "targetBaseWidthPx": 393.1497005988024,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.8164556962025317,
+          0.8165322580645161
+        ],
+        "baseline": 918
+      },
+      "sha256": "918379c99499abca9295b23be8d83aad4df1f5f7093ac2fd82864ec2c1907038",
+      "bytes": 213251,
+      "sourceSha256Actual": "e138b6850e35eee25d7ed3e2b6f1efd116fad10a79b9641e4023f5e91b9d16ee",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-BARREL",
+      "assetKey": "ASSET-DECOR-KIT-001",
+      "kind": "prop:SM_Decor_Barrel",
+      "role": "front",
+      "tripoSlot": null,
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/environment/ref-barrel-v3-front.png",
+      "sha256Recorded": "0253587543f27a3159b93879dc4e77870d711a6ad8fed4695bf9106aed340129",
+      "sha256Selection": "0253587543f27a3159b93879dc4e77870d711a6ad8fed4695bf9106aed340129",
+      "source": "art/imagegen/mvp-v1/environment/ref-barrel-v2-front.png",
+      "sourceSha256Recorded": "53a3445b0bc99429fcaadd572492fec70d0bb94d934ccc891f157e0681b2dcc6",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-environment.json",
+      "normalization": {
+        "method": "boundary gray removal, Lanczos scale, #808080 canvas",
+        "targetBaseWidthPx": null,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.8775731310942578,
+          0.8775731310942578
+        ],
+        "baseline": null
+      },
+      "sha256": "0253587543f27a3159b93879dc4e77870d711a6ad8fed4695bf9106aed340129",
+      "bytes": 664942,
+      "sourceSha256Actual": "53a3445b0bc99429fcaadd572492fec70d0bb94d934ccc891f157e0681b2dcc6",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-BARREL",
+      "assetKey": "ASSET-DECOR-KIT-001",
+      "kind": "prop:SM_Decor_Barrel",
+      "role": "side",
+      "tripoSlot": null,
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/environment/ref-barrel-v3-side.png",
+      "sha256Recorded": "f78baae79e13f0a6c1a4707a66600ca936b3cb613dd6e63623f6b551ee64f038",
+      "sha256Selection": "f78baae79e13f0a6c1a4707a66600ca936b3cb613dd6e63623f6b551ee64f038",
+      "source": "art/imagegen/mvp-v1/environment/ref-barrel-v2-side.png",
+      "sourceSha256Recorded": "a81434ffbab1f33eccaaaff915ba35c942a35b975fec3a015ef6cb5e72cf61e9",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-environment.json",
+      "normalization": {
+        "method": "boundary gray removal, Lanczos scale, #808080 canvas",
+        "targetBaseWidthPx": null,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.8980044345898004,
+          0.8980044345898004
+        ],
+        "baseline": null
+      },
+      "sha256": "f78baae79e13f0a6c1a4707a66600ca936b3cb613dd6e63623f6b551ee64f038",
+      "bytes": 653035,
+      "sourceSha256Actual": "a81434ffbab1f33eccaaaff915ba35c942a35b975fec3a015ef6cb5e72cf61e9",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-BARREL",
+      "assetKey": "ASSET-DECOR-KIT-001",
+      "kind": "prop:SM_Decor_Barrel",
+      "role": "three-quarter",
+      "tripoSlot": null,
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/environment/ref-barrel-v3-three-quarter.png",
+      "sha256Recorded": "09c67c971c788e380195ab08051cd7f5061f600d21ab72bc37eebead2909e8a7",
+      "sha256Selection": "09c67c971c788e380195ab08051cd7f5061f600d21ab72bc37eebead2909e8a7",
+      "source": "art/imagegen/mvp-v1/environment/ref-barrel-v2-three-quarter.png",
+      "sourceSha256Recorded": "2cdc2d8035404a222ad6d179cab0181b83a4bf44ca2604a9cda1a0e2c5cb7187",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-environment.json",
+      "normalization": {
+        "method": "boundary gray removal, Lanczos scale, #808080 canvas",
+        "targetBaseWidthPx": null,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.7795957651588066,
+          0.7795957651588066
+        ],
+        "baseline": null
+      },
+      "sha256": "09c67c971c788e380195ab08051cd7f5061f600d21ab72bc37eebead2909e8a7",
+      "bytes": 525018,
+      "sourceSha256Actual": "2cdc2d8035404a222ad6d179cab0181b83a4bf44ca2604a9cda1a0e2c5cb7187",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-BARREL",
+      "assetKey": "ASSET-DECOR-KIT-001",
+      "kind": "prop:SM_Decor_Barrel",
+      "role": "top",
+      "tripoSlot": null,
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/environment/ref-barrel-v3-top.png",
+      "sha256Recorded": "2f6a19639f79a6e76b7cb2bb13011498466419c34cc902ac8d9440696d8d6f6e",
+      "sha256Selection": "2f6a19639f79a6e76b7cb2bb13011498466419c34cc902ac8d9440696d8d6f6e",
+      "source": "art/imagegen/mvp-v1/environment/ref-barrel-v2-top.png",
+      "sourceSha256Recorded": "723aa0ada750933b17134bae13a89d078053a719220a55821ed9f57935f96f30",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-environment.json",
+      "normalization": {
+        "method": "boundary gray removal, Lanczos scale, #808080 canvas",
+        "targetBaseWidthPx": null,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.683991683991684,
+          0.683991683991684
+        ],
+        "baseline": null
+      },
+      "sha256": "2f6a19639f79a6e76b7cb2bb13011498466419c34cc902ac8d9440696d8d6f6e",
+      "bytes": 488138,
+      "sourceSha256Actual": "723aa0ada750933b17134bae13a89d078053a719220a55821ed9f57935f96f30",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-LANTERN",
+      "assetKey": "ASSET-DECOR-KIT-001",
+      "kind": "prop:SM_Decor_Lantern",
+      "role": "back",
+      "tripoSlot": null,
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-back.png",
+      "sha256Recorded": "69f256cc8023929d4ba58ad70264dc5bb0def611e5f13bcbbc0d840402210682",
+      "sha256Selection": "69f256cc8023929d4ba58ad70264dc5bb0def611e5f13bcbbc0d840402210682",
+      "source": "art/imagegen/mvp-v1/environment/ref-lantern-v2-back.png",
+      "sourceSha256Recorded": "1f5b511dc228ac7dbc29db48f012ba317311d9fd77a469526fdeeaef277f9a3c",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-environment.json",
+      "normalization": {
+        "method": "boundary gray removal, Lanczos scale, #808080 canvas",
+        "targetBaseWidthPx": null,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.6870229007633588,
+          0.6870229007633588
+        ],
+        "baseline": null
+      },
+      "sha256": "69f256cc8023929d4ba58ad70264dc5bb0def611e5f13bcbbc0d840402210682",
+      "bytes": 167800,
+      "sourceSha256Actual": "1f5b511dc228ac7dbc29db48f012ba317311d9fd77a469526fdeeaef277f9a3c",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-LANTERN",
+      "assetKey": "ASSET-DECOR-KIT-001",
+      "kind": "prop:SM_Decor_Lantern",
+      "role": "front",
+      "tripoSlot": null,
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-front.png",
+      "sha256Recorded": "710a17b99813347eff59f7a204457221b18d2d34239f8026e89118b303080a58",
+      "sha256Selection": "710a17b99813347eff59f7a204457221b18d2d34239f8026e89118b303080a58",
+      "source": "art/imagegen/mvp-v1/environment/ref-lantern-v2-front.png",
+      "sourceSha256Recorded": "e924b2ae2a397a309c14cdb566c4d2ab9524320ffd8838c893dd4d5239c66a4d",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-environment.json",
+      "normalization": {
+        "method": "boundary gray removal, Lanczos scale, #808080 canvas",
+        "targetBaseWidthPx": null,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.6870229007633588,
+          0.6870229007633588
+        ],
+        "baseline": null
+      },
+      "sha256": "710a17b99813347eff59f7a204457221b18d2d34239f8026e89118b303080a58",
+      "bytes": 168379,
+      "sourceSha256Actual": "e924b2ae2a397a309c14cdb566c4d2ab9524320ffd8838c893dd4d5239c66a4d",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-LANTERN",
+      "assetKey": "ASSET-DECOR-KIT-001",
+      "kind": "prop:SM_Decor_Lantern",
+      "role": "left",
+      "tripoSlot": null,
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-left.png",
+      "sha256Recorded": "01c870d8e0d701a4bba258590b9afd2580422dc7ec586f6206611a1350f0d7be",
+      "sha256Selection": "01c870d8e0d701a4bba258590b9afd2580422dc7ec586f6206611a1350f0d7be",
+      "source": "art/imagegen/mvp-v1/environment/ref-lantern-v2-left.png",
+      "sourceSha256Recorded": "a2b906de95ef6e9ee0402cafee6d27078db619724dda44feb30fb213627caeea",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-environment.json",
+      "normalization": {
+        "method": "boundary gray removal, Lanczos scale, #808080 canvas",
+        "targetBaseWidthPx": null,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.6870229007633588,
+          0.6870229007633588
+        ],
+        "baseline": null
+      },
+      "sha256": "01c870d8e0d701a4bba258590b9afd2580422dc7ec586f6206611a1350f0d7be",
+      "bytes": 166808,
+      "sourceSha256Actual": "a2b906de95ef6e9ee0402cafee6d27078db619724dda44feb30fb213627caeea",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-LANTERN",
+      "assetKey": "ASSET-DECOR-KIT-001",
+      "kind": "prop:SM_Decor_Lantern",
+      "role": "right",
+      "tripoSlot": null,
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-right.png",
+      "sha256Recorded": "48caa2b52b2f4b7328facba1654b8ec3f4abfead77f15c1051bfdeca349af55f",
+      "sha256Selection": "48caa2b52b2f4b7328facba1654b8ec3f4abfead77f15c1051bfdeca349af55f",
+      "source": "art/imagegen/mvp-v1/environment/ref-lantern-v2-right.png",
+      "sourceSha256Recorded": "0399b4b11bb7caae6d58c19b0a5fd231b618e331d4ee64a4e1a6dea42b372a63",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-environment.json",
+      "normalization": {
+        "method": "boundary gray removal, Lanczos scale, #808080 canvas",
+        "targetBaseWidthPx": null,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.6870229007633588,
+          0.6870229007633588
+        ],
+        "baseline": null
+      },
+      "sha256": "48caa2b52b2f4b7328facba1654b8ec3f4abfead77f15c1051bfdeca349af55f",
+      "bytes": 173239,
+      "sourceSha256Actual": "0399b4b11bb7caae6d58c19b0a5fd231b618e331d4ee64a4e1a6dea42b372a63",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-TABLE-BASE",
+      "assetKey": "ASSET-TABLE-BASE-001",
+      "kind": "decor",
+      "role": "front",
+      "tripoSlot": null,
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/environment/ref-table-base-v3-front.png",
+      "sha256Recorded": "b16fb858a6459ff6264f405f1984c43b9e39a8cef0300aa2d113e79ce078e9fc",
+      "sha256Selection": "b16fb858a6459ff6264f405f1984c43b9e39a8cef0300aa2d113e79ce078e9fc",
+      "source": "art/imagegen/mvp-v1/environment/ref-table-base-v2-front.png",
+      "sourceSha256Recorded": "7bc27883971aad122d83496ca18fd8781b8bdc0301c40caa055f4e87985b9b61",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-environment.json",
+      "normalization": {
+        "method": "boundary gray removal, Lanczos scale, #808080 canvas",
+        "targetBaseWidthPx": null,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.5994671403197158,
+          0.5994671403197158
+        ],
+        "baseline": null
+      },
+      "sha256": "b16fb858a6459ff6264f405f1984c43b9e39a8cef0300aa2d113e79ce078e9fc",
+      "bytes": 194561,
+      "sourceSha256Actual": "7bc27883971aad122d83496ca18fd8781b8bdc0301c40caa055f4e87985b9b61",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-TABLE-BASE",
+      "assetKey": "ASSET-TABLE-BASE-001",
+      "kind": "decor",
+      "role": "side",
+      "tripoSlot": null,
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/environment/ref-table-base-v3-side.png",
+      "sha256Recorded": "18f904d67a42c3b9515db51c8de78d966363ea64f5e612241cc3ae70ba286018",
+      "sha256Selection": "18f904d67a42c3b9515db51c8de78d966363ea64f5e612241cc3ae70ba286018",
+      "source": "art/imagegen/mvp-v1/environment/ref-table-base-v2-side.png",
+      "sourceSha256Recorded": "12ff75578974cd5484c920ba3119ba60989948d44ca73bf65bb67acbbd6576cc",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-environment.json",
+      "normalization": {
+        "method": "boundary gray removal, Lanczos scale, #808080 canvas",
+        "targetBaseWidthPx": null,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.6970740103270223,
+          0.6970740103270223
+        ],
+        "baseline": null
+      },
+      "sha256": "18f904d67a42c3b9515db51c8de78d966363ea64f5e612241cc3ae70ba286018",
+      "bytes": 222539,
+      "sourceSha256Actual": "12ff75578974cd5484c920ba3119ba60989948d44ca73bf65bb67acbbd6576cc",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    },
+    {
+      "refId": "REF-TABLE-BASE",
+      "assetKey": "ASSET-TABLE-BASE-001",
+      "kind": "decor",
+      "role": "three-quarter",
+      "tripoSlot": null,
+      "version": 3,
+      "status": "recommended",
+      "supersededBy": null,
+      "path": "art/imagegen/mvp-v1/environment/ref-table-base-v3-three-quarter.png",
+      "sha256Recorded": "f75c85e9fa9c7d6298dd93ff6d52d1b038a2f7c23e9d1b19fbddf151e3199d8a",
+      "sha256Selection": "f75c85e9fa9c7d6298dd93ff6d52d1b038a2f7c23e9d1b19fbddf151e3199d8a",
+      "source": "art/imagegen/mvp-v1/environment/ref-table-base-v2-three-quarter.png",
+      "sourceSha256Recorded": "f966df0840efbfab61c6145c8011befdd78295408e3ece54617f23438850a727",
+      "normalizationRecord": "art/imagegen/mvp-v1/normalized-environment.json",
+      "normalization": {
+        "method": "boundary gray removal, Lanczos scale, #808080 canvas",
+        "targetBaseWidthPx": null,
+        "baseDiameterUu": null,
+        "scaleXY": [
+          0.678391959798995,
+          0.678391959798995
+        ],
+        "baseline": null
+      },
+      "sha256": "f75c85e9fa9c7d6298dd93ff6d52d1b038a2f7c23e9d1b19fbddf151e3199d8a",
+      "bytes": 436380,
+      "sourceSha256Actual": "f966df0840efbfab61c6145c8011befdd78295408e3ece54617f23438850a727",
+      "pixels": [
+        1024,
+        1024
+      ],
+      "mode": "RGB",
+      "format": "PNG"
+    }
+  ]
+}

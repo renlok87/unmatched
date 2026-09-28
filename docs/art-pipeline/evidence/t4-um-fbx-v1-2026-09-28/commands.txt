@@ -1,0 +1,135 @@
+# Commands of the UM_FBX_v1 fix run (P0 review of T4), 2026-09-28, repo root C:/Users/ren/WebstormProjects/unmached/unmached
+# tool: tools/tripo-pipeline/tripo_pipeline.py 0.4.0; Git Bash with MSYS_NO_PATHCONV=1; exit codes as returned;
+# output tails are cut to 25 lines. Live apps: Blender 5.2.2 via blender-mcp :9876, UnrealEditor 5.8 via MCP :8123.
+# The headless comparison and the passthrough check ran in temporary run dirs under C:/tmp (deleted afterwards).
+
+$ python tools/tripo-pipeline/tripo_pipeline.py init --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1 --asset-id ASSET-MEDUSA-001 --primary-source tripo-b6253e58 --primary-role segmented-retopo-glb --profile skeletal-candidate --build-profile art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal-um-fbx-v1.json
+# 2026-09-28T07:32:13Z exit=0
+  init: created C:\Users\ren\WebstormProjects\unmached\unmached\art\pipeline-candidates\ASSET-MEDUSA-001\20260928-t4-um-fbx-v1\manifest.json
+
+$ python tools/tripo-pipeline/tripo_pipeline.py register-source --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1 --spec art/pipeline-candidates/ASSET-MEDUSA-001/source-specs/tripo-d562f057.json
+# 2026-09-28T07:32:13Z exit=0
+  register-source: registered tripo-d562f057 (5 files, historical spend {'studio-credits': 95}; this command spent 0)
+
+$ python tools/tripo-pipeline/tripo_pipeline.py register-source --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1 --spec art/pipeline-candidates/ASSET-MEDUSA-001/source-specs/tripo-b6253e58.json
+# 2026-09-28T07:32:14Z exit=0
+  register-source: registered tripo-b6253e58 (2 files, historical spend {'studio-credits': 40}; this command spent 0)
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp run --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1
+# 2026-09-28T07:32:17Z exit=0
+    preflight executed
+    import    executed
+    verify    executed
+    atlas     executed
+    build     executed
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp run --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1
+# 2026-09-28T07:33:09Z exit=0
+    preflight executed
+    import    skipped
+    verify    skipped
+    atlas     skipped
+    build     executed
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1 --ue-folder /Game/PipelineCandidates/Medusa/T4UmFbxV1
+# 2026-09-28T07:33:23Z exit=0
+    ue-import executed
+
+$ python tools/tripo-pipeline/tripo_pipeline.py snapshot --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1 --out docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/snapshot-1-after-ue-import.json
+# 2026-09-28T07:35:40Z exit=0
+  snapshot: 19 files -> C:\Users\ren\WebstormProjects\unmached\unmached\docs\art-pipeline\evidence\t4-um-fbx-v1-2026-09-28\snapshot-1-after-ue-import.json
+
+$ python tools/tripo-pipeline/review/ue_listing.py /Game/PipelineCandidates/Medusa/T4UmFbxV1 docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/ue-listing-1-after-import.json
+# 2026-09-28T07:35:41Z exit=0
+  {"count": 9, "skeletal": {"/Game/PipelineCandidates/Medusa/T4UmFbxV1/Meshes/SK_Medusa_Candidate": {"sockets": ["Weapon", "Head"], "material_slots": ["M_Medusa_Atlas", "M_Medusa_Face"]}}}
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp run --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1
+# 2026-09-28T07:35:46Z exit=0
+    preflight executed
+    import    skipped
+    verify    skipped
+    atlas     skipped
+    build     skipped
+    ue-import skipped
+
+$ python tools/tripo-pipeline/tripo_pipeline.py snapshot --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1 --out docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/snapshot-2-after-noop-run.json
+# 2026-09-28T07:35:49Z exit=0
+  snapshot: 19 files -> C:\Users\ren\WebstormProjects\unmached\unmached\docs\art-pipeline\evidence\t4-um-fbx-v1-2026-09-28\snapshot-2-after-noop-run.json
+
+# note: snapshot-2 differs from snapshot-1 only in reports/preflight.json + manifest.json: preflight re-ran because config.ue was added by ue-import after the first preflight (expected)
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp run --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1
+# 2026-09-28T07:36:01Z exit=0
+    preflight revalidated
+    import    skipped
+    verify    skipped
+    atlas     skipped
+    build     skipped
+    ue-import skipped
+
+$ python tools/tripo-pipeline/tripo_pipeline.py snapshot --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1 --out docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/snapshot-3-after-noop-run.json
+# 2026-09-28T07:36:04Z exit=0
+  snapshot: 19 files -> C:\Users\ren\WebstormProjects\unmached\unmached\docs\art-pipeline\evidence\t4-um-fbx-v1-2026-09-28\snapshot-3-after-noop-run.json
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1 --force
+# 2026-09-28T07:36:13Z exit=0
+    ue-import executed
+
+$ python tools/tripo-pipeline/tripo_pipeline.py snapshot --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1 --out docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/snapshot-4-after-forced-reimport.json
+# 2026-09-28T07:38:34Z exit=0
+  snapshot: 19 files -> C:\Users\ren\WebstormProjects\unmached\unmached\docs\art-pipeline\evidence\t4-um-fbx-v1-2026-09-28\snapshot-4-after-forced-reimport.json
+
+$ python tools/tripo-pipeline/review/ue_listing.py /Game/PipelineCandidates/Medusa/T4UmFbxV1 docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/ue-listing-2-after-forced-reimport.json
+# 2026-09-28T07:38:34Z exit=0
+  {"count": 9, "skeletal": {"/Game/PipelineCandidates/Medusa/T4UmFbxV1/Meshes/SK_Medusa_Candidate": {"sockets": ["Weapon", "Head"], "material_slots": ["M_Medusa_Atlas", "M_Medusa_Face"]}}}
+
+$ python tools/tripo-pipeline/review/ue_already_exists_probe.py --fbx art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1/export/SM_Medusa_Base_Candidate.fbx --out docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/ue-import-already-exists-transcript.json --folder /Game/PipelineCandidates/_T4UmFbxV1ImportProbe
+# 2026-09-28T07:39:11Z exit=0
+  {"first_import_error": false, "second_import_error": true, "second_import_message": "import_asset: SM_ImportProbe at /Game/PipelineCandidates/_T4UmFbxV1ImportProbe already exists", "assets_after_second_import": ["/Game/PipelineCandidates/_T4UmFbxV1ImportProbe/SM_ImportProbe"], "numbered_duplicate_created": false, "scratch_folder_removed": true}
+
+$ (cd tools/tripo-pipeline/review && python capture_ue_axes.py --run-dir ../../../art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1 --out ../../../docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/editor-frames)
+# attempt 1 (~07:43Z): exit 1 after the face probe (+X 4836 / -X 0 / +Y 691 / -Y 2194 px): ActorTools.set_actor_transform needs the key 'xform'; finally-block ran: actors removed, probe MI + folder deleted, S08Arena re-opened, both levels dirty=false
+# attempt 2 (~07:45Z): exit 0 (+X 4836 / -X 1 / +Y 696 / -Y 2193 px), frames too wide (camera 70 uu) and the 'reading' text overclaimed ("almost only"); frames discarded
+# attempt 3 (~07:46Z): exit 0, final: camera 52 uu, face pixels +X 8715 / -X 0 / +Y 961 / -Y 4070 (editor-frames/ue-axes-frames.json); restored S08Arena dirty=false, review level dirty=false, probe folder removed
+$ python tools/tripo-pipeline/tripo_pipeline.py init --run-dir C:/tmp/pipeline-t3t4-fix/headless-compare --asset-id ASSET-MEDUSA-001 --primary-source tripo-b6253e58 --primary-role segmented-retopo-glb --profile skeletal-candidate --build-profile art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal-um-fbx-v1.json
+# 2026-09-28T07:47:16Z exit=0
+  init: created C:\tmp\pipeline-t3t4-fix\headless-compare\manifest.json
+
+$ python tools/tripo-pipeline/tripo_pipeline.py register-source --run-dir C:/tmp/pipeline-t3t4-fix/headless-compare --spec art/pipeline-candidates/ASSET-MEDUSA-001/source-specs/tripo-d562f057.json
+# 2026-09-28T07:47:17Z exit=0
+  register-source: registered tripo-d562f057 (5 files, historical spend {'studio-credits': 95}; this command spent 0)
+
+$ python tools/tripo-pipeline/tripo_pipeline.py register-source --run-dir C:/tmp/pipeline-t3t4-fix/headless-compare --spec art/pipeline-candidates/ASSET-MEDUSA-001/source-specs/tripo-b6253e58.json
+# 2026-09-28T07:47:17Z exit=0
+  register-source: registered tripo-b6253e58 (2 files, historical spend {'studio-credits': 40}; this command spent 0)
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend headless run --run-dir C:/tmp/pipeline-t3t4-fix/headless-compare
+# 2026-09-28T07:47:17Z exit=0
+    preflight executed
+    import    executed
+    verify    executed
+    atlas     executed
+    build     executed
+
+$ python tools/tripo-pipeline/tripo_pipeline.py init --run-dir C:/tmp/pipeline-t3t4-fix/passthrough-check --asset-id ASSET-MEDUSA-001 --primary-source tripo-b6253e58 --primary-role segmented-retopo-glb
+# 2026-09-28T07:48:01Z exit=0
+  init: created C:\tmp\pipeline-t3t4-fix\passthrough-check\manifest.json
+
+$ python tools/tripo-pipeline/tripo_pipeline.py register-source --run-dir C:/tmp/pipeline-t3t4-fix/passthrough-check --spec art/pipeline-candidates/ASSET-MEDUSA-001/source-specs/tripo-d562f057.json
+# 2026-09-28T07:48:02Z exit=0
+  register-source: registered tripo-d562f057 (5 files, historical spend {'studio-credits': 95}; this command spent 0)
+
+$ python tools/tripo-pipeline/tripo_pipeline.py register-source --run-dir C:/tmp/pipeline-t3t4-fix/passthrough-check --spec art/pipeline-candidates/ASSET-MEDUSA-001/source-specs/tripo-b6253e58.json
+# 2026-09-28T07:48:02Z exit=0
+  register-source: registered tripo-b6253e58 (2 files, historical spend {'studio-credits': 40}; this command spent 0)
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend headless run --run-dir C:/tmp/pipeline-t3t4-fix/passthrough-check
+# 2026-09-28T07:48:02Z exit=0
+    preflight executed
+    import    executed
+    verify    executed
+    export    executed
+
+$ python tools/tripo-pipeline/review/ue_listing.py /Game/PipelineCandidates/Medusa/T4UmFbxV1 docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/ue-listing-3-final.json
+# 2026-09-28T07:48:12Z exit=0
+  {"count": 9, "skeletal": {"/Game/PipelineCandidates/Medusa/T4UmFbxV1/Meshes/SK_Medusa_Candidate": {"sockets": ["Weapon", "Head"], "material_slots": ["M_Medusa_Atlas", "M_Medusa_Face"]}}}
+
