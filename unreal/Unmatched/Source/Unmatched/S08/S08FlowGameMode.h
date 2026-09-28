@@ -152,6 +152,7 @@ private:
   void HandleCues(const TArray<FS08Cue>& Cues);
   void SyncBoardFromApplied();
   void SetupCameraForBoard();
+  void UpdateBoardCamera(float DeltaSeconds);
   // ---- TASK-022 input ----
   void HandleClick();
   void SelectFighter(const FString& FighterId);
@@ -410,6 +411,12 @@ private:
   UPROPERTY()
   TObjectPtr<ACameraActor> BoardCamera;
 
+  float CameraOverviewDistance = 0.0f;
+  float CameraCurrentDistance = 0.0f;
+  float CameraTargetDistance = 0.0f;
+  FVector CameraCurrentFocus = FVector::ZeroVector;
+  FVector CameraTargetFocus = FVector::ZeroVector;
+
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;
   FString SelectedFighterId;
@@ -438,6 +445,7 @@ private:
   bool bWsDroppedForTest = false;
   float AutoManeuverAfter = 0.0f; // >0: hold the auto maneuver until this elapsed time
   float ArtPreviewShotAfter = -1.0f; // optional live-board still when movement is blocked
+  float ArtPreviewFocusZoom = 0.0f; // opt-in K2 probe: overview distance / zoom
   bool bArtPreviewSelectOwnHero = false;
   bool bArtPreviewDidSelectOwnHero = false;
   int32 AutoStep = 0;

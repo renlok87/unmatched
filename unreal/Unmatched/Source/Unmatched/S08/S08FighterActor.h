@@ -28,6 +28,10 @@ public:
   const FString& GetFighterId() const { return Fighter.Id; }
 
   void SetSelected(bool bSelected);
+  /** Keep world-space identity labels legible without letting camera zoom
+   *  inflate them across the board. At close range show only the selected
+   *  fighter's name/HP; the full roster returns at overview distance. */
+  void SetLabelZoomRatio(float DistanceRatio, bool bOnlySelected);
 
 protected:
   virtual void BeginPlay() override;
@@ -58,6 +62,13 @@ private:
   TObjectPtr<UStaticMeshComponent> ArtPlaceholder;
 
   bool bArtSelectionRingLoaded = false;
+  bool bIsSelected = false;
+  float BaseNameWorldSize = 18.0f;
+  float BaseHpWorldSize = 22.0f;
+  float BaseNameHeight = 82.0f;
+  float BaseHpHeight = 66.0f;
+  float LastLabelRatio = -1.0f;
+  bool bLastOnlySelected = false;
 
   FS08BoardFighter Fighter;
 };

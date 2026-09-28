@@ -38,6 +38,7 @@ public:
   bool IsArtActive() const { return bArtActive; }
   const TArray<FS08BoardFighter>& GetFighters() const { return Fighters; }
   AS08FighterActor* FindFighterActor(const FString& FighterId) const;
+  void SetFighterLabelZoomRatio(float DistanceRatio, bool bOnlySelected);
 
   /** TASK-022 selection ring + reachable-cell highlights. */
   void SetSelectedFighter(const FString& FighterId, const TSet<uint64>& Reachable);

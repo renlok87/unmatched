@@ -237,8 +237,12 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
     }
   }
   const float NameFit = 84.0f / (FMath::Max(1, Fighter.Label.Len()) * 0.58f);
-  Label->SetWorldSize(FMath::Min(18.0f, NameFit) * FMath::Min(BoardScale, 1.2f));
-  HpLabel->SetWorldSize(22.0f * BoardScale);
+  BaseNameWorldSize = FMath::Min(18.0f, NameFit) * FMath::Min(BoardScale, 1.2f);
+  BaseHpWorldSize = 22.0f * BoardScale;
+  BaseNameHeight = Label->GetRelativeLocation().Z;
+  BaseHpHeight = HpLabel->GetRelativeLocation().Z;
+  LastLabelRatio = -1.0f;
+  SetLabelZoomRatio(1.0f, false);
 
   Label->SetText(FText::FromString(Fighter.Label));
   HpLabel->SetText(FText::FromString(
@@ -250,10 +254,36 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
 }
 
 void AS08FighterActor::SetSelected(bool bSelected) {
+  bIsSelected = bSelected;
+  LastLabelRatio = -1.0f;
   Ring->SetVisibility(bSelected);
   if (bSelected && bArtSelectionRingLoaded) {
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW selection ring shown fighter=%s mesh=%s"),
         *Fighter.Name, *Ring->GetStaticMesh()->GetName()));
   }
+}
+
+void AS08FighterActor::SetLabelZoomRatio(float DistanceRatio,
+                                         bool bOnlySelected) {
+  const float Ratio = FMath::Clamp(DistanceRatio, 0.15f, 1.5f);
+  if (FMath::Abs(Ratio - LastLabelRatio) < 0.01f &&
+      bOnlySelected == bLastOnlySelected) return;
+  LastLabelRatio = Ratio;
+  bLastOnlySelected = bOnlySelected;
+  Label->SetWorldSize(BaseNameWorldSize * Ratio);
+  HpLabel->SetWorldSize(BaseHpWorldSize * Ratio);
+  // Bring the compact label closer to the sculpt at K2 while keeping the
+  // overview's original vertical clearance. This remains world-space text,
+  // so it never captures mouse input or changes the authoritative fighter.
+  const float CloseAmount = FMath::Clamp((1.0f - Ratio) / 0.8f, 0.0f, 1.0f);
+  const float CloseNameZ = Fighter.bIsHero ? 68.0f : 48.0f;
+  const float CloseHpZ = Fighter.bIsHero ? 61.0f : 41.0f;
+  Label->SetRelativeLocation(FVector(0.0f, 0.0f,
+      FMath::Lerp(BaseNameHeight, CloseNameZ, CloseAmount)));
+  HpLabel->SetRelativeLocation(FVector(0.0f, 0.0f,
+      FMath::Lerp(BaseHpHeight, CloseHpZ, CloseAmount)));
+  const bool bShow = !bOnlySelected || bIsSelected;
+  Label->SetVisibility(bShow);
+  HpLabel->SetVisibility(bShow);
 }

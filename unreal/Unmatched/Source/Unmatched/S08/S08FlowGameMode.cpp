@@ -143,6 +143,7 @@ void AS08FlowGameMode::BeginPlay() {
   FParse::Value(FCommandLine::Get(), TEXT("S08ExitAfter="), AutoExitAfter);
   if (FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) {
     FParse::Value(FCommandLine::Get(), TEXT("ArtPreviewShotAfter="), ArtPreviewShotAfter);
+    FParse::Value(FCommandLine::Get(), TEXT("ArtPreviewFocusZoom="), ArtPreviewFocusZoom);
     bArtPreviewSelectOwnHero = FParse::Param(
         FCommandLine::Get(), TEXT("ArtPreviewSelectOwnHero"));
   }
@@ -515,6 +516,11 @@ void AS08FlowGameMode::SetupCameraForBoard() {
   const float NeedH = (ExtentX + 60.0f) / HalfH;
   const float Distance = FMath::Max(NeedV, NeedH) * 1.12f;
   const FVector Location(0.0f, Distance * CosPitch, Distance * SinPitch);
+  CameraOverviewDistance = Distance;
+  CameraCurrentDistance = Distance;
+  CameraTargetDistance = Distance;
+  CameraCurrentFocus = FVector::ZeroVector;
+  CameraTargetFocus = FVector::ZeroVector;
 
   if (!BoardCamera) {
     FActorSpawnParameters Params;
@@ -533,6 +539,55 @@ void AS08FlowGameMode::SetupCameraForBoard() {
                                        Distance, Location.X, Location.Y, Location.Z);
   TraceLines.Add(Line);
   FS08Trace::Write(Line);
+}
+
+void AS08FlowGameMode::UpdateBoardCamera(float DeltaSeconds) {
+  if (!BoardCamera || CameraOverviewDistance <= 0.0f) return;
+  auto* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  if (PC && Flow.IsValid() && Flow->GetStage() == ES08Stage::Started &&
+      !Hud.bGameOver) {
+    // D-10: wheel changes distance only; the perspective, pitch and yaw stay
+    // fixed. These bounds are a visual probe pending the K1/K2 gate (Q-302).
+    if (PC->WasInputKeyJustPressed(EKeys::MouseScrollUp)) {
+      CameraTargetDistance = FMath::Max(300.0f, CameraTargetDistance / 1.25f);
+    }
+    if (PC->WasInputKeyJustPressed(EKeys::MouseScrollDown)) {
+      CameraTargetDistance = FMath::Min(CameraOverviewDistance / 0.65f,
+                                        CameraTargetDistance * 1.25f);
+    }
+    if (PC->WasInputKeyJustPressed(EKeys::SpaceBar)) {
+      CameraTargetDistance = CameraOverviewDistance;
+    }
+  }
+  CameraTargetFocus = FVector::ZeroVector;
+  if (CameraTargetDistance <= CameraOverviewDistance / 1.2f) {
+    const FString& FocusId = !CommandUi.SelectedFighterId.IsEmpty()
+                                 ? CommandUi.SelectedFighterId
+                                 : SelectedFighterId;
+    for (const FS08BoardFighter& Entry : Fighters) {
+      if (Entry.Id == FocusId && Entry.IsAlive()) {
+        CameraTargetFocus = BoardModel.CellToWorld(Entry.X, Entry.Y) +
+                            FVector(0.0f, 0.0f, 28.0f);
+        break;
+      }
+    }
+  }
+  CameraCurrentDistance = FMath::FInterpTo(
+      CameraCurrentDistance, CameraTargetDistance, DeltaSeconds, 8.0f);
+  CameraCurrentFocus = FMath::VInterpTo(
+      CameraCurrentFocus, CameraTargetFocus, DeltaSeconds, 8.0f);
+  const float Pitch = FMath::DegreesToRadians(55.0f);
+  BoardCamera->SetActorLocationAndRotation(
+      CameraCurrentFocus + FVector(0.0f, CameraCurrentDistance * FMath::Cos(Pitch),
+                                   CameraCurrentDistance * FMath::Sin(Pitch)),
+      FRotator(-55.0f, -90.0f, 0.0f));
+  if (BoardActor) {
+    const float Ratio = CameraCurrentDistance / CameraOverviewDistance;
+    BoardActor->SetFighterLabelZoomRatio(
+        Ratio, Ratio < 0.4f &&
+                   (!SelectedFighterId.IsEmpty() ||
+                    !CommandUi.SelectedFighterId.IsEmpty()));
+  }
 }
 
 void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
@@ -3097,13 +3152,22 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
         SelectFighter(Entry.Id);
         bArtPreviewDidSelectOwnHero = true;
         FS08Trace::Write(FString::Printf(
-            TEXT("ARTPREVIEW selection ownHero=1 selected=%d fighter=%s reachable=%d"),
+            TEXT("ARTPREVIEW selection ownHero=1 selected=%d fighter=%s reachable=%d fighterId=%s"),
             SelectedFighterId == Entry.Id ? 1 : 0, *Entry.Name,
-            ReachableCells.Num()));
+            ReachableCells.Num(), *Entry.Id));
+        if (ArtPreviewFocusZoom > 0.0f && CameraOverviewDistance > 0.0f) {
+          CameraTargetDistance = FMath::Clamp(
+              CameraOverviewDistance / ArtPreviewFocusZoom, 300.0f,
+              CameraOverviewDistance);
+          FS08Trace::Write(FString::Printf(
+              TEXT("ARTPREVIEW camera focus requested zoom=%.2f overview=%.0f target=%.0f"),
+              ArtPreviewFocusZoom, CameraOverviewDistance, CameraTargetDistance));
+        }
         break;
       }
     }
   }
+  UpdateBoardCamera(DeltaSeconds);
   // Cobble's opening six figures can occupy every orthogonal square around
   // Medusa. Capture the authoritative, HUD-inclusive settled board even when
   // the historical one-step S08 demo has no legal move on this map.
