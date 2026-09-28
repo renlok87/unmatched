@@ -22,6 +22,9 @@ FRONT_ONLY = os.environ.get("ART004_FACE_FRONT_ONLY", "0") == "1"
 FACE_SLOT = os.environ.get("ART004_FACE_SLOT", "0") == "1"
 RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "0") == "1"
 NECK_BACK = os.environ.get("ART004_FACE_NECK_BACK", "0") == "1"
+CROWN_SPREAD = float(os.environ.get("ART004_CROWN_SPREAD", "0"))
+if not 0 <= CROWN_SPREAD <= .4:
+    raise ValueError("ART004_CROWN_SPREAD must be 0..0.4")
 if FRONT_ONLY and FACE_SLOT:
     raise ValueError("Choose either front-only winding or separate face slot")
 if RESTORE_NORMALS and FRONT_ONLY:
@@ -37,6 +40,10 @@ if RESTORE_NORMALS:
                               "SK_Medusa_FaceFixNormals.fbx")
 if NECK_BACK:
     OUTPUT = OUTPUT.with_name("SK_Medusa_FaceFixNormalsSlotNeck.fbx")
+if CROWN_SPREAD:
+    if not NECK_BACK:
+        raise ValueError("The crown probe builds on the corrected face-and-neck candidate")
+    OUTPUT = OUTPUT.with_name("SK_Medusa_CrownSpreadProbe.fbx")
 
 
 def part_indices(mesh, part_name):
@@ -113,6 +120,32 @@ def flip_face(mesh):
     return len(selected), mid_y, len(neck)
 
 
+def spread_crown(mesh):
+    if not CROWN_SPREAD:
+        return {"moved_vertices": 0}
+    # Keep the roots in place and fan the upper crown in both horizontal
+    # directions. This changes silhouette only; UVs, weights and bones stay put.
+    part = part_indices(mesh, "tripo_part_1")
+    assert len(part) == 2633, len(part)
+    indices = {index for poly in mesh.polygons if poly.index in part
+               for index in poly.vertices}
+    center_x, center_y = -.020, .005
+    root_z, full_z = .405, .475
+    moved = 0
+    for index in indices:
+        co = mesh.vertices[index].co
+        t = max(0.0, min(1.0, (co.z - root_z) / (full_z - root_z)))
+        t = t * t * (3.0 - 2.0 * t)
+        if t:
+            co.x = center_x + (co.x - center_x) * (1.0 + CROWN_SPREAD * t)
+            co.y = center_y + (co.y - center_y) * (1.0 + CROWN_SPREAD * t)
+            moved += 1
+    mesh.update()
+    return {"part": "tripo_part_1", "polygons": len(part),
+            "moved_vertices": moved, "spread_factor": CROWN_SPREAD,
+            "root_z_m": root_z, "full_z_m": full_z}
+
+
 def patch_fbx_units(path):
     buffer = bytearray(path.read_bytes())
     start = buffer.find(b"UnitScaleFactor")
@@ -135,6 +168,7 @@ def main():
     body = bpy.data.objects["SK_Medusa_Body"]
     bow = bpy.data.objects["SK_Medusa_Bow"]
     flipped, mid_y, neck_count = flip_face(body.data)
+    crown = spread_crown(body.data)
     arm.animation_data.action = None
     for bone in arm.pose.bones:
         bone.location = (0, 0, 0)
@@ -171,6 +205,7 @@ def main():
               "face_slot_polygons": 587 if FACE_SLOT else 0,
               "neck_back_polygons": neck_count,
               "front_mid_y_m": mid_y, "flipped_faces": flipped,
+              "crown_probe": crown,
               "body_triangles": sum(len(p.vertices) - 2 for p in body.data.polygons),
               "bow_triangles": sum(len(p.vertices) - 2 for p in bow.data.polygons),
               "bones": len(arm.data.bones), "material_slots": len(body.data.materials)}

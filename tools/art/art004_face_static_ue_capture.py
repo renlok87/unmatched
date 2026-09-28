@@ -22,6 +22,7 @@ FRONT_ONLY = os.environ.get("ART004_FACE_FRONT_ONLY", "0") == "1"
 FACE_SLOT = os.environ.get("ART004_FACE_SLOT", "0") == "1"
 RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "0") == "1"
 NECK_BACK = os.environ.get("ART004_FACE_NECK_BACK", "0") == "1"
+CROWN_PROBE = os.environ.get("ART004_FACE_CROWN_PROBE", "0") == "1"
 NORMAL_IMPORT = os.environ.get("ART004_FACE_NORMAL_IMPORT", "import")
 if NORMAL_IMPORT not in {"import", "compute"} or (NORMAL_IMPORT != "import" and not RESTORE_NORMALS):
     raise ValueError("ART004_FACE_NORMAL_IMPORT must be import or compute on restored-normal skeletal probe")
@@ -31,6 +32,8 @@ if RESTORE_NORMALS and (FRONT_ONLY or USE_PRODUCTION or not SKELETAL):
     raise ValueError("Restored normals need a separate full-flip skeletal test import")
 if NECK_BACK and not (FACE_SLOT and RESTORE_NORMALS and SKELETAL):
     raise ValueError("Rear-neck correction requires restored normals and the face slot")
+if CROWN_PROBE and not NECK_BACK:
+    raise ValueError("Crown probe requires the corrected v2 face-and-neck path")
 FLIP_HEAD = os.environ.get("ART004_FACE_FLIP_HEAD", "0") == "1"
 CLEAR_NORMALS = FLIP_HEAD and os.environ.get("ART004_FACE_CLEAR_NORMALS", "0") == "1"
 TWO_SIDED = os.environ.get("ART004_FACE_TWO_SIDED", "0") == "1"
@@ -50,6 +53,9 @@ if NECK_BACK:
     FBX = ROOT / "blender/ASSET-MEDUSA-001/variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx"
 elif FACE_SLOT and RESTORE_NORMALS:
     FBX = ROOT / "blender/ASSET-MEDUSA-001/variants/face-section-v1/SK_Medusa_FaceSection_v1.fbx"
+if CROWN_PROBE:
+    name = "SK_Medusa_CrownSpreadProbe"
+    FBX = ROOT / "unreal/Unmatched/Artifacts/ART004Face/SK_Medusa_CrownSpreadProbe.fbx"
 UNLIT = os.environ.get("ART004_FACE_UNLIT", "0") == "1"
 UNLIT_SINGLE = UNLIT and os.environ.get("ART004_FACE_UNLIT_SINGLE", "0") == "1"
 UNLIT_ALL = os.environ.get("ART004_FACE_UNLIT_ALL", "0") == "1"
@@ -118,8 +124,12 @@ MODE = mesh_mode + MATERIAL_MODE + (
             f"-d{round(D10_DISTANCE)}" if VIEW == "d10-k2" else "") + (
             "-computenormals" if NORMAL_IMPORT == "compute" else "") + (
             "-" + LIGHT_PROFILE if LIGHT_PROFILE != "cobble" else "")
+if CROWN_PROBE:
+    MODE += "-crownprobe"
 OUTPUT = ROOT / f"docs/game-design/evidence/ART-004/medusa-frozen-{MODE}-ue-editor-2026-09-28.png"
 REPORT = ROOT / f"unreal/Unmatched/Artifacts/ART004Face/ue-{MODE}-report.json"
+if CROWN_PROBE:
+    OUTPUT = ROOT / f"unreal/Unmatched/Artifacts/ART004Face/medusa-{MODE}.png"
 LEVEL = LEVELS[LIGHT_PROFILE]
 DEST = "/Game/ArtTests/ART004Face/Meshes"
 NAME = name
@@ -394,6 +404,7 @@ class CaptureJob:
                     "front_only": FRONT_ONLY,
                     "face_slot": FACE_SLOT,
                     "neck_back": NECK_BACK,
+                    "crown_probe": CROWN_PROBE,
                     "restore_normals": RESTORE_NORMALS,
                     "normal_import": NORMAL_IMPORT,
                     "flipped_head": FLIP_HEAD,
