@@ -54,6 +54,11 @@ AS08FighterActor::AS08FighterActor() {
   Ring->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   Ring->SetVisibility(false);
 
+  TargetRing = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TargetRing"));
+  TargetRing->SetupAttachment(RootComponent);
+  TargetRing->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  TargetRing->SetVisibility(false);
+
   ArtBody = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ArtBody"));
   ArtBody->SetupAttachment(RootComponent);
   ArtBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -92,12 +97,20 @@ void AS08FighterActor::BeginPlay() {
       Ring->SetStaticMesh(ArtRing);
       bArtSelectionRingLoaded = true;
     }
+    if (UStaticMesh* ArtTarget = LoadObject<UStaticMesh>(nullptr,
+            TEXT("/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TargetRing"))) {
+      TargetRing->SetStaticMesh(ArtTarget);
+      bArtTargetRingLoaded = true;
+    }
   }
   // Text faces the camera (+Y side, camera yaw -90 looks along -Y).
   Label->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
   HpLabel->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
   if (UMaterialInterface* Solid = LoadSolidMaterial()) {
     Ring->SetMaterial(0, UMaterialInstanceDynamic::Create(Solid, this));
+    UMaterialInstanceDynamic* TargetMid = UMaterialInstanceDynamic::Create(Solid, this);
+    TargetMid->SetVectorParameterValue(TEXT("Tint"), FLinearColor(1.4f, 0.18f, 0.06f));
+    TargetRing->SetMaterial(0, TargetMid);
   }
 }
 
@@ -206,6 +219,8 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   Base->SetRelativeLocation(FVector(0, 0, 3.0f));
   Ring->SetWorldScale3D(FVector(1.15f, 1.15f, 0.04f));
   Ring->SetRelativeLocation(FVector(0, 0, 1.0f));
+  TargetRing->SetRelativeScale3D(FVector(Fighter.bIsHero ? 1.0f : 0.78f));
+  TargetRing->SetRelativeLocation(FVector::ZeroVector);
   if (bArtFigure) {
     // The 30-uu pedestal remains a separate visual mesh. The original
     // cylinders are still team/selection feedback and query-only hit areas.
@@ -256,12 +271,27 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
 void AS08FighterActor::SetSelected(bool bSelected) {
   bIsSelected = bSelected;
   LastLabelRatio = -1.0f;
-  Ring->SetVisibility(bSelected);
+  Ring->SetVisibility(bSelected || (bArtSelectionRingLoaded && bIsCombatAttacker));
   if (bSelected && bArtSelectionRingLoaded) {
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW selection ring shown fighter=%s mesh=%s"),
         *Fighter.Name, *Ring->GetStaticMesh()->GetName()));
   }
+}
+
+void AS08FighterActor::SetCombatMarkers(bool bAttacker, bool bTarget) {
+  const bool bNewAttacker = bArtSelectionRingLoaded && bAttacker && Fighter.IsAlive();
+  const bool bNewTarget = bArtTargetRingLoaded && bTarget && Fighter.IsAlive();
+  if (bIsCombatAttacker == bNewAttacker && bIsCombatTarget == bNewTarget) return;
+  bIsCombatAttacker = bNewAttacker;
+  bIsCombatTarget = bNewTarget;
+  Ring->SetVisibility(bIsSelected || bIsCombatAttacker);
+  TargetRing->SetVisibility(bIsCombatTarget);
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW combat marker fighter=%s attacker=%d target=%d targetMesh=%s"),
+      *Fighter.Name, bIsCombatAttacker ? 1 : 0, bIsCombatTarget ? 1 : 0,
+      TargetRing->GetStaticMesh() ? *TargetRing->GetStaticMesh()->GetName()
+                                  : TEXT("none")));
 }
 
 void AS08FighterActor::SetLabelZoomRatio(float DistanceRatio,

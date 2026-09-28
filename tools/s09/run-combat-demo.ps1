@@ -3,7 +3,10 @@
   [string]$Api = "http://localhost:3120/graphql",
   [string]$EvidenceDir = "",
   [int]$RunSeconds = 240,
-  [string]$ShotMode = "request"
+  [string]$ShotMode = "request",
+  [switch]$ArtPreview,
+  [switch]$FullHd,
+  [int]$ClientFps = 30
 )
 # GD-034 two-client packaged COMBAT demo against the S09 worktree-local
 # backend (attack -> defense -> resolve against authoritative snapshots):
@@ -54,7 +57,9 @@ function Set-StagedResolution([string]$ExePath, [int]$W, [int]$H) {
   [System.IO.File]::WriteAllLines($gs, $lines)
   Write-Output "staged GameUserSettings -> ${W}x${H} (windowed): $gs"
 }
-Set-StagedResolution $Exe 1280 720
+$ShotWidth = if ($FullHd) { 1920 } else { 1280 }
+$ShotHeight = if ($FullHd) { 1080 } else { 720 }
+Set-StagedResolution $Exe $ShotWidth $ShotHeight
 
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $Script:CleanupFailure = $null
@@ -200,8 +205,10 @@ function Invoke-CombatDemo {
   $Script:ThisRunGameId = $null
   $Script:ThisRunGameCode = $null
 
-  $common = @("-windowed", "-resx=1280", "-resy=720", "-RenderOffScreen", "log=GrepLog",
-    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode")
+  $common = @("-windowed", "-resx=$ShotWidth", "-resy=$ShotHeight", "-RenderOffScreen", "log=GrepLog",
+    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode", "-ExecCmds=t.MaxFPS $ClientFps")
+  if ($ArtPreview) { $common += '-ArtPreview' }
+  if ($FullHd) { $common += '-ForceRes' }
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
     "-S09Flow", "-S09Combat=attack", "-S09ShotDir=$hostShots", "-S08ExitAfter=$RunSeconds")
@@ -323,9 +330,9 @@ function Invoke-CombatDemo {
       } finally { $bmp.Dispose() }
     }
     function Assert-Dimensions($Stats, [string]$Who) {
-      $ok = (($Stats.w -eq 1280 -and $Stats.h -eq 720) -or ($Stats.w -eq 1920 -and $Stats.h -eq 1080))
+      $ok = ($Stats.w -eq $ShotWidth -and $Stats.h -eq $ShotHeight)
       if (-not $ok) {
-        throw ("capture for {0} is {1}x{2} - NOT 1280x720/1920x1080 (saved GameUserSettings override?)" -f $Who, $Stats.w, $Stats.h)
+        throw ("capture for {0} is {1}x{2} - expected {3}x{4} (saved GameUserSettings override?)" -f $Who, $Stats.w, $Stats.h, $ShotWidth, $ShotHeight)
       }
     }
     function Test-StateImage($Stats, [string]$State) {
@@ -507,7 +514,7 @@ function Invoke-CombatDemo {
     }
     $manifest = [ordered]@{
       stamp   = $Stamp
-      verdict = 'GD-034 P1: live attack->defense->resolve two-client demo, defense/resolve/result state-marker shots at exact 1280x720 with swap/negative controls, role-gated traces (defender acted in attacker window, resolve in COMBAT_RESOLVE), privacy-clean logs, seq convergence'
+      verdict = "GD-034 P1: live attack->defense->resolve two-client demo, defense/resolve/result state-marker shots at exact ${ShotWidth}x${ShotHeight} with swap/negative controls, role-gated traces, privacy-clean logs, seq convergence; artPreview=$([bool]$ArtPreview); clientFpsCap=$ClientFps"
       revealProof = $RevealProof
       files   = @()
     }

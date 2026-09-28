@@ -151,6 +151,7 @@ private:
   void HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecision Decision);
   void HandleCues(const TArray<FS08Cue>& Cues);
   void SyncBoardFromApplied();
+  void SyncCombatFocus();
   void SetupCameraForBoard();
   void UpdateBoardCamera(float DeltaSeconds);
   // ---- TASK-022 input ----

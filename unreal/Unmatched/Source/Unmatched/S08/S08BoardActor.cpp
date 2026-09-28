@@ -174,6 +174,18 @@ void AS08BoardActor::SetFighterLabelZoomRatio(float DistanceRatio,
   }
 }
 
+void AS08BoardActor::SetCombatFocus(const FString& AttackerId,
+                                   const FString& TargetId) {
+  CombatAttackerId = AttackerId;
+  CombatTargetId = TargetId;
+  for (AS08FighterActor* Actor : FighterActors) {
+    if (Actor) {
+      Actor->SetCombatMarkers(Actor->GetFighterId() == CombatAttackerId,
+                              Actor->GetFighterId() == CombatTargetId);
+    }
+  }
+}
+
 void AS08BoardActor::ClearChildren() {
   for (AActor* Child : HighlightTiles) {
     if (Child) Child->Destroy();
@@ -376,6 +388,8 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
       Actor->ApplyFighter(Fighter, Board.CellToWorld(Fighter.X, Fighter.Y),
                           Fighter.OwnerId == OwnOwnerId, bArtActive);
       Actor->SetSelected(Fighter.Id == SelectedFighterId);
+      Actor->SetCombatMarkers(Fighter.Id == CombatAttackerId,
+                              Fighter.Id == CombatTargetId);
     }
   }
 }
