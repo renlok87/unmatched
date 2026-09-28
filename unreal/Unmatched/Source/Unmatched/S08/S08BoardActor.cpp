@@ -260,6 +260,8 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
       FRotator::ZeroRotator, FVector(0.0f, 0.0f, -0.5f - SlabHalfZ),
       FVector(static_cast<float>(Board.Width),
               static_cast<float>(Board.Height), 0.02f)));
+  int32 BlueZoneCells = 0;
+  int32 RedZoneCells = 0;
   for (int32 Y = 0; Y < Board.Height; ++Y) {
     for (int32 X = 0; X < Board.Width; ++X) {
       const FS08Cell* Cell = Board.CellAt(X, Y);
@@ -276,18 +278,31 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
       Target->AddInstanceWorldSpace(Instance);
       if (bArtActive) {
         const bool bBlue = Cell->Zones[0] == TEXT("blue");
-        (bBlue ? ArtBlueZones : ArtRedZones)->AddInstance(FTransform(
-            FRotator::ZeroRotator, World + FVector(0, 46, 0.28f),
-            FVector(0.96f, 0.035f, 0.004f)), true);
-        const FVector GlyphAt = World + FVector(-36, 36, 0.28f);
+        // The continuous blue edge and three separated red strokes remain
+        // different when hue is lost. Counts below refer to board cells, not
+        // to the number of decorative mesh instances.
+        if (bBlue) {
+          ++BlueZoneCells;
+          ArtBlueZones->AddInstance(FTransform(
+              FRotator::ZeroRotator, World + FVector(0, 46, 0.28f),
+              FVector(0.96f, 0.04f, 0.004f)), true);
+        } else {
+          ++RedZoneCells;
+          for (const float Offset : {-32.0f, 0.0f, 32.0f}) {
+            ArtRedZones->AddInstance(FTransform(
+                FRotator::ZeroRotator, World + FVector(Offset, 46, 0.28f),
+                FVector(0.28f, 0.045f, 0.004f)), true);
+          }
+        }
+        const FVector GlyphAt = World + FVector(-32, 32, 0.28f);
         if (bBlue) {
           ArtZoneGlyphs->AddInstance(FTransform(
-              FRotator(0, 45, 0), GlyphAt, FVector(0.105f, 0.105f, 0.004f)), true);
+              FRotator(0, 45, 0), GlyphAt, FVector(0.18f, 0.18f, 0.004f)), true);
         } else {
-          for (const float Offset : {-4.0f, 4.0f}) {
+          for (const float Offset : {-6.0f, 6.0f}) {
             ArtZoneGlyphs->AddInstance(FTransform(
                 FRotator::ZeroRotator, GlyphAt + FVector(Offset, 0, 0),
-                FVector(0.025f, 0.13f, 0.004f)), true);
+                FVector(0.05f, 0.20f, 0.004f)), true);
           }
         }
       }
@@ -302,10 +317,15 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
       ArtCorners->AddInstance(FTransform(
           FRotator(0, Corner.Value, 0), Corner.Key, FVector::OneVector), true);
     }
-    UE_LOG(LogTemp, Display, TEXT("ARTPREVIEW Cobble active 5x6 zones=%d"),
-           ArtBlueZones->GetInstanceCount() + ArtRedZones->GetInstanceCount());
-    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW Cobble active 5x6 zones=%d"),
-        ArtBlueZones->GetInstanceCount() + ArtRedZones->GetInstanceCount()));
+    const int32 ZoneCells = BlueZoneCells + RedZoneCells;
+    UE_LOG(LogTemp, Display,
+           TEXT("ARTPREVIEW Cobble active 5x6 zones=%d blue=%d red=%d blueMarks=%d redMarks=%d"),
+           ZoneCells, BlueZoneCells, RedZoneCells,
+           ArtBlueZones->GetInstanceCount(), ArtRedZones->GetInstanceCount());
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW Cobble active 5x6 zones=%d blue=%d red=%d blueMarks=%d redMarks=%d"),
+        ZoneCells, BlueZoneCells, RedZoneCells,
+        ArtBlueZones->GetInstanceCount(), ArtRedZones->GetInstanceCount()));
   }
   ClearChildren();
   return true;
