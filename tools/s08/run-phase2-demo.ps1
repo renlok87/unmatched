@@ -6,6 +6,9 @@ param(
   [ValidateRange(1, 60)][int]$ClientFps = 30,
   [int]$JoinerDropWsAfter = 12,
   [int]$HostManeuverAfter = 25,
+  # Opt-in ART-004/005 review on an explicitly selected 5x6 Cobble board.
+  # The default S08 20x20 regression path remains unchanged.
+  [string]$ArtPreviewBoardId = "",
   # Offline probe of the scoped-cleanup state machine only (no backend, no
   # clients): drives Stop-ThisRunGame against a mocked Invoke-RestMethod that
   # returns scripted HTTP-200 responses (including errors[]) and asserts the
@@ -308,10 +311,16 @@ function Invoke-Phase2Demo {
   $Script:ThisRunGameCode = $null
 
   $common = @("-windowed", "-resx=1920", "-resy=1080", "-RenderOffScreen", "log=GrepLog", "-ForceAbandonSequences", "-S08Api=$Api")
+  if ($ArtPreviewBoardId) { $common += @('-ArtPreview', '-ForceRes') }
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
-    "-S08Auto", "-S08Create", "-S08Maneuver", "-S08ManeuverAfter=$HostManeuverAfter",
+    "-S08Auto", "-S08Create",
     "-S08HeroId=$heroA", "-S08Trace=$hostTrace", "-S08Shot=$hostShot",
     "-S08ExitAfter=$RunSeconds")
+  if ($ArtPreviewBoardId) {
+    $hostArgs += @("-ArtPreviewBoardId=$ArtPreviewBoardId", '-ArtPreviewShotAfter=30')
+  } else {
+    $hostArgs += @('-S08Maneuver', "-S08ManeuverAfter=$HostManeuverAfter")
+  }
 
   $hostProc = $null
   $joinProc = $null
@@ -352,10 +361,23 @@ function Invoke-Phase2Demo {
     }
     if (-not $code) { throw "no room code found in host trace" }
     Write-Output "room created by this run (code redacted from output; id=$Script:ThisRunGameId)"
+    if ($ArtPreviewBoardId) {
+      $loginBody = @{ query = 'mutation L($input: LoginDto!) { login(input: $input) { accessToken } }'; variables = @{ input = @{ email = $AccountA.email; password = $AccountA.password } } } | ConvertTo-Json -Depth 5
+      $login = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Body $loginBody
+      Assert-GqlOk $login 'art-preview host login'
+      $lookup = @{ query = 'query G($id: String!) { game(id: $id) { id boardId } }'; variables = @{ id = $Script:ThisRunGameId } } | ConvertTo-Json -Depth 5
+      $game = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Headers @{ authorization = "Bearer $($login.data.login.accessToken)" } -Body $lookup
+      Assert-GqlOk $game 'art-preview board lookup'
+      if ($game.data.game.boardId -cne $ArtPreviewBoardId) {
+        throw "created room has boardId=$($game.data.game.boardId), expected $ArtPreviewBoardId"
+      }
+      Write-Output 'art-preview boardId verified against the authoritative game row'
+    }
 
     $joinArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
       "-S08Auto", "-S08HeroId=$heroB", "-S08Trace=$joinTrace", "-S08Shot=$joinShot",
       "-S08DropWsAfter=$JoinerDropWsAfter", "-S08ExitAfter=$RunSeconds")
+    if ($ArtPreviewBoardId) { $joinArgs += '-ArtPreviewShotAfter=30' }
     $joinStartUtc = [DateTime]::UtcNow
     $joinProc = Start-S08Client $joinArgs $AccountB.email $AccountB.password $code
     Write-Output "joiner pid=$($joinProc.Id)"
@@ -389,10 +411,26 @@ function Invoke-Phase2Demo {
         if (-not $text.Contains($needle)) { throw "$Who trace missing '$needle'" }
       }
     }
-    Assert-Trace $hostTrace @('SNAPSHOT applied', 'BOARD 20x20', 'FIGHTERS synced n=6', 'MANEUVER begin seq=', 'MANEUVER done', 'CUE move') 'host'
-    Assert-Trace $joinTrace @('SNAPSHOT applied', 'BOARD 20x20', 'FIGHTERS synced n=6', 'SUBSCRIBED gameStateUpdated',
-      'WS DROPPED', 'WS closed', 'WS reconnect attempt', 'WS reconnected',
-      'CUE move') 'joiner'
+    $expectedBoard = if ($ArtPreviewBoardId) { 'BOARD 5x6' } else { 'BOARD 20x20' }
+    if ($ArtPreviewBoardId) {
+      Assert-Trace $hostTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
+        'ARTPREVIEW Cobble assets ready', 'ARTPREVIEW Cobble active 5x6 zones=30',
+        'ARTPREVIEW Cobble probe lights key=4.5 fill=700 warm=85',
+        'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1') 'host'
+      Assert-Trace $joinTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
+        'WS DROPPED', 'WS closed', 'WS reconnect attempt', 'WS reconnected',
+        'ARTPREVIEW Cobble assets ready', 'ARTPREVIEW Cobble active 5x6 zones=30',
+        'ARTPREVIEW Cobble probe lights key=4.5 fill=700 warm=85',
+        'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1') 'joiner'
+    } else {
+      Assert-Trace $hostTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'MANEUVER begin seq=', 'MANEUVER done', 'CUE move') 'host'
+      Assert-Trace $joinTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SUBSCRIBED gameStateUpdated',
+        'WS DROPPED', 'WS closed', 'WS reconnect attempt', 'WS reconnected', 'CUE move') 'joiner'
+    }
+    if ($ArtPreviewBoardId) {
+      [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'),
+        (([ordered]@{ boardId = $ArtPreviewBoardId; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = 30; joinerLiveZones = 30 }) | ConvertTo-Json), $Utf8NoBom)
+    }
 
     # Six fighters IN FRAME: the shot diagnostics project every fighter to
     # screen space; all six must be projected and alive in BOTH clients. (The
@@ -419,15 +457,19 @@ function Invoke-Phase2Demo {
     if (-not $hostSeq -or -not $joinSeq) { throw "missing applied seq in traces" }
     if ($hostSeq -ne $joinSeq) { throw "clients diverged: host seq=$hostSeq joiner seq=$joinSeq" }
 
-    # GD-030 readable-grid verdict: each shot must show resolvable grid grooves
-    # on BOTH axes (the old full-scale slab is rejected) + team base colors
-    # inside the board box. JSON saved UTF-8 (Tee-Object on Windows PowerShell
-    # writes UTF-16LE).
+    # The old S08 checker locates a MID-GREY 20x20 tile box; it cannot judge
+    # painted Cobble stone. The art check instead rejects dark/flat/missing-HUD
+    # frames; gameplay geometry and all 30 zone instances are trace-gated.
     $checker = Join-Path $PSScriptRoot 'check-board-shot.ps1'
     foreach ($pair in @(@('host', $hostShot), @('joiner', $joinShot))) {
       $who = $pair[0]; $shot = $pair[1]
-      $jsonPath = $shot -replace '\.png$', '-grid.json'
-      $jsonLines = & powershell -NoProfile -ExecutionPolicy Bypass -File $checker -Path $shot
+      if ($ArtPreviewBoardId) {
+        $jsonPath = $shot -replace '\.png$', '-artcheck.json'
+        $jsonLines = & python (Join-Path $RepoRoot 'tools/art/check_art_preview_shot.py') $shot
+      } else {
+        $jsonPath = $shot -replace '\.png$', '-grid.json'
+        $jsonLines = & powershell -NoProfile -ExecutionPolicy Bypass -File $checker -Path $shot
+      }
       [System.IO.File]::WriteAllLines($jsonPath, [string[]]$jsonLines, $Utf8NoBom)
       Write-Output $jsonLines
       if ($LASTEXITCODE -ne 0) { throw "board-shot checker FAILED for $who (see $jsonPath)" }
@@ -445,11 +487,15 @@ function Invoke-Phase2Demo {
     # .tmp, while the previous run dir and pointer stay intact. A failure
     # anywhere above leaves the previous run untouched and this run's staging
     # behind for inspection.
-    $publishNames = @(
-      'phase2-client-host.trace.log', 'phase2-client-joiner.trace.log',
-      'phase2-board-host-1920x1080.png', 'phase2-board-host-1920x1080-grid.json',
-      'phase2-board-joiner-1920x1080.png', 'phase2-board-joiner-1920x1080-grid.json'
-    )
+    $publishNames = @('phase2-client-host.trace.log', 'phase2-client-joiner.trace.log',
+      'phase2-board-host-1920x1080.png', 'phase2-board-joiner-1920x1080.png')
+    if ($ArtPreviewBoardId) {
+      $publishNames += @('phase2-board-host-1920x1080-artcheck.json',
+        'phase2-board-joiner-1920x1080-artcheck.json', 'art-preview-status.json')
+    } else {
+      $publishNames += @('phase2-board-host-1920x1080-grid.json',
+        'phase2-board-joiner-1920x1080-grid.json')
+    }
     $RunDir = Join-Path $EvidenceDir ("run-" + $Stamp)
     if (Test-Path -LiteralPath $RunDir) { throw "run dir already exists: $RunDir" }
     New-Item -ItemType Directory -Path $RunDir | Out-Null
@@ -470,7 +516,11 @@ function Invoke-Phase2Demo {
     }
     $manifest = [ordered]@{
       stamp   = $Stamp
-      verdict = 'TRACES OK + SHOTS PRESENT + GRID VERIFIED + SIX FIGHTERS (trace: n=6, all projected in frame)'
+      verdict = if ($ArtPreviewBoardId) {
+        'ART PREVIEW: live 5x6 board + 30 zones + six projected fighters + HUD/board pixel gate; visual K1 review still required'
+      } else {
+        'TRACES OK + SHOTS PRESENT + GRID VERIFIED + SIX FIGHTERS (trace: n=6, all projected in frame)'
+      }
       files   = @()
     }
     function Get-Sha256Hex([string]$Path) {
@@ -538,8 +588,13 @@ function Invoke-Phase2Demo {
       foreach ($f in $legacy) { Move-Item -LiteralPath $f.FullName (Join-Path $legacyDir $f.Name) -Force }
     }
     Write-Output "published evidence run dir: $RunDir (pointer: latest.json)"
-    Write-Output "TRACES OK + SHOTS PRESENT + GRID VERIFIED + SIX FIGHTERS (trace: n=6, all projected in frame)"
-    Write-Output "NOTE: silhouette shapes in the PNGs are confirmed by manual screenshot review (the image checker proves grid+team colors only)."
+    if ($ArtPreviewBoardId) {
+      Write-Output 'ART PREVIEW: live 5x6 board and 30 zones, two 1920x1080 HUD shots, six projected fighters; visual art review remains separate.'
+      Write-Output 'NOTE: the pixel gate checks a lit textured board and HUD regions; it does not prove K1 readability or color-blind access.'
+    } else {
+      Write-Output "TRACES OK + SHOTS PRESENT + GRID VERIFIED + SIX FIGHTERS (trace: n=6, all projected in frame)"
+      Write-Output "NOTE: silhouette shapes in the PNGs are confirmed by manual screenshot review (the image checker proves grid+team colors only)."
+    }
     Write-Output "--- host trace (tail) ---"
     Get-Content -LiteralPath (Join-Path $RunDir 'phase2-client-host.trace.log') | Select-Object -Last 25
     Write-Output "--- joiner trace (tail) ---"

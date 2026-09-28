@@ -1,6 +1,8 @@
 #include "S08FlowController.h"
 #include "Dom/JsonObject.h"
+#include "Misc/CommandLine.h"
 #include "Misc/Guid.h"
+#include "Misc/Parse.h"
 
 // Operations verified against the live SDL (evidence/S08/live-schema.graphql):
 // login(input: LoginDto!), myGames(filters), game(id), gameByCode(code),
@@ -263,6 +265,14 @@ void FS08FlowController::CreateRoom(const FString& Mode) {
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   TSharedRef<FJsonObject> Input = MakeShared<FJsonObject>();
   Input->SetStringField(TEXT("mode"), Mode.IsEmpty() ? TEXT("ONE_V_ONE") : Mode);
+  // Opt-in art review: select a real board explicitly instead of relying on
+  // the database's first-created (historically 20x20) default board.
+  FString ArtBoardId;
+  if (FParse::Param(FCommandLine::Get(), TEXT("ArtPreview")) &&
+      FParse::Value(FCommandLine::Get(), TEXT("ArtPreviewBoardId="), ArtBoardId) &&
+      !ArtBoardId.IsEmpty()) {
+    Input->SetStringField(TEXT("boardId"), ArtBoardId);
+  }
   Variables->SetObjectField(TEXT("input"), Input);
   Variables->SetStringField(TEXT("idempotencyKey"), IdempotencyKey);
   const int32 Gen = MatchGeneration;

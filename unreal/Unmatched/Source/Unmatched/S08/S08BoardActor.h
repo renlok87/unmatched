@@ -35,6 +35,7 @@ public:
                     const FString& OwnOwnerId);
 
   const FS08BoardModel& GetBoard() const { return BoardModel; }
+  bool IsArtActive() const { return bArtActive; }
   const TArray<FS08BoardFighter>& GetFighters() const { return Fighters; }
   AS08FighterActor* FindFighterActor(const FString& FighterId) const;
 
@@ -78,6 +79,23 @@ private:
   // the old static S01 map underneath and keeps groove clicks on the board.
   UPROPERTY()
   TObjectPtr<UInstancedStaticMeshComponent> UnderlayTiles;
+
+  // ART-005 pilot: decorative Cobble is visible only for the matching 5x6
+  // live board contract. The original tiles stay as exact click surfaces.
+  UPROPERTY()
+  TObjectPtr<UStaticMeshComponent> ArtBoard;
+  UPROPERTY()
+  TObjectPtr<UInstancedStaticMeshComponent> ArtCorners;
+  UPROPERTY()
+  TObjectPtr<UInstancedStaticMeshComponent> ArtBlueZones;
+  UPROPERTY()
+  TObjectPtr<UInstancedStaticMeshComponent> ArtRedZones;
+  UPROPERTY()
+  TObjectPtr<UInstancedStaticMeshComponent> ArtZoneGlyphs;
+  bool bArtAssetsReady = false;
+  bool bArtActive = false;
+  UPROPERTY()
+  TArray<TObjectPtr<AActor>> ArtLights;
 
   UPROPERTY()
   TObjectPtr<AActor> IllegalCell;
