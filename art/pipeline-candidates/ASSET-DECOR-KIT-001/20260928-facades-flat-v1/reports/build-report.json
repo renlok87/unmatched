@@ -1,0 +1,1057 @@
+{
+ "schema": "unmatched.decor-facades.build/1",
+ "status": "measured",
+ "claims": {
+  "art_accepted": false,
+  "game_ready": false,
+  "budgets_declared": false,
+  "ue_imported": false
+ },
+ "blender_version": "5.2.2 LTS",
+ "script": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/facades_build.py",
+ "script_sha256_lf": "995291974c0ee0b647cb37c19074b5a7d310fc48827457bca07796636dacf011",
+ "helpers": {
+  "path": "tools/tripo-pipeline/blender/static_prop_candidate.py",
+  "sha256_lf": "6f703427539511afe37740035e55db1bcddbbb92bd2092bfedddc076b7b3d18b",
+  "used": [
+   "export_fbx",
+   "make_fbx_deterministic",
+   "patch_fbx_units",
+   "fbx_kwargs",
+   "um_fbx_v1_conformance",
+   "geometry_stats",
+   "corner_normal_stats",
+   "uv_analysis",
+   "build_material"
+  ]
+ },
+ "params": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/facades_params.json",
+ "params_sha256_lf": "23518d3ecadcc047af6c65bf67dba1f78bcf17abf3b1d67fe64cb0874d7a5bda",
+ "trace": {
+  "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/reports/trace.json",
+  "sha256": "6fc81b0bb54e6f18a0cb5bbc98babf2c8016804684ec54bab2349bf7d845626a"
+ },
+ "fbx_preset": {
+  "path": "blender/_tools/presets/UM_FBX_v1.json",
+  "sha256_lf": "06cb69892de24ec48c662bf3ed54b6d711e45c68b65cb51e625bf6a5b94f86f3"
+ },
+ "textures": {
+  "BC": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/textures/T_Decor_Facades_BC.png",
+   "sha256": "00cc76dd15f02bf4e5c6ca6dd230258dfa85aff4b8e637940942489336661d24",
+   "bytes": 1182086,
+   "size_px": [
+    1024,
+    1024
+   ],
+   "colour_space": "sRGB"
+  },
+  "N": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/textures/T_Decor_Facades_N.png",
+   "sha256": "d687d21a2890b3121bf4c31eeb13d21bca84c78b96fbede3356cef891d94c1ed",
+   "bytes": 1161459,
+   "size_px": [
+    1024,
+    1024
+   ],
+   "colour_space": "Linear (no sRGB/gAMA/cHRM chunk)",
+   "convention": "tangent space, DirectX (green = -Y), height ~ luminance high-pass"
+  },
+  "ORM": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/textures/T_Decor_Facades_ORM.png",
+   "sha256": "5e60660117669153145eb2d2b5433d49c9513c387102b6c295c1ebd9cd79ba7b",
+   "bytes": 18433,
+   "size_px": [
+    1024,
+    1024
+   ],
+   "colour_space": "Linear (no sRGB/gAMA/cHRM chunk)",
+   "channels": "R = AO 1.0 (concept render already contains its shading; not baked twice), G = roughness (stone 0.90 / wood 0.80 / glow 0.50 / back+sides 0.95), B = metallic 0"
+  }
+ },
+ "units": "Blender metres; uu = cm = FBX numbers (UnitScaleFactor 1.0)",
+ "facades": [
+  {
+   "key": "A",
+   "asset_name": "SM_Decor_FacadeA",
+   "build": {
+    "front_triangles": 104,
+    "back_triangles": 88,
+    "side_quads": 90,
+    "side_band_v_flipped": false,
+    "perimeter_uu": 1068.015,
+    "front_strip_px_per_uu": [
+     2.5004,
+     2.5
+    ],
+    "back_side_px_per_uu": 0.625
+   },
+   "triangles": 372,
+   "vertices": 188,
+   "geometry": {
+    "vertices_as_stored": 188,
+    "vertices_welded_1e-6m": 188,
+    "faces": 282,
+    "triangles": 372,
+    "welded_boundary_edges": 0,
+    "welded_non_manifold_edges": 0,
+    "wire_edges": 0,
+    "loose_vertices": 0,
+    "degenerate_faces_area_lt_1e-12": 0,
+    "faces_with_inconsistent_winding": 0,
+    "connected_shells": 1,
+    "signed_volume_m3": 0.280548745,
+    "raw_vertex_count_before_weld": 188
+   },
+   "corner_normals": {
+    "has_custom_normals": false,
+    "corners_pointing_into_surface": 0,
+    "corner_vs_face_normal_angle_deg_p50_p99_max": [
+     0.0,
+     0.03,
+     0.03
+    ]
+   },
+   "bounds_min_uu": [
+    -197.368,
+    0.0,
+    0.0
+   ],
+   "bounds_max_uu": [
+    197.368,
+    8.0,
+    110.0
+   ],
+   "dimensions_uu_x_len_y_thick_z_height": [
+    394.737,
+    8.0,
+    110.0
+   ],
+   "pivot": {
+    "origin": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rule": "04 §1: facade = bottom edge of the outer face, centred",
+    "min_z_uu": 0.0,
+    "x_centre_offset_uu": 0.0,
+    "front_face_y_uu": 0.0
+   },
+   "front_area_weighted_normal": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "front_area_m2": 3.506859,
+   "material_slots": [
+    "M_Decor_Facades",
+    "M_Decor_FacadeGlow"
+   ],
+   "material_slots_used": [
+    0,
+    1
+   ],
+   "glow_faces": 4,
+   "glow_area_uu2": 131.369,
+   "uv0": {
+    "uv_layers": [
+     "UVMap"
+    ],
+    "raster_size_px": 1024,
+    "islands": 3,
+    "triangles_out_of_0_1": 0,
+    "uv_bounds": [
+     0.007813,
+     0.070312,
+     0.971679,
+     0.992188
+    ],
+    "uv_area_used_fraction": 0.2253,
+    "raster_coverage_fraction": 0.2254,
+    "overlap_pixels_between_islands": 0,
+    "overlap_fraction_of_covered": 0.0,
+    "overlap_pixels_inside_islands_strict": 0,
+    "flipped_uv_triangles_vs_island_majority": 0,
+    "zero_area_uv_triangles": 0,
+    "texel_density_px_per_m_at_raster": 173.3,
+    "stretch_area_ratio_p05_p50_p95": [
+     0.13,
+     0.13,
+     2.082
+    ],
+    "stretch_anisotropy_sigma_max_over_min_p50_p95_max": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "stretch_sigma_max_norm_p95": 1.443,
+    "stretch_sigma_min_norm_p05": 0.361,
+    "min_gutter_px_estimate": 9,
+    "island_pairs_closer_than_4px": 0,
+    "note": "min_gutter_px_estimate / island_pairs_closer_than_4px: 4-neighbour growth at raster_size_px (odd/even estimate +-1 px). raster_metrics: Euclidean distance between centres of pixels of different islands (another metric, counts differ), plus strict in-island overlap from flipped UV triangles; at raster_size_px and 2x.",
+    "raster_metrics": [
+     {
+      "raster_size_px": 1024,
+      "overlap_pixels_between_islands": 0,
+      "overlap_pixels_inside_islands_strict": 0,
+      "raster_coverage_fraction": 0.2254,
+      "min_island_centre_distance_px": ">8",
+      "island_pairs_centre_distance_lt_4px": 0,
+      "island_pairs_centre_distance_lt_8px": 0,
+      "mip_where_min_distance_drops_below_1_texel": null
+     },
+     {
+      "raster_size_px": 2048,
+      "overlap_pixels_between_islands": 0,
+      "overlap_pixels_inside_islands_strict": 0,
+      "raster_coverage_fraction": 0.2254,
+      "min_island_centre_distance_px": ">8",
+      "island_pairs_centre_distance_lt_4px": 0,
+      "island_pairs_centre_distance_lt_8px": 0,
+      "mip_where_min_distance_drops_below_1_texel": null
+     }
+    ]
+   },
+   "uv_mirrored_faces": 0,
+   "collision": "none (04 §3.7: decor not interactive; clicks go through to L1)",
+   "um_fbx_v1_rows": [
+    {
+     "setting": "Forward / Up (04 1.1)",
+     "standard": [
+      "-Y",
+      "Z"
+     ],
+     "used": [
+      "-Y",
+      "Z"
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Apply Scalings (04 1.1)",
+     "standard": "FBX_SCALE_UNITS",
+     "used": "FBX_SCALE_UNITS",
+     "conforms": true
+    },
+    {
+     "setting": "Apply Unit (04 1.1)",
+     "standard": true,
+     "used": true,
+     "conforms": true
+    },
+    {
+     "setting": "Apply Transform (04 1.1)",
+     "standard": false,
+     "used": false,
+     "conforms": true
+    },
+    {
+     "setting": "Triangulate Faces (04 1.1)",
+     "standard": true,
+     "used": true,
+     "conforms": true
+    },
+    {
+     "setting": "Smoothing (04 1.1)",
+     "standard": "FACE",
+     "used": "FACE",
+     "conforms": true
+    },
+    {
+     "setting": "Object Types (04 1.1)",
+     "standard": [
+      "ARMATURE",
+      "MESH"
+     ],
+     "used": [
+      "ARMATURE",
+      "MESH"
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Loose Edges / Custom Properties (04 1.1)",
+     "standard": [
+      false,
+      false
+     ],
+     "used": [
+      false,
+      false
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Leaf bones / bone axes (04 1.1, preset)",
+     "standard": [
+      false,
+      "Y",
+      "X"
+     ],
+     "used": [
+      false,
+      "Y",
+      "X"
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Bake Animation (04 1.1: skeletal clips only)",
+     "standard": false,
+     "used": false,
+     "conforms": true
+    },
+    {
+     "setting": "Path Mode, textures not embedded (04 1.1)",
+     "standard": [
+      "AUTO",
+      false
+     ],
+     "used": [
+      "AUTO",
+      false
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+     "standard": [
+      90.0,
+      100.0,
+      1.0
+     ],
+     "used": [
+      90.0,
+      100.0,
+      1.0
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+     "standard": [
+      "METRIC",
+      1.0
+     ],
+     "used": [
+      "METRIC",
+      1.0
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Transforms applied: object matrix identity (04 1)",
+     "standard": true,
+     "used": true,
+     "conforms": true
+    },
+    {
+     "setting": "Pivot: facade = bottom edge of outer face, centred (04 §1)",
+     "standard": true,
+     "used": true,
+     "conforms": true
+    }
+   ],
+   "um_fbx_v1_conforms": true,
+   "export": {
+    "fbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/export/SM_Decor_FacadeA.fbx",
+    "sha256": "93a6d848a6309f6c52033df54bddb85ebfa098d5aacb1bb4b450ed56f4558010",
+    "bytes": 31772,
+    "absolute_path_leaks": [],
+    "texture_refs": [
+     "../textures/T_Decor_Facades_BC.png"
+    ]
+   },
+   "checks": {
+    "single_mesh_no_armature": true,
+    "closed_manifold_consistent_winding": true,
+    "front_faces_minus_y": true,
+    "length_300_600_uu_proposed": true,
+    "height_le_120_uu_proposed": true,
+    "height_matches_param_0_1pct": true,
+    "length_matches_trace_0_1pct": true,
+    "thickness_matches_param": true,
+    "material_slots_le_2": true,
+    "uv0_in_0_1_no_overlap": true,
+    "uv_not_mirrored": true,
+    "no_absolute_paths_in_fbx": true,
+    "um_fbx_v1_conforms": true
+   },
+   "checks_passed": true
+  },
+  {
+   "key": "B",
+   "asset_name": "SM_Decor_FacadeB",
+   "build": {
+    "front_triangles": 70,
+    "back_triangles": 54,
+    "side_quads": 56,
+    "side_band_v_flipped": false,
+    "perimeter_uu": 898.787,
+    "front_strip_px_per_uu": [
+     2.5008,
+     2.5
+    ],
+    "back_side_px_per_uu": 0.625
+   },
+   "triangles": 236,
+   "vertices": 120,
+   "geometry": {
+    "vertices_as_stored": 120,
+    "vertices_welded_1e-6m": 120,
+    "faces": 180,
+    "triangles": 236,
+    "welded_boundary_edges": 0,
+    "welded_non_manifold_edges": 0,
+    "wire_edges": 0,
+    "loose_vertices": 0,
+    "degenerate_faces_area_lt_1e-12": 0,
+    "faces_with_inconsistent_winding": 0,
+    "connected_shells": 1,
+    "signed_volume_m3": 0.231711341,
+    "raw_vertex_count_before_weld": 120
+   },
+   "corner_normals": {
+    "has_custom_normals": false,
+    "corners_pointing_into_surface": 0,
+    "corner_vs_face_normal_angle_deg_p50_p99_max": [
+     0.0,
+     0.03,
+     0.03
+    ]
+   },
+   "bounds_min_uu": [
+    -152.353,
+    0.0,
+    0.0
+   ],
+   "bounds_max_uu": [
+    152.353,
+    8.0,
+    120.0
+   ],
+   "dimensions_uu_x_len_y_thick_z_height": [
+    304.706,
+    8.0,
+    120.0
+   ],
+   "pivot": {
+    "origin": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rule": "04 §1: facade = bottom edge of the outer face, centred",
+    "min_z_uu": 0.0,
+    "x_centre_offset_uu": 0.0,
+    "front_face_y_uu": 0.0
+   },
+   "front_area_weighted_normal": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "front_area_m2": 2.896392,
+   "material_slots": [
+    "M_Decor_Facades",
+    "M_Decor_FacadeGlow"
+   ],
+   "material_slots_used": [
+    0,
+    1
+   ],
+   "glow_faces": 4,
+   "glow_area_uu2": 155.294,
+   "uv0": {
+    "uv_layers": [
+     "UVMap"
+    ],
+    "raster_size_px": 1024,
+    "islands": 3,
+    "triangles_out_of_0_1": 0,
+    "uv_bounds": [
+     0.007813,
+     0.057617,
+     0.94965,
+     0.71582
+    ],
+    "uv_area_used_fraction": 0.1862,
+    "raster_coverage_fraction": 0.1862,
+    "overlap_pixels_between_islands": 0,
+    "overlap_fraction_of_covered": 0.0,
+    "overlap_pixels_inside_islands_strict": 0,
+    "flipped_uv_triangles_vs_island_majority": 0,
+    "zero_area_uv_triangles": 0,
+    "texel_density_px_per_m_at_raster": 173.1,
+    "stretch_area_ratio_p05_p50_p95": [
+     0.13,
+     0.13,
+     2.086
+    ],
+    "stretch_anisotropy_sigma_max_over_min_p50_p95_max": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "stretch_sigma_max_norm_p95": 1.444,
+    "stretch_sigma_min_norm_p05": 0.361,
+    "min_gutter_px_estimate": 19,
+    "island_pairs_closer_than_4px": 0,
+    "note": "min_gutter_px_estimate / island_pairs_closer_than_4px: 4-neighbour growth at raster_size_px (odd/even estimate +-1 px). raster_metrics: Euclidean distance between centres of pixels of different islands (another metric, counts differ), plus strict in-island overlap from flipped UV triangles; at raster_size_px and 2x.",
+    "raster_metrics": [
+     {
+      "raster_size_px": 1024,
+      "overlap_pixels_between_islands": 0,
+      "overlap_pixels_inside_islands_strict": 0,
+      "raster_coverage_fraction": 0.1862,
+      "min_island_centre_distance_px": ">8",
+      "island_pairs_centre_distance_lt_4px": 0,
+      "island_pairs_centre_distance_lt_8px": 0,
+      "mip_where_min_distance_drops_below_1_texel": null
+     },
+     {
+      "raster_size_px": 2048,
+      "overlap_pixels_between_islands": 0,
+      "overlap_pixels_inside_islands_strict": 0,
+      "raster_coverage_fraction": 0.1862,
+      "min_island_centre_distance_px": ">8",
+      "island_pairs_centre_distance_lt_4px": 0,
+      "island_pairs_centre_distance_lt_8px": 0,
+      "mip_where_min_distance_drops_below_1_texel": null
+     }
+    ]
+   },
+   "uv_mirrored_faces": 0,
+   "collision": "none (04 §3.7: decor not interactive; clicks go through to L1)",
+   "um_fbx_v1_rows": [
+    {
+     "setting": "Forward / Up (04 1.1)",
+     "standard": [
+      "-Y",
+      "Z"
+     ],
+     "used": [
+      "-Y",
+      "Z"
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Apply Scalings (04 1.1)",
+     "standard": "FBX_SCALE_UNITS",
+     "used": "FBX_SCALE_UNITS",
+     "conforms": true
+    },
+    {
+     "setting": "Apply Unit (04 1.1)",
+     "standard": true,
+     "used": true,
+     "conforms": true
+    },
+    {
+     "setting": "Apply Transform (04 1.1)",
+     "standard": false,
+     "used": false,
+     "conforms": true
+    },
+    {
+     "setting": "Triangulate Faces (04 1.1)",
+     "standard": true,
+     "used": true,
+     "conforms": true
+    },
+    {
+     "setting": "Smoothing (04 1.1)",
+     "standard": "FACE",
+     "used": "FACE",
+     "conforms": true
+    },
+    {
+     "setting": "Object Types (04 1.1)",
+     "standard": [
+      "ARMATURE",
+      "MESH"
+     ],
+     "used": [
+      "ARMATURE",
+      "MESH"
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Loose Edges / Custom Properties (04 1.1)",
+     "standard": [
+      false,
+      false
+     ],
+     "used": [
+      false,
+      false
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Leaf bones / bone axes (04 1.1, preset)",
+     "standard": [
+      false,
+      "Y",
+      "X"
+     ],
+     "used": [
+      false,
+      "Y",
+      "X"
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Bake Animation (04 1.1: skeletal clips only)",
+     "standard": false,
+     "used": false,
+     "conforms": true
+    },
+    {
+     "setting": "Path Mode, textures not embedded (04 1.1)",
+     "standard": [
+      "AUTO",
+      false
+     ],
+     "used": [
+      "AUTO",
+      false
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+     "standard": [
+      90.0,
+      100.0,
+      1.0
+     ],
+     "used": [
+      90.0,
+      100.0,
+      1.0
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+     "standard": [
+      "METRIC",
+      1.0
+     ],
+     "used": [
+      "METRIC",
+      1.0
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Transforms applied: object matrix identity (04 1)",
+     "standard": true,
+     "used": true,
+     "conforms": true
+    },
+    {
+     "setting": "Pivot: facade = bottom edge of outer face, centred (04 §1)",
+     "standard": true,
+     "used": true,
+     "conforms": true
+    }
+   ],
+   "um_fbx_v1_conforms": true,
+   "export": {
+    "fbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/export/SM_Decor_FacadeB.fbx",
+    "sha256": "fa034b31b9f4393c266bf45121beabfbfe37f59ec404c2afc142a4c9bfb6a9e8",
+    "bytes": 27772,
+    "absolute_path_leaks": [],
+    "texture_refs": [
+     "../textures/T_Decor_Facades_BC.png"
+    ]
+   },
+   "checks": {
+    "single_mesh_no_armature": true,
+    "closed_manifold_consistent_winding": true,
+    "front_faces_minus_y": true,
+    "length_300_600_uu_proposed": true,
+    "height_le_120_uu_proposed": true,
+    "height_matches_param_0_1pct": true,
+    "length_matches_trace_0_1pct": true,
+    "thickness_matches_param": true,
+    "material_slots_le_2": true,
+    "uv0_in_0_1_no_overlap": true,
+    "uv_not_mirrored": true,
+    "no_absolute_paths_in_fbx": true,
+    "um_fbx_v1_conforms": true
+   },
+   "checks_passed": true
+  },
+  {
+   "key": "C",
+   "asset_name": "SM_Decor_FacadeC",
+   "build": {
+    "front_triangles": 65,
+    "back_triangles": 65,
+    "side_quads": 67,
+    "side_band_v_flipped": false,
+    "perimeter_uu": 850.651,
+    "front_strip_px_per_uu": [
+     2.4991,
+     2.4952
+    ],
+    "back_side_px_per_uu": 0.625
+   },
+   "triangles": 264,
+   "vertices": 134,
+   "geometry": {
+    "vertices_as_stored": 134,
+    "vertices_welded_1e-6m": 134,
+    "faces": 197,
+    "triangles": 264,
+    "welded_boundary_edges": 0,
+    "welded_non_manifold_edges": 0,
+    "wire_edges": 0,
+    "loose_vertices": 0,
+    "degenerate_faces_area_lt_1e-12": 0,
+    "faces_with_inconsistent_winding": 0,
+    "connected_shells": 1,
+    "signed_volume_m3": 0.191596971,
+    "raw_vertex_count_before_weld": 134
+   },
+   "corner_normals": {
+    "has_custom_normals": false,
+    "corners_pointing_into_surface": 0,
+    "corner_vs_face_normal_angle_deg_p50_p99_max": [
+     0.0,
+     0.03,
+     0.03
+    ]
+   },
+   "bounds_min_uu": [
+    -153.058,
+    0.0,
+    0.0
+   ],
+   "bounds_max_uu": [
+    153.058,
+    8.0,
+    105.0
+   ],
+   "dimensions_uu_x_len_y_thick_z_height": [
+    306.115,
+    8.0,
+    105.0
+   ],
+   "pivot": {
+    "origin": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "rule": "04 §1: facade = bottom edge of the outer face, centred",
+    "min_z_uu": 0.0,
+    "x_centre_offset_uu": 0.0,
+    "front_face_y_uu": 0.0
+   },
+   "front_area_weighted_normal": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "front_area_m2": 2.394963,
+   "material_slots": [
+    "M_Decor_Facades"
+   ],
+   "material_slots_used": [
+    0
+   ],
+   "glow_faces": 0,
+   "glow_area_uu2": 0.0,
+   "uv0": {
+    "uv_layers": [
+     "UVMap"
+    ],
+    "raster_size_px": 1024,
+    "islands": 3,
+    "triangles_out_of_0_1": 0,
+    "uv_bounds": [
+     0.007812,
+     0.086304,
+     0.972321,
+     0.415039
+    ],
+    "uv_area_used_fraction": 0.1539,
+    "raster_coverage_fraction": 0.1541,
+    "overlap_pixels_between_islands": 0,
+    "overlap_fraction_of_covered": 0.0,
+    "overlap_pixels_inside_islands_strict": 0,
+    "flipped_uv_triangles_vs_island_majority": 0,
+    "zero_area_uv_triangles": 0,
+    "texel_density_px_per_m_at_raster": 171.7,
+    "stretch_area_ratio_p05_p50_p95": [
+     0.132,
+     0.132,
+     2.114
+    ],
+    "stretch_anisotropy_sigma_max_over_min_p50_p95_max": [
+     1.0,
+     1.002,
+     1.002
+    ],
+    "stretch_sigma_max_norm_p95": 1.455,
+    "stretch_sigma_min_norm_p05": 0.364,
+    "min_gutter_px_estimate": 9,
+    "island_pairs_closer_than_4px": 0,
+    "note": "min_gutter_px_estimate / island_pairs_closer_than_4px: 4-neighbour growth at raster_size_px (odd/even estimate +-1 px). raster_metrics: Euclidean distance between centres of pixels of different islands (another metric, counts differ), plus strict in-island overlap from flipped UV triangles; at raster_size_px and 2x.",
+    "raster_metrics": [
+     {
+      "raster_size_px": 1024,
+      "overlap_pixels_between_islands": 0,
+      "overlap_pixels_inside_islands_strict": 0,
+      "raster_coverage_fraction": 0.1541,
+      "min_island_centre_distance_px": ">8",
+      "island_pairs_centre_distance_lt_4px": 0,
+      "island_pairs_centre_distance_lt_8px": 0,
+      "mip_where_min_distance_drops_below_1_texel": null
+     },
+     {
+      "raster_size_px": 2048,
+      "overlap_pixels_between_islands": 0,
+      "overlap_pixels_inside_islands_strict": 0,
+      "raster_coverage_fraction": 0.1538,
+      "min_island_centre_distance_px": ">8",
+      "island_pairs_centre_distance_lt_4px": 0,
+      "island_pairs_centre_distance_lt_8px": 0,
+      "mip_where_min_distance_drops_below_1_texel": null
+     }
+    ]
+   },
+   "uv_mirrored_faces": 0,
+   "collision": "none (04 §3.7: decor not interactive; clicks go through to L1)",
+   "um_fbx_v1_rows": [
+    {
+     "setting": "Forward / Up (04 1.1)",
+     "standard": [
+      "-Y",
+      "Z"
+     ],
+     "used": [
+      "-Y",
+      "Z"
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Apply Scalings (04 1.1)",
+     "standard": "FBX_SCALE_UNITS",
+     "used": "FBX_SCALE_UNITS",
+     "conforms": true
+    },
+    {
+     "setting": "Apply Unit (04 1.1)",
+     "standard": true,
+     "used": true,
+     "conforms": true
+    },
+    {
+     "setting": "Apply Transform (04 1.1)",
+     "standard": false,
+     "used": false,
+     "conforms": true
+    },
+    {
+     "setting": "Triangulate Faces (04 1.1)",
+     "standard": true,
+     "used": true,
+     "conforms": true
+    },
+    {
+     "setting": "Smoothing (04 1.1)",
+     "standard": "FACE",
+     "used": "FACE",
+     "conforms": true
+    },
+    {
+     "setting": "Object Types (04 1.1)",
+     "standard": [
+      "ARMATURE",
+      "MESH"
+     ],
+     "used": [
+      "ARMATURE",
+      "MESH"
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Loose Edges / Custom Properties (04 1.1)",
+     "standard": [
+      false,
+      false
+     ],
+     "used": [
+      false,
+      false
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Leaf bones / bone axes (04 1.1, preset)",
+     "standard": [
+      false,
+      "Y",
+      "X"
+     ],
+     "used": [
+      false,
+      "Y",
+      "X"
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Bake Animation (04 1.1: skeletal clips only)",
+     "standard": false,
+     "used": false,
+     "conforms": true
+    },
+    {
+     "setting": "Path Mode, textures not embedded (04 1.1)",
+     "standard": [
+      "AUTO",
+      false
+     ],
+     "used": [
+      "AUTO",
+      false
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+     "standard": [
+      90.0,
+      100.0,
+      1.0
+     ],
+     "used": [
+      90.0,
+      100.0,
+      1.0
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+     "standard": [
+      "METRIC",
+      1.0
+     ],
+     "used": [
+      "METRIC",
+      1.0
+     ],
+     "conforms": true
+    },
+    {
+     "setting": "Transforms applied: object matrix identity (04 1)",
+     "standard": true,
+     "used": true,
+     "conforms": true
+    },
+    {
+     "setting": "Pivot: facade = bottom edge of outer face, centred (04 §1)",
+     "standard": true,
+     "used": true,
+     "conforms": true
+    }
+   ],
+   "um_fbx_v1_conforms": true,
+   "export": {
+    "fbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/export/SM_Decor_FacadeC.fbx",
+    "sha256": "ecb1bf3431071c2a93f4ca56552827c3ca93494eaf76063e36d104db941c3023",
+    "bytes": 26908,
+    "absolute_path_leaks": [],
+    "texture_refs": [
+     "../textures/T_Decor_Facades_BC.png"
+    ]
+   },
+   "checks": {
+    "single_mesh_no_armature": true,
+    "closed_manifold_consistent_winding": true,
+    "front_faces_minus_y": true,
+    "length_300_600_uu_proposed": true,
+    "height_le_120_uu_proposed": true,
+    "height_matches_param_0_1pct": true,
+    "length_matches_trace_0_1pct": true,
+    "thickness_matches_param": true,
+    "material_slots_le_2": true,
+    "uv0_in_0_1_no_overlap": true,
+    "uv_not_mirrored": true,
+    "no_absolute_paths_in_fbx": true,
+    "um_fbx_v1_conforms": true
+   },
+   "checks_passed": true
+  }
+ ],
+ "k1_exact_frame_analysis": {
+  "vertical_half_fov_deg_16x9": 10.057,
+  "facade_front_y_uu": 270.0,
+  "per_facade": {
+   "A": {
+    "base_deg_above_frame_centre": 9.271,
+    "base_in_frame": true,
+    "top_deg_above_frame_centre": 12.667,
+    "top_in_frame": false
+   },
+   "B": {
+    "base_deg_above_frame_centre": 9.271,
+    "base_in_frame": true,
+    "top_deg_above_frame_centre": 12.996,
+    "top_in_frame": false
+   },
+   "C": {
+    "base_deg_above_frame_centre": 9.271,
+    "base_in_frame": true,
+    "top_deg_above_frame_centre": 12.504,
+    "top_in_frame": false
+   }
+  }
+ },
+ "previews": {
+  "SM_Decor_FacadeA_front": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeA_front-ortho.jpg"
+  },
+  "SM_Decor_FacadeB_front": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeB_front-ortho.jpg"
+  },
+  "SM_Decor_FacadeC_front": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeC_front-ortho.jpg"
+  },
+  "lineup_k1_exact": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/facades-lineup_k1-exact-12m.jpg"
+  },
+  "lineup_game_far": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/facades-lineup_game-fov35-pitch55-target-y150.jpg"
+  },
+  "SM_Decor_FacadeA_game": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeA_game-fov35-pitch55-target-y150.jpg"
+  },
+  "SM_Decor_FacadeB_game": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeB_game-fov35-pitch55-target-y150.jpg"
+  },
+  "SM_Decor_FacadeC_game": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeC_game-fov35-pitch55-target-y150.jpg"
+  },
+  "A_back": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeA_back-3q.jpg"
+  }
+ },
+ "preview_note": "EEVEE, neutral sun key (shadowed) + fill (no shadow), dark world; not the P1.7 control scene. Game shots: FOV 35 deg horizontal, pitch -55 deg, 12 m (03 §2), 16:9, board 6x5 tiles with the long side along X; facade front at y=+270 uu on the side far from the camera. *_k1-exact: target = board centre (K-1); *_target-y150: same camera shifted 1.5 m toward the far side so the facade is in frame. Lineup offsets (B left, C right, 0.6 m further back) are a skyline check, not a layout decision. Emission strength 4 is a preview value only.",
+ "work_blend": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/work/decor-facades.blend (transient, gitignored)",
+ "textures_unchanged": true,
+ "checks_passed": true
+}

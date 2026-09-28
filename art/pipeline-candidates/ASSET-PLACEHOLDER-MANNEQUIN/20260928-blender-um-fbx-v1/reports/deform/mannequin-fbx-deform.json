@@ -1,0 +1,155 @@
+{
+ "source": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/work/probe-fbx-authored.blend",
+ "label": "mannequin-fbx",
+ "family": "contract17",
+ "family_bone_hits": 7,
+ "height": 0.46097,
+ "bbox_min": [
+  -0.0953,
+  -0.045,
+  0.039
+ ],
+ "bbox_max": [
+  0.0953,
+  0.0338,
+  0.5
+ ],
+ "tests": [
+  {
+   "test": "head_turn",
+   "bone": "head",
+   "axis": "Z",
+   "deg": 35,
+   "moved_vertices": 84,
+   "centroid_z_norm": 0.905,
+   "centroid_x_norm": 0.0,
+   "expect": {
+    "z_norm_min": 0.7
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_PlaceholderMannequin",
+     0.1277
+    ]
+   ]
+  },
+  {
+   "test": "spine_bend_fwd",
+   "bone": "spine",
+   "axis": "X",
+   "deg": 25,
+   "moved_vertices": 353,
+   "centroid_z_norm": 0.626,
+   "centroid_x_norm": -0.0,
+   "expect": {
+    "z_norm_min": 0.45
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_PlaceholderMannequin",
+     0.5365
+    ]
+   ]
+  },
+  {
+   "test": "arm_l_raise",
+   "bone": "arm_upper.L",
+   "axis": "Y",
+   "deg": -45,
+   "moved_vertices": 126,
+   "centroid_z_norm": 0.504,
+   "centroid_x_norm": 0.783,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_min": 0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_PlaceholderMannequin",
+     0.1915
+    ]
+   ]
+  },
+  {
+   "test": "arm_r_raise",
+   "bone": "arm_upper.R",
+   "axis": "Y",
+   "deg": 45,
+   "moved_vertices": 126,
+   "centroid_z_norm": 0.504,
+   "centroid_x_norm": -0.783,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_max": -0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_PlaceholderMannequin",
+     0.1915
+    ]
+   ]
+  },
+  {
+   "test": "forearm_l_bend",
+   "bone": "arm_lower.L",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 72,
+   "centroid_z_norm": 0.39,
+   "centroid_x_norm": 0.845,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_min": 0.2
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_PlaceholderMannequin",
+     0.1094
+    ]
+   ]
+  },
+  {
+   "test": "thigh_l_flex",
+   "bone": "leg_upper.L",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 118,
+   "centroid_z_norm": 0.182,
+   "centroid_x_norm": 0.277,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_PlaceholderMannequin",
+     0.1793
+    ]
+   ]
+  },
+  {
+   "test": "thigh_r_flex",
+   "bone": "leg_upper.R",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 118,
+   "centroid_z_norm": 0.182,
+   "centroid_x_norm": -0.277,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_PlaceholderMannequin",
+     0.1793
+    ]
+   ]
+  }
+ ]
+}

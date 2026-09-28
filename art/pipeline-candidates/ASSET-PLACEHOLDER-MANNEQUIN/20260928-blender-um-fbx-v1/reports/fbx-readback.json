@@ -1,0 +1,608 @@
+{
+ "method": "Independent read-back of the three mannequin FBX files (only reads them and the authored .blend).",
+ "blender": "5.2.2 LTS",
+ "files": {
+  "skeletal": {
+   "file": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/export/SK_PlaceholderMannequin.fbx",
+   "objects": [
+    {
+     "name": "SKEL_UM_Humanoid",
+     "type": "ARMATURE",
+     "parent": null,
+     "scale": [
+      0.01,
+      0.01,
+      0.01
+     ],
+     "location": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "SK_PlaceholderMannequin",
+     "type": "MESH",
+     "parent": "SKEL_UM_Humanoid",
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "location": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ],
+   "meshes": {
+    "SK_PlaceholderMannequin": {
+     "triangles": 1256,
+     "vertices": 658,
+     "material_slots": [
+      "M_PlaceholderMannequin"
+     ],
+     "uv_layers": [
+      "UVMap"
+     ],
+     "mask": {
+      "present": true,
+      "layers": [
+       "UM_Mask"
+      ],
+      "domain": "CORNER",
+      "type": "BYTE_COLOR",
+      "binary": true,
+      "corners_R1": 0,
+      "corners_G1": 0,
+      "corners_B1": 0,
+      "corners": 3768
+     },
+     "export_frame_bounds_uu": {
+      "min": [
+       -3.381,
+       -9.531,
+       3.903
+      ],
+      "max": [
+       4.5,
+       9.531,
+       50.0
+      ]
+     },
+     "export_frame_dimensions_uu": [
+      7.881,
+      19.061,
+      46.097
+     ],
+     "predicted_ue_bounds_uu": {
+      "min": [
+       -3.381,
+       -9.531,
+       3.903
+      ],
+      "max": [
+       4.5,
+       9.531,
+       50.0
+      ]
+     },
+     "authored_match": {
+      "max_nearest_distance_uu": 1e-05,
+      "vertex_count": [
+       658,
+       658
+      ],
+      "triangles": [
+       1256,
+       1256
+      ]
+     },
+     "weights": {
+      "max_influences": 1,
+      "min_influences": 1,
+      "weight_sum_min_max": [
+       1.0,
+       1.0
+      ],
+      "vertices_with_other_bone_than_authored": 0,
+      "groups": [
+       "arm_lower.L",
+       "arm_lower.R",
+       "arm_upper.L",
+       "arm_upper.R",
+       "foot.L",
+       "foot.R",
+       "hand.L",
+       "hand.R",
+       "head",
+       "hips",
+       "leg_lower.L",
+       "leg_lower.R",
+       "leg_upper.L",
+       "leg_upper.R",
+       "spine"
+      ]
+     }
+    }
+   },
+   "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "bones": 17,
+    "parents_match_contract": true,
+    "max_head_offset_vs_authored_uu": 0.0,
+    "ue_bone_count_expected": 18,
+    "ue_bone_0": "SKEL_UM_Humanoid"
+   },
+   "facing_export_frame": {
+    "feet_band_vertices": 86,
+    "feet_mean_x_uu": 1.42,
+    "hand_vertices_at_+Y": 43,
+    "hand_vertices_total": 86,
+    "ue_prediction": "front +X, left hand -Y (ART-001 map ue = (x, -y, z))"
+   }
+  },
+  "skeletal_base": {
+   "file": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/export/SM_PlaceholderMannequin_Base.fbx",
+   "objects": [
+    {
+     "name": "SM_PlaceholderMannequin_Base",
+     "type": "MESH",
+     "parent": null,
+     "scale": [
+      0.01,
+      0.01,
+      0.01
+     ],
+     "location": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ],
+   "meshes": {
+    "SM_PlaceholderMannequin_Base": {
+     "triangles": 384,
+     "vertices": 194,
+     "material_slots": [
+      "M_PlaceholderMannequin_Base"
+     ],
+     "uv_layers": [
+      "UVMap"
+     ],
+     "mask": {
+      "present": true,
+      "layers": [
+       "UM_Mask"
+      ],
+      "domain": "CORNER",
+      "type": "BYTE_COLOR",
+      "binary": true,
+      "corners_R1": 384,
+      "corners_G1": 0,
+      "corners_B1": 0,
+      "corners": 1152
+     },
+     "export_frame_bounds_uu": {
+      "min": [
+       -12.0,
+       -12.0,
+       0.0
+      ],
+      "max": [
+       12.0,
+       12.0,
+       4.0
+      ]
+     },
+     "export_frame_dimensions_uu": [
+      24.0,
+      24.0,
+      4.0
+     ],
+     "predicted_ue_bounds_uu": {
+      "min": [
+       -12.0,
+       -12.0,
+       0.0
+      ],
+      "max": [
+       12.0,
+       12.0,
+       4.0
+      ]
+     },
+     "authored_match": {
+      "max_nearest_distance_uu": 0.0,
+      "vertex_count": [
+       194,
+       194
+      ],
+      "triangles": [
+       384,
+       384
+      ]
+     }
+    }
+   }
+  },
+  "static": {
+   "file": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/export/SM_PlaceholderMannequin.fbx",
+   "objects": [
+    {
+     "name": "SM_PlaceholderMannequin",
+     "type": "MESH",
+     "parent": null,
+     "scale": [
+      0.01,
+      0.01,
+      0.01
+     ],
+     "location": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    {
+     "name": "UCP_SM_PlaceholderMannequin_00",
+     "type": "MESH",
+     "parent": null,
+     "scale": [
+      0.01,
+      0.01,
+      0.01
+     ],
+     "location": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ],
+   "meshes": {
+    "SM_PlaceholderMannequin": {
+     "triangles": 1640,
+     "vertices": 852,
+     "material_slots": [
+      "M_PlaceholderMannequin",
+      "M_PlaceholderMannequin_Base"
+     ],
+     "uv_layers": [
+      "UVMap"
+     ],
+     "mask": {
+      "present": true,
+      "layers": [
+       "UM_Mask"
+      ],
+      "domain": "CORNER",
+      "type": "BYTE_COLOR",
+      "binary": true,
+      "corners_R1": 384,
+      "corners_G1": 0,
+      "corners_B1": 0,
+      "corners": 4920
+     },
+     "export_frame_bounds_uu": {
+      "min": [
+       -12.0,
+       -12.0,
+       0.0
+      ],
+      "max": [
+       12.0,
+       12.0,
+       50.0
+      ]
+     },
+     "export_frame_dimensions_uu": [
+      24.0,
+      24.0,
+      50.0
+     ],
+     "predicted_ue_bounds_uu": {
+      "min": [
+       -12.0,
+       -12.0,
+       0.0
+      ],
+      "max": [
+       12.0,
+       12.0,
+       50.0
+      ]
+     },
+     "authored_match": {
+      "max_nearest_distance_uu": 0.0,
+      "vertex_count": [
+       852,
+       852
+      ],
+      "triangles": [
+       1640,
+       1640
+      ]
+     }
+    },
+    "UCP_SM_PlaceholderMannequin_00": {
+     "triangles": 256,
+     "vertices": 130,
+     "material_slots": [],
+     "uv_layers": [],
+     "mask": {
+      "present": false,
+      "layers": []
+     },
+     "export_frame_bounds_uu": {
+      "min": [
+       -12.5,
+       -12.5,
+       -9.0
+      ],
+      "max": [
+       12.5,
+       12.5,
+       50.0
+      ]
+     },
+     "export_frame_dimensions_uu": [
+      25.0,
+      25.0,
+      59.0
+     ],
+     "predicted_ue_bounds_uu": {
+      "min": [
+       -12.5,
+       -12.5,
+       -9.0
+      ],
+      "max": [
+       12.5,
+       12.5,
+       50.0
+      ]
+     },
+     "authored_match": {
+      "max_nearest_distance_uu": 0.0,
+      "vertex_count": [
+       130,
+       130
+      ],
+      "triangles": [
+       256,
+       256
+      ]
+     }
+    }
+   },
+   "facing_export_frame": {
+    "feet_band_vertices": 87,
+    "feet_mean_x_uu": 1.404,
+    "hand_vertices_at_+Y": 43,
+    "hand_vertices_total": 86,
+    "ue_prediction": "front +X, left hand -Y (ART-001 map ue = (x, -y, z))"
+   }
+  }
+ },
+ "checks": {
+  "skeletal_objects": {
+   "passed": true,
+   "measured": [
+    "SKEL_UM_Humanoid",
+    "SK_PlaceholderMannequin"
+   ],
+   "expected": [
+    "SKEL_UM_Humanoid",
+    "SK_PlaceholderMannequin"
+   ]
+  },
+  "skeletal_SK_PlaceholderMannequin_matches_authored": {
+   "passed": true,
+   "measured": {
+    "max_nearest_distance_uu": 1e-05,
+    "vertex_count": [
+     658,
+     658
+    ],
+    "triangles": [
+     1256,
+     1256
+    ]
+   },
+   "expected": "same vertex count and triangles, every vertex within 0.001 uu after undoing the export rotation"
+  },
+  "skeletal_weights_roundtrip": {
+   "passed": true,
+   "measured": {
+    "max_influences": 1,
+    "min_influences": 1,
+    "weight_sum_min_max": [
+     1.0,
+     1.0
+    ],
+    "vertices_with_other_bone_than_authored": 0,
+    "groups": [
+     "arm_lower.L",
+     "arm_lower.R",
+     "arm_upper.L",
+     "arm_upper.R",
+     "foot.L",
+     "foot.R",
+     "hand.L",
+     "hand.R",
+     "head",
+     "hips",
+     "leg_lower.L",
+     "leg_lower.R",
+     "leg_upper.L",
+     "leg_upper.R",
+     "spine"
+    ]
+   }
+  },
+  "skeletal_SK_PlaceholderMannequin_mask": {
+   "passed": true,
+   "measured": {
+    "present": true,
+    "layers": [
+     "UM_Mask"
+    ],
+    "domain": "CORNER",
+    "type": "BYTE_COLOR",
+    "binary": true,
+    "corners_R1": 0,
+    "corners_G1": 0,
+    "corners_B1": 0,
+    "corners": 3768
+   }
+  },
+  "skeletal_SK_PlaceholderMannequin_uv0": {
+   "passed": true,
+   "measured": [
+    "UVMap"
+   ]
+  },
+  "skeletal_armature_object_name": {
+   "passed": true,
+   "measured": "SKEL_UM_Humanoid",
+   "expected": "SKEL_UM_Humanoid"
+  },
+  "skeletal_bones_match_contract": {
+   "passed": true,
+   "measured": {
+    "count": 17,
+    "diff": []
+   }
+  },
+  "skeletal_bone_heads_roundtrip": {
+   "passed": true,
+   "measured": 0.0,
+   "expected": "< 0.001 uu"
+  },
+  "skeletal_facing_front_plus_x": {
+   "passed": true,
+   "measured": 1.42,
+   "expected": "feet centroid ahead (+X) of the pivot"
+  },
+  "skeletal_base_objects": {
+   "passed": true,
+   "measured": [
+    "SM_PlaceholderMannequin_Base"
+   ],
+   "expected": [
+    "SM_PlaceholderMannequin_Base"
+   ]
+  },
+  "skeletal_base_SM_PlaceholderMannequin_Base_matches_authored": {
+   "passed": true,
+   "measured": {
+    "max_nearest_distance_uu": 0.0,
+    "vertex_count": [
+     194,
+     194
+    ],
+    "triangles": [
+     384,
+     384
+    ]
+   },
+   "expected": "same vertex count and triangles, every vertex within 0.001 uu after undoing the export rotation"
+  },
+  "skeletal_base_SM_PlaceholderMannequin_Base_mask": {
+   "passed": true,
+   "measured": {
+    "present": true,
+    "layers": [
+     "UM_Mask"
+    ],
+    "domain": "CORNER",
+    "type": "BYTE_COLOR",
+    "binary": true,
+    "corners_R1": 384,
+    "corners_G1": 0,
+    "corners_B1": 0,
+    "corners": 1152
+   }
+  },
+  "skeletal_base_SM_PlaceholderMannequin_Base_uv0": {
+   "passed": true,
+   "measured": [
+    "UVMap"
+   ]
+  },
+  "static_objects": {
+   "passed": true,
+   "measured": [
+    "SM_PlaceholderMannequin",
+    "UCP_SM_PlaceholderMannequin_00"
+   ],
+   "expected": [
+    "SM_PlaceholderMannequin",
+    "UCP_SM_PlaceholderMannequin_00"
+   ]
+  },
+  "static_SM_PlaceholderMannequin_matches_authored": {
+   "passed": true,
+   "measured": {
+    "max_nearest_distance_uu": 0.0,
+    "vertex_count": [
+     852,
+     852
+    ],
+    "triangles": [
+     1640,
+     1640
+    ]
+   },
+   "expected": "same vertex count and triangles, every vertex within 0.001 uu after undoing the export rotation"
+  },
+  "static_UCP_SM_PlaceholderMannequin_00_matches_authored": {
+   "passed": true,
+   "measured": {
+    "max_nearest_distance_uu": 0.0,
+    "vertex_count": [
+     130,
+     130
+    ],
+    "triangles": [
+     256,
+     256
+    ]
+   },
+   "expected": "same vertex count and triangles, every vertex within 0.001 uu after undoing the export rotation"
+  },
+  "static_SM_PlaceholderMannequin_mask": {
+   "passed": true,
+   "measured": {
+    "present": true,
+    "layers": [
+     "UM_Mask"
+    ],
+    "domain": "CORNER",
+    "type": "BYTE_COLOR",
+    "binary": true,
+    "corners_R1": 384,
+    "corners_G1": 0,
+    "corners_B1": 0,
+    "corners": 4920
+   }
+  },
+  "static_SM_PlaceholderMannequin_uv0": {
+   "passed": true,
+   "measured": [
+    "UVMap"
+   ]
+  },
+  "static_facing_front_plus_x": {
+   "passed": true,
+   "measured": 1.404,
+   "expected": "feet centroid ahead (+X) of the pivot"
+  }
+ },
+ "checks_failed": [],
+ "checks_passed_count": 19,
+ "checks_total": 19
+}

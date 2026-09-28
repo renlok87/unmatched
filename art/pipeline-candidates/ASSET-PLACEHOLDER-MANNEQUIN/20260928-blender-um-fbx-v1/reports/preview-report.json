@@ -1,0 +1,398 @@
+{
+ "method": "Measure the preview PNGs and store them as JPEG <= 1200 px (system Python with Pillow + numpy).",
+ "light": "neutral EEVEE preview light (key + fill sun), not the game light",
+ "measurements": {
+  "silhouette_k1": {
+   "frame_px": [
+    1200,
+    675
+   ],
+   "bbox_px": [
+    582,
+    309,
+    617,
+    369
+   ],
+   "width_px": 36,
+   "height_px": 61,
+   "height_px_at_1920x1080": 97.6,
+   "width_px_at_1920x1080": 57.6,
+   "dark_pixels": 1457
+  },
+  "silhouette_close": {
+   "frame_px": [
+    1200,
+    675
+   ],
+   "bbox_px": [
+    455,
+    84,
+    744,
+    628
+   ],
+   "width_px": 290,
+   "height_px": 545,
+   "height_px_at_1920x1080": 872.0,
+   "width_px_at_1920x1080": 464.0,
+   "dark_pixels": 108227
+  },
+  "silhouette_note": "K-1: camera 12.18 m, horizontal FOV 35 deg, pitch -55 deg (cell 1 m ≈ 250 px at 1920 px); 04 §3 proposes a figure of ≈ 110-140 px on 1080p for this view (proposal, Q-312 / GD-058)",
+  "fbx_vs_blend_ortho_front": {
+   "max_channel_diff": 1,
+   "pixels_diff_gt_8": 0,
+   "pixels_diff_gt_2": 0,
+   "pixels": 1000000
+  }
+ },
+ "files": {
+  "collision_front": {
+   "file": "collision_front.jpg",
+   "size_px": [
+    1000,
+    1000
+   ],
+   "bytes": 86535,
+   "sha256": "9524cb6eab62dfc8590f4f07af5d3fb22135217ea422d5361d43a4badb2ec466",
+   "png_before_jpeg": {
+    "sha256": "ad4f0c5bb9e9cdfe07ea55997cade533a9e1864a75c61a583059b633851e662b",
+    "bytes": 964526,
+    "size_px": [
+     1000,
+     1000
+    ]
+   }
+  },
+  "fbx_roundtrip_front": {
+   "file": "fbx_roundtrip_front.jpg",
+   "size_px": [
+    1000,
+    1000
+   ],
+   "bytes": 34475,
+   "sha256": "162674486da845ee841705bcd47e1156de438523d67ffce992d4a86dc4fbeaaa",
+   "png_before_jpeg": {
+    "sha256": "a8a38bfe0ddedbef453159b6832ed3f38846c12773eac9675e1256d325602c12",
+    "bytes": 824636,
+    "size_px": [
+     1000,
+     1000
+    ]
+   }
+  },
+  "game_close_3q": {
+   "file": "game_close_3q.jpg",
+   "size_px": [
+    1200,
+    675
+   ],
+   "bytes": 48378,
+   "sha256": "3650414b72258b88eef8d43b10e33143e35a5d902169dfd189c724cd49431d59",
+   "png_before_jpeg": {
+    "sha256": "91670e160e72398f4922ac578d3322ff270ab1591a06e4862b89c4a6fe063c4f",
+    "bytes": 741809,
+    "size_px": [
+     1200,
+     675
+    ]
+   }
+  },
+  "game_close_front": {
+   "file": "game_close_front.jpg",
+   "size_px": [
+    1200,
+    675
+   ],
+   "bytes": 47281,
+   "sha256": "aac08167a446868b637fc302aecb1b237ad5379c20c711e2f5b4760e4307f04d",
+   "png_before_jpeg": {
+    "sha256": "fd22f2e7db9493e562cfe98328576915c537dbeea284797d328475b3da6ec415",
+    "bytes": 718560,
+    "size_px": [
+     1200,
+     675
+    ]
+   }
+  },
+  "game_close_pair": {
+   "file": "game_close_pair.jpg",
+   "size_px": [
+    1200,
+    675
+   ],
+   "bytes": 50639,
+   "sha256": "bd26ec75f2bf7719b1a2e880e57c4f14c2579f306d2ccb29d52545244b98b404",
+   "png_before_jpeg": {
+    "sha256": "c98ba3e23edbe76a7f38c4fe8068c7a052ead469a2868d507b7bf4c9315466a6",
+    "bytes": 709739,
+    "size_px": [
+     1200,
+     675
+    ]
+   }
+  },
+  "game_k1_3q": {
+   "file": "game_k1_3q.jpg",
+   "size_px": [
+    1200,
+    675
+   ],
+   "bytes": 55147,
+   "sha256": "9bfe9563d26ce90051618957450a3d188ef2f673342c43bf9599044a0c7f28b7",
+   "png_before_jpeg": {
+    "sha256": "b778acb0ba6f04ecca0ee7f04635f9b9f5bb7f2db9f5d27df3ffc5867cb8ae42",
+    "bytes": 694881,
+    "size_px": [
+     1200,
+     675
+    ]
+   }
+  },
+  "game_k1_front": {
+   "file": "game_k1_front.jpg",
+   "size_px": [
+    1200,
+    675
+   ],
+   "bytes": 35697,
+   "sha256": "79163e601ddf54caee0546836211085071015f78492265ede76d9efc838dafcb",
+   "png_before_jpeg": {
+    "sha256": "9be8b0ba215730e5ee5b81610474896fbe32eda6b1b5a6a3a7bed9bf12261a2b",
+    "bytes": 659248,
+    "size_px": [
+     1200,
+     675
+    ]
+   }
+  },
+  "ortho_back": {
+   "file": "ortho_back.jpg",
+   "size_px": [
+    1000,
+    1000
+   ],
+   "bytes": 29609,
+   "sha256": "0407c84aabea56845af866f02684414e0b2a0743c81e380a6508f9f301fed2c3",
+   "png_before_jpeg": {
+    "sha256": "e2a8adc950b5de2e1ebabea1d025f2a38fc56a79066b81f380bf472e1a58e48d",
+    "bytes": 819860,
+    "size_px": [
+     1000,
+     1000
+    ]
+   }
+  },
+  "ortho_front": {
+   "file": "ortho_front.jpg",
+   "size_px": [
+    1000,
+    1000
+   ],
+   "bytes": 34473,
+   "sha256": "0bc6638100bed4fec1bae8a08e7f4269d86ab3af185a66b176e4154419912943",
+   "png_before_jpeg": {
+    "sha256": "1fd4bf0f96a1a190f40ae5f2a765df63b55ced3082d806fcf20f0ed808a9157e",
+    "bytes": 824916,
+    "size_px": [
+     1000,
+     1000
+    ]
+   }
+  },
+  "ortho_left": {
+   "file": "ortho_left.jpg",
+   "size_px": [
+    1000,
+    1000
+   ],
+   "bytes": 25954,
+   "sha256": "02d7f394bf831d662d5f68be6a0fd02ff9a8de30395ff65586592bbd72e1c994",
+   "png_before_jpeg": {
+    "sha256": "00b04885db58e9d06a7b98b3f82660cef725c04e1811ad815d290de77ecc69f5",
+    "bytes": 809005,
+    "size_px": [
+     1000,
+     1000
+    ]
+   }
+  },
+  "ortho_right": {
+   "file": "ortho_right.jpg",
+   "size_px": [
+    1000,
+    1000
+   ],
+   "bytes": 23027,
+   "sha256": "f625f1bcdc6dec36bf266d576d6570a2792cf80df2a9a44f35646260e3c6815b",
+   "png_before_jpeg": {
+    "sha256": "09f6979c5f67ac2d9e7b0190375bc5720539d8cbc17d94750e9c8edff3db387b",
+    "bytes": 806277,
+    "size_px": [
+     1000,
+     1000
+    ]
+   }
+  },
+  "ortho_top": {
+   "file": "ortho_top.jpg",
+   "size_px": [
+    1000,
+    1000
+   ],
+   "bytes": 32655,
+   "sha256": "1bf8d4bd71726e010d15915fa81f15ca4543441adffc59fbd14fab624ee8de69",
+   "png_before_jpeg": {
+    "sha256": "7e7bc7cb0cf57c863507c6b01629e29d5537ded64710b8c813355fc4d29b38f6",
+    "bytes": 852727,
+    "size_px": [
+     1000,
+     1000
+    ]
+   }
+  },
+  "silhouette_close": {
+   "file": "silhouette_close.jpg",
+   "size_px": [
+    1200,
+    675
+   ],
+   "bytes": 16849,
+   "sha256": "1d923e70cdda577ea1f8f9914ccea196735eb976a7b90443c4aa75a5cce986e7",
+   "png_before_jpeg": {
+    "sha256": "a673ded87e39bc64dff0cfa042e48967833fab4c37a3c19c79fb5c9e63f4910f",
+    "bytes": 273586,
+    "size_px": [
+     1200,
+     675
+    ]
+   }
+  },
+  "silhouette_k1": {
+   "file": "silhouette_k1.jpg",
+   "size_px": [
+    1200,
+    675
+   ],
+   "bytes": 8062,
+   "sha256": "9c50ac79bc83d2630bc6668877c43884f3e59cd6939195948d761f3df5538f3b",
+   "png_before_jpeg": {
+    "sha256": "de326ba6f6667fac31f6308c1f0fad463ee9a20f9a342771549ffccefe5d11af",
+    "bytes": 233987,
+    "size_px": [
+     1200,
+     675
+    ]
+   }
+  },
+  "uv0_base": {
+   "file": "uv0_base.jpg",
+   "size_px": [
+    1024,
+    1024
+   ],
+   "bytes": 246839,
+   "sha256": "1be2649df8b200fab6e8b2c237c30cebedcd3029ea8ddafd77ab30d68493a0b1",
+   "png_before_jpeg": {
+    "sha256": "9f8f457d7d995be99b81551512b44d03a3f09de85c034b0172900a1fb97eaedc",
+    "bytes": 77700,
+    "size_px": [
+     1024,
+     1024
+    ]
+   }
+  },
+  "uv0_figure": {
+   "file": "uv0_figure.jpg",
+   "size_px": [
+    1024,
+    1024
+   ],
+   "bytes": 352495,
+   "sha256": "37c73b6be65450d5ad0526aaece19314c51b2bf12ccac34af9a455d85f463956",
+   "png_before_jpeg": {
+    "sha256": "009066a1ce8aab4abd65f030f377fb84d750743e32b10f42f9778b7c7cbdec19",
+    "bytes": 101598,
+    "size_px": [
+     1024,
+     1024
+    ]
+   }
+  },
+  "wire_3q": {
+   "file": "wire_3q.jpg",
+   "size_px": [
+    1000,
+    1000
+   ],
+   "bytes": 72396,
+   "sha256": "f1cf3c0d766f94825b983a637d5f5bfdccef99eaec4b2d5865b17037b5a3f1c8",
+   "png_before_jpeg": {
+    "sha256": "cb6f9568c19979c6be735f8b5252c542fa342c084bae77994126770259876414",
+    "bytes": 945229,
+    "size_px": [
+     1000,
+     1000
+    ]
+   }
+  },
+  "wire_front": {
+   "file": "wire_front.jpg",
+   "size_px": [
+    1000,
+    1000
+   ],
+   "bytes": 63765,
+   "sha256": "7115a90f7a9c240f8e247febe5226d30e4ec9d750ee1b2c5a143266a456bb317",
+   "png_before_jpeg": {
+    "sha256": "bc80a79a62977d6278bf57f913f2edcb3a66547c7fd1c4864a8c84f4b192107d",
+    "bytes": 898728,
+    "size_px": [
+     1000,
+     1000
+    ]
+   }
+  },
+  "poses_sheet": {
+   "file": "poses_sheet.jpg",
+   "size_px": [
+    1200,
+    600
+   ],
+   "bytes": 57025,
+   "sha256": "c08c68f9d3b8faf69d616aad931b84771b668a795ac82da069b6a449d4f93c97"
+  },
+  "mannequin-blend-sheet": {
+   "file": "mannequin-blend-sheet.jpg",
+   "size_px": [
+    1200,
+    600
+   ],
+   "bytes": 72837,
+   "sha256": "5ee9c8c2800daf5acc964df0e3798c7943a188565e2a199fd3c27e5f1c96582b",
+   "png_before_jpeg": {
+    "sha256": "3c315293c55bd9f89f559b444b842f1ece9a1180b7b021f3ece98c39917862bf",
+    "bytes": 489958,
+    "size_px": [
+     2400,
+     1200
+    ]
+   }
+  },
+  "mannequin-fbx-sheet": {
+   "file": "mannequin-fbx-sheet.jpg",
+   "size_px": [
+    1200,
+    600
+   ],
+   "bytes": 72805,
+   "sha256": "226f93f662344dec9064f4a4bb899c24126361e472fee04979ba1ca0dd2de20b",
+   "png_before_jpeg": {
+    "sha256": "ac21310a9fa858650a2976468599b2851166de533ebab42ca933680e87ed74f7",
+    "bytes": 479256,
+    "size_px": [
+     2400,
+     1200
+    ]
+   }
+  }
+ }
+}

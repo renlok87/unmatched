@@ -1,0 +1,1445 @@
+{
+ "schema": "unmatched.decor-facades.trace/1",
+ "status": "measured",
+ "script": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/facades_trace.py",
+ "script_sha256_lf": "70348266af62e110b5e6f6ab62aee2e8f96efd0650d110ce57ba57867468870f",
+ "params": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/facades_params.json",
+ "params_sha256_lf": "23518d3ecadcc047af6c65bf67dba1f78bcf17abf3b1d67fe64cb0874d7a5bda",
+ "atlas_px": 1024,
+ "density_px_per_uu": 2.5,
+ "back_side_density_px_per_uu": 0.625,
+ "thickness_uu": 8.0,
+ "facades": [
+  {
+   "key": "A",
+   "asset_name": "SM_Decor_FacadeA",
+   "source": "art/imagegen/mvp-v1/environment/ref-facade-a.png",
+   "source_sha256": "2454c4fea890bc3e55d3983b7aa8e4d68ee9e0983250e3dec921fbd37964b5ef",
+   "segments": [
+    {
+     "x0": 36,
+     "x1": 212,
+     "y0": 24,
+     "base_y": 448,
+     "mirror": false
+    },
+    {
+     "x0": 212,
+     "x1": 500,
+     "y0": 24,
+     "base_y": 448,
+     "mirror": false
+    },
+    {
+     "x0": 212,
+     "x1": 500,
+     "y0": 24,
+     "base_y": 448,
+     "mirror": true
+    },
+    {
+     "x0": 212,
+     "x1": 500,
+     "y0": 24,
+     "base_y": 448,
+     "mirror": false
+    },
+    {
+     "x0": 212,
+     "x1": 500,
+     "y0": 24,
+     "base_y": 448,
+     "mirror": true
+    },
+    {
+     "x0": 36,
+     "x1": 212,
+     "y0": 24,
+     "base_y": 448,
+     "mirror": true
+    }
+   ],
+   "segments_trimmed_to_object": [
+    {
+     "offset": 0,
+     "x0": 36,
+     "x1": 212,
+     "mirror": false,
+     "base_y": 448
+    },
+    {
+     "offset": 176,
+     "x0": 212,
+     "x1": 500,
+     "mirror": false,
+     "base_y": 448
+    },
+    {
+     "offset": 464,
+     "x0": 212,
+     "x1": 500,
+     "mirror": true,
+     "base_y": 448
+    },
+    {
+     "offset": 752,
+     "x0": 212,
+     "x1": 500,
+     "mirror": false,
+     "base_y": 448
+    },
+    {
+     "offset": 1040,
+     "x0": 212,
+     "x1": 500,
+     "mirror": true,
+     "base_y": 448
+    },
+    {
+     "offset": 1328,
+     "x0": 36,
+     "x1": 212,
+     "mirror": true,
+     "base_y": 448
+    }
+   ],
+   "seam_columns": [
+    176,
+    464,
+    752,
+    1040,
+    1328
+   ],
+   "composition_note": "Gothic arcade. Source front view has 2 bays; 5 bays are built by chaining P=[40,212) (left pillar + left half of door 1), S=[212,500) (right half of door 1 + middle pillar + left half of door 2) and mirrored copies. Every seam is at a door centre and is either the original continuity or a mirror seam, so no texture discontinuity is introduced; doors 2..5 are symmetric by construction.",
+   "background_model": {
+    "bg_candidate_fraction": 0.5191,
+    "bg_residual_p50_p99_on_candidates": [
+     1.3,
+     4.97
+    ],
+    "local_std_p50_p99_on_candidates": [
+     0.8,
+     2.38
+    ]
+   },
+   "mask_components": {
+    "components": 1,
+    "dropped_component_pixels": [],
+    "dropped_total_px": 0
+   },
+   "composite_px": [
+    1504,
+    424
+   ],
+   "silhouette_cols": [
+    2,
+    1502
+   ],
+   "columns_with_several_runs_filled": 42,
+   "top_profile_columns_raised_by_closing": 366,
+   "uu_per_px": 0.263158,
+   "length_uu": 394.737,
+   "height_uu": 110.0,
+   "polygon_vertices": 90,
+   "polygon_uu": [
+    [
+     197.3684,
+     0.0
+    ],
+    [
+     197.3684,
+     13.6842
+    ],
+    [
+     195.0,
+     15.2632
+    ],
+    [
+     193.9474,
+     101.5789
+    ],
+    [
+     192.6316,
+     104.2105
+    ],
+    [
+     186.0526,
+     109.4737
+    ],
+    [
+     176.0526,
+     109.2105
+    ],
+    [
+     174.4737,
+     106.5789
+    ],
+    [
+     174.4737,
+     100.0
+    ],
+    [
+     165.7895,
+     100.0
+    ],
+    [
+     163.4211,
+     97.8947
+    ],
+    [
+     154.7368,
+     96.8421
+    ],
+    [
+     153.4211,
+     95.5263
+    ],
+    [
+     153.4211,
+     89.2105
+    ],
+    [
+     149.7368,
+     89.2105
+    ],
+    [
+     148.4211,
+     87.1053
+    ],
+    [
+     139.4737,
+     87.3684
+    ],
+    [
+     135.0,
+     85.5263
+    ],
+    [
+     131.0526,
+     86.8421
+    ],
+    [
+     126.3158,
+     85.7895
+    ],
+    [
+     123.9474,
+     87.8947
+    ],
+    [
+     111.3158,
+     87.6316
+    ],
+    [
+     108.6842,
+     86.8421
+    ],
+    [
+     105.7895,
+     83.1579
+    ],
+    [
+     100.5263,
+     81.8421
+    ],
+    [
+     93.4211,
+     82.6316
+    ],
+    [
+     91.0526,
+     84.7368
+    ],
+    [
+     84.4737,
+     84.7368
+    ],
+    [
+     81.8421,
+     90.0
+    ],
+    [
+     75.5263,
+     94.4737
+    ],
+    [
+     69.7368,
+     90.0
+    ],
+    [
+     67.1053,
+     84.7368
+    ],
+    [
+     60.5263,
+     84.7368
+    ],
+    [
+     58.1579,
+     82.6316
+    ],
+    [
+     53.6842,
+     81.8421
+    ],
+    [
+     45.7895,
+     83.1579
+    ],
+    [
+     42.8947,
+     86.8421
+    ],
+    [
+     40.2632,
+     87.6316
+    ],
+    [
+     27.6316,
+     87.8947
+    ],
+    [
+     25.2632,
+     85.7895
+    ],
+    [
+     20.5263,
+     86.8421
+    ],
+    [
+     14.4737,
+     85.5263
+    ],
+    [
+     12.1053,
+     87.3684
+    ],
+    [
+     3.1579,
+     87.1053
+    ],
+    [
+     1.8421,
+     89.2105
+    ],
+    [
+     -0.2632,
+     89.4737
+    ],
+    [
+     -3.1579,
+     87.1053
+    ],
+    [
+     -12.1053,
+     87.3684
+    ],
+    [
+     -14.4737,
+     85.5263
+    ],
+    [
+     -20.5263,
+     86.8421
+    ],
+    [
+     -25.2632,
+     85.7895
+    ],
+    [
+     -27.6316,
+     87.8947
+    ],
+    [
+     -40.2632,
+     87.6316
+    ],
+    [
+     -42.8947,
+     86.8421
+    ],
+    [
+     -45.7895,
+     83.1579
+    ],
+    [
+     -53.6842,
+     81.8421
+    ],
+    [
+     -58.1579,
+     82.6316
+    ],
+    [
+     -60.5263,
+     84.7368
+    ],
+    [
+     -67.1053,
+     84.7368
+    ],
+    [
+     -69.7368,
+     90.0
+    ],
+    [
+     -76.0526,
+     94.4737
+    ],
+    [
+     -81.8421,
+     90.0
+    ],
+    [
+     -84.4737,
+     84.7368
+    ],
+    [
+     -91.0526,
+     84.7368
+    ],
+    [
+     -93.4211,
+     82.6316
+    ],
+    [
+     -100.5263,
+     81.8421
+    ],
+    [
+     -105.7895,
+     83.1579
+    ],
+    [
+     -108.6842,
+     86.8421
+    ],
+    [
+     -111.3158,
+     87.6316
+    ],
+    [
+     -123.9474,
+     87.8947
+    ],
+    [
+     -126.3158,
+     85.7895
+    ],
+    [
+     -131.0526,
+     86.8421
+    ],
+    [
+     -135.0,
+     85.5263
+    ],
+    [
+     -139.4737,
+     87.3684
+    ],
+    [
+     -148.4211,
+     87.1053
+    ],
+    [
+     -149.7368,
+     89.2105
+    ],
+    [
+     -153.4211,
+     89.2105
+    ],
+    [
+     -153.4211,
+     95.5263
+    ],
+    [
+     -154.7368,
+     96.8421
+    ],
+    [
+     -163.4211,
+     97.8947
+    ],
+    [
+     -165.7895,
+     100.0
+    ],
+    [
+     -174.4737,
+     100.0
+    ],
+    [
+     -175.2632,
+     108.4211
+    ],
+    [
+     -181.3158,
+     110.0
+    ],
+    [
+     -186.0526,
+     109.4737
+    ],
+    [
+     -193.1579,
+     103.6842
+    ],
+    [
+     -193.9474,
+     101.5789
+    ],
+    [
+     -195.0,
+     15.2632
+    ],
+    [
+     -197.3684,
+     13.6842
+    ],
+    [
+     -197.3684,
+     0.0
+    ]
+   ],
+   "perimeter_uu": 1068.015,
+   "polygon_area_uu2": 35068.59,
+   "polygon_vs_profile_mask_px": {
+    "profile_px": 506658,
+    "polygon_px": 506394,
+    "in_polygon_not_object": 844,
+    "object_not_in_polygon": 1108
+   },
+   "glow": [
+    {
+     "rect_uu_x0_z0_x1_z1": [
+      -76.9895,
+      11.5789,
+      -74.5895,
+      38.9474
+     ],
+     "why": "door 2 (symmetric double door at a mirror seam): leaves ajar, warm slit from threshold to the cross bar"
+    },
+    {
+     "rect_uu_x0_z0_x1_z1": [
+      74.5895,
+      11.5789,
+      76.9895,
+      38.9474
+     ],
+     "why": "door 4, same"
+    }
+   ]
+  },
+  {
+   "key": "B",
+   "asset_name": "SM_Decor_FacadeB",
+   "source": "art/imagegen/mvp-v1/environment/ref-facade-b.png",
+   "source_sha256": "c8e6279b2ca6c0de412b76d0f08b85906bf1c32d49aa18d37d7ca952a567b112",
+   "segments": [
+    {
+     "x0": 12,
+     "x1": 532,
+     "y0": 12,
+     "base_y": 427,
+     "mirror": false
+    },
+    {
+     "x0": 12,
+     "x1": 532,
+     "y0": 12,
+     "base_y": 427,
+     "mirror": true
+    }
+   ],
+   "segments_trimmed_to_object": [
+    {
+     "offset": 0,
+     "x0": 12,
+     "x1": 532,
+     "mirror": false,
+     "base_y": 427
+    },
+    {
+     "offset": 520,
+     "x0": 12,
+     "x1": 532,
+     "mirror": true,
+     "base_y": 427
+    }
+   ],
+   "seam_columns": [
+    520
+   ],
+   "composition_note": "Half-timbered gable with a ruined stepped stone end. Two houses: B + mirror(B) joined at the ruined end (mirror seam at x=530), giving a row of two gables with a collapsed party wall between them; the eaves overhang at both outer ends.",
+   "background_model": {
+    "bg_candidate_fraction": 0.4259,
+    "bg_residual_p50_p99_on_candidates": [
+     1.07,
+     5.43
+    ],
+    "local_std_p50_p99_on_candidates": [
+     0.6,
+     1.97
+    ]
+   },
+   "mask_components": {
+    "components": 1,
+    "dropped_component_pixels": [],
+    "dropped_total_px": 0
+   },
+   "composite_px": [
+    1040,
+    415
+   ],
+   "silhouette_cols": [
+    2,
+    1038
+   ],
+   "columns_with_several_runs_filled": 68,
+   "top_profile_columns_raised_by_closing": 118,
+   "uu_per_px": 0.294118,
+   "length_uu": 304.706,
+   "height_uu": 120.0,
+   "polygon_vertices": 56,
+   "polygon_uu": [
+    [
+     -151.1765,
+     81.1765
+    ],
+    [
+     -149.1176,
+     81.1765
+    ],
+    [
+     -149.1176,
+     0.0
+    ],
+    [
+     149.1176,
+     0.0
+    ],
+    [
+     149.1176,
+     81.1765
+    ],
+    [
+     151.1765,
+     81.1765
+    ],
+    [
+     152.3529,
+     85.5882
+    ],
+    [
+     152.3529,
+     88.5294
+    ],
+    [
+     141.7647,
+     92.0588
+    ],
+    [
+     103.5294,
+     110.2941
+    ],
+    [
+     79.4118,
+     120.0
+    ],
+    [
+     77.9412,
+     118.2353
+    ],
+    [
+     77.9412,
+     109.7059
+    ],
+    [
+     70.8824,
+     109.4118
+    ],
+    [
+     69.7059,
+     103.8235
+    ],
+    [
+     62.0588,
+     102.6471
+    ],
+    [
+     61.1765,
+     97.3529
+    ],
+    [
+     50.5882,
+     97.9412
+    ],
+    [
+     49.1176,
+     96.7647
+    ],
+    [
+     48.8235,
+     92.3529
+    ],
+    [
+     38.8235,
+     91.7647
+    ],
+    [
+     37.0588,
+     82.0588
+    ],
+    [
+     34.7059,
+     79.7059
+    ],
+    [
+     24.4118,
+     79.1176
+    ],
+    [
+     22.6471,
+     85.8824
+    ],
+    [
+     16.1765,
+     85.8824
+    ],
+    [
+     14.1176,
+     80.2941
+    ],
+    [
+     7.9412,
+     78.8235
+    ],
+    [
+     6.7647,
+     72.6471
+    ],
+    [
+     4.1176,
+     71.1765
+    ],
+    [
+     4.1176,
+     67.6471
+    ],
+    [
+     -1.1765,
+     66.4706
+    ],
+    [
+     -4.1176,
+     67.6471
+    ],
+    [
+     -4.1176,
+     71.1765
+    ],
+    [
+     -6.7647,
+     72.6471
+    ],
+    [
+     -7.9412,
+     78.8235
+    ],
+    [
+     -14.1176,
+     80.2941
+    ],
+    [
+     -16.1765,
+     85.8824
+    ],
+    [
+     -22.6471,
+     85.8824
+    ],
+    [
+     -24.4118,
+     79.1176
+    ],
+    [
+     -32.6471,
+     78.8235
+    ],
+    [
+     -37.0588,
+     82.0588
+    ],
+    [
+     -38.8235,
+     91.7647
+    ],
+    [
+     -48.8235,
+     92.3529
+    ],
+    [
+     -49.1176,
+     96.7647
+    ],
+    [
+     -50.5882,
+     97.9412
+    ],
+    [
+     -61.1765,
+     97.3529
+    ],
+    [
+     -62.9412,
+     103.5294
+    ],
+    [
+     -70.0,
+     104.1176
+    ],
+    [
+     -70.8824,
+     109.4118
+    ],
+    [
+     -77.9412,
+     109.7059
+    ],
+    [
+     -77.9412,
+     118.2353
+    ],
+    [
+     -80.2941,
+     120.0
+    ],
+    [
+     -141.7647,
+     92.0588
+    ],
+    [
+     -152.3529,
+     88.5294
+    ],
+    [
+     -152.3529,
+     85.5882
+    ]
+   ],
+   "perimeter_uu": 898.787,
+   "polygon_area_uu2": 28963.92,
+   "polygon_vs_profile_mask_px": {
+    "profile_px": 335104,
+    "polygon_px": 334978,
+    "in_polygon_not_object": 675,
+    "object_not_in_polygon": 801
+   },
+   "glow": [
+    {
+     "rect_uu_x0_z0_x1_z1": [
+      -85.6118,
+      34.7059,
+      -83.2118,
+      67.0588
+     ],
+     "why": "gap between the two shutter leaves (shutters ajar), warm light from inside"
+    },
+    {
+     "rect_uu_x0_z0_x1_z1": [
+      83.2118,
+      34.7059,
+      85.6118,
+      67.0588
+     ],
+     "why": "same window in the mirrored house"
+    }
+   ]
+  },
+  {
+   "key": "C",
+   "asset_name": "SM_Decor_FacadeC",
+   "source": "art/imagegen/mvp-v1/environment/ref-facade-c.png",
+   "source_sha256": "004562349398af166c317ed9145fa456376d07561f5d489f684b7311985611be",
+   "segments": [
+    {
+     "x0": 40,
+     "x1": 610,
+     "y0": 30,
+     "base_y": 430,
+     "mirror": false,
+     "trim": [
+      "right"
+     ]
+    },
+    {
+     "x0": 896,
+     "x1": 1496,
+     "y0": 30,
+     "base_y": 431,
+     "mirror": true,
+     "trim": [
+      "left"
+     ]
+    }
+   ],
+   "segments_trimmed_to_object": [
+    {
+     "offset": 0,
+     "x0": 40,
+     "x1": 600,
+     "mirror": false,
+     "base_y": 430
+    },
+    {
+     "offset": 560,
+     "x0": 896,
+     "x1": 1477,
+     "mirror": true,
+     "base_y": 431
+    }
+   ],
+   "seam_columns": [
+    560
+   ],
+   "composition_note": "Stone ruin with a blind (stone-filled) arch and a pillar. Front view + mirrored back view of the same wall (top-right view of the collage: big blocks, pillar on its left) -> arch wall, pillar, high block wall stepping down, pillar. No opening in the concept, so no glow.",
+   "background_model": {
+    "bg_candidate_fraction": 0.5205,
+    "bg_residual_p50_p99_on_candidates": [
+     0.94,
+     4.96
+    ],
+    "local_std_p50_p99_on_candidates": [
+     0.5,
+     1.51
+    ]
+   },
+   "mask_components": {
+    "components": 1,
+    "dropped_component_pixels": [],
+    "dropped_total_px": 0
+   },
+   "composite_px": [
+    1141,
+    401
+   ],
+   "silhouette_cols": [
+    2,
+    1139
+   ],
+   "columns_with_several_runs_filled": 48,
+   "top_profile_columns_raised_by_closing": 191,
+   "uu_per_px": 0.269231,
+   "length_uu": 306.115,
+   "height_uu": 105.0,
+   "polygon_vertices": 67,
+   "polygon_uu": [
+    [
+     -152.7885,
+     0.0
+    ],
+    [
+     152.25,
+     0.0
+    ],
+    [
+     153.0577,
+     0.8077
+    ],
+    [
+     150.6346,
+     12.3846
+    ],
+    [
+     146.0577,
+     18.5769
+    ],
+    [
+     144.9808,
+     54.1154
+    ],
+    [
+     142.8269,
+     56.2692
+    ],
+    [
+     141.75,
+     60.5769
+    ],
+    [
+     137.1731,
+     62.1923
+    ],
+    [
+     130.7115,
+     62.1923
+    ],
+    [
+     129.3654,
+     64.0769
+    ],
+    [
+     125.8654,
+     65.1538
+    ],
+    [
+     117.5192,
+     65.4231
+    ],
+    [
+     113.4808,
+     63.5385
+    ],
+    [
+     111.5962,
+     65.1538
+    ],
+    [
+     101.3654,
+     64.8846
+    ],
+    [
+     85.4808,
+     67.8462
+    ],
+    [
+     85.4808,
+     69.7308
+    ],
+    [
+     83.3269,
+     71.6154
+    ],
+    [
+     82.25,
+     78.6154
+    ],
+    [
+     74.4423,
+     81.5769
+    ],
+    [
+     70.9423,
+     80.7692
+    ],
+    [
+     69.5962,
+     82.9231
+    ],
+    [
+     60.1731,
+     83.7308
+    ],
+    [
+     57.2115,
+     88.5769
+    ],
+    [
+     39.1731,
+     93.4231
+    ],
+    [
+     34.8654,
+     98.0
+    ],
+    [
+     30.8269,
+     97.4615
+    ],
+    [
+     29.4808,
+     102.3077
+    ],
+    [
+     26.5192,
+     105.0
+    ],
+    [
+     23.8269,
+     105.0
+    ],
+    [
+     19.5192,
+     101.5
+    ],
+    [
+     3.0962,
+     98.8077
+    ],
+    [
+     0.6731,
+     93.6923
+    ],
+    [
+     -2.8269,
+     92.8846
+    ],
+    [
+     -2.8269,
+     54.6538
+    ],
+    [
+     -5.25,
+     54.9231
+    ],
+    [
+     -6.8654,
+     59.7692
+    ],
+    [
+     -13.0577,
+     61.9231
+    ],
+    [
+     -20.0577,
+     61.6538
+    ],
+    [
+     -30.5577,
+     65.1538
+    ],
+    [
+     -36.2115,
+     63.5385
+    ],
+    [
+     -55.3269,
+     66.2308
+    ],
+    [
+     -60.9808,
+     69.7308
+    ],
+    [
+     -63.9423,
+     78.6154
+    ],
+    [
+     -71.2115,
+     81.5769
+    ],
+    [
+     -74.9808,
+     80.5
+    ],
+    [
+     -77.6731,
+     83.4615
+    ],
+    [
+     -86.5577,
+     83.7308
+    ],
+    [
+     -87.9038,
+     88.5769
+    ],
+    [
+     -104.0577,
+     92.8846
+    ],
+    [
+     -108.3654,
+     97.1923
+    ],
+    [
+     -111.5962,
+     98.2692
+    ],
+    [
+     -112.6731,
+     102.0385
+    ],
+    [
+     -116.1731,
+     102.0385
+    ],
+    [
+     -118.5962,
+     104.7308
+    ],
+    [
+     -123.9808,
+     104.4615
+    ],
+    [
+     -125.3269,
+     101.5
+    ],
+    [
+     -133.6731,
+     101.2308
+    ],
+    [
+     -134.75,
+     98.8077
+    ],
+    [
+     -141.4808,
+     99.0769
+    ],
+    [
+     -145.7885,
+     93.1538
+    ],
+    [
+     -148.75,
+     92.6154
+    ],
+    [
+     -149.2885,
+     89.6538
+    ],
+    [
+     -149.2885,
+     14.5385
+    ],
+    [
+     -153.0577,
+     9.6923
+    ],
+    [
+     -153.0577,
+     0.8077
+    ]
+   ],
+   "perimeter_uu": 850.651,
+   "polygon_area_uu2": 23949.62,
+   "polygon_vs_profile_mask_px": {
+    "profile_px": 330378,
+    "polygon_px": 330451,
+    "in_polygon_not_object": 738,
+    "object_not_in_polygon": 665
+   },
+   "glow": []
+  }
+ ],
+ "textures": {
+  "BC": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/textures/T_Decor_Facades_BC.png",
+   "sha256": "00cc76dd15f02bf4e5c6ca6dd230258dfa85aff4b8e637940942489336661d24",
+   "bytes": 1182086,
+   "size_px": [
+    1024,
+    1024
+   ],
+   "colour_space": "sRGB"
+  },
+  "N": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/textures/T_Decor_Facades_N.png",
+   "sha256": "d687d21a2890b3121bf4c31eeb13d21bca84c78b96fbede3356cef891d94c1ed",
+   "bytes": 1161459,
+   "size_px": [
+    1024,
+    1024
+   ],
+   "colour_space": "Linear (no sRGB/gAMA/cHRM chunk)",
+   "convention": "tangent space, DirectX (green = -Y), height ~ luminance high-pass"
+  },
+  "ORM": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/textures/T_Decor_Facades_ORM.png",
+   "sha256": "5e60660117669153145eb2d2b5433d49c9513c387102b6c295c1ebd9cd79ba7b",
+   "bytes": 18433,
+   "size_px": [
+    1024,
+    1024
+   ],
+   "colour_space": "Linear (no sRGB/gAMA/cHRM chunk)",
+   "channels": "R = AO 1.0 (concept render already contains its shading; not baked twice), G = roughness (stone 0.90 / wood 0.80 / glow 0.50 / back+sides 0.95), B = metallic 0"
+  }
+ },
+ "texture_measurements": {
+  "A": {
+   "front_rect_px": [
+    8,
+    8,
+    987,
+    275
+   ],
+   "back_rect_px": [
+    8,
+    869,
+    249,
+    71
+   ],
+   "side_rect_px": [
+    8,
+    946,
+    670,
+    7
+   ],
+   "front_object_texels": 219248,
+   "glow_texels": 1296,
+   "wood_texels_fraction": 0.0067,
+   "bc_front_median_srgb": [
+    65,
+    64,
+    64
+   ],
+   "bc_front_mean_linear_luminance": 0.0679,
+   "back_side_srgb": [
+    48,
+    48,
+    48
+   ],
+   "normal_gain": 0.3287,
+   "normal_tilt_deg_p50_p95_max_in_mask": [
+    5.51,
+    25.0,
+    51.23
+   ]
+  },
+  "B": {
+   "front_rect_px": [
+    8,
+    291,
+    762,
+    300
+   ],
+   "back_rect_px": [
+    781,
+    291,
+    193,
+    77
+   ],
+   "side_rect_px": [
+    8,
+    959,
+    564,
+    7
+   ],
+   "front_object_texels": 181282,
+   "glow_texels": 1512,
+   "wood_texels_fraction": 0.1059,
+   "bc_front_median_srgb": [
+    83,
+    78,
+    74
+   ],
+   "bc_front_mean_linear_luminance": 0.1129,
+   "back_side_srgb": [
+    62,
+    58,
+    55
+   ],
+   "normal_gain": 0.3741,
+   "normal_tilt_deg_p50_p95_max_in_mask": [
+    7.01,
+    25.0,
+    50.42
+   ]
+  },
+  "C": {
+   "front_rect_px": [
+    8,
+    599,
+    765,
+    262
+   ],
+   "back_rect_px": [
+    263,
+    869,
+    194,
+    68
+   ],
+   "side_rect_px": [
+    463,
+    869,
+    534,
+    7
+   ],
+   "front_object_texels": 149489,
+   "glow_texels": 0,
+   "wood_texels_fraction": 0.0002,
+   "bc_front_median_srgb": [
+    84,
+    84,
+    86
+   ],
+   "bc_front_mean_linear_luminance": 0.1014,
+   "back_side_srgb": [
+    63,
+    63,
+    64
+   ],
+   "normal_gain": 0.3277,
+   "normal_tilt_deg_p50_p95_max_in_mask": [
+    4.98,
+    25.0,
+    51.43
+   ]
+  }
+ },
+ "atlas_rects_px_x_y_w_h_top_left_origin": {
+  "front_A": [
+   8,
+   8,
+   987,
+   275
+  ],
+  "front_B": [
+   8,
+   291,
+   762,
+   300
+  ],
+  "front_C": [
+   8,
+   599,
+   765,
+   262
+  ],
+  "back_A": [
+   8,
+   869,
+   249,
+   71
+  ],
+  "side_A": [
+   8,
+   946,
+   670,
+   7
+  ],
+  "back_B": [
+   781,
+   291,
+   193,
+   77
+  ],
+  "side_B": [
+   8,
+   959,
+   564,
+   7
+  ],
+  "back_C": [
+   263,
+   869,
+   194,
+   68
+  ],
+  "side_C": [
+   463,
+   869,
+   534,
+   7
+  ]
+ },
+ "atlas_free_rects": [
+  [
+   781,
+   291,
+   1016,
+   861
+  ],
+  [
+   8,
+   869,
+   1016,
+   1016
+  ]
+ ]
+}

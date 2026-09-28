@@ -1,0 +1,1341 @@
+{
+ "schema": "um-asset-report/1",
+ "task": "MVP props/environment via the pipeline: ASSET-PLACEHOLDER-MANNEQUIN, Blender stage (no Tripo stage)",
+ "date": "2026-09-28",
+ "asset_id": "ASSET-PLACEHOLDER-MANNEQUIN",
+ "status": "измерено",
+ "status_scale": "предложено / измерено / технически импортировано / художественно принято",
+ "not_claimed": [
+  "UE import (technically imported)",
+  "art acceptance",
+  "QA-012 in the game: fallback wiring + Warning log (GD-053)",
+  "clips on the SK variant, shared UE Skeleton",
+  "final size (Q-312 / GD-058)",
+  "choice static vs skeletal",
+  "K-1/K-2 in the game light / packaged"
+ ],
+ "external_cost": {
+  "tripo_credits": 0,
+  "syntx": 0,
+  "purchases": 0,
+  "credits_ledger_changed": false,
+  "note": "parametric asset (04 §3.10, registry: «Tripo не нужен»)"
+ },
+ "inputs": {
+  "card": "docs/game-design/04-blender-production.md §3.10",
+  "registry_entry": "docs/art-pipeline/asset-registry.json ASSET-PLACEHOLDER-MANNEQUIN (read only)",
+  "reference_image": {
+   "path": "art/imagegen/mvp-v1/characters/ref-placeholder-mannequin.png",
+   "sha256": "f446c993e913df457621878f0afb615f624e86f9190e9f9442e217351b7f853a",
+   "role": "shape reference only: segmented grey figure, blank oval head, fists at the hips, dark round base with a light side band"
+  },
+  "rig_contract": {
+   "path": "docs/art-pipeline/rig/rig-contract.json",
+   "sha256_lf": "67a94bb2fedc6aa5d974f0c36c7122e81571ba8aa4b79359e3fddcbd141e7736"
+  },
+  "fbx_preset": {
+   "path": "blender/_tools/presets/UM_FBX_v1.json",
+   "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+   "name": "UM_FBX_v1",
+   "version": "1.0.0"
+  },
+  "uv_helpers": {
+   "path": "tools/tripo-pipeline/blender/static_prop_candidate.py",
+   "sha256_lf": "6f703427539511afe37740035e55db1bcddbbb92bd2092bfedddc076b7b3d18b",
+   "functions": [
+    "r",
+    "raster_triangles",
+    "island_centre_distances",
+    "uv_raster_metrics",
+    "uv_analysis",
+    "PNG_COLOR_CHUNKS",
+    "png_chunks",
+    "strip_png_color_chunks",
+    "save_png",
+    "uv_layout_png",
+    "make_fbx_deterministic",
+    "patch_fbx_units"
+   ]
+  },
+  "qa": "docs/game-design/10-acceptance-tests.md QA-012 (not a row of 14-sprint-backlog.csv; game check = GD-053 planned)"
+ },
+ "decisions_proposed": {
+  "variants": "static SM_PlaceholderMannequin (04 card) + skeletal SK_PlaceholderMannequin + SM_PlaceholderMannequin_Base (task: UM_HUMANOID_17_v1) from one geometry",
+  "height": "50 uu base bottom -> head top (ART-001 test figure 50 ±2, heroes 45-55); «48 uu + голова» open (17 line 2162)",
+  "base": "Ø24 x 4 uu; UM_Mask.R on the side band 0.9-2.9 uu and the top chamfer 3.3-4.0 uu (Ø24 -> Ø21.2)",
+  "weapon_bone_parent": "hand.L (rig-contract.json default); Arthur/Merlin hand.R — RIG-CONTRACT §11 q.2",
+  "textures": "none (04 §3.10); UV0 kept for M_DioramaMaster / AO",
+  "collision": "UCP capsule R 12.5 uu, -9..50 uu (static); SK: Physics Asset / actor capsule"
+ },
+ "run": {
+  "dir": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1",
+  "profile": {
+   "path": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/build-profiles/mannequin-parametric-um-fbx-v1.json",
+   "sha256_lf": "054e8efc56d6854f9c41f79cac513aca711468a436355819ac50ee4b1f048512",
+   "id": "mannequin-parametric-um-fbx-v1"
+  },
+  "builder": {
+   "path": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/scripts/build_mannequin.py",
+   "sha256_lf": "65f49af8296d36a9ee342ba3ecaeef25482808b2b9149d0f59d64f929e9de1df"
+  },
+  "runner": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/scripts/run_mannequin.sh",
+  "blender": "5.2.2 LTS",
+  "determinism": "second build: the three FBX byte-identical (logs/determinism.txt)",
+  "blend": {
+   "path": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/work/mannequin.blend",
+   "sha256": "d69c21cca40d7872a38d2b5055d21387b0b74484472c15a20a16f3d2ffbeb363",
+   "bytes": 962356,
+   "git": "ignored (art/pipeline-candidates/.gitignore */*/work/); rebuilt by run_mannequin.sh"
+  }
+ },
+ "result": {
+  "triangles": {
+   "figure": 1256,
+   "base": 384,
+   "static_total": 1640,
+   "collision_ucp": 256,
+   "base_faces_by_role": {
+    "bottom": 32,
+    "top": 32,
+    "bevel": 64,
+    "side": 128,
+    "team_band": 64,
+    "team_chamfer": 64
+   }
+  },
+  "parts": [
+   {
+    "name": "Head",
+    "bone": "head",
+    "kind": "ellipsoid",
+    "shading": "smooth",
+    "faces": 96,
+    "triangles": 168
+   },
+   {
+    "name": "Torso",
+    "bone": "spine",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 56,
+    "triangles": 96
+   },
+   {
+    "name": "Pelvis",
+    "bone": "hips",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 40,
+    "triangles": 64
+   },
+   {
+    "name": "ArmUpper_L",
+    "bone": "arm_upper.L",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 56,
+    "triangles": 96
+   },
+   {
+    "name": "ArmUpper_R",
+    "bone": "arm_upper.R",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 56,
+    "triangles": 96
+   },
+   {
+    "name": "ArmLower_L",
+    "bone": "arm_lower.L",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 48,
+    "triangles": 80
+   },
+   {
+    "name": "ArmLower_R",
+    "bone": "arm_lower.R",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 48,
+    "triangles": 80
+   },
+   {
+    "name": "Hand_L",
+    "bone": "hand.L",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 40,
+    "triangles": 64
+   },
+   {
+    "name": "Hand_R",
+    "bone": "hand.R",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 40,
+    "triangles": 64
+   },
+   {
+    "name": "LegUpper_L",
+    "bone": "leg_upper.L",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 48,
+    "triangles": 80
+   },
+   {
+    "name": "LegUpper_R",
+    "bone": "leg_upper.R",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 48,
+    "triangles": 80
+   },
+   {
+    "name": "LegLower_L",
+    "bone": "leg_lower.L",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 48,
+    "triangles": 80
+   },
+   {
+    "name": "LegLower_R",
+    "bone": "leg_lower.R",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 48,
+    "triangles": 80
+   },
+   {
+    "name": "Foot_L",
+    "bone": "foot.L",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 40,
+    "triangles": 64
+   },
+   {
+    "name": "Foot_R",
+    "bone": "foot.R",
+    "kind": "loft",
+    "shading": "flat",
+    "faces": 40,
+    "triangles": 64
+   }
+  ],
+  "dimensions_uu": {
+   "static": [
+    24.0,
+    24.0,
+    50.0
+   ],
+   "figure": [
+    19.061,
+    7.881,
+    46.097
+   ],
+   "base": [
+    24.0,
+    24.0,
+    4.0
+   ]
+  },
+  "bounds_m": {
+   "static": {
+    "min": [
+     -0.12,
+     -0.12,
+     0.0
+    ],
+    "max": [
+     0.12,
+     0.12,
+     0.5
+    ]
+   },
+   "figure": {
+    "min": [
+     -0.095306,
+     -0.045,
+     0.039033
+    ],
+    "max": [
+     0.095306,
+     0.033807,
+     0.5
+    ]
+   },
+   "base": {
+    "min": [
+     -0.12,
+     -0.12,
+     0.0
+    ],
+    "max": [
+     0.12,
+     0.12,
+     0.04
+    ]
+   }
+  },
+  "proportions": {
+   "figure_height_m": 0.460967,
+   "head_height_m": 0.088,
+   "heads_per_figure": 5.24,
+   "03_C1": "5-6 heads (stylised)"
+  },
+  "exports": {
+   "skeletal": {
+    "file": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/export/SK_PlaceholderMannequin.fbx",
+    "bytes": 97420,
+    "sha256": "ed0ac3db29fdf6e8999134da10740ef235b1566a104b67cb128f92f0f0b72ad4",
+    "objects": [
+     "SKEL_UM_Humanoid",
+     "SK_PlaceholderMannequin"
+    ]
+   },
+   "skeletal_base": {
+    "file": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/export/SM_PlaceholderMannequin_Base.fbx",
+    "bytes": 26220,
+    "sha256": "46809f02fb981b81c5c04235b6e814394fc13285d11ab0f9e899bc40f648a006",
+    "objects": [
+     "SM_PlaceholderMannequin_Base"
+    ]
+   },
+   "static": {
+    "file": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/export/SM_PlaceholderMannequin.fbx",
+    "bytes": 81244,
+    "sha256": "062f3d852770c2cdcefe57f4ede0f6d901c799e5f7cf37547cdbeb0941275475",
+    "objects": [
+     "SM_PlaceholderMannequin",
+     "UCP_SM_PlaceholderMannequin_00"
+    ]
+   }
+  },
+  "export_settings": {
+   "use_selection": true,
+   "apply_unit_scale": true,
+   "apply_scale_options": "FBX_SCALE_UNITS",
+   "bake_space_transform": false,
+   "axis_forward": "-Y",
+   "axis_up": "Z",
+   "use_triangles": true,
+   "mesh_smooth_type": "FACE",
+   "use_mesh_edges": false,
+   "use_custom_props": false,
+   "add_leaf_bones": false,
+   "primary_bone_axis": "Y",
+   "secondary_bone_axis": "X",
+   "bake_anim": false,
+   "path_mode": "AUTO",
+   "embed_textures": false,
+   "colors_type": "SRGB",
+   "object_types": "ARMATURE+MESH for SK, MESH for the base and the static mesh"
+  },
+  "export_deviations": {
+   "bake_anim": "False: skeletal mesh only, no clips in this stage (04 §1.1 bakes clips)",
+   "colors_type": "SRGB passed explicitly (Blender default); UM_Mask values are 0/1"
+  },
+  "materials": {
+   "figure_slots": [
+    "M_PlaceholderMannequin"
+   ],
+   "base_slots": [
+    "M_PlaceholderMannequin_Base"
+   ],
+   "static_slots": [
+    "M_PlaceholderMannequin",
+    "M_PlaceholderMannequin_Base"
+   ],
+   "figure_base_color_linear": [
+    0.3916,
+    0.3916,
+    0.3916
+   ],
+   "figure_base_color_srgb": "#A8A8A8",
+   "base_rule": "BaseColor = lerp(base_color, TeamColor, UM_Mask.R)",
+   "textures": "none (04 §3.10)"
+  },
+  "mask": {
+   "figure": {
+    "domain": "CORNER",
+    "type": "BYTE_COLOR",
+    "binary": true,
+    "corners_R1": 0,
+    "corners_G1": 0,
+    "corners_B1": 0,
+    "corners_A1": 3768,
+    "corners": 3768
+   },
+   "base": {
+    "domain": "CORNER",
+    "type": "BYTE_COLOR",
+    "binary": true,
+    "corners_R1": 384,
+    "corners_G1": 0,
+    "corners_B1": 0,
+    "corners_A1": 1152,
+    "corners": 1152
+   },
+   "static": {
+    "domain": "CORNER",
+    "type": "BYTE_COLOR",
+    "binary": true,
+    "corners_R1": 384,
+    "corners_G1": 0,
+    "corners_B1": 0,
+    "corners_A1": 4920,
+    "corners": 4920
+   },
+   "team_z_ranges_uu": [
+    [
+     0.9,
+     2.9
+    ],
+    [
+     3.3,
+     4.0
+    ]
+   ],
+   "team_faces": 128
+  },
+  "shading": {
+   "figure_flat_faces": 1088,
+   "figure_smooth_faces": 168,
+   "base_smooth_faces": 256,
+   "rule": "faceted lofts flat (reference look), head and the base side smooth; sharp edges where a flat face meets another face; FBX mesh_smooth_type FACE"
+  },
+  "topology": {
+   "figure": {
+    "shells": 15,
+    "boundary_edges": 0,
+    "non_manifold_edges": 0,
+    "degenerate_faces_area_lt_1e-10_m2": 0,
+    "faces_with_inconsistent_winding": 0,
+    "shell_signed_volumes_m3_min": 1.8262e-05,
+    "shells_with_non_positive_volume": 0,
+    "total_volume_m3": 0.001574688
+   },
+   "base": {
+    "shells": 1,
+    "boundary_edges": 0,
+    "non_manifold_edges": 0,
+    "degenerate_faces_area_lt_1e-10_m2": 0,
+    "faces_with_inconsistent_winding": 0,
+    "shell_signed_volumes_m3_min": 0.001760437,
+    "shells_with_non_positive_volume": 0,
+    "total_volume_m3": 0.001760437
+   },
+   "static": {
+    "shells": 16,
+    "boundary_edges": 0,
+    "non_manifold_edges": 0,
+    "degenerate_faces_area_lt_1e-10_m2": 0,
+    "faces_with_inconsistent_winding": 0,
+    "shell_signed_volumes_m3_min": 1.8262e-05,
+    "shells_with_non_positive_volume": 0,
+    "total_volume_m3": 0.003335124
+   },
+   "collision": {
+    "shells": 1,
+    "boundary_edges": 0,
+    "non_manifold_edges": 0,
+    "degenerate_faces_area_lt_1e-10_m2": 0,
+    "faces_with_inconsistent_winding": 0,
+    "shell_signed_volumes_m3_min": 0.023933179,
+    "shells_with_non_positive_volume": 0,
+    "total_volume_m3": 0.023933179
+   }
+  },
+  "uv": {
+   "figure": {
+    "islands": 95,
+    "uv_area_used_fraction": 0.3436,
+    "overlap_pixels_between_islands": 0,
+    "overlap_pixels_inside_islands_strict": 0,
+    "triangles_out_of_0_1": 0,
+    "flipped_uv_triangles_vs_island_majority": 0,
+    "min_gutter_px_estimate": 25,
+    "texel_density_px_per_m_at_raster": 1440.0,
+    "stretch_area_ratio_p05_p50_p95": [
+     0.8,
+     0.983,
+     1.203
+    ],
+    "stretch_anisotropy_sigma_max_over_min_p50_p95_max": [
+     1.224,
+     1.505,
+     2.144
+    ]
+   },
+   "base": {
+    "islands": 6,
+    "uv_area_used_fraction": 0.4804,
+    "overlap_pixels_between_islands": 0,
+    "overlap_pixels_inside_islands_strict": 0,
+    "triangles_out_of_0_1": 0,
+    "flipped_uv_triangles_vs_island_majority": 0,
+    "min_gutter_px_estimate": 7,
+    "texel_density_px_per_m_at_raster": 2094.3,
+    "stretch_area_ratio_p05_p50_p95": [
+     0.863,
+     1.038,
+     1.038
+    ],
+    "stretch_anisotropy_sigma_max_over_min_p50_p95_max": [
+     1.0,
+     1.203,
+     1.697
+    ]
+   }
+  },
+  "armature": {
+   "object": "SKEL_UM_Humanoid",
+   "bones": 17,
+   "weapon_parent": "hand.L",
+   "heads_m": {
+    "root": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "hips": [
+     0.0,
+     0.0,
+     0.245
+    ],
+    "spine": [
+     0.0,
+     0.0,
+     0.3
+    ],
+    "head": [
+     0.0,
+     0.0,
+     0.41
+    ],
+    "arm_upper.L": [
+     0.06,
+     0.0,
+     0.388
+    ],
+    "arm_lower.L": [
+     0.074,
+     0.004,
+     0.292
+    ],
+    "hand.L": [
+     0.082,
+     -0.004,
+     0.205
+    ],
+    "weapon": [
+     0.085,
+     -0.01,
+     0.165
+    ],
+    "arm_upper.R": [
+     -0.06,
+     0.0,
+     0.388
+    ],
+    "arm_lower.R": [
+     -0.074,
+     0.004,
+     0.292
+    ],
+    "hand.R": [
+     -0.082,
+     -0.004,
+     0.205
+    ],
+    "leg_upper.L": [
+     0.024,
+     0.0,
+     0.245
+    ],
+    "leg_lower.L": [
+     0.026,
+     0.0,
+     0.145
+    ],
+    "foot.L": [
+     0.027,
+     0.002,
+     0.062
+    ],
+    "leg_upper.R": [
+     -0.024,
+     0.0,
+     0.245
+    ],
+    "leg_lower.R": [
+     -0.026,
+     0.0,
+     0.145
+    ],
+    "foot.R": [
+     -0.027,
+     0.002,
+     0.062
+    ]
+   }
+  },
+  "weights": {
+   "method": "rigid: every part 100 % on one bone (segmented artist mannequin); ball-like capsule ends are centred on the joints, so a rotation about the joint keeps the gap covered",
+   "max_influences": 1,
+   "unweighted_vertices": 0,
+   "vertex_share_by_bone": {
+    "arm_lower.L": 0.0638,
+    "arm_lower.R": 0.0638,
+    "arm_upper.L": 0.076,
+    "arm_upper.R": 0.076,
+    "foot.L": 0.0517,
+    "foot.R": 0.0517,
+    "hand.L": 0.0517,
+    "hand.R": 0.0517,
+    "head": 0.1307,
+    "hips": 0.0517,
+    "leg_lower.L": 0.0638,
+    "leg_lower.R": 0.0638,
+    "leg_upper.L": 0.0638,
+    "leg_upper.R": 0.0638,
+    "spine": 0.076
+   },
+   "unweighted_bones": [
+    "root",
+    "weapon"
+   ]
+  },
+  "collision": {
+   "object": "UCP_SM_PlaceholderMannequin_00",
+   "kind": "UCP capsule",
+   "radius_uu": 12.5,
+   "bounds_uu": {
+    "min": [
+     -12.5,
+     -12.5,
+     -9.0
+    ],
+    "max": [
+     12.5,
+     12.5,
+     50.0
+    ]
+   },
+   "max_vertex_outside_uu": 0.0,
+   "note": "Covers the base rim (0.12, 0, 0.04) and the top of the head (z 0.50); the lower hemisphere reaches z -0.09, under the board plane (selection only, 04 §1 «Коллизии»).",
+   "skeletal_note": "SK variant: selection collision comes from the UE Physics Asset or the actor capsule, not from the FBX (as for the hero candidates)"
+  }
+ },
+ "checks": {
+  "build": {
+   "passed": 33,
+   "total": 33,
+   "failed": [],
+   "names": [
+    "reference_image_sha256",
+    "scene_units_metric_1",
+    "object_transforms_identity",
+    "triangles_in_proposed_1k_3k",
+    "static_equals_figure_plus_base",
+    "total_height_50uu",
+    "pivot_base_bottom_centre",
+    "figure_inside_base_footprint_xy",
+    "feet_touch_base_top",
+    "heads_5_to_6",
+    "closed_outward_figure",
+    "closed_outward_base",
+    "closed_outward_static",
+    "closed_outward_collision",
+    "figure_shells_equal_parts",
+    "material_slots_le_3",
+    "static_slot_split",
+    "mask_binary_everywhere",
+    "mask_R_only_on_base_band",
+    "uv0_clean_figure",
+    "uv_gutter_ge_4px_figure",
+    "uv0_clean_base",
+    "uv_gutter_ge_4px_base",
+    "uv_same_on_static",
+    "armature_object_name",
+    "bones_match_contract",
+    "weights_rigid_normalised",
+    "weights_only_contract_bones",
+    "parts_on_their_bones",
+    "ucp_encloses_static_mesh",
+    "ucp_name_convention",
+    "fbx_written",
+    "unit_scale_factor_1"
+   ]
+  },
+  "fbx_readback": {
+   "passed": 19,
+   "total": 19,
+   "failed": [],
+   "names": [
+    "skeletal_objects",
+    "skeletal_SK_PlaceholderMannequin_matches_authored",
+    "skeletal_weights_roundtrip",
+    "skeletal_SK_PlaceholderMannequin_mask",
+    "skeletal_SK_PlaceholderMannequin_uv0",
+    "skeletal_armature_object_name",
+    "skeletal_bones_match_contract",
+    "skeletal_bone_heads_roundtrip",
+    "skeletal_facing_front_plus_x",
+    "skeletal_base_objects",
+    "skeletal_base_SM_PlaceholderMannequin_Base_matches_authored",
+    "skeletal_base_SM_PlaceholderMannequin_Base_mask",
+    "skeletal_base_SM_PlaceholderMannequin_Base_uv0",
+    "static_objects",
+    "static_SM_PlaceholderMannequin_matches_authored",
+    "static_UCP_SM_PlaceholderMannequin_00_matches_authored",
+    "static_SM_PlaceholderMannequin_mask",
+    "static_SM_PlaceholderMannequin_uv0",
+    "static_facing_front_plus_x"
+   ]
+  },
+  "check_static_prop_fbx": {
+   "SM_PlaceholderMannequin": {
+    "open_edges": 0,
+    "non_manifold_edges": 0,
+    "faces_with_inconsistent_winding": 0
+   },
+   "SM_PlaceholderMannequin_Base": {
+    "open_edges": 0,
+    "non_manifold_edges": 0,
+    "faces_with_inconsistent_winding": 0
+   },
+   "note": "stock tool measures objs[0] (SM_PlaceholderMannequin, not the UCP); its protrusion direction is not a front cue for this figure (arms at 50 % height, round base)"
+  },
+  "rig_deform_probe": {
+   "blend": {
+    "head_turn": {
+     "status": "plausible",
+     "moved": 84,
+     "z_norm": 0.905,
+     "x_norm": 0.0
+    },
+    "spine_bend_fwd": {
+     "status": "plausible",
+     "moved": 353,
+     "z_norm": 0.626,
+     "x_norm": -0.0
+    },
+    "arm_l_raise": {
+     "status": "plausible",
+     "moved": 126,
+     "z_norm": 0.504,
+     "x_norm": 0.783
+    },
+    "arm_r_raise": {
+     "status": "plausible",
+     "moved": 126,
+     "z_norm": 0.504,
+     "x_norm": -0.783
+    },
+    "forearm_l_bend": {
+     "status": "plausible",
+     "moved": 72,
+     "z_norm": 0.39,
+     "x_norm": 0.845
+    },
+    "thigh_l_flex": {
+     "status": "plausible",
+     "moved": 118,
+     "z_norm": 0.182,
+     "x_norm": 0.277
+    },
+    "thigh_r_flex": {
+     "status": "plausible",
+     "moved": 118,
+     "z_norm": 0.182,
+     "x_norm": -0.277
+    }
+   },
+   "fbx": {
+    "head_turn": {
+     "status": "plausible",
+     "moved": 84,
+     "z_norm": 0.905,
+     "x_norm": 0.0
+    },
+    "spine_bend_fwd": {
+     "status": "plausible",
+     "moved": 353,
+     "z_norm": 0.626,
+     "x_norm": -0.0
+    },
+    "arm_l_raise": {
+     "status": "plausible",
+     "moved": 126,
+     "z_norm": 0.504,
+     "x_norm": 0.783
+    },
+    "arm_r_raise": {
+     "status": "plausible",
+     "moved": 126,
+     "z_norm": 0.504,
+     "x_norm": -0.783
+    },
+    "forearm_l_bend": {
+     "status": "plausible",
+     "moved": 72,
+     "z_norm": 0.39,
+     "x_norm": 0.845
+    },
+    "thigh_l_flex": {
+     "status": "plausible",
+     "moved": 118,
+     "z_norm": 0.182,
+     "x_norm": 0.277
+    },
+    "thigh_r_flex": {
+     "status": "plausible",
+     "moved": 118,
+     "z_norm": 0.182,
+     "x_norm": -0.277
+    }
+   }
+  },
+  "rig_deform_probe_summary": "7/7 plausible on the authored .blend and on the FBX turned back (fbx_to_authored_blend.py of ASSET-HARPY-001)"
+ },
+ "predicted_ue": {
+  "map": "ART-001: ue = (x, -y, z) of the export frame (+90 deg Z)",
+  "front": "+X",
+  "left_hand": "-Y",
+  "bounds_uu": {
+   "skeletal/SK_PlaceholderMannequin": {
+    "min": [
+     -3.381,
+     -9.531,
+     3.903
+    ],
+    "max": [
+     4.5,
+     9.531,
+     50.0
+    ]
+   },
+   "skeletal_base/SM_PlaceholderMannequin_Base": {
+    "min": [
+     -12.0,
+     -12.0,
+     0.0
+    ],
+    "max": [
+     12.0,
+     12.0,
+     4.0
+    ]
+   },
+   "static/SM_PlaceholderMannequin": {
+    "min": [
+     -12.0,
+     -12.0,
+     0.0
+    ],
+    "max": [
+     12.0,
+     12.0,
+     50.0
+    ]
+   },
+   "static/UCP_SM_PlaceholderMannequin_00": {
+    "min": [
+     -12.5,
+     -12.5,
+     -9.0
+    ],
+    "max": [
+     12.5,
+     12.5,
+     50.0
+    ]
+   }
+  },
+  "bones_in_ue": 18,
+  "bone_0": "SKEL_UM_Humanoid",
+  "note": "skeletal Medusa measured +Y in UE (RIG-CONTRACT §5): check the mannequin SK on the UE stage"
+ },
+ "visual_check": {
+  "opened_with_read": [
+   "ortho_front",
+   "game_k1_front",
+   "game_k1_3q",
+   "game_close_3q",
+   "game_close_pair",
+   "poses_sheet",
+   "wire_3q",
+   "collision_front",
+   "ortho_left",
+   "ortho_top",
+   "silhouette_close",
+   "uv0_figure",
+   "deform/mannequin-fbx-sheet"
+  ],
+  "light": "neutral EEVEE preview light (key + fill sun), not the game light",
+  "measurements": {
+   "silhouette_k1": {
+    "frame_px": [
+     1200,
+     675
+    ],
+    "bbox_px": [
+     582,
+     309,
+     617,
+     369
+    ],
+    "width_px": 36,
+    "height_px": 61,
+    "height_px_at_1920x1080": 97.6,
+    "width_px_at_1920x1080": 57.6,
+    "dark_pixels": 1457
+   },
+   "silhouette_close": {
+    "frame_px": [
+     1200,
+     675
+    ],
+    "bbox_px": [
+     455,
+     84,
+     744,
+     628
+    ],
+    "width_px": 290,
+    "height_px": 545,
+    "height_px_at_1920x1080": 872.0,
+    "width_px_at_1920x1080": 464.0,
+    "dark_pixels": 108227
+   },
+   "silhouette_note": "K-1: camera 12.18 m, horizontal FOV 35 deg, pitch -55 deg (cell 1 m ≈ 250 px at 1920 px); 04 §3 proposes a figure of ≈ 110-140 px on 1080p for this view (proposal, Q-312 / GD-058)",
+   "fbx_vs_blend_ortho_front": {
+    "max_channel_diff": 1,
+    "pixels_diff_gt_8": 0,
+    "pixels_diff_gt_2": 0,
+    "pixels": 1000000
+   }
+  },
+  "files": {
+   "collision_front": {
+    "file": "collision_front.jpg",
+    "size_px": [
+     1000,
+     1000
+    ],
+    "bytes": 86535,
+    "sha256": "9524cb6eab62dfc8590f4f07af5d3fb22135217ea422d5361d43a4badb2ec466",
+    "png_before_jpeg": {
+     "sha256": "ad4f0c5bb9e9cdfe07ea55997cade533a9e1864a75c61a583059b633851e662b",
+     "bytes": 964526,
+     "size_px": [
+      1000,
+      1000
+     ]
+    }
+   },
+   "fbx_roundtrip_front": {
+    "file": "fbx_roundtrip_front.jpg",
+    "size_px": [
+     1000,
+     1000
+    ],
+    "bytes": 34475,
+    "sha256": "162674486da845ee841705bcd47e1156de438523d67ffce992d4a86dc4fbeaaa",
+    "png_before_jpeg": {
+     "sha256": "a8a38bfe0ddedbef453159b6832ed3f38846c12773eac9675e1256d325602c12",
+     "bytes": 824636,
+     "size_px": [
+      1000,
+      1000
+     ]
+    }
+   },
+   "game_close_3q": {
+    "file": "game_close_3q.jpg",
+    "size_px": [
+     1200,
+     675
+    ],
+    "bytes": 48378,
+    "sha256": "3650414b72258b88eef8d43b10e33143e35a5d902169dfd189c724cd49431d59",
+    "png_before_jpeg": {
+     "sha256": "91670e160e72398f4922ac578d3322ff270ab1591a06e4862b89c4a6fe063c4f",
+     "bytes": 741809,
+     "size_px": [
+      1200,
+      675
+     ]
+    }
+   },
+   "game_close_front": {
+    "file": "game_close_front.jpg",
+    "size_px": [
+     1200,
+     675
+    ],
+    "bytes": 47281,
+    "sha256": "aac08167a446868b637fc302aecb1b237ad5379c20c711e2f5b4760e4307f04d",
+    "png_before_jpeg": {
+     "sha256": "fd22f2e7db9493e562cfe98328576915c537dbeea284797d328475b3da6ec415",
+     "bytes": 718560,
+     "size_px": [
+      1200,
+      675
+     ]
+    }
+   },
+   "game_close_pair": {
+    "file": "game_close_pair.jpg",
+    "size_px": [
+     1200,
+     675
+    ],
+    "bytes": 50639,
+    "sha256": "bd26ec75f2bf7719b1a2e880e57c4f14c2579f306d2ccb29d52545244b98b404",
+    "png_before_jpeg": {
+     "sha256": "c98ba3e23edbe76a7f38c4fe8068c7a052ead469a2868d507b7bf4c9315466a6",
+     "bytes": 709739,
+     "size_px": [
+      1200,
+      675
+     ]
+    }
+   },
+   "game_k1_3q": {
+    "file": "game_k1_3q.jpg",
+    "size_px": [
+     1200,
+     675
+    ],
+    "bytes": 55147,
+    "sha256": "9bfe9563d26ce90051618957450a3d188ef2f673342c43bf9599044a0c7f28b7",
+    "png_before_jpeg": {
+     "sha256": "b778acb0ba6f04ecca0ee7f04635f9b9f5bb7f2db9f5d27df3ffc5867cb8ae42",
+     "bytes": 694881,
+     "size_px": [
+      1200,
+      675
+     ]
+    }
+   },
+   "game_k1_front": {
+    "file": "game_k1_front.jpg",
+    "size_px": [
+     1200,
+     675
+    ],
+    "bytes": 35697,
+    "sha256": "79163e601ddf54caee0546836211085071015f78492265ede76d9efc838dafcb",
+    "png_before_jpeg": {
+     "sha256": "9be8b0ba215730e5ee5b81610474896fbe32eda6b1b5a6a3a7bed9bf12261a2b",
+     "bytes": 659248,
+     "size_px": [
+      1200,
+      675
+     ]
+    }
+   },
+   "ortho_back": {
+    "file": "ortho_back.jpg",
+    "size_px": [
+     1000,
+     1000
+    ],
+    "bytes": 29609,
+    "sha256": "0407c84aabea56845af866f02684414e0b2a0743c81e380a6508f9f301fed2c3",
+    "png_before_jpeg": {
+     "sha256": "e2a8adc950b5de2e1ebabea1d025f2a38fc56a79066b81f380bf472e1a58e48d",
+     "bytes": 819860,
+     "size_px": [
+      1000,
+      1000
+     ]
+    }
+   },
+   "ortho_front": {
+    "file": "ortho_front.jpg",
+    "size_px": [
+     1000,
+     1000
+    ],
+    "bytes": 34473,
+    "sha256": "0bc6638100bed4fec1bae8a08e7f4269d86ab3af185a66b176e4154419912943",
+    "png_before_jpeg": {
+     "sha256": "1fd4bf0f96a1a190f40ae5f2a765df63b55ced3082d806fcf20f0ed808a9157e",
+     "bytes": 824916,
+     "size_px": [
+      1000,
+      1000
+     ]
+    }
+   },
+   "ortho_left": {
+    "file": "ortho_left.jpg",
+    "size_px": [
+     1000,
+     1000
+    ],
+    "bytes": 25954,
+    "sha256": "02d7f394bf831d662d5f68be6a0fd02ff9a8de30395ff65586592bbd72e1c994",
+    "png_before_jpeg": {
+     "sha256": "00b04885db58e9d06a7b98b3f82660cef725c04e1811ad815d290de77ecc69f5",
+     "bytes": 809005,
+     "size_px": [
+      1000,
+      1000
+     ]
+    }
+   },
+   "ortho_right": {
+    "file": "ortho_right.jpg",
+    "size_px": [
+     1000,
+     1000
+    ],
+    "bytes": 23027,
+    "sha256": "f625f1bcdc6dec36bf266d576d6570a2792cf80df2a9a44f35646260e3c6815b",
+    "png_before_jpeg": {
+     "sha256": "09f6979c5f67ac2d9e7b0190375bc5720539d8cbc17d94750e9c8edff3db387b",
+     "bytes": 806277,
+     "size_px": [
+      1000,
+      1000
+     ]
+    }
+   },
+   "ortho_top": {
+    "file": "ortho_top.jpg",
+    "size_px": [
+     1000,
+     1000
+    ],
+    "bytes": 32655,
+    "sha256": "1bf8d4bd71726e010d15915fa81f15ca4543441adffc59fbd14fab624ee8de69",
+    "png_before_jpeg": {
+     "sha256": "7e7bc7cb0cf57c863507c6b01629e29d5537ded64710b8c813355fc4d29b38f6",
+     "bytes": 852727,
+     "size_px": [
+      1000,
+      1000
+     ]
+    }
+   },
+   "silhouette_close": {
+    "file": "silhouette_close.jpg",
+    "size_px": [
+     1200,
+     675
+    ],
+    "bytes": 16849,
+    "sha256": "1d923e70cdda577ea1f8f9914ccea196735eb976a7b90443c4aa75a5cce986e7",
+    "png_before_jpeg": {
+     "sha256": "a673ded87e39bc64dff0cfa042e48967833fab4c37a3c19c79fb5c9e63f4910f",
+     "bytes": 273586,
+     "size_px": [
+      1200,
+      675
+     ]
+    }
+   },
+   "silhouette_k1": {
+    "file": "silhouette_k1.jpg",
+    "size_px": [
+     1200,
+     675
+    ],
+    "bytes": 8062,
+    "sha256": "9c50ac79bc83d2630bc6668877c43884f3e59cd6939195948d761f3df5538f3b",
+    "png_before_jpeg": {
+     "sha256": "de326ba6f6667fac31f6308c1f0fad463ee9a20f9a342771549ffccefe5d11af",
+     "bytes": 233987,
+     "size_px": [
+      1200,
+      675
+     ]
+    }
+   },
+   "uv0_base": {
+    "file": "uv0_base.jpg",
+    "size_px": [
+     1024,
+     1024
+    ],
+    "bytes": 246839,
+    "sha256": "1be2649df8b200fab6e8b2c237c30cebedcd3029ea8ddafd77ab30d68493a0b1",
+    "png_before_jpeg": {
+     "sha256": "9f8f457d7d995be99b81551512b44d03a3f09de85c034b0172900a1fb97eaedc",
+     "bytes": 77700,
+     "size_px": [
+      1024,
+      1024
+     ]
+    }
+   },
+   "uv0_figure": {
+    "file": "uv0_figure.jpg",
+    "size_px": [
+     1024,
+     1024
+    ],
+    "bytes": 352495,
+    "sha256": "37c73b6be65450d5ad0526aaece19314c51b2bf12ccac34af9a455d85f463956",
+    "png_before_jpeg": {
+     "sha256": "009066a1ce8aab4abd65f030f377fb84d750743e32b10f42f9778b7c7cbdec19",
+     "bytes": 101598,
+     "size_px": [
+      1024,
+      1024
+     ]
+    }
+   },
+   "wire_3q": {
+    "file": "wire_3q.jpg",
+    "size_px": [
+     1000,
+     1000
+    ],
+    "bytes": 72396,
+    "sha256": "f1cf3c0d766f94825b983a637d5f5bfdccef99eaec4b2d5865b17037b5a3f1c8",
+    "png_before_jpeg": {
+     "sha256": "cb6f9568c19979c6be735f8b5252c542fa342c084bae77994126770259876414",
+     "bytes": 945229,
+     "size_px": [
+      1000,
+      1000
+     ]
+    }
+   },
+   "wire_front": {
+    "file": "wire_front.jpg",
+    "size_px": [
+     1000,
+     1000
+    ],
+    "bytes": 63765,
+    "sha256": "7115a90f7a9c240f8e247febe5226d30e4ec9d750ee1b2c5a143266a456bb317",
+    "png_before_jpeg": {
+     "sha256": "bc80a79a62977d6278bf57f913f2edcb3a66547c7fd1c4864a8c84f4b192107d",
+     "bytes": 898728,
+     "size_px": [
+      1000,
+      1000
+     ]
+    }
+   },
+   "poses_sheet": {
+    "file": "poses_sheet.jpg",
+    "size_px": [
+     1200,
+     600
+    ],
+    "bytes": 57025,
+    "sha256": "c08c68f9d3b8faf69d616aad931b84771b668a795ac82da069b6a449d4f93c97"
+   },
+   "mannequin-blend-sheet": {
+    "file": "mannequin-blend-sheet.jpg",
+    "size_px": [
+     1200,
+     600
+    ],
+    "bytes": 72837,
+    "sha256": "5ee9c8c2800daf5acc964df0e3798c7943a188565e2a199fd3c27e5f1c96582b",
+    "png_before_jpeg": {
+     "sha256": "3c315293c55bd9f89f559b444b842f1ece9a1180b7b021f3ece98c39917862bf",
+     "bytes": 489958,
+     "size_px": [
+      2400,
+      1200
+     ]
+    }
+   },
+   "mannequin-fbx-sheet": {
+    "file": "mannequin-fbx-sheet.jpg",
+    "size_px": [
+     1200,
+     600
+    ],
+    "bytes": 72805,
+    "sha256": "226f93f662344dec9064f4a4bb899c24126361e472fee04979ba1ca0dd2de20b",
+    "png_before_jpeg": {
+     "sha256": "ac21310a9fa858650a2976468599b2851166de533ebab42ca933680e87ed74f7",
+     "bytes": 479256,
+     "size_px": [
+      2400,
+      1200
+     ]
+    }
+   }
+  }
+ },
+ "deferred_ue_steps": [
+  "Legacy FBX import (Interchange FBX off) of export/SM_PlaceholderMannequin.fbx to /Game/PipelineCandidates/PlaceholderMannequin/: import_uniform_scale 1.0, auto-generate collision off (UCP_ provides it), vertex colours Replace; expect bounds (-12,-12,0)..(12,12,50) uu, 2 material slots, BodySetup 1 capsule (R 12.5, Z -9..50), 1640 triangles, vertex colour R=1 only on the base band/chamfer",
+  "Skeletal import of export/SK_PlaceholderMannequin.fbx with a new Skeleton: 18 bones, bone 0 SKEL_UM_Humanoid, bounds (-3.38,-9.53,3.90)..(4.50,9.53,50.00) uu; verify front +X / left hand -Y (Medusa deviation +Y, RIG-CONTRACT §5); import export/SM_PlaceholderMannequin_Base.fbx as static ±12 x ±12 x 0..4 uu",
+  "Materials: MI of M_DioramaMaster grey sRGB #A8A8A8 (Roughness 0.85) for the figure slot; base slot = vertex-mask material lerp(BaseColor linear (0.03,0.026,0.023), TeamColor, VertexColor.R) (Harpy base material, InstanceIndex unused); MI Gold (0.807,0.527,0.144) / Silver (0.347,0.539,0.686) linear",
+  "Mouse trace hits the UCP capsule of the static mesh (04 §2 row «Коллизия выбора»); for SK a Physics Asset capsule or the actor capsule",
+  "QA-012 / GD-053: debug build with Medusa marked missing -> mannequin + team ring + Warning log, full turn playable",
+  "Optional: retarget or play Medusa/Arthur clips on SK_PlaceholderMannequin to test a shared humanoid Skeleton (RIG-CONTRACT §8, brief §9 p.2-3)",
+  "Packaged K-1/K-2 frame at 1920x1080: figure height in px vs 04 «≈110-140 px» (Blender preview: 98 px)"
+ ],
+ "followups": [
+  "Registry (not edited here): ASSET-PLACEHOLDER-MANNEQUIN — add a layer stage blender-candidate, status «измерено», evidence = this report + run reports; plannedPaths blender/ASSET-PLACEHOLDER-MANNEQUIN still planned; note both variants",
+  "DIRECTORY-MAP.md (not edited here): add art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/{build-profiles,scripts,20260928-blender-um-fbx-v1}",
+  "Decide static vs skeletal fallback (04 §3.10 / 08 INT-018 / 17 / 18 say static; the task asked for UM_HUMANOID_17_v1); update the 04 card if skeletal is kept",
+  "Height reading «48 uu + голова» vs 50 uu (17 line 2162) and figure px at K-1 (98 px vs 110-140, Q-312 / GD-058)",
+  "weapon bone parent hand.L vs hand.R for the shared skeleton (RIG-CONTRACT §11 q.2)",
+  "Instance pips (UM_Mask G/B) not built: a mannequin replacing a Harpy loses H1/H2/H3 identity (AD-OPEN-06)",
+  "tools/tripo-pipeline/blender/check_static_prop_fbx.py: crashes (ValueError, empty band) when no vertex lies within ±8 % of the front_z_frac height; measures only objs[0] — robustness fix belongs to the tool owner",
+  "Pipeline traps to record: bmesh.ops.create_uvsphere face order differs between runs (byte-unstable FBX); in-session FBX import with an existing same-named armature fails (KeyError pose.bones['root']) in Blender 5.2.2",
+  "Promotion after acceptance: 04 §3.10 layout blender/ASSET-PLACEHOLDER-MANNEQUIN/{mannequin.blend, export/SM_PlaceholderMannequin.fbx, preview/*}; 06-asset-manifest row (version, sourceHash)"
+ ],
+ "commit_manifest": [
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/build-profiles/mannequin-parametric-um-fbx-v1.json",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/scripts/build_mannequin.py",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/scripts/readback_fbx.py",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/scripts/render_previews.py",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/scripts/postprocess_previews.py",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/scripts/run_mannequin.sh",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/export/SK_PlaceholderMannequin.fbx",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/export/SM_PlaceholderMannequin.fbx",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/export/SM_PlaceholderMannequin_Base.fbx",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/logs/determinism.txt",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/logs/fbx-sha-run1.txt",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/collision_front.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/deform/mannequin-blend-sheet.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/deform/mannequin-fbx-sheet.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/fbx_roundtrip_front.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/game_close_3q.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/game_close_front.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/game_close_pair.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/game_k1_3q.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/game_k1_front.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/ortho_back.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/ortho_front.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/ortho_left.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/ortho_right.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/ortho_top.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/poses_sheet.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/silhouette_close.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/silhouette_k1.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/uv0_base.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/uv0_figure.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/wire_3q.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/preview/wire_front.jpg",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/reports/build-report.json",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/reports/check_static_prop_fbx-SM_PlaceholderMannequin.json",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/reports/check_static_prop_fbx-SM_PlaceholderMannequin_Base.json",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/reports/deform/mannequin-blend-bones2d.json",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/reports/deform/mannequin-blend-deform.json",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/reports/deform/mannequin-fbx-bones2d.json",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/reports/deform/mannequin-fbx-deform.json",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/reports/fbx-readback.json",
+  "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1/reports/preview-report.json",
+  "docs/art-pipeline/placeholder-mannequin-report.md",
+  "docs/art-pipeline/placeholder-mannequin-report.json"
+ ],
+ "commit_note": "not committed; work/ (.blend) and logs/*.log are git-ignored and reproducible"
+}

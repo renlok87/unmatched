@@ -1,0 +1,1017 @@
+{
+ "assetId": "ASSET-DECOR-KIT-001.FACADES",
+ "date": "2026-09-28",
+ "stage": "blender-candidate",
+ "status": "измерено",
+ "statusNote": "Кандидат существует в виде файлов и численных отчётов Blender: сборка и два независимых readback. UE не запускался, художественной приёмки не было. Все размеры и нормы — ПРЕДЛОЖЕНИЕ (04:241, 17:398/719), а не бюджеты.",
+ "claims": {
+  "artAccepted": false,
+  "ueImported": false,
+  "gameReady": false,
+  "budgetsDeclared": false
+ },
+ "tripo": {
+  "used": false,
+  "creditsSpent": 0,
+  "syntxSpent": 0,
+  "ledgerEntries": 0,
+  "idempotencyCheck": "credits-ledger.json: нет записей по фасадам; Studio не открывался (трат нет)"
+ },
+ "decision": {
+  "earlyGate": "Не нужны для GD-058. Критерий GD-058 (14-sprint-backlog.csv:22): три кадра, размеры, бюджеты, packaged-замер; 6 копий фигурки и участок. Фасады относятся к ART-009 (14:68), который зависит от GD-058. Для кадров K-1..K-3 достаточно плоской кулисы-заглушки (как S05 SM_S05_Facade, 16 tris).",
+  "method": "Blender без Tripo: плоские кулисы по нормативу-предложению 04:241 и 17:398/719 (300-600 x <=120 uu, окно Emissive, 1K-атлас, <=2 слота, без коллизии). Концепты ref-facade-a/b/c - коллажи с ракурсами на сером фоне (реестр: для Tripo непригодны без новых видов); объёмная Tripo-модель противоречит роли фонового силуэта и fade при зуме.",
+  "sources": [
+   {
+    "path": "art/imagegen/mvp-v1/environment/ref-facade-a.png",
+    "sha256": "2454c4fea890bc3e55d3983b7aa8e4d68ee9e0983250e3dec921fbd37964b5ef",
+    "use": "фронтальный вид: готическая руина, 2 арочных двери"
+   },
+   {
+    "path": "art/imagegen/mvp-v1/environment/ref-facade-b.png",
+    "sha256": "c8e6279b2ca6c0de412b76d0f08b85906bf1c32d49aa18d37d7ca952a567b112",
+    "use": "фронтальный вид: фахверковый щипец, окно со ставнями"
+   },
+   {
+    "path": "art/imagegen/mvp-v1/environment/ref-facade-c.png",
+    "sha256": "004562349398af166c317ed9145fa456376d07561f5d489f684b7311985611be",
+    "use": "фронтальный вид: каменная руина с аркой"
+   }
+  ]
+ },
+ "tripoStagePlan": [
+  "1. Вырезать фронтальный вид из каждого коллажа (верхний левый блок), маска силуэта по отличию от серого фона (тот же риск серый-на-сером, что у table-base: при плохой маске - ручной полигон силуэта).",
+  "2. Силуэт -> упрощённый контур (Douglas-Peucker, 20-60 вершин) -> грань + solidify 6-10 uu; ожидаемо 100-600 tris на фасад.",
+  "3. Размеры (предложение): A 400x110, B 300x120, C 350x100 uu; не выше 120 uu.",
+  "4. UV: планарная проекция фронта; общий 1K-атлас трёх фасадов (BC, N из высоты/серого, ORM); тыл и торцы - тёмный однотон атласа.",
+  "5. Окна/проёмы: маска Emissive в атласе, тёплый #FFB45C-#FFCE8A (03 С-6); слот 2 или параметр одного MI - <=2 слота.",
+  "6. Pivot: нижний край наружной грани, по центру (04:24). Экспорт UM_FBX_v1, файл на объект SM_Decor_FacadeA/B/C (AD-CNF-19 открыт).",
+  "7. Выход: art/pipeline-candidates/ASSET-DECOR-KIT-001/<run-id>-facades/{source,export,textures,reports,preview}; скрипт в art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts (tripo_pipeline.py/build_candidate не трогать).",
+  "8. Проверки: tris, габариты, слоты, pivot, FBX round-trip (check_static_prop_fbx.py), превью JPG <=1200 px."
+ ],
+ "blenderStage": {
+  "runDir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1",
+  "runId": "20260928-facades-flat-v1",
+  "blender": "5.2.2 LTS",
+  "pipeline": [
+   "1. scripts/facades_trace.py (системный Python: numpy, Pillow, scipy). Фон коллажа -> маска -> композиция сегментов -> силуэт по столбцам -> Douglas-Peucker 0.9 uu -> полигон в uu. Общий 1K-атлас BC/N/ORM и UV-раскладка -> reports/trace.json, textures/.",
+   "2. scripts/facades_build.py (Blender 5.2 headless, отдельный процесс). CDT фронта, щели свечения заданы ограничениями; тыл, торцы, UV0, материалы. Экспорт UM_FBX_v1 хелперами static_prop_candidate.py (файл не менялся, его main() не запускается). Превью -> reports/build-report.json.",
+   "3. tools/tripo-pipeline/blender/check_static_prop_fbx.py и scripts/facades_readback.py, свежий процесс Blender на каждый FBX -> reports/fbx-readback-*.json, reports/facade-readback-*.json."
+  ],
+  "scripts": {
+   "facades_params.json": "23518d3ecadcc047af6c65bf67dba1f78bcf17abf3b1d67fe64cb0874d7a5bda",
+   "facades_trace.py": "70348266af62e110b5e6f6ab62aee2e8f96efd0650d110ce57ba57867468870f",
+   "facades_build.py": "995291974c0ee0b647cb37c19074b5a7d310fc48827457bca07796636dacf011",
+   "facades_readback.py": "5055feded9f232eea41724943f30289781116ad3a174e68b3e3373b57656f68c"
+  },
+  "scriptsHashNote": "sha256 текста с LF",
+  "helpers": {
+   "path": "tools/tripo-pipeline/blender/static_prop_candidate.py",
+   "sha256_lf": "6f703427539511afe37740035e55db1bcddbbb92bd2092bfedddc076b7b3d18b",
+   "used": [
+    "export_fbx",
+    "make_fbx_deterministic",
+    "patch_fbx_units",
+    "fbx_kwargs",
+    "um_fbx_v1_conformance",
+    "geometry_stats",
+    "corner_normal_stats",
+    "uv_analysis",
+    "build_material"
+   ]
+  },
+  "fbxPreset": {
+   "path": "blender/_tools/presets/UM_FBX_v1.json",
+   "sha256_lf": "06cb69892de24ec48c662bf3ed54b6d711e45c68b65cb51e625bf6a5b94f86f3"
+  },
+  "source": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/source/sources.json",
+  "determinism": "trace и build запущены дважды: 3 FBX и 3 PNG совпали побайтно",
+  "sizeDecision": {
+   "problem": "Фронтальные виды концептов имеют пропорции 1.28-1.53 : 1. Предложенная норма 300-600 x <=120 uu требует не меньше 2.5 : 1. Равномерным масштабом в неё не попасть, а растяжение по горизонтали в 1.6-2 раза искажает арки и кладку.",
+   "solution": "Длина набрана по горизонтали из сегментов исходного вида. Стыки проходят по осям дверей и стен, часть копий зеркальная. Пропорции деталей сохраняются. Каждый шов либо повторяет исходную непрерывность, либо зеркальный, поэтому разрывов текстуры нет.",
+   "resultUu_length_height_thickness": {
+    "A": [
+     394.7,
+     110,
+     8
+    ],
+    "B": [
+     304.7,
+     120,
+     8
+    ],
+    "C": [
+     306.1,
+     105,
+     8
+    ]
+   },
+   "why": "Высоты разные, чтобы силуэт «улицы» был неровным. A близок к S05-фасаду 400x110. B самый высокий (щипцы), но не выше 120. C высотой 105, чтобы длина была не меньше 300. Толщина 8 uu (в плане 6-10)."
+  },
+  "emissiveDecision": {
+   "A": "Двери 2 и 4 «приоткрыты»: щель 2.4 x 27.5 uu от порога до перекладины. Это симметричные двустворчатые двери на зеркальных швах.",
+   "B": "Окна обоих домов: щель 2.4 x 32.4 uu между створками ставен.",
+   "C": "Свечения нет: в концепте нет проёмов (глухая арка, заложенная камнем). Один слот.",
+   "why": "В концептах окна и двери закрыты. Свет из щели не меняет закрытые ставни и двери и даёт тёплую точку по 03 С-6. Щели — добавление к концепту, оно записано здесь.",
+   "colour": "#FFC27A, внутри диапазона #FFB45C-#FFCE8A (03 С-6). Цвет закрашен в BC. Грани щелей — в слоте 2 M_Decor_FacadeGlow. Интенсивность задаётся параметром MI в UE (отложено)."
+  },
+  "textures": {
+   "BC": {
+    "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/textures/T_Decor_Facades_BC.png",
+    "sha256": "00cc76dd15f02bf4e5c6ca6dd230258dfa85aff4b8e637940942489336661d24",
+    "bytes": 1182086,
+    "size_px": [
+     1024,
+     1024
+    ],
+    "colour_space": "sRGB"
+   },
+   "N": {
+    "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/textures/T_Decor_Facades_N.png",
+    "sha256": "d687d21a2890b3121bf4c31eeb13d21bca84c78b96fbede3356cef891d94c1ed",
+    "bytes": 1161459,
+    "size_px": [
+     1024,
+     1024
+    ],
+    "colour_space": "Linear (no sRGB/gAMA/cHRM chunk)",
+    "convention": "tangent space, DirectX (green = -Y), height ~ luminance high-pass"
+   },
+   "ORM": {
+    "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/textures/T_Decor_Facades_ORM.png",
+    "sha256": "5e60660117669153145eb2d2b5433d49c9513c387102b6c295c1ebd9cd79ba7b",
+    "bytes": 18433,
+    "size_px": [
+     1024,
+     1024
+    ],
+    "colour_space": "Linear (no sRGB/gAMA/cHRM chunk)",
+    "channels": "R = AO 1.0 (concept render already contains its shading; not baked twice), G = roughness (stone 0.90 / wood 0.80 / glow 0.50 / back+sides 0.95), B = metallic 0"
+   }
+  },
+  "atlas": {
+   "sizePx": 1024,
+   "densityFrontPxPerUu": 2.5,
+   "densityBackSidesPxPerUu": 0.625,
+   "padPx": 8,
+   "freeFill": "#2A3038 (нижняя граница 03 С-5)",
+   "backSideColour": "0.75 x медиана фронтальных текселей своего фасада",
+   "layout": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/atlas-layout.jpg"
+  },
+  "facades": [
+   {
+    "key": "A",
+    "ueName": "SM_Decor_FacadeA",
+    "composition": "Gothic arcade. Source front view has 2 bays; 5 bays are built by chaining P=[40,212) (left pillar + left half of door 1), S=[212,500) (right half of door 1 + middle pillar + left half of door 2) and mirrored copies. Every seam is at a door centre and is either the original continuity or a mirror seam, so no texture discontinuity is introduced; doors 2..5 are symmetric by construction.",
+    "segments": [
+     {
+      "offset": 0,
+      "x0": 36,
+      "x1": 212,
+      "mirror": false,
+      "base_y": 448
+     },
+     {
+      "offset": 176,
+      "x0": 212,
+      "x1": 500,
+      "mirror": false,
+      "base_y": 448
+     },
+     {
+      "offset": 464,
+      "x0": 212,
+      "x1": 500,
+      "mirror": true,
+      "base_y": 448
+     },
+     {
+      "offset": 752,
+      "x0": 212,
+      "x1": 500,
+      "mirror": false,
+      "base_y": 448
+     },
+     {
+      "offset": 1040,
+      "x0": 212,
+      "x1": 500,
+      "mirror": true,
+      "base_y": 448
+     },
+     {
+      "offset": 1328,
+      "x0": 36,
+      "x1": 212,
+      "mirror": true,
+      "base_y": 448
+     }
+    ],
+    "dimensionsUu": {
+     "length": 394.737,
+     "thickness": 8.0,
+     "height": 110.0
+    },
+    "uuPerSourcePx": 0.263158,
+    "silhouette": {
+     "polygonVertices": 90,
+     "perimeterUu": 1068.015,
+     "areaUu2": 35068.59,
+     "dpToleranceUu": 0.9,
+     "maskVsPolygonPx": {
+      "profile_px": 506658,
+      "polygon_px": 506394,
+      "in_polygon_not_object": 844,
+      "object_not_in_polygon": 1108
+     },
+     "columnsWithSeveralRunsFilled": 42,
+     "topColumnsRaisedByClosing": 366
+    },
+    "triangles": 372,
+    "vertices": 188,
+    "trianglesBreakdown": {
+     "front": 104,
+     "back": 88,
+     "sides": 180
+    },
+    "materialSlots": [
+     "M_Decor_Facades",
+     "M_Decor_FacadeGlow"
+    ],
+    "glow": {
+     "faces": 4,
+     "areaUu2": 131.369,
+     "rects": [
+      {
+       "rect_uu_x0_z0_x1_z1": [
+        -76.9895,
+        11.5789,
+        -74.5895,
+        38.9474
+       ],
+       "why": "door 2 (symmetric double door at a mirror seam): leaves ajar, warm slit from threshold to the cross bar"
+      },
+      {
+       "rect_uu_x0_z0_x1_z1": [
+        74.5895,
+        11.5789,
+        76.9895,
+        38.9474
+       ],
+       "why": "door 4, same"
+      }
+     ]
+    },
+    "topology": {
+     "welded_boundary_edges": 0,
+     "welded_non_manifold_edges": 0,
+     "faces_with_inconsistent_winding": 0,
+     "connected_shells": 1,
+     "degenerate_faces_area_lt_1e-12": 0,
+     "signed_volume_m3": 0.280548745
+    },
+    "normals": {
+     "shading": "flat (use_smooth off, FBX smoothing FACE)",
+     "customNormals": false,
+     "cornersIntoSurface": 0,
+     "frontAreaWeightedNormal": [
+      0.0,
+      -1.0,
+      0.0
+     ]
+    },
+    "pivot": {
+     "origin": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "rule": "04 §1: facade = bottom edge of the outer face, centred",
+     "min_z_uu": 0.0,
+     "x_centre_offset_uu": 0.0,
+     "front_face_y_uu": 0.0
+    },
+    "uv0": {
+     "islands": 3,
+     "outOf01": 0,
+     "overlapBetweenIslandsPx": 0,
+     "overlapInsideIslandsPx": 0,
+     "flippedVsIsland": 0,
+     "mirroredFaces": 0,
+     "anisotropyP50P95Max": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "minGutterPx1024": 9,
+     "islandPairsCloserThan4px": 0,
+     "texelDensityPxPerUu": {
+      "front": [
+       2.5004,
+       2.5
+      ],
+      "backAndSides": 0.625
+     },
+     "atlasRectsPx_xywh": {
+      "front": [
+       8,
+       8,
+       987,
+       275
+      ],
+      "back": [
+       8,
+       869,
+       249,
+       71
+      ],
+      "side": [
+       8,
+       946,
+       670,
+       7
+      ]
+     }
+    },
+    "textureMeasurements": {
+     "front_rect_px": [
+      8,
+      8,
+      987,
+      275
+     ],
+     "back_rect_px": [
+      8,
+      869,
+      249,
+      71
+     ],
+     "side_rect_px": [
+      8,
+      946,
+      670,
+      7
+     ],
+     "front_object_texels": 219248,
+     "glow_texels": 1296,
+     "wood_texels_fraction": 0.0067,
+     "bc_front_median_srgb": [
+      65,
+      64,
+      64
+     ],
+     "bc_front_mean_linear_luminance": 0.0679,
+     "back_side_srgb": [
+      48,
+      48,
+      48
+     ],
+     "normal_gain": 0.3287,
+     "normal_tilt_deg_p50_p95_max_in_mask": [
+      5.51,
+      25.0,
+      51.23
+     ]
+    },
+    "export": {
+     "fbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/export/SM_Decor_FacadeA.fbx",
+     "sha256": "93a6d848a6309f6c52033df54bddb85ebfa098d5aacb1bb4b450ed56f4558010",
+     "bytes": 31772,
+     "umFbxV1Conforms": true,
+     "absolutePathLeaks": [],
+     "textureRefsInFbx": [
+      "../textures/T_Decor_Facades_BC.png"
+     ]
+    },
+    "readback": {
+     "checkStaticPropFbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/reports/fbx-readback-A.json",
+     "facadeReadback": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/reports/facade-readback-A.json",
+     "triangles": 372,
+     "materialSlots": [
+      "M_Decor_Facades",
+      "M_Decor_FacadeGlow"
+     ],
+     "uvLayers": [
+      "UVMap"
+     ],
+     "objectScale": [
+      0.01,
+      0.01,
+      0.01
+     ],
+     "dimensionsUuReadbackAxes_xThick_yLen_zH": [
+      8.0,
+      394.737,
+      110.0
+     ],
+     "boundsMinUu": [
+      -8.0,
+      -197.368,
+      0.0
+     ],
+     "boundsMaxUu": [
+      0.0,
+      197.368,
+      110.0
+     ],
+     "topologyWelded1um": {
+      "open_edges": 0,
+      "non_manifold_edges": 0,
+      "faces_with_inconsistent_winding": 0
+     },
+     "outerFaceAxis": "+X",
+     "outerFaceOnPivotPlaneX0": true,
+     "texelDensityOuterVsBackPxPerUu": [
+      2.5002,
+      0.625
+     ],
+     "smoothFaces": 0,
+     "protrusionMeasure": "не применим к плоской стене (это мера бочки); запускался с front_z_frac=0.05, чтобы полоса вершин не была пустой"
+    },
+    "checks": {
+     "single_mesh_no_armature": true,
+     "closed_manifold_consistent_winding": true,
+     "front_faces_minus_y": true,
+     "length_300_600_uu_proposed": true,
+     "height_le_120_uu_proposed": true,
+     "height_matches_param_0_1pct": true,
+     "length_matches_trace_0_1pct": true,
+     "thickness_matches_param": true,
+     "material_slots_le_2": true,
+     "uv0_in_0_1_no_overlap": true,
+     "uv_not_mirrored": true,
+     "no_absolute_paths_in_fbx": true,
+     "um_fbx_v1_conforms": true
+    },
+    "checksPassed": true
+   },
+   {
+    "key": "B",
+    "ueName": "SM_Decor_FacadeB",
+    "composition": "Half-timbered gable with a ruined stepped stone end. Two houses: B + mirror(B) joined at the ruined end (mirror seam at x=530), giving a row of two gables with a collapsed party wall between them; the eaves overhang at both outer ends.",
+    "segments": [
+     {
+      "offset": 0,
+      "x0": 12,
+      "x1": 532,
+      "mirror": false,
+      "base_y": 427
+     },
+     {
+      "offset": 520,
+      "x0": 12,
+      "x1": 532,
+      "mirror": true,
+      "base_y": 427
+     }
+    ],
+    "dimensionsUu": {
+     "length": 304.706,
+     "thickness": 8.0,
+     "height": 120.0
+    },
+    "uuPerSourcePx": 0.294118,
+    "silhouette": {
+     "polygonVertices": 56,
+     "perimeterUu": 898.787,
+     "areaUu2": 28963.92,
+     "dpToleranceUu": 0.9,
+     "maskVsPolygonPx": {
+      "profile_px": 335104,
+      "polygon_px": 334978,
+      "in_polygon_not_object": 675,
+      "object_not_in_polygon": 801
+     },
+     "columnsWithSeveralRunsFilled": 68,
+     "topColumnsRaisedByClosing": 118
+    },
+    "triangles": 236,
+    "vertices": 120,
+    "trianglesBreakdown": {
+     "front": 70,
+     "back": 54,
+     "sides": 112
+    },
+    "materialSlots": [
+     "M_Decor_Facades",
+     "M_Decor_FacadeGlow"
+    ],
+    "glow": {
+     "faces": 4,
+     "areaUu2": 155.294,
+     "rects": [
+      {
+       "rect_uu_x0_z0_x1_z1": [
+        -85.6118,
+        34.7059,
+        -83.2118,
+        67.0588
+       ],
+       "why": "gap between the two shutter leaves (shutters ajar), warm light from inside"
+      },
+      {
+       "rect_uu_x0_z0_x1_z1": [
+        83.2118,
+        34.7059,
+        85.6118,
+        67.0588
+       ],
+       "why": "same window in the mirrored house"
+      }
+     ]
+    },
+    "topology": {
+     "welded_boundary_edges": 0,
+     "welded_non_manifold_edges": 0,
+     "faces_with_inconsistent_winding": 0,
+     "connected_shells": 1,
+     "degenerate_faces_area_lt_1e-12": 0,
+     "signed_volume_m3": 0.231711341
+    },
+    "normals": {
+     "shading": "flat (use_smooth off, FBX smoothing FACE)",
+     "customNormals": false,
+     "cornersIntoSurface": 0,
+     "frontAreaWeightedNormal": [
+      0.0,
+      -1.0,
+      0.0
+     ]
+    },
+    "pivot": {
+     "origin": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "rule": "04 §1: facade = bottom edge of the outer face, centred",
+     "min_z_uu": 0.0,
+     "x_centre_offset_uu": 0.0,
+     "front_face_y_uu": 0.0
+    },
+    "uv0": {
+     "islands": 3,
+     "outOf01": 0,
+     "overlapBetweenIslandsPx": 0,
+     "overlapInsideIslandsPx": 0,
+     "flippedVsIsland": 0,
+     "mirroredFaces": 0,
+     "anisotropyP50P95Max": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "minGutterPx1024": 19,
+     "islandPairsCloserThan4px": 0,
+     "texelDensityPxPerUu": {
+      "front": [
+       2.5008,
+       2.5
+      ],
+      "backAndSides": 0.625
+     },
+     "atlasRectsPx_xywh": {
+      "front": [
+       8,
+       291,
+       762,
+       300
+      ],
+      "back": [
+       781,
+       291,
+       193,
+       77
+      ],
+      "side": [
+       8,
+       959,
+       564,
+       7
+      ]
+     }
+    },
+    "textureMeasurements": {
+     "front_rect_px": [
+      8,
+      291,
+      762,
+      300
+     ],
+     "back_rect_px": [
+      781,
+      291,
+      193,
+      77
+     ],
+     "side_rect_px": [
+      8,
+      959,
+      564,
+      7
+     ],
+     "front_object_texels": 181282,
+     "glow_texels": 1512,
+     "wood_texels_fraction": 0.1059,
+     "bc_front_median_srgb": [
+      83,
+      78,
+      74
+     ],
+     "bc_front_mean_linear_luminance": 0.1129,
+     "back_side_srgb": [
+      62,
+      58,
+      55
+     ],
+     "normal_gain": 0.3741,
+     "normal_tilt_deg_p50_p95_max_in_mask": [
+      7.01,
+      25.0,
+      50.42
+     ]
+    },
+    "export": {
+     "fbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/export/SM_Decor_FacadeB.fbx",
+     "sha256": "fa034b31b9f4393c266bf45121beabfbfe37f59ec404c2afc142a4c9bfb6a9e8",
+     "bytes": 27772,
+     "umFbxV1Conforms": true,
+     "absolutePathLeaks": [],
+     "textureRefsInFbx": [
+      "../textures/T_Decor_Facades_BC.png"
+     ]
+    },
+    "readback": {
+     "checkStaticPropFbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/reports/fbx-readback-B.json",
+     "facadeReadback": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/reports/facade-readback-B.json",
+     "triangles": 236,
+     "materialSlots": [
+      "M_Decor_Facades",
+      "M_Decor_FacadeGlow"
+     ],
+     "uvLayers": [
+      "UVMap"
+     ],
+     "objectScale": [
+      0.01,
+      0.01,
+      0.01
+     ],
+     "dimensionsUuReadbackAxes_xThick_yLen_zH": [
+      8.0,
+      304.706,
+      120.0
+     ],
+     "boundsMinUu": [
+      -8.0,
+      -152.353,
+      0.0
+     ],
+     "boundsMaxUu": [
+      0.0,
+      152.353,
+      120.0
+     ],
+     "topologyWelded1um": {
+      "open_edges": 0,
+      "non_manifold_edges": 0,
+      "faces_with_inconsistent_winding": 0
+     },
+     "outerFaceAxis": "+X",
+     "outerFaceOnPivotPlaneX0": true,
+     "texelDensityOuterVsBackPxPerUu": [
+      2.5004,
+      0.625
+     ],
+     "smoothFaces": 0,
+     "protrusionMeasure": "не применим к плоской стене (это мера бочки); запускался с front_z_frac=0.05, чтобы полоса вершин не была пустой"
+    },
+    "checks": {
+     "single_mesh_no_armature": true,
+     "closed_manifold_consistent_winding": true,
+     "front_faces_minus_y": true,
+     "length_300_600_uu_proposed": true,
+     "height_le_120_uu_proposed": true,
+     "height_matches_param_0_1pct": true,
+     "length_matches_trace_0_1pct": true,
+     "thickness_matches_param": true,
+     "material_slots_le_2": true,
+     "uv0_in_0_1_no_overlap": true,
+     "uv_not_mirrored": true,
+     "no_absolute_paths_in_fbx": true,
+     "um_fbx_v1_conforms": true
+    },
+    "checksPassed": true
+   },
+   {
+    "key": "C",
+    "ueName": "SM_Decor_FacadeC",
+    "composition": "Stone ruin with a blind (stone-filled) arch and a pillar. Front view + mirrored back view of the same wall (top-right view of the collage: big blocks, pillar on its left) -> arch wall, pillar, high block wall stepping down, pillar. No opening in the concept, so no glow.",
+    "segments": [
+     {
+      "offset": 0,
+      "x0": 40,
+      "x1": 600,
+      "mirror": false,
+      "base_y": 430
+     },
+     {
+      "offset": 560,
+      "x0": 896,
+      "x1": 1477,
+      "mirror": true,
+      "base_y": 431
+     }
+    ],
+    "dimensionsUu": {
+     "length": 306.115,
+     "thickness": 8.0,
+     "height": 105.0
+    },
+    "uuPerSourcePx": 0.269231,
+    "silhouette": {
+     "polygonVertices": 67,
+     "perimeterUu": 850.651,
+     "areaUu2": 23949.62,
+     "dpToleranceUu": 0.9,
+     "maskVsPolygonPx": {
+      "profile_px": 330378,
+      "polygon_px": 330451,
+      "in_polygon_not_object": 738,
+      "object_not_in_polygon": 665
+     },
+     "columnsWithSeveralRunsFilled": 48,
+     "topColumnsRaisedByClosing": 191
+    },
+    "triangles": 264,
+    "vertices": 134,
+    "trianglesBreakdown": {
+     "front": 65,
+     "back": 65,
+     "sides": 134
+    },
+    "materialSlots": [
+     "M_Decor_Facades"
+    ],
+    "glow": {
+     "faces": 0,
+     "areaUu2": 0.0,
+     "rects": []
+    },
+    "topology": {
+     "welded_boundary_edges": 0,
+     "welded_non_manifold_edges": 0,
+     "faces_with_inconsistent_winding": 0,
+     "connected_shells": 1,
+     "degenerate_faces_area_lt_1e-12": 0,
+     "signed_volume_m3": 0.191596971
+    },
+    "normals": {
+     "shading": "flat (use_smooth off, FBX smoothing FACE)",
+     "customNormals": false,
+     "cornersIntoSurface": 0,
+     "frontAreaWeightedNormal": [
+      0.0,
+      -1.0,
+      0.0
+     ]
+    },
+    "pivot": {
+     "origin": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "rule": "04 §1: facade = bottom edge of the outer face, centred",
+     "min_z_uu": 0.0,
+     "x_centre_offset_uu": 0.0,
+     "front_face_y_uu": 0.0
+    },
+    "uv0": {
+     "islands": 3,
+     "outOf01": 0,
+     "overlapBetweenIslandsPx": 0,
+     "overlapInsideIslandsPx": 0,
+     "flippedVsIsland": 0,
+     "mirroredFaces": 0,
+     "anisotropyP50P95Max": [
+      1.0,
+      1.002,
+      1.002
+     ],
+     "minGutterPx1024": 9,
+     "islandPairsCloserThan4px": 0,
+     "texelDensityPxPerUu": {
+      "front": [
+       2.4991,
+       2.4952
+      ],
+      "backAndSides": 0.625
+     },
+     "atlasRectsPx_xywh": {
+      "front": [
+       8,
+       599,
+       765,
+       262
+      ],
+      "back": [
+       263,
+       869,
+       194,
+       68
+      ],
+      "side": [
+       463,
+       869,
+       534,
+       7
+      ]
+     }
+    },
+    "textureMeasurements": {
+     "front_rect_px": [
+      8,
+      599,
+      765,
+      262
+     ],
+     "back_rect_px": [
+      263,
+      869,
+      194,
+      68
+     ],
+     "side_rect_px": [
+      463,
+      869,
+      534,
+      7
+     ],
+     "front_object_texels": 149489,
+     "glow_texels": 0,
+     "wood_texels_fraction": 0.0002,
+     "bc_front_median_srgb": [
+      84,
+      84,
+      86
+     ],
+     "bc_front_mean_linear_luminance": 0.1014,
+     "back_side_srgb": [
+      63,
+      63,
+      64
+     ],
+     "normal_gain": 0.3277,
+     "normal_tilt_deg_p50_p95_max_in_mask": [
+      4.98,
+      25.0,
+      51.43
+     ]
+    },
+    "export": {
+     "fbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/export/SM_Decor_FacadeC.fbx",
+     "sha256": "ecb1bf3431071c2a93f4ca56552827c3ca93494eaf76063e36d104db941c3023",
+     "bytes": 26908,
+     "umFbxV1Conforms": true,
+     "absolutePathLeaks": [],
+     "textureRefsInFbx": [
+      "../textures/T_Decor_Facades_BC.png"
+     ]
+    },
+    "readback": {
+     "checkStaticPropFbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/reports/fbx-readback-C.json",
+     "facadeReadback": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/reports/facade-readback-C.json",
+     "triangles": 264,
+     "materialSlots": [
+      "M_Decor_Facades"
+     ],
+     "uvLayers": [
+      "UVMap"
+     ],
+     "objectScale": [
+      0.01,
+      0.01,
+      0.01
+     ],
+     "dimensionsUuReadbackAxes_xThick_yLen_zH": [
+      8.0,
+      306.115,
+      105.0
+     ],
+     "boundsMinUu": [
+      -8.0,
+      -153.058,
+      0.0
+     ],
+     "boundsMaxUu": [
+      0.0,
+      153.058,
+      105.0
+     ],
+     "topologyWelded1um": {
+      "open_edges": 0,
+      "non_manifold_edges": 0,
+      "faces_with_inconsistent_winding": 0
+     },
+     "outerFaceAxis": "+X",
+     "outerFaceOnPivotPlaneX0": true,
+     "texelDensityOuterVsBackPxPerUu": [
+      2.4971,
+      0.625
+     ],
+     "smoothFaces": 0,
+     "protrusionMeasure": "не применим к плоской стене (это мера бочки); запускался с front_z_frac=0.05, чтобы полоса вершин не была пустой"
+    },
+    "checks": {
+     "single_mesh_no_armature": true,
+     "closed_manifold_consistent_winding": true,
+     "front_faces_minus_y": true,
+     "length_300_600_uu_proposed": true,
+     "height_le_120_uu_proposed": true,
+     "height_matches_param_0_1pct": true,
+     "length_matches_trace_0_1pct": true,
+     "thickness_matches_param": true,
+     "material_slots_le_2": true,
+     "uv0_in_0_1_no_overlap": true,
+     "uv_not_mirrored": true,
+     "no_absolute_paths_in_fbx": true,
+     "um_fbx_v1_conforms": true
+    },
+    "checksPassed": true
+   }
+  ],
+  "totals": {
+   "triangles": 872,
+   "decorKitBudgetProposed": "30-60k tris на весь кит (04:242)"
+  },
+  "k1ExactFrame": {
+   "vertical_half_fov_deg_16x9": 10.057,
+   "facade_front_y_uu": 270.0,
+   "per_facade": {
+    "A": {
+     "base_deg_above_frame_centre": 9.271,
+     "base_in_frame": true,
+     "top_deg_above_frame_centre": 12.667,
+     "top_in_frame": false
+    },
+    "B": {
+     "base_deg_above_frame_centre": 9.271,
+     "base_in_frame": true,
+     "top_deg_above_frame_centre": 12.996,
+     "top_in_frame": false
+    },
+    "C": {
+     "base_deg_above_frame_centre": 9.271,
+     "base_in_frame": true,
+     "top_deg_above_frame_centre": 12.504,
+     "top_in_frame": false
+    }
+   }
+  },
+  "k1ExactFrameNote": "Камера по 03 §2: 12 м, pitch -55, горизонтальный FOV 35, кадр 16:9, половина вертикального FOV 10.06 град. Фасад стоит передней гранью в y=+270 uu. Основание на +9.27 град. от центра кадра (в кадре), верх на +12.5..+13.0 (вне кадра). В точном K-1 видна нижняя ~1/5 высоты (превью facades-lineup_k1-exact-12m.jpg). ИЗМЕРЕНО аналитически и по превью.",
+  "previews": {
+   "SM_Decor_FacadeA_front": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeA_front-ortho.jpg",
+   "SM_Decor_FacadeB_front": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeB_front-ortho.jpg",
+   "SM_Decor_FacadeC_front": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeC_front-ortho.jpg",
+   "lineup_k1_exact": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/facades-lineup_k1-exact-12m.jpg",
+   "lineup_game_far": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/facades-lineup_game-fov35-pitch55-target-y150.jpg",
+   "SM_Decor_FacadeA_game": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeA_game-fov35-pitch55-target-y150.jpg",
+   "SM_Decor_FacadeB_game": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeB_game-fov35-pitch55-target-y150.jpg",
+   "SM_Decor_FacadeC_game": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeC_game-fov35-pitch55-target-y150.jpg",
+   "A_back": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/SM_Decor_FacadeA_back-3q.jpg"
+  },
+  "previewsExtra": [
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/atlas-layout.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/trace-overlay-A.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/trace-overlay-B.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/preview/trace-overlay-C.jpg"
+  ],
+  "previewNote": "EEVEE, neutral sun key (shadowed) + fill (no shadow), dark world; not the P1.7 control scene. Game shots: FOV 35 deg horizontal, pitch -55 deg, 12 m (03 §2), 16:9, board 6x5 tiles with the long side along X; facade front at y=+270 uu on the side far from the camera. *_k1-exact: target = board centre (K-1); *_target-y150: same camera shifted 1.5 m toward the far side so the facade is in frame. Lineup offsets (B left, C right, 0.6 m further back) are a skyline check, not a layout decision. Emission strength 4 is a preview value only.",
+  "collision": "нет (04 §3.7: декор не интерактивен, клики уходят в L1)",
+  "limitations": [
+   "BC — пиксели концепта вместе с его запечённым светом, de-lighting не делался. Поэтому AO в ORM = 1.0, иначе тень учлась бы дважды.",
+   "N — эвристика из яркости (high-pass), 25 град. на p95; с геометрии не запекалась.",
+   "Зеркальные повторы заметны: у A «шпили» из завала над дверями 2 и 4, у B зеркальные петли ставен, у C зеркальный задний вид.",
+   "Верх стены с игровой камеры виден как однотонная полоса (0.75 x медиана фронта) и читается как тёмная кромка.",
+   "Медиана BC фронта (sRGB): A 65,64,64; B 83,78,74; C 84,84,86. Тон нейтрально-серый, без синевы 03 С-5. Подстройка тона и затемнение по С-9 оставлены параметрам MI; в UE не проверено.",
+   "FBX ссылается только на BC. У бочки так же: экспортёр не распознаёт узлы ORM и N. N и ORM подключаются при импорте по build-профилю."
+  ]
+ },
+ "cliIntegration": "CLI static-candidate adopt не запускался. Профиль рассчитан на Tripo-источник (primary source = GLB) и на отчёт static-prop-candidate/1 с одним FBX. Для концепт-PNG и трёх FBX с общим атласом нужна доработка tripo_pipeline.py, а этот файл сейчас меняет другая задача (см. followups).",
+ "ledger": "Трат не было (Tripo 0, SYNTX 0), поэтому в credits-ledger.json ничего не добавлено.",
+ "deferredUe": [
+  "Импорт SM_Decor_FacadeA/B/C по UM_FBX_v1 (import scale 1.0, без коллизии). Текстуры: BC sRGB/TC_Default, N linear/TC_Normalmap (DirectX, flip_green false), ORM linear/TC_Masks. MI от M_DioramaMaster для стены и свечения (EmissiveIntensity), TeamColor нейтральный.",
+  "Поставить на дальнюю от камеры сторону (AD-CNF-08/AD-OPEN-15), наружной гранью (+X в UE) к доске.",
+  "Fade при зуме >=1.2x до 30-40% за ~200 мс (AD-AC-45). Нужен translucent или dither MI; семантика зума — AD-CNF-04.",
+  "Кадр K-1: все клетки видны и фасадами не закрыты (ART-009). Замерить, какая часть фасадов попадает в кадр: по анализу в K-1 видна только нижняя ~1/5.",
+  "Emissive отключается на минимальных настройках (03 §1.2)."
+ ],
+ "openIssues": [
+  "AD-CNF-08/AD-OPEN-15: сторона размещения.",
+  "AD-CNF-19: 06 предлагает один SM_Decor.fbx, 04 — файл на объект. Сделано по 04: файл на объект, атлас общий.",
+  "AD-CNF-04: семантика зума для fade.",
+  "K-1 по 03 §2 почти не показывает фасады на дальней стороне. Вопрос к GD-058 и Q-302.",
+  "С-5/С-9: тон BC нейтрально-серый и светлее палитры камня из 03.",
+  "Щели свечения — добавление к концептам; нужна художественная оценка (art-chat)."
+ ]
+}

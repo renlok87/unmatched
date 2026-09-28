@@ -1,0 +1,76 @@
+{
+  "schema": "unmatched.decor-facades.params/1",
+  "asset_id": "ASSET-DECOR-KIT-001.FACADES",
+  "run_id": "20260928-facades-flat-v1",
+  "out_dir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "note": "Flat wings (04 §3.7 'плоские кулисы') cut from the front views of the concept collages; no Tripo. All sizes are PROPOSED (04:241, 17:398/719), not budgets. Pixel coordinates are in the source PNG (x right, y down); base_y is the exclusive bottom row of the object (ground contact). Segments are concatenated left to right and aligned at base_y; mirror=true flips the segment horizontally.",
+  "texture_prefix": "T_Decor_Facades",
+  "material_wall": "M_Decor_Facades",
+  "material_glow": "M_Decor_FacadeGlow",
+  "atlas_px": 1024,
+  "pad_px": 8,
+  "density_px_per_uu": 2.5,
+  "back_side_density_scale": 0.25,
+  "thickness_uu": 8.0,
+  "dp_tolerance_uu": 0.9,
+  "mask": {"bg_sigma_px": 20.0, "color_threshold": 11.0, "std_threshold": 4.0, "std_radius_px": 3, "std_needs_color_fraction": 0.45, "color_needs_std": 1.5, "base_snap_px": 6, "min_ground_run_px": 12, "trim_min_column_fraction": 0.25, "top_close_px": 7},
+  "glow_rgb_srgb": [255, 194, 122],
+  "glow_rgb_note": "#FFC27A inside 03 С-6 #FFB45C-#FFCE8A (R=FF, G C2 in B4..CE, B 7A in 5C..8A)",
+  "normal_max_tilt_deg_p95": 25.0,
+  "roughness": {"stone": 0.9, "wood": 0.8, "glow": 0.5, "back_side": 0.95},
+  "back_side_colour_scale": 0.75,
+  "free_fill_srgb": [42, 48, 56],
+  "free_fill_note": "#2A3038 = lower bound of 03 С-5 stone shadow palette; texels outside every UV island",
+  "facades": [
+    {
+      "key": "A",
+      "asset_name": "SM_Decor_FacadeA",
+      "height_uu": 110.0,
+      "source": "art/imagegen/mvp-v1/environment/ref-facade-a.png",
+      "sha256": "2454c4fea890bc3e55d3983b7aa8e4d68ee9e0983250e3dec921fbd37964b5ef",
+      "composition_note": "Gothic arcade. Source front view has 2 bays; 5 bays are built by chaining P=[40,212) (left pillar + left half of door 1), S=[212,500) (right half of door 1 + middle pillar + left half of door 2) and mirrored copies. Every seam is at a door centre and is either the original continuity or a mirror seam, so no texture discontinuity is introduced; doors 2..5 are symmetric by construction.",
+      "segments": [
+        {"x0": 36, "x1": 212, "y0": 24, "base_y": 448, "mirror": false},
+        {"x0": 212, "x1": 500, "y0": 24, "base_y": 448, "mirror": false},
+        {"x0": 212, "x1": 500, "y0": 24, "base_y": 448, "mirror": true},
+        {"x0": 212, "x1": 500, "y0": 24, "base_y": 448, "mirror": false},
+        {"x0": 212, "x1": 500, "y0": 24, "base_y": 448, "mirror": true},
+        {"x0": 36, "x1": 212, "y0": 24, "base_y": 448, "mirror": true}
+      ],
+      "glow": [
+        {"seam": 2, "width_uu": 2.4, "y0": 300, "y1": 404, "why": "door 2 (symmetric double door at a mirror seam): leaves ajar, warm slit from threshold to the cross bar"},
+        {"seam": 4, "width_uu": 2.4, "y0": 300, "y1": 404, "why": "door 4, same"}
+      ]
+    },
+    {
+      "key": "B",
+      "asset_name": "SM_Decor_FacadeB",
+      "height_uu": 120.0,
+      "source": "art/imagegen/mvp-v1/environment/ref-facade-b.png",
+      "sha256": "c8e6279b2ca6c0de412b76d0f08b85906bf1c32d49aa18d37d7ca952a567b112",
+      "composition_note": "Half-timbered gable with a ruined stepped stone end. Two houses: B + mirror(B) joined at the ruined end (mirror seam at x=530), giving a row of two gables with a collapsed party wall between them; the eaves overhang at both outer ends.",
+      "segments": [
+        {"x0": 12, "x1": 532, "y0": 12, "base_y": 427, "mirror": false},
+        {"x0": 12, "x1": 532, "y0": 12, "base_y": 427, "mirror": true}
+      ],
+      "glow": [
+        {"segment": 0, "x_center": 245, "width_uu": 2.4, "y0": 199, "y1": 309, "why": "gap between the two shutter leaves (shutters ajar), warm light from inside"},
+        {"segment": 1, "x_center": 245, "width_uu": 2.4, "y0": 199, "y1": 309, "why": "same window in the mirrored house"}
+      ]
+    },
+    {
+      "key": "C",
+      "asset_name": "SM_Decor_FacadeC",
+      "height_uu": 105.0,
+      "source": "art/imagegen/mvp-v1/environment/ref-facade-c.png",
+      "sha256": "004562349398af166c317ed9145fa456376d07561f5d489f684b7311985611be",
+      "composition_note": "Stone ruin with a blind (stone-filled) arch and a pillar. Front view + mirrored back view of the same wall (top-right view of the collage: big blocks, pillar on its left) -> arch wall, pillar, high block wall stepping down, pillar. No opening in the concept, so no glow.",
+      "segments": [
+        {"x0": 40, "x1": 610, "y0": 30, "base_y": 430, "mirror": false, "trim": ["right"]},
+        {"x0": 896, "x1": 1496, "y0": 30, "base_y": 431, "mirror": true, "trim": ["left"]}
+      ],
+      "glow": []
+    }
+  ]
+}
