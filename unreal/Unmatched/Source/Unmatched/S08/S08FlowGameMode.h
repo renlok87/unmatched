@@ -274,7 +274,7 @@ private:
   struct FS09CombatResult {
     bool bValid = false;
     int32 SequenceNumber = 0;
-    int32 Damage = 0;          // health the target lost in this combat
+    int32 Damage = -1;         // net health lost; -1 when the opening snapshot is unavailable
     FString TargetFighterId;  // attacked fighter (own or enemy - public board id)
     bool bViewerWasDefender = false;
     bool bViewerWasAttacker = false;
@@ -285,12 +285,16 @@ private:
   FS09CombatResult LastCombatResult;
   FS08Snapshot PrevApplied;    // combat-close detection baseline
   bool bHasPrevApplied = false;
+  FString CombatStartTargetId;
+  int32 CombatStartTargetHealth = -1;
   // auto plan tokens: attack | defend | nodefense | resolve | scheme
   TArray<FString> S09CombatPlan;
   bool bS09ShotDefense = false;
   bool bS09ShotResolve = false;
   bool bS09ShotResult = false;
   bool bS09ShotResolveRevealed = false; // resolve window AFTER the reveal (GD-033 proof)
+  bool bS09ShotDamage = false;
+  float DamageShotAtElapsed = -1.0f;
   FString S09ShotDefensePath;
   FString S09ShotResolvePath;
   FString S09ShotResultPath;

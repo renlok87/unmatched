@@ -11,6 +11,7 @@
 class UStaticMeshComponent;
 class USkeletalMeshComponent;
 class UTextRenderComponent;
+class UBillboardComponent;
 class UMaterialInstanceDynamic;
 
 UCLASS()
@@ -59,6 +60,9 @@ private:
   TObjectPtr<UStaticMeshComponent> TargetRing;
 
   UPROPERTY()
+  TObjectPtr<UBillboardComponent> TargetIcon;
+
+  UPROPERTY()
   TObjectPtr<USkeletalMeshComponent> ArtBody;
 
   UPROPERTY()
@@ -69,6 +73,7 @@ private:
 
   bool bArtSelectionRingLoaded = false;
   bool bArtTargetRingLoaded = false;
+  bool bArtTargetIconLoaded = false;
   bool bIsSelected = false;
   bool bIsCombatAttacker = false;
   bool bIsCombatTarget = false;

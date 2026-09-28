@@ -382,6 +382,28 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
   const bool bNowCombat =
       Snapshot.Phase == TEXT("COMBAT") || Snapshot.Phase == TEXT("COMBAT_RESOLVE");
   const FS08Snapshot Baseline = PrevApplied; // copy before the bookkeeping
+  if (Decision == ES08SeqDecision::Apply && !bPrevCombat && bNowCombat) {
+    CombatStartTargetId.Reset();
+    CombatStartTargetHealth = -1;
+    FS08CombatInfo OpeningCombat;
+    TArray<FS08BoardFighter> OpeningFighters;
+    // A client can first subscribe after ATTACK opened COMBAT. That initial
+    // COMBAT snapshot is still pre-resolution, so its target HP is a valid
+    // starting observation; COMBAT_RESOLVE alone is not (damage may exist).
+    const TSharedPtr<FJsonValue>& OpeningSource = bHasPrevApplied
+        ? Baseline.Fighters : Snapshot.Fighters;
+    if ((bHasPrevApplied || Snapshot.Phase == TEXT("COMBAT")) &&
+        FS08Contracts::CombatInfo(Snapshot, OpeningCombat) &&
+        FS08BoardModel::DecodeFighters(OpeningSource, OpeningFighters)) {
+      CombatStartTargetId = OpeningCombat.TargetFighterId;
+      for (const FS08BoardFighter& Fighter : OpeningFighters) {
+        if (Fighter.Id == CombatStartTargetId) {
+          CombatStartTargetHealth = Fighter.Health;
+          break;
+        }
+      }
+    }
+  }
   if (Decision == ES08SeqDecision::Apply) {
     PrevApplied = Snapshot;
     bHasPrevApplied = true;
@@ -390,26 +412,34 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
 
   FS08CombatInfo PrevCombat;
   const bool bHadCombat = FS08Contracts::CombatInfo(Baseline, PrevCombat);
-  if (!bHadCombat) return;
+  if (!bHadCombat) {
+    CombatStartTargetId.Reset();
+    CombatStartTargetHealth = -1;
+    return;
+  }
 
-  // Damage from the target fighter's health across THIS transition (public
-  // board data; no opponent values needed).
-  TArray<FS08BoardFighter> PrevFighters, NewFighters;
-  FS08BoardModel::DecodeFighters(Baseline.Fighters, PrevFighters);
+  // Damage can be applied on an earlier COMBAT_RESOLVE event. Compare the
+  // public target HP at combat opening with the first non-combat snapshot,
+  // not just the closing transition. Reconnects without an opening baseline
+  // remain unknown rather than being falsely reported as zero.
+  TArray<FS08BoardFighter> NewFighters;
   FS08BoardModel::DecodeFighters(Snapshot.Fighters, NewFighters);
   int32 Damage = -1;
   const FS08BoardFighter* Target = nullptr;
   for (const FS08BoardFighter& New : NewFighters) {
     if (New.Id != PrevCombat.TargetFighterId) continue;
     Target = &New;
-    for (const FS08BoardFighter& Old : PrevFighters) {
-      if (Old.Id == New.Id) { Damage = FMath::Max(0, Old.Health - New.Health); break; }
+    if (CombatStartTargetId == New.Id && CombatStartTargetHealth >= 0) {
+      Damage = FMath::Max(0, CombatStartTargetHealth - New.Health);
     }
+    break;
   }
+  CombatStartTargetId.Reset();
+  CombatStartTargetHealth = -1;
   LastCombatResult = FS09CombatResult();
   LastCombatResult.bValid = true;
   LastCombatResult.SequenceNumber = Snapshot.SequenceNumber;
-  LastCombatResult.Damage = Damage >= 0 ? Damage : 0;
+  LastCombatResult.Damage = Damage;
   LastCombatResult.TargetFighterId = PrevCombat.TargetFighterId;
   const FString ViewerId = Flow.IsValid() ? Flow->GetUserId() : FString();
   LastCombatResult.bViewerWasDefender = PrevCombat.DefenderId == ViewerId;
@@ -421,12 +451,15 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
   }
   const TCHAR* ResultRole = LastCombatResult.bViewerWasDefender ? TEXT("defended") : TEXT("attacked");
   LastCombatResult.OutcomeLine = FString::Printf(
-      TEXT("COMBAT OVER (seq %d): you %s%s - %s took %d damage"),
+      TEXT("COMBAT OVER (seq %d): you %s%s - %s"),
       Snapshot.SequenceNumber, ResultRole,
       LastCombatResult.OwnCommittedValue >= 0
           ? *FString::Printf(TEXT(" with value %d"), LastCombatResult.OwnCommittedValue)
           : TEXT(""),
-      Target ? *Target->Label : TEXT("the target"), LastCombatResult.Damage);
+      Damage >= 0
+          ? *FString::Printf(TEXT("%s took %d damage"),
+                            Target ? *Target->Label : TEXT("the target"), Damage)
+          : TEXT("damage unavailable after reconnect"));
   LastCombatResult.ShownAt = Elapsed;
   FS08Trace::Write(FString::Printf(TEXT("COMBAT-RESULT seq=%d damage=%d role=%s"),
                                    Snapshot.SequenceNumber, LastCombatResult.Damage, ResultRole));
@@ -618,6 +651,13 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
     } else {
       Line = FString::Printf(TEXT("CUE damage %s -%d seq=%d"), *Cue.FighterId, Cue.Damage,
                              Cue.SequenceNumber);
+      if (BoardActor) {
+        BoardActor->ShowDamageNumber(Cue.FighterId, Cue.Damage, Cue.SequenceNumber);
+        if (BoardActor->IsArtActive() && !bS09ShotDamage &&
+            DamageShotAtElapsed < 0.0f && !S09ShotDir.IsEmpty()) {
+          DamageShotAtElapsed = Elapsed + 0.2f;
+        }
+      }
     }
     TraceLines.Add(Line);
     FS08Trace::Write(Line);
@@ -2503,6 +2543,12 @@ void AS08FlowGameMode::RunS09Auto() {
 
 void AS08FlowGameMode::TakeS09Shots() {
   if (!bAutoS09 || !Flow.IsValid() || S09ShotDir.IsEmpty()) return;
+  if (!bS09ShotDamage && DamageShotAtElapsed >= 0.0f &&
+      Elapsed >= DamageShotAtElapsed) {
+    bS09ShotDamage = true;
+    FS08Trace::Write(TEXT("S09AUTO damage-number shot"));
+    TakeEvidenceShot(S09ShotDir / TEXT("s09-damage-number.png"));
+  }
   const FS08Snapshot& Snap = Flow->GetAppliedSnapshot();
   // Shot 1: first confirmed maneuver settled (begin+submit applied, HUD live).
   if (!bS09ShotHud && ShotHudAtElapsed < 0.0f && S09FirstConfirmSeq >= 0 &&
@@ -3454,6 +3500,10 @@ void AS08FlowGameMode::ClearGameplayHud() {
   LastCombatResult = FS09CombatResult();
   PrevApplied = FS08Snapshot();
   bHasPrevApplied = false;
+  CombatStartTargetId.Reset();
+  CombatStartTargetHealth = -1;
+  bS09ShotDamage = false;
+  DamageShotAtElapsed = -1.0f;
   PreviousOwnHandIds.Reset();
   PreviousHandSeq = 0;
   bDiscardBrowserOpen = false;

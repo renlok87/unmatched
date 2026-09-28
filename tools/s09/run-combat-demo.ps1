@@ -418,6 +418,21 @@ function Invoke-CombatDemo {
       'S09AUTO resolve-window shot', 'S09AUTO resolve',
       'RESOLVE sent', 'RESOLVE done seq=',
       'COMBAT-RESULT seq=', 'S09AUTO combat-result shot') 'joiner'
+    if ($ArtPreview) {
+      Assert-Trace $joinTrace @(
+        'ARTPREVIEW damage-number fighter=',
+        'S09AUTO damage-number shot', ' icon=1 targetMesh=') 'joiner-art'
+      foreach ($entry in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        $seen = @{}
+        foreach ($line in (Get-Content -LiteralPath $entry[1])) {
+          if ($line -match 'ARTPREVIEW damage-number fighter=(\S+) amount=(\d+) seq=(\d+)') {
+            $key = "$($Matches[1]):$($Matches[3])"
+            if ($seen.ContainsKey($key)) { throw "$($entry[0]) duplicate damage number: $key" }
+            $seen[$key] = $true
+          }
+        }
+      }
+    }
 
     # GD-033 reveal proof: the reveal-marker shot is captured when the server
     # reveal leaves the resolve window open (post-reveal pause). If the combat
@@ -492,6 +507,7 @@ function Invoke-CombatDemo {
       'joiner\s09-combat-defense-open.png', 'joiner\s09-combat-resolve-window.png', 'joiner\s09-combat-result.png'
     )
     if ($RevealProof.StartsWith('present')) { $publishNames += $RevealShotRel }
+    if ($ArtPreview) { $publishNames += (Join-Path 'joiner' 's09-damage-number.png') }
     $RunDir = Join-Path $EvidenceDir ("combat-" + $Stamp)
     if (Test-Path -LiteralPath $RunDir) { throw "run dir already exists: $RunDir" }
     New-Item -ItemType Directory -Path $RunDir | Out-Null

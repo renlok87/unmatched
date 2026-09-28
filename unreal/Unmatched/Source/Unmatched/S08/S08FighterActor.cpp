@@ -2,9 +2,11 @@
 #include "S08TraceLog.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/BillboardComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/StaticMesh.h"
+#include "Engine/Texture2D.h"
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Materials/MaterialInterface.h"
@@ -59,6 +61,13 @@ AS08FighterActor::AS08FighterActor() {
   TargetRing->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   TargetRing->SetVisibility(false);
 
+  TargetIcon = CreateDefaultSubobject<UBillboardComponent>(TEXT("TargetIcon"));
+  TargetIcon->SetupAttachment(RootComponent);
+  TargetIcon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  // BillboardComponent is hidden in game by default (editor helper sprite).
+  TargetIcon->SetHiddenInGame(false);
+  TargetIcon->SetVisibility(false);
+
   ArtBody = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ArtBody"));
   ArtBody->SetupAttachment(RootComponent);
   ArtBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -101,6 +110,12 @@ void AS08FighterActor::BeginPlay() {
             TEXT("/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TargetRing"))) {
       TargetRing->SetStaticMesh(ArtTarget);
       bArtTargetRingLoaded = true;
+    }
+    if (UTexture2D* AttackIcon = LoadObject<UTexture2D>(nullptr,
+            TEXT("/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_AttackConcept"))) {
+      TargetIcon->SetSprite(AttackIcon);
+      TargetIcon->SetRelativeScale3D(FVector(0.042f));
+      bArtTargetIconLoaded = true;
     }
   }
   // Text faces the camera (+Y side, camera yaw -90 looks along -Y).
@@ -221,6 +236,8 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   Ring->SetRelativeLocation(FVector(0, 0, 1.0f));
   TargetRing->SetRelativeScale3D(FVector(Fighter.bIsHero ? 1.0f : 0.78f));
   TargetRing->SetRelativeLocation(FVector::ZeroVector);
+  TargetIcon->SetRelativeLocation(FVector(Fighter.X >= 4 ? -20.0f : 20.0f, 0.0f,
+      Fighter.bIsHero ? 112.0f : 90.0f));
   if (bArtFigure) {
     // The 30-uu pedestal remains a separate visual mesh. The original
     // cylinders are still team/selection feedback and query-only hit areas.
@@ -287,9 +304,11 @@ void AS08FighterActor::SetCombatMarkers(bool bAttacker, bool bTarget) {
   bIsCombatTarget = bNewTarget;
   Ring->SetVisibility(bIsSelected || bIsCombatAttacker);
   TargetRing->SetVisibility(bIsCombatTarget);
+  TargetIcon->SetVisibility(bIsCombatTarget && bArtTargetIconLoaded);
   FS08Trace::Write(FString::Printf(
-      TEXT("ARTPREVIEW combat marker fighter=%s attacker=%d target=%d targetMesh=%s"),
+      TEXT("ARTPREVIEW combat marker fighter=%s attacker=%d target=%d icon=%d targetMesh=%s"),
       *Fighter.Name, bIsCombatAttacker ? 1 : 0, bIsCombatTarget ? 1 : 0,
+      bIsCombatTarget && bArtTargetIconLoaded ? 1 : 0,
       TargetRing->GetStaticMesh() ? *TargetRing->GetStaticMesh()->GetName()
                                   : TEXT("none")));
 }
