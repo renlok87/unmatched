@@ -141,6 +141,9 @@ void AS08FlowGameMode::BeginPlay() {
   FParse::Value(FCommandLine::Get(), TEXT("S08DropWsAfter="), AutoDropWsAfter);
   FParse::Value(FCommandLine::Get(), TEXT("S08ManeuverAfter="), AutoManeuverAfter);
   FParse::Value(FCommandLine::Get(), TEXT("S08ExitAfter="), AutoExitAfter);
+  if (FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) {
+    FParse::Value(FCommandLine::Get(), TEXT("ArtPreviewShotAfter="), ArtPreviewShotAfter);
+  }
   // S10/GD-039: the auto host create mode (-S08Mode=VS_AI drives the packaged
   // one-client VS_AI gate; anything else stays ONE_V_ONE).
   {
@@ -3079,6 +3082,15 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   if (IllegalUntil > 0.0f && Elapsed > IllegalUntil) {
     IllegalUntil = 0.0f;
     if (BoardActor) BoardActor->HideIllegalCell();
+  }
+  // Cobble's opening six figures can occupy every orthogonal square around
+  // Medusa. Capture the authoritative, HUD-inclusive settled board even when
+  // the historical one-step S08 demo has no legal move on this map.
+  if (!bShotTaken && ArtPreviewShotAfter >= 0.0f && Elapsed >= ArtPreviewShotAfter &&
+      !AutoShotPath.IsEmpty() && BoardActor && BoardActor->IsArtActive() &&
+      Flow.IsValid() && Flow->GetStage() == ES08Stage::Started &&
+      Flow->GetAppliedSnapshot().SequenceNumber > 0) {
+    TakeEvidenceShot(FString());
   }
   if (!bShotTaken && Flow.IsValid() && !Flow->IsManeuverInFlight()) {
     // Host path: maneuver complete = begin (seq+1) and submit (seq+2) both

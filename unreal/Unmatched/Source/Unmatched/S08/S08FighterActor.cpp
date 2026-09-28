@@ -1,6 +1,9 @@
 #include "S08FighterActor.h"
+#include "S08TraceLog.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/SkeletalMesh.h"
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Materials/MaterialInterface.h"
@@ -48,6 +51,21 @@ AS08FighterActor::AS08FighterActor() {
   Ring->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   Ring->SetVisibility(false);
 
+  ArtBody = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ArtBody"));
+  ArtBody->SetupAttachment(RootComponent);
+  ArtBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  ArtBody->SetVisibility(false);
+
+  ArtBase = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArtBase"));
+  ArtBase->SetupAttachment(RootComponent);
+  ArtBase->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  ArtBase->SetVisibility(false);
+
+  ArtPlaceholder = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArtPlaceholder"));
+  ArtPlaceholder->SetupAttachment(RootComponent);
+  ArtPlaceholder->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  ArtPlaceholder->SetVisibility(false);
+
   Label = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Label"));
   Label->SetupAttachment(RootComponent);
   Label->SetHorizontalAlignment(EHTA_Center);
@@ -74,9 +92,70 @@ void AS08FighterActor::BeginPlay() {
 }
 
 void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
-                                    const FVector& CellCenter, bool bOwn) {
+                                    const FVector& CellCenter, bool bOwn,
+                                    bool bArtPreview) {
   Fighter = InFighter;
   SetActorLocation(CellCenter);
+
+  bool bVisualArt = false;
+  bool bVisualBlockout = false;
+  // The candidate is a Medusa sculpt, not a substitute for Arthur, Merlin or
+  // the three Harpies. Keep their honest grey blockouts in this pilot.
+  const bool bMedusaCandidate = bArtPreview && Fighter.bIsHero &&
+      Fighter.Name.Equals(TEXT("Medusa"), ESearchCase::IgnoreCase);
+  if (bMedusaCandidate) {
+    USkeletalMesh* Mesh = LoadObject<USkeletalMesh>(nullptr,
+        TEXT("/Game/ArtPreview/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate"));
+    UStaticMesh* Pedestal = LoadObject<UStaticMesh>(nullptr,
+        TEXT("/Game/ArtPreview/Medusa/Meshes/SM_Medusa_Base_v2Candidate"));
+    UMaterialInterface* TeamMaterial = LoadObject<UMaterialInterface>(nullptr,
+        bOwn ? TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_Blue")
+             : TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_Red"));
+    bVisualArt = Mesh && Mesh->GetSkeleton() && Pedestal && TeamMaterial;
+    if (bVisualArt) {
+      ArtBody->SetSkeletalMeshAsset(Mesh);
+      ArtBase->SetStaticMesh(Pedestal);
+      for (int32 Slot = 0; Slot < 2; ++Slot) ArtBody->SetMaterial(Slot, TeamMaterial);
+      ArtBase->SetMaterial(0, TeamMaterial);
+      // The 5x6 board's negative-Y side faces +Y; the far side faces -Y.
+      ArtBody->SetRelativeRotation(FRotator(0, CellCenter.Y < 0 ? 0 : 180, 0));
+      ArtBase->SetRelativeRotation(FRotator(0, CellCenter.Y < 0 ? 0 : 180, 0));
+      const float FigureScale = Fighter.bIsHero ? 1.0f : 0.78f;
+      ArtBody->SetRelativeScale3D(FVector(FigureScale));
+      ArtBase->SetRelativeScale3D(FVector(FigureScale));
+    }
+  }
+  if (bArtPreview && !bMedusaCandidate) {
+    const TCHAR* MeshPath = nullptr;
+    if (Fighter.Name.Equals(TEXT("King Arthur"), ESearchCase::IgnoreCase)) {
+      MeshPath = TEXT("/Game/ArtTests/ART003/Meshes/SM_ART003_Arthur");
+    } else if (Fighter.Name.Equals(TEXT("Merlin"), ESearchCase::IgnoreCase)) {
+      MeshPath = TEXT("/Game/ArtTests/ART003/Meshes/SM_ART003_Merlin");
+    } else if (Fighter.Name.Equals(TEXT("Harpies"), ESearchCase::IgnoreCase)) {
+      MeshPath = TEXT("/Game/ArtTests/ART003/Meshes/SM_ART003_Harpy");
+    }
+    if (MeshPath) {
+      if (UStaticMesh* PreviewMesh = LoadObject<UStaticMesh>(nullptr, MeshPath)) {
+        ArtPlaceholder->SetStaticMesh(PreviewMesh);
+        ArtPlaceholder->SetRelativeRotation(
+            FRotator(0, CellCenter.Y < 0 ? 0 : 180, 0));
+        bVisualBlockout = true;
+      }
+    }
+  }
+  const bool bArtFigure = bVisualArt || bVisualBlockout;
+  Body->SetVisibility(!bArtFigure);
+  ArtBody->SetVisibility(bVisualArt);
+  ArtBase->SetVisibility(bVisualArt);
+  ArtPlaceholder->SetVisibility(bVisualBlockout);
+  if (bArtPreview && Fighter.Name.Contains(TEXT("Medusa"))) {
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW fighter=%s hero=%d eligible=%d visual=%d mesh=%s"),
+        *Fighter.Name, Fighter.bIsHero ? 1 : 0, bMedusaCandidate ? 1 : 0,
+        bVisualArt ? 1 : 0,
+        ArtBody->GetSkeletalMeshAsset() ?
+            *ArtBody->GetSkeletalMeshAsset()->GetName() : TEXT("none")));
+  }
 
   // Team-colored base: own = blue, enemy = red (grey-slice distinction).
   // The blue rides an HDR emissive value: the tonemapper dims dark blues
@@ -117,6 +196,17 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   Base->SetRelativeLocation(FVector(0, 0, 3.0f));
   Ring->SetWorldScale3D(FVector(1.15f, 1.15f, 0.04f));
   Ring->SetRelativeLocation(FVector(0, 0, 1.0f));
+  if (bArtFigure) {
+    // The 30-uu pedestal remains a separate visual mesh. The original
+    // cylinders are still team/selection feedback and query-only hit areas.
+    const float FigureScale = Fighter.bIsHero ? 1.0f : 0.78f;
+    Base->SetWorldScale3D(FVector(.4f * FigureScale, .4f * FigureScale, .02f));
+    Base->SetRelativeLocation(FVector(0, 0, -1.0f));
+    Ring->SetWorldScale3D(FVector(.47f * FigureScale, .47f * FigureScale, .02f));
+    Ring->SetRelativeLocation(FVector(0, 0, .5f));
+    Label->SetRelativeLocation(FVector(0, 0, Fighter.bIsHero ? 82.0f : 65.0f));
+    HpLabel->SetRelativeLocation(FVector(0, 0, Fighter.bIsHero ? 66.0f : 52.0f));
+  }
 
   // SetupCameraForBoard pulls the camera back to fit bigger boards, which
   // shrinks on-screen text; grow both lines back with the camera distance

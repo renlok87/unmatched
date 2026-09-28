@@ -9,6 +9,7 @@
 #include "S08FighterActor.generated.h"
 
 class UStaticMeshComponent;
+class USkeletalMeshComponent;
 class UTextRenderComponent;
 class UMaterialInstanceDynamic;
 
@@ -21,7 +22,8 @@ public:
 
   /** Positions the mannequin at the cell center (Z=0) and applies the
    *  grey-slice visual distinctions. */
-  void ApplyFighter(const FS08BoardFighter& Fighter, const FVector& CellCenter, bool bOwn);
+  void ApplyFighter(const FS08BoardFighter& Fighter, const FVector& CellCenter,
+                    bool bOwn, bool bArtPreview);
   const FS08BoardFighter& GetFighter() const { return Fighter; }
   const FString& GetFighterId() const { return Fighter.Id; }
 
@@ -45,6 +47,15 @@ private:
 
   UPROPERTY()
   TObjectPtr<UStaticMeshComponent> Ring;
+
+  UPROPERTY()
+  TObjectPtr<USkeletalMeshComponent> ArtBody;
+
+  UPROPERTY()
+  TObjectPtr<UStaticMeshComponent> ArtBase;
+
+  UPROPERTY()
+  TObjectPtr<UStaticMeshComponent> ArtPlaceholder;
 
   FS08BoardFighter Fighter;
 };

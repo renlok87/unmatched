@@ -11,7 +11,9 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "blender/ASSET-MEDUSA-001"
 EXPORT = SOURCE / "export"
 TEXTURES = SOURCE / "textures"
-DEST = "/Game/ART004/Medusa"
+DEST = os.environ.get("ART004_MATERIAL_DEST", "/Game/ART004/Medusa")
+if DEST != "/Game/ART004/Medusa" and os.environ.get("ART004_MATERIAL_ONLY", "0") != "1":
+    raise ValueError("Alternate material destination is available only for material-only import")
 ANIM_DEST = DEST + "/Animation"
 EVIDENCE = SOURCE / "ue-import-result.json"
 REPORT = {"destination": DEST, "checks": {}, "assets": {}}

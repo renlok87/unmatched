@@ -1,9 +1,18 @@
 #include "S08BoardActor.h"
 #include "S08FighterActor.h"
+#include "S08TraceLog.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/DirectionalLightComponent.h"
+#include "Components/PointLightComponent.h"
+#include "Engine/DirectionalLight.h"
+#include "Engine/PointLight.h"
+#include "Engine/SkeletalMesh.h"
+#include "Engine/StaticMesh.h"
 #include "Materials/MaterialInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "UObject/ConstructorHelpers.h"
 
 namespace {
@@ -13,6 +22,15 @@ UMaterialInterface* LoadTileMaterial() {
   return Cached ? Cached
                 : LoadObject<UMaterialInterface>(
                       nullptr, TEXT("/Engine/BasicShapes/BasicShapeMaterial"));
+}
+
+bool SupportsCobbleArt(const FS08BoardModel& Board) {
+  if (Board.Width != 5 || Board.Height != 6 || Board.Cells.Num() != 30) return false;
+  for (const FS08Cell& Cell : Board.Cells) {
+    if (Cell.Type != ES08CellType::Normal || Cell.Zones.Num() != 1 ||
+        (Cell.Zones[0] != TEXT("blue") && Cell.Zones[0] != TEXT("red"))) return false;
+  }
+  return true;
 }
 } // namespace
 
@@ -41,6 +59,34 @@ AS08BoardActor::AS08BoardActor() {
   UnderlayTiles->SetStaticMesh(Cube);
   UnderlayTiles->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
   UnderlayTiles->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+
+  ArtBoard = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArtBoard"));
+  ArtBoard->SetupAttachment(RootComponent);
+  ArtBoard->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  ArtBoard->SetVisibility(false);
+
+  ArtCorners = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("ArtCorners"));
+  ArtCorners->SetupAttachment(RootComponent);
+  ArtCorners->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  ArtCorners->SetVisibility(false);
+
+  ArtBlueZones = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("ArtBlueZones"));
+  ArtBlueZones->SetupAttachment(RootComponent);
+  ArtBlueZones->SetStaticMesh(Cube);
+  ArtBlueZones->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  ArtBlueZones->SetVisibility(false);
+
+  ArtRedZones = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("ArtRedZones"));
+  ArtRedZones->SetupAttachment(RootComponent);
+  ArtRedZones->SetStaticMesh(Cube);
+  ArtRedZones->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  ArtRedZones->SetVisibility(false);
+
+  ArtZoneGlyphs = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("ArtZoneGlyphs"));
+  ArtZoneGlyphs->SetupAttachment(RootComponent);
+  ArtZoneGlyphs->SetStaticMesh(Cube);
+  ArtZoneGlyphs->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  ArtZoneGlyphs->SetVisibility(false);
 }
 
 void AS08BoardActor::BeginPlay() {
@@ -54,9 +100,61 @@ void AS08BoardActor::BeginPlay() {
     UnderlayMid->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.07f, 0.07f, 0.09f));
     UnderlayTiles->SetMaterial(0, UnderlayMid);
   }
+  if (!FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) return;
+  UStaticMesh* Board = LoadObject<UStaticMesh>(nullptr,
+      TEXT("/Game/ArtTests/ART005F/Meshes/SM_ART005_BoardStoneV4_WoodUV"));
+  UStaticMesh* Corner = LoadObject<UStaticMesh>(nullptr,
+      TEXT("/Game/ArtTests/ART005H/Meshes/SM_ART005_CornerBracket_v1"));
+  UMaterialInterface* Stone = LoadObject<UMaterialInterface>(nullptr,
+      TEXT("/Game/ArtTests/ART005E/Materials/M_ART005E_Stone_DiffuseOnly_v4"));
+  UMaterialInterface* Wood = LoadObject<UMaterialInterface>(nullptr,
+      TEXT("/Game/ArtTests/ART005G/Materials/M_ART005G_Wood_DiffuseOnly"));
+  UMaterialInterface* Iron = LoadObject<UMaterialInterface>(nullptr,
+      TEXT("/Game/ArtTests/ART005H/Materials/M_ART005H_IronCorner_Review"));
+  UMaterialInterface* Blue = LoadObject<UMaterialInterface>(nullptr,
+      TEXT("/Game/ArtTests/ART005/Materials/M_ART005_BlueSection_Review"));
+  UMaterialInterface* Red = LoadObject<UMaterialInterface>(nullptr,
+      TEXT("/Game/ArtTests/ART005/Materials/M_ART005_RedSection_Review"));
+  UMaterialInterface* Glyph = LoadObject<UMaterialInterface>(nullptr,
+      TEXT("/Game/ArtTests/ART005/Materials/M_ART005_ZoneGlyph_Review"));
+  USkeletalMesh* Medusa = LoadObject<USkeletalMesh>(nullptr,
+      TEXT("/Game/ArtPreview/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate"));
+  UStaticMesh* Pedestal = LoadObject<UStaticMesh>(nullptr,
+      TEXT("/Game/ArtPreview/Medusa/Meshes/SM_Medusa_Base_v2Candidate"));
+  UMaterialInterface* TeamBlue = LoadObject<UMaterialInterface>(nullptr,
+      TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_Blue"));
+  UMaterialInterface* TeamRed = LoadObject<UMaterialInterface>(nullptr,
+      TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_Red"));
+  if (!Board || !Corner || !Stone || !Wood || !Iron || !Blue || !Red || !Glyph ||
+      !Medusa || !Medusa->GetSkeleton() || !Pedestal || !TeamBlue || !TeamRed) {
+    UE_LOG(LogTemp, Warning, TEXT("ARTPREVIEW Cobble assets missing; keeping grey board"));
+    return;
+  }
+  const int32 StoneSlot = Board->GetMaterialIndex(TEXT("M_ART005_Stone_AtlasB_Provisional"));
+  const int32 WoodSlot = Board->GetMaterialIndex(TEXT("M_ART005_Wood_Provisional"));
+  if (StoneSlot < 0 || WoodSlot < 0) {
+    UE_LOG(LogTemp, Warning, TEXT("ARTPREVIEW Cobble material slots changed; keeping grey board"));
+    return;
+  }
+  ArtBoard->SetStaticMesh(Board);
+  ArtBoard->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+  ArtBoard->SetMaterial(StoneSlot, Stone);
+  ArtBoard->SetMaterial(WoodSlot, Wood);
+  ArtCorners->SetStaticMesh(Corner);
+  ArtCorners->SetMaterial(0, Iron);
+  ArtBlueZones->SetMaterial(0, Blue);
+  ArtRedZones->SetMaterial(0, Red);
+  ArtZoneGlyphs->SetMaterial(0, Glyph);
+  bArtAssetsReady = true;
+  UE_LOG(LogTemp, Display, TEXT("ARTPREVIEW Cobble assets ready"));
+  FS08Trace::Write(TEXT("ARTPREVIEW Cobble assets ready"));
 }
 
 void AS08BoardActor::EndPlay(const EEndPlayReason::Type Reason) {
+  for (AActor* Light : ArtLights) {
+    if (Light) Light->Destroy();
+  }
+  ArtLights.Reset();
   ClearChildren();
   Super::EndPlay(Reason);
 }
@@ -90,7 +188,8 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
     bool bSameTypes = true;
     for (int32 i = 0; i < BoardModel.Cells.Num(); ++i) {
       if (BoardModel.Cells[i].Type != Board.Cells[i].Type ||
-          BoardModel.Cells[i].bIsOpen != Board.Cells[i].bIsOpen) {
+          BoardModel.Cells[i].bIsOpen != Board.Cells[i].bIsOpen ||
+          BoardModel.Cells[i].Zones != Board.Cells[i].Zones) {
         bSameTypes = false;
         break;
       }
@@ -98,9 +197,60 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
     if (bSameTypes) return true; // geometry unchanged: tiles stay as-is
   }
   BoardModel = Board;
+  bArtActive = bArtAssetsReady && SupportsCobbleArt(Board);
+  if (!bArtActive) {
+    for (AActor* Light : ArtLights) {
+      if (Light) Light->Destroy();
+    }
+    ArtLights.Reset();
+  } else if (ArtLights.IsEmpty()) {
+    // ART-005 editor probe lighting, reproduced only for this opt-in Cobble
+    // review. S08Arena has no scene lights, so the PBR board would be black.
+    // These measured candidates are not lighting settings for other maps.
+    ADirectionalLight* Key = GetWorld()->SpawnActor<ADirectionalLight>(
+        FVector(-350, -150, 600), FRotator(0, -55, 30));
+    APointLight* Ambient = GetWorld()->SpawnActor<APointLight>(
+        FVector(0, -100, 550), FRotator::ZeroRotator);
+    APointLight* Warm = GetWorld()->SpawnActor<APointLight>(
+        FVector(260, -300, 250), FRotator::ZeroRotator);
+    if (Key && Ambient && Warm) {
+      Key->GetLightComponent()->SetMobility(EComponentMobility::Movable);
+      Key->GetLightComponent()->SetIntensity(4.5f);
+      auto ConfigureFill = [](APointLight* Light, float Intensity, float Radius) {
+        UPointLightComponent* Component = CastChecked<UPointLightComponent>(Light->GetLightComponent());
+        Component->SetMobility(EComponentMobility::Movable);
+        Component->SetIntensity(Intensity);
+        Component->SetAttenuationRadius(Radius);
+        Component->SetCastShadows(false);
+      };
+      ConfigureFill(Ambient, 700.0f, 1800.0f);
+      ConfigureFill(Warm, 85.0f, 450.0f);
+      ArtLights.Add(Key);
+      ArtLights.Add(Ambient);
+      ArtLights.Add(Warm);
+      FS08Trace::Write(TEXT("ARTPREVIEW Cobble probe lights key=4.5 fill=700 warm=85"));
+    } else {
+      if (Key) Key->Destroy();
+      if (Ambient) Ambient->Destroy();
+      if (Warm) Warm->Destroy();
+      FS08Trace::Write(TEXT("ARTPREVIEW Cobble probe lights failed"));
+    }
+  }
   NormalTiles->ClearInstances();
   BlockerTiles->ClearInstances();
   UnderlayTiles->ClearInstances();
+  ArtCorners->ClearInstances();
+  ArtBlueZones->ClearInstances();
+  ArtRedZones->ClearInstances();
+  ArtZoneGlyphs->ClearInstances();
+  NormalTiles->SetVisibility(!bArtActive);
+  BlockerTiles->SetVisibility(!bArtActive);
+  UnderlayTiles->SetVisibility(!bArtActive);
+  ArtBoard->SetVisibility(bArtActive);
+  ArtCorners->SetVisibility(bArtActive);
+  ArtBlueZones->SetVisibility(bArtActive);
+  ArtRedZones->SetVisibility(bArtActive);
+  ArtZoneGlyphs->SetVisibility(bArtActive);
   // Full-board dark slab: top at z=-0.5 (just under the tile tops at z=0)
   // so grooves and the outer frame read dark; spans exactly the INT-019
   // cell boundaries, so a trace landing in a groove still resolves to the
@@ -124,7 +274,38 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
                                    : FVector(TileVisualScaleXY,
                                              TileVisualScaleXY, 0.1f));
       Target->AddInstanceWorldSpace(Instance);
+      if (bArtActive) {
+        const bool bBlue = Cell->Zones[0] == TEXT("blue");
+        (bBlue ? ArtBlueZones : ArtRedZones)->AddInstance(FTransform(
+            FRotator::ZeroRotator, World + FVector(0, 46, 0.28f),
+            FVector(0.96f, 0.035f, 0.004f)), true);
+        const FVector GlyphAt = World + FVector(-36, 36, 0.28f);
+        if (bBlue) {
+          ArtZoneGlyphs->AddInstance(FTransform(
+              FRotator(0, 45, 0), GlyphAt, FVector(0.105f, 0.105f, 0.004f)), true);
+        } else {
+          for (const float Offset : {-4.0f, 4.0f}) {
+            ArtZoneGlyphs->AddInstance(FTransform(
+                FRotator::ZeroRotator, GlyphAt + FVector(Offset, 0, 0),
+                FVector(0.025f, 0.13f, 0.004f)), true);
+          }
+        }
+      }
     }
+  }
+  if (bArtActive) {
+    for (const TPair<FVector, float>& Corner : {
+             TPair<FVector, float>(FVector(250, 300, 0), 180),
+             TPair<FVector, float>(FVector(-250, 300, 0), -90),
+             TPair<FVector, float>(FVector(-250, -300, 0), 0),
+             TPair<FVector, float>(FVector(250, -300, 0), 90)}) {
+      ArtCorners->AddInstance(FTransform(
+          FRotator(0, Corner.Value, 0), Corner.Key, FVector::OneVector), true);
+    }
+    UE_LOG(LogTemp, Display, TEXT("ARTPREVIEW Cobble active 5x6 zones=%d"),
+           ArtBlueZones->GetInstanceCount() + ArtRedZones->GetInstanceCount());
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW Cobble active 5x6 zones=%d"),
+        ArtBlueZones->GetInstanceCount() + ArtRedZones->GetInstanceCount()));
   }
   ClearChildren();
   return true;
@@ -165,7 +346,7 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
     }
     if (Actor) {
       Actor->ApplyFighter(Fighter, Board.CellToWorld(Fighter.X, Fighter.Y),
-                          Fighter.OwnerId == OwnOwnerId);
+                          Fighter.OwnerId == OwnOwnerId, bArtActive);
       Actor->SetSelected(Fighter.Id == SelectedFighterId);
     }
   }
