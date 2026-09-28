@@ -317,7 +317,7 @@ function Invoke-Phase2Demo {
     "-S08HeroId=$heroA", "-S08Trace=$hostTrace", "-S08Shot=$hostShot",
     "-S08ExitAfter=$RunSeconds")
   if ($ArtPreviewBoardId) {
-    $hostArgs += @("-ArtPreviewBoardId=$ArtPreviewBoardId", '-ArtPreviewShotAfter=30')
+    $hostArgs += @("-ArtPreviewBoardId=$ArtPreviewBoardId", '-ArtPreviewShotAfter=30', '-ArtPreviewSelectOwnHero')
   } else {
     $hostArgs += @('-S08Maneuver', "-S08ManeuverAfter=$HostManeuverAfter")
   }
@@ -416,7 +416,10 @@ function Invoke-Phase2Demo {
       Assert-Trace $hostTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
         'ARTPREVIEW Cobble assets ready', 'ARTPREVIEW Cobble active 5x6 zones=30 blue=15 red=15 blueMarks=15 redMarks=45',
         'ARTPREVIEW Cobble probe lights key=4.5 fill=700 warm=85',
-        'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1') 'host'
+        'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1',
+        'ARTPREVIEW selection ownHero=1 selected=1 fighter=Medusa',
+        'ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing',
+        'ARTPREVIEW reachable corners cells=13 placed=1') 'host'
       Assert-Trace $joinTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
         'WS DROPPED', 'WS closed', 'WS reconnect attempt', 'WS reconnected',
         'ARTPREVIEW Cobble assets ready', 'ARTPREVIEW Cobble active 5x6 zones=30 blue=15 red=15 blueMarks=15 redMarks=45',

@@ -438,6 +438,8 @@ private:
   bool bWsDroppedForTest = false;
   float AutoManeuverAfter = 0.0f; // >0: hold the auto maneuver until this elapsed time
   float ArtPreviewShotAfter = -1.0f; // optional live-board still when movement is blocked
+  bool bArtPreviewSelectOwnHero = false;
+  bool bArtPreviewDidSelectOwnHero = false;
   int32 AutoStep = 0;
   int32 AppliedCount = 0;
 };
