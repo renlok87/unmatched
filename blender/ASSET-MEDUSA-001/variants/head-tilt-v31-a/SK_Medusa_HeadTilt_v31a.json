@@ -1,0 +1,151 @@
+{
+  "blender": "5.2.2 LTS",
+  "body_triangles": 18199,
+  "bones": 17,
+  "bow_triangles": 1197,
+  "crown_probe": {
+    "moved_vertices": 0
+  },
+  "export_settings": {
+    "add_leaf_bones": false,
+    "apply_scale_options": "FBX_SCALE_UNITS",
+    "axis_forward": "-Y",
+    "axis_up": "Z",
+    "bake_anim": false,
+    "data_scale": 100,
+    "deterministic_writer": "header time 2000-01-01, sha256-based UUIDs, relative texture paths, repository-relative ApplicationNativeFile",
+    "deviation_from_UM_FBX_v1": "export_space_rotation_z_degrees 0 instead of 90: game frame of v2/v3 and production SK_Medusa (face +Y in UE), because S08FighterActor::ApplyFighter sets yaw 0/180 for a +Y-facing mesh and art004_import_v2_game_candidate.py imports without rotation; the +X standard twin is written with ART004_V31_UM_FBX_V1=1",
+    "mesh_smooth_type": "FACE",
+    "path_mode": "RELATIVE",
+    "path_mode_note": "deviation from the preset's AUTO: the atlas lies outside the export folder, so AUTO writes an absolute, checkout-specific path; RELATIVE (../../textures/...) keeps the bytes identical in every checkout. The game import does not import textures.",
+    "preset_basis": "UM_FBX_v1 (blender/_tools/presets/UM_FBX_v1.json, 04 section 1.1)",
+    "primary_bone_axis": "Y",
+    "secondary_bone_axis": "X",
+    "unit_scale_factor_patched": 1.0,
+    "use_triangles": true
+  },
+  "extra_flipped_parts": {
+    "tripo_part_13": 607,
+    "tripo_part_8": 575
+  },
+  "face_part": "tripo_part_10",
+  "face_slot": true,
+  "face_slot_polygons": 587,
+  "fbx_bytes": 1176892,
+  "fbx_sha256": "cce200693c4985363caf85343ffa6a3220facf6a5d6716c733faf29ba5ab310c",
+  "flipped_faces": 2249,
+  "front_only": false,
+  "head_tilt_probe": {
+    "moved_vertices": 0
+  },
+  "head_tilt_v31": {
+    "jacobian_check_samples": 175,
+    "jacobian_vs_central_differences_max_abs": 3.89e-06,
+    "moved_vertices": 6472,
+    "params": {
+      "collar_factor": 1.0,
+      "collar_front_ramp_z_m": [
+        0.38,
+        0.405
+      ],
+      "collar_front_y_m": [
+        -0.01,
+        0.015
+      ],
+      "collar_pivot_m": null,
+      "collar_ramp_z_m": [
+        0.385,
+        0.43
+      ],
+      "crown_deg": -15,
+      "crown_mode": "field",
+      "face_deg": -16,
+      "pivot_m": [
+        0,
+        0,
+        0.385
+      ],
+      "quiver_offset_m": [
+        0,
+        0,
+        0
+      ],
+      "quiver_pivot_m": [
+        -0.0418,
+        0.0426,
+        0.339
+      ],
+      "quiver_rot_deg": [
+        -6,
+        -4
+      ],
+      "ramp_z_m": [
+        0.385,
+        0.42
+      ],
+      "top_deg": -10,
+      "top_ramp_z_m": [
+        0.47,
+        0.55
+      ]
+    },
+    "per_part": {
+      "tripo_part_1": {
+        "max_displacement_cm": 3.2387,
+        "moved_vertices": 3555,
+        "vertices": 3555
+      },
+      "tripo_part_10": {
+        "max_displacement_cm": 2.5787,
+        "moved_vertices": 793,
+        "vertices": 795
+      },
+      "tripo_part_14": {
+        "max_displacement_cm": 1.2732,
+        "moved_vertices": 367,
+        "vertices": 367
+      },
+      "tripo_part_3": {
+        "max_displacement_cm": 0.8849,
+        "moved_vertices": 579,
+        "vertices": 1628
+      },
+      "tripo_part_7": {
+        "max_displacement_cm": 1.5828,
+        "moved_vertices": 1178,
+        "vertices": 1178
+      }
+    },
+    "preset": "a",
+    "split_normals_set_vs_requested_max_deg": 0.5268
+  },
+  "input": "blender/ASSET-MEDUSA-001/medusa.blend",
+  "input_sha256": "2a2534f89093e2a296d34e5b4da41290f1549109d6bc2ef4b1ba29ca978ed903",
+  "material_slots": 2,
+  "neck_back_polygons": 480,
+  "normals_tangents_before_export": {
+    "body": {
+      "corners": 54597,
+      "polygons": 18199,
+      "triangles": 18199,
+      "zero_or_nan_corner_normals": 0,
+      "zero_or_nan_tangents": 4
+    },
+    "bow": {
+      "corners": 3591,
+      "polygons": 1197,
+      "triangles": 1197,
+      "zero_or_nan_corner_normals": 0,
+      "zero_or_nan_tangents": 0
+    }
+  },
+  "output": "blender/ASSET-MEDUSA-001/variants/head-tilt-v31-a/SK_Medusa_HeadTilt_v31a.fbx",
+  "restore_normals": true,
+  "um_fbx_v1_twin": {
+    "bone_rotation": "EditBone.transform(roll=True)",
+    "bytes": 1173900,
+    "export_space_rotation_z_degrees": 90.0,
+    "path": "blender/ASSET-MEDUSA-001/variants/head-tilt-v31-a/SK_Medusa_HeadTilt_v31a_UM_FBX_v1.fbx",
+    "sha256": "b49a2c1b6c2f9c4031b157a43464ab2333c55bbcbe4b4623c8c5cb2c1c151b84"
+  }
+}

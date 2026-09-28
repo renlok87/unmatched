@@ -107,6 +107,18 @@
     "sockets": [
       {"name": "Weapon", "bone": "weapon", "offset": [0, 0, 0], "note": "ART004 кандидат; в S05 сокет стоял на hand_L (0,2,0)"},
       {"name": "Head", "bone": "head", "offset": [0, 0, 4], "note": "ART004 кандидат; в S05 (0,0,8)"}
+    ],
+    "socket_proposals": [
+      {"name": "Head", "bone": "head", "status": "предложено",
+       "source": "T1.2 этапа 3, 2026-09-28: docs/game-design/evidence/ART-004/head-tilt-v31-self-acceptance-2026-09-28.md, head-tilt-v31-probe-2026-09-28/blender-measurements.json#head_socket",
+       "applies_to": "blender/ASSET-MEDUSA-001/variants/head-tilt-v31-a/SK_Medusa_HeadTilt_v31a.fbx: наклон головы -16 deg записан в геометрию полем (опора (0; 0; 38,5) uu, smoothstep 38,5 -> 42 uu); поза покоя кости head и черновые клипы не меняются",
+       "offset_blender_bone_local_uu": [0, 1.103, 3.845],
+       "target_ue_component_uu": [0, 3.845, 39.603],
+       "target_frame": "игровой кадр v2/v3 (лицо +Y в UE); для двойника UM_FBX_v1 (лицо +X) цель (3,845; 0; 39,603)",
+       "offset_ue_bone_local": "не измерено: подобрать и проверить в T4.1 (MCP get_socket_location Head должен дать target_ue_component_uu с точностью 0,05 uu); сейчас (0, 0, 4) в UE даёт (0; 4; 38,5)",
+       "rule": "сокет следует за головой как при жёстком повороте на полный угол поля: расстояние до центра черт лица 7,639 uu, как у v2; без правки сокет остаётся в (0; 4; 38,5) и отстоит от центра черт на 8,565 uu",
+       "per_variant_offset_blender_bone_local_uu": {"v31a": [0, 1.103, 3.845], "v31b": [0, 0.954, 4.006], "v31c": [0, 0.984, 4.002]},
+       "alternative_not_taken": "перенести наклон в позу покоя кости head (у каждого персонажа свой Skeleton, RIG-CONTRACT §8): меняет bind и требует перепроверки клипов; выбор «кость или сокет» — вопрос 9 этапа 3 к пользователю"}
     ]
   },
   "clips": {

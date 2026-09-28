@@ -2,6 +2,15 @@
 
 This reads the committed .blend and writes only to ignored Artifacts. Existing
 production FBXs, .blend, and clips are not changed.
+
+v3.1 mode (stage 3 T1.2, 2026-09-28): ART004_HEAD_TILT_V31=<a|b|c> together with
+ART004_FACE_RESTORE_NORMALS=1, ART004_FACE_SLOT=1 and ART004_FACE_NECK_BACK=1. It also flips the
+inside-out parts tripo_part_8 (bow arm/bracer) and tripo_part_13 (right hand) like the T4 candidate,
+applies the deformation field of art004_head_tilt_v31_field.py (positions + per-vertex J^-T split
+normals), exports with Triangulate on and a byte-deterministic FBX writer straight into
+blender/ASSET-MEDUSA-001/variants/head-tilt-v31-<x>/ (+ <name>.json report). Axes stay in the
+game frame of v2/v3 (face +Y in UE, as S08FighterActor expects); ART004_V31_UM_FBX_V1=1 also
+writes a <name>_UM_FBX_v1.fbx twin rotated +90 deg about Z (04 section 1 standard, face +X).
 """
 
 import json
@@ -25,6 +34,8 @@ RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "0") == "1"
 NECK_BACK = os.environ.get("ART004_FACE_NECK_BACK", "0") == "1"
 CROWN_SPREAD = float(os.environ.get("ART004_CROWN_SPREAD", "0"))
 HEAD_TILT_DEG = float(os.environ.get("ART004_HEAD_TILT_DEG", "0"))
+V31 = os.environ.get("ART004_HEAD_TILT_V31", "")
+V31_TWIN = os.environ.get("ART004_V31_UM_FBX_V1", "0") == "1"
 if not 0 <= CROWN_SPREAD <= .4:
     raise ValueError("ART004_CROWN_SPREAD must be 0..0.4")
 if not -25 <= HEAD_TILT_DEG <= 25 or (CROWN_SPREAD and HEAD_TILT_DEG):
@@ -52,6 +63,19 @@ if HEAD_TILT_DEG:
     if not NECK_BACK:
         raise ValueError("Head tilt probe builds on the corrected face-and-neck candidate")
     OUTPUT = OUTPUT.with_name("SK_Medusa_HeadTiltProbe.fbx")
+if V31:
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import art004_head_tilt_v31_field as field31
+    if V31 not in field31.PRESETS:
+        raise ValueError("ART004_HEAD_TILT_V31 must be one of %s" % sorted(field31.PRESETS))
+    if not (NECK_BACK and FACE_SLOT and RESTORE_NORMALS) or HEAD_TILT_DEG or CROWN_SPREAD:
+        raise ValueError("v3.1 builds on the face/neck v2 candidate without the v3 tilt or crown probe")
+    OUTPUT = (ROOT / "blender/ASSET-MEDUSA-001/variants" / ("head-tilt-v31-" + V31) /
+              ("SK_Medusa_HeadTilt_v31" + V31 + ".fbx"))
+elif V31_TWIN:
+    raise ValueError("ART004_V31_UM_FBX_V1 needs ART004_HEAD_TILT_V31")
+V31_EXTRA_FLIPS = {"tripo_part_8": 575, "tripo_part_13": 607}  # inside-out in the Tripo source (T4)
 
 
 def part_indices(mesh, part_name):
@@ -89,6 +113,12 @@ def flip_face(mesh):
                     mesh.polygons[index].normal.y > .1}
                 if FRONT_ONLY else set(part))
     selected |= neck
+    if V31:
+        for name, count in V31_EXTRA_FLIPS.items():
+            extra = part_indices(mesh, name)
+            assert len(extra) == count, (name, len(extra))
+            assert not (extra & selected), "Atlas parts overlap"
+            selected |= extra
     assert selected, "No front-facing polygons selected"
     source_vertices = {poly.index: frozenset(poly.vertices) for poly in mesh.polygons}
     source_normals = {(poly.index, mesh.loops[loop].vertex_index):
@@ -184,6 +214,151 @@ def tilt_head(mesh):
             "pivot_m": list(pivot)}
 
 
+def labels_by_vertex(mesh):
+    """Atlas part of every vertex (parts are separate shells: no vertex belongs to two parts)."""
+    cells = json.loads(ATLAS.read_text())["cells"]
+    label = [None] * len(mesh.vertices)
+    for name in cells:
+        for index in part_indices(mesh, name):
+            for vertex in mesh.polygons[index].vertices:
+                assert label[vertex] in (None, name), "vertex shared by two parts"
+                label[vertex] = name
+    return label
+
+
+def tilt_head_v31(mesh):
+    """v3.1 field (art004_head_tilt_v31_field.py): positions and per-vertex J^-T split normals."""
+    import numpy as np
+    params = field31.PRESETS[V31]
+    labels = np.array(labels_by_vertex(mesh), dtype=object)
+    co = np.empty(len(mesh.vertices) * 3)
+    mesh.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3)
+    corner_vertex = np.empty(len(mesh.loops), dtype=np.int64)
+    mesh.loops.foreach_get("vertex_index", corner_vertex)
+    normals = np.empty(len(mesh.loops) * 3)
+    mesh.corner_normals.foreach_get("vector", normals)
+    normals = normals.reshape(-1, 3)
+    new, jac, moved = field31.apply(params, co, labels)
+    new_normals = field31.transform_normals(jac[corner_vertex], normals)
+    jac_err, jac_samples = field31.jacobian_check(params, co, labels)
+    mesh.vertices.foreach_set("co", new.reshape(-1))
+    mesh.update()
+    mesh.normals_split_custom_set([tuple(n) for n in new_normals])
+    mesh.update()
+    check = np.empty(len(mesh.loops) * 3)
+    mesh.corner_normals.foreach_get("vector", check)
+    check = check.reshape(-1, 3)
+    cos = np.clip((check * new_normals).sum(axis=1), -1, 1)
+    disp = np.linalg.norm(new - co, axis=1)
+    per_part = {}
+    for name in sorted(set(labels.tolist())):
+        sel = labels == name
+        if (disp[sel] > 1e-9).any():
+            per_part[name] = {"vertices": int(sel.sum()), "moved_vertices": int((disp[sel] > 1e-9).sum()),
+                              "max_displacement_cm": round(float(disp[sel].max() * 100), 4)}
+    return {"preset": V31, "params": params, "moved_vertices": int(moved.sum()), "per_part": per_part,
+            "jacobian_vs_central_differences_max_abs": float("%.3g" % jac_err),
+            "jacobian_check_samples": jac_samples,
+            "split_normals_set_vs_requested_max_deg": round(float(np.degrees(np.arccos(cos.min()))), 4)}
+
+
+def normals_tangents_health(mesh):
+    import numpy as np
+    n = np.empty(len(mesh.loops) * 3)
+    mesh.corner_normals.foreach_get("vector", n)
+    nl = np.linalg.norm(n.reshape(-1, 3), axis=1)
+    mesh.calc_tangents(uvmap=mesh.uv_layers.active.name)
+    t = np.empty(len(mesh.loops) * 3)
+    mesh.loops.foreach_get("tangent", t)
+    tl = np.linalg.norm(t.reshape(-1, 3), axis=1)
+    mesh.free_tangents()
+    return {"corners": len(mesh.loops),
+            "zero_or_nan_corner_normals": int(((nl < 1e-6) | ~np.isfinite(nl)).sum()),
+            "zero_or_nan_tangents": int(((tl < 1e-6) | ~np.isfinite(tl)).sum()),
+            "polygons": len(mesh.polygons),
+            "triangles": sum(len(p.vertices) - 2 for p in mesh.polygons)}
+
+
+def make_fbx_deterministic():
+    """Pin the FBX header time, UUID hashing and texture paths (relative in both fields).
+
+    Same technique as tools/tripo-pipeline/blender/build_candidate.py make_fbx_deterministic():
+    the exporter otherwise writes the current time and an absolute, host-specific texture path.
+    Returns restore().
+    """
+    import datetime
+    import hashlib
+    from io_scene_fbx import export_fbx_bin, fbx_utils
+    missing = object()
+    saved = {"vid": export_fbx_bin._gen_vid_path, "datetime": export_fbx_bin.datetime,
+             "hash": fbx_utils.__dict__.get("hash", missing)}
+    original_vid_path = saved["vid"]
+
+    def relative_vid_path(img, scene_data):
+        _abs, rel = original_vid_path(img, scene_data)
+        return rel, rel
+
+    def stable_hash(key):
+        digest = hashlib.sha256(repr(key).encode("utf-8")).digest()
+        return int.from_bytes(digest[:8], "little") & ((1 << 63) - 1)
+
+    class FixedDateTime(datetime.datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return datetime.datetime(2000, 1, 1, 0, 0, 0)
+
+    class FixedModule:
+        datetime = FixedDateTime
+
+    original_header = export_fbx_bin.fbx_header_elements
+    native = BLEND.relative_to(ROOT).as_posix().encode("utf-8")
+
+    def header_with_relative_native_file(root, scene_data, time=None):
+        # The header stores bpy.data.filepath (absolute, checkout-specific) as
+        # Original|ApplicationNativeFile; write the repository-relative path instead.
+        original_header(root, scene_data, time)
+        pending = [root]
+        while pending:
+            elem = pending.pop()
+            if elem.id == b"P" and elem.props and elem.props[0].endswith(b"Original|ApplicationNativeFile"):
+                elem.props[-1] = struct.pack("<I", len(native)) + native
+            pending.extend(elem.elems)
+
+    export_fbx_bin._gen_vid_path = relative_vid_path
+    export_fbx_bin.fbx_header_elements = header_with_relative_native_file
+    fbx_utils.hash = stable_hash
+    fbx_utils._keys_to_uuids.clear()
+    fbx_utils._uuids_to_keys.clear()
+    export_fbx_bin.datetime = FixedModule
+
+    def restore():
+        export_fbx_bin.fbx_header_elements = original_header
+        export_fbx_bin._gen_vid_path = saved["vid"]
+        export_fbx_bin.datetime = saved["datetime"]
+        if saved["hash"] is missing:
+            fbx_utils.__dict__.pop("hash", None)
+        else:
+            fbx_utils.hash = saved["hash"]
+        fbx_utils._keys_to_uuids.clear()
+        fbx_utils._uuids_to_keys.clear()
+    return restore
+
+
+def rotate_for_um_fbx_v1(arm, meshes):
+    """UM_FBX_v1 export space: +90 deg about Z as an exact axis permutation; bones rotate rigidly."""
+    rot = Matrix(((0.0, -1.0, 0.0, 0.0), (1.0, 0.0, 0.0, 0.0), (0.0, 0.0, 1.0, 0.0), (0.0, 0.0, 0.0, 1.0)))
+    bpy.ops.object.select_all(action="DESELECT")
+    bpy.context.view_layer.objects.active = arm
+    bpy.ops.object.mode_set(mode="EDIT")
+    for bone in arm.data.edit_bones:
+        bone.transform(rot, scale=False, roll=True)
+    bpy.ops.object.mode_set(mode="OBJECT")
+    for obj in meshes:
+        obj.data.transform(rot)
+    return rot
+
+
 def patch_fbx_units(path):
     buffer = bytearray(path.read_bytes())
     start = buffer.find(b"UnitScaleFactor")
@@ -208,6 +383,7 @@ def main():
     flipped, mid_y, neck_count = flip_face(body.data)
     crown = spread_crown(body.data)
     tilt = tilt_head(body.data)
+    tilt_v31 = tilt_head_v31(body.data) if V31 else None
     arm.animation_data.action = None
     for bone in arm.pose.bones:
         bone.location = (0, 0, 0)
@@ -228,16 +404,45 @@ def main():
     bow.select_set(True)
     bpy.context.view_layer.objects.active = arm
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    bpy.ops.export_scene.fbx(
-        filepath=str(OUTPUT), use_selection=True,
-        object_types={"ARMATURE", "MESH"},
-        apply_unit_scale=True, apply_scale_options="FBX_SCALE_UNITS",
-        axis_forward="-Y", axis_up="Z", add_leaf_bones=False,
-        bake_anim=False, bake_anim_use_nla_strips=False,
-        bake_anim_use_all_actions=False, mesh_smooth_type="FACE",
-        path_mode="AUTO", embed_textures=False,
-    )
-    patch_fbx_units(OUTPUT)
+    twin = None
+    if V31:
+        health = {"body": normals_tangents_health(body.data), "bow": normals_tangents_health(bow.data)}
+        assert health["body"]["triangles"] == health["body"]["polygons"], "Triangulate would change the body"
+        assert health["bow"]["triangles"] == health["bow"]["polygons"], "Triangulate would change the bow"
+        restore = make_fbx_deterministic()
+    try:
+        bpy.ops.export_scene.fbx(
+            filepath=str(OUTPUT), use_selection=True,
+            object_types={"ARMATURE", "MESH"},
+            apply_unit_scale=True, apply_scale_options="FBX_SCALE_UNITS",
+            axis_forward="-Y", axis_up="Z", add_leaf_bones=False,
+            bake_anim=False, bake_anim_use_nla_strips=False,
+            bake_anim_use_all_actions=False, mesh_smooth_type="FACE",
+            path_mode="RELATIVE" if V31 else "AUTO", embed_textures=False,
+            **({"use_triangles": True, "primary_bone_axis": "Y", "secondary_bone_axis": "X",
+                "use_custom_props": False} if V31 else {}),
+        )
+        patch_fbx_units(OUTPUT)
+        if V31 and V31_TWIN:
+            twin = OUTPUT.with_name(OUTPUT.stem + "_UM_FBX_v1.fbx")
+            restore()
+            restore = make_fbx_deterministic()
+            rotate_for_um_fbx_v1(arm, (body, bow))
+            arm.select_set(True)
+            body.select_set(True)
+            bow.select_set(True)
+            bpy.context.view_layer.objects.active = arm
+            bpy.ops.export_scene.fbx(
+                filepath=str(twin), use_selection=True, object_types={"ARMATURE", "MESH"},
+                apply_unit_scale=True, apply_scale_options="FBX_SCALE_UNITS",
+                axis_forward="-Y", axis_up="Z", add_leaf_bones=False, bake_anim=False,
+                bake_anim_use_nla_strips=False, bake_anim_use_all_actions=False,
+                mesh_smooth_type="FACE", path_mode="RELATIVE", embed_textures=False,
+                use_triangles=True, primary_bone_axis="Y", secondary_bone_axis="X", use_custom_props=False)
+            patch_fbx_units(twin)
+    finally:
+        if V31:
+            restore()
     report = {"input": str(BLEND), "output": str(OUTPUT),
               "face_part": "tripo_part_10", "front_only": FRONT_ONLY,
               "face_slot": FACE_SLOT, "restore_normals": RESTORE_NORMALS,
@@ -249,6 +454,42 @@ def main():
               "body_triangles": sum(len(p.vertices) - 2 for p in body.data.polygons),
               "bow_triangles": sum(len(p.vertices) - 2 for p in bow.data.polygons),
               "bones": len(arm.data.bones), "material_slots": len(body.data.materials)}
+    if V31:
+        import hashlib
+        report.update({
+            "input": BLEND.relative_to(ROOT).as_posix(), "output": OUTPUT.relative_to(ROOT).as_posix(),
+            "input_sha256": hashlib.sha256(BLEND.read_bytes()).hexdigest(),
+            "blender": bpy.app.version_string,
+            "extra_flipped_parts": V31_EXTRA_FLIPS,
+            "head_tilt_v31": tilt_v31,
+            "normals_tangents_before_export": health,
+            "fbx_sha256": hashlib.sha256(OUTPUT.read_bytes()).hexdigest(),
+            "fbx_bytes": OUTPUT.stat().st_size,
+            "export_settings": {
+                "preset_basis": "UM_FBX_v1 (blender/_tools/presets/UM_FBX_v1.json, 04 section 1.1)",
+                "axis_forward": "-Y", "axis_up": "Z", "apply_scale_options": "FBX_SCALE_UNITS",
+                "data_scale": 100, "unit_scale_factor_patched": 1.0, "use_triangles": True,
+                "mesh_smooth_type": "FACE", "add_leaf_bones": False, "primary_bone_axis": "Y",
+                "secondary_bone_axis": "X", "bake_anim": False, "path_mode": "RELATIVE",
+                "path_mode_note": "deviation from the preset's AUTO: the atlas lies outside the export folder, "
+                "so AUTO writes an absolute, checkout-specific path; RELATIVE (../../textures/...) keeps the "
+                "bytes identical in every checkout. The game import does not import textures.",
+                "deterministic_writer": "header time 2000-01-01, sha256-based UUIDs, relative texture paths, "
+                "repository-relative ApplicationNativeFile",
+                "deviation_from_UM_FBX_v1": "export_space_rotation_z_degrees 0 instead of 90: game frame "
+                "of v2/v3 and production SK_Medusa (face +Y in UE), because S08FighterActor::ApplyFighter "
+                "sets yaw 0/180 for a +Y-facing mesh and art004_import_v2_game_candidate.py imports "
+                "without rotation; the +X standard twin is written with ART004_V31_UM_FBX_V1=1"},
+            "um_fbx_v1_twin": ({"path": twin.relative_to(ROOT).as_posix(),
+                                "sha256": hashlib.sha256(twin.read_bytes()).hexdigest(),
+                                "bytes": twin.stat().st_size, "export_space_rotation_z_degrees": 90.0,
+                                "bone_rotation": "EditBone.transform(roll=True)"} if twin else None),
+        })
+        report.pop("front_mid_y_m", None)
+        OUTPUT.with_suffix(".json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n",
+                                               encoding="utf-8")
+        print("ART004_FACE_SKELETAL_EXPORT_COMPLETE", report["output"], report["fbx_sha256"])
+        return
     OUTPUT.with_suffix(".json").write_text(json.dumps(report, indent=2) + "\n")
     print("ART004_FACE_SKELETAL_EXPORT_COMPLETE", json.dumps(report))
 
