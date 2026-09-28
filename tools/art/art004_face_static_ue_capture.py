@@ -23,6 +23,7 @@ FACE_SLOT = os.environ.get("ART004_FACE_SLOT", "0") == "1"
 RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "0") == "1"
 NECK_BACK = os.environ.get("ART004_FACE_NECK_BACK", "0") == "1"
 CROWN_PROBE = os.environ.get("ART004_FACE_CROWN_PROBE", "0") == "1"
+HEAD_TILT_PROBE = os.environ.get("ART004_FACE_HEAD_TILT_PROBE", "0") == "1"
 NORMAL_IMPORT = os.environ.get("ART004_FACE_NORMAL_IMPORT", "import")
 if NORMAL_IMPORT not in {"import", "compute"} or (NORMAL_IMPORT != "import" and not RESTORE_NORMALS):
     raise ValueError("ART004_FACE_NORMAL_IMPORT must be import or compute on restored-normal skeletal probe")
@@ -34,6 +35,8 @@ if NECK_BACK and not (FACE_SLOT and RESTORE_NORMALS and SKELETAL):
     raise ValueError("Rear-neck correction requires restored normals and the face slot")
 if CROWN_PROBE and not NECK_BACK:
     raise ValueError("Crown probe requires the corrected v2 face-and-neck path")
+if HEAD_TILT_PROBE and (not NECK_BACK or CROWN_PROBE):
+    raise ValueError("Head tilt probe requires v2 face and neck without crown spread")
 FLIP_HEAD = os.environ.get("ART004_FACE_FLIP_HEAD", "0") == "1"
 CLEAR_NORMALS = FLIP_HEAD and os.environ.get("ART004_FACE_CLEAR_NORMALS", "0") == "1"
 TWO_SIDED = os.environ.get("ART004_FACE_TWO_SIDED", "0") == "1"
@@ -56,6 +59,9 @@ elif FACE_SLOT and RESTORE_NORMALS:
 if CROWN_PROBE:
     name = "SK_Medusa_CrownSpreadProbe"
     FBX = ROOT / "unreal/Unmatched/Artifacts/ART004Face/SK_Medusa_CrownSpreadProbe.fbx"
+if HEAD_TILT_PROBE:
+    name = "SK_Medusa_HeadTiltProbe"
+    FBX = ROOT / "unreal/Unmatched/Artifacts/ART004Face/SK_Medusa_HeadTiltProbe.fbx"
 UNLIT = os.environ.get("ART004_FACE_UNLIT", "0") == "1"
 UNLIT_SINGLE = UNLIT and os.environ.get("ART004_FACE_UNLIT_SINGLE", "0") == "1"
 UNLIT_ALL = os.environ.get("ART004_FACE_UNLIT_ALL", "0") == "1"
@@ -126,9 +132,11 @@ MODE = mesh_mode + MATERIAL_MODE + (
             "-" + LIGHT_PROFILE if LIGHT_PROFILE != "cobble" else "")
 if CROWN_PROBE:
     MODE += "-crownprobe"
+if HEAD_TILT_PROBE:
+    MODE += "-headtiltprobe"
 OUTPUT = ROOT / f"docs/game-design/evidence/ART-004/medusa-frozen-{MODE}-ue-editor-2026-09-28.png"
 REPORT = ROOT / f"unreal/Unmatched/Artifacts/ART004Face/ue-{MODE}-report.json"
-if CROWN_PROBE:
+if CROWN_PROBE or HEAD_TILT_PROBE:
     OUTPUT = ROOT / f"unreal/Unmatched/Artifacts/ART004Face/medusa-{MODE}.png"
 LEVEL = LEVELS[LIGHT_PROFILE]
 DEST = "/Game/ArtTests/ART004Face/Meshes"
@@ -405,6 +413,7 @@ class CaptureJob:
                     "face_slot": FACE_SLOT,
                     "neck_back": NECK_BACK,
                     "crown_probe": CROWN_PROBE,
+                    "head_tilt_probe": HEAD_TILT_PROBE,
                     "restore_normals": RESTORE_NORMALS,
                     "normal_import": NORMAL_IMPORT,
                     "flipped_head": FLIP_HEAD,

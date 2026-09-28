@@ -1,0 +1,3029 @@
+{
+ "status": "measured_diagnostic_not_art_acceptance",
+ "date": "2026-09-28",
+ "scope": "A1: static head-tilt v3 vs face-neck v2. Editor-only frames; no packaged K2, no HUD, no boardState; draft clips are diagnostic only.",
+ "image_inspection_method": "PNG frames were viewed directly with the Read tool in this session (rendered inline) plus pixel metrics with Pillow/numpy/scipy; zai analyze_image was not used.",
+ "inputs_sha256": {
+  "blender/ASSET-MEDUSA-001/medusa.blend": "2a2534f89093e2a296d34e5b4da41290f1549109d6bc2ef4b1ba29ca978ed903",
+  "blender/ASSET-MEDUSA-001/variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx": "bd125c6bbeb2559b28f6fc4908a1790e0d05fd572b128bd9188c2daeea046592",
+  "blender/ASSET-MEDUSA-001/variants/head-tilt-v3/SK_Medusa_HeadTilt_v3.fbx": "b9cea0fe05071b07732b8d72ecc75b074c366bc665679c378cd4e397e1f822a2",
+  "blender/ASSET-MEDUSA-001/export/SM_Medusa_Base.fbx": "a49bfbbfe6e51856aebcd9d3e7cc9a45bc142f0ff110830f446a28c76997ba4f",
+  "blender/ASSET-MEDUSA-001/atlas-report.json": "f0f6b9428d822e4b595792842853708737a34475060b176414c6cff4fe06b8aa"
+ },
+ "v3_edit": {
+  "source": "tools/art/art004_face_skeletal_export.py::tilt_head (uncommitted diff in the art worktree)",
+  "rotation_deg_about_x_source_axes": -15.0,
+  "pivot_cm": [
+   0,
+   0,
+   38.5
+  ],
+  "moved_parts": {
+   "tripo_part_1 crown": 2633,
+   "tripo_part_10 face/throat": 587,
+   "tripo_part_14 rear neck": 480
+  },
+  "moved_vertices": 4717,
+  "excluded": "tripo_part_3 shoulder/collar (100% head-weighted, not rotated), quiver, bow, hands",
+  "bones_changed": false,
+  "effect": "top of the head moves backward (away from the front), the face turns up toward the elevated D-10 camera"
+ },
+ "blender_headless_reproducible": {
+  "script": "tools/art/art004_head_tilt_v3_measure.py",
+  "output": "blender-measurements.json + blender-id-*.png + blender-tex-*.png",
+  "rerun_2026-09-28": "exit 0; blender-measurements.json byte-identical; 22 PNG pixel-identical (only PNG Date/RenderTime metadata differs)"
+ },
+ "blender_live_mcp": {
+  "session": "live Blender 5.2.2 GUI via MCP 127.0.0.1:9876, isolated scene A1V3_Review (appended read-only from medusa.blend + both FBX imported); removed after the review, nothing saved",
+  "v3_fbx_vs_live_tilt_of_source_max_abs_cm": 2e-06,
+  "fbx_structure": {
+   "body_triangles": 18199,
+   "bow_triangles": 1197,
+   "body_material_slots": 2,
+   "bow_material_slots": 1,
+   "armature_bones": 17,
+   "same_topology_uv_winding_v2_v3": true
+  },
+  "draft_clip_head_vs_nonhead_intersecting_triangle_pairs": {
+   "Idle": {
+    "v2_max": 0,
+    "v3_max": 0
+   },
+   "LungeAttack": {
+    "v2_max": 0,
+    "v3_max": 0
+   },
+   "DeathSettle": {
+    "v2_max": 0,
+    "v3_max": 0
+   },
+   "HitReact": {
+    "v2_max": 0,
+    "v3_max": 40,
+    "v3_mean": 9.5,
+    "v3_worst_frame": 4,
+    "v3_pair": "crown x quiver"
+   },
+   "per_frame_headless_followup": {
+    "DeathSettle": {
+     "frame_range": [
+      1,
+      22
+     ],
+     "v2": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "v3": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "v3_crown_quiver": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    "HitReact": {
+     "frame_range": [
+      1,
+      10
+     ],
+     "v2": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "v3": [
+      0,
+      0,
+      11,
+      40,
+      33,
+      11,
+      0,
+      0,
+      0,
+      0
+     ],
+     "v3_crown_quiver": [
+      0,
+      0,
+      11,
+      40,
+      33,
+      11,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    "Idle": {
+     "frame_range": [
+      1,
+      57
+     ],
+     "v2": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "v3": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "v3_crown_quiver": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    "LungeAttack": {
+     "frame_range": [
+      1,
+      15
+     ],
+     "v2": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "v3": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "v3_crown_quiver": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   },
+   "per_frame_matches_blender_measurements_max_mean": true,
+   "hitreact_render": {
+    "file": "compare-blender-hitreact-f4.png",
+    "frame": 4,
+    "camera": {
+     "type": "persp",
+     "horizontal_fov_deg": 35,
+     "resolution_px": [
+      1024,
+      1024
+     ],
+     "target_m": [
+      -0.0763,
+      0.1756,
+      0.4196
+     ],
+     "eye_m": [
+      0.1954,
+      0.3749,
+      0.5464
+     ],
+     "rule": "same camera for v2 and v3; target = centroid of v3 crown polygons intersecting the quiver at this frame; only body and bow rendered; backface culling on",
+     "v3_crown_vertices_in_contact": 30
+    },
+    "replaces": "blender-mcp-live/viewport-cmp-hitreact-f4.png (live viewport, two different cameras, unlabelled, other figure's base in frame)"
+   }
+  },
+  "rest_clearance_cm": {
+   "crown_to_quiver_v2": 1.074,
+   "crown_to_quiver_v3": 0.308,
+   "moved_parts_to_bow_v2": 10.124,
+   "moved_parts_to_bow_v3": 11.374
+  },
+  "viewport_comparisons": "blender-mcp-live/viewport-cmp-fbx-d10-{front,rear}.png: left v2, right v3 (matched pixel-exactly to the single live shots), caption strip added 2026-09-28; same camera relative to each figure's spine bone",
+  "rest_interpenetration_pairs_moved_vs_static": {
+   "v2": 28,
+   "v3": 88,
+   "v3_by_pair": {
+    "crown|shoulder_collar": 46,
+    "neck_back|shoulder_collar": 42
+   }
+  },
+  "neck_junction_see_through_backface_culled": {
+   "note": "enclosed transparent pixels near the face/throat (part 10) x collar (part 3) boundary; ortho 16 cm views at 1024 px (0.156 mm/px); k2 = 1920x1080 D-10 300 uu",
+   "rear_zones_note": "added 2026-09-28 after vc: in rear views the face zone is empty or nearly empty (face_x_collar_zone_px), so its 0 was 0 by construction. rear_zones = neck_back (part 14) x collar and crown (part 1) x collar, same band, recomputed on the same live renders; junction_only_px excludes enclosed regions bordered by the quiver or bow (>= 10 px: background seen between separate pieces, e.g. crown / collar / quiver strap). Components can fall in both zones, so the two zones are not summed.",
+   "views": {
+    "k2-front-d300": {
+     "v2_enclosed_px": 95,
+     "v3_enclosed_px": 137,
+     "v2_largest_px": [
+      28,
+      22
+     ],
+     "v3_largest_px": [
+      35,
+      23
+     ],
+     "face_x_collar_zone_px": {
+      "v2": 585,
+      "v3": 410
+     },
+     "rear_zones": {
+      "neck_back_x_collar": {
+       "v2": {
+        "zone_px": 0,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       },
+       "v3": {
+        "zone_px": 0,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       }
+      },
+      "crown_x_collar": {
+       "v2": {
+        "zone_px": 168,
+        "enclosed_gap_px": 10,
+        "junction_only_px": 10
+       },
+       "v3": {
+        "zone_px": 124,
+        "enclosed_gap_px": 9,
+        "junction_only_px": 9
+       }
+      }
+     }
+    },
+    "k2-rear-d300": {
+     "v2_enclosed_px": 0,
+     "v3_enclosed_px": 0,
+     "v2_largest_px": [],
+     "v3_largest_px": [],
+     "face_x_collar_zone_px": {
+      "v2": 21,
+      "v3": 0
+     },
+     "rear_zones": {
+      "neck_back_x_collar": {
+       "v2": {
+        "zone_px": 256,
+        "enclosed_gap_px": 1,
+        "junction_only_px": 1
+       },
+       "v3": {
+        "zone_px": 54,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       }
+      },
+      "crown_x_collar": {
+       "v2": {
+        "zone_px": 730,
+        "enclosed_gap_px": 1,
+        "junction_only_px": 1
+       },
+       "v3": {
+        "zone_px": 765,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       }
+      }
+     }
+    },
+    "neck-front": {
+     "v2_enclosed_px": 958,
+     "v3_enclosed_px": 3364,
+     "v2_largest_px": [
+      307,
+      268
+     ],
+     "v3_largest_px": [
+      1714,
+      1143
+     ],
+     "v2_mm2": 23.4,
+     "v3_mm2": 82.1,
+     "face_x_collar_zone_px": {
+      "v2": 39844,
+      "v3": 33180
+     },
+     "rear_zones": {
+      "neck_back_x_collar": {
+       "v2": {
+        "zone_px": 0,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       },
+       "v3": {
+        "zone_px": 3649,
+        "enclosed_gap_px": 1040,
+        "junction_only_px": 1040
+       }
+      },
+      "crown_x_collar": {
+       "v2": {
+        "zone_px": 23478,
+        "enclosed_gap_px": 2171,
+        "junction_only_px": 886
+       },
+       "v3": {
+        "zone_px": 22073,
+        "enclosed_gap_px": 2427,
+        "junction_only_px": 512
+       }
+      }
+     }
+    },
+    "neck-front-low": {
+     "v2_enclosed_px": 143,
+     "v3_enclosed_px": 1449,
+     "v2_largest_px": [
+      143
+     ],
+     "v3_largest_px": [
+      1171,
+      253
+     ],
+     "face_x_collar_zone_px": {
+      "v2": 30054,
+      "v3": 24301
+     },
+     "rear_zones": {
+      "neck_back_x_collar": {
+       "v2": {
+        "zone_px": 0,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       },
+       "v3": {
+        "zone_px": 0,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       }
+      },
+      "crown_x_collar": {
+       "v2": {
+        "zone_px": 15067,
+        "enclosed_gap_px": 143,
+        "junction_only_px": 143
+       },
+       "v3": {
+        "zone_px": 27620,
+        "enclosed_gap_px": 2464,
+        "junction_only_px": 363
+       }
+      }
+     }
+    },
+    "neck-front34L": {
+     "v2_enclosed_px": 39,
+     "v3_enclosed_px": 3,
+     "v2_largest_px": [
+      24,
+      2
+     ],
+     "v3_largest_px": [
+      2,
+      1
+     ],
+     "v2_mm2": 1.0,
+     "v3_mm2": 0.1,
+     "face_x_collar_zone_px": {
+      "v2": 35790,
+      "v3": 32907
+     },
+     "rear_zones": {
+      "neck_back_x_collar": {
+       "v2": {
+        "zone_px": 0,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       },
+       "v3": {
+        "zone_px": 3596,
+        "enclosed_gap_px": 2,
+        "junction_only_px": 2
+       }
+      },
+      "crown_x_collar": {
+       "v2": {
+        "zone_px": 19566,
+        "enclosed_gap_px": 75,
+        "junction_only_px": 75
+       },
+       "v3": {
+        "zone_px": 24140,
+        "enclosed_gap_px": 70,
+        "junction_only_px": 70
+       }
+      }
+     }
+    },
+    "neck-front34R": {
+     "v2_enclosed_px": 274,
+     "v3_enclosed_px": 2209,
+     "v2_largest_px": [
+      273,
+      1
+     ],
+     "v3_largest_px": [
+      1263,
+      943
+     ],
+     "v2_mm2": 6.7,
+     "v3_mm2": 53.9,
+     "face_x_collar_zone_px": {
+      "v2": 50138,
+      "v3": 47151
+     },
+     "rear_zones": {
+      "neck_back_x_collar": {
+       "v2": {
+        "zone_px": 9589,
+        "enclosed_gap_px": 5460,
+        "junction_only_px": 0
+       },
+       "v3": {
+        "zone_px": 6545,
+        "enclosed_gap_px": 4194,
+        "junction_only_px": 0
+       }
+      },
+      "crown_x_collar": {
+       "v2": {
+        "zone_px": 7084,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       },
+       "v3": {
+        "zone_px": 22247,
+        "enclosed_gap_px": 3424,
+        "junction_only_px": 0
+       }
+      }
+     }
+    },
+    "neck-rear": {
+     "v2_enclosed_px": 0,
+     "v3_enclosed_px": 0,
+     "v2_largest_px": [],
+     "v3_largest_px": [],
+     "v2_mm2": 0.0,
+     "v3_mm2": 0.0,
+     "face_x_collar_zone_px": {
+      "v2": 0,
+      "v3": 0
+     },
+     "rear_zones": {
+      "neck_back_x_collar": {
+       "v2": {
+        "zone_px": 29663,
+        "enclosed_gap_px": 199,
+        "junction_only_px": 199
+       },
+       "v3": {
+        "zone_px": 21332,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       }
+      },
+      "crown_x_collar": {
+       "v2": {
+        "zone_px": 24819,
+        "enclosed_gap_px": 1763,
+        "junction_only_px": 493
+       },
+       "v3": {
+        "zone_px": 44160,
+        "enclosed_gap_px": 1778,
+        "junction_only_px": 25
+       }
+      }
+     }
+    },
+    "neck-rear34L": {
+     "v2_enclosed_px": 0,
+     "v3_enclosed_px": 0,
+     "v2_largest_px": [],
+     "v3_largest_px": [],
+     "v2_mm2": 0.0,
+     "v3_mm2": 0.0,
+     "face_x_collar_zone_px": {
+      "v2": 0,
+      "v3": 0
+     },
+     "rear_zones": {
+      "neck_back_x_collar": {
+       "v2": {
+        "zone_px": 17692,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       },
+       "v3": {
+        "zone_px": 15479,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       }
+      },
+      "crown_x_collar": {
+       "v2": {
+        "zone_px": 8353,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       },
+       "v3": {
+        "zone_px": 17029,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       }
+      }
+     }
+    },
+    "neck-rear34R": {
+     "v2_enclosed_px": 0,
+     "v3_enclosed_px": 0,
+     "v2_largest_px": [],
+     "v3_largest_px": [],
+     "v2_mm2": 0.0,
+     "v3_mm2": 0.0,
+     "face_x_collar_zone_px": {
+      "v2": 4755,
+      "v3": 5922
+     },
+     "rear_zones": {
+      "neck_back_x_collar": {
+       "v2": {
+        "zone_px": 28508,
+        "enclosed_gap_px": 206,
+        "junction_only_px": 206
+       },
+       "v3": {
+        "zone_px": 16645,
+        "enclosed_gap_px": 17,
+        "junction_only_px": 17
+       }
+      },
+      "crown_x_collar": {
+       "v2": {
+        "zone_px": 24975,
+        "enclosed_gap_px": 275,
+        "junction_only_px": 275
+       },
+       "v3": {
+        "zone_px": 32186,
+        "enclosed_gap_px": 17,
+        "junction_only_px": 17
+       }
+      }
+     }
+    },
+    "neck-sideL": {
+     "v2_enclosed_px": 11,
+     "v3_enclosed_px": 30,
+     "v2_largest_px": [
+      11
+     ],
+     "v3_largest_px": [
+      29,
+      1
+     ],
+     "v2_mm2": 0.3,
+     "v3_mm2": 0.7,
+     "face_x_collar_zone_px": {
+      "v2": 17978,
+      "v3": 15671
+     },
+     "rear_zones": {
+      "neck_back_x_collar": {
+       "v2": {
+        "zone_px": 0,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       },
+       "v3": {
+        "zone_px": 0,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       }
+      },
+      "crown_x_collar": {
+       "v2": {
+        "zone_px": 12131,
+        "enclosed_gap_px": 73,
+        "junction_only_px": 11
+       },
+       "v3": {
+        "zone_px": 14267,
+        "enclosed_gap_px": 30,
+        "junction_only_px": 30
+       }
+      }
+     }
+    },
+    "neck-sideR": {
+     "v2_enclosed_px": 13,
+     "v3_enclosed_px": 43,
+     "v2_largest_px": [
+      9,
+      3
+     ],
+     "v3_largest_px": [
+      31,
+      12
+     ],
+     "v2_mm2": 0.3,
+     "v3_mm2": 1.0,
+     "face_x_collar_zone_px": {
+      "v2": 18745,
+      "v3": 22759
+     },
+     "rear_zones": {
+      "neck_back_x_collar": {
+       "v2": {
+        "zone_px": 7349,
+        "enclosed_gap_px": 83,
+        "junction_only_px": 83
+       },
+       "v3": {
+        "zone_px": 8920,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       }
+      },
+      "crown_x_collar": {
+       "v2": {
+        "zone_px": 12167,
+        "enclosed_gap_px": 75,
+        "junction_only_px": 13
+       },
+       "v3": {
+        "zone_px": 10029,
+        "enclosed_gap_px": 31,
+        "junction_only_px": 31
+       }
+      }
+     }
+    },
+    "neck-top55": {
+     "v2_enclosed_px": 6663,
+     "v3_enclosed_px": 14783,
+     "v2_largest_px": [
+      4487,
+      895
+     ],
+     "v3_largest_px": [
+      6944,
+      2763
+     ],
+     "v2_mm2": 162.7,
+     "v3_mm2": 360.9,
+     "face_x_collar_zone_px": {
+      "v2": 56033,
+      "v3": 51938
+     },
+     "rear_zones": {
+      "neck_back_x_collar": {
+       "v2": {
+        "zone_px": 0,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       },
+       "v3": {
+        "zone_px": 0,
+        "enclosed_gap_px": 0,
+        "junction_only_px": 0
+       }
+      },
+      "crown_x_collar": {
+       "v2": {
+        "zone_px": 21051,
+        "enclosed_gap_px": 1511,
+        "junction_only_px": 1511
+       },
+       "v3": {
+        "zone_px": 15937,
+        "enclosed_gap_px": 1427,
+        "junction_only_px": 1355
+       }
+      }
+     }
+    }
+   }
+  },
+  "k2_front_visible_px_1920x1080": {
+   "facial_features_z_ge_42cm": {
+    "v2": 809,
+    "v3": 1242
+   },
+   "throat_z_lt_42cm": {
+    "v2": 1434,
+    "v3": 1697
+   },
+   "whole_face_part_10": {
+    "v2": 2243,
+    "v3": 2939
+   },
+   "crown": {
+    "v2": 10517,
+    "v3": 11761
+   },
+   "quiver": {
+    "v2": 577,
+    "v3": 416
+   },
+   "quiver_note": "whole visible quiver (mostly its top with the fletching), not the fletching alone; recomputed in ue_face_metrics.py (quiver_px), throat likewise (throat_px)",
+   "bow": {
+    "v2": 6663,
+    "v3": 6663
+   },
+   "collar": {
+    "v2": 6448,
+    "v3": 6530
+   }
+  },
+  "k2_rear_visible_px": {
+   "crown": {
+    "v2": 13791,
+    "v3": 11684
+   },
+   "rear_neck": {
+    "v2": 318,
+    "v3": 21
+   },
+   "collar": {
+    "v2": 3156,
+    "v3": 1949
+   }
+  },
+  "k1_figure_bbox_px_headless": {
+   "v2": [
+    937,
+    512,
+    984,
+    584
+   ],
+   "v3": [
+    937,
+    509,
+    984,
+    584
+   ],
+   "note": "K1 fit distance, 1920x1080: v2 about 47 x 72 px (width x height incl. base), v3 top 3 px higher"
+  },
+  "crown_top_band_from_headless_ids": "see blender-measurements.json blender_views: K2 front rows with >=3 separate crown runs 9 -> 18, background gaps 271 -> 434 px; K2 rear 4 -> 0 rows, 693 -> 519 px",
+  "ramp_probe_diagnostic_not_candidate": {
+   "definition": "in memory only: same -15 deg, face and rear-neck angle smoothstep from 0 at z=38.5 cm to full at z=42 cm; crown full; not exported, not imported to UE",
+   "enclosed_gap_px": {
+    "neck-front": {
+     "v2": 958,
+     "v3": 3364,
+     "rampprobe": 485
+    },
+    "neck-top55": {
+     "v2": 6663,
+     "v3": 14783,
+     "rampprobe": 9777
+    },
+    "neck-front34R": {
+     "v2": 274,
+     "v3": 2209,
+     "rampprobe": 1094
+    },
+    "neck-front-low": {
+     "v2": 143,
+     "v3": 1449,
+     "rampprobe": 321
+    },
+    "k2-front-d300": {
+     "v2": 95,
+     "v3": 137,
+     "rampprobe": 125
+    },
+    "k2-rear-d300": {
+     "v2": 0,
+     "v3": 0,
+     "rampprobe": 0
+    }
+   },
+   "k2_front_face_part_px": {
+    "v2": 2243,
+    "v3": 2939,
+    "rampprobe": 3104
+   },
+   "crown_to_quiver_cm": 0.308
+  }
+ },
+ "ue_live_mcp": {
+  "editor": "live UnrealEditor 5.8 with C:/Users/ren/WebstormProjects/unmached/unmached/unreal/Unmatched, MCP 127.0.0.1:8123; no UnrealEditor-Cmd was started",
+  "import": {
+   "tool": "SkeletalMeshTools.import_file / StaticMeshTools.import_file (FbxImportUI + FbxFactory, defaults: import normals, tangents recomputed, uniform scale 1)",
+   "difference_to_game_import_script": "art004_import_v2_game_candidate.py uses FBXNIM_IMPORT_NORMALS_AND_TANGENTS; MCP frames are compared only with MCP frames",
+   "assets": [
+    "/Game/ArtTests/ART004_V3Review/Meshes/SK_Medusa_V2Review",
+    "/Game/ArtTests/ART004_V3Review/Meshes/SK_Medusa_V3Review",
+    "/Game/ArtTests/ART004_V3Review/Meshes/SM_Medusa_BaseReview"
+   ],
+   "production_or_artpreview_touched": false,
+   "measured": {
+    "SK_Medusa_V2Review": {
+     "skeleton": {
+      "refPath": "/Game/ArtTests/ART004_V3Review/Meshes/SK_Medusa_V2Review_Skeleton.SK_Medusa_V2Review_Skeleton"
+     },
+     "bounds": {
+      "origin": {
+       "x": 1.3397469520568848,
+       "y": 0.8672761917114258,
+       "z": 29.403696179389954
+      },
+      "boxExtent": {
+       "x": 14.374522686004639,
+       "y": 10.547591209411621,
+       "z": 25.596303820610046
+      },
+      "sphereRadius": 31.1937389879491
+     },
+     "bones": [
+      "SKEL_Medusa",
+      "root",
+      "hips",
+      "spine",
+      "head",
+      "arm_upper_L",
+      "arm_lower_L",
+      "hand_L",
+      "weapon",
+      "arm_upper_R",
+      "arm_lower_R",
+      "hand_R",
+      "leg_upper_L",
+      "leg_lower_L",
+      "foot_L",
+      "leg_upper_R",
+      "leg_lower_R",
+      "foot_R"
+     ],
+     "slots": [
+      "M_Medusa_Atlas",
+      "M_Medusa_Face_CorrectedProbe"
+     ],
+     "lods": 1,
+     "sections": 2,
+     "verts": 23731,
+     "sockets": [],
+     "morphs": []
+    },
+    "SK_Medusa_V3Review": {
+     "skeleton": {
+      "refPath": "/Game/ArtTests/ART004_V3Review/Meshes/SK_Medusa_V3Review_Skeleton.SK_Medusa_V3Review_Skeleton"
+     },
+     "bounds": {
+      "origin": {
+       "x": 1.3397469520568848,
+       "y": 0.8672761917114258,
+       "z": 29.100326657295227
+      },
+      "boxExtent": {
+       "x": 14.374522686004639,
+       "y": 10.547591209411621,
+       "z": 25.29293429851532
+      },
+      "sphereRadius": 30.945292181531133
+     },
+     "bones": [
+      "SKEL_Medusa",
+      "root",
+      "hips",
+      "spine",
+      "head",
+      "arm_upper_L",
+      "arm_lower_L",
+      "hand_L",
+      "weapon",
+      "arm_upper_R",
+      "arm_lower_R",
+      "hand_R",
+      "leg_upper_L",
+      "leg_lower_L",
+      "foot_L",
+      "leg_upper_R",
+      "leg_lower_R",
+      "foot_R"
+     ],
+     "slots": [
+      "M_Medusa_Atlas",
+      "M_Medusa_Face_CorrectedProbe"
+     ],
+     "lods": 1,
+     "sections": 2,
+     "verts": 23731,
+     "sockets": [],
+     "morphs": []
+    },
+    "base": {
+     "bounds": {
+      "min": {
+       "x": -15.000000953674316,
+       "y": -15.000000953674316,
+       "z": 0
+      },
+      "max": {
+       "x": 15.000000953674316,
+       "y": 15.000000953674316,
+       "z": 6
+      },
+      "isValid": true
+     },
+     "tris": 1778,
+     "slots": [
+      "M_Medusa_Atlas"
+     ]
+    }
+   }
+  },
+  "sockets": {
+   "added_like_game_import": {
+    "Weapon": "bone weapon, offset (0,0,0)",
+    "Head": "bone head, offset (0,0,4)"
+   },
+   "component_space_cm": {
+    "v2": {
+     "Head": [
+      0.0,
+      4.0,
+      38.5
+     ],
+     "Weapon": [
+      11.2,
+      6.0,
+      27.5
+     ]
+    },
+    "v3": {
+     "Head": [
+      0.0,
+      4.0,
+      38.5
+     ],
+     "Weapon": [
+      11.2,
+      6.0,
+      27.5
+     ]
+    }
+   },
+   "note_bone_name_collision": "get_socket_location('head') resolves the Head socket first (FName is case-insensitive), so bone_head_cm in the raw probe equals the socket",
+   "head_socket_vs_geometry": {
+    "socket_to_facial_feature_centroid_cm": {
+     "v2": 7.639,
+     "v3": 8.511
+    },
+    "socket_nearest_surface_cm": 1.122,
+    "socket_inside_mesh": false,
+    "v3_socket_if_rotated_with_head_ue_component_cm": [
+     0.0,
+     3.864,
+     39.535
+    ],
+    "v3_socket_offset_vs_rotated_cm": 1.044,
+    "tilt_direction_check_max_uu": {
+     "minus15": 0.0,
+     "plus15": 4.74253
+    },
+    "provenance": "Recomputed headless by tools/art/art004_head_tilt_v3_followup.py (followup-measurements.json). blender/b9_socket.py was corrected after the live run: the executed copy rotated by +15 deg; the saved -15 deg file was never run. The earlier hand-typed values (7.639/8.511/1.122, (0;3.864;39.535), 1.044) are confirmed by this recomputation and by the verifier's independent check."
+   },
+   "weapon_socket_changed": false
+  },
+  "capture_setup": {
+   "levels": {
+    "cobble": "/Game/ArtTests/ART005H/L_ART005H_CornerReview",
+    "forest-probe": "/Game/ArtTests/ART005I/L_ART005I_ForestReferenceLight",
+    "paddock-probe": "/Game/ArtTests/ART005I/L_ART005I_PaddockReferenceLight"
+   },
+   "in_memory_only": "fill 'ART005 neutral readability fill - review only' moved (0,-100,550)->(0,100,500), animation-review Medusa moved to (10000,10000,0), base + v2/v3 SkeletalMeshActors at (0,-50,0); levels reloaded from disk without saving (umap mtimes unchanged)",
+   "materials": "both body slots and the base = /Game/ART004/Medusa/Materials/MI_Medusa_Blue (as in the CLI capture script)",
+   "viewport": {
+    "capture": "EditorAppToolset.CaptureViewport with captureTransform",
+    "fov_deg": 35,
+    "aspect_constraint": "AspectRatio_MaintainXFOV",
+    "viewport_px": [
+     2033,
+     1216
+    ],
+    "crop": "centre 2033x1144 (16:9), Lanczos to 1920x1080",
+    "exposure": "fixed EV100 1.3 (viewport 'Game settings' off) calibrated to the CLI SceneCapture frames on the lower floor (calib.py windows): CLI vs MCP +1..4 % mean RGB (v3 frames, three lights; the first note said ~1-6 %). In the top corners the CLI frames are darker (SceneCapture vignette): -6..-13 % in 300x200 px windows, -12..-21 % in 150x100 px windows (frame_metrics.diffs.exposure_cli_vs_mcp_v3_percent). This does not affect v2 vs v3 inside the MCP set.",
+    "grid_show_flag": "off",
+    "r.EyeAdaptationQuality": 0,
+    "restored_after": {
+     "fov_deg": 90,
+     "exposure": "Game settings, EV100 1.0",
+     "grid": "on",
+     "r.EyeAdaptationQuality": 2,
+     "level": "/Game/S08/S08Arena",
+     "dirty_packages": 0
+    }
+   },
+   "d10_k2": "camera = figure + (0, 300cos55, 29+300sin55) looking at (x, y, 29); rear = mirrored Y; K1 = fit expression of art004_face_static_ue_capture.py",
+   "frames": {
+    "cobble/d10-k2-d300/v2": {
+     "cameraLocation": {
+      "x": 0,
+      "y": 122.07293090531383,
+      "z": 274.74561328669756
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": -89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/d10-k2-rear-d300/v2": {
+     "cameraLocation": {
+      "x": 0,
+      "y": -222.07293090531383,
+      "z": 274.74561328669756
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": 89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/d10-k1/v2": {
+     "cameraLocation": {
+      "x": 0,
+      "y": 1107.451534819616,
+      "z": 1581.60470201613
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": -90,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/front-diag/v2": {
+     "cameraLocation": {
+      "x": -70,
+      "y": 105,
+      "z": 105
+     },
+     "cameraRotation": {
+      "pitch": -24.07822408873799,
+      "yaw": -65.69545073406327,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/rear-diag/v2": {
+     "cameraLocation": {
+      "x": 70,
+      "y": -205,
+      "z": 105
+     },
+     "cameraRotation": {
+      "pitch": -24.07822408873799,
+      "yaw": 114.30454926593674,
+      "roll": 1.7418356790984571e-15
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-neck-rear34/v2": {
+     "cameraLocation": {
+      "x": 30.978,
+      "y": -94.295,
+      "z": 53.188
+     },
+     "cameraRotation": {
+      "pitch": -12.803106033358214,
+      "yaw": 127.94403827088638,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-neck-side-right/v2": {
+     "cameraLocation": {
+      "x": -57,
+      "y": -50,
+      "z": 41
+     },
+     "cameraRotation": {
+      "pitch": 0,
+      "yaw": 0,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-neck-side-left/v2": {
+     "cameraLocation": {
+      "x": 53,
+      "y": -50,
+      "z": 41
+     },
+     "cameraRotation": {
+      "pitch": 0,
+      "yaw": 180,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-head-front/v2": {
+     "cameraLocation": {
+      "x": -2,
+      "y": 5,
+      "z": 44
+     },
+     "cameraRotation": {
+      "pitch": 0,
+      "yaw": -90.00000000000001,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-head-rear/v2": {
+     "cameraLocation": {
+      "x": -2,
+      "y": -105,
+      "z": 44
+     },
+     "cameraRotation": {
+      "pitch": 0,
+      "yaw": 90.00000000000001,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-neck-front-low/v2": {
+     "cameraLocation": {
+      "x": -2,
+      "y": -5,
+      "z": 30
+     },
+     "cameraRotation": {
+      "pitch": 12.528807709151513,
+      "yaw": -89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-neck-front34-low/v2": {
+     "cameraLocation": {
+      "x": 28,
+      "y": -15,
+      "z": 32
+     },
+     "cameraRotation": {
+      "pitch": 9.845302162757212,
+      "yaw": -130.6012946450045,
+      "roll": -8.0702369983085715e-16
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/d10-k2-d300/v3": {
+     "cameraLocation": {
+      "x": 0,
+      "y": 122.07293090531383,
+      "z": 274.74561328669756
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": -89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/d10-k2-rear-d300/v3": {
+     "cameraLocation": {
+      "x": 0,
+      "y": -222.07293090531383,
+      "z": 274.74561328669756
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": 89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/d10-k1/v3": {
+     "cameraLocation": {
+      "x": 0,
+      "y": 1107.451534819616,
+      "z": 1581.60470201613
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": -90,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/front-diag/v3": {
+     "cameraLocation": {
+      "x": -70,
+      "y": 105,
+      "z": 105
+     },
+     "cameraRotation": {
+      "pitch": -24.07822408873799,
+      "yaw": -65.69545073406327,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/rear-diag/v3": {
+     "cameraLocation": {
+      "x": 70,
+      "y": -205,
+      "z": 105
+     },
+     "cameraRotation": {
+      "pitch": -24.07822408873799,
+      "yaw": 114.30454926593674,
+      "roll": 1.7418356790984571e-15
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-neck-rear34/v3": {
+     "cameraLocation": {
+      "x": 30.978,
+      "y": -94.295,
+      "z": 53.188
+     },
+     "cameraRotation": {
+      "pitch": -12.803106033358214,
+      "yaw": 127.94403827088638,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-neck-side-right/v3": {
+     "cameraLocation": {
+      "x": -57,
+      "y": -50,
+      "z": 41
+     },
+     "cameraRotation": {
+      "pitch": 0,
+      "yaw": 0,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-neck-side-left/v3": {
+     "cameraLocation": {
+      "x": 53,
+      "y": -50,
+      "z": 41
+     },
+     "cameraRotation": {
+      "pitch": 0,
+      "yaw": 180,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-head-front/v3": {
+     "cameraLocation": {
+      "x": -2,
+      "y": 5,
+      "z": 44
+     },
+     "cameraRotation": {
+      "pitch": 0,
+      "yaw": -90.00000000000001,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-head-rear/v3": {
+     "cameraLocation": {
+      "x": -2,
+      "y": -105,
+      "z": 44
+     },
+     "cameraRotation": {
+      "pitch": 0,
+      "yaw": 90.00000000000001,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-neck-front-low/v3": {
+     "cameraLocation": {
+      "x": -2,
+      "y": -5,
+      "z": 30
+     },
+     "cameraRotation": {
+      "pitch": 12.528807709151513,
+      "yaw": -89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "cobble/close-neck-front34-low/v3": {
+     "cameraLocation": {
+      "x": 28,
+      "y": -15,
+      "z": 32
+     },
+     "cameraRotation": {
+      "pitch": 9.845302162757212,
+      "yaw": -130.6012946450045,
+      "roll": -8.0702369983085715e-16
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "forest-probe/d10-k2-d300/v2": {
+     "cameraLocation": {
+      "x": 0,
+      "y": 122.07293090531383,
+      "z": 274.74561328669756
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": -89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "forest-probe/d10-k2-rear-d300/v2": {
+     "cameraLocation": {
+      "x": 0,
+      "y": -222.07293090531383,
+      "z": 274.74561328669756
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": 89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "forest-probe/front-diag/v2": {
+     "cameraLocation": {
+      "x": -70,
+      "y": 105,
+      "z": 105
+     },
+     "cameraRotation": {
+      "pitch": -24.07822408873799,
+      "yaw": -65.69545073406327,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "forest-probe/rear-diag/v2": {
+     "cameraLocation": {
+      "x": 70,
+      "y": -205,
+      "z": 105
+     },
+     "cameraRotation": {
+      "pitch": -24.07822408873799,
+      "yaw": 114.30454926593674,
+      "roll": 1.7418356790984571e-15
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "forest-probe/d10-k2-d300/v3": {
+     "cameraLocation": {
+      "x": 0,
+      "y": 122.07293090531383,
+      "z": 274.74561328669756
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": -89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "forest-probe/d10-k2-rear-d300/v3": {
+     "cameraLocation": {
+      "x": 0,
+      "y": -222.07293090531383,
+      "z": 274.74561328669756
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": 89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "forest-probe/front-diag/v3": {
+     "cameraLocation": {
+      "x": -70,
+      "y": 105,
+      "z": 105
+     },
+     "cameraRotation": {
+      "pitch": -24.07822408873799,
+      "yaw": -65.69545073406327,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "forest-probe/rear-diag/v3": {
+     "cameraLocation": {
+      "x": 70,
+      "y": -205,
+      "z": 105
+     },
+     "cameraRotation": {
+      "pitch": -24.07822408873799,
+      "yaw": 114.30454926593674,
+      "roll": 1.7418356790984571e-15
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "paddock-probe/d10-k2-d300/v2": {
+     "cameraLocation": {
+      "x": 0,
+      "y": 122.07293090531383,
+      "z": 274.74561328669756
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": -89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "paddock-probe/d10-k2-rear-d300/v2": {
+     "cameraLocation": {
+      "x": 0,
+      "y": -222.07293090531383,
+      "z": 274.74561328669756
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": 89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "paddock-probe/front-diag/v2": {
+     "cameraLocation": {
+      "x": -70,
+      "y": 105,
+      "z": 105
+     },
+     "cameraRotation": {
+      "pitch": -24.07822408873799,
+      "yaw": -65.69545073406327,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "paddock-probe/rear-diag/v2": {
+     "cameraLocation": {
+      "x": 70,
+      "y": -205,
+      "z": 105
+     },
+     "cameraRotation": {
+      "pitch": -24.07822408873799,
+      "yaw": 114.30454926593674,
+      "roll": 1.7418356790984571e-15
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "paddock-probe/d10-k2-d300/v3": {
+     "cameraLocation": {
+      "x": 0,
+      "y": 122.07293090531383,
+      "z": 274.74561328669756
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": -89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "paddock-probe/d10-k2-rear-d300/v3": {
+     "cameraLocation": {
+      "x": 0,
+      "y": -222.07293090531383,
+      "z": 274.74561328669756
+     },
+     "cameraRotation": {
+      "pitch": -55.000000000000014,
+      "yaw": 89.99999999999999,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "paddock-probe/front-diag/v3": {
+     "cameraLocation": {
+      "x": -70,
+      "y": 105,
+      "z": 105
+     },
+     "cameraRotation": {
+      "pitch": -24.07822408873799,
+      "yaw": -65.69545073406327,
+      "roll": 0
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    },
+    "paddock-probe/rear-diag/v3": {
+     "cameraLocation": {
+      "x": 70,
+      "y": -205,
+      "z": 105
+     },
+     "cameraRotation": {
+      "pitch": -24.07822408873799,
+      "yaw": 114.30454926593674,
+      "roll": 1.7418356790984571e-15
+     },
+     "cameraFOV": 35,
+     "grid": {
+      "spacingCm": 0,
+      "extentCm": 0,
+      "height": 0
+     },
+     "labeledActors": [],
+     "viewport_px": [
+      2033,
+      1216
+     ],
+     "crop_px": [
+      0,
+      36,
+      2033,
+      1180
+     ],
+     "output_px": [
+      1920,
+      1080
+     ]
+    }
+   }
+  },
+  "frame_metrics": {
+   "face_readability_proxy_k2_front": {
+    "definition": "UE frame pixels inside the Blender facial-feature mask (same D-10 camera, pixel-aligned); Sobel gradient of display luminance",
+    "values": {
+     "v2": {
+      "face_features_px": 809,
+      "face_eroded_px": 708,
+      "throat_px": 1434,
+      "quiver_px": 577,
+      "crown_px": 10517,
+      "cobble": {
+       "face_lum_mean": 0.3048,
+       "face_lum_std": 0.1526,
+       "face_gradient_mean": 0.5957,
+       "face_gradient_sum": 421.8,
+       "crown_lum_mean": 0.1336
+      },
+      "forest-probe": {
+       "face_lum_mean": 0.3425,
+       "face_lum_std": 0.1645,
+       "face_gradient_mean": 0.6404,
+       "face_gradient_sum": 453.4,
+       "crown_lum_mean": 0.1497
+      },
+      "paddock-probe": {
+       "face_lum_mean": 0.3738,
+       "face_lum_std": 0.1721,
+       "face_gradient_mean": 0.6656,
+       "face_gradient_sum": 471.2,
+       "crown_lum_mean": 0.164
+      }
+     },
+     "v3": {
+      "face_features_px": 1242,
+      "face_eroded_px": 1112,
+      "throat_px": 1697,
+      "quiver_px": 416,
+      "crown_px": 11761,
+      "cobble": {
+       "face_lum_mean": 0.3314,
+       "face_lum_std": 0.1718,
+       "face_gradient_mean": 0.642,
+       "face_gradient_sum": 713.9,
+       "crown_lum_mean": 0.1286
+      },
+      "forest-probe": {
+       "face_lum_mean": 0.3663,
+       "face_lum_std": 0.1805,
+       "face_gradient_mean": 0.6784,
+       "face_gradient_sum": 754.4,
+       "crown_lum_mean": 0.1447
+      },
+      "paddock-probe": {
+       "face_lum_mean": 0.3964,
+       "face_lum_std": 0.1854,
+       "face_gradient_mean": 0.6942,
+       "face_gradient_sum": 772.0,
+       "crown_lum_mean": 0.1592
+      }
+     }
+    },
+    "summary": {
+     "facial_feature_mask_px": {
+      "v2": 809,
+      "v3": 1242,
+      "change_percent": 53.5
+     },
+     "eroded_mask_px": {
+      "v2": 708,
+      "v3": 1112,
+      "change_percent": 57.1
+     },
+     "per_light": {
+      "cobble": {
+       "gradient_sum_change_percent": 69.3,
+       "gradient_mean_change_percent": 7.8
+      },
+      "forest-probe": {
+       "gradient_sum_change_percent": 66.4,
+       "gradient_mean_change_percent": 5.9
+      },
+      "paddock-probe": {
+       "gradient_sum_change_percent": 63.8,
+       "gradient_mean_change_percent": 4.3
+      }
+     },
+     "reading": "The +64..69 % gradient SUM is mostly the larger visible face area (eroded mask +57 %); per pixel the mean gradient rises only +4..8 %. Both describe the same gain in visible face area, not two independent proofs of more facial detail (verifier vc, 2026-09-28)."
+    }
+   },
+   "diffs": {
+    "mcp_vs_cli_v2_head_mad": 14.07,
+    "mcp_vs_cli_v2_full_mad": 7.11,
+    "mcp_vs_cli_v3_head_mad": 14.03,
+    "mcp_vs_cli_v3_full_mad": 7.11,
+    "cli_v2_vs_v3_head_mad": 7.28,
+    "mcp_cobble_v2_vs_v3": {
+     "head_mad": 5.79,
+     "changed_px_gt30": 14933,
+     "changed_bbox": [
+      800,
+      288,
+      1300,
+      860
+     ]
+    },
+    "mcp_forest-probe_v2_vs_v3": {
+     "head_mad": 5.74,
+     "changed_px_gt30": 14637,
+     "changed_bbox": [
+      516,
+      289,
+      1389,
+      696
+     ]
+    },
+    "mcp_paddock-probe_v2_vs_v3": {
+     "head_mad": 5.94,
+     "changed_px_gt30": 14629,
+     "changed_bbox": [
+      848,
+      326,
+      1096,
+      645
+     ]
+    },
+    "exposure_cli_vs_mcp_v3_percent": {
+     "cobble": {
+      "floor_lower_left_400x300": 1.3,
+      "floor_lower_right_400x300": 2.7,
+      "corner_top_left_300x200": -10.9,
+      "corner_top_right_300x200": -7.0,
+      "corner_top_left_150x100": -17.9,
+      "corner_top_right_150x100": -12.6
+     },
+     "forest-probe": {
+      "floor_lower_left_400x300": 1.9,
+      "floor_lower_right_400x300": 2.5,
+      "corner_top_left_300x200": -12.8,
+      "corner_top_right_300x200": -9.8,
+      "corner_top_left_150x100": -20.6,
+      "corner_top_right_150x100": -16.3
+     },
+     "paddock-probe": {
+      "floor_lower_left_400x300": 3.9,
+      "floor_lower_right_400x300": 3.8,
+      "corner_top_left_300x200": -7.5,
+      "corner_top_right_300x200": -5.9,
+      "corner_top_left_150x100": -14.4,
+      "corner_top_right_150x100": -11.9
+     }
+    }
+   },
+   "calibration_note": "MCP viewport vs CLI SceneCapture differ by ~14/255 mean abs in the head region, more than v2 vs v3 (~6/255): never mix the two sets in one comparison"
+  }
+ },
+ "files_in_probe_dir": {
+  "blender-id-d10-k1scale-front-v2.png": "9eaf04c3abd649068296cee9373320ee1f45fd6c777284ce3c1e50ad9547adbc",
+  "blender-id-d10-k1scale-front-v3.png": "ac3face82df98beac9f1f2c0068214f2c2c02d117ca42c5a0bcdd89b839f928d",
+  "blender-id-d10-k2-front-d300-v2.png": "57ad476c88f53529cd01527d2ee8079fcc9176483f32fdaeca5bf248e9287edf",
+  "blender-id-d10-k2-front-d300-v3.png": "ba090082c6cefb7de914fdcdb4cd30062f54a90d62afd55ad2c6e261a0003ff0",
+  "blender-id-d10-k2-rear-d300-v2.png": "af9989bcd8dead14c8ed66b970dffa800357bc272ef77a69d0f562660f93784f",
+  "blender-id-d10-k2-rear-d300-v3.png": "78e0f83a273726e373cf698166727a18f7aa039f94c7b95097cd3a50e33a3fff",
+  "blender-id-ortho-back-v2.png": "708393edb3143bd22cafb5d1736c52130fc395827bcbe7918ab5966965d8c7a0",
+  "blender-id-ortho-back-v3.png": "0fac4d4ec06f409a4d81f0337cc3c81d15d9e69ca11b56c0562957320f423f39",
+  "blender-id-ortho-front-v2.png": "f91c496c8be902ae337f39d43512ece6c74f134d2bb0b4f87340df391119c4ba",
+  "blender-id-ortho-front-v3.png": "82c1595b7057d25e52f8b103739c6d789b0e5c63c608ba43a47d0037d37d1753",
+  "blender-id-ortho-side-left-v2.png": "efdd337c7b50612b693e19102e7bfd71ac9fac6725eaf5fbc12c6611f50d5bbd",
+  "blender-id-ortho-side-left-v3.png": "3c7a4d8999a5bad88a52a3ca8319eaa7dad4689c2b9fe2b361b17bb315d131c0",
+  "blender-id-ortho-side-right-v2.png": "335a8def0a6dad7acdcb7b38896e441424f740f78916bbb266ebdf45043feba4",
+  "blender-id-ortho-side-right-v3.png": "fd6c54d80401e11db7690f832c26b0e6b7ed6eb55d3f37b8455de4a02b2a0c13",
+  "blender-mcp-live/id-cull-k2-front-d300-rampprobe.png": "177d79ecabda5edffc214244855ecfd19a1bfc85f1cf326bc5bee3179d5bd3d4",
+  "blender-mcp-live/id-cull-k2-front-d300-v2.png": "60b3e7eab360bdca08426ec690099340fcd91be58de6086a5bc933430f066f52",
+  "blender-mcp-live/id-cull-k2-front-d300-v3.png": "e7dfc92591e77e9263f07886e1542285899010d93064e48c59e269bb84044c40",
+  "blender-mcp-live/id-cull-k2-rear-d300-rampprobe.png": "1fc765959e73dc28a360fa632b75e69372718956f9615474c98a32fbf60ab6dc",
+  "blender-mcp-live/id-cull-k2-rear-d300-v2.png": "680132ae0623bc405c67539523cf92dc05620bb72fe8681cc54171d124b5ff3f",
+  "blender-mcp-live/id-cull-k2-rear-d300-v3.png": "4bc4b290f28eec34ee8f1f2e98dfed5fed540172ef745ebc78790285e78ef5a4",
+  "blender-mcp-live/id-cull-neck-front-low-rampprobe.png": "c2945a79091c789eb6f9f2a00086abb3be1de49db59ede0a8c08db0de064b080",
+  "blender-mcp-live/id-cull-neck-front-low-v2.png": "7d6659ded9182fc4e558ee16b3a39213c5a4fc262ff061b9ce3bc8253f1a1c67",
+  "blender-mcp-live/id-cull-neck-front-low-v3.png": "da8b0f509f37cad0681fea027acde6013e962dfa7858a1bc0a48f79e25e6ea88",
+  "blender-mcp-live/id-cull-neck-front-rampprobe.png": "e820f6cc2f6f637bc62dc971e097527ef89c0a94d22c38c3b95e9325e26f49ff",
+  "blender-mcp-live/id-cull-neck-front-v2.png": "2ee4ed7f7e16199eb9e483d2315455d7d2e6c0cfd97fda2666455ed0c7a6ab32",
+  "blender-mcp-live/id-cull-neck-front-v3.png": "f8106375bce6bffde05ac5a331c8928c8dfeb5c6d409f770a4c613a0abd81771",
+  "blender-mcp-live/id-cull-neck-front34L-v2.png": "878e9347da06315f6c4ffbb7c335c33c3fbfcdc82e5b47ef66097a16d09a0d9e",
+  "blender-mcp-live/id-cull-neck-front34L-v3.png": "177a5199d9d4849f8ba47e58b1d76b316223616785a380b20b563f69417cf42f",
+  "blender-mcp-live/id-cull-neck-front34R-rampprobe.png": "203e4e42cfe598146c7ee8cba61e271109cf7ab5b6c28ebc2e0f77987d686b96",
+  "blender-mcp-live/id-cull-neck-front34R-v2.png": "1277b43af8b6f256c1b9374645d4022053f452e5a3b71e45ad70777a5a8159b5",
+  "blender-mcp-live/id-cull-neck-front34R-v3.png": "b577014600b26a12d6ffa921789e9e844271b8437cfe2ea08888e8ef658341ae",
+  "blender-mcp-live/id-cull-neck-rear-v2.png": "7bc872b70b2405068d0ac556d8221d3d44af8d2729fe0b3acc18829b6df9f4ba",
+  "blender-mcp-live/id-cull-neck-rear-v3.png": "d81c70d63e5054d4bea5c3704df3938cc7e8cb04ee7933aa4afd3da94cc1d227",
+  "blender-mcp-live/id-cull-neck-rear34L-v2.png": "ae566e23279bb68062f730f7feaba07afcd0b54364454d0bff8237599c94b0bb",
+  "blender-mcp-live/id-cull-neck-rear34L-v3.png": "dbcf328e288b6cb3cbd88a11d4c6d9b85f77ff786ac941bb562518a9c3a8a11a",
+  "blender-mcp-live/id-cull-neck-rear34R-v2.png": "63341db5a47ec539020865e34204c358f9d998b2fe78b9d943473e38eaa8edcc",
+  "blender-mcp-live/id-cull-neck-rear34R-v3.png": "74cfcafdb08b726b557f95fb81b4854c29331f5bd7ab0d2e8e65ae7834d0e8d2",
+  "blender-mcp-live/id-cull-neck-sideL-v2.png": "0a9aa44e237a551f8c71624b1bc35d7ce92268585dda8fd24372e87533a563f1",
+  "blender-mcp-live/id-cull-neck-sideL-v3.png": "f25bd584ef8c20e8232d9b1f8a9413a2589cb616f7f8fc39eb85470b2ed193c1",
+  "blender-mcp-live/id-cull-neck-sideR-v2.png": "ac36ac3850b7fc99a3929a5f6e46f5c7ccd8b65b3c44d27db4026b58a5528d8a",
+  "blender-mcp-live/id-cull-neck-sideR-v3.png": "907b86dca02161b874bb4bbf464cb784b4411010b441421e2c68c255b5d01a7b",
+  "blender-mcp-live/id-cull-neck-top55-rampprobe.png": "42581c885acecb68dd81b4f17eaee363639adc3ea06d1b2bd4e030409a078bcd",
+  "blender-mcp-live/id-cull-neck-top55-v2.png": "17614315863a23b0fd07e101bcce1c7e5b40bdf2b65ed96a80449caf863f7ccf",
+  "blender-mcp-live/id-cull-neck-top55-v3.png": "133a4cfbd0d6756502400761c07ff6591e8cb76010c44cba86bf915d17429c3c",
+  "blender-mcp-live/idsplit-k2-front-d300-v2.png": "eb5994da00730184e9266ef4056368ae4487a210e22e6c00f5e5aaec9fb2080a",
+  "blender-mcp-live/idsplit-k2-front-d300-v3.png": "054670d572f836b9fdc00e8317b49b0a6a2e16fe384160a9b828f2e5cb6a8396",
+  "blender-mcp-live/viewport-cmp-fbx-d10-front.png": "09d8966fe33656f6ef1c164ccdd6781218dae0fc649abb0c23cdd7f25a1e8733",
+  "blender-mcp-live/viewport-cmp-fbx-d10-rear.png": "ee104cf4b47ce0989b7b55ac0a141254b7e09faf95a26dac5eac23d562717222",
+  "blender-measurements.json": "82a0818d0ca37e21ef74dcad7affd5169d5a00e30f8e3f385c9cd3a6c1080d8d",
+  "compare-blender-hitreact-f4.png": "2dc5af2999d1992e8c5f5c2fb0e6f663cafd9e44eb4ab0f644f31a4d4854d172",
+  "compare-blender-id-neck-junction.png": "ecdcf31a5477db5c5f1b996a4a930938c4d9c308b90fa1a71313423d67b28246",
+  "compare-blender-id-neck-rear.png": "b37fecfeb3599308eab9b0afbb2514982cbdec26661521203eff51355a4e55db",
+  "compare-ue-k2-face-zoom.png": "19bab40ad822f7c8c34bda0b7a77287d3bd32c18dd753b29f079d69ea4b08d1e",
+  "compare-ue-k2-front-three-lights.png": "097b20c71467935470fb94d291464b36c053a1b511b9956d45d6b0afb67a0521",
+  "compare-ue-k2-rear-three-lights.png": "885e207660d4e3f1166a192c70d75bf4383082ad17287dc0c2cfdd4414d4d379",
+  "compare-ue-neck-front-closeup.png": "8cc97bdb46a053773d268dc298ab7050406e9a5b48f444b5619a72fa84a4ff87",
+  "compare-ue-neck-rear34-closeup.png": "64d4ee00cb0f546da8a197e3a68d5054e116bdd0a1feabf149e0f86f6710e29f",
+  "ue-cli-headtiltprobe/SK_Medusa_HeadTiltProbe.json": "434a22fb9fba53336d93631d551f343749d94c7abd53bd1375b1c7358e1f573e",
+  "ue-cli-headtiltprobe/cli-rear-unlit-head-crop-v3.png": "e4c0af65e4e103c616a83602f3d69968d9458ce91ada7d3188de52332f977dd5",
+  "ue-cli-headtiltprobe/headtilt-export-log.txt": "b410bce43161d33a545b37ed96472f8cabe5bdca800a2f0511006a780115768c",
+  "ue-cli-headtiltprobe/ue-skeletal-restorednormals-faceslot-neck-static-frontambient-y100-z500-s100-d10-k2-base-d300-forest-probe-headtiltprobe-report.json": "5b18af0a64b2b37d95667f9c4672a7c0feb1e7061d8dcd4c17c607b0b25ff712",
+  "ue-cli-headtiltprobe/ue-skeletal-restorednormals-faceslot-neck-static-frontambient-y100-z500-s100-d10-k2-base-d300-headtiltprobe-report.json": "1b8d859115f4cc4fdfec14d1addf19c8d0439bd1648a1f2b6d88f65e6175dc6c",
+  "ue-cli-headtiltprobe/ue-skeletal-restorednormals-faceslot-neck-static-frontambient-y100-z500-s100-d10-k2-base-d300-paddock-probe-headtiltprobe-report.json": "5d03acafc20321abb49b2fa27d24458eb98d1d9beb4f7285a81e1bd9b98acf0c",
+  "ue-cli-headtiltprobe/ue-skeletal-restorednormals-faceslot-neck-unlit-all-frontambient-y100-z500-s100-rear-base-headtiltprobe-report.json": "5958e96515f4998b9f935f07484f512df0fe4a345059c7552c50cdea60229304",
+  "ue-mcp-live/ue-mcp-cobble-d10-k2-d300-v2.png": "46120c75b3f41b4acfd910275853c1d9d47657fe9764d47e74d89c0773e8f5e3",
+  "ue-mcp-live/ue-mcp-cobble-d10-k2-d300-v3.png": "d4ccbdbb3872b69a595dfbf6e52bd76aaa0674f1a67d1870dd8c44986cd0cc8b",
+  "ue-mcp-live/ue-mcp-cobble-d10-k2-rear-d300-v2.png": "a576f523233203a4e2bb07b955ecc446250ac71ede0351260e765cdf4a85f7a6",
+  "ue-mcp-live/ue-mcp-cobble-d10-k2-rear-d300-v3.png": "e5a636764705634dd6cd8ba4c265fe15149e187c78f08a6ed61f5cda5d01f42e"
+ },
+ "probe_dir_pruning_2026-09-28": {
+  "reason": "keep only key frames in git (P0 review): K2 Cobble UE frames, composites, part-ID renders, JSON; 54 MB -> about 14 MB",
+  "removed_sha256": {
+   "blender-mcp-live/viewport-cmp-hitreact-f4.png": "0602b158d0e8c5cfea52c69a78714dc443ea254b8ba813e857ad2635aac96871",
+   "blender-tex-head-d10-front-v2.png": "081cd15ada8adaca434677df6799af25445c9fec17d9ebc7a7ab3a4c34cdf9c6",
+   "blender-tex-head-d10-front-v3.png": "47925ef4d563df3e4124af5e318f04e0315473b1ed86d980b6676dd834f7df47",
+   "blender-tex-head-front-v2.png": "fa3ff5f711e51bb75fd77e3ac86711b89d3d8de5de945886343cf915a678ef5d",
+   "blender-tex-head-front-v3.png": "d4b8c1a048cec8450976877de4047d554f525a402964bf4ef3c4b337c250edcb",
+   "blender-tex-neck-rear34-v2.png": "d31a651c2c03756b8bac4ba13a90bac1cdcfd88c57c9f343892e9f0a65c79165",
+   "blender-tex-neck-rear34-v3.png": "0c4846a108981ef5c94161325fa982b0cb398f7a32946c9c0462ab9969d73fa3",
+   "blender-tex-neck-side-right-v2.png": "1d7368475dbb893f37cb3afeabeeb0572a02ce5ae7ff00e424d262454c3c65ab",
+   "blender-tex-neck-side-right-v3.png": "58f0ef9d1e87ceeff8abac1ed16b2cf4b1bf073acae8120c8e83717b6fbaa33c",
+   "ue-cli-headtiltprobe/medusa-skeletal-restorednormals-faceslot-neck-static-frontambient-y100-z500-s100-d10-k2-base-d300-forest-probe-headtiltprobe.png": "20776551dfb8200249f170c15eff333f619c1e88f623a4fe3d1eb71401a8a16e",
+   "ue-cli-headtiltprobe/medusa-skeletal-restorednormals-faceslot-neck-static-frontambient-y100-z500-s100-d10-k2-base-d300-headtiltprobe.png": "b06e86f02824060f9ad8475d5ed9e6d99f42a7b906195d3b3886d21a8236d1b4",
+   "ue-cli-headtiltprobe/medusa-skeletal-restorednormals-faceslot-neck-static-frontambient-y100-z500-s100-d10-k2-base-d300-paddock-probe-headtiltprobe.png": "ccfff264d10d3f8cd32e253fb682a545e8e2b89f975f32825a159ed0b0ac9041",
+   "ue-cli-headtiltprobe/medusa-skeletal-restorednormals-faceslot-neck-unlit-all-frontambient-y100-z500-s100-rear-base-headtiltprobe.png": "be96b6a01844c19ec54370082fa034011ef6aad54d46f65131f6776189f06691",
+   "ue-mcp-live/ue-mcp-cobble-close-head-front-v2.png": "123c1705f7d12f4342c582e748cafae69f4c65e64b4e165d8b539241edf4463a",
+   "ue-mcp-live/ue-mcp-cobble-close-head-front-v3.png": "56037cebe206709355daebd10b9149502d5392460b17177fab9dfebf4b8157d2",
+   "ue-mcp-live/ue-mcp-cobble-close-neck-rear34-v2.png": "dd1eba33daa1fed82ec6dd66a39708c33658651c514c46ce097eb578f5706aa2",
+   "ue-mcp-live/ue-mcp-cobble-close-neck-rear34-v3.png": "f3dfeeb1ff92102a3d2db0ffa53a113f86d42438ca2d012dc8d518010c4e79ae",
+   "ue-mcp-live/ue-mcp-forest-probe-d10-k2-d300-v2.png": "242b7fc5c2bf5922886de2cd19a7a145a4681dbeba2dd6df538b452d642ac11d",
+   "ue-mcp-live/ue-mcp-forest-probe-d10-k2-d300-v3.png": "57dc9d8c3f36ea7e0db19b5b56a4d079663b96bf5273bd6e3eb0d327aa69a4ad",
+   "ue-mcp-live/ue-mcp-forest-probe-d10-k2-rear-d300-v2.png": "b7fe37920db53a407bb56cd1ee57daa357998aaa305205c1dc29d3f7acf93500",
+   "ue-mcp-live/ue-mcp-forest-probe-d10-k2-rear-d300-v3.png": "a61db8a658cd54c60e5d6477d3658c6d7124d9d5c50579f503816b3faeaa6cec",
+   "ue-mcp-live/ue-mcp-paddock-probe-d10-k2-d300-v2.png": "0536fb6d5908339a0e761b105ce41daddd7c9af8de855b04c11fb376ac55fc13",
+   "ue-mcp-live/ue-mcp-paddock-probe-d10-k2-d300-v3.png": "e895024944bad004f0511cd9c7739743bf5f5b92022cfecb09b1d6c42ca0a9a4",
+   "ue-mcp-live/ue-mcp-paddock-probe-d10-k2-rear-d300-v2.png": "7bffddb746afcd833a08289f897c34c97d5944e0f0ef220b38df838a5bbe7f28",
+   "ue-mcp-live/ue-mcp-paddock-probe-d10-k2-rear-d300-v3.png": "9bb4c7d761ef76002c0b0bc2629901233c6cf6a4b427282ea86c6b6636462393"
+  },
+  "replaced_unlabelled_originals_sha256": {
+   "blender-mcp-live/viewport-cmp-fbx-d10-front.png": "269d28cd64d34997dffd93ca66bfa63056a8e728d58490b8db9851a26a80cb7d",
+   "blender-mcp-live/viewport-cmp-fbx-d10-rear.png": "d5fd30beb6b798278ecadabd07ac318118676499a45d2a513fab30826ff23bed"
+  },
+  "renamed": {
+   "ue-cli-headtiltprobe/headtilt-export.log": {
+    "now": "ue-cli-headtiltprobe/headtilt-export-log.txt",
+    "sha256": "b410bce43161d33a545b37ed96472f8cabe5bdca800a2f0511006a780115768c",
+    "byte_identical": true,
+    "reason": "*.log is git-ignored"
+   }
+  },
+  "cli_rear_unlit_crop": {
+   "sha256": "e4c0af65e4e103c616a83602f3d69968d9458ce91ada7d3188de52332f977dd5",
+   "source": "medusa-skeletal-restorednormals-faceslot-neck-unlit-all-frontambient-y100-z500-s100-rear-base-headtiltprobe.png",
+   "source_sha256": "be96b6a01844c19ec54370082fa034011ef6aad54d46f65131f6776189f06691",
+   "crop_box_px": [
+    820,
+    100,
+    1260,
+    580
+   ]
+  },
+  "where_now": {
+   "ue-mcp-live forest/paddock K2 (8) and Cobble close-ups (4)": "NOT durable: only in C:/tmp (backup C:/tmp/a1-probe-backup/head-tilt-v3-probe-2026-09-28.full and scratch C:/tmp/a1v3/frames_ev13, pixel-identical). Live-editor frames, not bit-reproducible. In git remain their crops in compare-ue-*.png and the metrics computed from them (ue_live_mcp.frame_metrics).",
+   "blender-mcp-live/viewport-cmp-hitreact-f4.png (1)": "NOT durable: only in C:/tmp (backup; C:/tmp/a1v3/blender/cmp-hitreact-f4.png is byte-identical). Superseded by compare-blender-hitreact-f4.png from the headless tools/art/art004_head_tilt_v3_followup.py.",
+   "ue-cli-headtiltprobe CLI PNG (4)": "local only: byte-identical in the git-ignored unreal/Unmatched/Artifacts/ART004Face of the art worktree (and in the backup).",
+   "blender-tex-*.png (8)": "durable: regenerated pixel-identically by tools/art/art004_head_tilt_v3_measure.py from inputs in git.",
+   "viewport-cmp-fbx-d10-{front,rear}.png unlabelled originals (2)": "durable: the labelled files in git are pixel-identical to them below the 40 px caption strip.",
+   "ue-cli-headtiltprobe/headtilt-export.log (1)": "in git as the byte-identical headtilt-export-log.txt (see renamed)."
+  },
+  "durability_check": {
+   "date": "2026-09-28",
+   "method": "SHA-256 and pixel comparison of every removed or replaced file against the full local copy made before pruning (C:/tmp/a1-probe-backup/head-tilt-v3-probe-2026-09-28.full); blender-tex against a headless re-run of tools/art/art004_head_tilt_v3_measure.py (C:/tmp/a1fix/measure-rerun)",
+   "removed": {
+    "blender-mcp-live/viewport-cmp-hitreact-f4.png": {
+     "class": "superseded_viewport_shot"
+    },
+    "blender-tex-head-d10-front-v2.png": {
+     "class": "blender_tex",
+     "headless_rerun_pixel_identical": true
+    },
+    "blender-tex-head-d10-front-v3.png": {
+     "class": "blender_tex",
+     "headless_rerun_pixel_identical": true
+    },
+    "blender-tex-head-front-v2.png": {
+     "class": "blender_tex",
+     "headless_rerun_pixel_identical": true
+    },
+    "blender-tex-head-front-v3.png": {
+     "class": "blender_tex",
+     "headless_rerun_pixel_identical": true
+    },
+    "blender-tex-neck-rear34-v2.png": {
+     "class": "blender_tex",
+     "headless_rerun_pixel_identical": true
+    },
+    "blender-tex-neck-rear34-v3.png": {
+     "class": "blender_tex",
+     "headless_rerun_pixel_identical": true
+    },
+    "blender-tex-neck-side-right-v2.png": {
+     "class": "blender_tex",
+     "headless_rerun_pixel_identical": true
+    },
+    "blender-tex-neck-side-right-v3.png": {
+     "class": "blender_tex",
+     "headless_rerun_pixel_identical": true
+    },
+    "ue-cli-headtiltprobe/medusa-skeletal-restorednormals-faceslot-neck-static-frontambient-y100-z500-s100-d10-k2-base-d300-forest-probe-headtiltprobe.png": {
+     "class": "cli_png",
+     "copy_byte_identical": true
+    },
+    "ue-cli-headtiltprobe/medusa-skeletal-restorednormals-faceslot-neck-static-frontambient-y100-z500-s100-d10-k2-base-d300-headtiltprobe.png": {
+     "class": "cli_png",
+     "copy_byte_identical": true
+    },
+    "ue-cli-headtiltprobe/medusa-skeletal-restorednormals-faceslot-neck-static-frontambient-y100-z500-s100-d10-k2-base-d300-paddock-probe-headtiltprobe.png": {
+     "class": "cli_png",
+     "copy_byte_identical": true
+    },
+    "ue-cli-headtiltprobe/medusa-skeletal-restorednormals-faceslot-neck-unlit-all-frontambient-y100-z500-s100-rear-base-headtiltprobe.png": {
+     "class": "cli_png",
+     "copy_byte_identical": true
+    },
+    "ue-mcp-live/ue-mcp-cobble-close-head-front-v2.png": {
+     "class": "ue_mcp_frame",
+     "scratch_pixel_identical": true
+    },
+    "ue-mcp-live/ue-mcp-cobble-close-head-front-v3.png": {
+     "class": "ue_mcp_frame",
+     "scratch_pixel_identical": true
+    },
+    "ue-mcp-live/ue-mcp-cobble-close-neck-rear34-v2.png": {
+     "class": "ue_mcp_frame",
+     "scratch_pixel_identical": true
+    },
+    "ue-mcp-live/ue-mcp-cobble-close-neck-rear34-v3.png": {
+     "class": "ue_mcp_frame",
+     "scratch_pixel_identical": true
+    },
+    "ue-mcp-live/ue-mcp-forest-probe-d10-k2-d300-v2.png": {
+     "class": "ue_mcp_frame",
+     "scratch_pixel_identical": true
+    },
+    "ue-mcp-live/ue-mcp-forest-probe-d10-k2-d300-v3.png": {
+     "class": "ue_mcp_frame",
+     "scratch_pixel_identical": true
+    },
+    "ue-mcp-live/ue-mcp-forest-probe-d10-k2-rear-d300-v2.png": {
+     "class": "ue_mcp_frame",
+     "scratch_pixel_identical": true
+    },
+    "ue-mcp-live/ue-mcp-forest-probe-d10-k2-rear-d300-v3.png": {
+     "class": "ue_mcp_frame",
+     "scratch_pixel_identical": true
+    },
+    "ue-mcp-live/ue-mcp-paddock-probe-d10-k2-d300-v2.png": {
+     "class": "ue_mcp_frame",
+     "scratch_pixel_identical": true
+    },
+    "ue-mcp-live/ue-mcp-paddock-probe-d10-k2-d300-v3.png": {
+     "class": "ue_mcp_frame",
+     "scratch_pixel_identical": true
+    },
+    "ue-mcp-live/ue-mcp-paddock-probe-d10-k2-rear-d300-v2.png": {
+     "class": "ue_mcp_frame",
+     "scratch_pixel_identical": true
+    },
+    "ue-mcp-live/ue-mcp-paddock-probe-d10-k2-rear-d300-v3.png": {
+     "class": "ue_mcp_frame",
+     "scratch_pixel_identical": true
+    }
+   },
+   "replaced": {
+    "blender-mcp-live/viewport-cmp-fbx-d10-front.png": {
+     "labelled_below_caption_pixel_identical": true
+    },
+    "blender-mcp-live/viewport-cmp-fbx-d10-rear.png": {
+     "labelled_below_caption_pixel_identical": true
+    }
+   }
+  }
+ },
+ "side_effects": {
+  "ue_main_checkout": "5 review assets in /Game/ArtTests/ART004_V3Review/Meshes (Content is git-ignored, about 10.4 MB) reference the production /Game/ART004/Medusa/Materials/MI_Medusa_Blue; keep or delete is an open orchestrator decision",
+  "blender_live_session": "b99_cleanup.py ran bpy.data.orphans_purge, which also removed one unused material from the user's unsaved start-up session (2 -> 1 materials); nothing was saved. Do not repeat in user sessions."
+ },
+ "headless_followup": {
+  "script": "tools/art/art004_head_tilt_v3_followup.py",
+  "runner": "Blender 5.2.2 LTS --background --factory-startup (no live Blender, no UE)",
+  "inputs_sha256": {
+   "medusa.blend": "2a2534f89093e2a296d34e5b4da41290f1549109d6bc2ef4b1ba29ca978ed903",
+   "v2": "bd125c6bbeb2559b28f6fc4908a1790e0d05fd572b128bd9188c2daeea046592",
+   "v3": "b9cea0fe05071b07732b8d72ecc75b074c366bc665679c378cd4e397e1f822a2"
+  }
+ },
+ "verdict": {
+  "decision": "rework (v3.1)",
+  "v3_as_static_candidate": "not accepted",
+  "v2": "remains the isolated game candidate",
+  "art_accepted": false,
+  "gd_058": "open",
+  "open_art_question": "seven separate snake heads are not readable at K2 in v2 or v3; 04-blender-production.md asks for a readable crown, not detailed snakes, so this is an open art question, not a failed check"
+ }
+}
