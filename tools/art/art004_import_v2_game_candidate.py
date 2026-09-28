@@ -1,4 +1,4 @@
-"""Import the saved Medusa v2 and its base with a persisted UE skeleton.
+"""Import a saved Medusa visual candidate with a persisted UE skeleton.
 
 This does not import or approve animation clips. The assets have explicit
 Candidate names so the existing production Medusa is left untouched.
@@ -8,6 +8,7 @@ in /Game/ArtPreview/Medusa. This namespace does not overwrite production.
 
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import unreal as u
@@ -15,16 +16,25 @@ import unreal as u
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE = ROOT / "blender/ASSET-MEDUSA-001"
-FBX = SOURCE / "variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx"
+VARIANT = os.environ.get("ART004_GAME_VARIANT", "face-neck-v2")
+if VARIANT not in {"face-neck-v2", "head-tilt-v3"}:
+    raise ValueError("ART004_GAME_VARIANT must be face-neck-v2 or head-tilt-v3")
+FBX = SOURCE / ("variants/head-tilt-v3/SK_Medusa_HeadTilt_v3.fbx" if VARIANT == "head-tilt-v3"
+                else "variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx")
 BASE_FBX = SOURCE / "export/SM_Medusa_Base.fbx"
 DEST = "/Game/ArtPreview/Medusa"
 MESH_DIR = DEST + "/Meshes"
-MESH_NAME = "SK_Medusa_FaceNeck_v2Candidate"
+MESH_NAME = ("SK_Medusa_HeadTilt_v3Candidate" if VARIANT == "head-tilt-v3"
+             else "SK_Medusa_FaceNeck_v2Candidate")
 BASE_NAME = "SM_Medusa_Base_v2Candidate"
 BLUE_PATH = DEST + "/Materials/MI_Medusa_Blue"
 RED_PATH = DEST + "/Materials/MI_Medusa_Red"
-REPORT = ROOT / "docs/game-design/evidence/ART-004/v2-game-import-report.json"
-EXPECTED_FBX_SHA256 = "bd125c6bbeb2559b28f6fc4908a1790e0d05fd572b128bd9188c2daeea046592"
+REPORT = ROOT / ("docs/game-design/evidence/ART-004/head-tilt-v3-game-import-report.json"
+                 if VARIANT == "head-tilt-v3"
+                 else "docs/game-design/evidence/ART-004/v2-game-import-report.json")
+EXPECTED_FBX_SHA256 = ("b9cea0fe05071b07732b8d72ecc75b074c366bc665679c378cd4e397e1f822a2"
+                       if VARIANT == "head-tilt-v3"
+                       else "bd125c6bbeb2559b28f6fc4908a1790e0d05fd572b128bd9188c2daeea046592")
 
 
 def require(condition, message):
@@ -126,19 +136,25 @@ def main():
     require(u.EditorAssetLibrary.does_asset_exist(skeleton_path),
             "Saved Skeleton package is missing")
 
-    base = import_asset(BASE_FBX, BASE_NAME, False)
+    # v3 keeps the already-saved v2 pedestal byte-for-byte. Reimporting it
+    # would dirty an unrelated tracked UE package for no visual change.
+    base = (u.load_asset(MESH_DIR + "/" + BASE_NAME) if VARIANT == "head-tilt-v3"
+            else import_asset(BASE_FBX, BASE_NAME, False))
+    require(base is not None, "Candidate base is missing")
     bounds = base.get_bounding_box()
     dimensions = [bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y,
                   bounds.max.z - bounds.min.z]
     require(all(abs(value - expected) < .5 for value, expected in
                 zip(dimensions, (30, 30, 6))), "Base size changed: " + str(dimensions))
-    base.set_material(0, blue)
-    require(u.EditorAssetLibrary.save_loaded_asset(base), "Could not persist base")
+    if VARIANT == "face-neck-v2":
+        base.set_material(0, blue)
+        require(u.EditorAssetLibrary.save_loaded_asset(base), "Could not persist base")
 
     # A new process must be able to load the skeleton by its package path.
     require(u.load_asset(skeleton_path) is not None, "Skeleton cannot be reloaded")
     result = {
         "status": "isolated_game_candidate_not_art_acceptance",
+        "variant": VARIANT,
         "source_fbx_sha256": EXPECTED_FBX_SHA256,
         "base_fbx_sha256": hashlib.sha256(BASE_FBX.read_bytes()).hexdigest(),
         "skeletal_mesh": mesh.get_path_name(),
@@ -155,7 +171,7 @@ def main():
     }
     REPORT.parent.mkdir(parents=True, exist_ok=True)
     REPORT.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print("ART004_V2_GAME_CANDIDATE_IMPORT_OK " + str(REPORT))
+    print("ART004_GAME_CANDIDATE_IMPORT_OK " + str(REPORT))
 
 
 main()

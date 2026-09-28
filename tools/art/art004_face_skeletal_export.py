@@ -5,13 +5,14 @@ production FBXs, .blend, and clips are not changed.
 """
 
 import json
+import math
 import os
 import struct
 from pathlib import Path
 
 import bmesh
 import bpy
-from mathutils import Matrix
+from mathutils import Matrix, Vector
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,8 +24,11 @@ FACE_SLOT = os.environ.get("ART004_FACE_SLOT", "0") == "1"
 RESTORE_NORMALS = os.environ.get("ART004_FACE_RESTORE_NORMALS", "0") == "1"
 NECK_BACK = os.environ.get("ART004_FACE_NECK_BACK", "0") == "1"
 CROWN_SPREAD = float(os.environ.get("ART004_CROWN_SPREAD", "0"))
+HEAD_TILT_DEG = float(os.environ.get("ART004_HEAD_TILT_DEG", "0"))
 if not 0 <= CROWN_SPREAD <= .4:
     raise ValueError("ART004_CROWN_SPREAD must be 0..0.4")
+if not -25 <= HEAD_TILT_DEG <= 25 or (CROWN_SPREAD and HEAD_TILT_DEG):
+    raise ValueError("Head tilt must be within ±25 degrees and separate from crown spread")
 if FRONT_ONLY and FACE_SLOT:
     raise ValueError("Choose either front-only winding or separate face slot")
 if RESTORE_NORMALS and FRONT_ONLY:
@@ -44,6 +48,10 @@ if CROWN_SPREAD:
     if not NECK_BACK:
         raise ValueError("The crown probe builds on the corrected face-and-neck candidate")
     OUTPUT = OUTPUT.with_name("SK_Medusa_CrownSpreadProbe.fbx")
+if HEAD_TILT_DEG:
+    if not NECK_BACK:
+        raise ValueError("Head tilt probe builds on the corrected face-and-neck candidate")
+    OUTPUT = OUTPUT.with_name("SK_Medusa_HeadTiltProbe.fbx")
 
 
 def part_indices(mesh, part_name):
@@ -146,6 +154,36 @@ def spread_crown(mesh):
             "root_z_m": root_z, "full_z_m": full_z}
 
 
+def tilt_head(mesh):
+    if not HEAD_TILT_DEG:
+        return {"moved_vertices": 0}
+    # Face, crown and short neck are separate atlas sections. The long
+    # shoulder/quiver section (part_3) is deliberately excluded.
+    parts = {name: part_indices(mesh, name)
+             for name in ("tripo_part_1", "tripo_part_10", "tripo_part_14")}
+    assert {name: len(indices) for name, indices in parts.items()} == {
+        "tripo_part_1": 2633, "tripo_part_10": 587, "tripo_part_14": 480}
+    selected = set().union(*parts.values())
+    vertices = {index for poly in mesh.polygons if poly.index in selected
+                for index in poly.vertices}
+    axis = Matrix.Rotation(math.radians(HEAD_TILT_DEG), 3, "X")
+    pivot = Vector((0, 0, .385))
+    split_normals = [loop.vector.copy() for loop in mesh.corner_normals]
+    for index in vertices:
+        co = mesh.vertices[index].co
+        co[:] = pivot + axis @ (co - pivot)
+    for poly in mesh.polygons:
+        if poly.index in selected:
+            for loop in poly.loop_indices:
+                split_normals[loop] = axis @ split_normals[loop]
+    mesh.update()
+    mesh.normals_split_custom_set(split_normals)
+    mesh.update()
+    return {"parts": {name: len(indices) for name, indices in parts.items()},
+            "moved_vertices": len(vertices), "degrees": HEAD_TILT_DEG,
+            "pivot_m": list(pivot)}
+
+
 def patch_fbx_units(path):
     buffer = bytearray(path.read_bytes())
     start = buffer.find(b"UnitScaleFactor")
@@ -169,6 +207,7 @@ def main():
     bow = bpy.data.objects["SK_Medusa_Bow"]
     flipped, mid_y, neck_count = flip_face(body.data)
     crown = spread_crown(body.data)
+    tilt = tilt_head(body.data)
     arm.animation_data.action = None
     for bone in arm.pose.bones:
         bone.location = (0, 0, 0)
@@ -206,6 +245,7 @@ def main():
               "neck_back_polygons": neck_count,
               "front_mid_y_m": mid_y, "flipped_faces": flipped,
               "crown_probe": crown,
+              "head_tilt_probe": tilt,
               "body_triangles": sum(len(p.vertices) - 2 for p in body.data.polygons),
               "bow_triangles": sum(len(p.vertices) - 2 for p in bow.data.polygons),
               "bones": len(arm.data.bones), "material_slots": len(body.data.materials)}
