@@ -39,6 +39,8 @@ public:
   const TArray<FS08BoardFighter>& GetFighters() const { return Fighters; }
   AS08FighterActor* FindFighterActor(const FString& FighterId) const;
   void SetFighterLabelZoomRatio(float DistanceRatio, bool bOnlySelected);
+  /** Apply local attack-draft or authoritative combat focus by fighter ID. */
+  void SetCombatFocus(const FString& AttackerId, const FString& TargetId);
 
   /** TASK-022 selection ring + reachable-cell highlights. */
   void SetSelectedFighter(const FString& FighterId, const TSet<uint64>& Reachable);
@@ -107,6 +109,8 @@ private:
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;
   FString SelectedFighterId;
+  FString CombatAttackerId;
+  FString CombatTargetId;
   TSet<uint64> ReachableCells;
   TArray<TObjectPtr<AActor>> HighlightTiles;
 };

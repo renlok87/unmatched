@@ -28,6 +28,9 @@ public:
   const FString& GetFighterId() const { return Fighter.Id; }
 
   void SetSelected(bool bSelected);
+  /** Art-preview combat focus. The target marker is a visual child of the
+   *  fighter and never participates in the visibility hit test. */
+  void SetCombatMarkers(bool bAttacker, bool bTarget);
   /** Keep world-space identity labels legible without letting camera zoom
    *  inflate them across the board. At close range show only the selected
    *  fighter's name/HP; the full roster returns at overview distance. */
@@ -53,6 +56,9 @@ private:
   TObjectPtr<UStaticMeshComponent> Ring;
 
   UPROPERTY()
+  TObjectPtr<UStaticMeshComponent> TargetRing;
+
+  UPROPERTY()
   TObjectPtr<USkeletalMeshComponent> ArtBody;
 
   UPROPERTY()
@@ -62,7 +68,10 @@ private:
   TObjectPtr<UStaticMeshComponent> ArtPlaceholder;
 
   bool bArtSelectionRingLoaded = false;
+  bool bArtTargetRingLoaded = false;
   bool bIsSelected = false;
+  bool bIsCombatAttacker = false;
+  bool bIsCombatTarget = false;
   float BaseNameWorldSize = 18.0f;
   float BaseHpWorldSize = 22.0f;
   float BaseNameHeight = 82.0f;

@@ -468,6 +468,7 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
   }
   if (BoardActor) {
     BoardActor->SyncFighters(BoardModel, Fighters, Flow->GetUserId());
+    SyncCombatFocus();
     // GD-030 six-fighter evidence line: the projection's roster, split into
     // own/enemy for THIS viewer (asserted by the demo driver; the image
     // checker alone cannot count silhouettes).
@@ -494,6 +495,21 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
     }
   }
   RefreshUi();
+}
+
+void AS08FlowGameMode::SyncCombatFocus() {
+  if (!BoardActor || !Flow.IsValid()) return;
+  if (CommandUi.Combat.bPresent &&
+      (Flow->GetAppliedSnapshot().Phase == TEXT("COMBAT") ||
+       Flow->GetAppliedSnapshot().Phase == TEXT("COMBAT_RESOLVE"))) {
+    BoardActor->SetCombatFocus(CommandUi.Combat.AttackerId,
+                               CommandUi.Combat.TargetFighterId);
+  } else if (CommandUi.Mode == ES09CommandMode::AttackDraft) {
+    BoardActor->SetCombatFocus(CommandUi.AttackAttackerId,
+                               CommandUi.AttackTargetId);
+  } else {
+    BoardActor->SetCombatFocus(FString(), FString());
+  }
 }
 
 void AS08FlowGameMode::SetupCameraForBoard() {
@@ -3678,6 +3694,7 @@ FString AS08FlowGameMode::CommittedCardLabel(const FString& InstanceId) const {
 }
 
 void AS08FlowGameMode::RefreshHud() {
+  SyncCombatFocus();
   if (!HandBox.IsValid() || !PanelsBox.IsValid() || !CommandBox.IsValid()) return;
   HandBox->ClearChildren();
   PanelsBox->ClearChildren();
