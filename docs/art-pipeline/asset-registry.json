@@ -9,8 +9,9 @@
     "mainCheckout": {
       "root": "repo",
       "branch": "fix/admin-panel",
-      "commit": "c43826d",
-      "tree": "7aed58c3f62982d09d9f00b551242d4992fdcda7",
+      "commit": "06bb4fa",
+      "tree": "920beeeefd585a3b0173157e4146030b42955245",
+      "treeHistory": "c43826d / 7aed58c3… (срез T1) → 10cd855 (P0: CLI пайплайна, реестр, T3/T4/t4-um-fbx-v1) → 264338b (P1: риг-контракт, бочка, видео-референсы, диагноз v3) → 06bb4fa (A1: v3 head-tilt); дерево 920beeee… = арт-worktree 7b5bfe6 (срез T0 этапа 3, 2026-09-28)",
       "untrackedForeignFiles": [
         ".zcode/",
         ".zcodeignore",
@@ -25,16 +26,30 @@
         "docs/game-design/evidence/ART-004/{v3-live-hookup-diagnosis-2026-09-28.md,v3-live-hookup.patch} (арт-трек, диагностика падения live-запуска v3)",
         "tools/art/analyze_video_ref.py (появился 12:09, владелец не установлен)"
       ],
-      "untrackedAfterT1Note": "Срез обновлён 2026-09-28 ~12:10 после P0 (T3/T4/A1). Собственные неотслеживаемые каталоги пайплайна (docs/art-pipeline/, tools/tripo-pipeline/, art/pipeline-candidates/) и каталоги параллельного P1 (art/animation-refs/ и др.) сюда не входят."
+      "untrackedAfterT1Note": "Срез обновлён 2026-09-28 ~12:10 после P0 (T3/T4/A1). Собственные неотслеживаемые каталоги пайплайна (docs/art-pipeline/, tools/tripo-pipeline/, art/pipeline-candidates/) и каталоги параллельного P1 (art/animation-refs/ и др.) сюда не входят. Срез T0 этапа 3: оба файла untrackedAfterT1 и все каталоги пайплайна/P1 закоммичены (264338b, 10cd855).",
+      "headAfterT0Cut": {
+        "commit": "bdd30cc",
+        "tree": "2027a5701ddefda3b75d440cbeda0d3ebe67b786",
+        "note": "После среза T0 (06bb4fa / 920beeee…) оркестратор закоммитил параллельный workflow T1.3 поверх него: bdd30cc «tools(qa010): evidence tooling for QA-010 visual checks». Коммит только добавляет 41 файл в docs/art-pipeline/qa010/ и tools/art/qa010/; файлы T0 и производственные файлы не затронуты (git diff --name-only 06bb4fa bdd30cc). Поля commit/tree выше и production-baseline.json остаются снимком среза T0."
+      },
+      "parallelWorkflows": [
+        {
+          "workflow": "T1.3 этапа 3 (инструменты QA-010)",
+          "paths": ["docs/art-pipeline/qa010/", "tools/art/qa010/"],
+          "gitState": "закоммичено (bdd30cc, fix/admin-panel)",
+          "note": "Владелец — workflow T1.3; пайплайн эти каталоги не меняет."
+        }
+      ]
     },
     "artWorktree": {
       "root": "art-worktree",
       "absolutePath": "C:/Users/ren/.codex/worktrees/art-foundation/unmached",
       "branch": "codex/medusa-shading-probe",
-      "commit": "3950132",
-      "tree": "7aed58c3f62982d09d9f00b551242d4992fdcda7",
-      "treeEqualsMain": true,
-      "uncommitted": [
+      "commit": "7b5bfe6",
+      "tree": "920beeeefd585a3b0173157e4146030b42955245",
+      "treeEqualsMainAtT0Cut": true,
+      "treeEqualsMainNote": "Дерево 920beeee… совпадает с fix/admin-panel на срезе T0 (06bb4fa). После bdd30cc (T1.3) главный checkout впереди арт-ветки на один коммит, который только добавляет каталоги qa010; в арт-ветку он не слит.",
+      "uncommittedAtT1": [
         "blender/ASSET-MEDUSA-001/variants/head-tilt-v3/SK_Medusa_HeadTilt_v3.fbx",
         "blender/ASSET-MEDUSA-001/variants/head-tilt-v3/README.md",
         "docs/game-design/evidence/ART-004/head-tilt-v3-game-import-report.json",
@@ -48,11 +63,12 @@
         "tools/art/art004_head_tilt_v3_mcp_review/, tools/art/art004_head_tilt_v3_measure.py, tools/art/art004_head_tilt_v3_followup.py (A1)",
         "unreal/Unmatched/Content/ArtPreview/Medusa/Meshes/SK_Medusa_HeadTilt_v3Candidate{,_Skeleton}.uasset (Content/ в .gitignore; в git не попадёт без force-add)"
       ],
-      "note": "Деревья коммитов совпадают; отличие только в незакоммиченных v3-файлах (+76/-11 в трёх скриптах) и файлах проверки A1 (включая по +2 строки в README ART-004 и акте GD-058). Интеграцию делает оркестратор после ревью diff."
+      "note": "Срез T1: деревья совпадали (7aed58c3…), v3-файлы и проверка A1 были незакоммичены (список uncommittedAtT1). Срез T0 этапа 3: A1 закоммичен (9f99d95 в арт-ветке, 06bb4fa в fix/admin-panel), арт-ветка слита с fix/admin-panel (7b5bfe6), деревья снова равны (920beeee…), рабочее дерево арт-worktree чистое. В git не входят только gitignored uasset v3 в Content/ арт-worktree (SK_Medusa_HeadTilt_v3Candidate{,_Skeleton}.uasset)."
     },
     "gitignoredButLocal": [
       "unreal/Unmatched/Content/ (кроме принудительно добавленных /Game/ArtPreview/Medusa/*, /Game/ArtTests/ART003|ART005*|ARTMarkers/*, /Game/S01|S05|S08/*)",
-      "unreal/Unmatched/Content/PipelineCandidates/ (9 uasset T4; воспроизводятся tripo_pipeline.py ue-import)",
+      "unreal/Unmatched/Content/PipelineCandidates/ (Medusa/T4LocalPass и Medusa/T4UmFbxV1 — по 9 uasset; воспроизводятся tripo_pipeline.py ue-import)",
+      "unreal/Unmatched/Content/ArtPreview/Medusa/Meshes/SK_Medusa_HeadTilt_v3Candidate{,_Skeleton}.uasset — только в арт-worktree (не в git; force-add только по художественному решению, R6 диагноза)",
       "unreal/Unmatched/Content/ArtTests/ART004_V3Review/ (5 временных uasset A1; судьба — решение пользователя)",
       "art/pipeline-candidates/*/*/work/ (art/pipeline-candidates/.gitignore) и */*/logs/*.log (корневое правило *.log)",
       "unreal/Unmatched/Artifacts/",
@@ -223,23 +239,26 @@
           "note": "2 слота на теле (лицевой + основной, один PBR). Живой K1/K2 — технические пробы, художественно не приняты. После A1 v2 остаётся изолированным игровым кандидатом. Как и в SK_Medusa.fbx: 18 костей в UE (кость 0 = SKEL_Medusa), вывернуты части 8 и 13 (измерено T4), лицо +Y."
         },
         {
-          "layer": "visual-candidate v3 head-tilt (арт-worktree, не интегрирован; A1: доработать v3.1)",
+          "layer": "visual-candidate v3 head-tilt (файлы в fix/admin-panel; uasset только в арт-worktree; A1: доработать v3.1)",
           "stage": "ue-editor-frames",
           "status": "технически импортировано",
           "decision": "доработать v3.1 (акт A1 2026-09-28): v3 не принят как статический кандидат, v2 остаётся изолированным игровым кандидатом",
           "owner": "art-chat",
           "paths": [
-            {"path": "blender/ASSET-MEDUSA-001/variants/head-tilt-v3/SK_Medusa_HeadTilt_v3.fbx", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "v3 FBX (незакоммичен)", "sha256": "b9cea0fe05071b07732b8d72ecc75b074c366bc665679c378cd4e397e1f822a2"},
-            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-game-import-report.json", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "UE import report v3 (незакоммичен)"},
-            {"path": "/Game/ArtPreview/Medusa/Meshes/SK_Medusa_HeadTilt_v3Candidate", "root": "art-worktree", "kind": "ue-asset", "expect": "exists", "role": "UE v3 в Content/ арт-worktree (gitignored; при интеграции нужен force-add, как у 9 uasset v2, или повторный импорт ART004_GAME_VARIANT=head-tilt-v3 tools/art/art004_import_v2_game_candidate.py)"},
-            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-self-acceptance-2026-09-28.md", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "акт A1: решение «доработать (v3.1)» (незакоммичен)"},
-            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/head-tilt-v3-review-measurements.json", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "машинные измерения A1 (незакоммичен)"},
-            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/ue-mcp-live/ue-mcp-cobble-d10-k2-d300-v3.png", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "полный кадр K2 v3 из живого UE MCP-вьюпорта A1: Cobble, спереди, 300 uu, 1920×1080; оставлен при сокращении каталога пробы A1 (незакоммичен)"},
-            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/compare-ue-k2-front-three-lights.png", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "сравнение v2/v3 в K2 спереди при трёх светах (A1, UE MCP; незакоммичен)"},
+            {"path": "blender/ASSET-MEDUSA-001/variants/head-tilt-v3/SK_Medusa_HeadTilt_v3.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "v3 FBX (закоммичен 06bb4fa)", "sha256": "b9cea0fe05071b07732b8d72ecc75b074c366bc665679c378cd4e397e1f822a2"},
+            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-game-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "UE import report v3"},
+            {"path": "/Game/ArtPreview/Medusa/Meshes/SK_Medusa_HeadTilt_v3Candidate", "root": "art-worktree", "kind": "ue-asset", "expect": "exists", "role": "UE v3 только в Content/ арт-worktree (gitignored, в git не входит; force-add — только по художественному решению, иначе повторный импорт ART004_GAME_VARIANT=head-tilt-v3 tools/art/art004_import_v2_game_candidate.py)"},
+            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-self-acceptance-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "акт A1: решение «доработать (v3.1)»"},
+            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/head-tilt-v3-review-measurements.json", "root": "repo", "kind": "file", "expect": "exists", "role": "машинные измерения A1"},
+            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/ue-mcp-live/ue-mcp-cobble-d10-k2-d300-v3.png", "root": "repo", "kind": "file", "expect": "exists", "role": "полный кадр K2 v3 из живого UE MCP-вьюпорта A1: Cobble, спереди, 300 uu, 1920×1080; класс editor-mcp-viewport (tools/art/classify_evidence.py), не packaged-live"},
+            {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/compare-ue-k2-front-three-lights.png", "root": "repo", "kind": "file", "expect": "exists", "role": "сравнение v2/v3 в K2 спереди при трёх светах (A1, UE MCP; редакторный композит)"},
             {"path": "unreal/Unmatched/Artifacts/ART004Face/medusa-skeletal-restorednormals-faceslot-neck-static-frontambient-y100-z500-s100-d10-k2-base-d300-headtiltprobe.png", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "исходный CLI-кадр K2 v3 арт-чата (SceneCapture, gitignored Artifacts). Копию в ue-cli-headtiltprobe/ A1 удалила при сокращении каталога пробы; SHA-256 записан в head-tilt-v3-review-measurements.json → probe_dir_pruning_2026-09-28. С кадрами MCP не смешивать", "sha256": "b06e86f02824060f9ad8475d5ed9e6d99f42a7b906195d3b3886d21a8236d1b4"},
-            {"path": "unreal/Unmatched/Artifacts/ART004Face/headtilt-live-flag-experiment.patch", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "отменённый эксперимент live-подключения (gitignored)"}
+            {"path": "unreal/Unmatched/Artifacts/ART004Face/headtilt-live-flag-experiment.patch", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "отменённый эксперимент live-подключения (gitignored)"},
+            {"path": "docs/game-design/evidence/ART-004/v3-live-hookup-diagnosis-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "диагноз падения live packaged-запуска v3 (редакция 3): место падения доказано, причина -NoLiveCoding — гипотеза без A/B; slug cobble-city → пустая сетка 20×20"},
+            {"path": "docs/game-design/evidence/ART-004/v3-live-hookup.patch", "root": "repo", "kind": "file", "expect": "exists", "role": "предложенный, не применённый патч подключения v3 к packaged K2 (вход T1.1 этапа 3)", "sha256": "7ecc6c08ce4d8d1908cd81ddfe077e147b647409558d15889bfaf0a29aac43eb"}
           ],
-          "note": "Измерено/технически импортировано, художественно не принято. A1 (живые Blender MCP и UE MCP, только редакторные кадры): лицо в K2 300 uu читается лучше (видимые пиксели черт лица 809 → 1 242, +54 %; рост суммы градиента в основном от площади маски, средний градиент +4…8 %). Дефекты v3: P1 — сквозной просвет у основания шеи спереди 23 → 82 мм²; P2 — зазор корона–колчан 1,07 → 0,31 см; P2 — кость head не повёрнута, сокет Head расходится с головой на 1,04 см. Предложено для v3.1: плавный переход угла z 38,5 → 42 см, зазор корона–колчан ≥ 1,0 см, решение по кости head/сокету Head в контракте рига P1.6. Живой packaged K2 с v3 не выполнен: оба запуска упали при старте клиента до загрузки карты; вероятная причина — флаг сборки -NoLiveCoding, не ассет v3 (диагностика арт-трека по следам, A/B не проводился). Временные ревью-ассеты A1 /Game/ArtTests/ART004_V3Review (5 uasset, главный checkout, gitignored) в пути не внесены: их судьба — решение пользователя. Каталог пробы A1 сокращён с ~54 до ≈14 МБ (14 466 696 байт, 69 файлов): оставлены кадры K2 Cobble из UE MCP, сравнения, ID-рендеры Blender и JSON; удалённые файлы с SHA-256 перечислены в head-tilt-v3-review-measurements.json → probe_dir_pruning_2026-09-28."
+          "liveHookupDiagnosis": {"status": "измерено по следам; A/B не выполнен", "proven": "оба запуска v3 (08:28:37, 08:33:20) упали через ≈1,3 с при регистрации UClass AS08BoardActor, до загрузки карты и ассета v3; обе сборки игрового target шли с -NoLiveCoding; -ArtPreviewBoardId cobble-city — slug, бэкенд собрал пустую сетку 20×20", "hypothesis": "WITH_RELOAD=0 при прекомпилированном движке WITH_RELOAD=1 → запись за границу статика FClassRegistrationInfo (DeferredRegistry.h:102)", "nextCheck": "T1.1 этапа 3: игровой target без -NoLiveCoding, boardId cmuhgs4b2001mwik4f2b2xtf8, A/B гипотезы WITH_RELOAD, контроль v2"},
+          "note": "Измерено/технически импортировано, художественно не принято. A1 (живые Blender MCP и UE MCP, только редакторные кадры): лицо в K2 300 uu читается лучше (видимые пиксели черт лица 809 → 1 242, +54 %; рост суммы градиента в основном от площади маски, средний градиент +4…8 %). Дефекты v3: P1 — сквозной просвет у основания шеи спереди 23 → 82 мм²; P2 — зазор корона–колчан 1,07 → 0,31 см; P2 — кость head не повёрнута, сокет Head расходится с головой на 1,04 см. Предложено для v3.1: плавный переход угла z 38,5 → 42 см, зазор корона–колчан ≥ 1,0 см, решение по кости head/сокету Head в контракте рига P1.6. Живой packaged K2 с v3 не выполнен: оба запуска упали при старте клиента до загрузки карты; вероятная причина — флаг сборки -NoLiveCoding, не ассет v3 (диагностика арт-трека по следам, A/B не проводился; см. liveHookupDiagnosis). Файлы слоя закоммичены (06bb4fa, 264338b); uasset v3 и CLI-кадр/патч в Artifacts — только в арт-worktree. Временные ревью-ассеты A1 /Game/ArtTests/ART004_V3Review (5 uasset, главный checkout, gitignored) в пути не внесены: их судьба — решение пользователя. Каталог пробы A1 сокращён с ~54 до ≈14 МБ (14 466 696 байт, 69 файлов): оставлены кадры K2 Cobble из UE MCP, сравнения, ID-рендеры Blender и JSON; удалённые файлы с SHA-256 перечислены в head-tilt-v3-review-measurements.json → probe_dir_pruning_2026-09-28."
         },
         {
           "layer": "pipeline-scaffold T3 (passthrough)",
@@ -275,7 +294,30 @@
             {"path": "docs/art-pipeline/evidence/t4-medusa-local-pass-2026-09-28/fbx-orientation-comparison.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вывернутые части 8/13 в SK_Medusa.fbx, v2, v3"},
             {"path": "docs/art-pipeline/evidence/t4-medusa-local-pass-2026-09-28/commands.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "команды и коды выхода"}
           ],
-          "note": "Технически импортировано; не художественная приёмка, не игровой ассет, не бюджет, не замена SK_Medusa, /Game/ART004 и /Game/ArtPreview. Измерено T4: тело 18 199 / лук 1 197 / подставка 1 780 tris (в UE 1 778), верх 55,0 uu, подставка 30×30×6 uu, 2 слота на теле, сокеты Weapon и Head ровно по одному, в UE 18 костей (кость 0 = SKEL_Medusa + 17 костей профиля). Исправлены вывернутые части 8 и 13 (в SK_Medusa.fbx, v2 и v3 не исправлены). Импорт и ue-import --force: те же 9 ассетов, без дублей. Отклонения: лицо в UE +Y — экспорт без поворота +90° Z проверенного пресета UM_FBX_v1 / 04 §1 (ART-001 PASS); собственный M_Medusa_Candidate_Atlas вместо M_DioramaMaster. Открытые и неманифолдные рёбра Tripo по частям (verify, информационно) не оценивались. Run-каталог untracked до интеграции; work/ и logs/*.log игнорируются git; uasset в gitignored Content/."
+          "note": "Технически импортировано; не художественная приёмка, не игровой ассет, не бюджет, не замена SK_Medusa, /Game/ART004 и /Game/ArtPreview. Измерено T4: тело 18 199 / лук 1 197 / подставка 1 780 tris (в UE 1 778), верх 55,0 uu, подставка 30×30×6 uu, 2 слота на теле, сокеты Weapon и Head ровно по одному, в UE 18 костей (кость 0 = SKEL_Medusa + 17 костей профиля). Исправлены вывернутые части 8 и 13 (в SK_Medusa.fbx, v2 и v3 не исправлены). Импорт и ue-import --force: те же 9 ассетов, без дублей. Отклонения: лицо в UE +Y — экспорт без поворота +90° Z проверенного пресета UM_FBX_v1 / 04 §1 (ART-001 PASS); собственный M_Medusa_Candidate_Atlas вместо M_DioramaMaster. Открытые и неманифолдные рёбра Tripo по частям (verify, информационно) не оценивались. Run-каталог закоммичен (10cd855); work/ и logs/*.log игнорируются git; uasset в gitignored Content/. После P0-ревью прогон заменён текущим кандидатом 20260928-t4-um-fbx-v1 (лицо +X, слой ниже); T4LocalPass оставлен как запись отклонения осей."
+        },
+        {
+          "layer": "pipeline-candidate T4 UM_FBX_v1 /Game/PipelineCandidates/Medusa/T4UmFbxV1 (текущий кандидат пайплайна)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal-um-fbx-v1.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль сборки skeletal-candidate по UM_FBX_v1 (числа — предложение)"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest t4-um-fbx-v1"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1/export/SK_Medusa_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "скелетный FBX кандидата UM_FBX_v1 (байт в байт = headless-прогон)", "sha256": "35809386bff7716ab8c354970d0683a45ff1f055a2679fd1144d01ccbef47625"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1/export/SM_Medusa_Base_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "подставка кандидата", "sha256": "de5ebcac44b23b5335a3a7b7802420802c3738f8958fab104fa0b044d87a0983"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1/textures", "root": "repo", "kind": "file", "expect": "exists", "role": "атлас 2K BC/N/N_OpenGL/ORM"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "build report"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "UE import report (MCP, после ue-import --force)"},
+            {"path": "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Meshes/SK_Medusa_Candidate", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE skeletal mesh кандидата (gitignored, воспроизводится ue-import)"},
+            {"path": "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Meshes/SM_Medusa_Base_Candidate", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE подставка кандидата (gitignored)"},
+            {"path": "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/editor-frames/ue-axes-frames.json", "root": "repo", "kind": "file", "expect": "exists", "role": "замер осей в живом UE: пиксели лица +X 8 715 / −X 0 / +Y 961 / −Y 4 070 (редакторные кадры, editor-mcp-viewport)"},
+            {"path": "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/backend-comparison.json", "root": "repo", "kind": "file", "expect": "exists", "role": "mcp vs headless: FBX, PNG и отчёты байт в байт (кроме isolation_note)"},
+            {"path": "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/ue-listing-3-final.json", "root": "repo", "kind": "file", "expect": "exists", "role": "листинг папки: 9 ассетов, сокеты Weapon/Head, 2 слота"},
+            {"path": "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/ue-import-already-exists-transcript.json", "root": "repo", "kind": "file", "expect": "exists", "role": "стенограмма отказа MCP import на занятое имя (без Name_1)"},
+            {"path": "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/commands.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "команды и коды выхода"}
+          ],
+          "note": "Технически импортировано (живой UE MCP :8123, 9 ассетов, повторный ue-import --force без дублей); не художественная приёмка, не игровой ассет, не бюджет, не замена SK_Medusa, /Game/ART004 и /Game/ArtPreview. Экспорт по UM_FBX_v1 (+90° Z, triangulate, FBX_SCALE_UNITS): лицо в UE смотрит в +X — измерено тремя способами (карта по границам, сверка с SK_Medusa_Atlas, пиксели лица по 4 сторонам). Все прочие импорты Medusa (SK_Medusa, v2, v3, T4LocalPass) смотрят в +Y. Части 8 и 13 исправлены, как в T4LocalPass. Собственный M_Medusa_Candidate_Atlas вместо M_DioramaMaster. Кадры осей — редакторные (MCP-вьюпорт), для K1/K2/K3 не годятся."
         },
         {
           "layer": "draft-animation-clips",
@@ -287,25 +329,60 @@
             {"path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "черновой клип"},
             {"path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "черновой клип"},
             {"path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "черновой клип"},
-            {"path": "blender/ASSET-MEDUSA-001/ue-animation-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "численная проверка движения костей и root"}
+            {"path": "blender/ASSET-MEDUSA-001/ue-animation-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "численная проверка движения костей и root"},
+            {"path": "docs/art-pipeline/animation-library/clip-manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "манифест библиотеки клипов P1.6: MVP-слоты proposed/not_run, черновые клипы draft_test"},
+            {"path": "docs/art-pipeline/animation-library/validation/summary.json", "root": "repo", "kind": "file", "expect": "exists", "role": "validate_clip.py: 4 черновых клипа pass (Idle — с предупреждением visible_pose_change), Tripo-пресет rejected"}
           ],
           "note": "Черновые; анимационная работа остановлена до пайплайна «модель → видео-референс → скелетный клип → ретаргет». Только тестовые файлы."
+        },
+        {
+          "layer": "tripo-autorig P1.6 tripo-rig-20260928-p16 (отклонён для производства)",
+          "stage": "tripo-source",
+          "status": "измерено",
+          "decision": "авториг Tripo отклонён: 5/7 (b6253e58) и 7/7 (d562f057) проб деформации в неверной зоне; производственный путь — Blender-скелет UM_HUMANOID_17_v1 (RIG-CONTRACT §1); повтор — только на A/T-позной версии нового персонажа (§8)",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/run.json", "root": "repo", "kind": "file", "expect": "exists", "role": "Studio: операции, цены, балансы (40 кредитов = 2 авторига по 20)", "sha256": "ee8947158767a418e5d547e5e5d469e8f61c8540c0e391629ce28ec6f50e48a6"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт P1.6: проверка авторига, вывод"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/preview/deform/tripo-ue5-forced-deform.json", "root": "repo", "kind": "file", "expect": "exists", "role": "числа проб деформации авторига b6253e58"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/preview/deform/blender-17-deform.json", "root": "repo", "kind": "file", "expect": "exists", "role": "контроль: Blender-риг 17 костей, 7/7 правдоподобны"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/fixtures", "root": "repo", "kind": "file", "expect": "exists", "role": "отслеживаемые фикстуры validate_clip (BVH/GLB LungeAttack, FBX пресета)"},
+            {"path": "docs/art-pipeline/rig/RIG-CONTRACT.md", "root": "repo", "kind": "file", "expect": "exists", "role": "контракт рига UM_HUMANOID_17_v1 (предложение)"},
+            {"path": "docs/art-pipeline/rig/rig-contract.json", "root": "repo", "kind": "file", "expect": "exists", "role": "контракт рига, машиночитаемый"}
+          ],
+          "note": "40 Studio-кредитов (история Studio «Риггинг −20» 11:18:01 и 11:26:52); цена пресета анимации «стоя_отдых» не подтверждена (списания в балансе не видно, клик по карточке запускает ретаргет без подтверждения — не кликать карточки пресетов). Чужой GLB бочки из source/ убран (побайтная копия файла P1.5, run.json → foreign_files_removed). work/ игнорируется git и воспроизводится unzip."
+        },
+        {
+          "layer": "animation-refs SYNTX/Kling (видео-референсы P1.6)",
+          "stage": "reference-images",
+          "status": "предложено",
+          "statusLabel": "референсы, не анимация",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/art-pipeline/animation-refs/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "манифест видео-референсов: overallStatus «референсы, не анимация»", "sha256": "ab53bed9be92c446fef23632f8560ea472df59b65b14385447da8ca500f07ceb"},
+            {"path": "art/animation-refs/ASSET-MEDUSA-001", "root": "repo", "kind": "file", "expect": "exists", "role": "4 ролика Kling 2.5 std 5 с (MED-Idle/LungeAttack/HitReact/DeathSettle), analysis.json, контакт-листы, сырые ответы SYNTX (id аккаунта REDACTED)"},
+            {"path": "tools/art/syntx_video_refs", "root": "repo", "kind": "file", "expect": "exists", "role": "скрипты генерации/импорта/манифеста (реальный gen.sh тратит ≈6 токенов SYNTX)"},
+            {"path": "tools/art/analyze_video_ref.py", "root": "repo", "kind": "file", "expect": "exists", "role": "замеры камеры/фона/силуэта роликов"}
+          ],
+          "note": "Статус по словарю — «предложено» (есть только референсы): ни один ролик не является клипом, не импортирован в Blender/UE и не принят художественно; pose-трекинг не запускался. SYNTX: 24 токена (4 генерации по 6) при лимите задачи 120 и лимите окна 150; баланс 685,5 → 661,5. Лицензия роликов Kling через SYNTX юристом не проверена."
         }
       ],
       "manifest06": {
         "verificationStatusIn06": "planned",
-        "drift": "06 указывает «модель с нуля (D-06)», sourceHash пуст, unrealAssetPath /Game/Meshes/SK/SK_Medusa не существует; фактически — Tripo-источники, кандидаты арт-трека в /Game/ART004 и /Game/ArtPreview и кандидат пайплайна в /Game/PipelineCandidates/Medusa/T4LocalPass.",
+        "drift": "06 указывает «модель с нуля (D-06)», sourceHash пуст, unrealAssetPath /Game/Meshes/SK/SK_Medusa не существует; фактически — Tripo-источники, кандидаты арт-трека в /Game/ART004 и /Game/ArtPreview и кандидаты пайплайна в /Game/PipelineCandidates/Medusa/{T4LocalPass,T4UmFbxV1}. Предложенный diff нормативов 00/17 по D-06: docs/art-pipeline/proposals/d06-tripo-norms.diff.md (не применён).",
         "proposedChange": "Предложение владельцу 06 (не применено): sourceReference → Tripo d562f057/b6253e58 + ссылки на run.json; sourceHash → sha256 SK_Medusa.fbx; verificationStatus planned → imported (технически), без verified до GD-058."
       },
-      "nextStep": "A1 и T4 выполнены (v3 → доработать v3.1; кандидат T4 технически импортирован). Дальше: арт-трек — v3.1 (плавный переход угла шеи, зазор корона–колчан ≥ 1,0 см, решение о переносе исправления частей 8/13); P1.6 — контракт рига с костью 0 = SKEL_Medusa и решением по кости head/сокету Head; A2 — подтвердить причину падения live-запуска v3 (A/B по -NoLiveCoding), затем packaged K2 с HUD и boardState.",
-      "blocker": "Художественный контраст лица и читаемость короны на игровом K2 не решены; v3 не принят (просвет шеи, зазор корона–колчан, сокет Head) и не интегрирован; причина падения live-запуска v3 диагностирована только по следам (вероятно -NoLiveCoding, A/B не выполнен); предел зума не утверждён; ось лица +Y у всех импортов Medusa против проверенного пресета UM_FBX_v1 / 04 §1 (+X) — нужно решение пользователя: исправлять экспорт/ассеты Medusa или сознательно принять +Y.",
+      "nextStep": "A1, T4 (+ t4-um-fbx-v1, лицо +X) и P1.6 выполнены и интегрированы. Этап 3: T1.1 — де-риск packaged (hookup-патч, контроль v2, A/B гипотезы -NoLiveCoding, живой v3); T1.2 — v3.1 в Blender по порогам evidence/s3-baseline-2026-09-28/thresholds.json; сокет Head — только предложение в rig-contract.json; затем packaged K2 с HUD и boardState (кадры класса packaged-live по tools/art/classify_evidence.py).",
+      "blocker": "Художественный контраст лица и читаемость короны на игровом K2 не решены; v3 не принят (просвет шеи, зазор корона–колчан, сокет Head; файлы интегрированы, uasset только в арт-worktree); причина падения live-запуска v3 диагностирована только по следам (вероятно -NoLiveCoding, A/B не выполнен); предел зума не утверждён; ось лица +Y у всех импортов Medusa против проверенного пресета UM_FBX_v1 / 04 §1 (+X) — нужно решение пользователя: исправлять экспорт/ассеты Medusa (кандидат пайплайна t4-um-fbx-v1 уже +X) или сознательно принять +Y.",
       "doneCriteria": "Художественный акт ART-004: K1/K2/K3 в живой packaged-сцене с HUD и boardState, лицо/корона/лук/кисти читаемы на рабочем зуме, сокеты Weapon/Head соответствуют кости, нулевой нежелательный root motion, QA-009/010 заполнены; затем решение GD-058.",
       "acceptanceEvidence": [],
       "evidence": [
         {"path": "docs/game-design/evidence/ART-004/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "ART-004 evidence index"},
         {"path": "docs/game-design/evidence/ART-004/crown-spread-self-acceptance-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отклонённая корона (не повторять)"},
         {"path": "docs/game-design/evidence/GD-058/acceptance-review-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "GD-058 не принят"},
-        {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-self-acceptance-2026-09-28.md", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "акт A1: v3 → доработать v3.1 (незакоммичен)"},
+        {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-self-acceptance-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "акт A1: v3 → доработать v3.1"},
+        {"path": "docs/game-design/evidence/ART-004/v3-live-hookup-diagnosis-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "диагноз падения live-запуска v3 (гипотеза -NoLiveCoding, slug cobble-city)"},
+        {"path": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/production-baseline.json", "root": "repo", "kind": "file", "expect": "exists", "role": "базовый снимок производства этапа 3 (sha256 SK_Medusa.fbx, ArtPreview/Medusa, Config)"},
         {"path": "docs/art-pipeline/medusa-local-pass-report.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт T4: кандидат пайплайна технически импортирован"},
         {"path": "docs/art-pipeline/imagegen-inputs/CONSISTENCY-REVIEW.md", "root": "repo", "kind": "file", "expect": "exists", "role": "проверка входов ImageGen T2 (#ref-medusa)"}
       ],
@@ -364,7 +441,7 @@
       "evidence": [
         {"path": "docs/game-design/evidence/ART-004/crown-spread-self-acceptance-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отклонение расширения короны"},
         {"path": "docs/game-design/evidence/ART-004/v2-base-d10-composition-self-acceptance-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "семь голов не разделяются"},
-        {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-self-acceptance-2026-09-28.md", "root": "art-worktree", "kind": "file", "expect": "exists", "role": "A1: корона спереди/сзади, зазор корона–колчан (незакоммичен)"}
+        {"path": "docs/game-design/evidence/ART-004/head-tilt-v3-self-acceptance-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "A1: корона спереди/сзади, зазор корона–колчан"}
       ],
       "plannedPaths": []
     },
@@ -904,7 +981,7 @@
             {"path": "docs/art-pipeline/evidence/p15-barrel-2026-09-28/tripo-run.json", "root": "repo", "kind": "file", "expect": "exists", "role": "Studio: цены, списания, баланс"},
             {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest tripo_pipeline (passthrough)"}
           ],
-          "note": "Итого 60 Studio-кредитов (45+10+5; Smart UV по бесплатной пробе). Studio-кредиты ≠ API-кредиты ≠ USD."
+          "note": "Итого 60 Studio-кредитов (45+10+5; Smart UV по бесплатной пробе). Studio-кредиты ≠ API-кредиты ≠ USD. Два списания «Риггинг −20» (11:18:01, 11:26:52) принадлежат P1.6, не бочке (сверено по истории Studio; единый журнал — docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json)."
         },
         {
           "layer": "blender-candidate SM_Decor_Barrel",
@@ -918,14 +995,14 @@
             {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_N.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K Normal DirectX", "sha256": "33f91b4db86fa7e31ead30466a4ba9328d9fcf22d160ec6ba445ed3826fb2c17"},
             {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_ORM.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K ORM (AO bake)", "sha256": "9a66a5581ba08573952d82aafd1987edaf8d890e2bf3a12761db571df98b875c"},
             {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/candidate-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "измерения кандидата"},
-            {"path": "/Game/PipelineCandidates/DecorBarrel", "root": "repo", "kind": "ue-asset", "expect": "planned", "role": "UE-импорт отложен"}
+            {"path": "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel", "root": "repo", "kind": "ue-asset", "expect": "planned", "role": "UE-импорт отложен (T2.1 этапа 3)"}
           ],
-          "note": "Измерено: 3837 tris, 21,4×21,4×26 uu, 1 слот, UV0 48 островов/75,7 %, 0 перекрытий, зазор ≈3 px на 1K. Край крышки: 1 открытое + 2 неманифолдных ребра (не исправлено). Числа не являются бюджетом."
+          "note": "Статус по prop-barrel-report (после исправлений P1): измерено; UE не запускался, художественной приёмки нет. Измерено: 3 790 tris (у источника 3 837; складка крышки исправлена), 1 оболочка, 0 открытых/неманифолдных рёбер, 0 несогласованных нормалей, 21,4×21,4×26 uu, 1 слот, UV0 36 островов / 75,6 %, 0 перекрытий, мин. зазор 3 px на 1K (18 пар < 4 px — риск мипов), пробка на +X по UM_FBX_v1. Открыто: 80 углов с нормалью внутрь в пазах, крышка додумана Tripo, материал в UE должен быть односторонним, AD-CNF-19. Числа не являются бюджетом."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "06 предлагает один SM_Decor.fbx, 04 — файл на объект (AD-CNF-19).", "proposedChange": "Нет; для кандидатов пайплайна — файл на объект."},
-      "nextStep": "UE-этап: импорт SM_Decor_Barrel + BC/N/ORM в /Game/PipelineCandidates при свободном UE, затем кадры K-1/K-2 для арт-проверки.",
-      "blocker": "Живой UE занят T4 (UnrealEditor-Cmd запрещён); художественная проверка не проводилась.",
+      "nextStep": "T2.1 этапа 3: импорт SM_Decor_Barrel + BC/N/ORM в /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel через живой UE MCP (масштаб 1, без коллизии, BC sRGB, N TC_Normalmap без flip, ORM linear, односторонний материал), затем кадры K-1/K-2 в контрольной сцене P1.7.",
+      "blocker": "UE-импорт ждёт T2.1 (UE-lock; UnrealEditor-Cmd на главном checkout запрещён, пока открыт редактор PID 19540); художественная проверка не проводилась.",
       "doneCriteria": "Ø22×26 uu (предложено), ≤2 слота, 1K, без коллизии; UE-импорт без дублей; художественная проверка в контрольной сцене.",
       "acceptanceEvidence": [],
       "evidence": [

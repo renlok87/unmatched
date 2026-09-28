@@ -1,0 +1,686 @@
+{
+  "schema": "unmatched.s3-production-baseline/1",
+  "createdUtc": "2026-09-28T08:51:45Z",
+  "task": "Stage 3 / T0: базовый снимок «производство не тронуто»",
+  "status": "измерено",
+  "command": "python docs/art-pipeline/evidence/s3-baseline-2026-09-28/snapshot_baseline.py production",
+  "checkCommand": "python docs/art-pipeline/evidence/s3-baseline-2026-09-28/snapshot_baseline.py check",
+  "roots": {
+    "repo": "C:/Users/ren/WebstormProjects/unmached/unmached",
+    "art-worktree": "C:/Users/ren/.codex/worktrees/art-foundation/unmached"
+  },
+  "heads": {
+    "repo": {
+      "branch": "fix/admin-panel",
+      "commit": "06bb4faa13169b8286bfd712d786d4f19fc7425e",
+      "tree": "920beeeefd585a3b0173157e4146030b42955245",
+      "statusPorcelain": [
+        " M docs/art-pipeline/DIRECTORY-MAP.md",
+        " M docs/art-pipeline/asset-registry.json",
+        "?? .zcode/",
+        "?? .zcodeignore",
+        "?? blender/ASSET-MEDUSA-001/animation-api-inspect.json",
+        "?? blender/ASSET-MEDUSA-001/build-output.txt",
+        "?? blender/ASSET-MEDUSA-001/build_tripo_medusa.py",
+        "?? blender/ASSET-MEDUSA-001/component-api-inspect.json",
+        "?? blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbm/",
+        "?? blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbm/",
+        "?? blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbm/",
+        "?? blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbm/",
+        "?? blender/ASSET-MEDUSA-001/export/SK_Medusa.fbm/",
+        "?? blender/ASSET-MEDUSA-001/inspect_segmented_blender.py",
+        "?? blender/ASSET-MEDUSA-001/medusa.blend1",
+        "?? blender/ASSET-MEDUSA-001/pose-api-inspect.json",
+        "?? blender/ASSET-MEDUSA-001/preview/light-probe-35-20.png",
+        "?? blender/ASSET-MEDUSA-001/preview/light-probe-45-12.png",
+        "?? blender/ASSET-MEDUSA-001/preview/rig-idle.png",
+        "?? blender/ASSET-MEDUSA-001/preview/ue-review/",
+        "?? blender/ASSET-MEDUSA-001/socket-inspect.json",
+        "?? blender/ASSET-MEDUSA-001/textures/T_Medusa_BC.jpg",
+        "?? blender/ASSET-MEDUSA-001/textures/T_Medusa_N.jpg",
+        "?? blender/ASSET-MEDUSA-001/textures/T_Medusa_RM.png",
+        "?? blender/ASSET-MEDUSA-001/verify-output.txt",
+        "?? docs/art-pipeline/evidence/s3-baseline-2026-09-28/",
+        "?? docs/art-pipeline/proposals/",
+        "?? docs/art-pipeline/qa010/",
+        "?? tools/art/art004_capture.py",
+        "?? tools/art/art004_inspect_component.py",
+        "?? tools/art/art004_inspect_pose_api.py",
+        "?? tools/art/classify_evidence.py",
+        "?? tools/art/inspect_medusa_animation_api.py",
+        "?? tools/art/inspect_medusa_sockets.py",
+        "?? tools/art/qa010/",
+        "?? tools/art/tests/"
+      ]
+    },
+    "art-worktree": {
+      "branch": "codex/medusa-shading-probe",
+      "commit": "7b5bfe6cabf42dc9f96ba664fb5ea99f1e68d369",
+      "tree": "920beeeefd585a3b0173157e4146030b42955245",
+      "statusPorcelain": []
+    }
+  },
+  "productionFiles": [
+    {
+      "root": "repo",
+      "path": "blender/ASSET-MEDUSA-001/export/SK_Medusa.fbx",
+      "exists": true,
+      "bytes": 1165452,
+      "sha256": "fb9772eaaffd591a221b50b1a6dec17a25a33712449d3c0e95f10ff9a87242aa",
+      "git": "tracked"
+    },
+    {
+      "root": "repo",
+      "path": "blender/ASSET-MEDUSA-001/export/SM_Medusa_Base.fbx",
+      "exists": true,
+      "bytes": 80060,
+      "sha256": "a49bfbbfe6e51856aebcd9d3e7cc9a45bc142f0ff110830f446a28c76997ba4f",
+      "git": "tracked"
+    },
+    {
+      "root": "repo",
+      "path": "blender/ASSET-MEDUSA-001/medusa.blend",
+      "exists": true,
+      "bytes": 1222198,
+      "sha256": "2a2534f89093e2a296d34e5b4da41290f1549109d6bc2ef4b1ba29ca978ed903",
+      "git": "tracked"
+    },
+    {
+      "root": "repo",
+      "path": "blender/ASSET-MEDUSA-001/variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx",
+      "exists": true,
+      "bytes": 1170156,
+      "sha256": "bd125c6bbeb2559b28f6fc4908a1790e0d05fd572b128bd9188c2daeea046592",
+      "git": "tracked"
+    },
+    {
+      "root": "repo",
+      "path": "blender/ASSET-MEDUSA-001/variants/head-tilt-v3/SK_Medusa_HeadTilt_v3.fbx",
+      "exists": true,
+      "bytes": 1176284,
+      "sha256": "b9cea0fe05071b07732b8d72ecc75b074c366bc665679c378cd4e397e1f822a2",
+      "git": "tracked"
+    },
+    {
+      "root": "repo",
+      "path": "unreal/Unmatched/Config/DefaultGame.ini",
+      "exists": true,
+      "bytes": 2928,
+      "sha256": "2711772fd33eb22f9aa6d0ccd7b4c6a94c4db0a1a61afe0c3bae907d6d9d763b",
+      "git": "tracked"
+    },
+    {
+      "root": "repo",
+      "path": "unreal/Unmatched/Config/DefaultGameUserSettings.ini",
+      "exists": true,
+      "bytes": 234,
+      "sha256": "5f39630f8b1a3cd5c802de43a1dce5fd5151237c2f5b3e6ef08d15261df10ebc",
+      "git": "tracked"
+    },
+    {
+      "root": "repo",
+      "path": "unreal/Unmatched/Config/DefaultEngine.ini",
+      "exists": true,
+      "bytes": 876,
+      "sha256": "e0f207d044eb5026c58d60918dd62c86fb31da6ba841796deee99b222ddee0f8",
+      "git": "tracked"
+    },
+    {
+      "root": "art-worktree",
+      "path": "blender/ASSET-MEDUSA-001/export/SK_Medusa.fbx",
+      "exists": true,
+      "bytes": 1165452,
+      "sha256": "fb9772eaaffd591a221b50b1a6dec17a25a33712449d3c0e95f10ff9a87242aa",
+      "git": "tracked"
+    },
+    {
+      "root": "art-worktree",
+      "path": "blender/ASSET-MEDUSA-001/export/SM_Medusa_Base.fbx",
+      "exists": true,
+      "bytes": 80060,
+      "sha256": "a49bfbbfe6e51856aebcd9d3e7cc9a45bc142f0ff110830f446a28c76997ba4f",
+      "git": "tracked"
+    },
+    {
+      "root": "art-worktree",
+      "path": "blender/ASSET-MEDUSA-001/medusa.blend",
+      "exists": true,
+      "bytes": 1222198,
+      "sha256": "2a2534f89093e2a296d34e5b4da41290f1549109d6bc2ef4b1ba29ca978ed903",
+      "git": "tracked"
+    },
+    {
+      "root": "art-worktree",
+      "path": "blender/ASSET-MEDUSA-001/variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx",
+      "exists": true,
+      "bytes": 1170156,
+      "sha256": "bd125c6bbeb2559b28f6fc4908a1790e0d05fd572b128bd9188c2daeea046592",
+      "git": "tracked"
+    },
+    {
+      "root": "art-worktree",
+      "path": "blender/ASSET-MEDUSA-001/variants/head-tilt-v3/SK_Medusa_HeadTilt_v3.fbx",
+      "exists": true,
+      "bytes": 1176284,
+      "sha256": "b9cea0fe05071b07732b8d72ecc75b074c366bc665679c378cd4e397e1f822a2",
+      "git": "tracked"
+    },
+    {
+      "root": "art-worktree",
+      "path": "unreal/Unmatched/Config/DefaultGame.ini",
+      "exists": true,
+      "bytes": 2928,
+      "sha256": "2711772fd33eb22f9aa6d0ccd7b4c6a94c4db0a1a61afe0c3bae907d6d9d763b",
+      "git": "tracked"
+    },
+    {
+      "root": "art-worktree",
+      "path": "unreal/Unmatched/Config/DefaultGameUserSettings.ini",
+      "exists": true,
+      "bytes": 234,
+      "sha256": "5f39630f8b1a3cd5c802de43a1dce5fd5151237c2f5b3e6ef08d15261df10ebc",
+      "git": "tracked"
+    },
+    {
+      "root": "art-worktree",
+      "path": "unreal/Unmatched/Config/DefaultEngine.ini",
+      "exists": true,
+      "bytes": 876,
+      "sha256": "e0f207d044eb5026c58d60918dd62c86fb31da6ba841796deee99b222ddee0f8",
+      "git": "tracked"
+    }
+  ],
+  "productionDirs": [
+    {
+      "root": "repo",
+      "dir": "unreal/Unmatched/Content/ArtPreview/Medusa",
+      "exists": true,
+      "fileCount": 9,
+      "files": [
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Materials/M_Medusa_Atlas.uasset",
+          "exists": true,
+          "bytes": 8517,
+          "sha256": "85c955a93646e20fbda3e8dce3fde2106bce364abc660a14a2c5046c90ceb5cd",
+          "git": "tracked"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Materials/MI_Medusa_Blue.uasset",
+          "exists": true,
+          "bytes": 3268,
+          "sha256": "19d56640233972e4cd18cd84d5902fb7fce515a1abccd435bb02ac2e00118507",
+          "git": "tracked"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Materials/MI_Medusa_Red.uasset",
+          "exists": true,
+          "bytes": 3263,
+          "sha256": "97a90425569e44928b66a6e008bf9cb1821813e5fb422d4cac817273b20bdc4e",
+          "git": "tracked"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate.uasset",
+          "exists": true,
+          "bytes": 5267345,
+          "sha256": "e8878aa99f9fd7d99df62b176762ae8e67e74670f88a9c4dc22710a699c14f5e",
+          "git": "tracked"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate_Skeleton.uasset",
+          "exists": true,
+          "bytes": 5267,
+          "sha256": "057becb07b8e7d53771dd42cf937aa2b4e3d011e74e6beea86a5add49fe5076c",
+          "git": "tracked"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Meshes/SM_Medusa_Base_v2Candidate.uasset",
+          "exists": true,
+          "bytes": 89539,
+          "sha256": "edddad66cfb07c291614c16b777e2d970737bc69f4293b635bc9c9c825f9bc1e",
+          "git": "tracked"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Textures/T_Medusa_BC.uasset",
+          "exists": true,
+          "bytes": 3888655,
+          "sha256": "3f94e83e8c9154ec36da2db4ce8dd67924824d336c38fdb6c30b7a5213374c49",
+          "git": "tracked"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Textures/T_Medusa_N.uasset",
+          "exists": true,
+          "bytes": 4565091,
+          "sha256": "94586f16c71169b9415ab25b41ef80e11f61a8f67d934793cda9540e3c0d8a80",
+          "git": "tracked"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Textures/T_Medusa_ORM.uasset",
+          "exists": true,
+          "bytes": 3439556,
+          "sha256": "61b215437fa5153dc1dcb0813f3a6611851b658c7ff0b6b0861fe93855976dd1",
+          "git": "tracked"
+        }
+      ]
+    },
+    {
+      "root": "repo",
+      "dir": "unreal/Unmatched/Content/ART004/Medusa",
+      "exists": true,
+      "fileCount": 17,
+      "files": [
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Animation/AM_Medusa_DeathSettle_Anim.uasset",
+          "exists": true,
+          "bytes": 27710,
+          "sha256": "2fa17af4bbdb889382a739a6866f26019480b8e33e14dc759f2dc3fc5e097004",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Animation/AM_Medusa_HitReact_Anim.uasset",
+          "exists": true,
+          "bytes": 26219,
+          "sha256": "2b5ce4c04dc7354a8c478c60e107926055c3fd6e0d452083747d0a72397d7a3f",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Animation/AM_Medusa_Idle_Anim.uasset",
+          "exists": true,
+          "bytes": 29204,
+          "sha256": "c2380926e8b8a96c873d0911359df6d60066c91e252bc05c3dd45399d34e743e",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Animation/AM_Medusa_LungeAttack_Anim.uasset",
+          "exists": true,
+          "bytes": 28958,
+          "sha256": "2e997195f8305555f16b030866f894f92583624dd37095885c0fc3473d1bfdd1",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Anims/AM_Medusa_Idle.uasset",
+          "exists": true,
+          "bytes": 5263052,
+          "sha256": "dc11acbd8b1db52fce36062f5dd882ee6a25af529d72ac107d3d2476ebe31717",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Anims/AM_Medusa_Idle_PhysicsAsset.uasset",
+          "exists": true,
+          "bytes": 6821,
+          "sha256": "e0f96f8a5ae04141db3efc5c0236930e065e8911a2b82489e04d6a4f7d61c830",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Anims/AM_Medusa_LungeAttack_PhysicsAsset.uasset",
+          "exists": true,
+          "bytes": 6877,
+          "sha256": "109d464259d1d133535ee651949320fa923d493b1acd179f952634b4f9ebce68",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Materials/M_Medusa_Atlas.uasset",
+          "exists": true,
+          "bytes": 9754,
+          "sha256": "ffc840d5320d1768c2980571159155226424638d1cf9efce3edb72f3150f80df",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Materials/MI_Medusa_Blue.uasset",
+          "exists": true,
+          "bytes": 3252,
+          "sha256": "ae3215e4a08721b0a1c1009b21573479ed075b85be4ba62c35637ed600acb11b",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Materials/MI_Medusa_Red.uasset",
+          "exists": true,
+          "bytes": 3247,
+          "sha256": "365ff671244e5137ca5b1a73e849e8284bf990c00b86fbaee79b02eeca354e5b",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Meshes/SK_Medusa_Atlas.uasset",
+          "exists": true,
+          "bytes": 5263738,
+          "sha256": "2f6d4ed1f7d8c07ca6e6016f5c4f3c3316f18fe6f647b8ecda8a42223581c049",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Meshes/SK_Medusa_Atlas_PhysicsAsset.uasset",
+          "exists": true,
+          "bytes": 6833,
+          "sha256": "7691f255d6895b4bd4915faf2e9f87347610b4623377f5af22c4306f5305f03b",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Meshes/SK_Medusa_Atlas_Skeleton.uasset",
+          "exists": true,
+          "bytes": 5199,
+          "sha256": "ea9322d5765bcdae62d69e5d3e1ca85429a5f64a4caa5349fadd54c26142a491",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Meshes/SM_Medusa_Base.uasset",
+          "exists": true,
+          "bytes": 115783,
+          "sha256": "bcf06976a19b0e42365a05f8e2db5030b7d30b306e3d44ed87b5c249f0337930",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Textures/T_Medusa_BC.uasset",
+          "exists": true,
+          "bytes": 3888674,
+          "sha256": "45525f5467b67d5027f7c4a541b1cb71f62db30f8e71db32852af998c811c118",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Textures/T_Medusa_N.uasset",
+          "exists": true,
+          "bytes": 4565110,
+          "sha256": "7180032bc22a15655b85167e4c7b5f96159a743b9d1968a1beadc4e68d3d5558",
+          "git": "ignored"
+        },
+        {
+          "root": "repo",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Textures/T_Medusa_ORM.uasset",
+          "exists": true,
+          "bytes": 3439575,
+          "sha256": "d56bf93b04e41608efcc4d24cf1d4a2f87f561bfec6a9e0a5da9ee8e1425520e",
+          "git": "ignored"
+        }
+      ]
+    },
+    {
+      "root": "art-worktree",
+      "dir": "unreal/Unmatched/Content/ArtPreview/Medusa",
+      "exists": true,
+      "fileCount": 11,
+      "files": [
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Materials/M_Medusa_Atlas.uasset",
+          "exists": true,
+          "bytes": 8517,
+          "sha256": "85c955a93646e20fbda3e8dce3fde2106bce364abc660a14a2c5046c90ceb5cd",
+          "git": "tracked"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Materials/MI_Medusa_Blue.uasset",
+          "exists": true,
+          "bytes": 3268,
+          "sha256": "19d56640233972e4cd18cd84d5902fb7fce515a1abccd435bb02ac2e00118507",
+          "git": "tracked"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Materials/MI_Medusa_Red.uasset",
+          "exists": true,
+          "bytes": 3263,
+          "sha256": "97a90425569e44928b66a6e008bf9cb1821813e5fb422d4cac817273b20bdc4e",
+          "git": "tracked"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate.uasset",
+          "exists": true,
+          "bytes": 5267345,
+          "sha256": "e8878aa99f9fd7d99df62b176762ae8e67e74670f88a9c4dc22710a699c14f5e",
+          "git": "tracked"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate_Skeleton.uasset",
+          "exists": true,
+          "bytes": 5267,
+          "sha256": "057becb07b8e7d53771dd42cf937aa2b4e3d011e74e6beea86a5add49fe5076c",
+          "git": "tracked"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Meshes/SK_Medusa_HeadTilt_v3Candidate.uasset",
+          "exists": true,
+          "bytes": 5268450,
+          "sha256": "cb8e421ebe048bf4673efcbe108e4824915e72ab7dbac18c3f6dda7c1465bedf",
+          "git": "ignored"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Meshes/SK_Medusa_HeadTilt_v3Candidate_Skeleton.uasset",
+          "exists": true,
+          "bytes": 5267,
+          "sha256": "9f53cb6e98354a998735400995918abaa906f06cc4979a3825411950d0b8b1f8",
+          "git": "ignored"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Meshes/SM_Medusa_Base_v2Candidate.uasset",
+          "exists": true,
+          "bytes": 89539,
+          "sha256": "edddad66cfb07c291614c16b777e2d970737bc69f4293b635bc9c9c825f9bc1e",
+          "git": "tracked"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Textures/T_Medusa_BC.uasset",
+          "exists": true,
+          "bytes": 3888655,
+          "sha256": "3f94e83e8c9154ec36da2db4ce8dd67924824d336c38fdb6c30b7a5213374c49",
+          "git": "tracked"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Textures/T_Medusa_N.uasset",
+          "exists": true,
+          "bytes": 4565091,
+          "sha256": "94586f16c71169b9415ab25b41ef80e11f61a8f67d934793cda9540e3c0d8a80",
+          "git": "tracked"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ArtPreview/Medusa/Textures/T_Medusa_ORM.uasset",
+          "exists": true,
+          "bytes": 3439556,
+          "sha256": "61b215437fa5153dc1dcb0813f3a6611851b658c7ff0b6b0861fe93855976dd1",
+          "git": "tracked"
+        }
+      ]
+    },
+    {
+      "root": "art-worktree",
+      "dir": "unreal/Unmatched/Content/ART004/Medusa",
+      "exists": true,
+      "fileCount": 9,
+      "files": [
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Materials/M_Medusa_Atlas.uasset",
+          "exists": true,
+          "bytes": 9915,
+          "sha256": "e3e954dea91dfd34c8c37e1db00bef0c71e5e18d79c814fd94a17ee3b1d83be4",
+          "git": "ignored"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Materials/MI_Medusa_Blue.uasset",
+          "exists": true,
+          "bytes": 3252,
+          "sha256": "96e90ab0ad4afaa3a50cae04d0029f9037f07ccb3c2624c65a64761901ee9ced",
+          "git": "ignored"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Materials/MI_Medusa_Red.uasset",
+          "exists": true,
+          "bytes": 3247,
+          "sha256": "631fa85fb99b3d054ea48d41f151a9dd0e72386b61162f0509d4c868c7f9c059",
+          "git": "ignored"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate.uasset",
+          "exists": true,
+          "bytes": 5266235,
+          "sha256": "3c68c01e9e94696fd8029ca21cf5f89bbd7b11af634161bfa1f5e15cd15952f3",
+          "git": "ignored"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate_Skeleton.uasset",
+          "exists": true,
+          "bytes": 5259,
+          "sha256": "96ffb328115c224dede2a5a1d7609d751727fd8cdf8cbee1519b0c1be0352568",
+          "git": "ignored"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Meshes/SM_Medusa_Base_v2Candidate.uasset",
+          "exists": true,
+          "bytes": 89523,
+          "sha256": "94b4c6b9cec866d31c769567605cbfbb8698aa1e83e38b375ce5fcee0379477d",
+          "git": "ignored"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Textures/T_Medusa_BC.uasset",
+          "exists": true,
+          "bytes": 3888728,
+          "sha256": "783a8fb71f6e70685eb1b0d367fdbb59b78eed6a2981be8d4e5cddc98d4b6437",
+          "git": "ignored"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Textures/T_Medusa_N.uasset",
+          "exists": true,
+          "bytes": 4565164,
+          "sha256": "2b8925a59bf254f247db5e6d4eede22ece2870d71a3ec3a72205a8fbf48028b8",
+          "git": "ignored"
+        },
+        {
+          "root": "art-worktree",
+          "path": "unreal/Unmatched/Content/ART004/Medusa/Textures/T_Medusa_ORM.uasset",
+          "exists": true,
+          "bytes": 3439629,
+          "sha256": "45615b6011151cac3228d052b643eee5d4ec759a6e1701d276e739dafbafef58",
+          "git": "ignored"
+        }
+      ]
+    }
+  ],
+  "runtimeLocalState": [
+    {
+      "root": "repo",
+      "path": "unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched/Saved/Config/Windows/GameUserSettings.ini",
+      "exists": true,
+      "bytes": 1378,
+      "sha256": "5a2d9d08ec21f9507777f396e982c22cfd463f14644a179292faa715be6a769f",
+      "git": "ignored"
+    },
+    {
+      "root": "repo",
+      "path": "unreal/Unmatched/Binaries/Win64/Unmatched.exe",
+      "exists": true,
+      "bytes": 336979968,
+      "sha256": "9244c46b45925fa9ae130b45834211582a437d28dc01ec7ef2412ebb39a93d8e",
+      "git": "ignored"
+    },
+    {
+      "root": "repo",
+      "path": "unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched/Binaries/Win64/Unmatched.exe",
+      "exists": true,
+      "bytes": 336979968,
+      "sha256": "9244c46b45925fa9ae130b45834211582a437d28dc01ec7ef2412ebb39a93d8e",
+      "git": "ignored"
+    },
+    {
+      "root": "repo",
+      "path": "unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched.exe",
+      "exists": true,
+      "bytes": 171520,
+      "sha256": "1d70715ffd5478c7a3cd620db247488cea8baaaef21b5cac84b10a62d7b027bc",
+      "git": "ignored"
+    },
+    {
+      "root": "art-worktree",
+      "path": "unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched/Saved/Config/Windows/GameUserSettings.ini",
+      "exists": true,
+      "bytes": 1344,
+      "sha256": "48f6862a9d2e767d5999ad3c7fa5ecddff13e140f8449dd851fd4ed56b8a3964",
+      "git": "ignored"
+    },
+    {
+      "root": "art-worktree",
+      "path": "unreal/Unmatched/Binaries/Win64/Unmatched.exe",
+      "exists": true,
+      "bytes": 337996288,
+      "sha256": "a8b2be242034448e88d49db33ae9bd58c09637d1d5c9781cc7639b8988964a1c",
+      "git": "ignored"
+    },
+    {
+      "root": "art-worktree",
+      "path": "unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched/Binaries/Win64/Unmatched.exe",
+      "exists": true,
+      "bytes": 337996288,
+      "sha256": "a8b2be242034448e88d49db33ae9bd58c09637d1d5c9781cc7639b8988964a1c",
+      "git": "ignored"
+    },
+    {
+      "root": "art-worktree",
+      "path": "unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched.exe",
+      "exists": true,
+      "bytes": 171520,
+      "sha256": "1d70715ffd5478c7a3cd620db247488cea8baaaef21b5cac84b10a62d7b027bc",
+      "git": "ignored"
+    }
+  ],
+  "effectiveFpsConfig": {
+    "repo": {
+      "DefaultGameUserSettings.FrameRateLimit": "60.000000",
+      "StagedSaved.GameUserSettings.FrameRateLimit": "0.000000"
+    },
+    "art-worktree": {
+      "DefaultGameUserSettings.FrameRateLimit": "60.000000",
+      "StagedSaved.GameUserSettings.FrameRateLimit": "absent"
+    }
+  },
+  "warnings": [
+    "repo: staged Saved/Config/Windows/GameUserSettings.ini FrameRateLimit=0.000000 overrides DefaultGameUserSettings (60); 0 = uncapped. A packaged client staged here would not run at the AGENTS.md default of 60 FPS unless -ClientFps/t.MaxFPS caps it.",
+    "art-worktree: staged GameUserSettings.ini has no FrameRateLimit line; the effective value is not proven by config alone (expected: DefaultGameUserSettings 60) and must be measured."
+  ],
+  "notes": [
+    "SK_Medusa.fbx, SM_Medusa_Base.fbx, medusa.blend и /Game/ART004/Medusa — производственный кандидат арт-трека; этап 3 их не заменяет.",
+    "/Game/ArtPreview/Medusa: 9 uasset v2 отслеживаются git (force-add); в арт-worktree дополнительно 2 gitignored uasset v3 (SK_Medusa_HeadTilt_v3Candidate{,_Skeleton}).",
+    "/Game/ART004/Medusa в git не входит (Content gitignored) и воспроизводится tools/art/import_medusa_candidate.py.",
+    "runtimeLocalState — локальные gitignored бинарники/настройки; меняются каждой сборкой и в «производство» не входят. Корневой StagedBuilds/Windows/Unmatched.exe — заглушка-лаунчер; сверять внутренний Binaries/Win64/Unmatched.exe (memory s09-duel-evidence-traps).",
+    "effectiveFpsConfig — только конфиги. Эффективный FPS packaged-клиента не измерялся (измеряет T1.1/T6: AGENTS.md, ACC-022)."
+  ],
+  "postSnapshotNotes": [
+    "2026-09-28: heads.repo.statusPorcelain[0] исправлен вручную с «M docs/…» на « M docs/…». Генератор обрезал ведущий пробел первой строки porcelain (git().strip()); исправлено в snapshot_baseline.py (strip=False для status). Остальные поля снимка не менялись.",
+    "После снимка (06bb4fa / 920beeee…) оркестратор закоммитил параллельный workflow T1.3: bdd30cc, дерево 2027a5701ddefda3b75d440cbeda0d3ebe67b786. Коммит только добавляет 41 файл в docs/art-pipeline/qa010/ и tools/art/qa010/ (строки «?? …qa010/» выше больше не актуальны); производственные файлы снимка не затронуты, `snapshot_baseline.py check` — 0 различий. heads остаются снимком среза T0."
+  ]
+}

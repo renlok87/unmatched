@@ -1,0 +1,78 @@
+{
+  "schema": "unmatched.s3-thresholds/1",
+  "title": "Предрегистрация порогов этапа 3 (E1–E3 критики), срез T0",
+  "created": "2026-09-28",
+  "status": "предложено",
+  "statusNote": "Все пороги ниже — ПРЕДЛОЖЕНИЕ. Они зарегистрированы до любой съёмки/замера этапа 3 и не являются бюджетами 04 §1 / 17 §7.6 и не подменяют решений пользователя (Q-302, D-07, GD-058).",
+  "registrationRules": [
+    "E3: порог действует, только если записан здесь до прогона, к которому он применяется. Изменение — новой записью в revisions (дата, причина, какие прогоны ещё не сняты); задним числом пороги не правятся.",
+    "E2: там, где порог зависит от шума съёмки, сначала 3 повтора одной конфигурации → шум → порог = 2 × измеренный шум; сам шум записывается рядом с результатом.",
+    "Сравнения только внутри одного класса кадров (tools/art/classify_evidence.py): packaged-live с packaged-live, editor-mcp-viewport с editor-mcp-viewport. Кадры MCP-вьюпорта и CLI-SceneCapture не сравниваются между собой: в области головы они расходятся в среднем на 14/255, а v2↔v3 — около 6/255 (DIRECTORY-MAP, head-tilt-v3-review-measurements.json).",
+    "K1/K2/K3, QA-010 и GD-058 закрываются только кадрами класса packaged-live с grade strict; редакторные кадры — диагностика и ранние строки QA-009.",
+    "Статусы результатов: предложено / измерено / технически импортировано / художественно принято. Выполнение порога даёт «измерено», не «художественно принято»."
+  ],
+  "E1_v31_blender": {
+    "task": "T1.2 (Medusa v3.1 в Blender, headless + живой Blender :9876)",
+    "status": "предложено",
+    "source": "акт A1 docs/game-design/evidence/ART-004/head-tilt-v3-self-acceptance-2026-09-28.md («Предлагаемые условия для v3.1»), stage3-final T1.2, medusa-local-pass-report.md (ray-escape)",
+    "method": "tools/art/art004_head_tilt_v3_measure.py, расширенный на v3.1; те же камеры D-10 и орто, что в A1; метрики v2/v3 пересчитываются тем же прогоном",
+    "thresholds": [
+      {"id": "V31-01", "metric": "замкнутый сквозной просвет у стыка головы и шеи, спереди (орто 16 см)", "comparator": "<=", "value": "v2 того же прогона", "reference": {"v2_mm2": 23, "v3_mm2": 82}, "unit": "мм²"},
+      {"id": "V31-02", "metric": "замкнутый просвет у стыка, 3/4 справа", "comparator": "<=", "value": "v2 того же прогона", "reference": {"v2_mm2": 7, "v3_mm2": 54}, "unit": "мм²"},
+      {"id": "V31-03", "metric": "замкнутый просвет у стыка вдоль оси камеры D-10", "comparator": "<=", "value": "v2 того же прогона", "reference": {"v2_mm2": 163, "v3_mm2": 361}, "unit": "мм²"},
+      {"id": "V31-04", "metric": "задний стык: новые сквозные дыры по обеим задним зонам («задняя шея × воротник», «корона × воротник»)", "comparator": "<=", "value": "v2 того же прогона (новых дыр 0)", "unit": "px ID-рендера"},
+      {"id": "V31-05", "metric": "видимые пиксели черт лица (z ≥ 42 см) в K2 300 uu спереди, Blender ID-маска D-10", "comparator": ">=", "value": 1242, "reference": {"v2_px": 809, "v3_px": 1242}, "unit": "px @1920×1080"},
+      {"id": "V31-06", "metric": "зазор корона → колчан (минимальное расстояние геометрии)", "comparator": ">=", "value": 1.0, "reference": {"v2_cm": 1.07, "v3_cm": 0.31}, "unit": "см"},
+      {"id": "V31-07", "metric": "пересечения треугольников голова/не-голова в черновом HitReact, все кадры", "comparator": "==", "value": 0, "reference": {"v2_max": 0, "v3_max": 40, "v3_worst_frame": 4}, "unit": "пар треугольников"},
+      {"id": "V31-08", "metric": "пересечения в черновых Idle / LungeAttack / DeathSettle, все кадры", "comparator": "==", "value": 0, "unit": "пар треугольников"},
+      {"id": "V31-09", "metric": "ray-escape оценка ориентации каждой из 15 частей (−1…+1), включая исправление winding частей 8 и 13", "comparator": ">=", "value": 0.978, "reference": "кандидат T4: все 15 частей ≥ 0,978; в SK_Medusa.fbx, v2, v3 части 8 (−0,9997) и 13 (−0,997) вывернуты", "unit": "score"},
+      {"id": "V31-10", "metric": "верх фигуры", "comparator": "within", "value": [54.5, 55.5], "reference": "55,0 uu у всех импортов", "unit": "uu"},
+      {"id": "V31-11", "metric": "лук и обе кисти: максимальное смещение вершин против v2", "comparator": "==", "value": 0, "unit": "см (с точностью экспорта ≤ 1e-5)"},
+      {"id": "V31-12", "metric": "структура: tris тело/лук, слоты тела, кости, UV, веса", "comparator": "==", "value": {"body_tris": 18199, "bow_tris": 1197, "body_slots": 2, "bones_blender": 17, "uv_weights": "идентичны v2"}},
+      {"id": "V31-13", "metric": "детерминизм: повторный headless-прогон", "comparator": "==", "value": "FBX и blender-measurements.json побайтно; PNG попиксельно (метаданные PNG Date/RenderTime не учитываются)"},
+      {"id": "V31-14", "metric": "источник не изменён: sha256 blender/ASSET-MEDUSA-001/medusa.blend", "comparator": "==", "value": "2a2534f89093e2a296d34e5b4da41290f1549109d6bc2ef4b1ba29ca978ed903", "check": "python docs/art-pipeline/evidence/s3-baseline-2026-09-28/snapshot_baseline.py check"}
+    ],
+    "stopRule": "не больше 3 итераций; если ни один вариант не выполняет V31-01…V31-09 — отказ числами, игровым кандидатом остаётся v2"
+  },
+  "E1_k2_live": {
+    "task": "T1.1 (контроль v2 и живой v3), T5.1 (длинный K2), T6 (приёмка)",
+    "status": "предложено",
+    "frameClass": "packaged-live, grade strict (tools/art/classify_evidence.py)",
+    "provenanceGates": [
+      "в трассе хоста и присоединившегося: BOARD 5x6, ARTPREVIEW Cobble active 5x6 zones=30, HANDLE_APPLIED … boardValid=1, HUD seq=, FIGHTERS synced n=6, ARTPREVIEW … visual=1 mesh=<ожидаемая сетка>, SHOT ctx viewport=1920x1080, SHOT requested → имя PNG",
+      "у хоста: camera focus requested zoom=<z> и CAMERA settled (|dist − target| < 1 %), экранная проекция сокета Head (трассу добавляет T1.1)",
+      "PNG 1920×1080 и трассы перечислены в manifest прогона с совпадающим sha256",
+      "sha256 внутреннего StagedBuilds/…/Binaries/Win64/Unmatched.exe = Binaries/Win64/Unmatched.exe; лог сборки игрового target с «Result: Succeeded» (UTF-16) без -NoLiveCoding; boardId cmuhgs4b2001mwik4f2b2xtf8 (не slug); своя комната ABORTED"
+    ],
+    "metrics": [
+      {"id": "K2-01", "metric": "кроп вокруг экранной проекции сокета Head", "definition": "квадрат со стороной 3 × экранной высоты головы (проекции точек Head ± 6 uu по Z), не меньше 96 px, центр — проекция Head из трассы SHOT", "use": "все метрики K2-02…K2-05 считаются в этом кропе"},
+      {"id": "K2-02", "metric": "энергия градиента (Sobel яркости дисплея) в маске лица", "comparator": ">=", "value": "v2 того же зума и той же сборки", "note": "маска лица — репроекция ID-маски Blender по той же камере или кроп верхней трети головы, если репроекция недоступна (записать, какой способ)"},
+      {"id": "K2-03", "metric": "различимые сегменты в полосе короны (связные компоненты ≥ 6 px по порогу контраста)", "comparator": ">=", "value": "v2 того же зума", "note": "«семь голов» 04 не требует; критерий — читаемая корона"},
+      {"id": "K2-04", "metric": "пиксели сквозного просвета у шеи в кропе (фон виден сквозь стык)", "comparator": "<=", "value": "v2 того же зума"},
+      {"id": "K2-05", "metric": "разброс повторов одной конфигурации (каждая пара ×2)", "comparator": "<=", "value": "2 × измеренный шум (E2)"},
+      {"id": "K2-06", "metric": "плашка/подписи не закрывают достижимые клетки", "comparator": "==", "value": "PLATE overlapReachable=0 в трассе (после T2.2)"},
+      {"id": "K2-07", "metric": "artcheck кадра", "comparator": "==", "value": "pass"}
+    ],
+    "zooms": [1.6, 2.5, 3.5, 5.0],
+    "workingZoomProposal": "рабочий зум K2 = минимальный зум, при котором K2-02…K2-04 кандидата не хуже v2 при 5× и визуальный просмотр подтверждает читаемость лица и короны. Это предложение (AD-CNF-05 / Q-302), решение за пользователем."
+  },
+  "E2_repeat_noise": {
+    "status": "предложено",
+    "rule": "3 повтора одной конфигурации (та же сборка/сцена/камера/свет) → шум = максимум попарного среднего |ΔRGB| в фиксированном ROI (0…255) → порог сравнения = 2 × шум",
+    "appliesTo": ["T1.1 пары прогонов K2", "T3.1 контрольная сцена P1.7 (CaptureViewport 1920×1080 одним методом)", "T5.1/T6 повторы K1/K2"],
+    "forbidden": "фиксированный порог «≤ 1/255» без измерения шума (критика E2)"
+  },
+  "perf": {
+    "task": "T1.1 (информативно), T6 (акт GD-058)",
+    "status": "предложено",
+    "scope": "текущий ПК разработки, не целевой ПК D-07; perf-gate GD-058 остаётся открытым (решение оркестратора: GD-058 делится на визуальную приёмку и открытый perf-gate)",
+    "setups": [
+      {"id": "PERF-01", "setup": "один packaged Development-клиент, 1920×1080, эффективный FrameRateLimit=60 (проверить staged GameUserSettings, AGENTS.md)", "warmupS": 30, "recordS": 120, "metrics": ["p95 frame time", "p95 GPU time", "hitch count > 50 ms"], "threshold": {"p95FrameTimeMs": 16.7, "note": "цель ACC-022 1080p/60; на текущем ПК — только ориентир"}},
+      {"id": "PERF-02", "setup": "два offscreen-клиента по 30 FPS (tools/s08/run-phase2-demo.ps1 -ClientFps 30)", "metrics": ["p95 frame time каждого", "GPU frame time каждого", "суммарная загрузка GPU и VRAM (nvidia-smi раз в секунду по всем клиентам)"], "threshold": {"p95FrameTimeMsEach": 33.3, "gpuUtilization": "только записывается, порога нет"}}
+    ],
+    "forbidden": "r.DynamicRes.TargetedGPUHeadRoomPercentage как ограничитель GPU при DX11 (AGENTS.md)"
+  },
+  "revisions": [
+    {"date": "2026-09-28", "by": "T0 этапа 3", "what": "первая регистрация до любой съёмки этапа 3"}
+  ]
+}
