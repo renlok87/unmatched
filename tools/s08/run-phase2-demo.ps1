@@ -9,6 +9,9 @@ param(
   # Opt-in ART-004/005 review on an explicitly selected 5x6 Cobble board.
   # The default S08 20x20 regression path remains unchanged.
   [string]$ArtPreviewBoardId = "",
+  # Optional K2 review: zoom toward the selected host hero while the joiner
+  # stays at K1. 1.6 is the written proposal; larger values are diagnostic.
+  [double]$ArtPreviewFocusZoom = 0,
   # Offline probe of the scoped-cleanup state machine only (no backend, no
   # clients): drives Stop-ThisRunGame against a mocked Invoke-RestMethod that
   # returns scripted HTTP-200 responses (including errors[]) and asserts the
@@ -49,6 +52,9 @@ param(
 #     $Script:CleanupFailure is rethrown after the finally block, so a failed
 #     scoped cleanup makes the whole demo exit nonzero.
 $ErrorActionPreference = 'Stop'
+if ($ArtPreviewFocusZoom -gt 0 -and (-not $ArtPreviewBoardId -or $ArtPreviewFocusZoom -le 1)) {
+  throw 'ArtPreviewFocusZoom requires ArtPreviewBoardId and a zoom greater than 1'
+}
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 if (-not $Exe) { $Exe = Join-Path $RepoRoot 'unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched.exe' }
 if (-not $EvidenceDir) { $EvidenceDir = Join-Path $RepoRoot 'docs\game-design\evidence\S08\run' }
@@ -318,6 +324,9 @@ function Invoke-Phase2Demo {
     "-S08ExitAfter=$RunSeconds")
   if ($ArtPreviewBoardId) {
     $hostArgs += @("-ArtPreviewBoardId=$ArtPreviewBoardId", '-ArtPreviewShotAfter=30', '-ArtPreviewSelectOwnHero')
+    if ($ArtPreviewFocusZoom -gt 0) {
+      $hostArgs += ('-ArtPreviewFocusZoom={0}' -f $ArtPreviewFocusZoom.ToString('0.###', [Globalization.CultureInfo]::InvariantCulture))
+    }
   } else {
     $hostArgs += @('-S08Maneuver', "-S08ManeuverAfter=$HostManeuverAfter")
   }
@@ -425,6 +434,9 @@ function Invoke-Phase2Demo {
         'ARTPREVIEW Cobble assets ready', 'ARTPREVIEW Cobble active 5x6 zones=30 blue=15 red=15 blueMarks=15 redMarks=45',
         'ARTPREVIEW Cobble probe lights key=4.5 fill=700 warm=85',
         'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1') 'joiner'
+      if ($ArtPreviewFocusZoom -gt 0) {
+        Assert-Trace $hostTrace @('ARTPREVIEW camera focus requested zoom=') 'host K2'
+      }
     } else {
       Assert-Trace $hostTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'MANEUVER begin seq=', 'MANEUVER done', 'CUE move') 'host'
       Assert-Trace $joinTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SUBSCRIBED gameStateUpdated',
@@ -432,20 +444,37 @@ function Invoke-Phase2Demo {
     }
     if ($ArtPreviewBoardId) {
       [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'),
-        (([ordered]@{ boardId = $ArtPreviewBoardId; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = 30; joinerLiveZones = 30 }) | ConvertTo-Json), $Utf8NoBom)
+        (([ordered]@{ boardId = $ArtPreviewBoardId; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = 30; joinerLiveZones = 30; hostFocusZoom = $ArtPreviewFocusZoom }) | ConvertTo-Json), $Utf8NoBom)
     }
 
-    # Six fighters IN FRAME: the shot diagnostics project every fighter to
-    # screen space; all six must be projected and alive in BOTH clients. (The
-    # image checker cannot count silhouettes; this plus the published PNGs -
-    # which get a manual review - is the six-fighter evidence.)
+    # ProjectWorldLocationToScreen can return true even for offscreen pixels.
+    # Count only living fighters whose projected centers lie inside 1920x1080.
     function Assert-SixFightersInFrame([string]$Path, [string]$Who) {
-      $lines = @(Select-String -Path $Path -Pattern 'SHOT fighter .* projected=1 alive=1')
-      if ($lines.Count -ne 6) {
-        throw "$Who trace shows $($lines.Count)/6 fighters projected+alive in frame"
+      $lines = @(Select-String -Path $Path -Pattern 'SHOT fighter .* screen=\((-?\d+),(-?\d+)\) projected=1 alive=1')
+      $inside = 0
+      foreach ($line in $lines) {
+        $x = [int]$line.Matches[0].Groups[1].Value
+        $y = [int]$line.Matches[0].Groups[2].Value
+        if ($x -ge 0 -and $x -lt 1920 -and $y -ge 0 -and $y -lt 1080) { $inside++ }
+      }
+      if ($inside -ne 6) {
+        throw "$Who trace shows $inside/6 living fighter centers inside the frame"
       }
     }
-    Assert-SixFightersInFrame $hostTrace 'host'
+    if ($ArtPreviewFocusZoom -gt 0) {
+      $picked = Select-String -Path $hostTrace -Pattern 'ARTPREVIEW selection ownHero=1 selected=1 .* fighterId=(\S+)' | Select-Object -Last 1
+      if (-not $picked) { throw 'host K2 trace has no selected hero id' }
+      $selectedId = $picked.Matches[0].Groups[1].Value
+      $heroShot = Select-String -Path $hostTrace -Pattern ('SHOT fighter ' + [regex]::Escape($selectedId) + ' .* screen=\((-?\d+),(-?\d+)\) projected=1 alive=1') | Select-Object -Last 1
+      if (-not $heroShot) { throw "host K2 selected fighter $selectedId is not projected alive" }
+      $heroX = [int]$heroShot.Matches[0].Groups[1].Value
+      $heroY = [int]$heroShot.Matches[0].Groups[2].Value
+      if ($heroX -lt 0 -or $heroX -ge 1920 -or $heroY -lt 0 -or $heroY -ge 1080) {
+        throw "host K2 selected fighter $selectedId center is outside the screenshot"
+      }
+    } else {
+      Assert-SixFightersInFrame $hostTrace 'host'
+    }
     Assert-SixFightersInFrame $joinTrace 'joiner'
 
     # Convergence: both clients end on the same highest applied seq.
@@ -520,7 +549,11 @@ function Invoke-Phase2Demo {
     $manifest = [ordered]@{
       stamp   = $Stamp
       verdict = if ($ArtPreviewBoardId) {
-        'ART PREVIEW: live 5x6 board + 30 zones + six projected fighters + HUD/board pixel gate; visual K1 review still required'
+        if ($ArtPreviewFocusZoom -gt 0) {
+          'ART PREVIEW K2 PROBE: live 5x6 board + selected host hero projected + joiner six fighters + HUD/board pixel gate; visual K2 review still required'
+        } else {
+          'ART PREVIEW: live 5x6 board + 30 zones + six projected fighters + HUD/board pixel gate; visual K1 review still required'
+        }
       } else {
         'TRACES OK + SHOTS PRESENT + GRID VERIFIED + SIX FIGHTERS (trace: n=6, all projected in frame)'
       }
@@ -592,7 +625,11 @@ function Invoke-Phase2Demo {
     }
     Write-Output "published evidence run dir: $RunDir (pointer: latest.json)"
     if ($ArtPreviewBoardId) {
-      Write-Output 'ART PREVIEW: live 5x6 board and 30 zones, two 1920x1080 HUD shots, six projected fighters; visual art review remains separate.'
+      if ($ArtPreviewFocusZoom -gt 0) {
+        Write-Output 'ART PREVIEW K2 PROBE: host selected hero in frame at the requested zoom; joiner K1 has six fighters in frame. Visual art review remains separate.'
+      } else {
+        Write-Output 'ART PREVIEW: live 5x6 board and 30 zones, two 1920x1080 HUD shots, six fighter centers in frame; visual art review remains separate.'
+      }
       Write-Output 'NOTE: the pixel gate checks a lit textured board and HUD regions; it does not prove K1 readability or color-blind access.'
     } else {
       Write-Output "TRACES OK + SHOTS PRESENT + GRID VERIFIED + SIX FIGHTERS (trace: n=6, all projected in frame)"

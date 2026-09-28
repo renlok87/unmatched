@@ -167,6 +167,13 @@ AS08FighterActor* AS08BoardActor::FindFighterActor(const FString& FighterId) con
   return nullptr;
 }
 
+void AS08BoardActor::SetFighterLabelZoomRatio(float DistanceRatio,
+                                             bool bOnlySelected) {
+  for (AS08FighterActor* Actor : FighterActors) {
+    if (Actor) Actor->SetLabelZoomRatio(DistanceRatio, bOnlySelected);
+  }
+}
+
 void AS08BoardActor::ClearChildren() {
   for (AActor* Child : HighlightTiles) {
     if (Child) Child->Destroy();
