@@ -1,0 +1,198 @@
+{
+  "schema": "unmatched.art004-live-run/1",
+  "label": "v2-5x-r1",
+  "startedLocal": "2026-09-28T15:11:56+05:00",
+  "argv": [
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "tools/s08/run-phase2-demo.ps1",
+    "-Api",
+    "http://localhost:3120/graphql",
+    "-EvidenceDir",
+    "docs/game-design/evidence/ART-004/live-v2-k2-control/5x",
+    "-ArtPreviewBoardId",
+    "cmuhgs4b2001mwik4f2b2xtf8",
+    "-RunSeconds",
+    "50",
+    "-ClientFps",
+    "30",
+    "-ArtPreviewShotAfter",
+    "36",
+    "-ClientPerf",
+    "-ClientCsvFrames",
+    "1200",
+    "-ArtPreviewFocusZoom",
+    "5.0",
+    "-ArtPreviewMedusaVariant",
+    "face-neck-v2"
+  ],
+  "credentials": "S08_DEMO_* from backend/.env injected into the child environment only (not argv)",
+  "backend": {
+    "port": 3120,
+    "pid": 49344,
+    "process": {
+      "pid": 49344,
+      "parent": 49676,
+      "name": "node.exe",
+      "exe": "C:\\nvm4w\\nodejs\\node.exe",
+      "cmd": "\"C:\\nvm4w\\nodejs\\node.exe\" -r dotenv/config dist/src/main.js ",
+      "created": "2026-09-28T14:33:32.0575980+05:00"
+    }
+  },
+  "variantFlag": "face-neck-v2",
+  "expectedMesh": "SK_Medusa_FaceNeck_v2Candidate",
+  "zoom": 5.0,
+  "shotAfter": 36,
+  "runSeconds": 50,
+  "clientFps": 30,
+  "demoExit": 0,
+  "finishedLocal": "2026-09-28T15:13:03+05:00",
+  "durationS": 66.7,
+  "staging": "C:\\Users\\ren\\AppData\\Local\\Temp\\s08-phase2-20260928-151159-48588",
+  "roomAborted": true,
+  "cleanupLine": "cleanup: aborted THIS run's game id=cmul38wni00d9wi2o53qmna7v status=ABORTED (verified)",
+  "runDir": "docs/game-design/evidence/ART-004/live-v2-k2-control/5x/run-20260928-151159",
+  "clientLogs": [
+    {
+      "name": "Unmatched.log",
+      "bytes": 97183,
+      "sha256": "28ebdc8057a1f469b24a76f0d9160d0c69889acdf3e8fa18f7cf057e4806cafa"
+    },
+    {
+      "name": "Unmatched_2.log",
+      "bytes": 96679,
+      "sha256": "1f8811e71076679fb41fdbb964f060d0cafc371133499ddbafbba8aea7b2b7d1"
+    }
+  ],
+  "clientCsv": [
+    {
+      "role": "host",
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260928-151159/client-csv/host-Profile-20260928_151159.csv",
+      "bytes": 2214089,
+      "sha256": "2309653db40aacf8b9f15dd340be7a4fec3fb36be04a2951ccf142174cbe0d57"
+    },
+    {
+      "role": "joiner",
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260928-151159/client-csv/joiner-Profile-20260928_151204.csv",
+      "bytes": 2228334,
+      "sha256": "d3f6bd8a02f463754fb0bba62af2a809f979d081fec12bb9a7195650f25a0726"
+    }
+  ],
+  "rawOutsideGit": [
+    {
+      "role": "host",
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260928-151159/client-csv/host-Profile-20260928_151159.csv",
+      "bytes": 2214089,
+      "sha256": "2309653db40aacf8b9f15dd340be7a4fec3fb36be04a2951ccf142174cbe0d57"
+    },
+    {
+      "role": "joiner",
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260928-151159/client-csv/joiner-Profile-20260928_151204.csv",
+      "bytes": 2228334,
+      "sha256": "d3f6bd8a02f463754fb0bba62af2a809f979d081fec12bb9a7195650f25a0726"
+    },
+    {
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260928-151159/nvidia-smi-pmon.txt",
+      "bytes": 296479,
+      "sha256": "f9cf310f9cc5848e9d981d664da3b0a1425247a20296cf5d8a497813e765b8f9"
+    }
+  ],
+  "crashLines": [],
+  "clientProcesses": [
+    {
+      "pid": 40388,
+      "parent": 48588,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-28T15:11:59.7121910+05:00"
+    },
+    {
+      "pid": 44936,
+      "parent": 40388,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-28T15:11:59.7211770+05:00"
+    },
+    {
+      "pid": 47748,
+      "parent": 48588,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-28T15:12:04.8419940+05:00"
+    },
+    {
+      "pid": 47816,
+      "parent": 47748,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-28T15:12:04.8535980+05:00"
+    }
+  ],
+  "timing": {
+    "host": {
+      "traceOpenUtc": "2026-09-28T10:12:01+00:00",
+      "startGameS": 18.0,
+      "board5x6S": 18.0,
+      "selectionS": 34.0,
+      "focusRequestedS": 34.0,
+      "cameraSettledS": 34.0,
+      "shotS": 36.0,
+      "traceCloseS": 50.0,
+      "cameraSettledElapsed": 34.63,
+      "shotCamera": {
+        "dist": "386.2",
+        "target": "386.2",
+        "overview": "1930.8",
+        "errPct": "0.000",
+        "focusErr": "0.00",
+        "settled": "1",
+        "zoom": "5.00"
+      },
+      "shotHeads": [
+        {
+          "fighter": "f-0-hero",
+          "socket": "Head",
+          "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+          "world": "(0.0,-46.0,38.5)",
+          "screen": "(960.0,517.7)",
+          "top": "(960.0,489.1)",
+          "bottom": "(960.0,545.6)",
+          "headPx": "56.4",
+          "projected": "1"
+        }
+      ]
+    },
+    "joiner": {
+      "traceOpenUtc": "2026-09-28T10:12:06+00:00",
+      "startGameS": null,
+      "board5x6S": 15.0,
+      "selectionS": null,
+      "focusRequestedS": null,
+      "cameraSettledS": null,
+      "shotS": 36.0,
+      "traceCloseS": 50.0,
+      "cameraSettledElapsed": null,
+      "shotCamera": {
+        "dist": "1930.8",
+        "target": "1930.8",
+        "overview": "1930.8",
+        "errPct": "0.000",
+        "focusErr": "0.00",
+        "settled": "1",
+        "zoom": "1.00"
+      },
+      "shotHeads": [
+        {
+          "fighter": "f-0-hero",
+          "socket": "Head",
+          "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+          "world": "(0.0,-46.0,38.5)",
+          "screen": "(960.0,445.5)",
+          "top": "(960.0,439.8)",
+          "bottom": "(960.0,451.2)",
+          "headPx": "11.4",
+          "projected": "1"
+        }
+      ]
+    }
+  }
+}

@@ -1,4 +1,5 @@
 #include "S08FighterActor.h"
+#include "S08ArtPreviewMedusa.h"
 #include "S08TraceLog.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/StaticMeshComponent.h"
@@ -142,8 +143,10 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   const bool bMedusaCandidate = bArtPreview && Fighter.bIsHero &&
       Fighter.Name.Equals(TEXT("Medusa"), ESearchCase::IgnoreCase);
   if (bMedusaCandidate) {
-    USkeletalMesh* Mesh = LoadObject<USkeletalMesh>(nullptr,
-        TEXT("/Game/ArtPreview/Medusa/Meshes/SK_Medusa_FaceNeck_v2Candidate"));
+    const FS08MedusaCandidate MedusaCandidate = S08SelectMedusaCandidate();
+    USkeletalMesh* Mesh = MedusaCandidate.MeshPath
+        ? LoadObject<USkeletalMesh>(nullptr, MedusaCandidate.MeshPath)
+        : nullptr;
     UStaticMesh* Pedestal = LoadObject<UStaticMesh>(nullptr,
         TEXT("/Game/ArtPreview/Medusa/Meshes/SM_Medusa_Base_v2Candidate"));
     UMaterialInterface* TeamMaterial = LoadObject<UMaterialInterface>(nullptr,

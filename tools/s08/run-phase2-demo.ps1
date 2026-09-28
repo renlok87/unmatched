@@ -12,6 +12,21 @@ param(
   # Optional K2 review: zoom toward the selected host hero while the joiner
   # stays at K1. 1.6 is the written proposal; larger values are diagnostic.
   [double]$ArtPreviewFocusZoom = 0,
+  # Opt-in ART-004 comparison: which isolated /Game/ArtPreview Medusa candidate
+  # both clients load in the same live board/HUD path. Production is untouched.
+  [ValidateSet('face-neck-v2', 'head-tilt-v3')][string]$ArtPreviewMedusaVariant = 'face-neck-v2',
+  # Seconds after each client's game-mode start when the ArtPreview evidence
+  # shot fires (the K2 hero selection happens at ShotAfter - 2). startGame must
+  # land before ShotAfter - 2 for the camera to arrive; RunSeconds must leave
+  # at least 10 s after the shot for the PNG write and the joiner's later start.
+  [ValidateRange(4, 600)][int]$ArtPreviewShotAfter = 30,
+  # Opt-in per-client frame timing in the trace (PERF config/window/summary:
+  # effective fps, frame/GPU/game/render ms). Measurement only.
+  [switch]$ClientPerf,
+  # Opt-in CSV profiler capture per client (-csvCaptureFrames + -csvGpuStats):
+  # per-frame FrameTime/GameThreadTime/RenderThreadTime and per-pass GPU busy
+  # times in <stage>/Unmatched/Saved/Profiling/CSV. 0 = off.
+  [ValidateRange(0, 100000)][int]$ClientCsvFrames = 0,
   # Offline probe of the scoped-cleanup state machine only (no backend, no
   # clients): drives Stop-ThisRunGame against a mocked Invoke-RestMethod that
   # returns scripted HTTP-200 responses (including errors[]) and asserts the
@@ -55,6 +70,25 @@ $ErrorActionPreference = 'Stop'
 if ($ArtPreviewFocusZoom -gt 0 -and (-not $ArtPreviewBoardId -or $ArtPreviewFocusZoom -le 1)) {
   throw 'ArtPreviewFocusZoom requires ArtPreviewBoardId and a zoom greater than 1'
 }
+# An explicitly passed variant (even face-neck-v2) reaches the clients, so an
+# explicit v2 run is distinguishable from the no-flag default path in traces.
+$MedusaVariantExplicit = $PSBoundParameters.ContainsKey('ArtPreviewMedusaVariant')
+if (($ArtPreviewMedusaVariant -ne 'face-neck-v2' -or $MedusaVariantExplicit) -and -not $ArtPreviewBoardId) {
+  throw 'ArtPreviewMedusaVariant requires ArtPreviewBoardId'
+}
+# ArtPreviewBoardId must be a Board ROW id (cuid). The backend stores any
+# string but silently builds an empty 20x20 grid when no Board row has that id,
+# so a content slug such as 'cobble-city' is refused up front.
+if ($ArtPreviewBoardId -and $ArtPreviewBoardId -cnotmatch '^c[a-z0-9]{24}$') {
+  throw "ArtPreviewBoardId '$ArtPreviewBoardId' is not a Board row id (cuid); content slugs such as 'cobble-city' are refused. Use the Board row id of the 5x6 Cobble review board (cmuhgs4b2001mwik4f2b2xtf8)."
+}
+if ($ArtPreviewBoardId -and $RunSeconds -lt ($ArtPreviewShotAfter + 10)) {
+  throw "RunSeconds=$RunSeconds must be at least ArtPreviewShotAfter+10 ($($ArtPreviewShotAfter + 10))"
+}
+$ExpectedMedusaMesh = @{
+  'face-neck-v2' = 'SK_Medusa_FaceNeck_v2Candidate'
+  'head-tilt-v3' = 'SK_Medusa_HeadTilt_v3Candidate'
+}[$ArtPreviewMedusaVariant]
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 if (-not $Exe) { $Exe = Join-Path $RepoRoot 'unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched.exe' }
 if (-not $EvidenceDir) { $EvidenceDir = Join-Path $RepoRoot 'docs\game-design\evidence\S08\run' }
@@ -102,7 +136,11 @@ function Start-S08Client([string[]]$CliArgs, [string]$Email, [string]$Password, 
   }
   # Both offscreen clients render continuously; cap each independently.
   # Keep the quotes around the value so UE receives the full console command.
-  $psi.Arguments += ('-ExecCmds="t.MaxFPS {0}" ' -f $ClientFps)
+  # With a CSV capture the engine draws a 'CsvProfiler frame: N' screen message into
+  # every frame (evidence PNGs included); DisableAllScreenMessages suppresses it.
+  $execCmds = 't.MaxFPS {0}' -f $ClientFps
+  if ($ClientCsvFrames -gt 0) { $execCmds += ', DisableAllScreenMessages' }
+  $psi.Arguments += ('-ExecCmds="{0}" ' -f $execCmds)
   $psi.EnvironmentVariables['S08_EMAIL'] = $Email
   $psi.EnvironmentVariables['S08_PASSWORD'] = $Password
   if ($RoomCode) { $psi.EnvironmentVariables['S08_ROOM_CODE'] = $RoomCode }
@@ -318,12 +356,15 @@ function Invoke-Phase2Demo {
 
   $common = @("-windowed", "-resx=1920", "-resy=1080", "-RenderOffScreen", "log=GrepLog", "-ForceAbandonSequences", "-S08Api=$Api")
   if ($ArtPreviewBoardId) { $common += @('-ArtPreview', '-ForceRes') }
+  if ($ArtPreviewMedusaVariant -ne 'face-neck-v2' -or $MedusaVariantExplicit) { $common += "-ArtPreviewMedusaVariant=$ArtPreviewMedusaVariant" }
+  if ($ClientPerf) { $common += '-S08Perf' }
+  if ($ClientCsvFrames -gt 0) { $common += @("-csvCaptureFrames=$ClientCsvFrames", '-csvGpuStats') }
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create",
     "-S08HeroId=$heroA", "-S08Trace=$hostTrace", "-S08Shot=$hostShot",
     "-S08ExitAfter=$RunSeconds")
   if ($ArtPreviewBoardId) {
-    $hostArgs += @("-ArtPreviewBoardId=$ArtPreviewBoardId", '-ArtPreviewShotAfter=30', '-ArtPreviewSelectOwnHero')
+    $hostArgs += @("-ArtPreviewBoardId=$ArtPreviewBoardId", "-ArtPreviewShotAfter=$ArtPreviewShotAfter", '-ArtPreviewSelectOwnHero')
     if ($ArtPreviewFocusZoom -gt 0) {
       $hostArgs += ('-ArtPreviewFocusZoom={0}' -f $ArtPreviewFocusZoom.ToString('0.###', [Globalization.CultureInfo]::InvariantCulture))
     }
@@ -386,7 +427,7 @@ function Invoke-Phase2Demo {
     $joinArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
       "-S08Auto", "-S08HeroId=$heroB", "-S08Trace=$joinTrace", "-S08Shot=$joinShot",
       "-S08DropWsAfter=$JoinerDropWsAfter", "-S08ExitAfter=$RunSeconds")
-    if ($ArtPreviewBoardId) { $joinArgs += '-ArtPreviewShotAfter=30' }
+    if ($ArtPreviewBoardId) { $joinArgs += "-ArtPreviewShotAfter=$ArtPreviewShotAfter" }
     $joinStartUtc = [DateTime]::UtcNow
     $joinProc = Start-S08Client $joinArgs $AccountB.email $AccountB.password $code
     Write-Output "joiner pid=$($joinProc.Id)"
@@ -408,6 +449,23 @@ function Invoke-Phase2Demo {
       if ($item.Length -lt 10KB) { throw "suspiciously small shot (likely black/empty) for ${Who}: $Path" }
       if ($item.LastWriteTimeUtc -le $ClientStartUtc) {
         throw "shot for ${Who} predates its client process (stale file): $Path"
+      }
+    }
+    # A missing trace file means that client exited before
+    # AS08FlowGameMode::BeginPlay opened it (e.g. the ART-004 v3 startup crash
+    # in UObject class registration); the board id is not the cause then.
+    # The backend stores any boardId string but silently falls back to an empty
+    # 20x20 grid when no Board row has that id (e.g. the content slug
+    # 'cobble-city'). Then the art board and its shot gate never activate;
+    # report that cause instead of a generic missing shot.
+    if ($ArtPreviewBoardId) {
+      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        if (-not (Test-Path -LiteralPath $pair[1])) {
+          throw "$($pair[0]) trace missing: $($pair[1]). The client likely crashed before AS08FlowGameMode::BeginPlay; copy $(Join-Path (Split-Path -Parent $Exe) 'Unmatched\Saved\Logs')\Unmatched*.log before the next package step wipes it"
+        }
+        if (-not (Select-String -LiteralPath $pair[1] -SimpleMatch -Pattern 'BOARD 5x6' -Quiet)) {
+          throw "$($pair[0]) trace has no 'BOARD 5x6': ArtPreviewBoardId=$ArtPreviewBoardId is not the 5x6 Cobble review board"
+        }
       }
     }
     Assert-FreshShot $hostShot $hostStartUtc 'host'
@@ -434,8 +492,19 @@ function Invoke-Phase2Demo {
         'ARTPREVIEW Cobble assets ready', 'ARTPREVIEW Cobble active 5x6 zones=30 blue=15 red=15 blueMarks=15 redMarks=45',
         'ARTPREVIEW Cobble probe lights key=4.5 fill=700 warm=85',
         'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1') 'joiner'
+      $requestedLabel = if ($MedusaVariantExplicit) { $ArtPreviewMedusaVariant } else { '(default)' }
+      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        Assert-Trace $pair[1] @("ARTPREVIEW medusa candidate variant=$ArtPreviewMedusaVariant mesh=$ExpectedMedusaMesh requested=$requestedLabel",
+          "visual=1 mesh=$ExpectedMedusaMesh", 'boardValid=1', 'HUD seq=',
+          "SHOT head fighter=", "socket=Head mesh=$ExpectedMedusaMesh") "$($pair[0]) Medusa candidate"
+        if ($ClientPerf) { Assert-Trace $pair[1] @('PERF config', 'PERF summary scope=started') "$($pair[0]) perf" }
+      }
       if ($ArtPreviewFocusZoom -gt 0) {
-        Assert-Trace $hostTrace @('ARTPREVIEW camera focus requested zoom=') 'host K2'
+        Assert-Trace $hostTrace @('ARTPREVIEW camera focus requested zoom=', 'CAMERA settled') 'host K2'
+        # The evidence shot must be taken after the focus zoom arrived.
+        if (-not (Select-String -LiteralPath $hostTrace -Pattern 'SHOT camera .* settled=1 ' -Quiet)) {
+          throw 'host K2 shot was taken before the camera settled (SHOT camera settled=0); raise ArtPreviewShotAfter'
+        }
       }
     } else {
       Assert-Trace $hostTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'MANEUVER begin seq=', 'MANEUVER done', 'CUE move') 'host'
@@ -444,7 +513,7 @@ function Invoke-Phase2Demo {
     }
     if ($ArtPreviewBoardId) {
       [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'),
-        (([ordered]@{ boardId = $ArtPreviewBoardId; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = 30; joinerLiveZones = 30; hostFocusZoom = $ArtPreviewFocusZoom }) | ConvertTo-Json), $Utf8NoBom)
+        (([ordered]@{ boardId = $ArtPreviewBoardId; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = 30; joinerLiveZones = 30; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf }) | ConvertTo-Json), $Utf8NoBom)
     }
 
     # ProjectWorldLocationToScreen can return true even for offscreen pixels.

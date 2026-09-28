@@ -1,0 +1,2018 @@
+{
+  "schema": "unmatched.art004-k2-metrics/2",
+  "status": "измерено: K2-01, K2-05 и разница v2<->v3 над шумом (K2-07 — artcheck в каталогах прогонов); K2-02 и K2-03 — не измерено (невалидно): зарегистрированные полосы не попадают на лицо и венец; K2-04 — не измерено",
+  "supersedes": "unmatched.art004-k2-metrics/1 того же дня: в ней K2-02/K2-03 ошибочно записаны как v3AtLeastV2=true (ложный PASS); формальные числа не изменились",
+  "thresholds": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/thresholds.json (E1_k2_live, E2_repeat_noise)",
+  "noise": {
+    "group": [
+      "docs/game-design/evidence/ART-004/live-v2-k2-control/5x-noflag/run-20260928-150841",
+      "docs/game-design/evidence/ART-004/live-v2-k2-control/5x-noflag/run-20260928-150947",
+      "docs/game-design/evidence/ART-004/live-v2-k2-control/5x-noflag/run-20260928-151054"
+    ],
+    "noiseMeanAbsDeltaRGB": 0.648,
+    "threshold2xNoise": 1.296,
+    "rule": "E2: 3 repeats of one configuration, noise = max pairwise mean |dRGB| in the fixed ROI"
+  },
+  "bandAudit": {
+    "date": "2026-09-28",
+    "by": "T1.1 verify (pixel check of the band placement) + T1.1 rework",
+    "K2_02": {
+      "status": "не измерено (невалидно)",
+      "bandCovers": {
+        "face-neck-v2": "шея и вырез хитона",
+        "head-tilt-v3": "шея и вырез хитона с тёмной V-полосой P1"
+      },
+      "reason": "полоса Head+2..+9 uu (и буквальная Head+2..+6 uu) в экранной проекции лежит ниже лица: сокет Head стоит у основания шеи, кроп K2-01 центрирован на груди. Прирост у v3 при 5x даёт тёмная V-полоса P1 по вырезу хитона, а не черты лица"
+    },
+    "K2_03": {
+      "status": "не измерено (невалидно)",
+      "bandCovers": {
+        "face-neck-v2": "венец и змеи",
+        "head-tilt-v3": "лицо (глаза, нос, рот) и нижний край змей"
+      },
+      "reason": "полоса Head+10..+18 uu у v3 содержит лицо, у v2 — венец и змей; связные компоненты — фон (крупнейшая, ~2970 px при 5x, — чёрная тень справа) и мелкие пятна контраста на змеях, волосах и лице, а не сегменты венца; полоса у вариантов содержит разные части головы"
+    },
+    "consequence": "K2-02/K2-03 из T1.1 не подтверждают и не опровергают v3 >= v2; опорой для workingZoomProposal (thresholds.json E1_k2_live) они служить не могут",
+    "illustrations": "k2-crops/k2-bands-*-v2-left-v3-right.png"
+  },
+  "bandOverlays": [
+    {
+      "zoom": 1.6,
+      "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2-bands-1p6-v2-left-v3-right.png",
+      "sha256": "1380b6f7ab83e55911e7322c2750e42eebf74c1f09385b9f5a01ac856620dba2",
+      "scale": 7,
+      "v2Run": "docs/game-design/evidence/ART-004/live-v2-k2-control/1p6/run-20260928-151640",
+      "v3Run": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/1p6/run-20260928-151748",
+      "legend": "слева v2, справа v3; пурпурная рамка — полоса K2-02, голубая — полоса K2-03"
+    },
+    {
+      "zoom": 5,
+      "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2-bands-5x-v2-left-v3-right.png",
+      "sha256": "1b8f65d5bfad727fd5a69a3cd867596b2dbc412508c8cf5ecfee330f701986ab",
+      "scale": 4,
+      "v2Run": "docs/game-design/evidence/ART-004/live-v2-k2-control/5x/run-20260928-151159",
+      "v3Run": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/5x/run-20260928-151307",
+      "legend": "слева v2, справа v3; пурпурная рамка — полоса K2-02, голубая — полоса K2-03"
+    }
+  ],
+  "proposedThresholdRevision": {
+    "status": "предложено, не применено; владелец thresholds.json — T0, правка только новой записью revisions до прогонов, к которым она применяется (E3)",
+    "K2_01": "центр кропа — экранная проекция Head+12 uu, сторона — 3 x проекция отрезка Head..Head+24 uu (лицо, венец и змеи целиком), не меньше 96 px",
+    "K2_02_K2_03_masks": "маски лица и венца — репроекция ID-маски Blender по той же камере отдельно для каждого варианта: наклон головы переставляет лицо и венец, поэтому общая для v2 и v3 полоса в экранных координатах их не разделяет",
+    "K2_02_K2_03_fallback": "если репроекции нет: полосы от проекции лица и венца (у v3 при 5x лицо ≈ Head+10..+18 uu в экранной проекции), подобранные по кадру-оверлею отдельно для каждого варианта и зума и зарегистрированные до прогона",
+    "placementGate": "K2-02/K2-03 засчитываются, только если оверлей полос (k2-bands-*.png) просмотрен и полоса лежит на лице/венце у обоих вариантов; иначе — «не измерено (невалидно)»",
+    "K2_02_darkPixels": "энергию K2-02 считать и без окрестности тёмных пикселей (luma < 25, ±2 px): тёмный шов или просвет у шеи иначе засчитывается как деталь лица"
+  },
+  "visualObservation": "наблюдение исполнителя, не метрика и не подтверждение через K2-02/K2-03: при 5x у v3 лицо открыто, у v2 венец закрывает глаза; у v3 по вырезу хитона тёмная V-полоса (P1). При 1,6x черт лица не различить ни у одного варианта",
+  "rows": [
+    {
+      "run": "docs/game-design/evidence/ART-004/live-v2-k2-control/5x-noflag/run-20260928-150841",
+      "variant": "face-neck-v2",
+      "explicit": false,
+      "zoom": 5,
+      "selectedFighter": "f-0-hero",
+      "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+      "headSocketWorld": "(0.0,-46.0,38.5)",
+      "K2_01_crop": {
+        "center": [
+          960.0,
+          517.7
+        ],
+        "headPx": 56.4,
+        "side": 169,
+        "box": [
+          876,
+          433,
+          1045,
+          602
+        ],
+        "pxPerUuZ": 4.7,
+        "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2crop-live-v2-k2-control-5x-noflag-run-20260928-150841-host.png",
+        "sha256": "9536a75f1687fc18ef5e668e3e88f698f8cffbd806225cd4ac22f87465e42e22",
+        "note": "центр — проекция сокета Head у основания шеи, поэтому кроп центрирован на груди"
+      },
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 82.498,
+        "formalValueLiteralUpperThirdHeadSpan": 78.771,
+        "bandZ": "Head+2..Head+9 uu",
+        "bandBoxInCrop": [
+          56,
+          42,
+          113,
+          75
+        ],
+        "literalBandZ": "Head+2..Head+6 uu",
+        "literalBandBoxInCrop": [
+          56,
+          57,
+          113,
+          75
+        ],
+        "method": "mean Sobel magnitude of display luma in the band; fallback without Blender ID-mask reprojection, middle third of the crop width",
+        "bandCovers": "шея и вырез хитона",
+        "darkPixelDiagnostics": {
+          "lumaBelow": 25.0,
+          "dilateIterations": 2,
+          "darkPx": 40,
+          "bandPx": 1881,
+          "sobelShareNearDark": 0.131,
+          "energyWithoutDarkNeighbourhood": 78.185
+        }
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 5,
+        "bandZ": "Head+10..Head+18 uu",
+        "bandBoxInCrop": [
+          34,
+          0,
+          135,
+          38
+        ],
+        "rule": "connected components (4-neighbour) of |luma - band mean| > 12 with >= 6 px, 60 % of the crop width",
+        "bandCovers": "венец и змеи",
+        "formalComponents": [
+          {
+            "px": 2972,
+            "bboxInCrop": [
+              34,
+              0,
+              135,
+              38
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              62,
+              60,
+              53
+            ]
+          },
+          {
+            "px": 118,
+            "bboxInCrop": [
+              93,
+              0,
+              111,
+              22
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              88,
+              93,
+              76
+            ]
+          },
+          {
+            "px": 9,
+            "bboxInCrop": [
+              76,
+              0,
+              80,
+              3
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              43,
+              46,
+              38
+            ]
+          },
+          {
+            "px": 8,
+            "bboxInCrop": [
+              100,
+              0,
+              104,
+              3
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              78,
+              83,
+              69
+            ]
+          },
+          {
+            "px": 6,
+            "bboxInCrop": [
+              91,
+              21,
+              94,
+              24
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              89,
+              80,
+              65
+            ]
+          }
+        ]
+      },
+      "K2_04": {
+        "status": "не измерено",
+        "neckSeeThroughPx": null,
+        "note": "в packaged-кадре нет маски сегментации; репроекция ID-маски Blender не выполнялась"
+      },
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3)",
+        "observedHeadZone": {
+          "bandZ": "Head+9.5..Head+17 uu (screen projection), middle third of the crop width",
+          "boxInCrop": [
+            56,
+            5,
+            113,
+            40
+          ],
+          "sobelEnergy": 94.405
+        }
+      },
+      "cropMeanRGB": [
+        75.68,
+        72.32,
+        67.69
+      ]
+    },
+    {
+      "run": "docs/game-design/evidence/ART-004/live-v2-k2-control/5x-noflag/run-20260928-150947",
+      "variant": "face-neck-v2",
+      "explicit": false,
+      "zoom": 5,
+      "selectedFighter": "f-0-hero",
+      "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+      "headSocketWorld": "(0.0,-46.0,38.5)",
+      "K2_01_crop": {
+        "center": [
+          960.0,
+          517.7
+        ],
+        "headPx": 56.4,
+        "side": 169,
+        "box": [
+          876,
+          433,
+          1045,
+          602
+        ],
+        "pxPerUuZ": 4.7,
+        "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2crop-live-v2-k2-control-5x-noflag-run-20260928-150947-host.png",
+        "sha256": "8151adadb055b2b4adaf9ec2863db7e93af51eb59b995984f999430607466ffb",
+        "note": "центр — проекция сокета Head у основания шеи, поэтому кроп центрирован на груди"
+      },
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 83.382,
+        "formalValueLiteralUpperThirdHeadSpan": 80.022,
+        "bandZ": "Head+2..Head+9 uu",
+        "bandBoxInCrop": [
+          56,
+          42,
+          113,
+          75
+        ],
+        "literalBandZ": "Head+2..Head+6 uu",
+        "literalBandBoxInCrop": [
+          56,
+          57,
+          113,
+          75
+        ],
+        "method": "mean Sobel magnitude of display luma in the band; fallback without Blender ID-mask reprojection, middle third of the crop width",
+        "bandCovers": "шея и вырез хитона",
+        "darkPixelDiagnostics": {
+          "lumaBelow": 25.0,
+          "dilateIterations": 2,
+          "darkPx": 39,
+          "bandPx": 1881,
+          "sobelShareNearDark": 0.13,
+          "energyWithoutDarkNeighbourhood": 79.128
+        }
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 4,
+        "bandZ": "Head+10..Head+18 uu",
+        "bandBoxInCrop": [
+          34,
+          0,
+          135,
+          38
+        ],
+        "rule": "connected components (4-neighbour) of |luma - band mean| > 12 with >= 6 px, 60 % of the crop width",
+        "bandCovers": "венец и змеи",
+        "formalComponents": [
+          {
+            "px": 2968,
+            "bboxInCrop": [
+              34,
+              0,
+              135,
+              38
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              62,
+              60,
+              53
+            ]
+          },
+          {
+            "px": 130,
+            "bboxInCrop": [
+              88,
+              0,
+              111,
+              26
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              89,
+              91,
+              75
+            ]
+          },
+          {
+            "px": 10,
+            "bboxInCrop": [
+              76,
+              0,
+              80,
+              4
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              42,
+              46,
+              38
+            ]
+          },
+          {
+            "px": 7,
+            "bboxInCrop": [
+              100,
+              0,
+              104,
+              3
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              80,
+              84,
+              71
+            ]
+          }
+        ]
+      },
+      "K2_04": {
+        "status": "не измерено",
+        "neckSeeThroughPx": null,
+        "note": "в packaged-кадре нет маски сегментации; репроекция ID-маски Blender не выполнялась"
+      },
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3)",
+        "observedHeadZone": {
+          "bandZ": "Head+9.5..Head+17 uu (screen projection), middle third of the crop width",
+          "boxInCrop": [
+            56,
+            5,
+            113,
+            40
+          ],
+          "sobelEnergy": 95.8
+        }
+      },
+      "cropMeanRGB": [
+        75.68,
+        72.32,
+        67.71
+      ]
+    },
+    {
+      "run": "docs/game-design/evidence/ART-004/live-v2-k2-control/5x-noflag/run-20260928-151054",
+      "variant": "face-neck-v2",
+      "explicit": false,
+      "zoom": 5,
+      "selectedFighter": "f-0-hero",
+      "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+      "headSocketWorld": "(0.0,-46.0,38.5)",
+      "K2_01_crop": {
+        "center": [
+          960.0,
+          517.7
+        ],
+        "headPx": 56.4,
+        "side": 169,
+        "box": [
+          876,
+          433,
+          1045,
+          602
+        ],
+        "pxPerUuZ": 4.7,
+        "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2crop-live-v2-k2-control-5x-noflag-run-20260928-151054-host.png",
+        "sha256": "43edeca72a59a1f13fae7f14a4a99628ddd5e4ebbf9bb8fb90988b433d9039da",
+        "note": "центр — проекция сокета Head у основания шеи, поэтому кроп центрирован на груди"
+      },
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 83.387,
+        "formalValueLiteralUpperThirdHeadSpan": 80.051,
+        "bandZ": "Head+2..Head+9 uu",
+        "bandBoxInCrop": [
+          56,
+          42,
+          113,
+          75
+        ],
+        "literalBandZ": "Head+2..Head+6 uu",
+        "literalBandBoxInCrop": [
+          56,
+          57,
+          113,
+          75
+        ],
+        "method": "mean Sobel magnitude of display luma in the band; fallback without Blender ID-mask reprojection, middle third of the crop width",
+        "bandCovers": "шея и вырез хитона",
+        "darkPixelDiagnostics": {
+          "lumaBelow": 25.0,
+          "dilateIterations": 2,
+          "darkPx": 39,
+          "bandPx": 1881,
+          "sobelShareNearDark": 0.13,
+          "energyWithoutDarkNeighbourhood": 79.151
+        }
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 4,
+        "bandZ": "Head+10..Head+18 uu",
+        "bandBoxInCrop": [
+          34,
+          0,
+          135,
+          38
+        ],
+        "rule": "connected components (4-neighbour) of |luma - band mean| > 12 with >= 6 px, 60 % of the crop width",
+        "bandCovers": "венец и змеи",
+        "formalComponents": [
+          {
+            "px": 2971,
+            "bboxInCrop": [
+              34,
+              0,
+              135,
+              38
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              62,
+              60,
+              53
+            ]
+          },
+          {
+            "px": 130,
+            "bboxInCrop": [
+              88,
+              0,
+              111,
+              26
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              89,
+              92,
+              75
+            ]
+          },
+          {
+            "px": 10,
+            "bboxInCrop": [
+              76,
+              0,
+              80,
+              4
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              42,
+              46,
+              38
+            ]
+          },
+          {
+            "px": 7,
+            "bboxInCrop": [
+              100,
+              0,
+              104,
+              3
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              80,
+              84,
+              71
+            ]
+          }
+        ]
+      },
+      "K2_04": {
+        "status": "не измерено",
+        "neckSeeThroughPx": null,
+        "note": "в packaged-кадре нет маски сегментации; репроекция ID-маски Blender не выполнялась"
+      },
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3)",
+        "observedHeadZone": {
+          "bandZ": "Head+9.5..Head+17 uu (screen projection), middle third of the crop width",
+          "boxInCrop": [
+            56,
+            5,
+            113,
+            40
+          ],
+          "sobelEnergy": 95.781
+        }
+      },
+      "cropMeanRGB": [
+        75.68,
+        72.33,
+        67.71
+      ]
+    },
+    {
+      "run": "docs/game-design/evidence/ART-004/live-v2-k2-control/5x/run-20260928-151159",
+      "variant": "face-neck-v2",
+      "explicit": true,
+      "zoom": 5,
+      "selectedFighter": "f-0-hero",
+      "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+      "headSocketWorld": "(0.0,-46.0,38.5)",
+      "K2_01_crop": {
+        "center": [
+          960.0,
+          517.7
+        ],
+        "headPx": 56.4,
+        "side": 169,
+        "box": [
+          876,
+          433,
+          1045,
+          602
+        ],
+        "pxPerUuZ": 4.7,
+        "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2crop-live-v2-k2-control-5x-run-20260928-151159-host.png",
+        "sha256": "427491e42b77f9882e81c228d64eee7aef7c79792dcb82af4e6b70a4a6a39b26",
+        "note": "центр — проекция сокета Head у основания шеи, поэтому кроп центрирован на груди"
+      },
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 82.487,
+        "formalValueLiteralUpperThirdHeadSpan": 78.767,
+        "bandZ": "Head+2..Head+9 uu",
+        "bandBoxInCrop": [
+          56,
+          42,
+          113,
+          75
+        ],
+        "literalBandZ": "Head+2..Head+6 uu",
+        "literalBandBoxInCrop": [
+          56,
+          57,
+          113,
+          75
+        ],
+        "method": "mean Sobel magnitude of display luma in the band; fallback without Blender ID-mask reprojection, middle third of the crop width",
+        "bandCovers": "шея и вырез хитона",
+        "darkPixelDiagnostics": {
+          "lumaBelow": 25.0,
+          "dilateIterations": 2,
+          "darkPx": 40,
+          "bandPx": 1881,
+          "sobelShareNearDark": 0.131,
+          "energyWithoutDarkNeighbourhood": 78.176
+        }
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 5,
+        "bandZ": "Head+10..Head+18 uu",
+        "bandBoxInCrop": [
+          34,
+          0,
+          135,
+          38
+        ],
+        "rule": "connected components (4-neighbour) of |luma - band mean| > 12 with >= 6 px, 60 % of the crop width",
+        "bandCovers": "венец и змеи",
+        "formalComponents": [
+          {
+            "px": 2973,
+            "bboxInCrop": [
+              34,
+              0,
+              135,
+              38
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              62,
+              60,
+              53
+            ]
+          },
+          {
+            "px": 118,
+            "bboxInCrop": [
+              93,
+              0,
+              111,
+              22
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              88,
+              93,
+              76
+            ]
+          },
+          {
+            "px": 9,
+            "bboxInCrop": [
+              76,
+              0,
+              80,
+              3
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              43,
+              46,
+              38
+            ]
+          },
+          {
+            "px": 8,
+            "bboxInCrop": [
+              100,
+              0,
+              104,
+              3
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              78,
+              83,
+              69
+            ]
+          },
+          {
+            "px": 6,
+            "bboxInCrop": [
+              91,
+              21,
+              94,
+              24
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              89,
+              80,
+              65
+            ]
+          }
+        ]
+      },
+      "K2_04": {
+        "status": "не измерено",
+        "neckSeeThroughPx": null,
+        "note": "в packaged-кадре нет маски сегментации; репроекция ID-маски Blender не выполнялась"
+      },
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3)",
+        "observedHeadZone": {
+          "bandZ": "Head+9.5..Head+17 uu (screen projection), middle third of the crop width",
+          "boxInCrop": [
+            56,
+            5,
+            113,
+            40
+          ],
+          "sobelEnergy": 94.431
+        }
+      },
+      "cropMeanRGB": [
+        75.68,
+        72.32,
+        67.69
+      ]
+    },
+    {
+      "run": "docs/game-design/evidence/ART-004/live-v2-k2-control/5x/run-20260928-151427",
+      "variant": "face-neck-v2",
+      "explicit": true,
+      "zoom": 5,
+      "selectedFighter": "f-0-hero",
+      "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+      "headSocketWorld": "(0.0,-46.0,38.5)",
+      "K2_01_crop": {
+        "center": [
+          960.0,
+          517.7
+        ],
+        "headPx": 56.4,
+        "side": 169,
+        "box": [
+          876,
+          433,
+          1045,
+          602
+        ],
+        "pxPerUuZ": 4.7,
+        "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2crop-live-v2-k2-control-5x-run-20260928-151427-host.png",
+        "sha256": "f1724a2a2e4d92a814134b306c4a03c6ab3c76f0d4638f921036b2737dca44e4",
+        "note": "центр — проекция сокета Head у основания шеи, поэтому кроп центрирован на груди"
+      },
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 82.467,
+        "formalValueLiteralUpperThirdHeadSpan": 78.765,
+        "bandZ": "Head+2..Head+9 uu",
+        "bandBoxInCrop": [
+          56,
+          42,
+          113,
+          75
+        ],
+        "literalBandZ": "Head+2..Head+6 uu",
+        "literalBandBoxInCrop": [
+          56,
+          57,
+          113,
+          75
+        ],
+        "method": "mean Sobel magnitude of display luma in the band; fallback without Blender ID-mask reprojection, middle third of the crop width",
+        "bandCovers": "шея и вырез хитона",
+        "darkPixelDiagnostics": {
+          "lumaBelow": 25.0,
+          "dilateIterations": 2,
+          "darkPx": 40,
+          "bandPx": 1881,
+          "sobelShareNearDark": 0.131,
+          "energyWithoutDarkNeighbourhood": 78.155
+        }
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 5,
+        "bandZ": "Head+10..Head+18 uu",
+        "bandBoxInCrop": [
+          34,
+          0,
+          135,
+          38
+        ],
+        "rule": "connected components (4-neighbour) of |luma - band mean| > 12 with >= 6 px, 60 % of the crop width",
+        "bandCovers": "венец и змеи",
+        "formalComponents": [
+          {
+            "px": 2975,
+            "bboxInCrop": [
+              34,
+              0,
+              135,
+              38
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              62,
+              60,
+              53
+            ]
+          },
+          {
+            "px": 119,
+            "bboxInCrop": [
+              93,
+              0,
+              111,
+              22
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              88,
+              92,
+              76
+            ]
+          },
+          {
+            "px": 9,
+            "bboxInCrop": [
+              76,
+              0,
+              80,
+              3
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              43,
+              46,
+              38
+            ]
+          },
+          {
+            "px": 8,
+            "bboxInCrop": [
+              100,
+              0,
+              104,
+              3
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              78,
+              83,
+              69
+            ]
+          },
+          {
+            "px": 6,
+            "bboxInCrop": [
+              91,
+              21,
+              94,
+              24
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              89,
+              80,
+              65
+            ]
+          }
+        ]
+      },
+      "K2_04": {
+        "status": "не измерено",
+        "neckSeeThroughPx": null,
+        "note": "в packaged-кадре нет маски сегментации; репроекция ID-маски Blender не выполнялась"
+      },
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3)",
+        "observedHeadZone": {
+          "bandZ": "Head+9.5..Head+17 uu (screen projection), middle third of the crop width",
+          "boxInCrop": [
+            56,
+            5,
+            113,
+            40
+          ],
+          "sobelEnergy": 94.405
+        }
+      },
+      "cropMeanRGB": [
+        75.68,
+        72.32,
+        67.69
+      ]
+    },
+    {
+      "run": "docs/game-design/evidence/ART-004/live-v2-k2-control/1p6/run-20260928-151640",
+      "variant": "face-neck-v2",
+      "explicit": true,
+      "zoom": 1.6,
+      "selectedFighter": "f-0-hero",
+      "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+      "headSocketWorld": "(0.0,-46.0,38.5)",
+      "K2_01_crop": {
+        "center": [
+          960.0,
+          533.0
+        ],
+        "headPx": 17.6,
+        "side": 96,
+        "box": [
+          912,
+          485,
+          1008,
+          581
+        ],
+        "pxPerUuZ": 1.467,
+        "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2crop-live-v2-k2-control-1p6-run-20260928-151640-host.png",
+        "sha256": "496279b951c7c03fe60cc35e45becb19e9496a281fb265c64d2a757f4bef6f8a",
+        "note": "центр — проекция сокета Head у основания шеи, поэтому кроп центрирован на груди"
+      },
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 159.383,
+        "formalValueLiteralUpperThirdHeadSpan": 162.312,
+        "bandZ": "Head+2..Head+9 uu",
+        "bandBoxInCrop": [
+          32,
+          35,
+          64,
+          45
+        ],
+        "literalBandZ": "Head+2..Head+6 uu",
+        "literalBandBoxInCrop": [
+          32,
+          39,
+          64,
+          45
+        ],
+        "method": "mean Sobel magnitude of display luma in the band; fallback without Blender ID-mask reprojection, middle third of the crop width",
+        "bandCovers": "шея и вырез хитона",
+        "darkPixelDiagnostics": {
+          "lumaBelow": 25.0,
+          "dilateIterations": 2,
+          "darkPx": 31,
+          "bandPx": 320,
+          "sobelShareNearDark": 0.3,
+          "energyWithoutDarkNeighbourhood": 138.362
+        }
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 1,
+        "bandZ": "Head+10..Head+18 uu",
+        "bandBoxInCrop": [
+          19,
+          22,
+          77,
+          33
+        ],
+        "rule": "connected components (4-neighbour) of |luma - band mean| > 12 with >= 6 px, 60 % of the crop width",
+        "bandCovers": "венец и змеи",
+        "formalComponents": [
+          {
+            "px": 575,
+            "bboxInCrop": [
+              19,
+              22,
+              77,
+              33
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              54,
+              53,
+              47
+            ]
+          }
+        ]
+      },
+      "K2_04": {
+        "status": "не измерено",
+        "neckSeeThroughPx": null,
+        "note": "в packaged-кадре нет маски сегментации; репроекция ID-маски Blender не выполнялась"
+      },
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3)",
+        "observedHeadZone": {
+          "bandZ": "Head+9.5..Head+17 uu (screen projection), middle third of the crop width",
+          "boxInCrop": [
+            32,
+            23,
+            64,
+            34
+          ],
+          "sobelEnergy": 99.586
+        }
+      },
+      "cropMeanRGB": [
+        76.9,
+        80.38,
+        80.75
+      ]
+    },
+    {
+      "run": "docs/game-design/evidence/ART-004/live-v2-k2-control/1p6/run-20260928-151853",
+      "variant": "face-neck-v2",
+      "explicit": true,
+      "zoom": 1.6,
+      "selectedFighter": "f-0-hero",
+      "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+      "headSocketWorld": "(0.0,-46.0,38.5)",
+      "K2_01_crop": {
+        "center": [
+          960.0,
+          533.0
+        ],
+        "headPx": 17.6,
+        "side": 96,
+        "box": [
+          912,
+          485,
+          1008,
+          581
+        ],
+        "pxPerUuZ": 1.467,
+        "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2crop-live-v2-k2-control-1p6-run-20260928-151853-host.png",
+        "sha256": "ac7e35f2f2dfdfebc915084c2399f2e93d7ca51df88ea97797c2fc1ec8847ed0",
+        "note": "центр — проекция сокета Head у основания шеи, поэтому кроп центрирован на груди"
+      },
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 159.418,
+        "formalValueLiteralUpperThirdHeadSpan": 162.415,
+        "bandZ": "Head+2..Head+9 uu",
+        "bandBoxInCrop": [
+          32,
+          35,
+          64,
+          45
+        ],
+        "literalBandZ": "Head+2..Head+6 uu",
+        "literalBandBoxInCrop": [
+          32,
+          39,
+          64,
+          45
+        ],
+        "method": "mean Sobel magnitude of display luma in the band; fallback without Blender ID-mask reprojection, middle third of the crop width",
+        "bandCovers": "шея и вырез хитона",
+        "darkPixelDiagnostics": {
+          "lumaBelow": 25.0,
+          "dilateIterations": 2,
+          "darkPx": 31,
+          "bandPx": 320,
+          "sobelShareNearDark": 0.3,
+          "energyWithoutDarkNeighbourhood": 138.412
+        }
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 1,
+        "bandZ": "Head+10..Head+18 uu",
+        "bandBoxInCrop": [
+          19,
+          22,
+          77,
+          33
+        ],
+        "rule": "connected components (4-neighbour) of |luma - band mean| > 12 with >= 6 px, 60 % of the crop width",
+        "bandCovers": "венец и змеи",
+        "formalComponents": [
+          {
+            "px": 576,
+            "bboxInCrop": [
+              19,
+              22,
+              77,
+              33
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              54,
+              53,
+              47
+            ]
+          }
+        ]
+      },
+      "K2_04": {
+        "status": "не измерено",
+        "neckSeeThroughPx": null,
+        "note": "в packaged-кадре нет маски сегментации; репроекция ID-маски Blender не выполнялась"
+      },
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3)",
+        "observedHeadZone": {
+          "bandZ": "Head+9.5..Head+17 uu (screen projection), middle third of the crop width",
+          "boxInCrop": [
+            32,
+            23,
+            64,
+            34
+          ],
+          "sobelEnergy": 99.549
+        }
+      },
+      "cropMeanRGB": [
+        76.9,
+        80.38,
+        80.76
+      ]
+    },
+    {
+      "run": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/5x/run-20260928-151307",
+      "variant": "head-tilt-v3",
+      "explicit": true,
+      "zoom": 5,
+      "selectedFighter": "f-0-hero",
+      "mesh": "SK_Medusa_HeadTilt_v3Candidate",
+      "headSocketWorld": "(0.0,-46.0,38.5)",
+      "K2_01_crop": {
+        "center": [
+          960.0,
+          517.7
+        ],
+        "headPx": 56.4,
+        "side": 169,
+        "box": [
+          876,
+          433,
+          1045,
+          602
+        ],
+        "pxPerUuZ": 4.7,
+        "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2crop-live-head-tilt-v3-k2-5x-run-20260928-151307-host.png",
+        "sha256": "96cec54baa374cdabeeb9de3fce5151f06a47e8bd81aa9591b371604ed63c052",
+        "note": "центр — проекция сокета Head у основания шеи, поэтому кроп центрирован на груди"
+      },
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 88.451,
+        "formalValueLiteralUpperThirdHeadSpan": 89.824,
+        "bandZ": "Head+2..Head+9 uu",
+        "bandBoxInCrop": [
+          56,
+          42,
+          113,
+          75
+        ],
+        "literalBandZ": "Head+2..Head+6 uu",
+        "literalBandBoxInCrop": [
+          56,
+          57,
+          113,
+          75
+        ],
+        "method": "mean Sobel magnitude of display luma in the band; fallback without Blender ID-mask reprojection, middle third of the crop width",
+        "bandCovers": "шея и вырез хитона с тёмной V-полосой P1",
+        "darkPixelDiagnostics": {
+          "lumaBelow": 25.0,
+          "dilateIterations": 2,
+          "darkPx": 150,
+          "bandPx": 1881,
+          "sobelShareNearDark": 0.491,
+          "energyWithoutDarkNeighbourhood": 56.734
+        }
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 8,
+        "bandZ": "Head+10..Head+18 uu",
+        "bandBoxInCrop": [
+          34,
+          0,
+          135,
+          38
+        ],
+        "rule": "connected components (4-neighbour) of |luma - band mean| > 12 with >= 6 px, 60 % of the crop width",
+        "bandCovers": "лицо (глаза, нос, рот) и нижний край змей",
+        "formalComponents": [
+          {
+            "px": 2988,
+            "bboxInCrop": [
+              34,
+              0,
+              135,
+              38
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              69,
+              68,
+              63
+            ]
+          },
+          {
+            "px": 117,
+            "bboxInCrop": [
+              88,
+              0,
+              105,
+              19
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              92,
+              97,
+              79
+            ]
+          },
+          {
+            "px": 87,
+            "bboxInCrop": [
+              34,
+              7,
+              47,
+              22
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              88,
+              94,
+              78
+            ]
+          },
+          {
+            "px": 35,
+            "bboxInCrop": [
+              79,
+              8,
+              88,
+              16
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              108,
+              96,
+              82
+            ]
+          },
+          {
+            "px": 23,
+            "bboxInCrop": [
+              91,
+              0,
+              97,
+              8
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              49,
+              49,
+              41
+            ]
+          },
+          {
+            "px": 14,
+            "bboxInCrop": [
+              42,
+              0,
+              45,
+              5
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              125,
+              102,
+              82
+            ]
+          },
+          {
+            "px": 7,
+            "bboxInCrop": [
+              37,
+              0,
+              41,
+              4
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              52,
+              54,
+              50
+            ]
+          },
+          {
+            "px": 7,
+            "bboxInCrop": [
+              89,
+              8,
+              92,
+              12
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              107,
+              86,
+              69
+            ]
+          }
+        ]
+      },
+      "K2_04": {
+        "status": "не измерено",
+        "neckSeeThroughPx": null,
+        "note": "в packaged-кадре нет маски сегментации; репроекция ID-маски Blender не выполнялась"
+      },
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3)",
+        "observedHeadZone": {
+          "bandZ": "Head+9.5..Head+17 uu (screen projection), middle third of the crop width",
+          "boxInCrop": [
+            56,
+            5,
+            113,
+            40
+          ],
+          "sobelEnergy": 88.678
+        }
+      },
+      "cropMeanRGB": [
+        76.03,
+        72.51,
+        68.35
+      ]
+    },
+    {
+      "run": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/5x/run-20260928-151532",
+      "variant": "head-tilt-v3",
+      "explicit": true,
+      "zoom": 5,
+      "selectedFighter": "f-0-hero",
+      "mesh": "SK_Medusa_HeadTilt_v3Candidate",
+      "headSocketWorld": "(0.0,-46.0,38.5)",
+      "K2_01_crop": {
+        "center": [
+          960.0,
+          517.7
+        ],
+        "headPx": 56.4,
+        "side": 169,
+        "box": [
+          876,
+          433,
+          1045,
+          602
+        ],
+        "pxPerUuZ": 4.7,
+        "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2crop-live-head-tilt-v3-k2-5x-run-20260928-151532-host.png",
+        "sha256": "7e27462f0cccfb3f4bad0dbc44e10fbe3caed88ad2a8f8a35b5a8d47d1e9936e",
+        "note": "центр — проекция сокета Head у основания шеи, поэтому кроп центрирован на груди"
+      },
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 88.426,
+        "formalValueLiteralUpperThirdHeadSpan": 89.761,
+        "bandZ": "Head+2..Head+9 uu",
+        "bandBoxInCrop": [
+          56,
+          42,
+          113,
+          75
+        ],
+        "literalBandZ": "Head+2..Head+6 uu",
+        "literalBandBoxInCrop": [
+          56,
+          57,
+          113,
+          75
+        ],
+        "method": "mean Sobel magnitude of display luma in the band; fallback without Blender ID-mask reprojection, middle third of the crop width",
+        "bandCovers": "шея и вырез хитона с тёмной V-полосой P1",
+        "darkPixelDiagnostics": {
+          "lumaBelow": 25.0,
+          "dilateIterations": 2,
+          "darkPx": 151,
+          "bandPx": 1881,
+          "sobelShareNearDark": 0.492,
+          "energyWithoutDarkNeighbourhood": 56.561
+        }
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 8,
+        "bandZ": "Head+10..Head+18 uu",
+        "bandBoxInCrop": [
+          34,
+          0,
+          135,
+          38
+        ],
+        "rule": "connected components (4-neighbour) of |luma - band mean| > 12 with >= 6 px, 60 % of the crop width",
+        "bandCovers": "лицо (глаза, нос, рот) и нижний край змей",
+        "formalComponents": [
+          {
+            "px": 2991,
+            "bboxInCrop": [
+              34,
+              0,
+              135,
+              38
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              69,
+              68,
+              63
+            ]
+          },
+          {
+            "px": 117,
+            "bboxInCrop": [
+              88,
+              0,
+              105,
+              19
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              92,
+              97,
+              79
+            ]
+          },
+          {
+            "px": 86,
+            "bboxInCrop": [
+              34,
+              7,
+              47,
+              22
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              88,
+              94,
+              78
+            ]
+          },
+          {
+            "px": 36,
+            "bboxInCrop": [
+              79,
+              8,
+              89,
+              16
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              108,
+              96,
+              81
+            ]
+          },
+          {
+            "px": 23,
+            "bboxInCrop": [
+              91,
+              0,
+              97,
+              8
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              49,
+              49,
+              41
+            ]
+          },
+          {
+            "px": 14,
+            "bboxInCrop": [
+              42,
+              0,
+              45,
+              5
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              125,
+              102,
+              82
+            ]
+          },
+          {
+            "px": 8,
+            "bboxInCrop": [
+              89,
+              8,
+              92,
+              12
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              104,
+              85,
+              69
+            ]
+          },
+          {
+            "px": 7,
+            "bboxInCrop": [
+              37,
+              0,
+              41,
+              4
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              52,
+              54,
+              50
+            ]
+          }
+        ]
+      },
+      "K2_04": {
+        "status": "не измерено",
+        "neckSeeThroughPx": null,
+        "note": "в packaged-кадре нет маски сегментации; репроекция ID-маски Blender не выполнялась"
+      },
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3)",
+        "observedHeadZone": {
+          "bandZ": "Head+9.5..Head+17 uu (screen projection), middle third of the crop width",
+          "boxInCrop": [
+            56,
+            5,
+            113,
+            40
+          ],
+          "sobelEnergy": 88.54
+        }
+      },
+      "cropMeanRGB": [
+        76.03,
+        72.51,
+        68.35
+      ]
+    },
+    {
+      "run": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/1p6/run-20260928-151748",
+      "variant": "head-tilt-v3",
+      "explicit": true,
+      "zoom": 1.6,
+      "selectedFighter": "f-0-hero",
+      "mesh": "SK_Medusa_HeadTilt_v3Candidate",
+      "headSocketWorld": "(0.0,-46.0,38.5)",
+      "K2_01_crop": {
+        "center": [
+          960.0,
+          533.0
+        ],
+        "headPx": 17.6,
+        "side": 96,
+        "box": [
+          912,
+          485,
+          1008,
+          581
+        ],
+        "pxPerUuZ": 1.467,
+        "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2crop-live-head-tilt-v3-k2-1p6-run-20260928-151748-host.png",
+        "sha256": "b7ecc8396915149d3e39a9c43c851c14bc07b50d24284c4557e86d1efc5edadb",
+        "note": "центр — проекция сокета Head у основания шеи, поэтому кроп центрирован на груди"
+      },
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 166.588,
+        "formalValueLiteralUpperThirdHeadSpan": 174.515,
+        "bandZ": "Head+2..Head+9 uu",
+        "bandBoxInCrop": [
+          32,
+          35,
+          64,
+          45
+        ],
+        "literalBandZ": "Head+2..Head+6 uu",
+        "literalBandBoxInCrop": [
+          32,
+          39,
+          64,
+          45
+        ],
+        "method": "mean Sobel magnitude of display luma in the band; fallback without Blender ID-mask reprojection, middle third of the crop width",
+        "bandCovers": "шея и вырез хитона с тёмной V-полосой P1",
+        "darkPixelDiagnostics": {
+          "lumaBelow": 25.0,
+          "dilateIterations": 2,
+          "darkPx": 32,
+          "bandPx": 320,
+          "sobelShareNearDark": 0.357,
+          "energyWithoutDarkNeighbourhood": 139.233
+        }
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 2,
+        "bandZ": "Head+10..Head+18 uu",
+        "bandBoxInCrop": [
+          19,
+          22,
+          77,
+          33
+        ],
+        "rule": "connected components (4-neighbour) of |luma - band mean| > 12 with >= 6 px, 60 % of the crop width",
+        "bandCovers": "лицо (глаза, нос, рот) и нижний край змей",
+        "formalComponents": [
+          {
+            "px": 522,
+            "bboxInCrop": [
+              23,
+              22,
+              77,
+              33
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              56,
+              55,
+              49
+            ]
+          },
+          {
+            "px": 36,
+            "bboxInCrop": [
+              19,
+              22,
+              24,
+              33
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              75,
+              78,
+              83
+            ]
+          }
+        ]
+      },
+      "K2_04": {
+        "status": "не измерено",
+        "neckSeeThroughPx": null,
+        "note": "в packaged-кадре нет маски сегментации; репроекция ID-маски Blender не выполнялась"
+      },
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3)",
+        "observedHeadZone": {
+          "bandZ": "Head+9.5..Head+17 uu (screen projection), middle third of the crop width",
+          "boxInCrop": [
+            32,
+            23,
+            64,
+            34
+          ],
+          "sobelEnergy": 109.977
+        }
+      },
+      "cropMeanRGB": [
+        78.13,
+        81.63,
+        81.86
+      ]
+    },
+    {
+      "run": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/1p6/run-20260928-151959",
+      "variant": "head-tilt-v3",
+      "explicit": true,
+      "zoom": 1.6,
+      "selectedFighter": "f-0-hero",
+      "mesh": "SK_Medusa_HeadTilt_v3Candidate",
+      "headSocketWorld": "(0.0,-46.0,38.5)",
+      "K2_01_crop": {
+        "center": [
+          960.0,
+          533.0
+        ],
+        "headPx": 17.6,
+        "side": 96,
+        "box": [
+          912,
+          485,
+          1008,
+          581
+        ],
+        "pxPerUuZ": 1.467,
+        "file": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops/k2crop-live-head-tilt-v3-k2-1p6-run-20260928-151959-host.png",
+        "sha256": "235f63ebc9e08a9eae591544b9dbbaf1213dfad6e045305911857652448a0b25",
+        "note": "центр — проекция сокета Head у основания шеи, поэтому кроп центрирован на груди"
+      },
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 166.58,
+        "formalValueLiteralUpperThirdHeadSpan": 174.495,
+        "bandZ": "Head+2..Head+9 uu",
+        "bandBoxInCrop": [
+          32,
+          35,
+          64,
+          45
+        ],
+        "literalBandZ": "Head+2..Head+6 uu",
+        "literalBandBoxInCrop": [
+          32,
+          39,
+          64,
+          45
+        ],
+        "method": "mean Sobel magnitude of display luma in the band; fallback without Blender ID-mask reprojection, middle third of the crop width",
+        "bandCovers": "шея и вырез хитона с тёмной V-полосой P1",
+        "darkPixelDiagnostics": {
+          "lumaBelow": 25.0,
+          "dilateIterations": 2,
+          "darkPx": 32,
+          "bandPx": 320,
+          "sobelShareNearDark": 0.357,
+          "energyWithoutDarkNeighbourhood": 139.24
+        }
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "formalValueRegisteredBand": 2,
+        "bandZ": "Head+10..Head+18 uu",
+        "bandBoxInCrop": [
+          19,
+          22,
+          77,
+          33
+        ],
+        "rule": "connected components (4-neighbour) of |luma - band mean| > 12 with >= 6 px, 60 % of the crop width",
+        "bandCovers": "лицо (глаза, нос, рот) и нижний край змей",
+        "formalComponents": [
+          {
+            "px": 522,
+            "bboxInCrop": [
+              23,
+              22,
+              77,
+              33
+            ],
+            "vsBandMean": "darker",
+            "meanRGB": [
+              56,
+              55,
+              49
+            ]
+          },
+          {
+            "px": 36,
+            "bboxInCrop": [
+              19,
+              22,
+              24,
+              33
+            ],
+            "vsBandMean": "brighter",
+            "meanRGB": [
+              75,
+              78,
+              83
+            ]
+          }
+        ]
+      },
+      "K2_04": {
+        "status": "не измерено",
+        "neckSeeThroughPx": null,
+        "note": "в packaged-кадре нет маски сегментации; репроекция ID-маски Blender не выполнялась"
+      },
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3)",
+        "observedHeadZone": {
+          "bandZ": "Head+9.5..Head+17 uu (screen projection), middle third of the crop width",
+          "boxInCrop": [
+            32,
+            23,
+            64,
+            34
+          ],
+          "sobelEnergy": 110.007
+        }
+      },
+      "cropMeanRGB": [
+        78.13,
+        81.63,
+        81.86
+      ]
+    }
+  ],
+  "repeatNoise": [
+    {
+      "variant": "face-neck-v2",
+      "explicit": false,
+      "zoom": 5,
+      "runs": [
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/5x-noflag/run-20260928-150841",
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/5x-noflag/run-20260928-150947",
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/5x-noflag/run-20260928-151054"
+      ],
+      "roiBox": [
+        876,
+        433,
+        1045,
+        602
+      ],
+      "pairwiseMeanAbsDeltaRGB": [
+        0.647,
+        0.648,
+        0.071
+      ],
+      "maxPairwise": 0.648,
+      "K2_05_pass": true
+    },
+    {
+      "variant": "face-neck-v2",
+      "explicit": true,
+      "zoom": 5,
+      "runs": [
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/5x/run-20260928-151159",
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/5x/run-20260928-151427"
+      ],
+      "roiBox": [
+        876,
+        433,
+        1045,
+        602
+      ],
+      "pairwiseMeanAbsDeltaRGB": [
+        0.054
+      ],
+      "maxPairwise": 0.054,
+      "K2_05_pass": true
+    },
+    {
+      "variant": "face-neck-v2",
+      "explicit": true,
+      "zoom": 1.6,
+      "runs": [
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/1p6/run-20260928-151640",
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/1p6/run-20260928-151853"
+      ],
+      "roiBox": [
+        912,
+        485,
+        1008,
+        581
+      ],
+      "pairwiseMeanAbsDeltaRGB": [
+        0.034
+      ],
+      "maxPairwise": 0.034,
+      "K2_05_pass": true
+    },
+    {
+      "variant": "head-tilt-v3",
+      "explicit": true,
+      "zoom": 5,
+      "runs": [
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/5x/run-20260928-151307",
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/5x/run-20260928-151532"
+      ],
+      "roiBox": [
+        876,
+        433,
+        1045,
+        602
+      ],
+      "pairwiseMeanAbsDeltaRGB": [
+        0.25
+      ],
+      "maxPairwise": 0.25,
+      "K2_05_pass": true
+    },
+    {
+      "variant": "head-tilt-v3",
+      "explicit": true,
+      "zoom": 1.6,
+      "runs": [
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/1p6/run-20260928-151748",
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/1p6/run-20260928-151959"
+      ],
+      "roiBox": [
+        912,
+        485,
+        1008,
+        581
+      ],
+      "pairwiseMeanAbsDeltaRGB": [
+        0.012
+      ],
+      "maxPairwise": 0.012,
+      "K2_05_pass": true
+    }
+  ],
+  "comparisons": [
+    {
+      "zoom": 1.6,
+      "roiBox": [
+        912,
+        485,
+        1008,
+        581
+      ],
+      "v2Runs": [
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/1p6/run-20260928-151640",
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/1p6/run-20260928-151853"
+      ],
+      "v3Runs": [
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/1p6/run-20260928-151748",
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/1p6/run-20260928-151959"
+      ],
+      "v2VsV3MeanAbsDeltaRGB": [
+        3.372,
+        3.375,
+        3.381,
+        3.38
+      ],
+      "v2VsV3AboveNoiseThreshold": true,
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "v3AtLeastV2": null,
+        "formal": {
+          "v2": 159.401,
+          "v3": 166.584,
+          "literal": {
+            "v2": 162.363,
+            "v3": 174.505
+          }
+        },
+        "darkPx": {
+          "v2": 31.0,
+          "v3": 32.0
+        },
+        "sobelShareNearDark": {
+          "v2": 0.3,
+          "v3": 0.357
+        },
+        "withoutDarkNeighbourhood": {
+          "v2": 138.387,
+          "v3": 139.237
+        },
+        "reason": "полоса Head+2..+9 uu (и буквальная Head+2..+6 uu) в экранной проекции лежит ниже лица: сокет Head стоит у основания шеи, кроп K2-01 центрирован на груди. Прирост у v3 при 5x даёт тёмная V-полоса P1 по вырезу хитона, а не черты лица"
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "v3AtLeastV2": null,
+        "formal": {
+          "v2": 1.0,
+          "v3": 2.0
+        },
+        "reason": "полоса Head+10..+18 uu у v3 содержит лицо, у v2 — венец и змей; связные компоненты — фон (крупнейшая, ~2970 px при 5x, — чёрная тень справа) и мелкие пятна контраста на змеях, волосах и лице, а не сегменты венца; полоса у вариантов содержит разные части головы"
+      },
+      "K2_04": "не измерено",
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3). В этой зоне у v2 лежит венец с резкими краями, у v3 — лицо: энергия градиента не отличает черты лица от края венца, поэтому число не подтверждает и не опровергает читаемость лица",
+        "observedHeadZoneSobelEnergy": {
+          "v2": 99.567,
+          "v3": 109.992
+        }
+      }
+    },
+    {
+      "zoom": 5,
+      "roiBox": [
+        876,
+        433,
+        1045,
+        602
+      ],
+      "v2Runs": [
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/5x/run-20260928-151159",
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/5x/run-20260928-151427"
+      ],
+      "v3Runs": [
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/5x/run-20260928-151307",
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/5x/run-20260928-151532"
+      ],
+      "v2VsV3MeanAbsDeltaRGB": [
+        5.565,
+        5.428,
+        5.565,
+        5.429
+      ],
+      "v2VsV3AboveNoiseThreshold": true,
+      "K2_02": {
+        "status": "не измерено (невалидно)",
+        "v3AtLeastV2": null,
+        "formal": {
+          "v2": 82.477,
+          "v3": 88.439,
+          "literal": {
+            "v2": 78.766,
+            "v3": 89.792
+          }
+        },
+        "darkPx": {
+          "v2": 40.0,
+          "v3": 150.5
+        },
+        "sobelShareNearDark": {
+          "v2": 0.131,
+          "v3": 0.491
+        },
+        "withoutDarkNeighbourhood": {
+          "v2": 78.166,
+          "v3": 56.648
+        },
+        "reason": "полоса Head+2..+9 uu (и буквальная Head+2..+6 uu) в экранной проекции лежит ниже лица: сокет Head стоит у основания шеи, кроп K2-01 центрирован на груди. Прирост у v3 при 5x даёт тёмная V-полоса P1 по вырезу хитона, а не черты лица"
+      },
+      "K2_03": {
+        "status": "не измерено (невалидно)",
+        "v3AtLeastV2": null,
+        "formal": {
+          "v2": 5.0,
+          "v3": 8.0
+        },
+        "reason": "полоса Head+10..+18 uu у v3 содержит лицо, у v2 — венец и змей; связные компоненты — фон (крупнейшая, ~2970 px при 5x, — чёрная тень справа) и мелкие пятна контраста на змеях, волосах и лице, а не сегменты венца; полоса у вариантов содержит разные части головы"
+      },
+      "K2_04": "не измерено",
+      "diagnostics": {
+        "note": "не зарегистрированная метрика, без pass/fail (E3). В этой зоне у v2 лежит венец с резкими краями, у v3 — лицо: энергия градиента не отличает черты лица от края венца, поэтому число не подтверждает и не опровергает читаемость лица",
+        "observedHeadZoneSobelEnergy": {
+          "v2": 94.418,
+          "v3": 88.609
+        }
+      }
+    }
+  ],
+  "caveat": "Metrics are computed on packaged-live frames with HUD, labels and boardState. They are measurements, not an artistic acceptance of the face (open until T4.1/T6)."
+}

@@ -23,6 +23,8 @@
 | `SK_Medusa_HeadTilt_v3Candidate.uasset` | 5 268 450 | `CB8E421EBE048BF4673EFCBE108E4824915E72AB7DBAC18C3F6DDA7C1465BEDF` |
 | `SK_Medusa_HeadTilt_v3Candidate_Skeleton.uasset` | 5 267 | `9F53CB6E98354A998735400995918ABAA906F06CC4979A3825411950D0B8B1F8` |
 
+**Уточнение T1.1 (2026-09-28).** С коммитом T1.1 довод «на v3 в `Source` ничего не ссылается» устарел. `S08ArtPreviewMedusa.h` выбирает `/Game/ArtPreview/Medusa/Meshes/SK_Medusa_HeadTilt_v3Candidate` по флагу `-ArtPreviewMedusaVariant head-tilt-v3`. Без uasset этот флаг в checkout без Content арт-worktree даёт явный провал прогона: меш не загружается, арт-доска серая, снимка нет. Подмены v2 при этом нет. Остальные доводы остаются в силе: весь каталог кукается, v3 художественно не принят, FBX и скрипт импорта лежат в git. Коммитить ли uasset ради воспроизведения живых кадров [T1.1](../../../../docs/game-design/evidence/ART-004/live-head-tilt-v3-k2-measured-2026-09-28.md) через `git add -f`, решает оркестратор (ограничение 6 акта T1.1). Пока uasset не в git, его восстанавливают импортом ниже.
+
 После удаления арт-worktree этих файлов больше нигде не будет. Если v3 понадобится в главном checkout, его импортируют заново тем же скриптом, в отдельном процессе при закрытом редакторе этого проекта:
 
 ```powershell

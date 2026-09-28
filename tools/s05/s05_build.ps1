@@ -26,7 +26,10 @@ if ((Get-Content "$work/s05-import-output.txt" -Raw) -match 'Python script execu
     throw "Import script raised (see $work/s05-import-output.txt)"
 }
 if (-not (Test-Path -LiteralPath $importEvidence)) { throw "Import evidence JSON missing (script died before writing it): $work/s05-import-output.txt" }
-Invoke-Checked "$Engine/Engine/Build/BatchFiles/Build.bat" @('Unmatched','Win64','Development',$project,'-WaitMutex','-NoHotReloadFromIDE','-NoLiveCoding') "$work/s05-game-build.txt"
+# Game target WITHOUT -NoLiveCoding (R14, ART-004 v3-live-hookup diagnosis): in a monolithic game it
+# sets WITH_RELOAD=0 against the precompiled UnrealGame engine (WITH_RELOAD=1); the packaged client can
+# then crash in UClass registration. -NoLiveCoding stays only on the UnmatchedEditor line above.
+Invoke-Checked "$Engine/Engine/Build/BatchFiles/Build.bat" @('Unmatched','Win64','Development',$project,'-WaitMutex','-NoHotReloadFromIDE') "$work/s05-game-build.txt"
 if (-not $SkipPackage) {
  # -NoXGE: the material gained a SkeletalMesh usage flag, so the cooker must compile a new shadermap;
  # the XGE Controller path hangs on this machine (license not activated) and the cook stalls forever.
