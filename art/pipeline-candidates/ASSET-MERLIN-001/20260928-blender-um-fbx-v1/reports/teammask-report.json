@@ -1,0 +1,55 @@
+{
+  "applicability": "open: AD-CNF-58 (TeamColor only on base/ring per 03 С-11, or on the figure material per 04 §3.4 «TeamColor-параметр»). The mask is an optional input produced after the build; the base is a separate mesh and can carry the team colour on its own",
+  "checks": {
+    "bc_unchanged": true,
+    "only_listed_cells": true
+  },
+  "coverage_over_0_5_atlas": 0.02103,
+  "coverage_over_0_5_by_cell": {
+    "tripo_part_0": 0.08411,
+    "tripo_part_1": 0.0,
+    "tripo_part_10": 0.0,
+    "tripo_part_11": 0.0,
+    "tripo_part_2": 0.0,
+    "tripo_part_3": 0.0,
+    "tripo_part_4": 0.0,
+    "tripo_part_5": 0.0,
+    "tripo_part_6": 0.0,
+    "tripo_part_7": 0.0,
+    "tripo_part_8": 0.0,
+    "tripo_part_9": 0.0
+  },
+  "input": {
+    "file": "T_Merlin_Candidate_Atlas_BC.png",
+    "sha256": "2ff0e2c50fb1a8ac47d9ee37b9c0a64da04e2cda2393a072ecc445c4b4b81f44"
+  },
+  "output": {
+    "bytes": 150303,
+    "colorspace": "linear (UE: sRGB off, TC_Grayscale / TC_Masks)",
+    "file": "T_Merlin_Candidate_Atlas_TeamMask.png",
+    "mode": "L",
+    "pixels": [
+      2048,
+      2048
+    ],
+    "sha256": "94e6dcf97837027bad1dabdafb9d57f84373c7fe0eb76f7f49b68bfa2c09fabc"
+  },
+  "passed": true,
+  "rule": {
+    "cells": [
+      "tripo_part_0"
+    ],
+    "edge": "3x3 box blur",
+    "hue_deg": [
+      18.0,
+      55.0
+    ],
+    "ramp": 0.05,
+    "saturation_min": 0.3,
+    "value_min": 0.22
+  },
+  "script": "art/pipeline-candidates/ASSET-MERLIN-001/scripts/make_teammask.py",
+  "script_sha256": "72e13508c799c51c232e29107af2e474d68ed40c352da37e61642d924ddb877f",
+  "stage": "teammask (optional, after build)",
+  "status": "предложено"
+}

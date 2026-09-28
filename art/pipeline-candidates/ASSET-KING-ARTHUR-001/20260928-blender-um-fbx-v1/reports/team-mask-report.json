@@ -1,0 +1,54 @@
+{
+  "applicability": "open: AD-CNF-58 (TeamColor only on base/ring per 03 С-11, or on the figure material per 04). The mask is produced as an optional input; the base is a separate mesh and can carry the team colour on its own",
+  "cells_with_coverage_over_1pct": [
+    "tripo_part_0",
+    "tripo_part_11",
+    "tripo_part_13",
+    "tripo_part_2",
+    "tripo_part_6",
+    "tripo_part_8"
+  ],
+  "coverage_by_cell_mask_ge_0_5": {
+    "tripo_part_0": 0.9867,
+    "tripo_part_1": 0.0,
+    "tripo_part_10": 0.0,
+    "tripo_part_11": 0.8268,
+    "tripo_part_12": 0.0,
+    "tripo_part_13": 0.8419,
+    "tripo_part_14": 0.0,
+    "tripo_part_2": 0.1099,
+    "tripo_part_3": 0.0003,
+    "tripo_part_4": 0.0,
+    "tripo_part_5": 0.0002,
+    "tripo_part_6": 0.0912,
+    "tripo_part_7": 0.0002,
+    "tripo_part_8": 0.2306,
+    "tripo_part_9": 0.0083
+  },
+  "note": "texture-space mask; UE material: BaseColor = lerp(BC, luminance(BC) x TeamColor x k, mask) is a proposal for the UE stage, not built here",
+  "output": {
+    "bytes": 87951,
+    "colour_space": "linear (sRGB off in UE)",
+    "file": "T_KingArthur_Candidate_Atlas_TeamMask.png",
+    "mode": "L",
+    "pixels": [
+      2048,
+      2048
+    ],
+    "sha256": "1e7b98f863324d7e24191fd8102ff6a26f66971d0ef1aa32f22acc4a4cbdab3c"
+  },
+  "rule": {
+    "blur_sigma_px": 1.0,
+    "hue_max_deg": 10,
+    "hue_min_deg": 340,
+    "s_min": 0.55,
+    "v_max": 0.85,
+    "v_min": 0.1
+  },
+  "source_bc": {
+    "file": "T_KingArthur_Candidate_Atlas_BC.png",
+    "sha256": "4693c9cb566fc679a904e745890d85457857cab24160e8f1f8d4143bf4cbe6c0"
+  },
+  "stage": "team-mask (optional, not a CLI stage)",
+  "status": "предложено"
+}

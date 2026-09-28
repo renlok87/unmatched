@@ -1,0 +1,161 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-22cb43f2",
+  "asset_id": "ASSET-MERLIN-001",
+  "service": "tripo-studio",
+  "task_id": "22cb43f2-feec-4288-91cd-22250c99e110",
+  "parent_task_id": "d9ff4260-15c5-4c8c-b16c-4ab26bf43c5f",
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/22cb43f2-feec-4288-91cd-22250c99e110",
+  "date": "2026-09-28",
+  "model_version": {
+    "ui_label": "clone of H3.1 Triangle original (d9ff4260, version 15:06) via History -> Save as new model",
+    "backend": null
+  },
+  "generation": null,
+  "operations": [
+    {
+      "op": "clone",
+      "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "observed_debit": 0,
+        "balance_before": 24620,
+        "balance_after": 24620
+      },
+      "note": "Smart UV rejects multi-part models (re-checked on the segmented retopo, no debit), so a single-part branch was cloned"
+    },
+    {
+      "op": "retopology",
+      "settings": {
+        "topology": "Quad",
+        "smart_mesh": "P1.0 on",
+        "target_polygons": 6500
+      },
+      "history_time": "2026-09-28 15:20:32",
+      "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 40,
+        "observed_debit": 40,
+        "balance_before": 24620,
+        "balance_after": 24580
+      }
+    },
+    {
+      "op": "smart-uv",
+      "note": "full price (the free x1 trial was already used by King Arthur); UV fill 42.6% -> 71.8%",
+      "history_time": "2026-09-28 15:23:24",
+      "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 20,
+        "observed_debit": 20,
+        "balance_before": 24580,
+        "balance_after": 24560
+      }
+    },
+    {
+      "op": "texture",
+      "settings": {
+        "multi_view": "front+right+back v3",
+        "resolution": "2K",
+        "remove_lighting": true
+      },
+      "history_time": "2026-09-28 15:25:25",
+      "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 10,
+        "observed_debit": 10,
+        "balance_before": 24560,
+        "balance_after": 24550
+      }
+    },
+    {
+      "op": "pbr",
+      "history_time": "2026-09-28 15:27:09",
+      "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5,
+        "balance_before": 24550,
+        "balance_after": 24545
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "retopo-6500-glb",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-22cb43f2-retopo-6500.glb",
+      "expected_sha256": "84a9b4b979499fab74684b43ecc42db40c8efa1de713f7a75f74a81410784514",
+      "expected_bytes": 8807424,
+      "produced_by": "retopology",
+      "origin": "Studio GLB export of the single-part clone after Quad retopology, 4k tier, unmodified"
+    },
+    {
+      "role": "smartuv-tex2k-glb",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-22cb43f2-smartuv-tex2k.glb",
+      "expected_sha256": "1b1bd37720c3c37bf8559c9220f2778a1a40fd35c4acbd1239baab4cfd8d3d2d",
+      "expected_bytes": 7269444,
+      "produced_by": "texture",
+      "origin": "Studio GLB export after Smart UV + texture 2K, 2k tier, unmodified"
+    },
+    {
+      "role": "smartuv-tex2k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-22cb43f2-smartuv-tex2k-pbr.glb",
+      "expected_sha256": "7a8030f1ab9a59762c712a0e09cdfda6c3ff64c0dac4f82a67ba9b7339115ee4",
+      "expected_bytes": 9614188,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export after PBR, 2k tier, unmodified"
+    },
+    {
+      "role": "texture-smartuv-tex2k-pbr_basecolor",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/textures/merlin-tripo-22cb43f2-smartuv-tex2k-pbr_basecolor.jpg",
+      "expected_sha256": "45c9250a65c3c02389d259910ddd056f9a3674b2e3c5ed3514a7375f3351590f",
+      "produced_by": "export",
+      "origin": "extracted from the PBR GLB without re-encoding"
+    },
+    {
+      "role": "texture-smartuv-tex2k-pbr_normal",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/textures/merlin-tripo-22cb43f2-smartuv-tex2k-pbr_normal.png",
+      "expected_sha256": "1b993d89db043bd7dffad916956fb4b464015d20b82e434efaa64b7c10090fbb",
+      "produced_by": "export",
+      "origin": "extracted from the PBR GLB without re-encoding"
+    },
+    {
+      "role": "texture-smartuv-tex2k-pbr_rm",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/textures/merlin-tripo-22cb43f2-smartuv-tex2k-pbr_rm.png",
+      "expected_sha256": "590de4a9bfbddacf2f7f881551f3c703dd8762d1d3b71b44527be638f4d2a319",
+      "produced_by": "export",
+      "origin": "extracted from the PBR GLB without re-encoding"
+    }
+  ],
+  "expectations": {
+    "retopo-6500-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 12219,
+      "glb_materials": 1,
+      "glb_images": 3,
+      "glb_skins": 0
+    },
+    "smartuv-tex2k-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 12219,
+      "glb_materials": 1,
+      "glb_images": 2,
+      "glb_skins": 0
+    },
+    "smartuv-tex2k-pbr-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 12219,
+      "glb_materials": 1,
+      "glb_images": 3,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/reports/tripo-run.json"
+  ]
+}

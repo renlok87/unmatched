@@ -1,0 +1,631 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "Серия героев MVP: Merlin, этап Tripo",
+  "asset_id": "ASSET-MERLIN-001",
+  "date": "2026-09-28",
+  "service": "tripo-studio",
+  "account_plan_ui": "Max",
+  "access": "Claude in Chrome, своя вкладка (закрыта в конце). Чужая вкладка группы (b6253e58 Medusa) не трогалась. Загрузки шли прямо в C:/Users/ren/Downloads без Save-диалога, по одной; каждый GLB проверен (длина заголовка = размер файла, обход чанков) и перенесён в source/ (read-only).",
+  "idempotency_check": {
+    "before_first_paid_op": "Ассеты Studio 15:05: последние ассеты — Arthur ×2, бочка, Medusa; заданий Merlin нет. Баланс UI 24 755 = balanceEndUi журнала кредитов после Arthur; записей Merlin в журнале нет; каталога art/pipeline-candidates/ASSET-MERLIN-001 не было; в Загрузках файлов Merlin нет. Прерванный прогон до Tripo не дошёл — повторных запусков нет."
+  },
+  "tasks": {
+    "d9ff4260-15c5-4c8c-b16c-4ab26bf43c5f": {
+      "role": "H3.1 multi-view исходник → сегментация Balanced → Quad-ретопология (многочастная ветка)",
+      "url": "https://studio.tripo3d.ai/ru/workspace/generate/d9ff4260-15c5-4c8c-b16c-4ab26bf43c5f",
+      "studio_versions": [
+        "15:06 генерация",
+        "15:11 сегментация",
+        "15:14 сохранение частей",
+        "15:16 ретопология (текущая)"
+      ]
+    },
+    "22cb43f2-feec-4288-91cd-22250c99e110": {
+      "role": "клон «Сохранить как новую модель» версии 15:06 (Triangle-исходник) → Quad-ретопология → Smart UV → текстура 2K → PBR (одночастная ветка)",
+      "url": "https://studio.tripo3d.ai/ru/workspace/generate/22cb43f2-feec-4288-91cd-22250c99e110",
+      "parent": "d9ff4260-15c5-4c8c-b16c-4ab26bf43c5f",
+      "clone_debit": 0
+    }
+  },
+  "generation": {
+    "mode": "multi-view",
+    "ui": "HD модель, режим «несколько видов» (кнопка-куб: слоты Спереди/Слева/Справа/Обратная сторона; одна модель, не Batch «до 30»)",
+    "model_ui_label": "H3.1 - Макс.кач. Ожидание дольше",
+    "views": {
+      "front": {
+        "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-front.png",
+        "sha256": "cdd344e012d02abbecf232a7c1c0e332a29501794455e1f4320830083705e109"
+      },
+      "left": null,
+      "right": {
+        "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-right.png",
+        "sha256": "839bffe4ac47d805778cd3cf5241976bb18fb854249ef12f0ed5166d2220d678"
+      },
+      "back": {
+        "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-back.png",
+        "sha256": "e859071fe3fbc9180c2c0b7af4eba855f91354e14f9e264fe8ef6869a4942d63"
+      }
+    },
+    "slot_mapping_source": "docs/art-pipeline/imagegen-inputs/manifest.json REF-MERLIN.recommendedTripoSlots (front/right/back v3, left пустой; у Merlin профиль — right, посох в правой руке у камеры)",
+    "settings": {
+      "privacy": "Приватный",
+      "output": "Геометрия и текстура",
+      "generate_parts": false,
+      "texture_8k": false,
+      "ultra_mesh_quality": true,
+      "ai_completion": false,
+      "texture": true,
+      "texture_quality": "4K",
+      "remove_lighting": true,
+      "pbr": true,
+      "topology": "Triangle",
+      "polygon_count": 2000000
+    },
+    "studio_settings_note": "Настройки генерации аккаунта не менялись (так и стояли). Временно менялись и затем возвращены: генератор текстур 2K + «Удалить освещение» вкл. → обратно 8K-проба + «Удалить освещение» выкл. (проверено по data-state/aria-checked); цель ретопологии 6 500 → обратно 10 000 (Studio запоминает её между заданиями). Пустая страница генерации после работы: режим одного изображения, H3.1, Приватный — как до работы."
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "task": "d9ff4260",
+      "ui": "Из нескольких видов в модель",
+      "history_time": "2026-09-28 15:06:56",
+      "quoted": 55,
+      "observed_debit": 55,
+      "balance_before": 24755,
+      "balance_after": 24700,
+      "result": {
+        "faces_ui": 1972293,
+        "vertices_ui": 1027528,
+        "topology_ui": "Triangle"
+      },
+      "review": {
+        "method": "Blender 5.2.2 headless, ортокамера: front/right/back/left/3/4 (preview/h31_*.png) + крупные планы головы, кистей, кристалла, подставки и низа посоха (work/crops, не в git)",
+        "findings": [
+          "Четыре стороны согласованы с референсом v3: один посох в правой руке (слева в кадре на front, у камеры на right, за фигурой на left — виден только кристалл над капюшоном), капюшон, борода с перехватом, мантия с кельтской каймой спереди, пояс; сзади сплошная ткань",
+          "Правая кисть обхватывает посох, пальцы читаются спереди; левая кисть у пояса, пальцы разделены",
+          "Лицо, брови, борода без явных дефектов; кристалл огранён, навершие читается",
+          "Низ посоха доходит до подставки у правого башмака; подставка круглая, гладкая"
+        ],
+        "decision": "явного брака нет → перегенерация не делалась (бесплатный повтор не использован)"
+      }
+    },
+    {
+      "op": "segment",
+      "task": "d9ff4260",
+      "mode": "Balanced (6–15 частей)",
+      "history_time": "2026-09-28 15:11:24",
+      "quoted": 40,
+      "trial": false,
+      "observed_debit": 40,
+      "balance_before": 24700,
+      "balance_after": 24660,
+      "result": {
+        "parts": 12,
+        "note": "Сегментация сохранена как новая версия того же задания. Посох отделён от кисти и разбит на 3 части (нижний отрезок tripo_part_11, верхний tripo_part_3, кристалл tripo_part_10); правая кисть — отдельная tripo_part_8; подставка — tripo_part_1; голова+капюшон+борода — одна tripo_part_2; самый низ посоха (z < 0,111 м) попал в часть правого башмака tripo_part_6"
+      }
+    },
+    {
+      "op": "part-save",
+      "task": "d9ff4260",
+      "ui": "Сохранить (части)",
+      "history_time": null,
+      "observed_debit": 0,
+      "note": "в истории Studio записи нет, баланс не изменился (версия 15:14)"
+    },
+    {
+      "op": "retopology",
+      "task": "d9ff4260",
+      "settings": {
+        "topology": "Quad",
+        "smart_mesh": "P1.0 on",
+        "target_polygons": 6500
+      },
+      "history_time": "2026-09-28 15:16:09",
+      "quoted": 40,
+      "observed_debit": 40,
+      "balance_before": 24660,
+      "balance_after": 24620,
+      "target_reason": "Бюджет 04 §3.4 / 17 (предложено): 8–15k tris. У Arthur цель 10 000 quad дала 18,8–21,3k tris (×1,9–2,1); цель 6 500 рассчитана на ≈12–15k tris",
+      "result": {
+        "faces_ui_selected_part": 476,
+        "glb_meshes": 12,
+        "glb_triangles": 14058,
+        "glb_materials": 12,
+        "glb_images": 36,
+        "image_sizes": "по частям 128²–1024²"
+      }
+    },
+    {
+      "op": "smart-uv-attempt",
+      "task": "d9ff4260",
+      "observed_debit": 0,
+      "result": "отказ Studio: «Smart UV пока не поддерживает модели из нескольких частей» (кнопка с ценой 20 нажата, баланс 24 620 не изменился) — то же, что у Arthur"
+    },
+    {
+      "op": "clone",
+      "task": "22cb43f2",
+      "ui": "История → версия 15:06 → «Сохранить как новую модель»",
+      "observed_debit": 0,
+      "reason": "Цепочка Smart UV → текстура 2K → PBR требует одночастной модели; многочастная ветка сохранена без изменений"
+    },
+    {
+      "op": "retopology",
+      "task": "22cb43f2",
+      "settings": {
+        "topology": "Quad",
+        "smart_mesh": "P1.0 on",
+        "target_polygons": 6500
+      },
+      "history_time": "2026-09-28 15:20:32",
+      "quoted": 40,
+      "observed_debit": 40,
+      "balance_before": 24620,
+      "balance_after": 24580,
+      "result": {
+        "faces_ui": 6634,
+        "vertices_ui": 6107,
+        "glb_triangles": 12219,
+        "glb_materials": 1
+      }
+    },
+    {
+      "op": "smart-uv",
+      "task": "22cb43f2",
+      "ui": "Развернуть UV → Сохранить",
+      "quoted": 20,
+      "charged_price_shown": 20,
+      "trial": "нет (проба ×1 израсходована на Arthur)",
+      "observed_debit": 20,
+      "history_time": "2026-09-28 15:23:24",
+      "history_entry": "Развёртка UV −20",
+      "balance_before": 24580,
+      "balance_after": 24560,
+      "result": {
+        "uv_fill_ui": "71.8% (до 42.6%)"
+      },
+      "note": "Smart UV удаляет текстуру; сохранено как новая версия 22cb43f2; «Бесплатный повтор (×3)» не использовался"
+    },
+    {
+      "op": "texture",
+      "task": "22cb43f2",
+      "ui": "Генератор текстур, несколько видов (front/right/back v3 подставлены Studio из исходного задания)",
+      "settings": {
+        "texture_resolution": "2K",
+        "remove_lighting": true
+      },
+      "history_time": "2026-09-28 15:25:25",
+      "quoted": 10,
+      "observed_debit": 10,
+      "balance_before": 24560,
+      "balance_after": 24550,
+      "note": "4K стоил бы 30, 8K — проба ×1 (0); выбрано 2K по заданию (04 §3.4 предлагает 1K — уменьшение в Blender-этапе)"
+    },
+    {
+      "op": "pbr",
+      "task": "22cb43f2",
+      "ui": "Генератор PBR",
+      "history_time": "2026-09-28 15:27:09",
+      "quoted": 5,
+      "observed_debit": 5,
+      "balance_before": 24550,
+      "balance_after": 24545,
+      "note": "BaseColor не изменился (тот же sha256, что в tex2k GLB), добавлена карта RM"
+    }
+  ],
+  "exports": [
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-h31-d9ff4260-source.glb",
+      "stage": "generate",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "sha256": "578cb8fc5d83e373050d10946978025d774bb054c55e7ce2fec6de0160847eb4",
+      "bytes": 63829324,
+      "glb": {
+        "meshes": 1,
+        "triangles": 1972293,
+        "materials": 1,
+        "images": 3,
+        "skins": 0,
+        "image_sizes": "4096²: BC jpg, RM jpg, N png"
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-d9ff4260-segmented-12.glb",
+      "stage": "segment",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "sha256": "a5fe9bcac5284e986d0147c4b09b3aa96bab17ccd366a1690b6f7a340fa2d42b",
+      "bytes": 67359900,
+      "glb": {
+        "meshes": 12,
+        "triangles": 1972293,
+        "materials": 12,
+        "images": 36,
+        "skins": 0
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-d9ff4260-segmented-retopo.glb",
+      "stage": "retopology (многочастная)",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "sha256": "3e111ab32670e2284735ac965399b49d11228700c2c0ba572b16c1933ff5c60b",
+      "bytes": 2312064,
+      "glb": {
+        "meshes": 12,
+        "triangles": 14058,
+        "materials": 12,
+        "images": 36,
+        "skins": 0,
+        "image_sizes": "по частям 128²–1024²"
+      },
+      "parts": [
+        {
+          "name": "tripo_part_0",
+          "tris": 5342,
+          "verts": 6513,
+          "min": [
+            -0.2196,
+            -0.1527,
+            0.0941
+          ],
+          "max": [
+            0.2343,
+            0.2037,
+            0.7331
+          ],
+          "uv_layers": 1,
+          "role": "мантия/корпус"
+        },
+        {
+          "name": "tripo_part_2",
+          "tris": 1420,
+          "verts": 1817,
+          "min": [
+            -0.0959,
+            -0.1014,
+            0.5968
+          ],
+          "max": [
+            0.0967,
+            0.0935,
+            0.8837
+          ],
+          "uv_layers": 1,
+          "role": "голова+капюшон+борода"
+        },
+        {
+          "name": "tripo_part_1",
+          "tris": 1155,
+          "verts": 741,
+          "min": [
+            -0.2406,
+            -0.2406,
+            0.0
+          ],
+          "max": [
+            0.2406,
+            0.2406,
+            0.0763
+          ],
+          "uv_layers": 1,
+          "role": "подставка"
+        },
+        {
+          "name": "tripo_part_4",
+          "tris": 971,
+          "verts": 1073,
+          "min": [
+            -0.1978,
+            -0.0035,
+            0.4044
+          ],
+          "max": [
+            -0.0748,
+            0.1342,
+            0.7142
+          ],
+          "uv_layers": 1,
+          "role": "правый рукав"
+        },
+        {
+          "name": "tripo_part_5",
+          "tris": 872,
+          "verts": 901,
+          "min": [
+            0.0615,
+            -0.1094,
+            0.3725
+          ],
+          "max": [
+            0.1912,
+            0.0519,
+            0.7089
+          ],
+          "uv_layers": 1,
+          "role": "левый рукав"
+        },
+        {
+          "name": "tripo_part_7",
+          "tris": 667,
+          "verts": 868,
+          "min": [
+            0.0699,
+            -0.1604,
+            0.0722
+          ],
+          "max": [
+            0.1733,
+            0.0095,
+            0.1616
+          ],
+          "uv_layers": 1,
+          "role": "левый башмак"
+        },
+        {
+          "name": "tripo_part_3",
+          "tris": 651,
+          "verts": 779,
+          "min": [
+            -0.2033,
+            -0.0301,
+            0.6508
+          ],
+          "max": [
+            -0.126,
+            0.0324,
+            0.9023
+          ],
+          "uv_layers": 1,
+          "role": "посох, верхний отрезок (над кистью)"
+        },
+        {
+          "name": "tripo_part_8",
+          "tris": 643,
+          "verts": 842,
+          "min": [
+            -0.1977,
+            -0.036,
+            0.5831
+          ],
+          "max": [
+            -0.1306,
+            0.0478,
+            0.6613
+          ],
+          "uv_layers": 1,
+          "role": "правая кисть (на посохе)"
+        },
+        {
+          "name": "tripo_part_9",
+          "tris": 623,
+          "verts": 765,
+          "min": [
+            0.0073,
+            -0.1131,
+            0.4882
+          ],
+          "max": [
+            0.1015,
+            -0.0622,
+            0.5632
+          ],
+          "uv_layers": 1,
+          "role": "левая кисть"
+        },
+        {
+          "name": "tripo_part_11",
+          "tris": 594,
+          "verts": 510,
+          "min": [
+            -0.1794,
+            -0.029,
+            0.111
+          ],
+          "max": [
+            -0.1246,
+            0.0134,
+            0.6396
+          ],
+          "uv_layers": 1,
+          "role": "посох, нижний отрезок (под кистью, от z 0,111)"
+        },
+        {
+          "name": "tripo_part_6",
+          "tris": 587,
+          "verts": 828,
+          "min": [
+            -0.1842,
+            -0.0436,
+            0.0725
+          ],
+          "max": [
+            -0.0587,
+            0.105,
+            0.165
+          ],
+          "uv_layers": 1,
+          "role": "правый башмак (вместе с нижним концом посоха)"
+        },
+        {
+          "name": "tripo_part_10",
+          "tris": 533,
+          "verts": 497,
+          "min": [
+            -0.2006,
+            -0.0307,
+            0.8862
+          ],
+          "max": [
+            -0.13,
+            0.0329,
+            0.9794
+          ],
+          "uv_layers": 1,
+          "role": "кристалл с навершием"
+        }
+      ],
+      "parts_note": "Границы — по вершинам в Blender 5.2.2 после импорта GLB (Z вверх, лицо −Y, метры Tripo). Посох = tripo_part_11 + tripo_part_3 + tripo_part_10 (без кисти); низ посоха ниже z 0,111 м — в tripo_part_6 (башмак)"
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-22cb43f2-retopo-6500.glb",
+      "stage": "retopology (одночастный клон)",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "sha256": "84a9b4b979499fab74684b43ecc42db40c8efa1de713f7a75f74a81410784514",
+      "bytes": 8807424,
+      "glb": {
+        "meshes": 1,
+        "triangles": 12219,
+        "materials": 1,
+        "images": 3,
+        "skins": 0,
+        "image_sizes": "BC 4096² jpg, прочие 2048²"
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-22cb43f2-smartuv-tex2k.glb",
+      "stage": "smart-uv + texture 2K",
+      "format": "GLB",
+      "texture_tier": "2k",
+      "sha256": "1b1bd37720c3c37bf8559c9220f2778a1a40fd35c4acbd1239baab4cfd8d3d2d",
+      "bytes": 7269444,
+      "glb": {
+        "meshes": 1,
+        "triangles": 12219,
+        "materials": 1,
+        "images": 2,
+        "skins": 0,
+        "image_sizes": "2048²: BC jpg, N png; metallicFactor 0, roughnessFactor 0.5, baseColorFactor 0.8"
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-22cb43f2-smartuv-tex2k-pbr.glb",
+      "stage": "pbr",
+      "format": "GLB",
+      "texture_tier": "2k",
+      "sha256": "7a8030f1ab9a59762c712a0e09cdfda6c3ff64c0dac4f82a67ba9b7339115ee4",
+      "bytes": 9614188,
+      "glb": {
+        "meshes": 1,
+        "triangles": 12219,
+        "materials": 1,
+        "images": 3,
+        "skins": 0,
+        "image_sizes": "2048²: BC jpg, RM png, N png; baseColorFactor 0.8"
+      }
+    }
+  ],
+  "extracted_textures": [
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/textures/merlin-tripo-22cb43f2-smartuv-tex2k-pbr_basecolor.jpg",
+      "sha256": "45c9250a65c3c02389d259910ddd056f9a3674b2e3c5ed3514a7375f3351590f"
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/textures/merlin-tripo-22cb43f2-smartuv-tex2k-pbr_normal.png",
+      "sha256": "1b993d89db043bd7dffad916956fb4b464015d20b82e434efaa64b7c10090fbb"
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/textures/merlin-tripo-22cb43f2-smartuv-tex2k-pbr_rm.png",
+      "sha256": "590de4a9bfbddacf2f7f881551f3c703dd8762d1d3b71b44527be638f4d2a319"
+    }
+  ],
+  "texture_measurements": {
+    "rm": "glTF: G = roughness, B = metallic, R = 1.0 везде (не AO). Измерено: roughness mean 0.966, metallic mean 0.009, metallic p90 0.024 — металличности почти нет (у Arthur metallic mean 0.151)",
+    "base_color_factor": "0.8 во всех GLB одночастной ветки — множитель BC; в Blender-этапе решить, запекать ли его в BC или сбросить в 1.0"
+  },
+  "measured_bounds_blender_m": {
+    "h31": [
+      0.4821,
+      0.48,
+      0.9802
+    ],
+    "segmented_retopo": [
+      0.4812,
+      0.4812,
+      0.9794
+    ],
+    "retopo_single": [
+      0.4844,
+      0.4844,
+      0.9783
+    ],
+    "pbr": [
+      0.4844,
+      0.4844,
+      0.9783
+    ],
+    "note": "Blender 5.2.2, импорт GLB, X×Y×Z (Z вверх), метры Tripo (нормировка ~1 м), не игровые uu; низ на Z=0"
+  },
+  "base_diameter_decision": {
+    "chosen_uu": 24,
+    "status": "предложено",
+    "rationale": "04 §3.4 (Ø24) и §3.8 (Base_Sidekick Ø22×5) внесены одним коммитом c8957e4 (2026-09-18) — более свежего значения внутри 04 нет. Самый свежий документ спецификации — 17-art-production-spec.md (коммит 2026-09-27 22:06, позже 18-animation-production-brief 17:53): его строки «Текущее рабочее значение» и карточка Merlin держат Ø24, а Ø22 помечают как конфликт AD-CNF-18. Нормализация входов v3 (manifest 2026-09-28) тоже сделана по Ø24. Поэтому для масштаба кандидата взят Ø24; AD-CNF-18 остаётся открытым у владельца.",
+    "measured_consequence": "Подставка кандидата Ø 0,4812 м, высота 0,0763 м; верх кристалла 0,9794 м, верх капюшона 0,8837 м. При Ø24 uu (49,88 uu/м): всего 48,9 uu, подставка 3,8 uu высотой, фигурка до капюшона 40,3 uu (в предложенном 40–48), кристалл выше капюшона на 4,8 uu. При Ø22 uu (45,72 uu/м): фигурка до капюшона 36,9 uu — ниже предложенного диапазона."
+  },
+  "previews": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/preview/{h31,segretopo,pbr}_*.png (ортокамера Blender 5.2.2 EEVEE, два солнца; свет превью не игровой)",
+  "visual_findings": [
+    "Многочастная ветка (текстура H3.1, перенесённая Tripo на ретопологию, по частям 128²–1024²): лицо, борода, кайма читаются (preview/segretopo_*); мелкий орнамент каймы размыт сильнее, чем в исходнике",
+    "Одночастная ветка после ретекстура 2K: силуэт, палитра, лицо и борода сохранены (preview/pbr_*); кожа не металлическая (metallic mean 0.009); кайма проще, на левой кисти тёмное пятно (шов текстуры); подставка гладко-серая",
+    "В обеих ветках посох прямой, без сплющивания; в многочастной ветке кисть и посох — разные части"
+  ],
+  "credits": {
+    "unit": "studio-credits",
+    "this_task_total_observed": 210,
+    "hero_ceiling": "≈400 (задание)",
+    "balance_ui_start": 24755,
+    "balance_ui_end": 24545,
+    "history_snapshot_2026-09-28_15:29": [
+      [
+        "2026-09-28 15:27:09",
+        "Генерация PBR",
+        -5
+      ],
+      [
+        "2026-09-28 15:25:25",
+        "Генерация текстур",
+        -10
+      ],
+      [
+        "2026-09-28 15:23:24",
+        "Развёртка UV",
+        -20
+      ],
+      [
+        "2026-09-28 15:20:32",
+        "Ретопология",
+        -40
+      ],
+      [
+        "2026-09-28 15:16:09",
+        "Ретопология",
+        -40
+      ],
+      [
+        "2026-09-28 15:11:24",
+        "ИИ сегментация",
+        -40
+      ],
+      [
+        "2026-09-28 15:06:56",
+        "Из нескольких видов в модель",
+        -55
+      ],
+      [
+        "2026-09-28 14:55:51",
+        "Генерация PBR",
+        -5
+      ]
+    ],
+    "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json (записи дописывались сразу после каждой траты под lock-файлом; время истории Studio проставлено по снимку 15:29)",
+    "extra_spend_reason": "Вторая ретопология (40) — не перегенерация: Smart UV отказывает многочастным моделям (проверено повторно, 0), поэтому для Smart UV → текстура 2K → PBR сделан одночастный клон. Smart UV стоил 20 (проба ×1 уже израсходована на Arthur)."
+  },
+  "animation_presets": "не открывались и не запускались",
+  "rig": "Tripo-авториг не запускался (по заданию — Blender-риг UM_HUMANOID_17_v1)",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false,
+    "status": "измерено"
+  }
+}

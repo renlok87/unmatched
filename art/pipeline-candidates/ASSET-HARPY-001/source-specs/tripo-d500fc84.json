@@ -1,0 +1,149 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-d500fc84",
+  "asset_id": "ASSET-HARPY-001",
+  "service": "tripo-studio",
+  "task_id": "d500fc84-26d7-4cb5-8537-1e53788a5dd6",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/d500fc84-26d7-4cb5-8537-1e53788a5dd6",
+  "date": "2026-09-28",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач. Ожидание дольше",
+    "backend": null
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-front.png",
+        "sha256": "0a27b796aebe2b859baac4c249913bf804d8de1f9bc02688f971ba9183250e4c"
+      },
+      "left": {
+        "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-left.png",
+        "sha256": "cc347722811849932bef3e0371852e50d7e0adfa159d5f175d6db48f719bdc6f"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-back.png",
+        "sha256": "bcb59c7c3ce126c931372d72bda4c657635fba01ea7059f56eabab7a2d67c789"
+      }
+    },
+    "input_manifest": "docs/art-pipeline/imagegen-inputs/manifest.json",
+    "settings": {
+      "output": "geometry and texture",
+      "texture_quality": "4K",
+      "texture_8k": false,
+      "generate_parts": false,
+      "ultra_mesh_quality": true,
+      "ai_completion": false,
+      "privacy": "private",
+      "topology": "triangle",
+      "polygon_count": 2000000,
+      "remove_lighting": true,
+      "pbr": true,
+      "seed": null
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "multi-view HD model",
+      "history_time": "2026-09-28 15:39:16",
+      "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 55,
+        "observed_debit": 55,
+        "balance_before": 24545,
+        "balance_after": 24490
+      }
+    },
+    {
+      "op": "segment",
+      "settings": {
+        "level": "Balanced (6-15 parts)"
+      },
+      "note": "9 parts (wings, head, torso, 2 legs, 2 feet, base); saved as a new version of the same task; part save (15:45 version) had no debit",
+      "history_time": "2026-09-28 15:42:58",
+      "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 40,
+        "observed_debit": 40,
+        "balance_before": 24490,
+        "balance_after": 24450
+      }
+    },
+    {
+      "op": "retopology",
+      "settings": {
+        "topology": "Quad",
+        "smart_mesh": "P1.0 on",
+        "target_polygons": 6800
+      },
+      "note": "applied to the segmented state; result stays multi-part; parts tripo_part_2 (head) and tripo_part_6 (left leg) have inverted winding",
+      "history_time": "2026-09-28 15:47:19",
+      "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 40,
+        "observed_debit": 40,
+        "balance_before": 24450,
+        "balance_after": 24410
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "source-glb",
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-h31-d500fc84-source.glb",
+      "expected_sha256": "326ecb9a06c69a004f844d3cc4fbc5211124a686f0c62850cfdd85c67d04b1c0",
+      "expected_bytes": 61970000,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, 4k texture tier, unmodified"
+    },
+    {
+      "role": "segmented-9-glb",
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-d500fc84-segmented-9.glb",
+      "expected_sha256": "974ea77584590ef57a3e1a49f1e826bf0738d4718259107f140803e7619c599c",
+      "expected_bytes": 65361688,
+      "produced_by": "segment",
+      "origin": "Studio GLB export after Balanced segmentation + part save, 4k tier, compact UV off, unmodified"
+    },
+    {
+      "role": "segmented-retopo-glb",
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-d500fc84-segmented-retopo.glb",
+      "expected_sha256": "dd5403dfff75256dbe5ec74f89b321bec458483b66b835b3f9ac5065b7d2d8cf",
+      "expected_bytes": 3033040,
+      "produced_by": "retopology",
+      "origin": "Studio GLB export after Quad retopology of the segmented state, 4k tier, compact UV off, unmodified"
+    }
+  ],
+  "expectations": {
+    "source-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 1918262,
+      "glb_materials": 1,
+      "glb_images": 3,
+      "glb_skins": 0
+    },
+    "segmented-9-glb": {
+      "glb_mesh_count": 9,
+      "glb_triangles": 1918262,
+      "glb_materials": 9,
+      "glb_images": 27,
+      "glb_skins": 0
+    },
+    "segmented-retopo-glb": {
+      "glb_mesh_count": 9,
+      "glb_triangles": 13893,
+      "glb_materials": 9,
+      "glb_images": 27,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json"
+  ]
+}

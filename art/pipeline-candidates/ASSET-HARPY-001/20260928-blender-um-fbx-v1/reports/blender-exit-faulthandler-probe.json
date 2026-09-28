@@ -1,0 +1,194 @@
+{
+  "blender": "Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)",
+  "conclusion": "With an empty script, Blender reports first-chance access violations on its main thread during its own exit (after the script, before Python finalisation) only when faulthandler is on, and exits 0: Windows faulthandler logs exceptions from a vectored handler, i.e. before the process's own exception handlers deal with them (the process goes on to atexit and exits 0). They do not come from the Harpy build; the build keeps faulthandler off unless --faulthandler is given.",
+  "probe_script": [
+    "import atexit, os, sys, threading",
+    "if sys.argv[-1] == \"fh\":",
+    "    import faulthandler",
+    "    faulthandler.enable()",
+    "os.write(2, (\"PROBE_SCRIPT_END main_thread=0x%08x\\n\" % threading.get_ident()).encode())",
+    "atexit.register(lambda: os.write(2, b\"PROBE_PY_ATEXIT\\n\"))"
+  ],
+  "runs": {
+    "faulthandler_off": [
+      {
+        "access_violation_reports": 0,
+        "all_after_script_end_before_py_atexit": false,
+        "all_on_main_thread": false,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x0000bae0",
+        "reported_threads": []
+      },
+      {
+        "access_violation_reports": 0,
+        "all_after_script_end_before_py_atexit": false,
+        "all_on_main_thread": false,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x00007f68",
+        "reported_threads": []
+      },
+      {
+        "access_violation_reports": 0,
+        "all_after_script_end_before_py_atexit": false,
+        "all_on_main_thread": false,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x0000b4d8",
+        "reported_threads": []
+      },
+      {
+        "access_violation_reports": 0,
+        "all_after_script_end_before_py_atexit": false,
+        "all_on_main_thread": false,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x000075d4",
+        "reported_threads": []
+      },
+      {
+        "access_violation_reports": 0,
+        "all_after_script_end_before_py_atexit": false,
+        "all_on_main_thread": false,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x0000bcfc",
+        "reported_threads": []
+      },
+      {
+        "access_violation_reports": 0,
+        "all_after_script_end_before_py_atexit": false,
+        "all_on_main_thread": false,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x0000be40",
+        "reported_threads": []
+      },
+      {
+        "access_violation_reports": 0,
+        "all_after_script_end_before_py_atexit": false,
+        "all_on_main_thread": false,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x00007100",
+        "reported_threads": []
+      },
+      {
+        "access_violation_reports": 0,
+        "all_after_script_end_before_py_atexit": false,
+        "all_on_main_thread": false,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x00008ddc",
+        "reported_threads": []
+      }
+    ],
+    "faulthandler_on": [
+      {
+        "access_violation_reports": 27,
+        "all_after_script_end_before_py_atexit": true,
+        "all_on_main_thread": true,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x00004ecc",
+        "reported_threads": [
+          "0x00004ecc"
+        ]
+      },
+      {
+        "access_violation_reports": 14,
+        "all_after_script_end_before_py_atexit": true,
+        "all_on_main_thread": true,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x00004bb8",
+        "reported_threads": [
+          "0x00004bb8"
+        ]
+      },
+      {
+        "access_violation_reports": 0,
+        "all_after_script_end_before_py_atexit": false,
+        "all_on_main_thread": false,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x00006bbc",
+        "reported_threads": []
+      },
+      {
+        "access_violation_reports": 8,
+        "all_after_script_end_before_py_atexit": true,
+        "all_on_main_thread": true,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x0000a78c",
+        "reported_threads": [
+          "0x0000a78c"
+        ]
+      },
+      {
+        "access_violation_reports": 3,
+        "all_after_script_end_before_py_atexit": true,
+        "all_on_main_thread": true,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x0000ba78",
+        "reported_threads": [
+          "0x0000ba78"
+        ]
+      },
+      {
+        "access_violation_reports": 1,
+        "all_after_script_end_before_py_atexit": true,
+        "all_on_main_thread": true,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x00007a1c",
+        "reported_threads": [
+          "0x00007a1c"
+        ]
+      },
+      {
+        "access_violation_reports": 0,
+        "all_after_script_end_before_py_atexit": false,
+        "all_on_main_thread": false,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x0000a9fc",
+        "reported_threads": []
+      },
+      {
+        "access_violation_reports": 0,
+        "all_after_script_end_before_py_atexit": false,
+        "all_on_main_thread": false,
+        "blender_quit_line": true,
+        "exit_code": 0,
+        "main_thread": "0x0000390c",
+        "reported_threads": []
+      }
+    ]
+  },
+  "summary": {
+    "faulthandler_off": {
+      "exit_codes": [
+        0
+      ],
+      "runs": 8,
+      "runs_with_reports": 0
+    },
+    "faulthandler_on": {
+      "exit_codes": [
+        0
+      ],
+      "reports_all_between_script_end_and_py_atexit": true,
+      "reports_all_on_main_thread": true,
+      "reports_min_max": [
+        0,
+        27
+      ],
+      "runs": 8,
+      "runs_with_reports": 5
+    }
+  }
+}

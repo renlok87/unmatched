@@ -1,0 +1,1507 @@
+{
+  "schema": "unmatched.art-pipeline.candidate-report/1",
+  "asset_id": "ASSET-KING-ARTHUR-001",
+  "date": "2026-09-28",
+  "stage": "tripo",
+  "status": "измерено",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false,
+    "technically_imported": false
+  },
+  "run_dir": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31",
+  "pipeline_run": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/pipeline",
+  "tool": "tools/tripo-pipeline/tripo_pipeline.py 0.4.0",
+  "pipeline_stages": {
+    "init": "done",
+    "register-source": [
+      "tripo-75e27ee8",
+      "tripo-5cb29330"
+    ],
+    "register_repeat": "no-op",
+    "preflight": "completed (all checks passed)",
+    "import/verify/export": "not run (Blender stage)"
+  },
+  "source_specs": [
+    "art/pipeline-candidates/ASSET-KING-ARTHUR-001/source-specs/tripo-75e27ee8.json",
+    "art/pipeline-candidates/ASSET-KING-ARTHUR-001/source-specs/tripo-5cb29330.json"
+  ],
+  "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/reports/tripo-run.json",
+  "tripo_tasks": {
+    "75e27ee8-c3c8-4e82-a211-12774ecb9166": {
+      "role": "H3.1 multi-view исходник → сегментация Balanced → Quad-ретопология (многочастная ветка)",
+      "url": "https://studio.tripo3d.ai/ru/workspace/generate/75e27ee8-c3c8-4e82-a211-12774ecb9166",
+      "studio_versions": [
+        "14:32 генерация",
+        "14:40 сегментация",
+        "14:42 сохранение частей",
+        "14:45 ретопология (текущая)"
+      ]
+    },
+    "5cb29330-e6d9-4041-af5b-d5de8b6d8b15": {
+      "role": "клон «Сохранить как новую модель» версии 14:32 (Triangle-исходник) → Quad-ретопология → Smart UV → текстура 2K → PBR (одночастная ветка)",
+      "url": "https://studio.tripo3d.ai/ru/workspace/generate/5cb29330-e6d9-4041-af5b-d5de8b6d8b15",
+      "parent": "75e27ee8-c3c8-4e82-a211-12774ecb9166",
+      "clone_debit": 0
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "task": "75e27ee8",
+      "history_time": "2026-09-28 14:32:01",
+      "quoted": 55,
+      "observed_debit": 55,
+      "balance_before": 24945,
+      "balance_after": 24890
+    },
+    {
+      "op": "segment",
+      "task": "75e27ee8",
+      "history_time": "2026-09-28 14:40:27",
+      "quoted": 40,
+      "observed_debit": 40,
+      "balance_before": 24890,
+      "balance_after": 24850
+    },
+    {
+      "op": "part-save",
+      "task": "75e27ee8",
+      "history_time": null,
+      "observed_debit": 0
+    },
+    {
+      "op": "retopology",
+      "task": "75e27ee8",
+      "history_time": "2026-09-28 14:45:21",
+      "quoted": 40,
+      "observed_debit": 40,
+      "balance_before": 24850,
+      "balance_after": 24810
+    },
+    {
+      "op": "smart-uv-attempt",
+      "task": "75e27ee8",
+      "observed_debit": 0
+    },
+    {
+      "op": "clone",
+      "task": "5cb29330",
+      "observed_debit": 0
+    },
+    {
+      "op": "retopology",
+      "task": "5cb29330",
+      "history_time": "2026-09-28 14:50:07",
+      "quoted": 40,
+      "observed_debit": 40,
+      "balance_before": 24810,
+      "balance_after": 24770
+    },
+    {
+      "op": "smart-uv",
+      "task": "5cb29330",
+      "quoted": 20,
+      "observed_debit": 0,
+      "balance_before": 24770,
+      "balance_after": 24770
+    },
+    {
+      "op": "texture",
+      "task": "5cb29330",
+      "history_time": "2026-09-28 14:54:11",
+      "quoted": 10,
+      "observed_debit": 10,
+      "balance_before": 24770,
+      "balance_after": 24760
+    },
+    {
+      "op": "pbr",
+      "task": "5cb29330",
+      "history_time": "2026-09-28 14:55:51",
+      "quoted": 5,
+      "observed_debit": 5,
+      "balance_before": 24760,
+      "balance_after": 24755
+    }
+  ],
+  "credits": {
+    "studio_spent": 190,
+    "balance_start": 24945,
+    "balance_end": 24755,
+    "hero_ceiling": 400,
+    "syntx_spent": 0,
+    "purchases": 0,
+    "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json"
+  },
+  "outputs": [
+    {
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/king-arthur-tripo-h31-75e27ee8-source.glb",
+      "stage": "generate",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "sha256": "509f79750e9b0b3936b5490e33116ae3098db2b2349abcd05b2c6725fd3cee82",
+      "bytes": 64628448,
+      "glb": {
+        "meshes": 1,
+        "triangles": 1989731,
+        "materials": 1,
+        "images": 3,
+        "image_sizes": "4096²: BC jpg, RM jpg, N png",
+        "skins": 0
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/king-arthur-tripo-75e27ee8-segmented-15.glb",
+      "stage": "segment",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "compact_uv": false,
+      "sha256": "6e615a7a976af55dabdddeb0e12756109bc3f07469a35e60124bdc3a869f5a28",
+      "bytes": 64607904,
+      "glb": {
+        "meshes": 15,
+        "triangles": 1989731,
+        "materials": 15,
+        "images": 45,
+        "skins": 0
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/king-arthur-tripo-75e27ee8-segmented-retopo.glb",
+      "stage": "retopology (многочастная)",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "sha256": "28c622ad3bc3ca1bbfd6bc31846afcaedcd1145ce7da3731f9083242008c3380",
+      "bytes": 3354552,
+      "glb": {
+        "meshes": 15,
+        "triangles": 21341,
+        "materials": 15,
+        "images": 45,
+        "skins": 0
+      },
+      "parts": [
+        {
+          "name": "tripo_part_0",
+          "triangles": 6272,
+          "accessor_min": [
+            -0.249,
+            0.0,
+            -0.207
+          ],
+          "accessor_max": [
+            0.254,
+            0.758,
+            0.038
+          ]
+        },
+        {
+          "name": "tripo_part_2",
+          "triangles": 1879,
+          "accessor_min": [
+            -0.147,
+            0.0,
+            -0.084
+          ],
+          "accessor_max": [
+            0.132,
+            0.527,
+            0.121
+          ]
+        },
+        {
+          "name": "tripo_part_4",
+          "triangles": 1747,
+          "accessor_min": [
+            -0.195,
+            0.0,
+            -0.047
+          ],
+          "accessor_max": [
+            -0.042,
+            0.357,
+            0.129
+          ]
+        },
+        {
+          "name": "tripo_part_1",
+          "triangles": 1596,
+          "accessor_min": [
+            -0.254,
+            0.0,
+            -0.248
+          ],
+          "accessor_max": [
+            0.243,
+            0.04,
+            0.248
+          ]
+        },
+        {
+          "name": "tripo_part_3",
+          "triangles": 1569,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.062
+          ],
+          "accessor_max": [
+            0.188,
+            0.356,
+            0.097
+          ]
+        },
+        {
+          "name": "tripo_part_5",
+          "triangles": 1543,
+          "accessor_min": [
+            -0.075,
+            0.0,
+            -0.074
+          ],
+          "accessor_max": [
+            0.059,
+            0.88,
+            0.068
+          ]
+        },
+        {
+          "name": "tripo_part_6",
+          "triangles": 1494,
+          "accessor_min": [
+            -0.105,
+            0.0,
+            -0.098
+          ],
+          "accessor_max": [
+            0.088,
+            0.752,
+            0.1
+          ]
+        },
+        {
+          "name": "tripo_part_7",
+          "triangles": 1110,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.068
+          ],
+          "accessor_max": [
+            0.206,
+            0.58,
+            0.065
+          ]
+        },
+        {
+          "name": "tripo_part_12",
+          "triangles": 1010,
+          "accessor_min": [
+            -0.206,
+            0.0,
+            0.0
+          ],
+          "accessor_max": [
+            -0.091,
+            0.979,
+            0.169
+          ]
+        },
+        {
+          "name": "tripo_part_8",
+          "triangles": 952,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.087
+          ],
+          "accessor_max": [
+            0.181,
+            0.759,
+            0.055
+          ]
+        },
+        {
+          "name": "tripo_part_9",
+          "triangles": 630,
+          "accessor_min": [
+            -0.206,
+            0.0,
+            -0.062
+          ],
+          "accessor_max": [
+            -0.088,
+            0.727,
+            0.05
+          ]
+        },
+        {
+          "name": "tripo_part_10",
+          "triangles": 620,
+          "accessor_min": [
+            -0.23,
+            0.0,
+            -0.03
+          ],
+          "accessor_max": [
+            -0.135,
+            0.627,
+            0.152
+          ]
+        },
+        {
+          "name": "tripo_part_13",
+          "triangles": 519,
+          "accessor_min": [
+            -0.048,
+            0.0,
+            -0.109
+          ],
+          "accessor_max": [
+            0.043,
+            0.56,
+            -0.095
+          ]
+        },
+        {
+          "name": "tripo_part_11",
+          "triangles": 396,
+          "accessor_min": [
+            -0.083,
+            0.0,
+            -0.119
+          ],
+          "accessor_max": [
+            0.07,
+            0.749,
+            -0.027
+          ]
+        },
+        {
+          "name": "tripo_part_14",
+          "triangles": 4,
+          "accessor_min": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "accessor_max": [
+            0.028,
+            0.716,
+            0.013
+          ]
+        }
+      ],
+      "parts_note": "accessor_min/max — значения из JSON GLB в осях glTF (Y вверх, +Z вперёд); нулевые минимумы у ряда частей похожи на неточные min accessor-а, по вершинам не измерялись. По габаритам: tripo_part_12 — меч с кистью (1010 tris, верх 0,979 м), tripo_part_1 — подставка (1596 tris, высота ≤0,040 м), tripo_part_14 — вырожденная часть (4 tris)"
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/king-arthur-tripo-5cb29330-retopo-10k.glb",
+      "stage": "retopology (одночастный клон)",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "sha256": "768a47d23d4a3ac86c31cb8b43a85ce078e91b9c014c8af22f3b8793ad12483d",
+      "bytes": 11666340,
+      "glb": {
+        "meshes": 1,
+        "triangles": 18755,
+        "materials": 1,
+        "images": 3,
+        "skins": 0
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/king-arthur-tripo-5cb29330-smartuv-tex2k.glb",
+      "stage": "smart-uv + texture 2K",
+      "format": "GLB",
+      "texture_tier": "2k",
+      "sha256": "7f8d7aa4bd7992bdb68a3bf3263342e46788791076f4a2efd44d53f3b8b78036",
+      "bytes": 8193096,
+      "glb": {
+        "meshes": 1,
+        "triangles": 18755,
+        "materials": 1,
+        "images": 2,
+        "image_sizes": "2048²: BC jpg, N png; metallicFactor 0, roughnessFactor 0.5",
+        "skins": 0
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/king-arthur-tripo-5cb29330-smartuv-tex2k-pbr.glb",
+      "stage": "pbr",
+      "format": "GLB",
+      "texture_tier": "2k",
+      "sha256": "997ae7dae527c23e444b17cf70fb1bbd19e854f9beaa67e705439fa2720bca51",
+      "bytes": 14010060,
+      "glb": {
+        "meshes": 1,
+        "triangles": 18755,
+        "materials": 1,
+        "images": 3,
+        "image_sizes": "2048²: BC jpg, RM png, N png",
+        "skins": 0
+      }
+    }
+  ],
+  "candidates": {
+    "primary_proposed": {
+      "source": "tripo-75e27ee8",
+      "role": "segmented-retopo-glb",
+      "triangles": 21341,
+      "meshes": 15,
+      "materials": 15,
+      "why": "исходная текстура H3.1 лучше по лицу/бороде; путь Medusa (атлас 2K + риг в Blender)"
+    },
+    "alternative": {
+      "source": "tripo-5cb29330",
+      "role": "smartuv-tex2k-pbr-glb",
+      "triangles": 18755,
+      "meshes": 1,
+      "materials": 1,
+      "uv_fill_ui": "75.7%",
+      "risk": "лицо слабее, кожа выглядит металлической в превью (причина не установлена)"
+    }
+  },
+  "visual_findings": [
+    "Многочастная ветка (исходная текстура H3.1, перенесённая Tripo на ретопологию): лицо, борода и корона читаются лучше (preview/segretopo_*)",
+    "Одночастная ветка после ретекстура 2K: силуэт и палитра сохранены, но лицо и борода заметно слабее, кожа в превью выглядит глянцево-металлической; подставка стала гладко-серой без плит (preview/pbr_*). Причина металлического вида не установлена (подозрение на карту RM) — проверить в Blender-этапе",
+    "В обеих ветках меч и кисть — одна геометрия; сокету Weapon это не мешает (точка на кости кисти), для отделения меча нужна граница по гарде"
+  ],
+  "proposed_budget_refs": {
+    "hero_tris": "15–25k (04 §1, 17 §4.5; предложено)",
+    "materials": "≤2 (04 §3.3; предложено)",
+    "textures": "2K (предложено)",
+    "height_uu": "52–56, подставка Ø30 (04 §3.3; предложено)"
+  },
+  "not_done": [
+    "Blender-риг, атлас, сокеты Weapon/Head, подставка Ø30×6, экспорт UM_FBX_v1",
+    "UE-импорт (отложен)",
+    "художественная приёмка"
+  ],
+  "blender_stage": {
+    "stage": "blender",
+    "date": "2026-09-28",
+    "status": "измерено",
+    "claims": {
+      "art_accepted": false,
+      "game_ready": false,
+      "budgets_declared": false,
+      "technically_imported": false,
+      "note": "technically exported (FBX + round trip in Blender); not imported into UE"
+    },
+    "run_dir": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1",
+    "build_profile": {
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-segmented-skeletal-um-fbx-v1.json",
+      "id": "king-arthur-segmented-skeletal/1",
+      "status": "proposed",
+      "sha256": "d7371ffda365eb1321d55442336bc8c42c434248a80d94a9949d101e7d7d68ac"
+    },
+    "source": {
+      "source_id": "tripo-75e27ee8",
+      "role": "segmented-retopo-glb",
+      "file": "king-arthur-tripo-75e27ee8-segmented-retopo.glb",
+      "sha256": "28c622ad3bc3ca1bbfd6bc31846afcaedcd1145ce7da3731f9083242008c3380"
+    },
+    "tool": "tools/tripo-pipeline/tripo_pipeline.py 0.4.0 (unchanged)",
+    "pipeline_stages": {
+      "init/register-source": "done (2 specs; repeat is a no-op)",
+      "preflight": "completed",
+      "import": "completed",
+      "verify": "completed (12 checks pass)",
+      "atlas": "completed",
+      "build": "executed outside the CLI by the Arthur builder (manifest: pending); 44/44 checks pass (closure rebuild after verify 2026-09-28; the first build had 40 checks)",
+      "ue-import": "not run (UE stage deferred)"
+    },
+    "why_own_builder": [
+      "build_candidate.py check axes_bow_on_plus_x requires the weapon on +X; Arthur holds the sword in the right hand (-X)",
+      "build_candidate.py takes the weapon as a whole GLB part; Tripo fused Arthur's sword with the right gauntlet (tripo_part_12)",
+      "build_candidate.py defaults the face part to tripo_part_10 and checks the neck on tripo_part_14 (Arthur: right forearm and a degenerate 4-triangle patch)"
+    ],
+    "scripts": {
+      "build_arthur_candidate.py": {
+        "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/build_arthur_candidate.py",
+        "sha256": "704b23604ce5aaeb6d0781958b39fc00120e73ddf0335d9251b1107f0fb99408"
+      },
+      "run_arthur_build.py": {
+        "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/run_arthur_build.py",
+        "sha256": "eece40bb8dcbf4a5d1fc5970c0d4574def1f91d23fc2f81c2d0d459ff840eb9f"
+      },
+      "review_arthur_candidate.py": {
+        "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/review_arthur_candidate.py",
+        "sha256": "9331d4f437af371cef406345ea89c368d3a210be117ac24c34997c66a7575639"
+      },
+      "pose_review_arthur.py": {
+        "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/pose_review_arthur.py",
+        "sha256": "ef7d424ba1093fdf964674e03fb7714afaf9abb2e0eb9c7f61007bd498582dab"
+      },
+      "fbx_to_authored_blend.py": {
+        "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/fbx_to_authored_blend.py",
+        "sha256": "6bad96dbebc32e78957a8768faa183196a5b0a36213e92d2808e0cf5b51ac7b5"
+      },
+      "team_mask_arthur.py": {
+        "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/team_mask_arthur.py",
+        "sha256": "ad4e295e4c22357609fa2ba3113ee0a93bd8f42b05b488047501b04cdd22e0fc"
+      },
+      "base_closure_review_arthur.py": {
+        "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/base_closure_review_arthur.py",
+        "sha256": "2f0962d859fd5c8cd62a41b02b27554ec23f490666c2b42d2109c9c5efb013ea"
+      },
+      "store_preview_frames.py": {
+        "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/store_preview_frames.py",
+        "sha256": "940b3abcd8067323d8d799b93b553466c933da75efd93dd27a4ed477189114c1"
+      }
+    },
+    "outputs": {
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/export/SK_KingArthur_Candidate.fbx": {
+        "sha256": "49ef62582ca77efe9787fb9501ee675f3f8646ad38df702ee220c83bf2dab6b0",
+        "bytes": 968972
+      },
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/export/SM_KingArthur_Base_Candidate.fbx": {
+        "sha256": "40cd709b4fa6416a2934086324bc7b96a1746d137595d5941e745d338fbc9c52",
+        "bytes": 68988
+      },
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/textures/T_KingArthur_Candidate_Atlas_BC.png": {
+        "sha256": "4693c9cb566fc679a904e745890d85457857cab24160e8f1f8d4143bf4cbe6c0",
+        "bytes": 2932996
+      },
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/textures/T_KingArthur_Candidate_Atlas_N.png": {
+        "sha256": "f5fbc143101b13c0ff22fcb0e957d4cb248b7c8d0946635fe76ad7e119247fbd",
+        "bytes": 4166576
+      },
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/textures/T_KingArthur_Candidate_Atlas_N_OpenGL.png": {
+        "sha256": "d5e3faec08c79a9910bfa39f2b41161b18f57b5682347d3c202b6da8d7b2542e",
+        "bytes": 4158176
+      },
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/textures/T_KingArthur_Candidate_Atlas_ORM.png": {
+        "sha256": "9e292fc5c59566db949e3a66c91dbcfdb1f0b3556cbfe84e0d3844ae35d3d38a",
+        "bytes": 2905601
+      },
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/textures/T_KingArthur_Candidate_Atlas_TeamMask.png": {
+        "sha256": "1e7b98f863324d7e24191fd8102ff6a26f66971d0ef1aa32f22acc4a4cbdab3c",
+        "bytes": 87951
+      },
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/reports/build-report.json": {
+        "sha256": "588f278deffc86ee707ddf98059c2f606316e519499e2b72696fc6a015141154",
+        "bytes": 88692
+      },
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/reports/inspect-rig-SK_KingArthur_Candidate.json": {
+        "sha256": "fb72be8db51ed0371336115375a7051d1e98c5d15b840eb979852415570832bd",
+        "bytes": 7471
+      },
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/preview/base-closure/base-closure-review.json": {
+        "sha256": "934cfc0d4f6325fb867bf03eec2eac6218a38bd678ef7283d10d3721bd4f2a15",
+        "bytes": 6848
+      },
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/preview/frames-storage.json": {
+        "sha256": "d7e404900493cfd4ee5720271f7c30782ffafb1f3691a8bc05b650b89f1130d4",
+        "bytes": 17553
+      }
+    },
+    "determinism": "SK and base FBX byte-identical across repeated builds (49ef6258... / 40cd709b..., closure rebuild; first build 13240a50... / b23510ef... superseded)",
+    "meshes": {
+      "SK_KingArthur_Body": {
+        "triangles": 19201,
+        "vertices": 10056,
+        "material_slots": [
+          "M_KingArthur_Atlas"
+        ],
+        "near_degenerate_triangles": 1
+      },
+      "SK_KingArthur_Sword": {
+        "triangles": 609,
+        "vertices": 332,
+        "material_slots": [
+          "M_KingArthur_Atlas"
+        ],
+        "near_degenerate_triangles": 0
+      },
+      "SM_KingArthur_Base": {
+        "triangles": 1528,
+        "vertices": 766,
+        "material_slots": [
+          "M_KingArthur_Atlas"
+        ],
+        "near_degenerate_triangles": 0
+      }
+    },
+    "triangles_total": 21338,
+    "triangles_note": "21 341 GLB - 4 dropped tripo_part_14 - 3 degenerate faces removed by the weld + 16 grip bridge = 21 350 (first build); closure rebuild: body + 56 sole-cap triangles, base - 125 flat top faces - 12 hole-wall faces + 69 cap triangles = 21 338",
+    "materials_unique": [
+      "M_KingArthur_Atlas"
+    ],
+    "scale": {
+      "head_top_uu": 55.0,
+      "sword_tip_uu": 60.797,
+      "figure_scale": 0.58338584,
+      "base_uu": [
+        30.0,
+        30.0,
+        6.0
+      ],
+      "feet_lowest_z_uu": 5.869,
+      "pivot": "base bottom centre; root bone and armature object at the origin",
+      "capsule_comparison": {
+        "fits": true,
+        "max_radius_from_pivot_axis": 15.999,
+        "proposed": {
+          "diameter": 36,
+          "height": 62
+        },
+        "top": 60.797
+      },
+      "game_scale_px": {
+        "with_base": 115,
+        "without_base": 92,
+        "proposed": [
+          110,
+          140
+        ],
+        "camera": "horizontal FOV 35, pitch -55, 1 m cell = 250 px of 1920 (04 §3)"
+      }
+    },
+    "axes": {
+      "blender_front": "-Y",
+      "weapon_side_blender": "-X (right hand)",
+      "export_frame": {
+        "body_centroid_m": [
+          -0.01134,
+          -0.00037,
+          0.28626
+        ],
+        "front_axis": "+X",
+        "weapon_centroid_m": [
+          0.07925,
+          -0.08105,
+          0.3937
+        ],
+        "weapon_side_axis": "-Y"
+      },
+      "expected_ue": {
+        "front": "+X",
+        "weapon_side": "+Y"
+      },
+      "skeletal_ue_predicted_uu": {
+        "max": [
+          9.851,
+          14.193,
+          60.797
+        ],
+        "min": [
+          -12.083,
+          -15.122,
+          5.869
+        ]
+      },
+      "base_ue_predicted_uu": {
+        "max": [
+          15.0,
+          15.0,
+          6.0
+        ],
+        "min": [
+          -15.0,
+          -15.0,
+          0.0
+        ]
+      }
+    },
+    "geometry_prep": {
+      "dropped_parts": {
+        "tripo_part_14": {
+          "polygons": 4,
+          "reason": "4 triangles in a 0.4 x 0.4 mm patch at the neck, 2 loose islands; degenerate Tripo segment (Tripo-stage report)",
+          "source_size": [
+            0.000378,
+            0.000375,
+            0.000253
+          ],
+          "vertices": 8
+        }
+      },
+      "weld": {
+        "distance_m": 1e-06,
+        "vertices": [
+          25521,
+          11152
+        ],
+        "polygons": [
+          21337,
+          21334
+        ]
+      },
+      "orientation_min_score": 0.9973,
+      "inside_out_parts": [],
+      "corner_normals_opposed_max_area_share": 0.00457,
+      "corner_normals_preserved_min_dot": 0.99994,
+      "cross_part_coincident_vertices": 0,
+      "weapon_split": {
+        "polygons": {
+          "hand": 417,
+          "sword": 593
+        },
+        "reasons_before_smoothing": {
+          "above_guard_line": 334,
+          "below_fist_line": 150,
+          "grey_off_axis": 419,
+          "on_grip_axis": 23,
+          "saturated_texel": 84
+        },
+        "smoothing_reassigned_polygons": 4,
+        "islands_after_split": {
+          "hand": [
+            417
+          ],
+          "sword": [
+            336,
+            257
+          ]
+        },
+        "islands_final": [
+          336,
+          257,
+          16
+        ],
+        "grip_bridge": {
+          "added": true,
+          "from_t_m": 0.02981,
+          "gap_m": 0.02869,
+          "islands_bridged": [
+            257,
+            336
+          ],
+          "overlap_m": 0.002,
+          "radius_m": 0.0079,
+          "sides": 8,
+          "to_t_m": 0.0625,
+          "triangles": 16,
+          "uv_rect_centre": [
+            0.812809,
+            0.357617
+          ],
+          "uv_rect_half_extent": 0.001002,
+          "uv_source_polygon_area_m2": 3.9024e-05
+        }
+      },
+      "closure": {
+        "why": "verify 2026-09-28 (two reviews, major): the Tripo base part had 4 open footprint holes in its top (74 boundary edges, ~47 cm2) and the boot soles were open (64 boundary edges below z 0.075 m). After the base normalisation (XY x0.604, Z x1.506 vs the figure's uniform x0.583) the holes no longer matched the feet: see-through crescents around the toes at rest with a one-sided material, dark openings in the base top when a foot lifts. The first report missed it (feet_on_base_top only compared the lowest foot vertex with the base top)",
+        "holes_before": [
+          {
+            "centre_m": [
+              -0.0962,
+              -0.0473,
+              0.06
+            ],
+            "closed": true,
+            "edges": 24,
+            "size_xy_m": [
+              0.0423,
+              0.0564
+            ],
+            "z_range_m": [
+              0.06,
+              0.06
+            ]
+          },
+          {
+            "centre_m": [
+              0.0936,
+              -0.0257,
+              0.0591
+            ],
+            "closed": true,
+            "edges": 29,
+            "size_xy_m": [
+              0.044,
+              0.0534
+            ],
+            "z_range_m": [
+              0.05561,
+              0.06
+            ]
+          },
+          {
+            "centre_m": [
+              -0.0829,
+              -0.0003,
+              0.06
+            ],
+            "closed": true,
+            "edges": 8,
+            "size_xy_m": [
+              0.0305,
+              0.0446
+            ],
+            "z_range_m": [
+              0.06,
+              0.06
+            ]
+          },
+          {
+            "centre_m": [
+              0.0826,
+              0.0118,
+              0.0598
+            ],
+            "closed": true,
+            "edges": 13,
+            "size_xy_m": [
+              0.0341,
+              0.037
+            ],
+            "z_range_m": [
+              0.05707,
+              0.06
+            ]
+          }
+        ],
+        "removed_flat_top_faces": {
+          "faces": 125,
+          "area_cm2": 28.58,
+          "rule": "flat top faces with all vertices within 15 mm of a hole whose texels are dark (unused hole texels) or bronze (baked boot fringe), dilated 8 px (mip bleed)"
+        },
+        "removed_hole_walls": [
+          {
+            "area_cm2": 0.867,
+            "faces": 12,
+            "openings": 3,
+            "z_min_m": 0.05707
+          }
+        ],
+        "caps": [
+          {
+            "loop_edges": 33,
+            "triangles": 33,
+            "walls": 2,
+            "vertices_below_top": 1,
+            "cap_area_cm2": 36.51,
+            "centre_m": [
+              0.0928,
+              -0.0214,
+              0.06
+            ],
+            "size_xy_m": [
+              0.0575,
+              0.1045
+            ],
+            "uv_scale": 1.0,
+            "donor_shift_px": [
+              61,
+              -265
+            ],
+            "donor_shift_m_on_top": [
+              -0.1171,
+              -0.069
+            ],
+            "tone_target": [
+              0.2078,
+              0.5137,
+              0.5137
+            ],
+            "tone_donor": [
+              0.2079,
+              0.481,
+              0.5153
+            ]
+          },
+          {
+            "loop_edges": 38,
+            "triangles": 36,
+            "walls": 0,
+            "vertices_below_top": 0,
+            "cap_area_cm2": 40.64,
+            "centre_m": [
+              -0.0912,
+              -0.0358,
+              0.06
+            ],
+            "size_xy_m": [
+              0.0569,
+              0.1086
+            ],
+            "uv_scale": 0.75,
+            "donor_shift_px": [
+              -127,
+              -23
+            ],
+            "donor_shift_m_on_top": [
+              0.0353,
+              -0.054
+            ],
+            "tone_target": [
+              0.2078,
+              0.4902,
+              0.4863
+            ],
+            "tone_donor": [
+              0.2075,
+              0.4853,
+              0.5061
+            ]
+          }
+        ],
+        "cap_uvs": "the flat top is one planar UV chart (affine XY->UV, residual 0.0001 px, 20.004 px/cm); cap UVs = the same map shifted onto clean stone texels (FFT search, footprint + 8 px bleed margin, tone matched on BC luminance and normal-map R/G); BC not edited",
+        "fringe_reuv": {
+          "faces": 23,
+          "groups": 15,
+          "area_cm2": 24.56,
+          "fringe_texels_before": 606,
+          "fringe_texels_left": 24,
+          "note": "kept top-chart faces touching the footprint zone that still sampled bronze/black texels: UVs moved onto clean stone per group, geometry unchanged"
+        },
+        "sole_caps": {
+          "tripo_part_3": [
+            {
+              "loop_edges": 14,
+              "triangles": 12,
+              "centre_m": [
+                0.0727,
+                0.0114,
+                0.0594
+              ],
+              "size_xy_m": [
+                0.0379,
+                0.0324
+              ],
+              "z_range_m": [
+                0.05942,
+                0.05942
+              ]
+            },
+            {
+              "loop_edges": 19,
+              "triangles": 17,
+              "centre_m": [
+                0.089,
+                -0.0248,
+                0.0594
+              ],
+              "size_xy_m": [
+                0.0437,
+                0.0524
+              ],
+              "z_range_m": [
+                0.05869,
+                0.06015
+              ]
+            }
+          ],
+          "tripo_part_4": [
+            {
+              "loop_edges": 17,
+              "triangles": 15,
+              "centre_m": [
+                -0.09,
+                -0.0458,
+                0.0595
+              ],
+              "size_xy_m": [
+                0.0421,
+                0.0534
+              ],
+              "z_range_m": [
+                0.05954,
+                0.05954
+              ]
+            },
+            {
+              "loop_edges": 14,
+              "triangles": 12,
+              "centre_m": [
+                -0.0735,
+                -0.0032,
+                0.0595
+              ],
+              "size_xy_m": [
+                0.037,
+                0.0323
+              ],
+              "z_range_m": [
+                0.05954,
+                0.05954
+              ]
+            }
+          ]
+        },
+        "checks": {
+          "base_top_closed": true,
+          "base_caps_flat_with_clean_stone_uvs": true,
+          "body_soles_closed": true,
+          "base_no_see_through_backface_culled": true
+        },
+        "boundary_edges_after": {
+          "base": 0,
+          "base_roundtrip": 0,
+          "body_below_z_0_075": 0,
+          "body_below_z_0_075_roundtrip": 0,
+          "body_total_info": 919
+        },
+        "see_through_rays": {
+          "per_view": 20073,
+          "views": 17,
+          "base_only_missed": 0,
+          "rest_figure_missed": 0,
+          "roundtrip_base_only_missed": 0,
+          "method": "per view a BVH of the triangles facing the camera only (exact backface culling); rays through a 1.5 mm grid on the top disc r <= 0.12 m; top + pitch 55/30 every 45 deg"
+        },
+        "culled_render_background_px_in_top_disc": {
+          "after": {
+            "culled_base_only_front55": 0,
+            "culled_base_only_top": 0,
+            "culled_rest_back55": 0,
+            "culled_rest_front55": 0,
+            "culled_rest_left55": 0,
+            "culled_rest_right55": 0,
+            "culled_rest_top": 0
+          },
+          "before_first_build": {
+            "culled_rest_top": 989,
+            "culled_rest_front55": 1518,
+            "culled_rest_left55": 3004,
+            "culled_rest_right55": 2694,
+            "culled_rest_back55": 0,
+            "culled_base_only_top": 75102,
+            "culled_base_only_front55": 60849
+          },
+          "disc_px": {
+            "top": 766878,
+            "pitch55": 628188
+          },
+          "script": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/base_closure_review_arthur.py (before: same script on the first-build FBX, scratch copy, not committed)"
+        },
+        "source_folds": "the Tripo top has 2 flipped slivers (0.15 and 0.007 cm2) overlapped by other top faces; invisible with culling, left as is",
+        "not_changed": "BC/N/ORM textures (atlas-stage hashes unchanged); the figure except the sole caps (built on existing vertices, vertex count 10 056 unchanged); rig; rig_deform_probe numbers and pose stretch identical. The heat solve of the two leg groups re-ran with the caps: body weight share foot.L 0.0324 -> 0.0322, foot.R 0.0360 -> 0.0363"
+      },
+      "open_edges_note": "open and non-manifold Tripo edges elsewhere are accepted as they are (body: 919 boundary edges after a 1e-6 m weld, cloak/sleeve rims); the base is closed and the soles are capped"
+    },
+    "rig": {
+      "armature_object": "SKEL_UM_Humanoid",
+      "bones": 17,
+      "weapon_parent": "hand.R",
+      "bone_heads_m": {
+        "arm_lower.L": [
+          0.088,
+          0.012,
+          0.352
+        ],
+        "arm_lower.R": [
+          -0.108,
+          0.01,
+          0.358
+        ],
+        "arm_upper.L": [
+          0.058,
+          0.006,
+          0.438
+        ],
+        "arm_upper.R": [
+          -0.062,
+          0.006,
+          0.438
+        ],
+        "foot.L": [
+          0.073,
+          0.004,
+          0.1
+        ],
+        "foot.R": [
+          -0.074,
+          -0.006,
+          0.1
+        ],
+        "hand.L": [
+          0.1,
+          -0.012,
+          0.3
+        ],
+        "hand.R": [
+          -0.093,
+          -0.063,
+          0.377
+        ],
+        "head": [
+          0.0,
+          0.004,
+          0.458
+        ],
+        "hips": [
+          0.0,
+          0.0,
+          0.258
+        ],
+        "leg_lower.L": [
+          0.055,
+          -0.008,
+          0.205
+        ],
+        "leg_lower.R": [
+          -0.056,
+          -0.008,
+          0.205
+        ],
+        "leg_upper.L": [
+          0.045,
+          -0.004,
+          0.258
+        ],
+        "leg_upper.R": [
+          -0.045,
+          -0.004,
+          0.258
+        ],
+        "root": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "spine": [
+          0.0,
+          0.0,
+          0.33
+        ],
+        "weapon": [
+          -0.08,
+          -0.079,
+          0.378
+        ]
+      },
+      "weapon_bone_vs_sword": {
+        "blade_tip_m": [
+          -0.09316,
+          -0.08047,
+          0.60797
+        ],
+        "head_inside_fist_bounds": true,
+        "head_to_fitted_axis_m": 0.00164,
+        "tail_to_blade_tip_m": 0.00055
+      },
+      "weights": {
+        "method": "Blender automatic weights (bone heat) per part group restricted to the group's bones; rigid head/fist/sword; height ramps (legs on cloak and tassets, hips->spine on the cloak collar); cap 0.3 legs on the cloak; clean < 0.01; <= 4 influences; normalised",
+        "body_weight_share": {
+          "arm_lower.L": 0.0201,
+          "arm_lower.R": 0.0285,
+          "arm_upper.L": 0.0589,
+          "arm_upper.R": 0.0445,
+          "foot.L": 0.0322,
+          "foot.R": 0.0363,
+          "hand.L": 0.0337,
+          "hand.R": 0.0269,
+          "head": 0.0849,
+          "hips": 0.2277,
+          "leg_lower.L": 0.0305,
+          "leg_lower.R": 0.0338,
+          "leg_upper.L": 0.0788,
+          "leg_upper.R": 0.0833,
+          "spine": 0.1798
+        },
+        "max_influences": 4,
+        "unweighted": 0,
+        "fallback_vertices": {
+          "tripo_part_0": 0,
+          "tripo_part_10": 0,
+          "tripo_part_11": 0,
+          "tripo_part_12": 0,
+          "tripo_part_13": 0,
+          "tripo_part_2": 0,
+          "tripo_part_3": 0,
+          "tripo_part_4": 0,
+          "tripo_part_5": 0,
+          "tripo_part_6": 0,
+          "tripo_part_7": 0,
+          "tripo_part_8": 0,
+          "tripo_part_9": 0
+        },
+        "rejected": "edge smoothing of weights (arm_l_raise stretch 1.46x -> 3.10x)"
+      },
+      "sockets": [
+        {
+          "bone": "weapon",
+          "bone_head_ue_component_uu": [
+            7.9,
+            8.0,
+            37.8
+          ],
+          "name": "Weapon",
+          "offset_blender_bone_local_uu": [
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          "target_blender_m": [
+            -0.08,
+            -0.079,
+            0.378
+          ],
+          "target_ue_component_uu": [
+            7.9,
+            8.0,
+            37.8
+          ]
+        },
+        {
+          "bone": "head",
+          "bone_head_ue_component_uu": [
+            -0.4,
+            -0.0,
+            45.8
+          ],
+          "name": "Head",
+          "offset_blender_bone_local_uu": [
+            -0.151,
+            4.127,
+            0.048
+          ],
+          "target_blender_m": [
+            -0.00151,
+            0.00169,
+            0.49921
+          ],
+          "target_ue_component_uu": [
+            -0.169,
+            0.151,
+            49.921
+          ]
+        }
+      ]
+    },
+    "rig_deform_probe": {
+      "blend": [
+        [
+          "head_turn",
+          "plausible",
+          0.806,
+          -0.036
+        ],
+        [
+          "spine_bend_fwd",
+          "plausible",
+          0.626,
+          -0.068
+        ],
+        [
+          "arm_l_raise",
+          "plausible",
+          0.545,
+          0.507
+        ],
+        [
+          "arm_r_raise",
+          "plausible",
+          0.612,
+          -0.581
+        ],
+        [
+          "forearm_l_bend",
+          "plausible",
+          0.424,
+          0.623
+        ],
+        [
+          "thigh_l_flex",
+          "plausible",
+          0.158,
+          0.258
+        ],
+        [
+          "thigh_r_flex",
+          "plausible",
+          0.161,
+          -0.278
+        ]
+      ],
+      "fbx_roundtrip": [
+        [
+          "head_turn",
+          "plausible",
+          0.806,
+          -0.036
+        ],
+        [
+          "spine_bend_fwd",
+          "plausible",
+          0.626,
+          -0.068
+        ],
+        [
+          "arm_l_raise",
+          "plausible",
+          0.545,
+          0.507
+        ],
+        [
+          "arm_r_raise",
+          "plausible",
+          0.612,
+          -0.581
+        ],
+        [
+          "forearm_l_bend",
+          "plausible",
+          0.424,
+          0.623
+        ],
+        [
+          "thigh_l_flex",
+          "plausible",
+          0.158,
+          0.258
+        ],
+        [
+          "thigh_r_flex",
+          "plausible",
+          0.161,
+          -0.278
+        ]
+      ],
+      "result": "7/7 plausible on both"
+    },
+    "pose_stretch": {
+      "arm_l_raise": {
+        "edge_stretch_max": 1.4618,
+        "edges_over_1_5x": 0
+      },
+      "arm_r_raise": {
+        "edge_stretch_max": 1.4,
+        "edges_over_1_5x": 0
+      },
+      "forearm_l_bend": {
+        "edge_stretch_max": 1.3198,
+        "edges_over_1_5x": 0
+      },
+      "head_turn": {
+        "edge_stretch_max": 1.4054,
+        "edges_over_1_5x": 0
+      },
+      "spine_bend_fwd": {
+        "edge_stretch_max": 1.553,
+        "edges_over_1_5x": 2
+      },
+      "thigh_l_flex": {
+        "edge_stretch_max": 1.4875,
+        "edges_over_1_5x": 0
+      },
+      "thigh_r_flex": {
+        "edge_stretch_max": 1.4563,
+        "edges_over_1_5x": 0
+      }
+    },
+    "iterations": [
+      {
+        "build": 1,
+        "finding": "separated sword = two islands, 2.87 cm gap (no grip inside the fist)",
+        "change": "grip bridge (8-sided open cylinder, 16 tris)"
+      },
+      {
+        "build": 2,
+        "finding": "heat weights: leg_upper.R up to 0.76 at belt height and 0.29 in the upper cloak (3.8x / 2.8x edge stretch in thigh_r_flex)",
+        "change": "height ramps for leg weights on cloak and tassets"
+      },
+      {
+        "build": 3,
+        "finding": "weight edge smoothing tried",
+        "change": "rejected: stretch rose (arm_l_raise 1.46x -> 3.10x)"
+      },
+      {
+        "build": 4,
+        "finding": "cloak collar hips/spine gradient (2.15x in spine_bend_fwd)",
+        "change": "hips->spine ramp on the cloak: 1.55x, 2 edges of 1-1.4 mm over 1.5x"
+      },
+      {
+        "build": 5,
+        "finding": "verify 2026-09-28: base top has 4 footprint holes (74 edges) and the soles are open (64 edges); see-through with a one-sided material, dark openings when a foot lifts; texels of the holes black, bronze boot fringe around them",
+        "change": "closure: dirty flat faces + hole walls removed, 2 flat caps with UVs on clean stone, 23 fringe faces re-UV'd, 4 sole caps; 4 new checks (44/44)"
+      }
+    ],
+    "textures": {
+      "atlas": {
+        "size": 2048,
+        "gutter_px": 4,
+        "conventions": {
+          "BC": "sRGB colour; Tripo baseColorFactor 0.800 multiplied in",
+          "N": "linear; DirectX (-Y) — for UE (flip_green_channel = false)",
+          "N_OpenGL": "linear; OpenGL (+Y) — Blender preview only",
+          "ORM": "linear; R = occlusion (filled 255, Tripo has none), G = roughness, B = metallic"
+        }
+      },
+      "texel_density_px_per_cm": [
+        13.265,
+        26.796
+      ],
+      "uv_overlap_max": 0.04533,
+      "team_mask": {
+        "file": "T_KingArthur_Candidate_Atlas_TeamMask.png",
+        "sha256": "1e7b98f863324d7e24191fd8102ff6a26f66971d0ef1aa32f22acc4a4cbdab3c",
+        "status": "предложено",
+        "applicability": "open (AD-CNF-58)",
+        "rule": {
+          "blur_sigma_px": 1.0,
+          "hue_max_deg": 10,
+          "hue_min_deg": 340,
+          "s_min": 0.55,
+          "v_max": 0.85,
+          "v_min": 0.1
+        },
+        "coverage": {
+          "tripo_part_0": 0.9867,
+          "tripo_part_1": 0.0,
+          "tripo_part_10": 0.0,
+          "tripo_part_11": 0.8268,
+          "tripo_part_12": 0.0,
+          "tripo_part_13": 0.8419,
+          "tripo_part_14": 0.0,
+          "tripo_part_2": 0.1099,
+          "tripo_part_3": 0.0003,
+          "tripo_part_4": 0.0,
+          "tripo_part_5": 0.0002,
+          "tripo_part_6": 0.0912,
+          "tripo_part_7": 0.0002,
+          "tripo_part_8": 0.2306,
+          "tripo_part_9": 0.0083
+        }
+      },
+      "uv_overlap_note": "base cell 4.5 %: the caps and the moved fringe faces share clean stone texels with the donor areas on purpose; every other cell <= 0.16 %"
+    },
+    "visual_review": {
+      "method": "frames rendered headless and opened with Read; EEVEE preview light, not game light",
+      "frames_dir": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/preview",
+      "fbx_vs_blend_render": {
+        "max_channel_diff": 4,
+        "pixels_over_8": 0
+      },
+      "findings": [
+        "silhouette 'sword + cloak' consistent from all sides; base now 6 uu thick (thin Tripo slab before)",
+        "3/4 from the right front at pitch -55: the vertical sword crosses the face",
+        "forehead: light triangular texture patch between the brows (Tripo texture seam), not fixed",
+        "right fist top edge is ragged where it met the guard (source mesh); hidden under the guard",
+        "separated sword whole after the grip bridge; small source spikes under the guard",
+        "cloak overhangs the 30 uu base by up to 1 uu at the back corners",
+        "base cell takes a quarter of the atlas (Tripo texture sizes)",
+        "poses: no tearing of the figure; cloak stays behind when a thigh flexes; pauldron/cloak interaction on arm raise not examined in detail. First edition missed that the dark spots on the base in pose-thigh_*_flex were see-through holes (verify 2026-09-28); fixed by the closure rebuild",
+        "base after the closure rebuild (preview/base-closure/, closeup_base): top closed and stone-coloured under lifted feet; residual: faint patch outlines of the caps in close-ups (~3 px/mm; broad normal-map bands of the Tripo bake), a bronze tint on the walls of a small crack at the right toe's outer edge (~2 x 10 mm, own UV chart), a tiny dark notch (source); none visible at the game scale (base ~75 px wide)"
+      ],
+      "base_closure_frames": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/preview/base-closure"
+    },
+    "not_checked": [
+      "UE import, UE facing (+X) and sockets",
+      "clips",
+      "K-1/K-2/K-3, game lighting",
+      "selection collision (physics asset / actor capsule)",
+      "LOD",
+      "M_DioramaMaster instead of the own material",
+      "art acceptance"
+    ],
+    "spend": {
+      "tripo_studio": 0,
+      "syntx": 0,
+      "purchases": 0,
+      "ledger_changed": false
+    },
+    "deferred_ue_steps_ref": "docs/art-pipeline/king-arthur-candidate-report.md#отложено-ue-этап-точные-шаги",
+    "closure_lessons_for_next_heroes": [
+      "Tripo segmented bases have footprint holes under the feet (Arthur 74 boundary edges, Medusa T4 72) and the foot parts have open soles; any base normalisation that changes XY relative to the figure opens them visibly: cap them and check base watertight, soles closed, culled see-through",
+      "the baked texture has black texels inside the hole UV regions and boot-coloured fringe around them: caps and fringe faces need UVs on clean stone (or a BC repaint at the art stage)",
+      "ray tests that emulate backface culling must use only camera-facing triangles: the Tripo top has coplanar overlapping slivers where a hop-past-back-face ray slips through"
+    ]
+  },
+  "latest_stage": "blender"
+}

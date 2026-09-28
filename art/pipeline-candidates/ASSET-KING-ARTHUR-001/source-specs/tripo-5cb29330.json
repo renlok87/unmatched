@@ -1,0 +1,160 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-5cb29330",
+  "asset_id": "ASSET-KING-ARTHUR-001",
+  "service": "tripo-studio",
+  "task_id": "5cb29330-e6d9-4041-af5b-d5de8b6d8b15",
+  "parent_task_id": "75e27ee8-c3c8-4e82-a211-12774ecb9166",
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/5cb29330-e6d9-4041-af5b-d5de8b6d8b15",
+  "date": "2026-09-28",
+  "model_version": {
+    "ui_label": "clone of H3.1 Triangle original (75e27ee8, version 14:32) via History -> Save as new model",
+    "backend": null
+  },
+  "generation": null,
+  "operations": [
+    {
+      "op": "clone",
+      "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "observed_debit": 0,
+        "balance_before": 24810,
+        "balance_after": 24810
+      },
+      "note": "Smart UV rejects multi-part models and Merge is disabled for the Quad segmented model, so a single-part branch was cloned"
+    },
+    {
+      "op": "retopology",
+      "settings": {
+        "topology": "Quad",
+        "smart_mesh": "P1.0 on",
+        "target_polygons": 10000
+      },
+      "history_time": "2026-09-28 14:50:07",
+      "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 40,
+        "observed_debit": 40,
+        "balance_before": 24810,
+        "balance_after": 24770
+      }
+    },
+    {
+      "op": "smart-uv",
+      "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 20,
+        "observed_debit": 0,
+        "balance_before": 24770,
+        "balance_after": 24770,
+        "note": "free trial (x1); no Studio history entry"
+      }
+    },
+    {
+      "op": "texture",
+      "settings": {
+        "multi_view": "front+left+back v5",
+        "resolution": "2K",
+        "remove_lighting": true
+      },
+      "history_time": "2026-09-28 14:54:11",
+      "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 10,
+        "observed_debit": 10,
+        "balance_before": 24770,
+        "balance_after": 24760
+      }
+    },
+    {
+      "op": "pbr",
+      "history_time": "2026-09-28 14:55:51",
+      "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5,
+        "balance_before": 24760,
+        "balance_after": 24755
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "retopo-10k-glb",
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/king-arthur-tripo-5cb29330-retopo-10k.glb",
+      "expected_sha256": "768a47d23d4a3ac86c31cb8b43a85ce078e91b9c014c8af22f3b8793ad12483d",
+      "expected_bytes": 11666340,
+      "produced_by": "retopology",
+      "origin": "Studio GLB export, 4k texture tier, unmodified"
+    },
+    {
+      "role": "smartuv-tex2k-glb",
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/king-arthur-tripo-5cb29330-smartuv-tex2k.glb",
+      "expected_sha256": "7f8d7aa4bd7992bdb68a3bf3263342e46788791076f4a2efd44d53f3b8b78036",
+      "expected_bytes": 8193096,
+      "produced_by": "texture",
+      "origin": "Studio GLB export after Smart UV + texture 2K, 2k tier, unmodified"
+    },
+    {
+      "role": "smartuv-tex2k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/king-arthur-tripo-5cb29330-smartuv-tex2k-pbr.glb",
+      "expected_sha256": "997ae7dae527c23e444b17cf70fb1bbd19e854f9beaa67e705439fa2720bca51",
+      "expected_bytes": 14010060,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export after PBR, 2k tier, unmodified"
+    },
+    {
+      "role": "texture-smartuv-tex2k-pbr_basecolor",
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/textures/king-arthur-tripo-5cb29330-smartuv-tex2k-pbr_basecolor.jpg",
+      "expected_sha256": "cc0b7ccead223ee2e9f507739a99922328cdb63c49dcce1f494de340b0beb76a",
+      "produced_by": "export",
+      "origin": "extracted from the PBR GLB without re-encoding"
+    },
+    {
+      "role": "texture-smartuv-tex2k-pbr_normal",
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/textures/king-arthur-tripo-5cb29330-smartuv-tex2k-pbr_normal.png",
+      "expected_sha256": "d356d3ff029e79b60de8d581d58de7c05d67a00eb2b9046f0096f482bdeeb631",
+      "produced_by": "export",
+      "origin": "extracted from the PBR GLB without re-encoding"
+    },
+    {
+      "role": "texture-smartuv-tex2k-pbr_rm",
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/textures/king-arthur-tripo-5cb29330-smartuv-tex2k-pbr_rm.png",
+      "expected_sha256": "eefae164817283db5103f502aa41539b09b8358965696238a0be6bb211f77de6",
+      "produced_by": "export",
+      "origin": "extracted from the PBR GLB without re-encoding"
+    }
+  ],
+  "expectations": {
+    "retopo-10k-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 18755,
+      "glb_materials": 1,
+      "glb_images": 3,
+      "glb_skins": 0
+    },
+    "smartuv-tex2k-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 18755,
+      "glb_materials": 1,
+      "glb_images": 2,
+      "glb_skins": 0
+    },
+    "smartuv-tex2k-pbr-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 18755,
+      "glb_materials": 1,
+      "glb_images": 3,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/reports/tripo-run.json"
+  ]
+}

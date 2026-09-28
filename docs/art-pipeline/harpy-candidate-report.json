@@ -1,0 +1,2498 @@
+{
+  "schema": "unmatched.art-pipeline.candidate-report/1",
+  "asset_id": "ASSET-HARPY-001",
+  "date": "2026-09-28",
+  "stage": "tripo",
+  "status": "измерено",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false,
+    "technically_imported": false
+  },
+  "run_dir": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31",
+  "pipeline_run": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/pipeline",
+  "tool": "tools/tripo-pipeline/tripo_pipeline.py 0.4.0",
+  "pipeline_stages": {
+    "init": "done (profile passthrough, primary tripo-d500fc84:segmented-retopo-glb)",
+    "register-source": [
+      "tripo-d500fc84",
+      "tripo-c756522c"
+    ],
+    "register_repeat": "no-op",
+    "preflight": "completed (all checks passed)",
+    "import/verify/export": "not run (Blender stage)"
+  },
+  "source_specs": [
+    "art/pipeline-candidates/ASSET-HARPY-001/source-specs/tripo-d500fc84.json",
+    "art/pipeline-candidates/ASSET-HARPY-001/source-specs/tripo-c756522c.json"
+  ],
+  "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+  "report_md": "docs/art-pipeline/harpy-candidate-report.md",
+  "inputs": {
+    "set": "ref-harpy-v5-{front,left,back}.png -> слоты Спереди/Слева/Обратная сторона; Справа пустой",
+    "views": {
+      "front": {
+        "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-front.png",
+        "sha256": "0a27b796aebe2b859baac4c249913bf804d8de1f9bc02688f971ba9183250e4c"
+      },
+      "left": {
+        "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-left.png",
+        "sha256": "cc347722811849932bef3e0371852e50d7e0adfa159d5f175d6db48f719bdc6f"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-back.png",
+        "sha256": "bcb59c7c3ce126c931372d72bda4c657635fba01ea7059f56eabab7a2d67c789"
+      }
+    },
+    "input_warn": "T2 WARN: v5 front сжат по Y на 3,6 % (scaleXY 0.9975 x 0.9639). Подан как есть (рекомендованный комплект). Измерено после генерации: отношение высота/диаметр подставки у модели 2,06 против 1,99 на front и 2,00 на back/left (2D-маска на сером фоне) — сплющивания модели по вертикали нет; размах/диаметр 3,34 против 3,36 front и 3,24 back."
+  },
+  "idempotency_check": {
+    "before_first_paid_op": "15:38: баланс UI 24 545 = balanceEndUi журнала кредитов после Merlin; записей Harpy в журнале нет; на странице «Ассеты» Studio последние ассеты — Merlin x2, Arthur x2, бочка, Medusa, гарпии нет; каталога art/pipeline-candidates/ASSET-HARPY-001 не было; в Загрузках файлов гарпии нет. Прерванный прогон до Tripo не дошёл — повторных запусков нет."
+  },
+  "tripo_tasks": {
+    "d500fc84-26d7-4cb5-8537-1e53788a5dd6": {
+      "role": "H3.1 multi-view исходник -> сегментация Balanced -> Quad-ретопология (многочастная ветка)",
+      "url": "https://studio.tripo3d.ai/ru/workspace/generate/d500fc84-26d7-4cb5-8537-1e53788a5dd6",
+      "studio_versions": [
+        "15:39 генерация",
+        "15:42 сегментация",
+        "15:45 сохранение частей",
+        "15:47 ретопология (текущая)"
+      ]
+    },
+    "c756522c-e19c-4ceb-88ae-80c5a2aadbb0": {
+      "role": "клон «Сохранить как новую модель» версии 15:39 (Triangle-исходник) -> Quad-ретопология -> Smart UV -> текстура 2K -> PBR (одночастная ветка)",
+      "url": "https://studio.tripo3d.ai/ru/workspace/generate/c756522c-e19c-4ceb-88ae-80c5a2aadbb0",
+      "parent": "d500fc84-26d7-4cb5-8537-1e53788a5dd6",
+      "clone_debit": 0
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "task": "d500fc84",
+      "ui": "Из нескольких видов в модель",
+      "history_time": "2026-09-28 15:39:16",
+      "quoted": 55,
+      "observed_debit": 55,
+      "balance_before": 24545,
+      "balance_after": 24490,
+      "result": {
+        "faces_ui": 1918262,
+        "vertices_ui": 1009532,
+        "topology_ui": "Triangle"
+      },
+      "review": {
+        "method": "Blender 5.2.2 headless, ортокамера: front/left/back/right/3/4 (preview/h31_*.png, h31_wide_front.png, h31_wide_top.png) + крупные планы головы, лап, браслета, крыла снизу (work/crops, не в git)",
+        "findings": [
+          "Крыльев ровно два, двоения нет: вид сверху (h31_wide_top) — два тонких крыла V-образно, отведены назад; на left/right ближнее крыло поднято и отведено назад, дальнее скрыто — как на left v5",
+          "Браслет на своей левой ноге (+X; справа в кадре на front, у ближней ноги на left, слева в кадре на back) — согласовано с референсом",
+          "Лицо, заострённые уши, хохолок из перьев без явных дефектов; рук нет (по референсу); когти — по 3 спереди + задний на каждой лапе",
+          "Подставка круглая, гладкая; центр подставки смещён от центра габарита на -0,063 м по Y (вперёд): крылья уходят назад"
+        ],
+        "decision": "явного брака нет -> перегенерация не делалась (бесплатный повтор не использован)"
+      }
+    },
+    {
+      "op": "segment",
+      "task": "d500fc84",
+      "mode": "Balanced (6-15 частей)",
+      "history_time": "2026-09-28 15:42:58",
+      "quoted": 40,
+      "trial": false,
+      "observed_debit": 40,
+      "balance_before": 24490,
+      "balance_after": 24450,
+      "result": {
+        "parts": 9,
+        "note": "Сохранена как новая версия того же задания. Каждое крыло — отдельная часть (tripo_part_0 левое, tripo_part_1 правое); подставка отдельно (tripo_part_4); голова+хохолок одной частью (tripo_part_2); бёдра (5/6) и лапы (7/8) раздельно. Оружия у гарпии нет."
+      }
+    },
+    {
+      "op": "part-save",
+      "task": "d500fc84",
+      "ui": "Сохранить (части)",
+      "history_time": null,
+      "observed_debit": 0,
+      "note": "в истории Studio записи нет, баланс не изменился (версия 15:45)"
+    },
+    {
+      "op": "retopology",
+      "task": "d500fc84",
+      "settings": {
+        "topology": "Quad",
+        "smart_mesh": "P1.0 on",
+        "target_polygons": 6800
+      },
+      "history_time": "2026-09-28 15:47:19",
+      "quoted": 40,
+      "observed_debit": 40,
+      "balance_before": 24450,
+      "balance_after": 24410,
+      "target_reason": "Бюджет 04 §3.2 / 17 §4.7.2 (предложено): 8-15k tris. У Merlin цель 6 500 дала 12,2k (одночастная, x1,88) и 14,1k (многочастная, x2,16); цель 6 800 рассчитана на ~12,8k / ~14,7k — под верхней границей, с запасом на перья крыльев",
+      "result": {
+        "faces_ui_selected_part": 347,
+        "glb_meshes": 9,
+        "glb_triangles": 13893,
+        "glb_materials": 9,
+        "glb_images": 27,
+        "image_sizes": "по частям 128²-1024²"
+      }
+    },
+    {
+      "op": "smart-uv-attempt",
+      "task": "d500fc84",
+      "observed_debit": 0,
+      "result": "отказ Studio: «Smart UV пока не поддерживает модели из нескольких частей» (кнопка с ценой 20 нажата, баланс 24 410 не изменился) — то же, что у Arthur и Merlin"
+    },
+    {
+      "op": "clone",
+      "task": "c756522c",
+      "ui": "История -> версия 15:39 -> «Сохранить как новую модель»",
+      "observed_debit": 0,
+      "reason": "Цепочка Smart UV -> текстура 2K -> PBR требует одночастной модели; многочастная ветка сохранена без изменений"
+    },
+    {
+      "op": "retopology",
+      "task": "c756522c",
+      "settings": {
+        "topology": "Quad",
+        "smart_mesh": "P1.0 on",
+        "target_polygons": 6800
+      },
+      "history_time": "2026-09-28 15:50:31",
+      "quoted": 40,
+      "observed_debit": 40,
+      "balance_before": 24410,
+      "balance_after": 24370,
+      "result": {
+        "faces_ui": 7229,
+        "vertices_ui": 6487,
+        "glb_triangles": 13011,
+        "glb_materials": 1
+      }
+    },
+    {
+      "op": "smart-uv",
+      "task": "c756522c",
+      "ui": "Развернуть UV -> Сохранить",
+      "quoted": 20,
+      "trial": "нет (проба x1 израсходована на Arthur)",
+      "observed_debit": 20,
+      "history_time": "2026-09-28 15:52:39",
+      "history_entry": "Развёртка UV -20",
+      "balance_before": 24370,
+      "balance_after": 24350,
+      "result": {
+        "uv_fill_ui": "69.2% (до 35.3%)"
+      },
+      "note": "Smart UV удаляет текстуру; «Бесплатный повтор (x3)» не использовался"
+    },
+    {
+      "op": "texture",
+      "task": "c756522c",
+      "ui": "Генератор текстур, несколько видов (front/left/back v5 подставлены Studio из исходного задания)",
+      "settings": {
+        "texture_resolution": "2K",
+        "remove_lighting": true
+      },
+      "history_time": "2026-09-28 15:54:06",
+      "quoted": 10,
+      "observed_debit": 10,
+      "balance_before": 24350,
+      "balance_after": 24340,
+      "note": "4K стоил бы 30, 8K — проба x1 (0; общий ресурс аккаунта не тратился); выбрано 2K по заданию (04 §3.2 предлагает 1K — уменьшение в Blender-этапе)"
+    },
+    {
+      "op": "pbr",
+      "task": "c756522c",
+      "ui": "Генератор PBR",
+      "history_time": "2026-09-28 15:55:40",
+      "quoted": 5,
+      "observed_debit": 5,
+      "balance_before": 24340,
+      "balance_after": 24335,
+      "note": "BaseColor и Normal не изменились (те же sha256, что в tex2k GLB), добавлена карта RM"
+    }
+  ],
+  "credits": {
+    "unit": "studio-credits",
+    "this_task_total_observed": 210,
+    "hero_ceiling": "~400 (задание)",
+    "balance_ui_start": 24545,
+    "balance_ui_end": 24335,
+    "history_snapshot_2026-09-28_15:57": [
+      [
+        "2026-09-28 15:55:40",
+        "Генерация PBR",
+        -5
+      ],
+      [
+        "2026-09-28 15:54:06",
+        "Генерация текстур",
+        -10
+      ],
+      [
+        "2026-09-28 15:52:39",
+        "Развёртка UV",
+        -20
+      ],
+      [
+        "2026-09-28 15:50:31",
+        "Ретопология",
+        -40
+      ],
+      [
+        "2026-09-28 15:47:19",
+        "Ретопология",
+        -40
+      ],
+      [
+        "2026-09-28 15:42:58",
+        "ИИ сегментация",
+        -40
+      ],
+      [
+        "2026-09-28 15:39:16",
+        "Из нескольких видов в модель",
+        -55
+      ],
+      [
+        "2026-09-28 15:27:09",
+        "Генерация PBR",
+        -5
+      ]
+    ],
+    "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json (записи дописывались сразу после каждой траты под lock-файлом; время истории Studio проставлено по снимку 15:57 скриптом work/ledger_patch_times.py)",
+    "extra_spend_reason": "Вторая ретопология (40) — не перегенерация: Smart UV отказывает многочастным моделям (проверено повторно, 0), поэтому для Smart UV -> текстура 2K -> PBR сделан одночастный клон. Smart UV стоил 20 (проба x1 уже израсходована на Arthur). Перегенераций не было."
+  },
+  "outputs": [
+    {
+      "file": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-h31-d500fc84-source.glb",
+      "stage": "generate",
+      "sha256": "326ecb9a06c69a004f844d3cc4fbc5211124a686f0c62850cfdd85c67d04b1c0",
+      "bytes": 61970000,
+      "glb": {
+        "meshes": 1,
+        "triangles": 1918262,
+        "materials": 1,
+        "images": 3,
+        "skins": 0,
+        "animations": 0,
+        "image_sizes": "4096²: BC jpg, RM jpg, N png"
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-d500fc84-segmented-9.glb",
+      "stage": "segment",
+      "sha256": "974ea77584590ef57a3e1a49f1e826bf0738d4718259107f140803e7619c599c",
+      "bytes": 65361688,
+      "glb": {
+        "meshes": 9,
+        "triangles": 1918262,
+        "materials": 9,
+        "images": 27,
+        "skins": 0,
+        "animations": 0,
+        "image_sizes": "по частям 256²-1024²"
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-d500fc84-segmented-retopo.glb",
+      "stage": "retopology (многочастная)",
+      "sha256": "dd5403dfff75256dbe5ec74f89b321bec458483b66b835b3f9ac5065b7d2d8cf",
+      "bytes": 3033040,
+      "glb": {
+        "meshes": 9,
+        "triangles": 13893,
+        "materials": 9,
+        "images": 27,
+        "skins": 0,
+        "animations": 0,
+        "image_sizes": "по частям 128²-1024²"
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-c756522c-retopo-6800.glb",
+      "stage": "retopology (одночастный клон)",
+      "sha256": "3063cc6b8abac74f85c80da521ba31fce46471fda0d824bfb4cafc7c66560463",
+      "bytes": 9517764,
+      "glb": {
+        "meshes": 1,
+        "triangles": 13011,
+        "materials": 1,
+        "images": 3,
+        "skins": 0,
+        "animations": 0,
+        "image_sizes": "BC 4096² jpg, прочие 2048²"
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-c756522c-smartuv-tex2k.glb",
+      "stage": "smart-uv + texture 2K",
+      "sha256": "4a3d3b7039bf4e179a3a91693e06421c8b6fd808b5097027c88f47c65eb19cd0",
+      "bytes": 9029056,
+      "glb": {
+        "meshes": 1,
+        "triangles": 13009,
+        "materials": 1,
+        "images": 2,
+        "skins": 0,
+        "animations": 0,
+        "image_sizes": "2048²: BC jpg, N png; metallicFactor 0, roughnessFactor 0.5, baseColorFactor 0.8"
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-c756522c-smartuv-tex2k-pbr.glb",
+      "stage": "pbr",
+      "sha256": "462425ed297ed7cfd06af37302ae4725fec601a0ca02f342bead68964d720113",
+      "bytes": 12981200,
+      "glb": {
+        "meshes": 1,
+        "triangles": 13009,
+        "materials": 1,
+        "images": 3,
+        "skins": 0,
+        "animations": 0,
+        "image_sizes": "2048²: BC jpg, RM png, N png; baseColorFactor 0.8"
+      }
+    }
+  ],
+  "segmented_parts": [
+    {
+      "name": "tripo_part_0",
+      "tris": 3262,
+      "verts": 3582,
+      "min": [
+        0.0466,
+        -0.1116,
+        0.1949
+      ],
+      "max": [
+        0.4888,
+        0.244,
+        0.5592
+      ],
+      "uv_layers": 1,
+      "role": "левое крыло (своё левое, +X)"
+    },
+    {
+      "name": "tripo_part_1",
+      "tris": 3042,
+      "verts": 3443,
+      "min": [
+        -0.4888,
+        -0.1251,
+        0.1953
+      ],
+      "max": [
+        -0.0473,
+        0.2438,
+        0.559
+      ],
+      "uv_layers": 1,
+      "role": "правое крыло (своё правое, -X)"
+    },
+    {
+      "name": "tripo_part_2",
+      "tris": 1918,
+      "verts": 3186,
+      "min": [
+        -0.0974,
+        -0.244,
+        0.3307
+      ],
+      "max": [
+        0.082,
+        -0.0401,
+        0.6027
+      ],
+      "uv_layers": 1,
+      "role": "голова + хохолок из перьев",
+      "winding": "вывернута: доля граней с нормалью наружу 0.284 (у остальных частей 0,70-0,81)"
+    },
+    {
+      "name": "tripo_part_3",
+      "tris": 1258,
+      "verts": 1871,
+      "min": [
+        -0.1021,
+        -0.1942,
+        0.2119
+      ],
+      "max": [
+        0.1008,
+        0.0398,
+        0.4322
+      ],
+      "uv_layers": 1,
+      "role": "грудь/торс с воротником перьев"
+    },
+    {
+      "name": "tripo_part_5",
+      "tris": 1241,
+      "verts": 1730,
+      "min": [
+        -0.131,
+        -0.149,
+        0.052
+      ],
+      "max": [
+        0.0839,
+        0.0569,
+        0.3068
+      ],
+      "uv_layers": 1,
+      "role": "правое бедро/голень + хвостовые перья (-X)"
+    },
+    {
+      "name": "tripo_part_4",
+      "tris": 976,
+      "verts": 1019,
+      "min": [
+        -0.1467,
+        -0.2088,
+        0.0
+      ],
+      "max": [
+        0.1461,
+        0.084,
+        0.0395
+      ],
+      "uv_layers": 1,
+      "role": "подставка"
+    },
+    {
+      "name": "tripo_part_6",
+      "tris": 928,
+      "verts": 1392,
+      "min": [
+        0.0135,
+        -0.1455,
+        0.052
+      ],
+      "max": [
+        0.1293,
+        0.0052,
+        0.2995
+      ],
+      "uv_layers": 1,
+      "role": "левое бедро/голень с браслетом (+X)",
+      "winding": "вывернута: доля граней с нормалью наружу 0.278 (у остальных частей 0,70-0,81)"
+    },
+    {
+      "name": "tripo_part_7",
+      "tris": 684,
+      "verts": 1122,
+      "min": [
+        -0.1161,
+        -0.1694,
+        0.0321
+      ],
+      "max": [
+        -0.0038,
+        0.0116,
+        0.0749
+      ],
+      "uv_layers": 1,
+      "role": "правая лапа с когтями (-X)"
+    },
+    {
+      "name": "tripo_part_8",
+      "tris": 584,
+      "verts": 939,
+      "min": [
+        0.0041,
+        -0.1697,
+        0.0329
+      ],
+      "max": [
+        0.1159,
+        0.0116,
+        0.0752
+      ],
+      "uv_layers": 1,
+      "role": "левая лапа с когтями (+X)"
+    }
+  ],
+  "winding": {
+    "segmented_retopo_inverted_parts": [
+      "tripo_part_2 (голова)",
+      "tripo_part_6 (левое бедро)"
+    ],
+    "single_part_branch": "не вывернута (доля граней наружу 0,633)",
+    "fix": "Blender: Recalculate Outside / flip",
+    "status": "измерено"
+  },
+  "extracted_textures": [
+    {
+      "file": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/textures/harpy-tripo-c756522c-smartuv-tex2k-pbr_basecolor.jpg",
+      "sha256": "9205de7ba2e6253176e5a4c84b0c1105a58c93dc5b99df2c463ed32bd7635abb"
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/textures/harpy-tripo-c756522c-smartuv-tex2k-pbr_normal.png",
+      "sha256": "a8b7d2129ffd3bd8c620bc7e5c7de9022a8e31a146a91eac82b3ba8c678e11c7"
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/textures/harpy-tripo-c756522c-smartuv-tex2k-pbr_rm.png",
+      "sha256": "5ba541398c16c9255d2db8bc481b67347e865b31ac5ace34ecde788e9126df8c"
+    }
+  ],
+  "texture_measurements": {
+    "rm": "glTF: G = roughness, B = metallic, R = 1.0 везде (не AO). Измерено: roughness mean 0.733 (p90 0.812), metallic mean 0.016 (p90 0.031) — металличности почти нет (медный браслет тоже не металлический)",
+    "base_color": "BC mean RGB 0.352/0.284/0.247 — тёмно-коричневая палитра референса",
+    "base_color_factor": "0.8 во всех GLB одночастной ветки — множитель BC; в Blender-этапе решить, запекать ли его в BC или сбросить в 1.0"
+  },
+  "measured_bounds_blender_m": {
+    "harpy-tripo-h31-d500fc84-source.glb": [
+      0.9785,
+      0.4865,
+      0.6027
+    ],
+    "harpy-tripo-d500fc84-segmented-9.glb": [
+      0.9785,
+      0.4865,
+      0.6027
+    ],
+    "harpy-tripo-d500fc84-segmented-retopo.glb": [
+      0.9776,
+      0.488,
+      0.6027
+    ],
+    "harpy-tripo-c756522c-retopo-6800.glb": [
+      0.9765,
+      0.4873,
+      0.602
+    ],
+    "harpy-tripo-c756522c-smartuv-tex2k-pbr.glb": [
+      0.9765,
+      0.4873,
+      0.602
+    ]
+  },
+  "scale_measurements": {
+    "base": {
+      "diameter_m": [
+        0.2924,
+        0.2934
+      ],
+      "height_m": 0.0389,
+      "center_xy_m": [
+        -0.0003,
+        -0.0629
+      ],
+      "source": "tripo_part_4 сегментации (до ретопологии)"
+    },
+    "at_base_22uu": {
+      "uu_per_m": 75.1,
+      "total_height_uu": 45.3,
+      "figure_above_base_uu": 42.3,
+      "wingspan_uu": 73.5,
+      "depth_uu": 36.5,
+      "base_height_uu": 2.9,
+      "vs_proposed": "04 §3.2 (предложено): высота 35-42 uu — фигура над подставкой 42,3 (на верхней границе), с подставкой 45,3; размах <= 80 — 73,5 (в пределах)"
+    },
+    "at_base_24uu": {
+      "uu_per_m": 81.9,
+      "figure_above_base_uu": 46.2,
+      "wingspan_uu": 80.1,
+      "note": "при диаметре 24 uu (рабочее значение 17 для героев) размах 80,1 uu — на 0,1 выше предложенного <= 80"
+    },
+    "status": "измерено (масштаб — предложение; диаметр подставки гарпии в 04 — 22 uu, AD-OPEN-09)"
+  },
+  "instances": {
+    "count": 3,
+    "approach": "одна геометрия; различение H1/H2/H3 маркером на подставке — носитель не решён (AD-OPEN-06)",
+    "status": "предложено"
+  },
+  "visual_findings": [
+    "Многочастная ветка (текстура H3.1, перенесённая Tripo на ретопологию, по частям 128²-1024²): крылья и перья читаются; голова (tripo_part_2) и левая нога (tripo_part_6) вывернуты — при backface culling лицо не видно (preview/segretopo_crop_head_front.png)",
+    "Одночастная ветка после ретекстура 2K: силуэт, палитра, крылья, браслет сохранены (preview/pbr_*); лицо читается, глаза и брови проще, чем в исходнике; подставка гладкая тёмная",
+    "В обеих ветках два крыла без двоения; размах и отвод назад соответствуют front/back/left v5"
+  ],
+  "proposed_budget_refs": {
+    "tris": "8-15k (04 §3.2, 17 §4.7.2 — предложено)",
+    "textures": "1K (предложено)",
+    "materials": 1,
+    "slots": "<= 2",
+    "measured": {
+      "segmented_retopo_tris": 13893,
+      "single_part_tris": 13009,
+      "single_part_materials": 1,
+      "segmented_materials": 9,
+      "texture": "2048²"
+    }
+  },
+  "blender_stage_proposals": [
+    "выбрать ветку (многочастная с отдельными крыльями или одночастная PBR) либо гибрид с переносом текстуры",
+    "центрировать по подставке (+0,063 м по Y), масштаб по Ø подставки (предложено Ø22), экспорт UM_FBX_v1",
+    "риг UM_HUMANOID_17_v1 без рук + цепочки крыльев по RIG-CONTRACT; Tripo-авториг не использовать",
+    "текстуры 2K -> 1K; решить baseColorFactor 0,8",
+    "маркер экземпляра после AD-OPEN-06"
+  ],
+  "not_done": [
+    "Blender-обработка, FBX-экспорт, риг, анимации",
+    "UE-этап (отложен)",
+    "SYNTX (не требовался)",
+    "правки asset-registry.json, DIRECTORY-MAP.md, tripo_pipeline.py",
+    "git commit/push"
+  ],
+  "blender_stage": {
+    "stage": "blender",
+    "date": "2026-09-28",
+    "status": "измерено",
+    "claims": {
+      "art_accepted": false,
+      "game_ready": false,
+      "budgets_declared": false,
+      "technically_imported": false,
+      "note": "technically exported (UM_FBX_v1 FBX + Blender round trip); not imported into UE"
+    },
+    "run_dir": "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1",
+    "credits": {
+      "tripo_studio": 0,
+      "syntx": 0,
+      "purchases": 0,
+      "ledger_changed": false
+    },
+    "build_profile": {
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-segmented-skeletal-um-fbx-v1.json",
+      "id": "harpy-segmented-skeletal/1",
+      "status": "proposed",
+      "sha256": "654976a37f236982534e72e698c56e1615810a4e2529b988c8753335a5c744e2"
+    },
+    "source": {
+      "source_id": "tripo-d500fc84",
+      "role": "segmented-retopo-glb",
+      "file": "harpy-tripo-d500fc84-segmented-retopo.glb",
+      "sha256": "dd5403dfff75256dbe5ec74f89b321bec458483b66b835b3f9ac5065b7d2d8cf"
+    },
+    "reference_for_orientation": {
+      "file": "harpy-tripo-d500fc84-segmented-9.glb",
+      "role": "segmented-9-glb",
+      "sha256": "974ea77584590ef57a3e1a49f1e826bf0738d4718259107f140803e7619c599c",
+      "use": "per-face orientation vote only"
+    },
+    "tool": "tools/tripo-pipeline/tripo_pipeline.py 0.4.0 (unchanged)",
+    "pipeline_stages": {
+      "init/register-source": "done (tripo-d500fc84, tripo-c756522c; repeat is a no-op)",
+      "preflight": "completed",
+      "import": "completed",
+      "verify": "completed (12 checks pass, warning: open/non-manifold edges after the diagnostic weld, informational)",
+      "atlas": "own scripts/atlas_harpy.py (CLI manifest: pending): the CLI atlas.py packs all 9 parts at native size, 4 325 376 px > 2048^2; reproduced 'cannot fit tripo_part_7 at 256px' (logs/atlas-cli-2k-probe.log)",
+      "build": "own scripts/build_harpy_candidate.py via run_harpy_build.py (CLI manifest: pending): 44/44 checks pass",
+      "ue-import": "not run (UE stage deferred)"
+    },
+    "why_own_builder": [
+      "build_candidate.py 0.4.0 is Medusa-specific (bow on +X, face tripo_part_10, neck tripo_part_14)",
+      "Harpy needs: Tripo base replaced by a parametric base with instance marks, per-face orientation fix of a mixed-winding part, wing_span weights, axis ramps, caps on open loops"
+    ],
+    "scripts": {
+      "measure_harpy_parts.py": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/scripts/measure_harpy_parts.py",
+        "sha256": "2630f0105de1590cdd2af66e08bc24a85f330fc3d5afbceed3f3618fc0c3a239"
+      },
+      "atlas_harpy.py": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/scripts/atlas_harpy.py",
+        "sha256": "701de1d8a4b5f1aea51f174c4108c01770e3bc0c239a22a063d346209d7e5394"
+      },
+      "build_harpy_candidate.py": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/scripts/build_harpy_candidate.py",
+        "sha256": "5627018621b93101f1c7985d424a8f077864cf0675989504ac0a1ca806fb0b8b"
+      },
+      "run_harpy_build.py": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/scripts/run_harpy_build.py",
+        "sha256": "db808fccb237e1a56c43a3856af4ee4cba65ef36b682d874d35de521ad861756"
+      },
+      "fbx_to_authored_blend.py": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/scripts/fbx_to_authored_blend.py",
+        "sha256": "6bad96dbebc32e78957a8768faa183196a5b0a36213e92d2808e0cf5b51ac7b5"
+      },
+      "pose_review_harpy.py": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/scripts/pose_review_harpy.py",
+        "sha256": "9ba5be30d5578bade28de27c81178e2cc072cdd8737e853ddc49b58a802bb3b4"
+      },
+      "review_harpy_candidate.py": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/scripts/review_harpy_candidate.py",
+        "sha256": "74ce489eb6c8c0cd219eb328d0fb44054202448926cc8d6560f98c4167758f2b"
+      },
+      "analyse_instances.py": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/scripts/analyse_instances.py",
+        "sha256": "6d2b50e8c50fd8de4ea581c699a21470c65fa659adb489e78e75e14d21054a1a"
+      },
+      "store_preview_frames_harpy.py": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/scripts/store_preview_frames_harpy.py",
+        "sha256": "6e9e0e576445433fca1f2b0aa1ba86a850ed4578b8ff68317874997d3b6abfcf"
+      },
+      "probe_blender_exit_faulthandler.py": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/scripts/probe_blender_exit_faulthandler.py",
+        "sha256": "9c75ce076118b47c729eb48dc8a81bad6cf6a5a68c41469d25146cff58fa5726"
+      }
+    },
+    "exports": {
+      "base": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/export/SM_Harpy_Base_Candidate.fbx",
+        "sha256": "5ecae266dc2d824754ea78724236a4ef0a652f42805a64642610382e34738a71",
+        "bytes": 35852
+      },
+      "skeletal": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/export/SK_Harpy_Candidate.fbx",
+        "sha256": "92a8632dc12456e63a745452a71e8e8d98b9c7b5ba88b4d7eaf01848882f36d1",
+        "bytes": 634908
+      }
+    },
+    "deterministic": "atlas and build re-run: textures and both FBX byte-identical; after the faulthandler change the build was run twice more: same FBX sha256, build-report.json identical between the two runs and different from the first build only in builder_sha256",
+    "build_log": {
+      "log": "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/logs/build.log",
+      "faulthandler": "off by default (run_harpy_build.py --faulthandler / HARPY_BUILD_FAULTHANDLER=1 for diagnostics; such a run writes logs/build-faulthandler.log, not the stage log)",
+      "first_build_log_note": "the first build.log (faulthandler on) ended with 25 'Windows fatal exception: access violation' reports after the stage marker, exit code 0; the regenerated log has none",
+      "explanation": "With an empty script, Blender reports first-chance access violations on its main thread during its own exit (after the script, before Python finalisation) only when faulthandler is on, and exits 0: Windows faulthandler logs exceptions from a vectored handler, i.e. before the process's own exception handlers deal with them (the process goes on to atexit and exits 0). They do not come from the Harpy build; the build keeps faulthandler off unless --faulthandler is given.",
+      "probe": {
+        "report": "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/reports/blender-exit-faulthandler-probe.json",
+        "script": "art/pipeline-candidates/ASSET-HARPY-001/scripts/probe_blender_exit_faulthandler.py",
+        "blender": "Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)",
+        "summary": {
+          "faulthandler_off": {
+            "exit_codes": [
+              0
+            ],
+            "runs": 8,
+            "runs_with_reports": 0
+          },
+          "faulthandler_on": {
+            "exit_codes": [
+              0
+            ],
+            "reports_all_between_script_end_and_py_atexit": true,
+            "reports_all_on_main_thread": true,
+            "reports_min_max": [
+              0,
+              27
+            ],
+            "runs": 8,
+            "runs_with_reports": 5
+          }
+        }
+      },
+      "earlier_real_crash": "EXCEPTION_ACCESS_VIOLATION in blender::property_string_get from the vertex-group removal loop copied from Merlin (non-zero exit, no stage marker); fixed before the first successful build, unrelated to the exit-time reports"
+    },
+    "storage": {
+      "decision": "proposed (owner decides LFS): no Git LFS, plain git objects, as the Medusa Tripo sources (blender/ASSET-MEDUSA-001/tripo-source/*.glb up to 64.2 MB, commit ea73db9, already on origin/fix/admin-panel); .gitattributes has no LFS rule; largest Harpy file 65.4 MB < GitHub's 100 MB limit (warning above 50 MB)",
+      "commit_order": [
+        "1: Tripo stage (source GLB/textures, source-specs, 20260928-tripo-h31/{pipeline,reports,preview}, ASSET-HARPY-001/.gitignore)",
+        "2: Blender stage (this run, build-profiles, scripts, reports docs); or both in one commit — never the Blender stage alone"
+      ],
+      "why_tripo_stage_is_needed": "the run manifest registers all 9 files of tripo-d500fc84 and tripo-c756522c (preflight re-hashes them); run_harpy_build.py needs segmented-retopo-glb (primary) and segmented-9-glb (per-face orientation vote)",
+      "tripo_source_files": {
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-c756522c-retopo-6800.glb": 9517764,
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-c756522c-smartuv-tex2k-pbr.glb": 12981200,
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-c756522c-smartuv-tex2k.glb": 9029056,
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-d500fc84-segmented-9.glb": 65361688,
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-d500fc84-segmented-retopo.glb": 3033040,
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-h31-d500fc84-source.glb": 61970000,
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/textures/harpy-tripo-c756522c-smartuv-tex2k-pbr_basecolor.jpg": 546548,
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/textures/harpy-tripo-c756522c-smartuv-tex2k-pbr_normal.png": 8045819,
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/textures/harpy-tripo-c756522c-smartuv-tex2k-pbr_rm.png": 3951954
+      },
+      "bytes": {
+        "tripo_stage_source": 174437069,
+        "tripo_stage_preview_png": 18846619,
+        "blender_stage_export": 670760,
+        "blender_stage_textures_png": 14155654,
+        "blender_stage_preview": 7896473,
+        "blender_stage_reports": 109891,
+        "blender_stage_logs": 3988
+      },
+      "blender_preview": {
+        "frames_storage": "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/preview/frames-storage.json",
+        "stored_as": {
+          "JPEG q92": 37,
+          "PNG L (unchanged)": 30,
+          "PNG L (lossless, grey)": 5
+        },
+        "removed_probe_frames": 16,
+        "before_bytes": 55912719,
+        "note": "colour frames JPEG q92 at full resolution, grey silhouettes PNG L, grey instance-analysis frames unchanged; PNG sha256 kept in frames-storage.json"
+      },
+      "tripo_preview": "kept as PNG (23 frames, cited by name in the Tripo-stage report and tripo-run.json; same as the Arthur and Merlin Tripo stages)",
+      "textures": "kept as PNG: lossless UE import inputs hashed in atlas-report.json",
+      "logs": "root .gitignore '*.log' would drop them; ASSET-HARPY-001/.gitignore re-includes '*/logs/*.log' (git add -n lists all 4)",
+      "not_committed": [
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/work/",
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/work/",
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/pipeline/work/"
+      ]
+    },
+    "textures": {
+      "BC": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/textures/T_Harpy_Candidate_Atlas_BC.png",
+        "sha256": "6c91809f85d49983538c846b6dd952888527f24cc97f4bf19caedff07609ea65",
+        "pixels": [
+          2048,
+          2048
+        ]
+      },
+      "N": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/textures/T_Harpy_Candidate_Atlas_N.png",
+        "sha256": "b83a9f922e6f4e1c5aed955d14479c66e68c630d276573f8fe99b86f4ff0c4b8",
+        "pixels": [
+          2048,
+          2048
+        ]
+      },
+      "N_OpenGL": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/textures/T_Harpy_Candidate_Atlas_N_OpenGL.png",
+        "sha256": "0620a86f868d8ca1164f102097ea52e5da74af908d0ea44dc8bcea84f321aebd",
+        "pixels": [
+          2048,
+          2048
+        ]
+      },
+      "ORM": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/textures/T_Harpy_Candidate_Atlas_ORM.png",
+        "sha256": "cf9c4081528c05cce717b831f61b501237e452b6155b698ee66e7dca3f7a83ee",
+        "pixels": [
+          2048,
+          2048
+        ]
+      }
+    },
+    "texture_conventions": {
+      "BC": "sRGB colour; Tripo baseColorFactor 0.800 multiplied in",
+      "N": "linear; DirectX (-Y) — for UE (flip_green_channel = false)",
+      "N_OpenGL": "linear; OpenGL (+Y) — Blender preview only",
+      "ORM": "linear; R = occlusion (filled 255, Tripo has none), G = roughness, B = metallic"
+    },
+    "atlas": {
+      "size": 2048,
+      "gutter_px": 4,
+      "cells": {
+        "tripo_part_0": {
+          "cell": 1024,
+          "inset": 4,
+          "x": 0,
+          "y_top": 0
+        },
+        "tripo_part_1": {
+          "cell": 1024,
+          "inset": 4,
+          "x": 1024,
+          "y_top": 0
+        },
+        "tripo_part_2": {
+          "cell": 1024,
+          "inset": 4,
+          "x": 0,
+          "y_top": 1024
+        },
+        "tripo_part_3": {
+          "cell": 512,
+          "inset": 4,
+          "x": 1024,
+          "y_top": 1024
+        },
+        "tripo_part_5": {
+          "cell": 512,
+          "inset": 4,
+          "x": 1536,
+          "y_top": 1024
+        },
+        "tripo_part_6": {
+          "cell": 512,
+          "inset": 4,
+          "x": 1024,
+          "y_top": 1536
+        },
+        "tripo_part_7": {
+          "cell": 256,
+          "inset": 4,
+          "x": 1536,
+          "y_top": 1536
+        },
+        "tripo_part_8": {
+          "cell": 256,
+          "inset": 4,
+          "x": 1792,
+          "y_top": 1536
+        }
+      },
+      "excluded_parts": {
+        "tripo_part_4": {
+          "base_px": 512,
+          "normal_px": 256,
+          "reason": "Tripo base: replaced by the parametric base of meshes.base (no textures, 04 §3.8); its 512^2 set would not fit the 2K atlas at native size",
+          "rm_px": 256
+        }
+      },
+      "normal_renormalised": {
+        "changed": 3569837,
+        "flat_replaced": 22
+      },
+      "source_normal_unit_fraction": {
+        "tripo_part_0": 0.9906,
+        "tripo_part_1": 0.9906,
+        "tripo_part_2": 0.9771,
+        "tripo_part_3": 0.9818,
+        "tripo_part_5": 0.9928,
+        "tripo_part_6": 0.999,
+        "tripo_part_7": 0.9763,
+        "tripo_part_8": 0.9788
+      }
+    },
+    "meshes": {
+      "SK_Harpy_Body": {
+        "triangles": 13061,
+        "vertices": 6681,
+        "material_slots": [
+          "M_Harpy_Atlas"
+        ],
+        "color_attributes": []
+      },
+      "SM_Harpy_Base": {
+        "triangles": 864,
+        "vertices": 515,
+        "material_slots": [
+          "M_Harpy_Base"
+        ],
+        "color_attributes": [
+          "UM_Mask"
+        ]
+      }
+    },
+    "triangle_accounting": "measured by the build of 2026-09-28 and fixed here: GLB 13 893 tris - Tripo base tripo_part_4 976 = 12 917 - 6 degenerate faces removed by the weld = 12 911 + 150 cap triangles (talon ankle 13 + 16, talon soles 28 + 39, wing sockets 28 + 26) = 13 061; parametric base 72 bottom + 288 band + 72 top + 432 pips = 864",
+    "scale": {
+      "base_diameter_m": 0.22,
+      "base_height_m": 0.05,
+      "figure_height_m": 0.42,
+      "figure_scale": 0.65697605,
+      "source_base_bottom": 0.0,
+      "source_base_centre_xy": [
+        -0.000328,
+        -0.062401
+      ],
+      "source_base_top": 0.039538,
+      "source_top_of_top_part": 0.602724,
+      "tripo_base_diameter_at_figure_scale_m": 0.192368
+    },
+    "bounds_m": {
+      "base": {
+        "max": [
+          0.11,
+          0.11,
+          0.0504
+        ],
+        "min": [
+          -0.11,
+          -0.11,
+          0.0
+        ]
+      },
+      "body": {
+        "max": [
+          0.321342,
+          0.201296,
+          0.42
+        ],
+        "min": [
+          -0.320911,
+          -0.119305,
+          0.045088
+        ]
+      },
+      "figure_with_base_height": 0.42,
+      "head_top": 0.42,
+      "span": 0.642253
+    },
+    "expected_ue_bounds_uu": {
+      "skeletal": {
+        "max": [
+          11.93,
+          32.091,
+          42.0
+        ],
+        "min": [
+          -20.13,
+          -32.134,
+          4.509
+        ]
+      },
+      "base": {
+        "max": [
+          11.0,
+          11.0,
+          5.04
+        ],
+        "min": [
+          -11.0,
+          -11.0,
+          0.0
+        ]
+      }
+    },
+    "axes": {
+      "blender_front": "-Y",
+      "export_front": "+X",
+      "export_left_wing": "+Y",
+      "expected_ue_front": "+X",
+      "expected_ue_left_wing": "-Y"
+    },
+    "pivot": {
+      "armature_object_location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "root_bone": "root",
+      "root_head_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "orientation": {
+      "raw_tripo_scores": {
+        "tripo_part_0": 0.9998,
+        "tripo_part_1": 1.0,
+        "tripo_part_2": -0.4152,
+        "tripo_part_3": 0.9973,
+        "tripo_part_4": 1.0,
+        "tripo_part_5": 0.9942,
+        "tripo_part_6": -1.0,
+        "tripo_part_7": 0.9844,
+        "tripo_part_8": 0.9912
+      },
+      "reference_vote_head": {
+        "tripo_part_2": {
+          "faces": 1918,
+          "raw_vote_to_flip": 1413,
+          "reference_triangles": 261401,
+          "smoothing": {
+            "changed_vs_raw_vote": 104,
+            "flipped": 1506,
+            "inconsistent_after_smoothing": 5,
+            "inconsistent_as_imported": 123,
+            "inconsistent_raw_vote": 274,
+            "lambda": 1.0,
+            "manifold_edges": 2847,
+            "sweeps": 4
+          },
+          "unanimous_share": 0.7628,
+          "unmatched_faces": 0,
+          "winding_after_fix": {
+            "inconsistent": 5,
+            "manifold_edges": 2847
+          },
+          "winding_after_weld_before_fix": {
+            "inconsistent": 123,
+            "manifold_edges": 2847
+          }
+        }
+      },
+      "flipped_whole_parts": [
+        "tripo_part_6"
+      ],
+      "after_fix_scores": {
+        "base": 1.0,
+        "tripo_part_0": 0.9998,
+        "tripo_part_1": 1.0,
+        "tripo_part_2": 0.9999,
+        "tripo_part_3": 0.9973,
+        "tripo_part_5": 0.9961,
+        "tripo_part_6": 1.0,
+        "tripo_part_7": 1.0,
+        "tripo_part_8": 1.0
+      },
+      "roundtrip_scores": {
+        "base": 1.0,
+        "tripo_part_0": 0.9998,
+        "tripo_part_1": 1.0,
+        "tripo_part_2": 0.9999,
+        "tripo_part_3": 0.9973,
+        "tripo_part_5": 0.9961,
+        "tripo_part_6": 1.0,
+        "tripo_part_7": 1.0,
+        "tripo_part_8": 1.0
+      },
+      "corner_normals_opposed_area_share": {
+        "base": 0.0,
+        "tripo_part_0": 0.00099,
+        "tripo_part_1": 0.00092,
+        "tripo_part_2": 0.03215,
+        "tripo_part_3": 0.00597,
+        "tripo_part_5": 0.00641,
+        "tripo_part_6": 0.00989,
+        "tripo_part_7": 0.0024,
+        "tripo_part_8": 0.01156
+      }
+    },
+    "caps": {
+      "tripo_part_3": [
+        {
+          "branch_vertices_left_open": 9,
+          "centre_m": [
+            0.05089,
+            -0.00682,
+            0.27547
+          ],
+          "loop_vertices": 28,
+          "max_angular_gap_deg": 63.23,
+          "max_off_plane_m": 0.02881,
+          "mean_radius_m": 0.02534,
+          "normal": [
+            0.9921,
+            0.0489,
+            -0.1155
+          ],
+          "target_source": [
+            0.0746,
+            -0.0722,
+            0.3849
+          ],
+          "triangles": 28
+        },
+        {
+          "branch_vertices_left_open": 0,
+          "centre_m": [
+            -0.05182,
+            -0.00721,
+            0.2724
+          ],
+          "loop_vertices": 26,
+          "max_angular_gap_deg": 81.51,
+          "max_off_plane_m": 0.01399,
+          "mean_radius_m": 0.02627,
+          "normal": [
+            -0.9243,
+            -0.1041,
+            -0.3673
+          ],
+          "target_source": [
+            -0.0792,
+            -0.0734,
+            0.3781
+          ],
+          "triangles": 26
+        }
+      ],
+      "tripo_part_7": [
+        {
+          "branch_vertices_left_open": 0,
+          "centre_m": [
+            -0.04115,
+            -0.02078,
+            0.04638
+          ],
+          "loop_vertices": 28,
+          "max_angular_gap_deg": 42.86,
+          "max_off_plane_m": 0.00203,
+          "mean_radius_m": 0.02027,
+          "normal": [
+            0.0316,
+            0.026,
+            -0.9992
+          ],
+          "target_source": [
+            -0.063,
+            -0.094,
+            0.034
+          ],
+          "triangles": 28
+        },
+        {
+          "branch_vertices_left_open": 0,
+          "centre_m": [
+            -0.02958,
+            0.00452,
+            0.0675
+          ],
+          "loop_vertices": 13,
+          "max_angular_gap_deg": 55.44,
+          "max_off_plane_m": 0.00697,
+          "mean_radius_m": 0.01578,
+          "normal": [
+            0.1178,
+            0.0888,
+            0.9891
+          ],
+          "target_source": [
+            -0.0453,
+            -0.0555,
+            0.0662
+          ],
+          "triangles": 13
+        }
+      ],
+      "tripo_part_8": [
+        {
+          "branch_vertices_left_open": 0,
+          "centre_m": [
+            0.04313,
+            -0.01945,
+            0.04679
+          ],
+          "loop_vertices": 39,
+          "max_angular_gap_deg": 30.7,
+          "max_off_plane_m": 0.0015,
+          "mean_radius_m": 0.02294,
+          "normal": [
+            -0.0257,
+            0.0204,
+            -0.9995
+          ],
+          "target_source": [
+            0.0629,
+            -0.0921,
+            0.0347
+          ],
+          "triangles": 39
+        },
+        {
+          "branch_vertices_left_open": 0,
+          "centre_m": [
+            0.03132,
+            0.00995,
+            0.0672
+          ],
+          "loop_vertices": 16,
+          "max_angular_gap_deg": 46.08,
+          "max_off_plane_m": 0.0074,
+          "mean_radius_m": 0.01417,
+          "normal": [
+            0.1926,
+            0.191,
+            0.9625
+          ],
+          "target_source": [
+            0.0473,
+            -0.0473,
+            0.0657
+          ],
+          "triangles": 16
+        }
+      ]
+    },
+    "weld": {
+      "tripo_part_0": {
+        "vertices": [
+          3582,
+          1649
+        ],
+        "degenerate_faces_removed": 0,
+        "islands_after": 1
+      },
+      "tripo_part_1": {
+        "vertices": [
+          3443,
+          1559
+        ],
+        "degenerate_faces_removed": 0,
+        "islands_after": 1
+      },
+      "tripo_part_2": {
+        "vertices": [
+          3186,
+          980
+        ],
+        "degenerate_faces_removed": 1,
+        "islands_after": 1
+      },
+      "tripo_part_3": {
+        "vertices": [
+          1871,
+          685
+        ],
+        "degenerate_faces_removed": 1,
+        "islands_after": 1
+      },
+      "tripo_part_5": {
+        "vertices": [
+          1730,
+          634
+        ],
+        "degenerate_faces_removed": 3,
+        "islands_after": 1
+      },
+      "tripo_part_6": {
+        "vertices": [
+          1392,
+          476
+        ],
+        "degenerate_faces_removed": 1,
+        "islands_after": 1
+      },
+      "tripo_part_7": {
+        "vertices": [
+          1122,
+          367
+        ],
+        "degenerate_faces_removed": 0,
+        "islands_after": 1
+      },
+      "tripo_part_8": {
+        "vertices": [
+          939,
+          325
+        ],
+        "degenerate_faces_removed": 0,
+        "islands_after": 1
+      }
+    },
+    "rig": {
+      "armature_object": "SKEL_UM_Humanoid",
+      "skeleton": "UM_HUMANOID_17_v1",
+      "bones": 17,
+      "fbx_bones": 17,
+      "wings": "arm_upper/arm_lower/hand.(L|R) (rig-contract optional_extensions.harpy_wings); wing_tip.L/R not added",
+      "weapon": "unweighted leaf under hand.L, kept for the 17-bone set (parent_by_character Harpy = null)",
+      "bones_final_m": {
+        "arm_lower.L": [
+          [
+            0.1077,
+            0.03186,
+            0.31966
+          ],
+          [
+            0.1774,
+            0.07621,
+            0.37748
+          ]
+        ],
+        "arm_lower.R": [
+          [
+            -0.10661,
+            0.02884,
+            0.32032
+          ],
+          [
+            -0.17684,
+            0.07483,
+            0.37859
+          ]
+        ],
+        "arm_upper.L": [
+          [
+            0.05067,
+            -0.00447,
+            0.27177
+          ],
+          [
+            0.1077,
+            0.03186,
+            0.31966
+          ]
+        ],
+        "arm_upper.R": [
+          [
+            -0.04912,
+            -0.00874,
+            0.2717
+          ],
+          [
+            -0.10661,
+            0.02884,
+            0.32032
+          ]
+        ],
+        "foot.L": [
+          [
+            0.03162,
+            0.00736,
+            0.06811
+          ],
+          [
+            0.03701,
+            -0.05755,
+            0.04768
+          ]
+        ],
+        "foot.R": [
+          [
+            -0.02955,
+            0.00453,
+            0.06752
+          ],
+          [
+            -0.03658,
+            -0.05755,
+            0.04768
+          ]
+        ],
+        "hand.L": [
+          [
+            0.1774,
+            0.07621,
+            0.37748
+          ],
+          [
+            0.3157,
+            0.19519,
+            0.28051
+          ]
+        ],
+        "hand.R": [
+          [
+            -0.17684,
+            0.07483,
+            0.37859
+          ],
+          [
+            -0.31415,
+            0.19387,
+            0.28419
+          ]
+        ],
+        "head": [
+          [
+            0.00022,
+            -0.02142,
+            0.29667
+          ],
+          [
+            -0.00964,
+            -0.0477,
+            0.41164
+          ]
+        ],
+        "hips": [
+          [
+            0.00022,
+            0.018,
+            0.17184
+          ],
+          [
+            0.00022,
+            0.00815,
+            0.2244
+          ]
+        ],
+        "leg_lower.L": [
+          [
+            0.05672,
+            -0.02799,
+            0.14557
+          ],
+          [
+            0.03162,
+            0.00736,
+            0.06811
+          ]
+        ],
+        "leg_lower.R": [
+          [
+            -0.05628,
+            -0.02799,
+            0.14557
+          ],
+          [
+            -0.02955,
+            0.00453,
+            0.06752
+          ]
+        ],
+        "leg_upper.L": [
+          [
+            0.03306,
+            0.01472,
+            0.19812
+          ],
+          [
+            0.05672,
+            -0.02799,
+            0.14557
+          ]
+        ],
+        "leg_upper.R": [
+          [
+            -0.03263,
+            0.01472,
+            0.19812
+          ],
+          [
+            -0.05628,
+            -0.02799,
+            0.14557
+          ]
+        ],
+        "root": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.04
+          ]
+        ],
+        "spine": [
+          [
+            0.00022,
+            0.00815,
+            0.2244
+          ],
+          [
+            0.00022,
+            -0.0201,
+            0.29207
+          ]
+        ],
+        "weapon": [
+          [
+            0.3157,
+            0.19519,
+            0.28051
+          ],
+          [
+            0.3289,
+            0.20655,
+            0.27124
+          ]
+        ]
+      },
+      "weights": {
+        "bones_used": {
+          "arm_lower.L": 1024,
+          "arm_lower.R": 942,
+          "arm_upper.L": 671,
+          "arm_upper.R": 701,
+          "foot.L": 327,
+          "foot.R": 369,
+          "hand.L": 780,
+          "hand.R": 677,
+          "head": 958,
+          "hips": 500,
+          "leg_lower.L": 418,
+          "leg_lower.R": 381,
+          "leg_upper.L": 321,
+          "leg_upper.R": 415,
+          "spine": 1175
+        },
+        "max_influences": 3,
+        "not_normalised_vertices": 0,
+        "unweighted_vertices": 0,
+        "vertices": 6681,
+        "weight_share": {
+          "arm_lower.L": 0.0961,
+          "arm_lower.R": 0.0868,
+          "arm_upper.L": 0.0628,
+          "arm_upper.R": 0.0701,
+          "foot.L": 0.0489,
+          "foot.R": 0.0552,
+          "hand.L": 0.0822,
+          "hand.R": 0.0696,
+          "head": 0.1389,
+          "hips": 0.0409,
+          "leg_lower.L": 0.0404,
+          "leg_lower.R": 0.0334,
+          "leg_upper.L": 0.0278,
+          "leg_upper.R": 0.0302,
+          "spine": 0.1166
+        }
+      },
+      "wing_span": {
+        "tripo_part_0": {
+          "direction_xy": [
+            0.7987,
+            0.6017,
+            0.0
+          ],
+          "dominant_bone_vertices": {
+            "arm_lower.L": 670,
+            "arm_upper.L": 441,
+            "hand.L": 523,
+            "spine": 15
+          },
+          "joint_band_m": 0.03285,
+          "root_band_m": 0.03942,
+          "root_mode": "distance",
+          "span_elbow_m": 0.06741,
+          "span_tip_m": 0.33181,
+          "span_wrist_m": 0.14977
+        },
+        "tripo_part_1": {
+          "direction_xy": [
+            -0.7944,
+            0.6073,
+            0.0
+          ],
+          "dominant_bone_vertices": {
+            "arm_lower.R": 597,
+            "arm_upper.R": 491,
+            "hand.R": 452,
+            "spine": 19
+          },
+          "joint_band_m": 0.03285,
+          "root_band_m": 0.03942,
+          "root_mode": "distance",
+          "span_elbow_m": 0.06849,
+          "span_tip_m": 0.3336,
+          "span_wrist_m": 0.15222
+        }
+      },
+      "weight_groups": {
+        "right talons (no toe bones)": {
+          "parts": [
+            "tripo_part_7"
+          ],
+          "rigid": "foot.R"
+        },
+        "left talons": {
+          "parts": [
+            "tripo_part_8"
+          ],
+          "rigid": "foot.L"
+        },
+        "head, face and feather crest; the collar feathers of the hea": {
+          "parts": [
+            "tripo_part_2"
+          ],
+          "axis_blend": {
+            "from": "spine",
+            "to": "head",
+            "axis": "z",
+            "zero_below": 0.37,
+            "full_above": 0.43
+          }
+        },
+        "chest and back with the wing sockets: spine; only the belly ": {
+          "parts": [
+            "tripo_part_3"
+          ],
+          "heat": [
+            "hips",
+            "spine"
+          ],
+          "height_ramps": [
+            {
+              "bones": [
+                "hips"
+              ],
+              "zero_above_z": 0.31,
+              "full_below_z": 0.26,
+              "to": "spine"
+            }
+          ]
+        },
+        "right leg (feathered thigh, shin, scaled tarsus) AND the tai": {
+          "parts": [
+            "tripo_part_5"
+          ],
+          "heat": [
+            "hips",
+            "leg_upper.R",
+            "leg_lower.R"
+          ],
+          "height_ramps": [
+            {
+              "bones": [
+                "leg_upper.R",
+                "leg_lower.R"
+              ],
+              "axis": "y",
+              "zero_above": 0.02,
+              "full_below": -0.01,
+              "to": "hips"
+            },
+            {
+              "bones": [
+                "leg_upper.R"
+              ],
+              "zero_above_z": 0.3,
+              "full_below_z": 0.265,
+              "to": "hips"
+            }
+          ]
+        },
+        "left leg with the bracelet on the scaled tarsus": {
+          "parts": [
+            "tripo_part_6"
+          ],
+          "heat": [
+            "hips",
+            "leg_upper.L",
+            "leg_lower.L"
+          ],
+          "height_ramps": [
+            {
+              "bones": [
+                "leg_upper.L"
+              ],
+              "zero_above_z": 0.3,
+              "full_below_z": 0.265,
+              "to": "hips"
+            }
+          ]
+        },
+        "left wing (+X)": {
+          "parts": [
+            "tripo_part_0"
+          ],
+          "wing_span": {
+            "chain": [
+              "arm_upper.L",
+              "arm_lower.L",
+              "hand.L"
+            ],
+            "root_to": "spine",
+            "root_mode": "distance",
+            "root_band_m": 0.06,
+            "joint_band_m": 0.05
+          }
+        },
+        "right wing (-X)": {
+          "parts": [
+            "tripo_part_1"
+          ],
+          "wing_span": {
+            "chain": [
+              "arm_upper.R",
+              "arm_lower.R",
+              "hand.R"
+            ],
+            "root_to": "spine",
+            "root_mode": "distance",
+            "root_band_m": 0.06,
+            "joint_band_m": 0.05
+          }
+        }
+      }
+    },
+    "sockets": [
+      {
+        "bone": "head",
+        "bone_head_ue_component_uu": [
+          2.142,
+          -0.022,
+          29.667
+        ],
+        "name": "Head",
+        "offset_blender_bone_local_uu": [
+          -0.406,
+          4.028,
+          2.226
+        ],
+        "status": "предложено",
+        "target_blender_m": [
+          -0.00485,
+          -0.05232,
+          0.33063
+        ],
+        "target_ue_component_uu": [
+          5.232,
+          0.485,
+          33.063
+        ]
+      },
+      {
+        "bone": "foot.R",
+        "bone_head_ue_component_uu": [
+          -0.453,
+          2.955,
+          6.752
+        ],
+        "name": "Weapon",
+        "offset_blender_bone_local_uu": [
+          -0.541,
+          5.443,
+          0.08
+        ],
+        "status": "предложено",
+        "target_blender_m": [
+          -0.04011,
+          -0.04735,
+          0.05377
+        ],
+        "target_ue_component_uu": [
+          4.735,
+          4.011,
+          5.377
+        ]
+      }
+    ],
+    "rig_deform_probe": {
+      "blend": {
+        "head_turn": {
+          "status": "plausible",
+          "moved": 943,
+          "z_norm": 0.791,
+          "x_norm": -0.001
+        },
+        "spine_bend_fwd": {
+          "status": "plausible",
+          "moved": 4814,
+          "z_norm": 0.648,
+          "x_norm": 0.016
+        },
+        "arm_l_raise": {
+          "status": "plausible",
+          "moved": 1644,
+          "z_norm": 0.622,
+          "x_norm": 0.463
+        },
+        "arm_r_raise": {
+          "status": "plausible",
+          "moved": 1554,
+          "z_norm": 0.63,
+          "x_norm": -0.439
+        },
+        "forearm_l_bend": {
+          "status": "plausible",
+          "moved": 1299,
+          "z_norm": 0.634,
+          "x_norm": 0.529
+        },
+        "thigh_l_flex": {
+          "status": "plausible",
+          "moved": 785,
+          "z_norm": 0.144,
+          "x_norm": 0.123
+        },
+        "thigh_r_flex": {
+          "status": "plausible",
+          "moved": 819,
+          "z_norm": 0.153,
+          "x_norm": -0.128
+        }
+      },
+      "fbx": {
+        "head_turn": {
+          "status": "plausible",
+          "moved": 943,
+          "z_norm": 0.791,
+          "x_norm": -0.001
+        },
+        "spine_bend_fwd": {
+          "status": "plausible",
+          "moved": 4814,
+          "z_norm": 0.648,
+          "x_norm": 0.016
+        },
+        "arm_l_raise": {
+          "status": "plausible",
+          "moved": 1644,
+          "z_norm": 0.622,
+          "x_norm": 0.463
+        },
+        "arm_r_raise": {
+          "status": "plausible",
+          "moved": 1554,
+          "z_norm": 0.63,
+          "x_norm": -0.439
+        },
+        "forearm_l_bend": {
+          "status": "plausible",
+          "moved": 1299,
+          "z_norm": 0.634,
+          "x_norm": 0.529
+        },
+        "thigh_l_flex": {
+          "status": "plausible",
+          "moved": 785,
+          "z_norm": 0.144,
+          "x_norm": 0.123
+        },
+        "thigh_r_flex": {
+          "status": "plausible",
+          "moved": 819,
+          "z_norm": 0.153,
+          "x_norm": -0.128
+        }
+      }
+    },
+    "pose_review": {
+      "arm_l_raise": {
+        "edge_stretch_max": 1.351,
+        "edge_stretch_p99": 1.0422,
+        "edges_over_1_5x": 0,
+        "seam_gap_max_m": 0.0109
+      },
+      "arm_r_raise": {
+        "edge_stretch_max": 1.3831,
+        "edge_stretch_p99": 1.0463,
+        "edges_over_1_5x": 0,
+        "seam_gap_max_m": 0.01679
+      },
+      "forearm_l_bend": {
+        "edge_stretch_max": 1.6805,
+        "edge_stretch_p99": 1.1076,
+        "edges_over_1_5x": 15,
+        "seam_gap_max_m": 0.0015
+      },
+      "head_turn": {
+        "edge_stretch_max": 2.0679,
+        "edge_stretch_p99": 1.0341,
+        "edges_over_1_5x": 22,
+        "seam_gap_max_m": 0.02499
+      },
+      "spine_bend_fwd": {
+        "edge_stretch_max": 1.2653,
+        "edge_stretch_p99": 1.0,
+        "edges_over_1_5x": 0,
+        "seam_gap_max_m": 0.00551
+      },
+      "thigh_l_flex": {
+        "edge_stretch_max": 1.5182,
+        "edge_stretch_p99": 1.0,
+        "edges_over_1_5x": 2,
+        "seam_gap_max_m": 0.01808
+      },
+      "thigh_r_flex": {
+        "edge_stretch_max": 1.6231,
+        "edge_stretch_p99": 1.034,
+        "edges_over_1_5x": 3,
+        "seam_gap_max_m": 0.01869
+      }
+    },
+    "base_and_instances": {
+      "base": {
+        "mask": {
+          "binary": true,
+          "corners": 2016,
+          "domain": "CORNER",
+          "rgb_counts": {
+            "000": 432,
+            "001": 672,
+            "010": 336,
+            "100": 576
+          },
+          "type": "BYTE_COLOR"
+        },
+        "parametric": {
+          "faces_by_role": {
+            "band": 144,
+            "bottom": 72,
+            "pip_centre": 96,
+            "pip_outer": 192,
+            "top": 72
+          },
+          "pips": [
+            {
+              "centre_m": [
+                -0.02951,
+                -0.09083
+              ],
+              "radius_from_axis_m": 0.0955,
+              "sector_deg": -90,
+              "slot": "outer_a"
+            },
+            {
+              "centre_m": [
+                0.0,
+                -0.0955
+              ],
+              "radius_from_axis_m": 0.0955,
+              "sector_deg": -90,
+              "slot": "centre"
+            },
+            {
+              "centre_m": [
+                0.02951,
+                -0.09083
+              ],
+              "radius_from_axis_m": 0.0955,
+              "sector_deg": -90,
+              "slot": "outer_b"
+            },
+            {
+              "centre_m": [
+                0.09341,
+                0.01986
+              ],
+              "radius_from_axis_m": 0.0955,
+              "sector_deg": 30,
+              "slot": "outer_a"
+            },
+            {
+              "centre_m": [
+                0.08271,
+                0.04775
+              ],
+              "radius_from_axis_m": 0.0955,
+              "sector_deg": 30,
+              "slot": "centre"
+            },
+            {
+              "centre_m": [
+                0.0639,
+                0.07097
+              ],
+              "radius_from_axis_m": 0.0955,
+              "sector_deg": 30,
+              "slot": "outer_b"
+            },
+            {
+              "centre_m": [
+                -0.0639,
+                0.07097
+              ],
+              "radius_from_axis_m": 0.0955,
+              "sector_deg": 150,
+              "slot": "outer_a"
+            },
+            {
+              "centre_m": [
+                -0.08271,
+                0.04775
+              ],
+              "radius_from_axis_m": 0.0955,
+              "sector_deg": 150,
+              "slot": "centre"
+            },
+            {
+              "centre_m": [
+                -0.09341,
+                0.01986
+              ],
+              "radius_from_axis_m": 0.0955,
+              "sector_deg": 150,
+              "slot": "outer_b"
+            }
+          ]
+        },
+        "roundtrip_mask": {
+          "binary": true,
+          "corners": 2592,
+          "domain": "CORNER",
+          "rgb_counts": {
+            "000": 432,
+            "001": 864,
+            "010": 432,
+            "100": 864
+          },
+          "type": "BYTE_COLOR"
+        },
+        "talon_max_radius_m": 0.08779
+      },
+      "profile": {
+        "radius_bottom_m": 0.11,
+        "side_top_z_m": 0.046,
+        "radius_top_m": 0.106,
+        "height_m": 0.05,
+        "segments": 72,
+        "azimuth_convention": "degrees in the XY plane from +X counter-clockwise; -90 = -Y = the figure's front",
+        "pips": {
+          "ring_radius_m": 0.0955,
+          "pip_radius_m": 0.009,
+          "pip_sides": 16,
+          "arc_spacing_m": 0.03,
+          "sector_azimuths_deg": [
+            -90,
+            30,
+            150
+          ],
+          "raise_m": 0.0004,
+          "skirt_m": 0.0006,
+          "slots_per_sector": [
+            "outer_a",
+            "centre",
+            "outer_b"
+          ],
+          "note": "3 sectors 120 deg apart, so for any yaw one sector faces the camera within ±60 deg. The talon tips reach r 8.4 uu (source r 0.127 x scale), the pips span r 8.65-10.45 uu on the flat top (r ≤ 10.6 uu). Pips are raised 0.04 uu with a 0.06 uu skirt (no z-fighting with the top); every pip exists in every instance, unlit pips take the base colour"
+        },
+        "mask": {
+          "attribute": "UM_Mask",
+          "domain": "CORNER",
+          "type": "BYTE_COLOR",
+          "channels": {
+            "R": "team band: side wall and chamfer (TeamColor, 03 С-11: team colour only on bases/rings/markers)",
+            "G": "centre pip of each sector",
+            "B": "outer pips of each sector",
+            "A": "unused (1.0)"
+          },
+          "instance_rule": "InstanceIndex 1 -> centre pips (•), 2 -> outer pips (• •), 3 -> all (•••): lit = G * (Index != 2) + B * (Index >= 2)",
+          "values_note": "binary 0/1 per channel, so sRGB/linear vertex-colour conversion cannot shift them"
+        },
+        "material": "M_Harpy_Base",
+        "preview_colours_linear": {
+          "base": [
+            0.03,
+            0.026,
+            0.023
+          ],
+          "pip": [
+            0.78,
+            0.74,
+            0.64
+          ],
+          "team_gold": [
+            0.807,
+            0.527,
+            0.144
+          ],
+          "team_silver": [
+            0.347,
+            0.539,
+            0.686
+          ],
+          "team_note": "03 С-11 hex converted sRGB -> linear: #E8C06A = sRGB (0.910, 0.753, 0.416) = linear (0.807, 0.527, 0.144); #9FC2D8 = sRGB (0.624, 0.761, 0.847) = linear (0.347, 0.539, 0.686). The Merlin/Arthur profiles list hex/255 (sRGB) values as 'linear'"
+        }
+      },
+      "instances": {
+        "count": 3,
+        "status": "предложено (AD-OPEN-06 open: «H1/H2/H3» GD-030 vs «Гарпия 1/2/3» QA-102; carrier — base marker or HUD)",
+        "carrier": "base top pips selected by a material parameter InstanceIndex (1/2/3) on one base mesh; figure mesh and material identical for all three",
+        "patterns": {
+          "1": "• (centre)",
+          "2": "• • (outer pair, gap in the middle)",
+          "3": "••• (all three)"
+        },
+        "grayscale": "pips light bone-white on a near-black top (luminance ratio > 10), so they read without colour; team colour lives on the side band (С-11)",
+        "identity_note": "InstanceIndex is bound to the fighter (fighter.id -> index), not to the actor slot, so death and return (Winged Frenzy) keep the same marks (ACC-014); binding is UE/gameplay work"
+      },
+      "k_frames": {
+        "instances_facing_k1": {
+          "all_distinguishable": true,
+          "per_instance": {
+            "1": {
+              "consistent_indices": [
+                1
+              ],
+              "distinguishable": true,
+              "lit_slots": 2,
+              "matches_own_pattern": true,
+              "max_unlit_delta": -0.8,
+              "min_lit_delta": 170.4,
+              "pip_radius_px": 2.27,
+              "visible_slots": 6,
+              "yaw_deg": 0.0
+            },
+            "2": {
+              "consistent_indices": [
+                2
+              ],
+              "distinguishable": true,
+              "lit_slots": 4,
+              "matches_own_pattern": true,
+              "max_unlit_delta": -19.1,
+              "min_lit_delta": 155.9,
+              "pip_radius_px": 2.27,
+              "visible_slots": 5,
+              "yaw_deg": 0.0
+            },
+            "3": {
+              "consistent_indices": [
+                3
+              ],
+              "distinguishable": true,
+              "lit_slots": 6,
+              "matches_own_pattern": true,
+              "max_unlit_delta": null,
+              "min_lit_delta": 154.0,
+              "pip_radius_px": 2.27,
+              "visible_slots": 6,
+              "yaw_deg": 0.0
+            }
+          }
+        },
+        "instances_facing_k2": {
+          "all_distinguishable": true,
+          "per_instance": {
+            "1": {
+              "consistent_indices": [
+                1
+              ],
+              "distinguishable": true,
+              "lit_slots": 2,
+              "matches_own_pattern": true,
+              "max_unlit_delta": -0.1,
+              "min_lit_delta": 188.0,
+              "pip_radius_px": 3.62,
+              "visible_slots": 5,
+              "yaw_deg": 0.0
+            },
+            "2": {
+              "consistent_indices": [
+                2
+              ],
+              "distinguishable": true,
+              "lit_slots": 4,
+              "matches_own_pattern": true,
+              "max_unlit_delta": -5.0,
+              "min_lit_delta": 156.8,
+              "pip_radius_px": 3.62,
+              "visible_slots": 5,
+              "yaw_deg": 0.0
+            },
+            "3": {
+              "consistent_indices": [
+                3
+              ],
+              "distinguishable": true,
+              "lit_slots": 5,
+              "matches_own_pattern": true,
+              "max_unlit_delta": null,
+              "min_lit_delta": 156.6,
+              "pip_radius_px": 3.62,
+              "visible_slots": 5,
+              "yaw_deg": 0.0
+            }
+          }
+        },
+        "instances_facing_k2close": {
+          "all_distinguishable": true,
+          "per_instance": {
+            "1": {
+              "consistent_indices": [
+                1
+              ],
+              "distinguishable": true,
+              "lit_slots": 2,
+              "matches_own_pattern": true,
+              "max_unlit_delta": -0.1,
+              "min_lit_delta": 190.3,
+              "pip_radius_px": 5.63,
+              "visible_slots": 6,
+              "yaw_deg": 0.0
+            },
+            "2": {
+              "consistent_indices": [
+                2
+              ],
+              "distinguishable": true,
+              "lit_slots": 4,
+              "matches_own_pattern": true,
+              "max_unlit_delta": -1.1,
+              "min_lit_delta": 156.5,
+              "pip_radius_px": 5.63,
+              "visible_slots": 5,
+              "yaw_deg": 0.0
+            },
+            "3": {
+              "consistent_indices": [
+                3
+              ],
+              "distinguishable": true,
+              "lit_slots": 6,
+              "matches_own_pattern": true,
+              "max_unlit_delta": null,
+              "min_lit_delta": 157.6,
+              "pip_radius_px": 5.63,
+              "visible_slots": 6,
+              "yaw_deg": 0.0
+            }
+          }
+        },
+        "instances_mixed_yaw_k1": {
+          "all_distinguishable": true,
+          "per_instance": {
+            "1": {
+              "consistent_indices": [
+                1
+              ],
+              "distinguishable": true,
+              "lit_slots": 2,
+              "matches_own_pattern": true,
+              "max_unlit_delta": -0.5,
+              "min_lit_delta": 159.0,
+              "pip_radius_px": 2.2,
+              "visible_slots": 6,
+              "yaw_deg": 35.0
+            },
+            "2": {
+              "consistent_indices": [
+                2
+              ],
+              "distinguishable": true,
+              "lit_slots": 5,
+              "matches_own_pattern": true,
+              "max_unlit_delta": -0.3,
+              "min_lit_delta": 131.1,
+              "pip_radius_px": 1.97,
+              "visible_slots": 7,
+              "yaw_deg": -120.0
+            },
+            "3": {
+              "consistent_indices": [
+                3
+              ],
+              "distinguishable": true,
+              "lit_slots": 6,
+              "matches_own_pattern": true,
+              "max_unlit_delta": null,
+              "min_lit_delta": 160.9,
+              "pip_radius_px": 2.22,
+              "visible_slots": 6,
+              "yaw_deg": 150.0
+            }
+          }
+        },
+        "instances_mixed_yaw_k2": {
+          "all_distinguishable": true,
+          "per_instance": {
+            "1": {
+              "consistent_indices": [
+                1
+              ],
+              "distinguishable": true,
+              "lit_slots": 2,
+              "matches_own_pattern": true,
+              "max_unlit_delta": -0.1,
+              "min_lit_delta": 174.8,
+              "pip_radius_px": 3.57,
+              "visible_slots": 6,
+              "yaw_deg": 35.0
+            },
+            "2": {
+              "consistent_indices": [
+                2
+              ],
+              "distinguishable": true,
+              "lit_slots": 5,
+              "matches_own_pattern": true,
+              "max_unlit_delta": -0.4,
+              "min_lit_delta": 108.4,
+              "pip_radius_px": 3.15,
+              "visible_slots": 7,
+              "yaw_deg": -120.0
+            },
+            "3": {
+              "consistent_indices": [
+                3
+              ],
+              "distinguishable": true,
+              "lit_slots": 6,
+              "matches_own_pattern": true,
+              "max_unlit_delta": null,
+              "min_lit_delta": 181.3,
+              "pip_radius_px": 3.59,
+              "visible_slots": 6,
+              "yaw_deg": 150.0
+            }
+          }
+        },
+        "instances_mixed_yaw_k2close": {
+          "all_distinguishable": true,
+          "per_instance": {
+            "1": {
+              "consistent_indices": [
+                1
+              ],
+              "distinguishable": true,
+              "lit_slots": 2,
+              "matches_own_pattern": true,
+              "max_unlit_delta": 0.0,
+              "min_lit_delta": 156.5,
+              "pip_radius_px": 5.69,
+              "visible_slots": 6,
+              "yaw_deg": 35.0
+            },
+            "2": {
+              "consistent_indices": [
+                2
+              ],
+              "distinguishable": true,
+              "lit_slots": 5,
+              "matches_own_pattern": true,
+              "max_unlit_delta": -0.2,
+              "min_lit_delta": 95.2,
+              "pip_radius_px": 4.9,
+              "visible_slots": 7,
+              "yaw_deg": -120.0
+            },
+            "3": {
+              "consistent_indices": [
+                3
+              ],
+              "distinguishable": true,
+              "lit_slots": 6,
+              "matches_own_pattern": true,
+              "max_unlit_delta": null,
+              "min_lit_delta": 184.4,
+              "pip_radius_px": 5.68,
+              "visible_slots": 6,
+              "yaw_deg": 150.0
+            }
+          }
+        }
+      }
+    },
+    "proposed_limits_comparison": {
+      "base_triangles": {
+        "measured_after_triangulation": 864,
+        "proposed": [
+          500,
+          2000
+        ]
+      },
+      "base_uu": {
+        "measured": [
+          22.0,
+          22.0,
+          5.04
+        ],
+        "proposed_diameter": 22,
+        "proposed_height": 5
+      },
+      "capsule_uu": {
+        "body_max_radius_from_pivot_axis": 37.888,
+        "core_fits": true,
+        "core_max_radius_without_wings": 12.036,
+        "note": "the wings (span 64.2 uu) are outside a Ø26 capsule by design; the capsule is the selection body, the wings stay within the cell (100 uu)",
+        "proposed": {
+          "diameter": 26,
+          "height": 48
+        },
+        "top": 42.0
+      },
+      "height_uu": {
+        "measured_head_top": 42.0,
+        "proposed": [
+          35,
+          42
+        ]
+      },
+      "material_slots": {
+        "base": 1,
+        "measured_skeletal_unique": 1,
+        "proposed_max": 2,
+        "total": 2
+      },
+      "note": "comparison with proposals only, not budgets (GD-058 open)",
+      "sidekick_triangles": {
+        "measured_body": 13061,
+        "proposed": [
+          8000,
+          15000
+        ],
+        "with_base": 13925
+      },
+      "span_uu": {
+        "fits": true,
+        "measured": 64.225,
+        "proposed_max": 80
+      },
+      "texture_px": {
+        "measured": 2048,
+        "note": "2K atlas at native part-texture size; the 1K proposal can be met on import (MaxTextureSize 1024)",
+        "proposed": 1024
+      }
+    },
+    "checks_failed": [],
+    "checks_passed": 44,
+    "evidence": [
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/reports/build-report.json",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/reports/atlas-report.json",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/reports/verify-report.json",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/reports/inspect-rig-SK_Harpy_Candidate.json",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/preview/review-frames.json",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/preview/poses/pose-review.json",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/preview/deform/harpy-fbx-deform.json",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/preview/instances/instances-analysis.json",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/preview/frames-storage.json",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/reports/blender-exit-faulthandler-probe.json",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/logs/build.log",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/logs/atlas.log",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/logs/atlas-cli-2k-probe.log"
+    ],
+    "not_done": [
+      "UE import, sockets and +X facing in UE, vertex-colour import, base material with InstanceIndex",
+      "clips Idle/LungeAttack/HitReact/DeathSettle (AD-CNF-30)",
+      "art acceptance, K1/K2/K3 in the game lighting, LOD",
+      "edits of asset-registry.json, DIRECTORY-MAP.md, tripo_pipeline.py; git commit/push"
+    ]
+  },
+  "latest_stage": "blender"
+}

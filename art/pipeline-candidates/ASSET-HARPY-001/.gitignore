@@ -1,0 +1,9 @@
+# Harpy candidate: transient files (the parent .gitignore only matches */*/work/ etc.)
+*/work/
+*/pipeline/work/
+*/pipeline/.staging/
+*/pipeline/run.lock
+*.blend1
+# Stage logs are evidence (cited in docs/art-pipeline/harpy-candidate-report.*): re-include them against the
+# root rule `*.log`. work/ stays excluded above, so logs inside it are not re-included.
+!*/logs/*.log

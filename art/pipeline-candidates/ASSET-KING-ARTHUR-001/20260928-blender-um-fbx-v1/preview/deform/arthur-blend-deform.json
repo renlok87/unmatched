@@ -1,0 +1,183 @@
+{
+ "source": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/work/ASSET-KING-ARTHUR-001_segmented-retopo-glb-candidate.blend",
+ "label": "arthur-blend",
+ "family": "contract17",
+ "family_bone_hits": 7,
+ "height": 0.54928,
+ "bbox_min": [
+  -0.1419,
+  -0.0985,
+  0.0587
+ ],
+ "bbox_max": [
+  0.1512,
+  0.1208,
+  0.608
+ ],
+ "tests": [
+  {
+   "test": "head_turn",
+   "bone": "head",
+   "axis": "Z",
+   "deg": 35,
+   "moved_vertices": 846,
+   "centroid_z_norm": 0.806,
+   "centroid_x_norm": -0.036,
+   "expect": {
+    "z_norm_min": 0.7
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_KingArthur_Body",
+     0.0841
+    ],
+    [
+     "SK_KingArthur_Sword",
+     0.0
+    ]
+   ]
+  },
+  {
+   "test": "spine_bend_fwd",
+   "bone": "spine",
+   "axis": "X",
+   "deg": 25,
+   "moved_vertices": 5169,
+   "centroid_z_norm": 0.626,
+   "centroid_x_norm": -0.068,
+   "expect": {
+    "z_norm_min": 0.45
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_KingArthur_Sword",
+     1.0
+    ],
+    [
+     "SK_KingArthur_Body",
+     0.481
+    ]
+   ]
+  },
+  {
+   "test": "arm_l_raise",
+   "bone": "arm_upper.L",
+   "axis": "Y",
+   "deg": -45,
+   "moved_vertices": 1209,
+   "centroid_z_norm": 0.545,
+   "centroid_x_norm": 0.507,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_min": 0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_KingArthur_Body",
+     0.1202
+    ],
+    [
+     "SK_KingArthur_Sword",
+     0.0
+    ]
+   ]
+  },
+  {
+   "test": "arm_r_raise",
+   "bone": "arm_upper.R",
+   "axis": "Y",
+   "deg": 45,
+   "moved_vertices": 1421,
+   "centroid_z_norm": 0.612,
+   "centroid_x_norm": -0.581,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_max": -0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_KingArthur_Sword",
+     1.0
+    ],
+    [
+     "SK_KingArthur_Body",
+     0.1083
+    ]
+   ]
+  },
+  {
+   "test": "forearm_l_bend",
+   "bone": "arm_lower.L",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 559,
+   "centroid_z_norm": 0.424,
+   "centroid_x_norm": 0.623,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_min": 0.2
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_KingArthur_Body",
+     0.0556
+    ],
+    [
+     "SK_KingArthur_Sword",
+     0.0
+    ]
+   ]
+  },
+  {
+   "test": "thigh_l_flex",
+   "bone": "leg_upper.L",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 2634,
+   "centroid_z_norm": 0.158,
+   "centroid_x_norm": 0.258,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_KingArthur_Body",
+     0.2619
+    ],
+    [
+     "SK_KingArthur_Sword",
+     0.0
+    ]
+   ]
+  },
+  {
+   "test": "thigh_r_flex",
+   "bone": "leg_upper.R",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 2902,
+   "centroid_z_norm": 0.161,
+   "centroid_x_norm": -0.278,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_KingArthur_Body",
+     0.2886
+    ],
+    [
+     "SK_KingArthur_Sword",
+     0.0
+    ]
+   ]
+  }
+ ]
+}

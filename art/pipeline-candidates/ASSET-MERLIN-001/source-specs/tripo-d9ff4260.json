@@ -1,0 +1,149 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-d9ff4260",
+  "asset_id": "ASSET-MERLIN-001",
+  "service": "tripo-studio",
+  "task_id": "d9ff4260-15c5-4c8c-b16c-4ab26bf43c5f",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/d9ff4260-15c5-4c8c-b16c-4ab26bf43c5f",
+  "date": "2026-09-28",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач. Ожидание дольше",
+    "backend": null
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-front.png",
+        "sha256": "cdd344e012d02abbecf232a7c1c0e332a29501794455e1f4320830083705e109"
+      },
+      "left": null,
+      "right": {
+        "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-right.png",
+        "sha256": "839bffe4ac47d805778cd3cf5241976bb18fb854249ef12f0ed5166d2220d678"
+      },
+      "back": {
+        "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-back.png",
+        "sha256": "e859071fe3fbc9180c2c0b7af4eba855f91354e14f9e264fe8ef6869a4942d63"
+      }
+    },
+    "input_manifest": "docs/art-pipeline/imagegen-inputs/manifest.json",
+    "settings": {
+      "output": "geometry and texture",
+      "texture_quality": "4K",
+      "texture_8k": false,
+      "generate_parts": false,
+      "ultra_mesh_quality": true,
+      "ai_completion": false,
+      "privacy": "private",
+      "topology": "triangle",
+      "polygon_count": 2000000,
+      "remove_lighting": true,
+      "pbr": true,
+      "seed": null
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "multi-view HD model",
+      "history_time": "2026-09-28 15:06:56",
+      "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 55,
+        "observed_debit": 55,
+        "balance_before": 24755,
+        "balance_after": 24700
+      }
+    },
+    {
+      "op": "segment",
+      "settings": {
+        "level": "Balanced (6-15 parts)"
+      },
+      "note": "12 parts; saved as a new version of the same task; part save (15:14 version) had no debit",
+      "history_time": "2026-09-28 15:11:24",
+      "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 40,
+        "observed_debit": 40,
+        "balance_before": 24700,
+        "balance_after": 24660
+      }
+    },
+    {
+      "op": "retopology",
+      "settings": {
+        "topology": "Quad",
+        "smart_mesh": "P1.0 on",
+        "target_polygons": 6500
+      },
+      "note": "applied to the segmented state; result stays multi-part",
+      "history_time": "2026-09-28 15:16:09",
+      "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 40,
+        "observed_debit": 40,
+        "balance_before": 24660,
+        "balance_after": 24620
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "source-glb",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-h31-d9ff4260-source.glb",
+      "expected_sha256": "578cb8fc5d83e373050d10946978025d774bb054c55e7ce2fec6de0160847eb4",
+      "expected_bytes": 63829324,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, 4k texture tier, unmodified"
+    },
+    {
+      "role": "segmented-12-glb",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-d9ff4260-segmented-12.glb",
+      "expected_sha256": "a5fe9bcac5284e986d0147c4b09b3aa96bab17ccd366a1690b6f7a340fa2d42b",
+      "expected_bytes": 67359900,
+      "produced_by": "segment",
+      "origin": "Studio GLB export after Balanced segmentation + part save, 4k tier, compact UV off, unmodified"
+    },
+    {
+      "role": "segmented-retopo-glb",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-d9ff4260-segmented-retopo.glb",
+      "expected_sha256": "3e111ab32670e2284735ac965399b49d11228700c2c0ba572b16c1933ff5c60b",
+      "expected_bytes": 2312064,
+      "produced_by": "retopology",
+      "origin": "Studio GLB export after Quad retopology of the segmented state, 4k tier, compact UV off, unmodified"
+    }
+  ],
+  "expectations": {
+    "source-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 1972293,
+      "glb_materials": 1,
+      "glb_images": 3,
+      "glb_skins": 0
+    },
+    "segmented-12-glb": {
+      "glb_mesh_count": 12,
+      "glb_triangles": 1972293,
+      "glb_materials": 12,
+      "glb_images": 36,
+      "glb_skins": 0
+    },
+    "segmented-retopo-glb": {
+      "glb_mesh_count": 12,
+      "glb_triangles": 14058,
+      "glb_materials": 12,
+      "glb_images": 36,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/reports/tripo-run.json"
+  ]
+}

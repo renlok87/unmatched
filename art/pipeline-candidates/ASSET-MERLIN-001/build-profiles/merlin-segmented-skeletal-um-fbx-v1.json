@@ -1,0 +1,677 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "profile_id": "merlin-segmented-skeletal/1",
+  "asset_id": "ASSET-MERLIN-001",
+  "status": "proposed",
+  "status_note": "Технический контракт изолированного кандидата пайплайна для Merlin (Blender-этап 2026-09-28). Не художественная приёмка и не бюджет. Высота, подставка и капсула — ПРЕДЛОЖЕНИЕ 04 §3.4 / §3.8 до GD-058; подставка Ø24 выбрана на Tripo-этапе (17 AD-CNF-18: рабочее значение Ø24), высота подставки 5 uu взята у Base_Sidekick (04 §3.8), других чисел для помощника нет. Кости поставлены по геометрии этого меша: открытые края частей (манжеты рукавов, запястья, отверстия башмаков, ворот) и срезы, координаты в кадре исходника Tripo; builder переводит их тем же преобразованием, что и фигуру. Стадия build выполняется собственным скриптом (формат отчёта build_candidate.py), потому что build_candidate.py 0.4.0 зашит под Medusa (лук на +X, лицо tripo_part_10, шея tripo_part_14, оружие = одна часть).",
+  "derived_from": [
+    "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-segmented-skeletal-um-fbx-v1.json (profile layout, weights cleanup, UM_FBX_v1 export, round trip)",
+    "tools/tripo-pipeline/blender/build_candidate.py (report format, atlas UV remap, ray-escape orientation)",
+    "docs/art-pipeline/rig/rig-contract.json (UM_HUMANOID_17_v1, armature object SKEL_UM_Humanoid, weapon parent hand.R for Merlin)"
+  ],
+  "builder": "art/pipeline-candidates/ASSET-MERLIN-001/scripts/build_merlin_candidate.py",
+  "source_role": "segmented-retopo-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "expected_part_count": 12,
+  "atlas": {
+    "size": 2048,
+    "gutter_px": 4,
+    "texture_prefix": "T_Merlin_Candidate_Atlas",
+    "base_color_factor_expected": 0.800000011920929,
+    "orm_occlusion_fill": 255,
+    "background": {
+      "BC": [
+        128,
+        128,
+        128
+      ],
+      "N_OpenGL": [
+        128,
+        128,
+        255
+      ],
+      "ORM": [
+        255,
+        220,
+        0
+      ]
+    },
+    "reference_textures": {},
+    "reference_note": "no committed reference atlas for Merlin",
+    "size_note": "part textures are 1024 (robe, base), 512 (head, sleeves) and 256 (hands, shoes, staff): 3 342 336 px, more than a 1K atlas holds at native size, so the atlas stage packs 2K; 04 §3.4 proposes 1K (proposal, GD-058) — the UE import can clamp with MaxTextureSize 1024"
+  },
+  "scale": {
+    "figure_height_m": 0.45,
+    "top_part": "tripo_part_2",
+    "measured_from": "base bottom (z = 0) to the highest vertex of the head part tripo_part_2 (top of the hood). The staff crystal is higher and is not the figure height (04 §3.4: «посох выше фигурки на голову»)",
+    "seat": "body and staff are scaled uniformly about the source base top and placed on the normalised base top (z = base height); the base is normalised separately to its footprint",
+    "choice_note": "45 uu inside the proposed 40-48 uu of 04 §3.4, below the heroes (Arthur 55); the Tripo base-proportional scale (base Ø24 uu = Tripo base Ø0.4812 m) would give 45.3 uu with a 5 uu base, rounded to 45.0"
+  },
+  "meshes": {
+    "body": {
+      "object": "SK_Merlin_Body",
+      "mesh": "Merlin_Body",
+      "join": "all parts except the base and the staff parts",
+      "active_part": "tripo_part_0"
+    },
+    "weapon": {
+      "object": "SK_Merlin_Staff",
+      "mesh": "Merlin_Staff",
+      "parts": [
+        "tripo_part_11",
+        "tripo_part_3",
+        "tripo_part_10"
+      ],
+      "bone": "weapon",
+      "note": "Tripo segmented the staff apart from the hand: lower shaft tripo_part_11, upper shaft tripo_part_3, crystal and finial tripo_part_10. The Tripo-stage note «the staff bottom below z 0.111 is merged into the right shoe tripo_part_6» was checked on renders, slices and open loops: the shaft ends at source z 0.112-0.118 in an open loop and stands on the toe of the right shoe; tripo_part_6 has only a 6-vertex contact hole (r 1.2 cm) under it and no shaft geometry, so nothing is cut out of tripo_part_6"
+    },
+    "base": {
+      "object": "SM_Merlin_Base",
+      "mesh": "Merlin_Base",
+      "part": "tripo_part_1",
+      "footprint_m": [
+        0.24,
+        0.24,
+        0.05
+      ],
+      "pivot": "centre of the base bottom",
+      "footprint_note": "Ø24 uu (04 §3.4, 17 AD-CNF-18 working value, chosen at the Tripo stage) x 5 uu (Base_Sidekick height, 04 §3.8); Tripo's own base is Ø0.4812 x 0.0763 m (3.8 uu at Ø24). Proposal until AD-CNF-18 / GD-058"
+    },
+    "drop_parts": {}
+  },
+  "staff_repair": {
+    "grip_bridge": {
+      "lower_part": "tripo_part_11",
+      "upper_part": "tripo_part_3",
+      "sides": 10,
+      "radius_factor": 0.92,
+      "from_source_z": 0.585,
+      "to_source_z": 0.664,
+      "axis_rings_source_z": {
+        "tripo_part_11": [
+          0.54,
+          0.6
+        ],
+        "tripo_part_3": [
+          0.66,
+          0.72
+        ]
+      },
+      "uv_source_band_z": [
+        0.5,
+        0.58
+      ],
+      "frame_note": "heights in the source frame (Tripo metres), mapped by the figure transform; the axis runs through the centroids of the two vertex bands; radius = radius_factor x median distance of the band vertices to that axis (a little thinner than the shaft, so it never shows through it)",
+      "why": "Tripo modelled no shaft inside the fist: tripo_part_11 ends in an oblique open cut (source z 0.589-0.640) and tripo_part_3 starts with an open loop at z 0.651-0.660, both hidden by the fist tripo_part_8. An open cylinder slightly thinner than the shaft on the axis fitted through the rings above and below the fist makes the separate staff whole (seen when the hand is hidden or the staff is posed apart); it starts inside the lower shaft below its oblique cut. UVs sit inside one wood polygon of tripo_part_11. Geometric repair, not art-accepted"
+    },
+    "caps": {
+      "part": "tripo_part_11",
+      "min_vertices": 8,
+      "below_source_z": 0.5,
+      "expected_loops": 1,
+      "loops_note": "open boundary loops of the lower shaft with >= 8 vertices whose centre is below source z 0.5 (the fist starts at 0.583): only the shaft bottom; the oblique cut inside the fist stays open behind the bridge, the 3-vertex hole at z 0.159 stays",
+      "why": "the shaft bottom (source z 0.112-0.118, 14 vertices) is an open loop: invisible while the staff stands on the shoe, visible once Idle/LungeAttack lift it. Filled with one fan per loop (centre vertex), UVs = mean of the loop UVs, corner normals along the direction from the lower-shaft centroid to the loop centre (at the bottom ~ -Z; measured (0.037, -0.003, -0.999))"
+    }
+  },
+  "weld": {
+    "distance_m": 1e-06,
+    "scope": "inside every part (never across parts), before the staff assembly",
+    "normals": "corner normals are captured once after import as a float corner attribute and re-applied after weld/assembly (custom normals are stored relative to smoothing fans, which topology edits change)"
+  },
+  "orientation": {
+    "method": "ray-escape",
+    "method_note": "per polygon: a ray along +normal and one along -normal (offset 1e-4 of height) against the whole candidate; area where only the +normal ray escapes counts outward, only the -normal ray escapes counts inward; score = (out - in) / (out + in)",
+    "flip_below_score": -0.5,
+    "expected_inside_out_parts": [
+      "tripo_part_6",
+      "tripo_part_7"
+    ],
+    "expected_note": "measured on the Tripo GLB 2026-09-28 (headless probe): the two shoes tripo_part_6 (score -1.0) and tripo_part_7 (-0.999) are inside out, winding and custom corner normals both inward (opposed corner area 0.7 % / 1.4 %); every other part >= 0.997 (the Medusa lesson: parts 8/10/13/14 there)",
+    "min_score_after_fix": 0.5,
+    "corner_normal_opposed_max_fraction": 0.02,
+    "fix": "flip polygon winding and negate the custom corner normals (as build_candidate.py)"
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "object_note": "rig-contract.json skeletons.UM_HUMANOID_17_v1.armature_object.name (proposed): one armature object name for every character of the skeleton",
+    "max_influences": 4,
+    "bones_frame": "source: Tripo GLB metres, mapped by the figure transform (uniform scale about the source base top, seated on the normalised base top); final: metres of the candidate (root only, pinned to the base bottom)",
+    "bones": [
+      [
+        "root",
+        null,
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0.04
+        ],
+        "final"
+      ],
+      [
+        "hips",
+        "root",
+        [
+          0,
+          0.01,
+          0.44
+        ],
+        [
+          0,
+          0.01,
+          0.52
+        ],
+        "source"
+      ],
+      [
+        "spine",
+        "hips",
+        [
+          0,
+          0.01,
+          0.52
+        ],
+        [
+          0,
+          0.005,
+          0.69
+        ],
+        "source"
+      ],
+      [
+        "head",
+        "spine",
+        [
+          0,
+          0.005,
+          0.7
+        ],
+        [
+          0,
+          -0.01,
+          0.86
+        ],
+        "source"
+      ],
+      [
+        "arm_upper.L",
+        "spine",
+        [
+          0.085,
+          0.02,
+          0.675
+        ],
+        [
+          0.14,
+          0.0,
+          0.57
+        ],
+        "source"
+      ],
+      [
+        "arm_lower.L",
+        "arm_upper.L",
+        [
+          0.14,
+          0.0,
+          0.57
+        ],
+        [
+          0.09,
+          -0.07,
+          0.54
+        ],
+        "source"
+      ],
+      [
+        "hand.L",
+        "arm_lower.L",
+        [
+          0.09,
+          -0.07,
+          0.54
+        ],
+        [
+          0.03,
+          -0.09,
+          0.515
+        ],
+        "source"
+      ],
+      [
+        "arm_upper.R",
+        "spine",
+        [
+          -0.085,
+          0.02,
+          0.675
+        ],
+        [
+          -0.12,
+          0.09,
+          0.605
+        ],
+        "source"
+      ],
+      [
+        "arm_lower.R",
+        "arm_upper.R",
+        [
+          -0.12,
+          0.09,
+          0.605
+        ],
+        [
+          -0.155,
+          0.033,
+          0.609
+        ],
+        "source"
+      ],
+      [
+        "hand.R",
+        "arm_lower.R",
+        [
+          -0.155,
+          0.033,
+          0.609
+        ],
+        [
+          -0.1615,
+          -0.0068,
+          0.6222
+        ],
+        "source"
+      ],
+      [
+        "leg_upper.L",
+        "hips",
+        [
+          0.05,
+          0.0,
+          0.43
+        ],
+        [
+          0.075,
+          -0.02,
+          0.29
+        ],
+        "source"
+      ],
+      [
+        "leg_lower.L",
+        "leg_upper.L",
+        [
+          0.075,
+          -0.02,
+          0.29
+        ],
+        [
+          0.104,
+          -0.036,
+          0.15
+        ],
+        "source"
+      ],
+      [
+        "foot.L",
+        "leg_lower.L",
+        [
+          0.104,
+          -0.036,
+          0.15
+        ],
+        [
+          0.135,
+          -0.13,
+          0.095
+        ],
+        "source"
+      ],
+      [
+        "leg_upper.R",
+        "hips",
+        [
+          -0.05,
+          0.02,
+          0.43
+        ],
+        [
+          -0.07,
+          0.05,
+          0.29
+        ],
+        "source"
+      ],
+      [
+        "leg_lower.R",
+        "leg_upper.R",
+        [
+          -0.07,
+          0.05,
+          0.29
+        ],
+        [
+          -0.093,
+          0.064,
+          0.15
+        ],
+        "source"
+      ],
+      [
+        "foot.R",
+        "leg_lower.R",
+        [
+          -0.093,
+          0.064,
+          0.15
+        ],
+        [
+          -0.15,
+          -0.025,
+          0.095
+        ],
+        "source"
+      ],
+      [
+        "weapon",
+        "hand.R",
+        [
+          -0.1615,
+          -0.0068,
+          0.6222
+        ],
+        [
+          -0.1621,
+          0.0047,
+          0.9794
+        ],
+        "source"
+      ]
+    ],
+    "placement_note": "joints measured on this mesh in the source frame: wrists = centres of the matching open loops of sleeve cuff and hand (right: tripo_part_4 / tripo_part_8 at (-0.155, 0.033, 0.609), r 0.022, the forearm runs along the loop normal (-0.52, -0.85, -0.10)); left wrist where the fist tripo_part_9 leaves the sleeve (front close-up); shoulders at the top of the robe armholes (tripo_part_0 loops at x ±0.089); neck = robe collar loop (0, -0.017, 0.699); ankles = centres of the shoe top openings shared with the robe leg openings (right (-0.093, 0.064, 0.15), left (0.104, -0.036, 0.15)); hips, knees and elbows are inside the robe/sleeves and are estimates (hips 9 cm below the belt at z 0.535, knees half way, elbows from the cuff normal and the sleeve volume); weapon = grip point on the shaft axis at the fist centre height (fist tripo_part_8 z 0.583-0.661) -> top vertex of the crystal. The builder checks the weapon bone against the geometry",
+    "weapon_axis_tolerance_m": 0.003
+  },
+  "weights": {
+    "method": "Blender automatic weights (bone heat, parent_set ARMATURE_AUTO) per part group, restricted to the group's bones (other bones use_deform off during the solve); rigid groups 100 % on one bone; then cleanup",
+    "clean_below": 0.01,
+    "smoothing_note": "no edge smoothing of weights (Arthur build 2026-09-28: smoothing raised the probe-pose edge stretch on Tripo retopology)",
+    "fallback": "vertices the heat solve leaves unweighted get 1.0 on the nearest allowed bone (point-segment distance); counted per part",
+    "ramps_frame": "source z (Tripo metres), mapped to final metres by the builder",
+    "groups": [
+      {
+        "parts": [
+          "tripo_part_8"
+        ],
+        "rigid": "hand.R",
+        "why": "fist around the staff, no finger bones"
+      },
+      {
+        "parts": [
+          "tripo_part_9"
+        ],
+        "rigid": "hand.L",
+        "why": "left fist at the belt, no finger bones"
+      },
+      {
+        "parts": [
+          "tripo_part_6"
+        ],
+        "rigid": "foot.R",
+        "why": "right shoe; the ankle opening is shared with the robe leg opening"
+      },
+      {
+        "parts": [
+          "tripo_part_7"
+        ],
+        "rigid": "foot.L",
+        "why": "left shoe"
+      },
+      {
+        "parts": [
+          "tripo_part_2"
+        ],
+        "heat": [
+          "spine",
+          "head"
+        ],
+        "why": "hood, face and beard: the hood rim lies on the collar (source z 0.69-0.73) and the beard hangs to z 0.597 on the chest, so both blend into spine instead of swinging rigidly with the head"
+      },
+      {
+        "parts": [
+          "tripo_part_0"
+        ],
+        "heat": [
+          "hips",
+          "spine",
+          "leg_upper.L",
+          "leg_upper.R",
+          "arm_upper.L",
+          "arm_upper.R"
+        ],
+        "height_ramps": [
+          {
+            "bones": [
+              "leg_upper.L",
+              "leg_upper.R"
+            ],
+            "zero_above_z": 0.34,
+            "full_below_z": 0.2,
+            "to": "hips"
+          },
+          {
+            "bones": [
+              "hips"
+            ],
+            "zero_above_z": 0.6,
+            "full_below_z": 0.5,
+            "to": "spine"
+          },
+          {
+            "bones": [
+              "arm_upper.L",
+              "arm_upper.R"
+            ],
+            "zero_below_z": 0.58,
+            "full_above_z": 0.66,
+            "to": "spine"
+          }
+        ],
+        "caps": {
+          "leg_upper.L": 0.35,
+          "leg_upper.R": 0.35,
+          "arm_upper.L": 0.5,
+          "arm_upper.R": 0.5
+        },
+        "cap_excess_to_by_bone": {
+          "leg_upper.L": "hips",
+          "leg_upper.R": "hips",
+          "arm_upper.L": "spine",
+          "arm_upper.R": "spine"
+        },
+        "why": "robe to the ankles: rig-contract §9.4 hips with a soft transition to leg_upper at the hem only (no leg weight above the knees, cap 0.35); the chest and collar hang from spine; the rim of the wide armholes follows the upper arm partly (up to 0.5, only near the shoulders) so the sleeve seam does not open fully when an arm rises"
+      },
+      {
+        "parts": [
+          "tripo_part_4"
+        ],
+        "heat": [
+          "spine",
+          "arm_upper.R",
+          "arm_lower.R"
+        ],
+        "why": "right sleeve, hangs behind the bent arm"
+      },
+      {
+        "parts": [
+          "tripo_part_5"
+        ],
+        "heat": [
+          "spine",
+          "arm_upper.L",
+          "arm_lower.L"
+        ],
+        "why": "left sleeve, bell cuff over the left fist"
+      }
+    ],
+    "part_roles": {
+      "tripo_part_0": "robe with the Celtic trim, belt and chest",
+      "tripo_part_1": "base",
+      "tripo_part_2": "head, hood, beard",
+      "tripo_part_3": "staff, upper shaft (above the fist)",
+      "tripo_part_4": "right sleeve",
+      "tripo_part_5": "left sleeve",
+      "tripo_part_6": "right shoe (the staff stands on its toe)",
+      "tripo_part_7": "left shoe",
+      "tripo_part_8": "right fist on the staff",
+      "tripo_part_9": "left fist",
+      "tripo_part_10": "staff crystal and finial",
+      "tripo_part_11": "staff, lower shaft (below the fist)"
+    }
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "blender_weapon_side": "-X",
+    "weapon_side_note": "staff in the character's right hand; .L = +X, so the right hand is -X (rig-contract side_convention); the Merlin reference kit is front/RIGHT/back for this reason",
+    "front_indicators": "toe tips ahead of the ankles (-Y) and the face/beard part and the left fist ahead of the body centroid; the staff stands at the side, it is not a front indicator (unlike Arthur's sword)",
+    "fbx": "fbx_preset (UM_FBX_v1): export_space_rotation_z_degrees 90, -Y forward, Z up, FBX_SCALE_UNITS, data x100, UnitScaleFactor patched to 1.0, Triangulate on",
+    "expected_ue_front": "+X",
+    "expected_ue_weapon_side": "+Y",
+    "expected_ue_front_source": "04-blender-production.md §1 «Оси» + §1.1 preset UM_FBX_v1; verified by ART-001 — a standard, not a proposal; UE map measured on the Medusa candidate: ue(x, y) = (-y_blender, -x_blender)"
+  },
+  "exports": {
+    "skeletal_fbx": "SK_Merlin_Candidate.fbx",
+    "base_fbx": "SM_Merlin_Base_Candidate.fbx",
+    "path_mode_note": "STRIP (bare texture names) instead of the preset's AUTO: textures reach UE from the atlas stage, not through the FBX"
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "weapon",
+      "location_uu": [
+        0,
+        0,
+        0
+      ],
+      "purpose": "rig-contract §7: Weapon on the weapon bone at (0,0,0) = the grip on the shaft axis; bone Y runs up the staff to the crystal",
+      "staff_tip_note": "the crystal centre is reported in weapon-bone space as a proposal for the ranged-attack VFX (CUE-008); AD-CNF-59 (Merlin sockets) stays open"
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "target": "head part centre (bounding box) of tripo_part_2",
+      "purpose": "damage / status VFX",
+      "location_note": "offset in UE bone space is verified at the UE stage with get_socket_location (Medusa: (0,0,4) in bone space landed 4 uu in front, rig-contract socket_proposals)"
+    }
+  ],
+  "team_color": {
+    "status": "предложено",
+    "applicability": "open: AD-CNF-58 (TeamColor only on base/ring per 03 С-11, or on the figure material per 04 §3.4 «TeamColor-параметр»). The mask is an optional input produced after the build; the base is a separate mesh and can carry the team colour on its own",
+    "mask_texture": "T_Merlin_Candidate_Atlas_TeamMask.png",
+    "mask_rule": "linear mask of the bronze Celtic trim and belt on the robe cell only (tripo_part_0): HSV hue 18-55 deg, s >= 0.30, v >= 0.22 on the BC atlas, 1-px soft edge; the brown staff, skin and shoes share that hue and are excluded by the cell",
+    "mask_parts_expected": [
+      "tripo_part_0"
+    ]
+  },
+  "ue": {
+    "skeletal_asset": "SK_Merlin_Candidate",
+    "base_asset": "SM_Merlin_Base_Candidate",
+    "material": "M_Merlin_Candidate_Atlas",
+    "default_instance": "MI_Merlin_Candidate_Gold",
+    "instances": {
+      "MI_Merlin_Candidate_Gold": [
+        0.91,
+        0.76,
+        0.42,
+        1.0
+      ],
+      "MI_Merlin_Candidate_Silver": [
+        0.62,
+        0.76,
+        0.85,
+        1.0
+      ]
+    },
+    "instances_note": "03 С-11 team colours as linear ≈ hex/255 (17 AD-CNF note, proposal); Merlin is on Arthur's side",
+    "textures": {
+      "BC": {
+        "asset": "T_Merlin_Candidate_BC",
+        "file_key": "BC",
+        "srgb": true,
+        "compression": "TC_Default",
+        "max_texture_size_proposal": 1024
+      },
+      "N": {
+        "asset": "T_Merlin_Candidate_N",
+        "file_key": "N",
+        "srgb": false,
+        "compression": "TC_Normalmap",
+        "flip_green": false,
+        "max_texture_size_proposal": 1024
+      },
+      "ORM": {
+        "asset": "T_Merlin_Candidate_ORM",
+        "file_key": "ORM",
+        "srgb": false,
+        "compression": "TC_Masks",
+        "max_texture_size_proposal": 1024
+      },
+      "TeamMask": {
+        "asset": "T_Merlin_Candidate_TeamMask",
+        "file": "T_Merlin_Candidate_Atlas_TeamMask.png",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "optional": true
+      }
+    }
+  },
+  "expectations": {
+    "triangles": {
+      "SK_Merlin_Body": 11114,
+      "SK_Merlin_Staff": 1811,
+      "SM_Merlin_Base": 1155
+    },
+    "bones": 17,
+    "skeletal_material_slots": 1,
+    "base_material_slots": 1,
+    "note": "measured by the build of 2026-09-28 and fixed here: GLB 14 058 tris; body = parts 0,2,4,5,6,7,8,9 = 11 125 - 11 degenerate faces removed by the weld (part_7: 7, part_4: 2, part_2: 1, part_9: 1) = 11 114; staff = parts 11+3+10 = 1 778 - 1 (weld, part_11) + 20 (grip bridge) + 14 (bottom cap) = 1 811; base = part_1 = 1 155"
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "04-blender-production.md §1/§3.4/§3.8, 17-art-production-spec.md §4.7.4 — ПРЕДЛОЖЕНИЕ до решения GD-058, не бюджет",
+    "hero_triangles": [
+      8000,
+      15000
+    ],
+    "texture_px": 1024,
+    "material_slots_max": 2,
+    "height_uu": [
+      40,
+      48
+    ],
+    "base_diameter_uu": 24,
+    "base_height_uu": 5,
+    "capsule_uu": {
+      "diameter": 28,
+      "height": 54
+    }
+  },
+  "review": {
+    "game_camera": {
+      "horizontal_fov_deg": 35,
+      "pitch_deg": -55,
+      "note": "03 §2 start angle; in Blender vertical FOV ~20 deg at 16:9"
+    },
+    "closeups": [
+      "head",
+      "right fist with staff",
+      "left fist",
+      "staff",
+      "staff bottom on the shoe",
+      "base"
+    ]
+  }
+}

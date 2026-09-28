@@ -1,0 +1,146 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-75e27ee8",
+  "asset_id": "ASSET-KING-ARTHUR-001",
+  "service": "tripo-studio",
+  "task_id": "75e27ee8-c3c8-4e82-a211-12774ecb9166",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/75e27ee8-c3c8-4e82-a211-12774ecb9166",
+  "date": "2026-09-28",
+  "model_version": {
+    "ui_label": "H3.1 - Макс.кач. Ожидание дольше",
+    "backend": null
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-front.png",
+        "sha256": "1467861455c6e7a011edca9e879982f088c5839ad39d2a4fadf94b1ab253f9a2"
+      },
+      "left": {
+        "path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-left.png",
+        "sha256": "f9799f034c5003514503952c9a8f005e5c19c216a9b108e80fc52b4ae2045fc3"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-back.png",
+        "sha256": "febe34fa79e74381ff2434ab264e6fe11c35b4b4d49a9d63f19ed123050f90f7"
+      }
+    },
+    "input_manifest": "docs/art-pipeline/imagegen-inputs/manifest.json",
+    "settings": {
+      "output": "geometry and texture",
+      "texture_quality": "4K",
+      "texture_8k": false,
+      "generate_parts": false,
+      "ultra_mesh_quality": true,
+      "ai_completion": false,
+      "privacy": "private",
+      "topology": "triangle",
+      "polygon_count": 2000000,
+      "remove_lighting": true,
+      "pbr": true,
+      "seed": null
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "multi-view HD model",
+      "history_time": "2026-09-28 14:32:01",
+      "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 55,
+        "observed_debit": 55,
+        "balance_before": 24945,
+        "balance_after": 24890
+      }
+    },
+    {
+      "op": "segment",
+      "mode": "Balanced",
+      "history_time": "2026-09-28 14:40:27",
+      "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 40,
+        "observed_debit": 40,
+        "balance_before": 24890,
+        "balance_after": 24850
+      },
+      "note": "saved as a new version of the same task (no clone); 15 parts, sword+right hand = tripo_part_12, base = tripo_part_1, tripo_part_14 degenerate"
+    },
+    {
+      "op": "retopology",
+      "settings": {
+        "topology": "Quad",
+        "smart_mesh": "P1.0 on",
+        "target_polygons": 10000
+      },
+      "history_time": "2026-09-28 14:45:21",
+      "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 40,
+        "observed_debit": 40,
+        "balance_before": 24850,
+        "balance_after": 24810
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "source-glb",
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/king-arthur-tripo-h31-75e27ee8-source.glb",
+      "expected_sha256": "509f79750e9b0b3936b5490e33116ae3098db2b2349abcd05b2c6725fd3cee82",
+      "expected_bytes": 64628448,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, 4k texture tier, unmodified"
+    },
+    {
+      "role": "segmented-15-glb",
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/king-arthur-tripo-75e27ee8-segmented-15.glb",
+      "expected_sha256": "6e615a7a976af55dabdddeb0e12756109bc3f07469a35e60124bdc3a869f5a28",
+      "expected_bytes": 64607904,
+      "produced_by": "segment",
+      "origin": "Studio GLB export, 4k texture tier, Compact UV off, unmodified"
+    },
+    {
+      "role": "segmented-retopo-glb",
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/source/king-arthur-tripo-75e27ee8-segmented-retopo.glb",
+      "expected_sha256": "28c622ad3bc3ca1bbfd6bc31846afcaedcd1145ce7da3731f9083242008c3380",
+      "expected_bytes": 3354552,
+      "produced_by": "retopology",
+      "origin": "Studio GLB export, 4k texture tier, unmodified"
+    }
+  ],
+  "expectations": {
+    "source-glb": {
+      "glb_mesh_count": 1,
+      "glb_triangles": 1989731,
+      "glb_materials": 1,
+      "glb_images": 3,
+      "glb_skins": 0
+    },
+    "segmented-15-glb": {
+      "glb_mesh_count": 15,
+      "glb_triangles": 1989731,
+      "glb_materials": 15,
+      "glb_images": 45,
+      "glb_skins": 0
+    },
+    "segmented-retopo-glb": {
+      "glb_mesh_count": 15,
+      "glb_triangles": 21341,
+      "glb_materials": 15,
+      "glb_images": 45,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/reports/tripo-run.json"
+  ]
+}

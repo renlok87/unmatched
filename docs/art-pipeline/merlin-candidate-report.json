@@ -1,0 +1,1512 @@
+{
+  "schema": "unmatched.art-pipeline.candidate-report/1",
+  "asset_id": "ASSET-MERLIN-001",
+  "date": "2026-09-28",
+  "stage": "tripo",
+  "status": "измерено",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false,
+    "technically_imported": false,
+    "technically_exported_fbx": true
+  },
+  "run_dir": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31",
+  "pipeline_run": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/pipeline",
+  "tool": "tools/tripo-pipeline/tripo_pipeline.py 0.4.0",
+  "pipeline_stages": {
+    "init": "done (profile passthrough, primary tripo-d9ff4260:segmented-retopo-glb)",
+    "register-source": [
+      "tripo-d9ff4260",
+      "tripo-22cb43f2"
+    ],
+    "register_repeat": "no-op",
+    "preflight": "completed (all checks passed)",
+    "import/verify/export": "not run (Blender stage)"
+  },
+  "source_specs": [
+    "art/pipeline-candidates/ASSET-MERLIN-001/source-specs/tripo-d9ff4260.json",
+    "art/pipeline-candidates/ASSET-MERLIN-001/source-specs/tripo-22cb43f2.json"
+  ],
+  "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/reports/tripo-run.json",
+  "inputs": {
+    "set": "ref-merlin-v3-{front,right,back}.png → слоты Спереди/Справа/Обратная сторона; Слева пустой",
+    "views": {
+      "front": {
+        "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-front.png",
+        "sha256": "cdd344e012d02abbecf232a7c1c0e332a29501794455e1f4320830083705e109"
+      },
+      "left": null,
+      "right": {
+        "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-right.png",
+        "sha256": "839bffe4ac47d805778cd3cf5241976bb18fb854249ef12f0ed5166d2220d678"
+      },
+      "back": {
+        "path": "art/imagegen/mvp-v1/characters/ref-merlin-v3-back.png",
+        "sha256": "e859071fe3fbc9180c2c0b7af4eba855f91354e14f9e264fe8ef6869a4942d63"
+      }
+    },
+    "manifest": "docs/art-pipeline/imagegen-inputs/manifest.json"
+  },
+  "idempotency_check": {
+    "before_first_paid_op": "Ассеты Studio 15:05: последние ассеты — Arthur ×2, бочка, Medusa; заданий Merlin нет. Баланс UI 24 755 = balanceEndUi журнала кредитов после Arthur; записей Merlin в журнале нет; каталога art/pipeline-candidates/ASSET-MERLIN-001 не было; в Загрузках файлов Merlin нет. Прерванный прогон до Tripo не дошёл — повторных запусков нет."
+  },
+  "tripo_tasks": {
+    "d9ff4260-15c5-4c8c-b16c-4ab26bf43c5f": {
+      "role": "H3.1 multi-view исходник → сегментация Balanced → Quad-ретопология (многочастная ветка)",
+      "url": "https://studio.tripo3d.ai/ru/workspace/generate/d9ff4260-15c5-4c8c-b16c-4ab26bf43c5f",
+      "studio_versions": [
+        "15:06 генерация",
+        "15:11 сегментация",
+        "15:14 сохранение частей",
+        "15:16 ретопология (текущая)"
+      ]
+    },
+    "22cb43f2-feec-4288-91cd-22250c99e110": {
+      "role": "клон «Сохранить как новую модель» версии 15:06 (Triangle-исходник) → Quad-ретопология → Smart UV → текстура 2K → PBR (одночастная ветка)",
+      "url": "https://studio.tripo3d.ai/ru/workspace/generate/22cb43f2-feec-4288-91cd-22250c99e110",
+      "parent": "d9ff4260-15c5-4c8c-b16c-4ab26bf43c5f",
+      "clone_debit": 0
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "task": "d9ff4260",
+      "history_time": "2026-09-28 15:06:56",
+      "quoted": 55,
+      "observed_debit": 55,
+      "balance_before": 24755,
+      "balance_after": 24700
+    },
+    {
+      "op": "segment",
+      "task": "d9ff4260",
+      "history_time": "2026-09-28 15:11:24",
+      "quoted": 40,
+      "observed_debit": 40,
+      "balance_before": 24700,
+      "balance_after": 24660
+    },
+    {
+      "op": "part-save",
+      "task": "d9ff4260",
+      "history_time": null,
+      "observed_debit": 0
+    },
+    {
+      "op": "retopology",
+      "task": "d9ff4260",
+      "history_time": "2026-09-28 15:16:09",
+      "quoted": 40,
+      "observed_debit": 40,
+      "balance_before": 24660,
+      "balance_after": 24620
+    },
+    {
+      "op": "smart-uv-attempt",
+      "task": "d9ff4260",
+      "observed_debit": 0
+    },
+    {
+      "op": "clone",
+      "task": "22cb43f2",
+      "observed_debit": 0
+    },
+    {
+      "op": "retopology",
+      "task": "22cb43f2",
+      "history_time": "2026-09-28 15:20:32",
+      "quoted": 40,
+      "observed_debit": 40,
+      "balance_before": 24620,
+      "balance_after": 24580
+    },
+    {
+      "op": "smart-uv",
+      "task": "22cb43f2",
+      "history_time": "2026-09-28 15:23:24",
+      "quoted": 20,
+      "observed_debit": 20,
+      "balance_before": 24580,
+      "balance_after": 24560
+    },
+    {
+      "op": "texture",
+      "task": "22cb43f2",
+      "history_time": "2026-09-28 15:25:25",
+      "quoted": 10,
+      "observed_debit": 10,
+      "balance_before": 24560,
+      "balance_after": 24550
+    },
+    {
+      "op": "pbr",
+      "task": "22cb43f2",
+      "history_time": "2026-09-28 15:27:09",
+      "quoted": 5,
+      "observed_debit": 5,
+      "balance_before": 24550,
+      "balance_after": 24545
+    }
+  ],
+  "credits": {
+    "studio_spent": 210,
+    "balance_start": 24755,
+    "balance_end": 24545,
+    "hero_ceiling": 400,
+    "syntx_spent": 0,
+    "purchases": 0,
+    "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json",
+    "extra_spend_reason": "Вторая ретопология (40) — не перегенерация: Smart UV отказывает многочастным моделям (проверено повторно, 0), поэтому для Smart UV → текстура 2K → PBR сделан одночастный клон. Smart UV стоил 20 (проба ×1 уже израсходована на Arthur)."
+  },
+  "outputs": [
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-h31-d9ff4260-source.glb",
+      "stage": "generate",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "sha256": "578cb8fc5d83e373050d10946978025d774bb054c55e7ce2fec6de0160847eb4",
+      "bytes": 63829324,
+      "glb": {
+        "meshes": 1,
+        "triangles": 1972293,
+        "materials": 1,
+        "images": 3,
+        "skins": 0,
+        "image_sizes": "4096²: BC jpg, RM jpg, N png"
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-d9ff4260-segmented-12.glb",
+      "stage": "segment",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "sha256": "a5fe9bcac5284e986d0147c4b09b3aa96bab17ccd366a1690b6f7a340fa2d42b",
+      "bytes": 67359900,
+      "glb": {
+        "meshes": 12,
+        "triangles": 1972293,
+        "materials": 12,
+        "images": 36,
+        "skins": 0
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-d9ff4260-segmented-retopo.glb",
+      "stage": "retopology (многочастная)",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "sha256": "3e111ab32670e2284735ac965399b49d11228700c2c0ba572b16c1933ff5c60b",
+      "bytes": 2312064,
+      "glb": {
+        "meshes": 12,
+        "triangles": 14058,
+        "materials": 12,
+        "images": 36,
+        "skins": 0,
+        "image_sizes": "по частям 128²–1024²"
+      },
+      "parts": [
+        {
+          "name": "tripo_part_0",
+          "tris": 5342,
+          "verts": 6513,
+          "min": [
+            -0.2196,
+            -0.1527,
+            0.0941
+          ],
+          "max": [
+            0.2343,
+            0.2037,
+            0.7331
+          ],
+          "uv_layers": 1,
+          "role": "мантия/корпус"
+        },
+        {
+          "name": "tripo_part_2",
+          "tris": 1420,
+          "verts": 1817,
+          "min": [
+            -0.0959,
+            -0.1014,
+            0.5968
+          ],
+          "max": [
+            0.0967,
+            0.0935,
+            0.8837
+          ],
+          "uv_layers": 1,
+          "role": "голова+капюшон+борода"
+        },
+        {
+          "name": "tripo_part_1",
+          "tris": 1155,
+          "verts": 741,
+          "min": [
+            -0.2406,
+            -0.2406,
+            0.0
+          ],
+          "max": [
+            0.2406,
+            0.2406,
+            0.0763
+          ],
+          "uv_layers": 1,
+          "role": "подставка"
+        },
+        {
+          "name": "tripo_part_4",
+          "tris": 971,
+          "verts": 1073,
+          "min": [
+            -0.1978,
+            -0.0035,
+            0.4044
+          ],
+          "max": [
+            -0.0748,
+            0.1342,
+            0.7142
+          ],
+          "uv_layers": 1,
+          "role": "правый рукав"
+        },
+        {
+          "name": "tripo_part_5",
+          "tris": 872,
+          "verts": 901,
+          "min": [
+            0.0615,
+            -0.1094,
+            0.3725
+          ],
+          "max": [
+            0.1912,
+            0.0519,
+            0.7089
+          ],
+          "uv_layers": 1,
+          "role": "левый рукав"
+        },
+        {
+          "name": "tripo_part_7",
+          "tris": 667,
+          "verts": 868,
+          "min": [
+            0.0699,
+            -0.1604,
+            0.0722
+          ],
+          "max": [
+            0.1733,
+            0.0095,
+            0.1616
+          ],
+          "uv_layers": 1,
+          "role": "левый башмак"
+        },
+        {
+          "name": "tripo_part_3",
+          "tris": 651,
+          "verts": 779,
+          "min": [
+            -0.2033,
+            -0.0301,
+            0.6508
+          ],
+          "max": [
+            -0.126,
+            0.0324,
+            0.9023
+          ],
+          "uv_layers": 1,
+          "role": "посох, верхний отрезок (над кистью)"
+        },
+        {
+          "name": "tripo_part_8",
+          "tris": 643,
+          "verts": 842,
+          "min": [
+            -0.1977,
+            -0.036,
+            0.5831
+          ],
+          "max": [
+            -0.1306,
+            0.0478,
+            0.6613
+          ],
+          "uv_layers": 1,
+          "role": "правая кисть (на посохе)"
+        },
+        {
+          "name": "tripo_part_9",
+          "tris": 623,
+          "verts": 765,
+          "min": [
+            0.0073,
+            -0.1131,
+            0.4882
+          ],
+          "max": [
+            0.1015,
+            -0.0622,
+            0.5632
+          ],
+          "uv_layers": 1,
+          "role": "левая кисть"
+        },
+        {
+          "name": "tripo_part_11",
+          "tris": 594,
+          "verts": 510,
+          "min": [
+            -0.1794,
+            -0.029,
+            0.111
+          ],
+          "max": [
+            -0.1246,
+            0.0134,
+            0.6396
+          ],
+          "uv_layers": 1,
+          "role": "посох, нижний отрезок (под кистью, от z 0,111)"
+        },
+        {
+          "name": "tripo_part_6",
+          "tris": 587,
+          "verts": 828,
+          "min": [
+            -0.1842,
+            -0.0436,
+            0.0725
+          ],
+          "max": [
+            -0.0587,
+            0.105,
+            0.165
+          ],
+          "uv_layers": 1,
+          "role": "правый башмак (вместе с нижним концом посоха)"
+        },
+        {
+          "name": "tripo_part_10",
+          "tris": 533,
+          "verts": 497,
+          "min": [
+            -0.2006,
+            -0.0307,
+            0.8862
+          ],
+          "max": [
+            -0.13,
+            0.0329,
+            0.9794
+          ],
+          "uv_layers": 1,
+          "role": "кристалл с навершием"
+        }
+      ],
+      "parts_note": "Границы — по вершинам в Blender 5.2.2 после импорта GLB (Z вверх, лицо −Y, метры Tripo). Посох = tripo_part_11 + tripo_part_3 + tripo_part_10 (без кисти); низ посоха ниже z 0,111 м — в tripo_part_6 (башмак)"
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-22cb43f2-retopo-6500.glb",
+      "stage": "retopology (одночастный клон)",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "sha256": "84a9b4b979499fab74684b43ecc42db40c8efa1de713f7a75f74a81410784514",
+      "bytes": 8807424,
+      "glb": {
+        "meshes": 1,
+        "triangles": 12219,
+        "materials": 1,
+        "images": 3,
+        "skins": 0,
+        "image_sizes": "BC 4096² jpg, прочие 2048²"
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-22cb43f2-smartuv-tex2k.glb",
+      "stage": "smart-uv + texture 2K",
+      "format": "GLB",
+      "texture_tier": "2k",
+      "sha256": "1b1bd37720c3c37bf8559c9220f2778a1a40fd35c4acbd1239baab4cfd8d3d2d",
+      "bytes": 7269444,
+      "glb": {
+        "meshes": 1,
+        "triangles": 12219,
+        "materials": 1,
+        "images": 2,
+        "skins": 0,
+        "image_sizes": "2048²: BC jpg, N png; metallicFactor 0, roughnessFactor 0.5, baseColorFactor 0.8"
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-22cb43f2-smartuv-tex2k-pbr.glb",
+      "stage": "pbr",
+      "format": "GLB",
+      "texture_tier": "2k",
+      "sha256": "7a8030f1ab9a59762c712a0e09cdfda6c3ff64c0dac4f82a67ba9b7339115ee4",
+      "bytes": 9614188,
+      "glb": {
+        "meshes": 1,
+        "triangles": 12219,
+        "materials": 1,
+        "images": 3,
+        "skins": 0,
+        "image_sizes": "2048²: BC jpg, RM png, N png; baseColorFactor 0.8"
+      }
+    }
+  ],
+  "extracted_textures": [
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/textures/merlin-tripo-22cb43f2-smartuv-tex2k-pbr_basecolor.jpg",
+      "sha256": "45c9250a65c3c02389d259910ddd056f9a3674b2e3c5ed3514a7375f3351590f"
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/textures/merlin-tripo-22cb43f2-smartuv-tex2k-pbr_normal.png",
+      "sha256": "1b993d89db043bd7dffad916956fb4b464015d20b82e434efaa64b7c10090fbb"
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/textures/merlin-tripo-22cb43f2-smartuv-tex2k-pbr_rm.png",
+      "sha256": "590de4a9bfbddacf2f7f881551f3c703dd8762d1d3b71b44527be638f4d2a319"
+    }
+  ],
+  "texture_measurements": {
+    "rm": "glTF: G = roughness, B = metallic, R = 1.0 везде (не AO). Измерено: roughness mean 0.966, metallic mean 0.009, metallic p90 0.024 — металличности почти нет (у Arthur metallic mean 0.151)",
+    "base_color_factor": "0.8 во всех GLB одночастной ветки — множитель BC; в Blender-этапе решить, запекать ли его в BC или сбросить в 1.0"
+  },
+  "measured_bounds_blender_m": {
+    "h31": [
+      0.4821,
+      0.48,
+      0.9802
+    ],
+    "segmented_retopo": [
+      0.4812,
+      0.4812,
+      0.9794
+    ],
+    "retopo_single": [
+      0.4844,
+      0.4844,
+      0.9783
+    ],
+    "pbr": [
+      0.4844,
+      0.4844,
+      0.9783
+    ],
+    "note": "Blender 5.2.2, импорт GLB, X×Y×Z (Z вверх), метры Tripo (нормировка ~1 м), не игровые uu; низ на Z=0"
+  },
+  "base_diameter_decision": {
+    "chosen_uu": 24,
+    "status": "предложено",
+    "rationale": "04 §3.4 (Ø24) и §3.8 (Base_Sidekick Ø22×5) внесены одним коммитом c8957e4 (2026-09-18) — более свежего значения внутри 04 нет. Самый свежий документ спецификации — 17-art-production-spec.md (коммит 2026-09-27 22:06, позже 18-animation-production-brief 17:53): его строки «Текущее рабочее значение» и карточка Merlin держат Ø24, а Ø22 помечают как конфликт AD-CNF-18. Нормализация входов v3 (manifest 2026-09-28) тоже сделана по Ø24. Поэтому для масштаба кандидата взят Ø24; AD-CNF-18 остаётся открытым у владельца.",
+    "measured_consequence": "Подставка кандидата Ø 0,4812 м, высота 0,0763 м; верх кристалла 0,9794 м, верх капюшона 0,8837 м. При Ø24 uu (49,88 uu/м): всего 48,9 uu, подставка 3,8 uu высотой, фигурка до капюшона 40,3 uu (в предложенном 40–48), кристалл выше капюшона на 4,8 uu. При Ø22 uu (45,72 uu/м): фигурка до капюшона 36,9 uu — ниже предложенного диапазона."
+  },
+  "candidates": {
+    "primary_proposed": {
+      "source": "tripo-d9ff4260",
+      "role": "segmented-retopo-glb",
+      "triangles": 14058,
+      "meshes": 12,
+      "materials": 12,
+      "why": "посох отделён от кисти (части 11+3+10) → второй меш «посох» по 04 §3.4 без ручного разрезания; исходная текстура H3.1 перенесена по частям; путь Medusa/Arthur (атлас + риг в Blender)"
+    },
+    "alternative": {
+      "source": "tripo-22cb43f2",
+      "role": "smartuv-tex2k-pbr-glb",
+      "triangles": 12219,
+      "meshes": 1,
+      "materials": 1,
+      "uv_fill_ui": "71.8%",
+      "notes": "один материал, UV готовы, не металлический (metallic mean 0.009); кайма проще, пятно на левой кисти, посох слит с кистью и телом в один меш"
+    }
+  },
+  "visual_findings": [
+    "Многочастная ветка (текстура H3.1, перенесённая Tripo на ретопологию, по частям 128²–1024²): лицо, борода, кайма читаются (preview/segretopo_*); мелкий орнамент каймы размыт сильнее, чем в исходнике",
+    "Одночастная ветка после ретекстура 2K: силуэт, палитра, лицо и борода сохранены (preview/pbr_*); кожа не металлическая (metallic mean 0.009); кайма проще, на левой кисти тёмное пятно (шов текстуры); подставка гладко-серая",
+    "В обеих ветках посох прямой, без сплющивания; в многочастной ветке кисть и посох — разные части"
+  ],
+  "proposed_budget_refs": {
+    "tris": "8–15k (04 §3.4; предложено)",
+    "materials": "1 (04 §3.4) / ≤2 слота; предложено",
+    "textures": "1K (04 §3.4; предложено) — Tripo выдал 2K по заданию",
+    "height_uu": "40–48, подставка Ø24 (04 §3.4; предложено)",
+    "collision": "UCP_ Ø28 × 54 uu (04 §3.4; предложено)"
+  },
+  "not_done": [
+    "UE-импорт (отложен; шаги — blender_stage.deferred_ue_steps)",
+    "клипы Idle/LungeAttack/HitReact/DeathSettle",
+    "художественная приёмка",
+    "Tripo-авториг (не запускался; Blender-риг прошёл rig_deform_probe 7/7)"
+  ],
+  "stages_done": [
+    "tripo",
+    "blender"
+  ],
+  "blender_stage": {
+    "date": "2026-09-28",
+    "status": "измерено",
+    "status_note": "FBX технически экспортирован и прочитан обратно в Blender (round trip); в UE не импортировался; художественно не принят; бюджеты не объявлены",
+    "run_dir": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1",
+    "spend": {
+      "tripo_studio_credits": 0,
+      "syntx_tokens": 0,
+      "purchases": 0,
+      "credits_ledger_changed": false
+    },
+    "cli": {
+      "tool": "tools/tripo-pipeline/tripo_pipeline.py 0.4.0",
+      "profile": "skeletal-candidate",
+      "build_profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-um-fbx-v1.json",
+      "build_profile_sha256": "0dfd178e10ea391e543edfd4872e8e10d7ac6fa30b97973e7510f0ad5b7d60b9",
+      "primary": "tripo-d9ff4260 / segmented-retopo-glb",
+      "stages": {
+        "atlas": "completed",
+        "import": "completed",
+        "preflight": "completed",
+        "verify": "completed"
+      },
+      "build_stage_note": "build ran through scripts/run_merlin_build.py with the parameters of exec_build (the CLI's build_candidate.py is Medusa-specific); the manifest keeps build pending, as for Arthur"
+    },
+    "scripts": {
+      "build_merlin_candidate.py": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/scripts/build_merlin_candidate.py",
+        "sha256": "3237273554428897a0bbc18cc6b7e95c978d311dc793b84d54151f3d25872769"
+      },
+      "fbx_to_authored_blend.py": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/scripts/fbx_to_authored_blend.py",
+        "sha256": "6bad96dbebc32e78957a8768faa183196a5b0a36213e92d2808e0cf5b51ac7b5"
+      },
+      "make_teammask.py": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/scripts/make_teammask.py",
+        "sha256": "72e13508c799c51c232e29107af2e474d68ed40c352da37e61642d924ddb877f"
+      },
+      "pose_review_merlin.py": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/scripts/pose_review_merlin.py",
+        "sha256": "85e1de8a11a685372d71bd17c4682de72eb8ac9b07fb314b966f0a514e29afba"
+      },
+      "pose_views_merlin.py": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/scripts/pose_views_merlin.py",
+        "sha256": "120d963cfe0c93a691859fa49964a5415bf2fd07ac416da17161da3cb3cb5c6a"
+      },
+      "review_merlin_candidate.py": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/scripts/review_merlin_candidate.py",
+        "sha256": "17cf0c7db40aee72cf896d673c4aebc1756ad8ba3ad2bddec14322d16dd559ca"
+      },
+      "run_merlin_build.py": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/scripts/run_merlin_build.py",
+        "sha256": "fcbb9997bd18da9d44037150a5f1a01d4aa48a2fb7ace635ec8be6b1a59425fb"
+      }
+    },
+    "builder_derived_from": {
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/build_arthur_candidate.py",
+      "sha256_when_copied": "db6adc6691e6a56848873b6125146a58c8f71a96a03acf554095809d272ea678",
+      "copied_before": "2026-09-28T15:53+05:00",
+      "sha256_current": "704b23604ce5aaeb6d0781958b39fc00120e73ddf0335d9251b1107f0fb99408",
+      "note": "the Arthur file was rewritten later the same day (16:14 and 16:33 +05:00); the current hash is the revision in Arthur's own build-report. The db6adc66 revision is not kept in git or anywhere else, so it cannot be checked against the working tree. Merlin does not depend on it: helpers are copied, not imported"
+    },
+    "exports": {
+      "base": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/export/SM_Merlin_Base_Candidate.fbx",
+        "sha256": "bf5c3db2dce7a299e0af53b2bbe2aea7c60d12dee45912c65ffbe47d8dea760f",
+        "bytes": 56956
+      },
+      "skeletal": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/export/SK_Merlin_Candidate.fbx",
+        "sha256": "8e312d9cda3888be70de381cc2b5e132afc2c6cde37eae8795f3ebf5fcfe790d",
+        "bytes": 639436
+      }
+    },
+    "deterministic_rebuild": "4 builds: the first stopped on a check artefact (zero captured corner normal on a degenerate Tripo triangle, since excluded from the comparison); the three passing builds (only descriptive profile fields and the fixed triangle expectations changed between them) gave identical FBX sha256; a fifth build (2026-09-28 17:04 +05:00, after the builder docstring provenance fix) gave the same FBX sha256, and build-report.json changed only in builder_sha256",
+    "textures": {
+      "BC": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/textures/T_Merlin_Candidate_Atlas_BC.png",
+        "sha256": "2ff0e2c50fb1a8ac47d9ee37b9c0a64da04e2cda2393a072ecc445c4b4b81f44",
+        "pixels": [
+          2048,
+          2048
+        ]
+      },
+      "N": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/textures/T_Merlin_Candidate_Atlas_N.png",
+        "sha256": "d73b43adefef113dd672c96f6165da338c64c6176a7d340e9c4b371a44905069",
+        "pixels": [
+          2048,
+          2048
+        ]
+      },
+      "N_OpenGL": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/textures/T_Merlin_Candidate_Atlas_N_OpenGL.png",
+        "sha256": "fbe92d56417ef97c53c9aa22f2e10befd865ccf6b1148c5b1d753e44f3dbedfc",
+        "pixels": [
+          2048,
+          2048
+        ]
+      },
+      "ORM": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/textures/T_Merlin_Candidate_Atlas_ORM.png",
+        "sha256": "d8977c4ecf8d053085e104bc1d9a8ed35e6bcf65df238977ebe35f9ff653be65",
+        "pixels": [
+          2048,
+          2048
+        ]
+      }
+    },
+    "texture_conventions": {
+      "BC": "sRGB colour; Tripo baseColorFactor 0.800 multiplied in",
+      "N": "linear; DirectX (-Y) — for UE (flip_green_channel = false)",
+      "N_OpenGL": "linear; OpenGL (+Y) — Blender preview only",
+      "ORM": "linear; R = occlusion (filled 255, Tripo has none), G = roughness, B = metallic"
+    },
+    "team_mask": {
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/textures/T_Merlin_Candidate_Atlas_TeamMask.png",
+      "sha256": "94e6dcf97837027bad1dabdafb9d57f84373c7fe0eb76f7f49b68bfa2c09fabc",
+      "status": "предложено",
+      "rule": {
+        "cells": [
+          "tripo_part_0"
+        ],
+        "edge": "3x3 box blur",
+        "hue_deg": [
+          18.0,
+          55.0
+        ],
+        "ramp": 0.05,
+        "saturation_min": 0.3,
+        "value_min": 0.22
+      },
+      "coverage_robe_cell": 0.08411,
+      "note": "bronze Celtic trim and belt of the robe; AD-CNF-58 open"
+    },
+    "geometry": {
+      "scale": {
+        "base_diameter_m": 0.24,
+        "base_height_m": 0.05,
+        "base_scale_xyz": [
+          0.49879472,
+          0.49879475,
+          0.65556589
+        ],
+        "figure_height_m": 0.45,
+        "figure_scale": 0.49539289,
+        "source_base_bottom": 0.0,
+        "source_base_centre_xy": [
+          0.0,
+          0.0
+        ],
+        "source_base_top": 0.07627,
+        "source_top_of_top_part": 0.88371,
+        "tripo_base_diameter_at_figure_scale_m": 0.238363
+      },
+      "meshes": {
+        "SK_Merlin_Body": {
+          "triangles": 11114,
+          "vertices": 5788,
+          "material_slots": [
+            "M_Merlin_Atlas"
+          ],
+          "near_degenerate_triangles": 2
+        },
+        "SK_Merlin_Staff": {
+          "triangles": 1811,
+          "vertices": 942,
+          "material_slots": [
+            "M_Merlin_Atlas"
+          ],
+          "near_degenerate_triangles": 1
+        },
+        "SM_Merlin_Base": {
+          "triangles": 1155,
+          "vertices": 608,
+          "material_slots": [
+            "M_Merlin_Atlas"
+          ],
+          "near_degenerate_triangles": 0
+        }
+      },
+      "hero_triangles_body_plus_staff": 12925,
+      "bounds_m": {
+        "base": {
+          "max": [
+            0.12,
+            0.12,
+            0.05
+          ],
+          "min": [
+            -0.12,
+            -0.12,
+            0.0
+          ]
+        },
+        "body": {
+          "max": [
+            0.11605,
+            0.100896,
+            0.45
+          ],
+          "min": [
+            -0.108793,
+            -0.079473,
+            0.047966
+          ]
+        },
+        "figure_with_base_height": 0.497414,
+        "head_top": 0.45,
+        "skeletal": {
+          "max": [
+            0.11605,
+            0.100896,
+            0.497414
+          ],
+          "min": [
+            -0.108793,
+            -0.079473,
+            0.047966
+          ]
+        }
+      },
+      "height_uu": {
+        "hood_top_with_base": 45.0,
+        "hood_top_above_base": 40.0,
+        "staff_crystal_top": 49.741
+      },
+      "base_uu": [
+        24.0,
+        24.0,
+        5.0
+      ],
+      "flipped_inside_out_parts": [
+        "tripo_part_6",
+        "tripo_part_7"
+      ],
+      "orientation_after_fix": {
+        "tripo_part_0": 0.9996,
+        "tripo_part_1": 1.0,
+        "tripo_part_2": 1.0,
+        "tripo_part_4": 1.0,
+        "tripo_part_5": 1.0,
+        "tripo_part_6": 1.0,
+        "tripo_part_7": 0.9978,
+        "tripo_part_8": 1.0,
+        "tripo_part_9": 0.997,
+        "weapon:tripo_part_10": 1.0,
+        "weapon:tripo_part_11": 1.0,
+        "weapon:tripo_part_3": 1.0
+      },
+      "weld_vertices_before_after": {
+        "tripo_part_0": [
+          6513,
+          2755
+        ],
+        "tripo_part_1": [
+          741,
+          608
+        ],
+        "tripo_part_10": [
+          497,
+          274
+        ],
+        "tripo_part_11": [
+          510,
+          311
+        ],
+        "tripo_part_2": [
+          1817,
+          721
+        ],
+        "tripo_part_3": [
+          779,
+          336
+        ],
+        "tripo_part_4": [
+          1073,
+          504
+        ],
+        "tripo_part_5": [
+          901,
+          461
+        ],
+        "tripo_part_6": [
+          828,
+          316
+        ],
+        "tripo_part_7": [
+          868,
+          338
+        ],
+        "tripo_part_8": [
+          842,
+          350
+        ],
+        "tripo_part_9": [
+          765,
+          343
+        ]
+      },
+      "staff": {
+        "parts": [
+          "tripo_part_11",
+          "tripo_part_3",
+          "tripo_part_10"
+        ],
+        "grip_bridge": {
+          "added": true,
+          "from_t_m": 0.00845,
+          "from_z_m": 0.30202,
+          "radius_m": 0.00736,
+          "shaft_median_radius_m": 0.008,
+          "sides": 10,
+          "to_t_m": 0.04759,
+          "to_z_m": 0.34116,
+          "triangles": 20,
+          "uv_rect_centre": [
+            0.615488,
+            0.274835
+          ],
+          "uv_rect_half_extent": 0.000294,
+          "uv_source_polygon_area_m2": 6.4095e-05
+        },
+        "bottom_cap": [
+          {
+            "centre_m": [
+              -0.06953,
+              -0.00514,
+              0.06909
+            ],
+            "loop_vertices": 14,
+            "outward": [
+              0.0371,
+              -0.0029,
+              -0.9993
+            ],
+            "triangles": 14
+          }
+        ],
+        "tripo_part_6_note": "no shaft geometry inside the right shoe: the shaft stands on its toe; nothing was cut"
+      }
+    },
+    "rig": {
+      "skeleton": "UM_HUMANOID_17_v1",
+      "armature_object": "SKEL_UM_Humanoid",
+      "bones": 17,
+      "weapon_parent": "hand.R",
+      "bones_final_m": {
+        "arm_lower.L": [
+          [
+            0.06936,
+            0.0,
+            0.29459
+          ],
+          [
+            0.04459,
+            -0.03468,
+            0.27973
+          ]
+        ],
+        "arm_lower.R": [
+          [
+            -0.05945,
+            0.04459,
+            0.31193
+          ],
+          [
+            -0.07679,
+            0.01635,
+            0.31391
+          ]
+        ],
+        "arm_upper.L": [
+          [
+            0.04211,
+            0.00991,
+            0.34661
+          ],
+          [
+            0.06936,
+            0.0,
+            0.29459
+          ]
+        ],
+        "arm_upper.R": [
+          [
+            -0.04211,
+            0.00991,
+            0.34661
+          ],
+          [
+            -0.05945,
+            0.04459,
+            0.31193
+          ]
+        ],
+        "foot.L": [
+          [
+            0.05152,
+            -0.01783,
+            0.08653
+          ],
+          [
+            0.06688,
+            -0.0644,
+            0.05928
+          ]
+        ],
+        "foot.R": [
+          [
+            -0.04607,
+            0.03171,
+            0.08653
+          ],
+          [
+            -0.07431,
+            -0.01238,
+            0.05928
+          ]
+        ],
+        "hand.L": [
+          [
+            0.04459,
+            -0.03468,
+            0.27973
+          ],
+          [
+            0.01486,
+            -0.04459,
+            0.26734
+          ]
+        ],
+        "hand.R": [
+          [
+            -0.07679,
+            0.01635,
+            0.31391
+          ],
+          [
+            -0.08001,
+            -0.00337,
+            0.32045
+          ]
+        ],
+        "head": [
+          [
+            0.0,
+            0.00248,
+            0.35899
+          ],
+          [
+            0.0,
+            -0.00495,
+            0.43825
+          ]
+        ],
+        "hips": [
+          [
+            0.0,
+            0.00495,
+            0.23019
+          ],
+          [
+            0.0,
+            0.00495,
+            0.26982
+          ]
+        ],
+        "leg_lower.L": [
+          [
+            0.03715,
+            -0.00991,
+            0.15588
+          ],
+          [
+            0.05152,
+            -0.01783,
+            0.08653
+          ]
+        ],
+        "leg_lower.R": [
+          [
+            -0.03468,
+            0.02477,
+            0.15588
+          ],
+          [
+            -0.04607,
+            0.03171,
+            0.08653
+          ]
+        ],
+        "leg_upper.L": [
+          [
+            0.02477,
+            0.0,
+            0.22524
+          ],
+          [
+            0.03715,
+            -0.00991,
+            0.15588
+          ]
+        ],
+        "leg_upper.R": [
+          [
+            -0.02477,
+            0.00991,
+            0.22524
+          ],
+          [
+            -0.03468,
+            0.02477,
+            0.15588
+          ]
+        ],
+        "root": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.04
+          ]
+        ],
+        "spine": [
+          [
+            0.0,
+            0.00495,
+            0.26982
+          ],
+          [
+            0.0,
+            0.00248,
+            0.35404
+          ]
+        ],
+        "weapon": [
+          [
+            -0.08001,
+            -0.00337,
+            0.32045
+          ],
+          [
+            -0.0803,
+            0.00233,
+            0.4974
+          ]
+        ]
+      },
+      "weights_share_body": {
+        "arm_lower.L": 0.048,
+        "arm_lower.R": 0.0448,
+        "arm_upper.L": 0.0436,
+        "arm_upper.R": 0.0526,
+        "foot.L": 0.0584,
+        "foot.R": 0.0546,
+        "hand.L": 0.0593,
+        "hand.R": 0.0605,
+        "head": 0.0986,
+        "hips": 0.2036,
+        "leg_upper.L": 0.0591,
+        "leg_upper.R": 0.0527,
+        "spine": 0.1643
+      },
+      "weights_share_per_part": {
+        "tripo_part_0": {
+          "arm_upper.L": 0.0305,
+          "arm_upper.R": 0.0301,
+          "hips": 0.4277,
+          "leg_upper.L": 0.1243,
+          "leg_upper.R": 0.1107,
+          "spine": 0.2767
+        },
+        "tripo_part_2": {
+          "head": 0.7913,
+          "spine": 0.2087
+        },
+        "tripo_part_4": {
+          "arm_lower.R": 0.5147,
+          "arm_upper.R": 0.4394,
+          "spine": 0.0458
+        },
+        "tripo_part_5": {
+          "arm_lower.L": 0.6023,
+          "arm_upper.L": 0.3647,
+          "spine": 0.033
+        },
+        "tripo_part_6": {
+          "foot.R": 1.0
+        },
+        "tripo_part_7": {
+          "foot.L": 1.0
+        },
+        "tripo_part_8": {
+          "hand.R": 1.0
+        },
+        "tripo_part_9": {
+          "hand.L": 1.0
+        }
+      },
+      "max_influences_measured": 3,
+      "estimated_joints": "hips, knees and elbows are inside the robe/sleeves: estimates; wrists, ankles, neck and the weapon bone are measured on open part edges and the shaft axis"
+    },
+    "sockets": [
+      {
+        "bone": "weapon",
+        "bone_head_ue_component_uu": [
+          0.337,
+          8.001,
+          32.045
+        ],
+        "name": "Weapon",
+        "offset_blender_bone_local_uu": [
+          0.0,
+          -0.0,
+          -0.0
+        ],
+        "staff_tip_proposal": {
+          "crystal_centre_blender_m": [
+            -0.0819,
+            0.00055,
+            0.47434
+          ],
+          "offset_blender_bone_local_uu": [
+            -0.164,
+            15.394,
+            0.103
+          ],
+          "status": "предложено (AD-CNF-59 open)"
+        },
+        "target_blender_m": [
+          -0.08001,
+          -0.00337,
+          0.32045
+        ],
+        "target_ue_component_uu": [
+          0.337,
+          8.001,
+          32.045
+        ]
+      },
+      {
+        "bone": "head",
+        "bone_head_ue_component_uu": [
+          -0.248,
+          -0.0,
+          35.899
+        ],
+        "name": "Head",
+        "offset_blender_bone_local_uu": [
+          0.019,
+          2.026,
+          0.255
+        ],
+        "target_blender_m": [
+          0.00019,
+          -0.00195,
+          0.37893
+        ],
+        "target_ue_component_uu": [
+          0.195,
+          -0.019,
+          37.893
+        ]
+      }
+    ],
+    "checks": {
+      "build_report_checks": 41,
+      "build_report_passed": true,
+      "failed": []
+    },
+    "rig_deform_probe": {
+      "script": "tools/tripo-pipeline/anim/rig_deform_probe.py",
+      "blend": {
+        "head_turn": {
+          "status": "plausible",
+          "z_norm": 0.715,
+          "x_norm": -0.048
+        },
+        "spine_bend_fwd": {
+          "status": "plausible",
+          "z_norm": 0.611,
+          "x_norm": -0.245
+        },
+        "arm_l_raise": {
+          "status": "plausible",
+          "z_norm": 0.527,
+          "x_norm": 0.345
+        },
+        "arm_r_raise": {
+          "status": "plausible",
+          "z_norm": 0.636,
+          "x_norm": -0.678
+        },
+        "forearm_l_bend": {
+          "status": "plausible",
+          "z_norm": 0.482,
+          "x_norm": 0.339
+        },
+        "thigh_l_flex": {
+          "status": "plausible",
+          "z_norm": 0.088,
+          "x_norm": 0.136
+        },
+        "thigh_r_flex": {
+          "status": "plausible",
+          "z_norm": 0.086,
+          "x_norm": -0.194
+        }
+      },
+      "fbx_roundtrip": {
+        "head_turn": "plausible",
+        "spine_bend_fwd": "plausible",
+        "arm_l_raise": "plausible",
+        "arm_r_raise": "plausible",
+        "forearm_l_bend": "plausible",
+        "thigh_l_flex": "plausible",
+        "thigh_r_flex": "plausible"
+      },
+      "result": "PASS 7/7 plausible (blend and FBX)",
+      "margin_note": "head_turn z_norm 0.715 against 0.70: the staff crystal above the hood stretches the normalised height",
+      "sheets": [
+        "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/preview/deform/merlin-blend-sheet.png",
+        "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/preview/deform/merlin-fbx-sheet.png"
+      ]
+    },
+    "pose_review": {
+      "arm_l_raise": {
+        "edge_stretch_max": 1.3819,
+        "edges_over_1_5x": 0,
+        "seam_gap_max_m": 0.09486
+      },
+      "arm_r_raise": {
+        "edge_stretch_max": 2.7266,
+        "edges_over_1_5x": 2,
+        "seam_gap_max_m": 0.05507
+      },
+      "forearm_l_bend": {
+        "edge_stretch_max": 1.2247,
+        "edges_over_1_5x": 0,
+        "seam_gap_max_m": 0.04228
+      },
+      "head_turn": {
+        "edge_stretch_max": 1.2161,
+        "edges_over_1_5x": 0,
+        "seam_gap_max_m": 0.02305
+      },
+      "spine_bend_fwd": {
+        "edge_stretch_max": 1.5009,
+        "edges_over_1_5x": 2,
+        "seam_gap_max_m": 0.02135
+      },
+      "thigh_l_flex": {
+        "edge_stretch_max": 1.5252,
+        "edges_over_1_5x": 2,
+        "seam_gap_max_m": 0.05711
+      },
+      "thigh_r_flex": {
+        "edge_stretch_max": 1.391,
+        "edges_over_1_5x": 0,
+        "seam_gap_max_m": 0.05681
+      }
+    },
+    "pose_review_note": "parts are not welded to each other; seam gap = largest posed distance of vertex pairs of two parts closer than 1.5 mm at rest (seams and contacts); no holes visible in front/back/game-camera renders of the probe poses (preview/poses/views)",
+    "review_frames": {
+      "dir": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/preview",
+      "lighting": "EEVEE preview (2 suns, grey world, Standard); not game lighting",
+      "game_camera": "horizontal FOV 35, pitch -55",
+      "on_screen_height_px_review_camera": {
+        "value": 92,
+        "note": "projection at the review camera (1 m cell ~ 250 px, 1920x1080), base front bottom to hood top; not the game camera"
+      }
+    },
+    "visual_findings": [
+      "four orthographic sides and the FBX round trip match; «hood + staff» reads in the black silhouette from the front",
+      "from the game angle the face under the hood is hardly visible; beard, trim and crystal read; in the 3/4 silhouette the staff mostly merges with the body (art track)",
+      "small dark texture seam spot at the top of the hood (Tripo texture)",
+      "the separate staff is whole; a small step shows at the grip bridge when the body is hidden; the bottom cap shows as a dark fan from below",
+      "shoes: flipped inside-out parts now shade outward in the renders"
+    ],
+    "decisions": {
+      "base": "Ø24 (Tripo stage) x 5 uu (Base_Sidekick height, 04 §3.8): proposal, AD-CNF-18 open",
+      "height": "45.0 uu to the hood top with the base (Medusa/Arthur convention: with base); 40.0 uu above the base",
+      "texture": "2K atlas at native part size; 1K via MaxTextureSize on import (proposal)",
+      "material_slots": "1 atlas material for body, staff and base (≤2 proposed)",
+      "tripo_part_6": "nothing cut: no shaft geometry there"
+    },
+    "deferred_ue_steps": [
+      "UE 5.8, legacy FBX importer (Interchange.FeatureFlags.Import.FBX=False, rig-contract §5): import art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/export/SK_Merlin_Candidate.fbx as a skeletal mesh into /Game/PipelineCandidates/Merlin/20260928-blender-um-fbx-v1/Meshes/SK_Merlin_Candidate with import_uniform_scale 1.0, import_materials false, import_textures false, import_animations false, a new Skeleton SK_Merlin_Candidate_Skeleton (a shared humanoid Skeleton is not proven, rig-contract §8). Expect 18 bones (bone 0 = SKEL_UM_Humanoid + 17), 12 925 triangles, 1 material slot",
+      "Import art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/export/SM_Merlin_Base_Candidate.fbx as a static mesh SM_Merlin_Base_Candidate (import_uniform_scale 1.0): expect 1 155 triangles, bounds x/y -12..12 uu, z 0..5 uu, pivot at the bottom centre",
+      "Textures from art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/textures: T_Merlin_Candidate_BC (sRGB on, TC_Default), T_Merlin_Candidate_N from *_Atlas_N.png (DirectX, sRGB off, TC_Normalmap, flip green off), T_Merlin_Candidate_ORM (sRGB off, TC_Masks), optional T_Merlin_Candidate_TeamMask (sRGB off, TC_Grayscale). Set MaxTextureSize 1024 on BC/N/ORM (04 §3.4 proposes 1K; the source atlas is 2048)",
+      "Material M_Merlin_Candidate_Atlas: BC -> Base Color (optionally lerp to luminance(BC) x TeamColor by TeamMask), N -> Normal, ORM.G -> Roughness, ORM.B -> Metallic, ORM.R -> AO (255 = no occlusion); instances MI_Merlin_Candidate_Gold (0.91, 0.76, 0.42) default and MI_Merlin_Candidate_Silver (0.62, 0.76, 0.85); assign to SK and base",
+      "Check facing and size in the editor: face along +X, staff on the +Y side (UM_FBX_v1; Medusa measured +Y facing, rig-contract §5 open question 1 — if it repeats, record it and fix by the import option/component rotation, not by changing the Blender side). Expected UE bounds (component, uu): skeletal min (-10.09, -11.605, 4.797) max (7.947, 10.879, 49.741); base min (-12, -12, 0) max (12, 12, 5); tolerance 1 %; top of the hood 45.0 uu with the base",
+      "Sockets on SK_Merlin_Candidate (rig-contract §7): Weapon on bone weapon at (0, 0, 0) -> get_socket_location ~ component (0.34, 8.00, 32.05) uu (grip); Head on bone head with the offset that puts it at the hood centre ~ component (0.20, -0.02, 37.89) uu (Blender bone-local offset (0.02, 2.03, 0.26) uu, measure the UE bone-space offset with get_socket_location as for Medusa). Optional staff-tip VFX point (proposal, AD-CNF-59): crystal centre ~ component (-0.06, 8.19, 47.43) uu = 15.4 uu along the weapon bone",
+      "Physics/selection: proposed UCP_ capsule Ø28 x 54 uu (04 §3.4); measured max radius 12.6 uu from the pivot axis and top 49.7 uu, so it fits; for the skeletal mesh create a physics asset with one capsule (root/hips) of that size",
+      "Scene check K1/K2: place on a 100 uu cell next to SK_KingArthur_Candidate; the robe hem reaches 0.6 uu past the Ø24 base rim; the staff must not leave the cell; check the shoes (their winding was flipped in Blender) and the face under the shared lighting; check both TeamColor instances",
+      "Performance per AGENTS.md: packaged Development build at FrameRateLimit 60, record the effective FPS and GPU frame time with the candidate in the frame",
+      "CLI note: tripo_pipeline.py ue-import (--backend mcp) reads the build stage from the run manifest, where it stays pending (the build ran through run_merlin_build.py); either import by hand (tools/art/import_medusa_candidate.py pattern) or first let the CLI accept the profile's builder (follow-up)"
+    ],
+    "integration": {
+      "status": "not committed (no commit/push in this workflow); the set below is for the integrator",
+      "rule": "commit the Tripo stage and the Blender stage in one integration: the Blender run manifest registers all 9 Tripo source files of both source-specs and the builder reads 20260928-tripo-h31/source/merlin-tripo-d9ff4260-segmented-retopo.glb (sha256 3e111ab3...); without them neither register-source nor the byte-identical rebuild can be reproduced from git",
+      "commit_set": {
+        "files": 140,
+        "bytes_without_reports": 248113993,
+        "approx_total": "248.2 MB (237 MiB) including the two report files (~0.1 MB)",
+        "tripo_stage": [
+          {
+            "files": 1,
+            "bytes": 163,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/asset .gitignore"
+          },
+          {
+            "files": 2,
+            "bytes": 11261,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/source-specs/*.json"
+          },
+          {
+            "files": 6,
+            "bytes": 159192344,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/*.glb"
+          },
+          {
+            "files": 3,
+            "bytes": 9224582,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/textures/*"
+          },
+          {
+            "files": 3,
+            "bytes": 32080,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/pipeline/{manifest.json,journal.jsonl,reports/preflight.json}"
+          },
+          {
+            "files": 1,
+            "bytes": 26468,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/reports/tripo-run.json"
+          },
+          {
+            "files": 21,
+            "bytes": 19746803,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/preview/*.png"
+          }
+        ],
+        "blender_stage": [
+          {
+            "files": 1,
+            "bytes": 23898,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/*.json"
+          },
+          {
+            "files": 7,
+            "bytes": 113614,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/scripts/*.py"
+          },
+          {
+            "files": 2,
+            "bytes": 36640,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/{manifest.json,journal.jsonl}"
+          },
+          {
+            "files": 7,
+            "bytes": 99896,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/reports/*.json"
+          },
+          {
+            "files": 2,
+            "bytes": 696392,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/export/*.fbx"
+          },
+          {
+            "files": 5,
+            "bytes": 10660148,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/textures/*.png"
+          },
+          {
+            "files": 69,
+            "bytes": 48204735,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/preview/** (png)"
+          },
+          {
+            "files": 8,
+            "bytes": 44969,
+            "pattern": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/preview/** (json)"
+          }
+        ],
+        "reports": [
+          {
+            "files": 2,
+            "bytes": 77843,
+            "pattern": "docs/art-pipeline/merlin-candidate-report.{md,json}"
+          }
+        ],
+        "size_correction": "preview/** of the Blender run is 48.2 MB of PNG (46.0 MiB) + 45 KB JSON, not ~40 MB; textures/ is 10.7 MB",
+        "git_attributes": "art/pipeline-candidates/** -text and docs/art-pipeline/** -text (bytes as is); no LFS",
+        "files_over_50MB": [
+          {
+            "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-d9ff4260-segmented-12.glb",
+            "bytes": 67359900
+          },
+          {
+            "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-h31-d9ff4260-source.glb",
+            "bytes": 63829324
+          }
+        ],
+        "files_over_50MB_note": "GitHub warns from 50 MB and rejects from 100 MB; the Medusa Tripo sources of the same size are already tracked (blender/ASSET-MEDUSA-001/tripo-source); both files are listed in source-spec tripo-d9ff4260, so register-source needs them",
+        "asset_gitignore": "art/pipeline-candidates/ASSET-MERLIN-001/.gitignore is part of the set: it covers */pipeline/work/, */pipeline/.staging/ and */pipeline/run.lock of the Tripo stage, which the shared art/pipeline-candidates/.gitignore (*/*/ depth) does not"
+      },
+      "not_committed": [
+        {
+          "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/logs/*.log",
+          "files": 3,
+          "bytes": 2797,
+          "reason": "ignored by the root .gitignore:18 (*.log), so a plain git add errors out; not referenced by manifest.json or the reports; the Medusa runs commit no logs either. Use git add -f only if the logs are wanted"
+        },
+        {
+          "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/work/",
+          "reason": "ignored (*/work/ here, */*/work/ in art/pipeline-candidates/.gitignore); regenerable",
+          "regenerate": {
+            "work/ASSET-MERLIN-001_segmented-retopo-glb.blend": "CLI stage import",
+            "work/ASSET-MERLIN-001_segmented-retopo-glb-candidate.blend, work/build-params.json": "scripts/run_merlin_build.py --run-dir art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1",
+            "work/probe-fbx-authored.blend": "blender -b --factory-startup --python scripts/fbx_to_authored_blend.py -- export/SK_Merlin_Candidate.fbx work/probe-fbx-authored.blend (the `source` of preview/deform/merlin-fbx-deform.json)"
+          }
+        },
+        {
+          "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/work/",
+          "reason": "ignored; Tripo-stage crops and helper scripts, marked 'not in git' in tripo-run.json"
+        }
+      ],
+      "provenance_only_references": {
+        "paths": [
+          "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/build_arthur_candidate.py",
+          "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-segmented-skeletal-um-fbx-v1.json",
+          "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/pose_review_arthur.py",
+          "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/review_arthur_candidate.py"
+        ],
+        "note": "untracked Arthur files cited as 'derived from'; not needed to reproduce Merlin; they resolve once the Arthur set is committed"
+      },
+      "checks_2026_09_28": {
+        "git_add_dry_run": "git add --dry-run --pathspec-from-file: 140/140 paths would be added, exit 0, index unchanged",
+        "logs_without_force": "git add --dry-run logs/build.log refused as ignored (.gitignore:18 *.log)",
+        "check_ignore": "work/, pipeline/work/ and pipeline/run.lock are ignored (git check-ignore -v)",
+        "scratch_reproduction": {
+          "tree": "temporary C:/tmp/merlin-fix/repro (deleted after the check): HEAD a2ed1e0 via git archive (tools/tripo-pipeline CLI 0.4.0, blender/_tools/presets/UM_FBX_v1.json, docs/art-pipeline/rig, docs/art-pipeline/imagegen-inputs/manifest.json, ref-merlin-v3-{front,right,back}.png, .gitignore, .gitattributes, art/pipeline-candidates/.gitignore) + the 140 files of the set; no work/, no logs/",
+          "rebuild_of_the_run_copy": "run_merlin_build.py: 41/41, SK 8e312d9c..., SM bf5c3db2..., build-report.json byte-identical",
+          "fresh_cli_run": "init, register-source x2, preflight, import, verify, atlas, then run_merlin_build.py: import/verify/atlas fingerprints equal; 4 atlas PNG, import/verify/atlas reports, both FBX and build-report.json byte-identical",
+          "preflight_difference": "preflight.json differs only in the recorded hashes of tools/tripo-pipeline/blender/{build_candidate,export_fbx}.py: CRLF in the working tree (core.autocrlf=true checkout), LF in HEAD, equal without CR. With core.autocrlf=true the import/atlas fingerprints change too; the CLI then re-runs those stages and their outputs stay byte-identical (checked)",
+          "teammask": "make_teammask.py: TeamMask PNG and teammask-report.json byte-identical",
+          "deform_probe": "fbx_to_authored_blend.py + rig_deform_probe.py on the rebuilt FBX and the rebuilt candidate .blend: deform JSON equal except `source`, bones2d byte-identical, 7/7 plausible each; 16 PNG pixel-identical (container bytes differ)",
+          "tripo_stage_preflight": "20260928-tripo-h31/pipeline preflight --force: passed, 0 failed"
+        }
+      }
+    }
+  }
+}

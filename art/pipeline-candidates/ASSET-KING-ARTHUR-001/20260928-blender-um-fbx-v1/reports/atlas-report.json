@@ -1,0 +1,287 @@
+{
+  "algorithm": "pack_segmented_atlas.py port (quadtree cells, LANCZOS resize, edge bleed)",
+  "cells": {
+    "tripo_part_0": {
+      "cell": 1024,
+      "inset": 4,
+      "x": 0,
+      "y_top": 0
+    },
+    "tripo_part_1": {
+      "cell": 1024,
+      "inset": 4,
+      "x": 1024,
+      "y_top": 0
+    },
+    "tripo_part_10": {
+      "cell": 256,
+      "inset": 4,
+      "x": 1280,
+      "y_top": 1792
+    },
+    "tripo_part_11": {
+      "cell": 256,
+      "inset": 4,
+      "x": 1536,
+      "y_top": 1536
+    },
+    "tripo_part_12": {
+      "cell": 512,
+      "inset": 4,
+      "x": 1536,
+      "y_top": 1024
+    },
+    "tripo_part_13": {
+      "cell": 128,
+      "inset": 4,
+      "x": 1792,
+      "y_top": 1536
+    },
+    "tripo_part_14": {
+      "cell": 32,
+      "inset": 4,
+      "x": 1920,
+      "y_top": 1536
+    },
+    "tripo_part_2": {
+      "cell": 512,
+      "inset": 4,
+      "x": 0,
+      "y_top": 1024
+    },
+    "tripo_part_3": {
+      "cell": 512,
+      "inset": 4,
+      "x": 512,
+      "y_top": 1024
+    },
+    "tripo_part_4": {
+      "cell": 512,
+      "inset": 4,
+      "x": 0,
+      "y_top": 1536
+    },
+    "tripo_part_5": {
+      "cell": 512,
+      "inset": 4,
+      "x": 512,
+      "y_top": 1536
+    },
+    "tripo_part_6": {
+      "cell": 512,
+      "inset": 4,
+      "x": 1024,
+      "y_top": 1024
+    },
+    "tripo_part_7": {
+      "cell": 256,
+      "inset": 4,
+      "x": 1024,
+      "y_top": 1536
+    },
+    "tripo_part_8": {
+      "cell": 256,
+      "inset": 4,
+      "x": 1280,
+      "y_top": 1536
+    },
+    "tripo_part_9": {
+      "cell": 256,
+      "inset": 4,
+      "x": 1024,
+      "y_top": 1792
+    }
+  },
+  "checks": {
+    "cell_coverage_of_atlas": {
+      "measured": 0.9573,
+      "note": "informational",
+      "passed": true
+    },
+    "cells_do_not_overlap": {
+      "measured": 0,
+      "passed": true
+    },
+    "cells_inside_atlas": {
+      "measured": 2048,
+      "passed": true
+    },
+    "gutter_px_between_parts": {
+      "measured": 8,
+      "note": "each cell keeps an edge-bleed inset on all sides: >= 2*inset px between islands of different parts",
+      "passed": true
+    },
+    "normal_directx_is_opengl_with_inverted_green": {
+      "measured": "G_dx == 255 - G_gl; R, B equal",
+      "passed": true
+    },
+    "normal_vectors_unit_length_in_cells": {
+      "measured": 0.9942,
+      "note": "fraction of texels inside part cells with |n| in (0.8, 1.2)",
+      "passed": true
+    },
+    "orm_metallic_range_in_cells": {
+      "measured": [
+        0,
+        255
+      ],
+      "note": "informational",
+      "passed": true
+    },
+    "orm_occlusion_channel_filled": {
+      "measured": 255,
+      "passed": true
+    },
+    "orm_roughness_range_in_cells": {
+      "measured": [
+        0,
+        255
+      ],
+      "note": "informational",
+      "passed": true
+    },
+    "part_count": {
+      "measured": 15,
+      "passed": true
+    },
+    "source_unchanged": {
+      "measured": "28c622ad3bc3ca1bbfd6bc31846afcaedcd1145ce7da3731f9083242008c3380",
+      "passed": true
+    }
+  },
+  "conventions": {
+    "BC": "sRGB colour; Tripo baseColorFactor 0.800 multiplied in",
+    "N": "linear; DirectX (-Y) \u2014 for UE (flip_green_channel = false)",
+    "N_OpenGL": "linear; OpenGL (+Y) \u2014 Blender preview only",
+    "ORM": "linear; R = occlusion (filled 255, Tripo has none), G = roughness, B = metallic"
+  },
+  "files": {
+    "BC": {
+      "bytes": 2932996,
+      "file": "T_KingArthur_Candidate_Atlas_BC.png",
+      "mode": "RGB",
+      "pixels": [
+        2048,
+        2048
+      ],
+      "sha256": "4693c9cb566fc679a904e745890d85457857cab24160e8f1f8d4143bf4cbe6c0"
+    },
+    "N": {
+      "bytes": 4166576,
+      "file": "T_KingArthur_Candidate_Atlas_N.png",
+      "mode": "RGB",
+      "pixels": [
+        2048,
+        2048
+      ],
+      "sha256": "f5fbc143101b13c0ff22fcb0e957d4cb248b7c8d0946635fe76ad7e119247fbd"
+    },
+    "N_OpenGL": {
+      "bytes": 4158176,
+      "file": "T_KingArthur_Candidate_Atlas_N_OpenGL.png",
+      "mode": "RGB",
+      "pixels": [
+        2048,
+        2048
+      ],
+      "sha256": "d5e3faec08c79a9910bfa39f2b41161b18f57b5682347d3c202b6da8d7b2542e"
+    },
+    "ORM": {
+      "bytes": 2905601,
+      "file": "T_KingArthur_Candidate_Atlas_ORM.png",
+      "mode": "RGB",
+      "pixels": [
+        2048,
+        2048
+      ],
+      "sha256": "9e292fc5c59566db949e3a66c91dbcfdb1f0b3556cbfe84e0d3844ae35d3d38a"
+    }
+  },
+  "gutter_px": 4,
+  "passed": true,
+  "profile": "king-arthur-segmented-skeletal/1",
+  "reference_comparison": {},
+  "size": 2048,
+  "source": {
+    "file": "king-arthur-tripo-75e27ee8-segmented-retopo.glb",
+    "sha256": "28c622ad3bc3ca1bbfd6bc31846afcaedcd1145ce7da3731f9083242008c3380"
+  },
+  "source_textures": {
+    "tripo_part_0": {
+      "base_px": 1024,
+      "normal_px": 512,
+      "rm_px": 512
+    },
+    "tripo_part_1": {
+      "base_px": 1024,
+      "normal_px": 512,
+      "rm_px": 512
+    },
+    "tripo_part_10": {
+      "base_px": 256,
+      "normal_px": 128,
+      "rm_px": 128
+    },
+    "tripo_part_11": {
+      "base_px": 256,
+      "normal_px": 128,
+      "rm_px": 128
+    },
+    "tripo_part_12": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_13": {
+      "base_px": 128,
+      "normal_px": 64,
+      "rm_px": 64
+    },
+    "tripo_part_14": {
+      "base_px": 32,
+      "normal_px": 16,
+      "rm_px": 16
+    },
+    "tripo_part_2": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_3": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_4": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_5": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_6": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_7": {
+      "base_px": 256,
+      "normal_px": 128,
+      "rm_px": 128
+    },
+    "tripo_part_8": {
+      "base_px": 256,
+      "normal_px": 128,
+      "rm_px": 128
+    },
+    "tripo_part_9": {
+      "base_px": 256,
+      "normal_px": 128,
+      "rm_px": 128
+    }
+  },
+  "stage": "atlas"
+}

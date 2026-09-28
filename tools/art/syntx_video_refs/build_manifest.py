@@ -274,6 +274,187 @@ man = {
         ],
     },
 }
+# ---------------------------------------------------------------------------------------------------------------------
+# 2026-09-28 (second pass): Medusa retakes and hero video refs (Arthur, Merlin, Harpy). Everything above is the P1 Medusa
+# manifest and is kept as it was; the second pass only adds keys (retakes, assets, heroSeries, budgetAll) and pointers.
+# Each take dir art/animation-refs/<ASSET>/<CUE>[/takeN]/ holds prompt.txt, <CUE>_<model>[_takeN]_ref.mp4, analysis.json,
+# contact-sheet-2fps.png, keyframes/fNNN.png, syntx/ (import_runs.py, redacted) and assessment.json (visual assessment).
+MODELS = {
+    'kling25std': {'service': 'SYNTX (syntx.ai) → Kling', 'aiName': 'kling', 'modelType': 'kling_image2video',
+                   'label': 'Kling 2.5 std, 5 с, без звука', 'tag': 'kling25'},
+    'seedance15pro720': {'service': 'SYNTX (syntx.ai) → Seedance', 'aiName': 'seedance', 'modelType': 'seedance-1.5-pro',
+                         'label': 'Seedance 1.5 Pro 720p, 5 с, без звука', 'tag': 'seedance15pro'},
+}
+SEED_NOTE = ('Seedance: фон неоднороден (виньетка, сдвиг тона) — border_mad_max и маска силуэта (fg_*) завышены и '
+             'недостоверны; движение камеры судить по base_* (обод подставки)')
+
+
+def quote_cost(raw):
+    p = f'{raw}/quote.json'
+    return json.loads(jload(p)['content'][0]['text'])['cost'] if os.path.exists(f'{R}/{p}') else None
+
+
+def take_entry(d):
+    """d = repo-relative take dir. Returns the manifest entry of one generated clip."""
+    ev = jload(f'{d}/assessment.json')
+    md = MODELS[ev['model']]
+    raw = f'{d}/syntx'
+    mp4s = sorted(os.path.basename(p) for p in glob.glob(f'{R}/{d}/*.mp4'))
+    assert len(mp4s) == 1, d
+    mp4 = f'{d}/{mp4s[0]}'
+    res, req = jload(f'{raw}/result.json'), jload(f'{raw}/req.json')
+    an = jload(f'{d}/analysis.json')['summary']
+    pr = subprocess.run(['ffprobe', '-v', 'error', '-show_entries',
+                         'stream=width,height,r_frame_rate,nb_frames,duration,codec_name', '-of', 'json', f'{R}/{mp4}'],
+                        capture_output=True, text=True, check=True)
+    st = json.loads(pr.stdout)['streams'][0]
+    prompt = open(f'{R}/{d}/prompt.txt', encoding='utf-8').read().strip()
+    assert prompt == res['prompt'].strip() == req['prompt'].strip(), d
+    assert req['model_type'] == md['modelType'] == res['settings']['model_type'], d
+    url_md5 = res['url'].rsplit('/', 1)[1].split('_')[0]
+    assert url_md5 == hashlib.md5(open(f'{R}/{mp4}', 'rb').read()).hexdigest(), f'{d}: mp4 differs from SYNTX output'
+    b0, b1 = bal(f'{raw}/balance_before.json'), bal(f'{raw}/balance_after.json')
+    kfs = sorted(glob.glob(f'{R}/{d}/keyframes/f*.png'))
+    meas = {'status': 'измерено', 'file': f'{d}/analysis.json', 'rangeNote': '*_range_px — размах (max − min) по всем кадрам, не ±',
+            **{k: an[k] for k in ('border_mad_max', 'base_center_x_range_px', 'base_bottom_y_range_px', 'base_width_range_px',
+                                  'fg_touches_edge_frames', 'fg_bbox_union', 'motion_mad_max', 'motion_peak_frames')}}
+    if ev['model'].startswith('seedance'):
+        meas['caveat'] = SEED_NOTE
+    if ev['cue'].endswith('-Idle'):
+        a0 = __import__('numpy').asarray(__import__('PIL.Image', fromlist=['Image']).open(f'{R}/{d}/keyframes/f000.png').convert('RGB'), dtype='float32')
+        a1 = __import__('numpy').asarray(__import__('PIL.Image', fromlist=['Image']).open(f'{R}/{d}/keyframes/f120.png').convert('RGB'), dtype='float32')
+        meas['loopMadFirstLast'] = round(float(abs(a0 - a1).mean()), 2)
+    settings = {k: v for k, v in res['settings'].items() if k not in ('file_urls', 'model_type')}
+    return {
+        'cue': ev['cue'], 'take': ev['take'], 'generationOrder2': ev['order'], 'selected': ev['selected'],
+        'cueRef': ev['cueRef'], 'status': 'референс, не анимация',
+        'whyThisTake': ev['why'],
+        'suitabilityVideoToMotion': {'verdict': ev['verdict'], 'status': VISUAL,
+                                     'basis': 'контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json'},
+        'briefFit': {'status': 'оценка по кадрам (визуально)', 'text': ev['briefFit']},
+        'service': md['service'], 'aiName': md['aiName'], 'modelType': md['modelType'], 'modelLabel': md['label'],
+        'parameters': settings,
+        'syntxChatUuid': req['chat_id'], 'syntxTaskId': res['task_id'],
+        'syntxRaw': {'dir': f'{raw}/', 'files': sorted(os.listdir(f'{R}/{raw}')),
+                     'note': 'сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url'},
+        'prompt': prompt, 'promptFile': f'{d}/prompt.txt',
+        'output': {'path': mp4, 'sha256': sha(mp4), 'bytes': os.path.getsize(f'{R}/{mp4}'), 'codec': st['codec_name'],
+                   'durationSec': float(st['duration']), 'fps': st['r_frame_rate'], 'frames': int(st['nb_frames']),
+                   'resolution': f"{st['width']}x{st['height']}"},
+        'keyframes': [{'frame': int(os.path.basename(p)[1:4]), 'timeSec': round(int(os.path.basename(p)[1:4]) / 24, 3),
+                       'path': f'{d}/keyframes/{os.path.basename(p)}', 'sha256': sha(f'{d}/keyframes/{os.path.basename(p)}')}
+                      for p in kfs],
+        'contactSheet': f'{d}/contact-sheet-2fps.png',
+        'measurements': meas,
+        'motionSummary': ev['motion'],
+        'assessment': {'status': 'оценка по кадрам (визуально); числа взяты из measurements', **ev['assessment']},
+        'assessmentFile': f'{d}/assessment.json',
+        'cost': {'syntxTokens': round(b0 - b1, 2), 'quotedBeforeRun': quote_cost(raw), 'balanceBefore': b0, 'balanceAfter': b1,
+                 'source': f'{raw}/quote.json, {raw}/balance_before.json, {raw}/balance_after.json',
+                 'ledger': 'docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries'},
+    }
+
+
+def cue_group(asset, cue, extra=None):
+    base = f'art/animation-refs/{asset}/{cue}'
+    dirs = [base] if os.path.exists(f'{R}/{base}/assessment.json') else []
+    dirs += sorted(p.replace('\\', '/').replace(f'{R}/', '') for p in glob.glob(f'{R}/{base}/take*') if os.path.exists(f'{p}/assessment.json'))
+    takes = sorted((take_entry(d) for d in dirs), key=lambda t: t['take'])
+    sel = [t['take'] for t in takes if t['selected']]
+    assert len(sel) <= 1, cue
+    g = {'cue': cue, 'selectedTake': sel[0] if sel else None, 'takes': takes}
+    if extra:
+        g.update(extra)
+    return g
+
+
+# Medusa retakes (P1 clips above stay as they were; pointers are added)
+retakes = [cue_group('ASSET-MEDUSA-001', 'MED-HitReact', {'retakeOf': 'clips[MED-HitReact] (take 1, Kling 2.5 std, P1)'}),
+           cue_group('ASSET-MEDUSA-001', 'MED-LungeAttack', {'retakeOf': 'clips[MED-LungeAttack] (take 1, Kling 2.5 std, P1)'})]
+for c in clips:
+    for g in retakes:
+        if c['cue'] == g['cue']:
+            c['retakes'] = {'see': 'retakes[' + g['cue'] + ']', 'takes': [t['take'] for t in g['takes']],
+                            'selectedTake': g['selectedTake']}
+man['retakes'] = retakes
+man['nextSteps']['items'] = [
+    it if not it.startswith(('MED-LungeAttack: альтернатива', 'MED-HitReact: одна повторная')) else
+    it + ' — ВЫПОЛНЕНО 2026-09-28, см. retakes' for it in man['nextSteps']['items']]
+
+HEROES = [
+    ('ASSET-KING-ARTHUR-001', 'ARTH', '§7', 'art/imagegen/mvp-v1/characters/ref-king-arthur-v5-front.png'),
+    ('ASSET-MERLIN-001', 'MER', '§8', 'art/imagegen/mvp-v1/characters/ref-merlin-v3-front.png'),
+    ('ASSET-HARPY-001', 'HAR', '§6', 'art/imagegen/mvp-v1/characters/ref-harpy-v5-front.png'),
+]
+clipman = jload('docs/art-pipeline/animation-library/clip-manifest.json')
+req_mvp = {}
+for x in clipman['clips']:
+    req_mvp[x['id']] = x.get('required_mvp')
+assets = []
+for aid, pre, sec, inp_h in HEROES:
+    sess = f'art/animation-refs/{aid}/syntx-session'
+    fo = jload(f'{sess}/fileobj.json')
+    groups = [cue_group(aid, f'{pre}-{c}') for c in ('LungeAttack', 'Idle', 'HitReact', 'DeathSettle')]
+    for g in groups:
+        g['requiredMvp'] = req_mvp.get(g['cue'])
+    allt = [t for g in groups for t in g['takes']]
+    assets.append({
+        'assetId': aid, 'status': 'референсы, не анимация',
+        'cueSource': f'docs/game-design/18-animation-production-brief.md {sec} ({pre}-Idle/LungeAttack/HitReact/DeathSettle)',
+        'inputChoice': {
+            'chosen': inp_h, 'sha256': sha(inp_h), 'uploadedHashMd5': fo['hash'],
+            'uploadRecord': f'{sess}/fileobj.json', 'chatRecord': f'{sess}/chat.json',
+            'why': 'рекомендованный front-концепт героя в docs/art-pipeline/imagegen-inputs/manifest.json (sets[].recommendedTripoSlots.front; sha совпадает с sha256Recorded); 1024×1024, полный рост с подставкой, ровный серый фон',
+        },
+        'clips': groups,
+        'budget': {'spentSyntxTokens': round(sum(t['cost']['syntxTokens'] for t in allt), 2), 'generations': len(allt),
+                   'status': 'измерено: сумма дельт balance_before/after'},
+    })
+man['assets'] = assets
+
+all_new = [t for g in retakes for t in g['takes']] + [t for a in assets for g in a['clips'] for t in g['takes']]
+all_new.sort(key=lambda t: t['generationOrder2'])
+man['heroSeries'] = {
+    'date': '2026-09-28',
+    'scope': 'видео-референсы Arthur, Merlin, Harpy (по 4 CUE брифа 18) + ретейки Medusa MED-HitReact (retryProposal) и MED-LungeAttack (¾, выстрел по оси камеры)',
+    'authorization': 'пользователь снял лимиты SYNTX для этой серии (покупки запрещены); каждая трата дописана в credits-ledger.json сразу после генерации',
+    'modelPolicy': {
+        'status': 'решение по результатам генераций (оценка по кадрам)',
+        'default': 'Kling 2.5 std 5 с (6 токенов) — пробный ролик героя и Idle/LungeAttack/DeathSettle',
+        'switch': 'HitReact — сразу Seedance 1.5 Pro 720p 1:1 camera_fixed (7.5): Kling дал кровь на MED-HitReact take1 и повторно на take2 с исправленным промптом, Seedance take4 — без VFX; ретейки на другой модели — только после зафиксированного артефакта (whyThisTake)',
+        'seedanceParams': 'aspect_ratio 1:1 и camera_fixed true задаются явно: без них SYNTX применил 16:9 и подвижную камеру (MED-HitReact take3)',
+        'observed': 'Kling 2.5 std: стабильная камера и ровный фон, но добавляет VFX/кровь (MED-HitReact ×2, MER-DeathSettle), вспышку (MER-LungeAttack) и игнорирует «не взлетать» (HAR-LungeAttack). Seedance 1.5 Pro: следует запретам на VFX/кровь, но фон неоднороден, пластика медленнее, есть отрывы стоп и наклон подставки (ARTH-HitReact), скачок позы (HAR-DeathSettle take1). Вывод по 20 роликам, не статистика.',
+        'priceQuotes': {'status': 'get-model-info до каждого запуска (syntx/quote.json); сводный опрос 2026-09-28 14:3x',
+                        'table': 'Kling 2.5 std 5 с 6; Seedance 1.0 Pro-Fast 480p 6 / 720p 10; Seedance 1.5 Pro 480p 6 / 720p 7.5; Hailuo 2.3 Fast 768p 6 с 9; Seedance 2.0 — цена не получена (API требует mode/size)'},
+    },
+    'generationOrder': [f"{t['generationOrder2']}. {t['cue']} take{t['take']} ({t['modelLabel']})" for t in all_new],
+    'spentSyntxTokens': round(sum(t['cost']['syntxTokens'] for t in all_new), 2),
+    'balanceBefore': all_new[0]['cost']['balanceBefore'], 'balanceAfter': all_new[-1]['cost']['balanceAfter'],
+    'generations': len(all_new),
+    'retakeReasons': [f"{t['cue']} take{t['take']}: {t['whyThisTake']}" for t in all_new if t['take'] > 1],
+    'ledger': 'docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries (writer: tools/art/syntx_video_refs/ledger_append.py)',
+    'nextSteps': {'status': 'предложено', 'items': [
+        'Пробы video-to-motion начинать с выбранных takes верха тела: MED-HitReact take4, MER-HitReact, ARTH-LungeAttack (кадры 0–84), MER-LungeAttack (0–56); сервис не выбран.',
+        'MED-LungeAttack: ни один take не показал выпуск по оси камеры (take2 — снова вправо, take3 — прицел в камеру без выпуска); варианты: перенос верха тела с коррекцией ориентации (как в briefDeviation) или keyframe-ключи по брифу; третья регенерация не делалась.',
+        'ARTH-HitReact: наклон подставки — возможный ретейк (Kling с HitReact-промптом рискует VFX; Seedance с «the base never tilts»).',
+        'HAR-LungeAttack: наскок без взлёта получен только частично (take2); Idle/DeathSettle Harpy — take Kling пригодны.',
+        'Idle всех героев — малая амплитуда, ставить руками по брифу; видео — референс тайминга.',
+        'Импорт в Blender/UE, ретаргет и ретайминг под окна CUE не начаты; «технически импортировано» и «художественно принято» не заявляются.',
+    ]},
+}
+man['budgetAll'] = {
+    'status': 'измерено (дельты balance_before/after по всем генерациям манифеста)',
+    'p1Medusa': man['budget']['spentSyntxTokens'], 'heroSeries': man['heroSeries']['spentSyntxTokens'],
+    'total': round(man['budget']['spentSyntxTokens'] + man['heroSeries']['spentSyntxTokens'], 2),
+    'balanceEnd': man['heroSeries']['balanceAfter'],
+}
+man['revisions'].append({'date': '2026-09-28', 'what': 'вторая серия: ретейки Medusa (retakes) и видео-референсы Arthur/Merlin/Harpy (assets, heroSeries, budgetAll); существующие ключи Medusa не изменены, добавлены указатели clips[].retakes и отметки ВЫПОЛНЕНО в nextSteps'})
+man['reproducibility']['scripts']['ledger'] = 'tools/art/syntx_video_refs/ledger_append.py (дописывает трату в credits-ledger.json)'
+man['reproducibility']['commands'] += [
+    "вторая серия, генерация (тратит 6–7.5 токена): SYNTX_MODEL=kling25std|seedance15pro720 SYNTX_WORK=<scratch> SYNTX_CHAT_ID=<uuid чата героя, syntx-session/chat.json> SYNTX_FILEOBJ=<объект upload-files вне репо> bash tools/art/syntx_video_refs/gen.sh <Run> art/animation-refs/<ASSET>/<CUE>[/takeN]/prompt.txt; затем python tools/art/syntx_video_refs/ledger_append.py <scratch>/run_<Run> --asset <ASSET> --cue <CUE> --model '<метка>' --ref art/animation-refs/<ASSET>/<CUE>[/takeN]/ --owner '<задача>'",
+    'вторая серия, сырые ответы → репо: python tools/art/syntx_video_refs/import_runs.py --asset <ASSET> --src <scratch> [--session-src <dir с chat.json, fileobj.json> | --no-session] --run <Run>=<CUE>[/takeN] ...',
+]
+
 with open(f'{R}/docs/art-pipeline/animation-refs/manifest.json', 'w', encoding='utf-8', newline='\n') as f:
     json.dump(man, f, ensure_ascii=False, indent=2)
     f.write('\n')

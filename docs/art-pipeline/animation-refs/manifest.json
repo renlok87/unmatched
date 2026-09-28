@@ -11,6 +11,10 @@
     {
       "date": "2026-09-28",
       "what": "исправления по ревью P1 (VID): «размах N px» вместо «±N px»; выбросы DeathSettle 56–59; статус визуальной оценки пригодности; модель — «дешевейшая из опрошенных»; balanceStart переименован; LungeAttack — отказ от yaw всего клипа; скрипты и сырые ответы SYNTX перенесены в репо"
+    },
+    {
+      "date": "2026-09-28",
+      "what": "вторая серия: ретейки Medusa (retakes) и видео-референсы Arthur/Merlin/Harpy (assets, heroSeries, budgetAll); существующие ключи Medusa не изменены, добавлены указатели clips[].retakes и отметки ВЫПОЛНЕНО в nextSteps"
     }
   ],
   "language": "ru",
@@ -105,7 +109,8 @@
       "priceQuote": "tools/art/syntx_video_refs/patch.cjs (добавляет version/native_audio в get_model_info)",
       "importRawResponses": "tools/art/syntx_video_refs/import_runs.py (копирует сырые ответы из scratch с заменой id аккаунта на REDACTED)",
       "manifest": "tools/art/syntx_video_refs/build_manifest.py",
-      "measurements": "tools/art/analyze_video_ref.py"
+      "measurements": "tools/art/analyze_video_ref.py",
+      "ledger": "tools/art/syntx_video_refs/ledger_append.py (дописывает трату в credits-ledger.json)"
     },
     "rawResponses": "art/animation-refs/ASSET-MEDUSA-001/MED-<Cue>/syntx/ и art/animation-refs/ASSET-MEDUSA-001/syntx-session/",
     "commands": [
@@ -116,7 +121,9 @@
       "замеры (в папке cue): python ../../../../tools/art/analyze_video_ref.py MED-<Cue>_kling25_ref.mp4 analysis.json",
       "ключевой кадр: ffmpeg -i <clip>.mp4 -vf \"select=eq(n\\,48)\" -vsync 0 -frames:v 1 keyframes/f048.png",
       "контакт-лист: ffmpeg -i <clip>.mp4 -vf \"fps=2,scale=320:-1,tile=5x2\" -frames:v 1 contact-sheet-2fps.png",
-      "манифест: python tools/art/syntx_video_refs/build_manifest.py"
+      "манифест: python tools/art/syntx_video_refs/build_manifest.py",
+      "вторая серия, генерация (тратит 6–7.5 токена): SYNTX_MODEL=kling25std|seedance15pro720 SYNTX_WORK=<scratch> SYNTX_CHAT_ID=<uuid чата героя, syntx-session/chat.json> SYNTX_FILEOBJ=<объект upload-files вне репо> bash tools/art/syntx_video_refs/gen.sh <Run> art/animation-refs/<ASSET>/<CUE>[/takeN]/prompt.txt; затем python tools/art/syntx_video_refs/ledger_append.py <scratch>/run_<Run> --asset <ASSET> --cue <CUE> --model '<метка>' --ref art/animation-refs/<ASSET>/<CUE>[/takeN]/ --owner '<задача>'",
+      "вторая серия, сырые ответы → репо: python tools/art/syntx_video_refs/import_runs.py --asset <ASSET> --src <scratch> [--session-src <dir с chat.json, fileobj.json> | --no-session] --run <Run>=<CUE>[/takeN] ..."
     ]
   },
   "clips": [
@@ -266,6 +273,14 @@
             "либо одна регенерация (≈6 токенов SYNTX) в ¾ с выстрелом по оси камеры, чтобы совпасть с брифом"
           ]
         }
+      },
+      "retakes": {
+        "see": "retakes[MED-LungeAttack]",
+        "takes": [
+          2,
+          3
+        ],
+        "selectedTake": 3
       }
     },
     {
@@ -547,6 +562,15 @@
         "why": "формулировка «struck by an invisible blow», вероятно, спровоцировала снаряд и VFX",
         "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of Medusa come to life, standing on her round black base, entire body and base always visible in frame. She holds the bow in her left hand (on the right side of the image). After one second she flinches in pain: her torso recoils backward, shoulders hunch up, head tilts back, then she recovers into her calm standing pose and stays still. Nothing touches her, nothing enters the frame. No visual effects, no particles, no blood, no wounds, no projectiles. Feet stay planted on the base. Plain neutral gray studio background, even soft lighting.",
         "expectedCostSyntxTokens": 6
+      },
+      "retakes": {
+        "see": "retakes[MED-HitReact]",
+        "takes": [
+          2,
+          3,
+          4
+        ],
+        "selectedTake": 4
       }
     },
     {
@@ -688,10 +712,3613 @@
     "status": "предложено",
     "items": [
       "Проба video-to-motion только на MED-LungeAttack и только для верха тела (позвоночник, плечи, руки) с коррекцией ориентации к оси «вперёд»; поворот всего клипа по yaw отклонён (briefDeviation). Сервис не выбран, выбор и стоимость фиксировать отдельно.",
-      "MED-LungeAttack: альтернатива — одна регенерация (≈6 токенов) в ¾ с выстрелом по оси камеры, чтобы совпасть с брифом 18 §5.",
-      "MED-HitReact: одна повторная генерация по retryProposal (≈6 токенов), если лимит «4 ролика» будет снят.",
+      "MED-LungeAttack: альтернатива — одна регенерация (≈6 токенов) в ¾ с выстрелом по оси камеры, чтобы совпасть с брифом 18 §5. — ВЫПОЛНЕНО 2026-09-28, см. retakes",
+      "MED-HitReact: одна повторная генерация по retryProposal (≈6 токенов), если лимит «4 ролика» будет снят. — ВЫПОЛНЕНО 2026-09-28, см. retakes",
       "MED-Idle и фазу укладки MED-DeathSettle ставить ключевой анимацией в Blender по брифу; видео использовать как референс тайминга.",
       "Ретаргет на риг Medusa и ретайминг под окна CUE не начаты; «технически импортировано» и «художественно принято» не заявляются."
     ]
+  },
+  "retakes": [
+    {
+      "cue": "MED-HitReact",
+      "selectedTake": 4,
+      "takes": [
+        {
+          "cue": "MED-HitReact",
+          "take": 2,
+          "generationOrder2": 1,
+          "selected": false,
+          "cueRef": "CUE-011 (900 мс), бриф 18 §5 MED-HitReact",
+          "status": "референс, не анимация",
+          "whyThisTake": "retryProposal манифеста (предложено в P1): промпт без «struck by an invisible blow», та же модель Kling 2.5 std",
+          "suitabilityVideoToMotion": {
+            "verdict": "непригоден (кровь в пиковых кадрах)",
+            "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+            "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+          },
+          "briefFit": {
+            "status": "оценка по кадрам (визуально)",
+            "text": "вздрагивание есть, амплитуда мала"
+          },
+          "service": "SYNTX (syntx.ai) → Kling",
+          "aiName": "kling",
+          "modelType": "kling_image2video",
+          "modelLabel": "Kling 2.5 std, 5 с, без звука",
+          "parameters": {
+            "mode": "standart",
+            "version": "2.5",
+            "gen_type": null,
+            "multi_shots": false,
+            "temperature": 0.5,
+            "aspect_ratio": "1:1",
+            "native_audio": false,
+            "video_duration": 5,
+            "camera_movement": null
+          },
+          "syntxChatUuid": "5ac4e224-2019-46c2-b4a2-8d5804835b0e",
+          "syntxTaskId": "170f1e15-7093-4fad-bef8-990c9a083921",
+          "syntxRaw": {
+            "dir": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/syntx/",
+            "files": [
+              "balance_after.json",
+              "balance_before.json",
+              "gen.json",
+              "quote.json",
+              "req.json",
+              "result.json",
+              "wait.json"
+            ],
+            "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+          },
+          "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of Medusa come to life, standing on her round black base, entire body and base always visible in frame. She holds the bow in her left hand (on the right side of the image). After one second she flinches in pain: her torso recoils backward, shoulders hunch up, head tilts back, then she recovers into her calm standing pose and stays still. Nothing touches her, nothing enters the frame. No visual effects, no particles, no blood, no wounds, no projectiles. Feet stay planted on the base. Plain neutral gray studio background, even soft lighting.",
+          "promptFile": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/prompt.txt",
+          "output": {
+            "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/MED-HitReact_kling25_take2_ref.mp4",
+            "sha256": "fb18cdd78f64c40d21f6ac3210491949eb88dd466ee8cd902a49d71b28785dab",
+            "bytes": 2184219,
+            "codec": "h264",
+            "durationSec": 5.041667,
+            "fps": "24/1",
+            "frames": 121,
+            "resolution": "960x960"
+          },
+          "keyframes": [
+            {
+              "frame": 0,
+              "timeSec": 0.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/keyframes/f000.png",
+              "sha256": "decabc7202b1581735d63b15ef623e385e6d556e0330ca7b4f2059a4b041c067"
+            },
+            {
+              "frame": 30,
+              "timeSec": 1.25,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/keyframes/f030.png",
+              "sha256": "18836f34815e6d268c5a3cac4b78057f4807cb5ef88b89f4321cfd7e3104bb31"
+            },
+            {
+              "frame": 36,
+              "timeSec": 1.5,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/keyframes/f036.png",
+              "sha256": "bba574258e83583e5afc01b50d3024485dd190100c845bebc2ac99ccb27e1aff"
+            },
+            {
+              "frame": 42,
+              "timeSec": 1.75,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/keyframes/f042.png",
+              "sha256": "2f7da9bcf42673b0f0282f7adb6b514c849786cf2165f6d9ba22059681783c18"
+            },
+            {
+              "frame": 48,
+              "timeSec": 2.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/keyframes/f048.png",
+              "sha256": "4d4cc17d183618ef984abe7b9a1827441020be61399dc8768abd06e32aa87a06"
+            },
+            {
+              "frame": 72,
+              "timeSec": 3.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/keyframes/f072.png",
+              "sha256": "83a145b8a0e3cb2d88d9d1d84f54993c2e7e257f747eddadc060aca63ca95b79"
+            },
+            {
+              "frame": 120,
+              "timeSec": 5.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/keyframes/f120.png",
+              "sha256": "4d6d318db23d8ddb53cb99e839d1051836b887f4997c8051fafd051e1801366e"
+            }
+          ],
+          "contactSheet": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/contact-sheet-2fps.png",
+          "measurements": {
+            "status": "измерено",
+            "file": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/analysis.json",
+            "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+            "border_mad_max": 1.449,
+            "base_center_x_range_px": 0.0,
+            "base_bottom_y_range_px": 0.0,
+            "base_width_range_px": 0.0,
+            "fg_touches_edge_frames": [],
+            "fg_bbox_union": [
+              108,
+              72,
+              957,
+              859
+            ],
+            "motion_mad_max": 3.677,
+            "motion_peak_frames": [
+              44,
+              46,
+              48,
+              42,
+              28
+            ]
+          },
+          "motionSummary": "слабое вздрагивание плеч и головы (кадры ~28–48), затем покой",
+          "assessment": {
+            "status": "оценка по кадрам (визуально); числа взяты из measurements",
+            "camera": "неподвижна: центр, низ и ширина обода — размах 0 px; фон MAD ≤1.45",
+            "limbs": "руки и стопы видны весь ролик",
+            "weapon": "лук в левой руке весь ролик",
+            "artifacts": "красное пятно на груди и радиальные красные брызги (кровь) в кадрах ~36–48, вопреки «no blood»; брызги доходят до x 957 из 960. Смена формулировки не убрала VFX у Kling 2.5 std",
+            "videoToMotion": "прогноз (pose-трекинг не запускался): пиковые кадры заслонены брызгами; амплитуда мала"
+          },
+          "assessmentFile": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/assessment.json",
+          "cost": {
+            "syntxTokens": 6.0,
+            "quotedBeforeRun": 6,
+            "balanceBefore": 661.5,
+            "balanceAfter": 655.5,
+            "source": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/syntx/quote.json, art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/syntx/balance_before.json, art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take2/syntx/balance_after.json",
+            "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+          }
+        },
+        {
+          "cue": "MED-HitReact",
+          "take": 3,
+          "generationOrder2": 2,
+          "selected": false,
+          "cueRef": "CUE-011 (900 мс), бриф 18 §5 MED-HitReact",
+          "status": "референс, не анимация",
+          "whyThisTake": "take2 (Kling) повторил кровь; тот же промпт на Seedance 1.5 Pro 720p для сравнения моделей",
+          "suitabilityVideoToMotion": {
+            "verdict": "ограниченно пригоден (кадры ≥24); заменён take4",
+            "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+            "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+          },
+          "briefFit": {
+            "status": "оценка по кадрам (визуально)",
+            "text": "вздрагивание и возврат есть"
+          },
+          "service": "SYNTX (syntx.ai) → Seedance",
+          "aiName": "seedance",
+          "modelType": "seedance-1.5-pro",
+          "modelLabel": "Seedance 1.5 Pro 720p, 5 с, без звука",
+          "parameters": {
+            "mode": "pro",
+            "resolution": "720p",
+            "aspect_ratio": "16:9",
+            "camera_fixed": false,
+            "output_format": null,
+            "generate_audio": false,
+            "video_duration": 5,
+            "input_video_duration": 0
+          },
+          "syntxChatUuid": "5ac4e224-2019-46c2-b4a2-8d5804835b0e",
+          "syntxTaskId": "2867398",
+          "syntxRaw": {
+            "dir": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/syntx/",
+            "files": [
+              "balance_after.json",
+              "balance_before.json",
+              "gen.json",
+              "quote.json",
+              "req.json",
+              "result.json",
+              "wait.json"
+            ],
+            "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+          },
+          "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of Medusa come to life, standing on her round black base, entire body and base always visible in frame. She holds the bow in her left hand (on the right side of the image). After one second she flinches in pain: her torso recoils backward, shoulders hunch up, head tilts back, then she recovers into her calm standing pose and stays still. Nothing touches her, nothing enters the frame. No visual effects, no particles, no blood, no wounds, no projectiles. Feet stay planted on the base. Plain neutral gray studio background, even soft lighting.",
+          "promptFile": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/prompt.txt",
+          "output": {
+            "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/MED-HitReact_seedance15pro_take3_ref.mp4",
+            "sha256": "fd26a3ccb75b51485f1690ad6bb1387a8de74ecfabb32ffdff9b7fdb43e4f8cc",
+            "bytes": 3479473,
+            "codec": "h264",
+            "durationSec": 5.041667,
+            "fps": "24/1",
+            "frames": 121,
+            "resolution": "1280x720"
+          },
+          "keyframes": [
+            {
+              "frame": 0,
+              "timeSec": 0.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/keyframes/f000.png",
+              "sha256": "90a43fb60e12a13319ad30ccd26163c6184692a4c2f8d03eb857a24bc7b1188b"
+            },
+            {
+              "frame": 12,
+              "timeSec": 0.5,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/keyframes/f012.png",
+              "sha256": "3200ce5a116e49c8ae54bda1fe3c90b08fe6fbae950c30a34c36f30cdd49642c"
+            },
+            {
+              "frame": 24,
+              "timeSec": 1.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/keyframes/f024.png",
+              "sha256": "96b951978a9e2d6c2822e0bf52ba246f91da9648e86b2d74641f050c580b5789"
+            },
+            {
+              "frame": 40,
+              "timeSec": 1.667,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/keyframes/f040.png",
+              "sha256": "fa077d1bae00484cc1c74f3522aea4b9e1f565f2d5850d4f018948dea1e79119"
+            },
+            {
+              "frame": 48,
+              "timeSec": 2.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/keyframes/f048.png",
+              "sha256": "e7afafd444061caa6bd5b4b1d0a63d570a14744784657f01ad463e4ff2dbfd6d"
+            },
+            {
+              "frame": 72,
+              "timeSec": 3.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/keyframes/f072.png",
+              "sha256": "b6b80afac89c04d60123306e257acc43a371aec04f1d2921c05b4c851fc4db1e"
+            },
+            {
+              "frame": 120,
+              "timeSec": 5.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/keyframes/f120.png",
+              "sha256": "bf3b6ec5a0ce93b360cabe7e2a7f25eb6c0a05355c1274c0588685b1c311d522"
+            }
+          ],
+          "contactSheet": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/contact-sheet-2fps.png",
+          "measurements": {
+            "status": "измерено",
+            "file": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/analysis.json",
+            "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+            "border_mad_max": 34.51,
+            "base_center_x_range_px": 16.0,
+            "base_bottom_y_range_px": 0.0,
+            "base_width_range_px": 112.0,
+            "fg_touches_edge_frames": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30,
+              31,
+              32,
+              33,
+              34,
+              35,
+              36,
+              37,
+              38,
+              39,
+              40,
+              41,
+              42,
+              43,
+              44,
+              45,
+              46,
+              47,
+              48,
+              49,
+              50,
+              51,
+              52,
+              53,
+              54,
+              55,
+              56,
+              57,
+              58,
+              59,
+              60,
+              61,
+              62,
+              63,
+              64,
+              65,
+              66,
+              67,
+              68,
+              69,
+              70,
+              71,
+              72,
+              73,
+              74,
+              75,
+              76,
+              77,
+              78,
+              79,
+              80,
+              81,
+              82,
+              83,
+              84,
+              85,
+              86,
+              87,
+              88,
+              89,
+              90,
+              91,
+              92,
+              93,
+              94,
+              95,
+              96,
+              97,
+              98,
+              99,
+              100,
+              101,
+              102,
+              103,
+              104,
+              105,
+              106,
+              107,
+              108,
+              109,
+              110,
+              111,
+              112,
+              113,
+              114,
+              115,
+              116,
+              117,
+              118,
+              119,
+              120
+            ],
+            "fg_bbox_union": [
+              0,
+              0,
+              1279,
+              719
+            ],
+            "motion_mad_max": 7.757,
+            "motion_peak_frames": [
+              6,
+              5,
+              7,
+              10,
+              8
+            ],
+            "caveat": "Seedance: фон неоднороден (виньетка, сдвиг тона) — border_mad_max и маска силуэта (fg_*) завышены и недостоверны; движение камеры судить по base_* (обод подставки)"
+          },
+          "motionSummary": "резкое откидывание головы назад и вздрагивание корпуса (кадры ~36–50), возврат в стойку (~72)",
+          "assessment": {
+            "status": "оценка по кадрам (визуально); числа взяты из measurements",
+            "camera": "запрос не задавал aspect_ratio и camera_fixed: SYNTX применил 16:9 и camera_fixed=false (result.json) → выход 1280×720 с кропом входа 1:1; в кадрах 0–24 камера отъезжает (ширина обода меняется, размах 112 px), дальше обод неподвижен; нижний край подставки на границе кадра",
+            "limbs": "руки и стопы видны; в кадрах 0–5 верх головы и подставка обрезаны кадром",
+            "weapon": "лук в левой руке весь ролик",
+            "artifacts": "крови, снарядов и VFX нет; у Seedance фон неоднороден (виньетка, тон меняется после первых кадров): border_mad и маска силуэта завышены, касания края по маске недостоверны; движение камеры оценивается только по ободу подставки",
+            "videoToMotion": "прогноз (pose-трекинг не запускался): пригоден только отрезок после кадра 24; заменён take4 с исправленными параметрами"
+          },
+          "assessmentFile": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/assessment.json",
+          "cost": {
+            "syntxTokens": 7.5,
+            "quotedBeforeRun": 7.5,
+            "balanceBefore": 655.5,
+            "balanceAfter": 648,
+            "source": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/syntx/quote.json, art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/syntx/balance_before.json, art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take3/syntx/balance_after.json",
+            "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+          }
+        },
+        {
+          "cue": "MED-HitReact",
+          "take": 4,
+          "generationOrder2": 3,
+          "selected": true,
+          "cueRef": "CUE-011 (900 мс), бриф 18 §5 MED-HitReact",
+          "status": "референс, не анимация",
+          "whyThisTake": "повтор take3 с явными aspect_ratio 1:1 и camera_fixed true (ошибка параметров запроса в take3, не результата модели)",
+          "suitabilityVideoToMotion": {
+            "verdict": "пригоден как референс верха тела (лучший из трёх ретейков)",
+            "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+            "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+          },
+          "briefFit": {
+            "status": "оценка по кадрам (визуально)",
+            "text": "фазы брифа (отдача → возврат) читаются; амплитуда и длительность больше брифа (0.4 с) — нужна выборка фазы и ретайминг"
+          },
+          "service": "SYNTX (syntx.ai) → Seedance",
+          "aiName": "seedance",
+          "modelType": "seedance-1.5-pro",
+          "modelLabel": "Seedance 1.5 Pro 720p, 5 с, без звука",
+          "parameters": {
+            "mode": "pro",
+            "resolution": "720p",
+            "aspect_ratio": "1:1",
+            "camera_fixed": true,
+            "output_format": null,
+            "generate_audio": false,
+            "video_duration": 5,
+            "input_video_duration": 0
+          },
+          "syntxChatUuid": "5ac4e224-2019-46c2-b4a2-8d5804835b0e",
+          "syntxTaskId": "2867470",
+          "syntxRaw": {
+            "dir": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/syntx/",
+            "files": [
+              "balance_after.json",
+              "balance_before.json",
+              "gen.json",
+              "quote.json",
+              "req.json",
+              "result.json",
+              "wait.json"
+            ],
+            "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+          },
+          "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of Medusa come to life, standing on her round black base, entire body and base always visible in frame. She holds the bow in her left hand (on the right side of the image). After one second she flinches in pain: her torso recoils backward, shoulders hunch up, head tilts back, then she recovers into her calm standing pose and stays still. Nothing touches her, nothing enters the frame. No visual effects, no particles, no blood, no wounds, no projectiles. Feet stay planted on the base. Plain neutral gray studio background, even soft lighting.",
+          "promptFile": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/prompt.txt",
+          "output": {
+            "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/MED-HitReact_seedance15pro_take4_ref.mp4",
+            "sha256": "e2baa57020a31bd0e8cd5018a2757a6c911feadd5970cd68543f90c0f69e3788",
+            "bytes": 3845259,
+            "codec": "h264",
+            "durationSec": 5.041667,
+            "fps": "24/1",
+            "frames": 121,
+            "resolution": "960x960"
+          },
+          "keyframes": [
+            {
+              "frame": 0,
+              "timeSec": 0.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/keyframes/f000.png",
+              "sha256": "6f821621a4864749699b87840584f217406545b27e7f2579be02c7f029f224ea"
+            },
+            {
+              "frame": 20,
+              "timeSec": 0.833,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/keyframes/f020.png",
+              "sha256": "7134cecc37c42208a3036b199bb69a60ea0c234464de65568874a6964ef01e4f"
+            },
+            {
+              "frame": 30,
+              "timeSec": 1.25,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/keyframes/f030.png",
+              "sha256": "5e0e529b0463ffe81d91cc45c3f279a2e4b6bd8d737daa0545a855298bd9c056"
+            },
+            {
+              "frame": 38,
+              "timeSec": 1.583,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/keyframes/f038.png",
+              "sha256": "2e883654db1a3da593e094f5924986893dc8356cea760cf1804679afdb832338"
+            },
+            {
+              "frame": 48,
+              "timeSec": 2.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/keyframes/f048.png",
+              "sha256": "21966a4b177b1890fa5272dbf4b9b1a5e3cece899b6672c77981c5b17ee9f1c1"
+            },
+            {
+              "frame": 72,
+              "timeSec": 3.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/keyframes/f072.png",
+              "sha256": "0bf96bfbf38ba61ce488adc104bf71fc608d8df3904c71aa4755a412b03ced04"
+            },
+            {
+              "frame": 120,
+              "timeSec": 5.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/keyframes/f120.png",
+              "sha256": "e4da7ebdc4a247ce7cc8c9cd64eff433dfb6ce40c69ef3e20e9212988585a74a"
+            }
+          ],
+          "contactSheet": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/contact-sheet-2fps.png",
+          "measurements": {
+            "status": "измерено",
+            "file": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/analysis.json",
+            "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+            "border_mad_max": 14.73,
+            "base_center_x_range_px": 0.5,
+            "base_bottom_y_range_px": 0.0,
+            "base_width_range_px": 1.0,
+            "fg_touches_edge_frames": [],
+            "fg_bbox_union": [
+              170,
+              83,
+              735,
+              859
+            ],
+            "motion_mad_max": 6.442,
+            "motion_peak_frames": [
+              38,
+              21,
+              20,
+              22,
+              23
+            ],
+            "caveat": "Seedance: фон неоднороден (виньетка, сдвиг тона) — border_mad_max и маска силуэта (fg_*) завышены и недостоверны; движение камеры судить по base_* (обод подставки)"
+          },
+          "motionSummary": "вздрагивание: голова и плечи назад, руки в стороны, корпус откинут (кадры ~20–48, пик 38), плавный возврат в стойку (~72), покой",
+          "assessment": {
+            "status": "оценка по кадрам (визуально); числа взяты из measurements",
+            "camera": "по подставке неподвижна: центр обода — размах 0.5 px, нижний край — 0 px, ширина — 1 px; фон MAD до 14.7 — неоднородность фона Seedance, не движение камеры",
+            "limbs": "обе руки видны весь ролик и не перекрыты телом; стопы на подставке",
+            "weapon": "лук в левой руке весь ролик",
+            "artifacts": "крови, снарядов и VFX нет; змеиная корона перерисовывается; у Seedance фон неоднороден (виньетка, тон меняется после первых кадров): border_mad и маска силуэта завышены, касания края по маске недостоверны; движение камеры оценивается только по ободу подставки",
+            "videoToMotion": "прогноз (pose-трекинг не запускался): подходит для пробы трекинга верха тела: руки в плоскости кадра, заслонений нет"
+          },
+          "assessmentFile": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/assessment.json",
+          "cost": {
+            "syntxTokens": 7.5,
+            "quotedBeforeRun": 7.5,
+            "balanceBefore": 648,
+            "balanceAfter": 640.5,
+            "source": "art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/syntx/quote.json, art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/syntx/balance_before.json, art/animation-refs/ASSET-MEDUSA-001/MED-HitReact/take4/syntx/balance_after.json",
+            "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+          }
+        }
+      ],
+      "retakeOf": "clips[MED-HitReact] (take 1, Kling 2.5 std, P1)"
+    },
+    {
+      "cue": "MED-LungeAttack",
+      "selectedTake": 3,
+      "takes": [
+        {
+          "cue": "MED-LungeAttack",
+          "take": 2,
+          "generationOrder2": 4,
+          "selected": false,
+          "cueRef": "CUE-008 (600 мс), бриф 18 §5 MED-LungeAttack",
+          "status": "референс, не анимация",
+          "whyThisTake": "nextSteps/briefDeviation манифеста: регенерация в ¾ с выстрелом по оси камеры",
+          "suitabilityVideoToMotion": {
+            "verdict": "ограниченно пригоден (как take1: верх тела с коррекцией ориентации)",
+            "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+            "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+          },
+          "briefFit": {
+            "status": "оценка по кадрам (визуально)",
+            "text": "не выполнено: выстрел снова вправо по кадру, как в take1, а не по оси камеры"
+          },
+          "service": "SYNTX (syntx.ai) → Kling",
+          "aiName": "kling",
+          "modelType": "kling_image2video",
+          "modelLabel": "Kling 2.5 std, 5 с, без звука",
+          "parameters": {
+            "mode": "standart",
+            "version": "2.5",
+            "gen_type": null,
+            "multi_shots": false,
+            "temperature": 0.5,
+            "aspect_ratio": "1:1",
+            "native_audio": false,
+            "video_duration": 5,
+            "camera_movement": null
+          },
+          "syntxChatUuid": "5ac4e224-2019-46c2-b4a2-8d5804835b0e",
+          "syntxTaskId": "b7b5316e-b5ba-4740-b8c1-418a2ab615ff",
+          "syntxRaw": {
+            "dir": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/syntx/",
+            "files": [
+              "balance_after.json",
+              "balance_before.json",
+              "gen.json",
+              "quote.json",
+              "req.json",
+              "result.json",
+              "wait.json"
+            ],
+            "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+          },
+          "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of Medusa come to life, standing on her round black base, entire body and base always visible in frame. She holds the bow in her left hand (on the right side of the image). She turns her body into a three-quarter stance with her left shoulder toward the camera, raises the bow and aims straight at the camera, draws the bowstring back to her cheek with her right hand while aiming directly at the viewer, holds aim for a moment, releases the string with a small forward lean of the torso toward the camera, then lowers the bow and turns back to her calm front-facing standing pose. Feet stay planted on the base, no stepping, no walking. Snake hair moves only with her head. Plain neutral gray studio background, even soft lighting, clean silhouette, no flying arrow, no visual effects, no motion blur, no extra limbs, no extra characters.",
+          "promptFile": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/prompt.txt",
+          "output": {
+            "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/MED-LungeAttack_kling25_take2_ref.mp4",
+            "sha256": "acac8bdf3b3381563b272ec1b2b75441c9805d25eedd32d94be1648ce923b62c",
+            "bytes": 2431527,
+            "codec": "h264",
+            "durationSec": 5.041667,
+            "fps": "24/1",
+            "frames": 121,
+            "resolution": "960x960"
+          },
+          "keyframes": [
+            {
+              "frame": 0,
+              "timeSec": 0.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/keyframes/f000.png",
+              "sha256": "d41caa526045cad74ff8d2b178272303b4ffe82aae28110688cb8e273e6e6af9"
+            },
+            {
+              "frame": 36,
+              "timeSec": 1.5,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/keyframes/f036.png",
+              "sha256": "21657afd7d92115a84a941af530a235510c2bf072eac17a19a78eb5dcfda9f30"
+            },
+            {
+              "frame": 48,
+              "timeSec": 2.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/keyframes/f048.png",
+              "sha256": "3679206fc591de099d94c777f4496854b18dd59d9d426cb74b5560d12955b925"
+            },
+            {
+              "frame": 66,
+              "timeSec": 2.75,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/keyframes/f066.png",
+              "sha256": "67b6532d3a09a45fe2664096846015ae1b4ba91025e3c0ed7a49646d7f77655e"
+            },
+            {
+              "frame": 84,
+              "timeSec": 3.5,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/keyframes/f084.png",
+              "sha256": "ded560d23b5d654d901b2a9677f520039ce68fa490679102d18a09a3cae60510"
+            },
+            {
+              "frame": 108,
+              "timeSec": 4.5,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/keyframes/f108.png",
+              "sha256": "7345ac4989c9bc56ec132b32452c8a576af13e4d08ed7b8b9dfa88e62ec69ec2"
+            },
+            {
+              "frame": 120,
+              "timeSec": 5.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/keyframes/f120.png",
+              "sha256": "42e7ed36d98eb8212aa31ff8bb697aa0b32b74cbca8ead4ddfd281760f187c88"
+            }
+          ],
+          "contactSheet": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/contact-sheet-2fps.png",
+          "measurements": {
+            "status": "измерено",
+            "file": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/analysis.json",
+            "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+            "border_mad_max": 2.517,
+            "base_center_x_range_px": 1.0,
+            "base_bottom_y_range_px": 0.0,
+            "base_width_range_px": 2.0,
+            "fg_touches_edge_frames": [
+              113,
+              114,
+              115
+            ],
+            "fg_bbox_union": [
+              295,
+              11,
+              959,
+              860
+            ],
+            "motion_mad_max": 2.981,
+            "motion_peak_frames": [
+              36,
+              34,
+              35,
+              38,
+              40
+            ]
+          },
+          "motionSummary": "разворот корпуса к ¾, подъём лука и натяжение (кадры ~24–48), прицел вправо по кадру (~48–84), выпуск (~90–100), стрела улетает вправо, возврат во фронтальную стойку",
+          "assessment": {
+            "status": "оценка по кадрам (визуально); числа взяты из measurements",
+            "camera": "неподвижна: центр обода — размах 1 px, низ — 0 px; фон MAD ≤2.5",
+            "limbs": "руки в плоскости кадра, читаемы; стопы на подставке",
+            "weapon": "лук в левой руке; стрела и тетива возникают без извлечения из колчана",
+            "artifacts": "летящая стрела в конце (кадры ~100–115, касается правого края в 113–115); верх лука у верхнего края кадра (y 11)",
+            "videoToMotion": "прогноз (pose-трекинг не запускался): как take1; ориентация выстрела вправо"
+          },
+          "assessmentFile": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/assessment.json",
+          "cost": {
+            "syntxTokens": 6.0,
+            "quotedBeforeRun": 6,
+            "balanceBefore": 640.5,
+            "balanceAfter": 634.5,
+            "source": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/syntx/quote.json, art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/syntx/balance_before.json, art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take2/syntx/balance_after.json",
+            "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+          }
+        },
+        {
+          "cue": "MED-LungeAttack",
+          "take": 3,
+          "generationOrder2": 5,
+          "selected": true,
+          "cueRef": "CUE-008 (600 мс), бриф 18 §5 MED-LungeAttack",
+          "status": "референс, не анимация",
+          "whyThisTake": "Kling take2 не выполнил выстрел по оси камеры и дал летящую стрелу; тот же промпт на Seedance 1.5 Pro",
+          "suitabilityVideoToMotion": {
+            "verdict": "ограниченно пригоден: только фаза натяжения и прицела по оси камеры",
+            "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+            "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+          },
+          "briefFit": {
+            "status": "оценка по кадрам (визуально)",
+            "text": "частично: прицел по оси камеры есть (кадры ~36–72), выпуска и микровыпада нет, финал не совпадает со стартовой позой"
+          },
+          "service": "SYNTX (syntx.ai) → Seedance",
+          "aiName": "seedance",
+          "modelType": "seedance-1.5-pro",
+          "modelLabel": "Seedance 1.5 Pro 720p, 5 с, без звука",
+          "parameters": {
+            "mode": "pro",
+            "resolution": "720p",
+            "aspect_ratio": "1:1",
+            "camera_fixed": true,
+            "output_format": null,
+            "generate_audio": false,
+            "video_duration": 5,
+            "input_video_duration": 0
+          },
+          "syntxChatUuid": "5ac4e224-2019-46c2-b4a2-8d5804835b0e",
+          "syntxTaskId": "2867570",
+          "syntxRaw": {
+            "dir": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/syntx/",
+            "files": [
+              "balance_after.json",
+              "balance_before.json",
+              "gen.json",
+              "quote.json",
+              "req.json",
+              "result.json",
+              "wait.json"
+            ],
+            "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+          },
+          "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of Medusa come to life, standing on her round black base, entire body and base always visible in frame. She holds the bow in her left hand (on the right side of the image). She turns her body into a three-quarter stance with her left shoulder toward the camera, raises the bow and aims straight at the camera, draws the bowstring back to her cheek with her right hand while aiming directly at the viewer, holds aim for a moment, releases the string with a small forward lean of the torso toward the camera, then lowers the bow and turns back to her calm front-facing standing pose. Feet stay planted on the base, no stepping, no walking. Snake hair moves only with her head. Plain neutral gray studio background, even soft lighting, clean silhouette, no flying arrow, no visual effects, no motion blur, no extra limbs, no extra characters.",
+          "promptFile": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/prompt.txt",
+          "output": {
+            "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/MED-LungeAttack_seedance15pro_take3_ref.mp4",
+            "sha256": "adb2d267d2f6050a5a9c953dc36f6280030e695fecb9580fd732799e9a90528a",
+            "bytes": 3650831,
+            "codec": "h264",
+            "durationSec": 5.041667,
+            "fps": "24/1",
+            "frames": 121,
+            "resolution": "960x960"
+          },
+          "keyframes": [
+            {
+              "frame": 0,
+              "timeSec": 0.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/keyframes/f000.png",
+              "sha256": "1d23af8a6b1ad75cefda0eaa905689752d7f525d429692864c555a152c4da83a"
+            },
+            {
+              "frame": 36,
+              "timeSec": 1.5,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/keyframes/f036.png",
+              "sha256": "ec158931ee51eacaba8cef14fa929cdf25f8a311c45cad0b282773f7a14d59f0"
+            },
+            {
+              "frame": 50,
+              "timeSec": 2.083,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/keyframes/f050.png",
+              "sha256": "1e86a82eb73f0757f0ba8d58be6f035855b178b09f9df2ec2ff6eb52d4d5e993"
+            },
+            {
+              "frame": 72,
+              "timeSec": 3.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/keyframes/f072.png",
+              "sha256": "2da5bcf2e9f911a1e2a392a61a00465c3e2f12eaea950494ca9a668bce4fa26f"
+            },
+            {
+              "frame": 94,
+              "timeSec": 3.917,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/keyframes/f094.png",
+              "sha256": "f44282a8eeb154a6f0a8153a2c3cb93215cde1b684b831464151944c281c087a"
+            },
+            {
+              "frame": 108,
+              "timeSec": 4.5,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/keyframes/f108.png",
+              "sha256": "5e0ae80f9aecb70eed3ba8e310b67bb9d798d932bde146f1f6de900fd168e304"
+            },
+            {
+              "frame": 120,
+              "timeSec": 5.0,
+              "path": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/keyframes/f120.png",
+              "sha256": "e2449a01e38218ca27bfd84535e0a7b0513d815c70739e619819b4c9b6f14b71"
+            }
+          ],
+          "contactSheet": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/contact-sheet-2fps.png",
+          "measurements": {
+            "status": "измерено",
+            "file": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/analysis.json",
+            "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+            "border_mad_max": 15.372,
+            "base_center_x_range_px": 0.5,
+            "base_bottom_y_range_px": 1.0,
+            "base_width_range_px": 3.0,
+            "fg_touches_edge_frames": [
+              38,
+              39,
+              40,
+              41,
+              42,
+              43,
+              44,
+              45,
+              46,
+              47,
+              48,
+              49,
+              50,
+              51,
+              52,
+              53,
+              54,
+              55,
+              56,
+              57,
+              58,
+              59,
+              60,
+              61,
+              85,
+              86
+            ],
+            "fg_bbox_union": [
+              76,
+              0,
+              959,
+              953
+            ],
+            "motion_mad_max": 3.972,
+            "motion_peak_frames": [
+              100,
+              101,
+              94,
+              95,
+              93
+            ],
+            "caveat": "Seedance: фон неоднороден (виньетка, сдвиг тона) — border_mad_max и маска силуэта (fg_*) завышены и недостоверны; движение камеры судить по base_* (обод подставки)"
+          },
+          "motionSummary": "подъём лука высоко (кадры ~24–36), натяжение с прицелом на камеру — стрела у щеки укорочена перспективой (~36–72), выпуска не видно; затем в правой руке снова стрела (~94), финал — стойка со стрелой, опущенной вниз-влево",
+          "assessment": {
+            "status": "оценка по кадрам (визуально); числа взяты из measurements",
+            "camera": "по подставке неподвижна: центр обода — размах 0.5 px, низ — 1 px; фон MAD 15.4 — неоднородность фона Seedance",
+            "limbs": "руки читаемы; тянущая рука у лица, в прицеле частично перекрыта луком",
+            "weapon": "лук в левой руке; верх лука выходит за верхний край кадра в кадрах ~38–61 (по маске, визуально подтверждено на f050)",
+            "artifacts": "стрела появляется в руке после «выстрела» и остаётся до конца; у Seedance фон неоднороден (виньетка, тон меняется после первых кадров): border_mad и маска силуэта завышены, касания края по маске недостоверны; движение камеры оценивается только по ободу подставки",
+            "videoToMotion": "прогноз (pose-трекинг не запускался): фазу прицела по оси камеры можно брать как референс; глубина (к камере) монокулярно неоднозначна"
+          },
+          "assessmentFile": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/assessment.json",
+          "cost": {
+            "syntxTokens": 7.5,
+            "quotedBeforeRun": 7.5,
+            "balanceBefore": 634.5,
+            "balanceAfter": 627,
+            "source": "art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/syntx/quote.json, art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/syntx/balance_before.json, art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack/take3/syntx/balance_after.json",
+            "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+          }
+        }
+      ],
+      "retakeOf": "clips[MED-LungeAttack] (take 1, Kling 2.5 std, P1)"
+    }
+  ],
+  "assets": [
+    {
+      "assetId": "ASSET-KING-ARTHUR-001",
+      "status": "референсы, не анимация",
+      "cueSource": "docs/game-design/18-animation-production-brief.md §7 (ARTH-Idle/LungeAttack/HitReact/DeathSettle)",
+      "inputChoice": {
+        "chosen": "art/imagegen/mvp-v1/characters/ref-king-arthur-v5-front.png",
+        "sha256": "1467861455c6e7a011edca9e879982f088c5839ad39d2a4fadf94b1ab253f9a2",
+        "uploadedHashMd5": "5806a58571c90a155e83f647b7689e3e",
+        "uploadRecord": "art/animation-refs/ASSET-KING-ARTHUR-001/syntx-session/fileobj.json",
+        "chatRecord": "art/animation-refs/ASSET-KING-ARTHUR-001/syntx-session/chat.json",
+        "why": "рекомендованный front-концепт героя в docs/art-pipeline/imagegen-inputs/manifest.json (sets[].recommendedTripoSlots.front; sha совпадает с sha256Recorded); 1024×1024, полный рост с подставкой, ровный серый фон"
+      },
+      "clips": [
+        {
+          "cue": "ARTH-LungeAttack",
+          "selectedTake": 1,
+          "takes": [
+            {
+              "cue": "ARTH-LungeAttack",
+              "take": 1,
+              "generationOrder2": 6,
+              "selected": true,
+              "cueRef": "CUE-008 (600 мс), бриф 18 §7 ARTH-LungeAttack",
+              "status": "референс, не анимация",
+              "whyThisTake": "пробный ролик героя (самый сложный: меч, обе руки)",
+              "suitabilityVideoToMotion": {
+                "verdict": "пригоден как референс тайминга и верха тела",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "фазы брифа (замах → выпад → удар → возврат) читаются; направление удара — вбок по кадру, а не на камеру"
+              },
+              "service": "SYNTX (syntx.ai) → Kling",
+              "aiName": "kling",
+              "modelType": "kling_image2video",
+              "modelLabel": "Kling 2.5 std, 5 с, без звука",
+              "parameters": {
+                "mode": "standart",
+                "version": "2.5",
+                "gen_type": null,
+                "multi_shots": false,
+                "temperature": 0.5,
+                "aspect_ratio": "1:1",
+                "native_audio": false,
+                "video_duration": 5,
+                "camera_movement": null
+              },
+              "syntxChatUuid": "0c59d05d-08f0-48a9-8c60-dc972f263948",
+              "syntxTaskId": "09ef5aed-671e-44aa-9411-c93093d616de",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of King Arthur come to life, standing on his square black base, entire body, the whole sword and the base always visible in frame. He wears a golden crown, plate armor and a red cape, and holds the sword Excalibur upright in his right hand (on the left side of the image); his left hand is empty, no shield. He shifts his weight back and draws the sword up and back over his right shoulder, then takes a small lunge forward toward the camera without leaving the base and swings the sword in one strong diagonal downward slash across his body, holds the end of the swing for a moment, then returns to his upright ready stance with the sword raised at his shoulder. Feet stay on the base, no walking. The cape moves only with his body. Plain neutral gray studio background, even soft lighting, clean silhouette, no motion blur, no sword trails, no visual effects, no extra limbs, no extra weapons, no extra characters.",
+              "promptFile": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/ARTH-LungeAttack_kling25_ref.mp4",
+                "sha256": "57626ad4208442949cc16161ff95256c8662fab0376c53242c9b6b0172cbc259",
+                "bytes": 2990036,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/keyframes/f000.png",
+                  "sha256": "864433fa3037cb3f592bc65ebf2ea46509b65f1c505aec4df7847c223380b776"
+                },
+                {
+                  "frame": 24,
+                  "timeSec": 1.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/keyframes/f024.png",
+                  "sha256": "9ce8c889aa1e4a7d8492980048fcf24aa1eded8de2e852d199751646eb36bf86"
+                },
+                {
+                  "frame": 36,
+                  "timeSec": 1.5,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/keyframes/f036.png",
+                  "sha256": "432278167f09b80a36da63dfbeb4d2d35877c0f50edab7dd035fd791f8e7cf01"
+                },
+                {
+                  "frame": 44,
+                  "timeSec": 1.833,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/keyframes/f044.png",
+                  "sha256": "347d7fe9b41161ad65043885359f1ce4576e5be8217a1734cc0f7f7f3074f86b"
+                },
+                {
+                  "frame": 60,
+                  "timeSec": 2.5,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/keyframes/f060.png",
+                  "sha256": "ee32cf30b485378b63393d36b659c5cebb3dc86b2e1eab47d8dea2ae903f3ff6"
+                },
+                {
+                  "frame": 84,
+                  "timeSec": 3.5,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/keyframes/f084.png",
+                  "sha256": "ca5739343aef6c31cba5c53df73e307dbc4b05d4e32213d27a9fa5094b5b2d77"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/keyframes/f120.png",
+                  "sha256": "0cea7e8eb0190fafc3118509743cad2184af790cc9c7a53bc83b48fa7c88e7c3"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 1.552,
+                "base_center_x_range_px": 8.5,
+                "base_bottom_y_range_px": 4.0,
+                "base_width_range_px": 17.0,
+                "fg_touches_edge_frames": [],
+                "fg_bbox_union": [
+                  8,
+                  95,
+                  950,
+                  863
+                ],
+                "motion_mad_max": 6.115,
+                "motion_peak_frames": [
+                  45,
+                  43,
+                  44,
+                  42,
+                  41
+                ]
+              },
+              "motionSummary": "замах: меч вверх-назад над правым плечом (кадры ~12–30), рубящий мах влево-вниз (~36–44, пик движения 41–45), доворот вправо и выпад корпусом в профиль с мечом вперёд (~48–64), возврат в стойку наизготовку (~72–84), покой",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "фон MAD ≤1.55; обод квадратной подставки — размах центра 8.5 px, ширины 17 px, низа 4 px (вероятно, стопы и плащ перекрывают край подставки в выпаде; не проверено)",
+                "limbs": "руки читаемы; в выпаде корпус в профиль, левая рука частично перекрыта телом",
+                "weapon": "меч в правой руке весь ролик; длина клинка и гарда плавают, клинок размыт на махе (кадры ~36–48); силуэт меча доходит до x 8 из 960, края не касается",
+                "artifacts": "смазанный тёмный шлейф справа у ног около кадра 48; корона и плащ перерисовываются",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): камера неподвижна, фон ровный — пригоден для пробы верха тела; ноги в профиле и плащ затрудняют трекинг таза"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/assessment.json",
+              "cost": {
+                "syntxTokens": 6,
+                "quotedBeforeRun": 6,
+                "balanceBefore": 627,
+                "balanceAfter": 621,
+                "source": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/syntx/quote.json, art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/syntx/balance_before.json, art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            }
+          ],
+          "requiredMvp": true
+        },
+        {
+          "cue": "ARTH-Idle",
+          "selectedTake": 1,
+          "takes": [
+            {
+              "cue": "ARTH-Idle",
+              "take": 1,
+              "generationOrder2": 7,
+              "selected": true,
+              "cueRef": "нет CUE (фон; бриф 18 §7 ARTH-Idle)",
+              "status": "референс, не анимация",
+              "whyThisTake": "параметры пробного ролика подтверждены",
+              "suitabilityVideoToMotion": {
+                "verdict": "ограниченно пригоден (амплитуда и тайминг дыхания)",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "дыхание есть; доворот корпуса лишний, цикл не замкнут"
+              },
+              "service": "SYNTX (syntx.ai) → Kling",
+              "aiName": "kling",
+              "modelType": "kling_image2video",
+              "modelLabel": "Kling 2.5 std, 5 с, без звука",
+              "parameters": {
+                "mode": "standart",
+                "version": "2.5",
+                "gen_type": null,
+                "multi_shots": false,
+                "temperature": 0.5,
+                "aspect_ratio": "1:1",
+                "native_audio": false,
+                "video_duration": 5,
+                "camera_movement": null
+              },
+              "syntxChatUuid": "0c59d05d-08f0-48a9-8c60-dc972f263948",
+              "syntxTaskId": "54f99e52-c7da-4965-95db-a076d0980b2b",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of King Arthur come to life, standing on his square black base, entire body, the whole sword and the base always visible in frame. He wears a golden crown, plate armor and a red cape, and holds the sword Excalibur upright in his right hand (on the left side of the image); his left hand is empty, no shield. He stands in a calm ready stance holding the sword upright at his shoulder. He breathes slowly: the chest rises and falls gently, the shoulders lift slightly, the head makes a very small movement and returns to looking forward. Subtle, calm, looping idle motion, the pose at the end matches the pose at the start. The sword stays upright in his right hand. Feet stay planted on the base, no stepping, no walking, no big gestures. Plain neutral gray studio background, even soft lighting, clean silhouette, no motion blur, no extra limbs, no extra characters.",
+              "promptFile": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/ARTH-Idle_kling25_ref.mp4",
+                "sha256": "6544b9016445a116ebb52afda66ec28b4dfac0480f95d1d7a89f96aa84b49579",
+                "bytes": 2342917,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/keyframes/f000.png",
+                  "sha256": "26b8afac953276a1751077cff1f589bf24b8558dd3803878196a75a4af50aac6"
+                },
+                {
+                  "frame": 40,
+                  "timeSec": 1.667,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/keyframes/f040.png",
+                  "sha256": "4a3b74e5bdc568312cda0059a9d0adc2d08f12b2aa907251e9ab7c5c322a75d0"
+                },
+                {
+                  "frame": 80,
+                  "timeSec": 3.333,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/keyframes/f080.png",
+                  "sha256": "a3f666c1ce44f2d8c2feef6aee354dad02254db6a52c4974c2c9d47102ba0e62"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/keyframes/f120.png",
+                  "sha256": "cc1de4b74420a8a7e1632187074da699c4e1101a31ab76706e13243b0bb4f636"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 1.427,
+                "base_center_x_range_px": 0.5,
+                "base_bottom_y_range_px": 0.0,
+                "base_width_range_px": 2.0,
+                "fg_touches_edge_frames": [],
+                "fg_bbox_union": [
+                  284,
+                  111,
+                  681,
+                  859
+                ],
+                "motion_mad_max": 1.979,
+                "motion_peak_frames": [
+                  82,
+                  83,
+                  80,
+                  84,
+                  88
+                ],
+                "loopMadFirstLast": 6.03
+              },
+              "motionSummary": "дыхание; во второй половине корпус слегка доворачивается к ¾ (кадры ~60–120)",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "неподвижна: центр обода — размах 0.5 px, низ — 0 px; фон MAD ≤1.43",
+                "limbs": "все конечности видны весь ролик",
+                "weapon": "меч в правой руке вертикально весь ролик",
+                "artifacts": "цикл не замкнут: MAD первый/последний кадр 6.03 (доворот корпуса)",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): движение мало (motion_mad_max 1.98); Idle дешевле ставить руками по брифу"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/assessment.json",
+              "cost": {
+                "syntxTokens": 6,
+                "quotedBeforeRun": 6,
+                "balanceBefore": 621,
+                "balanceAfter": 615,
+                "source": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/syntx/quote.json, art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/syntx/balance_before.json, art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            }
+          ],
+          "requiredMvp": true
+        },
+        {
+          "cue": "ARTH-HitReact",
+          "selectedTake": 1,
+          "takes": [
+            {
+              "cue": "ARTH-HitReact",
+              "take": 1,
+              "generationOrder2": 9,
+              "selected": true,
+              "cueRef": "CUE-011 (900 мс), бриф 18 §7 ARTH-HitReact",
+              "status": "референс, не анимация",
+              "whyThisTake": "HitReact сразу на Seedance: Kling дал кровь на MED-HitReact take1 и take2",
+              "suitabilityVideoToMotion": {
+                "verdict": "ограниченно пригоден: верх тела; ноги и root не брать",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "импульс назад и возврат есть; отрыв ноги и наклон подставки противоречат брифу (подставка не смещается)"
+              },
+              "service": "SYNTX (syntx.ai) → Seedance",
+              "aiName": "seedance",
+              "modelType": "seedance-1.5-pro",
+              "modelLabel": "Seedance 1.5 Pro 720p, 5 с, без звука",
+              "parameters": {
+                "mode": "pro",
+                "resolution": "720p",
+                "aspect_ratio": "1:1",
+                "camera_fixed": true,
+                "output_format": null,
+                "generate_audio": false,
+                "video_duration": 5,
+                "input_video_duration": 0
+              },
+              "syntxChatUuid": "0c59d05d-08f0-48a9-8c60-dc972f263948",
+              "syntxTaskId": "2867773",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of King Arthur come to life, standing on his square black base, entire body, the whole sword and the base always visible in frame. He wears a golden crown, plate armor and a red cape, and holds the sword Excalibur upright in his right hand (on the left side of the image); his left hand is empty, no shield. After one second he flinches in pain: his torso recoils backward and slightly to the side, shoulders hunch up, head tilts back, then he recovers into his upright ready stance and stays still. The sword stays gripped upright in his right hand. Nothing touches him, nothing enters the frame. No visual effects, no particles, no blood, no wounds, no projectiles. Feet stay planted on the base. Plain neutral gray studio background, even soft lighting, clean silhouette.",
+              "promptFile": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/ARTH-HitReact_seedance15pro_ref.mp4",
+                "sha256": "9f6753803313feaf4e91b9a48403337546ac87e5b9296d3d8cc9a3b973c56a90",
+                "bytes": 3693014,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/keyframes/f000.png",
+                  "sha256": "7ec2fb432520007b103dd3e36cbc11c5c998dfc3f6c90374f80379c36d7ce3f4"
+                },
+                {
+                  "frame": 30,
+                  "timeSec": 1.25,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/keyframes/f030.png",
+                  "sha256": "95567ba86d5fc766347b235214c509d92acfbff6e15108f08d04aae050afb39e"
+                },
+                {
+                  "frame": 42,
+                  "timeSec": 1.75,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/keyframes/f042.png",
+                  "sha256": "8ecd2a5ddc003d80d8da323eddb3880ad86f069a20ed0fb6ea5e4b6963207c07"
+                },
+                {
+                  "frame": 48,
+                  "timeSec": 2.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/keyframes/f048.png",
+                  "sha256": "7a49236aca99a44edb1c9e18b6e631857974cc30f760aea3919f622c0ba67c28"
+                },
+                {
+                  "frame": 64,
+                  "timeSec": 2.667,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/keyframes/f064.png",
+                  "sha256": "0732f52b3d83c7261d4c29e20a5b17b66ed12a953b6eff3123693002f9c8328d"
+                },
+                {
+                  "frame": 84,
+                  "timeSec": 3.5,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/keyframes/f084.png",
+                  "sha256": "1bca38c0951f2d732da37510bf6d8792a187689b10e9dbd68947d6eb3b749930"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/keyframes/f120.png",
+                  "sha256": "7e0aefc38231f902c2e5c3116470a8e23807aa01fbfeeea730ad7970288f59c9"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 23.086,
+                "base_center_x_range_px": 36.0,
+                "base_bottom_y_range_px": 3.0,
+                "base_width_range_px": 91.0,
+                "fg_touches_edge_frames": [
+                  5,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35,
+                  36,
+                  37,
+                  38,
+                  39,
+                  40,
+                  41,
+                  42,
+                  43,
+                  44,
+                  45,
+                  46,
+                  47,
+                  48,
+                  49,
+                  50,
+                  51,
+                  52,
+                  53,
+                  54,
+                  55,
+                  56,
+                  57,
+                  58,
+                  59,
+                  60,
+                  61,
+                  62,
+                  63,
+                  64,
+                  65,
+                  66,
+                  67,
+                  68,
+                  69,
+                  70,
+                  71,
+                  72,
+                  73,
+                  74,
+                  75,
+                  76,
+                  77,
+                  78,
+                  79,
+                  80,
+                  81,
+                  82,
+                  83,
+                  84,
+                  85,
+                  86,
+                  87,
+                  88,
+                  89,
+                  90,
+                  91,
+                  92,
+                  93,
+                  94,
+                  95,
+                  96,
+                  97,
+                  98,
+                  99,
+                  100,
+                  101,
+                  102,
+                  103,
+                  104,
+                  105,
+                  106,
+                  107,
+                  108,
+                  109,
+                  110,
+                  111,
+                  112,
+                  113,
+                  114,
+                  115,
+                  116,
+                  117,
+                  118,
+                  119,
+                  120
+                ],
+                "fg_bbox_union": [
+                  0,
+                  0,
+                  959,
+                  959
+                ],
+                "motion_mad_max": 7.295,
+                "motion_peak_frames": [
+                  30,
+                  1,
+                  64,
+                  63,
+                  65
+                ],
+                "caveat": "Seedance: фон неоднороден (виньетка, сдвиг тона) — border_mad_max и маска силуэта (fg_*) завышены и недостоверны; движение камеры судить по base_* (обод подставки)"
+              },
+              "motionSummary": "откидывание корпуса и головы назад с подъёмом левой ноги (кадры ~30–64), возврат в стойку (~84), покой",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "обод меняется, потому что наклоняется сама подставка вместе с фигурой (видно на f042/f048): размах центра 36 px, ширины 91 px; после кадра ~84 обод на месте; фон MAD 23.1 — неоднородность фона Seedance",
+                "limbs": "руки видны; левая нога отрывается от подставки в пике",
+                "weapon": "меч в правой руке весь ролик",
+                "artifacts": "крови и VFX нет; наклон фигуры с подставкой = паразитный root motion; у Seedance фон неоднороден (виньетка, тон меняется после первых кадров): border_mad и маска силуэта завышены, касания края по маске недостоверны; движение камеры оценивается только по ободу подставки",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): наклон подставки исказит root и ноги; верх тела пригоден"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/assessment.json",
+              "cost": {
+                "syntxTokens": 7.5,
+                "quotedBeforeRun": 7.5,
+                "balanceBefore": 609,
+                "balanceAfter": 601.5,
+                "source": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/syntx/quote.json, art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/syntx/balance_before.json, art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            }
+          ],
+          "requiredMvp": true
+        },
+        {
+          "cue": "ARTH-DeathSettle",
+          "selectedTake": 1,
+          "takes": [
+            {
+              "cue": "ARTH-DeathSettle",
+              "take": 1,
+              "generationOrder2": 8,
+              "selected": true,
+              "cueRef": "CUE-013 (950 мс), бриф 18 §7 ARTH-DeathSettle",
+              "status": "референс, не анимация",
+              "whyThisTake": "параметры пробного ролика подтверждены",
+              "suitabilityVideoToMotion": {
+                "verdict": "пригоден как референс тайминга оседания; укладку ставить ключами",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "фазы брифа (провал hips → оседание торса → укладка → удержание) читаются; переход 40→48 быстрый"
+              },
+              "service": "SYNTX (syntx.ai) → Kling",
+              "aiName": "kling",
+              "modelType": "kling_image2video",
+              "modelLabel": "Kling 2.5 std, 5 с, без звука",
+              "parameters": {
+                "mode": "standart",
+                "version": "2.5",
+                "gen_type": null,
+                "multi_shots": false,
+                "temperature": 0.5,
+                "aspect_ratio": "1:1",
+                "native_audio": false,
+                "video_duration": 5,
+                "camera_movement": null
+              },
+              "syntxChatUuid": "0c59d05d-08f0-48a9-8c60-dc972f263948",
+              "syntxTaskId": "52bfa632-6af8-4056-9096-279b05c5d724",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of King Arthur come to life, standing on his square black base, entire body, the whole sword and the base always visible in frame. He wears a golden crown, plate armor and a red cape, and holds the sword Excalibur upright in his right hand (on the left side of the image); his left hand is empty, no shield. He is defeated: his strength fails, his knees buckle, his hips drop, he slowly sinks down onto his knees and slumps forward in place, torso and head fold forward and down, the arm with the sword lowers with him and the sword stays in his right hand, and he ends kneeling, crumpled and still on top of the square base. He stays centered on the base, does not step or fall off the base. Plain neutral gray studio background, even soft lighting, clean silhouette, no blood, no motion blur, no extra limbs, no extra characters.",
+              "promptFile": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/ARTH-DeathSettle_kling25_ref.mp4",
+                "sha256": "e87d2f969171e1214c4d81733a7589447044a2dd5e033beaf7b02a282c8530e4",
+                "bytes": 2211106,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/keyframes/f000.png",
+                  "sha256": "918ef309ced9723c2e4f1629ed1c1f526b15ad3bbf2b0449d0251b1dfe697334"
+                },
+                {
+                  "frame": 24,
+                  "timeSec": 1.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/keyframes/f024.png",
+                  "sha256": "5db3bf1400e4e1d1ac188ebf47800b649c887e5465a121d70c5a9c6b217b9dcd"
+                },
+                {
+                  "frame": 36,
+                  "timeSec": 1.5,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/keyframes/f036.png",
+                  "sha256": "bb68e9e4246c8c32cb81ddadba97bb637f66627e9be49e816e1600ef3a7a4127"
+                },
+                {
+                  "frame": 40,
+                  "timeSec": 1.667,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/keyframes/f040.png",
+                  "sha256": "768d8e70521a3c1d36a6df4858718e66176e08aa1874bf1825271e4b480607c2"
+                },
+                {
+                  "frame": 48,
+                  "timeSec": 2.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/keyframes/f048.png",
+                  "sha256": "90efa2bad3b150f318b8c61bfb0b2325eaefa6225640423fc2026147c5ae1cf2"
+                },
+                {
+                  "frame": 72,
+                  "timeSec": 3.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/keyframes/f072.png",
+                  "sha256": "69e93f8985a4442b1f2497c2deed53e6cc4cad6859f18487a55b4d99c450a5aa"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/keyframes/f120.png",
+                  "sha256": "89a9c2ffb6e1c141bb3ef261bb45e5dc9b763b2a014fd52313f68e0fadde1db7"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 2.046,
+                "base_center_x_range_px": 11.0,
+                "base_bottom_y_range_px": 6.0,
+                "base_width_range_px": 23.0,
+                "fg_touches_edge_frames": [],
+                "fg_bbox_union": [
+                  276,
+                  117,
+                  691,
+                  940
+                ],
+                "motion_mad_max": 5.051,
+                "motion_peak_frames": [
+                  39,
+                  40,
+                  41,
+                  38,
+                  37
+                ]
+              },
+              "motionSummary": "подгиб коленей (кадры ~12–36), опускание на колени (~36–40), складывание корпуса вперёд, голова к подставке (~40–48, пик 37–41), неподвижная поза на коленях с мечом остриём вниз перед подставкой (~48–120)",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "фон MAD ≤2.05; обод — размах центра 11 px, ширины 23 px: тело ложится на обод (не камера, по кадрам)",
+                "limbs": "до кадра ~40 конечности читаемы; в финале руки и ноги под корпусом и плащом",
+                "weapon": "меч в правой руке до конца; в финале остриё ниже обода подставки (силуэт до y 940)",
+                "artifacts": "лицо в финале скрыто; корона перерисовывается",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): фаза до кадра ~40 пригодна; складывание вперёд к камере монокулярно неоднозначно"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/assessment.json",
+              "cost": {
+                "syntxTokens": 6,
+                "quotedBeforeRun": 6,
+                "balanceBefore": 615,
+                "balanceAfter": 609,
+                "source": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/syntx/quote.json, art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/syntx/balance_before.json, art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            }
+          ],
+          "requiredMvp": true
+        }
+      ],
+      "budget": {
+        "spentSyntxTokens": 25.5,
+        "generations": 4,
+        "status": "измерено: сумма дельт balance_before/after"
+      }
+    },
+    {
+      "assetId": "ASSET-MERLIN-001",
+      "status": "референсы, не анимация",
+      "cueSource": "docs/game-design/18-animation-production-brief.md §8 (MER-Idle/LungeAttack/HitReact/DeathSettle)",
+      "inputChoice": {
+        "chosen": "art/imagegen/mvp-v1/characters/ref-merlin-v3-front.png",
+        "sha256": "cdd344e012d02abbecf232a7c1c0e332a29501794455e1f4320830083705e109",
+        "uploadedHashMd5": "6f1ff0c50fe1c1f92e28da6724fcc1e6",
+        "uploadRecord": "art/animation-refs/ASSET-MERLIN-001/syntx-session/fileobj.json",
+        "chatRecord": "art/animation-refs/ASSET-MERLIN-001/syntx-session/chat.json",
+        "why": "рекомендованный front-концепт героя в docs/art-pipeline/imagegen-inputs/manifest.json (sets[].recommendedTripoSlots.front; sha совпадает с sha256Recorded); 1024×1024, полный рост с подставкой, ровный серый фон"
+      },
+      "clips": [
+        {
+          "cue": "MER-LungeAttack",
+          "selectedTake": 1,
+          "takes": [
+            {
+              "cue": "MER-LungeAttack",
+              "take": 1,
+              "generationOrder2": 10,
+              "selected": true,
+              "cueRef": "CUE-008 (600 мс), бриф 18 §8 MER-LungeAttack",
+              "status": "референс, не анимация",
+              "whyThisTake": "пробный ролик героя",
+              "suitabilityVideoToMotion": {
+                "verdict": "пригоден для замаха и выброса (кадры 0–56); акцент заслонён вспышкой",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "замах → выброс → акцент → возврат соответствуют брифу"
+              },
+              "service": "SYNTX (syntx.ai) → Kling",
+              "aiName": "kling",
+              "modelType": "kling_image2video",
+              "modelLabel": "Kling 2.5 std, 5 с, без звука",
+              "parameters": {
+                "mode": "standart",
+                "version": "2.5",
+                "gen_type": null,
+                "multi_shots": false,
+                "temperature": 0.5,
+                "aspect_ratio": "1:1",
+                "native_audio": false,
+                "video_duration": 5,
+                "camera_movement": null
+              },
+              "syntxChatUuid": "d4bb93f2-b194-483a-90bb-fd5100dc6c72",
+              "syntxTaskId": "0defa6b9-e2a7-4d0a-98e3-b19f9f1f60b6",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of the old wizard Merlin come to life, standing on his round black base, entire body, the whole staff and the base always visible in frame. He wears a dark blue hooded robe and has a long white beard. He holds a tall wooden staff with a crystal on top in his right hand (on the left side of the image); his left hand rests at his belt. He leans back slightly and draws the staff back and up, then thrusts the staff forward toward the camera so the crystal tip points straight at the viewer, leaning into a small forward lunge without lifting his feet, holds the pointing pose for a moment, then returns to his calm standing pose with the staff upright at his side. Feet stay on the base, no walking. Plain neutral gray studio background, even soft lighting, clean silhouette, no magic effects, no glow, no particles, no lightning, no motion blur, no extra limbs, no extra characters.",
+              "promptFile": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/MER-LungeAttack_kling25_ref.mp4",
+                "sha256": "42d27f2d9a1d23cf688cdf587a6d6beb79862eb6c969feadb9235a70f1f3a250",
+                "bytes": 2436972,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/keyframes/f000.png",
+                  "sha256": "7879feda6862106be3e814133f65b4cc6e041970cef4c6429fa2884bdf3f36b4"
+                },
+                {
+                  "frame": 24,
+                  "timeSec": 1.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/keyframes/f024.png",
+                  "sha256": "f0725bbe6ff04b6f97ae460d6c2fbc84ced80f5035f276b29400f18a0cdd3293"
+                },
+                {
+                  "frame": 36,
+                  "timeSec": 1.5,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/keyframes/f036.png",
+                  "sha256": "8a7c337cc9f2c80998632f0f05ef6c1d3a11598b297d72ec4b1d1e829d6344a1"
+                },
+                {
+                  "frame": 47,
+                  "timeSec": 1.958,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/keyframes/f047.png",
+                  "sha256": "5fc31570d683208c0d7193a988fc81aa319b398b6fc1828743f0062a6bbc1ce8"
+                },
+                {
+                  "frame": 60,
+                  "timeSec": 2.5,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/keyframes/f060.png",
+                  "sha256": "a4667de1d79412366fe2b971fdeede081aee2fb086a00b6b5ddf1f7deb093ce0"
+                },
+                {
+                  "frame": 84,
+                  "timeSec": 3.5,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/keyframes/f084.png",
+                  "sha256": "b15546886603893f98a19694cfe1904417369250f16b7598369ee7bbb566f818"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/keyframes/f120.png",
+                  "sha256": "9ba5ad189fe945536e9f533b67625585119d373aefc3914fa85a3dea526ac1ae"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 1.286,
+                "base_center_x_range_px": 0.0,
+                "base_bottom_y_range_px": 1.0,
+                "base_width_range_px": 0.0,
+                "fg_touches_edge_frames": [
+                  43,
+                  44,
+                  45,
+                  46
+                ],
+                "fg_bbox_union": [
+                  224,
+                  0,
+                  825,
+                  860
+                ],
+                "motion_mad_max": 5.102,
+                "motion_peak_frames": [
+                  47,
+                  48,
+                  60,
+                  46,
+                  45
+                ]
+              },
+              "motionSummary": "замах: посох назад-вверх (кадры ~12–36), выброс посоха вперёд на камеру, кристалл к зрителю (~44–56, пик 46–48), вспышка (~58–66), возврат в стойку (~84), покой",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "неподвижна: центр и ширина обода — размах 0 px; фон MAD ≤1.29",
+                "limbs": "руки читаемы; в выбросе кристалл закрывает лицо",
+                "weapon": "посох в правой руке весь ролик; верх посоха касается верхнего края кадра в кадрах 43–46",
+                "artifacts": "синяя вспышка и искры у кристалла около кадра 60 вопреки «no glow, no particles»",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): кадры 0–56 пригодны для верха тела; выброс к камере неоднозначен по глубине"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/assessment.json",
+              "cost": {
+                "syntxTokens": 6.0,
+                "quotedBeforeRun": 6,
+                "balanceBefore": 601.5,
+                "balanceAfter": 595.5,
+                "source": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/syntx/quote.json, art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/syntx/balance_before.json, art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            }
+          ],
+          "requiredMvp": true
+        },
+        {
+          "cue": "MER-Idle",
+          "selectedTake": 1,
+          "takes": [
+            {
+              "cue": "MER-Idle",
+              "take": 1,
+              "generationOrder2": 11,
+              "selected": true,
+              "cueRef": "нет CUE (фон; бриф 18 §8 MER-Idle)",
+              "status": "референс, не анимация",
+              "whyThisTake": "параметры пробного ролика подтверждены",
+              "suitabilityVideoToMotion": {
+                "verdict": "ограниченно пригоден (тайминг); движение, вероятно, ниже шума трекинга",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "покачивание есть, амплитуда минимальная (как в брифе)"
+              },
+              "service": "SYNTX (syntx.ai) → Kling",
+              "aiName": "kling",
+              "modelType": "kling_image2video",
+              "modelLabel": "Kling 2.5 std, 5 с, без звука",
+              "parameters": {
+                "mode": "standart",
+                "version": "2.5",
+                "gen_type": null,
+                "multi_shots": false,
+                "temperature": 0.5,
+                "aspect_ratio": "1:1",
+                "native_audio": false,
+                "video_duration": 5,
+                "camera_movement": null
+              },
+              "syntxChatUuid": "d4bb93f2-b194-483a-90bb-fd5100dc6c72",
+              "syntxTaskId": "6eeb28e3-56b2-4bf5-b07a-69bd63f9f88f",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-MERLIN-001/MER-Idle/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of the old wizard Merlin come to life, standing on his round black base, entire body, the whole staff and the base always visible in frame. He wears a dark blue hooded robe and has a long white beard. He holds a tall wooden staff with a crystal on top in his right hand (on the left side of the image); his left hand rests at his belt. He stands calmly with a slightly stooped posture. He breathes slowly: he leans a tiny bit forward and the staff tips slightly forward with him, then he leans a tiny bit back and the staff tips slightly back, and he returns to the starting pose. The lower end of the staff stays on the base. Subtle, calm, looping idle motion, the pose at the end matches the pose at the start. Feet stay planted on the base, no stepping, no walking, no big gestures. Plain neutral gray studio background, even soft lighting, clean silhouette, no magic effects, no glow, no motion blur, no extra limbs, no extra characters.",
+              "promptFile": "art/animation-refs/ASSET-MERLIN-001/MER-Idle/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-MERLIN-001/MER-Idle/MER-Idle_kling25_ref.mp4",
+                "sha256": "dc7217c72cc03c731462d2e1245a274c5dcb60d4f78e249db64a468ab708e13c",
+                "bytes": 1893445,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-Idle/keyframes/f000.png",
+                  "sha256": "ef1587bd233d98924f1c5958bd2470d764d858c69b5814c48bf0368024e1005b"
+                },
+                {
+                  "frame": 40,
+                  "timeSec": 1.667,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-Idle/keyframes/f040.png",
+                  "sha256": "8f00eaba6b5aa16ad280ac7b712cfd72ec23eb1575fbea354b0465fd83d610cb"
+                },
+                {
+                  "frame": 80,
+                  "timeSec": 3.333,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-Idle/keyframes/f080.png",
+                  "sha256": "758b1f3c52d0b29277abcfd7c166ac4809b5bb0790596ba79676e9177acb15b1"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-Idle/keyframes/f120.png",
+                  "sha256": "b50637b599aea4036aecbdf6b0f3d2d4a6f4daff220c5e300660c8a6796cfc65"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-MERLIN-001/MER-Idle/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-MERLIN-001/MER-Idle/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 1.666,
+                "base_center_x_range_px": 0.5,
+                "base_bottom_y_range_px": 1.0,
+                "base_width_range_px": 1.0,
+                "fg_touches_edge_frames": [],
+                "fg_bbox_union": [
+                  296,
+                  93,
+                  664,
+                  860
+                ],
+                "motion_mad_max": 0.959,
+                "motion_peak_frames": [
+                  47,
+                  43,
+                  72,
+                  40,
+                  51
+                ],
+                "loopMadFirstLast": 0.96
+              },
+              "motionSummary": "очень слабое покачивание корпуса и посоха; motion_mad_max 0.96",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "неподвижна: обод — размах 0.5 px; фон MAD ≤1.67",
+                "limbs": "все конечности видны",
+                "weapon": "посох в правой руке, нижний конец у подставки весь ролик",
+                "artifacts": "цикл почти замкнут: MAD первый/последний кадр 0.96",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): Idle дешевле ставить руками по брифу"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-MERLIN-001/MER-Idle/assessment.json",
+              "cost": {
+                "syntxTokens": 6.0,
+                "quotedBeforeRun": 6,
+                "balanceBefore": 595.5,
+                "balanceAfter": 589.5,
+                "source": "art/animation-refs/ASSET-MERLIN-001/MER-Idle/syntx/quote.json, art/animation-refs/ASSET-MERLIN-001/MER-Idle/syntx/balance_before.json, art/animation-refs/ASSET-MERLIN-001/MER-Idle/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            }
+          ],
+          "requiredMvp": true
+        },
+        {
+          "cue": "MER-HitReact",
+          "selectedTake": 1,
+          "takes": [
+            {
+              "cue": "MER-HitReact",
+              "take": 1,
+              "generationOrder2": 13,
+              "selected": true,
+              "cueRef": "CUE-011 (900 мс), бриф 18 §8 MER-HitReact",
+              "status": "референс, не анимация",
+              "whyThisTake": "HitReact сразу на Seedance: Kling дал кровь на MED-HitReact take1 и take2",
+              "suitabilityVideoToMotion": {
+                "verdict": "пригоден как референс верха тела",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "сжатие → отдача → возврат соответствуют брифу; длительность больше 0.35–0.45 с"
+              },
+              "service": "SYNTX (syntx.ai) → Seedance",
+              "aiName": "seedance",
+              "modelType": "seedance-1.5-pro",
+              "modelLabel": "Seedance 1.5 Pro 720p, 5 с, без звука",
+              "parameters": {
+                "mode": "pro",
+                "resolution": "720p",
+                "aspect_ratio": "1:1",
+                "camera_fixed": true,
+                "output_format": null,
+                "generate_audio": false,
+                "video_duration": 5,
+                "input_video_duration": 0
+              },
+              "syntxChatUuid": "d4bb93f2-b194-483a-90bb-fd5100dc6c72",
+              "syntxTaskId": "2867963",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of the old wizard Merlin come to life, standing on his round black base, entire body, the whole staff and the base always visible in frame. He wears a dark blue hooded robe and has a long white beard. He holds a tall wooden staff with a crystal on top in his right hand (on the left side of the image); his left hand rests at his belt. After one second he flinches in pain: his head and shoulders hunch down, his torso recoils backward, he sways once, then he recovers into his calm standing pose and stays still. The staff stays in his right hand. Nothing touches him, nothing enters the frame. No visual effects, no particles, no glow, no blood, no wounds, no projectiles. Feet stay planted on the base. Plain neutral gray studio background, even soft lighting, clean silhouette.",
+              "promptFile": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/MER-HitReact_seedance15pro_ref.mp4",
+                "sha256": "6be9d1cae612560103b4d5846ca4b694235a79c54e7be8a7f7903709783a21ca",
+                "bytes": 3437475,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/keyframes/f000.png",
+                  "sha256": "10b47f84f0620ed31d518fd97ddb47fb48acbd1dc16ff8c5543eb73f08f8ba05"
+                },
+                {
+                  "frame": 24,
+                  "timeSec": 1.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/keyframes/f024.png",
+                  "sha256": "8b1b3c3f8d780c6308c52538e84aab9b8227c365a140f11095737a55be75641b"
+                },
+                {
+                  "frame": 30,
+                  "timeSec": 1.25,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/keyframes/f030.png",
+                  "sha256": "5ece0c1447b044691ba85853752fc6f61d641c06af03e26515e659508a0db53b"
+                },
+                {
+                  "frame": 37,
+                  "timeSec": 1.542,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/keyframes/f037.png",
+                  "sha256": "7f0a6720625ae19cf71d5ba3fcf40d51f330af82e0579ce6423bdf72eaadfe77"
+                },
+                {
+                  "frame": 48,
+                  "timeSec": 2.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/keyframes/f048.png",
+                  "sha256": "7b52dfb03da2b0fa814473f123ef22c364630e389b360a99cc9dc3178a9c01fc"
+                },
+                {
+                  "frame": 72,
+                  "timeSec": 3.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/keyframes/f072.png",
+                  "sha256": "d3230bda391afb7d18bb8568132f44a4ea568b344685847e4e3ce0aa840010f3"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/keyframes/f120.png",
+                  "sha256": "c5147837ebce2cee7e8b5a795f64c7e54050f5af5870af10869eaaead2281619"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 18.487,
+                "base_center_x_range_px": 0.0,
+                "base_bottom_y_range_px": 1.0,
+                "base_width_range_px": 0.0,
+                "fg_touches_edge_frames": [
+                  80,
+                  81,
+                  100,
+                  120
+                ],
+                "fg_bbox_union": [
+                  6,
+                  70,
+                  927,
+                  959
+                ],
+                "motion_mad_max": 6.124,
+                "motion_peak_frames": [
+                  37,
+                  30,
+                  38,
+                  36,
+                  31
+                ],
+                "caveat": "Seedance: фон неоднороден (виньетка, сдвиг тона) — border_mad_max и маска силуэта (fg_*) завышены и недостоверны; движение камеры судить по base_* (обод подставки)"
+              },
+              "motionSummary": "сжатие: голова и плечи вниз-вперёд, левая рука выброшена в сторону (кадры ~24–37, пик 30–38), сутулая поза (~48), возврат (~72–96), покой",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "по подставке неподвижна: центр и ширина обода — размах 0 px; фон MAD 18.5 — неоднородность фона Seedance",
+                "limbs": "руки видны, левая рука в пике у края силуэта; стопы на подставке",
+                "weapon": "посох в правой руке весь ролик",
+                "artifacts": "кристалл перерисован: серый → голубой светящийся с первых кадров; у Seedance фон неоднороден (виньетка, тон меняется после первых кадров): border_mad и маска силуэта завышены, касания края по маске недостоверны; движение камеры оценивается только по ободу подставки",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): пригоден для пробы трекинга верха тела"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/assessment.json",
+              "cost": {
+                "syntxTokens": 7.5,
+                "quotedBeforeRun": 7.5,
+                "balanceBefore": 583.5,
+                "balanceAfter": 576,
+                "source": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact/syntx/quote.json, art/animation-refs/ASSET-MERLIN-001/MER-HitReact/syntx/balance_before.json, art/animation-refs/ASSET-MERLIN-001/MER-HitReact/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            }
+          ],
+          "requiredMvp": true
+        },
+        {
+          "cue": "MER-DeathSettle",
+          "selectedTake": 2,
+          "takes": [
+            {
+              "cue": "MER-DeathSettle",
+              "take": 1,
+              "generationOrder2": 12,
+              "selected": false,
+              "cueRef": "CUE-013 (950 мс), бриф 18 §8 MER-DeathSettle",
+              "status": "референс, не анимация",
+              "whyThisTake": "параметры пробного ролика подтверждены",
+              "suitabilityVideoToMotion": {
+                "verdict": "ограниченно пригоден (фаза до кадра ~36); заменён take2",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "оседание есть, но падение резкое"
+              },
+              "service": "SYNTX (syntx.ai) → Kling",
+              "aiName": "kling",
+              "modelType": "kling_image2video",
+              "modelLabel": "Kling 2.5 std, 5 с, без звука",
+              "parameters": {
+                "mode": "standart",
+                "version": "2.5",
+                "gen_type": null,
+                "multi_shots": false,
+                "temperature": 0.5,
+                "aspect_ratio": "1:1",
+                "native_audio": false,
+                "video_duration": 5,
+                "camera_movement": null
+              },
+              "syntxChatUuid": "d4bb93f2-b194-483a-90bb-fd5100dc6c72",
+              "syntxTaskId": "7f4f1f28-03c8-4cb7-b9c8-be60ded7ed49",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of the old wizard Merlin come to life, standing on his round black base, entire body, the whole staff and the base always visible in frame. He wears a dark blue hooded robe and has a long white beard. He holds a tall wooden staff with a crystal on top in his right hand (on the left side of the image); his left hand rests at his belt. He is defeated: his strength fails, his knees buckle, he slowly sinks down, the robe folds, torso and head slump forward and down onto the round base in place, the staff tilts down with his arm and stays in his right hand, and he ends crumpled and still on top of the base. He stays centered on the base, does not step or fall off the base. Plain neutral gray studio background, even soft lighting, clean silhouette, no magic effects, no blood, no motion blur, no extra limbs, no extra characters.",
+              "promptFile": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/MER-DeathSettle_kling25_ref.mp4",
+                "sha256": "5b50847d446d5fc74b3ef9fbc77d7afb0e3645485fe7a2e7b691ec594c7c4f5f",
+                "bytes": 1765804,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/keyframes/f000.png",
+                  "sha256": "8542e48aea4bfaba680615ad0a8f3f8bbd0347cd557fb3ac96180238ca84597c"
+                },
+                {
+                  "frame": 24,
+                  "timeSec": 1.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/keyframes/f024.png",
+                  "sha256": "4011c1169aea990c617ec690161dfd46d212f1b46944ea34c15380a9f68461d4"
+                },
+                {
+                  "frame": 36,
+                  "timeSec": 1.5,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/keyframes/f036.png",
+                  "sha256": "14cdf8c53af3e3f324341038d94aa5dd0e1cab6b9c0b1aa44f6bb4179350bea9"
+                },
+                {
+                  "frame": 40,
+                  "timeSec": 1.667,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/keyframes/f040.png",
+                  "sha256": "bc9001f61769476d1c705ccf49a8d12bce900da398f8ed3db803c4ccdf9d375c"
+                },
+                {
+                  "frame": 48,
+                  "timeSec": 2.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/keyframes/f048.png",
+                  "sha256": "880e83d343c4d34ed51b7ae15dc6f9c9a334ff69f957a4401d7ef892d8c3464a"
+                },
+                {
+                  "frame": 60,
+                  "timeSec": 2.5,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/keyframes/f060.png",
+                  "sha256": "411643f9575c9e574e699d6e11c8b5178f59067773e9260b33c0b9e7877103f3"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/keyframes/f120.png",
+                  "sha256": "5327093d2ac594f39cd9d3c93a5de54a31e6ff52afe42b5143d629f097dfbf46"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 1.926,
+                "base_center_x_range_px": 20.5,
+                "base_bottom_y_range_px": 4.0,
+                "base_width_range_px": 41.0,
+                "fg_touches_edge_frames": [],
+                "fg_bbox_union": [
+                  206,
+                  95,
+                  831,
+                  863
+                ],
+                "motion_mad_max": 4.973,
+                "motion_peak_frames": [
+                  39,
+                  37,
+                  38,
+                  40,
+                  36
+                ]
+              },
+              "motionSummary": "подгиб коленей (кадры ~12–36), посох наклоняется влево, падение ничком на подставку (~40–48, пик 36–40), неподвижная поза лицом вниз (~48–120)",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "фон MAD ≤1.93; обод — размах центра 20.5 px: тело и посох ложатся на обод",
+                "limbs": "в финале ноги скрыты мантией",
+                "weapon": "посох в правой руке; в финале кристалл за ободом слева",
+                "artifacts": "красные брызги (кровь) около кадров 44–60 и красный дым вопреки «no blood»",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): фаза падения заслонена брызгами"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/assessment.json",
+              "cost": {
+                "syntxTokens": 6.0,
+                "quotedBeforeRun": 6,
+                "balanceBefore": 589.5,
+                "balanceAfter": 583.5,
+                "source": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/syntx/quote.json, art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/syntx/balance_before.json, art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            },
+            {
+              "cue": "MER-DeathSettle",
+              "take": 2,
+              "generationOrder2": 14,
+              "selected": true,
+              "cueRef": "CUE-013 (950 мс), бриф 18 §8 MER-DeathSettle",
+              "status": "референс, не анимация",
+              "whyThisTake": "ретейк: Kling take1 дал кровь и дым в фазе падения",
+              "suitabilityVideoToMotion": {
+                "verdict": "пригоден как референс тайминга оседания (лучше take1)",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "потеря опоры → складывание → успокоение соответствуют; пластика медленнее брифа (0.85–0.95 с) — нужен ретайминг"
+              },
+              "service": "SYNTX (syntx.ai) → Seedance",
+              "aiName": "seedance",
+              "modelType": "seedance-1.5-pro",
+              "modelLabel": "Seedance 1.5 Pro 720p, 5 с, без звука",
+              "parameters": {
+                "mode": "pro",
+                "resolution": "720p",
+                "aspect_ratio": "1:1",
+                "camera_fixed": true,
+                "output_format": null,
+                "generate_audio": false,
+                "video_duration": 5,
+                "input_video_duration": 0
+              },
+              "syntxChatUuid": "d4bb93f2-b194-483a-90bb-fd5100dc6c72",
+              "syntxTaskId": "2868025",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of the old wizard Merlin come to life, standing on his round black base, entire body, the whole staff and the base always visible in frame. He wears a dark blue hooded robe and has a long white beard. He holds a tall wooden staff with a crystal on top in his right hand (on the left side of the image); his left hand rests at his belt. He is defeated: his strength fails, his knees buckle, he slowly sinks down, the robe folds, torso and head slump forward and down onto the round base in place, the staff tilts down with his arm and stays in his right hand, and he ends crumpled and still on top of the base. He stays centered on the base, does not step or fall off the base. Plain neutral gray studio background, even soft lighting, clean silhouette, no magic effects, no blood, no motion blur, no extra limbs, no extra characters.",
+              "promptFile": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/MER-DeathSettle_seedance15pro_take2_ref.mp4",
+                "sha256": "a21aee99376531c7ae278077a8669e858d8abb908e94e8a64b3fdf07ae78270d",
+                "bytes": 2946118,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/keyframes/f000.png",
+                  "sha256": "7f7829aa3bda8a970cb3cdb0df8ef8841f81bbaace04bfe8af4052df873c0e1a"
+                },
+                {
+                  "frame": 48,
+                  "timeSec": 2.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/keyframes/f048.png",
+                  "sha256": "2d7254b360681d110ada0a9f5a7ec11f40b657e6043c9f5846f0fac5d61aa576"
+                },
+                {
+                  "frame": 60,
+                  "timeSec": 2.5,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/keyframes/f060.png",
+                  "sha256": "734899cca9011f6f319be79ec72df232dc481e016589793e2d71f3c132f4834b"
+                },
+                {
+                  "frame": 72,
+                  "timeSec": 3.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/keyframes/f072.png",
+                  "sha256": "467d286b2ec612b1d22cc736670b3fda780410b0cbe56cfaff9199b73ea0d8d6"
+                },
+                {
+                  "frame": 78,
+                  "timeSec": 3.25,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/keyframes/f078.png",
+                  "sha256": "d8572437290d768d14ed099fa1084002ace23bc5c9d1c57598593358736b343d"
+                },
+                {
+                  "frame": 96,
+                  "timeSec": 4.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/keyframes/f096.png",
+                  "sha256": "220eff70c0345d468e4dc58cb87e0e42b72aa39bc6f57a09ae76d33de2ef4da8"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/keyframes/f120.png",
+                  "sha256": "8ff3b2017a5a240e24641c1c846f8a884a256dcb4f964795f87bc1a767a48f17"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 17.442,
+                "base_center_x_range_px": 442.5,
+                "base_bottom_y_range_px": 29.0,
+                "base_width_range_px": 478.0,
+                "fg_touches_edge_frames": [],
+                "fg_bbox_union": [
+                  21,
+                  84,
+                  799,
+                  895
+                ],
+                "motion_mad_max": 5.296,
+                "motion_peak_frames": [
+                  78,
+                  79,
+                  77,
+                  76,
+                  75
+                ],
+                "caveat": "Seedance: фон неоднороден (виньетка, сдвиг тона) — border_mad_max и маска силуэта (fg_*) завышены и недостоверны; движение камеры судить по base_* (обод подставки)"
+              },
+              "motionSummary": "медленная ссутуленность (кадры ~0–48), опускание/присед (~60), падение вперёд ничком на подставку, посох падает влево (~72–80, пик 75–79), покой (~96–120)",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "по подставке не измерима: мантия закрывает обод (размах центра 442 px — тело на ободе, не камера); визуально сдвига камеры нет",
+                "limbs": "до кадра ~60 конечности читаемы; в финале под мантией",
+                "weapon": "посох в правой руке, падает влево и выходит за обод",
+                "artifacts": "крови и VFX нет; кристалл голубеет; у Seedance фон неоднороден (виньетка, тон меняется после первых кадров): border_mad и маска силуэта завышены, касания края по маске недостоверны; движение камеры оценивается только по ободу подставки",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): фаза до ~72 пригодна; укладку ставить ключами"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/assessment.json",
+              "cost": {
+                "syntxTokens": 7.5,
+                "quotedBeforeRun": 7.5,
+                "balanceBefore": 576,
+                "balanceAfter": 568.5,
+                "source": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/syntx/quote.json, art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/syntx/balance_before.json, art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle/take2/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            }
+          ],
+          "requiredMvp": true
+        }
+      ],
+      "budget": {
+        "spentSyntxTokens": 33.0,
+        "generations": 5,
+        "status": "измерено: сумма дельт balance_before/after"
+      }
+    },
+    {
+      "assetId": "ASSET-HARPY-001",
+      "status": "референсы, не анимация",
+      "cueSource": "docs/game-design/18-animation-production-brief.md §6 (HAR-Idle/LungeAttack/HitReact/DeathSettle)",
+      "inputChoice": {
+        "chosen": "art/imagegen/mvp-v1/characters/ref-harpy-v5-front.png",
+        "sha256": "0a27b796aebe2b859baac4c249913bf804d8de1f9bc02688f971ba9183250e4c",
+        "uploadedHashMd5": "fc93f68d48b3b278e9460f1915452280",
+        "uploadRecord": "art/animation-refs/ASSET-HARPY-001/syntx-session/fileobj.json",
+        "chatRecord": "art/animation-refs/ASSET-HARPY-001/syntx-session/chat.json",
+        "why": "рекомендованный front-концепт героя в docs/art-pipeline/imagegen-inputs/manifest.json (sets[].recommendedTripoSlots.front; sha совпадает с sha256Recorded); 1024×1024, полный рост с подставкой, ровный серый фон"
+      },
+      "clips": [
+        {
+          "cue": "HAR-LungeAttack",
+          "selectedTake": 2,
+          "takes": [
+            {
+              "cue": "HAR-LungeAttack",
+              "take": 1,
+              "generationOrder2": 15,
+              "selected": false,
+              "cueRef": "CUE-008 (600 мс), бриф 18 §6 HAR-LungeAttack",
+              "status": "референс, не анимация",
+              "whyThisTake": "пробный ролик героя",
+              "suitabilityVideoToMotion": {
+                "verdict": "непригоден для наскока; фаза складывания крыльев (0–24) — референс",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "не соответствует: отрыв от подставки = root motion вверх; бриф — наскок без взлёта"
+              },
+              "service": "SYNTX (syntx.ai) → Kling",
+              "aiName": "kling",
+              "modelType": "kling_image2video",
+              "modelLabel": "Kling 2.5 std, 5 с, без звука",
+              "parameters": {
+                "mode": "standart",
+                "version": "2.5",
+                "gen_type": null,
+                "multi_shots": false,
+                "temperature": 0.5,
+                "aspect_ratio": "1:1",
+                "native_audio": false,
+                "video_duration": 5,
+                "camera_movement": null
+              },
+              "syntxChatUuid": "068a3d9a-65e9-4a5a-bfdc-1632f2a8145a",
+              "syntxTaskId": "1b522029-f801-46e3-aa55-d028c16fc79f",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of a harpy come to life, perched in a crouch on her small round black base, entire body, both wings and the base always visible in frame. She has feathered wings instead of arms, spread wide, and bird-like clawed feet gripping the base. She holds no weapons. She crouches lower and pulls her wings back and in behind her body, then springs her torso forward toward the camera in a quick pounce, head thrust forward, wings snapping open wide, clawed feet still gripping the base, then settles back into her crouch with her wings half open. She does not take off, does not fly, does not leave the base. Both wings stay inside the frame. Plain neutral gray studio background, even soft lighting, clean silhouette, no flying feathers, no visual effects, no motion blur, no extra limbs, no extra characters.",
+              "promptFile": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/HAR-LungeAttack_kling25_ref.mp4",
+                "sha256": "5c303289137c7992d3c79b42e8d5b57b27544054339771403fc8ce3f20afa779",
+                "bytes": 2481075,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/keyframes/f000.png",
+                  "sha256": "939f58002b28583234cff07fc7f1dffb41f155e2be3ed9edeef33c3ca2f12cda"
+                },
+                {
+                  "frame": 24,
+                  "timeSec": 1.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/keyframes/f024.png",
+                  "sha256": "c72ac72ab275355d13c77a83e3660f14771d5070b33b54cf7f344df92e69f5b6"
+                },
+                {
+                  "frame": 36,
+                  "timeSec": 1.5,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/keyframes/f036.png",
+                  "sha256": "b780ef9720f8cbdcac2d193780fd1c2ca8833560e98236907024e8f92a1d0f8c"
+                },
+                {
+                  "frame": 48,
+                  "timeSec": 2.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/keyframes/f048.png",
+                  "sha256": "417d20bdcad3107f071bd40d274839bbcfbcaa54590f09add18ccaffb1ec1e0a"
+                },
+                {
+                  "frame": 60,
+                  "timeSec": 2.5,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/keyframes/f060.png",
+                  "sha256": "2bc1a2aa07982a7f06f0242163bda84ca60ff2e93a53b655cb5168e7ec67c9df"
+                },
+                {
+                  "frame": 79,
+                  "timeSec": 3.292,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/keyframes/f079.png",
+                  "sha256": "bd6243b776f72c3823f25e12d9d5f10208ba604669252b5ff79dfdd87d5460d4"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/keyframes/f120.png",
+                  "sha256": "89ca082ea51f7e344f25e8bb00471043061d4bb83d7a685d50f709345a2fd420"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 2.408,
+                "base_center_x_range_px": 1.0,
+                "base_bottom_y_range_px": 1.0,
+                "base_width_range_px": 1.0,
+                "fg_touches_edge_frames": [],
+                "fg_bbox_union": [
+                  59,
+                  144,
+                  929,
+                  860
+                ],
+                "motion_mad_max": 6.844,
+                "motion_peak_frames": [
+                  79,
+                  78,
+                  77,
+                  34,
+                  62
+                ]
+              },
+              "motionSummary": "присед и складывание крыльев (кадры ~0–24), взлёт: крылья вверх «V», фигура над подставкой (~34–48), парение с раскрытыми крыльями (~60–72), посадка (~79–96), стойка",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "неподвижна: обод — размах 1 px; фон MAD ≤2.41",
+                "limbs": "крылья видны целиком, края кадра не касаются (силуэт x 59–929)",
+                "weapon": "оружия нет (по брифу)",
+                "artifacts": "взлёт вопреки «does not take off, does not fly»",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): не использовать для наскока"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/assessment.json",
+              "cost": {
+                "syntxTokens": 6.0,
+                "quotedBeforeRun": 6,
+                "balanceBefore": 568.5,
+                "balanceAfter": 562.5,
+                "source": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/syntx/quote.json, art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/syntx/balance_before.json, art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            },
+            {
+              "cue": "HAR-LungeAttack",
+              "take": 2,
+              "generationOrder2": 16,
+              "selected": true,
+              "cueRef": "CUE-008 (600 мс), бриф 18 §6 HAR-LungeAttack",
+              "status": "референс, не анимация",
+              "whyThisTake": "ретейк: пробный Kling взлетел с подставки",
+              "suitabilityVideoToMotion": {
+                "verdict": "ограниченно пригоден: фаза рывка и раскрытия крыльев",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "рывок и раскрытие крыльев есть; вместо приседа-anticipation — подъём во весь рост; финал = стартовый присед"
+              },
+              "service": "SYNTX (syntx.ai) → Seedance",
+              "aiName": "seedance",
+              "modelType": "seedance-1.5-pro",
+              "modelLabel": "Seedance 1.5 Pro 720p, 5 с, без звука",
+              "parameters": {
+                "mode": "pro",
+                "resolution": "720p",
+                "aspect_ratio": "1:1",
+                "camera_fixed": true,
+                "output_format": null,
+                "generate_audio": false,
+                "video_duration": 5,
+                "input_video_duration": 0
+              },
+              "syntxChatUuid": "068a3d9a-65e9-4a5a-bfdc-1632f2a8145a",
+              "syntxTaskId": "2868141",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of a harpy come to life, perched in a crouch on her small round black base, entire body, both wings and the base always visible in frame. She has feathered wings instead of arms, spread wide, and bird-like clawed feet gripping the base. She holds no weapons. She crouches lower and pulls her wings back and in behind her body, then springs her torso forward toward the camera in a quick pounce, head thrust forward, wings snapping open wide, clawed feet still gripping the base, then settles back into her crouch with her wings half open. She does not take off, does not fly, does not leave the base. Both wings stay inside the frame. Plain neutral gray studio background, even soft lighting, clean silhouette, no flying feathers, no visual effects, no motion blur, no extra limbs, no extra characters.",
+              "promptFile": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/HAR-LungeAttack_seedance15pro_take2_ref.mp4",
+                "sha256": "fde6cb702a762b7826a7b86d045ef582d2b79b5d378ecf012ee671dac1059988",
+                "bytes": 3610061,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/keyframes/f000.png",
+                  "sha256": "4f3c2ee80c18f09c74984987ade5fab8d219db6c76fa54d1e6fd7e9047af01df"
+                },
+                {
+                  "frame": 24,
+                  "timeSec": 1.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/keyframes/f024.png",
+                  "sha256": "97f098647678889c69519fff9ffdf52224c2fcef2fafc5a63882cdf327eff35a"
+                },
+                {
+                  "frame": 48,
+                  "timeSec": 2.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/keyframes/f048.png",
+                  "sha256": "1172b1fcaa4c0bcea990253a9ce4c8ae9f1b33df94234e6418284a84a1ab9fcb"
+                },
+                {
+                  "frame": 62,
+                  "timeSec": 2.583,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/keyframes/f062.png",
+                  "sha256": "37945aec7f5a166b3c51a271521a9af03fa1d873a09b8c5dc1ee56383f19d4dc"
+                },
+                {
+                  "frame": 69,
+                  "timeSec": 2.875,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/keyframes/f069.png",
+                  "sha256": "48840944bd71da30f0dca27be2d84aeb035269c78da14860f90be74434b43f89"
+                },
+                {
+                  "frame": 87,
+                  "timeSec": 3.625,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/keyframes/f087.png",
+                  "sha256": "1def75129155f1491905cd5baa2cae34f20bf515679cd536e21e206069e95a64"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/keyframes/f120.png",
+                  "sha256": "d585a270a48aff7ed614fbbc80c08b2951ed266e85bc7c2f1e3ad741a6919bdd"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 21.564,
+                "base_center_x_range_px": 0.5,
+                "base_bottom_y_range_px": 1.0,
+                "base_width_range_px": 1.0,
+                "fg_touches_edge_frames": [
+                  13,
+                  18,
+                  19,
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35,
+                  36,
+                  37,
+                  38,
+                  39,
+                  40,
+                  41,
+                  42,
+                  43,
+                  44,
+                  45,
+                  46,
+                  47,
+                  48,
+                  49,
+                  50,
+                  51,
+                  52,
+                  53,
+                  54,
+                  55,
+                  56,
+                  57,
+                  58,
+                  59,
+                  60,
+                  61,
+                  62,
+                  63,
+                  64,
+                  65,
+                  66,
+                  67,
+                  68,
+                  69,
+                  70,
+                  71,
+                  72,
+                  73,
+                  74,
+                  75,
+                  76,
+                  77,
+                  78,
+                  79,
+                  80,
+                  81,
+                  82,
+                  83,
+                  84,
+                  85,
+                  86,
+                  87,
+                  88,
+                  89,
+                  90,
+                  91,
+                  92,
+                  93,
+                  94,
+                  95,
+                  96,
+                  97,
+                  98,
+                  99,
+                  100,
+                  101,
+                  102,
+                  103,
+                  104,
+                  105,
+                  106,
+                  107,
+                  108,
+                  109,
+                  110,
+                  111,
+                  112,
+                  113,
+                  114,
+                  115,
+                  116,
+                  117,
+                  118,
+                  119,
+                  120
+                ],
+                "fg_bbox_union": [
+                  0,
+                  0,
+                  959,
+                  959
+                ],
+                "motion_mad_max": 13.792,
+                "motion_peak_frames": [
+                  69,
+                  87,
+                  70,
+                  68,
+                  62
+                ],
+                "caveat": "Seedance: фон неоднороден (виньетка, сдвиг тона) — border_mad_max и маска силуэта (fg_*) завышены и недостоверны; движение камеры судить по base_* (обод подставки)"
+              },
+              "motionSummary": "подъём из приседа во весь рост, крылья сложены вниз (кадры ~0–48), взмах, рывок корпуса к камере с раскрытием крыльев (~62–70, пик 68–70), вторая волна (~87), возврат в присед (~110–120)",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "по подставке неподвижна: центр и ширина обода — размах 0.5/1 px; фон MAD 21.6 — неоднородность фона Seedance",
+                "limbs": "крылья размыты на взмахе; около кадра 60 одна стопа отрывается от подставки",
+                "weapon": "оружия нет",
+                "artifacts": "размытие крыльев; у Seedance фон неоднороден (виньетка, тон меняется после первых кадров): border_mad и маска силуэта завышены, касания края по маске недостоверны; движение камеры оценивается только по ободу подставки",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): крылья = руки скелета; размытие крыльев ухудшит трекинг кистей"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/assessment.json",
+              "cost": {
+                "syntxTokens": 7.5,
+                "quotedBeforeRun": 7.5,
+                "balanceBefore": 562.5,
+                "balanceAfter": 555,
+                "source": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/syntx/quote.json, art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/syntx/balance_before.json, art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack/take2/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            }
+          ],
+          "requiredMvp": true
+        },
+        {
+          "cue": "HAR-Idle",
+          "selectedTake": 1,
+          "takes": [
+            {
+              "cue": "HAR-Idle",
+              "take": 1,
+              "generationOrder2": 17,
+              "selected": true,
+              "cueRef": "нет CUE (фон; бриф 18 §6 HAR-Idle)",
+              "status": "референс, не анимация",
+              "whyThisTake": "Idle — малое движение, риск взлёта низкий; дешевле",
+              "suitabilityVideoToMotion": {
+                "verdict": "пригоден как референс амплитуды и тайминга микровзмаха",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "соответствует брифу (микровзмах, силуэт «шире, чем выше»)"
+              },
+              "service": "SYNTX (syntx.ai) → Kling",
+              "aiName": "kling",
+              "modelType": "kling_image2video",
+              "modelLabel": "Kling 2.5 std, 5 с, без звука",
+              "parameters": {
+                "mode": "standart",
+                "version": "2.5",
+                "gen_type": null,
+                "multi_shots": false,
+                "temperature": 0.5,
+                "aspect_ratio": "1:1",
+                "native_audio": false,
+                "video_duration": 5,
+                "camera_movement": null
+              },
+              "syntxChatUuid": "068a3d9a-65e9-4a5a-bfdc-1632f2a8145a",
+              "syntxTaskId": "53c7e799-2f13-4e07-97b6-feb23f2b1cd8",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-HARPY-001/HAR-Idle/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of a harpy come to life, perched in a crouch on her small round black base, entire body, both wings and the base always visible in frame. She has feathered wings instead of arms, spread wide, and bird-like clawed feet gripping the base. She holds no weapons. She stays perched in her crouch. Her wings rise slightly and lower again in a slow, gentle micro-flap, her chest rises and falls, her head makes a small movement and returns to looking forward. Subtle, calm, looping idle motion, the pose at the end matches the pose at the start. She does not take off. Both wings stay inside the frame. Plain neutral gray studio background, even soft lighting, clean silhouette, no flying feathers, no motion blur, no extra limbs, no extra characters.",
+              "promptFile": "art/animation-refs/ASSET-HARPY-001/HAR-Idle/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-HARPY-001/HAR-Idle/HAR-Idle_kling25_ref.mp4",
+                "sha256": "e14b5204ae875dfb2c72ea0aac1316cdc5842ea3446fc751a2db61c4ec3107af",
+                "bytes": 2167947,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-Idle/keyframes/f000.png",
+                  "sha256": "3891c0f444e176dffffb9868511589b48489d174267500bcbc5fc8f321f9e6f7"
+                },
+                {
+                  "frame": 40,
+                  "timeSec": 1.667,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-Idle/keyframes/f040.png",
+                  "sha256": "ebd2a7a2f97fcce7a98b9840b49c43adfe83d62d0ebf500b9287761c55757bf7"
+                },
+                {
+                  "frame": 76,
+                  "timeSec": 3.167,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-Idle/keyframes/f076.png",
+                  "sha256": "5a92944c40ae63eb17a16baa58399c5bc8c9ea164cb5ae75d181b2ebe710c1ff"
+                },
+                {
+                  "frame": 96,
+                  "timeSec": 4.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-Idle/keyframes/f096.png",
+                  "sha256": "9c5f95c57351ab4333f66fd8dea62a4615f8344d65d91d1a4b2cd6ccffad332a"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-Idle/keyframes/f120.png",
+                  "sha256": "5059919bfd6202c8e47e5d6b531d0f9660124c130731d2e93e6d41f2039e3a3f"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-HARPY-001/HAR-Idle/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-HARPY-001/HAR-Idle/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 1.76,
+                "base_center_x_range_px": 0.0,
+                "base_bottom_y_range_px": 0.0,
+                "base_width_range_px": 0.0,
+                "fg_touches_edge_frames": [],
+                "fg_bbox_union": [
+                  87,
+                  385,
+                  875,
+                  860
+                ],
+                "motion_mad_max": 2.271,
+                "motion_peak_frames": [
+                  96,
+                  40,
+                  74,
+                  76,
+                  95
+                ],
+                "loopMadFirstLast": 2.81
+              },
+              "motionSummary": "мягкий микровзмах крыльев, дыхание, микродвижение головы; фигура сидит",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "неподвижна: обод — размах 0 px; фон MAD ≤1.76",
+                "limbs": "крылья видны целиком (силуэт x 87–875)",
+                "weapon": "оружия нет",
+                "artifacts": "цикл почти замкнут: MAD первый/последний кадр 2.81",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): амплитуда крыльев выше шума; пригоден для пробы"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-HARPY-001/HAR-Idle/assessment.json",
+              "cost": {
+                "syntxTokens": 6,
+                "quotedBeforeRun": 6,
+                "balanceBefore": 555,
+                "balanceAfter": 549,
+                "source": "art/animation-refs/ASSET-HARPY-001/HAR-Idle/syntx/quote.json, art/animation-refs/ASSET-HARPY-001/HAR-Idle/syntx/balance_before.json, art/animation-refs/ASSET-HARPY-001/HAR-Idle/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            }
+          ],
+          "requiredMvp": true
+        },
+        {
+          "cue": "HAR-HitReact",
+          "selectedTake": 1,
+          "takes": [
+            {
+              "cue": "HAR-HitReact",
+              "take": 1,
+              "generationOrder2": 20,
+              "selected": true,
+              "cueRef": "CUE-011 (900 мс), бриф 18 §6 HAR-HitReact (условный: clip-manifest required_mvp=false до AD-CNF-30; бриф — производить последним)",
+              "status": "референс, не анимация",
+              "whyThisTake": "условный клип сгенерирован последним по брифу; HitReact на Seedance",
+              "suitabilityVideoToMotion": {
+                "verdict": "ограниченно пригоден: только фаза ~55–82",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "отдача есть, но поздно и медленно; финальная поза не совпадает со стартовой (крылья сложены)"
+              },
+              "service": "SYNTX (syntx.ai) → Seedance",
+              "aiName": "seedance",
+              "modelType": "seedance-1.5-pro",
+              "modelLabel": "Seedance 1.5 Pro 720p, 5 с, без звука",
+              "parameters": {
+                "mode": "pro",
+                "resolution": "720p",
+                "aspect_ratio": "1:1",
+                "camera_fixed": true,
+                "output_format": null,
+                "generate_audio": false,
+                "video_duration": 5,
+                "input_video_duration": 0
+              },
+              "syntxChatUuid": "068a3d9a-65e9-4a5a-bfdc-1632f2a8145a",
+              "syntxTaskId": "2868353",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of a harpy come to life, perched in a crouch on her small round black base, entire body, both wings and the base always visible in frame. She has feathered wings instead of arms, spread wide, and bird-like clawed feet gripping the base. She holds no weapons. After one second she flinches in pain: her torso jolts backward and to the side, her head snaps back and her wings jerk up briefly, then she settles back into her crouch and stays still. Nothing touches her, nothing enters the frame. No visual effects, no particles, no flying feathers, no blood, no wounds, no projectiles. She does not take off. Plain neutral gray studio background, even soft lighting, clean silhouette.",
+              "promptFile": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/HAR-HitReact_seedance15pro_ref.mp4",
+                "sha256": "310a99f6b57ae409c347c3ff0337d3a499eacf45a4113759c329f7900ba88c4e",
+                "bytes": 3191992,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/keyframes/f000.png",
+                  "sha256": "9d0a6e39187e36d2cd0cb17d6dac4ee458c61c8fe8f69fdb031e00af0aef22c4"
+                },
+                {
+                  "frame": 24,
+                  "timeSec": 1.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/keyframes/f024.png",
+                  "sha256": "11983d56a27ffca6a5a526522c257ec54701fb43181d29676fcd747296e0f194"
+                },
+                {
+                  "frame": 55,
+                  "timeSec": 2.292,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/keyframes/f055.png",
+                  "sha256": "f3b4658653c4a865b54eaedce31e12fa34a152e58962204fb2af37b7804617ec"
+                },
+                {
+                  "frame": 67,
+                  "timeSec": 2.792,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/keyframes/f067.png",
+                  "sha256": "dfcf0541d39b61d393965d1eeae6c8ba2691989dcb74e93949ef26cebcdee3bb"
+                },
+                {
+                  "frame": 82,
+                  "timeSec": 3.417,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/keyframes/f082.png",
+                  "sha256": "1667c6156336400eacaee7709474b3fd59a23c9b4d2fce4afd5537c804fcb990"
+                },
+                {
+                  "frame": 96,
+                  "timeSec": 4.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/keyframes/f096.png",
+                  "sha256": "a0fa673e2cb21de7b9e66951f006f0b13650f06ab4cf1e2fc4b4745c55f3b3b4"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/keyframes/f120.png",
+                  "sha256": "64781ce9ccf69e4542b3070a3c21b83c9bc3b5fd74b71ebb9004aebee53a4e63"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 23.353,
+                "base_center_x_range_px": 49.0,
+                "base_bottom_y_range_px": 1.0,
+                "base_width_range_px": 134.0,
+                "fg_touches_edge_frames": [
+                  20,
+                  21,
+                  22,
+                  23,
+                  24,
+                  25,
+                  26,
+                  27,
+                  28,
+                  29,
+                  30,
+                  31,
+                  32,
+                  33,
+                  34,
+                  35,
+                  36,
+                  37,
+                  38,
+                  39,
+                  40,
+                  41,
+                  42,
+                  43,
+                  44,
+                  45,
+                  46,
+                  47,
+                  48,
+                  49,
+                  50,
+                  51,
+                  52,
+                  53,
+                  54,
+                  55,
+                  56,
+                  57,
+                  58,
+                  59,
+                  60,
+                  61,
+                  62,
+                  63,
+                  64,
+                  65,
+                  66,
+                  67,
+                  68,
+                  69,
+                  70,
+                  71,
+                  72,
+                  73,
+                  74,
+                  75,
+                  76,
+                  77,
+                  78,
+                  79,
+                  80,
+                  81,
+                  82,
+                  83,
+                  84,
+                  85,
+                  86,
+                  87,
+                  88,
+                  89,
+                  90,
+                  91,
+                  92,
+                  93,
+                  94,
+                  95,
+                  96,
+                  97,
+                  98,
+                  99,
+                  100,
+                  101,
+                  102,
+                  103,
+                  104,
+                  105,
+                  106,
+                  107,
+                  108,
+                  109,
+                  110,
+                  111,
+                  112,
+                  113,
+                  114,
+                  115,
+                  116,
+                  117,
+                  118,
+                  119,
+                  120
+                ],
+                "fg_bbox_union": [
+                  0,
+                  0,
+                  959,
+                  959
+                ],
+                "motion_mad_max": 13.442,
+                "motion_peak_frames": [
+                  67,
+                  82,
+                  81,
+                  55,
+                  83
+                ],
+                "caveat": "Seedance: фон неоднороден (виньетка, сдвиг тона) — border_mad_max и маска силуэта (fg_*) завышены и недостоверны; движение камеры судить по base_* (обод подставки)"
+              },
+              "motionSummary": "медленный подъём из приседа во весь рост (кадры ~0–48), около кадра 24 отрыв стопы, пик отдачи — голова назад, крылья вверх (~55–67), возврат в присед со сложенными вниз крыльями (~82–120)",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "обод — размах центра 49 px, ширины 134 px (вероятно, крылья и стопы перекрывают обод; не проверено); фон MAD 23.4",
+                "limbs": "крылья видны; отрыв стопы около кадра 24",
+                "weapon": "оружия нет",
+                "artifacts": "у Seedance фон неоднороден (виньетка, тон меняется после первых кадров): border_mad и маска силуэта завышены, касания края по маске недостоверны; движение камеры оценивается только по ободу подставки",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): пиковая фаза короткая; клип условный"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/assessment.json",
+              "cost": {
+                "syntxTokens": 7.5,
+                "quotedBeforeRun": 7.5,
+                "balanceBefore": 535.5,
+                "balanceAfter": 528,
+                "source": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact/syntx/quote.json, art/animation-refs/ASSET-HARPY-001/HAR-HitReact/syntx/balance_before.json, art/animation-refs/ASSET-HARPY-001/HAR-HitReact/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            }
+          ],
+          "requiredMvp": false
+        },
+        {
+          "cue": "HAR-DeathSettle",
+          "selectedTake": 2,
+          "takes": [
+            {
+              "cue": "HAR-DeathSettle",
+              "take": 1,
+              "generationOrder2": 18,
+              "selected": false,
+              "cueRef": "CUE-013 (950 мс), бриф 18 §6 HAR-DeathSettle (приоритетный клип гарпии)",
+              "status": "референс, не анимация",
+              "whyThisTake": "приоритетный клип сразу на Seedance (Kling взлетел на HAR-LungeAttack и дал кровь на MER-DeathSettle)",
+              "suitabilityVideoToMotion": {
+                "verdict": "непригоден; заменён take2",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "не соответствует: крылья распластаны вместо сложенных; падение скачкообразное"
+              },
+              "service": "SYNTX (syntx.ai) → Seedance",
+              "aiName": "seedance",
+              "modelType": "seedance-1.5-pro",
+              "modelLabel": "Seedance 1.5 Pro 720p, 5 с, без звука",
+              "parameters": {
+                "mode": "pro",
+                "resolution": "720p",
+                "aspect_ratio": "1:1",
+                "camera_fixed": true,
+                "output_format": null,
+                "generate_audio": false,
+                "video_duration": 5,
+                "input_video_duration": 0
+              },
+              "syntxChatUuid": "068a3d9a-65e9-4a5a-bfdc-1632f2a8145a",
+              "syntxTaskId": "2868262",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of a harpy come to life, perched in a crouch on her small round black base, entire body, both wings and the base always visible in frame. She has feathered wings instead of arms, spread wide, and bird-like clawed feet gripping the base. She holds no weapons. She is defeated: her wings go limp and fold down against her body, her head droops, and she slowly sinks down into a small crumpled heap on top of her round base, ending completely still. She stays centered on the base, does not fall off, does not fly. Plain neutral gray studio background, even soft lighting, clean silhouette, no flying feathers, no blood, no motion blur, no extra limbs, no extra characters.",
+              "promptFile": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/HAR-DeathSettle_seedance15pro_ref.mp4",
+                "sha256": "63f0a5f7860e7dd38e53b59a571be249ee3ed2b504ad5f20675d670a5980d730",
+                "bytes": 3179706,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/keyframes/f000.png",
+                  "sha256": "e2f1c85915b6bbf9aa50b22a8241c2ea4a426bd5d9ea6e274db25d570ab78349"
+                },
+                {
+                  "frame": 72,
+                  "timeSec": 3.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/keyframes/f072.png",
+                  "sha256": "ccf81e060225d24e64c3cddebd3aea1ba1bd866ce994c0ff28fc1320b9a9906c"
+                },
+                {
+                  "frame": 84,
+                  "timeSec": 3.5,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/keyframes/f084.png",
+                  "sha256": "eddeddbdc9574a3700b50140e115eb0e0e91c515968312b2b3aac8002fbeb447"
+                },
+                {
+                  "frame": 94,
+                  "timeSec": 3.917,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/keyframes/f094.png",
+                  "sha256": "3297e88ae970c422736a8d9a7cd8bfca3246d125a5f8d21320f01d4c6efbba49"
+                },
+                {
+                  "frame": 97,
+                  "timeSec": 4.042,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/keyframes/f097.png",
+                  "sha256": "e53139667697bf6ceec370214a73c3798fb4992566ad1f66f0f70d7b23bab91f"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/keyframes/f120.png",
+                  "sha256": "6d174cf7501dfd5c7cc1d6d4d4af733425acf4cd2cd580c12899a7c4ddf01f0b"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 18.861,
+                "base_center_x_range_px": 68.5,
+                "base_bottom_y_range_px": 7.0,
+                "base_width_range_px": 493.0,
+                "fg_touches_edge_frames": [
+                  80,
+                  120
+                ],
+                "fg_bbox_union": [
+                  0,
+                  0,
+                  943,
+                  959
+                ],
+                "motion_mad_max": 8.387,
+                "motion_peak_frames": [
+                  97,
+                  96,
+                  95,
+                  98,
+                  94
+                ],
+                "caveat": "Seedance: фон неоднороден (виньетка, сдвиг тона) — border_mad_max и маска силуэта (fg_*) завышены и недостоверны; движение камеры судить по base_* (обод подставки)"
+              },
+              "motionSummary": "кадры ~0–84 почти Idle (подъём корпуса, крылья вверх ~84), затем скачок: за кадры ~94–98 фигура падает плашмя, крылья распластаны в стороны, покой",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "обод недостоверен в финале (крылья на ободе, ширина — размах 493 px); фон MAD 18.9",
+                "limbs": "в финале крылья шире подставки",
+                "weapon": "оружия нет",
+                "artifacts": "скачкообразный переход (пик motion 94–98); у Seedance фон неоднороден (виньетка, тон меняется после первых кадров): border_mad и маска силуэта завышены, касания края по маске недостоверны; движение камеры оценивается только по ободу подставки",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): не использовать"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/assessment.json",
+              "cost": {
+                "syntxTokens": 7.5,
+                "quotedBeforeRun": 7.5,
+                "balanceBefore": 549,
+                "balanceAfter": 541.5,
+                "source": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/syntx/quote.json, art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/syntx/balance_before.json, art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            },
+            {
+              "cue": "HAR-DeathSettle",
+              "take": 2,
+              "generationOrder2": 19,
+              "selected": true,
+              "cueRef": "CUE-013 (950 мс), бриф 18 §6 HAR-DeathSettle (приоритетный клип гарпии)",
+              "status": "референс, не анимация",
+              "whyThisTake": "ретейк приоритетного клипа: Seedance take1 — 3.5 с почти без движения, скачкообразное падение, крылья распластаны",
+              "suitabilityVideoToMotion": {
+                "verdict": "пригоден как референс тайминга и финальной позы",
+                "status": "оценка по кадрам (визуально); pose-трекинг не запускался",
+                "basis": "контакт-лист 2 fps и ключевые кадры (просмотр через Read) + измерения из analysis.json"
+              },
+              "briefFit": {
+                "status": "оценка по кадрам (визуально)",
+                "text": "соответствует: финал — компактная кучка в габарите подставки, крылья сложены; фаза падения быстрая"
+              },
+              "service": "SYNTX (syntx.ai) → Kling",
+              "aiName": "kling",
+              "modelType": "kling_image2video",
+              "modelLabel": "Kling 2.5 std, 5 с, без звука",
+              "parameters": {
+                "mode": "standart",
+                "version": "2.5",
+                "gen_type": null,
+                "multi_shots": false,
+                "temperature": 0.5,
+                "aspect_ratio": "1:1",
+                "native_audio": false,
+                "video_duration": 5,
+                "camera_movement": null
+              },
+              "syntxChatUuid": "068a3d9a-65e9-4a5a-bfdc-1632f2a8145a",
+              "syntxTaskId": "70368af1-dd59-4f23-b11c-489702240df0",
+              "syntxRaw": {
+                "dir": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/syntx/",
+                "files": [
+                  "balance_after.json",
+                  "balance_before.json",
+                  "gen.json",
+                  "quote.json",
+                  "req.json",
+                  "result.json",
+                  "wait.json"
+                ],
+                "note": "сырые ответы SYNTX MCP (import_runs.py); id аккаунта заменён на REDACTED; quote.json — get-model-info до запуска; md5 mp4 = хэш в имени файла result.json.url"
+              },
+              "prompt": "Locked-off static camera, no camera movement, no zoom, no pan, no cuts. Full-body front view of the painted fantasy miniature figure of a harpy come to life, perched in a crouch on her small round black base, entire body, both wings and the base always visible in frame. She has feathered wings instead of arms, spread wide, and bird-like clawed feet gripping the base. She holds no weapons. She is defeated: her wings go limp and fold down against her body, her head droops, and she slowly sinks down into a small crumpled heap on top of her round base, ending completely still. She stays centered on the base, does not fall off, does not fly. Plain neutral gray studio background, even soft lighting, clean silhouette, no flying feathers, no blood, no motion blur, no extra limbs, no extra characters.",
+              "promptFile": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/prompt.txt",
+              "output": {
+                "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/HAR-DeathSettle_kling25_take2_ref.mp4",
+                "sha256": "bb1aba901e0b1a235b219d74cf2ce20cabaccbadff4e6f859fe1a6b34ab43aaa",
+                "bytes": 1616228,
+                "codec": "h264",
+                "durationSec": 5.041667,
+                "fps": "24/1",
+                "frames": 121,
+                "resolution": "960x960"
+              },
+              "keyframes": [
+                {
+                  "frame": 0,
+                  "timeSec": 0.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/keyframes/f000.png",
+                  "sha256": "a074627b393a3218016efd40a265e9eea7dda19b58d61215470e03a63e1761cc"
+                },
+                {
+                  "frame": 36,
+                  "timeSec": 1.5,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/keyframes/f036.png",
+                  "sha256": "3db1cf14335ca877a2ec8eec2981630b18886e38d7de3314dab80bb295ebe505"
+                },
+                {
+                  "frame": 44,
+                  "timeSec": 1.833,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/keyframes/f044.png",
+                  "sha256": "7792c4880f6d50d9bf32323243a48b9326ee764df62daa5dc514a3a4b4e49ba1"
+                },
+                {
+                  "frame": 48,
+                  "timeSec": 2.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/keyframes/f048.png",
+                  "sha256": "44997a7ee055e0faefc60117aef05aa4af940c56314ac2844272fba369534b01"
+                },
+                {
+                  "frame": 60,
+                  "timeSec": 2.5,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/keyframes/f060.png",
+                  "sha256": "9669d7f27e8e4c0c81e2b3094084493b4b7251e1b4b63098bb8c5fe6ce76ffe3"
+                },
+                {
+                  "frame": 120,
+                  "timeSec": 5.0,
+                  "path": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/keyframes/f120.png",
+                  "sha256": "034c6769d79a8c909c318beabdff6c213cead143a072208dfb1b5b9991cd1d03"
+                }
+              ],
+              "contactSheet": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/contact-sheet-2fps.png",
+              "measurements": {
+                "status": "измерено",
+                "file": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/analysis.json",
+                "rangeNote": "*_range_px — размах (max − min) по всем кадрам, не ±",
+                "border_mad_max": 2.035,
+                "base_center_x_range_px": 11.0,
+                "base_bottom_y_range_px": 2.0,
+                "base_width_range_px": 305.0,
+                "fg_touches_edge_frames": [],
+                "fg_bbox_union": [
+                  102,
+                  411,
+                  858,
+                  862
+                ],
+                "motion_mad_max": 6.21,
+                "motion_peak_frames": [
+                  50,
+                  46,
+                  48,
+                  52,
+                  44
+                ]
+              },
+              "motionSummary": "крылья опускаются, голова склоняется (кадры ~0–36), падение вперёд с крыльями в стороны (~44–48, пик 44–52), сворачивание в компактную «кучку» на подставке, крылья сложены вниз вокруг тела (~60–120)",
+              "assessment": {
+                "status": "оценка по кадрам (визуально); числа взяты из measurements",
+                "camera": "фон MAD ≤2.04; ширина обода плавает (размах 305 px) — крылья ложатся на обод; центр обода — размах 11 px",
+                "limbs": "крылья видны; в финале тело под крыльями",
+                "weapon": "оружия нет",
+                "artifacts": "взлёта и крови нет",
+                "videoToMotion": "прогноз (pose-трекинг не запускался): фаза до ~48 пригодна; складывание — ключами"
+              },
+              "assessmentFile": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/assessment.json",
+              "cost": {
+                "syntxTokens": 6.0,
+                "quotedBeforeRun": 6,
+                "balanceBefore": 541.5,
+                "balanceAfter": 535.5,
+                "source": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/syntx/quote.json, art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/syntx/balance_before.json, art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle/take2/syntx/balance_after.json",
+                "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries"
+              }
+            }
+          ],
+          "requiredMvp": true
+        }
+      ],
+      "budget": {
+        "spentSyntxTokens": 40.5,
+        "generations": 6,
+        "status": "измерено: сумма дельт balance_before/after"
+      }
+    }
+  ],
+  "heroSeries": {
+    "date": "2026-09-28",
+    "scope": "видео-референсы Arthur, Merlin, Harpy (по 4 CUE брифа 18) + ретейки Medusa MED-HitReact (retryProposal) и MED-LungeAttack (¾, выстрел по оси камеры)",
+    "authorization": "пользователь снял лимиты SYNTX для этой серии (покупки запрещены); каждая трата дописана в credits-ledger.json сразу после генерации",
+    "modelPolicy": {
+      "status": "решение по результатам генераций (оценка по кадрам)",
+      "default": "Kling 2.5 std 5 с (6 токенов) — пробный ролик героя и Idle/LungeAttack/DeathSettle",
+      "switch": "HitReact — сразу Seedance 1.5 Pro 720p 1:1 camera_fixed (7.5): Kling дал кровь на MED-HitReact take1 и повторно на take2 с исправленным промптом, Seedance take4 — без VFX; ретейки на другой модели — только после зафиксированного артефакта (whyThisTake)",
+      "seedanceParams": "aspect_ratio 1:1 и camera_fixed true задаются явно: без них SYNTX применил 16:9 и подвижную камеру (MED-HitReact take3)",
+      "observed": "Kling 2.5 std: стабильная камера и ровный фон, но добавляет VFX/кровь (MED-HitReact ×2, MER-DeathSettle), вспышку (MER-LungeAttack) и игнорирует «не взлетать» (HAR-LungeAttack). Seedance 1.5 Pro: следует запретам на VFX/кровь, но фон неоднороден, пластика медленнее, есть отрывы стоп и наклон подставки (ARTH-HitReact), скачок позы (HAR-DeathSettle take1). Вывод по 20 роликам, не статистика.",
+      "priceQuotes": {
+        "status": "get-model-info до каждого запуска (syntx/quote.json); сводный опрос 2026-09-28 14:3x",
+        "table": "Kling 2.5 std 5 с 6; Seedance 1.0 Pro-Fast 480p 6 / 720p 10; Seedance 1.5 Pro 480p 6 / 720p 7.5; Hailuo 2.3 Fast 768p 6 с 9; Seedance 2.0 — цена не получена (API требует mode/size)"
+      }
+    },
+    "generationOrder": [
+      "1. MED-HitReact take2 (Kling 2.5 std, 5 с, без звука)",
+      "2. MED-HitReact take3 (Seedance 1.5 Pro 720p, 5 с, без звука)",
+      "3. MED-HitReact take4 (Seedance 1.5 Pro 720p, 5 с, без звука)",
+      "4. MED-LungeAttack take2 (Kling 2.5 std, 5 с, без звука)",
+      "5. MED-LungeAttack take3 (Seedance 1.5 Pro 720p, 5 с, без звука)",
+      "6. ARTH-LungeAttack take1 (Kling 2.5 std, 5 с, без звука)",
+      "7. ARTH-Idle take1 (Kling 2.5 std, 5 с, без звука)",
+      "8. ARTH-DeathSettle take1 (Kling 2.5 std, 5 с, без звука)",
+      "9. ARTH-HitReact take1 (Seedance 1.5 Pro 720p, 5 с, без звука)",
+      "10. MER-LungeAttack take1 (Kling 2.5 std, 5 с, без звука)",
+      "11. MER-Idle take1 (Kling 2.5 std, 5 с, без звука)",
+      "12. MER-DeathSettle take1 (Kling 2.5 std, 5 с, без звука)",
+      "13. MER-HitReact take1 (Seedance 1.5 Pro 720p, 5 с, без звука)",
+      "14. MER-DeathSettle take2 (Seedance 1.5 Pro 720p, 5 с, без звука)",
+      "15. HAR-LungeAttack take1 (Kling 2.5 std, 5 с, без звука)",
+      "16. HAR-LungeAttack take2 (Seedance 1.5 Pro 720p, 5 с, без звука)",
+      "17. HAR-Idle take1 (Kling 2.5 std, 5 с, без звука)",
+      "18. HAR-DeathSettle take1 (Seedance 1.5 Pro 720p, 5 с, без звука)",
+      "19. HAR-DeathSettle take2 (Kling 2.5 std, 5 с, без звука)",
+      "20. HAR-HitReact take1 (Seedance 1.5 Pro 720p, 5 с, без звука)"
+    ],
+    "spentSyntxTokens": 133.5,
+    "balanceBefore": 661.5,
+    "balanceAfter": 528,
+    "generations": 20,
+    "retakeReasons": [
+      "MED-HitReact take2: retryProposal манифеста (предложено в P1): промпт без «struck by an invisible blow», та же модель Kling 2.5 std",
+      "MED-HitReact take3: take2 (Kling) повторил кровь; тот же промпт на Seedance 1.5 Pro 720p для сравнения моделей",
+      "MED-HitReact take4: повтор take3 с явными aspect_ratio 1:1 и camera_fixed true (ошибка параметров запроса в take3, не результата модели)",
+      "MED-LungeAttack take2: nextSteps/briefDeviation манифеста: регенерация в ¾ с выстрелом по оси камеры",
+      "MED-LungeAttack take3: Kling take2 не выполнил выстрел по оси камеры и дал летящую стрелу; тот же промпт на Seedance 1.5 Pro",
+      "MER-DeathSettle take2: ретейк: Kling take1 дал кровь и дым в фазе падения",
+      "HAR-LungeAttack take2: ретейк: пробный Kling взлетел с подставки",
+      "HAR-DeathSettle take2: ретейк приоритетного клипа: Seedance take1 — 3.5 с почти без движения, скачкообразное падение, крылья распластаны"
+    ],
+    "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json → syntx.window.entries (writer: tools/art/syntx_video_refs/ledger_append.py)",
+    "nextSteps": {
+      "status": "предложено",
+      "items": [
+        "Пробы video-to-motion начинать с выбранных takes верха тела: MED-HitReact take4, MER-HitReact, ARTH-LungeAttack (кадры 0–84), MER-LungeAttack (0–56); сервис не выбран.",
+        "MED-LungeAttack: ни один take не показал выпуск по оси камеры (take2 — снова вправо, take3 — прицел в камеру без выпуска); варианты: перенос верха тела с коррекцией ориентации (как в briefDeviation) или keyframe-ключи по брифу; третья регенерация не делалась.",
+        "ARTH-HitReact: наклон подставки — возможный ретейк (Kling с HitReact-промптом рискует VFX; Seedance с «the base never tilts»).",
+        "HAR-LungeAttack: наскок без взлёта получен только частично (take2); Idle/DeathSettle Harpy — take Kling пригодны.",
+        "Idle всех героев — малая амплитуда, ставить руками по брифу; видео — референс тайминга.",
+        "Импорт в Blender/UE, ретаргет и ретайминг под окна CUE не начаты; «технически импортировано» и «художественно принято» не заявляются."
+      ]
+    }
+  },
+  "budgetAll": {
+    "status": "измерено (дельты balance_before/after по всем генерациям манифеста)",
+    "p1Medusa": 24.0,
+    "heroSeries": 133.5,
+    "total": 157.5,
+    "balanceEnd": 528
   }
 }
