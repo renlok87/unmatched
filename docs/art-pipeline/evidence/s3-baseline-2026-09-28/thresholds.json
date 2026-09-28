@@ -73,6 +73,250 @@
     "forbidden": "r.DynamicRes.TargetedGPUHeadRoomPercentage как ограничитель GPU при DX11 (AGENTS.md)"
   },
   "revisions": [
-    {"date": "2026-09-28", "by": "T0 этапа 3", "what": "первая регистрация до любой съёмки этапа 3"}
+    {"date": "2026-09-28", "by": "T0 этапа 3", "what": "первая регистрация до любой съёмки этапа 3"},
+    {
+      "id": "rev1-t23",
+      "date": "2026-09-28",
+      "by": "T2.3 этапа 3 (ревизия порогов по followups T1.1 и T1.2)",
+      "status": "предложено",
+      "what": "K2-01…K2-04 (E1_k2_live): кроп вокруг проекции Head+12 uu со стороной 3 × проекция Head…Head+24 uu; маски черт лица, венца и сквозного просвета — ID-рендеры Blender отдельно для каждого варианта (v2, v3, v3.1), репроецированные в кадр по трассе SHOT и карте глубины того же рендера; K2-02…K2-04 засчитываются только после проверки размещения по оверлеям k2-bands-*.png. PERF-02: p95 ≤ период капа + 0,5 мс вместо 33,3 мс. Исходные записи E1_k2_live и perf.setups[PERF-02] выше не изменены (E3).",
+      "reason": [
+        "T1.1, акт docs/game-design/evidence/ART-004/live-head-tilt-v3-k2-measured-2026-09-28.md, ограничение 1: сокет Head стоит у основания шеи (кость head + 4 uu вперёд, мировая z 38,5 при фигуре 55 uu), поэтому кроп K2-01 центрирован на груди, а экранные полосы K2-02/K2-03 от сокета легли на шею и вырез хитона, у v3 — на само лицо; обе метрики «не измерено (невалидно)». Наклон головы переставляет лицо и венец, поэтому общая для вариантов полоса в экранных координатах их не разделяет — нужна маска своего варианта.",
+        "T1.1, ограничение 2, и followup T1.2 для T4.1: K2-04 без маски не измеряется. ID-рендеры K2 D-10 300 uu для v2/v3/v3.1a (T1.2, head-tilt-v31-probe-2026-09-28) сняты с тех же FBX, что импортированы в UE: sha256 FBX в blender-measurements.json = source_fbx_sha256 отчётов импорта v2 и v3.",
+        "PERF-02: при t.MaxFPS 30 p95 времени кадра не бывает ниже периода капа 1000/30 = 33,333 мс; порог 33,3 задан ниже периода, и T1.1 формально не выполнил его ни у одного из 22 клиентов при 29,6–29,9 FPS."
+      ],
+      "runsNotYetShot": [
+        "T4.1 (K2 v2/v3/v3.1 в UE)",
+        "T5.1 (длинный packaged K2)",
+        "T6 (приёмка)"
+      ],
+      "appliesIf": "запись действует для этих прогонов, только если принята до их съёмки (E3); до решения действуют исходные записи",
+      "retroactive": "к T1.1 как гейт не применяется (E3). Пересчёт K2-02…K2-04 на 22 кадрах T1.1 по этой ревизии — отдельный файл docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-metrics-rev1-t23.json; исходный k2-metrics.json не изменён",
+      "replacesIfAccepted": {
+        "E1_k2_live.metrics": [
+          "K2-01",
+          "K2-02",
+          "K2-03",
+          "K2-04"
+        ],
+        "perf.setups": [
+          "PERF-02 threshold.p95FrameTimeMsEach"
+        ]
+      },
+      "unchanged": "K2-05…K2-07, zooms, provenanceGates, frameClass, workingZoomProposal (при принятии опирается на K2-02…K2-04 этой ревизии), E1_v31_blender, E2_repeat_noise, PERF-01",
+      "E1_k2_live": [
+        {
+          "id": "K2-01",
+          "metric": "кроп вокруг экранной проекции Head+12 uu",
+          "definition": "квадрат со стороной 3 × длина экранной проекции отрезка Head…Head+(0,0,24) uu, не меньше 96 px; центр — проекция Head+(0,0,12) uu (лицо, венец и змеи входят целиком). Проекции считает модель камеры кадра: ориентация (−55, −90, 0) и горизонтальный FOV 35° из S08FlowGameMode::SetupCameraForBoard, положение — SHOT ctx cam (печать с шагом 1 uu), уточнённое по трассе: смещение вдоль оси камеры — по проекциям бойцов SHOT fighter screen, сдвиг в плоскости экрана — так, чтобы сокет Head попал в SHOT head screen; проверка модели — top/bottom (Head ∓ 6 uu) ≤ 0,15 px, бойцы ≤ 0,6 px (печать с шагом 1 px), смещение от ctx ≤ 0,87 uu",
+          "use": "K2-02…K2-05 считаются в этом кропе",
+          "was": "центр — проекция сокета Head, сторона 3 × headPx (проекция Head ± 6 uu)"
+        },
+        {
+          "id": "K2-02",
+          "metric": "энергия градиента (Sobel яркости дисплея, Rec.709 по sRGB) в маске черт лица",
+          "comparator": ">=",
+          "value": "v2 того же зума, той же роли клиента и той же сборки",
+          "mask": "черты лица своего варианта: часть 10 с центром полигона z ≥ 42 uu у v2 (определение A1; красный в idsplit-k2-front-d300-<tag>.png), репроецированная в кадр (K2-masks); пиксель в маске при покрытии ≥ 0,5 (k×k отсчётов на пиксель кадра); энергия считается после эрозии 1 px (4-связность), чтобы контур лицо/венец/фон и остаточная ошибка репроекции в неё не входили",
+          "minimum": "меньше 16 px после эрозии → «не измерено (маска меньше минимума)»",
+          "fallback": "нет: без маски своего варианта — «не измерено»; экранные полосы от сокета не используются",
+          "diagnostics": "энергия без окрестности тёмных пикселей (luma < 25, ±2 px) — предложение T1.1; пишется рядом, без pass/fail"
+        },
+        {
+          "id": "K2-03",
+          "metric": "различимые сегменты в маске венца: связные компоненты (4-связность) ≥ 6 px, где |luma − среднее luma по маске| > 12",
+          "comparator": ">=",
+          "value": "v2 того же зума и той же роли клиента",
+          "mask": "венец со змеями своего варианта (часть 1, зелёный в idsplit), покрытие ≥ 0,5, эрозия 1 px, минимум 16 px",
+          "note": "порог контраста 12 и ≥ 6 px — то же правило, что формально применялось в T1.1; меняется только область (маска варианта вместо экранной полосы). Критерий «семь голов» 04 не требует"
+        },
+        {
+          "id": "K2-04",
+          "metric": "площадь сквозного просвета у шеи в кропе (фон виден сквозь стык), px кадра",
+          "comparator": "<=",
+          "value": "v2 того же зума и той же роли клиента",
+          "mask": "замкнутые прозрачные пиксели id-cull-k2-front-d300-<tag>.png (backface culling, как односторонние материалы UE) в зоне стыка лицо × воротник: дилатация 3 px, те же функции, что face_x_collar.enclosed_gap_px в blender-measurements.json (tools/art/art004_junction_zones.py); репроецированные в кадр",
+          "valueDefinition": "сумма покрытия маской по пикселям кропа (площадь в px кадра). При 1,6× и 1× просвет уже пикселя, поэтому число пикселей с покрытием ≥ 0,5 пишется только как вторичное",
+          "nature": "геометрическая величина при камере кадра: сколько кадра приходится на просвет модели; живые пиксели используются только в проверке размещения и в диагностике (яркость под маской)"
+        },
+        {
+          "id": "K2-masks",
+          "renders": "docs/game-design/evidence/ART-004/head-tilt-v31-probe-2026-09-28/ (T1.2; набор камер A1 b4_idrender.py): idsplit-k2-front-d300-<tag>.png — классы, id-cull-k2-front-d300-<tag>.png — просвет",
+          "view": "k2-front-d300: перспектива, горизонтальный FOV 35°, 1920×1080, камера (0; −3·cos 55°; 0,29 + 3·sin 55°) м, цель (0; 0; 0,29) м, фигура в начале координат, лицо −Y Blender = +Y UE",
+          "perVariant": "вариант берётся по сетке из SHOT head mesh= кадра: SK_Medusa_FaceNeck_v2Candidate → v2, SK_Medusa_HeadTilt_v3Candidate → v3, SK_Medusa_HeadTilt_v31Candidate (имя — предложение T1.2 для T4.1) → v31a",
+          "provenance": "маска применяется, только если pixels_sha256 обоих рендеров = записанным в blender-measurements.json и sha256 FBX (inputs_sha256) = source_fbx_sha256 отчёта импорта UE этой сетки; маска просвета воспроизводит face_x_collar.enclosed_gap_px; для v3.1 до отчёта импорта T4.1 — «не измерено»",
+          "depth": "docs/game-design/evidence/ART-004/k2-id-depth-2026-09-28/ (T2.3, tools/art/art004_k2_id_depth.py): глубина первого лицевого попадания луча через центр каждого пикселя той же камеры в те же FBX (CPU, BVH, без рендера); совпадение попаданий с альфой ID-рендера 0,99997–0,99999, лук/тело 100 %",
+          "reprojection": "отсчёт кадра (k×k на пиксель) → луч камеры кадра → точка поверхности по карте глубины (итерация по лучу, у скачков глубины — проход по лучу до первой точки на/за поверхностью) → ближайший пиксель ID-рендера. Проверка на кадрах T1.1: точки поверхности, спроецированные в кадр и обратно, возвращаются в ≤ 1 px Blender в 99,5–100 % при 5×, 1,6× и 1× (класс совпадает в 99,8–100 %); без глубины (одна вертикальная плоскость фигуры) p99 ошибки 2,3–10,4 px Blender (≈ 1,5–1,7 px кадра)",
+          "scope": "только фронтальный K2: фигура с yaw 0 (клетки с Y < 0, S08FighterActor); yaw 180 → «не измерено»; поза покоя (в packaged-кадре анимация не играет). Проверка привязки: сокет Head маски (0; 4; 38,5) uu в мировых = SHOT head world ± 0,15 uu"
+        },
+        {
+          "id": "K2-placement",
+          "rule": "K2-02…K2-04 засчитываются для пары (зум, роль клиента), только если оверлей k2-bands-rev1-t23-<зум>-<роль>-v2-left-v3-right.png просмотрен и запись проверки (JSON: путь и sha256 оверлея; флаги faceMaskOnFace / crownMaskOnCrown / gapMaskOnNeckline для face-neck-v2 и head-tilt-v3) подтверждает, что маска лежит на лице / венце / стыке у обоих вариантов. Без записи — «ожидает проверки размещения (не засчитано)», при отрицательном флаге — «не измерено (размещение не подтверждено)»",
+          "automatic": "дополнительно по каждому кадру: лучший целый сдвиг контура силуэта маски относительно перепадов яркости кадра в окне ±3 px должен быть в пределах ±1 px (registration.ok); просмотр не заменяет",
+          "reviewer": "проверку может делать исполнитель; в записи указано, кто смотрел (это не независимый зритель)"
+        }
+      ],
+      "perf": {
+        "id": "PERF-02",
+        "setup": "два offscreen-клиента по 30 FPS (без изменений)",
+        "threshold": {
+          "p95FrameTimeMsEach": "<= 1000 / t.MaxFPS + 0,5 мс (при -ClientFps 30: 33,833 мс)",
+          "gpuUtilization": "только записывается, порога нет (без изменений)"
+        },
+        "was": "p95FrameTimeMsEach <= 33,3",
+        "source": "p95 frameMs трассы PERF summary scope=started каждого клиента (стадия Started, как в акте T1.1); кап — tMaxFPS из PERF config той же трассы. p95 FrameTime CSV-профайлера (первые 1200 кадров, включая лобби и загрузку) только записывается",
+        "justification": {
+          "data": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/perf-summary.json (T1.1: 11 прогонов × 2 клиента, t.MaxFPS 30, эффективно 29,64–29,91 FPS); пересчёт — tools/art/art004_live_k2.py perf02",
+          "periodMs": 33.333,
+          "traceP95Ms": [
+            33.33,
+            33.34
+          ],
+          "csvP95Ms": [
+            33.544,
+            33.813
+          ],
+          "passOf22": {
+            "33,3 (зарегистрировано)": "трасса 0",
+            "33,4 (предложение T1.1)": "трасса 22, CSV 0",
+            "период + 1 % = 33,667 (предложение T1.1)": "трасса 22, CSV 12",
+            "период + 0,5 мс = 33,833": "трасса 22 (запас 0,49 мс), CSV 22 (запас 0,02 мс)"
+          },
+          "why": [
+            "33,3 ниже периода капа: порог невыполним при любом удержании капа",
+            "дрожание кадра при t.MaxFPS — абсолютная величина пейсера кадров (сон/ожидание ОС): в T1.1 p95 трассы на 0…0,007 мс выше периода, p95 более широкого окна CSV — до +0,48 мс; оно не масштабируется с периодом, поэтому допуск абсолютный, а не «+1 %» (при капе 60 это было бы 0,17 мс)",
+            "0,5 мс покрывает p95 всех 22 клиентов T1.1 и в трассе, и в окне CSV; «+1 %» не покрывает окно CSV (10 из 22 выше)",
+            "p95 выше периода + 0,5 мс значит, что больше 5 % кадров превысили период более чем на 0,5 мс, то есть клиент реально не держит кап; этот случай порог по-прежнему ловит",
+            "окно CSV проходит с запасом 0,02 мс, поэтому гейтом остаётся трасса стадии Started, CSV — только запись"
+          ]
+        },
+        "note": "PERF-01 (16,7 мс при капе 60) этой записью не меняется; у него тот же риск (порог на 0,033 мс выше периода 16,667 мс) — решение отдельно, до T6"
+      },
+      "params": {
+        "crop": {
+          "centerDzUu": 12,
+          "segmentDzUu": 24,
+          "factor": 3,
+          "minSidePx": 96
+        },
+        "headSocketLocalUu": [
+          0.0,
+          4.0,
+          38.5
+        ],
+        "blenderView": {
+          "name": "k2-front-d300",
+          "cameraM": [
+            0.0,
+            -1.7207293,
+            2.7474561
+          ],
+          "targetM": [
+            0.0,
+            0.0,
+            0.29
+          ],
+          "hfovDeg": 35.0,
+          "resolution": [
+            1920,
+            1080
+          ]
+        },
+        "maskSources": {
+          "dir": "docs/game-design/evidence/ART-004/head-tilt-v31-probe-2026-09-28",
+          "measurements": "blender-measurements.json",
+          "idsplitPattern": "idsplit-k2-front-d300-{tag}.png",
+          "idsplitView": "idsplit-k2-front-d300",
+          "idcullPattern": "id-cull-k2-front-d300-{tag}.png",
+          "idcullView": "k2-front-d300",
+          "depth": {
+            "dir": "docs/game-design/evidence/ART-004/k2-id-depth-2026-09-28",
+            "pattern": "id-depth-k2-front-d300-{tag}.npz",
+            "report": "depth-report.json",
+            "minAlphaAgreement": 0.9999
+          },
+          "meshes": {
+            "SK_Medusa_FaceNeck_v2Candidate": {
+              "variant": "face-neck-v2",
+              "tag": "v2",
+              "importReport": "docs/game-design/evidence/ART-004/v2-game-import-report.json"
+            },
+            "SK_Medusa_HeadTilt_v3Candidate": {
+              "variant": "head-tilt-v3",
+              "tag": "v3",
+              "importReport": "docs/game-design/evidence/ART-004/head-tilt-v3-game-import-report.json"
+            },
+            "SK_Medusa_HeadTilt_v31Candidate": {
+              "variant": "head-tilt-v3.1",
+              "tag": "v31a",
+              "importReport": null,
+              "note": "имя сетки — предложение T1.2; нужен отчёт импорта T4.1 с source_fbx_sha256 cce200693c4985363caf85343ffa6a3220facf6a5d6716c733faf29ba5ab310c; при переносе сокета Head (вопрос 9) — свой headSocketLocalUu"
+            }
+          }
+        },
+        "masks": {
+          "coverageMin": 0.5,
+          "erodePx": 1,
+          "minMaskPx": 16,
+          "minSupersample": 4,
+          "contrastLuma": 12,
+          "minComponentPx": 6,
+          "gapZoneBandPx": 3,
+          "depthIterations": 8,
+          "depthMarchSteps": 96
+        },
+        "reprojectionPlane": {
+          "pointLocalUu": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "normalLocal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "role": "начальное приближение (вертикальная плоскость фигуры); точность даёт карта глубины"
+        },
+        "headBoxLocalUu": {
+          "x": [
+            -13.1,
+            13.0
+          ],
+          "y": [
+            -9.7,
+            9.7
+          ],
+          "z": [
+            34.0,
+            55.5
+          ],
+          "role": "габарит головы (body_bbox_uu T1.2) для оценки ошибки варианта без глубины"
+        },
+        "placementGate": {
+          "autoWindowPx": 3,
+          "reviewKeys": [
+            "faceMaskOnFace",
+            "crownMaskOnCrown",
+            "gapMaskOnNeckline"
+          ]
+        },
+        "perf02": {
+          "toleranceMs": 0.5
+        }
+      },
+      "tool": [
+        "python tools/art/art004_live_k2.py metrics --threshold-set rev1-t23 [--placement-review <json>] --out <json> <каталоги прогонов>",
+        "python tools/art/art004_live_k2.py perf02 --threshold-set rev1-t23 <perf-summary.json>",
+        "blender --background --factory-startup --python tools/art/art004_k2_id_depth.py -- --tags v2,v3,v31a",
+        "python -m unittest discover -s tools/art/tests -p test_art004_live_k2_rev1.py -v"
+      ],
+      "evidence": {
+        "recomputeT11": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-metrics-rev1-t23.json",
+        "overlaysAndMaskMaps": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-crops-rev1-t23/",
+        "placementReview": "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2/k2-placement-review-rev1-t23.json",
+        "depth": "docs/game-design/evidence/ART-004/k2-id-depth-2026-09-28/depth-report.json"
+      }
+    }
   ]
 }

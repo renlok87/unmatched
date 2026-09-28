@@ -1,0 +1,896 @@
+{
+ "clips": [
+  {
+   "checks": {
+    "bone0_in_place_0.5uu": {
+     "expected": "<= 0.5 uu per axis",
+     "measured": {
+      "bone0": "SKEL_Medusa",
+      "first_to_last_delta_uu": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "max_abs_delta_uu_xyz": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "root_max_abs_delta_uu_xyz": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "note": "root motion is read from bone 0 (ue-pipeline-traps 2); root_motion_enabled=False",
+     "passed": true
+    },
+    "component_scale_1_at_importer_default": {
+     "expected": 1.0,
+     "measured": 1.0,
+     "passed": true
+    },
+    "fps_24": {
+     "expected": 24.0,
+     "measured": 24.0,
+     "passed": true
+    },
+    "frame0_matches_target_reference_pose": {
+     "expected": 0.0,
+     "measured": {
+      "component_max_offset_uu": 0.0,
+      "max_rotation_delta_deg": 0.0,
+      "max_translation_delta_uu": 0.0
+     },
+     "note": "the draft clips start in the rest pose, so frame 0 = reference pose of a compatible skeleton",
+     "passed": true
+    },
+    "keys_equal_source_frames": {
+     "expected": 15,
+     "measured": 15,
+     "passed": true
+    },
+    "length_equals_source_within_0.05s": {
+     "expected": "|delta| <= 0.05 s",
+     "measured": {
+      "delta_s": 3.3e-05,
+      "source_s": 0.5833,
+      "ue_s": 0.583333
+     },
+     "passed": true
+    },
+    "sockets_follow_bones_on_3_frames": {
+     "expected": "constant within 0.01 uu",
+     "measured": {
+      "frames": [
+       0,
+       6,
+       14
+      ],
+      "head_socket_to_head_bone_uu": [
+       4.0,
+       4.0,
+       4.0
+      ],
+      "weapon_socket_to_hand_L_uu": [
+       2.4372,
+       2.4372,
+       2.4372
+      ]
+     },
+     "note": "sockets of the target mesh evaluated with AnimPoseExtensions.get_socket_pose (component space)",
+     "passed": true
+    },
+    "visible_pose_change_2pct": {
+     "expected": ">= 2 % of 55 uu (proposal, not calibrated)",
+     "measured": {
+      "below_threshold": false,
+      "bone": "head",
+      "frame": 6,
+      "height_uu": 55.0,
+      "note": "bone joints only (no mesh vertices); validator counts heads and tails",
+      "share_of_height": 0.05322,
+      "threshold_share": 0.02,
+      "uu": 2.9268
+     },
+     "passed": true
+    }
+   },
+   "clip_id": "MED-LungeAttack-draft",
+   "result": "PASS",
+   "role": "positive",
+   "source": {
+    "bytes": 1251100,
+    "fbx": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx",
+    "sha256": "b985af983166f62d320c95bdc88cbcfba1f897a6c0abcaf87bcf748f994338a8"
+   },
+   "status": "technically_imported",
+   "target_mesh": "/Game/PipelineCandidates/Medusa/T4LocalPass/Meshes/SK_Medusa_Candidate",
+   "target_skeleton": "/Game/PipelineCandidates/Medusa/T4LocalPass/Meshes/SK_Medusa_Candidate_Skeleton.SK_Medusa_Candidate_Skeleton",
+   "ue": {
+    "component_scale_ratio_frame0_vs_reference": 1.0,
+    "frame_rate": 24.0,
+    "length_s": 0.583333,
+    "num_frames": 14,
+    "num_keys": 15,
+    "root_motion_enabled": false,
+    "samples": [
+     {
+      "bone_SKEL_Medusa": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_hand_L": [
+       10.0,
+       4.5,
+       29.0
+      ],
+      "bone_head": [
+       0.0,
+       0.0,
+       38.5
+      ],
+      "bone_root": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_weapon": [
+       11.2,
+       6.0,
+       27.5
+      ],
+      "frame": 0,
+      "head_socket_to_head_bone_uu": 4.0,
+      "socket_Head": [
+       0.0,
+       4.0,
+       38.5
+      ],
+      "socket_Weapon": [
+       11.2,
+       6.0,
+       27.5
+      ],
+      "time_s": 0.0,
+      "weapon_socket_to_hand_L_uu": 2.4372
+     },
+     {
+      "bone_SKEL_Medusa": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_hand_L": [
+       10.1342,
+       4.9114,
+       27.9031
+      ],
+      "bone_head": [
+       -0.0,
+       2.9108,
+       38.1941
+      ],
+      "bone_root": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_weapon": [
+       11.2962,
+       5.9188,
+       26.0124
+      ],
+      "frame": 6,
+      "head_socket_to_head_bone_uu": 4.0,
+      "socket_Head": [
+       -0.0,
+       6.8234,
+       37.3624
+      ],
+      "socket_Weapon": [
+       11.2962,
+       5.9188,
+       26.0124
+      ],
+      "time_s": 0.25,
+      "weapon_socket_to_hand_L_uu": 2.4372
+     },
+     {
+      "bone_SKEL_Medusa": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_hand_L": [
+       10.0,
+       4.5,
+       29.0
+      ],
+      "bone_head": [
+       0.0,
+       0.0,
+       38.5
+      ],
+      "bone_root": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_weapon": [
+       11.2,
+       6.0,
+       27.5
+      ],
+      "frame": 14,
+      "head_socket_to_head_bone_uu": 4.0,
+      "socket_Head": [
+       0.0,
+       4.0,
+       38.5
+      ],
+      "socket_Weapon": [
+       11.2,
+       6.0,
+       27.5
+      ],
+      "time_s": 0.58333,
+      "weapon_socket_to_hand_L_uu": 2.4372
+     }
+    ],
+    "tracks": [
+     "skel_medusa",
+     "root",
+     "hips",
+     "spine",
+     "head",
+     "arm_upper_l",
+     "arm_lower_l",
+     "hand_l",
+     "weapon",
+     "arm_upper_r",
+     "arm_lower_r",
+     "hand_r",
+     "leg_upper_l",
+     "leg_lower_l",
+     "foot_l",
+     "leg_upper_r",
+     "leg_lower_r",
+     "foot_r"
+    ],
+    "translation_scale_ratio_median": 1.0
+   },
+   "ue_asset": "/Game/PipelineCandidates/Medusa/DraftClips20260928/T4LocalPass/AM_Medusa_LungeAttack_Draft",
+   "validator": {
+    "as_expected": true,
+    "fails": [],
+    "report": "docs/art-pipeline/evidence/p1-ue-import-2026-09-28/clip-validator/AM_Medusa_LungeAttack.validation.json",
+    "result": "pass",
+    "warnings": [
+     "armature_object_name"
+    ]
+   }
+  },
+  {
+   "checks": {
+    "bone0_in_place_0.5uu": {
+     "expected": "<= 0.5 uu per axis",
+     "measured": {
+      "bone0": "SKEL_Medusa",
+      "first_to_last_delta_uu": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "max_abs_delta_uu_xyz": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "root_max_abs_delta_uu_xyz": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "note": "root motion is read from bone 0 (ue-pipeline-traps 2); root_motion_enabled=False",
+     "passed": true
+    },
+    "component_scale_1_at_importer_default": {
+     "expected": 1.0,
+     "measured": 1.0,
+     "passed": true
+    },
+    "fps_24": {
+     "expected": 24.0,
+     "measured": 24.0,
+     "passed": true
+    },
+    "frame0_matches_target_reference_pose": {
+     "expected": 0.0,
+     "measured": {
+      "component_max_offset_uu": 0.0,
+      "max_rotation_delta_deg": 0.0,
+      "max_translation_delta_uu": 0.0
+     },
+     "note": "the draft clips start in the rest pose, so frame 0 = reference pose of a compatible skeleton",
+     "passed": true
+    },
+    "keys_equal_source_frames": {
+     "expected": 10,
+     "measured": 10,
+     "passed": true
+    },
+    "length_equals_source_within_0.05s": {
+     "expected": "|delta| <= 0.05 s",
+     "measured": {
+      "delta_s": 0.0,
+      "source_s": 0.375,
+      "ue_s": 0.375
+     },
+     "passed": true
+    },
+    "sockets_follow_bones_on_3_frames": {
+     "expected": "constant within 0.01 uu",
+     "measured": {
+      "frames": [
+       0,
+       3,
+       9
+      ],
+      "head_socket_to_head_bone_uu": [
+       4.0,
+       4.0,
+       4.0
+      ],
+      "weapon_socket_to_hand_L_uu": [
+       2.4372,
+       2.4373,
+       2.4372
+      ]
+     },
+     "note": "sockets of the target mesh evaluated with AnimPoseExtensions.get_socket_pose (component space)",
+     "passed": true
+    },
+    "visible_pose_change_2pct": {
+     "expected": ">= 2 % of 55 uu (proposal, not calibrated)",
+     "measured": {
+      "below_threshold": false,
+      "bone": "head",
+      "frame": 3,
+      "height_uu": 55.0,
+      "note": "bone joints only (no mesh vertices); validator counts heads and tails",
+      "share_of_height": 0.04437,
+      "threshold_share": 0.02,
+      "uu": 2.4404
+     },
+     "passed": true
+    }
+   },
+   "clip_id": "MED-HitReact-draft",
+   "result": "PASS",
+   "role": "positive",
+   "source": {
+    "bytes": 1250348,
+    "fbx": "blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx",
+    "sha256": "606b998af967508ee0ddd000e3083b49e135bf9765ce14a313339aa054105af2"
+   },
+   "status": "technically_imported",
+   "target_mesh": "/Game/PipelineCandidates/Medusa/T4LocalPass/Meshes/SK_Medusa_Candidate",
+   "target_skeleton": "/Game/PipelineCandidates/Medusa/T4LocalPass/Meshes/SK_Medusa_Candidate_Skeleton.SK_Medusa_Candidate_Skeleton",
+   "ue": {
+    "component_scale_ratio_frame0_vs_reference": 1.0,
+    "frame_rate": 24.0,
+    "length_s": 0.375,
+    "num_frames": 9,
+    "num_keys": 10,
+    "root_motion_enabled": false,
+    "samples": [
+     {
+      "bone_SKEL_Medusa": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_hand_L": [
+       10.0,
+       4.5,
+       29.0
+      ],
+      "bone_head": [
+       0.0,
+       0.0,
+       38.5
+      ],
+      "bone_root": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_weapon": [
+       11.2,
+       6.0,
+       27.5
+      ],
+      "frame": 0,
+      "head_socket_to_head_bone_uu": 4.0,
+      "socket_Head": [
+       0.0,
+       4.0,
+       38.5
+      ],
+      "socket_Weapon": [
+       11.2,
+       6.0,
+       27.5
+      ],
+      "time_s": 0.0,
+      "weapon_socket_to_hand_L_uu": 2.4372
+     },
+     {
+      "bone_SKEL_Medusa": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_hand_L": [
+       10.0,
+       3.6502,
+       29.7131
+      ],
+      "bone_head": [
+       -0.0,
+       -2.4311,
+       38.2873
+      ],
+      "bone_root": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_weapon": [
+       11.2,
+       5.3879,
+       28.4963
+      ],
+      "frame": 3,
+      "head_socket_to_head_bone_uu": 4.0,
+      "socket_Head": [
+       -0.0,
+       1.3277,
+       39.6554
+      ],
+      "socket_Weapon": [
+       11.2,
+       5.3879,
+       28.4963
+      ],
+      "time_s": 0.125,
+      "weapon_socket_to_hand_L_uu": 2.4373
+     },
+     {
+      "bone_SKEL_Medusa": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_hand_L": [
+       10.0,
+       4.5,
+       29.0
+      ],
+      "bone_head": [
+       0.0,
+       0.0,
+       38.5
+      ],
+      "bone_root": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_weapon": [
+       11.2,
+       6.0,
+       27.5
+      ],
+      "frame": 9,
+      "head_socket_to_head_bone_uu": 4.0,
+      "socket_Head": [
+       0.0,
+       4.0,
+       38.5
+      ],
+      "socket_Weapon": [
+       11.2,
+       6.0,
+       27.5
+      ],
+      "time_s": 0.375,
+      "weapon_socket_to_hand_L_uu": 2.4372
+     }
+    ],
+    "tracks": [
+     "skel_medusa",
+     "root",
+     "hips",
+     "spine",
+     "head",
+     "arm_upper_l",
+     "arm_lower_l",
+     "hand_l",
+     "weapon",
+     "arm_upper_r",
+     "arm_lower_r",
+     "hand_r",
+     "leg_upper_l",
+     "leg_lower_l",
+     "foot_l",
+     "leg_upper_r",
+     "leg_lower_r",
+     "foot_r"
+    ],
+    "translation_scale_ratio_median": 1.0
+   },
+   "ue_asset": "/Game/PipelineCandidates/Medusa/DraftClips20260928/T4LocalPass/AM_Medusa_HitReact_Draft",
+   "validator": {
+    "as_expected": true,
+    "fails": [],
+    "report": "docs/art-pipeline/evidence/p1-ue-import-2026-09-28/clip-validator/AM_Medusa_HitReact.validation.json",
+    "result": "pass",
+    "warnings": [
+     "armature_object_name"
+    ]
+   }
+  },
+  {
+   "checks": {
+    "bone0_in_place_0.5uu": {
+     "expected": "<= 0.5 uu per axis",
+     "measured": {
+      "bone0": "SKEL_Medusa",
+      "first_to_last_delta_uu": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "max_abs_delta_uu_xyz": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "root_max_abs_delta_uu_xyz": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "note": "root motion is read from bone 0 (ue-pipeline-traps 2); root_motion_enabled=False",
+     "passed": true
+    },
+    "component_scale_1_at_importer_default": {
+     "expected": 1.0,
+     "measured": 1.0,
+     "passed": true
+    },
+    "fps_24": {
+     "expected": 24.0,
+     "measured": 24.0,
+     "passed": true
+    },
+    "frame0_matches_target_reference_pose": {
+     "expected": 0.0,
+     "measured": {
+      "component_max_offset_uu": 0.0,
+      "max_rotation_delta_deg": 0.0,
+      "max_translation_delta_uu": 0.0
+     },
+     "note": "the draft clips start in the rest pose, so frame 0 = reference pose of a compatible skeleton",
+     "passed": true
+    },
+    "keys_equal_source_frames": {
+     "expected": 57,
+     "measured": 57,
+     "passed": true
+    },
+    "length_equals_source_within_0.05s": {
+     "expected": "|delta| <= 0.05 s",
+     "measured": {
+      "delta_s": 3.3e-05,
+      "source_s": 2.3333,
+      "ue_s": 2.333333
+     },
+     "passed": true
+    },
+    "sockets_follow_bones_on_3_frames": {
+     "expected": "constant within 0.01 uu",
+     "measured": {
+      "frames": [
+       0,
+       28,
+       56
+      ],
+      "head_socket_to_head_bone_uu": [
+       4.0,
+       4.0,
+       4.0
+      ],
+      "weapon_socket_to_hand_L_uu": [
+       2.4372,
+       2.4372,
+       2.4372
+      ]
+     },
+     "note": "sockets of the target mesh evaluated with AnimPoseExtensions.get_socket_pose (component space)",
+     "passed": true
+    },
+    "visible_pose_change_2pct": {
+     "expected": ">= 2 % of 55 uu (proposal, not calibrated)",
+     "measured": {
+      "below_threshold": true,
+      "bone": "head",
+      "frame": 28,
+      "height_uu": 55.0,
+      "note": "bone joints only (no mesh vertices); validator counts heads and tails",
+      "share_of_height": 0.01111,
+      "threshold_share": 0.02,
+      "uu": 0.6108
+     },
+     "passed": false
+    }
+   },
+   "clip_id": "MED-Idle-draft",
+   "result": "FAIL (expected: negative control caught)",
+   "role": "negative_control",
+   "source": {
+    "bytes": 1251244,
+    "fbx": "blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx",
+    "sha256": "03085e87b313d4be9d6102af3d348871b33d30b58304a5f4dcee883caab52105"
+   },
+   "status": "measured",
+   "target_mesh": "/Game/PipelineCandidates/Medusa/T4LocalPass/Meshes/SK_Medusa_Candidate",
+   "target_skeleton": "/Game/PipelineCandidates/Medusa/T4LocalPass/Meshes/SK_Medusa_Candidate_Skeleton.SK_Medusa_Candidate_Skeleton",
+   "ue": {
+    "component_scale_ratio_frame0_vs_reference": 1.0,
+    "frame_rate": 24.0,
+    "length_s": 2.333333,
+    "num_frames": 56,
+    "num_keys": 57,
+    "root_motion_enabled": false,
+    "samples": [
+     {
+      "bone_SKEL_Medusa": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_hand_L": [
+       10.0,
+       4.5,
+       29.0
+      ],
+      "bone_head": [
+       0.0,
+       0.0,
+       38.5
+      ],
+      "bone_root": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_weapon": [
+       11.2,
+       6.0,
+       27.5
+      ],
+      "frame": 0,
+      "head_socket_to_head_bone_uu": 4.0,
+      "socket_Head": [
+       0.0,
+       4.0,
+       38.5
+      ],
+      "socket_Weapon": [
+       11.2,
+       6.0,
+       27.5
+      ],
+      "time_s": 0.0,
+      "weapon_socket_to_hand_L_uu": 2.4372
+     },
+     {
+      "bone_SKEL_Medusa": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_hand_L": [
+       10.0,
+       4.692,
+       28.7994
+      ],
+      "bone_head": [
+       -0.0,
+       0.6107,
+       38.4867
+      ],
+      "bone_root": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_weapon": [
+       11.2,
+       6.1251,
+       27.2354
+      ],
+      "frame": 28,
+      "head_socket_to_head_bone_uu": 4.0,
+      "socket_Head": [
+       -0.0,
+       4.6105,
+       38.5216
+      ],
+      "socket_Weapon": [
+       11.2,
+       6.1251,
+       27.2354
+      ],
+      "time_s": 1.16667,
+      "weapon_socket_to_hand_L_uu": 2.4372
+     },
+     {
+      "bone_SKEL_Medusa": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_hand_L": [
+       10.0,
+       4.5,
+       29.0
+      ],
+      "bone_head": [
+       0.0,
+       0.0,
+       38.5
+      ],
+      "bone_root": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "bone_weapon": [
+       11.2,
+       6.0,
+       27.5
+      ],
+      "frame": 56,
+      "head_socket_to_head_bone_uu": 4.0,
+      "socket_Head": [
+       0.0,
+       4.0,
+       38.5
+      ],
+      "socket_Weapon": [
+       11.2,
+       6.0,
+       27.5
+      ],
+      "time_s": 2.33333,
+      "weapon_socket_to_hand_L_uu": 2.4372
+     }
+    ],
+    "tracks": [
+     "skel_medusa",
+     "root",
+     "hips",
+     "spine",
+     "head",
+     "arm_upper_l",
+     "arm_lower_l",
+     "hand_l",
+     "weapon",
+     "arm_upper_r",
+     "arm_lower_r",
+     "hand_r",
+     "leg_upper_l",
+     "leg_lower_l",
+     "foot_l",
+     "leg_upper_r",
+     "leg_lower_r",
+     "foot_r"
+    ],
+    "translation_scale_ratio_median": 1.0
+   },
+   "ue_asset": "/Game/PipelineCandidates/Medusa/DraftClips20260928/T4LocalPass/AM_Medusa_Idle_Draft",
+   "validator": {
+    "as_expected": true,
+    "fails": [
+     "visible_pose_change"
+    ],
+    "report": "docs/art-pipeline/evidence/p1-ue-import-2026-09-28/clip-validator/AM_Medusa_Idle.negative-control.validation.json",
+    "result": "fail",
+    "warnings": [
+     "armature_object_name"
+    ]
+   }
+  }
+ ],
+ "date": "2026-09-28",
+ "destination": "/Game/PipelineCandidates/Medusa/DraftClips20260928/T4LocalPass",
+ "destination_note": "a separate folder: anims inside /Game/PipelineCandidates/Medusa/T4LocalPass would break that run's recursive ownership listing (tripo_pipeline ue-import refuses foreign assets)",
+ "editor": "live UnrealEditor 5.8.2, project unreal/Unmatched of the main checkout, MCP :8123 + editor console `py`",
+ "import_scale": {
+  "at_default_1.0": {
+   "bone0_scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "component_scale_ratio": 1.0,
+   "result": "matches the mesh"
+  },
+  "fact": "for these FBX (Blender FBX_SCALE_UNITS + UnitScaleFactor patched to 1.0, like UM_FBX_v1) the animation import scale is 1.0 (contract RIG-CONTRACT §5 / VALIDATION.md); the S05 value 100 belongs to FBX_SCALE_NONE exports (ue-pipeline-traps 3) and is wrong here",
+  "importer_default_import_uniform_scale": 1.0,
+  "probe_100": {
+   "bone0_scale_frame0": [
+    100.0,
+    100.0,
+    100.0
+   ],
+   "component_scale_ratio": 100.0,
+   "local_translation_ratio": 1.0,
+   "result": "x100 lands on bone 0 scale: the figure is 100 times too large"
+  },
+  "probe_asset_deleted_after_measurement": true
+ },
+ "importer": {
+  "after": true,
+  "before": true,
+  "cvar": "Interchange.FeatureFlags.Import.FBX",
+  "during": false,
+  "path": "legacy FBX (FbxImportUI FBXIT_ANIMATION, import_mesh false, no materials/textures)",
+  "restored": true
+ },
+ "not_checked": [
+  "art acceptance of the clips (draft 2-3 bone clips, ART-004)",
+  "playback in a packaged build (/Game/PipelineCandidates is not cooked)",
+  "UM_FBX_v1 re-export of the clips for the T4UmFbxV1 skeleton"
+ ],
+ "reimport": {
+  "cvar_restored": true,
+  "numbered_duplicates": [],
+  "replaced_existing": [
+   true,
+   true,
+   true
+  ],
+  "unchanged_listing": true
+ },
+ "schema": "unmatched.p1-ue-anim-report/1",
+ "skeleton_compatibility": {
+  "T4LocalPass": {
+   "compatible": true,
+   "max_rotation_delta_deg": 0.0,
+   "max_translation_delta_uu": 0.0,
+   "note": "same 18 bones and the same reference pose as the clips' rig (build_segmented_medusa.py) and as /Game/ART004 (root local rotation roll 90)",
+   "skeleton": "/Game/PipelineCandidates/Medusa/T4LocalPass/Meshes/SK_Medusa_Candidate_Skeleton"
+  },
+  "T4UmFbxV1": {
+   "compatible": false,
+   "component_max_offset_frame0_uu": 17.9689,
+   "note": "UM_FBX_v1 bakes the +90 deg export rotation into the root reference pose (yaw -90); the draft clips were exported without it, so their root track turns the figure back by 90 deg (front +Y instead of +X). Needs clips re-exported with UM_FBX_v1; the probe asset was deleted after the measurement",
+   "root_rotation_delta_deg": 90.0,
+   "skeleton": "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Meshes/SK_Medusa_Candidate_Skeleton"
+  }
+ },
+ "summary": {
+  "MED-HitReact-draft": "PASS",
+  "MED-Idle-draft": "FAIL (expected: negative control caught)",
+  "MED-LungeAttack-draft": "PASS"
+ },
+ "task": "stage 3 T2.1"
+}

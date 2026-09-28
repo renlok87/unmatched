@@ -3,6 +3,11 @@
 */pipeline/work/
 */pipeline/.staging/
 */pipeline/run.lock
+# Stage 3 T2.1 UE runs next to pipeline/ (ue-passthrough: CLI 0.4.0 passthrough + ue-import; ue-candidate: static-candidate)
+*/ue-*/work/
+*/ue-*/.staging/
+*/ue-*/run.lock
+*/ue-*/*.tmp-*
 *.blend1
 # Tripo embedded textures: byte copies of the images inside source/*.glb (~13.5 MB, no new information).
 # Restore: python art/pipeline-candidates/ASSET-DECOR-KIT-001/source-specs/restore_embedded_textures.py
@@ -10,3 +15,5 @@
 # Before-Smart-UV measurement run (reports/candidate-params-h31.json): only its report is kept.
 */reports/before-smartuv/*
 !*/reports/before-smartuv/reports/
+# UE FBX import (Interchange) extracts embedded textures next to the FBX (stage 3 T2.1 passthrough import)
+*.fbm/

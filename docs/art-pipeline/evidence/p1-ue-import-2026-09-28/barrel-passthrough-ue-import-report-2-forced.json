@@ -1,0 +1,131 @@
+{
+  "assets": [
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/SM_SM_Decor_Barrel_TripoPassthrough",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_basecolor_jpg",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_normal_png",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/tripo_node_eda72a47-8d18-4031-9e06-2c061ab998d8_material"
+  ],
+  "backend": {
+    "backend": "mcp",
+    "client": "unreal_mcp.py",
+    "endpoint": "127.0.0.1:8123/mcp"
+  },
+  "checks": {
+    "asset_class": {
+      "expected": "StaticMesh",
+      "measured": "StaticMesh",
+      "passed": true
+    },
+    "assets_saved": {
+      "measured": true,
+      "passed": true
+    },
+    "dimensions_match_blender_at_import_scale_1": {
+      "expected": [
+        80.7037,
+        80.4718,
+        97.9736
+      ],
+      "measured": [
+        80.704,
+        80.472,
+        97.974
+      ],
+      "note": "tolerance 1.0%; per axis X, Y, Z (UM_FBX_v1 export frame)",
+      "passed": true
+    },
+    "folder_contains_only_this_import": {
+      "measured": {
+        "folder_before_import": [],
+        "importer_side_products": {
+          "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_basecolor_jpg": "Texture2D",
+          "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_normal_png": "Texture2D",
+          "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/tripo_node_eda72a47-8d18-4031-9e06-2c061ab998d8_material": "Material"
+        },
+        "returned_by_import": [
+          "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/SM_SM_Decor_Barrel_TripoPassthrough"
+        ]
+      },
+      "note": "no stale assets from earlier attempts: folder empty before the call; extra assets are only importer side products (Material, MaterialInstanceConstant, Texture2D)",
+      "passed": true
+    },
+    "material_slots_equal_blender_materials": {
+      "expected": 1,
+      "measured": 1,
+      "passed": true
+    },
+    "no_numbered_duplicates": {
+      "measured": [],
+      "passed": true
+    },
+    "primary_asset_created": {
+      "measured": "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/SM_SM_Decor_Barrel_TripoPassthrough",
+      "passed": true
+    },
+    "triangles_equal_blender_roundtrip": {
+      "expected": 3837,
+      "measured": 3837,
+      "passed": true
+    }
+  },
+  "destination": {
+    "folder": "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough",
+    "kind": "static",
+    "primary_asset": "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/SM_SM_Decor_Barrel_TripoPassthrough"
+  },
+  "fbx": {
+    "path": "export/SM_Decor_Barrel_TripoPassthrough.fbx",
+    "sha256": "ee656a70e950ce4fbd6ea72b42b937775e9dfe043c98fa32183e936e6b350303"
+  },
+  "import_args": {
+    "asset_name": "SM_SM_Decor_Barrel_TripoPassthrough",
+    "combine_meshes": true,
+    "folder_path": "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough",
+    "import_materials": true,
+    "import_textures": true,
+    "source_file": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\art\\pipeline-candidates\\ASSET-DECOR-KIT-001\\20260928-p15-barrel\\ue-passthrough\\export\\SM_Decor_Barrel_TripoPassthrough.fbx"
+  },
+  "logic": "ue-import/2",
+  "measured": {
+    "bounds": {
+      "isValid": true,
+      "max": {
+        "x": 40.35186767578125,
+        "y": 40.23590087890625,
+        "z": 97.9736328125
+      },
+      "min": {
+        "x": -40.35186767578125,
+        "y": -40.23590087890625,
+        "z": 0
+      }
+    },
+    "kind": "static",
+    "material_slots": [
+      "tripo_node_eda72a47-8d18-4031-9e06-2c061ab998d8_material"
+    ],
+    "size_uu": [
+      80.704,
+      80.472,
+      97.974
+    ],
+    "triangles_lod0": 3837,
+    "vertices_lod0": 2501
+  },
+  "not_checked": [
+    "art acceptance, silhouette, lighting (art track)",
+    "budgets: measured numbers are not budgets until GD-058 is decided",
+    "BC/N/ORM material contract: this passthrough imports Tripo materials as-is",
+    "facing: this passthrough path has not been imported into the live UE yet (T3/T4 ran only the skeletal-candidate profile live); the per-axis size check relies on the ART-001 axis mapping"
+  ],
+  "passed": true,
+  "previous_assets_deleted": [
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/SM_SM_Decor_Barrel_TripoPassthrough",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/tripo_node_eda72a47-8d18-4031-9e06-2c061ab998d8_material",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_basecolor_jpg",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_normal_png"
+  ],
+  "stage": "ue-import",
+  "status": "technically_imported",
+  "tool_name_style": "short"
+}

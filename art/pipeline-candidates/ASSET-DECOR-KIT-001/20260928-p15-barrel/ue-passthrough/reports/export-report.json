@@ -1,0 +1,115 @@
+{
+  "blender": "5.2.2 LTS",
+  "checks": {
+    "blender_roundtrip_ratio_is_1": true,
+    "export_frame_rotated_as_preset": true,
+    "mesh_count_preserved": true,
+    "no_armature_expected": true,
+    "triangles_preserved": true,
+    "uv_present_on_all_meshes": true
+  },
+  "expected_ue_dimensions_note": "per UE axis X, Y, Z: export-frame size (UM_FBX_v1 rotation applied); UE flips only the sign of Y (ART-001)",
+  "expected_ue_dimensions_uu_at_import_scale_1": [
+    80.7037,
+    80.4718,
+    97.9736
+  ],
+  "fbx": {
+    "bytes": 4393260,
+    "file": "SM_Decor_Barrel_TripoPassthrough.fbx",
+    "settings": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "creation_time_pinned": "2000-01-01T00:00:00",
+      "data_scale": 100.0,
+      "deviations_from_preset": {
+        "path_mode": "COPY + embed instead of AUTO: the passthrough carries Tripo's own textures inside the FBX"
+      },
+      "embed_textures": true,
+      "export_space_rotation_z_degrees": 90.0,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "COPY",
+      "preset": {
+        "file": "UM_FBX_v1.json",
+        "name": "UM_FBX_v1",
+        "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+        "version": "1.0.0"
+      },
+      "texture_paths": "relative names only; bytes embedded",
+      "unit_scale_factor_after_patch": 1.0,
+      "use_triangles": true
+    },
+    "sha256": "ee656a70e950ce4fbd6ea72b42b937775e9dfe043c98fa32183e936e6b350303"
+  },
+  "note": "technical passthrough; not a game asset and not art-accepted",
+  "passed": true,
+  "roundtrip_dimension_ratio": [
+    1.0,
+    1.000001,
+    1.0
+  ],
+  "roundtrip_export_frame": {
+    "bounds_dimensions": [
+      0.807037,
+      0.804718,
+      0.979736
+    ],
+    "bounds_min": [
+      -0.403519,
+      -0.402359,
+      0.0
+    ]
+  },
+  "roundtrip_reimport": {
+    "armatures": 0,
+    "bounds_dimensions": [
+      0.804718,
+      0.807038,
+      0.979736
+    ],
+    "bounds_min": [
+      -0.402359,
+      -0.403519,
+      0.0
+    ],
+    "images": [
+      "decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_basecolor.jpg.001",
+      "decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_normal.png.001"
+    ],
+    "material_count": 1,
+    "mesh_count": 1,
+    "triangles_total": 3837,
+    "uv_layers_min": 1
+  },
+  "scene_before_export": {
+    "armatures": 0,
+    "bounds_dimensions": [
+      0.804718,
+      0.807037,
+      0.979736
+    ],
+    "bounds_min": [
+      -0.402359,
+      -0.403519,
+      0.0
+    ],
+    "images": [
+      "decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_basecolor.jpg",
+      "decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_normal.png",
+      "decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_rm.png"
+    ],
+    "material_count": 1,
+    "mesh_count": 1,
+    "triangles_total": 3837,
+    "uv_layers_min": 1
+  },
+  "stage": "export",
+  "texture_transport": {
+    "images_after_roundtrip": 2,
+    "images_before_export": 3,
+    "note": "Blender FBX writer embeds only textures wired to supported Principled inputs; glTF metallic/roughness via Separate Color is not transported. Informational: BC/N/ORM packing is a later candidate stage, not part of this passthrough."
+  }
+}

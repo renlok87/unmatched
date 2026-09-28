@@ -3,6 +3,7 @@
 Срез: 2026-09-28. Инструмент: `tools/tripo-pipeline/tripo_pipeline.py`, версия 0.4.0.
 
 - T4 добавил профиль `skeletal-candidate` (раздел [Профиль skeletal-candidate](#профиль-skeletal-candidate-t4)).
+- Этап 3, T2.1 добавил профиль `static-candidate` для статических пропсов (раздел [Профиль static-candidate](#профиль-static-candidate-этап-3-t21)).
 - После P0-ревью каждый FBX инструмента пишется по пресету **UM_FBX_v1** (раздел [Оси и FBX-пресет UM_FBX_v1](#оси-и-fbx-пресет-um_fbx_v1)).
 
 Нужны Python 3.10+ (stdlib) и Blender 5.2 для стадий `import`/`export`/`build`.
@@ -86,6 +87,7 @@ UE отображает кадр экспорта Blender как `(x, −y, z)` 
 
 - `--profile passthrough` — по умолчанию, T3: статический FBX геометрии Tripo как есть (оси — UM_FBX_v1);
 - `--profile skeletal-candidate --build-profile <JSON>` — T4: игровой кандидат.
+- `--profile static-candidate --build-profile <JSON>` — этап 3, T2.1: статический пропс, собранный вне CLI.
 
 От профиля зависит набор стадий:
 
@@ -93,6 +95,7 @@ UE отображает кадр экспорта Blender как `(x, −y, z)` 
 |---|---|
 | passthrough | preflight → import → verify → export [→ ue-import] |
 | skeletal-candidate | preflight → import → verify → atlas → build [→ ue-import] |
+| static-candidate | preflight → adopt [→ ue-import] |
 
 Стадия чужого профиля отказывает с кодом 2 (`stage export is not part of profile skeletal-candidate`).
 
@@ -258,6 +261,56 @@ UE отображает кадр экспорта Blender как `(x, −y, z)` 
 Результат на Medusa: [medusa-local-pass-report.md](medusa-local-pass-report.md) и
 [medusa-local-pass-report.json](medusa-local-pass-report.json).
 
+## Профиль static-candidate (этап 3, T2.1)
+
+Кандидат статического пропса собирает `blender/static_prop_candidate.py` (P1.5, бочка), а не CLI. Профиль
+`static-candidate` фиксирует готовые файлы и импортирует их в UE по контракту 04 §1.
+
+Профиль сборки (`schema` как у skeletal-candidate, `kind: "static-candidate"`), пример:
+[decor-barrel-static-um-fbx-v1.json](../../art/pipeline-candidates/ASSET-DECOR-KIT-001/build-profiles/decor-barrel-static-um-fbx-v1.json).
+
+- `candidate`: каталог кандидата, FBX, BC/N/ORM, `candidate-report.json` (схема
+  `unmatched.tripo-pipeline.static-prop-candidate/1`) и `fbx-readback.json` (`check_static_prop_fbx.py`);
+- `ue`: имена ассетов, `collision: "none"`, `two_sided: false`, нейтральный `team_color`, текстуры
+  (BC — sRGB, `TC_Default`; N — linear, `TC_Normalmap`, `flip_green: false`, DirectX; ORM — linear, `TC_Masks`),
+  `shared_master` (`/Game/S05/M_DioramaMaster` и имена текстурных параметров);
+- `axes.protrusion_axis_ue` — ось выступа (у бочки пробка), по габаритам видна только ось, знак — по кадру.
+
+Стадия **adopt** ничего не копирует. Она пересчитывает SHA-256 файлов кандидата и сверяет их с отчётом кандидата.
+Проверяет, что все проверки отчёта прошли, что исходник кандидата равен зарегистрированной первичной роли и что
+настройки экспорта равны пресету UM_FBX_v1. По read-back сверяет треугольники, одну сетку без арматуры, замкнутость и
+число слотов. Пишет `reports/adopt-report.json` с ожиданиями для UE: треугольники, размеры, предсказанные границы
+UE как (x, −y, z) от read-back, размер текстур.
+
+Стадия **ue-import** этого профиля:
+
+- заново хеширует файлы из adopt-отчёта и отказывает, если они изменились;
+- импортирует три PNG и выставляет sRGB, сжатие и flip green;
+- материал: если `shared_master` существует и у него есть все текстурные параметры, MI создаётся от него. Иначе
+  создаётся свой `M_<...>_Candidate` (BC × TeamColor, нормаль, ORM: R→AO, G→Roughness, B→Metallic, TwoSided=false),
+  а отклонение пишется в `deviations` отчёта. На 2026-09-28 `M_DioramaMaster` существует, но в нём только
+  векторные и скалярные параметры, текстурных нет (измерено), поэтому бочка идёт по второй ветке;
+- импортирует меш с `import_materials=false`, `import_textures=false`, снимает коллизию (`remove_collisions`) и
+  назначает MI на единственный слот;
+- проверяет: папка пуста перед импортом, ассеты ровно по плану, нет `Name_1`, классы, свойства текстур,
+  граф и односторонность материала, родитель и TeamColor MI, слот, треугольники LOD0, размеры ±1 %, pivot в центре
+  основания, границы по UM_FBX_v1 (±0,05 uu), ось выступа, нет простой коллизии, всё сохранено.
+
+Повторный `ue-import` пропускается, если в папке ровно свои ассеты. `--force` удаляет свои ассеты и импортирует
+заново, `Name_1` не появляется. Проверено вживую на бочке:
+[evidence/p1-ue-import-2026-09-28/](evidence/p1-ue-import-2026-09-28/README.md).
+
+### Поведение UE 5.8 MCP (измерено в T2.1)
+
+- `StaticMeshTools.import_file` (Interchange) возвращает только меш. Материалы и текстуры, созданные импортёром рядом,
+  в ответ не попадают. Поэтому проверка passthrough `folder_contains_only_this_import` теперь требует пустую
+  папку перед импортом и допускает рядом только побочные продукты импорта (Material, MaterialInstanceConstant,
+  Texture2D). Первая живая попытка passthrough на бочке упала именно здесь; отчёт сохранён.
+- Статический импорт через MCP создаёт 1 выпуклый элемент коллизии (`BodySetup.AggGeom.convexElems`).
+- В MCP нет инструмента консоли и полноценного Python: sandbox `ProgrammaticToolset` разрешает только
+  json/math/re/… Для FBX-анимаций, консольных переменных и замеров AnimSequence используется `py "<файл>"` в поле
+  Cmd редактора, через `review/ue_live.py` (SlateInspector → Type).
+
 ## Схема каталогов
 
 ```
@@ -277,7 +330,7 @@ tools/tripo-pipeline/
 art/pipeline-candidates/
   .gitignore                   work/, .staging/, run.lock, *.tmp-*
   <ASSET-ID>/source-specs/     описания уже оплаченных Tripo-задач (вход register-source)
-  <ASSET-ID>/build-profiles/   профили сборки skeletal-candidate
+  <ASSET-ID>/build-profiles/   профили сборки skeletal-candidate и static-candidate
   <ASSET-ID>/<run-id>/         один изолированный прогон кандидата:
     manifest.json              состояние прогона (схема ниже)
     journal.jsonl              журнал событий (append-only)
@@ -406,8 +459,11 @@ docs/art-pipeline/
   - Проверено на живом редакторе игрового проекта: профиль `skeletal-candidate` импортирован в T4
     (`/Game/PipelineCandidates/Medusa/T4LocalPass`) и при исправлении (`.../T4UmFbxV1`). Сработали короткие имена
     инструментов, ответы пришли в `structuredContent`.
-  - **Ветка passthrough на живом UE не проверялась**: её `ue-import` ни разу не запускался против редактора. Её проверки
-    основаны на фейке и на карте осей ART-001.
+  - Ветка passthrough на живом UE проверена в этапе 3, T2.1: бочка, run
+    `art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-passthrough` (экспорт UM_FBX_v1, размеры по
+    осям UE X, Y, Z совпали с export-отчётом, `--force` без `Name_1`), см.
+    [evidence/p1-ue-import-2026-09-28/](evidence/p1-ue-import-2026-09-28/README.md). До этого её проверки основывались
+    на фейке и на карте осей ART-001.
 
 Пути клиентов переопределяются `--blender-mcp-client`, `--unreal-mcp-client` или (для тестов)
 переменными `TRIPO_PIPELINE_BLENDER_MCP_CMD` / `TRIPO_PIPELINE_UNREAL_MCP_CMD` (JSON-список команды).
@@ -422,7 +478,7 @@ docs/art-pipeline/
 | import | хеш основного GLB до и после; импорт в изолированную сцену; меши, треугольники, UV-слои, слоты материалов, изображения (цветовое пространство, упаковка), границы в метрах, открытые/неманифолдные рёбра после диагностической сварки 1e-7 | `work/*.blend`, `reports/import-report.json` |
 | verify | совпадение с evidence (число мешей, треугольники, материалы, изображения, скины); потеря треугольников Blender-импортом ≤ 0,1 % по каждому мешу; UV0 на каждом меше; арматуры как ожидалось; невырожденные границы | `reports/verify-report.json` (`status: measured`) |
 | export | пресет UM_FBX_v1: поворот +90° по Z, данные ×100 (метры → сантиметры), `FBX_SCALE_UNITS`, −Y вперёд, Z вверх, Triangulate, `UnitScaleFactor` = 1.0 (UE импортирует в масштабе 1.0); текстуры встраиваются (записанное отклонение от пресета); зафиксированы время и UUID FBX → детерминированные байты; round-trip: размеры в кадре экспорта = авторские, повёрнутые пресетом; после обратного поворота — те же меши и треугольники, UV, нет арматуры, коэффициент размеров 1.0; `expected_ue_dimensions_uu_at_import_scale_1` — по осям UE X, Y, Z | `export/*.fbx`, `reports/export-report.json` |
-| ue-import (только mcp) | папка кандидата; нет чужих ассетов; нет `Name_N`-дублей; папка содержит ровно этот импорт; класс ассета; число слотов = число материалов после round-trip; размеры = ожидаемые ±1 % по каждой оси UE X, Y, Z; треугольники LOD0 = round-trip ±0,1 % (static); кости и сокеты записываются (skeletal); сохранение. **На живом UE для passthrough не проверялось.** | `reports/ue-import-report.json` (`status: technically_imported`), `reports/ue-mcp-calls.json` |
+| ue-import (только mcp) | папка кандидата; нет чужих ассетов; нет `Name_N`-дублей; папка содержит ровно этот импорт; класс ассета; число слотов = число материалов после round-trip; размеры = ожидаемые ±1 % по каждой оси UE X, Y, Z; треугольники LOD0 = round-trip ±0,1 % (static); кости и сокеты записываются (skeletal); сохранение. На живом UE для passthrough проверено в этапе 3, T2.1 (бочка). | `reports/ue-import-report.json` (`status: technically_imported`), `reports/ue-mcp-calls.json` |
 
 Таблица выше описывает профиль passthrough. В нём не проверяются нормали и winding, BC/Normal/ORM и TeamColor,
 pivot и root, кости и сокеты — всё это проверяет профиль skeletal-candidate (раздел выше).
@@ -503,7 +559,7 @@ python tools/tripo-pipeline/review/capture_ue_review.py --run-dir $R --out <ка
 python -m unittest discover -s tools/tripo-pipeline/tests -v
 ```
 
-Тестов пайплайна 59 (2026-09-28, версия 0.4.0: все прошли, включая настоящий Blender). В том же каталоге лежат ещё
+Тестов пайплайна 67 (2026-09-28, версия 0.4.0; 59 до этапа 3 и 8 тестов static-candidate из T2.1). В том же каталоге лежат ещё
 27 тестов T1/T2 (`test_check_inputs.py`, `test_validate_registry.py`); за них отвечают их владельцы.
 
 - `test_pipeline.py` — регистрация (no-op, конфликт, хеши evidence, Studio/API-кредиты, batch,
@@ -531,6 +587,10 @@ python -m unittest discover -s tools/tripo-pipeline/tests -v
   - эталон с фронтом +Y переводится картой границ во фронт кандидата +X;
   - профиль без `fbx_preset` отказывает на preflight; правка пресета пересобирает build;
   - отказ UE при импорте на занятое имя, чужой ассет, провал контракта и чистый повтор;
+- `test_static_candidate.py` — профиль static-candidate (этап 3, T2.1): adopt, ue-import с 6 ассетами и снятой
+  коллизией, пропуск повтора, `--force` без `Name_1`, ветка общего мастера с текстурными параметрами и без них
+  (отклонение), отказ adopt при расхождении байт с отчётом кандидата, отказ ue-import после правки кандидата,
+  провал контракта треугольников, чужой ассет в папке, `--build-profile` только для профилей, которые его читают;
 - `test_candidate_integration.py` — настоящий Blender headless на исходнике Medusa во временном run-каталоге:
   - все контракты build проходят, второй прогон ничего не меняет;
   - экспорт по UM_FBX_v1: лицо +X в кадре экспорта, Triangulate без изменения геометрии, угловые нормали и кости
@@ -584,7 +644,7 @@ Run-каталог: `art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t3-scaffo
 - реальный формат ответов `call_tool` на игровом проекте;
 - фактические размеры, треугольники и слоты в UE — только для профиля `skeletal-candidate`.
 
-Ветка passthrough в живой UE так и не импортировалась.
+Ветка passthrough в живой UE в T3 и T4 так и не импортировалась (впервые — в этапе 3, T2.1, на бочке).
 
 **FBX этого прогона сделан до UM_FBX_v1** (инструмент 0.2.0: без поворота и Triangulate, лицо было бы +Y). Прогон
 оставлен как есть, как доказательство идемпотентности. Следующий `run` инструментом 0.4.0 переэкспортирует его по

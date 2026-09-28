@@ -19,11 +19,15 @@ Commands:
   build              Blender: skeletal candidate + separate base from a build profile, deterministic
                      FBX with the profile's preset (UM_FBX_v1: face -Y -> +X), round-trip and
                      reference checks (profile skeletal-candidate)
+  adopt              pin an externally built static prop candidate (FBX + BC/N/ORM, e.g. from
+                     blender/static_prop_candidate.py) against its candidate/read-back reports
+                     (profile static-candidate); copies nothing
   ue-import          UE (only --backend mcp): import into /Game/PipelineCandidates/... without
                      duplicates and measure the import contracts
   run                all stages of the run's profile (skips up-to-date stages):
                        passthrough:        preflight -> import -> verify -> export [-> ue-import]
                        skeletal-candidate: preflight -> import -> verify -> atlas -> build [-> ue-import]
+                       static-candidate:   preflight -> adopt [-> ue-import]
   resume             continue an interrupted run from the first unfinished stage
   status             print the manifest summary
   snapshot           hash every run file (proof of "no duplicates" between runs)
@@ -74,6 +78,8 @@ VERIFY_LOGIC_VERSION = "verify/1"
 PREFLIGHT_LOGIC_VERSION = "preflight/4"
 UE_IMPORT_LOGIC_VERSION = "ue-import/2"
 UE_CANDIDATE_LOGIC_VERSION = "ue-candidate/2"
+UE_STATIC_LOGIC_VERSION = "ue-static-candidate/1"
+ADOPT_LOGIC_VERSION = "adopt/1"
 
 EXIT_OK = 0
 EXIT_FAILED = 1
@@ -101,12 +107,17 @@ DEFAULT_MCP_CLIENTS = Path("C:/Users/ren/.claude/mcp-servers/clients")
 BACKENDS = ("headless", "mcp")
 PASSTHROUGH = "passthrough"
 CANDIDATE = "skeletal-candidate"
-PROFILES = (PASSTHROUGH, CANDIDATE)
+STATIC = "static-candidate"
+PROFILES = (PASSTHROUGH, CANDIDATE, STATIC)
+BUILD_PROFILE_KINDS = (CANDIDATE, STATIC)  # profiles that read --build-profile
 STAGES = ("preflight", "import", "verify", "export")  # passthrough profile (T3)
 CANDIDATE_STAGES = ("preflight", "import", "verify", "atlas", "build")
+# static-candidate: the candidate FBX/BC/N/ORM were built outside this tool (static_prop_candidate.py);
+# `adopt` pins their bytes against the candidate report before the UE stage imports them.
+STATIC_STAGES = ("preflight", "adopt")
 UE_STAGE = "ue-import"
 ALL_STAGES = STAGES + (UE_STAGE,)
-KNOWN_STAGES = ("preflight", "import", "verify", "export", "atlas", "build", UE_STAGE)
+KNOWN_STAGES = ("preflight", "import", "verify", "export", "atlas", "build", "adopt", UE_STAGE)
 UE_ALLOWED_ROOT = "/Game/PipelineCandidates/"
 UE_TOOLSETS = {
     "asset": "editor_toolset.toolsets.asset.AssetTools",
@@ -705,7 +716,7 @@ def run_profile(manifest: dict) -> str:
 
 
 def base_stages(manifest: dict) -> tuple:
-    return CANDIDATE_STAGES if run_profile(manifest) == CANDIDATE else STAGES
+    return {CANDIDATE: CANDIDATE_STAGES, STATIC: STATIC_STAGES}.get(run_profile(manifest), STAGES)
 
 
 def stage_order(manifest: dict) -> tuple:
@@ -715,7 +726,8 @@ def stage_order(manifest: dict) -> tuple:
 def load_build_profile(ctx: "Context") -> tuple:
     rel = ctx.manifest["config"].get("build_profile")
     if not rel:
-        raise PipelineError("run has no build profile (init --profile %s --build-profile ...)" % CANDIDATE, EXIT_USAGE)
+        raise PipelineError("run has no build profile (init --profile %s --build-profile ...)"
+                            % "|".join(BUILD_PROFILE_KINDS), EXIT_USAGE)
     path = ctx.repo_path(rel)
     if not path.is_file():
         raise PipelineError("build profile missing: %s" % rel)
@@ -747,7 +759,7 @@ def fbx_preset(ctx: "Context") -> dict:
 
     Returns {"rel", "path", "sha256", "name", "rotation_z"}; raises when missing or not UM_FBX_v1-shaped.
     """
-    if run_profile(ctx.manifest) == CANDIDATE:
+    if run_profile(ctx.manifest) in BUILD_PROFILE_KINDS:
         profile, _ = load_build_profile(ctx)
         rel = profile.get("fbx_preset")
         if not rel:
@@ -902,6 +914,18 @@ def exec_preflight(ctx: Context, staging: Path) -> StageResult:
             check("build_profile_valid", False, error=str(exc))
         deps = atlas_python_deps()
         check("atlas_python_deps", deps.get("ok"), measured=deps)
+    elif run_profile(m) == STATIC:
+        try:
+            profile, ppath = load_build_profile(ctx)
+            check("build_profile_valid", profile.get("kind") == STATIC,
+                  measured={"path": m["config"]["build_profile"], "id": profile["profile_id"],
+                            "kind": profile.get("kind"), "sha256": sha256_file(ppath)}, expected={"kind": STATIC})
+            check("build_profile_role_is_primary", profile["source_role"] == m["config"]["primary_role"],
+                  measured=profile["source_role"], expected=m["config"]["primary_role"])
+            missing = [rel for rel in static_candidate_files(profile).values() if not ctx.repo_path(rel).is_file()]
+            check("static_candidate_files_present", not missing, missing=missing)
+        except (PipelineError, KeyError) as exc:
+            check("build_profile_valid", False, error=str(exc))
         check("candidate_scripts_present", ATLAS_SCRIPT.is_file() and BLENDER_SCRIPTS["build"].is_file(),
               scripts={"atlas": sha256_file(ATLAS_SCRIPT) if ATLAS_SCRIPT.is_file() else None})
     try:
@@ -1219,6 +1243,16 @@ def ue_plan(ctx: Context) -> dict:
     if not (folder + "/").startswith(UE_ALLOWED_ROOT) or ".." in folder:
         raise PipelineError("UE folder must be inside %s (never /Game/ART004 or /Game/ArtPreview): %s"
                             % (UE_ALLOWED_ROOT, folder), EXIT_USAGE)
+    if run_profile(m) == STATIC:
+        profile, _ = load_build_profile(ctx)
+        u = profile["ue"]
+        names = {"static": "%s/Meshes/%s" % (folder, u["static_asset"]),
+                 "material": "%s/Materials/%s" % (folder, u["material"]),
+                 "instance": "%s/Materials/%s" % (folder, u["instance"])}
+        for key, tex in u["textures"].items():
+            names["texture:" + key] = "%s/Textures/%s" % (folder, tex["asset"])
+        return {"folder": folder, "name": u["static_asset"], "kind": STATIC, "primary": names["static"],
+                "names": names, "profile": profile}
     if run_profile(m) == CANDIDATE:
         profile, _ = load_build_profile(ctx)
         u = profile["ue"]
@@ -1242,6 +1276,11 @@ def ue_plan(ctx: Context) -> dict:
 
 def fp_ue_import(ctx: Context) -> dict:
     m = ctx.manifest
+    if run_profile(m) == STATIC:
+        _, ppath = load_build_profile(ctx)
+        return {"logic": UE_STATIC_LOGIC_VERSION, "backend": ctx.backend, "ue": m["config"].get("ue"),
+                "profile_sha256": sha256_file(ppath),
+                "adopt_report": stage_output_sha(m, "adopt", "reports/adopt-report.json")}
     if run_profile(m) == CANDIDATE:
         profile, ppath = load_build_profile(ctx)
         outs = {}
@@ -1271,6 +1310,7 @@ def within(measured, expected, tolerance) -> bool:
     return expected is not None and measured is not None and abs(measured - expected) <= abs(expected) * tolerance
 
 
+IMPORTER_SIDE_PRODUCT_CLASSES = ("Material", "MaterialInstanceConstant", "Texture2D")
 UE_DELETE_RANK = {"MaterialInstanceConstant": 0, "SkeletalMesh": 1, "StaticMesh": 1, "PhysicsAsset": 1,
                   "Skeleton": 2, "Material": 3, "Texture2D": 4}
 
@@ -1297,6 +1337,8 @@ def exec_ue_import(ctx: Context, staging: Path) -> StageResult:
     m = ctx.manifest
     if run_profile(m) == CANDIDATE:
         return exec_ue_candidate(ctx, staging)
+    if run_profile(m) == STATIC:
+        return exec_ue_static_candidate(ctx, staging)
     ue = ctx.unreal()
     cfg = m["config"]["ue"]
     rec = m["stages"][UE_STAGE]
@@ -1318,6 +1360,7 @@ def exec_ue_import(ctx: Context, staging: Path) -> StageResult:
     deleted = ue_delete_owned(ue, before)
     rec["ue_owned_assets"] = []
     ctx.save()
+    pre_import = ue_listing(ue, folder)
     args = {"folder_path": folder, "asset_name": plan["name"], "source_file": str(fbx),
             "import_materials": bool(cfg.get("import_materials", True)),
             "import_textures": bool(cfg.get("import_textures", True))}
@@ -1345,8 +1388,17 @@ def exec_ue_import(ctx: Context, staging: Path) -> StageResult:
     check("primary_asset_created", primary in after, primary)
     dupes = [a for a in after if re.fullmatch(re.escape(primary) + r"_\d+", a)]
     check("no_numbered_duplicates", not dupes, dupes)
-    check("folder_contains_only_this_import", set(after) == set(created), {"folder": after, "import": created},
-          note="no stale assets from earlier attempts")
+    # UE 5.8 MCP import_file returns only the mesh (measured live 2026-09-28, T2.1 barrel passthrough);
+    # the materials/textures the importer creates next to it are side products of the same call. The
+    # folder was empty right before the call, so everything in it now comes from this import.
+    side = sorted(set(after) - set(created))
+    side_classes = {a: str(ue.call("asset", "get_asset_class", {"asset_path": a})).rsplit(".", 1)[-1] for a in side}
+    check("folder_contains_only_this_import",
+          not pre_import and set(created) <= set(after) and
+          all(c in IMPORTER_SIDE_PRODUCT_CLASSES for c in side_classes.values()),
+          {"folder_before_import": pre_import, "returned_by_import": created, "importer_side_products": side_classes},
+          note="no stale assets from earlier attempts: folder empty before the call; extra assets are only "
+               "importer side products (%s)" % ", ".join(IMPORTER_SIDE_PRODUCT_CLASSES))
     asset_class = ue.call("asset", "get_asset_class", {"asset_path": primary})
     expected_class = "SkeletalMesh" if kind == "skeletal" else "StaticMesh"
     check("asset_class", str(asset_class).rsplit(".", 1)[-1] == expected_class, asset_class, expected_class)
@@ -1832,6 +1884,426 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
                        passed, None if passed else "ue-import failed: %s" % ", ".join(failed))
 
 
+# ------------------------------------------------- static-candidate: adopt, ue-import
+
+ADOPT_PRESET_KEYS = ("axis_forward", "axis_up", "export_space_rotation_z_degrees", "temporary_data_scale",
+                     "patch_fbx_unit_scale_to", "apply_scale_options", "use_triangles", "mesh_smooth_type",
+                     "path_mode")
+
+
+def static_candidate_files(profile: dict) -> dict:
+    """Repo-relative paths of the adopted candidate: fbx, texture:<key>, report, readback."""
+    c = profile["candidate"]
+    base = c["dir"].rstrip("/")
+    files = {"fbx": "%s/%s" % (base, c["fbx"]), "report": "%s/%s" % (base, c["report"]),
+             "readback": "%s/%s" % (base, c["readback"])}
+    for key, rel in sorted(c["textures"].items()):
+        files["texture:" + key] = "%s/%s" % (base, rel)
+    return files
+
+
+def fp_adopt(ctx: Context) -> dict:
+    m = ctx.manifest
+    profile, ppath = load_build_profile(ctx)
+    primary = source_file(m, m["config"]["primary_source"], m["config"]["primary_role"])
+    files = {}
+    for key, rel in sorted(static_candidate_files(profile).items()):
+        path = ctx.repo_path(rel)
+        files[key] = sha256_file(path) if path.is_file() else None
+    return {"logic": ADOPT_LOGIC_VERSION, "profile_sha256": sha256_file(ppath), "source_sha256": primary["sha256"],
+            "files": files, "fbx_preset": fbx_preset(ctx)["sha256"]}
+
+
+def exec_adopt(ctx: Context, staging: Path) -> StageResult:
+    """Pin the externally built static candidate (FBX + BC/N/ORM) against its own reports.
+
+    Nothing is copied: the report records repo-relative paths and SHA-256; ue-import re-hashes them.
+    """
+    m = ctx.manifest
+    profile, ppath = load_build_profile(ctx)
+    c = profile["candidate"]
+    files = static_candidate_files(profile)
+    missing = [rel for rel in files.values() if not ctx.repo_path(rel).is_file()]
+    if missing:
+        raise PipelineError("static candidate files missing: %s" % missing)
+    hashes = {key: sha256_file(ctx.repo_path(rel)) for key, rel in sorted(files.items())}
+    report = json.loads(ctx.repo_path(files["report"]).read_text(encoding="utf-8"))
+    readback = json.loads(ctx.repo_path(files["readback"]).read_text(encoding="utf-8"))
+    primary = source_file(m, m["config"]["primary_source"], m["config"]["primary_role"])
+    preset = fbx_preset(ctx)
+    preset_data = json.loads(preset["path"].read_text(encoding="utf-8"))
+    checks = {}
+
+    def check(name, passed, measured=None, expected=None, note=None):
+        item = {"passed": bool(passed), "measured": measured}
+        if expected is not None:
+            item["expected"] = expected
+        if note:
+            item["note"] = note
+        checks[name] = item
+
+    check("candidate_report_schema", report.get("schema") == c["report_schema"], report.get("schema"),
+          c["report_schema"])
+    failed_checks = sorted(k for k, v in (report.get("checks") or {}).items() if v is not True)
+    check("candidate_report_checks_passed", report.get("checks_passed") is True and not failed_checks,
+          {"checks_passed": report.get("checks_passed"), "failed": failed_checks})
+    check("candidate_not_claimed_art_accepted", (report.get("claims") or {}).get("art_accepted") is False,
+          report.get("claims"))
+    check("candidate_built_from_registered_primary_source",
+          (report.get("source") or {}).get("sha256") == primary["sha256"],
+          (report.get("source") or {}).get("sha256"), primary["sha256"])
+    exp = report.get("export") or {}
+    check("fbx_bytes_match_candidate_report", hashes["fbx"] == exp.get("sha256"), hashes["fbx"], exp.get("sha256"))
+    outs = (report.get("textures") or {}).get("outputs") or {}
+    tex_ok = {k: hashes["texture:" + k] == (outs.get(k) or {}).get("sha256") for k in c["textures"]}
+    check("texture_bytes_match_candidate_report", all(tex_ok.values()), tex_ok)
+    size = (report.get("params") or {}).get("texture_size")
+    px = {k: inspect_png(ctx.repo_path(files["texture:" + k])).get("pixels") for k in c["textures"]}
+    check("texture_size", all(v == [size, size] for v in px.values()), px, [size, size])
+    settings = exp.get("settings") or {}
+    diffs = {k: [settings.get(k), preset_data.get(k)] for k in ADOPT_PRESET_KEYS
+             if settings.get(k) != preset_data.get(k)}
+    conformance = exp.get("um_fbx_v1_conformance") or []
+    check("fbx_export_settings_equal_preset", not diffs and bool(conformance) and
+          all(i.get("conforms") for i in conformance),
+          {"differences": diffs, "preset": preset["rel"], "conformance_rows": len(conformance)},
+          note="candidate-report export.settings vs %s" % preset["rel"])
+    rt = report.get("roundtrip") or {}
+    topo = readback.get("topology_welded_1um") or {}
+    check("readback_is_this_fbx", Path(readback.get("fbx", "")).as_posix() == files["fbx"], readback.get("fbx"),
+          files["fbx"])
+    check("readback_triangles_equal_report", readback.get("triangles") == rt.get("triangles"),
+          readback.get("triangles"), rt.get("triangles"))
+    check("readback_single_mesh_no_armature",
+          readback.get("armatures") == 0 and len(readback.get("mesh_objects") or []) == 1,
+          {"armatures": readback.get("armatures"), "mesh_objects": readback.get("mesh_objects")})
+    check("readback_closed_manifold", bool(topo) and all(v == 0 for v in topo.values()), topo)
+    check("readback_material_slots_equal_report",
+          len(readback.get("material_slots") or []) == report.get("material_slots"),
+          readback.get("material_slots"), report.get("material_slots"))
+    lo, hi = readback.get("bounds_min_uu"), readback.get("bounds_max_uu")
+    expected = {
+        "triangles": rt.get("triangles"),
+        "material_slots": report.get("material_slots"),
+        "texture_px": size,
+        "size_uu_at_import_scale_1": rt.get("expected_ue_dimensions_uu_at_import_scale_1"),
+        # FBX read back in Blender = UM_FBX_v1 export frame; UE shows it as (x, -y, z) (ART-001)
+        "ue_bounds_uu_predicted": {"min": [lo[0], -hi[1], lo[2]], "max": [hi[0], -lo[1], hi[2]]} if lo and hi else None,
+        "protrusion_axis_export_frame": readback.get("protrusion_axis_blender"),
+        "protrusion_direction_deg_from_plus_x": readback.get("protrusion_direction_deg_from_plus_x_ccw"),
+    }
+    passed = all(v["passed"] for v in checks.values())
+    script = report.get("script_sha256_lf")
+    out = {"stage": "adopt", "logic": ADOPT_LOGIC_VERSION, "status": "measured" if passed else "failed",
+           "profile": {"path": m["config"]["build_profile"], "id": profile["profile_id"], "sha256": sha256_file(ppath)},
+           "inputs": {files[k]: v for k, v in sorted(hashes.items())}, "keys": files,
+           "expectations_for_ue": expected, "checks": checks, "passed": passed,
+           "note": "the candidate is built outside this tool (%s); adopt copies nothing and re-hashes it"
+                   % ("static_prop_candidate.py, script sha256 (LF) %s" % script if script else "external script")}
+    path = staging / "adopt-report.json"
+    path.write_text(dump_json(out), encoding="utf-8")
+    failed = sorted(k for k, v in checks.items() if not v["passed"])
+    return StageResult({"reports/adopt-report.json": path},
+                       {"passed": passed, "failed_checks": failed, "inputs": len(hashes)},
+                       passed, None if passed else "adopt failed: %s" % ", ".join(failed))
+
+
+def exec_ue_static_candidate(ctx: Context, staging: Path) -> StageResult:
+    m = ctx.manifest
+    ue = ctx.unreal()
+    rec = m["stages"][UE_STAGE]
+    plan = ue_plan(ctx)
+    profile, names, folder = plan["profile"], plan["names"], plan["folder"]
+    u = profile["ue"]
+    adopt = json.loads(ctx.run_path("reports/adopt-report.json").read_text(encoding="utf-8"))
+    for rel, digest in adopt["inputs"].items():
+        path = ctx.repo_path(rel)
+        if not path.is_file() or sha256_file(path) != digest:
+            raise PipelineError("adopted candidate file missing or changed since adopt: %s" % rel)
+    files = adopt["keys"]
+    exp = adopt["expectations_for_ue"]
+    owned = set(rec.get("ue_owned_assets") or [])
+    before = ue_listing(ue, folder)
+    foreign = [a for a in before if a not in owned]
+    if foreign:
+        raise PipelineError("UE folder %s holds assets this run did not create: %s; refusing to delete or "
+                            "import next to them (use another --ue-folder)" % (folder, foreign[:10]), EXIT_CONFLICT)
+    deleted = ue_delete_owned(ue, before)
+    rec["ue_owned_assets"] = []
+    ctx.save()
+    pre_import = ue_listing(ue, folder)
+    created = []
+
+    def track(result):
+        items = result if isinstance(result, list) else [result]
+        created.extend(ue_package(x) for x in items if x)
+
+    def setp(ref, props):
+        return ue.call("object", "set_properties", {"instance": ref, "values": json.dumps(props)})
+
+    def getp(ref, props):
+        raw = ue.call("object", "get_properties", {"instance": ref, "properties": props})
+        return json.loads(raw) if isinstance(raw, str) else (raw or {})
+
+    # textures: BC sRGB, N TC_Normalmap (DirectX, no green flip), ORM linear TC_Masks
+    for key, tcfg in sorted(u["textures"].items()):
+        pkg = names["texture:" + key]
+        track(ue.call("texture", "import_file", {"folder_path": pkg.rsplit("/", 1)[0], "asset_name": tcfg["asset"],
+                                                 "source_file": str(ctx.repo_path(files["texture:" + key]))}))
+        props = {"SRGB": tcfg["srgb"], "CompressionSettings": tcfg["compression"]}
+        if "flip_green" in tcfg:
+            props["bFlipGreenChannel"] = tcfg["flip_green"]
+        setp(ue_obj(pkg), props)
+    tex_path = {k: ue_object_path(names["texture:" + k]) for k in u["textures"]}
+    # material route: the shared master when it exists AND exposes the texture parameters, else own material
+    master_cfg = u.get("shared_master") or {}
+    master = master_cfg.get("asset")
+    route = {"shared_master": master, "used": "own_material"}
+    if master:
+        try:
+            present = bool(ue.call("asset", "exists", {"path": master}))
+        except PipelineError:
+            present = False
+        route["shared_master_exists"] = present
+        if present:
+            params = ue.call("instance", "list_parameters", {"material": ue_obj(master)}) or []
+            have = {p.get("name"): p.get("type") for p in params if isinstance(p, dict)}
+            route["shared_master_parameters"] = have
+            want = master_cfg.get("texture_parameters") or {}
+            route["missing_texture_parameters"] = sorted(v for v in want.values() if v not in have)
+            if want and not route["missing_texture_parameters"]:
+                route["used"] = "shared_master"
+    wiring = {}
+    mat_pkg = names["material"]
+    inst_pkg = names["instance"]
+    if route["used"] == "shared_master":
+        parent = ue_obj(master)
+        route["deviation"] = None
+    else:
+        if route.get("shared_master_exists"):
+            why = "exists but has no texture parameters %s" % route.get("missing_texture_parameters")
+        else:
+            why = "is absent" if master else "is not configured"
+        route["deviation"] = ("shared master %s %s; the candidate keeps its own %s (BC x TeamColor, DirectX "
+                              "normal, ORM) as the parent of %s" % (master, why, u["material"], u["instance"]))
+        track(ue.call("material", "create_material", {"folder_path": mat_pkg.rsplit("/", 1)[0],
+                                                      "asset_name": u["material"]}))
+        mat = ue_obj(mat_pkg)
+
+        def expr(cls, x, y, props=None):
+            ref = ue.call("material", "add_expression", {"material_or_function": mat, "x": x, "y": y,
+                                                         "expression_class": {"refPath": "/Script/Engine." + cls}})
+            if props:
+                setp(ref, props)
+            return ref
+
+        bc = expr("MaterialExpressionTextureSampleParameter2D", -800, 0,
+                  {"ParameterName": "BaseColorTexture", "Texture": tex_path["BC"], "SamplerType": "SAMPLERTYPE_Color"})
+        team = expr("MaterialExpressionVectorParameter", -800, 220,
+                    {"ParameterName": "TeamColor", "DefaultValue": {"R": 1, "G": 1, "B": 1, "A": 1}})
+        mul = expr("MaterialExpressionMultiply", -480, 60)
+        nrm = expr("MaterialExpressionTextureSampleParameter2D", -800, 420,
+                   {"ParameterName": "NormalTexture", "Texture": tex_path["N"], "SamplerType": "SAMPLERTYPE_Normal"})
+        orm = expr("MaterialExpressionTextureSampleParameter2D", -800, 680,
+                   {"ParameterName": "ORMTexture", "Texture": tex_path["ORM"], "SamplerType": "SAMPLERTYPE_Masks"})
+        ue.call("material", "connect_expressions", {"from_expression": bc, "from_output_name": "RGB",
+                                                    "to_expression": mul, "to_input_name": "A"})
+        ue.call("material", "connect_expressions", {"from_expression": team, "from_output_name": "",
+                                                    "to_expression": mul, "to_input_name": "B"})
+        wiring = {"MP_BaseColor": (mul, ""), "MP_Normal": (nrm, "RGB"), "MP_AmbientOcclusion": (orm, "R"),
+                  "MP_Roughness": (orm, "G"), "MP_Metallic": (orm, "B")}
+        for prop, (ref, out) in wiring.items():
+            ue.call("material", "connect_to_output", {"expression": ref, "output_name": out, "material_property": prop})
+        setp(mat, {"TwoSided": bool(u.get("two_sided", False))})
+        ue.call("material", "recompile", {"material_or_function": mat})
+        parent = mat
+    track(ue.call("instance", "create", {"folder_path": inst_pkg.rsplit("/", 1)[0], "asset_name": u["instance"],
+                                         "parent": parent}))
+    inst = ue_obj(inst_pkg)
+    if route["used"] == "shared_master":
+        for key, pname in sorted(master_cfg["texture_parameters"].items()):
+            ue.call("instance", "set_texture_parameter", {"instance": inst, "name": pname,
+                                                          "value": {"refPath": tex_path[key]}})
+    ue.call("instance", "set_vector_parameter", {"instance": inst, "name": "TeamColor",
+                                                 "value": dict(zip("rgba", u.get("team_color", [1, 1, 1, 1])))})
+    # mesh: no importer materials/textures; collision removed when the profile asks for none
+    sm_pkg = names["static"]
+    track(ue.call("static", "import_file", {"folder_path": sm_pkg.rsplit("/", 1)[0], "asset_name": u["static_asset"],
+                                            "source_file": str(ctx.repo_path(files["fbx"])),
+                                            "import_materials": False, "import_textures": False,
+                                            "combine_meshes": True}))
+    after_import = ue_listing(ue, folder)
+    rec["ue_owned_assets"] = sorted(set(after_import) | set(created))
+    ctx.save()
+    ctx.journal("ue_assets_owned", assets=rec["ue_owned_assets"], deleted_previous=deleted)
+    sm = ue_obj(sm_pkg)
+
+    def collision():
+        body = (getp(sm, ["BodySetup"]) or {}).get("BodySetup")
+        if not body:
+            return {"body_setup": None, "elements": {}, "simple_elements": 0}
+        data = getp(body if isinstance(body, dict) else {"refPath": body}, ["AggGeom", "CollisionTraceFlag"])
+        agg = data.get("AggGeom") or {}
+        counts = {k: len(v) for k, v in agg.items() if isinstance(v, list)}
+        return {"body_setup": body.get("refPath") if isinstance(body, dict) else body,
+                "elements": counts, "simple_elements": sum(counts.values()),
+                "collision_trace_flag": data.get("CollisionTraceFlag")}
+
+    collision_after_import = collision()
+    if u.get("collision") == "none":
+        ue.call("static", "remove_collisions", {"mesh": sm})
+    slots = ue.call("static", "get_material_slots", {"mesh": sm}) or []
+    for slot in slots:
+        ue.call("static", "set_material", {"mesh": sm, "slot_name": slot, "material": inst})
+    after = ue_listing(ue, folder)
+    rec["ue_owned_assets"] = sorted(set(after) | set(created))
+    ctx.save()
+    saved = ue.call("asset", "save_assets", {"asset_paths": after})
+
+    # ---------------------------------------------------------------- measurements
+    checks, measured = {}, {"material_route": route, "collision_after_import": collision_after_import}
+
+    def check(name, passed, value=None, expected=None, note=None):
+        item = {"passed": bool(passed), "measured": value}
+        if expected is not None:
+            item["expected"] = expected
+        if note:
+            item["note"] = note
+        checks[name] = item
+
+    planned = {k: v for k, v in names.items() if not (k == "material" and route["used"] == "shared_master")}
+    expected_assets = sorted(planned.values())
+    check("folder_empty_before_import", not pre_import, pre_import)
+    check("assets_exactly_as_planned", sorted(after) == expected_assets, after, expected_assets,
+          "no stale assets, no importer side products (import_materials/import_textures false)")
+    dupes = [a for a in after if re.search(r"_\d+$", a) and re.sub(r"_\d+$", "", a) in expected_assets]
+    check("no_numbered_duplicates", not dupes, dupes)
+    classes = {k: str(ue.call("asset", "get_asset_class", {"asset_path": p})).rsplit(".", 1)[-1]
+               for k, p in sorted(planned.items())}
+    want = {"static": "StaticMesh", "material": "Material", "instance": "MaterialInstanceConstant"}
+    want.update({k: "Texture2D" for k in planned if k.startswith("texture:")})
+    want = {k: v for k, v in want.items() if k in planned}
+    check("asset_classes", classes == want, classes, want)
+    tex = {}
+    for key, tcfg in sorted(u["textures"].items()):
+        ref = ue_obj(names["texture:" + key])
+        size = ue.call("texture", "get_size", {"texture": ref}) or {}
+        props = getp(ref, ["SRGB", "CompressionSettings", "bFlipGreenChannel"])
+        want_p = {"SRGB": tcfg["srgb"], "CompressionSettings": tcfg["compression"]}
+        if "flip_green" in tcfg:
+            want_p["bFlipGreenChannel"] = tcfg["flip_green"]
+        tex[key] = {"size": [size.get("x"), size.get("y")], "properties": props, "expected": want_p,
+                    "ok": [size.get("x"), size.get("y")] == [exp["texture_px"]] * 2 and
+                    all(props.get(k) == v for k, v in want_p.items())}
+    measured["textures"] = tex
+    check("textures_size_colour_space_compression", all(t["ok"] for t in tex.values()), tex)
+    inst_props = getp(inst, ["Parent", "BasePropertyOverrides"])
+    parent_ref = inst_props.get("Parent")
+    parent_ref = parent_ref.get("refPath") if isinstance(parent_ref, dict) else parent_ref
+    overrides = inst_props.get("BasePropertyOverrides") or {}
+    team_value = ue.call("instance", "get_vector_parameter", {"instance": inst, "name": "TeamColor"}) or {}
+    team_want = u.get("team_color", [1, 1, 1, 1])
+    measured["instance"] = {"parent": parent_ref, "base_property_overrides": overrides,
+                            "TeamColor": {k: round(float(team_value.get(k, -1)), 4) for k in "rgba"}}
+    two_sided_override = bool(overrides.get("bOverride_TwoSided")) and bool(overrides.get("TwoSided"))
+    if route["used"] == "shared_master":
+        parent_props = getp(ue_obj(master), ["TwoSided", "BlendMode"])
+        tex_params = {k: ue_package(ue.call("instance", "get_texture_parameter", {"instance": inst, "name": p}) or "")
+                      for k, p in master_cfg["texture_parameters"].items()}
+        measured["instance"]["texture_parameters"] = tex_params
+        graph_ok = all(tex_params[k] == names["texture:" + k] for k in tex_params)
+    else:
+        parent_props = getp(ue_obj(mat_pkg), ["TwoSided", "BlendMode", "ShadingModel"])
+        graph = {}
+        for prop, (ref, out) in wiring.items():
+            src = ue.call("material", "get_property_input",
+                          {"material": ue_obj(mat_pkg), "material_property": prop}) or {}
+            graph[prop] = {"expression": (src.get("expression") or {}).get("refPath", "").rsplit(":", 1)[-1],
+                           "output": src.get("output_name"),
+                           "ok": (src.get("expression") or {}).get("refPath") == ref.get("refPath") and
+                                 (src.get("output_name") or "") == out}
+        measured["material_graph"] = graph
+        graph_ok = all(g["ok"] for g in graph.values())
+    measured["parent_material"] = parent_props
+    check("material_bc_normal_orm_wired", graph_ok, measured.get("material_graph") or
+          measured["instance"].get("texture_parameters"))
+    check("material_one_sided_opaque", parent_props.get("TwoSided") is bool(u.get("two_sided", False))
+          and parent_props.get("BlendMode") == "BLEND_Opaque" and not two_sided_override,
+          {"parent": parent_props, "instance_two_sided_override": two_sided_override},
+          {"TwoSided": bool(u.get("two_sided", False)), "BlendMode": "BLEND_Opaque"},
+          "glTF from Tripo says doubleSided=true; the UE material stays one-sided (prop-barrel-report §5.4)")
+    want_parent = ue_package(master) if route["used"] == "shared_master" else mat_pkg
+    check("instance_parent_and_neutral_team_color",
+          ue_package(parent_ref or "") == want_parent and
+          all(abs(float(team_value.get(k, -1)) - c) < 1e-3 for k, c in zip("rgba", team_want)),
+          measured["instance"], {"parent": want_parent, "TeamColor": team_want})
+    slot_mats = {s: ue_package(ue.call("static", "get_material", {"mesh": sm, "slot_name": s}) or "") for s in slots}
+    check("material_slots", len(slots) == exp["material_slots"] and all(v == inst_pkg for v in slot_mats.values()),
+          {"slots": slots, "assigned": slot_mats}, {"count": exp["material_slots"], "assigned": inst_pkg})
+    tris = ue.call("static", "get_triangle_count", {"mesh": sm, "lod_index": 0})
+    measured["lod0"] = {"triangles": tris,
+                        "vertices": ue.call("static", "get_vertex_count", {"mesh": sm, "lod_index": 0}),
+                        "lods": ue.call("static", "get_lod_count", {"mesh": sm}),
+                        "nanite": ue.call("static", "is_nanite_enabled", {"mesh": sm})}
+    check("triangles_lod0_equal_candidate", tris == exp["triangles"], tris, exp["triangles"])
+    lo_u, hi_u = ue_minmax(ue.call("static", "get_bounds", {"mesh": sm}) or {})
+    tol = m["config"]["ue"].get("dimension_tolerance") or DEFAULT_UE_DIMENSION_TOLERANCE
+    size_uu = [hi_u[i] - lo_u[i] for i in range(3)] if lo_u else None
+    measured["bounds_uu"] = {"min": [round(v, 4) for v in lo_u], "max": [round(v, 4) for v in hi_u],
+                             "size": [round(v, 4) for v in size_uu]} if lo_u else None
+    want_size = exp["size_uu_at_import_scale_1"]
+    check("dimensions_match_candidate_at_import_scale_1", bool(size_uu) and
+          all(within(a, b, tol) for a, b in zip(size_uu, want_size)), measured["bounds_uu"], want_size,
+          "tolerance %.1f%% per axis X, Y, Z; MCP import_file has no import scale (1.0)" % (tol * 100))
+    pt = (profile.get("expectations") or {}).get("pivot_tolerance_uu", 0.05)
+    pred = exp.get("ue_bounds_uu_predicted")
+    check("pivot_base_centre", bool(lo_u) and abs(lo_u[2]) <= pt and abs(lo_u[0] + hi_u[0]) / 2 <= pt and
+          abs(lo_u[1] + hi_u[1]) / 2 <= pt, measured["bounds_uu"],
+          {"min_z": 0, "centre_xy": [0, 0], "tolerance_uu": pt})
+    check("bounds_equal_um_fbx_v1_prediction", bool(pred and lo_u) and
+          all(abs(a - b) <= pt for a, b in zip(pred["min"] + pred["max"], lo_u + hi_u)), measured["bounds_uu"], pred,
+          "fbx-readback bounds (export frame) as UE (x, -y, z) (ART-001); tolerance %.2f uu" % pt)
+    axes = profile.get("axes") or {}
+    if axes.get("protrusion_axis_ue") and size_uu:
+        longer = "X" if size_uu[0] > size_uu[1] else "Y"
+        check("protrusion_axis_by_bounds", longer == axes["protrusion_axis_ue"].lstrip("+-"),
+              {"size_x": round(size_uu[0], 4), "size_y": round(size_uu[1], 4), "longer_horizontal_axis": longer},
+              axes["protrusion_axis_ue"],
+              "axis only (the bung makes that axis longer); the sign (%s) needs a frame" % axes.get("expected_ue_front"))
+    coll = collision()
+    measured["collision_after_stage"] = coll
+    if u.get("collision") == "none":
+        check("no_simple_collision", coll["simple_elements"] == 0, coll, 0,
+              "UE 5.8 MCP import_file added %s simple element(s); removed with remove_collisions"
+              % collision_after_import.get("simple_elements"))
+    dirty = {a: ue.call("asset", "is_dirty", {"asset_path": a}) for a in after}
+    check("assets_saved", bool(saved) and not any(dirty.values()), {"save_assets": saved, "dirty": dirty})
+    passed = all(c["passed"] for c in checks.values())
+    report = {
+        "stage": UE_STAGE, "logic": UE_STATIC_LOGIC_VERSION, "profile": profile["profile_id"],
+        "backend": ue.describe(), "status": "technically_imported" if passed else "failed",
+        "inputs": adopt["inputs"], "destination": {"folder": folder, "assets": planned},
+        "previous_assets_deleted": deleted, "assets": after, "measured": measured, "checks": checks,
+        "passed": passed, "tool_name_style": ue.tool_name_style,
+        "deviations": [d for d in [route.get("deviation")] if d],
+        "not_checked": [
+            "art acceptance, silhouette, lighting, K1/K2/K3 (art track; editor frames are diagnostics only)",
+            "front sign of the bung: bounds give the axis only; see the editor frames of the evidence folder",
+            "UV seams at mips >= 2 and dark grooves (prop-barrel-report §4.3/§4.4): need K-1/K-2 frames",
+            "packaged build / cook of /Game/PipelineCandidates (not in DirectoriesToAlwaysCook)",
+        ],
+    }
+    out = staging / "ue-import-report.json"
+    out.write_text(dump_json(report), encoding="utf-8")
+    calls = staging / "ue-mcp-calls.json"
+    calls.write_text(dump_json(ue.calls), encoding="utf-8")
+    failed = sorted(k for k, c in checks.items() if not c["passed"])
+    return StageResult({"reports/ue-import-report.json": out, "reports/ue-mcp-calls.json": calls},
+                       {"passed": passed, "failed_checks": failed, "primary_asset": plan["primary"],
+                        "kind": STATIC, "assets": len(after), "material_route": route["used"]},
+                       passed, None if passed else "ue-import failed: %s" % ", ".join(failed))
+
+
 STAGE_IMPL = {
     "preflight": (fp_preflight, exec_preflight, True),
     "import": (fp_import, exec_import, False),
@@ -1839,6 +2311,7 @@ STAGE_IMPL = {
     "export": (fp_export, exec_export, False),
     "atlas": (fp_atlas, exec_atlas, False),
     "build": (fp_build, exec_build, False),
+    "adopt": (fp_adopt, exec_adopt, False),
     UE_STAGE: (fp_ue_import, exec_ue_import, False),
 }
 STAGE_PROBES = {UE_STAGE: probe_ue_import}
@@ -2021,13 +2494,14 @@ def new_manifest(args) -> dict:
         "generation_requests": [],
     }
     profile = getattr(args, "profile", None) or PASSTHROUGH
-    if profile == CANDIDATE:
+    if profile in BUILD_PROFILE_KINDS:
         if not args.build_profile:
-            raise PipelineError("--profile %s needs --build-profile <repo-relative JSON>" % CANDIDATE, EXIT_USAGE)
-        manifest["config"]["profile"] = CANDIDATE
+            raise PipelineError("--profile %s needs --build-profile <repo-relative JSON>" % profile, EXIT_USAGE)
+        manifest["config"]["profile"] = profile
         manifest["config"]["build_profile"] = Path(args.build_profile).as_posix()
     elif getattr(args, "build_profile", None):
-        raise PipelineError("--build-profile is only used with --profile %s" % CANDIDATE, EXIT_USAGE)
+        raise PipelineError("--build-profile is only used with --profile %s" % "|".join(BUILD_PROFILE_KINDS),
+                            EXIT_USAGE)
     return manifest
 
 
@@ -2112,6 +2586,10 @@ def cmd_ue_import(ctx: Context, args) -> int:
         wanted.update(import_materials=False, import_textures=False,
                       import_note="skeletal-candidate: meshes imported with import_materials=false, "
                                   "import_textures=false; textures come from the atlas stage")
+    elif run_profile(ctx.manifest) == STATIC:
+        wanted.update(import_materials=False, import_textures=False,
+                      import_note="static-candidate: mesh imported with import_materials=false, "
+                                  "import_textures=false; BC/N/ORM are the adopted candidate PNGs")
     cfg = ctx.manifest["config"].get("ue")
     if cfg is None:
         wanted["folder"] = wanted["folder"] or default_ue_folder(ctx.manifest)
@@ -2324,8 +2802,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--run-id")
     p.add_argument("--triangle-loss-tolerance", type=float, default=DEFAULT_TRIANGLE_LOSS_TOLERANCE)
     p.add_argument("--profile", choices=PROFILES, default=PASSTHROUGH,
-                   help="passthrough (T3 static FBX) or skeletal-candidate (atlas + build from --build-profile)")
-    p.add_argument("--build-profile", help="repo-relative build profile JSON (skeletal-candidate)")
+                   help="passthrough (T3 static FBX), skeletal-candidate (atlas + build from --build-profile) or "
+                        "static-candidate (adopt a static prop candidate FBX + BC/N/ORM named by --build-profile)")
+    p.add_argument("--build-profile", help="repo-relative build profile JSON (skeletal-candidate, static-candidate)")
     p = with_run(sub.add_parser("register-source"))
     p.add_argument("--spec", required=True)
     for name in [s for s in KNOWN_STAGES if s != UE_STAGE]:
@@ -2363,7 +2842,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 COMMANDS = {
     "init": cmd_init, "register-source": cmd_register, "preflight": cmd_stage, "import": cmd_stage,
-    "verify": cmd_stage, "export": cmd_stage, "atlas": cmd_stage, "build": cmd_stage, UE_STAGE: cmd_ue_import, "run": cmd_run, "resume": cmd_resume, "status": cmd_status,
+    "verify": cmd_stage, "export": cmd_stage, "atlas": cmd_stage, "build": cmd_stage, "adopt": cmd_stage,
+    UE_STAGE: cmd_ue_import, "run": cmd_run, "resume": cmd_resume, "status": cmd_status,
     "snapshot": cmd_snapshot, "prepare-generation": cmd_prepare_generation,
 }
 READ_ONLY = {"status", "snapshot"}

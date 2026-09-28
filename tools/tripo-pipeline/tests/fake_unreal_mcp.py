@@ -8,7 +8,8 @@ Import onto an existing asset name behaves like the real UE 5.8 MCP import_file
 exists". FAKE_UE_ON_EXISTING=number switches to the "<name>_1" behaviour of other
 importers, which the pipeline must survive as well.
 
-Supports the passthrough (T3) calls and the skeletal-candidate (T4) calls:
+Supports the passthrough (T3) calls, the skeletal-candidate (T4) calls and the static-candidate
+(T2.1 stage 3) calls (mesh data from reports/fbx-readback.json next to the candidate FBX):
 TextureTools, MaterialTools, MaterialInstanceTools, ObjectTools get/set_properties,
 SkeletalMeshTools (bones, sockets, slots, bounds), StaticMeshTools, LogsToolset.
 Mesh data comes from the run's reports next to the imported FBX
@@ -22,6 +23,9 @@ Env:
   FAKE_UE_FAIL_TOOL    tool (short name) that returns isError
   FAKE_UE_ON_EXISTING  "refuse" (default, real UE 5.8 MCP) or "number"
   FAKE_UE_ARMATURE_NODE  name of the extra bone 0 (default SKEL_Test)
+  FAKE_UE_RETURN_SIDE_PRODUCTS  "1": import_file also returns the materials it created (default: only the
+                       mesh and its skeleton, like the real UE 5.8 MCP, measured 2026-09-28)
+  FAKE_UE_IMPORT_CONVEX  simple collision elements a static import creates (default 1, like Interchange)
 """
 
 import json
@@ -99,8 +103,17 @@ def mesh_import(state, toolset, args):
     run = fbx.parent.parent
     state["log"].append("LogFbx: Loading FBX Scene from %s" % fbx.as_posix())
     build_path = run / "reports/build-report.json"
+    readback_path = run / "reports/fbx-readback.json"
     static = "static_mesh" in toolset
-    if build_path.exists():
+    if static and readback_path.exists():
+        rb = json.loads(readback_path.read_text(encoding="utf-8"))
+        lo, hi = rb["bounds_min_uu"], rb["bounds_max_uu"]
+        record = {"class": "StaticMesh", "slots": list(rb["material_slots"]), "source": str(fbx),
+                  "tris": rb["triangles"] + int(os.environ.get("FAKE_UE_TRIS_DELTA", "0")),
+                  "convex": int(os.environ.get("FAKE_UE_IMPORT_CONVEX", "1")),
+                  # export frame shown by UE as (x, -y, z) (ART-001)
+                  "bounds": {"min": {"x": lo[0], "y": -hi[1], "z": lo[2]}, "max": {"x": hi[0], "y": -lo[1], "z": hi[2]}}}
+    elif build_path.exists():
         build = json.loads(build_path.read_text(encoding="utf-8"))
         kind = next(k for k, e in build["exports"].items() if isinstance(e, dict) and e.get("file") == fbx.name)
         if kind == "base":
@@ -211,6 +224,8 @@ def main(argv):
         created, error = mesh_import(state, toolset, args)
         if error:
             return reply(error=error)
+        if os.environ.get("FAKE_UE_RETURN_SIDE_PRODUCTS") != "1":
+            created = [p for p in created if assets[p]["class"] != "Material"]
         return done([obj(p) for p in created])
     if short == "get_size":
         x, y = assets[pkg(args["texture"])]["size"]
@@ -225,8 +240,14 @@ def main(argv):
         return done(True)
     if short == "get_properties":
         key = args["instance"]["refPath"]
+        if key.endswith(":BodySetup_0"):
+            mesh = assets[pkg(key)]
+            agg = {"sphereElems": [], "boxElems": [], "sphylElems": [], "convexElems": [{}] * mesh.get("convex", 0)}
+            return reply(json.dumps({"AggGeom": agg, "CollisionTraceFlag": "CTF_UseDefault"}))
         key = pkg(key) if ":" not in key else key
-        values = props.get(key, {})
+        values = dict(props.get(key, {}))
+        if "BodySetup" in args["properties"] and assets.get(key, {}).get("class") == "StaticMesh":
+            values["BodySetup"] = {"refPath": obj(key)["refPath"] + ":BodySetup_0"}
         return reply(json.dumps({p: values.get(p) for p in args["properties"]}))
     # ---- MaterialTools / MaterialInstanceTools
     if short == "create_material":
@@ -265,6 +286,14 @@ def main(argv):
         return done(None)
     if short == "get_vector_parameter":
         return reply(assets[pkg(args["instance"])]["vectors"].get(args["name"]))
+    if short == "set_texture_parameter":
+        assets[pkg(args["instance"])].setdefault("textures", {})[args["name"]] = args["value"]["refPath"]
+        return done(None)
+    if short == "get_texture_parameter":
+        value = assets[pkg(args["instance"])].get("textures", {}).get(args["name"])
+        return reply({"refPath": value} if value else None)
+    if short == "list_parameters":
+        return reply(assets[pkg(args["material"])].get("parameters", []))
     # ---- mesh queries
     mesh = assets.get(pkg(args.get("mesh", {}).get("refPath", "")))
     if mesh is None:
@@ -286,6 +315,12 @@ def main(argv):
         return reply(mesh.get("tris", 10) * 3)
     if short in ("get_lod_count",):
         return reply(1)
+    if short == "is_nanite_enabled":
+        return reply(False)
+    if short == "remove_collisions":
+        mesh["convex"] = 0
+        mesh["dirty"] = True
+        return done(True)
     if short == "get_section_count":
         return reply(len(mesh["slots"]))
     if short == "get_bone_names":

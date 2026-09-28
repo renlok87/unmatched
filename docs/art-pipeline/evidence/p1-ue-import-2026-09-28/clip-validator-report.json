@@ -1,0 +1,56 @@
+{
+ "schema": "unmatched.p1-clip-validator-summary/1",
+ "tool": "tools/tripo-pipeline/anim/validate_clip.py (headless Blender 5.2.2, --factory-startup)",
+ "clips": [
+  {
+   "report": "clip-validator/AM_Medusa_HitReact.validation.json",
+   "sha256": "a62f204c277c6db1e65d3b7460273f13da23fc8a329e27014794e03a0ed3e25e",
+   "clip": "blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx",
+   "result": "pass",
+   "fails": [],
+   "warnings": [
+    "armature_object_name"
+   ],
+   "fps": 24.0,
+   "frames": 10,
+   "duration_s": 0.375,
+   "role": "positive"
+  },
+  {
+   "report": "clip-validator/AM_Medusa_Idle.negative-control.validation.json",
+   "sha256": "9f01d01ec6c5958bf09688c3519cfa647af8e152608e7ff00a1a0293e131e5a3",
+   "clip": "blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx",
+   "result": "fail",
+   "fails": [
+    "visible_pose_change"
+   ],
+   "warnings": [
+    "armature_object_name"
+   ],
+   "fps": 24.0,
+   "frames": 57,
+   "duration_s": 2.3333,
+   "role": "negative_control"
+  },
+  {
+   "report": "clip-validator/AM_Medusa_LungeAttack.validation.json",
+   "sha256": "4cd31d8e506aa95e6bb5af394a5d1fcc9857a96f8d69e52cab12c377499355cd",
+   "clip": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx",
+   "result": "pass",
+   "fails": [],
+   "warnings": [
+    "armature_object_name"
+   ],
+   "fps": 24.0,
+   "frames": 15,
+   "duration_s": 0.5833,
+   "role": "positive"
+  }
+ ],
+ "expected": {
+  "AM_Medusa_LungeAttack": "pass",
+  "AM_Medusa_HitReact": "pass",
+  "AM_Medusa_Idle (--pose-change-mode=fail)": "fail visible_pose_change"
+ },
+ "as_expected": true
+}

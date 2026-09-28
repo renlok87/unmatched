@@ -1,0 +1,307 @@
+# Commands of T2.1 (stage 3 wave 2, P1: barrel + test clip in the live UE), 2026-09-28, repo root C:/Users/ren/WebstormProjects/unmached/unmached
+# tool: tools/tripo-pipeline/tripo_pipeline.py; Git Bash with MSYS_NO_PATHCONV=1; exit codes as returned; output tails cut to 25 lines.
+# Live apps: UnrealEditor 5.8.2 (PID 19540, project unreal/Unmatched of this checkout) via MCP :8123; Blender 5.2.2 via blender-mcp :9876 (no scene changes).
+
+$ python tools/tripo-pipeline/tripo_pipeline.py status --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline
+# 2026-09-28T12:03:54Z exit=0
+  run 20260928-p15-barrel  asset ASSET-DECOR-KIT-001.BARREL  created by tool 0.3.0  (this tool 0.4.0, backend headless)
+  source tripo-3f7a258f  task 3f7a258f-d41c-4720-b31a-cb1573604670  tripo-studio  credits(historical) {'studio-credits': 60}
+  profile passthrough
+  stage preflight completed   attempts=1  by 0.3.0/headless
+  stage import    completed   attempts=1  by 0.3.0/headless
+  stage verify    completed   attempts=1  by 0.3.0/headless
+  stage export    completed   attempts=1  by 0.3.0/headless
+  export export/SM_Decor_Barrel_TripoPassthrough.fbx f9c9042a656a
+  network: tripo_calls=0 paid_tasks_created=0
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline --ue-folder /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough
+# 2026-09-28T12:04:09Z exit=1
+  ERROR: ue-import failed: folder_contains_only_this_import
+
+$ python tools/tripo-pipeline/tripo_pipeline.py init --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-candidate --asset-id ASSET-DECOR-KIT-001.BARREL --primary-source tripo-3f7a258f --primary-role smartuv-tex2k-pbr-glb --export-basename SM_Decor_Barrel --run-id 20260928-p15-barrel-ue-candidate --profile static-candidate --build-profile art/pipeline-candidates/ASSET-DECOR-KIT-001/build-profiles/decor-barrel-static-um-fbx-v1.json
+# 2026-09-28T12:13:29Z exit=0
+  init: created C:\Users\ren\WebstormProjects\unmached\unmached\art\pipeline-candidates\ASSET-DECOR-KIT-001\20260928-p15-barrel\ue-candidate\manifest.json
+
+$ python tools/tripo-pipeline/tripo_pipeline.py register-source --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-candidate --spec art/pipeline-candidates/ASSET-DECOR-KIT-001/source-specs/tripo-3f7a258f.json
+# 2026-09-28T12:13:29Z exit=0
+  register-source: registered tripo-3f7a258f (11 files, historical spend {'studio-credits': 60}; this command spent 0)
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp run --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-candidate
+# 2026-09-28T12:13:35Z exit=0
+    preflight executed
+    adopt     executed
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-candidate --ue-folder /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Candidate
+# 2026-09-28T12:14:55Z exit=0
+    ue-import executed
+
+$ python tools/tripo-pipeline/review/ue_listing.py /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Candidate docs/art-pipeline/evidence/p1-ue-import-2026-09-28/barrel-candidate-ue-listing-1-after-import.json
+# 2026-09-28T12:15:07Z exit=0
+  {"count": 6, "skeletal": null}
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-candidate --ue-folder /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Candidate
+# 2026-09-28T12:15:10Z exit=0
+    ue-import skipped
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp run --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-candidate
+# 2026-09-28T12:15:12Z exit=0
+    preflight executed
+    adopt     skipped
+    ue-import skipped
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-candidate --ue-folder /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Candidate --force
+# 2026-09-28T12:16:40Z exit=0
+    ue-import executed
+
+$ python tools/tripo-pipeline/review/ue_listing.py /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Candidate docs/art-pipeline/evidence/p1-ue-import-2026-09-28/barrel-candidate-ue-listing-2-after-force.json
+# 2026-09-28T12:16:43Z exit=0
+  {"count": 6, "skeletal": null}
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline --ue-folder /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough
+# 2026-09-28T12:17:14Z exit=0
+    ue-import executed
+
+$ python tools/tripo-pipeline/review/ue_listing.py /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough docs/art-pipeline/evidence/p1-ue-import-2026-09-28/barrel-passthrough-ue-listing-1-after-import.json
+# 2026-09-28T12:17:17Z exit=0
+  {"count": 4, "skeletal": null}
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline --ue-folder /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough
+# 2026-09-28T12:17:19Z exit=0
+    ue-import skipped
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline --ue-folder /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough --force
+# 2026-09-28T12:17:41Z exit=0
+    ue-import executed
+
+$ python tools/tripo-pipeline/review/ue_listing.py /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough docs/art-pipeline/evidence/p1-ue-import-2026-09-28/barrel-passthrough-ue-listing-2-after-force.json
+# 2026-09-28T12:17:45Z exit=0
+  {"count": 4, "skeletal": null}
+
+$ C:/Program Files/Blender Foundation/Blender 5.2/blender.exe -b --factory-startup --python tools/tripo-pipeline/anim/validate_clip.py -- blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx --expect-duration=0.6 --out=docs/art-pipeline/evidence/p1-ue-import-2026-09-28/clip-validator/AM_Medusa_LungeAttack.validation.json
+# 2026-09-28T12:23:54Z exit=0
+  FBX version: 7400
+  CLIP_VALIDATION PASS AM_Medusa_LungeAttack.fbx fps 24.0 dur 0.5833 fails [] warns ['armature_object_name']
+  Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+$ C:/Program Files/Blender Foundation/Blender 5.2/blender.exe -b --factory-startup --python tools/tripo-pipeline/anim/validate_clip.py -- blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx --expect-duration=0.4 --out=docs/art-pipeline/evidence/p1-ue-import-2026-09-28/clip-validator/AM_Medusa_HitReact.validation.json
+# 2026-09-28T12:23:55Z exit=0
+  FBX version: 7400
+  CLIP_VALIDATION PASS AM_Medusa_HitReact.fbx fps 24.0 dur 0.375 fails [] warns ['armature_object_name']
+  Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+$ C:/Program Files/Blender Foundation/Blender 5.2/blender.exe -b --factory-startup --python tools/tripo-pipeline/anim/validate_clip.py -- blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx --expect-duration=2.3333 --loop=true --pose-change-mode=fail --out=docs/art-pipeline/evidence/p1-ue-import-2026-09-28/clip-validator/AM_Medusa_Idle.negative-control.validation.json
+# 2026-09-28T12:23:56Z exit=1
+  FBX version: 7400
+  CLIP_VALIDATION FAIL AM_Medusa_Idle.fbx fps 24.0 dur 2.3333 fails ['visible_pose_change'] warns ['armature_object_name']
+  Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+$ python tools/tripo-pipeline/review/p1_editor_frames.py --out docs/art-pipeline/evidence/p1-ue-import-2026-09-28/editor-frames
+# 2026-09-28T12:29:08Z exit=1
+  restored: /Game/S08/S08Arena dirty: False review level dirty: False
+  Traceback (most recent call last):
+    File "C:\Users\ren\WebstormProjects\unmached\unmached\tools\tripo-pipeline\review\p1_editor_frames.py", line 166, in <module>
+      main()
+      ~~~~^^
+    File "C:\Users\ren\WebstormProjects\unmached\unmached\tools\tripo-pipeline\review\p1_editor_frames.py", line 133, in main
+      shot("barrel-%s-ue-editor-cobble" % tag, eye, rot, {"subject": "barrel", "distance_uu": dist})
+      ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "C:\Users\ren\WebstormProjects\unmached\unmached\tools\tripo-pipeline\review\p1_editor_frames.py", line 99, in shot
+      ue.call("app", "CaptureViewport", {"annotations": NOANN, "bShowUI": False}, record=False)
+      ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "C:\Users\ren\WebstormProjects\unmached\unmached\tools\tripo-pipeline\review\ue_live.py", line 88, in call
+      raise UeError("%s.%s: %s" % (ts, tool, " ".join(texts)[:1500]))
+  ue_live.UeError: EditorToolset.EditorAppToolset.CaptureViewport: Function "CaptureViewport", input param "captureTransform" needs a default value.Function input params Json -
+  {"annotations":{"gridSpacing":0,"gridExtent":0,"gridHeight":0,"maxLabelDistance":0,"classFilter":null,"maxLabels":0},"bShowUI":false}
+
+$ python tools/tripo-pipeline/review/p1_editor_frames.py --out docs/art-pipeline/evidence/p1-ue-import-2026-09-28/editor-frames
+# 2026-09-28T12:29:46Z exit=1
+  barrel-k1-ue-editor-cobble.png b9bae52886f7
+  barrel-k2-1p6-ue-editor-cobble.png 8298a3f4f011
+  barrel-close300-ue-editor-cobble.png 5808e1371b0b
+  barrel-side-plusX-close-ue-editor.png aa9da59808c6
+  restored: /Game/S08/S08Arena dirty: False review level dirty: False
+  Traceback (most recent call last):
+    File "C:\Users\ren\WebstormProjects\unmached\unmached\tools\tripo-pipeline\review\p1_editor_frames.py", line 169, in <module>
+      main()
+      ~~~~^^
+    File "C:\Users\ren\WebstormProjects\unmached\unmached\tools\tripo-pipeline\review\p1_editor_frames.py", line 144, in main
+      pose = scene("pose", label=L_MEDUSA, anim="%s/AM_Medusa_%s_Draft" % (CLIPS, clip), time=t)
+    File "C:\Users\ren\WebstormProjects\unmached\unmached\tools\tripo-pipeline\review\p1_editor_frames.py", line 71, in scene
+      return ue.run_task(str(task), str(tmp), timeout=300, op=op, **kw)
+             ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "C:\Users\ren\WebstormProjects\unmached\unmached\tools\tripo-pipeline\review\ue_live.py", line 141, in run_task
+      raise UeError("UE task %s failed: %s\n%s" % (script, data["error"], data.get("traceback", "")[-2000:]))
+  ue_live.UeError: UE task C:\Users\ren\WebstormProjects\unmached\unmached\tools\tripo-pipeline\review\ue_py\frames_scene.py failed: AttributeError: 'SkeletalMeshComponent' object has no attribute 'tick_animation'
+  Traceback (most recent call last):
+    File "C:/Users/ren/WebstormProjects/unmached/unmached/tools/tripo-pipeline/review/ue_py/_run.py", line 16, in <module>
+      exec(compile(_code, ARGS["script"], "exec"), {"__name__": "__ue_task__", "ARGS": ARGS, "unreal": u})
+    File "C:/Users/ren/WebstormProjects/unmached/unmached/tools/tripo-pipeline/review/ue_py/frames_scene.py", line 54, in <module>
+      comp.tick_animation(0.0, False)
+      ^^^^^^^^^^^^^^^^^^^
+  AttributeError: 'SkeletalMeshComponent' object has no attribute 'tick_animation'
+
+$ python tools/tripo-pipeline/review/p1_editor_frames.py --out docs/art-pipeline/evidence/p1-ue-import-2026-09-28/editor-frames
+# 2026-09-28T12:32:06Z exit=0
+  barrel-k1-ue-editor-cobble.png b9bae52886f7
+  barrel-k2-1p6-ue-editor-cobble.png 8298a3f4f011
+  barrel-close300-ue-editor-cobble.png 5808e1371b0b
+  barrel-side-plusX-close-ue-editor.png e292f23d6f66
+  clip-lungeattack-f00-k2-1p6-ue-editor.png 701564632a1c
+  clip-lungeattack-f00-close300-ue-editor.png 0ebec96bb922
+  clip-lungeattack-f06-k2-1p6-ue-editor.png ce7e0e6c2206
+  clip-lungeattack-f06-close300-ue-editor.png 90291925ad7a
+  clip-lungeattack-f14-k2-1p6-ue-editor.png 089c7bdad520
+  clip-lungeattack-f14-close300-ue-editor.png ac48ee39c492
+  clip-hitreact-f00-k2-1p6-ue-editor.png ce7e0e6c2206
+  clip-hitreact-f00-close300-ue-editor.png 90291925ad7a
+  clip-hitreact-f03-k2-1p6-ue-editor.png 701564632a1c
+  clip-hitreact-f03-close300-ue-editor.png 0ebec96bb922
+  clip-hitreact-f09-k2-1p6-ue-editor.png 619e3620d0f3
+  clip-hitreact-f09-close300-ue-editor.png 0ce005d7133f
+  restored: /Game/S08/S08Arena dirty: False review level dirty: False
+
+$ python tools/tripo-pipeline/review/p1_editor_frames.py --out docs/art-pipeline/evidence/p1-ue-import-2026-09-28/editor-frames
+# 2026-09-28T12:34:53Z exit=0
+  barrel-k1-ue-editor-cobble.png b9bae52886f7
+  barrel-k2-1p6-ue-editor-cobble.png f571a60f29fe
+  barrel-close300-ue-editor-cobble.png 5808e1371b0b
+  barrel-side-plusX-close-ue-editor.png 33f817af8516
+  clip-lungeattack-f00-k2-1p6-ue-editor.png 701564632a1c
+  clip-lungeattack-f00-close300-ue-editor.png 0ebec96bb922
+  clip-lungeattack-f06-k2-1p6-ue-editor.png 73aa172f0ae6
+  clip-lungeattack-f06-close300-ue-editor.png e531394efd1d
+  clip-lungeattack-f14-k2-1p6-ue-editor.png 701564632a1c
+  clip-lungeattack-f14-close300-ue-editor.png 0ebec96bb922
+  clip-hitreact-f00-k2-1p6-ue-editor.png 9ce88cf696b2
+  clip-hitreact-f00-close300-ue-editor.png 860d12fdcca4
+  clip-hitreact-f03-k2-1p6-ue-editor.png 2077eadae795
+  clip-hitreact-f03-close300-ue-editor.png 515a6f708f13
+  clip-hitreact-f09-k2-1p6-ue-editor.png 9ce88cf696b2
+  clip-hitreact-f09-close300-ue-editor.png 860d12fdcca4
+  restored: /Game/S08/S08Arena dirty: False review level dirty: False
+
+$ python tools/tripo-pipeline/review/ue_content_snapshot.py docs/art-pipeline/evidence/p1-ue-import-2026-09-28/snapshot-after.json --compare docs/art-pipeline/evidence/p1-ue-import-2026-09-28/snapshot-before.json
+# 2026-09-28T12:36:23Z exit=0
+  {
+   "/Game/ART004": 17,
+   "/Game/ArtPreview": 9,
+   "/Game/PipelineCandidates": 31,
+   "editor_dirty": {
+    "maps": [],
+    "content": []
+   },
+   "protected_unchanged": true,
+   "pipeline_candidates_added": [
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Candidate/Materials/MI_Decor_Barrel_Candidate",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Candidate/Materials/M_Decor_Barrel_Candidate",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Candidate/Meshes/SM_Decor_Barrel",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Candidate/Textures/T_Decor_Barrel_BC",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Candidate/Textures/T_Decor_Barrel_N",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Candidate/Textures/T_Decor_Barrel_ORM",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/SM_SM_Decor_Barrel_TripoPassthrough",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_basecolor_jpg",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/decor-barrel-tripo-3f7a258f-smartuv-tex2k-pbr_normal_png",
+    "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough/tripo_node_eda72a47-8d18-4031-9e06-2c061ab998d8_material",
+    "/Game/PipelineCandidates/Medusa/DraftClips20260928/T4LocalPass/AM_Medusa_HitReact_Draft",
+    "/Game/PipelineCandidates/Medusa/DraftClips20260928/T4LocalPass/AM_Medusa_Idle_Draft",
+    "/Game/PipelineCandidates/Medusa/DraftClips20260928/T4LocalPass/AM_Medusa_LungeAttack_Draft"
+   ]
+  }
+
+$ (inline python) build clip-validator-report.json from clip-validator/*.json
+# 2026-09-28T12:37:17Z exit=0
+
+# ---- Steps run from inline Python drivers (review/ue_live.py, UE side through the editor Cmd box `py`), in order:
+# 12:0x  ue_live.Ue().py_file(ue_py/editor_state.py)  -> current level /Game/S08/S08Arena, 0 dirty packages, Interchange.FeatureFlags.Import.FBX=true
+# 12:2x  run_task(ue_py/skeleton_refpose.py, skeletons=[T4UmFbxV1, T4LocalPass, /Game/ART004 SK_Medusa_Atlas_Skeleton])  -> skeleton-refpose.json (read only)
+# 12:2x  run_task(ue_py/import_clips.py, clips=AM_Medusa_{LungeAttack,HitReact,Idle}.fbx -> /Game/PipelineCandidates/Medusa/DraftClips20260928/T4LocalPass/AM_Medusa_*_Draft, skeleton T4LocalPass, uniform_scale=null) -> ue-anim-import-1.json
+# 12:2x  run_task(ue_py/import_clips.py, probes: LungeAttack uniform_scale=100 on T4LocalPass; LungeAttack on the T4UmFbxV1 skeleton -> .../DraftClips20260928/Probes/) -> ue-anim-import-probes.json
+# 12:2x  run_task(ue_py/measure_clips.py, 3 clips + 2 probes, height 55 uu, sample frames Lunge 0/6/14, HitReact 0/3/9, Idle 0/28/56) -> ue-anim-measure-raw.json
+# 12:2x  run_task(ue_py/import_clips.py, the same 3 clips again: replace_existing) -> ue-anim-import-2-reimport.json, ue-anim-listing-reimport.json (listing unchanged, no *_1)
+# 12:2x  MCP AssetTools.delete: .../Probes/AM_Medusa_LungeAttack_ScaleProbe100, .../Probes/AM_Medusa_LungeAttack_OnT4UmFbxV1, folder .../Probes (both probes had 0 referencers)
+# 12:3x  pose experiment in L_ART004_MedusaAnimationReview (temporary actor, destroyed; S08Arena reloaded, not dirty): re-posing an existing single-node actor lags one call, a fresh actor poses at once
+# 12:36  rm art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline/export/SM_Decor_Barrel_TripoPassthrough.fbm/ (embedded textures the UE FBX importer extracted during the passthrough import; *.fbm/ added to that .gitignore)
+# 12:2x  python tools/tripo-pipeline/review/p1_anim_report.py docs/art-pipeline/evidence/p1-ue-import-2026-09-28 -> ue-anim-report.json (exit 0)
+# 12:38  editor-frames/*.png (1920x1080) -> JPEG 1200x675 q92, sidecars updated (png_before_jpeg), PNGs kept outside git in C:/tmp/t21/frames-png; classify_evidence.py -> 16 x editor-mcp-viewport, 0 rejected
+
+# ==== Fix round (T2.1 review remark, 2026-09-28 13:0x UTC): passthrough ue-import moved out of the committed P1.5 snapshot run ====
+# The ue-import of 12:04-12:17 above ran on 20260928-p15-barrel/pipeline (created by CLI 0.3.0; prop-barrel-report §3 calls it a
+# registration snapshot). It added config.ue and a 0.4.0 ue-import stage to that run. In this round that run is restored to its
+# committed bytes (git HEAD) and the passthrough is imported from a NEW run 20260928-p15-barrel/ue-passthrough (CLI 0.4.0, UM_FBX_v1).
+# Backups of the rolled-back files (outside git): C:/tmp/t21fix/backup-pipeline-snapshot-ue-import/ (manifest 864cb850..., journal da5b02f0...,
+# reports/ue-import-report.json 2fe4100c..., reports/ue-mcp-calls.json 66daabf8...).
+
+$ python tools/tripo-pipeline/review/ue_content_snapshot.py C:/tmp/t21fix/snapshot-before-fix.json --compare docs/art-pipeline/evidence/p1-ue-import-2026-09-28/snapshot-after.json
+# 2026-09-28T13:03Z exit=0   (copied to snapshot-fix-round-before.json; state equal to the first round's snapshot-after.json, editor clean)
+  protected_unchanged: true, pipeline_candidates_added: [], editor_dirty: {maps: [], content: []}
+
+$ python tools/tripo-pipeline/tripo_pipeline.py init --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-passthrough --asset-id ASSET-DECOR-KIT-001.BARREL --primary-source tripo-3f7a258f --primary-role smartuv-tex2k-pbr-glb --export-basename SM_Decor_Barrel_TripoPassthrough --run-id 20260928-p15-barrel-ue-passthrough
+# 2026-09-28T13:03:41Z exit=0
+  init: created C:\Users\ren\WebstormProjects\unmached\unmached\art\pipeline-candidates\ASSET-DECOR-KIT-001\20260928-p15-barrel\ue-passthrough\manifest.json
+
+$ python tools/tripo-pipeline/tripo_pipeline.py register-source --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-passthrough --spec art/pipeline-candidates/ASSET-DECOR-KIT-001/source-specs/tripo-3f7a258f.json
+# 2026-09-28T13:03:41Z exit=0
+  register-source: registered tripo-3f7a258f (11 files, historical spend {'studio-credits': 60}; this command spent 0)
+
+$ python tools/tripo-pipeline/tripo_pipeline.py run --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-passthrough
+# 2026-09-28T13:03:45Z exit=0   (backend headless: blender -b per stage; the live Blender :9876 was not used)
+  preflight executed
+  import    executed
+  verify    executed
+  export    executed
+
+# 2026-09-28T13:04:33Z  inline python (review/ue_live.py + tripo_pipeline.ue_delete_owned): delete the 4 assets that the snapshot run's
+#   ue-import owned in /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough (listing == its ue_owned_assets, asserted first)
+#   -> barrel-passthrough-snapshot-assets-deleted.json (deleted StaticMesh, Material, 2 x Texture2D; listing after: [])
+
+$ git -c core.longpaths=true checkout -- art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline/manifest.json art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline/journal.jsonl
+$ mv art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline/reports/ue-import-report.json art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline/reports/ue-mcp-calls.json C:/tmp/t21fix/moved-from-pipeline-reports/
+$ python tools/tripo-pipeline/tripo_pipeline.py status --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/pipeline
+# 2026-09-28T13:04Z exit=0   (git diff HEAD -- .../pipeline: empty)
+  run 20260928-p15-barrel  asset ASSET-DECOR-KIT-001.BARREL  created by tool 0.3.0  (this tool 0.4.0, backend headless)
+  stage preflight/import/verify/export completed by 0.3.0/headless; no ue-import stage
+  export export/SM_Decor_Barrel_TripoPassthrough.fbx f9c9042a656a
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-passthrough --ue-folder /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough
+# 2026-09-28T13:04:45Z exit=0
+    ue-import executed
+
+$ python tools/tripo-pipeline/review/ue_listing.py /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough docs/art-pipeline/evidence/p1-ue-import-2026-09-28/barrel-passthrough-ue-listing-1-after-import.json
+# 2026-09-28T13:05:01Z exit=0
+  {"count": 4, "skeletal": null}
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-passthrough --ue-folder /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough
+# 2026-09-28T13:05:27Z exit=0
+    ue-import skipped
+
+$ python tools/tripo-pipeline/tripo_pipeline.py run --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-passthrough
+# 2026-09-28T13:05:29Z exit=0
+  preflight executed
+  import    skipped
+  verify    skipped
+  export    skipped
+  ue-import not-run (needs --backend mcp)
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-passthrough --ue-folder /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough --force
+# 2026-09-28T13:05:29Z exit=0
+    ue-import executed
+
+$ python tools/tripo-pipeline/review/ue_listing.py /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough docs/art-pipeline/evidence/p1-ue-import-2026-09-28/barrel-passthrough-ue-listing-2-after-force.json
+# 2026-09-28T13:05:52Z exit=0
+  {"count": 4, "skeletal": null}   (listing equal to listing-1; report-2 differs from report-1 only in previous_assets_deleted)
+
+$ python tools/tripo-pipeline/tripo_pipeline.py --backend mcp ue-import --run-dir art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-passthrough --ue-folder /Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Passthrough
+# 2026-09-28T13:06:20Z exit=0
+    ue-import skipped
+
+$ mv art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/ue-passthrough/export/SM_Decor_Barrel_TripoPassthrough.fbm C:/tmp/t21fix/fbm-moved/
+# 13:06  embedded textures the UE FBX importer extracted next to the FBX (also covered by *.fbm/ in the .gitignore)
+
+$ python tools/tripo-pipeline/review/ue_content_snapshot.py docs/art-pipeline/evidence/p1-ue-import-2026-09-28/snapshot-after.json --compare docs/art-pipeline/evidence/p1-ue-import-2026-09-28/snapshot-before.json
+# 2026-09-28T13:06:58Z exit=0   (replaces the first round's snapshot-after.json, which is kept in C:/tmp/t21fix/backup-evidence/)
+  /Game/ART004 17, /Game/ArtPreview 9, /Game/PipelineCandidates 31; protected_unchanged: true; editor_dirty: {maps: [], content: []}
+  pipeline_candidates_added: the same 13 assets (Candidate 6, Passthrough 4, DraftClips20260928/T4LocalPass 3)
+
+$ python tools/tripo-pipeline/review/ue_content_snapshot.py docs/art-pipeline/evidence/p1-ue-import-2026-09-28/snapshot-fix-round-after.json --compare docs/art-pipeline/evidence/p1-ue-import-2026-09-28/snapshot-fix-round-before.json
+# 2026-09-28T13:07Z exit=0
+  protected_unchanged: true; /Game/PipelineCandidates: no assets added or removed, files_changed = the 4 Passthrough .uasset only
