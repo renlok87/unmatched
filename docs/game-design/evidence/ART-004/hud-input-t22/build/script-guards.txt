@@ -1,0 +1,8 @@
+ART-004 T2.2 - tools/s08/run-phase2-demo.ps1 refusal checks (2026-09-28, art worktree, PowerShell 5.1)
+1) -ArtPreviewAllMedusa without -ArtPreviewBoardId
+   -> throw: ArtPreviewAllMedusa / ArtPreviewInputPlan / ArtPreviewIconSize / ArtPreviewIconProbe require ArtPreviewBoardId
+2) -ArtPreviewBoardId cmuhgs4b2001mwik4f2b2xtf8 -ArtPreviewInputPlan wheelin,space
+   -> throw: ArtPreviewInputPlan 'wheelin,space' is not a '+'-separated token list
+3) -ArtPreviewIconSize 40
+   -> ValidateSet refusal (allowed 0;24;32;48)
+Parser: [System.Management.Automation.Language.Parser]::ParseFile -> 0 errors; -ProbeCleanupOnly -> CLEANUP PROBE OK: 6/6 cases.

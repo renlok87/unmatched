@@ -12,7 +12,12 @@ class UStaticMeshComponent;
 class USkeletalMeshComponent;
 class UTextRenderComponent;
 class UBillboardComponent;
+class UCapsuleComponent;
 class UMaterialInstanceDynamic;
+
+/** ART-004 T2.2 world-label presentation: the plate owner hides its world
+ *  labels (the screen plate replaces them); neighbours show one compact line. */
+enum class ES08FighterLabelMode : uint8 { Full, Compact, Hidden };
 
 UCLASS()
 class UNMATCHED_API AS08FighterActor : public AActor {
@@ -36,6 +41,20 @@ public:
    *  inflate them across the board. At close range show only the selected
    *  fighter's name/HP; the full roster returns at overview distance. */
   void SetLabelZoomRatio(float DistanceRatio, bool bOnlySelected);
+  /** ART-004 T2.2: Full (name + HP), Compact (one short "Label HP" line) or
+   *  Hidden (the plate shows this fighter). */
+  void SetLabelMode(ES08FighterLabelMode Mode);
+  ES08FighterLabelMode GetLabelMode() const { return LabelMode; }
+  /** World box of the visible label text (false when no label is visible). */
+  bool GetVisibleLabelBox(FBox& OutBox) const;
+  /** Height of the visible figure above the cell plane (uu): the art sculpt,
+   *  the blockout or the grey mannequin box. */
+  float GetFigureHeightUU() const;
+  bool HasArtFigure() const { return bArtFigureVisible; }
+  bool HasMedusaCandidate() const { return bMedusaVisual; }
+  /** Screen-space combat icon mode: the world billboard stays hidden while
+   *  the HUD draws the exact-size icon (the trace still reports icon=1). */
+  void SetScreenIconMode(bool bScreen);
 
 protected:
   virtual void BeginPlay() override;
@@ -71,6 +90,12 @@ private:
   UPROPERTY()
   TObjectPtr<UStaticMeshComponent> ArtPlaceholder;
 
+  // ART-004 T2.2: click volume matching the visible art figure. The candidate
+  // skeletal meshes carry no physics asset, and the hidden 120-uu grey Body
+  // box used to catch clicks far above the 55-uu sculpt.
+  UPROPERTY()
+  TObjectPtr<UCapsuleComponent> ClickCapsule;
+
   bool bArtSelectionRingLoaded = false;
   bool bArtTargetRingLoaded = false;
   bool bArtTargetIconLoaded = false;
@@ -83,6 +108,14 @@ private:
   float BaseHpHeight = 66.0f;
   float LastLabelRatio = -1.0f;
   bool bLastOnlySelected = false;
+  ES08FighterLabelMode LabelMode = ES08FighterLabelMode::Full;
+  bool bArtFigureVisible = false;
+  bool bMedusaVisual = false;
+  bool bScreenIconMode = false;
+  float FigureHeightUU = 120.0f;
+  bool bCapsuleTraced = false;
+  bool bAllMedusaTraced = false;
+  void ApplyLabelVisibility();
 
   FS08BoardFighter Fighter;
 };

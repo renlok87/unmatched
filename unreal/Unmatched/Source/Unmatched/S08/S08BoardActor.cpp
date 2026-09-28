@@ -185,6 +185,40 @@ void AS08BoardActor::SetFighterLabelZoomRatio(float DistanceRatio,
   }
 }
 
+void AS08BoardActor::SetLabelPresentation(const FString& PlateFighterId) {
+  LabelPlateFighterId = PlateFighterId;
+  for (AS08FighterActor* Actor : FighterActors) {
+    if (!Actor) continue;
+    Actor->SetLabelMode(PlateFighterId.IsEmpty() ? ES08FighterLabelMode::Full
+                        : Actor->GetFighterId() == PlateFighterId ? ES08FighterLabelMode::Hidden
+                                                                  : ES08FighterLabelMode::Compact);
+  }
+}
+
+void AS08BoardActor::SetScreenIconMode(bool bScreen) {
+  bScreenIconMode = bScreen;
+  for (AS08FighterActor* Actor : FighterActors) {
+    if (Actor) Actor->SetScreenIconMode(bScreen);
+  }
+}
+
+bool AS08BoardActor::GetDamageNumberWorldBox(const FString& FighterId, FBox& OutBox) const {
+  const TWeakObjectPtr<AActor>* Number = DamageNumbers.Find(FighterId);
+  if (!Number || !Number->IsValid()) return false;
+  const USceneComponent* Root = Number->Get()->GetRootComponent();
+  if (!Root) return false;
+  OutBox = Root->Bounds.GetBox();
+  return OutBox.IsValid != 0;
+}
+
+TArray<FString> AS08BoardActor::GetActiveDamageNumberIds() const {
+  TArray<FString> Out;
+  for (const TPair<FString, TWeakObjectPtr<AActor>>& Entry : DamageNumbers) {
+    if (Entry.Value.IsValid()) Out.Add(Entry.Key);
+  }
+  return Out;
+}
+
 void AS08BoardActor::SetCombatFocus(const FString& AttackerId,
                                    const FString& TargetId) {
   CombatAttackerId = AttackerId;
@@ -203,6 +237,12 @@ void AS08BoardActor::ShowDamageNumber(const FString& FighterId, int32 Damage,
   const FS08BoardFighter* Target = Fighters.FindByPredicate(
       [&](const FS08BoardFighter& Fighter) { return Fighter.Id == FighterId; });
   if (!Target) return;
+  if (!DamageDedupe.Accept(FighterId, SequenceNumber)) {
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW damage-number duplicate ignored fighter=%s amount=%d seq=%d"),
+        *FighterId, Damage, SequenceNumber));
+    return;
+  }
 
   if (TWeakObjectPtr<AActor>* Old = DamageNumbers.Find(FighterId)) {
     if (Old->IsValid()) Old->Get()->Destroy();
@@ -433,12 +473,26 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
       FighterActors.Add(Actor);
     }
     if (Actor) {
+      Actor->SetScreenIconMode(bScreenIconMode);
       Actor->ApplyFighter(Fighter, Board.CellToWorld(Fighter.X, Fighter.Y),
                           Fighter.OwnerId == OwnOwnerId, bArtActive);
       Actor->SetSelected(Fighter.Id == SelectedFighterId);
       Actor->SetCombatMarkers(Fighter.Id == CombatAttackerId,
                               Fighter.Id == CombatTargetId);
+      Actor->SetLabelMode(LabelPlateFighterId.IsEmpty() ? ES08FighterLabelMode::Full
+                          : Fighter.Id == LabelPlateFighterId ? ES08FighterLabelMode::Hidden
+                                                              : ES08FighterLabelMode::Compact);
     }
+  }
+  // ART-004 T2.2 six-copies review: one summary once every fighter applied.
+  if (bArtActive && S08ArtPreviewAllMedusa() && !bAllMedusaSummaryTraced && FighterActors.Num() > 0) {
+    bAllMedusaSummaryTraced = true;
+    int32 Visual = 0;
+    for (const AS08FighterActor* Actor : FighterActors) {
+      if (Actor && Actor->HasMedusaCandidate()) ++Visual;
+    }
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW allMedusa copies=%d visual=%d"),
+                                     FighterActors.Num(), Visual));
   }
 }
 

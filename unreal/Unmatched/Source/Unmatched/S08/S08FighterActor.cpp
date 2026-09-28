@@ -1,7 +1,9 @@
 #include "S08FighterActor.h"
+#include "S08ArtHud.h"
 #include "S08ArtPreviewMedusa.h"
 #include "S08TraceLog.h"
 #include "Camera/PlayerCameraManager.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BillboardComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -84,6 +86,16 @@ AS08FighterActor::AS08FighterActor() {
   ArtPlaceholder->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   ArtPlaceholder->SetVisibility(false);
 
+  // ART-004 T2.2: visibility-channel click volume of an art figure. Enabled
+  // only while an art figure replaces the grey Body box (ApplyFighter).
+  ClickCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("ClickCapsule"));
+  ClickCapsule->SetupAttachment(RootComponent);
+  ClickCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  ClickCapsule->SetCollisionResponseToAllChannels(ECR_Ignore);
+  ClickCapsule->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+  ClickCapsule->SetCanEverAffectNavigation(false);
+  ClickCapsule->SetHiddenInGame(true);
+
   Label = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Label"));
   Label->SetupAttachment(RootComponent);
   Label->SetHorizontalAlignment(EHTA_Center);
@@ -139,9 +151,15 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   bool bVisualArt = false;
   bool bVisualBlockout = false;
   // The candidate is a Medusa sculpt, not a substitute for Arthur, Merlin or
-  // the three Harpies. Keep their honest grey blockouts in this pilot.
-  const bool bMedusaCandidate = bArtPreview && Fighter.bIsHero &&
-      Fighter.Name.Equals(TEXT("Medusa"), ESearchCase::IgnoreCase);
+  // the three Harpies. Keep their honest grey blockouts in this pilot - except
+  // in the opt-in -ArtPreviewAllMedusa review (ART-004 T2.2): six copies of
+  // the candidate with the team MI and the hero/sidekick scale, so the art
+  // review sees six sculpts in one live frame. Never a production mapping.
+  const bool bAllMedusa = S08ArtPreviewAllMedusa();
+  const bool bMedusaCandidate = S08IsMedusaCandidateFighter(
+      bArtPreview, bAllMedusa, Fighter.bIsHero, Fighter.Name);
+  USkeletalMesh* CandidateMesh = nullptr;
+  UStaticMesh* BlockoutMesh = nullptr;
   if (bMedusaCandidate) {
     const FS08MedusaCandidate MedusaCandidate = S08SelectMedusaCandidate();
     USkeletalMesh* Mesh = MedusaCandidate.MeshPath
@@ -154,6 +172,7 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
              : TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_Red"));
     bVisualArt = Mesh && Mesh->GetSkeleton() && Pedestal && TeamMaterial;
     if (bVisualArt) {
+      CandidateMesh = Mesh;
       ArtBody->SetSkeletalMeshAsset(Mesh);
       ArtBase->SetStaticMesh(Pedestal);
       for (int32 Slot = 0; Slot < 2; ++Slot) ArtBody->SetMaterial(Slot, TeamMaterial);
@@ -177,6 +196,7 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
     }
     if (MeshPath) {
       if (UStaticMesh* PreviewMesh = LoadObject<UStaticMesh>(nullptr, MeshPath)) {
+        BlockoutMesh = PreviewMesh;
         ArtPlaceholder->SetStaticMesh(PreviewMesh);
         ArtPlaceholder->SetRelativeRotation(
             FRotator(0, CellCenter.Y < 0 ? 0 : 180, 0));
@@ -189,6 +209,51 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   ArtBody->SetVisibility(bVisualArt);
   ArtBase->SetVisibility(bVisualArt);
   ArtPlaceholder->SetVisibility(bVisualBlockout);
+  bArtFigureVisible = bArtFigure;
+  bMedusaVisual = bVisualArt;
+
+  // ART-004 T2.2 click volume. The hidden grey Body box (60x60x120 uu for a
+  // hero) kept catching visibility traces far above the 55-uu sculpt; an art
+  // figure gets a capsule sized from its own mesh bounds instead, and the
+  // hidden box stops blocking. The candidate skeletal meshes have no physics
+  // asset (checked and traced), so the capsule is the click contract.
+  const float ArtScale = Fighter.bIsHero ? 1.0f : 0.78f;
+  if (bArtFigure) {
+    const FBoxSphereBounds MeshBounds = CandidateMesh ? CandidateMesh->GetBounds()
+        : (BlockoutMesh ? BlockoutMesh->GetBounds()
+                        : FBoxSphereBounds(FVector::ZeroVector, FVector(15.0f, 15.0f, 27.5f), 30.0f));
+    const float Scale = bVisualArt ? ArtScale : 1.0f;
+    const float Top = FMath::Max(10.0f, static_cast<float>(MeshBounds.Origin.Z + MeshBounds.BoxExtent.Z) * Scale);
+    const float Radius = FMath::Clamp(
+        0.5f * static_cast<float>(MeshBounds.BoxExtent.X + MeshBounds.BoxExtent.Y) * Scale,
+        8.0f * Scale, 20.0f * Scale);
+    const float HalfHeight = FMath::Max(Radius, Top * 0.5f);
+    FigureHeightUU = Top;
+    ClickCapsule->SetCapsuleSize(Radius, HalfHeight);
+    ClickCapsule->SetRelativeLocation(FVector(0.0f, 0.0f, HalfHeight));
+    ClickCapsule->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    if (!bCapsuleTraced) {
+      bCapsuleTraced = true;
+      FS08Trace::Write(FString::Printf(
+          TEXT("ARTPREVIEW click capsule fighter=%s mesh=%s physicsAsset=%d radius=%.1f halfHeight=%.1f top=%.1f bodyCollision=0 source=meshBounds"),
+          *Fighter.Id,
+          CandidateMesh ? *CandidateMesh->GetName() : (BlockoutMesh ? *BlockoutMesh->GetName() : TEXT("none")),
+          CandidateMesh && CandidateMesh->GetPhysicsAsset() ? 1 : 0, Radius, HalfHeight, Top));
+    }
+  } else {
+    FigureHeightUU = Fighter.bIsHero ? 120.0f : 50.0f;
+    ClickCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    Body->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+  }
+  if (bAllMedusa && bArtPreview && !bAllMedusaTraced) {
+    bAllMedusaTraced = true;
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW allMedusa copy fighter=%s hero=%d team=%s visual=%d mesh=%s scale=%.2f name=%s"),
+        *Fighter.Id, Fighter.bIsHero ? 1 : 0, bOwn ? TEXT("own") : TEXT("enemy"), bVisualArt ? 1 : 0,
+        ArtBody->GetSkeletalMeshAsset() ? *ArtBody->GetSkeletalMeshAsset()->GetName() : TEXT("none"),
+        ArtScale, *Fighter.Name));
+  }
   if (bArtPreview && Fighter.Name.Contains(TEXT("Medusa"))) {
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW fighter=%s hero=%d eligible=%d visual=%d mesh=%s"),
@@ -279,13 +344,17 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   LastLabelRatio = -1.0f;
   SetLabelZoomRatio(1.0f, false);
 
-  Label->SetText(FText::FromString(Fighter.Label));
-  HpLabel->SetText(FText::FromString(
-      FString::Printf(TEXT("%d/%d"), Fighter.Health, Fighter.MaxHealth)));
+  ApplyLabelVisibility();
 
   // Death (isDefeated/health<=0): instant hide, no animations (grey slice).
   SetActorHiddenInGame(!Fighter.IsAlive());
   SetActorEnableCollision(Fighter.IsAlive());
+}
+
+void AS08FighterActor::SetScreenIconMode(bool bScreen) {
+  if (bScreenIconMode == bScreen) return;
+  bScreenIconMode = bScreen;
+  TargetIcon->SetVisibility(bIsCombatTarget && bArtTargetIconLoaded && !bScreenIconMode);
 }
 
 void AS08FighterActor::SetSelected(bool bSelected) {
@@ -307,13 +376,16 @@ void AS08FighterActor::SetCombatMarkers(bool bAttacker, bool bTarget) {
   bIsCombatTarget = bNewTarget;
   Ring->SetVisibility(bIsSelected || bIsCombatAttacker);
   TargetRing->SetVisibility(bIsCombatTarget);
-  TargetIcon->SetVisibility(bIsCombatTarget && bArtTargetIconLoaded);
+  TargetIcon->SetVisibility(bIsCombatTarget && bArtTargetIconLoaded && !bScreenIconMode);
+  // icon=1 means "the target icon is bound to this fighter"; iconMode says
+  // whether the world billboard or the exact-size HUD icon (T2.2) draws it.
   FS08Trace::Write(FString::Printf(
-      TEXT("ARTPREVIEW combat marker fighter=%s attacker=%d target=%d icon=%d targetMesh=%s"),
+      TEXT("ARTPREVIEW combat marker fighter=%s attacker=%d target=%d icon=%d targetMesh=%s iconMode=%s"),
       *Fighter.Name, bIsCombatAttacker ? 1 : 0, bIsCombatTarget ? 1 : 0,
       bIsCombatTarget && bArtTargetIconLoaded ? 1 : 0,
       TargetRing->GetStaticMesh() ? *TargetRing->GetStaticMesh()->GetName()
-                                  : TEXT("none")));
+                                  : TEXT("none"),
+      bScreenIconMode ? TEXT("screen") : TEXT("world")));
 }
 
 void AS08FighterActor::SetLabelZoomRatio(float DistanceRatio,
@@ -335,7 +407,47 @@ void AS08FighterActor::SetLabelZoomRatio(float DistanceRatio,
       FMath::Lerp(BaseNameHeight, CloseNameZ, CloseAmount)));
   HpLabel->SetRelativeLocation(FVector(0.0f, 0.0f,
       FMath::Lerp(BaseHpHeight, CloseHpZ, CloseAmount)));
-  const bool bShow = !bOnlySelected || bIsSelected;
+  ApplyLabelVisibility();
+}
+
+void AS08FighterActor::SetLabelMode(ES08FighterLabelMode Mode) {
+  if (LabelMode == Mode) return;
+  LabelMode = Mode;
+  ApplyLabelVisibility();
+}
+
+void AS08FighterActor::ApplyLabelVisibility() {
+  const float Ratio = LastLabelRatio > 0.0f ? LastLabelRatio : 1.0f;
+  if (LabelMode == ES08FighterLabelMode::Compact) {
+    // One short line "Label HP" at the name height: neighbours of the plate
+    // owner stay identifiable at K2 without two stacked lines per figure.
+    Label->SetText(FText::FromString(FString::Printf(TEXT("%s %d/%d"), *Fighter.Label,
+                                                     Fighter.Health, Fighter.MaxHealth)));
+    Label->SetWorldSize(FMath::Min(BaseNameWorldSize, BaseHpWorldSize) * 0.85f * Ratio);
+    Label->SetVisibility(true);
+    HpLabel->SetVisibility(false);
+    return;
+  }
+  Label->SetText(FText::FromString(Fighter.Label));
+  HpLabel->SetText(FText::FromString(
+      FString::Printf(TEXT("%d/%d"), Fighter.Health, Fighter.MaxHealth)));
+  Label->SetWorldSize(BaseNameWorldSize * Ratio);
+  HpLabel->SetWorldSize(BaseHpWorldSize * Ratio);
+  const bool bShow = LabelMode == ES08FighterLabelMode::Full && (!bLastOnlySelected || bIsSelected);
   Label->SetVisibility(bShow);
   HpLabel->SetVisibility(bShow);
+}
+
+bool AS08FighterActor::GetVisibleLabelBox(FBox& OutBox) const {
+  OutBox = FBox(ForceInit);
+  if (IsHidden()) return false;
+  const UTextRenderComponent* Texts[2] = {Label.Get(), HpLabel.Get()};
+  for (const UTextRenderComponent* Text : Texts) {
+    if (Text && Text->IsVisible()) OutBox += Text->Bounds.GetBox();
+  }
+  return OutBox.IsValid != 0;
+}
+
+float AS08FighterActor::GetFigureHeightUU() const {
+  return FigureHeightUU;
 }

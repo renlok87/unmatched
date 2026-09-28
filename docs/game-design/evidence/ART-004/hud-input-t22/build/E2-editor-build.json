@@ -1,0 +1,75 @@
+{
+  "schema": "unmatched.t22-editor-build/1",
+  "label": "E2",
+  "target": "UnmatchedEditor Win64 Development",
+  "startedLocal": "2026-09-28T17:27:22+05:00",
+  "flags": [
+    "-WaitMutex",
+    "-NoXGE",
+    "-NoUBA",
+    "-MaxParallelActions=2",
+    "-NoHotReloadFromIDE"
+  ],
+  "freeCommitGB": 19.5,
+  "liveCodingMutexBefore": {
+    "name": "Global\\LiveCoding_C++Program Files+Epic Games+UE_5.8+Engine+Binaries+Win64+UnrealEditor.exe",
+    "exists": true
+  },
+  "command": "Build.bat UnmatchedEditor Win64 Development <uproject> -WaitMutex -NoXGE -NoUBA -MaxParallelActions=2 -NoHotReloadFromIDE",
+  "launcher": "powershell Start-Process -WindowStyle Hidden -Wait (no console window)",
+  "why": "the live main-checkout editor holds the Live Coding mutex of the shared UnrealEditor.exe; -NoHotReloadFromIDE skips that UBT check only and keeps WITH_LIVE_CODING 1 (not -NoLiveCoding, R3)",
+  "log": "docs/game-design/evidence/ART-004/hud-input-t22/build/E2-editor-build.log",
+  "sharedDefinitionsBefore": {
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Core/SharedDefinitions.Core.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/CoreUObject/SharedDefinitions.CoreUObject.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/CoreUObject/SharedDefinitions.CoreUObject.RTTI.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Engine/SharedDefinitions.Engine.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Engine/SharedDefinitions.Engine.Project.ValApi.ValExpApi.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Slate/SharedDefinitions.Slate.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/UnrealEd/SharedDefinitions.UnrealEd.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/UnrealEd/SharedDefinitions.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/UnrealEd/SharedDefinitions.UnrealEd.RTTI.Cpp20.h": 1
+  },
+  "dllBefore": {
+    "sha256": "b3aa9d447c524d1a598863c5d215bc59cd6f3c152a11670b9f522d7f2552cccb",
+    "mtime": "2026-09-28T08:23:03+05:00"
+  },
+  "exitCode": 6,
+  "durationS": 12.3,
+  "finishedLocal": "2026-09-28T17:27:35+05:00",
+  "resultLines": [
+    "Result: Failed (OtherCompilationError)"
+  ],
+  "errorLines": [
+    "S08FlowGameMode.cpp.obj : error LNK2019: ?????? ?? ????????????? ??????? ?????? \"__declspec(dllimport) unsigned int __cdecl RHIGetGPUFrameCycles(unsigned int)\" (__imp_?RHIGetGPUFrameCycles@@YAII@Z) ? ??????? \"public: virtual void __cdecl AS08FlowGameMode::Tick(float)\" (?Tick@AS08FlowGameMode@@UEAAXM@Z).",
+    "S08FlowGameMode.cpp.obj : error LNK2019: ?????? ?? ????????????? ??????? ?????? \"__declspec(dllimport) class FDynamicRHI * GDynamicRHI\" (__imp_?GDynamicRHI@@3PEAVFDynamicRHI@@EA) ? ??????? \"void __cdecl `anonymous namespace'::S08WritePerfConfig(void)\" (?S08WritePerfConfig@?A0x35c9e761@@YAXXZ).",
+    "S08FlowGameMode.cpp.obj : error LNK2019: ?????? ?? ????????????? ??????? ?????? \"__declspec(dllimport) unsigned int GRenderThreadTime\" (__imp_?GRenderThreadTime@@3IA) ? ??????? \"public: virtual void __cdecl AS08FlowGameMode::Tick(float)\" (?Tick@AS08FlowGameMode@@UEAAXM@Z).",
+    "S08FlowGameMode.cpp.obj : error LNK2019: ?????? ?? ????????????? ??????? ?????? \"__declspec(dllimport) unsigned int GGameThreadTime\" (__imp_?GGameThreadTime@@3IA) ? ??????? \"public: virtual void __cdecl AS08FlowGameMode::Tick(float)\" (?Tick@AS08FlowGameMode@@UEAAXM@Z).",
+    "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Binaries\\Win64\\UnrealEditor-Unmatched.dll : fatal error LNK1120: ????????????? ??????? ?????????: 4"
+  ],
+  "warningLines": [],
+  "result": "Failed",
+  "sharedDefinitionsAfter": {
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Core/SharedDefinitions.Core.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/CoreUObject/SharedDefinitions.CoreUObject.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/CoreUObject/SharedDefinitions.CoreUObject.RTTI.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Engine/SharedDefinitions.Engine.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Engine/SharedDefinitions.Engine.Project.ValApi.ValExpApi.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Slate/SharedDefinitions.Slate.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/UnrealEd/SharedDefinitions.UnrealEd.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/UnrealEd/SharedDefinitions.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/UnrealEd/SharedDefinitions.UnrealEd.RTTI.Cpp20.h": 1
+  },
+  "withLiveCodingValues": [
+    1
+  ],
+  "dll": {
+    "path": "unreal/Unmatched/Binaries/Win64/UnrealEditor-Unmatched.dll",
+    "sha256": null,
+    "mtime": null
+  },
+  "liveCodingMutexAfter": {
+    "name": "Global\\LiveCoding_C++Program Files+Epic Games+UE_5.8+Engine+Binaries+Win64+UnrealEditor.exe",
+    "exists": true
+  }
+}

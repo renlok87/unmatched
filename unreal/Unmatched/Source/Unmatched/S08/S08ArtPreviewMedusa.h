@@ -38,3 +38,10 @@ inline FS08MedusaCandidate S08SelectMedusaCandidate() {
   Unknown.Requested = RequestedLabel;
   return Unknown;
 }
+
+// ART-004 T2.2 opt-in review: -ArtPreviewAllMedusa puts the selected candidate
+// on all six live fighters (team MI, hero/sidekick scale) so one packaged frame
+// shows six sculpts on the board. Review only; never a hero mapping.
+inline bool S08ArtPreviewAllMedusa() {
+  return FParse::Param(FCommandLine::Get(), TEXT("ArtPreviewAllMedusa"));
+}
