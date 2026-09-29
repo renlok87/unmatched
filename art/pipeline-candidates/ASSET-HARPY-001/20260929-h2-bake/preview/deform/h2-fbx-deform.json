@@ -1,0 +1,155 @@
+{
+ "source": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/work/probe-fbx-authored.blend",
+ "label": "h2-fbx",
+ "family": "contract17",
+ "family_bone_hits": 7,
+ "height": 0.37225,
+ "bbox_min": [
+  -0.3226,
+  -0.119,
+  0.0478
+ ],
+ "bbox_max": [
+  0.3224,
+  0.1807,
+  0.42
+ ],
+ "tests": [
+  {
+   "test": "head_turn",
+   "bone": "head",
+   "axis": "Z",
+   "deg": 35,
+   "moved_vertices": 2854,
+   "centroid_z_norm": 0.749,
+   "centroid_x_norm": -0.006,
+   "expect": {
+    "z_norm_min": 0.7
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Harpy_Body",
+     0.1708
+    ]
+   ]
+  },
+  {
+   "test": "spine_bend_fwd",
+   "bone": "spine",
+   "axis": "X",
+   "deg": 25,
+   "moved_vertices": 12825,
+   "centroid_z_norm": 0.63,
+   "centroid_x_norm": 0.01,
+   "expect": {
+    "z_norm_min": 0.45
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Harpy_Body",
+     0.7676
+    ]
+   ]
+  },
+  {
+   "test": "arm_l_raise",
+   "bone": "arm_upper.L",
+   "axis": "Y",
+   "deg": -45,
+   "moved_vertices": 3891,
+   "centroid_z_norm": 0.598,
+   "centroid_x_norm": 0.499,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_min": 0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Harpy_Body",
+     0.2329
+    ]
+   ]
+  },
+  {
+   "test": "arm_r_raise",
+   "bone": "arm_upper.R",
+   "axis": "Y",
+   "deg": 45,
+   "moved_vertices": 3696,
+   "centroid_z_norm": 0.603,
+   "centroid_x_norm": -0.495,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_max": -0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Harpy_Body",
+     0.2212
+    ]
+   ]
+  },
+  {
+   "test": "forearm_l_bend",
+   "bone": "arm_lower.L",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 2989,
+   "centroid_z_norm": 0.609,
+   "centroid_x_norm": 0.584,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_min": 0.2
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Harpy_Body",
+     0.1789
+    ]
+   ]
+  },
+  {
+   "test": "thigh_l_flex",
+   "bone": "leg_upper.L",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 1698,
+   "centroid_z_norm": 0.18,
+   "centroid_x_norm": 0.122,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Harpy_Body",
+     0.1016
+    ]
+   ]
+  },
+  {
+   "test": "thigh_r_flex",
+   "bone": "leg_upper.R",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 1778,
+   "centroid_z_norm": 0.174,
+   "centroid_x_norm": -0.112,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Harpy_Body",
+     0.1064
+    ]
+   ]
+  }
+ ]
+}

@@ -1,0 +1,3469 @@
+{
+  "schema": "unmatched.h2-hero-report/1",
+  "revision": 2,
+  "asset_id": "ASSET-MEDUSA-001",
+  "iteration": "H2 (проработка героев по концептам hero-quality-v1), Blender-этап",
+  "date": "2026-09-29",
+  "status": "измерено",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false,
+    "ue_imported": false
+  },
+  "current_game_candidate_unchanged": "v2/v3.1 (ART004, 20260929-w4b-um-master) остаются игровым кандидатом до приёмки H2",
+  "revision_2_verify_fixes": {
+    "defect": "сквозные дыры в местах контакта частей в позах (verify 2026-09-29, major ×2): сегментация Tripo «по частям» режет каждую часть по линии контакта; в ревизии 1 это ошибочно названо «естественный отход, а не трещина» — на деле за петлёй не было поверхности",
+    "fix": [
+      "стадия close: 19 контактных крышек по точной петле (платье под кулаком по форме пояса, ладонь кулака, проймы и верхушки плеч, разрезы и верхушки бёдер, низ левого бедра, поножи, платье над левой поножью, низ подола, подошвы) + 9 дыр верха подставки перестроены по точной кромке",
+      "ворот: не крышкой (седловая петля выходила перед кожей декольте в покое), а весами — rig.junctions (полоса платья у ворота получает веса шеи)",
+      "тексели крышек заполняются от кромки (BC/ORM гармонически по отсчётам граней кромки, N плоская), а не запеканием",
+      "стадия seams: метрика «открытые петли, открывшиеся в позе» + ray-тест сквозных дыр по задним граням на .blend и FBX + кадры проб с отсечением задних граней",
+      "превью Cycles: у игровых моделей задние грани отсечены (как UE one-sided)"
+    ],
+    "before_after": {
+      "open_rim_loops_ge_1cm": {
+        "before": 38,
+        "after_open": 19,
+        "after_closed_by_caps": 19
+      },
+      "loops_opening_in_poses_uncapped": {
+        "before": 20,
+        "after": 0
+      },
+      "see_through_blend": {
+        "before": {
+          "arm_l_raise": {
+            "backface_px": 848,
+            "new_vs_rest_px": 518,
+            "largest_new_blob_px": 116,
+            "largest_new_blob_view": "front_lo"
+          },
+          "arm_r_raise": {
+            "backface_px": 1344,
+            "new_vs_rest_px": 1014,
+            "largest_new_blob_px": 90,
+            "largest_new_blob_view": "front_r"
+          },
+          "forearm_l_bend": {
+            "backface_px": 336,
+            "new_vs_rest_px": 6,
+            "largest_new_blob_px": 4,
+            "largest_new_blob_view": "left_hi"
+          },
+          "head_turn": {
+            "backface_px": 643,
+            "new_vs_rest_px": 313,
+            "largest_new_blob_px": 39,
+            "largest_new_blob_view": "back_hi"
+          },
+          "rest": {
+            "backface_px": 330,
+            "new_vs_rest_px": null,
+            "largest_new_blob_px": null,
+            "largest_new_blob_view": null
+          },
+          "spine_bend_fwd": {
+            "backface_px": 314,
+            "new_vs_rest_px": -16,
+            "largest_new_blob_px": 4,
+            "largest_new_blob_view": "left_hi"
+          },
+          "thigh_l_flex": {
+            "backface_px": 5475,
+            "new_vs_rest_px": 5145,
+            "largest_new_blob_px": 549,
+            "largest_new_blob_view": "front_lo"
+          },
+          "thigh_r_flex": {
+            "backface_px": 7074,
+            "new_vs_rest_px": 6744,
+            "largest_new_blob_px": 974,
+            "largest_new_blob_view": "front_r"
+          }
+        },
+        "after": {
+          "arm_l_raise": {
+            "backface_px": 85,
+            "new_vs_rest_px": 15,
+            "largest_new_blob_px": 2,
+            "largest_new_blob_view": "front"
+          },
+          "arm_r_raise": {
+            "backface_px": 83,
+            "new_vs_rest_px": 13,
+            "largest_new_blob_px": 8,
+            "largest_new_blob_view": "back_lo"
+          },
+          "forearm_l_bend": {
+            "backface_px": 69,
+            "new_vs_rest_px": -1,
+            "largest_new_blob_px": 1,
+            "largest_new_blob_view": "front"
+          },
+          "head_turn": {
+            "backface_px": 101,
+            "new_vs_rest_px": 31,
+            "largest_new_blob_px": 7,
+            "largest_new_blob_view": "back_hi"
+          },
+          "rest": {
+            "backface_px": 70,
+            "new_vs_rest_px": null,
+            "largest_new_blob_px": null,
+            "largest_new_blob_view": null
+          },
+          "spine_bend_fwd": {
+            "backface_px": 61,
+            "new_vs_rest_px": -9,
+            "largest_new_blob_px": 2,
+            "largest_new_blob_view": "front_r"
+          },
+          "thigh_l_flex": {
+            "backface_px": 180,
+            "new_vs_rest_px": 110,
+            "largest_new_blob_px": 4,
+            "largest_new_blob_view": "front"
+          },
+          "thigh_r_flex": {
+            "backface_px": 133,
+            "new_vs_rest_px": 63,
+            "largest_new_blob_px": 2,
+            "largest_new_blob_view": "front_l"
+          }
+        }
+      },
+      "see_through_fbx": {
+        "before": {
+          "arm_l_raise": {
+            "backface_px": 848,
+            "new_vs_rest_px": 518,
+            "largest_new_blob_px": 116,
+            "largest_new_blob_view": "front_lo"
+          },
+          "arm_r_raise": {
+            "backface_px": 1344,
+            "new_vs_rest_px": 1014,
+            "largest_new_blob_px": 90,
+            "largest_new_blob_view": "front_r"
+          },
+          "forearm_l_bend": {
+            "backface_px": 336,
+            "new_vs_rest_px": 6,
+            "largest_new_blob_px": 4,
+            "largest_new_blob_view": "left_hi"
+          },
+          "head_turn": {
+            "backface_px": 643,
+            "new_vs_rest_px": 313,
+            "largest_new_blob_px": 39,
+            "largest_new_blob_view": "back_hi"
+          },
+          "rest": {
+            "backface_px": 330,
+            "new_vs_rest_px": null,
+            "largest_new_blob_px": null,
+            "largest_new_blob_view": null
+          },
+          "spine_bend_fwd": {
+            "backface_px": 314,
+            "new_vs_rest_px": -16,
+            "largest_new_blob_px": 4,
+            "largest_new_blob_view": "left_hi"
+          },
+          "thigh_l_flex": {
+            "backface_px": 5475,
+            "new_vs_rest_px": 5145,
+            "largest_new_blob_px": 549,
+            "largest_new_blob_view": "front_lo"
+          },
+          "thigh_r_flex": {
+            "backface_px": 7074,
+            "new_vs_rest_px": 6744,
+            "largest_new_blob_px": 974,
+            "largest_new_blob_view": "front_r"
+          }
+        },
+        "after": {
+          "arm_l_raise": {
+            "backface_px": 92,
+            "new_vs_rest_px": 20,
+            "largest_new_blob_px": 2,
+            "largest_new_blob_view": "front"
+          },
+          "arm_r_raise": {
+            "backface_px": 88,
+            "new_vs_rest_px": 16,
+            "largest_new_blob_px": 8,
+            "largest_new_blob_view": "back_lo"
+          },
+          "forearm_l_bend": {
+            "backface_px": 73,
+            "new_vs_rest_px": 1,
+            "largest_new_blob_px": 2,
+            "largest_new_blob_view": "back"
+          },
+          "head_turn": {
+            "backface_px": 103,
+            "new_vs_rest_px": 31,
+            "largest_new_blob_px": 7,
+            "largest_new_blob_view": "back_hi"
+          },
+          "rest": {
+            "backface_px": 72,
+            "new_vs_rest_px": null,
+            "largest_new_blob_px": null,
+            "largest_new_blob_view": null
+          },
+          "spine_bend_fwd": {
+            "backface_px": 63,
+            "new_vs_rest_px": -9,
+            "largest_new_blob_px": 2,
+            "largest_new_blob_view": "front_r"
+          },
+          "thigh_l_flex": {
+            "backface_px": 174,
+            "new_vs_rest_px": 102,
+            "largest_new_blob_px": 4,
+            "largest_new_blob_view": "front"
+          },
+          "thigh_r_flex": {
+            "backface_px": 138,
+            "new_vs_rest_px": 66,
+            "largest_new_blob_px": 2,
+            "largest_new_blob_view": "front_l"
+          }
+        }
+      },
+      "before_source": "C:/tmp/h2mfix/before (копия прогона ревизии 1) — та же стадия seams ревизии 2, вне репозитория"
+    }
+  },
+  "run": {
+    "dir": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-bake",
+    "tool": "h2-bake/0.2.0",
+    "blender": "Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)",
+    "profile": {
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-bake-h2.json",
+      "profile_id": "medusa-h2-bake/1",
+      "sha256": "fc7b3bebac00f96be8e8ff9ae219dc36a17e5a03108f09c1a0cdd5ab4a3730ab"
+    },
+    "modules": "tools/tripo-pipeline/blender/h2_bake/ (новый модуль; tripo_pipeline.py, candidate/atlas.py, candidate_build/* не изменялись)",
+    "read_only_dependencies": {
+      "blender/_tools/presets/UM_FBX_v1.json": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+      "tools/tripo-pipeline/blender/candidate_build/closure.py": "72c2b0ce92f9179fbc3be49de575a72b8613438637bb87347b8943e5436e5af0",
+      "tools/tripo-pipeline/blender/candidate_build/core.py": "d2a5b9b10e25b0aa188bcdcf50a829174ecf399bf82d813298e2e478b7d24073",
+      "tools/tripo-pipeline/blender/candidate_build/measure.py": "bfe3538fe3a4c7d18398d8940f16c46093c50dc5272909ca1151605d70aaadef"
+    },
+    "network": {
+      "paid_tasks_created": 0,
+      "tripo_calls": 0
+    },
+    "paid_operations": 0
+  },
+  "sources": {
+    "parts_glb": {
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/source/medusa-h2-tripo-40c4d1cd-parts17.glb",
+      "sha256": "69ef27b36fb9c46fd16ec2acf6f930a2d61f98af1847ea73225266295b147f32"
+    },
+    "tex_glb": {
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/source/medusa-h2-tripo-40c4d1cd-tex8k-pbr.glb",
+      "sha256": "c1ae050f7b8a63f06aaecca2acef263ccdf07c8a5a9e84b52d14e9415e495604"
+    },
+    "source_spec": "art/pipeline-candidates/ASSET-MEDUSA-001/source-specs/tripo-40c4d1cd-h2.json",
+    "in_git": false,
+    "in_git_note": "оба сырых GLB исключены .gitignore ассета (решение Tripo-этапа оркестратора) и закреплены sha256/байтами в source-spec и 20260929-h2-tripo/reports/tripo-run.json: tex8k-pbr 69,2 МБ > 50 МБ, parts17 44,7 МБ < 50 МБ — исключение по решению закреплять оба оригинала по sha, а не по порогу",
+    "task": "40c4d1cd-a4cc-42de-9007-772b6958366e (Tripo Studio, multi-view front/LEFT/back, по частям Баланс, ультра 2M; 8K без освещения; PBR)",
+    "concepts": {
+      "front": "art/imagegen/hero-quality-v1/medusa/medusa-front.png",
+      "side": "art/imagegen/hero-quality-v1/medusa/medusa-side.png",
+      "back": "art/imagegen/hero-quality-v1/medusa/medusa-back.png"
+    },
+    "quality_reference": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png"
+  },
+  "import_and_match": {
+    "checks": {
+      "geometry_identical_parts_vs_textured": {
+        "measured": "per part: triangles equal and unique vertex position sets equal (float32)",
+        "note": "the textured GLB splits vertices along UV seams (more vertices, same positions)",
+        "passed": true
+      },
+      "orientation_inside_out_parts_as_profile": {
+        "expected": [],
+        "measured": [],
+        "passed": true
+      },
+      "part_sets_match": {
+        "expected": [
+          "tripo_part_0",
+          "tripo_part_1",
+          "tripo_part_2",
+          "tripo_part_3",
+          "tripo_part_4",
+          "tripo_part_5",
+          "tripo_part_6",
+          "tripo_part_7",
+          "tripo_part_8",
+          "tripo_part_9",
+          "tripo_part_10",
+          "tripo_part_11",
+          "tripo_part_12",
+          "tripo_part_13",
+          "tripo_part_14",
+          "tripo_part_15",
+          "tripo_part_16"
+        ],
+        "measured": {
+          "parts_glb": [
+            "tripo_part_0",
+            "tripo_part_1",
+            "tripo_part_2",
+            "tripo_part_3",
+            "tripo_part_4",
+            "tripo_part_5",
+            "tripo_part_6",
+            "tripo_part_7",
+            "tripo_part_8",
+            "tripo_part_9",
+            "tripo_part_10",
+            "tripo_part_11",
+            "tripo_part_12",
+            "tripo_part_13",
+            "tripo_part_14",
+            "tripo_part_15",
+            "tripo_part_16"
+          ],
+          "tex_glb": [
+            "tripo_part_0",
+            "tripo_part_1",
+            "tripo_part_2",
+            "tripo_part_3",
+            "tripo_part_4",
+            "tripo_part_5",
+            "tripo_part_6",
+            "tripo_part_7",
+            "tripo_part_8",
+            "tripo_part_9",
+            "tripo_part_10",
+            "tripo_part_11",
+            "tripo_part_12",
+            "tripo_part_13",
+            "tripo_part_14",
+            "tripo_part_15",
+            "tripo_part_16"
+          ]
+        },
+        "passed": true
+      },
+      "parts_glb_sha256_as_source_spec": {
+        "expected": {
+          "bytes": 44696832,
+          "sha256": "69ef27b36fb9c46fd16ec2acf6f930a2d61f98af1847ea73225266295b147f32"
+        },
+        "measured": {
+          "bytes": 44696832,
+          "sha256": "69ef27b36fb9c46fd16ec2acf6f930a2d61f98af1847ea73225266295b147f32"
+        },
+        "passed": true
+      },
+      "tex_glb_sha256_as_source_spec": {
+        "expected": {
+          "bytes": 69244076,
+          "sha256": "c1ae050f7b8a63f06aaecca2acef263ccdf07c8a5a9e84b52d14e9415e495604"
+        },
+        "measured": {
+          "bytes": 69244076,
+          "sha256": "c1ae050f7b8a63f06aaecca2acef263ccdf07c8a5a9e84b52d14e9415e495604"
+        },
+        "passed": true
+      }
+    },
+    "frame_map": {
+      "base_bottom_src": 0.0,
+      "base_height_m": 0.06,
+      "base_scale": [
+        0.6070209,
+        0.61493807,
+        0.77810626
+      ],
+      "base_top_src": 0.07711029,
+      "centre_xy_src": [
+        -0.02726668,
+        0.0
+      ],
+      "figure_scale": 0.54284814,
+      "figure_top_m": 0.55,
+      "figure_top_src": 0.97975683
+    },
+    "bounds_final_m": [
+      [
+        -0.15,
+        -0.15,
+        0.0
+      ],
+      [
+        0.16375,
+        0.15,
+        0.55
+      ]
+    ],
+    "orientation": "ray-escape по 4000 полигонов каждой части high-poly: все 17 частей наружу (score 0,9998–1,0), вывернутых частей нет"
+  },
+  "parts": {
+    "tripo_part_0": {
+      "role": "платье, плащ-накидка, ремень колчана, пояс (ткань + кожа + золото)",
+      "mesh": "body",
+      "hi_triangles": 788125,
+      "game_triangles_retopo": 8999,
+      "game_triangles_with_caps": 10260,
+      "deviation_hi_to_lo_mm": {
+        "max": 1.3111,
+        "p50": 0.1121,
+        "p95": 0.3751,
+        "p99": 0.5352
+      },
+      "deviation_lo_to_hi_p99_mm": 0.5726,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 565,
+      "texel_px_per_cm_4k": 38.343,
+      "texel_px_per_cm_2k": 19.172,
+      "bake_cage_extrusion_m": 0.000859,
+      "bake_miss_share_non_cap": 0.003502,
+      "cap_texels": 100038,
+      "weights": "cloth"
+    },
+    "tripo_part_1": {
+      "role": "голова: лицо, диадема, 7 змей короны, шея, открытая кожа груди",
+      "mesh": "body",
+      "hi_triangles": 282638,
+      "game_triangles_retopo": 9000,
+      "game_triangles_with_caps": 9000,
+      "deviation_hi_to_lo_mm": {
+        "max": 0.8421,
+        "p50": 0.069,
+        "p95": 0.2111,
+        "p99": 0.2893
+      },
+      "deviation_lo_to_hi_p99_mm": 0.2781,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 243,
+      "texel_px_per_cm_4k": 43.419,
+      "texel_px_per_cm_2k": 21.709,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.001034,
+      "cap_texels": 0,
+      "weights": "zblend"
+    },
+    "tripo_part_10": {
+      "role": "колчан со стрелами (спина справа)",
+      "mesh": "body",
+      "hi_triangles": 67541,
+      "game_triangles_retopo": 2000,
+      "game_triangles_with_caps": 2000,
+      "deviation_hi_to_lo_mm": {
+        "max": 0.872,
+        "p50": 0.0736,
+        "p95": 0.2495,
+        "p99": 0.3506
+      },
+      "deviation_lo_to_hi_p99_mm": 0.3668,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 345,
+      "texel_px_per_cm_4k": 38.343,
+      "texel_px_per_cm_2k": 19.172,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.004172,
+      "cap_texels": 0,
+      "weights": "rigid"
+    },
+    "tripo_part_11": {
+      "role": "левое предплечье: наруч + кисть на рукояти лука",
+      "mesh": "body",
+      "hi_triangles": 29529,
+      "game_triangles_retopo": 1998,
+      "game_triangles_with_caps": 1998,
+      "deviation_hi_to_lo_mm": {
+        "max": 0.3561,
+        "p50": 0.0402,
+        "p95": 0.1214,
+        "p99": 0.1668
+      },
+      "deviation_lo_to_hi_p99_mm": 0.1639,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 7,
+      "texel_px_per_cm_4k": 45.332,
+      "texel_px_per_cm_2k": 22.666,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.000579,
+      "cap_texels": 0,
+      "weights": "chain"
+    },
+    "tripo_part_12": {
+      "role": "левое бедро (открытая нога в разрезе)",
+      "mesh": "body",
+      "hi_triangles": 17741,
+      "game_triangles_retopo": 800,
+      "game_triangles_with_caps": 1220,
+      "deviation_hi_to_lo_mm": {
+        "max": 0.6207,
+        "p50": 0.0439,
+        "p95": 0.1337,
+        "p99": 0.1932
+      },
+      "deviation_lo_to_hi_p99_mm": 0.1968,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 11,
+      "texel_px_per_cm_4k": 38.343,
+      "texel_px_per_cm_2k": 19.172,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.001931,
+      "cap_texels": 25522,
+      "weights": "chain"
+    },
+    "tripo_part_13": {
+      "role": "правая кисть (кулак у пояса)",
+      "mesh": "body",
+      "hi_triangles": 14304,
+      "game_triangles_retopo": 1199,
+      "game_triangles_with_caps": 1345,
+      "deviation_hi_to_lo_mm": {
+        "max": 0.2902,
+        "p50": 0.0328,
+        "p95": 0.0973,
+        "p99": 0.1345
+      },
+      "deviation_lo_to_hi_p99_mm": 0.1323,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 8,
+      "texel_px_per_cm_4k": 67.101,
+      "texel_px_per_cm_2k": 33.55,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.000444,
+      "cap_texels": 1691,
+      "weights": "chain"
+    },
+    "tripo_part_14": {
+      "role": "правая сандалия: носок",
+      "mesh": "body",
+      "hi_triangles": 6403,
+      "game_triangles_retopo": 500,
+      "game_triangles_with_caps": 500,
+      "deviation_hi_to_lo_mm": {
+        "max": 0.6237,
+        "p50": 0.0487,
+        "p95": 0.1456,
+        "p99": 0.2079
+      },
+      "deviation_lo_to_hi_p99_mm": 0.1997,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 1,
+      "texel_px_per_cm_4k": 47.929,
+      "texel_px_per_cm_2k": 23.964,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.001581,
+      "cap_texels": 0,
+      "weights": "rigid"
+    },
+    "tripo_part_15": {
+      "role": "левая сандалия: носок",
+      "mesh": "body",
+      "hi_triangles": 5788,
+      "game_triangles_retopo": 499,
+      "game_triangles_with_caps": 499,
+      "deviation_hi_to_lo_mm": {
+        "max": 1.205,
+        "p50": 0.043,
+        "p95": 0.142,
+        "p99": 0.2035
+      },
+      "deviation_lo_to_hi_p99_mm": 0.18,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 1,
+      "texel_px_per_cm_4k": 47.929,
+      "texel_px_per_cm_2k": 23.964,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.001679,
+      "cap_texels": 0,
+      "weights": "rigid"
+    },
+    "tripo_part_16": {
+      "role": "правая сандалия: пятка",
+      "mesh": "body",
+      "hi_triangles": 2140,
+      "game_triangles_retopo": 250,
+      "game_triangles_with_caps": 250,
+      "deviation_hi_to_lo_mm": {
+        "max": 0.2084,
+        "p50": 0.0274,
+        "p95": 0.0768,
+        "p99": 0.0979
+      },
+      "deviation_lo_to_hi_p99_mm": 0.1051,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 1,
+      "texel_px_per_cm_4k": 38.343,
+      "texel_px_per_cm_2k": 19.172,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.002119,
+      "cap_texels": 0,
+      "weights": "chain"
+    },
+    "tripo_part_2": {
+      "role": "подставка",
+      "mesh": "base",
+      "hi_triangles": 217491,
+      "game_triangles_retopo": 1316,
+      "game_triangles_with_caps": 1598,
+      "deviation_hi_to_lo_mm": {
+        "max": 1.3475,
+        "p50": 0.058,
+        "p95": 0.3258,
+        "p99": 0.497
+      },
+      "deviation_lo_to_hi_p99_mm": 7.5248,
+      "orientation_score_high_poly": 0.9999,
+      "uv_islands": 250,
+      "texel_px_per_cm_4k": 17.254,
+      "texel_px_per_cm_2k": 8.627,
+      "bake_cage_extrusion_m": 0.004,
+      "bake_miss_share_non_cap": 0.000875,
+      "cap_texels": 23998,
+      "weights": "static (base)"
+    },
+    "tripo_part_3": {
+      "role": "лук с тетивой (левая рука)",
+      "mesh": "weapon",
+      "hi_triangles": 187407,
+      "game_triangles_retopo": 5000,
+      "game_triangles_with_caps": 5000,
+      "deviation_hi_to_lo_mm": {
+        "max": 0.7709,
+        "p50": 0.0817,
+        "p95": 0.2743,
+        "p99": 0.3854
+      },
+      "deviation_lo_to_hi_p99_mm": 0.3809,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 78,
+      "texel_px_per_cm_4k": 57.515,
+      "texel_px_per_cm_2k": 28.757,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.002992,
+      "cap_texels": 0,
+      "weights": "rigid"
+    },
+    "tripo_part_4": {
+      "role": "правая голень: поножь + сандалия",
+      "mesh": "body",
+      "hi_triangles": 70760,
+      "game_triangles_retopo": 2500,
+      "game_triangles_with_caps": 3033,
+      "deviation_hi_to_lo_mm": {
+        "max": 1.2126,
+        "p50": 0.0784,
+        "p95": 0.2556,
+        "p99": 0.3554
+      },
+      "deviation_lo_to_hi_p99_mm": 0.3729,
+      "orientation_score_high_poly": 0.9998,
+      "uv_islands": 67,
+      "texel_px_per_cm_4k": 38.343,
+      "texel_px_per_cm_2k": 19.172,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.004892,
+      "cap_texels": 32008,
+      "weights": "chain"
+    },
+    "tripo_part_5": {
+      "role": "левая голень: поножь + сандалия",
+      "mesh": "body",
+      "hi_triangles": 82006,
+      "game_triangles_retopo": 2500,
+      "game_triangles_with_caps": 2855,
+      "deviation_hi_to_lo_mm": {
+        "max": 0.996,
+        "p50": 0.0834,
+        "p95": 0.2694,
+        "p99": 0.3824
+      },
+      "deviation_lo_to_hi_p99_mm": 0.3819,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 25,
+      "texel_px_per_cm_4k": 38.343,
+      "texel_px_per_cm_2k": 19.172,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.004454,
+      "cap_texels": 21838,
+      "weights": "chain"
+    },
+    "tripo_part_6": {
+      "role": "левое плечо (верх руки)",
+      "mesh": "body",
+      "hi_triangles": 18757,
+      "game_triangles_retopo": 999,
+      "game_triangles_with_caps": 1192,
+      "deviation_hi_to_lo_mm": {
+        "max": 1.5073,
+        "p50": 0.037,
+        "p95": 0.1072,
+        "p99": 0.1565
+      },
+      "deviation_lo_to_hi_p99_mm": 0.144,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 5,
+      "texel_px_per_cm_4k": 38.343,
+      "texel_px_per_cm_2k": 19.172,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.00041,
+      "cap_texels": 9309,
+      "weights": "chain"
+    },
+    "tripo_part_7": {
+      "role": "правое плечо (верх руки)",
+      "mesh": "body",
+      "hi_triangles": 19476,
+      "game_triangles_retopo": 1000,
+      "game_triangles_with_caps": 1180,
+      "deviation_hi_to_lo_mm": {
+        "max": 0.4543,
+        "p50": 0.0409,
+        "p95": 0.1111,
+        "p99": 0.1443
+      },
+      "deviation_lo_to_hi_p99_mm": 0.1414,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 5,
+      "texel_px_per_cm_4k": 38.343,
+      "texel_px_per_cm_2k": 19.172,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.000374,
+      "cap_texels": 8208,
+      "weights": "chain"
+    },
+    "tripo_part_8": {
+      "role": "правое предплечье: браслет-наруч",
+      "mesh": "body",
+      "hi_triangles": 30997,
+      "game_triangles_retopo": 1500,
+      "game_triangles_with_caps": 1500,
+      "deviation_hi_to_lo_mm": {
+        "max": 0.6044,
+        "p50": 0.0579,
+        "p95": 0.174,
+        "p99": 0.2414
+      },
+      "deviation_lo_to_hi_p99_mm": 0.245,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 5,
+      "texel_px_per_cm_4k": 38.343,
+      "texel_px_per_cm_2k": 19.172,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.000823,
+      "cap_texels": 0,
+      "weights": "chain"
+    },
+    "tripo_part_9": {
+      "role": "правое бедро (открытая нога в разрезе)",
+      "mesh": "body",
+      "hi_triangles": 15370,
+      "game_triangles_retopo": 800,
+      "game_triangles_with_caps": 1222,
+      "deviation_hi_to_lo_mm": {
+        "max": 0.4052,
+        "p50": 0.0398,
+        "p95": 0.1165,
+        "p99": 0.1661
+      },
+      "deviation_lo_to_hi_p99_mm": 0.1801,
+      "orientation_score_high_poly": 1.0,
+      "uv_islands": 7,
+      "texel_px_per_cm_4k": 38.343,
+      "texel_px_per_cm_2k": 19.172,
+      "bake_cage_extrusion_m": 0.0006,
+      "bake_miss_share_non_cap": 0.002149,
+      "cap_texels": 30123,
+      "weights": "chain"
+    }
+  },
+  "retopology": {
+    "method": "collapse-децимация (QEM) по частям из геометрии без UV-швов; лицо — двухшаговая (плотность ×1,9)",
+    "triangles_by_mesh_retopo": {
+      "base": 1316,
+      "body": 34544,
+      "weapon": 5000
+    },
+    "face_region": {
+      "after_step1_triangles": 1632,
+      "box_m": [
+        [
+          -0.03,
+          -0.045,
+          0.425
+        ],
+        [
+          0.03,
+          0.005,
+          0.495
+        ]
+      ],
+      "final_triangles": 1634,
+      "hi_triangles": 27013,
+      "name": "face",
+      "target_triangles": 1600
+    },
+    "checks": {
+      "all_parts_outward_low_poly": {
+        "expected": ">= 0.5",
+        "measured": {
+          "tripo_part_0": 0.9997,
+          "tripo_part_1": 1.0,
+          "tripo_part_10": 1.0,
+          "tripo_part_11": 0.9999,
+          "tripo_part_12": 0.9997,
+          "tripo_part_13": 0.9999,
+          "tripo_part_14": 1.0,
+          "tripo_part_15": 1.0,
+          "tripo_part_16": 1.0,
+          "tripo_part_2": 0.9998,
+          "tripo_part_3": 0.9991,
+          "tripo_part_4": 0.9996,
+          "tripo_part_5": 1.0,
+          "tripo_part_6": 1.0,
+          "tripo_part_7": 1.0,
+          "tripo_part_8": 0.9996,
+          "tripo_part_9": 1.0
+        },
+        "passed": true
+      },
+      "flipped_low_poly_parts": {
+        "expected": [],
+        "measured": [],
+        "note": "decimation keeps the high-poly winding; a flip here would mean a collapse error",
+        "passed": true
+      },
+      "near_degenerate_faces": {
+        "expected": 0,
+        "measured": {
+          "tripo_part_0": 0,
+          "tripo_part_1": 0,
+          "tripo_part_10": 0,
+          "tripo_part_11": 0,
+          "tripo_part_12": 0,
+          "tripo_part_13": 0,
+          "tripo_part_14": 0,
+          "tripo_part_15": 0,
+          "tripo_part_16": 0,
+          "tripo_part_2": 0,
+          "tripo_part_3": 0,
+          "tripo_part_4": 0,
+          "tripo_part_5": 0,
+          "tripo_part_6": 0,
+          "tripo_part_7": 0,
+          "tripo_part_8": 0,
+          "tripo_part_9": 0
+        },
+        "passed": true
+      }
+    },
+    "decimation_curve": {
+      "path": "reports/decimation-curve.json",
+      "stage": "curve (--stages curve), воспроизводимо из репозитория",
+      "levels": [
+        250,
+        500,
+        1000,
+        2000,
+        4000,
+        8000,
+        16000
+      ]
+    }
+  },
+  "closure": {
+    "contact_caps": 19,
+    "base_hole_caps": 9,
+    "cap_triangles_figure": 3510,
+    "cap_area_cm2": 317.471,
+    "triangles_by_mesh": {
+      "base": 1598,
+      "body": 38054,
+      "weapon": 5000
+    },
+    "triangles_figure": 43054,
+    "rest_visibility_totals": {
+      "backface_px_with_caps": 357,
+      "backface_px_without_caps": 5380,
+      "cap_backside_px": 230,
+      "cap_px": 5704,
+      "covers_front_px": 178,
+      "figure_px": 1504855,
+      "fills_gap_px": 5296,
+      "largest_covers_front_blob_px": 6
+    },
+    "checks": {
+      "all_cap_loops_found_and_built": {
+        "expected": "no problems",
+        "measured": "all",
+        "passed": true
+      },
+      "caps_hidden_at_rest": {
+        "expected": "front-facing cap pixels that hide a real front face at rest: <= 0.0001 of the figure pixels and no 8-connected blob > 9 px (17 views, 1.0 mm pitch; a back-facing cap pixel is culled in UE)",
+        "measured": {
+          "covers_front_px": 123,
+          "figure_px": 1504855,
+          "largest_blob_px": 5,
+          "per_cap": {
+            "armhole_l": [
+              11,
+              4
+            ],
+            "armhole_r": [
+              22,
+              5
+            ],
+            "dress_over_greave_l": [
+              0,
+              0
+            ],
+            "dress_under_fist": [
+              2,
+              1
+            ],
+            "fist_palm": [
+              0,
+              0
+            ],
+            "greave_top_l": [
+              7,
+              3
+            ],
+            "greave_top_r": [
+              4,
+              2
+            ],
+            "hem_floor": [
+              9,
+              2
+            ],
+            "shoulder_top_l": [
+              0,
+              0
+            ],
+            "shoulder_top_r": [
+              0,
+              0
+            ],
+            "slit_l": [
+              22,
+              5
+            ],
+            "slit_r": [
+              31,
+              3
+            ],
+            "sole_l_1": [
+              0,
+              0
+            ],
+            "sole_l_2": [
+              1,
+              1
+            ],
+            "sole_r_1": [
+              5,
+              1
+            ],
+            "sole_r_2": [
+              9,
+              2
+            ],
+            "thigh_knee_l": [
+              0,
+              0
+            ],
+            "thigh_top_l": [
+              0,
+              0
+            ],
+            "thigh_top_r": [
+              0,
+              0
+            ]
+          }
+        },
+        "passed": true
+      },
+      "no_degenerate_or_inverted_cap_triangles": {
+        "expected": "[0 degenerate, area share of cap triangles facing away from the cap normal <= 0.02]",
+        "measured": {
+          "armhole_l": [
+            0,
+            0.0
+          ],
+          "armhole_r": [
+            0,
+            0.0
+          ],
+          "base_hole_1": [
+            0,
+            0.0
+          ],
+          "base_hole_2": [
+            0,
+            0.0
+          ],
+          "base_hole_3": [
+            0,
+            0.0
+          ],
+          "base_hole_4": [
+            0,
+            0.0
+          ],
+          "base_hole_5": [
+            0,
+            0.0
+          ],
+          "base_hole_6": [
+            0,
+            0.0
+          ],
+          "base_hole_7": [
+            0,
+            0.0
+          ],
+          "base_hole_8": [
+            0,
+            0.0
+          ],
+          "base_hole_9": [
+            0,
+            0.0
+          ],
+          "dress_over_greave_l": [
+            0,
+            0.0
+          ],
+          "dress_under_fist": [
+            0,
+            0.0
+          ],
+          "fist_palm": [
+            0,
+            0.0
+          ],
+          "greave_top_l": [
+            0,
+            0.00083
+          ],
+          "greave_top_r": [
+            0,
+            0.00206
+          ],
+          "hem_floor": [
+            0,
+            0.0
+          ],
+          "shoulder_top_l": [
+            0,
+            0.0
+          ],
+          "shoulder_top_r": [
+            0,
+            0.0
+          ],
+          "slit_l": [
+            0,
+            0.0
+          ],
+          "slit_r": [
+            0,
+            0.00026
+          ],
+          "sole_l_1": [
+            0,
+            0.0
+          ],
+          "sole_l_2": [
+            0,
+            0.01258
+          ],
+          "sole_r_1": [
+            0,
+            0.0
+          ],
+          "sole_r_2": [
+            0,
+            0.0
+          ],
+          "thigh_knee_l": [
+            0,
+            0.00674
+          ],
+          "thigh_top_l": [
+            0,
+            0.0
+          ],
+          "thigh_top_r": [
+            0,
+            0.01981
+          ]
+        },
+        "note": "triangles along rim zig-zags / local folds of the decimated Tripo loop (1-3 mm) may face away",
+        "passed": true
+      }
+    },
+    "open_loops": {
+      "closed_by_caps": 28,
+      "count": 20,
+      "count_before": 51
+    },
+    "caps": [
+      {
+        "name": "dress_under_fist",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_13",
+        "perimeter_cm": 6.721,
+        "loop_vertices": 33,
+        "shape": "fit",
+        "bulge_m": -0.0005,
+        "triangles": 83,
+        "cap_area_cm2": 2.235,
+        "rim_height_range_mm": 3.12,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 2,
+        "rest_largest_blob_px": 1,
+        "rest_fills_gap_px": 3
+      },
+      {
+        "name": "fist_palm",
+        "part": "tripo_part_13",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 7.739,
+        "loop_vertices": 94,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 146,
+        "cap_area_cm2": 2.34,
+        "rim_height_range_mm": 3.233,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": 0,
+        "rest_fills_gap_px": 2
+      },
+      {
+        "name": "armhole_l",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_6",
+        "perimeter_cm": 14.04,
+        "loop_vertices": 49,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 109,
+        "cap_area_cm2": 12.858,
+        "rim_height_range_mm": 7.653,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 11,
+        "rest_largest_blob_px": 4,
+        "rest_fills_gap_px": 16
+      },
+      {
+        "name": "armhole_r",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_7",
+        "perimeter_cm": 13.129,
+        "loop_vertices": 63,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 109,
+        "cap_area_cm2": 11.248,
+        "rim_height_range_mm": 6.181,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 22,
+        "rest_largest_blob_px": 5,
+        "rest_fills_gap_px": 9
+      },
+      {
+        "name": "shoulder_top_l",
+        "part": "tripo_part_6",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 15.145,
+        "loop_vertices": 137,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 193,
+        "cap_area_cm2": 12.924,
+        "rim_height_range_mm": 7.508,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": 0,
+        "rest_fills_gap_px": 0
+      },
+      {
+        "name": "shoulder_top_r",
+        "part": "tripo_part_7",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 14.65,
+        "loop_vertices": 138,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 180,
+        "cap_area_cm2": 11.403,
+        "rim_height_range_mm": 7.066,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": 0,
+        "rest_fills_gap_px": 1
+      },
+      {
+        "name": "slit_r",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_9",
+        "perimeter_cm": 51.513,
+        "loop_vertices": 175,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 403,
+        "cap_area_cm2": 56.129,
+        "rim_height_range_mm": 39.937,
+        "rim_layout_untangled_vertices": 2,
+        "facing_away_area_share": 0.00026,
+        "visible_by_design": null,
+        "rest_covers_front_px": 31,
+        "rest_largest_blob_px": 3,
+        "rest_fills_gap_px": 22
+      },
+      {
+        "name": "slit_l",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_12",
+        "perimeter_cm": 24.986,
+        "loop_vertices": 83,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 189,
+        "cap_area_cm2": 24.933,
+        "rim_height_range_mm": 19.198,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 22,
+        "rest_largest_blob_px": 5,
+        "rest_fills_gap_px": 10
+      },
+      {
+        "name": "thigh_top_r",
+        "part": "tripo_part_9",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 39.372,
+        "loop_vertices": 288,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 422,
+        "cap_area_cm2": 41.783,
+        "rim_height_range_mm": 31.476,
+        "rim_layout_untangled_vertices": 34,
+        "facing_away_area_share": 0.01981,
+        "visible_by_design": null,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": 0,
+        "rest_fills_gap_px": 0
+      },
+      {
+        "name": "thigh_top_l",
+        "part": "tripo_part_12",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 26.091,
+        "loop_vertices": 193,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 295,
+        "cap_area_cm2": 25.042,
+        "rim_height_range_mm": 19.144,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": 0,
+        "rest_fills_gap_px": 0
+      },
+      {
+        "name": "thigh_knee_l",
+        "part": "tripo_part_12",
+        "covered_by": "tripo_part_5",
+        "perimeter_cm": 13.696,
+        "loop_vertices": 87,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 125,
+        "cap_area_cm2": 10.432,
+        "rim_height_range_mm": 11.104,
+        "rim_layout_untangled_vertices": 7,
+        "facing_away_area_share": 0.00674,
+        "visible_by_design": null,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": 0,
+        "rest_fills_gap_px": 1
+      },
+      {
+        "name": "dress_over_greave_l",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_5",
+        "perimeter_cm": 8.993,
+        "loop_vertices": 45,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 53,
+        "cap_area_cm2": 4.141,
+        "rim_height_range_mm": 2.116,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": 0,
+        "rest_fills_gap_px": 2
+      },
+      {
+        "name": "greave_top_r",
+        "part": "tripo_part_4",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 30.889,
+        "loop_vertices": 190,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 284,
+        "cap_area_cm2": 25.949,
+        "rim_height_range_mm": 36.831,
+        "rim_layout_untangled_vertices": 6,
+        "facing_away_area_share": 0.00206,
+        "visible_by_design": null,
+        "rest_covers_front_px": 4,
+        "rest_largest_blob_px": 2,
+        "rest_fills_gap_px": 5
+      },
+      {
+        "name": "greave_top_l",
+        "part": "tripo_part_5",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 15.679,
+        "loop_vertices": 89,
+        "shape": "harmonic",
+        "bulge_m": -0.001,
+        "triangles": 127,
+        "cap_area_cm2": 11.863,
+        "rim_height_range_mm": 15.638,
+        "rim_layout_untangled_vertices": 2,
+        "facing_away_area_share": 0.00083,
+        "visible_by_design": null,
+        "rest_covers_front_px": 7,
+        "rest_largest_blob_px": 3,
+        "rest_fills_gap_px": 10
+      },
+      {
+        "name": "hem_floor",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_2",
+        "perimeter_cm": 36.744,
+        "loop_vertices": 207,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 315,
+        "cap_area_cm2": 27.274,
+        "rim_height_range_mm": 1.748,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 9,
+        "rest_largest_blob_px": 2,
+        "rest_fills_gap_px": 89
+      },
+      {
+        "name": "sole_r_1",
+        "part": "tripo_part_4",
+        "covered_by": "tripo_part_2",
+        "perimeter_cm": 15.475,
+        "loop_vertices": 105,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 171,
+        "cap_area_cm2": 14.51,
+        "rim_height_range_mm": 1.234,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 5,
+        "rest_largest_blob_px": 1,
+        "rest_fills_gap_px": 34
+      },
+      {
+        "name": "sole_r_2",
+        "part": "tripo_part_4",
+        "covered_by": "tripo_part_2",
+        "perimeter_cm": 8.375,
+        "loop_vertices": 68,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 78,
+        "cap_area_cm2": 3.978,
+        "rim_height_range_mm": 1.006,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 9,
+        "rest_largest_blob_px": 2,
+        "rest_fills_gap_px": 41
+      },
+      {
+        "name": "sole_l_1",
+        "part": "tripo_part_5",
+        "covered_by": "tripo_part_2",
+        "perimeter_cm": 16.107,
+        "loop_vertices": 81,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 143,
+        "cap_area_cm2": 14.446,
+        "rim_height_range_mm": 1.059,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": null,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": 0,
+        "rest_fills_gap_px": 7
+      },
+      {
+        "name": "sole_l_2",
+        "part": "tripo_part_5",
+        "covered_by": "tripo_part_2",
+        "perimeter_cm": 11.094,
+        "loop_vertices": 75,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 85,
+        "cap_area_cm2": 3.983,
+        "rim_height_range_mm": 1.339,
+        "rim_layout_untangled_vertices": 7,
+        "facing_away_area_share": 0.01258,
+        "visible_by_design": null,
+        "rest_covers_front_px": 1,
+        "rest_largest_blob_px": 1,
+        "rest_fills_gap_px": 10
+      },
+      {
+        "name": "base_hole_1",
+        "part": "tripo_part_2",
+        "covered_by": null,
+        "perimeter_cm": 40.48,
+        "loop_vertices": 168,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 196,
+        "cap_area_cm2": 34.402,
+        "rim_height_range_mm": 2.598,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": true,
+        "rest_covers_front_px": 18,
+        "rest_largest_blob_px": 6,
+        "rest_fills_gap_px": 489
+      },
+      {
+        "name": "base_hole_2",
+        "part": "tripo_part_2",
+        "covered_by": null,
+        "perimeter_cm": 16.891,
+        "loop_vertices": 48,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 60,
+        "cap_area_cm2": 18.253,
+        "rim_height_range_mm": 1.504,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": true,
+        "rest_covers_front_px": 25,
+        "rest_largest_blob_px": 5,
+        "rest_fills_gap_px": 2005
+      },
+      {
+        "name": "base_hole_3",
+        "part": "tripo_part_2",
+        "covered_by": null,
+        "perimeter_cm": 16.363,
+        "loop_vertices": 54,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 66,
+        "cap_area_cm2": 18.26,
+        "rim_height_range_mm": 2.152,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": true,
+        "rest_covers_front_px": 5,
+        "rest_largest_blob_px": 2,
+        "rest_fills_gap_px": 1909
+      },
+      {
+        "name": "base_hole_4",
+        "part": "tripo_part_2",
+        "covered_by": null,
+        "perimeter_cm": 10.618,
+        "loop_vertices": 39,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 37,
+        "cap_area_cm2": 4.802,
+        "rim_height_range_mm": 1.512,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": true,
+        "rest_covers_front_px": 7,
+        "rest_largest_blob_px": 4,
+        "rest_fills_gap_px": 325
+      },
+      {
+        "name": "base_hole_5",
+        "part": "tripo_part_2",
+        "covered_by": null,
+        "perimeter_cm": 8.877,
+        "loop_vertices": 35,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 33,
+        "cap_area_cm2": 4.838,
+        "rim_height_range_mm": 1.189,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": true,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": 0,
+        "rest_fills_gap_px": 305
+      },
+      {
+        "name": "base_hole_6",
+        "part": "tripo_part_2",
+        "covered_by": null,
+        "perimeter_cm": 1.218,
+        "loop_vertices": 5,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 3,
+        "cap_area_cm2": 0.048,
+        "rim_height_range_mm": 0.691,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": true,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": 0,
+        "rest_fills_gap_px": 1
+      },
+      {
+        "name": "base_hole_7",
+        "part": "tripo_part_2",
+        "covered_by": null,
+        "perimeter_cm": 0.703,
+        "loop_vertices": 3,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 1,
+        "cap_area_cm2": 0.014,
+        "rim_height_range_mm": 0.0,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": true,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": null,
+        "rest_fills_gap_px": 0
+      },
+      {
+        "name": "base_hole_8",
+        "part": "tripo_part_2",
+        "covered_by": null,
+        "perimeter_cm": 0.568,
+        "loop_vertices": 3,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 1,
+        "cap_area_cm2": 0.014,
+        "rim_height_range_mm": 0.0,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": true,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": null,
+        "rest_fills_gap_px": 0
+      },
+      {
+        "name": "base_hole_9",
+        "part": "tripo_part_2",
+        "covered_by": null,
+        "perimeter_cm": 0.407,
+        "loop_vertices": 3,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "triangles": 1,
+        "cap_area_cm2": 0.006,
+        "rim_height_range_mm": 0.0,
+        "rim_layout_untangled_vertices": 0,
+        "facing_away_area_share": 0.0,
+        "visible_by_design": true,
+        "rest_covers_front_px": 0,
+        "rest_largest_blob_px": null,
+        "rest_fills_gap_px": 0
+      }
+    ],
+    "collar": "ворот закрыт весами rig.junctions, не крышкой: гармоническая крышка седловой петли (перепад 41 мм) выходила перед кожей декольте в покое (138 + 406 px лицевых пикселей в ray-видах)"
+  },
+  "uv": {
+    "atlas_px": 4096,
+    "coverage_share": 0.4372,
+    "islands": 1624,
+    "min_gap_px_at_4k": 8,
+    "overlap_px": 0,
+    "region_density_px_per_cm_4k": {
+      "face": 76.686,
+      "left_hand": 67.101
+    },
+    "method": "voronoi charts + MINIMUM_STRETCH (fallback: one island per face)",
+    "checks": {
+      "island_gap_px_at_4k": {
+        "expected": ">= 8",
+        "measured": 8,
+        "note": "raster at pixel centres; None = no two islands closer than the BFS horizon",
+        "passed": true
+      },
+      "no_folded_uv_triangles": {
+        "expected": 0,
+        "measured": {
+          "tripo_part_0": 0,
+          "tripo_part_1": 0,
+          "tripo_part_10": 0,
+          "tripo_part_11": 0,
+          "tripo_part_12": 0,
+          "tripo_part_13": 0,
+          "tripo_part_14": 0,
+          "tripo_part_15": 0,
+          "tripo_part_16": 0,
+          "tripo_part_2": 0,
+          "tripo_part_3": 0,
+          "tripo_part_4": 0,
+          "tripo_part_5": 0,
+          "tripo_part_6": 0,
+          "tripo_part_7": 0,
+          "tripo_part_8": 0,
+          "tripo_part_9": 0
+        },
+        "passed": true
+      },
+      "priority_face_denser_than_body": {
+        "expected": "face >= 1.5 x dress",
+        "measured": {
+          "dress": 38.343,
+          "face": 76.686
+        },
+        "passed": true
+      },
+      "raster_overlap_px": {
+        "expected": "<= 0",
+        "measured": 0,
+        "note": "pixel centres strictly inside two or more UV triangles (any islands, any parts)",
+        "passed": true
+      },
+      "uv_inside_0_1": {
+        "expected": "[0, 1]",
+        "measured": [
+          [
+            0.0013,
+            0.0013
+          ],
+          [
+            0.995659,
+            0.99533
+          ]
+        ],
+        "passed": true
+      }
+    },
+    "caps": {
+      "count": 28,
+      "note": "cap texels are filled by the textures stage from their rim (caps.npz), not baked",
+      "rim_samples": 49430,
+      "texel_priority": 0.7,
+      "texels_4k": 252735
+    },
+    "limitation": "упаковка ~44 % атласа: упаковщик Blender на ~1 600 рваных островах с зазором ≥ 8 px"
+  },
+  "bake": {
+    "device": "GPU:OPTIX:NVIDIA GeForce RTX 4090",
+    "resolution": 4096,
+    "passes": [
+      "NORMAL",
+      "AO",
+      "BC",
+      "RM",
+      "HIT"
+    ],
+    "samples": {
+      "AO": 128,
+      "BC": 1,
+      "HIT": 1,
+      "NORMAL": 1,
+      "RM": 1
+    },
+    "ao_distance_m": 0.044,
+    "normal": {
+      "includes_tripo_normal_map": true,
+      "space": "TANGENT",
+      "swizzle": "POS_X POS_Y POS_Z (OpenGL)"
+    },
+    "checks": {
+      "cage_miss_share": {
+        "expected": "<= 0.01 per part",
+        "measured": {
+          "tripo_part_0": 0.003502,
+          "tripo_part_1": 0.001034,
+          "tripo_part_10": 0.004172,
+          "tripo_part_11": 0.000579,
+          "tripo_part_12": 0.001931,
+          "tripo_part_13": 0.000444,
+          "tripo_part_14": 0.001581,
+          "tripo_part_15": 0.001679,
+          "tripo_part_16": 0.002119,
+          "tripo_part_2": 0.000875,
+          "tripo_part_3": 0.002992,
+          "tripo_part_4": 0.004892,
+          "tripo_part_5": 0.004454,
+          "tripo_part_6": 0.00041,
+          "tripo_part_7": 0.000374,
+          "tripo_part_8": 0.000823,
+          "tripo_part_9": 0.002149
+        },
+        "note": "non-cap UV texels whose cage ray found no high-poly (filled by dilation from neighbours); cap texels (parts.<part>.HIT.cap_texels) are filled from their rim by the textures stage",
+        "passed": true
+      },
+      "texels_outside_own_islands_share": {
+        "expected": "<= 0.1 % of the part's baked texels",
+        "measured": {
+          "tripo_part_0": 124,
+          "tripo_part_1": 37,
+          "tripo_part_10": 51,
+          "tripo_part_11": 1,
+          "tripo_part_12": 5,
+          "tripo_part_13": 3,
+          "tripo_part_14": 0,
+          "tripo_part_15": 0,
+          "tripo_part_16": 0,
+          "tripo_part_2": 16,
+          "tripo_part_3": 26,
+          "tripo_part_4": 9,
+          "tripo_part_5": 9,
+          "tripo_part_6": 3,
+          "tripo_part_7": 2,
+          "tripo_part_8": 3,
+          "tripo_part_9": 0
+        },
+        "note": "edge texels Cycles covered but the UV raster (pixel centres) did not; dropped from the composite, refilled by the textures stage dilation",
+        "passed": true
+      }
+    }
+  },
+  "textures": {
+    "outputs": {
+      "T_Medusa_H2_2K_BC.png": {
+        "bytes": 4692189,
+        "mode": "RGB",
+        "px": [
+          2048,
+          2048
+        ],
+        "sha256": "8faf853b74d17bfc776b0d7663043bb1473dd76b22a1fa08885cdc4d5f5662b2"
+      },
+      "T_Medusa_H2_2K_N.png": {
+        "bytes": 4897846,
+        "mode": "RGB",
+        "px": [
+          2048,
+          2048
+        ],
+        "sha256": "11112739e6d8bbe1341a0fc4a573e2e43fcaaa4a0d1920fe7ae1f339b5345313"
+      },
+      "T_Medusa_H2_2K_N_OpenGL.png": {
+        "bytes": 4898389,
+        "mode": "RGB",
+        "px": [
+          2048,
+          2048
+        ],
+        "sha256": "7944e386130634a7e43c6ea5eb3163551f10ba836f6c8f64fe9ebe0cae4d82e0"
+      },
+      "T_Medusa_H2_2K_ORM.png": {
+        "bytes": 4404085,
+        "mode": "RGB",
+        "px": [
+          2048,
+          2048
+        ],
+        "sha256": "3aa8f3fc1b63017e0197d12accfb90fe7738a2adf8a268c4fb801200d0cede74"
+      },
+      "T_Medusa_H2_2K_TeamMask.png": {
+        "bytes": 1033112,
+        "mode": "RGBA",
+        "px": [
+          2048,
+          2048
+        ],
+        "sha256": "3d784aa8918f9b9a0ddab182bfb87dc0b2fe5285c7c2490788fe54acf9718fbb"
+      },
+      "T_Medusa_H2_BC.png": {
+        "bytes": 14807007,
+        "mode": "RGB",
+        "px": [
+          4096,
+          4096
+        ],
+        "sha256": "90ae70b5b468face319ff7a006560b4dc32c104b9f7004836d1a6c2627091da1"
+      },
+      "T_Medusa_H2_N.png": {
+        "bytes": 14330460,
+        "mode": "RGB",
+        "px": [
+          4096,
+          4096
+        ],
+        "sha256": "f65c9268e3594eb03de95e6c07346c1b263d905f98f782c66495647e69c9f85c"
+      },
+      "T_Medusa_H2_N_OpenGL.png": {
+        "bytes": 14332721,
+        "mode": "RGB",
+        "px": [
+          4096,
+          4096
+        ],
+        "sha256": "a00b08c404b0a4b30b145dc25784b66156d037b85ea0c4d2c32fd07a614b0e5e"
+      },
+      "T_Medusa_H2_ORM.png": {
+        "bytes": 13488023,
+        "mode": "RGB",
+        "px": [
+          4096,
+          4096
+        ],
+        "sha256": "36817003257d6a0494093832606f468d9848bcf6930865dd258d93dd5abcefd5"
+      },
+      "T_Medusa_H2_TeamMask.png": {
+        "bytes": 2821157,
+        "mode": "RGBA",
+        "px": [
+          4096,
+          4096
+        ],
+        "sha256": "e1c768918a29098f3b578da5ea0116a44b11d281da0f02e5a3064edd988fd505"
+      }
+    },
+    "checks": {
+      "cap_texels_filled_from_rim": {
+        "expected": "every cap texel of the uv raster painted, none outside",
+        "measured": {
+          "cap_texels": 252735,
+          "cap_texels_not_painted": 0,
+          "cap_triangles": 3908,
+          "cap_vertices": 3261,
+          "painted_outside_cap_raster": 0,
+          "painted_texels": 252735,
+          "rim_samples": 49430
+        },
+        "passed": true
+      },
+      "dx_equals_opengl_g_inverted_2k": {
+        "measured": "exact",
+        "passed": true
+      },
+      "dx_equals_opengl_g_inverted_4k": {
+        "measured": "exact",
+        "passed": true
+      },
+      "in_island_unbaked_share": {
+        "expected": "<= 1 % of the non-cap island texels (filled by dilation from baked neighbours; cap texels are filled from their rim)",
+        "measured": {
+          "AO": 0.00272,
+          "BC": 0.00272,
+          "NORMAL": 0.00272,
+          "RM": 0.00272
+        },
+        "passed": true
+      },
+      "normal_length_2k": {
+        "expected": "|len - 1| p99.9 < 0.02",
+        "measured": {
+          "p50": 1.0003,
+          "p99.9_abs_dev": 0.0055
+        },
+        "passed": true
+      },
+      "normal_length_4k": {
+        "expected": "|len - 1| p99.9 < 0.02",
+        "measured": {
+          "p50": 1.0003,
+          "p99.9_abs_dev": 0.0053
+        },
+        "passed": true
+      },
+      "orm_occlusion_baked_not_constant": {
+        "expected": {
+          "occluded_fraction_min": 0.02,
+          "p99_minus_p1_min": 32
+        },
+        "measured": {
+          "occluded_fraction": 0.8628,
+          "p1": 4.0,
+          "p99": 255.0
+        },
+        "passed": true
+      },
+      "sizes_2k": {
+        "measured": 2048,
+        "passed": true
+      },
+      "sizes_4k": {
+        "measured": 4096,
+        "passed": true
+      },
+      "team_mask_cloth_share": {
+        "expected": "0.5..0.98 of the cloth part's texels (gold trim, belt, strap stay out)",
+        "measured": 0.8414,
+        "passed": true
+      }
+    },
+    "team_mask": {
+      "base_band_texels": 136785,
+      "cloth_parts": [
+        "tripo_part_0"
+      ],
+      "cloth_share_of_cloth_texels": 0.8414,
+      "format": "RGBA: R = clothing (TeamColor), G = base side band, B = 0, A = 255",
+      "hsv": {
+        "note": "калибровка по запечённому BC платья (tripo_part_0): v p50 0,24, s p50 0,22; золото каймы и кожа ремня s > 0,34 — вне маски",
+        "ramp": 0.04,
+        "s_max": 0.34,
+        "v_max": 0.4
+      }
+    },
+    "caps": {
+      "cap_texels": 252735,
+      "cap_texels_not_painted": 0,
+      "cap_triangles": 3908,
+      "cap_vertices": 3261,
+      "painted_outside_cap_raster": 0,
+      "painted_texels": 252735,
+      "rim_samples": 49430
+    },
+    "format_note": "N = DirectX (G инвертирован) для UE, N_OpenGL для Blender; ORM: R = AO, G = Roughness, B = Metallic; TeamMask RGBA: R = одежда, G = боковая полоса подставки"
+  },
+  "rig": {
+    "skeleton": "UM_HUMANOID_17_v2",
+    "armature_object": "SKEL_UM_Humanoid",
+    "bones": {
+      "arm_lower.L": {
+        "head_m": [
+          0.066,
+          0.004,
+          0.334
+        ],
+        "parent": "arm_upper.L",
+        "tail_m": [
+          0.092,
+          -0.022,
+          0.321
+        ]
+      },
+      "arm_lower.R": {
+        "head_m": [
+          -0.086,
+          0.014,
+          0.345
+        ],
+        "parent": "arm_upper.R",
+        "tail_m": [
+          -0.047,
+          -0.021,
+          0.334
+        ]
+      },
+      "arm_upper.L": {
+        "head_m": [
+          0.04,
+          0.014,
+          0.397
+        ],
+        "parent": "spine",
+        "tail_m": [
+          0.066,
+          0.004,
+          0.334
+        ]
+      },
+      "arm_upper.R": {
+        "head_m": [
+          -0.047,
+          0.015,
+          0.398
+        ],
+        "parent": "spine",
+        "tail_m": [
+          -0.086,
+          0.014,
+          0.345
+        ]
+      },
+      "foot.L": {
+        "head_m": [
+          0.071,
+          0.004,
+          0.085
+        ],
+        "parent": "leg_lower.L",
+        "tail_m": [
+          0.082,
+          -0.035,
+          0.066
+        ]
+      },
+      "foot.R": {
+        "head_m": [
+          -0.074,
+          0.004,
+          0.085
+        ],
+        "parent": "leg_lower.R",
+        "tail_m": [
+          -0.083,
+          -0.035,
+          0.066
+        ]
+      },
+      "hand.L": {
+        "head_m": [
+          0.092,
+          -0.022,
+          0.321
+        ],
+        "parent": "arm_lower.L",
+        "tail_m": [
+          0.106,
+          -0.036,
+          0.314
+        ]
+      },
+      "hand.R": {
+        "head_m": [
+          -0.047,
+          -0.021,
+          0.334
+        ],
+        "parent": "arm_lower.R",
+        "tail_m": [
+          -0.022,
+          -0.035,
+          0.325
+        ]
+      },
+      "head": {
+        "head_m": [
+          0,
+          0.012,
+          0.435
+        ],
+        "parent": "spine",
+        "tail_m": [
+          0,
+          0.012,
+          0.52
+        ]
+      },
+      "hips": {
+        "head_m": [
+          0,
+          0.012,
+          0.27
+        ],
+        "parent": "root",
+        "tail_m": [
+          0,
+          0.012,
+          0.32
+        ]
+      },
+      "leg_lower.L": {
+        "head_m": [
+          0.049,
+          0.008,
+          0.205
+        ],
+        "parent": "leg_upper.L",
+        "tail_m": [
+          0.071,
+          0.004,
+          0.085
+        ]
+      },
+      "leg_lower.R": {
+        "head_m": [
+          -0.052,
+          0.008,
+          0.205
+        ],
+        "parent": "leg_upper.R",
+        "tail_m": [
+          -0.074,
+          0.004,
+          0.085
+        ]
+      },
+      "leg_upper.L": {
+        "head_m": [
+          0.035,
+          0.01,
+          0.285
+        ],
+        "parent": "hips",
+        "tail_m": [
+          0.049,
+          0.008,
+          0.205
+        ]
+      },
+      "leg_upper.R": {
+        "head_m": [
+          -0.038,
+          0.01,
+          0.285
+        ],
+        "parent": "hips",
+        "tail_m": [
+          -0.052,
+          0.008,
+          0.205
+        ]
+      },
+      "root": {
+        "head_m": [
+          0,
+          0,
+          0
+        ],
+        "parent": null,
+        "tail_m": [
+          0,
+          0,
+          0.045
+        ]
+      },
+      "spine": {
+        "head_m": [
+          0,
+          0.012,
+          0.32
+        ],
+        "parent": "hips",
+        "tail_m": [
+          0,
+          0.012,
+          0.41
+        ]
+      },
+      "weapon.L": {
+        "head_m": [
+          0.103,
+          -0.033,
+          0.315
+        ],
+        "parent": "hand.L",
+        "tail_m": [
+          0.131,
+          -0.033,
+          0.315
+        ]
+      }
+    },
+    "weights": {
+      "body": {
+        "bones_used": {
+          "arm_lower.L": 940,
+          "arm_lower.R": 949,
+          "arm_upper.L": 786,
+          "arm_upper.R": 805,
+          "foot.L": 1214,
+          "foot.R": 1446,
+          "hand.L": 462,
+          "hand.R": 1032,
+          "head": 4289,
+          "hips": 4743,
+          "leg_lower.L": 1582,
+          "leg_lower.R": 1974,
+          "leg_upper.L": 2637,
+          "leg_upper.R": 3090,
+          "spine": 3964
+        },
+        "max_influences": 3,
+        "not_normalised_vertices": 0,
+        "unweighted_vertices": 0,
+        "vertices": 22167,
+        "weight_share": {
+          "arm_lower.L": 0.0333,
+          "arm_lower.R": 0.0312,
+          "arm_upper.L": 0.0238,
+          "arm_upper.R": 0.0257,
+          "foot.L": 0.047,
+          "foot.R": 0.0528,
+          "hand.L": 0.0163,
+          "hand.R": 0.0412,
+          "head": 0.1888,
+          "hips": 0.1366,
+          "leg_lower.L": 0.0593,
+          "leg_lower.R": 0.0718,
+          "leg_upper.L": 0.0547,
+          "leg_upper.R": 0.0604,
+          "spine": 0.1573
+        }
+      },
+      "weapon": {
+        "bones_used": {
+          "weapon.L": 2520
+        },
+        "max_influences": 1,
+        "not_normalised_vertices": 0,
+        "unweighted_vertices": 0,
+        "vertices": 2520,
+        "weight_share": {
+          "weapon.L": 1.0
+        }
+      }
+    },
+    "junctions": [
+      {
+        "band_m": 0.012,
+        "note": "ворот: полоса шеи/кожи декольте (tripo_part_1) 1,2 см у петли ворота получает веса платья (spine) в той же точке — ворот не открывается при повороте головы (head_turn 35°: было 6,6–8,9 мм), шея закручивается выше ворота. Замер ray-теста head_turn (наибольшее пятно новых задних граней, шаг 1,5 мм): без стыка 39 px, платье по весам шеи (полоса 1–4 см) 13–186 px (складка накидки), шея по весам платья 7 px",
+        "part": "tripo_part_1",
+        "rim_points": 296,
+        "with": "tripo_part_0"
+      }
+    ],
+    "weight_continuity_at_part_junctions": {
+      "tripo_part_0|tripo_part_1": {
+        "max_l1": 0.0,
+        "p95_l1": 0.0,
+        "pairs": 145
+      },
+      "tripo_part_0|tripo_part_10": {
+        "max_l1": 0.0,
+        "p95_l1": 0.0,
+        "pairs": 96
+      },
+      "tripo_part_0|tripo_part_12": {
+        "max_l1": 2.0,
+        "p95_l1": 2.0,
+        "pairs": 203
+      },
+      "tripo_part_0|tripo_part_13": {
+        "max_l1": 2.0,
+        "p95_l1": 2.0,
+        "pairs": 92
+      },
+      "tripo_part_0|tripo_part_4": {
+        "max_l1": 2.0,
+        "p95_l1": 2.0,
+        "pairs": 174
+      },
+      "tripo_part_0|tripo_part_5": {
+        "max_l1": 2.0,
+        "p95_l1": 2.0,
+        "pairs": 66
+      },
+      "tripo_part_0|tripo_part_6": {
+        "max_l1": 2.0,
+        "p95_l1": 2.0,
+        "pairs": 98
+      },
+      "tripo_part_0|tripo_part_7": {
+        "max_l1": 2.0,
+        "p95_l1": 2.0,
+        "pairs": 130
+      },
+      "tripo_part_0|tripo_part_9": {
+        "max_l1": 2.0,
+        "p95_l1": 2.0,
+        "pairs": 207
+      },
+      "tripo_part_11|tripo_part_3": {
+        "max_l1": 2.0,
+        "p95_l1": 2.0,
+        "pairs": 79
+      },
+      "tripo_part_11|tripo_part_6": {
+        "max_l1": 1.381,
+        "p95_l1": 0.0301,
+        "pairs": 73
+      },
+      "tripo_part_12|tripo_part_5": {
+        "max_l1": 0.0,
+        "p95_l1": 0.0,
+        "pairs": 110
+      },
+      "tripo_part_13|tripo_part_8": {
+        "max_l1": 0.0935,
+        "p95_l1": 0.0356,
+        "pairs": 78
+      },
+      "tripo_part_14|tripo_part_4": {
+        "max_l1": 0.0,
+        "p95_l1": 0.0,
+        "pairs": 183
+      },
+      "tripo_part_15|tripo_part_5": {
+        "max_l1": 0.0,
+        "p95_l1": 0.0,
+        "pairs": 210
+      },
+      "tripo_part_16|tripo_part_4": {
+        "max_l1": 0.0538,
+        "p95_l1": 0.0169,
+        "pairs": 125
+      },
+      "tripo_part_4|tripo_part_9": {
+        "max_l1": 0.0,
+        "p95_l1": 0.0,
+        "pairs": 102
+      },
+      "tripo_part_7|tripo_part_8": {
+        "max_l1": 0.0176,
+        "p95_l1": 0.0045,
+        "pairs": 108
+      }
+    },
+    "sockets": [
+      {
+        "bone": "weapon.L",
+        "location_uu_for_ue": [
+          0,
+          0,
+          0
+        ],
+        "name": "Weapon",
+        "offset_blender_bone_uu": [
+          -0.0,
+          -0.0,
+          -0.0
+        ],
+        "source": "profile",
+        "target_blender_m": [
+          0.103,
+          -0.033,
+          0.315
+        ],
+        "target_ue_component_uu": [
+          3.3,
+          -10.3,
+          31.5
+        ],
+        "ue_bone": "weapon_L"
+      },
+      {
+        "bone": "head",
+        "location_uu_for_ue": [
+          0.0,
+          -3.7,
+          1.6
+        ],
+        "name": "Head",
+        "offset_blender_bone_uu": [
+          0.0,
+          3.7,
+          1.6
+        ],
+        "source": "build prediction (x, -y, z)",
+        "target_blender_m": [
+          0.0,
+          -0.004,
+          0.472
+        ],
+        "target_ue_component_uu": [
+          0.4,
+          -0.0,
+          47.2
+        ],
+        "ue_bone": "head"
+      }
+    ],
+    "checks": {
+      "armature_object_is_bone0_name": {
+        "expected": [
+          "SKEL_UM_Humanoid"
+        ],
+        "measured": [
+          "SKEL_UM_Humanoid.001"
+        ],
+        "passed": true
+      },
+      "authored_bounds_after_inverse_rotation": {
+        "expected": {
+          "max_cm": [
+            16.358,
+            9.29,
+            55.009
+          ],
+          "min_cm": [
+            -10.742,
+            -9.933,
+            5.752
+          ]
+        },
+        "measured": {
+          "max_cm": [
+            16.358,
+            9.29,
+            55.009
+          ],
+          "min_cm": [
+            -10.742,
+            -9.933,
+            5.752
+          ]
+        },
+        "passed": true
+      },
+      "bones_and_parents_as_profile": {
+        "expected": 17,
+        "measured": 17,
+        "passed": true
+      },
+      "export_frame_bow_on_rotated_left": {
+        "expected": "bow on +Y of the export frame (UE -Y)",
+        "measured": {
+          "bow_centroid_cm": [
+            0.05936,
+            0.12218,
+            0.32417
+          ],
+          "rotated_bow_side": [
+            0.0,
+            1.0,
+            0.0
+          ]
+        },
+        "passed": true
+      },
+      "export_frame_face_points_along_rotated_front": {
+        "expected": "dot > 0.5 (UE +X)",
+        "measured": {
+          "face_normal": [
+            0.6853,
+            0.0323,
+            -0.0814
+          ],
+          "rotated_front": [
+            1.0,
+            -0.0,
+            0.0
+          ]
+        },
+        "passed": true
+      },
+      "material_slots": {
+        "expected": "1 per mesh (<= 2 total)",
+        "measured": {
+          "SK_Medusa_H2_Body": [
+            "M_Medusa_H2_Atlas"
+          ],
+          "SK_Medusa_H2_Bow": [
+            "M_Medusa_H2_Atlas"
+          ],
+          "SM_Medusa_H2_Base": [
+            "M_Medusa_H2_Atlas"
+          ]
+        },
+        "passed": true
+      },
+      "max_influences": {
+        "expected": "<= 4",
+        "measured": 3,
+        "passed": true
+      },
+      "no_unweighted_vertices": {
+        "expected": 0,
+        "measured": 0,
+        "passed": true
+      },
+      "triangles_round_trip": {
+        "expected": {
+          "SK_Medusa_H2_Body": 38054,
+          "SK_Medusa_H2_Bow": 5000,
+          "SM_Medusa_H2_Base": 1598
+        },
+        "measured": {
+          "SK_Medusa_H2_Body": 38054,
+          "SK_Medusa_H2_Bow": 5000,
+          "SM_Medusa_H2_Base": 1598
+        },
+        "passed": true
+      },
+      "unit_scale_1_and_height": {
+        "expected": {
+          "base_top_cm": 5.924,
+          "skeletal_top_cm": 55.009
+        },
+        "measured": {
+          "base_top_cm": 5.924,
+          "skeletal_top_cm": 55.009
+        },
+        "passed": true
+      },
+      "uv0_present_in_unit_square": {
+        "expected": "UV0 in [0,1]",
+        "measured": {
+          "SK_Medusa_H2_Body": [
+            "UVMap"
+          ],
+          "SK_Medusa_H2_Bow": [
+            "UVMap"
+          ],
+          "SM_Medusa_H2_Base": [
+            "UVMap"
+          ]
+        },
+        "passed": true
+      },
+      "weapon_bone_by_side_v2": {
+        "expected": "hand.L",
+        "measured": "hand.L",
+        "passed": true
+      }
+    },
+    "deform_probe": {
+      "medusa-h2-blend": {
+        "arm_l_raise": "plausible",
+        "arm_r_raise": "plausible",
+        "forearm_l_bend": "plausible",
+        "head_turn": "plausible",
+        "spine_bend_fwd": "plausible",
+        "thigh_l_flex": "plausible",
+        "thigh_r_flex": "plausible"
+      },
+      "medusa-h2-fbx": {
+        "arm_l_raise": "plausible",
+        "arm_r_raise": "plausible",
+        "forearm_l_bend": "plausible",
+        "head_turn": "plausible",
+        "spine_bend_fwd": "plausible",
+        "thigh_l_flex": "plausible",
+        "thigh_r_flex": "plausible"
+      }
+    },
+    "validate_clip_v2": {
+      "fails": [],
+      "result": "pass",
+      "warnings": []
+    },
+    "skeleton_note": "задание называет UM_HUMANOID_17_v1; по RIG-CONTRACT v2 (волна 4) v1 закрыт для новых сборок, поэтому H2 собран по v2: SKEL_UM_Humanoid, weapon.L под hand.L — те же 16 базовых костей"
+  },
+  "seams": {
+    "junctions_worst_by_pair": {
+      "tripo_part_10|tripo_part_0": {
+        "max_mm": 0.022,
+        "p95_mm": 0.0,
+        "pose": "spine_bend_fwd"
+      },
+      "tripo_part_12|tripo_part_0": {
+        "max_mm": 32.032,
+        "p95_mm": 23.725,
+        "pose": "thigh_l_flex"
+      },
+      "tripo_part_12|tripo_part_5": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "pose": "head_turn"
+      },
+      "tripo_part_13|tripo_part_0": {
+        "max_mm": 44.508,
+        "p95_mm": 43.799,
+        "pose": "arm_r_raise"
+      },
+      "tripo_part_13|tripo_part_8": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "pose": "head_turn"
+      },
+      "tripo_part_14|tripo_part_4": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "pose": "head_turn"
+      },
+      "tripo_part_15|tripo_part_5": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "pose": "head_turn"
+      },
+      "tripo_part_16|tripo_part_4": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "pose": "head_turn"
+      },
+      "tripo_part_1|tripo_part_0": {
+        "max_mm": 0.1,
+        "p95_mm": 0.0,
+        "pose": "head_turn"
+      },
+      "tripo_part_6|tripo_part_0": {
+        "max_mm": 20.984,
+        "p95_mm": 19.966,
+        "pose": "arm_l_raise"
+      },
+      "tripo_part_6|tripo_part_11": {
+        "max_mm": 0.072,
+        "p95_mm": 0.006,
+        "pose": "forearm_l_bend"
+      },
+      "tripo_part_7|tripo_part_0": {
+        "max_mm": 12.603,
+        "p95_mm": 11.953,
+        "pose": "arm_r_raise"
+      },
+      "tripo_part_7|tripo_part_8": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "pose": "head_turn"
+      },
+      "tripo_part_9|tripo_part_0": {
+        "max_mm": 35.856,
+        "p95_mm": 30.085,
+        "pose": "thigh_r_flex"
+      },
+      "tripo_part_9|tripo_part_4": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "pose": "head_turn"
+      }
+    },
+    "loops": {
+      "closed_by_cap": 19,
+      "count": 38,
+      "open": 19,
+      "threshold_mm": 1.5
+    },
+    "loops_opening_in_poses": [
+      {
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_9",
+        "perimeter_cm": 51.51,
+        "closed_by_cap": "slit_r",
+        "worst": {
+          "max_mm": 42.56,
+          "open_share": 0.8306,
+          "pose": "thigh_r_flex"
+        }
+      },
+      {
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_2",
+        "perimeter_cm": 36.74,
+        "closed_by_cap": "hem_floor",
+        "worst": {
+          "max_mm": 33.17,
+          "open_share": 0.7585,
+          "pose": "thigh_r_flex"
+        }
+      },
+      {
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_12",
+        "perimeter_cm": 24.99,
+        "closed_by_cap": "slit_l",
+        "worst": {
+          "max_mm": 32.18,
+          "open_share": 0.962,
+          "pose": "thigh_l_flex"
+        }
+      },
+      {
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_6",
+        "perimeter_cm": 14.04,
+        "closed_by_cap": "armhole_l",
+        "worst": {
+          "max_mm": 19.73,
+          "open_share": 0.4574,
+          "pose": "arm_l_raise"
+        }
+      },
+      {
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_7",
+        "perimeter_cm": 13.13,
+        "closed_by_cap": "armhole_r",
+        "worst": {
+          "max_mm": 12.77,
+          "open_share": 0.3768,
+          "pose": "arm_r_raise"
+        }
+      },
+      {
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_5",
+        "perimeter_cm": 8.99,
+        "closed_by_cap": "dress_over_greave_l",
+        "worst": {
+          "max_mm": 45.43,
+          "open_share": 1.0,
+          "pose": "thigh_l_flex"
+        }
+      },
+      {
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_13",
+        "perimeter_cm": 6.72,
+        "closed_by_cap": "dress_under_fist",
+        "worst": {
+          "max_mm": 57.32,
+          "open_share": 1.0,
+          "pose": "arm_r_raise"
+        }
+      },
+      {
+        "part": "tripo_part_12",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 26.09,
+        "closed_by_cap": "thigh_top_l",
+        "worst": {
+          "max_mm": 22.41,
+          "open_share": 0.8345,
+          "pose": "thigh_l_flex"
+        }
+      },
+      {
+        "part": "tripo_part_13",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 7.74,
+        "closed_by_cap": "fist_palm",
+        "worst": {
+          "max_mm": 44.51,
+          "open_share": 1.0,
+          "pose": "arm_r_raise"
+        }
+      },
+      {
+        "part": "tripo_part_4",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 30.89,
+        "closed_by_cap": "greave_top_r",
+        "worst": {
+          "max_mm": 46.75,
+          "open_share": 1.0,
+          "pose": "thigh_r_flex"
+        }
+      },
+      {
+        "part": "tripo_part_4",
+        "covered_by": "tripo_part_2",
+        "perimeter_cm": 15.47,
+        "closed_by_cap": "sole_r_1",
+        "worst": {
+          "max_mm": 87.21,
+          "open_share": 1.0,
+          "pose": "thigh_r_flex"
+        }
+      },
+      {
+        "part": "tripo_part_4",
+        "covered_by": "tripo_part_2",
+        "perimeter_cm": 8.38,
+        "closed_by_cap": "sole_r_2",
+        "worst": {
+          "max_mm": 43.47,
+          "open_share": 1.0,
+          "pose": "thigh_r_flex"
+        }
+      },
+      {
+        "part": "tripo_part_5",
+        "covered_by": "tripo_part_2",
+        "perimeter_cm": 16.11,
+        "closed_by_cap": "sole_l_1",
+        "worst": {
+          "max_mm": 87.78,
+          "open_share": 1.0,
+          "pose": "thigh_l_flex"
+        }
+      },
+      {
+        "part": "tripo_part_5",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 15.68,
+        "closed_by_cap": "greave_top_l",
+        "worst": {
+          "max_mm": 33.46,
+          "open_share": 1.0,
+          "pose": "thigh_l_flex"
+        }
+      },
+      {
+        "part": "tripo_part_5",
+        "covered_by": "tripo_part_2",
+        "perimeter_cm": 11.09,
+        "closed_by_cap": "sole_l_2",
+        "worst": {
+          "max_mm": 43.18,
+          "open_share": 1.0,
+          "pose": "thigh_l_flex"
+        }
+      },
+      {
+        "part": "tripo_part_6",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 15.15,
+        "closed_by_cap": "shoulder_top_l",
+        "worst": {
+          "max_mm": 20.98,
+          "open_share": 0.4983,
+          "pose": "arm_l_raise"
+        }
+      },
+      {
+        "part": "tripo_part_7",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 14.65,
+        "closed_by_cap": "shoulder_top_r",
+        "worst": {
+          "max_mm": 12.6,
+          "open_share": 0.3462,
+          "pose": "arm_r_raise"
+        }
+      },
+      {
+        "part": "tripo_part_9",
+        "covered_by": "tripo_part_0",
+        "perimeter_cm": 39.37,
+        "closed_by_cap": "thigh_top_r",
+        "worst": {
+          "max_mm": 37.58,
+          "open_share": 0.8307,
+          "pose": "thigh_r_flex"
+        }
+      }
+    ],
+    "see_through": {
+      "pitch_m": 0.0015,
+      "views": [
+        "front",
+        "front_l",
+        "left",
+        "back_l",
+        "back",
+        "back_r",
+        "right",
+        "front_r",
+        "front_hi",
+        "left_hi",
+        "back_hi",
+        "right_hi",
+        "k2",
+        "front_lo",
+        "left_lo",
+        "back_lo",
+        "right_lo"
+      ],
+      "blend": {
+        "arm_l_raise": {
+          "backface_px": 85,
+          "new_vs_rest_px": 15,
+          "largest_new_blob_px": 2,
+          "largest_new_blob_view": "front"
+        },
+        "arm_r_raise": {
+          "backface_px": 83,
+          "new_vs_rest_px": 13,
+          "largest_new_blob_px": 8,
+          "largest_new_blob_view": "back_lo"
+        },
+        "forearm_l_bend": {
+          "backface_px": 69,
+          "new_vs_rest_px": -1,
+          "largest_new_blob_px": 1,
+          "largest_new_blob_view": "front"
+        },
+        "head_turn": {
+          "backface_px": 101,
+          "new_vs_rest_px": 31,
+          "largest_new_blob_px": 7,
+          "largest_new_blob_view": "back_hi"
+        },
+        "rest": {
+          "backface_px": 70,
+          "new_vs_rest_px": null,
+          "largest_new_blob_px": null,
+          "largest_new_blob_view": null
+        },
+        "spine_bend_fwd": {
+          "backface_px": 61,
+          "new_vs_rest_px": -9,
+          "largest_new_blob_px": 2,
+          "largest_new_blob_view": "front_r"
+        },
+        "thigh_l_flex": {
+          "backface_px": 180,
+          "new_vs_rest_px": 110,
+          "largest_new_blob_px": 4,
+          "largest_new_blob_view": "front"
+        },
+        "thigh_r_flex": {
+          "backface_px": 133,
+          "new_vs_rest_px": 63,
+          "largest_new_blob_px": 2,
+          "largest_new_blob_view": "front_l"
+        }
+      },
+      "fbx": {
+        "arm_l_raise": {
+          "backface_px": 92,
+          "new_vs_rest_px": 20,
+          "largest_new_blob_px": 2,
+          "largest_new_blob_view": "front"
+        },
+        "arm_r_raise": {
+          "backface_px": 88,
+          "new_vs_rest_px": 16,
+          "largest_new_blob_px": 8,
+          "largest_new_blob_view": "back_lo"
+        },
+        "forearm_l_bend": {
+          "backface_px": 73,
+          "new_vs_rest_px": 1,
+          "largest_new_blob_px": 2,
+          "largest_new_blob_view": "back"
+        },
+        "head_turn": {
+          "backface_px": 103,
+          "new_vs_rest_px": 31,
+          "largest_new_blob_px": 7,
+          "largest_new_blob_view": "back_hi"
+        },
+        "rest": {
+          "backface_px": 72,
+          "new_vs_rest_px": null,
+          "largest_new_blob_px": null,
+          "largest_new_blob_view": null
+        },
+        "spine_bend_fwd": {
+          "backface_px": 63,
+          "new_vs_rest_px": -9,
+          "largest_new_blob_px": 2,
+          "largest_new_blob_view": "front_r"
+        },
+        "thigh_l_flex": {
+          "backface_px": 174,
+          "new_vs_rest_px": 102,
+          "largest_new_blob_px": 4,
+          "largest_new_blob_view": "front"
+        },
+        "thigh_r_flex": {
+          "backface_px": 138,
+          "new_vs_rest_px": 66,
+          "largest_new_blob_px": 2,
+          "largest_new_blob_view": "front_l"
+        }
+      }
+    },
+    "checks": {
+      "fbx_polygons_matched_to_authored": {
+        "expected": "< 0.1 mm (nearest polygon centre)",
+        "measured": 0.00018,
+        "passed": true
+      },
+      "no_see_through_holes_in_probe_poses": {
+        "expected": "no 8-connected blob of new back-face pixels (pose and not rest, same view) larger than 8 px (1.5 mm pitch, 17 views), .blend and FBX; the sum of new back-face pixels is reported (rim-edge grazing rays leave scattered single pixels)",
+        "measured": {
+          "largest_new_blob_px": {
+            "blend": 8,
+            "fbx": 8
+          },
+          "new_backface_px_sum_of_views": {
+            "blend": 110,
+            "fbx": 102
+          }
+        },
+        "passed": true
+      },
+      "open_loops_do_not_open_in_probe_poses": {
+        "expected": "every rim loop not closed by a cap opens (> 1.5 mm) on <= 0.05 of its perimeter",
+        "measured": "none",
+        "passed": true
+      }
+    },
+    "reading": "контакты ткани и тела в позах расходятся на 12–57 мм (кулак от пояса, бедро из разреза, подмышка) — там, где раньше за петлёй не было поверхности; теперь каждую такую петлю закрывает крышка, открытых петель, открывающихся в позах, 0; остаток ray-теста — единичные пиксели по кромкам и складки скиннинга (подмышка, плечо у ворота), не дыры"
+  },
+  "export": {
+    "skeletal_fbx": {
+      "bytes": 1712156,
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-bake/export/SK_Medusa_H2.fbx",
+      "sha256": "b1250d8f0d999a71474414607dbc31e8c05ab35669acc04d957f30293ab39be6"
+    },
+    "base_fbx": {
+      "bytes": 84668,
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-bake/export/SM_Medusa_H2_Base.fbx",
+      "sha256": "87fe88733ab8832c7f2a3ede0912a153d097b30164f70bb7bfd060b5fc42abc4"
+    },
+    "settings": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+      "colors_type": "SRGB",
+      "creation_time_pinned": "2000-01-01T00:00:00",
+      "data_scale": 100.0,
+      "deviations_from_preset": {
+        "bake_anim": "off: the candidate FBX carries no clips",
+        "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+      },
+      "embed_textures": false,
+      "export_space_rotation_z_degrees": 90.0,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "STRIP",
+      "preset": {
+        "name": "UM_FBX_v1",
+        "path": "blender/_tools/presets/UM_FBX_v1.json",
+        "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+        "version": "1.0.0"
+      },
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "unit_scale_factor_after_patch": 1.0,
+      "use_triangles": true
+    },
+    "expected_ue_bounds_uu_at_import_scale_1": {
+      "base": {
+        "max": [
+          15.008,
+          15.002,
+          5.924
+        ],
+        "min": [
+          -15.001,
+          -15.002,
+          0.004
+        ]
+      },
+      "skeletal": {
+        "max": [
+          9.933,
+          10.742,
+          55.009
+        ],
+        "min": [
+          -9.29,
+          -16.358,
+          5.752
+        ]
+      }
+    },
+    "bounds_authored_m": {
+      "base": [
+        [
+          -0.15002,
+          -0.15008,
+          4e-05
+        ],
+        [
+          0.15002,
+          0.15001,
+          0.05924
+        ]
+      ],
+      "skeletal": [
+        [
+          -0.10742,
+          -0.09933,
+          0.05752
+        ],
+        [
+          0.16358,
+          0.0929,
+          0.55009
+        ]
+      ]
+    },
+    "triangles": {
+      "SK_Medusa_H2_Body": 38054,
+      "SK_Medusa_H2_Bow": 5000,
+      "SM_Medusa_H2_Base": 1598
+    }
+  },
+  "frames": {
+    "label": "blender (Cycles), не игровой свет; у H2 и прежнего кандидата задние грани отсечены (как UE one-sided)",
+    "backface_culling_game_models": true,
+    "k2_camera": {
+      "distances_uu": {
+        "k2-1p6": 1207.0,
+        "k2-5x": 386.0
+      },
+      "focus_z_m": 0.28,
+      "fov_deg_horizontal": 35,
+      "pitch_deg": -55,
+      "silhouettes": {
+        "k2-1p6/h2": {
+          "height_px": 116,
+          "silhouette_px": 6072,
+          "width_px": 79
+        },
+        "k2-1p6/prev": {
+          "height_px": 116,
+          "silhouette_px": 6090,
+          "width_px": 77
+        },
+        "k2-5x/h2": {
+          "height_px": 362,
+          "silhouette_px": 57795,
+          "width_px": 246
+        },
+        "k2-5x/prev": {
+          "height_px": 365,
+          "silhouette_px": 58091,
+          "width_px": 240
+        }
+      }
+    },
+    "sheets": [
+      "closeups-hp-vs-h2.jpg",
+      "compare-back.jpg",
+      "compare-front.jpg",
+      "compare-k2-1p6.jpg",
+      "compare-k2-5x.jpg",
+      "compare-side.jpg",
+      "deform-medusa-h2-blend.jpg",
+      "deform-medusa-h2-fbx.jpg",
+      "frame-k2-1p6.jpg",
+      "frame-k2-5x.jpg",
+      "probe-culled-closeups.jpg",
+      "probe-culled-k2.jpg",
+      "uv-layout-1024.png"
+    ],
+    "probe_frames": {
+      "label": "blender Workbench, FBX read-back, BC 2K, backface culling; пурпур внутри силуэта = сквозная дыра",
+      "raw_dir": "<run>/work/seams_raw",
+      "shots": [
+        "fist_front-rest-view",
+        "fist_front-arm_r_raise-view",
+        "fist_q34-rest-view",
+        "fist_q34-arm_r_raise-view",
+        "armhole_r-rest-view",
+        "armhole_r-arm_r_raise-view",
+        "armhole_l-rest-view",
+        "armhole_l-arm_l_raise-view",
+        "collar_back-rest-view",
+        "collar_back-head_turn-view",
+        "collar_front-rest-view",
+        "collar_front-head_turn-view",
+        "thigh_r-rest-view",
+        "thigh_r-thigh_r_flex-view",
+        "thigh_l-rest-view",
+        "thigh_l-thigh_l_flex-view",
+        "hem_low-rest-view",
+        "hem_low-thigh_r_flex-view",
+        "forearm_l-rest-view",
+        "forearm_l-forearm_l_bend-view",
+        "spine_side-rest-view",
+        "spine_side-spine_bend_fwd-view",
+        "k2-rest",
+        "k2-arm_r_raise",
+        "k2-arm_l_raise",
+        "k2-head_turn",
+        "k2-thigh_r_flex",
+        "k2-thigh_l_flex",
+        "k2-spine_bend_fwd"
+      ]
+    }
+  },
+  "budget_proposal": {
+    "status": "предложено",
+    "hero_triangles": [
+      30000,
+      45000
+    ],
+    "atlas": "4K мастер + 2K рантайм",
+    "slots_max": 2,
+    "h2_measured": {
+      "figure_triangles": 43054,
+      "of_which_caps": 3510,
+      "base_triangles": 1598,
+      "slots": "1 на меш, 2 меша (SK, подставка) — 1 материал"
+    },
+    "k2": {
+      "k2-5x": {
+        "distance_uu": 386.0,
+        "silhouette_h2_px": 57795,
+        "height_h2_px": 362,
+        "width_h2_px": 246,
+        "silhouette_previous_px": 58091,
+        "height_previous_px": 365,
+        "screen_px_per_cm_of_figure_height": 6.582,
+        "figure_triangles_per_silhouette_px": 0.745,
+        "texels_per_screen_px_2k_runtime": {
+          "dress_body": 2.91,
+          "face": 5.83,
+          "hand_r": 5.1,
+          "bow": 4.37,
+          "base": 1.31
+        },
+        "texels_per_screen_px_1k_hypothetical": {
+          "dress_body": 1.46,
+          "face": 2.91,
+          "hand_r": 2.55,
+          "bow": 2.18,
+          "base": 0.66
+        },
+        "retopo_p95_max_px": 0.247,
+        "retopo_max_px": 0.992
+      },
+      "k2-1p6": {
+        "distance_uu": 1207.0,
+        "silhouette_h2_px": 6072,
+        "height_h2_px": 116,
+        "width_h2_px": 79,
+        "silhouette_previous_px": 6090,
+        "height_previous_px": 116,
+        "screen_px_per_cm_of_figure_height": 2.109,
+        "figure_triangles_per_silhouette_px": 7.091,
+        "texels_per_screen_px_2k_runtime": {
+          "dress_body": 9.09,
+          "face": 18.18,
+          "hand_r": 15.91,
+          "bow": 13.63,
+          "base": 4.09
+        },
+        "texels_per_screen_px_1k_hypothetical": {
+          "dress_body": 4.55,
+          "face": 9.09,
+          "hand_r": 7.95,
+          "bow": 6.82,
+          "base": 2.05
+        },
+        "retopo_p95_max_px": 0.079,
+        "retopo_max_px": 0.318
+      }
+    },
+    "current_spec": "17-art-production-spec.md §4.5 / 04 §1: герой 15–25k, 2K — ПРЕДЛОЖЕНИЕ"
+  },
+  "determinism": {
+    "summary": {
+      "different": 14,
+      "identical": 24,
+      "identical after run-path normalisation": 1,
+      "missing in other run": 1
+    },
+    "other_run": "C:/tmp/h2mfix/repro",
+    "files": {
+      "preview/closeups-hp-vs-h2.jpg": {
+        "result": "different",
+        "sha256": [
+          "fceeea9e24fb267ab2a55f96afebe25577724b1d786f864f06a87d371c3f3d0e",
+          "7b196fa4b871a72a2f59b3fb9bc08162ffd517f7f53dca05fecfc36cee01dafd"
+        ]
+      },
+      "preview/compare-back.jpg": {
+        "result": "different",
+        "sha256": [
+          "e2b4bd046b7406e09af01390b0e05622974c756fc1fabcd7a01adc0331a2a80b",
+          "a9f7d31526b14a284617f44dd33f894def83aa75799e903637715393b9313959"
+        ]
+      },
+      "preview/compare-front.jpg": {
+        "result": "different",
+        "sha256": [
+          "6f9e1d4c2bebfcba42a9d215ab4e528aab861cdc4bb234551e0b1c5d4fbf16b9",
+          "4ccfe88d8cca6e6c51b9cb76936d91a8bb27e866614715a9f89c8065309368ff"
+        ]
+      },
+      "preview/compare-k2-1p6.jpg": {
+        "result": "different",
+        "sha256": [
+          "ca8957e7109e75c1fcb84a4c7025faf8d8e1767222a8cbea1ee01d5f07d06014",
+          "2f0254588328c0a6d8ee8c803f5334abf74854be1c28c7a8dc1d36986049f3bb"
+        ]
+      },
+      "preview/compare-k2-5x.jpg": {
+        "result": "different",
+        "sha256": [
+          "a0c37e9247ac62217d06b34995ca242e7a4cbf2f9b8d2938a0ee37e0de160c67",
+          "90b82a0ec83baacd34e58b1b3e0bf5c22beaf8283c3d644022af95b7f51d13d9"
+        ]
+      },
+      "preview/compare-side.jpg": {
+        "result": "different",
+        "sha256": [
+          "0a84b39bf4bcf63b8bf6cd96e804f373e44105a2ff0827dc5d06afbf782b848c",
+          "53c6d54696a0bf21bbddb0fbde834e59aabf13c0bb97299b9433387bfc09df2d"
+        ]
+      },
+      "preview/frame-k2-1p6.jpg": {
+        "result": "different",
+        "sha256": [
+          "eccab524ae75b7e0cbb44b4c4e804a0a82b3fb1a61af22372324494a1a9758fc",
+          "f7159f5fb598bebc1674e67616e5e03e5cf10c230222ef6908245ce2fad00db4"
+        ]
+      },
+      "preview/frame-k2-5x.jpg": {
+        "result": "different",
+        "sha256": [
+          "e2306ec180985401a6bafa23b70d00b0eb4159f6238b9da04d87e06f3ee6da01",
+          "0806b8c3e3c4cab0fa7a90a8e152e3483473c7780bf211f9ccf7066a2fdd0952"
+        ]
+      },
+      "reports/compose-report.json": {
+        "result": "different",
+        "sha256": [
+          "c666ebc99523e55d4bfae7e2942e9d19e1b8a44cf0e5dbc062f63f5f64e5040f",
+          "ad8644873e09f375a28017f37ff1508455140067824e201f9f9c83cd88df21fd"
+        ]
+      },
+      "reports/decimation-curve.json": {
+        "result": "missing in other run"
+      },
+      "reports/rig-report.json": {
+        "result": "identical after run-path normalisation",
+        "sha256": [
+          "12cb6e2154bd07c2ab2dcf02141cc10579674b82e06085d6d9be20646fe8d143",
+          "8f203ac3f7f381f011b5c23d1b588e57f69ff8c4bef1c2d529fa41987b8fa013"
+        ]
+      },
+      "reports/textures-report.json": {
+        "result": "different",
+        "sha256": [
+          "a5cade8efb4306582790e0c418420aeaa80f39cc1f06bf4e1ec6435b202c684e",
+          "9d31c3e63ff411cb87ba8d20fd84d681b0f7819b81d1a63dff7a8c224d28a186"
+        ]
+      },
+      "textures/T_Medusa_H2_2K_ORM.png": {
+        "differing_pixels": 1,
+        "differing_values": 1,
+        "max_abs_diff": 1,
+        "result": "different",
+        "sha256": [
+          "3aa8f3fc1b63017e0197d12accfb90fe7738a2adf8a268c4fb801200d0cede74",
+          "5fc3d4f2b3b1af66e0592dfd7c62fecbba7016b34b0a3208ce78dc1ee8c78afb"
+        ]
+      },
+      "textures/T_Medusa_H2_N.png": {
+        "differing_pixels": 3,
+        "differing_values": 3,
+        "max_abs_diff": 1,
+        "result": "different",
+        "sha256": [
+          "f65c9268e3594eb03de95e6c07346c1b263d905f98f782c66495647e69c9f85c",
+          "8f17b2d573f65e76e3f531bd30a0e41e8e49384d200e507950c515bc970af08f"
+        ]
+      },
+      "textures/T_Medusa_H2_N_OpenGL.png": {
+        "differing_pixels": 3,
+        "differing_values": 3,
+        "max_abs_diff": 1,
+        "result": "different",
+        "sha256": [
+          "a00b08c404b0a4b30b145dc25784b66156d037b85ea0c4d2c32fd07a614b0e5e",
+          "76f447d33616df3f5c044a46e0ad625ff43a42197d1904fec1f6bacbd2781bc5"
+        ]
+      },
+      "textures/T_Medusa_H2_ORM.png": {
+        "differing_pixels": 1,
+        "differing_values": 1,
+        "max_abs_diff": 2,
+        "result": "different",
+        "sha256": [
+          "36817003257d6a0494093832606f468d9848bcf6930865dd258d93dd5abcefd5",
+          "b3ec8f576ca3ffb1cf4eb0085ffd33c8c309da10c15133cfb0ccdb5e47f088b6"
+        ]
+      }
+    }
+  },
+  "shortfalls_vs_concept": [
+    {
+      "what": "золото читается неметаллом",
+      "measured": {
+        "gold_bc_mean_srgb": [
+          0.627,
+          0.45,
+          0.28
+        ],
+        "concept_gold_mean_srgb": [
+          0.62,
+          0.454,
+          0.286
+        ],
+        "gold_metallic_mean": 0.095,
+        "gold_metallic_p90": 0.157,
+        "gold_roughness_mean": 0.749,
+        "gold_share_of_islands_2k": 0.151
+      },
+      "cause": "PBR-шаг Tripo (metallicRoughness) — не запекание",
+      "proposal": "маска золота по BC (h 12–52°, s > 0,38, v > 0,42): metallic 0,9, roughness 0,38 — разведочный кадр вне прогона ближе к эталону; решение — за арт-треком"
+    },
+    {
+      "what": "платье светлее и серее концепта в кадре",
+      "measured": {
+        "dress_bc_mean_srgb": [
+          0.238,
+          0.19,
+          0.188
+        ],
+        "concept_dress_patch_srgb": [
+          0.244,
+          0.203,
+          0.184
+        ],
+        "dress_roughness_mean": 0.939
+      },
+      "cause": "свет и материал (BC совпадает)",
+      "proposal": "ручки M_UM_Figure / свет сцены UE"
+    },
+    {
+      "what": "подставка толще концепта",
+      "cause": "карточка 04: Ø 30 × 6 uu (намеренно)"
+    },
+    {
+      "what": "упаковка UV 43 %",
+      "cause": "упаковщик Blender на ~1 600 рваных островах при зазоре ≥ 8 px",
+      "proposal": "UVPackmaster/xatlas или ручная UV (×1,3–1,5 плотности)"
+    },
+    {
+      "what": "лицо почти скрыто короной на K2 −55°",
+      "measured": "5×: глаза/нос/диадема ≈ 15–20 px; 1,6×: не различается"
+    },
+    {
+      "what": "мелкие артефакты",
+      "list": [
+        "насечки на кончиках пальцев сандалии",
+        "смягчённые мелкие детали",
+        "AO запечено в позе покоя: зона контакта (пояс под кулаком, проймы) темнее, когда открывается в позе"
+      ]
+    }
+  ],
+  "not_done": [
+    "UE-импорт (живой UE занят волной 4)",
+    "клипы под H2",
+    "LOD1",
+    "правка металла",
+    "художественная приёмка",
+    "регистрация прогона в tripo_pipeline.py (CLI не читает H2-профиль)",
+    "живой Blender :9877 не открывался"
+  ]
+}

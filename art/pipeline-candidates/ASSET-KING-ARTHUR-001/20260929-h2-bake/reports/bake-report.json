@@ -1,0 +1,273 @@
+{
+  "ao_distance_m_tripo_frame": 0.03999999910593033,
+  "atlas_px": 4096,
+  "blender": "5.2.2 LTS",
+  "device": "GPU:OPTIX:NVIDIA GeForce RTX 4090",
+  "groups": [
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_0"
+      ],
+      "low": "LP_tripo_part_0",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_1"
+      ],
+      "low": "LP_tripo_part_1",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_2"
+      ],
+      "low": "LP_tripo_part_2",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_3"
+      ],
+      "low": "LP_tripo_part_3",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_4"
+      ],
+      "low": "LP_tripo_part_4",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_5"
+      ],
+      "low": "LP_tripo_part_5",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_6"
+      ],
+      "low": "LP_tripo_part_6",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_7"
+      ],
+      "low": "LP_tripo_part_7",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_8"
+      ],
+      "low": "LP_tripo_part_8",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_9"
+      ],
+      "low": "LP_tripo_part_9",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_10"
+      ],
+      "low": "LP_tripo_part_10",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_12"
+      ],
+      "low": "LP_tripo_part_12",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_15"
+      ],
+      "low": "LP_tripo_part_15",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_17"
+      ],
+      "low": "LP_tripo_part_17",
+      "max_ray_distance_m": 0.01
+    },
+    {
+      "cage_extrusion_m": 0.004,
+      "high": [
+        "tripo_part_17",
+        "tripo_part_10"
+      ],
+      "low": "LP_grip_bridge",
+      "max_ray_distance_m": 0.01
+    }
+  ],
+  "margin_px": 8,
+  "margin_type": "ADJACENT_FACES",
+  "normal_map_probe": {
+    "mean_abs_diff": 0.0378,
+    "note": "difference of the baked tangent normal with the Tripo normal map linked vs unlinked on the high material: > 0 means the detail normal map is carried into the bake",
+    "p95_abs_diff": 0.1765,
+    "part": "tripo_part_1",
+    "share_diff_above_0.02": 0.3804,
+    "texels": 532947
+  },
+  "passes": {
+    "AO": {
+      "channel_mean": [
+        0.8497
+      ],
+      "dtype": "float16",
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/work/bake/AO.npy",
+      "rows": "top first",
+      "samples": 128,
+      "seconds": 153.0,
+      "type": "AO"
+    },
+    "BC": {
+      "channel_mean": [
+        0.0722,
+        0.0323,
+        0.022
+      ],
+      "dtype": "float16",
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/work/bake/BC.npy",
+      "rows": "top first",
+      "samples": 16,
+      "seconds": 144.3,
+      "type": "EMIT"
+    },
+    "HIT": {
+      "channel_mean": [
+        0.4728
+      ],
+      "dtype": "float16",
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/work/bake/HIT.npy",
+      "rows": "top first",
+      "samples": 1,
+      "seconds": 96.8,
+      "type": "EMIT"
+    },
+    "MR": {
+      "channel_mean": [
+        0.4728,
+        0.3377,
+        0.0374
+      ],
+      "dtype": "float16",
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/work/bake/MR.npy",
+      "rows": "top first",
+      "samples": 16,
+      "seconds": 124.9,
+      "type": "EMIT"
+    },
+    "NORMAL": {
+      "channel_mean": [
+        0.4998,
+        0.5003,
+        0.9647
+      ],
+      "dtype": "float16",
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/work/bake/NORMAL.npy",
+      "rows": "top first",
+      "samples": 8,
+      "seconds": 105.6,
+      "type": "NORMAL"
+    },
+    "POS": {
+      "dtype": "float32",
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/work/bake/POS.npy",
+      "frame": "Tripo (low parts before seat)",
+      "rows": "top first",
+      "samples": 1,
+      "seconds": 90.2,
+      "type": "EMIT (low onto itself, Geometry.Position)"
+    }
+  },
+  "repairs": {
+    "dropped": {
+      "tripo_part_11": {
+        "triangles": 43377,
+        "why": "phantom of the mis-slotted side view: a second blade at the back (+Y), edge-on from the front; absent in the front/back concepts"
+      },
+      "tripo_part_13": {
+        "triangles": 30913,
+        "why": "phantom: fist holding the phantom blade at the back (+Y)"
+      },
+      "tripo_part_14": {
+        "triangles": 24542,
+        "why": "phantom: the side concept's near LEFT arm hanging down, rebuilt on the right side; the real right forearm is part 12 (bent forward, fist on the grip)"
+      },
+      "tripo_part_16": {
+        "triangles": 17073,
+        "why": "phantom: the side concept's knee plate, mirrored to the back of the right leg; the back concept shows only the cloak there"
+      },
+      "tripo_part_18": {
+        "triangles": 11806,
+        "why": "phantom: pommel under the phantom back fist"
+      },
+      "tripo_part_19": {
+        "triangles": 8344,
+        "why": "phantom: open gauntlet at the end of the phantom right vambrace (part 14)"
+      },
+      "tripo_part_20": {
+        "triangles": 3989,
+        "why": "phantom: the front collar clasp seen in the side concept, mirrored to the back of the right shoulder; not in the back concept"
+      }
+    },
+    "symmetrized": {
+      "tripo_part_6": {
+        "kept_side": "+X",
+        "merge_m": 1e-06,
+        "plane_x_m": -0.0077,
+        "symmetric_extent": true,
+        "topology_after": {
+          "boundary_edges": 575,
+          "largest_shells_faces": [
+            92835
+          ],
+          "non_manifold_edges": 348,
+          "shells": 1,
+          "welded_vertices": 46536,
+          "wire_edges": 2
+        },
+        "triangles_after": 92847,
+        "why": "a second face profile (second nose and cheek) is fused into the right side of the head (renders az -45/-90 of stage inspect); the left half (+X) is clean. Plane x = -0.0077 m: x of the frontmost head vertex in every 1 cm slice z 0.74-0.89 (-0.0044..-0.0090, nose ridge and beard) and the centre of the crown band (-0.0555..0.0402 -> -0.0077)",
+        "x_extent_after_m": [
+          -0.06007,
+          0.06007
+        ],
+        "x_extent_before_m": [
+          -0.06692,
+          0.06007
+        ]
+      }
+    }
+  },
+  "schema": "unmatched.h2-bake.bake/1",
+  "seconds": 737.7
+}

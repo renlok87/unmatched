@@ -1,0 +1,1133 @@
+{
+  "armature_object": "SKEL_UM_Humanoid",
+  "bones": {
+    "arm_lower.L": {
+      "head_m": [
+        0.066,
+        0.004,
+        0.334
+      ],
+      "parent": "arm_upper.L",
+      "tail_m": [
+        0.092,
+        -0.022,
+        0.321
+      ]
+    },
+    "arm_lower.R": {
+      "head_m": [
+        -0.086,
+        0.014,
+        0.345
+      ],
+      "parent": "arm_upper.R",
+      "tail_m": [
+        -0.047,
+        -0.021,
+        0.334
+      ]
+    },
+    "arm_upper.L": {
+      "head_m": [
+        0.04,
+        0.014,
+        0.397
+      ],
+      "parent": "spine",
+      "tail_m": [
+        0.066,
+        0.004,
+        0.334
+      ]
+    },
+    "arm_upper.R": {
+      "head_m": [
+        -0.047,
+        0.015,
+        0.398
+      ],
+      "parent": "spine",
+      "tail_m": [
+        -0.086,
+        0.014,
+        0.345
+      ]
+    },
+    "foot.L": {
+      "head_m": [
+        0.071,
+        0.004,
+        0.085
+      ],
+      "parent": "leg_lower.L",
+      "tail_m": [
+        0.082,
+        -0.035,
+        0.066
+      ]
+    },
+    "foot.R": {
+      "head_m": [
+        -0.074,
+        0.004,
+        0.085
+      ],
+      "parent": "leg_lower.R",
+      "tail_m": [
+        -0.083,
+        -0.035,
+        0.066
+      ]
+    },
+    "hand.L": {
+      "head_m": [
+        0.092,
+        -0.022,
+        0.321
+      ],
+      "parent": "arm_lower.L",
+      "tail_m": [
+        0.106,
+        -0.036,
+        0.314
+      ]
+    },
+    "hand.R": {
+      "head_m": [
+        -0.047,
+        -0.021,
+        0.334
+      ],
+      "parent": "arm_lower.R",
+      "tail_m": [
+        -0.022,
+        -0.035,
+        0.325
+      ]
+    },
+    "head": {
+      "head_m": [
+        0,
+        0.012,
+        0.435
+      ],
+      "parent": "spine",
+      "tail_m": [
+        0,
+        0.012,
+        0.52
+      ]
+    },
+    "hips": {
+      "head_m": [
+        0,
+        0.012,
+        0.27
+      ],
+      "parent": "root",
+      "tail_m": [
+        0,
+        0.012,
+        0.32
+      ]
+    },
+    "leg_lower.L": {
+      "head_m": [
+        0.049,
+        0.008,
+        0.205
+      ],
+      "parent": "leg_upper.L",
+      "tail_m": [
+        0.071,
+        0.004,
+        0.085
+      ]
+    },
+    "leg_lower.R": {
+      "head_m": [
+        -0.052,
+        0.008,
+        0.205
+      ],
+      "parent": "leg_upper.R",
+      "tail_m": [
+        -0.074,
+        0.004,
+        0.085
+      ]
+    },
+    "leg_upper.L": {
+      "head_m": [
+        0.035,
+        0.01,
+        0.285
+      ],
+      "parent": "hips",
+      "tail_m": [
+        0.049,
+        0.008,
+        0.205
+      ]
+    },
+    "leg_upper.R": {
+      "head_m": [
+        -0.038,
+        0.01,
+        0.285
+      ],
+      "parent": "hips",
+      "tail_m": [
+        -0.052,
+        0.008,
+        0.205
+      ]
+    },
+    "root": {
+      "head_m": [
+        0,
+        0,
+        0
+      ],
+      "parent": null,
+      "tail_m": [
+        0,
+        0,
+        0.045
+      ]
+    },
+    "spine": {
+      "head_m": [
+        0,
+        0.012,
+        0.32
+      ],
+      "parent": "hips",
+      "tail_m": [
+        0,
+        0.012,
+        0.41
+      ]
+    },
+    "weapon.L": {
+      "head_m": [
+        0.103,
+        -0.033,
+        0.315
+      ],
+      "parent": "hand.L",
+      "tail_m": [
+        0.131,
+        -0.033,
+        0.315
+      ]
+    }
+  },
+  "bounds_authored_m": {
+    "base": [
+      [
+        -0.15002,
+        -0.15008,
+        4e-05
+      ],
+      [
+        0.15002,
+        0.15001,
+        0.05924
+      ]
+    ],
+    "skeletal": [
+      [
+        -0.10742,
+        -0.09933,
+        0.05752
+      ],
+      [
+        0.16358,
+        0.0929,
+        0.55009
+      ]
+    ]
+  },
+  "bow_centroid_authored_m": [
+    0.12218,
+    -0.05936,
+    0.32417
+  ],
+  "checks": {
+    "armature_object_is_bone0_name": {
+      "expected": [
+        "SKEL_UM_Humanoid"
+      ],
+      "measured": [
+        "SKEL_UM_Humanoid.001"
+      ],
+      "passed": true
+    },
+    "authored_bounds_after_inverse_rotation": {
+      "expected": {
+        "max_cm": [
+          16.358,
+          9.29,
+          55.009
+        ],
+        "min_cm": [
+          -10.742,
+          -9.933,
+          5.752
+        ]
+      },
+      "measured": {
+        "max_cm": [
+          16.358,
+          9.29,
+          55.009
+        ],
+        "min_cm": [
+          -10.742,
+          -9.933,
+          5.752
+        ]
+      },
+      "passed": true
+    },
+    "bones_and_parents_as_profile": {
+      "expected": 17,
+      "measured": 17,
+      "passed": true
+    },
+    "export_frame_bow_on_rotated_left": {
+      "expected": "bow on +Y of the export frame (UE -Y)",
+      "measured": {
+        "bow_centroid_cm": [
+          0.05936,
+          0.12218,
+          0.32417
+        ],
+        "rotated_bow_side": [
+          0.0,
+          1.0,
+          0.0
+        ]
+      },
+      "passed": true
+    },
+    "export_frame_face_points_along_rotated_front": {
+      "expected": "dot > 0.5 (UE +X)",
+      "measured": {
+        "face_normal": [
+          0.6853,
+          0.0323,
+          -0.0814
+        ],
+        "rotated_front": [
+          1.0,
+          -0.0,
+          0.0
+        ]
+      },
+      "passed": true
+    },
+    "material_slots": {
+      "expected": "1 per mesh (<= 2 total)",
+      "measured": {
+        "SK_Medusa_H2_Body": [
+          "M_Medusa_H2_Atlas"
+        ],
+        "SK_Medusa_H2_Bow": [
+          "M_Medusa_H2_Atlas"
+        ],
+        "SM_Medusa_H2_Base": [
+          "M_Medusa_H2_Atlas"
+        ]
+      },
+      "passed": true
+    },
+    "max_influences": {
+      "expected": "<= 4",
+      "measured": 3,
+      "passed": true
+    },
+    "no_unweighted_vertices": {
+      "expected": 0,
+      "measured": 0,
+      "passed": true
+    },
+    "triangles_round_trip": {
+      "expected": {
+        "SK_Medusa_H2_Body": 38054,
+        "SK_Medusa_H2_Bow": 5000,
+        "SM_Medusa_H2_Base": 1598
+      },
+      "measured": {
+        "SK_Medusa_H2_Body": 38054,
+        "SK_Medusa_H2_Bow": 5000,
+        "SM_Medusa_H2_Base": 1598
+      },
+      "passed": true
+    },
+    "unit_scale_1_and_height": {
+      "expected": {
+        "base_top_cm": 5.924,
+        "skeletal_top_cm": 55.009
+      },
+      "measured": {
+        "base_top_cm": 5.924,
+        "skeletal_top_cm": 55.009
+      },
+      "passed": true
+    },
+    "uv0_present_in_unit_square": {
+      "expected": "UV0 in [0,1]",
+      "measured": {
+        "SK_Medusa_H2_Body": [
+          "UVMap"
+        ],
+        "SK_Medusa_H2_Bow": [
+          "UVMap"
+        ],
+        "SM_Medusa_H2_Base": [
+          "UVMap"
+        ]
+      },
+      "passed": true
+    },
+    "weapon_bone_by_side_v2": {
+      "expected": "hand.L",
+      "measured": "hand.L",
+      "passed": true
+    }
+  },
+  "claims": {
+    "art_accepted": false,
+    "budgets_declared": false,
+    "game_ready": false
+  },
+  "expected_ue_bounds_uu_at_import_scale_1": {
+    "base": {
+      "max": [
+        15.008,
+        15.002,
+        5.924
+      ],
+      "min": [
+        -15.001,
+        -15.002,
+        0.004
+      ]
+    },
+    "skeletal": {
+      "max": [
+        9.933,
+        10.742,
+        55.009
+      ],
+      "min": [
+        -9.29,
+        -16.358,
+        5.752
+      ]
+    }
+  },
+  "exports": {
+    "base_fbx": {
+      "bytes": 84668,
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-bake/export/SM_Medusa_H2_Base.fbx",
+      "sha256": "87fe88733ab8832c7f2a3ede0912a153d097b30164f70bb7bfd060b5fc42abc4"
+    },
+    "settings": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+      "colors_type": "SRGB",
+      "creation_time_pinned": "2000-01-01T00:00:00",
+      "data_scale": 100.0,
+      "deviations_from_preset": {
+        "bake_anim": "off: the candidate FBX carries no clips",
+        "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+      },
+      "embed_textures": false,
+      "export_space_rotation_z_degrees": 90.0,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "STRIP",
+      "preset": {
+        "name": "UM_FBX_v1",
+        "path": "blender/_tools/presets/UM_FBX_v1.json",
+        "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+        "version": "1.0.0"
+      },
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "unit_scale_factor_after_patch": 1.0,
+      "use_triangles": true
+    },
+    "skeletal_fbx": {
+      "bytes": 1712156,
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-bake/export/SK_Medusa_H2.fbx",
+      "sha256": "b1250d8f0d999a71474414607dbc31e8c05ab35669acc04d957f30293ab39be6"
+    }
+  },
+  "face_mean_normal_authored": [
+    0.0323,
+    -0.6853,
+    -0.0814
+  ],
+  "face_polygons": 1374,
+  "failed": [],
+  "junctions": [
+    {
+      "band_m": 0.012,
+      "note": "ворот: полоса шеи/кожи декольте (tripo_part_1) 1,2 см у петли ворота получает веса платья (spine) в той же точке — ворот не открывается при повороте головы (head_turn 35°: было 6,6–8,9 мм), шея закручивается выше ворота. Замер ray-теста head_turn (наибольшее пятно новых задних граней, шаг 1,5 мм): без стыка 39 px, платье по весам шеи (полоса 1–4 см) 13–186 px (складка накидки), шея по весам платья 7 px",
+      "part": "tripo_part_1",
+      "rim_points": 296,
+      "with": "tripo_part_0"
+    }
+  ],
+  "meshes_pre_export": {
+    "SK_Medusa_H2_Body": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_Medusa_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 1,
+      "polygons": 38054,
+      "triangles": 38054,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap"
+      ],
+      "vertices": 22167
+    },
+    "SK_Medusa_H2_Bow": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_Medusa_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 0,
+      "polygons": 5000,
+      "triangles": 5000,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap"
+      ],
+      "vertices": 2520
+    },
+    "SM_Medusa_H2_Base": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_Medusa_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 0,
+      "polygons": 1598,
+      "triangles": 1598,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap"
+      ],
+      "vertices": 1160
+    }
+  },
+  "passed": true,
+  "roundtrip": {
+    "base": {
+      "armature_objects": [],
+      "armatures": 0,
+      "bones": {},
+      "meshes": {
+        "SM_Medusa_H2_Base": {
+          "bounds_m": {
+            "max": [
+              0.15008,
+              0.15002,
+              0.05924
+            ],
+            "min": [
+              -0.15001,
+              -0.15002,
+              4e-05
+            ]
+          },
+          "color_attributes": [],
+          "has_custom_normals": true,
+          "material_slots": [
+            "M_Medusa_H2_Atlas"
+          ],
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "polygons": 1598,
+          "triangles": 1598,
+          "uv0_in_unit_square": true,
+          "uv_layers": [
+            "UVMap"
+          ],
+          "vertices": 1160,
+          "weights": null
+        }
+      }
+    },
+    "bounds_export_frame_cm": {
+      "max": [
+        9.933,
+        16.358,
+        55.009
+      ],
+      "min": [
+        -9.29,
+        -10.742,
+        5.752
+      ]
+    },
+    "skeletal": {
+      "armature_objects": [
+        "SKEL_UM_Humanoid"
+      ],
+      "armatures": 1,
+      "bones": {
+        "arm_lower.L": {
+          "head_m": [
+            -0.004,
+            0.066,
+            0.334
+          ],
+          "parent": "arm_upper.L",
+          "tail_m": [
+            0.022,
+            0.092,
+            0.321
+          ]
+        },
+        "arm_lower.R": {
+          "head_m": [
+            -0.014,
+            -0.086,
+            0.345
+          ],
+          "parent": "arm_upper.R",
+          "tail_m": [
+            0.021,
+            -0.047,
+            0.334
+          ]
+        },
+        "arm_upper.L": {
+          "head_m": [
+            -0.014,
+            0.04,
+            0.397
+          ],
+          "parent": "spine",
+          "tail_m": [
+            -0.004,
+            0.066,
+            0.334
+          ]
+        },
+        "arm_upper.R": {
+          "head_m": [
+            -0.015,
+            -0.047,
+            0.398
+          ],
+          "parent": "spine",
+          "tail_m": [
+            -0.014,
+            -0.086,
+            0.345
+          ]
+        },
+        "foot.L": {
+          "head_m": [
+            -0.004,
+            0.071,
+            0.085
+          ],
+          "parent": "leg_lower.L",
+          "tail_m": [
+            0.10237,
+            0.101,
+            0.03318
+          ]
+        },
+        "foot.R": {
+          "head_m": [
+            -0.004,
+            -0.074,
+            0.085
+          ],
+          "parent": "leg_lower.R",
+          "tail_m": [
+            0.10345,
+            -0.0988,
+            0.03265
+          ]
+        },
+        "hand.L": {
+          "head_m": [
+            0.022,
+            0.092,
+            0.321
+          ],
+          "parent": "arm_lower.L",
+          "tail_m": [
+            0.03312,
+            0.10312,
+            0.31544
+          ]
+        },
+        "hand.R": {
+          "head_m": [
+            0.021,
+            -0.047,
+            0.334
+          ],
+          "parent": "arm_lower.R",
+          "tail_m": [
+            0.04596,
+            -0.00243,
+            0.31795
+          ]
+        },
+        "head": {
+          "head_m": [
+            -0.012,
+            -0.0,
+            0.435
+          ],
+          "parent": "spine",
+          "tail_m": [
+            -0.012,
+            -0.0,
+            0.53264
+          ]
+        },
+        "hips": {
+          "head_m": [
+            -0.012,
+            -0.0,
+            0.27
+          ],
+          "parent": "root",
+          "tail_m": [
+            -0.012,
+            -0.0,
+            0.31301
+          ]
+        },
+        "leg_lower.L": {
+          "head_m": [
+            -0.008,
+            0.049,
+            0.205
+          ],
+          "parent": "leg_upper.L",
+          "tail_m": [
+            -0.004,
+            0.071,
+            0.085
+          ]
+        },
+        "leg_lower.R": {
+          "head_m": [
+            -0.008,
+            -0.052,
+            0.205
+          ],
+          "parent": "leg_upper.R",
+          "tail_m": [
+            -0.004,
+            -0.074,
+            0.085
+          ]
+        },
+        "leg_upper.L": {
+          "head_m": [
+            -0.01,
+            0.035,
+            0.285
+          ],
+          "parent": "hips",
+          "tail_m": [
+            -0.008,
+            0.049,
+            0.205
+          ]
+        },
+        "leg_upper.R": {
+          "head_m": [
+            -0.01,
+            -0.038,
+            0.285
+          ],
+          "parent": "hips",
+          "tail_m": [
+            -0.008,
+            -0.052,
+            0.205
+          ]
+        },
+        "root": {
+          "head_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "parent": null,
+          "tail_m": [
+            0.0,
+            0.0,
+            0.27027
+          ]
+        },
+        "spine": {
+          "head_m": [
+            -0.012,
+            -0.0,
+            0.32
+          ],
+          "parent": "hips",
+          "tail_m": [
+            -0.012,
+            -0.0,
+            0.41764
+          ]
+        },
+        "weapon.L": {
+          "head_m": [
+            0.033,
+            0.103,
+            0.315
+          ],
+          "parent": "hand.L",
+          "tail_m": [
+            0.033,
+            0.11967,
+            0.315
+          ]
+        }
+      },
+      "meshes": {
+        "SK_Medusa_H2_Body": {
+          "bounds_m": {
+            "max": [
+              0.04923,
+              0.11272,
+              0.55009
+            ],
+            "min": [
+              -0.0929,
+              -0.10742,
+              0.05752
+            ]
+          },
+          "color_attributes": [],
+          "has_custom_normals": true,
+          "material_slots": [
+            "M_Medusa_H2_Atlas"
+          ],
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 1,
+          "polygons": 38054,
+          "triangles": 38054,
+          "uv0_in_unit_square": true,
+          "uv_layers": [
+            "UVMap"
+          ],
+          "vertices": 22167,
+          "weights": {
+            "bones_used": {
+              "arm_lower.L": 940,
+              "arm_lower.R": 949,
+              "arm_upper.L": 786,
+              "arm_upper.R": 805,
+              "foot.L": 1214,
+              "foot.R": 1446,
+              "hand.L": 462,
+              "hand.R": 1032,
+              "head": 4289,
+              "hips": 4743,
+              "leg_lower.L": 1582,
+              "leg_lower.R": 1974,
+              "leg_upper.L": 2637,
+              "leg_upper.R": 3090,
+              "spine": 3964
+            },
+            "max_influences": 3,
+            "not_normalised_vertices": 0,
+            "unweighted_vertices": 0,
+            "vertices": 22167,
+            "weight_share": {
+              "arm_lower.L": 0.0333,
+              "arm_lower.R": 0.0312,
+              "arm_upper.L": 0.0238,
+              "arm_upper.R": 0.0257,
+              "foot.L": 0.047,
+              "foot.R": 0.0528,
+              "hand.L": 0.0163,
+              "hand.R": 0.0412,
+              "head": 0.1888,
+              "hips": 0.1366,
+              "leg_lower.L": 0.0593,
+              "leg_lower.R": 0.0718,
+              "leg_upper.L": 0.0547,
+              "leg_upper.R": 0.0604,
+              "spine": 0.1573
+            }
+          }
+        },
+        "SK_Medusa_H2_Bow": {
+          "bounds_m": {
+            "max": [
+              0.09933,
+              0.16358,
+              0.50643
+            ],
+            "min": [
+              0.01681,
+              0.0822,
+              0.14828
+            ]
+          },
+          "color_attributes": [],
+          "has_custom_normals": true,
+          "material_slots": [
+            "M_Medusa_H2_Atlas"
+          ],
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "polygons": 5000,
+          "triangles": 5000,
+          "uv0_in_unit_square": true,
+          "uv_layers": [
+            "UVMap"
+          ],
+          "vertices": 2520,
+          "weights": {
+            "bones_used": {
+              "weapon.L": 2520
+            },
+            "max_influences": 1,
+            "not_normalised_vertices": 0,
+            "unweighted_vertices": 0,
+            "vertices": 2520,
+            "weight_share": {
+              "weapon.L": 1.0
+            }
+          }
+        }
+      }
+    }
+  },
+  "skeleton": "UM_HUMANOID_17_v2",
+  "sockets": [
+    {
+      "bone": "weapon.L",
+      "location_uu_for_ue": [
+        0,
+        0,
+        0
+      ],
+      "name": "Weapon",
+      "offset_blender_bone_uu": [
+        -0.0,
+        -0.0,
+        -0.0
+      ],
+      "source": "profile",
+      "target_blender_m": [
+        0.103,
+        -0.033,
+        0.315
+      ],
+      "target_ue_component_uu": [
+        3.3,
+        -10.3,
+        31.5
+      ],
+      "ue_bone": "weapon_L"
+    },
+    {
+      "bone": "head",
+      "location_uu_for_ue": [
+        0.0,
+        -3.7,
+        1.6
+      ],
+      "name": "Head",
+      "offset_blender_bone_uu": [
+        0.0,
+        3.7,
+        1.6
+      ],
+      "source": "build prediction (x, -y, z)",
+      "target_blender_m": [
+        0.0,
+        -0.004,
+        0.472
+      ],
+      "target_ue_component_uu": [
+        0.4,
+        -0.0,
+        47.2
+      ],
+      "ue_bone": "head"
+    }
+  ],
+  "stage": "rig",
+  "status": "измерено",
+  "weight_continuity_at_part_junctions": {
+    "tripo_part_0|tripo_part_1": {
+      "max_l1": 0.0,
+      "p95_l1": 0.0,
+      "pairs": 145
+    },
+    "tripo_part_0|tripo_part_10": {
+      "max_l1": 0.0,
+      "p95_l1": 0.0,
+      "pairs": 96
+    },
+    "tripo_part_0|tripo_part_12": {
+      "max_l1": 2.0,
+      "p95_l1": 2.0,
+      "pairs": 203
+    },
+    "tripo_part_0|tripo_part_13": {
+      "max_l1": 2.0,
+      "p95_l1": 2.0,
+      "pairs": 92
+    },
+    "tripo_part_0|tripo_part_4": {
+      "max_l1": 2.0,
+      "p95_l1": 2.0,
+      "pairs": 174
+    },
+    "tripo_part_0|tripo_part_5": {
+      "max_l1": 2.0,
+      "p95_l1": 2.0,
+      "pairs": 66
+    },
+    "tripo_part_0|tripo_part_6": {
+      "max_l1": 2.0,
+      "p95_l1": 2.0,
+      "pairs": 98
+    },
+    "tripo_part_0|tripo_part_7": {
+      "max_l1": 2.0,
+      "p95_l1": 2.0,
+      "pairs": 130
+    },
+    "tripo_part_0|tripo_part_9": {
+      "max_l1": 2.0,
+      "p95_l1": 2.0,
+      "pairs": 207
+    },
+    "tripo_part_11|tripo_part_3": {
+      "max_l1": 2.0,
+      "p95_l1": 2.0,
+      "pairs": 79
+    },
+    "tripo_part_11|tripo_part_6": {
+      "max_l1": 1.381,
+      "p95_l1": 0.0301,
+      "pairs": 73
+    },
+    "tripo_part_12|tripo_part_5": {
+      "max_l1": 0.0,
+      "p95_l1": 0.0,
+      "pairs": 110
+    },
+    "tripo_part_13|tripo_part_8": {
+      "max_l1": 0.0935,
+      "p95_l1": 0.0356,
+      "pairs": 78
+    },
+    "tripo_part_14|tripo_part_4": {
+      "max_l1": 0.0,
+      "p95_l1": 0.0,
+      "pairs": 183
+    },
+    "tripo_part_15|tripo_part_5": {
+      "max_l1": 0.0,
+      "p95_l1": 0.0,
+      "pairs": 210
+    },
+    "tripo_part_16|tripo_part_4": {
+      "max_l1": 0.0538,
+      "p95_l1": 0.0169,
+      "pairs": 125
+    },
+    "tripo_part_4|tripo_part_9": {
+      "max_l1": 0.0,
+      "p95_l1": 0.0,
+      "pairs": 102
+    },
+    "tripo_part_7|tripo_part_8": {
+      "max_l1": 0.0176,
+      "p95_l1": 0.0045,
+      "pairs": 108
+    }
+  },
+  "weights": {
+    "body": {
+      "bones_used": {
+        "arm_lower.L": 940,
+        "arm_lower.R": 949,
+        "arm_upper.L": 786,
+        "arm_upper.R": 805,
+        "foot.L": 1214,
+        "foot.R": 1446,
+        "hand.L": 462,
+        "hand.R": 1032,
+        "head": 4289,
+        "hips": 4743,
+        "leg_lower.L": 1582,
+        "leg_lower.R": 1974,
+        "leg_upper.L": 2637,
+        "leg_upper.R": 3090,
+        "spine": 3964
+      },
+      "max_influences": 3,
+      "not_normalised_vertices": 0,
+      "unweighted_vertices": 0,
+      "vertices": 22167,
+      "weight_share": {
+        "arm_lower.L": 0.0333,
+        "arm_lower.R": 0.0312,
+        "arm_upper.L": 0.0238,
+        "arm_upper.R": 0.0257,
+        "foot.L": 0.047,
+        "foot.R": 0.0528,
+        "hand.L": 0.0163,
+        "hand.R": 0.0412,
+        "head": 0.1888,
+        "hips": 0.1366,
+        "leg_lower.L": 0.0593,
+        "leg_lower.R": 0.0718,
+        "leg_upper.L": 0.0547,
+        "leg_upper.R": 0.0604,
+        "spine": 0.1573
+      }
+    },
+    "weapon": {
+      "bones_used": {
+        "weapon.L": 2520
+      },
+      "max_influences": 1,
+      "not_normalised_vertices": 0,
+      "unweighted_vertices": 0,
+      "vertices": 2520,
+      "weight_share": {
+        "weapon.L": 1.0
+      }
+    }
+  }
+}

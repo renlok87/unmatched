@@ -1,0 +1,1561 @@
+{
+ "blender": "5.2.2 LTS",
+ "checks": {
+  "geometry_identical_parts_vs_textured": {
+   "expected": "<= 1e-7 m both directions",
+   "measured": {
+    "tripo_part_0": [
+     0.0,
+     0.0
+    ],
+    "tripo_part_1": [
+     0.0,
+     0.0
+    ],
+    "tripo_part_10": [
+     0.0,
+     0.0
+    ],
+    "tripo_part_11": [
+     0.0,
+     0.0
+    ],
+    "tripo_part_2": [
+     0.0,
+     0.0
+    ],
+    "tripo_part_3": [
+     0.0,
+     0.0
+    ],
+    "tripo_part_4": [
+     0.0,
+     0.0
+    ],
+    "tripo_part_5": [
+     0.0,
+     0.0
+    ],
+    "tripo_part_6": [
+     0.0,
+     0.0
+    ],
+    "tripo_part_7": [
+     0.0,
+     0.0
+    ],
+    "tripo_part_8": [
+     0.0,
+     0.0
+    ],
+    "tripo_part_9": [
+     0.0,
+     0.0
+    ]
+   },
+   "note": "vertex counts differ only by UV-seam splits of the textured file",
+   "passed": true
+  },
+  "mesh_counts": {
+   "expected": [
+    12,
+    12
+   ],
+   "measured": [
+    12,
+    12
+   ],
+   "passed": true
+  },
+  "orientation_all_parts_outward": {
+   "expected": ">= 0.5 (ray escape, 3000 sampled polygons per part)",
+   "measured": {
+    "tripo_part_0": 1.0,
+    "tripo_part_1": 1.0,
+    "tripo_part_10": 1.0,
+    "tripo_part_11": 1.0,
+    "tripo_part_2": 1.0,
+    "tripo_part_3": 1.0,
+    "tripo_part_4": 1.0,
+    "tripo_part_5": 1.0,
+    "tripo_part_6": 1.0,
+    "tripo_part_7": 1.0,
+    "tripo_part_8": 1.0,
+    "tripo_part_9": 1.0
+   },
+   "note": "no inside-out part in H2 (unlike d9ff4260 shoes)",
+   "passed": true
+  },
+  "part_names_match": {
+   "expected": [
+    "tripo_part_0",
+    "tripo_part_1",
+    "tripo_part_10",
+    "tripo_part_11",
+    "tripo_part_2",
+    "tripo_part_3",
+    "tripo_part_4",
+    "tripo_part_5",
+    "tripo_part_6",
+    "tripo_part_7",
+    "tripo_part_8",
+    "tripo_part_9"
+   ],
+   "measured": {
+    "parts_glb": [
+     "tripo_part_0",
+     "tripo_part_1",
+     "tripo_part_10",
+     "tripo_part_11",
+     "tripo_part_2",
+     "tripo_part_3",
+     "tripo_part_4",
+     "tripo_part_5",
+     "tripo_part_6",
+     "tripo_part_7",
+     "tripo_part_8",
+     "tripo_part_9"
+    ],
+    "textured_glb": [
+     "tripo_part_0",
+     "tripo_part_1",
+     "tripo_part_10",
+     "tripo_part_11",
+     "tripo_part_2",
+     "tripo_part_3",
+     "tripo_part_4",
+     "tripo_part_5",
+     "tripo_part_6",
+     "tripo_part_7",
+     "tripo_part_8",
+     "tripo_part_9"
+    ]
+   },
+   "passed": true
+  },
+  "seam_loops_shared": {
+   "measured": {
+    "loops": 36,
+    "unshared_over_3_vertices": []
+   },
+   "note": "every open loop of a part (except tiny holes) is shared with another part within weld_m",
+   "passed": true
+  },
+  "source_parts_sha256_bytes": {
+   "expected": [
+    "82c3eff8e73359969decc807a637eccc5e05847df91e5d5c1a8d4377205cd74d",
+    46857420
+   ],
+   "measured": [
+    "82c3eff8e73359969decc807a637eccc5e05847df91e5d5c1a8d4377205cd74d",
+    46857420
+   ],
+   "passed": true
+  },
+  "source_textured_sha256_bytes": {
+   "expected": [
+    "bb970839f3431af1f7bc188a62502ea210dc65210796257f8c391f40fbbfd9d2",
+    69793876
+   ],
+   "measured": [
+    "bb970839f3431af1f7bc188a62502ea210dc65210796257f8c391f40fbbfd9d2",
+    69793876
+   ],
+   "passed": true
+  },
+  "textured_materials_images": {
+   "expected": [
+    12,
+    36
+   ],
+   "measured": [
+    12,
+    36
+   ],
+   "passed": true
+  },
+  "triangle_counts": {
+   "expected": {
+    "parts": 1947523,
+    "textured": 1947523
+   },
+   "measured": {
+    "parts": 1947523,
+    "textured": 1947523
+   },
+   "passed": true
+  },
+  "winding_agrees_with_corner_normals": {
+   "expected": "< 0.1 % of polygons",
+   "measured": {
+    "tripo_part_0": 4.89e-05,
+    "tripo_part_1": 0.0,
+    "tripo_part_10": 4.39e-05,
+    "tripo_part_11": 0.0,
+    "tripo_part_2": 0.0,
+    "tripo_part_3": 2.92e-05,
+    "tripo_part_4": 2.4e-05,
+    "tripo_part_5": 2.09e-05,
+    "tripo_part_6": 3.43e-05,
+    "tripo_part_7": 0.0,
+    "tripo_part_8": 3.34e-05,
+    "tripo_part_9": 1.43e-05
+   },
+   "passed": true
+  }
+ },
+ "files": {
+  "parts": {
+   "bytes": 46857420,
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-parts12.glb",
+   "sha256": "82c3eff8e73359969decc807a637eccc5e05847df91e5d5c1a8d4377205cd74d"
+  },
+  "textured": {
+   "bytes": 69793876,
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-tex8k-pbr.glb",
+   "sha256": "bb970839f3431af1f7bc188a62502ea210dc65210796257f8c391f40fbbfd9d2"
+  }
+ },
+ "parts": {
+  "tripo_part_0": {
+   "bounds_m": {
+    "max": [
+     0.23958,
+     0.20456,
+     0.88985
+    ],
+    "min": [
+     -0.22845,
+     -0.15591,
+     0.11205
+    ]
+   },
+   "geometry_identity": {
+    "max_nearest_m": [
+     0.0,
+     0.0
+    ],
+    "unique_positions": [
+     533263,
+     533263
+    ]
+   },
+   "object": "body",
+   "opposed_corner_normal_fraction": 4.89e-05,
+   "ray_escape_score": 1.0,
+   "role": "robe with hood, stoles/trim, belt, stars",
+   "same_polygon_count": true,
+   "textures": {
+    "basecolor": {
+     "colorspace": "sRGB",
+     "px": [
+      4096,
+      4096
+     ]
+    },
+    "normal": {
+     "colorspace": "Non-Color",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "rm": {
+     "colorspace": "Non-Color",
+     "px": [
+      1024,
+      1024
+     ]
+    }
+   },
+   "triangles": 1063800,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertices": [
+    533297,
+    554097
+   ]
+  },
+  "tripo_part_1": {
+   "bounds_m": {
+    "max": [
+     0.23879,
+     0.23604,
+     0.09754
+    ],
+    "min": [
+     -0.23958,
+     -0.23604,
+     0.0
+    ]
+   },
+   "geometry_identity": {
+    "max_nearest_m": [
+     0.0,
+     0.0
+    ],
+    "unique_positions": [
+     118284,
+     118284
+    ]
+   },
+   "object": "base",
+   "opposed_corner_normal_fraction": 0.0,
+   "ray_escape_score": 1.0,
+   "role": "base (dark stone)",
+   "same_polygon_count": true,
+   "textures": {
+    "basecolor": {
+     "colorspace": "sRGB",
+     "px": [
+      4096,
+      4096
+     ]
+    },
+    "normal": {
+     "colorspace": "Non-Color",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "rm": {
+     "colorspace": "Non-Color",
+     "px": [
+      1024,
+      1024
+     ]
+    }
+   },
+   "triangles": 235801,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertices": [
+    118284,
+    121451
+   ]
+  },
+  "tripo_part_10": {
+   "bounds_m": {
+    "max": [
+     -0.12217,
+     0.02954,
+     0.90287
+    ],
+    "min": [
+     -0.20149,
+     -0.03296,
+     0.67044
+    ]
+   },
+   "geometry_identity": {
+    "max_nearest_m": [
+     0.0,
+     0.0
+    ],
+    "unique_positions": [
+     34339,
+     34339
+    ]
+   },
+   "object": "staff",
+   "opposed_corner_normal_fraction": 4.39e-05,
+   "ray_escape_score": 1.0,
+   "role": "staff, carved upper shaft and crystal claw (above the fist)",
+   "same_polygon_count": true,
+   "textures": {
+    "basecolor": {
+     "colorspace": "sRGB",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "normal": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    },
+    "rm": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    }
+   },
+   "triangles": 68415,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertices": [
+    34339,
+    35177
+   ]
+  },
+  "tripo_part_11": {
+   "bounds_m": {
+    "max": [
+     -0.04907,
+     0.10084,
+     0.19282
+    ],
+    "min": [
+     -0.17926,
+     -0.05614,
+     0.09293
+    ]
+   },
+   "geometry_identity": {
+    "max_nearest_m": [
+     0.0,
+     0.0
+    ],
+    "unique_positions": [
+     23715,
+     23715
+    ]
+   },
+   "object": "body",
+   "opposed_corner_normal_fraction": 0.0,
+   "ray_escape_score": 1.0,
+   "role": "right shoe",
+   "same_polygon_count": true,
+   "textures": {
+    "basecolor": {
+     "colorspace": "sRGB",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "normal": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    },
+    "rm": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    }
+   },
+   "triangles": 46676,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertices": [
+    23715,
+    24208
+   ]
+  },
+  "tripo_part_2": {
+   "bounds_m": {
+    "max": [
+     -0.115,
+     0.00992,
+     0.64802
+    ],
+    "min": [
+     -0.181,
+     -0.03689,
+     0.13145
+    ]
+   },
+   "geometry_identity": {
+    "max_nearest_m": [
+     0.0,
+     0.0
+    ],
+    "unique_positions": [
+     38044,
+     38044
+    ]
+   },
+   "object": "staff",
+   "opposed_corner_normal_fraction": 0.0,
+   "ray_escape_score": 1.0,
+   "role": "staff, lower shaft (below the fist)",
+   "same_polygon_count": true,
+   "textures": {
+    "basecolor": {
+     "colorspace": "sRGB",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "normal": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    },
+    "rm": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    }
+   },
+   "triangles": 75685,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertices": [
+    38044,
+    39310
+   ]
+  },
+  "tripo_part_3": {
+   "bounds_m": {
+    "max": [
+     0.18772,
+     0.05494,
+     0.72886
+    ],
+    "min": [
+     0.05525,
+     -0.09941,
+     0.40696
+    ]
+   },
+   "geometry_identity": {
+    "max_nearest_m": [
+     0.0,
+     0.0
+    ],
+    "unique_positions": [
+     68934,
+     68934
+    ]
+   },
+   "object": "body",
+   "opposed_corner_normal_fraction": 2.92e-05,
+   "ray_escape_score": 1.0,
+   "role": "left sleeve (bell cuff over the left fist)",
+   "same_polygon_count": true,
+   "textures": {
+    "basecolor": {
+     "colorspace": "sRGB",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "normal": {
+     "colorspace": "Non-Color",
+     "px": [
+      512,
+      512
+     ]
+    },
+    "rm": {
+     "colorspace": "Non-Color",
+     "px": [
+      512,
+      512
+     ]
+    }
+   },
+   "triangles": 137019,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertices": [
+    68934,
+    70278
+   ]
+  },
+  "tripo_part_4": {
+   "bounds_m": {
+    "max": [
+     -0.07414,
+     0.12337,
+     0.7332
+    ],
+    "min": [
+     -0.19769,
+     -0.00586,
+     0.44
+    ]
+   },
+   "geometry_identity": {
+    "max_nearest_m": [
+     0.0,
+     0.0
+    ],
+    "unique_positions": [
+     62834,
+     62834
+    ]
+   },
+   "object": "body",
+   "opposed_corner_normal_fraction": 2.4e-05,
+   "ray_escape_score": 1.0,
+   "role": "right sleeve",
+   "same_polygon_count": true,
+   "textures": {
+    "basecolor": {
+     "colorspace": "sRGB",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "normal": {
+     "colorspace": "Non-Color",
+     "px": [
+      512,
+      512
+     ]
+    },
+    "rm": {
+     "colorspace": "Non-Color",
+     "px": [
+      512,
+      512
+     ]
+    }
+   },
+   "triangles": 124948,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertices": [
+    62834,
+    64666
+   ]
+  },
+  "tripo_part_5": {
+   "bounds_m": {
+    "max": [
+     0.17187,
+     0.02977,
+     0.19337
+    ],
+    "min": [
+     0.06126,
+     -0.14414,
+     0.09404
+    ]
+   },
+   "geometry_identity": {
+    "max_nearest_m": [
+     0.0,
+     0.0
+    ],
+    "unique_positions": [
+     24265,
+     24265
+    ]
+   },
+   "object": "body",
+   "opposed_corner_normal_fraction": 2.09e-05,
+   "ray_escape_score": 1.0,
+   "role": "left shoe",
+   "same_polygon_count": true,
+   "textures": {
+    "basecolor": {
+     "colorspace": "sRGB",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "normal": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    },
+    "rm": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    }
+   },
+   "triangles": 47898,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertices": [
+    24265,
+    25065
+   ]
+  },
+  "tripo_part_6": {
+   "bounds_m": {
+    "max": [
+     -0.13083,
+     0.0417,
+     0.68265
+    ],
+    "min": [
+     -0.19794,
+     -0.04609,
+     0.58814
+    ]
+   },
+   "geometry_identity": {
+    "max_nearest_m": [
+     0.0,
+     0.0
+    ],
+    "unique_positions": [
+     14790,
+     14790
+    ]
+   },
+   "object": "body",
+   "opposed_corner_normal_fraction": 3.43e-05,
+   "ray_escape_score": 1.0,
+   "role": "right fist on the staff",
+   "same_polygon_count": true,
+   "textures": {
+    "basecolor": {
+     "colorspace": "sRGB",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "normal": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    },
+    "rm": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    }
+   },
+   "triangles": 29138,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertices": [
+    14790,
+    15301
+   ]
+  },
+  "tripo_part_7": {
+   "bounds_m": {
+    "max": [
+     -0.12822,
+     0.0343,
+     0.97742
+    ],
+    "min": [
+     -0.19556,
+     -0.03287,
+     0.88576
+    ]
+   },
+   "geometry_identity": {
+    "max_nearest_m": [
+     0.0,
+     0.0
+    ],
+    "unique_positions": [
+     9294,
+     9294
+    ]
+   },
+   "object": "staff",
+   "opposed_corner_normal_fraction": 0.0,
+   "ray_escape_score": 1.0,
+   "role": "staff crystal",
+   "same_polygon_count": true,
+   "textures": {
+    "basecolor": {
+     "colorspace": "sRGB",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "normal": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    },
+    "rm": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    }
+   },
+   "triangles": 18421,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertices": [
+    9294,
+    9525
+   ]
+  },
+  "tripo_part_8": {
+   "bounds_m": {
+    "max": [
+     0.09994,
+     -0.05192,
+     0.58815
+    ],
+    "min": [
+     0.00621,
+     -0.10742,
+     0.51586
+    ]
+   },
+   "geometry_identity": {
+    "max_nearest_m": [
+     0.0,
+     0.0
+    ],
+    "unique_positions": [
+     15210,
+     15210
+    ]
+   },
+   "object": "body",
+   "opposed_corner_normal_fraction": 3.34e-05,
+   "ray_escape_score": 1.0,
+   "role": "left fist at the belt",
+   "same_polygon_count": true,
+   "textures": {
+    "basecolor": {
+     "colorspace": "sRGB",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "normal": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    },
+    "rm": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    }
+   },
+   "triangles": 29957,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertices": [
+    15210,
+    15602
+   ]
+  },
+  "tripo_part_9": {
+   "bounds_m": {
+    "max": [
+     0.05669,
+     -0.01541,
+     0.83203
+    ],
+    "min": [
+     -0.05911,
+     -0.09016,
+     0.61912
+    ]
+   },
+   "geometry_identity": {
+    "max_nearest_m": [
+     0.0,
+     0.0
+    ],
+    "unique_positions": [
+     35173,
+     35173
+    ]
+   },
+   "object": "body",
+   "opposed_corner_normal_fraction": 1.43e-05,
+   "ray_escape_score": 1.0,
+   "role": "face and tied beard",
+   "same_polygon_count": true,
+   "textures": {
+    "basecolor": {
+     "colorspace": "sRGB",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "normal": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    },
+    "rm": {
+     "colorspace": "Non-Color",
+     "px": [
+      256,
+      256
+     ]
+    }
+   },
+   "triangles": 69765,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "vertices": [
+    35173,
+    36223
+   ]
+  }
+ },
+ "passed": true,
+ "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json",
+ "profile_id": "merlin-h2-bake/1",
+ "seams": [
+  {
+   "centre_m": [
+    0.0714,
+    -0.0295,
+    0.5667
+   ],
+   "part": "tripo_part_0",
+   "radius_m": 0.0768,
+   "shared_with": {
+    "tripo_part_3": 0.688,
+    "tripo_part_8": 0.313
+   },
+   "vertices": 1008,
+   "z_range_m": [
+    0.4276,
+    0.7289
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0063,
+    -0.0471,
+    0.7602
+   ],
+   "part": "tripo_part_0",
+   "radius_m": 0.0624,
+   "shared_with": {
+    "tripo_part_9": 1.0
+   },
+   "vertices": 518,
+   "z_range_m": [
+    0.6739,
+    0.832
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0843,
+    0.0428,
+    0.6615
+   ],
+   "part": "tripo_part_0",
+   "radius_m": 0.0561,
+   "shared_with": {
+    "tripo_part_4": 1.0
+   },
+   "vertices": 306,
+   "z_range_m": [
+    0.5932,
+    0.7332
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0863,
+    0.0673,
+    0.1623
+   ],
+   "part": "tripo_part_0",
+   "radius_m": 0.0402,
+   "shared_with": {
+    "tripo_part_11": 1.0
+   },
+   "vertices": 272,
+   "z_range_m": [
+    0.1254,
+    0.1928
+   ]
+  },
+  {
+   "centre_m": [
+    0.1053,
+    -0.0121,
+    0.1697
+   ],
+   "part": "tripo_part_0",
+   "radius_m": 0.0397,
+   "shared_with": {
+    "tripo_part_5": 1.0
+   },
+   "vertices": 254,
+   "z_range_m": [
+    0.138,
+    0.1934
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0964,
+    0.046,
+    0.5274
+   ],
+   "part": "tripo_part_0",
+   "radius_m": 0.0349,
+   "shared_with": {
+    "tripo_part_4": 1.0
+   },
+   "vertices": 211,
+   "z_range_m": [
+    0.4773,
+    0.5727
+   ]
+  },
+  {
+   "centre_m": [
+    -0.1196,
+    -0.0137,
+    0.1882
+   ],
+   "part": "tripo_part_0",
+   "radius_m": 0.0294,
+   "shared_with": {
+    "tripo_part_2": 1.0
+   },
+   "vertices": 169,
+   "z_range_m": [
+    0.1486,
+    0.2421
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0018,
+    -0.053,
+    0.6521
+   ],
+   "part": "tripo_part_0",
+   "radius_m": 0.0094,
+   "shared_with": {
+    "tripo_part_9": 1.0
+   },
+   "vertices": 63,
+   "z_range_m": [
+    0.6428,
+    0.6614
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0061,
+    0.0742,
+    0.6684
+   ],
+   "part": "tripo_part_0",
+   "radius_m": 0.0005,
+   "shared_with": {},
+   "vertices": 3,
+   "z_range_m": [
+    0.6679,
+    0.6689
+   ]
+  },
+  {
+   "centre_m": [
+    -0.1337,
+    -0.0022,
+    0.0942
+   ],
+   "part": "tripo_part_1",
+   "radius_m": 0.0434,
+   "shared_with": {
+    "tripo_part_11": 1.0
+   },
+   "vertices": 269,
+   "z_range_m": [
+    0.0929,
+    0.0957
+   ]
+  },
+  {
+   "centre_m": [
+    0.1313,
+    -0.0898,
+    0.0953
+   ],
+   "part": "tripo_part_1",
+   "radius_m": 0.046,
+   "shared_with": {
+    "tripo_part_5": 1.0
+   },
+   "vertices": 244,
+   "z_range_m": [
+    0.094,
+    0.0975
+   ]
+  },
+  {
+   "centre_m": [
+    0.1012,
+    0.0024,
+    0.0947
+   ],
+   "part": "tripo_part_1",
+   "radius_m": 0.0286,
+   "shared_with": {
+    "tripo_part_5": 1.0
+   },
+   "vertices": 136,
+   "z_range_m": [
+    0.0945,
+    0.0956
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0836,
+    0.0712,
+    0.0945
+   ],
+   "part": "tripo_part_1",
+   "radius_m": 0.0276,
+   "shared_with": {
+    "tripo_part_11": 1.0
+   },
+   "vertices": 122,
+   "z_range_m": [
+    0.0944,
+    0.0952
+   ]
+  },
+  {
+   "centre_m": [
+    -0.1196,
+    -0.0137,
+    0.1882
+   ],
+   "part": "tripo_part_2",
+   "radius_m": 0.0294,
+   "shared_with": {
+    "tripo_part_0": 1.0
+   },
+   "vertices": 169,
+   "z_range_m": [
+    0.1486,
+    0.2421
+   ]
+  },
+  {
+   "centre_m": [
+    -0.1606,
+    -0.0147,
+    0.6262
+   ],
+   "part": "tripo_part_2",
+   "radius_m": 0.0188,
+   "shared_with": {
+    "tripo_part_6": 1.0
+   },
+   "vertices": 141,
+   "z_range_m": [
+    0.6128,
+    0.648
+   ]
+  },
+  {
+   "centre_m": [
+    -0.134,
+    -0.0163,
+    0.1339
+   ],
+   "part": "tripo_part_2",
+   "radius_m": 0.0134,
+   "shared_with": {
+    "tripo_part_11": 1.0
+   },
+   "vertices": 95,
+   "z_range_m": [
+    0.1315,
+    0.1392
+   ]
+  },
+  {
+   "centre_m": [
+    0.087,
+    -0.0256,
+    0.5726
+   ],
+   "part": "tripo_part_3",
+   "radius_m": 0.0786,
+   "shared_with": {
+    "tripo_part_0": 0.819,
+    "tripo_part_8": 0.183
+   },
+   "vertices": 847,
+   "z_range_m": [
+    0.4276,
+    0.7289
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0843,
+    0.0428,
+    0.6615
+   ],
+   "part": "tripo_part_4",
+   "radius_m": 0.0561,
+   "shared_with": {
+    "tripo_part_0": 1.0
+   },
+   "vertices": 306,
+   "z_range_m": [
+    0.5932,
+    0.7332
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0964,
+    0.046,
+    0.5274
+   ],
+   "part": "tripo_part_4",
+   "radius_m": 0.0349,
+   "shared_with": {
+    "tripo_part_0": 1.0
+   },
+   "vertices": 211,
+   "z_range_m": [
+    0.4773,
+    0.5727
+   ]
+  },
+  {
+   "centre_m": [
+    -0.1543,
+    0.0236,
+    0.6239
+   ],
+   "part": "tripo_part_4",
+   "radius_m": 0.0309,
+   "shared_with": {
+    "tripo_part_6": 1.0
+   },
+   "vertices": 205,
+   "z_range_m": [
+    0.5881,
+    0.6629
+   ]
+  },
+  {
+   "centre_m": [
+    0.1053,
+    -0.0121,
+    0.1697
+   ],
+   "part": "tripo_part_5",
+   "radius_m": 0.0397,
+   "shared_with": {
+    "tripo_part_0": 1.0
+   },
+   "vertices": 254,
+   "z_range_m": [
+    0.138,
+    0.1934
+   ]
+  },
+  {
+   "centre_m": [
+    0.1313,
+    -0.0898,
+    0.0953
+   ],
+   "part": "tripo_part_5",
+   "radius_m": 0.046,
+   "shared_with": {
+    "tripo_part_1": 1.0
+   },
+   "vertices": 244,
+   "z_range_m": [
+    0.094,
+    0.0975
+   ]
+  },
+  {
+   "centre_m": [
+    0.1012,
+    0.0024,
+    0.0947
+   ],
+   "part": "tripo_part_5",
+   "radius_m": 0.0286,
+   "shared_with": {
+    "tripo_part_1": 1.0
+   },
+   "vertices": 136,
+   "z_range_m": [
+    0.0945,
+    0.0956
+   ]
+  },
+  {
+   "centre_m": [
+    -0.1543,
+    0.0236,
+    0.6239
+   ],
+   "part": "tripo_part_6",
+   "radius_m": 0.0309,
+   "shared_with": {
+    "tripo_part_4": 1.0
+   },
+   "vertices": 205,
+   "z_range_m": [
+    0.5881,
+    0.6629
+   ]
+  },
+  {
+   "centre_m": [
+    -0.1606,
+    -0.0147,
+    0.6262
+   ],
+   "part": "tripo_part_6",
+   "radius_m": 0.0188,
+   "shared_with": {
+    "tripo_part_2": 1.0
+   },
+   "vertices": 141,
+   "z_range_m": [
+    0.6128,
+    0.648
+   ]
+  },
+  {
+   "centre_m": [
+    -0.1589,
+    -0.0143,
+    0.6756
+   ],
+   "part": "tripo_part_6",
+   "radius_m": 0.0161,
+   "shared_with": {
+    "tripo_part_10": 1.0
+   },
+   "vertices": 98,
+   "z_range_m": [
+    0.6704,
+    0.6796
+   ]
+  },
+  {
+   "centre_m": [
+    -0.1644,
+    0.0009,
+    0.8903
+   ],
+   "part": "tripo_part_7",
+   "radius_m": 0.0251,
+   "shared_with": {
+    "tripo_part_10": 1.0
+   },
+   "vertices": 165,
+   "z_range_m": [
+    0.8858,
+    0.9008
+   ]
+  },
+  {
+   "centre_m": [
+    0.0478,
+    -0.0651,
+    0.5585
+   ],
+   "part": "tripo_part_8",
+   "radius_m": 0.0308,
+   "shared_with": {
+    "tripo_part_0": 0.674,
+    "tripo_part_3": 0.33
+   },
+   "vertices": 469,
+   "z_range_m": [
+    0.5233,
+    0.5881
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0063,
+    -0.0471,
+    0.7602
+   ],
+   "part": "tripo_part_9",
+   "radius_m": 0.0624,
+   "shared_with": {
+    "tripo_part_0": 1.0
+   },
+   "vertices": 518,
+   "z_range_m": [
+    0.6739,
+    0.832
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0018,
+    -0.053,
+    0.6521
+   ],
+   "part": "tripo_part_9",
+   "radius_m": 0.0094,
+   "shared_with": {
+    "tripo_part_0": 1.0
+   },
+   "vertices": 63,
+   "z_range_m": [
+    0.6428,
+    0.6614
+   ]
+  },
+  {
+   "centre_m": [
+    -0.1644,
+    0.0009,
+    0.8903
+   ],
+   "part": "tripo_part_10",
+   "radius_m": 0.0251,
+   "shared_with": {
+    "tripo_part_7": 1.0
+   },
+   "vertices": 165,
+   "z_range_m": [
+    0.8858,
+    0.9008
+   ]
+  },
+  {
+   "centre_m": [
+    -0.1589,
+    -0.0143,
+    0.6756
+   ],
+   "part": "tripo_part_10",
+   "radius_m": 0.0161,
+   "shared_with": {
+    "tripo_part_6": 1.0
+   },
+   "vertices": 98,
+   "z_range_m": [
+    0.6704,
+    0.6796
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0863,
+    0.0673,
+    0.1623
+   ],
+   "part": "tripo_part_11",
+   "radius_m": 0.0402,
+   "shared_with": {
+    "tripo_part_0": 1.0
+   },
+   "vertices": 272,
+   "z_range_m": [
+    0.1254,
+    0.1928
+   ]
+  },
+  {
+   "centre_m": [
+    -0.1337,
+    -0.0022,
+    0.0942
+   ],
+   "part": "tripo_part_11",
+   "radius_m": 0.0434,
+   "shared_with": {
+    "tripo_part_1": 1.0
+   },
+   "vertices": 269,
+   "z_range_m": [
+    0.0929,
+    0.0957
+   ]
+  },
+  {
+   "centre_m": [
+    -0.0836,
+    0.0712,
+    0.0945
+   ],
+   "part": "tripo_part_11",
+   "radius_m": 0.0276,
+   "shared_with": {
+    "tripo_part_1": 1.0
+   },
+   "vertices": 122,
+   "z_range_m": [
+    0.0944,
+    0.0952
+   ]
+  },
+  {
+   "centre_m": [
+    -0.134,
+    -0.0163,
+    0.1339
+   ],
+   "part": "tripo_part_11",
+   "radius_m": 0.0134,
+   "shared_with": {
+    "tripo_part_2": 1.0
+   },
+   "vertices": 95,
+   "z_range_m": [
+    0.1314,
+    0.1392
+   ]
+  }
+ ],
+ "stage": "source",
+ "work_blend": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/work/h2-source.blend"
+}

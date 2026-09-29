@@ -1,0 +1,71 @@
+{
+ "schema": "unmatched.clip-validation/2",
+ "clip": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/export/SK_KingArthur_H2.fbx",
+ "clip_bytes": 1631276,
+ "clip_sha256": "9f3478122333d6488d4847654583b0e56a54c1a6415923ce658bf61d5356e828",
+ "contract": "docs/art-pipeline/rig/rig-contract.json",
+ "contract_revision": "v2-2026-09-29",
+ "skeleton": "UM_HUMANOID_17_v2",
+ "character": "Arthur",
+ "kind": "skeletal-mesh",
+ "clip_role": null,
+ "blender": "5.2.2 LTS",
+ "checks": [
+  {
+   "check": "import",
+   "status": "pass"
+  },
+  {
+   "check": "single_armature",
+   "status": "pass",
+   "value": "SKEL_UM_Humanoid"
+  },
+  {
+   "check": "skeleton_version",
+   "status": "pass",
+   "skeleton": "UM_HUMANOID_17_v2"
+  },
+  {
+   "check": "armature_object_name",
+   "status": "pass",
+   "value": "SKEL_UM_Humanoid"
+  },
+  {
+   "check": "skeleton_contract",
+   "status": "pass",
+   "missing": [],
+   "extra": [],
+   "parent_mismatch": []
+  },
+  {
+   "check": "weapon_side",
+   "status": "pass",
+   "present": [
+    "weapon.R"
+   ],
+   "legacy_present": [],
+   "character": "Arthur",
+   "expected": "weapon.R"
+  },
+  {
+   "check": "ref_pose_facing",
+   "status": "pass",
+   "facing_yaw_deg": -2.132,
+   "expected": 0.0,
+   "tol_deg": 10.0,
+   "delta_deg": -2.132
+  },
+  {
+   "check": "ref_pose_root_axis",
+   "status": "pass",
+   "root_x_axis_yaw_deg": 90.0,
+   "expected": 90,
+   "delta_deg": 0.0
+  }
+ ],
+ "bones": {},
+ "bone_count": 17,
+ "result": "pass",
+ "fails": [],
+ "warnings": []
+}

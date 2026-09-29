@@ -1,0 +1,600 @@
+{
+ "atlas_px": 4096,
+ "checks": {
+  "ao_not_constant": {
+   "expected": "> 32/255 (W4-B gate min_range_p1_p99)",
+   "measured": 0.9844,
+   "passed": true
+  },
+  "bake_surface_misses_below_0_5_percent": {
+   "expected": "< 0.005",
+   "measured": {
+    "ao": 0.000756,
+    "basecolor": 0.000756,
+    "metallic": 0.000756,
+    "normal": 0.000756,
+    "roughness": 0.000756
+   },
+   "note": "texels inside non-cap UV triangles no cage ray matched; filled from the nearest baked texel. Caps and the staff bridge lie inside the fist / on the base where the high-poly has no surface: their misses are reported, not gated",
+   "passed": true
+  },
+  "island_gap_at_least_padding_px": {
+   "expected": ">= 8 px at 4096",
+   "measured": 9.857,
+   "note": "min over neighbouring texels of different nearest islands of (d1 + d2), d = EDT distance to the island",
+   "passed": true
+  },
+  "no_uv_overlap_texels": {
+   "expected": 0,
+   "measured": 0,
+   "note": "texel centres inside more than one UV triangle",
+   "passed": true
+  },
+  "team_cloth_mask_only_on_cloth_parts": {
+   "expected": 0.0,
+   "measured": 0.0,
+   "note": "face, hands, staff, shoes and base stay outside the cloth mask",
+   "passed": true
+  }
+ },
+ "conventions": {
+  "N": "DirectX (-Y): green of the OpenGL bake inverted; no N_OpenGL file is written (the Blender preview inverts G of N in its shader; a derived copy added 16.5 MB to git)",
+  "ORM": "R = AO, G = roughness, B = metallic (linear)",
+  "TeamMask": "L 8-bit linear = cloth (compatible with W4-B M_UM_Figure: lerp by TeamMask.R, TC_Grayscale)",
+  "TeamMaskRGBA": "R = cloth (same as TeamMask), G = base side band, B = gold trim/embroidery on the cloth parts, A = 255; proposal for wave 4 (TC_Masks/TC_Default)",
+  "downscale": "2x2 box (BC in linear light, normals renormalised)"
+ },
+ "game_frame_scale_from_source": 0.504853,
+ "min_island_gap_px": 9.857,
+ "misses": {
+  "ao": {
+   "cap_texels": 45871,
+   "cap_texels_total": 49200,
+   "share_of_covered": 0.005778,
+   "surface_by_part": {
+    "tripo_part_0": 2646,
+    "tripo_part_1": 125,
+    "tripo_part_10": 326,
+    "tripo_part_11": 378,
+    "tripo_part_2": 1255,
+    "tripo_part_3": 827,
+    "tripo_part_4": 209,
+    "tripo_part_5": 197,
+    "tripo_part_6": 165,
+    "tripo_part_7": 333,
+    "tripo_part_8": 243,
+    "tripo_part_9": 162
+   },
+   "surface_share": 0.000756,
+   "surface_texels": 6866,
+   "texels": 52737
+  },
+  "basecolor": {
+   "cap_texels": 45871,
+   "cap_texels_total": 49200,
+   "share_of_covered": 0.005778,
+   "surface_by_part": {
+    "tripo_part_0": 2646,
+    "tripo_part_1": 125,
+    "tripo_part_10": 326,
+    "tripo_part_11": 378,
+    "tripo_part_2": 1255,
+    "tripo_part_3": 827,
+    "tripo_part_4": 209,
+    "tripo_part_5": 197,
+    "tripo_part_6": 165,
+    "tripo_part_7": 333,
+    "tripo_part_8": 243,
+    "tripo_part_9": 162
+   },
+   "surface_share": 0.000756,
+   "surface_texels": 6866,
+   "texels": 52737
+  },
+  "metallic": {
+   "cap_texels": 45871,
+   "cap_texels_total": 49200,
+   "share_of_covered": 0.005778,
+   "surface_by_part": {
+    "tripo_part_0": 2646,
+    "tripo_part_1": 125,
+    "tripo_part_10": 326,
+    "tripo_part_11": 378,
+    "tripo_part_2": 1255,
+    "tripo_part_3": 827,
+    "tripo_part_4": 209,
+    "tripo_part_5": 197,
+    "tripo_part_6": 165,
+    "tripo_part_7": 333,
+    "tripo_part_8": 243,
+    "tripo_part_9": 162
+   },
+   "surface_share": 0.000756,
+   "surface_texels": 6866,
+   "texels": 52737
+  },
+  "normal": {
+   "cap_texels": 45871,
+   "cap_texels_total": 49200,
+   "share_of_covered": 0.005778,
+   "surface_by_part": {
+    "tripo_part_0": 2646,
+    "tripo_part_1": 125,
+    "tripo_part_10": 326,
+    "tripo_part_11": 378,
+    "tripo_part_2": 1255,
+    "tripo_part_3": 827,
+    "tripo_part_4": 209,
+    "tripo_part_5": 197,
+    "tripo_part_6": 165,
+    "tripo_part_7": 333,
+    "tripo_part_8": 243,
+    "tripo_part_9": 162
+   },
+   "surface_share": 0.000756,
+   "surface_texels": 6866,
+   "texels": 52737
+  },
+  "roughness": {
+   "cap_texels": 45871,
+   "cap_texels_total": 49200,
+   "share_of_covered": 0.005778,
+   "surface_by_part": {
+    "tripo_part_0": 2646,
+    "tripo_part_1": 125,
+    "tripo_part_10": 326,
+    "tripo_part_11": 378,
+    "tripo_part_2": 1255,
+    "tripo_part_3": 827,
+    "tripo_part_4": 209,
+    "tripo_part_5": 197,
+    "tripo_part_6": 165,
+    "tripo_part_7": 333,
+    "tripo_part_8": 243,
+    "tripo_part_9": 162
+   },
+   "surface_share": 0.000756,
+   "surface_texels": 6866,
+   "texels": 52737
+  }
+ },
+ "part_stats": {
+  "tripo_part_0": {
+   "ao_p5_p50": [
+    0.156,
+    0.66
+   ],
+   "bc_srgb_mean": [
+    0.192,
+    0.193,
+    0.289
+   ],
+   "metallic_p50_p95": [
+    0.019,
+    0.043
+   ],
+   "roughness_p50": 0.965
+  },
+  "tripo_part_1": {
+   "ao_p5_p50": [
+    0.512,
+    1.0
+   ],
+   "bc_srgb_mean": [
+    0.192,
+    0.18,
+    0.19
+   ],
+   "metallic_p50_p95": [
+    0.023,
+    0.036
+   ],
+   "roughness_p50": 0.659
+  },
+  "tripo_part_10": {
+   "ao_p5_p50": [
+    0.488,
+    0.898
+   ],
+   "bc_srgb_mean": [
+    0.325,
+    0.241,
+    0.182
+   ],
+   "metallic_p50_p95": [
+    0.019,
+    0.045
+   ],
+   "roughness_p50": 0.835
+  },
+  "tripo_part_11": {
+   "ao_p5_p50": [
+    0.008,
+    0.48
+   ],
+   "bc_srgb_mean": [
+    0.287,
+    0.222,
+    0.174
+   ],
+   "metallic_p50_p95": [
+    0.019,
+    0.041
+   ],
+   "roughness_p50": 0.791
+  },
+  "tripo_part_2": {
+   "ao_p5_p50": [
+    0.031,
+    0.676
+   ],
+   "bc_srgb_mean": [
+    0.292,
+    0.217,
+    0.165
+   ],
+   "metallic_p50_p95": [
+    0.02,
+    0.045
+   ],
+   "roughness_p50": 0.85
+  },
+  "tripo_part_3": {
+   "ao_p5_p50": [
+    0.078,
+    0.852
+   ],
+   "bc_srgb_mean": [
+    0.179,
+    0.19,
+    0.305
+   ],
+   "metallic_p50_p95": [
+    0.013,
+    0.032
+   ],
+   "roughness_p50": 0.972
+  },
+  "tripo_part_4": {
+   "ao_p5_p50": [
+    0.141,
+    0.695
+   ],
+   "bc_srgb_mean": [
+    0.181,
+    0.189,
+    0.297
+   ],
+   "metallic_p50_p95": [
+    0.014,
+    0.038
+   ],
+   "roughness_p50": 0.968
+  },
+  "tripo_part_5": {
+   "ao_p5_p50": [
+    0.012,
+    0.449
+   ],
+   "bc_srgb_mean": [
+    0.293,
+    0.225,
+    0.173
+   ],
+   "metallic_p50_p95": [
+    0.016,
+    0.036
+   ],
+   "roughness_p50": 0.788
+  },
+  "tripo_part_6": {
+   "ao_p5_p50": [
+    0.164,
+    0.758
+   ],
+   "bc_srgb_mean": [
+    0.547,
+    0.431,
+    0.375
+   ],
+   "metallic_p50_p95": [
+    0.027,
+    0.06
+   ],
+   "roughness_p50": 0.54
+  },
+  "tripo_part_7": {
+   "ao_p5_p50": [
+    0.586,
+    0.961
+   ],
+   "bc_srgb_mean": [
+    0.221,
+    0.312,
+    0.557
+   ],
+   "metallic_p50_p95": [
+    0.034,
+    0.087
+   ],
+   "roughness_p50": 0.575
+  },
+  "tripo_part_8": {
+   "ao_p5_p50": [
+    0.008,
+    0.484
+   ],
+   "bc_srgb_mean": [
+    0.484,
+    0.372,
+    0.302
+   ],
+   "metallic_p50_p95": [
+    0.023,
+    0.055
+   ],
+   "roughness_p50": 0.577
+  },
+  "tripo_part_9": {
+   "ao_p5_p50": [
+    0.07,
+    0.652
+   ],
+   "bc_srgb_mean": [
+    0.538,
+    0.491,
+    0.462
+   ],
+   "metallic_p50_p95": [
+    0.031,
+    0.053
+   ],
+   "roughness_p50": 0.632
+  }
+ },
+ "passed": true,
+ "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json",
+ "profile_id": "merlin-h2-bake/1",
+ "runtime_px": 2048,
+ "stage": "maps",
+ "team_mask_coverage": {
+  "tripo_part_0": {
+   "band_mean": 0.0,
+   "cloth_mean": 0.8182,
+   "trim_mean": 0.1173
+  },
+  "tripo_part_1": {
+   "band_mean": 0.304,
+   "cloth_mean": 0.0,
+   "trim_mean": 0.0
+  },
+  "tripo_part_10": {
+   "band_mean": 0.0,
+   "cloth_mean": 0.0,
+   "trim_mean": 0.0
+  },
+  "tripo_part_11": {
+   "band_mean": 0.0,
+   "cloth_mean": 0.0,
+   "trim_mean": 0.0
+  },
+  "tripo_part_2": {
+   "band_mean": 0.0,
+   "cloth_mean": 0.0,
+   "trim_mean": 0.0
+  },
+  "tripo_part_3": {
+   "band_mean": 0.0,
+   "cloth_mean": 0.8866,
+   "trim_mean": 0.0655
+  },
+  "tripo_part_4": {
+   "band_mean": 0.0,
+   "cloth_mean": 0.8719,
+   "trim_mean": 0.0708
+  },
+  "tripo_part_5": {
+   "band_mean": 0.0,
+   "cloth_mean": 0.0,
+   "trim_mean": 0.0
+  },
+  "tripo_part_6": {
+   "band_mean": 0.0,
+   "cloth_mean": 0.0,
+   "trim_mean": 0.0
+  },
+  "tripo_part_7": {
+   "band_mean": 0.0,
+   "cloth_mean": 0.0,
+   "trim_mean": 0.0
+  },
+  "tripo_part_8": {
+   "band_mean": 0.0,
+   "cloth_mean": 0.0,
+   "trim_mean": 0.0
+  },
+  "tripo_part_9": {
+   "band_mean": 0.0,
+   "cloth_mean": 0.0,
+   "trim_mean": 0.0
+  }
+ },
+ "texel_density": {
+  "tripo_part_0": {
+   "px_per_uu_at_4k": 46.044,
+   "relative_to_robe": 1.0,
+   "td_priority": 1.0,
+   "uv_share": 0.2739
+  },
+  "tripo_part_1": {
+   "px_per_uu_at_4k": 23.051,
+   "relative_to_robe": 0.501,
+   "td_priority": 0.5,
+   "uv_share": 0.0388
+  },
+  "tripo_part_10": {
+   "px_per_uu_at_4k": 68.373,
+   "relative_to_robe": 1.485,
+   "td_priority": 1.5,
+   "uv_share": 0.0273
+  },
+  "tripo_part_11": {
+   "px_per_uu_at_4k": 41.822,
+   "relative_to_robe": 0.908,
+   "td_priority": 1.0,
+   "uv_share": 0.0111
+  },
+  "tripo_part_2": {
+   "px_per_uu_at_4k": 65.896,
+   "relative_to_robe": 1.431,
+   "td_priority": 1.5,
+   "uv_share": 0.0403
+  },
+  "tripo_part_3": {
+   "px_per_uu_at_4k": 41.998,
+   "relative_to_robe": 0.912,
+   "td_priority": 1.0,
+   "uv_share": 0.0313
+  },
+  "tripo_part_4": {
+   "px_per_uu_at_4k": 46.052,
+   "relative_to_robe": 1.0,
+   "td_priority": 1.0,
+   "uv_share": 0.0279
+  },
+  "tripo_part_5": {
+   "px_per_uu_at_4k": 41.925,
+   "relative_to_robe": 0.911,
+   "td_priority": 1.0,
+   "uv_share": 0.0115
+  },
+  "tripo_part_6": {
+   "px_per_uu_at_4k": 77.04,
+   "relative_to_robe": 1.673,
+   "td_priority": 1.75,
+   "uv_share": 0.0152
+  },
+  "tripo_part_7": {
+   "px_per_uu_at_4k": 65.832,
+   "relative_to_robe": 1.43,
+   "td_priority": 1.5,
+   "uv_share": 0.0114
+  },
+  "tripo_part_8": {
+   "px_per_uu_at_4k": 69.243,
+   "relative_to_robe": 1.504,
+   "td_priority": 1.75,
+   "uv_share": 0.0151
+  },
+  "tripo_part_9": {
+   "px_per_uu_at_4k": 93.428,
+   "relative_to_robe": 2.029,
+   "td_priority": 2.0,
+   "uv_share": 0.0402
+  }
+ },
+ "textures": {
+  "BC_2K": {
+   "bytes": 4691137,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_BC_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "1403368ecd85d6e39473b5faad9cebd9d18a02bb0a4bf311cc846fc3ff7f8e06"
+  },
+  "BC_4K": {
+   "bytes": 13563020,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_BC_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "9af464d82f9387f484a2d10237d70b0cccf9ae415b4109f9b1e28cf1cf93f894"
+  },
+  "N_2K": {
+   "bytes": 4456144,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_N_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "76db74d9135efddd76bf8fa63b3520249b95a347bb3a8f4618b4e03da5969860"
+  },
+  "N_4K": {
+   "bytes": 11999754,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_N_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "4dff0da273eb6d4b43dee008a2d78c7faf4befd734e985f55d31e081d5edab8b"
+  },
+  "ORM_2K": {
+   "bytes": 3754684,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_ORM_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "9f6620c04470dd8d4a82faca2cf517cd875a45826c553541c5ba21245c295268"
+  },
+  "ORM_4K": {
+   "bytes": 11622874,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_ORM_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "bf3c6528e0bbb8e0346b72330cc727e1aee6ecca3e8b515bc6bafaba3d3adc2a"
+  },
+  "TeamMaskRGBA_2K": {
+   "bytes": 1018667,
+   "mode": "RGBA",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_TeamMaskRGBA_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "784cf249570691e04b156445a066b9383f009e29dbacb63cf49bc0c5e7ada10d"
+  },
+  "TeamMaskRGBA_4K": {
+   "bytes": 2235745,
+   "mode": "RGBA",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_TeamMaskRGBA_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "3d1b2bf0df5d0cb6ce1f260e6c2a0366dedeb7b7ec1e7ff85d816e6b09bd6407"
+  },
+  "TeamMask_2K": {
+   "bytes": 381006,
+   "mode": "L",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_TeamMask_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "e7668641c5f3c9479b18e8ab3b3b8d96cefc1b2530c7ba8f174cc34ae6647ab4"
+  },
+  "TeamMask_4K": {
+   "bytes": 722317,
+   "mode": "L",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_TeamMask_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "21c1413d49d7527085698ad7669d2c7cb6abd6eebdaa06ab3d1055b2582a48b6"
+  }
+ },
+ "utilisation": 0.544,
+ "uv_overlap_texels": 0
+}

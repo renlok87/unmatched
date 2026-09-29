@@ -1,0 +1,137 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-40c4d1cd-h2",
+  "asset_id": "ASSET-MEDUSA-001",
+  "service": "tripo-studio",
+  "task_id": "40c4d1cd-a4cc-42de-9007-772b6958366e",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/40c4d1cd-a4cc-42de-9007-772b6958366e",
+  "date": "2026-09-29",
+  "iteration": "H2 (проработка героев по концептам hero-quality-v1)",
+  "model_version": {
+    "ui_label": null,
+    "backend": null,
+    "note": "H3.1 со слов оркестратора; подпись UI не записана"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/hero-quality-v1/medusa/medusa-front.png",
+        "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9"
+      },
+      "left": {
+        "path": "art/imagegen/hero-quality-v1/medusa/medusa-side.png",
+        "sha256": "1b50156d6b2a214fce7772dd8806446782a6c687d536da438aa191e366a9f280"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/hero-quality-v1/medusa/medusa-back.png",
+        "sha256": "efb36c04c4421f4568ff5c77c8e47f76c262b3759bb8bc10645046a0c980dd43"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/hero-quality-v1/medusa/prompts.md",
+    "slot_note": "Боковой концепт — левый вид (prompts.md), подан в слот LEFT: согласовано.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": null,
+      "topology": null,
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — это последующие шаги генератора текстур и PBR на high-poly, а не настройки генерации геометрии. null = не записано."
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "Из нескольких видов в модель, по частям (Баланс), ультра-геометрия 2M, без текстуры",
+      "history_time": "2026-09-29 07:00",
+      "evidence": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60,
+        "balance_before": 24205,
+        "balance_after": 24145
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, удалить освещение, на high-poly модели по частям",
+      "history_time": "2026-09-29 07:12",
+      "evidence": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 0,
+        "observed_debit": 0,
+        "balance_before": 23965,
+        "balance_after": 23965
+      },
+      "note": "пробная версия ×1 (бесплатно, по журналу)"
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": "2026-09-29 07:18",
+      "evidence": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5,
+        "balance_before": 23875,
+        "balance_after": 23870
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/source/medusa-h2-tripo-40c4d1cd-parts17.glb",
+      "expected_sha256": "69ef27b36fb9c46fd16ec2acf6f930a2d61f98af1847ea73225266295b147f32",
+      "expected_bytes": 44696832,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/source/medusa-h2-tripo-40c4d1cd-tex8k-pbr.glb",
+      "expected_sha256": "c1ae050f7b8a63f06aaecca2acef263ccdf07c8a5a9e84b52d14e9415e495604",
+      "expected_bytes": 69244076,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export после текстуры 8K (удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB (44–77 МБ) не коммитятся: .gitignore ассета исключает 20260929-h2-tripo/source/*-parts*.glb и *-tex8k-pbr.glb; файл восстанавливается выгрузкой из Studio по task_url и проверяется по expected_sha256/expected_bytes",
+  "expectations": {
+    "h2-parts-glb": {
+      "glb_mesh_count": 17,
+      "glb_triangles": 1856473,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h2-tex8k-pbr-glb": {
+      "glb_mesh_count": 17,
+      "glb_triangles": 1856473,
+      "glb_materials": 17,
+      "glb_images": 51,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/reports/tripo-run.json",
+    "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json"
+  ]
+}

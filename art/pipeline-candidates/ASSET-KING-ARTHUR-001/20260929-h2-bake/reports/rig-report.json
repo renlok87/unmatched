@@ -1,0 +1,1297 @@
+{
+  "armature": {
+    "bones_final_m": {
+      "arm_lower.L": [
+        [
+          0.09267,
+          -0.01709,
+          0.35677
+        ],
+        [
+          0.10125,
+          -0.05142,
+          0.29056
+        ]
+      ],
+      "arm_lower.R": [
+        [
+          -0.09983,
+          -0.01096,
+          0.36474
+        ],
+        [
+          -0.08818,
+          -0.04407,
+          0.3678
+        ]
+      ],
+      "arm_upper.L": [
+        [
+          0.07121,
+          -0.01832,
+          0.42911
+        ],
+        [
+          0.09267,
+          -0.01709,
+          0.35677
+        ]
+      ],
+      "arm_upper.R": [
+        [
+          -0.07347,
+          -0.00912,
+          0.42911
+        ],
+        [
+          -0.09983,
+          -0.01096,
+          0.36474
+        ]
+      ],
+      "foot.L": [
+        [
+          0.07366,
+          -0.01219,
+          0.0858
+        ],
+        [
+          0.08163,
+          -0.06123,
+          0.06435
+        ]
+      ],
+      "foot.R": [
+        [
+          -0.07163,
+          7e-05,
+          0.0858
+        ],
+        [
+          -0.08082,
+          0.04299,
+          0.06435
+        ]
+      ],
+      "hand.L": [
+        [
+          0.10125,
+          -0.05142,
+          0.29056
+        ],
+        [
+          0.09819,
+          -0.06123,
+          0.25132
+        ]
+      ],
+      "hand.R": [
+        [
+          -0.08818,
+          -0.04407,
+          0.3678
+        ],
+        [
+          -0.07573,
+          -0.06135,
+          0.37332
+        ]
+      ],
+      "head": [
+        [
+          0.00028,
+          -0.00299,
+          0.45669
+        ],
+        [
+          0.00028,
+          -0.00299,
+          0.54865
+        ]
+      ],
+      "hips": [
+        [
+          0.00028,
+          -0.02751,
+          0.2268
+        ],
+        [
+          0.00028,
+          -0.02751,
+          0.27585
+        ]
+      ],
+      "leg_lower.L": [
+        [
+          0.05895,
+          -0.02751,
+          0.15017
+        ],
+        [
+          0.07366,
+          -0.01219,
+          0.0858
+        ]
+      ],
+      "leg_lower.R": [
+        [
+          -0.0563,
+          -0.01832,
+          0.15017
+        ],
+        [
+          -0.07163,
+          7e-05,
+          0.0858
+        ]
+      ],
+      "leg_upper.L": [
+        [
+          0.05098,
+          -0.02751,
+          0.22374
+        ],
+        [
+          0.05895,
+          -0.02751,
+          0.15017
+        ]
+      ],
+      "leg_upper.R": [
+        [
+          -0.0514,
+          -0.02751,
+          0.22374
+        ],
+        [
+          -0.0563,
+          -0.01832,
+          0.15017
+        ]
+      ],
+      "root": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.045
+        ]
+      ],
+      "spine": [
+        [
+          0.00028,
+          -0.02751,
+          0.27585
+        ],
+        [
+          0.00028,
+          -0.00912,
+          0.45056
+        ]
+      ],
+      "weapon.R": [
+        [
+          -0.07671,
+          -0.06642,
+          0.37332
+        ],
+        [
+          -0.0916,
+          -0.06005,
+          0.60044
+        ]
+      ]
+    },
+    "object": "SKEL_UM_Humanoid",
+    "skeleton": "UM_HUMANOID_17_v2 (docs/art-pipeline/rig/rig-contract.json, character Arthur: weapon.R under hand.R; 16 base bones + weapon.R = 17; armature object SKEL_UM_Humanoid = bone 0 in UE)",
+    "weapon_fit": {
+      "axis": [
+        -0.06537,
+        0.02798,
+        0.99747
+      ],
+      "blade_vertices": 501,
+      "head_m": [
+        -0.07671,
+        -0.06642,
+        0.37332
+      ],
+      "method": "PCA axis of the blade vertices above blade_min_z_tripo; head where the axis crosses the grip height, tail at the farthest vertex along the axis",
+      "tail_m": [
+        -0.0916,
+        -0.06005,
+        0.60044
+      ]
+    }
+  },
+  "authored_blend": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/work/h2-rig-authored.blend",
+  "checks": {
+    "base_30x6_uu": {
+      "expected": [
+        30,
+        6
+      ],
+      "measured": [
+        29.68,
+        6.03
+      ],
+      "passed": true
+    },
+    "bones_17_names": {
+      "measured": 17,
+      "passed": true
+    },
+    "fbx_no_absolute_blend_path": {
+      "expected": "ApplicationNativeFile = run-dir-relative path in both FBX; no absolute work/ path in the bytes",
+      "measured": {
+        "ApplicationNativeFile": "work/h2-rig-authored.blend",
+        "absolute_path_found": {
+          "SK_KingArthur_H2.fbx": false,
+          "SM_KingArthur_H2_Base.fbx": false
+        },
+        "pinned_writes": 2
+      },
+      "passed": true
+    },
+    "feet_on_base_top": {
+      "expected": "[-4, +3] mm",
+      "measured": -1.41,
+      "passed": true
+    },
+    "height_52_56_uu": {
+      "expected": [
+        52,
+        56
+      ],
+      "measured": 55.0,
+      "passed": true
+    },
+    "inside_capsule_36x62_uu": {
+      "expected": {
+        "diameter": 36,
+        "height": 62
+      },
+      "measured": [
+        16.34,
+        60.06
+      ],
+      "passed": true
+    },
+    "readback_17_bones_hierarchy": {
+      "measured": 17,
+      "passed": true
+    },
+    "readback_face_plus_x": {
+      "expected": "0 +- 10 deg (FBX in Blender; UE +X)",
+      "measured": -2.13,
+      "passed": true
+    },
+    "readback_no_near_degenerate_triangles": {
+      "measured": [
+        0,
+        0,
+        0
+      ],
+      "note": "UE drops triangles below 1e-4 cm2",
+      "passed": true
+    },
+    "readback_one_armature_named": {
+      "measured": [
+        [
+          "SKEL_UM_Humanoid.001"
+        ],
+        []
+      ],
+      "note": "a .NNN suffix only comes from the authored armature of this session",
+      "passed": true
+    },
+    "readback_triangles": {
+      "expected": {
+        "SK_KingArthur_H2_Body": 36469,
+        "SK_KingArthur_H2_Sword": 2215,
+        "SM_KingArthur_H2_Base": 1500
+      },
+      "measured": {
+        "SK_KingArthur_H2_Body": 36469,
+        "SK_KingArthur_H2_Sword": 2215,
+        "SM_KingArthur_H2_Base": 1500
+      },
+      "passed": true
+    },
+    "readback_uv0_single_slot": {
+      "measured": [
+        [
+          [
+            "UVMap"
+          ],
+          [
+            "M_KingArthur_H2"
+          ]
+        ],
+        [
+          [
+            "UVMap"
+          ],
+          [
+            "M_KingArthur_H2"
+          ]
+        ],
+        [
+          [
+            "UVMap"
+          ],
+          [
+            "M_KingArthur_H2"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    "readback_weapon_front_and_right": {
+      "expected": "x > 0 (front), y < 0 (right side in the FBX frame -> UE +Y)",
+      "measured": [
+        0.0476,
+        -0.0799,
+        0.09
+      ],
+      "passed": true
+    },
+    "single_material_slot": {
+      "measured": {
+        "SK_KingArthur_H2_Body": 1,
+        "SK_KingArthur_H2_Sword": 1,
+        "SM_KingArthur_H2_Base": 1
+      },
+      "passed": true
+    },
+    "sword_rigid_on_weapon_bone": {
+      "measured": {
+        "weapon.R": 1164
+      },
+      "passed": true
+    },
+    "triangles_in_proposed_h2_range": {
+      "expected": [
+        30000,
+        45000
+      ],
+      "measured": 40184,
+      "note": "proposed H2 guide, not a budget (GD-058 open)",
+      "passed": true
+    },
+    "weapon_bone_on_sword_axis": {
+      "expected": "< 4 mm (tip; centroid of the blade vertices off the bone axis)",
+      "measured": [
+        0.00195,
+        0.00114
+      ],
+      "passed": true
+    },
+    "weights_max_4_normalised_no_unweighted": {
+      "measured": {
+        "SK_KingArthur_H2_Body": [
+          4,
+          0,
+          0
+        ],
+        "SK_KingArthur_H2_Sword": [
+          1,
+          0,
+          0
+        ]
+      },
+      "passed": true
+    }
+  },
+  "exports": {
+    "application_native_file": "work/h2-rig-authored.blend",
+    "base_fbx": {
+      "bytes": 74092,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/export/SM_KingArthur_H2_Base.fbx",
+      "sha256": "dc75338c4b4ab543298da1af4c1bea4d6cfc440063c6647df23a40882aa73c0c"
+    },
+    "settings": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+      "colors_type": "SRGB",
+      "creation_time_pinned": "2000-01-01T00:00:00",
+      "data_scale": 100.0,
+      "deviations_from_preset": {
+        "bake_anim": "off: the candidate FBX carries no clips",
+        "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+      },
+      "embed_textures": false,
+      "export_space_rotation_z_degrees": 90.0,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "STRIP",
+      "preset": {
+        "name": "UM_FBX_v1",
+        "path": "blender/_tools/presets/UM_FBX_v1.json",
+        "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+        "version": "1.0.0"
+      },
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "unit_scale_factor_after_patch": 1.0,
+      "use_triangles": true
+    },
+    "skeletal_fbx": {
+      "bytes": 1631276,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/export/SK_KingArthur_H2.fbx",
+      "sha256": "9f3478122333d6488d4847654583b0e56a54c1a6415923ce658bf61d5356e828"
+    }
+  },
+  "failed": [],
+  "geometry": {
+    "base_top_m_p99_5": 0.05948,
+    "bounds_body_m": {
+      "max": [
+        0.16018,
+        0.08018,
+        0.55
+      ],
+      "min": [
+        -0.14432,
+        -0.12683,
+        0.05807
+      ]
+    },
+    "feet_lowest_m": 0.05807,
+    "figure_height_m": 0.55,
+    "radius_from_axis_m": 0.16339,
+    "sword_tip_m": 0.60058,
+    "triangles": {
+      "SK_KingArthur_H2_Body": 36469,
+      "SK_KingArthur_H2_Sword": 2215,
+      "SM_KingArthur_H2_Base": 1500
+    },
+    "triangles_total": 40184,
+    "weapon_bone": {
+      "blade_centroid_off_axis_m": 0.00114,
+      "blade_median_radial_m": 0.00959,
+      "head_m": [
+        -0.07671,
+        -0.06642,
+        0.37332
+      ],
+      "tail_m": [
+        -0.0916,
+        -0.06005,
+        0.60044
+      ],
+      "tip_error_m": 0.00195
+    }
+  },
+  "profile": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-skeletal-um-fbx-v1-h2.json",
+  "readback": {
+    "base": {
+      "armatures": [],
+      "meshes": {
+        "SM_KingArthur_H2_Base.001": {
+          "bounds_m_fbx_frame": {
+            "max": [
+              0.14747,
+              0.15018,
+              0.0603
+            ],
+            "min": [
+              -0.14766,
+              -0.14993,
+              0.0
+            ]
+          },
+          "color_attributes": [],
+          "has_custom_normals": true,
+          "material_slots": [
+            "M_KingArthur_H2"
+          ],
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "polygons": 1500,
+          "triangles": 1500,
+          "uv0_in_unit_square": true,
+          "uv_layers": [
+            "UVMap"
+          ],
+          "vertices": 876
+        }
+      }
+    },
+    "skeletal": {
+      "anatomy_fbx_frame": {
+        "front_xy": [
+          0.9993,
+          -0.0372,
+          0.0
+        ],
+        "left_minus_right_xy": [
+          0.0372,
+          0.9993,
+          0.0
+        ],
+        "method": "side = mean(arm_upper, leg_upper heads) .L - .R; front = side turned -90 deg about Z",
+        "yaw_deg_of_front_from_plus_x": -2.13
+      },
+      "armatures": [
+        "SKEL_UM_Humanoid.001"
+      ],
+      "bones": {
+        "arm_lower.L": {
+          "parent": "arm_upper.L"
+        },
+        "arm_lower.R": {
+          "parent": "arm_upper.R"
+        },
+        "arm_upper.L": {
+          "parent": "spine"
+        },
+        "arm_upper.R": {
+          "parent": "spine"
+        },
+        "foot.L": {
+          "parent": "leg_lower.L"
+        },
+        "foot.R": {
+          "parent": "leg_lower.R"
+        },
+        "hand.L": {
+          "parent": "arm_lower.L"
+        },
+        "hand.R": {
+          "parent": "arm_lower.R"
+        },
+        "head": {
+          "parent": "spine"
+        },
+        "hips": {
+          "parent": "root"
+        },
+        "leg_lower.L": {
+          "parent": "leg_upper.L"
+        },
+        "leg_lower.R": {
+          "parent": "leg_upper.R"
+        },
+        "leg_upper.L": {
+          "parent": "hips"
+        },
+        "leg_upper.R": {
+          "parent": "hips"
+        },
+        "root": {
+          "parent": null
+        },
+        "spine": {
+          "parent": "hips"
+        },
+        "weapon.R": {
+          "parent": "hand.R"
+        }
+      },
+      "meshes": {
+        "SK_KingArthur_H2_Body.001": {
+          "bounds_m_fbx_frame": {
+            "max": [
+              0.12683,
+              0.16018,
+              0.55
+            ],
+            "min": [
+              -0.08018,
+              -0.14432,
+              0.05807
+            ]
+          },
+          "color_attributes": [],
+          "has_custom_normals": true,
+          "material_slots": [
+            "M_KingArthur_H2"
+          ],
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "polygons": 36469,
+          "triangles": 36469,
+          "uv0_in_unit_square": true,
+          "uv_layers": [
+            "UVMap"
+          ],
+          "vertices": 20073
+        },
+        "SK_KingArthur_H2_Sword.001": {
+          "bounds_m_fbx_frame": {
+            "max": [
+              0.07992,
+              -0.04615,
+              0.60058
+            ],
+            "min": [
+              0.05188,
+              -0.11757,
+              0.32498
+            ]
+          },
+          "color_attributes": [],
+          "has_custom_normals": true,
+          "material_slots": [
+            "M_KingArthur_H2"
+          ],
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "polygons": 2215,
+          "triangles": 2215,
+          "uv0_in_unit_square": true,
+          "uv_layers": [
+            "UVMap"
+          ],
+          "vertices": 1164
+        }
+      },
+      "root_x_axis_fbx_frame": [
+        -0.0,
+        0.01,
+        0.0
+      ],
+      "ue_predicted_bounds_uu": {
+        "map": "ue(x, y, z) = fbx-in-Blender(x, -y, z) x 100 (UM_FBX_v1, ART-001/T4 measurements)",
+        "max": [
+          12.68,
+          14.43,
+          60.06
+        ],
+        "min": [
+          -8.02,
+          -16.02,
+          5.81
+        ]
+      },
+      "weapon_minus_body_centroid_fbx_frame_m": [
+        0.0476,
+        -0.0799,
+        0.09
+      ]
+    }
+  },
+  "schema": "unmatched.h2-bake.rig/1",
+  "seams": {
+    "contact_m": 0.0015,
+    "contacts_per_pair": {
+      "tripo_part_0|tripo_part_1": 116,
+      "tripo_part_0|tripo_part_12": 51,
+      "tripo_part_0|tripo_part_2": 119,
+      "tripo_part_0|tripo_part_3": 148,
+      "tripo_part_0|tripo_part_7": 82,
+      "tripo_part_0|tripo_part_8": 128,
+      "tripo_part_0|tripo_part_9": 18,
+      "tripo_part_1|tripo_part_2": 80,
+      "tripo_part_1|tripo_part_3": 69,
+      "tripo_part_1|tripo_part_5": 147,
+      "tripo_part_1|tripo_part_6": 67,
+      "tripo_part_1|tripo_part_7": 78,
+      "tripo_part_1|tripo_part_8": 26,
+      "tripo_part_7|tripo_part_9": 64,
+      "tripo_part_8|tripo_part_12": 75,
+      "tripo_part_9|tripo_part_15": 41
+    },
+    "joints": [
+      {
+        "pair": [
+          "tripo_part_6",
+          "tripo_part_1"
+        ],
+        "what": "neck: head part into the gorget (z <= 0.765 in the Tripo frame; above it the beard lies on the gorget and slides)",
+        "z_range_source": [
+          0.7,
+          0.765
+        ]
+      },
+      {
+        "pair": [
+          "tripo_part_1",
+          "tripo_part_7"
+        ],
+        "what": "left shoulder"
+      },
+      {
+        "pair": [
+          "tripo_part_1",
+          "tripo_part_8"
+        ],
+        "what": "right shoulder"
+      },
+      {
+        "pair": [
+          "tripo_part_7",
+          "tripo_part_9"
+        ],
+        "what": "left elbow"
+      },
+      {
+        "pair": [
+          "tripo_part_8",
+          "tripo_part_12"
+        ],
+        "what": "right elbow"
+      },
+      {
+        "pair": [
+          "tripo_part_9",
+          "tripo_part_15"
+        ],
+        "what": "left wrist"
+      },
+      {
+        "pair": [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        "what": "left hip"
+      },
+      {
+        "pair": [
+          "tripo_part_1",
+          "tripo_part_3"
+        ],
+        "what": "right hip"
+      },
+      {
+        "pair": [
+          "tripo_part_1",
+          "tripo_part_5"
+        ],
+        "what": "tabard at the belt"
+      },
+      {
+        "pair": [
+          "tripo_part_0",
+          "tripo_part_1"
+        ],
+        "what": "cloak at the collar (z >= 0.70 in the Tripo frame)",
+        "z_range_source": [
+          0.7,
+          1.0
+        ]
+      }
+    ],
+    "note": "joints = pairs of parts that continue one body surface (neck, shoulders, elbows, wrist, hips, collar); other contacts are layered garments (cloak over armour) that may slide apart",
+    "poses": {
+      "arm_l_raise": {
+        "all_contacts_max_opening_mm": 78.558,
+        "all_contacts_p99_opening_mm": 66.422,
+        "all_contacts_worst_pairs_mm": {
+          "tripo_part_0|tripo_part_1": 7.13,
+          "tripo_part_0|tripo_part_7": 63.445,
+          "tripo_part_0|tripo_part_9": 78.558,
+          "tripo_part_1|tripo_part_7": 2.626
+        },
+        "bone": "arm_upper.L",
+        "deg": -45,
+        "joints_max_opening_mm": {
+          "tripo_part_0|tripo_part_1": 7.13,
+          "tripo_part_1|tripo_part_2": 0.0,
+          "tripo_part_1|tripo_part_3": 0.0,
+          "tripo_part_1|tripo_part_5": 0.0,
+          "tripo_part_1|tripo_part_6": 0.0,
+          "tripo_part_1|tripo_part_7": 2.626,
+          "tripo_part_1|tripo_part_8": 0.0,
+          "tripo_part_7|tripo_part_9": 2.1,
+          "tripo_part_8|tripo_part_12": 0.0,
+          "tripo_part_9|tripo_part_15": 0.0
+        }
+      },
+      "arm_r_raise": {
+        "all_contacts_max_opening_mm": 66.906,
+        "all_contacts_p99_opening_mm": 61.09,
+        "all_contacts_worst_pairs_mm": {
+          "tripo_part_0|tripo_part_1": 4.305,
+          "tripo_part_0|tripo_part_12": 66.906,
+          "tripo_part_0|tripo_part_8": 51.539,
+          "tripo_part_1|tripo_part_8": 2.117
+        },
+        "bone": "arm_upper.R",
+        "deg": 45,
+        "joints_max_opening_mm": {
+          "tripo_part_0|tripo_part_1": 4.305,
+          "tripo_part_1|tripo_part_2": 0.0,
+          "tripo_part_1|tripo_part_3": 0.0,
+          "tripo_part_1|tripo_part_5": 0.0,
+          "tripo_part_1|tripo_part_6": 0.0,
+          "tripo_part_1|tripo_part_7": 0.0,
+          "tripo_part_1|tripo_part_8": 2.117,
+          "tripo_part_7|tripo_part_9": 0.0,
+          "tripo_part_8|tripo_part_12": 0.0,
+          "tripo_part_9|tripo_part_15": 0.0
+        }
+      },
+      "forearm_l_bend": {
+        "all_contacts_max_opening_mm": 18.075,
+        "all_contacts_p99_opening_mm": 7.72,
+        "all_contacts_worst_pairs_mm": {
+          "tripo_part_0|tripo_part_7": 6.129,
+          "tripo_part_0|tripo_part_9": 18.075,
+          "tripo_part_1|tripo_part_7": 2.736,
+          "tripo_part_7|tripo_part_9": 0.201
+        },
+        "bone": "arm_lower.L",
+        "deg": -40,
+        "joints_max_opening_mm": {
+          "tripo_part_0|tripo_part_1": 0.0,
+          "tripo_part_1|tripo_part_2": 0.0,
+          "tripo_part_1|tripo_part_3": 0.0,
+          "tripo_part_1|tripo_part_5": 0.0,
+          "tripo_part_1|tripo_part_6": 0.0,
+          "tripo_part_1|tripo_part_7": 2.736,
+          "tripo_part_1|tripo_part_8": 0.0,
+          "tripo_part_7|tripo_part_9": 0.201,
+          "tripo_part_8|tripo_part_12": 0.0,
+          "tripo_part_9|tripo_part_15": 0.0
+        }
+      },
+      "head_turn": {
+        "all_contacts_max_opening_mm": 11.966,
+        "all_contacts_p99_opening_mm": 3.663,
+        "all_contacts_worst_pairs_mm": {
+          "tripo_part_0|tripo_part_12": 0.0,
+          "tripo_part_0|tripo_part_2": 0.0,
+          "tripo_part_0|tripo_part_7": 0.0,
+          "tripo_part_1|tripo_part_6": 11.966
+        },
+        "bone": "head",
+        "deg": 35,
+        "joints_max_opening_mm": {
+          "tripo_part_0|tripo_part_1": 0.0,
+          "tripo_part_1|tripo_part_2": 0.0,
+          "tripo_part_1|tripo_part_3": 0.0,
+          "tripo_part_1|tripo_part_5": 0.0,
+          "tripo_part_1|tripo_part_6": 11.966,
+          "tripo_part_1|tripo_part_7": 0.0,
+          "tripo_part_1|tripo_part_8": 0.0,
+          "tripo_part_7|tripo_part_9": 0.0,
+          "tripo_part_8|tripo_part_12": 0.0,
+          "tripo_part_9|tripo_part_15": 0.0
+        }
+      },
+      "spine_bend_fwd": {
+        "all_contacts_max_opening_mm": 3.595,
+        "all_contacts_p99_opening_mm": 0.081,
+        "all_contacts_worst_pairs_mm": {
+          "tripo_part_0|tripo_part_3": 0.761,
+          "tripo_part_0|tripo_part_9": 3.595,
+          "tripo_part_1|tripo_part_5": 0.835,
+          "tripo_part_9|tripo_part_15": 0.0
+        },
+        "bone": "spine",
+        "deg": 25,
+        "joints_max_opening_mm": {
+          "tripo_part_0|tripo_part_1": 0.0,
+          "tripo_part_1|tripo_part_2": 0.0,
+          "tripo_part_1|tripo_part_3": 0.0,
+          "tripo_part_1|tripo_part_5": 0.835,
+          "tripo_part_1|tripo_part_6": 0.0,
+          "tripo_part_1|tripo_part_7": 0.0,
+          "tripo_part_1|tripo_part_8": 0.0,
+          "tripo_part_7|tripo_part_9": 0.0,
+          "tripo_part_8|tripo_part_12": 0.0,
+          "tripo_part_9|tripo_part_15": 0.0
+        }
+      },
+      "thigh_l_flex": {
+        "all_contacts_max_opening_mm": 74.133,
+        "all_contacts_p99_opening_mm": 58.448,
+        "all_contacts_worst_pairs_mm": {
+          "tripo_part_0|tripo_part_2": 74.133,
+          "tripo_part_0|tripo_part_7": 0.0,
+          "tripo_part_1|tripo_part_2": 9.243,
+          "tripo_part_1|tripo_part_5": 5.883
+        },
+        "bone": "leg_upper.L",
+        "deg": -35,
+        "joints_max_opening_mm": {
+          "tripo_part_0|tripo_part_1": 0.0,
+          "tripo_part_1|tripo_part_2": 9.243,
+          "tripo_part_1|tripo_part_3": 0.0,
+          "tripo_part_1|tripo_part_5": 5.883,
+          "tripo_part_1|tripo_part_6": 0.0,
+          "tripo_part_1|tripo_part_7": 0.0,
+          "tripo_part_1|tripo_part_8": 0.0,
+          "tripo_part_7|tripo_part_9": 0.0,
+          "tripo_part_8|tripo_part_12": 0.0,
+          "tripo_part_9|tripo_part_15": 0.0
+        }
+      },
+      "thigh_r_flex": {
+        "all_contacts_max_opening_mm": 59.416,
+        "all_contacts_p99_opening_mm": 54.48,
+        "all_contacts_worst_pairs_mm": {
+          "tripo_part_0|tripo_part_2": 22.956,
+          "tripo_part_0|tripo_part_3": 59.416,
+          "tripo_part_1|tripo_part_3": 8.788,
+          "tripo_part_1|tripo_part_5": 3.704
+        },
+        "bone": "leg_upper.R",
+        "deg": -35,
+        "joints_max_opening_mm": {
+          "tripo_part_0|tripo_part_1": 0.0,
+          "tripo_part_1|tripo_part_2": 0.136,
+          "tripo_part_1|tripo_part_3": 8.788,
+          "tripo_part_1|tripo_part_5": 3.704,
+          "tripo_part_1|tripo_part_6": 0.0,
+          "tripo_part_1|tripo_part_7": 0.0,
+          "tripo_part_1|tripo_part_8": 0.0,
+          "tripo_part_7|tripo_part_9": 0.0,
+          "tripo_part_8|tripo_part_12": 0.0,
+          "tripo_part_9|tripo_part_15": 0.0
+        }
+      }
+    }
+  },
+  "seat": {
+    "base_axis_tripo_m": [
+      -0.00816,
+      -0.00012
+    ],
+    "base_bottom_tripo_m": 4e-05,
+    "base_diameter_final_m": 0.29682,
+    "base_height_final_m": 0.0603,
+    "base_radius_tripo_m": 0.24209,
+    "head_top_tripo_m": 0.89721,
+    "method": "uniform scale about the base bottom centre (least-squares circle of the base side wall, 20-80 % of its height)",
+    "scale": 0.613039
+  },
+  "seconds": 20.4,
+  "sockets": [
+    {
+      "bone": "weapon.R",
+      "location_uu_for_ue": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "name": "Weapon",
+      "offset_blender_bone_local_uu": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "offset_ue_bone_local_uu_predicted": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "status": "предсказание (UE bone space = (x, -y, z)); проверить get_socket_location на UE-этапе",
+      "target": "bone_head",
+      "target_blender_m": [
+        -0.07671,
+        -0.06642,
+        0.37332
+      ],
+      "target_ue_component_uu": [
+        6.642,
+        7.671,
+        37.332
+      ],
+      "ue_bone": "weapon_R"
+    },
+    {
+      "bone": "head",
+      "location_uu_for_ue": [
+        0.0,
+        -4.388,
+        -0.603
+      ],
+      "name": "Head",
+      "offset_blender_bone_local_uu": [
+        0.0,
+        4.388,
+        -0.603
+      ],
+      "offset_ue_bone_local_uu_predicted": [
+        0.0,
+        -4.388,
+        -0.603
+      ],
+      "status": "предсказание (UE bone space = (x, -y, z)); проверить get_socket_location на UE-этапе",
+      "target": "part_bbox_centre",
+      "target_blender_m": [
+        0.00028,
+        0.00304,
+        0.50057
+      ],
+      "target_ue_component_uu": [
+        -0.304,
+        -0.028,
+        50.057
+      ],
+      "ue_bone": "head"
+    }
+  ],
+  "weights": {
+    "parts": {
+      "tripo_part_0": {
+        "allowed": [
+          "arm_upper.L",
+          "arm_upper.R",
+          "hips",
+          "leg_upper.L",
+          "leg_upper.R",
+          "spine"
+        ],
+        "cleanup": {
+          "capped": 1532,
+          "fallback_nearest_bone": 12,
+          "foreign_weights_removed": 9492,
+          "quantized": {
+            "levels": 255,
+            "vertices": 4242
+          },
+          "ramped_x": 481,
+          "ramped_z": 6328
+        },
+        "rule": "cloak (rig-contract §9.4): hips with a soft transition to the thighs at the hem only; the collar on spine; over the pauldrons (z > 0.62, outside the torso's shoulder ramp) up to half on the upper arms"
+      },
+      "tripo_part_1": {
+        "allowed": [
+          "arm_upper.L",
+          "arm_upper.R",
+          "hips",
+          "leg_upper.L",
+          "leg_upper.R",
+          "spine"
+        ],
+        "cleanup": {
+          "foreign_weights_removed": 4329,
+          "quantized": {
+            "levels": 255,
+            "vertices": 3229
+          },
+          "ramped_x": 2546,
+          "ramped_z": 3217
+        },
+        "rule": "armour torso: one hips->spine blend over z 0.44..0.52 (same ramps as the tabard: the belt seam stays closed), no head influence (the gorget does not twist with the head), shoulder clasps follow the upper arms only outside |x| 0.05..0.095, tassets follow the thighs below z 0.42"
+      },
+      "tripo_part_12": {
+        "allowed": [
+          "arm_lower.R",
+          "arm_upper.R",
+          "hand.R"
+        ],
+        "cleanup": {
+          "foreign_weights_removed": 29,
+          "quantized": {
+            "levels": 255,
+            "vertices": 1503
+          },
+          "ramped_y": 1354
+        },
+        "rule": "the gauntlet fist around the grip (y < -0.085) is rigid on hand.R (no finger bones), the vambrace blends to the forearm"
+      },
+      "tripo_part_15": {
+        "allowed": [
+          "arm_lower.L",
+          "hand.L"
+        ],
+        "cleanup": {
+          "quantized": {
+            "levels": 255,
+            "vertices": 842
+          }
+        },
+        "rule": ""
+      },
+      "tripo_part_2": {
+        "allowed": [
+          "foot.L",
+          "hips",
+          "leg_lower.L",
+          "leg_upper.L"
+        ],
+        "cleanup": {
+          "foreign_weights_removed": 449,
+          "quantized": {
+            "levels": 255,
+            "vertices": 1564
+          }
+        },
+        "rule": ""
+      },
+      "tripo_part_3": {
+        "allowed": [
+          "foot.R",
+          "hips",
+          "leg_lower.R",
+          "leg_upper.R"
+        ],
+        "cleanup": {
+          "foreign_weights_removed": 213,
+          "quantized": {
+            "levels": 255,
+            "vertices": 1594
+          }
+        },
+        "rule": ""
+      },
+      "tripo_part_5": {
+        "allowed": [
+          "hips",
+          "leg_upper.L",
+          "leg_upper.R",
+          "spine"
+        ],
+        "cleanup": {
+          "foreign_weights_removed": 1894,
+          "quantized": {
+            "levels": 255,
+            "vertices": 957
+          },
+          "ramped_z": 2153
+        },
+        "rule": "front tabard: the torso's hips->spine blend at the belt, thighs only at the hem"
+      },
+      "tripo_part_6": {
+        "allowed": [
+          "head",
+          "spine"
+        ],
+        "cleanup": {
+          "foreign_weights_removed": 1949,
+          "quantized": {
+            "levels": 255,
+            "vertices": 3344
+          },
+          "ramped_z": 372
+        },
+        "rule": "head, hair, beard and crown on head; the neck inside the gorget (below z 0.748..0.772) on spine, so the gorget (torso, no head influence) and the neck stay together"
+      },
+      "tripo_part_7": {
+        "allowed": [
+          "arm_lower.L",
+          "arm_upper.L",
+          "spine"
+        ],
+        "cleanup": {
+          "foreign_weights_removed": 148,
+          "quantized": {
+            "levels": 255,
+            "vertices": 1001
+          }
+        },
+        "rule": ""
+      },
+      "tripo_part_8": {
+        "allowed": [
+          "arm_lower.R",
+          "arm_upper.R",
+          "spine"
+        ],
+        "cleanup": {
+          "foreign_weights_removed": 553,
+          "quantized": {
+            "levels": 255,
+            "vertices": 1030
+          }
+        },
+        "rule": ""
+      },
+      "tripo_part_9": {
+        "allowed": [
+          "arm_lower.L",
+          "arm_upper.L",
+          "hand.L"
+        ],
+        "cleanup": {
+          "foreign_weights_removed": 75,
+          "quantized": {
+            "levels": 255,
+            "vertices": 767
+          }
+        },
+        "rule": ""
+      }
+    },
+    "proxy": {
+      "crumb_faces_removed": 379,
+      "faces": 118032,
+      "heat_scale": 10.0,
+      "topology": {
+        "boundary_edges": 51,
+        "largest_shells_faces": [
+          118032
+        ],
+        "non_manifold_edges": 163,
+        "shells": 1,
+        "welded_vertices": 52393,
+        "wire_edges": 0
+      },
+      "transfer_distance_mm": {
+        "max": 10.806,
+        "mean": 0.408,
+        "p95": 1.462
+      },
+      "unweighted_vertices_after_heat": 0,
+      "vertices": 52393,
+      "voxel_m": 0.002
+    },
+    "summary": {
+      "SK_KingArthur_H2_Body": {
+        "bones_used": {
+          "arm_lower.L": 2022,
+          "arm_lower.R": 1703,
+          "arm_upper.L": 2196,
+          "arm_upper.R": 2974,
+          "foot.L": 825,
+          "foot.R": 718,
+          "hand.L": 1252,
+          "hand.R": 1280,
+          "head": 3302,
+          "hips": 6078,
+          "leg_lower.L": 1185,
+          "leg_lower.R": 1167,
+          "leg_upper.L": 2634,
+          "leg_upper.R": 2538,
+          "spine": 8454
+        },
+        "max_influences": 4,
+        "not_normalised_vertices": 0,
+        "unweighted_vertices": 0,
+        "vertices": 20073,
+        "weight_share": {
+          "arm_lower.L": 0.0406,
+          "arm_lower.R": 0.0335,
+          "arm_upper.L": 0.0599,
+          "arm_upper.R": 0.0679,
+          "foot.L": 0.0205,
+          "foot.R": 0.0167,
+          "hand.L": 0.0405,
+          "hand.R": 0.0399,
+          "head": 0.153,
+          "hips": 0.1739,
+          "leg_lower.L": 0.0247,
+          "leg_lower.R": 0.0246,
+          "leg_upper.L": 0.0491,
+          "leg_upper.R": 0.0509,
+          "spine": 0.2044
+        }
+      },
+      "SK_KingArthur_H2_Sword": {
+        "bones_used": {
+          "weapon.R": 1164
+        },
+        "max_influences": 1,
+        "not_normalised_vertices": 0,
+        "unweighted_vertices": 0,
+        "vertices": 1164,
+        "weight_share": {
+          "weapon.R": 1.0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,154 @@
+{
+ "all_equal": false,
+ "date": "2026-09-29",
+ "differs": [
+  "reports/textures-report.json (volatile keys removed)",
+  "work/bake/normal.npy"
+ ],
+ "earlier_findings": [
+  "revision 1: 3 texels differed across 3 of the 10 PNGs (one OptiX AO ray, CPU normal summation); revision 2 has none",
+  "revision 2 development: the first same-path rebuild caught a determinism bug in the nape patch (bmesh duplicate's vert_map maps both ways, a set of BMesh elements was iterated): patch_101 798 vs 799 triangles; fixed (repair_ops.copy_patch), then both final builds"
+ ],
+ "files": {
+  "export/SK_Harpy_H2.fbx": {
+   "a": "62ae4761c2550e50",
+   "b": "62ae4761c2550e50",
+   "bytes": 1290060,
+   "equal": true
+  },
+  "export/SM_Harpy_H2_Base.fbx": {
+   "a": "aadc891599ac714e",
+   "b": "aadc891599ac714e",
+   "bytes": 35948,
+   "equal": true
+  },
+  "reports/h2-bake-report.json (volatile keys removed)": {
+   "differing_keys": [],
+   "equal": true
+  },
+  "reports/h2-lowpoly-report.json (volatile keys removed)": {
+   "differing_keys": [],
+   "equal": true
+  },
+  "reports/h2-rig-report.json (volatile keys removed)": {
+   "differing_keys": [],
+   "equal": true
+  },
+  "reports/h2-uv-stage.json (volatile keys removed)": {
+   "differing_keys": [],
+   "equal": true
+  },
+  "reports/textures-report.json (volatile keys removed)": {
+   "differing_keys": [
+    "inputs"
+   ],
+   "equal": false
+  },
+  "reports/uv-report.json (volatile keys removed)": {
+   "differing_keys": [],
+   "equal": true
+  },
+  "textures/2k/T_Harpy_H2_BC.png": {
+   "a": "c01417784bfa20ab",
+   "b": "c01417784bfa20ab",
+   "bytes": 5210163,
+   "equal": true
+  },
+  "textures/2k/T_Harpy_H2_N.png": {
+   "a": "b5853e84ac116e34",
+   "b": "b5853e84ac116e34",
+   "bytes": 5750269,
+   "equal": true
+  },
+  "textures/2k/T_Harpy_H2_N_OpenGL.png": {
+   "a": "2069ac5b66133702",
+   "b": "2069ac5b66133702",
+   "bytes": 5751613,
+   "equal": true
+  },
+  "textures/2k/T_Harpy_H2_ORM.png": {
+   "a": "1a5dadbbbe3f50f2",
+   "b": "1a5dadbbbe3f50f2",
+   "bytes": 4261655,
+   "equal": true
+  },
+  "textures/2k/T_Harpy_H2_TeamMask.png": {
+   "a": "49bc1d88378207b0",
+   "b": "49bc1d88378207b0",
+   "bytes": 799569,
+   "equal": true
+  },
+  "textures/4k/T_Harpy_H2_BC.png": {
+   "a": "6c39cc81410c4708",
+   "b": "6c39cc81410c4708",
+   "bytes": 14520129,
+   "equal": true
+  },
+  "textures/4k/T_Harpy_H2_N.png": {
+   "a": "f172622fc4c628da",
+   "b": "f172622fc4c628da",
+   "bytes": 15039033,
+   "equal": true
+  },
+  "textures/4k/T_Harpy_H2_N_OpenGL.png": {
+   "a": "97c10313a443ea5a",
+   "b": "97c10313a443ea5a",
+   "bytes": 15043560,
+   "equal": true
+  },
+  "textures/4k/T_Harpy_H2_ORM.png": {
+   "a": "1dfaaddb8d646b93",
+   "b": "1dfaaddb8d646b93",
+   "bytes": 11664238,
+   "equal": true
+  },
+  "textures/4k/T_Harpy_H2_TeamMask.png": {
+   "a": "51c18a6f62c49653",
+   "b": "51c18a6f62c49653",
+   "bytes": 2175857,
+   "equal": true
+  },
+  "work/bake/ao.npy": {
+   "a": "01d20798c1ce438b",
+   "b": "01d20798c1ce438b",
+   "bytes": 268435584,
+   "equal": true
+  },
+  "work/bake/bc.npy": {
+   "a": "75b271ca43f10b94",
+   "b": "75b271ca43f10b94",
+   "bytes": 268435584,
+   "equal": true
+  },
+  "work/bake/normal.npy": {
+   "a": "b15bd017627fd07a",
+   "b": "82fc278f91a6a2dc",
+   "bytes": 268435584,
+   "equal": false
+  },
+  "work/bake/rm.npy": {
+   "a": "8df703fbbd9ead08",
+   "b": "8df703fbbd9ead08",
+   "bytes": 268435584,
+   "equal": true
+  },
+  "work/uv-labels.npz": {
+   "a": "d2e49816bb82721c",
+   "b": "d2e49816bb82721c",
+   "bytes": 1421270,
+   "equal": true
+  },
+  "work/uv-tris.npz": {
+   "a": "8317f04c4cbaaf7b",
+   "b": "8317f04c4cbaaf7b",
+   "bytes": 698553,
+   "equal": true
+  }
+ },
+ "method": "two full builds of the same profile at the SAME path (the FBX exporter writes the file path into the FBX): build A (lowpoly..review) was moved to a scratch folder, build B ran from import (GLBs) into the run folder; determinism_check.py compares sha256 of export/*.fbx, textures/**/*.png, work/uv-*.npz, work/bake/*.npy and the stage reports with volatile keys (times, paths, blend hashes) removed",
+ "profile": "harpy-h2-bake/2",
+ "run_a": "scratch:runA_final",
+ "run_b": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake",
+ "schema": "unmatched.h2-bake.determinism/2",
+ "summary": "byte-identical: both FBX, all 10 texture PNGs (4K and 2K), uv-tris/uv-labels, the AO/BC/RM bake buffers and every stage report; differs: only the float32 normal bake buffer work/bake/normal.npy (CPU Cycles, max |diff| 2.4e-7 on 25 967 of 16.8 M texels, summation order) - below one 8-bit step, so the normal PNGs are identical - and textures-report.json 'inputs', which records that buffer's sha256"
+}

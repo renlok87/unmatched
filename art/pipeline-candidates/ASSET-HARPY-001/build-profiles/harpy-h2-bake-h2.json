@@ -1,0 +1,1062 @@
+{
+  "schema": "unmatched.h2-bake.profile/1",
+  "profile_id": "harpy-h2-bake/2",
+  "asset_id": "ASSET-HARPY-001",
+  "status": "proposed",
+  "sources": {
+    "geometry_glb": {
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-tripo/source/harpy-h2-tripo-330872a3-parts13.glb",
+      "sha256": "cdc18f936e402d6ebbe607b7acac27d5966627fdf2149aeb238dc5f0c5ea19bb",
+      "source_spec": "art/pipeline-candidates/ASSET-HARPY-001/source-specs/tripo-330872a3-h2.json",
+      "role": "h2-parts-glb"
+    },
+    "textured_glb": {
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-tripo/source/harpy-h2-tripo-330872a3-tex8k-pbr.glb",
+      "sha256": "e79ed139d1cf59610f396142c2e2d20c266955f6f9e31e08b688aa6f0121b3ed",
+      "source_spec": "art/pipeline-candidates/ASSET-HARPY-001/source-specs/tripo-330872a3-h2.json",
+      "role": "h2-tex8k-pbr-glb"
+    }
+  },
+  "import": {
+    "orientation_samples_per_part": 4000
+  },
+  "repair": {
+    "rotate_z_deg": 180.0,
+    "why": "Janus head of Tripo task 330872a3 (measured 2026-09-29, work/probe sheets): the side concept (drawn over ortho_left, face looking left) went into the RIGHT slot, so Tripo fitted a face on BOTH sides of the head (-Y: tripo_part_12 from the front concept; +Y: tripo_part_0 from the mirrored side profile) and swept the wings toward -Y. Turning the high-poly 180 deg about Z makes the side-consistent face (tripo_part_0, with a real nose/chin profile) the front and sweeps the wings back as in the side concept; the front-concept face part tripo_part_12 is dropped. The dropped face sat inside a feathered hood of the TORSO part tripo_part_1 (its neck column behind the head, authored y -0.026..0.070, rising to z 0.534 = eye level): that hood stays hollow after the drop (open toward +Y, its inside faces the viewer from behind) and reads from the elevated game camera as a smooth bald dome behind the crest (harpy-h2-bake/1 review, verifier frames 2026-09-29). Profile /2 trims it (repair.trim), closes the torso's neck opening with a closed cap (repair.caps) and covers the cap's upper half with a copy of the head's own back feathers (repair.patches). The back of tripo_part_0 itself is a closed feathered surface. The second ankle band tripo_part_11 (right leg after the turn) is kept because it is structural (see kept_parts_note). Repair of a generation defect, proposal; regeneration with the side view in the LEFT slot is the clean fix (followup)",
+    "drop_parts": {
+      "tripo_part_12": "front-concept face of the Janus head (source -Y); after the 180 deg turn it would be a second face on the back of the head. Its neck sat in the hood/neck column of tripo_part_1 (see repair.trim)"
+    },
+    "occluder_only_parts": {
+      "tripo_part_7": "Tripo base (gold cylinder, source Ø0.321 m): AO occluder under the feet only; the game base is the parametric SM_Harpy_Base (instance pips, team band)"
+    },
+    "kept_parts_note": {
+      "tripo_part_11": "second ankle band (on the RIGHT leg after the turn; the concept has one band, on the LEFT leg). Kept: it bridges the 2.2 cm (source) gap between the right shin (tripo_part_8, bottom z 0.166) and the right tarsus (tripo_part_9, top z 0.144); dropping it opened the leg (measured in the first low-poly front frame 2026-09-29). Deviation from the concept, recorded in the report"
+    },
+    "plugs": [],
+    "trim": [
+      {
+        "part": "tripo_part_1",
+        "boxes": [
+          {
+            "min": [
+              -0.07,
+              -0.035,
+              0.455
+            ],
+            "max": [
+              0.07,
+              0.1,
+              0.6
+            ]
+          }
+        ],
+        "report_loops_min_z": 0.4,
+        "why": "hood / neck column of the torso that framed the dropped face tripo_part_12: faces with centroid above z 0.455 behind the head (authored frame, source scale; measured 2026-09-29: 15 829 of 266 455 high-poly faces, centroids x -0.055..0.057, y -0.026..0.070, z 0.455..0.534). Below z 0.455 the part is the collar ruff; the cut leaves one open loop around the neck (0.65 m, x -0.055..0.058, y -0.027..0.042, z 0.384..0.457), closed by repair.caps. Proposal"
+      }
+    ],
+    "caps": [
+      {
+        "name": "cap_100",
+        "part": "tripo_part_1",
+        "near_m": [
+          0.0,
+          0.01,
+          0.445
+        ],
+        "samples": 64,
+        "outward": 0.12,
+        "skirt_m": 0.004,
+        "lip_m": 0.003,
+        "dome_m": 0.008,
+        "depth_m": 0.025,
+        "rings": 4,
+        "smooth": 1,
+        "material": {
+          "kind": "feather_scallop",
+          "feature": "F1",
+          "cell_m": 0.016,
+          "stretch": 2.2,
+          "randomness": 0.85,
+          "colour_centre_linear": [
+            0.07,
+            0.04,
+            0.024
+          ],
+          "colour_edge_linear": [
+            0.014,
+            0.008,
+            0.005
+          ],
+          "edge_position": 0.55,
+          "cell_jitter": 0.3,
+          "bump_strength": 0.8,
+          "bump_distance_m": 0.002,
+          "roughness": 0.8
+        },
+        "why": "closes the torso's neck opening left by repair.trim (and by the dropped tripo_part_12, whose neck filled it; harpy-h2-bake/1 closed only its lower back part with the ellipsoid plug_100 and left a see-through gap at the base of the head: 119-130 px at azimuth 180 / 4.8 m, measured by see_through.py). Closed domed cap on the loop's best-fit plane: skirt ring 12 % outside the loop and 4 mm under it (tucks under the collar), lip ring on the rim 3 mm up (a ray grazing the rim meets the cap before the rim's culled inner side), closed underside. Dark feather tone with a soft procedural scallop (Voronoi F1, baked into BC and N); prototypes 2026-09-29: ellipsoid plugs left 5-85 px see-through, the cap 0-1 px on the high-poly. Proposal"
+      }
+    ],
+    "patches": [
+      {
+        "name": "patch_101",
+        "source": "tripo_part_0",
+        "boxes": [
+          {
+            "min": [
+              -0.052,
+              -0.065,
+              0.43
+            ],
+            "max": [
+              0.052,
+              0.0,
+              0.54
+            ]
+          }
+        ],
+        "translate": [
+          0.0,
+          0.045,
+          -0.045
+        ],
+        "solidify_m": 0.002,
+        "why": "the head's own back feathers (tripo_part_0 faces with centroid behind y -0.065, z 0.43..0.54, |x| <= 0.052; Tripo UVs and material kept) copied 4.5 cm back and 4.5 cm down over the cap's upper half, so the crest continues into the collar as on the back concept instead of a smooth dark shape; a reversed backing sheet 2 mm behind it (no rim) keeps its back side from showing culled faces toward the front camera (without it: 20-35 px see-through at azimuth 320-340). Proposal"
+      }
+    ]
+  },
+  "seat": {
+    "expected_scale": 0.66024,
+    "note": "42 uu with the base = upper end of the proposed 35-42 uu (04 §3.2) and the previous candidate (harpy-segmented-skeletal/2); uniform scale about the Tripo base top centre, figure on the parametric base top; exact scale in h2-rig-report.json",
+    "figure_height_m": 0.42,
+    "base_height_m": 0.05,
+    "base_reference_part": "tripo_part_7"
+  },
+  "lowpoly": {
+    "method": "Decimate COLLAPSE per part on the welded high-poly copy, priority vertex group protects the face",
+    "why_not_quadriflow": "QuadriFlow needs closed manifold input and smooths thin features: every Tripo part is one shell with 264-2413 open edges (segmentation cuts), and the figure is mostly thin feather sheets (wing primaries, crest spikes, collar ruff) whose serrated outline is the silhouette; collapse decimation keeps those outlines (measured: surface distance high->low per part in h2-lowpoly-report.json)",
+    "weld_distance_m": 1e-06,
+    "degenerate_dist_m": 1e-06,
+    "sharp_angle_deg": 60.0,
+    "distance_samples_per_part": 20000,
+    "parts": {
+      "tripo_part_0": {
+        "role": "head: face, pointed ears, feather crest, back collar",
+        "side": "C",
+        "target_triangles": 5000,
+        "priority_regions": [
+          {
+            "name": "face",
+            "box": {
+              "min": [
+                -0.065,
+                -0.235,
+                0.415
+              ],
+              "max": [
+                0.065,
+                -0.14,
+                0.53
+              ]
+            },
+            "uv_density_factor": 2.0,
+            "note": "skin-coloured face and ears of the head part (source probe: skin v>0.45 s<0.4 at source y>0.15, z 0.424-0.518), turned 180 deg",
+            "protect": 0.8,
+            "min_triangles": 1200,
+            "min_triangles_note": "uniform decimation of the head part to 5000 gives the face box 639 triangles (measured 2026-09-29, 12.8 %, = its share of the high-poly vertices); 1200 = about 2x"
+          }
+        ]
+      },
+      "tripo_part_1": {
+        "role": "torso: chest, collar ruff, back, short tail (hood of the Janus face trimmed, repair.trim)",
+        "side": "C",
+        "target_triangles": 3000
+      },
+      "tripo_part_2": {
+        "role": "left wing, inner (coverts, arm)",
+        "side": "L",
+        "target_triangles": 2800
+      },
+      "tripo_part_3": {
+        "role": "right wing, inner (coverts, arm)",
+        "side": "R",
+        "target_triangles": 2600
+      },
+      "tripo_part_4": {
+        "role": "right wing, outer (primaries)",
+        "side": "R",
+        "target_triangles": 3000
+      },
+      "tripo_part_5": {
+        "role": "left wing, outer (primaries)",
+        "side": "L",
+        "target_triangles": 3200
+      },
+      "tripo_part_6": {
+        "role": "left leg: feathered thigh, shin, gold ankle band",
+        "side": "L",
+        "target_triangles": 1600
+      },
+      "tripo_part_8": {
+        "role": "right leg: feathered thigh, shin",
+        "side": "R",
+        "target_triangles": 1400
+      },
+      "tripo_part_9": {
+        "role": "right foot: scaled tarsus, toes, talons",
+        "side": "R",
+        "target_triangles": 1300,
+        "priority_regions": [
+          {
+            "name": "talons",
+            "box": {
+              "min": [
+                -1,
+                -1,
+                -1
+              ],
+              "max": [
+                1,
+                1,
+                1
+              ]
+            },
+            "uv_density_factor": 1.5,
+            "protect": 0.0
+          }
+        ]
+      },
+      "tripo_part_10": {
+        "role": "left foot: scaled tarsus, toes, talons",
+        "side": "L",
+        "target_triangles": 1300,
+        "priority_regions": [
+          {
+            "name": "talons",
+            "box": {
+              "min": [
+                -1,
+                -1,
+                -1
+              ],
+              "max": [
+                1,
+                1,
+                1
+              ]
+            },
+            "uv_density_factor": 1.5,
+            "protect": 0.0
+          }
+        ]
+      },
+      "tripo_part_11": {
+        "role": "right ankle band (gold; second band made by Tripo, the concept has one)",
+        "side": "R",
+        "target_triangles": 300
+      },
+      "cap_100": {
+        "role": "neck cap (repair of the trimmed hood / dropped Janus face part)",
+        "side": "C",
+        "target_triangles": 500
+      },
+      "patch_101": {
+        "role": "nape feathers: copy of the head's back feathers over the cap, with backing sheet (repair)",
+        "side": "C",
+        "target_triangles": 800
+      }
+    },
+    "factor_search_min": 0.005,
+    "factor_search_max": 0.3,
+    "factor_search_iterations": 7,
+    "keep_tripo_uv": true,
+    "keep_tripo_uv_note": "measured 2026-09-29: Tripo charts per part 70 (part_4) / 221 (part_0) / 133 (part_1); collapse decimation with the UVs kept leaves 89 / 295 / 178 islands with 26-29 flipped UV triangles per part; the own-seam alternatives (Smart UV / sharp-edge seams / chart merging + SLIM) gave 1.8k-8.4k islands for 25.7k triangles and a 25-33 % atlas fill",
+    "stitch": {
+      "enabled": true,
+      "tol_hp_m": 1e-05,
+      "min_chain_vertices": 8,
+      "snap_m": 0.002,
+      "merge_m": 0.0005,
+      "max_edge_factor": 1.5,
+      "junctions": true,
+      "exclude_parts": [
+        "cap_100",
+        "patch_101"
+      ],
+      "note": "the Tripo parts are one surface cut into parts: neighbouring high-poly parts share their cut vertex for vertex (12 part pairs, 36 shared chains, e.g. inner/outer right wing), but the per-part decimation moved each boundary on its own and opened sub-millimetre cracks. One-sided game-camera frames (see_through.py, 36 frames) of the unstitched game mesh: 212 see-through pixels, 0-15 per frame; stitched: 49, 0-4 per frame (measured 2026-09-29 on the harpy-h2-bake/2 mesh). Stitching projects both boundaries onto the high-poly cut, clusters vertices closer than merge_m, inserts the other part's vertices (~1.3k, +~1.3k triangles) and puts a vertex of both parts on every open chain end (three-part corners). max_edge_factor 3.0 folded a wing corner (max high->low distance of tripo_part_2 6.4 mm), 1.5 keeps it at 3.2 mm (unstitched 3.3 mm). Repair parts (cap, patch) are excluded: they overlap, they do not share cuts. Proposal"
+    }
+  },
+  "uv": {
+    "atlas_px": 4096,
+    "runtime_px": 2048,
+    "margin_px": 5,
+    "min_padding_px": 8,
+    "gap_search_px": 40,
+    "region_island_share": 0.5,
+    "shape_method": "CONCAVE",
+    "note": "one UV0 atlas for the whole figure; pack margin 12 px of 4096 (fraction) so that the measured free texels between islands stay >= 8 at 4K (4 at the 2K runtime mip); face islands x2 texel density, feet/talon islands x1.5 (lowpoly.parts.*.priority_regions)",
+    "seed_angle_limit_deg": 89.0,
+    "min_chart_area_fraction": 0.02,
+    "max_chart_normal_angle_deg": 70.0,
+    "unwrap_method": "MINIMUM_STRETCH",
+    "unwrap_iterations": 30,
+    "fallback_angle_limit_deg": 66.0,
+    "fallback_rounds": 3,
+    "overlap_check_px": 512,
+    "charts": "tripo",
+    "repair_rings": 0
+  },
+  "bake": {
+    "size": 4096,
+    "cage_extrusion_m": 0.002,
+    "max_ray_distance_m": 0.006,
+    "seed": 0,
+    "samples": {
+      "normal": 16,
+      "emit": 16,
+      "ao": 128
+    },
+    "ao": {
+      "distance_m": 0.05,
+      "note": "0.08 x the source figure height 0.634 m (W4-B atlas.ao_bake distance_rel 0.08)"
+    },
+    "note": "authored frame at source scale (before the seat transform); extrusion 2 mm / ray 6 mm from the cage: the high->low surface distance is p99 0.7-1.4 mm, max 1.4-3.6 mm per part (h2-lowpoly-report.json); a larger cage reaches the next feather layer of the same part",
+    "recolor": [
+      {
+        "part": "tripo_part_1",
+        "boxes": [
+          {
+            "min": [
+              -0.04,
+              0.0,
+              0.37
+            ],
+            "max": [
+              0.04,
+              0.12,
+              0.44
+            ]
+          },
+          {
+            "min": [
+              -0.022,
+              0.0,
+              0.352
+            ],
+            "max": [
+              0.022,
+              0.12,
+              0.37
+            ]
+          }
+        ],
+        "skin": {
+          "v_min": 0.45,
+          "s_max": 0.4
+        },
+        "target_srgb": [
+          0.26,
+          0.18,
+          0.13
+        ],
+        "luminance_ref": 0.3,
+        "strength": 1.0,
+        "why": "after the 180 deg turn the torso's skin-coloured V below the old front face sits at the back of the neck (review frame closeup_neck_back); the concept back shows dark feathers there. Skin-like texels (v > 0.45, s < 0.4) of the torso inside the box are tinted to the dark feather tone keeping their luminance detail. Repair, proposal",
+        "box_note": "first run with z >= 0.33 also darkened light tan chest feathers below the V (speckles, review 2026-09-29); the V itself lies at source z 0.373-0.397; harpy-h2-bake/2 adds a narrow second box (|x| <= 0.022, z 0.352-0.37) for the light tip of the V that stayed visible below the neck cap from behind (verified on the high-poly vertex mask 2026-09-29: z >= 0.35 over the full width selects speckles on the tan feathers again, the narrow box does not)"
+      }
+    ],
+    "device_per_pass": {
+      "ao": "GPU",
+      "normal": "CPU",
+      "bc": "CPU",
+      "rm": "CPU"
+    },
+    "device_note": "measured 2026-09-29 (two full rebuilds at the same path): OptiX AO bit-identical; OptiX normal/EMIT passes differ by <= 4.2e-7 on 3-6 M texels, i.e. 10-863 texels one 8-bit step apart in the PNGs; Cycles CPU for those passes (W4-B: Cycles CPU repeats byte for byte)"
+  },
+  "textures": {
+    "prefix": "T_Harpy_H2",
+    "ao_gate": {
+      "min_range_p1_p99": 32,
+      "occluded_below": 250,
+      "min_occluded_fraction": 0.02,
+      "note": "W4-B gate orm_occlusion_baked_not_constant (proposal)"
+    },
+    "team_mask": {
+      "method": "hsv-band-parts",
+      "parts": [
+        "tripo_part_2",
+        "tripo_part_3",
+        "tripo_part_4",
+        "tripo_part_5"
+      ],
+      "v_max": 0.22,
+      "ramp": 0.05,
+      "blur": "3x3",
+      "note": "W4-B rule of Harpy (harpy-segmented-skeletal/3 team_color.mask: no cloth; the dark flight feathers of the wings carry the team colour, v <= 0.22 on the sRGB BC, ramp 0.05, blur 3x3) applied to the four H2 wing parts. Format = W4-B TeamMask (separate 8-bit linear L texture, UE reads .R). Proposal"
+    },
+    "metal_rule": {
+      "parts": [
+        "tripo_part_6",
+        "tripo_part_11"
+      ],
+      "hue_deg": [
+        30,
+        62
+      ],
+      "ramp_deg": 6,
+      "s_min": 0.45,
+      "v_min": 0.45,
+      "ramp": 0.1,
+      "metallic": 1.0,
+      "roughness": 0.35,
+      "note": "Tripo PBR left the gold ankle bands non-metallic (metallic > 0.5 on 0 texels of the figure, measured 2026-09-29); the concept paints them as antique gold/bronze. Proposal: gold-coloured texels (sRGB hue 30-62 deg, s >= 0.45, v >= 0.45) of the two leg parts that carry a band get metallic 1.0 / roughness 0.35 with a soft 3x3 edge"
+    }
+  },
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "base_parametric": {
+    "radius_bottom_m": 0.11,
+    "side_top_z_m": 0.046,
+    "radius_top_m": 0.106,
+    "height_m": 0.05,
+    "segments": 72,
+    "azimuth_convention": "degrees in the XY plane from +X counter-clockwise; -90 = -Y = the figure's front",
+    "pips": {
+      "ring_radius_m": 0.0955,
+      "pip_radius_m": 0.009,
+      "pip_sides": 16,
+      "arc_spacing_m": 0.03,
+      "sector_azimuths_deg": [
+        -90,
+        30,
+        150
+      ],
+      "raise_m": 0.0004,
+      "skirt_m": 0.0006,
+      "slots_per_sector": [
+        "outer_a",
+        "centre",
+        "outer_b"
+      ],
+      "clearance": {
+        "band_m": 0.015,
+        "min_m": 0.001,
+        "note": "every pip edge > min_m (XY) from any body vertex lower than band_m above the base top"
+      },
+      "note": "3 sectors 120 deg apart, so for any yaw one sector faces the camera within ±60 deg. The talon tips reach r 8.4 uu (source r 0.127 x scale), the pips span r 8.65-10.45 uu on the flat top (r ≤ 10.6 uu). Pips are raised 0.04 uu with a 0.06 uu skirt (no z-fighting with the top); every pip exists in every instance, unlit pips take the base colour",
+      "search_offsets_deg": [
+        0,
+        120,
+        2
+      ],
+      "search_ring_radii_m": [
+        0.0955,
+        0.092,
+        0.089
+      ],
+      "search_note": "the H2 talons reach further out than the previous candidate's; the three pip sectors (120 deg apart) are turned by the offset (0..118 deg, step 2, preferring the one nearest the previous -90/30/150) with every pip edge > clearance.min_m from the feet in XY; smaller ring radii only if no offset clears"
+    },
+    "mask": {
+      "attribute": "UM_Mask",
+      "domain": "CORNER",
+      "type": "BYTE_COLOR",
+      "channels": {
+        "R": "team band: side wall and chamfer (TeamColor, 03 С-11: team colour only on bases/rings/markers)",
+        "G": "centre pip of each sector",
+        "B": "outer pips of each sector",
+        "A": "unused (1.0)"
+      },
+      "instance_rule": "InstanceIndex 1 -> centre pips (•), 2 -> outer pips (• •), 3 -> all (•••): lit = G * (Index != 2) + B * (Index >= 2)",
+      "values_note": "binary 0/1 per channel, so sRGB/linear vertex-colour conversion cannot shift them"
+    },
+    "material": "M_Harpy_Base",
+    "preview_colours_linear": {
+      "base": [
+        0.03,
+        0.026,
+        0.023
+      ],
+      "pip": [
+        0.78,
+        0.74,
+        0.64
+      ],
+      "team_gold": [
+        0.807,
+        0.527,
+        0.144
+      ],
+      "team_silver": [
+        0.347,
+        0.539,
+        0.686
+      ],
+      "team_note": "03 С-11 hex converted sRGB -> linear: #E8C06A = sRGB (0.910, 0.753, 0.416) = linear (0.807, 0.527, 0.144); #9FC2D8 = sRGB (0.624, 0.761, 0.847) = linear (0.347, 0.539, 0.686). The Merlin/Arthur profiles list hex/255 (sRGB) values as 'linear'"
+    }
+  },
+  "names": {
+    "body_object": "SK_Harpy_Body",
+    "body_mesh": "Harpy_Body",
+    "material": "M_Harpy_H2_Atlas",
+    "base_object": "SM_Harpy_Base",
+    "base_mesh": "Harpy_Base"
+  },
+  "exports": {
+    "skeletal_fbx": "SK_Harpy_H2.fbx",
+    "base_fbx": "SM_Harpy_H2_Base.fbx"
+  },
+  "anatomy": {
+    "head_part": "tripo_part_0",
+    "feet": {
+      "L": "tripo_part_10",
+      "R": "tripo_part_9"
+    },
+    "capsule_exclude_parts": [
+      "tripo_part_2",
+      "tripo_part_3",
+      "tripo_part_4",
+      "tripo_part_5"
+    ]
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "skeleton": "UM_HUMANOID_17_v2",
+    "max_influences": 4,
+    "skeleton_note": "RIG-CONTRACT v2 (docs/art-pipeline/rig, W4-D 2026-09-29): Harpy = the 16 base bones, no weapon bone (characters.Harpy.weapon_bone null); v1 is closed for new files (validate_clip skeleton_version FAIL outside grandfathered_files). The task text named UM_HUMANOID_17_v1: its only difference for Harpy is an unweighted leaf weapon under hand.L",
+    "bones_frame": "source = authored frame at Tripo scale (after repair.rotate_z_deg), mapped by the seat",
+    "bones": [
+      [
+        "root",
+        null,
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0.04
+        ],
+        "final"
+      ],
+      [
+        "hips",
+        "root",
+        [
+          0,
+          -0.035,
+          0.24
+        ],
+        [
+          0,
+          -0.03,
+          0.31
+        ],
+        "source"
+      ],
+      [
+        "spine",
+        "hips",
+        [
+          0,
+          -0.03,
+          0.31
+        ],
+        [
+          0,
+          -0.075,
+          0.415
+        ],
+        "source"
+      ],
+      [
+        "head",
+        "spine",
+        [
+          0,
+          -0.09,
+          0.415
+        ],
+        [
+          0,
+          -0.13,
+          0.6
+        ],
+        "source"
+      ],
+      [
+        "arm_upper.L",
+        "spine",
+        [
+          0.0802,
+          -0.0093,
+          0.4058
+        ],
+        [
+          0.1813,
+          0.0328,
+          0.4769
+        ],
+        "source"
+      ],
+      [
+        "arm_lower.L",
+        "arm_upper.L",
+        [
+          0.1813,
+          0.0328,
+          0.4769
+        ],
+        [
+          0.3048,
+          0.0843,
+          0.5748
+        ],
+        "source"
+      ],
+      [
+        "hand.L",
+        "arm_lower.L",
+        [
+          0.3048,
+          0.0843,
+          0.5748
+        ],
+        [
+          0.4724,
+          0.2121,
+          0.4302
+        ],
+        "source"
+      ],
+      [
+        "arm_upper.R",
+        "spine",
+        [
+          -0.0863,
+          -0.0223,
+          0.4023
+        ],
+        [
+          -0.1854,
+          -0.0078,
+          0.475
+        ],
+        "source"
+      ],
+      [
+        "arm_lower.R",
+        "arm_upper.R",
+        [
+          -0.1854,
+          -0.0078,
+          0.475
+        ],
+        [
+          -0.3065,
+          0.01,
+          0.5753
+        ],
+        "source"
+      ],
+      [
+        "hand.R",
+        "arm_lower.R",
+        [
+          -0.3065,
+          0.01,
+          0.5753
+        ],
+        [
+          -0.4718,
+          0.0905,
+          0.4324
+        ],
+        "source"
+      ],
+      [
+        "leg_upper.L",
+        "hips",
+        [
+          0.035,
+          -0.04,
+          0.29
+        ],
+        [
+          0.085,
+          -0.1,
+          0.215
+        ],
+        "source"
+      ],
+      [
+        "leg_lower.L",
+        "leg_upper.L",
+        [
+          0.085,
+          -0.1,
+          0.215
+        ],
+        [
+          0.0495,
+          -0.016,
+          0.157
+        ],
+        "source"
+      ],
+      [
+        "foot.L",
+        "leg_lower.L",
+        [
+          0.0495,
+          -0.016,
+          0.157
+        ],
+        [
+          0.055,
+          -0.11,
+          0.086
+        ],
+        "source"
+      ],
+      [
+        "leg_upper.R",
+        "hips",
+        [
+          -0.035,
+          -0.035,
+          0.29
+        ],
+        [
+          -0.08,
+          0.0,
+          0.22
+        ],
+        "source"
+      ],
+      [
+        "leg_lower.R",
+        "leg_upper.R",
+        [
+          -0.08,
+          0.0,
+          0.22
+        ],
+        [
+          -0.043,
+          -0.022,
+          0.154
+        ],
+        "source"
+      ],
+      [
+        "foot.R",
+        "leg_lower.R",
+        [
+          -0.043,
+          -0.022,
+          0.154
+        ],
+        [
+          -0.046,
+          -0.1,
+          0.085
+        ],
+        "source"
+      ]
+    ],
+    "placement_note": "measured on the H2 game mesh (authored frame, source scale; probe 2026-09-29): shoulders = centroid of the inner-wing vertices within 8 mm of the torso (L (0.080, -0.009, 0.406), R (-0.086, -0.022, 0.402)); wrists = highest wing vertex (leading-edge bend, z 0.587) lowered 1.2 cm; wing tips = outer 2 % by |x|; elbows at 45 % shoulder->wrist, 5 mm lower (as the previous candidate); neck = centroid of the head-part vertices within 6 mm of the torso (-0.009, -0.094, 0.417); knees inside the thigh mass at z 0.215-0.22 (the left thigh bulges forward to y -0.133, the right one backward to y +0.072: Tripo made the thighs asymmetric); ankles = centres of the gold bands (L inside tripo_part_6 (0.050, -0.014, 0.157), R tripo_part_11 (-0.043, -0.022, 0.154)); foot tails = front quartile of the talons"
+  },
+  "weights": {
+    "clean_below": 0.01,
+    "coordinates_frame": "source",
+    "seam_probe_pair_distance_m": 0.003,
+    "groups": [
+      {
+        "parts": [
+          "tripo_part_9",
+          "tripo_part_11"
+        ],
+        "rigid": "foot.R",
+        "why": "right talons/tarsus and the right ankle band"
+      },
+      {
+        "parts": [
+          "tripo_part_10"
+        ],
+        "rigid": "foot.L",
+        "why": "left talons/tarsus"
+      },
+      {
+        "parts": [
+          "tripo_part_0"
+        ],
+        "axis_blend": {
+          "from": "spine",
+          "to": "head",
+          "axis": "z",
+          "zero_below": 0.39,
+          "full_above": 0.43
+        },
+        "why": "head, face, crest and back collar: z blend below the chin (face box bottom z 0.415) as the previous candidate; the back collar hanging to z 0.341 stays on spine"
+      },
+      {
+        "parts": [
+          "tripo_part_1"
+        ],
+        "heat": [
+          "hips",
+          "spine"
+        ],
+        "height_ramps": [
+          {
+            "bones": [
+              "hips"
+            ],
+            "zero_above_z": 0.33,
+            "full_below_z": 0.27,
+            "to": "spine"
+          }
+        ],
+        "why": "torso with the collar ruff; the front feather apron between the legs (z 0.15-0.24) follows hips"
+      },
+      {
+        "parts": [
+          "tripo_part_6"
+        ],
+        "heat": [
+          "hips",
+          "leg_upper.L",
+          "leg_lower.L",
+          "foot.L"
+        ],
+        "height_ramps": [
+          {
+            "bones": [
+              "hips",
+              "leg_upper.L",
+              "leg_lower.L"
+            ],
+            "zero_below_z": 0.168,
+            "full_above_z": 0.18,
+            "to": "foot.L"
+          },
+          {
+            "bones": [
+              "leg_upper.L"
+            ],
+            "zero_above_z": 0.315,
+            "full_below_z": 0.29,
+            "to": "hips"
+          }
+        ],
+        "why": "left thigh + shin; the gold band at its bottom (z < 0.172) goes with the foot"
+      },
+      {
+        "parts": [
+          "tripo_part_8"
+        ],
+        "heat": [
+          "hips",
+          "leg_upper.R",
+          "leg_lower.R"
+        ],
+        "height_ramps": [
+          {
+            "bones": [
+              "leg_upper.R"
+            ],
+            "zero_above_z": 0.315,
+            "full_below_z": 0.29,
+            "to": "hips"
+          }
+        ],
+        "why": "right thigh + shin"
+      },
+      {
+        "parts": [
+          "tripo_part_2",
+          "tripo_part_5"
+        ],
+        "wing_span": {
+          "chain": [
+            "arm_upper.L",
+            "arm_lower.L",
+            "hand.L"
+          ],
+          "root_to": "spine",
+          "root_mode": "distance",
+          "root_band_m": 0.06,
+          "joint_band_m": 0.05
+        },
+        "why": "left wing, inner coverts + outer primaries"
+      },
+      {
+        "parts": [
+          "tripo_part_3",
+          "tripo_part_4"
+        ],
+        "wing_span": {
+          "chain": [
+            "arm_upper.R",
+            "arm_lower.R",
+            "hand.R"
+          ],
+          "root_to": "spine",
+          "root_mode": "distance",
+          "root_band_m": 0.06,
+          "joint_band_m": 0.05
+        },
+        "why": "right wing"
+      },
+      {
+        "parts": [
+          "cap_100",
+          "patch_101"
+        ],
+        "rigid": "spine",
+        "why": "neck cap and nape feathers sit on the torso collar: rigid spine; harmonise blends the patch toward the head where it touches tripo_part_0 and the cap toward the collar"
+      }
+    ],
+    "harmonise": {
+      "distance_m": 0.01,
+      "strength": 1.0,
+      "pairs": [
+        [
+          "tripo_part_0",
+          "tripo_part_1"
+        ],
+        [
+          "tripo_part_1",
+          "tripo_part_2"
+        ],
+        [
+          "tripo_part_1",
+          "tripo_part_3"
+        ],
+        [
+          "tripo_part_1",
+          "tripo_part_6"
+        ],
+        [
+          "tripo_part_1",
+          "tripo_part_8"
+        ],
+        [
+          "tripo_part_6",
+          "tripo_part_10"
+        ],
+        [
+          "tripo_part_8",
+          "tripo_part_11"
+        ],
+        [
+          "tripo_part_9",
+          "tripo_part_11"
+        ],
+        [
+          "tripo_part_2",
+          "tripo_part_5"
+        ],
+        [
+          "tripo_part_3",
+          "tripo_part_4"
+        ],
+        [
+          "tripo_part_0",
+          "tripo_part_2"
+        ],
+        [
+          "tripo_part_0",
+          "tripo_part_3"
+        ],
+        [
+          "cap_100",
+          "tripo_part_1"
+        ],
+        [
+          "cap_100",
+          "tripo_part_0"
+        ],
+        [
+          "patch_101",
+          "tripo_part_0"
+        ],
+        [
+          "cap_100",
+          "patch_101"
+        ]
+      ],
+      "note": "distance in source metres (x seat scale in the build); touching parts get the mean weights at the contact, fading out by smoothstep over the distance"
+    }
+  },
+  "sockets": [
+    {
+      "name": "Head",
+      "bone": "head",
+      "target": {
+        "kind": "part_bbox_centre",
+        "part": "tripo_part_0"
+      },
+      "purpose": "damage / status VFX"
+    },
+    {
+      "name": "Weapon",
+      "bone": "foot.R",
+      "target": {
+        "kind": "part_front_quartile",
+        "part": "tripo_part_9"
+      },
+      "purpose": "talon strike point (LungeAttack VFX); RIG-CONTRACT v2 characters.Harpy: the talon socket is attached by the profile (its text names hand.L/hand.R); kept on foot.R as in the previous candidate, see the report followups"
+    }
+  ],
+  "review": {
+    "concepts": {
+      "front": "art/imagegen/hero-quality-v1/harpy/harpy-front.png",
+      "side": "art/imagegen/hero-quality-v1/harpy/harpy-side.png",
+      "back": "art/imagegen/hero-quality-v1/harpy/harpy-back.png"
+    },
+    "quality_reference": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+    "previous_candidate_run": "art/pipeline-candidates/ASSET-HARPY-001/20260928-cli-um-fbx-v1",
+    "game_camera": {
+      "horizontal_fov_deg": 35,
+      "pitch_deg": -55,
+      "k1_distance_m": 12.0,
+      "k2_distance_m": 7.5,
+      "note": "03 §2 / 17 §2.7: K2 = zoom 1.6 of K1 (12 m / 1.6 = 7.5 m, as the T3.3 review)"
+    },
+    "see_through": {
+      "azimuths_deg": [
+        0,
+        20,
+        40,
+        60,
+        80,
+        100,
+        120,
+        140,
+        160,
+        180,
+        200,
+        220,
+        240,
+        260,
+        280,
+        300,
+        320,
+        340
+      ],
+      "distances_m": [
+        4.8,
+        7.5
+      ],
+      "gate_azimuth_range_deg": [
+        120,
+        240
+      ],
+      "gate_max_px": 0,
+      "note": "two gates (proposal). gate_strict = the verifier's gate 2026-09-29: with back faces culled as in UE (M_UM_Figure TwoSided=false) no background pixel may show through the figure in the game camera (FOV 35, pitch -55, 1920x1080) at 4.8 and 7.5 m for azimuths 120..240 - reported. gate = stage gate: no opening, i.e. no 8-connected see-through component of 4 px or more at any of the 18 azimuths (the harpy-h2-bake/1 neck gap had components of 69 and 44 px at azimuth 180 / 4.8 m); isolated 1-3 px pinholes (sub-millimetre cracks left between parts) are counted and reported",
+      "hole_min_px": 4,
+      "gate_max_holes": 0
+    }
+  }
+}

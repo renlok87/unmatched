@@ -1,0 +1,242 @@
+{
+ "checks": {
+  "ao_gate": {
+   "gate": {
+    "min_occluded_fraction": 0.02,
+    "min_range_p1_p99": 32,
+    "note": "W4-B gate orm_occlusion_baked_not_constant (proposal)",
+    "occluded_below": 250
+   },
+   "occluded_fraction": 0.8657,
+   "p1": 4.0,
+   "p99": 255.0,
+   "passed": true
+  },
+  "bc_linear_mean_covered": [
+   0.1287,
+   0.0688,
+   0.0416
+  ],
+  "metal_rule": {
+   "coverage_by_part": {
+    "tripo_part_11": 0.5541,
+    "tripo_part_6": 0.0309
+   },
+   "rule": {
+    "hue_deg": [
+     30,
+     62
+    ],
+    "metallic": 1.0,
+    "note": "Tripo PBR left the gold ankle bands non-metallic (metallic > 0.5 on 0 texels of the figure, measured 2026-09-29); the concept paints them as antique gold/bronze. Proposal: gold-coloured texels (sRGB hue 30-62 deg, s >= 0.45, v >= 0.45) of the two leg parts that carry a band get metallic 1.0 / roughness 0.35 with a soft 3x3 edge",
+    "parts": [
+     "tripo_part_6",
+     "tripo_part_11"
+    ],
+    "ramp": 0.1,
+    "ramp_deg": 6,
+    "roughness": 0.35,
+    "s_min": 0.45,
+    "v_min": 0.45
+   },
+   "texels_over_0_5": 77132
+  },
+  "missed_by_part": {
+   "cap_100": 7,
+   "patch_101": 1535,
+   "tripo_part_0": 16893,
+   "tripo_part_1": 11368,
+   "tripo_part_10": 4668,
+   "tripo_part_11": 432,
+   "tripo_part_2": 5709,
+   "tripo_part_3": 5415,
+   "tripo_part_4": 1366,
+   "tripo_part_5": 1432,
+   "tripo_part_6": 3324,
+   "tripo_part_8": 1735,
+   "tripo_part_9": 3179
+  },
+  "normal_inward_fraction": 0.019157,
+  "normal_tilt_over_60deg_by_part": {
+   "cap_100": 0.0296,
+   "patch_101": 0.04427,
+   "tripo_part_0": 0.04831,
+   "tripo_part_1": 0.02817,
+   "tripo_part_10": 0.02735,
+   "tripo_part_11": 0.05213,
+   "tripo_part_2": 0.03139,
+   "tripo_part_3": 0.02983,
+   "tripo_part_4": 0.0036,
+   "tripo_part_5": 0.00248,
+   "tripo_part_6": 0.02524,
+   "tripo_part_8": 0.01537,
+   "tripo_part_9": 0.01893
+  },
+  "normal_tilt_over_60deg_fraction": 0.026774,
+  "team_mask": {
+   "coverage_by_part": {
+    "cap_100": 0.0,
+    "patch_101": 0.0,
+    "tripo_part_0": 0.0,
+    "tripo_part_1": 0.0,
+    "tripo_part_10": 0.0,
+    "tripo_part_11": 0.0,
+    "tripo_part_2": 0.0447,
+    "tripo_part_3": 0.0421,
+    "tripo_part_4": 0.527,
+    "tripo_part_5": 0.5063,
+    "tripo_part_6": 0.0,
+    "tripo_part_8": 0.0,
+    "tripo_part_9": 0.0
+   },
+   "coverage_of_cells": 0.2826,
+   "coverage_of_figure": 0.1254,
+   "rule": {
+    "blur": "3x3",
+    "method": "hsv-band-parts",
+    "note": "W4-B rule of Harpy (harpy-segmented-skeletal/3 team_color.mask: no cloth; the dark flight feathers of the wings carry the team colour, v <= 0.22 on the sRGB BC, ramp 0.05, blur 3x3) applied to the four H2 wing parts. Format = W4-B TeamMask (separate 8-bit linear L texture, UE reads .R). Proposal",
+    "parts": [
+     "tripo_part_2",
+     "tripo_part_3",
+     "tripo_part_4",
+     "tripo_part_5"
+    ],
+    "ramp": 0.05,
+    "v_max": 0.22
+   }
+  },
+  "texels_covered_by_uv": 8216700,
+  "texels_covered_not_written": 57063,
+  "texels_covered_not_written_fraction": 0.006945,
+  "texels_written_by_bake": 8159940,
+  "tripo_metallic_fraction_over_0_5": 0.0,
+  "tripo_metallic_mean_covered": 0.0248,
+  "tripo_roughness_mean_covered": 0.7678
+ },
+ "inputs": {
+  "ao": "01d20798c1ce438be76624c889d333c633502e34547abe6cc7a4226eaf7eb166",
+  "bc": "75b271ca43f10b94ad3fc2c32094a086887b37dfba173af9ae38dbd1f26ecf37",
+  "normal": "82fc278f91a6a2dc85835d297b2f808509be8d790726e64d6a3b479298a2faf7",
+  "rm": "8df703fbbd9ead08c14e1d51a6aaebe52fe2c58b33f7c7a154c07bdbc577deae"
+ },
+ "master_px": 4096,
+ "outputs": {
+  "master": {
+   "BC": {
+    "bytes": 14520129,
+    "mode": "RGB",
+    "path": "textures/4k/T_Harpy_H2_BC.png",
+    "sha256": "6c39cc81410c470863b409ccf5fa5679fe6df02da0111c842bff329be2133203",
+    "size": [
+     4096,
+     4096
+    ]
+   },
+   "N": {
+    "bytes": 15039033,
+    "mode": "RGB",
+    "path": "textures/4k/T_Harpy_H2_N.png",
+    "sha256": "f172622fc4c628dac9131e04e4506b1b00473efc37426711ecc1e6519a84149d",
+    "size": [
+     4096,
+     4096
+    ]
+   },
+   "N_OpenGL": {
+    "bytes": 15043560,
+    "mode": "RGB",
+    "path": "textures/4k/T_Harpy_H2_N_OpenGL.png",
+    "sha256": "97c10313a443ea5a906b0281d9d10f8aaef1c6e8aca4bf3a722bb552ecc15455",
+    "size": [
+     4096,
+     4096
+    ]
+   },
+   "ORM": {
+    "bytes": 11664238,
+    "mode": "RGB",
+    "path": "textures/4k/T_Harpy_H2_ORM.png",
+    "sha256": "1dfaaddb8d646b9315110dfa91d62872ea531c188120bc0915541178d74d2e71",
+    "size": [
+     4096,
+     4096
+    ]
+   },
+   "TeamMask": {
+    "bytes": 2175857,
+    "mode": "L",
+    "path": "textures/4k/T_Harpy_H2_TeamMask.png",
+    "sha256": "51c18a6f62c4965361e36da2155b5e9cfac282eddef310f62fe7643556b9884e",
+    "size": [
+     4096,
+     4096
+    ]
+   },
+   "_checks": {
+    "directx_equals_opengl_with_inverted_g": true,
+    "normal_length_within_0_02_fraction": 1.0,
+    "orm_r_is_baked_ao_not_constant": true
+   }
+  },
+  "runtime": {
+   "BC": {
+    "bytes": 5210163,
+    "mode": "RGB",
+    "path": "textures/2k/T_Harpy_H2_BC.png",
+    "sha256": "c01417784bfa20abc883fa82d4a81de37d680e5e26df9c58e990f52a267b8ddd",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "N": {
+    "bytes": 5750269,
+    "mode": "RGB",
+    "path": "textures/2k/T_Harpy_H2_N.png",
+    "sha256": "b5853e84ac116e34422ea6d24e5e5a4e00f77a71515c6dcbaa94af00ef109cf0",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "N_OpenGL": {
+    "bytes": 5751613,
+    "mode": "RGB",
+    "path": "textures/2k/T_Harpy_H2_N_OpenGL.png",
+    "sha256": "2069ac5b66133702e9481496568e478bb57f5bbdcebadf815e3d0f568a509d46",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "ORM": {
+    "bytes": 4261655,
+    "mode": "RGB",
+    "path": "textures/2k/T_Harpy_H2_ORM.png",
+    "sha256": "1a5dadbbbe3f50f25c4b333242651df0b82006133c095d3622985ea6fdd45577",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "TeamMask": {
+    "bytes": 799569,
+    "mode": "L",
+    "path": "textures/2k/T_Harpy_H2_TeamMask.png",
+    "sha256": "49bc1d88378207b022440df592638071c8a49ea6c86cbdf0d703fdbbbf7b4064",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "_checks": {
+    "directx_equals_opengl_with_inverted_g": true,
+    "normal_length_within_0_02_fraction": 1.0,
+    "orm_r_is_baked_ao_not_constant": true
+   }
+  }
+ },
+ "profile_sha256": "290171af1526825c1b9960bcaaa432c90cdfa0889451dc73e7ed3edde8670ad3",
+ "runtime_px": 2048,
+ "schema": "unmatched.h2-bake.textures-report/1"
+}

@@ -1,0 +1,243 @@
+{
+  "schema": "unmatched.tripo-pipeline.h2-bake-profile/1",
+  "profile_id": "merlin-h2-bake/1",
+  "asset_id": "ASSET-MERLIN-001",
+  "status": "proposed",
+  "status_note": "H2 iteration (2026-09-29): game mesh retopologised from the Tripo H3.1 parts high-poly (task de0654b5), 4K atlas baked from the Tripo 8K/PBR high-poly, UM_HUMANOID_17_v2 rig. Technical candidate, not art acceptance; budgets below are proposals (GD-058 open). Driver: tools/tripo-pipeline/blender/h2_bake_merlin/run.py (does not touch tripo_pipeline.py / candidate_build / candidate/atlas.py / the rig contract: wave 4 owns them).",
+  "run_dir": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake",
+  "blender": "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe",
+  "sources": {
+    "parts": {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-parts12.glb",
+      "sha256": "82c3eff8e73359969decc807a637eccc5e05847df91e5d5c1a8d4377205cd74d",
+      "bytes": 46857420,
+      "meshes": 12,
+      "triangles": 1947523
+    },
+    "textured": {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-tex8k-pbr.glb",
+      "sha256": "bb970839f3431af1f7bc188a62502ea210dc65210796257f8c391f40fbbfd9d2",
+      "bytes": 69793876,
+      "meshes": 12,
+      "triangles": 1947523,
+      "materials": 12,
+      "images": 36
+    },
+    "source_spec": "art/pipeline-candidates/ASSET-MERLIN-001/source-specs/tripo-de0654b5-h2.json",
+    "frame_note": "glTF import of Blender 5.2: Z up, the figure faces -Y, .L = +X (rig-contract side convention); Tripo metres. All retopo/UV/bake work is done in this source frame; the rig stage maps it to the final frame (scale)."
+  },
+  "concepts": {
+    "front": "art/imagegen/hero-quality-v1/merlin/merlin-front.png",
+    "side": "art/imagegen/hero-quality-v1/merlin/merlin-side.png",
+    "back": "art/imagegen/hero-quality-v1/merlin/merlin-back.png",
+    "side_is": "right",
+    "quality_reference": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png"
+  },
+  "previous_candidate": {
+    "run": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1",
+    "sk_fbx": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/export/SK_Merlin_Candidate.fbx",
+    "base_fbx": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/export/SM_Merlin_Base_Candidate.fbx",
+    "textures": {
+      "BC": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/textures/T_Merlin_Candidate_Atlas_BC.png",
+      "N_OpenGL": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/textures/T_Merlin_Candidate_Atlas_N_OpenGL.png",
+      "ORM": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/textures/T_Merlin_Candidate_Atlas_ORM.png"
+    },
+    "triangles": {"SK_Merlin_Body": 11114, "SK_Merlin_Staff": 1811, "SM_Merlin_Base": 1155},
+    "note": "CLI run 2026-09-28 (profile /2, 12 925 figure tris, 2K atlas of the Tripo segmented retopology); used only as the comparison frame of the review"
+  },
+  "parts": {
+    "tripo_part_0": {"role": "robe with hood, stoles/trim, belt, stars", "object": "body", "tris": 14000, "td_priority": 1.0, "team": "cloth"},
+    "tripo_part_9": {"role": "face and tied beard", "object": "body", "tris": 4400, "td_priority": 2.0, "team": null},
+    "tripo_part_3": {"role": "left sleeve (bell cuff over the left fist)", "object": "body", "tris": 2000, "td_priority": 1.0, "team": "cloth"},
+    "tripo_part_4": {"role": "right sleeve", "object": "body", "tris": 2000, "td_priority": 1.0, "team": "cloth"},
+    "tripo_part_6": {"role": "right fist on the staff", "object": "body", "tris": 1700, "td_priority": 1.75, "team": null},
+    "tripo_part_8": {"role": "left fist at the belt", "object": "body", "tris": 1700, "td_priority": 1.75, "team": null},
+    "tripo_part_5": {"role": "left shoe", "object": "body", "tris": 800, "td_priority": 1.0, "team": null},
+    "tripo_part_11": {"role": "right shoe", "object": "body", "tris": 800, "td_priority": 1.0, "team": null},
+    "tripo_part_2": {"role": "staff, lower shaft (below the fist)", "object": "staff", "tris": 1500, "td_priority": 1.5, "team": null},
+    "tripo_part_10": {"role": "staff, carved upper shaft and crystal claw (above the fist)", "object": "staff", "tris": 1700, "td_priority": 1.5, "team": null},
+    "tripo_part_7": {"role": "staff crystal", "object": "staff", "tris": 400, "td_priority": 1.5, "team": null},
+    "tripo_part_1": {"role": "base (dark stone)", "object": "base", "tris": 2000, "td_priority": 0.5, "team": "base"}
+  },
+  "parts_note": "Roles measured 2026-09-29 on the H2 GLBs (part-coloured x-ray renders and shared boundary loops, work/explore). Tris = proposed decimation target per part (collapse), before caps/bridges. td_priority = linear texel-density factor over the uniform world density (face x2, hands x1.75, staff/crystal x1.5, base x0.5).",
+  "objects": {
+    "body": {
+      "name": "SK_Merlin_H2_Body", "mesh": "Merlin_H2_Body",
+      "parts": ["tripo_part_0", "tripo_part_9", "tripo_part_3", "tripo_part_4", "tripo_part_6", "tripo_part_8", "tripo_part_5", "tripo_part_11"],
+      "weld_m": 3e-05,
+      "weld_pairs": [
+        {"parts": ["tripo_part_0", "tripo_part_9"], "z_min": 0.67, "why": "face opening of the hood (loop 518, z 0.674-0.832); the beard tip on the chest (loop 63, z 0.643-0.661) is a contact, not welded"},
+        {"parts": ["tripo_part_0", "tripo_part_4"], "z_min": 0.58, "why": "right armhole (loop 306, z 0.593-0.733); the sleeve lying on the robe side (loop 211, z 0.477-0.573) is a contact, not welded"},
+        {"parts": ["tripo_part_4", "tripo_part_6"], "why": "right wrist: sleeve cuff and fist (loop 205)"},
+        {"parts": ["tripo_part_0", "tripo_part_5"], "why": "hem and left shoe (loop 254)"},
+        {"parts": ["tripo_part_0", "tripo_part_11"], "why": "hem and right shoe (loop 272)"}
+      ],
+      "weld_note": "the H2 parts are one surface cut into parts: every seam loop exists on both sides within 2.2e-5 m (measured). Only anatomical seams are welded. The left sleeve (p3) shares ONE loop with the robe (armhole + the whole side contact, z 0.428-0.729) and the left fist (p8) one loop with the robe (contact) and the sleeve (wrist): not welded, so the left arm, the left fist and the robe are separate shells there, each closed by its own cap. Measured 2026-09-29: welding every contact made a skin web between the raised sleeves and the robe in the probe poses arm_l_raise/arm_r_raise",
+      "cap_open_loops": true,
+      "cap_note": "after the weld the remaining open loops are the contacts that were not welded (left sleeve/left fist/robe, right sleeve side, beard tip) and the contacts with other objects (shoe soles on the base, the fist holes of the staff, the robe hole of the staff contact, a 3-vertex hole on the robe back); each side is closed by a fan so nothing is open when a limb, the staff or the feet move"
+    },
+    "staff": {
+      "name": "SK_Merlin_H2_Staff", "mesh": "Merlin_H2_Staff",
+      "parts": ["tripo_part_2", "tripo_part_10", "tripo_part_7"],
+      "weld_m": 3e-05,
+      "bridge": [{"lower": "tripo_part_2", "upper": "tripo_part_10", "lower_partner": "tripo_part_6", "upper_partner": "tripo_part_6",
+                  "why": "Tripo modelled no shaft inside the right fist: tripo_part_2 ends in the loop it shares with the fist (source z 0.613-0.648) and tripo_part_10 starts in the loop it shares with the fist (z 0.670-0.680). A bridge between the two decimated loops makes the separate staff whole (seen if the hand is hidden or the staff is posed apart)"}],
+      "cap_open_loops": true
+    },
+    "base": {
+      "name": "SM_Merlin_H2_Base", "mesh": "Merlin_H2_Base",
+      "parts": ["tripo_part_1"],
+      "weld_m": 3e-05,
+      "cap_open_loops": true,
+      "cap_note": "four open loops on the base top where the shoes were cut off (z 0.093-0.098): flat caps, so the base top has no see-through holes"
+    }
+  },
+  "retopo": {
+    "method": "collapse-sequential",
+    "method_note": "per part, largest first: Decimate COLLAPSE (triangulate) on the welded object with the other parts protected (vertex group weight 0, factor protect_factor; the seam vertices shared with the part are decimatable). Measured 2026-09-29 against QuadriFlow (scaled x100 to pass Blender's zero-length-edge check): at equal triangle counts QuadriFlow deviated 5-10x more from the high-poly (sleeves p99 6.5-8.8 mm vs 0.8-0.9 mm; face max 7.9 mm vs 0.8 mm at 3k tris) and needs closed manifold input, so collapse decimation is used; triangle shape is improved afterwards by beautify on near-flat edges",
+    "prep_merge_m": 3e-05,
+    "protect_factor": 1000.0,
+    "beautify_max_dihedral_deg": 8.0,
+    "sharp_edge_dihedral_deg": {"default": 180.0, "tripo_part_7": 35.0},
+    "sharp_note": "smooth shading everywhere (the tangent-space normal map carries the relief) except the faceted crystal (sharp at > 35 deg)",
+    "deviation_samples": 40000
+  },
+  "uv": {
+    "atlas_px": 4096,
+    "padding_px": 8,
+    "pack_margin_px": 5,
+    "smart_project_angle_deg": {"default": 66.0, "tripo_part_7": 30.0},
+    "seam_proxy_smooth_factor": 0.5,
+    "seam_proxy_smooth_iterations": 60,
+    "merge_islands_max_faces": 8,
+    "unwrap_method": "ANGLE_BASED",
+    "fix_passes": 10,
+    "overlap_check_px": 8192,
+    "cap_td_factor": 0.25,
+    "pack_shape_method": "CONCAVE",
+    "note": "seams from Smart UV Project per part on a smoothed proxy (islands never cross parts; tiny islands merged), ABF unwrap with a fold fix, average island scale (uniform world density), then island scale x td_priority, one pack of body+staff+base into a single 0..1 atlas; pack margin 5 px of 4096 per island side (measured gap ~2x margin: 20 px at margin 10, 2026-09-29) so the gap stays >= 8 px. Direct Smart UV on the decimated mesh gave 3971 body islands (2184 single triangles), measured 2026-09-29"
+  },
+  "bake": {
+    "engine": "CYCLES",
+    "device": "CPU",
+    "device_note": "CPU for byte determinism: two full GPU (OptiX) runs of 2026-09-29 gave the same meshes/UV/FBX but different texture bytes (53 of 72 output files differed); Cycles CPU with a fixed seed is byte-stable (W4-B bake_ao, re-measured here). Set GPU for speed when bytes do not matter",
+    "seed": 0,
+    "pairing": "per part: low-poly faces of part k (split to a temp object) <- high-poly part k only; all high-poly parts stay in the scene as occluders for AO; low-poly objects are invisible to rays",
+    "cage_extrusion_min_m": 0.0015,
+    "cage_extrusion_factor": 1.5,
+    "max_ray_distance_factor": 3.0,
+    "cage_note": "per part extrusion = max(min, factor x measured p99.9 high->low deviation); max ray = factor x extrusion (source metres)",
+    "maps": {
+      "normal": {"type": "NORMAL", "space": "TANGENT", "samples": 16, "highpoly_normal_map": false,
+                 "note": "geometry only: the 2M-tri high-poly already carries the relief; the Tripo normal maps are 1/4 of the base colour size"},
+      "ao": {"type": "AO", "samples": 256, "distance_rel": 0.08, "note": "distance 0.08 x figure height as W4-B atlas.ao_bake; whole high-poly as occluder"},
+      "basecolor": {"type": "EMIT", "source": "baseColorTexture", "samples": 16},
+      "roughness": {"type": "EMIT", "source": "metallicRoughnessTexture.G", "samples": 16},
+      "metallic": {"type": "EMIT", "source": "metallicRoughnessTexture.B", "samples": 16}
+    }
+  },
+  "maps": {
+    "prefix": "T_Merlin_H2",
+    "master_px": 4096,
+    "runtime_px": 2048,
+    "downscale": "2x2 box (BC in linear light, normals renormalised)",
+    "normal_convention_ue": "DirectX (-Y): green of the OpenGL bake inverted; no N_OpenGL file is written (the Blender preview inverts G of N in its shader; a derived copy added 16.5 MB to git)",
+    "orm": "R = AO, G = roughness, B = metallic (linear)",
+    "team_mask": {
+      "file": "TeamMask",
+      "format": "L 8-bit linear = cloth (compatible with W4-B M_UM_Figure: lerp by TeamMask.R, TC_Grayscale)",
+      "rgba_file": "TeamMaskRGBA",
+      "rgba_format": "R = cloth (same as TeamMask), G = base side band, B = gold trim/embroidery on the cloth parts, A = 255; proposal for wave 4 (TC_Masks/TC_Default)",
+      "cloth": {"parts_team": "cloth", "hue_deg": [195.0, 265.0], "s_min": 0.25, "v_max": 0.75, "soft": 0.06,
+                "note": "midnight-blue woven robe, hood and sleeves: blue hue on the cloth parts; the gold trim, the brown belt and the stars fall outside the hue band"},
+      "trim": {"parts_team": "cloth", "hue_deg": [20.0, 60.0], "s_min": 0.25, "v_min": 0.18, "soft": 0.06},
+      "base_band": {"parts_team": "base", "normal_z_abs_max": 0.5, "note": "side wall of the base (face normal |z| < 0.5)"}
+    }
+  },
+  "scale": {
+    "top_part": "tripo_part_0",
+    "figure_height_m": 0.45,
+    "base_footprint_m": [0.24, 0.24, 0.05],
+    "choice_note": "as the previous candidates (profile /2-/4): hood top 45.0 uu above the base bottom, base 24 x 24 x 5 uu (04 §3.4 / 17 AD-CNF-18 working value Ø24; 5 uu = Base_Sidekick). Figure and staff: uniform scale about the source base-top centre, seated on the normalised base top. H2 Tripo base: Ø0.478 x 0.0975 m -> x0.505 gives Ø24.15 x 4.92 uu, so the normalisation is almost uniform"
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "skeleton": "UM_HUMANOID_17_v2",
+    "rig_contract": "docs/art-pipeline/rig/rig-contract.json#UM_HUMANOID_17_v2 (character Merlin: weapon.R under hand.R)",
+    "skeleton_choice_note": "the task text names UM_HUMANOID_17_v1; the contract v2 (W4-D, 2026-09-29) closes v1 for new files (validate_clip FAIL outside grandfathered_files) and v2 only renames weapon -> weapon.R for Merlin, so the H2 build uses v2",
+    "max_influences": 4,
+    "bones_frame": "source (Tripo metres, Z up, face -Y) except root (final)",
+    "bones": [
+      ["root", null, [0, 0, 0], [0, 0, 0.04], "final"],
+      ["hips", "root", [0, 0.01, 0.44], [0, 0.01, 0.52], "source"],
+      ["spine", "hips", [0, 0.01, 0.52], [0, 0.005, 0.69], "source"],
+      ["head", "spine", [0, 0.0, 0.7], [0.003, -0.01, 0.87], "source"],
+      ["arm_upper.L", "spine", [0.085, 0.02, 0.685], [0.13, 0.01, 0.585], "source"],
+      ["arm_lower.L", "arm_upper.L", [0.13, 0.01, 0.585], [0.0785, -0.073, 0.5704], "source"],
+      ["hand.L", "arm_lower.L", [0.0785, -0.073, 0.5704], [0.025, -0.087, 0.55], "source"],
+      ["arm_upper.R", "spine", [-0.083, 0.035, 0.69], [-0.13, 0.1, 0.585], "source"],
+      ["arm_lower.R", "arm_upper.R", [-0.13, 0.1, 0.585], [-0.1543, 0.0236, 0.6239], "source"],
+      ["hand.R", "arm_lower.R", [-0.1543, 0.0236, 0.6239], [-0.1598, -0.0145, 0.6509], "source"],
+      ["leg_upper.L", "hips", [0.05, 0.0, 0.43], [0.08, -0.01, 0.3], "source"],
+      ["leg_lower.L", "leg_upper.L", [0.08, -0.01, 0.3], [0.1053, -0.0121, 0.1697], "source"],
+      ["foot.L", "leg_lower.L", [0.1053, -0.0121, 0.1697], [0.1318, -0.1441, 0.1023], "source"],
+      ["leg_upper.R", "hips", [-0.05, 0.02, 0.43], [-0.07, 0.045, 0.3], "source"],
+      ["leg_lower.R", "leg_upper.R", [-0.07, 0.045, 0.3], [-0.0863, 0.0673, 0.1623], "source"],
+      ["foot.R", "leg_lower.R", [-0.0863, 0.0673, 0.1623], [-0.1486, -0.0561, 0.1003], "source"],
+      ["weapon.R", "hand.R", [-0.1598, -0.0145, 0.6509], [-0.1585, -0.0015, 0.9774], "source"]
+    ],
+    "placement_note": "measured 2026-09-29 on the H2 high-poly (work/explore/loops.txt, dbg_land): right wrist = centre of the sleeve/fist shared loop (p4|p6, r 0.031); left wrist = centre of the fist/sleeve shared vertices (p8|p3, 155 verts); ankles = centres of the hem/shoe shared loops (p0|p5, p0|p11); toes = front-most low shoe vertex; grip = midpoint of the staff loops entering/leaving the fist (p2|p6 (-0.1606,-0.0147,0.6262), p10|p6 (-0.1589,-0.0143,0.6756)); weapon tail = crystal top vertex; hood top (0.003,0.002,0.888). Shoulders at the top of the armhole loops (p0|p4 z 0.593-0.733, p0|p3 z 0.428-0.729), elbows, hips and knees are inside the sleeves/robe: estimates as in the previous candidate (profile /4), adjusted to the H2 sleeves"
+  },
+  "weights": {
+    "clean_below": 0.01,
+    "groups": [
+      {"parts": ["tripo_part_6"], "rigid": "hand.R"},
+      {"parts": ["tripo_part_8"], "rigid": "hand.L"},
+      {"parts": ["tripo_part_5"], "rigid": "foot.L"},
+      {"parts": ["tripo_part_11"], "rigid": "foot.R"},
+      {"parts": ["tripo_part_9"], "heat": ["spine", "head"],
+       "height_ramps": [{"bones": ["head"], "zero_below_z": 0.62, "full_above_z": 0.7, "to": "spine"}],
+       "why": "face and beard: the beard hangs to z 0.62 on the chest and blends into spine"},
+      {"parts": ["tripo_part_0"], "heat": ["hips", "spine", "head", "leg_upper.L", "leg_upper.R", "arm_upper.L", "arm_upper.R"],
+       "height_ramps": [
+         {"bones": ["leg_upper.L", "leg_upper.R"], "zero_above_z": 0.34, "full_below_z": 0.2, "to": "hips"},
+         {"bones": ["hips"], "zero_above_z": 0.6, "full_below_z": 0.5, "to": "spine"},
+         {"bones": ["head"], "zero_below_z": 0.7, "full_above_z": 0.76, "to": "spine"},
+         {"bones": ["arm_upper.L", "arm_upper.R"], "zero_below_z": 0.58, "full_above_z": 0.66, "to": "spine"}],
+       "caps": {"leg_upper.L": 0.35, "leg_upper.R": 0.35, "arm_upper.L": 0.5, "arm_upper.R": 0.5},
+       "cap_excess_to_by_bone": {"leg_upper.L": "hips", "leg_upper.R": "hips", "arm_upper.L": "spine", "arm_upper.R": "spine"},
+       "why": "robe to the ankles (rig-contract §9.4): hips with a soft transition to leg_upper only at the hem; the hood (part of the robe in H2) follows head above z 0.70-0.76; armhole rims partly follow the upper arms"},
+      {"parts": ["tripo_part_3"], "heat": ["spine", "arm_upper.L", "arm_lower.L"]},
+      {"parts": ["tripo_part_4"], "heat": ["spine", "arm_upper.R", "arm_lower.R"]}
+    ],
+    "seam_sync": {"radius_m": 0.012, "frame": "source",
+                  "note": "vertices within radius of a welded seam blend (smoothstep by distance) toward the weights of the nearest seam vertex; seam vertices take the mean of the rules of their parts. Makes both sides of every weld move together (no torn or sheared seam)"},
+    "staff": {"rigid": "weapon.R"}
+  },
+  "sockets": [
+    {"name": "Weapon", "bone": "weapon.R", "target": "bone_head", "location_uu": [0, 0, 0]},
+    {"name": "Head", "bone": "head", "target": "part_bbox_centre", "part": "tripo_part_9", "location_uu": null},
+    {"name": "StaffTip_proposal", "bone": "weapon.R", "target": "part_bbox_centre", "part": "tripo_part_7", "location_uu": null,
+     "status": "предложено (AD-CNF-59 open): crystal centre for the ranged-attack VFX (CUE-008); not created in UE by this run"}
+  ],
+  "materials": {"atlas": "M_Merlin_H2_Atlas", "slots_skeletal": 1, "slots_base": 1},
+  "exports": {"skeletal_fbx": "SK_Merlin_H2.fbx", "base_fbx": "SM_Merlin_H2_Base.fbx",
+              "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json"},
+  "axes": {"blender_front": "-Y", "blender_weapon_side": "-X", "expected_ue_front": "+X", "expected_ue_weapon_side": "+Y"},
+  "budget_proposal": {
+    "status": "предложено",
+    "figure_triangles": [30000, 45000],
+    "atlas": "4K master + 2K runtime, <= 2 slots",
+    "base_triangles_note": "the base is a separate static mesh (SM); its triangles are not counted in the figure budget"
+  },
+  "review": {
+    "resolution": [1200, 1333],
+    "ortho_views": ["front", "right", "back"],
+    "closeups": ["face", "right_fist_staff", "left_fist", "crystal", "staff_mid", "feet_base"],
+    "game_camera": {"horizontal_fov_deg": 35.0, "pitch_deg": -55.0, "distance_uu": [1207.0, 386.0], "focus_above_cell_uu": 28.0,
+                    "resolution": [1920, 1080],
+                    "note": "K2 of the P1.7 control scene (docs/art-pipeline/evidence/p17-control-scene-2026-09-28/README.md: K2 focus = cell + 28 uu, D 1207 (1.6x) and 386 (5x)); here in Blender, light is not the game light"}
+  }
+}

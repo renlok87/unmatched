@@ -1,0 +1,183 @@
+{
+ "source": "<run>/work/probe-fbx-authored.blend",
+ "label": "medusa-h2-fbx",
+ "family": "contract17",
+ "family_bone_hits": 7,
+ "height": 0.49257,
+ "bbox_min": [
+  -0.1074,
+  -0.0993,
+  0.0575
+ ],
+ "bbox_max": [
+  0.1636,
+  0.0929,
+  0.5501
+ ],
+ "tests": [
+  {
+   "test": "head_turn",
+   "bone": "head",
+   "axis": "Z",
+   "deg": 35,
+   "moved_vertices": 4103,
+   "centroid_z_norm": 0.87,
+   "centroid_x_norm": -0.253,
+   "expect": {
+    "z_norm_min": 0.7
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Medusa_H2_Body",
+     0.1851
+    ],
+    [
+     "SK_Medusa_H2_Bow",
+     0.0
+    ]
+   ]
+  },
+  {
+   "test": "spine_bend_fwd",
+   "bone": "spine",
+   "axis": "X",
+   "deg": 25,
+   "moved_vertices": 13849,
+   "centroid_z_norm": 0.687,
+   "centroid_x_norm": -0.095,
+   "expect": {
+    "z_norm_min": 0.45
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Medusa_H2_Bow",
+     1.0
+    ],
+    [
+     "SK_Medusa_H2_Body",
+     0.5111
+    ]
+   ]
+  },
+  {
+   "test": "arm_l_raise",
+   "bone": "arm_upper.L",
+   "axis": "Y",
+   "deg": -45,
+   "moved_vertices": 4113,
+   "centroid_z_norm": 0.552,
+   "centroid_x_norm": 0.559,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_min": 0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Medusa_H2_Bow",
+     1.0
+    ],
+    [
+     "SK_Medusa_H2_Body",
+     0.0719
+    ]
+   ]
+  },
+  {
+   "test": "arm_r_raise",
+   "bone": "arm_upper.R",
+   "axis": "Y",
+   "deg": 45,
+   "moved_vertices": 2134,
+   "centroid_z_norm": 0.577,
+   "centroid_x_norm": -0.585,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_max": -0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Medusa_H2_Body",
+     0.0963
+    ],
+    [
+     "SK_Medusa_H2_Bow",
+     0.0
+    ]
+   ]
+  },
+  {
+   "test": "forearm_l_bend",
+   "bone": "arm_lower.L",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 3521,
+   "centroid_z_norm": 0.542,
+   "centroid_x_norm": 0.62,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_min": 0.2
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Medusa_H2_Bow",
+     1.0
+    ],
+    [
+     "SK_Medusa_H2_Body",
+     0.0452
+    ]
+   ]
+  },
+  {
+   "test": "thigh_l_flex",
+   "bone": "leg_upper.L",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 4573,
+   "centroid_z_norm": 0.15,
+   "centroid_x_norm": 0.135,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Medusa_H2_Body",
+     0.2063
+    ],
+    [
+     "SK_Medusa_H2_Bow",
+     0.0
+    ]
+   ]
+  },
+  {
+   "test": "thigh_r_flex",
+   "bone": "leg_upper.R",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 5323,
+   "centroid_z_norm": 0.145,
+   "centroid_x_norm": -0.604,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Medusa_H2_Body",
+     0.2401
+    ],
+    [
+     "SK_Medusa_H2_Bow",
+     0.0
+    ]
+   ]
+  }
+ ]
+}

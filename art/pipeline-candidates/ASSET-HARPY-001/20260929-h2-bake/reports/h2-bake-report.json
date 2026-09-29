@@ -1,0 +1,182 @@
+{
+ "ao_distance_m": 0.05,
+ "blender": "5.2.2 LTS",
+ "cage_extrusion_m": 0.002,
+ "device": {
+  "backend": "OPTIX",
+  "device": "GPU",
+  "devices": [
+   "NVIDIA GeForce RTX 4090"
+  ],
+  "requested_gpu": true
+ },
+ "input_blend_sha256": "3d8f48668f648e918e42ef18f4d1ac845fea85326d4aaecced88c76d570f22dc",
+ "max_ray_distance_m": 0.006,
+ "occluders": [
+  "HP_tripo_part_7"
+ ],
+ "passes": {
+  "ao": {
+   "device": "GPU",
+   "npy": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/work/bake/ao.npy",
+   "rgb_mean_written": [
+    0.68598,
+    0.68598,
+    0.68598
+   ],
+   "samples": 128,
+   "seconds_per_part": {
+    "cap_100": 3.47,
+    "patch_101": 3.53,
+    "tripo_part_0": 6.44,
+    "tripo_part_1": 5.01,
+    "tripo_part_10": 3.92,
+    "tripo_part_11": 3.12,
+    "tripo_part_2": 5.01,
+    "tripo_part_3": 4.79,
+    "tripo_part_4": 4.89,
+    "tripo_part_5": 4.96,
+    "tripo_part_6": 3.81,
+    "tripo_part_8": 3.76,
+    "tripo_part_9": 3.83
+   },
+   "texels_written": 8159940,
+   "type": "AO"
+  },
+  "bc": {
+   "device": "CPU",
+   "npy": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/work/bake/bc.npy",
+   "rgb_mean_written": [
+    0.12903,
+    0.06896,
+    0.04165
+   ],
+   "samples": 16,
+   "seconds_per_part": {
+    "cap_100": 4.11,
+    "patch_101": 4.27,
+    "tripo_part_0": 11.05,
+    "tripo_part_1": 7.79,
+    "tripo_part_10": 5.41,
+    "tripo_part_11": 3.57,
+    "tripo_part_2": 7.0,
+    "tripo_part_3": 6.69,
+    "tripo_part_4": 5.8,
+    "tripo_part_5": 5.96,
+    "tripo_part_6": 5.02,
+    "tripo_part_8": 4.86,
+    "tripo_part_9": 5.44
+   },
+   "texels_written": 8159940,
+   "type": "EMIT"
+  },
+  "normal": {
+   "device": "CPU",
+   "npy": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/work/bake/normal.npy",
+   "rgb_mean_written": [
+    0.50042,
+    0.49999,
+    0.97721
+   ],
+   "samples": 16,
+   "seconds_per_part": {
+    "cap_100": 3.04,
+    "patch_101": 3.04,
+    "tripo_part_0": 6.7,
+    "tripo_part_1": 4.8,
+    "tripo_part_10": 3.56,
+    "tripo_part_11": 2.8,
+    "tripo_part_2": 4.73,
+    "tripo_part_3": 4.35,
+    "tripo_part_4": 4.27,
+    "tripo_part_5": 4.36,
+    "tripo_part_6": 3.43,
+    "tripo_part_8": 3.33,
+    "tripo_part_9": 3.47
+   },
+   "texels_written": 8159940,
+   "type": "NORMAL"
+  },
+  "rm": {
+   "device": "CPU",
+   "npy": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/work/bake/rm.npy",
+   "rgb_mean_written": [
+    0.98464,
+    0.76297,
+    0.02488
+   ],
+   "samples": 16,
+   "seconds_per_part": {
+    "cap_100": 4.55,
+    "patch_101": 4.49,
+    "tripo_part_0": 11.03,
+    "tripo_part_1": 7.73,
+    "tripo_part_10": 6.56,
+    "tripo_part_11": 3.86,
+    "tripo_part_2": 7.0,
+    "tripo_part_3": 6.59,
+    "tripo_part_4": 5.88,
+    "tripo_part_5": 6.05,
+    "tripo_part_6": 5.07,
+    "tripo_part_8": 4.8,
+    "tripo_part_9": 5.39
+   },
+   "texels_written": 8159940,
+   "type": "EMIT"
+  }
+ },
+ "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2-bake-h2.json",
+ "profile_sha256": "290171af1526825c1b9960bcaaa432c90cdfa0889451dc73e7ed3edde8670ad3",
+ "recolor": {
+  "tripo_part_1": {
+   "rule": {
+    "box_note": "first run with z >= 0.33 also darkened light tan chest feathers below the V (speckles, review 2026-09-29); the V itself lies at source z 0.373-0.397; harpy-h2-bake/2 adds a narrow second box (|x| <= 0.022, z 0.352-0.37) for the light tip of the V that stayed visible below the neck cap from behind (verified on the high-poly vertex mask 2026-09-29: z >= 0.35 over the full width selects speckles on the tan feathers again, the narrow box does not)",
+    "boxes": [
+     {
+      "max": [
+       0.04,
+       0.12,
+       0.44
+      ],
+      "min": [
+       -0.04,
+       0.0,
+       0.37
+      ]
+     },
+     {
+      "max": [
+       0.022,
+       0.12,
+       0.37
+      ],
+      "min": [
+       -0.022,
+       0.0,
+       0.352
+      ]
+     }
+    ],
+    "luminance_ref": 0.3,
+    "part": "tripo_part_1",
+    "skin": {
+     "s_max": 0.4,
+     "v_min": 0.45
+    },
+    "strength": 1.0,
+    "target_srgb": [
+     0.26,
+     0.18,
+     0.13
+    ],
+    "why": "after the 180 deg turn the torso's skin-coloured V below the old front face sits at the back of the neck (review frame closeup_neck_back); the concept back shows dark feathers there. Skin-like texels (v > 0.45, s < 0.4) of the torso inside the box are tinted to the dark feather tone keeping their luminance detail. Repair, proposal"
+   },
+   "vertices": 133718,
+   "vertices_masked": 2919
+  }
+ },
+ "schema": "unmatched.h2-bake.bake-report/1",
+ "seconds": 268.0,
+ "seed": 0,
+ "size": 4096
+}

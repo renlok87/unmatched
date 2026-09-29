@@ -1,0 +1,1201 @@
+{
+ "armature_object": "SKEL_UM_Humanoid",
+ "blender": "5.2.2 LTS",
+ "checks": {
+  "base_footprint": {
+   "expected": [
+    24.0,
+    24.0,
+    5.0
+   ],
+   "measured": {
+    "min_z": 0.0,
+    "size": [
+     24.0,
+     24.0,
+     5.0
+    ]
+   },
+   "passed": true
+  },
+  "body_weights_valid": {
+   "expected": {
+    "max_influences": "<= 4",
+    "unweighted": 0
+   },
+   "measured": {
+    "max_influences": 4,
+    "unweighted": 0
+   },
+   "passed": true
+  },
+  "bones_17_v2": {
+   "expected": 17,
+   "measured": 17,
+   "passed": true
+  },
+  "export_face_plus_x": {
+   "expected": "face part ahead of the body centroid along +X by > 0.5 uu; lateral yaw 0 +- 10 deg (UE front +X)",
+   "measured": {
+    "body_centroid_uu": [
+     0.495,
+     -0.369,
+     24.342
+    ],
+    "face_part_centroid_uu": [
+     3.41,
+     -0.171,
+     36.865
+    ],
+    "lateral_L_minus_R": [
+     0.0076,
+     0.0848,
+     -0.0025
+    ],
+    "staff_centroid_uu": [
+     0.495,
+     -7.836,
+     32.517
+    ],
+    "yaw_deg": -5.1
+   },
+   "passed": true
+  },
+  "export_no_host_path": {
+   "expected": {
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx": 0,
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SM_Merlin_H2_Base.fbx": 0
+   },
+   "measured": {
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx": 0,
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SM_Merlin_H2_Base.fbx": 0
+   },
+   "note": "number of absolute host paths (repo root, user home, <drive>:/Users/) in the FBX bytes",
+   "passed": true
+  },
+  "export_staff_side_minus_y_blender_plus_y_ue": {
+   "expected": "< -2 uu (Blender export frame) = UE +Y",
+   "measured": -7.467,
+   "passed": true
+  },
+  "figure_triangles_in_proposed_band": {
+   "expected": [
+    30000,
+    45000
+   ],
+   "measured": 33967,
+   "note": "proposal",
+   "passed": true
+  },
+  "hood_top_45uu": {
+   "expected": 45.0,
+   "measured": 44.986,
+   "passed": true
+  },
+  "roundtrip_bones_hierarchy_positions": {
+   "expected": {
+    "bones": 17
+   },
+   "measured": {
+    "bones": 17,
+    "heads_within_0_02uu": true,
+    "parents_ok": true
+   },
+   "passed": true
+  },
+  "roundtrip_material_slots": {
+   "expected": "1 slot M_Merlin_H2_Atlas on SK meshes and SM",
+   "measured": {
+    "SK_Merlin_H2_Body": [
+     "M_Merlin_H2_Atlas"
+    ],
+    "SK_Merlin_H2_Staff": [
+     "M_Merlin_H2_Atlas"
+    ],
+    "SM_Merlin_H2_Base": [
+     "M_Merlin_H2_Atlas"
+    ]
+   },
+   "passed": true
+  },
+  "roundtrip_one_armature_named": {
+   "expected": [
+    "SKEL_UM_Humanoid"
+   ],
+   "measured": [
+    "SKEL_UM_Humanoid"
+   ],
+   "passed": true
+  },
+  "roundtrip_scale_ratio_1": {
+   "expected": [
+    1,
+    1,
+    1
+   ],
+   "measured": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "passed": true
+  },
+  "roundtrip_triangles": {
+   "expected": {
+    "SK_Merlin_H2_Body": 30047,
+    "SK_Merlin_H2_Staff": 3920,
+    "SM_Merlin_H2_Base": 2240
+   },
+   "measured": {
+    "SK_Merlin_H2_Body": 30047,
+    "SK_Merlin_H2_Staff": 3920,
+    "SM_Merlin_H2_Base": 2240
+   },
+   "passed": true
+  },
+  "roundtrip_uv0": {
+   "expected": "one UVMap in [0,1]",
+   "measured": {
+    "SK_Merlin_H2_Body": [
+     [
+      "UVMap"
+     ],
+     true
+    ],
+    "SK_Merlin_H2_Staff": [
+     [
+      "UVMap"
+     ],
+     true
+    ],
+    "SM_Merlin_H2_Base": [
+     [
+      "UVMap"
+     ],
+     true
+    ]
+   },
+   "passed": true
+  },
+  "roundtrip_weights": {
+   "expected": "0 unweighted, <= 4",
+   "measured": {
+    "SK_Merlin_H2_Body": {
+     "max_influences": 4,
+     "unweighted_vertices": 0
+    },
+    "SK_Merlin_H2_Staff": {
+     "max_influences": 1,
+     "unweighted_vertices": 0
+    }
+   },
+   "passed": true
+  },
+  "session_blend_path_empty": {
+   "expected": false,
+   "measured": false,
+   "note": "measured value = a .blend path is open (the path itself is not written to the report)",
+   "passed": true
+  },
+  "staff_rigid_weapon_R": {
+   "expected": {
+    "weapon.R": 1.0
+   },
+   "measured": {
+    "weapon.R": 1.0
+   },
+   "passed": true
+  },
+  "weapon_R_parent_hand_R": {
+   "expected": "hand.R",
+   "measured": "hand.R",
+   "passed": true
+  },
+  "weapon_tail_at_crystal_top": {
+   "expected": "|dz| < 0.2 uu",
+   "measured": -0.002,
+   "passed": true
+  }
+ },
+ "export_frame": {
+  "body_centroid_uu": [
+   0.495,
+   -0.369,
+   24.342
+  ],
+  "face_part_centroid_uu": [
+   3.41,
+   -0.171,
+   36.865
+  ],
+  "lateral_L_minus_R": [
+   0.0076,
+   0.0848,
+   -0.0025
+  ],
+  "staff_centroid_uu": [
+   0.495,
+   -7.836,
+   32.517
+  ],
+  "yaw_deg": -5.1
+ },
+ "exports": {
+  "base_fbx": {
+   "bytes": 85516,
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SM_Merlin_H2_Base.fbx",
+   "sha256": "6214e7bb97bfdf909c5c5545aafad59791423617a8c3ebb957ff1cc482fee3d8"
+  },
+  "settings": {
+   "add_leaf_bones": false,
+   "apply_scale_options": "FBX_SCALE_UNITS",
+   "apply_unit_scale": true,
+   "axis_forward": "-Y",
+   "axis_up": "Z",
+   "bake_anim": false,
+   "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+   "colors_type": "SRGB",
+   "creation_time_pinned": "2000-01-01T00:00:00",
+   "data_scale": 100.0,
+   "deviations_from_preset": {
+    "bake_anim": "off: the candidate FBX carries no clips",
+    "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+   },
+   "embed_textures": false,
+   "export_space_rotation_z_degrees": 90.0,
+   "mesh_smooth_type": "FACE",
+   "path_mode": "STRIP",
+   "preset": {
+    "name": "UM_FBX_v1",
+    "path": "blender/_tools/presets/UM_FBX_v1.json",
+    "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+    "version": "1.0.0"
+   },
+   "primary_bone_axis": "Y",
+   "secondary_bone_axis": "X",
+   "unit_scale_factor_after_patch": 1.0,
+   "use_triangles": true
+  },
+  "skeletal_fbx": {
+   "bytes": 1386172,
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx",
+   "sha256": "c1e29b68192c01b2116cf0dee3eaf53eab164adf95e1ca076d23923e645ca87a"
+  }
+ },
+ "measures": {
+  "base_bounds_uu": {
+   "max": [
+    12.0,
+    12.0,
+    5.0
+   ],
+   "min": [
+    -12.0,
+    -12.0,
+    0.0
+   ]
+  },
+  "base_scale_xyz": [
+   0.501889,
+   0.508409,
+   0.513891
+  ],
+  "bones_final_m": {
+   "arm_lower.L": [
+    [
+     0.06583,
+     0.00505,
+     0.2961
+    ],
+    [
+     0.03983,
+     -0.03685,
+     0.28872
+    ]
+   ],
+   "arm_lower.R": [
+    [
+     -0.06543,
+     0.05049,
+     0.2961
+    ],
+    [
+     -0.0777,
+     0.01191,
+     0.31573
+    ]
+   ],
+   "arm_upper.L": [
+    [
+     0.04311,
+     0.0101,
+     0.34658
+    ],
+    [
+     0.06583,
+     0.00505,
+     0.2961
+    ]
+   ],
+   "arm_upper.R": [
+    [
+     -0.0417,
+     0.01767,
+     0.34911
+    ],
+    [
+     -0.06543,
+     0.05049,
+     0.2961
+    ]
+   ],
+   "foot.L": [
+    [
+     0.05336,
+     -0.00611,
+     0.08643
+    ],
+    [
+     0.06674,
+     -0.07275,
+     0.0524
+    ]
+   ],
+   "foot.R": [
+    [
+     -0.04337,
+     0.03398,
+     0.08269
+    ],
+    [
+     -0.07482,
+     -0.02832,
+     0.05139
+    ]
+   ],
+   "hand.L": [
+    [
+     0.03983,
+     -0.03685,
+     0.28872
+    ],
+    [
+     0.01282,
+     -0.04392,
+     0.27843
+    ]
+   ],
+   "hand.R": [
+    [
+     -0.0777,
+     0.01191,
+     0.31573
+    ],
+    [
+     -0.08048,
+     -0.00732,
+     0.32937
+    ]
+   ],
+   "head": [
+    [
+     0.0002,
+     0.0,
+     0.35415
+    ],
+    [
+     0.00171,
+     -0.00505,
+     0.43998
+    ]
+   ],
+   "hips": [
+    [
+     0.0002,
+     0.00505,
+     0.22289
+    ],
+    [
+     0.0002,
+     0.00505,
+     0.26328
+    ]
+   ],
+   "leg_lower.L": [
+    [
+     0.04059,
+     -0.00505,
+     0.15221
+    ],
+    [
+     0.05336,
+     -0.00611,
+     0.08643
+    ]
+   ],
+   "leg_lower.R": [
+    [
+     -0.03514,
+     0.02272,
+     0.15221
+    ],
+    [
+     -0.04337,
+     0.03398,
+     0.08269
+    ]
+   ],
+   "leg_upper.L": [
+    [
+     0.02544,
+     0.0,
+     0.21784
+    ],
+    [
+     0.04059,
+     -0.00505,
+     0.15221
+    ]
+   ],
+   "leg_upper.R": [
+    [
+     -0.02504,
+     0.0101,
+     0.21784
+    ],
+    [
+     -0.03514,
+     0.02272,
+     0.15221
+    ]
+   ],
+   "root": [
+    [
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.04
+    ]
+   ],
+   "spine": [
+    [
+     0.0002,
+     0.00505,
+     0.26328
+    ],
+    [
+     0.0002,
+     0.00252,
+     0.34911
+    ]
+   ],
+   "weapon.R": [
+    [
+     -0.08048,
+     -0.00732,
+     0.32937
+    ],
+    [
+     -0.07982,
+     -0.00076,
+     0.4942
+    ]
+   ]
+  },
+  "figure_bounds_uu": {
+   "max": [
+    12.118,
+    10.302,
+    49.422
+   ],
+   "min": [
+    -11.504,
+    -7.896,
+    4.759
+   ]
+  },
+  "figure_max_radius_uu": 13.108,
+  "figure_top_uu": 49.422,
+  "figure_triangles": 33967,
+  "hood_top_uu": 44.986,
+  "scale_source_to_final": 0.504853,
+  "triangles": {
+   "SK_Merlin_H2_Body": 30047,
+   "SK_Merlin_H2_Staff": 3920,
+   "SM_Merlin_H2_Base": 2240
+  }
+ },
+ "passed": true,
+ "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json",
+ "profile_id": "merlin-h2-bake/1",
+ "roundtrip": {
+  "base": {
+   "armature_objects": [],
+   "armatures": 0,
+   "bones": {},
+   "meshes": {
+    "SM_Merlin_H2_Base": {
+     "bounds_m": {
+      "max": [
+       0.12,
+       0.12,
+       0.05
+      ],
+      "min": [
+       -0.12,
+       -0.12,
+       0.0
+      ]
+     },
+     "color_attributes": [],
+     "has_custom_normals": true,
+     "material_slots": [
+      "M_Merlin_H2_Atlas"
+     ],
+     "near_degenerate_area_cm2_below": 0.0001,
+     "near_degenerate_triangles": 0,
+     "polygons": 2240,
+     "triangles": 2240,
+     "uv0_in_unit_square": true,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "vertices": 1122,
+     "weights": null
+    }
+   }
+  },
+  "scale_ratio": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "skeletal": {
+   "armature_objects": [
+    "SKEL_UM_Humanoid"
+   ],
+   "armatures": 1,
+   "bones": {
+    "arm_lower.L": {
+     "head_m": [
+      0.06583,
+      0.00505,
+      0.2961
+     ],
+     "parent": "arm_upper.L",
+     "tail_m": [
+      0.03983,
+      -0.03685,
+      0.28872
+     ]
+    },
+    "arm_lower.R": {
+     "head_m": [
+      -0.06543,
+      0.05049,
+      0.2961
+     ],
+     "parent": "arm_upper.R",
+     "tail_m": [
+      -0.0777,
+      0.01191,
+      0.31573
+     ]
+    },
+    "arm_upper.L": {
+     "head_m": [
+      0.04311,
+      0.0101,
+      0.34658
+     ],
+     "parent": "spine",
+     "tail_m": [
+      0.06583,
+      0.00505,
+      0.2961
+     ]
+    },
+    "arm_upper.R": {
+     "head_m": [
+      -0.0417,
+      0.01767,
+      0.34911
+     ],
+     "parent": "spine",
+     "tail_m": [
+      -0.06543,
+      0.05049,
+      0.2961
+     ]
+    },
+    "foot.L": {
+     "head_m": [
+      0.05336,
+      -0.00611,
+      0.08643
+     ],
+     "parent": "leg_lower.L",
+     "tail_m": [
+      0.06516,
+      -0.06487,
+      0.05643
+     ]
+    },
+    "foot.R": {
+     "head_m": [
+      -0.04337,
+      0.03398,
+      0.08269
+     ],
+     "parent": "leg_lower.R",
+     "tail_m": [
+      -0.07253,
+      -0.02377,
+      0.05368
+     ]
+    },
+    "hand.L": {
+     "head_m": [
+      0.03983,
+      -0.03685,
+      0.28872
+     ],
+     "parent": "arm_lower.L",
+     "tail_m": [
+      -0.00543,
+      -0.0487,
+      0.27147
+     ]
+    },
+    "hand.R": {
+     "head_m": [
+      -0.0777,
+      0.01191,
+      0.31573
+     ],
+     "parent": "arm_lower.R",
+     "tail_m": [
+      -0.08048,
+      -0.00732,
+      0.32937
+     ]
+    },
+    "head": {
+     "head_m": [
+      0.0002,
+      -0.0,
+      0.35415
+     ],
+     "parent": "spine",
+     "tail_m": [
+      0.00185,
+      -0.0055,
+      0.44771
+     ]
+    },
+    "hips": {
+     "head_m": [
+      0.0002,
+      0.00505,
+      0.22289
+     ],
+     "parent": "root",
+     "tail_m": [
+      0.0002,
+      0.00505,
+      0.25384
+     ]
+    },
+    "leg_lower.L": {
+     "head_m": [
+      0.04059,
+      -0.00505,
+      0.15221
+     ],
+     "parent": "leg_upper.L",
+     "tail_m": [
+      0.05336,
+      -0.00611,
+      0.08643
+     ]
+    },
+    "leg_lower.R": {
+     "head_m": [
+      -0.03514,
+      0.02272,
+      0.15221
+     ],
+     "parent": "leg_upper.R",
+     "tail_m": [
+      -0.04337,
+      0.03398,
+      0.08269
+     ]
+    },
+    "leg_upper.L": {
+     "head_m": [
+      0.02544,
+      0.0,
+      0.21784
+     ],
+     "parent": "hips",
+     "tail_m": [
+      0.04059,
+      -0.00505,
+      0.15221
+     ]
+    },
+    "leg_upper.R": {
+     "head_m": [
+      -0.02504,
+      0.0101,
+      0.21784
+     ],
+     "parent": "hips",
+     "tail_m": [
+      -0.03514,
+      0.02272,
+      0.15221
+     ]
+    },
+    "root": {
+     "head_m": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "parent": null,
+     "tail_m": [
+      0.0,
+      0.0,
+      0.22295
+     ]
+    },
+    "spine": {
+     "head_m": [
+      0.0002,
+      0.00505,
+      0.26328
+     ],
+     "parent": "hips",
+     "tail_m": [
+      0.0002,
+      0.00229,
+      0.35697
+     ]
+    },
+    "weapon.R": {
+     "head_m": [
+      -0.08048,
+      -0.00732,
+      0.32937
+     ],
+     "parent": "hand.R",
+     "tail_m": [
+      -0.08038,
+      -0.00638,
+      0.35308
+     ]
+    }
+   },
+   "meshes": {
+    "SK_Merlin_H2_Body": {
+     "bounds_m": {
+      "max": [
+       0.12118,
+       0.10302,
+       0.44986
+      ],
+      "min": [
+       -0.11504,
+       -0.07896,
+       0.04759
+      ]
+     },
+     "color_attributes": [],
+     "has_custom_normals": true,
+     "material_slots": [
+      "M_Merlin_H2_Atlas"
+     ],
+     "near_degenerate_area_cm2_below": 0.0001,
+     "near_degenerate_triangles": 3,
+     "polygons": 30047,
+     "triangles": 30047,
+     "uv0_in_unit_square": true,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "vertices": 14998,
+     "weights": {
+      "bones_used": {
+       "arm_lower.L": 1046,
+       "arm_lower.R": 1163,
+       "arm_upper.L": 2171,
+       "arm_upper.R": 2198,
+       "foot.L": 486,
+       "foot.R": 508,
+       "hand.L": 1002,
+       "hand.R": 978,
+       "head": 3397,
+       "hips": 5704,
+       "leg_upper.L": 3558,
+       "leg_upper.R": 3620,
+       "spine": 4441
+      },
+      "max_influences": 4,
+      "not_normalised_vertices": 0,
+      "unweighted_vertices": 0,
+      "vertices": 14998,
+      "weight_share": {
+       "arm_lower.L": 0.0486,
+       "arm_lower.R": 0.043,
+       "arm_upper.L": 0.0387,
+       "arm_upper.R": 0.0413,
+       "foot.L": 0.0309,
+       "foot.R": 0.0322,
+       "hand.L": 0.0668,
+       "hand.R": 0.0607,
+       "head": 0.1687,
+       "hips": 0.2151,
+       "leg_upper.L": 0.0592,
+       "leg_upper.R": 0.0596,
+       "spine": 0.1354
+      }
+     }
+    },
+    "SK_Merlin_H2_Staff": {
+     "bounds_m": {
+      "max": [
+       -0.05786,
+       0.01748,
+       0.49422
+      ],
+      "min": [
+       -0.10156,
+       -0.01866,
+       0.0672
+      ]
+     },
+     "color_attributes": [],
+     "has_custom_normals": true,
+     "material_slots": [
+      "M_Merlin_H2_Atlas"
+     ],
+     "near_degenerate_area_cm2_below": 0.0001,
+     "near_degenerate_triangles": 0,
+     "polygons": 3920,
+     "triangles": 3920,
+     "uv0_in_unit_square": true,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "vertices": 1964,
+     "weights": {
+      "bones_used": {
+       "weapon.R": 1964
+      },
+      "max_influences": 1,
+      "not_normalised_vertices": 0,
+      "unweighted_vertices": 0,
+      "vertices": 1964,
+      "weight_share": {
+       "weapon.R": 1.0
+      }
+     }
+    }
+   }
+  }
+ },
+ "skeleton": "UM_HUMANOID_17_v2",
+ "sockets": [
+  {
+   "bone": "weapon.R",
+   "location_uu_for_ue": [
+    0,
+    0,
+    0
+   ],
+   "name": "Weapon",
+   "offset_blender_bone_local_uu": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "offset_ue_bone_local_uu_predicted": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "part": null,
+   "status": "предложено",
+   "target": "bone_head",
+   "target_blender_m": [
+    -0.08048,
+    -0.00732,
+    0.32937
+   ],
+   "target_ue_component_uu": [
+    0.732,
+    8.048,
+    32.937
+   ],
+   "ue_bone": "weapon_R"
+  },
+  {
+   "bone": "head",
+   "location_uu_for_ue": [
+    -0.121,
+    -1.448,
+    2.588
+   ],
+   "name": "Head",
+   "offset_blender_bone_local_uu": [
+    -0.121,
+    1.448,
+    2.588
+   ],
+   "offset_ue_bone_local_uu_predicted": [
+    -0.121,
+    -1.448,
+    2.588
+   ],
+   "part": "tripo_part_9",
+   "status": "предложено",
+   "target": "part_bbox_centre",
+   "target_blender_m": [
+    -0.00124,
+    -0.02666,
+    0.36712
+   ],
+   "target_ue_component_uu": [
+    2.666,
+    0.124,
+    36.712
+   ],
+   "ue_bone": "head"
+  },
+  {
+   "bone": "weapon.R",
+   "location_uu_for_ue": [
+    -0.169,
+    -14.19,
+    -0.211
+   ],
+   "name": "StaffTip_proposal",
+   "offset_blender_bone_local_uu": [
+    -0.169,
+    14.19,
+    -0.211
+   ],
+   "offset_ue_bone_local_uu_predicted": [
+    -0.169,
+    -14.19,
+    -0.211
+   ],
+   "part": "tripo_part_7",
+   "status": "предложено (AD-CNF-59 open): crystal centre for the ranged-attack VFX (CUE-008); not created in UE by this run",
+   "target": "part_bbox_centre",
+   "target_blender_m": [
+    -0.0816,
+    0.00044,
+    0.47108
+   ],
+   "target_ue_component_uu": [
+    -0.044,
+    8.16,
+    47.108
+   ],
+   "ue_bone": "weapon_R"
+  }
+ ],
+ "stage": "rig",
+ "weights": {
+  "body": {
+   "bone_share": {
+    "arm_lower.L": 0.0486,
+    "arm_lower.R": 0.043,
+    "arm_upper.L": 0.0387,
+    "arm_upper.R": 0.0413,
+    "foot.L": 0.0309,
+    "foot.R": 0.0322,
+    "hand.L": 0.0668,
+    "hand.R": 0.0607,
+    "head": 0.1687,
+    "hips": 0.2151,
+    "leg_upper.L": 0.0592,
+    "leg_upper.R": 0.0596,
+    "spine": 0.1354
+   },
+   "max_influences": 4,
+   "unweighted": 0,
+   "vertices": 14998
+  },
+  "groups": [
+   {
+    "allowed": [
+     "hand.R"
+    ],
+    "cleanup": {
+     "rigid": "hand.R"
+    },
+    "parts": [
+     "tripo_part_6"
+    ],
+    "vertices": 940
+   },
+   {
+    "allowed": [
+     "hand.L"
+    ],
+    "cleanup": {
+     "rigid": "hand.L"
+    },
+    "parts": [
+     "tripo_part_8"
+    ],
+    "vertices": 1002
+   },
+   {
+    "allowed": [
+     "foot.L"
+    ],
+    "cleanup": {
+     "rigid": "foot.L"
+    },
+    "parts": [
+     "tripo_part_5"
+    ],
+    "vertices": 480
+   },
+   {
+    "allowed": [
+     "foot.R"
+    ],
+    "cleanup": {
+     "rigid": "foot.R"
+    },
+    "parts": [
+     "tripo_part_11"
+    ],
+    "vertices": 499
+   },
+   {
+    "allowed": [
+     "head",
+     "spine"
+    ],
+    "cleanup": {
+     "ramped_z": 720
+    },
+    "parts": [
+     "tripo_part_9"
+    ],
+    "vertices": 2263
+   },
+   {
+    "allowed": [
+     "arm_upper.L",
+     "arm_upper.R",
+     "head",
+     "hips",
+     "leg_upper.L",
+     "leg_upper.R",
+     "spine"
+    ],
+    "cleanup": {
+     "capped": 4196,
+     "ramped_z": 8835
+    },
+    "parts": [
+     "tripo_part_0"
+    ],
+    "vertices": 7741
+   },
+   {
+    "allowed": [
+     "arm_lower.L",
+     "arm_upper.L",
+     "spine"
+    ],
+    "cleanup": {},
+    "parts": [
+     "tripo_part_3"
+    ],
+    "vertices": 1111
+   },
+   {
+    "allowed": [
+     "arm_lower.R",
+     "arm_upper.R",
+     "spine"
+    ],
+    "cleanup": {},
+    "parts": [
+     "tripo_part_4"
+    ],
+    "vertices": 1155
+   }
+  ],
+  "per_part_top_bones": {
+   "tripo_part_0": {
+    "head": 0.12,
+    "hips": 0.416,
+    "leg_upper.R": 0.115,
+    "spine": 0.184
+   },
+   "tripo_part_11": {
+    "foot.R": 0.965,
+    "hips": 0.017,
+    "leg_upper.L": 0.006,
+    "leg_upper.R": 0.012
+   },
+   "tripo_part_3": {
+    "arm_lower.L": 0.657,
+    "arm_upper.L": 0.334,
+    "spine": 0.01
+   },
+   "tripo_part_4": {
+    "arm_lower.R": 0.544,
+    "arm_upper.R": 0.415,
+    "hand.R": 0.018,
+    "spine": 0.024
+   },
+   "tripo_part_5": {
+    "foot.L": 0.962,
+    "hips": 0.019,
+    "leg_upper.L": 0.013,
+    "leg_upper.R": 0.006
+   },
+   "tripo_part_6": {
+    "arm_lower.R": 0.032,
+    "arm_upper.R": 0.005,
+    "hand.R": 0.963,
+    "spine": 0.0
+   },
+   "tripo_part_8": {
+    "hand.L": 1.0
+   },
+   "tripo_part_9": {
+    "arm_upper.L": 0.003,
+    "arm_upper.R": 0.002,
+    "head": 0.735,
+    "spine": 0.26
+   }
+  },
+  "seam_sync_radius_m_final": 0.00606,
+  "seam_vertices": 193,
+  "staff": {
+   "bone_share": {
+    "weapon.R": 1.0
+   },
+   "max_influences": 1,
+   "unweighted": 0,
+   "vertices": 1964
+  },
+  "synced_vertices": 751
+ }
+}

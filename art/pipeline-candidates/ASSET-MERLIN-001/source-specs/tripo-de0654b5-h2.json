@@ -1,0 +1,136 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-de0654b5-h2",
+  "asset_id": "ASSET-MERLIN-001",
+  "service": "tripo-studio",
+  "task_id": "de0654b5-b879-46aa-90fe-62a05e7c6366",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/de0654b5-b879-46aa-90fe-62a05e7c6366",
+  "date": "2026-09-29",
+  "iteration": "H2 (проработка героев по концептам hero-quality-v1)",
+  "model_version": {
+    "ui_label": null,
+    "backend": null,
+    "note": "H3.1 со слов оркестратора; подпись UI не записана"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/hero-quality-v1/merlin/merlin-front.png",
+        "sha256": "25856808d165affebc0ad26fd774ef589b725d7a92d3fa3c6cdd4757e76db0bf"
+      },
+      "left": null,
+      "right": {
+        "path": "art/imagegen/hero-quality-v1/merlin/merlin-side.png",
+        "sha256": "6a9cadbb5281c26d9adbfed61eac33528ed2eea84cb79d9f1ad8433cd3b3ea8b"
+      },
+      "back": {
+        "path": "art/imagegen/hero-quality-v1/merlin/merlin-back.png",
+        "sha256": "c077b41a260fe937a152d85f560375af7a6632c6769ba7105c6e00b8c043123d"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/hero-quality-v1/merlin/prompts.md",
+    "slot_note": "Боковой концепт — правый вид (prompts.md), подан в слот RIGHT: согласовано (как у прежнего H3.1 Merlin d9ff4260).",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": null,
+      "topology": null,
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — это последующие шаги генератора текстур и PBR на high-poly, а не настройки генерации геометрии. null = не записано."
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "Из нескольких видов в модель, по частям (Баланс), ультра-геометрия 2M, без текстуры",
+      "history_time": "2026-09-29 07:02",
+      "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60,
+        "balance_before": 24085,
+        "balance_after": 24025
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, удалить освещение, на high-poly модели по частям",
+      "history_time": "2026-09-29 07:12",
+      "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30,
+        "balance_before": 23935,
+        "balance_after": 23905
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": "2026-09-29 07:18",
+      "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5,
+        "balance_before": 23865,
+        "balance_after": 23860
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-parts12.glb",
+      "expected_sha256": "82c3eff8e73359969decc807a637eccc5e05847df91e5d5c1a8d4377205cd74d",
+      "expected_bytes": 46857420,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-tex8k-pbr.glb",
+      "expected_sha256": "bb970839f3431af1f7bc188a62502ea210dc65210796257f8c391f40fbbfd9d2",
+      "expected_bytes": 69793876,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export после текстуры 8K (удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB (44–77 МБ) не коммитятся: .gitignore ассета исключает 20260929-h2-tripo/source/*-parts*.glb и *-tex8k-pbr.glb; файл восстанавливается выгрузкой из Studio по task_url и проверяется по expected_sha256/expected_bytes",
+  "expectations": {
+    "h2-parts-glb": {
+      "glb_mesh_count": 12,
+      "glb_triangles": 1947523,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h2-tex8k-pbr-glb": {
+      "glb_mesh_count": 12,
+      "glb_triangles": 1947523,
+      "glb_materials": 12,
+      "glb_images": 36,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/reports/tripo-run.json",
+    "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json"
+  ]
+}

@@ -1,0 +1,183 @@
+{
+ "source": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/work/probe-fbx-authored.blend",
+ "label": "merlin-h2-fbx",
+ "family": "contract17",
+ "family_bone_hits": 7,
+ "height": 0.44663,
+ "bbox_min": [
+  -0.115,
+  -0.079,
+  0.0476
+ ],
+ "bbox_max": [
+  0.1212,
+  0.103,
+  0.4942
+ ],
+ "tests": [
+  {
+   "test": "head_turn",
+   "bone": "head",
+   "axis": "Z",
+   "deg": 35,
+   "moved_vertices": 2877,
+   "centroid_z_norm": 0.757,
+   "centroid_x_norm": -0.033,
+   "expect": {
+    "z_norm_min": 0.7
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Merlin_H2_Body",
+     0.1918
+    ],
+    [
+     "SK_Merlin_H2_Staff",
+     0.0
+    ]
+   ]
+  },
+  {
+   "test": "spine_bend_fwd",
+   "bone": "spine",
+   "axis": "X",
+   "deg": 25,
+   "moved_vertices": 10980,
+   "centroid_z_norm": 0.625,
+   "centroid_x_norm": -0.191,
+   "expect": {
+    "z_norm_min": 0.45
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Merlin_H2_Staff",
+     0.9847
+    ],
+    [
+     "SK_Merlin_H2_Body",
+     0.6031
+    ]
+   ]
+  },
+  {
+   "test": "arm_l_raise",
+   "bone": "arm_upper.L",
+   "axis": "Y",
+   "deg": -45,
+   "moved_vertices": 2575,
+   "centroid_z_norm": 0.551,
+   "centroid_x_norm": 0.321,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_min": 0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Merlin_H2_Body",
+     0.1717
+    ],
+    [
+     "SK_Merlin_H2_Staff",
+     0.0
+    ]
+   ]
+  },
+  {
+   "test": "arm_r_raise",
+   "bone": "arm_upper.R",
+   "axis": "Y",
+   "deg": 45,
+   "moved_vertices": 4285,
+   "centroid_z_norm": 0.605,
+   "centroid_x_norm": -0.649,
+   "expect": {
+    "z_norm_min": 0.35,
+    "x_norm_max": -0.15
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Merlin_H2_Staff",
+     1.0
+    ],
+    [
+     "SK_Merlin_H2_Body",
+     0.1548
+    ]
+   ]
+  },
+  {
+   "test": "forearm_l_bend",
+   "bone": "arm_lower.L",
+   "axis": "X",
+   "deg": -40,
+   "moved_vertices": 1902,
+   "centroid_z_norm": 0.505,
+   "centroid_x_norm": 0.318,
+   "expect": {
+    "z_norm_min": 0.3,
+    "x_norm_min": 0.2
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Merlin_H2_Body",
+     0.1268
+    ],
+    [
+     "SK_Merlin_H2_Staff",
+     0.0
+    ]
+   ]
+  },
+  {
+   "test": "thigh_l_flex",
+   "bone": "leg_upper.L",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 3451,
+   "centroid_z_norm": 0.098,
+   "centroid_x_norm": 0.219,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Merlin_H2_Body",
+     0.2301
+    ],
+    [
+     "SK_Merlin_H2_Staff",
+     0.0
+    ]
+   ]
+  },
+  {
+   "test": "thigh_r_flex",
+   "bone": "leg_upper.R",
+   "axis": "X",
+   "deg": -35,
+   "moved_vertices": 3568,
+   "centroid_z_norm": 0.097,
+   "centroid_x_norm": -0.209,
+   "expect": {
+    "z_norm_max": 0.55
+   },
+   "status": "plausible",
+   "top_meshes_moved_share": [
+    [
+     "SK_Merlin_H2_Body",
+     0.2379
+    ],
+    [
+     "SK_Merlin_H2_Staff",
+     0.0
+    ]
+   ]
+  }
+ ]
+}

@@ -4,3 +4,12 @@
 */pipeline/.staging/
 */pipeline/run.lock
 *.blend1
+# H2 Tripo originals (44-77 MB each, >50 MB policy): not committed, pinned by sha256/bytes in
+# source-specs/tripo-<task8>-h2.json and 20260929-h2-tripo/reports/tripo-run.json.
+20260929-h2-tripo/source/*-tex8k-pbr.glb
+20260929-h2-tripo/source/*-parts*.glb
+# H2 4K master textures: kept local (reproducible from the local build, sha256 pinned in
+# 20260929-h2-bake/reports/textures-report.json); the 2K runtime set is committed.
+20260929-h2-bake/textures/master_4k/
+20260929-h2-bake/textures/4k/
+20260929-h2-bake/textures/*_4K.png

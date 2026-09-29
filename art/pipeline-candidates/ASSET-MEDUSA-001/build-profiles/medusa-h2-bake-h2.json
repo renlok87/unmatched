@@ -1,0 +1,1509 @@
+{
+  "schema": "unmatched.h2-bake-profile/1",
+  "profile_id": "medusa-h2-bake/1",
+  "asset_id": "ASSET-MEDUSA-001",
+  "status": "предложено",
+  "status_note": "Итерация H2 (2026-09-29): игровая модель Medusa из high-poly Tripo 40c4d1cd (по частям, ~1,86M tris) и его 8K/PBR-двойника: ретопология по частям, атлас 4K мастер + 2K рантайм, запекание N/AO/BC/RM, риг UM_HUMANOID_17_v2, UM_FBX_v1. Не художественная приёмка и не бюджет; текущий игровой кандидат v2/v3.1 остаётся до приёмки H2.",
+  "expected_part_count": 17,
+  "sources": {
+    "source_spec": "art/pipeline-candidates/ASSET-MEDUSA-001/source-specs/tripo-40c4d1cd-h2.json",
+    "parts_glb": {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/source/medusa-h2-tripo-40c4d1cd-parts17.glb",
+      "sha256": "69ef27b36fb9c46fd16ec2acf6f930a2d61f98af1847ea73225266295b147f32",
+      "bytes": 44696832
+    },
+    "tex_glb": {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-tripo/source/medusa-h2-tripo-40c4d1cd-tex8k-pbr.glb",
+      "sha256": "c1ae050f7b8a63f06aaecca2acef263ccdf07c8a5a9e84b52d14e9415e495604",
+      "bytes": 69244076
+    }
+  },
+  "parts": {
+    "tripo_part_0": {
+      "mesh": "body",
+      "role": "платье, плащ-накидка, ремень колчана, пояс (ткань + кожа + золото)",
+      "cloth": true
+    },
+    "tripo_part_1": {
+      "mesh": "body",
+      "role": "голова: лицо, диадема, 7 змей короны, шея, открытая кожа груди"
+    },
+    "tripo_part_2": {
+      "mesh": "base",
+      "role": "подставка"
+    },
+    "tripo_part_3": {
+      "mesh": "weapon",
+      "role": "лук с тетивой (левая рука)"
+    },
+    "tripo_part_4": {
+      "mesh": "body",
+      "role": "правая голень: поножь + сандалия"
+    },
+    "tripo_part_5": {
+      "mesh": "body",
+      "role": "левая голень: поножь + сандалия"
+    },
+    "tripo_part_6": {
+      "mesh": "body",
+      "role": "левое плечо (верх руки)"
+    },
+    "tripo_part_7": {
+      "mesh": "body",
+      "role": "правое плечо (верх руки)"
+    },
+    "tripo_part_8": {
+      "mesh": "body",
+      "role": "правое предплечье: браслет-наруч"
+    },
+    "tripo_part_9": {
+      "mesh": "body",
+      "role": "правое бедро (открытая нога в разрезе)"
+    },
+    "tripo_part_10": {
+      "mesh": "body",
+      "role": "колчан со стрелами (спина справа)"
+    },
+    "tripo_part_11": {
+      "mesh": "body",
+      "role": "левое предплечье: наруч + кисть на рукояти лука"
+    },
+    "tripo_part_12": {
+      "mesh": "body",
+      "role": "левое бедро (открытая нога в разрезе)"
+    },
+    "tripo_part_13": {
+      "mesh": "body",
+      "role": "правая кисть (кулак у пояса)"
+    },
+    "tripo_part_14": {
+      "mesh": "body",
+      "role": "правая сандалия: носок"
+    },
+    "tripo_part_15": {
+      "mesh": "body",
+      "role": "левая сандалия: носок"
+    },
+    "tripo_part_16": {
+      "mesh": "body",
+      "role": "правая сандалия: пятка"
+    }
+  },
+  "scale": {
+    "figure_top_m": 0.55,
+    "base_diameter_m": 0.3,
+    "base_height_m": 0.06
+  },
+  "orientation": {
+    "method": "ray-escape",
+    "samples_per_part": 4000,
+    "seed": 0,
+    "flip_below_score": -0.5,
+    "expected_inside_out_parts": [],
+    "min_score_after_fix": 0.5
+  },
+  "retopo": {
+    "method": "decimate-collapse",
+    "seed": 0,
+    "deviation_samples": 40000,
+    "target_tris": {
+      "tripo_part_0": 9000,
+      "tripo_part_1": 9000,
+      "tripo_part_2": 1200,
+      "tripo_part_3": 5000,
+      "tripo_part_4": 2500,
+      "tripo_part_5": 2500,
+      "tripo_part_6": 1000,
+      "tripo_part_7": 1000,
+      "tripo_part_8": 1500,
+      "tripo_part_9": 800,
+      "tripo_part_10": 2000,
+      "tripo_part_11": 2000,
+      "tripo_part_12": 800,
+      "tripo_part_13": 1200,
+      "tripo_part_14": 500,
+      "tripo_part_15": 500,
+      "tripo_part_16": 250
+    },
+    "dense_regions": [
+      {
+        "part": "tripo_part_1",
+        "name": "face",
+        "box_m": [
+          [
+            -0.03,
+            -0.045,
+            0.425
+          ],
+          [
+            0.03,
+            0.005,
+            0.495
+          ]
+        ],
+        "target_tris": 1600,
+        "note": "лицо и диадема спереди головы: плотность выше остальной части (змеи, шея)"
+      }
+    ],
+    "cleanup": {
+      "merge_distance_m": 1e-06,
+      "degenerate_distance_m": 1e-07,
+      "tiny_island_area_m2": 2e-07,
+      "degenerate_area_m2": 1e-10
+    },
+    "caps": [
+      {
+        "part": "tripo_part_2",
+        "z_band_m": [
+          0.055,
+          0.0605
+        ],
+        "note": "верх подставки Tripo вырезан под ступнями, пятками и подолом (9 открытых петель, z 0,0565–0,0592 м, замер): дыры видны в кадре K2 −55°; закрываются плоскими крышками"
+      }
+    ]
+  },
+  "closure": {
+    "note": "контактные крышки (verify 2026-09-29): сегментация Tripo «по частям» режет каждую часть по линии контакта с соседом; в позе сосед уходит и открывается сквозная дыра. Каждая петля закрывается отдельной крышкой по самой петле (вершины петли продублированы, те же позиционные веса), высота по нормали Ньюэлла: гармоническая или по форме окружающей поверхности (fit), bulge < 0 — внутрь части",
+    "spacing_m": 0.006,
+    "bulge_m": -0.001,
+    "ring_m": 0.008,
+    "min_perimeter_cm": 3.0,
+    "max_median_mm": 1.0,
+    "inventory_min_perimeter_cm": 1.0,
+    "degenerate_area_m2": 1e-10,
+    "texel_priority": 0.7,
+    "rest_visibility": {
+      "pitch_m": 0.001,
+      "max_covers_front_share": 0.0001,
+      "note": "17 ортоганальных ray-cast видов (raycam.DEFAULT_VIEWS: 8 по кругу, 4 сверху 35°, K2 55°, 4 снизу −25°), шаг 1 мм; крышка не должна закрывать лицевую поверхность, видимую в покое",
+      "max_covers_front_blob_px": 9
+    },
+    "contact_caps": [
+      {
+        "name": "dress_under_fist",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_13",
+        "shape": "fit",
+        "spacing_m": 0.0025,
+        "bulge_m": -0.0005,
+        "note": "платье/пояс под правым кулаком: крышка по форме пояса",
+        "repaint_footprint": {
+          "max_distance_m": 0.025,
+          "max_ray_m": 0.1,
+          "max_escape_share": 0.1,
+          "min_cover_share": 0.4
+        },
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "fist_palm",
+        "part": "tripo_part_13",
+        "covered_by": "tripo_part_0",
+        "spacing_m": 0.0025,
+        "bulge_m": -0.001,
+        "note": "кулак со стороны пояса (ладонь)",
+        "repaint_footprint": {
+          "max_distance_m": 0.025,
+          "max_ray_m": 0.1,
+          "max_escape_share": 0.1,
+          "min_cover_share": 0.4
+        },
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "armhole_l",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_6",
+        "repaint_footprint": {
+          "max_distance_m": 0.025,
+          "max_ray_m": 0.1,
+          "max_escape_share": 0.1,
+          "min_cover_share": 0.4
+        },
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "armhole_r",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_7",
+        "repaint_footprint": {
+          "max_distance_m": 0.025,
+          "max_ray_m": 0.1,
+          "max_escape_share": 0.1,
+          "min_cover_share": 0.4
+        },
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "shoulder_top_l",
+        "part": "tripo_part_6",
+        "covered_by": "tripo_part_0",
+        "repaint_footprint": {
+          "max_distance_m": 0.025,
+          "max_ray_m": 0.1,
+          "max_escape_share": 0.1,
+          "min_cover_share": 0.4
+        },
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "shoulder_top_r",
+        "part": "tripo_part_7",
+        "covered_by": "tripo_part_0",
+        "repaint_footprint": {
+          "max_distance_m": 0.025,
+          "max_ray_m": 0.1,
+          "max_escape_share": 0.1,
+          "min_cover_share": 0.4
+        },
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "slit_r",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_9",
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "slit_l",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_12",
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "thigh_top_r",
+        "part": "tripo_part_9",
+        "covered_by": "tripo_part_0",
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "thigh_top_l",
+        "part": "tripo_part_12",
+        "covered_by": "tripo_part_0",
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "thigh_knee_l",
+        "part": "tripo_part_12",
+        "covered_by": "tripo_part_5",
+        "note": "низ левого бедра у поножи: петля совпадает с поножью лишь частично (медиана 0,17 мм, p90 11 мм), остальное в покое закрывает платье — при thigh_l_flex видна изнанка бедра (ray-тест seams)",
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "dress_over_greave_l",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_5",
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "greave_top_r",
+        "part": "tripo_part_4",
+        "covered_by": "tripo_part_0",
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "greave_top_l",
+        "part": "tripo_part_5",
+        "covered_by": "tripo_part_0",
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "hem_floor",
+        "part": "tripo_part_0",
+        "covered_by": "tripo_part_2",
+        "max_median_mm": 3.0,
+        "bulge_m": 0.0,
+        "note": "низ подола на подставке: виден снизу, когда подол поднимается",
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "sole_r",
+        "part": "tripo_part_4",
+        "covered_by": "tripo_part_2",
+        "max_median_mm": 2.0,
+        "expect": 2,
+        "bulge_m": 0.0,
+        "note": "подошва правой сандалии (две петли)",
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      },
+      {
+        "name": "sole_l",
+        "part": "tripo_part_5",
+        "covered_by": "tripo_part_2",
+        "max_median_mm": 2.0,
+        "expect": 2,
+        "bulge_m": 0.0,
+        "note": "подошва левой сандалии (две петли)",
+        "rim_ring_m": [
+          0.004,
+          0.009,
+          4
+        ]
+      }
+    ],
+    "not_capped_note": "ворот (платье ↔ шея, tripo_part_0 ↔ tripo_part_1) закрыт весами, а не крышкой: петля ворота — седло (перепад 41 мм), гармоническая крышка выходила перед кожей декольте в покое (замер rest_visibility); стык ворота ведёт rig.junctions. Колчан ↔ платье (обе части на spine, в пробах 0,0 мм) и стыки внутри конечностей (позиционные веса, 0,00–0,07 мм) не закрываются: там петли соседей совпадают и не расходятся",
+    "rim_sample_fraction": 0.35,
+    "texel_note": "тексели крышек не запекаются, а заполняются стадией textures от кромки: вершина крышки = линейная комбинация отсчётов граней кромки (граница) или гармонические веса границы (внутри); N — плоская (0,5; 0,5; 1); texel_priority — множитель плотности островов крышек",
+    "rebuild_retopo_caps": [
+      {
+        "name": "base_hole",
+        "part": "tripo_part_2",
+        "z_band_m": [
+          0.055,
+          0.0605
+        ],
+        "expect": 9,
+        "shape": "harmonic",
+        "bulge_m": 0.0,
+        "min_perimeter_cm": 0.0,
+        "note": "дыры верха подставки: веера retopo (0,3 мм ниже кромки) заменены крышками по точной кромке — между кромкой и веером под углом была видна изнанка верха (ray-тест seams, стопа поднята)",
+        "spacing_m": 0.012
+      }
+    ],
+    "footprint_note": "repaint_footprint: грани части у закрытой петли, скрытые в покое под покрывающей частью (лучи из центра грани по полусфере нормали, 64 направления Фибоначчи с d·n > 0,2, против всей фигуры: ≤ 10 % уходят наружу и ≥ 40 % упираются в покрывающую часть), получают BC/RM/AO от видимой поверхности вокруг (нормали остаются запечёнными): Tripo текстурировал невидимую зону цветом соседа (светлое пятно на поясе, где был кулак — кадр пробы arm_r_raise)",
+    "rim_ring_note": "rim_ring_m [d_in, d_out, k]: граничные вершины крышки берут отсчёты у k ближайших вершин части на расстоянии d_in..d_out от петли, а не у самой кромки — текстура Tripo прямо на линии контакта несёт цвет соседа (пояс под кулаком телесный: кадр пробы arm_r_raise)"
+  },
+  "uv": {
+    "atlas_px": 4096,
+    "runtime_px": 2048,
+    "min_gap_px": 8,
+    "pack_margin_fraction": 0.0013,
+    "max_overlap_px": 0,
+    "charts": {
+      "unwrap_method": "MINIMUM_STRETCH",
+      "normal_penalty": 3.0,
+      "max_rounds": 6,
+      "max_overlap_share": 0.0,
+      "max_stretch_log_p95": 0.5,
+      "chart_area_cm2": {
+        "default": 18,
+        "tripo_part_0": 60,
+        "tripo_part_1": 9,
+        "tripo_part_2": 180,
+        "tripo_part_3": 9,
+        "tripo_part_10": 9
+      },
+      "regions": [
+        {
+          "part": "tripo_part_1",
+          "name": "face",
+          "box_m": [
+            [
+              -0.03,
+              -0.045,
+              0.425
+            ],
+            [
+              0.03,
+              0.005,
+              0.495
+            ]
+          ],
+          "chart_area_cm2": 40
+        }
+      ],
+      "note": "Smart UV Project резал децимированный меш на 5 402 острова (41 % атласа при зазоре 8 px, замер) и перекрывал складки ткани; карты Вороного по поверхности + MINIMUM_STRETCH + сглаживание границ дают ~1 600 островов и ~46 % (предел упаковщика Blender на рваных островах; см. отчёт)",
+      "stretch_min_faces": 12,
+      "smooth_iterations": 4
+    },
+    "texel_priority": {
+      "default": 1.0,
+      "parts": {
+        "tripo_part_3": 1.5,
+        "tripo_part_13": 1.75,
+        "tripo_part_2": 0.45,
+        "tripo_part_14": 1.25,
+        "tripo_part_15": 1.25
+      },
+      "regions": [
+        {
+          "part": "tripo_part_1",
+          "name": "face",
+          "box_m": [
+            [
+              -0.03,
+              -0.045,
+              0.425
+            ],
+            [
+              0.03,
+              0.005,
+              0.495
+            ]
+          ],
+          "factor": 2.0
+        },
+        {
+          "part": "tripo_part_11",
+          "name": "left_hand",
+          "box_m": [
+            [
+              0.088,
+              -0.05,
+              0.29
+            ],
+            [
+              0.12,
+              -0.012,
+              0.335
+            ]
+          ],
+          "factor": 1.75
+        }
+      ]
+    },
+    "priority_note": "множитель линейной тексельной плотности (×1,5–2 по заданию H2): лицо ×2, кисти ×1,75, лук ×1,5; подставка ×0,45 (однородный камень)"
+  },
+  "bake": {
+    "device": "GPU",
+    "resolution": 4096,
+    "ao": {
+      "samples": 128,
+      "distance_m": 0.044,
+      "seed": 0,
+      "note": "distance 0,08 × рост 0,55 м (как atlas.ao_bake волны 4); весь high-poly — окклюдер, low-poly невидим для лучей"
+    },
+    "normal": {
+      "space": "TANGENT",
+      "include_tripo_normal_map": true,
+      "samples": 1
+    },
+    "emission": {
+      "samples": 1
+    },
+    "cage": {
+      "extrusion_from": "retopo lo_to_hi p99 и hi_to_lo p99 части",
+      "factor": 1.5,
+      "min_m": 0.0006,
+      "max_m": 0.004,
+      "max_ray_factor": 2.5
+    },
+    "hit_check": {
+      "max_miss_share_warn": 0.01
+    }
+  },
+  "textures": {
+    "prefix": "T_Medusa_H2",
+    "pad_fill": "8-neighbour dilation edge_extend_px, then pull-push pyramid",
+    "maps": {
+      "BC": "sRGB RGB 8 бит (BaseColor Tripo, освещение удалено Tripo)",
+      "N": "DirectX (G инвертирован) для UE",
+      "N_OpenGL": "OpenGL для Blender",
+      "ORM": "R = AO (Cycles), G = Roughness, B = Metallic (из PBR Tripo)",
+      "TeamMask": "RGBA: R = одежда (TeamColor на ткани), G = подставка (боковая полоса), B = 0, A = 255"
+    },
+    "ao_gate": {
+      "min_range_p1_p99": 32,
+      "min_occluded_fraction": 0.02,
+      "occluded_below": 250
+    },
+    "team_mask": {
+      "cloth_parts": [
+        "tripo_part_0"
+      ],
+      "cloth_hsv": {
+        "v_max": 0.4,
+        "s_max": 0.34,
+        "ramp": 0.04,
+        "note": "калибровка по запечённому BC платья (tripo_part_0): v p50 0,24, s p50 0,22; золото каймы и кожа ремня s > 0,34 — вне маски"
+      },
+      "base_band": {
+        "part": "tripo_part_2",
+        "normal_z_abs_max": 0.35
+      },
+      "blur": 3,
+      "note": "предложено: формат маски волны 4 = TeamMask.R (TC_Grayscale); G — предложение для подставки (M_UM_BaseMarker сейчас берёт полосу по нормалям вершин)"
+    },
+    "edge_extend_px": 16
+  },
+  "rig": {
+    "skeleton": "UM_HUMANOID_17_v2",
+    "armature_object": "SKEL_UM_Humanoid",
+    "character": "Medusa",
+    "max_influences": 4,
+    "clean_below": 0.01,
+    "bones": [
+      [
+        "root",
+        null,
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0.045
+        ]
+      ],
+      [
+        "hips",
+        "root",
+        [
+          0,
+          0.012,
+          0.27
+        ],
+        [
+          0,
+          0.012,
+          0.32
+        ]
+      ],
+      [
+        "spine",
+        "hips",
+        [
+          0,
+          0.012,
+          0.32
+        ],
+        [
+          0,
+          0.012,
+          0.41
+        ]
+      ],
+      [
+        "head",
+        "spine",
+        [
+          0,
+          0.012,
+          0.435
+        ],
+        [
+          0,
+          0.012,
+          0.52
+        ]
+      ],
+      [
+        "arm_upper.L",
+        "spine",
+        [
+          0.04,
+          0.014,
+          0.397
+        ],
+        [
+          0.066,
+          0.004,
+          0.334
+        ]
+      ],
+      [
+        "arm_lower.L",
+        "arm_upper.L",
+        [
+          0.066,
+          0.004,
+          0.334
+        ],
+        [
+          0.092,
+          -0.022,
+          0.321
+        ]
+      ],
+      [
+        "hand.L",
+        "arm_lower.L",
+        [
+          0.092,
+          -0.022,
+          0.321
+        ],
+        [
+          0.106,
+          -0.036,
+          0.314
+        ]
+      ],
+      [
+        "arm_upper.R",
+        "spine",
+        [
+          -0.047,
+          0.015,
+          0.398
+        ],
+        [
+          -0.086,
+          0.014,
+          0.345
+        ]
+      ],
+      [
+        "arm_lower.R",
+        "arm_upper.R",
+        [
+          -0.086,
+          0.014,
+          0.345
+        ],
+        [
+          -0.047,
+          -0.021,
+          0.334
+        ]
+      ],
+      [
+        "hand.R",
+        "arm_lower.R",
+        [
+          -0.047,
+          -0.021,
+          0.334
+        ],
+        [
+          -0.022,
+          -0.035,
+          0.325
+        ]
+      ],
+      [
+        "leg_upper.L",
+        "hips",
+        [
+          0.035,
+          0.01,
+          0.285
+        ],
+        [
+          0.049,
+          0.008,
+          0.205
+        ]
+      ],
+      [
+        "leg_lower.L",
+        "leg_upper.L",
+        [
+          0.049,
+          0.008,
+          0.205
+        ],
+        [
+          0.071,
+          0.004,
+          0.085
+        ]
+      ],
+      [
+        "foot.L",
+        "leg_lower.L",
+        [
+          0.071,
+          0.004,
+          0.085
+        ],
+        [
+          0.082,
+          -0.035,
+          0.066
+        ]
+      ],
+      [
+        "leg_upper.R",
+        "hips",
+        [
+          -0.038,
+          0.01,
+          0.285
+        ],
+        [
+          -0.052,
+          0.008,
+          0.205
+        ]
+      ],
+      [
+        "leg_lower.R",
+        "leg_upper.R",
+        [
+          -0.052,
+          0.008,
+          0.205
+        ],
+        [
+          -0.074,
+          0.004,
+          0.085
+        ]
+      ],
+      [
+        "foot.R",
+        "leg_lower.R",
+        [
+          -0.074,
+          0.004,
+          0.085
+        ],
+        [
+          -0.083,
+          -0.035,
+          0.066
+        ]
+      ],
+      [
+        "weapon.L",
+        "hand.L",
+        [
+          0.103,
+          -0.033,
+          0.315
+        ],
+        [
+          0.131,
+          -0.033,
+          0.315
+        ]
+      ]
+    ],
+    "bones_note": "головы/хвосты в финальных метрах; суставы по стыкам частей H2 (замер стыков: плечо, локоть, запястье, колено) и ортокадрам с сеткой 1 см",
+    "weights": {
+      "tripo_part_0": {
+        "kind": "cloth",
+        "base_bone": "hips",
+        "top_bone": "spine",
+        "top_blend_z": [
+          0.3,
+          0.335
+        ],
+        "legs": {
+          "L": "leg_upper.L",
+          "R": "leg_upper.R"
+        },
+        "leg_start_z": 0.27,
+        "leg_full_z": 0.1,
+        "leg_max": 0.55,
+        "side_band_m": 0.02,
+        "note": "платье/плащ: hips, выше талии spine; к подолу плавно до 55 % на бедро своей стороны (RIG-CONTRACT §9.4)"
+      },
+      "tripo_part_1": {
+        "kind": "zblend",
+        "stops": [
+          [
+            "spine",
+            0.412
+          ],
+          [
+            "head",
+            0.44
+          ]
+        ],
+        "rigid_outside": {
+          "bone": "head",
+          "axis_xy": [
+            0.0,
+            0.012
+          ],
+          "r0": 0.026,
+          "r1": 0.036,
+          "z0": 0.405,
+          "z1": 0.42
+        },
+        "note": "шея: spine→head по z; змеи и всё дальше 2,6–3,6 см от оси шеи выше 0,405–0,42 м — жёстко head (RIG-CONTRACT §9.3)"
+      },
+      "tripo_part_3": {
+        "kind": "rigid",
+        "bone": "weapon.L"
+      },
+      "tripo_part_10": {
+        "kind": "rigid",
+        "bone": "spine"
+      },
+      "tripo_part_6": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.L",
+          "arm_lower.L",
+          "hand.L"
+        ],
+        "bands_m": [
+          0.012,
+          0.01,
+          0.008
+        ]
+      },
+      "tripo_part_11": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.L",
+          "arm_lower.L",
+          "hand.L"
+        ],
+        "bands_m": [
+          0.012,
+          0.01,
+          0.008
+        ]
+      },
+      "tripo_part_7": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.R",
+          "arm_lower.R",
+          "hand.R"
+        ],
+        "bands_m": [
+          0.012,
+          0.01,
+          0.008
+        ]
+      },
+      "tripo_part_8": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.R",
+          "arm_lower.R",
+          "hand.R"
+        ],
+        "bands_m": [
+          0.012,
+          0.01,
+          0.008
+        ]
+      },
+      "tripo_part_13": {
+        "kind": "chain",
+        "chain": [
+          "spine",
+          "arm_upper.R",
+          "arm_lower.R",
+          "hand.R"
+        ],
+        "bands_m": [
+          0.012,
+          0.01,
+          0.008
+        ]
+      },
+      "tripo_part_9": {
+        "kind": "chain",
+        "chain": [
+          "hips",
+          "leg_upper.R",
+          "leg_lower.R",
+          "foot.R"
+        ],
+        "bands_m": [
+          0.015,
+          0.012,
+          0.01
+        ]
+      },
+      "tripo_part_4": {
+        "kind": "chain",
+        "chain": [
+          "hips",
+          "leg_upper.R",
+          "leg_lower.R",
+          "foot.R"
+        ],
+        "bands_m": [
+          0.015,
+          0.012,
+          0.01
+        ]
+      },
+      "tripo_part_16": {
+        "kind": "chain",
+        "chain": [
+          "hips",
+          "leg_upper.R",
+          "leg_lower.R",
+          "foot.R"
+        ],
+        "bands_m": [
+          0.015,
+          0.012,
+          0.01
+        ]
+      },
+      "tripo_part_14": {
+        "kind": "rigid",
+        "bone": "foot.R"
+      },
+      "tripo_part_12": {
+        "kind": "chain",
+        "chain": [
+          "hips",
+          "leg_upper.L",
+          "leg_lower.L",
+          "foot.L"
+        ],
+        "bands_m": [
+          0.015,
+          0.012,
+          0.01
+        ]
+      },
+      "tripo_part_5": {
+        "kind": "chain",
+        "chain": [
+          "hips",
+          "leg_upper.L",
+          "leg_lower.L",
+          "foot.L"
+        ],
+        "bands_m": [
+          0.015,
+          0.012,
+          0.01
+        ]
+      },
+      "tripo_part_15": {
+        "kind": "rigid",
+        "bone": "foot.L"
+      }
+    },
+    "weights_note": "веса — функция положения (цепочки суставов общие для всех частей конечности): совпадающие точки соседних частей получают одинаковые веса, поэтому стыки частей не расходятся без сварки меша",
+    "seam_radius_m": 0.001,
+    "seam_pairs": [
+      [
+        "tripo_part_6",
+        "tripo_part_11"
+      ],
+      [
+        "tripo_part_7",
+        "tripo_part_8"
+      ],
+      [
+        "tripo_part_13",
+        "tripo_part_8"
+      ],
+      [
+        "tripo_part_12",
+        "tripo_part_5"
+      ],
+      [
+        "tripo_part_9",
+        "tripo_part_4"
+      ],
+      [
+        "tripo_part_14",
+        "tripo_part_4"
+      ],
+      [
+        "tripo_part_15",
+        "tripo_part_5"
+      ],
+      [
+        "tripo_part_16",
+        "tripo_part_4"
+      ],
+      [
+        "tripo_part_6",
+        "tripo_part_0"
+      ],
+      [
+        "tripo_part_7",
+        "tripo_part_0"
+      ],
+      [
+        "tripo_part_1",
+        "tripo_part_0"
+      ],
+      [
+        "tripo_part_9",
+        "tripo_part_0"
+      ],
+      [
+        "tripo_part_12",
+        "tripo_part_0"
+      ],
+      [
+        "tripo_part_10",
+        "tripo_part_0"
+      ],
+      [
+        "tripo_part_13",
+        "tripo_part_0"
+      ]
+    ],
+    "continuity_radius_m": 0.0015,
+    "junctions": [
+      {
+        "part": "tripo_part_1",
+        "with": "tripo_part_0",
+        "band_m": 0.012,
+        "max_distance_mm": 1.0,
+        "note": "ворот: полоса шеи/кожи декольте (tripo_part_1) 1,2 см у петли ворота получает веса платья (spine) в той же точке — ворот не открывается при повороте головы (head_turn 35°: было 6,6–8,9 мм), шея закручивается выше ворота. Замер ray-теста head_turn (наибольшее пятно новых задних граней, шаг 1,5 мм): без стыка 39 px, платье по весам шеи (полоса 1–4 см) 13–186 px (складка накидки), шея по весам платья 7 px"
+      }
+    ]
+  },
+  "seams": {
+    "note": "verify 2026-09-29: открытые петли в позах, сквозные дыры (ray-тест по задним граням), кадры проб с отсечением задних граней",
+    "exposure_threshold_mm": 1.5,
+    "max_open_share": 0.05,
+    "loop_min_perimeter_cm": 1.0,
+    "raycast": {
+      "pitch_m": 0.0015,
+      "margin_m": 0.1
+    },
+    "frames_label": "blender Workbench, FBX read-back, BC 2K, backface culling; пурпур внутри силуэта = сквозная дыра",
+    "frames": [
+      {
+        "name": "fist_front",
+        "pose": "arm_r_raise",
+        "target_m": [
+          -0.03,
+          -0.02,
+          0.33
+        ],
+        "dir": [
+          -0.4,
+          -1,
+          0.15
+        ],
+        "ortho_m": 0.13
+      },
+      {
+        "name": "fist_q34",
+        "pose": "arm_r_raise",
+        "target_m": [
+          -0.03,
+          -0.02,
+          0.33
+        ],
+        "dir": [
+          -1,
+          -0.8,
+          0.2
+        ],
+        "ortho_m": 0.13
+      },
+      {
+        "name": "armhole_r",
+        "pose": "arm_r_raise",
+        "target_m": [
+          -0.045,
+          0.012,
+          0.39
+        ],
+        "dir": [
+          -1,
+          -0.4,
+          0.15
+        ],
+        "ortho_m": 0.13
+      },
+      {
+        "name": "armhole_l",
+        "pose": "arm_l_raise",
+        "target_m": [
+          0.04,
+          0.012,
+          0.39
+        ],
+        "dir": [
+          1,
+          -0.4,
+          0.15
+        ],
+        "ortho_m": 0.13
+      },
+      {
+        "name": "collar_back",
+        "pose": "head_turn",
+        "target_m": [
+          0.0,
+          0.02,
+          0.43
+        ],
+        "dir": [
+          0.2,
+          1,
+          0.5
+        ],
+        "ortho_m": 0.13
+      },
+      {
+        "name": "collar_front",
+        "pose": "head_turn",
+        "target_m": [
+          0.0,
+          -0.01,
+          0.41
+        ],
+        "dir": [
+          0.3,
+          -1,
+          0.4
+        ],
+        "ortho_m": 0.13
+      },
+      {
+        "name": "thigh_r",
+        "pose": "thigh_r_flex",
+        "target_m": [
+          -0.05,
+          -0.01,
+          0.17
+        ],
+        "dir": [
+          -0.6,
+          -1,
+          0.1
+        ],
+        "ortho_m": 0.26
+      },
+      {
+        "name": "thigh_l",
+        "pose": "thigh_l_flex",
+        "target_m": [
+          0.05,
+          -0.01,
+          0.17
+        ],
+        "dir": [
+          0.6,
+          -1,
+          0.1
+        ],
+        "ortho_m": 0.26
+      },
+      {
+        "name": "hem_low",
+        "pose": "thigh_r_flex",
+        "target_m": [
+          0.0,
+          -0.02,
+          0.1
+        ],
+        "dir": [
+          -0.3,
+          -1,
+          -0.35
+        ],
+        "ortho_m": 0.3
+      },
+      {
+        "name": "forearm_l",
+        "pose": "forearm_l_bend",
+        "target_m": [
+          0.08,
+          -0.01,
+          0.33
+        ],
+        "dir": [
+          0.4,
+          -1,
+          0.2
+        ],
+        "ortho_m": 0.16
+      },
+      {
+        "name": "spine_side",
+        "pose": "spine_bend_fwd",
+        "target_m": [
+          0.0,
+          0.0,
+          0.3
+        ],
+        "dir": [
+          1,
+          -0.3,
+          0.2
+        ],
+        "ortho_m": 0.62
+      }
+    ],
+    "k2_frames": [
+      "arm_r_raise",
+      "arm_l_raise",
+      "head_turn",
+      "thigh_r_flex",
+      "thigh_l_flex",
+      "spine_bend_fwd"
+    ],
+    "max_new_blob_px": 8
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "weapon.L",
+      "target": "bone_head",
+      "location_uu": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "target_m": [
+        0.0,
+        -0.004,
+        0.472
+      ],
+      "location_uu": null,
+      "note": "центр головы под змеями; смещение — прогноз в UE bone space (x, −y, z), живой замер — задача UE-этапа"
+    }
+  ],
+  "exports": {
+    "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+    "skeletal_fbx": "SK_Medusa_H2.fbx",
+    "base_fbx": "SM_Medusa_H2_Base.fbx"
+  },
+  "meshes": {
+    "body": "SK_Medusa_H2_Body",
+    "weapon": "SK_Medusa_H2_Bow",
+    "base": "SM_Medusa_H2_Base"
+  },
+  "materials": {
+    "atlas": "M_Medusa_H2_Atlas",
+    "slots_note": "один слот на фигуре (тело+лук) и один на подставке — тот же атлас; ≤ 2 слота"
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "blender_bow_side": "+X",
+    "expected_ue_front": "+X",
+    "expected_ue_bow_side": "-Y"
+  },
+  "preview": {
+    "concepts": {
+      "front": "art/imagegen/hero-quality-v1/medusa/medusa-front.png",
+      "side": "art/imagegen/hero-quality-v1/medusa/medusa-side.png",
+      "back": "art/imagegen/hero-quality-v1/medusa/medusa-back.png"
+    },
+    "quality_reference": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+    "previous_candidate": {
+      "run": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-w4b-um-master",
+      "skeletal_fbx": "export/SK_Medusa_Candidate.fbx",
+      "base_fbx": "export/SM_Medusa_Base_Candidate.fbx",
+      "textures": {
+        "BC": "textures/T_Medusa_Candidate_Atlas_BC.png",
+        "N_OpenGL": "textures/T_Medusa_Candidate_Atlas_N_OpenGL.png",
+        "ORM": "textures/T_Medusa_Candidate_Atlas_ORM.png"
+      },
+      "note": "текущий CLI-кандидат (геометрия v2, W4-B); FBX по UM_FBX_v1 (лицо +X) поворачивается обратно в авторский кадр"
+    },
+    "k2": {
+      "fov_deg_horizontal": 35,
+      "pitch_deg": -55,
+      "distances_uu": {
+        "k2-5x": 386.0,
+        "k2-1p6": 1207.0
+      },
+      "focus_z_m": 0.28,
+      "resolution": [
+        1920,
+        1080
+      ],
+      "source": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/frames/p17-k2-5x-medusa-ue-editor.evidence.json, p17-k2-1p6-medusa-ue-editor.evidence.json"
+    },
+    "samples": 64,
+    "label": "blender (Cycles), не игровой свет; у H2 и прежнего кандидата задние грани отсечены (как UE one-sided)",
+    "closeups": [
+      {
+        "name": "face_front",
+        "target_m": [
+          0.0,
+          -0.02,
+          0.465
+        ],
+        "dir": [
+          0,
+          -1,
+          0.05
+        ],
+        "ortho_m": 0.09
+      },
+      {
+        "name": "face_3q",
+        "target_m": [
+          -0.004,
+          -0.02,
+          0.465
+        ],
+        "dir": [
+          -0.6,
+          -0.8,
+          0.1
+        ],
+        "ortho_m": 0.1
+      },
+      {
+        "name": "crown",
+        "target_m": [
+          0.0,
+          0.01,
+          0.505
+        ],
+        "dir": [
+          0,
+          -1,
+          0.8
+        ],
+        "ortho_m": 0.17
+      },
+      {
+        "name": "hand_r",
+        "target_m": [
+          -0.03,
+          -0.032,
+          0.328
+        ],
+        "dir": [
+          -0.3,
+          -1,
+          0.3
+        ],
+        "ortho_m": 0.07
+      },
+      {
+        "name": "hand_l_grip",
+        "target_m": [
+          0.1,
+          -0.033,
+          0.316
+        ],
+        "dir": [
+          0.5,
+          -1,
+          0.2
+        ],
+        "ortho_m": 0.08
+      },
+      {
+        "name": "bow_upper",
+        "target_m": [
+          0.125,
+          -0.07,
+          0.43
+        ],
+        "dir": [
+          0.2,
+          -1,
+          0
+        ],
+        "ortho_m": 0.16
+      },
+      {
+        "name": "quiver_back",
+        "target_m": [
+          -0.045,
+          0.055,
+          0.41
+        ],
+        "dir": [
+          -0.3,
+          1,
+          0.2
+        ],
+        "ortho_m": 0.16
+      },
+      {
+        "name": "sandal_l",
+        "target_m": [
+          0.075,
+          -0.03,
+          0.085
+        ],
+        "dir": [
+          0.3,
+          -1,
+          0.5
+        ],
+        "ortho_m": 0.08
+      }
+    ],
+    "backface_culling": true
+  },
+  "proposed_budget": {
+    "status": "предложено",
+    "hero_triangles": [
+      30000,
+      45000
+    ],
+    "harpy_triangles": [
+      20000,
+      30000
+    ],
+    "atlas_master_px": 4096,
+    "atlas_runtime_px": 2048,
+    "material_slots_max": 2,
+    "source": "ориентир задания оркестратора H2; обоснование — замеры кадра K2 в отчёте medusa-h2-report"
+  },
+  "history": {
+    "previous_profiles": [
+      "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal-um-fbx-v1-um-master.json"
+    ],
+    "note": "H2 — отдельная схема (unmatched.h2-bake-profile/1) и отдельный модуль tools/tripo-pipeline/blender/h2_bake; CLI tripo_pipeline.py её пока не читает (интеграция — followup)"
+  }
+}

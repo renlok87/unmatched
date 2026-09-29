@@ -1,0 +1,1053 @@
+{
+ "base_triangles": 2240,
+ "checks": {
+  "base_all_triangles": {
+   "expected": 0,
+   "measured": 0,
+   "passed": true
+  },
+  "base_closed_except_source_self_contact": {
+   "expected": {
+    "boundary_edges": 0,
+    "self_contact_edges_marked_sharp": 0
+   },
+   "measured": {
+    "boundary_edges": 0,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0
+   },
+   "note": "open edges only in skipped open chains; non-manifold/inconsistent edges are Tripo self-contacts (hood back, hem) present in the source after the seam weld, marked sharp (no normal averaging)",
+   "passed": true
+  },
+  "body_all_triangles": {
+   "expected": 0,
+   "measured": 0,
+   "passed": true
+  },
+  "body_closed_except_source_self_contact": {
+   "expected": {
+    "boundary_edges": 2,
+    "self_contact_edges_marked_sharp": 19
+   },
+   "measured": {
+    "boundary_edges": 2,
+    "inconsistent_winding_edges": 13,
+    "non_manifold_edges": 6
+   },
+   "note": "open edges only in skipped open chains; non-manifold/inconsistent edges are Tripo self-contacts (hood back, hem) present in the source after the seam weld, marked sharp (no normal averaging)",
+   "passed": true
+  },
+  "deviation_high_to_low_p99_below_2mm_source": {
+   "expected": "< 2 mm (Tripo metres; x0.505 in the game frame)",
+   "measured": {
+    "tripo_part_0": 0.8488,
+    "tripo_part_1": 0.6553,
+    "tripo_part_10": 0.5422,
+    "tripo_part_11": 0.6728,
+    "tripo_part_2": 0.5699,
+    "tripo_part_3": 0.7813,
+    "tripo_part_4": 0.7727,
+    "tripo_part_5": 0.7422,
+    "tripo_part_6": 0.234,
+    "tripo_part_7": 0.5085,
+    "tripo_part_8": 0.28,
+    "tripo_part_9": 0.2435
+   },
+   "passed": true
+  },
+  "figure_triangles_in_proposed_band": {
+   "expected": [
+    30000,
+    45000
+   ],
+   "measured": 33967,
+   "note": "proposal (budget_proposal), not a budget",
+   "passed": true
+  },
+  "staff_all_triangles": {
+   "expected": 0,
+   "measured": 0,
+   "passed": true
+  },
+  "staff_closed_except_source_self_contact": {
+   "expected": {
+    "boundary_edges": 0,
+    "self_contact_edges_marked_sharp": 0
+   },
+   "measured": {
+    "boundary_edges": 0,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0
+   },
+   "note": "open edges only in skipped open chains; non-manifold/inconsistent edges are Tripo self-contacts (hood back, hem) present in the source after the seam weld, marked sharp (no normal averaging)",
+   "passed": true
+  }
+ },
+ "figure_triangles": 33967,
+ "method": "collapse-sequential",
+ "objects": {
+  "base": {
+   "after_decimation": {
+    "tripo_part_1": 1998
+   },
+   "beautify_edges": 1890,
+   "bridges": [],
+   "cap_winding_flipped": 0,
+   "caps": [
+    {
+     "centre_m": [
+      -0.0826,
+      0.0687,
+      0.0946
+     ],
+     "faces": 34,
+     "loop_vertices": 34,
+     "part": "tripo_part_1"
+    },
+    {
+     "centre_m": [
+      -0.1357,
+      -0.0045,
+      0.0942
+     ],
+     "faces": 80,
+     "loop_vertices": 80,
+     "part": "tripo_part_1"
+    },
+    {
+     "centre_m": [
+      0.1354,
+      -0.0899,
+      0.0954
+     ],
+     "faces": 89,
+     "loop_vertices": 89,
+     "part": "tripo_part_1"
+    },
+    {
+     "centre_m": [
+      0.098,
+      -0.0007,
+      0.0947
+     ],
+     "faces": 39,
+     "loop_vertices": 39,
+     "part": "tripo_part_1"
+    }
+   ],
+   "decimation": [
+    {
+     "after": 1998,
+     "before": 235801,
+     "others_changed": {},
+     "part": "tripo_part_1",
+     "target": 2000
+    }
+   ],
+   "deviation_mm_source": {
+    "tripo_part_1": {
+     "high_to_low": {
+      "max_mm": 1.8185,
+      "n": 40000,
+      "p50_mm": 0.0625,
+      "p95_mm": 0.3074,
+      "p999_mm": 1.2852,
+      "p99_mm": 0.6553
+     },
+     "low_to_high": {
+      "max_mm": 1.1756,
+      "n": 40000,
+      "p50_mm": 0.0734,
+      "p95_mm": 0.3774,
+      "p999_mm": 1.1756,
+      "p99_mm": 0.6511
+     },
+     "low_to_high_any_part": {
+      "max_mm": 1.1756,
+      "n": 40000,
+      "p50_mm": 0.0734,
+      "p95_mm": 0.3774,
+      "p999_mm": 1.1756,
+      "p99_mm": 0.6511
+     }
+    }
+   },
+   "high_poly_triangles": {
+    "tripo_part_1": 235801
+   },
+   "object": "SM_Merlin_H2_Base",
+   "parts": [
+    "tripo_part_1"
+   ],
+   "removed_wire_edges_loose_verts": [
+    0,
+    0
+   ],
+   "sharp_edges": {
+    "by_angle": 0,
+    "self_contact": 0
+   },
+   "topology": {
+    "boundary_edges": 0,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "non_triangles": 0,
+    "triangles": 2240,
+    "vertices": 1122
+   },
+   "triangle_quality": {
+    "tripo_part_1": {
+     "degenerate_area_below_1e-12_m2": 0,
+     "q_median": 0.385,
+     "q_p5": 0.09,
+     "share_q_below_0_2": 0.1996
+    }
+   },
+   "triangles_by_part": {
+    "tripo_part_1": 2240
+   },
+   "weld": {
+    "boundary_vertices_before": 7043,
+    "cross_part_vertex_pairs_welded": {},
+    "merged": 3167,
+    "vertices_after": 118284,
+    "vertices_before": 121451
+   }
+  },
+  "body": {
+   "after_decimation": {
+    "tripo_part_0": 14992,
+    "tripo_part_11": 832,
+    "tripo_part_3": 1999,
+    "tripo_part_4": 2189,
+    "tripo_part_5": 819,
+    "tripo_part_6": 1701,
+    "tripo_part_8": 1699,
+    "tripo_part_9": 4407
+   },
+   "beautify_edges": 10278,
+   "bridges": [],
+   "cap_winding_flipped": 0,
+   "caps": [
+    {
+     "centre_m": [
+      -0.1196,
+      -0.0138,
+      0.1886
+     ],
+     "faces": 46,
+     "loop_vertices": 46,
+     "part": "tripo_part_0"
+    },
+    {
+     "centre_m": [
+      -0.0975,
+      0.046,
+      0.5228
+     ],
+     "faces": 53,
+     "loop_vertices": 53,
+     "part": "tripo_part_0"
+    },
+    {
+     "centre_m": [
+      -0.0061,
+      0.0742,
+      0.6684
+     ],
+     "faces": 0,
+     "loop_vertices": 3,
+     "part": null,
+     "skipped": "open chain (2 edges): source self-contact, left open"
+    },
+    {
+     "centre_m": [
+      0.0689,
+      -0.0321,
+      0.5644
+     ],
+     "faces": 272,
+     "loop_vertices": 272,
+     "part": "tripo_part_0"
+    },
+    {
+     "centre_m": [
+      -0.0022,
+      -0.0528,
+      0.6522
+     ],
+     "faces": 16,
+     "loop_vertices": 16,
+     "part": "tripo_part_0"
+    },
+    {
+     "centre_m": [
+      -0.0016,
+      -0.053,
+      0.6525
+     ],
+     "faces": 40,
+     "loop_vertices": 40,
+     "part": "tripo_part_9"
+    },
+    {
+     "centre_m": [
+      0.0864,
+      -0.0271,
+      0.5736
+     ],
+     "faces": 219,
+     "loop_vertices": 219,
+     "part": "tripo_part_3"
+    },
+    {
+     "centre_m": [
+      -0.0969,
+      0.0458,
+      0.525
+     ],
+     "faces": 62,
+     "loop_vertices": 62,
+     "part": "tripo_part_4"
+    },
+    {
+     "centre_m": [
+      -0.159,
+      -0.0141,
+      0.6756
+     ],
+     "faces": 61,
+     "loop_vertices": 61,
+     "part": "tripo_part_6"
+    },
+    {
+     "centre_m": [
+      -0.16,
+      -0.0144,
+      0.6269
+     ],
+     "faces": 85,
+     "loop_vertices": 85,
+     "part": "tripo_part_6"
+    },
+    {
+     "centre_m": [
+      0.0482,
+      -0.065,
+      0.5581
+     ],
+     "faces": 309,
+     "loop_vertices": 309,
+     "part": "tripo_part_8"
+    },
+    {
+     "centre_m": [
+      0.1359,
+      -0.088,
+      0.0955
+     ],
+     "faces": 78,
+     "loop_vertices": 78,
+     "part": "tripo_part_5"
+    },
+    {
+     "centre_m": [
+      0.1012,
+      0.0003,
+      0.0947
+     ],
+     "faces": 32,
+     "loop_vertices": 32,
+     "part": "tripo_part_5"
+    },
+    {
+     "centre_m": [
+      -0.1377,
+      -0.0082,
+      0.0943
+     ],
+     "faces": 71,
+     "loop_vertices": 71,
+     "part": "tripo_part_11"
+    },
+    {
+     "centre_m": [
+      -0.134,
+      -0.0154,
+      0.1342
+     ],
+     "faces": 39,
+     "loop_vertices": 39,
+     "part": "tripo_part_11"
+    },
+    {
+     "centre_m": [
+      -0.0827,
+      0.0667,
+      0.0946
+     ],
+     "faces": 26,
+     "loop_vertices": 26,
+     "part": "tripo_part_11"
+    }
+   ],
+   "decimation": [
+    {
+     "after": 15075,
+     "before": 1063800,
+     "others_changed": {
+      "tripo_part_11": [
+       46676,
+       46479
+      ],
+      "tripo_part_4": [
+       124948,
+       124692
+      ],
+      "tripo_part_5": [
+       47898,
+       47697
+      ],
+      "tripo_part_9": [
+       69765,
+       69344
+      ]
+     },
+     "part": "tripo_part_0",
+     "target": 14000
+    },
+    {
+     "after": 1999,
+     "before": 137019,
+     "others_changed": {},
+     "part": "tripo_part_3",
+     "target": 2000
+    },
+    {
+     "after": 2191,
+     "before": 124692,
+     "others_changed": {
+      "tripo_part_0": [
+       15075,
+       15053
+      ],
+      "tripo_part_6": [
+       29138,
+       28968
+      ]
+     },
+     "part": "tripo_part_4",
+     "target": 2000
+    },
+    {
+     "after": 4407,
+     "before": 69344,
+     "others_changed": {
+      "tripo_part_0": [
+       15053,
+       15045
+      ]
+     },
+     "part": "tripo_part_9",
+     "target": 4400
+    },
+    {
+     "after": 819,
+     "before": 47697,
+     "others_changed": {
+      "tripo_part_0": [
+       15045,
+       15025
+      ]
+     },
+     "part": "tripo_part_5",
+     "target": 800
+    },
+    {
+     "after": 832,
+     "before": 46479,
+     "others_changed": {
+      "tripo_part_0": [
+       15025,
+       14992
+      ]
+     },
+     "part": "tripo_part_11",
+     "target": 800
+    },
+    {
+     "after": 1699,
+     "before": 29957,
+     "others_changed": {},
+     "part": "tripo_part_8",
+     "target": 1700
+    },
+    {
+     "after": 1701,
+     "before": 28968,
+     "others_changed": {
+      "tripo_part_4": [
+       2191,
+       2189
+      ]
+     },
+     "part": "tripo_part_6",
+     "target": 1700
+    }
+   ],
+   "deviation_mm_source": {
+    "tripo_part_0": {
+     "high_to_low": {
+      "max_mm": 7.6808,
+      "n": 29260,
+      "p50_mm": 0.1469,
+      "p95_mm": 0.5469,
+      "p999_mm": 1.8264,
+      "p99_mm": 0.8488
+     },
+     "low_to_high": {
+      "max_mm": 2.2912,
+      "n": 29260,
+      "p50_mm": 0.1833,
+      "p95_mm": 0.6135,
+      "p999_mm": 1.3916,
+      "p99_mm": 0.9641
+     },
+     "low_to_high_any_part": {
+      "max_mm": 2.2912,
+      "n": 29260,
+      "p50_mm": 0.1833,
+      "p95_mm": 0.6127,
+      "p999_mm": 1.3879,
+      "p99_mm": 0.9603
+     }
+    },
+    "tripo_part_11": {
+     "high_to_low": {
+      "max_mm": 1.6092,
+      "n": 2000,
+      "p50_mm": 0.1548,
+      "p95_mm": 0.4701,
+      "p999_mm": 1.1788,
+      "p99_mm": 0.6728
+     },
+     "low_to_high": {
+      "max_mm": 14.0505,
+      "n": 2000,
+      "p50_mm": 0.2097,
+      "p95_mm": 0.5879,
+      "p999_mm": 14.0505,
+      "p99_mm": 14.0505
+     },
+     "low_to_high_any_part": {
+      "max_mm": 0.818,
+      "n": 2000,
+      "p50_mm": 0.204,
+      "p95_mm": 0.55,
+      "p999_mm": 0.818,
+      "p99_mm": 0.6659
+     }
+    },
+    "tripo_part_3": {
+     "high_to_low": {
+      "max_mm": 1.112,
+      "n": 3313,
+      "p50_mm": 0.1709,
+      "p95_mm": 0.5635,
+      "p999_mm": 0.9995,
+      "p99_mm": 0.7813
+     },
+     "low_to_high": {
+      "max_mm": 1.1112,
+      "n": 3313,
+      "p50_mm": 0.2224,
+      "p95_mm": 0.6559,
+      "p999_mm": 1.0069,
+      "p99_mm": 0.8815
+     },
+     "low_to_high_any_part": {
+      "max_mm": 1.1112,
+      "n": 3313,
+      "p50_mm": 0.2224,
+      "p95_mm": 0.6559,
+      "p999_mm": 1.0069,
+      "p99_mm": 0.8815
+     }
+    },
+    "tripo_part_4": {
+     "high_to_low": {
+      "max_mm": 1.593,
+      "n": 3005,
+      "p50_mm": 0.1547,
+      "p95_mm": 0.5046,
+      "p999_mm": 1.3355,
+      "p99_mm": 0.7727
+     },
+     "low_to_high": {
+      "max_mm": 1.2332,
+      "n": 3005,
+      "p50_mm": 0.2127,
+      "p95_mm": 0.5745,
+      "p999_mm": 1.2332,
+      "p99_mm": 0.852
+     },
+     "low_to_high_any_part": {
+      "max_mm": 1.2332,
+      "n": 3005,
+      "p50_mm": 0.2127,
+      "p95_mm": 0.5745,
+      "p999_mm": 1.2332,
+      "p99_mm": 0.852
+     }
+    },
+    "tripo_part_5": {
+     "high_to_low": {
+      "max_mm": 2.669,
+      "n": 2000,
+      "p50_mm": 0.1529,
+      "p95_mm": 0.4964,
+      "p999_mm": 1.2353,
+      "p99_mm": 0.7422
+     },
+     "low_to_high": {
+      "max_mm": 2.2149,
+      "n": 2000,
+      "p50_mm": 0.2073,
+      "p95_mm": 0.5626,
+      "p999_mm": 1.1689,
+      "p99_mm": 0.8069
+     },
+     "low_to_high_any_part": {
+      "max_mm": 1.1679,
+      "n": 2000,
+      "p50_mm": 0.2069,
+      "p95_mm": 0.5536,
+      "p999_mm": 1.1679,
+      "p99_mm": 0.8069
+     }
+    },
+    "tripo_part_6": {
+     "high_to_low": {
+      "max_mm": 0.6247,
+      "n": 2000,
+      "p50_mm": 0.0562,
+      "p95_mm": 0.1781,
+      "p999_mm": 0.3166,
+      "p99_mm": 0.234
+     },
+     "low_to_high": {
+      "max_mm": 0.7417,
+      "n": 2000,
+      "p50_mm": 0.0856,
+      "p95_mm": 0.2123,
+      "p999_mm": 0.4214,
+      "p99_mm": 0.2676
+     },
+     "low_to_high_any_part": {
+      "max_mm": 0.4329,
+      "n": 2000,
+      "p50_mm": 0.0853,
+      "p95_mm": 0.2091,
+      "p999_mm": 0.3455,
+      "p99_mm": 0.2635
+     }
+    },
+    "tripo_part_8": {
+     "high_to_low": {
+      "max_mm": 0.4541,
+      "n": 2000,
+      "p50_mm": 0.0635,
+      "p95_mm": 0.2141,
+      "p999_mm": 0.4034,
+      "p99_mm": 0.28
+     },
+     "low_to_high": {
+      "max_mm": 0.4113,
+      "n": 2000,
+      "p50_mm": 0.1051,
+      "p95_mm": 0.2651,
+      "p999_mm": 0.4095,
+      "p99_mm": 0.3272
+     },
+     "low_to_high_any_part": {
+      "max_mm": 0.4113,
+      "n": 2000,
+      "p50_mm": 0.105,
+      "p95_mm": 0.2651,
+      "p999_mm": 0.4095,
+      "p99_mm": 0.3272
+     }
+    },
+    "tripo_part_9": {
+     "high_to_low": {
+      "max_mm": 0.3726,
+      "n": 2000,
+      "p50_mm": 0.0568,
+      "p95_mm": 0.1701,
+      "p999_mm": 0.3147,
+      "p99_mm": 0.2435
+     },
+     "low_to_high": {
+      "max_mm": 2.6879,
+      "n": 2000,
+      "p50_mm": 0.0945,
+      "p95_mm": 0.2375,
+      "p999_mm": 2.2975,
+      "p99_mm": 1.0653
+     },
+     "low_to_high_any_part": {
+      "max_mm": 0.4452,
+      "n": 2000,
+      "p50_mm": 0.0924,
+      "p95_mm": 0.218,
+      "p999_mm": 0.3783,
+      "p99_mm": 0.295
+     }
+    }
+   },
+   "high_poly_triangles": {
+    "tripo_part_0": 1063800,
+    "tripo_part_11": 46676,
+    "tripo_part_3": 137019,
+    "tripo_part_4": 124948,
+    "tripo_part_5": 47898,
+    "tripo_part_6": 29138,
+    "tripo_part_8": 29957,
+    "tripo_part_9": 69765
+   },
+   "object": "SK_Merlin_H2_Body",
+   "parts": [
+    "tripo_part_0",
+    "tripo_part_9",
+    "tripo_part_3",
+    "tripo_part_4",
+    "tripo_part_6",
+    "tripo_part_8",
+    "tripo_part_5",
+    "tripo_part_11"
+   ],
+   "removed_wire_edges_loose_verts": [
+    2,
+    0
+   ],
+   "sharp_edges": {
+    "by_angle": 0,
+    "self_contact": 19
+   },
+   "topology": {
+    "boundary_edges": 2,
+    "inconsistent_winding_edges": 13,
+    "non_manifold_edges": 6,
+    "non_triangles": 0,
+    "triangles": 30047,
+    "vertices": 14998
+   },
+   "triangle_quality": {
+    "tripo_part_0": {
+     "degenerate_area_below_1e-12_m2": 0,
+     "q_median": 0.509,
+     "q_p5": 0.121,
+     "share_q_below_0_2": 0.1161
+    },
+    "tripo_part_11": {
+     "degenerate_area_below_1e-12_m2": 0,
+     "q_median": 0.603,
+     "q_p5": 0.124,
+     "share_q_below_0_2": 0.1105
+    },
+    "tripo_part_3": {
+     "degenerate_area_below_1e-12_m2": 0,
+     "q_median": 0.496,
+     "q_p5": 0.063,
+     "share_q_below_0_2": 0.1758
+    },
+    "tripo_part_4": {
+     "degenerate_area_below_1e-12_m2": 0,
+     "q_median": 0.483,
+     "q_p5": 0.118,
+     "share_q_below_0_2": 0.1288
+    },
+    "tripo_part_5": {
+     "degenerate_area_below_1e-12_m2": 0,
+     "q_median": 0.62,
+     "q_p5": 0.099,
+     "share_q_below_0_2": 0.1141
+    },
+    "tripo_part_6": {
+     "degenerate_area_below_1e-12_m2": 0,
+     "q_median": 0.706,
+     "q_p5": 0.141,
+     "share_q_below_0_2": 0.0812
+    },
+    "tripo_part_8": {
+     "degenerate_area_below_1e-12_m2": 0,
+     "q_median": 0.684,
+     "q_p5": 0.05,
+     "share_q_below_0_2": 0.1643
+    },
+    "tripo_part_9": {
+     "degenerate_area_below_1e-12_m2": 0,
+     "q_median": 0.662,
+     "q_p5": 0.266,
+     "share_q_below_0_2": 0.0238
+    }
+   },
+   "triangles_by_part": {
+    "tripo_part_0": 15379,
+    "tripo_part_11": 968,
+    "tripo_part_3": 2218,
+    "tripo_part_4": 2251,
+    "tripo_part_5": 929,
+    "tripo_part_6": 1847,
+    "tripo_part_8": 2008,
+    "tripo_part_9": 4447
+   },
+   "weld": {
+    "boundary_vertices_before": 60894,
+    "cross_part_vertex_pairs_welded": {
+     "tripo_part_0|tripo_part_11": 283,
+     "tripo_part_0|tripo_part_4": 327,
+     "tripo_part_0|tripo_part_5": 267,
+     "tripo_part_0|tripo_part_9": 543,
+     "tripo_part_4|tripo_part_6": 216
+    },
+    "merged": 28807,
+    "vertices_after": 776633,
+    "vertices_before": 805440
+   }
+  },
+  "staff": {
+   "after_decimation": {
+    "tripo_part_10": 1700,
+    "tripo_part_2": 1498,
+    "tripo_part_7": 399
+   },
+   "beautify_edges": 1008,
+   "bridges": [
+    {
+     "centre_offsets_m": [
+      0.00087,
+      0.00145
+     ],
+     "faces": 81,
+     "loop_vertices": [
+      45,
+      36
+     ],
+     "lower": "tripo_part_2",
+     "upper": "tripo_part_10"
+    }
+   ],
+   "cap_winding_flipped": 0,
+   "caps": [
+    {
+     "centre_m": [
+      -0.1196,
+      -0.0135,
+      0.187
+     ],
+     "faces": 66,
+     "loop_vertices": 66,
+     "part": "tripo_part_2"
+    },
+    {
+     "centre_m": [
+      -0.1339,
+      -0.0155,
+      0.1341
+     ],
+     "faces": 45,
+     "loop_vertices": 45,
+     "part": "tripo_part_2"
+    },
+    {
+     "centre_m": [
+      -0.1623,
+      0.0012,
+      0.8898
+     ],
+     "faces": 62,
+     "loop_vertices": 62,
+     "part": "tripo_part_10"
+    },
+    {
+     "centre_m": [
+      -0.1634,
+      0.0018,
+      0.89
+     ],
+     "faces": 69,
+     "loop_vertices": 69,
+     "part": "tripo_part_7"
+    }
+   ],
+   "decimation": [
+    {
+     "after": 1498,
+     "before": 75685,
+     "others_changed": {},
+     "part": "tripo_part_2",
+     "target": 1500
+    },
+    {
+     "after": 1700,
+     "before": 68415,
+     "others_changed": {},
+     "part": "tripo_part_10",
+     "target": 1700
+    },
+    {
+     "after": 399,
+     "before": 18421,
+     "others_changed": {},
+     "part": "tripo_part_7",
+     "target": 400
+    }
+   ],
+   "deviation_mm_source": {
+    "tripo_part_10": {
+     "high_to_low": {
+      "max_mm": 0.9378,
+      "n": 13851,
+      "p50_mm": 0.1192,
+      "p95_mm": 0.3859,
+      "p999_mm": 0.7207,
+      "p99_mm": 0.5422
+     },
+     "low_to_high": {
+      "max_mm": 0.8557,
+      "n": 13851,
+      "p50_mm": 0.1535,
+      "p95_mm": 0.4479,
+      "p999_mm": 0.7342,
+      "p99_mm": 0.6365
+     },
+     "low_to_high_any_part": {
+      "max_mm": 0.8557,
+      "n": 13851,
+      "p50_mm": 0.1535,
+      "p95_mm": 0.4479,
+      "p999_mm": 0.7342,
+      "p99_mm": 0.6365
+     }
+    },
+    "tripo_part_2": {
+     "high_to_low": {
+      "max_mm": 1.2752,
+      "n": 20333,
+      "p50_mm": 0.1202,
+      "p95_mm": 0.3843,
+      "p999_mm": 0.8341,
+      "p99_mm": 0.5699
+     },
+     "low_to_high": {
+      "max_mm": 0.9103,
+      "n": 20333,
+      "p50_mm": 0.14,
+      "p95_mm": 0.4169,
+      "p999_mm": 0.8444,
+      "p99_mm": 0.617
+     },
+     "low_to_high_any_part": {
+      "max_mm": 0.9103,
+      "n": 20333,
+      "p50_mm": 0.14,
+      "p95_mm": 0.4169,
+      "p999_mm": 0.8444,
+      "p99_mm": 0.617
+     }
+    },
+    "tripo_part_7": {
+     "high_to_low": {
+      "max_mm": 0.8307,
+      "n": 5815,
+      "p50_mm": 0.0982,
+      "p95_mm": 0.3531,
+      "p999_mm": 0.7877,
+      "p99_mm": 0.5085
+     },
+     "low_to_high": {
+      "max_mm": 0.8096,
+      "n": 5815,
+      "p50_mm": 0.1419,
+      "p95_mm": 0.4038,
+      "p999_mm": 0.6426,
+      "p99_mm": 0.5985
+     },
+     "low_to_high_any_part": {
+      "max_mm": 0.8096,
+      "n": 5815,
+      "p50_mm": 0.1419,
+      "p95_mm": 0.4038,
+      "p999_mm": 0.6426,
+      "p99_mm": 0.5985
+     }
+    }
+   },
+   "high_poly_triangles": {
+    "tripo_part_10": 68415,
+    "tripo_part_2": 75685,
+    "tripo_part_7": 18421
+   },
+   "object": "SK_Merlin_H2_Staff",
+   "parts": [
+    "tripo_part_2",
+    "tripo_part_10",
+    "tripo_part_7"
+   ],
+   "removed_wire_edges_loose_verts": [
+    0,
+    0
+   ],
+   "sharp_edges": {
+    "by_angle": 225,
+    "self_contact": 0
+   },
+   "topology": {
+    "boundary_edges": 0,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "non_triangles": 0,
+    "triangles": 3920,
+    "vertices": 1964
+   },
+   "triangle_quality": {
+    "tripo_part_10": {
+     "degenerate_area_below_1e-12_m2": 0,
+     "q_median": 0.638,
+     "q_p5": 0.186,
+     "share_q_below_0_2": 0.0516
+    },
+    "tripo_part_2": {
+     "degenerate_area_below_1e-12_m2": 0,
+     "q_median": 0.563,
+     "q_p5": 0.092,
+     "share_q_below_0_2": 0.1207
+    },
+    "tripo_part_7": {
+     "degenerate_area_below_1e-12_m2": 0,
+     "q_median": 0.507,
+     "q_p5": 0.104,
+     "share_q_below_0_2": 0.1474
+    }
+   },
+   "triangles_by_part": {
+    "tripo_part_10": 1762,
+    "tripo_part_2": 1690,
+    "tripo_part_7": 468
+   },
+   "weld": {
+    "boundary_vertices_before": 5443,
+    "cross_part_vertex_pairs_welded": {},
+    "merged": 2335,
+    "vertices_after": 81677,
+    "vertices_before": 84012
+   }
+  }
+ },
+ "passed": true,
+ "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json",
+ "profile_id": "merlin-h2-bake/1",
+ "stage": "retopo",
+ "work_blend": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/work/h2-retopo.blend"
+}

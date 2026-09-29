@@ -1,0 +1,226 @@
+{
+  "bc_mean_srgb_in_islands": [
+    95.84,
+    75.01,
+    60.76
+  ],
+  "checks": {
+    "cap_texels_filled_from_rim": {
+      "expected": "every cap texel of the uv raster painted, none outside",
+      "measured": {
+        "cap_texels": 252735,
+        "cap_texels_not_painted": 0,
+        "cap_triangles": 3908,
+        "cap_vertices": 3261,
+        "painted_outside_cap_raster": 0,
+        "painted_texels": 252735,
+        "rim_samples": 49430
+      },
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_2k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "dx_equals_opengl_g_inverted_4k": {
+      "measured": "exact",
+      "passed": true
+    },
+    "in_island_unbaked_share": {
+      "expected": "<= 1 % of the non-cap island texels (filled by dilation from baked neighbours; cap texels are filled from their rim)",
+      "measured": {
+        "AO": 0.00272,
+        "BC": 0.00272,
+        "NORMAL": 0.00272,
+        "RM": 0.00272
+      },
+      "passed": true
+    },
+    "normal_length_2k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0003,
+        "p99.9_abs_dev": 0.0055
+      },
+      "passed": true
+    },
+    "normal_length_4k": {
+      "expected": "|len - 1| p99.9 < 0.02",
+      "measured": {
+        "p50": 1.0003,
+        "p99.9_abs_dev": 0.0053
+      },
+      "passed": true
+    },
+    "orm_occlusion_baked_not_constant": {
+      "expected": {
+        "occluded_fraction_min": 0.02,
+        "p99_minus_p1_min": 32
+      },
+      "measured": {
+        "occluded_fraction": 0.8628,
+        "p1": 4.0,
+        "p99": 255.0
+      },
+      "passed": true
+    },
+    "sizes_2k": {
+      "measured": 2048,
+      "passed": true
+    },
+    "sizes_4k": {
+      "measured": 4096,
+      "passed": true
+    },
+    "team_mask_cloth_share": {
+      "expected": "0.5..0.98 of the cloth part's texels (gold trim, belt, strap stay out)",
+      "measured": 0.8414,
+      "passed": true
+    }
+  },
+  "edge_extend_px": 16,
+  "fill": "8-neighbour dilation 16 px, then pull-push pyramid",
+  "outputs": {
+    "T_Medusa_H2_2K_BC.png": {
+      "bytes": 4692189,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "8faf853b74d17bfc776b0d7663043bb1473dd76b22a1fa08885cdc4d5f5662b2"
+    },
+    "T_Medusa_H2_2K_N.png": {
+      "bytes": 4897846,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "11112739e6d8bbe1341a0fc4a573e2e43fcaaa4a0d1920fe7ae1f339b5345313"
+    },
+    "T_Medusa_H2_2K_N_OpenGL.png": {
+      "bytes": 4898389,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "7944e386130634a7e43c6ea5eb3163551f10ba836f6c8f64fe9ebe0cae4d82e0"
+    },
+    "T_Medusa_H2_2K_ORM.png": {
+      "bytes": 4404085,
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "3aa8f3fc1b63017e0197d12accfb90fe7738a2adf8a268c4fb801200d0cede74"
+    },
+    "T_Medusa_H2_2K_TeamMask.png": {
+      "bytes": 1033112,
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "3d784aa8918f9b9a0ddab182bfb87dc0b2fe5285c7c2490788fe54acf9718fbb"
+    },
+    "T_Medusa_H2_BC.png": {
+      "bytes": 14807007,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "90ae70b5b468face319ff7a006560b4dc32c104b9f7004836d1a6c2627091da1"
+    },
+    "T_Medusa_H2_N.png": {
+      "bytes": 14330460,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "f65c9268e3594eb03de95e6c07346c1b263d905f98f782c66495647e69c9f85c"
+    },
+    "T_Medusa_H2_N_OpenGL.png": {
+      "bytes": 14332721,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "a00b08c404b0a4b30b145dc25784b66156d037b85ea0c4d2c32fd07a614b0e5e"
+    },
+    "T_Medusa_H2_ORM.png": {
+      "bytes": 13488023,
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "36817003257d6a0494093832606f468d9848bcf6930865dd258d93dd5abcefd5"
+    },
+    "T_Medusa_H2_TeamMask.png": {
+      "bytes": 2821157,
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "e1c768918a29098f3b578da5ea0116a44b11d281da0f02e5a3064edd988fd505"
+    }
+  },
+  "passed": true,
+  "prefix": "T_Medusa_H2",
+  "stage": "textures",
+  "stats": {
+    "baked_texels": {
+      "AO": 7072981,
+      "BC": 7072981,
+      "HIT": 7072981,
+      "NORMAL": 7072981,
+      "RM": 7072981
+    },
+    "caps": {
+      "cap_texels": 252735,
+      "cap_texels_not_painted": 0,
+      "cap_triangles": 3908,
+      "cap_vertices": 3261,
+      "painted_outside_cap_raster": 0,
+      "painted_texels": 252735,
+      "rim_samples": 49430
+    },
+    "footprints": {
+      "painted_texels": 16402,
+      "rim_samples": 852,
+      "triangles": 244,
+      "vertices": 370
+    },
+    "in_island_unbaked_texels": {
+      "AO": 262546,
+      "BC": 262546,
+      "HIT": 262546,
+      "NORMAL": 262546,
+      "RM": 262546
+    },
+    "size": 4096,
+    "uv_texels": 7335527
+  },
+  "status": "измерено",
+  "team_mask": {
+    "base_band_texels": 136785,
+    "cloth_parts": [
+      "tripo_part_0"
+    ],
+    "cloth_share_of_cloth_texels": 0.8414,
+    "format": "RGBA: R = clothing (TeamColor), G = base side band, B = 0, A = 255",
+    "hsv": {
+      "note": "калибровка по запечённому BC платья (tripo_part_0): v p50 0,24, s p50 0,22; золото каймы и кожа ремня s > 0,34 — вне маски",
+      "ramp": 0.04,
+      "s_max": 0.34,
+      "v_max": 0.4
+    }
+  }
+}

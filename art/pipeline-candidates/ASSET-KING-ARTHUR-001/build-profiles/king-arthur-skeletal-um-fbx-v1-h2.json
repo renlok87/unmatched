@@ -1,0 +1,1253 @@
+{
+  "schema": "unmatched.h2-bake.profile/1",
+  "profile_id": "king-arthur-h2-bake/1",
+  "asset_id": "ASSET-KING-ARTHUR-001",
+  "status": "proposed",
+  "status_note": "Технический профиль H2-запекания King Arthur (2026-09-29): Tripo high-poly по частям (c24eeff0) -> игровая модель + атлас 4K/2K + риг UM_HUMANOID_17 (v2: weapon.R). Числа треугольников и плотности текселей — предложенный ориентир H2 (герой 30–45k tris, атлас 4K мастер + 2K рантайм, ≤ 2 слота), не бюджет (GD-058 открыт). Художественной приёмки нет.",
+  "module": "tools/tripo-pipeline/blender/h2_bake_arthur (run.py)",
+  "sources": {
+    "parts_glb": {
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/source/king-arthur-h2-tripo-c24eeff0-parts21.glb",
+      "sha256": "9920f86fb91bbc24e66a143b3ea0136ead2e85f664c0930a7332d5a07309c466",
+      "bytes": 47962564
+    },
+    "tex_glb": {
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/source/king-arthur-h2-tripo-c24eeff0-tex8k-pbr.glb",
+      "sha256": "60633dd9d1e5ea10c059d646c24bb1ea0d969c4ae1f0d47df4218b62252d4b82",
+      "bytes": 76905596
+    },
+    "source_spec": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/source-specs/tripo-c24eeff0-h2.json",
+    "concepts": {
+      "front": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-front.png",
+      "side": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-side.png",
+      "back": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-back.png",
+      "side_is": "left view (camera at the character's left, +X in Blender; the figure faces image-left; the sword is in the far right hand)",
+      "quality_reference": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png"
+    }
+  },
+  "inspect": {
+    "orientation_samples_per_part": 6000,
+    "flip_below_score": -0.5
+  },
+  "phantom_note": "Измерено стадией inspect (кадры preview/inspect/, отчёт reports/inspect-sources.json): боковой концепт — ЛЕВЫЙ вид (prompts.md: нарисован поверх ortho_left, фигура смотрит влево), а подан в слот RIGHT. Tripo понял его зеркально (перед фигуры — сзади, ближняя левая рука — правая) и достроил фантомные дубли: второй меч с кулаком и навершием за спиной (11, 13, 18), вторую опущенную правую руку (наруч 14 + латная перчатка 19), наколенник с драконом на задней стороне правого бедра (16), львиный медальон на задней стороне правого плеча (20), второй профиль лица на правой стороне головы (часть 6). Фантомы удаляются, голова симметризуется по чистой левой половине. Это геометрические правки, не художественная приёмка; настоящий ремонт — повторная генерация Tripo со слотом LEFT (платно, не выполнялось).",
+  "parts": {
+    "tripo_part_0": {
+      "role": "cloak (cloth)",
+      "target_tris": 7500,
+      "texel_priority": 1.0,
+      "cloth": true
+    },
+    "tripo_part_1": {
+      "role": "torso armour: breastplate, gorget, collar clasps, belt",
+      "target_tris": 5500,
+      "texel_priority": 1.0
+    },
+    "tripo_part_2": {
+      "role": "left leg with boot (+X)",
+      "target_tris": 2800,
+      "texel_priority": 1.0
+    },
+    "tripo_part_3": {
+      "role": "right leg with boot (-X)",
+      "target_tris": 2800,
+      "texel_priority": 1.0
+    },
+    "tripo_part_4": {
+      "role": "base (round pedestal)",
+      "target_tris": 1500,
+      "texel_priority": 0.6,
+      "bottom_faces_priority": 0.12
+    },
+    "tripo_part_5": {
+      "role": "front tabard (cloth)",
+      "target_tris": 1800,
+      "texel_priority": 1.0,
+      "cloth": true
+    },
+    "tripo_part_6": {
+      "role": "head: face, hair, beard, crown (symmetrized)",
+      "target_tris": 7000,
+      "texel_priority": 2.0
+    },
+    "tripo_part_7": {
+      "role": "left pauldron + mail upper arm",
+      "target_tris": 1800,
+      "texel_priority": 1.0
+    },
+    "tripo_part_8": {
+      "role": "right pauldron + mail upper arm",
+      "target_tris": 1800,
+      "texel_priority": 1.0
+    },
+    "tripo_part_9": {
+      "role": "left vambrace (forearm)",
+      "target_tris": 1400,
+      "texel_priority": 1.0
+    },
+    "tripo_part_10": {
+      "role": "sword blade + guard",
+      "target_tris": 1500,
+      "texel_priority": 1.6
+    },
+    "tripo_part_12": {
+      "role": "right forearm + gauntlet fist on the grip",
+      "target_tris": 2600,
+      "texel_priority": 1.6
+    },
+    "tripo_part_15": {
+      "role": "left open gauntlet hand",
+      "target_tris": 1600,
+      "texel_priority": 1.75
+    },
+    "tripo_part_17": {
+      "role": "sword grip stub + pommel",
+      "target_tris": 700,
+      "texel_priority": 1.6
+    },
+    "tripo_part_11": {
+      "role": "phantom: second sword blade behind the back",
+      "drop": "phantom of the mis-slotted side view: a second blade at the back (+Y), edge-on from the front; absent in the front/back concepts"
+    },
+    "tripo_part_13": {
+      "role": "phantom: second fist behind the back",
+      "drop": "phantom: fist holding the phantom blade at the back (+Y)"
+    },
+    "tripo_part_14": {
+      "role": "phantom: second right vambrace hanging down",
+      "drop": "phantom: the side concept's near LEFT arm hanging down, rebuilt on the right side; the real right forearm is part 12 (bent forward, fist on the grip)"
+    },
+    "tripo_part_16": {
+      "role": "phantom: dragon knee plate on the back of the right thigh",
+      "drop": "phantom: the side concept's knee plate, mirrored to the back of the right leg; the back concept shows only the cloak there"
+    },
+    "tripo_part_18": {
+      "role": "phantom: pommel of the back sword",
+      "drop": "phantom: pommel under the phantom back fist"
+    },
+    "tripo_part_19": {
+      "role": "phantom: second right gauntlet hanging down",
+      "drop": "phantom: open gauntlet at the end of the phantom right vambrace (part 14)"
+    },
+    "tripo_part_20": {
+      "role": "phantom: lion medallion on the back of the right shoulder",
+      "drop": "phantom: the front collar clasp seen in the side concept, mirrored to the back of the right shoulder; not in the back concept"
+    }
+  },
+  "repairs": {
+    "symmetrize": [
+      {
+        "part": "tripo_part_6",
+        "plane_x_m": -0.0077,
+        "keep": "+X",
+        "merge_m": 1e-06,
+        "why": "a second face profile (second nose and cheek) is fused into the right side of the head (renders az -45/-90 of stage inspect); the left half (+X) is clean. Plane x = -0.0077 m: x of the frontmost head vertex in every 1 cm slice z 0.74-0.89 (-0.0044..-0.0090, nose ridge and beard) and the centre of the crown band (-0.0555..0.0402 -> -0.0077)"
+      }
+    ],
+    "phantom_points_stride": 3,
+    "fill_phantom_holes": {
+      "parts": [
+        "tripo_part_0",
+        "tripo_part_12"
+      ],
+      "max_dist_m": 0.001,
+      "max_edges": 150,
+      "why": "the generator cut holes where a phantom crossed a garment (measured on the low parts: cloak loops of 68/106/39 edges at 0.0-0.4 mm from the phantom vambrace 14, knee plate 16 and medallion 20; the right forearm 12 has a 77-edge opening where the phantom forearm 14 continued down); natural openings (cloak inner edge 757 edges at 9 mm, elbow openings at 2 mm) are not touched"
+    },
+    "smooth_boxes": [
+      {
+        "part": "tripo_part_0",
+        "min_m": [
+          -0.1,
+          0.03,
+          0.33
+        ],
+        "max_m": [
+          -0.045,
+          0.2,
+          0.53
+        ],
+        "iterations": 25,
+        "factor": 0.5,
+        "why": "the raised strip with tabs of the phantom back sword/scabbard printed into the cloak geometry; smoothed flat (low part only; the bake normal there is replaced by the plain repaint)"
+      }
+    ]
+  },
+  "groups": {
+    "body": [
+      "tripo_part_0",
+      "tripo_part_1",
+      "tripo_part_2",
+      "tripo_part_3",
+      "tripo_part_5",
+      "tripo_part_6",
+      "tripo_part_7",
+      "tripo_part_8",
+      "tripo_part_9",
+      "tripo_part_12",
+      "tripo_part_15"
+    ],
+    "weapon": [
+      "tripo_part_10",
+      "tripo_part_17",
+      "LP_grip_bridge"
+    ],
+    "base": [
+      "tripo_part_4"
+    ]
+  },
+  "lowpoly": {
+    "method_note": "per part: Blender Decimate COLLAPSE (quadric, triangulated, no symmetry) on the welded untextured high-poly to target_tris; cleanup: weld 1e-6 m, dissolve degenerate, delete loose, triangulate; smooth shading, hard edges only on UV seams with a dihedral angle above uv.sharp_angle_deg",
+    "weld_m": 1e-06,
+    "deviation_samples": 20000,
+    "grip_bridge": {
+      "name": "LP_grip_bridge",
+      "blade_part": "tripo_part_10",
+      "pommel_part": "tripo_part_17",
+      "tip_band_m": 0.01,
+      "grip_band_m": 0.012,
+      "min_gap_m": 0.001,
+      "overlap_m": 0.004,
+      "sides": 8,
+      "radius_factor": 1.0,
+      "texel_priority": 0.3,
+      "why": "Tripo modelled no grip inside the fist: the blade/guard part and the grip/pommel part leave a gap hidden by the fist; an open cylinder makes the separate weapon whole (same repair as the 2026-09-28 candidate)"
+    },
+    "min_triangle_area_m2_tripo_frame": 1.1e-07,
+    "min_triangle_area_note": "UE drops triangles below 1e-4 cm2 (candidate_build.core.DEGENERATE_AREA_CM2); final = Tripo x 0.613 -> 1e-8 m2 final = 2.7e-8 m2 Tripo; x4 margin -> 1.1e-7 m2; the first build left 80 such slivers on the sword (readback check)"
+  },
+  "uv": {
+    "method_note": "charts per part (charts.py: normal-cone region growing over the face adjacency, folds > 120 deg always cut, small charts merged, SLIM MINIMUM_STRETCH unwrap with no_flip, islands that flip or compress below bad_area_ratio re-segmented with a narrower cone); every island scaled to a uniform texel density (sqrt(3D area / UV area)) times the part's texel_priority (bottom faces of the base: bottom_faces_priority), then one pack of all parts (rotate ANY, CONCAVE, margin fraction) into 0..1. Smart UV Project was measured first and rejected: 6019 islands, 4.8 % coverage",
+    "charts": {
+      "cone_deg": 60,
+      "min_chart_faces": 25,
+      "min_chart_area_share": 0.002,
+      "merge_extra_deg": 25,
+      "force_merge_max_faces": 6,
+      "slim_iterations": 20,
+      "bad_area_ratio": 0.35,
+      "refine_cones_deg": [
+        45,
+        32,
+        22
+      ]
+    },
+    "sharp_angle_deg": 60,
+    "pack_margin_fraction": 0.0022,
+    "pack_margin_note": "Blender FRACTION margin is applied on each island side: measured gap = 39 px for 0.00488 at 4096 (first pack), so 0.0022 targets ~18 px; required island gap >= 16 px at 4K (8 px padding each side, >= 8 px gap at 2K); measured by stage uvcheck",
+    "pack_shape": "CONCAVE",
+    "atlas_px": 4096,
+    "runtime_px": 2048,
+    "min_gap_px_4k": 16
+  },
+  "bake": {
+    "engine": "Cycles (Blender 5.2.2), selected-to-active per low part from its own high part(s)",
+    "device": "GPU",
+    "margin_px": 8,
+    "margin_type": "ADJACENT_FACES",
+    "cage_extrusion_m": 0.004,
+    "max_ray_distance_m": 0.01,
+    "cage_note": "Tripo frame (figure 0.98 m incl. sword; x 0.613 -> final). Measured low<->high deviation (stage lowpoly): p95 0.2-0.9 mm, max 3.4 mm (cloak); the cage starts 4 mm outside the low surface and searches 10 mm inward, i.e. -6..+4 mm around the low surface; misses are counted by the HIT pass",
+    "overrides": {},
+    "extra_sources": {
+      "LP_grip_bridge": [
+        "tripo_part_17",
+        "tripo_part_10"
+      ]
+    },
+    "ao_distance_m": 0.04,
+    "samples": {
+      "NORMAL": 8,
+      "AO": 128,
+      "EMIT": 16
+    },
+    "normal_map_probe_part": "tripo_part_1"
+  },
+  "textures": {
+    "prefix": "T_KingArthur_H2",
+    "team_mask": {
+      "status": "предложено",
+      "format": "RGBA 8-bit linear: R = cloth (TeamColor on clothing, user decision U-3 / AD-CNF-58 = b), G = base band (side wall of the base), B = 0, A = 255. Wave 4 proposal: 1-channel TeamMask read as .R by M_UM_Figure (TC_Grayscale) - compatible; the base band G is an input for M_UM_BaseMarker only if wave 4 adopts it (it currently uses a vertex mask R / side-wall normal)",
+      "cloth_parts": [
+        "tripo_part_0",
+        "tripo_part_5",
+        "tripo_part_1"
+      ],
+      "cloth_parts_note": "cloak, front tabard and the torso part (its red collar/cloak lining only, through the colour rule); pauldrons are excluded (their red texels are cloak bleed of the Tripo texture)",
+      "hue_min_deg": 330,
+      "hue_max_deg": 15,
+      "s_min": 0.5,
+      "v_min": 0.08,
+      "v_max": 0.85,
+      "blur_sigma_px": 1.0,
+      "rule_note": "measured on the baked BC (4K, hit texels): cloak red hue 330-15 deg, s p10/p50/p90 0.70/0.75/0.79, v p5/p95 0.32/0.46; gold embroidery hue 20-55 deg stays out of the mask",
+      "base_band": {
+        "part": "tripo_part_4",
+        "normal_z_max": 0.5
+      },
+      "edge": "soft edge = normalised Gaussian inside the cloth parts' coverage (gauss(cloth * cov) / gauss(cov)), then the gutters and the empty atlas take the nearest covered texel like BC; the first build blurred over the empty gutter and cut at the bake margin, so the edge row of the cloth islands fell to R 0.60 (interior 0.93) and a TeamDye render showed red hairlines on the cloak seams (review 2026-09-29)",
+      "edge_ratio_min": 0.9
+    },
+    "phantom_repaint": {
+      "parts": [
+        "tripo_part_0",
+        "tripo_part_12",
+        "tripo_part_3",
+        "tripo_part_8"
+      ],
+      "zone_m": 0.012,
+      "feather_m": 0.004,
+      "mirror_plane_x_m": -0.0077,
+      "method": "texels of these parts whose Tripo-frame position (POS bake) lies within zone_m of a phantom vertex take BC and ORM from the nearest clean texel of the donor part at the mirrored point (x' = 2 * plane - x; the left back of the figure is clean), feathered over feather_m; the phantom miss clusters (miss_clusters) and the boxes are repainted too; the normal is blended to flat (the baked normal carries the phantom imprint or does not exist)",
+      "why": "the Tripo texture painted the phantoms onto the garments they crossed (grey/gold streaks of the phantom back sword, the dragon knee plate and the lion medallion on the cloak back; review close_cloak_back of the first build)",
+      "donor_parts": {
+        "tripo_part_0": "tripo_part_0",
+        "tripo_part_12": "tripo_part_9",
+        "tripo_part_3": "tripo_part_2",
+        "tripo_part_8": "tripo_part_7"
+      },
+      "donor_note": "mirror lookup of the cloak in a metric with Y (depth toward the back) weighted 0.15: the back of the cloak is a height field over (x, z), and the smoothed strip lies up to 47 mm inward, so a plain 3D nearest donor projected far-off points onto folds (median 10.7 mm, 44 % distinct donors = smears); scaled: median 1.9 mm, 61-66 % distinct. Among the 8 nearest donors the first whose POS normal faces the mirrored target normal (dot >= 0.2) wins, so the inner and outer cloth layers are never swapped. mirror_cloth shifts the query along x in 3 mm steps (<= 24 mm) until the unrestricted donor is red cloth: the left border band lies about 2 cm more central than the right one (measured on the back renders), so without the shift the column next to the right band takes the band's edge texel (vertical streaks); the scaled metric applies only to targets facing along Y (|n_y| >= 0.5): fold walls facing sideways use the plain 3D metric (the scaled one collapsed them onto a few donors: vertical streaks on the fold at the right edge of the strip)",
+      "boxes": [
+        {
+          "part": "tripo_part_0",
+          "min_m": [
+            -0.108,
+            0.0,
+            0.27
+          ],
+          "max_m": [
+            -0.045,
+            0.2,
+            0.53
+          ],
+          "why": "the cloak back carries a raised vertical strip with gold tabs (the phantom back sword/scabbard printed into the cloak geometry and texture) and the knee-plate hole, 2-4 cm from the phantom vertices, so outside zone_m; box measured on an orthographic back render of the high-poly cloak (x -0.091..-0.056, z 0.345..0.504) plus margin; mode plain: the median of clean cloak texels in a 3 cm shell around the box (a mirrored donor brought the opposite border band into the box, first repaint run)",
+          "mode": "mirror_cloth",
+          "shell_m": 0.03,
+          "mode_note": "was 'plain' (median cloth colour: a smooth patch without the weave, visible in close_cloak_back); now the clean red-cloth texels of the mirrored left back, which carry the weave and the dragon panel edge",
+          "keep_band": true,
+          "extent_note": "extended 2026-09-29 (review): x -0.100 -> -0.108 covers the gold tab printed on the fold at the right edge of the strip (x -0.104, z 0.44-0.47); z 0.33 -> 0.27 covers the tail of the trail below the strip (gold/grey fragments at z 0.30-0.32); large gold components inside the box keep the Tripo paint (keep_band). Tried z 0.53 -> 0.565 for the small top tab (x -0.086, z 0.540-0.554): the raised top of the strip has no good mirror donor there and became a smeared flat patch larger than the tab, so the top stays at 0.53 and the tab is a listed residual"
+        }
+      ],
+      "miss_clusters": {
+        "max_phantom_dist_m": 0.02,
+        "feather_m": 0.003,
+        "modes": {
+          "tripo_part_0": "mirror_cloth",
+          "tripo_part_12": "mirror",
+          "tripo_part_3": "mirror",
+          "tripo_part_8": "mirror"
+        },
+        "why": "texels without a ray hit have no high-poly surface under them: the filled phantom holes (68/106/39 edges on the cloak, 77 on the right forearm) and the smoothed strip. The first build filled them from the nearest hit texel anywhere in the atlas (4 906 texels took another part, 28 144 a texel > 17 px away): a grey steel patch on the right hip of the cloak (ortho_right) and gold/black fragments along the right edge of the plain box down to the hem. Now every 8-connected miss cluster of a repaint part that comes within max_phantom_dist_m of a phantom vertex is repainted with weight 1 (+ a feather_m ring); all other misses take the nearest hit texel of their own UV island",
+        "mode_note": "mirror_cloth for the cloak: the holes and the strip lie in plain red cloth in the concept (between the dragon panel and the right border band, and on the right hip); the mirror of the figure is not exact, so an unrestricted donor brings the other side's border band into them"
+      },
+      "residue_check": {
+        "part": "tripo_part_0",
+        "radius_m": 0.04,
+        "why": "measured share of grey/dark and gold texels of the cloak in the phantom misses and within 4 cm of the phantoms, against the mirrored clean side"
+      },
+      "donor_metric_scale": {
+        "tripo_part_0": [
+          1.0,
+          0.15,
+          1.0
+        ]
+      },
+      "donor_facing_min_dot": 0.2,
+      "cloth_offset_search": {
+        "axis": 0,
+        "step_m": 0.003,
+        "max_m": 0.024
+      },
+      "phantom_zone_modes": {
+        "tripo_part_0": "mirror_cloth_keep_band"
+      },
+      "band_component_min_texels": 2000,
+      "phantom_zone_modes_note": "cloak phantom zone: 1 730 of its 56 034 hit texels are gold, 629 of them in large gold components (the right border band where it reaches the shoulder, z 0.70-0.75: Tripo painted it correctly up to the shoulder, only the medallion hole beside it is defective), 1 101 in small fragments (phantom paint). An unrestricted mirror stamped the left band about 2 cm off next to the right band (a broken double band at the shoulder, a knot fragment at the knee-plate zone). Now the hit texels of large gold components (dilated 2 px) keep the Tripo paint (weight 0) and all other zone texels take red-cloth donors",
+      "normal_transfer": "detail",
+      "normal_transfer_note": "the first builds blended the repainted normal to flat: the weave came back in BC but the repainted areas read smoother than the untouched cloth in close_cloak_back; now the donor's tangent normal is moved as detail relief (donor frame -> object space -> mirror -> minimal rotation onto the target normal -> target frame; frames from the POS gradients); normals that disagree (dot < 0.2) stay flat"
+    }
+  },
+  "rig": {
+    "skeleton": "UM_HUMANOID_17_v2 (docs/art-pipeline/rig/rig-contract.json, character Arthur: weapon.R under hand.R; 16 base bones + weapon.R = 17; armature object SKEL_UM_Humanoid = bone 0 in UE)",
+    "skeleton_note": "Задание называет UM_HUMANOID_17_v1; действующий RIG-CONTRACT (волна 4, v2) закрыл v1 для новых файлов (validate_clip: FAIL вне grandfathered_files). Отличие только в имени кости оружия: v1 weapon, v2 weapon.R. Сборка по v2; для v1-совместимости достаточно переименовать кость (ключ weapon_bone профиля)",
+    "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+    "figure_height_m": 0.55,
+    "top_part": "tripo_part_6",
+    "base_part": "tripo_part_4",
+    "feet_parts": [
+      "tripo_part_2",
+      "tripo_part_3"
+    ],
+    "height_note": "04 §3.3 (предложено): фигура 52-56 uu от низа подставки до верха короны; меч выше и в высоту не входит; подставка Base_Hero 30 x 6 uu (§3.8). Равномерный масштаб по голове даёт подставку около 30 x 6 uu без отдельной нормализации (замер stage rig)",
+    "material": "M_KingArthur_H2",
+    "objects": {
+      "body": "SK_KingArthur_H2_Body",
+      "body_mesh": "KingArthur_H2_Body",
+      "weapon": "SK_KingArthur_H2_Sword",
+      "weapon_mesh": "KingArthur_H2_Sword",
+      "base": "SM_KingArthur_H2_Base",
+      "base_mesh": "KingArthur_H2_Base"
+    },
+    "exports": {
+      "skeletal_fbx": "SK_KingArthur_H2.fbx",
+      "base_fbx": "SM_KingArthur_H2_Base.fbx"
+    },
+    "weapon_bone": "weapon.R",
+    "armature": {
+      "object": "SKEL_UM_Humanoid",
+      "max_influences": 4,
+      "frame_note": "bones in the Tripo frame (source: mapped by the seat transform, as candidate_build.rig.make_armature); joints measured on this mesh: contact centroids of neighbouring parts (shoulder/elbow/wrist/neck/hip), 2 cm slices of the leg parts (knee, ankle), the fitted sword axis (weapon.R head = grip centre, tail = blade tip); root in the final frame",
+      "bones": [
+        [
+          "root",
+          null,
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0.045
+          ],
+          "final"
+        ],
+        [
+          "hips",
+          "root",
+          [
+            -0.0077,
+            -0.045,
+            0.37
+          ],
+          [
+            -0.0077,
+            -0.045,
+            0.45
+          ],
+          "source"
+        ],
+        [
+          "spine",
+          "hips",
+          [
+            -0.0077,
+            -0.045,
+            0.45
+          ],
+          [
+            -0.0077,
+            -0.015,
+            0.735
+          ],
+          "source"
+        ],
+        [
+          "head",
+          "spine",
+          [
+            -0.0077,
+            -0.005,
+            0.745
+          ],
+          [
+            -0.0077,
+            -0.005,
+            0.895
+          ],
+          "source"
+        ],
+        [
+          "arm_upper.L",
+          "spine",
+          [
+            0.108,
+            -0.03,
+            0.7
+          ],
+          [
+            0.143,
+            -0.028,
+            0.582
+          ],
+          "source"
+        ],
+        [
+          "arm_lower.L",
+          "arm_upper.L",
+          [
+            0.143,
+            -0.028,
+            0.582
+          ],
+          [
+            0.157,
+            -0.084,
+            0.474
+          ],
+          "source"
+        ],
+        [
+          "hand.L",
+          "arm_lower.L",
+          [
+            0.157,
+            -0.084,
+            0.474
+          ],
+          [
+            0.152,
+            -0.1,
+            0.41
+          ],
+          "source"
+        ],
+        [
+          "arm_upper.R",
+          "spine",
+          [
+            -0.128,
+            -0.015,
+            0.7
+          ],
+          [
+            -0.171,
+            -0.018,
+            0.595
+          ],
+          "source"
+        ],
+        [
+          "arm_lower.R",
+          "arm_upper.R",
+          [
+            -0.171,
+            -0.018,
+            0.595
+          ],
+          [
+            -0.152,
+            -0.072,
+            0.6
+          ],
+          "source"
+        ],
+        [
+          "hand.R",
+          "arm_lower.R",
+          [
+            -0.152,
+            -0.072,
+            0.6
+          ],
+          [
+            -0.1317,
+            -0.1002,
+            0.609
+          ],
+          "source"
+        ],
+        [
+          "leg_upper.L",
+          "hips",
+          [
+            0.075,
+            -0.045,
+            0.365
+          ],
+          [
+            0.088,
+            -0.045,
+            0.245
+          ],
+          "source"
+        ],
+        [
+          "leg_lower.L",
+          "leg_upper.L",
+          [
+            0.088,
+            -0.045,
+            0.245
+          ],
+          [
+            0.112,
+            -0.02,
+            0.14
+          ],
+          "source"
+        ],
+        [
+          "foot.L",
+          "leg_lower.L",
+          [
+            0.112,
+            -0.02,
+            0.14
+          ],
+          [
+            0.125,
+            -0.1,
+            0.105
+          ],
+          "source"
+        ],
+        [
+          "leg_upper.R",
+          "hips",
+          [
+            -0.092,
+            -0.045,
+            0.365
+          ],
+          [
+            -0.1,
+            -0.03,
+            0.245
+          ],
+          "source"
+        ],
+        [
+          "leg_lower.R",
+          "leg_upper.R",
+          [
+            -0.1,
+            -0.03,
+            0.245
+          ],
+          [
+            -0.125,
+            0.0,
+            0.14
+          ],
+          "source"
+        ],
+        [
+          "foot.R",
+          "leg_lower.R",
+          [
+            -0.125,
+            0.0,
+            0.14
+          ],
+          [
+            -0.14,
+            0.07,
+            0.105
+          ],
+          "source"
+        ],
+        [
+          "weapon.R",
+          "hand.R",
+          [
+            -0.1317,
+            -0.10021,
+            0.609
+          ],
+          [
+            -0.15353,
+            -0.09898,
+            0.97401
+          ],
+          "source"
+        ]
+      ],
+      "foot_R_note": "foot.R points backward (+Y): the Tripo right boot has its toe behind the ankle (phantom of the mis-slotted side view, see inspect); the bone follows the geometry"
+    },
+    "weights": {
+      "method": "bone heat once on a voxel proxy of the whole body (continuous fields across the part seams), closest-point barycentric transfer to every part, then per part: allowed bones, ramps, caps, < clean_below dropped, <= 4 influences, normalised (candidate_build.rig.cleanup_weights); sword rigid on weapon.R; base not skinned",
+      "proxy_voxel_m": 0.002,
+      "proxy_faces": 60000,
+      "proxy_heat_bones": [
+        "hips",
+        "spine",
+        "head",
+        "arm_upper.L",
+        "arm_lower.L",
+        "hand.L",
+        "arm_upper.R",
+        "arm_lower.R",
+        "hand.R",
+        "leg_upper.L",
+        "leg_lower.L",
+        "foot.L",
+        "leg_upper.R",
+        "leg_lower.R",
+        "foot.R"
+      ],
+      "clean_below": 0.01,
+      "coordinates_frame": "source (Tripo frame; mapped by the seat transform)",
+      "groups": [
+        {
+          "parts": [
+            "tripo_part_6"
+          ],
+          "heat": [
+            "head",
+            "spine"
+          ],
+          "height_ramps": [
+            {
+              "bones": [
+                "head"
+              ],
+              "zero_below_z": 0.748,
+              "full_above_z": 0.772,
+              "to": "spine"
+            }
+          ],
+          "why": "head, hair, beard and crown on head; the neck inside the gorget (below z 0.748..0.772) on spine, so the gorget (torso, no head influence) and the neck stay together"
+        },
+        {
+          "parts": [
+            "tripo_part_1"
+          ],
+          "heat": [
+            "hips",
+            "spine",
+            "arm_upper.L",
+            "arm_upper.R",
+            "leg_upper.L",
+            "leg_upper.R"
+          ],
+          "height_ramps": [
+            {
+              "bones": [
+                "spine"
+              ],
+              "zero_below_z": 0.44,
+              "full_above_z": 0.52,
+              "to": "hips"
+            },
+            {
+              "bones": [
+                "hips"
+              ],
+              "zero_above_z": 0.52,
+              "full_below_z": 0.44,
+              "to": "spine"
+            },
+            {
+              "axis": "x",
+              "bones": [
+                "arm_upper.L"
+              ],
+              "zero_below": 0.05,
+              "full_above": 0.08,
+              "to": "spine"
+            },
+            {
+              "axis": "x",
+              "bones": [
+                "arm_upper.R"
+              ],
+              "zero_above": -0.065,
+              "full_below": -0.095,
+              "to": "spine"
+            },
+            {
+              "bones": [
+                "leg_upper.L",
+                "leg_upper.R"
+              ],
+              "zero_above_z": 0.42,
+              "full_below_z": 0.37,
+              "to": "hips"
+            }
+          ],
+          "why": "armour torso: one hips->spine blend over z 0.44..0.52 (same ramps as the tabard: the belt seam stays closed), no head influence (the gorget does not twist with the head), shoulder clasps follow the upper arms only outside |x| 0.05..0.095, tassets follow the thighs below z 0.42"
+        },
+        {
+          "parts": [
+            "tripo_part_0"
+          ],
+          "heat": [
+            "hips",
+            "spine",
+            "arm_upper.L",
+            "arm_upper.R",
+            "leg_upper.L",
+            "leg_upper.R"
+          ],
+          "height_ramps": [
+            {
+              "bones": [
+                "leg_upper.L",
+                "leg_upper.R"
+              ],
+              "zero_above_z": 0.33,
+              "full_below_z": 0.2,
+              "to": "hips"
+            },
+            {
+              "bones": [
+                "hips"
+              ],
+              "zero_above_z": 0.62,
+              "full_below_z": 0.5,
+              "to": "spine"
+            },
+            {
+              "bones": [
+                "arm_upper.L",
+                "arm_upper.R"
+              ],
+              "zero_below_z": 0.62,
+              "full_above_z": 0.7,
+              "to": "spine"
+            },
+            {
+              "axis": "x",
+              "bones": [
+                "arm_upper.L"
+              ],
+              "zero_below": 0.05,
+              "full_above": 0.08,
+              "to": "spine"
+            },
+            {
+              "axis": "x",
+              "bones": [
+                "arm_upper.R"
+              ],
+              "zero_above": -0.065,
+              "full_below": -0.095,
+              "to": "spine"
+            }
+          ],
+          "caps": {
+            "leg_upper.L": 0.3,
+            "leg_upper.R": 0.3,
+            "arm_upper.L": 0.5,
+            "arm_upper.R": 0.5
+          },
+          "cap_excess_to_by_bone": {
+            "arm_upper.L": "spine",
+            "arm_upper.R": "spine"
+          },
+          "cap_excess_to": "hips",
+          "why": "cloak (rig-contract §9.4): hips with a soft transition to the thighs at the hem only; the collar on spine; over the pauldrons (z > 0.62, outside the torso's shoulder ramp) up to half on the upper arms"
+        },
+        {
+          "parts": [
+            "tripo_part_5"
+          ],
+          "heat": [
+            "hips",
+            "spine",
+            "leg_upper.L",
+            "leg_upper.R"
+          ],
+          "height_ramps": [
+            {
+              "bones": [
+                "spine"
+              ],
+              "zero_below_z": 0.44,
+              "full_above_z": 0.52,
+              "to": "hips"
+            },
+            {
+              "bones": [
+                "hips"
+              ],
+              "zero_above_z": 0.52,
+              "full_below_z": 0.44,
+              "to": "spine"
+            },
+            {
+              "bones": [
+                "leg_upper.L",
+                "leg_upper.R"
+              ],
+              "zero_above_z": 0.3,
+              "full_below_z": 0.18,
+              "to": "hips"
+            }
+          ],
+          "caps": {
+            "leg_upper.L": 0.35,
+            "leg_upper.R": 0.35
+          },
+          "cap_excess_to": "hips",
+          "why": "front tabard: the torso's hips->spine blend at the belt, thighs only at the hem"
+        },
+        {
+          "parts": [
+            "tripo_part_2"
+          ],
+          "heat": [
+            "hips",
+            "leg_upper.L",
+            "leg_lower.L",
+            "foot.L"
+          ]
+        },
+        {
+          "parts": [
+            "tripo_part_3"
+          ],
+          "heat": [
+            "hips",
+            "leg_upper.R",
+            "leg_lower.R",
+            "foot.R"
+          ]
+        },
+        {
+          "parts": [
+            "tripo_part_7"
+          ],
+          "heat": [
+            "spine",
+            "arm_upper.L",
+            "arm_lower.L"
+          ]
+        },
+        {
+          "parts": [
+            "tripo_part_8"
+          ],
+          "heat": [
+            "spine",
+            "arm_upper.R",
+            "arm_lower.R"
+          ]
+        },
+        {
+          "parts": [
+            "tripo_part_9"
+          ],
+          "heat": [
+            "arm_upper.L",
+            "arm_lower.L",
+            "hand.L"
+          ]
+        },
+        {
+          "parts": [
+            "tripo_part_15"
+          ],
+          "heat": [
+            "arm_lower.L",
+            "hand.L"
+          ]
+        },
+        {
+          "parts": [
+            "tripo_part_12"
+          ],
+          "heat": [
+            "arm_upper.R",
+            "arm_lower.R",
+            "hand.R"
+          ],
+          "height_ramps": [
+            {
+              "axis": "y",
+              "bones": [
+                "arm_lower.R",
+                "arm_upper.R"
+              ],
+              "zero_below": -0.085,
+              "full_above": -0.06,
+              "to": "hand.R"
+            }
+          ],
+          "why": "the gauntlet fist around the grip (y < -0.085) is rigid on hand.R (no finger bones), the vambrace blends to the forearm"
+        }
+      ],
+      "proxy_min_shell_faces": 200,
+      "heat_scale": 10.0,
+      "heat_note": "Bone Heat fails on the 0.55 m proxy (Blender warning 'failed to find solution for one or more bones', every proxy vertex unweighted, measured 2026-09-29); solved on a x10 copy of the proxy and armature",
+      "quantize_levels": 255,
+      "quantize_note": "weights snapped to 1/255 with an exact per-vertex sum (UE keeps 8-bit skin weights by default); removes the run-to-run noise of the heat solve (<= 2.7e-6 on 513 of 38 336 weights between two builds, positions/UV/bones identical) from the FBX bytes"
+    },
+    "seams": {
+      "contact_m": 0.0015,
+      "min_contacts": 10,
+      "note": "vertex of part A within 1.5 mm (final frame) of part B at rest; opening = posed distance - rest distance in the 7 rig_deform_probe poses",
+      "joints": [
+        {
+          "pair": [
+            "tripo_part_6",
+            "tripo_part_1"
+          ],
+          "what": "neck: head part into the gorget (z <= 0.765 in the Tripo frame; above it the beard lies on the gorget and slides)",
+          "z_range_source": [
+            0.7,
+            0.765
+          ]
+        },
+        {
+          "pair": [
+            "tripo_part_1",
+            "tripo_part_7"
+          ],
+          "what": "left shoulder"
+        },
+        {
+          "pair": [
+            "tripo_part_1",
+            "tripo_part_8"
+          ],
+          "what": "right shoulder"
+        },
+        {
+          "pair": [
+            "tripo_part_7",
+            "tripo_part_9"
+          ],
+          "what": "left elbow"
+        },
+        {
+          "pair": [
+            "tripo_part_8",
+            "tripo_part_12"
+          ],
+          "what": "right elbow"
+        },
+        {
+          "pair": [
+            "tripo_part_9",
+            "tripo_part_15"
+          ],
+          "what": "left wrist"
+        },
+        {
+          "pair": [
+            "tripo_part_1",
+            "tripo_part_2"
+          ],
+          "what": "left hip"
+        },
+        {
+          "pair": [
+            "tripo_part_1",
+            "tripo_part_3"
+          ],
+          "what": "right hip"
+        },
+        {
+          "pair": [
+            "tripo_part_1",
+            "tripo_part_5"
+          ],
+          "what": "tabard at the belt"
+        },
+        {
+          "pair": [
+            "tripo_part_0",
+            "tripo_part_1"
+          ],
+          "what": "cloak at the collar (z >= 0.70 in the Tripo frame)",
+          "z_range_source": [
+            0.7,
+            1.0
+          ]
+        }
+      ]
+    },
+    "sockets": [
+      {
+        "name": "Weapon",
+        "bone": "weapon.R",
+        "target": "bone_head",
+        "purpose": "Holy Avenger VFX (CUE-014): grip centre on the sword axis"
+      },
+      {
+        "name": "Head",
+        "bone": "head",
+        "target": "part_bbox_centre",
+        "target_part": "tripo_part_6",
+        "purpose": "damage / status VFX"
+      }
+    ],
+    "proposed_limits_for_comparison_only": {
+      "source": "H2 guide of the orchestrator (hero 30-45k tris, 4K master + 2K runtime, <= 2 slots) and 04 §3.3/§3.8 (height 52-56 uu, base 30 x 6 uu, capsule 36 x 62 uu); 17 §4.5 hero 15-25k = current proposal; not budgets (GD-058)",
+      "hero_triangles": [
+        30000,
+        45000
+      ],
+      "material_slots_max": 2,
+      "capsule_uu": {
+        "diameter": 36,
+        "height": 62
+      }
+    },
+    "weapon_fit": {
+      "blade_part": "tripo_part_10",
+      "blade_min_z_tripo": 0.665,
+      "grip_z_tripo": 0.609,
+      "why": "the profile's grip->tip line left the blade centroid 4.1 mm off the bone (first build); the bone is refitted on the blade's own axis (guard top ~0.653 in the Tripo frame, grip centre z 0.609 = fitted grip of the grip bridge)"
+    }
+  },
+  "review": {
+    "note": "Blender EEVEE preview frames, not the game light and not UE; every frame is marked 'blender' in the sheets",
+    "eevee_samples": 32,
+    "concept_framing": {
+      "base_bottom_frac": 0.962,
+      "sword_tip_frac": 0.042,
+      "source": "prompts.md front: base x 24.8-75.2 %, y 87.2-96.2 %, sword tip y 4.2 %"
+    },
+    "concept_px": [
+      1190,
+      1322
+    ],
+    "closeups": [
+      {
+        "name": "face",
+        "part": "tripo_part_6",
+        "azimuths": [
+          0,
+          35,
+          -35
+        ],
+        "margin": 1.1
+      },
+      {
+        "name": "fist_hilt",
+        "part": "tripo_part_12",
+        "azimuths": [
+          0,
+          -45
+        ],
+        "margin": 1.3
+      },
+      {
+        "name": "left_hand",
+        "part": "tripo_part_15",
+        "azimuths": [
+          0,
+          45
+        ],
+        "margin": 1.5
+      },
+      {
+        "name": "blade",
+        "object": "weapon",
+        "azimuths": [
+          0,
+          -90
+        ],
+        "margin": 1.05
+      },
+      {
+        "name": "torso",
+        "part": "tripo_part_1",
+        "azimuths": [
+          0
+        ],
+        "margin": 1.1
+      },
+      {
+        "name": "cloak_back",
+        "part": "tripo_part_0",
+        "azimuths": [
+          180,
+          -135
+        ],
+        "margin": 1.05
+      },
+      {
+        "name": "cloak_side",
+        "part": "tripo_part_0",
+        "azimuths": [
+          -90,
+          90
+        ],
+        "margin": 1.05
+      },
+      {
+        "name": "feet",
+        "parts": [
+          "tripo_part_2",
+          "tripo_part_3"
+        ],
+        "azimuths": [
+          0,
+          -90
+        ],
+        "margin": 1.1
+      },
+      {
+        "name": "base",
+        "object": "base",
+        "azimuths": [
+          0
+        ],
+        "elevation_deg": 35,
+        "margin": 1.1
+      }
+    ],
+    "k1_px_per_m": 250,
+    "k2_zoom": 1.6,
+    "k2_s05_distance_m": 3.0,
+    "cameras_note": "K1: FOV 35 horizontal, pitch -55, a 1 m cell ~ 250 px across 1920 px at the target (04 §3; prior candidate review); K2 = K1 x 1.6 zoom (03 proposal, QA-010); K2S05 = FOV 20, 300 uu (S05 measured)",
+    "game_azimuths": [
+      0,
+      -40,
+      40
+    ],
+    "previous": {
+      "run": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1",
+      "skeletal_fbx": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/export/SK_KingArthur_Candidate.fbx",
+      "base_fbx": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/export/SM_KingArthur_Base_Candidate.fbx",
+      "textures_dir": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/textures",
+      "texture_prefix": "T_KingArthur_Candidate_Atlas_",
+      "offset_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "note": "CLI candidate 2026-09-28 (Tripo 75e27ee8 segmented retopo, 21.3k tris, 2K atlas), rendered alone on the same spot with the same camera and light (equal scale)"
+    },
+    "teamdye": {
+      "dye_linear": [
+        0.05,
+        0.12,
+        0.55
+      ],
+      "close_name": "cloak_back",
+      "close_part": "tripo_part_0",
+      "close_azimuths": [
+        180,
+        -135
+      ],
+      "game": [
+        [
+          "K2S05",
+          180
+        ],
+        [
+          "K2S05",
+          -140
+        ],
+        [
+          "K2S05",
+          -40
+        ],
+        [
+          "K2",
+          180
+        ]
+      ],
+      "why": "user decision TeamColor also on clothing: the TeamMask must reach the island seams at the S05 K-2 close-up (the first build left red hairlines on the cloak seams, review 2026-09-29)"
+    },
+    "game_back": [
+      [
+        "K2S05",
+        180
+      ],
+      [
+        "K2S05",
+        -140
+      ],
+      [
+        "K2",
+        180
+      ]
+    ]
+  }
+}

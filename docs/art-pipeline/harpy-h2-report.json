@@ -1,0 +1,5407 @@
+{
+ "assessment": {
+  "budget_proposal": {
+   "harpy_triangles": "20-30k (this candidate 28.5k figure + 0.9k base; revision 1: 26.0k; stitching adds ~1.3k). Budget probe of revision 2 (reports/budget-probe.json, same build at x0.5 / x0.75 / x1.5 of the part targets): worst-part p99 surface deviation 0.65 / 0.49 / 0.39 / 0.28 px at K2 7.5 m for 15.0k / 21.7k / 28.5k / 41.7k triangles; the worst-part MAX is 1.36 / 1.25 / 1.06 / 0.55 px, dominated by tripo_part_1 around the trimmed hood rim (hidden under the neck cap); returns diminish above ~20k, 28.5k keeps the face at 1.2k triangles",
+   "hero_triangles": "30-45k (orchestrator's H2 target); not measured on Harpy",
+   "memory_estimate": "2K BC (BC1) + N (BC5) + ORM (BC1) + TeamMask (G8) with mips ~ 16 MB per Harpy material, shared by the three instances",
+   "slots": "2 (body atlas + base), <= 2",
+   "status": "предложено (не бюджет; решение GD-058)",
+   "textures": "4K master (bake target, archive) + 2K runtime; at 2K the body carries 18.5 px/cm, face 36.8 px/cm, talons 27.6 px/cm"
+  },
+  "determinism": "see reports/determinism.json",
+  "falls_short": [
+   "the neck cap is a smooth dark area inside the collar (the patch covers its upper half); not sculpted feathers",
+   "1-3 px see-through pinholes remain at every azimuth (50 px over 36 game frames, worst 6 px per frame): the verifier's strict gate (0 px behind the figure) is not met; no opening (component >= 4 px) remains",
+   "two ankle bands (concept: one)",
+   "faceted jaw and crest spikes in extreme close-ups",
+   "head turn 35 deg opens a 3.0 cm gap between head and collar (limit Idle head turns to ~15 deg, as the previous candidate)",
+   "flat roughness; material contrast below the Medusa quality reference",
+   "UV atlas fill 49 % (1.27k islands from Tripo's charts): a dedicated packer would raise texel density by ~20 %"
+  ],
+  "findings": [
+   {
+    "evidence": [
+     "preview/evidence/janus_head_sheet_source_frame.jpg (8 azimuths around the head, faces at az 0 and az 180)",
+     "preview/evidence/source_highpoly_textured_{front,back,left,right,top}.jpg",
+     "preview/evidence/janus_head_without_part{12,0}_source_frame.jpg"
+    ],
+    "id": "H2-HARPY-JANUS",
+    "severity": "blocker for art acceptance of the raw Tripo result (repaired locally, see repair)",
+    "what": "Tripo task 330872a3 produced a two-faced (Janus) head: a full face at source -Y (tripo_part_12, from the front concept) and a second full face with a real nose/chin profile at source +Y (inside tripo_part_0); the wings and the crest were fitted to the MIRRORED side concept (swept toward source -Y). Cause: the side concept (drawn over ortho_left, face looking left) went into the Studio slot RIGHT (tripo-run.json slot_consistency warned)."
+   },
+   {
+    "id": "H2-HARPY-HOOD",
+    "severity": "major (found by verification of revision 1, fixed in revision 2)",
+    "what": "The dropped face tripo_part_12 sat inside a feathered hood of the torso part tripo_part_1 (neck column behind the head up to z 0.534 source). Without the face the hood is hollow: a bald dome behind the crest from the game camera and an open cavity from behind. Trimmed and capped (repair.trim, repair.caps, repair.patches)."
+   },
+   {
+    "id": "H2-HARPY-SEAM-CRACKS",
+    "severity": "minor (found in revision 2, mostly fixed)",
+    "what": "The Tripo parts are one surface cut into parts; the per-part decimation opened sub-millimetre cracks along the shared cuts, visible with one-sided materials as 1-3 px background pinholes in game frames. Stitching (lowpoly.stitch) closes most of them; 50 px over 36 frames remain (see revision.verified_defects_fixed V1-NECK-SEE-THROUGH)."
+   },
+   {
+    "id": "H2-HARPY-TWO-BANDS",
+    "severity": "deviation from the concept",
+    "what": "Tripo gave both ankles a gold band (the concept has one, on the left leg). The right band (tripo_part_11, a separate part) is kept: it bridges a 2.2 cm source gap between the right shin and tarsus; dropping it opened the leg."
+   },
+   {
+    "id": "H2-HARPY-THIGHS",
+    "severity": "deviation (geometry)",
+    "what": "The thighs are asymmetric: the left bulges forward (source y to -0.133), the right backward (to +0.072); knees are placed inside each thigh's mass."
+   },
+   {
+    "id": "H2-HARPY-NO-METAL",
+    "severity": "material",
+    "what": "Tripo PBR left the gold bands non-metallic (0 texels with metallic > 0.5); a colour rule (textures.metal_rule) sets metallic 1 / roughness 0.35 on the gold texels of the two band-carrying parts (proposal)."
+   }
+  ],
+  "note": "Hand-written part of the H2 Harpy report (docs/art-pipeline/harpy-h2-report.md), revision 2 (harpy-h2-bake/2, after the verification of revision 1). Statuses: measured numbers are in the stage reports; everything here is an observation on Blender frames (label blender) or a proposal. Not art-accepted, not UE-imported.",
+  "repair": [
+   "180 deg turn of the whole high-poly about Z: the side-consistent face (tripo_part_0) becomes the front, wings sweep back as in the side concept",
+   "tripo_part_12 (front-concept face) dropped",
+   "trim of tripo_part_1: the hollow hood / neck column that framed the dropped face (15 829 high-poly faces above z 0.455 behind the head)",
+   "cap_100: closed domed cap over the torso's neck opening (874 game triangles, dark feather tone with a soft procedural scallop baked into BC and N)",
+   "patch_101: the head's own back feathers (tripo_part_0, Tripo UVs and textures) copied 4.5 cm back and down over the cap's upper half, with a reversed backing sheet 2 mm behind it (799 game triangles)",
+   "recolour of the torso's skin-coloured V at the back of the neck to the dark feather tone (bake.recolor, now two boxes: the V and its light tip below the cap)",
+   "all are proposals, recorded in the profile (repair, bake.recolor); the clean fix is a Tripo regeneration with the side concept in the LEFT slot (paid, orchestrator decision)"
+  ],
+  "revision": {
+   "date": "2026-09-29",
+   "found_during_the_fix": [
+    "the per-part decimation opened sub-millimetre cracks along every cut Tripo shares between two parts (36 shared chains between 12 part pairs); stitch.py makes both boundaries the same polyline on the high-poly cut (1 297 vertices inserted, 56 three-part corners closed, 1 sliver collapsed and 1 rotated)",
+    "the first build of the nape patch had a determinism bug (bmesh duplicate's vert_map maps both ways, the loop iterated a set of BMesh elements): the same-path rebuild caught it (patch 798 vs 799 triangles); fixed before the two final builds",
+    "revision 1 counted 1 texel 'covered twice' once the geometry changed: a shared edge through a texel centre (inclusive rasteriser tie); uv_check.py now reports texels_overlapping_strict (strictly inside two triangles) next to the raw count"
+   ],
+   "id": "harpy-h2-bake/2",
+   "other_remarks_addressed": [
+    "logs: 20 stage logs in logs/ (the revision-1 manifest said 20 but there were 18; now run_all.sh also writes preview-shape, see-through and k2-projection logs; counted after the final run)",
+    "the Harpy asset .gitignore (the orchestrator's rules for the raw H2 GLBs) is listed in the commit manifest: it has to be committed with this run or before it, together with 20260929-h2-tripo/reports/tripo-run.json and source-specs/tripo-330872a3-h2.json",
+    "reports/determinism.json has no local paths any more (determinism_check.py writes repo-relative paths or 'scratch:<name>')",
+    "payload: the task rule is 'raw GLBs > 50 MB stay out, everything else goes into the commit manifest', so the 4K masters (5 PNG, ~58 MB) stay in the manifest; the total size is stated there; pinning them by sha256 instead (or LFS) is left to the orchestrator (followup). The single close-ups review/closeup_*.jpg are no longer stored: both halves are in the cmp_closeup_* sheets (store_preview.py records their sha256)",
+    "the H2 GLB table no longer blames the 50 MB policy for parts13.glb (47.3 MB, under 50 MB): both GLBs are excluded by the orchestrator's rules in the asset .gitignore and pinned by sha256 in the source-spec",
+    "the manifest lists the module's .py files one by one (__pycache__ is ignored by the root .gitignore)"
+   ],
+   "previous": "harpy-h2-bake/1 (same run folder, rebuilt from the same Tripo GLBs; its frames are not in git)",
+   "verified_defects_fixed": [
+    {
+     "defect": "the Janus repair left a hollow hood of the TORSO part tripo_part_1 behind the head (the feathered cowl that framed the dropped face tripo_part_12): open toward +Y, its inside faced the viewer from behind (back faces culled with TwoSided=false, cavity in any two-sided render), undisclosed",
+     "evidence": "preview/fix/before_after_nape_game_back.jpg, before_after_neck_back_ortho.jpg, cmp_closeup_nape_back_game.jpg, cmp_closeup_nape_back3q_game.jpg",
+     "fix": "repair.trim removes the 15 829 high-poly faces of tripo_part_1 with centroid above z 0.455 behind the head (x -0.055..0.057, y -0.026..0.070, z 0.455..0.534 authored source frame), in the high-poly and therefore in the game mesh; the torso's neck opening that remains (one open loop, 0.65 m) is closed by the cap cap_100 and covered by patch_101 (below)",
+     "id": "V1-HOOD",
+     "severity": "major"
+    },
+    {
+     "defect": "the same hood read from the elevated game camera (front, pitch -55) as a smooth bald tan dome rising behind the crest to eye level (tripo_part_1 max z 0.534 source) - a 'second bald head' at K2; hidden in the level ortho frames; repair.why misattributed it to tripo_part_0",
+     "evidence": "preview/fix/before_after_k2_front.jpg, before_after_k2close_front.jpg, before_after_teamcolor_game3q.jpg, cmp_closeup_crest_front_game.jpg",
+     "fix": "same trim; profile repair.why rewritten (the dome is tripo_part_1's hood; the back of tripo_part_0 is a closed feathered surface). From the front the crest is the top of the figure again; a thin dark edge of the cap/nape patch shows between two crest spikes up close (crest_front_game)",
+     "id": "V1-BALD-DOME",
+     "severity": "major"
+    },
+    {
+     "defect": "compose_review.py labelled all K2 crops 'left = previous, right = H2', but from behind (azimuth 180) the H2 figure (x = +0.5) is on the LEFT; the file k2close_back_prev_left_h2_right and the report's back assessment described the previous candidate as H2",
+     "evidence": "preview/crop_k2close_back_h2_left_prev_right.png, preview/crop_k2close_back3q_h2_left_prev_right.png, preview/k2/review-frames-k2.json",
+     "fix": "review_h2.py names every K2 frame from the projected figure centres (…_prev_left_h2_right or …_h2_left_prev_right) and records left_to_right in review-frames-k2.json; compose_review.py labels the crops from that record; new frames k2/k2close_back_h2_left_prev_right and k2close_back3q_h2_left_prev_right (azimuth 140); the old mislabelled files are gone; the back assessment below is written from the H2 figure",
+     "id": "V1-K2-BACK-LABEL",
+     "severity": "major (review tooling)"
+    },
+    {
+     "defect": "with back faces culled the background showed through the neck from behind: 119-130 px at azimuth 180 / 4.8 m (components of 69 and 44 px), 42-47 px at 7.5 m; the ellipsoid plug_100 closed only the lower back of the opening; not disclosed",
+     "evidence": "reports/see-through.json, preview/see-through/*.png (red = see-through pixels), preview/fix/before_after_see_through_az180.jpg",
+     "fix": "the ellipsoid is replaced by cap_100, a closed domed cap built on the neck loop itself (skirt 12 % outside and 4 mm under the rim, lip 3 mm above it, closed underside); new automatic gate see_through.py in run_all.sh (18 azimuths x 4.8 / 7.5 m, one-sided vs two-sided Workbench masks). Measured on the game mesh: 0 openings (no component >= 4 px) at every azimuth; largest component 3 px; the neck gap is gone. The strict gate of the verifier (0 px at azimuths 120-240) is NOT met: isolated 1-3 px pinholes remain (worst frame 4 px in the gated range, 6 px over all azimuths, 50 px over all 36 frames; revision 1: 676 px, worst 130). They are sub-millimetre cracks between Tripo parts that the per-part decimation opened; lowpoly.stitch now welds the shared cuts geometrically (213 -> 50 px before/after stitching), the rest sits at non-shared boundary pieces",
+     "id": "V1-NECK-SEE-THROUGH",
+     "severity": "major"
+    }
+   ]
+  },
+  "visual_assessment_vs_concept": {
+   "back": "the crest now continues into the collar through the copied back-of-head feathers, close to the back concept's dark nape; below them the cap reads as a smooth dark area inside the collar ruff (about 2 x 3 cm at the final scale), with the recoloured V under it - darker and flatter than the concept's feathers up close, a dark nape at game distance; no cavity, no light gap",
+   "closeups": "bake fidelity against the Tripo high-poly is high on face, talons, bands and wing feathers; faceted jawline and some crest spikes up close (face region 1.2k triangles); thin light slivers at a few feather edges",
+   "front": "silhouette, crest, pointed ears and palette follow the concept closely; the face is the strongest element; the crest is again the top of the figure (revision 1 showed the tan hood as a bald dome behind it); up close at the game pitch a thin dark edge of the nape cap/patch shows between two crest spikes; the neutral preview light flattens the wings compared with the concept's studio light; two gold bands instead of one; the parametric instance base instead of the concept's gold cylinder (deliberate)",
+   "k2": "at K2 (7.5 m, FOV 35, pitch -55) the figure projects to 262 x 146 px and the face region to 36 x 27 px (k2-projection.json). From the front the dome above the crest is gone (before_after_k2_front). From behind (4.8 m, H2 = LEFT figure, crop_k2close_back_h2_left_prev_right): crest, dark nape and collar read as one dark feather mass, wings layered and lighter than the previous candidate's; a small light spot of the torso shows between the legs; the previous candidate reads flatter and darker. The three instances stay distinguishable without colour in all six K1/K2 frames",
+   "side": "after the repair turn the side silhouette matches the concept: face profile left, crest swept back, wings swept back and raised, band on the near (left) leg",
+   "vs_medusa_reference": "the reference is a painted collectible with strong value contrast and specular breakup; H2 Harpy reaches its sculpt density in the high-poly and keeps most of it in the bake, but the material response is flatter (Tripo roughness ~0.77 almost everywhere, no specular variation in the feathers) and the colours lighter; the repaired nape is smoother than the rest of the plumage"
+  }
+ },
+ "asset_id": "ASSET-HARPY-001",
+ "bake": {
+  "ao_distance_m": 0.05,
+  "cage_extrusion_m": 0.002,
+  "device": {
+   "backend": "OPTIX",
+   "device": "GPU",
+   "devices": [
+    "NVIDIA GeForce RTX 4090"
+   ],
+   "requested_gpu": true
+  },
+  "max_ray_distance_m": 0.006,
+  "occluders": [
+   "HP_tripo_part_7"
+  ],
+  "recolor": {
+   "tripo_part_1": {
+    "rule": {
+     "box_note": "first run with z >= 0.33 also darkened light tan chest feathers below the V (speckles, review 2026-09-29); the V itself lies at source z 0.373-0.397; harpy-h2-bake/2 adds a narrow second box (|x| <= 0.022, z 0.352-0.37) for the light tip of the V that stayed visible below the neck cap from behind (verified on the high-poly vertex mask 2026-09-29: z >= 0.35 over the full width selects speckles on the tan feathers again, the narrow box does not)",
+     "boxes": [
+      {
+       "max": [
+        0.04,
+        0.12,
+        0.44
+       ],
+       "min": [
+        -0.04,
+        0.0,
+        0.37
+       ]
+      },
+      {
+       "max": [
+        0.022,
+        0.12,
+        0.37
+       ],
+       "min": [
+        -0.022,
+        0.0,
+        0.352
+       ]
+      }
+     ],
+     "luminance_ref": 0.3,
+     "part": "tripo_part_1",
+     "skin": {
+      "s_max": 0.4,
+      "v_min": 0.45
+     },
+     "strength": 1.0,
+     "target_srgb": [
+      0.26,
+      0.18,
+      0.13
+     ],
+     "why": "after the 180 deg turn the torso's skin-coloured V below the old front face sits at the back of the neck (review frame closeup_neck_back); the concept back shows dark feathers there. Skin-like texels (v > 0.45, s < 0.4) of the torso inside the box are tinted to the dark feather tone keeping their luminance detail. Repair, proposal"
+    },
+    "vertices": 133718,
+    "vertices_masked": 2919
+   }
+  },
+  "seconds": 268.0,
+  "seed": 0,
+  "size": 4096
+ },
+ "bake_passes": {
+  "ao": {
+   "rgb_mean_written": [
+    0.68598,
+    0.68598,
+    0.68598
+   ],
+   "samples": 128,
+   "texels_written": 8159940,
+   "type": "AO"
+  },
+  "bc": {
+   "rgb_mean_written": [
+    0.12903,
+    0.06896,
+    0.04165
+   ],
+   "samples": 16,
+   "texels_written": 8159940,
+   "type": "EMIT"
+  },
+  "normal": {
+   "rgb_mean_written": [
+    0.50042,
+    0.49999,
+    0.97721
+   ],
+   "samples": 16,
+   "texels_written": 8159940,
+   "type": "NORMAL"
+  },
+  "rm": {
+   "rgb_mean_written": [
+    0.98464,
+    0.76297,
+    0.02488
+   ],
+   "samples": 16,
+   "texels_written": 8159940,
+   "type": "EMIT"
+  }
+ },
+ "blender": "5.2.2 LTS",
+ "budget_probe": {
+  "levels": {
+   "0.5": {
+    "max_px_K2": 1.36,
+    "max_px_K2close": 2.12,
+    "p99_px_K2": 0.65,
+    "tris": 15004,
+    "worst_part_max_final_mm": 3.348,
+    "worst_part_p99_final_mm": 1.605
+   },
+   "0.75": {
+    "max_px_K2": 1.25,
+    "max_px_K2close": 1.95,
+    "p99_px_K2": 0.49,
+    "tris": 21747,
+    "worst_part_max_final_mm": 3.068,
+    "worst_part_p99_final_mm": 1.213
+   },
+   "1.0": {
+    "max_px_K2": 1.06,
+    "max_px_K2close": 1.65,
+    "p99_px_K2": 0.39,
+    "tris": 28458,
+    "worst_part_max_final_mm": 2.606,
+    "worst_part_p99_final_mm": 0.953
+   },
+   "1.5": {
+    "max_px_K2": 0.55,
+    "max_px_K2close": 0.85,
+    "p99_px_K2": 0.28,
+    "tris": 41680,
+    "worst_part_max_final_mm": 1.344,
+    "worst_part_p99_final_mm": 0.684
+   }
+  },
+  "mm_per_px": {
+   "K2_7.5m": 2.4633,
+   "K2close_4.8m": 1.5765
+  },
+  "note": "surface deviation high->low per part (stage_lowpoly, 20 000 area samples), worst part; pixels at the camera target distance",
+  "per_level_parts": {
+   "0.5": {
+    "parts": {
+     "cap_100": {
+      "max_mm": 0.008,
+      "p50_mm": 0.0,
+      "p99_mm": 0.001,
+      "tris": 874
+     },
+     "patch_101": {
+      "max_mm": 2.864,
+      "p50_mm": 0.514,
+      "p99_mm": 2.042,
+      "tris": 398
+     },
+     "tripo_part_0": {
+      "max_mm": 3.434,
+      "p50_mm": 0.33,
+      "p99_mm": 1.649,
+      "tris": 2569
+     },
+     "tripo_part_1": {
+      "max_mm": 5.074,
+      "p50_mm": 0.551,
+      "p99_mm": 2.432,
+      "tris": 1682
+     },
+     "tripo_part_10": {
+      "max_mm": 3.335,
+      "p50_mm": 0.517,
+      "p99_mm": 2.163,
+      "tris": 663
+     },
+     "tripo_part_11": {
+      "max_mm": 2.703,
+      "p50_mm": 0.609,
+      "p99_mm": 2.208,
+      "tris": 170
+     },
+     "tripo_part_2": {
+      "max_mm": 3.546,
+      "p50_mm": 0.341,
+      "p99_mm": 1.906,
+      "tris": 1596
+     },
+     "tripo_part_3": {
+      "max_mm": 4.65,
+      "p50_mm": 0.359,
+      "p99_mm": 2.003,
+      "tris": 1510
+     },
+     "tripo_part_4": {
+      "max_mm": 2.241,
+      "p50_mm": 0.228,
+      "p99_mm": 1.093,
+      "tris": 1608
+     },
+     "tripo_part_5": {
+      "max_mm": 2.198,
+      "p50_mm": 0.211,
+      "p99_mm": 1.047,
+      "tris": 1697
+     },
+     "tripo_part_6": {
+      "max_mm": 2.945,
+      "p50_mm": 0.495,
+      "p99_mm": 1.896,
+      "tris": 837
+     },
+     "tripo_part_8": {
+      "max_mm": 2.827,
+      "p50_mm": 0.503,
+      "p99_mm": 1.991,
+      "tris": 740
+     },
+     "tripo_part_9": {
+      "max_mm": 2.869,
+      "p50_mm": 0.462,
+      "p99_mm": 1.942,
+      "tris": 660
+     }
+    },
+    "triangles_total": 15004
+   },
+   "0.75": {
+    "parts": {
+     "cap_100": {
+      "max_mm": 0.008,
+      "p50_mm": 0.0,
+      "p99_mm": 0.001,
+      "tris": 874
+     },
+     "patch_101": {
+      "max_mm": 2.64,
+      "p50_mm": 0.353,
+      "p99_mm": 1.545,
+      "tris": 600
+     },
+     "tripo_part_0": {
+      "max_mm": 2.088,
+      "p50_mm": 0.245,
+      "p99_mm": 1.201,
+      "tris": 3839
+     },
+     "tripo_part_1": {
+      "max_mm": 4.024,
+      "p50_mm": 0.399,
+      "p99_mm": 1.838,
+      "tris": 2481
+     },
+     "tripo_part_10": {
+      "max_mm": 3.129,
+      "p50_mm": 0.381,
+      "p99_mm": 1.499,
+      "tris": 990
+     },
+     "tripo_part_11": {
+      "max_mm": 2.417,
+      "p50_mm": 0.436,
+      "p99_mm": 1.623,
+      "tris": 255
+     },
+     "tripo_part_2": {
+      "max_mm": 2.79,
+      "p50_mm": 0.269,
+      "p99_mm": 1.343,
+      "tris": 2336
+     },
+     "tripo_part_3": {
+      "max_mm": 4.65,
+      "p50_mm": 0.285,
+      "p99_mm": 1.46,
+      "tris": 2174
+     },
+     "tripo_part_4": {
+      "max_mm": 1.701,
+      "p50_mm": 0.182,
+      "p99_mm": 0.858,
+      "tris": 2356
+     },
+     "tripo_part_5": {
+      "max_mm": 1.725,
+      "p50_mm": 0.16,
+      "p99_mm": 0.838,
+      "tris": 2504
+     },
+     "tripo_part_6": {
+      "max_mm": 2.365,
+      "p50_mm": 0.361,
+      "p99_mm": 1.485,
+      "tris": 1246
+     },
+     "tripo_part_8": {
+      "max_mm": 2.218,
+      "p50_mm": 0.385,
+      "p99_mm": 1.455,
+      "tris": 1098
+     },
+     "tripo_part_9": {
+      "max_mm": 2.003,
+      "p50_mm": 0.356,
+      "p99_mm": 1.387,
+      "tris": 994
+     }
+    },
+    "triangles_total": 21747
+   },
+   "1.0": {
+    "parts": {
+     "cap_100": {
+      "max_mm": 0.008,
+      "p50_mm": 0.0,
+      "p99_mm": 0.001,
+      "tris": 874
+     },
+     "patch_101": {
+      "max_mm": 1.92,
+      "p50_mm": 0.263,
+      "p99_mm": 1.241,
+      "tris": 799
+     },
+     "tripo_part_0": {
+      "max_mm": 1.932,
+      "p50_mm": 0.198,
+      "p99_mm": 0.96,
+      "tris": 5099
+     },
+     "tripo_part_1": {
+      "max_mm": 3.949,
+      "p50_mm": 0.323,
+      "p99_mm": 1.444,
+      "tris": 3289
+     },
+     "tripo_part_10": {
+      "max_mm": 1.825,
+      "p50_mm": 0.298,
+      "p99_mm": 1.203,
+      "tris": 1317
+     },
+     "tripo_part_11": {
+      "max_mm": 1.992,
+      "p50_mm": 0.356,
+      "p99_mm": 1.168,
+      "tris": 327
+     },
+     "tripo_part_2": {
+      "max_mm": 2.377,
+      "p50_mm": 0.225,
+      "p99_mm": 1.133,
+      "tris": 3069
+     },
+     "tripo_part_3": {
+      "max_mm": 1.874,
+      "p50_mm": 0.229,
+      "p99_mm": 1.201,
+      "tris": 2846
+     },
+     "tripo_part_4": {
+      "max_mm": 1.588,
+      "p50_mm": 0.151,
+      "p99_mm": 0.711,
+      "tris": 3108
+     },
+     "tripo_part_5": {
+      "max_mm": 1.413,
+      "p50_mm": 0.135,
+      "p99_mm": 0.692,
+      "tris": 3310
+     },
+     "tripo_part_6": {
+      "max_mm": 1.808,
+      "p50_mm": 0.286,
+      "p99_mm": 1.179,
+      "tris": 1657
+     },
+     "tripo_part_8": {
+      "max_mm": 1.781,
+      "p50_mm": 0.295,
+      "p99_mm": 1.224,
+      "tris": 1449
+     },
+     "tripo_part_9": {
+      "max_mm": 1.679,
+      "p50_mm": 0.28,
+      "p99_mm": 1.179,
+      "tris": 1314
+     }
+    },
+    "triangles_total": 28458
+   },
+   "1.5": {
+    "parts": {
+     "cap_100": {
+      "max_mm": 0.008,
+      "p50_mm": 0.0,
+      "p99_mm": 0.001,
+      "tris": 874
+     },
+     "patch_101": {
+      "max_mm": 1.866,
+      "p50_mm": 0.199,
+      "p99_mm": 0.974,
+      "tris": 1200
+     },
+     "tripo_part_0": {
+      "max_mm": 1.276,
+      "p50_mm": 0.142,
+      "p99_mm": 0.698,
+      "tris": 7595
+     },
+     "tripo_part_1": {
+      "max_mm": 1.919,
+      "p50_mm": 0.241,
+      "p99_mm": 1.037,
+      "tris": 4842
+     },
+     "tripo_part_10": {
+      "max_mm": 1.626,
+      "p50_mm": 0.209,
+      "p99_mm": 0.917,
+      "tris": 1957
+     },
+     "tripo_part_11": {
+      "max_mm": 2.037,
+      "p50_mm": 0.23,
+      "p99_mm": 0.805,
+      "tris": 470
+     },
+     "tripo_part_2": {
+      "max_mm": 1.634,
+      "p50_mm": 0.169,
+      "p99_mm": 0.843,
+      "tris": 4484
+     },
+     "tripo_part_3": {
+      "max_mm": 1.867,
+      "p50_mm": 0.172,
+      "p99_mm": 0.839,
+      "tris": 4182
+     },
+     "tripo_part_4": {
+      "max_mm": 1.273,
+      "p50_mm": 0.111,
+      "p99_mm": 0.527,
+      "tris": 4606
+     },
+     "tripo_part_5": {
+      "max_mm": 0.992,
+      "p50_mm": 0.101,
+      "p99_mm": 0.477,
+      "tris": 4896
+     },
+     "tripo_part_6": {
+      "max_mm": 1.261,
+      "p50_mm": 0.201,
+      "p99_mm": 0.865,
+      "tris": 2462
+     },
+     "tripo_part_8": {
+      "max_mm": 1.432,
+      "p50_mm": 0.204,
+      "p99_mm": 0.865,
+      "tris": 2151
+     },
+     "tripo_part_9": {
+      "max_mm": 1.202,
+      "p50_mm": 0.191,
+      "p99_mm": 0.825,
+      "tris": 1961
+     }
+    },
+    "triangles_total": 41680
+   }
+  },
+  "seat_scale": 0.659871
+ },
+ "claims": {
+  "art_accepted": false,
+  "budgets_declared": false,
+  "game_ready": false,
+  "ue_imported": false
+ },
+ "credits": {
+  "note": "only local Blender/Python; the Tripo stage was paid earlier by the orchestrator",
+  "paid_operations": 0,
+  "tripo": 0
+ },
+ "date": "2026-09-29",
+ "determinism": {
+  "all_equal": false,
+  "date": "2026-09-29",
+  "differs": [
+   "reports/textures-report.json (volatile keys removed)",
+   "work/bake/normal.npy"
+  ],
+  "earlier_findings": [
+   "revision 1: 3 texels differed across 3 of the 10 PNGs (one OptiX AO ray, CPU normal summation); revision 2 has none",
+   "revision 2 development: the first same-path rebuild caught a determinism bug in the nape patch (bmesh duplicate's vert_map maps both ways, a set of BMesh elements was iterated): patch_101 798 vs 799 triangles; fixed (repair_ops.copy_patch), then both final builds"
+  ],
+  "files": {
+   "export/SK_Harpy_H2.fbx": {
+    "a": "62ae4761c2550e50",
+    "b": "62ae4761c2550e50",
+    "bytes": 1290060,
+    "equal": true
+   },
+   "export/SM_Harpy_H2_Base.fbx": {
+    "a": "aadc891599ac714e",
+    "b": "aadc891599ac714e",
+    "bytes": 35948,
+    "equal": true
+   },
+   "reports/h2-bake-report.json (volatile keys removed)": {
+    "differing_keys": [],
+    "equal": true
+   },
+   "reports/h2-lowpoly-report.json (volatile keys removed)": {
+    "differing_keys": [],
+    "equal": true
+   },
+   "reports/h2-rig-report.json (volatile keys removed)": {
+    "differing_keys": [],
+    "equal": true
+   },
+   "reports/h2-uv-stage.json (volatile keys removed)": {
+    "differing_keys": [],
+    "equal": true
+   },
+   "reports/textures-report.json (volatile keys removed)": {
+    "differing_keys": [
+     "inputs"
+    ],
+    "equal": false
+   },
+   "reports/uv-report.json (volatile keys removed)": {
+    "differing_keys": [],
+    "equal": true
+   },
+   "textures/2k/T_Harpy_H2_BC.png": {
+    "a": "c01417784bfa20ab",
+    "b": "c01417784bfa20ab",
+    "bytes": 5210163,
+    "equal": true
+   },
+   "textures/2k/T_Harpy_H2_N.png": {
+    "a": "b5853e84ac116e34",
+    "b": "b5853e84ac116e34",
+    "bytes": 5750269,
+    "equal": true
+   },
+   "textures/2k/T_Harpy_H2_N_OpenGL.png": {
+    "a": "2069ac5b66133702",
+    "b": "2069ac5b66133702",
+    "bytes": 5751613,
+    "equal": true
+   },
+   "textures/2k/T_Harpy_H2_ORM.png": {
+    "a": "1a5dadbbbe3f50f2",
+    "b": "1a5dadbbbe3f50f2",
+    "bytes": 4261655,
+    "equal": true
+   },
+   "textures/2k/T_Harpy_H2_TeamMask.png": {
+    "a": "49bc1d88378207b0",
+    "b": "49bc1d88378207b0",
+    "bytes": 799569,
+    "equal": true
+   },
+   "textures/4k/T_Harpy_H2_BC.png": {
+    "a": "6c39cc81410c4708",
+    "b": "6c39cc81410c4708",
+    "bytes": 14520129,
+    "equal": true
+   },
+   "textures/4k/T_Harpy_H2_N.png": {
+    "a": "f172622fc4c628da",
+    "b": "f172622fc4c628da",
+    "bytes": 15039033,
+    "equal": true
+   },
+   "textures/4k/T_Harpy_H2_N_OpenGL.png": {
+    "a": "97c10313a443ea5a",
+    "b": "97c10313a443ea5a",
+    "bytes": 15043560,
+    "equal": true
+   },
+   "textures/4k/T_Harpy_H2_ORM.png": {
+    "a": "1dfaaddb8d646b93",
+    "b": "1dfaaddb8d646b93",
+    "bytes": 11664238,
+    "equal": true
+   },
+   "textures/4k/T_Harpy_H2_TeamMask.png": {
+    "a": "51c18a6f62c49653",
+    "b": "51c18a6f62c49653",
+    "bytes": 2175857,
+    "equal": true
+   },
+   "work/bake/ao.npy": {
+    "a": "01d20798c1ce438b",
+    "b": "01d20798c1ce438b",
+    "bytes": 268435584,
+    "equal": true
+   },
+   "work/bake/bc.npy": {
+    "a": "75b271ca43f10b94",
+    "b": "75b271ca43f10b94",
+    "bytes": 268435584,
+    "equal": true
+   },
+   "work/bake/normal.npy": {
+    "a": "b15bd017627fd07a",
+    "b": "82fc278f91a6a2dc",
+    "bytes": 268435584,
+    "equal": false
+   },
+   "work/bake/rm.npy": {
+    "a": "8df703fbbd9ead08",
+    "b": "8df703fbbd9ead08",
+    "bytes": 268435584,
+    "equal": true
+   },
+   "work/uv-labels.npz": {
+    "a": "d2e49816bb82721c",
+    "b": "d2e49816bb82721c",
+    "bytes": 1421270,
+    "equal": true
+   },
+   "work/uv-tris.npz": {
+    "a": "8317f04c4cbaaf7b",
+    "b": "8317f04c4cbaaf7b",
+    "bytes": 698553,
+    "equal": true
+   }
+  },
+  "method": "two full builds of the same profile at the SAME path (the FBX exporter writes the file path into the FBX): build A (lowpoly..review) was moved to a scratch folder, build B ran from import (GLBs) into the run folder; determinism_check.py compares sha256 of export/*.fbx, textures/**/*.png, work/uv-*.npz, work/bake/*.npy and the stage reports with volatile keys (times, paths, blend hashes) removed",
+  "profile": "harpy-h2-bake/2",
+  "run_a": "scratch:runA_final",
+  "run_b": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake",
+  "schema": "unmatched.h2-bake.determinism/2",
+  "summary": "byte-identical: both FBX, all 10 texture PNGs (4K and 2K), uv-tris/uv-labels, the AO/BC/RM bake buffers and every stage report; differs: only the float32 normal bake buffer work/bake/normal.npy (CPU Cycles, max |diff| 2.4e-7 on 25 967 of 16.8 M texels, summation order) - below one 8-bit step, so the normal PNGs are identical - and textures-report.json 'inputs', which records that buffer's sha256"
+ },
+ "files": [
+  {
+   "bytes": 1290060,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/export/SK_Harpy_H2.fbx",
+   "sha256": "62ae4761c2550e5079f6bae75f0ca15186c00695ba33f36f1dd0a1dd14674e57"
+  },
+  {
+   "bytes": 35948,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/export/SM_Harpy_H2_Base.fbx",
+   "sha256": "aadc891599ac714e889c3cf43a47f0bb48413564b226fa3cf4cbc43c7defc157"
+  },
+  {
+   "bytes": 4467,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/bake.log",
+   "sha256": "c6a268795044ceee26b90bb91e73e320bb284f7c183464456bf263ea72e69cd8"
+  },
+  {
+   "bytes": 856,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/compose.log",
+   "sha256": "aea39aec928369bf2ee4e2eb251d0489b33d85229726bde925f876133d5ad864"
+  },
+  {
+   "bytes": 2017,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/deform-blend.log",
+   "sha256": "ad8eb6688f06d64d939fd8385ddbda004b1d15ce8c36bd4ea4e6164c203d9b31"
+  },
+  {
+   "bytes": 2089,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/deform-fbx.log",
+   "sha256": "23af4377454d4594654926771a578c204ebbbff08d89db514a88083fff09b6c4"
+  },
+  {
+   "bytes": 330,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/fbx-authored.log",
+   "sha256": "86ac23ad851a73b445d2d2e1061709faccdd9ac8ef3999e90746437c8e10e43f"
+  },
+  {
+   "bytes": 2356,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/import.log",
+   "sha256": "8fce4d6a8289e3f2d09b0106794310fec886b94cf7fdc2a5b73ac69d028065e9"
+  },
+  {
+   "bytes": 605,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/instances-analysis.log",
+   "sha256": "c0a108da1da0f2081212897a27c4d853244b7bf342ea97dc241e6b05b3cc3803"
+  },
+  {
+   "bytes": 733,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/k2-projection.log",
+   "sha256": "b84a9c4673f107376c82611d53648bbbf360026b664349ee02ee093f553e1684"
+  },
+  {
+   "bytes": 1545,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/lowpoly.log",
+   "sha256": "eb6317322ae77b4f6020ce26db599894e77074f11babe0bc77fb3107d6cff9e6"
+  },
+  {
+   "bytes": 322,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/overlay.log",
+   "sha256": "bfa15fb8e0d506fdd5f4431b6394e1d36a7fdb55b13cc52d158816b94b4a2770"
+  },
+  {
+   "bytes": 3702,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/preview-shape.log",
+   "sha256": "288d04d5e946ade9f627e19ab19debb6a68dd1e74467c49dd78c7b280a111027"
+  },
+  {
+   "bytes": 5380,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/review-concept.log",
+   "sha256": "5246877e7b4b159b90c5299fea68e9f9581eb2ccf78e028a76a8ef4b4af64b9a"
+  },
+  {
+   "bytes": 1423,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/review-instances.log",
+   "sha256": "67770ebd662dfe43f3bd33b7df4b5754c5ce6aa951d07d1d00188bdcc468be87"
+  },
+  {
+   "bytes": 1659,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/review-k2.log",
+   "sha256": "d9fabcafe10d0a58fb606b087d276b0c5e8a750495153043049a80d9cb0e6b4f"
+  },
+  {
+   "bytes": 1021,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/rig.log",
+   "sha256": "2248d2bbadc8e2e9399bea227ee90c6eda9e751f8fcf6ee63db7643340fbe787"
+  },
+  {
+   "bytes": 13868,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/see-through.log",
+   "sha256": "e2109c8ae2eb39523217d9e2f664981b63b2553478ca36d0111ebaa7eec5f2f0"
+  },
+  {
+   "bytes": 1514,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/textures.log",
+   "sha256": "b931aac1661d1cdc79abe8848501bfb818869b70ac46e0cb06c256770e4d3aa7"
+  },
+  {
+   "bytes": 396,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/uv.log",
+   "sha256": "d9e61c261a115a7e556be42b90ef53f3a9b581e7e9b0e8edf4a7390d06ae9ff1"
+  },
+  {
+   "bytes": 427,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/uvcheck.log",
+   "sha256": "68b1b184d7cf308e2b2798e660ee53ac7b62c542241fde10ce11b11dd6b27e7d"
+  },
+  {
+   "bytes": 157,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/validate.log",
+   "sha256": "cfa85f0755677e67ccab829f6807a02d70391d4cb2d2f133397793fdbd9bd5b0"
+  },
+  {
+   "bytes": 346918,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/atlas_BC_1k.jpg",
+   "sha256": "ab66b769e8a1a1854aa2f69347823c7f52ea06d5a38e5ed6decc44b10715d2fa"
+  },
+  {
+   "bytes": 475748,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/atlas_N_1k.jpg",
+   "sha256": "bca35530af292a35707dcd54db1fcaee4a89895769ac0eb5330d7f6837f87b26"
+  },
+  {
+   "bytes": 329569,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/atlas_ORM_1k.jpg",
+   "sha256": "f50fad79ae32777d8f5a9de9c3e6ba57d65ce8cbce885688e4cc16752ca67492"
+  },
+  {
+   "bytes": 248052,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/atlas_TeamMask_1k.jpg",
+   "sha256": "fe9c4c4919bacee08ed73099a741d39c498713d8db0bedd4b28083ee7932182c"
+  },
+  {
+   "bytes": 440430,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_crest_front_game.jpg",
+   "sha256": "75d44a31c9eed5e74e28a2d7ae0461a50318573295f5c6f9425d541b1da2923d"
+  },
+  {
+   "bytes": 454440,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_face_3q.jpg",
+   "sha256": "c2ccf94cdc2626d8f00c545a2c4e4717f5f9cbef6aeb32c03321faafc714f0a9"
+  },
+  {
+   "bytes": 461602,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_face_front.jpg",
+   "sha256": "ce43f38b260a0b7d1b7305f6f21ba31f8fb7086678357892b3c7f747c8c9ebc6"
+  },
+  {
+   "bytes": 466703,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_nape_back3q_game.jpg",
+   "sha256": "7ab2deeedacd9d1011f39148497396fa102971504e86363bb3d3fe84b8b51bcd"
+  },
+  {
+   "bytes": 414829,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_nape_back_game.jpg",
+   "sha256": "05f50415180bf90e2435a881c3a66496374beee95dcee78cb23b41545f036e75"
+  },
+  {
+   "bytes": 393389,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_neck_back.jpg",
+   "sha256": "2df103d84a3f4421251e301c88143aae519fac97f5b9f32bce56278e134965df"
+  },
+  {
+   "bytes": 326296,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_talons_3q_left.jpg",
+   "sha256": "1bb865e44415d682f5113ec90e1ef1c922c1f8e761775b6e18bb480759dea1ee"
+  },
+  {
+   "bytes": 331379,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_talons_front.jpg",
+   "sha256": "d9ae8601b6cc4a76624908f68232cab06afcef6900cd9d4dd6ebcd819694544b"
+  },
+  {
+   "bytes": 355542,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_wing_front_left.jpg",
+   "sha256": "aa0b16716d32c09cd60769cb7a46d99a0ff852a7a8a47dcff80390fa1ed167d5"
+  },
+  {
+   "bytes": 339968,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_wing_primaries_left_back.jpg",
+   "sha256": "e52c4871315d64c9f084d69571dd7062e21915630f8c275284f7af4798acb6ce"
+  },
+  {
+   "bytes": 572507,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_concept_back.jpg",
+   "sha256": "f7f1a9554adf9404009225b0a3eca4699dddf975b3e00482fb70be9d0a8f326b"
+  },
+  {
+   "bytes": 581741,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_concept_front.jpg",
+   "sha256": "5de3d1f01429580793e7e123e6623ed6fe7cde34752f0cb6fe82bc46006c0032"
+  },
+  {
+   "bytes": 360800,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_concept_side.jpg",
+   "sha256": "34020d35c11b5abb612264e031e44aee83e9e457691be5aca9b56ff280560dbf"
+  },
+  {
+   "bytes": 256081,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/crop_k2_3q_prev_left_h2_right.png",
+   "sha256": "249a8d05cf13f335d545328ffef609772c2c106f29f0d97231e9f4f86355a2bd"
+  },
+  {
+   "bytes": 260315,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/crop_k2_front_prev_left_h2_right.png",
+   "sha256": "744e53c97cd656365707c448c7620095568a815e671cb496900537a69399b6df"
+  },
+  {
+   "bytes": 474394,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/crop_k2close_back3q_h2_left_prev_right.png",
+   "sha256": "b3d3675d834e1becc9357599024e78f8e2d05e54643bb8abb21fda4d808bc852"
+  },
+  {
+   "bytes": 506407,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/crop_k2close_back_h2_left_prev_right.png",
+   "sha256": "5389a62563a0fe137519a8b82e667bc4a3876bdc31dd04f2ec0e606a571843c9"
+  },
+  {
+   "bytes": 494206,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/crop_k2close_front_prev_left_h2_right.png",
+   "sha256": "ac65d277b6d2082a83b756d1e2ebe42e194e7d88ff13e0adb36ebe3adea3ca7c"
+  },
+  {
+   "bytes": 8693,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/deform/h2-blend-bones2d.json",
+   "sha256": "e482c8aa5a5bf2e47945b819daf5cda325045a7feb23271ad86036ef93d7a510"
+  },
+  {
+   "bytes": 2816,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/deform/h2-blend-deform.json",
+   "sha256": "aac33c65350422a7686c8c171999d9f7b7cfc76207814e699ba7f3f81d5a080e"
+  },
+  {
+   "bytes": 619037,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/deform/h2-blend-sheet.jpg",
+   "sha256": "1d739cacf9fec1710df30e15e724c2c68f8ea9cd236b6a3eedae806331ffa778"
+  },
+  {
+   "bytes": 8683,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/deform/h2-fbx-bones2d.json",
+   "sha256": "542f38d5d53145017579dd41f099a4d5c881a382b58f7332b069439ec5516f26"
+  },
+  {
+   "bytes": 2820,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/deform/h2-fbx-deform.json",
+   "sha256": "858b28e7daaf0222ef49baeaf5cb249ea73731ee8bbdff3ad698216e73c9a7fb"
+  },
+  {
+   "bytes": 624636,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/deform/h2-fbx-sheet.jpg",
+   "sha256": "f2dcc9fccbc66fb16158ddaf07635f8f48a23dca5c3c940e5d8a94f85512d68d"
+  },
+  {
+   "bytes": 2111,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/evidence-frames.json",
+   "sha256": "19cb519e37bfd8dacede956f7bf3145349b7c2d7f1631e67204569b5bb69693c"
+  },
+  {
+   "bytes": 411154,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/janus_head_sheet_source_frame.jpg",
+   "sha256": "cc8d0b67f05abf88f1d7fbab310ca6be47ce97b6b495749e04931a3f062dbe4b"
+  },
+  {
+   "bytes": 223864,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/janus_head_without_part0_source_frame.jpg",
+   "sha256": "fbee7582610ad171d2a0e204a3f83c0a33975f977d25426c9c7ed768020b44f8"
+  },
+  {
+   "bytes": 263726,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/janus_head_without_part12_source_frame.jpg",
+   "sha256": "ff0a366add9b1081ddae527c852efb7c2c69d4b70bcfca283fb83ee15a447c7b"
+  },
+  {
+   "bytes": 158263,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_parts_back.jpg",
+   "sha256": "1546c9ae4e3368bd4eb2228c07dc504b20b1d51652ee46bcb8c964e63941a8cb"
+  },
+  {
+   "bytes": 176828,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_parts_front.jpg",
+   "sha256": "733d8a2561865bb36723abee45a1e48115dc9510b090abcb0c4498596d06668f"
+  },
+  {
+   "bytes": 100528,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_parts_left.jpg",
+   "sha256": "6da6eb6cb0fd846483434e82d2019c31e6e0d9c85903e57bb41a76935a22f5a9"
+  },
+  {
+   "bytes": 91282,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_parts_top.jpg",
+   "sha256": "3a47eb28c5e5d5478090f5380ca9e77dafa9dd066d5c9f5a148ec4f653e0c2ed"
+  },
+  {
+   "bytes": 170760,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_textured_back.jpg",
+   "sha256": "69bbc0f56075cb13b980d29e9fbc45daac93fbfba8f9fd4716f1c33ff2eac970"
+  },
+  {
+   "bytes": 190788,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_textured_front.jpg",
+   "sha256": "18cc3ee76d2774ec8487136a153fc1303b7d77bf685cb8cc91f4c0f22d65c550"
+  },
+  {
+   "bytes": 105137,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_textured_left.jpg",
+   "sha256": "6264e1d94be1ee27ccb522a69cbaecac88f6edc092279200d8cfec8059e9729c"
+  },
+  {
+   "bytes": 101590,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_textured_right.jpg",
+   "sha256": "df46eafb7b8c0ccb618c7361799f83b024b99ef8b7f8b7a747b469d3373e10e4"
+  },
+  {
+   "bytes": 93319,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_textured_top.jpg",
+   "sha256": "325f6be8fee1531b4a58f303db83a78cec4e73e8e6cfaee8d6317ff04225ba25"
+  },
+  {
+   "bytes": 318451,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/fix/before_after_k2_front.jpg",
+   "sha256": "655bc950c5fe75040a11d9a076279a9e8c5457ef5fa4f3a6ee70f17898e4ae50"
+  },
+  {
+   "bytes": 171072,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/fix/before_after_k2close_back.jpg",
+   "sha256": "0e94ed766271dadc999884ed0439a1b12bfa4cf394c16b45b709b23b2830f315"
+  },
+  {
+   "bytes": 138417,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/fix/before_after_k2close_front.jpg",
+   "sha256": "fae93881e4cdf24621bbf954a036cf359b91d3a1d407685738642e6527b303cf"
+  },
+  {
+   "bytes": 389398,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/fix/before_after_neck_back_ortho.jpg",
+   "sha256": "23bbc70e012768bd335c9354ecdc70f78ea38e0e6446027f0b0e56cb4a8868f6"
+  },
+  {
+   "bytes": 12330,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/fix/before_after_see_through_az180.png",
+   "sha256": "316686e37d45d6c055b0b63814842cac9c055fae9e166653006b49171b61f2e6"
+  },
+  {
+   "bytes": 191351,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/fix/before_after_teamcolor_game3q.jpg",
+   "sha256": "08d5964bc7c7434d6d0f6d5376f207aa6b4995c27a94de630a3fe552dbdf1454"
+  },
+  {
+   "bytes": 42627,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/frames-storage.json",
+   "sha256": "828b93720db7f6d60f4bfcc1c94bee7af11019a02be189527c1badb4074f1fa2"
+  },
+  {
+   "bytes": 43664,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances-analysis.json",
+   "sha256": "d5773192ff2ccd300d5e9f297ad3dbc6f3d462ed2c3074829562226d2cd7dd38"
+  },
+  {
+   "bytes": 35642,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances-pips.json",
+   "sha256": "65028b420eaed0c1f12d887cd047626970bca4cf1ccadba0ad69638113b4d015"
+  },
+  {
+   "bytes": 68190,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k1.jpg",
+   "sha256": "e4c86bf40fff0ac101c9fc31ca2e18cbc9cb5989af1a720247ef5cbb40299bfa"
+  },
+  {
+   "bytes": 6758,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k1_crop_1.png",
+   "sha256": "25a133072d8a36d003a8c5e23a51b63cde2a44d9ca0e3024b3b8465f33bfeba9"
+  },
+  {
+   "bytes": 6840,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k1_crop_2.png",
+   "sha256": "454410b5fa4b2afefd2c9c1bd24366bcfd0095198fe21224dca1e22a77381c13"
+  },
+  {
+   "bytes": 6882,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k1_crop_3.png",
+   "sha256": "c2105e8591593a6eb9e09e6f25fc9097638cfdc46556c0d28bcd1e55425c8b13"
+  },
+  {
+   "bytes": 478812,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k1_gray.png",
+   "sha256": "1f28129c0f42dd67fab84d13c87456e24513419397638aa03e925785c6d5ecea"
+  },
+  {
+   "bytes": 100722,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2.jpg",
+   "sha256": "123ae0f2f8b894488599c44f5e0e0ee9baf649eab2c14e0a1fa484922e6cf6c4"
+  },
+  {
+   "bytes": 8209,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2_crop_1.png",
+   "sha256": "0231cfc9350a46ea9a5a37faa3af4f0b43ce819c748071a112daee72310e4be6"
+  },
+  {
+   "bytes": 8404,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2_crop_2.png",
+   "sha256": "c65481f5cabefe366c40b63c188895923908ae203359620de03da6afcac94352"
+  },
+  {
+   "bytes": 8538,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2_crop_3.png",
+   "sha256": "be22b33b7a53e3ecc3dbd206ba0795a62009e9a6796d04a6faef55358027830a"
+  },
+  {
+   "bytes": 511737,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2_gray.png",
+   "sha256": "9cca2027e1c8f922285e416ecbcdc9bc6a8074ac318f8184a6bdec857acbaf34"
+  },
+  {
+   "bytes": 141778,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2close.jpg",
+   "sha256": "7efc627bb6f1343ed690d24117391e87ddc6cfa37865eb12b1a0d27589e59018"
+  },
+  {
+   "bytes": 17535,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2close_crop_1.png",
+   "sha256": "bf0f4349a66260f95c5dadcc12aac90a058903efccef213f6b6c187b1635f827"
+  },
+  {
+   "bytes": 18032,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2close_crop_2.png",
+   "sha256": "595527fe49b5d9628e0bcc585a03f9506ded5e17111ce17af1d5bde8757e90a1"
+  },
+  {
+   "bytes": 18373,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2close_crop_3.png",
+   "sha256": "8f5010a5ba7e15993de117555e3eb6d5491eaa382ff2a95e6b30d84d25d5f907"
+  },
+  {
+   "bytes": 555871,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2close_gray.png",
+   "sha256": "801ca42257860c5fb192635253d9385f21dd301d3f8a4a10fb4785304174ba5a"
+  },
+  {
+   "bytes": 67397,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k1.jpg",
+   "sha256": "701974e677ef59a75cb2c84eb982c4a84427f3bbeeb675b6b377aaa4f59b8685"
+  },
+  {
+   "bytes": 6700,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k1_crop_1.png",
+   "sha256": "5a8f691acd38b7beb4f781fc4a60dff3ed13eefee231c60f27f77aaada5e3aa0"
+  },
+  {
+   "bytes": 6471,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k1_crop_2.png",
+   "sha256": "ea2f1b68b7bc83ec1722bdf76302c02e44d53174cecbdcc36b598a5492772f0c"
+  },
+  {
+   "bytes": 6912,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k1_crop_3.png",
+   "sha256": "394abd96adf0ad300818f398be5ff82240b469f2979fc6f5ba64ff7f211c8a9f"
+  },
+  {
+   "bytes": 478889,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k1_gray.png",
+   "sha256": "67a1ad4af7221970034addb4f6d67c18f74b7e4f3154ef67004033cd676065b9"
+  },
+  {
+   "bytes": 100084,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2.jpg",
+   "sha256": "82f4c94a3b94c4dc18a76664a240aad803438f54745609e49ebe75f48556689e"
+  },
+  {
+   "bytes": 7995,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2_crop_1.png",
+   "sha256": "9c497683411371da110afaf45b632bc755bd5a345628a8059e7fb5ced7283e6a"
+  },
+  {
+   "bytes": 7294,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2_crop_2.png",
+   "sha256": "0db18444458062b6c3c8685daf8c2fbdda8ef0246db9226c465fcd10e9c69d24"
+  },
+  {
+   "bytes": 8242,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2_crop_3.png",
+   "sha256": "dc2469bc9b22d1fc775b62d874e7634db399eb2ced7ed7ade2a979527ed59710"
+  },
+  {
+   "bytes": 512489,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2_gray.png",
+   "sha256": "7f2aa030e8a14cab2c644f99916d7992a1a36183c5a18f85bba61e48123d22e8"
+  },
+  {
+   "bytes": 142052,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2close.jpg",
+   "sha256": "e94e4339d2798d69d03b84bcf814885357d07d7a8dbabb365aeb853af6fd2576"
+  },
+  {
+   "bytes": 18278,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2close_crop_1.png",
+   "sha256": "dfdce681cfbdd81d15070fc0ae1cc0541cda5e76648f27f45f877a47aa277249"
+  },
+  {
+   "bytes": 13568,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2close_crop_2.png",
+   "sha256": "e8ca966fff45555ad114a738ddd90cf40829f6e0eb82a15067cf1fbd825c62d0"
+  },
+  {
+   "bytes": 18234,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2close_crop_3.png",
+   "sha256": "76d8d15a0a33ad2e49a9b80079cade3b2f3da8683f71342c5650edf46e04b630"
+  },
+  {
+   "bytes": 560327,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2close_gray.png",
+   "sha256": "2a60d509333bfd1eb9fb7c765d02d460cf33444bff48d45315e1b58133b240a3"
+  },
+  {
+   "bytes": 2082,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/review-frames-instances.json",
+   "sha256": "e6e9f59123cdffe804fee98ec98f3a56949014c084323b8a31ae504b20f2c4d7"
+  },
+  {
+   "bytes": 18263,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/sheet_facing_k1_gray_crops.png",
+   "sha256": "84243789873e127d722a372a9c57696bd6ca7fc930150a795be50516788721f7"
+  },
+  {
+   "bytes": 22701,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/sheet_facing_k2_gray_crops.png",
+   "sha256": "89c49a0742373f074b42663d0ca0f151a5e8df8b940c99bc71453fc8ae8916b7"
+  },
+  {
+   "bytes": 50338,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/sheet_facing_k2close_gray_crops.png",
+   "sha256": "f86dd4eb7340a1497dd9d3e5e7b0e9e071a82aa88069010ec52f2a4110bca48b"
+  },
+  {
+   "bytes": 18000,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/sheet_mixed_yaw_k1_gray_crops.png",
+   "sha256": "c8702f9e463314e944b41d701068bc12394be7c56b57a87aabcc014aa4460675"
+  },
+  {
+   "bytes": 21502,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/sheet_mixed_yaw_k2_gray_crops.png",
+   "sha256": "5357d294116758ce8ec15f752d99df79af0ba25369f87abe530e223e458481bc"
+  },
+  {
+   "bytes": 47471,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/sheet_mixed_yaw_k2close_gray_crops.png",
+   "sha256": "2134b1e0a2fd86e0a9306afb1c8edc9a2675e81f6edb669e277c0c0523d4cbe1"
+  },
+  {
+   "bytes": 58530,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/k1_gamescale_front_prev_left_h2_right.jpg",
+   "sha256": "bcb028bbcd3f8647da77561a41a1782ae3c019a8768f26bd3b490ebc1584b13d"
+  },
+  {
+   "bytes": 108346,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/k2_3q_prev_left_h2_right.jpg",
+   "sha256": "e84f62cfb30ac6e7c543daa5e79d029124bcf3f4112a29b36129d0e6a705b427"
+  },
+  {
+   "bytes": 83929,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/k2_front_prev_left_h2_right.jpg",
+   "sha256": "68ed7ba8fa33ef975a460c38a18bb7aac7a4ef6935c3902f4359ebb19d3639fb"
+  },
+  {
+   "bytes": 132226,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/k2close_back3q_h2_left_prev_right.jpg",
+   "sha256": "ec41718b9da5727d7273664f152260aa0868b937227a1e6d27370e372118db01"
+  },
+  {
+   "bytes": 115014,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/k2close_back_h2_left_prev_right.jpg",
+   "sha256": "a8fe513cea1580604500816283257c9a2176184d0ab18eb4c1df19814f39620f"
+  },
+  {
+   "bytes": 109218,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/k2close_front_prev_left_h2_right.jpg",
+   "sha256": "0025657448ca9d80343fbc1b762bc35300b5acee00133e31078fb8b02949f294"
+  },
+  {
+   "bytes": 3100,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/review-frames-k2.json",
+   "sha256": "57fc93fb45931ff13cd64015d766bf3bf9192c6a8abba645d56f71e6f71ca609"
+  },
+  {
+   "bytes": 202193,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/concept_frame_back.jpg",
+   "sha256": "e7dd625f6f11537446a6fd476e7a47d13087320f711145861776ee1711b8df79"
+  },
+  {
+   "bytes": 219329,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/concept_frame_front.jpg",
+   "sha256": "bd1a17d471d74532d0b8111ae79fd6cb3b86e83132b873ce9f8304a0e40ddc7c"
+  },
+  {
+   "bytes": 123576,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/concept_frame_side.jpg",
+   "sha256": "25196920f521f09f82388a0d83d6c249bbfb442c5ce001770e53ccae6b47c1af"
+  },
+  {
+   "bytes": 6966,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/review-frames-concept.json",
+   "sha256": "9f1f90e7f9a67c96399c9b773622d00d2bdd4b96905ee9f6d43d0dc67474d5de"
+  },
+  {
+   "bytes": 115569,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/teamcolor_gold_front.jpg",
+   "sha256": "2d5d2015fecffca585b165f81fcfa648a5d65ddad49f00ad1ce38bace2b40bde"
+  },
+  {
+   "bytes": 84676,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/teamcolor_gold_game3q.jpg",
+   "sha256": "b4a5389caf903ac0772bcc1d818b9144eae908f8c8703e76db1b1c2747cf54ac"
+  },
+  {
+   "bytes": 119038,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/teamcolor_silver_front.jpg",
+   "sha256": "f70f99a020262e109f3c5cb9dd53f944d0ae4d5ca326f19c1c32b52d1db73a70"
+  },
+  {
+   "bytes": 84483,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/teamcolor_silver_game3q.jpg",
+   "sha256": "1a5ae6d118b7e09b30794069191fef11cca0292b2a8e5143391409bc5beb840c"
+  },
+  {
+   "bytes": 33622,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az000_d4.8.png",
+   "sha256": "bd9643697e6ae71bfc79ad09df95cd43b228d4ea9bd0ea45a822e63fe0f8e716"
+  },
+  {
+   "bytes": 33504,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az080_d4.8.png",
+   "sha256": "c9b92f434d2404d12a76cc8f13255013dfe2c8edaa8e5281561a520677c243d8"
+  },
+  {
+   "bytes": 33505,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az100_d4.8.png",
+   "sha256": "24235bc387927569997ebd5c5692c212787486a69508546cb90b5118b0494af3"
+  },
+  {
+   "bytes": 33276,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az120_d4.8.png",
+   "sha256": "139fca1c1511ada31b0e736effd242196fe883b9a8f185c63cff4f61a7e24f69"
+  },
+  {
+   "bytes": 33309,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az140_d4.8.png",
+   "sha256": "0ba35bdb03233d58c0536629bda33644786985c51f52eca4376efa74ebe25ff3"
+  },
+  {
+   "bytes": 33591,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az160_d4.8.png",
+   "sha256": "2ab7945fa11e7095bf2fcf2da5462c0f0ab93e1fffd9741340cd54b31ad1c42c"
+  },
+  {
+   "bytes": 32748,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az160_d7.5.png",
+   "sha256": "8879c456523f29afdb3657e63866006841fe5957ffe2349fb11a36638217a149"
+  },
+  {
+   "bytes": 34521,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az180_d4.8.png",
+   "sha256": "c5d515ecfb4e6aa5b26a537cc19700192d0a758f56cb9a58d0475599d73353c2"
+  },
+  {
+   "bytes": 34359,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az200_d4.8.png",
+   "sha256": "6208662e7e4a9912282a62cd0b8ec650d6ac907050eb86c2d3e28846fd0ca2a7"
+  },
+  {
+   "bytes": 32919,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az200_d7.5.png",
+   "sha256": "5237c99dd4d75b6be412f7e28547cd57547539d0326ed3ca5f4866d903ccdcfb"
+  },
+  {
+   "bytes": 33599,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az220_d4.8.png",
+   "sha256": "a29064a3adb97e7dd7d7903393996f5a5a36306794d1608e02d745683f40d985"
+  },
+  {
+   "bytes": 32488,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az220_d7.5.png",
+   "sha256": "ef5bd3644fe9e76de524df59a8191408dbb6d4a5e915972d24cdcb17d5325a50"
+  },
+  {
+   "bytes": 33248,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az240_d4.8.png",
+   "sha256": "921c98747ea900f771d04ed2e2a1bfaf0935f3a5d9e056497efcbb95b3ce7833"
+  },
+  {
+   "bytes": 33436,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az260_d4.8.png",
+   "sha256": "3777f1896f40322909168979ab6c11eb64aaf102353b1c8a310b89f22ba30a57"
+  },
+  {
+   "bytes": 32305,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az260_d7.5.png",
+   "sha256": "7f9d05bdfbf974754b5cbaa373983b1357be12e7e095f96008f64d01424c84ff"
+  },
+  {
+   "bytes": 33598,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az280_d4.8.png",
+   "sha256": "c4f346b81c73114d7e8fe5b29cb1013719bf6177ea95c8bb9248481e4a9e5380"
+  },
+  {
+   "bytes": 33453,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az300_d4.8.png",
+   "sha256": "31fc7ea35d987ea14be1ca114d880a7ecf788b0dd85f8eb194923edc4a2d075b"
+  },
+  {
+   "bytes": 32398,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az300_d7.5.png",
+   "sha256": "93f0a067abd2c269fb00eef7655eccb7ca2bdd2fa47e16d1abcac85f326056b4"
+  },
+  {
+   "bytes": 33476,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az320_d4.8.png",
+   "sha256": "0630a99883c2e560ddab14d6a42078912c1a03cf2cde5d873dc268ee08be5332"
+  },
+  {
+   "bytes": 32326,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az320_d7.5.png",
+   "sha256": "27ba977d4ca7fb99fc749a296abd64d3e603b2703395de73eea2502af8da647b"
+  },
+  {
+   "bytes": 33707,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az340_d4.8.png",
+   "sha256": "816524ec371aaa9eb765770a9ee7bb6feab5eefd52e9bffbf6ae4090f4ffadf0"
+  },
+  {
+   "bytes": 32579,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az340_d7.5.png",
+   "sha256": "0974f572bbd94994744f2af3479201f1176277980dd84075f7d5dd16051fcb5d"
+  },
+  {
+   "bytes": 4062,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/preview-lowpoly.json",
+   "sha256": "9e8c4eeddc98327ccda06637701b8f3868441187d9e8ec6a24cfef7051e6ab8e"
+  },
+  {
+   "bytes": 284166,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_back.jpg",
+   "sha256": "196714f0f6e966bb74e513c892a530d9cd565da5b5e3c4ad89eca1097f935144"
+  },
+  {
+   "bytes": 136059,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_feet_front.jpg",
+   "sha256": "b7b65720d91c5b09d4f9d5df7f6a34afe17115995722abdc38fb44f163ce90ff"
+  },
+  {
+   "bytes": 259440,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_front.jpg",
+   "sha256": "b43e805960e21e42291d75eb1856325e1bc1ec8290ae41aab038d150c38d9cc0"
+  },
+  {
+   "bytes": 217627,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_head_3q.jpg",
+   "sha256": "81d4c5ffb3e2d3ab583ac848696f7c32788373372500ff5718c93d2ae5948380"
+  },
+  {
+   "bytes": 248012,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_head_front.jpg",
+   "sha256": "c57b742e2f306822ffeb825f1db07a4e12a8c12a583cfe9c2a83526aed34e33c"
+  },
+  {
+   "bytes": 194124,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_side_left.jpg",
+   "sha256": "971b5acb57c2a60aa8b0214ec98256fb6d2a51e9236401aa83694a0fb98dd774"
+  },
+  {
+   "bytes": 125487,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_top.jpg",
+   "sha256": "18119c210d1c4b74ff5edd343445f6c319a3c6f8e1c362c94fccf29a2266e49d"
+  },
+  {
+   "bytes": 212327,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_wing_tip_back.jpg",
+   "sha256": "449cae81f6e16047bf95b72f42769ee9f5c19548a8a3a12d8f173e355b792586"
+  },
+  {
+   "bytes": 204140,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/uv_layout_parts.png",
+   "sha256": "bce088d406f4ee34695ff27c8a008a989dc8736f0595f804cf08985381482c6f"
+  },
+  {
+   "bytes": 14731,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/assessment-notes.json",
+   "sha256": "3280937e52175379c564432f659b50444a68181111f44afa15e5946e5adae77f"
+  },
+  {
+   "bytes": 7429,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/budget-probe.json",
+   "sha256": "eb8dc61e9a5d193b4ba56e400a7dfbe003c437300c02f28787a23748c58e3c14"
+  },
+  {
+   "bytes": 4787,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/determinism.json",
+   "sha256": "ca5b8a5b944d7e3d7eabeff5be678c76de0e8ac2c3b81476aca4d4200baca624"
+  },
+  {
+   "bytes": 4739,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/h2-bake-report.json",
+   "sha256": "ad912905e9db7d5b2b1578fa4c0266b6102d185eec45aab9a6469b73b1e0cc16"
+  },
+  {
+   "bytes": 28615,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/h2-import-report.json",
+   "sha256": "754f6de7a9c10e851a3d05691dd1b47d9f076da188f6b9888ebeba78401c4681"
+  },
+  {
+   "bytes": 37036,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/h2-lowpoly-report.json",
+   "sha256": "f0ce02b06ae2b3c7a51e9eb872b92400a62d6d45ab7e963ecf277afa6e78f64e"
+  },
+  {
+   "bytes": 19408,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/h2-rig-report.json",
+   "sha256": "237f2286b2a3ee41805c6b1a0be404a0e7acd1979ebc70bb00a37c3253275c53"
+  },
+  {
+   "bytes": 4500,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/h2-uv-stage.json",
+   "sha256": "12722e72d09d8a6d80e2fc7ec0aa62232c7a9553f108a0ebea95ec9936a246d4"
+  },
+  {
+   "bytes": 921,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/k2-projection.json",
+   "sha256": "964ba0ac6aff21af94f4875447cdca4882904567d5145a5128db79bc4a805269"
+  },
+  {
+   "bytes": 11410,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/see-through.json",
+   "sha256": "80f4558a591be6767708adb3f7324089d1fcaf9c99ebc3478e672d5cb1441db1"
+  },
+  {
+   "bytes": 6602,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/textures-report.json",
+   "sha256": "d9858c10a847006e4f36242b1c8efd7ff422c558db6ddc63933c39db007b9d7b"
+  },
+  {
+   "bytes": 4357,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/uv-report.json",
+   "sha256": "6db7a8d89a41492a63f95e88816da593a2fe63086c11a8e8b796a44c3bf387cb"
+  },
+  {
+   "bytes": 1524,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/validate-skeletal-mesh-v2.json",
+   "sha256": "cd27d09dc51b87ccc2fd7d810f33982c64faee87332a72a5d384b430cdbea2cd"
+  },
+  {
+   "bytes": 5210163,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/2k/T_Harpy_H2_BC.png",
+   "sha256": "c01417784bfa20abc883fa82d4a81de37d680e5e26df9c58e990f52a267b8ddd"
+  },
+  {
+   "bytes": 5750269,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/2k/T_Harpy_H2_N.png",
+   "sha256": "b5853e84ac116e34422ea6d24e5e5a4e00f77a71515c6dcbaa94af00ef109cf0"
+  },
+  {
+   "bytes": 5751613,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/2k/T_Harpy_H2_N_OpenGL.png",
+   "sha256": "2069ac5b66133702e9481496568e478bb57f5bbdcebadf815e3d0f568a509d46"
+  },
+  {
+   "bytes": 4261655,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/2k/T_Harpy_H2_ORM.png",
+   "sha256": "1a5dadbbbe3f50f25c4b333242651df0b82006133c095d3622985ea6fdd45577"
+  },
+  {
+   "bytes": 799569,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/2k/T_Harpy_H2_TeamMask.png",
+   "sha256": "49bc1d88378207b022440df592638071c8a49ea6c86cbdf0d703fdbbbf7b4064"
+  },
+  {
+   "bytes": 14520129,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_BC.png",
+   "sha256": "6c39cc81410c470863b409ccf5fa5679fe6df02da0111c842bff329be2133203"
+  },
+  {
+   "bytes": 15039033,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_N.png",
+   "sha256": "f172622fc4c628dac9131e04e4506b1b00473efc37426711ecc1e6519a84149d"
+  },
+  {
+   "bytes": 15043560,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_N_OpenGL.png",
+   "sha256": "97c10313a443ea5a906b0281d9d10f8aaef1c6e8aca4bf3a722bb552ecc15455"
+  },
+  {
+   "bytes": 11664238,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_ORM.png",
+   "sha256": "1dfaaddb8d646b9315110dfa91d62872ea531c188120bc0915541178d74d2e71"
+  },
+  {
+   "bytes": 2175857,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_TeamMask.png",
+   "sha256": "51c18a6f62c4965361e36da2155b5e9cfac282eddef310f62fe7643556b9884e"
+  }
+ ],
+ "files_total_bytes": 103598897,
+ "game_mesh": {
+  "parts": {
+   "cap_100": {
+    "distance_high_to_low": {
+     "max_mm": 0.008,
+     "p50_mm": 0.0,
+     "p95_mm": 0.0,
+     "p99_mm": 0.001
+    },
+    "distance_low_to_high": {
+     "max_mm": 0.009,
+     "p50_mm": 0.0,
+     "p95_mm": 0.0,
+     "p99_mm": 0.001
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 0,
+    "priority_regions": {},
+    "role": "neck cap (repair of the trimmed hood / dropped Janus face part)",
+    "side": "C",
+    "target_triangles": 500,
+    "triangles": 874,
+    "vertex_group_factor": null,
+    "vertices": 439
+   },
+   "patch_101": {
+    "distance_high_to_low": {
+     "max_mm": 1.92,
+     "p50_mm": 0.263,
+     "p95_mm": 0.881,
+     "p99_mm": 1.241
+    },
+    "distance_low_to_high": {
+     "max_mm": 1.814,
+     "p50_mm": 0.247,
+     "p95_mm": 0.813,
+     "p99_mm": 0.973
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0289,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 605,
+    "priority_regions": {},
+    "role": "nape feathers: copy of the head's back feathers over the cap, with backing sheet (repair)",
+    "side": "C",
+    "target_triangles": 800,
+    "triangles": 799,
+    "vertex_group_factor": null,
+    "vertices": 726
+   },
+   "tripo_part_0": {
+    "distance_high_to_low": {
+     "max_mm": 1.932,
+     "p50_mm": 0.198,
+     "p95_mm": 0.67,
+     "p99_mm": 0.96
+    },
+    "distance_low_to_high": {
+     "max_mm": 2.497,
+     "p50_mm": 0.189,
+     "p95_mm": 0.674,
+     "p99_mm": 0.968
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0054,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 369,
+    "priority_regions": {
+     "face": {
+      "min_triangles": 1200,
+      "protect": 0.8,
+      "triangles_lowpoly": 1211,
+      "uv_density_factor": 2.0,
+      "vertices_highpoly": 23713,
+      "vertices_lowpoly": 706
+     }
+    },
+    "role": "head: face, pointed ears, feather crest, back collar",
+    "side": "C",
+    "target_triangles": 5000,
+    "triangles": 5099,
+    "vertex_group_factor": 0.041288513067836284,
+    "vertices": 2735
+   },
+   "tripo_part_1": {
+    "distance_high_to_low": {
+     "max_mm": 3.949,
+     "p50_mm": 0.323,
+     "p95_mm": 1.038,
+     "p99_mm": 1.444
+    },
+    "distance_low_to_high": {
+     "max_mm": 2.578,
+     "p50_mm": 0.302,
+     "p95_mm": 1.018,
+     "p99_mm": 1.423
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0075,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 823,
+    "priority_regions": {},
+    "role": "torso: chest, collar ruff, back, short tail (hood of the Janus face trimmed, repair.trim)",
+    "side": "C",
+    "target_triangles": 3000,
+    "triangles": 3289,
+    "vertex_group_factor": null,
+    "vertices": 2053
+   },
+   "tripo_part_10": {
+    "distance_high_to_low": {
+     "max_mm": 1.825,
+     "p50_mm": 0.298,
+     "p95_mm": 0.914,
+     "p99_mm": 1.203
+    },
+    "distance_low_to_high": {
+     "max_mm": 1.801,
+     "p50_mm": 0.287,
+     "p95_mm": 0.875,
+     "p99_mm": 1.211
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0039,
+    "inconsistent_winding_edges": 1,
+    "non_manifold_edges": 1,
+    "open_edges": 186,
+    "priority_regions": {
+     "talons": {
+      "min_triangles": null,
+      "protect": 0.0,
+      "triangles_lowpoly": 1317,
+      "uv_density_factor": 1.5,
+      "vertices_highpoly": 34366,
+      "vertices_lowpoly": 743
+     }
+    },
+    "role": "left foot: scaled tarsus, toes, talons",
+    "side": "L",
+    "target_triangles": 1300,
+    "triangles": 1317,
+    "vertex_group_factor": null,
+    "vertices": 743
+   },
+   "tripo_part_11": {
+    "distance_high_to_low": {
+     "max_mm": 1.992,
+     "p50_mm": 0.356,
+     "p95_mm": 0.956,
+     "p99_mm": 1.168
+    },
+    "distance_low_to_high": {
+     "max_mm": 1.644,
+     "p50_mm": 0.338,
+     "p95_mm": 0.95,
+     "p99_mm": 1.173
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0122,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 103,
+    "priority_regions": {},
+    "role": "right ankle band (gold; second band made by Tripo, the concept has one)",
+    "side": "R",
+    "target_triangles": 300,
+    "triangles": 327,
+    "vertex_group_factor": null,
+    "vertices": 215
+   },
+   "tripo_part_2": {
+    "distance_high_to_low": {
+     "max_mm": 2.377,
+     "p50_mm": 0.225,
+     "p95_mm": 0.79,
+     "p99_mm": 1.133
+    },
+    "distance_low_to_high": {
+     "max_mm": 2.062,
+     "p50_mm": 0.219,
+     "p95_mm": 0.754,
+     "p99_mm": 1.069
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0068,
+    "inconsistent_winding_edges": 3,
+    "non_manifold_edges": 0,
+    "open_edges": 683,
+    "priority_regions": {},
+    "role": "left wing, inner (coverts, arm)",
+    "side": "L",
+    "target_triangles": 2800,
+    "triangles": 3069,
+    "vertex_group_factor": null,
+    "vertices": 1876
+   },
+   "tripo_part_3": {
+    "distance_high_to_low": {
+     "max_mm": 1.874,
+     "p50_mm": 0.229,
+     "p95_mm": 0.849,
+     "p99_mm": 1.201
+    },
+    "distance_low_to_high": {
+     "max_mm": 2.11,
+     "p50_mm": 0.224,
+     "p95_mm": 0.81,
+     "p99_mm": 1.214
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0053,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 644,
+    "priority_regions": {},
+    "role": "right wing, inner (coverts, arm)",
+    "side": "R",
+    "target_triangles": 2600,
+    "triangles": 2846,
+    "vertex_group_factor": null,
+    "vertices": 1745
+   },
+   "tripo_part_4": {
+    "distance_high_to_low": {
+     "max_mm": 1.588,
+     "p50_mm": 0.151,
+     "p95_mm": 0.511,
+     "p99_mm": 0.711
+    },
+    "distance_low_to_high": {
+     "max_mm": 1.445,
+     "p50_mm": 0.149,
+     "p95_mm": 0.511,
+     "p99_mm": 0.717
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0014,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 446,
+    "priority_regions": {},
+    "role": "right wing, outer (primaries)",
+    "side": "R",
+    "target_triangles": 3000,
+    "triangles": 3108,
+    "vertex_group_factor": null,
+    "vertices": 1778
+   },
+   "tripo_part_5": {
+    "distance_high_to_low": {
+     "max_mm": 1.413,
+     "p50_mm": 0.135,
+     "p95_mm": 0.471,
+     "p99_mm": 0.692
+    },
+    "distance_low_to_high": {
+     "max_mm": 1.449,
+     "p50_mm": 0.138,
+     "p95_mm": 0.475,
+     "p99_mm": 0.702
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0004,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 510,
+    "priority_regions": {},
+    "role": "left wing, outer (primaries)",
+    "side": "L",
+    "target_triangles": 3200,
+    "triangles": 3310,
+    "vertex_group_factor": null,
+    "vertices": 1911
+   },
+   "tripo_part_6": {
+    "distance_high_to_low": {
+     "max_mm": 1.808,
+     "p50_mm": 0.286,
+     "p95_mm": 0.88,
+     "p99_mm": 1.179
+    },
+    "distance_low_to_high": {
+     "max_mm": 2.55,
+     "p50_mm": 0.279,
+     "p95_mm": 0.881,
+     "p99_mm": 1.177
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0046,
+    "inconsistent_winding_edges": 5,
+    "non_manifold_edges": 2,
+    "open_edges": 200,
+    "priority_regions": {},
+    "role": "left leg: feathered thigh, shin, gold ankle band",
+    "side": "L",
+    "target_triangles": 1600,
+    "triangles": 1657,
+    "vertex_group_factor": null,
+    "vertices": 921
+   },
+   "tripo_part_8": {
+    "distance_high_to_low": {
+     "max_mm": 1.781,
+     "p50_mm": 0.295,
+     "p95_mm": 0.92,
+     "p99_mm": 1.224
+    },
+    "distance_low_to_high": {
+     "max_mm": 2.351,
+     "p50_mm": 0.283,
+     "p95_mm": 0.892,
+     "p99_mm": 1.198
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0031,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 185,
+    "priority_regions": {},
+    "role": "right leg: feathered thigh, shin",
+    "side": "R",
+    "target_triangles": 1400,
+    "triangles": 1449,
+    "vertex_group_factor": null,
+    "vertices": 817
+   },
+   "tripo_part_9": {
+    "distance_high_to_low": {
+     "max_mm": 1.679,
+     "p50_mm": 0.28,
+     "p95_mm": 0.874,
+     "p99_mm": 1.179
+    },
+    "distance_low_to_high": {
+     "max_mm": 1.757,
+     "p50_mm": 0.26,
+     "p95_mm": 0.836,
+     "p99_mm": 1.165
+    },
+    "faces_flipped_vs_highpoly_fraction": 0.0028,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 196,
+    "priority_regions": {
+     "talons": {
+      "min_triangles": null,
+      "protect": 0.0,
+      "triangles_lowpoly": 1314,
+      "uv_density_factor": 1.5,
+      "vertices_highpoly": 31877,
+      "vertices_lowpoly": 750
+     }
+    },
+    "role": "right foot: scaled tarsus, toes, talons",
+    "side": "R",
+    "target_triangles": 1300,
+    "triangles": 1314,
+    "vertex_group_factor": null,
+    "vertices": 750
+   }
+  },
+  "settings": {
+   "decimate": "COLLAPSE, use_collapse_triangulate, vertex group h2_priority (factor 1)",
+   "distance_samples_per_part": 20000,
+   "sharp_angle_deg": 60.0,
+   "weld_distance_m": 1e-06,
+   "why_not_quadriflow": "QuadriFlow needs closed manifold input and smooths thin features: every Tripo part is one shell with 264-2413 open edges (segmentation cuts), and the figure is mostly thin feather sheets (wing primaries, crest spikes, collar ruff) whose serrated outline is the silhouette; collapse decimation keeps those outlines (measured: surface distance high->low per part in h2-lowpoly-report.json)"
+  },
+  "silhouette_iou_vs_highpoly": {
+   "back": {
+    "hp_px": 590210,
+    "iou": 0.98863,
+    "lp_px": 589200,
+    "xor_px": 6742
+   },
+   "feet_front": {
+    "hp_px": 343160,
+    "iou": 0.97662,
+    "lp_px": 341512,
+    "xor_px": 8098
+   },
+   "front": {
+    "hp_px": 590060,
+    "iou": 0.98838,
+    "lp_px": 589018,
+    "xor_px": 6890
+   },
+   "head_3q": {
+    "hp_px": 794915,
+    "iou": 0.95154,
+    "lp_px": 785239,
+    "xor_px": 39242
+   },
+   "head_front": {
+    "hp_px": 771726,
+    "iou": 0.92279,
+    "lp_px": 780846,
+    "xor_px": 62342
+   },
+   "side_left": {
+    "hp_px": 401186,
+    "iou": 0.98876,
+    "lp_px": 400797,
+    "xor_px": 4531
+   },
+   "top": {
+    "hp_px": 283586,
+    "iou": 0.98443,
+    "lp_px": 283097,
+    "xor_px": 4447
+   },
+   "wing_tip_back": {
+    "hp_px": 493877,
+    "iou": 0.95102,
+    "lp_px": 492164,
+    "xor_px": 24755
+   }
+  },
+  "triangles_base": 864,
+  "triangles_figure": 28458
+ },
+ "import": {
+  "geometry_files_match": true,
+  "parts": {
+   "tripo_part_0": {
+    "basecolor_px": [
+     4096,
+     4096
+    ],
+    "bounds_max_m": [
+     0.11516,
+     0.22704,
+     0.6339
+    ],
+    "bounds_min_m": [
+     -0.11805,
+     0.02463,
+     0.34186
+    ],
+    "corner_normals_against_winding_fraction": 5e-05,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 0,
+    "open_edges": 990,
+    "ray_escape_score": 0.9999,
+    "shells": 1,
+    "triangles": 333832
+   },
+   "tripo_part_1": {
+    "basecolor_px": [
+     2048,
+     2048
+    ],
+    "bounds_max_m": [
+     0.12342,
+     0.16921,
+     0.53378
+    ],
+    "bounds_min_m": [
+     -0.10391,
+     -0.09399,
+     0.15627
+    ],
+    "corner_normals_against_winding_fraction": 0.00013,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 0,
+    "open_edges": 2413,
+    "ray_escape_score": 1.0,
+    "shells": 1,
+    "triangles": 266455
+   },
+   "tripo_part_10": {
+    "basecolor_px": [
+     1024,
+     1024
+    ],
+    "bounds_max_m": [
+     -0.0025,
+     0.15998,
+     0.14991
+    ],
+    "bounds_min_m": [
+     -0.11627,
+     -0.02878,
+     0.07082
+    ],
+    "corner_normals_against_winding_fraction": 1e-05,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 0,
+    "open_edges": 733,
+    "ray_escape_score": 1.0,
+    "shells": 1,
+    "triangles": 68017
+   },
+   "tripo_part_11": {
+    "basecolor_px": [
+     512,
+     512
+    ],
+    "bounds_max_m": [
+     0.06982,
+     0.04881,
+     0.17204
+    ],
+    "bounds_min_m": [
+     0.01737,
+     -0.00679,
+     0.13681
+    ],
+    "corner_normals_against_winding_fraction": 0.00027,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 0,
+    "open_edges": 264,
+    "ray_escape_score": 1.0,
+    "shells": 1,
+    "triangles": 14764
+   },
+   "tripo_part_12": {
+    "basecolor_px": [
+     2048,
+     2048
+    ],
+    "bounds_max_m": [
+     0.07644,
+     0.0031,
+     0.59533
+    ],
+    "bounds_min_m": [
+     -0.07905,
+     -0.10949,
+     0.38386
+    ],
+    "corner_normals_against_winding_fraction": 4e-05,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 0,
+    "open_edges": 356,
+    "ray_escape_score": 1.0,
+    "shells": 1,
+    "triangles": 65948
+   },
+   "tripo_part_2": {
+    "basecolor_px": [
+     2048,
+     2048
+    ],
+    "bounds_max_m": [
+     -0.04762,
+     0.07196,
+     0.58692
+    ],
+    "bounds_min_m": [
+     -0.34564,
+     -0.13275,
+     0.31136
+    ],
+    "corner_normals_against_winding_fraction": 0.00014,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 0,
+    "open_edges": 1646,
+    "ray_escape_score": 1.0,
+    "shells": 1,
+    "triangles": 241118
+   },
+   "tripo_part_3": {
+    "basecolor_px": [
+     2048,
+     2048
+    ],
+    "bounds_max_m": [
+     0.34293,
+     0.07932,
+     0.58705
+    ],
+    "bounds_min_m": [
+     0.05121,
+     -0.04602,
+     0.3114
+    ],
+    "corner_normals_against_winding_fraction": 0.00011,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 0,
+    "open_edges": 1714,
+    "ray_escape_score": 1.0,
+    "shells": 1,
+    "triangles": 216762
+   },
+   "tripo_part_4": {
+    "basecolor_px": [
+     2048,
+     2048
+    ],
+    "bounds_max_m": [
+     0.48887,
+     0.03735,
+     0.55935
+    ],
+    "bounds_min_m": [
+     0.07528,
+     -0.10091,
+     0.22387
+    ],
+    "corner_normals_against_winding_fraction": 7e-05,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 0,
+    "open_edges": 1125,
+    "ray_escape_score": 1.0,
+    "shells": 1,
+    "triangles": 191311
+   },
+   "tripo_part_5": {
+    "basecolor_px": [
+     2048,
+     2048
+    ],
+    "bounds_max_m": [
+     -0.07368,
+     0.03048,
+     0.5594
+    ],
+    "bounds_min_m": [
+     -0.48887,
+     -0.22704,
+     0.22401
+    ],
+    "corner_normals_against_winding_fraction": 3e-05,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 0,
+    "open_edges": 1133,
+    "ray_escape_score": 1.0,
+    "shells": 1,
+    "triangles": 199429
+   },
+   "tripo_part_6": {
+    "basecolor_px": [
+     2048,
+     2048
+    ],
+    "bounds_max_m": [
+     -0.012,
+     0.13227,
+     0.32297
+    ],
+    "bounds_min_m": [
+     -0.1292,
+     -0.02578,
+     0.14626
+    ],
+    "corner_normals_against_winding_fraction": 0.00011,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 1,
+    "open_edges": 603,
+    "ray_escape_score": 1.0,
+    "shells": 1,
+    "triangles": 108233
+   },
+   "tripo_part_7": {
+    "basecolor_px": [
+     4096,
+     4096
+    ],
+    "bounds_max_m": [
+     0.16008,
+     0.20319,
+     0.07351
+    ],
+    "bounds_min_m": [
+     -0.16042,
+     -0.10892,
+     0.0
+    ],
+    "corner_normals_against_winding_fraction": 3e-05,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 0,
+    "open_edges": 1216,
+    "ray_escape_score": 1.0,
+    "shells": 1,
+    "triangles": 101306
+   },
+   "tripo_part_8": {
+    "basecolor_px": [
+     2048,
+     2048
+    ],
+    "bounds_max_m": [
+     0.12802,
+     0.07902,
+     0.32276
+    ],
+    "bounds_min_m": [
+     0.01295,
+     -0.07244,
+     0.1656
+    ],
+    "corner_normals_against_winding_fraction": 0.00013,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 0,
+    "open_edges": 505,
+    "ray_escape_score": 1.0,
+    "shells": 1,
+    "triangles": 94137
+   },
+   "tripo_part_9": {
+    "basecolor_px": [
+     1024,
+     1024
+    ],
+    "bounds_max_m": [
+     0.11448,
+     0.16007,
+     0.14409
+    ],
+    "bounds_min_m": [
+     -0.00214,
+     -0.03228,
+     0.07054
+    ],
+    "corner_normals_against_winding_fraction": 4e-05,
+    "geometry_equals_textured_glb": true,
+    "non_manifold_edges": 0,
+    "open_edges": 750,
+    "ray_escape_score": 1.0,
+    "shells": 1,
+    "triangles": 63014
+   }
+  },
+  "triangles_total": {
+   "triangles_geometry": 1964326,
+   "triangles_textured": 1964326
+  }
+ },
+ "instances": {
+  "instances_facing_k1": {
+   "all_distinguishable": true,
+   "per_instance": {
+    "1": {
+     "consistent_indices": [
+      1
+     ],
+     "lit_slots": 3,
+     "min_lit_delta": 161.9,
+     "pip_radius_px": 2.27,
+     "visible_slots": 7
+    },
+    "2": {
+     "consistent_indices": [
+      2
+     ],
+     "lit_slots": 5,
+     "min_lit_delta": 154.1,
+     "pip_radius_px": 2.27,
+     "visible_slots": 7
+    },
+    "3": {
+     "consistent_indices": [
+      3
+     ],
+     "lit_slots": 7,
+     "min_lit_delta": 155.7,
+     "pip_radius_px": 2.27,
+     "visible_slots": 7
+    }
+   }
+  },
+  "instances_facing_k2": {
+   "all_distinguishable": true,
+   "per_instance": {
+    "1": {
+     "consistent_indices": [
+      1
+     ],
+     "lit_slots": 3,
+     "min_lit_delta": 177.3,
+     "pip_radius_px": 3.62,
+     "visible_slots": 7
+    },
+    "2": {
+     "consistent_indices": [
+      2
+     ],
+     "lit_slots": 5,
+     "min_lit_delta": 157.5,
+     "pip_radius_px": 3.62,
+     "visible_slots": 7
+    },
+    "3": {
+     "consistent_indices": [
+      3
+     ],
+     "lit_slots": 6,
+     "min_lit_delta": 157.6,
+     "pip_radius_px": 3.62,
+     "visible_slots": 6
+    }
+   }
+  },
+  "instances_facing_k2close": {
+   "all_distinguishable": true,
+   "per_instance": {
+    "1": {
+     "consistent_indices": [
+      1
+     ],
+     "lit_slots": 3,
+     "min_lit_delta": 157.5,
+     "pip_radius_px": 5.63,
+     "visible_slots": 8
+    },
+    "2": {
+     "consistent_indices": [
+      2
+     ],
+     "lit_slots": 5,
+     "min_lit_delta": 156.5,
+     "pip_radius_px": 5.63,
+     "visible_slots": 7
+    },
+    "3": {
+     "consistent_indices": [
+      3
+     ],
+     "lit_slots": 6,
+     "min_lit_delta": 177.0,
+     "pip_radius_px": 5.63,
+     "visible_slots": 6
+    }
+   }
+  },
+  "instances_mixed_yaw_k1": {
+   "all_distinguishable": true,
+   "per_instance": {
+    "1": {
+     "consistent_indices": [
+      1
+     ],
+     "lit_slots": 2,
+     "min_lit_delta": 157.6,
+     "pip_radius_px": 2.2,
+     "visible_slots": 6
+    },
+    "2": {
+     "consistent_indices": [
+      2
+     ],
+     "lit_slots": 5,
+     "min_lit_delta": 128.8,
+     "pip_radius_px": 1.97,
+     "visible_slots": 8
+    },
+    "3": {
+     "consistent_indices": [
+      3
+     ],
+     "lit_slots": 6,
+     "min_lit_delta": 158.4,
+     "pip_radius_px": 2.22,
+     "visible_slots": 6
+    }
+   }
+  },
+  "instances_mixed_yaw_k2": {
+   "all_distinguishable": true,
+   "per_instance": {
+    "1": {
+     "consistent_indices": [
+      1
+     ],
+     "lit_slots": 2,
+     "min_lit_delta": 169.7,
+     "pip_radius_px": 3.57,
+     "visible_slots": 6
+    },
+    "2": {
+     "consistent_indices": [
+      2
+     ],
+     "lit_slots": 5,
+     "min_lit_delta": 114.8,
+     "pip_radius_px": 3.15,
+     "visible_slots": 8
+    },
+    "3": {
+     "consistent_indices": [
+      3
+     ],
+     "lit_slots": 6,
+     "min_lit_delta": 181.1,
+     "pip_radius_px": 3.59,
+     "visible_slots": 6
+    }
+   }
+  },
+  "instances_mixed_yaw_k2close": {
+   "all_distinguishable": true,
+   "per_instance": {
+    "1": {
+     "consistent_indices": [
+      1
+     ],
+     "lit_slots": 2,
+     "min_lit_delta": 163.6,
+     "pip_radius_px": 5.69,
+     "visible_slots": 6
+    },
+    "2": {
+     "consistent_indices": [
+      2
+     ],
+     "lit_slots": 5,
+     "min_lit_delta": 97.4,
+     "pip_radius_px": 4.9,
+     "visible_slots": 7
+    },
+    "3": {
+     "consistent_indices": [
+      3
+     ],
+     "lit_slots": 6,
+     "min_lit_delta": 180.5,
+     "pip_radius_px": 5.68,
+     "visible_slots": 6
+    }
+   }
+  }
+ },
+ "iteration": "H2 (проработка героев по концептам hero-quality-v1)",
+ "k2_frames": {
+  "k1_gamescale_front_prev_left_h2_right": {
+   "azimuth_deg": 0,
+   "distance_m": 12.178924041074737,
+   "label": "blender",
+   "left_to_right": [
+    "previous",
+    "H2"
+   ]
+  },
+  "k2_3q_prev_left_h2_right": {
+   "azimuth_deg": -40,
+   "distance_m": 7.5,
+   "label": "blender",
+   "left_to_right": [
+    "previous",
+    "H2"
+   ]
+  },
+  "k2_front_prev_left_h2_right": {
+   "azimuth_deg": 0,
+   "distance_m": 7.5,
+   "label": "blender",
+   "left_to_right": [
+    "previous",
+    "H2"
+   ]
+  },
+  "k2close_back3q_h2_left_prev_right": {
+   "azimuth_deg": 140,
+   "distance_m": 4.8,
+   "label": "blender",
+   "left_to_right": [
+    "H2",
+    "previous"
+   ]
+  },
+  "k2close_back_h2_left_prev_right": {
+   "azimuth_deg": 180,
+   "distance_m": 4.8,
+   "label": "blender",
+   "left_to_right": [
+    "H2",
+    "previous"
+   ]
+  },
+  "k2close_front_prev_left_h2_right": {
+   "azimuth_deg": 0,
+   "distance_m": 4.8,
+   "label": "blender",
+   "left_to_right": [
+    "previous",
+    "H2"
+   ]
+  }
+ },
+ "k2_projection": {
+  "camera": {
+   "figure_offset_m": [
+    0.5,
+    0.0,
+    0.0
+   ],
+   "horizontal_fov_deg": 35,
+   "pitch_deg": -55,
+   "resolution": [
+    1920,
+    1080
+   ]
+  },
+  "frames": {
+   "K1_12m": {
+    "base_top_bbox_px": [
+     55.6,
+     45.6
+    ],
+    "face_region_bbox_px": [
+     22.2,
+     16.9
+    ],
+    "figure_bbox_px": [
+     163.5,
+     91.2
+    ],
+    "mm_per_px_at_target": 3.941
+   },
+   "K2_7.5m": {
+    "base_top_bbox_px": [
+     88.6,
+     72.9
+    ],
+    "face_region_bbox_px": [
+     36.1,
+     27.3
+    ],
+    "figure_bbox_px": [
+     262.3,
+     146.4
+    ],
+    "mm_per_px_at_target": 2.463
+   },
+   "K2close_4.8m": {
+    "base_top_bbox_px": [
+     138.1,
+     113.6
+    ],
+    "face_region_bbox_px": [
+     57.7,
+     43.4
+    ],
+    "figure_bbox_px": [
+     411.5,
+     229.7
+    ],
+    "mm_per_px_at_target": 1.576
+   }
+  },
+  "label": "projection of the authored game mesh, no rendering"
+ },
+ "module": "tools/tripo-pipeline/blender/h2_bake_harpy/",
+ "profile": {
+  "path": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2-bake-h2.json",
+  "profile_id": "harpy-h2-bake/2",
+  "sha256": "290171af1526825c1b9960bcaaa432c90cdfa0889451dc73e7ed3edde8670ad3"
+ },
+ "repair": {
+  "evidence_frames": [
+   "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/janus_head_sheet_source_frame.jpg",
+   "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/janus_head_without_part0_source_frame.jpg",
+   "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/janus_head_without_part12_source_frame.jpg",
+   "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_parts_back.jpg",
+   "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_parts_front.jpg",
+   "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_parts_left.jpg",
+   "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_parts_top.jpg",
+   "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_textured_back.jpg",
+   "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_textured_front.jpg",
+   "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_textured_left.jpg",
+   "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_textured_right.jpg",
+   "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/evidence/source_highpoly_textured_top.jpg"
+  ],
+  "measured": {
+   "caps": {
+    "cap_100": {
+     "centre_m": [
+      0.001,
+      0.0101,
+      0.4434
+     ],
+     "depth_m": 0.025,
+     "dome_m": 0.008,
+     "lip_m": 0.003,
+     "loop_bounds_m": {
+      "max": [
+       0.0575,
+       0.0416,
+       0.4565
+      ],
+      "min": [
+       -0.0552,
+       -0.0269,
+       0.3839
+      ]
+     },
+     "loop_length_m": 0.6535,
+     "loop_points": 449,
+     "material": {
+      "bump_distance_m": 0.002,
+      "bump_strength": 0.8,
+      "cell_jitter": 0.3,
+      "cell_m": 0.016,
+      "colour_centre_linear": [
+       0.07,
+       0.04,
+       0.024
+      ],
+      "colour_edge_linear": [
+       0.014,
+       0.008,
+       0.005
+      ],
+      "edge_position": 0.55,
+      "feature": "F1",
+      "kind": "feather_scallop",
+      "randomness": 0.85,
+      "roughness": 0.8,
+      "stretch": 2.2,
+      "uv_span_m": 0.14498
+     },
+     "normal": [
+      -0.0668,
+      0.7015,
+      0.7096
+     ],
+     "outward": 0.12,
+     "rings": 4,
+     "samples": 64,
+     "skirt_m": 0.004,
+     "top_faces": 384,
+     "top_faces_facing_out": 360,
+     "triangles": 896,
+     "uv_span_m": 0.14498,
+     "why": "closes the torso's neck opening left by repair.trim (and by the dropped tripo_part_12, whose neck filled it; harpy-h2-bake/1 closed only its lower back part with the ellipsoid plug_100 and left a see-through gap at the base of the head: 119-130 px at azimuth 180 / 4.8 m, measured by see_through.py). Closed domed cap on the loop's best-fit plane: skirt ring 12 % outside the loop and 4 mm under it (tucks under the collar), lip ring on the rim 3 mm up (a ray grazing the rim meets the cap before the rim's culled inner side), closed underside. Dark feather tone with a soft procedural scallop (Voronoi F1, baked into BC and N); prototypes 2026-09-29: ellipsoid plugs left 5-85 px see-through, the cap 0-1 px on the high-poly. Proposal"
+    }
+   },
+   "corner_normals_min_dot_after_turn": {
+    "tripo_part_0": 1.0,
+    "tripo_part_1": 1.0,
+    "tripo_part_10": 1.0,
+    "tripo_part_11": 0.999999,
+    "tripo_part_2": 1.0,
+    "tripo_part_3": 1.0,
+    "tripo_part_4": 1.0,
+    "tripo_part_5": 1.0,
+    "tripo_part_6": 1.0,
+    "tripo_part_7": 1.0,
+    "tripo_part_8": 1.0,
+    "tripo_part_9": 1.0
+   },
+   "dropped_parts": {
+    "tripo_part_12": {
+     "triangles": 65948,
+     "why": "front-concept face of the Janus head (source -Y); after the 180 deg turn it would be a second face on the back of the head. Its neck sat in the hood/neck column of tripo_part_1 (see repair.trim)"
+    }
+   },
+   "occluder_only_parts": {
+    "tripo_part_7": "Tripo base (gold cylinder, source Ø0.321 m): AO occluder under the feet only; the game base is the parametric SM_Harpy_Base (instance pips, team band)"
+   },
+   "patches": {
+    "patch_101": {
+     "area_m2": 0.0242017,
+     "boxes": [
+      {
+       "max": [
+        0.052,
+        0.0,
+        0.54
+       ],
+       "min": [
+        -0.052,
+        -0.065,
+        0.43
+       ]
+      }
+     ],
+     "faces": 42712,
+     "faces_sheet": 21356,
+     "matrix": [
+      [
+       1.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0,
+       0.0,
+       0.045
+      ],
+      [
+       0.0,
+       0.0,
+       1.0,
+       -0.045
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       1.0
+      ]
+     ],
+     "solidify_m": 0.002,
+     "source": "HP_tripo_part_0",
+     "translate": [
+      0.0,
+      0.045,
+      -0.045
+     ],
+     "why": "the head's own back feathers (tripo_part_0 faces with centroid behind y -0.065, z 0.43..0.54, |x| <= 0.052; Tripo UVs and material kept) copied 4.5 cm back and 4.5 cm down over the cap's upper half, so the crest continues into the collar as on the back concept instead of a smooth dark shape; a reversed backing sheet 2 mm behind it (no rim) keeps its back side from showing culled faces toward the front camera (without it: 20-35 px see-through at azimuth 320-340). Proposal"
+    }
+   },
+   "plugs": {},
+   "rotate_z_deg": 180.0,
+   "trims": {
+    "tripo_part_1": [
+     {
+      "area_removed_m2": 0.013735,
+      "boxes": [
+       {
+        "max": [
+         0.07,
+         0.1,
+         0.6
+        ],
+        "min": [
+         -0.07,
+         -0.035,
+         0.455
+        ]
+       }
+      ],
+      "faces_before": 266455,
+      "faces_removed": 15829,
+      "open_loops_after_m": [
+       {
+        "edges": 1218,
+        "length_m": 1.5783,
+        "max_m": [
+         0.1039,
+         0.0189,
+         0.4572
+        ],
+        "mean_m": [
+         -0.0052,
+         -0.0511,
+         0.4088
+        ],
+        "min_m": [
+         -0.1135,
+         -0.1491,
+         0.3457
+        ]
+       },
+       {
+        "edges": 449,
+        "length_m": 0.6535,
+        "max_m": [
+         0.0575,
+         0.0416,
+         0.4565
+        ],
+        "mean_m": [
+         0.0019,
+         0.0109,
+         0.4459
+        ],
+        "min_m": [
+         -0.0552,
+         -0.0269,
+         0.3839
+        ]
+       }
+      ],
+      "removed_bounds_m": {
+       "max": [
+        0.0568,
+        0.0696,
+        0.5338
+       ],
+       "min": [
+        -0.0548,
+        -0.0255,
+        0.455
+       ]
+      },
+      "why": "hood / neck column of the torso that framed the dropped face tripo_part_12: faces with centroid above z 0.455 behind the head (authored frame, source scale; measured 2026-09-29: 15 829 of 266 455 high-poly faces, centroids x -0.055..0.057, y -0.026..0.070, z 0.455..0.534). Below z 0.455 the part is the collar ruff; the cut leaves one open loop around the neck (0.65 m, x -0.055..0.058, y -0.027..0.042, z 0.384..0.457), closed by repair.caps. Proposal"
+     }
+    ]
+   },
+   "why": "Janus head of Tripo task 330872a3 (measured 2026-09-29, work/probe sheets): the side concept (drawn over ortho_left, face looking left) went into the RIGHT slot, so Tripo fitted a face on BOTH sides of the head (-Y: tripo_part_12 from the front concept; +Y: tripo_part_0 from the mirrored side profile) and swept the wings toward -Y. Turning the high-poly 180 deg about Z makes the side-consistent face (tripo_part_0, with a real nose/chin profile) the front and sweeps the wings back as in the side concept; the front-concept face part tripo_part_12 is dropped. The dropped face sat inside a feathered hood of the TORSO part tripo_part_1 (its neck column behind the head, authored y -0.026..0.070, rising to z 0.534 = eye level): that hood stays hollow after the drop (open toward +Y, its inside faces the viewer from behind) and reads from the elevated game camera as a smooth bald dome behind the crest (harpy-h2-bake/1 review, verifier frames 2026-09-29). Profile /2 trims it (repair.trim), closes the torso's neck opening with a closed cap (repair.caps) and covers the cap's upper half with a copy of the head's own back feathers (repair.patches). The back of tripo_part_0 itself is a closed feathered surface. The second ankle band tripo_part_11 (right leg after the turn) is kept because it is structural (see kept_parts_note). Repair of a generation defect, proposal; regeneration with the side view in the LEFT slot is the clean fix (followup)"
+  },
+  "profile": {
+   "caps": [
+    {
+     "depth_m": 0.025,
+     "dome_m": 0.008,
+     "lip_m": 0.003,
+     "material": {
+      "bump_distance_m": 0.002,
+      "bump_strength": 0.8,
+      "cell_jitter": 0.3,
+      "cell_m": 0.016,
+      "colour_centre_linear": [
+       0.07,
+       0.04,
+       0.024
+      ],
+      "colour_edge_linear": [
+       0.014,
+       0.008,
+       0.005
+      ],
+      "edge_position": 0.55,
+      "feature": "F1",
+      "kind": "feather_scallop",
+      "randomness": 0.85,
+      "roughness": 0.8,
+      "stretch": 2.2
+     },
+     "name": "cap_100",
+     "near_m": [
+      0.0,
+      0.01,
+      0.445
+     ],
+     "outward": 0.12,
+     "part": "tripo_part_1",
+     "rings": 4,
+     "samples": 64,
+     "skirt_m": 0.004,
+     "smooth": 1,
+     "why": "closes the torso's neck opening left by repair.trim (and by the dropped tripo_part_12, whose neck filled it; harpy-h2-bake/1 closed only its lower back part with the ellipsoid plug_100 and left a see-through gap at the base of the head: 119-130 px at azimuth 180 / 4.8 m, measured by see_through.py). Closed domed cap on the loop's best-fit plane: skirt ring 12 % outside the loop and 4 mm under it (tucks under the collar), lip ring on the rim 3 mm up (a ray grazing the rim meets the cap before the rim's culled inner side), closed underside. Dark feather tone with a soft procedural scallop (Voronoi F1, baked into BC and N); prototypes 2026-09-29: ellipsoid plugs left 5-85 px see-through, the cap 0-1 px on the high-poly. Proposal"
+    }
+   ],
+   "drop_parts": {
+    "tripo_part_12": "front-concept face of the Janus head (source -Y); after the 180 deg turn it would be a second face on the back of the head. Its neck sat in the hood/neck column of tripo_part_1 (see repair.trim)"
+   },
+   "kept_parts_note": {
+    "tripo_part_11": "second ankle band (on the RIGHT leg after the turn; the concept has one band, on the LEFT leg). Kept: it bridges the 2.2 cm (source) gap between the right shin (tripo_part_8, bottom z 0.166) and the right tarsus (tripo_part_9, top z 0.144); dropping it opened the leg (measured in the first low-poly front frame 2026-09-29). Deviation from the concept, recorded in the report"
+   },
+   "occluder_only_parts": {
+    "tripo_part_7": "Tripo base (gold cylinder, source Ø0.321 m): AO occluder under the feet only; the game base is the parametric SM_Harpy_Base (instance pips, team band)"
+   },
+   "patches": [
+    {
+     "boxes": [
+      {
+       "max": [
+        0.052,
+        0.0,
+        0.54
+       ],
+       "min": [
+        -0.052,
+        -0.065,
+        0.43
+       ]
+      }
+     ],
+     "name": "patch_101",
+     "solidify_m": 0.002,
+     "source": "tripo_part_0",
+     "translate": [
+      0.0,
+      0.045,
+      -0.045
+     ],
+     "why": "the head's own back feathers (tripo_part_0 faces with centroid behind y -0.065, z 0.43..0.54, |x| <= 0.052; Tripo UVs and material kept) copied 4.5 cm back and 4.5 cm down over the cap's upper half, so the crest continues into the collar as on the back concept instead of a smooth dark shape; a reversed backing sheet 2 mm behind it (no rim) keeps its back side from showing culled faces toward the front camera (without it: 20-35 px see-through at azimuth 320-340). Proposal"
+    }
+   ],
+   "plugs": [],
+   "rotate_z_deg": 180.0,
+   "trim": [
+    {
+     "boxes": [
+      {
+       "max": [
+        0.07,
+        0.1,
+        0.6
+       ],
+       "min": [
+        -0.07,
+        -0.035,
+        0.455
+       ]
+      }
+     ],
+     "part": "tripo_part_1",
+     "report_loops_min_z": 0.4,
+     "why": "hood / neck column of the torso that framed the dropped face tripo_part_12: faces with centroid above z 0.455 behind the head (authored frame, source scale; measured 2026-09-29: 15 829 of 266 455 high-poly faces, centroids x -0.055..0.057, y -0.026..0.070, z 0.455..0.534). Below z 0.455 the part is the collar ruff; the cut leaves one open loop around the neck (0.65 m, x -0.055..0.058, y -0.027..0.042, z 0.384..0.457), closed by repair.caps. Proposal"
+    }
+   ],
+   "why": "Janus head of Tripo task 330872a3 (measured 2026-09-29, work/probe sheets): the side concept (drawn over ortho_left, face looking left) went into the RIGHT slot, so Tripo fitted a face on BOTH sides of the head (-Y: tripo_part_12 from the front concept; +Y: tripo_part_0 from the mirrored side profile) and swept the wings toward -Y. Turning the high-poly 180 deg about Z makes the side-consistent face (tripo_part_0, with a real nose/chin profile) the front and sweeps the wings back as in the side concept; the front-concept face part tripo_part_12 is dropped. The dropped face sat inside a feathered hood of the TORSO part tripo_part_1 (its neck column behind the head, authored y -0.026..0.070, rising to z 0.534 = eye level): that hood stays hollow after the drop (open toward +Y, its inside faces the viewer from behind) and reads from the elevated game camera as a smooth bald dome behind the crest (harpy-h2-bake/1 review, verifier frames 2026-09-29). Profile /2 trims it (repair.trim), closes the torso's neck opening with a closed cap (repair.caps) and covers the cap's upper half with a copy of the head's own back feathers (repair.patches). The back of tripo_part_0 itself is a closed feathered surface. The second ankle band tripo_part_11 (right leg after the turn) is kept because it is structural (see kept_parts_note). Repair of a generation defect, proposal; regeneration with the side view in the LEFT slot is the clean fix (followup)"
+  }
+ },
+ "rig": {
+  "armature": {
+   "bones_final_m": {
+    "arm_lower.L": [
+     [
+      0.11952,
+      0.05275,
+      0.31619
+     ],
+     [
+      0.20102,
+      0.08673,
+      0.38079
+     ]
+    ],
+    "arm_lower.R": [
+     [
+      -0.12245,
+      0.02596,
+      0.31493
+     ],
+     [
+      -0.20236,
+      0.0377,
+      0.38112
+     ]
+    ],
+    "arm_upper.L": [
+     [
+      0.05281,
+      0.02497,
+      0.26927
+     ],
+     [
+      0.11952,
+      0.05275,
+      0.31619
+     ]
+    ],
+    "arm_upper.R": [
+     [
+      -0.05706,
+      0.01639,
+      0.26696
+     ],
+     [
+      -0.12245,
+      0.02596,
+      0.31493
+     ]
+    ],
+    "foot.L": [
+     [
+      0.03255,
+      0.02054,
+      0.10509
+     ],
+     [
+      0.03618,
+      -0.04148,
+      0.05824
+     ]
+    ],
+    "foot.R": [
+     [
+      -0.02849,
+      0.01659,
+      0.10311
+     ],
+     [
+      -0.03047,
+      -0.03488,
+      0.05758
+     ]
+    ],
+    "hand.L": [
+     [
+      0.20102,
+      0.08673,
+      0.38079
+     ],
+     [
+      0.31161,
+      0.17106,
+      0.28537
+     ]
+    ],
+    "hand.R": [
+     [
+      -0.20236,
+      0.0377,
+      0.38112
+     ],
+     [
+      -0.31144,
+      0.09082,
+      0.28682
+     ]
+    ],
+    "head": [
+     [
+      -0.00011,
+      -0.02829,
+      0.27534
+     ],
+     [
+      -0.00011,
+      -0.05468,
+      0.39742
+     ]
+    ],
+    "hips": [
+     [
+      -0.00011,
+      0.00801,
+      0.15986
+     ],
+     [
+      -0.00011,
+      0.01131,
+      0.20605
+     ]
+    ],
+    "leg_lower.L": [
+     [
+      0.05598,
+      -0.03488,
+      0.14337
+     ],
+     [
+      0.03255,
+      0.02054,
+      0.10509
+     ]
+    ],
+    "leg_lower.R": [
+     [
+      -0.0529,
+      0.0311,
+      0.14667
+     ],
+     [
+      -0.02849,
+      0.01659,
+      0.10311
+     ]
+    ],
+    "leg_upper.L": [
+     [
+      0.02298,
+      0.00471,
+      0.19286
+     ],
+     [
+      0.05598,
+      -0.03488,
+      0.14337
+     ]
+    ],
+    "leg_upper.R": [
+     [
+      -0.02321,
+      0.00801,
+      0.19286
+     ],
+     [
+      -0.0529,
+      0.0311,
+      0.14667
+     ]
+    ],
+    "root": [
+     [
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.04
+     ]
+    ],
+    "spine": [
+     [
+      -0.00011,
+      0.01131,
+      0.20605
+     ],
+     [
+      -0.00011,
+      -0.01839,
+      0.27534
+     ]
+    ]
+   },
+   "object": "SKEL_UM_Humanoid",
+   "skeleton": "UM_HUMANOID_17_v2"
+  },
+  "base": {
+   "clearance_m": 0.00399,
+   "pips": {
+    "faces_by_role": {
+     "band": 144,
+     "bottom": 72,
+     "pip_centre": 96,
+     "pip_outer": 192,
+     "top": 72
+    },
+    "pips": [
+     {
+      "centre_m": [
+       -0.02951,
+       -0.09083
+      ],
+      "radius_from_axis_m": 0.0955,
+      "sector_deg": -90,
+      "slot": "outer_a"
+     },
+     {
+      "centre_m": [
+       0.0,
+       -0.0955
+      ],
+      "radius_from_axis_m": 0.0955,
+      "sector_deg": -90,
+      "slot": "centre"
+     },
+     {
+      "centre_m": [
+       0.02951,
+       -0.09083
+      ],
+      "radius_from_axis_m": 0.0955,
+      "sector_deg": -90,
+      "slot": "outer_b"
+     },
+     {
+      "centre_m": [
+       0.09341,
+       0.01986
+      ],
+      "radius_from_axis_m": 0.0955,
+      "sector_deg": 30,
+      "slot": "outer_a"
+     },
+     {
+      "centre_m": [
+       0.08271,
+       0.04775
+      ],
+      "radius_from_axis_m": 0.0955,
+      "sector_deg": 30,
+      "slot": "centre"
+     },
+     {
+      "centre_m": [
+       0.0639,
+       0.07097
+      ],
+      "radius_from_axis_m": 0.0955,
+      "sector_deg": 30,
+      "slot": "outer_b"
+     },
+     {
+      "centre_m": [
+       -0.0639,
+       0.07097
+      ],
+      "radius_from_axis_m": 0.0955,
+      "sector_deg": 150,
+      "slot": "outer_a"
+     },
+     {
+      "centre_m": [
+       -0.08271,
+       0.04775
+      ],
+      "radius_from_axis_m": 0.0955,
+      "sector_deg": 150,
+      "slot": "centre"
+     },
+     {
+      "centre_m": [
+       -0.09341,
+       0.01986
+      ],
+      "radius_from_axis_m": 0.0955,
+      "sector_deg": 150,
+      "slot": "outer_b"
+     }
+    ]
+   },
+   "search_best": {
+    "offset_deg": 0,
+    "ring_radius_m": 0.0955
+   },
+   "triangles": 864
+  },
+  "checks": {
+   "all_triangles": {
+    "expected": 0,
+    "measured": 0,
+    "passed": true
+   },
+   "base_bottom_at_zero": {
+    "expected": 0.0,
+    "measured": 0.0,
+    "passed": true
+   },
+   "base_pips_clear_of_feet": {
+    "expected": "> 0.001 m",
+    "measured": {
+     "min_xy_clearance_m": 0.00399,
+     "offset_deg": 0,
+     "ring_radius_m": 0.0955,
+     "sector_azimuths_deg": [
+      -90,
+      30,
+      150
+     ]
+    },
+    "passed": true
+   },
+   "body_triangles": {
+    "measured": 28458,
+    "passed": true
+   },
+   "bone_count": {
+    "expected": 16,
+    "measured": 16,
+    "passed": true
+   },
+   "export_frame_face_points_plus_x": {
+    "expected": "+X (UM_FBX_v1 ref pose: FBX opened in Blender faces +X)",
+    "measured": [
+     10.531,
+     -0.541,
+     7.1
+    ],
+    "passed": true
+   },
+   "face_ahead_of_body_minus_y": {
+    "expected": "face y < body y - 0.02",
+    "measured": {
+     "body_centroid_y": 0.02046,
+     "face_centroid_y": -0.08485
+    },
+    "passed": true
+   },
+   "figure_top_m": {
+    "expected": 0.42,
+    "measured": 0.42,
+    "passed": true
+   },
+   "max_influences": {
+    "expected": 4,
+    "measured": 4,
+    "passed": true
+   },
+   "no_triangles_below_1e-4_cm2": {
+    "expected": 0,
+    "measured": 0,
+    "passed": true
+   },
+   "no_unweighted_vertices": {
+    "expected": ">= 1",
+    "measured": 1,
+    "passed": true
+   },
+   "one_material_slot_body": {
+    "expected": 1,
+    "measured": 1,
+    "passed": true
+   },
+   "one_uv_layer_body": {
+    "expected": [
+     "UVMap"
+    ],
+    "measured": [
+     "UVMap"
+    ],
+    "passed": true
+   },
+   "roundtrip_armature_object_name": {
+    "expected": "SKEL_UM_Humanoid",
+    "measured": "SKEL_UM_Humanoid",
+    "passed": true
+   },
+   "roundtrip_base_triangles": {
+    "expected": 864,
+    "measured": 864,
+    "passed": true
+   },
+   "roundtrip_base_vertex_colours": {
+    "measured": [
+     "UM_Mask"
+    ],
+    "passed": true
+   },
+   "roundtrip_bone_heads_m": {
+    "expected": "< 1e-4",
+    "measured": 1e-07,
+    "passed": true
+   },
+   "roundtrip_bone_names": {
+    "expected": [
+     "arm_lower.L",
+     "arm_lower.R",
+     "arm_upper.L",
+     "arm_upper.R",
+     "foot.L",
+     "foot.R",
+     "hand.L",
+     "hand.R",
+     "head",
+     "hips",
+     "leg_lower.L",
+     "leg_lower.R",
+     "leg_upper.L",
+     "leg_upper.R",
+     "root",
+     "spine"
+    ],
+    "measured": [
+     "arm_lower.L",
+     "arm_lower.R",
+     "arm_upper.L",
+     "arm_upper.R",
+     "foot.L",
+     "foot.R",
+     "hand.L",
+     "hand.R",
+     "head",
+     "hips",
+     "leg_lower.L",
+     "leg_lower.R",
+     "leg_upper.L",
+     "leg_upper.R",
+     "root",
+     "spine"
+    ],
+    "passed": true
+   },
+   "roundtrip_bounds_m": {
+    "expected": {
+     "max": [
+      0.32241,
+      0.18073,
+      0.42
+     ],
+     "min": [
+      -0.32264,
+      -0.11902,
+      0.04775
+     ]
+    },
+    "measured": {
+     "max": [
+      0.32241,
+      0.18073,
+      0.42
+     ],
+     "min": [
+      -0.32264,
+      -0.11902,
+      0.04775
+     ]
+    },
+    "passed": true
+   },
+   "roundtrip_hierarchy": {
+    "measured": null,
+    "passed": true
+   },
+   "roundtrip_material_slots_body": {
+    "measured": [
+     "M_Harpy_H2_Atlas"
+    ],
+    "passed": true
+   },
+   "roundtrip_max_influences": {
+    "measured": {
+     "max": 4,
+     "min": 1
+    },
+    "passed": true
+   },
+   "roundtrip_triangles": {
+    "expected": 28458,
+    "measured": 28458,
+    "passed": true
+   },
+   "roundtrip_uv0": {
+    "measured": [
+     "UVMap"
+    ],
+    "passed": true
+   }
+  },
+  "checks_failed": [],
+  "exports": {
+   "base_fbx": {
+    "bytes": 35948,
+    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/export/SM_Harpy_H2_Base.fbx",
+    "sha256": "aadc891599ac714e889c3cf43a47f0bb48413564b226fa3cf4cbc43c7defc157"
+   },
+   "settings": {
+    "add_leaf_bones": false,
+    "apply_scale_options": "FBX_SCALE_UNITS",
+    "apply_unit_scale": true,
+    "axis_forward": "-Y",
+    "axis_up": "Z",
+    "bake_anim": false,
+    "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+    "colors_type": "SRGB",
+    "creation_time_pinned": "2000-01-01T00:00:00",
+    "data_scale": 100.0,
+    "deviations_from_preset": {
+     "bake_anim": "off: the candidate FBX carries no clips",
+     "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+    },
+    "embed_textures": false,
+    "export_space_rotation_z_degrees": 90.0,
+    "mesh_smooth_type": "FACE",
+    "path_mode": "STRIP",
+    "preset": {
+     "name": "UM_FBX_v1",
+     "path": "blender/_tools/presets/UM_FBX_v1.json",
+     "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+     "version": "1.0.0"
+    },
+    "primary_bone_axis": "Y",
+    "secondary_bone_axis": "X",
+    "unit_scale_factor_after_patch": 1.0,
+    "use_triangles": true
+   },
+   "skeletal_fbx": {
+    "bytes": 1290060,
+    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/export/SK_Harpy_H2.fbx",
+    "sha256": "62ae4761c2550e5079f6bae75f0ca15186c00695ba33f36f1dd0a1dd14674e57"
+   }
+  },
+  "measure": {
+   "body_centroid_m": [
+    0.00243,
+    0.02046,
+    0.24486
+   ],
+   "bounds_body_m": {
+    "max": [
+     0.32241,
+     0.18073,
+     0.42
+    ],
+    "min": [
+     -0.32264,
+     -0.11902,
+     0.04775
+    ]
+   },
+   "export_bounds_cm": {
+    "max": [
+     11.902,
+     32.241,
+     42.0
+    ],
+    "min": [
+     -18.073,
+     -32.264,
+     4.775
+    ]
+   },
+   "face_centroid_m": [
+    -0.00298,
+    -0.08485,
+    0.31586
+   ],
+   "height_with_base_uu": 42.0,
+   "radial_core_uu": 11.9,
+   "radial_max_uu": 36.96,
+   "span_uu": 64.5,
+   "triangles_base": 864,
+   "triangles_body": 28458,
+   "ue_predicted_bounds_uu": {
+    "max": [
+     11.902,
+     32.264,
+     42.0
+    ],
+    "min": [
+     -18.073,
+     -32.241,
+     4.775
+    ]
+   },
+   "vertices_body": 16709
+  },
+  "roundtrip": {
+   "bones": 16,
+   "triangles_base": 864,
+   "triangles_body": 28458,
+   "vertices_body": 16709
+  },
+  "seam_gap_probe": {
+   "after_harmonise": {
+    "arm_l_raise": {
+     "between": [
+      "tripo_part_1",
+      "tripo_part_2"
+     ],
+     "max_opening_m": 0.01079
+    },
+    "arm_r_raise": {
+     "between": [
+      "tripo_part_1",
+      "tripo_part_3"
+     ],
+     "max_opening_m": 0.0114
+    },
+    "forearm_l_bend": {
+     "between": [
+      "tripo_part_1",
+      "tripo_part_3"
+     ],
+     "max_opening_m": 0.0
+    },
+    "head_turn": {
+     "between": [
+      "tripo_part_0",
+      "tripo_part_1"
+     ],
+     "max_opening_m": 0.0302
+    },
+    "spine_bend_fwd": {
+     "between": [
+      "tripo_part_1",
+      "tripo_part_6"
+     ],
+     "max_opening_m": 0.00017
+    },
+    "thigh_l_flex": {
+     "between": [
+      "tripo_part_1",
+      "tripo_part_6"
+     ],
+     "max_opening_m": 0.00517
+    },
+    "thigh_r_flex": {
+     "between": [
+      "tripo_part_1",
+      "tripo_part_8"
+     ],
+     "max_opening_m": 0.00014
+    }
+   },
+   "pair_distance_m": 0.003,
+   "pairs": 2190,
+   "per_part_weights_only": {
+    "arm_l_raise": {
+     "between": [
+      "tripo_part_1",
+      "tripo_part_2"
+     ],
+     "max_opening_m": 0.02619
+    },
+    "arm_r_raise": {
+     "between": [
+      "tripo_part_1",
+      "tripo_part_3"
+     ],
+     "max_opening_m": 0.02669
+    },
+    "forearm_l_bend": {
+     "between": [
+      "tripo_part_1",
+      "tripo_part_3"
+     ],
+     "max_opening_m": 0.0
+    },
+    "head_turn": {
+     "between": [
+      "tripo_part_0",
+      "tripo_part_3"
+     ],
+     "max_opening_m": 0.04514
+    },
+    "spine_bend_fwd": {
+     "between": [
+      "tripo_part_1",
+      "tripo_part_8"
+     ],
+     "max_opening_m": 0.01009
+    },
+    "thigh_l_flex": {
+     "between": [
+      "tripo_part_1",
+      "tripo_part_6"
+     ],
+     "max_opening_m": 0.0407
+    },
+    "thigh_r_flex": {
+     "between": [
+      "tripo_part_1",
+      "tripo_part_8"
+     ],
+     "max_opening_m": 0.02395
+    }
+   }
+  },
+  "seat": {
+   "base_height_m": 0.05,
+   "expected_scale_in_profile": 0.66024,
+   "figure_height_m": 0.42,
+   "scale": 0.659871,
+   "source_base_centre_xy_m": [
+    0.00017,
+    -0.04713
+   ],
+   "source_base_top_z_m": 0.07351,
+   "source_figure_top_z_m": 0.63422
+  },
+  "sockets": [
+   {
+    "bone": "head",
+    "location_source": "predicted: UE bone space = (x, -y, z) of the Blender bone-local offset (RIG-CONTRACT §7); verify with a live get_socket_location against target_ue_component_uu",
+    "location_uu_for_ue": [
+     0.099,
+     -5.184,
+     1.277
+    ],
+    "name": "Head",
+    "offset_blender_bone_local_uu": [
+     0.099,
+     5.184,
+     1.277
+    ],
+    "offset_ue_bone_local_uu_predicted": [
+     0.099,
+     -5.184,
+     1.277
+    ],
+    "purpose": "damage / status VFX",
+    "status": "предложено",
+    "target_blender_m": [
+     0.00088,
+     -0.05172,
+     0.32331
+    ],
+    "target_kind": "part_bbox_centre",
+    "target_part": "tripo_part_0",
+    "target_ue_component_uu": [
+     5.172,
+     -0.088,
+     32.331
+    ],
+    "ue_bone": "head"
+   },
+   {
+    "bone": "foot.R",
+    "location_source": "predicted: UE bone space = (x, -y, z) of the Blender bone-local offset (RIG-CONTRACT §7); verify with a live get_socket_location against target_ue_component_uu",
+    "location_uu_for_ue": [
+     0.02,
+     -6.932,
+     -0.005
+    ],
+    "name": "Weapon",
+    "offset_blender_bone_local_uu": [
+     0.02,
+     6.932,
+     -0.005
+    ],
+    "offset_ue_bone_local_uu_predicted": [
+     0.02,
+     -6.932,
+     -0.005
+    ],
+    "purpose": "talon strike point (LungeAttack VFX); RIG-CONTRACT v2 characters.Harpy: the talon socket is attached by the profile (its text names hand.L/hand.R); kept on foot.R as in the previous candidate, see the report followups",
+    "status": "предложено",
+    "target_blender_m": [
+     -0.03028,
+     -0.03534,
+     0.05722
+    ],
+    "target_kind": "part_front_quartile",
+    "target_part": "tripo_part_9",
+    "target_ue_component_uu": [
+     3.534,
+     3.028,
+     5.722
+    ],
+    "ue_bone": "foot_R"
+   }
+  ],
+  "weights": {
+   "cleanup": {
+    "cap_100": {},
+    "patch_101": {},
+    "tripo_part_0": {
+     "foreign_weights_removed": 2735
+    },
+    "tripo_part_1": {
+     "ramped_z": 1538
+    },
+    "tripo_part_10": {},
+    "tripo_part_11": {},
+    "tripo_part_2": {},
+    "tripo_part_3": {},
+    "tripo_part_4": {},
+    "tripo_part_5": {},
+    "tripo_part_6": {
+     "ramped_z": 287
+    },
+    "tripo_part_8": {
+     "ramped_z": 141
+    },
+    "tripo_part_9": {}
+   },
+   "harmonise": {
+    "distance_m_final": 0.0066,
+    "pairs": [
+     [
+      "tripo_part_0",
+      "tripo_part_1"
+     ],
+     [
+      "tripo_part_1",
+      "tripo_part_2"
+     ],
+     [
+      "tripo_part_1",
+      "tripo_part_3"
+     ],
+     [
+      "tripo_part_1",
+      "tripo_part_6"
+     ],
+     [
+      "tripo_part_1",
+      "tripo_part_8"
+     ],
+     [
+      "tripo_part_6",
+      "tripo_part_10"
+     ],
+     [
+      "tripo_part_8",
+      "tripo_part_11"
+     ],
+     [
+      "tripo_part_9",
+      "tripo_part_11"
+     ],
+     [
+      "tripo_part_2",
+      "tripo_part_5"
+     ],
+     [
+      "tripo_part_3",
+      "tripo_part_4"
+     ],
+     [
+      "tripo_part_0",
+      "tripo_part_2"
+     ],
+     [
+      "tripo_part_0",
+      "tripo_part_3"
+     ],
+     [
+      "cap_100",
+      "tripo_part_1"
+     ],
+     [
+      "cap_100",
+      "tripo_part_0"
+     ],
+     [
+      "patch_101",
+      "tripo_part_0"
+     ],
+     [
+      "cap_100",
+      "patch_101"
+     ]
+    ],
+    "vertices_blended": {
+     "cap_100<-patch_101": 117,
+     "cap_100<-tripo_part_0": 0,
+     "cap_100<-tripo_part_1": 206,
+     "patch_101<-cap_100": 169,
+     "patch_101<-tripo_part_0": 0,
+     "tripo_part_0<-cap_100": 0,
+     "tripo_part_0<-patch_101": 0,
+     "tripo_part_0<-tripo_part_1": 314,
+     "tripo_part_0<-tripo_part_2": 99,
+     "tripo_part_0<-tripo_part_3": 135,
+     "tripo_part_10<-tripo_part_6": 83,
+     "tripo_part_11<-tripo_part_8": 72,
+     "tripo_part_11<-tripo_part_9": 68,
+     "tripo_part_1<-cap_100": 146,
+     "tripo_part_1<-tripo_part_0": 270,
+     "tripo_part_1<-tripo_part_2": 144,
+     "tripo_part_1<-tripo_part_3": 160,
+     "tripo_part_1<-tripo_part_6": 186,
+     "tripo_part_1<-tripo_part_8": 172,
+     "tripo_part_2<-tripo_part_0": 97,
+     "tripo_part_2<-tripo_part_1": 146,
+     "tripo_part_2<-tripo_part_5": 584,
+     "tripo_part_3<-tripo_part_0": 121,
+     "tripo_part_3<-tripo_part_1": 161,
+     "tripo_part_3<-tripo_part_4": 518,
+     "tripo_part_4<-tripo_part_3": 515,
+     "tripo_part_5<-tripo_part_2": 573,
+     "tripo_part_6<-tripo_part_1": 183,
+     "tripo_part_6<-tripo_part_10": 79,
+     "tripo_part_8<-tripo_part_1": 173,
+     "tripo_part_8<-tripo_part_11": 69,
+     "tripo_part_9<-tripo_part_11": 80
+    }
+   },
+   "share_by_bone": {
+    "arm_lower.L": 0.0924,
+    "arm_lower.R": 0.0868,
+    "arm_upper.L": 0.0628,
+    "arm_upper.R": 0.0592,
+    "foot.L": 0.053,
+    "foot.R": 0.0577,
+    "hand.L": 0.0692,
+    "hand.R": 0.0629,
+    "head": 0.1485,
+    "hips": 0.0328,
+    "leg_lower.L": 0.0138,
+    "leg_lower.R": 0.015,
+    "leg_upper.L": 0.0281,
+    "leg_upper.R": 0.0285,
+    "spine": 0.1892
+   },
+   "wing_span": {
+    "tripo_part_2": {
+     "direction_xy": [
+      0.8708,
+      0.4916,
+      0.0
+     ],
+     "dominant_bone_vertices": {
+      "arm_lower.L": 934,
+      "arm_upper.L": 759,
+      "hand.L": 149,
+      "spine": 34
+     },
+     "joint_band_m": 0.03299,
+     "root_band_m": 0.03959,
+     "root_mode": "distance",
+     "span_elbow_m": 0.07175,
+     "span_tip_m": 0.29719,
+     "span_wrist_m": 0.15943
+    },
+    "tripo_part_3": {
+     "direction_xy": [
+      -0.9598,
+      0.2808,
+      0.0
+     ],
+     "dominant_bone_vertices": {
+      "arm_lower.R": 873,
+      "arm_upper.R": 745,
+      "hand.R": 115,
+      "spine": 12
+     },
+     "joint_band_m": 0.03299,
+     "root_band_m": 0.03959,
+     "root_mode": "distance",
+     "span_elbow_m": 0.06545,
+     "span_tip_m": 0.26505,
+     "span_wrist_m": 0.14544
+    },
+    "tripo_part_4": {
+     "direction_xy": [
+      -0.9598,
+      0.2808,
+      0.0
+     ],
+     "dominant_bone_vertices": {
+      "arm_lower.R": 623,
+      "arm_upper.R": 252,
+      "hand.R": 903
+     },
+     "joint_band_m": 0.03299,
+     "root_band_m": 0.03959,
+     "root_mode": "distance",
+     "span_elbow_m": 0.06545,
+     "span_tip_m": 0.26505,
+     "span_wrist_m": 0.14544
+    },
+    "tripo_part_5": {
+     "direction_xy": [
+      0.8708,
+      0.4916,
+      0.0
+     ],
+     "dominant_bone_vertices": {
+      "arm_lower.L": 635,
+      "arm_upper.L": 284,
+      "hand.L": 992
+     },
+     "joint_band_m": 0.03299,
+     "root_band_m": 0.03959,
+     "root_mode": "distance",
+     "span_elbow_m": 0.07175,
+     "span_tip_m": 0.29719,
+     "span_wrist_m": 0.15943
+    }
+   }
+  }
+ },
+ "rig_deform_probe": {
+  "h2-blend": {
+   "arm_l_raise": {
+    "centroid_x_norm": 0.499,
+    "centroid_z_norm": 0.598,
+    "moved_vertices": 3891,
+    "status": "plausible"
+   },
+   "arm_r_raise": {
+    "centroid_x_norm": -0.495,
+    "centroid_z_norm": 0.603,
+    "moved_vertices": 3696,
+    "status": "plausible"
+   },
+   "forearm_l_bend": {
+    "centroid_x_norm": 0.584,
+    "centroid_z_norm": 0.609,
+    "moved_vertices": 2989,
+    "status": "plausible"
+   },
+   "head_turn": {
+    "centroid_x_norm": -0.006,
+    "centroid_z_norm": 0.749,
+    "moved_vertices": 2854,
+    "status": "plausible"
+   },
+   "spine_bend_fwd": {
+    "centroid_x_norm": 0.01,
+    "centroid_z_norm": 0.63,
+    "moved_vertices": 12825,
+    "status": "plausible"
+   },
+   "thigh_l_flex": {
+    "centroid_x_norm": 0.122,
+    "centroid_z_norm": 0.18,
+    "moved_vertices": 1698,
+    "status": "plausible"
+   },
+   "thigh_r_flex": {
+    "centroid_x_norm": -0.112,
+    "centroid_z_norm": 0.174,
+    "moved_vertices": 1778,
+    "status": "plausible"
+   }
+  },
+  "h2-fbx": {
+   "arm_l_raise": {
+    "centroid_x_norm": 0.499,
+    "centroid_z_norm": 0.598,
+    "moved_vertices": 3891,
+    "status": "plausible"
+   },
+   "arm_r_raise": {
+    "centroid_x_norm": -0.495,
+    "centroid_z_norm": 0.603,
+    "moved_vertices": 3696,
+    "status": "plausible"
+   },
+   "forearm_l_bend": {
+    "centroid_x_norm": 0.584,
+    "centroid_z_norm": 0.609,
+    "moved_vertices": 2989,
+    "status": "plausible"
+   },
+   "head_turn": {
+    "centroid_x_norm": -0.006,
+    "centroid_z_norm": 0.749,
+    "moved_vertices": 2854,
+    "status": "plausible"
+   },
+   "spine_bend_fwd": {
+    "centroid_x_norm": 0.01,
+    "centroid_z_norm": 0.63,
+    "moved_vertices": 12825,
+    "status": "plausible"
+   },
+   "thigh_l_flex": {
+    "centroid_x_norm": 0.122,
+    "centroid_z_norm": 0.18,
+    "moved_vertices": 1698,
+    "status": "plausible"
+   },
+   "thigh_r_flex": {
+    "centroid_x_norm": -0.112,
+    "centroid_z_norm": 0.174,
+    "moved_vertices": 1778,
+    "status": "plausible"
+   }
+  }
+ },
+ "run_dir": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake",
+ "schema": "unmatched.h2-bake.hero-report/1",
+ "see_through": {
+  "all_azimuths_total_px": 50,
+  "all_azimuths_worst_px": 6,
+  "camera": {
+   "fov_h_deg": 35.0,
+   "pitch_deg": -55.0,
+   "resolution": [
+    1920,
+    1080
+   ],
+   "target_m": [
+    0.0,
+    0.0,
+    0.12
+   ]
+  },
+  "frames_azimuth_distance_px_components": [
+   [
+    0,
+    4.8,
+    1,
+    [
+     1
+    ]
+   ],
+   [
+    20,
+    4.8,
+    0,
+    []
+   ],
+   [
+    40,
+    4.8,
+    0,
+    []
+   ],
+   [
+    60,
+    4.8,
+    0,
+    []
+   ],
+   [
+    80,
+    4.8,
+    3,
+    [
+     1,
+     1,
+     1
+    ]
+   ],
+   [
+    100,
+    4.8,
+    1,
+    [
+     1
+    ]
+   ],
+   [
+    120,
+    4.8,
+    2,
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    140,
+    4.8,
+    1,
+    [
+     1
+    ]
+   ],
+   [
+    160,
+    4.8,
+    3,
+    [
+     3
+    ]
+   ],
+   [
+    180,
+    4.8,
+    4,
+    [
+     2,
+     1,
+     1
+    ]
+   ],
+   [
+    200,
+    4.8,
+    2,
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    220,
+    4.8,
+    2,
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    240,
+    4.8,
+    3,
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    260,
+    4.8,
+    3,
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    280,
+    4.8,
+    2,
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    300,
+    4.8,
+    2,
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    320,
+    4.8,
+    4,
+    [
+     3,
+     1
+    ]
+   ],
+   [
+    340,
+    4.8,
+    6,
+    [
+     2,
+     1,
+     1,
+     1,
+     1
+    ]
+   ],
+   [
+    0,
+    7.5,
+    0,
+    []
+   ],
+   [
+    20,
+    7.5,
+    0,
+    []
+   ],
+   [
+    40,
+    7.5,
+    0,
+    []
+   ],
+   [
+    60,
+    7.5,
+    0,
+    []
+   ],
+   [
+    80,
+    7.5,
+    0,
+    []
+   ],
+   [
+    100,
+    7.5,
+    0,
+    []
+   ],
+   [
+    120,
+    7.5,
+    0,
+    []
+   ],
+   [
+    140,
+    7.5,
+    0,
+    []
+   ],
+   [
+    160,
+    7.5,
+    1,
+    [
+     1
+    ]
+   ],
+   [
+    180,
+    7.5,
+    0,
+    []
+   ],
+   [
+    200,
+    7.5,
+    1,
+    [
+     1
+    ]
+   ],
+   [
+    220,
+    7.5,
+    3,
+    [
+     1,
+     1,
+     1
+    ]
+   ],
+   [
+    240,
+    7.5,
+    0,
+    []
+   ],
+   [
+    260,
+    7.5,
+    1,
+    [
+     1
+    ]
+   ],
+   [
+    280,
+    7.5,
+    0,
+    []
+   ],
+   [
+    300,
+    7.5,
+    1,
+    [
+     1
+    ]
+   ],
+   [
+    320,
+    7.5,
+    2,
+    [
+     2
+    ]
+   ],
+   [
+    340,
+    7.5,
+    2,
+    [
+     1,
+     1
+    ]
+   ]
+  ],
+  "gate": {
+   "azimuth_range_deg": [
+    0,
+    360
+   ],
+   "distances_m": [
+    4.8,
+    7.5
+   ],
+   "hole_min_px": 4,
+   "holes": 0,
+   "largest_component_px": 3,
+   "max_holes": 0,
+   "pass": true
+  },
+  "gate_strict": {
+   "azimuth_range_deg": [
+    120,
+    240
+   ],
+   "distances_m": [
+    4.8,
+    7.5
+   ],
+   "max_px": 0,
+   "pass": false,
+   "worst_px": 4
+  },
+  "label": "blender Workbench mask (flat, no AA), not an UE frame",
+  "method": "see_through_px = covered with both face sides AND NOT covered with back faces culled (M_UM_Figure TwoSided=false)"
+ },
+ "sources": {
+  "geometry_glb": {
+   "bytes": 47316360,
+   "expected_sha256": "cdc18f936e402d6ebbe607b7acac27d5966627fdf2149aeb238dc5f0c5ea19bb",
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-tripo/source/harpy-h2-tripo-330872a3-parts13.glb",
+   "sha256": "cdc18f936e402d6ebbe607b7acac27d5966627fdf2149aeb238dc5f0c5ea19bb",
+   "sha256_matches": true
+  },
+  "textured_glb": {
+   "bytes": 75403176,
+   "expected_sha256": "e79ed139d1cf59610f396142c2e2d20c266955f6f9e31e08b688aa6f0121b3ed",
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-tripo/source/harpy-h2-tripo-330872a3-tex8k-pbr.glb",
+   "sha256": "e79ed139d1cf59610f396142c2e2d20c266955f6f9e31e08b688aa6f0121b3ed",
+   "sha256_matches": true
+  }
+ },
+ "status": "измерено",
+ "stitch": {
+  "chains": {
+   "tripo_part_0|tripo_part_1": [
+    198,
+    166,
+    190
+   ],
+   "tripo_part_0|tripo_part_2": [
+    191
+   ],
+   "tripo_part_0|tripo_part_3": [
+    242
+   ],
+   "tripo_part_10|tripo_part_6": [
+    95,
+    43
+   ],
+   "tripo_part_11|tripo_part_8": [
+    134
+   ],
+   "tripo_part_11|tripo_part_9": [
+    132
+   ],
+   "tripo_part_1|tripo_part_2": [
+    318
+   ],
+   "tripo_part_1|tripo_part_3": [
+    277,
+    66
+   ],
+   "tripo_part_1|tripo_part_6": [
+    54,
+    318,
+    98
+   ],
+   "tripo_part_1|tripo_part_8": [
+    373
+   ],
+   "tripo_part_2|tripo_part_5": [
+    403,
+    14,
+    111,
+    460,
+    8,
+    22,
+    16,
+    34,
+    24
+   ],
+   "tripo_part_3|tripo_part_4": [
+    84,
+    16,
+    8,
+    438,
+    55,
+    367,
+    52,
+    12,
+    9,
+    18,
+    28
+   ]
+  },
+  "junction_vertices": 56,
+  "settings": {
+   "enabled": true,
+   "exclude_parts": [
+    "cap_100",
+    "patch_101"
+   ],
+   "junctions": true,
+   "max_edge_factor": 1.5,
+   "merge_m": 0.0005,
+   "min_chain_vertices": 8,
+   "note": "the Tripo parts are one surface cut into parts: neighbouring high-poly parts share their cut vertex for vertex (12 part pairs, 36 shared chains, e.g. inner/outer right wing), but the per-part decimation moved each boundary on its own and opened sub-millimetre cracks. One-sided game-camera frames (see_through.py, 36 frames) of the unstitched game mesh: 212 see-through pixels, 0-15 per frame; stitched: 49, 0-4 per frame (measured 2026-09-29 on the harpy-h2-bake/2 mesh). Stitching projects both boundaries onto the high-poly cut, clusters vertices closer than merge_m, inserts the other part's vertices (~1.3k, +~1.3k triangles) and puts a vertex of both parts on every open chain end (three-part corners). max_edge_factor 3.0 folded a wing corner (max high->low distance of tripo_part_2 6.4 mm), 1.5 keeps it at 3.2 mm (unstitched 3.3 mm). Repair parts (cap, patch) are excluded: they overlap, they do not share cuts. Proposal",
+   "snap_m": 0.002,
+   "tol_hp_m": 1e-05
+  },
+  "vertices_inserted": {
+   "tripo_part_0": 99,
+   "tripo_part_1": 292,
+   "tripo_part_10": 19,
+   "tripo_part_11": 27,
+   "tripo_part_2": 269,
+   "tripo_part_3": 247,
+   "tripo_part_4": 108,
+   "tripo_part_5": 110,
+   "tripo_part_6": 62,
+   "tripo_part_8": 49,
+   "tripo_part_9": 15
+  },
+  "vertices_snapped": {
+   "tripo_part_0": 375,
+   "tripo_part_1": 720,
+   "tripo_part_10": 55,
+   "tripo_part_11": 102,
+   "tripo_part_2": 663,
+   "tripo_part_3": 617,
+   "tripo_part_4": 427,
+   "tripo_part_5": 497,
+   "tripo_part_6": 209,
+   "tripo_part_8": 185,
+   "tripo_part_9": 55
+  }
+ },
+ "textures": {
+  "checks": {
+   "ao_gate": {
+    "gate": {
+     "min_occluded_fraction": 0.02,
+     "min_range_p1_p99": 32,
+     "note": "W4-B gate orm_occlusion_baked_not_constant (proposal)",
+     "occluded_below": 250
+    },
+    "occluded_fraction": 0.8657,
+    "p1": 4.0,
+    "p99": 255.0,
+    "passed": true
+   },
+   "bc_linear_mean_covered": [
+    0.1287,
+    0.0688,
+    0.0416
+   ],
+   "metal_rule": {
+    "coverage_by_part": {
+     "tripo_part_11": 0.5541,
+     "tripo_part_6": 0.0309
+    },
+    "rule": {
+     "hue_deg": [
+      30,
+      62
+     ],
+     "metallic": 1.0,
+     "note": "Tripo PBR left the gold ankle bands non-metallic (metallic > 0.5 on 0 texels of the figure, measured 2026-09-29); the concept paints them as antique gold/bronze. Proposal: gold-coloured texels (sRGB hue 30-62 deg, s >= 0.45, v >= 0.45) of the two leg parts that carry a band get metallic 1.0 / roughness 0.35 with a soft 3x3 edge",
+     "parts": [
+      "tripo_part_6",
+      "tripo_part_11"
+     ],
+     "ramp": 0.1,
+     "ramp_deg": 6,
+     "roughness": 0.35,
+     "s_min": 0.45,
+     "v_min": 0.45
+    },
+    "texels_over_0_5": 77132
+   },
+   "missed_by_part": {
+    "cap_100": 7,
+    "patch_101": 1535,
+    "tripo_part_0": 16893,
+    "tripo_part_1": 11368,
+    "tripo_part_10": 4668,
+    "tripo_part_11": 432,
+    "tripo_part_2": 5709,
+    "tripo_part_3": 5415,
+    "tripo_part_4": 1366,
+    "tripo_part_5": 1432,
+    "tripo_part_6": 3324,
+    "tripo_part_8": 1735,
+    "tripo_part_9": 3179
+   },
+   "normal_inward_fraction": 0.019157,
+   "normal_tilt_over_60deg_by_part": {
+    "cap_100": 0.0296,
+    "patch_101": 0.04427,
+    "tripo_part_0": 0.04831,
+    "tripo_part_1": 0.02817,
+    "tripo_part_10": 0.02735,
+    "tripo_part_11": 0.05213,
+    "tripo_part_2": 0.03139,
+    "tripo_part_3": 0.02983,
+    "tripo_part_4": 0.0036,
+    "tripo_part_5": 0.00248,
+    "tripo_part_6": 0.02524,
+    "tripo_part_8": 0.01537,
+    "tripo_part_9": 0.01893
+   },
+   "normal_tilt_over_60deg_fraction": 0.026774,
+   "team_mask": {
+    "coverage_by_part": {
+     "cap_100": 0.0,
+     "patch_101": 0.0,
+     "tripo_part_0": 0.0,
+     "tripo_part_1": 0.0,
+     "tripo_part_10": 0.0,
+     "tripo_part_11": 0.0,
+     "tripo_part_2": 0.0447,
+     "tripo_part_3": 0.0421,
+     "tripo_part_4": 0.527,
+     "tripo_part_5": 0.5063,
+     "tripo_part_6": 0.0,
+     "tripo_part_8": 0.0,
+     "tripo_part_9": 0.0
+    },
+    "coverage_of_cells": 0.2826,
+    "coverage_of_figure": 0.1254,
+    "rule": {
+     "blur": "3x3",
+     "method": "hsv-band-parts",
+     "note": "W4-B rule of Harpy (harpy-segmented-skeletal/3 team_color.mask: no cloth; the dark flight feathers of the wings carry the team colour, v <= 0.22 on the sRGB BC, ramp 0.05, blur 3x3) applied to the four H2 wing parts. Format = W4-B TeamMask (separate 8-bit linear L texture, UE reads .R). Proposal",
+     "parts": [
+      "tripo_part_2",
+      "tripo_part_3",
+      "tripo_part_4",
+      "tripo_part_5"
+     ],
+     "ramp": 0.05,
+     "v_max": 0.22
+    }
+   },
+   "texels_covered_by_uv": 8216700,
+   "texels_covered_not_written": 57063,
+   "texels_covered_not_written_fraction": 0.006945,
+   "texels_written_by_bake": 8159940,
+   "tripo_metallic_fraction_over_0_5": 0.0,
+   "tripo_metallic_mean_covered": 0.0248,
+   "tripo_roughness_mean_covered": 0.7678
+  },
+  "inputs": {
+   "ao": "01d20798c1ce438be76624c889d333c633502e34547abe6cc7a4226eaf7eb166",
+   "bc": "75b271ca43f10b94ad3fc2c32094a086887b37dfba173af9ae38dbd1f26ecf37",
+   "normal": "82fc278f91a6a2dc85835d297b2f808509be8d790726e64d6a3b479298a2faf7",
+   "rm": "8df703fbbd9ead08c14e1d51a6aaebe52fe2c58b33f7c7a154c07bdbc577deae"
+  },
+  "master_px": 4096,
+  "outputs": {
+   "master": {
+    "BC": {
+     "bytes": 14520129,
+     "mode": "RGB",
+     "path": "textures/4k/T_Harpy_H2_BC.png",
+     "sha256": "6c39cc81410c470863b409ccf5fa5679fe6df02da0111c842bff329be2133203",
+     "size": [
+      4096,
+      4096
+     ]
+    },
+    "N": {
+     "bytes": 15039033,
+     "mode": "RGB",
+     "path": "textures/4k/T_Harpy_H2_N.png",
+     "sha256": "f172622fc4c628dac9131e04e4506b1b00473efc37426711ecc1e6519a84149d",
+     "size": [
+      4096,
+      4096
+     ]
+    },
+    "N_OpenGL": {
+     "bytes": 15043560,
+     "mode": "RGB",
+     "path": "textures/4k/T_Harpy_H2_N_OpenGL.png",
+     "sha256": "97c10313a443ea5a906b0281d9d10f8aaef1c6e8aca4bf3a722bb552ecc15455",
+     "size": [
+      4096,
+      4096
+     ]
+    },
+    "ORM": {
+     "bytes": 11664238,
+     "mode": "RGB",
+     "path": "textures/4k/T_Harpy_H2_ORM.png",
+     "sha256": "1dfaaddb8d646b9315110dfa91d62872ea531c188120bc0915541178d74d2e71",
+     "size": [
+      4096,
+      4096
+     ]
+    },
+    "TeamMask": {
+     "bytes": 2175857,
+     "mode": "L",
+     "path": "textures/4k/T_Harpy_H2_TeamMask.png",
+     "sha256": "51c18a6f62c4965361e36da2155b5e9cfac282eddef310f62fe7643556b9884e",
+     "size": [
+      4096,
+      4096
+     ]
+    },
+    "_checks": {
+     "directx_equals_opengl_with_inverted_g": true,
+     "normal_length_within_0_02_fraction": 1.0,
+     "orm_r_is_baked_ao_not_constant": true
+    }
+   },
+   "runtime": {
+    "BC": {
+     "bytes": 5210163,
+     "mode": "RGB",
+     "path": "textures/2k/T_Harpy_H2_BC.png",
+     "sha256": "c01417784bfa20abc883fa82d4a81de37d680e5e26df9c58e990f52a267b8ddd",
+     "size": [
+      2048,
+      2048
+     ]
+    },
+    "N": {
+     "bytes": 5750269,
+     "mode": "RGB",
+     "path": "textures/2k/T_Harpy_H2_N.png",
+     "sha256": "b5853e84ac116e34422ea6d24e5e5a4e00f77a71515c6dcbaa94af00ef109cf0",
+     "size": [
+      2048,
+      2048
+     ]
+    },
+    "N_OpenGL": {
+     "bytes": 5751613,
+     "mode": "RGB",
+     "path": "textures/2k/T_Harpy_H2_N_OpenGL.png",
+     "sha256": "2069ac5b66133702e9481496568e478bb57f5bbdcebadf815e3d0f568a509d46",
+     "size": [
+      2048,
+      2048
+     ]
+    },
+    "ORM": {
+     "bytes": 4261655,
+     "mode": "RGB",
+     "path": "textures/2k/T_Harpy_H2_ORM.png",
+     "sha256": "1a5dadbbbe3f50f25c4b333242651df0b82006133c095d3622985ea6fdd45577",
+     "size": [
+      2048,
+      2048
+     ]
+    },
+    "TeamMask": {
+     "bytes": 799569,
+     "mode": "L",
+     "path": "textures/2k/T_Harpy_H2_TeamMask.png",
+     "sha256": "49bc1d88378207b022440df592638071c8a49ea6c86cbdf0d703fdbbbf7b4064",
+     "size": [
+      2048,
+      2048
+     ]
+    },
+    "_checks": {
+     "directx_equals_opengl_with_inverted_g": true,
+     "normal_length_within_0_02_fraction": 1.0,
+     "orm_r_is_baked_ao_not_constant": true
+    }
+   }
+  },
+  "profile_sha256": "290171af1526825c1b9960bcaaa432c90cdfa0889451dc73e7ed3edde8670ad3",
+  "runtime_px": 2048,
+  "schema": "unmatched.h2-bake.textures-report/1"
+ },
+ "uv": {
+  "check": {
+   "atlas_px": 4096,
+   "closest_pair": {
+    "islands": [
+     834,
+     141
+    ],
+    "texel": [
+     831,
+     1813
+    ]
+   },
+   "density_regions": {
+    "density_factor_1": {
+     "area_cm2_final": 4810.12,
+     "ratio_to_base": 1.0,
+     "texel_density_px_per_cm_master": 37.07,
+     "triangles": 24466
+    },
+    "density_factor_1.5": {
+     "area_cm2_final": 270.02,
+     "ratio_to_base": 1.49,
+     "texel_density_px_per_cm_master": 55.24,
+     "triangles": 2631
+    },
+    "density_factor_2": {
+     "area_cm2_final": 136.8,
+     "ratio_to_base": 1.987,
+     "texel_density_px_per_cm_master": 73.67,
+     "triangles": 1361
+    }
+   },
+   "fill_ratio": 0.4898,
+   "gap_search_px": 40,
+   "islands": 1266,
+   "min_texel_distance_between_islands_px": 10.44,
+   "min_texel_distance_between_parts_px": 10.44,
+   "padding_ok": true,
+   "padding_requirement": "free texels between islands >= 8 at 4096 px (texel centre distance >= 9)",
+   "parts": {
+    "cap_100": {
+     "area_cm2_final": 91.25,
+     "islands": 43,
+     "texel_density_px_per_cm_master": 37.14,
+     "texel_density_px_per_cm_runtime": 18.57,
+     "texels": 125345,
+     "triangles": 874
+    },
+    "patch_101": {
+     "area_cm2_final": 97.2,
+     "islands": 129,
+     "texel_density_px_per_cm_master": 37.06,
+     "texel_density_px_per_cm_runtime": 18.53,
+     "texels": 133544,
+     "triangles": 799
+    },
+    "tripo_part_0": {
+     "area_cm2_final": 890.39,
+     "islands": 301,
+     "texel_density_px_per_cm_master": 37.86,
+     "texel_density_px_per_cm_runtime": 18.93,
+     "texels": 1809363,
+     "triangles": 5099
+    },
+    "tripo_part_1": {
+     "area_cm2_final": 671.01,
+     "islands": 187,
+     "texel_density_px_per_cm_master": 37.06,
+     "texel_density_px_per_cm_runtime": 18.53,
+     "texels": 922014,
+     "triangles": 3289
+    },
+    "tripo_part_10": {
+     "area_cm2_final": 139.63,
+     "islands": 31,
+     "texel_density_px_per_cm_master": 55.49,
+     "texel_density_px_per_cm_runtime": 27.74,
+     "texels": 431575,
+     "triangles": 1317
+    },
+    "tripo_part_11": {
+     "area_cm2_final": 32.42,
+     "islands": 5,
+     "texel_density_px_per_cm_master": 36.83,
+     "texel_density_px_per_cm_runtime": 18.41,
+     "texels": 44559,
+     "triangles": 327
+    },
+    "tripo_part_2": {
+     "area_cm2_final": 689.62,
+     "islands": 181,
+     "texel_density_px_per_cm_master": 37.07,
+     "texel_density_px_per_cm_runtime": 18.53,
+     "texels": 947092,
+     "triangles": 3069
+    },
+    "tripo_part_3": {
+     "area_cm2_final": 621.75,
+     "islands": 117,
+     "texel_density_px_per_cm_master": 37.07,
+     "texel_density_px_per_cm_runtime": 18.54,
+     "texels": 854057,
+     "triangles": 2846
+    },
+    "tripo_part_4": {
+     "area_cm2_final": 640.73,
+     "islands": 89,
+     "texel_density_px_per_cm_master": 37.06,
+     "texel_density_px_per_cm_runtime": 18.53,
+     "texels": 880356,
+     "triangles": 3108
+    },
+    "tripo_part_5": {
+     "area_cm2_final": 701.78,
+     "islands": 98,
+     "texel_density_px_per_cm_master": 37.06,
+     "texel_density_px_per_cm_runtime": 18.53,
+     "texels": 964090,
+     "triangles": 3310
+    },
+    "tripo_part_6": {
+     "area_cm2_final": 271.3,
+     "islands": 36,
+     "texel_density_px_per_cm_master": 37.06,
+     "texel_density_px_per_cm_runtime": 18.53,
+     "texels": 372700,
+     "triangles": 1657
+    },
+    "tripo_part_8": {
+     "area_cm2_final": 239.47,
+     "islands": 31,
+     "texel_density_px_per_cm_master": 37.08,
+     "texel_density_px_per_cm_runtime": 18.54,
+     "texels": 328914,
+     "triangles": 1449
+    },
+    "tripo_part_9": {
+     "area_cm2_final": 130.38,
+     "islands": 18,
+     "texel_density_px_per_cm_master": 55.13,
+     "texel_density_px_per_cm_runtime": 27.57,
+     "texels": 403091,
+     "triangles": 1314
+    }
+   },
+   "preview": "preview/uv_layout_parts.png",
+   "runtime_px": 2048,
+   "texels_covered": 8216700,
+   "texels_covered_by_two_islands": 0,
+   "texels_covered_twice": 0,
+   "texels_covered_twice_detail": [],
+   "texels_covered_twice_note": "texels_covered_twice counts every texel centre the inclusive pixel-centre rasteriser gives to two triangles; texels_overlapping_strict counts only those strictly inside two triangles (a shared edge through a texel centre is a tie, not an overlap)",
+   "texels_overlapping_strict": 0,
+   "triangles": 28458,
+   "triangles_outside_0_1": 0,
+   "uv_tris_sha256": "8317f04c4cbaaf7b351d807488b97d858528d1399a3ea4d0193c7123318609ca"
+  },
+  "stage": {
+   "charts": {
+    "cap_100": {
+     "tripo_islands_after_decimation": 1
+    },
+    "patch_101": {
+     "tripo_islands_after_decimation": 129
+    },
+    "tripo_part_0": {
+     "tripo_islands_after_decimation": 286
+    },
+    "tripo_part_1": {
+     "tripo_islands_after_decimation": 174
+    },
+    "tripo_part_10": {
+     "tripo_islands_after_decimation": 31
+    },
+    "tripo_part_11": {
+     "tripo_islands_after_decimation": 5
+    },
+    "tripo_part_2": {
+     "tripo_islands_after_decimation": 169
+    },
+    "tripo_part_3": {
+     "tripo_islands_after_decimation": 94
+    },
+    "tripo_part_4": {
+     "tripo_islands_after_decimation": 89
+    },
+    "tripo_part_5": {
+     "tripo_islands_after_decimation": 94
+    },
+    "tripo_part_6": {
+     "tripo_islands_after_decimation": 33
+    },
+    "tripo_part_8": {
+     "tripo_islands_after_decimation": 31
+    },
+    "tripo_part_9": {
+     "tripo_islands_after_decimation": 16
+    }
+   },
+   "fallback_smart_project_faces_per_round": {
+    "cap_100": [
+     874,
+     865,
+     21
+    ],
+    "patch_101": [
+     82,
+     0,
+     0
+    ],
+    "tripo_part_0": [
+     1572,
+     20,
+     0
+    ],
+    "tripo_part_1": [
+     1810,
+     18,
+     0
+    ],
+    "tripo_part_10": [
+     306,
+     0,
+     0
+    ],
+    "tripo_part_11": [
+     288,
+     0,
+     0
+    ],
+    "tripo_part_2": [
+     1757,
+     18,
+     0
+    ],
+    "tripo_part_3": [
+     1770,
+     46,
+     0
+    ],
+    "tripo_part_4": [
+     1722,
+     0,
+     0
+    ],
+    "tripo_part_5": [
+     1728,
+     5,
+     0
+    ],
+    "tripo_part_6": [
+     655,
+     2,
+     0
+    ],
+    "tripo_part_8": [
+     1108,
+     0,
+     0
+    ],
+    "tripo_part_9": [
+     872,
+     2,
+     0
+    ]
+   },
+   "islands": {
+    "cap_100": 43,
+    "patch_101": 129,
+    "tripo_part_0": 301,
+    "tripo_part_1": 187,
+    "tripo_part_10": 31,
+    "tripo_part_11": 5,
+    "tripo_part_2": 181,
+    "tripo_part_3": 117,
+    "tripo_part_4": 89,
+    "tripo_part_5": 98,
+    "tripo_part_6": 36,
+    "tripo_part_8": 31,
+    "tripo_part_9": 18
+   },
+   "islands_total": 1266,
+   "priority_scaled": {
+    "tripo_part_0": {
+     "islands": 301,
+     "islands_scaled": 30
+    },
+    "tripo_part_10": {
+     "islands": 31,
+     "islands_scaled": 31
+    },
+    "tripo_part_9": {
+     "islands": 18,
+     "islands_scaled": 18
+    }
+   },
+   "uv_flipped_faces_after": {
+    "cap_100": 0,
+    "patch_101": 0,
+    "tripo_part_0": 0,
+    "tripo_part_1": 0,
+    "tripo_part_10": 0,
+    "tripo_part_11": 0,
+    "tripo_part_2": 0,
+    "tripo_part_3": 0,
+    "tripo_part_4": 0,
+    "tripo_part_5": 0,
+    "tripo_part_6": 0,
+    "tripo_part_8": 0,
+    "tripo_part_9": 0
+   },
+   "uv_self_overlap_faces_after": {
+    "cap_100": 0,
+    "patch_101": 0,
+    "tripo_part_0": 0,
+    "tripo_part_1": 0,
+    "tripo_part_10": 0,
+    "tripo_part_11": 0,
+    "tripo_part_2": 0,
+    "tripo_part_3": 0,
+    "tripo_part_4": 0,
+    "tripo_part_5": 0,
+    "tripo_part_6": 0,
+    "tripo_part_8": 0,
+    "tripo_part_9": 0
+   }
+  }
+ },
+ "validate_clip_skeletal_mesh_v2": {
+  "checks": [
+   [
+    "import",
+    "pass"
+   ],
+   [
+    "single_armature",
+    "pass"
+   ],
+   [
+    "skeleton_version",
+    "pass"
+   ],
+   [
+    "armature_object_name",
+    "pass"
+   ],
+   [
+    "skeleton_contract",
+    "pass"
+   ],
+   [
+    "weapon_side",
+    "pass"
+   ],
+   [
+    "ref_pose_facing",
+    "pass"
+   ],
+   [
+    "ref_pose_root_axis",
+    "pass"
+   ]
+  ],
+  "file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/validate-skeletal-mesh-v2.json",
+  "status": "PASS"
+ }
+}

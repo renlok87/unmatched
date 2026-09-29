@@ -1,0 +1,725 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "Проработка героев H2: Merlin, этап Tripo (multi-view по частям → 8K без освещения → PBR)",
+  "asset_id": "ASSET-MERLIN-001",
+  "date": "2026-09-29",
+  "service": "tripo-studio",
+  "account_plan_ui": "Max (по журналу кредитов, tripo.plan)",
+  "performed_by": "Оркестратор лично в своей вкладке Studio (платные операции, выгрузка GLB в source/). Отчёт составлен позже субагентом документации БЕЗ доступа к Studio: операции, цены и балансы — из записей журнала кредитов с owner «Проработка героев H2 (Tripo по концептам hero-quality-v1)»; sha256, размеры и структура GLB и концептов — измерены субагентом по файлам.",
+  "evidence_basis": {
+    "measured_by_this_report": [
+      "sha256 и байты обоих GLB в source/",
+      "структура GLB (JSON-чанк: меши, треугольники, вершины, материалы, изображения, скины, accessor-границы; размеры встроенных карт по заголовкам PNG/JPEG)",
+      "sha256 и размеры PNG концептов, sha256 prompts.md"
+    ],
+    "from_credit_ledger": [
+      "время истории Studio (с точностью до минуты)",
+      "quoted / observed_debit / balance_before / balance_after",
+      "формулировка операций (multi-view, по частям Баланс, ультра-геометрия 2M, без текстуры; 8K, удалить освещение; PBR)"
+    ],
+    "from_orchestrator_task_text": [
+      "модель H3.1",
+      "слоты front/RIGHT/back",
+      "имена файлов и сокращённые sha (совпали с измеренными)"
+    ],
+    "not_recorded": [
+      "точная подпись модели в UI",
+      "privacy, topology, seed, AI-дополнение",
+      "настройки экспорта GLB (уровень текстуры экспорта, Compact UV)",
+      "снимок истории Studio",
+      "превью/ревью результата Tripo"
+    ]
+  },
+  "tasks": {
+    "de0654b5-b879-46aa-90fe-62a05e7c6366": {
+      "role": "H2 multi-view high-poly по частям (Баланс) → текстура 8K без освещения → PBR; одна ветка, без клонов и ретопологии",
+      "url": "https://studio.tripo3d.ai/ru/workspace/generate/de0654b5-b879-46aa-90fe-62a05e7c6366"
+    }
+  },
+  "generation": {
+    "mode": "multi-view",
+    "ui": "HD модель, «из нескольких видов в модель», генерация по частям",
+    "model_ui_label": null,
+    "model_version_note": "H3.1 — со слов задания оркестратора; точная подпись UI не записана",
+    "views": {
+      "front": {
+        "path": "art/imagegen/hero-quality-v1/merlin/merlin-front.png",
+        "sha256": "25856808d165affebc0ad26fd774ef589b725d7a92d3fa3c6cdd4757e76db0bf",
+        "bytes": 1777994,
+        "px": [
+          1190,
+          1322
+        ],
+        "concept_view": "front"
+      },
+      "left": null,
+      "right": {
+        "path": "art/imagegen/hero-quality-v1/merlin/merlin-side.png",
+        "sha256": "6a9cadbb5281c26d9adbfed61eac33528ed2eea84cb79d9f1ad8433cd3b3ea8b",
+        "bytes": 1582312,
+        "px": [
+          1190,
+          1322
+        ],
+        "concept_view": "side"
+      },
+      "back": {
+        "path": "art/imagegen/hero-quality-v1/merlin/merlin-back.png",
+        "sha256": "c077b41a260fe937a152d85f560375af7a6632c6769ba7105c6e00b8c043123d",
+        "bytes": 1759324,
+        "px": [
+          1190,
+          1322
+        ],
+        "concept_view": "back"
+      }
+    },
+    "slot_mapping": "front/RIGHT/back — по заданию оркестратора и формулировкам записей журнала",
+    "slot_consistency": "Боковой концепт — правый вид (prompts.md), подан в слот RIGHT: согласовано (как у прежнего H3.1 Merlin d9ff4260).",
+    "concepts": {
+      "set": "art/imagegen/hero-quality-v1 (Codex imagegen, дорисовка поверх прежних low-poly моделей)",
+      "prompts": {
+        "path": "art/imagegen/hero-quality-v1/merlin/prompts.md",
+        "sha256": "069eeadcd5704c5b05f8494fbc621a8ca086e7c286e01dd1022ae0737a90b146"
+      },
+      "quality_reference": {
+        "path": "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+        "sha256": "e97c4a28be8adc63b560a323aa5283d791ae9c098473862f6f834ad7cb42bfc9"
+      },
+      "side_source": "прототип бокового вида — ortho_right.png (prompts.md: «RIGHT SIDE orthographic view facing right»)",
+      "limitations": "prompts.md: концепты — по модели, не геометрически точные проекции; детали между видами расходятся (раздел «Проверка и ограничения»)"
+    },
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": null,
+      "topology": null,
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — это последующие шаги генератора текстур и PBR на high-poly, а не настройки генерации геометрии. null = не записано."
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "task": "de0654b5",
+      "history_time": "2026-09-29 07:02",
+      "ledger_op": "Из нескольких видов в модель, по частям (Баланс), ультра-геометрия 2M, без текстуры (Merlin H2, front/right/back hero-quality-v1)",
+      "quoted": 60,
+      "observed_debit": 60,
+      "balance_before": 24085,
+      "balance_after": 24025,
+      "ui": "Из нескольких видов в модель, по частям (Баланс), ультра-геометрия 2M, без текстуры",
+      "result": {
+        "glb": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-parts12.glb",
+        "parts": 12,
+        "glb_triangles": 1947523
+      }
+    },
+    {
+      "op": "texture",
+      "task": "de0654b5",
+      "history_time": "2026-09-29 07:12",
+      "ledger_op": "Генерация текстур 8K, удалить освещение (Merlin H2 de0654b5, high-poly по частям)",
+      "quoted": 30,
+      "observed_debit": 30,
+      "balance_before": 23935,
+      "balance_after": 23905,
+      "ui": "Генератор текстур 8K, удалить освещение, на high-poly модели по частям",
+      "settings": {
+        "texture_resolution": "8K",
+        "remove_lighting": true
+      }
+    },
+    {
+      "op": "pbr",
+      "task": "de0654b5",
+      "history_time": "2026-09-29 07:18",
+      "ledger_op": "Генерация PBR (Merlin H2 de0654b5 после 8K)",
+      "quoted": 5,
+      "observed_debit": 5,
+      "balance_before": 23865,
+      "balance_after": 23860,
+      "ui": "Генератор PBR после 8K",
+      "result": {
+        "glb": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-tex8k-pbr.glb"
+      }
+    }
+  ],
+  "exports": [
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-parts12.glb",
+      "stage": "generate (по частям, без текстуры)",
+      "format": "GLB",
+      "texture_tier": null,
+      "sha256": "82c3eff8e73359969decc807a637eccc5e05847df91e5d5c1a8d4377205cd74d",
+      "bytes": 46857420,
+      "git": "не в git (.gitignore ассета), закреплён по sha256 в source-spec",
+      "glb": {
+        "meshes": 12,
+        "nodes_named": "ROOT + tripo_part_0..11 (узел i → mesh i)",
+        "triangles": 1947523,
+        "vertices": 978179,
+        "materials": 1,
+        "images": 0,
+        "skins": 0,
+        "generator": "Tripo",
+        "extensionsUsed": [
+          "KHR_materials_volume",
+          "FB_ngon_encoding"
+        ],
+        "attributes": "POSITION, NORMAL (UV нет)",
+        "container_check": "magic glTF, версия 2, длина заголовка = размер файла, обход чанков (JSON+BIN) дошёл ровно до конца файла",
+        "bounds_accessor_gltf_m": {
+          "min": [
+            -0.24,
+            0.0,
+            -0.236
+          ],
+          "max": [
+            0.24,
+            0.977,
+            0.236
+          ],
+          "dimensions_xyz": [
+            0.48,
+            0.977,
+            0.472
+          ],
+          "note": "из accessor min/max JSON-чанка, оси glTF (Y вверх, +Z вперёд), метры нормировки Tripo; по вершинам не пересчитывались"
+        },
+        "material_factors": "один материал «material» без текстур: metallicFactor 0, roughnessFactor 0.5"
+      },
+      "parts": [
+        {
+          "node": "tripo_part_0",
+          "mesh_index": 0,
+          "triangles": 1063800,
+          "accessor_min": [
+            -0.228,
+            0.0,
+            -0.205
+          ],
+          "accessor_max": [
+            0.24,
+            0.89,
+            0.156
+          ]
+        },
+        {
+          "node": "tripo_part_1",
+          "mesh_index": 1,
+          "triangles": 235801,
+          "accessor_min": [
+            -0.24,
+            0.0,
+            -0.236
+          ],
+          "accessor_max": [
+            0.239,
+            0.098,
+            0.236
+          ]
+        },
+        {
+          "node": "tripo_part_3",
+          "mesh_index": 3,
+          "triangles": 137019,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.055
+          ],
+          "accessor_max": [
+            0.188,
+            0.729,
+            0.099
+          ]
+        },
+        {
+          "node": "tripo_part_4",
+          "mesh_index": 4,
+          "triangles": 124948,
+          "accessor_min": [
+            -0.198,
+            0.0,
+            -0.123
+          ],
+          "accessor_max": [
+            -0.074,
+            0.733,
+            0.006
+          ]
+        },
+        {
+          "node": "tripo_part_2",
+          "mesh_index": 2,
+          "triangles": 75685,
+          "accessor_min": [
+            -0.181,
+            0.0,
+            -0.01
+          ],
+          "accessor_max": [
+            -0.115,
+            0.648,
+            0.037
+          ]
+        },
+        {
+          "node": "tripo_part_9",
+          "mesh_index": 9,
+          "triangles": 69765,
+          "accessor_min": [
+            -0.059,
+            0.0,
+            0.0
+          ],
+          "accessor_max": [
+            0.057,
+            0.832,
+            0.09
+          ]
+        },
+        {
+          "node": "tripo_part_10",
+          "mesh_index": 10,
+          "triangles": 68415,
+          "accessor_min": [
+            -0.201,
+            0.0,
+            -0.03
+          ],
+          "accessor_max": [
+            -0.122,
+            0.903,
+            0.033
+          ]
+        },
+        {
+          "node": "tripo_part_5",
+          "mesh_index": 5,
+          "triangles": 47898,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.03
+          ],
+          "accessor_max": [
+            0.172,
+            0.193,
+            0.144
+          ]
+        },
+        {
+          "node": "tripo_part_11",
+          "mesh_index": 11,
+          "triangles": 46676,
+          "accessor_min": [
+            -0.179,
+            0.0,
+            -0.101
+          ],
+          "accessor_max": [
+            -0.049,
+            0.193,
+            0.056
+          ]
+        },
+        {
+          "node": "tripo_part_8",
+          "mesh_index": 8,
+          "triangles": 29957,
+          "accessor_min": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "accessor_max": [
+            0.1,
+            0.588,
+            0.107
+          ]
+        },
+        {
+          "node": "tripo_part_6",
+          "mesh_index": 6,
+          "triangles": 29138,
+          "accessor_min": [
+            -0.198,
+            0.0,
+            -0.042
+          ],
+          "accessor_max": [
+            -0.131,
+            0.683,
+            0.046
+          ]
+        },
+        {
+          "node": "tripo_part_7",
+          "mesh_index": 7,
+          "triangles": 18421,
+          "accessor_min": [
+            -0.196,
+            0.0,
+            -0.034
+          ],
+          "accessor_max": [
+            -0.128,
+            0.977,
+            0.033
+          ]
+        }
+      ]
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-tex8k-pbr.glb",
+      "stage": "texture 8K (удалить освещение) + PBR",
+      "format": "GLB",
+      "texture_tier": "8K (UI)",
+      "sha256": "bb970839f3431af1f7bc188a62502ea210dc65210796257f8c391f40fbbfd9d2",
+      "bytes": 69793876,
+      "git": "не в git (.gitignore ассета), закреплён по sha256 в source-spec",
+      "glb": {
+        "meshes": 12,
+        "nodes_named": "ROOT + tripo_part_0..11 (узел i → mesh i)",
+        "triangles": 1947523,
+        "vertices": 1010903,
+        "materials": 12,
+        "images": 36,
+        "skins": 0,
+        "generator": "Tripo",
+        "extensionsUsed": [
+          "KHR_materials_volume",
+          "FB_ngon_encoding"
+        ],
+        "attributes": "POSITION, NORMAL, TEXCOORD_0",
+        "container_check": "magic glTF, версия 2, длина заголовка = размер файла, обход чанков (JSON+BIN) дошёл ровно до конца файла",
+        "bounds_accessor_gltf_m": {
+          "min": [
+            -0.24,
+            0.0,
+            -0.236
+          ],
+          "max": [
+            0.24,
+            0.977,
+            0.236
+          ],
+          "dimensions_xyz": [
+            0.48,
+            0.977,
+            0.472
+          ],
+          "note": "из accessor min/max JSON-чанка, оси glTF (Y вверх, +Z вперёд), метры нормировки Tripo; по вершинам не пересчитывались"
+        },
+        "texture_set": {
+          "per_material": "BaseColor jpeg + metallicRoughness jpeg + normal png (3 изображения на часть)",
+          "basecolor_size_histogram": {
+            "4096": 2,
+            "2048": 2,
+            "1024": 8
+          },
+          "max_image_px": 4096,
+          "basecolor_texel_area": 50331648,
+          "basecolor_equivalent_square_px": 7094,
+          "basecolor_share_of_8192sq": 0.75,
+          "embedded_image_bytes": 14051729,
+          "note": "«8K» в UI Studio — уровень текстурирования, а не одна карта 8192²: в GLB свой набор карт на каждую часть, крупнейшая 4096² (измерено по заголовкам PNG/JPEG в BIN-чанке)"
+        },
+        "material_factors": "metallicFactor/roughnessFactor не заданы (по glTF = 1.0, умножаются на карту MR)"
+      },
+      "parts": [
+        {
+          "node": "tripo_part_0",
+          "mesh_index": 0,
+          "triangles": 1063800,
+          "accessor_min": [
+            -0.228,
+            0.0,
+            -0.205
+          ],
+          "accessor_max": [
+            0.24,
+            0.89,
+            0.156
+          ],
+          "texture_px": {
+            "basecolor": 4096,
+            "metal_rough": 1024,
+            "normal": 1024
+          }
+        },
+        {
+          "node": "tripo_part_1",
+          "mesh_index": 1,
+          "triangles": 235801,
+          "accessor_min": [
+            -0.24,
+            0.0,
+            -0.236
+          ],
+          "accessor_max": [
+            0.239,
+            0.098,
+            0.236
+          ],
+          "texture_px": {
+            "basecolor": 4096,
+            "metal_rough": 1024,
+            "normal": 1024
+          }
+        },
+        {
+          "node": "tripo_part_3",
+          "mesh_index": 3,
+          "triangles": 137019,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.055
+          ],
+          "accessor_max": [
+            0.188,
+            0.729,
+            0.099
+          ],
+          "texture_px": {
+            "basecolor": 2048,
+            "metal_rough": 512,
+            "normal": 512
+          }
+        },
+        {
+          "node": "tripo_part_4",
+          "mesh_index": 4,
+          "triangles": 124948,
+          "accessor_min": [
+            -0.198,
+            0.0,
+            -0.123
+          ],
+          "accessor_max": [
+            -0.074,
+            0.733,
+            0.006
+          ],
+          "texture_px": {
+            "basecolor": 2048,
+            "metal_rough": 512,
+            "normal": 512
+          }
+        },
+        {
+          "node": "tripo_part_2",
+          "mesh_index": 2,
+          "triangles": 75685,
+          "accessor_min": [
+            -0.181,
+            0.0,
+            -0.01
+          ],
+          "accessor_max": [
+            -0.115,
+            0.648,
+            0.037
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_9",
+          "mesh_index": 9,
+          "triangles": 69765,
+          "accessor_min": [
+            -0.059,
+            0.0,
+            0.0
+          ],
+          "accessor_max": [
+            0.057,
+            0.832,
+            0.09
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_10",
+          "mesh_index": 10,
+          "triangles": 68415,
+          "accessor_min": [
+            -0.201,
+            0.0,
+            -0.03
+          ],
+          "accessor_max": [
+            -0.122,
+            0.903,
+            0.033
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_5",
+          "mesh_index": 5,
+          "triangles": 47898,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.03
+          ],
+          "accessor_max": [
+            0.172,
+            0.193,
+            0.144
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_11",
+          "mesh_index": 11,
+          "triangles": 46676,
+          "accessor_min": [
+            -0.179,
+            0.0,
+            -0.101
+          ],
+          "accessor_max": [
+            -0.049,
+            0.193,
+            0.056
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_8",
+          "mesh_index": 8,
+          "triangles": 29957,
+          "accessor_min": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "accessor_max": [
+            0.1,
+            0.588,
+            0.107
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_6",
+          "mesh_index": 6,
+          "triangles": 29138,
+          "accessor_min": [
+            -0.198,
+            0.0,
+            -0.042
+          ],
+          "accessor_max": [
+            -0.131,
+            0.683,
+            0.046
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_7",
+          "mesh_index": 7,
+          "triangles": 18421,
+          "accessor_min": [
+            -0.196,
+            0.0,
+            -0.034
+          ],
+          "accessor_max": [
+            -0.128,
+            0.977,
+            0.033
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        }
+      ]
+    }
+  ],
+  "parts_vs_textured": {
+    "same_part_set": true,
+    "same_triangles_per_part": true,
+    "same_accessor_bounds_per_part": true,
+    "vertices": {
+      "parts_glb": 978179,
+      "tex8k_pbr_glb": 1010903,
+      "delta": 32724
+    },
+    "note": "Набор частей, треугольники и accessor-границы каждой части сравнены по JSON-чанкам; рост числа вершин в текстурированном GLB ожидаем от разрезов по UV-швам (TEXCOORD_0 есть только после 8K). Позиции вершин поштучно не сравнивались."
+  },
+  "findings": [
+    "Оба GLB — high-poly (~2M треугольников), без скинов и арматуры; для игры нужен Blender-этап (low-poly + запекание high→low, риг по rig-contract) — в этом отчёте не выполнялся",
+    "GLB без текстуры не имеет UV; источник для запекания цвета — tex8k-pbr GLB (UV0 на каждой части, карты BC/MR/N на часть)",
+    "«8K» дал набор карт по частям (крупнейшая 4096²); суммарная площадь BaseColor ≈ 7094² ≈ 75% от 8192²",
+    "Визуальное ревью результата Tripo в этом отчёте не выполнялось (задача без Blender)"
+  ],
+  "credits": {
+    "unit": "studio-credits",
+    "this_hero_total_observed": 95,
+    "h2_group_total_observed": 350,
+    "h2_group_balance_start": 24205,
+    "h2_group_balance_end": 23855,
+    "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json",
+    "ledger_owner": "Проработка героев H2 (Tripo по концептам hero-quality-v1)",
+    "ledger_check": "3 записи задачи de0654b5 сверены: quoted = −delta, balanceAfter = balanceBefore + delta; цепочка балансов окна непрерывна; сумма группы H2 = byTask[owner] = 350",
+    "history_snapshot": null
+  },
+  "budget_context": {
+    "status": "предложено (не объявлено)",
+    "proposed_h2_target": "герой 30–45k tris, Harpy 20–30k; атлас 4K мастер + 2K рантайм; ≤ 2 слота (ориентир задания оркестратора H2)",
+    "current_spec": "docs/game-design/17-art-production-spec.md §4.5: герой 15–25k tris, помощник 8–15k, текстуры 2K герой — ПРЕДЛОЖЕНИЕ",
+    "note": "Обоснование по замерам кадра K2 — задача Blender/UE-этапа H2, здесь не выполнялось"
+  },
+  "animation_presets": "не открывались и не запускались (в журнале других операций этой задачи нет)",
+  "rig": "Tripo-авториг не запускался (в журнале нет записи)",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false,
+    "status": "измерено"
+  }
+}

@@ -1,0 +1,170 @@
+{
+ "checks": {
+  "no_folded_or_self_overlapping_uv": {
+   "expected": 0,
+   "measured": {
+    "base": {
+     "folded_triangles": 0,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 0,
+     "self_overlapping_islands": 0
+    },
+    "body": {
+     "folded_triangles": 0,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 0,
+     "self_overlapping_islands": 0
+    },
+    "staff": {
+     "folded_triangles": 0,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 0,
+     "self_overlapping_islands": 0
+    }
+   },
+   "note": "after the last unwrap pass: UV triangles with negative/zero area; islands overlapping themselves (raster at overlap_check_px)",
+   "passed": true
+  },
+  "no_overlap_texels_after_pack": {
+   "expected": 0,
+   "measured": 0,
+   "note": "texel centres covered by more than one UV triangle at atlas_px after the final pack",
+   "passed": true
+  },
+  "one_uv_layer": {
+   "expected": 1,
+   "measured": [
+    1,
+    1,
+    1
+   ],
+   "passed": true
+  },
+  "uv0_in_unit_square": {
+   "expected": "[0, 1]",
+   "measured": {
+    "max": [
+     0.996236,
+     0.996934
+    ],
+    "min": [
+     0.001221,
+     0.001221
+    ]
+   },
+   "passed": true
+  }
+ },
+ "islands_after_priority": {
+  "LP_base": 31,
+  "LP_body": 909,
+  "LP_staff": 223
+ },
+ "method": "seams from Smart UV Project per part on a smoothed proxy (islands never cross parts; tiny islands merged), ABF unwrap with a fold fix, average island scale (uniform world density), then island scale x td_priority, one pack of body+staff+base into a single 0..1 atlas; pack margin 5 px of 4096 per island side (measured gap ~2x margin: 20 px at margin 10, 2026-09-29) so the gap stays >= 8 px. Direct Smart UV on the decimated mesh gave 3971 body islands (2184 single triangles), measured 2026-09-29",
+ "note": "pixel gaps, overlaps and texel density are measured by the maps stage on the rasterised atlas",
+ "objects": {
+  "base": {
+   "islands": 31,
+   "triangles": 2240
+  },
+  "body": {
+   "islands": 909,
+   "triangles": 30047
+  },
+  "staff": {
+   "islands": 223,
+   "triangles": 3920
+  }
+ },
+ "pack_margin_fraction": 0.0012207,
+ "passed": true,
+ "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json",
+ "profile_id": "merlin-h2-bake/1",
+ "seams": {
+  "base": {
+   "passes": [
+    {
+     "folded_triangles": 2,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 0,
+     "self_overlapping_islands": 0
+    },
+    {
+     "folded_triangles": 2,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 9,
+     "self_overlapping_islands": 1
+    },
+    {
+     "folded_triangles": 2,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 5,
+     "self_overlapping_islands": 1
+    },
+    {
+     "folded_triangles": 0,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 0,
+     "self_overlapping_islands": 0
+    }
+   ],
+   "proxy_islands": 48,
+   "tiny_islands_merged": 41
+  },
+  "body": {
+   "passes": [
+    {
+     "folded_triangles": 78,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 395,
+     "self_overlapping_islands": 23
+    },
+    {
+     "folded_triangles": 4,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 179,
+     "self_overlapping_islands": 2
+    },
+    {
+     "folded_triangles": 0,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 13,
+     "self_overlapping_islands": 2
+    },
+    {
+     "folded_triangles": 0,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 14,
+     "self_overlapping_islands": 1
+    },
+    {
+     "folded_triangles": 0,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 0,
+     "self_overlapping_islands": 0
+    }
+   ],
+   "proxy_islands": 1011,
+   "tiny_islands_merged": 882
+  },
+  "staff": {
+   "passes": [
+    {
+     "folded_triangles": 0,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 92,
+     "self_overlapping_islands": 6
+    },
+    {
+     "folded_triangles": 0,
+     "mirrored_single_triangle_islands": 0,
+     "self_overlapping_faces": 0,
+     "self_overlapping_islands": 0
+    }
+   ],
+   "proxy_islands": 176,
+   "tiny_islands_merged": 155
+  }
+ },
+ "stage": "uv"
+}

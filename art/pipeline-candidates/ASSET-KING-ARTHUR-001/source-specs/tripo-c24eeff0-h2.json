@@ -1,0 +1,136 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-c24eeff0-h2",
+  "asset_id": "ASSET-KING-ARTHUR-001",
+  "service": "tripo-studio",
+  "task_id": "c24eeff0-9b29-4968-8b21-1daa39ead4d8",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/c24eeff0-9b29-4968-8b21-1daa39ead4d8",
+  "date": "2026-09-29",
+  "iteration": "H2 (проработка героев по концептам hero-quality-v1)",
+  "model_version": {
+    "ui_label": null,
+    "backend": null,
+    "note": "H3.1 со слов оркестратора; подпись UI не записана"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-front.png",
+        "sha256": "26399f6fa7a52178b022902a871be689c91570c75b5d8e7e313b13c67227d2c5"
+      },
+      "left": null,
+      "right": {
+        "path": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-side.png",
+        "sha256": "3bb174aa58df24dea8ac9589562cc1cc376e58b6fed5fcb2c56494bd0a5bbe7b"
+      },
+      "back": {
+        "path": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-back.png",
+        "sha256": "6e00c1c20ae82ca771a5c1ca22d5afc7234a9955fee892d4dba7feac3c64de55"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/hero-quality-v1/king-arthur/prompts.md",
+    "slot_note": "РАСХОЖДЕНИЕ: по prompts.md боковой концепт нарисован поверх ortho_left (левый вид), а по журналу кредитов и заданию оркестратора подан в слот RIGHT. Прежний H3.1 Arthur (75e27ee8) шёл через слот LEFT. Влияние на геометрию не проверялось; проверить в Blender-этапе сторону меча и контур плаща против front/back (при зеркальной ошибке рука с мечом и складки не совпадут с концептом).",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": null,
+      "topology": null,
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — это последующие шаги генератора текстур и PBR на high-poly, а не настройки генерации геометрии. null = не записано."
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "Из нескольких видов в модель, по частям (Баланс), ультра-геометрия 2M, без текстуры",
+      "history_time": "2026-09-29 07:01",
+      "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60,
+        "balance_before": 24145,
+        "balance_after": 24085
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, удалить освещение, на high-poly модели по частям",
+      "history_time": "2026-09-29 07:12",
+      "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30,
+        "balance_before": 23965,
+        "balance_after": 23935
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": "2026-09-29 07:18",
+      "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5,
+        "balance_before": 23870,
+        "balance_after": 23865
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/source/king-arthur-h2-tripo-c24eeff0-parts21.glb",
+      "expected_sha256": "9920f86fb91bbc24e66a143b3ea0136ead2e85f664c0930a7332d5a07309c466",
+      "expected_bytes": 47962564,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/source/king-arthur-h2-tripo-c24eeff0-tex8k-pbr.glb",
+      "expected_sha256": "60633dd9d1e5ea10c059d646c24bb1ea0d969c4ae1f0d47df4218b62252d4b82",
+      "expected_bytes": 76905596,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export после текстуры 8K (удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB (44–77 МБ) не коммитятся: .gitignore ассета исключает 20260929-h2-tripo/source/*-parts*.glb и *-tex8k-pbr.glb; файл восстанавливается выгрузкой из Studio по task_url и проверяется по expected_sha256/expected_bytes",
+  "expectations": {
+    "h2-parts-glb": {
+      "glb_mesh_count": 21,
+      "glb_triangles": 1990362,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h2-tex8k-pbr-glb": {
+      "glb_mesh_count": 21,
+      "glb_triangles": 1990362,
+      "glb_materials": 21,
+      "glb_images": 63,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/reports/tripo-run.json",
+    "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json"
+  ]
+}

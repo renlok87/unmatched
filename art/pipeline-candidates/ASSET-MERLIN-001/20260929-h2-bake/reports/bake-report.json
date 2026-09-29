@@ -1,0 +1,188 @@
+{
+ "ao_distance_m_source": 0.078193,
+ "atlas_px": 4096,
+ "blender": "5.2.2 LTS",
+ "cages": {
+  "tripo_part_0": {
+   "extrusion_m": 0.00274,
+   "high_poly_parts": [
+    "tripo_part_0",
+    "tripo_part_3",
+    "tripo_part_4",
+    "tripo_part_5",
+    "tripo_part_8",
+    "tripo_part_9",
+    "tripo_part_11"
+   ],
+   "max_ray_distance_m": 0.008219
+  },
+  "tripo_part_1": {
+   "extrusion_m": 0.001928,
+   "high_poly_parts": [
+    "tripo_part_1"
+   ],
+   "max_ray_distance_m": 0.005783
+  },
+  "tripo_part_10": {
+   "extrusion_m": 0.0015,
+   "high_poly_parts": [
+    "tripo_part_7",
+    "tripo_part_10"
+   ],
+   "max_ray_distance_m": 0.0045
+  },
+  "tripo_part_11": {
+   "extrusion_m": 0.001768,
+   "high_poly_parts": [
+    "tripo_part_0",
+    "tripo_part_11"
+   ],
+   "max_ray_distance_m": 0.005305
+  },
+  "tripo_part_2": {
+   "extrusion_m": 0.0015,
+   "high_poly_parts": [
+    "tripo_part_2"
+   ],
+   "max_ray_distance_m": 0.0045
+  },
+  "tripo_part_3": {
+   "extrusion_m": 0.0015,
+   "high_poly_parts": [
+    "tripo_part_0",
+    "tripo_part_3",
+    "tripo_part_8"
+   ],
+   "max_ray_distance_m": 0.0045
+  },
+  "tripo_part_4": {
+   "extrusion_m": 0.002003,
+   "high_poly_parts": [
+    "tripo_part_0",
+    "tripo_part_4",
+    "tripo_part_6"
+   ],
+   "max_ray_distance_m": 0.00601
+  },
+  "tripo_part_5": {
+   "extrusion_m": 0.001853,
+   "high_poly_parts": [
+    "tripo_part_0",
+    "tripo_part_5"
+   ],
+   "max_ray_distance_m": 0.005559
+  },
+  "tripo_part_6": {
+   "extrusion_m": 0.0015,
+   "high_poly_parts": [
+    "tripo_part_4",
+    "tripo_part_6"
+   ],
+   "max_ray_distance_m": 0.0045
+  },
+  "tripo_part_7": {
+   "extrusion_m": 0.0015,
+   "high_poly_parts": [
+    "tripo_part_7",
+    "tripo_part_10"
+   ],
+   "max_ray_distance_m": 0.0045
+  },
+  "tripo_part_8": {
+   "extrusion_m": 0.0015,
+   "high_poly_parts": [
+    "tripo_part_0",
+    "tripo_part_3",
+    "tripo_part_8"
+   ],
+   "max_ray_distance_m": 0.0045
+  },
+  "tripo_part_9": {
+   "extrusion_m": 0.0015,
+   "high_poly_parts": [
+    "tripo_part_0",
+    "tripo_part_9"
+   ],
+   "max_ray_distance_m": 0.0045
+  }
+ },
+ "compute_device_type": "NONE",
+ "device": "CPU",
+ "figure_height_m_source": 0.97742,
+ "maps": {
+  "ao": {
+   "distance_rel": 0.08,
+   "note": "distance 0.08 x figure height as W4-B atlas.ao_bake; whole high-poly as occluder",
+   "samples": 256,
+   "type": "AO"
+  },
+  "basecolor": {
+   "samples": 16,
+   "source": "baseColorTexture",
+   "type": "EMIT"
+  },
+  "metallic": {
+   "samples": 16,
+   "source": "metallicRoughnessTexture.B",
+   "type": "EMIT"
+  },
+  "normal": {
+   "highpoly_normal_map": false,
+   "note": "geometry only: the 2M-tri high-poly already carries the relief; the Tripo normal maps are 1/4 of the base colour size",
+   "samples": 16,
+   "space": "TANGENT",
+   "type": "NORMAL"
+  },
+  "roughness": {
+   "samples": 16,
+   "source": "metallicRoughnessTexture.G",
+   "type": "EMIT"
+  }
+ },
+ "note": "misses (texels inside UV triangles that no ray matched) are measured by the maps stage against the rasterised atlas",
+ "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json",
+ "profile_id": "merlin-h2-bake/1",
+ "stage": "bake",
+ "written": {
+  "ao": {
+   "mean_rgb_written": [
+    0.6664,
+    0.6664,
+    0.6664
+   ],
+   "texels_written": 9073926
+  },
+  "basecolor": {
+   "mean_rgb_written": [
+    0.07937,
+    0.06214,
+    0.07831
+   ],
+   "texels_written": 9073926
+  },
+  "metallic": {
+   "mean_rgb_written": [
+    0.02188,
+    0.02188,
+    0.02188
+   ],
+   "texels_written": 9073926
+  },
+  "normal": {
+   "mean_rgb_written": [
+    0.50045,
+    0.49879,
+    0.98984
+   ],
+   "texels_written": 9073926
+  },
+  "roughness": {
+   "mean_rgb_written": [
+    0.86957,
+    0.86957,
+    0.86957
+   ],
+   "texels_written": 9073926
+  }
+ }
+}

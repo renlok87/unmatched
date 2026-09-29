@@ -1,0 +1,136 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-330872a3-h2",
+  "asset_id": "ASSET-HARPY-001",
+  "service": "tripo-studio",
+  "task_id": "330872a3-1eea-44a6-a9d1-d1c840a9b532",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/330872a3-1eea-44a6-a9d1-d1c840a9b532",
+  "date": "2026-09-29",
+  "iteration": "H2 (проработка героев по концептам hero-quality-v1)",
+  "model_version": {
+    "ui_label": null,
+    "backend": null,
+    "note": "H3.1 со слов оркестратора; подпись UI не записана"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/hero-quality-v1/harpy/harpy-front.png",
+        "sha256": "1a93e22efb138ec0ef48fc1dcd387ec823bc836639772475f073d7bc95780b1f"
+      },
+      "left": null,
+      "right": {
+        "path": "art/imagegen/hero-quality-v1/harpy/harpy-side.png",
+        "sha256": "44fd58066ffb310f6768eb1e326ef42a99ab7a905252bc41da78740ecd25844f"
+      },
+      "back": {
+        "path": "art/imagegen/hero-quality-v1/harpy/harpy-back.png",
+        "sha256": "af82978b804dbbf31e92d469ec4a604308acc6b9d74fc080b56fdd2d22d1e086"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/hero-quality-v1/harpy/prompts.md",
+    "slot_note": "РАСХОЖДЕНИЕ: по prompts.md боковой концепт нарисован поверх ortho_left (левый вид), а по журналу кредитов и заданию оркестратора подан в слот RIGHT. Прежний H3.1 Harpy (d500fc84) шёл через слот LEFT. Влияние на геометрию не проверялось; проверить в Blender-этапе асимметрию крыльев и когтей против front/back.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": null,
+      "topology": null,
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — это последующие шаги генератора текстур и PBR на high-poly, а не настройки генерации геометрии. null = не записано."
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "Из нескольких видов в модель, по частям (Баланс), ультра-геометрия 2M, без текстуры",
+      "history_time": "2026-09-29 07:03",
+      "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60,
+        "balance_before": 24025,
+        "balance_after": 23965
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, удалить освещение, на high-poly модели по частям",
+      "history_time": "2026-09-29 07:12",
+      "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30,
+        "balance_before": 23905,
+        "balance_after": 23875
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": "2026-09-29 07:18",
+      "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5,
+        "balance_before": 23860,
+        "balance_after": 23855
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h2-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-tripo/source/harpy-h2-tripo-330872a3-parts13.glb",
+      "expected_sha256": "cdc18f936e402d6ebbe607b7acac27d5966627fdf2149aeb238dc5f0c5ea19bb",
+      "expected_bytes": 47316360,
+      "produced_by": "generate",
+      "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h2-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-tripo/source/harpy-h2-tripo-330872a3-tex8k-pbr.glb",
+      "expected_sha256": "e79ed139d1cf59610f396142c2e2d20c266955f6f9e31e08b688aa6f0121b3ed",
+      "expected_bytes": 75403176,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export после текстуры 8K (удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB (44–77 МБ) не коммитятся: .gitignore ассета исключает 20260929-h2-tripo/source/*-parts*.glb и *-tex8k-pbr.glb; файл восстанавливается выгрузкой из Studio по task_url и проверяется по expected_sha256/expected_bytes",
+  "expectations": {
+    "h2-parts-glb": {
+      "glb_mesh_count": 13,
+      "glb_triangles": 1964326,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h2-tex8k-pbr-glb": {
+      "glb_mesh_count": 13,
+      "glb_triangles": 1964326,
+      "glb_materials": 13,
+      "glb_images": 39,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "evidence": [
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-tripo/reports/tripo-run.json",
+    "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json"
+  ]
+}
