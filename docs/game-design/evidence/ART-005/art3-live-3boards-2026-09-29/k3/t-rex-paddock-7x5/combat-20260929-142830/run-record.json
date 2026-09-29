@@ -1,0 +1,120 @@
+{
+  "schema": "unmatched.t52-k3-run/1",
+  "label": "K3-trex",
+  "startedLocal": "2026-09-29T14:28:27+05:00",
+  "argv": [
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "tools/s09/run-combat-demo.ps1",
+    "-Api",
+    "http://localhost:3120/graphql",
+    "-EvidenceDir",
+    "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5",
+    "-ArtPreview",
+    "-FullHd",
+    "-ClientFps",
+    "30",
+    "-ArtPreviewBoardId",
+    "c70e9f624617750c2a2b856fd",
+    "-ArtPreviewMedusaVariant",
+    "face-neck-v2",
+    "-RunSeconds",
+    "240",
+    "-ClientRenderPreset",
+    "High",
+    "-RequireRenderReference",
+    "-ClientPerf"
+  ],
+  "credentials": "S08_DEMO_* from backend/.env injected as S09_DEMO_* into the child environment only",
+  "backend": {
+    "port": 3120,
+    "pid": 24572,
+    "process": {
+      "pid": 24572,
+      "parent": 54012,
+      "name": "node.exe",
+      "exe": "C:\\nvm4w\\nodejs\\node.exe",
+      "cmd": "\"C:\\nvm4w\\nodejs\\node.exe\" -r dotenv/config dist/src/main.js ",
+      "created": "2026-09-29T14:17:46.6988860+05:00"
+    }
+  },
+  "artBoard": {
+    "boardId": "c70e9f624617750c2a2b856fd",
+    "profile": "t-rex-paddock-art-fixture",
+    "size": "7x5",
+    "light": "paddock-probe",
+    "artFixture": true
+  },
+  "clientFps": 30,
+  "runSeconds": 240,
+  "variant": "face-neck-v2",
+  "staged": {
+    "global.ucas": "e2192c004c7cfb9b53402197a73eac34727e8ddc9e10f912f6b9a3f6793ffabd",
+    "global.utoc": "9992db340e36a8859639c46cebfb7fbc01fef8b78bd7895583d1807c6a0636ea",
+    "Unmatched-Windows.pak": "c36b9584c4fc5da6bfaf57373fcc390d3bfacc8266571700574d948b0da79dbf",
+    "Unmatched-Windows.ucas": "5f2830044ed0fcd9e78daf4a4e2b5c2df86724fe48cf585ab7055b0f1e41141f",
+    "Unmatched-Windows.utoc": "894fb56d130f79c149c3a977ab389b7ceb37d49adf07f31ed924ba7c65f0701c",
+    "Unmatched.exe(inner)": "13d80d2e1884e2a427231f3bb598a300e979410198a55923a9f367eac2a6e645"
+  },
+  "demoExit": 0,
+  "finishedLocal": "2026-09-29T14:30:21+05:00",
+  "durationS": 113.6,
+  "staging": "C:\\Users\\ren\\AppData\\Local\\Temp\\s09-combat-20260929-142830-17740",
+  "cleanupLine": "cleanup: game cmumh4uin00i7wiyk8qwog32l already terminal (FINISHED)",
+  "roomStatus": "FINISHED",
+  "runDir": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-142830",
+  "clientLogs": [
+    {
+      "name": "Unmatched.log",
+      "bytes": 139874,
+      "sha256": "08d82898733509afd01558f2f0bb4a1a67f2ea655adfbfaafa50f16fa2e462ca",
+      "roomCodeRedacted": false
+    },
+    {
+      "name": "Unmatched_2.log",
+      "bytes": 154457,
+      "sha256": "26f049289eb6997ff580d2e4e7d5bf86c7539fbd99407375252dc245f81336cf",
+      "roomCodeRedacted": false
+    }
+  ],
+  "rawOutsideGit": [
+    {
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/t52-combat-20260929-142830/nvidia-smi-pmon.txt",
+      "sha256": "7c7940aacb76a575d2c779fd5914b09ef4aae6f12cca53082a05481dff80b71c"
+    }
+  ],
+  "crashLines": [],
+  "clientProcesses": [
+    {
+      "pid": 57648,
+      "parent": 17740,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-29T14:28:30.7465790+05:00"
+    },
+    {
+      "pid": 44532,
+      "parent": 57648,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-29T14:28:30.7542900+05:00"
+    },
+    {
+      "pid": 35548,
+      "parent": 17740,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-29T14:28:36.3431960+05:00"
+    },
+    {
+      "pid": 9848,
+      "parent": 35548,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-29T14:28:36.3534760+05:00"
+    }
+  ],
+  "validation": {
+    "status": "pass_technical_evidence_only",
+    "problems": []
+  }
+}

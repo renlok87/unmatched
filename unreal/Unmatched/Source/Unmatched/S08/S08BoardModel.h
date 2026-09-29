@@ -110,6 +110,24 @@ public:
                                 int32 TargetX, int32 TargetY,
                                 TArray<FIntPoint>& OutPath);
 
+  /** Multi-step approach of the S09AUTO demo driver (stage 3 T5.2). Scores
+   *  every cell the mover may legally END a move on (ComputeReachableCells
+   *  with Allowance; allies pass-through, enemies block) by the terrain
+   *  distance to the NEAREST living enemy: an orthogonal BFS over passable
+   *  cells that starts at the enemies' cells and ignores fighters, so 1 means
+   *  "orthogonally adjacent = melee range of the auto attack". Picks the
+   *  lowest score; ties go to fewer steps (shortest legal route), then lower
+   *  Y, then lower X (deterministic). Returns false when no reachable cell is
+   *  strictly closer than the mover's own cell (already adjacent, boxed in,
+   *  no living enemy, or no enemy reachable through terrain). The former
+   *  one-cell greedy step could not leave a start cell whose four
+   *  neighbours are an obstacle and own fighters (T.Rex art fixture). */
+  static bool PickApproachDestination(const FS08BoardModel& Board,
+                                      const TArray<FS08BoardFighter>& Fighters,
+                                      const FString& MoverId, int32 Allowance,
+                                      FIntPoint& OutCell, int32& OutFromDistance,
+                                      int32& OutToDistance, int32& OutSteps);
+
   static uint64 CellKey(int32 X, int32 Y) {
     return (static_cast<uint64>(static_cast<uint32>(X)) << 32) |
            static_cast<uint32>(Y);

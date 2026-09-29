@@ -1,0 +1,1103 @@
+{
+  "schema": "unmatched.t52-analysis/1",
+  "board": "sherwood-forest-8x5",
+  "boardId": "c37a3b6643a96c45fa71f10de",
+  "profile": "sherwood-forest-art-fixture",
+  "light": "forest-probe",
+  "status": "измерено (не приёмка)",
+  "thresholds": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/t52-thresholds.json",
+  "frames": {
+    "K1_host": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/sherwood-forest-8x5/run-20260929-141815/phase2-board-host-1920x1080.png",
+    "K1_joiner": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/sherwood-forest-8x5/run-20260929-141815/phase2-board-joiner-1920x1080.png",
+    "K3": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/sherwood-forest-8x5/combat-20260929-143030/joiner/s09-combat-resolve-revealed.png",
+    "K3_damage": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/sherwood-forest-8x5/combat-20260929-143030/joiner/s09-damage-number.png"
+  },
+  "k3Choice": {
+    "rule": "первый опубликованный кадр присоединившегося из s09-combat-resolve-revealed.png, s09-combat-resolve-window.png, s09-combat-defense-open.png, s09-damage-number.png, в SHOT-блоке которого есть 'SHOT icon'. s09-combat-result.png исключён: трасса пишет иконку видимой, а в пикселях её нет (устаревшая трасса после закрытия боя, T5.2)",
+    "excluded": [
+      "s09-combat-result.png"
+    ],
+    "withIconAndDamage": [],
+    "withIcon": [
+      "s09-combat-resolve-revealed.png",
+      "s09-combat-resolve-window.png"
+    ]
+  },
+  "derive": {
+    "exit": 0,
+    "entries": 4,
+    "outputsOutsideGit": "C:\\tmp\\t52\\derived\\sherwood-forest-8x5"
+  },
+  "contactSheet": {
+    "path": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/analysis/sherwood-forest-8x5/contact-k1-k3-color-gray-deuteranopia.jpg",
+    "layout": "rows: K1 joiner, K3; columns: colour, gray, deuteranopia; 640x360 tiles (downscaled, LANCZOS); full-size derivatives outside git"
+  },
+  "render": {
+    "phase2-board-host-1920x1080.png": {
+      "exit": 0,
+      "reference": true
+    },
+    "phase2-board-joiner-1920x1080.png": {
+      "exit": 0,
+      "reference": true
+    },
+    "K3:s09-combat-resolve-revealed.png": {
+      "exit": 0,
+      "reference": true
+    }
+  },
+  "c9": {
+    "k1-host/all": {
+      "exit": 3,
+      "status": "measured",
+      "result_normative": "proxy",
+      "result_on_proxy": {
+        "normative": "pass",
+        "proposed": "fail",
+        "note": "измерено на прокси-маске, не норматив"
+      },
+      "dEV": 0.8438,
+      "dChroma": -4.382
+    },
+    "k1-host/passable": {
+      "exit": 3,
+      "status": "measured",
+      "result_normative": "proxy",
+      "result_on_proxy": {
+        "normative": "pass",
+        "proposed": "fail",
+        "note": "измерено на прокси-маске, не норматив"
+      },
+      "dEV": 1.2397,
+      "dChroma": -2.756
+    },
+    "k1-joiner/all": {
+      "exit": 3,
+      "status": "measured",
+      "result_normative": "proxy",
+      "result_on_proxy": {
+        "normative": "pass",
+        "proposed": "fail",
+        "note": "измерено на прокси-маске, не норматив"
+      },
+      "dEV": 0.8608,
+      "dChroma": -4.667
+    },
+    "k1-joiner/passable": {
+      "exit": 3,
+      "status": "measured",
+      "result_normative": "proxy",
+      "result_on_proxy": {
+        "normative": "pass",
+        "proposed": "fail",
+        "note": "измерено на прокси-маске, не норматив"
+      },
+      "dEV": 1.2505,
+      "dChroma": -3.121
+    },
+    "k3/all": {
+      "exit": 3,
+      "status": "measured",
+      "result_normative": "proxy",
+      "result_on_proxy": {
+        "normative": "pass",
+        "proposed": "fail",
+        "note": "измерено на прокси-маске, не норматив"
+      },
+      "dEV": 0.9292,
+      "dChroma": -6.796
+    },
+    "k3/passable": {
+      "exit": 3,
+      "status": "measured",
+      "result_normative": "proxy",
+      "result_on_proxy": {
+        "normative": "pass",
+        "proposed": "fail",
+        "note": "измерено на прокси-маске, не норматив"
+      },
+      "dEV": 1.3177,
+      "dChroma": -5.352
+    }
+  },
+  "icon": {
+    "method": "rev 2 (W5-live3): qa010 icon --mask docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/analysis/icon-mask-template-32.png",
+    "exit": 1,
+    "result": "fail",
+    "bboxSource": "trace:shot-block@line654",
+    "sizes": [
+      {
+        "size_px": 24,
+        "contrast_ratio": 1.007,
+        "contrast_ratio_vs_ring": 1.022,
+        "upscaled": false,
+        "pass": false
+      },
+      {
+        "size_px": 32,
+        "contrast_ratio": 1.081,
+        "contrast_ratio_vs_ring": 1.091,
+        "upscaled": false,
+        "pass": false
+      },
+      {
+        "size_px": 48,
+        "contrast_ratio": 1.084,
+        "contrast_ratio_vs_ring": 1.093,
+        "upscaled": true,
+        "pass": false
+      }
+    ],
+    "guard": {
+      "verdict": "valid: explicit mask, icon present in pixels",
+      "iconInPixels": {
+        "noIconFrame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/sherwood-forest-8x5/combat-20260929-143030/joiner/s09-combat-result.png",
+        "available": true,
+        "sameView": "same viewport, camera and fighter screen points",
+        "rule": "IoU(max|ΔRGB| > 16, template), строки bbox ≥ 10 (ниже кольца атакующего) ≥ 0.6",
+        "iou": 0.878,
+        "present": true,
+        "diffPixelsWholeBbox": 474
+      },
+      "autoOtsu": {
+        "foreground": "dark",
+        "basis": "farther from ring median luma 189.0",
+        "threshold": 146,
+        "pixels": 159,
+        "iouWithTemplate": 0.2796,
+        "pixelsOutsideTemplate": 39,
+        "valid": false,
+        "sizes": [
+          {
+            "size_px": 24,
+            "contrast_ratio": 3.16,
+            "pass": true
+          },
+          {
+            "size_px": 32,
+            "contrast_ratio": 2.812,
+            "pass": false
+          },
+          {
+            "size_px": 48,
+            "contrast_ratio": 2.779,
+            "pass": false
+          }
+        ]
+      },
+      "bboxBackground": {
+        "pixels": 497,
+        "tileLumaLowerHalf": 188.0,
+        "foreignPixels": 39,
+        "foreignShare": 0.078,
+        "foreignDarkPixels": 39,
+        "rule": "фон bbox = пиксели вне маски (+1 px); «чужие» — |luma − медиана нижней половины| > 40 (подставка фигуры сзади, кольцо)"
+      },
+      "partsVsTile": {
+        "tileLuma": 188.0,
+        "otsuInsideMask": 162,
+        "icon": {
+          "pixels": 317,
+          "lumaMedian": 180.4,
+          "wcagVsTile": 1.077
+        },
+        "blades": {
+          "pixels": 191,
+          "lumaMedian": 201.9,
+          "wcagVsTile": 1.16
+        },
+        "hilts": {
+          "pixels": 126,
+          "lumaMedian": 127.7,
+          "wcagVsTile": 2.077
+        }
+      }
+    },
+    "supersededAutoOtsu": {
+      "file": "icon-k3-auto-otsu.json",
+      "exit": 1,
+      "foreground": "dark",
+      "sizes": [
+        {
+          "size_px": 24,
+          "contrast_ratio": 3.16,
+          "contrast_ratio_vs_ring": 3.09,
+          "upscaled": false,
+          "pass": true
+        },
+        {
+          "size_px": 32,
+          "contrast_ratio": 2.812,
+          "contrast_ratio_vs_ring": 2.757,
+          "upscaled": false,
+          "pass": false
+        },
+        {
+          "size_px": 48,
+          "contrast_ratio": 2.779,
+          "contrast_ratio_vs_ring": 2.728,
+          "upscaled": true,
+          "pass": false
+        }
+      ]
+    }
+  },
+  "plate": {
+    "exit": 0,
+    "status": "measured",
+    "result": "pass",
+    "checkedCells": 9,
+    "violations": 0,
+    "reason": null
+  },
+  "zoneMarks": {
+    "brown": {
+      "visible": true,
+      "perCellMedian": 950.0,
+      "color": 2.11,
+      "gray": 2.237,
+      "deuteranopia": 1.977
+    },
+    "gray": {
+      "visible": false,
+      "perCellMedian": 488.0,
+      "color": 1.21,
+      "gray": 1.213,
+      "deuteranopia": 1.203
+    },
+    "green": {
+      "visible": true,
+      "perCellMedian": 1117.0,
+      "color": 1.354,
+      "gray": 1.519,
+      "deuteranopia": 1.419
+    },
+    "light-gray": {
+      "visible": false,
+      "perCellMedian": 0.0,
+      "color": 1.411,
+      "gray": 1.405,
+      "deuteranopia": 1.409
+    },
+    "light-green": {
+      "visible": true,
+      "perCellMedian": 427.5,
+      "color": 1.042,
+      "gray": 1.066,
+      "deuteranopia": 1.05
+    },
+    "orange": {
+      "visible": true,
+      "perCellMedian": 89.5,
+      "color": 1.399,
+      "gray": 1.502,
+      "deuteranopia": 1.3
+    },
+    "yellow": {
+      "visible": true,
+      "perCellMedian": 875.0,
+      "color": 1.127,
+      "gray": 1.088,
+      "deuteranopia": 1.16
+    }
+  },
+  "boundaries": [
+    {
+      "pair": "brown/gray",
+      "edges": 1,
+      "shapeDiffers": true,
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    },
+    {
+      "pair": "brown/light-green",
+      "edges": 1,
+      "shapeDiffers": true,
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    },
+    {
+      "pair": "brown/orange",
+      "edges": 1,
+      "shapeDiffers": true,
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    },
+    {
+      "pair": "gray/green",
+      "edges": 2,
+      "shapeDiffers": true,
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    },
+    {
+      "pair": "gray/orange",
+      "edges": 1,
+      "shapeDiffers": true,
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    },
+    {
+      "pair": "gray/yellow",
+      "edges": 1,
+      "shapeDiffers": true,
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    },
+    {
+      "pair": "green/yellow",
+      "edges": 1,
+      "shapeDiffers": true,
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    }
+  ],
+  "zoneMarksDiagDE25": {
+    "brown": {
+      "visible": true,
+      "perCellMedian": 1028.0,
+      "color": 2.109,
+      "gray": 2.237,
+      "deuteranopia": 1.972
+    },
+    "gray": {
+      "visible": false,
+      "perCellMedian": 0.0,
+      "color": 1.21,
+      "gray": 1.213,
+      "deuteranopia": 1.203
+    },
+    "green": {
+      "visible": true,
+      "perCellMedian": 1174.5,
+      "color": 1.354,
+      "gray": 1.519,
+      "deuteranopia": 1.419
+    },
+    "light-gray": {
+      "visible": false,
+      "perCellMedian": 0.0,
+      "color": 1.633,
+      "gray": 1.619,
+      "deuteranopia": 1.649
+    },
+    "light-green": {
+      "visible": true,
+      "perCellMedian": 1114.0,
+      "color": 1.018,
+      "gray": 1.043,
+      "deuteranopia": 1.028
+    },
+    "orange": {
+      "visible": true,
+      "perCellMedian": 1183.0,
+      "color": 1.293,
+      "gray": 1.381,
+      "deuteranopia": 1.203
+    },
+    "yellow": {
+      "visible": true,
+      "perCellMedian": 1337.0,
+      "color": 1.127,
+      "gray": 1.088,
+      "deuteranopia": 1.16
+    }
+  },
+  "boundariesDiagDE25": [
+    {
+      "pair": "brown/gray",
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    },
+    {
+      "pair": "brown/light-green",
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    },
+    {
+      "pair": "brown/orange",
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    },
+    {
+      "pair": "gray/green",
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    },
+    {
+      "pair": "gray/orange",
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    },
+    {
+      "pair": "gray/yellow",
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    },
+    {
+      "pair": "green/yellow",
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    }
+  ],
+  "multizone": {
+    "multizoneCells": 14,
+    "unreadableZones": [
+      "gray",
+      "light-gray"
+    ],
+    "cellsWithUnreadableZone": [
+      {
+        "cell": [
+          3,
+          0
+        ],
+        "zones": [
+          "gray",
+          "orange"
+        ],
+        "unreadable": [
+          "gray"
+        ]
+      },
+      {
+        "cell": [
+          6,
+          0
+        ],
+        "zones": [
+          "light-gray",
+          "green",
+          "orange"
+        ],
+        "unreadable": [
+          "light-gray"
+        ]
+      },
+      {
+        "cell": [
+          7,
+          1
+        ],
+        "zones": [
+          "light-gray",
+          "green"
+        ],
+        "unreadable": [
+          "light-gray"
+        ]
+      },
+      {
+        "cell": [
+          4,
+          2
+        ],
+        "zones": [
+          "gray",
+          "brown",
+          "yellow"
+        ],
+        "unreadable": [
+          "gray"
+        ]
+      },
+      {
+        "cell": [
+          7,
+          2
+        ],
+        "zones": [
+          "light-gray",
+          "green"
+        ],
+        "unreadable": [
+          "light-gray"
+        ]
+      },
+      {
+        "cell": [
+          5,
+          3
+        ],
+        "zones": [
+          "gray",
+          "brown",
+          "yellow"
+        ],
+        "unreadable": [
+          "gray"
+        ]
+      },
+      {
+        "cell": [
+          7,
+          3
+        ],
+        "zones": [
+          "light-gray",
+          "yellow"
+        ],
+        "unreadable": [
+          "light-gray"
+        ]
+      },
+      {
+        "cell": [
+          7,
+          4
+        ],
+        "zones": [
+          "light-gray",
+          "yellow"
+        ],
+        "unreadable": [
+          "light-gray"
+        ]
+      }
+    ],
+    "grayVanishingZones(<1.2:1 in gray)": [
+      "light-green",
+      "yellow"
+    ],
+    "cellsLosingAZoneInGray": [
+      [
+        1,
+        0
+      ],
+      [
+        3,
+        0
+      ],
+      [
+        6,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        7,
+        1
+      ],
+      [
+        3,
+        2
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        7,
+        2
+      ],
+      [
+        5,
+        3
+      ],
+      [
+        7,
+        3
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        7,
+        4
+      ]
+    ],
+    "rule": "зона нечитаема в цвете, если её метку нельзя отделить от плитки по цвету (zone-contrast.json: visible=false — цвет = плитка или метки не найдены); zonesListed = zonesMarked трассы — доказательство геометрии, не читаемости"
+  },
+  "rings": {
+    "K1_host": [
+      {
+        "fighter": "f-0-hero",
+        "name": "Medusa",
+        "cell": [
+          2,
+          2
+        ],
+        "team": "own",
+        "fraction": 0.1392,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "cell": [
+          3,
+          2
+        ],
+        "team": "own",
+        "fraction": 0.2236,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "cell": [
+          1,
+          2
+        ],
+        "team": "own",
+        "fraction": 0.2433,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "cell": [
+          4,
+          2
+        ],
+        "team": "own",
+        "fraction": 0.2229,
+        "visible": true
+      },
+      {
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "cell": [
+          5,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.2207,
+        "visible": true
+      },
+      {
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "cell": [
+          5,
+          3
+        ],
+        "team": "enemy",
+        "fraction": 0.0039,
+        "visible": false
+      }
+    ],
+    "K1_joiner": [
+      {
+        "fighter": "f-0-hero",
+        "name": "Medusa",
+        "cell": [
+          2,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.242,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "cell": [
+          3,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.2214,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "cell": [
+          1,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.2177,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "cell": [
+          4,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.2052,
+        "visible": true
+      },
+      {
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "cell": [
+          5,
+          2
+        ],
+        "team": "own",
+        "fraction": 0.2475,
+        "visible": true
+      },
+      {
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "cell": [
+          5,
+          3
+        ],
+        "team": "own",
+        "fraction": 0.0068,
+        "visible": false
+      }
+    ],
+    "K3": [
+      {
+        "fighter": "f-0-hero",
+        "name": "Medusa",
+        "cell": [
+          5,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.0619,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "cell": [
+          2,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.1392,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "cell": [
+          1,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.1501,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "cell": [
+          4,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.1463,
+        "visible": true
+      },
+      {
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "cell": [
+          5,
+          3
+        ],
+        "team": "own",
+        "fraction": 0.2117,
+        "visible": true
+      },
+      {
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "cell": [
+          6,
+          3
+        ],
+        "team": "own",
+        "fraction": 0.1838,
+        "visible": true
+      }
+    ]
+  },
+  "labels": {
+    "K1_host": [
+      {
+        "kind": "label",
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "verdict": "fail",
+        "crHp": null,
+        "crName": null,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "verdict": "fail",
+        "crHp": null,
+        "crName": null,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "verdict": "fail",
+        "crHp": null,
+        "crName": null,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "verdict": "AA",
+        "crHp": null,
+        "crName": null,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "verdict": "fail",
+        "crHp": null,
+        "crName": null,
+        "tileEdgeCrosses": true
+      }
+    ],
+    "K1_joiner": [
+      {
+        "kind": "label",
+        "fighter": "f-0-hero",
+        "name": "Medusa",
+        "verdict": "AA",
+        "crHp": 16.416,
+        "crName": 16.455,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "verdict": "fail",
+        "crHp": 1.853,
+        "crName": 1.541,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "verdict": "fail",
+        "crHp": 1.735,
+        "crName": 1.495,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "verdict": "fail",
+        "crHp": 1.819,
+        "crName": 1.63,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "verdict": "AA",
+        "crHp": 16.601,
+        "crName": 16.266,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "verdict": "fail",
+        "crHp": 1.622,
+        "crName": 1.509,
+        "tileEdgeCrosses": true
+      }
+    ],
+    "K3": [
+      {
+        "kind": "label",
+        "fighter": "f-0-hero",
+        "name": "Medusa",
+        "verdict": "AA",
+        "crHp": 16.457,
+        "crName": 16.477,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "verdict": "fail",
+        "crHp": 1.703,
+        "crName": 16.267,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "verdict": "fail",
+        "crHp": 1.738,
+        "crName": 1.5,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "verdict": "fail",
+        "crHp": 1.811,
+        "crName": 1.63,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "verdict": "fail",
+        "crHp": 1.39,
+        "crName": 1.512,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "verdict": "fail",
+        "crHp": 1.54,
+        "crName": 15.817,
+        "tileEdgeCrosses": true
+      }
+    ],
+    "K3_damage": [
+      {
+        "kind": "label",
+        "fighter": "f-0-hero",
+        "name": "Medusa",
+        "verdict": "fail",
+        "crHp": 1.99,
+        "crName": 1.653,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "verdict": "fail",
+        "crHp": 1.828,
+        "crName": 1.535,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "verdict": "fail",
+        "crHp": 1.708,
+        "crName": 1.478,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "verdict": "fail",
+        "crHp": 1.827,
+        "crName": 1.716,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "verdict": "AA",
+        "crHp": 16.309,
+        "crName": 16.154,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "verdict": "fail",
+        "crHp": 1.605,
+        "crName": 1.504,
+        "tileEdgeCrosses": true
+      },
+      {
+        "kind": "damage",
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "verdict": "fail",
+        "crHp": null,
+        "crName": null,
+        "tileEdgeCrosses": true
+      }
+    ]
+  },
+  "classify": {
+    "exit": 0,
+    "frames": [
+      {
+        "frame": "phase2-board-host-1920x1080.png",
+        "class": "packaged-live",
+        "grade": "strict",
+        "rejected": false
+      },
+      {
+        "frame": "phase2-board-joiner-1920x1080.png",
+        "class": "packaged-live",
+        "grade": "strict",
+        "rejected": false
+      },
+      {
+        "frame": "s09-combat-resolve-revealed.png",
+        "class": "packaged-live",
+        "grade": "strict",
+        "rejected": false
+      },
+      {
+        "frame": "s09-damage-number.png",
+        "class": "packaged-live",
+        "grade": "strict",
+        "rejected": false
+      }
+    ]
+  },
+  "checklist": {
+    "exit": 0,
+    "md": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/analysis/sherwood-forest-8x5/qa010-checklist.md",
+    "statusCounts": {
+      "открыто (ручная проверка)": 10,
+      "нет данных: декор — прокси (нужна stencil- или ручная маска L3)": 1,
+      "нет данных": 1,
+      "измерено: fail (предложенный порог)": 1,
+      "измерено: неполно": 2,
+      "суррогат (агент) — до ответа пользователя": 1,
+      "не годится для приёмки: K2": 1,
+      "ок": 1
+    }
+  }
+}

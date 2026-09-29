@@ -230,6 +230,86 @@ bool FS08BoardModel::BuildManeuverPath(const FS08BoardModel& Board,
   return OutPath.Num() > 0;
 }
 
+bool FS08BoardModel::PickApproachDestination(const FS08BoardModel& Board,
+                                             const TArray<FS08BoardFighter>& Fighters,
+                                             const FString& MoverId, int32 Allowance,
+                                             FIntPoint& OutCell, int32& OutFromDistance,
+                                             int32& OutToDistance, int32& OutSteps) {
+  OutFromDistance = OutToDistance = MAX_int32;
+  OutSteps = 0;
+  const FS08BoardFighter* Mover = nullptr;
+  for (const FS08BoardFighter& Fighter : Fighters) {
+    if (Fighter.Id == MoverId) {
+      Mover = &Fighter;
+      break;
+    }
+  }
+  if (!Mover || !Mover->IsAlive() || Board.Width <= 0 || Board.Height <= 0) return false;
+
+  // Terrain distance field from every living enemy (multi-source BFS). The
+  // enemy's own cell is the source even though it is occupied; fighters do
+  // not block this field (they move), only terrain does.
+  TArray<int32> Dist;
+  Dist.Init(MAX_int32, Board.Width * Board.Height);
+  TArray<FIntPoint> Queue;
+  for (const FS08BoardFighter& Enemy : Fighters) {
+    if (Enemy.OwnerId == Mover->OwnerId || !Enemy.IsAlive()) continue;
+    if (!Board.CellAt(Enemy.X, Enemy.Y)) continue;
+    const int32 Index = Enemy.Y * Board.Width + Enemy.X;
+    if (Dist[Index] == 0) continue;
+    Dist[Index] = 0;
+    Queue.Add(FIntPoint(Enemy.X, Enemy.Y));
+  }
+  static const int32 Dx[4] = {1, -1, 0, 0};
+  static const int32 Dy[4] = {0, 0, 1, -1};
+  for (int32 Head = 0; Head < Queue.Num(); ++Head) {
+    const FIntPoint P = Queue[Head];
+    const int32 Next = Dist[P.Y * Board.Width + P.X] + 1;
+    for (int32 Dir = 0; Dir < 4; ++Dir) {
+      const int32 NX = P.X + Dx[Dir], NY = P.Y + Dy[Dir];
+      const FS08Cell* Cell = Board.CellAt(NX, NY);
+      if (!Cell || !Cell->IsPassable()) continue;
+      int32& D = Dist[NY * Board.Width + NX];
+      if (D <= Next) continue;
+      D = Next;
+      Queue.Add(FIntPoint(NX, NY));
+    }
+  }
+  auto DistAt = [&](int32 X, int32 Y) -> int32 {
+    return Board.CellAt(X, Y) ? Dist[Y * Board.Width + X] : MAX_int32;
+  };
+  OutFromDistance = DistAt(Mover->X, Mover->Y);
+
+  const TSet<uint64> Reachable = ComputeReachableCells(Board, Fighters, MoverId, Allowance);
+  bool bFound = false;
+  FIntPoint Best(-1, -1);
+  int32 BestDist = MAX_int32, BestSteps = MAX_int32;
+  for (const uint64 Key : Reachable) {
+    const int32 X = static_cast<int32>(static_cast<uint32>(Key >> 32));
+    const int32 Y = static_cast<int32>(static_cast<uint32>(Key & 0xffffffffull));
+    if (X == Mover->X && Y == Mover->Y) continue;
+    const int32 D = DistAt(X, Y);
+    if (D == MAX_int32 || D >= OutFromDistance) continue; // must strictly improve
+    TArray<FIntPoint> Path;
+    if (!BuildManeuverPath(Board, Fighters, MoverId, Allowance, X, Y, Path)) continue;
+    const int32 Steps = Path.Num();
+    const bool bBetter = D < BestDist ||
+        (D == BestDist && (Steps < BestSteps ||
+         (Steps == BestSteps && (Y < Best.Y || (Y == Best.Y && X < Best.X)))));
+    if (bBetter) {
+      bFound = true;
+      Best = FIntPoint(X, Y);
+      BestDist = D;
+      BestSteps = Steps;
+    }
+  }
+  if (!bFound) return false;
+  OutCell = Best;
+  OutToDistance = BestDist;
+  OutSteps = BestSteps;
+  return true;
+}
+
 bool FS08BoardModel::DecodeFighters(const TSharedPtr<FJsonValue>& FightersValue,
                                     TArray<FS08BoardFighter>& OutFighters) {
   OutFighters.Reset();

@@ -2602,36 +2602,30 @@ void AS08FlowGameMode::RunS09Auto() {
       }
       if (!Hero) return;
       if (HasPlan(TEXT("attack"))) {
-        // Greedy approach: step to the reachable neighbor that minimizes the
-        // distance to the NEAREST living enemy (StepOneCell's fixed order can
-        // walk away and never reach melee adjacency).
-        const FS08BoardFighter* BestTarget = nullptr;
-        int32 BestDist = TNumericLimits<int32>::Max();
-        for (const FS08BoardFighter& Enemy : Fighters) {
-          if (Enemy.OwnerId == CommandUi.ViewerId || !Enemy.IsAlive()) continue;
-          const int32 Dist = FMath::Abs(Enemy.X - Hero->X) + FMath::Abs(Enemy.Y - Hero->Y);
-          if (Dist < BestDist) { BestDist = Dist; BestTarget = &Enemy; }
-        }
-        if (BestTarget) {
-          CommandUi.SelectFighter(Hero->Id, Snap, BoardModel, Fighters);
-          static const int32 Dx[4] = {1, -1, 0, 0};
-          static const int32 Dy[4] = {0, 0, 1, -1};
-          FString Reason;
-          int32 BestScore = TNumericLimits<int32>::Max();
-          bool bStepped = false;
-          for (int32 Dir = 0; Dir < 4; ++Dir) {
-            const int32 NX = Hero->X + Dx[Dir], NY = Hero->Y + Dy[Dir];
-            const int32 Score = FMath::Abs(BestTarget->X - NX) + FMath::Abs(BestTarget->Y - NY);
-            if (Score < BestScore &&
-                CommandUi.SetDestination(Hero->Id, NX, NY, Snap, BoardModel, Fighters,
-                                         Reason)) {
-              BestScore = Score;
-              bStepped = true;
-            }
-          }
-          if (!bStepped) {
-            FS08Trace::Write(TEXT("S09AUTO approach: no improving legal step"));
-          }
+        // Multi-step approach (stage 3 T5.2): the legal destination within the
+        // hero's movement that is closest (terrain distance) to the NEAREST
+        // living enemy - allies are pass-through, so a hero boxed in by its
+        // own sidekicks and an obstacle still gets out (T.Rex art fixture,
+        // T3.2 attempt). The former one-cell greedy step only tried the four
+        // neighbours and parked the hero there for the whole game.
+        CommandUi.SelectFighter(Hero->Id, Snap, BoardModel, Fighters);
+        FIntPoint Dest(-1, -1);
+        int32 FromDist = 0, ToDist = 0, Steps = 0;
+        FString Reason;
+        const bool bPicked = FS08BoardModel::PickApproachDestination(
+            BoardModel, Fighters, Hero->Id, Hero->Movement, Dest, FromDist, ToDist, Steps);
+        if (bPicked &&
+            CommandUi.SetDestination(Hero->Id, Dest.X, Dest.Y, Snap, BoardModel, Fighters,
+                                     Reason)) {
+          FS08Trace::Write(FString::Printf(
+              TEXT("S09AUTO approach fighter=%s from=(%d,%d) to=(%d,%d) steps=%d allowance=%d enemyDist=%d->%d"),
+              *Hero->Id, Hero->X, Hero->Y, Dest.X, Dest.Y, Steps, Hero->Movement, FromDist, ToDist));
+        } else if (bPicked) {
+          FS08Trace::Write(FString::Printf(
+              TEXT("S09AUTO approach: destination (%d,%d) refused by the draft (%s)"), Dest.X, Dest.Y,
+              *Reason));
+        } else {
+          FS08Trace::Write(TEXT("S09AUTO approach: no improving legal step"));
         }
       } else {
         StepOneCell(CommandUi, Snap, BoardModel, Fighters, Hero->Id);

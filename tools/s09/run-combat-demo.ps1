@@ -23,7 +23,19 @@
   # src=flag'). The S09 combat plan itself is unchanged.
   [switch]$ArtPreviewSelectOwnHero,
   [double]$ArtPreviewFocusZoom = 0,
-  [ValidateRange(0, 600)][int]$ArtPreviewShotAfter = 0
+  [ValidateRange(0, 600)][int]$ArtPreviewShotAfter = 0,
+  # Stage 3 T5.2 port of the W4-A render reference flags of run-phase2-demo
+  # (user decision 2026-09-28: DX12/SM6 + Lumen, High). Both clients get
+  # -S08RenderPreset=<preset> (None = keep the saved GameUserSettings, the
+  # pre-T5.2 behaviour of this script); every SHOT of the S08/S09 clients
+  # carries a 'RENDER tag=SHOT ... reference=0|1' fingerprint.
+  [ValidateSet('None', 'Low', 'Medium', 'High', 'Epic')][string]$ClientRenderPreset = 'High',
+  # Fail the run unless EVERY SHOT fingerprint of both clients is on the
+  # reference (docs/art-pipeline/render-reference.json; K3 acceptance runs).
+  [switch]$RequireRenderReference,
+  # Opt-in per-client frame timing in the trace (PERF config/window/summary),
+  # as run-phase2-demo -ClientPerf. Measurement only.
+  [switch]$ClientPerf
 )
 # GD-034 two-client packaged COMBAT demo against the S09 worktree-local
 # backend (attack -> defense -> resolve against authoritative snapshots):
@@ -262,6 +274,8 @@ function Invoke-CombatDemo {
   if ($ArtPreview) { $common += '-ArtPreview' }
   if ($FullHd) { $common += '-ForceRes' }
   if ($MedusaVariantExplicit) { $common += "-ArtPreviewMedusaVariant=$ArtPreviewMedusaVariant" }
+  if ($ClientRenderPreset -ne 'None') { $common += "-S08RenderPreset=$ClientRenderPreset" }
+  if ($ClientPerf) { $common += '-S08Perf' }
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
     "-S09Flow", "-S09Combat=attack", "-S09ShotDir=$hostShots", "-S08ExitAfter=$RunSeconds")
@@ -503,6 +517,33 @@ function Invoke-CombatDemo {
     if ($ArtPreviewSelectOwnHero) {
       Assert-Trace $hostTrace @('ARTPREVIEW selection ownHero=1 selected=1', 'INPUT select src=flag') 'host flag selection'
     }
+    # T5.2: W4-A render reference on every evidence SHOT of both clients that
+    # shows the board. The lobby-return shot is taken after leaving the room:
+    # no board and no art profile, so its fingerprint reports noArtProfile by
+    # design and is listed, not gated.
+    foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+      $shots = New-Object System.Collections.Generic.List[object]
+      $lastRef = $null; $lastLine = $null
+      foreach ($line in (Get-Content -LiteralPath $pair[1])) {
+        if ($line -match 'RENDER tag=SHOT .* reference=(\d)') { $lastRef = $Matches[1]; $lastLine = $line; continue }
+        if ($line -match 'SHOT requested: .*[\\/]([^\\/]+\.png)\s*$') {
+          $shots.Add([pscustomobject]@{ name = $Matches[1]; ref = $lastRef; line = $lastLine })
+          $lastRef = $null; $lastLine = $null
+        }
+      }
+      $gated = @($shots | Where-Object { $_.name -ne 's09-lobby-return.png' })
+      $off = @($gated | Where-Object { $_.ref -ne '1' })
+      $lobby = @($shots | Where-Object { $_.name -eq 's09-lobby-return.png' })
+      Write-Output ("render fingerprint {0}: shots={1} gated={2} offReference={3} lobbyShots={4} preset={5}" -f $pair[0], $shots.Count, $gated.Count, $off.Count, $lobby.Count, $ClientRenderPreset)
+      if ($RequireRenderReference) {
+        if ($gated.Count -eq 0) { throw "$($pair[0]) trace has no board SHOT" }
+        if ($off.Count -gt 0) { throw "$($pair[0]) SHOT $($off[0].name) is off the render reference: $(if ($off[0].line) { $off[0].line } else { 'no RENDER line in its SHOT block' })" }
+      }
+      # The duel flow exits right after GAME_OVER -> result -> lobby, before -S08ExitAfter,
+      # so the exit-time 'PERF summary' lines are not guaranteed here: gate on the
+      # config line and the periodic 5 s 'PERF window' samples.
+      if ($ClientPerf) { Assert-Trace $pair[1] @('PERF config', 'PERF window t=') "$($pair[0]) perf" }
+    }
     if ($ArtPreviewFocusZoom -gt 0) {
       Assert-Trace $hostTrace @('ARTPREVIEW camera focus requested zoom=', 'INPUT zoom src=flag', 'CAMERA focus src=flag') 'host focus zoom'
     }
@@ -632,6 +673,7 @@ function Invoke-CombatDemo {
       verdict = "GD-034 P1: live attack->defense->resolve two-client demo, defense/resolve/result state-marker shots at exact ${ShotWidth}x${ShotHeight} with swap/negative controls, role-gated traces, privacy-clean logs, seq convergence; artPreview=$([bool]$ArtPreview); clientFpsCap=$ClientFps"
       artBoard = if ($ArtBoard) { [ordered]@{ boardId = $ArtPreviewBoardId; profile = $ArtBoard.id; size = $ArtBoardSize; light = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture } } else { $null }
       artPreviewFlags = [ordered]@{ medusaVariant = $(if ($MedusaVariantExplicit) { $ArtPreviewMedusaVariant } else { '(default)' }); selectOwnHero = [bool]$ArtPreviewSelectOwnHero; focusZoom = $ArtPreviewFocusZoom; shotAfter = $ArtPreviewShotAfter }
+      render = [ordered]@{ clientRenderPreset = $ClientRenderPreset; requireRenderReference = [bool]$RequireRenderReference; clientPerf = [bool]$ClientPerf }
       revealProof = $RevealProof
       files   = @()
     }

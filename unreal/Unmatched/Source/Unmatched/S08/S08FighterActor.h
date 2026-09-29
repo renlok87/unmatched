@@ -115,6 +115,7 @@ private:
   float FigureHeightUU = 120.0f;
   bool bCapsuleTraced = false;
   bool bAllMedusaTraced = false;
+  bool bMedusaMaterialsTraced = false;
   void ApplyLabelVisibility();
 
   FS08BoardFighter Fighter;

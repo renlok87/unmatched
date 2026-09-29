@@ -1,0 +1,1947 @@
+{
+  "schema": "unmatched.t52-zone-contrast/1",
+  "status": "измерено",
+  "thresholds": {
+    "method": "пиксели меток зоны = пиксели в проекции клеток этой зоны (квад клетки, трасса SHOT, qa010 projection), чей цвет в CIELAB ближе ΔE76 ≤ markDeltaE к цвету зоны из S08ArtBoardProfiles.json (игровой слой unlit + EyeAdaptationInverse рисует байты профиля, T4.2 §2). Фон = остальные пиксели тех же клеток. Контраст — WCAG 2.x по медианам (относительная яркость в линейном свете) и ΔY′ Rec.709; варианты: цвет, серый (qa010 derive), deuteranopia (Machado 2009, qa010 derive)",
+    "markDeltaE": 12.0,
+    "minMarkPixelsPerZoneCell": 20,
+    "markVsTileMinContrast": 3.0,
+    "markVsTileSource": "по аналогии с 02 стр. 864 (≥ 3:1 для иконок, ПРЕДЛОЖЕНИЕ); для штрихов/глифов зон нормы нет",
+    "boundaries": {
+      "method": "пара зон (za, zb) — граница, если есть две ортогонально соседние проходимые клетки, у одной из которых есть za и нет zb, а у другой — наоборот. Для пары: ΔE76 медианных цветов меток (цвет, deuteranopia), |ΔY′| (серый), различие формы (штрих или глиф из профиля)",
+      "colorMinDeltaE76": 20.0,
+      "deutMinDeltaE76": 15.0,
+      "grayMinDeltaY": 20.0,
+      "verdict": "pass — форма различается (штрих или глиф) И метки обеих зон читаются на фоне (markVsTileMinContrast) в проверяемом варианте; «только формой» — pass по форме при ΔE/ΔY′ ниже порога (10 QA-010: цвет не единственный признак); fail — форма совпадает и цветового/яркостного отличия нет, ИЛИ метка одной из зон не читается на фоне",
+      "source": "10 QA-010 стр. 132 «зоны (цвет+глиф+буква, симуляция deuteranopia)» — НОРМАТИВ как условие; числа — ПРЕДЛОЖЕНИЕ T5.2 (ΔE76 ≈ 2,3 — порог JND; 20 — «явно разные цвета» UI; 15 — ослабленный для симуляции; ΔY′ 20/255 ≈ 8 %)"
+    }
+  },
+  "frames": {
+    "K1_joiner": {
+      "projection": {
+        "mode": "trace",
+        "camera_pos": [
+          0.0,
+          1107.0,
+          1582.0
+        ],
+        "camera_rot": [
+          -55.0,
+          -90.0,
+          0.0
+        ],
+        "hfov_deg": 35.0,
+        "viewport": [
+          1920,
+          1080
+        ],
+        "validation_pairs": 6,
+        "residual_max_px_trace_camera": 1.342,
+        "residual_max_px_used_camera": 1.342,
+        "tolerance_px": 2.0,
+        "ok": true,
+        "reason": "ok"
+      },
+      "occupied": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "zones": {
+        "blue": {
+          "cells": 15,
+          "freeCellsUsed": 11,
+          "hex": "#3B78D8",
+          "stroke": "solid",
+          "glyph": "diamond",
+          "tileVsZoneColourDE76": 54.08,
+          "colourClashWithTile": false,
+          "markPixels": 21,
+          "markPixelsPerCellMedian": 0.0,
+          "markPixelsPerCellMin": 0,
+          "variants": {
+            "color": {
+              "mark": {
+                "pixels": 21,
+                "medianRgb": [
+                  55.0,
+                  117.0,
+                  194.0
+                ],
+                "medianRelLum": 0.17443,
+                "medianLuma": 109.24,
+                "lab": [
+                  48.79,
+                  6.08,
+                  -46.07
+                ]
+              },
+              "tile": {
+                "pixels": 25800,
+                "medianRgb": [
+                  140.0,
+                  143.0,
+                  148.0
+                ],
+                "medianRelLum": 0.27358,
+                "medianLuma": 142.72,
+                "lab": [
+                  59.3,
+                  -0.09,
+                  -3.03
+                ]
+              },
+              "wcag": 1.442,
+              "dLuma": -33.48,
+              "dE76": 44.73,
+              "pass": false
+            },
+            "gray": {
+              "mark": {
+                "pixels": 21,
+                "medianRgb": [
+                  109.0,
+                  109.0,
+                  109.0
+                ],
+                "medianRelLum": 0.15293,
+                "medianLuma": 109.0,
+                "lab": [
+                  46.03,
+                  -0.0,
+                  0.0
+                ]
+              },
+              "tile": {
+                "pixels": 25800,
+                "medianRgb": [
+                  143.0,
+                  143.0,
+                  143.0
+                ],
+                "medianRelLum": 0.27468,
+                "medianLuma": 143.0,
+                "lab": [
+                  59.4,
+                  -0.0,
+                  0.0
+                ]
+              },
+              "wcag": 1.6,
+              "dLuma": -34.0,
+              "dE76": 13.37,
+              "pass": false
+            },
+            "deuteranopia": {
+              "mark": {
+                "pixels": 21,
+                "medianRgb": [
+                  60.0,
+                  110.0,
+                  192.0
+                ],
+                "medianRelLum": 0.15902,
+                "medianLuma": 105.08,
+                "lab": [
+                  46.86,
+                  10.47,
+                  -47.98
+                ]
+              },
+              "tile": {
+                "pixels": 25800,
+                "medianRgb": [
+                  141.0,
+                  142.0,
+                  148.0
+                ],
+                "medianRelLum": 0.27135,
+                "medianLuma": 142.16,
+                "lab": [
+                  59.11,
+                  0.83,
+                  -3.31
+                ]
+              },
+              "wcag": 1.537,
+              "dLuma": -37.08,
+              "dE76": 47.31,
+              "pass": false
+            }
+          },
+          "visible": false
+        },
+        "red": {
+          "cells": 15,
+          "freeCellsUsed": 13,
+          "hex": "#D8453B",
+          "stroke": "dash3",
+          "glyph": "bars2",
+          "tileVsZoneColourDE76": 70.28,
+          "colourClashWithTile": false,
+          "markPixels": 16378,
+          "markPixelsPerCellMedian": 1215.0,
+          "markPixelsPerCellMin": 1163,
+          "variants": {
+            "color": {
+              "mark": {
+                "pixels": 16378,
+                "medianRgb": [
+                  206.0,
+                  66.0,
+                  54.0
+                ],
+                "medianRelLum": 0.17419,
+                "medianLuma": 95.11,
+                "lab": [
+                  48.62,
+                  54.43,
+                  38.17
+                ]
+              },
+              "tile": {
+                "pixels": 41713,
+                "medianRgb": [
+                  131.0,
+                  134.0,
+                  141.0
+                ],
+                "medianRelLum": 0.239,
+                "medianLuma": 134.14,
+                "lab": [
+                  55.89,
+                  0.33,
+                  -4.13
+                ]
+              },
+              "wcag": 1.289,
+              "dLuma": -39.03,
+              "dE76": 69.06,
+              "pass": false
+            },
+            "gray": {
+              "mark": {
+                "pixels": 16378,
+                "medianRgb": [
+                  95.0,
+                  95.0,
+                  95.0
+                ],
+                "medianRelLum": 0.11444,
+                "medianLuma": 95.0,
+                "lab": [
+                  40.32,
+                  -0.0,
+                  0.0
+                ]
+              },
+              "tile": {
+                "pixels": 41713,
+                "medianRgb": [
+                  134.0,
+                  134.0,
+                  134.0
+                ],
+                "medianRelLum": 0.2384,
+                "medianLuma": 134.0,
+                "lab": [
+                  55.93,
+                  -0.0,
+                  0.0
+                ]
+              },
+              "wcag": 1.754,
+              "dLuma": -39.0,
+              "dE76": 15.61,
+              "pass": false
+            },
+            "deuteranopia": {
+              "mark": {
+                "pixels": 16378,
+                "medianRgb": [
+                  141.0,
+                  127.0,
+                  49.0
+                ],
+                "medianRelLum": 0.21055,
+                "medianLuma": 124.27,
+                "lab": [
+                  53.02,
+                  -4.48,
+                  43.05
+                ]
+              },
+              "tile": {
+                "pixels": 41713,
+                "medianRgb": [
+                  132.0,
+                  134.0,
+                  141.0
+                ],
+                "medianRelLum": 0.2384,
+                "medianLuma": 134.0,
+                "lab": [
+                  55.97,
+                  0.69,
+                  -4.0
+                ]
+              },
+              "wcag": 1.107,
+              "dLuma": -9.73,
+              "dE76": 47.43,
+              "pass": false
+            }
+          },
+          "visible": true
+        }
+      },
+      "boundaries": [
+        {
+          "pair": [
+            "blue",
+            "red"
+          ],
+          "edges": 5,
+          "shapeDiffers": true,
+          "strokes": [
+            "solid",
+            "dash3"
+          ],
+          "glyphs": [
+            "diamond",
+            "bars2"
+          ],
+          "variants": {
+            "color": {
+              "dE76": 97.13,
+              "dLuma": 14.13,
+              "byColor": true,
+              "readable": false,
+              "verdict": "fail",
+              "why": "метка не читается на плитке: blue 1.442:1, red 1.289:1"
+            },
+            "gray": {
+              "dE76": 5.71,
+              "dLuma": 14.0,
+              "byColor": false,
+              "readable": false,
+              "verdict": "fail",
+              "why": "метка не читается на плитке: blue 1.6:1, red 1.754:1"
+            },
+            "deuteranopia": {
+              "dE76": 92.45,
+              "dLuma": 19.19,
+              "byColor": true,
+              "readable": false,
+              "verdict": "fail",
+              "why": "метка не читается на плитке: blue 1.537:1, red 1.107:1"
+            }
+          }
+        }
+      ],
+      "tileHalfUU": 18.0,
+      "diagnosticMarkDeltaE25": {
+        "status": "диагностика вне зарегистрированного метода (T5.2 после съёмки)",
+        "markDeltaE": 25.0,
+        "zones": {
+          "blue": {
+            "cells": 15,
+            "freeCellsUsed": 11,
+            "hex": "#3B78D8",
+            "stroke": "solid",
+            "glyph": "diamond",
+            "tileVsZoneColourDE76": 54.08,
+            "colourClashWithTile": false,
+            "markPixels": 13900,
+            "markPixelsPerCellMedian": 1284.0,
+            "markPixelsPerCellMin": 959,
+            "variants": {
+              "color": {
+                "mark": {
+                  "pixels": 13900,
+                  "medianRgb": [
+                    52.0,
+                    130.0,
+                    204.0
+                  ],
+                  "medianRelLum": 0.21103,
+                  "medianLuma": 119.12,
+                  "lab": [
+                    53.01,
+                    1.4,
+                    -45.09
+                  ]
+                },
+                "tile": {
+                  "pixels": 25800,
+                  "medianRgb": [
+                    140.0,
+                    143.0,
+                    148.0
+                  ],
+                  "medianRelLum": 0.27358,
+                  "medianLuma": 142.72,
+                  "lab": [
+                    59.3,
+                    -0.09,
+                    -3.03
+                  ]
+                },
+                "wcag": 1.24,
+                "dLuma": -23.6,
+                "dE76": 42.55,
+                "pass": false
+              },
+              "gray": {
+                "mark": {
+                  "pixels": 13900,
+                  "medianRgb": [
+                    119.0,
+                    119.0,
+                    119.0
+                  ],
+                  "medianRelLum": 0.18447,
+                  "medianLuma": 119.0,
+                  "lab": [
+                    50.03,
+                    -0.0,
+                    0.0
+                  ]
+                },
+                "tile": {
+                  "pixels": 25800,
+                  "medianRgb": [
+                    143.0,
+                    143.0,
+                    143.0
+                  ],
+                  "medianRelLum": 0.27468,
+                  "medianLuma": 143.0,
+                  "lab": [
+                    59.4,
+                    -0.0,
+                    0.0
+                  ]
+                },
+                "wcag": 1.385,
+                "dLuma": -24.0,
+                "dE76": 9.37,
+                "pass": false
+              },
+              "deuteranopia": {
+                "mark": {
+                  "pixels": 13900,
+                  "medianRgb": [
+                    74.0,
+                    120.0,
+                    203.0
+                  ],
+                  "medianRelLum": 0.19201,
+                  "medianLuma": 116.21,
+                  "lab": [
+                    50.92,
+                    10.51,
+                    -47.79
+                  ]
+                },
+                "tile": {
+                  "pixels": 25800,
+                  "medianRgb": [
+                    141.0,
+                    142.0,
+                    148.0
+                  ],
+                  "medianRelLum": 0.27135,
+                  "medianLuma": 142.16,
+                  "lab": [
+                    59.11,
+                    0.83,
+                    -3.31
+                  ]
+                },
+                "wcag": 1.328,
+                "dLuma": -25.95,
+                "dE76": 46.25,
+                "pass": false
+              }
+            },
+            "visible": true
+          },
+          "red": {
+            "cells": 15,
+            "freeCellsUsed": 13,
+            "hex": "#D8453B",
+            "stroke": "dash3",
+            "glyph": "bars2",
+            "tileVsZoneColourDE76": 70.28,
+            "colourClashWithTile": false,
+            "markPixels": 18149,
+            "markPixelsPerCellMedian": 1374.0,
+            "markPixelsPerCellMin": 1319,
+            "variants": {
+              "color": {
+                "mark": {
+                  "pixels": 18149,
+                  "medianRgb": [
+                    206.0,
+                    67.0,
+                    54.0
+                  ],
+                  "medianRelLum": 0.17303,
+                  "medianLuma": 95.61,
+                  "lab": [
+                    48.77,
+                    54.03,
+                    38.33
+                  ]
+                },
+                "tile": {
+                  "pixels": 41713,
+                  "medianRgb": [
+                    131.0,
+                    134.0,
+                    141.0
+                  ],
+                  "medianRelLum": 0.239,
+                  "medianLuma": 134.14,
+                  "lab": [
+                    55.89,
+                    0.33,
+                    -4.13
+                  ]
+                },
+                "wcag": 1.296,
+                "dLuma": -38.53,
+                "dE76": 68.83,
+                "pass": false
+              },
+              "gray": {
+                "mark": {
+                  "pixels": 18149,
+                  "medianRgb": [
+                    96.0,
+                    96.0,
+                    96.0
+                  ],
+                  "medianRelLum": 0.11697,
+                  "medianLuma": 96.0,
+                  "lab": [
+                    40.73,
+                    -0.0,
+                    0.0
+                  ]
+                },
+                "tile": {
+                  "pixels": 41713,
+                  "medianRgb": [
+                    134.0,
+                    134.0,
+                    134.0
+                  ],
+                  "medianRelLum": 0.2384,
+                  "medianLuma": 134.0,
+                  "lab": [
+                    55.93,
+                    -0.0,
+                    0.0
+                  ]
+                },
+                "wcag": 1.727,
+                "dLuma": -38.0,
+                "dE76": 15.2,
+                "pass": false
+              },
+              "deuteranopia": {
+                "mark": {
+                  "pixels": 18149,
+                  "medianRgb": [
+                    141.0,
+                    127.0,
+                    49.0
+                  ],
+                  "medianRelLum": 0.21055,
+                  "medianLuma": 124.27,
+                  "lab": [
+                    53.02,
+                    -4.48,
+                    43.05
+                  ]
+                },
+                "tile": {
+                  "pixels": 41713,
+                  "medianRgb": [
+                    132.0,
+                    134.0,
+                    141.0
+                  ],
+                  "medianRelLum": 0.2384,
+                  "medianLuma": 134.0,
+                  "lab": [
+                    55.97,
+                    0.69,
+                    -4.0
+                  ]
+                },
+                "wcag": 1.107,
+                "dLuma": -9.73,
+                "dE76": 47.43,
+                "pass": false
+              }
+            },
+            "visible": true
+          }
+        },
+        "boundaries": [
+          {
+            "pair": [
+              "blue",
+              "red"
+            ],
+            "edges": 5,
+            "shapeDiffers": true,
+            "strokes": [
+              "solid",
+              "dash3"
+            ],
+            "glyphs": [
+              "diamond",
+              "bars2"
+            ],
+            "variants": {
+              "color": {
+                "dE76": 98.73,
+                "dLuma": 23.51,
+                "byColor": true,
+                "readable": false,
+                "verdict": "fail",
+                "why": "метка не читается на плитке: blue 1.24:1, red 1.296:1"
+              },
+              "gray": {
+                "dE76": 9.3,
+                "dLuma": 23.0,
+                "byColor": true,
+                "readable": false,
+                "verdict": "fail",
+                "why": "метка не читается на плитке: blue 1.385:1, red 1.727:1"
+              },
+              "deuteranopia": {
+                "dE76": 92.09,
+                "dLuma": 8.06,
+                "byColor": true,
+                "readable": false,
+                "verdict": "fail",
+                "why": "метка не читается на плитке: blue 1.328:1, red 1.107:1"
+              }
+            }
+          }
+        ],
+        "tileHalfUU": 18.0
+      }
+    },
+    "K1_host": {
+      "projection": {
+        "mode": "trace",
+        "camera_pos": [
+          0.0,
+          1107.0,
+          1582.0
+        ],
+        "camera_rot": [
+          -55.0,
+          -90.0,
+          0.0
+        ],
+        "hfov_deg": 35.0,
+        "viewport": [
+          1920,
+          1080
+        ],
+        "validation_pairs": 6,
+        "residual_max_px_trace_camera": 1.342,
+        "residual_max_px_used_camera": 1.342,
+        "tolerance_px": 2.0,
+        "ok": true,
+        "reason": "ok"
+      },
+      "occupied": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          3,
+          2
+        ],
+        [
+          3,
+          3
+        ]
+      ],
+      "zones": {
+        "blue": {
+          "cells": 15,
+          "freeCellsUsed": 11,
+          "hex": "#3B78D8",
+          "stroke": "solid",
+          "glyph": "diamond",
+          "tileVsZoneColourDE76": 54.07,
+          "colourClashWithTile": false,
+          "markPixels": 19,
+          "markPixelsPerCellMedian": 0.0,
+          "markPixelsPerCellMin": 0,
+          "variants": {
+            "color": {
+              "mark": {
+                "pixels": 19,
+                "medianRgb": [
+                  55.0,
+                  117.0,
+                  194.0
+                ],
+                "medianRelLum": 0.17385,
+                "medianLuma": 109.31,
+                "lab": [
+                  48.79,
+                  6.08,
+                  -46.07
+                ]
+              },
+              "tile": {
+                "pixels": 25800,
+                "medianRgb": [
+                  140.0,
+                  143.0,
+                  148.0
+                ],
+                "medianRelLum": 0.27327,
+                "medianLuma": 142.65,
+                "lab": [
+                  59.3,
+                  -0.09,
+                  -3.03
+                ]
+              },
+              "wcag": 1.444,
+              "dLuma": -33.34,
+              "dE76": 44.73,
+              "pass": false
+            },
+            "gray": {
+              "mark": {
+                "pixels": 19,
+                "medianRgb": [
+                  109.0,
+                  109.0,
+                  109.0
+                ],
+                "medianRelLum": 0.15293,
+                "medianLuma": 109.0,
+                "lab": [
+                  46.03,
+                  -0.0,
+                  0.0
+                ]
+              },
+              "tile": {
+                "pixels": 25800,
+                "medianRgb": [
+                  143.0,
+                  143.0,
+                  143.0
+                ],
+                "medianRelLum": 0.27468,
+                "medianLuma": 143.0,
+                "lab": [
+                  59.4,
+                  -0.0,
+                  0.0
+                ]
+              },
+              "wcag": 1.6,
+              "dLuma": -34.0,
+              "dE76": 13.37,
+              "pass": false
+            },
+            "deuteranopia": {
+              "mark": {
+                "pixels": 19,
+                "medianRgb": [
+                  60.0,
+                  110.0,
+                  192.0
+                ],
+                "medianRelLum": 0.15874,
+                "medianLuma": 104.94,
+                "lab": [
+                  46.86,
+                  10.47,
+                  -47.98
+                ]
+              },
+              "tile": {
+                "pixels": 25800,
+                "medianRgb": [
+                  141.0,
+                  142.0,
+                  148.0
+                ],
+                "medianRelLum": 0.27123,
+                "medianLuma": 142.15,
+                "lab": [
+                  59.11,
+                  0.83,
+                  -3.31
+                ]
+              },
+              "wcag": 1.539,
+              "dLuma": -37.21,
+              "dE76": 47.31,
+              "pass": false
+            }
+          },
+          "visible": false
+        },
+        "red": {
+          "cells": 15,
+          "freeCellsUsed": 13,
+          "hex": "#D8453B",
+          "stroke": "dash3",
+          "glyph": "bars2",
+          "tileVsZoneColourDE76": 70.28,
+          "colourClashWithTile": false,
+          "markPixels": 16560,
+          "markPixelsPerCellMedian": 1215.0,
+          "markPixelsPerCellMin": 1176,
+          "variants": {
+            "color": {
+              "mark": {
+                "pixels": 16560,
+                "medianRgb": [
+                  206.0,
+                  67.0,
+                  54.0
+                ],
+                "medianRelLum": 0.17419,
+                "medianLuma": 95.25,
+                "lab": [
+                  48.77,
+                  54.03,
+                  38.33
+                ]
+              },
+              "tile": {
+                "pixels": 41713,
+                "medianRgb": [
+                  131.0,
+                  134.0,
+                  141.0
+                ],
+                "medianRelLum": 0.23859,
+                "medianLuma": 134.01,
+                "lab": [
+                  55.89,
+                  0.33,
+                  -4.13
+                ]
+              },
+              "wcag": 1.287,
+              "dLuma": -38.76,
+              "dE76": 68.83,
+              "pass": false
+            },
+            "gray": {
+              "mark": {
+                "pixels": 16560,
+                "medianRgb": [
+                  95.0,
+                  95.0,
+                  95.0
+                ],
+                "medianRelLum": 0.11444,
+                "medianLuma": 95.0,
+                "lab": [
+                  40.32,
+                  -0.0,
+                  0.0
+                ]
+              },
+              "tile": {
+                "pixels": 41713,
+                "medianRgb": [
+                  134.0,
+                  134.0,
+                  134.0
+                ],
+                "medianRelLum": 0.2384,
+                "medianLuma": 134.0,
+                "lab": [
+                  55.93,
+                  -0.0,
+                  0.0
+                ]
+              },
+              "wcag": 1.754,
+              "dLuma": -39.0,
+              "dE76": 15.61,
+              "pass": false
+            },
+            "deuteranopia": {
+              "mark": {
+                "pixels": 16560,
+                "medianRgb": [
+                  141.0,
+                  127.0,
+                  49.0
+                ],
+                "medianRelLum": 0.21055,
+                "medianLuma": 124.27,
+                "lab": [
+                  53.02,
+                  -4.48,
+                  43.05
+                ]
+              },
+              "tile": {
+                "pixels": 41713,
+                "medianRgb": [
+                  132.0,
+                  134.0,
+                  141.0
+                ],
+                "medianRelLum": 0.23814,
+                "medianLuma": 133.93,
+                "lab": [
+                  55.97,
+                  0.69,
+                  -4.0
+                ]
+              },
+              "wcag": 1.106,
+              "dLuma": -9.66,
+              "dE76": 47.43,
+              "pass": false
+            }
+          },
+          "visible": true
+        }
+      },
+      "boundaries": [
+        {
+          "pair": [
+            "blue",
+            "red"
+          ],
+          "edges": 5,
+          "shapeDiffers": true,
+          "strokes": [
+            "solid",
+            "dash3"
+          ],
+          "glyphs": [
+            "diamond",
+            "bars2"
+          ],
+          "variants": {
+            "color": {
+              "dE76": 97.07,
+              "dLuma": 14.06,
+              "byColor": true,
+              "readable": false,
+              "verdict": "fail",
+              "why": "метка не читается на плитке: blue 1.444:1, red 1.287:1"
+            },
+            "gray": {
+              "dE76": 5.71,
+              "dLuma": 14.0,
+              "byColor": false,
+              "readable": false,
+              "verdict": "fail",
+              "why": "метка не читается на плитке: blue 1.6:1, red 1.754:1"
+            },
+            "deuteranopia": {
+              "dE76": 92.45,
+              "dLuma": 19.33,
+              "byColor": true,
+              "readable": false,
+              "verdict": "fail",
+              "why": "метка не читается на плитке: blue 1.539:1, red 1.106:1"
+            }
+          }
+        }
+      ],
+      "tileHalfUU": 18.0,
+      "diagnosticMarkDeltaE25": {
+        "status": "диагностика вне зарегистрированного метода (T5.2 после съёмки)",
+        "markDeltaE": 25.0,
+        "zones": {
+          "blue": {
+            "cells": 15,
+            "freeCellsUsed": 11,
+            "hex": "#3B78D8",
+            "stroke": "solid",
+            "glyph": "diamond",
+            "tileVsZoneColourDE76": 54.07,
+            "colourClashWithTile": false,
+            "markPixels": 13998,
+            "markPixelsPerCellMedian": 1284.0,
+            "markPixelsPerCellMin": 976,
+            "variants": {
+              "color": {
+                "mark": {
+                  "pixels": 13998,
+                  "medianRgb": [
+                    52.0,
+                    130.0,
+                    204.0
+                  ],
+                  "medianRelLum": 0.21089,
+                  "medianLuma": 119.12,
+                  "lab": [
+                    53.01,
+                    1.4,
+                    -45.09
+                  ]
+                },
+                "tile": {
+                  "pixels": 25800,
+                  "medianRgb": [
+                    140.0,
+                    143.0,
+                    148.0
+                  ],
+                  "medianRelLum": 0.27327,
+                  "medianLuma": 142.65,
+                  "lab": [
+                    59.3,
+                    -0.09,
+                    -3.03
+                  ]
+                },
+                "wcag": 1.239,
+                "dLuma": -23.53,
+                "dE76": 42.55,
+                "pass": false
+              },
+              "gray": {
+                "mark": {
+                  "pixels": 13998,
+                  "medianRgb": [
+                    119.0,
+                    119.0,
+                    119.0
+                  ],
+                  "medianRelLum": 0.18447,
+                  "medianLuma": 119.0,
+                  "lab": [
+                    50.03,
+                    -0.0,
+                    0.0
+                  ]
+                },
+                "tile": {
+                  "pixels": 25800,
+                  "medianRgb": [
+                    143.0,
+                    143.0,
+                    143.0
+                  ],
+                  "medianRelLum": 0.27468,
+                  "medianLuma": 143.0,
+                  "lab": [
+                    59.4,
+                    -0.0,
+                    0.0
+                  ]
+                },
+                "wcag": 1.385,
+                "dLuma": -24.0,
+                "dE76": 9.37,
+                "pass": false
+              },
+              "deuteranopia": {
+                "mark": {
+                  "pixels": 13998,
+                  "medianRgb": [
+                    74.0,
+                    120.0,
+                    203.0
+                  ],
+                  "medianRelLum": 0.19186,
+                  "medianLuma": 116.26,
+                  "lab": [
+                    50.92,
+                    10.51,
+                    -47.79
+                  ]
+                },
+                "tile": {
+                  "pixels": 25800,
+                  "medianRgb": [
+                    141.0,
+                    142.0,
+                    148.0
+                  ],
+                  "medianRelLum": 0.27123,
+                  "medianLuma": 142.15,
+                  "lab": [
+                    59.11,
+                    0.83,
+                    -3.31
+                  ]
+                },
+                "wcag": 1.328,
+                "dLuma": -25.89,
+                "dE76": 46.25,
+                "pass": false
+              }
+            },
+            "visible": true
+          },
+          "red": {
+            "cells": 15,
+            "freeCellsUsed": 13,
+            "hex": "#D8453B",
+            "stroke": "dash3",
+            "glyph": "bars2",
+            "tileVsZoneColourDE76": 70.28,
+            "colourClashWithTile": false,
+            "markPixels": 18116,
+            "markPixelsPerCellMedian": 1376.0,
+            "markPixelsPerCellMin": 1326,
+            "variants": {
+              "color": {
+                "mark": {
+                  "pixels": 18116,
+                  "medianRgb": [
+                    206.0,
+                    67.0,
+                    54.0
+                  ],
+                  "medianRelLum": 0.17382,
+                  "medianLuma": 95.69,
+                  "lab": [
+                    48.77,
+                    54.03,
+                    38.33
+                  ]
+                },
+                "tile": {
+                  "pixels": 41713,
+                  "medianRgb": [
+                    131.0,
+                    134.0,
+                    141.0
+                  ],
+                  "medianRelLum": 0.23859,
+                  "medianLuma": 134.01,
+                  "lab": [
+                    55.89,
+                    0.33,
+                    -4.13
+                  ]
+                },
+                "wcag": 1.289,
+                "dLuma": -38.32,
+                "dE76": 68.83,
+                "pass": false
+              },
+              "gray": {
+                "mark": {
+                  "pixels": 18116,
+                  "medianRgb": [
+                    96.0,
+                    96.0,
+                    96.0
+                  ],
+                  "medianRelLum": 0.11697,
+                  "medianLuma": 96.0,
+                  "lab": [
+                    40.73,
+                    -0.0,
+                    0.0
+                  ]
+                },
+                "tile": {
+                  "pixels": 41713,
+                  "medianRgb": [
+                    134.0,
+                    134.0,
+                    134.0
+                  ],
+                  "medianRelLum": 0.2384,
+                  "medianLuma": 134.0,
+                  "lab": [
+                    55.93,
+                    -0.0,
+                    0.0
+                  ]
+                },
+                "wcag": 1.727,
+                "dLuma": -38.0,
+                "dE76": 15.2,
+                "pass": false
+              },
+              "deuteranopia": {
+                "mark": {
+                  "pixels": 18116,
+                  "medianRgb": [
+                    141.0,
+                    127.0,
+                    49.0
+                  ],
+                  "medianRelLum": 0.21055,
+                  "medianLuma": 124.27,
+                  "lab": [
+                    53.02,
+                    -4.48,
+                    43.05
+                  ]
+                },
+                "tile": {
+                  "pixels": 41713,
+                  "medianRgb": [
+                    132.0,
+                    134.0,
+                    141.0
+                  ],
+                  "medianRelLum": 0.23814,
+                  "medianLuma": 133.93,
+                  "lab": [
+                    55.97,
+                    0.69,
+                    -4.0
+                  ]
+                },
+                "wcag": 1.106,
+                "dLuma": -9.66,
+                "dE76": 47.43,
+                "pass": false
+              }
+            },
+            "visible": true
+          }
+        },
+        "boundaries": [
+          {
+            "pair": [
+              "blue",
+              "red"
+            ],
+            "edges": 5,
+            "shapeDiffers": true,
+            "strokes": [
+              "solid",
+              "dash3"
+            ],
+            "glyphs": [
+              "diamond",
+              "bars2"
+            ],
+            "variants": {
+              "color": {
+                "dE76": 98.73,
+                "dLuma": 23.43,
+                "byColor": true,
+                "readable": false,
+                "verdict": "fail",
+                "why": "метка не читается на плитке: blue 1.239:1, red 1.289:1"
+              },
+              "gray": {
+                "dE76": 9.3,
+                "dLuma": 23.0,
+                "byColor": true,
+                "readable": false,
+                "verdict": "fail",
+                "why": "метка не читается на плитке: blue 1.385:1, red 1.727:1"
+              },
+              "deuteranopia": {
+                "dE76": 92.09,
+                "dLuma": 8.01,
+                "byColor": true,
+                "readable": false,
+                "verdict": "fail",
+                "why": "метка не читается на плитке: blue 1.328:1, red 1.106:1"
+              }
+            }
+          }
+        ],
+        "tileHalfUU": 18.0
+      }
+    },
+    "K3": {
+      "projection": {
+        "mode": "trace",
+        "camera_pos": [
+          0.0,
+          1107.0,
+          1582.0
+        ],
+        "camera_rot": [
+          -55.0,
+          -90.0,
+          0.0
+        ],
+        "hfov_deg": 35.0,
+        "viewport": [
+          1920,
+          1080
+        ],
+        "validation_pairs": 6,
+        "residual_max_px_trace_camera": 1.342,
+        "residual_max_px_used_camera": 1.342,
+        "tolerance_px": 2.0,
+        "ok": true,
+        "reason": "ok"
+      },
+      "occupied": [
+        [
+          1,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          4,
+          3
+        ]
+      ],
+      "zones": {
+        "blue": {
+          "cells": 15,
+          "freeCellsUsed": 12,
+          "hex": "#3B78D8",
+          "stroke": "solid",
+          "glyph": "diamond",
+          "tileVsZoneColourDE76": 54.12,
+          "colourClashWithTile": false,
+          "markPixels": 22,
+          "markPixelsPerCellMedian": 0.0,
+          "markPixelsPerCellMin": 0,
+          "variants": {
+            "color": {
+              "mark": {
+                "pixels": 22,
+                "medianRgb": [
+                  56.0,
+                  117.0,
+                  194.0
+                ],
+                "medianRelLum": 0.17374,
+                "medianLuma": 109.2,
+                "lab": [
+                  48.83,
+                  6.23,
+                  -46.01
+                ]
+              },
+              "tile": {
+                "pixels": 28445,
+                "medianRgb": [
+                  139.0,
+                  142.0,
+                  147.0
+                ],
+                "medianRelLum": 0.2711,
+                "medianLuma": 142.14,
+                "lab": [
+                  58.92,
+                  -0.09,
+                  -3.03
+                ]
+              },
+              "wcag": 1.435,
+              "dLuma": -32.94,
+              "dE76": 44.6,
+              "pass": false
+            },
+            "gray": {
+              "mark": {
+                "pixels": 22,
+                "medianRgb": [
+                  109.0,
+                  109.0,
+                  109.0
+                ],
+                "medianRelLum": 0.15293,
+                "medianLuma": 109.0,
+                "lab": [
+                  46.03,
+                  -0.0,
+                  0.0
+                ]
+              },
+              "tile": {
+                "pixels": 28445,
+                "medianRgb": [
+                  142.0,
+                  142.0,
+                  142.0
+                ],
+                "medianRelLum": 0.2705,
+                "medianLuma": 142.0,
+                "lab": [
+                  59.02,
+                  -0.0,
+                  0.0
+                ]
+              },
+              "wcag": 1.579,
+              "dLuma": -33.0,
+              "dE76": 12.99,
+              "pass": false
+            },
+            "deuteranopia": {
+              "mark": {
+                "pixels": 22,
+                "medianRgb": [
+                  60.0,
+                  109.5,
+                  192.0
+                ],
+                "medianRelLum": 0.15768,
+                "medianLuma": 104.68,
+                "lab": [
+                  46.86,
+                  10.47,
+                  -47.98
+                ]
+              },
+              "tile": {
+                "pixels": 28445,
+                "medianRgb": [
+                  140.0,
+                  142.0,
+                  147.0
+                ],
+                "medianRelLum": 0.2706,
+                "medianLuma": 142.01,
+                "lab": [
+                  59.0,
+                  0.27,
+                  -2.91
+                ]
+              },
+              "wcag": 1.544,
+              "dLuma": -37.33,
+              "dE76": 47.78,
+              "pass": false
+            }
+          },
+          "visible": false
+        },
+        "red": {
+          "cells": 15,
+          "freeCellsUsed": 12,
+          "hex": "#D8453B",
+          "stroke": "dash3",
+          "glyph": "bars2",
+          "tileVsZoneColourDE76": 70.11,
+          "colourClashWithTile": false,
+          "markPixels": 15110,
+          "markPixelsPerCellMedian": 1219.5,
+          "markPixelsPerCellMin": 1134,
+          "variants": {
+            "color": {
+              "mark": {
+                "pixels": 15110,
+                "medianRgb": [
+                  206.0,
+                  66.0,
+                  53.0
+                ],
+                "medianRelLum": 0.17294,
+                "medianLuma": 95.04,
+                "lab": [
+                  48.61,
+                  54.39,
+                  38.71
+                ]
+              },
+              "tile": {
+                "pixels": 38825,
+                "medianRgb": [
+                  131.0,
+                  135.0,
+                  141.0
+                ],
+                "medianRelLum": 0.24012,
+                "medianLuma": 134.43,
+                "lab": [
+                  56.16,
+                  -0.24,
+                  -3.72
+                ]
+              },
+              "wcag": 1.301,
+              "dLuma": -39.39,
+              "dE76": 69.58,
+              "pass": false
+            },
+            "gray": {
+              "mark": {
+                "pixels": 15110,
+                "medianRgb": [
+                  95.0,
+                  95.0,
+                  95.0
+                ],
+                "medianRelLum": 0.11444,
+                "medianLuma": 95.0,
+                "lab": [
+                  40.32,
+                  -0.0,
+                  0.0
+                ]
+              },
+              "tile": {
+                "pixels": 38825,
+                "medianRgb": [
+                  134.0,
+                  134.0,
+                  134.0
+                ],
+                "medianRelLum": 0.2384,
+                "medianLuma": 134.0,
+                "lab": [
+                  55.93,
+                  -0.0,
+                  0.0
+                ]
+              },
+              "wcag": 1.754,
+              "dLuma": -39.0,
+              "dE76": 15.61,
+              "pass": false
+            },
+            "deuteranopia": {
+              "mark": {
+                "pixels": 15110,
+                "medianRgb": [
+                  141.0,
+                  127.0,
+                  48.0
+                ],
+                "medianRelLum": 0.21055,
+                "medianLuma": 124.27,
+                "lab": [
+                  53.01,
+                  -4.55,
+                  43.5
+                ]
+              },
+              "tile": {
+                "pixels": 38825,
+                "medianRgb": [
+                  132.0,
+                  134.0,
+                  141.0
+                ],
+                "medianRelLum": 0.23879,
+                "medianLuma": 134.08,
+                "lab": [
+                  55.97,
+                  0.69,
+                  -4.0
+                ]
+              },
+              "wcag": 1.108,
+              "dLuma": -9.81,
+              "dE76": 47.88,
+              "pass": false
+            }
+          },
+          "visible": true
+        }
+      },
+      "boundaries": [
+        {
+          "pair": [
+            "blue",
+            "red"
+          ],
+          "edges": 5,
+          "shapeDiffers": true,
+          "strokes": [
+            "solid",
+            "dash3"
+          ],
+          "glyphs": [
+            "diamond",
+            "bars2"
+          ],
+          "variants": {
+            "color": {
+              "dE76": 97.45,
+              "dLuma": 14.16,
+              "byColor": true,
+              "readable": false,
+              "verdict": "fail",
+              "why": "метка не читается на плитке: blue 1.435:1, red 1.301:1"
+            },
+            "gray": {
+              "dE76": 5.71,
+              "dLuma": 14.0,
+              "byColor": false,
+              "readable": false,
+              "verdict": "fail",
+              "why": "метка не читается на плитке: blue 1.579:1, red 1.754:1"
+            },
+            "deuteranopia": {
+              "dE76": 92.91,
+              "dLuma": 19.59,
+              "byColor": true,
+              "readable": false,
+              "verdict": "fail",
+              "why": "метка не читается на плитке: blue 1.544:1, red 1.108:1"
+            }
+          }
+        }
+      ],
+      "tileHalfUU": 18.0,
+      "diagnosticMarkDeltaE25": {
+        "status": "диагностика вне зарегистрированного метода (T5.2 после съёмки)",
+        "markDeltaE": 25.0,
+        "zones": {
+          "blue": {
+            "cells": 15,
+            "freeCellsUsed": 12,
+            "hex": "#3B78D8",
+            "stroke": "solid",
+            "glyph": "diamond",
+            "tileVsZoneColourDE76": 54.12,
+            "colourClashWithTile": false,
+            "markPixels": 14630,
+            "markPixelsPerCellMedian": 1280.5,
+            "markPixelsPerCellMin": 903,
+            "variants": {
+              "color": {
+                "mark": {
+                  "pixels": 14630,
+                  "medianRgb": [
+                    53.0,
+                    131.0,
+                    205.0
+                  ],
+                  "medianRelLum": 0.2137,
+                  "medianLuma": 119.76,
+                  "lab": [
+                    53.38,
+                    1.29,
+                    -45.07
+                  ]
+                },
+                "tile": {
+                  "pixels": 28445,
+                  "medianRgb": [
+                    139.0,
+                    142.0,
+                    147.0
+                  ],
+                  "medianRelLum": 0.2711,
+                  "medianLuma": 142.14,
+                  "lab": [
+                    58.92,
+                    -0.09,
+                    -3.03
+                  ]
+                },
+                "wcag": 1.218,
+                "dLuma": -22.38,
+                "dE76": 42.43,
+                "pass": false
+              },
+              "gray": {
+                "mark": {
+                  "pixels": 14630,
+                  "medianRgb": [
+                    120.0,
+                    120.0,
+                    120.0
+                  ],
+                  "medianRelLum": 0.18782,
+                  "medianLuma": 120.0,
+                  "lab": [
+                    50.43,
+                    -0.0,
+                    0.0
+                  ]
+                },
+                "tile": {
+                  "pixels": 28445,
+                  "medianRgb": [
+                    142.0,
+                    142.0,
+                    142.0
+                  ],
+                  "medianRelLum": 0.2705,
+                  "medianLuma": 142.0,
+                  "lab": [
+                    59.02,
+                    -0.0,
+                    0.0
+                  ]
+                },
+                "wcag": 1.348,
+                "dLuma": -22.0,
+                "dE76": 8.59,
+                "pass": false
+              },
+              "deuteranopia": {
+                "mark": {
+                  "pixels": 14630,
+                  "medianRgb": [
+                    75.0,
+                    121.0,
+                    204.0
+                  ],
+                  "medianRelLum": 0.1949,
+                  "medianLuma": 117.0,
+                  "lab": [
+                    51.3,
+                    10.42,
+                    -47.75
+                  ]
+                },
+                "tile": {
+                  "pixels": 28445,
+                  "medianRgb": [
+                    140.0,
+                    142.0,
+                    147.0
+                  ],
+                  "medianRelLum": 0.2706,
+                  "medianLuma": 142.01,
+                  "lab": [
+                    59.0,
+                    0.27,
+                    -2.91
+                  ]
+                },
+                "wcag": 1.309,
+                "dLuma": -25.01,
+                "dE76": 46.61,
+                "pass": false
+              }
+            },
+            "visible": true
+          },
+          "red": {
+            "cells": 15,
+            "freeCellsUsed": 12,
+            "hex": "#D8453B",
+            "stroke": "dash3",
+            "glyph": "bars2",
+            "tileVsZoneColourDE76": 70.11,
+            "colourClashWithTile": false,
+            "markPixels": 16773,
+            "markPixelsPerCellMedian": 1378.0,
+            "markPixelsPerCellMin": 1254,
+            "variants": {
+              "color": {
+                "mark": {
+                  "pixels": 16773,
+                  "medianRgb": [
+                    206.0,
+                    67.0,
+                    54.0
+                  ],
+                  "medianRelLum": 0.17275,
+                  "medianLuma": 95.04,
+                  "lab": [
+                    48.77,
+                    54.03,
+                    38.33
+                  ]
+                },
+                "tile": {
+                  "pixels": 38825,
+                  "medianRgb": [
+                    131.0,
+                    135.0,
+                    141.0
+                  ],
+                  "medianRelLum": 0.24012,
+                  "medianLuma": 134.43,
+                  "lab": [
+                    56.16,
+                    -0.24,
+                    -3.72
+                  ]
+                },
+                "wcag": 1.302,
+                "dLuma": -39.39,
+                "dE76": 69.05,
+                "pass": false
+              },
+              "gray": {
+                "mark": {
+                  "pixels": 16773,
+                  "medianRgb": [
+                    95.0,
+                    95.0,
+                    95.0
+                  ],
+                  "medianRelLum": 0.11444,
+                  "medianLuma": 95.0,
+                  "lab": [
+                    40.32,
+                    -0.0,
+                    0.0
+                  ]
+                },
+                "tile": {
+                  "pixels": 38825,
+                  "medianRgb": [
+                    134.0,
+                    134.0,
+                    134.0
+                  ],
+                  "medianRelLum": 0.2384,
+                  "medianLuma": 134.0,
+                  "lab": [
+                    55.93,
+                    -0.0,
+                    0.0
+                  ]
+                },
+                "wcag": 1.754,
+                "dLuma": -39.0,
+                "dE76": 15.61,
+                "pass": false
+              },
+              "deuteranopia": {
+                "mark": {
+                  "pixels": 16773,
+                  "medianRgb": [
+                    141.0,
+                    127.0,
+                    49.0
+                  ],
+                  "medianRelLum": 0.21027,
+                  "medianLuma": 124.2,
+                  "lab": [
+                    53.02,
+                    -4.48,
+                    43.05
+                  ]
+                },
+                "tile": {
+                  "pixels": 38825,
+                  "medianRgb": [
+                    132.0,
+                    134.0,
+                    141.0
+                  ],
+                  "medianRelLum": 0.23879,
+                  "medianLuma": 134.08,
+                  "lab": [
+                    55.97,
+                    0.69,
+                    -4.0
+                  ]
+                },
+                "wcag": 1.11,
+                "dLuma": -9.88,
+                "dE76": 47.43,
+                "pass": false
+              }
+            },
+            "visible": true
+          }
+        },
+        "boundaries": [
+          {
+            "pair": [
+              "blue",
+              "red"
+            ],
+            "edges": 5,
+            "shapeDiffers": true,
+            "strokes": [
+              "solid",
+              "dash3"
+            ],
+            "glyphs": [
+              "diamond",
+              "bars2"
+            ],
+            "variants": {
+              "color": {
+                "dE76": 98.78,
+                "dLuma": 24.72,
+                "byColor": true,
+                "readable": false,
+                "verdict": "fail",
+                "why": "метка не читается на плитке: blue 1.218:1, red 1.302:1"
+              },
+              "gray": {
+                "dE76": 10.11,
+                "dLuma": 25.0,
+                "byColor": true,
+                "readable": false,
+                "verdict": "fail",
+                "why": "метка не читается на плитке: blue 1.348:1, red 1.754:1"
+              },
+              "deuteranopia": {
+                "dE76": 92.03,
+                "dLuma": 7.2,
+                "byColor": true,
+                "readable": false,
+                "verdict": "fail",
+                "why": "метка не читается на плитке: blue 1.309:1, red 1.11:1"
+              }
+            }
+          }
+        ],
+        "tileHalfUU": 18.0
+      }
+    }
+  }
+}

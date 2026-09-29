@@ -3,6 +3,14 @@
 Geometry/zone count and authoritative state are checked separately in the
 client traces. This gate only rejects empty, unlit, missing-HUD and
 wrong-resolution captures; it does not approve K1 readability by itself.
+
+    python check_art_preview_shot.py <png> [--min-board-lit F]
+
+--min-board-lit (default 0.75, the Cobble value) is the lit fraction the board
+box needs. Boards with obstacle cells draw them as intentional dark voids
+(T3.2 'tiles' surface); since the W4-A render (DX12 + Lumen, fixed exposure)
+those voids read black, so run-phase2-demo passes 0.75 x the registered
+passable-cell fraction for such boards (T4.2, 2026-09-29).
 """
 import json
 import statistics
@@ -16,7 +24,13 @@ def fraction_lit(pixels):
     return sum(max(rgb) > 20 for rgb in pixels) / max(1, len(pixels))
 
 
-path = Path(sys.argv[1])
+args = sys.argv[1:]
+min_board_lit = 0.75
+if "--min-board-lit" in args:
+    i = args.index("--min-board-lit")
+    min_board_lit = float(args[i + 1])
+    del args[i:i + 2]
+path = Path(args[0])
 im = Image.open(path).convert("RGB")
 w, h = im.size
 all_pixels = list(im.get_flattened_data())
@@ -31,13 +45,14 @@ measured = {
     "board_luma_stddev": round(statistics.pstdev(lightness), 2),
     "top_hud_nonblack_fraction": round(fraction_lit(top_hud), 4),
     "hand_nonblack_fraction": round(fraction_lit(hand), 4),
+    "min_board_lit": min_board_lit,
 }
 reasons = []
 if (w, h) != (1920, 1080):
     reasons.append("capture is not 1920x1080")
 if measured["frame_nonblack_fraction"] < .25:
     reasons.append("mostly black frame")
-if measured["board_nonblack_fraction"] < .75 or measured["board_luma_stddev"] < 7:
+if measured["board_nonblack_fraction"] < min_board_lit or measured["board_luma_stddev"] < 7:
     reasons.append("board region is missing, unlit, or flat")
 if measured["top_hud_nonblack_fraction"] < .08:
     reasons.append("top HUD region missing")

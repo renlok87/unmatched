@@ -1,0 +1,92 @@
+{
+  "command": "derive",
+  "tool": "qa010-tools 1.1.0",
+  "method": {
+    "gray": "Rec.709 luma Y' = 0.2126R'+0.7152G'+0.0722B' on 8-bit sRGB values, round half up, replicated to RGB",
+    "deuteranopia": "Machado, Oliveira, Fernandes 2009, severity 1.0; IEC 61966-2-1 sRGB decode -> matrix on linear RGB -> clip [0,1] -> sRGB encode -> round half up",
+    "matrix": [
+      [
+        0.367322,
+        0.860646,
+        -0.227968
+      ],
+      [
+        0.280085,
+        0.672501,
+        0.047413
+      ],
+      [
+        -0.01182,
+        0.04294,
+        0.968881
+      ]
+    ],
+    "alpha": "ignored (not composited)"
+  },
+  "entries": [
+    {
+      "input": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/cobble-5x6/run-20260929-142039/phase2-board-host-1920x1080.png",
+      "input_sha256": "63e9879cb7e8cae3ff662c918a9a5455d6ad5f80868bff9efbe135edba16b821",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/t52/derived/cobble-5x6/phase2-board-host-1920x1080.gray.png",
+        "sha256": "8f17ff424def1a9520736698752d736de7bcfbb66f9b1ea4f6b42d88afe980ea"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/t52/derived/cobble-5x6/phase2-board-host-1920x1080.deuteranopia.png",
+        "sha256": "da32f1caa40ec13e938513b6719259c500452105e63e2f0b38697326b1d605c4"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/cobble-5x6/run-20260929-142039/phase2-board-joiner-1920x1080.png",
+      "input_sha256": "0e0b0b7bc3bf097162eb80552720c80e282d3f4c70da8160ff4421dc17ef3199",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/t52/derived/cobble-5x6/phase2-board-joiner-1920x1080.gray.png",
+        "sha256": "eff204a371407888b5a15d224e90397e1e5dafda0ae778473d89ce215513ed6b"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/t52/derived/cobble-5x6/phase2-board-joiner-1920x1080.deuteranopia.png",
+        "sha256": "e114a042c440cf0ea67c1d0f10cf46345815c26f55ab7a1677ed395daba38572"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/joiner/s09-combat-resolve-revealed.png",
+      "input_sha256": "4b208545b3ea0f1fa5f318d91f86a9502618689149a73a93200ecd50f375c32a",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/t52/derived/cobble-5x6/s09-combat-resolve-revealed.gray.png",
+        "sha256": "ccf671f459ccf8729074547e07d3d02c776b18faee547bc8f506afac4be29c03"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/t52/derived/cobble-5x6/s09-combat-resolve-revealed.deuteranopia.png",
+        "sha256": "c65099ef43beb4cd394c79d59442358d14bf323aa17b55c09b87a4928211f908"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/joiner/s09-damage-number.png",
+      "input_sha256": "1f812ef0c8fd8610ba4bac73119f4c6c50bfb037b918a7f65eb63a1cda8f2148",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/t52/derived/cobble-5x6/s09-damage-number.gray.png",
+        "sha256": "fc375eb38ce250e26b238b93659b964280487d13863da00e1c7363af6c52eee8"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/t52/derived/cobble-5x6/s09-damage-number.deuteranopia.png",
+        "sha256": "178479e5c280b3217d4cadb95fe4f3125339a9ae80ed9f1e5745f0de6ad15a99"
+      }
+    }
+  ]
+}

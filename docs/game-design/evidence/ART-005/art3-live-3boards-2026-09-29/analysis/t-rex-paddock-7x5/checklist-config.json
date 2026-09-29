@@ -1,0 +1,180 @@
+{
+  "title": "QA-010 чек-лист T5.2 — t-rex-paddock-7x5 (t-rex-paddock-art-fixture): K1 + K3 (K2 — задача T5.1). Не приёмка",
+  "run": {
+    "задача": "этап 3 T5.2 «Арт 3 живьём»",
+    "доска": "t-rex-paddock-7x5 boardId=c70e9f624617750c2a2b856fd",
+    "K1_хост": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/t-rex-paddock-7x5/run-20260929-141931/phase2-board-host-1920x1080.png",
+    "K1_присоединившийся": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/t-rex-paddock-7x5/run-20260929-141931/phase2-board-joiner-1920x1080.png",
+    "K3": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-142830/joiner/s09-combat-resolve-revealed.png",
+    "производные": "C:\\tmp\\t52\\derived (вне git; sha256 в derive-manifest.json)",
+    "пороги": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/t52-thresholds.json"
+  },
+  "frames": {
+    "K1": {
+      "path": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/t-rex-paddock-7x5/run-20260929-141931/phase2-board-host-1920x1080.png",
+      "provenance": "packaged-live (strict + render-reference: tools/art/classify_evidence.py --strict --render-reference)"
+    },
+    "K3": {
+      "path": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-142830/joiner/s09-combat-resolve-revealed.png",
+      "provenance": "packaged-live (strict + render-reference: tools/art/classify_evidence.py --strict --render-reference)"
+    }
+  },
+  "results": [
+    {
+      "k": "K1..K3",
+      "path": "derive-manifest.json"
+    },
+    {
+      "k": "K1..K3",
+      "path": "luma-frames.json"
+    },
+    {
+      "k": "K1",
+      "path": "c9-k1-host-all.json"
+    },
+    {
+      "k": "K3",
+      "path": "icon-k3.json"
+    },
+    {
+      "k": "K1",
+      "path": "project-k1-host.json"
+    },
+    {
+      "k": "K1",
+      "path": "render-run-20260929-141931-phase2-board-host-1920x1080.json"
+    },
+    {
+      "k": "K3",
+      "path": "render-joiner-s09-combat-resolve-revealed.json"
+    }
+  ],
+  "manual": {
+    "K1.cells_all": {
+      "note": "проекция трассы: клеток целиком в кадре 35/35 (частично 0); различимость — глазами"
+    },
+    "K1.multizone": {
+      "note": "трасса хоста: multizone cells=13 zonesListed=26 zonesMarked=26 — это доказательство геометрии (штрих и глиф заспавнены), не читаемости. Замер K1 присоединившегося: в 5 из 13 мультизонных клеток метка хотя бы одной зоны не отделяется от плитки по цвету (gray): (5,1) (4,2) (5,2) (3,4) (5,4) — такая клетка читается как однозонная (zone-contrast.json)"
+    },
+    "K1.hero_helper": {
+      "note": "фигуры: Medusa-кандидат + серые блок-ауты; подписи мира (имя + HP, белый текст без подложки) против светлого фона в SHOT label bbox (labels-damage.json; fail < 3:1, AA-large only 3..4,5:1, AA ≥ 4,5:1, худшая строка): fail: Harpies 1 [K1_host K1_joiner K3 K3_damage], Harpies 2 [K1_host K1_joiner K3 K3_damage], Harpies 3 [K1_host K1_joiner K3 K3_damage], Medusa [K1_joiner K3 K3_damage], Merlin [K1_host K1_joiner K3 K3_damage]; AA: King Arthur [K1_host K1_joiner K3 K3_damage]"
+    },
+    "K1.teams_gray": {
+      "note": "команды: MI_Medusa_Blue / MI_Medusa_Red и кольца подставок (W4-B: пара С-11 почти изолюминантна, Q-304); серый — глазами по производным. Кольцо команды в цвете (доля пикселей цвета команды в кольце, порог 0.05, team-rings.json) не видно: Harpies 1 (2,3) K1_joiner 0.0032; Harpies 2 (2,1) K1_joiner 0.0395; Medusa (5,1) K3 0.0449"
+    },
+    "K1.selected": {
+      "note": "хост: ARTPREVIEW selection ownHero=1 selected=1 fighter=Medusa reachable=11 fighterId=f-0-hero"
+    },
+    "K1.zones_deut": {
+      "note": "метка зоны против плитки (WCAG ≥ 3:1, зарегистрировано до съёмки) — не проходят: blue, blue-green, gray, green, purple, yellow; форма (штрих+глиф) у всех пар соседних зон разная; буквы зон не реализованы — zone-contrast.json"
+    },
+    "K3.attack_result": {
+      "note": "COMBAT-RESULT и числа урона сходятся у обоих клиентов (validation.json); цель — кольцо-дуги и иконка; иконка висит над целью и ложится на подставку фигуры в клетке за ней (k3-icon-bbox-crops.png); на s09-combat-result.png иконки в пикселях нет, хотя трасса пишет visible=1; атакующий — без позы (клипы не подключены). Число урона: совпадение CUE = число — это счёт, не видимость; читаемость и столкновения с подписями — labels-damage.json"
+    },
+    "K3.icon_sizes": {
+      "note": "метод иконки rev 2 (W5-live3): явная маска иконки (analysis/icon-mask-template-32.png), auto-Otsu заменён — на светлой плитке он берёт тёмный передний план (рукояти + подставка соседней фигуры); icon-k3-guard.json"
+    }
+  },
+  "viewer": {
+    "kind": "agent",
+    "note": "самоприёмка агента T5.2: агент смотрел кадры, кропы и листы (Read рендерит PNG в этой сессии) и пиксельные замеры; не независимый зритель — нужен взгляд пользователя"
+  },
+  "elements": [
+    {
+      "frame": "K1",
+      "id": "facade",
+      "status": "отложено",
+      "reason": "фасадов в сцене S08Arena нет (кандидаты пайплайна не расставлены)"
+    },
+    {
+      "frame": "K1",
+      "id": "lantern",
+      "status": "отложено",
+      "reason": "фонаря в сцене нет"
+    },
+    {
+      "frame": "K1",
+      "id": "tray_darkness",
+      "status": "есть",
+      "reason": "деревянная рама и тёмный фон (профиль доски); рваного края подноса нет"
+    },
+    {
+      "frame": "K1",
+      "id": "fog",
+      "status": "отложено",
+      "reason": "туман в профиле рендера не задан"
+    },
+    {
+      "frame": "K1",
+      "id": "vignette",
+      "status": "отложено",
+      "reason": "виньетка не задана"
+    },
+    {
+      "frame": "K1",
+      "id": "zone_pictograms",
+      "status": "отложено",
+      "reason": "пиктограммы зон по краю подноса не реализованы; глифы зон — в клетках (T4.2)"
+    },
+    {
+      "frame": "K1",
+      "id": "hud",
+      "status": "есть",
+      "reason": "UMG-гибрид W4-C (панели сверху, рука снизу)"
+    },
+    {
+      "frame": "K1",
+      "id": "shadow_casters_1",
+      "status": "есть",
+      "reason": "RENDER shadowCasters=1 (трасса хоста)"
+    },
+    {
+      "frame": "K1",
+      "id": "six_fighters",
+      "status": "есть",
+      "reason": "FIGHTERS synced n=6 alive=6: кандидат Medusa v2 + серые блок-ауты гарпий, Артура и Мерлина"
+    },
+    {
+      "frame": "K2",
+      "id": "facade_hidden",
+      "status": "отложено",
+      "reason": "K2 — вне T5.2 (T5.1)"
+    },
+    {
+      "frame": "K2",
+      "id": "plate",
+      "status": "отложено",
+      "reason": "K2 — T5.1; плашка и её перекрытие с клетками выбора измерены на K1 хоста (plate-k1-host.json)"
+    },
+    {
+      "frame": "K2",
+      "id": "base_profile",
+      "status": "отложено",
+      "reason": "K2 — вне T5.2 (T5.1)"
+    },
+    {
+      "frame": "K3",
+      "id": "poses",
+      "status": "отложено",
+      "reason": "клипы боя не подключены — «постановка» (фигуры в покое)"
+    },
+    {
+      "frame": "K3",
+      "id": "inspector_2d",
+      "status": "отложено",
+      "reason": "инспектор карты с 2D-артом не реализован (D-09)"
+    },
+    {
+      "frame": "K3",
+      "id": "target_frame_icon",
+      "status": "есть",
+      "reason": "кольцо цели + иконка UMG (SHOT icon src=combat в SHOT-блоке кадра K3)"
+    },
+    {
+      "frame": "K3",
+      "id": "damage_result",
+      "status": "есть",
+      "reason": "числа урона: ARTPREVIEW damage-number = CUE damage ровно по одному (validation.json); итог боя — панель результата S09 (кадр s09-combat-result.png)"
+    }
+  ]
+}

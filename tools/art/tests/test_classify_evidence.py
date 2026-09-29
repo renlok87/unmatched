@@ -130,7 +130,8 @@ class SelfTest(unittest.TestCase):
         ok, results = ce.self_test()
         self.assertTrue(ok, results)
         self.assertEqual([c["case"] for c in results],
-                         ["positive", "positive", "positive", "negative-render", "negative"])
+                         ["positive", "positive", "positive", "positive-subdir-host", "positive-subdir-joiner",
+                          "negative-render", "negative"])
 
 
 class SyntheticRules(unittest.TestCase):
@@ -148,6 +149,31 @@ class SyntheticRules(unittest.TestCase):
         run.write_sidecar()
         r = ce.classify_frame(run.png, expect_mesh="SK_Medusa_FaceNeck_v2Candidate")
         self.assertEqual((r["class"], r["grade"]), ("packaged-live", "strict"))
+
+    def test_combat_subdir_frames_bind_to_their_own_trace(self):
+        # T5.2: run-combat-demo.ps1 keeps host/ and joiner/ frames with the SAME file name in sub-directories
+        # and lists them as r'joiner\s09-combat-result.png'; each frame must bind to its own client trace.
+        run_dir = self.tmp / "k3-synthetic" / "combat-20260929-000000"
+        files = []
+        for role in ("host", "joiner"):
+            (run_dir / role).mkdir(parents=True)
+            png = run_dir / role / "s09-combat-result.png"
+            png.write_bytes(png_bytes(salt=role.encode()))
+            trace = run_dir / f"combat-client-{role}.trace.log"
+            text = TRACE.replace(r"C:\Temp\s08\phase2-board-host-1920x1080.png",
+                                 "C:\\Temp\\s09-combat-x\\" + role + "/s09-combat-result.png")
+            self.assertNotEqual(text, TRACE)
+            trace.write_text(text, encoding="utf-8")
+            files += [{"name": trace.name, "sha256": sha(trace.read_bytes())},
+                      {"name": role + "\\s09-combat-result.png", "sha256": sha(png.read_bytes())}]
+        (run_dir / "manifest.json").write_text(json.dumps({"stamp": "x", "files": files}), encoding="utf-8")
+        for role in ("host", "joiner"):
+            r = ce.classify_frame(run_dir / role / "s09-combat-result.png")
+            self.assertEqual(r["class"], "packaged-live", r["reasons"])
+            self.assertFalse(r["rejected"])
+            self.assertTrue(r["live"]["trace"]["file"].endswith(f"combat-client-{role}.trace.log"))
+            self.assertEqual(r["live"]["trace"]["binding"], "shot-requested")
+            self.assertTrue(r["live"]["render"]["reference"])
 
     def test_render_fingerprint_is_strict_s5(self):
         # W4-A: a pre-W4 trace (no RENDER line) never reaches strict; --render-reference rejects it.

@@ -1,0 +1,52 @@
+{
+ "schema": "unmatched.t42-superseded-attempt/1",
+ "run": "failed-20260929-132209 (moved out of git to C:/tmp/t42/superseded/)",
+ "board": "sherwood-forest-8x5",
+ "argv": [
+  "powershell",
+  "-NoProfile",
+  "-ExecutionPolicy",
+  "Bypass",
+  "-File",
+  "tools/s08/run-phase2-demo.ps1",
+  "-Api",
+  "http://localhost:3120/graphql",
+  "-EvidenceDir",
+  "docs/game-design/evidence/ART-005/content-maps-t42/live/sherwood-forest-8x5",
+  "-ArtPreviewBoardId",
+  "c37a3b6643a96c45fa71f10de",
+  "-RunSeconds",
+  "50",
+  "-ClientFps",
+  "30",
+  "-ArtPreviewShotAfter",
+  "36",
+  "-ClientPerf",
+  "-ClientCsvFrames",
+  "1200",
+  "-ArtPreviewMedusaVariant",
+  "face-neck-v2",
+  "-RequireRenderReference"
+ ],
+ "demoExit": 1,
+ "roomAborted": true,
+ "hostArtcheck": {
+  "pass": false,
+  "reasons": [
+   "board region is missing, unlit, or flat"
+  ],
+  "measurements": {
+   "resolution": [
+    1920,
+    1080
+   ],
+   "frame_nonblack_fraction": 0.5875,
+   "board_nonblack_fraction": 0.7126,
+   "board_luma_stddev": 84.19,
+   "top_hud_nonblack_fraction": 0.9774,
+   "hand_nonblack_fraction": 0.9771
+  }
+ },
+ "cause": "check_art_preview_shot.py required 75 % lit pixels in the board box (a Cobble-only constant); the Sherwood fixture draws its 10 of 40 obstacle cells as intentional near-black voids, which read black under the W4-A render, so the box held 71 % lit pixels although the board was lit and complete (traces gated: BOARD 8x5, expectOk=1, zone content 12/12 + 11/11, glyph meshes 47, sky 11.8).",
+ "fix": "tools/art/check_art_preview_shot.py --min-board-lit; tools/s08/run-phase2-demo.ps1 passes 0.75 x the registered passable fraction for boards with obstacles (Sherwood 0.5625, T. Rex 0.5571, Cobble unchanged 0.75); rerun run-20260929-132312 passed."
+}

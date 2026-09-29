@@ -15,6 +15,7 @@
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Materials/MaterialInterface.h"
+#include "Materials/MaterialInstance.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
@@ -26,6 +27,39 @@ namespace {
 UMaterialInterface* LoadSolidMaterial() {
   if (UMaterialInterface* GameLayer = S08GameLayerMaterial()) return GameLayer;
   return LoadObject<UMaterialInterface>(nullptr, TEXT("/Engine/BasicShapes/BasicShapeMaterial"));
+}
+
+// Stage 3 T5.2 ("MI Medusa identical by hash on every board"): sha256 of what
+// the loaded (cooked) material carries - its path, its parent path and every
+// scalar/vector/texture parameter override, sorted by name. The same pak gives
+// the same digest on every board; a per-board material swap or a runtime
+// override would change it. Written once per Medusa fighter.
+FString S08MaterialDigest(const UMaterialInterface* Material, FString& OutParent, int32& OutParams) {
+  OutParent = TEXT("-");
+  OutParams = 0;
+  if (!Material) return TEXT("-");
+  TArray<FString> Parts;
+  if (const UMaterialInstance* Instance = Cast<UMaterialInstance>(Material)) {
+    if (Instance->Parent) OutParent = Instance->Parent->GetPathName();
+    for (const FScalarParameterValue& P : Instance->ScalarParameterValues) {
+      Parts.Add(FString::Printf(TEXT("S:%s=%.6f"), *P.ParameterInfo.Name.ToString(), P.ParameterValue));
+    }
+    for (const FVectorParameterValue& P : Instance->VectorParameterValues) {
+      Parts.Add(FString::Printf(TEXT("V:%s=%.6f,%.6f,%.6f,%.6f"), *P.ParameterInfo.Name.ToString(),
+                                P.ParameterValue.R, P.ParameterValue.G, P.ParameterValue.B,
+                                P.ParameterValue.A));
+    }
+    for (const FTextureParameterValue& P : Instance->TextureParameterValues) {
+      Parts.Add(FString::Printf(TEXT("T:%s=%s"), *P.ParameterInfo.Name.ToString(),
+                                P.ParameterValue ? *P.ParameterValue->GetPathName() : TEXT("-")));
+    }
+  }
+  Parts.Sort();
+  OutParams = Parts.Num();
+  const FString Canonical = Material->GetPathName() + TEXT("|") + OutParent + TEXT("|") +
+                            FString::Join(Parts, TEXT(";"));
+  const FTCHARToUTF8 Utf8(*Canonical);
+  return S08Sha256Hex(reinterpret_cast<const uint8*>(Utf8.Get()), Utf8.Length());
 }
 } // namespace
 
@@ -192,6 +226,20 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
       const float FigureScale = Fighter.bIsHero ? 1.0f : 0.78f;
       ArtBody->SetRelativeScale3D(FVector(FigureScale));
       ArtBase->SetRelativeScale3D(FVector(FigureScale));
+      if (!bMedusaMaterialsTraced) {
+        bMedusaMaterialsTraced = true;
+        FString Parent;
+        int32 Params = 0;
+        const FString Digest = S08MaterialDigest(ArtBody->GetMaterial(0), Parent, Params);
+        const UMaterialInterface* Slot1 = ArtBody->GetMaterial(1);
+        const UMaterialInterface* BaseMaterial = ArtBase->GetMaterial(0);
+        FS08Trace::Write(FString::Printf(
+            TEXT("ARTPREVIEW medusa materials fighter=%s team=%s mesh=%s slots=%d mi=%s slot1=%s base=%s parent=%s params=%d miSha256=%s"),
+            *Fighter.Id, bOwn ? TEXT("own") : TEXT("enemy"), *Mesh->GetName(), ArtBody->GetNumMaterials(),
+            ArtBody->GetMaterial(0) ? *ArtBody->GetMaterial(0)->GetPathName() : TEXT("-"),
+            Slot1 ? *Slot1->GetPathName() : TEXT("-"),
+            BaseMaterial ? *BaseMaterial->GetPathName() : TEXT("-"), *Parent, Params, *Digest));
+      }
     }
   }
   if (bArtPreview && !bMedusaCandidate) {

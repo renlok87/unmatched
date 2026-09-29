@@ -30,7 +30,10 @@ R1  PNG metadata. A PNG whose tEXt chunks carry Blender's stamp keys
     Pillow) carry no text chunks, so R1 never fires for them.
 R2  Run manifest + traces (packaged-live). Look for manifest.json in the
     frame's directory and up to two parents. It must list the frame's file
-    name with a sha256 equal to the file on disk, and list at least one
+    name (or, T5.2, its path relative to the manifest dir: the combat runs of
+    tools/s09/run-combat-demo.ps1 list 'joiner\\s09-combat-result.png'; the
+    SHOT path must then end with the same sub-directory, so a host frame never
+    binds to the joiner trace) with a sha256 equal to the file on disk, and list at least one
     *.trace.log whose sha256 also matches. The frame is bound to one trace:
     the trace whose "SHOT requested: ..." line names the frame's file name,
     otherwise the trace with the same role token (host/joiner) in its name.
@@ -215,6 +218,12 @@ def rule_blender_metadata(info: dict) -> bool:
     return "RenderTime" in t and ("Scene" in t or "Camera" in t)
 
 
+def manifest_name(entry: dict) -> str:
+    """Manifest entry name with '/' separators: tools/s09/run-combat-demo.ps1
+    lists its host/ and joiner/ frames as 'joiner\\s09-combat-result.png'."""
+    return str(entry.get("name", "")).replace("\\", "/")
+
+
 def find_manifest(frame: Path) -> tuple[Path, dict, dict] | None:
     for d in ancestors(frame, 2):
         m = d / "manifest.json"
@@ -223,8 +232,18 @@ def find_manifest(frame: Path) -> tuple[Path, dict, dict] | None:
         doc = load_json(m)
         if not isinstance(doc, dict) or not isinstance(doc.get("files"), list):
             continue
-        for entry in doc["files"]:
-            if isinstance(entry, dict) and entry.get("name") == frame.name:
+        # T5.2: an entry may name the frame by its path relative to the
+        # manifest dir (combat runs keep host/ and joiner/ frames in subdirs).
+        try:
+            relname = frame.resolve().relative_to(d.resolve()).as_posix()
+        except ValueError:
+            relname = frame.name
+        entries = [e for e in doc["files"] if isinstance(e, dict)]
+        for entry in entries:
+            if manifest_name(entry) == relname:
+                return m, doc, entry
+        for entry in entries:  # pre-T5.2 rule: the bare file name
+            if entry.get("name") == frame.name:
                 return m, doc, entry
     return None
 
@@ -254,19 +273,22 @@ def check_live(frame: Path, info: dict, sha: str, expect_mesh: str | None) -> di
         res["reasons"].append("manifest lists no *.trace.log")
     elif not core["C2_traces_listed_and_hash_ok"]:
         res["reasons"].append("a listed trace is missing or its sha256 differs from the manifest")
-    # bind frame -> trace
+    # bind frame -> trace. A sub-directory entry (joiner/s09-combat-result.png)
+    # must match the tail of the SHOT path, so the host frame with the same file
+    # name never binds to the joiner trace or vice versa (T5.2, combat runs).
+    want = manifest_name(entry).split("/")
     bound, binding, shot_line = None, None, None
     for tp, ok in traces:
         if not ok:
             continue
         for line in read_text_any(tp).splitlines():
-            if "SHOT requested" in line and re.split(r"[\\/]", line.strip())[-1] == frame.name:
+            if "SHOT requested" in line and re.split(r"[\\/]", line.strip())[-len(want):] == want:
                 bound, binding, shot_line = tp, "shot-requested", line
                 break
         if bound:
             break
     if not bound:
-        role = role_token(frame.name)
+        role = role_token(frame.name) or next((r for r in map(role_token, want[:-1]) if r), None)
         cands = [tp for tp, ok in traces if ok and role and role_token(tp.name) == role]
         if len(cands) == 1:
             bound, binding = cands[0], "role-name"
@@ -489,10 +511,11 @@ SELF_TEST_CASES = [
     ("positive", "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/blender-id-d10-k2-front-d300-v3.png", "blender"),
 ]
 NEGATIVE_SOURCE = "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/ue-mcp-live/ue-mcp-cobble-d10-k2-d300-v3.png"
+SUBDIR_COMBAT_RUN = "docs/game-design/evidence/ART-005/art-boards-t32/combat-cobble-5x6/combat-20260928-194340"
 
 
 def self_test() -> tuple[bool, list[dict]]:
-    """3 known positives + 1 negative (editor PNG renamed as a live host frame)
+    """3 known positives + 2 combat sub-directory positives (T5.2) + 1 negative (editor PNG renamed as a live host frame)
     + 1 W4-A negative (a pre-W4 live frame under --render-reference)."""
     results = []
     for kind, rel, expected in SELF_TEST_CASES:
@@ -500,6 +523,16 @@ def self_test() -> tuple[bool, list[dict]]:
         passed = r["class"] == expected and not r["rejected"]
         results.append({"case": kind, "frame": rel, "expected": expected, "got": r["class"],
                         "grade": r["grade"], "rejected": r["rejected"], "pass": passed})
+    # T5.2: combat-run layout (manifest in the run dir, frames in host/ and
+    # joiner/ with the same file name): each frame binds to its own trace.
+    for role in ("host", "joiner"):
+        rel = f"{SUBDIR_COMBAT_RUN}/{role}/s09-combat-result.png"
+        r = classify_frame(REPO_ROOT / rel)
+        tfile = ((r.get("live") or {}).get("trace") or {}).get("file") or ""
+        results.append({"case": f"positive-subdir-{role}", "frame": rel, "expected": f"packaged-live bound to the {role} trace",
+                        "got": r["class"], "trace": tfile, "grade": r["grade"], "rejected": r["rejected"],
+                        "pass": r["class"] == "packaged-live" and not r["rejected"]
+                        and tfile.endswith(f"combat-client-{role}.trace.log")})
     rel_live = SELF_TEST_CASES[0][1]
     r = classify_frame(REPO_ROOT / rel_live, render_reference=True)
     results.append({"case": "negative-render", "frame": rel_live,

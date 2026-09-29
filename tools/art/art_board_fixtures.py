@@ -513,6 +513,33 @@ def check_profiles(fixtures: list[dict], profiles: dict) -> list[str]:
         if any(p.get("castShadows") for p in pts):
             errs.append(f"light {lid}: point lights must not cast shadows")
         errs += check_render_blocks(lid, lp)
+    errs += check_content_blocks(profiles)
+    return errs
+
+
+GLYPH_NAMES = ("diamond", "bar1", "bars2", "bars3", "hbars2", "square", "cross", "x", "tee", "chevron", "ring")
+
+
+def check_content_blocks(profiles: dict) -> list[str]:
+    """T4.2 content: every zone style (and the fallback) names a /Game/ zone MI, and glyphMeshes maps each known
+    glyph name to a /Game/ static mesh; every glyph a style uses has a mesh. Assets themselves are checked by the UE
+    automation test Unmatched.S08.BoardArt.ZoneContent (parent, LayerColor, bounds)."""
+    errs = []
+    styles = dict(profiles.get("zoneStyles") or {})
+    styles["(fallback)"] = profiles.get("fallbackZoneStyle") or {}
+    for key, st in styles.items():
+        mi = st.get("materialInstance")
+        if not (isinstance(mi, str) and mi.startswith("/Game/") and " " not in mi):
+            errs.append(f"zone style {key}: materialInstance {mi!r} is not a /Game/ package path")
+    meshes = profiles.get("glyphMeshes") or {}
+    for glyph, path in meshes.items():
+        if glyph not in GLYPH_NAMES:
+            errs.append(f"glyphMeshes: unknown glyph {glyph!r}")
+        if not (isinstance(path, str) and path.startswith("/Game/") and " " not in path):
+            errs.append(f"glyphMeshes {glyph}: {path!r} is not a /Game/ package path")
+    for key, st in styles.items():
+        if st.get("glyph") and st["glyph"] not in meshes:
+            errs.append(f"zone style {key}: glyph {st['glyph']!r} has no glyph mesh")
     return errs
 
 

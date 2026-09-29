@@ -1,0 +1,370 @@
+{
+  "command": "checklist",
+  "tool": "qa010-tools 1.1.0",
+  "generated_utc": "2026-09-29T10:29:16Z",
+  "title": "QA-010 чек-лист T5.2 — t-rex-paddock-7x5 (t-rex-paddock-art-fixture): K1 + K3 (K2 — задача T5.1). Не приёмка",
+  "run": {
+    "задача": "этап 3 T5.2 «Арт 3 живьём»",
+    "доска": "t-rex-paddock-7x5 boardId=c70e9f624617750c2a2b856fd",
+    "K1_хост": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/t-rex-paddock-7x5/run-20260929-141931/phase2-board-host-1920x1080.png",
+    "K1_присоединившийся": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/t-rex-paddock-7x5/run-20260929-141931/phase2-board-joiner-1920x1080.png",
+    "K3": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-142830/joiner/s09-combat-resolve-revealed.png",
+    "производные": "C:\\tmp\\t52\\derived (вне git; sha256 в derive-manifest.json)",
+    "пороги": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/t52-thresholds.json"
+  },
+  "frames": {
+    "K1": {
+      "path": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/t-rex-paddock-7x5/run-20260929-141931/phase2-board-host-1920x1080.png",
+      "provenance": "packaged-live (strict + render-reference: tools/art/classify_evidence.py --strict --render-reference)",
+      "provenance_used": "packaged-live (strict + render-reference: tools/art/classify_evidence.py --strict --render-reference)"
+    },
+    "K3": {
+      "path": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-142830/joiner/s09-combat-resolve-revealed.png",
+      "provenance": "packaged-live (strict + render-reference: tools/art/classify_evidence.py --strict --render-reference)",
+      "provenance_used": "packaged-live (strict + render-reference: tools/art/classify_evidence.py --strict --render-reference)"
+    }
+  },
+  "viewer": {
+    "kind": "agent",
+    "note": "самоприёмка агента T5.2: агент смотрел кадры, кропы и листы (Read рендерит PNG в этой сессии) и пиксельные замеры; не независимый зритель — нужен взгляд пользователя"
+  },
+  "rows": [
+    {
+      "id": "K1.cells_all",
+      "frame": "K1",
+      "criterion": "Различимы все клетки, включая дальнюю строку",
+      "source": "10 QA-010 стр. 132; 17 AD-AC-27",
+      "norm_status": "НОРМАТИВ",
+      "kind": "manual+auto",
+      "status": "открыто (ручная проверка)",
+      "detail": "проекция трассы: клеток целиком в кадре 35/35 (частично 0); различимость — глазами | авто: измерено (вспомогательно) клеток полностью в кадре 35/35 (частично 0); остаток проекции 0.994 px; различимость — ручная"
+    },
+    {
+      "id": "K1.multizone",
+      "frame": "K1",
+      "criterion": "Различимы мультизонные клетки",
+      "source": "10 QA-010 стр. 132; 17 AD-AC-28, AD-OPEN-21",
+      "norm_status": "НОРМАТИВ (на живой доске мультизон нет — ОТКРЫТО)",
+      "kind": "manual",
+      "status": "открыто (ручная проверка)",
+      "detail": "трасса хоста: multizone cells=13 zonesListed=26 zonesMarked=26 — это доказательство геометрии (штрих и глиф заспавнены), не читаемости. Замер K1 присоединившегося: в 5 из 13 мультизонных клеток метка хотя бы одной зоны не отделяется от плитки по цвету (gray): (5,1) (4,2) (5,2) (3,4) (5,4) — такая клетка читается как однозонная (zone-contrast.json)"
+    },
+    {
+      "id": "K1.hero_helper",
+      "frame": "K1",
+      "criterion": "Различимы герои и помощники",
+      "source": "10 QA-010 стр. 132",
+      "norm_status": "НОРМАТИВ",
+      "kind": "manual",
+      "status": "открыто (ручная проверка)",
+      "detail": "фигуры: Medusa-кандидат + серые блок-ауты; подписи мира (имя + HP, белый текст без подложки) против светлого фона в SHOT label bbox (labels-damage.json; fail < 3:1, AA-large only 3..4,5:1, AA ≥ 4,5:1, худшая строка): fail: Harpies 1 [K1_host K1_joiner K3 K3_damage], Harpies 2 [K1_host K1_joiner K3 K3_damage], Harpies 3 [K1_host K1_joiner K3 K3_damage], Medusa [K1_joiner K3 K3_damage], Merlin [K1_host K1_joiner K3 K3_damage]; AA: King Arthur [K1_host K1_joiner K3 K3_damage]"
+    },
+    {
+      "id": "K1.teams_gray",
+      "frame": "K1",
+      "criterion": "Своя/чужая команда различимы, кольца С-11 — в т.ч. в градациях серого",
+      "source": "10 QA-010 стр. 132; 03 С-11; 17 AD-AC-31",
+      "norm_status": "НОРМАТИВ",
+      "kind": "manual+derived",
+      "status": "открыто (ручная проверка)",
+      "detail": "команды: MI_Medusa_Blue / MI_Medusa_Red и кольца подставок (W4-B: пара С-11 почти изолюминантна, Q-304); серый — глазами по производным. Кольцо команды в цвете (доля пикселей цвета команды в кольце, порог 0.05, team-rings.json) не видно: Harpies 1 (2,3) K1_joiner 0.0032; Harpies 2 (2,1) K1_joiner 0.0395; Medusa (5,1) K3 0.0449 | авто: измерено: есть серый + deuteranopia для K1"
+    },
+    {
+      "id": "K1.selected",
+      "frame": "K1",
+      "criterion": "Видно, какая фигурка выделена",
+      "source": "10 QA-010 стр. 132",
+      "norm_status": "НОРМАТИВ",
+      "kind": "manual",
+      "status": "открыто (ручная проверка)",
+      "detail": "хост: ARTPREVIEW selection ownHero=1 selected=1 fighter=Medusa reachable=11 fighterId=f-0-hero"
+    },
+    {
+      "id": "K1.zones_deut",
+      "frame": "K1",
+      "criterion": "Зоны различимы не только цветом (цвет+глиф+буква), проверка симуляцией deuteranopia",
+      "source": "10 QA-010 стр. 132; 15 ACC-020; 17 AD-AC-29",
+      "norm_status": "НОРМАТИВ (способ кодирования — ПРЕДЛОЖЕНИЕ, AD-CNF-10)",
+      "kind": "manual+derived",
+      "status": "открыто (ручная проверка)",
+      "detail": "метка зоны против плитки (WCAG ≥ 3:1, зарегистрировано до съёмки) — не проходят: blue, blue-green, gray, green, purple, yellow; форма (штрих+глиф) у всех пар соседних зон разная; буквы зон не реализованы — zone-contrast.json | авто: измерено: есть серый + deuteranopia для K1"
+    },
+    {
+      "id": "K1.c9",
+      "frame": "K1",
+      "criterion": "Игровой слой ярче декора (С-9); +0.3..+0.7 EV и «насыщеннее» — предложение",
+      "source": "10 QA-010 стр. 132; 03 С-9 стр. 28; 17 AD-AC-33, §11.10",
+      "norm_status": "НОРМАТИВ «ярче»; диапазон — ПРЕДЛОЖЕНИЕ",
+      "kind": "auto",
+      "status": "нет данных: декор — прокси (нужна stencil- или ручная маска L3)",
+      "detail": "измерено на прокси (не норматив): «ярче» pass, предложено fail; ΔEV=+0.587; ΔC*=-1.53; прокси: decor tray_proxy=trace-ring:0.05,0.35 — кольцо вокруг доски = поднос/рамка (L4 фон по 03 §4.1), не декор L3"
+    },
+    {
+      "id": "K2.cobble_borders",
+      "frame": "K2",
+      "criterion": "Различимы булыжник и границы клетки",
+      "source": "10 QA-010 стр. 132; 03 стр. 107",
+      "norm_status": "НОРМАТИВ",
+      "kind": "manual",
+      "status": "открыто (ручная проверка)",
+      "detail": ""
+    },
+    {
+      "id": "K2.face_weapon",
+      "frame": "K2",
+      "criterion": "Различимы лицо и оружие фигурки",
+      "source": "10 QA-010 стр. 132; 17 стр. 847",
+      "norm_status": "НОРМАТИВ (модель зума K-2 открыта, AD-OPEN-08; 1,6× — Given QA-010)",
+      "kind": "manual",
+      "status": "открыто (ручная проверка)",
+      "detail": ""
+    },
+    {
+      "id": "K2.plate",
+      "frame": "K2",
+      "criterion": "Плашка фигурки не перекрывает кликабельные клетки текущего выбора",
+      "source": "03 §3 К-2 стр. 107; 17 §2.7",
+      "norm_status": "ПРЕДЛОЖЕНИЕ",
+      "kind": "auto",
+      "status": "нет данных",
+      "detail": "нет результата plate"
+    },
+    {
+      "id": "K3.attack_result",
+      "frame": "K3",
+      "criterion": "Различимы атакующий, цель и результат (на фигурке и в HUD)",
+      "source": "10 QA-010 стр. 132; 03 стр. 123",
+      "norm_status": "НОРМАТИВ",
+      "kind": "manual",
+      "status": "открыто (ручная проверка)",
+      "detail": "COMBAT-RESULT и числа урона сходятся у обоих клиентов (validation.json); цель — кольцо-дуги и иконка; иконка висит над целью и ложится на подставку фигуры в клетке за ней (k3-icon-bbox-crops.png); на s09-combat-result.png иконки в пикселях нет, хотя трасса пишет visible=1; атакующий — без позы (клипы не подключены). Число урона: совпадение CUE = число — это счёт, не видимость; читаемость и столкновения с подписями — labels-damage.json"
+    },
+    {
+      "id": "K3.icon_sizes",
+      "frame": "K3",
+      "criterion": "Пиктограмма цели читается при 24/32/48 px, контраст с фоном",
+      "source": "02 стр. 864, 894; 17 стр. 1200, 1229; GD-058 акт 2026-09-28",
+      "norm_status": "ПРЕДЛОЖЕНИЕ (≥3:1)",
+      "kind": "auto",
+      "status": "измерено: fail (предложенный порог)",
+      "detail": "24px: 1.035:1; 32px: 1.114:1; 48px: 1.118:1 ↑"
+    },
+    {
+      "id": "ALL.highlight_shapes",
+      "frame": "K1/K3",
+      "criterion": "Подсветки хода/атаки/выбора различимы формой и иконкой, не только цветом",
+      "source": "10 QA-010 стр. 133; 03 §6; 17 AD-AC-32",
+      "norm_status": "НОРМАТИВ",
+      "kind": "manual+derived",
+      "status": "открыто (ручная проверка)",
+      "detail": "авто: измерено: есть серый + deuteranopia для K1, K3"
+    },
+    {
+      "id": "ALL.derived_evidence",
+      "frame": "K1..K3",
+      "criterion": "Приложены скриншоты в градациях серого и deuteranopia",
+      "source": "10 QA-010 стр. 135; 17 стр. 548",
+      "norm_status": "НОРМАТИВ (доказательство)",
+      "kind": "auto",
+      "status": "измерено: неполно",
+      "detail": "нет производных для K2"
+    },
+    {
+      "id": "ALL.luma_recorded",
+      "frame": "K1..K3",
+      "criterion": "Luma p50/p90 кадров записаны (эталон для Q-303)",
+      "source": "17 §11.10; 03 Q-303",
+      "norm_status": "ПРЕДЛОЖЕНИЕ (порога нет)",
+      "kind": "auto",
+      "status": "измерено: неполно",
+      "detail": "K1: p50 23.0 / p90 198.575; K3: p50 30.164 / p90 199.362; нет для K2"
+    },
+    {
+      "id": "ALL.viewer",
+      "frame": "K1..K3",
+      "criterion": "Проверку выполнили проверяющий и независимый зритель (не автор вида)",
+      "source": "10 QA-010 стр. 129; stage-3 E5",
+      "norm_status": "НОРМАТИВ",
+      "kind": "viewer",
+      "status": "суррогат (агент) — до ответа пользователя",
+      "detail": "самоприёмка агента T5.2: агент смотрел кадры, кропы и листы (Read рендерит PNG в этой сессии) и пиксельные замеры; не независимый зритель — нужен взгляд пользователя"
+    },
+    {
+      "id": "ALL.provenance",
+      "frame": "K1..K3",
+      "criterion": "Кадры K1–K3 — packaged-live (редакторные кадры — только диагностика)",
+      "source": "stage-3 инвариант (classify_evidence, T0)",
+      "norm_status": "ПРАВИЛО ЭТАПА 3",
+      "kind": "provenance",
+      "status": "не годится для приёмки: K2",
+      "detail": "K1: packaged-live (strict + render-reference: tools/art/classify_evidence.py --strict --render-reference); K2: unknown; K3: packaged-live (strict + render-reference: tools/art/classify_evidence.py --strict --render-reference)"
+    },
+    {
+      "id": "ALL.render_reference",
+      "frame": "K1..K3",
+      "criterion": "Кадры K1–K3 сняты на эталоне рендера: DX12/SM6 + Lumen, High (sg.* = 2), SP 100, экспозиция и единицы света профиля — строка RENDER в SHOT-блоке кадра (qa010 render)",
+      "source": "решение пользователя 2026-09-28 (W4-A); docs/art-pipeline/render-reference.json",
+      "norm_status": "РЕШЕНИЕ ПОЛЬЗОВАТЕЛЯ",
+      "kind": "render",
+      "status": "ок",
+      "detail": "K1: эталон (D3D12/SM6, gi=lumen, preset=High, SP 100.0); K3: эталон (D3D12/SM6, gi=lumen, preset=High, SP 100.0)"
+    }
+  ],
+  "elements": [
+    {
+      "frame": "K1",
+      "id": "facade",
+      "element": "Фасад на дальней стороне, приглушён",
+      "source": "03 §3 стр. 73; 17 §2.7",
+      "status": "отложено",
+      "reason": "фасадов в сцене S08Arena нет (кандидаты пайплайна не расставлены)",
+      "norm": ""
+    },
+    {
+      "frame": "K1",
+      "id": "lantern",
+      "element": "Фонарь (тёплый акцент)",
+      "source": "03 С-6; 17 §2.7",
+      "status": "отложено",
+      "reason": "фонаря в сцене нет",
+      "norm": ""
+    },
+    {
+      "frame": "K1",
+      "id": "tray_darkness",
+      "element": "Поднос с рваным краем, за ним тьма (С-10)",
+      "source": "03 С-10 стр. 29; 17 AD-AC-35",
+      "status": "есть",
+      "reason": "деревянная рама и тёмный фон (профиль доски); рваного края подноса нет",
+      "norm": ""
+    },
+    {
+      "frame": "K1",
+      "id": "fog",
+      "element": "Экспоненциальный туман",
+      "source": "03 С-10; 17 §2.7",
+      "status": "отложено",
+      "reason": "туман в профиле рендера не задан",
+      "norm": ""
+    },
+    {
+      "frame": "K1",
+      "id": "vignette",
+      "element": "Виньетка",
+      "source": "03 С-10; 17 стр. 515",
+      "status": "отложено",
+      "reason": "виньетка не задана",
+      "norm": ""
+    },
+    {
+      "frame": "K1",
+      "id": "zone_pictograms",
+      "element": "Пиктограммы зон по краю подноса",
+      "source": "03 §3 стр. 77; 02 UI-ICON-ZONE",
+      "status": "отложено",
+      "reason": "пиктограммы зон по краю подноса не реализованы; глифы зон — в клетках (T4.2)",
+      "norm": ""
+    },
+    {
+      "frame": "K1",
+      "id": "hud",
+      "element": "HUD: оппонент сверху, рука снизу",
+      "source": "03 §3 стр. 84; 17 §2.7",
+      "status": "есть",
+      "reason": "UMG-гибрид W4-C (панели сверху, рука снизу)",
+      "norm": ""
+    },
+    {
+      "frame": "K1",
+      "id": "shadow_casters_1",
+      "element": "Счётчик источников с тенью = 1",
+      "source": "03 С-8; 09 TASK-043 стр. 410",
+      "status": "есть",
+      "reason": "RENDER shadowCasters=1 (трасса хоста)",
+      "norm": ""
+    },
+    {
+      "frame": "K1",
+      "id": "six_fighters",
+      "element": "6 фигурок (Medusa + 3 гарпии, Arthur + Merlin) или 6 копий принятой Medusa",
+      "source": "14 GD-058; D-03",
+      "status": "есть",
+      "reason": "FIGHTERS synced n=6 alive=6: кандидат Medusa v2 + серые блок-ауты гарпий, Артура и Мерлина",
+      "norm": ""
+    },
+    {
+      "frame": "K2",
+      "id": "facade_hidden",
+      "element": "Фасад скрыт/прозрачен при зуме",
+      "source": "03 §4.4; 17 §2.7",
+      "status": "отложено",
+      "reason": "K2 — вне T5.2 (T5.1)",
+      "norm": ""
+    },
+    {
+      "frame": "K2",
+      "id": "plate",
+      "element": "Плашка фигурки: имя, HP, статус",
+      "source": "03 §3 стр. 105; GD-058 акт 2026-09-28",
+      "status": "отложено",
+      "reason": "K2 — T5.1; плашка и её перекрытие с клетками выбора измерены на K1 хоста (plate-k1-host.json)",
+      "norm": ""
+    },
+    {
+      "frame": "K2",
+      "id": "base_profile",
+      "element": "Подставка с номером/профилем команды",
+      "source": "03 стр. 107; 04 §3.8",
+      "status": "отложено",
+      "reason": "K2 — вне T5.2 (T5.1)",
+      "norm": ""
+    },
+    {
+      "frame": "K3",
+      "id": "poses",
+      "element": "Позы LungeAttack / HitReact (D-11); без клипов — «постановка»",
+      "source": "03 §3 К-3; 17 §2.7; stage-3 B6",
+      "status": "отложено",
+      "reason": "клипы боя не подключены — «постановка» (фигуры в покое)",
+      "norm": ""
+    },
+    {
+      "frame": "K3",
+      "id": "inspector_2d",
+      "element": "Инспектор карты с 2D-артом (D-09), не прячет цель",
+      "source": "03 стр. 123; 17 §2.7",
+      "status": "отложено",
+      "reason": "инспектор карты с 2D-артом не реализован (D-09)",
+      "norm": ""
+    },
+    {
+      "frame": "K3",
+      "id": "target_frame_icon",
+      "element": "Рамка-прицел + пиктограмма цели",
+      "source": "03 §6 стр. 193",
+      "status": "есть",
+      "reason": "кольцо цели + иконка UMG (SHOT icon src=combat в SHOT-блоке кадра K3)",
+      "norm": ""
+    },
+    {
+      "frame": "K3",
+      "id": "damage_result",
+      "element": "Число урона на фигурке и итог в HUD",
+      "source": "03 стр. 123; ART-003 акт 2026-09-28",
+      "status": "есть",
+      "reason": "числа урона: ARTPREVIEW damage-number = CUE damage ровно по одному (validation.json); итог боя — панель результата S09 (кадр s09-combat-result.png)",
+      "norm": ""
+    }
+  ],
+  "status_counts": {
+    "открыто (ручная проверка)": 10,
+    "нет данных: декор — прокси (нужна stencil- или ручная маска L3)": 1,
+    "нет данных": 1,
+    "измерено: fail (предложенный порог)": 1,
+    "измерено: неполно": 2,
+    "суррогат (агент) — до ответа пользователя": 1,
+    "не годится для приёмки: K2": 1,
+    "ок": 1
+  },
+  "verdict": "Не является приёмкой: инструмент фиксирует измерения и открытые пункты. Решение QA-010 — проверяющий + независимый зритель (10 стр. 129); GD-058 — автор."
+}

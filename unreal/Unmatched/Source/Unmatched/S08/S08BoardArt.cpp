@@ -98,6 +98,13 @@ bool ParseStyle(const FString& Key, const TSharedPtr<FJsonObject>& Object, FS08Z
     return false;
   }
   Object->TryGetStringField(TEXT("material"), Out.MaterialPath);
+  // T4.2 zone MI (optional): a /Game/ package path, checked here so a typo fails the document, not the frame.
+  if (Object->TryGetStringField(TEXT("materialInstance"), Out.MaterialInstancePath) &&
+      (!Out.MaterialInstancePath.StartsWith(TEXT("/Game/")) || Out.MaterialInstancePath.Contains(TEXT(" ")))) {
+    Errors.Add(FString::Printf(TEXT("zoneStyle %s: materialInstance '%s' is not a /Game/ package path"), *Key,
+                               *Out.MaterialInstancePath));
+    return false;
+  }
   return true;
 }
 
@@ -413,6 +420,26 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
   }
   FallbackStyle.bFallback = true;
 
+  // T4.2 glyph meshes: glyph name -> /Game/ static mesh package (one per glyph shape).
+  GlyphMeshPaths.Reset();
+  const TSharedPtr<FJsonObject>* GlyphMeshes = nullptr;
+  if (Root->TryGetObjectField(TEXT("glyphMeshes"), GlyphMeshes) && GlyphMeshes && GlyphMeshes->IsValid()) {
+    for (const TPair<FString, TSharedPtr<FJsonValue>>& Pair : (*GlyphMeshes)->Values) {
+      ES08ZoneGlyph Glyph;
+      FString Path;
+      if (!S08ParseZoneGlyph(Pair.Key, Glyph)) {
+        OutErrors.Add(FString::Printf(TEXT("glyphMeshes: unknown glyph '%s'"), *Pair.Key));
+        continue;
+      }
+      if (!Pair.Value.IsValid() || !Pair.Value->TryGetString(Path) || !Path.StartsWith(TEXT("/Game/")) ||
+          Path.Contains(TEXT(" "))) {
+        OutErrors.Add(FString::Printf(TEXT("glyphMeshes %s: '%s' is not a /Game/ package path"), *Pair.Key, *Path));
+        continue;
+      }
+      GlyphMeshPaths.Add(Pair.Key, Path);
+    }
+  }
+
   const TSharedPtr<FJsonObject>* LightObjects = nullptr;
   if (Root->TryGetObjectField(TEXT("lightProfiles"), LightObjects) && LightObjects) {
     for (const TPair<FString, TSharedPtr<FJsonValue>>& Pair : (*LightObjects)->Values) {
@@ -642,6 +669,11 @@ void S08GlyphPieces(ES08ZoneGlyph Glyph, int32 Slot, TArray<FTransform>& Out) {
   }
 }
 
+FVector S08GlyphAnchor(int32 Slot) {
+  const FVector2D P2 = GlyphSlot(Slot);
+  return FVector(P2.X, P2.Y, MarkZ);
+}
+
 FS08ZoneMarkLayout S08BuildZoneMarks(const FS08BoardModel& Board, const FS08BoardArtData& Data) {
   FS08ZoneMarkLayout L;
   for (int32 Y = 0; Y < Board.Height; ++Y) {
@@ -670,6 +702,7 @@ FS08ZoneMarkLayout S08BuildZoneMarks(const FS08BoardModel& Board, const FS08Boar
           W.SetTranslation(World + T.GetTranslation());
           L.Glyphs.Add({Key, FIntPoint(X, Y), I, W});
         }
+        L.GlyphAnchors.Add({Key, FIntPoint(X, Y), I, FTransform(World + S08GlyphAnchor(I))});
         L.StrokePiecesByKey.FindOrAdd(Key) += Strokes.Num();
         L.GlyphPiecesByKey.FindOrAdd(Key) += Glyphs.Num();
         if (Strokes.Num() > 0 && Glyphs.Num() > 0) ++Marked;

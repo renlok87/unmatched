@@ -1,0 +1,2000 @@
+{
+ "schema": "unmatched.t42-sky-calib-editor/1",
+ "tool": "tools/art/t42_sky_calib_editor.py run",
+ "startedUtc": "2026-09-29T07:41:24+00:00",
+ "originalLevel": "/Game/ArtTests/T42Calib/L_T42_Cobble_t2",
+ "profilesFile": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json",
+ "profilesSha256": "1772bdb02820ac81bb35751c95254b3fcf069ca43788a215fa628adbfe68463b",
+ "camera": {
+  "pitch": -55.0,
+  "yaw": -90.0,
+  "distanceUU": 608.84,
+  "viewportFovDeg": 90,
+  "equivalent": "live K1 FOV 35.0 at 1931.0 uu (same horizontal framing at the focus)"
+ },
+ "exposure": {
+  "method": "histogram-fixed",
+  "minMaxBrightness": 2.46229,
+  "bias": 0.0,
+  "ev100": 1.3
+ },
+ "roi": {
+  "boardK1Box": [
+   600,
+   700,
+   1360,
+   940
+  ]
+ },
+ "repeats": 3,
+ "decisionRule": "match when |rev2 - target| <= 2 x max(noise) and <= 0.5... else refine",
+ "profiles": {
+  "cobble": {
+   "light": "cobble-probe",
+   "level": {
+    "source": "/Game/ArtTests/ART005H/L_ART005H_CornerReview",
+    "scratch": "/Game/ArtTests/T42Calib/L_T42_Cobble_f1",
+    "fresh": true
+   },
+   "prep": {
+    "hiddenSprites": 4,
+    "removed": [
+     "ART005 K1 review camera - unapproved"
+    ],
+    "reviewLights": {
+     "ART005 cool scene key - proposed": {
+      "actor": "DirectionalLight_0",
+      "intensity": 4.5,
+      "lightColor": {
+       "r": 1,
+       "g": 1,
+       "b": 1,
+       "a": 1
+      },
+      "castShadows": true,
+      "transform": {
+       "location": {
+        "x": -350,
+        "y": -150,
+        "z": 600
+       },
+       "rotation": {
+        "pitch": -55.00000000000003,
+        "yaw": 30.000000000000025,
+        "roll": 0
+       },
+       "scale": {
+        "x": 2.5,
+        "y": 2.5,
+        "z": 2.5
+       }
+      }
+     },
+     "ART005 neutral readability fill - review only": {
+      "actor": "PointLight_0",
+      "intensity": 700,
+      "intensityUnits": "Candelas",
+      "lightColor": {
+       "r": 1,
+       "g": 1,
+       "b": 1,
+       "a": 1
+      },
+      "attenuationRadius": 1800,
+      "castShadows": false,
+      "transform": {
+       "location": {
+        "x": 0,
+        "y": -100,
+        "z": 550
+       },
+       "rotation": {
+        "pitch": 0,
+        "yaw": 0,
+        "roll": 0
+       },
+       "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+       }
+      }
+     },
+     "ART005 warm lantern accent - proposed": {
+      "actor": "PointLight_1",
+      "intensity": 85,
+      "intensityUnits": "Candelas",
+      "lightColor": {
+       "r": 1,
+       "g": 1,
+       "b": 1,
+       "a": 1
+      },
+      "attenuationRadius": 450,
+      "castShadows": false,
+      "transform": {
+       "location": {
+        "x": 260,
+        "y": -300,
+        "z": 250
+       },
+       "rotation": {
+        "pitch": 0,
+        "yaw": 0,
+        "roll": 0
+       },
+       "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+       }
+      }
+     }
+    }
+   },
+   "dx11Reference": {
+    "frame": "docs/game-design/evidence/ART-005/stone-corner-combined-k1-editor-2026-09-28.png",
+    "sha256": "268e79ad578c5bf209ea1e1cb3167c1a5d606c15659c6e9f49c2267f15ca5d73",
+    "boardK1P50": 134.15,
+    "boardK1Mean": 130.71,
+    "boardK1P10": 98.23,
+    "boardK1P90": 154.66,
+    "frameP50": 0.0,
+    "note": "ART-005/ART-005I DX11 editor frame (SceneCapture FOV 35 from -Y, own exposure): a different camera and exposure, so only the ratios between the three probes are comparable"
+   },
+   "legacyLevelFill": {
+    "fillPosition": [
+     0.0,
+     -100.0,
+     550.0
+    ],
+    "boardK1P50": 104.14
+   },
+   "fillMovedTo": {
+    "location": {
+     "x": 0,
+     "y": 100,
+     "z": 500
+    },
+    "rotation": {
+     "pitch": 0,
+     "yaw": 0,
+     "roll": 0
+    },
+    "scale": {
+     "x": 1,
+     "y": 1,
+     "z": 1
+    }
+   },
+   "target": {
+    "n": 3,
+    "mean": 132.65,
+    "min": 132.65,
+    "max": 132.65,
+    "noise": 0.0,
+    "values": [
+     132.65,
+     132.65,
+     132.65
+    ]
+   },
+   "removedReviewLights": [
+    "ART005 cool scene key - proposed",
+    "ART005 neutral readability fill - review only",
+    "ART005 warm lantern accent - proposed"
+   ],
+   "rig": {
+    "key": {
+     "actor": "DirectionalLight_1",
+     "pos": [
+      -350.0,
+      -150.0,
+      600.0
+     ],
+     "rotationPYR": [
+      0,
+      -55,
+      30
+     ],
+     "readback": {
+      "intensity": 4.5,
+      "lightColor": {
+       "r": 1,
+       "g": 1,
+       "b": 1,
+       "a": 1
+      },
+      "castShadows": true,
+      "dynamicShadowDistanceMovableLight": 3000,
+      "dynamicShadowCascades": 2
+     }
+    },
+    "points": [
+     {
+      "name": "warm",
+      "pos": [
+       260.0,
+       -300.0,
+       250.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 85,
+       "attenuationRadius": 450,
+       "lightColor": {
+        "r": 1,
+        "g": 1,
+        "b": 1,
+        "a": 1
+       }
+      }
+     }
+    ],
+    "sky": {
+     "actor": "SkyLight_0",
+     "readback": {
+      "sourceType": "SLS_SpecifiedCubemap",
+      "cubemap": {
+       "refPath": "/Game/S08/Render/TC_S08_AmbientDome.TC_S08_AmbientDome"
+      },
+      "intensity": 8,
+      "lightColor": {
+       "r": 1,
+       "g": 1,
+       "b": 1,
+       "a": 1
+      },
+      "bLowerHemisphereIsBlack": false
+     }
+    }
+   },
+   "curve": [
+    {
+     "sky": 8.0,
+     "boardK1P50": 107.08
+    },
+    {
+     "sky": 11.2,
+     "boardK1P50": 131.72
+    },
+    {
+     "sky": 11.3,
+     "boardK1P50": 132.22
+    },
+    {
+     "sky": 11.34,
+     "boardK1P50": 132.58
+    },
+    {
+     "sky": 11.4,
+     "boardK1P50": 133.08
+    },
+    {
+     "sky": 12.0,
+     "boardK1P50": 137.07
+    },
+    {
+     "sky": 16.0,
+     "boardK1P50": 158.29
+    }
+   ],
+   "final": {
+    "sky": 11.4,
+    "n": 3,
+    "mean": 132.967,
+    "min": 132.94,
+    "max": 133.01,
+    "noise": 0.07,
+    "values": [
+     133.01,
+     132.94,
+     132.95
+    ]
+   },
+   "shipped": {
+    "sky": 11.2,
+    "n": 3,
+    "mean": 131.73,
+    "min": 131.73,
+    "max": 131.73,
+    "noise": 0.0,
+    "values": [
+     131.73,
+     131.73,
+     131.73
+    ]
+   },
+   "rigKeyPitch55": {
+    "key": {
+     "actor": "DirectionalLight_2",
+     "pos": [
+      -350.0,
+      -150.0,
+      600.0
+     ],
+     "rotationPYR": [
+      -55.0,
+      30.0,
+      0.0
+     ],
+     "readback": {
+      "intensity": 4.5,
+      "lightColor": {
+       "r": 1,
+       "g": 1,
+       "b": 1,
+       "a": 1
+      },
+      "castShadows": true,
+      "dynamicShadowDistanceMovableLight": 3000,
+      "dynamicShadowCascades": 2
+     }
+    },
+    "points": [
+     {
+      "name": "warm",
+      "pos": [
+       260.0,
+       -300.0,
+       250.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 85,
+       "attenuationRadius": 450,
+       "lightColor": {
+        "r": 1,
+        "g": 1,
+        "b": 1,
+        "a": 1
+       }
+      }
+     }
+    ],
+    "sky": {
+     "actor": "SkyLight_1",
+     "readback": {
+      "sourceType": "SLS_SpecifiedCubemap",
+      "cubemap": {
+       "refPath": "/Game/S08/Render/TC_S08_AmbientDome.TC_S08_AmbientDome"
+      },
+      "intensity": 11.399999618530273,
+      "lightColor": {
+       "r": 1,
+       "g": 1,
+       "b": 1,
+       "a": 1
+      },
+      "bLowerHemisphereIsBlack": false
+     }
+    }
+   },
+   "keyPitch55Diagnostic": {
+    "sky": 11.4,
+    "n": 1,
+    "mean": 142.23,
+    "min": 142.23,
+    "max": 142.23,
+    "noise": 0.0,
+    "values": [
+     142.23
+    ]
+   },
+   "verdict": {
+    "delta": 0.317,
+    "threshold": 0.5,
+    "matched": true
+   }
+  },
+  "forest": {
+   "light": "forest-probe",
+   "level": {
+    "source": "/Game/ArtTests/ART005I/L_ART005I_ForestReferenceLight",
+    "scratch": "/Game/ArtTests/T42Calib/L_T42_Forest_f1",
+    "fresh": true
+   },
+   "prep": {
+    "hiddenSprites": 5,
+    "removed": [
+     "ART005 K1 review camera - unapproved"
+    ],
+    "reviewLights": {
+     "ART005 cool scene key - proposed": {
+      "actor": "DirectionalLight_0",
+      "intensity": 4,
+      "lightColor": {
+       "r": 0.729411780834198,
+       "g": 0.8196079134941101,
+       "b": 0.7411764860153198,
+       "a": 1
+      },
+      "castShadows": true,
+      "transform": {
+       "location": {
+        "x": -350,
+        "y": -150,
+        "z": 600
+       },
+       "rotation": {
+        "pitch": -55.00000000000003,
+        "yaw": 30.000000000000025,
+        "roll": 0
+       },
+       "scale": {
+        "x": 2.5,
+        "y": 2.5,
+        "z": 2.5
+       }
+      }
+     },
+     "ART005 neutral readability fill - review only": {
+      "actor": "PointLight_0",
+      "intensity": 950,
+      "intensityUnits": "Candelas",
+      "lightColor": {
+       "r": 0.8784314393997192,
+       "g": 0.9411765336990356,
+       "b": 0.8784314393997192,
+       "a": 1
+      },
+      "attenuationRadius": 1800,
+      "castShadows": false,
+      "transform": {
+       "location": {
+        "x": 0,
+        "y": -100,
+        "z": 550
+       },
+       "rotation": {
+        "pitch": 0,
+        "yaw": 0,
+        "roll": 0
+       },
+       "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+       }
+      }
+     },
+     "ART005 warm lantern accent - proposed": {
+      "actor": "PointLight_1",
+      "intensity": 150,
+      "intensityUnits": "Candelas",
+      "lightColor": {
+       "r": 1,
+       "g": 0.6196078658103943,
+       "b": 0.32156863808631897,
+       "a": 1
+      },
+      "attenuationRadius": 430,
+      "castShadows": false,
+      "transform": {
+       "location": {
+        "x": 260,
+        "y": -300,
+        "z": 250
+       },
+       "rotation": {
+        "pitch": 0,
+        "yaw": 0,
+        "roll": 0
+       },
+       "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+       }
+      }
+     },
+     "ART005I extra light forest": {
+      "actor": "PointLight_2",
+      "intensity": 110,
+      "intensityUnits": "Candelas",
+      "lightColor": {
+       "r": 1,
+       "g": 0.6705882549285889,
+       "b": 0.3490196168422699,
+       "a": 1
+      },
+      "attenuationRadius": 330,
+      "castShadows": false,
+      "transform": {
+       "location": {
+        "x": -180,
+        "y": 125,
+        "z": 230
+       },
+       "rotation": {
+        "pitch": 0,
+        "yaw": 0,
+        "roll": 0
+       },
+       "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+       }
+      }
+     }
+    }
+   },
+   "dx11Reference": {
+    "frame": "docs/game-design/evidence/ART-005/stone-forestProbe-combined-k1-editor-2026-09-28.png",
+    "sha256": "520dd103eebd4e0485071df4a9f41ee312a6b42cc04b72da683d628813d6b3af",
+    "boardK1P50": 136.01,
+    "boardK1Mean": 132.22,
+    "boardK1P10": 100.73,
+    "boardK1P90": 155.72,
+    "frameP50": 0.0,
+    "note": "ART-005/ART-005I DX11 editor frame (SceneCapture FOV 35 from -Y, own exposure): a different camera and exposure, so only the ratios between the three probes are comparable"
+   },
+   "legacyLevelFill": {
+    "fillPosition": [
+     0.0,
+     -100.0,
+     550.0
+    ],
+    "boardK1P50": 110.31
+   },
+   "fillMovedTo": {
+    "location": {
+     "x": 0,
+     "y": 100,
+     "z": 500
+    },
+    "rotation": {
+     "pitch": 0,
+     "yaw": 0,
+     "roll": 0
+    },
+    "scale": {
+     "x": 1,
+     "y": 1,
+     "z": 1
+    }
+   },
+   "target": {
+    "n": 3,
+    "mean": 140.5,
+    "min": 140.5,
+    "max": 140.5,
+    "noise": 0.0,
+    "values": [
+     140.5,
+     140.5,
+     140.5
+    ]
+   },
+   "removedReviewLights": [
+    "ART005 cool scene key - proposed",
+    "ART005 neutral readability fill - review only",
+    "ART005 warm lantern accent - proposed",
+    "ART005I extra light forest"
+   ],
+   "rig": {
+    "key": {
+     "actor": "DirectionalLight_1",
+     "pos": [
+      -350.0,
+      -150.0,
+      600.0
+     ],
+     "rotationPYR": [
+      0,
+      -55,
+      30
+     ],
+     "readback": {
+      "intensity": 4,
+      "lightColor": {
+       "r": 0.8705883026123047,
+       "g": 0.917647123336792,
+       "b": 0.8784314393997192,
+       "a": 1
+      },
+      "castShadows": true,
+      "dynamicShadowDistanceMovableLight": 3000,
+      "dynamicShadowCascades": 2
+     }
+    },
+    "points": [
+     {
+      "name": "warm-pool-a",
+      "pos": [
+       -150.0,
+       -179.99999999999997,
+       250.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 150,
+       "attenuationRadius": 430,
+       "lightColor": {
+        "r": 1,
+        "g": 0.8117647767066956,
+        "b": 0.6000000238418579,
+        "a": 1
+       }
+      }
+     },
+     {
+      "name": "warm-pool-b",
+      "pos": [
+       150.0,
+       30.000000000000004,
+       230.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 110,
+       "attenuationRadius": 330,
+       "lightColor": {
+        "r": 1,
+        "g": 0.8392157554626465,
+        "b": 0.6274510025978088,
+        "a": 1
+       }
+      }
+     },
+     {
+      "name": "canopy-shade",
+      "pos": [
+       -100.0,
+       209.99999999999997,
+       260.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 80,
+       "attenuationRadius": 380,
+       "lightColor": {
+        "r": 0.7686275243759155,
+        "g": 0.9098039865493774,
+        "b": 0.8000000715255737,
+        "a": 1
+       }
+      }
+     }
+    ],
+    "sky": {
+     "actor": "SkyLight_0",
+     "readback": {
+      "sourceType": "SLS_SpecifiedCubemap",
+      "cubemap": {
+       "refPath": "/Game/S08/Render/TC_S08_AmbientDome.TC_S08_AmbientDome"
+      },
+      "intensity": 8,
+      "lightColor": {
+       "r": 0.9450981020927429,
+       "g": 0.9764706492424011,
+       "b": 0.9450981020927429,
+       "a": 1
+      },
+      "bLowerHemisphereIsBlack": false
+     }
+    }
+   },
+   "curve": [
+    {
+     "sky": 8.0,
+     "boardK1P50": 114.73
+    },
+    {
+     "sky": 11.9,
+     "boardK1P50": 140.07
+    },
+    {
+     "sky": 12.0,
+     "boardK1P50": 140.59
+    },
+    {
+     "sky": 15.2,
+     "boardK1P50": 156.36
+    },
+    {
+     "sky": 16.0,
+     "boardK1P50": 159.85
+    }
+   ],
+   "final": {
+    "sky": 12.0,
+    "n": 3,
+    "mean": 140.58,
+    "min": 140.58,
+    "max": 140.58,
+    "noise": 0.0,
+    "values": [
+     140.58,
+     140.58,
+     140.58
+    ]
+   },
+   "rigKeyPitch55": {
+    "key": {
+     "actor": "DirectionalLight_2",
+     "pos": [
+      -350.0,
+      -150.0,
+      600.0
+     ],
+     "rotationPYR": [
+      -55.0,
+      30.0,
+      0.0
+     ],
+     "readback": {
+      "intensity": 4,
+      "lightColor": {
+       "r": 0.8705883026123047,
+       "g": 0.917647123336792,
+       "b": 0.8784314393997192,
+       "a": 1
+      },
+      "castShadows": true,
+      "dynamicShadowDistanceMovableLight": 3000,
+      "dynamicShadowCascades": 2
+     }
+    },
+    "points": [
+     {
+      "name": "warm-pool-a",
+      "pos": [
+       -150.0,
+       -179.99999999999997,
+       250.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 150,
+       "attenuationRadius": 430,
+       "lightColor": {
+        "r": 1,
+        "g": 0.8117647767066956,
+        "b": 0.6000000238418579,
+        "a": 1
+       }
+      }
+     },
+     {
+      "name": "warm-pool-b",
+      "pos": [
+       150.0,
+       30.000000000000004,
+       230.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 110,
+       "attenuationRadius": 330,
+       "lightColor": {
+        "r": 1,
+        "g": 0.8392157554626465,
+        "b": 0.6274510025978088,
+        "a": 1
+       }
+      }
+     },
+     {
+      "name": "canopy-shade",
+      "pos": [
+       -100.0,
+       209.99999999999997,
+       260.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 80,
+       "attenuationRadius": 380,
+       "lightColor": {
+        "r": 0.7686275243759155,
+        "g": 0.9098039865493774,
+        "b": 0.8000000715255737,
+        "a": 1
+       }
+      }
+     }
+    ],
+    "sky": {
+     "actor": "SkyLight_1",
+     "readback": {
+      "sourceType": "SLS_SpecifiedCubemap",
+      "cubemap": {
+       "refPath": "/Game/S08/Render/TC_S08_AmbientDome.TC_S08_AmbientDome"
+      },
+      "intensity": 12,
+      "lightColor": {
+       "r": 0.9450981020927429,
+       "g": 0.9764706492424011,
+       "b": 0.9450981020927429,
+       "a": 1
+      },
+      "bLowerHemisphereIsBlack": false
+     }
+    }
+   },
+   "keyPitch55Diagnostic": {
+    "sky": 12.0,
+    "n": 1,
+    "mean": 146.51,
+    "min": 146.51,
+    "max": 146.51,
+    "noise": 0.0,
+    "values": [
+     146.51
+    ]
+   },
+   "verdict": {
+    "delta": 0.08,
+    "threshold": 0.5,
+    "matched": true
+   }
+  },
+  "paddock": {
+   "light": "paddock-probe",
+   "level": {
+    "source": "/Game/ArtTests/ART005I/L_ART005I_PaddockReferenceLight",
+    "scratch": "/Game/ArtTests/T42Calib/L_T42_Paddock_f1",
+    "fresh": true
+   },
+   "prep": {
+    "hiddenSprites": 5,
+    "removed": [
+     "ART005 K1 review camera - unapproved"
+    ],
+    "reviewLights": {
+     "ART005 cool scene key - proposed": {
+      "actor": "DirectionalLight_0",
+      "intensity": 3.5,
+      "lightColor": {
+       "r": 0.6196078658103943,
+       "g": 0.6901960968971252,
+       "b": 0.8784314393997192,
+       "a": 1
+      },
+      "castShadows": true,
+      "transform": {
+       "location": {
+        "x": -350,
+        "y": -150,
+        "z": 600
+       },
+       "rotation": {
+        "pitch": -55.00000000000003,
+        "yaw": 30.000000000000025,
+        "roll": 0
+       },
+       "scale": {
+        "x": 2.5,
+        "y": 2.5,
+        "z": 2.5
+       }
+      }
+     },
+     "ART005 neutral readability fill - review only": {
+      "actor": "PointLight_0",
+      "intensity": 1150,
+      "intensityUnits": "Candelas",
+      "lightColor": {
+       "r": 0.8392157554626465,
+       "g": 0.8784314393997192,
+       "b": 0.960784375667572,
+       "a": 1
+      },
+      "attenuationRadius": 1800,
+      "castShadows": false,
+      "transform": {
+       "location": {
+        "x": 0,
+        "y": -100,
+        "z": 550
+       },
+       "rotation": {
+        "pitch": 0,
+        "yaw": 0,
+        "roll": 0
+       },
+       "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+       }
+      }
+     },
+     "ART005 warm lantern accent - proposed": {
+      "actor": "PointLight_1",
+      "intensity": 130,
+      "intensityUnits": "Candelas",
+      "lightColor": {
+       "r": 1,
+       "g": 0.5882353186607361,
+       "b": 0.3019607961177826,
+       "a": 1
+      },
+      "attenuationRadius": 430,
+      "castShadows": false,
+      "transform": {
+       "location": {
+        "x": 260,
+        "y": -300,
+        "z": 250
+       },
+       "rotation": {
+        "pitch": 0,
+        "yaw": 0,
+        "roll": 0
+       },
+       "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+       }
+      }
+     },
+     "ART005I extra light paddock": {
+      "actor": "PointLight_2",
+      "intensity": 85,
+      "intensityUnits": "Candelas",
+      "lightColor": {
+       "r": 0.5490196347236633,
+       "g": 0.8000000715255737,
+       "b": 1,
+       "a": 1
+      },
+      "attenuationRadius": 420,
+      "castShadows": false,
+      "transform": {
+       "location": {
+        "x": -210,
+        "y": 110,
+        "z": 250
+       },
+       "rotation": {
+        "pitch": 0,
+        "yaw": 0,
+        "roll": 0
+       },
+       "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+       }
+      }
+     }
+    }
+   },
+   "dx11Reference": {
+    "frame": "docs/game-design/evidence/ART-005/stone-paddockProbe-combined-k1-editor-2026-09-28.png",
+    "sha256": "33ac80fd64a0e35f97a6f3ee3698840ea1580ea417f0dabff35ad552e5e0efaa",
+    "boardK1P50": 139.19,
+    "boardK1Mean": 135.44,
+    "boardK1P10": 105.03,
+    "boardK1P90": 158.53,
+    "frameP50": 0.0,
+    "note": "ART-005/ART-005I DX11 editor frame (SceneCapture FOV 35 from -Y, own exposure): a different camera and exposure, so only the ratios between the three probes are comparable"
+   },
+   "legacyLevelFill": {
+    "fillPosition": [
+     0.0,
+     -100.0,
+     550.0
+    ],
+    "boardK1P50": 112.83
+   },
+   "fillMovedTo": {
+    "location": {
+     "x": 0,
+     "y": 100,
+     "z": 500
+    },
+    "rotation": {
+     "pitch": 0,
+     "yaw": 0,
+     "roll": 0
+    },
+    "scale": {
+     "x": 1,
+     "y": 1,
+     "z": 1
+    }
+   },
+   "target": {
+    "n": 3,
+    "mean": 144.007,
+    "min": 143.98,
+    "max": 144.02,
+    "noise": 0.04,
+    "values": [
+     144.02,
+     144.02,
+     143.98
+    ]
+   },
+   "removedReviewLights": [
+    "ART005 cool scene key - proposed",
+    "ART005 neutral readability fill - review only",
+    "ART005 warm lantern accent - proposed",
+    "ART005I extra light paddock"
+   ],
+   "rig": {
+    "key": {
+     "actor": "DirectionalLight_1",
+     "pos": [
+      -350.0,
+      -150.0,
+      600.0
+     ],
+     "rotationPYR": [
+      0,
+      -55,
+      30
+     ],
+     "readback": {
+      "intensity": 3.5,
+      "lightColor": {
+       "r": 0.8117647767066956,
+       "g": 0.8509804606437683,
+       "b": 0.9450981020927429,
+       "a": 1
+      },
+      "castShadows": true,
+      "dynamicShadowDistanceMovableLight": 3000,
+      "dynamicShadowCascades": 2
+     }
+    },
+    "points": [
+     {
+      "name": "warm-practical",
+      "pos": [
+       75.0,
+       -270.0,
+       250.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 130,
+       "attenuationRadius": 430,
+       "lightColor": {
+        "r": 1,
+        "g": 0.7921569347381592,
+        "b": 0.5843137502670288,
+        "a": 1
+       }
+      }
+     },
+     {
+      "name": "cyan-rim",
+      "pos": [
+       -225.0,
+       -270.0,
+       250.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 85,
+       "attenuationRadius": 420,
+       "lightColor": {
+        "r": 0.7686275243759155,
+        "g": 0.9098039865493774,
+        "b": 1,
+        "a": 1
+       }
+      }
+     },
+     {
+      "name": "indigo-pool",
+      "pos": [
+       175.0,
+       240.00000000000003,
+       240.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 70,
+       "attenuationRadius": 360,
+       "lightColor": {
+        "r": 0.7019608020782471,
+        "g": 0.7372549176216125,
+        "b": 0.9803922176361084,
+        "a": 1
+       }
+      }
+     }
+    ],
+    "sky": {
+     "actor": "SkyLight_0",
+     "readback": {
+      "sourceType": "SLS_SpecifiedCubemap",
+      "cubemap": {
+       "refPath": "/Game/S08/Render/TC_S08_AmbientDome.TC_S08_AmbientDome"
+      },
+      "intensity": 8,
+      "lightColor": {
+       "r": 0.9294118285179138,
+       "g": 0.9450981020927429,
+       "b": 0.9843137860298157,
+       "a": 1
+      },
+      "bLowerHemisphereIsBlack": false
+     }
+    }
+   },
+   "curve": [
+    {
+     "sky": 8.0,
+     "boardK1P50": 102.89
+    },
+    {
+     "sky": 12.0,
+     "boardK1P50": 130.88
+    },
+    {
+     "sky": 14.3,
+     "boardK1P50": 143.6
+    },
+    {
+     "sky": 14.38,
+     "boardK1P50": 143.96
+    },
+    {
+     "sky": 14.4,
+     "boardK1P50": 144.09
+    },
+    {
+     "sky": 14.53,
+     "boardK1P50": 144.81
+    },
+    {
+     "sky": 16.0,
+     "boardK1P50": 151.66
+    },
+    {
+     "sky": 18.4,
+     "boardK1P50": 161.6
+    }
+   ],
+   "final": {
+    "sky": 14.4,
+    "n": 3,
+    "mean": 144.11,
+    "min": 144.09,
+    "max": 144.15,
+    "noise": 0.06,
+    "values": [
+     144.09,
+     144.09,
+     144.15
+    ]
+   },
+   "rigKeyPitch55": {
+    "key": {
+     "actor": "DirectionalLight_2",
+     "pos": [
+      -350.0,
+      -150.0,
+      600.0
+     ],
+     "rotationPYR": [
+      -55.0,
+      30.0,
+      0.0
+     ],
+     "readback": {
+      "intensity": 3.5,
+      "lightColor": {
+       "r": 0.8117647767066956,
+       "g": 0.8509804606437683,
+       "b": 0.9450981020927429,
+       "a": 1
+      },
+      "castShadows": true,
+      "dynamicShadowDistanceMovableLight": 3000,
+      "dynamicShadowCascades": 2
+     }
+    },
+    "points": [
+     {
+      "name": "warm-practical",
+      "pos": [
+       75.0,
+       -270.0,
+       250.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 130,
+       "attenuationRadius": 430,
+       "lightColor": {
+        "r": 1,
+        "g": 0.7921569347381592,
+        "b": 0.5843137502670288,
+        "a": 1
+       }
+      }
+     },
+     {
+      "name": "cyan-rim",
+      "pos": [
+       -225.0,
+       -270.0,
+       250.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 85,
+       "attenuationRadius": 420,
+       "lightColor": {
+        "r": 0.7686275243759155,
+        "g": 0.9098039865493774,
+        "b": 1,
+        "a": 1
+       }
+      }
+     },
+     {
+      "name": "indigo-pool",
+      "pos": [
+       175.0,
+       240.00000000000003,
+       240.0
+      ],
+      "readback": {
+       "intensityUnits": "Candelas",
+       "intensity": 70,
+       "attenuationRadius": 360,
+       "lightColor": {
+        "r": 0.7019608020782471,
+        "g": 0.7372549176216125,
+        "b": 0.9803922176361084,
+        "a": 1
+       }
+      }
+     }
+    ],
+    "sky": {
+     "actor": "SkyLight_1",
+     "readback": {
+      "sourceType": "SLS_SpecifiedCubemap",
+      "cubemap": {
+       "refPath": "/Game/S08/Render/TC_S08_AmbientDome.TC_S08_AmbientDome"
+      },
+      "intensity": 14.399999618530273,
+      "lightColor": {
+       "r": 0.9294118285179138,
+       "g": 0.9450981020927429,
+       "b": 0.9843137860298157,
+       "a": 1
+      },
+      "bLowerHemisphereIsBlack": false
+     }
+    }
+   },
+   "keyPitch55Diagnostic": {
+    "sky": 14.4,
+    "n": 1,
+    "mean": 148.45,
+    "min": 148.45,
+    "max": 148.45,
+    "noise": 0.0,
+    "values": [
+     148.45
+    ]
+   },
+   "verdict": {
+    "delta": 0.103,
+    "threshold": 0.5,
+    "matched": true
+   }
+  }
+ },
+ "frames": [
+  {
+   "frame": "t42-cobble-legacy-levelfill-ue-editor.png",
+   "sha256": "db05b00b7c782233d32e69c6381e6afd0660ba274e89962a580e1019f180a5ad",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 104.14,
+   "boardK1Mean": 103.24,
+   "boardK1P10": 81.58,
+   "boardK1P90": 123.0,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "legacy-probe-level-fill",
+   "fill": "level (0,-100,550)",
+   "repeat": 1
+  },
+  {
+   "frame": "t42-cobble-legacy-r1-ue-editor.png",
+   "sha256": "aff1277b69a06f9c3213f67cfda0e615438708639eee1d2fa990e0abbb1123e9",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 132.65,
+   "boardK1Mean": 130.24,
+   "boardK1P10": 106.35,
+   "boardK1P90": 151.22,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "legacy-probe",
+   "fill": "P17 (0,100,500)",
+   "repeat": 1
+  },
+  {
+   "frame": "t42-cobble-legacy-r2-ue-editor.png",
+   "sha256": "a1d010c5308fc0eea31743437b7f02a04ebe1f7f2795fa98e7455b2ddfca19c3",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 132.65,
+   "boardK1Mean": 130.24,
+   "boardK1P10": 106.35,
+   "boardK1P90": 151.21,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "legacy-probe",
+   "fill": "P17 (0,100,500)",
+   "repeat": 2
+  },
+  {
+   "frame": "t42-cobble-legacy-r3-ue-editor.png",
+   "sha256": "8a8db381428e363b8e53fdfa343c11e79aee82419f3853d2f1575cffebc90921",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 132.65,
+   "boardK1Mean": 130.24,
+   "boardK1P10": 106.35,
+   "boardK1P90": 151.21,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "legacy-probe",
+   "fill": "P17 (0,100,500)",
+   "repeat": 3
+  },
+  {
+   "frame": "t42-cobble-rev2-sky8-sweep-ue-editor.png",
+   "sha256": "7fb29237e31f15ede686dd5f8219f6327141c3f6e27f1e9efe3a1788e07f986a",
+   "settled": true,
+   "settleSteps": 6,
+   "boardK1P50": 107.08,
+   "boardK1Mean": 105.39,
+   "boardK1P10": 85.38,
+   "boardK1P90": 121.72,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2",
+   "sky": 8.0,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-cobble-rev2-sky11.2-sweep-ue-editor.png",
+   "sha256": "38b92841f2597c8e77a47dabc7ec7e9f367028af0a32cc8b5a1ba95badf1a8ad",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 131.72,
+   "boardK1Mean": 129.01,
+   "boardK1P10": 107.57,
+   "boardK1P90": 146.94,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2",
+   "sky": 11.2,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-cobble-rev2-sky12-sweep-ue-editor.png",
+   "sha256": "6e254300c0e77a401cbc77215c8dcc6f8931cdf92a18ec9628d187329426b9ed",
+   "settled": true,
+   "settleSteps": 8,
+   "boardK1P50": 137.07,
+   "boardK1Mean": 133.97,
+   "boardK1P10": 112.57,
+   "boardK1P90": 152.01,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2",
+   "sky": 12.0,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-cobble-rev2-sky16-sweep-ue-editor.png",
+   "sha256": "94d0d8783643e830bfc0696abbf05481c8eb700185ff3bfcc5eb296965df243e",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 158.29,
+   "boardK1Mean": 154.44,
+   "boardK1P10": 133.57,
+   "boardK1P90": 172.51,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2",
+   "sky": 16.0,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-cobble-rev2-sky11.34-refine1-ue-editor.png",
+   "sha256": "079c79ab0c126a1a6c76cbf3e22dd4abcd3d3be895bda1976ed310d3a25e42cc",
+   "settled": true,
+   "settleSteps": 6,
+   "boardK1P50": 132.58,
+   "boardK1Mean": 129.87,
+   "boardK1P10": 108.43,
+   "boardK1P90": 147.86,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2",
+   "sky": 11.34,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-cobble-rev2-sky11.4-check-ue-editor.png",
+   "sha256": "23464a4594214bd58442f901f506069bfcb20d7a634f01bc6e6e0fa31fb7966c",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 133.08,
+   "boardK1Mean": 130.27,
+   "boardK1P10": 108.86,
+   "boardK1P90": 148.22,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2",
+   "sky": 11.4,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-cobble-rev2-sky11.3-check-ue-editor.png",
+   "sha256": "b97212b8586be62d4724f76c5a5f50d65a70c4ddf36a9a304969e5178e2f5f4c",
+   "settled": true,
+   "settleSteps": 9,
+   "boardK1P50": 132.22,
+   "boardK1Mean": 129.51,
+   "boardK1P10": 108.07,
+   "boardK1P90": 147.58,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2",
+   "sky": 11.3,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-cobble-rev2-sky11.4-r1-ue-editor.png",
+   "sha256": "c9c0ba155c25b03931d4fe7493bbe67b2eca21f661933cd1ac0419410df50615",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 133.01,
+   "boardK1Mean": 130.25,
+   "boardK1P10": 108.8,
+   "boardK1P90": 148.22,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2-final",
+   "sky": 11.4,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-cobble-rev2-sky11.4-r2-ue-editor.png",
+   "sha256": "c8a1f7e3df2d24868bc69baa8c3027ef02894ff934d5e27582c7877cc25de89c",
+   "settled": true,
+   "settleSteps": 8,
+   "boardK1P50": 132.94,
+   "boardK1Mean": 130.11,
+   "boardK1P10": 108.72,
+   "boardK1P90": 148.0,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2-final",
+   "sky": 11.4,
+   "repeat": 2
+  },
+  {
+   "frame": "t42-cobble-rev2-sky11.4-r3-ue-editor.png",
+   "sha256": "6dc082df38b6b4afc1595bafb13c13fa28e7704fad3699c4b330cf8832d5be7d",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 132.95,
+   "boardK1Mean": 130.12,
+   "boardK1P10": 108.72,
+   "boardK1P90": 148.0,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2-final",
+   "sky": 11.4,
+   "repeat": 3
+  },
+  {
+   "frame": "t42-cobble-rev2-sky11.2-shipped-r1-ue-editor.png",
+   "sha256": "938da66e5985fedee993faa198a46eeebc7ac6a2539bf3be1671b14e47b3afd6",
+   "settled": true,
+   "settleSteps": 6,
+   "boardK1P50": 131.73,
+   "boardK1Mean": 129.05,
+   "boardK1P10": 107.65,
+   "boardK1P90": 146.94,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2-shipped",
+   "sky": 11.2,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-cobble-rev2-sky11.2-shipped-r2-ue-editor.png",
+   "sha256": "c9f7eb39f13aedf86db2b93832b625a337c1abd3f9362f1eb76575adc474b664",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 131.73,
+   "boardK1Mean": 129.04,
+   "boardK1P10": 107.58,
+   "boardK1P90": 146.94,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2-shipped",
+   "sky": 11.2,
+   "repeat": 2
+  },
+  {
+   "frame": "t42-cobble-rev2-sky11.2-shipped-r3-ue-editor.png",
+   "sha256": "e31e45e7c3c535aafeec7f5e136c9203edc4bf82c88a3c08015e4f14db5a77f7",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 131.73,
+   "boardK1Mean": 129.04,
+   "boardK1P10": 107.64,
+   "boardK1P90": 146.94,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2-shipped",
+   "sky": 11.2,
+   "repeat": 3
+  },
+  {
+   "frame": "t42-cobble-rev2-sky11.4-keypitch55-r1-ue-editor.png",
+   "sha256": "f52c30f2d263e4eacd235a922011d10b31d64dbbd3d7a778675ec63b4a19028c",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 142.23,
+   "boardK1Mean": 139.1,
+   "boardK1P10": 117.64,
+   "boardK1P90": 157.5,
+   "frameP50": 3.0,
+   "profile": "cobble",
+   "mode": "rev2-key-pitch-55",
+   "sky": 11.4,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-forest-legacy-levelfill-ue-editor.png",
+   "sha256": "798ad904dba4aab84cbf7f8dedc1c0b329533778c755ccb9946e69b902222350",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 110.31,
+   "boardK1Mean": 109.14,
+   "boardK1P10": 85.08,
+   "boardK1P90": 132.56,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "legacy-probe-level-fill",
+   "fill": "level (0,-100,550)",
+   "repeat": 1
+  },
+  {
+   "frame": "t42-forest-legacy-r1-ue-editor.png",
+   "sha256": "49cdeb4ed3934bc89e1948b589d14aec0ce4fbde770fa606e7bfdeb4b1691c05",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 140.5,
+   "boardK1Mean": 137.38,
+   "boardK1P10": 112.22,
+   "boardK1P90": 159.57,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "legacy-probe",
+   "fill": "P17 (0,100,500)",
+   "repeat": 1
+  },
+  {
+   "frame": "t42-forest-legacy-r2-ue-editor.png",
+   "sha256": "8a6ed30458b53146b278ed514ca345e926ca9c711124c71f1f53c2804a52088d",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 140.5,
+   "boardK1Mean": 137.38,
+   "boardK1P10": 112.22,
+   "boardK1P90": 159.55,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "legacy-probe",
+   "fill": "P17 (0,100,500)",
+   "repeat": 2
+  },
+  {
+   "frame": "t42-forest-legacy-r3-ue-editor.png",
+   "sha256": "93459f4ba81b89f2ba4818f1cf5739784d08e404d560f310014a85adaa7065e2",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 140.5,
+   "boardK1Mean": 137.38,
+   "boardK1P10": 112.21,
+   "boardK1P90": 159.56,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "legacy-probe",
+   "fill": "P17 (0,100,500)",
+   "repeat": 3
+  },
+  {
+   "frame": "t42-forest-rev2-sky8-sweep-ue-editor.png",
+   "sha256": "796697ec1acdb37f7f096305486614353ad1b2d2638cb14deb96a5a32f9425d7",
+   "settled": true,
+   "settleSteps": 6,
+   "boardK1P50": 114.73,
+   "boardK1Mean": 112.95,
+   "boardK1P10": 91.29,
+   "boardK1P90": 131.5,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "rev2",
+   "sky": 8.0,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-forest-rev2-sky12-sweep-ue-editor.png",
+   "sha256": "8de6991974edc0cf712299fef9ec97044e345240327fe4aad46af8aff07fa35f",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 140.59,
+   "boardK1Mean": 137.71,
+   "boardK1P10": 115.66,
+   "boardK1P90": 156.79,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "rev2",
+   "sky": 12.0,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-forest-rev2-sky15.2-sweep-ue-editor.png",
+   "sha256": "2834cb331bd1249dba16b5d085062465b3aee91ec8968be2dcc577edc28d9c29",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 156.36,
+   "boardK1Mean": 152.81,
+   "boardK1P10": 131.37,
+   "boardK1P90": 171.58,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "rev2",
+   "sky": 15.2,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-forest-rev2-sky16-sweep-ue-editor.png",
+   "sha256": "6a646f5efb752f896bd57a8a674f90a21b2c4b922f23ed9864697309b8948ccd",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 159.85,
+   "boardK1Mean": 156.14,
+   "boardK1P10": 135.0,
+   "boardK1P90": 174.79,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "rev2",
+   "sky": 16.0,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-forest-rev2-sky11.9-check-ue-editor.png",
+   "sha256": "92eca78a1d57a46b34b515b813bca7bfc77960a274905701311c2cd656e0e873",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 140.07,
+   "boardK1Mean": 137.13,
+   "boardK1P10": 115.02,
+   "boardK1P90": 156.21,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "rev2",
+   "sky": 11.9,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-forest-rev2-sky12-r1-ue-editor.png",
+   "sha256": "815169ddf265a1f4f1210f41e60c227d9607206432430a8ec9fcf20d40971e60",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 140.58,
+   "boardK1Mean": 137.61,
+   "boardK1P10": 115.51,
+   "boardK1P90": 156.66,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "rev2-final",
+   "sky": 12.0,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-forest-rev2-sky12-r2-ue-editor.png",
+   "sha256": "5b817886a2742a5160aabcdb29c984ce250bd9b9df56cb4a401d744bc920a495",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 140.58,
+   "boardK1Mean": 137.6,
+   "boardK1P10": 115.54,
+   "boardK1P90": 156.71,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "rev2-final",
+   "sky": 12.0,
+   "repeat": 2
+  },
+  {
+   "frame": "t42-forest-rev2-sky12-r3-ue-editor.png",
+   "sha256": "58e5390d575e02941e4f477a0267c168f8bf155e7b0d3677928f7e7c318b2d5c",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 140.58,
+   "boardK1Mean": 137.61,
+   "boardK1P10": 115.51,
+   "boardK1P90": 156.66,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "rev2-final",
+   "sky": 12.0,
+   "repeat": 3
+  },
+  {
+   "frame": "t42-forest-rev2-sky12-keypitch55-r1-ue-editor.png",
+   "sha256": "4e85b59fa5202589a5fe589d6854f1783146905e8c730de5af03b9d9f83d1ae3",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 146.51,
+   "boardK1Mean": 143.35,
+   "boardK1P10": 121.44,
+   "boardK1P90": 162.37,
+   "frameP50": 3.0,
+   "profile": "forest",
+   "mode": "rev2-key-pitch-55",
+   "sky": 12.0,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-paddock-legacy-levelfill-ue-editor.png",
+   "sha256": "90423ecf7c09d0d848ee726d7aea75e0909814eec030ff7e5ba7532fe790a07d",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 112.83,
+   "boardK1Mean": 111.39,
+   "boardK1P10": 86.95,
+   "boardK1P90": 134.75,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "legacy-probe-level-fill",
+   "fill": "level (0,-100,550)",
+   "repeat": 1
+  },
+  {
+   "frame": "t42-paddock-legacy-r1-ue-editor.png",
+   "sha256": "710ee9310da82436d9fe991cdde411cc64c314ac9d35e486408637cac3628a9c",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 144.02,
+   "boardK1Mean": 140.72,
+   "boardK1P10": 115.39,
+   "boardK1P90": 162.82,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "legacy-probe",
+   "fill": "P17 (0,100,500)",
+   "repeat": 1
+  },
+  {
+   "frame": "t42-paddock-legacy-r2-ue-editor.png",
+   "sha256": "d2e4407f3f3ab07a128bcb0958d3b59aae69bd6bb523be00b17ab8a8ef1f94bd",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 144.02,
+   "boardK1Mean": 140.72,
+   "boardK1P10": 115.39,
+   "boardK1P90": 162.82,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "legacy-probe",
+   "fill": "P17 (0,100,500)",
+   "repeat": 2
+  },
+  {
+   "frame": "t42-paddock-legacy-r3-ue-editor.png",
+   "sha256": "c2008f653ab2e3cb372cf02350c0d63e2f5f78b79512dad917dd920d42e2b614",
+   "settled": true,
+   "settleSteps": 5,
+   "boardK1P50": 143.98,
+   "boardK1Mean": 140.72,
+   "boardK1P10": 115.39,
+   "boardK1P90": 162.82,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "legacy-probe",
+   "fill": "P17 (0,100,500)",
+   "repeat": 3
+  },
+  {
+   "frame": "t42-paddock-rev2-sky8-sweep-ue-editor.png",
+   "sha256": "d669ec69c996e2b8621e733fdc34a3e05be2bba205166b22514d30d1ee8df3ad",
+   "settled": true,
+   "settleSteps": 9,
+   "boardK1P50": 102.89,
+   "boardK1Mean": 101.47,
+   "boardK1P10": 81.51,
+   "boardK1P90": 118.52,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "rev2",
+   "sky": 8.0,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-paddock-rev2-sky12-sweep-ue-editor.png",
+   "sha256": "6f6057703ed0f77bf2fee05904ad8e974f1ed5a9b6dea5582bf4c2ec72f4d9e7",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 130.88,
+   "boardK1Mean": 128.08,
+   "boardK1P10": 106.51,
+   "boardK1P90": 146.3,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "rev2",
+   "sky": 12.0,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-paddock-rev2-sky16-sweep-ue-editor.png",
+   "sha256": "6bcf9719ff054016794d746f2fa8ca16b3cf41d034c62cbe52c7ea1507c5ca71",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 151.66,
+   "boardK1Mean": 148.07,
+   "boardK1P10": 126.8,
+   "boardK1P90": 166.45,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "rev2",
+   "sky": 16.0,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-paddock-rev2-sky18.4-sweep-ue-editor.png",
+   "sha256": "9aa37ad18bfdbb49d54d06e6f27683bf138a7a554a41dbfd18a0ac3e37792b0d",
+   "settled": true,
+   "settleSteps": 6,
+   "boardK1P50": 161.6,
+   "boardK1Mean": 157.71,
+   "boardK1P10": 137.0,
+   "boardK1P90": 175.94,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "rev2",
+   "sky": 18.4,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-paddock-rev2-sky14.53-refine1-ue-editor.png",
+   "sha256": "59d65c99ca40aa81ee336eb7b9aba67275c2069bed6e4540e92294b073914d5e",
+   "settled": true,
+   "settleSteps": 8,
+   "boardK1P50": 144.81,
+   "boardK1Mean": 141.45,
+   "boardK1P10": 120.01,
+   "boardK1P90": 159.8,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "rev2",
+   "sky": 14.53,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-paddock-rev2-sky14.38-refine2-ue-editor.png",
+   "sha256": "570e58fe65494dee0e639d3732c57ebace002062faf8df060bf89f003fab7f19",
+   "settled": true,
+   "settleSteps": 8,
+   "boardK1P50": 143.96,
+   "boardK1Mean": 140.74,
+   "boardK1P10": 119.29,
+   "boardK1P90": 159.32,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "rev2",
+   "sky": 14.38,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-paddock-rev2-sky14.4-check-ue-editor.png",
+   "sha256": "40842b704e081a927524505eb9886c8ab05c6c6286d2cc7b06c372c8ea7d389f",
+   "settled": true,
+   "settleSteps": 6,
+   "boardK1P50": 144.09,
+   "boardK1Mean": 140.76,
+   "boardK1P10": 119.3,
+   "boardK1P90": 159.09,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "rev2",
+   "sky": 14.4,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-paddock-rev2-sky14.3-check-ue-editor.png",
+   "sha256": "98a5031c5e41a39d8e49b87e8c4bc522e716d477354998562c78c138fd46102a",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 143.6,
+   "boardK1Mean": 140.29,
+   "boardK1P10": 118.8,
+   "boardK1P90": 158.66,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "rev2",
+   "sky": 14.3,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-paddock-rev2-sky14.4-r1-ue-editor.png",
+   "sha256": "e4b9b378c75ea9e104e6d87c07fb61eddd596ac2b7ed2b0916646840625bb9d5",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 144.09,
+   "boardK1Mean": 140.76,
+   "boardK1P10": 119.36,
+   "boardK1P90": 159.08,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "rev2-final",
+   "sky": 14.4,
+   "repeat": 1
+  },
+  {
+   "frame": "t42-paddock-rev2-sky14.4-r2-ue-editor.png",
+   "sha256": "2547efbeea4ef53dbfdaf5d9a464e09b6c65a2ab0293ac3d3e5c1828e413056a",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 144.09,
+   "boardK1Mean": 140.84,
+   "boardK1P10": 119.36,
+   "boardK1P90": 159.38,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "rev2-final",
+   "sky": 14.4,
+   "repeat": 2
+  },
+  {
+   "frame": "t42-paddock-rev2-sky14.4-r3-ue-editor.png",
+   "sha256": "6e57283d2ae07454d1deba66f5f385a330a0bd0b365eed759f1f14cfddbc0a6a",
+   "settled": true,
+   "settleSteps": 6,
+   "boardK1P50": 144.15,
+   "boardK1Mean": 140.78,
+   "boardK1P10": 119.3,
+   "boardK1P90": 159.08,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "rev2-final",
+   "sky": 14.4,
+   "repeat": 3
+  },
+  {
+   "frame": "t42-paddock-rev2-sky14.4-keypitch55-r1-ue-editor.png",
+   "sha256": "c1ab619e930c814039864d739a03ba37d9ac4d968bb3c20b3c9a83b058090d32",
+   "settled": true,
+   "settleSteps": 7,
+   "boardK1P50": 148.45,
+   "boardK1Mean": 144.99,
+   "boardK1P10": 123.6,
+   "boardK1P90": 163.31,
+   "frameP50": 3.0,
+   "profile": "paddock",
+   "mode": "rev2-key-pitch-55",
+   "sky": 14.4,
+   "repeat": 1
+  }
+ ],
+ "finishedUtc": "2026-09-29T07:55:40+00:00",
+ "mcpCalls": 185
+}

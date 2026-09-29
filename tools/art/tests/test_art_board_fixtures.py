@@ -174,6 +174,23 @@ class CommittedFixtures(unittest.TestCase):
         self.assertTrue(any("exposure needs" in e for e in errs))
         self.assertEqual(F.check_render_blocks("cobble-probe", profiles["lightProfiles"]["cobble-probe"]), [])
 
+    def test_profile_content_rules_detect_violations(self):
+        # T4.2: zone MI per style (and fallback), one /Game/ glyph mesh per known glyph, every used glyph covered.
+        profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))
+        self.assertEqual(F.check_content_blocks(profiles), [])
+        bad = json.loads(json.dumps(profiles))
+        del bad["zoneStyles"]["green"]["materialInstance"]
+        bad["fallbackZoneStyle"]["materialInstance"] = "/Engine/X"
+        bad["glyphMeshes"]["star"] = "/Game/X/SM_Star"
+        bad["glyphMeshes"]["ring"] = "SM_Ring"
+        del bad["glyphMeshes"]["cross"]
+        errs = F.check_content_blocks(bad)
+        self.assertTrue(any("zone style green: materialInstance" in e for e in errs))
+        self.assertTrue(any("zone style (fallback): materialInstance" in e for e in errs))
+        self.assertTrue(any("unknown glyph 'star'" in e for e in errs))
+        self.assertTrue(any("glyphMeshes ring" in e for e in errs))
+        self.assertTrue(any("glyph 'cross' has no glyph mesh" in e for e in errs))
+
     def test_light_section_on_a_zone_is_rejected(self):
         fx = load(F.DEFAULT_OUT / "t-rex-paddock.art-fixture.json")
         # a warm spot centred on the blue column (x=0) covers exactly blue cells

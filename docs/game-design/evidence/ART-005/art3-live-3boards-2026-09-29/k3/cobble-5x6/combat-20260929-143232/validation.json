@@ -1,0 +1,46 @@
+{
+  "schema": "unmatched.t52-combat-validation/1",
+  "rules": "tools/art/check_art003_combat_evidence.py check_trace (CUE damage == ARTPREVIEW damage-number exactly once, target icon bound and cleared, first COMBAT-RESULT damage > 0 and equal to its CUE, authoritative seq) + host/joiner convergence",
+  "trace": {
+    "host": {
+      "damage_cues": 11,
+      "unique_damage_numbers": 11,
+      "cues_equal_numbers": true,
+      "no_duplicate_number": true,
+      "target_icon_bound": true,
+      "target_icon_cleared": true,
+      "combat_results": 8,
+      "max_seq": 105,
+      "first_combat_result": {
+        "seq": 57,
+        "damage": 4
+      },
+      "first_result_matches_cue": false,
+      "first_result_matches_cue_prev2": true
+    },
+    "joiner": {
+      "damage_cues": 11,
+      "unique_damage_numbers": 11,
+      "cues_equal_numbers": true,
+      "no_duplicate_number": true,
+      "target_icon_bound": true,
+      "target_icon_cleared": true,
+      "combat_results": 8,
+      "max_seq": 105,
+      "first_combat_result": {
+        "seq": 57,
+        "damage": 4
+      },
+      "first_result_matches_cue": false,
+      "first_result_matches_cue_prev2": true
+    }
+  },
+  "problems": [],
+  "notes": [
+    "host: the strict check_art003 rule (CUE at the SAME seq as the first COMBAT-RESULT) is not met; a CUE with the same amount lies within 2 preceding snapshots (damage applied inside COMBAT_RESOLVE, result closed on the next snapshot)",
+    "joiner: the strict check_art003 rule (CUE at the SAME seq as the first COMBAT-RESULT) is not met; a CUE with the same amount lies within 2 preceding snapshots (damage applied inside COMBAT_RESOLVE, result closed on the next snapshot)"
+  ],
+  "seqConverged": true,
+  "firstResultAgrees": true,
+  "status": "pass_with_note"
+}

@@ -1,0 +1,1092 @@
+{
+  "schema": "unmatched.t52-labels-damage/1",
+  "status": "измерено (W5-live3, после съёмки)",
+  "method": "Подписи мира (TextRender, белый текст без подложки: имя сверху, HP снизу) и числа урона — по bbox из строк SHOT label / SHOT damage SHOT-блока кадра. Текст — пиксели bbox с luma ≥ p99(bbox) − 6 и C* < 12; фон — luma < p99 − 30 и дальше 2 px от пикселей текста (без сглаженных краёв букв). Контраст WCAG = текст (медиана) против светлого фона (медиана пикселей фона с luma ≥ 120, если их ≥ 10 %; иначе медиана всего фона) — отдельно для строки имени (верхняя половина bbox) и строки HP (нижняя). Вердикт: ≥ 4,5 : 1 — AA; 3..4,5 — только AA для крупного текста; < 3 — fail (WCAG 2.x 1.4.3; порог взят из WCAG ПОСЛЕ съёмки, не зарегистрирован). «Край плитки режет подпись» — в фоне строки ≥ 10 % тёмных (luma < 60: шов, пустота) и ≥ 10 % светлых (≥ 120) пикселей. Число урона: пересечение его bbox с bbox подписей того же блока (доля площади числа).",
+  "frames": {
+    "K1_host": {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/cobble-5x6/run-20260929-142039/phase2-board-host-1920x1080.png",
+      "trace": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/cobble-5x6/run-20260929-142039/phase2-client-host.trace.log",
+      "items": [
+        {
+          "kind": "label",
+          "fighter": "f-0-sk0",
+          "mode": "compact",
+          "bbox": [
+            1062,
+            402,
+            1179,
+            415
+          ],
+          "name": "Harpies 1",
+          "parts": {
+            "whole": {
+              "textPx": 181,
+              "textLuma": 234.9,
+              "bgPx": 607,
+              "bgLumaMedian": 125.5,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.71,
+              "cr": 2.992,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 2.992,
+          "crName": null,
+          "crHp": null,
+          "tileEdgeCrosses": false,
+          "verdict": "fail"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-0-sk1",
+          "mode": "compact",
+          "bbox": [
+            904,
+            278,
+            1016,
+            292
+          ],
+          "name": "Harpies 2",
+          "parts": {
+            "whole": {
+              "textPx": 192,
+              "textLuma": 236.0,
+              "bgPx": 620,
+              "bgLumaMedian": 124.4,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.919,
+              "cr": 3.195,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.195,
+          "crName": null,
+          "crHp": null,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-0-sk2",
+          "mode": "compact",
+          "bbox": [
+            741,
+            402,
+            858,
+            415
+          ],
+          "name": "Harpies 3",
+          "parts": {
+            "whole": {
+              "textPx": 162,
+              "textLuma": 236.1,
+              "bgPx": 613,
+              "bgLumaMedian": 129.0,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.778,
+              "cr": 2.974,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 2.974,
+          "crName": null,
+          "crHp": null,
+          "tileEdgeCrosses": false,
+          "verdict": "fail"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-1-hero",
+          "mode": "compact",
+          "bbox": [
+            896,
+            519,
+            1024,
+            530
+          ],
+          "name": "King Arthur",
+          "parts": {
+            "whole": {
+              "textPx": 150,
+              "textLuma": 239.1,
+              "bgPx": 440,
+              "bgLumaMedian": 127.5,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.868,
+              "cr": 3.28,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.28,
+          "crName": null,
+          "crHp": null,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-1-sk0",
+          "mode": "compact",
+          "bbox": [
+            1074,
+            532,
+            1177,
+            546
+          ],
+          "name": "Merlin",
+          "parts": {
+            "whole": {
+              "textPx": 218,
+              "textLuma": 238.0,
+              "bgPx": 537,
+              "bgLumaMedian": 124.4,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.719,
+              "cr": 3.252,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.252,
+          "crName": null,
+          "crHp": null,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        }
+      ]
+    },
+    "K1_joiner": {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/cobble-5x6/run-20260929-142039/phase2-board-joiner-1920x1080.png",
+      "trace": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/cobble-5x6/run-20260929-142039/phase2-client-joiner.trace.log",
+      "items": [
+        {
+          "kind": "label",
+          "fighter": "f-0-hero",
+          "mode": "full",
+          "bbox": [
+            916,
+            381,
+            1004,
+            414
+          ],
+          "name": "Medusa",
+          "parts": {
+            "whole": {
+              "textPx": 624,
+              "textLuma": 241.0,
+              "bgPx": 1010,
+              "bgLumaMedian": 125.0,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.619,
+              "cr": 3.262,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 326,
+              "textLuma": 241.1,
+              "bgPx": 316,
+              "bgLumaMedian": 130.9,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.725,
+              "cr": 3.182,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 298,
+              "textLuma": 241.0,
+              "bgPx": 694,
+              "bgLumaMedian": 123.6,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.571,
+              "cr": 3.296,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.182,
+          "crName": 3.182,
+          "crHp": 3.296,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-0-sk0",
+          "mode": "full",
+          "bbox": [
+            1072,
+            399,
+            1169,
+            428
+          ],
+          "name": "Harpies 1",
+          "parts": {
+            "whole": {
+              "textPx": 368,
+              "textLuma": 236.9,
+              "bgPx": 1604,
+              "bgLumaMedian": 124.8,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.648,
+              "cr": 3.221,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 271,
+              "textLuma": 237.0,
+              "bgPx": 451,
+              "bgLumaMedian": 134.1,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.845,
+              "cr": 2.775,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 97,
+              "textLuma": 236.0,
+              "bgPx": 1153,
+              "bgLumaMedian": 122.5,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.571,
+              "cr": 3.313,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 2.775,
+          "crName": 2.775,
+          "crHp": 3.313,
+          "tileEdgeCrosses": false,
+          "verdict": "fail"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-0-sk1",
+          "mode": "full",
+          "bbox": [
+            914,
+            276,
+            1006,
+            305
+          ],
+          "name": "Harpies 2",
+          "parts": {
+            "whole": {
+              "textPx": 355,
+              "textLuma": 239.0,
+              "bgPx": 1447,
+              "bgLumaMedian": 128.2,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.787,
+              "cr": 3.169,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 258,
+              "textLuma": 239.0,
+              "bgPx": 349,
+              "bgLumaMedian": 138.2,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.911,
+              "cr": 2.936,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 97,
+              "textLuma": 239.0,
+              "bgPx": 1098,
+              "bgLumaMedian": 126.7,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.748,
+              "cr": 3.212,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 2.936,
+          "crName": 2.936,
+          "crHp": 3.212,
+          "tileEdgeCrosses": false,
+          "verdict": "fail"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-0-sk2",
+          "mode": "full",
+          "bbox": [
+            751,
+            399,
+            848,
+            428
+          ],
+          "name": "Harpies 3",
+          "parts": {
+            "whole": {
+              "textPx": 383,
+              "textLuma": 237.0,
+              "bgPx": 1565,
+              "bgLumaMedian": 127.7,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.716,
+              "cr": 3.155,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 282,
+              "textLuma": 237.0,
+              "bgPx": 406,
+              "bgLumaMedian": 136.5,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.901,
+              "cr": 2.934,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 101,
+              "textLuma": 237.0,
+              "bgPx": 1159,
+              "bgLumaMedian": 125.7,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.651,
+              "cr": 3.214,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 2.934,
+          "crName": 2.934,
+          "crHp": 3.214,
+          "tileEdgeCrosses": false,
+          "verdict": "fail"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-1-hero",
+          "mode": "full",
+          "bbox": [
+            913,
+            517,
+            1007,
+            545
+          ],
+          "name": "King Arthur",
+          "parts": {
+            "whole": {
+              "textPx": 510,
+              "textLuma": 241.0,
+              "bgPx": 973,
+              "bgLumaMedian": 122.0,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.561,
+              "cr": 3.257,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 268,
+              "textLuma": 241.0,
+              "bgPx": 325,
+              "bgLumaMedian": 124.2,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.76,
+              "cr": 3.593,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 242,
+              "textLuma": 240.9,
+              "bgPx": 648,
+              "bgLumaMedian": 117.9,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.461,
+              "cr": 3.13,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.13,
+          "crName": 3.593,
+          "crHp": 3.13,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-1-sk0",
+          "mode": "full",
+          "bbox": [
+            1088,
+            529,
+            1162,
+            558
+          ],
+          "name": "Merlin",
+          "parts": {
+            "whole": {
+              "textPx": 418,
+              "textLuma": 239.0,
+              "bgPx": 945,
+              "bgLumaMedian": 120.8,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.545,
+              "cr": 3.586,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 307,
+              "textLuma": 239.0,
+              "bgPx": 233,
+              "bgLumaMedian": 126.3,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.687,
+              "cr": 3.277,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 111,
+              "textLuma": 238.9,
+              "bgPx": 712,
+              "bgLumaMedian": 119.9,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.499,
+              "cr": 3.645,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.277,
+          "crName": 3.277,
+          "crHp": 3.645,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        }
+      ]
+    },
+    "K3": {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/joiner/s09-combat-resolve-revealed.png",
+      "trace": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/combat-client-joiner.trace.log",
+      "items": [
+        {
+          "kind": "label",
+          "fighter": "f-0-hero",
+          "mode": "full",
+          "bbox": [
+            915,
+            513,
+            1005,
+            545
+          ],
+          "name": "Medusa",
+          "parts": {
+            "whole": {
+              "textPx": 618,
+              "textLuma": 241.0,
+              "bgPx": 957,
+              "bgLumaMedian": 127.8,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.722,
+              "cr": 3.139,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 321,
+              "textLuma": 241.0,
+              "bgPx": 319,
+              "bgLumaMedian": 137.6,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.915,
+              "cr": 3.018,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 297,
+              "textLuma": 241.0,
+              "bgPx": 638,
+              "bgLumaMedian": 123.7,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.625,
+              "cr": 3.222,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.018,
+          "crName": 3.018,
+          "crHp": 3.222,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-0-sk0",
+          "mode": "full",
+          "bbox": [
+            1230,
+            399,
+            1329,
+            428
+          ],
+          "name": "Harpies 1",
+          "parts": {
+            "whole": {
+              "textPx": 377,
+              "textLuma": 237.1,
+              "bgPx": 1666,
+              "bgLumaMedian": 136.7,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.849,
+              "cr": 2.839,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 276,
+              "textLuma": 237.1,
+              "bgPx": 491,
+              "bgLumaMedian": 144.6,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.908,
+              "cr": 2.682,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 101,
+              "textLuma": 237.0,
+              "bgPx": 1175,
+              "bgLumaMedian": 135.1,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.825,
+              "cr": 2.943,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 2.682,
+          "crName": 2.682,
+          "crHp": 2.943,
+          "tileEdgeCrosses": false,
+          "verdict": "fail"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-0-sk1",
+          "mode": "full",
+          "bbox": [
+            914,
+            276,
+            1006,
+            305
+          ],
+          "name": "Harpies 2",
+          "parts": {
+            "whole": {
+              "textPx": 344,
+              "textLuma": 238.1,
+              "bgPx": 1452,
+              "bgLumaMedian": 127.7,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.769,
+              "cr": 3.15,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 247,
+              "textLuma": 238.0,
+              "bgPx": 354,
+              "bgLumaMedian": 137.2,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.881,
+              "cr": 2.92,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 97,
+              "textLuma": 238.8,
+              "bgPx": 1098,
+              "bgLumaMedian": 126.2,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.732,
+              "cr": 3.223,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 2.92,
+          "crName": 2.92,
+          "crHp": 3.223,
+          "tileEdgeCrosses": false,
+          "verdict": "fail"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-0-sk2",
+          "mode": "full",
+          "bbox": [
+            751,
+            399,
+            848,
+            428
+          ],
+          "name": "Harpies 3",
+          "parts": {
+            "whole": {
+              "textPx": 375,
+              "textLuma": 237.0,
+              "bgPx": 1575,
+              "bgLumaMedian": 126.2,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.692,
+              "cr": 3.151,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 274,
+              "textLuma": 237.0,
+              "bgPx": 415,
+              "bgLumaMedian": 135.5,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.911,
+              "cr": 3.003,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 101,
+              "textLuma": 237.0,
+              "bgPx": 1160,
+              "bgLumaMedian": 123.8,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.614,
+              "cr": 3.218,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.003,
+          "crName": 3.003,
+          "crHp": 3.218,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-1-hero",
+          "mode": "full",
+          "bbox": [
+            746,
+            517,
+            842,
+            545
+          ],
+          "name": "King Arthur",
+          "parts": {
+            "whole": {
+              "textPx": 486,
+              "textLuma": 241.0,
+              "bgPx": 1051,
+              "bgLumaMedian": 115.5,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.469,
+              "cr": 3.219,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 262,
+              "textLuma": 241.0,
+              "bgPx": 368,
+              "bgLumaMedian": 123.6,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.557,
+              "cr": 3.263,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 224,
+              "textLuma": 241.0,
+              "bgPx": 683,
+              "bgLumaMedian": 111.4,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.422,
+              "cr": 3.192,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.192,
+          "crName": 3.263,
+          "crHp": 3.192,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-1-sk0",
+          "mode": "full",
+          "bbox": [
+            1252,
+            529,
+            1328,
+            558
+          ],
+          "name": "Merlin",
+          "parts": {
+            "whole": {
+              "textPx": 410,
+              "textLuma": 236.9,
+              "bgPx": 1003,
+              "bgLumaMedian": 125.5,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.74,
+              "cr": 3.341,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 300,
+              "textLuma": 236.9,
+              "bgPx": 259,
+              "bgLumaMedian": 123.2,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.672,
+              "cr": 3.302,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 110,
+              "textLuma": 236.6,
+              "bgPx": 744,
+              "bgLumaMedian": 126.3,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.763,
+              "cr": 3.339,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.302,
+          "crName": 3.302,
+          "crHp": 3.339,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        }
+      ]
+    },
+    "K3_damage": {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/joiner/s09-damage-number.png",
+      "trace": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/combat-client-joiner.trace.log",
+      "items": [
+        {
+          "kind": "label",
+          "fighter": "f-0-hero",
+          "mode": "full",
+          "bbox": [
+            915,
+            513,
+            1005,
+            545
+          ],
+          "name": "Medusa",
+          "parts": {
+            "whole": {
+              "textPx": 597,
+              "textLuma": 241.0,
+              "bgPx": 984,
+              "bgLumaMedian": 127.8,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.729,
+              "cr": 3.17,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 308,
+              "textLuma": 241.0,
+              "bgPx": 337,
+              "bgLumaMedian": 136.8,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.914,
+              "cr": 3.051,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 289,
+              "textLuma": 241.0,
+              "bgPx": 647,
+              "bgLumaMedian": 123.7,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.632,
+              "cr": 3.258,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.051,
+          "crName": 3.051,
+          "crHp": 3.258,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-0-sk0",
+          "mode": "full",
+          "bbox": [
+            1230,
+            399,
+            1329,
+            428
+          ],
+          "name": "Harpies 1",
+          "parts": {
+            "whole": {
+              "textPx": 361,
+              "textLuma": 237.0,
+              "bgPx": 1688,
+              "bgLumaMedian": 137.0,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.854,
+              "cr": 2.806,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 262,
+              "textLuma": 237.0,
+              "bgPx": 511,
+              "bgLumaMedian": 144.5,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.896,
+              "cr": 2.658,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 99,
+              "textLuma": 237.0,
+              "bgPx": 1177,
+              "bgLumaMedian": 135.3,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.835,
+              "cr": 2.916,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 2.658,
+          "crName": 2.658,
+          "crHp": 2.916,
+          "tileEdgeCrosses": false,
+          "verdict": "fail"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-0-sk1",
+          "mode": "full",
+          "bbox": [
+            914,
+            276,
+            1006,
+            305
+          ],
+          "name": "Harpies 2",
+          "parts": {
+            "whole": {
+              "textPx": 341,
+              "textLuma": 238.7,
+              "bgPx": 1451,
+              "bgLumaMedian": 128.1,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.784,
+              "cr": 3.148,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 244,
+              "textLuma": 238.0,
+              "bgPx": 352,
+              "bgLumaMedian": 138.5,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.909,
+              "cr": 2.916,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 97,
+              "textLuma": 239.0,
+              "bgPx": 1099,
+              "bgLumaMedian": 126.2,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.743,
+              "cr": 3.202,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 2.916,
+          "crName": 2.916,
+          "crHp": 3.202,
+          "tileEdgeCrosses": false,
+          "verdict": "fail"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-0-sk2",
+          "mode": "full",
+          "bbox": [
+            751,
+            399,
+            848,
+            428
+          ],
+          "name": "Harpies 3",
+          "parts": {
+            "whole": {
+              "textPx": 359,
+              "textLuma": 236.9,
+              "bgPx": 1586,
+              "bgLumaMedian": 127.5,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.721,
+              "cr": 3.136,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 260,
+              "textLuma": 236.9,
+              "bgPx": 424,
+              "bgLumaMedian": 135.7,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.892,
+              "cr": 2.929,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 99,
+              "textLuma": 236.3,
+              "bgPx": 1162,
+              "bgLumaMedian": 125.9,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.659,
+              "cr": 3.193,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 2.929,
+          "crName": 2.929,
+          "crHp": 3.193,
+          "tileEdgeCrosses": false,
+          "verdict": "fail"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-1-hero",
+          "mode": "full",
+          "bbox": [
+            746,
+            517,
+            842,
+            545
+          ],
+          "name": "King Arthur",
+          "parts": {
+            "whole": {
+              "textPx": 445,
+              "textLuma": 240.0,
+              "bgPx": 1112,
+              "bgLumaMedian": 119.7,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.499,
+              "cr": 3.187,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 240,
+              "textLuma": 240.0,
+              "bgPx": 380,
+              "bgLumaMedian": 124.3,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.561,
+              "cr": 3.239,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 205,
+              "textLuma": 240.0,
+              "bgPx": 732,
+              "bgLumaMedian": 113.7,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.467,
+              "cr": 3.153,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.153,
+          "crName": 3.239,
+          "crHp": 3.153,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        },
+        {
+          "kind": "label",
+          "fighter": "f-1-sk0",
+          "mode": "full",
+          "bbox": [
+            1252,
+            529,
+            1328,
+            558
+          ],
+          "name": "Merlin",
+          "parts": {
+            "whole": {
+              "textPx": 402,
+              "textLuma": 236.9,
+              "bgPx": 1012,
+              "bgLumaMedian": 125.6,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.738,
+              "cr": 3.34,
+              "tileEdgeCrosses": false
+            },
+            "name": {
+              "textPx": 294,
+              "textLuma": 237.0,
+              "bgPx": 261,
+              "bgLumaMedian": 123.9,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.678,
+              "cr": 3.29,
+              "tileEdgeCrosses": false
+            },
+            "hp": {
+              "textPx": 108,
+              "textLuma": 236.0,
+              "bgPx": 751,
+              "bgLumaMedian": 126.6,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.759,
+              "cr": 3.323,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 3.29,
+          "crName": 3.29,
+          "crHp": 3.323,
+          "tileEdgeCrosses": false,
+          "verdict": "AA-large only"
+        },
+        {
+          "kind": "damage",
+          "fighter": "f-1-hero",
+          "bbox": [
+            804,
+            539,
+            842,
+            563
+          ],
+          "name": "King Arthur",
+          "parts": {
+            "whole": {
+              "textPx": 77,
+              "textLuma": 238.1,
+              "bgPx": 637,
+              "bgLumaMedian": 117.6,
+              "bgDarkShare": 0.0,
+              "bgLightShare": 0.455,
+              "cr": 2.828,
+              "tileEdgeCrosses": false
+            }
+          },
+          "crWorst": 2.828,
+          "crName": null,
+          "crHp": null,
+          "tileEdgeCrosses": false,
+          "verdict": "fail",
+          "collidesWithLabels": [
+            {
+              "label": "King Arthur",
+              "shareOfDamageBbox": 0.25
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

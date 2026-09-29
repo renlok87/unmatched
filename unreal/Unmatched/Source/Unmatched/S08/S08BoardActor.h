@@ -15,6 +15,7 @@
 
 class UInstancedStaticMeshComponent;
 class UStaticMeshComponent;
+class UStaticMesh;
 class UTextRenderComponent;
 class AS08FighterActor;
 class UMaterialInterface;
@@ -130,6 +131,9 @@ private:
   TMap<FString, TObjectPtr<UInstancedStaticMeshComponent>> ArtZoneStrokes;
   UPROPERTY()
   TObjectPtr<UInstancedStaticMeshComponent> ArtZoneGlyphs;
+  // T4.2: one glyph-mesh ISM per zone KEY (SM_ART005_ZoneGlyph_<Glyph>, one instance per zone slot).
+  UPROPERTY()
+  TMap<FString, TObjectPtr<UInstancedStaticMeshComponent>> ArtZoneGlyphMeshes;
   bool bArtAssetsReady = false;   // shared art assets + Medusa candidate + board data
   bool bCobbleMeshReady = false;  // ART-005 Cobble slab and its two material slots
   bool bTileArtReady = false;     // stone/wood probe materials + dark void tint for 'tiles'
@@ -158,6 +162,11 @@ private:
   TMap<FString, TObjectPtr<UMaterialInterface>> ArtZoneMaterials;
   UPROPERTY()
   TMap<FString, TObjectPtr<UMaterialInstanceDynamic>> ArtZoneTints;
+  // T4.2 content: zone MI per key ("" = fallback style) and glyph mesh per glyph name, loaded from the data paths.
+  UPROPERTY()
+  TMap<FString, TObjectPtr<UMaterialInterface>> ArtZoneInstances;
+  UPROPERTY()
+  TMap<FString, TObjectPtr<UStaticMesh>> ArtGlyphMeshes;
 
   FS08BoardArtData ArtData;
   bool bArtDataLoaded = false;
@@ -169,6 +178,10 @@ private:
   /** Authored material when it supports instancing (or on the legacy Cobble
    *  profile, kept exact), else an unlit tint of the data colour. */
   UMaterialInterface* ZoneMaterialFor(const FS08ZoneStyle& Style, bool& bOutAuthored, bool& bOutIsmUsage);
+  /** T4.2: the zone MI of a style (fallback style under ""), nullptr = not in the data or not loaded. */
+  UMaterialInterface* ZoneInstanceFor(const FS08ZoneStyle& Style) const;
+  /** T4.2: glyph-mesh ISM of a zone key, nullptr when its glyph has no loaded mesh (cube pieces then). */
+  UInstancedStaticMeshComponent* ZoneGlyphMeshComponent(const FS08ZoneStyle& Style);
   void ClearArtSurface();
   void AddArtSurfacePart(UMaterialInterface* Material, const FTransform& Transform);
   void ClearArtLights();
