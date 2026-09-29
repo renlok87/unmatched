@@ -1,0 +1,443 @@
+{
+  "atlas_px": 4096,
+  "checks": {
+    "every_zone_present": {
+      "expected": "> 0 for every zone",
+      "measured": {
+        "base": 0.05494,
+        "belt": 0.00813,
+        "blade": 0.01809,
+        "cloth": 0.40754,
+        "embroidery": 0.03443,
+        "face_skin": 0.02794,
+        "gold": 0.17071,
+        "hair": 0.08582,
+        "lining": 0.01723,
+        "steel_plate": 0.17517
+      },
+      "note": "",
+      "passed": true
+    },
+    "matid_encoding_roundtrip": {
+      "expected": "value = index x 16 + 8; floor(v / 16) = index",
+      "measured": {
+        "step": 16,
+        "values": [
+          8,
+          24,
+          40,
+          72,
+          136,
+          152,
+          184,
+          216,
+          232
+        ]
+      },
+      "note": "",
+      "passed": true
+    },
+    "matid_metal_equals_h22_metallic_outside_embroidery": {
+      "expected": "disagree <= 2 % of the metal texels (2K)",
+      "measured": {
+        "disagree_outside_embroidery": 4599,
+        "embroidery_texels_2k_h22_metallic": 136090,
+        "h22_metallic_ge_0_5_texels_2k": 1796184,
+        "metal_class_texels_2k": 1648965
+      },
+      "note": "",
+      "passed": true
+    },
+    "team_accent_area_share": {
+      "expected": [
+        0.05,
+        0.12
+      ],
+      "measured": {
+        "share_3d_belt": 0.0076,
+        "share_3d_strip": 0.047,
+        "share_3d_total": 0.0553
+      },
+      "note": "share of the figure's 3D surface (body + sword, no base)",
+      "passed": true
+    },
+    "team_accent_cloak_stays_red": {
+      "expected": "<= 0.2 of the red cloth core texels of the cloak carry the accent",
+      "measured": {
+        "accent_ge_0_5_share": 0.0907,
+        "core_texels_4k": 1928056,
+        "part": "tripo_part_0"
+      },
+      "note": "the cloak stays red (the accent is only a strip / the belt)",
+      "passed": true
+    },
+    "team_accent_tabard_stays_red": {
+      "expected": "<= 0.2 of the red cloth core texels of the tabard carry the accent",
+      "measured": {
+        "accent_ge_0_5_share": 0.0,
+        "core_texels_4k": 258556,
+        "part": "tripo_part_5"
+      },
+      "note": "the tabard stays red (the accent is only a strip / the belt)",
+      "passed": true
+    },
+    "team_accent_zero_outside_cloth_and_belt": {
+      "expected": "0 (8-bit) on the core texels of metal, embroidery, skin, hair, stone, lining",
+      "measured": {
+        "base": 0,
+        "blade": 0,
+        "embroidery": 0,
+        "face_skin": 0,
+        "gold": 0,
+        "hair": 0,
+        "lining": 0,
+        "steel_plate": 0
+      },
+      "note": "",
+      "passed": true
+    },
+    "unchanged_maps_equal_h22_2k": {
+      "expected": "N, TeamMask (= H2.2 TeamMask.R, deprecated) and TeamMaskRGBA.RG = the H2.2 runtime 2K pixels",
+      "measured": {
+        "N": true,
+        "TeamMaskRGBA_RG": true,
+        "TeamMask_R": true
+      },
+      "note": "",
+      "passed": true
+    },
+    "uv1_raster_covers_atlas": {
+      "expected": "the export's triangles cover the texels of the bake atlas (mismatch <= 0.01 %)",
+      "measured": {
+        "coverage_mismatch_texels": 0,
+        "degenerate_uv0_triangles": 0,
+        "raster_equals_atlas_coverage": true,
+        "triangles": 40184,
+        "uv1_abs_max_m_covered": 0.1983
+      },
+      "note": "",
+      "passed": true
+    },
+    "zone_weights_partition": {
+      "expected": "< 1e-4 on every texel of the atlas",
+      "measured": 1e-07,
+      "note": "",
+      "passed": true
+    }
+  },
+  "conventions": {
+    "EdgeMask": "L8 linear, 1 = convex edge (EdgeMaskTexture of M_UM_Figure_v2)",
+    "MatID": "G8 linear (UE TC_Grayscale, sRGB off, NoMipmaps, Nearest, never streamed); value = class index x 16 + 8; shader: Load(int3(frac(uv0) x size, 0)), id = floor(v x 255 / 16)",
+    "N": "DirectX (-Y), = H2.2",
+    "TeamAccent": "L8 linear (UE TC_Grayscale, sRGB off): team-colour accent (team-accent.md); goes into the TeamMaskTexture slot of M_UM_Figure_v2",
+    "TeamMask": "L8 linear = H2.2 TeamMask.R (cloak, tabard, collar lining): DEPRECATED, kept for compatibility (v1 MIs, W5c import)",
+    "TeamMaskRGBA": "R TeamMask (deprecated), G base side band, B TeamAccent, A EdgeMask; linear"
+  },
+  "dielectric_bake_2k": {
+    "leather_worn": {
+      "Y_p2_p50_p98": [
+        0.02935,
+        0.05875,
+        0.21342
+      ],
+      "texels_2k": 11986
+    },
+    "silk": {
+      "Y_p2_p50_p98": [
+        0.06484,
+        0.22199,
+        0.49406
+      ],
+      "texels_2k": 48359
+    },
+    "skin": {
+      "Y_p2_p50_p98": [
+        0.08073,
+        0.18978,
+        0.52833
+      ],
+      "texels_2k": 39670
+    },
+    "stone_base": {
+      "Y_p2_p50_p98": [
+        0.02245,
+        0.03148,
+        0.06026
+      ],
+      "texels_2k": 79350
+    },
+    "wool_coarse": {
+      "Y_p2_p50_p98": [
+        0.0224,
+        0.03244,
+        0.10081
+      ],
+      "texels_2k": 620709
+    }
+  },
+  "edge_mask": {
+    "method": "convexity of the baked tangent normal: d(nx)/du + d(ny)/dv inside UV islands at gaussian sigma 1.5 and 4 texels (4K), positive part / p99, mean of the two",
+    "sigma_1.5_p99": 0.18146,
+    "sigma_4_p99": 0.07475
+  },
+  "id_textures": {
+    "accent": {
+      "bytes": 317600,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/work/lookdev/id/accent.png",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "b039b05cc6752173a951e59c42f32cdfe12bc316ca33163497f742dad90824a7"
+    },
+    "tabard": {
+      "bytes": 295628,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/work/lookdev/id/tabard.png",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "051a2df888a596948d49283793bd47c62db2db166466eef4f59fdff333346547"
+    },
+    "zones": {
+      "bytes": 289271,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/work/lookdev/id/zones.png",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "bf8d898c0b26b4cdb2afff71bf35a265b291b56a4003157c820e4c55ae638ef0"
+    }
+  },
+  "matid_class_area_share_2k": {
+    "gold_antique": 0.17309,
+    "leather_worn": 0.0082,
+    "legacy_bake": 0.08594,
+    "silk": 0.0331,
+    "skin": 0.02715,
+    "steel_blued": 0.1754,
+    "steel_polished": 0.01799,
+    "stone_base": 0.05431,
+    "wool_coarse": 0.42482
+  },
+  "matid_px": 2048,
+  "passed": true,
+  "presets_sha256": "863a3c2f5457e0f6352a4ce600e9ee17b79a92badcdc1a5f654a79784cd197e7",
+  "previews": {
+    "accent": {
+      "bytes": 1569597,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_teamaccent_1K.png",
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "73c0670102a9be645d707b8b99cb6751e6c5cd7f6b9e56f7541574ea83d9923d"
+    },
+    "edge": {
+      "bytes": 409388,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_edgemask_1K.png",
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "00ce95889bb177fbb9d86feeca55e8e79ca869ce46aa59ef513e379dd6057b67"
+    },
+    "matid": {
+      "bytes": 282532,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_matid_2K.png",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "c8ae2ca72a9e70ba19d5dfdf5e3ec1eaa67f4f1fab82977f25de5d47aad8b197"
+    },
+    "zones": {
+      "bytes": 740405,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_zones_1K.png",
+      "px": [
+        1024,
+        1024
+      ],
+      "sha256": "5d16c15cc1fc5022a56efe0ea1e18f68bb4f2b34d544a93b8358b7bb75147783"
+    }
+  },
+  "profile": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-lookdev.json",
+  "profile_id": "king-arthur-h2-lookdev/1",
+  "source_profile": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-skeletal-um-fbx-v1-h2.json",
+  "stage": "ld_maps",
+  "team_accent": {
+    "area_method": "texel area = |dPOS/drow x dPOS/dcol| of the POS bake (Tripo frame; ratio, so the frame scale cancels), clipped at 8 x median against island-edge jumps; figure = body + sword, without the base part",
+    "band_components": 10,
+    "band_texels_4k": 45393,
+    "red_core_share_by_part": {
+      "cloak": 0.0907,
+      "tabard": 0.0
+    },
+    "seat_scale": 0.613039,
+    "share_3d_belt": 0.0076,
+    "share_3d_by_part": {
+      "tripo_part_0": 0.0477,
+      "tripo_part_1": 0.0076
+    },
+    "share_3d_strip": 0.047,
+    "share_3d_total": 0.0553,
+    "texels_4k_ge_0_5": 251357,
+    "width_m_final": 0.014,
+    "width_m_tripo": 0.02284
+  },
+  "textures": {
+    "EdgeMask_2K": {
+      "bytes": 1152881,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_EdgeMask_2K.png",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "9304a5bc9299d7fe02ac607002fe233eb6ecd283cb055a64503dcab74969aefd"
+    },
+    "EdgeMask_4K": {
+      "bytes": 2974188,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_EdgeMask_4K.png",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "a5c1cbc07ff7ae6045d4a5fe57b5031b388918030976e83e30fe2627071fa4bc"
+    },
+    "MatID_2K": {
+      "bytes": 201522,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_MatID_2K.png",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "3f96c9d4c93c7a7b986bc8e4400dd037e2714199cf1e6f47d0e16a2c931e8b7c"
+    },
+    "N_2K": {
+      "bytes": 4643337,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_N_2K.png",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "704933e8375470d9a431c41f45d105ddaba246b4c9a467e691ef5bdb4c7526dd"
+    },
+    "N_4K": {
+      "bytes": 11557277,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_N_4K.png",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "b81214eb6a11638003903f75c5b3cf77fd77536d975ceb5314d924a094211eb6"
+    },
+    "TeamAccent_2K": {
+      "bytes": 160951,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamAccent_2K.png",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "1bee50dd272d88c834b233e2939d665d7893bcb4dad23fc3b03a4a40809c1502"
+    },
+    "TeamAccent_4K": {
+      "bytes": 360725,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamAccent_4K.png",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "8f64ab38b105424ff1c392707e18ef28163e8c616c54a0bbb09a56c69c2829ed"
+    },
+    "TeamMaskRGBA_2K": {
+      "bytes": 2120886,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamMaskRGBA_2K.png",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "ffcc17c5a429d564451a598e9d9833e2e1e457f8441214062f587fd9f659cef6"
+    },
+    "TeamMaskRGBA_4K": {
+      "bytes": 5319529,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamMaskRGBA_4K.png",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "14b6cb33066411e4aa5bc434e70bd62aa1fb74f6b3d93967be78e556fd88fd7b"
+    },
+    "TeamMask_2K": {
+      "bytes": 295041,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamMask_2K.png",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "808b4f072ee208d26d97276bf0855f6222144b5dbb78603ce3f44e8c2d9eaf8b"
+    },
+    "TeamMask_4K": {
+      "bytes": 630017,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamMask_4K.png",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "4f9c56cacadcd6452acc86060ff6b145290443ab3b1e998984ba1a2b34a20dcf"
+    }
+  },
+  "uv1_raster": {
+    "coverage_mismatch_texels": 0,
+    "degenerate_uv0_triangles": 0,
+    "raster_equals_atlas_coverage": true,
+    "triangles": 40184,
+    "uv1_abs_max_m_covered": 0.1983
+  },
+  "ymed_bake_2k": {
+    "gold_antique": 0.44426,
+    "steel_blued": 0.15017,
+    "steel_polished": 0.51621
+  },
+  "zone_area_share_4k": {
+    "base": 0.05494,
+    "belt": 0.00813,
+    "blade": 0.01809,
+    "cloth": 0.40754,
+    "embroidery": 0.03443,
+    "face_skin": 0.02794,
+    "gold": 0.17071,
+    "hair": 0.08582,
+    "lining": 0.01723,
+    "steel_plate": 0.17517
+  },
+  "zone_class": {
+    "base": "stone_base",
+    "belt": "leather_worn",
+    "blade": "steel_polished",
+    "cloth": "wool_coarse",
+    "embroidery": "silk",
+    "face_skin": "skin",
+    "gold": "gold_antique",
+    "hair": "legacy_bake",
+    "lining": "wool_coarse",
+    "steel_plate": "steel_blued"
+  },
+  "zone_texture": {
+    "encoding": "zone index (order of zones) x 16 + 8, 4K",
+    "note": "local (work/); input of the debug ZoneID of lookdev_ue_inputs.py",
+    "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/work/lookdev/T_Zone_4K.png",
+    "sha256": "8d347dc68b6d16ea9c1db482889991b931b52e93ac74cf14ee760df287b69715"
+  },
+  "zones": [
+    "steel_plate",
+    "blade",
+    "gold",
+    "embroidery",
+    "cloth",
+    "lining",
+    "belt",
+    "face_skin",
+    "hair",
+    "base"
+  ]
+}

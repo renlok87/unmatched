@@ -20,6 +20,12 @@ Stages (profile: art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/*-
                         + silhouettes
   sheets    (python)   side-by-side sheets with the H2 concepts and the previous candidate, labelled "blender"
 
+Look-dev v2 (2026-09-29; profile build-profiles/king-arthur-h2-lookdev.json, run 20260929-h2-lookdev, report
+docs/art-pipeline/king-arthur-lookdev-v2.md): lookdev_state (H2.2 texel state rebuilt byte-exact), lookdev_export (UV1
+in metres + FBX read-back), lookdev_maps (zones, MatID, TeamAccent, EdgeMask), lookdev_emul (numpy emulation of the
+M_UM_Figure_v2 core for the Blender frames), lookdev_tone (steel / gold F0 and dielectric tone from the concept, LUT),
+lookdev_render (studio_env + Cobble calibrated to the W4-A anchor + ID frames), lookdev_report; the H2 stages are unchanged.
+
 Driver: tools/tripo-pipeline/blender/h2_bake_arthur/run.py (system python). Every Blender stage is headless only.
 """
 

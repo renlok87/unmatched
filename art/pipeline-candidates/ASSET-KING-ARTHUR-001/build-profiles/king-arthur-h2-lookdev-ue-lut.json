@@ -1,0 +1,42 @@
+{
+ "schema": "unmatched.um-v2-lookdev-ue-lut/1",
+ "hero": "Arthur",
+ "asset_id": "ASSET-KING-ARTHUR-001",
+ "lookdev_run": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev",
+ "lookdev_profile_id": "king-arthur-h2-lookdev/1",
+ "texture_tier": "runtime_2k",
+ "status_note": "LD-arthur-blender (2026-09-29): PROPOSAL for the UE look-dev stage, written by the Blender look-dev of Arthur (profile king-arthur-h2-lookdev.json). lut.ue_lookdev = the LUT fields the Blender override format does not carry (reports/ld-lut.json ue_lut_fields: bake luminance modulation of steel_blued / gold_antique, steel wear, luminance floors if any); the UE stage owns this file and records its own iterations in lut.iterations. Not art acceptance.",
+ "lut": {
+  "blender_lut_report": "reports/ld-lut.json",
+  "ue_lookdev": {
+   "gold_antique": {
+    "bakeLuminanceModulation": 0.3,
+    "why": "the gold trims carry painted relief (lion heads, knotwork): +-30 % instead of +-12 %"
+   },
+   "steel_blued": {
+    "bakeLuminanceModulation": 0.5,
+    "wearStrength": 0.12,
+    "why": "engraving and the lighter gauntlets live in the bake luminance (H2.2 BC p10 / p90 = 0.47 / 1.51 of the median, gauntlets 1.5x the plate): the preset's +-15 % would flatten them; wear: the concept plate edges are gold trims, the EdgeMask of the Tripo normal also lights the engraving ridges -> 0.12 instead of 0.35 (a hint of bare iron on the ridges)"
+   }
+  },
+  "iterations": [
+   {
+    "id": "BL-0",
+    "change": "Blender look-dev proposal (ld-lut.json ue_lut_fields)",
+    "evidence": "docs/art-pipeline/king-arthur-lookdev-v2.md"
+   }
+  ]
+ },
+ "edge_mask": {
+  "source": "textures/T_KingArthur_H2LD_TeamMaskRGBA_2K.png",
+  "channel": "A",
+  "out": "T_KingArthur_H2LD_EdgeMask_2K.png",
+  "note": "TeamMaskRGBA.A = the EdgeMask (as Merlin); textures/T_KingArthur_H2LD_EdgeMask_2K.png holds the same bytes as L8 (lookdev_ue_inputs.py indexes a channel axis, so an L source would be read as one column)"
+ },
+ "zone_debug": {
+  "maps_report": "reports/ld-maps-report.json",
+  "out": "T_KingArthur_H2LD_ZoneID_2K.png",
+  "lut_out": "T_KingArthur_H2LD_ZoneLUT_Debug.dds",
+  "palette_exposure": 0.34
+ }
+}

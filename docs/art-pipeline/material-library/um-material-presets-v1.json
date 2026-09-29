@@ -19,7 +19,8 @@
   "maxClasses": 16,
   "reserved": {
    "0": "legacy_bake"
-  }
+  },
+  "extension": "extensionClasses (libraryIndex ≥ 16) не имеют глобального индекса MatID: герой кладёт такой класс в столбец LUT неиспользуемого им класса (heroSlot), срез деталей — extension.arraySlice (README §3a)"
  },
  "referenceF0": {
   "iron": {
@@ -962,6 +963,78 @@
     "note": "захватанные места светлее и глаже"
    },
    "teamDyeAllowed": false
+  }
+ ],
+ "extensionClasses": [
+  {
+   "family": "dielectric",
+   "metallic": 0,
+   "index": 16,
+   "id": "horn_claw",
+   "nameRu": "рог / коготь (кератин)",
+   "shadingModel": "DefaultLit",
+   "baseColor": {
+    "mode": "bake-clamped",
+    "typicalLinear": [0.03, 0.026, 0.024],
+    "luminanceRange": [0.02, 0.55],
+    "maxChannel": 0.9,
+    "sourceKind": "art",
+    "source": [
+     "ALBEDO",
+     "ART-DIR"
+    ],
+    "note": "превью-цвет — тёмный коготь хищной птицы (концепт Harpy: чёрный рог); в рантайме — альбедо героя. Верх диапазона 0.55 — светлый рог/кость (роговой чехол козы, слоновая кость), низ — пол диэлектриков"
+   },
+   "roughness": {
+    "typical": 0.33,
+    "range": [0.22, 0.5],
+    "variation": 0.06,
+    "sourceKind": "art",
+    "source": [
+     "ART-DIR",
+     "CC0-measured"
+    ],
+    "note": "Кератиновый чехол когтя/рога гладкий, полируется износом (у концепта на когтях узкие яркие блики): глаже гладкой кожи (Leather026, measured median 0.371) и пера (0.55). Пол 0.22 — против спекулярного алиасинга на мелких формах. Справочного значения шероховатости кератина нет — арт-решение, калибруется в look-dev."
+   },
+   "specular": {
+    "value": 0.575,
+    "f0": 0.046,
+    "sourceKind": "reference",
+    "source": [
+     "RTR4-T9.1",
+     "IOR-F0"
+    ],
+    "note": "кератин n ≈ 1.55 → F0 0.046 = «волосы» RTR4 (как перья)"
+   },
+   "detail": {
+    "DetailN": "art/material-library/v1/tiles/stone_base/stone_base_DetailN.png",
+    "DetailRMH": "art/material-library/v1/tiles/stone_base/stone_base_DetailRMH.png",
+    "tileSizePx": 1024,
+    "tilesPerMeter": 12.0,
+    "tileWorldSizeM": 0.0833,
+    "feature": "слабые продольные прожилки и пятна (тайл камня подставки на мелком масштабе; свой процедурный тайл «годичные полосы рога» — v1.1)",
+    "normalStrength": 0.3,
+    "tileFrom": "stone_base"
+   },
+   "edgeWear": {
+    "enabled": true,
+    "strength": 0.25,
+    "wornBaseColorScale": 1.4,
+    "wornRoughnessDelta": -0.08,
+    "source": [
+     "ART-DIR"
+    ],
+    "note": "стёртые кончики когтя светлее (открытый слой кератина) и глаже"
+   },
+   "teamDyeAllowed": false,
+   "extension": {
+    "libraryIndex": 16,
+    "globalMatId": false,
+    "heroSlot": "столбец LUT класса, которого у героя нет (у Harpy — brass, индекс 5); MatID героя = слот × 16 + 8",
+    "arraySlice": 14,
+    "arraySliceNote": "срез массива деталей класса tileFrom (stone_base = 14)",
+    "why": "4-битный MatID занят классами 0–15 (README §10); отдельный класс нужен, чтобы коготь не делил шероховатость/износ с пером или кожей. Физика кератина — как у перьев (F0 0.046), отличие — гладкость и износ"
+   }
   }
  ]
 }

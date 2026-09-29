@@ -1,0 +1,162 @@
+{
+ "classes": {
+  "gold_antique": {
+   "bakeLuminanceModulation": 0.3,
+   "bc": [
+    1.0,
+    0.474,
+    0.137
+   ],
+   "ymedClassHero": 0.44619
+  },
+  "leather_worn": {
+   "bc": [
+    0.10946,
+    0.04971,
+    0.02519
+   ]
+  },
+  "silk": {
+   "bc": [
+    0.61721,
+    0.20508,
+    0.06663
+   ],
+   "roughHi": 0.58,
+   "roughLo": 0.32,
+   "roughTypical": 0.42,
+   "roughVariation": 0.08,
+   "sheenIntensity": 0.5,
+   "sheenTint": 1.0,
+   "teamDyeAllowed": 0.0
+  },
+  "skin": {
+   "bc": [
+    0.4452,
+    0.18447,
+    0.09531
+   ]
+  },
+  "steel_blued": {
+   "bakeLuminanceModulation": 0.5,
+   "bc": [
+    0.159,
+    0.147,
+    0.134
+   ],
+   "roughHi": 0.56,
+   "roughLo": 0.38,
+   "roughTypical": 0.46,
+   "roughVariation": 0.048,
+   "wearStrength": 0.12,
+   "ymedClassHero": 0.15017
+  },
+  "steel_polished": {
+   "ymedClassHero": 0.51621
+  },
+  "stone_base": {
+   "bc": [
+    0.0319,
+    0.03071,
+    0.0331
+   ]
+  },
+  "wool_coarse": {
+   "bc": [
+    0.15896,
+    0.00651,
+    0.00913
+   ]
+  }
+ },
+ "generator": "tools/art/material_library/lookdev_ue_inputs.py",
+ "hero": "Arthur",
+ "layers": {
+  "blender_lookdev": {
+   "classes": {
+    "gold_antique": {
+     "bc": [
+      1.0,
+      0.474,
+      0.137
+     ],
+     "ymedClassHero": 0.44619
+    },
+    "leather_worn": {
+     "bc": [
+      0.10946,
+      0.04971,
+      0.02519
+     ]
+    },
+    "silk": {
+     "bc": [
+      0.61721,
+      0.20508,
+      0.06663
+     ],
+     "roughHi": 0.58,
+     "roughLo": 0.32,
+     "roughTypical": 0.42,
+     "roughVariation": 0.08,
+     "sheenIntensity": 0.5,
+     "sheenTint": 1.0,
+     "teamDyeAllowed": 0.0
+    },
+    "skin": {
+     "bc": [
+      0.4452,
+      0.18447,
+      0.09531
+     ]
+    },
+    "steel_blued": {
+     "bc": [
+      0.159,
+      0.147,
+      0.134
+     ],
+     "roughHi": 0.56,
+     "roughLo": 0.38,
+     "roughTypical": 0.46,
+     "roughVariation": 0.048,
+     "ymedClassHero": 0.15017
+    },
+    "steel_polished": {
+     "ymedClassHero": 0.51621
+    },
+    "stone_base": {
+     "bc": [
+      0.0319,
+      0.03071,
+      0.0331
+     ]
+    },
+    "wool_coarse": {
+     "bc": [
+      0.15896,
+      0.00651,
+      0.00913
+     ]
+    }
+   },
+   "source": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/reports/ld-lut.json#overrides"
+  },
+  "ue_lookdev": {
+   "classes": {
+    "gold_antique": {
+     "bakeLuminanceModulation": 0.3,
+     "why": "the gold trims carry painted relief (lion heads, knotwork): +-30 % instead of +-12 %"
+    },
+    "steel_blued": {
+     "bakeLuminanceModulation": 0.5,
+     "wearStrength": 0.12,
+     "why": "engraving and the lighter gauntlets live in the bake luminance (H2.2 BC p10 / p90 = 0.47 / 1.51 of the median, gauntlets 1.5x the plate): the preset's +-15 % would flatten them; wear: the concept plate edges are gold trims, the EdgeMask of the Tripo normal also lights the engraving ridges -> 0.12 instead of 0.35 (a hint of bare iron on the ridges)"
+    }
+   },
+   "source": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-lookdev-ue-lut.json#lut.ue_lookdev"
+  }
+ },
+ "rebuild": "python tools/art/material_library/lookdev_ue_inputs.py --config art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-lookdev-ue-lut.json",
+ "schema": "unmatched.um-v2-hero-overrides/1"
+}

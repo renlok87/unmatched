@@ -1,0 +1,501 @@
+{
+  "blender": "5.2.2 LTS",
+  "checks": {
+    "appended_skinning_intact": {
+      "expected": {
+        "base": [],
+        "body": [
+          [
+            "ARMATURE",
+            "SKEL_UM_Humanoid"
+          ]
+        ],
+        "weapon": [
+          [
+            "ARMATURE",
+            "SKEL_UM_Humanoid"
+          ]
+        ]
+      },
+      "measured": {
+        "base": [],
+        "body": [
+          [
+            "ARMATURE",
+            "SKEL_UM_Humanoid"
+          ]
+        ],
+        "weapon": [
+          [
+            "ARMATURE",
+            "SKEL_UM_Humanoid"
+          ]
+        ]
+      },
+      "note": "",
+      "passed": true
+    },
+    "bones_equal_h2": {
+      "expected": {
+        "armature": "SKEL_UM_Humanoid",
+        "bones": 17
+      },
+      "measured": {
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "bones": 17,
+        "names_parents_heads_tails_equal": true
+      },
+      "note": "",
+      "passed": true
+    },
+    "export_front_plus_x": {
+      "expected": "0 +- 10 deg (UE +X)",
+      "measured": -2.13,
+      "note": "",
+      "passed": true
+    },
+    "export_no_host_path": {
+      "expected": "no repo / home / Users path in the FBX bytes",
+      "measured": {
+        "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/export/SK_KingArthur_H2LD.fbx": [],
+        "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/export/SM_KingArthur_H2LD_Base.fbx": []
+      },
+      "note": "",
+      "passed": true
+    },
+    "export_sword_front_right": {
+      "expected": "x > 0.01 (front), y < -0.01 (FBX -Y = UE +Y: right hand)",
+      "measured": [
+        0.0476,
+        -0.0799,
+        0.09
+      ],
+      "note": "",
+      "passed": true
+    },
+    "geometry_equal_h2": {
+      "expected": "all polygons matched (positions 1e-4 m + UV0 1e-5), vertex arrays equal (<= 1e-6)",
+      "measured": {
+        "SK_KingArthur_H2_Body": {
+          "max_vertex_delta_m": 0.0,
+          "polygons_candidate": 36469,
+          "polygons_reference": 36469,
+          "unmatched_candidate_polygons": 0,
+          "unmatched_reference_polygons": 0,
+          "vertices": [
+            20073,
+            20073
+          ]
+        },
+        "SK_KingArthur_H2_Sword": {
+          "max_vertex_delta_m": 0.0,
+          "polygons_candidate": 2215,
+          "polygons_reference": 2215,
+          "unmatched_candidate_polygons": 0,
+          "unmatched_reference_polygons": 0,
+          "vertices": [
+            1164,
+            1164
+          ]
+        },
+        "SM_KingArthur_H2_Base": {
+          "max_vertex_delta_m": 0.0,
+          "polygons_candidate": 1500,
+          "polygons_reference": 1500,
+          "unmatched_candidate_polygons": 0,
+          "unmatched_reference_polygons": 0,
+          "vertices": [
+            876,
+            876
+          ]
+        }
+      },
+      "note": "",
+      "passed": true
+    },
+    "material_slot_single": {
+      "expected": "M_KingArthur_H2",
+      "measured": {
+        "SK_KingArthur_H2_Body": [
+          "M_KingArthur_H2"
+        ],
+        "SK_KingArthur_H2_Sword": [
+          "M_KingArthur_H2"
+        ],
+        "SM_KingArthur_H2_Base": [
+          "M_KingArthur_H2"
+        ]
+      },
+      "note": "",
+      "passed": true
+    },
+    "session_blend_path_empty": {
+      "expected": "",
+      "measured": "",
+      "note": "",
+      "passed": true
+    },
+    "source_fbx_sha256": {
+      "expected": {
+        "SK_KingArthur_H2.fbx": "9f3478122333d6488d4847654583b0e56a54c1a6415923ce658bf61d5356e828",
+        "SM_KingArthur_H2_Base.fbx": "dc75338c4b4ab543298da1af4c1bea4d6cfc440063c6647df23a40882aa73c0c"
+      },
+      "measured": {
+        "SK_KingArthur_H2.fbx": "9f3478122333d6488d4847654583b0e56a54c1a6415923ce658bf61d5356e828",
+        "SM_KingArthur_H2_Base.fbx": "dc75338c4b4ab543298da1af4c1bea4d6cfc440063c6647df23a40882aa73c0c"
+      },
+      "note": "",
+      "passed": true
+    },
+    "triangles_equal_h2": {
+      "expected": "equal",
+      "measured": {
+        "h2": {
+          "SK_KingArthur_H2_Body": 36469,
+          "SK_KingArthur_H2_Sword": 2215,
+          "SM_KingArthur_H2_Base": 1500
+        },
+        "lookdev": {
+          "SK_KingArthur_H2_Body": 36469,
+          "SK_KingArthur_H2_Sword": 2215,
+          "SM_KingArthur_H2_Base": 1500
+        }
+      },
+      "note": "",
+      "passed": true
+    },
+    "uv0_not_mirrored": {
+      "expected": 0,
+      "measured": {
+        "base": 0,
+        "body": 0,
+        "weapon": 0
+      },
+      "note": "a similarity UV1 keeps the UV0 tangent frame only without mirrored UV0 triangles",
+      "passed": true
+    },
+    "uv1_half_precision": {
+      "expected": "<= 0.25 mm (UE stores UVs as 16-bit floats unless Use Full Precision UVs)",
+      "measured": {
+        "half_float_step_mm_at_max": 0.12207,
+        "uv1_abs_max_m": 0.19793
+      },
+      "note": "",
+      "passed": true
+    },
+    "uv1_metres_per_island": {
+      "expected": "UV1 area / 3D area = 1 +- 0.001 per island",
+      "measured": {
+        "base": {
+          "island_area_ratio_uv1_over_3d_min_max": [
+            1.0,
+            1.0
+          ],
+          "island_scale_min_max": [
+            2.4619,
+            12.3101
+          ],
+          "islands": 23,
+          "mirrored_uv0_triangles": 0,
+          "rotated_islands": 0,
+          "triangle_area_ratio_p5_p50_p95": [
+            0.9842,
+            0.9998,
+            1.0184
+          ],
+          "uv1_abs_max_m": 0.16508
+        },
+        "body": {
+          "island_area_ratio_uv1_over_3d_min_max": [
+            1.0,
+            1.0
+          ],
+          "island_scale_min_max": [
+            0.7383,
+            1.4775
+          ],
+          "islands": 1188,
+          "mirrored_uv0_triangles": 0,
+          "rotated_islands": 0,
+          "triangle_area_ratio_p5_p50_p95": [
+            0.8306,
+            0.9992,
+            1.1749
+          ],
+          "uv1_abs_max_m": 0.19793
+        },
+        "weapon": {
+          "island_area_ratio_uv1_over_3d_min_max": [
+            1.0,
+            1.0
+          ],
+          "island_scale_min_max": [
+            0.9232,
+            4.9241
+          ],
+          "islands": 30,
+          "mirrored_uv0_triangles": 0,
+          "rotated_islands": 0,
+          "triangle_area_ratio_p5_p50_p95": [
+            0.8406,
+            0.9979,
+            1.1306
+          ],
+          "uv1_abs_max_m": 0.10536
+        }
+      },
+      "note": "",
+      "passed": true
+    },
+    "uv1_readback_equals_authored": {
+      "expected": "<= 1e-5",
+      "measured": {
+        "SK_KingArthur_H2_Body": 0.0,
+        "SK_KingArthur_H2_Sword": 0.0,
+        "SM_KingArthur_H2_Base": 0.0
+      },
+      "note": "",
+      "passed": true
+    },
+    "uv_layers_uvmap_then_uv1": {
+      "expected": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "measured": {
+        "SK_KingArthur_H2_Body": [
+          "UVMap",
+          "UV1_m"
+        ],
+        "SK_KingArthur_H2_Sword": [
+          "UVMap",
+          "UV1_m"
+        ],
+        "SM_KingArthur_H2_Base": [
+          "UVMap",
+          "UV1_m"
+        ]
+      },
+      "note": "",
+      "passed": true
+    },
+    "weights_equal_h2": {
+      "expected": "same bones per vertex, |dw| <= 1e-6",
+      "measured": {
+        "SK_KingArthur_H2_Body": {
+          "max_abs_weight_delta": 0.0,
+          "same_bones_per_vertex": true
+        },
+        "SK_KingArthur_H2_Sword": {
+          "max_abs_weight_delta": 0.0,
+          "same_bones_per_vertex": true
+        }
+      },
+      "note": "",
+      "passed": true
+    }
+  },
+  "export_frame": {
+    "front_yaw_deg_from_plus_x": -2.13,
+    "method": "FBX re-imported in Blender (metres); the H2 rig readback uses the same measures",
+    "sword_minus_body_centroid_m": [
+      0.0476,
+      -0.0799,
+      0.09
+    ]
+  },
+  "exports": {
+    "base_fbx": {
+      "bytes": 89932,
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/export/SM_KingArthur_H2LD_Base.fbx",
+      "sha256": "cc1e7bd0696d7c30b53cc2b4e8dc036c05ba6f7ae13e6a7eadd008dfd95387a9"
+    },
+    "settings": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+      "colors_type": "SRGB",
+      "creation_time_pinned": "2000-01-01T00:00:00",
+      "data_scale": 100.0,
+      "deviations_from_preset": {
+        "bake_anim": "off: the candidate FBX carries no clips",
+        "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+      },
+      "embed_textures": false,
+      "export_space_rotation_z_degrees": 90.0,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "STRIP",
+      "preset": {
+        "name": "UM_FBX_v1",
+        "path": "blender/_tools/presets/UM_FBX_v1.json",
+        "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+        "version": "1.0.0"
+      },
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "unit_scale_factor_after_patch": 1.0,
+      "use_triangles": true
+    },
+    "skeletal_fbx": {
+      "bytes": 2076876,
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/export/SK_KingArthur_H2LD.fbx",
+      "sha256": "2844846e5bbdbe95e34d16aa1c6f2788ba91dabcc66347a1bf606710c830bced"
+    }
+  },
+  "passed": true,
+  "profile": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-lookdev.json",
+  "profile_id": "king-arthur-h2-lookdev/1",
+  "readback": {
+    "geometry_vs_h2": {
+      "SK_KingArthur_H2_Body": {
+        "max_vertex_delta_m": 0.0,
+        "polygons_candidate": 36469,
+        "polygons_reference": 36469,
+        "unmatched_candidate_polygons": 0,
+        "unmatched_reference_polygons": 0,
+        "vertices": [
+          20073,
+          20073
+        ]
+      },
+      "SK_KingArthur_H2_Sword": {
+        "max_vertex_delta_m": 0.0,
+        "polygons_candidate": 2215,
+        "polygons_reference": 2215,
+        "unmatched_candidate_polygons": 0,
+        "unmatched_reference_polygons": 0,
+        "vertices": [
+          1164,
+          1164
+        ]
+      },
+      "SM_KingArthur_H2_Base": {
+        "max_vertex_delta_m": 0.0,
+        "polygons_candidate": 1500,
+        "polygons_reference": 1500,
+        "unmatched_candidate_polygons": 0,
+        "unmatched_reference_polygons": 0,
+        "vertices": [
+          876,
+          876
+        ]
+      }
+    },
+    "triangles": {
+      "SK_KingArthur_H2_Body": 36469,
+      "SK_KingArthur_H2_Sword": 2215,
+      "SM_KingArthur_H2_Base": 1500
+    },
+    "uv1_readback_max_abs": {
+      "SK_KingArthur_H2_Body": 0.0,
+      "SK_KingArthur_H2_Sword": 0.0,
+      "SM_KingArthur_H2_Base": 0.0
+    },
+    "uv_layers": {
+      "SK_KingArthur_H2_Body": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "SK_KingArthur_H2_Sword": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "SM_KingArthur_H2_Base": [
+        "UVMap",
+        "UV1_m"
+      ]
+    },
+    "weights_vs_h2": {
+      "SK_KingArthur_H2_Body": {
+        "max_abs_weight_delta": 0.0,
+        "same_bones_per_vertex": true
+      },
+      "SK_KingArthur_H2_Sword": {
+        "max_abs_weight_delta": 0.0,
+        "same_bones_per_vertex": true
+      }
+    }
+  },
+  "source": {
+    "h2_fbx": {
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/export/SK_KingArthur_H2.fbx": "9f3478122333d6488d4847654583b0e56a54c1a6415923ce658bf61d5356e828",
+      "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/export/SM_KingArthur_H2_Base.fbx": "dc75338c4b4ab543298da1af4c1bea4d6cfc440063c6647df23a40882aa73c0c"
+    },
+    "rig_blend": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/work/h2-rig-authored.blend",
+    "rig_blend_sha256": "4b1560b66c12ecccad3b1ce7e39da35fe53e1cbea09fe0efb0d3ff6472a637cc"
+  },
+  "stage": "ld_export",
+  "uv1": {
+    "layer_name": "UV1_m",
+    "offset": "island bounding-box centre to (0, 0) (smallest |UV1| for 16-bit UE UVs), as Merlin",
+    "rotate_note": "no class of Arthur has a directional tile (wood / metal_forged are not used): every island is a similarity of its UV0 without rotation, so the detail normal blends in the UV0 tangent frame of the hero normal map",
+    "rotate_zones": [],
+    "stats": {
+      "base": {
+        "island_area_ratio_uv1_over_3d_min_max": [
+          1.0,
+          1.0
+        ],
+        "island_scale_min_max": [
+          2.4619,
+          12.3101
+        ],
+        "islands": 23,
+        "mirrored_uv0_triangles": 0,
+        "rotated_islands": 0,
+        "triangle_area_ratio_p5_p50_p95": [
+          0.9842,
+          0.9998,
+          1.0184
+        ],
+        "uv1_abs_max_m": 0.16508
+      },
+      "body": {
+        "island_area_ratio_uv1_over_3d_min_max": [
+          1.0,
+          1.0
+        ],
+        "island_scale_min_max": [
+          0.7383,
+          1.4775
+        ],
+        "islands": 1188,
+        "mirrored_uv0_triangles": 0,
+        "rotated_islands": 0,
+        "triangle_area_ratio_p5_p50_p95": [
+          0.8306,
+          0.9992,
+          1.1749
+        ],
+        "uv1_abs_max_m": 0.19793
+      },
+      "weapon": {
+        "island_area_ratio_uv1_over_3d_min_max": [
+          1.0,
+          1.0
+        ],
+        "island_scale_min_max": [
+          0.9232,
+          4.9241
+        ],
+        "islands": 30,
+        "mirrored_uv0_triangles": 0,
+        "rotated_islands": 0,
+        "triangle_area_ratio_p5_p50_p95": [
+          0.8406,
+          0.9979,
+          1.1306
+        ],
+        "uv1_abs_max_m": 0.10536
+      }
+    },
+    "units": "metres of the exported object (final frame; UE uu / 100)"
+  },
+  "uv1_triangles": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/work/lookdev/uv1-triangles.npz"
+}

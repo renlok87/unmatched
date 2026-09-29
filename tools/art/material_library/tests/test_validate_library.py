@@ -171,6 +171,39 @@ class Mutations(unittest.TestCase):
         self.save(vl.PRESETS, d)
         self.assertOnlyFails("preset_physics")
 
+    def ext(self, data, cid):
+        return next(c for c in data["extensionClasses"] if c.get("id") == cid)
+
+    def test_horn_claw_present_and_extension(self):
+        d = self.load(vl.PRESETS)
+        c = self.ext(d, "horn_claw")
+        self.assertEqual((c["metallic"], c["extension"]["globalMatId"], c["detail"]["tileFrom"]), (0, False, "stone_base"))
+        self.assertNotIn("horn_claw", [x["id"] for x in d["classes"]])     # the global 0..15 layout is untouched
+
+    def test_horn_claw_metallic_half(self):
+        d = self.load(vl.PRESETS)
+        self.ext(d, "horn_claw")["metallic"] = 0.5
+        self.save(vl.PRESETS, d)
+        self.assertOnlyFails("preset_physics")
+
+    def test_horn_claw_f0_not_keratin_band(self):
+        d = self.load(vl.PRESETS)
+        self.ext(d, "horn_claw")["specular"].update(value=1.0, f0=0.08)
+        self.save(vl.PRESETS, d)
+        self.assertOnlyFails("preset_physics")
+
+    def test_horn_claw_global_matid_rejected(self):
+        d = self.load(vl.PRESETS)
+        self.ext(d, "horn_claw")["extension"]["globalMatId"] = True
+        self.save(vl.PRESETS, d)
+        self.assertOnlyFails("presets_tiles")
+
+    def test_horn_claw_tiles_must_be_tile_from(self):
+        d = self.load(vl.PRESETS)
+        self.ext(d, "horn_claw")["detail"]["DetailN"] = "art/material-library/v1/tiles/wood/wood_DetailN.png"
+        self.save(vl.PRESETS, d)
+        self.assertOnlyFails("presets_tiles")
+
     def test_non_cc0_license(self):
         m = self.load(vl.MANIFEST)
         m["assets"][0]["license"] = "CC BY 4.0"

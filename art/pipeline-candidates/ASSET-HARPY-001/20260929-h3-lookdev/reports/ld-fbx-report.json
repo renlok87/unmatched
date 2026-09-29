@@ -1,0 +1,382 @@
+{
+ "blender": "5.2.2 LTS",
+ "checks": {
+  "appended_skinning_intact": {
+   "measured": {
+    "SK_Harpy_Body": [
+     [
+      "ARMATURE",
+      "SKEL_UM_Humanoid"
+     ]
+    ],
+    "SM_Harpy_Base": []
+   },
+   "passed": true
+  },
+  "bone_heads_tails_as_h3": {
+   "expected": "equal (5 decimals, export frame)",
+   "measured": "equal",
+   "passed": true
+  },
+  "bones_and_parents_as_h3": {
+   "expected": 16,
+   "measured": 16,
+   "passed": true
+  },
+  "export_frame_face_along_plus_x": {
+   "expected": "dot > 0.5, front = +X",
+   "measured": {
+    "face_normal": [
+     0.6527,
+     -0.0163,
+     -0.1993
+    ],
+    "face_polygons": 402,
+    "rotated_front": [
+     1.0,
+     -0.0,
+     0.0
+    ]
+   },
+   "passed": true
+  },
+  "export_no_host_path": {
+   "expected": 0,
+   "measured": {
+    "SK_Harpy_H3LD.fbx": 0,
+    "SM_Harpy_H3LD_Base.fbx": 0
+   },
+   "passed": true
+  },
+  "positions_and_uv0_per_loop_as_h3": {
+   "expected": "<= 1e-6 / 1e-7",
+   "measured": {
+    "SK_Harpy_Body": {
+     "max_abs_position_diff": 0.0,
+     "max_abs_uv0_diff": 0.0
+    },
+    "SM_Harpy_Base": {
+     "max_abs_position_diff": 0.0,
+     "max_abs_uv0_diff": 0.0
+    }
+   },
+   "passed": true
+  },
+  "session_blend_path_empty": {
+   "expected": "",
+   "measured": "",
+   "passed": true
+  },
+  "source_fbx_sha256": {
+   "expected": {
+    "SK_Harpy_H3.fbx": "ba841a77f26b9c99e333dc7c9e08094cbea2e6c7755b12c2401d1e4eab2ac2c4",
+    "SM_Harpy_H3_Base.fbx": "77fc45deb2b2d0715e0874bdffde68fd3c4f4c88317572e9b8a36ccdddc4476b"
+   },
+   "measured": {
+    "SK_Harpy_H3.fbx": "ba841a77f26b9c99e333dc7c9e08094cbea2e6c7755b12c2401d1e4eab2ac2c4",
+    "SM_Harpy_H3_Base.fbx": "77fc45deb2b2d0715e0874bdffde68fd3c4f4c88317572e9b8a36ccdddc4476b"
+   },
+   "passed": true
+  },
+  "triangles_as_h3": {
+   "expected": {
+    "SK_Harpy_Body": 37177,
+    "SM_Harpy_Base": 864
+   },
+   "measured": {
+    "SK_Harpy_Body": 37177,
+    "SM_Harpy_Base": 864
+   },
+   "passed": true
+  },
+  "uv1_density_authored": {
+   "expected": "area UV1 / area 3D = 1 per island",
+   "measured": {
+    "SK_Harpy_Body": {
+     "degenerate_islands_3d_area_share": 0.2134985,
+     "degenerate_uv0_islands": 11,
+     "density_ratio_min_max": [
+      1.0,
+      1.0
+     ],
+     "half_float_step_at_abs_max_mm": 0.2441,
+     "islands": 1454,
+     "metres_per_uv_unit_p5_p50_p95": [
+      1.03838,
+      1.13408,
+      1.13436
+     ],
+     "uv1_abs_max_m": 0.363
+    },
+    "SM_Harpy_Base": {
+     "degenerate_islands_3d_area_share": 0.3402644,
+     "degenerate_uv0_islands": 1,
+     "density_ratio_min_max": [
+      1.0,
+      1.0
+     ],
+     "half_float_step_at_abs_max_mm": 0.2441,
+     "islands": 12,
+     "metres_per_uv_unit_p5_p50_p95": [
+      0.27094,
+      0.28332,
+      0.46594
+     ],
+     "uv1_abs_max_m": 0.3446
+    }
+   },
+   "passed": true
+  },
+  "uv1_half_precision": {
+   "expected": "<= 0.25 mm",
+   "measured": {
+    "SK_Harpy_Body": 0.2441,
+    "SM_Harpy_Base": 0.2441
+   },
+   "passed": true
+  },
+  "uv1_metres_density_readback": {
+   "expected": "area(UV1) / area3D = 1 +- 0.02 (p1..p99 of islands)",
+   "measured": {
+    "SK_Harpy_Body": {
+     "islands": 1443,
+     "ratio_p1_p50_p99": [
+      0.99997,
+      1.0,
+      1.00003
+     ]
+    },
+    "SM_Harpy_Base": {
+     "islands": 11,
+     "ratio_p1_p50_p99": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "passed": true
+  },
+  "uv_layers_order": {
+   "expected": [
+    "UVMap",
+    "UV1_m"
+   ],
+   "measured": {
+    "SK_Harpy_Body": [
+     "UVMap",
+     "UV1_m"
+    ],
+    "SM_Harpy_Base": [
+     "UVMap",
+     "UV1_m"
+    ]
+   },
+   "passed": true
+  },
+  "weights_as_h3": {
+   "measured": {
+    "SK_Harpy_Body": {
+     "max_abs_weight_delta": 0.0,
+     "same_bones_per_vertex": true
+    }
+   },
+   "passed": true
+  }
+ },
+ "claims": {
+  "art_accepted": false,
+  "game_ready": false
+ },
+ "exports": {
+  "base_fbx": {
+   "bytes": 47948,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/export/SM_Harpy_H3LD_Base.fbx",
+   "sha256": "57197cc5a4e65052546363f2d013f4da596d727d9ff971f4226464075abf35e7"
+  },
+  "settings": {
+   "add_leaf_bones": false,
+   "apply_scale_options": "FBX_SCALE_UNITS",
+   "apply_unit_scale": true,
+   "axis_forward": "-Y",
+   "axis_up": "Z",
+   "bake_anim": false,
+   "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+   "colors_type": "SRGB",
+   "creation_time_pinned": "2000-01-01T00:00:00",
+   "data_scale": 100.0,
+   "deviations_from_preset": {
+    "bake_anim": "off: the candidate FBX carries no clips",
+    "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+   },
+   "embed_textures": false,
+   "export_space_rotation_z_degrees": 90.0,
+   "mesh_smooth_type": "FACE",
+   "path_mode": "STRIP",
+   "preset": {
+    "name": "UM_FBX_v1",
+    "path": "blender/_tools/presets/UM_FBX_v1.json",
+    "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+    "version": "1.0.0"
+   },
+   "primary_bone_axis": "Y",
+   "secondary_bone_axis": "X",
+   "unit_scale_factor_after_patch": 1.0,
+   "use_triangles": true
+  },
+  "skeletal_fbx": {
+   "bytes": 2067948,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/export/SK_Harpy_H3LD.fbx",
+   "sha256": "9998ba1066206c96ee88d4f6e0013eab6660fdf973e542195545e79e7c859300"
+  }
+ },
+ "failed": [],
+ "material_slots": {
+  "SK_Harpy_Body": [
+   "M_Harpy_H3_Atlas"
+  ],
+  "SM_Harpy_Base": [
+   "M_Harpy_Base"
+  ]
+ },
+ "meshes_pre_export": {
+  "SK_Harpy_Body": {
+   "color_attributes": [],
+   "has_custom_normals": false,
+   "material_slots": [
+    "M_Harpy_H3_Atlas"
+   ],
+   "near_degenerate_area_cm2_below": 0.0001,
+   "near_degenerate_triangles": 0,
+   "polygons": 37177,
+   "triangles": 37177,
+   "uv0_in_unit_square": true,
+   "uv_layers": [
+    "UVMap",
+    "UV1_m"
+   ],
+   "vertices": 21932
+  },
+  "SM_Harpy_Base": {
+   "color_attributes": [
+    "UM_Mask"
+   ],
+   "has_custom_normals": false,
+   "material_slots": [
+    "M_Harpy_Base"
+   ],
+   "near_degenerate_area_cm2_below": 0.0001,
+   "near_degenerate_triangles": 0,
+   "polygons": 576,
+   "triangles": 864,
+   "uv0_in_unit_square": true,
+   "uv_layers": [
+    "UVMap",
+    "UV1_m"
+   ],
+   "vertices": 515
+  }
+ },
+ "passed": true,
+ "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-lookdev.json",
+ "readback": {
+  "geometry_vs_h3": {
+   "SK_Harpy_Body": {
+    "max_abs_position_diff": 0.0,
+    "max_abs_uv0_diff": 0.0
+   },
+   "SM_Harpy_Base": {
+    "max_abs_position_diff": 0.0,
+    "max_abs_uv0_diff": 0.0
+   }
+  },
+  "uv1_density": {
+   "SK_Harpy_Body": {
+    "islands": 1443,
+    "ratio_p1_p50_p99": [
+     0.99997,
+     1.0,
+     1.00003
+    ]
+   },
+   "SM_Harpy_Base": {
+    "islands": 11,
+    "ratio_p1_p50_p99": [
+     1.0,
+     1.0,
+     1.0
+    ]
+   }
+  },
+  "uv_layers": {
+   "SK_Harpy_Body": [
+    "UVMap",
+    "UV1_m"
+   ],
+   "SM_Harpy_Base": [
+    "UVMap",
+    "UV1_m"
+   ]
+  },
+  "weights_vs_h3": {
+   "SK_Harpy_Body": {
+    "max_abs_weight_delta": 0.0,
+    "same_bones_per_vertex": true
+   }
+  }
+ },
+ "source": {
+  "blend": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/h2-candidate.blend",
+  "blend_sha256": "9b8f745967108b07361e00fdde6a51f084973ee613e6ed29b334315ab4a76716",
+  "h3_fbx": {
+   "SK_Harpy_H3.fbx": "ba841a77f26b9c99e333dc7c9e08094cbea2e6c7755b12c2401d1e4eab2ac2c4",
+   "SM_Harpy_H3_Base.fbx": "77fc45deb2b2d0715e0874bdffde68fd3c4f4c88317572e9b8a36ccdddc4476b"
+  }
+ },
+ "stage": "ld_fbx",
+ "status": "измерено",
+ "ue_import_notes": [
+  "UV1_m — второй UV-канал (индекс 1): при импорте SM подставки выключить Generate Lightmap UVs (или DstLightmapIndex >= 2), иначе UE перезапишет UV1 картой освещения",
+  "материальный слот тот же (M_Harpy_H3_Atlas): назначается MI v2 героя",
+  "у подставки UV1 есть, но она остаётся на M_UM_BaseMarker (метки, полоса команды)"
+ ],
+ "uv1": {
+  "density_tolerance": 0.02,
+  "layer_name": "UV1_m",
+  "method": "per UV0 island: UV1 = (UV0 - centre of the island bbox) x s, s = sqrt(area3D / areaUV0) (final frame metres per UV unit); no rotation, no mirror (Medusa look-dev); centred for UE half-float UVs",
+  "per_mesh": {
+   "SK_Harpy_Body": {
+    "degenerate_islands_3d_area_share": 0.2134985,
+    "degenerate_uv0_islands": 11,
+    "density_ratio_min_max": [
+     1.0,
+     1.0
+    ],
+    "half_float_step_at_abs_max_mm": 0.2441,
+    "islands": 1454,
+    "metres_per_uv_unit_p5_p50_p95": [
+     1.03838,
+     1.13408,
+     1.13436
+    ],
+    "uv1_abs_max_m": 0.363
+   },
+   "SM_Harpy_Base": {
+    "degenerate_islands_3d_area_share": 0.3402644,
+    "degenerate_uv0_islands": 1,
+    "density_ratio_min_max": [
+     1.0,
+     1.0
+    ],
+    "half_float_step_at_abs_max_mm": 0.2441,
+    "islands": 12,
+    "metres_per_uv_unit_p5_p50_p95": [
+     0.27094,
+     0.28332,
+     0.46594
+    ],
+    "uv1_abs_max_m": 0.3446
+   }
+  }
+ }
+}

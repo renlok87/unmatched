@@ -1,0 +1,392 @@
+{
+ "bracelet_cobble_close": {
+  "box_px": [
+   590,
+   220,
+   860,
+   380
+  ],
+  "filter": "hue 25-65, S >= 0.2, V >= 0.35 (gold pixels of the band)",
+  "stats": {
+   "h3": {
+    "hue_of_median_deg": 37.1,
+    "luma_p50": 144.1,
+    "n": 26159,
+    "s_p50": 0.373,
+    "srgb8_median": [
+     166.0,
+     142.0,
+     103.0
+    ]
+   },
+   "h3_orm_connected": {
+    "hue_of_median_deg": 37.1,
+    "luma_p50": 144.2,
+    "n": 26159,
+    "s_p50": 0.373,
+    "srgb8_median": [
+     166.0,
+     142.0,
+     103.0
+    ]
+   },
+   "ld_none": {
+    "hue_of_median_deg": 30.0,
+    "luma_p50": 108.2,
+    "n": 11378,
+    "s_p50": 0.634,
+    "srgb8_median": [
+     151.0,
+     101.5,
+     52.0
+    ]
+   }
+  }
+ },
+ "gold_tone": {
+  "f0_current": [
+   1.0,
+   0.437,
+   0.1032
+  ],
+  "f0_suggested": [
+   1.0,
+   0.4241,
+   0.0842
+  ],
+  "f0_suggested_Y": 0.522,
+  "f0_suggested_raw": [
+   1.0755,
+   0.4562,
+   0.0906
+  ],
+  "gold_chroma_ratio_corrected": [
+   1.0246,
+   0.9945,
+   0.8364
+  ],
+  "gold_luma_ratio_over_k": 1.0497,
+  "k_light_ratio": 1.3048,
+  "k_per_reference": [
+   1.866,
+   0.7435
+  ],
+  "method": "F0_new = F0 x chroma x luma. chroma = per-channel ratio concept / LD render of the gold zone (luminance-normalised) divided by the same ratio of the feather reference zones (geometric mean): the concept's colour grading - it saturates the orange feathers too, whose BC is the concept colour - is cancelled; luma = Y ratio of the gold zone / k, k = median Y ratio of the reference zones (light and exposure of the two images). A rough metal reflects in proportion to F0 per channel. Max channel <= 1; Y >= 0.45 (bare metal rule of the library)",
+  "reference_chroma_ratio": [
+   1.0294,
+   0.9811,
+   0.8442
+  ],
+  "reference_zones": [
+   "orange",
+   "dark"
+  ],
+  "residual_per_channel": [
+   1.0755,
+   1.0439,
+   0.878
+  ],
+  "zones": {
+   "claw": {
+    "concept": {
+     "hue_of_median_deg": 240.0,
+     "linear_median": [
+      0.0497,
+      0.0497,
+      0.0513
+     ],
+     "luma_p50": 63.2,
+     "n": 5842,
+     "s_p50": 0.068,
+     "srgb8_median": [
+      63.0,
+      63.0,
+      64.0
+     ]
+    },
+    "h3": {
+     "hue_of_median_deg": 270.0,
+     "linear_median": [
+      0.0467,
+      0.0452,
+      0.0482
+     ],
+     "luma_p50": 60.3,
+     "n": 4425,
+     "s_p50": 0.043,
+     "srgb8_median": [
+      61.0,
+      60.0,
+      62.0
+     ]
+    },
+    "ld": {
+     "hue_of_median_deg": 270.0,
+     "linear_median": [
+      0.0497,
+      0.0482,
+      0.0513
+     ],
+     "luma_p50": 62.5,
+     "n": 4425,
+     "s_p50": 0.043,
+     "srgb8_median": [
+      63.0,
+      62.0,
+      64.0
+     ]
+    }
+   },
+   "dark": {
+    "concept": {
+     "hue_of_median_deg": 17.1,
+     "linear_median": [
+      0.0319,
+      0.0262,
+      0.0242
+     ],
+     "luma_p50": 46.0,
+     "n": 368797,
+     "s_p50": 0.159,
+     "srgb8_median": [
+      50.0,
+      45.0,
+      43.0
+     ]
+    },
+    "h3": {
+     "hue_of_median_deg": 10.9,
+     "linear_median": [
+      0.0423,
+      0.0307,
+      0.0284
+     ],
+     "luma_p50": 51.0,
+     "n": 253195,
+     "s_p50": 0.176,
+     "srgb8_median": [
+      58.0,
+      49.0,
+      47.0
+     ]
+    },
+    "ld": {
+     "hue_of_median_deg": 15.0,
+     "linear_median": [
+      0.0467,
+      0.0343,
+      0.0307
+     ],
+     "luma_p50": 53.3,
+     "n": 253195,
+     "s_p50": 0.17,
+     "srgb8_median": [
+      61.0,
+      52.0,
+      49.0
+     ]
+    }
+   },
+   "gold": {
+    "concept": {
+     "hue_of_median_deg": 33.2,
+     "linear_median": [
+      0.3968,
+      0.1812,
+      0.0382
+     ],
+     "luma_p50": 124.3,
+     "n": 1578,
+     "s_p50": 0.66,
+     "srgb8_median": [
+      169.0,
+      118.0,
+      55.0
+     ]
+    },
+    "h3": {
+     "hue_of_median_deg": 42.5,
+     "linear_median": [
+      0.2664,
+      0.2051,
+      0.0931
+     ],
+     "luma_p50": 125.4,
+     "n": 1990,
+     "s_p50": 0.396,
+     "srgb8_median": [
+      141.0,
+      125.0,
+      86.0
+     ]
+    },
+    "ld": {
+     "hue_of_median_deg": 32.4,
+     "linear_median": [
+      0.2747,
+      0.1356,
+      0.0395
+     ],
+     "luma_p50": 108.0,
+     "n": 1990,
+     "s_p50": 0.616,
+     "srgb8_median": [
+      143.0,
+      103.0,
+      56.0
+     ]
+    }
+   },
+   "orange": {
+    "concept": {
+     "hue_of_median_deg": 23.3,
+     "linear_median": [
+      0.2462,
+      0.107,
+      0.0513
+     ],
+     "luma_p50": 99.5,
+     "n": 152585,
+     "s_p50": 0.534,
+     "srgb8_median": [
+      136.0,
+      92.0,
+      64.0
+     ]
+    },
+    "h3": {
+     "hue_of_median_deg": 21.5,
+     "linear_median": [
+      0.1119,
+      0.0595,
+      0.0382
+     ],
+     "luma_p50": 73.1,
+     "n": 276483,
+     "s_p50": 0.42,
+     "srgb8_median": [
+      94.0,
+      69.0,
+      55.0
+     ]
+    },
+    "ld": {
+     "hue_of_median_deg": 20.5,
+     "linear_median": [
+      0.1144,
+      0.0612,
+      0.0409
+     ],
+     "luma_p50": 74.5,
+     "n": 276483,
+     "s_p50": 0.409,
+     "srgb8_median": [
+      95.0,
+      70.0,
+      57.0
+     ]
+    }
+   },
+   "skin": {
+    "concept": {
+     "hue_of_median_deg": 30.0,
+     "linear_median": [
+      0.3419,
+      0.2346,
+      0.15
+     ],
+     "luma_p50": 136.8,
+     "n": 6799,
+     "s_p50": 0.31,
+     "srgb8_median": [
+      158.0,
+      133.0,
+      108.0
+     ]
+    },
+    "h3": {
+     "hue_of_median_deg": 27.0,
+     "linear_median": [
+      0.2159,
+      0.1441,
+      0.0976
+     ],
+     "luma_p50": 109.5,
+     "n": 9820,
+     "s_p50": 0.309,
+     "srgb8_median": [
+      128.0,
+      106.0,
+      88.0
+     ]
+    },
+    "ld": {
+     "hue_of_median_deg": 28.1,
+     "linear_median": [
+      0.214,
+      0.1441,
+      0.0953
+     ],
+     "luma_p50": 108.9,
+     "n": 9820,
+     "s_p50": 0.317,
+     "srgb8_median": [
+      127.5,
+      106.0,
+      87.0
+     ]
+    }
+   }
+  }
+ },
+ "k2_cobble": {
+  "h3": {
+   "dark_share_v_lt_0.25": 0.171,
+   "luma_p50": 78.7,
+   "pixels": 44252,
+   "s_p50": 0.349
+  },
+  "h3_orm_connected": {
+   "dark_share_v_lt_0.25": 0.1708,
+   "luma_p50": 78.7,
+   "pixels": 44244,
+   "s_p50": 0.349
+  },
+  "ld_none": {
+   "dark_share_v_lt_0.25": 0.1234,
+   "luma_p50": 80.4,
+   "pixels": 44244,
+   "s_p50": 0.341
+  },
+  "note": "az 040 has no body-only frame: changed pixels only; share of body pixels for az 000",
+  "team_accent_visibility": {
+   "az000_P1": {
+    "changed_pixels": 7797,
+    "share_of_body_pixels": 0.1473
+   },
+   "az000_P2": {
+    "changed_pixels": 12266,
+    "share_of_body_pixels": 0.1422
+   },
+   "az040_P1": {
+    "changed_pixels": 6505
+   },
+   "az040_P2": {
+    "changed_pixels": 11067
+   }
+  }
+ },
+ "label": "blender (EEVEE); M_UM_Figure_v2 approximated per texel in numpy (LUT class values, metal F0 x bake modulation, dielectric clamp, TeamAccent dye), no detail tiles; not an UE frame",
+ "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-lookdev.json",
+ "sheets": {
+  "back": "ld_sheet_concept_back.jpg",
+  "bracelet_front": "ld_sheet_bracelet_front.jpg",
+  "front": "ld_sheet_concept_front.jpg",
+  "k2_cobble": "ld_sheet_k2_cobble.jpg",
+  "k2_preview": "ld_sheet_k2_preview.jpg",
+  "side": "ld_sheet_concept_side.jpg",
+  "talons": "ld_sheet_talons_cobble.jpg"
+ },
+ "stage": "ld_compose",
+ "status": "измерено"
+}

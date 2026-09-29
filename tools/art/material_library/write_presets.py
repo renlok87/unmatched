@@ -196,6 +196,36 @@ classes = [
          teamDyeAllowed=False),
 ]
 
+# Extension classes (2026-09-29, look-dev v2 Harpy): the 4-bit MatID has no free global index (README §10), so a class
+# added after v1 has no global column. A hero that uses it puts it into the LUT column of a library class it does not
+# use (hero slot, README §3a); its detail slice is the slice of an existing class (tileFrom) until the arrays get
+# their own slice. Physics numbers are validated like the classes above (validate_library.py preset_physics).
+extension_classes = [
+    diel(index=16, id="horn_claw", nameRu="рог / коготь (кератин)", shadingModel="DefaultLit",
+         baseColor={"mode": "bake-clamped", "typicalLinear": [0.030, 0.026, 0.024], "luminanceRange": [0.02, 0.55], "maxChannel": 0.9,
+                    "sourceKind": "art", "source": ["ALBEDO", "ART-DIR"],
+                    "note": "превью-цвет — тёмный коготь хищной птицы (концепт Harpy: чёрный рог); в рантайме — альбедо героя. "
+                            "Верх диапазона 0.55 — светлый рог/кость (роговой чехол козы, слоновая кость), низ — пол диэлектриков"},
+         roughness={"typical": 0.33, "range": [0.22, 0.50], "variation": 0.06, "sourceKind": "art", "source": ["ART-DIR", "CC0-measured"],
+                    "note": "Кератиновый чехол когтя/рога гладкий, полируется износом (у концепта на когтях узкие яркие блики): глаже "
+                            "гладкой кожи (Leather026, measured median 0.371) и пера (0.55). Пол 0.22 — против спекулярного алиасинга "
+                            "на мелких формах. Справочного значения шероховатости кератина нет — арт-решение, калибруется в look-dev."},
+         specular={"value": 0.575, "f0": 0.046, "sourceKind": "reference", "source": ["RTR4-T9.1", "IOR-F0"],
+                   "note": "кератин n ≈ 1.55 → F0 0.046 = «волосы» RTR4 (как перья)"},
+         detail=dict(tile("stone_base", 1024, 12.0, 0.0833, "слабые продольные прожилки и пятна (тайл камня подставки на мелком "
+                                                              "масштабе; свой процедурный тайл «годичные полосы рога» — v1.1)", 0.3),
+                     tileFrom="stone_base"),
+         edgeWear={"enabled": True, "strength": 0.25, "wornBaseColorScale": 1.4, "wornRoughnessDelta": -0.08, "source": ["ART-DIR"],
+                   "note": "стёртые кончики когтя светлее (открытый слой кератина) и глаже"},
+         teamDyeAllowed=False,
+         extension={"libraryIndex": 16, "globalMatId": False,
+                    "heroSlot": "столбец LUT класса, которого у героя нет (у Harpy — brass, индекс 5); MatID героя = слот × 16 + 8",
+                    "arraySlice": 14, "arraySliceNote": "срез массива деталей класса tileFrom (stone_base = 14)",
+                    "why": "4-битный MatID занят классами 0–15 (README §10); отдельный класс нужен, чтобы коготь не делил "
+                           "шероховатость/износ с пером или кожей. Физика кератина — как у перьев (F0 0.046), отличие — гладкость и износ"}),
+]
+
+
 def fuzz(bc, intensity, tint):
     y = 0.2126 * bc[0] + 0.7152 * bc[1] + 0.0722 * bc[2]
     return [round(intensity * ((1 - tint) + tint * c / y) * y ** 0.5, 4) for c in bc]
@@ -221,7 +251,9 @@ data = {
     },
     "figureHeightM": 0.55,
     "matId": {"encoding": "R8 unorm, value = index × 16 + 8, decode floor(v × 255 / 16)", "maxClasses": 16,
-              "reserved": {"0": "legacy_bake"}},
+              "reserved": {"0": "legacy_bake"},
+              "extension": "extensionClasses (libraryIndex ≥ 16) не имеют глобального индекса MatID: герой кладёт такой класс в "
+                           "столбец LUT неиспользуемого им класса (heroSlot), срез деталей — extension.arraySlice (README §3a)"},
     "referenceF0": {
         "iron": {"linear": [0.560, 0.570, 0.580], "source": "UE-PBM"},
         "chromium": {"linear": [0.550, 0.556, 0.554], "source": "UE-PBM"},
@@ -235,6 +267,7 @@ data = {
     },
     "references": refs,
     "classes": classes,
+    "extensionClasses": extension_classes,
 }
 sys.path.insert(0, "tools/art/material_library")
 from build_library import dump_json  # noqa: E402

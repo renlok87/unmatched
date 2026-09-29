@@ -1,0 +1,195 @@
+{
+  "conventions": {
+    "EdgeMask": "L8 linear, 1 = convex edge (EdgeMaskTexture of M_UM_Figure_v2)",
+    "MatID": "G8 linear (UE TC_Grayscale, sRGB off, NoMipmaps, Nearest, never streamed); value = class index x 16 + 8; shader: Load(int3(frac(uv0) x size, 0)), id = floor(v x 255 / 16)",
+    "N": "DirectX (-Y), = H2.2",
+    "TeamAccent": "L8 linear (UE TC_Grayscale, sRGB off): team-colour accent (team-accent.md); goes into the TeamMaskTexture slot of M_UM_Figure_v2",
+    "TeamMask": "L8 linear = H2.2 TeamMask.R (cloak, tabard, collar lining): DEPRECATED, kept for compatibility (v1 MIs, W5c import)",
+    "TeamMaskRGBA": "R TeamMask (deprecated), G base side band, B TeamAccent, A EdgeMask; linear"
+  },
+  "lut": {
+    "file": {
+      "bytes": 1483,
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_MatLUT.exr",
+      "readback_equal": true,
+      "sha256": "1515cdb05764c69abd337333beb0a04ca11a29973d2b4209229675f83da4a1b3"
+    },
+    "format": "OpenEXR scanline, uncompressed, HALF RGBA, 16 x 8; row 0 = top = EXR y 0 = Load(int3(id, row, 0)); rows 0-7 = README section 4; ymedClassHero of the metal columns also in row 7.R (LDM-7); the UE LUT 16 x 16 is rebuilt from 'overrides' + 'ue_lut_fields' by lookdev_ue_inputs.py"
+  },
+  "note": "the 4K masters are local (reproducible from the chain, sha256 here); the 2K runtime set, MatID, TeamAccent, EdgeMask and the LUT are committed",
+  "prefix": "T_KingArthur_H2LD",
+  "stage": "ld_report",
+  "textures": {
+    "T_KingArthur_H2LD_BC_2K.png": {
+      "bytes": 4688783,
+      "committed": true,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_BC_2K.png",
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "764eb12af59858dcf3adfa0703cd5b62288bff0adb18faee2275228442ba2d4d"
+    },
+    "T_KingArthur_H2LD_BC_4K.png": {
+      "bytes": 12874105,
+      "committed": false,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_BC_4K.png",
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "a1a583c36b2bb7621e7a956f3b1ce62eef55cae053ba5bf73ceaf0a6d6b8ea4d"
+    },
+    "T_KingArthur_H2LD_EdgeMask_2K.png": {
+      "bytes": 1152881,
+      "committed": true,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_EdgeMask_2K.png",
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "9304a5bc9299d7fe02ac607002fe233eb6ecd283cb055a64503dcab74969aefd"
+    },
+    "T_KingArthur_H2LD_EdgeMask_4K.png": {
+      "bytes": 2974188,
+      "committed": false,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_EdgeMask_4K.png",
+      "mode": "L",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "a5c1cbc07ff7ae6045d4a5fe57b5031b388918030976e83e30fe2627071fa4bc"
+    },
+    "T_KingArthur_H2LD_MatID_2K.png": {
+      "bytes": 201522,
+      "committed": true,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_MatID_2K.png",
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "3f96c9d4c93c7a7b986bc8e4400dd037e2714199cf1e6f47d0e16a2c931e8b7c"
+    },
+    "T_KingArthur_H2LD_MatLUT.exr": {
+      "bytes": 1483,
+      "committed": true,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_MatLUT.exr",
+      "sha256": "1515cdb05764c69abd337333beb0a04ca11a29973d2b4209229675f83da4a1b3"
+    },
+    "T_KingArthur_H2LD_N_2K.png": {
+      "bytes": 4643337,
+      "committed": true,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_N_2K.png",
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "704933e8375470d9a431c41f45d105ddaba246b4c9a467e691ef5bdb4c7526dd"
+    },
+    "T_KingArthur_H2LD_N_4K.png": {
+      "bytes": 11557277,
+      "committed": false,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_N_4K.png",
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "b81214eb6a11638003903f75c5b3cf77fd77536d975ceb5314d924a094211eb6"
+    },
+    "T_KingArthur_H2LD_ORM_2K.png": {
+      "bytes": 3740544,
+      "committed": true,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_ORM_2K.png",
+      "mode": "RGB",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "07b5ad706a4738e74d92f8719ff3abad7ecc3961d364dfda3b05b01575cdd0dc"
+    },
+    "T_KingArthur_H2LD_ORM_4K.png": {
+      "bytes": 9384229,
+      "committed": false,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_ORM_4K.png",
+      "mode": "RGB",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "9b44ee760974aee36bad2c9818d7775383005f6d76d5063417623f6281abfae7"
+    },
+    "T_KingArthur_H2LD_TeamAccent_2K.png": {
+      "bytes": 160951,
+      "committed": true,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamAccent_2K.png",
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "1bee50dd272d88c834b233e2939d665d7893bcb4dad23fc3b03a4a40809c1502"
+    },
+    "T_KingArthur_H2LD_TeamAccent_4K.png": {
+      "bytes": 360725,
+      "committed": false,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamAccent_4K.png",
+      "mode": "L",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "8f64ab38b105424ff1c392707e18ef28163e8c616c54a0bbb09a56c69c2829ed"
+    },
+    "T_KingArthur_H2LD_TeamMaskRGBA_2K.png": {
+      "bytes": 2120886,
+      "committed": true,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamMaskRGBA_2K.png",
+      "mode": "RGBA",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "ffcc17c5a429d564451a598e9d9833e2e1e457f8441214062f587fd9f659cef6"
+    },
+    "T_KingArthur_H2LD_TeamMaskRGBA_4K.png": {
+      "bytes": 5319529,
+      "committed": false,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamMaskRGBA_4K.png",
+      "mode": "RGBA",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "14b6cb33066411e4aa5bc434e70bd62aa1fb74f6b3d93967be78e556fd88fd7b"
+    },
+    "T_KingArthur_H2LD_TeamMask_2K.png": {
+      "bytes": 295041,
+      "committed": true,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamMask_2K.png",
+      "mode": "L",
+      "px": [
+        2048,
+        2048
+      ],
+      "sha256": "808b4f072ee208d26d97276bf0855f6222144b5dbb78603ce3f44e8c2d9eaf8b"
+    },
+    "T_KingArthur_H2LD_TeamMask_4K.png": {
+      "bytes": 630017,
+      "committed": false,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamMask_4K.png",
+      "mode": "L",
+      "px": [
+        4096,
+        4096
+      ],
+      "sha256": "4f9c56cacadcd6452acc86060ff6b145290443ab3b1e998984ba1a2b34a20dcf"
+    }
+  }
+}

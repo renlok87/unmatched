@@ -1,0 +1,1003 @@
+{
+ "base_note": "SM_Harpy_Base keeps M_UM_BaseMarker: band colour = hero gold F0 (visible with BandKeepsTexture 1; the flat team band covers it by default), top = dark antique of H3 (pip readability, H3 2.4)",
+ "base_textures": {
+  "BC": {
+   "bytes": 361627,
+   "mode": "RGB",
+   "path": "textures/base_1k/T_Harpy_H3LD_Base_BC.png",
+   "sha256": "ad1564babcaca25abd5ce826528d85f1ddcc89555f922cba065a0599dd75d642",
+   "size": [
+    1024,
+    1024
+   ]
+  },
+  "N": {
+   "bytes": 418163,
+   "mode": "RGB",
+   "path": "textures/base_1k/T_Harpy_H3LD_Base_N.png",
+   "sha256": "b671edc08f8dcf70c6449db552f6a8ec2b36c930cf1409c485881686ac1fd9e6",
+   "size": [
+    1024,
+    1024
+   ]
+  },
+  "N_OpenGL": {
+   "bytes": 417982,
+   "mode": "RGB",
+   "path": "textures/base_1k/T_Harpy_H3LD_Base_N_OpenGL.png",
+   "sha256": "ce8e9f70dbe773e9b84a67e08789311658148018fc48f6a9e715c30b4920b577",
+   "size": [
+    1024,
+    1024
+   ]
+  },
+  "ORM": {
+   "bytes": 261969,
+   "mode": "RGB",
+   "path": "textures/base_1k/T_Harpy_H3LD_Base_ORM.png",
+   "sha256": "d70f488de7d6bf52455821844e05b8d9631f26ec1102fc8f225b9ad59517e117",
+   "size": [
+    1024,
+    1024
+   ]
+  }
+ },
+ "bracelet": {
+  "cord_scaled_to_Y": 0.0173,
+  "cord_texels_4k": 16458,
+  "cord_tripo_Y_median": 0.3194,
+  "cord_z_source_m": [
+   0.1507,
+   0.1662
+  ],
+  "gold_texels_4k": 22115,
+  "z_band_source_m": [
+   0.143,
+   0.174
+  ]
+ },
+ "checks": {
+  "bc_changed_only_by_rules": {
+   "expected": "H3 BC except the cord texels and the dielectric luminance clamp",
+   "measured": {
+    "by_class": {
+     "feathers": 2275926,
+     "horn_claw": 86031,
+     "leather_smooth": 48113,
+     "skin": 9582
+    },
+    "changed_texels_4k": 2419652
+   },
+   "passed": true
+  },
+  "dielectric_bc_in_class_range": {
+   "expected": "<= 5 %",
+   "measured": {
+    "feathers": {
+     "range": [
+      0.02,
+      0.7
+     ],
+     "share_outside": 0.0
+    },
+    "horn_claw": {
+     "range": [
+      0.02,
+      0.55
+     ],
+     "share_outside": 0.0
+    },
+    "leather_smooth": {
+     "range": [
+      0.02,
+      0.45
+     ],
+     "share_outside": 0.0
+    },
+    "skin": {
+     "range": [
+      0.03,
+      0.6
+     ],
+     "share_outside": 0.0
+    }
+   },
+   "passed": true
+  },
+  "h3_state_reproduced": {
+   "expected": "every H3 PNG (4K and 2K) byte-equal",
+   "measured": {
+    "master/BC": {
+     "equal": true,
+     "h3_sha256": "07fc834f68ae6b26960f130181006b5d35ce01620ec6003b98f409cfac641296",
+     "replay_sha256": "07fc834f68ae6b26960f130181006b5d35ce01620ec6003b98f409cfac641296"
+    },
+    "master/N": {
+     "equal": true,
+     "h3_sha256": "838f2bc5a1b05a6067e4604fd71ea1b474c758155dbb8b9e2b05b0b0d31ab5f7",
+     "replay_sha256": "838f2bc5a1b05a6067e4604fd71ea1b474c758155dbb8b9e2b05b0b0d31ab5f7"
+    },
+    "master/N_OpenGL": {
+     "equal": true,
+     "h3_sha256": "4300167549694c68e189851b9f8a5f7b0437aea75622a5ddc3946c274055e435",
+     "replay_sha256": "4300167549694c68e189851b9f8a5f7b0437aea75622a5ddc3946c274055e435"
+    },
+    "master/ORM": {
+     "equal": true,
+     "h3_sha256": "67d2d0a209e213efdd0a6fd1a853c19b633beeb8029f91d376359a5d6af570fe",
+     "replay_sha256": "67d2d0a209e213efdd0a6fd1a853c19b633beeb8029f91d376359a5d6af570fe"
+    },
+    "master/TeamMask": {
+     "equal": true,
+     "h3_sha256": "fda605df327bfa8312cba6187deb375bbbd0554e2ca169041347f035076ce5ca",
+     "replay_sha256": "fda605df327bfa8312cba6187deb375bbbd0554e2ca169041347f035076ce5ca"
+    },
+    "runtime/BC": {
+     "equal": true,
+     "h3_sha256": "413d228f71bbf48ccc3fd0162009b20a280094fa299a18e24ef11ca505f45355",
+     "replay_sha256": "413d228f71bbf48ccc3fd0162009b20a280094fa299a18e24ef11ca505f45355"
+    },
+    "runtime/N": {
+     "equal": true,
+     "h3_sha256": "8fa9aaafd24381b3700f3bbf62fe90dff0b572cd5b27b3c5aea851b99dc05509",
+     "replay_sha256": "8fa9aaafd24381b3700f3bbf62fe90dff0b572cd5b27b3c5aea851b99dc05509"
+    },
+    "runtime/N_OpenGL": {
+     "equal": true,
+     "h3_sha256": "9a6869448e38eb34694ac6dd44b96273cb193f03ec6b2fee045e865c4c9df00c",
+     "replay_sha256": "9a6869448e38eb34694ac6dd44b96273cb193f03ec6b2fee045e865c4c9df00c"
+    },
+    "runtime/ORM": {
+     "equal": true,
+     "h3_sha256": "9a7c9399cdc2c020358d300b384ecc5c17cc3b2186c1676d54a0a8976d1030ef",
+     "replay_sha256": "9a7c9399cdc2c020358d300b384ecc5c17cc3b2186c1676d54a0a8976d1030ef"
+    },
+    "runtime/TeamMask": {
+     "equal": true,
+     "h3_sha256": "fa21ae69f219d1d1550a629a801bbaea979e03d64209729edc7e427b9350e81c",
+     "replay_sha256": "fa21ae69f219d1d1550a629a801bbaea979e03d64209729edc7e427b9350e81c"
+    }
+   },
+   "passed": true
+  },
+  "lut_dds_read_back": {
+   "expected": "half values equal",
+   "measured": {
+    "bytes": 2196,
+    "dds_sha256": "c19a4e5f57ffa040810781aebff44c047f712e62648d00c60c2f694272c86ea8"
+   },
+   "passed": true
+  },
+  "matid_decode_roundtrip_2k": {
+   "expected": true,
+   "measured": "floor(v / 16) = column",
+   "passed": true
+  },
+  "matid_values_valid": {
+   "expected": "index x 16 + 8",
+   "measured": [
+    72,
+    88,
+    120,
+    200,
+    216
+   ],
+   "passed": true
+  },
+  "orm_metallic_binary_4k": {
+   "expected": "0 or 1 per class",
+   "measured": {
+    "metal_texels": 22115
+   },
+   "passed": true
+  },
+  "orm_metallic_matches_preset_class": {
+   "expected": "ORM.B = 255 x preset metallic of the class occupying the column (hero slots: the extension class)",
+   "measured": {
+    "feathers": {
+     "2k": {
+      "B_max": 0,
+      "B_mean": 0.0,
+      "B_min": 0,
+      "ok": true,
+      "texels": 1748974
+     },
+     "4k": {
+      "B_max": 0,
+      "B_mean": 0.0,
+      "B_min": 0,
+      "ok": true,
+      "texels": 7250757
+     },
+     "column": 12,
+     "preset_metallic": 0
+    },
+    "gold_antique": {
+     "2k": {
+      "B_max": 255,
+      "B_mean": 255.0,
+      "B_min": 255,
+      "ok": true,
+      "texels": 5028
+     },
+     "4k": {
+      "B_max": 255,
+      "B_mean": 255.0,
+      "B_min": 255,
+      "ok": true,
+      "texels": 22115
+     },
+     "column": 4,
+     "preset_metallic": 1
+    },
+    "horn_claw": {
+     "2k": {
+      "B_max": 0,
+      "B_mean": 0.0,
+      "B_min": 0,
+      "ok": true,
+      "texels": 34493
+     },
+     "4k": {
+      "B_max": 0,
+      "B_mean": 0.0,
+      "B_min": 0,
+      "ok": true,
+      "texels": 142654
+     },
+     "column": 5,
+     "preset_metallic": 0
+    },
+    "leather_smooth": {
+     "2k": {
+      "B_max": 0,
+      "B_mean": 0.0,
+      "B_min": 0,
+      "ok": true,
+      "texels": 3687
+     },
+     "4k": {
+      "B_max": 0,
+      "B_mean": 0.0,
+      "B_min": 0,
+      "ok": true,
+      "texels": 16458
+     },
+     "column": 7,
+     "preset_metallic": 0
+    },
+    "skin": {
+     "2k": {
+      "B_max": 0,
+      "B_mean": 0.0,
+      "B_min": 0,
+      "ok": true,
+      "texels": 108705
+     },
+     "4k": {
+      "B_max": 0,
+      "B_mean": 0.0,
+      "B_min": 0,
+      "ok": true,
+      "texels": 443739
+     },
+     "column": 13,
+     "preset_metallic": 0
+    }
+   },
+   "passed": true
+  },
+  "source_fbx_sha256": {
+   "expected": {
+    "SK_Harpy_H3.fbx": "ba841a77f26b9c99e333dc7c9e08094cbea2e6c7755b12c2401d1e4eab2ac2c4",
+    "SM_Harpy_H3_Base.fbx": "77fc45deb2b2d0715e0874bdffde68fd3c4f4c88317572e9b8a36ccdddc4476b"
+   },
+   "measured": {
+    "SK_Harpy_H3.fbx": "ba841a77f26b9c99e333dc7c9e08094cbea2e6c7755b12c2401d1e4eab2ac2c4",
+    "SM_Harpy_H3_Base.fbx": "77fc45deb2b2d0715e0874bdffde68fd3c4f4c88317572e9b8a36ccdddc4476b"
+   },
+   "passed": true
+  },
+  "team_accent_area_share": {
+   "expected": "0.05..0.1 of the figure area (final frame)",
+   "measured": {
+    "cord": 0.0024,
+    "figure": 0.0619,
+    "wing_tips": 0.0594
+   },
+   "passed": true
+  },
+  "team_accent_zero_on_non_dye_classes": {
+   "expected": 0,
+   "measured": 0,
+   "passed": true
+  }
+ },
+ "classes": {
+  "feathers": {
+   "Y_p5_p50_p95": [
+    0.02,
+    0.0495,
+    0.2021
+   ],
+   "bc_linear_median": [
+    0.0816,
+    0.0418,
+    0.026
+   ],
+   "column": 12,
+   "edge_mask_mean": 0.1196,
+   "matid_value": 200,
+   "share_of_figure_area": 0.9655,
+   "team_accent_mean": 0.0573,
+   "texels_4k": 7250757
+  },
+  "gold_antique": {
+   "Y_p5_p50_p95": [
+    0.042,
+    0.6316,
+    0.7938
+   ],
+   "bc_linear_median": [
+    0.8142,
+    0.6148,
+    0.2672
+   ],
+   "column": 4,
+   "edge_mask_mean": 0.2098,
+   "matid_value": 72,
+   "share_of_figure_area": 0.0031,
+   "team_accent_mean": 0.0,
+   "texels_4k": 22115
+  },
+  "horn_claw": {
+   "Y_p5_p50_p95": [
+    0.02,
+    0.0201,
+    0.0419
+   ],
+   "bc_linear_median": [
+    0.0262,
+    0.02,
+    0.0235
+   ],
+   "column": 5,
+   "edge_mask_mean": 0.0378,
+   "matid_value": 88,
+   "share_of_figure_area": 0.0106,
+   "team_accent_mean": 0.0,
+   "texels_4k": 142654
+  },
+  "leather_smooth": {
+   "Y_p5_p50_p95": [
+    0.02,
+    0.02,
+    0.0269
+   ],
+   "bc_linear_median": [
+    0.0385,
+    0.017,
+    0.0025
+   ],
+   "column": 7,
+   "edge_mask_mean": 0.313,
+   "matid_value": 120,
+   "share_of_figure_area": 0.0025,
+   "team_accent_mean": 0.9853,
+   "texels_4k": 16458
+  },
+  "skin": {
+   "Y_p5_p50_p95": [
+    0.1415,
+    0.2535,
+    0.3267
+   ],
+   "bc_linear_median": [
+    0.3645,
+    0.2319,
+    0.143
+   ],
+   "column": 13,
+   "edge_mask_mean": 0.0617,
+   "matid_value": 216,
+   "share_of_figure_area": 0.0183,
+   "team_accent_mean": 0.0,
+   "texels_4k": 443739
+  }
+ },
+ "conventions": {
+  "Edge": "R8 linear: EdgeMaskTexture of the v2 master",
+  "MatID": "G8 linear (TC_Grayscale, sRGB off, NoMipmaps, Nearest, never streamed); value = column x 16 + 8",
+  "N": "DirectX, = H3; N_OpenGL = H3",
+  "ORM": "R AO, G roughness (H3; ignored by library classes), B metallic binary = preset metallic of the class in the column (horn_claw 0)",
+  "TeamAccent": "R8 linear (TC_Grayscale, sRGB off): 1 = TeamColor dye (UE: TeamMaskTexture of the v2 MI = TeamAccent; dye only on classes with teamDyeAllowed)",
+  "TeamMask": "H3 W4-B mask, byte copy, deprecated"
+ },
+ "edge_mask": {
+  "config": {
+   "curvature_per_m": [
+    150,
+    600
+   ],
+   "note": "as Medusa look-dev: convexity of the baked tangent normal (div n.xy / metres per texel, final frame), smoothstep",
+   "smooth_px": 3
+  },
+  "curvature_p50_p90_p99_per_m": [
+   14.9,
+   386.6,
+   961.9
+  ],
+  "edge_share_ge_0.5": 0.1051,
+  "metres_per_texel_4k_median": 0.0002766
+ },
+ "figure_area_m2_final": 0.5349,
+ "h3_replay": {
+  "master/BC": {
+   "equal": true,
+   "h3_sha256": "07fc834f68ae6b26960f130181006b5d35ce01620ec6003b98f409cfac641296",
+   "replay_sha256": "07fc834f68ae6b26960f130181006b5d35ce01620ec6003b98f409cfac641296"
+  },
+  "master/N": {
+   "equal": true,
+   "h3_sha256": "838f2bc5a1b05a6067e4604fd71ea1b474c758155dbb8b9e2b05b0b0d31ab5f7",
+   "replay_sha256": "838f2bc5a1b05a6067e4604fd71ea1b474c758155dbb8b9e2b05b0b0d31ab5f7"
+  },
+  "master/N_OpenGL": {
+   "equal": true,
+   "h3_sha256": "4300167549694c68e189851b9f8a5f7b0437aea75622a5ddc3946c274055e435",
+   "replay_sha256": "4300167549694c68e189851b9f8a5f7b0437aea75622a5ddc3946c274055e435"
+  },
+  "master/ORM": {
+   "equal": true,
+   "h3_sha256": "67d2d0a209e213efdd0a6fd1a853c19b633beeb8029f91d376359a5d6af570fe",
+   "replay_sha256": "67d2d0a209e213efdd0a6fd1a853c19b633beeb8029f91d376359a5d6af570fe"
+  },
+  "master/TeamMask": {
+   "equal": true,
+   "h3_sha256": "fda605df327bfa8312cba6187deb375bbbd0554e2ca169041347f035076ce5ca",
+   "replay_sha256": "fda605df327bfa8312cba6187deb375bbbd0554e2ca169041347f035076ce5ca"
+  },
+  "runtime/BC": {
+   "equal": true,
+   "h3_sha256": "413d228f71bbf48ccc3fd0162009b20a280094fa299a18e24ef11ca505f45355",
+   "replay_sha256": "413d228f71bbf48ccc3fd0162009b20a280094fa299a18e24ef11ca505f45355"
+  },
+  "runtime/N": {
+   "equal": true,
+   "h3_sha256": "8fa9aaafd24381b3700f3bbf62fe90dff0b572cd5b27b3c5aea851b99dc05509",
+   "replay_sha256": "8fa9aaafd24381b3700f3bbf62fe90dff0b572cd5b27b3c5aea851b99dc05509"
+  },
+  "runtime/N_OpenGL": {
+   "equal": true,
+   "h3_sha256": "9a6869448e38eb34694ac6dd44b96273cb193f03ec6b2fee045e865c4c9df00c",
+   "replay_sha256": "9a6869448e38eb34694ac6dd44b96273cb193f03ec6b2fee045e865c4c9df00c"
+  },
+  "runtime/ORM": {
+   "equal": true,
+   "h3_sha256": "9a7c9399cdc2c020358d300b384ecc5c17cc3b2186c1676d54a0a8976d1030ef",
+   "replay_sha256": "9a7c9399cdc2c020358d300b384ecc5c17cc3b2186c1676d54a0a8976d1030ef"
+  },
+  "runtime/TeamMask": {
+   "equal": true,
+   "h3_sha256": "fa21ae69f219d1d1550a629a801bbaea979e03d64209729edc7e427b9350e81c",
+   "replay_sha256": "fa21ae69f219d1d1550a629a801bbaea979e03d64209729edc7e427b9350e81c"
+  }
+ },
+ "hero_slots": {
+  "horn_claw": "brass"
+ },
+ "luminance_clamp": {
+  "feathers": {
+   "in_toe_below_2lo": 0.4149,
+   "lowered_above_hi": 0.0,
+   "raised_below_lo": 0.1349
+  },
+  "horn_claw": {
+   "in_toe_below_2lo": 0.9345,
+   "lowered_above_hi": 0.0,
+   "raised_below_lo": 0.4968
+  },
+  "leather_smooth": {
+   "in_toe_below_2lo": 1.0,
+   "lowered_above_hi": 0.0,
+   "raised_below_lo": 0.6433
+  },
+  "skin": {
+   "in_toe_below_2lo": 0.0262,
+   "lowered_above_hi": 0.0001,
+   "raised_below_lo": 0.0213
+  }
+ },
+ "lut": {
+  "applied": [
+   {
+    "class": "brass",
+    "field": "bakeLuminanceModulation",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "bc",
+    "value": [
+     0.0262,
+     0.02,
+     0.0235
+    ]
+   },
+   {
+    "class": "brass",
+    "field": "bcMode",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "cavityDarken",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "cavityTintB",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "cavityTintG",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "cavityTintR",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "cavityTintStrength",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "clothAmount",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "luminanceMax",
+    "value": 0.55
+   },
+   {
+    "class": "brass",
+    "field": "luminanceMin",
+    "value": 0.02
+   },
+   {
+    "class": "brass",
+    "field": "maxChannel",
+    "value": 0.9
+   },
+   {
+    "class": "brass",
+    "field": "metallic",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "normalStrength",
+    "value": 0.3
+   },
+   {
+    "class": "brass",
+    "field": "roughHi",
+    "value": 0.5
+   },
+   {
+    "class": "brass",
+    "field": "roughLo",
+    "value": 0.22
+   },
+   {
+    "class": "brass",
+    "field": "roughTypical",
+    "value": 0.33
+   },
+   {
+    "class": "brass",
+    "field": "roughVariation",
+    "value": 0.06
+   },
+   {
+    "class": "brass",
+    "field": "shadingModel",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "sheenIntensity",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "sheenRoughness",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "sheenTint",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "slice",
+    "value": 14.0
+   },
+   {
+    "class": "brass",
+    "field": "specular",
+    "value": 0.575
+   },
+   {
+    "class": "brass",
+    "field": "teamDyeAllowed",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "tilesPerMeter",
+    "value": 12.0
+   },
+   {
+    "class": "brass",
+    "field": "wearStrength",
+    "value": 0.25
+   },
+   {
+    "class": "brass",
+    "field": "wornBCB",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "wornBCG",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "wornBCMode",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "wornBCR",
+    "value": 0.0
+   },
+   {
+    "class": "brass",
+    "field": "wornBCScale",
+    "value": 1.4
+   },
+   {
+    "class": "brass",
+    "field": "wornRoughness",
+    "value": -1.0
+   },
+   {
+    "class": "brass",
+    "field": "wornRoughnessDelta",
+    "value": -0.08
+   },
+   {
+    "class": "brass",
+    "field": "ymedClassHero",
+    "value": 0.02012
+   },
+   {
+    "class": "feathers",
+    "field": "bc",
+    "value": [
+     0.0816,
+     0.0418,
+     0.026
+    ]
+   },
+   {
+    "class": "feathers",
+    "field": "ymedClassHero",
+    "value": 0.04946
+   },
+   {
+    "class": "gold_antique",
+    "field": "bc",
+    "value": [
+     1.0,
+     0.4371,
+     0.1032
+    ]
+   },
+   {
+    "class": "gold_antique",
+    "field": "ymedClassHero",
+    "value": 0.63156
+   },
+   {
+    "class": "leather_smooth",
+    "field": "bc",
+    "value": [
+     0.0385,
+     0.017,
+     0.0025
+    ]
+   },
+   {
+    "class": "leather_smooth",
+    "field": "ymedClassHero",
+    "value": 0.02
+   },
+   {
+    "class": "skin",
+    "field": "bc",
+    "value": [
+     0.3645,
+     0.2319,
+     0.143
+    ]
+   },
+   {
+    "class": "skin",
+    "field": "ymedClassHero",
+    "value": 0.25347
+   }
+  ],
+  "builder": "tools/art/material_library/build_ue_inputs.py 2.0.0 (imported, main() not run)",
+  "dds": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/T_UM_MatLUT_Harpy.dds",
+  "dds_sha256": "c19a4e5f57ffa040810781aebff44c047f712e62648d00c60c2f694272c86ea8",
+  "gold_antique_f0_hero": [
+   1.0,
+   0.437,
+   0.1032
+  ],
+  "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index (hero slot 5 = horn_claw)",
+  "overrides_json": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/T_UM_MatLUT_Harpy.overrides.json",
+  "overrides_sha256": "97ce30e716e440857f60929967f0ccebef6c91a2024494ce7453ccce5af577c3"
+ },
+ "passed": true,
+ "preview_textures": {
+  "BC_P1": {
+   "bytes": 5177085,
+   "mode": "RGB",
+   "path": "work/lookdev/preview/LD_BC_P1.png",
+   "sha256": "06bdc2d5987d345f6a2705d56a6a63893ce4590d15ee63daae7f1b5069b376b0",
+   "size": [
+    2048,
+    2048
+   ]
+  },
+  "BC_P2": {
+   "bytes": 5120747,
+   "mode": "RGB",
+   "path": "work/lookdev/preview/LD_BC_P2.png",
+   "sha256": "879949763fec120232a16441a4319841b0c71a128469fe327e4a20b80369c333",
+   "size": [
+    2048,
+    2048
+   ]
+  },
+  "BC_none": {
+   "bytes": 5072333,
+   "mode": "RGB",
+   "path": "work/lookdev/preview/LD_BC_none.png",
+   "sha256": "d1a76b12df0babe15aca8b6a89fe4f6cfe1398f0fc41cdb91e36195b528d3ab0",
+   "size": [
+    2048,
+    2048
+   ]
+  },
+  "CLASS": {
+   "bytes": 35093,
+   "mode": "RGB",
+   "path": "work/lookdev/preview/LD_CLASS.png",
+   "sha256": "49f15f9e5eb0f03fc16b916b2b0dd99b69b7195ad6b43c68d42cda217dfe1b6b",
+   "size": [
+    2048,
+    2048
+   ]
+  },
+  "RMS": {
+   "bytes": 59047,
+   "mode": "RGB",
+   "path": "work/lookdev/preview/LD_RMS.png",
+   "sha256": "56b164f8689b6919a28fdea1bd1dfb80b9a8d3ab57badc521f46d3134c31158b",
+   "size": [
+    2048,
+    2048
+   ]
+  }
+ },
+ "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-lookdev.json",
+ "profile_id": "harpy-h3-lookdev/1",
+ "seat_scale": 0.652145,
+ "skin_holes_filled_texels_4k": 18786,
+ "small_components_to_default": {
+  "horn_claw": 7,
+  "skin": 511
+ },
+ "source": {
+  "fbx_sha256": {
+   "SK_Harpy_H3.fbx": "ba841a77f26b9c99e333dc7c9e08094cbea2e6c7755b12c2401d1e4eab2ac2c4",
+   "SM_Harpy_H3_Base.fbx": "77fc45deb2b2d0715e0874bdffde68fd3c4f4c88317572e9b8a36ccdddc4476b"
+  },
+  "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-bake.json",
+  "profile_sha256": "35efe89bd51b770e000f4a96234876882ad535e1b2979fe81d2d1fa45a07adba",
+  "run": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake"
+ },
+ "stage": "ld_maps",
+ "status": "измерено",
+ "team_accent": {
+  "TeamDye": 1.0,
+  "accent_median_Y_bc": 0.02,
+  "accent_p95_Y_bc": 0.0272,
+  "cord_share": 0.0024,
+  "edge_width_final_m": 0.0163,
+  "edge_width_source_m": 0.025,
+  "gain_cap_p95": 40.99,
+  "gain_for_median": 40.0,
+  "old_teammask_share": 0.1594,
+  "share_of_figure_area": 0.0619,
+  "silhouette": {
+   "grid": [
+    306,
+    511
+   ],
+   "px_m": 0.002
+  },
+  "suggested_TeamDyeGain": 40.0,
+  "tripo_wing_accent_Y_median": 0.0173,
+  "wing_tips_share": 0.0594
+ },
+ "textures": {
+  "2k": {
+   "BC": {
+    "bytes": 5079324,
+    "mode": "RGB",
+    "path": "textures/2k/T_Harpy_H3LD_BC.png",
+    "sha256": "0a32c05341796c3b833e94225d56ba8f0b30b4bd2026b6c7067e078153a4132a",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "Edge": {
+    "bytes": 1147071,
+    "mode": "L",
+    "path": "textures/2k/T_Harpy_H3LD_Edge.png",
+    "sha256": "2ae7f4a2adf56eed264fc9b93dba2fb2c4979081a32c4b43d25acb3ef185b759",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "MatID": {
+    "bytes": 21979,
+    "mode": "L",
+    "path": "textures/2k/T_Harpy_H3LD_MatID.png",
+    "sha256": "1f62aede2a0db49637e9211e1a56dd6bfb6e028d7128f61c412810780662f883",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "N": {
+    "bytes": 5646964,
+    "copied_from": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/textures/2k/T_Harpy_H3_N.png",
+    "note": "H3 bytes",
+    "path": "textures/2k/T_Harpy_H3LD_N.png",
+    "sha256": "8fa9aaafd24381b3700f3bbf62fe90dff0b572cd5b27b3c5aea851b99dc05509"
+   },
+   "N_OpenGL": {
+    "bytes": 5648246,
+    "copied_from": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/textures/2k/T_Harpy_H3_N_OpenGL.png",
+    "note": "H3 bytes",
+    "path": "textures/2k/T_Harpy_H3LD_N_OpenGL.png",
+    "sha256": "9a6869448e38eb34694ac6dd44b96273cb193f03ec6b2fee045e865c4c9df00c"
+   },
+   "ORM": {
+    "bytes": 3763450,
+    "mode": "RGB",
+    "path": "textures/2k/T_Harpy_H3LD_ORM.png",
+    "sha256": "6cc539b8741d5a762345781b2b003127d43e16bb889a8c64463b112d691d97ad",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "TeamAccent": {
+    "bytes": 334150,
+    "mode": "L",
+    "path": "textures/2k/T_Harpy_H3LD_TeamAccent.png",
+    "sha256": "360d918bee586e8ff5073003bdd3b2256694c0792dc4eba24ce8fad489c66e9d",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "TeamMask": {
+    "bytes": 890143,
+    "copied_from": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/textures/2k/T_Harpy_H3_TeamMask.png",
+    "note": "H3 bytes (deprecated: W4-B mask of all dark flight feathers; use TeamAccent)",
+    "path": "textures/2k/T_Harpy_H3LD_TeamMask.png",
+    "sha256": "fa21ae69f219d1d1550a629a801bbaea979e03d64209729edc7e427b9350e81c"
+   }
+  },
+  "4k": {
+   "BC": {
+    "bytes": 14273974,
+    "mode": "RGB",
+    "path": "textures/4k/T_Harpy_H3LD_BC.png",
+    "sha256": "8cc2996992699ea8f61a1ff551aed190fdf0498045537dc2295eadc233404a5e",
+    "size": [
+     4096,
+     4096
+    ]
+   },
+   "Edge": {
+    "bytes": 3167337,
+    "mode": "L",
+    "path": "textures/4k/T_Harpy_H3LD_Edge.png",
+    "sha256": "2621767aff968c069b2b21d1c18710d9b337c1123abd4a13281e416514383213",
+    "size": [
+     4096,
+     4096
+    ]
+   },
+   "MatID": {
+    "bytes": 53595,
+    "mode": "L",
+    "path": "textures/4k/T_Harpy_H3LD_MatID.png",
+    "sha256": "4474b4ebcf673af8a38d465f59f4c011751c606684531abadef4bfbdb57ce731",
+    "size": [
+     4096,
+     4096
+    ]
+   },
+   "N": {
+    "bytes": 14781363,
+    "copied_from": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/textures/4k/T_Harpy_H3_N.png",
+    "note": "H3 bytes",
+    "path": "textures/4k/T_Harpy_H3LD_N.png",
+    "sha256": "838f2bc5a1b05a6067e4604fd71ea1b474c758155dbb8b9e2b05b0b0d31ab5f7"
+   },
+   "N_OpenGL": {
+    "bytes": 14784393,
+    "copied_from": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/textures/4k/T_Harpy_H3_N_OpenGL.png",
+    "note": "H3 bytes",
+    "path": "textures/4k/T_Harpy_H3LD_N_OpenGL.png",
+    "sha256": "4300167549694c68e189851b9f8a5f7b0437aea75622a5ddc3946c274055e435"
+   },
+   "ORM": {
+    "bytes": 10177062,
+    "mode": "RGB",
+    "path": "textures/4k/T_Harpy_H3LD_ORM.png",
+    "sha256": "2af718591b718959e738bf6efd48c9da8381d7c2816756f6277e2cd3793f3e67",
+    "size": [
+     4096,
+     4096
+    ]
+   },
+   "TeamAccent": {
+    "bytes": 872922,
+    "mode": "L",
+    "path": "textures/4k/T_Harpy_H3LD_TeamAccent.png",
+    "sha256": "81e99b0f461a9dd4a79bbcfeca569619cf427a974c344ab114a28c4d270da7af",
+    "size": [
+     4096,
+     4096
+    ]
+   },
+   "TeamMask": {
+    "bytes": 2447833,
+    "copied_from": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/textures/4k/T_Harpy_H3_TeamMask.png",
+    "note": "H3 bytes (deprecated: W4-B mask of all dark flight feathers; use TeamAccent)",
+    "path": "textures/4k/T_Harpy_H3LD_TeamMask.png",
+    "sha256": "fda605df327bfa8312cba6187deb375bbbd0554e2ca169041347f035076ce5ca"
+   }
+  }
+ }
+}

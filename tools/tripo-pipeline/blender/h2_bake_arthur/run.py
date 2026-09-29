@@ -5,6 +5,10 @@
         [--stages inspect,lowpoly,uvcheck,bake,textures,rig,probe,review,sheets,compare,sheets_h21,compare_h22,
                   steelcheck,sheets_h22,manifest]
         [--from STAGE]
+    python tools/tripo-pipeline/blender/h2_bake_arthur/run.py --profile <king-arthur-h2-lookdev.json> [--stages ...]
+        look-dev v2 (profile with "lookdev" + "stages"): ld_state ld_export ld_maps ld_tone_prep ld_render_tone ld_tone
+        ld_render_final ld_ue_inputs ld_report on the H2 bake run (read only) into the profile's run_dir; the H2 stages
+        and their defaults are unchanged
 
 Every stage writes logs/<stage>.log; a Blender stage counts as done only if its log has the H2_BAKE_STAGE_OK marker
 (Blender exits 0 even when the script raised). No paid service is called; the Tripo GLBs are only read.
@@ -33,6 +37,16 @@ PY_STAGES = {"uvcheck": "uvcheck.py", "textures": "textures.py", "sheets": "shee
 ANIM = P.REPO / "tools" / "tripo-pipeline" / "anim"
 FBX_TO_BLEND = P.REPO / "art" / "pipeline-candidates" / "ASSET-KING-ARTHUR-001" / "scripts" / "fbx_to_authored_blend.py"
 NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+# look-dev v2 (2026-09-29): stage -> (kind, script, extra args); python stages get <profile> <run_dir>, Blender stages
+# get -- <profile> <run_dir> [job]
+LD_ORDER = ["ld_state", "ld_export", "ld_maps", "ld_tone_prep", "ld_render_tone", "ld_tone", "ld_render_final",
+            "ld_ue_inputs", "ld_report"]
+LD_STAGES = {"ld_state": ("py", "lookdev_state.py", []), "ld_export": ("blender", "lookdev_export.py", []),
+             "ld_maps": ("py", "lookdev_maps.py", []), "ld_tone_prep": ("py", "lookdev_tone.py", ["prep"]),
+             "ld_render_tone": ("blender", "lookdev_render.py", ["work/lookdev/job-tone.json"]),
+             "ld_tone": ("py", "lookdev_tone.py", ["fit"]),
+             "ld_render_final": ("blender", "lookdev_render.py", ["work/lookdev/job-final.json"]),
+             "ld_ue_inputs": ("ue_inputs", None, []), "ld_report": ("py", "lookdev_report.py", [])}
 
 
 def run(cmd, log, marker=None, ok_codes=(0,)):
@@ -160,15 +174,47 @@ def stage_manifest(profile, paths):
                                                          "files": [f for f in files if not f["file"].endswith("manifest-h2.json")]})
 
 
+def run_lookdev(profile, profile_path, a):
+    """Look-dev v2 stages (profile["stages"] by default); every stage logs to <run>/logs/<stage>.log."""
+    run_dir = Path(a.run_dir).resolve() if a.run_dir else P.repo_path(profile["run_dir"])
+    paths = P.run_paths(run_dir)
+    for k in ("logs", "reports", "work", "export", "textures", "preview"):
+        paths[k].mkdir(parents=True, exist_ok=True)
+    stages = [s for s in LD_ORDER if s in (a.stages.split(",") if a.stages else profile["stages"])]
+    if a.from_stage:
+        stages = stages[stages.index(a.from_stage):]
+    timing = {}
+    for st in stages:
+        kind, script, extra = LD_STAGES[st]
+        log = paths["logs"] / ("%s.log" % st)
+        if kind == "py":
+            cmd = [sys.executable, str(HERE / script)] + extra[:1] + [str(profile_path), str(run_dir)]
+        elif kind == "blender":
+            cmd = blender(HERE / script, profile_path, run_dir, *[run_dir / e for e in extra])
+        else:
+            cfg = P.repo_path(profile["lookdev"]["ue_lut_config"])
+            cmd = [sys.executable, str(P.REPO / "tools" / "art" / "material_library" / "lookdev_ue_inputs.py"),
+                   "--config", str(cfg)]
+        timing[st] = run(cmd, log, None if kind == "ue_inputs" else P.STAGE_MARKER)
+        print("stage", st, timing[st], flush=True)
+    P.write_json(paths["logs"] / "timings.json", timing)
+    print(json.dumps(timing))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--profile", required=True)
-    ap.add_argument("--run-dir", required=True)
-    ap.add_argument("--stages", default=",".join(s for s in ORDER if s not in DEFAULT_SKIP))
+    ap.add_argument("--run-dir")
+    ap.add_argument("--stages")
     ap.add_argument("--from", dest="from_stage")
     a = ap.parse_args()
     profile_path = Path(a.profile).resolve()
     profile = P.load_json(profile_path)
+    if "lookdev" in profile and "stages" in profile:
+        return run_lookdev(profile, profile_path, a)
+    if not a.run_dir:
+        ap.error("--run-dir is required for the H2 bake profile")
+    a.stages = a.stages or ",".join(s for s in ORDER if s not in DEFAULT_SKIP)
     profile["_path"] = str(profile_path)
     paths = P.run_paths(a.run_dir)
     for k in ("logs", "reports", "work", "export", "textures", "preview"):

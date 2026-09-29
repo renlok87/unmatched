@@ -3,14 +3,15 @@
 Checks (each result: {"check", "ok", "detail"}; exit code 1 when any fails):
   files            presets / sources / report / README / cc0-raw manifest exist
   tile_files       every tile of the report exists, sha256 and size match, RGB, square 512/1024
-  presets_tiles    presets classes 0..15 = report classes 1..15, same ids, same tile paths and sizes
+  presets_tiles    presets classes 0..15 = report classes 1..15, same ids, same tile paths and sizes; extension
+                   classes (README §3a): libraryIndex >= 16, no global MatID, tiles = those of tileFrom, unique ids
   licenses         every manifest asset is CC0; sources.json covers all manifest ids once, same zip sha256
   source_mapping   used sets <-> classes built from them; unused sets have a reason; procedural classes listed
   raw_files        (only with --verify-raw, when cc0-raw is present) zip and source-file sha256
   seamless         wrap-pair / p99 interior-pair difference <= SEAM_MAX per axis, for N.xy, R, G, B
   normal_dx        DetailN: unit length, z > 0, xy mean ~ 0; DirectX sign: corr(N.y, -dB/drow) > 0 and >= half of
                    corr(N.x, -dB/dcol) (when B has relief; a G-flipped map gives corr_y ~ -corr_x); the source NormalDX was the G-inverted NormalGL
-  preset_physics   metallic in {0, 1}; metal BC = reference F0 (oxide film: low-F0 band with a reference);
+  preset_physics   (classes and extensionClasses) metallic in {0, 1}; metal BC = reference F0 (oxide film: low-F0 band with a reference);
                    dielectric BC Y in [0.02, 0.9], channels <= 0.9; specular/F0 consistent and in the dielectric
                    band; roughness ranges ordered, measured values equal the report; Cloth <=> cloth block with a
                    formula-consistent sheen colour; tiles per metre consistent; every cited source defined
@@ -194,7 +195,35 @@ def _check_presets_vs_report(presets, report, res):
     extra = set(rep) - {c.get("index") for c in pcs}
     if extra:
         bad.append(f"report classes without a preset: {sorted(extra)}")
-    res.add("presets_tiles", not bad, "; ".join(bad) or f"{len(pcs)} presets (incl. index 0) match the report")
+    # extension classes (README §3a): no global MatID, library index >= 16, unique ids, detail = tiles of tileFrom
+    ext = presets.get("extensionClasses", [])
+    ids = [c.get("id") for c in pcs] + [c.get("id") for c in ext]
+    if len(set(ids)) != len(ids):
+        bad.append(f"class ids not unique: {ids}")
+    by_id = {c.get("id"): c for c in pcs}
+    lib_idx = []
+    for c in ext:
+        e = c.get("extension") or {}
+        li = e.get("libraryIndex")
+        lib_idx.append(li)
+        if not isinstance(li, int) or li < 16 or c.get("index") != li:
+            bad.append(f"extension {c.get('id')}: libraryIndex {li} (index {c.get('index')}) must be an int >= 16 = index")
+        if e.get("globalMatId") is not False:
+            bad.append(f"extension {c.get('id')}: globalMatId must be false (4-bit MatID, README §3a)")
+        d = c.get("detail", {})
+        src = by_id.get(d.get("tileFrom"))
+        if src is None or not src.get("index"):
+            bad.append(f"extension {c.get('id')}: tileFrom {d.get('tileFrom')!r} is not a library class with tiles")
+            continue
+        sd = src.get("detail", {})
+        if (d.get("DetailN"), d.get("DetailRMH"), d.get("tileSizePx")) != (sd.get("DetailN"), sd.get("DetailRMH"), sd.get("tileSizePx")):
+            bad.append(f"extension {c.get('id')}: tiles differ from tileFrom {src['id']}")
+        if e.get("arraySlice") != src.get("index"):
+            bad.append(f"extension {c.get('id')}: arraySlice {e.get('arraySlice')} != index {src.get('index')} of {src['id']}")
+    if len(set(lib_idx)) != len(lib_idx):
+        bad.append(f"extension libraryIndex not unique: {lib_idx}")
+    res.add("presets_tiles", not bad, "; ".join(bad) or f"{len(pcs)} presets (incl. index 0) match the report"
+            + (f"; {len(ext)} extension class(es) on existing tiles" if ext else ""))
 
 
 def _check_licenses(manifest, sources, res):
@@ -317,7 +346,7 @@ def _check_physics(presets, report, res):
             if s not in refs:
                 bad.append(f"{c['id']}.{name}: source {s!r} not in references")
 
-    for c in presets.get("classes", []):
+    for c in presets.get("classes", []) + presets.get("extensionClasses", []):
         cid = c.get("id")
         if c.get("family") == "passthrough":
             continue

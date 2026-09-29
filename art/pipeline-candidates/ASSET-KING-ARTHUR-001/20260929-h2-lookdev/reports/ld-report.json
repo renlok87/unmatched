@@ -1,0 +1,244 @@
+{
+  "checks": {
+    "gold_f0_metal_rule": {
+      "expected": "Y >= 0.45, channels <= 1 (LDD-7)",
+      "measured": {
+        "Y": 0.5615,
+        "max": 1.0
+      },
+      "note": "",
+      "passed": true
+    },
+    "ld_export_passed": {
+      "expected": [],
+      "measured": [],
+      "note": "",
+      "passed": true
+    },
+    "ld_maps_passed": {
+      "expected": [],
+      "measured": [],
+      "note": "",
+      "passed": true
+    },
+    "ld_state_passed": {
+      "expected": [],
+      "measured": [],
+      "note": "",
+      "passed": true
+    },
+    "lut_dye_only_wool_and_leather": {
+      "expected": "teamDyeAllowed = 1 only on the classes the TeamAccent covers (wool_coarse, leather_worn)",
+      "measured": {
+        "gold_antique": 0.0,
+        "leather_worn": 1.0,
+        "silk": 0.0,
+        "skin": 0.0,
+        "steel_blued": 0.0,
+        "steel_polished": 0.0,
+        "stone_base": 0.0,
+        "wool_coarse": 1.0
+      },
+      "note": "",
+      "passed": true
+    },
+    "lut_exr_readback": {
+      "expected": true,
+      "measured": true,
+      "note": "",
+      "passed": true
+    },
+    "lut_metallic_binary": {
+      "expected": "0 or 1",
+      "measured": {
+        "1": 1.0,
+        "11": 0.0,
+        "13": 0.0,
+        "14": 0.0,
+        "2": 1.0,
+        "4": 1.0,
+        "8": 0.0,
+        "9": 0.0
+      },
+      "note": "",
+      "passed": true
+    },
+    "steel_cobble_mean_in_range": {
+      "expected": [
+        0.4,
+        0.6
+      ],
+      "measured": {
+        "mean": 0.3961,
+        "per_view": {
+          "k2_5x_az-40": 0.4231,
+          "k2_5x_az0": 0.369
+        }
+      },
+      "note": "mean steel / board over K2 5x az 0 / -40 (the fit rule; 0.02 = measurement noise of the refit)",
+      "passed": true
+    },
+    "steel_f0_in_oxide_band": {
+      "expected": [
+        0.1,
+        0.26
+      ],
+      "measured": 0.1486,
+      "note": "preset steel_blued luminanceRange (validator oxide film band 0.05-0.35)",
+      "passed": true
+    },
+    "steel_not_white_on_board": {
+      "expected": "<= 1 % of the steel pixels with a display channel >= 0.85",
+      "measured": 0.0,
+      "note": "",
+      "passed": true
+    },
+    "steel_relative_within_h22_tolerance": {
+      "expected": "|ld - 1| <= 0.15",
+      "measured": {
+        "h2": {
+          "ratio": {
+            "red_cloth": 0.918,
+            "stone": 0.6658
+          },
+          "ratio_geomean": 0.7818,
+          "ratio_min_max": [
+            0.6658,
+            0.918
+          ]
+        },
+        "h22": {
+          "ratio": {
+            "red_cloth": 1.2102,
+            "stone": 0.8879
+          },
+          "ratio_geomean": 1.0366,
+          "ratio_min_max": [
+            0.8879,
+            1.2102
+          ]
+        },
+        "ld": {
+          "ratio": {
+            "red_cloth": 0.9831,
+            "stone": 0.8843
+          },
+          "ratio_geomean": 0.9324,
+          "ratio_min_max": [
+            0.8843,
+            0.9831
+          ]
+        }
+      },
+      "note": "the H2.2 gate (steelcheck.relative_check) on the final look-dev frames",
+      "passed": true
+    },
+    "team_accent_reads_at_k2": {
+      "expected": "CIELAB dE >= 15 against the red cloth next to it, >= 20 between P1 and P2 (K2 5x and 1.6x, Cobble)",
+      "measured": {
+        "min_delta_e_accent_vs_cloth": 33.6,
+        "min_delta_e_p1_vs_p2": 37.7
+      },
+      "note": "",
+      "passed": true
+    },
+    "team_accent_tabard_red_in_render": {
+      "expected": ">= 0.8 x the no-dye red share of the tabard pixels with P1 and with P2 (Cobble, k2_5x_az0, k2_5x_az-40, k2_1p6_az0, k2_1p6_az-40, close_torso_az0)",
+      "measured": {
+        "min_ratio": 1.0,
+        "per_view": {
+          "close_torso_az0": {
+            "ld": 0.9995,
+            "ld_p1": 0.9995,
+            "ld_p2": 0.9995,
+            "ratio_ld_p1": 1.0,
+            "ratio_ld_p2": 1.0,
+            "tabard_px": 36905
+          },
+          "k2_1p6_az-40": {
+            "ld": 0.9808,
+            "ld_p1": 0.9808,
+            "ld_p2": 0.9808,
+            "ratio_ld_p1": 1.0,
+            "ratio_ld_p2": 1.0,
+            "tabard_px": 208
+          },
+          "k2_5x_az-40": {
+            "ld": 0.9984,
+            "ld_p1": 0.9984,
+            "ld_p2": 0.9984,
+            "ratio_ld_p1": 1.0,
+            "ratio_ld_p2": 1.0,
+            "tabard_px": 2462
+          },
+          "k2_5x_az0": {
+            "ld": 0.9996,
+            "ld_p1": 0.9996,
+            "ld_p2": 0.9996,
+            "ratio_ld_p1": 1.0,
+            "ratio_ld_p2": 1.0,
+            "tabard_px": 2516
+          }
+        }
+      },
+      "note": "rev. 2: the front panel stays red; red = display hue within +-20 deg of 0, saturation >= 0.35",
+      "passed": true
+    }
+  },
+  "concept_zone_overlays": {
+    "back": {
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_concept_zones_back.png",
+      "sha256": "f98de9e7f7d51f9bd9850af0db11e0961797f0f4d9eee4468973201ae41cad5f"
+    },
+    "front": {
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_concept_zones_front.png",
+      "sha256": "16c12cc52c92f04a0600dec772997a7acf1340e2f4b60258b1a901a17aad96b5"
+    },
+    "side": {
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_concept_zones_side.png",
+      "sha256": "1d16f7baafc17d8c403eb902c94ab275fdffda7b79a5f98dfebfd408277e4b45"
+    }
+  },
+  "passed": true,
+  "profile": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-lookdev.json",
+  "profile_id": "king-arthur-h2-lookdev/1",
+  "sheets": {
+    "closeups": {
+      "bytes": 1416189,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_closeups.jpg",
+      "sha256": "bee9d7d65884ee93d1255e44073ac2d1a74f9730208793cb94a18467cce5c0a0"
+    },
+    "id": {
+      "bytes": 436004,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_id_masks.jpg",
+      "sha256": "393cc0cafdc595b1f75e26d33862f0ac19a6f53fb0fa9212a2f90badc1e56614"
+    },
+    "k2_1p6": {
+      "bytes": 360628,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_k2_1p6_cobble.jpg",
+      "sha256": "79c3a4a33caa8bce20a3c12e0855f3221cd141fb0678ca4c37d8b3332f9612cc"
+    },
+    "k2_5x": {
+      "bytes": 548508,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_k2_5x_cobble.jpg",
+      "sha256": "249292b288283cf8e306a03da39bbbe0ab6990f80a5e55f4200a14219f12cf32"
+    },
+    "sheet_back": {
+      "bytes": 514237,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_sbs_back.jpg",
+      "sha256": "bcc99d122b638544a3f9ae70975795c055fae9802fb0bd7e359df754ae0e94d4"
+    },
+    "sheet_front": {
+      "bytes": 615528,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_sbs_front.jpg",
+      "sha256": "c8bf6bd9afc838ce997f97581de3d4ddd986529bdfe95534b05f113363f2ce33"
+    },
+    "sheet_side": {
+      "bytes": 427332,
+      "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_sbs_side.jpg",
+      "sha256": "3ef878713bb78e5d6eda1aeefab6c6ca819a3d97b08dedd54fe17a9d43f64e40"
+    }
+  },
+  "stage": "ld_report",
+  "status": "измерено"
+}

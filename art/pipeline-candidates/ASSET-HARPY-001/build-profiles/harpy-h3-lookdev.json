@@ -1,0 +1,102 @@
+{
+ "schema": "unmatched.tripo-pipeline.h3-lookdev-profile/1",
+ "profile_id": "harpy-h3-lookdev/1",
+ "asset_id": "ASSET-HARPY-001",
+ "status": "proposed",
+ "status_note": "Look-dev v2 (2026-09-29): the H3 game model of Harpy moved onto the UM material library v1 for M_UM_Figure_v2 (docs/art-pipeline/material-library/README.md, m-um-figure-v2.md): MatID (R8, index x 16 + 8, no mips), hero LUT 16 x 16 RGBA16F (build_ue_inputs.py layout, rows 0-9), UV1 in metres, EdgeMask, TeamAccent (new, docs/art-pipeline/material-library/team-accent.md); the W4-B TeamMask stays byte-identical and is deprecated. Geometry, UV0, rig and weights are those of the H3 run (appended from its work/h2-candidate.blend and checked against its FBX). Status: measured (Blender frames only), not art acceptance; UE import is the next stage.",
+ "run_dir": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev",
+ "blender": "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe",
+ "stages": ["ld_maps", "ld_fbx", "ld_review", "ld_compose"],
+ "lookdev": {
+  "source": {
+   "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-bake.json",
+   "run": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake",
+   "prefix": "T_Harpy_H3",
+   "fbx_sha256": {
+    "SK_Harpy_H3.fbx": "ba841a77f26b9c99e333dc7c9e08094cbea2e6c7755b12c2401d1e4eab2ac2c4",
+    "SM_Harpy_H3_Base.fbx": "77fc45deb2b2d0715e0874bdffde68fd3c4f4c88317572e9b8a36ccdddc4476b"
+   },
+   "note": "read only: work/bake/*.npy, work/uv-labels.npz, work/uv-tris.npz (local, git-ignored) are hard-linked into a scratch run and textures.py of the module is replayed unchanged; its 4K/2K PNGs must equal the H3 textures-report (check h3_state_reproduced). work/h2-candidate.blend is appended by ld_fbx / ld_review"
+  },
+  "presets": "docs/art-pipeline/material-library/um-material-presets-v1.json",
+  "prefix": "T_Harpy_H3LD",
+  "lut_hero": "Harpy",
+  "lut_name": "T_UM_MatLUT_Harpy",
+  "exports": {"skeletal_fbx": "SK_Harpy_H3LD.fbx", "base_fbx": "SM_Harpy_H3LD_Base.fbx"},
+  "matid_px": 2048,
+  "matid_px_note": "MatID at the runtime atlas size 2K as Merlin (LDM-4) and Medusa (LDD-10): the talons and the bracelet cord are 20-60 texel features at 2K; 4K master local",
+  "gutter_px": 16,
+  "hero_slots": {
+   "brass": "horn_claw",
+   "note": "horn_claw is an extension class of the library (no global MatID, README §3a): Harpy has no brass, so its LUT column 5 carries horn_claw (all fields, detail slice 14 = stone_base tiles); the MatID of the talons is 5 x 16 + 8 = 88"
+  },
+  "classes": {
+   "default": "feathers",
+   "default_note": "every texel of the figure is keratin feather or keratin scale unless a rule below takes it: the feet parts (scaled tarsus) are feathers too (same F0 0.046, matte 0.55; no scale class in v1)",
+   "skin": {"weight_min": 0.5, "face_density_min": 2.0, "fill_holes_in_face": true,
+            "note": "H3 skin weight (textures.materials.feathers.skin: head part, v >= 0.45, s <= 0.4) >= 0.5; holes of the skin inside the face islands (brows, eyes, lip line: dark painted features) are filled, so the face is one skin class"},
+   "horn_claw": {"weight_min": 0.5, "note": "H3 talon weight (textures.materials.talons: feet parts, s <= 0.3, v <= 0.4, opened 3 px) >= 0.5"},
+   "bracelet": {"part": "tripo_part_13", "z_band_source_m": [0.143, 0.174], "cord_core": 0.5, "gold": "gold_antique", "cord": "leather_smooth",
+                "note": "the band of part 13 is z 0.1430-0.1740 (source frame; measured 2026-09-29: metallic mean 0.75-0.91 inside, 0.04 / 0.17 in the lowest / highest decile = leg scales of the same part -> feathers). Concept: two gold rims and a central braid (~55 % of the height). The central half of the band becomes the team-colour cord inset (leather_smooth: dyeable dielectric; metals are never dyed, rule 5c-A), the rims stay gold_antique",
+                "cord_tone": "dark leather: the Tripo BC of the braid texels scaled so the cord median luminance = the median luminance of the wing accent texels (one TeamDyeGain gives both the same team colour)"},
+   "min_component_px": 12,
+   "dielectric_clamp": "shader",
+   "dielectric_clamp_note": "clamp(Y, lo, hi) of the v2 core applied in the texture (not the Medusa toe): measured 2026-09-29, the toe lifted every feather texel below Y 0.04 (41 % of the feathers) and the Cobble K2 dark share of the body fell from 17 % (H3) to 11 % against 34 % of the concept; the hard clamp moves only the texels below the albedo floor 0.02"
+  },
+  "team_accent": {
+   "wing_parts": ["tripo_part_0", "tripo_part_1", "tripo_part_3", "tripo_part_7"],
+   "dark_mask": "the W4-B TeamMask of H3 (dark flight feathers, v <= 0.22, ramp 0.05, blur 3 x 3)",
+   "edge_width_source_m": 0.025,
+   "edge_soft_source_m": 0.004,
+   "silhouette_px_m": 0.002,
+   "silhouette_closing": 3,
+   "blur": "3x3",
+   "area_share_range": [0.05, 0.10],
+   "dye": {"TeamDye": 1.0, "target_gain_x_ymed": 0.8, "max_albedo_p95": 0.9,
+           "note": "UE: dyed = TeamColor x Y(BC) x TeamDyeGain (TeamDye 1); TeamDyeGain = min(0.8 / median Y, 0.9 / (p95 Y x max channel of the palette)) of the accent texels -> the accent median reads close to the team colour and the brightest 5 % of the dyed albedo stay <= 0.9"},
+   "palette": {"source": "art/um-materials/um-masters.json team_palette (active = c11_value_split_proposal)", "P1": "#E8C06A", "P2": "#5A7F9F"},
+   "note": "TeamAccent = the tips of the dark primaries along the wing outline (dark mask x distance to the frontal XZ silhouette <= 2.5 cm source = 1.6 cm final, 4 mm soft) + the bracelet cord. The feathers keep the concept colours; the old TeamMask (all dark flight feathers, 14-16 %) is kept byte-identical for compatibility and deprecated"
+  },
+  "edge": {"curvature_per_m": [150, 600], "smooth_px": 3, "note": "as Medusa look-dev: convexity of the baked tangent normal (div n.xy / metres per texel, final frame), smoothstep"},
+  "lut_overrides": {
+   "gold_antique": {"bc": [1.0, 0.4371, 0.1032], "note": "hero F0 = concept tone (ld_compose gold_tone). Iteration 0 = preset F0 (1.0, 0.766, 0.336): LD render gold hue 47 deg / S 0.36 / luma 132 against the concept 33 deg / 0.66 / 124 (front + back framing, preview light); suggestion iteration 1 = (1.0, 0.4371, 0.1032), Y 0.533"}
+  },
+  "uv1": {"layer_name": "UV1_m", "density_tolerance": 0.02,
+          "method": "per UV0 island: UV1 = (UV0 - centre of the island bbox) x s, s = sqrt(area3D / areaUV0) (final frame metres per UV unit); no rotation, no mirror (Medusa look-dev); centred for UE half-float UVs"},
+  "concept_zones": {
+   "note": "boxes [x0, y0, x1, y1] in concept pixels (1470 x 1070, the H3 concept framing of review_h3.py = these pixels) + an HSV filter on the concept pixel; the render side takes the pixels of the class in the same box from the ID pass",
+   "filters": {
+    "gold": {"hue": [30, 58], "s_min": 0.45, "v_min": 0.45},
+    "orange": {"hue": [15, 38], "s_min": 0.35, "v_min": 0.35, "v_max": 0.9},
+    "dark": {"v_max": 0.3},
+    "skin": {"hue": [15, 60], "s_min": 0.08, "s_max": 0.45, "v_min": 0.45},
+    "claw": {"v_max": 0.3, "s_max": 0.45}
+   },
+   "front": [
+    {"zone": "gold", "class": "gold_antique", "box": [755, 725, 815, 780], "filter": "gold"},
+    {"zone": "orange", "class": "feathers", "box": [280, 160, 560, 470], "filter": "orange"},
+    {"zone": "orange", "class": "feathers", "box": [910, 160, 1190, 470], "filter": "orange"},
+    {"zone": "dark", "class": "feathers", "box": [60, 180, 330, 560], "filter": "dark"},
+    {"zone": "dark", "class": "feathers", "box": [1140, 180, 1410, 560], "filter": "dark"},
+    {"zone": "skin", "class": "skin", "box": [680, 300, 790, 440], "filter": "skin"},
+    {"zone": "claw", "class": "horn_claw", "box": [570, 820, 900, 870], "filter": "claw"}
+   ],
+   "back": [
+    {"zone": "gold", "class": "gold_antique", "box": [625, 715, 690, 770], "filter": "gold"},
+    {"zone": "orange", "class": "feathers", "box": [280, 160, 560, 470], "filter": "orange"},
+    {"zone": "orange", "class": "feathers", "box": [910, 160, 1190, 470], "filter": "orange"},
+    {"zone": "dark", "class": "feathers", "box": [60, 180, 330, 560], "filter": "dark"},
+    {"zone": "dark", "class": "feathers", "box": [1140, 180, 1410, 560], "filter": "dark"}
+   ],
+   "reference_zones": ["orange", "dark"],
+   "reference_note": "the feather BC is unchanged from H3 (concept colours): the concept / render ratio of the feather zones measures the light and exposure difference of the two images, the gold ratio is divided by it (as steelcheck.py of Arthur H2.2 uses the base stone and the red cloth)"
+  },
+  "review": {
+   "baseline_frames": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/h3-frames",
+   "baseline_label": "H3 (harpy-h3-bake/1, M_UM_Figure v1 values in Blender)",
+   "cobble_from_source_profile": "review.h3.cobble",
+   "k2_distance_m": 3.86,
+   "label": "blender (EEVEE); M_UM_Figure_v2 approximated per texel in numpy (LUT class values, metal F0 x bake modulation, dielectric clamp, TeamAccent dye), no detail tiles; not an UE frame"
+  }
+ }
+}
