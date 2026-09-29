@@ -1,0 +1,76 @@
+{
+  "selfTest": "PASS",
+  "cases": [
+    {
+      "case": "positive",
+      "frame": "docs/game-design/evidence/ART-004/live-k2-label-probe-5x/run-20260928-063853/phase2-board-host-1920x1080.png",
+      "expected": "packaged-live",
+      "got": "packaged-live",
+      "grade": "legacy",
+      "rejected": false,
+      "pass": true
+    },
+    {
+      "case": "positive",
+      "frame": "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/ue-mcp-live/ue-mcp-cobble-d10-k2-d300-v3.png",
+      "expected": "editor-mcp-viewport",
+      "got": "editor-mcp-viewport",
+      "grade": null,
+      "rejected": false,
+      "pass": true
+    },
+    {
+      "case": "positive",
+      "frame": "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/blender-id-d10-k2-front-d300-v3.png",
+      "expected": "blender",
+      "got": "blender",
+      "grade": null,
+      "rejected": false,
+      "pass": true
+    },
+    {
+      "case": "positive-subdir-host",
+      "frame": "docs/game-design/evidence/ART-005/art-boards-t32/combat-cobble-5x6/combat-20260928-194340/host/s09-combat-result.png",
+      "expected": "packaged-live bound to the host trace",
+      "got": "packaged-live",
+      "trace": "docs/game-design/evidence/ART-005/art-boards-t32/combat-cobble-5x6/combat-20260928-194340/combat-client-host.trace.log",
+      "grade": "legacy",
+      "rejected": false,
+      "pass": true
+    },
+    {
+      "case": "positive-subdir-joiner",
+      "frame": "docs/game-design/evidence/ART-005/art-boards-t32/combat-cobble-5x6/combat-20260928-194340/joiner/s09-combat-result.png",
+      "expected": "packaged-live bound to the joiner trace",
+      "got": "packaged-live",
+      "trace": "docs/game-design/evidence/ART-005/art-boards-t32/combat-cobble-5x6/combat-20260928-194340/combat-client-joiner.trace.log",
+      "grade": "legacy",
+      "rejected": false,
+      "pass": true
+    },
+    {
+      "case": "negative-render",
+      "frame": "docs/game-design/evidence/ART-004/live-k2-label-probe-5x/run-20260928-063853/phase2-board-host-1920x1080.png",
+      "expected": "rejected under --render-reference (pre-W4 frame, no RENDER fingerprint)",
+      "got": "packaged-live",
+      "grade": "legacy",
+      "rejected": true,
+      "reasons": [
+        "W4-A render reference: no RENDER fingerprint for this SHOT"
+      ],
+      "pass": true
+    },
+    {
+      "case": "negative",
+      "frame": "<tmp>/phase2-board-host-1920x1080.png (copy of docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-28/ue-mcp-live/ue-mcp-cobble-d10-k2-d300-v3.png)",
+      "expected": "rejected, not packaged-live",
+      "got": "unclassified",
+      "grade": null,
+      "rejected": true,
+      "reasons": [
+        "frame claims packaged-live (live-*/run-*/ location or live capture name) but has no valid run manifest and traces"
+      ],
+      "pass": true
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "schema": "unmatched.t52-k3-run/1",
+  "label": "K3-trex",
+  "startedLocal": "2026-09-29T14:22:58+05:00",
+  "argv": [
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "tools/s09/run-combat-demo.ps1",
+    "-Api",
+    "http://localhost:3120/graphql",
+    "-EvidenceDir",
+    "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5",
+    "-ArtPreview",
+    "-FullHd",
+    "-ClientFps",
+    "30",
+    "-ArtPreviewBoardId",
+    "c70e9f624617750c2a2b856fd",
+    "-ArtPreviewMedusaVariant",
+    "face-neck-v2",
+    "-RunSeconds",
+    "240",
+    "-ClientRenderPreset",
+    "High",
+    "-RequireRenderReference",
+    "-ClientPerf"
+  ],
+  "credentials": "S08_DEMO_* from backend/.env injected as S09_DEMO_* into the child environment only",
+  "backend": {
+    "port": 3120,
+    "pid": 24572,
+    "process": {
+      "pid": 24572,
+      "parent": 54012,
+      "name": "node.exe",
+      "exe": "C:\\nvm4w\\nodejs\\node.exe",
+      "cmd": "\"C:\\nvm4w\\nodejs\\node.exe\" -r dotenv/config dist/src/main.js ",
+      "created": "2026-09-29T14:17:46.6988860+05:00"
+    }
+  },
+  "artBoard": {
+    "boardId": "c70e9f624617750c2a2b856fd",
+    "profile": "t-rex-paddock-art-fixture",
+    "size": "7x5",
+    "light": "paddock-probe",
+    "artFixture": true
+  },
+  "clientFps": 30,
+  "runSeconds": 240,
+  "variant": "face-neck-v2",
+  "staged": {
+    "global.ucas": "e2192c004c7cfb9b53402197a73eac34727e8ddc9e10f912f6b9a3f6793ffabd",
+    "global.utoc": "9992db340e36a8859639c46cebfb7fbc01fef8b78bd7895583d1807c6a0636ea",
+    "Unmatched-Windows.pak": "c36b9584c4fc5da6bfaf57373fcc390d3bfacc8266571700574d948b0da79dbf",
+    "Unmatched-Windows.ucas": "5f2830044ed0fcd9e78daf4a4e2b5c2df86724fe48cf585ab7055b0f1e41141f",
+    "Unmatched-Windows.utoc": "894fb56d130f79c149c3a977ab389b7ceb37d49adf07f31ed924ba7c65f0701c",
+    "Unmatched.exe(inner)": "13d80d2e1884e2a427231f3bb598a300e979410198a55923a9f367eac2a6e645"
+  },
+  "demoExit": 1,
+  "finishedLocal": "2026-09-29T14:24:57+05:00",
+  "durationS": 117.8,
+  "staging": "C:\\Users\\ren\\AppData\\Local\\Temp\\s09-combat-20260929-142302-46964",
+  "cleanupLine": "cleanup: game cmumgxtdz0031wiyk91k3ecdv already terminal (FINISHED)",
+  "roomStatus": "FINISHED",
+  "failedTracesRoomCodeRedacted": true,
+  "runDir": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5/failed-20260929-142457",
+  "clientLogs": [
+    {
+      "name": "Unmatched.log",
+      "bytes": 147091,
+      "sha256": "05760da44424e8a3900fe8d88f1789dae03775585214e7b53ea9572b029efd5d",
+      "roomCodeRedacted": false
+    },
+    {
+      "name": "Unmatched_2.log",
+      "bytes": 166422,
+      "sha256": "525518cb71939e79844c630edbeae815ea2d3381833838857c33523a3e6a8942",
+      "roomCodeRedacted": false
+    }
+  ],
+  "rawOutsideGit": [
+    {
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/t52-failed-20260929-142457/nvidia-smi-pmon.txt",
+      "sha256": "ffd3e4313d2e7f68646a8e7e53d52a0b7cf7649f682f7cd4aea9bd900ba28d9e"
+    }
+  ],
+  "crashLines": [],
+  "clientProcesses": [
+    {
+      "pid": 41192,
+      "parent": 46964,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-29T14:23:02.6073010+05:00"
+    },
+    {
+      "pid": 49104,
+      "parent": 41192,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-29T14:23:02.6181170+05:00"
+    },
+    {
+      "pid": 47040,
+      "parent": 46964,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-29T14:23:08.2629320+05:00"
+    },
+    {
+      "pid": 48528,
+      "parent": 47040,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-29T14:23:08.2748130+05:00"
+    }
+  ],
+  "failure": [
+    "+ ... nt -gt 0) { throw \"$($pair[0]) SHOT is off the render reference: $($o ...",
+    "    + CategoryInfo          : OperationStopped: (host SHOT is of...,profilesSource:String) [], RuntimeException"
+  ]
+}

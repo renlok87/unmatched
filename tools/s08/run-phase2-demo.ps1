@@ -589,6 +589,19 @@ function Invoke-Phase2Demo {
           if (-not $zoneLine -or [int]$zoneLine.Matches[0].Groups[1].Value -ne [int]$want) {
             throw "$($pair[0]) zone '$key' expected $want cells: $(if ($zoneLine) { $zoneLine.Line } else { 'no zone line' })"
           }
+          if ($ArtBoardsDoc.glyphMeshes) {
+            # T4.2 content: the zone draws with its MI (MI_ART005_Zone_*) and one glyph-mesh instance per zone cell.
+            $content = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW board zone key=' + [regex]::Escape($key) + ' cells=\d+ .* mi=(MI_ART005_Zone_\S+) glyphMesh=(SM_ART005_ZoneGlyph_\S+) glyphInstances=(\d+) fallback=0') | Select-Object -Last 1
+            if (-not $content -or [int]$content.Matches[0].Groups[3].Value -ne [int]$want) {
+              throw "$($pair[0]) zone '$key' T4.2 content (MI + $want glyph-mesh instances) missing: $(if ($zoneLine) { $zoneLine.Line } else { 'no zone line' })"
+            }
+          }
+        }
+        if ($ArtBoardsDoc.glyphMeshes) {
+          $zc = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW zone content instances=(\d+)/(\d+) glyphMeshes=(\d+)/(\d+)' | Select-Object -Last 1
+          if (-not $zc -or $zc.Matches[0].Groups[1].Value -ne $zc.Matches[0].Groups[2].Value -or $zc.Matches[0].Groups[3].Value -ne $zc.Matches[0].Groups[4].Value -or [int]$zc.Matches[0].Groups[2].Value -eq 0) {
+            throw "$($pair[0]) T4.2 zone content not fully loaded: $(if ($zc) { $zc.Line } else { 'no zone content line' })"
+          }
         }
       }
       if ($ArtBoardLegacy) {
@@ -712,7 +725,13 @@ function Invoke-Phase2Demo {
       $who = $pair[0]; $shot = $pair[1]
       if ($ArtPreviewBoardId) {
         $jsonPath = $shot -replace '\.png$', '-artcheck.json'
-        $jsonLines = & python (Join-Path $RepoRoot 'tools/art/check_art_preview_shot.py') $shot
+        # T4.2: obstacle cells of a registered board are intentional dark voids; the lit-fraction gate scales
+        # with the registered passable fraction (Cobble: no obstacles -> the original 0.75).
+        $minLit = 0.75
+        if ($ArtBoard -and $ArtBoard.expect -and [int]$ArtBoard.expect.cells -gt 0 -and [int]$ArtBoard.expect.obstacles -gt 0) {
+          $minLit = [math]::Round(0.75 * (1.0 - [double]$ArtBoard.expect.obstacles / [double]$ArtBoard.expect.cells), 4)
+        }
+        $jsonLines = & python (Join-Path $RepoRoot 'tools/art/check_art_preview_shot.py') $shot --min-board-lit ([string]::Format([Globalization.CultureInfo]::InvariantCulture, '{0}', $minLit))
       } else {
         $jsonPath = $shot -replace '\.png$', '-grid.json'
         $jsonLines = & powershell -NoProfile -ExecutionPolicy Bypass -File $checker -Path $shot

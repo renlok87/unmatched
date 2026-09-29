@@ -1,0 +1,75 @@
+{
+  "schema": "unmatched.t52-icon-guard/1",
+  "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-142830/joiner/s09-combat-resolve-revealed.png",
+  "template": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/analysis/icon-mask-template-32.png",
+  "bbox": [
+    1315,
+    412,
+    1347,
+    444
+  ],
+  "iconInPixels": {
+    "noIconFrame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-142830/joiner/s09-combat-result.png",
+    "available": true,
+    "sameView": "same viewport, camera and fighter screen points",
+    "rule": "IoU(max|ΔRGB| > 16, template), строки bbox ≥ 10 (ниже кольца атакующего) ≥ 0.6",
+    "iou": 0.9167,
+    "present": true,
+    "diffPixelsWholeBbox": 462
+  },
+  "autoOtsu": {
+    "foreground": "dark",
+    "basis": "farther from ring median luma 187.0",
+    "threshold": 147,
+    "pixels": 154,
+    "iouWithTemplate": 0.2904,
+    "pixelsOutsideTemplate": 33,
+    "valid": false,
+    "sizes": [
+      {
+        "size_px": 24,
+        "contrast_ratio": 2.674,
+        "pass": false
+      },
+      {
+        "size_px": 32,
+        "contrast_ratio": 2.692,
+        "pass": false
+      },
+      {
+        "size_px": 48,
+        "contrast_ratio": 2.662,
+        "pass": false
+      }
+    ]
+  },
+  "bboxBackground": {
+    "pixels": 497,
+    "tileLumaLowerHalf": 191.0,
+    "foreignPixels": 34,
+    "foreignShare": 0.068,
+    "foreignDarkPixels": 34,
+    "rule": "фон bbox = пиксели вне маски (+1 px); «чужие» — |luma − медиана нижней половины| > 40 (подставка фигуры сзади, кольцо)"
+  },
+  "partsVsTile": {
+    "tileLuma": 191.0,
+    "otsuInsideMask": 163,
+    "icon": {
+      "pixels": 317,
+      "lumaMedian": 178.4,
+      "wcagVsTile": 1.137
+    },
+    "blades": {
+      "pixels": 187,
+      "lumaMedian": 202.8,
+      "wcagVsTile": 1.135
+    },
+    "hilts": {
+      "pixels": 130,
+      "lumaMedian": 127.2,
+      "wcagVsTile": 2.167
+    }
+  },
+  "verdict": "valid: explicit mask, icon present in pixels",
+  "autoOtsuNote": "auto-Otsu superseded: its foreground is not the icon (IoU < 0.5)"
+}

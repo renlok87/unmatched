@@ -172,6 +172,38 @@ void AS08BoardActor::BeginPlay() {
                                        *Style.Key, *Style.Value.MaterialPath));
     }
   }
+  // T4.2 content (ART-005): zone MIs of the game-layer master (MI_ART005_Zone_<Key>, LayerColor = the data
+  // colour) and glyph meshes (SM_ART005_ZoneGlyph_<Glyph> = the S08GlyphPieces cubes merged). Soft paths from
+  // the data, cooked through DirectoriesToAlwaysCook /Game/ArtTests/ART005. A missing asset keeps the runtime
+  // tint MID / cube pieces (traced); -S08LegacyRender (pre-W4 emulation) loads none of them.
+  if (!S08LegacyRender()) {
+    int32 Wanted = 0, Loaded = 0;
+    auto LoadInstance = [&](const FString& MapKey, const FS08ZoneStyle& Style) {
+      if (Style.MaterialInstancePath.IsEmpty()) return;
+      ++Wanted;
+      if (UMaterialInterface* M = LoadObject<UMaterialInterface>(nullptr, *Style.MaterialInstancePath)) {
+        ArtZoneInstances.Add(MapKey, M);
+        ++Loaded;
+      } else {
+        FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW zone content missing key=%s mi=%s (tint fallback)"),
+                                         MapKey.IsEmpty() ? TEXT("(fallback)") : *MapKey, *Style.MaterialInstancePath));
+      }
+    };
+    for (const TPair<FString, FS08ZoneStyle>& Style : ArtData.ZoneStyles) LoadInstance(Style.Key, Style.Value);
+    LoadInstance(FString(), ArtData.FallbackStyle);
+    int32 MeshesLoaded = 0;
+    for (const TPair<FString, FString>& GlyphPath : ArtData.GlyphMeshPaths) {
+      if (UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *GlyphPath.Value)) {
+        ArtGlyphMeshes.Add(GlyphPath.Key, Mesh);
+        ++MeshesLoaded;
+      } else {
+        FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW zone content missing glyph=%s mesh=%s (cube pieces)"),
+                                         *GlyphPath.Key, *GlyphPath.Value));
+      }
+    }
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW zone content instances=%d/%d glyphMeshes=%d/%d"), Loaded,
+                                     Wanted, MeshesLoaded, ArtData.GlyphMeshPaths.Num()));
+  }
   // W4-A game layer: unlit + EyeAdaptationInverse (M_S08_GameLayerUnlit);
   // -S08LegacyRender or a missing asset keeps the pre-W4 M_S08_Solid.
   ArtSolidMaterial = S08GameLayerMaterial();
@@ -387,6 +419,12 @@ UMaterialInterface* AS08BoardActor::ZoneMaterialFor(const FS08ZoneStyle& Style, 
       return *Authored;
     }
   }
+  // T4.2: the zone MI of the data (same linear colour as the tint below, on the game-layer master).
+  if (UMaterialInterface* Instance = ZoneInstanceFor(Style)) {
+    const UMaterial* Base = Instance->GetMaterial();
+    bOutIsmUsage = Base && Base->GetUsageByFlag(MATUSAGE_InstancedStaticMeshes);
+    return Instance;
+  }
   if (TObjectPtr<UMaterialInstanceDynamic>* Cached = ArtZoneTints.Find(Style.Key)) {
     if (*Cached) return *Cached;
   }
@@ -396,6 +434,30 @@ UMaterialInterface* AS08BoardActor::ZoneMaterialFor(const FS08ZoneStyle& Style, 
   Mid->SetVectorParameterValue(TEXT("Tint"), FLinearColor(Style.Color));
   ArtZoneTints.Add(Style.Key, Mid);
   return Mid;
+}
+
+UMaterialInterface* AS08BoardActor::ZoneInstanceFor(const FS08ZoneStyle& Style) const {
+  if (S08LegacyRender()) return nullptr;
+  const TObjectPtr<UMaterialInterface>* Found = ArtZoneInstances.Find(Style.bFallback ? FString() : Style.Key);
+  return Found ? Found->Get() : nullptr;
+}
+
+UInstancedStaticMeshComponent* AS08BoardActor::ZoneGlyphMeshComponent(const FS08ZoneStyle& Style) {
+  if (S08LegacyRender()) return nullptr;
+  const TObjectPtr<UStaticMesh>* Mesh = ArtGlyphMeshes.Find(S08ZoneGlyphName(Style.Glyph));
+  if (!Mesh || !*Mesh) return nullptr;
+  if (TObjectPtr<UInstancedStaticMeshComponent>* Found = ArtZoneGlyphMeshes.Find(Style.Key)) {
+    if (*Found) return *Found;
+  }
+  UInstancedStaticMeshComponent* Component = NewObject<UInstancedStaticMeshComponent>(
+      this, FName(*(ZoneComponentName(Style.Key) + TEXT("_Glyph"))));
+  Component->SetupAttachment(RootComponent);
+  Component->SetStaticMesh(*Mesh);
+  Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  S08ApplyGameLayerPrimitive(Component);
+  Component->RegisterComponent();
+  ArtZoneGlyphMeshes.Add(Style.Key, Component);
+  return Component;
 }
 
 void AS08BoardActor::ClearArtSurface() {
@@ -670,6 +732,12 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
       Stroke.Value->SetVisibility(bArtActive);
     }
   }
+  for (TPair<FString, TObjectPtr<UInstancedStaticMeshComponent>>& Glyph : ArtZoneGlyphMeshes) {
+    if (Glyph.Value) {
+      Glyph.Value->ClearInstances();
+      Glyph.Value->SetVisibility(bArtActive);
+    }
+  }
   ApplySurfaceMaterials();
   NormalTiles->SetVisibility(!bArtActive);
   BlockerTiles->SetVisibility(!bArtActive);
@@ -728,11 +796,36 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
     }
     // Glyphs in the zone colour (default) or the ART-005 review material.
     const bool bZoneColorGlyphs = ActiveProfile.bZoneColorGlyphs || !S08LegacyRender();
+    // T4.2: a key whose glyph has a mesh gets one instance per zone slot (GlyphAnchors) instead of its cube
+    // pieces; same geometry, same MI as its strokes.
+    TMap<FString, int32> GlyphMeshInstances;
+    if (bZoneColorGlyphs) {
+      for (const FS08ZoneMarkPiece& Anchor : Marks.GlyphAnchors) {
+        const FS08ZoneStyle Style = ArtData.StyleFor(Anchor.Key);
+        if (UInstancedStaticMeshComponent* Component = ZoneGlyphMeshComponent(Style)) {
+          bool bAuthored = false, bIsm = false;
+          Component->SetMaterial(0, ZoneMaterialFor(Style, bAuthored, bIsm));
+          Component->SetVisibility(true);
+          Component->AddInstance(Anchor.Transform, true);
+          GlyphMeshInstances.FindOrAdd(Anchor.Key) += 1;
+        }
+      }
+    }
+    int32 CubeGlyphPieces = 0;
     for (const FS08ZoneMarkPiece& Piece : Marks.Glyphs) {
+      if (GlyphMeshInstances.Contains(Piece.Key)) continue;
       UInstancedStaticMeshComponent* Target = bZoneColorGlyphs
           ? ZoneStrokeComponent(ArtData.StyleFor(Piece.Key)) : ArtZoneGlyphs.Get();
-      if (Target) Target->AddInstance(Piece.Transform, true);
+      if (Target) {
+        Target->AddInstance(Piece.Transform, true);
+        ++CubeGlyphPieces;
+      }
     }
+    int32 GlyphMeshTotal = 0;
+    for (const TPair<FString, int32>& Count : GlyphMeshInstances) GlyphMeshTotal += Count.Value;
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW board glyph meshes instances=%d keys=%d/%d cubePieces=%d anchors=%d"), GlyphMeshTotal,
+        GlyphMeshInstances.Num(), Summary.ZoneKeys.Num(), CubeGlyphPieces, Marks.GlyphAnchors.Num()));
     const float HalfX = Board.Width * FS08BoardModel::CellSizeUU * 0.5f;
     const float HalfY = Board.Height * FS08BoardModel::CellSizeUU * 0.5f;
     for (const TPair<FVector, float>& Corner : {
@@ -778,13 +871,18 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
       const FS08ZoneStyle Style = ArtData.StyleFor(Key);
       bool bAuthored = false, bIsm = false;
       ZoneMaterialFor(Style, bAuthored, bIsm);
+      const UMaterialInterface* Instance = bAuthored ? nullptr : ZoneInstanceFor(Style);
+      const TObjectPtr<UInstancedStaticMeshComponent>* GlyphMesh = ArtZoneGlyphMeshes.Find(Key);
+      const UStaticMesh* GlyphAsset = GlyphMesh && *GlyphMesh ? (*GlyphMesh)->GetStaticMesh().Get() : nullptr;
       FS08Trace::Write(FString::Printf(
-          TEXT("ARTPREVIEW board zone key=%s cells=%d stroke=%s glyph=%s %s=%s ismUsage=%d strokePieces=%d glyphPieces=%d fallback=%d"),
+          TEXT("ARTPREVIEW board zone key=%s cells=%d stroke=%s glyph=%s %s=%s ismUsage=%d strokePieces=%d glyphPieces=%d mi=%s glyphMesh=%s glyphInstances=%d fallback=%d"),
           *Key, Marks.CellsByKey.FindRef(Key), S08ZoneStrokeName(Style.Stroke), S08ZoneGlyphName(Style.Glyph),
           bAuthored ? TEXT("material") : TEXT("color"),
           bAuthored ? *FPaths::GetBaseFilename(Style.MaterialPath) : *Style.ColorHex(),
-          bAuthored ? (bIsm ? 1 : 0) : 1, Marks.StrokePiecesByKey.FindRef(Key),
-          Marks.GlyphPiecesByKey.FindRef(Key), Style.bFallback ? 1 : 0));
+          bAuthored ? (bIsm ? 1 : 0) : (Instance ? (bIsm ? 1 : 0) : 1), Marks.StrokePiecesByKey.FindRef(Key),
+          Marks.GlyphPiecesByKey.FindRef(Key), Instance ? *Instance->GetName() : TEXT("-"),
+          GlyphAsset ? *GlyphAsset->GetName() : TEXT("-"), GlyphMeshInstances.FindRef(Key),
+          Style.bFallback ? 1 : 0));
     }
     FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW board multizone cells=%d zonesListed=%d zonesMarked=%d"),
                                      Marks.MultizoneCells, Marks.MultizoneZonesListed, Marks.MultizoneZonesMarked));

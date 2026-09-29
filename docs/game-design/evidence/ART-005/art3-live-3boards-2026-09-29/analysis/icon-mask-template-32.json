@@ -1,0 +1,37 @@
+{
+  "schema": "unmatched.t52-icon-template/1",
+  "status": "измерено (W5-live3, метод иконки rev 2)",
+  "template": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/analysis/icon-mask-template-32.png",
+  "templateSha256": "f857872f7b876e6aa4651b11a68ef05995264ef7473ea41901d64d0ebe0fcc16",
+  "size": [
+    32,
+    32
+  ],
+  "pixels": 317,
+  "threshold": 16,
+  "iconFrame": {
+    "path": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/joiner/s09-combat-resolve-revealed.png",
+    "sha256": "4b208545b3ea0f1fa5f318d91f86a9502618689149a73a93200ecd50f375c32a",
+    "bbox": [
+      781,
+      481,
+      813,
+      513
+    ],
+    "traceLine": 892
+  },
+  "noIconFrame": {
+    "path": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/joiner/s09-combat-result.png",
+    "sha256": "d30c8b4de93de9473eee854b83cfa8649cb8ceeb55b05738205e9713a23760a8",
+    "note": "тот же клиент и вид; трасса пишет иконку видимой, в пикселях её нет (T5.2)"
+  },
+  "sameView": "same viewport, camera and fighter screen points",
+  "trace": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/combat-client-joiner.trace.log",
+  "noiseOutsideBbox": {
+    "ringPx": 8,
+    "p50": 2.0,
+    "p90": 5.0,
+    "p99": 41.63000000000011
+  },
+  "rule": "маска = max|ΔRGB| кадра с иконкой и кадра без неё > threshold внутри SHOT icon bbox; маска bbox-размера (32x32), qa010 icon --mask принимает её на любой доске (виджет 32 px, та же текстура); совпадение с иконкой на доске проверяется в icon-k3-guard.json"
+}

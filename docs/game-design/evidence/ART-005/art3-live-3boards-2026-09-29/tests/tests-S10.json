@@ -1,0 +1,272 @@
+{
+  "schema": "unmatched.t22-ue-tests/1",
+  "label": "S10",
+  "filter": "Unmatched.S10",
+  "startedLocal": "2026-09-29T14:05:38+05:00",
+  "durationS": 15.4,
+  "exitCode": 0,
+  "log": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/tests/tests-S10.log",
+  "editorDll": {
+    "sha256": "d050472e9f25ece4c14420048d039b555a70cc78866ebc3404a1ee73995d2242"
+  },
+  "found": [
+    50
+  ],
+  "results": [
+    {
+      "result": "Success",
+      "name": "401 refreshes token pair once and retries the read",
+      "path": "Unmatched.S10.Auth.401 refreshes token pair once and retries the read"
+    },
+    {
+      "result": "Success",
+      "name": "429 surfaces once with no automatic retry or refresh",
+      "path": "Unmatched.S10.Auth.429 surfaces once with no automatic retry or refresh"
+    },
+    {
+      "result": "Success",
+      "name": "backend-shaped 200 UNAUTHENTICATED and TOO_MANY_REQUESTS classify",
+      "path": "Unmatched.S10.Auth.backend-shaped 200 UNAUTHENTICATED and TOO_MANY_REQUESTS classify"
+    },
+    {
+      "result": "Success",
+      "name": "concurrent login stale answer cannot install over the newer one",
+      "path": "Unmatched.S10.Auth.concurrent login stale answer cannot install over the newer one"
+    },
+    {
+      "result": "Success",
+      "name": "deferred refresh from the previous identity is dropped",
+      "path": "Unmatched.S10.Auth.deferred refresh from the previous identity is dropped"
+    },
+    {
+      "result": "Success",
+      "name": "expired or revoked refresh ends session visibly without retry loop",
+      "path": "Unmatched.S10.Auth.expired or revoked refresh ends session visibly without retry loop"
+    },
+    {
+      "result": "Success",
+      "name": "relogin during a live match tears down stream room and op id",
+      "path": "Unmatched.S10.Auth.relogin during a live match tears down stream room and op id"
+    },
+    {
+      "result": "Success",
+      "name": "relogin invalidates a pending myGames recovery read",
+      "path": "Unmatched.S10.Auth.relogin invalidates a pending myGames recovery read"
+    },
+    {
+      "result": "Success",
+      "name": "relogin invalidates pending room mutation callbacks",
+      "path": "Unmatched.S10.Auth.relogin invalidates pending room mutation callbacks"
+    },
+    {
+      "result": "Success",
+      "name": "stale refresh answer does not clear the newer refresh single-flight",
+      "path": "Unmatched.S10.Auth.stale refresh answer does not clear the newer refresh single-flight"
+    },
+    {
+      "result": "Success",
+      "name": "WS 4403 during a live match rotates and recreates the socket",
+      "path": "Unmatched.S10.Auth.WS 4403 during a live match rotates and recreates the socket"
+    },
+    {
+      "result": "Success",
+      "name": "WS 4408 control close reconnects without a refresh",
+      "path": "Unmatched.S10.Auth.WS 4408 control close reconnects without a refresh"
+    },
+    {
+      "result": "Success",
+      "name": "WS close reason is redacted to code and fixed description",
+      "path": "Unmatched.S10.Auth.WS close reason is redacted to code and fixed description"
+    },
+    {
+      "result": "Success",
+      "name": "401 attack path rejects explicitly and never resends",
+      "path": "Unmatched.S10.Recovery.401 attack path rejects explicitly and never resends"
+    },
+    {
+      "result": "Success",
+      "name": "401 gameplay mutation refreshes once and refetches state; no replay",
+      "path": "Unmatched.S10.Recovery.401 gameplay mutation refreshes once and refetches state; no replay"
+    },
+    {
+      "result": "Success",
+      "name": "429-answered recovery refetch stops the retry timer",
+      "path": "Unmatched.S10.Recovery.429-answered recovery refetch stops the retry timer"
+    },
+    {
+      "result": "Success",
+      "name": "absent pending metadata keeps the choice lock held",
+      "path": "Unmatched.S10.Recovery.absent pending metadata keeps the choice lock held"
+    },
+    {
+      "result": "Success",
+      "name": "acked socket with dead subscription fails the stream gate",
+      "path": "Unmatched.S10.Recovery.acked socket with dead subscription fails the stream gate"
+    },
+    {
+      "result": "Success",
+      "name": "barrier body with a contiguous move fires no cues",
+      "path": "Unmatched.S10.Recovery.barrier body with a contiguous move fires no cues"
+    },
+    {
+      "result": "Success",
+      "name": "commands are gated until the state stream is ready",
+      "path": "Unmatched.S10.Recovery.commands are gated until the state stream is ready"
+    },
+    {
+      "result": "Success",
+      "name": "gate-blocked command returns false without sending",
+      "path": "Unmatched.S10.Recovery.gate-blocked command returns false without sending"
+    },
+    {
+      "result": "Success",
+      "name": "HTTP 5xx is unknown outcome; GraphQL rejection unlocks",
+      "path": "Unmatched.S10.Recovery.HTTP 5xx is unknown outcome; GraphQL rejection unlocks"
+    },
+    {
+      "result": "Success",
+      "name": "HTTP read does not close the first-WS-frame barrier",
+      "path": "Unmatched.S10.Recovery.HTTP read does not close the first-WS-frame barrier"
+    },
+    {
+      "result": "Success",
+      "name": "lost defense response converges via live WS snapshot",
+      "path": "Unmatched.S10.Recovery.lost defense response converges via live WS snapshot"
+    },
+    {
+      "result": "Success",
+      "name": "lost discardToLimit settles by kind; partial body never settles",
+      "path": "Unmatched.S10.Recovery.lost discardToLimit settles by kind; partial body never settles"
+    },
+    {
+      "result": "Success",
+      "name": "lost mutation response locks input and refetches; no resend",
+      "path": "Unmatched.S10.Recovery.lost mutation response locks input and refetches; no resend"
+    },
+    {
+      "result": "Success",
+      "name": "malformed pendingEffects array keeps the choice lock",
+      "path": "Unmatched.S10.Recovery.malformed pendingEffects array keeps the choice lock"
+    },
+    {
+      "result": "Success",
+      "name": "malformed recovery read retries the ladder instead of hanging",
+      "path": "Unmatched.S10.Recovery.malformed recovery read retries the ladder instead of hanging"
+    },
+    {
+      "result": "Success",
+      "name": "null or errors-only next frame ends the operation",
+      "path": "Unmatched.S10.Recovery.null or errors-only next frame ends the operation"
+    },
+    {
+      "result": "Success",
+      "name": "pending auto budget counts only actual dispatches",
+      "path": "Unmatched.S10.Recovery.pending auto budget counts only actual dispatches"
+    },
+    {
+      "result": "Success",
+      "name": "pending choice lock holds through unrelated seq advances",
+      "path": "Unmatched.S10.Recovery.pending choice lock holds through unrelated seq advances"
+    },
+    {
+      "result": "Success",
+      "name": "read before subscription error keeps the gate closed",
+      "path": "Unmatched.S10.Recovery.read before subscription error keeps the gate closed"
+    },
+    {
+      "result": "Success",
+      "name": "refetch retries boundedly then surfaces visible error",
+      "path": "Unmatched.S10.Recovery.refetch retries boundedly then surfaces visible error"
+    },
+    {
+      "result": "Success",
+      "name": "S09AUTO draft transitions: blocked send, 401 reset, unknown locked",
+      "path": "Unmatched.S10.Recovery.S09AUTO draft transitions: blocked send, 401 reset, unknown locked"
+    },
+    {
+      "result": "Success",
+      "name": "stale same-seq WS snapshot keeps the recovery lock",
+      "path": "Unmatched.S10.Recovery.stale same-seq WS snapshot keeps the recovery lock"
+    },
+    {
+      "result": "Success",
+      "name": "truncated or malformed mutation reply locks recovery",
+      "path": "Unmatched.S10.Recovery.truncated or malformed mutation reply locks recovery"
+    },
+    {
+      "result": "Success",
+      "name": "wrong-type pending fields keep the choice lock held",
+      "path": "Unmatched.S10.Recovery.wrong-type pending fields keep the choice lock held"
+    },
+    {
+      "result": "Success",
+      "name": "WS ordering: barrier frame silent, then live cues, gaps muted",
+      "path": "Unmatched.S10.Recovery.WS ordering: barrier frame silent, then live cues, gaps muted"
+    },
+    {
+      "result": "Success",
+      "name": "WS seq past the arm baseline releases the lock",
+      "path": "Unmatched.S10.Recovery.WS seq past the arm baseline releases the lock"
+    },
+    {
+      "result": "Success",
+      "name": "a create superseded by a concurrent join (stale answer or none) rotates the idempotency key for the next intent",
+      "path": "Unmatched.S10.VsAiClient.a create superseded by a concurrent join (stale answer or none) rotates the idempotency key for the next intent"
+    },
+    {
+      "result": "Success",
+      "name": "abort proof stays dormant without the opt-in flag and orders screen shot -> one leave -> lobby shot -> exit",
+      "path": "Unmatched.S10.VsAiClient.abort proof stays dormant without the opt-in flag and orders screen shot -> one leave -> lobby shot -> exit"
+    },
+    {
+      "result": "Success",
+      "name": "aborted and result screens own L/Enter for the lobby return",
+      "path": "Unmatched.S10.VsAiClient.aborted and result screens own L/Enter for the lobby return"
+    },
+    {
+      "result": "Success",
+      "name": "aborted live room disables input and leaves to a clean lobby",
+      "path": "Unmatched.S10.VsAiClient.aborted live room disables input and leaves to a clean lobby"
+    },
+    {
+      "result": "Success",
+      "name": "aborted room cancels the armed WS reconnect and the mutation recovery ladder - no spurious reconnect or errors",
+      "path": "Unmatched.S10.VsAiClient.aborted room cancels the armed WS reconnect and the mutation recovery ladder - no spurious reconnect or errors"
+    },
+    {
+      "result": "Success",
+      "name": "create VS_AI installs bot-mode room from the lobby mode control",
+      "path": "Unmatched.S10.VsAiClient.create VS_AI installs bot-mode room from the lobby mode control"
+    },
+    {
+      "result": "Success",
+      "name": "finished row after applied GAME_OVER does not refetch",
+      "path": "Unmatched.S10.VsAiClient.finished row after applied GAME_OVER does not refetch"
+    },
+    {
+      "result": "Success",
+      "name": "finished row without GAME_OVER body triggers one state refetch",
+      "path": "Unmatched.S10.VsAiClient.finished row without GAME_OVER body triggers one state refetch"
+    },
+    {
+      "result": "Success",
+      "name": "late aborted poll answer for a left match cannot abort the newer room",
+      "path": "Unmatched.S10.VsAiClient.late aborted poll answer for a left match cannot abort the newer room"
+    },
+    {
+      "result": "Success",
+      "name": "lost-reply retry keeps the idempotency key; a new create intent rotates it",
+      "path": "Unmatched.S10.VsAiClient.lost-reply retry keeps the idempotency key; a new create intent rotates it"
+    },
+    {
+      "result": "Success",
+      "name": "one human seat starts VS_AI; bot seat appears and the waiting indicator follows the authoritative turn owner",
+      "path": "Unmatched.S10.VsAiClient.one human seat starts VS_AI; bot seat appears and the waiting indicator follows the authoritative turn owner"
+    }
+  ],
+  "passed": 50,
+  "failed": [],
+  "errorLines": [],
+  "startupNoiseErrorLines": 17,
+  "command": "UnrealEditor-Cmd <art uproject> -ExecCmds=\"Automation RunTests <filter>; Quit\" -unattended -nosplash -nullrhi -nullaudio (MCP auto-start off)"
+}

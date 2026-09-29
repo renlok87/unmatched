@@ -1,0 +1,105 @@
+{
+  "command": "icon",
+  "tool": "qa010-tools 1.1.0",
+  "frame": {
+    "path": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-142830/joiner/s09-combat-resolve-revealed.png",
+    "sha256": "04f55205ce179a4f65fb7a805d68d1490e560244b24764bcbe25cf98ac427f05",
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "bbox_source": "trace:shot-block@line343",
+  "trace": {
+    "trace": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-142830/combat-client-joiner.trace.log",
+    "shot": "s09-combat-resolve-revealed.png"
+  },
+  "status": "measured",
+  "result": "fail",
+  "bbox": [
+    1315,
+    412,
+    1347,
+    444
+  ],
+  "native_size_px": [
+    32,
+    32
+  ],
+  "ring_px": 8,
+  "native_fg_pixels": 154,
+  "foreground": {
+    "method": "auto-otsu",
+    "threshold": 147,
+    "foreground": "dark",
+    "basis": "farther from ring median luma 187.0"
+  },
+  "sizes": [
+    {
+      "size_px": 24,
+      "scale": 0.75,
+      "upscaled": false,
+      "fg_pixels": 79,
+      "bbox_pixels": 576,
+      "fg_fraction": 0.1372,
+      "bg_pixels": 474,
+      "bg_source": "bbox",
+      "fg_rel_luminance": 0.163969,
+      "bg_rel_luminance": 0.522147,
+      "contrast_ratio": 2.674,
+      "luma_delta": -79.19,
+      "contrast_ratio_vs_ring": 2.556,
+      "contrast_ratio_deuteranopia": 2.574,
+      "pass": false,
+      "reason": "contrast 2.67 < 3.0"
+    },
+    {
+      "size_px": 32,
+      "scale": 1.0,
+      "upscaled": false,
+      "fg_pixels": 154,
+      "bbox_pixels": 1024,
+      "fg_fraction": 0.1504,
+      "bg_pixels": 870,
+      "bg_source": "bbox",
+      "fg_rel_luminance": 0.163456,
+      "bg_rel_luminance": 0.524702,
+      "contrast_ratio": 2.692,
+      "luma_delta": -80.04,
+      "contrast_ratio_vs_ring": 2.558,
+      "contrast_ratio_deuteranopia": 2.594,
+      "pass": false,
+      "reason": "contrast 2.69 < 3.0"
+    },
+    {
+      "size_px": 48,
+      "scale": 1.5,
+      "upscaled": true,
+      "fg_pixels": 333,
+      "bbox_pixels": 2304,
+      "fg_fraction": 0.1445,
+      "bg_pixels": 1971,
+      "bg_source": "bbox",
+      "fg_rel_luminance": 0.165932,
+      "bg_rel_luminance": 0.524868,
+      "contrast_ratio": 2.662,
+      "luma_delta": -79.2,
+      "contrast_ratio_vs_ring": 2.527,
+      "contrast_ratio_deuteranopia": 2.592,
+      "pass": false,
+      "reason": "contrast 2.66 < 3.0"
+    }
+  ],
+  "params": {
+    "min_contrast_ratio": 3.0,
+    "min_contrast_status": "ПРЕДЛОЖЕНИЕ: 02 стр. 864 «иконки ≥ 3:1»; 17 стр. 1200",
+    "min_luma_delta": null,
+    "min_luma_delta_status": "не задан нормативами; информативно, если не указан",
+    "fg_coverage": 0.75,
+    "bg_coverage": 0.25,
+    "min_fg_fraction": 0.02,
+    "min_fg_fraction_status": "ПРЕДЛОЖЕНИЕ инструмента (нормы нет)",
+    "background": "bbox",
+    "sizes_status": "02 стр. 894 UI-ICON-ACTION 24/32/48; «проверка в 24 px обязательна»"
+  }
+}

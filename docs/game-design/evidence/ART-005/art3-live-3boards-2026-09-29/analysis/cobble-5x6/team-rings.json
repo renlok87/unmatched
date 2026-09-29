@@ -1,0 +1,502 @@
+{
+  "schema": "unmatched.t52-team-rings/1",
+  "status": "измерено (W5-live3, после съёмки)",
+  "method": "Кольцо команды — подставка-цилиндр цвета команды (S08FighterActor: свой (0.02,0.25,1.5) синий, чужой (0.85,0.2,0.2) красный; у арт-фигур верх диска на z=0 актора, т.е. в плоскости верха плитки). Кольцевая зона 12..26 uu × масштаб фигуры (герой 1,0, помощник 0,78) вокруг SHOT fighter world, спроецирована камерой SHOT-блока (qa010 projection). Пиксель цвета команды (CIELAB): синий — hue 240..300°, C* ≥ 15, L* ≥ 40; красный — hue 345..40°, C* ≥ 15, L* ≥ 55 (коричневая подставка Medusa L* ≈ 40 и жёлтое кольцо выбора hue 70..110° не считаются). Доля = пиксели цвета команды / пиксели кольцевой зоны. Кольцо «видно» при доле ≥ 0.05 — порог назначен ПОСЛЕ съёмки (распределение двугорбое), не зарегистрирован. Свой/чужой — по строке ARTPREVIEW medusa materials team= клиента кадра.",
+  "frames": {
+    "K1_host": {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/cobble-5x6/run-20260929-142039/phase2-board-host-1920x1080.png",
+      "trace": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/cobble-5x6/run-20260929-142039/phase2-client-host.trace.log",
+      "client": "host",
+      "ownSide": "f-0",
+      "projection": {
+        "mode": "trace",
+        "residual_max_px_used_camera": 1.342,
+        "tolerance_px": 2.0,
+        "ok": true,
+        "reason": "ok"
+      },
+      "fighters": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "cell": [
+            2,
+            2
+          ],
+          "team": "own",
+          "expected": "blue",
+          "screen": [
+            960.0,
+            476.0
+          ],
+          "annulusBBox": [
+            919,
+            444,
+            1001,
+            511
+          ],
+          "annulusPx": 3268,
+          "teamPx": 478,
+          "fraction": 0.1463,
+          "yellowRingPx": 316,
+          "visible": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "cell": [
+            3,
+            2
+          ],
+          "team": "own",
+          "expected": "blue",
+          "screen": [
+            1115.0,
+            476.0
+          ],
+          "annulusBBox": [
+            1083,
+            451,
+            1147,
+            503
+          ],
+          "annulusPx": 1996,
+          "teamPx": 628,
+          "fraction": 0.3146,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "cell": [
+            2,
+            1
+          ],
+          "team": "own",
+          "expected": "blue",
+          "screen": [
+            960.0,
+            355.0
+          ],
+          "annulusBBox": [
+            929,
+            331,
+            991,
+            380
+          ],
+          "annulusPx": 1836,
+          "teamPx": 481,
+          "fraction": 0.262,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "cell": [
+            1,
+            2
+          ],
+          "team": "own",
+          "expected": "blue",
+          "screen": [
+            805.0,
+            476.0
+          ],
+          "annulusBBox": [
+            773,
+            451,
+            837,
+            503
+          ],
+          "annulusPx": 1996,
+          "teamPx": 558,
+          "fraction": 0.2796,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "cell": [
+            2,
+            3
+          ],
+          "team": "enemy",
+          "expected": "red",
+          "screen": [
+            960.0,
+            606.0
+          ],
+          "annulusBBox": [
+            918,
+            572,
+            1002,
+            642
+          ],
+          "annulusPx": 3588,
+          "teamPx": 893,
+          "fraction": 0.2489,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "cell": [
+            3,
+            3
+          ],
+          "team": "enemy",
+          "expected": "red",
+          "screen": [
+            1120.0,
+            606.0
+          ],
+          "annulusBBox": [
+            1087,
+            579,
+            1153,
+            634
+          ],
+          "annulusPx": 2201,
+          "teamPx": 495,
+          "fraction": 0.2249,
+          "yellowRingPx": 0,
+          "visible": true
+        }
+      ]
+    },
+    "K1_joiner": {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/cobble-5x6/run-20260929-142039/phase2-board-joiner-1920x1080.png",
+      "trace": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/cobble-5x6/run-20260929-142039/phase2-client-joiner.trace.log",
+      "client": "joiner",
+      "ownSide": "f-1",
+      "projection": {
+        "mode": "trace",
+        "residual_max_px_used_camera": 1.342,
+        "tolerance_px": 2.0,
+        "ok": true,
+        "reason": "ok"
+      },
+      "fighters": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "cell": [
+            2,
+            2
+          ],
+          "team": "enemy",
+          "expected": "red",
+          "screen": [
+            960.0,
+            476.0
+          ],
+          "annulusBBox": [
+            919,
+            444,
+            1001,
+            511
+          ],
+          "annulusPx": 3268,
+          "teamPx": 792,
+          "fraction": 0.2424,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "cell": [
+            3,
+            2
+          ],
+          "team": "enemy",
+          "expected": "red",
+          "screen": [
+            1115.0,
+            476.0
+          ],
+          "annulusBBox": [
+            1083,
+            451,
+            1147,
+            503
+          ],
+          "annulusPx": 1996,
+          "teamPx": 539,
+          "fraction": 0.27,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "cell": [
+            2,
+            1
+          ],
+          "team": "enemy",
+          "expected": "red",
+          "screen": [
+            960.0,
+            355.0
+          ],
+          "annulusBBox": [
+            929,
+            331,
+            991,
+            380
+          ],
+          "annulusPx": 1836,
+          "teamPx": 400,
+          "fraction": 0.2179,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "cell": [
+            1,
+            2
+          ],
+          "team": "enemy",
+          "expected": "red",
+          "screen": [
+            805.0,
+            476.0
+          ],
+          "annulusBBox": [
+            773,
+            451,
+            837,
+            503
+          ],
+          "annulusPx": 1996,
+          "teamPx": 472,
+          "fraction": 0.2365,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "cell": [
+            2,
+            3
+          ],
+          "team": "own",
+          "expected": "blue",
+          "screen": [
+            960.0,
+            606.0
+          ],
+          "annulusBBox": [
+            918,
+            572,
+            1002,
+            642
+          ],
+          "annulusPx": 3588,
+          "teamPx": 1012,
+          "fraction": 0.2821,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "cell": [
+            3,
+            3
+          ],
+          "team": "own",
+          "expected": "blue",
+          "screen": [
+            1120.0,
+            606.0
+          ],
+          "annulusBBox": [
+            1087,
+            579,
+            1153,
+            634
+          ],
+          "annulusPx": 2201,
+          "teamPx": 585,
+          "fraction": 0.2658,
+          "yellowRingPx": 0,
+          "visible": true
+        }
+      ]
+    },
+    "K3": {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/joiner/s09-combat-resolve-revealed.png",
+      "trace": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/combat-client-joiner.trace.log",
+      "client": "joiner",
+      "ownSide": "f-1",
+      "projection": {
+        "mode": "trace",
+        "residual_max_px_used_camera": 1.342,
+        "tolerance_px": 2.0,
+        "ok": true,
+        "reason": "ok"
+      },
+      "fighters": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "cell": [
+            2,
+            3
+          ],
+          "team": "enemy",
+          "expected": "red",
+          "screen": [
+            960.0,
+            606.0
+          ],
+          "annulusBBox": [
+            918,
+            572,
+            1002,
+            642
+          ],
+          "annulusPx": 3588,
+          "teamPx": 423,
+          "fraction": 0.1179,
+          "yellowRingPx": 551,
+          "visible": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "cell": [
+            4,
+            2
+          ],
+          "team": "enemy",
+          "expected": "red",
+          "screen": [
+            1271.0,
+            476.0
+          ],
+          "annulusBBox": [
+            1239,
+            451,
+            1303,
+            503
+          ],
+          "annulusPx": 1990,
+          "teamPx": 540,
+          "fraction": 0.2714,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "cell": [
+            2,
+            1
+          ],
+          "team": "enemy",
+          "expected": "red",
+          "screen": [
+            960.0,
+            355.0
+          ],
+          "annulusBBox": [
+            929,
+            331,
+            991,
+            380
+          ],
+          "annulusPx": 1836,
+          "teamPx": 398,
+          "fraction": 0.2168,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "cell": [
+            1,
+            2
+          ],
+          "team": "enemy",
+          "expected": "red",
+          "screen": [
+            805.0,
+            476.0
+          ],
+          "annulusBBox": [
+            773,
+            451,
+            837,
+            503
+          ],
+          "annulusPx": 1996,
+          "teamPx": 362,
+          "fraction": 0.1814,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "cell": [
+            1,
+            3
+          ],
+          "team": "own",
+          "expected": "blue",
+          "screen": [
+            800.0,
+            606.0
+          ],
+          "annulusBBox": [
+            758,
+            572,
+            842,
+            642
+          ],
+          "annulusPx": 3594,
+          "teamPx": 937,
+          "fraction": 0.2607,
+          "yellowRingPx": 0,
+          "visible": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "cell": [
+            4,
+            3
+          ],
+          "team": "own",
+          "expected": "blue",
+          "screen": [
+            1280.0,
+            606.0
+          ],
+          "annulusBBox": [
+            1247,
+            579,
+            1313,
+            634
+          ],
+          "annulusPx": 2193,
+          "teamPx": 583,
+          "fraction": 0.2658,
+          "yellowRingPx": 0,
+          "visible": true
+        }
+      ]
+    }
+  }
+}

@@ -4,6 +4,8 @@
 // Cobble 5x6 legacy geometry and lights kept exact, multizone cells keeping
 // every zone, and the committed art fixtures (backend/prisma/fixtures/
 // art-boards) decoded through FS08BoardModel::Decode against their profiles.
+// T4.2: the zone MI / glyph mesh fields of the data, the glyph anchors, and
+// (ZoneContent, editor assets) the MIs and glyph meshes themselves.
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     -ExecCmds="Automation RunTests Unmatched.S08.BoardArt; Quit" -unattended -nosplash -nullrhi
 #if WITH_AUTOMATION_TESTS
@@ -15,6 +17,10 @@
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
 #include "HAL/FileManager.h"
+#include "Engine/StaticMesh.h"
+#include "Materials/Material.h"
+#include "Materials/MaterialInstance.h"
+#include "Materials/MaterialInterface.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
@@ -162,6 +168,20 @@ bool FS08BoardArtShippedTest::RunTest(const FString&) {
   }
   // A key never listed falls back visibly (drawn + traced, never dropped).
   TestTrue("unknown key -> fallback style", Data.StyleFor(TEXT("no-such-zone")).bFallback);
+  // T4.2: every zone key and the fallback have a zone MI under /Game/ArtTests/ART005/Zones, every glyph a mesh.
+  for (const TPair<FString, FS08ZoneStyle>& Style : Data.ZoneStyles) {
+    TestTrue(FString::Printf(TEXT("zone %s has a T4.2 MI: '%s'"), *Style.Key, *Style.Value.MaterialInstancePath),
+             Style.Value.MaterialInstancePath.StartsWith(TEXT("/Game/ArtTests/ART005/Zones/MI_ART005_Zone_")));
+  }
+  TestTrue(TEXT("fallback style has a T4.2 MI: ") + Data.FallbackStyle.MaterialInstancePath,
+           Data.FallbackStyle.MaterialInstancePath.StartsWith(TEXT("/Game/ArtTests/ART005/Zones/MI_ART005_Zone_")));
+  for (const ES08ZoneGlyph G : {ES08ZoneGlyph::Diamond, ES08ZoneGlyph::Bar1, ES08ZoneGlyph::Bars2, ES08ZoneGlyph::Bars3,
+                                ES08ZoneGlyph::HBars2, ES08ZoneGlyph::Square, ES08ZoneGlyph::Cross, ES08ZoneGlyph::X,
+                                ES08ZoneGlyph::Tee, ES08ZoneGlyph::Chevron, ES08ZoneGlyph::Ring}) {
+    const FString* Path = Data.GlyphMeshPaths.Find(S08ZoneGlyphName(G));
+    TestTrue(FString::Printf(TEXT("glyph %s has a T4.2 mesh"), S08ZoneGlyphName(G)),
+             Path && Path->StartsWith(TEXT("/Game/ArtTests/ART005/Zones/SM_ART005_ZoneGlyph_")));
+  }
   return true;
 }
 
@@ -206,6 +226,25 @@ bool FS08BoardArtParserTest::RunTest(const FString&) {
   Expect(TEXT("unknown glyph material"), TEXT("\"surface\":\"tiles\","), TEXT("\"surface\":\"tiles\",\"glyphs\":\"neon\","),
          TEXT("is not zone|review"));
     Expect(TEXT("wrong schema"), TEXT("s08-art-board-profiles/1"), TEXT("s08-art-board-profiles/9"), TEXT("schema"));
+  // T4.2 content fields: valid ones parse, broken ones reject the document.
+  {
+    FString Doc = MinimalDoc;
+    Doc.ReplaceInline(TEXT("\"color\":\"#102030\"}"),
+                      TEXT("\"color\":\"#102030\",\"materialInstance\":\"/Game/Z/MI_A\"}"));
+    Doc.ReplaceInline(TEXT("\"lightProfiles\":"), TEXT("\"glyphMeshes\":{\"ring\":\"/Game/Z/SM_Ring\"},\"lightProfiles\":"));
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    TestTrue(TEXT("T4.2 fields parse: ") + FString::Join(Errors, TEXT(" | ")), Data.ParseJson(Doc, Errors));
+    TestEqual("zone MI path kept", Data.StyleFor(TEXT("a")).MaterialInstancePath, FString(TEXT("/Game/Z/MI_A")));
+    TestTrue("a style without an MI keeps the tint", Data.StyleFor(TEXT("b")).MaterialInstancePath.IsEmpty());
+    TestEqual("glyph mesh path kept", Data.GlyphMeshPaths.FindRef(TEXT("ring")), FString(TEXT("/Game/Z/SM_Ring")));
+  }
+  Expect(TEXT("zone MI outside /Game"), TEXT("\"color\":\"#102030\"}"),
+         TEXT("\"color\":\"#102030\",\"materialInstance\":\"/Engine/X\"}"), TEXT("materialInstance"));
+  Expect(TEXT("glyph mesh for an unknown glyph"), TEXT("\"lightProfiles\":"),
+         TEXT("\"glyphMeshes\":{\"star\":\"/Game/Z/SM_Star\"},\"lightProfiles\":"), TEXT("unknown glyph 'star'"));
+  Expect(TEXT("glyph mesh outside /Game"), TEXT("\"lightProfiles\":"),
+         TEXT("\"glyphMeshes\":{\"ring\":\"SM_Ring\"},\"lightProfiles\":"), TEXT("glyphMeshes ring"));
   // W4-A render blocks: valid ones parse, broken ones reject the profile.
   const FString Blocks = TEXT("\"L\":{\"units\":{\"point\":\"candelas\",\"directional\":\"lux\"},")
       TEXT("\"sky\":{\"source\":\"cubemap\",\"cubemap\":\"/Game/S08/Render/TC_S08_AmbientDome\",\"intensity\":8,")
@@ -458,6 +497,209 @@ bool FS08BoardArtFixtureTest::RunTest(const FString&) {
       TestTrue(Name + TEXT(": separate warm and cool spots"), Warm >= 1 && Cool >= 1);
     }
   }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtGlyphAnchorTest,
+    "Unmatched.S08.BoardArt.GlyphAnchors one per zone slot, pieces are the slot-0 glyph moved",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtGlyphAnchorTest::RunTest(const FString&) {
+  FS08BoardArtData Data;
+  TArray<FString> Errors;
+  if (!TestTrue("shipped data", LoadShipped(Data, Errors))) return false;
+  FS08BoardModel Board = MakeBoard(3, 1);
+  Board.Cells[0].Zones = {TEXT("gray")};
+  Board.Cells[1].Zones = {TEXT("gray"), TEXT("brown"), TEXT("yellow")};
+  Board.Cells[2].Zones = {TEXT("a"), TEXT("b"), TEXT("c"), TEXT("d"), TEXT("e")};
+  const FS08ZoneMarkLayout L = S08BuildZoneMarks(Board, Data);
+  TestEqual("one anchor per zone of every cell", L.GlyphAnchors.Num(), 9);
+  for (const FS08ZoneMarkPiece& A : L.GlyphAnchors) {
+    const FVector Want = Board.CellToWorld(A.Cell.X, A.Cell.Y) + S08GlyphAnchor(A.Slot);
+    TestTrue(FString::Printf(TEXT("anchor (%d,%d) slot %d at the slot centre"), A.Cell.X, A.Cell.Y, A.Slot),
+             A.Transform.GetTranslation().Equals(Want, 1e-3) && A.Transform.GetRotation().IsIdentity(1e-6) &&
+                 A.Transform.GetScale3D().Equals(FVector::OneVector, 1e-6));
+  }
+  TestTrue("a fifth zone reuses slot 0 (i % 4)", S08GlyphAnchor(4).Equals(S08GlyphAnchor(0), 1e-6));
+  // A glyph mesh instance at the anchor draws exactly the cube pieces: slot pieces == slot-0 pieces + anchor delta.
+  for (const ES08ZoneGlyph G : {ES08ZoneGlyph::Diamond, ES08ZoneGlyph::Tee, ES08ZoneGlyph::Chevron, ES08ZoneGlyph::Ring}) {
+    TArray<FTransform> P0, P2;
+    S08GlyphPieces(G, 0, P0);
+    S08GlyphPieces(G, 2, P2);
+    const FVector Delta = S08GlyphAnchor(2) - S08GlyphAnchor(0);
+    bool bSame = P0.Num() == P2.Num();
+    for (int32 I = 0; bSame && I < P0.Num(); ++I) {
+      bSame = P2[I].GetTranslation().Equals(P0[I].GetTranslation() + Delta, 1e-3) &&
+              P2[I].GetRotation().Equals(P0[I].GetRotation(), 1e-6) &&
+              P2[I].GetScale3D().Equals(P0[I].GetScale3D(), 1e-6);
+    }
+    TestTrue(FString::Printf(TEXT("glyph %s: slot pieces are a translation of slot 0"), S08ZoneGlyphName(G)), bSame);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtZoneContentTest,
+    "Unmatched.S08.BoardArt.ZoneContent T4.2 zone MIs and glyph meshes match the data and the cube pieces",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtZoneContentTest::RunTest(const FString&) {
+  FS08BoardArtData Data;
+  TArray<FString> Errors;
+  if (!TestTrue("shipped data", LoadShipped(Data, Errors))) return false;
+  TArray<FS08ZoneStyle> Styles;
+  Data.ZoneStyles.GenerateValueArray(Styles);
+  Styles.Add(Data.FallbackStyle);
+  for (const FS08ZoneStyle& Style : Styles) {
+    const FString Name = Style.bFallback ? FString(TEXT("(fallback)")) : Style.Key;
+    UMaterialInstance* MI = LoadObject<UMaterialInstance>(nullptr, *Style.MaterialInstancePath);
+    if (!TestNotNull(Name + TEXT(": MI loads ") + Style.MaterialInstancePath, MI)) continue;
+    TestTrue(Name + TEXT(": parent is the game-layer master M_UM_GameLayer"),
+             MI->Parent && MI->Parent->GetPathName() == TEXT("/Game/UM/Materials/M_UM_GameLayer.M_UM_GameLayer"));
+    FLinearColor Got;
+    const bool bHas = MI->GetVectorParameterValue(FHashedMaterialParameterInfo(TEXT("LayerColor")), Got);
+    const FLinearColor Want(Style.Color);  // = the pre-T4.2 runtime tint (FLinearColor(FColor), memory trap 9)
+    TestTrue(FString::Printf(TEXT("%s: LayerColor %s == FLinearColor(%s) %s"), *Name, *Got.ToString(),
+                             *Style.ColorHex(), *Want.ToString()),
+             bHas && Got.Equals(Want, 1e-5f));
+    const UMaterial* Base = MI->GetMaterial();
+    TestTrue(Name + TEXT(": base material has ISM usage"), Base && Base->GetUsageByFlag(MATUSAGE_InstancedStaticMeshes));
+  }
+  for (const TPair<FString, FString>& Glyph : Data.GlyphMeshPaths) {
+    ES08ZoneGlyph G;
+    if (!TestTrue(Glyph.Key + TEXT(": glyph name"), S08ParseZoneGlyph(Glyph.Key, G))) continue;
+    UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *Glyph.Value);
+    if (!TestNotNull(Glyph.Key + TEXT(": mesh loads ") + Glyph.Value, Mesh)) continue;
+    TArray<FTransform> Pieces;
+    S08GlyphPieces(G, 0, Pieces);
+    FBox Want(ForceInit);
+    for (const FTransform& T : Pieces) {
+      for (int32 C = 0; C < 8; ++C) {
+        const FVector Corner((C & 1) ? 50.0 : -50.0, (C & 2) ? 50.0 : -50.0, (C & 4) ? 50.0 : -50.0);
+        Want += T.TransformPosition(Corner) - S08GlyphAnchor(0);
+      }
+    }
+    const FBox Got = Mesh->GetBoundingBox();
+    TestTrue(FString::Printf(TEXT("%s: mesh bounds %s == cube pieces %s"), *Glyph.Key, *Got.ToString(), *Want.ToString()),
+             Got.Min.Equals(Want.Min, 0.01) && Got.Max.Equals(Want.Max, 0.01));
+#if WITH_EDITOR
+    TestFalse(Glyph.Key + TEXT(": Nanite off"), Mesh->IsNaniteEnabled());  // editor-only API
+#endif
+  }
+  return true;
+}
+
+// Stage 3 T5.2: K3 on the art fixtures needs the S09AUTO driver to reach melee
+// range. The T3.2 attempt on T. Rex parked Medusa on (2,2) for the whole game:
+// obstacle (3,2) and her three Harpies on the other neighbours, and the old
+// driver only tried one-cell steps. PickApproachDestination (multi-step, allies
+// pass-through, terrain distance to the nearest enemy) must get her out and
+// into melee range within a few maneuvers; the start layout is the one the
+// backend placed in that run (host trace SHOT fighter lines).
+namespace {
+FS08BoardFighter ApproachFighter(const TCHAR* Id, const TCHAR* Owner, bool bHero, int32 X, int32 Y,
+                                 int32 Movement) {
+  FS08BoardFighter F;
+  F.Id = Id;
+  F.OwnerId = Owner;
+  F.Name = Id;
+  F.bIsHero = bHero;
+  F.Health = F.MaxHealth = 5;
+  F.X = X;
+  F.Y = Y;
+  F.Movement = Movement;
+  return F;
+}
+
+int32 NearestEnemyManhattan(const TArray<FS08BoardFighter>& Fighters, const FS08BoardFighter& Mover) {
+  int32 Best = MAX_int32;
+  for (const FS08BoardFighter& E : Fighters) {
+    if (E.OwnerId == Mover.OwnerId || !E.IsAlive()) continue;
+    Best = FMath::Min(Best, FMath::Abs(E.X - Mover.X) + FMath::Abs(E.Y - Mover.Y));
+  }
+  return Best;
+}
+}  // namespace
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtAutoApproachTest,
+    "Unmatched.S08.BoardArt.AutoApproach S09AUTO multi-step approach leaves a boxed-in start and reaches melee range",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtAutoApproachTest::RunTest(const FString&) {
+  // 1. T. Rex art fixture, the T3.2 attempt layout.
+  TSharedPtr<FJsonValue> State;
+  FString BoardId;
+  FS08BoardExpect Summary;
+  if (!TestTrue(TEXT("T. Rex fixture -> boardState"),
+                FixtureBoardState(FPaths::Combine(FixtureDir(), TEXT("t-rex-paddock.art-fixture.json")), State,
+                                  BoardId, Summary))) {
+    return false;
+  }
+  FS08BoardModel Board;
+  if (!TestTrue(TEXT("T. Rex decode"), Board.Decode(State))) return false;
+  TestTrue(TEXT("(3,2) is the obstacle next to Medusa"), Board.CellAt(3, 2) && !Board.CellAt(3, 2)->IsPassable());
+  TArray<FS08BoardFighter> Fighters = {
+      ApproachFighter(TEXT("f-0-hero"), TEXT("A"), true, 2, 2, 3),
+      ApproachFighter(TEXT("f-0-sk0"), TEXT("A"), false, 2, 3, 3),
+      ApproachFighter(TEXT("f-0-sk1"), TEXT("A"), false, 2, 1, 3),
+      ApproachFighter(TEXT("f-0-sk2"), TEXT("A"), false, 1, 2, 3),
+      ApproachFighter(TEXT("f-1-hero"), TEXT("B"), true, 4, 2, 3),
+      ApproachFighter(TEXT("f-1-sk0"), TEXT("B"), false, 5, 2, 3)};
+  // The old one-cell driver's dead end: no orthogonal neighbour is a legal endpoint.
+  const TSet<uint64> Reach1 = FS08BoardModel::ComputeReachableCells(Board, Fighters, TEXT("f-0-hero"), 1);
+  TestEqual(TEXT("one-step reach = own cell only (old greedy dead end)"), Reach1.Num(), 1);
+  int32 Maneuvers = 0;
+  int32 LastDist = MAX_int32;
+  for (; Maneuvers < 4; ++Maneuvers) {
+    FS08BoardFighter& Hero = Fighters[0];
+    if (NearestEnemyManhattan(Fighters, Hero) == 1) break;
+    FIntPoint Dest;
+    int32 From = 0, To = 0, Steps = 0;
+    if (!TestTrue(FString::Printf(TEXT("maneuver %d picks an improving destination"), Maneuvers + 1),
+                  FS08BoardModel::PickApproachDestination(Board, Fighters, Hero.Id, Hero.Movement, Dest, From,
+                                                          To, Steps))) {
+      return false;
+    }
+    TestTrue(TEXT("strictly closer"), To < From);
+    TestTrue(TEXT("never farther than the previous maneuver"), From <= LastDist);
+    TestTrue(TEXT("within movement"), Steps >= 1 && Steps <= Hero.Movement);
+    TestTrue(TEXT("a legal endpoint (the draft's SetDestination rule)"),
+             FS08BoardModel::ComputeReachableCells(Board, Fighters, Hero.Id, Hero.Movement)
+                 .Contains(FS08BoardModel::CellKey(Dest.X, Dest.Y)));
+    TArray<FIntPoint> Path;
+    TestTrue(TEXT("a legal route exists"),
+             FS08BoardModel::BuildManeuverPath(Board, Fighters, Hero.Id, Hero.Movement, Dest.X, Dest.Y, Path) &&
+                 Path.Num() == Steps);
+    LastDist = To;
+    Hero.X = Dest.X;
+    Hero.Y = Dest.Y;
+  }
+  TestEqual(TEXT("Medusa reaches melee range of an enemy (static enemies)"),
+            NearestEnemyManhattan(Fighters, Fighters[0]), 1);
+  TestTrue(TEXT("within 3 maneuvers"), Maneuvers <= 3);
+  {
+    FIntPoint Dest;
+    int32 From = 0, To = 0, Steps = 0;
+    TestFalse(TEXT("already adjacent: no improving step, the hero stays"),
+              FS08BoardModel::PickApproachDestination(Board, Fighters, TEXT("f-0-hero"), 3, Dest, From, To, Steps));
+    TestEqual(TEXT("adjacent = terrain distance 1"), From, 1);
+  }
+
+  // 2. Open 5x6 board: deterministic tie-break (lower steps, then Y, then X).
+  FS08BoardModel Open = MakeBoard(5, 6);
+  TArray<FS08BoardFighter> Duel = {ApproachFighter(TEXT("h"), TEXT("A"), true, 0, 0, 2),
+                                   ApproachFighter(TEXT("e"), TEXT("B"), true, 4, 5, 2)};
+  FIntPoint Dest;
+  int32 From = 0, To = 0, Steps = 0;
+  TestTrue(TEXT("open board picks"),
+           FS08BoardModel::PickApproachDestination(Open, Duel, TEXT("h"), 2, Dest, From, To, Steps));
+  TestEqual(TEXT("open board: from 9"), From, 9);
+  TestEqual(TEXT("open board: to 7"), To, 7);
+  TestEqual(TEXT("open board: two steps"), Steps, 2);
+  TestTrue(FString::Printf(TEXT("open board: (2,0), (1,1), (0,2) tie at 7 in 2 steps -> lowest Y = (2,0), got (%d,%d)"), Dest.X, Dest.Y),
+           Dest == FIntPoint(2, 0));
+
+  // 3. No enemy reachable through terrain (wall column) -> false.
+  FS08BoardModel Walled = MakeBoard(5, 6);
+  for (int32 Y = 0; Y < 6; ++Y) Walled.Cells[Y * 5 + 2].Type = ES08CellType::Wall;
+  TestFalse(TEXT("walled off: nothing improves"),
+            FS08BoardModel::PickApproachDestination(Walled, Duel, TEXT("h"), 2, Dest, From, To, Steps));
   return true;
 }
 

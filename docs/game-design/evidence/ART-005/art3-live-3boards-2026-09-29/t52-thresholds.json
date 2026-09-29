@@ -1,0 +1,51 @@
+{
+  "schema": "unmatched.t52-thresholds/1",
+  "status": "ПРЕДЛОЖЕНО (T5.2). Зарегистрировано ДО съёмки (правило E1-E3 этапа 3): ни одно число ниже не подбиралось по кадрам T5.2. Нормативных числовых порогов читаемости нет (17 AD-OPEN-18); где норматив есть, он назван в source. Менять только новой записью revisions[] до прогонов, к которым она применяется.",
+  "registeredLocal": "2026-09-29T14:12:00+05:00",
+  "registeredBy": "T5.2 art3-live-3boards (агент, самоприёмка)",
+  "frames": {
+    "K1": "phase2-board-{host,joiner}-1920x1080.png пары run-phase2-demo (-ArtPreviewBoardId, без зума; хост выделяет свою Medusa флагом, присоединившийся — чистый K1)",
+    "K3": "joiner/s09-combat-*.png пары run-combat-demo без зума (Given QA-010: стартовая камера); основной K3 — кадр, в SHOT-блоке которого есть 'SHOT icon' (цель боя), число урона — кадр joiner/s09-damage-number.png",
+    "provenance": "только packaged-live strict + render-reference (classify_evidence.py --strict --render-reference) — иначе строка «не годится для приёмки»"
+  },
+  "qa010": {
+    "file": "tools/art/qa010/thresholds.proposed.json",
+    "note": "С-9, плашка, иконка, проекция — пороги инструментов QA-010 без изменений (ΔEV > 0 — НОРМАТИВ; +0,3..+0,7 EV и ΔC*ab > 0 — ПРЕДЛОЖЕНИЕ; плашка 0 перекрытий; иконка ≥ 3:1 на 24/32/48)"
+  },
+  "c9": {
+    "game": ["board=trace-cells:all", "passable=trace-cells:<проходимые клетки фикстуры>"],
+    "decor": "tray_proxy=trace-ring:0.05,0.35 (рамка/поднос L4 — ПРОКСИ; декора L3 в кадре нет) — результат «proxy», не норматив",
+    "exclude": ["hud_tl=bbox:0,0,610,140", "hud_tr=bbox:1425,0,1920,120", "hud_hand=bbox:330,975,1590,1080"]
+  },
+  "zoneMarks": {
+    "method": "пиксели меток зоны = пиксели в проекции клеток этой зоны (квад клетки, трасса SHOT, qa010 projection), чей цвет в CIELAB ближе ΔE76 ≤ markDeltaE к цвету зоны из S08ArtBoardProfiles.json (игровой слой unlit + EyeAdaptationInverse рисует байты профиля, T4.2 §2). Фон = остальные пиксели тех же клеток. Контраст — WCAG 2.x по медианам (относительная яркость в линейном свете) и ΔY′ Rec.709; варианты: цвет, серый (qa010 derive), deuteranopia (Machado 2009, qa010 derive)",
+    "markDeltaE": 12.0,
+    "minMarkPixelsPerZoneCell": 20,
+    "markVsTileMinContrast": 3.0,
+    "markVsTileSource": "по аналогии с 02 стр. 864 (≥ 3:1 для иконок, ПРЕДЛОЖЕНИЕ); для штрихов/глифов зон нормы нет"
+  },
+  "zoneBoundaries": {
+    "method": "пара зон (za, zb) — граница, если есть две ортогонально соседние проходимые клетки, у одной из которых есть za и нет zb, а у другой — наоборот. Для пары: ΔE76 медианных цветов меток (цвет, deuteranopia), |ΔY′| (серый), различие формы (штрих или глиф из профиля)",
+    "colorMinDeltaE76": 20.0,
+    "deutMinDeltaE76": 15.0,
+    "grayMinDeltaY": 20.0,
+    "verdict": "pass — форма различается (штрих или глиф) И метки обеих зон читаются на фоне (markVsTileMinContrast) в проверяемом варианте; «только формой» — pass по форме при ΔE/ΔY′ ниже порога (10 QA-010: цвет не единственный признак); fail — форма совпадает и цветового/яркостного отличия нет, ИЛИ метка одной из зон не читается на фоне",
+    "source": "10 QA-010 стр. 132 «зоны (цвет+глиф+буква, симуляция deuteranopia)» — НОРМАТИВ как условие; числа — ПРЕДЛОЖЕНИЕ T5.2 (ΔE76 ≈ 2,3 — порог JND; 20 — «явно разные цвета» UI; 15 — ослабленный для симуляции; ΔY′ 20/255 ≈ 8 %)"
+  },
+  "lumaSections": {
+    "method": "Rec.709 luma p50/p90 (qa010 luma_stats) по проекции клеток: (а) каждой световой секции профиля (клетки, чей центр в пределах половины радиуса не-fill point-света — правило art_board_fixtures.light_sections_vs_zones), (б) каждой зоны, (в) всей доски, (г) проходимых клеток. Серый/deuteranopia — те же маски",
+    "threshold": "нет (Q-303 открыт) — только запись"
+  },
+  "medusaMi": {
+    "rule": "строки 'ARTPREVIEW medusa materials ... miSha256=' у своей и чужой Medusa совпадают (по команде) во ВСЕХ прогонах K1/K3 всех трёх досок; sha256 исходных .uasset MI_Medusa_Blue/Red в арт-worktree и в куке одинаковы для всех прогонов (один пак)",
+    "threshold": "точное равенство"
+  },
+  "k3": {
+    "gate": "tools/s09/run-combat-demo.ps1 -RequireRenderReference (все SHOT обоих клиентов на эталоне) + check_art003_combat_evidence-эквивалент: CUE damage = ARTPREVIEW damage-number ровно по одному, иконка цели привязана и снята, первый COMBAT-RESULT совпадает с CUE, seq сходится",
+    "runSeconds": 240
+  },
+  "perf": {
+    "status": "загрязнено фоном H2 (headless Blender/Cycles параллельной линии героев) — не для ACC-022; записывается, не оценивается"
+  },
+  "revisions": []
+}

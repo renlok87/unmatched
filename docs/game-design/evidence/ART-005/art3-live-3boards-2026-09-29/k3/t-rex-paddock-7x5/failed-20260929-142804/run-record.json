@@ -1,0 +1,123 @@
+{
+  "schema": "unmatched.t52-k3-run/1",
+  "label": "K3-trex",
+  "startedLocal": "2026-09-29T14:26:24+05:00",
+  "argv": [
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "tools/s09/run-combat-demo.ps1",
+    "-Api",
+    "http://localhost:3120/graphql",
+    "-EvidenceDir",
+    "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5",
+    "-ArtPreview",
+    "-FullHd",
+    "-ClientFps",
+    "30",
+    "-ArtPreviewBoardId",
+    "c70e9f624617750c2a2b856fd",
+    "-ArtPreviewMedusaVariant",
+    "face-neck-v2",
+    "-RunSeconds",
+    "240",
+    "-ClientRenderPreset",
+    "High",
+    "-RequireRenderReference",
+    "-ClientPerf"
+  ],
+  "credentials": "S08_DEMO_* from backend/.env injected as S09_DEMO_* into the child environment only",
+  "backend": {
+    "port": 3120,
+    "pid": 24572,
+    "process": {
+      "pid": 24572,
+      "parent": 54012,
+      "name": "node.exe",
+      "exe": "C:\\nvm4w\\nodejs\\node.exe",
+      "cmd": "\"C:\\nvm4w\\nodejs\\node.exe\" -r dotenv/config dist/src/main.js ",
+      "created": "2026-09-29T14:17:46.6988860+05:00"
+    }
+  },
+  "artBoard": {
+    "boardId": "c70e9f624617750c2a2b856fd",
+    "profile": "t-rex-paddock-art-fixture",
+    "size": "7x5",
+    "light": "paddock-probe",
+    "artFixture": true
+  },
+  "clientFps": 30,
+  "runSeconds": 240,
+  "variant": "face-neck-v2",
+  "staged": {
+    "global.ucas": "e2192c004c7cfb9b53402197a73eac34727e8ddc9e10f912f6b9a3f6793ffabd",
+    "global.utoc": "9992db340e36a8859639c46cebfb7fbc01fef8b78bd7895583d1807c6a0636ea",
+    "Unmatched-Windows.pak": "c36b9584c4fc5da6bfaf57373fcc390d3bfacc8266571700574d948b0da79dbf",
+    "Unmatched-Windows.ucas": "5f2830044ed0fcd9e78daf4a4e2b5c2df86724fe48cf585ab7055b0f1e41141f",
+    "Unmatched-Windows.utoc": "894fb56d130f79c149c3a977ab389b7ceb37d49adf07f31ed924ba7c65f0701c",
+    "Unmatched.exe(inner)": "13d80d2e1884e2a427231f3bb598a300e979410198a55923a9f367eac2a6e645"
+  },
+  "demoExit": 1,
+  "finishedLocal": "2026-09-29T14:28:04+05:00",
+  "durationS": 99.0,
+  "staging": "C:\\Users\\ren\\AppData\\Local\\Temp\\s09-combat-20260929-142628-16608",
+  "cleanupLine": "cleanup: game cmumh283800b9wiyk9upvt5qp already terminal (FINISHED)",
+  "roomStatus": "FINISHED",
+  "failedTracesRoomCodeRedacted": true,
+  "runDir": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/t-rex-paddock-7x5/failed-20260929-142804",
+  "clientLogs": [
+    {
+      "name": "Unmatched.log",
+      "bytes": 143787,
+      "sha256": "d1bf956f3f181d1215c517ae2ee92fab9ea2290f247a8bedd091428198847b03",
+      "roomCodeRedacted": false
+    },
+    {
+      "name": "Unmatched_2.log",
+      "bytes": 160727,
+      "sha256": "d3a93579526fe5fc9c9e56bf9d2b00e66bf7910cc35cffdbea7eca27100f11ea",
+      "roomCodeRedacted": false
+    }
+  ],
+  "rawOutsideGit": [
+    {
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/t52-failed-20260929-142804/nvidia-smi-pmon.txt",
+      "sha256": "2b13c91219f1d085568bae6d374aa1f0492e858641b31d4011909a181417e85c"
+    }
+  ],
+  "crashLines": [],
+  "clientProcesses": [
+    {
+      "pid": 46076,
+      "parent": 16608,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-29T14:26:28.2788790+05:00"
+    },
+    {
+      "pid": 43816,
+      "parent": 46076,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-29T14:26:28.2872720+05:00"
+    },
+    {
+      "pid": 32924,
+      "parent": 16608,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-29T14:26:33.9291100+05:00"
+    },
+    {
+      "pid": 47480,
+      "parent": 32924,
+      "exe": "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-29T14:26:33.9404880+05:00"
+    }
+  ],
+  "failure": [
+    "host perf trace missing 'PERF summary scope=started'",
+    "+ ... not $text.Contains($needle)) { throw \"$Who trace missing '$needle'\" }",
+    "    + CategoryInfo          : OperationStopped: (host perf trace... scope=started':String) [], RuntimeException",
+    "    + FullyQualifiedErrorId : host perf trace missing 'PERF summary scope=started'"
+  ]
+}

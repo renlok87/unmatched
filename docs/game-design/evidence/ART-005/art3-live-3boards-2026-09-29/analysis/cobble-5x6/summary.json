@@ -1,0 +1,789 @@
+{
+  "schema": "unmatched.t52-analysis/1",
+  "board": "cobble-5x6",
+  "boardId": "cmuhgs4b2001mwik4f2b2xtf8",
+  "profile": "cobble-city",
+  "light": "cobble-probe",
+  "status": "измерено (не приёмка)",
+  "thresholds": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/t52-thresholds.json",
+  "frames": {
+    "K1_host": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/cobble-5x6/run-20260929-142039/phase2-board-host-1920x1080.png",
+    "K1_joiner": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/cobble-5x6/run-20260929-142039/phase2-board-joiner-1920x1080.png",
+    "K3": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/joiner/s09-combat-resolve-revealed.png",
+    "K3_damage": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/joiner/s09-damage-number.png"
+  },
+  "k3Choice": {
+    "rule": "первый опубликованный кадр присоединившегося из s09-combat-resolve-revealed.png, s09-combat-resolve-window.png, s09-combat-defense-open.png, s09-damage-number.png, в SHOT-блоке которого есть 'SHOT icon'. s09-combat-result.png исключён: трасса пишет иконку видимой, а в пикселях её нет (устаревшая трасса после закрытия боя, T5.2)",
+    "excluded": [
+      "s09-combat-result.png"
+    ],
+    "withIconAndDamage": [],
+    "withIcon": [
+      "s09-combat-resolve-revealed.png",
+      "s09-combat-resolve-window.png",
+      "s09-combat-defense-open.png"
+    ]
+  },
+  "derive": {
+    "exit": 0,
+    "entries": 4,
+    "outputsOutsideGit": "C:\\tmp\\t52\\derived\\cobble-5x6"
+  },
+  "contactSheet": {
+    "path": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/analysis/cobble-5x6/contact-k1-k3-color-gray-deuteranopia.jpg",
+    "layout": "rows: K1 joiner, K3; columns: colour, gray, deuteranopia; 640x360 tiles (downscaled, LANCZOS); full-size derivatives outside git"
+  },
+  "render": {
+    "phase2-board-host-1920x1080.png": {
+      "exit": 0,
+      "reference": true
+    },
+    "phase2-board-joiner-1920x1080.png": {
+      "exit": 0,
+      "reference": true
+    },
+    "K3:s09-combat-resolve-revealed.png": {
+      "exit": 0,
+      "reference": true
+    }
+  },
+  "c9": {
+    "k1-host/all": {
+      "exit": 3,
+      "status": "measured",
+      "result_normative": "proxy",
+      "result_on_proxy": {
+        "normative": "pass",
+        "proposed": "fail",
+        "note": "измерено на прокси-маске, не норматив"
+      },
+      "dEV": 0.6052,
+      "dChroma": -0.116
+    },
+    "k1-host/passable": {
+      "exit": 3,
+      "status": "measured",
+      "result_normative": "proxy",
+      "result_on_proxy": {
+        "normative": "pass",
+        "proposed": "fail",
+        "note": "измерено на прокси-маске, не норматив"
+      },
+      "dEV": 0.6052,
+      "dChroma": -0.116
+    },
+    "k1-joiner/all": {
+      "exit": 3,
+      "status": "measured",
+      "result_normative": "proxy",
+      "result_on_proxy": {
+        "normative": "pass",
+        "proposed": "fail",
+        "note": "измерено на прокси-маске, не норматив"
+      },
+      "dEV": 0.62,
+      "dChroma": -0.648
+    },
+    "k1-joiner/passable": {
+      "exit": 3,
+      "status": "measured",
+      "result_normative": "proxy",
+      "result_on_proxy": {
+        "normative": "pass",
+        "proposed": "fail",
+        "note": "измерено на прокси-маске, не норматив"
+      },
+      "dEV": 0.62,
+      "dChroma": -0.648
+    },
+    "k3/all": {
+      "exit": 3,
+      "status": "measured",
+      "result_normative": "proxy",
+      "result_on_proxy": {
+        "normative": "pass",
+        "proposed": "fail",
+        "note": "измерено на прокси-маске, не норматив"
+      },
+      "dEV": 0.6747,
+      "dChroma": -1.472
+    },
+    "k3/passable": {
+      "exit": 3,
+      "status": "measured",
+      "result_normative": "proxy",
+      "result_on_proxy": {
+        "normative": "pass",
+        "proposed": "fail",
+        "note": "измерено на прокси-маске, не норматив"
+      },
+      "dEV": 0.6747,
+      "dChroma": -1.472
+    }
+  },
+  "icon": {
+    "method": "rev 2 (W5-live3): qa010 icon --mask docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/analysis/icon-mask-template-32.png",
+    "exit": 1,
+    "result": "fail",
+    "bboxSource": "trace:shot-block@line892",
+    "sizes": [
+      {
+        "size_px": 24,
+        "contrast_ratio": 2.467,
+        "contrast_ratio_vs_ring": 2.219,
+        "upscaled": false,
+        "pass": false
+      },
+      {
+        "size_px": 32,
+        "contrast_ratio": 2.297,
+        "contrast_ratio_vs_ring": 2.062,
+        "upscaled": false,
+        "pass": false
+      },
+      {
+        "size_px": 48,
+        "contrast_ratio": 2.283,
+        "contrast_ratio_vs_ring": 2.061,
+        "upscaled": true,
+        "pass": false
+      }
+    ],
+    "guard": {
+      "verdict": "valid: explicit mask, icon present in pixels",
+      "iconInPixels": {
+        "noIconFrame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/joiner/s09-combat-result.png",
+        "available": true,
+        "sameView": "same viewport, camera and fighter screen points",
+        "rule": "IoU(max|ΔRGB| > 16, template), строки bbox ≥ 10 (ниже кольца атакующего) ≥ 0.6",
+        "iou": 1.0,
+        "present": true,
+        "diffPixelsWholeBbox": 317
+      },
+      "autoOtsu": {
+        "foreground": "bright",
+        "basis": "farther from ring median luma 120.0",
+        "threshold": 146,
+        "pixels": 286,
+        "iouWithTemplate": 0.453,
+        "pixelsOutsideTemplate": 53,
+        "valid": false,
+        "sizes": [
+          {
+            "size_px": 24,
+            "contrast_ratio": 2.787,
+            "pass": false
+          },
+          {
+            "size_px": 32,
+            "contrast_ratio": 2.746,
+            "pass": false
+          },
+          {
+            "size_px": 48,
+            "contrast_ratio": 2.761,
+            "pass": false
+          }
+        ]
+      },
+      "bboxBackground": {
+        "pixels": 497,
+        "tileLumaLowerHalf": 110.1,
+        "foreignPixels": 53,
+        "foreignShare": 0.107,
+        "foreignDarkPixels": 5,
+        "rule": "фон bbox = пиксели вне маски (+1 px); «чужие» — |luma − медиана нижней половины| > 40 (подставка фигуры сзади, кольцо)"
+      },
+      "partsVsTile": {
+        "tileLuma": 110.1,
+        "otsuInsideMask": 153,
+        "icon": {
+          "pixels": 317,
+          "lumaMedian": 176.9,
+          "wcagVsTile": 2.383
+        },
+        "blades": {
+          "pixels": 179,
+          "lumaMedian": 204.7,
+          "wcagVsTile": 3.199
+        },
+        "hilts": {
+          "pixels": 138,
+          "lumaMedian": 105.2,
+          "wcagVsTile": 1.073
+        }
+      }
+    },
+    "supersededAutoOtsu": {
+      "file": "icon-k3-auto-otsu.json",
+      "exit": 1,
+      "foreground": "bright",
+      "sizes": [
+        {
+          "size_px": 24,
+          "contrast_ratio": 2.787,
+          "contrast_ratio_vs_ring": 2.419,
+          "upscaled": false,
+          "pass": false
+        },
+        {
+          "size_px": 32,
+          "contrast_ratio": 2.746,
+          "contrast_ratio_vs_ring": 2.384,
+          "upscaled": false,
+          "pass": false
+        },
+        {
+          "size_px": 48,
+          "contrast_ratio": 2.761,
+          "contrast_ratio_vs_ring": 2.402,
+          "upscaled": true,
+          "pass": false
+        }
+      ]
+    }
+  },
+  "plate": {
+    "exit": 0,
+    "status": "measured",
+    "result": "pass",
+    "checkedCells": 13,
+    "violations": 0,
+    "reason": null
+  },
+  "zoneMarks": {
+    "blue": {
+      "visible": false,
+      "perCellMedian": 0.0,
+      "color": 1.442,
+      "gray": 1.6,
+      "deuteranopia": 1.537
+    },
+    "red": {
+      "visible": true,
+      "perCellMedian": 1215.0,
+      "color": 1.289,
+      "gray": 1.754,
+      "deuteranopia": 1.107
+    }
+  },
+  "boundaries": [
+    {
+      "pair": "blue/red",
+      "edges": 5,
+      "shapeDiffers": true,
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    }
+  ],
+  "zoneMarksDiagDE25": {
+    "blue": {
+      "visible": true,
+      "perCellMedian": 1284.0,
+      "color": 1.24,
+      "gray": 1.385,
+      "deuteranopia": 1.328
+    },
+    "red": {
+      "visible": true,
+      "perCellMedian": 1374.0,
+      "color": 1.296,
+      "gray": 1.727,
+      "deuteranopia": 1.107
+    }
+  },
+  "boundariesDiagDE25": [
+    {
+      "pair": "blue/red",
+      "color": "fail",
+      "gray": "fail",
+      "deuteranopia": "fail"
+    }
+  ],
+  "multizone": {
+    "multizoneCells": 0,
+    "unreadableZones": [
+      "blue"
+    ],
+    "cellsWithUnreadableZone": [],
+    "grayVanishingZones(<1.2:1 in gray)": [],
+    "cellsLosingAZoneInGray": [],
+    "rule": "зона нечитаема в цвете, если её метку нельзя отделить от плитки по цвету (zone-contrast.json: visible=false — цвет = плитка или метки не найдены); zonesListed = zonesMarked трассы — доказательство геометрии, не читаемости"
+  },
+  "rings": {
+    "K1_host": [
+      {
+        "fighter": "f-0-hero",
+        "name": "Medusa",
+        "cell": [
+          2,
+          2
+        ],
+        "team": "own",
+        "fraction": 0.1463,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "cell": [
+          3,
+          2
+        ],
+        "team": "own",
+        "fraction": 0.3146,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "cell": [
+          2,
+          1
+        ],
+        "team": "own",
+        "fraction": 0.262,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "cell": [
+          1,
+          2
+        ],
+        "team": "own",
+        "fraction": 0.2796,
+        "visible": true
+      },
+      {
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "cell": [
+          2,
+          3
+        ],
+        "team": "enemy",
+        "fraction": 0.2489,
+        "visible": true
+      },
+      {
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "cell": [
+          3,
+          3
+        ],
+        "team": "enemy",
+        "fraction": 0.2249,
+        "visible": true
+      }
+    ],
+    "K1_joiner": [
+      {
+        "fighter": "f-0-hero",
+        "name": "Medusa",
+        "cell": [
+          2,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.2424,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "cell": [
+          3,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.27,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "cell": [
+          2,
+          1
+        ],
+        "team": "enemy",
+        "fraction": 0.2179,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "cell": [
+          1,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.2365,
+        "visible": true
+      },
+      {
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "cell": [
+          2,
+          3
+        ],
+        "team": "own",
+        "fraction": 0.2821,
+        "visible": true
+      },
+      {
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "cell": [
+          3,
+          3
+        ],
+        "team": "own",
+        "fraction": 0.2658,
+        "visible": true
+      }
+    ],
+    "K3": [
+      {
+        "fighter": "f-0-hero",
+        "name": "Medusa",
+        "cell": [
+          2,
+          3
+        ],
+        "team": "enemy",
+        "fraction": 0.1179,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "cell": [
+          4,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.2714,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "cell": [
+          2,
+          1
+        ],
+        "team": "enemy",
+        "fraction": 0.2168,
+        "visible": true
+      },
+      {
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "cell": [
+          1,
+          2
+        ],
+        "team": "enemy",
+        "fraction": 0.1814,
+        "visible": true
+      },
+      {
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "cell": [
+          1,
+          3
+        ],
+        "team": "own",
+        "fraction": 0.2607,
+        "visible": true
+      },
+      {
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "cell": [
+          4,
+          3
+        ],
+        "team": "own",
+        "fraction": 0.2658,
+        "visible": true
+      }
+    ]
+  },
+  "labels": {
+    "K1_host": [
+      {
+        "kind": "label",
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "verdict": "fail",
+        "crHp": null,
+        "crName": null,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "verdict": "AA-large only",
+        "crHp": null,
+        "crName": null,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "verdict": "fail",
+        "crHp": null,
+        "crName": null,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "verdict": "AA-large only",
+        "crHp": null,
+        "crName": null,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "verdict": "AA-large only",
+        "crHp": null,
+        "crName": null,
+        "tileEdgeCrosses": false
+      }
+    ],
+    "K1_joiner": [
+      {
+        "kind": "label",
+        "fighter": "f-0-hero",
+        "name": "Medusa",
+        "verdict": "AA-large only",
+        "crHp": 3.296,
+        "crName": 3.182,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "verdict": "fail",
+        "crHp": 3.313,
+        "crName": 2.775,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "verdict": "fail",
+        "crHp": 3.212,
+        "crName": 2.936,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "verdict": "fail",
+        "crHp": 3.214,
+        "crName": 2.934,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "verdict": "AA-large only",
+        "crHp": 3.13,
+        "crName": 3.593,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "verdict": "AA-large only",
+        "crHp": 3.645,
+        "crName": 3.277,
+        "tileEdgeCrosses": false
+      }
+    ],
+    "K3": [
+      {
+        "kind": "label",
+        "fighter": "f-0-hero",
+        "name": "Medusa",
+        "verdict": "AA-large only",
+        "crHp": 3.222,
+        "crName": 3.018,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "verdict": "fail",
+        "crHp": 2.943,
+        "crName": 2.682,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "verdict": "fail",
+        "crHp": 3.223,
+        "crName": 2.92,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "verdict": "AA-large only",
+        "crHp": 3.218,
+        "crName": 3.003,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "verdict": "AA-large only",
+        "crHp": 3.192,
+        "crName": 3.263,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "verdict": "AA-large only",
+        "crHp": 3.339,
+        "crName": 3.302,
+        "tileEdgeCrosses": false
+      }
+    ],
+    "K3_damage": [
+      {
+        "kind": "label",
+        "fighter": "f-0-hero",
+        "name": "Medusa",
+        "verdict": "AA-large only",
+        "crHp": 3.258,
+        "crName": 3.051,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk0",
+        "name": "Harpies 1",
+        "verdict": "fail",
+        "crHp": 2.916,
+        "crName": 2.658,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk1",
+        "name": "Harpies 2",
+        "verdict": "fail",
+        "crHp": 3.202,
+        "crName": 2.916,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-0-sk2",
+        "name": "Harpies 3",
+        "verdict": "fail",
+        "crHp": 3.193,
+        "crName": 2.929,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "verdict": "AA-large only",
+        "crHp": 3.153,
+        "crName": 3.239,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "label",
+        "fighter": "f-1-sk0",
+        "name": "Merlin",
+        "verdict": "AA-large only",
+        "crHp": 3.323,
+        "crName": 3.29,
+        "tileEdgeCrosses": false
+      },
+      {
+        "kind": "damage",
+        "fighter": "f-1-hero",
+        "name": "King Arthur",
+        "verdict": "fail",
+        "crHp": null,
+        "crName": null,
+        "tileEdgeCrosses": false
+      }
+    ]
+  },
+  "classify": {
+    "exit": 0,
+    "frames": [
+      {
+        "frame": "phase2-board-host-1920x1080.png",
+        "class": "packaged-live",
+        "grade": "strict",
+        "rejected": false
+      },
+      {
+        "frame": "phase2-board-joiner-1920x1080.png",
+        "class": "packaged-live",
+        "grade": "strict",
+        "rejected": false
+      },
+      {
+        "frame": "s09-combat-resolve-revealed.png",
+        "class": "packaged-live",
+        "grade": "strict",
+        "rejected": false
+      },
+      {
+        "frame": "s09-damage-number.png",
+        "class": "packaged-live",
+        "grade": "strict",
+        "rejected": false
+      }
+    ]
+  },
+  "checklist": {
+    "exit": 0,
+    "md": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/analysis/cobble-5x6/qa010-checklist.md",
+    "statusCounts": {
+      "открыто (ручная проверка)": 10,
+      "нет данных: декор — прокси (нужна stencil- или ручная маска L3)": 1,
+      "нет данных": 1,
+      "измерено: fail (предложенный порог)": 1,
+      "измерено: неполно": 2,
+      "суррогат (агент) — до ответа пользователя": 1,
+      "не годится для приёмки: K2": 1,
+      "ок": 1
+    }
+  }
+}

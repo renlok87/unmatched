@@ -40,7 +40,10 @@ struct UNMATCHED_API FS08ZoneStyle {
   ES08ZoneStroke Stroke = ES08ZoneStroke::Dots5;
   ES08ZoneGlyph Glyph = ES08ZoneGlyph::Bar1;
   FColor Color = FColor::White;  // sRGB bytes: use FLinearColor(Color) for a Tint
-  FString MaterialPath;          // optional authored material (Cobble blue/red)
+  FString MaterialPath;          // optional authored material (Cobble blue/red, -S08LegacyRender only)
+  /** T4.2: MI_ART005_Zone_<Key> (child of the game-layer master M_UM_GameLayer, LayerColor = this colour) under
+   *  /Game/ArtTests/ART005/Zones; empty = a runtime tint MID of the game-layer material (pre-T4.2 behaviour). */
+  FString MaterialInstancePath;
   bool bFallback = false;
   FString ColorHex() const;
 };
@@ -157,6 +160,10 @@ public:
   FS08ZoneStyle FallbackStyle;
   TMap<FString, FS08LightProfile> Lights;
   TArray<FS08BoardArtProfile> Boards;
+  /** T4.2 "glyphMeshes": glyph name (S08ZoneGlyphName) -> SM_ART005_ZoneGlyph_<Glyph> package. A glyph mesh is
+   *  exactly the S08GlyphPieces cubes merged, pivot on the slot centre at the mark height (S08GlyphAnchor); a glyph
+   *  without a mesh keeps the cube pieces. */
+  TMap<FString, FString> GlyphMeshPaths;
 
   /** <ProjectConfigDir>/ArtBoards/S08ArtBoardProfiles.json (staged as a UFS
    *  runtime dependency of the Unmatched module, see Unmatched.Build.cs). */
@@ -194,6 +201,9 @@ struct UNMATCHED_API FS08ZoneMarkPiece {
 struct UNMATCHED_API FS08ZoneMarkLayout {
   TArray<FS08ZoneMarkPiece> Strokes;
   TArray<FS08ZoneMarkPiece> Glyphs;
+  /** T4.2: one entry per zone of a cell - the glyph slot centre at the mark height (translation only), where one
+   *  instance of the zone's glyph mesh replaces that zone's cube pieces in Glyphs. */
+  TArray<FS08ZoneMarkPiece> GlyphAnchors;
   TMap<FString, int32> StrokePiecesByKey;
   TMap<FString, int32> GlyphPiecesByKey;
   TMap<FString, int32> CellsByKey;
@@ -211,6 +221,9 @@ UNMATCHED_API FS08ZoneMarkLayout S08BuildZoneMarks(const FS08BoardModel& Board, 
 /** Stroke / glyph cube pieces relative to the cell centre (for tests too). */
 UNMATCHED_API void S08StrokePieces(ES08ZoneStroke Stroke, int32 Side, TArray<FTransform>& Out);
 UNMATCHED_API void S08GlyphPieces(ES08ZoneGlyph Glyph, int32 Slot, TArray<FTransform>& Out);
+/** T4.2: glyph slot centre relative to the cell centre, at the mark height (z = 0.28 uu): the pivot of the glyph
+ *  meshes, so S08GlyphPieces(Glyph, Slot) == pieces of S08GlyphPieces(Glyph, 0) moved by the anchor difference. */
+UNMATCHED_API FVector S08GlyphAnchor(int32 Slot);
 
 struct UNMATCHED_API FS08PlacedLight {
   FS08LightSpec Spec;

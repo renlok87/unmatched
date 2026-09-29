@@ -1,0 +1,75 @@
+{
+  "schema": "unmatched.t52-icon-guard/1",
+  "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/joiner/s09-combat-resolve-revealed.png",
+  "template": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/analysis/icon-mask-template-32.png",
+  "bbox": [
+    781,
+    481,
+    813,
+    513
+  ],
+  "iconInPixels": {
+    "noIconFrame": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k3/cobble-5x6/combat-20260929-143232/joiner/s09-combat-result.png",
+    "available": true,
+    "sameView": "same viewport, camera and fighter screen points",
+    "rule": "IoU(max|ΔRGB| > 16, template), строки bbox ≥ 10 (ниже кольца атакующего) ≥ 0.6",
+    "iou": 1.0,
+    "present": true,
+    "diffPixelsWholeBbox": 317
+  },
+  "autoOtsu": {
+    "foreground": "bright",
+    "basis": "farther from ring median luma 120.0",
+    "threshold": 146,
+    "pixels": 286,
+    "iouWithTemplate": 0.453,
+    "pixelsOutsideTemplate": 53,
+    "valid": false,
+    "sizes": [
+      {
+        "size_px": 24,
+        "contrast_ratio": 2.787,
+        "pass": false
+      },
+      {
+        "size_px": 32,
+        "contrast_ratio": 2.746,
+        "pass": false
+      },
+      {
+        "size_px": 48,
+        "contrast_ratio": 2.761,
+        "pass": false
+      }
+    ]
+  },
+  "bboxBackground": {
+    "pixels": 497,
+    "tileLumaLowerHalf": 110.1,
+    "foreignPixels": 53,
+    "foreignShare": 0.107,
+    "foreignDarkPixels": 5,
+    "rule": "фон bbox = пиксели вне маски (+1 px); «чужие» — |luma − медиана нижней половины| > 40 (подставка фигуры сзади, кольцо)"
+  },
+  "partsVsTile": {
+    "tileLuma": 110.1,
+    "otsuInsideMask": 153,
+    "icon": {
+      "pixels": 317,
+      "lumaMedian": 176.9,
+      "wcagVsTile": 2.383
+    },
+    "blades": {
+      "pixels": 179,
+      "lumaMedian": 204.7,
+      "wcagVsTile": 3.199
+    },
+    "hilts": {
+      "pixels": 138,
+      "lumaMedian": 105.2,
+      "wcagVsTile": 1.073
+    }
+  },
+  "verdict": "valid: explicit mask, icon present in pixels",
+  "autoOtsuNote": "auto-Otsu superseded: its foreground is not the icon (IoU < 0.5)"
+}

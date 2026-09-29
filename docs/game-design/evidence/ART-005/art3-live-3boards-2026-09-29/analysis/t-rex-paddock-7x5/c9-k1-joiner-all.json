@@ -1,0 +1,146 @@
+{
+  "command": "c9",
+  "tool": "qa010-tools 1.1.0",
+  "frame": {
+    "path": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/t-rex-paddock-7x5/run-20260929-141931/phase2-board-joiner-1920x1080.png",
+    "sha256": "4360a8ebdc67e25c7586f5ba98f3c4159bceb649b47d2aaecc8caf051d573ccc",
+    "size": [
+      1920,
+      1080
+    ]
+  },
+  "interpretation": "С-9 по 17 AD-AC-33 (свежее 03): НОРМАТИВ — игровой слой «ярче» декора (ΔEV > 0 по относительной яркости в линейном свете); диапазон +0.3..+0.7 EV и «насыщеннее» (ΔC*ab > 0) — ПРЕДЛОЖЕНИЕ 03 С-9. Декор — слой L3 (фасады, фонарь, ящики; 03 §4.1); маски слоёв — вход (stencil, 17 §11.10, или ручная маска). trace-ring (поднос L4), trace-cells как декор и frame — прокси: результат «proxy», не норматив.",
+  "game_region": [
+    {
+      "spec": "board=trace-cells:all",
+      "kind": "trace-cells",
+      "proxy": false,
+      "note": "35 projected cells from trace"
+    }
+  ],
+  "decor_region": {
+    "spec": "tray_proxy=trace-ring:0.05,0.35",
+    "kinds": [
+      "trace-ring"
+    ],
+    "proxy": true,
+    "note": "board-ring proxy (not a stencil layer mask)"
+  },
+  "exclude_region": [
+    "hud_tl=bbox:0,0,610,140",
+    "hud_tr=bbox:1425,0,1920,120",
+    "hud_hand=bbox:330,975,1590,1080"
+  ],
+  "trace": {
+    "trace": "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29/k1/t-rex-paddock-7x5/run-20260929-141931/phase2-client-joiner.trace.log",
+    "shot": "phase2-board-joiner-1920x1080.png",
+    "shot_index": 0,
+    "shot_matches_frame": true,
+    "projection": {
+      "mode": "trace",
+      "camera_pos": [
+        0.0,
+        959.0,
+        1370.0
+      ],
+      "camera_rot": [
+        -55.0,
+        -90.0,
+        0.0
+      ],
+      "hfov_deg": 35.0,
+      "viewport": [
+        1920,
+        1080
+      ],
+      "validation_pairs": 6,
+      "residual_max_px_trace_camera": 0.994,
+      "residual_max_px_used_camera": 0.994,
+      "tolerance_px": 2.0,
+      "ok": true,
+      "reason": "ok"
+    }
+  },
+  "status": "measured",
+  "result_normative": "proxy",
+  "result_proposed": "proxy",
+  "result_on_proxy": {
+    "normative": "pass",
+    "proposed": "fail",
+    "note": "измерено на прокси-маске, не норматив"
+  },
+  "layer_basis": {
+    "proxy": true,
+    "normative": false,
+    "proxy_regions": [
+      {
+        "layer": "decor",
+        "spec": "tray_proxy=trace-ring:0.05,0.35",
+        "kind": "trace-ring",
+        "why": "кольцо вокруг доски = поднос/рамка (L4 фон по 03 §4.1), не декор L3"
+      }
+    ],
+    "reason": "С-9 сравнивает игровой слой с декором L3 (фасады, фонарь, ящики; 03 §4.1, 17 §11.10). Маска-прокси не даёт нормативного результата: нужна stencil- или ручная маска L3 (и маска игрового слоя L1/L2)."
+  },
+  "verdicts": {
+    "brighter": {
+      "rule": "dEV(mean) > 0.0",
+      "value": 0.5974,
+      "pass": true,
+      "threshold_status": "НОРМАТИВ (качественное «ярче»): 10 QA-010 стр. 132; 17 AD-AC-33"
+    },
+    "ev_range": {
+      "rule": "0.3 <= dEV(mean) <= 0.7",
+      "value": 0.5974,
+      "pass": true,
+      "threshold_status": "ПРЕДЛОЖЕНИЕ: 03 С-9 (+0.3..+0.7 EV); 17 AD-AC-33, AD-OPEN-11"
+    },
+    "more_saturated": {
+      "rule": "mean C*ab(game) - mean C*ab(decor) > 0.0",
+      "value": -2.001,
+      "pass": false,
+      "threshold_status": "ПРЕДЛОЖЕНИЕ: 03 С-9 «ярче и насыщеннее»; метрика C*ab выбрана инструментом"
+    }
+  },
+  "layers": {
+    "game": {
+      "pixels": 967580,
+      "rel_luminance_mean": 0.335189,
+      "rel_luminance_median": 0.454178,
+      "chroma_mean": 4.742,
+      "b_star_mean": -1.615
+    },
+    "decor": {
+      "pixels": 168252,
+      "rel_luminance_mean": 0.221541,
+      "rel_luminance_median": 0.281074,
+      "chroma_mean": 6.744,
+      "b_star_mean": 4.047
+    }
+  },
+  "delta_ev": {
+    "used": 0.5974,
+    "mean": 0.5974,
+    "median": 0.6923
+  },
+  "info": {
+    "decor_cool": {
+      "rule": "mean b*(decor) < 0 (холодные тона, 03 С-9) — информативно, не gate",
+      "value": 4.047,
+      "cool": false
+    }
+  },
+  "issues": [],
+  "params": {
+    "statistic": "mean",
+    "ev_min_normative": 0.0,
+    "ev_range_proposed": [
+      0.3,
+      0.7
+    ],
+    "chroma_min_delta_proposed": 0.0,
+    "min_pixels": 2000,
+    "allow_overlap": false
+  },
+  "proxy_accepted_by_flag": false
+}
