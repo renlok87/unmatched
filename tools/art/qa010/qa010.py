@@ -8,10 +8,12 @@
   python tools/art/qa010/qa010.py icon    FRAME (--bbox x0,y0,x1,y1 | --trace T) [--mask PNG]
   python tools/art/qa010/qa010.py project --trace T [--shot NAME|#N | --all]
   python tools/art/qa010/qa010.py checklist --config CFG.json --out-md X.md --out-json X.json
+  python tools/art/qa010/qa010.py render  --trace T [--shot NAME] [--frame PNG] [--reference R]
 
 Exit codes: 0 ok/pass, 1 measured fail, 2 usage or input error,
 3 insufficient input / требуется новая трасса / c9 on a proxy layer mask
-(without --accept-proxy).
+(without --accept-proxy). render: 0 on the W4-A render reference, 1 off it,
+3 no RENDER fingerprint in the SHOT block (every pre-W4 frame).
 Formats, thresholds (all «предложено») and sources: docs/art-pipeline/qa010/README.md
 """
 
@@ -450,6 +452,33 @@ def cmd_project(args) -> int:
 
 # --------------------------------------------------------------- checklist --
 
+def cmd_render(args) -> int:
+    """W4-A RENDER fingerprint of one SHOT against docs/art-pipeline/render-reference.json."""
+    art = HERE.parent
+    if str(art) not in sys.path:
+        sys.path.insert(0, str(art))
+    import render_fingerprint as RF
+    ref = RF.load_reference(Path(args.reference) if args.reference else None)
+    shot_name = args.shot or (Path(args.frame).name if args.frame else None)
+    lines = RF.read_lines(Path(args.trace))
+    block = RF.fingerprint_for_shot(lines, shot_name)
+    fp = block["render"] if block else None
+    ok, reasons = RF.check(fp, ref)
+    out = {"command": "render", "tool": VERSION, "trace": str(args.trace).replace("\\", "/"),
+           "shot": (block or {}).get("shot") or shot_name, "blockFound": block is not None,
+           "fingerprint": fp, "reference": ok, "reasons": reasons,
+           "status": "reference" if ok else ("missing" if fp is None else "off-reference"),
+           "referenceFile": "docs/art-pipeline/render-reference.json", "referenceRevision": ref.get("revision")}
+    if args.frame:
+        fr = Path(args.frame)
+        out["frame"] = {"path": str(fr).replace("\\", "/"), "sha256": sha256_path(fr) if fr.is_file() else None,
+                        "matches_shot": (out["shot"] or "").lower() == fr.name.lower()}
+    emit(out, args.json)
+    if fp is None:
+        return EXIT_INSUFFICIENT
+    return EXIT_OK if ok else EXIT_FAIL
+
+
 def cmd_checklist(args) -> int:
     from qa010lib.checklist import build_checklist, render_markdown
     cfg_path = Path(args.config)
@@ -537,6 +566,14 @@ def main(argv=None) -> int:
     pr.add_argument("--all", action="store_true", help="summarise every SHOT block")
     pr.add_argument("--json")
     pr.set_defaults(func=cmd_project)
+
+    rd = sub.add_parser("render", help="W4-A RENDER fingerprint of a SHOT vs the render reference")
+    rd.add_argument("--trace", required=True)
+    rd.add_argument("--shot", help="PNG basename from 'SHOT requested' (default: --frame name / single block)")
+    rd.add_argument("--frame", help="PNG the result is bound to (checklist frames.K*.path)")
+    rd.add_argument("--reference", help="reference JSON (default docs/art-pipeline/render-reference.json)")
+    rd.add_argument("--json")
+    rd.set_defaults(func=cmd_render)
 
     ck = sub.add_parser("checklist", help="QA-010 checklist markdown + json")
     ck.add_argument("--config", required=True)

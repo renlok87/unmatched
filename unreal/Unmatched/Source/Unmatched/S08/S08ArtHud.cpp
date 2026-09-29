@@ -348,6 +348,15 @@ FString FormatRect(const FS08ScreenRect& Rect) {
                          FMath::RoundToInt(Rect.X1), FMath::RoundToInt(Rect.Y1));
 }
 
+FString FormatWidgetLine(const FString& Id, const TCHAR* Impl, const TCHAR* State, const FString& Fighter,
+                         const FS08ScreenRect& Rect, bool bPainted, bool bTwin, const FString& Source) {
+  return FString::Printf(
+      TEXT("SHOT widget id=%s impl=%s state=%s fighter=%s bbox=%s geom=%s visible=%d twin=%d source=%s"), *Id, Impl,
+      (State && *State) ? State : TEXT("none"), Fighter.IsEmpty() ? TEXT("none") : *Fighter,
+      *FormatRect(bPainted ? Rect : FS08ScreenRect()), bPainted ? TEXT("painted") : TEXT("unpainted"), bTwin ? 0 : 1,
+      bTwin ? 1 : 0, Source.IsEmpty() ? TEXT("none") : *Source);
+}
+
 void SortCells(TArray<FIntPoint>& Cells) {
   Cells.Sort([](const FIntPoint& A, const FIntPoint& B) {
     return A.Y != B.Y ? A.Y < B.Y : A.X < B.X;

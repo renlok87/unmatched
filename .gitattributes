@@ -52,3 +52,13 @@ docs/game-design/evidence/ART-005/art-boards-t32/** -text
 
 # Wave 4 W4-B: the UM master spec and its default textures are hashed byte-for-byte in the masters report.
 art/um-materials/** -text
+
+# ART-004 W4-A render (DX12/SM6 + Lumen, High): run manifests and bench records hash the exact bytes of
+# traces, client logs and JSON; the -Bench Cobble fixture is replayed byte-for-byte by the packaged client.
+docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/** -text
+unreal/Unmatched/Config/Bench/** -text
+
+# ART-004 W4-C hybrid UMG HUD: run manifests hash the exact bytes of traces, client logs and JSON;
+# the art HUD string table CSV is staged into the pak and read byte-for-byte by the client.
+docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29/** -text
+unreal/Unmatched/Content/Localization/StringTables/** -text

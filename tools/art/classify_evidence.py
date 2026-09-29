@@ -46,7 +46,14 @@ R2  Run manifest + traces (packaged-live). Look for manifest.json in the
          (the staged ROOT exe is a launcher stub, compare the inner
          Binaries/Win64 exe), build.result "Succeeded" and no -NoLiveCoding
          in build.flags, run.roomStatus ABORTED/FINISHED, run.boardId given.
+      S5 W4-A RENDER fingerprint: the bound SHOT block carries a 'RENDER tag=SHOT'
+         line and it equals docs/art-pipeline/render-reference.json (user
+         decision 2026-09-28: DX12/SM6 + Lumen, High; tools/art/render_fingerprint.py).
     Otherwise grade "legacy" (historical runs) with the missing items listed.
+    With --strict or --render-reference a packaged-live frame that fails S5 is
+    REJECTED as an acceptance frame (K1-K3 / QA-010 / GD-058 / ACC-022): no
+    fingerprint (every pre-W4 frame) or off the reference (DX11, SM5 fallback,
+    sg.* != High, screen percentage != 100, legacy light units, ...).
 R3  Sidecar for non-live classes: <frame-stem>.evidence.json with the same
     schema, a matching frameSha256 and class editor-mcp-viewport /
     editor-cli / blender / packaged-staged is accepted as declared. A sidecar
@@ -93,6 +100,9 @@ import struct
 import sys
 import tempfile
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import render_fingerprint as RF  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg"}
@@ -220,7 +230,8 @@ def find_manifest(frame: Path) -> tuple[Path, dict, dict] | None:
 
 
 def check_live(frame: Path, info: dict, sha: str, expect_mesh: str | None) -> dict:
-    res: dict = {"manifest": None, "core": {}, "strict": {}, "trace": None, "missingStrict": [], "reasons": []}
+    res: dict = {"manifest": None, "core": {}, "strict": {}, "trace": None, "missingStrict": [], "reasons": [],
+                 "render": None}
     found = find_manifest(frame)
     if not found:
         res["reasons"].append("no run manifest listing this frame (manifest.json in the frame dir or 2 parents)")
@@ -292,6 +303,19 @@ def check_live(frame: Path, info: dict, sha: str, expect_mesh: str | None) -> di
                                            and info.get("height") == int(viewport[1])
                                            and (info.get("width"), info.get("height")) == (1920, 1080))
     st["S3_artpreview_mesh"] = mesh is not None and (expect_mesh is None or mesh == expect_mesh)
+    # S5 (W4-A): the RENDER fingerprint of the bound SHOT against the reference.
+    block = RF.fingerprint_for_shot(lines, frame.name) if binding == "shot-requested" else None
+    if block is None and binding != "shot-requested":
+        blocks = RF.shot_fingerprints(lines)
+        block = blocks[-1] if blocks else None
+    fp = block["render"] if block else None
+    try:
+        ok, why = RF.check(fp, RF.load_reference())
+    except (OSError, ValueError) as exc:
+        ok, why = False, [f"render reference unreadable: {exc}"]
+    res["render"] = {"fingerprint": fp, "reference": ok, "reasons": why,
+                     "referenceFile": "docs/art-pipeline/render-reference.json"}
+    st["S5_render_reference"] = ok
     st["S4_sidecar_build_run"] = False
     side = frame.with_name(frame.stem + ".evidence.json")
     sdoc = load_json(side) if side.is_file() else None
@@ -390,7 +414,7 @@ def claims_live(frame: Path) -> bool:
 
 
 # ---------------------------------------------------------------- driver
-def classify_frame(frame: Path, expect_mesh: str | None = None) -> dict:
+def classify_frame(frame: Path, expect_mesh: str | None = None, render_reference: bool = False) -> dict:
     frame = frame.resolve()
     info = image_info(frame)
     sha = sha256_file(frame)
@@ -398,7 +422,7 @@ def classify_frame(frame: Path, expect_mesh: str | None = None) -> dict:
                "class": "unclassified", "grade": None, "basis": [], "rejected": False, "reasons": [],
                "claimsLive": claims_live(frame)}
     live = check_live(frame, info, sha, expect_mesh)
-    r["live"] = {k: live[k] for k in ("manifest", "core", "strict", "trace", "missingStrict")}
+    r["live"] = {k: live[k] for k in ("manifest", "core", "strict", "trace", "missingStrict", "render")}
     if rule_blender_metadata(info):
         r["class"], r["basis"] = "blender", ["R1 png-metadata: " + ", ".join(sorted(info["text"]))]
     elif live["manifest"]:
@@ -439,6 +463,11 @@ def classify_frame(frame: Path, expect_mesh: str | None = None) -> dict:
                             "but has no valid run manifest and traces")
     if r["class"] == "unclassified" and not r["reasons"]:
         r["reasons"].append("no metadata, manifest, sidecar, registering report or name rule applies")
+    if render_reference and r["class"] == "packaged-live" and not r["rejected"]:
+        rend = live.get("render") or {}
+        if not rend.get("reference"):
+            r["rejected"] = True
+            r["reasons"].append("W4-A render reference: " + "; ".join(rend.get("reasons") or ["no RENDER fingerprint"]))
     return r
 
 
@@ -463,13 +492,20 @@ NEGATIVE_SOURCE = "docs/game-design/evidence/ART-004/head-tilt-v3-probe-2026-09-
 
 
 def self_test() -> tuple[bool, list[dict]]:
-    """3 known positives + 1 negative (editor PNG renamed as a live host frame)."""
+    """3 known positives + 1 negative (editor PNG renamed as a live host frame)
+    + 1 W4-A negative (a pre-W4 live frame under --render-reference)."""
     results = []
     for kind, rel, expected in SELF_TEST_CASES:
         r = classify_frame(REPO_ROOT / rel)
         passed = r["class"] == expected and not r["rejected"]
         results.append({"case": kind, "frame": rel, "expected": expected, "got": r["class"],
                         "grade": r["grade"], "rejected": r["rejected"], "pass": passed})
+    rel_live = SELF_TEST_CASES[0][1]
+    r = classify_frame(REPO_ROOT / rel_live, render_reference=True)
+    results.append({"case": "negative-render", "frame": rel_live,
+                    "expected": "rejected under --render-reference (pre-W4 frame, no RENDER fingerprint)",
+                    "got": r["class"], "grade": r["grade"], "rejected": r["rejected"],
+                    "reasons": r["reasons"][-1:], "pass": r["class"] == "packaged-live" and r["rejected"]})
     tmp = Path(tempfile.mkdtemp(prefix="classify-evidence-neg-"))
     try:
         fake = tmp / "phase2-board-host-1920x1080.png"
@@ -490,6 +526,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--require", choices=CLASSES, help="exit 3 unless every frame has this class")
     ap.add_argument("--strict", action="store_true", help="with --require packaged-live: also require grade strict")
     ap.add_argument("--expect-mesh", help="strict S3: mesh name expected in 'ARTPREVIEW ... visual=1 mesh='")
+    ap.add_argument("--render-reference", action="store_true",
+                    help="reject packaged-live frames whose SHOT has no RENDER fingerprint or one off "
+                         "docs/art-pipeline/render-reference.json (implied by --strict)")
     ap.add_argument("--self-test", action="store_true", help="run the built-in 3 positive + 1 negative cases")
     a = ap.parse_args(argv)
     if a.self_test:
@@ -504,7 +543,7 @@ def main(argv: list[str] | None = None) -> int:
     except FileNotFoundError as e:
         print(f"not found: {e}", file=sys.stderr)
         return 1
-    results = [classify_frame(f, a.expect_mesh) for f in frames]
+    results = [classify_frame(f, a.expect_mesh, render_reference=a.strict or a.render_reference) for f in frames]
     print(json.dumps(results, ensure_ascii=False, indent=2))
     if a.require:
         bad = [r for r in results if r["class"] != a.require

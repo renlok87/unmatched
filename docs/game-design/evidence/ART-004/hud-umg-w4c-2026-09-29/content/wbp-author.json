@@ -1,0 +1,114 @@
+{
+  "schema": "unmatched.w4c-wbp-author/1",
+  "startedLocal": "2026-09-29T08:49:07+05:00",
+  "durationS": 13.8,
+  "exitCode": 0,
+  "log": "C:/tmp/w4c/author/wbp-author.log",
+  "command": "UnrealEditor-Cmd <art uproject> -run=pythonscript -script=tools/art/umg/ue_author_art_hud.py -unattended -nosplash -nullrhi -nullaudio (MCP auto-start off)",
+  "why": "UWidgetBlueprint::WidgetTree is not reachable from Python and the UMGToolSet functions are AICallable only; the tree is built by US08ArtHudAuthoringLibrary (C++, editor-only) from the same BuildDefaultTree the widget classes use at runtime",
+  "editorDll": {
+    "path": "unreal/Unmatched/Binaries/Win64/UnrealEditor-Unmatched.dll",
+    "sha256": "49dd9b0a9fd27a361ef6209c30b8aa11914751c4cfc758c27fa7c01b5e8b737f"
+  },
+  "pass": [
+    "W4C_ART_HUD_WBP_PASS {\"assets\": [[\"/Game/S08/UI/ArtHud/WBP_S08ArtPlate\", \"created\", \"up-to-date\"], [\"/Game/S08/UI/ArtHud/WBP_S08ArtIcon\", \"created\", \"up-to-date\"]]}"
+  ],
+  "fail": [],
+  "pythonErrors": [],
+  "blueprintErrors": [],
+  "report": {
+    "schema": "unmatched.w4c-art-hud-wbp/1",
+    "folder": "/Game/S08/UI/ArtHud",
+    "overwrite": false,
+    "assets": [
+      {
+        "asset": "/Game/S08/UI/ArtHud/WBP_S08ArtPlate",
+        "parentClass": "/Script/Unmatched.S08ArtPlateWidget",
+        "widgets": [
+          "PlateBackground:Border",
+          "PlateColumn:VerticalBox",
+          "MarkerBox:SizeBox",
+          "Marker:Image",
+          "NameRow:HorizontalBox",
+          "NameText:TextBlock",
+          "TeamChip:Border",
+          "TeamText:TextBlock",
+          "HpRow:HorizontalBox",
+          "HpBar:SizeBox",
+          "HpBarLayers:Overlay",
+          "HpBack:Image",
+          "HpFill:SizeBox",
+          "HpFillImage:Image",
+          "HpText:TextBlock",
+          "StatusText:TextBlock"
+        ],
+        "compileStatus": "up-to-date",
+        "file": "C:/Users/ren/.codex/worktrees/art-foundation/unmached/unreal/Unmatched/Content/S08/UI/ArtHud/WBP_S08ArtPlate.uasset",
+        "saved": true,
+        "result": "created",
+        "generatedClass": "/Game/S08/UI/ArtHud/WBP_S08ArtPlate.WBP_S08ArtPlate_C"
+      },
+      {
+        "asset": "/Game/S08/UI/ArtHud/WBP_S08ArtIcon",
+        "parentClass": "/Script/Unmatched.S08ArtIconWidget",
+        "widgets": [
+          "Icon:Image"
+        ],
+        "compileStatus": "up-to-date",
+        "file": "C:/Users/ren/.codex/worktrees/art-foundation/unmached/unreal/Unmatched/Content/S08/UI/ArtHud/WBP_S08ArtIcon.uasset",
+        "saved": true,
+        "result": "created",
+        "generatedClass": "/Game/S08/UI/ArtHud/WBP_S08ArtIcon.WBP_S08ArtIcon_C"
+      }
+    ],
+    "checks": [
+      {
+        "asset": "/Game/S08/UI/ArtHud/WBP_S08ArtPlate",
+        "loaded": true,
+        "generatedClass": "/Game/S08/UI/ArtHud/WBP_S08ArtPlate.WBP_S08ArtPlate_C",
+        "parentIsNativeClass": true,
+        "requiredParts": [
+          "PlateBackground",
+          "Marker",
+          "NameText",
+          "TeamChip",
+          "TeamText",
+          "HpBar",
+          "HpBack",
+          "HpFill",
+          "HpFillImage",
+          "HpText",
+          "StatusText"
+        ],
+        "file": "unreal/Unmatched/Content/S08/UI/ArtHud/WBP_S08ArtPlate.uasset",
+        "bytes": 49597,
+        "sha256": "5d0924ec70ee5c4b676529013cb30d52f5969b6818ce7d33bd53ec91212342bb"
+      },
+      {
+        "asset": "/Game/S08/UI/ArtHud/WBP_S08ArtIcon",
+        "loaded": true,
+        "generatedClass": "/Game/S08/UI/ArtHud/WBP_S08ArtIcon.WBP_S08ArtIcon_C",
+        "parentIsNativeClass": true,
+        "requiredParts": [
+          "Icon"
+        ],
+        "file": "unreal/Unmatched/Content/S08/UI/ArtHud/WBP_S08ArtIcon.uasset",
+        "bytes": 22860,
+        "sha256": "cae00e775078829f1d1ed065360b1b08890730bf37746c5b38995f606ab171cc"
+      }
+    ],
+    "pass": true
+  },
+  "files": [
+    {
+      "path": "unreal/Unmatched/Content/S08/UI/ArtHud/WBP_S08ArtIcon.uasset",
+      "bytes": 22860,
+      "sha256": "cae00e775078829f1d1ed065360b1b08890730bf37746c5b38995f606ab171cc"
+    },
+    {
+      "path": "unreal/Unmatched/Content/S08/UI/ArtHud/WBP_S08ArtPlate.uasset",
+      "bytes": 49597,
+      "sha256": "5d0924ec70ee5c4b676529013cb30d52f5969b6818ce7d33bd53ec91212342bb"
+    }
+  ]
+}

@@ -1,0 +1,3761 @@
+{
+  "schema": "unmatched.w4a-render-bench-run/1",
+  "variant": "dx12-sm5-fallback",
+  "notes": {
+    "emulates": "DX12 without SM6 (no SM 6.6 / 64-bit atomics)"
+  },
+  "startedLocal": "2026-09-29T06:48:08+05:00",
+  "argv": [
+    "<repo>\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+    "/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode",
+    "-windowed",
+    "-resx=1920",
+    "-resy=1080",
+    "-ForceRes",
+    "-RenderOffScreen",
+    "-ArtPreview",
+    "-Bench",
+    "-BenchOut=C:\\tmp\\w4a\\bench\\dx12-sm5-fallback\\r1",
+    "-S08Trace=C:\\tmp\\w4a\\bench\\dx12-sm5-fallback\\r1\\bench.trace.log",
+    "-BenchViews=K1+K2x5",
+    "-BenchWarmup=30",
+    "-BenchSettle=8",
+    "-BenchMeasure=20",
+    "-BenchCsv",
+    "-csvGpuStats",
+    "-abslog=C:\\tmp\\w4a\\bench\\dx12-sm5-fallback\\r1\\client.log",
+    "-sm5",
+    "-S08RenderPreset=High",
+    "-ExecCmds=DisableAllScreenMessages"
+  ],
+  "exeSha256": "2d651e9e562e6fbe609e2a007c38ea9e4fe0286f6a52f7f7e1a45026fdee369f",
+  "pid": 13400,
+  "exitCode": 0,
+  "durationS": 96.8,
+  "csv": [
+    {
+      "file": "csv-0-Profile-20260929_064848.csv",
+      "sha256": "ae7a4f82015587ccd00b3754840da51a95e31fdca4d3fe2e04a7d1b69c8c1e3e",
+      "summary": {
+        "file": "csv-0-Profile-20260929_064848.csv",
+        "frames": 3859,
+        "gpu": {
+          "GPU/RayTracingGeometry": {
+            "mean": 0.0004,
+            "p50": 0.0003,
+            "p95": 0.0011
+          },
+          "GPU/DistanceFields": {
+            "mean": 0.0184,
+            "p50": 0.0182,
+            "p95": 0.0204
+          },
+          "GPU/GlobalDistanceFieldUpdate": {
+            "mean": 0.0003,
+            "p50": 0.0003,
+            "p95": 0.0007
+          },
+          "GPU/AllocateRendertargets": {
+            "mean": 0.0006,
+            "p50": 0.0006,
+            "p95": 0.0007
+          },
+          "GPU/VisibilityCommands": {
+            "mean": 0.0006,
+            "p50": 0.0006,
+            "p95": 0.0007
+          },
+          "GPU/GPUSceneUpdate": {
+            "mean": 0.0059,
+            "p50": 0.006,
+            "p95": 0.0075
+          },
+          "GPU/FXSystemPreRender": {
+            "mean": 0.0024,
+            "p50": 0.0024,
+            "p95": 0.0037
+          },
+          "GPU/BuildRenderingCommandsDeferred": {
+            "mean": 0.039,
+            "p50": 0.0376,
+            "p95": 0.0484
+          },
+          "GPU/Prepass": {
+            "mean": 0.0258,
+            "p50": 0.0269,
+            "p95": 0.029
+          },
+          "GPU/RenderVelocities": {
+            "mean": 0.0343,
+            "p50": 0.0367,
+            "p95": 0.0391
+          },
+          "GPU/HZB": {
+            "mean": 0.0167,
+            "p50": 0.0169,
+            "p95": 0.0172
+          },
+          "GPU/BeginOcclusionTests": {
+            "mean": 0.0098,
+            "p50": 0.0098,
+            "p95": 0.0104
+          },
+          "GPU/LightGrid": {
+            "mean": 0.0288,
+            "p50": 0.0294,
+            "p95": 0.0345
+          },
+          "GPU/LightFunctionAtlasGeneration": {
+            "mean": 0.0001,
+            "p50": 0.0,
+            "p95": 0.001
+          },
+          "GPU/Basepass": {
+            "mean": 0.0608,
+            "p50": 0.0606,
+            "p95": 0.0664
+          },
+          "GPU/ShadowDepths": {
+            "mean": 0.0363,
+            "p50": 0.0368,
+            "p95": 0.0402
+          },
+          "GPU/CompositionPreLighting": {
+            "mean": 0.001,
+            "p50": 0.0007,
+            "p95": 0.0019
+          },
+          "GPU/SSAOSetup": {
+            "mean": 0.0103,
+            "p50": 0.0103,
+            "p95": 0.0119
+          },
+          "GPU/SSAO": {
+            "mean": 0.3095,
+            "p50": 0.3093,
+            "p95": 0.3133
+          },
+          "GPU/RenderDeferredLighting": {
+            "mean": 0.0247,
+            "p50": 0.0246,
+            "p95": 0.0265
+          },
+          "GPU/TranslucentLighting": {
+            "mean": 0.0039,
+            "p50": 0.0041,
+            "p95": 0.0041
+          },
+          "GPU/Lights": {
+            "mean": 0.0324,
+            "p50": 0.0318,
+            "p95": 0.0349
+          },
+          "GPU/ShadowProjection": {
+            "mean": 0.0098,
+            "p50": 0.0093,
+            "p95": 0.0103
+          },
+          "GPU/DistanceFieldShadows": {
+            "mean": 0.0428,
+            "p50": 0.042,
+            "p95": 0.046
+          },
+          "GPU/SkyLightDiffuse": {
+            "mean": 0.0983,
+            "p50": 0.0983,
+            "p95": 0.1014
+          },
+          "GPU/ScreenSpaceReflections": {
+            "mean": 0.0086,
+            "p50": 0.0082,
+            "p95": 0.0093
+          },
+          "GPU/ReflectionEnvironment": {
+            "mean": 0.0267,
+            "p50": 0.0266,
+            "p95": 0.0307
+          },
+          "GPU/TemporalSuperResolution": {
+            "mean": 0.5856,
+            "p50": 0.5191,
+            "p95": 0.7435
+          },
+          "GPU/PostRenderOpsFX": {
+            "mean": 0.0016,
+            "p50": 0.0015,
+            "p95": 0.0019
+          },
+          "GPU/FXSystemPostRenderOpaque": {
+            "mean": 0.0015,
+            "p50": 0.0011,
+            "p95": 0.0026
+          },
+          "GPU/Translucency": {
+            "mean": 0.0022,
+            "p50": 0.0017,
+            "p95": 0.0029
+          },
+          "GPU/Postprocessing": {
+            "mean": 0.1133,
+            "p50": 0.1127,
+            "p95": 0.1159
+          },
+          "GPU/VirtualTextureUpdate": {
+            "mean": 0.0006,
+            "p50": 0.0006,
+            "p95": 0.0007
+          },
+          "GPU/SlateUI": {
+            "mean": 0.0063,
+            "p50": 0.0063,
+            "p95": 0.0072
+          },
+          "GPU/Unaccounted": {
+            "mean": 0.2306,
+            "p50": 0.2278,
+            "p95": 0.248
+          },
+          "FrameTime": {
+            "mean": 5.1828,
+            "p50": 5.1803,
+            "p95": 5.9818
+          },
+          "RenderThreadTime": {
+            "mean": 5.182,
+            "p50": 5.177,
+            "p95": 5.9786
+          },
+          "GameThreadTime": {
+            "mean": 1.2867,
+            "p50": 1.2398,
+            "p95": 1.6353
+          },
+          "GPUTime": {
+            "mean": 1.8381,
+            "p50": 1.774,
+            "p95": 2.0141
+          }
+        }
+      }
+    },
+    {
+      "file": "csv-1-Profile-20260929_064920.csv",
+      "sha256": "acd80d16328b74b3c4951d5bf0556953fa7e5ec782c58aa8898f3fce1f2c0e3d",
+      "summary": {
+        "file": "csv-1-Profile-20260929_064920.csv",
+        "frames": 3652,
+        "gpu": {
+          "FrameTime": {
+            "mean": 5.4766,
+            "p50": 5.4748,
+            "p95": 6.283
+          },
+          "RenderThreadTime": {
+            "mean": 5.4759,
+            "p50": 5.4742,
+            "p95": 6.29
+          },
+          "GameThreadTime": {
+            "mean": 1.2205,
+            "p50": 1.183,
+            "p95": 1.5024
+          },
+          "GPUTime": {
+            "mean": 2.0771,
+            "p50": 2.1177,
+            "p95": 2.2014
+          },
+          "GPU/RayTracingGeometry": {
+            "mean": 0.0004,
+            "p50": 0.0003,
+            "p95": 0.0007
+          },
+          "GPU/DistanceFields": {
+            "mean": 0.0185,
+            "p50": 0.0182,
+            "p95": 0.0204
+          },
+          "GPU/GlobalDistanceFieldUpdate": {
+            "mean": 0.0003,
+            "p50": 0.0003,
+            "p95": 0.0006
+          },
+          "GPU/AllocateRendertargets": {
+            "mean": 0.0006,
+            "p50": 0.0006,
+            "p95": 0.0007
+          },
+          "GPU/VisibilityCommands": {
+            "mean": 0.0006,
+            "p50": 0.0006,
+            "p95": 0.0007
+          },
+          "GPU/GPUSceneUpdate": {
+            "mean": 0.0058,
+            "p50": 0.0059,
+            "p95": 0.0078
+          },
+          "GPU/FXSystemPreRender": {
+            "mean": 0.0026,
+            "p50": 0.0026,
+            "p95": 0.0039
+          },
+          "GPU/BuildRenderingCommandsDeferred": {
+            "mean": 0.0379,
+            "p50": 0.0358,
+            "p95": 0.0491
+          },
+          "GPU/Prepass": {
+            "mean": 0.0275,
+            "p50": 0.0287,
+            "p95": 0.031
+          },
+          "GPU/RenderVelocities": {
+            "mean": 0.0345,
+            "p50": 0.0373,
+            "p95": 0.0396
+          },
+          "GPU/HZB": {
+            "mean": 0.0168,
+            "p50": 0.017,
+            "p95": 0.018
+          },
+          "GPU/BeginOcclusionTests": {
+            "mean": 0.0097,
+            "p50": 0.0097,
+            "p95": 0.0102
+          },
+          "GPU/LightGrid": {
+            "mean": 0.0288,
+            "p50": 0.0287,
+            "p95": 0.0342
+          },
+          "GPU/LightFunctionAtlasGeneration": {
+            "mean": 0.0001,
+            "p50": 0.0,
+            "p95": 0.001
+          },
+          "GPU/Basepass": {
+            "mean": 0.0771,
+            "p50": 0.0766,
+            "p95": 0.082
+          },
+          "GPU/ShadowDepths": {
+            "mean": 0.0683,
+            "p50": 0.0691,
+            "p95": 0.0729
+          },
+          "GPU/CompositionPreLighting": {
+            "mean": 0.0009,
+            "p50": 0.0007,
+            "p95": 0.0019
+          },
+          "GPU/SSAOSetup": {
+            "mean": 0.0099,
+            "p50": 0.0097,
+            "p95": 0.0117
+          },
+          "GPU/SSAO": {
+            "mean": 0.3192,
+            "p50": 0.3184,
+            "p95": 0.3297
+          },
+          "GPU/RenderDeferredLighting": {
+            "mean": 0.032,
+            "p50": 0.0308,
+            "p95": 0.0329
+          },
+          "GPU/TranslucentLighting": {
+            "mean": 0.0039,
+            "p50": 0.0041,
+            "p95": 0.0041
+          },
+          "GPU/Lights": {
+            "mean": 0.057,
+            "p50": 0.0564,
+            "p95": 0.0593
+          },
+          "GPU/ShadowProjection": {
+            "mean": 0.0198,
+            "p50": 0.0195,
+            "p95": 0.0205
+          },
+          "GPU/DistanceFieldShadows": {
+            "mean": 0.0399,
+            "p50": 0.0399,
+            "p95": 0.041
+          },
+          "GPU/SkyLightDiffuse": {
+            "mean": 0.1435,
+            "p50": 0.1024,
+            "p95": 0.3195
+          },
+          "GPU/ScreenSpaceReflections": {
+            "mean": 0.0229,
+            "p50": 0.0082,
+            "p95": 0.2027
+          },
+          "GPU/ReflectionEnvironment": {
+            "mean": 0.1302,
+            "p50": 0.0573,
+            "p95": 0.2816
+          },
+          "GPU/TemporalSuperResolution": {
+            "mean": 0.5467,
+            "p50": 0.5253,
+            "p95": 0.7302
+          },
+          "GPU/PostRenderOpsFX": {
+            "mean": 0.0016,
+            "p50": 0.0015,
+            "p95": 0.0019
+          },
+          "GPU/FXSystemPostRenderOpaque": {
+            "mean": 0.0015,
+            "p50": 0.0011,
+            "p95": 0.0025
+          },
+          "GPU/Translucency": {
+            "mean": 0.0042,
+            "p50": 0.0017,
+            "p95": 0.0029
+          },
+          "GPU/Postprocessing": {
+            "mean": 0.1123,
+            "p50": 0.112,
+            "p95": 0.1147
+          },
+          "GPU/VirtualTextureUpdate": {
+            "mean": 0.0006,
+            "p50": 0.0006,
+            "p95": 0.0007
+          },
+          "GPU/SlateUI": {
+            "mean": 0.0063,
+            "p50": 0.0063,
+            "p95": 0.0072
+          },
+          "GPU/Unaccounted": {
+            "mean": 0.2345,
+            "p50": 0.2308,
+            "p95": 0.2486
+          }
+        }
+      }
+    }
+  ],
+  "trace": {
+    "views": {
+      "K1": {
+        "frameMs": {
+          "avg": 5.18,
+          "p50": 5.18,
+          "p95": 5.98,
+          "p99": 6.31,
+          "max": 8.99,
+          "hitches50": 0.0
+        },
+        "gpuMs": {
+          "avg": 1.84,
+          "p50": 1.77,
+          "p95": 2.01
+        },
+        "gameMs": {
+          "avg": 1.29,
+          "p95": 1.63
+        },
+        "renderMs": {
+          "avg": 5.18,
+          "p95": 5.98
+        },
+        "frames": 3859.0,
+        "fps": 192.95,
+        "hitches50": 0.0,
+        "window": 20.0
+      },
+      "K2x5": {
+        "frameMs": {
+          "avg": 5.48,
+          "p50": 5.47,
+          "p95": 6.28,
+          "p99": 6.65,
+          "max": 9.14,
+          "hitches50": 0.0
+        },
+        "gpuMs": {
+          "avg": 2.08,
+          "p50": 2.12,
+          "p95": 2.2
+        },
+        "gameMs": {
+          "avg": 1.22,
+          "p95": 1.5
+        },
+        "renderMs": {
+          "avg": 5.48,
+          "p95": 6.29
+        },
+        "frames": 3652.0,
+        "fps": 182.6,
+        "hitches50": 0.0,
+        "window": 20.0
+      }
+    },
+    "render": {
+      "K1": {
+        "tag": "BENCH",
+        "rhi": "D3D12",
+        "featureLevel": "SM5",
+        "shaderPlatform": "PCD3D_SM5",
+        "lumenPlatform": "0",
+        "gi": "lumen-unsupported",
+        "giMethod": "1",
+        "refl": "lumen-unsupported",
+        "reflMethod": "1",
+        "shadows": "csm",
+        "vsmEnable": "0",
+        "sg.res": "100",
+        "sg.view": "2",
+        "sg.aa": "2",
+        "sg.shadow": "2",
+        "sg.gi": "2",
+        "sg.refl": "2",
+        "sg.pp": "2",
+        "sg.tex": "2",
+        "sg.fx": "2",
+        "sg.foliage": "2",
+        "sg.shading": "2",
+        "sg.landscape": "2",
+        "preset": "High",
+        "screenPct": "100.0",
+        "screenPctMode": "0",
+        "aa": "TSR",
+        "aaMethod": "4",
+        "exposure": "fixed-histogram",
+        "expMin": "2.46229",
+        "expMax": "2.46229",
+        "expBias": "0.000",
+        "ev100": "1.30",
+        "lightUnits": "candelas",
+        "sky": "1",
+        "skyIntensity": "11.200",
+        "keyShadow": "csm-3000uu-2c-contact0.000",
+        "shadowCasters": "1",
+        "profile": "cobble-probe",
+        "profilesSha256": "91ea86be522212fc770a33e3c9ac66f1cfde90c720c609bdc6bd29589965eaa5",
+        "profilesSource": "pak",
+        "legacyRender": "0",
+        "gameLayer": "unlit-eyeadaptinv",
+        "tMaxFPS": "0.0",
+        "vsync": "0",
+        "frameRateLimit": "60.0",
+        "substrate": "0",
+        "nanite": "1",
+        "meshDF": "1",
+        "viewport": "1920x1080",
+        "reference": "0",
+        "notReference": "featureLevel,gi,reflections"
+      },
+      "K2x5": {
+        "tag": "BENCH",
+        "rhi": "D3D12",
+        "featureLevel": "SM5",
+        "shaderPlatform": "PCD3D_SM5",
+        "lumenPlatform": "0",
+        "gi": "lumen-unsupported",
+        "giMethod": "1",
+        "refl": "lumen-unsupported",
+        "reflMethod": "1",
+        "shadows": "csm",
+        "vsmEnable": "0",
+        "sg.res": "100",
+        "sg.view": "2",
+        "sg.aa": "2",
+        "sg.shadow": "2",
+        "sg.gi": "2",
+        "sg.refl": "2",
+        "sg.pp": "2",
+        "sg.tex": "2",
+        "sg.fx": "2",
+        "sg.foliage": "2",
+        "sg.shading": "2",
+        "sg.landscape": "2",
+        "preset": "High",
+        "screenPct": "100.0",
+        "screenPctMode": "0",
+        "aa": "TSR",
+        "aaMethod": "4",
+        "exposure": "fixed-histogram",
+        "expMin": "2.46229",
+        "expMax": "2.46229",
+        "expBias": "0.000",
+        "ev100": "1.30",
+        "lightUnits": "candelas",
+        "sky": "1",
+        "skyIntensity": "11.200",
+        "keyShadow": "csm-3000uu-2c-contact0.000",
+        "shadowCasters": "1",
+        "profile": "cobble-probe",
+        "profilesSha256": "91ea86be522212fc770a33e3c9ac66f1cfde90c720c609bdc6bd29589965eaa5",
+        "profilesSource": "pak",
+        "legacyRender": "0",
+        "gameLayer": "unlit-eyeadaptinv",
+        "tMaxFPS": "0.0",
+        "vsync": "0",
+        "frameRateLimit": "60.0",
+        "substrate": "0",
+        "nanite": "1",
+        "meshDF": "1",
+        "viewport": "1920x1080",
+        "reference": "0",
+        "notReference": "featureLevel,gi,reflections"
+      }
+    },
+    "heads": {
+      "K1": {
+        "fighter": "f-0-hero",
+        "socket": "Head",
+        "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+        "world": "(0.0,-46.0,38.5)",
+        "screen": "(960.0,445.5)",
+        "top": "(960.0,439.8)",
+        "bottom": "(960.0,451.2)",
+        "headPx": "11.4",
+        "projected": "1"
+      },
+      "K2x5": {
+        "fighter": "f-0-hero",
+        "socket": "Head",
+        "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+        "world": "(0.0,-46.0,38.5)",
+        "screen": "(960.0,517.7)",
+        "top": "(960.0,489.1)",
+        "bottom": "(960.0,545.6)",
+        "headPx": "56.4",
+        "projected": "1"
+      }
+    },
+    "scene": {
+      "fixture": "S08BenchCobble.json",
+      "board": "5x6",
+      "fighters": "6",
+      "viewer": "cmukie55u0000wiao06h107t9",
+      "hero": "f-0-hero",
+      "art": "1",
+      "profile": "cobble-city",
+      "views": "K1+K2x5",
+      "warmup": "30",
+      "settle": "8",
+      "measure": "20",
+      "fps": "0",
+      "profileGpu": "1",
+      "csv": "1"
+    },
+    "done": true,
+    "failed": null,
+    "lines": 83,
+    "shotFingerprints": {
+      "bench-K1-1920x1080.png": {
+        "tag": "SHOT",
+        "rhi": "D3D12",
+        "featureLevel": "SM5",
+        "shaderPlatform": "PCD3D_SM5",
+        "lumenPlatform": "0",
+        "gi": "lumen-unsupported",
+        "giMethod": "1",
+        "refl": "lumen-unsupported",
+        "reflMethod": "1",
+        "shadows": "csm",
+        "vsmEnable": "0",
+        "sg.res": "100",
+        "sg.view": "2",
+        "sg.aa": "2",
+        "sg.shadow": "2",
+        "sg.gi": "2",
+        "sg.refl": "2",
+        "sg.pp": "2",
+        "sg.tex": "2",
+        "sg.fx": "2",
+        "sg.foliage": "2",
+        "sg.shading": "2",
+        "sg.landscape": "2",
+        "preset": "High",
+        "screenPct": "100.0",
+        "screenPctMode": "0",
+        "aa": "TSR",
+        "aaMethod": "4",
+        "exposure": "fixed-histogram",
+        "expMin": "2.46229",
+        "expMax": "2.46229",
+        "expBias": "0.000",
+        "ev100": "1.30",
+        "lightUnits": "candelas",
+        "sky": "1",
+        "skyIntensity": "11.200",
+        "keyShadow": "csm-3000uu-2c-contact0.000",
+        "shadowCasters": "1",
+        "profile": "cobble-probe",
+        "profilesSha256": "91ea86be522212fc770a33e3c9ac66f1cfde90c720c609bdc6bd29589965eaa5",
+        "profilesSource": "pak",
+        "legacyRender": "0",
+        "gameLayer": "unlit-eyeadaptinv",
+        "tMaxFPS": "0.0",
+        "vsync": "0",
+        "frameRateLimit": "60.0",
+        "substrate": "0",
+        "nanite": "1",
+        "meshDF": "1",
+        "viewport": "1920x1080",
+        "reference": "0",
+        "notReference": "featureLevel,gi,reflections"
+      },
+      "bench-K2x5-1920x1080.png": {
+        "tag": "SHOT",
+        "rhi": "D3D12",
+        "featureLevel": "SM5",
+        "shaderPlatform": "PCD3D_SM5",
+        "lumenPlatform": "0",
+        "gi": "lumen-unsupported",
+        "giMethod": "1",
+        "refl": "lumen-unsupported",
+        "reflMethod": "1",
+        "shadows": "csm",
+        "vsmEnable": "0",
+        "sg.res": "100",
+        "sg.view": "2",
+        "sg.aa": "2",
+        "sg.shadow": "2",
+        "sg.gi": "2",
+        "sg.refl": "2",
+        "sg.pp": "2",
+        "sg.tex": "2",
+        "sg.fx": "2",
+        "sg.foliage": "2",
+        "sg.shading": "2",
+        "sg.landscape": "2",
+        "preset": "High",
+        "screenPct": "100.0",
+        "screenPctMode": "0",
+        "aa": "TSR",
+        "aaMethod": "4",
+        "exposure": "fixed-histogram",
+        "expMin": "2.46229",
+        "expMax": "2.46229",
+        "expBias": "0.000",
+        "ev100": "1.30",
+        "lightUnits": "candelas",
+        "sky": "1",
+        "skyIntensity": "11.200",
+        "keyShadow": "csm-3000uu-2c-contact0.000",
+        "shadowCasters": "1",
+        "profile": "cobble-probe",
+        "profilesSha256": "91ea86be522212fc770a33e3c9ac66f1cfde90c720c609bdc6bd29589965eaa5",
+        "profilesSource": "pak",
+        "legacyRender": "0",
+        "gameLayer": "unlit-eyeadaptinv",
+        "tMaxFPS": "0.0",
+        "vsync": "0",
+        "frameRateLimit": "60.0",
+        "substrate": "0",
+        "nanite": "1",
+        "meshDF": "1",
+        "viewport": "1920x1080",
+        "reference": "0",
+        "notReference": "featureLevel,gi,reflections"
+      }
+    }
+  },
+  "profileGpu": [
+    {
+      "queues": {
+        "Compute pipeline 0": [
+          {
+            "name": "<root>",
+            "indent": 1,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.176
+          },
+          {
+            "name": "Frame 10937 (CsvFrame 3858)",
+            "indent": 4,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "RenderGraphExecute - Slate",
+            "indent": 7,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "BufferPoolCopyOps",
+            "indent": 4,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "TexturePoolCopyOps",
+            "indent": 4,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "Frame 10938 (CsvFrame 3859)",
+            "indent": 4,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.173
+          },
+          {
+            "name": "SceneRender - ViewFamilies",
+            "indent": 7,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.172
+          },
+          {
+            "name": "\"VisibilityCommands\"",
+            "indent": 10,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "RenderGraphExecute - /ViewFamilies",
+            "indent": 10,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.167
+          },
+          {
+            "name": "Scene",
+            "indent": 13,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.167
+          },
+          {
+            "name": "FXSystemPreRender",
+            "indent": 16,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "AccessModePass[AsyncCompute] (Textures: 0, Buffers: 1)",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "AccessModePass[AsyncCompute] (Textures: 4, Buffers: 1)",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "PostProcessing",
+            "indent": 16,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.16
+          },
+          {
+            "name": "TemporalSuperResolution(sg.AntiAliasingQuality=2) 1920x1080 -> 1920x1080",
+            "indent": 19,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.154
+          },
+          {
+            "name": "TSR ClearPrevTextures 1920x1080",
+            "indent": 22,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "TSR DilateVelocity(#0 MotionBlurDirections=0 ReprojectionField OutputIsMoving) 1920x1080",
+            "indent": 22,
+            "exclusiveMs": 0.065,
+            "inclusiveMs": 0.065
+          },
+          {
+            "name": "TSR DecimateHistory(#3 ReprojectMoire ReprojectResurrection) 1920x1080",
+            "indent": 22,
+            "exclusiveMs": 0.081,
+            "inclusiveMs": 0.081
+          },
+          {
+            "name": "RenderGraphExecute - Slate",
+            "indent": 7,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "FRDGBuilder::SubmitBufferUploads",
+            "indent": 10,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          }
+        ],
+        "Graphics pipeline 0": [
+          {
+            "name": "<root>",
+            "indent": 1,
+            "exclusiveMs": 0.008,
+            "inclusiveMs": 1.965
+          },
+          {
+            "name": "BufferPoolCopyOps",
+            "indent": 4,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "TexturePoolCopyOps",
+            "indent": 4,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "Frame 10938 (CsvFrame 3859)",
+            "indent": 4,
+            "exclusiveMs": 0.015,
+            "inclusiveMs": 1.956
+          },
+          {
+            "name": "WorldTick",
+            "indent": 7,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "SendAllEndOfFrameUpdates",
+            "indent": 7,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "SceneRender - ViewFamilies",
+            "indent": 7,
+            "exclusiveMs": 0.059,
+            "inclusiveMs": 1.915
+          },
+          {
+            "name": "RayTracingGeometry",
+            "indent": 10,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "\"DistanceFields\"",
+            "indent": 10,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "\"GlobalDistanceFieldUpdate\"",
+            "indent": 13,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "\"AllocateRendertargets\"",
+            "indent": 10,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "\"VisibilityCommands\"",
+            "indent": 10,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "RenderGraphExecute - /ViewFamilies",
+            "indent": 10,
+            "exclusiveMs": 0.032,
+            "inclusiveMs": 1.852
+          },
+          {
+            "name": "FRDGBuilder::SubmitBufferUploads",
+            "indent": 13,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "ClearGPUMessageBuffer",
+            "indent": 13,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "UpdateAllPrimitiveSceneInfos",
+            "indent": 13,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "ScatterUpload (Resource: Skinning.HeaderData)",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "Skinning",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ScatterUpload",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "ScatterUpload (Resource: Skinning.BoneTransforms)",
+            "indent": 22,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "GPUSceneUpdate",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "GPUScene.Update",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "UpdateGPUScene NumPrimitiveDataUploads 1",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "ScatterUpload (Resource: GPUScene.PrimitiveData)",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "ScatterUpload (Resource: GPUScene.InstanceSceneData)",
+            "indent": 25,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "\"DistanceFields\"",
+            "indent": 13,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.021
+          },
+          {
+            "name": "UpdateDistanceFieldAtlas",
+            "indent": 16,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.019
+          },
+          {
+            "name": "ClearBuffer(DistanceFields.DistanceFieldAssetWantedNumMips Size=32bytes)",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "ComputeWantedMips",
+            "indent": 19,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "GenerateStreamingRequests",
+            "indent": 19,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "DistanceFieldAssetReadback",
+            "indent": 19,
+            "exclusiveMs": 0.01,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "Scene",
+            "indent": 13,
+            "exclusiveMs": 0.057,
+            "inclusiveMs": 1.77
+          },
+          {
+            "name": "FXSystemPreRender",
+            "indent": 16,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "AccessModePass[Graphics] (Textures: 0, Buffers: 1)",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "GPUParticles_PreRender",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "GPUSceneUpdate",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "ClearBuffer(ViewData.DeformingInstanceViewMask Size=20bytes)",
+            "indent": 19,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "BuildRenderingCommandsDeferred(Culling=On)",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.016
+          },
+          {
+            "name": "ClearBuffer(InstanceCulling.Compaction.BlockInstanceCounts Size=4bytes)",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "ClearIndirectArgInstanceCount",
+            "indent": 19,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "CullInstances(UnCulled). Bin 0",
+            "indent": 19,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "CullInstances(Generic). Bin 1",
+            "indent": 19,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "Instance Compaction Phase 1",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "Instance Compaction Phase 2",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "AccessModePass[Graphics] (Textures: 6, Buffers: 3)",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "ClearDepthStencil (SceneDepthZ)",
+            "indent": 16,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "PrePass DDM_AllOpaqueNoVelocity (Forced by DBuffer)",
+            "indent": 16,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.03
+          },
+          {
+            "name": "DepthPassParallel",
+            "indent": 19,
+            "exclusiveMs": 0.017,
+            "inclusiveMs": 0.027
+          },
+          {
+            "name": "ParallelDraw (Index: 0, Num: 1)",
+            "indent": 22,
+            "exclusiveMs": 0.01,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "EditorPrimitives",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "RenderVelocities(Opaque)",
+            "indent": 16,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.038
+          },
+          {
+            "name": "ClearRenderTarget(SceneVelocity, slice 0, mip 0) 1920x1080 ClearAction",
+            "indent": 19,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "VelocityParallel",
+            "indent": 19,
+            "exclusiveMs": 0.025,
+            "inclusiveMs": 0.034
+          },
+          {
+            "name": "ParallelDraw (Index: 0, Num: 1)",
+            "indent": 22,
+            "exclusiveMs": 0.009,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "HZB",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.011
+          },
+          {
+            "name": "BeginOcclusionTests",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "BeginOcclusionTests",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "BeginOcclusionTests",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "ViewOcclusionTests 0",
+            "indent": 28,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "BeginOcclusionTests",
+            "indent": 31,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "ShadowFrustumQueries",
+            "indent": 34,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "GroupedQueries",
+            "indent": 34,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "IndividualQueries",
+            "indent": 34,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "HZB",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.016
+          },
+          {
+            "name": "BuildHZB(ViewId=0)",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.016
+          },
+          {
+            "name": "BuildHZB",
+            "indent": 22,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.016
+          },
+          {
+            "name": "ReduceHZB(mips=[0;3] Furthest) 1024x1024",
+            "indent": 25,
+            "exclusiveMs": 0.011,
+            "inclusiveMs": 0.011
+          },
+          {
+            "name": "ReduceHZB(mips=[4;7] Furthest) 64x64",
+            "indent": 25,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ReduceHZB(mips=[8;9] Furthest) 4x4",
+            "indent": 25,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ComputeLightGrid",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.038
+          },
+          {
+            "name": "CullLights 30x17x32 NumLights 1 NumCaptures 0",
+            "indent": 19,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.037
+          },
+          {
+            "name": "ClearBuffer(CulledLightLinkAllocator Size=4bytes)",
+            "indent": 22,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "ClearBuffer(CulledLightDataAllocator Size=4bytes)",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "ClearBuffer(NumCulledLightsGrid Size=261120bytes)",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "LightGridInject LinkedList  UseHZBCull  SingleThread",
+            "indent": 22,
+            "exclusiveMs": 0.023,
+            "inclusiveMs": 0.023
+          },
+          {
+            "name": "LightGridFeedbackStatus",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "LightFunctionAtlasGeneration",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "LightFunctionAtlas Generation",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "GBufferClear",
+            "indent": 16,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "BasePass",
+            "indent": 16,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.064
+          },
+          {
+            "name": "BasePassParallel",
+            "indent": 19,
+            "exclusiveMs": 0.025,
+            "inclusiveMs": 0.059
+          },
+          {
+            "name": "ParallelDraw (Index: 0, Num: 1)",
+            "indent": 22,
+            "exclusiveMs": 0.034,
+            "inclusiveMs": 0.034
+          },
+          {
+            "name": "EditorPrimitives",
+            "indent": 19,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "EditorPrimitives: SDPG_World",
+            "indent": 22,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "ShadowDepths",
+            "indent": 16,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.072
+          },
+          {
+            "name": "BuildRenderingCommandsDeferred(Culling=On)",
+            "indent": 19,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.033
+          },
+          {
+            "name": "ClearBuffer(InstanceCulling.Compaction.BlockInstanceCounts Size=4bytes)",
+            "indent": 22,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "ClearIndirectArgInstanceCount",
+            "indent": 22,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "CullInstances(UnCulled). Bin 0",
+            "indent": 22,
+            "exclusiveMs": 0.01,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "CullInstances(Generic). Bin 1",
+            "indent": 22,
+            "exclusiveMs": 0.01,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "Instance Compaction Phase 1",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "Instance Compaction Phase 2",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "Atlas0 4096x2048",
+            "indent": 19,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.037
+          },
+          {
+            "name": "ClearShadowDepth",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "S08Arena.DirectionalLight_2147482374",
+            "indent": 22,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.03
+          },
+          {
+            "name": "WholeScene split0 2040x2040",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "ShadowDepthPassParallel",
+            "indent": 28,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "WholeScene split1 2040x2040",
+            "indent": 25,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.029
+          },
+          {
+            "name": "ShadowDepthPassParallel",
+            "indent": 28,
+            "exclusiveMs": 0.016,
+            "inclusiveMs": 0.028
+          },
+          {
+            "name": "ParallelDraw (Index: 0, Num: 1)",
+            "indent": 31,
+            "exclusiveMs": 0.011,
+            "inclusiveMs": 0.011
+          },
+          {
+            "name": "LightCompositionTasks_PreLighting",
+            "indent": 16,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.318
+          },
+          {
+            "name": "ScreenSpace AO Setup",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.012
+          },
+          {
+            "name": "AccessModePass[Graphics] (Textures: 1, Buffers: 0)",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "AmbientOcclusionSetup 960x540",
+            "indent": 22,
+            "exclusiveMs": 0.01,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "ScreenSpace AO",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.121
+          },
+          {
+            "name": "AmbientOcclusionPS 960x540 SetupAsInput=1 Upsample=0 ShaderQuality=2",
+            "indent": 22,
+            "exclusiveMs": 0.121,
+            "inclusiveMs": 0.121
+          },
+          {
+            "name": "ScreenSpace AO",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.184
+          },
+          {
+            "name": "AmbientOcclusionPS 1920x1080 SetupAsInput=0 Upsample=1 ShaderQuality=2",
+            "indent": 22,
+            "exclusiveMs": 0.184,
+            "inclusiveMs": 0.184
+          },
+          {
+            "name": "ClearStencil (SceneDepthZ)",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "RenderDeferredLighting",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.117
+          },
+          {
+            "name": "DiffuseIndirectAndAO",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "DiffuseIndirectComposite(DiffuseIndirect=Disabled ApplyAOToSceneColor) 1920x1080",
+            "indent": 22,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "InitTranslucencyLightingVolumeTextures",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "ClearTranslucencyLightingVolumeCompute 48",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "Lights",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.089
+          },
+          {
+            "name": "DirectLighting",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.089
+          },
+          {
+            "name": "BatchedLights",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.014
+          },
+          {
+            "name": "RenderLight Light::StandardDeferred: PointLight_2147482373",
+            "indent": 28,
+            "exclusiveMs": 0.014,
+            "inclusiveMs": 0.014
+          },
+          {
+            "name": "UnbatchedLights",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.075
+          },
+          {
+            "name": "S08Arena.DirectionalLight_2147482374",
+            "indent": 28,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.075
+          },
+          {
+            "name": "ClearRenderTarget(ShadowMaskTexture, slice 0, mip 0) 1920x1080 ClearAction",
+            "indent": 31,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "ShadowProjectionOnOpaque",
+            "indent": 31,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.055
+          },
+          {
+            "name": "Shadows",
+            "indent": 34,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "S08Arena.DirectionalLight_2147482374",
+            "indent": 37,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "ShadowProjection WholeScene split1",
+            "indent": 40,
+            "exclusiveMs": 0.009,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "ShadowProjection WholeScene split0",
+            "indent": 40,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "DistanceFieldShadows",
+            "indent": 34,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.046
+          },
+          {
+            "name": "BeginRayTracedDistanceFieldShadow",
+            "indent": 37,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.042
+          },
+          {
+            "name": "CullDistanceFieldObjectsForLight MeshSDF",
+            "indent": 40,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.029
+          },
+          {
+            "name": "ClearBuffer(DistanceField.ObjectIndirectArguments Size=20bytes)",
+            "indent": 43,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "CullMeshSDFObjectsToFrustum",
+            "indent": 43,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "ClearBuffer(ShadowTileNumCulledObjects Size=147456bytes)",
+            "indent": 43,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "ScatterMeshSDFsToLightGrid 192x192",
+            "indent": 43,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "ClearBuffer(ShadowNextStartOffset Size=4bytes)",
+            "indent": 43,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "ComputeCulledObjectStartOffset",
+            "indent": 43,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "ClearBuffer(ShadowTileNumCulledObjects Size=147456bytes)",
+            "indent": 43,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ScatterMeshSDFsToLightGrid 192x192",
+            "indent": 43,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "DistanceFieldShadowing 960x544",
+            "indent": 40,
+            "exclusiveMs": 0.012,
+            "inclusiveMs": 0.012
+          },
+          {
+            "name": "Upsample",
+            "indent": 37,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "RenderLight Light::StandardDeferred: DirectionalLight_2147482374",
+            "indent": 31,
+            "exclusiveMs": 0.018,
+            "inclusiveMs": 0.018
+          },
+          {
+            "name": "TranslucencyLightingVolume",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.017
+          },
+          {
+            "name": "InjectTranslucencyLightingVolume(View=0)",
+            "indent": 22,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.017
+          },
+          {
+            "name": "InjectTranslucencyLightingVolumeBatch(VolumeCascade=0,Max=32)",
+            "indent": 25,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "InjectTranslucencyLightingVolumeBatch(VolumeCascade=1,Max=32)",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "BarrierPass",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "InjectTranslucencyLightingVolume(VolumeCascade=0,ShadowMap)",
+            "indent": 25,
+            "exclusiveMs": 0.009,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "InjectTranslucencyLightingVolume(VolumeCascade=0,ShadowMap)",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "InjectTranslucencyLightingVolume(VolumeCascade=1,ShadowMap)",
+            "indent": 25,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "InjectTranslucencyLightingVolume(VolumeCascade=1,ShadowMap)",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "FilterTranslucentVolume 48x48x48 Cascades:2",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "BarrierPass",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "RenderDeferredLighting",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.137
+          },
+          {
+            "name": "DiffuseIndirectAndAO",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.137
+          },
+          {
+            "name": "SkyLightDiffuse",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.098
+          },
+          {
+            "name": "DistanceFieldLighting",
+            "indent": 25,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.098
+          },
+          {
+            "name": "ComputeNormal",
+            "indent": 28,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "ClearBuffer(ScreenGridConeVisibility Size=1166400bytes)",
+            "indent": 28,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "ConeTraceGlobal",
+            "indent": 28,
+            "exclusiveMs": 0.061,
+            "inclusiveMs": 0.061
+          },
+          {
+            "name": "CombineCones",
+            "indent": 28,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "ClearTextureFloat(DistanceFieldAOHistory) 960x540",
+            "indent": 28,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "UpdateHistory",
+            "indent": 28,
+            "exclusiveMs": 0.01,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "ReflectionIndirect",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.039
+          },
+          {
+            "name": "ScreenSpaceReflections(Quality=2)",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.008
+          },
+          {
+            "name": "ScreenSpaceReflections",
+            "indent": 28,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.008
+          },
+          {
+            "name": "SSR RayMarch(Quality=2 RayPerPixel=1) 1920x1080",
+            "indent": 31,
+            "exclusiveMs": 0.008,
+            "inclusiveMs": 0.008
+          },
+          {
+            "name": "ReflectionEnvironment",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.031
+          },
+          {
+            "name": "ReflectionEnvironmentAndSky(1920x1080,SubstrateMat=Off)",
+            "indent": 28,
+            "exclusiveMs": 0.031,
+            "inclusiveMs": 0.031
+          },
+          {
+            "name": "TemporalSuperResolution",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "TSR MeasureFlickeringLuma 1920x1080",
+            "indent": 19,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "PostRenderOpsFX",
+            "indent": 16,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "SetSceneTexturesUniformBuffer",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "FXSystemPostRenderOpaque",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "GPUParticles_PostRenderOpaque",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "AsyncGpuTraceHelper::PostRenderOpaque",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "Niagara::PostRenderFinish",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "UnsetSceneTexturesUniformBuffer",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "Translucency",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "RenderTranslucency",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ClearRenderTarget(Translucency.AfterDOF.Color, slice 0, mip 0) 1920x1080 ClearAction",
+            "indent": 22,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "PostProcessing",
+            "indent": 16,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.817
+          },
+          {
+            "name": "TemporalSuperResolution(sg.AntiAliasingQuality=2) 1920x1080 -> 1920x1080",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.699
+          },
+          {
+            "name": "TSR RejectShading(#51 TileSize=26 PaddingCostMultiplier=1.5 WaveSize=0 VALU=32bit FlickeringFramePeriod=2.000000 Resurrection)",
+            "indent": 22,
+            "exclusiveMs": 0.621,
+            "inclusiveMs": 0.621
+          },
+          {
+            "name": "TSR SpatialAntiAliasing(#1 Quality=1) 1920x1080",
+            "indent": 22,
+            "exclusiveMs": 0.017,
+            "inclusiveMs": 0.017
+          },
+          {
+            "name": "TSR UpdateHistory(#2 Quality=High R11G11B10 ReprojectionField SupportLensDistortion OutputMip1) 1920x1080",
+            "indent": 22,
+            "exclusiveMs": 0.06,
+            "inclusiveMs": 0.06
+          },
+          {
+            "name": "Histogram",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.014
+          },
+          {
+            "name": "ClearTextureUint(Histogram.Scatter32 R32_UINT 128x1 Mip=0)",
+            "indent": 22,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "Histogram Atomic 960x540 (CS)",
+            "indent": 22,
+            "exclusiveMs": 0.008,
+            "inclusiveMs": 0.008
+          },
+          {
+            "name": "Histogram Convert",
+            "indent": 22,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "TextureDownsampleChain",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.013
+          },
+          {
+            "name": "Downsample(Scene(1/4) Quality=High PS) 960x540 -> 480x270",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "Downsample(Scene(1/8) Quality=High PS) 480x270 -> 240x135",
+            "indent": 22,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "Downsample(Scene(1/16) Quality=High PS) 240x135 -> 120x68",
+            "indent": 22,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "Downsample(Scene(1/32) Quality=High PS) 120x68 -> 60x34",
+            "indent": 22,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "Downsample(Scene(1/64) Quality=High PS) 60x34 -> 30x17",
+            "indent": 22,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "HistogramEyeAdaptation (CS)",
+            "indent": 19,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "EnqueueCopy(EyeAdaptationBuffer)",
+            "indent": 19,
+            "exclusiveMs": 0.011,
+            "inclusiveMs": 0.011
+          },
+          {
+            "name": "Bloom",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.056
+          },
+          {
+            "name": "GaussianBlur.BloomX 15x17 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "GaussianBlur.BloomY 30x17 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "GaussianBlur.BloomX 30x34 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "GaussianBlur.BloomY 60x34 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "GaussianBlur.BloomX 60x68 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "GaussianBlur.BloomY 120x68 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "GaussianBlur.BloomX 120x135 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "GaussianBlur.BloomY 240x135 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "GaussianBlur.BloomX 240x270 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "GaussianBlur.BloomY 480x270 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "GaussianBlur.BloomX 480x540 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "GaussianBlur.BloomY 960x540 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "Tonemap 1920x1080 (PS GammaOnly=0)",
+            "indent": 19,
+            "exclusiveMs": 0.015,
+            "inclusiveMs": 0.015
+          },
+          {
+            "name": "VirtualTextureUpdate",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "ExtractUniformBuffer",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "EnqueueCopy(GPUMessageManager.MessageBuffer)",
+            "indent": 13,
+            "exclusiveMs": 0.017,
+            "inclusiveMs": 0.017
+          },
+          {
+            "name": "RenderGraphExecute - Slate",
+            "indent": 7,
+            "exclusiveMs": 0.018,
+            "inclusiveMs": 0.026
+          },
+          {
+            "name": "FRDGBuilder::SubmitBufferUploads",
+            "indent": 10,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "SlateUI Title = Unmatched (64-bit Development PCD3D_SM5)",
+            "indent": 10,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "ElementBatch",
+            "indent": 13,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          }
+        ]
+      },
+      "line": "[2026.09.29-01.49.08:855][939]LogRHI: Di",
+      "summary": {
+        "Compute pipeline 0": {
+          "<root>": 0.176,
+          "Scene": 0.167,
+          "PostProcessing": 0.16
+        },
+        "Graphics pipeline 0": {
+          "<root>": 1.965,
+          "Scene": 1.77,
+          "HZB": 0.011,
+          "BasePass": 0.064,
+          "ShadowDepths": 0.072,
+          "RenderDeferredLighting": 0.117,
+          "DiffuseIndirectAndAO": 0.006,
+          "Lights": 0.089,
+          "DistanceFieldShadows": 0.046,
+          "ScreenSpaceReflections": 0.008,
+          "TemporalSuperResolution": 0.007,
+          "Translucency": 0.002,
+          "PostProcessing": 0.817
+        }
+      }
+    },
+    {
+      "queues": {
+        "Compute pipeline 0": [
+          {
+            "name": "<root>",
+            "indent": 1,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.198
+          },
+          {
+            "name": "Frame 16628 (CsvFrame 3651)",
+            "indent": 4,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "RenderGraphExecute - Slate",
+            "indent": 7,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "BufferPoolCopyOps",
+            "indent": 4,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "TexturePoolCopyOps",
+            "indent": 4,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "Frame 16629 (CsvFrame 3652)",
+            "indent": 4,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.192
+          },
+          {
+            "name": "SceneRender - ViewFamilies",
+            "indent": 7,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.192
+          },
+          {
+            "name": "\"VisibilityCommands\"",
+            "indent": 10,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "RenderGraphExecute - /ViewFamilies",
+            "indent": 10,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.183
+          },
+          {
+            "name": "Scene",
+            "indent": 13,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.183
+          },
+          {
+            "name": "FXSystemPreRender",
+            "indent": 16,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "AccessModePass[AsyncCompute] (Textures: 0, Buffers: 1)",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "AccessModePass[AsyncCompute] (Textures: 4, Buffers: 1)",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "PostProcessing",
+            "indent": 16,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.176
+          },
+          {
+            "name": "TemporalSuperResolution(sg.AntiAliasingQuality=2) 1920x1080 -> 1920x1080",
+            "indent": 19,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.169
+          },
+          {
+            "name": "TSR ClearPrevTextures 1920x1080",
+            "indent": 22,
+            "exclusiveMs": 0.008,
+            "inclusiveMs": 0.008
+          },
+          {
+            "name": "TSR DilateVelocity(#0 MotionBlurDirections=0 ReprojectionField OutputIsMoving) 1920x1080",
+            "indent": 22,
+            "exclusiveMs": 0.062,
+            "inclusiveMs": 0.062
+          },
+          {
+            "name": "TSR DecimateHistory(#3 ReprojectMoire ReprojectResurrection) 1920x1080",
+            "indent": 22,
+            "exclusiveMs": 0.094,
+            "inclusiveMs": 0.094
+          },
+          {
+            "name": "RenderGraphExecute - Slate",
+            "indent": 7,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "FRDGBuilder::SubmitBufferUploads",
+            "indent": 10,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          }
+        ],
+        "Graphics pipeline 0": [
+          {
+            "name": "<root>",
+            "indent": 1,
+            "exclusiveMs": 0.009,
+            "inclusiveMs": 2.127
+          },
+          {
+            "name": "BufferPoolCopyOps",
+            "indent": 4,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "TexturePoolCopyOps",
+            "indent": 4,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "Frame 16629 (CsvFrame 3652)",
+            "indent": 4,
+            "exclusiveMs": 0.026,
+            "inclusiveMs": 2.117
+          },
+          {
+            "name": "WorldTick",
+            "indent": 7,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "SendAllEndOfFrameUpdates",
+            "indent": 7,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "SceneRender - ViewFamilies",
+            "indent": 7,
+            "exclusiveMs": 0.056,
+            "inclusiveMs": 2.066
+          },
+          {
+            "name": "RayTracingGeometry",
+            "indent": 10,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "\"DistanceFields\"",
+            "indent": 10,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "\"GlobalDistanceFieldUpdate\"",
+            "indent": 13,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "\"AllocateRendertargets\"",
+            "indent": 10,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "\"VisibilityCommands\"",
+            "indent": 10,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "RenderGraphExecute - /ViewFamilies",
+            "indent": 10,
+            "exclusiveMs": 0.034,
+            "inclusiveMs": 2.007
+          },
+          {
+            "name": "FRDGBuilder::SubmitBufferUploads",
+            "indent": 13,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "ClearGPUMessageBuffer",
+            "indent": 13,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "UpdateAllPrimitiveSceneInfos",
+            "indent": 13,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "ScatterUpload (Resource: Skinning.HeaderData)",
+            "indent": 16,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "Skinning",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "ScatterUpload",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "ScatterUpload (Resource: Skinning.BoneTransforms)",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "GPUSceneUpdate",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "GPUScene.Update",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "UpdateGPUScene NumPrimitiveDataUploads 1",
+            "indent": 22,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ScatterUpload (Resource: GPUScene.PrimitiveData)",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "ScatterUpload (Resource: GPUScene.InstanceSceneData)",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "\"DistanceFields\"",
+            "indent": 13,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.023
+          },
+          {
+            "name": "UpdateDistanceFieldAtlas",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.02
+          },
+          {
+            "name": "ClearBuffer(DistanceFields.DistanceFieldAssetWantedNumMips Size=32bytes)",
+            "indent": 19,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ComputeWantedMips",
+            "indent": 19,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "GenerateStreamingRequests",
+            "indent": 19,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "DistanceFieldAssetReadback",
+            "indent": 19,
+            "exclusiveMs": 0.012,
+            "inclusiveMs": 0.012
+          },
+          {
+            "name": "Scene",
+            "indent": 13,
+            "exclusiveMs": 0.052,
+            "inclusiveMs": 1.92
+          },
+          {
+            "name": "FXSystemPreRender",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "AccessModePass[Graphics] (Textures: 0, Buffers: 1)",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "GPUParticles_PreRender",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "GPUSceneUpdate",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "ClearBuffer(ViewData.DeformingInstanceViewMask Size=24bytes)",
+            "indent": 19,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "BuildRenderingCommandsDeferred(Culling=On)",
+            "indent": 16,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.018
+          },
+          {
+            "name": "ClearBuffer(InstanceCulling.Compaction.BlockInstanceCounts Size=4bytes)",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "ClearIndirectArgInstanceCount",
+            "indent": 19,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "CullInstances(UnCulled). Bin 0",
+            "indent": 19,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "CullInstances(Generic). Bin 1",
+            "indent": 19,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "Instance Compaction Phase 1",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "Instance Compaction Phase 2",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "AccessModePass[Graphics] (Textures: 6, Buffers: 3)",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "ClearDepthStencil (SceneDepthZ)",
+            "indent": 16,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "PrePass DDM_AllOpaqueNoVelocity (Forced by DBuffer)",
+            "indent": 16,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.033
+          },
+          {
+            "name": "DepthPassParallel",
+            "indent": 19,
+            "exclusiveMs": 0.016,
+            "inclusiveMs": 0.03
+          },
+          {
+            "name": "ParallelDraw (Index: 0, Num: 1)",
+            "indent": 22,
+            "exclusiveMs": 0.013,
+            "inclusiveMs": 0.013
+          },
+          {
+            "name": "EditorPrimitives",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "RenderVelocities(Opaque)",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.04
+          },
+          {
+            "name": "ClearRenderTarget(SceneVelocity, slice 0, mip 0) 1920x1080 ClearAction",
+            "indent": 19,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "VelocityParallel",
+            "indent": 19,
+            "exclusiveMs": 0.025,
+            "inclusiveMs": 0.035
+          },
+          {
+            "name": "ParallelDraw (Index: 0, Num: 1)",
+            "indent": 22,
+            "exclusiveMs": 0.01,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "HZB",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.011
+          },
+          {
+            "name": "BeginOcclusionTests",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "BeginOcclusionTests",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "BeginOcclusionTests",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "ViewOcclusionTests 0",
+            "indent": 28,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "BeginOcclusionTests",
+            "indent": 31,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "ShadowFrustumQueries",
+            "indent": 34,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "GroupedQueries",
+            "indent": 34,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "IndividualQueries",
+            "indent": 34,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "HZB",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.017
+          },
+          {
+            "name": "BuildHZB(ViewId=0)",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.016
+          },
+          {
+            "name": "BuildHZB",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.016
+          },
+          {
+            "name": "ReduceHZB(mips=[0;3] Furthest) 1024x1024",
+            "indent": 25,
+            "exclusiveMs": 0.012,
+            "inclusiveMs": 0.012
+          },
+          {
+            "name": "ReduceHZB(mips=[4;7] Furthest) 64x64",
+            "indent": 25,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ReduceHZB(mips=[8;9] Furthest) 4x4",
+            "indent": 25,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ComputeLightGrid",
+            "indent": 16,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.03
+          },
+          {
+            "name": "CullLights 30x17x32 NumLights 1 NumCaptures 0",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.028
+          },
+          {
+            "name": "ClearBuffer(CulledLightLinkAllocator Size=4bytes)",
+            "indent": 22,
+            "exclusiveMs": 0.009,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "ClearBuffer(CulledLightDataAllocator Size=4bytes)",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "ClearBuffer(NumCulledLightsGrid Size=261120bytes)",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "LightGridInject LinkedList  UseHZBCull  SingleThread",
+            "indent": 22,
+            "exclusiveMs": 0.01,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "LightGridFeedbackStatus",
+            "indent": 22,
+            "exclusiveMs": 0.008,
+            "inclusiveMs": 0.008
+          },
+          {
+            "name": "LightFunctionAtlasGeneration",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "LightFunctionAtlas Generation",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "GBufferClear",
+            "indent": 16,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "BasePass",
+            "indent": 16,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.081
+          },
+          {
+            "name": "BasePassParallel",
+            "indent": 19,
+            "exclusiveMs": 0.021,
+            "inclusiveMs": 0.075
+          },
+          {
+            "name": "ParallelDraw (Index: 0, Num: 1)",
+            "indent": 22,
+            "exclusiveMs": 0.055,
+            "inclusiveMs": 0.055
+          },
+          {
+            "name": "EditorPrimitives",
+            "indent": 19,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "EditorPrimitives: SDPG_World",
+            "indent": 22,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "ShadowDepths",
+            "indent": 16,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.1
+          },
+          {
+            "name": "BuildRenderingCommandsDeferred(Culling=On)",
+            "indent": 19,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.023
+          },
+          {
+            "name": "ClearBuffer(InstanceCulling.Compaction.BlockInstanceCounts Size=4bytes)",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "ClearIndirectArgInstanceCount",
+            "indent": 22,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "CullInstances(UnCulled). Bin 0",
+            "indent": 22,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "CullInstances(Generic). Bin 1",
+            "indent": 22,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "Instance Compaction Phase 1",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "Instance Compaction Phase 2",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "Atlas0 4096x2048",
+            "indent": 19,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.075
+          },
+          {
+            "name": "ClearShadowDepth",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "S08Arena.DirectionalLight_2147482374",
+            "indent": 22,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.068
+          },
+          {
+            "name": "WholeScene split0 2040x2040",
+            "indent": 25,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.031
+          },
+          {
+            "name": "ShadowDepthPassParallel",
+            "indent": 28,
+            "exclusiveMs": 0.018,
+            "inclusiveMs": 0.03
+          },
+          {
+            "name": "ParallelDraw (Index: 0, Num: 1)",
+            "indent": 31,
+            "exclusiveMs": 0.012,
+            "inclusiveMs": 0.012
+          },
+          {
+            "name": "WholeScene split1 2040x2040",
+            "indent": 25,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.034
+          },
+          {
+            "name": "ShadowDepthPassParallel",
+            "indent": 28,
+            "exclusiveMs": 0.021,
+            "inclusiveMs": 0.032
+          },
+          {
+            "name": "ParallelDraw (Index: 0, Num: 1)",
+            "indent": 31,
+            "exclusiveMs": 0.01,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "LightCompositionTasks_PreLighting",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.336
+          },
+          {
+            "name": "ScreenSpace AO Setup",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.012
+          },
+          {
+            "name": "AccessModePass[Graphics] (Textures: 1, Buffers: 0)",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "AmbientOcclusionSetup 960x540",
+            "indent": 22,
+            "exclusiveMs": 0.01,
+            "inclusiveMs": 0.01
+          },
+          {
+            "name": "ScreenSpace AO",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.125
+          },
+          {
+            "name": "AmbientOcclusionPS 960x540 SetupAsInput=1 Upsample=0 ShaderQuality=2",
+            "indent": 22,
+            "exclusiveMs": 0.125,
+            "inclusiveMs": 0.125
+          },
+          {
+            "name": "ScreenSpace AO",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.199
+          },
+          {
+            "name": "AmbientOcclusionPS 1920x1080 SetupAsInput=0 Upsample=1 ShaderQuality=2",
+            "indent": 22,
+            "exclusiveMs": 0.199,
+            "inclusiveMs": 0.199
+          },
+          {
+            "name": "ClearStencil (SceneDepthZ)",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "RenderDeferredLighting",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.155
+          },
+          {
+            "name": "DiffuseIndirectAndAO",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.013
+          },
+          {
+            "name": "DiffuseIndirectComposite(DiffuseIndirect=Disabled ApplyAOToSceneColor) 1920x1080",
+            "indent": 22,
+            "exclusiveMs": 0.013,
+            "inclusiveMs": 0.013
+          },
+          {
+            "name": "InitTranslucencyLightingVolumeTextures",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "ClearTranslucencyLightingVolumeCompute 48",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "Lights",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.118
+          },
+          {
+            "name": "DirectLighting",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.118
+          },
+          {
+            "name": "BatchedLights",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.029
+          },
+          {
+            "name": "RenderLight Light::StandardDeferred: PointLight_2147482373",
+            "indent": 28,
+            "exclusiveMs": 0.029,
+            "inclusiveMs": 0.029
+          },
+          {
+            "name": "UnbatchedLights",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.089
+          },
+          {
+            "name": "S08Arena.DirectionalLight_2147482374",
+            "indent": 28,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.089
+          },
+          {
+            "name": "ClearRenderTarget(ShadowMaskTexture, slice 0, mip 0) 1920x1080 ClearAction",
+            "indent": 31,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "ShadowProjectionOnOpaque",
+            "indent": 31,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.061
+          },
+          {
+            "name": "Shadows",
+            "indent": 34,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.019
+          },
+          {
+            "name": "S08Arena.DirectionalLight_2147482374",
+            "indent": 37,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.019
+          },
+          {
+            "name": "ShadowProjection WholeScene split1",
+            "indent": 40,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ShadowProjection WholeScene split0",
+            "indent": 40,
+            "exclusiveMs": 0.017,
+            "inclusiveMs": 0.017
+          },
+          {
+            "name": "DistanceFieldShadows",
+            "indent": 34,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.042
+          },
+          {
+            "name": "BeginRayTracedDistanceFieldShadow",
+            "indent": 37,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.038
+          },
+          {
+            "name": "CullDistanceFieldObjectsForLight MeshSDF",
+            "indent": 40,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.029
+          },
+          {
+            "name": "ClearBuffer(DistanceField.ObjectIndirectArguments Size=20bytes)",
+            "indent": 43,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "CullMeshSDFObjectsToFrustum",
+            "indent": 43,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "ClearBuffer(ShadowTileNumCulledObjects Size=147456bytes)",
+            "indent": 43,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "ScatterMeshSDFsToLightGrid 192x192",
+            "indent": 43,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "ClearBuffer(ShadowNextStartOffset Size=4bytes)",
+            "indent": 43,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ComputeCulledObjectStartOffset",
+            "indent": 43,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ClearBuffer(ShadowTileNumCulledObjects Size=147456bytes)",
+            "indent": 43,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ScatterMeshSDFsToLightGrid 192x192",
+            "indent": 43,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "DistanceFieldShadowing 960x544",
+            "indent": 40,
+            "exclusiveMs": 0.008,
+            "inclusiveMs": 0.008
+          },
+          {
+            "name": "Upsample",
+            "indent": 37,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "RenderLight Light::StandardDeferred: DirectionalLight_2147482374",
+            "indent": 31,
+            "exclusiveMs": 0.028,
+            "inclusiveMs": 0.028
+          },
+          {
+            "name": "TranslucencyLightingVolume",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.019
+          },
+          {
+            "name": "InjectTranslucencyLightingVolume(View=0)",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.019
+          },
+          {
+            "name": "InjectTranslucencyLightingVolumeBatch(VolumeCascade=0,Max=32)",
+            "indent": 25,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "InjectTranslucencyLightingVolumeBatch(VolumeCascade=1,Max=32)",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "BarrierPass",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "InjectTranslucencyLightingVolume(VolumeCascade=0,ShadowMap)",
+            "indent": 25,
+            "exclusiveMs": 0.009,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "InjectTranslucencyLightingVolume(VolumeCascade=0,ShadowMap)",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "InjectTranslucencyLightingVolume(VolumeCascade=1,ShadowMap)",
+            "indent": 25,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "InjectTranslucencyLightingVolume(VolumeCascade=1,ShadowMap)",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "FilterTranslucentVolume 48x48x48 Cascades:2",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "BarrierPass",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "RenderDeferredLighting",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.368
+          },
+          {
+            "name": "DiffuseIndirectAndAO",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.368
+          },
+          {
+            "name": "SkyLightDiffuse",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.304
+          },
+          {
+            "name": "DistanceFieldLighting",
+            "indent": 25,
+            "exclusiveMs": 0.01,
+            "inclusiveMs": 0.304
+          },
+          {
+            "name": "ComputeNormal",
+            "indent": 28,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "ClearBuffer(ScreenGridConeVisibility Size=1166400bytes)",
+            "indent": 28,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "ConeTraceGlobal",
+            "indent": 28,
+            "exclusiveMs": 0.262,
+            "inclusiveMs": 0.262
+          },
+          {
+            "name": "CombineCones",
+            "indent": 28,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "ClearTextureFloat(DistanceFieldAOHistory) 960x540",
+            "indent": 28,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "UpdateHistory",
+            "indent": 28,
+            "exclusiveMs": 0.014,
+            "inclusiveMs": 0.014
+          },
+          {
+            "name": "ReflectionIndirect",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.064
+          },
+          {
+            "name": "ScreenSpaceReflections(Quality=2)",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "ScreenSpaceReflections",
+            "indent": 28,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.009
+          },
+          {
+            "name": "SSR RayMarch(Quality=2 RayPerPixel=1) 1920x1080",
+            "indent": 31,
+            "exclusiveMs": 0.008,
+            "inclusiveMs": 0.008
+          },
+          {
+            "name": "ReflectionEnvironment",
+            "indent": 25,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.054
+          },
+          {
+            "name": "ReflectionEnvironmentAndSky(1920x1080,SubstrateMat=Off)",
+            "indent": 28,
+            "exclusiveMs": 0.054,
+            "inclusiveMs": 0.054
+          },
+          {
+            "name": "TemporalSuperResolution",
+            "indent": 16,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "TSR MeasureFlickeringLuma 1920x1080",
+            "indent": 19,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "PostRenderOpsFX",
+            "indent": 16,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "SetSceneTexturesUniformBuffer",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "FXSystemPostRenderOpaque",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "GPUParticles_PostRenderOpaque",
+            "indent": 22,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "AsyncGpuTraceHelper::PostRenderOpaque",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "Niagara::PostRenderFinish",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "UnsetSceneTexturesUniformBuffer",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "Translucency",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "RenderTranslucency",
+            "indent": 19,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "ClearRenderTarget(Translucency.AfterDOF.Color, slice 0, mip 0) 1920x1080 ClearAction",
+            "indent": 22,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "PostProcessing",
+            "indent": 16,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.639
+          },
+          {
+            "name": "TemporalSuperResolution(sg.AntiAliasingQuality=2) 1920x1080 -> 1920x1080",
+            "indent": 19,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.518
+          },
+          {
+            "name": "TSR RejectShading(#51 TileSize=26 PaddingCostMultiplier=1.5 WaveSize=0 VALU=32bit FlickeringFramePeriod=2.000000 Resurrection)",
+            "indent": 22,
+            "exclusiveMs": 0.435,
+            "inclusiveMs": 0.435
+          },
+          {
+            "name": "TSR SpatialAntiAliasing(#1 Quality=1) 1920x1080",
+            "indent": 22,
+            "exclusiveMs": 0.016,
+            "inclusiveMs": 0.016
+          },
+          {
+            "name": "TSR UpdateHistory(#2 Quality=High R11G11B10 ReprojectionField SupportLensDistortion OutputMip1) 1920x1080",
+            "indent": 22,
+            "exclusiveMs": 0.066,
+            "inclusiveMs": 0.066
+          },
+          {
+            "name": "Histogram",
+            "indent": 19,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.015
+          },
+          {
+            "name": "ClearTextureUint(Histogram.Scatter32 R32_UINT 128x1 Mip=0)",
+            "indent": 22,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "Histogram Atomic 960x540 (CS)",
+            "indent": 22,
+            "exclusiveMs": 0.007,
+            "inclusiveMs": 0.007
+          },
+          {
+            "name": "Histogram Convert",
+            "indent": 22,
+            "exclusiveMs": 0.003,
+            "inclusiveMs": 0.003
+          },
+          {
+            "name": "TextureDownsampleChain",
+            "indent": 19,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.014
+          },
+          {
+            "name": "Downsample(Scene(1/4) Quality=High PS) 960x540 -> 480x270",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "Downsample(Scene(1/8) Quality=High PS) 480x270 -> 240x135",
+            "indent": 22,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "Downsample(Scene(1/16) Quality=High PS) 240x135 -> 120x68",
+            "indent": 22,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "Downsample(Scene(1/32) Quality=High PS) 120x68 -> 60x34",
+            "indent": 22,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.002
+          },
+          {
+            "name": "Downsample(Scene(1/64) Quality=High PS) 60x34 -> 30x17",
+            "indent": 22,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "HistogramEyeAdaptation (CS)",
+            "indent": 19,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "EnqueueCopy(EyeAdaptationBuffer)",
+            "indent": 19,
+            "exclusiveMs": 0.011,
+            "inclusiveMs": 0.011
+          },
+          {
+            "name": "Bloom",
+            "indent": 19,
+            "exclusiveMs": 0.002,
+            "inclusiveMs": 0.058
+          },
+          {
+            "name": "GaussianBlur.BloomX 15x17 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "GaussianBlur.BloomY 30x17 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "GaussianBlur.BloomX 30x34 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "GaussianBlur.BloomY 60x34 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "GaussianBlur.BloomX 60x68 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "GaussianBlur.BloomY 120x68 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "GaussianBlur.BloomX 120x135 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "GaussianBlur.BloomY 240x135 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "GaussianBlur.BloomX 240x270 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "GaussianBlur.BloomY 480x270 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.005,
+            "inclusiveMs": 0.005
+          },
+          {
+            "name": "GaussianBlur.BloomX 480x540 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "GaussianBlur.BloomY 960x540 (PS, Static)",
+            "indent": 22,
+            "exclusiveMs": 0.004,
+            "inclusiveMs": 0.004
+          },
+          {
+            "name": "Tonemap 1920x1080 (PS GammaOnly=0)",
+            "indent": 19,
+            "exclusiveMs": 0.015,
+            "inclusiveMs": 0.015
+          },
+          {
+            "name": "VirtualTextureUpdate",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "ExtractUniformBuffer",
+            "indent": 16,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.001
+          },
+          {
+            "name": "EnqueueCopy(GPUMessageManager.MessageBuffer)",
+            "indent": 13,
+            "exclusiveMs": 0.017,
+            "inclusiveMs": 0.017
+          },
+          {
+            "name": "RenderGraphExecute - Slate",
+            "indent": 7,
+            "exclusiveMs": 0.016,
+            "inclusiveMs": 0.023
+          },
+          {
+            "name": "FRDGBuilder::SubmitBufferUploads",
+            "indent": 10,
+            "exclusiveMs": 0.0,
+            "inclusiveMs": 0.0
+          },
+          {
+            "name": "SlateUI Title = Unmatched (64-bit Development PCD3D_SM5)",
+            "indent": 10,
+            "exclusiveMs": 0.001,
+            "inclusiveMs": 0.006
+          },
+          {
+            "name": "ElementBatch",
+            "indent": 13,
+            "exclusiveMs": 0.006,
+            "inclusiveMs": 0.006
+          }
+        ]
+      },
+      "line": "[2026.09.29-01.49.40:273][630]LogRHI: Di",
+      "summary": {
+        "Compute pipeline 0": {
+          "<root>": 0.198,
+          "Scene": 0.183,
+          "PostProcessing": 0.176
+        },
+        "Graphics pipeline 0": {
+          "<root>": 2.127,
+          "Scene": 1.92,
+          "HZB": 0.011,
+          "BasePass": 0.081,
+          "ShadowDepths": 0.1,
+          "RenderDeferredLighting": 0.155,
+          "DiffuseIndirectAndAO": 0.013,
+          "Lights": 0.118,
+          "DistanceFieldShadows": 0.042,
+          "ScreenSpaceReflections": 0.009,
+          "TemporalSuperResolution": 0.007,
+          "Translucency": 0.003,
+          "PostProcessing": 0.639
+        }
+      }
+    }
+  ],
+  "shots": {
+    "K1": {
+      "file": "bench-K1-1920x1080.png",
+      "sha256": "9e702b5f41b2a217e29e32d1c4b54124f68cfd5fedf38dec3d3b7461e12beb68",
+      "luma": {
+        "frame": {
+          "p10": 0.0,
+          "p50": 0.0,
+          "p90": 150.65,
+          "mean": 52.39
+        },
+        "center": 134.89,
+        "faceRoiSkipped": "head too small for a face ROI (11.4 px < 40)"
+      }
+    },
+    "K2x5": {
+      "file": "bench-K2x5-1920x1080.png",
+      "sha256": "f13e7cd840a39984527fb68920a7ea6a6da00a2f1a2a8e32fd6a09a4b8d79e7b",
+      "luma": {
+        "frame": {
+          "p10": 92.65,
+          "p50": 120.01,
+          "p90": 147.07,
+          "mean": 120.86
+        },
+        "center": 111.39,
+        "faceRoi": {
+          "box": [
+            925,
+            464,
+            958,
+            480
+          ],
+          "pixels": 528,
+          "mean": 166.17,
+          "p5": 134.31,
+          "p50": 166.33,
+          "p95": 193.57,
+          "std": 18.07,
+          "pxPerUU": 4.7,
+          "rule": "face: below the diadem tip down to the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-3.95, 9.7) u, 7 x 3.4 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+        },
+        "faceNeckRoi": {
+          "box": [
+            924,
+            462,
+            956,
+            490
+          ],
+          "pixels": 896,
+          "mean": 172.18,
+          "p5": 132.22,
+          "p50": 175.44,
+          "p95": 199.43,
+          "std": 22.76,
+          "pxPerUU": 4.7,
+          "rule": "face plus the throat below the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-4.25, 8.9) u, 6.8 x 6 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+        }
+      }
+    }
+  },
+  "referenceCheck": {
+    "bench-K1-1920x1080.png": {
+      "reference": false,
+      "reasons": [
+        "featureLevel=SM5 (reference SM6)",
+        "gi=lumen-unsupported (reference lumen)",
+        "refl=lumen-unsupported (reference lumen)"
+      ]
+    },
+    "bench-K2x5-1920x1080.png": {
+      "reference": false,
+      "reasons": [
+        "featureLevel=SM5 (reference SM6)",
+        "gi=lumen-unsupported (reference lumen)",
+        "refl=lumen-unsupported (reference lumen)"
+      ]
+    }
+  }
+}

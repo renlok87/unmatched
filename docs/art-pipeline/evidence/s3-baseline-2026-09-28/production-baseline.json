@@ -113,17 +113,27 @@
       "root": "repo",
       "path": "unreal/Unmatched/Config/DefaultGameUserSettings.ini",
       "exists": true,
-      "bytes": 234,
-      "sha256": "5f39630f8b1a3cd5c802de43a1dce5fd5151237c2f5b3e6ef08d15261df10ebc",
-      "git": "tracked"
+      "bytes": 1049,
+      "sha256": "69ab7cda46545edf1ffaa7db8680703168c48081c71900ca722b325fab2f09c6",
+      "git": "tracked",
+      "rebaselined": {
+        "by": "W4-A 2026-09-29 (user decision 2026-09-28: DX12/SM6 + Lumen, High reference)",
+        "previousSha256": "5f39630f8b1a3cd5c802de43a1dce5fd5151237c2f5b3e6ef08d15261df10ebc",
+        "report": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29.md"
+      }
     },
     {
       "root": "repo",
       "path": "unreal/Unmatched/Config/DefaultEngine.ini",
       "exists": true,
-      "bytes": 876,
-      "sha256": "e0f207d044eb5026c58d60918dd62c86fb31da6ba841796deee99b222ddee0f8",
-      "git": "tracked"
+      "bytes": 2300,
+      "sha256": "3158a3b1663a6a9053bb569e37aaf1507f16adcab25b8e19eb603d9ad6f51157",
+      "git": "tracked",
+      "rebaselined": {
+        "by": "W4-A 2026-09-29 (user decision 2026-09-28: DX12/SM6 + Lumen, High reference)",
+        "previousSha256": "e0f207d044eb5026c58d60918dd62c86fb31da6ba841796deee99b222ddee0f8",
+        "report": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29.md"
+      }
     },
     {
       "root": "art-worktree",
@@ -177,17 +187,27 @@
       "root": "art-worktree",
       "path": "unreal/Unmatched/Config/DefaultGameUserSettings.ini",
       "exists": true,
-      "bytes": 234,
-      "sha256": "5f39630f8b1a3cd5c802de43a1dce5fd5151237c2f5b3e6ef08d15261df10ebc",
-      "git": "tracked"
+      "bytes": 1049,
+      "sha256": "69ab7cda46545edf1ffaa7db8680703168c48081c71900ca722b325fab2f09c6",
+      "git": "tracked",
+      "rebaselined": {
+        "by": "W4-A 2026-09-29 (user decision 2026-09-28: DX12/SM6 + Lumen, High reference)",
+        "previousSha256": "5f39630f8b1a3cd5c802de43a1dce5fd5151237c2f5b3e6ef08d15261df10ebc",
+        "report": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29.md"
+      }
     },
     {
       "root": "art-worktree",
       "path": "unreal/Unmatched/Config/DefaultEngine.ini",
       "exists": true,
-      "bytes": 876,
-      "sha256": "e0f207d044eb5026c58d60918dd62c86fb31da6ba841796deee99b222ddee0f8",
-      "git": "tracked"
+      "bytes": 2300,
+      "sha256": "3158a3b1663a6a9053bb569e37aaf1507f16adcab25b8e19eb603d9ad6f51157",
+      "git": "tracked",
+      "rebaselined": {
+        "by": "W4-A 2026-09-29 (user decision 2026-09-28: DX12/SM6 + Lumen, High reference)",
+        "previousSha256": "e0f207d044eb5026c58d60918dd62c86fb31da6ba841796deee99b222ddee0f8",
+        "report": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29.md"
+      }
     }
   ],
   "productionDirs": [
@@ -682,5 +702,12 @@
   "postSnapshotNotes": [
     "2026-09-28: heads.repo.statusPorcelain[0] исправлен вручную с «M docs/…» на « M docs/…». Генератор обрезал ведущий пробел первой строки porcelain (git().strip()); исправлено в snapshot_baseline.py (strip=False для status). Остальные поля снимка не менялись.",
     "После снимка (06bb4fa / 920beeee…) оркестратор закоммитил параллельный workflow T1.3: bdd30cc, дерево 2027a5701ddefda3b75d440cbeda0d3ebe67b786. Коммит только добавляет 41 файл в docs/art-pipeline/qa010/ и tools/art/qa010/ (строки «?? …qa010/» выше больше не актуальны); производственные файлы снимка не затронуты, `snapshot_baseline.py check` — 0 различий. heads остаются снимком среза T0."
+  ],
+  "revisions": [
+    {
+      "date": "2026-09-29",
+      "task": "W4-A render (user decision 2026-09-28)",
+      "change": "DefaultEngine.ini (DX12/SM6 + SM5 fallback, Lumen GI/reflections, mesh distance fields, CSM, r.Substrate=0, SP 100) and DefaultGameUserSettings.ini ([ScalabilityGroups] High) rebaselined for both roots; the main-checkout rows match after the art-worktree commit is integrated into fix/admin-panel"
+    }
   ]
 }

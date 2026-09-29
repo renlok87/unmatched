@@ -1,0 +1,90 @@
+art board: profile=cobble-city size=5x6 light=cobble-probe legacyCobble=True
+heroA=cmuhgvgke00skwi9glfew6898 heroB=cmuhgvghu00oawi9gv9ehihmg
+staging: C:\Users\ren\AppData\Local\Temp\s08-phase2-20260929-102845-50292
+host pid=30452
+room created by this run (code redacted from output; id=cmum8kk0i00wdwilkmzg73wqz)
+art-preview boardId verified against the authoritative game row
+joiner pid=54452
+both clients exited
+convergence: host max applied seq=1 joiner max applied seq=1
+{
+  "pass": true,
+  "reasons": [],
+  "measurements": {
+    "resolution": [
+      1920,
+      1080
+    ],
+    "frame_nonblack_fraction": 0.9999,
+    "board_nonblack_fraction": 1.0,
+    "board_luma_stddev": 28.95,
+    "top_hud_nonblack_fraction": 1.0,
+    "hand_nonblack_fraction": 0.9997
+  }
+}
+{
+  "pass": true,
+  "reasons": [],
+  "measurements": {
+    "resolution": [
+      1920,
+      1080
+    ],
+    "frame_nonblack_fraction": 0.4402,
+    "board_nonblack_fraction": 1.0,
+    "board_luma_stddev": 16.61,
+    "top_hud_nonblack_fraction": 0.4035,
+    "hand_nonblack_fraction": 0.9873
+  }
+}
+published evidence run dir: C:\Users\ren\.codex\worktrees\art-foundation\unmached\docs\game-design\evidence\ART-004\hud-umg-w4c-2026-09-29\alternate-5x\run-20260929-102845 (pointer: latest.json)
+ART PREVIEW K2 PROBE: host selected hero in frame at the requested zoom; joiner K1 has six fighters in frame. Visual art review remains separate.
+NOTE: the pixel gate checks a lit textured board and HUD regions; it does not prove K1 readability or color-blind access.
+--- host trace (tail) ---
+2026.09.29-05.30.13 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.14 HUD alternate period=17 impl=slate frames=84 gameAvg=2.261 gameP50=2.083 gameP95=3.417 gpuP95=2.215
+2026.09.29-05.30.14 HUD alternate swap=18 active=umg elapsed=85.31
+2026.09.29-05.30.14 PERF window t=80.5-85.5 frames=150 fps=29.81 frameMs avg=33.55 p50=33.33 p95=33.79 p99=40.64 max=45.20 hitches50=0 gpuMs avg=2.03 p50=2.00 p95=2.21 gameMs avg=2.21 p95=3.42 renderMs avg=5.17 p95=7.01
+2026.09.29-05.30.16 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.17 HUD alternate period=18 impl=umg frames=83 gameAvg=2.267 gameP50=1.978 gameP95=2.940 gpuP95=2.390
+2026.09.29-05.30.17 HUD alternate swap=19 active=slate elapsed=88.33
+2026.09.29-05.30.19 PERF window t=85.5-90.6 frames=149 fps=29.66 frameMs avg=33.72 p50=33.33 p95=34.65 p99=45.77 max=46.11 hitches50=0 gpuMs avg=2.09 p50=2.05 p95=2.39 gameMs avg=2.25 p95=3.10 renderMs avg=4.92 p95=6.97
+2026.09.29-05.30.19 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.20 HUD alternate period=19 impl=slate frames=84 gameAvg=2.373 gameP50=2.066 gameP95=4.919 gpuP95=2.297
+2026.09.29-05.30.20 HUD alternate swap=20 active=umg elapsed=91.34
+2026.09.29-05.30.22 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.23 HUD alternate period=20 impl=umg frames=83 gameAvg=2.316 gameP50=1.897 gameP95=3.359 gpuP95=2.266
+2026.09.29-05.30.23 HUD alternate swap=21 active=slate elapsed=94.34
+2026.09.29-05.30.24 PERF window t=90.6-95.6 frames=149 fps=29.63 frameMs avg=33.75 p50=33.33 p95=34.63 p99=45.56 max=47.62 hitches50=0 gpuMs avg=2.08 p50=2.04 p95=2.28 gameMs avg=2.30 p95=3.45 renderMs avg=4.98 p95=7.18
+2026.09.29-05.30.25 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.26 HUD alternate period=21 impl=slate frames=84 gameAvg=2.283 gameP50=1.869 gameP95=3.013 gpuP95=2.280
+2026.09.29-05.30.26 HUD alternate swap=22 active=umg elapsed=97.36
+2026.09.29-05.30.28 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.29 PERF summary scope=afterWarmup warmup=5 elapsed=100.0 frames=2817 fps=29.64 frameMs avg=33.74 p50=33.33 p95=34.16 p99=42.67 max=260.66 hitches50=4 gpuMs avg=1.91 p50=1.99 p95=2.22 gameMs avg=2.32 p95=3.42 renderMs avg=4.79 p95=6.91
+2026.09.29-05.30.29 PERF summary scope=started elapsed=100.0 frames=2330 fps=29.61 frameMs avg=33.78 p50=33.33 p95=34.19 p99=42.77 max=260.66 hitches50=4 gpuMs avg=2.03 p50=2.00 p95=2.23 gameMs avg=2.41 p95=3.50 renderMs avg=4.97 p95=7.00
+2026.09.29-05.30.29 PERF summary scope=artHud impl=alternate elapsed=100.0 frames=2134 fps=29.64 frameMs avg=33.74 p50=33.33 p95=34.16 p99=42.72 max=260.66 hitches50=2 gpuMs avg=2.05 p50=2.01 p95=2.24 gameMs avg=2.41 p95=3.48 renderMs avg=4.96 p95=7.00
+2026.09.29-05.30.29 PERF summary scope=artHudUmg impl=umg swaps=22 periodS=3.0 elapsed=100.0 frames=911 fps=29.78 frameMs avg=33.58 p50=33.33 p95=33.83 p99=42.94 max=47.62 hitches50=0 gpuMs avg=2.05 p50=2.01 p95=2.23 gameMs avg=2.28 p95=3.42 renderMs avg=4.92 p95=7.00 gameP50=2.013 gameP99=8.213
+2026.09.29-05.30.29 PERF summary scope=artHudSlate impl=slate swaps=22 periodS=3.0 elapsed=100.0 frames=920 fps=29.72 frameMs avg=33.64 p50=33.33 p95=34.35 p99=42.10 max=65.19 hitches50=1 gpuMs avg=2.05 p50=2.01 p95=2.23 gameMs avg=2.27 p95=3.52 renderMs avg=5.00 p95=7.02 gameP50=2.005 gameP99=7.274
+2026.09.29-05.30.29 --- S08 trace close ---
+--- joiner trace (tail) ---
+2026.09.29-05.30.11 PERF window t=70.3-75.3 frames=149 fps=29.72 frameMs avg=33.65 p50=33.33 p95=34.30 p99=41.99 max=46.62 hitches50=0 gpuMs avg=1.83 p50=1.81 p95=1.97 gameMs avg=1.56 p95=2.23 renderMs avg=4.66 p95=6.36
+2026.09.29-05.30.11 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.14 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.16 PERF window t=75.3-80.4 frames=149 fps=29.62 frameMs avg=33.76 p50=33.33 p95=34.77 p99=47.42 max=48.82 hitches50=0 gpuMs avg=1.83 p50=1.80 p95=2.01 gameMs avg=1.75 p95=2.69 renderMs avg=4.75 p95=6.30
+2026.09.29-05.30.17 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.20 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.21 PERF window t=80.4-85.4 frames=149 fps=29.71 frameMs avg=33.66 p50=33.33 p95=34.69 p99=44.17 max=46.02 hitches50=0 gpuMs avg=1.87 p50=1.85 p95=2.03 gameMs avg=1.52 p95=3.19 renderMs avg=4.44 p95=6.19
+2026.09.29-05.30.23 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.26 PERF window t=85.4-90.4 frames=149 fps=29.73 frameMs avg=33.64 p50=33.33 p95=34.29 p99=42.81 max=45.80 hitches50=0 gpuMs avg=1.86 p50=1.84 p95=2.01 gameMs avg=1.50 p95=2.14 renderMs avg=4.80 p95=6.23
+2026.09.29-05.30.26 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.29 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.31 PERF window t=90.4-95.4 frames=149 fps=29.68 frameMs avg=33.69 p50=33.33 p95=34.31 p99=41.77 max=50.02 hitches50=1 gpuMs avg=1.85 p50=1.82 p95=2.13 gameMs avg=1.58 p95=2.48 renderMs avg=4.65 p95=6.53
+2026.09.29-05.30.32 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.35 game -> room=cmum8kk0i00wdwilkmzg73wqz code=<redacted> status=IN_PROGRESS
+2026.09.29-05.30.36 PERF summary scope=afterWarmup warmup=5 elapsed=100.0 frames=2817 fps=29.64 frameMs avg=33.74 p50=33.33 p95=34.32 p99=42.16 max=177.53 hitches50=5 gpuMs avg=1.83 p50=1.83 p95=2.05 gameMs avg=1.77 p95=2.65 renderMs avg=4.60 p95=6.37
+2026.09.29-05.30.36 PERF summary scope=started elapsed=100.0 frames=2514 fps=29.62 frameMs avg=33.76 p50=33.33 p95=34.34 p99=42.52 max=177.53 hitches50=5 gpuMs avg=1.89 p50=1.84 p95=2.07 gameMs avg=1.75 p95=2.55 renderMs avg=4.70 p95=6.42
+2026.09.29-05.30.36 PERF summary scope=artHud impl=alternate elapsed=100.0 frames=0 fps=0.00 frameMs avg=0.00 p50=0.00 p95=0.00 p99=0.00 max=0.00 hitches50=0 gpuMs avg=0.00 p50=0.00 p95=0.00 gameMs avg=0.00 p95=0.00 renderMs avg=0.00 p95=0.00
+2026.09.29-05.30.36 PERF summary scope=artHudUmg impl=umg swaps=0 periodS=3.0 elapsed=100.0 frames=0 fps=0.00 frameMs avg=0.00 p50=0.00 p95=0.00 p99=0.00 max=0.00 hitches50=0 gpuMs avg=0.00 p50=0.00 p95=0.00 gameMs avg=0.00 p95=0.00 renderMs avg=0.00 p95=0.00 gameP50=0.000 gameP99=0.000
+2026.09.29-05.30.36 PERF summary scope=artHudSlate impl=slate swaps=0 periodS=3.0 elapsed=100.0 frames=0 fps=0.00 frameMs avg=0.00 p50=0.00 p95=0.00 p99=0.00 max=0.00 hitches50=0 gpuMs avg=0.00 p50=0.00 p95=0.00 gameMs avg=0.00 p95=0.00 renderMs avg=0.00 p95=0.00 gameP50=0.000 gameP99=0.000
+2026.09.29-05.30.36 --- S08 trace close ---
+cleanup: aborted THIS run's game id=cmum8kk0i00wdwilkmzg73wqz status=ABORTED (verified)

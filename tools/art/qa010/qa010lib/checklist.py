@@ -65,6 +65,11 @@ ITEMS = [
      "10 QA-010 стр. 129; stage-3 E5", "НОРМАТИВ", "viewer", None),
     ("ALL.provenance", "K1..K3", "Кадры K1–K3 — packaged-live (редакторные кадры — только диагностика)",
      "stage-3 инвариант (classify_evidence, T0)", "ПРАВИЛО ЭТАПА 3", "provenance", None),
+    ("ALL.render_reference", "K1..K3",
+     "Кадры K1–K3 сняты на эталоне рендера: DX12/SM6 + Lumen, High (sg.* = 2), SP 100, экспозиция и "
+     "единицы света профиля — строка RENDER в SHOT-блоке кадра (qa010 render)",
+     "решение пользователя 2026-09-28 (W4-A); docs/art-pipeline/render-reference.json",
+     "РЕШЕНИЕ ПОЛЬЗОВАТЕЛЯ", "render", None),
 ]
 
 DEFAULT_ELEMENTS = [
@@ -350,6 +355,35 @@ def _provenance(frames: dict, results: dict) -> tuple[str, str]:
     return status, "; ".join(desc)
 
 
+def _render_reference(frames: dict, results: dict) -> tuple[str, str]:
+    """W4-A: every config frame K1..K3 needs a `qa010 render` result bound to
+    it (same PNG / SHOT block) whose fingerprint equals the reference. A frame
+    without a RENDER line (every pre-W4 frame) or off the reference (DX11, SM5
+    fallback, sg.* != High, SP != 100, legacy light units) is not an
+    acceptance frame."""
+    renders = results.get("render", [])
+    present = [k for k in KEYS if frames.get(k, {}).get("path")]
+    if not present:
+        return "открыто", "в конфиге нет кадров K1..K3"
+    bad, desc = [], []
+    for k in present:
+        bound = [r for r in renders if _bound_to("render", r, frames, [k])]
+        if not bound:
+            bad.append(f"{k} (нет результата qa010 render по этому кадру)")
+            continue
+        r = bound[-1]
+        if r.get("reference"):
+            fp = r.get("fingerprint") or {}
+            desc.append(f"{k}: эталон ({fp.get('rhi')}/{fp.get('featureLevel')}, gi={fp.get('gi')}, "
+                        f"preset={fp.get('preset')}, SP {fp.get('screenPct')})")
+        elif not r.get("fingerprint"):
+            bad.append(f"{k} (в SHOT-блоке нет строки RENDER)")
+        else:
+            bad.append(f"{k} (не эталон: " + "; ".join((r.get("reasons") or [])[:4]) + ")")
+    status = "ок" if not bad else "не годится для приёмки: " + ", ".join(bad)
+    return status, "; ".join(desc)
+
+
 def build_checklist(config: dict, base_dir: Path) -> dict:
     frames = config.get("frames", {})
     results: dict[str, list] = {}
@@ -384,6 +418,8 @@ def build_checklist(config: dict, base_dir: Path) -> dict:
             detail = viewer.get("note", "")
         elif kind == "provenance":
             status, detail = _provenance(frames, results)
+        elif kind == "render":
+            status, detail = _render_reference(frames, results)
         elif kind == "auto":
             status, detail = auto_status, auto_detail
         else:

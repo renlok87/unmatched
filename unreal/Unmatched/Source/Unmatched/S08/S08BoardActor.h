@@ -10,6 +10,7 @@
 #include "S08BoardModel.h"
 #include "S08BoardArt.h"
 #include "S08ArtHud.h"
+#include "S08Render.h"
 #include "S08BoardActor.generated.h"
 
 class UInstancedStaticMeshComponent;
@@ -37,6 +38,9 @@ public:
   void SetRoomBoardId(const FString& BoardId) { RoomBoardId = BoardId; }
   /** Active -ArtPreview board profile id (empty = grey board). */
   const FString& GetArtProfileId() const { return ActiveProfile.Id; }
+  /** W4-A: light units / SkyLight / exposure / profile sha actually applied
+   *  (input of the RENDER fingerprint line of every SHOT). */
+  const FS08AppliedRender& GetAppliedRender() const { return AppliedRender; }
 
   /** Syncs fighter actors with the latest decoded fighters (spawn/move/
    *  re-label by stable fighter id; dead fighters hide instantly). */
@@ -132,8 +136,9 @@ private:
   bool bArtActive = false;
   bool bArtTiles = false;
   UPROPERTY()
-  TArray<TObjectPtr<AActor>> ArtLights;
+  TArray<TObjectPtr<AActor>> ArtLights;  // key, points, W4-A SkyLight and exposure volume
   FString ActiveLightProfileId;
+  FS08AppliedRender AppliedRender;
 
   UPROPERTY()
   TObjectPtr<UMaterialInterface> GreyTileMaterial;

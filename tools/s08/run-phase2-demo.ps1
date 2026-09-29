@@ -48,7 +48,17 @@ param(
   # clients): drives Stop-ThisRunGame against a mocked Invoke-RestMethod that
   # returns scripted HTTP-200 responses (including errors[]) and asserts the
   # success/failure propagation of each scenario. Exit 0 = all probe cases ok.
-  [switch]$ProbeCleanupOnly
+  [switch]$ProbeCleanupOnly,
+  # W4-A render reference (user decision 2026-09-28: DX12/SM6 + Lumen, High).
+  # Both clients get -S08RenderPreset=<preset> (sg.* of the preset before the
+  # first frame; None = keep the saved GameUserSettings). The trace of every
+  # SHOT carries a 'RENDER tag=SHOT ... reference=0|1' fingerprint.
+  [ValidateSet('None', 'Low', 'Medium', 'High', 'Epic')][string]$ClientRenderPreset = 'High',
+  # Fail the run unless both clients' SHOT fingerprints are on the reference
+  # (docs/art-pipeline/render-reference.json; acceptance runs pass this).
+  [switch]$RequireRenderReference,
+  # Extra client arguments, '+'-separated (diagnostics only, e.g. -dx11+-S08LegacyRender).
+  [string]$ClientExtraArgs = ''
 )
 # GD-030/GD-031 two-client packaged demo: both clients hidden (-RenderOffScreen)
 # against the SAME real backend. Sequence under test:
@@ -397,6 +407,8 @@ function Invoke-Phase2Demo {
   $Script:ThisRunGameCode = $null
 
   $common = @("-windowed", "-resx=1920", "-resy=1080", "-RenderOffScreen", "log=GrepLog", "-ForceAbandonSequences", "-S08Api=$Api")
+  if ($ClientRenderPreset -ne 'None') { $common += "-S08RenderPreset=$ClientRenderPreset" }
+  if ($ClientExtraArgs) { $common += @($ClientExtraArgs.Split('+') | Where-Object { $_ }) }
   if ($ArtPreviewBoardId) { $common += @('-ArtPreview', '-ForceRes') }
   if ($ArtPreviewMedusaVariant -ne 'face-neck-v2' -or $MedusaVariantExplicit) { $common += "-ArtPreviewMedusaVariant=$ArtPreviewMedusaVariant" }
   if ($ClientPerf) { $common += '-S08Perf' }
@@ -541,9 +553,17 @@ function Invoke-Phase2Demo {
         "ARTPREVIEW lights applied profile=$($ArtBoard.light) directional=1 shadow=1 points=$pointCount pointShadows=0 budgetOk=1",
         "ARTPREVIEW board multizone cells=$($exp.multizoneCells) ")
       if ($ArtBoardLegacy) {
-        # ART-005 Cobble evidence lines stay byte-compatible.
+        # ART-005 Cobble evidence lines stay byte-compatible; the probe-lights
+        # line follows the registered profile (W4-A: the point fill became the
+        # SkyLight, so fill=0 unless a point named 'fill' is registered).
+        $inv = [Globalization.CultureInfo]::InvariantCulture
+        $fillPoint = @($ArtLight.points | Where-Object { $_.name -eq 'fill' }) | Select-Object -First 1
+        $warmPoint = @($ArtLight.points | Where-Object { $_.name -eq 'warm' }) | Select-Object -First 1
+        $probeKey = ([double]$ArtLight.directional.intensity).ToString('G', $inv)
+        $probeFill = if ($fillPoint) { ([double]$fillPoint.intensity).ToString('G', $inv) } else { '0' }
+        $probeWarm = if ($warmPoint) { ([double]$warmPoint.intensity).ToString('G', $inv) } else { '0' }
         $artLines += @('ARTPREVIEW Cobble assets ready', 'ARTPREVIEW Cobble active 5x6 zones=30 blue=15 red=15 blueMarks=15 redMarks=45',
-          'ARTPREVIEW Cobble probe lights key=4.5 fill=700 warm=85')
+          "ARTPREVIEW Cobble probe lights key=$probeKey fill=$probeFill warm=$probeWarm")
       } else {
         $artLines += @('ARTPREVIEW board assets ready cobbleMesh=', ' tiles=1 ')
       }
@@ -582,6 +602,13 @@ function Invoke-Phase2Demo {
           "visual=1 mesh=$ExpectedMedusaMesh", 'boardValid=1', 'HUD seq=',
           "SHOT head fighter=", "socket=Head mesh=$ExpectedMedusaMesh") "$($pair[0]) Medusa candidate"
         if ($ClientPerf) { Assert-Trace $pair[1] @('PERF config', 'PERF summary scope=started') "$($pair[0]) perf" }
+        # W4-A: every SHOT carries a RENDER fingerprint; acceptance runs
+        # (-RequireRenderReference) also need it on the reference.
+        $render = Select-String -LiteralPath $pair[1] -Pattern 'RENDER tag=SHOT .* reference=(\d)' | Select-Object -Last 1
+        if ($RequireRenderReference) {
+          if (-not $render) { throw "$($pair[0]) trace has no RENDER fingerprint at its SHOT" }
+          if ($render.Matches[0].Groups[1].Value -ne '1') { throw "$($pair[0]) SHOT is off the render reference: $($render.Line)" }
+        }
       }
       # ART-004 T2.2: zoom config, flag-marked input and the QA-010 selection/
       # plate lines. The plate must cover no destination cell of the selection

@@ -1,6 +1,8 @@
 #include "S08FighterActor.h"
+#include "S08ArtHudText.h"
 #include "S08ArtHud.h"
 #include "S08ArtPreviewMedusa.h"
+#include "S08Render.h"
 #include "S08TraceLog.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/CapsuleComponent.h"
@@ -19,14 +21,11 @@
 #include "UObject/ConstructorHelpers.h"
 
 namespace {
+// W4-A game layer: the unlit EyeAdaptationInverse material (or the pre-W4
+// M_S08_Solid under -S08LegacyRender); both carry the "Tint" parameter.
 UMaterialInterface* LoadSolidMaterial() {
-  static UMaterialInterface* Cached = LoadObject<UMaterialInterface>(
-      nullptr, TEXT("/Game/S08/M_S08_Solid.M_S08_Solid"));
-  if (!Cached) {
-    Cached = LoadObject<UMaterialInterface>(
-        nullptr, TEXT("/Engine/BasicShapes/BasicShapeMaterial"));
-  }
-  return Cached;
+  if (UMaterialInterface* GameLayer = S08GameLayerMaterial()) return GameLayer;
+  return LoadObject<UMaterialInterface>(nullptr, TEXT("/Engine/BasicShapes/BasicShapeMaterial"));
 }
 } // namespace
 
@@ -130,6 +129,16 @@ void AS08FighterActor::BeginPlay() {
       TargetIcon->SetRelativeScale3D(FVector(0.042f));
       bArtTargetIconLoaded = true;
     }
+  }
+  // W4-A game layer: rings, team base and labels cast no shadow and stay out
+  // of Lumen / distance-field lighting (the art figure and pedestal do not).
+  for (UPrimitiveComponent* GameLayer : {static_cast<UPrimitiveComponent*>(Ring.Get()),
+                                         static_cast<UPrimitiveComponent*>(TargetRing.Get()),
+                                         static_cast<UPrimitiveComponent*>(Base.Get()),
+                                         static_cast<UPrimitiveComponent*>(Label.Get()),
+                                         static_cast<UPrimitiveComponent*>(HpLabel.Get()),
+                                         static_cast<UPrimitiveComponent*>(TargetIcon.Get())}) {
+    S08ApplyGameLayerPrimitive(GameLayer);
   }
   // Text faces the camera (+Y side, camera yaw -90 looks along -Y).
   Label->SetWorldRotation(FRotator(0.0f, 90.0f, 0.0f));
@@ -421,16 +430,14 @@ void AS08FighterActor::ApplyLabelVisibility() {
   if (LabelMode == ES08FighterLabelMode::Compact) {
     // One short line "Label HP" at the name height: neighbours of the plate
     // owner stay identifiable at K2 without two stacked lines per figure.
-    Label->SetText(FText::FromString(FString::Printf(TEXT("%s %d/%d"), *Fighter.Label,
-                                                     Fighter.Health, Fighter.MaxHealth)));
+    Label->SetText(S08ArtHudText::CompactLabel(Fighter.Label, Fighter.Health, Fighter.MaxHealth));
     Label->SetWorldSize(FMath::Min(BaseNameWorldSize, BaseHpWorldSize) * 0.85f * Ratio);
     Label->SetVisibility(true);
     HpLabel->SetVisibility(false);
     return;
   }
   Label->SetText(FText::FromString(Fighter.Label));
-  HpLabel->SetText(FText::FromString(
-      FString::Printf(TEXT("%d/%d"), Fighter.Health, Fighter.MaxHealth)));
+  HpLabel->SetText(S08ArtHudText::HpLabel(Fighter.Health, Fighter.MaxHealth));
   Label->SetWorldSize(BaseNameWorldSize * Ratio);
   HpLabel->SetWorldSize(BaseHpWorldSize * Ratio);
   const bool bShow = LabelMode == ES08FighterLabelMode::Full && (!bLastOnlySelected || bIsSelected);

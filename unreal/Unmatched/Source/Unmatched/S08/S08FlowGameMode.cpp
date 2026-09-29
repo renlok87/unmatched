@@ -1,6 +1,11 @@
 #include "S08FlowGameMode.h"
 #include "S08BoardActor.h"
 #include "S08FighterActor.h"
+#include "S08Render.h"
+#include "S08ArtHudText.h"
+#include "S08ArtHudViews.h"
+#include "S08ArtHudWidgets.h"
+#include "Blueprint/UserWidget.h"
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "Dom/JsonObject.h"
@@ -63,6 +68,12 @@ struct FS08ArtProbeState {
   TArray<float> WindowFrameMs, WindowGpuMs, WindowGameMs, WindowRenderMs;
   TArray<float> RunFrameMs, RunGpuMs, RunGameMs, RunRenderMs;
   TArray<float> StartedFrameMs, StartedGpuMs, StartedGameMs, StartedRenderMs;
+  // W4-C: frames with the art HUD plate on screen (UMG vs Slate delta GT);
+  // alternate mode splits them by the visible implementation [0]=umg [1]=slate.
+  TArray<float> ArtHudFrameMs, ArtHudGpuMs, ArtHudGameMs, ArtHudRenderMs;
+  TArray<float> AltFrameMs[2], AltGpuMs[2], AltGameMs[2], AltRenderMs[2];
+  // Steady frames of the CURRENT alternate period (paired per-period A/B).
+  TArray<float> PeriodGameMs, PeriodGpuMs;
 };
 FS08ArtProbeState GS08ArtProbe;
 constexpr float GS08PerfWarmupSeconds = 5.0f;
@@ -268,6 +279,21 @@ void AS08FlowGameMode::BeginPlay() {
   FS08Trace::Open();
   for (const FString& Line : ArtHud.PendingTrace) FS08Trace::Write(Line);
   ArtHud.PendingTrace.Reset();
+  // W4-A: -S08RenderPreset=High (bench + evidence scripts) puts every sg.*
+  // group on the acceptance reference before the first measured frame.
+  {
+    const FString Preset = S08ApplyRenderPresetFromCommandLine();
+    if (!Preset.IsEmpty()) {
+      FS08Trace::Write(FString::Printf(TEXT("RENDER preset applied=%s flag=S08RenderPreset"), *Preset));
+    }
+  }
+  // W4-A -Bench: backend-less render bench (no login, no room, no HUD).
+  bBench = FParse::Param(FCommandLine::Get(), TEXT("Bench"));
+  if (bBench) {
+    FS08Trace::Write(TEXT("BENCH start (W4-A backend-less render bench)"));
+    RefreshUi();
+    return;
+  }
   if (bAutoS09 || bAutoS09Boost) {
     FS08Trace::Write(FString::Printf(TEXT("S09AUTO config flow=%d boost=%d shotDir=%s"),
                                      bAutoS09 ? 1 : 0, bAutoS09Boost ? 1 : 0, *S09ShotDir));
@@ -557,6 +583,9 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
 }
 
 void AS08FlowGameMode::SyncBoardFromApplied() {
+  // W4-A -Bench has no room: the fixture names the board row and the viewer.
+  const FString RoomBoardId = bBench ? BenchBoardId : Flow->GetRoom().BoardId;
+  const FString ViewerId = bBench ? BenchViewerId : Flow->GetUserId();
   if (!BoardActor) {
     FActorSpawnParameters Params;
     Params.Owner = this;
@@ -564,7 +593,7 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
         AS08BoardActor::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, Params);
     if (BoardActor) {
       // T3.2: the room's Board row id selects the -ArtPreview board profile.
-      BoardActor->SetRoomBoardId(Flow->GetRoom().BoardId);
+      BoardActor->SetRoomBoardId(RoomBoardId);
       BoardActor->Rebuild(BoardModel);
       SetupCameraForBoard();
       // INT-019 control points (evidence line, also asserted by automation
@@ -582,11 +611,11 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
       FS08Trace::Write(Line);
     }
   } else {
-    BoardActor->SetRoomBoardId(Flow->GetRoom().BoardId);
+    BoardActor->SetRoomBoardId(RoomBoardId);
     BoardActor->Rebuild(BoardModel);
   }
   if (BoardActor) {
-    BoardActor->SyncFighters(BoardModel, Fighters, Flow->GetUserId());
+    BoardActor->SyncFighters(BoardModel, Fighters, ViewerId);
     SyncCombatFocus();
     // GD-030 six-fighter evidence line: the projection's roster, split into
     // own/enemy for THIS viewer (asserted by the demo driver; the image
@@ -595,7 +624,7 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
     for (const FS08BoardFighter& F : Fighters) {
       if (!F.IsAlive()) continue;
       ++Alive;
-      if (F.OwnerId == Flow->GetUserId()) ++Own; else ++Enemy;
+      if (F.OwnerId == ViewerId) ++Own; else ++Enemy;
     }
     FS08Trace::Write(FString::Printf(TEXT("FIGHTERS synced n=%d alive=%d own=%d enemy=%d"),
                                      Fighters.Num(), Alive, Own, Enemy));
@@ -2673,15 +2702,12 @@ void AS08FlowGameMode::TakeS09Shots() {
 namespace {
 const TCHAR* S09ProbeHostId = TEXT("cmugykjjb0000wi9w2nq4qlkj");
 
-bool S09ProbeLoadSnapshot(FS08Snapshot& Out) {
-  FString Dir;
-  if (!FParse::Value(FCommandLine::Get(), TEXT("S08Fixtures="), Dir) || Dir.IsEmpty()) {
-    Dir = FPaths::Combine(FPaths::ProjectDir(),
-                          TEXT("../../docs/game-design/evidence/S08/fixtures"));
-  }
+// A captured gameState(gameId) response {"raw": <body object or string>}.
+// W4-A -Bench reuses it for the Cobble scene (Config/Bench/S08BenchCobble.json,
+// which adds benchViewerId / benchBoardId at the root).
+bool S08LoadGameStateFixture(const FString& File, FS08Snapshot& Out, TSharedPtr<FJsonObject>* OutRoot = nullptr) {
   FString Text;
-  if (!FFileHelper::LoadFileToString(
-          Text, *FPaths::Combine(Dir, TEXT("04-game-state-query-host.json")))) {
+  if (!FFileHelper::LoadFileToString(Text, *File)) {
     return false;
   }
   TSharedPtr<FJsonValue> Value;
@@ -2689,6 +2715,7 @@ bool S09ProbeLoadSnapshot(FS08Snapshot& Out) {
   if (!FS08Contracts::TryParseJsonValue(Text, Value, Problem)) return false;
   const TSharedPtr<FJsonObject>* Root = nullptr;
   if (!Value->TryGetObject(Root) || !Root->IsValid()) return false;
+  if (OutRoot) *OutRoot = *Root;
   FString Body;
   const TSharedPtr<FJsonObject>* RawObject = nullptr;
   if ((*Root)->TryGetStringField(TEXT("raw"), Body)) {
@@ -2700,6 +2727,15 @@ bool S09ProbeLoadSnapshot(FS08Snapshot& Out) {
   FString RawState;
   FS08GraphQLError Error;
   return FS08Contracts::ParseGameStateQuery(Body, Out, RawState, Error);
+}
+
+bool S09ProbeLoadSnapshot(FS08Snapshot& Out) {
+  FString Dir;
+  if (!FParse::Value(FCommandLine::Get(), TEXT("S08Fixtures="), Dir) || Dir.IsEmpty()) {
+    Dir = FPaths::Combine(FPaths::ProjectDir(),
+                          TEXT("../../docs/game-design/evidence/S08/fixtures"));
+  }
+  return S08LoadGameStateFixture(FPaths::Combine(Dir, TEXT("04-game-state-query-host.json")), Out);
 }
 
 TSharedRef<FJsonObject> S09ProbeMeta(const FS08Snapshot& Snapshot) {
@@ -3186,6 +3222,12 @@ void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
         static_cast<int32>(ViewportSize.X), static_cast<int32>(ViewportSize.Y),
         VT ? *VT->GetName() : TEXT("none"), CamLoc.X, CamLoc.Y, CamLoc.Z,
         CamRot.Pitch, CamRot.Yaw, CamRot.Roll));
+    // W4-A RENDER fingerprint of THIS frame (RHI, SM, GI/reflections, sg.*,
+    // screen percentage, AA, exposure, light units, t.MaxFPS/VSync, profile
+    // sha). classify_evidence / qa010 reject frames without it or off the
+    // reference (docs/art-pipeline/render-reference.json).
+    FS08Trace::Write(S08RenderFingerprint(
+        GetWorld(), BoardActor ? BoardActor->GetAppliedRender() : FS08AppliedRender(), TEXT("SHOT")));
     // GD-030 diagnosis: every fighter's projected screen position at shot
     // time - answers "in frame or not" without eyeballing the PNG.
     if (BoardActor) {
@@ -3307,10 +3349,29 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
       GS08ArtProbe.StartedGameMs.Add(GameMs);
       GS08ArtProbe.StartedRenderMs.Add(RenderMs);
     }
+    if (ArtHud.bPlateVisible) {
+      GS08ArtProbe.ArtHudFrameMs.Add(FrameMs);
+      GS08ArtProbe.ArtHudGpuMs.Add(GpuMs);
+      GS08ArtProbe.ArtHudGameMs.Add(GameMs);
+      GS08ArtProbe.ArtHudRenderMs.Add(RenderMs);
+      // Alternate: steady frames only (a swap re-lays out the shown pair).
+      if (static_cast<ES08ArtHudImpl>(ArtHud.Impl) == ES08ArtHudImpl::Alternate && ArtHud.bAlternateStarted &&
+          ArtHud.FramesSinceSwap > 5 && ArtHud.PlateViews.IsValidIndex(ArtHud.ActiveView)) {
+        const int32 I = FCString::Strcmp(ArtHud.PlateViews[ArtHud.ActiveView]->ImplName(), TEXT("umg")) == 0 ? 0 : 1;
+        GS08ArtProbe.AltFrameMs[I].Add(FrameMs);
+        GS08ArtProbe.AltGpuMs[I].Add(GpuMs);
+        GS08ArtProbe.AltGameMs[I].Add(GameMs);
+        GS08ArtProbe.AltRenderMs[I].Add(RenderMs);
+        GS08ArtProbe.PeriodGameMs.Add(GameMs);
+        GS08ArtProbe.PeriodGpuMs.Add(GpuMs);
+      }
+    }
     if (Elapsed - GS08ArtProbe.WindowStart >= GS08PerfWindowSeconds) {
       if (!GS08ArtProbe.bPerfConfigLogged) {
         GS08ArtProbe.bPerfConfigLogged = true;
         S08WritePerfConfig();
+        FS08Trace::Write(S08RenderFingerprint(
+            GetWorld(), BoardActor ? BoardActor->GetAppliedRender() : FS08AppliedRender(), TEXT("PERF")));
       }
       FS08Trace::Write(FString::Printf(
           TEXT("PERF window t=%.1f-%.1f %s"), GS08ArtProbe.WindowStart, Elapsed,
@@ -3359,6 +3420,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   RunS09Auto();
   RunS10AbortProof();
   if (bS09Probe) RunS09HudProbe();
+  if (bBench) RunRenderBench();
   // GD-034: the server deadline countdown must tick without a new snapshot.
   if (CommandUi.Mode == ES09CommandMode::CombatDefense ||
       CommandUi.Mode == ES09CommandMode::CombatResolve) {
@@ -3464,7 +3526,11 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
     UE_LOG(LogTemp, Display, TEXT("S08_FLOW_COMPLETE elapsed=%f"), Elapsed);
     if (GS08ArtProbe.bPerf && !GS08ArtProbe.bPerfSummaryLogged) {
       GS08ArtProbe.bPerfSummaryLogged = true;
-      if (!GS08ArtProbe.bPerfConfigLogged) S08WritePerfConfig();
+      if (!GS08ArtProbe.bPerfConfigLogged) {
+        S08WritePerfConfig();
+        FS08Trace::Write(S08RenderFingerprint(
+            GetWorld(), BoardActor ? BoardActor->GetAppliedRender() : FS08AppliedRender(), TEXT("PERF")));
+      }
       FS08Trace::Write(FString::Printf(
           TEXT("PERF summary scope=afterWarmup warmup=%.0f elapsed=%.1f %s"),
           GS08PerfWarmupSeconds, Elapsed,
@@ -3474,6 +3540,23 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
           TEXT("PERF summary scope=started elapsed=%.1f %s"), Elapsed,
           *S08PerfStats(GS08ArtProbe.StartedFrameMs, GS08ArtProbe.StartedGpuMs,
                         GS08ArtProbe.StartedGameMs, GS08ArtProbe.StartedRenderMs)));
+      // W4-C: frames with the art HUD plate on screen, per implementation.
+      FS08Trace::Write(FString::Printf(
+          TEXT("PERF summary scope=artHud impl=%s elapsed=%.1f %s"),
+          S08ArtHudImplName(static_cast<ES08ArtHudImpl>(ArtHud.Impl)), Elapsed,
+          *S08PerfStats(GS08ArtProbe.ArtHudFrameMs, GS08ArtProbe.ArtHudGpuMs,
+                        GS08ArtProbe.ArtHudGameMs, GS08ArtProbe.ArtHudRenderMs)));
+      if (static_cast<ES08ArtHudImpl>(ArtHud.Impl) == ES08ArtHudImpl::Alternate) {
+        for (int32 I = 0; I < 2; ++I) {
+          FS08Trace::Write(FString::Printf(
+              TEXT("PERF summary scope=%s impl=%s swaps=%d periodS=%.1f elapsed=%.1f %s gameP50=%.3f gameP99=%.3f"),
+              I == 0 ? TEXT("artHudUmg") : TEXT("artHudSlate"), I == 0 ? TEXT("umg") : TEXT("slate"), ArtHud.Swaps,
+              ArtHud.AlternateSeconds, Elapsed,
+              *S08PerfStats(GS08ArtProbe.AltFrameMs[I], GS08ArtProbe.AltGpuMs[I], GS08ArtProbe.AltGameMs[I],
+                            GS08ArtProbe.AltRenderMs[I]),
+              S08PerfPercentile(GS08ArtProbe.AltGameMs[I], 0.50f), S08PerfPercentile(GS08ArtProbe.AltGameMs[I], 0.99f)));
+        }
+      }
     }
     FS08Trace::Close();
     FGenericPlatformMisc::RequestExit(false);
@@ -3659,7 +3742,7 @@ void AS08FlowGameMode::UpdateLegacyRootVisibility() {
   // shows the user-facing HUD lobby panel instead; the legacy form stays an
   // F10 operator overlay there too. Login (pre-auth) and Room keep it.
   const bool bGameplay =
-      bS09Probe || (Flow.IsValid() &&
+      bS09Probe || bBench || (Flow.IsValid() &&
                     (Flow->GetStage() == ES08Stage::Started ||
                      Flow->GetStage() == ES08Stage::Lobby));
   const bool bVisible = !bGameplay || bDebugPanelForced;
@@ -4932,19 +5015,14 @@ void AS08FlowGameMode::RefreshUi() {
 // buffer converts back, so the PNG carries exactly these bytes.
 
 namespace {
-// Plate marker strip #C8A0FF: every channel set differs from all S09/S10 HUD
-// markers by > 32 in at least one channel (nearest #A020FF: dR = 40).
-const FLinearColor GS08PlateMarker(FColor(200, 160, 255, 255));
-const FLinearColor GS08PlateBackground(FColor(22, 26, 40, 255));
-const FLinearColor GS08PlateName(FColor(242, 236, 222, 255));
-const FLinearColor GS08PlateOwnChip(FColor(70, 120, 200, 255));
-const FLinearColor GS08PlateEnemyChip(FColor(200, 70, 60, 255));
-const FLinearColor GS08PlateHpBack(FColor(70, 30, 30, 255));
-const FLinearColor GS08PlateHpFill(FColor(80, 190, 100, 255));
-const FLinearColor GS08PlateStatus(FColor(200, 204, 220, 255));
-constexpr float GS08PlateWidthSu = 172.0f;
-constexpr float GS08PlateHeightSu = 54.0f;
-constexpr float GS08PlateHpBarSu = 96.0f;
+// W4-C: the plate colors, fonts and sizes are the Style tokens of
+// S08ArtHudStyle.h (FS08ArtHudPlateStyle); the widgets are S08ArtHudViews.h.
+
+// W4-C: the view the viewer sees (alternate mode: the active pair member).
+int32 S08ShownViewIndex(const FS08ArtHudRuntime& ArtHud, int32 Num) {
+  const bool bAlternate = static_cast<ES08ArtHudImpl>(ArtHud.Impl) == ES08ArtHudImpl::Alternate;
+  return bAlternate ? FMath::Clamp(ArtHud.ActiveView, 0, FMath::Max(0, Num - 1)) : 0;
+}
 
 // Gap between two screen rectangles (0 when they touch or overlap).
 float S08RectGap(const FS08ScreenRect& A, const FS08ScreenRect& B) {
@@ -5009,61 +5087,119 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
     }
   }
 
-  Canvas->AddSlot()
-      .Anchors(FAnchors(0.0f, 0.0f))
-      .Alignment(FVector2D(0.0f, 0.0f))
-      .AutoSize(false)
-      .Offset(FMargin(0.0f, 0.0f, GS08PlateWidthSu, GS08PlateHeightSu))
-      .Expose(ArtHud.PlateSlot)
-      [SAssignNew(ArtHud.PlateBorder, SBorder)
-           .Visibility(EVisibility::Collapsed)
-           .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
-           .BorderBackgroundColor(FSlateColor(GS08PlateBackground))
-           .Padding(0.0f)
-           [SNew(SVerticalBox) +
-            SVerticalBox::Slot().AutoHeight()
-                [SNew(SBox).HeightOverride(3.0f)[SNew(SColorBlock).Color(GS08PlateMarker)]] +
-            SVerticalBox::Slot().AutoHeight().Padding(6.0f, 2.0f, 6.0f, 0.0f)
-                [SNew(SHorizontalBox) +
-                 SHorizontalBox::Slot().FillWidth(1.0f).VAlign(VAlign_Center)
-                     [SAssignNew(ArtHud.PlateName, STextBlock)
-                          .Font(FCoreStyle::GetDefaultFontStyle("Bold", 12))
-                          .ColorAndOpacity(FSlateColor(GS08PlateName))] +
-                 SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-                     [SAssignNew(ArtHud.PlateTeamChip, SBorder)
-                          .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
-                          .BorderBackgroundColor(FSlateColor(GS08PlateOwnChip))
-                          .Padding(FMargin(4.0f, 0.0f))
-                          [SAssignNew(ArtHud.PlateTeamText, STextBlock)
-                               .Font(FCoreStyle::GetDefaultFontStyle("Bold", 8))
-                               .ColorAndOpacity(FSlateColor(GS08PlateName))]]] +
-            SVerticalBox::Slot().AutoHeight().Padding(6.0f, 2.0f, 6.0f, 0.0f)
-                [SNew(SHorizontalBox) +
-                 SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
-                     [SNew(SBox).WidthOverride(GS08PlateHpBarSu).HeightOverride(7.0f)
-                          [SNew(SOverlay) +
-                           SOverlay::Slot()[SNew(SColorBlock).Color(GS08PlateHpBack)] +
-                           SOverlay::Slot().HAlign(HAlign_Left)
-                               [SAssignNew(ArtHud.PlateHpFill, SBox).WidthOverride(GS08PlateHpBarSu)
-                                    [SNew(SColorBlock).Color(GS08PlateHpFill)]]]] +
-                 SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center).Padding(6.0f, 0.0f, 0.0f, 0.0f)
-                     [SAssignNew(ArtHud.PlateHp, STextBlock)
-                          .Font(FCoreStyle::GetDefaultFontStyle("Bold", 10))
-                          .ColorAndOpacity(FSlateColor(GS08PlateName))]] +
-            SVerticalBox::Slot().AutoHeight().Padding(6.0f, 2.0f, 6.0f, 2.0f)
-                [SAssignNew(ArtHud.PlateStatusText, STextBlock)
-                     .Font(FCoreStyle::GetDefaultFontStyle("Regular", 8))
-                     .ColorAndOpacity(FSlateColor(GS08PlateStatus))]]];
+  // ---- W4-C hybrid HUD: views (S08ArtHudViews.h). -ArtHudImpl=umg (default:
+  // the WBP children of the UMG widget classes, else their code default tree)
+  // | slate (the T2.2 Slate widgets, transitional) | compare (UMG shown + a
+  // Slate twin at render opacity 0 in the same slot geometry; both traced).
+  FString ImplText;
+  FParse::Value(Cmd, TEXT("ArtHudImpl="), ImplText);
+  ES08ArtHudImpl Impl = ES08ArtHudImpl::Umg;
+  if (!S08ParseArtHudImpl(ImplText, Impl)) {
+    ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD art impl '%s' refused (umg/slate/compare only) - using umg"),
+                                            *ImplText));
+    Impl = ES08ArtHudImpl::Umg;
+  }
+  ArtHud.Impl = static_cast<uint8>(Impl);
+  ArtHud.bTextTableReady = S08ArtHudText::EnsureTable();
+  // The plate and the icon exist only on the -ArtPreview board (bEnabled and
+  // the icon both require it); other runs (S09/S10 probes) get no art layer.
+  if (!bArtPreview) return;
 
-  Canvas->AddSlot()
-      .Anchors(FAnchors(0.0f, 0.0f))
-      .Alignment(FVector2D(0.0f, 0.0f))
-      .AutoSize(false)
-      .Offset(FMargin(0.0f, 0.0f, ArtHud.IconSize, ArtHud.IconSize))
-      .Expose(ArtHud.IconSlot)
-      [SAssignNew(ArtHud.Icon, SImage)
-           .Visibility(EVisibility::Collapsed)
-           .Image(&ArtHud.IconBrush)];
+  const bool bUmg = Impl != ES08ArtHudImpl::Slate;
+  const bool bSlate = Impl != ES08ArtHudImpl::Umg;
+  const bool bTwinSlate = Impl == ES08ArtHudImpl::Compare;
+  if (Impl == ES08ArtHudImpl::Alternate) {
+    // Same-process A/B: starts after the evidence shot (-ArtPreviewShotAfter
+    // + 4 s: no screenshot hitch or camera tween inside a bucket), swaps every
+    // -ArtHudAlternateSeconds (default 3); -ArtHudAlternateFirst=slate flips
+    // the order so runs can balance it.
+    FParse::Value(Cmd, TEXT("ArtHudAlternateSeconds="), ArtHud.AlternateSeconds);
+    ArtHud.AlternateSeconds = FMath::Clamp(ArtHud.AlternateSeconds, 1.0f, 60.0f);
+    float ShotAfter = -1.0f;
+    FParse::Value(Cmd, TEXT("ArtPreviewShotAfter="), ShotAfter);
+    ArtHud.AlternateStartAt = ShotAfter >= 0.0f ? ShotAfter + 4.0f : 0.0f;
+    FParse::Value(Cmd, TEXT("ArtHudAlternateStart="), ArtHud.AlternateStartAt);
+    FString First;
+    FParse::Value(Cmd, TEXT("ArtHudAlternateFirst="), First);
+    ArtHud.AlternateFirst = First.Equals(TEXT("slate"), ESearchCase::IgnoreCase) ? 1 : 0;
+    ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD alternate config periodS=%.1f startAt=%.1f first=%s"),
+                                            ArtHud.AlternateSeconds, ArtHud.AlternateStartAt,
+                                            ArtHud.AlternateFirst ? TEXT("slate") : TEXT("umg")));
+  }
+  UWorld* World = GetWorld();
+  auto AddPlate = [&](const TSharedRef<IS08ArtPlateView>& View, bool bTwin) {
+    const FVector2D Size = View->SizeSu();
+    Canvas->AddSlot()
+        .Anchors(FAnchors(0.0f, 0.0f))
+        .Alignment(FVector2D(0.0f, 0.0f))
+        .AutoSize(false)
+        .Offset(FMargin(0.0f, 0.0f, Size.X, Size.Y))
+        .Expose(View->Slot)[View->GetRoot()];
+    View->SetShown(false);
+    View->SetTwin(bTwin);
+    ArtHud.PlateViews.Add(View);
+  };
+  auto AddIcon = [&](const TSharedRef<IS08ArtIconView>& View, bool bTwin) {
+    Canvas->AddSlot()
+        .Anchors(FAnchors(0.0f, 0.0f))
+        .Alignment(FVector2D(0.0f, 0.0f))
+        .AutoSize(false)
+        .Offset(FMargin(0.0f, 0.0f, ArtHud.IconSize, ArtHud.IconSize))
+        .Expose(View->Slot)[View->GetRoot()];
+    View->SetIconBrush(ArtHud.IconBrush);
+    View->SetShown(false);
+    View->SetTwin(bTwin);
+    ArtHud.IconViews.Add(View);
+  };
+  auto WidgetLine = [this](const TCHAR* What, UClass* Class, const TCHAR* Source, bool bParts,
+                           const FString& Missing, bool bCodeDefault) {
+    ArtHud.PendingTrace.Add(FString::Printf(
+        TEXT("HUD art widget %s impl=umg source=%s class=%s parts=%d missing=%s codeDefaultTree=%d"), What, Source,
+        Class ? *Class->GetPathName() : TEXT("none"), bParts ? 1 : 0, Missing.IsEmpty() ? TEXT("-") : *Missing,
+        bCodeDefault ? 1 : 0));
+  };
+  bool bUmgPlate = false;
+  bool bUmgIcon = false;
+  if (bUmg && World) {
+    // Plate: the designer's WBP when it is cooked, else the class's code
+    // default tree (identical to the Slate plate by construction and test).
+    UClass* PlateClass = S08LoadArtHudWidgetClass(US08ArtPlateWidget::WidgetBlueprintPath,
+                                                  US08ArtPlateWidget::StaticClass());
+    UClass* PlateUse = PlateClass ? PlateClass : US08ArtPlateWidget::StaticClass();
+    if (US08ArtPlateWidget* Plate = CreateWidget<US08ArtPlateWidget>(World, PlateUse)) {
+      FString Missing;
+      const bool bParts = Plate->HasAllParts(&Missing);
+      const TCHAR* Source = PlateClass ? US08ArtPlateWidget::WidgetBlueprintPath : TEXT("code-default");
+      WidgetLine(TEXT("plate"), PlateUse, Source, bParts, Missing, Plate->UsesCodeDefaultTree());
+      if (bParts) {
+        ArtHudWidgets.Add(Plate);
+        AddPlate(S08MakeUmgPlateView(*Plate, Source), false);
+        bUmgPlate = true;
+      }
+    }
+    UClass* IconClass = S08LoadArtHudWidgetClass(US08ArtIconWidget::WidgetBlueprintPath,
+                                                 US08ArtIconWidget::StaticClass());
+    UClass* IconUse = IconClass ? IconClass : US08ArtIconWidget::StaticClass();
+    if (US08ArtIconWidget* IconWidget = CreateWidget<US08ArtIconWidget>(World, IconUse)) {
+      FString Missing;
+      const bool bParts = IconWidget->HasAllParts(&Missing);
+      const TCHAR* Source = IconClass ? US08ArtIconWidget::WidgetBlueprintPath : TEXT("code-default");
+      WidgetLine(TEXT("icon"), IconUse, Source, bParts, Missing, IconWidget->UsesCodeDefaultTree());
+      if (bParts) {
+        ArtHudWidgets.Add(IconWidget);
+        AddIcon(S08MakeUmgIconView(*IconWidget, Source), false);
+        bUmgIcon = true;
+      }
+    }
+  }
+  // Slate: the transitional path, the compare twin, and the fallback when a
+  // UMG widget could not be created (traced above with parts=0).
+  if (bSlate || !bUmgPlate) {
+    AddPlate(S08MakeSlatePlateView(FS08ArtHudPlateStyle()), bUmgPlate && bTwinSlate);
+  }
+  if (bSlate || !bUmgIcon) {
+    AddIcon(S08MakeSlateIconView(), bUmgIcon && bTwinSlate);
+  }
 }
 
 float AS08FlowGameMode::HudPixelsPerUnit() const {
@@ -5252,6 +5388,24 @@ void AS08FlowGameMode::UpdateArtHud(float DeltaSeconds) {
     FS08Trace::Write(FString::Printf(TEXT("HUD art layer plate=%d iconSize=%d iconTexture=%d iconProbe=%d plan=%d"),
                                      ArtHud.bEnabled ? 1 : 0, ArtHud.IconSize, ArtHud.bIconTextureReady ? 1 : 0,
                                      ArtHud.bIconProbe ? 1 : 0, ArtHud.Plan.Num()));
+    // W4-C: which views draw the layer (shown first; compare adds the twin).
+    TArray<FString> PlateViews, IconViews;
+    for (const TSharedPtr<IS08ArtPlateView>& View : ArtHud.PlateViews) {
+      PlateViews.Add(FString::Printf(TEXT("%s%s:%s"), View->ImplName(), View->bTwin ? TEXT("(twin)") : TEXT(""),
+                                     *View->Source()));
+    }
+    for (const TSharedPtr<IS08ArtIconView>& View : ArtHud.IconViews) {
+      IconViews.Add(FString::Printf(TEXT("%s%s:%s"), View->ImplName(), View->bTwin ? TEXT("(twin)") : TEXT(""),
+                                    *View->Source()));
+    }
+    const TArray<FString> MissingKeys = S08ArtHudText::MissingKeys();
+    FS08Trace::Write(FString::Printf(
+        TEXT("HUD art impl=%s plateViews=%s iconViews=%s textTable=%s entries=%d missingKeys=%d%s%s"),
+        S08ArtHudImplName(static_cast<ES08ArtHudImpl>(ArtHud.Impl)),
+        PlateViews.Num() ? *FString::Join(PlateViews, TEXT(",")) : TEXT("none"),
+        IconViews.Num() ? *FString::Join(IconViews, TEXT(",")) : TEXT("none"), *S08ArtHudText::TableId.ToString(),
+        S08ArtHudText::NumEntries(), MissingKeys.Num(), MissingKeys.Num() ? TEXT(" missing=") : TEXT(""),
+        *FString::Join(MissingKeys, TEXT(","))));
   }
   if (bBoard) {
     RunArtPreviewInputPlan();
@@ -5259,13 +5413,57 @@ void AS08FlowGameMode::UpdateArtHud(float DeltaSeconds) {
   }
   UpdateCombatIcon(bActive);
   UpdatePlate(bActive);
+  // W4-C alternate mode: one view pair visible at a time, swapped every
+  // AlternateSeconds while the plate is on screen (the same-process A/B of
+  // the game-thread cost; PERF skips the first frames after each swap).
+  ++ArtHud.FramesSinceSwap;
+  if (static_cast<ES08ArtHudImpl>(ArtHud.Impl) == ES08ArtHudImpl::Alternate && ArtHud.bPlateVisible &&
+      ArtHud.PlateViews.Num() > 1) {
+    const bool bStart = !ArtHud.bAlternateStarted && Elapsed >= ArtHud.AlternateStartAt;
+    if (bStart || (ArtHud.bAlternateStarted && Elapsed >= ArtHud.NextSwapAt)) {
+      // Close the period that just ended: one line per period, so the A/B can
+      // be paired period by period (robust to bursts of external CPU load).
+      if (ArtHud.bAlternateStarted && GS08ArtProbe.PeriodGameMs.Num() > 0) {
+        FS08Trace::Write(FString::Printf(
+            TEXT("HUD alternate period=%d impl=%s frames=%d gameAvg=%.3f gameP50=%.3f gameP95=%.3f gpuP95=%.3f"),
+            ArtHud.Swaps, ArtHud.PlateViews[ArtHud.ActiveView]->ImplName(), GS08ArtProbe.PeriodGameMs.Num(),
+            S08PerfMean(GS08ArtProbe.PeriodGameMs), S08PerfPercentile(GS08ArtProbe.PeriodGameMs, 0.50f),
+            S08PerfPercentile(GS08ArtProbe.PeriodGameMs, 0.95f), S08PerfPercentile(GS08ArtProbe.PeriodGpuMs, 0.95f)));
+      }
+      GS08ArtProbe.PeriodGameMs.Reset();
+      GS08ArtProbe.PeriodGpuMs.Reset();
+      ArtHud.ActiveView = bStart ? ArtHud.AlternateFirst : 1 - ArtHud.ActiveView;
+      ArtHud.bAlternateStarted = true;
+      ArtHud.NextSwapAt = Elapsed + ArtHud.AlternateSeconds;
+      ArtHud.FramesSinceSwap = 0;
+      ++ArtHud.Swaps;
+      for (int32 Index = 0; Index < ArtHud.PlateViews.Num(); ++Index) {
+        ArtHud.PlateViews[Index]->SetShown(ArtHud.IsViewShown(Index, true));
+      }
+      for (int32 Index = 0; Index < ArtHud.IconViews.Num() && ArtHud.bIconVisible; ++Index) {
+        ArtHud.IconViews[Index]->SetShown(ArtHud.IsViewShown(Index, true));
+      }
+      ArtHud.PlateStableFrames = 0;  // the newly shown view paints next frame
+      FS08Trace::Write(FString::Printf(TEXT("HUD alternate swap=%d active=%s elapsed=%.2f"), ArtHud.Swaps,
+                                       ArtHud.PlateViews[ArtHud.ActiveView]->ImplName(), Elapsed));
+    }
+  }
+  // W4-C compare mode: besides the SHOT blocks, a same-frame parity sample of
+  // both views every 0.5 s while the plate stands still (camera tweens and
+  // flag input plans move it between samples).
+  if (static_cast<ES08ArtHudImpl>(ArtHud.Impl) == ES08ArtHudImpl::Compare && ArtHud.bPlateVisible &&
+      ArtHud.PlateStableFrames >= 2 && Elapsed >= ArtHud.NextCompareSampleAt) {
+    ArtHud.NextCompareSampleAt = Elapsed + 0.5f;
+    ++ArtHud.CompareSamples;
+    WriteArtHudWidgetLines(FString::Printf(TEXT("HUD sample=%d "), ArtHud.CompareSamples));
+  }
   if (BoardActor) {
     BoardActor->SetLabelPresentation(bActive && ArtHud.bPlateVisible ? ArtHud.PlateFighterId : FString());
   }
 }
 
 void AS08FlowGameMode::UpdateCombatIcon(bool bActive) {
-  if (!ArtHud.Icon.IsValid() || !ArtHud.IconSlot) return;
+  if (ArtHud.IconViews.Num() == 0) return;
   FString Target;
   FString Source;
   if (bActive && BoardActor) {
@@ -5297,7 +5495,7 @@ void AS08FlowGameMode::UpdateCombatIcon(bool bActive) {
   const float Ppu = HudPixelsPerUnit();
   if (Target.IsEmpty() || !ArtHud.bIconTextureReady || Ppu <= 0.0f || !FigureScreenRect(Target, Figure)) {
     if (ArtHud.bIconVisible) {
-      ArtHud.Icon->SetVisibility(EVisibility::Collapsed);
+      for (const TSharedPtr<IS08ArtIconView>& View : ArtHud.IconViews) View->SetShown(false);
       ArtHud.bIconVisible = false;
       FS08Trace::Write(FString::Printf(TEXT("HUD icon hidden fighter=%s"), *ArtHud.IconFighterId));
       ArtHud.IconFighterId.Reset();
@@ -5346,9 +5544,17 @@ void AS08FlowGameMode::UpdateCombatIcon(bool bActive) {
     bHudAvoid = true;
   }
   const FS08ScreenRect Rect(X0, Y0, X0 + N, Y0 + N);
-  ArtHud.IconSlot->SetOffset(FMargin(X0 / Ppu, Y0 / Ppu, N / Ppu, N / Ppu));
-  ArtHud.IconBrush.ImageSize = FVector2D(N / Ppu, N / Ppu);
-  if (!ArtHud.bIconVisible) ArtHud.Icon->SetVisibility(EVisibility::HitTestInvisible);
+  const FVector2D ImageSize(N / Ppu, N / Ppu);
+  const bool bBrushChanged = !FMath::IsNearlyEqual(static_cast<double>(ArtHud.IconBrush.ImageSize.X), ImageSize.X, 1e-4) ||
+                             !FMath::IsNearlyEqual(static_cast<double>(ArtHud.IconBrush.ImageSize.Y), ImageSize.Y, 1e-4);
+  ArtHud.IconBrush.ImageSize = ImageSize;
+  const bool bAlternate = static_cast<ES08ArtHudImpl>(ArtHud.Impl) == ES08ArtHudImpl::Alternate;
+  for (int32 Index = 0; Index < ArtHud.IconViews.Num(); ++Index) {
+    const TSharedPtr<IS08ArtIconView>& View = ArtHud.IconViews[Index];
+    View->Slot->SetOffset(FMargin(X0 / Ppu, Y0 / Ppu, N / Ppu, N / Ppu));
+    if (bBrushChanged) View->SetIconBrush(ArtHud.IconBrush);
+    if (!ArtHud.bIconVisible) View->SetShown(ArtHud.IsViewShown(Index, bAlternate));
+  }
   const bool bChanged = !ArtHud.bIconVisible || ArtHud.IconFighterId != Target ||
                         !FMath::IsNearlyEqual(ArtHud.IconPlanned.X0, Rect.X0) ||
                         !FMath::IsNearlyEqual(ArtHud.IconPlanned.Y0, Rect.Y0);
@@ -5369,14 +5575,14 @@ void AS08FlowGameMode::UpdateCombatIcon(bool bActive) {
 }
 
 void AS08FlowGameMode::UpdatePlate(bool bActive) {
-  if (!ArtHud.PlateBorder.IsValid() || !ArtHud.PlateSlot) return;
+  if (ArtHud.PlateViews.Num() == 0) return;
   const FString Id = bActive ? PlateFighterIdNow() : FString();
   const FS08BoardFighter* Fighter = FindFighter(Id);
   const float Ppu = HudPixelsPerUnit();
   FS08ScreenRect Anchor;
   if (!Fighter || !Fighter->IsAlive() || Ppu <= 0.0f || !FigureScreenRect(Id, Anchor)) {
     if (ArtHud.bPlateVisible) {
-      ArtHud.PlateBorder->SetVisibility(EVisibility::Collapsed);
+      for (const TSharedPtr<IS08ArtPlateView>& View : ArtHud.PlateViews) View->SetShown(false);
       ArtHud.bPlateVisible = false;
       FS08Trace::Write(FString::Printf(TEXT("PLATE hidden fighter=%s"), *ArtHud.PlateFighterId));
       ArtHud.PlateFighterId.Reset();
@@ -5398,15 +5604,11 @@ void AS08FlowGameMode::UpdatePlate(bool bActive) {
                                              Fighter->Health, Fighter->MaxHealth, bOwn ? 1 : 0, *PlateStatusLine);
   if (ContentKey != ArtHud.PlateContentKey) {
     ArtHud.PlateContentKey = ContentKey;
-    ArtHud.PlateName->SetText(FText::FromString(Fighter->Label));
-    ArtHud.PlateHp->SetText(FText::FromString(FString::Printf(TEXT("HP %d/%d"), Fighter->Health,
-                                                              Fighter->MaxHealth)));
-    const float Frac = Fighter->MaxHealth > 0
-        ? FMath::Clamp(static_cast<float>(Fighter->Health) / Fighter->MaxHealth, 0.0f, 1.0f) : 0.0f;
-    ArtHud.PlateHpFill->SetWidthOverride(FOptionalSize(FMath::Max(1.0f, GS08PlateHpBarSu * Frac)));
-    ArtHud.PlateTeamText->SetText(FText::FromString(bOwn ? TEXT("YOURS") : TEXT("ENEMY")));
-    ArtHud.PlateTeamChip->SetBorderBackgroundColor(FSlateColor(bOwn ? GS08PlateOwnChip : GS08PlateEnemyChip));
-    ArtHud.PlateStatusText->SetText(FText::FromString(PlateStatusLine));
+    // W4-C: the views show string-table text (S08ArtHudText); the trace
+    // below keeps the English codes byte for byte.
+    const FS08PlateTexts Texts =
+        S08ArtHudText::PlateTexts(Fighter->Label, Fighter->Health, Fighter->MaxHealth, bOwn, Statuses);
+    for (const TSharedPtr<IS08ArtPlateView>& View : ArtHud.PlateViews) View->ApplyTexts(Texts);
     FS08Trace::Write(FString::Printf(TEXT("HUD plate content fighter=%s name=%s hp=%d/%d team=%s statuses=%s"),
                                      *Fighter->Id, *Fighter->Label, Fighter->Health, Fighter->MaxHealth,
                                      bOwn ? TEXT("own") : TEXT("enemy"), *PlateStatusLine));
@@ -5422,7 +5624,9 @@ void AS08FlowGameMode::UpdatePlate(bool bActive) {
   FVector2D ViewportPx(0.0, 0.0);
   GEngine->GameViewport->GetViewportSize(ViewportPx);
   In.Viewport = ViewportPx;
-  In.PlateSize = FVector2D(FMath::RoundToFloat(GS08PlateWidthSu * Ppu), FMath::RoundToFloat(GS08PlateHeightSu * Ppu));
+  // Plate size from the shown view's Style tokens (a WBP may change it).
+  const FVector2D PlateSizeSu = ArtHud.PlateViews[0]->SizeSu();
+  In.PlateSize = FVector2D(FMath::RoundToFloat(PlateSizeSu.X * Ppu), FMath::RoundToFloat(PlateSizeSu.Y * Ppu));
   In.Anchor = Anchor;
   In.Forbidden = ProjectCells(Destinations);
   // Soft obstacles: every visible figure (incl. the owner), labels, the combat
@@ -5478,8 +5682,13 @@ void AS08FlowGameMode::UpdatePlate(bool bActive) {
   const bool bMoved = !ArtHud.bPlateVisible || ArtHud.PlateFighterId != Id ||
                       !FMath::IsNearlyEqual(ArtHud.PlatePlanned.X0, Rect.X0, 0.5f) ||
                       !FMath::IsNearlyEqual(ArtHud.PlatePlanned.Y0, Rect.Y0, 0.5f);
-  ArtHud.PlateSlot->SetOffset(FMargin(Rect.X0 / Ppu, Rect.Y0 / Ppu, GS08PlateWidthSu, GS08PlateHeightSu));
-  if (!ArtHud.bPlateVisible) ArtHud.PlateBorder->SetVisibility(EVisibility::HitTestInvisible);
+  // Every view (compare: the Slate twin too) gets the SAME slot geometry.
+  const bool bAlternate = static_cast<ES08ArtHudImpl>(ArtHud.Impl) == ES08ArtHudImpl::Alternate;
+  for (int32 Index = 0; Index < ArtHud.PlateViews.Num(); ++Index) {
+    const TSharedPtr<IS08ArtPlateView>& View = ArtHud.PlateViews[Index];
+    View->Slot->SetOffset(FMargin(Rect.X0 / Ppu, Rect.Y0 / Ppu, PlateSizeSu.X, PlateSizeSu.Y));
+    if (!ArtHud.bPlateVisible) View->SetShown(ArtHud.IsViewShown(Index, bAlternate));
+  }
   ArtHud.bPlateVisible = true;
   ArtHud.PlateFighterId = Id;
   ArtHud.PlatePlanned = Rect;
@@ -5635,7 +5844,8 @@ void AS08FlowGameMode::WriteArtHudShotLines() {
     // at its current place yet is written as a zero box (qa010: trace error,
     // never a pass).
     FS08ScreenRect Painted;
-    const bool bPainted = ArtHud.PlateStableFrames >= 2 && WidgetViewportRect(ArtHud.PlateBorder, Painted) &&
+    const bool bPainted = ArtHud.PlateStableFrames >= 2 &&
+                          WidgetViewportRect(TSharedPtr<SWidget>(ArtHud.PlateViews[S08ShownViewIndex(ArtHud, ArtHud.PlateViews.Num())]->GetRoot()), Painted) &&
                           !Painted.IsEmpty();
     const FS08ScreenRect Used = bPainted ? Painted : FS08ScreenRect();
     const int32 Overlap = S08ArtHud::CountOverlaps(Used, ProjectCells(Destinations), S08ArtHud::OverlapEpsilonPx2);
@@ -5648,12 +5858,14 @@ void AS08FlowGameMode::WriteArtHudShotLines() {
   }
   if (ArtHud.bIconVisible) {
     FS08ScreenRect Painted;
-    const bool bPainted = WidgetViewportRect(ArtHud.Icon, Painted) && !Painted.IsEmpty();
+    const bool bPainted = WidgetViewportRect(TSharedPtr<SWidget>(ArtHud.IconViews[S08ShownViewIndex(ArtHud, ArtHud.IconViews.Num())]->GetRoot()), Painted) &&
+                          !Painted.IsEmpty();
     FS08Trace::Write(FString::Printf(TEXT("SHOT icon fighter=%s bbox=%s size=%d src=%s planned=%s geom=%s"),
                                      *ArtHud.IconFighterId, *S08ArtHud::FormatRect(bPainted ? Painted : ArtHud.IconPlanned),
                                      ArtHud.IconSize, *ArtHud.IconSource, *S08ArtHud::FormatRect(ArtHud.IconPlanned),
                                      bPainted ? TEXT("painted") : TEXT("planned")));
   }
+  WriteArtHudWidgetLines();
   for (const FS08BoardFighter& F : Fighters) {
     const AS08FighterActor* Actor = BoardActor->FindFighterActor(F.Id);
     FBox Box;
@@ -5686,5 +5898,245 @@ void AS08FlowGameMode::WriteArtHudShotLines() {
       FS08Trace::Write(FString::Printf(TEXT("SHOT damage fighter=%s bbox=%s"), *DamageId,
                                        *S08ArtHud::FormatRect(FS08ScreenRect::FromPoints(Corners))));
     }
+  }
+}
+
+void AS08FlowGameMode::WriteArtHudWidgetLines(const FString& Prefix) {
+  // W4-C trace gate (engine gate memo, HUD row "gates by SHOT widget traces"):
+  // the painted viewport-pixel bbox of every part of every view, one line per
+  // part. Format (docs/art-pipeline/qa010/README.md):
+  //   SHOT widget id=<ui-id> impl=<umg|slate> state=<own|enemy|combat|flag>
+  //     fighter=<id> bbox=(x0,y0,x1,y1) geom=<painted|unpainted> visible=0|1 twin=0|1 source=<...>
+  // twin=1 is the compare-mode Slate twin (render opacity 0, same slot
+  // geometry): "bbox UMG = Slate +-1 px" compares the two on the SAME frame.
+  // A part is "painted" once its view has kept its place for 2 frames.
+  auto Emit = [this, &Prefix](const FS08WidgetPart& Part, const TCHAR* Impl, const TCHAR* State,
+                              const FString& Fighter, bool bStable, bool bTwin, const FString& Source) {
+    FS08ScreenRect Rect;
+    const bool bPainted = bStable && WidgetViewportRect(Part.Widget, Rect) && !Rect.IsEmpty();
+    FS08Trace::Write(Prefix + S08ArtHud::FormatWidgetLine(Part.Id, Impl, State, Fighter, Rect, bPainted, bTwin, Source));
+  };
+  const bool bAlternate = static_cast<ES08ArtHudImpl>(ArtHud.Impl) == ES08ArtHudImpl::Alternate;
+  if (ArtHud.bPlateVisible) {
+    const FS08BoardFighter* Fighter = FindFighter(ArtHud.PlateFighterId);
+    const bool bOwn = Fighter && Flow.IsValid() && Fighter->OwnerId == Flow->GetUserId();
+    for (int32 Index = 0; Index < ArtHud.PlateViews.Num(); ++Index) {
+      const TSharedPtr<IS08ArtPlateView>& View = ArtHud.PlateViews[Index];
+      if (!ArtHud.IsViewShown(Index, bAlternate)) continue;  // collapsed: no painted geometry
+      TArray<FS08WidgetPart> Parts;
+      View->CollectParts(Parts);
+      for (const FS08WidgetPart& Part : Parts) {
+        Emit(Part, View->ImplName(), bOwn ? TEXT("own") : TEXT("enemy"), ArtHud.PlateFighterId,
+             ArtHud.PlateStableFrames >= 2, View->bTwin, View->Source());
+      }
+    }
+  }
+  if (ArtHud.bIconVisible) {
+    for (int32 Index = 0; Index < ArtHud.IconViews.Num(); ++Index) {
+      const TSharedPtr<IS08ArtIconView>& View = ArtHud.IconViews[Index];
+      if (!ArtHud.IsViewShown(Index, bAlternate)) continue;
+      TArray<FS08WidgetPart> Parts;
+      View->CollectParts(Parts);
+      for (const FS08WidgetPart& Part : Parts) {
+        Emit(Part, View->ImplName(), ArtHud.IconSource.IsEmpty() ? TEXT("none") : *ArtHud.IconSource,
+             ArtHud.IconFighterId, true, View->bTwin, View->Source());
+      }
+    }
+  }
+}
+
+// ---- W4-A render bench (-Bench) -------------------------------------------
+// Backend-less, deterministic scene: the captured Cobble 5x6 game state
+// (Config/Bench/S08BenchCobble.json, staged as UFS) goes through the same
+// SyncBoardFromApplied path as a live snapshot, so the board, the light
+// profile, the fighters and the game layer are exactly the -ArtPreview ones.
+// Per view (default K1 + K2 5x on the viewer's hero): warm-up (first view),
+// settle, a measurement window (frame / GPU / game / render thread ms; GPU
+// from RHIGetGPUFrameCycles, which excludes idle bubbles on D3D12), optional
+// CsvProfile Start/Stop (per-pass GPU with -csvGpuStats), ProfileGPU, then one
+// SHOT with the RENDER fingerprint. Frame rate is unlimited (t.MaxFPS 0,
+// VSync 0) unless -BenchFps=N. Flags: -Bench -ArtPreview -BenchOut=<dir>
+// [-BenchFixture=<json>] [-BenchViews=K1+K2x5] [-BenchWarmup=30]
+// [-BenchSettle=8] [-BenchMeasure=20] [-BenchCsv] [-BenchNoProfileGPU].
+namespace {
+struct FS08BenchState {
+  bool bInit = false;
+  int32 Step = 0;
+  float NextAt = 0.0f;
+  float Warmup = 30.0f;
+  float Settle = 8.0f;
+  float Measure = 20.0f;
+  TArray<FString> Views;
+  int32 View = 0;
+  FString OutDir;
+  bool bProfileGpu = true;
+  bool bCsv = false;
+  FString HeroId;
+  FString ShotPath;
+  float StepStart = 0.0f;
+  bool bSettleLogged = false;
+  TArray<float> FrameMs, GpuMs, GameMs, RenderMs;
+};
+FS08BenchState GS08Bench;
+
+void S08BenchSetCvar(const TCHAR* Name, const FString& Value) {
+  if (IConsoleVariable* V = IConsoleManager::Get().FindConsoleVariable(Name)) {
+    V->Set(*Value, ECVF_SetByConsole);
+  }
+}
+
+float S08BenchViewZoom(const FString& View) {
+  // "K1" = overview, "K2x5" = zoom 5 on the hero, "K2x1.6" = 1.6.
+  int32 X = INDEX_NONE;
+  if (View.FindChar(TCHAR('x'), X)) return FCString::Atof(*View.Mid(X + 1));
+  return 1.0f;
+}
+} // namespace
+
+void AS08FlowGameMode::RunRenderBench() {
+  FS08BenchState& B = GS08Bench;
+  if (B.Step == 99) return;
+  auto Finish = [&](const FString& Line) {
+    FS08Trace::Write(Line);
+    FS08Trace::Close();
+    B.Step = 99;
+    FGenericPlatformMisc::RequestExit(false);
+  };
+  const TCHAR* Cmd = FCommandLine::Get();
+  if (!B.bInit) {
+    B.bInit = true;
+    FParse::Value(Cmd, TEXT("BenchWarmup="), B.Warmup);
+    FParse::Value(Cmd, TEXT("BenchSettle="), B.Settle);
+    FParse::Value(Cmd, TEXT("BenchMeasure="), B.Measure);
+    FString Views = TEXT("K1+K2x5");
+    FParse::Value(Cmd, TEXT("BenchViews="), Views);
+    Views.ParseIntoArray(B.Views, TEXT("+"), true);
+    FParse::Value(Cmd, TEXT("BenchOut="), B.OutDir);
+    B.bProfileGpu = !FParse::Param(Cmd, TEXT("BenchNoProfileGPU"));
+    B.bCsv = FParse::Param(Cmd, TEXT("BenchCsv"));
+    FString Fixture = FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("Bench"), TEXT("S08BenchCobble.json"));
+    FParse::Value(Cmd, TEXT("BenchFixture="), Fixture);
+    if (B.OutDir.IsEmpty() || B.Views.Num() == 0) {
+      Finish(TEXT("BENCH FAILED usage: -BenchOut=<dir> and -BenchViews=K1+K2x5 are required"));
+      return;
+    }
+    FS08Snapshot Snap;
+    TSharedPtr<FJsonObject> Root;
+    if (!S08LoadGameStateFixture(Fixture, Snap, &Root) || !Root.IsValid()) {
+      Finish(FString::Printf(TEXT("BENCH FAILED fixture load %s"), *Fixture));
+      return;
+    }
+    Root->TryGetStringField(TEXT("benchViewerId"), BenchViewerId);
+    Root->TryGetStringField(TEXT("benchBoardId"), BenchBoardId);
+    if (!FS08BoardModel::DecodeFighters(Snap.Fighters, Fighters) || !BoardModel.Decode(Snap.BoardState)) {
+      Finish(TEXT("BENCH FAILED fighters/board decode"));
+      return;
+    }
+    for (const FS08BoardFighter& F : Fighters) {
+      if (F.OwnerId == BenchViewerId && F.bIsHero) B.HeroId = F.Id;
+    }
+    float Fps = 0.0f;
+    FParse::Value(Cmd, TEXT("BenchFps="), Fps);
+    S08BenchSetCvar(TEXT("t.MaxFPS"), FString::SanitizeFloat(Fps));
+    S08BenchSetCvar(TEXT("r.VSync"), TEXT("0"));
+    S08BenchSetCvar(TEXT("r.ProfileGPU.ShowUI"), TEXT("0"));
+    SyncBoardFromApplied();
+    FS08Trace::Write(FString::Printf(
+        TEXT("BENCH scene fixture=%s board=%dx%d fighters=%d viewer=%s hero=%s art=%d profile=%s views=%s warmup=%.0f settle=%.0f measure=%.0f fps=%.0f profileGpu=%d csv=%d"),
+        *FPaths::GetCleanFilename(Fixture), BoardModel.Width, BoardModel.Height, Fighters.Num(),
+        *BenchViewerId, B.HeroId.IsEmpty() ? TEXT("-") : *B.HeroId,
+        BoardActor && BoardActor->IsArtActive() ? 1 : 0,
+        BoardActor && !BoardActor->GetArtProfileId().IsEmpty() ? *BoardActor->GetArtProfileId() : TEXT("-"),
+        *Views, B.Warmup, B.Settle, B.Measure, Fps, B.bProfileGpu ? 1 : 0, B.bCsv ? 1 : 0));
+    B.Step = 1;
+    B.NextAt = Elapsed + B.Warmup;
+    return;
+  }
+  const FString View = B.Views.IsValidIndex(B.View) ? B.Views[B.View] : FString();
+  switch (B.Step) {
+    case 1:  // warm-up (shader/PSO caches, Lumen surface cache and history)
+      if (Elapsed < B.NextAt) return;
+      FS08Trace::Write(FString::Printf(TEXT("BENCH warmup done elapsed=%.1f"), Elapsed));
+      B.Step = 2;
+      return;
+    case 2: {  // view setup
+      const float Zoom = S08BenchViewZoom(View);
+      if (Zoom > 1.0f && !B.HeroId.IsEmpty()) {
+        SelectFighter(B.HeroId);
+        const FS08ZoomStep ZoomStep = CameraZoom.FocusZoom(Zoom);
+        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s focus hero=%s zoom=%.2f target=%.1f clamp=%d"), *View,
+                                         *B.HeroId, Zoom, ZoomStep.To, ZoomStep.bClamped ? 1 : 0));
+      } else {
+        SelectFighter(FString());
+        CameraZoom.ReturnToOverview();
+        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s overview target=%.1f"), *View, CameraZoom.Target));
+      }
+      B.StepStart = Elapsed;
+      B.bSettleLogged = false;
+      B.Step = 3;
+      return;
+    }
+    case 3: {  // camera settle, then a Lumen / TSR history settle
+      const float DistErrPct = CameraZoom.Target > 0.0f
+          ? 100.0f * FMath::Abs(CameraZoom.Current - CameraZoom.Target) / CameraZoom.Target : 100.0f;
+      const float FocusErr = FVector::Dist(CameraZoom.CurrentFocus, CameraZoom.TargetFocus);
+      const bool bSettled = DistErrPct < 1.0f && FocusErr < 1.0f;
+      if (!bSettled && Elapsed - B.StepStart < 20.0f) return;
+      if (!B.bSettleLogged) {
+        B.bSettleLogged = true;
+        B.NextAt = Elapsed + B.Settle;
+        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s camera settled=%d dist=%.1f target=%.1f zoom=%.2f"),
+                                         *View, bSettled ? 1 : 0, CameraZoom.Current, CameraZoom.Target,
+                                         CameraZoom.ZoomOf(CameraZoom.Current)));
+      }
+      if (Elapsed < B.NextAt) return;
+      B.FrameMs.Reset();
+      B.GpuMs.Reset();
+      B.GameMs.Reset();
+      B.RenderMs.Reset();
+      if (B.bCsv && GEngine) GEngine->Exec(GetWorld(), TEXT("CsvProfile Start"));
+      B.StepStart = Elapsed;
+      B.Step = 4;
+      return;
+    }
+    case 4:  // measurement window
+      B.FrameMs.Add(static_cast<float>(FApp::GetDeltaTime() * 1000.0));
+      B.GpuMs.Add(static_cast<float>(FPlatformTime::ToMilliseconds(RHIGetGPUFrameCycles())));
+      B.GameMs.Add(static_cast<float>(FPlatformTime::ToMilliseconds(GGameThreadTime)));
+      B.RenderMs.Add(static_cast<float>(FPlatformTime::ToMilliseconds(GRenderThreadTime)));
+      if (Elapsed - B.StepStart < B.Measure) return;
+      if (B.bCsv && GEngine) GEngine->Exec(GetWorld(), TEXT("CsvProfile Stop"));
+      FS08Trace::Write(FString::Printf(TEXT("BENCH measure view=%s window=%.1f %s"), *View, Elapsed - B.StepStart,
+                                       *S08PerfStats(B.FrameMs, B.GpuMs, B.GameMs, B.RenderMs)));
+      FS08Trace::Write(S08RenderFingerprint(
+          GetWorld(), BoardActor ? BoardActor->GetAppliedRender() : FS08AppliedRender(), TEXT("BENCH")));
+      if (B.bProfileGpu && GEngine) {
+        GEngine->Exec(GetWorld(), TEXT("ProfileGPU"));
+        FS08Trace::Write(FString::Printf(TEXT("BENCH profilegpu view=%s requested (dump in Unmatched.log, LogRHI)"), *View));
+      }
+      B.NextAt = Elapsed + 3.0f;
+      B.Step = 5;
+      return;
+    case 5:  // shot (after the ProfileGPU frame)
+      if (Elapsed < B.NextAt) return;
+      B.ShotPath = FPaths::Combine(B.OutDir, FString::Printf(TEXT("bench-%s-1920x1080.png"),
+                                                             *View.Replace(TEXT("."), TEXT("p"))));
+      TakeEvidenceShot(B.ShotPath);
+      B.NextAt = Elapsed + 15.0f;
+      B.Step = 6;
+      return;
+    case 6:
+      if (!FPaths::FileExists(B.ShotPath) && Elapsed < B.NextAt) return;
+      FS08Trace::Write(FString::Printf(TEXT("BENCH shot view=%s saved=%d path=%s"), *View,
+                                       FPaths::FileExists(B.ShotPath) ? 1 : 0, *B.ShotPath));
+      ++B.View;
+      if (B.View < B.Views.Num()) {
+        B.Step = 2;
+        return;
+      }
+      Finish(FString::Printf(TEXT("BENCH done views=%d elapsed=%.1f"), B.Views.Num(), Elapsed));
+      return;
+    default:
+      return;
   }
 }

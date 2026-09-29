@@ -6,7 +6,17 @@ public class Unmatched : ModuleRules {
       "Core", "CoreUObject", "Engine", "InputCore",
       // S08 (GD-028/GD-029): HTTP + graphql-transport-ws + JSON contracts + grey-flow Slate UI
       "HTTP", "WebSockets", "Json", "Slate", "SlateCore",
+      // W4-C hybrid HUD (user decision 2026-09-28): the art HUD plate/icon are
+      // UMG widget classes (S08ArtHudWidgets.h) with WBP children.
+      "UMG",
     });
+    // W4-C: editor-only authoring of the art HUD widget blueprints
+    // (S08ArtHudAuthoring.cpp, WITH_EDITOR) - UnrealEditor-Cmd of the art
+    // worktree builds WBP_S08ArtPlate/WBP_S08ArtIcon from the code default
+    // tree. Never linked into the game target.
+    if (Target.bBuildEditor) {
+      PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd", "UMGEditor", "Kismet", "AssetRegistry" });
+    }
     // ART-004 T1.1 -S08Perf reads RHIGetGPUFrameCycles/GDynamicRHI (RHI) and
     // GGameThreadTime/GRenderThreadTime (RenderCore). The monolithic game
     // target links them implicitly; the modular UnmatchedEditor target (T2.2
@@ -17,5 +27,11 @@ public class Unmatched : ModuleRules {
     // runtime from <Project>/Config/ArtBoards; staged into the pak (UFS) so
     // the packaged client reads the same file (S08BoardArt.h).
     RuntimeDependencies.Add("$(ProjectDir)/Config/ArtBoards/S08ArtBoardProfiles.json", StagedFileType.UFS);
+    // W4-A -Bench: the captured Cobble 5x6 game state the backend-less render
+    // bench replays (S08FlowGameMode.cpp RunRenderBench).
+    RuntimeDependencies.Add("$(ProjectDir)/Config/Bench/S08BenchCobble.json", StagedFileType.UFS);
+    // W4-C: the art HUD string table (LOCTABLE_FROMFILE_GAME, Content-relative)
+    // is a CSV, not an asset - staged into the pak like the board profiles.
+    RuntimeDependencies.Add("$(ProjectDir)/Content/Localization/StringTables/S08ArtHud.csv", StagedFileType.UFS);
   }
 }

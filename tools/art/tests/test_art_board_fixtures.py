@@ -149,13 +149,30 @@ class CommittedFixtures(unittest.TestCase):
         profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))
         bad = json.loads(json.dumps(profiles))
         lp = bad["lightProfiles"]["forest-probe"]
-        lp["points"] = lp["points"] * 2  # 8 points
+        lp["points"] = lp["points"] * 3  # 9 points (W4-A: the forest profile has 3 points, the fill became the sky)
         lp["points"][0] = dict(lp["points"][0], castShadows=True)
         lp["directional"]["castShadows"] = False
         errs = F.check_profiles([load(p) for p in FIXTURES], bad)
         self.assertTrue(any("> 6" in e for e in errs))
         self.assertTrue(any("must not cast shadows" in e for e in errs))
         self.assertTrue(any("directional light with a shadow" in e for e in errs))
+
+    def test_profile_render_rules_detect_violations(self):
+        # W4-A: units in candelas/lux, SkyLight instead of a point fill, fixed exposure.
+        profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))
+        bad = json.loads(json.dumps(profiles))
+        lp = bad["lightProfiles"]["cobble-probe"]
+        del lp["units"]
+        lp["sky"]["cubemap"] = "/Engine/MapTemplates/Sky/DaylightAmbientCubemap"
+        lp["points"].append({"name": "fill", "role": "fill", "posUU": [0, -100, 550], "intensity": 700,
+                             "radiusUU": 1800})
+        lp["exposure"]["maxBrightness"] = 4.0
+        errs = F.check_render_blocks("cobble-probe", lp)
+        self.assertTrue(any("units must be" in e for e in errs))
+        self.assertTrue(any("sky needs" in e for e in errs))
+        self.assertTrue(any("'fill' ambient" in e for e in errs))
+        self.assertTrue(any("exposure needs" in e for e in errs))
+        self.assertEqual(F.check_render_blocks("cobble-probe", profiles["lightProfiles"]["cobble-probe"]), [])
 
     def test_light_section_on_a_zone_is_rejected(self):
         fx = load(F.DEFAULT_OUT / "t-rex-paddock.art-fixture.json")

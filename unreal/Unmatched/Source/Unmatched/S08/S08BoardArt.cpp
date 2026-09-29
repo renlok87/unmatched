@@ -1,7 +1,10 @@
 #include "S08BoardArt.h"
 #include "S08Contracts.h"
+#include "S08Render.h"
 #include "Dom/JsonObject.h"
+#include "Misc/CommandLine.h"
 #include "Misc/FileHelper.h"
+#include "Misc/Parse.h"
 #include "Misc/Paths.h"
 
 namespace {
@@ -140,6 +143,90 @@ bool ParseLight(const FString& ProfileId, const TSharedPtr<FJsonObject>& Object,
   Object->TryGetBoolField(TEXT("castShadows"), Out.bCastShadows);
   return true;
 }
+
+// W4-A (engine gate memo §1 items 1 and 3): units, SkyLight, fixed exposure
+// and the key CSM of a light profile. Every block is validated; a broken
+// block makes the whole profile invalid (never a silent default).
+bool ParseRenderBlocks(const FString& ProfileId, const TSharedPtr<FJsonObject>& Obj, FS08LightProfile& Profile,
+                       TArray<FString>& Errors) {
+  bool bOk = true;
+  const TSharedPtr<FJsonObject>* Units = nullptr;
+  if (Obj->TryGetObjectField(TEXT("units"), Units) && Units) {
+    (*Units)->TryGetStringField(TEXT("point"), Profile.PointUnits);
+    (*Units)->TryGetStringField(TEXT("directional"), Profile.DirectionalUnits);
+    if (Profile.PointUnits != TEXT("candelas") || Profile.DirectionalUnits != TEXT("lux")) {
+      Errors.Add(FString::Printf(TEXT("light profile %s: units must be {point: candelas, directional: lux}, got %s/%s"),
+                                 *ProfileId, *Profile.PointUnits, *Profile.DirectionalUnits));
+      bOk = false;
+    }
+  }
+  const TSharedPtr<FJsonObject>* Sky = nullptr;
+  if (Obj->TryGetObjectField(TEXT("sky"), Sky) && Sky) {
+    FS08SkySpec& S = Profile.Sky;
+    FString Source;
+    (*Sky)->TryGetStringField(TEXT("source"), Source);
+    (*Sky)->TryGetStringField(TEXT("cubemap"), S.CubemapPath);
+    double Value = 0.0;
+    if (Source != TEXT("cubemap") || !S.CubemapPath.StartsWith(TEXT("/Game/")) ||
+        !(*Sky)->TryGetNumberField(TEXT("intensity"), Value) || Value <= 0.0) {
+      Errors.Add(FString::Printf(TEXT("light profile %s: sky needs source=cubemap, a /Game/ cubemap and intensity > 0"),
+                                 *ProfileId));
+      bOk = false;
+    } else {
+      S.bSet = true;
+      S.Intensity = static_cast<float>(Value);
+      TArray<double> N;
+      if (ReadNumberArray(*Sky, TEXT("colorLinear"), 3, N)) S.Color = FLinearColor(N[0], N[1], N[2]);
+      (*Sky)->TryGetBoolField(TEXT("lowerHemisphereIsBlack"), S.bLowerHemisphereIsBlack);
+      if (ReadNumberArray(*Sky, TEXT("lowerHemisphereColorLinear"), 3, N)) {
+        S.LowerHemisphereColor = FLinearColor(N[0], N[1], N[2]);
+      }
+    }
+  }
+  const TSharedPtr<FJsonObject>* Exposure = nullptr;
+  if (Obj->TryGetObjectField(TEXT("exposure"), Exposure) && Exposure) {
+    FS08ExposureSpec& E = Profile.Exposure;
+    FString Method;
+    double Min = 0.0, Max = 0.0, Bias = 0.0, Ev = 0.0;
+    (*Exposure)->TryGetStringField(TEXT("method"), Method);
+    const bool bNumbers = (*Exposure)->TryGetNumberField(TEXT("minBrightness"), Min) &&
+                          (*Exposure)->TryGetNumberField(TEXT("maxBrightness"), Max) &&
+                          (*Exposure)->TryGetNumberField(TEXT("bias"), Bias);
+    (*Exposure)->TryGetNumberField(TEXT("ev100"), Ev);
+    if (Method != TEXT("histogram-fixed") || !bNumbers || Min <= 0.0 || !FMath::IsNearlyEqual(Min, Max)) {
+      Errors.Add(FString::Printf(TEXT("light profile %s: exposure needs method=histogram-fixed and minBrightness == maxBrightness > 0 plus bias"),
+                                 *ProfileId));
+      bOk = false;
+    } else {
+      E.bSet = true;
+      E.MinBrightness = static_cast<float>(Min);
+      E.MaxBrightness = static_cast<float>(Max);
+      E.Bias = static_cast<float>(Bias);
+      E.Ev100 = static_cast<float>(Ev);
+    }
+  }
+  const TSharedPtr<FJsonObject>* Dir = nullptr;
+  const TSharedPtr<FJsonObject>* Shadow = nullptr;
+  if (Obj->TryGetObjectField(TEXT("directional"), Dir) && Dir &&
+      (*Dir)->TryGetObjectField(TEXT("shadow"), Shadow) && Shadow) {
+    FS08KeyShadowSpec& K = Profile.KeyShadow;
+    double Distance = 0.0, Cascades = 0.0, Contact = 0.0;
+    (*Shadow)->TryGetNumberField(TEXT("contactShadowLength"), Contact);
+    if (!(*Shadow)->TryGetNumberField(TEXT("distanceUU"), Distance) || Distance <= 0.0 ||
+        !(*Shadow)->TryGetNumberField(TEXT("cascades"), Cascades) || Cascades < 1.0 || Cascades > 4.0 ||
+        Contact < 0.0 || Contact > 0.1) {
+      Errors.Add(FString::Printf(TEXT("light profile %s: directional.shadow needs distanceUU > 0, cascades 1..4, contactShadowLength 0..0.1"),
+                                 *ProfileId));
+      bOk = false;
+    } else {
+      K.bSet = true;
+      K.DistanceUU = static_cast<float>(Distance);
+      K.Cascades = static_cast<int32>(Cascades);
+      K.ContactShadowLength = static_cast<float>(Contact);
+    }
+  }
+  return bOk;
+}
 }  // namespace
 
 const TCHAR* S08ZoneStrokeName(ES08ZoneStroke Stroke) {
@@ -266,13 +353,23 @@ FString FS08BoardArtData::DefaultPath() {
   return FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("ArtBoards"), TEXT("S08ArtBoardProfiles.json"));
 }
 
+FString FS08BoardArtData::ResolvePath(bool& bOutOverride) {
+  FString Override;
+  bOutOverride = FParse::Value(FCommandLine::Get(), TEXT("ArtBoardProfiles="), Override) && !Override.IsEmpty();
+  return bOutOverride ? Override : DefaultPath();
+}
+
 bool FS08BoardArtData::LoadFile(const FString& Path, TArray<FString>& OutErrors) {
-  FString Text;
-  if (!FFileHelper::LoadFileToString(Text, *Path)) {
+  TArray<uint8> Bytes;
+  if (!FFileHelper::LoadFileToArray(Bytes, *Path)) {
     OutErrors.Add(FString::Printf(TEXT("cannot read %s"), *Path));
     return false;
   }
-  return ParseJson(Text, OutErrors);
+  FString Text;
+  FFileHelper::BufferToString(Text, Bytes.GetData(), Bytes.Num());
+  const bool bOk = ParseJson(Text, OutErrors);
+  SourceSha256 = S08Sha256Hex(Bytes.GetData(), Bytes.Num());
+  return bOk;
 }
 
 bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors) {
@@ -280,6 +377,7 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
   Lights.Reset();
   Boards.Reset();
   Revision = 0;
+  SourceSha256.Reset();
   const int32 ErrorsBefore = OutErrors.Num();
   TSharedPtr<FJsonObject> Root;
   FString Problem;
@@ -336,6 +434,7 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
           }
         }
       }
+      if (!ParseRenderBlocks(Pair.Key, *Obj, Profile, OutErrors)) continue;
       FString Reason;
       if (!Profile.BudgetOk(Reason)) {
         OutErrors.Add(FString::Printf(TEXT("light profile %s over budget: %s"), *Pair.Key, *Reason));
