@@ -147,7 +147,9 @@
       "TeamMask": {"file_key": "TeamMask", "srgb": false, "compression": "TC_Grayscale", "asset": "T_KingArthur_H2_TeamMask"}
     },
     "textures_note": "N — DirectX-вариант (зелёный инвертирован в бейке), flip_green false; ORM и TeamMask линейные. TeamMask — TC_Grayscale (G8 без сжатия): сэмплер TeamMaskTexture в M_UM_Figure имеет тип LinearGrayscale, TC_Masks дал бы несовпадение типа сэмплера; RGBA -> G8 в UE берёт канал R без потерь (Engine/Source/Runtime/ImageCore/Private/ImageCore.cpp: «blit from RGBA to G8 does NOT grab the gray, it just take the R»)",
-    "measure_skeletal_triangles": true
+    "measure_skeletal_triangles": true,
+    "target_skeleton": "/Game/PipelineCandidates/KingArthur/Rig/SK_KingArthur_Skeleton",
+    "target_skeleton_note": "волна 5c (H2Anim, CLI 0.8.0): меш H2 импортируется на канонический скелет героя (создан tools/tripo-pipeline/anim/h2anim_ue.py skeleton из SK_KingArthur_H2.fbx), клипы H2Anim привязаны к нему же; своего SK_KingArthur_H2_Skeleton прогон больше не создаёт, повторный импорт канонический скелет не удаляет. Переимпорт 2026-09-29 взял текстуры H2.2 (тёмная сталь), FBX бейка не менялся"
   },
   "expectations": {
     "triangles": {

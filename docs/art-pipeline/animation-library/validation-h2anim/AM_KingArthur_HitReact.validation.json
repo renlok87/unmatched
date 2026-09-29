@@ -1,0 +1,284 @@
+{
+ "schema": "unmatched.clip-validation/2",
+ "clip": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/export/AM_KingArthur_HitReact.fbx",
+ "clip_bytes": 1743196,
+ "clip_sha256": "c4eaf583f208dcb65929a9219b994343642d3b50de16a97479a2ea968ce80eef",
+ "contract": "docs/art-pipeline/rig/rig-contract.json",
+ "contract_revision": "v2-2026-09-29",
+ "skeleton": "UM_HUMANOID_17_v2",
+ "character": "Arthur",
+ "kind": "clip",
+ "clip_role": "oneshot",
+ "blender": "5.2.2 LTS",
+ "checks": [
+  {
+   "check": "import",
+   "status": "pass"
+  },
+  {
+   "check": "single_armature",
+   "status": "pass",
+   "value": "SKEL_UM_Humanoid"
+  },
+  {
+   "check": "skeleton_version",
+   "status": "pass",
+   "skeleton": "UM_HUMANOID_17_v2"
+  },
+  {
+   "check": "armature_object_name",
+   "status": "pass",
+   "value": "SKEL_UM_Humanoid"
+  },
+  {
+   "check": "skeleton_contract",
+   "status": "pass",
+   "missing": [],
+   "extra": [],
+   "parent_mismatch": []
+  },
+  {
+   "check": "weapon_side",
+   "status": "pass",
+   "present": [
+    "weapon.R"
+   ],
+   "legacy_present": [],
+   "character": "Arthur",
+   "expected": "weapon.R"
+  },
+  {
+   "check": "ref_pose_facing",
+   "status": "pass",
+   "facing_yaw_deg": -2.132,
+   "expected": 0.0,
+   "tol_deg": 10.0,
+   "delta_deg": -2.132
+  },
+  {
+   "check": "ref_pose_root_axis",
+   "status": "pass",
+   "root_x_axis_yaw_deg": 90.0,
+   "expected": 90,
+   "delta_deg": 0.0
+  },
+  {
+   "check": "action",
+   "status": "pass",
+   "value": "SKEL_UM_Humanoid|Scene",
+   "actions_in_file": 1
+  },
+  {
+   "check": "fps",
+   "status": "pass",
+   "value": 24.0,
+   "expected": 24.0
+  },
+  {
+   "check": "duration",
+   "status": "pass",
+   "value": 0.4167,
+   "expected": 0.4167,
+   "tol": 0.05
+  },
+  {
+   "check": "bone_length_plausible",
+   "status": "pass",
+   "max_bone_length_of_height": 0.4211,
+   "max": 1.0
+  },
+  {
+   "check": "bones_move",
+   "status": "pass",
+   "moving_bones": 11,
+   "top": [
+    [
+     "leg_upper.R",
+     19.992
+    ],
+    [
+     "foot.R",
+     19.352
+    ],
+    [
+     "head",
+     14.402
+    ],
+    [
+     "spine",
+     13.392
+    ],
+    [
+     "leg_lower.R",
+     9.818
+    ],
+    [
+     "leg_upper.L",
+     8.866
+    ],
+    [
+     "arm_lower.R",
+     8.0
+    ],
+    [
+     "foot.L",
+     7.378
+    ]
+   ]
+  },
+  {
+   "check": "bone_scale_unit",
+   "status": "pass",
+   "max_deviation": 0.0
+  },
+  {
+   "check": "clip_boundary_rest",
+   "status": "pass",
+   "role": "oneshot",
+   "first_vs_rest_of_height": 0.0,
+   "last_vs_rest_of_height": 0.0,
+   "tol_of_height": 0.005
+  },
+  {
+   "check": "root_in_place",
+   "status": "pass",
+   "object": {
+    "end_delta": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "end_delta_of_height": 0.0,
+    "max_excursion_of_height": 0.0
+   },
+   "root_bone": {
+    "end_delta": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "end_delta_of_height": 0.0,
+    "max_excursion_of_height": 0.0
+   },
+   "tol_of_height": 0.005
+  },
+  {
+   "check": "visible_pose_change",
+   "status": "pass",
+   "peak_max_joint_shift_of_height": 0.21581,
+   "peak_mean_joint_shift_of_height": 0.03525,
+   "min": 0.02,
+   "mode": "warn",
+   "peak_frame": 4,
+   "note": "макс. сдвиг головы/хвоста кости относительно первого кадра, доля высоты фигуры; порог — предложение, до калибровки по визуальному просмотру ниже порога = WARN"
+  },
+  {
+   "check": "loop_seam",
+   "status": "info",
+   "first_last_shift_of_height": 0.0
+  }
+ ],
+ "bones": {
+  "root": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "hips": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.5099
+  },
+  "spine": {
+   "max_rot_deg": 13.392,
+   "max_loc": 0.0
+  },
+  "head": {
+   "max_rot_deg": 14.402,
+   "max_loc": 1e-05
+  },
+  "arm_upper.L": {
+   "max_rot_deg": 5.122,
+   "max_loc": 0.0
+  },
+  "arm_lower.L": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "hand.L": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "arm_upper.R": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "arm_lower.R": {
+   "max_rot_deg": 8.0,
+   "max_loc": 1e-05
+  },
+  "hand.R": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "weapon.R": {
+   "max_rot_deg": 6.0,
+   "max_loc": 1e-05
+  },
+  "leg_upper.L": {
+   "max_rot_deg": 8.866,
+   "max_loc": 0.0
+  },
+  "leg_lower.L": {
+   "max_rot_deg": 7.33,
+   "max_loc": 0.0
+  },
+  "foot.L": {
+   "max_rot_deg": 7.378,
+   "max_loc": 0.0
+  },
+  "leg_upper.R": {
+   "max_rot_deg": 19.992,
+   "max_loc": 0.0
+  },
+  "leg_lower.R": {
+   "max_rot_deg": 9.818,
+   "max_loc": 0.0
+  },
+  "foot.R": {
+   "max_rot_deg": 19.352,
+   "max_loc": 0.0
+  }
+ },
+ "bone_count": 17,
+ "fps": 24.0,
+ "frame_start": 1.0,
+ "frame_end": 11.0,
+ "frames": 11,
+ "duration_s": 0.4167,
+ "reference_meshes": [
+  "SK_KingArthur_H2_Body",
+  "SK_KingArthur_H2_Sword"
+ ],
+ "reference_height": 0.54251,
+ "reference_height_source": "skinned_mesh_bbox",
+ "root_object": {
+  "end_delta": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "end_delta_of_height": 0.0,
+  "max_excursion_of_height": 0.0
+ },
+ "root_bone": {
+  "end_delta": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "end_delta_of_height": 0.0,
+  "max_excursion_of_height": 0.0
+ },
+ "result": "pass",
+ "fails": [],
+ "warnings": []
+}

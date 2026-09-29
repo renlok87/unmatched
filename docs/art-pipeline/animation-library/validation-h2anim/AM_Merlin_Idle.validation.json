@@ -1,0 +1,285 @@
+{
+ "schema": "unmatched.clip-validation/2",
+ "clip": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2anim/export/AM_Merlin_Idle.fbx",
+ "clip_bytes": 1566396,
+ "clip_sha256": "dd3e09828dd28a4f8fcbd989cb46e7b4203bb177aec7f5c17048f97f8bf90744",
+ "contract": "docs/art-pipeline/rig/rig-contract.json",
+ "contract_revision": "v2-2026-09-29",
+ "skeleton": "UM_HUMANOID_17_v2",
+ "character": "Merlin",
+ "kind": "clip",
+ "clip_role": "idle",
+ "blender": "5.2.2 LTS",
+ "checks": [
+  {
+   "check": "import",
+   "status": "pass"
+  },
+  {
+   "check": "single_armature",
+   "status": "pass",
+   "value": "SKEL_UM_Humanoid"
+  },
+  {
+   "check": "skeleton_version",
+   "status": "pass",
+   "skeleton": "UM_HUMANOID_17_v2"
+  },
+  {
+   "check": "armature_object_name",
+   "status": "pass",
+   "value": "SKEL_UM_Humanoid"
+  },
+  {
+   "check": "skeleton_contract",
+   "status": "pass",
+   "missing": [],
+   "extra": [],
+   "parent_mismatch": []
+  },
+  {
+   "check": "weapon_side",
+   "status": "pass",
+   "present": [
+    "weapon.R"
+   ],
+   "legacy_present": [],
+   "character": "Merlin",
+   "expected": "weapon.R"
+  },
+  {
+   "check": "ref_pose_facing",
+   "status": "pass",
+   "facing_yaw_deg": -7.441,
+   "expected": 0.0,
+   "tol_deg": 10.0,
+   "delta_deg": -7.441
+  },
+  {
+   "check": "ref_pose_root_axis",
+   "status": "pass",
+   "root_x_axis_yaw_deg": 90.0,
+   "expected": 90,
+   "delta_deg": 0.0
+  },
+  {
+   "check": "action",
+   "status": "pass",
+   "value": "SKEL_UM_Humanoid|Scene",
+   "actions_in_file": 1
+  },
+  {
+   "check": "fps",
+   "status": "pass",
+   "value": 24.0,
+   "expected": 24.0
+  },
+  {
+   "check": "duration",
+   "status": "pass",
+   "value": 3.0,
+   "expected": 3.0,
+   "tol": 0.05
+  },
+  {
+   "check": "bone_length_plausible",
+   "status": "pass",
+   "max_bone_length_of_height": 0.4992,
+   "max": 1.0
+  },
+  {
+   "check": "bones_move",
+   "status": "pass",
+   "moving_bones": 13,
+   "top": [
+    [
+     "leg_lower.L",
+     9.838
+    ],
+    [
+     "leg_lower.R",
+     9.571
+    ],
+    [
+     "hand.R",
+     7.289
+    ],
+    [
+     "foot.R",
+     6.804
+    ],
+    [
+     "foot.L",
+     6.507
+    ],
+    [
+     "leg_upper.R",
+     6.085
+    ],
+    [
+     "leg_upper.L",
+     5.894
+    ],
+    [
+     "head",
+     5.494
+    ]
+   ]
+  },
+  {
+   "check": "bone_scale_unit",
+   "status": "pass",
+   "max_deviation": 0.0
+  },
+  {
+   "check": "clip_boundary_rest",
+   "status": "pass",
+   "role": "idle",
+   "first_vs_rest_of_height": 0.0,
+   "last_vs_rest_of_height": 0.0,
+   "tol_of_height": 0.005
+  },
+  {
+   "check": "root_in_place",
+   "status": "pass",
+   "object": {
+    "end_delta": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "end_delta_of_height": 0.0,
+    "max_excursion_of_height": 0.0
+   },
+   "root_bone": {
+    "end_delta": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "end_delta_of_height": 0.0,
+    "max_excursion_of_height": 0.0
+   },
+   "tol_of_height": 0.005
+  },
+  {
+   "check": "visible_pose_change",
+   "status": "pass",
+   "peak_max_joint_shift_of_height": 0.0345,
+   "peak_mean_joint_shift_of_height": 0.00645,
+   "min": 0.02,
+   "mode": "warn",
+   "peak_frame": 37,
+   "note": "макс. сдвиг головы/хвоста кости относительно первого кадра, доля высоты фигуры; порог — предложение, до калибровки по визуальному просмотру ниже порога = WARN"
+  },
+  {
+   "check": "loop_seam",
+   "status": "pass",
+   "first_last_shift_of_height": 0.0,
+   "tol": 0.005
+  }
+ ],
+ "bones": {
+  "root": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "hips": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.20616
+  },
+  "spine": {
+   "max_rot_deg": 3.9,
+   "max_loc": 0.0
+  },
+  "head": {
+   "max_rot_deg": 5.494,
+   "max_loc": 1e-05
+  },
+  "arm_upper.L": {
+   "max_rot_deg": 3.0,
+   "max_loc": 1e-05
+  },
+  "arm_lower.L": {
+   "max_rot_deg": 5.0,
+   "max_loc": 1e-05
+  },
+  "hand.L": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "arm_upper.R": {
+   "max_rot_deg": 4.173,
+   "max_loc": 1e-05
+  },
+  "arm_lower.R": {
+   "max_rot_deg": 0.662,
+   "max_loc": 0.0
+  },
+  "hand.R": {
+   "max_rot_deg": 7.289,
+   "max_loc": 1e-05
+  },
+  "weapon.R": {
+   "max_rot_deg": 0.0,
+   "max_loc": 1e-05
+  },
+  "leg_upper.L": {
+   "max_rot_deg": 5.894,
+   "max_loc": 0.0
+  },
+  "leg_lower.L": {
+   "max_rot_deg": 9.838,
+   "max_loc": 0.0
+  },
+  "foot.L": {
+   "max_rot_deg": 6.507,
+   "max_loc": 0.0
+  },
+  "leg_upper.R": {
+   "max_rot_deg": 6.085,
+   "max_loc": 0.0
+  },
+  "leg_lower.R": {
+   "max_rot_deg": 9.571,
+   "max_loc": 0.0
+  },
+  "foot.R": {
+   "max_rot_deg": 6.804,
+   "max_loc": 0.0
+  }
+ },
+ "bone_count": 17,
+ "fps": 24.0,
+ "frame_start": 1.0,
+ "frame_end": 73.0,
+ "frames": 73,
+ "duration_s": 3.0,
+ "reference_meshes": [
+  "SK_Merlin_H2_Body",
+  "SK_Merlin_H2_Staff"
+ ],
+ "reference_height": 0.44663,
+ "reference_height_source": "skinned_mesh_bbox",
+ "root_object": {
+  "end_delta": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "end_delta_of_height": 0.0,
+  "max_excursion_of_height": 0.0
+ },
+ "root_bone": {
+  "end_delta": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "end_delta_of_height": 0.0,
+  "max_excursion_of_height": 0.0
+ },
+ "result": "pass",
+ "fails": [],
+ "warnings": []
+}

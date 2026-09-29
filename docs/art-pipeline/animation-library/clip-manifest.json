@@ -1,9 +1,10 @@
 {
  "schema": "unmatched.animation-clip-manifest/1",
- "revision": "p16-2026-09-28",
+ "revision": "h2anim-2026-09-29",
  "rig_contract": "docs/art-pipeline/rig/rig-contract.json",
  "notes": [
-  "16 production-слотов = 4 клипа D-11 x 4 персонажа (бриф 18 §4): 15 безусловных, HAR-HitReact условен до AD-CNF-30 (required_mvp=false); ни один не заполнен",
+  "16 production-слотов = 4 клипа D-11 x 4 персонажа (бриф 18 §4): 15 безусловных, HAR-HitReact условен до AD-CNF-30 (required_mvp=false); заполнено кандидатами H2Anim (волна 5c, UM_HUMANOID_17_v2): 16",
+  "production-слоты — контракт v2 (v1 закрыт для новых клипов, RIG-CONTRACT §0 п.2); черновики AM_Medusa_* v1 — тестовые записи",
   "длительности — ПРЕДЛОЖЕНИЕ/ОТКРЫТО (AD-OPEN-46); FPS 24 измерен на S05/ART004",
   "test-записи не могут стать artistically_accepted (правило схемы)"
  ],
@@ -20,36 +21,52 @@
     "CUE-017"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/export/AM_Medusa_Idle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "a819e690123a96f2eee63a225933de9428b472d036798fc1cb5e42e73ebf1abe"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
     "target": "2-3 (loop)",
     "target_status": "proposal",
-    "measured": null
+    "measured": 2.3333
    },
    "loop": true,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-MEDUSA-001/Animation/AM_Medusa_Idle",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/Medusa/H2Anim/AM_Medusa_Idle",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Medusa_Idle.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-bake/export/SK_Medusa_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-MEDUSA-001/MED-Idle; контакты (clip_contact_check): PASS; UE: импортирован на канонический скелет /Game/PipelineCandidates/Medusa/Rig/SK_Medusa_Skeleton; художественно не принят"
   },
   {
    "id": "MED-LungeAttack",
@@ -62,36 +79,52 @@
     "CUE-008"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/export/AM_Medusa_LungeAttack.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "cfc3daeb6867f6a2bab8b1a7028b25fbf31a484afa64fcac09c42b6e1bdabba5"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
     "target": 0.6,
     "target_status": "proposal",
-    "measured": null
+    "measured": 0.5833
    },
    "loop": false,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-MEDUSA-001/Animation/AM_Medusa_LungeAttack",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/Medusa/H2Anim/AM_Medusa_LungeAttack",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Medusa_LungeAttack.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-bake/export/SK_Medusa_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-MEDUSA-001/MED-LungeAttack; контакты (clip_contact_check): PASS (WARN: skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/Medusa/Rig/SK_Medusa_Skeleton; художественно не принят"
   },
   {
    "id": "MED-HitReact",
@@ -104,36 +137,52 @@
     "CUE-011"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/export/AM_Medusa_HitReact.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "9e2adbfb17b6eb404732e9574a7f2d4f5fceb73947a89e67aa2ab3190207f613"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
-    "target": "0.4 (04) vs 0.9 (CUE-011)",
+    "target": "0.4 (предложение волны 5c, 04) vs 0.9 (CUE-011)",
     "target_status": "open",
-    "measured": null
+    "measured": 0.4167
    },
    "loop": false,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-MEDUSA-001/Animation/AM_Medusa_HitReact",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/Medusa/H2Anim/AM_Medusa_HitReact",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Medusa_HitReact.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-bake/export/SK_Medusa_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-MEDUSA-001/MED-HitReact; контакты (clip_contact_check): PASS; UE: импортирован на канонический скелет /Game/PipelineCandidates/Medusa/Rig/SK_Medusa_Skeleton; художественно не принят"
   },
   {
    "id": "MED-DeathSettle",
@@ -146,36 +195,52 @@
     "CUE-013"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/export/AM_Medusa_DeathSettle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "7174a6bcece71831c853a6cd30c68bf8ec634dc8b7f882862f70504b3637d31e"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
-    "target": "0.9 (04), <=0.95 (CUE-013)",
+    "target": "0.875-0.9 (предложение волны 5c, 04), <=0.95 (CUE-013)",
     "target_status": "open",
-    "measured": null
+    "measured": 0.875
    },
    "loop": false,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-MEDUSA-001/Animation/AM_Medusa_DeathSettle",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/Medusa/H2Anim/AM_Medusa_DeathSettle",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Medusa_DeathSettle.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-bake/export/SK_Medusa_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-MEDUSA-001/MED-DeathSettle; контакты (clip_contact_check): PASS (WARN: hem_below_base_top, skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/Medusa/Rig/SK_Medusa_Skeleton; художественно не принят"
   },
   {
    "id": "HAR-Idle",
@@ -189,36 +254,52 @@
     "CUE-017"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/export/AM_Harpy_Idle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "c2924bfa03593ce7119a5c3119c6118da7abf9994d3398c2baa81104124c775b"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
     "target": "2-3 (loop)",
     "target_status": "proposal",
-    "measured": null
+    "measured": 2.0
    },
    "loop": true,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-HARPY-001/Animation/AM_Harpy_Idle",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/Harpy/H2Anim/AM_Harpy_Idle",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Harpy_Idle.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H3 (art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/export/SK_Harpy_H3.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-HARPY-001/HAR-Idle; контакты (clip_contact_check): PASS (WARN: skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/Harpy/Rig/SK_Harpy_Skeleton; художественно не принят"
   },
   {
    "id": "HAR-LungeAttack",
@@ -231,36 +312,52 @@
     "CUE-008"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/export/AM_Harpy_LungeAttack.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "574f37306edaf54c87bd45d017317f30c242ad7585a19b66e9a5a2cf56247e51"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
     "target": 0.6,
     "target_status": "proposal",
-    "measured": null
+    "measured": 0.5833
    },
    "loop": false,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-HARPY-001/Animation/AM_Harpy_LungeAttack",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/Harpy/H2Anim/AM_Harpy_LungeAttack",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Harpy_LungeAttack.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H3 (art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/export/SK_Harpy_H3.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack; контакты (clip_contact_check): PASS (WARN: skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/Harpy/Rig/SK_Harpy_Skeleton; художественно не принят"
   },
   {
    "id": "HAR-HitReact",
@@ -273,36 +370,52 @@
     "CUE-011"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/export/AM_Harpy_HitReact.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "26ca15dbd9d72a0ddf286f307fd37c474769150caa69e2b2ae4761dc9c72961c"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
-    "target": "0.4 (04) vs 0.9 (CUE-011)",
+    "target": "0.4 (предложение волны 5c, 04) vs 0.9 (CUE-011)",
     "target_status": "open",
-    "measured": null
+    "measured": 0.4167
    },
    "loop": false,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-HARPY-001/Animation/AM_Harpy_HitReact",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/Harpy/H2Anim/AM_Harpy_HitReact",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Harpy_HitReact.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет; условно до AD-CNF-30 (бриф 18, стр. 10; Т2№7): при HP 1 HitReact почти недостижим, автор может сократить набор Harpy до смерть+idle"
+   "notes": "кандидат H2Anim волны 5c на rest H3 (art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/export/SK_Harpy_H3.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-HARPY-001/HAR-HitReact; контакты (clip_contact_check): PASS (WARN: skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/Harpy/Rig/SK_Harpy_Skeleton; художественно не принят; условно до AD-CNF-30 (бриф 18, стр. 10; Т2№7): при HP 1 HitReact почти недостижим, автор может сократить набор Harpy до смерть+idle"
   },
   {
    "id": "HAR-DeathSettle",
@@ -315,36 +428,52 @@
     "CUE-013"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/export/AM_Harpy_DeathSettle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "6472335ba334871abe6a5bc2e55de67ad8eefbf8683dd657e64baf72d58a72e7"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
-    "target": "0.9 (04), <=0.95 (CUE-013)",
+    "target": "0.875-0.9 (предложение волны 5c, 04), <=0.95 (CUE-013)",
     "target_status": "open",
-    "measured": null
+    "measured": 0.875
    },
    "loop": false,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-HARPY-001/Animation/AM_Harpy_DeathSettle",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/Harpy/H2Anim/AM_Harpy_DeathSettle",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Harpy_DeathSettle.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H3 (art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/export/SK_Harpy_H3.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle; контакты (clip_contact_check): PASS (WARN: skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/Harpy/Rig/SK_Harpy_Skeleton; художественно не принят"
   },
   {
    "id": "ARTH-Idle",
@@ -358,36 +487,52 @@
     "CUE-017"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/export/AM_KingArthur_Idle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "6f06573170643f0b747fc1f07673216709dd84b1f1a67262dfe68fc6f05db3a8"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
     "target": "2-3 (loop)",
     "target_status": "proposal",
-    "measured": null
+    "measured": 2.5
    },
    "loop": true,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-KING-ARTHUR-001/Animation/AM_Arthur_Idle",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/KingArthur/H2Anim/AM_KingArthur_Idle",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_KingArthur_Idle.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/export/SK_KingArthur_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-Idle; контакты (clip_contact_check): PASS; UE: импортирован на канонический скелет /Game/PipelineCandidates/KingArthur/Rig/SK_KingArthur_Skeleton; художественно не принят"
   },
   {
    "id": "ARTH-LungeAttack",
@@ -400,36 +545,52 @@
     "CUE-008"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/export/AM_KingArthur_LungeAttack.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "eef934baf0d4a675cc52c703b15c81b1b2ae7bc9b828b101091f9b840823c417"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
     "target": 0.6,
     "target_status": "proposal",
-    "measured": null
+    "measured": 0.5833
    },
    "loop": false,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-KING-ARTHUR-001/Animation/AM_Arthur_LungeAttack",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/KingArthur/H2Anim/AM_KingArthur_LungeAttack",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_KingArthur_LungeAttack.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/export/SK_KingArthur_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack; контакты (clip_contact_check): PASS (WARN: hem_below_base_top, limb_body_R, skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/KingArthur/Rig/SK_KingArthur_Skeleton; художественно не принят"
   },
   {
    "id": "ARTH-HitReact",
@@ -442,36 +603,52 @@
     "CUE-011"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/export/AM_KingArthur_HitReact.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "c4eaf583f208dcb65929a9219b994343642d3b50de16a97479a2ea968ce80eef"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
-    "target": "0.4 (04) vs 0.9 (CUE-011)",
+    "target": "0.4 (предложение волны 5c, 04) vs 0.9 (CUE-011)",
     "target_status": "open",
-    "measured": null
+    "measured": 0.4167
    },
    "loop": false,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-KING-ARTHUR-001/Animation/AM_Arthur_HitReact",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/KingArthur/H2Anim/AM_KingArthur_HitReact",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_KingArthur_HitReact.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/export/SK_KingArthur_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-HitReact; контакты (clip_contact_check): PASS (WARN: skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/KingArthur/Rig/SK_KingArthur_Skeleton; художественно не принят"
   },
   {
    "id": "ARTH-DeathSettle",
@@ -484,36 +661,52 @@
     "CUE-013"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/export/AM_KingArthur_DeathSettle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "de7c000d85e5df59952dff3e5de0f15db2ef06fa5055bc0285591f911eac9cc4"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
-    "target": "0.9 (04), <=0.95 (CUE-013)",
+    "target": "0.875-0.9 (предложение волны 5c, 04), <=0.95 (CUE-013)",
     "target_status": "open",
-    "measured": null
+    "measured": 0.875
    },
    "loop": false,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-KING-ARTHUR-001/Animation/AM_Arthur_DeathSettle",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/KingArthur/H2Anim/AM_KingArthur_DeathSettle",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_KingArthur_DeathSettle.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/export/SK_KingArthur_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-DeathSettle; контакты (clip_contact_check): PASS (WARN: limb_body_R, skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/KingArthur/Rig/SK_KingArthur_Skeleton; художественно не принят"
   },
   {
    "id": "MER-Idle",
@@ -527,36 +720,52 @@
     "CUE-017"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2anim/export/AM_Merlin_Idle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "dd3e09828dd28a4f8fcbd989cb46e7b4203bb177aec7f5c17048f97f8bf90744"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
     "target": "2-3 (loop)",
     "target_status": "proposal",
-    "measured": null
+    "measured": 3.0
    },
    "loop": true,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-MERLIN-001/Animation/AM_Merlin_Idle",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/Merlin/H2Anim/AM_Merlin_Idle",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Merlin_Idle.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-MERLIN-001/MER-Idle; контакты (clip_contact_check): PASS; UE: импортирован на канонический скелет /Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton; художественно не принят"
   },
   {
    "id": "MER-LungeAttack",
@@ -569,36 +778,52 @@
     "CUE-008"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2anim/export/AM_Merlin_LungeAttack.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "dbc86fc3862468433781acd646ac18f92215d30ae9b8efa29a7cb3d9cc3098ea"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
     "target": 0.6,
     "target_status": "proposal",
-    "measured": null
+    "measured": 0.5833
    },
    "loop": false,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-MERLIN-001/Animation/AM_Merlin_LungeAttack",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/Merlin/H2Anim/AM_Merlin_LungeAttack",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Merlin_LungeAttack.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack; контакты (clip_contact_check): PASS (WARN: skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton; художественно не принят"
   },
   {
    "id": "MER-HitReact",
@@ -611,36 +836,52 @@
     "CUE-011"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2anim/export/AM_Merlin_HitReact.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "f9ba01b5f90705bbe8cbbc7f62b0fcfd52bcb5b0abfcf840209c49621a42becb"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
-    "target": "0.4 (04) vs 0.9 (CUE-011)",
+    "target": "0.4 (предложение волны 5c, 04) vs 0.9 (CUE-011)",
     "target_status": "open",
-    "measured": null
+    "measured": 0.4167
    },
    "loop": false,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-MERLIN-001/Animation/AM_Merlin_HitReact",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/Merlin/H2Anim/AM_Merlin_HitReact",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Merlin_HitReact.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-MERLIN-001/MER-HitReact; контакты (clip_contact_check): PASS; UE: импортирован на канонический скелет /Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton; художественно не принят"
   },
   {
    "id": "MER-DeathSettle",
@@ -653,36 +894,52 @@
     "CUE-013"
    ],
    "source": {
-    "type": "none"
+    "type": "blender_keyframed",
+    "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+    "reference": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2anim.json",
+    "files": [
+     {
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2anim/export/AM_Merlin_DeathSettle.fbx",
+      "exists": true,
+      "format": "fbx",
+      "sha256": "272b1847fceea0074595261633aa835f213c89dcb8dcaa6a728e1597da8c489e"
+     }
+    ]
    },
    "license": {
-    "terms": "нет файла",
-    "commercial_use": "n/a"
+    "holder": "проект Unmatched",
+    "terms": "собственная работа (Blender-скрипт репозитория)",
+    "commercial_use": "yes"
    },
    "fps": {
     "target": 24,
-    "measured": null
+    "measured": 24.0
    },
    "duration_s": {
-    "target": "0.9 (04), <=0.95 (CUE-013)",
+    "target": "0.875-0.9 (предложение волны 5c, 04), <=0.95 (CUE-013)",
     "target_status": "open",
-    "measured": null
+    "measured": 0.875
    },
    "loop": false,
    "root_motion": "in_place",
    "skeleton": {
-    "contract_key": "UM_HUMANOID_17_v1",
-    "version": "p16-2026-09-28"
+    "contract_key": "UM_HUMANOID_17_v2",
+    "version": "v2-2026-09-29"
    },
    "ue": {
-    "target_path": "/Game/PipelineCandidates/ASSET-MERLIN-001/Animation/AM_Merlin_DeathSettle",
-    "status": "proposed"
+    "target_path": "/Game/PipelineCandidates/Merlin/H2Anim/AM_Merlin_DeathSettle",
+    "status": "technically_imported",
+    "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2anim/reports/ue-import-clips.json"
    },
-   "status": "proposed",
+   "status": "technically_imported",
    "validation": {
-    "result": "not_run"
+    "result": "pass",
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Merlin_DeathSettle.validation.json",
+    "fails": [],
+    "warnings": [],
+    "date": "2026-09-29"
    },
-   "notes": "слот брифа 18; производственного клипа нет"
+   "notes": "кандидат H2Anim волны 5c на rest H2 (art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx): шаблон дельт blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx + авторский слой по видео-референсу art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle; контакты (clip_contact_check): PASS (WARN: skin_stretch); UE: импортирован на канонический скелет /Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton; художественно не принят"
   },
   {
    "id": "MED-Idle-draft",

@@ -152,7 +152,7 @@ if op == "setup":
     sc.set_editor_property("real_time_capture", False)
     sc.set_light_color(u.LinearColor(*[float(c) for c in sky_cfg["color_linear"]], 1.0))
     sc.recapture_sky()
-    for spec in (args["figure"], args["base"]):
+    for spec in [x for x in (args["figure"], args.get("base")) if x]:  # base optional (H2Anim: Medusa/Harpy)
         old = by_label(spec["label"], required=False)
         if old is not None:
             actors_sub.destroy_actor(old)

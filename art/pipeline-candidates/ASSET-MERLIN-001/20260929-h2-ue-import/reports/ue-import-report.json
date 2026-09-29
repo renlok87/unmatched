@@ -7,7 +7,6 @@
     "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Blue",
     "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Red",
     "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2",
-    "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2_Skeleton",
     "/Game/PipelineCandidates/Merlin/H2/Meshes/SM_Merlin_H2_Base",
     "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_BC",
     "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_N",
@@ -27,7 +26,6 @@
         "base_instance": "MaterialInstanceConstant",
         "figure_instance": "MaterialInstanceConstant",
         "skeletal": "SkeletalMesh",
-        "skeleton": "Skeleton",
         "team:base:Blue": "MaterialInstanceConstant",
         "team:base:Red": "MaterialInstanceConstant",
         "team:figure:Blue": "MaterialInstanceConstant",
@@ -42,7 +40,6 @@
         "base_instance": "MaterialInstanceConstant",
         "figure_instance": "MaterialInstanceConstant",
         "skeletal": "SkeletalMesh",
-        "skeleton": "Skeleton",
         "team:base:Blue": "MaterialInstanceConstant",
         "team:base:Red": "MaterialInstanceConstant",
         "team:figure:Blue": "MaterialInstanceConstant",
@@ -63,7 +60,6 @@
         "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Blue",
         "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Red",
         "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2",
-        "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2_Skeleton",
         "/Game/PipelineCandidates/Merlin/H2/Meshes/SM_Merlin_H2_Base",
         "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_BC",
         "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_N",
@@ -78,7 +74,6 @@
         "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Blue",
         "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Red",
         "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2",
-        "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2_Skeleton",
         "/Game/PipelineCandidates/Merlin/H2/Meshes/SM_Merlin_H2_Base",
         "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_BC",
         "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_N",
@@ -98,7 +93,6 @@
           "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Blue": false,
           "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Red": false,
           "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2": false,
-          "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2_Skeleton": false,
           "/Game/PipelineCandidates/Merlin/H2/Meshes/SM_Merlin_H2_Base": false,
           "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_BC": false,
           "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_N": false,
@@ -359,6 +353,16 @@
       },
       "measured": 33967,
       "note": "Blender round trip 33967 (SK_Merlin_H2_Body + SK_Merlin_H2_Staff); UE's mesh build may drop the near-degenerate slivers the build counted",
+      "passed": true
+    },
+    "skeleton_is_canonical_target": {
+      "expected": "/Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton",
+      "measured": {
+        "owned_by_run": false,
+        "planned": "/Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton",
+        "read_back": "/Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton"
+      },
+      "note": "0.8.0: the mesh is imported onto the existing canonical skeleton (ue.target_skeleton); no <asset>_Skeleton is created, the skeleton is not owned (a reimport never deletes it)",
       "passed": true
     },
     "sockets_weapon_head": {
@@ -636,7 +640,6 @@
       "base_instance": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Base",
       "figure_instance": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2",
       "skeletal": "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2",
-      "skeleton": "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2_Skeleton",
       "team:base:Blue": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Base_Blue",
       "team:base:Red": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Base_Red",
       "team:figure:Blue": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Blue",
@@ -743,6 +746,9 @@
       "triangles": [
         33967
       ],
+      "uv_sets": [
+        1
+      ],
       "vertices": [
         16984
       ]
@@ -809,6 +815,11 @@
         "ue_bone": "head"
       }
     ],
+    "target_skeleton": {
+      "owned_by_run": false,
+      "planned": "/Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton",
+      "read_back": "/Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton"
+    },
     "textures": {
       "BC": {
         "ok": true,
@@ -869,6 +880,7 @@
             "SideBandWeight": 1.0,
             "VertexMaskWeight": 0.0
           },
+          "switches": {},
           "textures": {
             "BaseColorTexture": "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_BC",
             "NormalTexture": "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_N",
@@ -882,6 +894,7 @@
             "SideBandWeight": 1.0,
             "VertexMaskWeight": 0.0
           },
+          "switches": {},
           "textures": {
             "BaseColorTexture": "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_BC",
             "NormalTexture": "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_N",
@@ -899,6 +912,7 @@
             "TeamDye": 1.0,
             "TeamDyeGain": 5.5
           },
+          "switches": {},
           "textures": {
             "BaseColorTexture": "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_BC",
             "NormalTexture": "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_N",
@@ -913,6 +927,7 @@
             "TeamDye": 1.0,
             "TeamDyeGain": 5.5
           },
+          "switches": {},
           "textures": {
             "BaseColorTexture": "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_BC",
             "NormalTexture": "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_N",
@@ -928,6 +943,7 @@
           "asset": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Base_Blue",
           "parent": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Base",
           "scalars": {},
+          "switches": {},
           "team_hex": "#3F6FD8",
           "textures": {},
           "vectors": {
@@ -942,6 +958,7 @@
         "read_back": {
           "parent": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Base",
           "scalars": {},
+          "switches": {},
           "textures": {},
           "vectors": {
             "TeamColor": [
@@ -959,6 +976,7 @@
           "asset": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Base_Red",
           "parent": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Base",
           "scalars": {},
+          "switches": {},
           "team_hex": "#D0453A",
           "textures": {},
           "vectors": {
@@ -973,6 +991,7 @@
         "read_back": {
           "parent": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Base",
           "scalars": {},
+          "switches": {},
           "textures": {},
           "vectors": {
             "TeamColor": [
@@ -990,6 +1009,7 @@
           "asset": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Blue",
           "parent": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2",
           "scalars": {},
+          "switches": {},
           "team_hex": "#3F6FD8",
           "textures": {},
           "vectors": {
@@ -1004,6 +1024,7 @@
         "read_back": {
           "parent": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2",
           "scalars": {},
+          "switches": {},
           "textures": {},
           "vectors": {
             "TeamColor": [
@@ -1021,6 +1042,7 @@
           "asset": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Red",
           "parent": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2",
           "scalars": {},
+          "switches": {},
           "team_hex": "#D0453A",
           "textures": {},
           "vectors": {
@@ -1035,6 +1057,7 @@
         "read_back": {
           "parent": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2",
           "scalars": {},
+          "switches": {},
           "textures": {},
           "vectors": {
             "TeamColor": [

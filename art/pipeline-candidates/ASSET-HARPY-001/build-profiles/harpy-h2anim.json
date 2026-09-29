@@ -1,0 +1,800 @@
+{
+ "schema": "unmatched.h2anim-spec/1",
+ "hero": "Harpy",
+ "character": "Harpy",
+ "ue_hero": "Harpy",
+ "asset_id": "ASSET-HARPY-001",
+ "status": "proposed",
+ "status_note": "Волна 5c (H2Anim, 2026-09-29): 4 клипа D-11 на меше Harpy H3. Запечено на rest H3 (решение оркестратора (3)): первый проход шёл на H2, пока экспорт H3 и отчёт docs/art-pipeline/harpy-h3-report.md не были готовы; когда они появились, клипы перезапечены на H3 заменой target и повтором anim/h2anim_run.py (ключи — дельты в осях арматуры, правки ключей не понадобились). Крылья = arm_upper/arm_lower/hand, оружия нет (удар когтями), ноги цифрового типа и асимметричны (leg_upper.R 5,96 см против .L 7,15 см) — ключи по сторонам, без зеркалирования. Гуманоидный шаблон годится только для spine/head (контракт §9.2); крылья и ноги авторские по art/animation-refs/ASSET-HARPY-001/HAR-*. HitReact условен (AD-CNF-30, required_mvp=false). Оси: +X вперёд, +Y влево, +Z вверх; Эйлер XYZ: X крен вправо (для левого крыла + поднимает, для правого − поднимает), Y наклон вперёд, Z поворот влево.",
+ "target": {
+  "sk_fbx": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/export/SK_Harpy_H3.fbx",
+  "base_fbx": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/export/SM_Harpy_H3_Base.fbx",
+  "sha256": "ba841a77f26b9c99e333dc7c9e08094cbea2e6c7755b12c2401d1e4eab2ac2c4",
+  "rest_generation": "H3",
+  "rebaked_from": "H2 (20260929-h2-bake/export/SK_Harpy_H2.fbx, sha256 4a615a91…8984f): те же ключи, перезапечено на rest H3 после отчёта docs/art-pipeline/harpy-h3-report.md"
+ },
+ "meshes": {
+  "body": "SK_Harpy_Body",
+  "weapon": null
+ },
+ "weapon": {
+  "bone": null,
+  "side": null,
+  "note": "оружия нет: удар когтями; сокет Weapon ставится профилем на hand_L/hand_R"
+ },
+ "contact": {
+  "wings": true,
+  "note": "крылья = руки: пересечение крыльев с корпусом, головой и ногами — FAIL"
+ },
+ "run_dir": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim",
+ "ue": {
+  "skeleton": "/Game/PipelineCandidates/Harpy/Rig/SK_Harpy_Skeleton",
+  "mesh_for_preview": "/Game/PipelineCandidates/Harpy/Rig/SK_Harpy",
+  "clips_folder": "/Game/PipelineCandidates/Harpy/H2Anim",
+  "mesh_for_preview_note": "носитель канонического скелета Rig/SK_Harpy (меш H3 без материалов): H3-меша Harpy в UE нет"
+ },
+ "fps": 24,
+ "clips": {
+  "Idle": {
+   "frames": 48,
+   "role": "idle",
+   "reference": "art/animation-refs/ASSET-HARPY-001/HAR-Idle",
+   "design": "хищное ожидание: крылья медленно приподнимаются и чуть разводятся назад (полувзмах), концы крыльев подрагивают с двойной частотой, корпус дышит, голова резко, по-птичьи, поворачивается влево-вправо; когти стоят на месте",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx",
+    "bones": [
+     "spine",
+     "head"
+    ],
+    "weight": 0.6
+   },
+   "waves": [
+    {
+     "bone": "arm_upper.L",
+     "axis": "x",
+     "amp": 7.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "arm_upper.R",
+     "axis": "x",
+     "amp": -7.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "arm_upper.L",
+     "axis": "y",
+     "amp": -4.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "arm_upper.R",
+     "axis": "y",
+     "amp": -4.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "hand.L",
+     "axis": "x",
+     "amp": 4.0,
+     "cycles": 2,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "hand.R",
+     "axis": "x",
+     "amp": -4.0,
+     "cycles": 2,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "spine",
+     "axis": "y",
+     "amp": -2.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "head",
+     "axis": "z",
+     "amp": 10.0,
+     "cycles": 1,
+     "shape": "sin"
+    },
+    {
+     "bone": "head",
+     "axis": "y",
+     "amp": 3.0,
+     "cycles": 2,
+     "shape": "raised_cos"
+    }
+   ],
+   "keys": [
+    {
+     "f": 24,
+     "hips_loc": [
+      0.0,
+      0.0,
+      0.25
+     ]
+    }
+   ],
+   "key_frames": [
+    0,
+    12,
+    24,
+    36
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   }
+  },
+  "LungeAttack": {
+   "frames": 14,
+   "role": "oneshot",
+   "reference": "art/animation-refs/ASSET-HARPY-001/HAR-LungeAttack",
+   "design": "замах крыльями вверх-назад, корпус откидывается (к. 4); мощный взмах вниз-вперёд, корпус бросается вперёд, правая лапа (цель IK стопы) выбрасывает когти вперёд-вверх (+X) (к. 7–9); левая лапа — опора, стоит на месте; крылья и лапа возвращаются (к. 11–14) (anim-v2 fix) Амплитуды уменьшены по skin_stretch: мах крыльев вперёд ±16/12° (было 22/18°), удар лапой — подъём стопы 1,9 см и вынос 2,6 см (было 4,5 и 6,0), голова почти неподвижна: перья шеи/крыла (вес head/arm_upper.L 0,5/0,5) и шов бедра (hips/leg_upper.R) на H3-меше рвались видимыми рёбрами > 5×",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx",
+    "bones": [
+     "spine"
+    ],
+    "weight": 0.3
+   },
+   "keys": [
+    {
+     "f": 4,
+     "bones": {
+      "arm_upper.L": [
+       18,
+       -14,
+       0
+      ],
+      "arm_upper.R": [
+       -18,
+       -14,
+       0
+      ],
+      "arm_lower.L": [
+       8,
+       -6,
+       0
+      ],
+      "arm_lower.R": [
+       -8,
+       -6,
+       0
+      ],
+      "spine": [
+       0,
+       -9,
+       0
+      ],
+      "head": [
+       0,
+       2,
+       0
+      ]
+     },
+     "hips_loc": [
+      -0.3,
+      0.0,
+      0.3
+     ],
+     "feet_offset": {
+      "R": [
+       -0.3,
+       0,
+       1.8
+      ]
+     },
+     "foot_world": {
+      "R": [
+       0,
+       -6,
+       0
+      ]
+     }
+    },
+    {
+     "f": 7,
+     "bones": {
+      "arm_upper.L": [
+       -16,
+       12,
+       0
+      ],
+      "arm_upper.R": [
+       16,
+       12,
+       0
+      ],
+      "arm_lower.L": [
+       -10,
+       10,
+       0
+      ],
+      "arm_lower.R": [
+       10,
+       10,
+       0
+      ],
+      "hand.L": [
+       -8,
+       6,
+       0
+      ],
+      "hand.R": [
+       8,
+       6,
+       0
+      ],
+      "spine": [
+       0,
+       16,
+       0
+      ],
+      "head": [
+       0,
+       -2,
+       0
+      ]
+     },
+     "hips_loc": [
+      0.35,
+      0,
+      0.1
+     ],
+     "feet_offset": {
+      "R": [
+       2.6,
+       0.3,
+       1.9
+      ]
+     },
+     "foot_world": {
+      "R": [
+       0,
+       -15,
+       0
+      ]
+     }
+    },
+    {
+     "f": 9,
+     "bones": {
+      "arm_upper.L": [
+       -13,
+       10,
+       0
+      ],
+      "arm_upper.R": [
+       13,
+       10,
+       0
+      ],
+      "arm_lower.L": [
+       -8,
+       8,
+       0
+      ],
+      "arm_lower.R": [
+       8,
+       8,
+       0
+      ],
+      "hand.L": [
+       -6,
+       4,
+       0
+      ],
+      "hand.R": [
+       6,
+       4,
+       0
+      ],
+      "spine": [
+       0,
+       14,
+       0
+      ],
+      "head": [
+       0,
+       -2,
+       0
+      ]
+     },
+     "hips_loc": [
+      0.24999999999999997,
+      0,
+      0.1
+     ],
+     "feet_offset": {
+      "R": [
+       2.3,
+       0.3,
+       1.7
+      ]
+     },
+     "foot_world": {
+      "R": [
+       0,
+       -13,
+       0
+      ]
+     }
+    },
+    {
+     "f": 11,
+     "bones": {
+      "arm_upper.L": [
+       -4,
+       4,
+       0
+      ],
+      "arm_upper.R": [
+       4,
+       4,
+       0
+      ],
+      "spine": [
+       0,
+       4,
+       0
+      ],
+      "head": [
+       0,
+       -2,
+       0
+      ]
+     },
+     "hips_loc": [
+      0.15,
+      0.0,
+      0.05
+     ],
+     "feet_offset": {
+      "R": [
+       1.5,
+       0.2,
+       1.2
+      ]
+     },
+     "foot_world": {
+      "R": [
+       0,
+       -8,
+       0
+      ]
+     }
+    }
+   ],
+   "key_frames": [
+    0,
+    4,
+    7,
+    9,
+    11,
+    14
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ],
+    "pin_frames_L": [
+     [
+      0,
+      14
+     ]
+    ],
+    "pin_frames_R": [
+     [
+      0,
+      0
+     ],
+     [
+      14,
+      14
+     ]
+    ]
+   }
+  },
+  "HitReact": {
+   "frames": 10,
+   "role": "oneshot",
+   "reference": "art/animation-refs/ASSET-HARPY-001/HAR-HitReact",
+   "duration_note": "0,4 с (док 04) — ПРЕДЛОЖЕНИЕ; слот условен до AD-CNF-30 (required_mvp=false)",
+   "design": "крылья вздрагивают вверх и назад, корпус отбрасывает назад, голова мотается; когти на месте",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx",
+    "bones": [
+     "spine",
+     "head"
+    ],
+    "weight": 0.6
+   },
+   "keys": [
+    {
+     "f": 2,
+     "bones": {
+      "arm_upper.L": [
+       14,
+       -10,
+       0
+      ],
+      "arm_upper.R": [
+       -14,
+       -10,
+       0
+      ],
+      "hand.L": [
+       8,
+       0,
+       0
+      ],
+      "hand.R": [
+       -8,
+       0,
+       0
+      ],
+      "spine": [
+       0,
+       -8,
+       4
+      ],
+      "head": [
+       0,
+       -8,
+       -8
+      ]
+     },
+     "hips_loc": [
+      -0.4,
+      0.0,
+      0.1
+     ]
+    },
+    {
+     "f": 5,
+     "bones": {
+      "arm_upper.L": [
+       8,
+       -6,
+       0
+      ],
+      "arm_upper.R": [
+       -8,
+       -6,
+       0
+      ],
+      "hand.L": [
+       4,
+       0,
+       0
+      ],
+      "hand.R": [
+       -4,
+       0,
+       0
+      ],
+      "spine": [
+       0,
+       -5,
+       2
+      ],
+      "head": [
+       0,
+       -4,
+       -4
+      ]
+     },
+     "hips_loc": [
+      -0.25,
+      0.0,
+      0.05
+     ]
+    },
+    {
+     "f": 8,
+     "bones": {
+      "arm_upper.L": [
+       -2,
+       1,
+       0
+      ],
+      "arm_upper.R": [
+       2,
+       1,
+       0
+      ],
+      "spine": [
+       0,
+       1,
+       0
+      ]
+     }
+    }
+   ],
+   "key_frames": [
+    0,
+    2,
+    5,
+    8,
+    10
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   }
+  },
+  "DeathSettle": {
+   "frames": 21,
+   "role": "terminal",
+   "reference": "art/animation-refs/ASSET-HARPY-001/HAR-DeathSettle",
+   "duration_note": "0,875 с — ПРЕДЛОЖЕНИЕ (0,9 с по 04, ≤ 0,95 с по CUE-013), target_status open",
+   "design": "удар и судорожный взмах крыльями (к. 3–8), лапы подгибаются, тело оседает на подставку и клонится вперёд, голова падает; крылья безвольно остаются раскрытыми, концы свисают наружу (к. 13–21) — складывание крыльев вдоль корпуса на этом риге уводит перья в таз и спину (проверка limb_body), поэтому финальная поза — «мёртвая птица с раскрытыми крыльями» (anim-v2 fix) Присед меньше (таз −1,2…−1,35 см, было −3,2…−3,8), поклон — корпусом (spine 26–31°), голова ниже 16°: швы перьев у бедра (hips/leg_upper 0,5/0,5, острова из 3 вершин) рвались видимыми рёбрами; оставшиеся разрывы закрыты со всех 24 направлений (WARN skin_stretch)",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx",
+    "bones": [
+     "spine",
+     "head"
+    ],
+    "weight": 0.4
+   },
+   "keys": [
+    {
+     "f": 3,
+     "bones": {
+      "arm_upper.L": [
+       12,
+       -8,
+       0
+      ],
+      "arm_upper.R": [
+       -12,
+       -8,
+       0
+      ],
+      "spine": [
+       0,
+       -8,
+       3
+      ],
+      "head": [
+       0,
+       -10,
+       -6
+      ]
+     },
+     "hips_loc": [
+      -0.3,
+      0.0,
+      0.2
+     ]
+    },
+    {
+     "f": 8,
+     "bones": {
+      "arm_upper.L": [
+       10,
+       2,
+       0
+      ],
+      "arm_upper.R": [
+       -10,
+       2,
+       0
+      ],
+      "arm_lower.L": [
+       4,
+       0,
+       0
+      ],
+      "arm_lower.R": [
+       -4,
+       0,
+       0
+      ],
+      "spine": [
+       0,
+       8,
+       2
+      ],
+      "head": [
+       0,
+       8,
+       -2
+      ]
+     },
+     "hips_loc": [
+      0.2,
+      0,
+      -0.6
+     ]
+    },
+    {
+     "f": 13,
+     "bones": {
+      "arm_upper.L": [
+       3,
+       8,
+       0
+      ],
+      "arm_upper.R": [
+       -3,
+       8,
+       0
+      ],
+      "arm_lower.L": [
+       -5,
+       0,
+       0
+      ],
+      "arm_lower.R": [
+       5,
+       0,
+       0
+      ],
+      "hand.L": [
+       -10,
+       0,
+       0
+      ],
+      "hand.R": [
+       10,
+       0,
+       0
+      ],
+      "spine": [
+       2,
+       26,
+       3
+      ],
+      "head": [
+       2,
+       14,
+       -6
+      ]
+     },
+     "hips_loc": [
+      0.4,
+      0,
+      -1.2
+     ]
+    },
+    {
+     "f": 17,
+     "bones": {
+      "arm_upper.L": [
+       4,
+       8,
+       0
+      ],
+      "arm_upper.R": [
+       -4,
+       8,
+       0
+      ],
+      "arm_lower.L": [
+       -6,
+       0,
+       0
+      ],
+      "arm_lower.R": [
+       6,
+       0,
+       0
+      ],
+      "hand.L": [
+       -14,
+       0,
+       0
+      ],
+      "hand.R": [
+       14,
+       0,
+       0
+      ],
+      "spine": [
+       3,
+       31,
+       4
+      ],
+      "head": [
+       3,
+       15,
+       -8
+      ]
+     },
+     "hips_loc": [
+      0.5,
+      0,
+      -1.3
+     ]
+    },
+    {
+     "f": 21,
+     "bones": {
+      "arm_upper.L": [
+       4,
+       8,
+       0
+      ],
+      "arm_upper.R": [
+       -4,
+       8,
+       0
+      ],
+      "arm_lower.L": [
+       -6,
+       0,
+       0
+      ],
+      "arm_lower.R": [
+       6,
+       0,
+       0
+      ],
+      "hand.L": [
+       -13,
+       0,
+       0
+      ],
+      "hand.R": [
+       13,
+       0,
+       0
+      ],
+      "spine": [
+       3,
+       31,
+       4
+      ],
+      "head": [
+       3,
+       15,
+       -8
+      ]
+     },
+     "hips_loc": [
+      0.5,
+      0,
+      -1.3499999999999999
+     ]
+    }
+   ],
+   "key_frames": [
+    0,
+    3,
+    8,
+    13,
+    17,
+    21
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   }
+  }
+ }
+}

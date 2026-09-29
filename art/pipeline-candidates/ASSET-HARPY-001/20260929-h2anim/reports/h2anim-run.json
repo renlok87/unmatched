@@ -1,0 +1,635 @@
+{
+ "clips": {
+  "Idle": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Harpy_Idle.validation.json",
+    "peak_joint_shift_of_height": 0.05865
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/reports/contact-Idle.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 4.8e-05,
+      "frame": 22,
+      "pinned_frames": 49,
+      "tol": 0.005,
+      "foot_vertices": 965
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 4.5e-05,
+      "frame": 24,
+      "pinned_frames": 49,
+      "tol": 0.005,
+      "foot_vertices": 734
+     },
+     "weapon_body": {
+      "status": "info",
+      "note": "у героя нет меша оружия"
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": true,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": true,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 252,
+      "bleed_regions": {
+       "arm_upper.L->head": 111,
+       "arm_upper.R->head": 99,
+       "arm_upper.R->spine": 26,
+       "arm_upper.L->spine": 16
+      },
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [
+       31,
+       32,
+       33,
+       34,
+       35,
+       36,
+       37,
+       38,
+       39
+      ],
+      "frame": 36,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 1,
+      "warn_regions": {
+       "arm_upper.L|head": 1
+      },
+      "warn_z_of_height": 0.671,
+      "max_ratio": 4.072,
+      "max_growth_of_height": 0.01598,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.006588,
+      "max_penetration_of_height": 0.006588,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 5.04,
+      "base_radius_cm": 10.78
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "warn_above": 0.002,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "pass",
+      "position_of_height": 0.0,
+      "velocity_of_height": 0.000256,
+      "tol": 0.005
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/preview/Harpy-Idle-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "LungeAttack": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Harpy_LungeAttack.validation.json",
+    "peak_joint_shift_of_height": 0.23246
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/reports/contact-LungeAttack.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 9.9e-05,
+      "frame": 4,
+      "pinned_frames": 15,
+      "tol": 0.005,
+      "foot_vertices": 965
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "pinned_frames": 2,
+      "tol": 0.005,
+      "foot_vertices": 734
+     },
+     "weapon_body": {
+      "status": "info",
+      "note": "у героя нет меша оружия"
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": true,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": true,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 252,
+      "bleed_regions": {
+       "arm_upper.L->head": 111,
+       "arm_upper.R->head": 99,
+       "arm_upper.R->spine": 26,
+       "arm_upper.L->spine": 16
+      },
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10,
+       11
+      ],
+      "frame": 7,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 22,
+      "warn_regions": {
+       "leg_upper.R|leg_upper.R": 8,
+       "leg_upper.R|spine": 7,
+       "hips|leg_upper.R": 4,
+       "leg_lower.R|leg_upper.R": 2
+      },
+      "warn_z_of_height": 0.366,
+      "max_ratio": 20.29,
+      "max_growth_of_height": 0.05063,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.006588,
+      "max_penetration_of_height": 0.006588,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 5.04,
+      "base_radius_cm": 10.78
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "warn_above": 0.002,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (oneshot)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/preview/Harpy-LungeAttack-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "HitReact": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Harpy_HitReact.validation.json",
+    "peak_joint_shift_of_height": 0.232
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/reports/contact-HitReact.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 7.6e-05,
+      "frame": 2,
+      "pinned_frames": 11,
+      "tol": 0.005,
+      "foot_vertices": 965
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 9.9e-05,
+      "frame": 2,
+      "pinned_frames": 11,
+      "tol": 0.005,
+      "foot_vertices": 734
+     },
+     "weapon_body": {
+      "status": "info",
+      "note": "у героя нет меша оружия"
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": true,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": true,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 252,
+      "bleed_regions": {
+       "arm_upper.L->head": 111,
+       "arm_upper.R->head": 99,
+       "arm_upper.R->spine": 26,
+       "arm_upper.L->spine": 16
+      },
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [
+       2,
+       3
+      ],
+      "frame": 3,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 3,
+      "warn_regions": {
+       "leg_upper.R|spine": 2,
+       "arm_upper.L|head": 1
+      },
+      "warn_z_of_height": 0.349,
+      "max_ratio": 8.225,
+      "max_growth_of_height": 0.02191,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.006588,
+      "max_penetration_of_height": 0.006588,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 5.04,
+      "base_radius_cm": 10.78
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "warn_above": 0.002,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (oneshot)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/preview/Harpy-HitReact-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "DeathSettle": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_Harpy_DeathSettle.validation.json",
+    "peak_joint_shift_of_height": 0.52931
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/reports/contact-DeathSettle.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.001129,
+      "frame": 20,
+      "pinned_frames": 22,
+      "tol": 0.005,
+      "foot_vertices": 965
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.001123,
+      "frame": 20,
+      "pinned_frames": 22,
+      "tol": 0.005,
+      "foot_vertices": 734
+     },
+     "weapon_body": {
+      "status": "info",
+      "note": "у героя нет меша оружия"
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": true,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "regions": {},
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": true,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 252,
+      "bleed_regions": {
+       "arm_upper.L->head": 111,
+       "arm_upper.R->head": 99,
+       "arm_upper.R->spine": 26,
+       "arm_upper.L->spine": 16
+      },
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [
+       7,
+       8,
+       9,
+       10,
+       11,
+       12,
+       13,
+       14,
+       15,
+       16,
+       17,
+       18,
+       19,
+       20,
+       21
+      ],
+      "warn_frames": [
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10,
+       11,
+       12,
+       13,
+       14,
+       15,
+       16,
+       17,
+       18,
+       19,
+       20,
+       21
+      ],
+      "frame": 21,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 17,
+      "fail_regions": {},
+      "fail_z_of_height": 0.331,
+      "warn_edges": 35,
+      "warn_regions": {
+       "hips|leg_upper.L": 9,
+       "leg_upper.R|spine": 9,
+       "hips|hips": 5,
+       "leg_lower.L|leg_upper.L": 3
+      },
+      "warn_z_of_height": 0.332,
+      "max_ratio": 25.564,
+      "max_growth_of_height": 0.05497,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.006588,
+      "max_penetration_of_height": 0.006588,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 5.04,
+      "base_radius_cm": 10.78
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.0,
+      "max_penetration_of_height": 0.0,
+      "frame": 0,
+      "warn_above": 0.002,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (terminal)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/preview/Harpy-DeathSettle-blender-sheet.jpg"
+   },
+   "passed": true
+  }
+ },
+ "author": {
+  "code": 0,
+  "seconds": 3.1,
+  "lines": [
+   "CLIP_AUTHOR OK Idle art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/export/AM_Harpy_Idle.fbx rest 3.81e-06 pose 1.9e-05 unreached []",
+   "CLIP_AUTHOR OK LungeAttack art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/export/AM_Harpy_LungeAttack.fbx rest 3.81e-06 pose 1.7e-05 unreached []",
+   "CLIP_AUTHOR OK HitReact art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/export/AM_Harpy_HitReact.fbx rest 3.81e-06 pose 1.9e-05 unreached []",
+   "CLIP_AUTHOR OK DeathSettle art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/export/AM_Harpy_DeathSettle.fbx rest 3.81e-06 pose 2.5e-05 unreached []"
+  ]
+ },
+ "spec": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2anim.json"
+}

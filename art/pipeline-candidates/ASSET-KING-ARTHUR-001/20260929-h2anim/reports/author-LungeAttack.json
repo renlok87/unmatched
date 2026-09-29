@@ -1,0 +1,505 @@
+{
+ "schema": "unmatched.h2anim-author/1",
+ "clip": "LungeAttack",
+ "hero": "KingArthur",
+ "character": "Arthur",
+ "spec": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2anim.json",
+ "spec_sha256": "4d4fdbf63fc7ce1819065ea7ef0605922dcd439c35fdbe2830039260affcb5b2",
+ "target": {
+  "sk_fbx": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/export/SK_KingArthur_H2.fbx",
+  "sha256": "9f3478122333d6488d4847654583b0e56a54c1a6415923ce658bf61d5356e828",
+  "rest_generation": "H2"
+ },
+ "tool": "tools/tripo-pipeline/anim/clip_author.py",
+ "tool_sha256": "6711e13233594e3bdc2dba5adb67ad94c09e3ac4a7ef8d82928393ba0a185d55",
+ "curves_sha256": "59f328e04c93add84c93924e472e52b1bdb4cd356c8cb4879c6fe42dffd0cec8",
+ "blender": "5.2.2 LTS",
+ "fps": 24,
+ "frames": 15,
+ "intervals": 14,
+ "duration_s": 0.5833,
+ "role": "oneshot",
+ "loop": false,
+ "template": {
+  "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx",
+  "sha256": "b985af983166f62d320c95bdc88cbcfba1f897a6c0abcaf87bcf748f994338a8",
+  "frames": [
+   2,
+   16
+  ],
+  "bones": [
+   "spine"
+  ],
+  "mirror": true,
+  "weight": 0.3,
+  "bone_weights": {}
+ },
+ "reference": "art/animation-refs/ASSET-KING-ARTHUR-001/ARTH-LungeAttack",
+ "ik_feet": {
+  "weight": [
+   [
+    0,
+    1.0
+   ]
+  ]
+ },
+ "hand_follow": {
+  "side": "R",
+  "mode": "anchor",
+  "anchor_bone": "spine",
+  "anchor_offset": [
+   4.0,
+   -14.0,
+   -4.0
+  ],
+  "hand_rot": "forearm",
+  "keep_weapon_world": "weapon.R",
+  "pole": [
+   -0.3,
+   -0.3,
+   -1.0
+  ],
+  "weight": [
+   [
+    0,
+    0.0
+   ],
+   [
+    1,
+    0.3
+   ],
+   [
+    2,
+    0.8
+   ],
+   [
+    4,
+    1.0
+   ],
+   [
+    5,
+    0.6
+   ],
+   [
+    6,
+    0.0
+   ]
+  ],
+  "note": "замах: кисть правой перед правой грудью (IK от spine, локоть вниз), меч сохраняет поворот aim в кулаке. anim-v2 fix 2026-09-30 (02:30+): смещение (5; −10,5; 7) -> (4; −14; −4) см — подъём arm_upper.R на к. 3–5 с 36–38° до 16–18°; при 38° крупный план UE f03–f05 показывал дыры оболочки наруча/плаща у локтя (skin_stretch их не ловит: рёбра < 5×)"
+ },
+ "ik_unreached_frames": [
+  1,
+  2,
+  3,
+  4,
+  5
+ ],
+ "weapon_tip": {
+  "bone": "weapon.R",
+  "tip_rest_cm": [
+   6.0626,
+   -8.9745,
+   60.0577
+  ]
+ },
+ "ik_log": [
+  {
+   "f": 0,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "weapon_tip_cm": [
+    6.063,
+    -8.975,
+    60.058
+   ],
+   "follow_R_weight": 0.0
+  },
+  {
+   "f": 1,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "follow_R": false,
+   "follow_R_reach_deficit_cm": 10.767,
+   "weapon_tip_cm": [
+    9.638,
+    -12.109,
+    60.254
+   ],
+   "follow_R_weight": 0.3,
+   "follow_R_hand_to_target_cm": 14.479
+  },
+  {
+   "f": 2,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "follow_R": false,
+   "follow_R_reach_deficit_cm": 10.767,
+   "weapon_tip_cm": [
+    9.326,
+    -15.886,
+    60.359
+   ],
+   "follow_R_weight": 0.8,
+   "follow_R_hand_to_target_cm": 15.053
+  },
+  {
+   "f": 3,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "follow_R": false,
+   "follow_R_reach_deficit_cm": 10.767,
+   "weapon_tip_cm": [
+    2.84,
+    -19.604,
+    59.12
+   ],
+   "follow_R_weight": 0.9,
+   "follow_R_hand_to_target_cm": 15.179
+  },
+  {
+   "f": 4,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "follow_R": false,
+   "follow_R_reach_deficit_cm": 10.767,
+   "weapon_tip_cm": [
+    1.641,
+    -20.183,
+    58.67
+   ],
+   "follow_R_weight": 1.0,
+   "follow_R_hand_to_target_cm": 15.323
+  },
+  {
+   "f": 5,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "follow_R": false,
+   "follow_R_reach_deficit_cm": 10.767,
+   "weapon_tip_cm": [
+    18.255,
+    -18.799,
+    55.997
+   ],
+   "follow_R_weight": 0.6,
+   "follow_R_hand_to_target_cm": 14.77
+  },
+  {
+   "f": 6,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "weapon_tip_cm": [
+    35.398,
+    -8.241,
+    41.322
+   ],
+   "follow_R_weight": 0.0
+  },
+  {
+   "f": 7,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "weapon_tip_cm": [
+    36.398,
+    -0.218,
+    27.274
+   ],
+   "follow_R_weight": 0.0
+  },
+  {
+   "f": 8,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "weapon_tip_cm": [
+    32.218,
+    3.918,
+    20.718
+   ],
+   "follow_R_weight": 0.0
+  },
+  {
+   "f": 9,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "weapon_tip_cm": [
+    29.093,
+    11.215,
+    23.461
+   ],
+   "follow_R_weight": 0.0
+  },
+  {
+   "f": 10,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "weapon_tip_cm": [
+    29.973,
+    12.626,
+    34.966
+   ],
+   "follow_R_weight": 0.0
+  },
+  {
+   "f": 11,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "weapon_tip_cm": [
+    25.273,
+    5.32,
+    51.049
+   ],
+   "follow_R_weight": 0.0
+  },
+  {
+   "f": 12,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "weapon_tip_cm": [
+    15.214,
+    -4.498,
+    58.418
+   ],
+   "follow_R_weight": 0.0
+  },
+  {
+   "f": 13,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "weapon_tip_cm": [
+    8.361,
+    -8.544,
+    59.669
+   ],
+   "follow_R_weight": 0.0
+  },
+  {
+   "f": 14,
+   "ik_weight": {
+    "L": 1.0,
+    "R": 1.0
+   },
+   "L": true,
+   "R": true,
+   "weapon_tip_cm": [
+    6.063,
+    -8.975,
+    60.058
+   ],
+   "follow_R_weight": 0.0
+  }
+ ],
+ "aim_keys": [
+  {
+   "f": 7,
+   "bone": "arm_upper.R",
+   "euler_deg": [
+    -13.773,
+    -21.53,
+    11.764
+   ],
+   "to": [
+    0.35,
+    -0.45,
+    -0.82
+   ]
+  },
+  {
+   "f": 9,
+   "bone": "arm_upper.R",
+   "euler_deg": [
+    -6.167,
+    -26.587,
+    12.685
+   ],
+   "to": [
+    0.35,
+    -0.3,
+    -0.89
+   ]
+  },
+  {
+   "f": 7,
+   "bone": "arm_lower.R",
+   "euler_deg": [
+    -15.088,
+    23.533,
+    -38.444
+   ],
+   "to": [
+    0.95,
+    0.15,
+    -0.25
+   ]
+  },
+  {
+   "f": 9,
+   "bone": "arm_lower.R",
+   "euler_deg": [
+    -17.856,
+    31.748,
+    -24.175
+   ],
+   "to": [
+    0.8,
+    0.45,
+    -0.4
+   ]
+  },
+  {
+   "f": 2,
+   "bone": "weapon.R",
+   "euler_deg": [
+    14.11,
+    17.298,
+    3.71
+   ],
+   "to": [
+    0.15,
+    -0.3,
+    0.94
+   ]
+  },
+  {
+   "f": 4,
+   "bone": "weapon.R",
+   "euler_deg": [
+    30.177,
+    17.67,
+    6.92
+   ],
+   "to": [
+    -0.1,
+    -0.5,
+    0.86
+   ]
+  },
+  {
+   "f": 7,
+   "bone": "weapon.R",
+   "euler_deg": [
+    -94.453,
+    61.664,
+    -60.666
+   ],
+   "to": [
+    0.85,
+    0.3,
+    -0.35
+   ]
+  },
+  {
+   "f": 9,
+   "bone": "weapon.R",
+   "euler_deg": [
+    -92.703,
+    53.896,
+    -52.072
+   ],
+   "to": [
+    0.55,
+    0.65,
+    -0.45
+   ]
+  },
+  {
+   "f": 12,
+   "bone": "weapon.R",
+   "euler_deg": [
+    -2.221,
+    3.497,
+    0.099
+   ],
+   "to": [
+    0.2,
+    0.1,
+    1.0
+   ]
+  }
+ ],
+ "fbx": {
+  "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/export/AM_KingArthur_LungeAttack.fbx",
+  "sha256": "eef934baf0d4a675cc52c703b15c81b1b2ae7bc9b828b101091f9b840823c417",
+  "bytes": 1750972
+ },
+ "export": {
+  "preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "preset_sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+  "rotation_applied": false,
+  "note": "сцена SK_*_H2.fbx уже в кадре UM_FBX_v1 (+X); масштаб объекта арматуры 1, UnitScaleFactor 1.0"
+ },
+ "readback": {
+  "rest_max_abs_diff_cm": 1.764e-05,
+  "rest_ok": true,
+  "missing_bones": [],
+  "frame_range": [
+   1,
+   15
+  ],
+  "fps": 24,
+  "pose_heads_max_diff_cm": 2e-05,
+  "pose_ok": true,
+  "armature_object": "SKEL_UM_Humanoid",
+  "armature_scale": [
+   0.01,
+   0.01,
+   0.01
+  ]
+ },
+ "passed": true
+}

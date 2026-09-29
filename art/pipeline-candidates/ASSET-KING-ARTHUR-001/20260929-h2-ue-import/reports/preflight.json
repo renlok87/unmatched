@@ -38,7 +38,7 @@
         "id": "king-arthur-h2-ue-import/1",
         "kind": "skeletal-adopt",
         "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-ue-import.json",
-        "sha256": "f8288f30a315522f10c90632a44f095540dea64293e6968eb3f3795166fc6ab0"
+        "sha256": "87ba1d3f2555fcde65d44dabf9de6bae1849187b59f735f00c0fa28e45869b1c"
       },
       "passed": true
     },
@@ -79,7 +79,7 @@
       "passed": true
     },
     "skeletal_adopt_module_present": {
-      "measured": "f4a285cd5bd9adbfb633c6287cb90a84fbf6de00a9e368fbbec3c7d8f93bb45d",
+      "measured": "bd69435fd03d63858fdf6c20401eecd4e723ff2c0a66b389e7bfac39db60c49a",
       "passed": true
     },
     "skeletal_candidate_files_present": {
@@ -105,6 +105,16 @@
       "measured": [],
       "passed": true
     },
+    "ue_folder_is_pipeline_candidate": {
+      "measured": "/Game/PipelineCandidates/KingArthur/H2",
+      "passed": true
+    },
+    "ue_stage_runnable_with_backend": {
+      "measured": false,
+      "note": "informational; ue-import runs only with --backend mcp (live editor via unreal_mcp.py)",
+      "passed": true,
+      "required": false
+    },
     "unreal_editor_cmd_present": {
       "measured": true,
       "note": "informational; this scaffold never launches UnrealEditor-Cmd",
@@ -120,6 +130,6 @@
   "stage": "preflight",
   "tool": {
     "name": "tripo-pipeline",
-    "version": "0.7.0"
+    "version": "0.8.0"
   }
 }

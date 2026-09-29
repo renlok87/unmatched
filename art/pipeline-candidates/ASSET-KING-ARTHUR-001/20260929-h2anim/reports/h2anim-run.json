@@ -1,0 +1,768 @@
+{
+ "clips": {
+  "Idle": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_KingArthur_Idle.validation.json",
+    "peak_joint_shift_of_height": 0.03374
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/reports/contact-Idle.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.000574,
+      "frame": 45,
+      "pinned_frames": 61,
+      "tol": 0.005,
+      "foot_vertices": 116
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.000573,
+      "frame": 15,
+      "pinned_frames": 61,
+      "tol": 0.005,
+      "foot_vertices": 62
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ]
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {
+       "spine": 43
+      },
+      "max_pairs": 43,
+      "frame": 0,
+      "regions": {
+       "spine": 43
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {
+       "spine": 72
+      },
+      "max_pairs": 73,
+      "frame": 3,
+      "regions": {
+       "spine": 73
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 564,
+      "bleed_regions": {
+       "arm_upper.R->spine": 323,
+       "arm_upper.L->spine": 137,
+       "arm_upper.R->hips": 104
+      },
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "pass",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [],
+      "frame": 15,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 0,
+      "warn_regions": {},
+      "warn_z_of_height": null,
+      "max_ratio": 2.51,
+      "max_growth_of_height": 0.00996,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.004055,
+      "max_penetration_of_height": 0.004055,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 6.03,
+      "base_radius_cm": 14.461
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.004108,
+      "max_penetration_of_height": 0.004647,
+      "frame": 10,
+      "warn_above": 0.006108,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "pass",
+      "position_of_height": 0.0,
+      "velocity_of_height": 0.00011,
+      "tol": 0.005
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/preview/KingArthur-Idle-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "LungeAttack": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_KingArthur_LungeAttack.validation.json",
+    "peak_joint_shift_of_height": 0.26449
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/reports/contact-LungeAttack.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.001619,
+      "frame": 7,
+      "pinned_frames": 15,
+      "tol": 0.005,
+      "foot_vertices": 116
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.000401,
+      "frame": 5,
+      "pinned_frames": 15,
+      "tol": 0.005,
+      "foot_vertices": 62
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ]
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {
+       "spine": 43
+      },
+      "max_pairs": 43,
+      "frame": 0,
+      "regions": {
+       "spine": 43
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "warn",
+      "rest_regions": {
+       "spine": 71
+      },
+      "max_pairs": 118,
+      "frame": 11,
+      "regions": {
+       "spine": 118
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [
+       {
+        "f": 4,
+        "bone": "spine",
+        "pairs": 107,
+        "rest_pairs": 71
+       },
+       {
+        "f": 5,
+        "bone": "spine",
+        "pairs": 111,
+        "rest_pairs": 71
+       },
+       {
+        "f": 11,
+        "bone": "spine",
+        "pairs": 118,
+        "rest_pairs": 71
+       },
+       {
+        "f": 13,
+        "bone": "spine",
+        "pairs": 105,
+        "rest_pairs": 71
+       }
+      ],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 564,
+      "bleed_regions": {
+       "arm_upper.R->spine": 323,
+       "arm_upper.L->spine": 137,
+       "arm_upper.R->hips": 104
+      },
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10,
+       11
+      ],
+      "frame": 8,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 9,
+      "warn_regions": {
+       "arm_lower.R|arm_upper.R": 4,
+       "hips|hips": 3,
+       "hips|spine": 2
+      },
+      "warn_z_of_height": 0.474,
+      "max_ratio": 6.362,
+      "max_growth_of_height": 0.02941,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.004055,
+      "max_penetration_of_height": 0.004055,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 6.03,
+      "base_radius_cm": 14.461
+     },
+     "hem_below_base_top": {
+      "status": "warn",
+      "rest_penetration_of_height": 0.004108,
+      "max_penetration_of_height": 0.007581,
+      "frame": 8,
+      "warn_above": 0.006108,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (oneshot)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/preview/KingArthur-LungeAttack-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "HitReact": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_KingArthur_HitReact.validation.json",
+    "peak_joint_shift_of_height": 0.21581
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/reports/contact-HitReact.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 0.000571,
+      "frame": 2,
+      "pinned_frames": 11,
+      "tol": 0.005,
+      "foot_vertices": 116
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.001067,
+      "frame": 2,
+      "pinned_frames": 11,
+      "tol": 0.005,
+      "foot_vertices": 62
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ]
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {
+       "spine": 43
+      },
+      "max_pairs": 43,
+      "frame": 0,
+      "regions": {
+       "spine": 43
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "pass",
+      "rest_regions": {
+       "spine": 72
+      },
+      "max_pairs": 79,
+      "frame": 8,
+      "regions": {
+       "spine": 79
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 564,
+      "bleed_regions": {
+       "arm_upper.R->spine": 323,
+       "arm_upper.L->spine": 137,
+       "arm_upper.R->hips": 104
+      },
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [
+       2,
+       3
+      ],
+      "frame": 2,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 3,
+      "warn_regions": {
+       "hips|hips": 3
+      },
+      "warn_z_of_height": 0.088,
+      "max_ratio": 4.021,
+      "max_growth_of_height": 0.02203,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "info",
+      "note": "клип без опоры на оружие (contact.weapon_tip_frames не задан)"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.004055,
+      "max_penetration_of_height": 0.004055,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 6.03,
+      "base_radius_cm": 14.461
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.004108,
+      "max_penetration_of_height": 0.004348,
+      "frame": 6,
+      "warn_above": 0.006108,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (oneshot)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/preview/KingArthur-HitReact-blender-sheet.jpg"
+   },
+   "passed": true
+  },
+  "DeathSettle": {
+   "validate": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "report": "docs/art-pipeline/animation-library/validation-h2anim/AM_KingArthur_DeathSettle.validation.json",
+    "peak_joint_shift_of_height": 0.52578
+   },
+   "contact": {
+    "code": 0,
+    "result": "pass",
+    "fails": [],
+    "report": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/reports/contact-DeathSettle.json",
+    "summary": {
+     "foot_slide_L": {
+      "status": "pass",
+      "max_of_height": 5.3e-05,
+      "frame": 3,
+      "pinned_frames": 22,
+      "tol": 0.005,
+      "foot_vertices": 116
+     },
+     "foot_slide_R": {
+      "status": "pass",
+      "max_of_height": 0.000115,
+      "frame": 15,
+      "pinned_frames": 22,
+      "tol": 0.005,
+      "foot_vertices": 62
+     },
+     "weapon_body": {
+      "status": "pass",
+      "soft_violations": [],
+      "soft_frames": 0,
+      "rest_pairs": 0,
+      "rest_bones": {},
+      "max_pairs": 0,
+      "frame": 0,
+      "body_bones": {},
+      "violations": [],
+      "violating_frames": 0,
+      "excluded_grip_bones": [
+       "arm_lower.R",
+       "hand.R"
+      ]
+     },
+     "limb_body_L": {
+      "status": "pass",
+      "rest_regions": {
+       "spine": 43
+      },
+      "max_pairs": 43,
+      "frame": 0,
+      "regions": {
+       "spine": 43
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [],
+      "wings": false,
+      "level": "fail"
+     },
+     "limb_body_R": {
+      "status": "warn",
+      "rest_regions": {
+       "spine": 71
+      },
+      "max_pairs": 159,
+      "frame": 4,
+      "regions": {
+       "spine": 159
+      },
+      "new_region_frames": 0,
+      "pair_violations": [],
+      "soft_violations": [
+       {
+        "f": 1,
+        "bone": "spine",
+        "pairs": 107,
+        "rest_pairs": 71
+       },
+       {
+        "f": 4,
+        "bone": "spine",
+        "pairs": 159,
+        "rest_pairs": 71
+       },
+       {
+        "f": 5,
+        "bone": "spine",
+        "pairs": 124,
+        "rest_pairs": 71
+       },
+       {
+        "f": 6,
+        "bone": "spine",
+        "pairs": 103,
+        "rest_pairs": 71
+       },
+       {
+        "f": 21,
+        "bone": "spine",
+        "pairs": 106,
+        "rest_pairs": 71
+       }
+      ],
+      "wings": false,
+      "level": "fail"
+     },
+     "skin_weight_bleed": {
+      "status": "info",
+      "frames": [],
+      "frame": 0,
+      "max_bleed_fail_edges": 0,
+      "bleed_vertices": 564,
+      "bleed_regions": {
+       "arm_upper.R->spine": 323,
+       "arm_upper.L->spine": 137,
+       "arm_upper.R->hips": 104
+      },
+      "radius_of_height": 0.1,
+      "note": "справочно: сколько FAIL-рёбер skin_stretch касаются вершин корпуса с весом на кости руки дальше 10 % H от неё (дефект весов меша, исправляется в скине H2/H2LD); из вердикта skin_stretch не исключаются"
+     },
+     "skin_stretch": {
+      "status": "warn",
+      "fail_frames": [],
+      "torn_frames": [],
+      "warn_frames": [
+       5,
+       6,
+       7,
+       8,
+       9,
+       10,
+       11,
+       12,
+       13,
+       14,
+       15,
+       16,
+       17,
+       18,
+       19,
+       20,
+       21
+      ],
+      "frame": 13,
+      "visible_torn_edges": 0,
+      "visible_regions": {},
+      "visible_xyz_cm": [],
+      "fail_edges": 0,
+      "fail_regions": {},
+      "fail_z_of_height": null,
+      "warn_edges": 10,
+      "warn_regions": {
+       "arm_lower.R|arm_upper.R": 5,
+       "hips|spine": 2,
+       "spine|spine": 2,
+       "arm_upper.R|spine": 1
+      },
+      "warn_z_of_height": 0.487,
+      "max_ratio": 8.514,
+      "max_growth_of_height": 0.07327,
+      "fail_rule": "ребро > 5× rest и > 2.0 % H, видимое хотя бы с одного из 24 направлений обзора",
+      "hidden_note": "torn_frames без fail_frames — разрывы только в закрытых со всех сторон местах (WARN)",
+      "warn_rule": "ребро > 3× rest и > 1.0 % H"
+     },
+     "weapon_tip": {
+      "status": "pass",
+      "frames": [
+       13,
+       21
+      ],
+      "max_r_of_base": 0.9556,
+      "max_abs_dz_of_height": 0.000744,
+      "tol_dz_of_height": 0.002,
+      "violations": [],
+      "note": "острие в круге подставки (r ≤ радиуса) на уровне её верха: опора на оружие"
+     },
+     "weapon_below_base_top_outside": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0,
+      "tol": 0.002,
+      "note": "оружие вне круга подставки ниже её верха: висит в воздухе у бока подставки"
+     },
+     "below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.004055,
+      "max_penetration_of_height": 0.004055,
+      "frame": 0,
+      "worst_bone": "foot.L",
+      "tol": 0.002,
+      "base_top_cm": 6.03,
+      "base_radius_cm": 14.461
+     },
+     "hem_below_base_top": {
+      "status": "pass",
+      "rest_penetration_of_height": 0.004108,
+      "max_penetration_of_height": 0.004357,
+      "frame": 3,
+      "warn_above": 0.006108,
+      "fail_above": 0.015,
+      "note": "подол (доминирующая кость hips/leg_upper/leg_lower) скинен жёстко, симуляции ткани нет"
+     },
+     "below_ground": {
+      "status": "pass",
+      "max_of_height": 0.0,
+      "frame": 0
+     },
+     "loop_seam": {
+      "status": "info",
+      "note": "не петля (terminal)"
+     }
+    }
+   },
+   "probe": {
+    "code": 0,
+    "overlay_code": 0,
+    "sheet": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/preview/KingArthur-DeathSettle-blender-sheet.jpg"
+   },
+   "passed": true
+  }
+ },
+ "author": {
+  "code": 0,
+  "seconds": 1.3,
+  "lines": [
+   "CLIP_AUTHOR OK LungeAttack art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/export/AM_KingArthur_LungeAttack.fbx rest 1.764e-05 pose 2e-05 unreached [1, 2, 3, 4, 5]"
+  ]
+ },
+ "spec": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2anim.json"
+}

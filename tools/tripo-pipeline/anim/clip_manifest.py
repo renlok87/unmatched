@@ -7,8 +7,14 @@ build собирает записи функциями slot()/medusa_draft()/tri
 (16 слотов брифа 18 §4: 4 клипа D-11 x 4 персонажа; 15 безусловных, HAR-HitReact условен до
 AD-CNF-30 — бриф 18, стр. 10) и тестовые файлы, подставляет измеренные fps/длительности и результаты
 из docs/art-pipeline/animation-library/validation/*.validation.json и считает sha256.
-Статусы не повышаются автоматически: сборка никогда не пишет technically_imported
-или artistically_accepted для production-слотов без явной правки кода записи.
+
+Волна 5c (H2Anim, 2026-09-29): production-слоты переведены на UM_HUMANOID_17_v2 и заполняются кандидатами
+H2Anim функцией h2anim() — клип <run>/export/AM_<UEHero>_<Clip>.fbx спеки героя (build-profiles/*-h2anim.json,
+anim/clip_author.py), отчёт validate_clip v2 (validation-h2anim/), контакты (reports/contact-<Clip>.json) и
+UE-импорт (reports/ue-import-clips.json). Статус technically_imported ставится только кодом h2anim() и только если
+все три свидетельства есть и сходятся (validate PASS, контакты PASS, импорт legacy FbxFactory + bForceRootLock с тем же
+sha256 FBX); иначе measured (validate PASS) или draft_test. artistically_accepted сборка не пишет никогда.
+v1-черновики AM_Medusa_* остаются тестовыми записями.
 """
 import hashlib
 import json
@@ -34,6 +40,13 @@ TARGETS = {
 }
 CHARS = {"Medusa": ("MED", "ASSET-MEDUSA-001"), "Harpy": ("HAR", "ASSET-HARPY-001"),
          "Arthur": ("ARTH", "ASSET-KING-ARTHUR-001"), "Merlin": ("MER", "ASSET-MERLIN-001")}
+# волна 5c: спека H2Anim героя (ue_hero = имя героя в путях UE и в файлах клипов)
+H2ANIM = {"Medusa": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2anim.json",
+          "Arthur": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2anim.json",
+          "Merlin": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2anim.json",
+          "Harpy": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2anim.json"}
+VAL2 = os.path.join(LIB, "validation-h2anim")
+V2_KEY = "UM_HUMANOID_17_v2"
 NO_LICENSE = {"terms": "нет файла", "commercial_use": "n/a"}
 OWN = {"holder": "проект Unmatched", "terms": "собственная работа (Blender-скрипт репозитория)",
        "commercial_use": "yes"}
@@ -69,6 +82,89 @@ def val(name):
                "fails": r["fails"], "warnings": r.get("warnings", []), "date": "2026-09-28"}
 
 
+def load_json(rel):
+    p = os.path.join(REPO, rel)
+    if not os.path.exists(p):
+        return None
+    with open(p, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def contract_revision():
+    return load_json("docs/art-pipeline/rig/rig-contract.json")["revision"]
+
+
+def h2anim(char, clip):
+    """Production-слот, заполненный кандидатом H2Anim (волна 5c), или None, если спеки/клипа нет."""
+    spec = load_json(H2ANIM[char])
+    if not spec or clip not in spec["clips"]:
+        return None
+    pre, asset = CHARS[char]
+    t = TARGETS[clip]
+    hero = spec["ue_hero"]
+    c = spec["clips"][clip]
+    fbx = "%s/export/AM_%s_%s.fbx" % (spec["run_dir"], hero, clip)
+    if not os.path.exists(os.path.join(REPO, fbx)):
+        return None
+    cid = f"{pre}-{clip}"
+    vrel = "docs/art-pipeline/animation-library/validation-h2anim/AM_%s_%s.validation.json" % (hero, clip)
+    rep_v = load_json(vrel)
+    fbx_sha = sha(fbx)
+    if rep_v is None:
+        v = {"result": "not_run"}
+    else:
+        v = {"result": rep_v["result"], "report": vrel, "fails": rep_v["fails"],
+             "warnings": rep_v.get("warnings", []), "date": "2026-09-29"}
+        if rep_v.get("clip_sha256") != fbx_sha:
+            v = {"result": "not_run"}  # отчёт от другой версии файла
+    contact = load_json("%s/reports/contact-%s.json" % (spec["run_dir"], clip))
+    contact_ok = bool(contact) and contact.get("result") == "pass"
+    contact_warn = sorted(k["check"] for k in (contact or {}).get("checks", []) if k["status"] == "warn")
+    imp = load_json("%s/reports/ue-import-clips.json" % spec["run_dir"]) or {}
+    name = "AM_%s_%s" % (hero, clip)
+    rec = next((x for x in imp.get("clips", []) if x.get("name") == name), None)
+    imported = bool(rec) and rec.get("legacy_fbx_import") and rec.get("force_root_lock_ok") and \
+        (imp.get("fbx_sha256") or {}).get(name) == fbx_sha and rec.get("skeleton") == spec["ue"]["skeleton"]
+    if v["result"] == "pass" and contact_ok and imported:
+        status = "technically_imported"
+    elif v["result"] == "pass":
+        status = "measured"
+    else:
+        status = "draft_test"
+    target_path = "%s/%s" % (spec["ue"]["clips_folder"], name)
+    note = ("кандидат H2Anim волны 5c на rest %s (%s): шаблон дельт %s + авторский слой по видео-референсу %s; "
+            "контакты (clip_contact_check): %s%s; UE: %s на канонический скелет %s; художественно не принят"
+            % (spec["target"].get("rest_generation"), spec["target"]["sk_fbx"],
+               (c.get("template") or {}).get("file", "нет"), c.get("reference"),
+               "PASS" if contact_ok else ("FAIL" if contact else "не проверены"),
+               (" (WARN: %s)" % ", ".join(contact_warn)) if contact_warn else "",
+               "импортирован" if imported else "не импортирован", spec["ue"]["skeleton"]))
+    if spec["target"].get("rebake_on"):
+        note += "; ПЕРЕЗАПЕЧЬ НА %s" % spec["target"]["rebake_on"]
+    if cid in CONDITIONAL:
+        note += "; " + CONDITIONAL[cid]
+    dur = {"target": t["duration"], "target_status": t["status"], "measured": rep_v and rep_v.get("duration_s")}
+    if clip in ("HitReact", "DeathSettle"):
+        dur["target"] = {"HitReact": "0.4 (предложение волны 5c, 04) vs 0.9 (CUE-011)",
+                         "DeathSettle": "0.875-0.9 (предложение волны 5c, 04), <=0.95 (CUE-013)"}[clip]
+        dur["target_status"] = "open"
+    return {
+        "id": cid, "character": char, "asset_id": asset, "clip": clip, "role": "production",
+        "required_mvp": cid not in CONDITIONAL, "cue": t["cue"],
+        "source": {"type": "blender_keyframed",
+                   "tool": "Blender 5.2.2, tools/tripo-pipeline/anim/clip_author.py (дельты в осях арматуры, IK стоп)",
+                   "reference": H2ANIM[char], "files": [file_entry(fbx, "fbx")]},
+        "license": OWN,
+        "fps": {"target": 24, "measured": rep_v and rep_v.get("fps")},
+        "duration_s": dur,
+        "loop": t["loop"], "root_motion": "in_place",
+        "skeleton": {"contract_key": V2_KEY, "version": contract_revision()},
+        "ue": {"target_path": target_path, "status": "technically_imported" if imported else "proposed",
+               "evidence": "%s/reports/ue-import-clips.json" % spec["run_dir"]},
+        "status": status, "validation": v, "notes": note,
+    }
+
+
 def slot(char, clip):
     pre, asset = CHARS[char]
     t = TARGETS[clip]
@@ -82,7 +178,7 @@ def slot(char, clip):
         "fps": {"target": 24, "measured": None},
         "duration_s": {"target": t["duration"], "target_status": t["status"], "measured": None},
         "loop": t["loop"], "root_motion": "in_place",
-        "skeleton": {"contract_key": "UM_HUMANOID_17_v1", "version": "p16-2026-09-28"},
+        "skeleton": {"contract_key": V2_KEY, "version": contract_revision()},
         "ue": {"target_path": f"/Game/PipelineCandidates/{asset}/Animation/AM_{char}_{clip}", "status": "proposed"},
         "status": "proposed", "validation": {"result": "not_run"},
         "notes": note,
@@ -173,11 +269,13 @@ def glb_fixture():
 
 
 def build():
-    clips = [slot(c, k) for c in CHARS for k in TARGETS]
+    clips = [h2anim(c, k) or slot(c, k) for c in CHARS for k in TARGETS]
     clips += [medusa_draft(k) for k in TARGETS] + [tripo_test(), bvh_fixture(), glb_fixture()]
-    m = {"schema": "unmatched.animation-clip-manifest/1", "revision": "p16-2026-09-28",
+    filled = sum(1 for c in clips if c["role"] == "production" and c["source"]["type"] != "none")
+    m = {"schema": "unmatched.animation-clip-manifest/1", "revision": "h2anim-2026-09-29",
          "rig_contract": "docs/art-pipeline/rig/rig-contract.json",
-         "notes": ["16 production-слотов = 4 клипа D-11 x 4 персонажа (бриф 18 §4): 15 безусловных, HAR-HitReact условен до AD-CNF-30 (required_mvp=false); ни один не заполнен",
+         "notes": ["16 production-слотов = 4 клипа D-11 x 4 персонажа (бриф 18 §4): 15 безусловных, HAR-HitReact условен до AD-CNF-30 (required_mvp=false); заполнено кандидатами H2Anim (волна 5c, UM_HUMANOID_17_v2): %d" % filled,
+                   "production-слоты — контракт v2 (v1 закрыт для новых клипов, RIG-CONTRACT §0 п.2); черновики AM_Medusa_* v1 — тестовые записи",
                    "длительности — ПРЕДЛОЖЕНИЕ/ОТКРЫТО (AD-OPEN-46); FPS 24 измерен на S05/ART004",
                    "test-записи не могут стать artistically_accepted (правило схемы)"],
          "clips": clips}

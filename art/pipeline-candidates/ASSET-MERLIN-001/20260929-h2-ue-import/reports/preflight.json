@@ -38,7 +38,7 @@
         "id": "merlin-h2-ue-import/1",
         "kind": "skeletal-adopt",
         "path": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-ue-import.json",
-        "sha256": "f7586cd97de8eb9d0b2fe26b52a264ffb8b56ba6d1a0f4b7ec24e11103692312"
+        "sha256": "d1cfb2179612888c4c2df33bb1fcb27098a126d77112af8190f22d0eefdaca7f"
       },
       "passed": true
     },
@@ -79,7 +79,7 @@
       "passed": true
     },
     "skeletal_adopt_module_present": {
-      "measured": "3f5150bc39f23228cad09265eee71a1fa40fab234efe87729da9293c97f7fef9",
+      "measured": "bd69435fd03d63858fdf6c20401eecd4e723ff2c0a66b389e7bfac39db60c49a",
       "passed": true
     },
     "skeletal_candidate_files_present": {
@@ -105,6 +105,16 @@
       "measured": [],
       "passed": true
     },
+    "ue_folder_is_pipeline_candidate": {
+      "measured": "/Game/PipelineCandidates/Merlin/H2",
+      "passed": true
+    },
+    "ue_stage_runnable_with_backend": {
+      "measured": false,
+      "note": "informational; ue-import runs only with --backend mcp (live editor via unreal_mcp.py)",
+      "passed": true,
+      "required": false
+    },
     "unreal_editor_cmd_present": {
       "measured": true,
       "note": "informational; this scaffold never launches UnrealEditor-Cmd",
@@ -120,6 +130,6 @@
   "stage": "preflight",
   "tool": {
     "name": "tripo-pipeline",
-    "version": "0.7.0"
+    "version": "0.8.0"
   }
 }

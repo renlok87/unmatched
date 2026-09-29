@@ -1,0 +1,734 @@
+{
+ "schema": "unmatched.h2anim-spec/1",
+ "hero": "Merlin",
+ "character": "Merlin",
+ "ue_hero": "Merlin",
+ "asset_id": "ASSET-MERLIN-001",
+ "status": "proposed",
+ "status_note": "Волна 5c (H2Anim, 2026-09-29): 4 клипа D-11 на H2-меше Merlin (посох в правой, длинная мантия). Старик: медленнее и тяжелее Arthur — длинные подготовки, короткие выбросы, медленные возвраты. Посох — опора: в Idle, HitReact и DeathSettle правая кисть держится IK на rest-позиции (hand_pin), посох остаётся на подставке. Двуручный хват проверен: левая кисть в rest лежит у пояса перед корпусом, до оси посоха ~12 см (голова hand.L (3,69; 3,98; 28,87) см, ось посоха x ≈ 0,5, y ≈ −7,8) — посох её не касается, hand_follow не нужен. Шаблон — черновики AM_Medusa_* (spine/head, вес ≤ 0,6). Оси: +X вперёд, +Y влево, +Z вверх; Эйлер XYZ: X крен вправо, Y наклон вперёд, Z поворот влево. Статус максимум «технически импортировано».",
+ "target": {
+  "sk_fbx": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx",
+  "base_fbx": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SM_Merlin_H2_Base.fbx",
+  "sha256": "b1db49c6f7400bcea0bc23e84fef0b77e76f15caed16ab7e8bd611eb32dc38ee",
+  "rest_generation": "H2"
+ },
+ "meshes": {
+  "body": "SK_Merlin_H2_Body",
+  "weapon": "SK_Merlin_H2_Staff"
+ },
+ "weapon": {
+  "bone": "weapon.R",
+  "side": "R",
+  "note": "посох в правой руке, вертикально, нижний конец у подставки (z 6,7 см), верх z 49,4; ось кости weapon.R — вдоль посоха"
+ },
+ "run_dir": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2anim",
+ "ue": {
+  "skeleton": "/Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton",
+  "mesh_for_preview": "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2",
+  "clips_folder": "/Game/PipelineCandidates/Merlin/H2Anim"
+ },
+ "fps": 24,
+ "clips": {
+  "Idle": {
+   "frames": 72,
+   "role": "idle",
+   "reference": "art/animation-refs/ASSET-MERLIN-001/MER-Idle",
+   "design": "медленное глубокое дыхание сутулого старика (грудь вперёд-назад), голова опущена и медленно покачивается, левая кисть у пояса чуть поднимается на вдохе, посох неподвижен — правая кисть держится на месте IK",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx",
+    "bones": [
+     "spine",
+     "head"
+    ],
+    "weight": 0.6
+   },
+   "hand_follow": {
+    "side": "R",
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   },
+   "waves": [
+    {
+     "bone": "spine",
+     "axis": "y",
+     "amp": 2.4,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "spine",
+     "axis": "x",
+     "amp": 0.8,
+     "cycles": 1,
+     "shape": "sin"
+    },
+    {
+     "bone": "head",
+     "axis": "y",
+     "amp": 3.5,
+     "cycles": 1,
+     "shape": "raised_cos",
+     "phase": 0.0
+    },
+    {
+     "bone": "head",
+     "axis": "z",
+     "amp": 5.0,
+     "cycles": 1,
+     "shape": "sin"
+    },
+    {
+     "bone": "head",
+     "axis": "x",
+     "amp": -2.0,
+     "cycles": 2,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "arm_upper.L",
+     "axis": "y",
+     "amp": -3.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    },
+    {
+     "bone": "arm_lower.L",
+     "axis": "y",
+     "amp": -5.0,
+     "cycles": 1,
+     "shape": "raised_cos"
+    }
+   ],
+   "keys": [
+    {
+     "f": 18,
+     "hips_loc": [
+      0.0,
+      0.2,
+      -0.05
+     ]
+    },
+    {
+     "f": 54,
+     "hips_loc": [
+      0.0,
+      -0.2,
+      -0.05
+     ]
+    }
+   ],
+   "key_frames": [
+    0,
+    18,
+    36,
+    54
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   }
+  },
+  "LungeAttack": {
+   "frames": 14,
+   "role": "oneshot",
+   "reference": "art/animation-refs/ASSET-MERLIN-001/MER-LungeAttack",
+   "design": "длинная подготовка (к. 0–6, ~40 % клипа): маг отрывает посох от подставки, подтягивает его к себе, откидывается и поднимает левую руку к груди; короткий выброс (к. 8): посох вперёд-вверх, навершием к цели (+X), левая ладонь выбрасывается вперёд, корпус подаётся вперёд; медленный возврат (к. 8–14); стопы на месте (anim-v2 fix) Выпад посохом: правая кисть в к. 6–10 выносится вперёд IK-якорем от spine (hand_follow anchor, локоть наружу-назад, кисть продолжает предплечье), посох сохраняет направление aim в кулаке; в к. 0–4 и с к. 12 — hand_pin (посох-опора). Мировые aim плеча/предплечья убраны: они скручивали рукав мантии (skin_stretch, спина-бок у правой руки)",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx",
+    "bones": [
+     "spine"
+    ],
+    "weight": 0.25,
+    "mirror": true
+   },
+   "keys": [
+    {
+     "f": 3,
+     "bones": {
+      "spine": [
+       0,
+       -2,
+       -4
+      ],
+      "head": [
+       0,
+       -2,
+       2
+      ]
+     },
+     "aim": {
+      "arm_upper.L": {
+       "to": [
+        0.4,
+        0.55,
+        -0.75
+       ]
+      },
+      "arm_lower.L": {
+       "to": [
+        0.75,
+        -0.3,
+        0.55
+       ]
+      }
+     },
+     "hand_offset": {
+      "R": [
+       0.0,
+       0.0,
+       1.5
+      ]
+     }
+    },
+    {
+     "f": 4,
+     "bones": {
+      "weapon.R": [
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    {
+     "f": 6,
+     "bones": {
+      "spine": [
+       1,
+       -6,
+       -8
+      ],
+      "head": [
+       0,
+       -4,
+       4
+      ]
+     },
+     "aim": {
+      "arm_upper.L": {
+       "to": [
+        0.3,
+        0.6,
+        -0.75
+       ]
+      },
+      "arm_lower.L": {
+       "to": [
+        0.55,
+        -0.4,
+        0.75
+       ]
+      },
+      "weapon.R": {
+       "to": [
+        -0.2,
+        -0.2,
+        0.96
+       ]
+      }
+     },
+     "hips_loc": [
+      -0.25,
+      0,
+      -0.12
+     ]
+    },
+    {
+     "f": 8,
+     "bones": {
+      "spine": [
+       0,
+       10,
+       6
+      ],
+      "head": [
+       0,
+       6,
+       -4
+      ]
+     },
+     "aim": {
+      "arm_upper.L": {
+       "to": [
+        0.85,
+        0.45,
+        -0.1
+       ]
+      },
+      "arm_lower.L": {
+       "to": [
+        0.95,
+        0.15,
+        0.1
+       ]
+      },
+      "weapon.R": {
+       "to": [
+        0.35,
+        -0.25,
+        0.9
+       ]
+      }
+     },
+     "hips_loc": [
+      0.35,
+      0,
+      -0.12
+     ]
+    },
+    {
+     "f": 10,
+     "bones": {
+      "spine": [
+       0,
+       9,
+       5
+      ],
+      "head": [
+       0,
+       5,
+       -3
+      ]
+     },
+     "aim": {
+      "arm_upper.L": {
+       "to": [
+        0.8,
+        0.45,
+        -0.25
+       ]
+      },
+      "arm_lower.L": {
+       "to": [
+        0.9,
+        0.2,
+        -0.05
+       ]
+      },
+      "weapon.R": {
+       "to": [
+        0.3,
+        -0.25,
+        0.92
+       ]
+      }
+     },
+     "hips_loc": [
+      0.3,
+      0,
+      -0.1
+     ]
+    },
+    {
+     "f": 11,
+     "bones": {
+      "weapon.R": [
+       0,
+       0,
+       0
+      ]
+     }
+    }
+   ],
+   "hand_follow": [
+    {
+     "side": "R",
+     "weight": [
+      [
+       0,
+       1.0
+      ],
+      [
+       4,
+       1.0
+      ],
+      [
+       6,
+       0.0
+      ],
+      [
+       10,
+       0.0
+      ],
+      [
+       12,
+       1.0
+      ]
+     ]
+    },
+    {
+     "side": "R",
+     "mode": "anchor",
+     "anchor_bone": "spine",
+     "anchor_offset": [
+      5.5,
+      -8.5,
+      7.0
+     ],
+     "hand_rot": "forearm",
+     "keep_weapon_world": "weapon.R",
+     "pole": [
+      -0.6,
+      -0.6,
+      -0.5
+     ],
+     "weight": [
+      [
+       0,
+       0.0
+      ],
+      [
+       4,
+       0.0
+      ],
+      [
+       6,
+       1.0
+      ],
+      [
+       9,
+       1.0
+      ],
+      [
+       11,
+       0.0
+      ]
+     ],
+     "note": "выпад: кисть правой вперёд от spine (IK), посох в кулаке сохраняет поворот aim"
+    }
+   ],
+   "key_frames": [
+    0,
+    3,
+    6,
+    8,
+    10,
+    14
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   }
+  },
+  "HitReact": {
+   "frames": 10,
+   "role": "oneshot",
+   "reference": "art/animation-refs/ASSET-MERLIN-001/MER-HitReact",
+   "duration_note": "0,4 с (док 04) — ПРЕДЛОЖЕНИЕ, против 0,9 с по CUE-011 открыто",
+   "design": "старика качнуло назад и вбок, он удерживается на посохе (правая кисть на месте), левая рука взлетает для равновесия, голова запрокидывается; медленное возвращение",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx",
+    "bones": [
+     "spine",
+     "head"
+    ],
+    "weight": 0.5
+   },
+   "hand_follow": {
+    "side": "R",
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   },
+   "keys": [
+    {
+     "f": 2,
+     "bones": {
+      "spine": [
+       4,
+       -6,
+       5
+      ],
+      "head": [
+       3,
+       -9,
+       6
+      ],
+      "arm_upper.L": [
+       14,
+       -6,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -12,
+       0
+      ]
+     },
+     "hips_loc": [
+      -0.4,
+      0.15,
+      -0.12
+     ]
+    },
+    {
+     "f": 5,
+     "bones": {
+      "spine": [
+       3,
+       -4,
+       3
+      ],
+      "head": [
+       2,
+       -5,
+       4
+      ],
+      "arm_upper.L": [
+       9,
+       -4,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -8,
+       0
+      ]
+     },
+     "hips_loc": [
+      -0.3,
+      0.1,
+      -0.1
+     ]
+    },
+    {
+     "f": 8,
+     "bones": {
+      "spine": [
+       0,
+       1,
+       0
+      ],
+      "head": [
+       0,
+       1,
+       0
+      ],
+      "arm_upper.L": [
+       2,
+       0,
+       0
+      ]
+     },
+     "hips_loc": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    }
+   ],
+   "key_frames": [
+    0,
+    2,
+    5,
+    8,
+    10
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   }
+  },
+  "DeathSettle": {
+   "frames": 21,
+   "role": "terminal",
+   "reference": "art/animation-refs/ASSET-MERLIN-001/MER-DeathSettle",
+   "duration_note": "0,875 с — ПРЕДЛОЖЕНИЕ (0,9 с по 04, ≤ 0,95 с по CUE-013), target_status open",
+   "design": "удар (к. 3), медленное оседание: колени слабеют, корпус складывается вперёд, правая кисть не отпускает посох: кисть держится IK на месте, посох остаётся на подставке, рука распрямляется под оседающим телом, голова свешивается, левая рука повисает (к. 12–21)",
+   "template": {
+    "file": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx",
+    "bones": [
+     "spine",
+     "head"
+    ],
+    "weight": 0.35
+   },
+   "hand_follow": {
+    "side": "R",
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   },
+   "keys": [
+    {
+     "f": 3,
+     "bones": {
+      "spine": [
+       3,
+       -6,
+       4
+      ],
+      "head": [
+       2,
+       -8,
+       4
+      ],
+      "arm_upper.L": [
+       8,
+       0,
+       0
+      ]
+     },
+     "hips_loc": [
+      -0.3,
+      0,
+      -0.1
+     ]
+    },
+    {
+     "f": 8,
+     "bones": {
+      "spine": [
+       2,
+       12,
+       2
+      ],
+      "head": [
+       0,
+       8,
+       0
+      ],
+      "arm_upper.L": [
+       4,
+       -8,
+       0
+      ]
+     },
+     "hips_loc": [
+      0.2,
+      0,
+      -0.3
+     ]
+    },
+    {
+     "f": 13,
+     "bones": {
+      "spine": [
+       2,
+       34,
+       4
+      ],
+      "head": [
+       0,
+       20,
+       -2
+      ],
+      "arm_upper.L": [
+       3,
+       -24,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -6,
+       0
+      ]
+     },
+     "hips_loc": [
+      0.35,
+      0,
+      -0.5
+     ]
+    },
+    {
+     "f": 17,
+     "bones": {
+      "spine": [
+       3,
+       42,
+       5
+      ],
+      "head": [
+       1,
+       28,
+       -3
+      ],
+      "arm_upper.L": [
+       3,
+       -30,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -8,
+       0
+      ]
+     },
+     "hips_loc": [
+      0.4,
+      0,
+      -0.6
+     ]
+    },
+    {
+     "f": 21,
+     "bones": {
+      "spine": [
+       3,
+       41,
+       5
+      ],
+      "head": [
+       1,
+       27,
+       -3
+      ],
+      "arm_upper.L": [
+       3,
+       -29,
+       0
+      ],
+      "arm_lower.L": [
+       0,
+       -7,
+       0
+      ]
+     },
+     "hips_loc": [
+      0.4,
+      0,
+      -0.58
+     ]
+    }
+   ],
+   "key_frames": [
+    0,
+    3,
+    8,
+    13,
+    17,
+    21
+   ],
+   "ik_feet": {
+    "weight": [
+     [
+      0,
+      1.0
+     ]
+    ]
+   }
+  }
+ }
+}
