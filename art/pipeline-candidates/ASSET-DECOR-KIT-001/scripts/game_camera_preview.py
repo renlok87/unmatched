@@ -12,6 +12,8 @@ normal convention therefore shows up as inverted relief in these renders.
 
 Outputs (JPEG, 1200x900): <name>_game-fov35-pitch55-yaw<Y>.jpg (perspective, horizontal FOV like UE)
 and <name>_ortho-{front-plusX,side-plusY}.jpg; <name>_preview.json. Axes are UE axes (asset front = +X).
+Two material slots (glow_slot of static_prop_candidate.py params): the slot whose name contains "Glow" gets the
+same triplet plus a constant emission (preview value, recorded in the JSON; the UE value is an MI parameter).
 Measurement only.
 """
 import json
@@ -23,7 +25,8 @@ import bpy
 from mathutils import Vector
 
 args = sys.argv[sys.argv.index("--") + 1:]
-fbx, tex_prefix, out = Path(args[0]), args[1], Path(args[2])
+# absolute paths: images.load and render.filepath do not resolve a relative path against the working directory
+fbx, tex_prefix, out = Path(args[0]), str(Path(args[1]).resolve()), Path(args[2]).resolve()
 pitch = float(args[3]) if len(args) > 3 else 55.0
 fov = float(args[4]) if len(args) > 4 else 35.0
 yaws = [float(y) for y in (args[5] if len(args) > 5 else "0,45").split(",")]
@@ -69,9 +72,28 @@ L(inv.outputs["Value"], ncomb.inputs["Green"])
 L(nsep.outputs["Blue"], ncomb.inputs["Blue"])
 L(ncomb.outputs["Color"], nmap.inputs["Color"])
 L(nmap.outputs["Normal"], bsdf.inputs["Normal"])
+GLOW_PREVIEW = {"srgb_8bit": [255, 194, 122], "strength": 3.0}  # 03 C-6 warm range; preview only
+glow_mat, glow_slots = None, []
 for o in objs:
-    o.data.materials.clear()
-    o.data.materials.append(mat)
+    names = [m.name if m else "" for m in o.data.materials]
+    if len(names) <= 1:
+        o.data.materials.clear()
+        o.data.materials.append(mat)
+        continue
+    for i, nm in enumerate(names):
+        if "Glow" in nm:
+            if glow_mat is None:
+                glow_mat = mat.copy()
+                glow_mat.name = "PreviewGlowFromTriplet"
+                gb = glow_mat.node_tree.nodes["Principled BSDF"]
+                lin = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+                       for c in (v / 255.0 for v in GLOW_PREVIEW["srgb_8bit"])]
+                gb.inputs["Emission Color"].default_value = (lin[0], lin[1], lin[2], 1.0)
+                gb.inputs["Emission Strength"].default_value = GLOW_PREVIEW["strength"]
+            o.data.materials[i] = glow_mat
+            glow_slots.append(nm)
+        else:
+            o.data.materials[i] = mat
 
 scene = bpy.context.scene
 try:
@@ -101,6 +123,9 @@ cd = bpy.data.cameras.new("Cam")
 cam = bpy.data.objects.new("Cam", cd); scene.collection.objects.link(cam); scene.camera = cam
 report = {"fbx": fbx.name, "bounds_blender_m": {"min": [round(v, 5) for v in lo], "max": [round(v, 5) for v in hi]},
           "material": "rebuilt from %s_{BC,N,ORM}.png (N DirectX->OpenGL)" % Path(tex_prefix).name, "shots": {}}
+if glow_slots:
+    report["glow_preview"] = dict(GLOW_PREVIEW, slots=glow_slots,
+                                  note="constant emission on the glow slot, Blender preview only")
 
 
 def shoot(key, d):

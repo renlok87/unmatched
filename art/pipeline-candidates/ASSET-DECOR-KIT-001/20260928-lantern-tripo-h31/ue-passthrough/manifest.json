@@ -1,0 +1,290 @@
+{
+  "asset_id": "ASSET-DECOR-KIT-001.LANTERN",
+  "claims": {
+    "art_accepted": false,
+    "budgets_declared": false,
+    "game_ready": false,
+    "note": "technical pipeline evidence only"
+  },
+  "config": {
+    "export_basename": "SM_Decor_Lantern_TripoPassthrough",
+    "primary_role": "smartuv-tex2k-pbr-glb",
+    "primary_source": "tripo-26bb832e",
+    "triangle_loss_tolerance": 0.001
+  },
+  "created_at": "2026-09-29T01:15:32+00:00",
+  "exports": [],
+  "generation_requests": [],
+  "network": {
+    "paid_tasks_created": 0,
+    "policy": "no network code; Tripo results are registered from existing local files",
+    "tripo_calls": 0
+  },
+  "run_id": "20260928-lantern-tripo-h31-ue-passthrough",
+  "schema": "unmatched.tripo-pipeline.run/1",
+  "sources": {
+    "tripo-26bb832e": {
+      "evidence": [
+        {
+          "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/tripo-run.json",
+          "sha256": "bd8d956091cf5215d3c32d634ad76b232c651949cbc8790d6517061804320aea"
+        },
+        {
+          "path": "docs/art-pipeline/imagegen-inputs/manifest.json",
+          "sha256": "2b928f422eda088386785c01952ee64bf5b26e56f0d863590e4e78fb7475ec27"
+        }
+      ],
+      "files": [
+        {
+          "bytes": 13180092,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export after Quad retopology, Smart UV, texture 2K and PBR, 2k tier, unmodified",
+          "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr.glb",
+          "produced_by": "pbr",
+          "role": "smartuv-tex2k-pbr-glb",
+          "sha256": "085d062e3060699edaec25f4ee969dc296a0e99dbea2449fe15ca943715467bb",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 3,
+            "materials": 1,
+            "mesh_count": 1,
+            "meshes": [
+              {
+                "name": "tripo_node_03ed779d-3ca8-4ced-b078-b2c2287e118e",
+                "triangles": 4486
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 4486
+          }
+        },
+        {
+          "bytes": 68146168,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export of the H3.1 generation, 4k tier, unmodified; local only (not committed, see notes)",
+          "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-h31-26bb832e-source.glb",
+          "produced_by": "generate",
+          "role": "source-glb",
+          "sha256": "ab8a9a07b9119480c01ae6f7613ba7684fc43b737c250441873d3bfad9c8cac2",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 3,
+            "materials": 1,
+            "mesh_count": 1,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 1992294
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1992294
+          }
+        }
+      ],
+      "generation_inputs": [
+        {
+          "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-back.png",
+          "present": true,
+          "sha256": "69f256cc8023929d4ba58ad70264dc5bb0def611e5f13bcbbc0d840402210682",
+          "view": "back"
+        },
+        {
+          "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-front.png",
+          "present": true,
+          "sha256": "710a17b99813347eff59f7a204457221b18d2d34239f8026e89118b303080a58",
+          "view": "front"
+        }
+      ],
+      "historical_credits_observed": {
+        "studio-credits": 130
+      },
+      "registered_at": "2026-09-29T01:15:32+00:00",
+      "registered_by": "tripo-pipeline 0.5.0",
+      "spec": {
+        "asset_id": "ASSET-DECOR-KIT-001.LANTERN",
+        "date": "2026-09-29",
+        "evidence": [
+          "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/tripo-run.json",
+          "docs/art-pipeline/imagegen-inputs/manifest.json"
+        ],
+        "expectations": {
+          "smartuv-tex2k-pbr-glb": {
+            "glb_images": 3,
+            "glb_materials": 1,
+            "glb_mesh_count": 1,
+            "glb_skins": 0,
+            "glb_triangles": 4486
+          },
+          "source-glb": {
+            "glb_images": 3,
+            "glb_materials": 1,
+            "glb_mesh_count": 1,
+            "glb_skins": 0,
+            "glb_triangles": 1992294
+          }
+        },
+        "files": [
+          {
+            "expected_bytes": 68146168,
+            "expected_sha256": "ab8a9a07b9119480c01ae6f7613ba7684fc43b737c250441873d3bfad9c8cac2",
+            "origin": "Studio GLB export of the H3.1 generation, 4k tier, unmodified; local only (not committed, see notes)",
+            "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-h31-26bb832e-source.glb",
+            "produced_by": "generate",
+            "role": "source-glb"
+          },
+          {
+            "expected_bytes": 13180092,
+            "expected_sha256": "085d062e3060699edaec25f4ee969dc296a0e99dbea2449fe15ca943715467bb",
+            "origin": "Studio GLB export after Quad retopology, Smart UV, texture 2K and PBR, 2k tier, unmodified",
+            "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr.glb",
+            "produced_by": "pbr",
+            "role": "smartuv-tex2k-pbr-glb"
+          }
+        ],
+        "generation": {
+          "input_manifest": "docs/art-pipeline/imagegen-inputs/manifest.json",
+          "mode": "multi-view",
+          "settings": {
+            "generate_parts": false,
+            "output": "geometry and texture",
+            "polygon_count": "account setting 2 000 000 (measured: 1 992 294 triangles)",
+            "privacy": "private",
+            "seed": null,
+            "texture_8k": false,
+            "texture_quality": "4K (measured: raw GLB images 4096 px)",
+            "topology": "triangle"
+          },
+          "slot_note": "side slots empty on purpose: the hardware is mirrored in the v3 side views (tripo-stage-plan.json hingeSideDecision)",
+          "views": {
+            "back": {
+              "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-back.png",
+              "sha256": "69f256cc8023929d4ba58ad70264dc5bb0def611e5f13bcbbc0d840402210682"
+            },
+            "front": {
+              "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-front.png",
+              "sha256": "710a17b99813347eff59f7a204457221b18d2d34239f8026e89118b303080a58"
+            },
+            "left": null,
+            "right": null
+          }
+        },
+        "model_version": {
+          "backend": null,
+          "ui_label": "H3.1"
+        },
+        "notes": [
+          "Credits are Studio credits of the observed account; not API credits, not USD.",
+          "The raw source-glb (68 MB) stays local like the heroes' raw sources (commit de252a25) and is git-ignored; a clean checkout cannot run preflight of a run that registered this spec until the file is restored. The Blender candidate uses only smartuv-tex2k-pbr-glb.",
+          "Intermediate GLBs (after retopology, after Smart UV + texture) were not exported.",
+          "game_ready=false; registration does not change any acceptance status."
+        ],
+        "operations": [
+          {
+            "credits": {
+              "balance_after": 24280,
+              "balance_before": 24335,
+              "observed_debit": 55,
+              "quoted": 55,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/tripo-run.json",
+            "history_time": "2026-09-29 05:32",
+            "mode": "multi-view HD model",
+            "op": "generate"
+          },
+          {
+            "credits": {
+              "balance_after": 24240,
+              "balance_before": 24280,
+              "observed_debit": 40,
+              "quoted": 40,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/tripo-run.json",
+            "history_time": "2026-09-29 05:37",
+            "note": "2 538 faces in the Studio UI (reported by the orchestrator); 4 486 triangles in the final GLB",
+            "op": "retopology",
+            "settings": {
+              "smart_mesh": "P1.0 on",
+              "target_polygons": 2500,
+              "topology": "Quad"
+            }
+          },
+          {
+            "credits": {
+              "balance_after": 24220,
+              "balance_before": 24240,
+              "observed_debit": 20,
+              "quoted": 20,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/tripo-run.json",
+            "history_time": "2026-09-29 05:39",
+            "note": "UV fill 77 % in the Studio UI (reported by the orchestrator); 0.7705 of the UV square measured in the final GLB",
+            "op": "smart-uv"
+          },
+          {
+            "credits": {
+              "balance_after": 24210,
+              "balance_before": 24220,
+              "observed_debit": 10,
+              "quoted": 10,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/tripo-run.json",
+            "history_time": "2026-09-29 05:41",
+            "op": "texture",
+            "settings": {
+              "multi_view": "front+back v3",
+              "remove_lighting": true,
+              "resolution": "2K"
+            }
+          },
+          {
+            "credits": {
+              "balance_after": 24205,
+              "balance_before": 24210,
+              "observed_debit": 5,
+              "quoted": 5,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/tripo-run.json",
+            "history_time": "2026-09-29 05:44",
+            "op": "pbr"
+          }
+        ],
+        "parent_task_id": null,
+        "schema": "unmatched.tripo-pipeline.source-spec/1",
+        "service": "tripo-studio",
+        "source_id": "tripo-26bb832e",
+        "task_id": "26bb832e-6c2b-4b7f-80e6-570cd1c37355",
+        "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/26bb832e-6c2b-4b7f-80e6-570cd1c37355"
+      },
+      "spec_sha256": "d03621c6a52530f3cf4f2c5225b9722e398e0a255a5b106d7d10c611da053a8b"
+    }
+  },
+  "stages": {},
+  "status_legend": {
+    "art_accepted": "художественно принято — только решением арт-трека; этот инструмент его не ставит",
+    "measured": "измерено — число получено инструментом из файла",
+    "proposed": "предложено — план или норматив без проверки",
+    "technically_imported": "технически импортировано — файл прочитан/записан без ошибок, контракты проверены"
+  },
+  "tool": {
+    "name": "tripo-pipeline",
+    "version": "0.5.0"
+  }
+}

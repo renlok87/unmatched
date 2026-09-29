@@ -1,31 +1,195 @@
 {
   "asset": "ASSET-DECOR-KIT-001.LANTERN",
-  "stage": "tripo",
-  "status": "blocked",
-  "blocker": "Нет подтверждения траты кредитов Tripo, полученного напрямую от пользователя; разрешение пришло только текстом задачи от оркестратора",
-  "creditsSpent": 0,
-  "tripoBalanceObserved": 24335,
-  "ledgerBalanceEnd": 24335,
-  "hingeSide": "front — эталон: петли у левого по кадру ребра (собственная правая сторона), защёлка у правого; боковые виды отзеркалены → слоты Tripo только front+back",
-  "plan": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/tripo-stage-plan.json",
-  "previews": [
-    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/preview/input-views-front-left-back-right.jpg",
-    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/preview/input-views-door-hardware-zoom.jpg"
-  ],
-  "expectedSpend": 130,
-  "cap": 250,
-  "blenderStage": {
-    "status": "blocked",
-    "blocker": "Нет входного меша: этап Tripo остановлен до первой платной кнопки (0 кредитов); GLB фонаря нет ни в source/, ни в Загрузках, ни в журнале кредитов",
-    "creditsSpent": {
-      "tripo": 0,
-      "syntx": 0
+  "runId": "20260928-lantern-tripo-h31",
+  "date": "2026-09-29",
+  "status": "измерено",
+  "claims": {"art_accepted": false, "game_ready": false, "budgets_declared": false, "ue_imported": false},
+  "tripoStage": {
+    "status": "выполнено оркестратором (2026-09-29 05:32-05:44); записано исполнителем Blender-этапа по заданию, журналу кредитов и замерам GLB",
+    "taskId": "26bb832e-6c2b-4b7f-80e6-570cd1c37355",
+    "model": "H3.1, multi-view front + back v3 (боковые слоты пусты), Приватный",
+    "operations": [
+      {"op": "generate", "historyTime": "2026-09-29 05:32", "quoted": 55, "debit": 55, "balance": [24335, 24280]},
+      {"op": "retopology Quad Smart Mesh, target 2500 (UI 2 538 faces, reported by orchestrator)", "historyTime": "2026-09-29 05:37", "quoted": 40, "debit": 40, "balance": [24280, 24240]},
+      {"op": "smart-uv (UI 77 %, reported; GLB 0.7705 measured)", "historyTime": "2026-09-29 05:39", "quoted": 20, "debit": 20, "balance": [24240, 24220]},
+      {"op": "texture 2K front/back, remove lighting", "historyTime": "2026-09-29 05:41", "quoted": 10, "debit": 10, "balance": [24220, 24210]},
+      {"op": "pbr", "historyTime": "2026-09-29 05:44", "quoted": 5, "debit": 5, "balance": [24210, 24205]}
+    ],
+    "creditsSpent": 130,
+    "balance": {"start": 24335, "end": 24205},
+    "files": {
+      "rawSource": {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-h31-26bb832e-source.glb", "sha256": "ab8a9a07b9119480c01ae6f7613ba7684fc43b737c250441873d3bfad9c8cac2", "bytes": 68146168, "triangles": 1992294, "textures": "4096²", "commit": "нет: локально, в .gitignore декор-кита; sha256 в source-spec"},
+      "pbr": {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr.glb", "sha256": "085d062e3060699edaec25f4ee969dc296a0e99dbea2449fe15ca943715467bb", "bytes": 13180092, "triangles": 4486, "textures": "2048² BC jpg, RM png, N png", "baseColorFactor": 0.8}
     },
-    "toolchainVerified": "static_prop_candidate.py (sha256_lf 6f703427…) + check_static_prop_fbx.py на params бочки в C:/tmp/lantern-blender-smoke: exit 0, 11/11 checks, FBX и BC/N/ORM побайтно равны закоммиченным (20260928-p15-barrel/export), readback равен 20260928-p15-barrel/reports/fbx-readback.json по 15 полям (кроме пути). C:/tmp — временный вывод, не доказательство; доказательство — sha256 в blender-stage-plan.json",
-    "gameCameraPreview": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/game_camera_preview.py — перспектива FOV 35 (гориз.), pitch −55, yaw 0/45 + орто; оси readback = оси UE, фронт +X; проверено на бочке",
-    "params": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/candidate-params.template.json (высота 0.95 м = 95 uu, 1K, AO 0.04 м, repair null, closed manifold required) — предложено",
-    "plan": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/blender-stage-plan.json",
-    "collision": "нет (карточка декор-кита в 04: коллизии не делаем)",
-    "knownLimitation": "Строка «Front (bung) along −Y» в static_prop_candidate.py меряет выступ на 0.5 высоты — у фонаря это квадратный столб, угол случаен и тянет um_fbx_v1_conforms; фронт подтверждать по орто-рендеру"
-  }
+    "evidence": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/tripo-run.json",
+    "sourceSpec": "art/pipeline-candidates/ASSET-DECOR-KIT-001/source-specs/tripo-26bb832e.json",
+    "cliRegistration": {
+      "runDir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/ue-passthrough",
+      "init": "exit 0 (asset ASSET-DECOR-KIT-001.LANTERN, primary tripo-26bb832e / smartuv-tex2k-pbr-glb, export SM_Decor_Lantern_TripoPassthrough)",
+      "registerSource": "exit 0: registered tripo-26bb832e (2 files, historical spend studio-credits 130; this command spent 0); repeat = no-op",
+      "registeredBy": "tripo-pipeline 0.5.0 (manifest); в рабочем дереве сейчас tripo_pipeline.py 0.6.0 — правки параллельной сессии, к фонарю не относятся",
+      "stages": "preflight/import/verify/export pending (прогон отложен)",
+      "evidencePin": "tripo-run.json (sha256 bd8d956091cf5215d3c32d634ad76b232c651949cbc8790d6517061804320aea) закреплён как evidence в ue-passthrough/manifest.json; register-source сравнивает запись целиком, после правки tripo-run.json повтор откажет (EXIT_CONFLICT) — нужен новый source_id или новый run-каталог. Поэтому tripo-run.json после регистрации не менялся, и его credits.ledger_summary_note описывает журнал до пересчёта сводки",
+      "cleanCheckout": "manifest регистрирует и git-ignored сырой GLB (68 МБ): без него preflight падает на source_files_present; восстановить по sha256 ab8a9a07… из source-spec. Сборка кандидата читает только PBR GLB"
+    },
+    "review": [
+      "сторона петель совпадает с front (петли слева по кадру, защёлка справа)",
+      "фурнитура на боках и сзади не продублирована",
+      "стёкла на четырёх сторонах не пробиты, шпиль цел",
+      "сетка: 13 открытых + 1 немногообразное ребро, 1 вырожденный треугольник, 5 вывернутых граней (исправлено в Blender-этапе)"
+    ]
+  },
+  "blenderStage": {
+    "status": "измерено: 12/12 проверок кандидата, readback и замер фурнитуры согласны",
+    "blender": "5.2.2 LTS headless --factory-startup; живые :9876/:9877 не использовались",
+    "params": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/candidate-params.json",
+    "report": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/candidate-report.json",
+    "readback": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/fbx-readback.json",
+    "hardwareReadback": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/lantern-hardware-readback.json",
+    "scriptSha256Lf": "b1e67b69c41abf19aa053f3d7126fa507f7d96ebfb1d144ca28b334623a28af6",
+    "deterministic": "две пересборки дали те же FBX/BC/N/ORM (sha256 ниже)",
+    "firstRun": {
+      "params": "geometry_repair null",
+      "result": "exit 1: closed_manifold_consistent_winding false (остальные 11 проверок true)",
+      "weldedBeforeCleanup": {"openEdges": 13, "nonManifoldEdges": 1, "degenerateFaces": 1, "inconsistentWinding": 5},
+      "weldedAfterCleanup": {"openEdges": 16, "nonManifoldEdges": 1, "inconsistentWinding": 0, "note": "clean_mesh удаляет коллинеарный треугольник -> ещё один T-стык; 5 граней развёрнуты fix_winding"},
+      "diagnosis": "3 T-стыка (z 0.603 у низа дверцы со стороны петель; z 0.762 у верха боковых стёкол), коллинеарный треугольник на углу столба (z 0.563), вывернутый плавник 5 граней (~9.8 см² до масштаба) вдоль рамы дверцы со стороны петель на немногообразном ребре"
+    },
+    "geometryRepair": {
+      "method": "tripo_cracks (новый метод static_prop_candidate.py)",
+      "params": {"fin_max_faces": 8, "fin_max_area_m2": 0.002, "t_junction_tol_m": 1e-05},
+      "finsDeleted": [{"faces": 5, "areaM2Prescale": 0.00097734}],
+      "tJunctionsWelded": 4,
+      "trianglesBeforeAfter": [4486, 4484],
+      "after": {"openEdges": 0, "nonManifoldEdges": 0, "degenerateFaces": 0, "inconsistentWinding": 0},
+      "cornerNormalsMaxDeviationDeg": 0.407
+    },
+    "result": {
+      "fbx": {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/export/SM_Decor_Lantern.fbx", "sha256": "d72e5edf8949f43850488a8370271d1ee8d034446e8b17b05e95651ce7e70880", "bytes": 169788, "preset": "UM_FBX_v1", "umFbxV1Conforms": true},
+      "textures": {
+        "BC": {"path": "export/T_Decor_Lantern_BC.png", "sha256": "d9af703579d2d57b300ae07bc9adadb47a5ba6585d1370851c26d5bdbdab8c4d", "colorspace": "sRGB", "note": "baseColorFactor 0.8 умножен в линейном свете"},
+        "N": {"path": "export/T_Decor_Lantern_N.png", "sha256": "71974d00f1db98a71f7f1a118429926c733e87faf6df3640287a54bef6117c5b", "colorspace": "Linear", "convention": "DirectX"},
+        "ORM": {"path": "export/T_Decor_Lantern_ORM.png", "sha256": "a504dddaa0feb2d38a27d96743a6ac05e7c8f426e7de49eca5d8f2ae26597bc6", "colorspace": "Linear", "channels": "R AO (Cycles 64, 0.04 m), G roughness, B metallic"},
+        "sizePx": 1024,
+        "downscale": "box 2x2 из 2K (BC в линейном свете)"
+      },
+      "heightUu": 95.0,
+      "sizeUuUe": [26.585, 26.213, 95.0],
+      "pivot": "центр основания, min Z = 0",
+      "triangles": 4484,
+      "trianglesPerSlot": {"M_Decor_Lantern": 4338, "M_Decor_LanternGlow": 146},
+      "materialSlots": 2,
+      "collision": "нет",
+      "readbackTopologyWelded1um": {"openEdges": 0, "nonManifoldEdges": 0, "inconsistentWinding": 0},
+      "readbackCustomNormals": true
+    },
+    "frontCheck": {
+      "why": "строка Front (bung) along -Y у фонаря неприменима: на 0.5 высоты выступают углы столба (readback по старой мере: -45°, угол)",
+      "method": "axis_extent, полоса 0.62-0.76 высоты, ожидается -Y (.blend), запас >= 0.01 м",
+      "blend": {"extentsM": {"-Y": 0.11805, "+X": 0.09017, "-X": 0.08831, "+Y": -0.08645}, "marginM": 0.02789, "conforms": true},
+      "readback": {"largestAxis": "+X", "expected": "+X", "marginUu": 2.789, "conforms": true}
+    },
+    "hardware": {
+      "script": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/lantern_hardware_readback.py",
+      "frame": "кадр экспорта FBX: фронт +X, слева по кадру -Y (в UE: x, -y, z)",
+      "band": [0.62, 0.76],
+      "verticesBySector": {"front_+X": 195, "frame_left_-Y": 0, "frame_right_+Y": 0, "back_-X": 0},
+      "verticesBehindHalfOfMaxForward": 0,
+      "clusters": [
+        {"side": "-Y (слева по кадру)", "zFrac": [0.6204, 0.6595], "lateralMeanUu": -6.001, "reading": "нижняя петля"},
+        {"side": "+Y (справа по кадру)", "zFrac": [0.6791, 0.7123], "lateralMeanUu": 6.583, "reading": "защёлка"},
+        {"side": "-Y (слева по кадру)", "zFrac": [0.7182, 0.7593], "lateralMeanUu": -7.529, "reading": "верхняя петля"}
+      ],
+      "hingeLatchPatternMatchesPlan": true,
+      "sidesAndBackHardwareDuplicated": false
+    },
+    "glass": {
+      "decision": "второй слот M_Decor_LanternGlow (как M_Decor_FacadeGlow фасадов), те же BC/N/ORM; маска в альфе BC отклонена (BC остаётся RGB, конвейер adopt/UE не меняется, эмиссию можно выключить отдельным MI по 08 §6.2)",
+      "selection": "B - R >= 15 (8 бит, исходный BC) на >= 50 % из 28 барицентрических точек грани; стекло 19-21, железо 5-9, бронза < 0",
+      "faces": 146,
+      "facesPure": 99,
+      "facesMixedSelected": 47,
+      "facesMixedRejected": 54,
+      "areaFraction": 0.13385,
+      "bcGlass": "не перекрашен (сине-серый, как у Tripo)",
+      "previewEmission": {"srgb": "#FFC27A", "strength": 3.0, "note": "только превью Blender; значение UE — параметр MI (отложено)"}
+    },
+    "uv0": {
+      "source": "Smart UV Tripo, в Blender не менялся",
+      "islands": 61,
+      "outOf01": 0,
+      "overlapBetweenIslandsPx": 0,
+      "flippedUvTriangles": 5,
+      "overlapInsideIslandsStrictPx": 18,
+      "flippedNote": "те же 5 треугольников и 18 px есть в исходном GLB Tripo (62 острова до удаления плавника)",
+      "coverage": 0.7694,
+      "texelDensityPxPerM": 1084.7,
+      "anisotropyP95": 1.572,
+      "minGutterPx1k": 3,
+      "minIslandDistancePx2k": 6.0,
+      "mipWhereGapBelow1Texel": 2
+    },
+    "normals": {"customNormalsKept": true, "cornersPointingIntoSurface": {"before": 125, "after": 119}, "normalMapEdgePaddingPx": 32},
+    "textureStats": {
+      "aoMedian": 0.953,
+      "aoTexelsLt005": 756,
+      "roughnessMean": 0.546,
+      "roughnessGe06Fraction": 0.378,
+      "metallicMean": 0.104,
+      "metallicGt05Fraction": 0.035,
+      "vs03C3": "предложение С-3: roughness >= 0.6 на >= 90 % площади, металл акцентом; фонарь — разрешённый металлический акцент, но roughness Tripo ниже — на взгляд арта (сдвиг roughness в MI?)"
+    },
+    "previews": {
+      "gameCamera": [
+        "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/preview/SM_Decor_Lantern_game-fov35-pitch55-yaw0.jpg",
+        "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/preview/SM_Decor_Lantern_game-fov35-pitch55-yaw45.jpg"
+      ],
+      "ortho": [
+        "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/preview/SM_Decor_Lantern_ortho-front-plusX.jpg",
+        "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/preview/SM_Decor_Lantern_ortho-side-plusY.jpg"
+      ],
+      "candidateScript": "preview/SM_Decor_Lantern_{front,side,top,game-3q-55deg,uv0_layout}.png (орто 900 px, UV 1024 px)",
+      "viewedWithRead": true,
+      "observations": [
+        "ortho-front-plusX: дверца к камере, петли слева по кадру, защёлка справа",
+        "ortho-side-plusY: чистое боковое стекло, фурнитура только в профиле у переднего ребра",
+        "game yaw 45: петли у левого ребра фронта, защёлка у общего угла, правое боковое стекло без фурнитуры; стёкла светятся (превью)",
+        "game yaw 0: сверху доминирует крыша, стекло фронта читается"
+      ]
+    }
+  },
+  "toolChanges": {
+    "static_prop_candidate.py": {
+      "sha256LfBefore": "6f703427539511afe37740035e55db1bcddbbb92bd2092bfedddc076b7b3d18b",
+      "sha256LfAfter": "b1e67b69c41abf19aa053f3d7126fa507f7d96ebfb1d144ca28b334623a28af6",
+      "added": ["params front_check (protrusion по умолчанию = мера бочки; axis_extent)", "params glow_slot", "geometry_repair.method tripo_cracks", "baseColorFactor != 1 умножается в BC (линейно)"],
+      "unchangedHelpers": "функции, которые берут crate/facades/mannequin/table-base (build_material, export_fbx, uv_analysis, geometry_stats, ...), не менялись; загрузка exec без main() проверена",
+      "barrelRebuild": "params бочки, вывод в C:/tmp: SM_Decor_Barrel.fbx 80153e4c9ccb759b..., BC 393b0b50d431d949..., N 33f91b4db86fa7e3..., ORM 9a66a5581ba08573... побайтно равны закоммиченным; candidate-report отличается только script_sha256_lf и out_dir; превью совпадают по пикселям ±1, как и у прогона старого скрипта (байты PNG нестабильны и раньше)"
+    },
+    "check_static_prop_fbx.py": {
+      "sha256LfAfter": "2c4f218d41171ddad11b0f8a018a0bed1a9eea187ab5ad6b40bd7475f10e7605",
+      "change": "третий аргумент может быть params JSON: применяется его front_check (axis_extent пересчитан в кадр экспорта); с числом или без аргумента вывод прежний",
+      "barrelReadback": "равен закоммиченному 20260928-p15-barrel/reports/fbx-readback.json (и с 0.5, и с params JSON бочки)"
+    },
+    "game_camera_preview.py": {
+      "sha256LfAfter": "114c383ff2c62c6097a38f6a5c0ec58035f291a376ff5a83762024a58cdf49fd",
+      "change": "слот *Glow* получает превью-эмиссию; пути абсолютные",
+      "incident": "первый запуск с относительным out записал 4 JPG в C:\\art\\... (каталог создан этим запуском, файлы и каталог удалены)"
+    },
+    "lantern_hardware_readback.py": {"sha256Lf": "bb4b09fdf1029e7b293bafde269f5086dd69b8847315cb9277b64c177bc8c186", "change": "новый"},
+    "unitTests": "2026-09-29, tools/tripo-pipeline/tests по модулям (unittest discover -p <модуль>; целиком ≈ 555 с, близко к лимиту 600 с): 164 теста, 163 OK, 1 падение RealHarpyCandidateTests.test_ue_import_accepts_the_run («fake editor: unknown script ue_import_fbx.launch.py») — во время прогона параллельная сессия меняла tripo_pipeline.py (457884de… → b8eea7cf…) и tests/fake_unreal_mcp.py; повтор класса RealHarpyCandidateTests после этого: 3 OK. test_static_candidate 8 OK (CLI на синтетике; static_prop_candidate.py не запускает — он проверен пересборкой бочки). В 164 входят неотслеживаемые test_rig_rules.py и test_um_master.py параллельных сессий; рабочее дерево ≠ состояние коммита этого прогона"
+  },
+  "deferred": [
+    "UE не использовался: passthrough run ($R/ue-passthrough, init+register уже сделаны; preflight требует локальный git-ignored сырой GLB decor-lantern-tripo-h31-26bb832e-source.glb), build-профиль decor-lantern-static-um-fbx-v1.json (collision none, N flip_green false, protrusion_axis_ue +X: X длиннее Y на 0.37 uu за счёт фурнитуры), CLI adopt, импорт в /Game/PipelineCandidates/DecorLantern/20260928-lantern-tripo-h31/{Passthrough,Candidate} (ADDING-AN-ASSET §4.1 шаги 1, 3, 4; §5)",
+    "UE-материал свечения: стадия static-candidate ставит один MI на все слоты; для M_Decor_LanternGlow нужен MI с тёплой эмиссией (03 С-6) и параметром интенсивности, выключаемый на минимальных настройках (08 §6.2); тёплый point без теней в голове (03 С-8)",
+    "взгляд арта: roughness против 03 С-3, сине-серое стекло при выключенной эмиссии, силуэт на игровой камере",
+    "DIRECTORY-MAP.md: run-каталог фонаря не внесён (ADDING-AN-ASSET §7 п. 3); файл сейчас правит параллельная сессия (волна 4), внести отдельным изменением",
+    "коммит не делался (по заданию); сырой GLB 68 МБ и work/*.blend не коммитить",
+    "проработка героев до уровня Medusa (просьба пользователя при этой задаче) — вне задачи фонаря; пользователь допустил перенос на следующую итерацию"
+  ],
+  "commitPrep": {
+    "creditsLedger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json: сводка tripo.window пересчитана по записям окна (новых списаний нет; lock-файл, CRLF сохранены): byTask + строка фонаря 130 (сумма byTask 840 = spent), balanceEndUi 24205 (было 24335), balanceEndSource = balanceAfter последней записи (PBR 05:44), arithmetic «25045 − 840 = 24205», новое поле summaryNote; stage3Plan T7.1: spent 130 и spentNote (больше maxCredits 100 этого плана; план Tripo-этапа фонаря: expectedTotal 130, cap 250; основание — owner записей, писал оркестратор)",
+    "assetRegistry": "docs/art-pipeline/asset-registry.json, запись ASSET-DECOR-KIT-001.LANTERN: статус измерено, стадия blender-candidate; вопрос о стороне петель закрыт для конвейера (hingeSideDecision + lantern-hardware-readback.json; решение агента-планировщика, человеком отдельно не подтверждалось — взгляд человека в художественной проверке в UE); source3d PBR GLB с sha; слои tripo-sources и blender-candidate SM_Decor_Lantern (FBX, BC/N/ORM с sha); evidence — этот отчёт; nextStep/blocker обновлены; validate_registry.py RESULT PASS"
+  },
+  "history": "до 2026-09-28 22:25 оба этапа были заблокированы (нет подтверждения траты от пользователя; нет входного меша); планы: reports/tripo-stage-plan.json, reports/blender-stage-plan.json; превью входов: preview/input-views-*.jpg"
 }

@@ -1,0 +1,200 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "Декор-кит: фонарь, этап Tripo (пилот T7.1)",
+  "asset_id": "ASSET-DECOR-KIT-001.LANTERN",
+  "date": "2026-09-29",
+  "service": "tripo-studio",
+  "access": "Этап выполнил оркестратор лично, в своей вкладке Chrome. Этот файл записан исполнителем Blender-этапа по трём источникам: тексту задания оркестратора, записям журнала кредитов (время истории Studio, цены, балансы) и замерам GLB в source/. Значения из UI Studio (число граней после ретопологии, заполнение Smart UV, итоговый баланс) исполнитель сам не видел. Они помечены как reported_by_orchestrator.",
+  "sources_of_record": {
+    "orchestrator_task_text": "задание 26bb832e, H3.1 multi-view front+back v3, «Приватный»; Quad-ретопология Smart Mesh, цель 2 500, получено 2 538 граней; Smart UV, заполнение 77 %; текстура 2K с удалением освещения; PBR; траты 55+40+20+10+5 = 130; баланс 24 335 -> 24 205",
+    "credits_ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json (tripo.window.entries, 5 записей 2026-09-29 05:32-05:44, taskId 26bb832e-6c2b-4b7f-80e6-570cd1c37355)",
+    "measured_here": "sha256, размеры, структура GLB (меши, треугольники, материалы, картинки и их размеры), габариты после импорта в Blender 5.2.2, статистика карт, осмотр меша"
+  },
+  "idempotency_check": {
+    "before_first_paid_op": "tripo-stage-plan.json: 2026-09-28 баланс UI 24 335 = balanceEndUi журнала, платных заданий фонаря не было",
+    "this_run": "в журнале ровно одна генерация фонаря (05:32) и по одной операции каждого вида после неё; перегенераций нет"
+  },
+  "tasks": {
+    "26bb832e-6c2b-4b7f-80e6-570cd1c37355": {
+      "role": "H3.1 multi-view исходник -> Quad-ретопология -> Smart UV -> текстура 2K -> PBR (одна одночастная ветка, без сегментации)",
+      "url": "https://studio.tripo3d.ai/ru/workspace/generate/26bb832e-6c2b-4b7f-80e6-570cd1c37355",
+      "url_note": "адрес собран по образцу прежних заданий Studio, не скопирован из браузера"
+    }
+  },
+  "generation": {
+    "mode": "multi-view",
+    "model_ui_label": "H3.1",
+    "views": {
+      "front": {
+        "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-front.png",
+        "sha256": "710a17b99813347eff59f7a204457221b18d2d34239f8026e89118b303080a58"
+      },
+      "left": null,
+      "right": null,
+      "back": {
+        "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-back.png",
+        "sha256": "69f256cc8023929d4ba58ad70264dc5bb0def611e5f13bcbbc0d840402210682"
+      }
+    },
+    "inputs_sha256_rechecked": "2026-09-29: файлы front/back совпадают с tripo-stage-plan.json.inputs",
+    "slot_mapping_source": "tripo-stage-plan.json hingeSideDecision: только front + back, боковые слоты пустые (фурнитура в боковых видах отзеркалена)",
+    "settings": {
+      "privacy": "Приватный",
+      "reported_by_orchestrator": "H3.1, multi-view front+back v3, «Приватный»",
+      "measured_from_raw_glb": "текстуры 4096² (BC jpg, RM jpg, N png), 1 992 294 треугольника: соответствует настройкам аккаунта 4K / 2 000 000 полигонов, Triangle (tripo-stage-plan runbook, шаг 1)"
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "ui": "Из нескольких видов в модель",
+      "history_time": "2026-09-29 05:32",
+      "quoted": 55,
+      "observed_debit": 55,
+      "balance_before": 24335,
+      "balance_after": 24280,
+      "result": {"glb_triangles": 1992294, "glb_images": "3 x 4096²"}
+    },
+    {
+      "op": "retopology",
+      "settings": {"topology": "Quad", "smart_mesh": "P1.0 on", "target_polygons": 2500},
+      "history_time": "2026-09-29 05:37",
+      "quoted": 40,
+      "observed_debit": 40,
+      "balance_before": 24280,
+      "balance_after": 24240,
+      "target_reason": "tripo-stage-plan.json targets.retopologyTarget: 2 000-3 000 faces (бюджет кита 30-60k tris предложен, бочка 3 837 tris, фонарь ~ один из 6 объектов)",
+      "result": {
+        "faces_ui": 2538,
+        "faces_ui_source": "reported_by_orchestrator",
+        "glb_triangles_after_smart_uv": 4486,
+        "note": "промежуточный GLB после ретопологии не выгружался; 4 486 треугольников измерены в итоговом GLB"
+      }
+    },
+    {
+      "op": "smart-uv",
+      "ui": "Развернуть UV",
+      "history_time": "2026-09-29 05:39",
+      "quoted": 20,
+      "observed_debit": 20,
+      "balance_before": 24240,
+      "balance_after": 24220,
+      "result": {
+        "uv_fill_ui": "77 %",
+        "uv_fill_ui_source": "reported_by_orchestrator",
+        "uv_area_used_measured": 0.7705,
+        "uv_measured_on": "итоговый GLB, Blender 5.2.2, uv_analysis из static_prop_candidate.py (растр 1024): 62 острова, 0 пикселей перекрытия между островами, 5 треугольников UV перевёрнуты против большинства своего острова (18 px перекрытия внутри островов), вне 0-1 нет"
+      }
+    },
+    {
+      "op": "texture",
+      "settings": {"multi_view": "front+back v3", "resolution": "2K", "remove_lighting": true},
+      "history_time": "2026-09-29 05:41",
+      "quoted": 10,
+      "observed_debit": 10,
+      "balance_before": 24220,
+      "balance_after": 24210
+    },
+    {
+      "op": "pbr",
+      "history_time": "2026-09-29 05:44",
+      "quoted": 5,
+      "observed_debit": 5,
+      "balance_before": 24210,
+      "balance_after": 24205
+    }
+  ],
+  "exports": [
+    {
+      "file": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-h31-26bb832e-source.glb",
+      "stage": "generate",
+      "format": "GLB",
+      "texture_tier": "4k",
+      "sha256": "ab8a9a07b9119480c01ae6f7613ba7684fc43b737c250441873d3bfad9c8cac2",
+      "bytes": 68146168,
+      "glb_integrity": "длина из заголовка = размер файла; чанки JSON 2 040 + BIN 68 144 100 байт, обход чанков доходит до конца файла",
+      "commit": "не коммитить: сырой исходник 68 МБ хранится локально, как у героев (коммит de252a25); в git только sha256 в source-spec",
+      "glb": {
+        "meshes": 1,
+        "primitives": 1,
+        "triangles": 1992294,
+        "materials": 1,
+        "images": 3,
+        "skins": 0,
+        "animations": 0,
+        "image_sizes": "4096²: BC jpg, RM jpg, N png",
+        "extensions_used": ["KHR_materials_volume", "FB_ngon_encoding"],
+        "embedded_images_sha256": {
+          "decor-lantern-tripo-h31-26bb832e-source_basecolor.jpg": "8f991fcb972ce823ce7461ac948a2dfd2556a0a8a998732d4f11c5b3a6dbfbae",
+          "decor-lantern-tripo-h31-26bb832e-source_rm.jpg": "5e8618447628a73ac9bde8d6c5258b9973c5dcdd24352406eeaff549307b94fd",
+          "decor-lantern-tripo-h31-26bb832e-source_normal.png": "e61e23d5e0edfe62ff9eef3a5b9899b518caf630e91d739e6234630fe665de98"
+        }
+      }
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr.glb",
+      "stage": "pbr (после Quad-ретопологии, Smart UV и текстуры 2K)",
+      "format": "GLB",
+      "texture_tier": "2k",
+      "sha256": "085d062e3060699edaec25f4ee969dc296a0e99dbea2449fe15ca943715467bb",
+      "bytes": 13180092,
+      "glb_integrity": "длина из заголовка = размер файла; чанки JSON 2 616 + BIN 13 177 448 байт",
+      "commit": "основной вход Blender-этапа (13 МБ); коммит — по правилу бочки и героев (итоговые GLB в git)",
+      "glb": {
+        "meshes": 1,
+        "primitives": 1,
+        "triangles": 4486,
+        "materials": 1,
+        "images": 3,
+        "skins": 0,
+        "animations": 0,
+        "image_sizes": "2048²: BC jpg RGB, RM png RGBA, N png RGBA",
+        "material_factors": "baseColorFactor 0.8 (RGB); KHR_materials_specular specularFactor 1.0, specularColorFactor 0.8",
+        "extensions_used": ["KHR_materials_specular", "KHR_materials_volume", "FB_ngon_encoding"],
+        "embedded_images_sha256": {
+          "decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr_basecolor.jpg": "f26ce3c314d092bf0d717ec25bb2de6c5d6ccc252e30c4a780936611a0b26c44",
+          "decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr_rm.png": "9ff836e4cc50f48833da4087e4c640cb3ddfbbd7b3b45f82515d9844e4b2b4c0",
+          "decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr_normal.png": "b804416de006d00be3c2f54fbf3d3acba7b9d8e9ae1050a665c575d79fd03237"
+        }
+      }
+    }
+  ],
+  "not_exported": "промежуточные GLB (после ретопологии, после Smart UV + текстуры без PBR) не выгружались; в source/ только сырой исходник и итоговый PBR",
+  "measured_bounds_blender_m": {
+    "decor-lantern-tripo-h31-26bb832e-source.glb": [0.2694, 0.2702, 0.9801],
+    "decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr.glb": [0.2699, 0.2737, 0.9782],
+    "note": "X x Y x Z после импорта в Blender 5.2.2 (Z вверх, дверца смотрит в -Y); исходник — по min/max accessor POSITION (glTF Y вверх), итоговый — по вершинам после импорта; метры Tripo, не игровые uu; низ на Z = 0"
+  },
+  "texture_measurements": {
+    "rm": "итоговый GLB: R = 1.0 везде (не AO), G = roughness mean 0.565 (p10 0.424, p90 0.671), B = metallic mean 0.097 (p90 0.208, доля > 0.5 — 3.1 %)",
+    "base_color": "BC mean RGB 0.271/0.261/0.258 (закодированные значения); стекло сине-серое: B - R = 19-21 на 8 битах, железо 5-9, бронзовые накладки < 0",
+    "base_color_factor": "0.8: в Blender-этапе умножен в BC (линейно, как стадия atlas у героев)"
+  },
+  "review": {
+    "method": "Blender 5.2.2 headless, импорт итогового GLB, орто-рендеры 4 сторон + крупный план головы фонаря (временные файлы C:/tmp/lantern-t71, не доказательство), замеры вершин по высоте и сторонам",
+    "findings": [
+      "Сторона петель совпадает с front: камера на -Y (.blend) видит дверцу, петли слева по кадру (-X), защёлка справа (+X) на середине высоты дверцы",
+      "Фурнитура на боках и сзади не продублирована: в полосе 0.62-0.76 высоты все вершины лежат у передней грани (у бокового и заднего стекла вершин нет — это большие четырёхугольники); на орто-видах сбоку фурнитура видна только в профиле у переднего ребра",
+      "Стёкла на всех четырёх сторонах, не пробиты (поверхности в утопленной раме); шпиль и ступенчатая крыша целы",
+      "Дефекты сетки (сварка 1e-6 м): 13 открытых рёбер, 1 немногообразное, 1 вырожденный треугольник, 5 граней с несогласованной ориентацией. Это три T-стыка (щели нулевой площади), коллинеарный треугольник на углу столба и тонкий вывернутый «плавник» из 5 граней у рамы дверцы со стороны петель. Исправлено в Blender-этапе (geometry_repair tripo_cracks)"
+    ],
+    "decision": "брака, требующего перегенерации, нет"
+  },
+  "credits": {
+    "unit": "studio-credits",
+    "this_task_total_observed": 130,
+    "planned": 130,
+    "cap": 250,
+    "balance_ui_start": 24335,
+    "balance_end": 24205,
+    "balance_end_source": "reported_by_orchestrator + balanceAfter последней записи журнала",
+    "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json",
+    "ledger_summary_note": "Записи фонаря в tripo.window.entries есть, spent = 840 пересчитан. Не пересчитаны byTask (нет строки фонаря, 130), balanceEndUi (24 335 вместо 24 205), balanceEndSource и arithmetic («25045 − 710 = 24335»). Журнал ведёт оркестратор, исполнитель его не правил"
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false,
+    "status": "измерено"
+  }
+}

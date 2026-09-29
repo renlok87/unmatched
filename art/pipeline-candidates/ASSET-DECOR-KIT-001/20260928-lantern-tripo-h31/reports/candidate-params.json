@@ -1,0 +1,53 @@
+{
+  "_purpose": "Params of tools/tripo-pipeline/blender/static_prop_candidate.py for the lantern candidate (from candidate-params.template.json, <task8> = 26bb832e). All numbers are proposals or measurement settings, not accepted values.",
+  "_target_height_m": "0.95 = inside both the 04 card range 90-110 uu (proposed) and the S05 gate 90-100 uu (AD-CNF-56, open)",
+  "_ao_distance_m": "0.04: barrel used 0.03 at 26 uu height; lantern detail (rivets, frame bars, roof edge) has a similar absolute size, so AO distance is not scaled with height",
+  "_geometry_repair": "tripo_cracks, decided after the first run failed require_closed_manifold (its numbers are in docs/art-pipeline/prop-lantern-report.json, blenderStage.firstRun): the Tripo mesh has 13 open + 1 non-manifold welded edges = three collinear T-junction cracks (z 0.603 at the hinge-side door bottom, z 0.762 on both side panes), one collinear zero-area triangle at a post corner (z 0.563; clean_mesh deletes it and leaves a T-junction crack) and a 5-face flipped sliver fin (~9.8 cm2 pre-scale) along the hinge-side door frame, attached by the non-manifold edge. Nothing is filled: fins are deleted, cracks welded, and the run fails if anything stays open",
+  "_front_check": "axis_extent: the lantern front is the door hardware (two hinges + latch), not one protrusion at mid height (there the square post corners win). In the band 0.62-0.76 of the height only the door hardware has vertices; measured before the run on the Tripo GLB: -Y 0.1216 m vs runner-up +X 0.0928 m (pre-scale), so a 0.01 m margin after scaling leaves room",
+  "_glow_slot": "Glass decision: second slot M_Decor_LanternGlow on the glass faces (as M_Decor_FacadeGlow of the facades), same BC/N/ORM; faces chosen by the blue-grey glass colour of the Tripo BC (B - R >= 15 on 8-bit encoded values, measured: glass 19-21, iron 5-9, bronze < 0) on >= 50 % of 28 barycentric samples. Emission here is a Blender preview (#FFC27A, 03 C-6 range, strength 3); the UE emissive colour/intensity is an MI parameter (deferred)",
+  "source_glb": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr.glb",
+  "out_dir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31",
+  "asset_name": "SM_Decor_Lantern",
+  "texture_prefix": "T_Decor_Lantern",
+  "material_name": "M_Decor_Lantern",
+  "target_height_m": 0.95,
+  "texture_size": 1024,
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "bake_ao": true,
+  "ao_samples": 64,
+  "ao_distance_m": 0.04,
+  "geometry_repair": {
+    "method": "tripo_cracks",
+    "fin_max_faces": 8,
+    "fin_max_area_m2": 0.002,
+    "t_junction_tol_m": 1e-05
+  },
+  "require_closed_manifold": true,
+  "front_check": {
+    "method": "axis_extent",
+    "feature": "door hinges and latch",
+    "z_band_frac": [
+      0.62,
+      0.76
+    ],
+    "expected_axis": "-Y",
+    "min_margin_m": 0.01
+  },
+  "glow_slot": {
+    "material_name": "M_Decor_LanternGlow",
+    "select": {
+      "method": "bc_channel_difference",
+      "channel_a": "B",
+      "channel_b": "R",
+      "min_difference_8bit": 15,
+      "min_face_fraction": 0.5,
+      "grid": 6
+    },
+    "preview_emission_srgb_8bit": [
+      255,
+      194,
+      122
+    ],
+    "preview_emission_strength": 3.0
+  }
+}

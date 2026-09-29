@@ -1156,8 +1156,8 @@
       "backlog": ["ART-009"],
       "parent": "ASSET-DECOR-KIT-001",
       "instances": 1,
-      "status": "предложено",
-      "stage": "reference-images",
+      "status": "измерено",
+      "stage": "blender-candidate",
       "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
       "sourceImages": {
         "selectionManifest": {"path": "art/imagegen/mvp-v1/generation-inputs.json", "root": "repo", "kind": "file", "expect": "exists", "role": "selection manifest (REF-LANTERN)"},
@@ -1168,18 +1168,55 @@
           {"path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-right.png", "root": "repo", "kind": "file", "expect": "exists", "role": "right", "sha256": "48caa2b52b2f4b7328facba1654b8ec3f4abfead77f15c1051bfdeca349af55f"}
         ],
         "excludedCandidates": [],
-        "note": "Фурнитура дверцы дрейфует между боковыми видами. T2 (imagegen-inputs/manifest.json → sets[REF-LANTERN].propTripoSlotProposal, предложено): подавать только front + back, боковые слоты Tripo оставить пустыми. Открытый вопрос: в left у переднего ребра видны петли, в right — защёлка, то есть боковые файлы, вероятно, названы по противоположному соглашению сторон, чем у персонажей (не доказано; нужна ручная проверка стороны петель/защёлки)."
+        "note": "Фурнитура дверцы дрейфует между боковыми видами. Вопрос о стороне петель закрыт для конвейера решением T7.1 (tripo-stage-plan.json → hingeSideDecision; решение агента-планировщика, человеком отдельно не подтверждалось): эталон — front, петли у левого по кадру ребра, защёлка у правого на середине дверцы. В left/right фурнитура отзеркалена относительно front при любом соглашении сторон (персонажей или камеры), поэтому в Tripo поданы только front + back (task 26bb832e), слоты left/right пустые; вопрос о соглашении имён боковых файлов больше не влияет на ассет. На меше кандидата проверено замером (lantern-hardware-readback.json): петли на −Y кадра экспорта (слева по кадру при фронте +X), защёлка на +Y, на боках и сзади вершин фурнитуры 0. Взгляд человека на сторону петель — в художественной проверке в UE."
       },
       "source3d": [
+        {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "Tripo H3.1 multi-view front+back v3 (task 26bb832e) → Quad-ретопология 2 500 → Smart UV → текстура 2K → PBR; 4 486 tris; основной вход кандидата", "sha256": "085d062e3060699edaec25f4ee969dc296a0e99dbea2449fe15ca943715467bb"},
         {"path": "blender/S05/export/SM_S05_Lantern.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "S05 блок-аут 11×11×94 uu, 128 tris (исторический)"}
       ],
-      "layers": [],
+      "layers": [
+        {
+          "layer": "tripo-sources",
+          "stage": "tripo-source",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/source-specs/tripo-26bb832e.json", "root": "repo", "kind": "file", "expect": "exists", "role": "source spec"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/tripo-run.json", "root": "repo", "kind": "file", "expect": "exists", "role": "Studio: операции, цены, списания, балансы, файлы"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/tripo-stage-plan.json", "root": "repo", "kind": "file", "expect": "exists", "role": "план Tripo-этапа и решение о стороне петель (hingeSideDecision)"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/ue-passthrough/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest tripo_pipeline (init + register-source; стадии не запускались)"}
+          ],
+          "note": "Итого 130 Studio-кредитов (55+40+20+10+5), баланс 24 335 → 24 205; этап выполнил оркестратор 2026-09-29 05:32–05:44. Studio-кредиты ≠ API-кредиты ≠ USD; единый журнал — docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json. Сырой GLB генерации decor-lantern-tripo-h31-26bb832e-source.glb (68 146 168 байт, sha256 ab8a9a07…c8cac2) хранится только локально и git-ignored, sha — в source spec; preflight прогона ue-passthrough в чистом checkout требует восстановить этот файл."
+        },
+        {
+          "layer": "blender-candidate SM_Decor_Lantern",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/tripo-pipeline/blender/static_prop_candidate.py", "root": "repo", "kind": "file", "expect": "exists", "role": "build script (front_check, glow_slot, geometry_repair tripo_cracks)"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/candidate-params.json", "root": "repo", "kind": "file", "expect": "exists", "role": "params кандидата"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/export/SM_Decor_Lantern.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX UM_FBX_v1", "sha256": "d72e5edf8949f43850488a8370271d1ee8d034446e8b17b05e95651ce7e70880"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/export/T_Decor_Lantern_BC.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K BC sRGB", "sha256": "d9af703579d2d57b300ae07bc9adadb47a5ba6585d1370851c26d5bdbdab8c4d"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/export/T_Decor_Lantern_N.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K Normal DirectX", "sha256": "71974d00f1db98a71f7f1a118429926c733e87faf6df3640287a54bef6117c5b"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/export/T_Decor_Lantern_ORM.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K ORM (AO bake)", "sha256": "a504dddaa0feb2d38a27d96743a6ac05e7c8f426e7de49eca5d8f2ae26597bc6"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/candidate-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "измерения кандидата"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/fbx-readback.json", "root": "repo", "kind": "file", "expect": "exists", "role": "readback FBX (check_static_prop_fbx.py)"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/lantern-hardware-readback.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сторона петель/защёлки, фурнитура на боках (lantern_hardware_readback.py)"},
+            {"path": "/Game/PipelineCandidates/DecorLantern/20260928-lantern-tripo-h31", "root": "repo", "kind": "ue-asset", "expect": "planned", "role": "UE-импорт отложен (prop-lantern-report §4)"}
+          ],
+          "note": "Статус по prop-lantern-report: измерено; UE не запускался, художественной приёмки нет. Измерено: 95,0 uu (26,6 × 26,2), pivot в центре основания, 4 484 tris (4 338 + 146 стекла), 2 слота (M_Decor_Lantern; M_Decor_LanternGlow — стекло на тех же BC/N/ORM, эмиссия задаётся в MI), после ремонта tripo_cracks (удалён 1 плавник из 5 граней, сварено 4 T-стыка) 0 открытых/немногообразных/несогласованных рёбер, фронт −Y .blend → +X экспорта (front_check axis_extent, запас 2,79 uu), UV0 61 остров, 0 перекрытий между островами, 5 перевёрнутых UV-треугольников из исходника Tripo, мин. зазор ≈ 3 px на 1K. Открыто: roughness ≥ 0,6 только на 37,8 % текселей (03 С-3 предлагает ≥ 90 %), значение эмиссии для UE, 119 углов с нормалью внутрь (у Tripo 125). Числа не являются бюджетом."
+        }
+      ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "AD-CNF-19 (один FBX vs файл на объект).", "proposedChange": "Нет."},
-      "nextStep": "После пилота бочки; человеку подтвердить сторону петель/защёлки на боковых видах, затем решить раскладку слотов; фурнитуру согласовать на меше.",
-      "blocker": "ART-009 после GD-058; гейт высоты 90–100 vs 90–110 uu (AD-CNF-56).",
+      "nextStep": "ADDING-AN-ASSET §4.1: прогон ue-passthrough (init и register-source сделаны; нужен локальный сырой GLB), build-профиль decor-lantern-static-um-fbx-v1.json (collision none, N без flip, protrusion_axis_ue +X), adopt в ue-candidate, импорт в /Game/PipelineCandidates/DecorLantern/20260928-lantern-tripo-h31/{Passthrough,Candidate}; свой MI свечения для M_Decor_LanternGlow и тёплый point без теней; художественная проверка в контрольной сцене.",
+      "blocker": "UE-этап отложен (prop-lantern-report §4); ART-009 после GD-058; гейт высоты 90–100 vs 90–110 uu (AD-CNF-56) — кандидат 95 uu внутри обоих.",
       "doneCriteria": "90–110 uu (предложено), тёплый point без теней не мешает читаемости клеток.",
       "acceptanceEvidence": [],
-      "evidence": [],
+      "evidence": [
+        {"path": "docs/art-pipeline/prop-lantern-report.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт T7.1"},
+        {"path": "docs/art-pipeline/prop-lantern-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт T7.1 (json)"}
+      ],
       "plannedPaths": []
     },
     {

@@ -1,12 +1,17 @@
 """Independent read-back of a static prop FBX (no dependency on the build script).
 
 blender -b --factory-startup --python-exit-code 1 --python check_static_prop_fbx.py -- <fbx> <out.json> [front_z_frac]
+blender ... -- <fbx> <out.json> <candidate-params.json>   (front_check of static_prop_candidate.py params)
 
 Measures in a fresh scene: objects, triangles, material slots, UV layers, custom/split normals,
 dimensions as UE would see them (FBX numbers, UnitScaleFactor 1.0 -> 1 unit = 1 uu),
 pivot (object origin vs bounds), topology after welding coincident vertices (open / non-manifold
 edges, faces whose winding disagrees with a consistent outward orientation) and the horizontal
 direction of the most protruding vertex band at front_z_frac of the height (barrel: the bung = front).
+With a params JSON instead of front_z_frac, its front_check is applied as well: method protrusion sets the band
+height; method axis_extent adds "front_check" (largest vertex extent along +-X/+-Y in the height band, measured in
+this read-back frame, where the .blend axis maps by the UM_FBX_v1 +90 deg Z turn: -Y -> +X, +X -> +Y, +Y -> -X,
+-X -> -Y). Without a params JSON the output is unchanged.
 """
 import json
 import math
@@ -18,7 +23,12 @@ from mathutils import Vector
 
 args = sys.argv[sys.argv.index("--") + 1:]
 fbx, out = args[0], args[1]
-zfrac = float(args[2]) if len(args) > 2 else 0.5
+front_cfg = None
+if len(args) > 2 and args[2].lower().endswith(".json"):
+    front_cfg = json.load(open(args[2], encoding="utf-8")).get("front_check")
+    zfrac = float(front_cfg.get("z_frac", 0.5)) if front_cfg and front_cfg.get("method") == "protrusion" else 0.5
+else:
+    zfrac = float(args[2]) if len(args) > 2 else 0.5
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.import_scene.fbx(filepath=fbx)
 objs = [o for o in bpy.context.scene.objects if o.type == "MESH"]
@@ -60,6 +70,24 @@ ang = math.degrees(math.atan2(far.y - cy, far.x - cx))
 res["protrusion_direction_deg_from_plus_x_ccw"] = round(ang, 1)
 res["protrusion_axis_blender"] = min((("+X", 0), ("+Y", 90), ("-X", 180), ("-X", -180), ("-Y", -90)),
                                      key=lambda a: abs(ang - a[1]))[0]
+if front_cfg and front_cfg.get("method") == "axis_extent":
+    band = [float(v) for v in front_cfg["z_band_frac"]]
+    z_lo, z_hi = lo.z + (hi.z - lo.z) * band[0], lo.z + (hi.z - lo.z) * band[1]
+    sel = [p for p in pts if z_lo <= p.z <= z_hi]
+    dirs = (("+X", (1.0, 0.0)), ("-X", (-1.0, 0.0)), ("+Y", (0.0, 1.0)), ("-Y", (0.0, -1.0)))
+    ext = {k: max((p.x - cx) * d[0] + (p.y - cy) * d[1] for p in sel) * uu for k, d in dirs}
+    order = sorted(ext, key=lambda k: -ext[k])
+    blend_to_readback = {"-Y": "+X", "+X": "+Y", "+Y": "-X", "-X": "-Y"}
+    expected = blend_to_readback[front_cfg.get("expected_axis", "-Y")]
+    margin_uu = ext[order[0]] - ext[order[1]]
+    min_margin_uu = float(front_cfg["min_margin_m"]) * uu
+    res["front_check"] = {
+        "method": "axis_extent", "feature": front_cfg.get("feature"), "z_band_frac": band, "vertices_in_band": len(sel),
+        "extents_uu_from_footprint_centre": {k: round(v, 3) for k, v in ext.items()},
+        "largest_axis_readback": order[0], "runner_up_axis_readback": order[1], "margin_uu": round(margin_uu, 3),
+        "expected_axis_readback": expected, "min_margin_uu": round(min_margin_uu, 3),
+        "conforms": order[0] == expected and margin_uu >= min_margin_uu,
+    }
 res["note"] = ("Blender FBX import converts FBX axes back to Blender Z-up; UE's FBX import with the same "
                "-Y forward/Z up convention was verified for UM_FBX_v1 in ART-001 (root arrow along +X).")
 json.dump(res, open(out, "w", encoding="utf-8"), indent=2, ensure_ascii=False)

@@ -13,9 +13,27 @@ params.json (source_glb, out_dir, fbx_preset: absolute or relative to the reposi
   fbx_preset (blender/_tools/presets/UM_FBX_v1.json), bake_ao (bool), ao_samples, ao_distance_m,
   geometry_repair (optional; null = keep Tripo geometry): {centre_xy_m_prescale, radius_m_prescale,
       z_min_m_prescale, small_island_max_faces} - a disc on the lid top that is deleted and closed again
-      with a flat fill (see repair_region), coordinates in the imported glTF space before scaling,
+      with a flat fill (see repair_region), coordinates in the imported glTF space before scaling;
+      or {"method": "tripo_cracks", "fin_max_faces", "fin_max_area_m2", "t_junction_tol_m"}: weld, delete small
+      flipped fins at non-manifold/open edges, weld T-junction cracks, fail on anything left open (repair_cracks),
   require_closed_manifold (default true): fail the run if the welded mesh still has open/non-manifold
-      edges or inconsistent winding after the repair (set false only for measurement-only runs).
+      edges or inconsistent winding after the repair (set false only for measurement-only runs),
+  front_check (optional; absent = the barrel rule): how the "Front along -Y" row of the UM_FBX_v1 conformance
+      is measured (04 1: asset front = -Y in .blend -> +X in UE):
+        {"method": "protrusion", "feature": "bung", "z_frac": 0.5, "expected_deg": -90.0, "tolerance_deg": 15.0}
+            = default: direction of the most protruding vertex in a band at z_frac of the height (barrel bung);
+        {"method": "axis_extent", "feature": "...", "z_band_frac": [lo, hi], "expected_axis": "-Y",
+         "min_margin_m": m}: in the height band [lo, hi] (fractions of the height) the largest vertex extent from
+            the footprint centre along +-X/+-Y must be expected_axis and beat the runner-up by >= m metres (after
+            scaling); for props whose front feature is asymmetric hardware, not a single protrusion (lantern door),
+  glow_slot (optional; absent = one material slot): a second material slot for emissive faces, <= 2 slots (04 3.7):
+      {"material_name": "M_*Glow", "select": {"method": "bc_channel_difference", "channel_a": "B", "channel_b": "R",
+       "min_difference_8bit": 15, "min_face_fraction": 0.5, "grid": 6}, "preview_emission_srgb_8bit": [r, g, b],
+       "preview_emission_strength": s}: faces whose source base colour (encoded 8-bit, sampled on a barycentric grid)
+      has channel_a - channel_b >= min_difference_8bit on >= min_face_fraction of the samples go to slot 1. Both
+      slots use the same BC/N/ORM; the Blender emission is a preview value only (UE: MI parameter).
+Base colour: a glTF baseColorFactor other than 1 is multiplied into BC in linear light (glTF semantics, same as the
+CLI atlas stage); a factor of exactly 1 leaves the pixels untouched.
 
 Outputs in out_dir:
   work/<asset>.blend                       editable scene (metres, pivot at base centre)
@@ -442,6 +460,133 @@ def repair_region(obj, cfg):
     dev = np.degrees(np.arccos(np.clip((got * vec).sum(1), -1, 1)))
     rec["corner_normals_max_deviation_deg_after_rewrite"] = r(dev.max(), 3)
     rec["triangles_after"] = triangles(obj)
+    return rec
+
+
+def repair_cracks(obj, cfg):
+    """geometry_repair {"method": "tripo_cracks"}: retopology artefacts found by measurement, not by index.
+
+    - the mesh is welded at 1e-6 m (glTF splits vertices at UV/normal seams; UVs and corner normals are per
+      corner and are kept, corner normals via a corner attribute written back with normals_split_custom_set);
+    - fins: connected groups of faces whose winding disagrees with the recalculated outward orientation and that
+      touch a non-manifold or open edge; each group must have <= fin_max_faces faces and <= fin_max_area_m2
+      (glTF space, pre-scale), else the run fails; the group is deleted with its loose vertices;
+    - T-junction cracks: an open-edge vertex lying on another open edge (distance <= t_junction_tol_m, strictly
+      inside it) is inserted into that edge and welded, the grown face is re-triangulated (BEAUTY); this also
+      closes the crack left by clean_mesh deleting a collinear (zero-area) triangle;
+    - anything still open or non-manifold afterwards fails the run (nothing is filled blindly)."""
+    me = obj.data
+    orig = np.empty(len(me.loops) * 3, dtype=np.float32)
+    me.corner_normals.foreach_get("vector", orig)
+    attr = me.attributes.new("um_orig_normal", "FLOAT_VECTOR", "CORNER")
+    attr.data.foreach_set("vector", orig)
+    bm = bmesh.new()
+    bm.from_mesh(me)
+    n_verts_stored = len(bm.verts)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-6)
+    rec = {"method": "tripo_cracks: weld 1e-6 m, delete flipped fins at non-manifold/open edges, weld T-junctions",
+           "vertices_stored_before": n_verts_stored, "vertices_after_weld": len(bm.verts),
+           "triangles_before": sum(len(f.verts) - 2 for f in bm.faces)}
+    # fins
+    bm.faces.ensure_lookup_table()
+    work = bm.copy()
+    before = [f.normal.copy() for f in work.faces]
+    bmesh.ops.recalc_face_normals(work, faces=work.faces)
+    work.faces.ensure_lookup_table()
+    flagged = {i for i, f in enumerate(work.faces) if before[i].dot(f.normal) < 0}
+    work.free()
+    groups, seen = [], set()
+    for i in sorted(flagged):
+        if i in seen:
+            continue
+        comp, stack = [], [i]
+        seen.add(i)
+        while stack:
+            c = stack.pop()
+            comp.append(c)
+            for e in bm.faces[c].edges:
+                for nf in e.link_faces:
+                    if nf.index in flagged and nf.index not in seen:
+                        seen.add(nf.index)
+                        stack.append(nf.index)
+        groups.append(sorted(comp))
+    fins = []
+    for comp in groups:
+        faces = [bm.faces[i] for i in comp]
+        touches = any((not e.is_manifold) for f in faces for e in f.edges)
+        if not touches:
+            continue
+        area = sum(f.calc_area() for f in faces)
+        cen = [f.calc_center_median() for f in faces]
+        if len(faces) > int(cfg.get("fin_max_faces", 8)) or area > float(cfg.get("fin_max_area_m2", 2e-3)):
+            raise RuntimeError("tripo_cracks: flipped group of %d faces / %.6f m2 at an open or non-manifold edge "
+                               "exceeds the fin limits; inspect it" % (len(faces), area))
+        fins.append({"faces": len(faces), "area_m2_prescale": r(area, 8),
+                     "bbox_m_prescale": [[r(min(c[k] for c in cen), 4) for k in range(3)],
+                                         [r(max(c[k] for c in cen), 4) for k in range(3)]],
+                     "_faces": faces})
+    for fin in fins:
+        bmesh.ops.delete(bm, geom=fin.pop("_faces"), context="FACES")
+    loose = [v for v in bm.verts if not v.link_faces]
+    if loose:
+        bmesh.ops.delete(bm, geom=loose, context="VERTS")
+    rec["fins_deleted"] = fins
+    rec["loose_vertices_deleted_after_fins"] = len(loose)
+    # T-junctions
+    tol = float(cfg.get("t_junction_tol_m", 1e-5))
+    welds = []
+    for _ in range(1000):
+        bm.edges.ensure_lookup_table()
+        open_edges = [e for e in bm.edges if e.is_boundary]
+        open_verts = {v for e in open_edges for v in e.verts}
+        hit = None
+        for v in sorted(open_verts, key=lambda x: (round(x.co.x, 7), round(x.co.y, 7), round(x.co.z, 7))):
+            for e in open_edges:
+                if v in e.verts:
+                    continue
+                a, b = e.verts[0].co, e.verts[1].co
+                ab = b - a
+                t = (v.co - a).dot(ab) / max(ab.length_squared, 1e-18)
+                if 1e-6 < t < 1 - 1e-6 and (a + ab * t - v.co).length <= tol:
+                    hit = (v, e, t, (a + ab * t - v.co).length)
+                    break
+            if hit:
+                break
+        if not hit:
+            break
+        v, e, t, dist = hit
+        face = e.link_faces[0]
+        _ne, nv = bmesh.utils.edge_split(e, e.verts[0], t)
+        bmesh.ops.weld_verts(bm, targetmap={nv: v})
+        res = bmesh.ops.triangulate(bm, faces=[face], quad_method="BEAUTY", ngon_method="BEAUTY")
+        welds.append({"vertex_m_prescale": [r(c, 5) for c in v.co], "edge_param": r(t, 4),
+                      "distance_m": r(dist, 9), "faces_after_retriangulation": len(res["faces"])})
+    else:
+        raise RuntimeError("tripo_cracks: T-junction weld did not converge")
+    rec["t_junctions_welded"] = welds
+    bm.edges.ensure_lookup_table()
+    left_open = sum(1 for e in bm.edges if e.is_boundary)
+    left_nm = sum(1 for e in bm.edges if not e.is_manifold and not e.is_boundary)
+    degenerate = sum(1 for f in bm.faces if f.calc_area() < 1e-12)
+    rec.update({"open_edges_after": left_open, "non_manifold_edges_after": left_nm,
+                "degenerate_faces_after": degenerate, "triangles_after": sum(len(f.verts) - 2 for f in bm.faces)})
+    if left_open or left_nm or degenerate:
+        raise RuntimeError("tripo_cracks: still %d open / %d non-manifold edges / %d degenerate faces; not filled "
+                           "blindly" % (left_open, left_nm, degenerate))
+    bm.to_mesh(me)
+    bm.free()
+    me.update()
+    vec = np.empty(len(me.loops) * 3, dtype=np.float32)
+    me.attributes["um_orig_normal"].data.foreach_get("vector", vec)
+    vec = vec.reshape(-1, 3)
+    vec /= np.maximum(np.linalg.norm(vec, axis=1, keepdims=True), 1e-12)
+    me.normals_split_custom_set([tuple(v) for v in vec])
+    me.attributes.remove(me.attributes["um_orig_normal"])
+    me.update()
+    got = np.empty(len(me.loops) * 3, dtype=np.float32)
+    me.corner_normals.foreach_get("vector", got)
+    dev = np.degrees(np.arccos(np.clip((got.reshape(-1, 3) * vec).sum(1), -1, 1)))
+    rec["corner_normals_max_deviation_deg_after_rewrite"] = r(dev.max(), 3)
     return rec
 
 
@@ -980,6 +1125,131 @@ def front_direction(obj, z_frac=0.5):
     return r(math.degrees(math.atan2(far.y - cy, far.x - cx)), 1)
 
 
+FRONT_CHECK_DEFAULT = {"method": "protrusion", "feature": "bung", "z_frac": 0.5, "expected_deg": -90.0,
+                       "tolerance_deg": 15.0}
+AXES_2D = (("+X", (1.0, 0.0)), ("-X", (-1.0, 0.0)), ("+Y", (0.0, 1.0)), ("-Y", (0.0, -1.0)))
+
+
+def axis_extents(pts, band):
+    """Largest vertex extent from the centre of the XY bounds along +-X/+-Y, over vertices whose height lies in
+    [band[0], band[1]] (fractions of the full height). Same frame as the points given (.blend or read-back)."""
+    lo = Vector((min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts)))
+    hi = Vector((max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts)))
+    cx, cy = (lo.x + hi.x) / 2, (lo.y + hi.y) / 2
+    z0, z1 = lo.z + (hi.z - lo.z) * float(band[0]), lo.z + (hi.z - lo.z) * float(band[1])
+    sel = [p for p in pts if z0 <= p.z <= z1]
+    if not sel:
+        raise RuntimeError("front_check: no vertex in the height band %s" % (list(band),))
+    ext = {k: max((p.x - cx) * d[0] + (p.y - cy) * d[1] for p in sel) for k, d in AXES_2D}
+    return ext, len(sel)
+
+
+def front_check_row(obj, cfg):
+    """Front row of the UM_FBX_v1 conformance (04 1: face -Y -> +X in UE), measured as params front_check says.
+    Returns (row, export_fields)."""
+    if not cfg:
+        cfg = FRONT_CHECK_DEFAULT
+    method = cfg.get("method", "protrusion")
+    label = "Front (%s) along -Y in .blend (04 1: face -Y -> +X in UE)" % cfg.get("feature", "bung")
+    if method == "protrusion":
+        z_frac = float(cfg.get("z_frac", FRONT_CHECK_DEFAULT["z_frac"]))
+        expected = float(cfg.get("expected_deg", FRONT_CHECK_DEFAULT["expected_deg"]))
+        tol = float(cfg.get("tolerance_deg", FRONT_CHECK_DEFAULT["tolerance_deg"]))
+        deg = front_direction(obj, z_frac)
+        row = {"setting": label, "standard": expected, "used": deg, "conforms": abs(deg - expected) <= tol}
+        return row, {"front_direction_deg_in_blend_ccw_from_plus_x": deg}
+    if method == "axis_extent":
+        band = [float(v) for v in cfg["z_band_frac"]]
+        expected = cfg.get("expected_axis", "-Y")
+        min_margin = float(cfg["min_margin_m"])
+        ext, n = axis_extents([obj.matrix_world @ v.co for v in obj.data.vertices], band)
+        order = sorted(ext, key=lambda k: -ext[k])
+        margin = ext[order[0]] - ext[order[1]]
+        measured = {"method": method, "z_band_frac": band, "vertices_in_band": n,
+                    "extents_m_from_footprint_centre": {k: r(v, 5) for k, v in ext.items()},
+                    "largest_axis": order[0], "runner_up_axis": order[1], "margin_m": r(margin, 5),
+                    "min_margin_m": min_margin}
+        row = {"setting": label, "standard": expected, "used": order[0],
+               "conforms": order[0] == expected and margin >= min_margin, "measured": measured}
+        return row, {"front_check": measured}
+    raise RuntimeError("front_check.method must be protrusion or axis_extent, got %r" % method)
+
+
+# ----------------------------------------------------------------------------- glow slot (optional 2nd material)
+def select_faces_by_bc(obj, bc_encoded, cfg):
+    """Per face: fraction of barycentric sample points whose source base colour (encoded values 0..1, row 0 =
+    bottom as Blender stores it) passes channel_a - channel_b >= min_difference_8bit / 255."""
+    if cfg.get("method") != "bc_channel_difference":
+        raise RuntimeError("glow_slot.select.method must be bc_channel_difference")
+    ch = {"R": 0, "G": 1, "B": 2}
+    diff = bc_encoded[..., ch[cfg["channel_a"]]] - bc_encoded[..., ch[cfg["channel_b"]]]
+    hit_px = diff * 255.0 >= float(cfg["min_difference_8bit"])
+    h, w = hit_px.shape
+    g = int(cfg.get("grid", 6))
+    bary = np.array([(a / g, b / g, 1 - (a + b) / g) for a in range(g + 1) for b in range(g + 1 - a)])
+    me = obj.data
+    me.calc_loop_triangles()
+    uvl = me.uv_layers[0].data
+    hits = np.zeros(len(me.polygons))
+    count = np.zeros(len(me.polygons))
+    for t in me.loop_triangles:
+        tri = np.array([uvl[i].uv[:] for i in t.loops])
+        uv = bary @ tri
+        xs = np.clip((uv[:, 0] * w).astype(int), 0, w - 1)
+        ys = np.clip((uv[:, 1] * h).astype(int), 0, h - 1)
+        hits[t.polygon_index] += hit_px[ys, xs].sum()
+        count[t.polygon_index] += len(bary)
+    frac = hits / np.maximum(count, 1)
+    selected = frac >= float(cfg["min_face_fraction"])
+    return selected, frac
+
+
+def glow_material(name, bc, n_dx, orm, srgb_8bit, strength):
+    """Same BC/N/ORM as slot 0 plus a constant emission (preview only; the UE value is an MI parameter)."""
+    mat = build_material(name, bc, n_dx, orm)
+    bsdf = next(n for n in mat.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+    lin = srgb_to_lin(np.array(srgb_8bit, dtype=np.float64) / 255.0)
+    bsdf.inputs["Emission Color"].default_value = (float(lin[0]), float(lin[1]), float(lin[2]), 1.0)
+    bsdf.inputs["Emission Strength"].default_value = float(strength)
+    return mat
+
+
+def assign_glow_slot(obj, bc_encoded, cfg, bc_img, n_img, orm_img):
+    """Append the glow material as slot 1 and move the selected faces to it; returns the report record."""
+    selected, frac = select_faces_by_bc(obj, bc_encoded, cfg["select"])
+    me = obj.data
+    mat = glow_material(cfg["material_name"], bc_img, n_img, orm_img, cfg["preview_emission_srgb_8bit"],
+                        cfg["preview_emission_strength"])
+    me.materials.append(mat)
+    idx = np.where(selected, 1, 0).astype(np.int32)
+    me.polygons.foreach_set("material_index", idx)
+    me.update()
+    area = np.array([p.area for p in me.polygons])
+    nrm = np.array([p.normal[:] for p in me.polygons])
+    tri_per_face = np.array([len(p.vertices) - 2 for p in me.polygons])
+    by_axis = {}
+    for k, d in (("+X", (1, 0, 0)), ("-X", (-1, 0, 0)), ("+Y", (0, 1, 0)), ("-Y", (0, -1, 0)),
+                 ("+Z", (0, 0, 1)), ("-Z", (0, 0, -1))):
+        m = selected & ((nrm @ np.array(d, dtype=np.float64)) > 0.7)
+        by_axis[k] = {"faces": int(m.sum()), "area_m2": r(area[m].sum(), 6)}
+    lo_mixed, hi_mixed = 0.1, 0.9
+    return {
+        "material_name": cfg["material_name"], "slot_index": 1, "select": cfg["select"],
+        "faces_selected": int(selected.sum()), "triangles_selected": int(tri_per_face[selected].sum()),
+        "area_m2_selected": r(area[selected].sum(), 6), "area_fraction_of_mesh": r(area[selected].sum() / area.sum(), 5),
+        "faces_by_sample_fraction": {
+            "ge_0.9_selected": int((frac >= hi_mixed).sum()),
+            "mixed_selected_[threshold,0.9)": int((selected & (frac < hi_mixed)).sum()),
+            "mixed_rejected_(0.1,threshold)": int((~selected & (frac > lo_mixed)).sum()),
+            "le_0.1_rejected": int((frac <= lo_mixed).sum())},
+        "area_m2_mixed_faces_(0.1,0.9)": r(area[(frac > lo_mixed) & (frac < hi_mixed)].sum(), 6),
+        "selected_faces_by_normal_axis_dot_gt_0.7": by_axis,
+        "preview_emission": {"srgb_8bit": cfg["preview_emission_srgb_8bit"],
+                             "strength": cfg["preview_emission_strength"],
+                             "note": "Blender preview only; UE emissive colour/intensity is an MI parameter (not set here)"},
+    }
+
+
 def export_fbx(obj, path, preset):
     """UM_FBX_v1 on a temporary copy: rotate +Z, x100, export, patch UnitScaleFactor."""
     final_name = obj.name
@@ -1111,7 +1381,8 @@ def main():
     removed = clean_mesh(obj)
     repair = None
     if P.get("geometry_repair"):
-        repair = repair_region(obj, P["geometry_repair"])
+        gr = P["geometry_repair"]
+        repair = repair_cracks(obj, gr) if gr.get("method") == "tripo_cracks" else repair_region(obj, gr)
     geo_mid, flipped = geometry_stats(obj)
     # reverse faces flagged by the outward recalculation only if that really reduces inconsistency
     fixed = 0
@@ -1182,6 +1453,10 @@ def main():
     # pixels come as stored (byte images: encoded values), row 0 = bottom
     bc = image_array(bc_img)[..., :3]
     bc_lin = srgb_to_lin(bc) if bc_img.colorspace_settings.name == "sRGB" else bc
+    bc_factor = [float(v) for v in names["factors"]["basecolor"][:3]]
+    bc_factor_applied = any(f != 1.0 for f in bc_factor)
+    if bc_factor_applied:  # glTF: base colour = factor x texture (linear); a factor of 1 leaves the bytes as before
+        bc_lin = bc_lin * np.array(bc_factor, dtype=bc_lin.dtype)
     bc_out = lin_to_srgb(box_down(bc_lin, factor))
     n_raw = image_array(n_img)[..., :3]
     # Tripo leaves the normal map background near-black with no edge padding; black decodes to
@@ -1260,6 +1535,14 @@ def main():
         },
         "teamcolor": "not applicable: decor L3 is not team-owned (04 3.7); M_DioramaMaster TeamColor left at neutral in UE",
     }
+    if bc_factor_applied:
+        report["textures"]["base_color_factor_applied"] = {
+            "factor_rgb": bc_factor, "space": "linear, before the box downscale",
+            "note": "glTF baseColorFactor multiplied into BC (as the CLI atlas stage does for the heroes)"}
+    glow = None
+    if P.get("glow_slot"):
+        glow = assign_glow_slot(obj, bc, P["glow_slot"], t_bc, t_n, t_orm)
+        report["glow_slot"] = glow
 
     uv, tuv = uv_analysis(obj, size)
     report["uv0"] = uv
@@ -1275,9 +1558,8 @@ def main():
     fbx = out / "export" / ("%s.fbx" % P["asset_name"])
     kwargs = fbx_kwargs(preset)
     conformance = um_fbx_v1_conformance(preset, kwargs, obj, bpy.context.scene)
-    front_deg = front_direction(obj)
-    conformance.append({"setting": "Front (bung) along -Y in .blend (04 1: face -Y -> +X in UE)", "standard": -90.0,
-                        "used": front_deg, "conforms": abs(front_deg + 90.0) <= 15.0})
+    front_row, front_fields = front_check_row(obj, P.get("front_check"))
+    conformance.append(front_row)
     export_fbx(obj, fbx, preset)
     report["export"] = {
         "fbx": fbx.name, "sha256": sha256(fbx), "bytes": fbx.stat().st_size,
@@ -1290,7 +1572,7 @@ def main():
         "texture_paths": "relative to the FBX (absolute checkout path is never written)",
         "um_fbx_v1_conformance": conformance,
         "um_fbx_v1_conforms": all(c["conforms"] for c in conformance),
-        "front_direction_deg_in_blend_ccw_from_plus_x": front_deg,
+        **front_fields,
     }
 
     previews = render_previews(obj, out / "preview", P["asset_name"])
@@ -1298,6 +1580,12 @@ def main():
 
     # round trip in an empty scene
     expected_tris = triangles(obj)
+    expected_per_material = None
+    if glow:
+        expected_per_material = {}
+        for p in obj.data.polygons:
+            key = obj.data.materials[p.material_index].name
+            expected_per_material[key] = expected_per_material.get(key, 0) + len(p.vertices) - 2
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.import_scene.fbx(filepath=str(fbx))
     rt = mesh_objects()
@@ -1316,6 +1604,14 @@ def main():
         "object_scale": [r(v) for v in rt_obj.scale] if rt_obj else None,
         "note": "Blender reads UnitScaleFactor 1.0 as cm and scales x0.01, so metres here = UE uu/100",
     }
+    if glow:
+        per = {}
+        for o in rt:
+            for p in o.data.polygons:
+                m = o.data.materials[p.material_index] if o.data.materials else None
+                per[m.name if m else None] = per.get(m.name if m else None, 0) + len(p.vertices) - 2
+        report["roundtrip"]["triangles_per_material"] = per
+        report["roundtrip"]["expected_triangles_per_material"] = expected_per_material
     rt_uu = [r(v * 100, 3) for v in rt_dims]
     exp_m = report["scale_pivot"]["dimensions_m"]
     report["roundtrip"]["expected_ue_dimensions_uu_at_import_scale_1"] = [r(exp_m[1] * 100, 3), r(exp_m[0] * 100, 3),
@@ -1324,7 +1620,14 @@ def main():
     checks = {
         "single_mesh": len(rt) == 1,
         "triangles_preserved": report["roundtrip"]["triangles"] == expected_tris,
-        "one_material_slot": report["roundtrip"]["material_slots"] == 1,
+    }
+    if glow:
+        checks["material_slots_equal_plan_2"] = report["roundtrip"]["material_slots"] == 2
+        checks["glow_slot_triangles_preserved"] = (glow["triangles_selected"] > 0 and
+                                                   report["roundtrip"]["triangles_per_material"] == expected_per_material)
+    else:
+        checks["one_material_slot"] = report["roundtrip"]["material_slots"] == 1
+    checks.update({
         "uv0_present": (report["roundtrip"]["uv_layers"] or 0) >= 1,
         "no_armature": not arm,
         "height_matches_target_1pct": abs(rt_dims.z - P["target_height_m"]) / P["target_height_m"] < 0.01,
@@ -1332,7 +1635,7 @@ def main():
         "centred_xy": abs((lo2.x + hi2.x) / 2) < 1e-4 and abs((lo2.y + hi2.y) / 2) < 1e-4,
         "source_unchanged": sha256(P["source_glb"]) == src_sha_before,
         "um_fbx_v1_conforms": report["export"]["um_fbx_v1_conforms"],
-    }
+    })
     if P.get("require_closed_manifold", True):
         checks["closed_manifold_consistent_winding"] = report["geometry"]["closed_manifold_consistent_after"]
     report["checks"] = checks

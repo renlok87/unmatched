@@ -1,0 +1,778 @@
+{
+  "schema": "unmatched.tripo-pipeline.static-prop-candidate/1",
+  "status": "measured",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  },
+  "blender_version": "5.2.2 LTS",
+  "script_sha256_lf": "b1e67b69c41abf19aa053f3d7126fa507f7d96ebfb1d144ca28b334623a28af6",
+  "params": {
+    "_purpose": "Params of tools/tripo-pipeline/blender/static_prop_candidate.py for the lantern candidate (from candidate-params.template.json, <task8> = 26bb832e). All numbers are proposals or measurement settings, not accepted values.",
+    "_target_height_m": "0.95 = inside both the 04 card range 90-110 uu (proposed) and the S05 gate 90-100 uu (AD-CNF-56, open)",
+    "_ao_distance_m": "0.04: barrel used 0.03 at 26 uu height; lantern detail (rivets, frame bars, roof edge) has a similar absolute size, so AO distance is not scaled with height",
+    "_geometry_repair": "tripo_cracks, decided after the first run failed require_closed_manifold (its numbers are in docs/art-pipeline/prop-lantern-report.json, blenderStage.firstRun): the Tripo mesh has 13 open + 1 non-manifold welded edges = three collinear T-junction cracks (z 0.603 at the hinge-side door bottom, z 0.762 on both side panes), one collinear zero-area triangle at a post corner (z 0.563; clean_mesh deletes it and leaves a T-junction crack) and a 5-face flipped sliver fin (~9.8 cm2 pre-scale) along the hinge-side door frame, attached by the non-manifold edge. Nothing is filled: fins are deleted, cracks welded, and the run fails if anything stays open",
+    "_front_check": "axis_extent: the lantern front is the door hardware (two hinges + latch), not one protrusion at mid height (there the square post corners win). In the band 0.62-0.76 of the height only the door hardware has vertices; measured before the run on the Tripo GLB: -Y 0.1216 m vs runner-up +X 0.0928 m (pre-scale), so a 0.01 m margin after scaling leaves room",
+    "_glow_slot": "Glass decision: second slot M_Decor_LanternGlow on the glass faces (as M_Decor_FacadeGlow of the facades), same BC/N/ORM; faces chosen by the blue-grey glass colour of the Tripo BC (B - R >= 15 on 8-bit encoded values, measured: glass 19-21, iron 5-9, bronze < 0) on >= 50 % of 28 barycentric samples. Emission here is a Blender preview (#FFC27A, 03 C-6 range, strength 3); the UE emissive colour/intensity is an MI parameter (deferred)",
+    "source_glb": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr.glb",
+    "out_dir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31",
+    "asset_name": "SM_Decor_Lantern",
+    "texture_prefix": "T_Decor_Lantern",
+    "material_name": "M_Decor_Lantern",
+    "target_height_m": 0.95,
+    "texture_size": 1024,
+    "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+    "bake_ao": true,
+    "ao_samples": 64,
+    "ao_distance_m": 0.04,
+    "geometry_repair": {
+      "method": "tripo_cracks",
+      "fin_max_faces": 8,
+      "fin_max_area_m2": 0.002,
+      "t_junction_tol_m": 1e-05
+    },
+    "require_closed_manifold": true,
+    "front_check": {
+      "method": "axis_extent",
+      "feature": "door hinges and latch",
+      "z_band_frac": [
+        0.62,
+        0.76
+      ],
+      "expected_axis": "-Y",
+      "min_margin_m": 0.01
+    },
+    "glow_slot": {
+      "material_name": "M_Decor_LanternGlow",
+      "select": {
+        "method": "bc_channel_difference",
+        "channel_a": "B",
+        "channel_b": "R",
+        "min_difference_8bit": 15,
+        "min_face_fraction": 0.5,
+        "grid": 6
+      },
+      "preview_emission_srgb_8bit": [
+        255,
+        194,
+        122
+      ],
+      "preview_emission_strength": 3.0
+    }
+  },
+  "source": {
+    "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr.glb",
+    "sha256": "085d062e3060699edaec25f4ee969dc296a0e99dbea2449fe15ca943715467bb",
+    "bytes": 13180092,
+    "gltf_generator": "Tripo"
+  },
+  "import": {
+    "mesh_objects": 1,
+    "triangles": 4486,
+    "materials": [
+      "tripo_node_03ed779d-3ca8-4ced-b078-b2c2287e118e_material"
+    ],
+    "images": [
+      {
+        "name": "decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr_basecolor.jpg",
+        "size": [
+          2048,
+          2048
+        ],
+        "colorspace": "sRGB"
+      },
+      {
+        "name": "decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr_normal.png",
+        "size": [
+          2048,
+          2048
+        ],
+        "colorspace": "Non-Color"
+      },
+      {
+        "name": "decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr_rm.png",
+        "size": [
+          2048,
+          2048
+        ],
+        "colorspace": "Non-Color"
+      }
+    ],
+    "bounds_min_m": [
+      -0.134956,
+      -0.13687,
+      0.0
+    ],
+    "bounds_max_m": [
+      0.134956,
+      0.13687,
+      0.978188
+    ],
+    "dimensions_m": [
+      0.269911,
+      0.27374,
+      0.978188
+    ]
+  },
+  "geometry": {
+    "before_cleanup": {
+      "vertices_as_stored": 2999,
+      "vertices_welded_1e-6m": 2247,
+      "faces": 4486,
+      "triangles": 4486,
+      "welded_boundary_edges": 13,
+      "welded_non_manifold_edges": 1,
+      "wire_edges": 0,
+      "loose_vertices": 0,
+      "degenerate_faces_area_lt_1e-12": 1,
+      "faces_with_inconsistent_winding": 5,
+      "connected_shells": 1,
+      "signed_volume_m3": 0.020603566,
+      "raw_vertex_count_before_weld": 2999
+    },
+    "removed": {
+      "loose_vertices": 0,
+      "wire_edges": 0,
+      "degenerate_faces": 1
+    },
+    "repair": {
+      "method": "tripo_cracks: weld 1e-6 m, delete flipped fins at non-manifold/open edges, weld T-junctions",
+      "vertices_stored_before": 2999,
+      "vertices_after_weld": 2247,
+      "triangles_before": 4485,
+      "fins_deleted": [
+        {
+          "faces": 5,
+          "area_m2_prescale": 0.00097734,
+          "bbox_m_prescale": [
+            [
+              -0.0743,
+              -0.0999,
+              0.5921
+            ],
+            [
+              -0.0616,
+              -0.0884,
+              0.7051
+            ]
+          ]
+        }
+      ],
+      "loose_vertices_deleted_after_fins": 0,
+      "t_junctions_welded": [
+        {
+          "vertex_m_prescale": [
+            -0.11007,
+            -0.0737,
+            0.76188
+          ],
+          "edge_param": 0.0471,
+          "distance_m": 0.0,
+          "faces_after_retriangulation": 2
+        },
+        {
+          "vertex_m_prescale": [
+            -0.05264,
+            -0.09093,
+            0.60299
+          ],
+          "edge_param": 0.5,
+          "distance_m": 0.0,
+          "faces_after_retriangulation": 2
+        },
+        {
+          "vertex_m_prescale": [
+            0.08901,
+            0.08901,
+            0.56279
+          ],
+          "edge_param": 0.5,
+          "distance_m": 0.0,
+          "faces_after_retriangulation": 2
+        },
+        {
+          "vertex_m_prescale": [
+            0.11007,
+            -0.07561,
+            0.76188
+          ],
+          "edge_param": 0.0353,
+          "distance_m": 0.0,
+          "faces_after_retriangulation": 2
+        }
+      ],
+      "open_edges_after": 0,
+      "non_manifold_edges_after": 0,
+      "degenerate_faces_after": 0,
+      "triangles_after": 4484,
+      "corner_normals_max_deviation_deg_after_rewrite": 0.407
+    },
+    "winding_faces_reversed": 0,
+    "winding_note": "no inconsistent faces",
+    "after_cleanup": {
+      "vertices_as_stored": 2244,
+      "vertices_welded_1e-6m": 2244,
+      "faces": 4484,
+      "triangles": 4484,
+      "welded_boundary_edges": 0,
+      "welded_non_manifold_edges": 0,
+      "wire_edges": 0,
+      "loose_vertices": 0,
+      "degenerate_faces_area_lt_1e-12": 0,
+      "faces_with_inconsistent_winding": 0,
+      "connected_shells": 1,
+      "signed_volume_m3": 0.020607259,
+      "raw_vertex_count_before_weld": 2244
+    },
+    "flagged_face_centres_m_prescale": [],
+    "open_or_non_manifold_edge_midpoints_m_prescale": [],
+    "corner_normals_before": {
+      "has_custom_normals": true,
+      "corners_pointing_into_surface": 125,
+      "corner_vs_face_normal_angle_deg_p50_p99_max": [
+        26.77,
+        85.65,
+        179.41
+      ]
+    },
+    "corner_normals_after": {
+      "has_custom_normals": true,
+      "corners_pointing_into_surface": 119,
+      "corner_vs_face_normal_angle_deg_p50_p99_max": [
+        26.72,
+        83.8,
+        179.41
+      ]
+    },
+    "closed_manifold_consistent_after": true
+  },
+  "orientation": {
+    "dimensions_before_scale_m": [
+      0.269911,
+      0.27374,
+      0.978188
+    ],
+    "z_is_tallest_axis": true
+  },
+  "scale_pivot": {
+    "uniform_scale_applied": 0.971183,
+    "target_height_m_proposed": 0.95,
+    "dimensions_m": [
+      0.262133,
+      0.265851,
+      0.95
+    ],
+    "bounds_min_m": [
+      -0.131067,
+      -0.132926,
+      0.0
+    ],
+    "bounds_max_m": [
+      0.131067,
+      0.132926,
+      0.95
+    ],
+    "pivot": "object origin = (0,0,0) = centre of bounding box footprint at base (min Z)",
+    "diameter_to_height_ratio": 0.2798
+  },
+  "textures": {
+    "source_images": {
+      "basecolor": "decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr_basecolor.jpg",
+      "metallic_roughness": "decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr_rm.png",
+      "normal": "decor-lantern-tripo-26bb832e-smartuv-tex2k-pbr_normal.png",
+      "occlusion": null,
+      "factors": {
+        "metallic": 1.0,
+        "roughness": 1.0,
+        "basecolor": [
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          1.0
+        ]
+      }
+    },
+    "source_size_px": 2048,
+    "target_size_px": 1024,
+    "downscale": "box 2x2 (BC in linear light)",
+    "outputs": {
+      "BC": {
+        "path": "T_Decor_Lantern_BC.png",
+        "colorspace": "sRGB",
+        "png_color_chunks": [
+          "cHRM",
+          "gAMA",
+          "sRGB"
+        ],
+        "sha256": "d9af703579d2d57b300ae07bc9adadb47a5ba6585d1370851c26d5bdbdab8c4d"
+      },
+      "N": {
+        "path": "T_Decor_Lantern_N.png",
+        "colorspace": "Linear (Non-Color)",
+        "convention": "DirectX (G flipped from glTF OpenGL)",
+        "png_color_chunks": [],
+        "note": "Linear is an import setting (UE: sRGB off); no sRGB/gAMA/cHRM/iCCP chunk in the file",
+        "sha256": "71974d00f1db98a71f7f1a118429926c733e87faf6df3640287a54bef6117c5b"
+      },
+      "ORM": {
+        "path": "T_Decor_Lantern_ORM.png",
+        "colorspace": "Linear (Non-Color)",
+        "channels": {
+          "R": "AO baked in Blender Cycles",
+          "G": "roughness from glTF metallicRoughness.G",
+          "B": "metallic from glTF metallicRoughness.B"
+        },
+        "png_color_chunks": [],
+        "note": "Linear is an import setting (UE: sRGB off); no sRGB/gAMA/cHRM/iCCP chunk in the file",
+        "sha256": "a504dddaa0feb2d38a27d96743a6ac05e7c8f426e7de49eca5d8f2ae26597bc6"
+      }
+    },
+    "ao_bake": {
+      "measured_on": "texels covered by UV islands",
+      "min": 0.0,
+      "p05": 0.594,
+      "p50": 0.953,
+      "mean": 0.897,
+      "texels_lt_0.05": 756,
+      "texels_lt_0.2": 2364,
+      "samples": 64,
+      "distance_m": 0.04
+    },
+    "normal_padding": {
+      "background_fraction_source": 0.128,
+      "dilated_px_at_source": 32,
+      "flat_filled_fraction_source": 0.0071
+    },
+    "channel_stats": {
+      "roughness_mean": 0.565,
+      "metallic_mean": 0.097,
+      "metallic_fraction_gt_0.5": 0.0306,
+      "normal_mean_rgb_dx": [
+        0.511,
+        0.499,
+        0.929
+      ]
+    },
+    "teamcolor": "not applicable: decor L3 is not team-owned (04 3.7); M_DioramaMaster TeamColor left at neutral in UE",
+    "base_color_factor_applied": {
+      "factor_rgb": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
+      ],
+      "space": "linear, before the box downscale",
+      "note": "glTF baseColorFactor multiplied into BC (as the CLI atlas stage does for the heroes)"
+    }
+  },
+  "glow_slot": {
+    "material_name": "M_Decor_LanternGlow",
+    "slot_index": 1,
+    "select": {
+      "method": "bc_channel_difference",
+      "channel_a": "B",
+      "channel_b": "R",
+      "min_difference_8bit": 15,
+      "min_face_fraction": 0.5,
+      "grid": 6
+    },
+    "faces_selected": 146,
+    "triangles_selected": 146,
+    "area_m2_selected": 0.091802,
+    "area_fraction_of_mesh": 0.13385,
+    "faces_by_sample_fraction": {
+      "ge_0.9_selected": 99,
+      "mixed_selected_[threshold,0.9)": 47,
+      "mixed_rejected_(0.1,threshold)": 54,
+      "le_0.1_rejected": 4284
+    },
+    "area_m2_mixed_faces_(0.1,0.9)": 0.013589,
+    "selected_faces_by_normal_axis_dot_gt_0.7": {
+      "+X": {
+        "faces": 26,
+        "area_m2": 0.022255
+      },
+      "-X": {
+        "faces": 22,
+        "area_m2": 0.020589
+      },
+      "+Y": {
+        "faces": 22,
+        "area_m2": 0.022623
+      },
+      "-Y": {
+        "faces": 38,
+        "area_m2": 0.020989
+      },
+      "+Z": {
+        "faces": 17,
+        "area_m2": 0.001533
+      },
+      "-Z": {
+        "faces": 29,
+        "area_m2": 0.005079
+      }
+    },
+    "preview_emission": {
+      "srgb_8bit": [
+        255,
+        194,
+        122
+      ],
+      "strength": 3.0,
+      "note": "Blender preview only; UE emissive colour/intensity is an MI parameter (not set here)"
+    }
+  },
+  "uv0": {
+    "uv_layers": [
+      "UVMap"
+    ],
+    "raster_size_px": 1024,
+    "islands": 61,
+    "triangles_out_of_0_1": 0,
+    "uv_bounds": [
+      0.00116,
+      0.00116,
+      0.998506,
+      0.994149
+    ],
+    "uv_area_used_fraction": 0.7695,
+    "raster_coverage_fraction": 0.7694,
+    "overlap_pixels_between_islands": 0,
+    "overlap_fraction_of_covered": 0.0,
+    "overlap_pixels_inside_islands_strict": 18,
+    "flipped_uv_triangles_vs_island_majority": 5,
+    "zero_area_uv_triangles": 0,
+    "texel_density_px_per_m_at_raster": 1084.7,
+    "stretch_area_ratio_p05_p50_p95": [
+      0.537,
+      1.0,
+      1.684
+    ],
+    "stretch_anisotropy_sigma_max_over_min_p50_p95_max": [
+      1.054,
+      1.572,
+      52192.482
+    ],
+    "stretch_sigma_max_norm_p95": 1.378,
+    "stretch_sigma_min_norm_p05": 0.588,
+    "min_gutter_px_estimate": 3,
+    "island_pairs_closer_than_4px": 38,
+    "note": "min_gutter_px_estimate / island_pairs_closer_than_4px: 4-neighbour growth at raster_size_px (odd/even estimate +-1 px). raster_metrics: Euclidean distance between centres of pixels of different islands (another metric, counts differ), plus strict in-island overlap from flipped UV triangles; at raster_size_px and 2x.",
+    "raster_metrics": [
+      {
+        "raster_size_px": 1024,
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 18,
+        "raster_coverage_fraction": 0.7694,
+        "min_island_centre_distance_px": 3.0,
+        "island_pairs_centre_distance_lt_4px": 10,
+        "island_pairs_centre_distance_lt_8px": 103,
+        "mip_where_min_distance_drops_below_1_texel": 2
+      },
+      {
+        "raster_size_px": 2048,
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 79,
+        "raster_coverage_fraction": 0.7695,
+        "min_island_centre_distance_px": 6.0,
+        "island_pairs_centre_distance_lt_4px": 0,
+        "island_pairs_centre_distance_lt_8px": 39,
+        "mip_where_min_distance_drops_below_1_texel": 3
+      }
+    ]
+  },
+  "material_slots": 2,
+  "material_names": [
+    "M_Decor_Lantern",
+    "M_Decor_LanternGlow"
+  ],
+  "export": {
+    "fbx": "SM_Decor_Lantern.fbx",
+    "sha256": "d72e5edf8949f43850488a8370271d1ee8d034446e8b17b05e95651ce7e70880",
+    "bytes": 169788,
+    "preset": "UM_FBX_v1.json",
+    "settings": {
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "export_space_rotation_z_degrees": 90.0,
+      "temporary_data_scale": 100.0,
+      "patch_fbx_unit_scale_to": 1.0,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "use_triangles": true,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "AUTO"
+    },
+    "exporter_kwargs": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bake_space_transform": false,
+      "embed_textures": false,
+      "mesh_smooth_type": "FACE",
+      "object_types": [
+        "ARMATURE",
+        "MESH"
+      ],
+      "path_mode": "AUTO",
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "use_custom_props": false,
+      "use_mesh_edges": false,
+      "use_selection": true,
+      "use_triangles": true
+    },
+    "textures_embedded": false,
+    "texture_paths": "relative to the FBX (absolute checkout path is never written)",
+    "um_fbx_v1_conformance": [
+      {
+        "setting": "Forward / Up (04 1.1)",
+        "standard": [
+          "-Y",
+          "Z"
+        ],
+        "used": [
+          "-Y",
+          "Z"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Apply Scalings (04 1.1)",
+        "standard": "FBX_SCALE_UNITS",
+        "used": "FBX_SCALE_UNITS",
+        "conforms": true
+      },
+      {
+        "setting": "Apply Unit (04 1.1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Apply Transform (04 1.1)",
+        "standard": false,
+        "used": false,
+        "conforms": true
+      },
+      {
+        "setting": "Triangulate Faces (04 1.1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Smoothing (04 1.1)",
+        "standard": "FACE",
+        "used": "FACE",
+        "conforms": true
+      },
+      {
+        "setting": "Object Types (04 1.1)",
+        "standard": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "used": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Loose Edges / Custom Properties (04 1.1)",
+        "standard": [
+          false,
+          false
+        ],
+        "used": [
+          false,
+          false
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Leaf bones / bone axes (04 1.1, preset)",
+        "standard": [
+          false,
+          "Y",
+          "X"
+        ],
+        "used": [
+          false,
+          "Y",
+          "X"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Bake Animation (04 1.1: skeletal clips only)",
+        "standard": false,
+        "used": false,
+        "conforms": true
+      },
+      {
+        "setting": "Path Mode, textures not embedded (04 1.1)",
+        "standard": [
+          "AUTO",
+          false
+        ],
+        "used": [
+          "AUTO",
+          false
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+        "standard": [
+          90.0,
+          100.0,
+          1.0
+        ],
+        "used": [
+          90.0,
+          100.0,
+          1.0
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+        "standard": [
+          "METRIC",
+          1.0
+        ],
+        "used": [
+          "METRIC",
+          1.0
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Transforms applied: object matrix identity (04 1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Pivot: base centre, min Z = 0 (04 1, decor: centre of base)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Front (door hinges and latch) along -Y in .blend (04 1: face -Y -> +X in UE)",
+        "standard": "-Y",
+        "used": "-Y",
+        "conforms": true,
+        "measured": {
+          "method": "axis_extent",
+          "z_band_frac": [
+            0.62,
+            0.76
+          ],
+          "vertices_in_band": 195,
+          "extents_m_from_footprint_centre": {
+            "+X": 0.09017,
+            "-X": 0.08831,
+            "+Y": -0.08645,
+            "-Y": 0.11805
+          },
+          "largest_axis": "-Y",
+          "runner_up_axis": "+X",
+          "margin_m": 0.02789,
+          "min_margin_m": 0.01
+        }
+      }
+    ],
+    "um_fbx_v1_conforms": true,
+    "front_check": {
+      "method": "axis_extent",
+      "z_band_frac": [
+        0.62,
+        0.76
+      ],
+      "vertices_in_band": 195,
+      "extents_m_from_footprint_centre": {
+        "+X": 0.09017,
+        "-X": 0.08831,
+        "+Y": -0.08645,
+        "-Y": 0.11805
+      },
+      "largest_axis": "-Y",
+      "runner_up_axis": "+X",
+      "margin_m": 0.02789,
+      "min_margin_m": 0.01
+    }
+  },
+  "previews": {
+    "front": "SM_Decor_Lantern_front.png",
+    "side": "SM_Decor_Lantern_side.png",
+    "game-3q-55deg": "SM_Decor_Lantern_game-3q-55deg.png",
+    "top": "SM_Decor_Lantern_top.png"
+  },
+  "roundtrip": {
+    "mesh_objects": 1,
+    "object_names": [
+      "SM_Decor_Lantern"
+    ],
+    "triangles": 4484,
+    "expected_triangles": 4484,
+    "material_slots": 2,
+    "uv_layers": 1,
+    "armatures": 0,
+    "dimensions_blender_m": [
+      0.265851,
+      0.262133,
+      0.95
+    ],
+    "bounds_min_blender_m": [
+      -0.132926,
+      -0.131067,
+      0.0
+    ],
+    "object_scale": [
+      0.01,
+      0.01,
+      0.01
+    ],
+    "note": "Blender reads UnitScaleFactor 1.0 as cm and scales x0.01, so metres here = UE uu/100",
+    "triangles_per_material": {
+      "M_Decor_Lantern": 4338,
+      "M_Decor_LanternGlow": 146
+    },
+    "expected_triangles_per_material": {
+      "M_Decor_Lantern": 4338,
+      "M_Decor_LanternGlow": 146
+    },
+    "expected_ue_dimensions_uu_at_import_scale_1": [
+      26.585,
+      26.213,
+      95.0
+    ],
+    "dimensions_uu": [
+      26.585,
+      26.213,
+      95.0
+    ]
+  },
+  "checks": {
+    "single_mesh": true,
+    "triangles_preserved": true,
+    "material_slots_equal_plan_2": true,
+    "glow_slot_triangles_preserved": true,
+    "uv0_present": true,
+    "no_armature": true,
+    "height_matches_target_1pct": true,
+    "base_at_zero": true,
+    "centred_xy": true,
+    "source_unchanged": true,
+    "um_fbx_v1_conforms": true,
+    "closed_manifold_consistent_winding": true
+  },
+  "checks_passed": true
+}
