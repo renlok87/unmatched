@@ -1,0 +1,70 @@
+{
+  "schema": "unmatched.t53-icon-presence/1",
+  "frames": [
+    {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-193642/joiner/s09-combat-defense-open.png",
+      "icon": "traced",
+      "guard": {
+        "ncc": 0.9968,
+        "iou": 0.9795,
+        "min_ncc": 0.9,
+        "min_iou": 0.6,
+        "max_drgb": 16,
+        "present": true
+      }
+    },
+    {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-193642/joiner/s09-combat-resolve-revealed.png",
+      "icon": "traced",
+      "guard": {
+        "ncc": 0.9968,
+        "iou": 0.9795,
+        "min_ncc": 0.9,
+        "min_iou": 0.6,
+        "max_drgb": 16,
+        "present": true
+      }
+    },
+    {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-193642/joiner/s09-combat-resolve-window.png",
+      "icon": "traced",
+      "guard": {
+        "ncc": 0.9968,
+        "iou": 0.9795,
+        "min_ncc": 0.9,
+        "min_iou": 0.6,
+        "max_drgb": 16,
+        "present": true
+      }
+    },
+    {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-193642/joiner/s09-combat-result.png",
+      "icon": "none (late: hidden)"
+    },
+    {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-193642/joiner/s09-damage-combat.png",
+      "icon": "none (late: hidden)"
+    },
+    {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-193642/joiner/s09-damage-number.png",
+      "icon": "traced",
+      "guard": {
+        "ncc": 0.9968,
+        "iou": 0.9795,
+        "min_ncc": 0.9,
+        "min_iou": 0.6,
+        "max_drgb": 16,
+        "present": true
+      }
+    },
+    {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-193642/host/s09-combat-result.png",
+      "icon": "none (late: hidden)"
+    },
+    {
+      "frame": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/k3/t-rex-paddock-7x5/combat-20260929-193642/host/s09-damage-combat.png",
+      "icon": "none (late: hidden)"
+    }
+  ],
+  "rule": "присутствие иконки в пикселях: NCC(кроп painted-bbox, текстура жетона) по форме жетона ≥ 0,9 И IoU(пиксели, совпавшие с текстурой в пределах max|ΔRGB| ≤ 16, форма жетона) ≥ 0,6; иначе «нет данных», не «pass»"
+}

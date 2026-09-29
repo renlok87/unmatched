@@ -96,9 +96,29 @@ def parse_shot_widget(line):
     return dict(w.split("=", 1) for w in m.group(1).split() if "=" in w)
 
 
+# Словарь арт-слоя HUD (W4-C плашка/иконка, W5b-R тег/число урона): в 02 для них UI-ID нет — предложенный diff
+# docs/art-pipeline/proposals/w5br-hud-tag-damage-02.diff.md (UI-HUD-TAG / UI-HUD-DAMAGE); до решения автора
+# клиент пишет эти id.
+ART_HUD_IDS = {"plate", "plate.marker", "plate.name", "plate.team", "plate.hpbar", "plate.hpfill", "plate.hp",
+               "plate.status", "plate.teamshape", "icon", "board.tag", "board.tag.name", "board.tag.hp",
+               "board.tag.bar", "board.tag.chip", "board.damage", "board.damage.text"}
+
+
+def parse_bbox(value):
+    """'x,y,w,h' (формат HUD-RULES П4) или '(x0,y0,x1,y1)' (строки арт-слоя) -> (x, y, w, h)."""
+    v = value.strip()
+    if v.startswith("(") and v.endswith(")"):
+        x0, y0, x1, y1 = (float(t) for t in v[1:-1].split(","))
+        return x0, y0, x1 - x0, y1 - y0
+    x, y, w, h = (float(t) for t in v.split(","))
+    return x, y, w, h
+
+
 def check_widget_trace(lines, known_ids, width=1920, height=1080):
-    """Правило 3: гейт по трассе геометрии виджета, не по пикселям."""
+    """Правило 3: гейт по трассе геометрии виджета, не по пикселям. Невидимая часть (visible=0, например
+    сравнительный Slate-двойник или скрытая иконка в поздней строке W5b-R) может быть unpainted."""
     errors, seen = [], 0
+    ids = set(known_ids) | ART_HUD_IDS
     for n, line in enumerate(lines, 1):
         f = parse_shot_widget(line)
         if f is None:
@@ -107,12 +127,14 @@ def check_widget_trace(lines, known_ids, width=1920, height=1080):
         for k in ("id", "state", "bbox", "geom", "visible"):
             if k not in f:
                 errors.append("строка %d: нет поля %s" % (n, k))
-        if "id" in f and f["id"] not in known_ids:
+        if "id" in f and f["id"] not in ids:
             errors.append("строка %d: неизвестный UI-ID %s" % (n, f["id"]))
+        if f.get("visible") == "0":
+            continue
         if f.get("geom") != "painted":
             errors.append("строка %d: geom=%s (нужна нарисованная геометрия)" % (n, f.get("geom")))
         try:
-            x, y, w, h = (float(v) for v in f.get("bbox", "").split(","))
+            x, y, w, h = parse_bbox(f.get("bbox", ""))
             if w <= 0 or h <= 0 or x < 0 or y < 0 or x + w > width + 0.5 or y + h > height + 0.5:
                 errors.append("строка %d: bbox %s вне кадра %dx%d" % (n, f["bbox"], width, height))
         except ValueError:

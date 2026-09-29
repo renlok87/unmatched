@@ -63,6 +63,8 @@ public:
   FVector2D GetPlateSizeSu() const { return Style.SizeSu; }
   /** "code-default" when the tree came from BuildDefaultTree at runtime. */
   bool UsesCodeDefaultTree() const { return bCodeDefaultTree; }
+  /** W5b-R: exact-size team shape textures (T_UI_TeamShape_Circle_12 / _Hex_12); tinted by the chip colour. */
+  void SetTeamShapeBrushes(const FSlateBrush& Circle, const FSlateBrush& Hex);
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD")
   FS08ArtHudPlateStyle Style;
@@ -77,6 +79,9 @@ public:
   TObjectPtr<UBorder> TeamChip;
   UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
   TObjectPtr<UTextBlock> TeamText;
+  /** W5b-R D-3: team shape chip (circle P1 / hexagon P2) in the on-screen team colour. */
+  UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
+  TObjectPtr<UImage> TeamShape;
   UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
   TObjectPtr<USizeBox> HpBar;
   UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
@@ -97,8 +102,117 @@ private:
   void ApplyDynamic();
   bool bCodeDefaultTree = false;
   bool bOwn = true;
+  uint8 TeamSlot = 0;
   float HpFraction = 1.0f;
+  FSlateBrush ShapeBrushes[2];
+  bool bShapeBrushes = false;
 };
+
+/** W5b-R D-1: tag mode of a fighter's screen tag. */
+enum class ES08TagMode : uint8 { Full, Compact, Hidden };
+inline const TCHAR* S08TagModeName(ES08TagMode Mode) {
+  return Mode == ES08TagMode::Full ? TEXT("full") : Mode == ES08TagMode::Compact ? TEXT("compact") : TEXT("hidden");
+}
+
+/** Everything a tag shows (already localized; the controller pushes it on change). */
+struct FS08TagTexts {
+  FText Name;
+  FText Hp;
+  float HpFraction = 0.0f;
+  uint8 TeamSlot = 0;  // look slot: 0 = P1 circle, 1 = P2 hexagon
+  ES08TagMode Mode = ES08TagMode::Compact;
+};
+
+/** W5b-R D-1 (proposal UI-HUD-TAG): screen tag of a fighter - team chip, name (full mode), HP mini bar + HP text on an
+ *  opaque background. Replaces the world TextRender labels on the art board. */
+UCLASS(Blueprintable, BlueprintType)
+class UNMATCHED_API US08ArtTagWidget : public UUserWidget {
+  GENERATED_BODY()
+
+public:
+  static const TCHAR* const WidgetBlueprintPath;  // /Game/S08/UI/ArtHud/WBP_S08ArtTag
+
+  virtual bool Initialize() override;
+  static bool BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget Attach, FString* OutError = nullptr);
+  void ApplyStyle();
+  void ApplyModel(const FS08TagTexts& Texts);
+  void SetTeamShapeBrushes(const FSlateBrush& Circle, const FSlateBrush& Hex);
+  bool HasAllParts(FString* OutMissing = nullptr) const;
+  void CollectParts(TArray<FS08WidgetPart>& Out) const;
+  bool UsesCodeDefaultTree() const { return bCodeDefaultTree; }
+  int32 NameFontSize() const { return Style.NameFont.Size; }
+  int32 HpFontSize() const { return Style.HpFont.Size; }
+
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD")
+  FS08ArtHudTagStyle Style;
+
+  UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
+  TObjectPtr<UBorder> TagBackground;
+  UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
+  TObjectPtr<USizeBox> ChipBox;
+  UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
+  TObjectPtr<UImage> TeamShape;
+  UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
+  TObjectPtr<UTextBlock> NameText;
+  UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
+  TObjectPtr<USizeBox> HpBar;
+  UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
+  TObjectPtr<UImage> HpBack;
+  UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
+  TObjectPtr<USizeBox> HpFill;
+  UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
+  TObjectPtr<UImage> HpFillImage;
+  UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
+  TObjectPtr<UTextBlock> HpText;
+
+protected:
+  virtual void NativePreConstruct() override;
+
+private:
+  void ApplyDynamic();
+  bool bCodeDefaultTree = false;
+  uint8 TeamSlot = 0;
+  float HpFraction = 1.0f;
+  ES08TagMode Mode = ES08TagMode::Compact;
+  FSlateBrush ShapeBrushes[2];
+  bool bShapeBrushes = false;
+};
+
+/** W5b-R D-1 (proposal UI-HUD-DAMAGE): the "-N" damage number capsule. */
+UCLASS(Blueprintable, BlueprintType)
+class UNMATCHED_API US08ArtDamageWidget : public UUserWidget {
+  GENERATED_BODY()
+
+public:
+  static const TCHAR* const WidgetBlueprintPath;  // /Game/S08/UI/ArtHud/WBP_S08ArtDamage
+
+  virtual bool Initialize() override;
+  static bool BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget Attach, FString* OutError = nullptr);
+  void ApplyStyle();
+  void ApplyAmount(const FText& Text);
+  bool HasAllParts(FString* OutMissing = nullptr) const;
+  void CollectParts(TArray<FS08WidgetPart>& Out) const;
+  bool UsesCodeDefaultTree() const { return bCodeDefaultTree; }
+  int32 FontSize() const { return Style.Font.Size; }
+
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD")
+  FS08ArtHudDamageStyle Style;
+
+  UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
+  TObjectPtr<UBorder> DamageBackground;
+  UPROPERTY(BlueprintReadOnly, Category = "S08 Art HUD", meta = (BindWidget))
+  TObjectPtr<UTextBlock> DamageText;
+
+protected:
+  virtual void NativePreConstruct() override;
+
+private:
+  bool bCodeDefaultTree = false;
+};
+
+/** Desired size of a widget in slate units at layout scale 1 (SlatePrepass(1) on its Slate widget - also while it is
+ *  collapsed, so the layout can size a tag before it is shown). */
+UNMATCHED_API FVector2D S08ArtHudPrepassSize(UWidget& Widget);
 
 /** Exact-size combat icon (24/32/48 px texture, no mips). */
 UCLASS(Blueprintable, BlueprintType)

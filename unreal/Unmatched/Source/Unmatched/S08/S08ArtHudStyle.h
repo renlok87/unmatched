@@ -57,10 +57,13 @@ struct UNMATCHED_API FS08ArtHudPlateStyle {
   FColor Background = FColor(22, 26, 40, 255);
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Colors")
   FColor NameText = FColor(242, 236, 222, 255);
+  /** W5b-R D-2/D-3: the team chip = the team shape (circle P1 / hexagon P2) in the ON-SCREEN colour of the team
+   *  ring fill (hud-style-tokens team.p1.screen / team.p2.screen), drawn on the plate background; YOURS/ENEMY text
+   *  carries own/enemy. Replaces the T2.2 own/enemy chip box (OwnChip / EnemyChip). */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Colors")
-  FColor OwnChip = FColor(70, 120, 200, 255);
+  FColor TeamChipP1 = FColor(218, 197, 118, 255);
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Colors")
-  FColor EnemyChip = FColor(200, 70, 60, 255);
+  FColor TeamChipP2 = FColor(87, 134, 168, 255);
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Colors")
   FColor HpBack = FColor(70, 30, 30, 255);
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Colors")
@@ -75,6 +78,9 @@ struct UNMATCHED_API FS08ArtHudPlateStyle {
   /** Full HP bar width in su; the fill is width * health / maxHealth (>= 1 su). */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Size", meta = (ClampMin = "8"))
   float HpBarWidthSu = 96.0f;
+  /** Team shape chip (exact-size 12 px texture, hud-style-tokens icon.team_shape). */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Size", meta = (ClampMin = "4"))
+  float TeamShapeSu = 12.0f;
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Fonts")
   FS08ArtHudFontToken NameFont = FS08ArtHudFontToken(TEXT("Bold"), 12);
@@ -87,7 +93,54 @@ struct UNMATCHED_API FS08ArtHudPlateStyle {
 
   /** The pixel-gate conversion (sRGB bytes -> linear). */
   static FLinearColor Linear(const FColor& Srgb) { return FLinearColor(Srgb); }
-  FLinearColor ChipColor(bool bOwn) const { return Linear(bOwn ? OwnChip : EnemyChip); }
+  /** Team chip colour by the team LOOK slot (0 = P1, 1 = P2). */
+  FLinearColor TeamChipColor(uint8 Slot) const { return Linear(Slot == 0 ? TeamChipP1 : TeamChipP2); }
+};
+
+/** W5b-R D-1: screen tag of a fighter (UI-HUD-TAG proposal): team chip, name (full mode), HP mini bar + "7/7". */
+USTRUCT(BlueprintType)
+struct UNMATCHED_API FS08ArtHudTagStyle {
+  GENERATED_BODY()
+
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Colors")
+  FColor Background = FColor(22, 26, 40, 255);  // tag.background #161A28
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Colors")
+  FColor Text = FColor(242, 236, 222, 255);  // tag.text #F2ECDE (14.7:1 on the background)
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Colors")
+  FColor HpBack = FColor(70, 30, 30, 255);
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Colors")
+  FColor HpFill = FColor(80, 190, 100, 255);
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Fonts")
+  FS08ArtHudFontToken NameFont = FS08ArtHudFontToken(TEXT("Bold"), 12);
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Fonts")
+  FS08ArtHudFontToken HpFont = FS08ArtHudFontToken(TEXT("Bold"), 11);
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Size")
+  FMargin Padding = FMargin(4.0f, 2.0f);
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Size")
+  float ChipSu = 12.0f;
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Size")
+  float GapSu = 3.0f;
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Size")
+  float BarWidthSu = 34.0f;
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Size")
+  float BarHeightSu = 5.0f;
+};
+
+/** W5b-R D-1: the damage number capsule (UI-HUD-DAMAGE proposal). */
+USTRUCT(BlueprintType)
+struct UNMATCHED_API FS08ArtHudDamageStyle {
+  GENERATED_BODY()
+
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Colors")
+  FColor Background = FColor(22, 26, 40, 255);
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Colors")
+  FColor Text = FColor(255, 224, 175, 255);  // damage.text #FFE0AF (13.6:1 on the capsule)
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Fonts")
+  FS08ArtHudFontToken Font = FS08ArtHudFontToken(TEXT("Bold"), 18);
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Size")
+  FMargin Padding = FMargin(8.0f, 0.0f);
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Size")
+  float CornerRadiusSu = 12.0f;
 };
 
 /** Layout defaults of the code default tree (UMG) and of the Slate path. In a
@@ -113,5 +166,14 @@ inline const TCHAR* const PlateHpBar = TEXT("plate.hpbar");
 inline const TCHAR* const PlateHpFill = TEXT("plate.hpfill");
 inline const TCHAR* const PlateHp = TEXT("plate.hp");
 inline const TCHAR* const PlateStatus = TEXT("plate.status");
+inline const TCHAR* const PlateTeamShape = TEXT("plate.teamshape");
 inline const TCHAR* const Icon = TEXT("icon");
+// W5b-R D-1 (proposed UI-HUD-TAG / UI-HUD-DAMAGE, docs/art-pipeline/proposals/w5br-hud-tag-damage-02.diff.md)
+inline const TCHAR* const Tag = TEXT("board.tag");
+inline const TCHAR* const TagName = TEXT("board.tag.name");
+inline const TCHAR* const TagHp = TEXT("board.tag.hp");
+inline const TCHAR* const TagBar = TEXT("board.tag.bar");
+inline const TCHAR* const TagChip = TEXT("board.tag.chip");
+inline const TCHAR* const Damage = TEXT("board.damage");
+inline const TCHAR* const DamageText = TEXT("board.damage.text");
 }  // namespace S08ArtHudIds

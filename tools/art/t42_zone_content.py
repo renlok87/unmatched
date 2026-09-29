@@ -56,6 +56,10 @@ IRON = "/Game/ArtTests/ART005H/Materials/M_ART005H_IronCorner_Review"
 COLOR_PARAM = "LayerColor"
 SCHEMA = "unmatched.t42-zone-content/1"
 MARK_DEPTH = 0.004  # S08BoardArt.cpp MarkDepth (cube scale z); the pivot sits at MarkZ, so pieces are centred on z 0
+# W5b-R (D-4): dark keyline under every zone glyph and stroke (S08BoardArt.cpp KeylineGrowUU / KeylineDepth)
+KEYLINE_GROW_UU = 1.5
+KEYLINE_DEPTH = 0.003
+KEYLINE_MI = FOLDER + "/MI_ART005_Zone_Keyline"
 
 # S08GlyphPieces (S08BoardArt.cpp): (yaw deg, offset x, offset y, scale x, scale y) per engine-cube piece, relative to
 # the glyph slot centre. Keep in step with the C++; Unmatched.S08.BoardArt.GlyphMeshes compares the imported bounds.
@@ -87,6 +91,10 @@ def mi_package(key: str | None) -> str:
 
 def glyph_package(glyph: str) -> str:
     return f"{FOLDER}/SM_ART005_ZoneGlyph_{GLYPH_ASSET[glyph]}"
+
+
+def keyline_package(glyph: str) -> str:
+    return f"{FOLDER}/SM_ART005_ZoneGlyphKey_{GLYPH_ASSET[glyph]}"
 
 
 def obj_path(package: str) -> str:
@@ -136,11 +144,12 @@ def plan(profiles: dict) -> dict:
             "glyphMeshes": glyphs, "ismUsageFix": [IRON]}
 
 
-def piece_corners(yaw: float, ox: float, oy: float, sx: float, sy: float) -> list[tuple[float, float, float]]:
+def piece_corners(yaw: float, ox: float, oy: float, sx: float, sy: float,
+                  depth: float = MARK_DEPTH) -> list[tuple[float, float, float]]:
     """Corners of one engine cube (100 uu, centred) scaled then yawed (FRotator yaw: X toward +Y) then offset -
     UE space, pivot = glyph slot centre at the mark height."""
     c, s = math.cos(math.radians(yaw)), math.sin(math.radians(yaw))
-    hx, hy, hz = 50.0 * sx, 50.0 * sy, 50.0 * MARK_DEPTH
+    hx, hy, hz = 50.0 * sx, 50.0 * sy, 50.0 * depth
     out = []
     for dz in (-hz, hz):
         for dy in (-hy, hy):
@@ -149,8 +158,18 @@ def piece_corners(yaw: float, ox: float, oy: float, sx: float, sy: float) -> lis
     return out
 
 
-def glyph_bounds(glyph: str) -> dict:
-    pts = [p for piece in GLYPH_PIECES[glyph] for p in piece_corners(*piece)]
+def keyline_pieces(glyph: str) -> list[tuple]:
+    """W5b-R (D-4): the dark keyline under a zone glyph - every cube piece grown by KEYLINE_GROW_UU on each side
+    (scale + 2 x grow / 100), same yaw and offset; depth KEYLINE_DEPTH (the glyph fill is MARK_DEPTH deep around the
+    same pivot, so the keyline top sits 0.05 uu under the glyph fill top). Keep in step with S08GlyphKeylinePieces."""
+    g = 2.0 * KEYLINE_GROW_UU / 100.0
+    return [(yaw, ox, oy, sx + g, sy + g) for (yaw, ox, oy, sx, sy) in GLYPH_PIECES[glyph]]
+
+
+def glyph_bounds(glyph: str, keyline: bool = False) -> dict:
+    pieces = keyline_pieces(glyph) if keyline else GLYPH_PIECES[glyph]
+    depth = KEYLINE_DEPTH if keyline else MARK_DEPTH
+    pts = [p for piece in pieces for p in piece_corners(*piece, depth=depth)]
     return {"min": [round(min(p[i] for p in pts), 4) for i in range(3)],
             "max": [round(max(p[i] for p in pts), 4) for i in range(3)]}
 
@@ -159,16 +178,18 @@ FACES = [(0, 2, 3, 1), (4, 5, 7, 6), (0, 1, 5, 4), (2, 6, 7, 3), (0, 4, 6, 2), (
 UV_QUAD = [(0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0)]
 
 
-def glyph_obj(glyph: str) -> str:
+def glyph_obj(glyph: str, keyline: bool = False) -> str:
     """OBJ text: per piece 8 corners mapped UE (x, y, z) -> OBJ (x, -y, z) (the importer mirrors Y back), 6 quads with
     outward right-handed winding in OBJ space, one flat normal and a unit-square UV each (v/vt/vn). UE 5.8 reads the
     OBJ through the FBX SDK (log category FBXImport)."""
-    lines = [f"# {glyph_package(glyph)} - S08GlyphPieces '{glyph}' merged (tools/art/t42_zone_content.py)",
-             f"o SM_ART005_ZoneGlyph_{GLYPH_ASSET[glyph]}", "s off", "usemtl ZoneGlyph"]
+    pkg = keyline_package(glyph) if keyline else glyph_package(glyph)
+    what = "keyline (pieces +%.1f uu)" % KEYLINE_GROW_UU if keyline else "merged"
+    lines = [f"# {pkg} - S08GlyphPieces '{glyph}' {what} (tools/art/t42_zone_content.py)",
+             f"o {pkg.rsplit('/', 1)[1]}", "s off", "usemtl ZoneGlyph"]
     verts, normals, faces = [], [], []
-    for piece in GLYPH_PIECES[glyph]:
+    for piece in (keyline_pieces(glyph) if keyline else GLYPH_PIECES[glyph]):
         base = len(verts)
-        corners = [(x, -y, z) for (x, y, z) in piece_corners(*piece)]
+        corners = [(x, -y, z) for (x, y, z) in piece_corners(*piece, depth=KEYLINE_DEPTH if keyline else MARK_DEPTH)]
         verts += corners
         cx = sum(p[0] for p in corners) / 8.0
         cy = sum(p[1] for p in corners) / 8.0
@@ -405,6 +426,159 @@ def cmd_copy(a) -> int:
     return 0 if not bad else 1
 
 
+# ------------------------------------------------------------------ W5b-R keylines (decision D-4)
+def keyline_plan(profiles: dict) -> dict:
+    kl = profiles.get("zoneKeyline") or {}
+    hexc = kl.get("color", "#111317")
+    return {"materialInstance": {"package": kl.get("materialInstance", KEYLINE_MI), "hex": hexc,
+                                 "linear": hex_to_linear(hexc)},
+            "glyphMeshes": [{"glyph": g, "package": keyline_package(g), "pieces": len(GLYPH_PIECES[g]),
+                             "expectedBounds": glyph_bounds(g, keyline=True)} for g in GLYPH_PIECES],
+            "growUU": KEYLINE_GROW_UU, "depth": KEYLINE_DEPTH,
+            "recolor": [{"key": m["key"], "package": m["package"], "hex": m["hex"], "linear": m["linear"]}
+                        for m in plan(profiles)["materialInstances"]]}
+
+
+def cmd_keylines(a) -> int:
+    """Keyline content of D-4 through MCP (live editor): MI_ART005_Zone_Keyline, SM_ART005_ZoneGlyphKey_<Glyph> (the
+    glyph pieces grown by 1.5 uu, depth 0.3 uu, same pivot as the glyph meshes) and a re-colour of every zone MI whose
+    LayerColor differs from the profile (rev 4: gray #D2D7DC -> #7F868E). Only changed packages are saved."""
+    profiles = load_profiles(Path(a.profiles))
+    kp = keyline_plan(profiles)
+    obj_dir = Path(a.obj_dir)
+    obj_dir.mkdir(parents=True, exist_ok=True)
+    objs = {}
+    for g in GLYPH_PIECES:
+        pth = obj_dir / f"SM_ART005_ZoneGlyphKey_{GLYPH_ASSET[g]}.obj"
+        pth.write_bytes(glyph_obj(g, keyline=True).encode("ascii"))
+        objs[g] = {"file": pth.name, "sha256": sha256_file(pth)}
+    live = Live()
+    owned = ([kp["materialInstance"]["package"]] + [g["package"] for g in kp["glyphMeshes"]]
+             + [m["package"] for m in kp["recolor"]])
+    dirty = [pk for pk in owned if live.exists(pk) and live.dirty(pk)]
+    if dirty:
+        raise SystemExit(f"REFUSED: packages this script would save have unsaved editor changes: {dirty}")
+    rep = {"schema": SCHEMA + "+keylines", "tool": "tools/art/t42_zone_content.py keylines",
+           "startedUtc": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat(),
+           "editor": "live UnrealEditor of the main checkout via MCP 127.0.0.1:8123", "plan": kp, "obj": objs,
+           "currentLevel": live.call("scene", "get_current_level"), "actions": []}
+    mi = kp["materialInstance"]
+    if not live.exists(mi["package"]):
+        live.call("instance", "create", {"folder_path": FOLDER, "asset_name": mi["package"].rsplit("/", 1)[1],
+                                         "parent": ref(MASTER)})
+        rep["actions"].append({"createMI": mi["package"]})
+    live.call("instance", "set_vector_parameter", {"instance": ref(mi["package"]), "name": COLOR_PARAM,
+                                                   "value": dict(zip("rgba", mi["linear"]))})
+    for m in kp["recolor"]:
+        got = live.call("instance", "get_vector_parameter", {"instance": ref(m["package"]), "name": COLOR_PARAM})
+        vals = [got.get(k) for k in "rgba"] if isinstance(got, dict) else None
+        if vals and all(abs(float(x) - float(y)) <= 1e-5 for x, y in zip(vals, m["linear"])):
+            continue
+        live.call("instance", "set_vector_parameter", {"instance": ref(m["package"]), "name": COLOR_PARAM,
+                                                       "value": dict(zip("rgba", m["linear"]))})
+        rep["actions"].append({"recolor": m["package"], "from": got, "to": m["linear"], "hex": m["hex"]})
+    for g in kp["glyphMeshes"]:
+        pkg = g["package"]
+        name = pkg.rsplit("/", 1)[1]
+        if live.exists(pkg):
+            if not a.force:
+                rep["actions"].append({"keylineMesh": pkg, "imported": False, "reason": "exists (use --force)"})
+                continue
+            refs = live.call("asset", "get_referencers", {"asset_path": pkg}) or []
+            if refs:
+                raise SystemExit(f"REFUSED: {pkg} is referenced by {refs}")
+            live.call("asset", "delete", {"path": pkg})
+        src = (obj_dir / f"{name}.obj").resolve().as_posix()
+        res = live.call("static", "import_file", {"folder_path": FOLDER, "asset_name": name, "source_file": src,
+                                                  "import_materials": False, "import_textures": False,
+                                                  "combine_meshes": True})
+        mesh = ref(pkg)
+        live.call("static", "remove_collisions", {"mesh": mesh})
+        if live.call("static", "is_nanite_enabled", {"mesh": mesh}):
+            live.call("static", "set_nanite_enabled", {"mesh": mesh, "enabled": False})
+        slots = live.call("static", "get_material_slots", {"mesh": mesh})
+        for slot in slots or []:
+            live.call("static", "set_material", {"mesh": mesh, "slot_name": slot, "material": ref(mi["package"])})
+        rep["actions"].append({"keylineMesh": pkg, "imported": True, "source": src, "result": res, "slots": slots})
+    to_save = [pk for pk in owned if live.exists(pk) and live.dirty(pk)]
+    saved = live.call("asset", "save_assets", {"asset_paths": to_save}) if to_save else True
+    time.sleep(1.0)
+    rep["saved"] = {"packages": to_save, "result": saved, "dirtyAfter": {pk: live.dirty(pk) for pk in owned}}
+    rep["verify"] = verify_keylines(live, profiles, Path(a.content))
+    rep["finishedUtc"] = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
+    write_json(Path(a.report), rep)
+    ok = rep["verify"]["ok"] and not any(rep["saved"]["dirtyAfter"].values())
+    print(json.dumps({"ok": ok, "saved": to_save, "failures": rep["verify"]["failures"]}, ensure_ascii=False))
+    return 0 if ok else 1
+
+
+def verify_keylines(live: Live, profiles: dict, content_root: Path) -> dict:
+    kp = keyline_plan(profiles)
+    failures, assets = [], {}
+
+    def frow(pkg):
+        f = package_file(content_root, pkg)
+        return {"path": f.as_posix(), "sha256": sha256_file(f) if f.is_file() else None,
+                "bytes": f.stat().st_size if f.is_file() else None}
+    for m in [kp["materialInstance"]] + kp["recolor"]:
+        pkg = m["package"]
+        got = (live.call("instance", "get_vector_parameter", {"instance": ref(pkg), "name": COLOR_PARAM})
+               if live.exists(pkg) else None)
+        vals = [got.get(k) for k in "rgba"] if isinstance(got, dict) else None
+        if not vals or any(abs(float(x) - float(y)) > 1e-5 for x, y in zip(vals, m["linear"])):
+            failures.append(f"{pkg}: LayerColor {got} != {m['linear']} ({m['hex']})")
+        assets[pkg] = {"LayerColor": got, "hex": m["hex"], "file": frow(pkg)}
+    for g in kp["glyphMeshes"]:
+        pkg = g["package"]
+        row = {"exists": live.exists(pkg)}
+        if row["exists"]:
+            mesh = ref(pkg)
+            b = live.call("static", "get_bounds", {"mesh": mesh})
+            row.update({"bounds": b, "triangles": live.call("static", "get_triangle_count", {"mesh": mesh}),
+                        "nanite": live.call("static", "is_nanite_enabled", {"mesh": mesh}),
+                        "slots": live.call("static", "get_material_slots", {"mesh": mesh})})
+            exp = g["expectedBounds"]
+            got = [[b["min"][k] for k in "xyz"], [b["max"][k] for k in "xyz"]]
+            err = max(abs(got[i][j] - [exp["min"], exp["max"]][i][j]) for i in range(2) for j in range(3))
+            row["boundsMaxError"] = round(err, 5)
+            if err > 0.01:
+                failures.append(f"{pkg}: bounds {got} != expected {exp}")
+            if row["triangles"] != 12 * g["pieces"]:
+                failures.append(f"{pkg}: {row['triangles']} triangles != 12 x {g['pieces']}")
+            if row["nanite"]:
+                failures.append(f"{pkg}: Nanite enabled")
+        else:
+            failures.append(f"{pkg}: missing")
+        row["file"] = frow(pkg)
+        assets[pkg] = row
+    return {"ok": not failures, "failures": failures, "assets": assets}
+
+
+def cmd_keylines_copy(a) -> int:
+    """Copy the keyline packages of a keylines report (main Content -> art worktree Content), byte for byte."""
+    rep = json.loads(Path(a.report).read_text(encoding="utf-8"))
+    src_root, dst_root = Path(a.content), Path(a.to)
+    copied, bad = [], []
+    for pkg, row in sorted(rep["verify"]["assets"].items()):
+        src, dst = package_file(src_root, pkg), package_file(dst_root, pkg)
+        want = row["file"]["sha256"]
+        if not src.is_file() or sha256_file(src) != want:
+            bad.append(f"{pkg}: main Content changed since the report")
+            continue
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        before = sha256_file(dst) if dst.is_file() else None
+        shutil.copy2(src, dst)
+        got = sha256_file(dst)
+        copied.append({"package": pkg, "to": dst.as_posix(), "sha256": got, "before": before, "same": got == want})
+        if got != want:
+            bad.append(f"{pkg}: copy hash mismatch")
+    rep["copy"] = {"to": dst_root.as_posix(), "files": copied, "failures": bad,
+                   "atUtc": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()}
+    write_json(Path(a.report), rep)
+    print(json.dumps({"copied": len(copied), "failures": bad}, ensure_ascii=False))
+    return 0 if not bad else 1
+
+
 def cmd_plan(a) -> int:
     p = plan(load_profiles(Path(a.profiles)))
     if a.obj_dir:
@@ -416,7 +590,7 @@ def cmd_plan(a) -> int:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    for name in ("plan", "build", "verify", "copy"):
+    for name in ("plan", "build", "verify", "copy", "keylines", "keylines-copy"):
         s = sub.add_parser(name)
         s.add_argument("--profiles", default=str(PROFILES))
         s.add_argument("--content", default=str(MAIN_CONTENT), help="Content dir of the editor project (main checkout)")
@@ -424,12 +598,15 @@ def main(argv=None) -> int:
             s.add_argument("--report", required=True)
         if name in ("plan", "build"):
             s.add_argument("--obj-dir", default=None if name == "plan" else "C:/tmp/t42/glyph-obj")
-        if name == "build":
+        if name == "keylines":
+            s.add_argument("--obj-dir", default="C:/tmp/w5br/obj")
+        if name in ("build", "keylines"):
             s.add_argument("--force", action="store_true")
-        if name == "copy":
+        if name in ("copy", "keylines-copy"):
             s.add_argument("--to", required=True)
     a = ap.parse_args(argv)
-    return {"plan": cmd_plan, "build": cmd_build, "verify": cmd_verify, "copy": cmd_copy}[a.cmd](a)
+    return {"plan": cmd_plan, "build": cmd_build, "verify": cmd_verify, "copy": cmd_copy,
+            "keylines": cmd_keylines, "keylines-copy": cmd_keylines_copy}[a.cmd](a)
 
 
 if __name__ == "__main__":

@@ -255,6 +255,194 @@ def cmd_icons(a) -> int:
     return 0
 
 
+TOKEN_BODY = (22, 26, 40)      # hud-style-tokens icon.token.body = tag.background (#161A28)
+TOKEN_RIM = (242, 236, 222)    # icon.token.rim (#F2ECDE)
+TOKEN_OUTLINE = (17, 19, 23)   # mark.keyline (#111317): 1 px glyph outline
+TOKEN_MIN_REL_LUM = 0.16       # D-5: hilts lightened to Y >= 0.16 (>= 3:1 against the body Y 0.0107, p10 of the filtered glyph incl.)
+TEAM_SHAPE_DIR = REPO / "art" / "imagegen" / "mvp-v1" / "ui" / "team"
+
+
+def _rel_lum(lin):
+    return 0.2126 * lin[..., 0] + 0.7152 * lin[..., 1] + 0.0722 * lin[..., 2]
+
+
+def _srgb8_to_lin(c):
+    import numpy as np
+    c = np.asarray(c, dtype=np.float64) / 255.0
+    return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
+
+
+def _lin_to_srgb8(lin):
+    import numpy as np
+    lin = np.clip(lin, 0.0, 1.0)
+    s = np.where(lin <= 0.0031308, lin * 12.92, 1.055 * np.power(lin, 1 / 2.4) - 0.055)
+    return np.clip(np.round(s * 255.0), 0, 255).astype(np.uint8)
+
+
+def _wcag(y1, y2):
+    hi, lo = max(y1, y2), min(y1, y2)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+def _area_resize_premul(premul, size_xy):
+    """Linear-light area filter (PIL BOX on float channels) of a premultiplied RGBA float image."""
+    import numpy as np
+    from PIL import Image
+    chans = [np.asarray(Image.fromarray(premul[..., c].astype(np.float32), mode="F").resize(size_xy, Image.BOX),
+                        dtype=np.float64) for c in range(4)]
+    return np.stack(chans, axis=-1)
+
+
+def cmd_tokens(a) -> int:
+    """W5b-R decision D-5: the attack icon as an opaque TOKEN at 24/32/48 px - a dark rounded square (body #161A28,
+    radius N/4), a 1 px light rim (#F2ECDE), the ART-003 glyph fitted into N-4 px (linear-light area filter, same as
+    `icons`) with a 1 px dark outline (#111317) and the dark hilts lifted to relative luminance >= 0.16 in linear
+    light with the chromaticity kept (>= 3:1 against the body). Also writes the glyph mask (alpha = glyph coverage)
+    that qa010 `icon --mask-texture` reads (alpha >= 0.5 = glyph), and the team shape chips (D-3): 12x12 white
+    circle (P1) / pointy-left-right hexagon (P2) with anti-aliased alpha, tinted in the UI. Status: предложено (a
+    concept style, not artistically accepted; the source concept stays unchanged)."""
+    import numpy as np
+    from PIL import Image
+    src = Image.open(ICON_SOURCE).convert("RGBA")
+    arr = np.asarray(src, dtype=np.float64) / 255.0
+    ys, xs = np.where(arr[..., 3] > 0.05)
+    crop = arr[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+    lin = np.where(crop[..., :3] <= 0.04045, crop[..., :3] / 12.92, ((crop[..., :3] + 0.055) / 1.055) ** 2.4)
+    alpha = crop[..., 3:4]
+    premul = np.concatenate([lin * alpha, alpha], axis=2)
+    ICON_DIR.mkdir(parents=True, exist_ok=True)
+    SS = 8
+    manifest = {"schema": "unmatched.w5br-attack-token/1",
+                "status": "предложено (жетон иконки цели, решение советника D-5; художественно не принят)",
+                "source": rel(ICON_SOURCE), "sourceSha256": sha256_file(ICON_SOURCE),
+                "sourceGlyphBox": [int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1],
+                "colors": {"body": "#%02X%02X%02X" % TOKEN_BODY, "rim": "#%02X%02X%02X" % TOKEN_RIM,
+                           "outline": "#%02X%02X%02X" % TOKEN_OUTLINE},
+                "rule": {"shape": "rounded square N x N, corner radius N/4, coverage by 8x8 supersampling",
+                         "rimPx": 1, "glyphBoxPx": "N-4 (1 px rim + 1 px margin each side), aspect kept, centred",
+                         "glyphFilter": "linear light, premultiplied alpha, area average (PIL BOX)",
+                         "outline": "1 px: glyph alpha dilated 3x3 (max), painted #111317 under the glyph",
+                         "hilts": f"glyph pixels with relative luminance < {TOKEN_MIN_REL_LUM} scaled up in linear light "
+                                  "(all channels x k, k = Ymin / Y, capped so no channel exceeds 1) - hue kept",
+                         "maskTexture": "alpha = glyph coverage after the filter (qa010 icon --mask-texture ... "
+                                        "--mask-alpha 0.5); body = token shape minus glyph minus the outer 1 px rim"},
+                "outputs": []}
+    for size in (24, 32, 48):
+        n = size
+        # token shape coverage and rim coverage (supersampled distance to the rounded-square border)
+        g = (np.arange(n * SS) + 0.5) / SS
+        X, Y = np.meshgrid(g, g)
+        r = n / 4.0
+        cx = np.clip(X, r, n - r)
+        cy = np.clip(Y, r, n - r)
+        d_out = np.hypot(X - cx, Y - cy) - r  # <= 0 inside
+        inside = d_out <= 0
+        depth = np.minimum.reduce([X, Y, n - X, n - Y])  # distance to the square border
+        corner = (np.hypot(X - cx, Y - cy) > 0)
+        dist_in = np.where(corner, -d_out, depth)
+        rim = inside & (dist_in <= 1.0)
+
+        def pool(m):
+            return m.reshape(n, SS, n, SS).mean(axis=(1, 3))
+        cov_shape, cov_rim = pool(inside.astype(np.float64)), pool(rim.astype(np.float64))
+        # glyph fitted into n-4
+        box = n - 4
+        h0, w0 = crop.shape[:2]
+        scale = box / max(h0, w0)
+        gw, gh = max(1, round(w0 * scale)), max(1, round(h0 * scale))
+        small = _area_resize_premul(premul, (gw, gh))
+        ga = np.clip(small[..., 3], 0.0, 1.0)
+        glin = np.where(ga[..., None] > 1e-6, small[..., :3] / np.maximum(ga[..., None], 1e-6), 0.0)
+        glyph_a = np.zeros((n, n))
+        glyph_lin = np.zeros((n, n, 3))
+        ox, oy = (n - gw) // 2, (n - gh) // 2
+        glyph_a[oy:oy + gh, ox:ox + gw] = ga
+        glyph_lin[oy:oy + gh, ox:ox + gw] = glin
+        y_before = _rel_lum(glyph_lin)
+        lift = (glyph_a > 0.05) & (y_before < TOKEN_MIN_REL_LUM)
+        k = np.where(lift, TOKEN_MIN_REL_LUM / np.maximum(y_before, 1e-4), 1.0)
+        k = np.minimum(k, 1.0 / np.maximum(glyph_lin.max(axis=-1), 1e-4))
+        glyph_lin = np.clip(glyph_lin * k[..., None], 0.0, 1.0)
+        y_after = _rel_lum(glyph_lin)
+        # outline = glyph alpha dilated by 1 px
+        pad = np.pad(glyph_a, 1)
+        dil = np.max(np.stack([pad[1 + dy:1 + dy + n, 1 + dx:1 + dx + n] for dy in (-1, 0, 1) for dx in (-1, 0, 1)]),
+                     axis=0)
+        body, rimc, outl = _srgb8_to_lin(TOKEN_BODY), _srgb8_to_lin(TOKEN_RIM), _srgb8_to_lin(TOKEN_OUTLINE)
+        # layers (linear, over): body -> rim -> outline -> glyph, all within the token shape
+        rgb = np.broadcast_to(body, (n, n, 3)).copy()
+        rim_w = np.clip(cov_rim / np.maximum(cov_shape, 1e-6), 0.0, 1.0)[..., None]
+        rgb = rgb * (1 - rim_w) + rimc * rim_w
+        ow = np.clip(dil - glyph_a, 0.0, 1.0)[..., None]
+        rgb = rgb * (1 - ow) + outl * ow
+        rgb = rgb * (1 - glyph_a[..., None]) + glyph_lin * glyph_a[..., None]
+        out = np.concatenate([_lin_to_srgb8(rgb), np.clip(np.round(cov_shape * 255.0), 0, 255).astype(np.uint8)[..., None]],
+                             axis=2)
+        dst = ICON_DIR / f"ui-action-attack-token-{size}.png"
+        Image.fromarray(out, mode="RGBA").save(dst, optimize=False)
+        mask = np.zeros((n, n, 4), dtype=np.uint8)
+        mask[..., :3] = 255
+        mask[..., 3] = np.clip(np.round(glyph_a * 255.0), 0, 255).astype(np.uint8)
+        mdst = ICON_DIR / f"ui-action-attack-token-{size}-glyphmask.png"
+        Image.fromarray(mask, mode="RGBA").save(mdst, optimize=False)
+        # predicted contrasts on the texture itself (not a frame measurement)
+        final_lin = _srgb8_to_lin(out[..., :3])
+        yf = _rel_lum(final_lin)
+        gm = glyph_a >= 0.5
+        shape = cov_shape >= 0.5
+        ring1 = shape & ~np.pad(shape, 1)[2:, 1:-1] | shape & ~np.pad(shape, 1)[:-2, 1:-1] | \
+            shape & ~np.pad(shape, 1)[1:-1, 2:] | shape & ~np.pad(shape, 1)[1:-1, :-2]
+        bodym = shape & ~gm & ~ring1
+        yb = float(np.median(yf[bodym]))
+        manifest["outputs"].append({
+            "size": size, "path": rel(dst), "sha256": sha256_file(dst), "glyphMask": rel(mdst),
+            "glyphMaskSha256": sha256_file(mdst),
+            "ueAsset": f"/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_AttackToken_{size}",
+            "glyphBoxPx": [int(ox), int(oy), int(ox + gw), int(oy + gh)],
+            "glyphPixelsAlpha05": int(gm.sum()), "bodyPixels": int(bodym.sum()), "rimPixels": int(ring1.sum()),
+            "hiltsLifted": int(lift.sum()),
+            "glyphRelLumBefore": {"p10": round(float(np.percentile(y_before[glyph_a > 0.5], 10)), 4),
+                                  "median": round(float(np.median(y_before[glyph_a > 0.5])), 4)},
+            "glyphRelLumAfter": {"p10": round(float(np.percentile(y_after[glyph_a > 0.5], 10)), 4),
+                                 "median": round(float(np.median(y_after[glyph_a > 0.5])), 4)},
+            "predictedOnTexture": {
+                "glyphMedianVsBody": round(_wcag(float(np.median(yf[gm])), yb), 2),
+                "glyphP10VsBody": round(_wcag(float(np.percentile(yf[gm], 10)), yb), 2),
+                "rimVsBody": round(_wcag(float(np.median(yf[ring1])), yb), 2)}})
+        print(dst, manifest["outputs"][-1]["predictedOnTexture"])
+    write_json(ICON_DIR / "token-manifest.json", manifest)
+    # team shape chips (D-3)
+    TEAM_SHAPE_DIR.mkdir(parents=True, exist_ok=True)
+    shapes = {"schema": "unmatched.w5br-team-shapes/1",
+              "status": "предложено (значок команды ● P1 / ⬡ P2, решение советника D-3)", "outputs": []}
+    n = 12
+    g = (np.arange(n * SS) + 0.5) / SS
+    X, Y = np.meshgrid(g, g)
+    cxy = n / 2.0
+    for name in ("circle", "hex"):
+        if name == "circle":
+            m = np.hypot(X - cxy, Y - cxy) <= 5.5
+        else:
+            # pointy left/right (corners at 0/60/.../300 deg like SM_Marker_TeamRing_P2), circumradius 6
+            ang = np.arctan2(-(Y - cxy), X - cxy)
+            rr = np.hypot(X - cxy, Y - cxy)
+            a6 = np.mod(ang, np.pi / 3) - np.pi / 6
+            m = rr * np.cos(a6) <= 6.0 * np.cos(np.pi / 6)
+        cov = m.reshape(n, SS, n, SS).mean(axis=(1, 3))
+        img = np.zeros((n, n, 4), dtype=np.uint8)
+        img[..., :3] = 255
+        img[..., 3] = np.clip(np.round(cov * 255.0), 0, 255).astype(np.uint8)
+        dst = TEAM_SHAPE_DIR / f"team-shape-{name}-{n}.png"
+        Image.fromarray(img, mode="RGBA").save(dst, optimize=False)
+        shapes["outputs"].append({"shape": name, "team": "P1" if name == "circle" else "P2", "size": n,
+                                  "path": rel(dst), "sha256": sha256_file(dst),
+                                  "ueAsset": f"/Game/ArtTests/ARTMarkers/Textures/T_UI_TeamShape_{name.capitalize()}_{n}",
+                                  "coverageSum": round(float(cov.sum()), 2)})
+        print(dst)
+    write_json(TEAM_SHAPE_DIR / "team-shapes-manifest.json", shapes)
+    return 0
+
+
 def cmd_import_icons(a) -> int:
     out = Path(a.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -369,13 +557,14 @@ def main(argv=None) -> int:
     t.add_argument("--filter", default="Unmatched.S08.ArtHud")
     t.add_argument("--timeout", type=int, default=1500)
     sub.add_parser("icons")
+    sub.add_parser("tokens", help="W5b-R D-5 attack token 24/32/48 + glyph masks, D-3 team shape chips")
     i = sub.add_parser("import-icons")
     i.add_argument("--out", required=True)
     i.add_argument("--timeout", type=int, default=900)
     q = sub.add_parser("qa")
     q.add_argument("run_dir")
     a = ap.parse_args(argv)
-    return {"editor-build": cmd_editor_build, "tests": cmd_tests, "icons": cmd_icons,
+    return {"editor-build": cmd_editor_build, "tests": cmd_tests, "icons": cmd_icons, "tokens": cmd_tokens,
             "import-icons": cmd_import_icons, "qa": cmd_qa}[a.cmd](a)
 
 

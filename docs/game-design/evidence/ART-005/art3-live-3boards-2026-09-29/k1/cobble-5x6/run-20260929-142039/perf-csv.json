@@ -1,6 +1,6 @@
 {
   "schema": "unmatched.art004-perf-csv/1",
-  "status": "измерено",
+  "status": "измерено; ЗАГРЯЗНЕНО фоном H2 (headless Blender/Cycles параллельной линии героев) — не для ACC-022",
   "method": "UE CSV profiler (-csvCaptureFrames, -csvGpuStats); first 150 frames skipped as warm-up",
   "gpuBusyDefinition": "sum of the named GPU/<pass> times per frame (D3D11 timestamp queries), GPU/Unaccounted excluded; means are inflated by rare long passes when other processes preempt the GPU, p50 is the typical per-frame GPU cost",
   "gpuUnaccountedDefinition": "GPU/Unaccounted = BeginWork..EndWork time not covered by named passes (idle gaps and other processes' work on the shared GPU)",
@@ -146,5 +146,11 @@
       "effectiveFps": 29.92,
       "hitchesOver50ms": 3
     }
+  },
+  "errata": {
+    "date": "2026-09-29",
+    "ref": "эррата W5b-R (docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md §9; art3-live-3boards-2026-09-29.md §9.1)",
+    "previousStatus": "измерено",
+    "why": "метка фона H2 добавлена после съёмки: K1 и K3 T5.2 снимались при одном фоне (акт T5.2 §3), в K3 метка стояла с начала"
   }
 }

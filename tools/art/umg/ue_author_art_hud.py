@@ -29,11 +29,16 @@ ROOT = Path(__file__).resolve().parents[3]
 FOLDER = "/Game/S08/UI/ArtHud"
 CONTENT = ROOT / "unreal/Unmatched/Content/S08/UI/ArtHud"
 PARTS = {
-    "WBP_S08ArtPlate": ["PlateBackground", "Marker", "NameText", "TeamChip", "TeamText", "HpBar", "HpBack",
-                        "HpFill", "HpFillImage", "HpText", "StatusText"],
+    "WBP_S08ArtPlate": ["PlateBackground", "Marker", "NameText", "TeamChip", "TeamText", "TeamShape", "HpBar",
+                        "HpBack", "HpFill", "HpFillImage", "HpText", "StatusText"],
     "WBP_S08ArtIcon": ["Icon"],
+    # W5b-R D-1: the screen tag and the damage number
+    "WBP_S08ArtTag": ["TagBackground", "ChipBox", "TeamShape", "NameText", "HpBar", "HpBack", "HpFill", "HpFillImage",
+                      "HpText"],
+    "WBP_S08ArtDamage": ["DamageBackground", "DamageText"],
 }
-PARENTS = {"WBP_S08ArtPlate": "S08ArtPlateWidget", "WBP_S08ArtIcon": "S08ArtIconWidget"}
+PARENTS = {"WBP_S08ArtPlate": "S08ArtPlateWidget", "WBP_S08ArtIcon": "S08ArtIconWidget",
+           "WBP_S08ArtTag": "S08ArtTagWidget", "WBP_S08ArtDamage": "S08ArtDamageWidget"}
 
 
 def sha256(path: Path) -> str:

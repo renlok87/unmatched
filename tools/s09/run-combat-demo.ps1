@@ -33,10 +33,27 @@
   # Fail the run unless EVERY SHOT fingerprint of both clients is on the
   # reference (docs/art-pipeline/render-reference.json; K3 acceptance runs).
   [switch]$RequireRenderReference,
+  # W5b-R: require the pixel provenance line of every published frame (SHOT captured, t53-thresholds shotCaptured).
+  [switch]$RequireShotCaptured,
   # Opt-in per-client frame timing in the trace (PERF config/window/summary),
   # as run-phase2-demo -ClientPerf. Measurement only.
   [switch]$ClientPerf
 )
+
+# W5b-R (t53-thresholds.json shotCaptured): every published frame must carry its pixel provenance line
+# "SHOT captured file=<name> frame=<N> px=WxH sha256=<hex> order=BGRA saved=1" (UGameViewportClient::OnScreenshotCaptured;
+# the client writes the PNG itself) and the late SHOT block of the same file ("SHOT late begin file=<name> frame=<M>")
+# with |N - M| <= 1.
+function Assert-ShotCaptured([string]$TracePath, [string]$Name, [string]$Who) {
+  $cap = Select-String -LiteralPath $TracePath -Pattern ('SHOT captured file=' + [regex]::Escape($Name) + ' frame=(\d+) px=(\d+)x(\d+) sha256=([0-9a-f]{64}) order=BGRA saved=1') | Select-Object -Last 1
+  if (-not $cap) { throw "$Who trace has no 'SHOT captured file=$Name ... saved=1' line (pixel provenance)" }
+  $late = Select-String -LiteralPath $TracePath -Pattern ('SHOT late begin file=' + [regex]::Escape($Name) + ' frame=(\d+)') | Select-Object -Last 1
+  if (-not $late) { throw "$Who trace has no end-of-frame SHOT block for $Name" }
+  $capFrame = [long]$cap.Matches[0].Groups[1].Value
+  $lateFrame = [long]$late.Matches[0].Groups[1].Value
+  if ([Math]::Abs($capFrame - $lateFrame) -gt 1) { throw "$Who ${Name}: captured frame $capFrame vs late SHOT frame $lateFrame (> 1)" }
+  Write-Output ("shot captured {0} {1}: frame={2} lateFrame={3} px={4}x{5} sha256={6}" -f $Who, $Name, $capFrame, $lateFrame, $cap.Matches[0].Groups[2].Value, $cap.Matches[0].Groups[3].Value, $cap.Matches[0].Groups[4].Value.Substring(0, 12))
+}
 # GD-034 two-client packaged COMBAT demo against the S09 worktree-local
 # backend (attack -> defense -> resolve against authoritative snapshots):
 #   host   -S09Flow -S09Combat=attack,scheme : greedy approach each own turn,
@@ -648,6 +665,22 @@ function Invoke-CombatDemo {
     )
     if ($RevealProof.StartsWith('present')) { $publishNames += $RevealShotRel }
     if ($ArtPreview) { $publishNames += (Join-Path 'joiner' 's09-damage-number.png') }
+    # W5b-R: the damage number of the first COMBAT (host evidence; the first damage of a game can be an ability's).
+    if ($ArtPreview) {
+      foreach ($side in @('host', 'joiner')) {
+        $combatDamage = Join-Path $side 's09-damage-combat.png'
+        if (Test-Path -LiteralPath (Join-Path $Script:Staging $combatDamage)) { $publishNames += $combatDamage }
+        else { Write-Output "damage-combat frame: $side has none (no damage CUE on the combat target while its number was painted)" }
+      }
+    }
+    if ($RequireShotCaptured) {
+      foreach ($name in $publishNames) {
+        if ($name -notlike '*.png') { continue }
+        $who = ($name -split '[\\/]')[0]
+        $tracePath = if ($who -eq 'host') { $hostTrace } else { $joinTrace }
+        Assert-ShotCaptured $tracePath (Split-Path -Leaf $name) $who
+      }
+    }
     $RunDir = Join-Path $EvidenceDir ("combat-" + $Stamp)
     if (Test-Path -LiteralPath $RunDir) { throw "run dir already exists: $RunDir" }
     New-Item -ItemType Directory -Path $RunDir | Out-Null

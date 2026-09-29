@@ -428,13 +428,13 @@ def summarize_csv(path: Path, warmup_frames: int = 150) -> dict:
     return out
 
 
-def write_csv_summary(run_dir: Path) -> dict | None:
+def write_csv_summary(run_dir: Path, status: str | None = None) -> dict | None:
     csv_dir = RAW_ROOT / run_dir.name / "client-csv"
     if not csv_dir.is_dir():
         csv_dir = run_dir / "client-csv"
     if not csv_dir.is_dir():
         return None
-    doc = {"schema": "unmatched.art004-perf-csv/1", "status": "измерено",
+    doc = {"schema": "unmatched.art004-perf-csv/1", "status": status or "измерено",
            "method": "UE CSV profiler (-csvCaptureFrames, -csvGpuStats); first 150 frames skipped as warm-up",
            "gpuBusyDefinition": "sum of the named GPU/<pass> times per frame (D3D11 timestamp queries), GPU/Unaccounted "
                                 "excluded; means are inflated by rare long passes when other processes preempt the GPU, "
@@ -689,7 +689,7 @@ def cmd_run(a) -> int:
     for r in pmon:
         if r["pid"] in client_pids or r["name"].lower().startswith(("unrealeditor", "blender", "dwm")):
             per_proc.setdefault(f"{r['name']}#{r['pid']}", []).append(r["sm"])
-    perf = {"schema": "unmatched.art004-perf/1", "status": "измерено",
+    perf = {"schema": "unmatched.art004-perf/1", "status": getattr(a, "perf_status", None) or "измерено",
             "scope": "текущий ПК разработки (RTX 4090), не целевой ПК D-07; ACC-022 не заявляется",
             "clientFpsCap": a.client_fps, "clients": {},
             "gpuTotal": {"window": [win[0].isoformat(), win[1].isoformat()] if win else None,
@@ -698,8 +698,9 @@ def cmd_run(a) -> int:
                          "memUsedMiB": stats([r["memUsedMiB"] for r in in_win]),
                          "powerW": stats([r["powerW"] for r in in_win])},
             "perProcessSmPct": {k: stats(v) for k, v in sorted(per_proc.items())},
-            "concurrentGpuUsers": "UnrealEditor PID 19540 (main checkout, orchestrator, idle viewport) and Blender MCP "
-                                  "sessions 9876/9877 were running; see perProcessSmPct and gpu-baseline.json"}
+            "concurrentGpuUsers": getattr(a, "concurrent_gpu_users", None) or (
+                "UnrealEditor PID 19540 (main checkout, orchestrator, idle viewport) and Blender MCP "
+                "sessions 9876/9877 were running; see perProcessSmPct and gpu-baseline.json")}
     for role, tp in traces.items():
         if tp.is_file():
             perf["clients"][role] = parse_perf(tp)
@@ -709,7 +710,7 @@ def cmd_run(a) -> int:
            "perClientTrace": {r: (perf["clients"].get(r) or {}).get("config") for r in traces}}
     perf["frameRateLimit"] = frl
     write_json(run_dir / "perf.json", perf)
-    write_csv_summary(run_dir)
+    write_csv_summary(run_dir, status=getattr(a, "perf_status", None))
     timing = {role: parse_timing(tp) for role, tp in traces.items() if tp.is_file()}
     write_json(run_dir / "timing.json", timing)
     record["timing"] = timing
@@ -2081,6 +2082,8 @@ def main(argv=None) -> int:
     r.add_argument("--expect-crash", action="store_true")
     r.add_argument("--demo-arg", action="append", default=[],
                    help="extra run-phase2-demo.ps1 token per occurrence (use --demo-arg=-Flag)")
+    r.add_argument("--perf-status", help="status of perf.json / perf-csv.json (W5b-R: the H2 background label)")
+    r.add_argument("--concurrent-gpu-users", help="free-text note of other GPU users during the run")
     g = sub.add_parser("baseline")
     g.add_argument("--out", required=True)
     g.add_argument("--seconds", type=int, default=20)

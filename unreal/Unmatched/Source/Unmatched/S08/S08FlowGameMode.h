@@ -241,6 +241,19 @@ private:
   void UpdateHover();
   void UpdateCombatIcon(bool bActive);
   void UpdatePlate(bool bActive);
+  /** W5b-R D-1/D-5: screen tags, the combat icon anchor and the damage number, one deterministic layout per change
+   *  of its inputs (plate -> target tag -> icon -> damage number -> other tags, far to near). */
+  void UpdateBoardLabels(bool bActive, const FString& IconTarget, const FString& IconSource);
+  /** W5b-R: honest SHOT lines - the widget / icon / tag / damage / HUD panel lines of the shots requested in this
+   *  frame, written at the END of the frame from the widgets' actual visibility and painted geometry (the T5.2 icon
+   *  was traced visible=1 at request time and hidden later in the same tick). */
+  void HandleEndFrame();
+  void WriteArtHudLateLines(const FString& File, uint64 RequestFrame);
+  /** UGameViewportClient::OnScreenshotCaptured: the engine hands the captured pixels to this delegate INSTEAD of
+   *  writing the file - it saves the PNG and writes "SHOT captured file= frame= px= sha256=" (pixel provenance). */
+  void HandleScreenshotCaptured(int32 Width, int32 Height, const TArray<FColor>& Colors);
+  /** Viewport rect of a figure's on-screen box keyed by fighter id (alive fighters with a projection). */
+  TMap<FString, FS08ScreenRect> FigureScreenRects() const;
   void ApplyWheel(int32 Direction, ES08InputSource Source);
   void ApplySpace(ES08InputSource Source);
   void TraceOsClick(const FKey& Button);
@@ -250,7 +263,7 @@ private:
   /** W4-C: `SHOT widget id=<ui-id> impl=<umg|slate> ...` painted bboxes of
    *  every plate/icon part of every view (compare mode: UMG + Slate twin).
    *  Prefix "HUD sample=N " = the compare-mode periodic parity samples. */
-  void WriteArtHudWidgetLines(const FString& Prefix = FString());
+  void WriteArtHudWidgetLines(const FString& Prefix = FString(), bool bLate = false);
   /** Viewport-pixel projection (same call as the SHOT fighter lines). */
   bool ProjectToViewport(const FVector& World, FVector2D& OutScreen) const;
   /** On-screen box of a fighter's visible figure (base disc to figure top). */
@@ -329,6 +342,13 @@ private:
   bool bS09ShotResolveRevealed = false; // resolve window AFTER the reveal (GD-033 proof)
   bool bS09ShotDamage = false;
   float DamageShotAtElapsed = -1.0f;
+  // W5b-R: the damage number of the first COMBAT (host evidence; the first damage of a game can be an ability).
+  bool bS09ShotDamageCombat = false;
+  float DamageCombatShotAtElapsed = -1.0f;
+  float DamageCombatShotDeadline = -1.0f;
+  FString LastTeamMappingLine;
+  FDelegateHandle EndFrameHandle;
+  FDelegateHandle ScreenshotCapturedHandle;
   FString S09ShotDefensePath;
   FString S09ShotResolvePath;
   FString S09ShotResultPath;

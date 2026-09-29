@@ -49,7 +49,8 @@ WBP_DIR = REPO / "unreal" / "Unmatched" / "Content" / "S08" / "UI" / "ArtHud"
 TS = re.compile(r"^\s*(\d{4}\.\d{2}\.\d{2}-\d{2}\.\d{2}\.\d{2})\s+(.*?)\s*$")
 WIDGET = re.compile(
     r"^(?:HUD sample=(\d+) )?SHOT widget id=(\S+) impl=(umg|slate) state=(\S+) fighter=(\S+) "
-    r"bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\) geom=(painted|unpainted) visible=([01]) twin=([01]) source=(\S+)$")
+    r"bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\) geom=(painted|unpainted) visible=([01]) twin=([01]) source=(\S+)"
+    r"(?: .*)?$")  # W5b-R: late lines append frame= (and tag/damage fields)
 SHOT_PLATE = re.compile(r"^SHOT plate fighter=(\S+) bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\) overlapReachable=(\d+)")
 SHOT_ICON = re.compile(r"^SHOT icon fighter=(\S+) bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)")
 SHOT_LABEL = re.compile(r"^SHOT label fighter=(\S+) mode=(\S+) bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)")

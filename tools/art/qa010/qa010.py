@@ -375,6 +375,34 @@ def cmd_icon(args) -> int:
         print("icon needs --bbox or --trace with a 'SHOT icon' line", file=sys.stderr)
         return EXIT_USAGE
     ibox = (int(round(bb[0])), int(round(bb[1])), int(round(bb[2])), int(round(bb[3])))
+    if args.mask_texture:
+        # W5b-R icon rev 3: native size only, masks from the drawn texture, presence guard
+        import hashlib
+        import numpy as np
+        from PIL import Image
+        from qa010lib.checks import check_icon_token
+        mt, tt = Path(args.mask_texture), Path(args.token_texture or "")
+        if not tt.is_file():
+            print("--mask-texture needs --token-texture", file=sys.stderr)
+            return EXIT_USAGE
+        with Image.open(mt) as im:
+            glyph_alpha = np.asarray(im.convert("RGBA"), dtype=np.float64)[..., 3] / 255.0
+        with Image.open(tt) as im:
+            token = np.asarray(im.convert("RGBA"), dtype=np.uint8)
+        res = check_icon_token(rgb, ibox, glyph_alpha, token, mask_alpha=args.mask_alpha,
+                               min_contrast=ti["min_contrast_ratio"] if args.min_contrast is None else args.min_contrast)
+        sha = lambda q: hashlib.sha256(q.read_bytes()).hexdigest()  # noqa: E731
+        out = {"command": "icon", "method": "rev 3 (W5b-R): token masks from the drawn texture, native size",
+               "tool": VERSION, "frame": frame_info(p, rgb), "bbox_source": bbox_src,
+               **({"trace": tmeta} if tmeta else {}),
+               "mask_texture": {"path": str(mt).replace("\\", "/"), "sha256": sha(mt), "alpha": args.mask_alpha},
+               "token_texture": {"path": str(tt).replace("\\", "/"), "sha256": sha(tt)}, **res}
+        emit(out, args.json)
+        if res["status"] == "insufficient_input":
+            return EXIT_INSUFFICIENT
+        if res["status"] != "measured":
+            return EXIT_INSUFFICIENT
+        return EXIT_OK if res["result"] == "pass" else EXIT_FAIL
     sizes = tuple(int(s) for s in args.sizes.split(",")) if args.sizes else tuple(ti["sizes_px"])
     params = IconParams(
         sizes=sizes,
@@ -552,6 +580,9 @@ def main(argv=None) -> int:
     ic.add_argument("frame")
     ic.add_argument("--bbox", help="x0,y0,x1,y1 frame pixels (half-open)")
     ic.add_argument("--mask", help="icon mask PNG (frame-sized or bbox-sized); default auto Otsu")
+    ic.add_argument("--mask-texture", help="W5b-R icon rev 3: glyph mask PNG N x N of the drawn token (alpha = glyph)")
+    ic.add_argument("--mask-alpha", type=float, default=0.5, help="glyph = mask alpha >= this (rev 3)")
+    ic.add_argument("--token-texture", help="rev 3: the token PNG N x N that is drawn (shape, rim, body, guard)")
     ic.add_argument("--sizes", help="comma list, default 24,32,48")
     ic.add_argument("--min-contrast", type=float)
     ic.add_argument("--min-luma-delta", type=float)

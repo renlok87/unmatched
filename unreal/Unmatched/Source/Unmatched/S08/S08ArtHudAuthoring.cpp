@@ -130,6 +130,19 @@ FString US08ArtHudAuthoringLibrary::AuthorArtHudWidgetBlueprints(const FString& 
         return US08ArtIconWidget::BuildDefaultTree(Tree, Attach, Error);
       },
       bOverwrite)));
+  // W5b-R D-1: the screen tag and the damage number (proposals UI-HUD-TAG / UI-HUD-DAMAGE).
+  Assets.Add(MakeShared<FJsonValueObject>(S08AuthorOne(
+      Root, FPackageName::GetShortName(US08ArtTagWidget::WidgetBlueprintPath), US08ArtTagWidget::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) {
+        return US08ArtTagWidget::BuildDefaultTree(Tree, Attach, Error);
+      },
+      bOverwrite)));
+  Assets.Add(MakeShared<FJsonValueObject>(S08AuthorOne(
+      Root, FPackageName::GetShortName(US08ArtDamageWidget::WidgetBlueprintPath), US08ArtDamageWidget::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) {
+        return US08ArtDamageWidget::BuildDefaultTree(Tree, Attach, Error);
+      },
+      bOverwrite)));
   Report->SetArrayField(TEXT("assets"), Assets);
 #else
   Report->SetStringField(TEXT("error"), TEXT("editor only"));

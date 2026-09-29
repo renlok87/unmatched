@@ -280,7 +280,8 @@ FPlacementResult ChoosePlateRect(const FPlacementInput& In) {
     Out.ForbiddenOverlaps = Near.Num() > 0
         ? CountOverlaps(Grown, Near, OverlapEpsilonPx2, nullptr, &Out.ForbiddenArea) : 0;
     for (const FS08ScreenRect& Soft : In.Soft) Out.SoftArea += Rect.Expand(2.0f).IntersectionArea(Soft);
-    Out.bClean = Out.ForbiddenOverlaps == 0 && Out.SoftArea <= 0.0;
+    Out.bBound = IsRectBoundTo(Rect, In.BindTarget, In.BindOthers);
+    Out.bClean = Out.ForbiddenOverlaps == 0 && Out.SoftArea <= 0.0 && Out.bBound;
     return true;
   };
   bool bHaveBest = false;
@@ -317,11 +318,14 @@ FPlacementResult ChoosePlateRect(const FPlacementInput& In) {
           }
           continue;
         }
+        // least bad: forbidden count, forbidden area, then bound before unbound, then soft area
         const bool bBetter = !bHaveBest ||
             Try.ForbiddenOverlaps < Best.ForbiddenOverlaps ||
             (Try.ForbiddenOverlaps == Best.ForbiddenOverlaps &&
              (Try.ForbiddenArea < Best.ForbiddenArea - 0.5 ||
-              (FMath::Abs(Try.ForbiddenArea - Best.ForbiddenArea) <= 0.5 && Try.SoftArea < Best.SoftArea - 0.5)));
+              (FMath::Abs(Try.ForbiddenArea - Best.ForbiddenArea) <= 0.5 &&
+               ((Try.bBound && !Best.bBound) ||
+                (Try.bBound == Best.bBound && Try.SoftArea < Best.SoftArea - 0.5)))));
         if (bBetter) {
           Best = Try;
           bHaveBest = true;
@@ -335,6 +339,205 @@ FPlacementResult ChoosePlateRect(const FPlacementInput& In) {
   }
   Best.Tested = Tested;
   return Best;
+}
+
+double OverlapArea(const FS08ScreenRect& A, const TArray<FS08ScreenRect>& Others) {
+  double Sum = 0.0;
+  for (const FS08ScreenRect& O : Others) {
+    if (!O.IsEmpty()) Sum += A.IntersectionArea(O);
+  }
+  return Sum;
+}
+
+double PointRectDistance(const FVector2D& P, const FS08ScreenRect& R) {
+  const double Dx = FMath::Max3(static_cast<double>(R.X0) - P.X, 0.0, P.X - static_cast<double>(R.X1));
+  const double Dy = FMath::Max3(static_cast<double>(R.Y0) - P.Y, 0.0, P.Y - static_cast<double>(R.Y1));
+  return FMath::Sqrt(Dx * Dx + Dy * Dy);
+}
+
+bool IsBoundTo(const FVector2D& P, const FS08ScreenRect& Target, const TArray<FS08ScreenRect>& Others) {
+  if (Target.IsEmpty()) return true;
+  const double D = PointRectDistance(P, Target);
+  for (const FS08ScreenRect& O : Others) {
+    if (!O.IsEmpty() && PointRectDistance(P, O) <= D) return false;
+  }
+  return true;
+}
+
+double RectGap(const FS08ScreenRect& A, const FS08ScreenRect& B) {
+  const double Dx = FMath::Max3(static_cast<double>(B.X0) - A.X1, 0.0, static_cast<double>(A.X0) - B.X1);
+  const double Dy = FMath::Max3(static_cast<double>(B.Y0) - A.Y1, 0.0, static_cast<double>(A.Y0) - B.Y1);
+  return FMath::Sqrt(Dx * Dx + Dy * Dy);
+}
+
+bool IsRectBoundTo(const FS08ScreenRect& R, const FS08ScreenRect& Target, const TArray<FS08ScreenRect>& Others) {
+  if (Target.IsEmpty()) return true;
+  const double D = RectGap(R, Target);
+  for (const FS08ScreenRect& O : Others) {
+    if (!O.IsEmpty() && RectGap(R, O) <= D) return false;
+  }
+  return true;
+}
+
+FLabelPlacementResult ChooseLabelRect(const FLabelPlacementInput& In) {
+  FLabelPlacementResult Best;
+  const float W = static_cast<float>(In.Size.X);
+  const float H = static_cast<float>(In.Size.Y);
+  if (W <= 0.0f || H <= 0.0f || In.Viewport.X <= 0.0 || In.Viewport.Y <= 0.0) return Best;
+  const FS08ScreenRect View(In.EdgeMargin, In.EdgeMargin, static_cast<float>(In.Viewport.X) - In.EdgeMargin,
+                            static_cast<float>(In.Viewport.Y) - In.EdgeMargin);
+  const float Step = FMath::Max(2.0f, In.Step);
+  const float Cx = static_cast<float>(In.Anchor.Center().X);
+  bool bHaveHardClean = false, bHaveAny = false;
+  FLabelPlacementResult BestHardClean, BestAny;
+  int32 Tested = 0;
+  auto Try = [&](float X0, float Y0, const TCHAR* Name, int32 Ring) -> bool {
+    X0 = FMath::RoundToFloat(X0);
+    Y0 = FMath::RoundToFloat(Y0);
+    const FS08ScreenRect Rect(X0, Y0, X0 + W, Y0 + H);
+    if (!View.Contains(Rect)) return false;
+    ++Tested;
+    FLabelPlacementResult R;
+    R.Rect = Rect;
+    R.Candidate = Name;
+    R.Ring = Ring;
+    R.HardArea = OverlapArea(Rect, In.Hard);
+    R.SoftArea = OverlapArea(Rect, In.Soft);
+    R.bBound = IsBoundTo(Rect.Center(), In.BindTarget, In.BindOthers);
+    R.bHardClean = R.HardArea <= 0.5 && R.bBound;
+    R.bClean = R.bHardClean && R.SoftArea <= 0.5;
+    if (R.bClean) {
+      Best = R;
+      return true;
+    }
+    if (R.bHardClean && (!bHaveHardClean || R.SoftArea < BestHardClean.SoftArea - 0.5)) {
+      BestHardClean = R;
+      bHaveHardClean = true;
+    }
+    // unbound candidates rank after every bound one (a large fixed penalty keeps the order deterministic)
+    const double Rank = R.HardArea + (R.bBound ? 0.0 : 1e9);
+    const double BestRank = BestAny.HardArea + (BestAny.bBound ? 0.0 : 1e9);
+    if (!bHaveAny || Rank < BestRank - 0.5 ||
+        (FMath::Abs(Rank - BestRank) <= 0.5 && R.SoftArea < BestAny.SoftArea - 0.5)) {
+      BestAny = R;
+      bHaveAny = true;
+    }
+    return false;
+  };
+  for (int32 Ring = 0; Ring < FMath::Max(1, In.Rings); ++Ring) {
+    const float G = In.Gap + Ring * Step;
+    const int32 Slides = Ring + 1;
+    if (In.bRightFirst) {
+      // right of the anchor, vertically centred on it, then sliding down/up
+      for (int32 K = 0; K < 2 * Slides - 1; ++K) {
+        const int32 Off = (K + 1) / 2 * ((K % 2) ? 1 : -1);
+        if (Try(In.Anchor.X1 + G, static_cast<float>(In.Anchor.Center().Y) - H * 0.5f + Off * Step, TEXT("right"),
+                Ring)) {
+          Best.Tested = Tested;
+          return Best;
+        }
+      }
+    }
+    // above: centred, then alternating left/right slides
+    for (int32 K = 0; K < 2 * Slides - 1; ++K) {
+      const int32 Off = (K + 1) / 2 * ((K % 2) ? 1 : -1);
+      if (Try(Cx - W * 0.5f + Off * Step, In.Anchor.Y0 - G - H, TEXT("above"), Ring)) {
+        Best.Tested = Tested;
+        return Best;
+      }
+    }
+    // right: top-aligned to the anchor top, sliding down
+    for (int32 K = 0; K < Slides && !In.bRightFirst; ++K) {
+      if (Try(In.Anchor.X1 + G, In.Anchor.Y0 + K * Step, TEXT("right"), Ring)) {
+        Best.Tested = Tested;
+        return Best;
+      }
+    }
+    for (int32 K = 0; K < Slides; ++K) {
+      if (Try(In.Anchor.X0 - G - W, In.Anchor.Y0 + K * Step, TEXT("left"), Ring)) {
+        Best.Tested = Tested;
+        return Best;
+      }
+    }
+    for (int32 K = 0; K < 2 * Slides - 1; ++K) {
+      const int32 Off = (K + 1) / 2 * ((K % 2) ? 1 : -1);
+      if (Try(Cx - W * 0.5f + Off * Step, In.Anchor.Y1 + G, TEXT("below"), Ring)) {
+        Best.Tested = Tested;
+        return Best;
+      }
+    }
+    // W5b-R r3: inset - centred, flush with the top of the owner's own box (tags only; see bInset)
+    if (In.bInset && Ring == 0) {
+      if (Try(Cx - W * 0.5f, In.Anchor.Y0, TEXT("inset"), Ring)) {
+        Best.Tested = Tested;
+        return Best;
+      }
+    }
+    // W5b-R r3: near rings - a bound hard-clean candidate here beats a clean one further out
+    if (In.NearRings > 0 && Ring + 1 >= In.NearRings && bHaveHardClean) {
+      BestHardClean.Tested = Tested;
+      return BestHardClean;
+    }
+  }
+  Best = bHaveHardClean ? BestHardClean : BestAny;
+  Best.Tested = Tested;
+  return Best;
+}
+
+FLabelPlacementInput MakeTagPlacementInput(const FVector2D& Viewport, const FVector2D& Size, const FS08ScreenRect& Owner,
+                                           const TArray<FS08ScreenRect>& Others, const TArray<FS08ScreenRect>& Hard) {
+  FLabelPlacementInput In;
+  In.Viewport = Viewport;
+  In.Size = Size;
+  In.Anchor = Owner;
+  In.Hard = Hard;
+  In.Soft = Others;
+  // t53 revision 1 tags.binding: the tag reads as its owner's (the W5b-R G3 Medusa tag sat 98 px away, next to the
+  // Harpies 2 tag, because nothing bound it)
+  In.BindTarget = Owner;
+  In.BindOthers = Others;
+  In.bInset = true;
+  In.NearRings = 2;
+  return In;
+}
+
+FIconAnchorResult ChooseIconAnchor(const FIconAnchorInput& In) {
+  FIconAnchorResult Out;
+  const float N = In.Size;
+  if (N <= 0.0f || In.Viewport.X <= 0.0 || In.Viewport.Y <= 0.0 || In.Target.IsEmpty()) return Out;
+  const FS08ScreenRect View(In.EdgeMargin, In.EdgeMargin, static_cast<float>(In.Viewport.X) - In.EdgeMargin,
+                            static_cast<float>(In.Viewport.Y) - In.EdgeMargin);
+  const FS08ScreenRect& T = In.Target;
+  const float Cy35 = T.Y0 + 0.35f * T.Height();
+  const float Cx = static_cast<float>(T.Center().X);
+  struct FCand {
+    const TCHAR* Name;
+    float X0, Y0;
+  };
+  const FCand Cands[] = {{TEXT("right"), T.X1 + In.Gap, Cy35 - N * 0.5f},
+                         {TEXT("left"), T.X0 - In.Gap - N, Cy35 - N * 0.5f},
+                         {TEXT("below"), Cx - N * 0.5f, T.Y1 + In.Gap},
+                         {TEXT("above"), Cx - N * 0.5f, T.Y0 - In.Gap - N}};
+  TArray<FS08ScreenRect> Obstacles = In.Figures;
+  Obstacles.Append(In.Hard);
+  for (const FCand& C : Cands) {
+    const float X0 = FMath::RoundToFloat(C.X0), Y0 = FMath::RoundToFloat(C.Y0);
+    const FS08ScreenRect Rect(X0, Y0, X0 + N, Y0 + N);
+    ++Out.Tested;
+    if (!View.Contains(Rect)) continue;
+    if (OverlapArea(Rect, Obstacles) > 0.5) continue;
+    Out.Rect = Rect;
+    Out.Anchor = C.Name;
+    return Out;
+  }
+  // every anchor is taken: above the figure (clamped into the viewport), the overlap is recorded
+  const float X0 = FMath::Clamp(FMath::RoundToFloat(Cx - N * 0.5f), View.X0, FMath::Max(View.X0, View.X1 - N));
+  const float Y0 = FMath::Clamp(FMath::RoundToFloat(T.Y0 - In.Gap - N), View.Y0, FMath::Max(View.Y0, View.Y1 - N));
+  Out.Rect = FS08ScreenRect(X0, Y0, X0 + N, Y0 + N);
+  Out.Anchor = TEXT("above");
+  Out.bFallback = true;
+  Out.OverlapArea = OverlapArea(Out.Rect, Obstacles);
+  return Out;
 }
 
 FString FormatCells(const TArray<FIntPoint>& Cells) {
@@ -355,6 +558,16 @@ FString FormatWidgetLine(const FString& Id, const TCHAR* Impl, const TCHAR* Stat
       (State && *State) ? State : TEXT("none"), Fighter.IsEmpty() ? TEXT("none") : *Fighter,
       *FormatRect(bPainted ? Rect : FS08ScreenRect()), bPainted ? TEXT("painted") : TEXT("unpainted"), bTwin ? 0 : 1,
       bTwin ? 1 : 0, Source.IsEmpty() ? TEXT("none") : *Source);
+}
+
+FString FormatWidgetLineEx(const FString& Id, const TCHAR* Impl, const TCHAR* State, const FString& Fighter,
+                           const FS08ScreenRect& Rect, bool bPainted, bool bVisible, const FString& Source,
+                           const FString& Extra) {
+  return FString::Printf(
+      TEXT("SHOT widget id=%s impl=%s state=%s fighter=%s bbox=%s geom=%s visible=%d twin=0 source=%s%s%s"), *Id, Impl,
+      (State && *State) ? State : TEXT("none"), Fighter.IsEmpty() ? TEXT("none") : *Fighter,
+      *FormatRect(bPainted ? Rect : FS08ScreenRect()), bPainted ? TEXT("painted") : TEXT("unpainted"), bVisible ? 1 : 0,
+      Source.IsEmpty() ? TEXT("none") : *Source, Extra.IsEmpty() ? TEXT("") : TEXT(" "), *Extra);
 }
 
 void SortCells(TArray<FIntPoint>& Cells) {

@@ -59,13 +59,13 @@
     },
     {
       "name": "perf-csv.json",
-      "bytes": 5601,
-      "sha256": "614314a69b121ea09406f325650a9f411c7a2ccb5643636868b454e99fc8aac0"
+      "bytes": 6175,
+      "sha256": "91ffe991f56586fa34c06a0cf6fb316736d286066f727202cb7506dae0290253"
     },
     {
       "name": "perf.json",
-      "bytes": 17579,
-      "sha256": "f2eaf58bda7156724774a3b7466548c8bee4d73dc20799f4562d8d597c578da5"
+      "bytes": 18488,
+      "sha256": "54c955d24154b5c795afd32cdcba247e4d9132bb58d8a9098a75aac190e0bf1a"
     },
     {
       "name": "phase2-board-host-1920x1080.evidence.json",
@@ -88,5 +88,23 @@
       "sha256": "5ce588c08e5ccb2129f9c14ae98577549e8df40d9af2962450d3391ecc3ebd41"
     }
   ],
-  "extendedBy": "tools/art/art004_live_k2.py run (client logs, perf, timing, sidecars, nvidia-smi, stdout)"
+  "extendedBy": "tools/art/art004_live_k2.py run (client logs, perf, timing, sidecars, nvidia-smi, stdout)",
+  "errata": [
+    {
+      "date": "2026-09-29",
+      "ref": "эррата W5b-R (docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md §9; art3-live-3boards-2026-09-29.md §9.1)",
+      "rehashed": [
+        {
+          "name": "perf.json",
+          "before": "f2eaf58bda7156724774a3b7466548c8bee4d73dc20799f4562d8d597c578da5",
+          "after": "54c955d24154b5c795afd32cdcba247e4d9132bb58d8a9098a75aac190e0bf1a"
+        },
+        {
+          "name": "perf-csv.json",
+          "before": "614314a69b121ea09406f325650a9f411c7a2ccb5643636868b454e99fc8aac0",
+          "after": "91ffe991f56586fa34c06a0cf6fb316736d286066f727202cb7506dae0290253"
+        }
+      ]
+    }
+  ]
 }

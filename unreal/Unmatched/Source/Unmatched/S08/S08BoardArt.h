@@ -23,6 +23,22 @@
 #include "CoreMinimal.h"
 #include "S08BoardModel.h"
 
+/** Zone mark geometry (uu, z above the tile top z = 0). W5b-R D-4: strokes moved inside the slab (nominal centre
+ *  line 42, clamped so that fill + keyline <= 45), dark keylines under every stroke and glyph, glyphs above strokes:
+ *  top faces - stroke keyline 0.33 < stroke fill 0.48 < glyph keyline 0.53 < glyph fill 0.58 < team ring 1.2. */
+namespace S08ZoneMarkSpec {
+constexpr float EdgeUU = 42.0f;          // nominal stroke centre line (was 46 = the slab edge, T5.2)
+constexpr float MaxOuterUU = 45.0f;      // any stroke fill + keyline stays within this distance of the cell centre
+constexpr float SlabHalfUU = 46.0f;      // 'tiles' slab half size (ArtTileScaleXY 0.92 x 50)
+constexpr float KeylineGrowUU = 1.5f;    // keyline width on each side of a stroke / glyph piece
+constexpr float StrokeZ = 0.28f;         // stroke fill centre (depth 0.4 -> 0.08..0.48)
+constexpr float StrokeDepth = 0.004f;
+constexpr float StrokeKeylineZ = 0.18f;  // stroke keyline centre (depth 0.3 -> 0.03..0.33)
+constexpr float KeylineDepth = 0.003f;
+constexpr float GlyphZ = 0.38f;          // glyph anchor / fill centre (depth 0.4 -> 0.18..0.58); keyline 0.23..0.53
+constexpr float GlyphDepth = 0.004f;
+}  // namespace S08ZoneMarkSpec
+
 enum class ES08ZoneStroke : uint8 { Solid, Dash2, Dash3, Dash4, Dots5, Double, DashDot };
 enum class ES08ZoneGlyph : uint8 { Diamond, Bar1, Bars2, Bars3, HBars2, Square, Cross, X, Tee, Chevron, Ring };
 enum class ES08BoardSurface : uint8 { Tiles, Cobble5x6Mesh };
@@ -46,6 +62,15 @@ struct UNMATCHED_API FS08ZoneStyle {
   FString MaterialInstancePath;
   bool bFallback = false;
   FString ColorHex() const;
+};
+
+/** W5b-R D-4: the dark keyline under zone strokes and glyphs ("zoneKeyline" of the profile data, rev 4). */
+struct UNMATCHED_API FS08ZoneKeyline {
+  bool bSet = false;
+  FColor Color = FColor(17, 19, 23, 255);  // #111317 = hud-style-tokens mark.keyline
+  float GrowUU = S08ZoneMarkSpec::KeylineGrowUU;
+  FString MaterialInstancePath;              // MI_ART005_Zone_Keyline (game-layer master)
+  TMap<FString, FString> GlyphMeshPaths;     // glyph name -> SM_ART005_ZoneGlyphKey_<Glyph>
 };
 
 struct UNMATCHED_API FS08LightSpec {
@@ -164,6 +189,8 @@ public:
    *  exactly the S08GlyphPieces cubes merged, pivot on the slot centre at the mark height (S08GlyphAnchor); a glyph
    *  without a mesh keeps the cube pieces. */
   TMap<FString, FString> GlyphMeshPaths;
+  /** W5b-R D-4 zone keylines (bSet = the profile has a valid "zoneKeyline" block). */
+  FS08ZoneKeyline Keyline;
 
   /** <ProjectConfigDir>/ArtBoards/S08ArtBoardProfiles.json (staged as a UFS
    *  runtime dependency of the Unmatched module, see Unmatched.Build.cs). */
@@ -204,6 +231,9 @@ struct UNMATCHED_API FS08ZoneMarkLayout {
   /** T4.2: one entry per zone of a cell - the glyph slot centre at the mark height (translation only), where one
    *  instance of the zone's glyph mesh replaces that zone's cube pieces in Glyphs. */
   TArray<FS08ZoneMarkPiece> GlyphAnchors;
+  /** W5b-R D-4: keyline cube pieces under every stroke / glyph (NOT in the *ByKey counts). */
+  TArray<FS08ZoneMarkPiece> StrokeKeylines;
+  TArray<FS08ZoneMarkPiece> GlyphKeylines;
   TMap<FString, int32> StrokePiecesByKey;
   TMap<FString, int32> GlyphPiecesByKey;
   TMap<FString, int32> CellsByKey;
@@ -221,8 +251,18 @@ UNMATCHED_API FS08ZoneMarkLayout S08BuildZoneMarks(const FS08BoardModel& Board, 
 /** Stroke / glyph cube pieces relative to the cell centre (for tests too). */
 UNMATCHED_API void S08StrokePieces(ES08ZoneStroke Stroke, int32 Side, TArray<FTransform>& Out);
 UNMATCHED_API void S08GlyphPieces(ES08ZoneGlyph Glyph, int32 Slot, TArray<FTransform>& Out);
-/** T4.2: glyph slot centre relative to the cell centre, at the mark height (z = 0.28 uu): the pivot of the glyph
- *  meshes, so S08GlyphPieces(Glyph, Slot) == pieces of S08GlyphPieces(Glyph, 0) moved by the anchor difference. */
+/** W5b-R D-4: the keyline pieces - every piece grown by KeylineGrowUU per side, under the fill (S08ZoneMarkSpec). */
+UNMATCHED_API void S08StrokeKeylinePieces(ES08ZoneStroke Stroke, int32 Side, TArray<FTransform>& Out);
+UNMATCHED_API void S08GlyphKeylinePieces(ES08ZoneGlyph Glyph, int32 Slot, TArray<FTransform>& Out);
+/** Largest |across offset| + half thickness of a stroke's segments (fill only, uu). */
+UNMATCHED_API float S08ZoneStrokeHalfExtentUU(ES08ZoneStroke Stroke);
+/** Stroke centre line from the cell centre: min(EdgeUU, MaxOuterUU - KeylineGrowUU - half extent). */
+UNMATCHED_API float S08ZoneStrokeCenterUU(ES08ZoneStroke Stroke);
+/** Outermost distance of a stroke's fill (or fill + keyline) from the cell centre. */
+UNMATCHED_API float S08ZoneStrokeOuterUU(ES08ZoneStroke Stroke, bool bKeyline);
+/** T4.2: glyph slot centre relative to the cell centre, at the glyph height (W5b-R: z = 0.38 uu, above the strokes):
+ *  the pivot of the glyph and glyph-keyline meshes, so S08GlyphPieces(Glyph, Slot) == pieces of
+ *  S08GlyphPieces(Glyph, 0) moved by the anchor difference. */
 UNMATCHED_API FVector S08GlyphAnchor(int32 Slot);
 
 struct UNMATCHED_API FS08PlacedLight {

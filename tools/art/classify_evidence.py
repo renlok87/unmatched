@@ -52,6 +52,11 @@ R2  Run manifest + traces (packaged-live). Look for manifest.json in the
       S5 W4-A RENDER fingerprint: the bound SHOT block carries a 'RENDER tag=SHOT'
          line and it equals docs/art-pipeline/render-reference.json (user
          decision 2026-09-28: DX12/SM6 + Lumen, High; tools/art/render_fingerprint.py).
+      S6 W5b-R pixel provenance (traces of a W5b-R client, i.e. with 'SHOT request file=' lines, or --require-captured):
+         'SHOT captured file=<frame> frame=N px=WxH sha256=<hex> order=BGRA saved=1' (UGameViewportClient::
+         OnScreenshotCaptured - the client saves the PNG from these pixels), the end-of-frame block
+         'SHOT late begin file=<frame> frame=M' with |N - M| <= 1, and the sha256 of the PNG's decoded pixels in
+         B,G,R,A order equal to the traced sha256. Pre-W5b traces: "n/a" (not required).
     Otherwise grade "legacy" (historical runs) with the missing items listed.
     With --strict or --render-reference a packaged-live frame that fails S5 is
     REJECTED as an acceptance frame (K1-K3 / QA-010 / GD-058 / ACC-022): no
@@ -248,7 +253,7 @@ def find_manifest(frame: Path) -> tuple[Path, dict, dict] | None:
     return None
 
 
-def check_live(frame: Path, info: dict, sha: str, expect_mesh: str | None) -> dict:
+def check_live(frame: Path, info: dict, sha: str, expect_mesh: str | None, require_captured: bool = False) -> dict:
     res: dict = {"manifest": None, "core": {}, "strict": {}, "trace": None, "missingStrict": [], "reasons": [],
                  "render": None}
     found = find_manifest(frame)
@@ -350,8 +355,60 @@ def check_live(frame: Path, info: dict, sha: str, expect_mesh: str | None) -> di
             and b.get("result") == "Succeeded"
             and "-nolivecoding" not in " ".join(b.get("flags") or []).lower()
             and r.get("roomStatus") in ("ABORTED", "FINISHED") and bool(r.get("boardId")))
+    # S6 (W5b-R): pixel provenance of the capture (t53-thresholds.json shotCaptured)
+    cap = shot_captured(lines, frame, info)
+    res["captured"] = cap
+    if cap["applies"] or require_captured:
+        st["S6_shot_captured"] = cap["ok"]
     res["missingStrict"] = [k for k, v in st.items() if not v]
     return res
+
+
+SHOT_CAPTURED = re.compile(r"SHOT captured file=(\S+) frame=(\d+) px=(\d+)x(\d+) sha256=([0-9a-f]{64}) order=(\w+) "
+                           r"saved=(\d)")
+SHOT_LATE = re.compile(r"SHOT late begin file=(\S+) frame=(\d+)")
+
+
+def pixel_sha256_bgra(frame: Path) -> str | None:
+    """sha256 of the decoded pixels in memory order B,G,R,A (alpha as stored; the client saves alpha 255)."""
+    try:
+        from PIL import Image
+    except ImportError:
+        return None
+    with Image.open(frame) as im:
+        r, g, b, a = im.convert("RGBA").split()
+        return hashlib.sha256(Image.merge("RGBA", (b, g, r, a)).tobytes()).hexdigest()
+
+
+def shot_captured(lines: list[str], frame: Path, info: dict) -> dict:
+    """W5b-R S6: 'SHOT captured' of this frame, its late SHOT block within one frame, pixel sha256 = traced."""
+    applies = any("SHOT request file=" in ln for ln in lines)
+    out = {"applies": applies, "ok": False, "reasons": []}
+    caps = [m for ln in lines for m in [SHOT_CAPTURED.search(ln)] if m and m.group(1) == frame.name]
+    lates = [m for ln in lines for m in [SHOT_LATE.search(ln)] if m and m.group(1) == frame.name]
+    if not caps:
+        out["reasons"].append("no 'SHOT captured file=%s' line" % frame.name)
+        return out
+    cap = caps[-1]
+    out.update(frame=int(cap.group(2)), px=[int(cap.group(3)), int(cap.group(4))], sha256=cap.group(5),
+               order=cap.group(6), saved=cap.group(7) == "1")
+    if lates:
+        out["lateFrame"] = int(lates[-1].group(2))
+    frame_ok = bool(lates) and abs(out["lateFrame"] - out["frame"]) <= 1
+    size_ok = out["px"] == [info.get("width"), info.get("height")]
+    pix = pixel_sha256_bgra(frame)
+    out["pixelSha256"] = pix
+    pix_ok = pix is not None and pix == out["sha256"] and out["order"] == "BGRA"
+    if not out["saved"]:
+        out["reasons"].append("captured saved=0")
+    if not frame_ok:
+        out["reasons"].append("late SHOT block missing or its frame differs from the capture by > 1")
+    if not size_ok:
+        out["reasons"].append("captured px %s != PNG size" % out["px"])
+    if not pix_ok:
+        out["reasons"].append("PNG pixel sha256 %s != traced %s" % (str(pix)[:12], out["sha256"][:12]))
+    out["ok"] = out["saved"] and frame_ok and size_ok and pix_ok
+    return out
 
 
 def rule_sidecar(frame: Path, sha: str) -> str | None:
@@ -436,15 +493,16 @@ def claims_live(frame: Path) -> bool:
 
 
 # ---------------------------------------------------------------- driver
-def classify_frame(frame: Path, expect_mesh: str | None = None, render_reference: bool = False) -> dict:
+def classify_frame(frame: Path, expect_mesh: str | None = None, render_reference: bool = False,
+                   require_captured: bool = False) -> dict:
     frame = frame.resolve()
     info = image_info(frame)
     sha = sha256_file(frame)
     r: dict = {"frame": rel_to_repo(frame), "sha256": sha, "size": [info["width"], info["height"]],
                "class": "unclassified", "grade": None, "basis": [], "rejected": False, "reasons": [],
                "claimsLive": claims_live(frame)}
-    live = check_live(frame, info, sha, expect_mesh)
-    r["live"] = {k: live[k] for k in ("manifest", "core", "strict", "trace", "missingStrict", "render")}
+    live = check_live(frame, info, sha, expect_mesh, require_captured)
+    r["live"] = {k: live.get(k) for k in ("manifest", "core", "strict", "trace", "missingStrict", "render", "captured")}
     if rule_blender_metadata(info):
         r["class"], r["basis"] = "blender", ["R1 png-metadata: " + ", ".join(sorted(info["text"]))]
     elif live["manifest"]:
@@ -562,6 +620,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--render-reference", action="store_true",
                     help="reject packaged-live frames whose SHOT has no RENDER fingerprint or one off "
                          "docs/art-pipeline/render-reference.json (implied by --strict)")
+    ap.add_argument("--require-captured", action="store_true",
+                    help="strict S6 for every frame: the W5b-R 'SHOT captured' pixel provenance (default: only for "
+                         "traces of a W5b-R client, those with 'SHOT request file=' lines)")
     ap.add_argument("--self-test", action="store_true", help="run the built-in 3 positive + 1 negative cases")
     a = ap.parse_args(argv)
     if a.self_test:
@@ -576,7 +637,8 @@ def main(argv: list[str] | None = None) -> int:
     except FileNotFoundError as e:
         print(f"not found: {e}", file=sys.stderr)
         return 1
-    results = [classify_frame(f, a.expect_mesh, render_reference=a.strict or a.render_reference) for f in frames]
+    results = [classify_frame(f, a.expect_mesh, render_reference=a.strict or a.render_reference,
+                              require_captured=a.require_captured) for f in frames]
     print(json.dumps(results, ensure_ascii=False, indent=2))
     if a.require:
         bad = [r for r in results if r["class"] != a.require

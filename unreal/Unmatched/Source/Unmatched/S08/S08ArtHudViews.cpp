@@ -75,11 +75,18 @@ public:
                      SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
                          [SAssignNew(Chip, SBorder)
                               .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
-                              .BorderBackgroundColor(FSlateColor(Style.ChipColor(true)))
+                              .BorderBackgroundColor(FSlateColor(FS08ArtHudPlateStyle::Linear(Style.Background)))
                               .Padding(S08ArtHudLayout::ChipPadding)
-                              [SAssignNew(Team, STextBlock)
-                                   .Font(Style.TeamFont.Resolve())
-                                   .ColorAndOpacity(FSlateColor(NameColor))]]] +
+                              [SNew(SHorizontalBox) +
+                               SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center).Padding(0.0f, 0.0f, 3.0f, 0.0f)
+                                   [SNew(SBox).WidthOverride(Style.TeamShapeSu).HeightOverride(Style.TeamShapeSu)
+                                        [SAssignNew(Shape, SImage)
+                                             .Image(FCoreStyle::Get().GetBrush("WhiteBrush"))
+                                             .ColorAndOpacity(FSlateColor(Style.TeamChipColor(0)))]] +
+                               SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
+                                   [SAssignNew(Team, STextBlock)
+                                        .Font(Style.TeamFont.Resolve())
+                                        .ColorAndOpacity(FSlateColor(NameColor))]]]] +
                 SVerticalBox::Slot().AutoHeight().Padding(S08ArtHudLayout::HpRowPadding)
                     [SNew(SHorizontalBox) +
                      SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center)
@@ -111,8 +118,21 @@ public:
     Hp->SetText(Texts.Hp);
     HpFill->SetWidthOverride(FOptionalSize(FMath::Max(1.0f, Style.HpBarWidthSu * Texts.HpFraction)));
     Team->SetText(Texts.Team);
-    Chip->SetBorderBackgroundColor(FSlateColor(Style.ChipColor(Texts.bOwn)));
+    TeamSlot = Texts.TeamSlot;
+    ApplyShape();
     Status->SetText(Texts.Statuses);
+  }
+
+  void SetTeamShapeBrushes(const FSlateBrush& Circle, const FSlateBrush& Hex) override {
+    ShapeBrushes[0] = Circle;
+    ShapeBrushes[1] = Hex;
+    bShapeBrushes = true;
+    ApplyShape();
+  }
+
+  void ApplyShape() {
+    if (bShapeBrushes) Shape->SetImage(&ShapeBrushes[TeamSlot ? 1 : 0]);
+    Shape->SetColorAndOpacity(FSlateColor(Style.TeamChipColor(TeamSlot)));
   }
 
   void SetShown(bool bShown) override {
@@ -133,10 +153,15 @@ public:
     Out.Add({S08ArtHudIds::PlateHpFill, HpFill});
     Out.Add({S08ArtHudIds::PlateHp, Hp});
     Out.Add({S08ArtHudIds::PlateStatus, Status});
+    Out.Add({S08ArtHudIds::PlateTeamShape, Shape});
   }
 
 private:
   FS08ArtHudPlateStyle Style;
+  TSharedPtr<SImage> Shape;
+  FSlateBrush ShapeBrushes[2];
+  bool bShapeBrushes = false;
+  uint8 TeamSlot = 0;
   TSharedPtr<SBorder> Root;
   TSharedPtr<SColorBlock> Marker;
   TSharedPtr<STextBlock> Name;
@@ -188,6 +213,9 @@ public:
   FVector2D SizeSu() const override { return Widget.IsValid() ? Widget->GetPlateSizeSu() : FVector2D::ZeroVector; }
   void ApplyTexts(const FS08PlateTexts& Texts) override {
     if (Widget.IsValid()) Widget->ApplyTexts(Texts);
+  }
+  void SetTeamShapeBrushes(const FSlateBrush& Circle, const FSlateBrush& Hex) override {
+    if (Widget.IsValid()) Widget->SetTeamShapeBrushes(Circle, Hex);
   }
   void SetShown(bool bShown) override {
     if (Widget.IsValid()) {

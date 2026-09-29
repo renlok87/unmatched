@@ -1,0 +1,242 @@
+{
+  "schema": "unmatched.t22-ue-tests/1",
+  "label": "T4-S09",
+  "filter": "Unmatched.S09",
+  "startedLocal": "2026-09-29T18:59:49+05:00",
+  "durationS": 15.9,
+  "exitCode": 0,
+  "log": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/tests/tests-T4-S09.log",
+  "editorDll": {
+    "sha256": "2ddbf431e243629a0c8ba55372ea2c11f567c55613759c0f4d438c49f0168342"
+  },
+  "found": [
+    44
+  ],
+  "results": [
+    {
+      "result": "Success",
+      "name": "CMD begin gate: legal start, duplicate blocked while pending, not-your-turn rejected",
+      "path": "Unmatched.S09.CMD begin gate: legal start, duplicate blocked while pending, not-your-turn rejected"
+    },
+    {
+      "result": "Success",
+      "name": "CMD boost: exact hand instance toggles, hidden/foreign ids rejected",
+      "path": "Unmatched.S09.CMD boost: exact hand instance toggles, hidden/foreign ids rejected"
+    },
+    {
+      "result": "Success",
+      "name": "CMD cancel is local-only: pending survives, begin stays blocked, resume works",
+      "path": "Unmatched.S09.CMD cancel is local-only: pending survives, begin stays blocked, resume works"
+    },
+    {
+      "result": "Success",
+      "name": "CMD destinations: unreachable rejected with reason, same-cell conflict caught",
+      "path": "Unmatched.S09.CMD destinations: unreachable rejected with reason, same-cell conflict caught"
+    },
+    {
+      "result": "Success",
+      "name": "CMD discard: exactly count unique own ids, foreign/hidden rejected, over-select gated",
+      "path": "Unmatched.S09.CMD discard: exactly count unique own ids, foreign/hidden rejected, over-select gated"
+    },
+    {
+      "result": "Success",
+      "name": "CMD double-fire gate: duplicate discard/submit blocked in flight; TURN_END discard survives turn flip",
+      "path": "Unmatched.S09.CMD double-fire gate: duplicate discard/submit blocked in flight; TURN_END discard survives turn flip"
+    },
+    {
+      "result": "Success",
+      "name": "CMD multi-fighter: hero + sidekick drafted, confirm builds both paths",
+      "path": "Unmatched.S09.CMD multi-fighter: hero + sidekick drafted, confirm builds both paths"
+    },
+    {
+      "result": "Success",
+      "name": "CMD regression: same-seq reapply keeps drawn card new and boostable exactly once",
+      "path": "Unmatched.S09.CMD regression: same-seq reapply keeps drawn card new and boostable exactly once"
+    },
+    {
+      "result": "Success",
+      "name": "CMD zero-move: confirm with no drafted moves is legal (ACC-006)",
+      "path": "Unmatched.S09.CMD zero-move: confirm with no drafted moves is legal (ACC-006)"
+    },
+    {
+      "result": "Success",
+      "name": "COMBAT attack card replacement: later legal pick replaces, old pick re-toggle re-selects",
+      "path": "Unmatched.S09.COMBAT attack card replacement: later legal pick replaces, old pick re-toggle re-selects"
+    },
+    {
+      "result": "Success",
+      "name": "COMBAT attack draft: adjacency, banner/type gates, confirm re-validation",
+      "path": "Unmatched.S09.COMBAT attack draft: adjacency, banner/type gates, confirm re-validation"
+    },
+    {
+      "result": "Success",
+      "name": "COMBAT boost choice: mode opens for the owner, mandatory cannot be declined",
+      "path": "Unmatched.S09.COMBAT boost choice: mode opens for the owner, mandatory cannot be declined"
+    },
+    {
+      "result": "Success",
+      "name": "COMBAT defense: card pick for the attacked fighter, expired deadline blocks",
+      "path": "Unmatched.S09.COMBAT defense: card pick for the attacked fighter, expired deadline blocks"
+    },
+    {
+      "result": "Success",
+      "name": "COMBAT mutation echoes parse (attack/defense/resolve)",
+      "path": "Unmatched.S09.COMBAT mutation echoes parse (attack/defense/resolve)"
+    },
+    {
+      "result": "Success",
+      "name": "COMBAT privacy flags per seat (fixtures, pre-reveal)",
+      "path": "Unmatched.S09.COMBAT privacy flags per seat (fixtures, pre-reveal)"
+    },
+    {
+      "result": "Success",
+      "name": "COMBAT role gates: defender window, attacker cannot resolve, resolve window open",
+      "path": "Unmatched.S09.COMBAT role gates: defender window, attacker cannot resolve, resolve window open"
+    },
+    {
+      "result": "Success",
+      "name": "COMBAT seq guard: resolve echo applies once, same-seq merge fires no second cue, stale ignored",
+      "path": "Unmatched.S09.COMBAT seq guard: resolve echo applies once, same-seq merge fires no second cue, stale ignored"
+    },
+    {
+      "result": "Success",
+      "name": "HUD counter freshness: WS bodies carry no decks, stale counts are marked",
+      "path": "Unmatched.S09.HUD counter freshness: WS bodies carry no decks, stale counts are marked"
+    },
+    {
+      "result": "Success",
+      "name": "HUD guest perspective: roles flip, hidden host hand stays count-only (fixture 05)",
+      "path": "Unmatched.S09.HUD guest perspective: roles flip, hidden host hand stays count-only (fixture 05)"
+    },
+    {
+      "result": "Success",
+      "name": "HUD host perspective: exact own instance ids, opponent count only (fixture 04)",
+      "path": "Unmatched.S09.HUD host perspective: exact own instance ids, opponent count only (fixture 04)"
+    },
+    {
+      "result": "Success",
+      "name": "HUD inspector lines: full text + identity for public cards, hidden stays faceless",
+      "path": "Unmatched.S09.HUD inspector lines: full text + identity for public cards, hidden stays faceless"
+    },
+    {
+      "result": "Success",
+      "name": "HUD new-card marking: beginManeuver draw is bNew vs previous hand (ACC-006)",
+      "path": "Unmatched.S09.HUD new-card marking: beginManeuver draw is bNew vs previous hand (ACC-006)"
+    },
+    {
+      "result": "Success",
+      "name": "HUD privacy: hidden entries carry no face, summary never leaks card identity",
+      "path": "Unmatched.S09.HUD privacy: hidden entries carry no face, summary never leaks card identity"
+    },
+    {
+      "result": "Success",
+      "name": "PENDING card types: DISCARD_CARDS exact own ids, BOOST_CHOICE exactly one (synthesized)",
+      "path": "Unmatched.S09.PENDING card types: DISCARD_CARDS exact own ids, BOOST_CHOICE exactly one (synthesized)"
+    },
+    {
+      "result": "Success",
+      "name": "PENDING CHOOSE_SPACE: live stage-1 zones, synthesized zones, stage-2 anchor",
+      "path": "Unmatched.S09.PENDING CHOOSE_SPACE: live stage-1 zones, synthesized zones, stage-2 anchor"
+    },
+    {
+      "result": "Success",
+      "name": "PENDING DECK_TOP_PICK: PICK exact ids, ORDER full order, opponent privacy",
+      "path": "Unmatched.S09.PENDING DECK_TOP_PICK: PICK exact ids, ORDER full order, opponent privacy"
+    },
+    {
+      "result": "Success",
+      "name": "PENDING DISCARD_CARDS live: owner gates, exact own ids, wait-seat privacy, echo closes head",
+      "path": "Unmatched.S09.PENDING DISCARD_CARDS live: owner gates, exact own ids, wait-seat privacy, echo closes head"
+    },
+    {
+      "result": "Success",
+      "name": "PENDING malformed pendingEffects metadata (no crash, entries degrade)",
+      "path": "Unmatched.S09.PENDING malformed pendingEffects metadata (no crash, entries degrade)"
+    },
+    {
+      "result": "Success",
+      "name": "PENDING MOVE queue: owner gates, legal fighter/cell, zero-step, stale head",
+      "path": "Unmatched.S09.PENDING MOVE queue: owner gates, legal fighter/cell, zero-step, stale head"
+    },
+    {
+      "result": "Success",
+      "name": "PENDING parser matrix (live fixtures: types, stages, privacy fields)",
+      "path": "Unmatched.S09.PENDING parser matrix (live fixtures: types, stages, privacy fields)"
+    },
+    {
+      "result": "Success",
+      "name": "PENDING pick plan: exact pool+count per card head (PICK/ORDER/DISCARD/BOOST)",
+      "path": "Unmatched.S09.PENDING pick plan: exact pool+count per card head (PICK/ORDER/DISCARD/BOOST)"
+    },
+    {
+      "result": "Success",
+      "name": "PENDING seq guard: pending open + resolved echo, duplicate merges (live seqs)",
+      "path": "Unmatched.S09.PENDING seq guard: pending open + resolved echo, duplicate merges (live seqs)"
+    },
+    {
+      "result": "Success",
+      "name": "PENDING synthesized heads: TARGET_FIGHTER list gate, CHOOSE_ONE multi-step (synthesized)",
+      "path": "Unmatched.S09.PENDING synthesized heads: TARGET_FIGHTER list gate, CHOOSE_ONE multi-step (synthesized)"
+    },
+    {
+      "result": "Success",
+      "name": "RESULT endTurn phase gate: no mutation outside ACTION_MANEUVER/ACTION_ATTACK",
+      "path": "Unmatched.S09.RESULT endTurn phase gate: no mutation outside ACTION_MANEUVER/ACTION_ATTACK"
+    },
+    {
+      "result": "Success",
+      "name": "RESULT scheme banner legality mirror: dead-banner schemes are never re-sent",
+      "path": "Unmatched.S09.RESULT scheme banner legality mirror: dead-banner schemes are never re-sent"
+    },
+    {
+      "result": "Success",
+      "name": "RESULT strictly phase-driven: live phases and abort-shaped bodies never render a result",
+      "path": "Unmatched.S09.RESULT strictly phase-driven: live phases and abort-shaped bodies never render a result"
+    },
+    {
+      "result": "Success",
+      "name": "RESULT terminal snapshot closes drafts and kills gameplay input (model + controller)",
+      "path": "Unmatched.S09.RESULT terminal snapshot closes drafts and kills gameplay input (model + controller)"
+    },
+    {
+      "result": "Success",
+      "name": "RESULT winner/loser/draw parse for both seats over the live projection",
+      "path": "Unmatched.S09.RESULT winner/loser/draw parse for both seats over the live projection"
+    },
+    {
+      "result": "Success",
+      "name": "SCHEME cancel: local-only close sends nothing and clears the pick",
+      "path": "Unmatched.S09.SCHEME cancel: local-only close sends nothing and clears the pick"
+    },
+    {
+      "result": "Success",
+      "name": "SCHEME invalid picks: dead banner, non-SCHEME, hidden, foreign rejected",
+      "path": "Unmatched.S09.SCHEME invalid picks: dead banner, non-SCHEME, hidden, foreign rejected"
+    },
+    {
+      "result": "Success",
+      "name": "SCHEME open gate: turn/phase/pending/in-flight/empty-hand",
+      "path": "Unmatched.S09.SCHEME open gate: turn/phase/pending/in-flight/empty-hand"
+    },
+    {
+      "result": "Success",
+      "name": "SCHEME snapshot staleness: turn end / pending open close the picker",
+      "path": "Unmatched.S09.SCHEME snapshot staleness: turn end / pending open close the picker"
+    },
+    {
+      "result": "Success",
+      "name": "SCHEME stale confirm: selection that left the hand is rejected, never substituted",
+      "path": "Unmatched.S09.SCHEME stale confirm: selection that left the hand is rejected, never substituted"
+    },
+    {
+      "result": "Success",
+      "name": "SCHEME two legal schemes: exact-instance select, switch and confirm",
+      "path": "Unmatched.S09.SCHEME two legal schemes: exact-instance select, switch and confirm"
+    }
+  ],
+  "passed": 44,
+  "failed": [],
+  "errorLines": [],
+  "startupNoiseErrorLines": 17,
+  "command": "UnrealEditor-Cmd <art uproject> -ExecCmds=\"Automation RunTests <filter>; Quit\" -unattended -nosplash -nullrhi -nullaudio (MCP auto-start off)"
+}

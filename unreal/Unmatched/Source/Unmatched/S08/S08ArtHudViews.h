@@ -48,6 +48,8 @@ public:
   /** Plate size in HUD slate units (Style tokens of this view). */
   virtual FVector2D SizeSu() const = 0;
   virtual void ApplyTexts(const FS08PlateTexts& Texts) = 0;
+  /** W5b-R D-3: team shape chip textures (circle P1 / hexagon P2), tinted by the team chip colour. */
+  virtual void SetTeamShapeBrushes(const FSlateBrush& Circle, const FSlateBrush& Hex) = 0;
   /** HitTestInvisible when shown, Collapsed when hidden. */
   virtual void SetShown(bool bShown) = 0;
   /** Compare-mode twin: laid out and painted, but at render opacity 0. */

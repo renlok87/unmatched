@@ -152,7 +152,7 @@
       "id": "UM-MASTERS",
       "note": "Мастер-материалы волны 4 (W4-B, меморандум engine-gate §1 п. 4): M_UM_Figure / M_UM_BaseMarker / M_UM_GameLayer, строятся и проверяются `tools/tripo-pipeline/um_masters.py` (граф = граф кандидатов при нейтральных ручках; CPD 0–3 TeamColor, 4 InstanceIndex, 5–8 FxFlash, 9–10 Rim, 11 Fade; hex → FromSRGBColor; без Masked/WPO). Статус — технически импортировано; ручки и палитра — предложено. .uasset в Content (gitignored) добавлены принудительно. Для кандидатов пайплайна заменяет M-DIORAMA-MASTER (S05 не трогается).",
       "paths": [
-        {"path": "art/um-materials/um-masters.json", "root": "repo", "kind": "file", "expect": "exists", "role": "спецификация мастеров (параметры, CPD, палитра С-11 и предложение)", "sha256": "789eef60250269f02c1ce9619ff3844c6427c0f36e695b7e0c5223445d1c8a2d"},
+        {"path": "art/um-materials/um-masters.json", "root": "repo", "kind": "file", "expect": "exists", "role": "спецификация мастеров (параметры, CPD, палитра С-11 и предложение)", "sha256": "8935c45be2315f96d42436ba0d11881059bc1efc45ed4b5de7cd0e2e27da4e5b"},
         {"path": "tools/tripo-pipeline/um_masters.py", "root": "repo", "kind": "file", "expect": "exists", "role": "build/verify мастеров через MCP"},
         {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/um-masters-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт build/verify: 3 × PASS, graph_signature"},
         {"path": "/Game/UM/Materials/M_UM_Figure", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "мастер фигур"},
@@ -1036,6 +1036,42 @@
       "evidence": [
         {"path": "docs/game-design/evidence/ART-003/live-combat-target-acceptance-2026-09-28.md", "root": "repo", "kind": "file", "expect": "exists", "role": "техническая привязка прицела к бою"},
         {"path": "blender/ASSET-MARKERS-001/ue-hit-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "UE hit test"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-MARKERS-001.TEAMRING",
+      "name": "Кольца команды SM_Marker_TeamRing_P1 (окружность) / _P2 (шестигранник с разрывами)",
+      "category": "marker",
+      "contentKey": null,
+      "manifest06Row": "ASSET-MARKERS-001",
+      "backlog": ["ART-005"],
+      "parent": "ASSET-MARKERS-001",
+      "instances": 2,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "art-chat", "nextCandidates": "art-chat", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [],
+        "excludedCandidates": [],
+        "note": "Параметрические меши W5b-R (решение советника D-3); референса-картинки нет, Tripo не нужен."
+      },
+      "source3d": [
+        {"path": "tools/art/t53_team_ring.py", "root": "repo", "kind": "file", "expect": "exists", "role": "генератор OBJ и импорт через MCP (RING_SPEC = S08TeamRingSpec)"},
+        {"path": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/content/obj/SM_Marker_TeamRing_P1.obj", "root": "repo", "kind": "file", "expect": "exists", "role": "OBJ P1 (детерминирован генератором)"},
+        {"path": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/content/obj/SM_Marker_TeamRing_P2.obj", "root": "repo", "kind": "file", "expect": "exists", "role": "OBJ P2 (детерминирован генератором)"}
+      ],
+      "layers": [],
+      "manifest06": {"verificationStatusIn06": "in_progress", "drift": "Новый вид кольца команды; строка 06 не менялась.", "proposedChange": "docs/art-pipeline/proposals/w5br-c11-team-split-03.diff.md (03 С-11)"},
+      "nextStep": "Взгляд пользователя на палитру Gold/Silver, круг/шестигранник и A/B absolute/relative (шаг 9 журнала решений W5b-R).",
+      "blocker": "Художественно не принято; классификатор формы не распознаёт часть колец при тонких перекрытиях блок-аутом (акт W5b-R).",
+      "doneCriteria": "Кольца видны у всех бойцов на трёх досках (доля заливки не ниже порога t53), форма распознаётся в цвете, сером и deuteranopia, пользователь принял вид.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md", "root": "repo", "kind": "file", "expect": "exists", "role": "акт W5b-R: пересъёмка трёх досок"},
+        {"path": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/t53-thresholds.json", "root": "repo", "kind": "file", "expect": "exists", "role": "пороги, зарегистрированные до съёмки"},
+        {"path": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/content/team-ring-content.json", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт мешей и MI через MCP"}
       ],
       "plannedPaths": []
     },

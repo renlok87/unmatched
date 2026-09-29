@@ -3,7 +3,12 @@ param(
   [int]$MinVerticalGrooves = 12,
   [int]$MinHorizontalGrooves = 10,
   [int]$MinTeamPixels = 150,
-  [double]$MinNonBlackPct = 35.0
+  [double]$MinNonBlackPct = 35.0,
+  # W5b-R (decision D-2): 'relative-blue-red' = the grey S08/S09 path (own blue / enemy red base discs, relative to the
+  # viewer - unchanged); 'absolute-p1-p2' = the art team palette of docs/unreal/contracts/hud/hud-style-tokens.json
+  # (team.p1.screen / team.p2.screen: the on-screen ring fills, absolute by seat).
+  [ValidateSet('relative-blue-red', 'absolute-p1-p2')][string]$Palette = 'relative-blue-red',
+  [int]$PaletteTolerance = 30
 )
 # GD-030 board-shot verdict. A non-black frame with saturated team colors is
 # NOT enough: the old build rendered 20x20 tiles at full XY scale and merged
@@ -143,10 +148,26 @@ $hGrid = Count-GrooveRuns (Smooth $hProf)
 # OUTSIDE the board (the real fighters' base rings sit on board tiles).
 $bluePx = 0; $redPx = 0
 $bx0 = $x0; $bx1 = [Math]::Min($x1, $w - 1); $by0 = $y0; $by1 = [Math]::Min($y1, $h - 1)
+$p1 = $null; $p2 = $null
+if ($Palette -eq 'absolute-p1-p2') {
+  $tokensPath = Join-Path $PSScriptRoot '..\..\docs\unreal\contracts\hud\hud-style-tokens.json'
+  $tok = (Get-Content -LiteralPath $tokensPath -Raw -Encoding UTF8 | ConvertFrom-Json).colors
+  $hexToRgb = { param($hex) @([Convert]::ToInt32($hex.Substring(1, 2), 16), [Convert]::ToInt32($hex.Substring(3, 2), 16), [Convert]::ToInt32($hex.Substring(5, 2), 16)) }
+  $p1 = & $hexToRgb $tok.'team.p1.screen'.hex
+  $p2 = & $hexToRgb $tok.'team.p2.screen'.hex
+}
 for ($y = $by0; $y -le $by1; $y += 2) {
   for ($x = $bx0; $x -le $bx1; $x += 2) {
     $o = $y * $stride + $x * 4
     $r = $bytes[$o + 2]; $g = $bytes[$o + 1]; $b = $bytes[$o]
+    if ($p1) {
+      # absolute palette: 'blue' counts team P1 (Gold), 'red' counts team P2 (Silver) - max channel distance
+      $d1 = [Math]::Max([Math]::Max([Math]::Abs($r - $p1[0]), [Math]::Abs($g - $p1[1])), [Math]::Abs($b - $p1[2]))
+      $d2 = [Math]::Max([Math]::Max([Math]::Abs($r - $p2[0]), [Math]::Abs($g - $p2[1])), [Math]::Abs($b - $p2[2]))
+      if ($d1 -le $PaletteTolerance) { $bluePx++ }
+      if ($d2 -le $PaletteTolerance) { $redPx++ }
+      continue
+    }
     # Tonemapped team bases: the HDR blue base lands near (179,223,242)
     # (pale cyan), the red base near (244,180,180). Neutral greys (tiles,
     # bodies, white labels) have near-equal channels and never match.
@@ -168,8 +189,10 @@ $nonBlackPct = [Math]::Round(100.0 * $nonBlack / [double]$total, 1)
 $reasons = @()
 if ($vGrid.runs -lt $MinVerticalGrooves) { $reasons += "vertical grooves $($vGrid.runs) < $MinVerticalGrooves (solid slab?)" }
 if ($hGrid.runs -lt $MinHorizontalGrooves) { $reasons += "horizontal grooves $($hGrid.runs) < $MinHorizontalGrooves (solid slab?)" }
-if ($bluePx -lt $MinTeamPixels) { $reasons += "own blue base pixels $bluePx < $MinTeamPixels" }
-if ($redPx -lt $MinTeamPixels) { $reasons += "enemy red base pixels $redPx < $MinTeamPixels" }
+$teamA = if ($p1) { 'team P1 (Gold) ring' } else { 'own blue base' }
+$teamB = if ($p1) { 'team P2 (Silver) ring' } else { 'enemy red base' }
+if ($bluePx -lt $MinTeamPixels) { $reasons += "$teamA pixels $bluePx < $MinTeamPixels" }
+if ($redPx -lt $MinTeamPixels) { $reasons += "$teamB pixels $redPx < $MinTeamPixels" }
 if ($nonBlackPct -lt $MinNonBlackPct) { $reasons += "nonBlackPct $nonBlackPct < $MinNonBlackPct" }
 
 $out = [ordered]@{
@@ -180,6 +203,7 @@ $out = [ordered]@{
   horizontalGrooves = $hGrid.runs
   vThreshold        = $vGrid.threshold
   hThreshold        = $hGrid.threshold
+  palette           = $Palette
   bluePx            = $bluePx
   redPx             = $redPx
   nonBlackPct       = $nonBlackPct

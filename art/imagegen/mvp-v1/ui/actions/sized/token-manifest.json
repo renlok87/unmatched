@@ -1,0 +1,121 @@
+{
+  "schema": "unmatched.w5br-attack-token/1",
+  "status": "предложено (жетон иконки цели, решение советника D-5; художественно не принят)",
+  "source": "art/imagegen/mvp-v1/ui/actions/ui-action-attack-normal.png",
+  "sourceSha256": "8ca8f1af4d097a0a77ffa8eb09696c93ad7113fcc28ac6f3ab2cbaf292d4643f",
+  "sourceGlyphBox": [
+    101,
+    87,
+    1153,
+    1161
+  ],
+  "colors": {
+    "body": "#161A28",
+    "rim": "#F2ECDE",
+    "outline": "#111317"
+  },
+  "rule": {
+    "shape": "rounded square N x N, corner radius N/4, coverage by 8x8 supersampling",
+    "rimPx": 1,
+    "glyphBoxPx": "N-4 (1 px rim + 1 px margin each side), aspect kept, centred",
+    "glyphFilter": "linear light, premultiplied alpha, area average (PIL BOX)",
+    "outline": "1 px: glyph alpha dilated 3x3 (max), painted #111317 under the glyph",
+    "hilts": "glyph pixels with relative luminance < 0.16 scaled up in linear light (all channels x k, k = Ymin / Y, capped so no channel exceeds 1) - hue kept",
+    "maskTexture": "alpha = glyph coverage after the filter (qa010 icon --mask-texture ... --mask-alpha 0.5); body = token shape minus glyph minus the outer 1 px rim"
+  },
+  "outputs": [
+    {
+      "size": 24,
+      "path": "art/imagegen/mvp-v1/ui/actions/sized/ui-action-attack-token-24.png",
+      "sha256": "1bd352eb4588221434345f3321b856817fb4e4494ca5b49fa437947f9bfa26f0",
+      "glyphMask": "art/imagegen/mvp-v1/ui/actions/sized/ui-action-attack-token-24-glyphmask.png",
+      "glyphMaskSha256": "f687decfa4a114b5dcbe957238f770142476d7771c46492f555f20eb460f0cb9",
+      "ueAsset": "/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_AttackToken_24",
+      "glyphBoxPx": [
+        2,
+        2,
+        22,
+        22
+      ],
+      "glyphPixelsAlpha05": 156,
+      "bodyPixels": 308,
+      "rimPixels": 80,
+      "hiltsLifted": 61,
+      "glyphRelLumBefore": {
+        "p10": 0.1203,
+        "median": 0.5475
+      },
+      "glyphRelLumAfter": {
+        "p10": 0.16,
+        "median": 0.5475
+      },
+      "predictedOnTexture": {
+        "glyphMedianVsBody": 9.38,
+        "glyphP10VsBody": 3.16,
+        "rimVsBody": 14.7
+      }
+    },
+    {
+      "size": 32,
+      "path": "art/imagegen/mvp-v1/ui/actions/sized/ui-action-attack-token-32.png",
+      "sha256": "4fb9750c989856cf23a33e2bf4044e88543f40bab794c4811c81f77d68297a81",
+      "glyphMask": "art/imagegen/mvp-v1/ui/actions/sized/ui-action-attack-token-32-glyphmask.png",
+      "glyphMaskSha256": "cf0761008613b3458674e46223a92a10d908a9f1e484cb9d1cfa7ee810061fad",
+      "ueAsset": "/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_AttackToken_32",
+      "glyphBoxPx": [
+        2,
+        2,
+        29,
+        30
+      ],
+      "glyphPixelsAlpha05": 291,
+      "bodyPixels": 578,
+      "rimPixels": 108,
+      "hiltsLifted": 118,
+      "glyphRelLumBefore": {
+        "p10": 0.0916,
+        "median": 0.4868
+      },
+      "glyphRelLumAfter": {
+        "p10": 0.16,
+        "median": 0.4868
+      },
+      "predictedOnTexture": {
+        "glyphMedianVsBody": 8.74,
+        "glyphP10VsBody": 3.07,
+        "rimVsBody": 14.7
+      }
+    },
+    {
+      "size": 48,
+      "path": "art/imagegen/mvp-v1/ui/actions/sized/ui-action-attack-token-48.png",
+      "sha256": "9b76e2df72d405b2b5732b49f4f9638b17ba17db9fc2b862dea5b75558d458b1",
+      "glyphMask": "art/imagegen/mvp-v1/ui/actions/sized/ui-action-attack-token-48-glyphmask.png",
+      "glyphMaskSha256": "a8930c64965f98ae224660eb6149bcbfa066dae901fa919e3fc0b60a6232937b",
+      "ueAsset": "/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_AttackToken_48",
+      "glyphBoxPx": [
+        2,
+        2,
+        45,
+        46
+      ],
+      "glyphPixelsAlpha05": 729,
+      "bodyPixels": 1299,
+      "rimPixels": 160,
+      "hiltsLifted": 304,
+      "glyphRelLumBefore": {
+        "p10": 0.0705,
+        "median": 0.4597
+      },
+      "glyphRelLumAfter": {
+        "p10": 0.16,
+        "median": 0.4597
+      },
+      "predictedOnTexture": {
+        "glyphMedianVsBody": 8.32,
+        "glyphP10VsBody": 3.2,
+        "rimVsBody": 14.7
+      }
+    }
+  ]
+}

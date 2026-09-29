@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "S08BoardModel.h"
+#include "S08Team.h"
 #include "S08FighterActor.generated.h"
 
 class UStaticMeshComponent;
@@ -30,6 +31,26 @@ public:
    *  grey-slice visual distinctions. */
   void ApplyFighter(const FS08BoardFighter& Fighter, const FVector& CellCenter,
                     bool bOwn, bool bArtPreview);
+  /** W5b-R D-2/D-3: absolute team and the drawn look (ring shape/colour, Medusa MI); call before ApplyFighter. */
+  void SetTeam(ES08TeamSlot InTeam, ES08TeamSlot InLook, ES08TeamColorMode InMode) {
+    Team = InTeam;
+    Look = InLook;
+    TeamMode = InMode;
+  }
+  ES08TeamSlot GetTeam() const { return Team; }
+  ES08TeamSlot GetLook() const { return Look; }
+  /** The authored team ring replaced the grey base disc (art figure + ring assets). */
+  bool HasTeamRing() const { return bTeamRingShown; }
+  /** Grey ART-003 blockout (Arthur, Merlin, Harpies) - not the art sculpt (D-1: full tag). */
+  bool IsBlockout() const { return bBlockoutVisible; }
+  /** W5b-R D-1: the screen tag layer hides the world TextRender name/HP lines. */
+  void SetWorldLabelsSuppressed(bool bSuppressed);
+  /** W5b-R D-3: loads the team ring meshes and MIs (BeginPlay under -ArtPreview; public for the automation test). */
+  bool LoadTeamRingAssets();
+  bool IsBaseVisible() const;
+  bool IsTeamRingVisible() const;
+  const UStaticMesh* GetTeamRingMesh() const;
+  FVector GetTeamRingScale() const;
   const FS08BoardFighter& GetFighter() const { return Fighter; }
   const FString& GetFighterId() const { return Fighter.Id; }
 
@@ -75,6 +96,20 @@ private:
   UPROPERTY()
   TObjectPtr<UStaticMeshComponent> Ring;
 
+  // W5b-R D-3: the authored team ring (SM_Marker_TeamRing_P1/_P2) of an art figure, z +0.6..+1.2 above the tile.
+  UPROPERTY()
+  TObjectPtr<UStaticMeshComponent> TeamRing;
+  UPROPERTY()
+  TObjectPtr<UStaticMesh> TeamRingMeshP1;
+  UPROPERTY()
+  TObjectPtr<UStaticMesh> TeamRingMeshP2;
+  UPROPERTY()
+  TObjectPtr<UMaterialInterface> TeamRingKeyline;
+  UPROPERTY()
+  TObjectPtr<UMaterialInterface> TeamRingFill;
+  UPROPERTY()
+  TObjectPtr<UMaterialInstanceDynamic> TeamRingFillMid;
+
   UPROPERTY()
   TObjectPtr<UStaticMeshComponent> TargetRing;
 
@@ -116,6 +151,14 @@ private:
   bool bCapsuleTraced = false;
   bool bAllMedusaTraced = false;
   bool bMedusaMaterialsTraced = false;
+  bool bTeamRingReady = false;
+  bool bTeamRingShown = false;
+  bool bTeamRingTraced = false;
+  bool bBlockoutVisible = false;
+  bool bWorldLabelsSuppressed = false;
+  ES08TeamSlot Team = ES08TeamSlot::P1;
+  ES08TeamSlot Look = ES08TeamSlot::P1;
+  ES08TeamColorMode TeamMode = ES08TeamColorMode::Absolute;
   void ApplyLabelVisibility();
 
   FS08BoardFighter Fighter;
