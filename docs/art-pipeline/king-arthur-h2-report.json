@@ -3757,5 +3757,671 @@
         "master_4k/ and work/ ignored (git check-ignore)"
       ]
     }
+  },
+  "h22": {
+    "date": "2026-09-29",
+    "iteration": "H2.2 ред. 2: тёмно-серая воронёная сталь лат по концепту, калибровка относительно эталонных материалов кадра (ред. 1 «чёрный лак» отклонена ревью)",
+    "status": "измерено",
+    "claims": {
+      "art_accepted": false,
+      "ue_checked": false,
+      "game_ready": false
+    },
+    "credits": {
+      "tripo": 0,
+      "syntx": 0,
+      "purchases": 0
+    },
+    "unchanged": {
+      "geometry_uv_bake_rig_fbx": true,
+      "fbx_sha256": {
+        "SK_KingArthur_H2.fbx": "9f3478122333d6488d4847654583b0e56a54c1a6415923ce658bf61d5356e828",
+        "SM_KingArthur_H2_Base.fbx": "dc75338c4b4ab543298da1af4c1bea4d6cfc440063c6647df23a40882aa73c0c"
+      },
+      "identical_to_h21": [
+        "N",
+        "N_OpenGL",
+        "TeamMask"
+      ],
+      "metal_mask": true,
+      "not_regenerated": [
+        "preview/frames/*, game_*, closeups, back_teamdye (H2.1 records, labelled H2.1)",
+        "preview/h21/*"
+      ]
+    },
+    "stages_rebuilt": [
+      "textures",
+      "compare_h22",
+      "steelcheck",
+      "sheets_h22",
+      "manifest"
+    ],
+    "code": {
+      "new": [
+        "tools/tripo-pipeline/blender/h2_bake_arthur/steelcheck.py",
+        "tools/tripo-pipeline/blender/h2_bake_arthur/sheets_h22.py"
+      ],
+      "changed": [
+        "tools/tripo-pipeline/blender/h2_bake_arthur/materials.py (per-texel steel parameters, steel_part_overrides, tint_linear, plate / blade classes; with the H2.1 profile the 10 H2.1 textures byte for byte)",
+        "tools/tripo-pipeline/blender/h2_bake_arthur/stage_compare.py (light 'cobble')",
+        "tools/tripo-pipeline/blender/h2_bake_arthur/run.py (stages compare_h22, steelcheck, sheets_h22; baseline_dir; compare renders the H2.1 baseline c6068808)",
+        "rev. 2: steelcheck.py - relative gate (steel / stone and steel / red cloth, render vs concept, geometric mean, pooled front/side/back), zones of the front view, cobble_check (steel / board 0.4-0.6), absolute ratio informative; change_vs_h21.baseline = commit c6068808 + git path + sha256 (the local work/ copy is checked by sha256 and not committed)",
+        "rev. 2: materials.py - class 'steel_own_params' (blade colour in the class raster) = own_reference_parts only; plate parts with overridden values stay plate steel",
+        "rev. 2: sheets_h22.py / steelcheck.py - label 'H2.2 ред. 2'"
+      ],
+      "profile_blocks": [
+        "textures.materials.metal.steel",
+        "textures.materials.metal.steel_part_overrides",
+        "textures.materials.metal.steel_h22_note",
+        "review_h22",
+        "review_h22.steel_check.relative",
+        "review_h22.steel_check.cobble_steel_over_board_range"
+      ]
+    },
+    "rev1_rejected": {
+      "values": {
+        "bc_target_linear": 0.055,
+        "gamma": 0.5,
+        "bc_clamp": [
+          0.03,
+          0.12
+        ],
+        "chroma_keep": 0.3,
+        "tint_linear": [
+          1.06,
+          1.0,
+          0.92
+        ]
+      },
+      "why": "review 2026-09-29: black lacquer instead of the concept's dark grey blued steel; greaves / tassets near black, engraving lost, gauntlets as dark as the plates; the absolute gate (x1.015) passed only because studio_env lights the unchanged stone x2.1 brighter than the concept's light",
+      "relative_pooled_geomean": 0.5131,
+      "relative_per_ref": {
+        "stone": 0.4428,
+        "red_cloth": 0.5946
+      },
+      "cobble_steel_over_board": {
+        "k2_5x_az0": 0.1725,
+        "k2_5x_az-40": 0.2031
+      },
+      "runtime_2k_sha256_prefix": {
+        "BC": "8e808978bc12cea3",
+        "ORM": "09893e5ad2a8c526"
+      },
+      "note": "rev. 1 runtime textures were never committed; a local copy is in C:/tmp/h22b/h22a_runtime_2k (scratch)"
+    },
+    "steel_plate": {
+      "values": {
+        "bc_target_linear": 0.13,
+        "gamma": 0.8,
+        "bc_clamp": [
+          0.04,
+          0.19
+        ],
+        "chroma_keep": 0.1,
+        "tint_linear": [
+          1.02,
+          1.0,
+          0.96
+        ],
+        "roughness": [
+          0.45,
+          0.55
+        ]
+      },
+      "part_overrides": {
+        "tripo_part_2": {
+          "bc_target_linear": 0.2,
+          "bc_clamp": [
+            0.06,
+            0.26
+          ],
+          "roughness": [
+            0.5,
+            0.55
+          ]
+        },
+        "tripo_part_3": {
+          "bc_target_linear": 0.2,
+          "bc_clamp": [
+            0.06,
+            0.26
+          ],
+          "roughness": [
+            0.5,
+            0.55
+          ]
+        },
+        "tripo_part_7": {
+          "bc_target_linear": 0.1
+        },
+        "tripo_part_8": {
+          "bc_target_linear": 0.1
+        }
+      },
+      "part_overrides_why": {
+        "tripo_part_2/3 (legs: greaves, knees, sabatons)": "vertical greaves reflect the dark lower half of studio.exr: the darkest zone (H2 0.27, rev. 1 0.14 of the concept)",
+        "tripo_part_7/8 (pauldrons)": "lit from above: the brightest zone (x2.26 at the plate value 0.12, x1.99 at 0.10)",
+        "gauntlets": "no override: their painted Tripo steel is 1.7x the plate median (0.075 vs 0.045), with gamma 0.8 their BC is ~1.8x the torso; zone 1.04 of the concept"
+      },
+      "measured_4k": {
+        "texels": 1003753,
+        "metallic_mean": 0.9986,
+        "roughness_p10_p50_p90": [
+          0.45,
+          0.51,
+          0.547
+        ],
+        "bc_lum_linear_p10_p50_p90": [
+          0.07,
+          0.1494,
+          0.2246
+        ],
+        "bc_mean_linear_rgb": [
+          0.1546,
+          0.1481,
+          0.1402
+        ]
+      },
+      "bc_lum_linear_p10_p50_p90_by_part_2k": {
+        "torso tripo_part_1": {
+          "H2": [
+            0.02,
+            0.035,
+            0.065
+          ],
+          "H2.1": [
+            0.227,
+            0.407,
+            0.675
+          ],
+          "rev1": [
+            0.036,
+            0.049,
+            0.066
+          ],
+          "rev2": [
+            0.067,
+            0.107,
+            0.172
+          ]
+        },
+        "legs tripo_part_2/3": {
+          "H2": [
+            0.026,
+            0.044,
+            0.074
+          ],
+          "H2.1": [
+            0.297,
+            0.504,
+            0.68
+          ],
+          "rev1": [
+            0.042,
+            0.054,
+            0.07
+          ],
+          "rev2": [
+            0.128,
+            0.195,
+            0.259
+          ]
+        },
+        "pauldrons tripo_part_7/8": {
+          "H2": [
+            0.018,
+            0.036,
+            0.082
+          ],
+          "H2.1": [
+            0.202,
+            0.413,
+            0.681
+          ],
+          "rev1": [
+            0.035,
+            0.049,
+            0.074
+          ],
+          "rev2": [
+            0.048,
+            0.084,
+            0.157
+          ]
+        },
+        "left forearm tripo_part_9": {
+          "H2": [
+            0.024,
+            0.045,
+            0.074
+          ],
+          "H2.1": [
+            0.281,
+            0.516,
+            0.681
+          ],
+          "rev1": [
+            0.04,
+            0.055,
+            0.071
+          ],
+          "rev2": [
+            0.079,
+            0.129,
+            0.184
+          ]
+        },
+        "right arm + fist tripo_part_12": {
+          "H2": [
+            0.021,
+            0.064,
+            0.154
+          ],
+          "H2.1": [
+            0.25,
+            0.673,
+            0.681
+          ],
+          "rev1": [
+            0.038,
+            0.066,
+            0.101
+          ],
+          "rev2": [
+            0.073,
+            0.169,
+            0.189
+          ]
+        },
+        "left gauntlet tripo_part_15": {
+          "H2": [
+            0.044,
+            0.075,
+            0.168
+          ],
+          "H2.1": [
+            0.514,
+            0.68,
+            0.681
+          ],
+          "rev1": [
+            0.055,
+            0.071,
+            0.106
+          ],
+          "rev2": [
+            0.128,
+            0.189,
+            0.191
+          ]
+        }
+      },
+      "painted_tripo_bc_lum_p10_p50_p90": [
+        0.0212,
+        0.045,
+        0.109
+      ],
+      "task_range_note": "the BC medians (torso 0.107, pauldrons 0.084, forearm 0.129, gauntlets 0.17-0.19, legs 0.195) are partly above the 0.04-0.12 of the H2.2 task: with the plate at 0.10 / 0.12 the relative gate gave 0.85 / 0.96 and the Cobble steel / board 0.31-0.39 / 0.36-0.45 (below 0.4 on az 0)"
+    },
+    "candidates": {
+      "a": {
+        "plate": 0.1,
+        "gamma": 0.8,
+        "chroma_keep": 0.3,
+        "tint": [
+          1.06,
+          1.0,
+          0.92
+        ],
+        "relative": 0.8483,
+        "cobble": [
+          0.3141,
+          0.3883
+        ],
+        "greaves_zone": 0.2255
+      },
+      "b": {
+        "plate": 0.12,
+        "gamma": 0.8,
+        "chroma_keep": 0.3,
+        "tint": [
+          1.06,
+          1.0,
+          0.92
+        ],
+        "relative": 0.959,
+        "cobble": [
+          0.3647,
+          0.452
+        ],
+        "greaves_zone": 0.2556,
+        "note": "steel read bronze in the Cobble frame"
+      },
+      "c": {
+        "plate": 0.12,
+        "legs": 0.16,
+        "chroma_keep": 0.1,
+        "tint": [
+          1.02,
+          1.0,
+          0.96
+        ],
+        "relative": 0.9937,
+        "cobble": [
+          0.3863,
+          0.4678
+        ],
+        "greaves_zone": 0.3158
+      },
+      "d": {
+        "plate": 0.13,
+        "legs": 0.16,
+        "pauldrons": 0.1,
+        "relative": 1.0052,
+        "cobble": [
+          0.4036,
+          0.4731
+        ],
+        "greaves_zone": 0.3158
+      },
+      "e (accepted)": {
+        "plate": 0.13,
+        "legs": 0.2,
+        "pauldrons": 0.1,
+        "relative": 1.04,
+        "cobble": [
+          0.4273,
+          0.4941
+        ],
+        "greaves_zone": 0.3697
+      },
+      "scratch": "C:/tmp/h22b (prof_*.json, sc_*.json, renders)"
+    },
+    "blade": "steel_part_overrides.tripo_part_10 = H2.1 values; blade texels of BC / ORM 2K unchanged vs H2.1 (0 changed)",
+    "steel_luminance_check": {
+      "gate": "relative.pooled[h22].ratio_geomean within +-0.15 of 1 AND cobble_check (steel / board in [0.4, 0.6])",
+      "passed": true,
+      "relative": {
+        "references": [
+          "red_cloth",
+          "stone"
+        ],
+        "tolerance": 0.15,
+        "passed": true,
+        "pooled": {
+          "h2": {
+            "ratio_geomean": 0.8123,
+            "ratio": {
+              "red_cloth": 0.9463,
+              "stone": 0.6974
+            }
+          },
+          "h21": {
+            "ratio_geomean": 2.3279,
+            "ratio": {
+              "red_cloth": 2.6977,
+              "stone": 2.0087
+            }
+          },
+          "h22": {
+            "ratio_geomean": 1.04,
+            "ratio": {
+              "red_cloth": 1.2053,
+              "stone": 0.8975
+            }
+          }
+        },
+        "per_view_geomean": {
+          "back": {
+            "h2": 0.9243,
+            "h21": 2.7408,
+            "h22": 0.879
+          },
+          "front": {
+            "h2": 0.765,
+            "h21": 2.1285,
+            "h22": 0.9032
+          },
+          "side": {
+            "h2": 0.6296,
+            "h21": 1.909,
+            "h22": 1.0034
+          }
+        },
+        "zones_front_geomean": {
+          "chest": {
+            "h2": 0.7021,
+            "h21": 3.0566,
+            "h22": 1.1096
+          },
+          "faulds": {
+            "h2": 0.6158,
+            "h21": 2.2542,
+            "h22": 0.8507
+          },
+          "gauntlets": {
+            "h2": 1.1512,
+            "h21": 2.0415,
+            "h22": 1.0424
+          },
+          "greaves": {
+            "h2": 0.2699,
+            "h21": 0.8149,
+            "h22": 0.3697
+          },
+          "pauldron_left": {
+            "h2": 1.48,
+            "h21": 5.7685,
+            "h22": 1.9876
+          },
+          "vambrace_left": {
+            "h2": 0.7729,
+            "h21": 2.6951,
+            "h22": 1.1311
+          }
+        },
+        "rev1_pooled_geomean": 0.5131,
+        "why_gold_is_not_a_reference": "the H2.1 pass made the gold a metal (not unchanged since H2) and it differs from the concept gold in hue / saturation"
+      },
+      "absolute_informative": {
+        "ratio_to_concept": {
+          "h2": 1.5839,
+          "h21": 4.6037,
+          "h22": 2.0568
+        },
+        "rev1": 1.0148,
+        "concept_Y_mean": 0.06,
+        "stone_exposure_steel_ratio": {
+          "h2": 0.7469,
+          "h21": 2.1528,
+          "h22": 0.9618
+        }
+      },
+      "cobble_check": {
+        "note": "the plate steel on the Cobble-light K2 frames neither white (> hi, H2.1 1.27-1.51) nor black (< lo, H2.2 rev. 1 0.17-0.20); H2 0.48-0.53",
+        "passed": true,
+        "range": [
+          0.4,
+          0.6
+        ],
+        "set": "h22",
+        "steel_Y_mean_over_board": [
+          0.4273,
+          0.4941
+        ]
+      }
+    },
+    "cobble_light": {
+      "sheet": "preview/h22/cobble_light.jpg",
+      "steel_Y_mean_over_board": {
+        "k2_5x_az-40": {
+          "h2": 0.5249,
+          "h21": 1.5062,
+          "h22": 0.4941
+        },
+        "k2_5x_az0": {
+          "h2": 0.481,
+          "h21": 1.2747,
+          "h22": 0.4273
+        }
+      },
+      "steel_Y_p90_over_board": {
+        "k2_5x_az-40": {
+          "h2": 0.8296,
+          "h21": 2.1674,
+          "h22": 0.9593
+        },
+        "k2_5x_az0": {
+          "h2": 0.8715,
+          "h21": 2.0427,
+          "h22": 0.8558
+        }
+      },
+      "share_display_ge_0.85": {
+        "k2_5x_az-40": {
+          "h2": 0.0,
+          "h21": 0.00096,
+          "h22": 0.0
+        },
+        "k2_5x_az0": {
+          "h2": 0.0,
+          "h21": 0.0,
+          "h22": 0.0
+        }
+      },
+      "rev1": {
+        "k2_5x_az0": 0.1725,
+        "k2_5x_az-40": 0.2031
+      },
+      "exposure_offset_stops": -1.0,
+      "note": "Blender approximation of lightProfiles.cobble-probe (not UE): H2.1 lighter than the board (white), rev. 1 x0.17-0.20 (black), rev. 2 x0.43-0.49 (dark grey; H2 0.48-0.53)"
+    },
+    "change_vs_h21_2k": {
+      "baseline": {
+        "commit": "c6068808",
+        "files": {
+          "BC": "c6068808:art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/textures/runtime_2k/T_KingArthur_H2_BC.png",
+          "ORM": "c6068808:art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/textures/runtime_2k/T_KingArthur_H2_ORM.png"
+        },
+        "local_copy": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/work/h21-baseline-runtime-2k (not committed: run.py baseline_dir extracts the files with git show <commit>:<path> and checks the sha256)",
+        "sha256": {
+          "BC": "9b2d971acbc1d25d868689aa5be8715b43fb6a37dfbf1c468f1846650fbd45f3",
+          "ORM": "8e10f4f40f2c23a9f7a337ee145f902384adb9007bd865fb4120443aef8ab440"
+        }
+      },
+      "BC": {
+        "gold": {
+          "changed": 10853,
+          "max_abs_diff": 4
+        },
+        "head_non_metal": {
+          "changed": 0,
+          "max_abs_diff": 0
+        },
+        "leather": {
+          "changed": 103,
+          "max_abs_diff": 3
+        },
+        "mixed": {
+          "changed": 206292,
+          "max_abs_diff": 114
+        },
+        "other_non_metal": {
+          "changed": 0,
+          "max_abs_diff": 0
+        },
+        "red_cloth": {
+          "changed": 934,
+          "max_abs_diff": 4
+        },
+        "steel_blade": {
+          "changed": 0,
+          "max_abs_diff": 0
+        },
+        "steel_plate": {
+          "changed": 602237,
+          "max_abs_diff": 119
+        },
+        "stone": {
+          "changed": 0,
+          "max_abs_diff": 0
+        }
+      },
+      "ORM": {
+        "gold": {
+          "changed": 1465,
+          "max_abs_diff": 1
+        },
+        "head_non_metal": {
+          "changed": 0,
+          "max_abs_diff": 0
+        },
+        "leather": {
+          "changed": 0,
+          "max_abs_diff": 0
+        },
+        "mixed": {
+          "changed": 166483,
+          "max_abs_diff": 30
+        },
+        "other_non_metal": {
+          "changed": 0,
+          "max_abs_diff": 0
+        },
+        "red_cloth": {
+          "changed": 12,
+          "max_abs_diff": 1
+        },
+        "steel_blade": {
+          "changed": 0,
+          "max_abs_diff": 0
+        },
+        "steel_plate": {
+          "changed": 539317,
+          "max_abs_diff": 31
+        },
+        "stone": {
+          "changed": 0,
+          "max_abs_diff": 0
+        }
+      }
+    },
+    "determinism": {
+      "textures_builds": 3,
+      "identical": true,
+      "builds": [
+        "run folder (run.py --stages textures,...)",
+        "C:/tmp/h22_arthur/run_dev, candidate profile e (same metal values; 2K compared)",
+        "C:/tmp/h22_arthur/run_dev, final profile (all 10 PNG compared)"
+      ],
+      "outputs_sha256": {
+        "master_4k": {
+          "BC": "8d809773c4caa060ef9ab44fa75440a3e40c72812cd8134622cb89b76fbb7103",
+          "N": "b81214eb6a11638003903f75c5b3cf77fd77536d975ceb5314d924a094211eb6",
+          "N_OpenGL": "f18c1761753f1c2150cca45ba35f27e28d25a9a12608295c7c064b41df3b6443",
+          "ORM": "740636068752ac1fdf353ddff25c1024670079c91e6d656e3dae2f5dddf90f85",
+          "TeamMask": "00168b5c5f42c33909b7e7e8f20055cda12986105c409dbe0da15dbaaa8ab12f"
+        },
+        "runtime_2k": {
+          "BC": "f08e7756e6e281e78dc1797cd9c2e903d38e22d836acca2df9820a3f7955862e",
+          "N": "704933e8375470d9a431c41f45d105ddaba246b4c9a467e691ef5bdb4c7526dd",
+          "N_OpenGL": "96e33a82ab7e60f09f7a7319634804da59860b7d7ae33849aa06a6da0d733ae6",
+          "ORM": "1df42e015bdb9e126cc0de67068d6d1cb46f7cd52e6d16c6b0dbcbbe87ac8d57",
+          "TeamMask": "bb3b945d8274331267ffc5a0f8a43852e7c8ca9cfa1cec7de555dd8828b26586"
+        }
+      },
+      "renders": "EEVEE is not byte-exact; the steel-check numbers of the final run equal those of candidate e to the 4th digit"
+    },
+    "sheets": "preview/h22/{compare_front,compare_side,compare_back,k2_5x,k2_1p6,closeups_steel,cobble_light,steel_masks}.jpg, frames-h22.json",
+    "residuals": [
+      "greaves stay the darkest zone: 0.37 of the concept relative to stone / cloth in studio_env (H2 0.27, rev. 1 0.14); vertical plates reflect the dark lower half of studio.exr, roughness is capped at 0.55 by the task",
+      "pauldrons x1.99 of the concept (lit from above in studio_env), faulds x0.85; zones are informative, the gate is pooled",
+      "per view 0.88 (back) / 0.90 (front) / 1.00 (side); per reference stone 0.90, red cloth 1.21: the references disagree by x1.34",
+      "BC medians partly above the 0.04-0.12 of the task (torso 0.107, legs 0.195, gauntlets 0.17-0.19; the gauntlet p50 sits at the clamp 0.19 and flattens their brightest paint)",
+      "the concept steel is warm (chroma 1.13 / 0.98 / 0.84, its own warm light); the rev. 2 steel renders neutral-cool in studio_env (0.96 / 1.01 / 1.02) and slightly warm in the Cobble frame (1.06 / 0.99 / 0.90)",
+      "bumpy Tripo normals sparkle on metal (H2.1 residual 3-4)",
+      "the Cobble frame is a Blender approximation, not UE; the final check is UE (DX12 + Lumen, High) after the parallel import wave reimports the textures",
+      "H2.1 residuals (cloak fold gaps, medallion patch, geometry 1a / 3 / 8, back view from the wrong Tripo slot) untouched"
+    ]
   }
 }

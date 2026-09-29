@@ -432,7 +432,7 @@
       "cloth_cleanup_note": "H2.1 (2026-09-29): recolour in place (textures.cloth_cleanup) instead of another donor lookup: the three H2 residuals are mostly paint that is out of the cloth range; large gold components (the right border band) dilated 6 px keep their paint"
     },
     "materials": {
-      "status": "измерено (H2.1, 2026-09-29): маска металла и PBR-значения по классам; художественной приёмки нет",
+      "status": "измерено (H2.1, 2026-09-29): маска металла и PBR-значения по классам; H2.2 (2026-09-29): сталь лат тёмная воронёная по концепту (замер яркости стальных зон, проверка ±15 %), клинок светлый как в H2.1; художественной приёмки нет",
       "why": "Tripo metallicRoughness gave the armour almost no metal (H2: metallic mean 0.074 over the atlas, > 0.5 on 0.27 % of the texels): plate, crown, sword and the gold trims rendered as paint. Concept: steel plate and blade, gold trims/crown/hilt, red cloth with gold embroidery, leather belt",
       "method": "materials.py: soft class weights from the painted BC (sRGB HSV ramps, no hard edges), per part group; metal texels get a PBR base colour (= specular reflectance F0: steel neutral grey, gold) keeping the painted luminance detail, metallic = metal weight; roughness steel / gold ranges with cavities rougher; non-metal keeps the painted colour, roughness = Tripo roughness clamped per class",
       "groups": {
@@ -542,15 +542,20 @@
       "head_regions_note": "crown from Tripo z 0.840 (gold share 0.22 -> 0.86 over z 0.840-0.850; the forehead below is skin: a first rule with z 0.842 and the loose gold rule made a metallic strip on the forehead, fixed by gold_strict); neck ring below z 0.757 (gold 94-100 %)",
       "metal": {
         "steel": {
-          "bc_target_linear": 0.52,
-          "gamma": 1.0,
+          "bc_target_linear": 0.13,
+          "gamma": 0.8,
           "bc_clamp": [
-            0.06,
-            0.68
+            0.04,
+            0.19
           ],
           "chroma_keep": 0.1,
+          "tint_linear": [
+            1.02,
+            1.0,
+            0.96
+          ],
           "roughness": [
-            0.38,
+            0.45,
             0.55
           ],
           "roughness_detail_ratio": [
@@ -587,7 +592,60 @@
             0.45,
             2.2
           ]
-        }
+        },
+        "steel_part_overrides": {
+          "tripo_part_10": {
+            "bc_target_linear": 0.52,
+            "gamma": 1.0,
+            "bc_clamp": [
+              0.06,
+              0.68
+            ],
+            "chroma_keep": 0.1,
+            "roughness": [
+              0.38,
+              0.55
+            ],
+            "roughness_detail_ratio": [
+              0.45,
+              2.2
+            ],
+            "tint_linear": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          },
+          "tripo_part_2": {
+            "bc_target_linear": 0.2,
+            "bc_clamp": [
+              0.06,
+              0.26
+            ],
+            "roughness": [
+              0.5,
+              0.55
+            ]
+          },
+          "tripo_part_3": {
+            "bc_target_linear": 0.2,
+            "bc_clamp": [
+              0.06,
+              0.26
+            ],
+            "roughness": [
+              0.5,
+              0.55
+            ]
+          },
+          "tripo_part_7": {
+            "bc_target_linear": 0.1
+          },
+          "tripo_part_8": {
+            "bc_target_linear": 0.1
+          }
+        },
+        "steel_h22_note": "H2.2 rev. 2 (2026-09-29, after the review of rev. 1). H2.1 mapped the plate to a neutral grey F0 0.52 (polished chrome, white under the UE Cobble sky). Rev. 1 matched the ABSOLUTE mean luminance of the steel in studio_env to the concept (F0 median 0.055, gamma 0.5): studio_env lights the unchanged stone x2.1 brighter than the concept light, so the plate came out ~2x too dark next to the cloth and the stone (review: black lacquer; greaves and tassets near black, engraving lost, gauntlets as dark as the plates; Cobble steel/board 0.17-0.20). Rev. 2 calibrates against the concept RELATIVE to reference materials of the same frame (steelcheck.py, review_h22.steel_check.relative: (Y_steel / Y_ref)_render / (Y_steel / Y_ref)_concept, references = stone of the base and red cloth, geometric mean, pooled front/side/back) and checks the Cobble-light frame (steel / board 0.4-0.6). Candidates (C:/tmp/h22b, full textures stage + studio_env ortho + Cobble K2 each): F0 0.10 gamma 0.8 -> rel 0.85, Cobble 0.31/0.39; F0 0.12 -> rel 0.96, Cobble 0.36/0.45 but the steel read bronze (30 % painted chroma + warm tint); 0.12 + chroma_keep 0.1, tint (1.02, 1.0, 0.96), legs 0.16 -> rel 0.99, Cobble 0.39/0.47; + plate 0.13, pauldrons 0.10 -> rel 1.005, Cobble 0.404/0.473; accepted: + legs 0.20 -> rel 1.04, Cobble 0.43/0.49, greaves zone 0.37 (H2 0.27). Accepted values: plate core median -> 0.13 linear (the painted Tripo median 0.045), gamma 0.8 (the painted engraving contrast comes back; rev. 1 had 0.5), clamp 0.04-0.19, 10 % painted chroma + tint (1.02, 1.0, 0.96), roughness 0.45-0.55 (cavities rough, raised paint smooth). Per part (steel_part_overrides): legs tripo_part_2/3 (greaves, knees, sabatons) 0.20, clamp 0.06-0.26, roughness 0.50-0.55 - the vertical greaves reflect the dark lower half of studio.exr and stay the darkest zone (0.37 of the concept); pauldrons tripo_part_7/8 0.10 - lit from above they are the brightest zone (x2.0). Gauntlets: no override - their painted Tripo steel is 1.7x the plate median (0.075 vs 0.045), with gamma 0.8 they come out ~1.5x the plate BC and the gauntlet zone measures 1.04 of the concept (lighter than the plates, as in the concept). No curvature edge wear: the concept plate edges are gold trims. The blade (tripo_part_10, own reference) keeps the H2.1 values (light polished steel as in the concept). The BC medians 0.13 (plate) and 0.20 (legs) are above the 0.04-0.12 of the H2.2 task: at 0.10-0.12 the relative check and the Cobble check are not met (see the candidates)"
       },
       "metal_note": "steel: F0 of iron is ~0.56 linear. The median luminance of the steel core texels (metal >= 0.95, gold share <= 0.05; measured, reported as refs) maps to bc_target_linear 0.52; the blade has its own reference (painted 6.7x brighter than the plate). gamma 1 keeps the painted contrast (engraving, mail), clamp [0.06, 0.68], 10 % of the painted chromaticity kept. Tried first (Blender, studio.exr / courtyard.exr worlds): gamma 0.45 with target 0.56 washed the engraving out and read as chrome; targets 0.35-0.40 (darker than PBR steel) changed the look little under an environment (the reflection dominates) and leave the stated 0.5-0.65 range, so the median stays at 0.52. gold: chromaticity 50 % toward (1.0, 0.72, 0.32) (the Tripo gold is orange, hue 24-30), luminance target 0.45 for the median gold core texel, gamma 0.7. Roughness: detail = log(lum / ref) mapped over roughness_detail_ratio; texels darker than 0.45 x ref take the rough end, brighter than 2.2 x ref the smooth end",
       "non_metal_roughness": {
@@ -1656,5 +1714,712 @@
       "close_torso_az0"
     ],
     "k2_note": "K2 as in the Medusa/Merlin H2 reports: FOV 35 horizontal, pitch -55, 1207 uu (1.6x) and 386 uu (5x), focus +28 uu; the H2 review cameras of this module (K1 12.18 m, K2 7.6 m, K2S05) stay in stage review"
+  },
+  "review_h22": {
+    "what": "H2.2 (2026-09-29): dark blued plate steel as in the concept; frames concept | H2 | H2.1 | H2.2 and one Cobble-light frame; steel luminance check against the concept",
+    "baseline_h21": {
+      "commit": "c6068808",
+      "what": "H2.1 runtime textures (committed), rendered with the same mesh/light/cameras as H2 and H2.2",
+      "runtime_2k_sha256": {
+        "BC": "9b2d971acbc1d25d868689aa5be8715b43fb6a37dfbf1c468f1846650fbd45f3",
+        "N_OpenGL": "96e33a82ab7e60f09f7a7319634804da59860b7d7ae33849aa06a6da0d733ae6",
+        "ORM": "8e10f4f40f2c23a9f7a337ee145f902384adb9007bd865fb4120443aef8ab440"
+      }
+    },
+    "studio_env_views": [
+      "ortho_front",
+      "ortho_left",
+      "ortho_back",
+      "k2_5x_az0",
+      "k2_5x_az-40",
+      "k2_5x_az180",
+      "k2_1p6_az0",
+      "k2_1p6_az-40",
+      "k2_1p6_az180",
+      "close_torso_az0",
+      "close_blade_az0",
+      "close_head_az0",
+      "close_legs_az0",
+      "close_left_hand_az0"
+    ],
+    "classes_views": [
+      "ortho_front",
+      "ortho_left",
+      "ortho_back",
+      "k2_5x_az0",
+      "k2_5x_az-40"
+    ],
+    "cobble_views": [
+      "k2_5x_az0",
+      "k2_5x_az-40"
+    ],
+    "lights": {
+      "cobble": {
+        "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json lightProfiles.cobble-probe (read-only): directional key 4.5 lux, rotation pitch -55 yaw 30, no colour (white, 6500 K off; labelled 'cool scene key'); sky = TC_S08_AmbientDome x 11.2, colour (1, 1, 1); exposure histogram-fixed EV100 1.3; warm point 85 cd at (260, -300, 250) uu, radius 450",
+        "key_lux": 4.5,
+        "key_pitch_deg": -55.0,
+        "key_yaw_deg": 30.0,
+        "key_colour_linear": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "key_source_angle_deg": 0.5357,
+        "sky_intensity": 11.2,
+        "sky_colour_linear": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "ev100": 1.3,
+        "view_transform": "AgX",
+        "board_size_m": 6.0,
+        "board_albedo_linear": [
+          0.119,
+          0.121,
+          0.121
+        ],
+        "board_roughness": 0.85,
+        "not_included": "the warm point (85 cd, attenuation radius 450 uu) does not reach the figure cell: the P17 figure stands at (0, 50, 0) uu, 502 uu from the light; UE Lumen GI / reflections, TSR and the UE tonemapper are approximated by EEVEE ray tracing and the AgX view transform; the board is a flat plane with the mean albedo of the cobblestone texture (no stones, no normal map)",
+        "units_note": "UE lux / cd/m2 and Blender sun strength / world strength use the same convention (a white Lambertian surface under a uniform world of radiance L renders L; under a sun of E renders E / pi), so the numbers go 1:1; exposure = 1 / (1.2 * 2^EV100) (the saturation-based EV100 convention of UE / Frostbite)",
+        "exposure_offset_stops": -1.0,
+        "calibration": "board albedo = mean linear colour of art/imagegen/mvp-v1/materials/export/T_cobblestone_D_2048.png (Y 0.120); exposure: log2(1 / (1.2 * 2^1.3)) alone put the board at display median 164 (sRGB 8-bit, K2 5x az 0), the UE Cobble editor frame of the H2.1 import (docs/art-pipeline/evidence/w5c-arthur-h2-ue-2026-09-29/arthur-h2-k2-5x-az0-blue-ue-editor.jpg, parallel UE import wave) has the board at luma p50 129.4; offsets -0.8 / -1.2 stops gave 136 / 121 -> -1.0 (measured 2026-09-29, C:/tmp/h22_arthur/r_exp*)"
+      }
+    },
+    "steel_check": {
+      "light": "studio_env (the H2.1 comparison light: three suns + studio.exr)",
+      "metric": "mean relative luminance Y (Rec.709) of the sRGB-decoded pixels of the steel masks, pooled over the three ortho views",
+      "tolerance": 0.15,
+      "gate": {
+        "s_max": 0.3,
+        "v_min": 0.03,
+        "note": "sRGB HSV of the pixel: saturation <= s_max (gold trims, red cloth, brown leather out), value >= v_min (black gaps out)"
+      },
+      "class_tolerance": 12,
+      "erode_px": 2,
+      "white_display_threshold": 0.85,
+      "relative": {
+        "note": "H2.2 rev. 2 gate (2026-09-29): steel luminance relative to reference materials of the same frame (stone of the base, red cloth, gold; the steel pass does not change them), concept vs render: ratio_r = (Y_steel / Y_r)_render / (Y_steel / Y_r)_concept; gate = geometric mean over the references, pooled over front/side/back, within +-tolerance of 1. Why: H2.2 rev. 1 matched the ABSOLUTE mean Y in studio_env, which lights the unchanged stone x2.1 brighter than the concept's own light, so the steel came out ~2x too dark next to the other materials (review: 'black lacquer' instead of the concept's dark grey blued steel). Gold is not a reference: the material pass of H2.1 made it a metal (it reflects the environment like the steel and differs from the concept gold: concept hue 30 / saturation 0.51, render hue 40 / saturation 0.37), and it is not unchanged since H2",
+        "tolerance": 0.15,
+        "references": {
+          "stone": {
+            "concept_rects": {
+              "front": [
+                320,
+                1130,
+                860,
+                1215
+              ],
+              "side": [
+                360,
+                1125,
+                830,
+                1200
+              ],
+              "back": [
+                340,
+                1125,
+                820,
+                1200
+              ]
+            },
+            "render_class_rgb": [
+              55,
+              55,
+              55
+            ],
+            "erode_px": 3,
+            "note": "the vertical face of the base (concept: rectangle inside the face; render: the stone class, eroded)"
+          },
+          "red_cloth": {
+            "gate": {
+              "hue_deg": [
+                330,
+                20
+              ],
+              "s_min": 0.4,
+              "v_min": 0.1
+            },
+            "render_class_rgb": [
+              190,
+              25,
+              30
+            ],
+            "erode_px": 2,
+            "note": "concept: every pixel passing the red gate (the cloak, the tabard, the collar lining); render: the red-cloth class x the same gate"
+          }
+        },
+        "zones_front": {
+          "chest": {
+            "concept": [
+              "chest"
+            ],
+            "render_rects": [
+              [
+                500,
+                400,
+                690,
+                540
+              ]
+            ]
+          },
+          "pauldron_left": {
+            "concept": [
+              "pauldron_left"
+            ],
+            "render_rects": [
+              [
+                690,
+                340,
+                800,
+                470
+              ]
+            ]
+          },
+          "vambrace_left": {
+            "concept": [
+              "vambrace_left"
+            ],
+            "render_rects": [
+              [
+                740,
+                560,
+                845,
+                655
+              ]
+            ]
+          },
+          "gauntlets": {
+            "concept": [
+              "gauntlet_left",
+              "fist_right"
+            ],
+            "render_rects": [
+              [
+                755,
+                660,
+                840,
+                785
+              ],
+              [
+                385,
+                460,
+                470,
+                550
+              ]
+            ]
+          },
+          "faulds": {
+            "concept": [
+              "fauld_right",
+              "fauld_left"
+            ],
+            "render_rects": [
+              [
+                435,
+                600,
+                545,
+                790
+              ],
+              [
+                650,
+                600,
+                765,
+                790
+              ]
+            ]
+          },
+          "greaves": {
+            "concept": [
+              "leg_right",
+              "leg_left"
+            ],
+            "render_rects": [
+              [
+                415,
+                870,
+                505,
+                1040
+              ],
+              [
+                685,
+                870,
+                775,
+                1040
+              ]
+            ]
+          }
+        }
+      },
+      "cobble_steel_over_board_range": [
+        0.4,
+        0.6
+      ],
+      "views": {
+        "front": "ortho_front",
+        "side": "ortho_left",
+        "back": "ortho_back"
+      },
+      "cobble_views": [
+        "k2_5x_az0",
+        "k2_5x_az-40"
+      ],
+      "concept_zones_note": "concept pixel coordinates (1190 x 1322 for front and side; the back concept is 1189 x 1323 and is used as is), drawn inside the armour silhouette on a 25 px grid: no background pixel inside a zone (a background model would cut dark steel that looks like the backdrop). Excluded by construction: blade, head, crown, base, cloak",
+      "concept_zones": {
+        "front": [
+          {
+            "name": "chest",
+            "poly": [
+              [
+                490,
+                375
+              ],
+              [
+                690,
+                375
+              ],
+              [
+                700,
+                515
+              ],
+              [
+                480,
+                515
+              ]
+            ]
+          },
+          {
+            "name": "pauldron_left",
+            "poly": [
+              [
+                700,
+                345
+              ],
+              [
+                790,
+                335
+              ],
+              [
+                800,
+                470
+              ],
+              [
+                730,
+                480
+              ],
+              [
+                700,
+                430
+              ]
+            ]
+          },
+          {
+            "name": "upper_arm_left",
+            "rect": [
+              712,
+              482,
+              798,
+              525
+            ]
+          },
+          {
+            "name": "vambrace_left",
+            "rect": [
+              732,
+              542,
+              818,
+              628
+            ]
+          },
+          {
+            "name": "gauntlet_left",
+            "rect": [
+              742,
+              632,
+              818,
+              748
+            ]
+          },
+          {
+            "name": "fist_right",
+            "poly": [
+              [
+                345,
+                470
+              ],
+              [
+                390,
+                440
+              ],
+              [
+                460,
+                440
+              ],
+              [
+                462,
+                510
+              ],
+              [
+                420,
+                540
+              ],
+              [
+                360,
+                550
+              ],
+              [
+                335,
+                520
+              ]
+            ]
+          },
+          {
+            "name": "fauld_right",
+            "poly": [
+              [
+                455,
+                560
+              ],
+              [
+                540,
+                560
+              ],
+              [
+                540,
+                750
+              ],
+              [
+                430,
+                750
+              ],
+              [
+                440,
+                650
+              ]
+            ]
+          },
+          {
+            "name": "fauld_left",
+            "poly": [
+              [
+                640,
+                560
+              ],
+              [
+                725,
+                560
+              ],
+              [
+                745,
+                650
+              ],
+              [
+                740,
+                750
+              ],
+              [
+                640,
+                750
+              ]
+            ]
+          },
+          {
+            "name": "leg_right",
+            "poly": [
+              [
+                435,
+                765
+              ],
+              [
+                515,
+                765
+              ],
+              [
+                522,
+                880
+              ],
+              [
+                512,
+                1005
+              ],
+              [
+                425,
+                1005
+              ],
+              [
+                418,
+                880
+              ]
+            ]
+          },
+          {
+            "name": "foot_right",
+            "poly": [
+              [
+                395,
+                1030
+              ],
+              [
+                470,
+                1025
+              ],
+              [
+                480,
+                1095
+              ],
+              [
+                372,
+                1100
+              ],
+              [
+                378,
+                1060
+              ]
+            ]
+          },
+          {
+            "name": "leg_left",
+            "poly": [
+              [
+                655,
+                765
+              ],
+              [
+                735,
+                765
+              ],
+              [
+                752,
+                880
+              ],
+              [
+                755,
+                1005
+              ],
+              [
+                660,
+                1005
+              ],
+              [
+                648,
+                880
+              ]
+            ]
+          },
+          {
+            "name": "foot_left",
+            "poly": [
+              [
+                700,
+                1030
+              ],
+              [
+                780,
+                1030
+              ],
+              [
+                812,
+                1095
+              ],
+              [
+                700,
+                1100
+              ]
+            ]
+          }
+        ],
+        "side": [
+          {
+            "name": "pauldron",
+            "rect": [
+              545,
+              310,
+              640,
+              460
+            ]
+          },
+          {
+            "name": "chest",
+            "rect": [
+              500,
+              370,
+              545,
+              485
+            ]
+          },
+          {
+            "name": "vambrace",
+            "rect": [
+              550,
+              470,
+              625,
+              605
+            ]
+          },
+          {
+            "name": "gauntlet",
+            "rect": [
+              518,
+              615,
+              592,
+              690
+            ]
+          },
+          {
+            "name": "fauld",
+            "rect": [
+              510,
+              520,
+              545,
+              675
+            ]
+          },
+          {
+            "name": "thigh_knee",
+            "rect": [
+              510,
+              715,
+              600,
+              860
+            ]
+          },
+          {
+            "name": "greave",
+            "rect": [
+              542,
+              865,
+              618,
+              1000
+            ]
+          },
+          {
+            "name": "foot_heel",
+            "rect": [
+              530,
+              1015,
+              615,
+              1095
+            ]
+          },
+          {
+            "name": "foot_toe",
+            "rect": [
+              470,
+              1060,
+              530,
+              1095
+            ]
+          },
+          {
+            "name": "fist",
+            "rect": [
+              405,
+              400,
+              468,
+              460
+            ]
+          }
+        ],
+        "back": [
+          {
+            "name": "pauldron_left",
+            "rect": [
+              398,
+              315,
+              445,
+              390
+            ]
+          },
+          {
+            "name": "arm_left",
+            "rect": [
+              382,
+              392,
+              438,
+              432
+            ]
+          },
+          {
+            "name": "mail_left",
+            "rect": [
+              388,
+              437,
+              425,
+              488
+            ]
+          },
+          {
+            "name": "forearm_left",
+            "rect": [
+              362,
+              495,
+              392,
+              565
+            ]
+          },
+          {
+            "name": "pauldron_right",
+            "rect": [
+              745,
+              340,
+              792,
+              390
+            ]
+          },
+          {
+            "name": "arm_right",
+            "rect": [
+              752,
+              392,
+              800,
+              432
+            ]
+          },
+          {
+            "name": "mail_right",
+            "rect": [
+              752,
+              437,
+              803,
+              500
+            ]
+          },
+          {
+            "name": "heel_left",
+            "rect": [
+              408,
+              1045,
+              468,
+              1078
+            ]
+          },
+          {
+            "name": "heel_right",
+            "rect": [
+              703,
+              1045,
+              765,
+              1078
+            ]
+          }
+        ]
+      },
+      "exposure_reference": {
+        "view": "front",
+        "concept_rect": [
+          320,
+          1130,
+          860,
+          1215
+        ],
+        "render_class_rgb": [
+          55,
+          55,
+          55
+        ],
+        "render_erode_px": 3,
+        "note": "informative, not the gate: the stone of the base (unchanged since H2) in the concept front vs the model front in studio_env; concept / render = how much brighter studio_env lights a diffuse material than the concept's own light; steel ratio x that factor = the steel ratio with the exposure of the concept"
+      }
+    }
   }
 }

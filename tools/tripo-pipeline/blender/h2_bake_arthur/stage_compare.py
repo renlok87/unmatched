@@ -15,6 +15,14 @@ Lights (profile review_h21.lights):
               studio light file, sha256 in the report), seen by the camera as the same dark grey (Light Path
               "Is Camera Ray"); the UE board has a sky light (render-reference.json "sky": "1"), so a metal there
               reflects an environment - this light is closer to that than the dark world, and still not the game light
+  cobble      (H2.2, profile review_h22.lights.cobble) an approximation of the UE Cobble board light
+              (Config/ArtBoards/S08ArtBoardProfiles.json lightProfiles.cobble-probe): one sun = the directional key
+              (lux -> Blender sun strength 1:1, UE pitch/yaw taken relative to the camera of azimuth 0), the W4-A
+              ambient dome (tools/art/render/make_ambient_dome_hdr.py, same bytes) x the sky intensity as the world
+              (cd/m2 -> world strength 1:1; the camera sees it), a flat board plane under the base, fixed exposure
+              log2(1 / (1.2 * 2^EV100)) + a measured offset (the board of the UE Cobble editor frame) and a filmic
+              view transform; EEVEE ray-traced reflections on. Not UE, not Lumen:
+              a check that the dark steel does not turn white from the sky reflection
 Cameras: ortho views framed like the H2 concepts (as stage review), K2 = FOV 35 (horizontal), pitch -55, distance
 review_h21.k2_distance_m (1207 / 386 uu: the 1.6x / 5x K2 frames of Medusa and Merlin), focus +28 uu; close-ups on
 parts or Tripo-frame boxes. Writes <out_dir>/<label>/<view>.png and <out_dir>/compare-<label>.json.
@@ -129,9 +137,68 @@ def add_light(name, energy, rot, colour=(1, 1, 1)):
     scene.collection.objects.link(lo)
 
 
-add_light("key", 3.2, (50, 0, -35), (1.0, 0.97, 0.92))
-add_light("fill", 1.1, (65, 0, 140), (0.9, 0.93, 1.0))
-add_light("rim", 2.0, (-60, 0, 20))
+if a.light == "cobble":
+    cc = profile["review_h22"]["lights"]["cobble"]
+    sys.path.insert(0, str(P.REPO / "tools" / "art" / "render"))
+    import make_ambient_dome_hdr as dome  # noqa: E402
+    dome_path = paths["work"] / "cobble-ambient-dome.hdr"
+    data = dome.build()
+    if not dome_path.exists() or dome_path.read_bytes() != data:
+        dome_path.write_bytes(data)
+    for n in list(wnt.nodes):
+        if n.bl_idname != "ShaderNodeOutputWorld":
+            wnt.nodes.remove(n)
+    env = wnt.nodes.new("ShaderNodeTexEnvironment")
+    env.image = bpy.data.images.load(str(dome_path), check_existing=True)
+    env.image.colorspace_settings.name = "Linear Rec.709"
+    bg_sky = wnt.nodes.new("ShaderNodeBackground")
+    bg_sky.inputs[1].default_value = float(cc["sky_intensity"])
+    tint = wnt.nodes.new("ShaderNodeVectorMath")      # colour x sky colour (linear)
+    tint.operation = "MULTIPLY"
+    wnt.links.new(env.outputs["Color"], tint.inputs[0])
+    tint.inputs[1].default_value = tuple(float(x) for x in cc["sky_colour_linear"])
+    wnt.links.new(tint.outputs["Vector"], bg_sky.inputs[0])
+    out = next(n for n in wnt.nodes if n.bl_idname == "ShaderNodeOutputWorld")
+    wnt.links.new(bg_sky.outputs[0], out.inputs["Surface"])
+    # key: UE rotation (pitch, yaw) relative to the camera of azimuth 0 (looks along +Y; UE yaw + turns toward the
+    # camera's right = +X); the sun shines along its local -Z
+    pitch, yaw = math.radians(cc["key_pitch_deg"]), math.radians(cc["key_yaw_deg"])
+    travel = Vector((math.cos(pitch) * math.sin(yaw), math.cos(pitch) * math.cos(yaw), math.sin(pitch)))
+    ld = bpy.data.lights.new("cobble_key", "SUN")
+    ld.energy = float(cc["key_lux"])
+    ld.color = cc.get("key_colour_linear", (1.0, 1.0, 1.0))
+    ld.angle = math.radians(float(cc.get("key_source_angle_deg", 0.5357)))
+    lo = bpy.data.objects.new("cobble_key", ld)
+    lo.rotation_euler = travel.to_track_quat("-Z", "Y").to_euler()
+    scene.collection.objects.link(lo)
+    # the board: a flat plane under the base
+    bpy.ops.mesh.primitive_plane_add(size=float(cc["board_size_m"]), location=(0.0, 0.0, -0.0005))
+    board = bpy.context.active_object
+    board.name = "cobble_board"
+    bm = bpy.data.materials.new("cobble_board")
+    bm.use_nodes = True
+    bsdf = next(n for n in bm.node_tree.nodes if n.bl_idname == "ShaderNodeBsdfPrincipled")
+    bsdf.inputs["Base Color"].default_value = (*cc["board_albedo_linear"], 1.0)
+    bsdf.inputs["Roughness"].default_value = float(cc["board_roughness"])
+    board.data.materials.append(bm)
+    ours.append(board)
+    scene.eevee.use_raytracing = True
+    scene.view_settings.view_transform = cc["view_transform"]
+    scene.view_settings.exposure = (math.log2(1.0 / (1.2 * 2.0 ** float(cc["ev100"])))
+                                    + float(cc.get("exposure_offset_stops", 0.0)))
+    light_meta = {"mode": "cobble", "profile_source": cc["source"], "key_lux": float(cc["key_lux"]),
+                  "key_pitch_yaw_deg": [cc["key_pitch_deg"], cc["key_yaw_deg"]],
+                  "key_travel_dir": [round(x, 4) for x in travel],
+                  "sky": "ambient dome x %s (%s, sha256 %s)" % (cc["sky_intensity"], P.rel(dome_path), P.sha256(dome_path)),
+                  "board": {"albedo_linear": cc["board_albedo_linear"], "roughness": cc["board_roughness"]},
+                  "ev100": float(cc["ev100"]), "exposure_offset_stops": float(cc.get("exposure_offset_stops", 0.0)),
+                  "blender_exposure": round(scene.view_settings.exposure, 4),
+                  "view_transform": cc["view_transform"], "eevee_raytracing": True,
+                  "not_included": cc.get("not_included", "")}
+else:
+    add_light("key", 3.2, (50, 0, -35), (1.0, 0.97, 0.92))
+    add_light("fill", 1.1, (65, 0, 140), (0.9, 0.93, 1.0))
+    add_light("rim", 2.0, (-60, 0, 20))
 cam = bl.new_camera(scene)
 
 if a.debug_bc:

@@ -30,6 +30,8 @@ from scipy import ndimage
 import pure as P
 
 LUM = np.array([0.2126, 0.7152, 0.0722], dtype=np.float32)
+STEEL_PLATE_RGB = (150, 175, 210)       # class raster colours (steelcheck.py reads the plate colour)
+STEEL_OVERRIDE_RGB = (200, 240, 235)
 
 
 def srgb(x):
@@ -99,6 +101,36 @@ def region_weight(pos, reg):
     return w.astype(np.float32)
 
 
+def steel_params(st, overrides, pid, names):
+    """Per-texel steel parameters: the plate values of metal.steel, replaced on the texels of the parts listed in
+    metal.steel_part_overrides (every key the override omits falls back to the plate value). float32 arrays (H, W),
+    tint (H, W, 3) luminance-normalised, tinted = texels with a tint other than neutral."""
+    def one(c):
+        tint = np.array(c.get("tint_linear", [1.0, 1.0, 1.0]), dtype=np.float32)
+        return {"target": float(c["bc_target_linear"]), "gamma": float(c["gamma"]), "lo": float(c["bc_clamp"][0]),
+                "hi": float(c["bc_clamp"][1]), "chroma_keep": float(c.get("chroma_keep", 0.0)),
+                "r_lo": float(c["roughness"][0]), "r_hi": float(c["roughness"][1]),
+                "dr_lo": float(c["roughness_detail_ratio"][0]), "dr_hi": float(c["roughness_detail_ratio"][1]),
+                "tint": tint / float(tint @ LUM), "tinted": bool(np.any(tint != tint[0]))}
+    base = one(st)
+    # dtypes as the H2.1 scalar arithmetic: the detail ratio in float64, the roughness span computed in double
+    f64 = ("dr_lo", "dr_hi")
+    base["r_span"] = base["r_hi"] - base["r_lo"]
+    out = {k: np.full(pid.shape, v, dtype=np.float64 if k in f64 else np.float32)
+           for k, v in base.items() if k not in ("tint", "tinted")}
+    out["tint"] = np.broadcast_to(base["tint"], pid.shape + (3,)).copy()
+    out["tinted"] = np.full(pid.shape, base["tinted"], dtype=bool)
+    for part, ov in sorted(overrides.items()):
+        if part not in names:
+            continue
+        m = pid == names.index(part) + 1
+        o = one({**st, **ov})
+        o["r_span"] = o["r_hi"] - o["r_lo"]
+        for k in out:
+            out[k][m] = o[k]
+    return out
+
+
 def pct(x, qs=(10, 50, 90), nd=4):
     if len(x) == 0:
         return None
@@ -164,11 +196,19 @@ def apply_materials(bc, mr, pid, names, pos, covered, cfg):
     lum_safe = np.maximum(lum, 1e-5)
     ratio_s = lum_safe / ref_steel
     ratio_g = lum_safe / ref_gold
-    Ls = np.clip(float(st["bc_target_linear"]) * ratio_s ** float(st["gamma"]), *st["bc_clamp"])
+    # steel parameters per texel: the plate values (metal.steel) with per-part overrides (metal.steel_part_overrides,
+    # H2.2: the polished blade keeps the H2.1 light steel while the plate is dark blued steel)
+    sp = steel_params(st, mc.get("steel_part_overrides", {}), pid, names)
+    Ls = np.clip(sp["target"] * ratio_s ** sp["gamma"], sp["lo"], sp["hi"])
     chroma = bc / lum_safe[..., None]
     chroma = chroma / np.maximum(chroma @ LUM, 1e-6)[..., None]
-    k = float(st.get("chroma_keep", 0.0))
+    k = sp["chroma_keep"][..., None]
     bc_steel = Ls[..., None] * ((1.0 - k) + k * np.clip(chroma, 0.0, 3.0))
+    if sp["tinted"].any():
+        # tint (linear, luminance-normalised; measured on the concept): colour only, the luminance stays Ls
+        tinted = bc_steel * sp["tint"]
+        tinted = tinted * (Ls / np.maximum(tinted @ LUM, 1e-9))[..., None]
+        bc_steel = np.where(sp["tinted"][..., None], tinted, bc_steel)
     ref_rgb = np.array(gd["reference_linear"], dtype=np.float32)
     ref_chroma = ref_rgb / float(ref_rgb @ LUM)
     ch_g = np.clip(chroma, 0.0, 4.0)
@@ -182,9 +222,10 @@ def apply_materials(bc, mr, pid, names, pos, covered, cfg):
 
     def detail(ratio, lo, hi):
         return np.clip((np.log(ratio) - np.log(lo)) / (np.log(hi) - np.log(lo)), 0.0, 1.0).astype(np.float32)
-    ts = detail(ratio_s, *st["roughness_detail_ratio"])
+    ts = np.clip((np.log(ratio_s) - np.log(sp["dr_lo"])) / (np.log(sp["dr_hi"]) - np.log(sp["dr_lo"])),
+                 0.0, 1.0).astype(np.float32)
     tg = detail(ratio_g, *gd["roughness_detail_ratio"])
-    r_steel = st["roughness"][1] - (st["roughness"][1] - st["roughness"][0]) * ts
+    r_steel = sp["r_hi"] - sp["r_span"] * ts
     gr = np.where(clo[..., None], np.array(gd["roughness_on_cloth"], dtype=np.float32),
                   np.array(gd["roughness"], dtype=np.float32))
     r_gold = gr[..., 1] - (gr[..., 1] - gr[..., 0]) * tg
@@ -210,8 +251,15 @@ def apply_materials(bc, mr, pid, names, pos, covered, cfg):
     # ------------------------------------------------ measurements
     cov = covered
     lum_out = bc_out @ LUM
+    # the steel with its own reference and parameters (the polished blade: st.own_reference_parts) is its own class;
+    # the plate parts with overridden values (H2.2 rev. 2: legs, pauldrons) stay plate steel
+    steel_over = np.isin(pid, [names.index(p) + 1 for p in st.get("own_reference_parts", [])
+                               if p in names and p in mc.get("steel_part_overrides", {})])
     classes_hard = {
         "steel": cov & (metal >= 0.5) & (gshare < 0.5),
+        # H2.2: the plate steel and the steel with its own reference and parameters (the blade) separately
+        "steel_plate": cov & (metal >= 0.5) & (gshare < 0.5) & ~steel_over,
+        "steel_own_params": cov & (metal >= 0.5) & (gshare < 0.5) & steel_over,
         "gold": cov & (metal >= 0.5) & (gshare >= 0.5),
         "gold_on_cloth": cov & clo & (metal >= 0.5),
         "red_cloth": cov & (red >= 0.5) & (metal < 0.5),
@@ -231,7 +279,7 @@ def apply_materials(bc, mr, pid, names, pos, covered, cfg):
                   "before": {"metallic_mean": P.r(mr[..., 2][sel].mean(), 4),
                              "roughness_p10_p50_p90": pct(mr[..., 1][sel], nd=3),
                              "bc_lum_linear_p10_p50_p90": pct(lum[sel])}}
-            if name == "steel":
+            if name.startswith("steel"):
                 e["bc_channel_spread_p50_p95"] = pct(bc_out[sel].max(axis=1) - bc_out[sel].min(axis=1), (50, 95))
                 e["bc_mean_linear_rgb"] = [P.r(x, 4) for x in bc_out[sel].mean(axis=0)]
             if name.startswith("gold"):
@@ -262,15 +310,20 @@ def apply_materials(bc, mr, pid, names, pos, covered, cfg):
                     "before": {"metallic_mean_covered": P.r(mr[..., 2][cov].mean(), 4),
                                "metallic_share_above_0.5": P.r((mr[..., 2][cov] > 0.5).mean(), 4),
                                "roughness_mean_covered": P.r(mr[..., 1][cov].mean(), 4)}}
-    classes = {"metal": metal, "gold_share": gshare, "red": red, "leather": leather, "group": group_of}
+    classes = {"metal": metal, "gold_share": gshare, "red": red, "leather": leather, "group": group_of,
+               "steel_override": steel_over}
     return bc_out, mr_out, rep, classes
 
 
 def class_raster(classes, covered):
-    """Inspection colours (sRGB 8-bit): steel light blue-grey, gold yellow, red cloth red, leather brown, head non-metal
-    skin, stone dark grey, other non-metal mid grey; blended by the soft weights."""
+    """Inspection colours (sRGB 8-bit): steel light blue-grey (the plate; the steel of the parts with their own steel
+    parameters, i.e. the blade, pale cyan - H2.2, the steel luminance check separates the two), gold yellow, red
+    cloth red, leather brown, head non-metal skin, stone dark grey, other non-metal mid grey; blended by the soft
+    weights."""
     metal, gs, red, lea, grp = (classes[k] for k in ("metal", "gold_share", "red", "leather", "group"))
-    c_steel = np.array([150, 175, 210], dtype=np.float32)
+    over = classes.get("steel_override", np.zeros(metal.shape, dtype=bool))
+    c_steel = np.where(over[..., None], np.array(STEEL_OVERRIDE_RGB, dtype=np.float32),
+                       np.array(STEEL_PLATE_RGB, dtype=np.float32))
     c_gold = np.array([245, 205, 30], dtype=np.float32)
     c_red = np.array([190, 25, 30], dtype=np.float32)
     c_lea = np.array([110, 60, 25], dtype=np.float32)

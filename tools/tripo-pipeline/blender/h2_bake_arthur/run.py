@@ -2,7 +2,8 @@
 """Driver of the King Arthur H2 bake (system python; Blender stages run headless, one process at a time).
 
     python tools/tripo-pipeline/blender/h2_bake_arthur/run.py --profile <profile.json> --run-dir <dir>
-        [--stages inspect,lowpoly,uvcheck,bake,textures,rig,probe,review,sheets,compare,sheets_h21,manifest]
+        [--stages inspect,lowpoly,uvcheck,bake,textures,rig,probe,review,sheets,compare,sheets_h21,compare_h22,
+                  steelcheck,sheets_h22,manifest]
         [--from STAGE]
 
 Every stage writes logs/<stage>.log; a Blender stage counts as done only if its log has the H2_BAKE_STAGE_OK marker
@@ -21,10 +22,14 @@ sys.path.insert(0, str(HERE))
 import pure as P  # noqa: E402
 
 ORDER = ["inspect", "lowpoly", "uvcheck", "bake", "textures", "rig", "probe", "review", "sheets", "compare", "sheets_h21",
-         "manifest"]
+         "compare_h22", "steelcheck", "sheets_h22", "manifest"]
+# default stages of a full run: the H2.1 frames (compare, sheets_h21) are the committed H2.1 record and are not rebuilt
+# by default (after H2.2 stage compare renders the H2.1 baseline textures of review_h22.baseline_h21, not the current)
+DEFAULT_SKIP = {"inspect", "compare", "sheets_h21"}
 BLENDER_STAGES = {"inspect": "stage_inspect.py", "lowpoly": "stage_lowpoly.py", "bake": "stage_bake.py",
                   "rig": "stage_rig.py", "review": "stage_review.py"}
-PY_STAGES = {"uvcheck": "uvcheck.py", "textures": "textures.py", "sheets": "sheets.py", "sheets_h21": "sheets_h21.py"}
+PY_STAGES = {"uvcheck": "uvcheck.py", "textures": "textures.py", "sheets": "sheets.py", "sheets_h21": "sheets_h21.py",
+             "steelcheck": "steelcheck.py", "sheets_h22": "sheets_h22.py"}
 ANIM = P.REPO / "tools" / "tripo-pipeline" / "anim"
 FBX_TO_BLEND = P.REPO / "art" / "pipeline-candidates" / "ASSET-KING-ARTHUR-001" / "scripts" / "fbx_to_authored_blend.py"
 NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
@@ -82,14 +87,11 @@ def stage_probe(profile, paths, logs):
     return out
 
 
-def stage_compare(profile, paths, logs):
-    """H2.1 before/after frames (stage_compare.py): the H2 runtime textures of the baseline commit (git show, sha256
-    checked against review_h21.baseline) and the current runtime textures on the same mesh, light and cameras; the
-    H2 review light for a few views; the material class raster flat on the mesh. Raw PNG -> work/h21_png/."""
-    rc = profile["review_h21"]
-    base = rc["baseline"]
+def baseline_dir(profile, paths, base, name):
+    """Runtime 2K textures of a committed baseline (git show <commit>:<runtime_2k file>, sha256 checked) ->
+    work/<name>/ (kept between runs)."""
     prefix = profile["textures"]["prefix"]
-    bdir = paths["work"] / "h2-baseline-runtime-2k"
+    bdir = paths["work"] / name
     bdir.mkdir(parents=True, exist_ok=True)
     for key, sha in base["runtime_2k_sha256"].items():
         f = bdir / ("%s_%s.png" % (prefix, key))
@@ -99,8 +101,19 @@ def stage_compare(profile, paths, logs):
                                          creationflags=NO_WINDOW).stdout)
         if P.sha256(f) != sha:
             raise SystemExit("baseline texture %s: sha256 %s, expected %s" % (f, P.sha256(f), sha))
+    return bdir
+
+
+def stage_compare(profile, paths, logs):
+    """H2.1 before/after frames (stage_compare.py): the H2 runtime textures of the baseline commit (git show, sha256
+    checked against review_h21.baseline) and the H2.1 runtime textures on the same mesh, light and cameras; the
+    H2 review light for a few views; the material class raster flat on the mesh. Raw PNG -> work/h21_png/.
+    The H2.1 set is the current runtime textures until H2.2, then the committed H2.1 baseline (review_h22)."""
+    rc = profile["review_h21"]
+    bdir = baseline_dir(profile, paths, rc["baseline"], "h2-baseline-runtime-2k")
     out = paths["work"] / "h21_png"
-    cur = paths["textures"] / "runtime_2k"
+    cur = (baseline_dir(profile, paths, profile["review_h22"]["baseline_h21"], "h21-baseline-runtime-2k")
+           if "review_h22" in profile else paths["textures"] / "runtime_2k")
     script = HERE / "stage_compare.py"
     sets = ["--set", "h2=%s" % bdir, "--set", "h21=%s" % cur]
     t = {"studio_env": run(blender(script, profile["_path"], paths["run"], out / "studio_env", *sets, "--light", "studio_env"),
@@ -111,6 +124,28 @@ def stage_compare(profile, paths, logs):
                                 "--debug-bc", paths["work"] / "materials-classes-2k.png", "--views",
                                 ",".join(rc["classes_views"])), logs / "compare-classes.log", P.STAGE_MARKER)}
     return t
+
+
+def stage_compare_h22(profile, paths, logs):
+    """H2.2 frames (stage_compare.py): H2 (9a2a5184), H2.1 (review_h22.baseline_h21) and the current runtime textures on
+    the same mesh, light and cameras: studio_env (the H2.1 comparison light) for the ortho / K2 / close-up views, the
+    Cobble-light approximation for review_h22.cobble_views, the class raster (plate steel / blade steel separated) for
+    the steel masks. Raw PNG -> work/h22_png/."""
+    rc = profile["review_h22"]
+    h2 = baseline_dir(profile, paths, profile["review_h21"]["baseline"], "h2-baseline-runtime-2k")
+    h21 = baseline_dir(profile, paths, rc["baseline_h21"], "h21-baseline-runtime-2k")
+    cur = paths["textures"] / "runtime_2k"
+    out = paths["work"] / "h22_png"
+    script = HERE / "stage_compare.py"
+    sets = ["--set", "h2=%s" % h2, "--set", "h21=%s" % h21, "--set", "h22=%s" % cur]
+    return {"studio_env": run(blender(script, profile["_path"], paths["run"], out / "studio_env", *sets, "--light",
+                                      "studio_env", "--views", ",".join(rc["studio_env_views"])),
+                              logs / "compare_h22-studio_env.log", P.STAGE_MARKER),
+            "cobble": run(blender(script, profile["_path"], paths["run"], out / "cobble", *sets, "--light", "cobble",
+                                  "--views", ",".join(rc["cobble_views"])), logs / "compare_h22-cobble.log", P.STAGE_MARKER),
+            "classes": run(blender(script, profile["_path"], paths["run"], out / "classes", "--set", "classes=%s" % cur,
+                                   "--debug-bc", paths["work"] / "materials-classes-2k.png", "--views",
+                                   ",".join(rc["classes_views"])), logs / "compare_h22-classes.log", P.STAGE_MARKER)}
 
 
 def stage_manifest(profile, paths):
@@ -129,7 +164,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--profile", required=True)
     ap.add_argument("--run-dir", required=True)
-    ap.add_argument("--stages", default=",".join(s for s in ORDER if s != "inspect"))
+    ap.add_argument("--stages", default=",".join(s for s in ORDER if s not in DEFAULT_SKIP))
     ap.add_argument("--from", dest="from_stage")
     a = ap.parse_args()
     profile_path = Path(a.profile).resolve()
@@ -154,6 +189,8 @@ def main():
             timing[st] = stage_probe(profile, paths, paths["logs"])
         elif st == "compare":
             timing[st] = stage_compare(profile, paths, paths["logs"])
+        elif st == "compare_h22":
+            timing[st] = stage_compare_h22(profile, paths, paths["logs"])
         elif st == "manifest":
             stage_manifest(profile, paths)
         print("stage", st, timing.get(st), flush=True)
