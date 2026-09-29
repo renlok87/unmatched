@@ -1,0 +1,155 @@
+{
+ "ao_distance_m": 0.051,
+ "blender": "5.2.2 LTS",
+ "cage_extrusion_m": 0.002,
+ "device": {
+  "backend": "OPTIX",
+  "device": "GPU",
+  "devices": [
+   "NVIDIA GeForce RTX 4090"
+  ],
+  "requested_gpu": true
+ },
+ "input_blend_sha256": "eee2a40ae463f96f34b04241e56c47cccf025f3cb6bc01c1db4bb8388ecdd8d2",
+ "max_ray_distance_m": 0.006,
+ "occluders": [
+  "HP_tripo_part_6"
+ ],
+ "passes": {
+  "ao": {
+   "device": "GPU",
+   "npy": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/bake/ao.npy",
+   "rgb_mean_written": [
+    0.68937,
+    0.68937,
+    0.68937
+   ],
+   "samples": 128,
+   "seconds_per_part": {
+    "tripo_part_0": 6.15,
+    "tripo_part_1": 6.12,
+    "tripo_part_10": 4.16,
+    "tripo_part_11": 3.57,
+    "tripo_part_12": 3.99,
+    "tripo_part_13": 3.4,
+    "tripo_part_14": 4.05,
+    "tripo_part_15": 3.58,
+    "tripo_part_16": 3.43,
+    "tripo_part_17": 3.3,
+    "tripo_part_18": 3.43,
+    "tripo_part_2": 6.37,
+    "tripo_part_3": 4.78,
+    "tripo_part_4": 3.96,
+    "tripo_part_5": 4.31,
+    "tripo_part_7": 4.81,
+    "tripo_part_8": 3.95,
+    "tripo_part_9": 3.87
+   },
+   "texels_written": 7827445,
+   "type": "AO"
+  },
+  "bc": {
+   "device": "CPU",
+   "npy": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/bake/bc.npy",
+   "rgb_mean_written": [
+    0.13544,
+    0.07029,
+    0.04008
+   ],
+   "samples": 16,
+   "seconds_per_part": {
+    "tripo_part_0": 8.71,
+    "tripo_part_1": 9.01,
+    "tripo_part_10": 6.36,
+    "tripo_part_11": 4.37,
+    "tripo_part_12": 6.28,
+    "tripo_part_13": 4.22,
+    "tripo_part_14": 4.94,
+    "tripo_part_15": 4.41,
+    "tripo_part_16": 4.12,
+    "tripo_part_17": 3.99,
+    "tripo_part_18": 4.1,
+    "tripo_part_2": 10.78,
+    "tripo_part_3": 6.25,
+    "tripo_part_4": 5.26,
+    "tripo_part_5": 6.0,
+    "tripo_part_7": 5.93,
+    "tripo_part_8": 5.19,
+    "tripo_part_9": 5.03
+   },
+   "texels_written": 7827445,
+   "type": "EMIT"
+  },
+  "normal": {
+   "device": "CPU",
+   "npy": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/bake/normal.npy",
+   "rgb_mean_written": [
+    0.4995,
+    0.49981,
+    0.97629
+   ],
+   "samples": 16,
+   "seconds_per_part": {
+    "tripo_part_0": 5.75,
+    "tripo_part_1": 6.26,
+    "tripo_part_10": 3.88,
+    "tripo_part_11": 3.1,
+    "tripo_part_12": 4.11,
+    "tripo_part_13": 2.99,
+    "tripo_part_14": 3.45,
+    "tripo_part_15": 3.07,
+    "tripo_part_16": 2.77,
+    "tripo_part_17": 2.66,
+    "tripo_part_18": 2.75,
+    "tripo_part_2": 6.33,
+    "tripo_part_3": 4.27,
+    "tripo_part_4": 3.95,
+    "tripo_part_5": 4.13,
+    "tripo_part_7": 4.38,
+    "tripo_part_8": 3.7,
+    "tripo_part_9": 3.49
+   },
+   "texels_written": 7827445,
+   "type": "NORMAL"
+  },
+  "rm": {
+   "device": "CPU",
+   "npy": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/bake/rm.npy",
+   "rgb_mean_written": [
+    1.0,
+    0.80278,
+    0.03613
+   ],
+   "samples": 16,
+   "seconds_per_part": {
+    "tripo_part_0": 9.31,
+    "tripo_part_1": 9.35,
+    "tripo_part_10": 6.32,
+    "tripo_part_11": 4.58,
+    "tripo_part_12": 6.2,
+    "tripo_part_13": 4.15,
+    "tripo_part_14": 5.01,
+    "tripo_part_15": 4.25,
+    "tripo_part_16": 4.27,
+    "tripo_part_17": 4.03,
+    "tripo_part_18": 3.89,
+    "tripo_part_2": 10.95,
+    "tripo_part_3": 6.16,
+    "tripo_part_4": 5.37,
+    "tripo_part_5": 6.01,
+    "tripo_part_7": 6.31,
+    "tripo_part_8": 5.41,
+    "tripo_part_9": 5.06
+   },
+   "texels_written": 7827445,
+   "type": "EMIT"
+  }
+ },
+ "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-bake.json",
+ "profile_sha256": "86e3195fa7fd5011f419f088ae64fa91fec4ad3ed3a9518f6600a54d0b49ee81",
+ "recolor": {},
+ "schema": "unmatched.h2-bake.bake-report/1",
+ "seconds": 363.5,
+ "seed": 0,
+ "size": 4096
+}

@@ -363,6 +363,53 @@ if LPC.get("fix_nonmanifold"):
         bm.free()
 report["nonmanifold_fix"] = nm_report if LPC.get("fix_nonmanifold") else None
 
+# ---------------------------------------------------------------- final cleanup (H3, profile lowpoly.final_cleanup)
+# the stitch can leave a vertex duplicated at the position of another vertex of the same part (a zero-length edge,
+# i.e. a zero-area triangle) and a loose vertex (measured on the harpy-h3-bake/1 draft: tripo_part_14 one triangle
+# with two coincident corners, loose vertices in tripo_part_4 / tripo_part_8). Zero-length edges are collapsed
+# (the merged vertices share one position, so no neighbour boundary moves), loose vertices removed, non-manifold
+# edges re-checked. Off unless the profile asks for it (H2 / H2.1 builds unchanged).
+fc_report = None
+if LPC.get("final_cleanup"):
+    fc_report = {}
+    fdist = float(LPC.get("final_cleanup_dist_m", 1e-7))
+    for part in sorted(pending, key=lambda n: int(n.rsplit("_", 1)[1])):
+        me = pending[part]["me"]
+        bm = bmesh.new()
+        bm.from_mesh(me)
+        nf0, nv0 = len(bm.faces), len(bm.verts)
+        short = [e for e in bm.edges if e.calc_length() <= fdist]
+        if short:
+            bmesh.ops.collapse(bm, edges=short, uvs=True)
+        # slivers below the export check (1.2 x 1e-4 cm2 at the final scale, as the stitch): collapse the shortest edge
+        amin = 1.2e-8 / float(P["seat"]["expected_scale"]) ** 2
+        slivers = []
+        for f in list(bm.faces):
+            if f.is_valid and f.calc_area() < amin:
+                e = min(f.edges, key=lambda e_: e_.calc_length())
+                slivers.append(round(e.calc_length() * 1000, 5))
+                bmesh.ops.collapse(bm, edges=[e], uvs=True)
+        dead = [f for f in bm.faces if f.calc_area() <= 0.0 or len({v.index for v in f.verts}) < 3]
+        if dead:
+            bmesh.ops.delete(bm, geom=dead, context="FACES_ONLY")
+        loose_e = [e for e in bm.edges if not e.link_faces]
+        if loose_e:
+            bmesh.ops.delete(bm, geom=loose_e, context="EDGES")
+        loose_v = [v for v in bm.verts if not v.link_faces]
+        if loose_v:
+            bmesh.ops.delete(bm, geom=loose_v, context="VERTS")
+        nm_res = SL.fix_nonmanifold(bm) if LPC.get("fix_nonmanifold") else None
+        if short or slivers or dead or loose_e or loose_v or (nm_res and nm_res["edges_before"]):
+            bm.to_mesh(me)
+            me.update()
+            fc_report[part] = {"zero_length_edges_collapsed": len(short),
+                               "sliver_shortest_edges_collapsed_mm": slivers, "degenerate_faces_deleted": len(dead),
+                               "loose_edges_deleted": len(loose_e), "loose_vertices_deleted": len(loose_v),
+                               "faces": [nf0, len(bm.faces)], "vertices": [nv0, len(bm.verts)],
+                               "nonmanifold_after": nm_res}
+        bm.free()
+report["final_cleanup"] = fc_report
+
 for part in sorted(pending, key=lambda n: int(n.rsplit("_", 1)[1])):
     st = pending[part]
     cfg, src, me, lo, region_report = st["cfg"], st["src"], st["me"], st["lo"], st["region_report"]

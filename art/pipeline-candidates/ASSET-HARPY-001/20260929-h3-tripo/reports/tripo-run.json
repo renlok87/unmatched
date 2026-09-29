@@ -1,0 +1,1047 @@
+{
+  "schema": "unmatched.tripo-pipeline.studio-run-evidence/1",
+  "task": "Harpy H3: перегенерация в Tripo Studio (исправление двуликой головы H2), multi-view по частям → 8K без освещения → PBR",
+  "asset_id": "ASSET-HARPY-001",
+  "date": "2026-09-29",
+  "service": "tripo-studio",
+  "account_plan_ui": "Max (по журналу кредитов, tripo.plan)",
+  "performed_by": "Оркестратор лично в своей вкладке Studio (платные операции, визуальная проверка, выгрузка GLB скачиванием из Studio; DCC Bridge доступен, но не использовался). Этот отчёт составлен субагентом Blender-этапа БЕЗ доступа к Studio: операции, цены и балансы — из журнала кредитов (owner «Harpy H3 regen (orchestrator, Janus fix)»); sha256, размеры и структура GLB и концептов — измерены по файлам.",
+  "evidence_basis": {
+    "measured_by_this_report": [
+      "sha256 и байты обоих GLB в source/",
+      "структура GLB (glb_inspect.py: контейнер, меши, треугольники, вершины, материалы, изображения, accessor-границы, размеры встроенных карт по заголовкам PNG/JPEG)",
+      "совпадение геометрии двух GLB поштучно по частям (stage_import.py: канонические наборы треугольников равны)",
+      "sha256 и размеры PNG концептов, sha256 prompts.md",
+      "визуальная проверка «одно лицо / затылок в перьях / один браслет» на импортированном high-poly (Blender, 20260929-h3-bake, reports/h3-landmarks.json)"
+    ],
+    "from_credit_ledger": [
+      "время истории Studio (до минуты)",
+      "quoted / delta / balanceBefore / balanceAfter",
+      "формулировка операций"
+    ],
+    "from_orchestrator_task_text": [
+      "модель H3.1",
+      "слоты FRONT/LEFT/BACK, RIGHT пусто",
+      "«Генерировать по частям» Баланс, ультра-качество сетки 2M, треугольники",
+      "визуальная проверка оркестратора в Studio: одно лицо, затылок в перьях, один браслет",
+      "итог 60+30+5 = 95, баланс 23 850 → 23 755"
+    ],
+    "not_recorded": [
+      "точная подпись модели в UI",
+      "privacy, seed, AI-дополнение",
+      "настройки экспорта GLB в Studio",
+      "снимок истории Studio"
+    ]
+  },
+  "tasks": {
+    "bca735a3-b49f-42f6-8495-29707318ba61": {
+      "role": "H3 multi-view high-poly по частям (Баланс) → текстура 8K без освещения → PBR; одна ветка, без клонов, ретопологии и авторига",
+      "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/bca735a3-b49f-42f6-8495-29707318ba61",
+      "replaces": "330872a3 (H2: боковой концепт в слоте RIGHT → двуликая голова, см. harpy-h2-report.md)"
+    }
+  },
+  "generation": {
+    "mode": "multi-view",
+    "ui": "HD модель, «из нескольких видов в модель», генерировать по частям",
+    "model_ui_label": null,
+    "model_version_note": "H3.1 — со слов задания оркестратора; точная подпись UI не записана",
+    "views": {
+      "front": {
+        "path": "art/imagegen/hero-quality-v1/harpy/harpy-front.png",
+        "sha256": "1a93e22efb138ec0ef48fc1dcd387ec823bc836639772475f073d7bc95780b1f",
+        "bytes": 1985130,
+        "px": [
+          1470,
+          1070
+        ],
+        "concept_view": "front"
+      },
+      "left": {
+        "path": "art/imagegen/hero-quality-v1/harpy/harpy-side.png",
+        "sha256": "44fd58066ffb310f6768eb1e326ef42a99ab7a905252bc41da78740ecd25844f",
+        "bytes": 1653451,
+        "px": [
+          1470,
+          1070
+        ],
+        "concept_view": "side"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/hero-quality-v1/harpy/harpy-back.png",
+        "sha256": "af82978b804dbbf31e92d469ec4a604308acc6b9d74fc080b56fdd2d22d1e086",
+        "bytes": 1988185,
+        "px": [
+          1470,
+          1070
+        ],
+        "concept_view": "back"
+      }
+    },
+    "slot_mapping": "FRONT/LEFT/BACK, RIGHT пусто — по заданию оркестратора и формулировкам журнала («front/LEFT/back»)",
+    "slot_consistency": "Совпадает с prompts.md: боковой концепт нарисован поверх ortho_left (лицо смотрит влево) и подан в слот LEFT. Результат (замер Blender-этапа): одно лицо на -Y у части tripo_part_2, затылок — замкнутая перьевая поверхность, один браслет (tripo_part_13) на ЛЕВОЙ ноге, как на концепте.",
+    "concepts": {
+      "set": "art/imagegen/hero-quality-v1",
+      "prompts": {
+        "path": "art/imagegen/hero-quality-v1/harpy/prompts.md",
+        "sha256": "4ad0c0c393a0597f39a66fe03976482d8765ce29e3e948e3c8160441446a3659"
+      },
+      "limitations": "prompts.md: концепты — по модели, не геометрически точные проекции"
+    },
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "face_type": "треугольники",
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": null,
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на high-poly. null = не записано."
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "task": "bca735a3",
+      "history_time": "2026-09-29 18:44",
+      "ledger_op": "H3.1 multi-view generate by parts (Balance), ultra 2M, no texture — Harpy H3 regen (front/LEFT/back)",
+      "quoted": 60,
+      "observed_debit": 60,
+      "balance_before": 23850,
+      "balance_after": 23790,
+      "ledger_ref": "art/imagegen/hero-quality-v1/harpy",
+      "ui": "Из нескольких видов в модель (H3.1), «Генерировать по частям» Баланс, ультра-качество сетки 2M, треугольники, без текстуры",
+      "result": {
+        "glb": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/source/harpy-h3-tripo-bca735a3-parts19.glb",
+        "parts": 19,
+        "glb_triangles": 1930656
+      }
+    },
+    {
+      "op": "texture",
+      "task": "bca735a3",
+      "history_time": "2026-09-29 18:48",
+      "ledger_op": "texture 8K, remove lighting (multi-view front/LEFT/back) — Harpy H3",
+      "quoted": 30,
+      "observed_debit": 30,
+      "balance_before": 23790,
+      "balance_after": 23760,
+      "ledger_ref": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo",
+      "ui": "Генератор текстур 8K, «Удалить освещение», на high-poly модели по частям",
+      "settings": {
+        "texture_resolution": "8K",
+        "remove_lighting": true
+      }
+    },
+    {
+      "op": "pbr",
+      "task": "bca735a3",
+      "history_time": "2026-09-29 18:54",
+      "ledger_op": "PBR generation — Harpy H3",
+      "quoted": 5,
+      "observed_debit": 5,
+      "balance_before": 23760,
+      "balance_after": 23755,
+      "ledger_ref": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo",
+      "ui": "Генератор PBR после 8K",
+      "result": {
+        "glb": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/source/harpy-h3-tripo-bca735a3-tex8k-pbr.glb",
+        "parts": 19,
+        "glb_triangles": 1930656
+      }
+    }
+  ],
+  "exports": [
+    {
+      "file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/source/harpy-h3-tripo-bca735a3-parts19.glb",
+      "stage": "generate (по частям, без текстуры)",
+      "format": "GLB",
+      "texture_tier": null,
+      "sha256": "430819dd79fd1178d0da1ebf72dc00af5788f071d7d3b9d0d3c1d4bb6d2b63a5",
+      "bytes": 46513416,
+      "git": "не в git (.gitignore ассета: 20260929-h3-tripo/source/*.glb), закреплён по sha256 в source-spec",
+      "glb": {
+        "meshes": 19,
+        "nodes": 20,
+        "triangles": 1930656,
+        "vertices": 972008,
+        "materials": 1,
+        "images": 0,
+        "skins": 0,
+        "generator": "Tripo",
+        "extensionsUsed": [
+          "KHR_materials_volume",
+          "FB_ngon_encoding"
+        ],
+        "attributes": [
+          "NORMAL",
+          "POSITION"
+        ],
+        "bounds_accessor_gltf_m": {
+          "min": [
+            -0.4909,
+            0.0,
+            -0.2418
+          ],
+          "max": [
+            0.4909,
+            0.6424,
+            0.2418
+          ],
+          "dimensions_xyz": [
+            0.9818,
+            0.6424,
+            0.4836
+          ],
+          "note": "accessor min/max, glTF axes (Y up, +Z forward), Tripo units"
+        },
+        "nodes_named": "ROOT + tripo_part_0..18 (узел i -> mesh i)",
+        "container_check": {
+          "magic": "glTF",
+          "version": 2,
+          "header_length_equals_file": true,
+          "chunk_walk_ends_at_file_end": true,
+          "chunks": [
+            "JSON",
+            "BIN"
+          ]
+        },
+        "material_factors": [
+          [
+            "material",
+            0.0,
+            0.5
+          ]
+        ]
+      },
+      "parts": [
+        {
+          "node": "tripo_part_0",
+          "mesh_index": 0,
+          "triangles": 342761,
+          "vertices": 172091,
+          "accessor_min": [
+            -0.4909,
+            0.0,
+            -0.2417
+          ],
+          "accessor_max": [
+            -0.0454,
+            0.5949,
+            0.1243
+          ]
+        },
+        {
+          "node": "tripo_part_1",
+          "mesh_index": 1,
+          "triangles": 328729,
+          "vertices": 165100,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.2418
+          ],
+          "accessor_max": [
+            0.4909,
+            0.595,
+            0.1228
+          ]
+        },
+        {
+          "node": "tripo_part_2",
+          "mesh_index": 2,
+          "triangles": 283133,
+          "vertices": 141905,
+          "accessor_min": [
+            -0.0977,
+            0.0,
+            0.0
+          ],
+          "accessor_max": [
+            0.0867,
+            0.6424,
+            0.2418
+          ]
+        },
+        {
+          "node": "tripo_part_3",
+          "mesh_index": 3,
+          "triangles": 149939,
+          "vertices": 75472,
+          "accessor_min": [
+            -0.4444,
+            0.0,
+            -0.2122
+          ],
+          "accessor_max": [
+            -0.0798,
+            0.4792,
+            0.0234
+          ]
+        },
+        {
+          "node": "tripo_part_4",
+          "mesh_index": 4,
+          "triangles": 79243,
+          "vertices": 39916,
+          "accessor_min": [
+            -0.0876,
+            0.0,
+            -0.0678
+          ],
+          "accessor_max": [
+            0.088,
+            0.4558,
+            0.0573
+          ]
+        },
+        {
+          "node": "tripo_part_5",
+          "mesh_index": 5,
+          "triangles": 119976,
+          "vertices": 60543,
+          "accessor_min": [
+            -0.1021,
+            0.0,
+            -0.0077
+          ],
+          "accessor_max": [
+            0.1017,
+            0.454,
+            0.1789
+          ]
+        },
+        {
+          "node": "tripo_part_6",
+          "mesh_index": 6,
+          "triangles": 76848,
+          "vertices": 38867,
+          "accessor_min": [
+            -0.1576,
+            0.0,
+            -0.1085
+          ],
+          "accessor_max": [
+            0.1571,
+            0.0754,
+            0.2056
+          ]
+        },
+        {
+          "node": "tripo_part_7",
+          "mesh_index": 7,
+          "triangles": 143344,
+          "vertices": 72204,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.2122
+          ],
+          "accessor_max": [
+            0.444,
+            0.4788,
+            0.0239
+          ]
+        },
+        {
+          "node": "tripo_part_8",
+          "mesh_index": 8,
+          "triangles": 67756,
+          "vertices": 34204,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.0187
+          ],
+          "accessor_max": [
+            0.1278,
+            0.32,
+            0.1321
+          ]
+        },
+        {
+          "node": "tripo_part_9",
+          "mesh_index": 9,
+          "triangles": 64331,
+          "vertices": 32524,
+          "accessor_min": [
+            -0.1281,
+            0.0,
+            -0.0183
+          ],
+          "accessor_max": [
+            -0.0166,
+            0.3182,
+            0.1321
+          ]
+        },
+        {
+          "node": "tripo_part_10",
+          "mesh_index": 10,
+          "triangles": 65811,
+          "vertices": 33188,
+          "accessor_min": [
+            -0.1135,
+            0.0,
+            -0.0267
+          ],
+          "accessor_max": [
+            -0.0035,
+            0.1953,
+            0.1596
+          ]
+        },
+        {
+          "node": "tripo_part_11",
+          "mesh_index": 11,
+          "triangles": 21962,
+          "vertices": 11213,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.0014
+          ],
+          "accessor_max": [
+            0.121,
+            0.3279,
+            0.1013
+          ]
+        },
+        {
+          "node": "tripo_part_12",
+          "mesh_index": 12,
+          "triangles": 54901,
+          "vertices": 27726,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.0262
+          ],
+          "accessor_max": [
+            0.1128,
+            0.1453,
+            0.1596
+          ]
+        },
+        {
+          "node": "tripo_part_13",
+          "mesh_index": 13,
+          "triangles": 13577,
+          "vertices": 6903,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.0136
+          ],
+          "accessor_max": [
+            0.0731,
+            0.1765,
+            0.0472
+          ]
+        },
+        {
+          "node": "tripo_part_14",
+          "mesh_index": 14,
+          "triangles": 69676,
+          "vertices": 35223,
+          "accessor_min": [
+            -0.0832,
+            0.0,
+            -0.0721
+          ],
+          "accessor_max": [
+            0.083,
+            0.3338,
+            0.0178
+          ]
+        },
+        {
+          "node": "tripo_part_15",
+          "mesh_index": 15,
+          "triangles": 18980,
+          "vertices": 9698,
+          "accessor_min": [
+            -0.0321,
+            0.0,
+            -0.021
+          ],
+          "accessor_max": [
+            0.0314,
+            0.3127,
+            0.1026
+          ]
+        },
+        {
+          "node": "tripo_part_16",
+          "mesh_index": 16,
+          "triangles": 13616,
+          "vertices": 6975,
+          "accessor_min": [
+            -0.1207,
+            0.0,
+            -0.0013
+          ],
+          "accessor_max": [
+            -0.0421,
+            0.3276,
+            0.0986
+          ]
+        },
+        {
+          "node": "tripo_part_17",
+          "mesh_index": 17,
+          "triangles": 8211,
+          "vertices": 4229,
+          "accessor_min": [
+            -0.0331,
+            0.0,
+            -0.0539
+          ],
+          "accessor_max": [
+            0.0322,
+            0.3262,
+            -0.0005
+          ]
+        },
+        {
+          "node": "tripo_part_18",
+          "mesh_index": 18,
+          "triangles": 7862,
+          "vertices": 4027,
+          "accessor_min": [
+            -0.0587,
+            0.0,
+            0.0
+          ],
+          "accessor_max": [
+            -0.0232,
+            0.3108,
+            0.1014
+          ]
+        }
+      ],
+      "structure_report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/reports/glb-parts19.json"
+    },
+    {
+      "file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/source/harpy-h3-tripo-bca735a3-tex8k-pbr.glb",
+      "stage": "texture 8K (удалить освещение) + PBR",
+      "format": "GLB",
+      "texture_tier": "8K (UI)",
+      "sha256": "710a1cd468c1a8016776d0931891dbfcc3021f328096128d764ec2e76d8b0790",
+      "bytes": 78651856,
+      "git": "не в git (.gitignore ассета: 20260929-h3-tripo/source/*.glb), закреплён по sha256 в source-spec",
+      "glb": {
+        "meshes": 19,
+        "nodes": 20,
+        "triangles": 1930656,
+        "vertices": 1020008,
+        "materials": 19,
+        "images": 57,
+        "skins": 0,
+        "generator": "Tripo",
+        "extensionsUsed": [
+          "KHR_materials_volume",
+          "FB_ngon_encoding"
+        ],
+        "attributes": [
+          "NORMAL",
+          "POSITION",
+          "TEXCOORD_0"
+        ],
+        "bounds_accessor_gltf_m": {
+          "min": [
+            -0.4909,
+            0.0,
+            -0.2418
+          ],
+          "max": [
+            0.4909,
+            0.6424,
+            0.2418
+          ],
+          "dimensions_xyz": [
+            0.9818,
+            0.6424,
+            0.4836
+          ],
+          "note": "accessor min/max, glTF axes (Y up, +Z forward), Tripo units"
+        },
+        "nodes_named": "ROOT + tripo_part_0..18 (узел i -> mesh i)",
+        "container_check": {
+          "magic": "glTF",
+          "version": 2,
+          "header_length_equals_file": true,
+          "chunk_walk_ends_at_file_end": true,
+          "chunks": [
+            "JSON",
+            "BIN"
+          ]
+        },
+        "texture_set": {
+          "per_material": "BaseColor + metallicRoughness + normal (3 изображения на часть, 19 материалов)",
+          "basecolor_size_histogram": {
+            "4096": 4,
+            "2048": 4,
+            "1024": 7,
+            "512": 4
+          },
+          "basecolor_texel_area": 92274688,
+          "basecolor_equivalent_square_px": 9606,
+          "basecolor_share_of_8192sq": 1.375,
+          "embedded_image_bytes": 22807619,
+          "max_image_px": 4096,
+          "note": "«8K» в UI Studio — уровень текстурирования, а не одна карта 8192²: свой набор карт на часть (basecolor 4096/2048/1024/512, MR и normal в 4 раза меньше), измерено по заголовкам PNG/JPEG в BIN-чанке"
+        },
+        "material_factors": [
+          [
+            null,
+            null
+          ]
+        ]
+      },
+      "parts": [
+        {
+          "node": "tripo_part_0",
+          "mesh_index": 0,
+          "triangles": 342761,
+          "vertices": 180639,
+          "accessor_min": [
+            -0.4909,
+            0.0,
+            -0.2417
+          ],
+          "accessor_max": [
+            -0.0454,
+            0.5949,
+            0.1243
+          ],
+          "texture_px": {
+            "basecolor": 4096,
+            "metal_rough": 1024,
+            "normal": 1024
+          }
+        },
+        {
+          "node": "tripo_part_1",
+          "mesh_index": 1,
+          "triangles": 328729,
+          "vertices": 174001,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.2418
+          ],
+          "accessor_max": [
+            0.4909,
+            0.595,
+            0.1228
+          ],
+          "texture_px": {
+            "basecolor": 4096,
+            "metal_rough": 1024,
+            "normal": 1024
+          }
+        },
+        {
+          "node": "tripo_part_2",
+          "mesh_index": 2,
+          "triangles": 283133,
+          "vertices": 152776,
+          "accessor_min": [
+            -0.0977,
+            0.0,
+            0.0
+          ],
+          "accessor_max": [
+            0.0867,
+            0.6424,
+            0.2418
+          ],
+          "texture_px": {
+            "basecolor": 4096,
+            "metal_rough": 1024,
+            "normal": 1024
+          }
+        },
+        {
+          "node": "tripo_part_3",
+          "mesh_index": 3,
+          "triangles": 149939,
+          "vertices": 78846,
+          "accessor_min": [
+            -0.4444,
+            0.0,
+            -0.2122
+          ],
+          "accessor_max": [
+            -0.0798,
+            0.4792,
+            0.0234
+          ],
+          "texture_px": {
+            "basecolor": 2048,
+            "metal_rough": 512,
+            "normal": 512
+          }
+        },
+        {
+          "node": "tripo_part_4",
+          "mesh_index": 4,
+          "triangles": 79243,
+          "vertices": 41767,
+          "accessor_min": [
+            -0.0876,
+            0.0,
+            -0.0678
+          ],
+          "accessor_max": [
+            0.088,
+            0.4558,
+            0.0573
+          ],
+          "texture_px": {
+            "basecolor": 2048,
+            "metal_rough": 512,
+            "normal": 512
+          }
+        },
+        {
+          "node": "tripo_part_5",
+          "mesh_index": 5,
+          "triangles": 119976,
+          "vertices": 63785,
+          "accessor_min": [
+            -0.1021,
+            0.0,
+            -0.0077
+          ],
+          "accessor_max": [
+            0.1017,
+            0.454,
+            0.1789
+          ],
+          "texture_px": {
+            "basecolor": 2048,
+            "metal_rough": 512,
+            "normal": 512
+          }
+        },
+        {
+          "node": "tripo_part_6",
+          "mesh_index": 6,
+          "triangles": 76848,
+          "vertices": 40125,
+          "accessor_min": [
+            -0.1576,
+            0.0,
+            -0.1085
+          ],
+          "accessor_max": [
+            0.1571,
+            0.0754,
+            0.2056
+          ],
+          "texture_px": {
+            "basecolor": 4096,
+            "metal_rough": 1024,
+            "normal": 1024
+          }
+        },
+        {
+          "node": "tripo_part_7",
+          "mesh_index": 7,
+          "triangles": 143344,
+          "vertices": 75122,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.2122
+          ],
+          "accessor_max": [
+            0.444,
+            0.4788,
+            0.0239
+          ],
+          "texture_px": {
+            "basecolor": 2048,
+            "metal_rough": 512,
+            "normal": 512
+          }
+        },
+        {
+          "node": "tripo_part_8",
+          "mesh_index": 8,
+          "triangles": 67756,
+          "vertices": 35322,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.0187
+          ],
+          "accessor_max": [
+            0.1278,
+            0.32,
+            0.1321
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_9",
+          "mesh_index": 9,
+          "triangles": 64331,
+          "vertices": 33465,
+          "accessor_min": [
+            -0.1281,
+            0.0,
+            -0.0183
+          ],
+          "accessor_max": [
+            -0.0166,
+            0.3182,
+            0.1321
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_10",
+          "mesh_index": 10,
+          "triangles": 65811,
+          "vertices": 34169,
+          "accessor_min": [
+            -0.1135,
+            0.0,
+            -0.0267
+          ],
+          "accessor_max": [
+            -0.0035,
+            0.1953,
+            0.1596
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_11",
+          "mesh_index": 11,
+          "triangles": 21962,
+          "vertices": 11897,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.0014
+          ],
+          "accessor_max": [
+            0.121,
+            0.3279,
+            0.1013
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_12",
+          "mesh_index": 12,
+          "triangles": 54901,
+          "vertices": 28422,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.0262
+          ],
+          "accessor_max": [
+            0.1128,
+            0.1453,
+            0.1596
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_13",
+          "mesh_index": 13,
+          "triangles": 13577,
+          "vertices": 7417,
+          "accessor_min": [
+            0.0,
+            0.0,
+            -0.0136
+          ],
+          "accessor_max": [
+            0.0731,
+            0.1765,
+            0.0472
+          ],
+          "texture_px": {
+            "basecolor": 512,
+            "metal_rough": 128,
+            "normal": 128
+          }
+        },
+        {
+          "node": "tripo_part_14",
+          "mesh_index": 14,
+          "triangles": 69676,
+          "vertices": 36364,
+          "accessor_min": [
+            -0.0832,
+            0.0,
+            -0.0721
+          ],
+          "accessor_max": [
+            0.083,
+            0.3338,
+            0.0178
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_15",
+          "mesh_index": 15,
+          "triangles": 18980,
+          "vertices": 10032,
+          "accessor_min": [
+            -0.0321,
+            0.0,
+            -0.021
+          ],
+          "accessor_max": [
+            0.0314,
+            0.3127,
+            0.1026
+          ],
+          "texture_px": {
+            "basecolor": 1024,
+            "metal_rough": 256,
+            "normal": 256
+          }
+        },
+        {
+          "node": "tripo_part_16",
+          "mesh_index": 16,
+          "triangles": 13616,
+          "vertices": 7437,
+          "accessor_min": [
+            -0.1207,
+            0.0,
+            -0.0013
+          ],
+          "accessor_max": [
+            -0.0421,
+            0.3276,
+            0.0986
+          ],
+          "texture_px": {
+            "basecolor": 512,
+            "metal_rough": 128,
+            "normal": 128
+          }
+        },
+        {
+          "node": "tripo_part_17",
+          "mesh_index": 17,
+          "triangles": 8211,
+          "vertices": 4329,
+          "accessor_min": [
+            -0.0331,
+            0.0,
+            -0.0539
+          ],
+          "accessor_max": [
+            0.0322,
+            0.3262,
+            -0.0005
+          ],
+          "texture_px": {
+            "basecolor": 512,
+            "metal_rough": 128,
+            "normal": 128
+          }
+        },
+        {
+          "node": "tripo_part_18",
+          "mesh_index": 18,
+          "triangles": 7862,
+          "vertices": 4093,
+          "accessor_min": [
+            -0.0587,
+            0.0,
+            0.0
+          ],
+          "accessor_max": [
+            -0.0232,
+            0.3108,
+            0.1014
+          ],
+          "texture_px": {
+            "basecolor": 512,
+            "metal_rough": 128,
+            "normal": 128
+          }
+        }
+      ],
+      "structure_report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/reports/glb-tex8k-pbr.json"
+    }
+  ],
+  "parts_vs_textured": {
+    "same_part_set": true,
+    "canonical_triangle_sets_equal_all_parts": true,
+    "vertices": {
+      "parts_glb": 972008,
+      "tex8k_pbr_glb": 1020008,
+      "delta": 48000
+    },
+    "note": "stage_import.py сравнил треугольники каждой части поштучно (канонические наборы, допуск 1e-7 м): равны у всех 19 частей; рост числа вершин — разрезы по UV-швам (TEXCOORD_0 только после 8K)",
+    "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/reports/h2-import-report.json"
+  },
+  "findings": [
+    "Одно лицо (часть tripo_part_2, спереди на -Y), затылок замкнут перьями — двуликой головы H2 нет (Blender, импорт high-poly)",
+    "Один золотой браслет (tripo_part_13) на левой ноге, как на концепте; у H2 было два",
+    "19 частей вместо 13: крылья разделены на верх/низ, отдельно перья бёдер, хвост, «V» живота",
+    "«8K» дал 19 наборов карт (basecolor 4×4096, 4×2048, 7×1024, 4×512), суммарная площадь basecolor ≈ 9606² ≈ 138% от 8192²"
+  ],
+  "credits": {
+    "unit": "studio-credits",
+    "this_task_total_observed": 95,
+    "balance_start": 23850,
+    "balance_end": 23755,
+    "ledger": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json",
+    "ledger_owner": "Harpy H3 regen (orchestrator, Janus fix)",
+    "ledger_check": "3 записи задачи bca735a3: quoted = −delta, balanceAfter = balanceBefore + delta, цепочка внутри задачи непрерывна; byTask[owner] = 95. Разрыв перед задачей: прежняя запись окна (PBR Harpy H2, 07:18) закончилась на 23 855, запись H3 начинается с 23 850 (5 кредитов между 07:18 и 18:44 журналом не объяснены — не этой задачей)",
+    "history_snapshot": null,
+    "paid_by_this_subagent": 0
+  },
+  "animation_presets": "не запускались (в журнале нет записей этой задачи)",
+  "rig": "Tripo-авториг не запускался",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false,
+    "status": "измерено"
+  }
+}

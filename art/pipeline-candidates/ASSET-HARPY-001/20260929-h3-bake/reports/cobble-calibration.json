@@ -1,0 +1,203 @@
+{
+ "anchor": "S08ArtBoardProfiles.json lightProfiles.cobble-probe sky.calibration: K1 board ROI p50 131.2",
+ "base_exposure": -1.563,
+ "blender_exposure": -2.563,
+ "board_albedo_linear": [
+  0.119,
+  0.121,
+  0.121
+ ],
+ "board_roughness": 0.85,
+ "calibration_board_size_m": 40.0,
+ "camera": {
+  "azimuth_deg": 0.0,
+  "distance_m": 19.31,
+  "fov_h_deg": 35.0,
+  "pitch_deg": -55.0,
+  "source": "t42_sky_calib_editor.py FOV_LIVE 35, K1_LIVE 1931 uu, pitch -55"
+ },
+ "ev100": 1.3,
+ "exposure_offset_stops": -1.0,
+ "k1_board_p50_final": 131.0,
+ "label": "blender frames (EEVEE, AgX), figure hidden; approximation of the UE Cobble light, not an UE frame",
+ "method": "W4-A anchor (S08ArtBoardProfiles.json cobble-probe sky.calibration): K1 board ROI p50 of Rec.709 luma of the 8-bit sRGB frame = 131.2. Blender: figure and base hidden, calibration board 40 m (same albedo and roughness), K1 camera, exposure offset (stops, added to log2(1 / (1.2 * 2^EV100))) bisected until |p50 - target| <= tolerance; the offset is measured per run and recorded in preview/h3/review-frames-h3.json and reports/cobble-calibration.json",
+ "roi_px": [
+  600,
+  700,
+  1360,
+  940
+ ],
+ "roi_source": "tools/art/t42_sky_calib_editor.py BOARD_K1_BOX (x 600-1360, y 700-940 of the 1920x1080 frame)",
+ "schema": "unmatched.h3-cobble-calibration/1",
+ "steps": [
+  {
+   "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_lo.png",
+   "k1_board_p50": 40.787,
+   "offset_stops": -4.0
+  },
+  {
+   "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_hi.png",
+   "k1_board_p50": 215.0,
+   "offset_stops": 2.0
+  },
+  {
+   "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_i00.png",
+   "k1_board_p50": 131.0,
+   "offset_stops": -1.0
+  },
+  {
+   "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_final.png",
+   "k1_board_p50": 131.0,
+   "offset_stops": -1.0
+  }
+ ],
+ "target_board_p50_luma": 131.2,
+ "tolerance_luma": 0.75,
+ "view_transform": "AgX",
+ "view_transform_probe": {
+  "Filmic": {
+   "available": true,
+   "blender_exposure": -2.7974,
+   "exposure_offset_stops": -1.2344,
+   "k1_board_p50_final": 131.715,
+   "steps": [
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_filmic_lo.png",
+     "k1_board_p50": 50.715,
+     "offset_stops": -4.0
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_filmic_hi.png",
+     "k1_board_p50": 225.0,
+     "offset_stops": 2.0
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_filmic_i00.png",
+     "k1_board_p50": 139.715,
+     "offset_stops": -1.0
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_filmic_i01.png",
+     "k1_board_p50": 89.715,
+     "offset_stops": -2.5
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_filmic_i02.png",
+     "k1_board_p50": 113.715,
+     "offset_stops": -1.75
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_filmic_i03.png",
+     "k1_board_p50": 126.715,
+     "offset_stops": -1.375
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_filmic_i04.png",
+     "k1_board_p50": 133.0,
+     "offset_stops": -1.1875
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_filmic_i05.png",
+     "k1_board_p50": 129.787,
+     "offset_stops": -1.28125
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_filmic_i06.png",
+     "k1_board_p50": 131.715,
+     "offset_stops": -1.23438
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_filmic_final.png",
+     "k1_board_p50": 131.715,
+     "offset_stops": -1.2344
+    }
+   ]
+  },
+  "Khronos PBR Neutral": {
+   "available": true,
+   "blender_exposure": -2.3286,
+   "exposure_offset_stops": -0.7656,
+   "k1_board_p50_final": 131.715,
+   "steps": [
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_khronos_pbr_neutral_lo.png",
+     "k1_board_p50": 16.715,
+     "offset_stops": -4.0
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_khronos_pbr_neutral_hi.png",
+     "k1_board_p50": 249.715,
+     "offset_stops": 2.0
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_khronos_pbr_neutral_i00.png",
+     "k1_board_p50": 120.715,
+     "offset_stops": -1.0
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_khronos_pbr_neutral_i01.png",
+     "k1_board_p50": 205.503,
+     "offset_stops": 0.5
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_khronos_pbr_neutral_i02.png",
+     "k1_board_p50": 159.715,
+     "offset_stops": -0.25
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_khronos_pbr_neutral_i03.png",
+     "k1_board_p50": 139.503,
+     "offset_stops": -0.625
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_khronos_pbr_neutral_i04.png",
+     "k1_board_p50": 129.715,
+     "offset_stops": -0.8125
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_khronos_pbr_neutral_i05.png",
+     "k1_board_p50": 133.787,
+     "offset_stops": -0.71875
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_khronos_pbr_neutral_i06.png",
+     "k1_board_p50": 131.715,
+     "offset_stops": -0.76562
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_khronos_pbr_neutral_final.png",
+     "k1_board_p50": 131.715,
+     "offset_stops": -0.7656
+    }
+   ]
+  },
+  "Standard": {
+   "available": true,
+   "blender_exposure": -2.563,
+   "exposure_offset_stops": -1.0,
+   "k1_board_p50_final": 131.715,
+   "steps": [
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_standard_lo.png",
+     "k1_board_p50": 47.0,
+     "offset_stops": -4.0
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_standard_hi.png",
+     "k1_board_p50": 255.0,
+     "offset_stops": 2.0
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_standard_i00.png",
+     "k1_board_p50": 131.715,
+     "offset_stops": -1.0
+    },
+    {
+     "frame": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-calibration/k1_board_standard_final.png",
+     "k1_board_p50": 131.715,
+     "offset_stops": -1.0
+    }
+   ]
+  }
+ }
+}

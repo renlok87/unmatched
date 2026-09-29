@@ -1,0 +1,1541 @@
+{
+ "schema": "unmatched.art-pipeline.hero-report/1",
+ "asset_id": "ASSET-HARPY-001",
+ "iteration": "H3",
+ "date": "2026-09-29",
+ "status": "измерено",
+ "status_note": "не «технически импортировано» (UE не трогался), не «художественно принято»; бюджеты и значения материалов — «предложено»",
+ "credits_this_stage": 0,
+ "tripo": {
+  "task_id": "bca735a3-b49f-42f6-8495-29707318ba61",
+  "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/reports/tripo-run.json",
+  "source_spec": "art/pipeline-candidates/ASSET-HARPY-001/source-specs/tripo-bca735a3-h3.json",
+  "credits": 95,
+  "balance": [
+   23850,
+   23755
+  ],
+  "paid_by": "оркестратор (журнал кредитов, owner «Harpy H3 regen (orchestrator, Janus fix)»)"
+ },
+ "profile": {
+  "path": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-bake.json",
+  "id": "harpy-h3-bake/1",
+  "sha256": "35efe89bd51b770e000f4a96234876882ad535e1b2979fe81d2d1fa45a07adba",
+  "build_stages_sha256": "86e3195fa7fd5011f419f088ae64fa91fec4ad3ed3a9518f6600a54d0b49ee81",
+  "sha256_note": "build stages import..review ran on sha256 86e3195f...; after the review, revision 2 changed only review.h3.cobble (board albedo, size and roughness, exposure_calibration, view_transform_probe, revision_note). That block is read only by review_h3.py and compose_h3.py; the stage3 review was rerun on the new sha256"
+ },
+ "run": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake",
+ "baseline": {
+  "run": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake",
+  "label": "H2.1 (harpy-h2-bake/3)"
+ },
+ "module": "tools/tripo-pipeline/blender/h2_bake_harpy",
+ "metrics": {
+  "h3": {
+   "triangles_lowpoly_parts": 36444,
+   "triangles_body": 37177,
+   "triangles_base": 864,
+   "vertices_body": 21932,
+   "parts_game": 18,
+   "face_box_triangles": 2238,
+   "head_part_triangles": 6570,
+   "seat_scale": 0.652145,
+   "span_uu": 63.96,
+   "height_with_base_uu": 42.0,
+   "radial_max_uu": 37.19,
+   "uv": {
+    "fill_ratio": 0.4694,
+    "islands": 1298,
+    "min_texel_distance_between_islands_px": 10.0,
+    "texels_overlapping_strict": 0,
+    "triangles_outside_0_1": 0
+   },
+   "bake": {
+    "texels_covered_not_written_fraction": 0.006169,
+    "normal_inward_fraction": 0.02305,
+    "normal_tilt_over_60deg_fraction": 0.028812,
+    "ao_gate_passed": true
+   },
+   "team_mask": {
+    "coverage_of_figure": 0.1416,
+    "coverage_of_cells": 0.2896
+   },
+   "metal_texels_over_0_5": 89668,
+   "metal_rule_colour": {
+    "bake_luminance_modulation": 0.12,
+    "base_colour_linear": [
+     1.0,
+     0.765999972820282,
+     0.335999995470047
+    ],
+    "bc_linear_mean_before_after": [
+     [
+      0.5917,
+      0.2905,
+      0.0488
+     ],
+     [
+      0.8683,
+      0.6562,
+      0.284
+     ]
+    ],
+    "mask_luminance_mean_before": 0.3371
+   },
+   "materials": {
+    "face_cavity": {
+     "face_texels": 602002,
+     "factor_p1_p50": [
+      0.45,
+      0.9879
+     ],
+     "luminance_p5_before_after": [
+      0.0189,
+      0.0141
+     ],
+     "luminance_std_before_after": [
+      0.1046,
+      0.1052
+     ]
+    },
+    "feathers": {
+     "metallic_max": 0.2348,
+     "metallic_max_feather_ge_0_99": 0.0013,
+     "metallic_note": "texels with metallic > 0 inside the feather mask are the 3x3 soft edge of the gold bands (textures.metal_rule)",
+     "roughness_p1_p50_p99": [
+      0.4151,
+      0.58,
+      0.7321
+     ],
+     "skin_texels_over_0_5": 619844,
+     "texels_feather_over_0_5_metallic_over_0_05": 2922,
+     "texels_over_0_5": 14516670
+    },
+    "skin": {
+     "roughness_p1_p50_p99": [
+      0.4041,
+      0.4781,
+      0.6321
+     ],
+     "roughness_rule": [
+      0.4,
+      0.65
+     ],
+     "texels_over_0_5": 619807
+    },
+    "talons": {
+     "coverage_by_part": {
+      "tripo_part_10": 0.167,
+      "tripo_part_12": 0.1722
+     },
+     "roughness_mean": 0.5088,
+     "texels_over_0_5": 179407
+    }
+   },
+   "roughness_mean_covered_after": 0.594,
+   "see_through": {
+    "gate": {
+     "azimuth_range_deg": [
+      0,
+      360
+     ],
+     "distances_m": [
+      3.86,
+      4.8,
+      7.5,
+      12.07
+     ],
+     "hole_min_px": 4,
+     "holes": 0,
+     "largest_component_px": 0,
+     "max_holes": 0,
+     "pass": true
+    },
+    "gate_strict": {
+     "azimuth_range_deg": [
+      0,
+      360
+     ],
+     "distances_m": [
+      4.8,
+      7.5
+     ],
+     "max_px": 0,
+     "pass": true,
+     "worst_px": 0
+    },
+    "sum_px": 0
+   },
+   "see_through_holdout": {
+    "gate": {
+     "azimuth_range_deg": [
+      0,
+      360
+     ],
+     "distances_m": [
+      3.86,
+      4.3,
+      6.0,
+      10.0
+     ],
+     "hole_min_px": 4,
+     "holes": 0,
+     "largest_component_px": 0,
+     "max_holes": 0,
+     "pass": true
+    },
+    "gate_strict": {
+     "azimuth_range_deg": [
+      0,
+      360
+     ],
+     "distances_m": [
+      4.3,
+      6.0
+     ],
+     "max_px": 0,
+     "pass": true,
+     "worst_px": 0
+    }
+   },
+   "topology_body": {
+    "loose_vertices": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 6469
+   },
+   "checks_failed": [],
+   "seam_gap_after_harmonise_m": {
+    "arm_l_raise": 0.02526,
+    "arm_r_raise": 0.02549,
+    "forearm_l_bend": 0.00012,
+    "head_turn": 0.02386,
+    "spine_bend_fwd": 0.00896,
+    "thigh_l_flex": 0.01027,
+    "thigh_r_flex": 0.00357
+   },
+   "seam_pairs": 3221,
+   "sockets": [
+    {
+     "name": "Head",
+     "bone": "head",
+     "target_blender_m": [
+      -0.00335,
+      -0.05219,
+      0.33953
+     ],
+     "location_uu_for_ue": [
+      -0.352,
+      -6.495,
+      0.673
+     ]
+    },
+    {
+     "name": "Weapon",
+     "bone": "foot.R",
+     "target_blender_m": [
+      -0.03877,
+      -0.0427,
+      0.05755
+     ],
+     "location_uu_for_ue": [
+      0.053,
+      -7.809,
+      0.04
+     ]
+    }
+   ],
+   "exports": {
+    "base_fbx": {
+     "bytes": 40252,
+     "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/export/SM_Harpy_H3_Base.fbx",
+     "sha256": "77fc45deb2b2d0715e0874bdffde68fd3c4f4c88317572e9b8a36ccdddc4476b"
+    },
+    "settings": {
+     "add_leaf_bones": false,
+     "apply_scale_options": "FBX_SCALE_UNITS",
+     "apply_unit_scale": true,
+     "axis_forward": "-Y",
+     "axis_up": "Z",
+     "bake_anim": false,
+     "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+     "colors_type": "SRGB",
+     "creation_time_pinned": "2000-01-01T00:00:00",
+     "data_scale": 100.0,
+     "deviations_from_preset": {
+      "bake_anim": "off: the candidate FBX carries no clips",
+      "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+     },
+     "embed_textures": false,
+     "export_space_rotation_z_degrees": 90.0,
+     "mesh_smooth_type": "FACE",
+     "path_mode": "STRIP",
+     "preset": {
+      "name": "UM_FBX_v1",
+      "path": "blender/_tools/presets/UM_FBX_v1.json",
+      "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+      "version": "1.0.0"
+     },
+     "primary_bone_axis": "Y",
+     "secondary_bone_axis": "X",
+     "unit_scale_factor_after_patch": 1.0,
+     "use_triangles": true
+    },
+    "skeletal_fbx": {
+     "bytes": 1637452,
+     "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/export/SK_Harpy_H3.fbx",
+     "sha256": "ba841a77f26b9c99e333dc7c9e08094cbea2e6c7755b12c2401d1e4eab2ac2c4"
+    }
+   },
+   "validate_clip": {
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "skeleton": "UM_HUMANOID_17_v2"
+   }
+  },
+  "h21": {
+   "triangles_lowpoly_parts": 28620,
+   "triangles_body": 30238,
+   "triangles_base": 864,
+   "vertices_body": 19377,
+   "parts_game": 13,
+   "face_box_triangles": 1211,
+   "head_part_triangles": 5099,
+   "seat_scale": 0.659871,
+   "span_uu": 64.5,
+   "height_with_base_uu": 42.0,
+   "radial_max_uu": 36.96,
+   "uv": {
+    "fill_ratio": 0.4811,
+    "islands": 1383,
+    "min_texel_distance_between_islands_px": 10.77,
+    "texels_overlapping_strict": 0,
+    "triangles_outside_0_1": 0
+   },
+   "bake": {
+    "texels_covered_not_written_fraction": 0.00765,
+    "normal_inward_fraction": 0.022688,
+    "normal_tilt_over_60deg_fraction": 0.03177,
+    "ao_gate_passed": true
+   },
+   "team_mask": {
+    "coverage_of_figure": 0.1241,
+    "coverage_of_cells": 0.2825
+   },
+   "metal_texels_over_0_5": 70819,
+   "metal_rule_colour": null,
+   "materials": {
+    "face_cavity": {
+     "face_texels": 704385,
+     "factor_p1_p50": [
+      0.45,
+      0.9798
+     ],
+     "luminance_p5_before_after": [
+      0.0168,
+      0.0133
+     ],
+     "luminance_std_before_after": [
+      0.117,
+      0.1165
+     ]
+    },
+    "feathers": {
+     "metallic_max": 0.273,
+     "metallic_max_feather_ge_0_99": 0.0012,
+     "metallic_note": "texels with metallic > 0 inside the feather mask are the 3x3 soft edge of the gold bands (textures.metal_rule)",
+     "roughness_p1_p50_p99": [
+      0.7035,
+      0.7665,
+      0.833
+     ],
+     "skin_texels_over_0_5": 537002,
+     "texels_feather_over_0_5_metallic_over_0_05": 12796,
+     "texels_over_0_5": 14748823
+    },
+    "talons": {
+     "coverage_by_part": {
+      "tripo_part_10": 0.1789,
+      "tripo_part_9": 0.1719
+     },
+     "roughness_mean": 0.5011,
+     "texels_over_0_5": 214948
+    }
+   },
+   "roughness_mean_covered_after": 0.7531,
+   "see_through": {
+    "gate": {
+     "azimuth_range_deg": [
+      0,
+      360
+     ],
+     "distances_m": [
+      3.86,
+      4.8,
+      7.5,
+      12.07
+     ],
+     "hole_min_px": 4,
+     "holes": 0,
+     "largest_component_px": 0,
+     "max_holes": 0,
+     "pass": true
+    },
+    "gate_strict": {
+     "azimuth_range_deg": [
+      120,
+      240
+     ],
+     "distances_m": [
+      4.8,
+      7.5
+     ],
+     "max_px": 0,
+     "pass": true,
+     "worst_px": 0
+    },
+    "sum_px": 0
+   },
+   "see_through_holdout": {
+    "gate": {
+     "azimuth_range_deg": [
+      0,
+      360
+     ],
+     "distances_m": [
+      3.86,
+      4.3,
+      6.0,
+      10.0
+     ],
+     "hole_min_px": 4,
+     "holes": 0,
+     "largest_component_px": 1,
+     "max_holes": 0,
+     "pass": true
+    },
+    "gate_strict": {
+     "azimuth_range_deg": [
+      120,
+      240
+     ],
+     "distances_m": [
+      4.3,
+      6.0
+     ],
+     "max_px": 0,
+     "pass": false,
+     "worst_px": 1
+    }
+   },
+   "topology_body": {
+    "loose_vertices": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 7232
+   },
+   "checks_failed": [],
+   "seam_gap_after_harmonise_m": {
+    "arm_l_raise": 0.01079,
+    "arm_r_raise": 0.0114,
+    "forearm_l_bend": 0.0,
+    "head_turn": 0.0302,
+    "spine_bend_fwd": 0.0002,
+    "thigh_l_flex": 0.00517,
+    "thigh_r_flex": 0.00014
+   },
+   "seam_pairs": 2772,
+   "sockets": [
+    {
+     "name": "Head",
+     "bone": "head",
+     "target_blender_m": [
+      0.00088,
+      -0.05172,
+      0.32331
+     ],
+     "location_uu_for_ue": [
+      0.099,
+      -5.184,
+      1.277
+     ]
+    },
+    {
+     "name": "Weapon",
+     "bone": "foot.R",
+     "target_blender_m": [
+      -0.03032,
+      -0.03513,
+      0.05725
+     ],
+     "location_uu_for_ue": [
+      0.017,
+      -6.914,
+      0.007
+     ]
+    }
+   ],
+   "exports": null,
+   "validate_clip": {
+    "result": "pass",
+    "fails": [],
+    "warnings": [],
+    "skeleton": "UM_HUMANOID_17_v2"
+   }
+  }
+ },
+ "h3_rig_checks": {
+  "all_triangles": {
+   "expected": 0,
+   "measured": 0,
+   "passed": true
+  },
+  "base_bottom_at_zero": {
+   "expected": 0.0,
+   "measured": 0.0,
+   "passed": true
+  },
+  "base_pips_clear_of_feet": {
+   "expected": "> 0.001 m",
+   "measured": {
+    "min_xy_clearance_m": 0.0101,
+    "offset_deg": 0,
+    "ring_radius_m": 0.0955,
+    "sector_azimuths_deg": [
+     -90,
+     30,
+     150
+    ]
+   },
+   "passed": true
+  },
+  "body_triangles": {
+   "measured": 37177,
+   "passed": true
+  },
+  "bone_count": {
+   "expected": 16,
+   "measured": 16,
+   "passed": true
+  },
+  "export_frame_face_points_plus_x": {
+   "expected": "+X (UM_FBX_v1 ref pose: FBX opened in Blender faces +X)",
+   "measured": [
+    11.068,
+    0.189,
+    7.497
+   ],
+   "passed": true
+  },
+  "face_ahead_of_body_minus_y": {
+   "expected": "face y < body y - 0.02",
+   "measured": {
+    "body_centroid_y": 0.02297,
+    "face_centroid_y": -0.0877
+   },
+   "passed": true
+  },
+  "figure_top_m": {
+   "expected": 0.42,
+   "measured": 0.42,
+   "passed": true
+  },
+  "max_influences": {
+   "expected": 4,
+   "measured": 4,
+   "passed": true
+  },
+  "no_non_manifold_edges_body": {
+   "expected": 0,
+   "measured": 0,
+   "passed": true
+  },
+  "no_triangles_below_1e-4_cm2": {
+   "expected": 0,
+   "measured": 0,
+   "passed": true
+  },
+  "no_unweighted_vertices": {
+   "expected": ">= 1",
+   "measured": 1,
+   "passed": true
+  },
+  "one_material_slot_body": {
+   "expected": 1,
+   "measured": 1,
+   "passed": true
+  },
+  "one_uv_layer_body": {
+   "expected": [
+    "UVMap"
+   ],
+   "measured": [
+    "UVMap"
+   ],
+   "passed": true
+  },
+  "roundtrip_armature_object_name": {
+   "expected": "SKEL_UM_Humanoid",
+   "measured": "SKEL_UM_Humanoid",
+   "passed": true
+  },
+  "roundtrip_base_triangles": {
+   "expected": 864,
+   "measured": 864,
+   "passed": true
+  },
+  "roundtrip_base_vertex_colours": {
+   "measured": [
+    "UM_Mask"
+   ],
+   "passed": true
+  },
+  "roundtrip_bone_heads_m": {
+   "expected": "< 1e-4",
+   "measured": 1e-07,
+   "passed": true
+  },
+  "roundtrip_bone_names": {
+   "expected": [
+    "arm_lower.L",
+    "arm_lower.R",
+    "arm_upper.L",
+    "arm_upper.R",
+    "foot.L",
+    "foot.R",
+    "hand.L",
+    "hand.R",
+    "head",
+    "hips",
+    "leg_lower.L",
+    "leg_lower.R",
+    "leg_upper.L",
+    "leg_upper.R",
+    "root",
+    "spine"
+   ],
+   "measured": [
+    "arm_lower.L",
+    "arm_lower.R",
+    "arm_upper.L",
+    "arm_upper.R",
+    "foot.L",
+    "foot.R",
+    "hand.L",
+    "hand.R",
+    "head",
+    "hips",
+    "leg_lower.L",
+    "leg_lower.R",
+    "leg_upper.L",
+    "leg_upper.R",
+    "root",
+    "spine"
+   ],
+   "passed": true
+  },
+  "roundtrip_bounds_m": {
+   "expected": {
+    "max": [
+     0.32022,
+     0.18976,
+     0.42
+    ],
+    "min": [
+     -0.31936,
+     -0.1261,
+     0.04795
+    ]
+   },
+   "measured": {
+    "max": [
+     0.32022,
+     0.18976,
+     0.42
+    ],
+    "min": [
+     -0.31936,
+     -0.1261,
+     0.04795
+    ]
+   },
+   "passed": true
+  },
+  "roundtrip_hierarchy": {
+   "measured": null,
+   "passed": true
+  },
+  "roundtrip_material_slots_body": {
+   "measured": [
+    "M_Harpy_H3_Atlas"
+   ],
+   "passed": true
+  },
+  "roundtrip_max_influences": {
+   "measured": {
+    "max": 4,
+    "min": 1
+   },
+   "passed": true
+  },
+  "roundtrip_triangles": {
+   "expected": 37177,
+   "measured": 37177,
+   "passed": true
+  },
+  "roundtrip_uv0": {
+   "measured": [
+    "UVMap"
+   ],
+   "passed": true
+  }
+ },
+ "final_cleanup": {
+  "tripo_part_14": {
+   "degenerate_faces_deleted": 0,
+   "faces": [
+    1707,
+    1706
+   ],
+   "loose_edges_deleted": 0,
+   "loose_vertices_deleted": 0,
+   "nonmanifold_after": {
+    "edges_before": 0,
+    "faces_removed": 0,
+    "left": 0,
+    "vertex_splits": 0
+   },
+   "sliver_shortest_edges_collapsed_mm": [
+    0.01363
+   ],
+   "vertices": [
+    1055,
+    1054
+   ],
+   "zero_length_edges_collapsed": 0
+  },
+  "tripo_part_4": {
+   "degenerate_faces_deleted": 0,
+   "faces": [
+    1667,
+    1667
+   ],
+   "loose_edges_deleted": 1,
+   "loose_vertices_deleted": 0,
+   "nonmanifold_after": {
+    "edges_before": 0,
+    "faces_removed": 0,
+    "left": 0,
+    "vertex_splits": 0
+   },
+   "sliver_shortest_edges_collapsed_mm": [],
+   "vertices": [
+    971,
+    970
+   ],
+   "zero_length_edges_collapsed": 0
+  },
+  "tripo_part_8": {
+   "degenerate_faces_deleted": 0,
+   "faces": [
+    1479,
+    1479
+   ],
+   "loose_edges_deleted": 1,
+   "loose_vertices_deleted": 0,
+   "nonmanifold_after": {
+    "edges_before": 0,
+    "faces_removed": 0,
+    "left": 0,
+    "vertex_splits": 0
+   },
+   "sliver_shortest_edges_collapsed_mm": [],
+   "vertices": [
+    901,
+    900
+   ],
+   "zero_length_edges_collapsed": 0
+  }
+ },
+ "seal": {
+  "core": {
+   "crossing_faces_removed": 61,
+   "grid": [
+    53,
+    64,
+    97
+   ],
+   "margin_m": 0.003,
+   "min_distance_to_surface_m": 0.00069,
+   "min_inside_votes": 12,
+   "min_triangle_area_m2": 2.98082159133628e-05,
+   "nonmanifold_fix": {
+    "duplicate_faces_removed": 6,
+    "edges_before": 0,
+    "faces_removed": 0,
+    "left": 0,
+    "vertex_splits": 0
+   },
+   "rays": 14,
+   "triangles": 533,
+   "triangles_remesh": 73328,
+   "triangles_voxel": 57916,
+   "uv": [
+    0.357868,
+    0.660165
+   ],
+   "uv_from_part": "tripo_part_14",
+   "vertex_moves_against_crossing": 2365,
+   "vertices_pulled_in": 257,
+   "voxel_m": 0.005,
+   "voxels_inside": 58903
+  },
+  "exposed": {
+   "tripo_part_0": 10,
+   "tripo_part_1": 12,
+   "tripo_part_10": 3,
+   "tripo_part_11": 9,
+   "tripo_part_12": 1,
+   "tripo_part_13": 7,
+   "tripo_part_14": 6,
+   "tripo_part_15": 0,
+   "tripo_part_16": 8,
+   "tripo_part_17": 2,
+   "tripo_part_18": 0,
+   "tripo_part_2": 7,
+   "tripo_part_3": 14,
+   "tripo_part_4": 2,
+   "tripo_part_5": 11,
+   "tripo_part_7": 8,
+   "tripo_part_8": 40,
+   "tripo_part_9": 15
+  },
+  "seconds": 272.6,
+  "slivers": {
+   "tripo_part_0": {
+    "slivers": 12,
+    "tiny_triangles_dropped": 0,
+    "triangles": 19
+   },
+   "tripo_part_1": {
+    "slivers": 7,
+    "tiny_triangles_dropped": 0,
+    "triangles": 11
+   },
+   "tripo_part_10": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_11": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_12": {
+    "slivers": 1,
+    "tiny_triangles_dropped": 0,
+    "triangles": 1
+   },
+   "tripo_part_13": {
+    "slivers": 1,
+    "tiny_triangles_dropped": 0,
+    "triangles": 2
+   },
+   "tripo_part_14": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_15": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_16": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_17": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_18": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_2": {
+    "slivers": 1,
+    "tiny_triangles_dropped": 0,
+    "triangles": 1
+   },
+   "tripo_part_3": {
+    "slivers": 1,
+    "tiny_triangles_dropped": 0,
+    "triangles": 1
+   },
+   "tripo_part_4": {
+    "slivers": 2,
+    "tiny_triangles_dropped": 0,
+    "triangles": 3
+   },
+   "tripo_part_5": {
+    "slivers": 6,
+    "tiny_triangles_dropped": 0,
+    "triangles": 6
+   },
+   "tripo_part_7": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_8": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_9": {
+    "slivers": 1,
+    "tiny_triangles_dropped": 0,
+    "triangles": 1
+   }
+  }
+ },
+ "k2_projection": {
+  "h3": {
+   "K1_12m": {
+    "base_top_bbox_px": [
+     55.6,
+     45.6
+    ],
+    "face_region_bbox_px": [
+     24.0,
+     18.0
+    ],
+    "figure_bbox_px": [
+     162.5,
+     92.2
+    ],
+    "mm_per_px_at_target": 3.941
+   },
+   "K2_7.5m": {
+    "base_top_bbox_px": [
+     88.6,
+     72.9
+    ],
+    "face_region_bbox_px": [
+     38.9,
+     29.2
+    ],
+    "figure_bbox_px": [
+     260.9,
+     147.9
+    ],
+    "mm_per_px_at_target": 2.463
+   },
+   "K2close_4.8m": {
+    "base_top_bbox_px": [
+     138.1,
+     113.6
+    ],
+    "face_region_bbox_px": [
+     61.9,
+     46.4
+    ],
+    "figure_bbox_px": [
+     409.5,
+     231.8
+    ],
+    "mm_per_px_at_target": 1.576
+   }
+  },
+  "h21": {
+   "K1_12m": {
+    "base_top_bbox_px": [
+     55.6,
+     45.6
+    ],
+    "face_region_bbox_px": [
+     22.2,
+     17.1
+    ],
+    "figure_bbox_px": [
+     163.5,
+     91.2
+    ],
+    "mm_per_px_at_target": 3.941
+   },
+   "K2_7.5m": {
+    "base_top_bbox_px": [
+     88.6,
+     72.9
+    ],
+    "face_region_bbox_px": [
+     36.1,
+     27.6
+    ],
+    "figure_bbox_px": [
+     262.3,
+     146.4
+    ],
+    "mm_per_px_at_target": 2.463
+   },
+   "K2close_4.8m": {
+    "base_top_bbox_px": [
+     138.1,
+     113.6
+    ],
+    "face_region_bbox_px": [
+     57.7,
+     43.9
+    ],
+    "figure_bbox_px": [
+     411.5,
+     229.7
+    ],
+    "mm_per_px_at_target": 1.576
+   }
+  }
+ },
+ "determinism": {
+  "all_equal": false,
+  "differs": [
+   "reports/textures-report.json (volatile keys removed)",
+   "textures/2k/T_Harpy_H3_N.png",
+   "textures/2k/T_Harpy_H3_N_OpenGL.png",
+   "work/bake/normal.npy"
+  ],
+  "files": {
+   "export/SK_Harpy_H3.fbx": {
+    "a": "ba841a77f26b9c99",
+    "b": "ba841a77f26b9c99",
+    "bytes": 1637452,
+    "equal": true
+   },
+   "export/SM_Harpy_H3_Base.fbx": {
+    "a": "77fc45deb2b2d071",
+    "b": "77fc45deb2b2d071",
+    "bytes": 40252,
+    "equal": true
+   },
+   "reports/h2-bake-report.json (volatile keys removed)": {
+    "differing_keys": [],
+    "equal": true
+   },
+   "reports/h2-lowpoly-report.json (volatile keys removed)": {
+    "differing_keys": [],
+    "equal": true
+   },
+   "reports/h2-rig-report.json (volatile keys removed)": {
+    "differing_keys": [],
+    "equal": true
+   },
+   "reports/h2-uv-stage.json (volatile keys removed)": {
+    "differing_keys": [],
+    "equal": true
+   },
+   "reports/textures-report.json (volatile keys removed)": {
+    "differing_keys": [
+     "inputs",
+     "outputs"
+    ],
+    "equal": false
+   },
+   "reports/uv-report.json (volatile keys removed)": {
+    "differing_keys": [],
+    "equal": true
+   },
+   "textures/2k/T_Harpy_H3_BC.png": {
+    "a": "413d228f71bbf48c",
+    "b": "413d228f71bbf48c",
+    "bytes": 5211178,
+    "equal": true
+   },
+   "textures/2k/T_Harpy_H3_N.png": {
+    "a": "f4f0fb0c7b6deeb1",
+    "b": "8fa9aaafd24381b3",
+    "bytes": 5646964,
+    "equal": false
+   },
+   "textures/2k/T_Harpy_H3_N_OpenGL.png": {
+    "a": "ece3fb89756edee0",
+    "b": "9a6869448e38eb34",
+    "bytes": 5648246,
+    "equal": false
+   },
+   "textures/2k/T_Harpy_H3_ORM.png": {
+    "a": "9a7c9399cdc2c020",
+    "b": "9a7c9399cdc2c020",
+    "bytes": 3830430,
+    "equal": true
+   },
+   "textures/2k/T_Harpy_H3_TeamMask.png": {
+    "a": "fa21ae69f219d1d1",
+    "b": "fa21ae69f219d1d1",
+    "bytes": 890143,
+    "equal": true
+   },
+   "textures/4k/T_Harpy_H3_BC.png": {
+    "a": "07fc834f68ae6b26",
+    "b": "07fc834f68ae6b26",
+    "bytes": 14656002,
+    "equal": true
+   },
+   "textures/4k/T_Harpy_H3_N.png": {
+    "a": "838f2bc5a1b05a60",
+    "b": "838f2bc5a1b05a60",
+    "bytes": 14781363,
+    "equal": true
+   },
+   "textures/4k/T_Harpy_H3_N_OpenGL.png": {
+    "a": "4300167549694c68",
+    "b": "4300167549694c68",
+    "bytes": 14784393,
+    "equal": true
+   },
+   "textures/4k/T_Harpy_H3_ORM.png": {
+    "a": "67d2d0a209e213ef",
+    "b": "67d2d0a209e213ef",
+    "bytes": 10372474,
+    "equal": true
+   },
+   "textures/4k/T_Harpy_H3_TeamMask.png": {
+    "a": "fda605df327bfa83",
+    "b": "fda605df327bfa83",
+    "bytes": 2447833,
+    "equal": true
+   },
+   "textures/base_1k/T_Harpy_H3_Base_BC.png": {
+    "a": "b1279cb4c113f0ac",
+    "b": "b1279cb4c113f0ac",
+    "bytes": 365941,
+    "equal": true
+   },
+   "textures/base_1k/T_Harpy_H3_Base_N.png": {
+    "a": "b671edc08f8dcf70",
+    "b": "b671edc08f8dcf70",
+    "bytes": 418163,
+    "equal": true
+   },
+   "textures/base_1k/T_Harpy_H3_Base_N_OpenGL.png": {
+    "a": "ce8e9f70dbe773e9",
+    "b": "ce8e9f70dbe773e9",
+    "bytes": 417982,
+    "equal": true
+   },
+   "textures/base_1k/T_Harpy_H3_Base_ORM.png": {
+    "a": "d70f488de7d6bf52",
+    "b": "d70f488de7d6bf52",
+    "bytes": 261969,
+    "equal": true
+   },
+   "work/bake/ao.npy": {
+    "a": "f20f6579e0909a27",
+    "b": "f20f6579e0909a27",
+    "bytes": 268435584,
+    "equal": true
+   },
+   "work/bake/bc.npy": {
+    "a": "51ae92fd138e2c93",
+    "b": "51ae92fd138e2c93",
+    "bytes": 268435584,
+    "equal": true
+   },
+   "work/bake/normal.npy": {
+    "a": "09b1f5f38c830afa",
+    "b": "fcb01f80e72b7ffe",
+    "bytes": 268435584,
+    "equal": false
+   },
+   "work/bake/rm.npy": {
+    "a": "b9fa9570bceb2160",
+    "b": "b9fa9570bceb2160",
+    "bytes": 268435584,
+    "equal": true
+   },
+   "work/uv-labels.npz": {
+    "a": "9424811768b28cfd",
+    "b": "9424811768b28cfd",
+    "bytes": 1407984,
+    "equal": true
+   },
+   "work/uv-tris.npz": {
+    "a": "9b954ad7324e3cb4",
+    "b": "9b954ad7324e3cb4",
+    "bytes": 867331,
+    "equal": true
+   }
+  },
+  "finding": {
+   "everything_else": "SK/SM FBX, BC/ORM/TeamMask at 4K and 2K, base textures, UV rasters, AO/BC/RM bakes and the lowpoly/uv/bake/rig reports (volatile keys removed) byte-identical",
+   "normal_npy": "work/bake/normal.npy (Cycles CPU normal pass): 23 876 of 16.8 M texels differ by 1.19e-7 (1 ULP of float32) between the two builds",
+   "png_effect": "4K N / N_OpenGL PNG byte-identical; 2K N and N_OpenGL: 1 texel differs by 1 step (box average + renormalise crosses a rounding boundary); textures-report.json differs only in these sha256 (inputs.normal, outputs.runtime.N/N_OpenGL)",
+   "verdict": "not strictly deterministic: CPU normal bake 1-ULP noise (H2.1 measured it bit-identical); effect on shipped textures 1 texel x 1 step of the 2K normal map"
+  },
+  "label": "measured",
+  "method": "two full builds (import -> rig, run_all.sh) of harpy-h3-bake/1 into the same run folder 2026-09-29; build A copied to a scratch folder before build B; sha256 of FBX, all texture PNGs, UV rasters, bake arrays and the stage reports with volatile keys removed",
+  "profile_sha256": {
+   "a": [
+    "86e3195fa7fd5011f419f088ae64fa91fec4ad3ed3a9518f6600a54d0b49ee81"
+   ],
+   "b": [
+    "86e3195fa7fd5011f419f088ae64fa91fec4ad3ed3a9518f6600a54d0b49ee81"
+   ],
+   "same_profile": true
+  },
+  "review_frames_build": "build B (2026-09-29, Cobble rev 2: the whole review3 stage was rerun on the current run folder = build B; the frames use the 4K textures, which are byte-identical in A and B. The preview-light sheets match the build-A sheets byte for byte or within 3 levels in talons_*)",
+  "run_a": "scratch:runA",
+  "run_b": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake"
+ },
+ "landmarks": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/reports/h3-landmarks.json",
+ "frames": {
+  "sheets": [
+   "cmp_h3_close_base_band.jpg",
+   "cmp_h3_close_face_front.jpg",
+   "cmp_h3_close_face_game.jpg",
+   "cmp_h3_close_nape_back.jpg",
+   "cmp_h3_close_nape_game.jpg",
+   "cmp_h3_close_talons_3q.jpg",
+   "cmp_h3_close_talons_front.jpg",
+   "cmp_h3_cobble_close_face_game.jpg",
+   "cmp_h3_cobble_close_nape_game.jpg",
+   "cmp_h3_cobble_close_talons_3q.jpg",
+   "cmp_h3_cobble_k2.jpg",
+   "cmp_h3_cobble_vt_probe.jpg",
+   "cmp_h3_cobble_warm_k2.jpg",
+   "cmp_h3_concept_back.jpg",
+   "cmp_h3_concept_front.jpg",
+   "cmp_h3_concept_side.jpg",
+   "cmp_h3_face_k2.jpg",
+   "cmp_h3_k2_1p6x.jpg",
+   "cmp_h3_k2_5x.jpg",
+   "cmp_h3_teamcolor.jpg"
+  ],
+  "dir": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/preview/h3",
+  "light": {
+   "cobble": {
+    "blender_exposure": -2.563,
+    "board": {
+     "albedo_linear": [
+      0.119,
+      0.121,
+      0.121
+     ],
+     "roughness": 0.85,
+     "size_m": 8.0
+    },
+    "ev100": 1.3,
+    "exposure_calibration": "reports/cobble-calibration.json",
+    "exposure_offset_stops": -1.0,
+    "key_colour_linear": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "key_lux": 4.5,
+    "key_travel_dir": [
+     0.2868,
+     0.4967,
+     -0.8192
+    ],
+    "not_included": "Lumen GI/reflections, CSM shadow filtering, TSR, the UE tonemapper, the warm point light, the stone texture and normal map of the board (flat plane of the mean albedo)",
+    "sky": "ambient dome x 11.2 (art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-ambient-dome.hdr, sha256 389961f05066d780c4d1dd3fef8de61f30f4feb7ae7a7416108df4ed66f0ef71)",
+    "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json lightProfiles.cobble-probe",
+    "view_transform": "AgX",
+    "warm_point_note": "cobble-probe point 'warm' (85 cd at (260, -300, 250) uu, radius 450 uu, white): 470 uu from the board centre = outside its attenuation radius, not included"
+   },
+   "cobwarm": {
+    "blender_exposure": -2.563,
+    "board": {
+     "albedo_linear": [
+      0.119,
+      0.121,
+      0.121
+     ],
+     "roughness": 0.85,
+     "size_m": 8.0
+    },
+    "ev100": 1.3,
+    "exposure_calibration": "reports/cobble-calibration.json",
+    "exposure_offset_stops": -1.0,
+    "key_colour_linear": [
+     1.0,
+     0.86,
+     0.7
+    ],
+    "key_lux": 4.5,
+    "key_travel_dir": [
+     0.2868,
+     0.4967,
+     -0.8192
+    ],
+    "not_included": "Lumen GI/reflections, CSM shadow filtering, TSR, the UE tonemapper, the warm point light, the stone texture and normal map of the board (flat plane of the mean albedo)",
+    "sky": "ambient dome x 11.2 (art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/work/cobble-ambient-dome.hdr, sha256 389961f05066d780c4d1dd3fef8de61f30f4feb7ae7a7416108df4ed66f0ef71)",
+    "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json lightProfiles.cobble-probe",
+    "view_transform": "AgX",
+    "warm_point_note": "cobble-probe point 'warm' (85 cd at (260, -300, 250) uu, radius 450 uu, white): 470 uu from the board centre = outside its attenuation radius, not included"
+   }
+  },
+  "calibration": {
+   "blender_exposure": -2.563,
+   "exposure_offset_stops": -1.0,
+   "k1_board_p50_final": 131.0,
+   "target_board_p50_luma": 131.2
+  },
+  "label": "blender frames (EEVEE); preview light or the Cobble approximation; back faces culled; not an UE frame"
+ },
+ "summary": {
+  "better_than_h21": [
+   "одно лицо и перьевой затылок от Tripo, без ремонта Janus (нет поворота, крышки, наполнения, перекраски)",
+   "один браслет на левой ноге, как концепт (H2.1: два)",
+   "лицо плотнее: 2238 tris в коробке лица против 1211",
+   "просвет 0 px на гейте (72 кадра, все азимуты) и на отложенном наборе (H2.1: 2 px)",
+   "бёдра симметричны (H2: асимметрия Tripo)"
+  ],
+  "worse_or_same": [
+   "37 177 tris против 30 238 (+23 %, в пределах брифа 30–40k)",
+   "шов в позах пробы: подъём крыла 25 мм (H2.1 11), наклон спины 9 мм (0,2), бедро L 10 мм (5)",
+   "браслет (замер, Cobble ред. 2): яркость 152 / S 0,34 против концепта 80 / 0,67 и H2.1 96 / 0,65; так же при PBR Neutral/Filmic/Standard и в превью — материал (F0 чистого золота пресета), плетение слабее",
+   "тело светлее концепта (~20 %), тёмного вдвое меньше (17 % против 34 %) — и в превью, то есть модель/ракурс, не свет",
+   "перья по пресету глянцевее (roughness p50 0,58 против 0,77)",
+   "лицо на K2 (−55°) закрыто гребнем до бровей — как H2.1",
+   "детерминизм: 1 ULP в CPU-нормалях → 1 тексель 2K N на 1 шаг"
+  ],
+  "residuals_visual": [
+   "светлая точка у основания затылка (cmp_h3_close_nape_back)",
+   "светлый UV-шов у уха на орто-крупном плане лица",
+   "верх подставки тёмный с метками, не золотой (читаемость меток)"
+  ],
+  "fixed_after_review": [
+   "кадры игрового света (Cobble) ред. 2: экспозиция откалибрована по якорю доски W4-A (−1,00 EV, p50 K1 131,0), перья и лицо не выбелены (замер в cobble_rev2)"
+  ]
+ },
+ "team_mask_decision": "W4-B правило Harpy (harpy-segmented-skeletal/3, H2): одежды нет → TeamColor на тёмных маховых перьях крыльев (v ≤ 0,22, рампа 0,05, 3×3), части tripo_part_0/1/3/7; формат W4-B TeamMask; предложено",
+ "material_library": {
+  "presets": "docs/art-pipeline/material-library/um-material-presets-v1.json",
+  "used": {
+   "gold_antique": "браслет (metallic 1, roughness 0,30, цвет F0 × яркость ±12 % × полость AO 0,5), стенка и roughness верха подставки",
+   "feathers": "roughness 0,40–0,75",
+   "skin": "roughness 0,40–0,65"
+  },
+  "not_followed": {
+   "base_top_colour": "тёмный H2.1: F0-золото на верхе ломало чтение меток (analyse_instances 4 из 6 NOT ALL на промежуточной сборке)",
+   "talons": "нет класса рога/когтя, правило H2.1 0,40–0,55"
+  }
+ },
+ "cobble_caveats": [
+  "ключ профиля белый (colorLinear не задан); тёплый ключ брифа — отдельный набор cobwarm (допущение), та же откалиброванная экспозиция",
+  "точка warm профиля (радиус 450 uu) до центра доски не достаёт — не включена",
+  "нет Lumen/CSM/TSR/тонмаппера UE и текстуры камней доски; якорь W4-A — p50 доски (131,2), а не фигуры; K2 5x доска Blender 131,0 против UE-редактора (Arthur H2.1) 129,4",
+  "не кадр приёмки K1/K2"
+ ],
+ "cobble_rev2": {
+  "defect": "ред. 1: значения профиля взяты буквально (без калибровки), доска 1,2 м альбедо 0,18 почти не попадала в кадр K2; «195» ред. 1 — яркость фона-купола, фигура на ~1 EV светлее якоря W4-A",
+  "fix": "доска 8 м, альбедо T_cobblestone_D_2048 (0,119/0,121/0,121), экспозиция = log2(1/(1,2*2^EV100)) + смещение, бисекция до p50 K1-ROI доски = 131,2 (cobble-probe sky.calibration, BOARD_K1_BOX t42_sky_calib_editor.py)",
+  "calibration": {
+   "target_board_p50_luma": 131.2,
+   "tolerance_luma": 0.75,
+   "exposure_offset_stops": -1.0,
+   "blender_exposure": -2.563,
+   "k1_board_p50_final": 131.0,
+   "roi_px": [
+    600,
+    700,
+    1360,
+    940
+   ],
+   "camera": {
+    "azimuth_deg": 0.0,
+    "distance_m": 19.31,
+    "fov_h_deg": 35.0,
+    "pitch_deg": -55.0,
+    "source": "t42_sky_calib_editor.py FOV_LIVE 35, K1_LIVE 1931 uu, pitch -55"
+   }
+  },
+  "calibration_steps": [
+   [
+    -4.0,
+    40.787
+   ],
+   [
+    2.0,
+    215.0
+   ],
+   [
+    -1.0,
+    131.0
+   ],
+   [
+    -1.0,
+    131.0
+   ]
+  ],
+  "calibration_repeatability": "EEVEE: тот же кадр калибровки между запусками 130,79–131,00",
+  "k2_5x_board_check": {
+   "blender_board_only_az000": {
+    "frame_p50": 131.0,
+    "corners_p50": [
+     131.7,
+     131.7,
+     131.0,
+     131.0
+    ]
+   },
+   "ue_cobble_editor_arthur_h21_k2_5x_az0": {
+    "file": "docs/art-pipeline/evidence/w5c-arthur-h2-ue-2026-09-29/arthur-h2-k2-5x-az0-blue-ue-editor.jpg",
+    "sha256": "9531107a6241cc8a41a9df163f413c436d5c5263c0771439f1a8ba741071d1a6",
+    "frame_p50": 129.4,
+    "corners_p50": [
+     123.6,
+     121.1,
+     101.9,
+     99.9
+    ]
+   },
+   "note": "UE frame: textured cobblestones, figure and UI in frame; Blender: flat board of the mean albedo"
+  },
+  "view_transform_probe": {
+   "agx": {
+    "exposure_offset_stops": -1.0,
+    "k1_board_p50_final": 131.0
+   },
+   "Filmic": {
+    "available": true,
+    "exposure_offset_stops": -1.2344,
+    "k1_board_p50_final": 131.715
+   },
+   "Khronos PBR Neutral": {
+    "available": true,
+    "exposure_offset_stops": -0.7656,
+    "k1_board_p50_final": 131.715
+   },
+   "Standard": {
+    "available": true,
+    "exposure_offset_stops": -1.0,
+    "k1_board_p50_final": 131.715
+   }
+  },
+  "measure_file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/preview/h3/cobble-measure-h3.json",
+  "calibration_file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/reports/cobble-calibration.json",
+  "table": {
+   "body_k2_5x_az0": {
+    "concept": {
+     "luma_p50": 64.8,
+     "S_p50": 0.333,
+     "dark_frac_V_lt_0p25": 0.3421,
+     "bleached_frac": 0.0044,
+     "orange_V_p50": 0.533,
+     "orange_S_p50": 0.492
+    },
+    "h3_preview": {
+     "luma_p50": 74.2,
+     "S_p50": 0.337,
+     "dark_frac_V_lt_0p25": 0.1991,
+     "bleached_frac": 0.0005,
+     "orange_V_p50": 0.522,
+     "orange_S_p50": 0.445
+    },
+    "h3_cobble_rev1": {
+     "luma_p50": 117.2,
+     "S_p50": 0.263,
+     "dark_frac_V_lt_0p25": 0.0004,
+     "bleached_frac": 0.041,
+     "orange_V_p50": 0.655,
+     "orange_S_p50": 0.359
+    },
+    "h3_cobble_rev2": {
+     "luma_p50": 78.7,
+     "S_p50": 0.349,
+     "dark_frac_V_lt_0p25": 0.171,
+     "bleached_frac": 0.0,
+     "orange_V_p50": 0.529,
+     "orange_S_p50": 0.444
+    },
+    "h21_cobble_rev2": {
+     "luma_p50": 80.1,
+     "S_p50": 0.347,
+     "dark_frac_V_lt_0p25": 0.1806,
+     "bleached_frac": 0.0,
+     "orange_V_p50": 0.518,
+     "orange_S_p50": 0.435
+    }
+   },
+   "face_skin": {
+    "concept": {
+     "luma_p50": 153.6,
+     "S_p50": 0.297
+    },
+    "h3_preview": {
+     "luma_p50": 148.3,
+     "S_p50": 0.314
+    },
+    "h3_cobble_rev1": {
+     "luma_p50": 174.3,
+     "S_p50": 0.172
+    },
+    "h3_cobble_rev2": {
+     "luma_p50": 148.1,
+     "S_p50": 0.236
+    },
+    "h21_cobble_rev2": {
+     "luma_p50": 147.7,
+     "S_p50": 0.216
+    },
+    "h3_cobble_rev2_pbr_neutral": {
+     "luma_p50": 159.9,
+     "S_p50": 0.337
+    }
+   },
+   "band": {
+    "concept": {
+     "luma_p50": 80.2,
+     "S_p50": 0.672,
+     "hue_p50_of_S_gt_0p3": 30.8
+    },
+    "h3_preview": {
+     "luma_p50": 122.9,
+     "S_p50": 0.403,
+     "hue_p50_of_S_gt_0p3": 42.4
+    },
+    "h3_cobble_rev1": {
+     "luma_p50": 183.1,
+     "S_p50": 0.233,
+     "hue_p50_of_S_gt_0p3": 35.7
+    },
+    "h3_cobble_rev2_agx": {
+     "luma_p50": 152.4,
+     "S_p50": 0.341,
+     "hue_p50_of_S_gt_0p3": 37.5
+    },
+    "h3_cobble_rev2_pbr_neutral": {
+     "luma_p50": 168.0,
+     "S_p50": 0.48,
+     "hue_p50_of_S_gt_0p3": 41.2
+    },
+    "h3_cobble_rev2_filmic": {
+     "luma_p50": 153.8,
+     "S_p50": 0.356,
+     "hue_p50_of_S_gt_0p3": 42.9
+    },
+    "h3_cobble_rev2_standard": {
+     "luma_p50": 163.0,
+     "S_p50": 0.435,
+     "hue_p50_of_S_gt_0p3": 40.5
+    },
+    "h21_cobble_rev2_agx": {
+     "luma_p50": 95.7,
+     "S_p50": 0.651,
+     "hue_p50_of_S_gt_0p3": 31.6
+    }
+   }
+  },
+  "verdict": {
+   "feathers": "не выбелены: оранжевые V 0,53 = концепт 0,53, S 0,44 против 0,49; выбеленных 0 %. Тело на ~20 % светлее концепта и тёмного вдвое меньше (17 % против 34 %) — так же в свете превью (20 %): модель/ракурс −55°, не свет",
+   "face": "не «почти белое»: кожа 148 против 154 у концепта, но серее (S 0,24 против 0,30) — AgX и белый купол (PBR Neutral S 0,34); на K2 лицо в основном закрыто гребнем",
+   "band": "бледный из-за материала: S 0,34–0,48 при всех четырёх преобразованиях и 0,40 в превью против 0,67 у концепта и 0,65 у H2.1 (цвет Tripo); причина — F0 чистого золота gold_antique (1,0/0,766/0,336) отражает яркий купол, AgX добавляет ненасыщенности",
+   "rev1_claim": "фраза ред. 1 «бледнее в основном из-за приближения» заменена замером: бледность ред. 1 — некалиброванная экспозиция (+1 EV); остаток по телу — модель/ракурс; браслет — материал"
+  }
+ }
+}

@@ -1,0 +1,139 @@
+{
+  "schema": "unmatched.tripo-pipeline.source-spec/1",
+  "source_id": "tripo-bca735a3-h3",
+  "asset_id": "ASSET-HARPY-001",
+  "service": "tripo-studio",
+  "task_id": "bca735a3-b49f-42f6-8495-29707318ba61",
+  "parent_task_id": null,
+  "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/bca735a3-b49f-42f6-8495-29707318ba61",
+  "date": "2026-09-29",
+  "iteration": "H3 (перегенерация Harpy: исправление двуликой головы H2)",
+  "model_version": {
+    "ui_label": null,
+    "backend": null,
+    "note": "H3.1 со слов оркестратора; подпись UI не записана"
+  },
+  "generation": {
+    "mode": "multi-view",
+    "views": {
+      "front": {
+        "path": "art/imagegen/hero-quality-v1/harpy/harpy-front.png",
+        "sha256": "1a93e22efb138ec0ef48fc1dcd387ec823bc836639772475f073d7bc95780b1f"
+      },
+      "left": {
+        "path": "art/imagegen/hero-quality-v1/harpy/harpy-side.png",
+        "sha256": "44fd58066ffb310f6768eb1e326ef42a99ab7a905252bc41da78740ecd25844f"
+      },
+      "right": null,
+      "back": {
+        "path": "art/imagegen/hero-quality-v1/harpy/harpy-back.png",
+        "sha256": "af82978b804dbbf31e92d469ec4a604308acc6b9d74fc080b56fdd2d22d1e086"
+      }
+    },
+    "input_manifest": null,
+    "concept_prompts": "art/imagegen/hero-quality-v1/harpy/prompts.md",
+    "slot_note": "Боковой концепт (ortho_left, лицо влево) — в слоте LEFT, как в prompts.md; RIGHT пусто. У H2 (330872a3) он шёл в RIGHT → двуликая голова.",
+    "settings": {
+      "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+      "generate_parts": true,
+      "parts_mode": "Баланс (Balanced)",
+      "ultra_mesh_quality": true,
+      "polygon_count": 2000000,
+      "face_type": "треугольники",
+      "texture_8k": true,
+      "remove_lighting": true,
+      "pbr": true,
+      "privacy": null,
+      "ai_completion": null,
+      "seed": null,
+      "settings_note": "texture_8k/remove_lighting/pbr — последующие шаги генератора текстур и PBR на high-poly. null = не записано."
+    }
+  },
+  "operations": [
+    {
+      "op": "generate",
+      "mode": "Из нескольких видов в модель (H3.1), «Генерировать по частям» Баланс, ультра-качество сетки 2M, треугольники, без текстуры",
+      "history_time": "2026-09-29 18:44",
+      "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 60,
+        "observed_debit": 60,
+        "balance_before": 23850,
+        "balance_after": 23790
+      }
+    },
+    {
+      "op": "texture",
+      "mode": "Генератор текстур 8K, «Удалить освещение», на high-poly модели по частям",
+      "history_time": "2026-09-29 18:48",
+      "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 30,
+        "observed_debit": 30,
+        "balance_before": 23790,
+        "balance_after": 23760
+      }
+    },
+    {
+      "op": "pbr",
+      "mode": "Генератор PBR после 8K",
+      "history_time": "2026-09-29 18:54",
+      "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/reports/tripo-run.json",
+      "credits": {
+        "unit": "studio-credits",
+        "quoted": 5,
+        "observed_debit": 5,
+        "balance_before": 23760,
+        "balance_after": 23755
+      }
+    }
+  ],
+  "files": [
+    {
+      "role": "h3-parts-glb",
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/source/harpy-h3-tripo-bca735a3-parts19.glb",
+      "expected_sha256": "430819dd79fd1178d0da1ebf72dc00af5788f071d7d3b9d0d3c1d4bb6d2b63a5",
+      "expected_bytes": 46513416,
+      "produced_by": "generate",
+      "origin": "Studio GLB export (скачивание), high-poly по частям без текстуры, unmodified",
+      "in_git": false
+    },
+    {
+      "role": "h3-tex8k-pbr-glb",
+      "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/source/harpy-h3-tripo-bca735a3-tex8k-pbr.glb",
+      "expected_sha256": "710a1cd468c1a8016776d0931891dbfcc3021f328096128d764ec2e76d8b0790",
+      "expected_bytes": 78651856,
+      "produced_by": "pbr",
+      "origin": "Studio GLB export (скачивание) после текстуры 8K (удалить освещение) и PBR, unmodified",
+      "in_git": false
+    }
+  ],
+  "git_policy": "Сырые GLB (44–79 МБ) не коммитятся: .gitignore ассета исключает 20260929-h3-tripo/source/*.glb; файл восстанавливается выгрузкой из Studio по task_url и проверяется по expected_sha256/expected_bytes",
+  "expectations": {
+    "h3-parts-glb": {
+      "glb_mesh_count": 19,
+      "glb_triangles": 1930656,
+      "glb_materials": 1,
+      "glb_images": 0,
+      "glb_skins": 0,
+      "armatures": 0
+    },
+    "h3-tex8k-pbr-glb": {
+      "glb_mesh_count": 19,
+      "glb_triangles": 1930656,
+      "glb_materials": 19,
+      "glb_images": 57,
+      "glb_skins": 0,
+      "armatures": 0
+    }
+  },
+  "consumers": [
+    "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-bake.json"
+  ],
+  "evidence": [
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-tripo/reports/tripo-run.json",
+    "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json"
+  ]
+}

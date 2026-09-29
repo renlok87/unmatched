@@ -11,6 +11,12 @@
 #              reports/nape-visibility.json)
 #   review21   (H2.1, optional, needs H2_BASELINE=<harpy-h2-bake/2 run copy>) review_h21.py: concept | H2 | H2.1 sheets
 #              and the K2 5x / 1.6x game frames of both
+#   review3    (H3, optional, profile review.h3) review_h3.py + compose_h3.py: concept | H2.1 | H3 sheets, K2 5x / 1.6x,
+#              close-ups and the Cobble-light approximation (exposure calibrated to the W4-A board anchor,
+#              reports/cobble-calibration.json, preview/h3/cobble-measure-h3.json); baseline = review.h3.baseline_run
+#              (or H3_BASELINE=<dir>)
+# Profiles without repair caps (H3: harpy-h3-bake) skip the nape-visibility gate of the seethrough stage (it measures
+# the H2.1 neck cap cap_100).
 set -euo pipefail
 export MSYS_NO_PATHCONV=1
 PROFILE=$(cd "$(dirname "$1")" && pwd -W)/$(basename "$1")
@@ -33,7 +39,7 @@ B=${BLENDER:-"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"}
 PY=${PYTHON:-python}
 mkdir -p "$RUN/logs" "$RUN/reports" "$RUN/preview" "$RUN/export" "$RUN/textures" "$RUN/work"
 PREV=$($PY -c "import json,sys;print(json.load(open(sys.argv[1],encoding='utf-8'))['review']['previous_candidate_run'])" "$PROFILE")
-STAGES=(import lowpoly shape uv uvcheck bake textures rig seethrough probe review review21)
+STAGES=(import lowpoly shape uv uvcheck bake textures rig seethrough probe review review21 review3)
 run=0
 blender_stage() {  # stage script args...
   local log="$RUN/logs/$1.log"; shift
@@ -57,7 +63,10 @@ for s in "${STAGES[@]}"; do
     seethrough)
       blender_stage see-through "$HERE/see_through.py" -- "$PROFILE" "$RUN"
       blender_stage k2-projection "$HERE/k2_projection.py" -- "$PROFILE" "$RUN"
-      blender_stage nape-visibility "$HERE/nape_visibility.py" -- "$PROFILE" "$RUN" --frames "$RUN/work/nape-frames" --tag h21
+      CAPS=$($PY -c "import json,sys;print(1 if json.load(open(sys.argv[1],encoding='utf-8'))['repair'].get('caps') else 0)" "$PROFILE")
+      if [ "$CAPS" = 1 ]; then
+        blender_stage nape-visibility "$HERE/nape_visibility.py" -- "$PROFILE" "$RUN" --frames "$RUN/work/nape-frames" --tag h21
+      fi
       HOLD=$($PY -c "import json,sys;print(1 if 'see_through_holdout' in json.load(open(sys.argv[1],encoding='utf-8'))['review'] else 0)" "$PROFILE")
       if [ "$HOLD" = 1 ]; then
         blender_stage see-through-holdout "$HERE/see_through.py" -- "$PROFILE" "$RUN" --config-key see_through_holdout             --out "$RUN/reports/see-through-holdout.json" --frames "$RUN/preview/see-through-holdout" --no-gate
@@ -88,6 +97,14 @@ for s in "${STAGES[@]}"; do
         blender_stage see-through-holdout-baseline "$HERE/see_through.py" -- "$PROFILE" "$H2_BASELINE" --no-gate             --config-key see_through_holdout --out "$RUN/reports/see-through-holdout-h2-baseline.json"             --frames "$RUN/work/see-through-holdout-h2-baseline"
         blender_stage review21-frames "$HERE/review_h21.py" -- "$PROFILE" "$RUN" "$H2_BASELINE"
         $PY "$HERE/compose_h21.py" "$PROFILE" "$RUN" > "$RUN/logs/compose-h21.log" 2>&1
+      fi
+      ;;
+    review3)
+      BASE3=${H3_BASELINE:-$($PY -c "import json,sys;print(json.load(open(sys.argv[1],encoding='utf-8'))['review'].get('h3',{}).get('baseline_run',''))" "$PROFILE")}
+      if [ -z "$BASE3" ]; then echo "review3 skipped (no review.h3.baseline_run)"; else
+        case "$BASE3" in /*|?:*) ;; *) BASE3="$REPO/$BASE3" ;; esac
+        blender_stage review3-frames "$HERE/review_h3.py" -- "$PROFILE" "$RUN" "$BASE3"
+        $PY "$HERE/compose_h3.py" "$PROFILE" "$RUN" > "$RUN/logs/compose-h3.log" 2>&1
       fi
       ;;
   esac

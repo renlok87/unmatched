@@ -127,6 +127,25 @@ if mr:
     metal_mask = ndimage.uniform_filter(metal_mask, size=3, mode="nearest")
     metal = metal * (1 - metal_mask) + float(mr["metallic"]) * metal_mask
     rough = rough * (1 - metal_mask) + float(mr["roughness"]) * metal_mask
+    if mr.get("base_colour_linear"):
+        # H3 (material library preset, mode preset-f0): the metal texels take the preset F0 colour, modulated by the
+        # baked luminance relative to its mean inside the mask (amplitude bake_luminance_modulation)
+        f0 = np.array(mr["base_colour_linear"], np.float32)
+        lum_ = bc_lin @ np.array([0.2126, 0.7152, 0.0722], np.float32)
+        sel_ = metal_mask > 0.5
+        lmean = float(lum_[sel_].mean()) if sel_.any() else 1.0
+        mod = 1.0 + float(mr.get("bake_luminance_modulation", 0.0)) * (lum_ / max(lmean, 1e-6) - 1.0)
+        # preset ageing.cavityDarken: darken toward the baked AO (1 - k * (1 - AO)); keeps the relief of the band
+        cav_k = float(mr.get("cavity_darken", 0.0))
+        mod = mod * (1.0 - cav_k * (1.0 - np.clip(ao, 0.0, 1.0)))
+        f0_px = np.clip(f0[None, None, :] * np.clip(mod, 0.0, None)[..., None], 0.0, 1.0)
+        bc_before = bc_lin[sel_].mean(0) if sel_.any() else None
+        bc_lin = bc_lin * (1 - metal_mask[..., None]) + f0_px * metal_mask[..., None]
+        report["checks"].setdefault("metal_rule_colour", {
+            "base_colour_linear": f0.tolist(), "bake_luminance_modulation": mr.get("bake_luminance_modulation", 0.0),
+            "mask_luminance_mean_before": round(lmean, 4),
+            "bc_linear_mean_before_after": [[round(float(c), 4) for c in bc_before] if bc_before is not None else None,
+                                            [round(float(c), 4) for c in bc_lin[sel_].mean(0)] if sel_.any() else None]})
     report["checks"]["metal_rule"] = {"rule": mr, "texels_over_0_5": int((metal_mask > 0.5).sum()),
                                       "coverage_by_part": {q: round(float(metal_mask[part_lab == parts.index(q)].mean()), 4)
                                                            for q in mr["parts"]}}
@@ -190,9 +209,24 @@ if MAT:
         t_ao = 1.0 - np.clip((ao - a5) / max(a95 - a5, 1e-4), 0, 1)
         w_ao = float(fr.get("ao_weight", 0.5))
         r_f = lo_r + (hi_r - lo_r) * np.clip((1 - w_ao) * t_r + w_ao * t_ao, 0, 1)
+        rough_tripo = rough.copy()
         rough = rough * (1 - feather) + r_f * feather
         metal = metal * (1 - feather)
         fm = feather > 0.5
+        sk_r = (fr.get("skin") or {}).get("roughness")
+        if sk_r:
+            # H3 (material library preset "skin"): skin texels of the head part remapped into the preset range by the
+            # same rank (half the Tripo roughness rank inside the skin mask, half the baked AO), metallic 0
+            skin_w = skin * (1 - mm) * (1 - talon)
+            sm_ = skin_w > 0.5
+            if sm_.any():
+                p5s, p95s = np.percentile(rough_tripo[sm_], [5, 95])
+                t_s = np.clip((rough_tripo - p5s) / max(p95s - p5s, 1e-4), 0, 1)
+                r_s = sk_r[0] + (sk_r[1] - sk_r[0]) * np.clip((1 - w_ao) * t_s + w_ao * t_ao, 0, 1)
+                rough = rough * (1 - skin_w) + r_s * skin_w
+                metal = metal * (1 - skin_w)
+                mat_report["skin"] = {"roughness_rule": sk_r, "texels_over_0_5": int(sm_.sum()),
+                                      "roughness_p1_p50_p99": [round(float(x), 4) for x in np.percentile(rough[sm_], [1, 50, 99])]}
         mat_report["feathers"] = {"rule": fr, "texels_over_0_5": int(fm.sum()),
                                   "roughness_p1_p50_p99": [round(float(x), 4) for x in np.percentile(rough[fm], [1, 50, 99])],
                                   "metallic_max": round(float(metal[fm].max()), 4),
