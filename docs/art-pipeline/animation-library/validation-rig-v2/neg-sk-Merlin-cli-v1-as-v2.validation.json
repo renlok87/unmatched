@@ -1,0 +1,82 @@
+{
+ "schema": "unmatched.clip-validation/2",
+ "clip": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/export/SK_Merlin_Candidate.fbx",
+ "clip_bytes": 639436,
+ "clip_sha256": "8e312d9cda3888be70de381cc2b5e132afc2c6cde37eae8795f3ebf5fcfe790d",
+ "contract": "docs/art-pipeline/rig/rig-contract.json",
+ "contract_revision": "v2-2026-09-29",
+ "skeleton": "UM_HUMANOID_17_v2",
+ "character": "Merlin",
+ "kind": "skeletal-mesh",
+ "clip_role": null,
+ "blender": "5.2.2 LTS",
+ "checks": [
+  {
+   "check": "import",
+   "status": "pass"
+  },
+  {
+   "check": "single_armature",
+   "status": "pass",
+   "value": "SKEL_UM_Humanoid"
+  },
+  {
+   "check": "skeleton_version",
+   "status": "pass",
+   "skeleton": "UM_HUMANOID_17_v2"
+  },
+  {
+   "check": "armature_object_name",
+   "status": "pass",
+   "value": "SKEL_UM_Humanoid"
+  },
+  {
+   "check": "skeleton_contract",
+   "status": "fail",
+   "missing": [
+    "weapon.R"
+   ],
+   "extra": [
+    "weapon"
+   ],
+   "parent_mismatch": []
+  },
+  {
+   "check": "weapon_side",
+   "status": "fail",
+   "present": [],
+   "legacy_present": [
+    "weapon"
+   ],
+   "character": "Merlin",
+   "expected": "weapon.R",
+   "problems": [
+    "старое имя кости оружия ['weapon']: в v2 только weapon.L/weapon.R",
+    "у Merlin ожидается weapon.R, в клипе нет"
+   ]
+  },
+  {
+   "check": "ref_pose_facing",
+   "status": "pass",
+   "facing_yaw_deg": -4.236,
+   "expected": 0.0,
+   "tol_deg": 10.0,
+   "delta_deg": -4.236
+  },
+  {
+   "check": "ref_pose_root_axis",
+   "status": "pass",
+   "root_x_axis_yaw_deg": 90.0,
+   "expected": 90,
+   "delta_deg": 0.0
+  }
+ ],
+ "bones": {},
+ "bone_count": 17,
+ "result": "fail",
+ "fails": [
+  "skeleton_contract",
+  "weapon_side"
+ ],
+ "warnings": []
+}

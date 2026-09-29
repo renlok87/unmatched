@@ -1,0 +1,97 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "reconnect-no-replay",
+ "kind": "scenario",
+ "description": "Урон seq 10 показан; разрыв связи (CUE-017, повторный сигнал разрыва — duplicate); восстановление recovered_seq=14 обрывает активные показы; запоздавшие seq 12 и 14 — stale, seq 15 — новый показ; тост CUE-018.",
+ "covers": [
+  "ACC-012",
+  "QA-108",
+  "CUE-017",
+  "CUE-018",
+  "07 onReconnect"
+ ],
+ "assets_present": {
+  "CUE-011": {
+   "vfx": "/Game/FX/Test/NS_Test_Hit.NS_Test_Hit",
+   "sfx": "/Game/Audio/Test/SW_Test_Hit.SW_Test_Hit",
+   "clip": "/Game/Anim/Test/AS_Test_HitReact.AS_Test_HitReact"
+  }
+ },
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "arthur",
+   "seq": 10,
+   "channel": "ws"
+  },
+  {
+   "t": 300,
+   "kind": "cue",
+   "id": "CUE-017"
+  },
+  {
+   "t": 1200,
+   "kind": "cue",
+   "id": "CUE-017"
+  },
+  {
+   "t": 4000,
+   "kind": "reconnect",
+   "recovered_seq": 14
+  },
+  {
+   "t": 4000,
+   "kind": "cue",
+   "id": "CUE-018"
+  },
+  {
+   "t": 4100,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "arthur",
+   "seq": 12,
+   "channel": "http"
+  },
+  {
+   "t": 4150,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "harpy-1",
+   "seq": 14,
+   "channel": "http"
+  },
+  {
+   "t": 4200,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "arthur",
+   "seq": 15,
+   "channel": "ws"
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-011 subject=arthur seq=10 t=0 vfx=NS_Test_Hit sfx=SW_Test_Hit clip=AS_Test_HitReact mat=FxFlash socket=Head reduced=0 result=spawned",
+  "CUE fx id=CUE-017 subject=scene seq=- t=300 vfx=none sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx done id=CUE-017 subject=scene seq=- t=300 ms=0 cut=0",
+  "CUE fx done id=CUE-011 subject=arthur seq=10 t=900 ms=900 cut=0",
+  "CUE fx id=CUE-017 subject=scene seq=- t=1200 result=duplicate",
+  "CUE reconnect recovered_seq=14 t=4000",
+  "CUE fx id=CUE-018 subject=scene seq=- t=4000 vfx=none sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx id=CUE-011 subject=arthur seq=12 t=4100 result=stale",
+  "CUE fx id=CUE-011 subject=harpy-1 seq=14 t=4150 result=stale",
+  "CUE fx id=CUE-011 subject=arthur seq=15 t=4200 vfx=NS_Test_Hit sfx=SW_Test_Hit clip=AS_Test_HitReact mat=FxFlash socket=Head reduced=0 result=spawned",
+  "CUE fx done id=CUE-018 subject=scene seq=- t=4800 ms=800 cut=0",
+  "CUE fx done id=CUE-011 subject=arthur seq=15 t=5100 ms=900 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 4,
+  "spawned": 2,
+  "fallback": 2,
+  "duplicate": 1,
+  "stale": 2,
+  "done": 4,
+  "unique_triples": 2
+ }
+}

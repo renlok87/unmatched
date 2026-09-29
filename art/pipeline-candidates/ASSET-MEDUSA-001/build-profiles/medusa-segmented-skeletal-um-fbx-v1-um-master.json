@@ -1,0 +1,638 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "profile_id": "medusa-segmented-skeletal/3",
+  "asset_id": "ASSET-MEDUSA-001",
+  "status": "proposed",
+  "status_note": "W4-B (волна 4, 2026-09-29): тот же технический контракт сборки, что medusa-segmented-skeletal/2 (build/анатомия/кости/веса без изменений — FBX байт в байт те же), плюс: atlas.ao_bake (ORM.R = запечённый AO, гейт «не константа»), TeamMask одежды (новая: платье tripo_part_0, dye), UE-маршрут um-master (MI от M_UM_Figure / M_UM_BaseMarker, цвета команд hex С-11 через FromSRGBColor). Не художественная приёмка и не бюджет; маски, dye-ручки и палитра — предложено.",
+  "derived_from": [
+    "blender/ASSET-MEDUSA-001/build_segmented_medusa.py",
+    "blender/ASSET-MEDUSA-001/pack_segmented_atlas.py",
+    "tools/art/art004_face_skeletal_export.py (ART004_FACE_RESTORE_NORMALS=1, ART004_FACE_SLOT=1, ART004_FACE_NECK_BACK=1)",
+    "tools/art/import_medusa_candidate.py (sockets, TeamColor material)"
+  ],
+  "build": {
+    "flow": "whole-figure",
+    "builder": "tools/tripo-pipeline/blender/build_candidate.py (library candidate_build/)",
+    "note": "the T4 algorithm of tool 0.4.0 unchanged; tool 0.5.0 reads the part names it used to hard-code from anatomy, axes.blender_bow_side and reference.parts_fixed_in_reference (same FBX bytes)"
+  },
+  "source_role": "segmented-retopo-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "expected_part_count": 15,
+  "atlas": {
+    "size": 2048,
+    "gutter_px": 4,
+    "texture_prefix": "T_Medusa_Candidate_Atlas",
+    "base_color_factor_expected": 0.800000011920929,
+    "orm_occlusion_fill": 255,
+    "background": {
+      "BC": [
+        128,
+        128,
+        128
+      ],
+      "N_OpenGL": [
+        128,
+        128,
+        255
+      ],
+      "ORM": [
+        255,
+        220,
+        0
+      ]
+    },
+    "reference_textures": {
+      "BC": "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_BC.png",
+      "N_OpenGL": "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_N_OpenGL.png",
+      "N": "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_N.png",
+      "ORM": "blender/ASSET-MEDUSA-001/textures/T_Medusa_Atlas_ORM.png"
+    },
+    "reference_note": "read-only comparison with the committed atlas of blender/ASSET-MEDUSA-001",
+    "ao_bake": {
+      "samples": 128,
+      "distance_rel": 0.08,
+      "margin_px": 8,
+      "seed": 0,
+      "gate": {
+        "min_range_p1_p99": 32,
+        "min_occluded_fraction": 0.02,
+        "occluded_below": 250
+      },
+      "note": "W4-B (engine gate memo §1 item 5): ORM.R = ambient occlusion baked per atlas part by headless Cycles (tools/tripo-pipeline/blender/bake_ao.py), distance 0.08 x figure height, the whole figure as occluder; gate orm_occlusion_baked_not_constant. ORM.R only acts on indirect/sky light (critic G03): without a SkyLight in the light profile it changes nothing in the frame (proposal, measured in the act)"
+    }
+  },
+  "scale": {
+    "figure_height_m": 0.55,
+    "measured_from": "lowest vertex of all 15 parts (base bottom) to highest vertex (crown)"
+  },
+  "meshes": {
+    "body": {
+      "object": "SK_Medusa_Body",
+      "mesh": "Medusa_Body_Quad",
+      "join": "all parts except bow and base",
+      "active_part": "tripo_part_0"
+    },
+    "bow": {
+      "object": "SK_Medusa_Bow",
+      "part": "tripo_part_4",
+      "bone": "weapon"
+    },
+    "base": {
+      "object": "SM_Medusa_Base",
+      "part": "tripo_part_2",
+      "footprint_m": [
+        0.3,
+        0.3,
+        0.06
+      ],
+      "pivot": "centre of the base bottom"
+    }
+  },
+  "materials": {
+    "atlas": "M_Medusa_Atlas",
+    "face_slot": {
+      "material": "M_Medusa_Face",
+      "part": "tripo_part_10",
+      "note": "second slot kept for parity with face-section-neck-v2; both slots use the same atlas material in UE"
+    },
+    "master_material_deviation": "04 §1 names one shared master material M_DioramaMaster (/Game/S05/M_DioramaMaster). The candidate builds its own M_Medusa_Candidate_Atlas (BC x TeamColor, N, ORM) like the production import (M_Medusa_Atlas); recorded deviation, decision pending (Fable synthesis §4: own M_*_Atlas vs M_DioramaMaster)"
+  },
+  "orientation": {
+    "method": "ray-escape",
+    "method_note": "per polygon: a ray along +normal and one along -normal (offset 1e-4 of height) against the whole candidate; area where only the +normal ray escapes counts outward, only the -normal ray escapes counts inward; score = (out - in) / (out + in)",
+    "flip_below_score": -0.5,
+    "expected_inside_out_parts": [
+      "tripo_part_10",
+      "tripo_part_13",
+      "tripo_part_14",
+      "tripo_part_8"
+    ],
+    "expected_note": "measured on the Tripo GLB 2026-09-28 (live Blender MCP probe): part_10 face -0.978, part_14 rear neck -1.0 (both fixed in v2), part_8 left arm -1.0 and part_13 right hand -0.997 (NOT fixed in v2)",
+    "min_score_after_fix": 0.5,
+    "fix": "flip polygon winding and negate the custom corner normals (as art004_face_skeletal_export.py RESTORE_NORMALS)"
+  },
+  "anatomy": {
+    "face": "tripo_part_10",
+    "neck": "tripo_part_14",
+    "note": "face = the open face part (also materials.face_slot.part), neck = the rear neck part; hard-coded in build_candidate.py 0.4.0 (checks face_slot_polygons, neck_polygons)"
+  },
+  "armature": {
+    "object": "SKEL_Medusa",
+    "max_influences": 2,
+    "bones": [
+      [
+        "root",
+        null,
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0.045
+        ]
+      ],
+      [
+        "hips",
+        "root",
+        [
+          0,
+          0,
+          0.18
+        ],
+        [
+          0,
+          0,
+          0.245
+        ]
+      ],
+      [
+        "spine",
+        "hips",
+        [
+          0,
+          0,
+          0.245
+        ],
+        [
+          0,
+          0,
+          0.35
+        ]
+      ],
+      [
+        "head",
+        "spine",
+        [
+          0,
+          0,
+          0.385
+        ],
+        [
+          0,
+          0,
+          0.49
+        ]
+      ],
+      [
+        "arm_upper.L",
+        "spine",
+        [
+          0.045,
+          0,
+          0.355
+        ],
+        [
+          0.068,
+          -0.013,
+          0.305
+        ]
+      ],
+      [
+        "arm_lower.L",
+        "arm_upper.L",
+        [
+          0.068,
+          -0.013,
+          0.305
+        ],
+        [
+          0.1,
+          -0.045,
+          0.29
+        ]
+      ],
+      [
+        "hand.L",
+        "arm_lower.L",
+        [
+          0.1,
+          -0.045,
+          0.29
+        ],
+        [
+          0.112,
+          -0.06,
+          0.275
+        ]
+      ],
+      [
+        "arm_upper.R",
+        "spine",
+        [
+          -0.045,
+          0,
+          0.355
+        ],
+        [
+          -0.068,
+          -0.018,
+          0.305
+        ]
+      ],
+      [
+        "arm_lower.R",
+        "arm_upper.R",
+        [
+          -0.068,
+          -0.018,
+          0.305
+        ],
+        [
+          -0.05,
+          -0.045,
+          0.305
+        ]
+      ],
+      [
+        "hand.R",
+        "arm_lower.R",
+        [
+          -0.05,
+          -0.045,
+          0.305
+        ],
+        [
+          -0.038,
+          -0.055,
+          0.29
+        ]
+      ],
+      [
+        "leg_upper.L",
+        "hips",
+        [
+          0.03,
+          0,
+          0.19
+        ],
+        [
+          0.038,
+          -0.012,
+          0.12
+        ]
+      ],
+      [
+        "leg_lower.L",
+        "leg_upper.L",
+        [
+          0.038,
+          -0.012,
+          0.12
+        ],
+        [
+          0.04,
+          -0.015,
+          0.065
+        ]
+      ],
+      [
+        "foot.L",
+        "leg_lower.L",
+        [
+          0.04,
+          -0.015,
+          0.065
+        ],
+        [
+          0.04,
+          -0.045,
+          0.045
+        ]
+      ],
+      [
+        "leg_upper.R",
+        "hips",
+        [
+          -0.03,
+          0,
+          0.19
+        ],
+        [
+          -0.038,
+          -0.012,
+          0.12
+        ]
+      ],
+      [
+        "leg_lower.R",
+        "leg_upper.R",
+        [
+          -0.038,
+          -0.012,
+          0.12
+        ],
+        [
+          -0.04,
+          -0.015,
+          0.065
+        ]
+      ],
+      [
+        "foot.R",
+        "leg_lower.R",
+        [
+          -0.04,
+          -0.015,
+          0.065
+        ],
+        [
+          -0.04,
+          -0.045,
+          0.045
+        ]
+      ],
+      [
+        "weapon",
+        "hand.L",
+        [
+          0.112,
+          -0.06,
+          0.275
+        ],
+        [
+          0.14,
+          -0.06,
+          0.275
+        ]
+      ]
+    ]
+  },
+  "weights": [
+    {
+      "parts": [
+        "tripo_part_1",
+        "tripo_part_3",
+        "tripo_part_10",
+        "tripo_part_14"
+      ],
+      "bone": "head"
+    },
+    {
+      "parts": [
+        "tripo_part_7"
+      ],
+      "bone": "spine"
+    },
+    {
+      "parts": [
+        "tripo_part_0"
+      ],
+      "blend": {
+        "center": 0.29,
+        "span": 0.07,
+        "low": "hips",
+        "high": "spine"
+      }
+    },
+    {
+      "parts": [
+        "tripo_part_5"
+      ],
+      "split_z": 0.105,
+      "below": {
+        "blend": {
+          "center": 0.075,
+          "span": 0.03,
+          "low": "foot.L",
+          "high": "leg_lower.L"
+        }
+      },
+      "above": {
+        "blend": {
+          "center": 0.16,
+          "span": 0.04,
+          "low": "leg_lower.L",
+          "high": "leg_upper.L"
+        }
+      }
+    },
+    {
+      "parts": [
+        "tripo_part_6"
+      ],
+      "split_z": 0.105,
+      "below": {
+        "blend": {
+          "center": 0.075,
+          "span": 0.03,
+          "low": "foot.R",
+          "high": "leg_lower.R"
+        }
+      },
+      "above": {
+        "blend": {
+          "center": 0.16,
+          "span": 0.04,
+          "low": "leg_lower.R",
+          "high": "leg_upper.R"
+        }
+      }
+    },
+    {
+      "parts": [
+        "tripo_part_8"
+      ],
+      "blend": {
+        "center": 0.335,
+        "span": 0.035,
+        "low": "arm_lower.L",
+        "high": "arm_upper.L"
+      }
+    },
+    {
+      "parts": [
+        "tripo_part_9"
+      ],
+      "blend": {
+        "center": 0.335,
+        "span": 0.035,
+        "low": "arm_lower.R",
+        "high": "arm_upper.R"
+      }
+    },
+    {
+      "parts": [
+        "tripo_part_11"
+      ],
+      "bone": "arm_lower.R"
+    },
+    {
+      "parts": [
+        "tripo_part_12"
+      ],
+      "bone": "hand.L"
+    },
+    {
+      "parts": [
+        "tripo_part_13"
+      ],
+      "bone": "hand.R"
+    }
+  ],
+  "axes": {
+    "blender_front": "-Y",
+    "blender_bow_side": "+X",
+    "fbx": "fbx_preset (UM_FBX_v1): export_space_rotation_z_degrees 90, -Y forward, Z up, FBX_SCALE_UNITS, data x100, UnitScaleFactor patched to 1.0, Triangulate on",
+    "expected_ue_front": "+X",
+    "expected_ue_bow_side": "-Y",
+    "expected_ue_front_source": "04-blender-production.md §1 «Оси» + §1.1 preset UM_FBX_v1; verified by ART-001 (arrow tip +X, root motion +100 uu X) — a standard, not a proposal",
+    "known_deviation": "production SK_Medusa / SK_Medusa_Atlas, v2 and v3 face +Y in UE (measured in T4); S08FighterActor compensates with yaw 0/180 for a +Y-facing mesh. Tracked for art task 2 (in-game rotation or re-export)"
+  },
+  "exports": {
+    "skeletal_fbx": "SK_Medusa_Candidate.fbx",
+    "base_fbx": "SM_Medusa_Base_Candidate.fbx",
+    "triangulate_note": "preset use_triangles=true; the Tripo retopology is already all triangles (18 199 / 1 197 / 1 780 polygons = triangles), so Triangulate changes no geometry (checked by build: triangulate_changes_no_geometry)",
+    "path_mode_note": "STRIP (bare texture names) instead of the preset's AUTO: textures reach UE from the atlas stage, not through the FBX"
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "weapon",
+      "location_uu": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "location_uu": [
+        0,
+        0,
+        4
+      ]
+    }
+  ],
+  "ue": {
+    "skeletal_asset": "SK_Medusa_Candidate",
+    "base_asset": "SM_Medusa_Base_Candidate",
+    "material_route": "um-master",
+    "material_route_note": "W4-B: MI of /Game/UM/Materials/M_UM_Figure (figure) and M_UM_BaseMarker (base), team MIs as their children; masters built by tools/tripo-pipeline/um_masters.py",
+    "masters": {
+      "figure": "/Game/UM/Materials/M_UM_Figure",
+      "base": "/Game/UM/Materials/M_UM_BaseMarker"
+    },
+    "figure_instance": "MI_Medusa_Candidate",
+    "base_instance": "MI_Medusa_Base_Candidate",
+    "teams": {
+      "Gold": "#E8C06A",
+      "Silver": "#9FC2D8"
+    },
+    "teams_note": "03 С-11 hex (Q-304 open); linear only through FLinearColor::FromSRGBColor (AD-OPEN-39 rule)",
+    "default_team": "Silver",
+    "team_instances": {
+      "figure": "MI_Medusa_Candidate_{team}",
+      "base": "MI_Medusa_Base_Candidate_{team}"
+    },
+    "team_color_mode": "mask",
+    "team_color_mode_note": "user decision 2026-09-28 (AD-CNF-58 = b): TeamColor on the base band and on the clothing by TeamMask; mask: lerp(BC, BC x TeamColor | dye, TeamMask.R)",
+    "figure_parameters": {
+      "TeamDye": 1.0,
+      "TeamDyeGain": 6.0
+    },
+    "base_marker": {
+      "textures": true,
+      "parameters": {
+        "SideBandWeight": 1.0,
+        "VertexMaskWeight": 0.0
+      },
+      "note": "textured Tripo base: team band = the side wall (local vertex normal |z| < SideBandNormalZMax), flat TeamColor (BandKeepsTexture 0); proposal"
+    },
+    "textures": {
+      "BC": {
+        "file_key": "BC",
+        "srgb": true,
+        "compression": "TC_Default",
+        "asset": "T_Medusa_Candidate_BC"
+      },
+      "N": {
+        "file_key": "N",
+        "srgb": false,
+        "compression": "TC_Normalmap",
+        "flip_green": false,
+        "asset": "T_Medusa_Candidate_N"
+      },
+      "ORM": {
+        "file_key": "ORM",
+        "srgb": false,
+        "compression": "TC_Masks",
+        "asset": "T_Medusa_Candidate_ORM"
+      },
+      "TeamMask": {
+        "asset": "T_Medusa_Candidate_TeamMask",
+        "file_key": "TeamMask",
+        "srgb": false,
+        "compression": "TC_Grayscale"
+      }
+    },
+    "reference_skeletal_for_axes": {
+      "asset": "/Game/ART004/Medusa/Meshes/SK_Medusa_Atlas",
+      "ue_front": "+Y",
+      "ue_front_status": "measured in T4 (same Tripo geometry; bounds identical to the T4 candidate and v2)",
+      "note": "read-only get_bounds of the stable production asset; ue-import checks that the map from its bounds onto the candidate's carries its +Y front onto +X"
+    }
+  },
+  "reference": {
+    "skeletal_fbx": "blender/ASSET-MEDUSA-001/variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx",
+    "skeletal_fbx_sha256": "bd125c6bbeb2559b28f6fc4908a1790e0d05fd572b128bd9188c2daeea046592",
+    "base_fbx": "blender/ASSET-MEDUSA-001/export/SM_Medusa_Base.fbx",
+    "base_fbx_sha256": "a49bfbbfe6e51856aebcd9d3e7cc9a45bc142f0ff110830f446a28c76997ba4f",
+    "parts_fixed_in_reference": [
+      "tripo_part_10",
+      "tripo_part_14"
+    ],
+    "note": "read-only structural comparison (Blender re-import of both FBX); the reference is never written"
+  },
+  "expectations": {
+    "triangles": {
+      "SK_Medusa_Body": 18199,
+      "SK_Medusa_Bow": 1197,
+      "SM_Medusa_Base": 1780
+    },
+    "face_slot_polygons": 587,
+    "neck_polygons": 480,
+    "bones": 17,
+    "skeletal_material_slots": 2,
+    "base_material_slots": 1
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "04-blender-production.md §1/§3.1, 17-art-production-spec.md §4.5 — ПРЕДЛОЖЕНИЕ до решения GD-058, не бюджет",
+    "hero_triangles": [
+      15000,
+      25000
+    ],
+    "texture_px": 2048,
+    "material_slots_max": 3,
+    "height_uu": [
+      50,
+      55
+    ],
+    "base_diameter_uu": 30,
+    "base_height_uu": 6
+  },
+  "history": {
+    "previous": "medusa-segmented-skeletal/2",
+    "previous_profile": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal-um-fbx-v1.json",
+    "note": "the previous profile is kept unchanged as the record of its runs (20260928-cli-um-fbx-v1)"
+  },
+  "team_color": {
+    "status": "предложено",
+    "applicability": "AD-CNF-58 = b (user decision 2026-09-28): clothing",
+    "mask_texture": "T_Medusa_Candidate_Atlas_TeamMask.png",
+    "mask": {
+      "method": "hsv-band-cells",
+      "texture": "T_Medusa_Candidate_Atlas_TeamMask.png",
+      "cells": [
+        "tripo_part_0"
+      ],
+      "v_max": 0.3,
+      "s_max": 0.4,
+      "ramp": 0.05,
+      "note": "dress = the body/skirt cell tripo_part_0 (weights hips/spine): measured v p5..p95 0.11..0.25, s median 0.13; v <= 0.3 and s <= 0.4 keep the cloth and drop the bronze flecks (s > 0.45). Dark cloth: a multiply shows no team colour, so the MI uses TeamDye 1 (TeamColor x luminance(BC) x TeamDyeGain 6) - proposal"
+    }
+  }
+}

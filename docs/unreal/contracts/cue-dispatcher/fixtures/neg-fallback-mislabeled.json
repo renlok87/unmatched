@@ -1,0 +1,16 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "neg-fallback-mislabeled",
+ "kind": "negative-trace",
+ "description": "Нет ассета, но result=spawned (G8), и нет done (G4).",
+ "covers": [
+  "17 §6.5 fallback с логом"
+ ],
+ "trace": [
+  "CUE fx id=CUE-013 subject=merlin seq=30 t=0 vfx=missing sfx=missing clip=missing mat=Fade socket=- reduced=0 result=spawned"
+ ],
+ "expect_error_codes": [
+  "G8",
+  "G4"
+ ]
+}

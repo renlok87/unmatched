@@ -1,0 +1,264 @@
+{
+ "schema": "unmatched.clip-validation-summary/1",
+ "contract": "docs/art-pipeline/rig/rig-contract.json",
+ "runner": "tools/tripo-pipeline/anim/run_rig_v2_validation.py",
+ "cases": [
+  {
+   "case": "pos-rigv2-Medusa-oneshot",
+   "clip": "docs/art-pipeline/animation-library/fixtures/rig-contract-v2/AM_RigV2_LungeAttack_weaponL.fbx",
+   "args": [
+    "--character=Medusa",
+    "--expect-duration=0.5833"
+   ],
+   "meaning": "фикстура v2: SKEL_UM_Humanoid, weapon.L, ref-поза +X, кадр 0 и последний = rest",
+   "expected_exit": 0,
+   "expected_fails": [],
+   "expected_warnings": [],
+   "exit": 0,
+   "result": "pass",
+   "fails": [],
+   "warnings": [],
+   "expectation_met": true,
+   "clip_sha256": "1945533acb3dc228f182b3750ca4fd1fe53c37590fc03680a34b9045d919646b"
+  },
+  {
+   "case": "neg-rigv2-as-Arthur",
+   "clip": "docs/art-pipeline/animation-library/fixtures/rig-contract-v2/AM_RigV2_LungeAttack_weaponL.fbx",
+   "args": [
+    "--character=Arthur",
+    "--expect-duration=0.5833"
+   ],
+   "meaning": "у Arthur кость оружия weapon.R, а в файле weapon.L",
+   "expected_exit": 1,
+   "expected_fails": [
+    "skeleton_contract",
+    "weapon_side"
+   ],
+   "expected_warnings": [],
+   "exit": 1,
+   "result": "fail",
+   "fails": [
+    "skeleton_contract",
+    "weapon_side"
+   ],
+   "warnings": [],
+   "expectation_met": true,
+   "clip_sha256": "1945533acb3dc228f182b3750ca4fd1fe53c37590fc03680a34b9045d919646b"
+  },
+  {
+   "case": "neg-draft-Lunge-v2",
+   "clip": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx",
+   "args": [
+    "--expect-duration=0.5833"
+   ],
+   "meaning": "черновик как новый клип: SKEL_Medusa, одно имя weapon (без --character это лишняя кость = WARN skeleton_contract и FAIL weapon_side), лицо -Y (без поворота UM_FBX_v1)",
+   "expected_exit": 1,
+   "expected_fails": [
+    "armature_object_name",
+    "weapon_side",
+    "ref_pose_facing"
+   ],
+   "expected_warnings": [
+    "skeleton_contract",
+    "ref_pose_root_axis"
+   ],
+   "exit": 1,
+   "result": "fail",
+   "fails": [
+    "armature_object_name",
+    "weapon_side",
+    "ref_pose_facing"
+   ],
+   "warnings": [
+    "skeleton_contract",
+    "ref_pose_root_axis"
+   ],
+   "expectation_met": true,
+   "clip_sha256": "b985af983166f62d320c95bdc88cbcfba1f897a6c0abcaf87bcf748f994338a8"
+  },
+  {
+   "case": "legacy-draft-Lunge-v1-grandfathered",
+   "clip": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx",
+   "args": [
+    "--skeleton=UM_HUMANOID_17_v1",
+    "--expect-duration=0.5833"
+   ],
+   "meaning": "старый черновик на закрытом v1: допущен по sha256 с WARN",
+   "expected_exit": 0,
+   "expected_fails": [],
+   "expected_warnings": [
+    "skeleton_version",
+    "armature_object_name"
+   ],
+   "exit": 0,
+   "result": "pass",
+   "fails": [],
+   "warnings": [
+    "skeleton_version",
+    "armature_object_name"
+   ],
+   "expectation_met": true,
+   "clip_sha256": "b985af983166f62d320c95bdc88cbcfba1f897a6c0abcaf87bcf748f994338a8"
+  },
+  {
+   "case": "neg-rigv2-on-closed-v1",
+   "clip": "docs/art-pipeline/animation-library/fixtures/rig-contract-v2/AM_RigV2_LungeAttack_weaponL.fbx",
+   "args": [
+    "--skeleton=UM_HUMANOID_17_v1",
+    "--expect-duration=0.5833"
+   ],
+   "meaning": "новый файл на закрытом v1: FAIL skeleton_version",
+   "expected_exit": 1,
+   "expected_fails": [
+    "skeleton_version",
+    "skeleton_contract"
+   ],
+   "expected_warnings": [],
+   "exit": 1,
+   "result": "fail",
+   "fails": [
+    "skeleton_version",
+    "skeleton_contract"
+   ],
+   "warnings": [],
+   "expectation_met": true,
+   "clip_sha256": "1945533acb3dc228f182b3750ca4fd1fe53c37590fc03680a34b9045d919646b"
+  },
+  {
+   "case": "neg-draft-DeathSettle-v1-as-oneshot",
+   "clip": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx",
+   "args": [
+    "--skeleton=UM_HUMANOID_17_v1",
+    "--expect-duration=0.875",
+    "--clip-role=oneshot"
+   ],
+   "meaning": "DeathSettle с ролью oneshot: последний кадр не rest",
+   "expected_exit": 1,
+   "expected_fails": [
+    "clip_boundary_rest"
+   ],
+   "expected_warnings": [
+    "skeleton_version",
+    "armature_object_name"
+   ],
+   "exit": 1,
+   "result": "fail",
+   "fails": [
+    "clip_boundary_rest"
+   ],
+   "warnings": [
+    "skeleton_version",
+    "armature_object_name"
+   ],
+   "expectation_met": true,
+   "clip_sha256": "278052b4f48dab53df574646d902ab04259985b1aafffca02bd171f8c544e00f"
+  },
+  {
+   "case": "legacy-draft-DeathSettle-v1-terminal",
+   "clip": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx",
+   "args": [
+    "--skeleton=UM_HUMANOID_17_v1",
+    "--expect-duration=0.875",
+    "--clip-role=terminal"
+   ],
+   "meaning": "DeathSettle с ролью terminal: финальная поза допустима",
+   "expected_exit": 0,
+   "expected_fails": [],
+   "expected_warnings": [
+    "skeleton_version",
+    "armature_object_name"
+   ],
+   "exit": 0,
+   "result": "pass",
+   "fails": [],
+   "warnings": [
+    "skeleton_version",
+    "armature_object_name"
+   ],
+   "expectation_met": true,
+   "clip_sha256": "278052b4f48dab53df574646d902ab04259985b1aafffca02bd171f8c544e00f"
+  },
+  {
+   "case": "neg-sk-Arthur-cli-v1-as-v2",
+   "clip": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/export/SK_KingArthur_Candidate.fbx",
+   "args": [
+    "--kind=skeletal-mesh",
+    "--character=Arthur"
+   ],
+   "meaning": "SK Arthur CLI 20260928 (одно имя weapon под hand.R): до пересборки с weapon.R (профиль /4) не соответствует v2; кость 0 и ref-поза уже по v2",
+   "expected_exit": 1,
+   "expected_fails": [
+    "skeleton_contract",
+    "weapon_side"
+   ],
+   "expected_warnings": [],
+   "exit": 1,
+   "result": "fail",
+   "fails": [
+    "skeleton_contract",
+    "weapon_side"
+   ],
+   "warnings": [],
+   "expectation_met": true,
+   "clip_sha256": "49ef62582ca77efe9787fb9501ee675f3f8646ad38df702ee220c83bf2dab6b0"
+  },
+  {
+   "case": "neg-sk-Merlin-cli-v1-as-v2",
+   "clip": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/export/SK_Merlin_Candidate.fbx",
+   "args": [
+    "--kind=skeletal-mesh",
+    "--character=Merlin"
+   ],
+   "meaning": "SK Merlin CLI 20260928: то же, что у Arthur (профиль /4 — weapon.R)",
+   "expected_exit": 1,
+   "expected_fails": [
+    "skeleton_contract",
+    "weapon_side"
+   ],
+   "expected_warnings": [],
+   "exit": 1,
+   "result": "fail",
+   "fails": [
+    "skeleton_contract",
+    "weapon_side"
+   ],
+   "warnings": [],
+   "expectation_met": true,
+   "clip_sha256": "8e312d9cda3888be70de381cc2b5e132afc2c6cde37eae8795f3ebf5fcfe790d"
+  },
+  {
+   "case": "ext-tripo-preset-retarget-map-v2",
+   "clip": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/fixtures/tripo-preset-stoya-otdyh-d562/tripo_convert_93b4445d-b871-4057-a0d7-1317f45a1548.fbx",
+   "args": [
+    "--retarget-map=tripo_ue5_mannequin_to_um17",
+    "--loop=true"
+   ],
+   "meaning": "внешний клип с картой ретаргета: имя кости 0, ref-поза и граница — info",
+   "expected_exit": 0,
+   "expected_fails": [],
+   "expected_warnings": [],
+   "exit": 0,
+   "result": "pass",
+   "fails": [],
+   "warnings": [],
+   "expectation_met": true,
+   "clip_sha256": "8bf9b3af990ca2d0f43305477b3e1432d0cc6acfd44f52392d21334fcfe3c560"
+  },
+  {
+   "case": "err-unknown-character",
+   "clip": "docs/art-pipeline/animation-library/fixtures/rig-contract-v2/AM_RigV2_LungeAttack_weaponL.fbx",
+   "args": [
+    "--character=Nobody"
+   ],
+   "meaning": "неизвестный персонаж — ошибка запуска",
+   "expected_exit": 2,
+   "expected_fails": null,
+   "expected_warnings": [],
+   "exit": 2,
+   "result": "launch_error",
+   "line": "CLIP_VALIDATION ERROR 'character Nobody is not in skeleton characters (Arthur, Harpy, Medusa, Merlin)'",
+   "expectation_met": true
+  }
+ ],
+ "result": "pass"
+}

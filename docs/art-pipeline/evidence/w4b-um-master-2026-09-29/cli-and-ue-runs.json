@@ -1,0 +1,892 @@
+{
+ "assets": {
+  "ASSET-DECOR-KIT-001.BARREL": {
+   "profile": "art/pipeline-candidates/ASSET-DECOR-KIT-001/build-profiles/decor-barrel-static-um-fbx-v1-um-master.json",
+   "ue_import": {
+    "deviations": [],
+    "failed_checks": [],
+    "import_contract": {
+     "asset_import_data": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Meshes/SM_Decor_Barrel.SM_Decor_Barrel:FbxStaticMeshImportData_0",
+     "normal_import_method": "FBXNIM_ImportNormals"
+    },
+    "parent": "/Game/UM/Materials/M_UM_Figure.M_UM_Figure",
+    "route": "shared_master",
+    "status": "technically_imported"
+   },
+   "ue_import_log_first_pass": [
+    "ue-import executed",
+    "import rc=0",
+    "ue-import skipped",
+    "repeat rc=0",
+    "ue-import executed",
+    "force rc=0",
+    "ue-import skipped",
+    "repeat2 rc=0"
+   ],
+   "ue_import_log_refix": [
+    "ue-import skipped",
+    "repeat rc=0"
+   ]
+  },
+  "ASSET-HARPY-001": {
+   "ao_bake": {
+    "blender": "5.2.2 LTS",
+    "distance_m": 0.045653,
+    "distance_rel": 0.08,
+    "engine": "CYCLES CPU",
+    "flipped_before_bake": [
+     "tripo_part_6"
+    ],
+    "height_m": 0.570664,
+    "occluders_excluded": [
+     "tripo_part_4"
+    ],
+    "samples": 128,
+    "seed": 0
+   },
+   "ao_gate": {
+    "mean": 190.22,
+    "occluded_fraction": 0.7339,
+    "p1": 11.0,
+    "p99": 255.0,
+    "passed": true
+   },
+   "ao_orientation_gate": {
+    "expected": "inward_area_fraction <= 0.02 for every baked cell",
+    "max_inward_area_fraction": 0.0031,
+    "passed": true,
+    "per_face_reference_flipped": {
+     "tripo_part_2": 1506
+    }
+   },
+   "changed_since_first_w4b_pass": {
+    "textures/T_Harpy_Candidate_Atlas_ORM.png": [
+     "f28a260304d5",
+     "2f397561dc04"
+    ]
+   },
+   "cli_log_refix": [
+    "preflight executed",
+    "import    skipped",
+    "verify    skipped",
+    "atlas     executed",
+    "build     executed",
+    "ue-import not-run (needs --backend mcp)",
+    "run rc=0",
+    "preflight revalidated",
+    "import    skipped",
+    "verify    skipped",
+    "atlas     skipped",
+    "build     skipped",
+    "ue-import not-run (needs --backend mcp)",
+    "second run rc=0"
+   ],
+   "outputs_equal_to_20260928_cli_um_fbx_v1": {
+    "export/SK_Harpy_Candidate.fbx": true,
+    "export/SM_Harpy_Base_Candidate.fbx": true,
+    "textures/T_Harpy_Candidate_Atlas_BC.png": true,
+    "textures/T_Harpy_Candidate_Atlas_N.png": true,
+    "textures/T_Harpy_Candidate_Atlas_N_OpenGL.png": true,
+    "textures/T_Harpy_Candidate_Atlas_ORM.png": false,
+    "textures/T_Harpy_Candidate_Atlas_TeamMask.png": false
+   },
+   "outputs_equal_to_first_w4b_pass": {
+    "export/SK_Harpy_Candidate.fbx": true,
+    "export/SM_Harpy_Base_Candidate.fbx": true,
+    "textures/T_Harpy_Candidate_Atlas_BC.png": true,
+    "textures/T_Harpy_Candidate_Atlas_N.png": true,
+    "textures/T_Harpy_Candidate_Atlas_N_OpenGL.png": true,
+    "textures/T_Harpy_Candidate_Atlas_ORM.png": false,
+    "textures/T_Harpy_Candidate_Atlas_TeamMask.png": true
+   },
+   "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-segmented-skeletal-um-fbx-v1-um-master.json",
+   "stages": {
+    "atlas": "completed",
+    "build": "completed",
+    "import": "completed",
+    "preflight": "completed",
+    "ue-import": "completed",
+    "verify": "completed"
+   },
+   "team_mask": {
+    "coverage": {
+     "tripo_part_0": 0.60584,
+     "tripo_part_1": 0.5191
+    },
+    "method": "hsv-band-cells",
+    "rule": {
+     "cells": [
+      "tripo_part_0",
+      "tripo_part_1"
+     ],
+     "ramp": 0.05,
+     "v_max": 0.22
+    }
+   },
+   "ue_import": {
+    "checks_passed": "23/23",
+    "failed_checks": [],
+    "import_contract": {
+     "base": {
+      "asset_import_data": "/Game/PipelineCandidates/Harpy/20260929-w4b-um-master/Meshes/SM_Harpy_Base_Candidate.SM_Harpy_Base_Candidate:FbxStaticMeshImportData_0",
+      "asset_import_data_class": "FbxStaticMeshImportData",
+      "factory": "FbxFactory",
+      "nanite_enabled": false,
+      "normal_import_method": "FBXNIM_ImportNormals",
+      "vertex_color_import_option": "Replace"
+     },
+     "skeletal": {
+      "asset_import_data": "/Game/PipelineCandidates/Harpy/20260929-w4b-um-master/Meshes/SK_Harpy_Candidate.SK_Harpy_Candidate:FbxSkeletalMeshImportData_0",
+      "asset_import_data_class": "FbxSkeletalMeshImportData",
+      "factory": "FbxFactory",
+      "nanite_enabled": false,
+      "normal_import_method": "FBXNIM_ImportNormals",
+      "vertex_color_import_option": "Replace"
+     }
+    },
+    "instances": {
+     "base_instance": {
+      "TeamColor": null,
+      "parent": "/Game/UM/Materials/M_UM_BaseMarker",
+      "scalars": {
+       "PipEmissive": 0.35,
+       "SideBandWeight": 0.0,
+       "VertexMaskWeight": 1.0
+      },
+      "textures": {}
+     },
+     "figure_instance": {
+      "TeamColor": null,
+      "parent": "/Game/UM/Materials/M_UM_Figure",
+      "scalars": {
+       "TeamDye": 1.0,
+       "TeamDyeGain": 6.0
+      },
+      "textures": {
+       "BaseColorTexture": "/Game/PipelineCandidates/Harpy/20260929-w4b-um-master/Textures/T_Harpy_Candidate_BC",
+       "NormalTexture": "/Game/PipelineCandidates/Harpy/20260929-w4b-um-master/Textures/T_Harpy_Candidate_N",
+       "ORMTexture": "/Game/PipelineCandidates/Harpy/20260929-w4b-um-master/Textures/T_Harpy_Candidate_ORM",
+       "TeamMaskTexture": "/Game/PipelineCandidates/Harpy/20260929-w4b-um-master/Textures/T_Harpy_Candidate_TeamMask"
+      }
+     },
+     "team:base:Gold": {
+      "TeamColor": [
+       0.806952,
+       0.527115,
+       0.144128,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/Harpy/20260929-w4b-um-master/Materials/MI_Harpy_Base_Candidate",
+      "scalars": {},
+      "textures": {}
+     },
+     "team:base:Silver": {
+      "TeamColor": [
+       0.346704,
+       0.539479,
+       0.686685,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/Harpy/20260929-w4b-um-master/Materials/MI_Harpy_Base_Candidate",
+      "scalars": {},
+      "textures": {}
+     },
+     "team:figure:Gold": {
+      "TeamColor": [
+       0.806952,
+       0.527115,
+       0.144128,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/Harpy/20260929-w4b-um-master/Materials/MI_Harpy_Candidate",
+      "scalars": {},
+      "textures": {}
+     },
+     "team:figure:Silver": {
+      "TeamColor": [
+       0.346704,
+       0.539479,
+       0.686685,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/Harpy/20260929-w4b-um-master/Materials/MI_Harpy_Candidate",
+      "scalars": {},
+      "textures": {}
+     }
+    },
+    "status": "technically_imported",
+    "texture_inputs": {
+     "textures/T_Harpy_Candidate_Atlas_BC.png": "6c91809f85d4",
+     "textures/T_Harpy_Candidate_Atlas_N.png": "b83a9f922e6f",
+     "textures/T_Harpy_Candidate_Atlas_N_OpenGL.png": "0620a86f868d",
+     "textures/T_Harpy_Candidate_Atlas_ORM.png": "2f397561dc04",
+     "textures/T_Harpy_Candidate_Atlas_TeamMask.png": "1ede68eb02f6"
+    }
+   },
+   "ue_import_log_first_pass": [
+    "ue-import executed",
+    "import rc=0",
+    "ue-import skipped",
+    "repeat rc=0",
+    "ue-import executed",
+    "force rc=0",
+    "ue-import skipped",
+    "repeat2 rc=0"
+   ],
+   "ue_import_log_refix": [
+    "ue-import executed",
+    "import rc=0",
+    "ue-import skipped",
+    "repeat rc=0"
+   ]
+  },
+  "ASSET-KING-ARTHUR-001": {
+   "ao_bake": {
+    "blender": "5.2.2 LTS",
+    "distance_m": 0.078331,
+    "distance_rel": 0.08,
+    "engine": "CYCLES CPU",
+    "flipped_before_bake": [],
+    "height_m": 0.979139,
+    "occluders_excluded": [
+     "tripo_part_14"
+    ],
+    "samples": 128,
+    "seed": 0
+   },
+   "ao_gate": {
+    "mean": 182.78,
+    "occluded_fraction": 0.6932,
+    "p1": 8.0,
+    "p99": 255.0,
+    "passed": true
+   },
+   "ao_orientation_gate": {
+    "expected": "inward_area_fraction <= 0.02 for every baked cell",
+    "max_inward_area_fraction": 0.0012,
+    "passed": true,
+    "per_face_reference_flipped": {}
+   },
+   "changed_since_first_w4b_pass": {},
+   "cli_log_refix": [
+    "preflight executed",
+    "import    skipped",
+    "verify    skipped",
+    "atlas     executed",
+    "build     executed",
+    "ue-import not-run (needs --backend mcp)",
+    "run rc=0",
+    "preflight revalidated",
+    "import    skipped",
+    "verify    skipped",
+    "atlas     skipped",
+    "build     skipped",
+    "ue-import not-run (needs --backend mcp)",
+    "second run rc=0"
+   ],
+   "outputs_equal_to_20260928_cli_um_fbx_v1": {
+    "export/SK_KingArthur_Candidate.fbx": true,
+    "export/SM_KingArthur_Base_Candidate.fbx": true,
+    "textures/T_KingArthur_Candidate_Atlas_BC.png": true,
+    "textures/T_KingArthur_Candidate_Atlas_N.png": true,
+    "textures/T_KingArthur_Candidate_Atlas_N_OpenGL.png": true,
+    "textures/T_KingArthur_Candidate_Atlas_ORM.png": false,
+    "textures/T_KingArthur_Candidate_Atlas_TeamMask.png": true
+   },
+   "outputs_equal_to_first_w4b_pass": {
+    "export/SK_KingArthur_Candidate.fbx": true,
+    "export/SM_KingArthur_Base_Candidate.fbx": true,
+    "textures/T_KingArthur_Candidate_Atlas_BC.png": true,
+    "textures/T_KingArthur_Candidate_Atlas_N.png": true,
+    "textures/T_KingArthur_Candidate_Atlas_N_OpenGL.png": true,
+    "textures/T_KingArthur_Candidate_Atlas_ORM.png": true,
+    "textures/T_KingArthur_Candidate_Atlas_TeamMask.png": true
+   },
+   "profile": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-segmented-skeletal-um-fbx-v1-um-master.json",
+   "stages": {
+    "atlas": "completed",
+    "build": "completed",
+    "import": "completed",
+    "preflight": "completed",
+    "ue-import": "completed",
+    "verify": "completed"
+   },
+   "team_mask": {
+    "coverage": {
+     "tripo_part_0": 0.98668,
+     "tripo_part_11": 0.82684,
+     "tripo_part_13": 0.84194,
+     "tripo_part_2": 0.10988,
+     "tripo_part_3": 0.00035,
+     "tripo_part_5": 0.00018,
+     "tripo_part_6": 0.0912,
+     "tripo_part_7": 0.0002,
+     "tripo_part_8": 0.23057,
+     "tripo_part_9": 0.00834
+    },
+    "method": "hsv-hard-gaussian",
+    "rule": {
+     "blur_sigma_px": 1.0,
+     "hue_max_deg": 10,
+     "hue_min_deg": 340,
+     "s_min": 0.55,
+     "v_max": 0.85,
+     "v_min": 0.1
+    }
+   },
+   "ue_import": {
+    "checks_passed": "22/22",
+    "failed_checks": [],
+    "import_contract": {
+     "base": {
+      "asset_import_data": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Meshes/SM_KingArthur_Base_Candidate.SM_KingArthur_Base_Candidate:FbxStaticMeshImportData_0",
+      "asset_import_data_class": "FbxStaticMeshImportData",
+      "factory": "FbxFactory",
+      "nanite_enabled": false,
+      "normal_import_method": "FBXNIM_ImportNormals",
+      "vertex_color_import_option": "Ignore"
+     },
+     "skeletal": {
+      "asset_import_data": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Meshes/SK_KingArthur_Candidate.SK_KingArthur_Candidate:FbxSkeletalMeshImportData_0",
+      "asset_import_data_class": "FbxSkeletalMeshImportData",
+      "factory": "FbxFactory",
+      "nanite_enabled": false,
+      "normal_import_method": "FBXNIM_ImportNormals",
+      "vertex_color_import_option": "Replace"
+     }
+    },
+    "instances": {
+     "base_instance": {
+      "TeamColor": null,
+      "parent": "/Game/UM/Materials/M_UM_BaseMarker",
+      "scalars": {
+       "SideBandWeight": 1.0,
+       "VertexMaskWeight": 0.0
+      },
+      "textures": {
+       "BaseColorTexture": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Textures/T_KingArthur_Candidate_BC",
+       "NormalTexture": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Textures/T_KingArthur_Candidate_N",
+       "ORMTexture": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Textures/T_KingArthur_Candidate_ORM"
+      }
+     },
+     "figure_instance": {
+      "TeamColor": null,
+      "parent": "/Game/UM/Materials/M_UM_Figure",
+      "scalars": {
+       "TeamDye": 0.0
+      },
+      "textures": {
+       "BaseColorTexture": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Textures/T_KingArthur_Candidate_BC",
+       "NormalTexture": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Textures/T_KingArthur_Candidate_N",
+       "ORMTexture": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Textures/T_KingArthur_Candidate_ORM",
+       "TeamMaskTexture": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Textures/T_KingArthur_Candidate_TeamMask"
+      }
+     },
+     "team:base:Gold": {
+      "TeamColor": [
+       0.806952,
+       0.527115,
+       0.144128,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Materials/MI_KingArthur_Base_Candidate",
+      "scalars": {},
+      "textures": {}
+     },
+     "team:base:Silver": {
+      "TeamColor": [
+       0.346704,
+       0.539479,
+       0.686685,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Materials/MI_KingArthur_Base_Candidate",
+      "scalars": {},
+      "textures": {}
+     },
+     "team:figure:Gold": {
+      "TeamColor": [
+       0.806952,
+       0.527115,
+       0.144128,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Materials/MI_KingArthur_Candidate",
+      "scalars": {},
+      "textures": {}
+     },
+     "team:figure:Silver": {
+      "TeamColor": [
+       0.346704,
+       0.539479,
+       0.686685,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/KingArthur/20260929-w4b-um-master/Materials/MI_KingArthur_Candidate",
+      "scalars": {},
+      "textures": {}
+     }
+    },
+    "status": "technically_imported",
+    "texture_inputs": {
+     "textures/T_KingArthur_Candidate_Atlas_BC.png": "4693c9cb566f",
+     "textures/T_KingArthur_Candidate_Atlas_N.png": "f5fbc143101b",
+     "textures/T_KingArthur_Candidate_Atlas_N_OpenGL.png": "d5e3faec08c7",
+     "textures/T_KingArthur_Candidate_Atlas_ORM.png": "9c3e73e9c097",
+     "textures/T_KingArthur_Candidate_Atlas_TeamMask.png": "1e7b98f86332"
+    }
+   },
+   "ue_import_log_first_pass": [
+    "ue-import executed",
+    "import rc=0",
+    "ue-import skipped",
+    "repeat rc=0",
+    "ue-import executed",
+    "force rc=0",
+    "ue-import skipped",
+    "repeat2 rc=0"
+   ],
+   "ue_import_log_refix": [
+    "ue-import executed",
+    "import rc=0",
+    "ue-import skipped",
+    "repeat rc=0"
+   ]
+  },
+  "ASSET-MEDUSA-001": {
+   "ao_bake": {
+    "blender": "5.2.2 LTS",
+    "distance_m": 0.078423,
+    "distance_rel": 0.08,
+    "engine": "CYCLES CPU",
+    "flipped_before_bake": [
+     "tripo_part_10",
+     "tripo_part_13",
+     "tripo_part_14",
+     "tripo_part_8"
+    ],
+    "height_m": 0.980289,
+    "occluders_excluded": [],
+    "samples": 128,
+    "seed": 0
+   },
+   "ao_gate": {
+    "mean": 179.43,
+    "occluded_fraction": 0.6707,
+    "p1": 3.0,
+    "p99": 255.0,
+    "passed": true
+   },
+   "ao_orientation_gate": {
+    "expected": "inward_area_fraction <= 0.02 for every baked cell",
+    "max_inward_area_fraction": 0.0083,
+    "passed": true,
+    "per_face_reference_flipped": {}
+   },
+   "changed_since_first_w4b_pass": {},
+   "cli_log_refix": [
+    "preflight executed",
+    "import    skipped",
+    "verify    skipped",
+    "atlas     executed",
+    "build     executed",
+    "ue-import not-run (needs --backend mcp)",
+    "run rc=0",
+    "preflight revalidated",
+    "import    skipped",
+    "verify    skipped",
+    "atlas     skipped",
+    "build     skipped",
+    "ue-import not-run (needs --backend mcp)",
+    "second run rc=0"
+   ],
+   "outputs_equal_to_20260928_cli_um_fbx_v1": {
+    "export/SK_Medusa_Candidate.fbx": true,
+    "export/SM_Medusa_Base_Candidate.fbx": true,
+    "textures/T_Medusa_Candidate_Atlas_BC.png": true,
+    "textures/T_Medusa_Candidate_Atlas_N.png": true,
+    "textures/T_Medusa_Candidate_Atlas_N_OpenGL.png": true,
+    "textures/T_Medusa_Candidate_Atlas_ORM.png": false,
+    "textures/T_Medusa_Candidate_Atlas_TeamMask.png": false
+   },
+   "outputs_equal_to_first_w4b_pass": {
+    "export/SK_Medusa_Candidate.fbx": true,
+    "export/SM_Medusa_Base_Candidate.fbx": true,
+    "textures/T_Medusa_Candidate_Atlas_BC.png": true,
+    "textures/T_Medusa_Candidate_Atlas_N.png": true,
+    "textures/T_Medusa_Candidate_Atlas_N_OpenGL.png": true,
+    "textures/T_Medusa_Candidate_Atlas_ORM.png": true,
+    "textures/T_Medusa_Candidate_Atlas_TeamMask.png": true
+   },
+   "profile": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal-um-fbx-v1-um-master.json",
+   "stages": {
+    "atlas": "completed",
+    "build": "completed",
+    "import": "completed",
+    "preflight": "completed",
+    "ue-import": "completed",
+    "verify": "completed"
+   },
+   "team_mask": {
+    "coverage": {
+     "tripo_part_0": 0.98314
+    },
+    "method": "hsv-band-cells",
+    "rule": {
+     "cells": [
+      "tripo_part_0"
+     ],
+     "ramp": 0.05,
+     "s_max": 0.4,
+     "v_max": 0.3
+    }
+   },
+   "ue_import": {
+    "checks_passed": "23/23",
+    "failed_checks": [],
+    "import_contract": {
+     "base": {
+      "asset_import_data": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Meshes/SM_Medusa_Base_Candidate.SM_Medusa_Base_Candidate:FbxStaticMeshImportData_0",
+      "asset_import_data_class": "FbxStaticMeshImportData",
+      "factory": "FbxFactory",
+      "nanite_enabled": false,
+      "normal_import_method": "FBXNIM_ImportNormals",
+      "vertex_color_import_option": "Ignore"
+     },
+     "skeletal": {
+      "asset_import_data": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Meshes/SK_Medusa_Candidate.SK_Medusa_Candidate:FbxSkeletalMeshImportData_0",
+      "asset_import_data_class": "FbxSkeletalMeshImportData",
+      "factory": "FbxFactory",
+      "nanite_enabled": false,
+      "normal_import_method": "FBXNIM_ImportNormals",
+      "vertex_color_import_option": "Replace"
+     }
+    },
+    "instances": {
+     "base_instance": {
+      "TeamColor": null,
+      "parent": "/Game/UM/Materials/M_UM_BaseMarker",
+      "scalars": {
+       "SideBandWeight": 1.0,
+       "VertexMaskWeight": 0.0
+      },
+      "textures": {
+       "BaseColorTexture": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Textures/T_Medusa_Candidate_BC",
+       "NormalTexture": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Textures/T_Medusa_Candidate_N",
+       "ORMTexture": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Textures/T_Medusa_Candidate_ORM"
+      }
+     },
+     "figure_instance": {
+      "TeamColor": null,
+      "parent": "/Game/UM/Materials/M_UM_Figure",
+      "scalars": {
+       "TeamDye": 1.0,
+       "TeamDyeGain": 6.0
+      },
+      "textures": {
+       "BaseColorTexture": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Textures/T_Medusa_Candidate_BC",
+       "NormalTexture": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Textures/T_Medusa_Candidate_N",
+       "ORMTexture": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Textures/T_Medusa_Candidate_ORM",
+       "TeamMaskTexture": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Textures/T_Medusa_Candidate_TeamMask"
+      }
+     },
+     "team:base:Gold": {
+      "TeamColor": [
+       0.806952,
+       0.527115,
+       0.144128,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Materials/MI_Medusa_Base_Candidate",
+      "scalars": {},
+      "textures": {}
+     },
+     "team:base:Silver": {
+      "TeamColor": [
+       0.346704,
+       0.539479,
+       0.686685,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Materials/MI_Medusa_Base_Candidate",
+      "scalars": {},
+      "textures": {}
+     },
+     "team:figure:Gold": {
+      "TeamColor": [
+       0.806952,
+       0.527115,
+       0.144128,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Materials/MI_Medusa_Candidate",
+      "scalars": {},
+      "textures": {}
+     },
+     "team:figure:Silver": {
+      "TeamColor": [
+       0.346704,
+       0.539479,
+       0.686685,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/Medusa/20260929-w4b-um-master/Materials/MI_Medusa_Candidate",
+      "scalars": {},
+      "textures": {}
+     }
+    },
+    "status": "technically_imported",
+    "texture_inputs": {
+     "textures/T_Medusa_Candidate_Atlas_BC.png": "6b5fd7649a73",
+     "textures/T_Medusa_Candidate_Atlas_N.png": "8ad31dda8480",
+     "textures/T_Medusa_Candidate_Atlas_N_OpenGL.png": "f893bbae9148",
+     "textures/T_Medusa_Candidate_Atlas_ORM.png": "da7250fb0918",
+     "textures/T_Medusa_Candidate_Atlas_TeamMask.png": "6578fa0c28e6"
+    }
+   },
+   "ue_import_log_first_pass": [
+    "ue-import executed",
+    "import rc=0",
+    "ue-import skipped",
+    "repeat rc=0",
+    "ue-import executed",
+    "force rc=0",
+    "ue-import skipped",
+    "repeat2 rc=0"
+   ],
+   "ue_import_log_refix": [
+    "ue-import executed",
+    "import rc=0",
+    "ue-import skipped",
+    "repeat rc=0"
+   ]
+  },
+  "ASSET-MERLIN-001": {
+   "ao_bake": {
+    "blender": "5.2.2 LTS",
+    "distance_m": 0.078354,
+    "distance_rel": 0.08,
+    "engine": "CYCLES CPU",
+    "flipped_before_bake": [
+     "tripo_part_6",
+     "tripo_part_7"
+    ],
+    "height_m": 0.97942,
+    "occluders_excluded": [],
+    "samples": 128,
+    "seed": 0
+   },
+   "ao_gate": {
+    "mean": 193.01,
+    "occluded_fraction": 0.6078,
+    "p1": 8.0,
+    "p99": 255.0,
+    "passed": true
+   },
+   "ao_orientation_gate": {
+    "expected": "inward_area_fraction <= 0.02 for every baked cell",
+    "max_inward_area_fraction": 0.0008,
+    "passed": true,
+    "per_face_reference_flipped": {}
+   },
+   "changed_since_first_w4b_pass": {
+    "textures/T_Merlin_Candidate_Atlas_TeamMask.png": [
+     "94e6dcf97837",
+     "7135a816f37f"
+    ]
+   },
+   "cli_log_refix": [
+    "preflight executed",
+    "import    skipped",
+    "verify    skipped",
+    "atlas     executed",
+    "build     executed",
+    "ue-import not-run (needs --backend mcp)",
+    "run rc=0",
+    "preflight revalidated",
+    "import    skipped",
+    "verify    skipped",
+    "atlas     skipped",
+    "build     skipped",
+    "ue-import not-run (needs --backend mcp)",
+    "second run rc=0"
+   ],
+   "outputs_equal_to_20260928_cli_um_fbx_v1": {
+    "export/SK_Merlin_Candidate.fbx": true,
+    "export/SM_Merlin_Base_Candidate.fbx": true,
+    "textures/T_Merlin_Candidate_Atlas_BC.png": true,
+    "textures/T_Merlin_Candidate_Atlas_N.png": true,
+    "textures/T_Merlin_Candidate_Atlas_N_OpenGL.png": true,
+    "textures/T_Merlin_Candidate_Atlas_ORM.png": false,
+    "textures/T_Merlin_Candidate_Atlas_TeamMask.png": false
+   },
+   "outputs_equal_to_first_w4b_pass": {
+    "export/SK_Merlin_Candidate.fbx": true,
+    "export/SM_Merlin_Base_Candidate.fbx": true,
+    "textures/T_Merlin_Candidate_Atlas_BC.png": true,
+    "textures/T_Merlin_Candidate_Atlas_N.png": true,
+    "textures/T_Merlin_Candidate_Atlas_N_OpenGL.png": true,
+    "textures/T_Merlin_Candidate_Atlas_ORM.png": true,
+    "textures/T_Merlin_Candidate_Atlas_TeamMask.png": false
+   },
+   "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-um-fbx-v1-um-master.json",
+   "stages": {
+    "atlas": "completed",
+    "build": "completed",
+    "import": "completed",
+    "preflight": "completed",
+    "ue-import": "completed",
+    "verify": "completed"
+   },
+   "team_mask": {
+    "coverage": {
+     "tripo_part_0": 0.74497,
+     "tripo_part_2": 0.59352,
+     "tripo_part_4": 0.95151,
+     "tripo_part_5": 0.97762
+    },
+    "method": "hsv-band-cells",
+    "rule": {
+     "cells": [
+      "tripo_part_0",
+      "tripo_part_2",
+      "tripo_part_4",
+      "tripo_part_5"
+     ],
+     "hue_deg": [
+      205.0,
+      250.0
+     ],
+     "hue_ramp_deg": 6.0,
+     "ramp": 0.05,
+     "s_min": 0.12
+    }
+   },
+   "ue_import": {
+    "checks_passed": "22/22",
+    "failed_checks": [],
+    "import_contract": {
+     "base": {
+      "asset_import_data": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Meshes/SM_Merlin_Base_Candidate.SM_Merlin_Base_Candidate:FbxStaticMeshImportData_0",
+      "asset_import_data_class": "FbxStaticMeshImportData",
+      "factory": "FbxFactory",
+      "nanite_enabled": false,
+      "normal_import_method": "FBXNIM_ImportNormals",
+      "vertex_color_import_option": "Ignore"
+     },
+     "skeletal": {
+      "asset_import_data": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Meshes/SK_Merlin_Candidate.SK_Merlin_Candidate:FbxSkeletalMeshImportData_0",
+      "asset_import_data_class": "FbxSkeletalMeshImportData",
+      "factory": "FbxFactory",
+      "nanite_enabled": false,
+      "normal_import_method": "FBXNIM_ImportNormals",
+      "vertex_color_import_option": "Replace"
+     }
+    },
+    "instances": {
+     "base_instance": {
+      "TeamColor": null,
+      "parent": "/Game/UM/Materials/M_UM_BaseMarker",
+      "scalars": {
+       "SideBandWeight": 1.0,
+       "VertexMaskWeight": 0.0
+      },
+      "textures": {
+       "BaseColorTexture": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Textures/T_Merlin_Candidate_BC",
+       "NormalTexture": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Textures/T_Merlin_Candidate_N",
+       "ORMTexture": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Textures/T_Merlin_Candidate_ORM"
+      }
+     },
+     "figure_instance": {
+      "TeamColor": null,
+      "parent": "/Game/UM/Materials/M_UM_Figure",
+      "scalars": {
+       "TeamDye": 1.0,
+       "TeamDyeGain": 5.5
+      },
+      "textures": {
+       "BaseColorTexture": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Textures/T_Merlin_Candidate_BC",
+       "NormalTexture": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Textures/T_Merlin_Candidate_N",
+       "ORMTexture": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Textures/T_Merlin_Candidate_ORM",
+       "TeamMaskTexture": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Textures/T_Merlin_Candidate_TeamMask"
+      }
+     },
+     "team:base:Gold": {
+      "TeamColor": [
+       0.806952,
+       0.527115,
+       0.144128,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Materials/MI_Merlin_Base_Candidate",
+      "scalars": {},
+      "textures": {}
+     },
+     "team:base:Silver": {
+      "TeamColor": [
+       0.346704,
+       0.539479,
+       0.686685,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Materials/MI_Merlin_Base_Candidate",
+      "scalars": {},
+      "textures": {}
+     },
+     "team:figure:Gold": {
+      "TeamColor": [
+       0.806952,
+       0.527115,
+       0.144128,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Materials/MI_Merlin_Candidate",
+      "scalars": {},
+      "textures": {}
+     },
+     "team:figure:Silver": {
+      "TeamColor": [
+       0.346704,
+       0.539479,
+       0.686685,
+       1.0
+      ],
+      "parent": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master/Materials/MI_Merlin_Candidate",
+      "scalars": {},
+      "textures": {}
+     }
+    },
+    "status": "technically_imported",
+    "texture_inputs": {
+     "textures/T_Merlin_Candidate_Atlas_BC.png": "2ff0e2c50fb1",
+     "textures/T_Merlin_Candidate_Atlas_N.png": "d73b43adefef",
+     "textures/T_Merlin_Candidate_Atlas_N_OpenGL.png": "fbe92d56417e",
+     "textures/T_Merlin_Candidate_Atlas_ORM.png": "c4f37e9cace8",
+     "textures/T_Merlin_Candidate_Atlas_TeamMask.png": "7135a816f37f"
+    }
+   },
+   "ue_import_log_first_pass": [
+    "ue-import executed",
+    "import rc=0",
+    "ue-import skipped",
+    "repeat rc=0",
+    "ue-import executed",
+    "force rc=0",
+    "ue-import skipped",
+    "repeat2 rc=0"
+   ],
+   "ue_import_log_refix": [
+    "ue-import executed",
+    "import rc=0",
+    "ue-import skipped",
+    "repeat rc=0"
+   ]
+  }
+ },
+ "commands": {
+  "first_pass": "tools/tripo-pipeline/tripo_pipeline.py 0.6.0 --backend headless: init, register-source x2, run, run; --backend mcp ue-import: import, repeat, --force, repeat (2026-09-29 06:30-07:10)",
+  "refix": "after the review fix (bake_ao.py per-face orientation + gate, Merlin robe mask): run, run (C:/tmp/w4b-refix/run_cli.sh), then --backend mcp ue-import, repeat (run_ue.sh); the changed atlas fingerprint (bake script and library) re-executes atlas, build and ue-import"
+ },
+ "run": "20260929-w4b-um-master",
+ "schema": "unmatched.w4b-cli-runs/2"
+}

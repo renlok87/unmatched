@@ -1,0 +1,718 @@
+{
+  "command": "build",
+  "default_textures": {
+    "BC": {
+      "action": "kept",
+      "asset": "/Game/UM/Materials/Textures/T_UM_Default_BC",
+      "dirty": false,
+      "file": "art/um-materials/textures/T_UM_Default_BC.png",
+      "file_sha256": "b68de61392c506377e0d673fa36e239a47b67e603bdcb9cbf61d4ddbcd9722ff",
+      "ok": true,
+      "properties": {
+        "CompressionSettings": "TC_Default",
+        "SRGB": true
+      }
+    },
+    "N": {
+      "action": "kept",
+      "asset": "/Game/UM/Materials/Textures/T_UM_Default_N",
+      "dirty": false,
+      "file": "art/um-materials/textures/T_UM_Default_N.png",
+      "file_sha256": "b38e316361e2f8999226c66d1541468e56bc3f60d8d8f259abb6eb2a78500be2",
+      "ok": true,
+      "properties": {
+        "CompressionSettings": "TC_Normalmap",
+        "SRGB": false
+      }
+    },
+    "ORM": {
+      "action": "kept",
+      "asset": "/Game/UM/Materials/Textures/T_UM_Default_ORM",
+      "dirty": false,
+      "file": "art/um-materials/textures/T_UM_Default_ORM.png",
+      "file_sha256": "99cd2821b7339ab07f99567e9970bf3df79934734c3867f92b59c1f474e4377f",
+      "ok": true,
+      "properties": {
+        "CompressionSettings": "TC_Masks",
+        "SRGB": false
+      }
+    },
+    "TeamMask": {
+      "action": "kept",
+      "asset": "/Game/UM/Materials/Textures/T_UM_Mask_White",
+      "dirty": false,
+      "file": "art/um-materials/textures/T_UM_Mask_White.png",
+      "file_sha256": "304293895c5b70ecb8f014efb4e7c9af0005eb29c301622da17e5e5d0a805a0f",
+      "ok": true,
+      "properties": {
+        "CompressionSettings": "TC_Grayscale",
+        "SRGB": false
+      }
+    },
+    "TeamMaskNone": {
+      "action": "kept",
+      "asset": "/Game/UM/Materials/Textures/T_UM_Mask_Black",
+      "dirty": false,
+      "file": "art/um-materials/textures/T_UM_Mask_Black.png",
+      "file_sha256": "d97ab539a604052336db6ca28f93c9810d24f154d68c5151506f31f9c496b5cf",
+      "ok": true,
+      "properties": {
+        "CompressionSettings": "TC_Grayscale",
+        "SRGB": false
+      }
+    }
+  },
+  "force": false,
+  "logic": "um-masters/1",
+  "masters": {
+    "base_marker": {
+      "action": "skipped: the editor graph already equals the plan (graph_signature 2892a04818bf)",
+      "previous_graph_signature": "2892a04818bfdbba41857c854d0efb69c82b2055ca913767358b68e6a6beaccf",
+      "verify": {
+        "asset": "/Game/UM/Materials/M_UM_BaseMarker",
+        "checks": {
+          "class_material": {
+            "expected": "Material",
+            "measured": "Material",
+            "passed": true
+          },
+          "custom_primitive_data_layout": {
+            "expected": {
+              "CPD_Fade": {
+                "ParameterName": "CPD_Fade",
+                "PrimitiveDataIndex": 11,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_FxFlash": {
+                "ParameterName": "CPD_FxFlash",
+                "PrimitiveDataIndex": 5,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_InstanceIndex": {
+                "ParameterName": "CPD_InstanceIndex",
+                "PrimitiveDataIndex": 4,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_RimIntensity": {
+                "ParameterName": "CPD_RimIntensity",
+                "PrimitiveDataIndex": 9,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_RimWidth": {
+                "ParameterName": "CPD_RimWidth",
+                "PrimitiveDataIndex": 10,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_TeamColor": {
+                "ParameterName": "CPD_TeamColor",
+                "PrimitiveDataIndex": 0,
+                "bUseCustomPrimitiveData": true
+              }
+            },
+            "measured": {
+              "CPD_Fade": {
+                "ParameterName": "CPD_Fade",
+                "PrimitiveDataIndex": 11,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_FxFlash": {
+                "ParameterName": "CPD_FxFlash",
+                "PrimitiveDataIndex": 5,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_InstanceIndex": {
+                "ParameterName": "CPD_InstanceIndex",
+                "PrimitiveDataIndex": 4,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_RimIntensity": {
+                "ParameterName": "CPD_RimIntensity",
+                "PrimitiveDataIndex": 9,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_RimWidth": {
+                "ParameterName": "CPD_RimWidth",
+                "PrimitiveDataIndex": 10,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_TeamColor": {
+                "ParameterName": "CPD_TeamColor",
+                "PrimitiveDataIndex": 0,
+                "bUseCustomPrimitiveData": true
+              }
+            },
+            "passed": true
+          },
+          "exists": {
+            "measured": "/Game/UM/Materials/M_UM_BaseMarker",
+            "passed": true
+          },
+          "expression_properties_match_plan": {
+            "measured": {},
+            "passed": true
+          },
+          "expressions_match_plan": {
+            "expected": 87,
+            "measured": {
+              "expressions": 87,
+              "extra_in_editor": [],
+              "unmatched_planned": []
+            },
+            "passed": true
+          },
+          "links_match_plan": {
+            "expected": 97,
+            "measured": {
+              "found": 97,
+              "missing": [],
+              "unexpected": []
+            },
+            "passed": true
+          },
+          "no_wpo_no_opacity": {
+            "measured": {
+              "MP_Opacity": null,
+              "MP_OpacityMask": null,
+              "MP_WorldPositionOffset": null
+            },
+            "passed": true
+          },
+          "outputs_match_plan": {
+            "expected": {
+              "MP_AmbientOcclusion": {
+                "expression": "t_orm",
+                "output": "R"
+              },
+              "MP_BaseColor": {
+                "expression": "base_final",
+                "output": ""
+              },
+              "MP_EmissiveColor": {
+                "expression": "emissive",
+                "output": ""
+              },
+              "MP_Metallic": {
+                "expression": "t_orm",
+                "output": "B"
+              },
+              "MP_Normal": {
+                "expression": "normal",
+                "output": ""
+              },
+              "MP_Roughness": {
+                "expression": "rough",
+                "output": ""
+              }
+            },
+            "measured": {
+              "MP_AmbientOcclusion": {
+                "expression": "t_orm",
+                "output": "R"
+              },
+              "MP_BaseColor": {
+                "expression": "base_final",
+                "output": ""
+              },
+              "MP_EmissiveColor": {
+                "expression": "emissive",
+                "output": ""
+              },
+              "MP_Metallic": {
+                "expression": "t_orm",
+                "output": "B"
+              },
+              "MP_Normal": {
+                "expression": "normal",
+                "output": ""
+              },
+              "MP_Roughness": {
+                "expression": "rough",
+                "output": ""
+              }
+            },
+            "passed": true
+          },
+          "parameters_present": {
+            "expected": [
+              "AOToBaseColor",
+              "BandKeepsTexture",
+              "BaseColor",
+              "BaseColorTexture",
+              "CPD_Fade",
+              "CPD_FxFlash",
+              "CPD_InstanceIndex",
+              "CPD_RimIntensity",
+              "CPD_RimWidth",
+              "CPD_TeamColor",
+              "EmissiveIntensity",
+              "InstanceIndex",
+              "NormalStrength",
+              "NormalTexture",
+              "ORMTexture",
+              "PipColor",
+              "PipEmissive",
+              "RimColor",
+              "RoughnessMax",
+              "RoughnessMin",
+              "Saturation",
+              "SideBandNormalZMax",
+              "SideBandWeight",
+              "TeamColor",
+              "ValueLift",
+              "VertexMaskWeight"
+            ],
+            "measured": {
+              "listed": [
+                "AOToBaseColor",
+                "BandKeepsTexture",
+                "BaseColor",
+                "BaseColorTexture",
+                "CPD_Fade",
+                "CPD_FxFlash",
+                "CPD_InstanceIndex",
+                "CPD_RimIntensity",
+                "CPD_RimWidth",
+                "CPD_TeamColor",
+                "EmissiveIntensity",
+                "InstanceIndex",
+                "NormalStrength",
+                "NormalTexture",
+                "ORMTexture",
+                "PipColor",
+                "PipEmissive",
+                "RimColor",
+                "RoughnessMax",
+                "RoughnessMin",
+                "Saturation",
+                "SideBandNormalZMax",
+                "SideBandWeight",
+                "TeamColor",
+                "ValueLift",
+                "VertexMaskWeight"
+              ],
+              "missing": []
+            },
+            "passed": true
+          },
+          "saved": {
+            "measured": {
+              "dirty": false
+            },
+            "passed": true
+          },
+          "settings_opaque_one_sided_usage": {
+            "expected": {
+              "BlendMode": "BLEND_Opaque",
+              "ShadingModel": "MSM_DefaultLit",
+              "TwoSided": false,
+              "bUsedWithInstancedStaticMeshes": true,
+              "bUsedWithSkeletalMesh": false
+            },
+            "measured": {
+              "BlendMode": "BLEND_Opaque",
+              "ShadingModel": "MSM_DefaultLit",
+              "TwoSided": false,
+              "bUsedWithInstancedStaticMeshes": true,
+              "bUsedWithSkeletalMesh": false
+            },
+            "passed": true
+          }
+        },
+        "graph_signature": "2892a04818bfdbba41857c854d0efb69c82b2055ca913767358b68e6a6beaccf",
+        "passed": true
+      }
+    },
+    "figure": {
+      "action": "skipped: the editor graph already equals the plan (graph_signature d49f75d3471a)",
+      "previous_graph_signature": "d49f75d3471ae82e04252d894c1372a8019004dcb456cbb26fc6dfde95a900f6",
+      "verify": {
+        "asset": "/Game/UM/Materials/M_UM_Figure",
+        "checks": {
+          "class_material": {
+            "expected": "Material",
+            "measured": "Material",
+            "passed": true
+          },
+          "custom_primitive_data_layout": {
+            "expected": {
+              "CPD_Fade": {
+                "ParameterName": "CPD_Fade",
+                "PrimitiveDataIndex": 11,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_FxFlash": {
+                "ParameterName": "CPD_FxFlash",
+                "PrimitiveDataIndex": 5,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_RimIntensity": {
+                "ParameterName": "CPD_RimIntensity",
+                "PrimitiveDataIndex": 9,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_RimWidth": {
+                "ParameterName": "CPD_RimWidth",
+                "PrimitiveDataIndex": 10,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_TeamColor": {
+                "ParameterName": "CPD_TeamColor",
+                "PrimitiveDataIndex": 0,
+                "bUseCustomPrimitiveData": true
+              }
+            },
+            "measured": {
+              "CPD_Fade": {
+                "ParameterName": "CPD_Fade",
+                "PrimitiveDataIndex": 11,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_FxFlash": {
+                "ParameterName": "CPD_FxFlash",
+                "PrimitiveDataIndex": 5,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_RimIntensity": {
+                "ParameterName": "CPD_RimIntensity",
+                "PrimitiveDataIndex": 9,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_RimWidth": {
+                "ParameterName": "CPD_RimWidth",
+                "PrimitiveDataIndex": 10,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_TeamColor": {
+                "ParameterName": "CPD_TeamColor",
+                "PrimitiveDataIndex": 0,
+                "bUseCustomPrimitiveData": true
+              }
+            },
+            "passed": true
+          },
+          "exists": {
+            "measured": "/Game/UM/Materials/M_UM_Figure",
+            "passed": true
+          },
+          "expression_properties_match_plan": {
+            "measured": {},
+            "passed": true
+          },
+          "expressions_match_plan": {
+            "expected": 48,
+            "measured": {
+              "expressions": 48,
+              "extra_in_editor": [],
+              "unmatched_planned": []
+            },
+            "passed": true
+          },
+          "links_match_plan": {
+            "expected": 51,
+            "measured": {
+              "found": 51,
+              "missing": [],
+              "unexpected": []
+            },
+            "passed": true
+          },
+          "no_wpo_no_opacity": {
+            "measured": {
+              "MP_Opacity": null,
+              "MP_OpacityMask": null,
+              "MP_WorldPositionOffset": null
+            },
+            "passed": true
+          },
+          "outputs_match_plan": {
+            "expected": {
+              "MP_AmbientOcclusion": {
+                "expression": "t_orm",
+                "output": "R"
+              },
+              "MP_BaseColor": {
+                "expression": "base_final",
+                "output": ""
+              },
+              "MP_EmissiveColor": {
+                "expression": "emissive",
+                "output": ""
+              },
+              "MP_Metallic": {
+                "expression": "t_orm",
+                "output": "B"
+              },
+              "MP_Normal": {
+                "expression": "normal",
+                "output": ""
+              },
+              "MP_Roughness": {
+                "expression": "rough",
+                "output": ""
+              }
+            },
+            "measured": {
+              "MP_AmbientOcclusion": {
+                "expression": "t_orm",
+                "output": "R"
+              },
+              "MP_BaseColor": {
+                "expression": "base_final",
+                "output": ""
+              },
+              "MP_EmissiveColor": {
+                "expression": "emissive",
+                "output": ""
+              },
+              "MP_Metallic": {
+                "expression": "t_orm",
+                "output": "B"
+              },
+              "MP_Normal": {
+                "expression": "normal",
+                "output": ""
+              },
+              "MP_Roughness": {
+                "expression": "rough",
+                "output": ""
+              }
+            },
+            "passed": true
+          },
+          "parameters_present": {
+            "expected": [
+              "AOToBaseColor",
+              "BaseColorTexture",
+              "CPD_Fade",
+              "CPD_FxFlash",
+              "CPD_RimIntensity",
+              "CPD_RimWidth",
+              "CPD_TeamColor",
+              "EmissiveIntensity",
+              "NormalStrength",
+              "NormalTexture",
+              "ORMTexture",
+              "RimColor",
+              "RoughnessMax",
+              "RoughnessMin",
+              "Saturation",
+              "TeamColor",
+              "TeamDye",
+              "TeamDyeGain",
+              "TeamMaskTexture",
+              "ValueLift"
+            ],
+            "measured": {
+              "listed": [
+                "AOToBaseColor",
+                "BaseColorTexture",
+                "CPD_Fade",
+                "CPD_FxFlash",
+                "CPD_RimIntensity",
+                "CPD_RimWidth",
+                "CPD_TeamColor",
+                "EmissiveIntensity",
+                "NormalStrength",
+                "NormalTexture",
+                "ORMTexture",
+                "RimColor",
+                "RoughnessMax",
+                "RoughnessMin",
+                "Saturation",
+                "TeamColor",
+                "TeamDye",
+                "TeamDyeGain",
+                "TeamMaskTexture",
+                "ValueLift"
+              ],
+              "missing": []
+            },
+            "passed": true
+          },
+          "saved": {
+            "measured": {
+              "dirty": false
+            },
+            "passed": true
+          },
+          "settings_opaque_one_sided_usage": {
+            "expected": {
+              "BlendMode": "BLEND_Opaque",
+              "ShadingModel": "MSM_DefaultLit",
+              "TwoSided": false,
+              "bUsedWithInstancedStaticMeshes": true,
+              "bUsedWithSkeletalMesh": true
+            },
+            "measured": {
+              "BlendMode": "BLEND_Opaque",
+              "ShadingModel": "MSM_DefaultLit",
+              "TwoSided": false,
+              "bUsedWithInstancedStaticMeshes": true,
+              "bUsedWithSkeletalMesh": true
+            },
+            "passed": true
+          }
+        },
+        "graph_signature": "d49f75d3471ae82e04252d894c1372a8019004dcb456cbb26fc6dfde95a900f6",
+        "passed": true
+      }
+    },
+    "game_layer": {
+      "action": "skipped: the editor graph already equals the plan (graph_signature 1f0cd35d0a98)",
+      "previous_graph_signature": "1f0cd35d0a98de19b6386ddcba9b8f891e4309d459b14d23c36426ef7126fc40",
+      "verify": {
+        "asset": "/Game/UM/Materials/M_UM_GameLayer",
+        "checks": {
+          "class_material": {
+            "expected": "Material",
+            "measured": "Material",
+            "passed": true
+          },
+          "custom_primitive_data_layout": {
+            "expected": {
+              "CPD_Fade": {
+                "ParameterName": "CPD_Fade",
+                "PrimitiveDataIndex": 11,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_FxFlash": {
+                "ParameterName": "CPD_FxFlash",
+                "PrimitiveDataIndex": 5,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_TeamColor": {
+                "ParameterName": "CPD_TeamColor",
+                "PrimitiveDataIndex": 0,
+                "bUseCustomPrimitiveData": true
+              }
+            },
+            "measured": {
+              "CPD_Fade": {
+                "ParameterName": "CPD_Fade",
+                "PrimitiveDataIndex": 11,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_FxFlash": {
+                "ParameterName": "CPD_FxFlash",
+                "PrimitiveDataIndex": 5,
+                "bUseCustomPrimitiveData": true
+              },
+              "CPD_TeamColor": {
+                "ParameterName": "CPD_TeamColor",
+                "PrimitiveDataIndex": 0,
+                "bUseCustomPrimitiveData": true
+              }
+            },
+            "passed": true
+          },
+          "exists": {
+            "measured": "/Game/UM/Materials/M_UM_GameLayer",
+            "passed": true
+          },
+          "expression_properties_match_plan": {
+            "measured": {},
+            "passed": true
+          },
+          "expressions_match_plan": {
+            "expected": 16,
+            "measured": {
+              "expressions": 16,
+              "extra_in_editor": [],
+              "unmatched_planned": []
+            },
+            "passed": true
+          },
+          "links_match_plan": {
+            "expected": 17,
+            "measured": {
+              "found": 17,
+              "missing": [],
+              "unexpected": []
+            },
+            "passed": true
+          },
+          "no_wpo_no_opacity": {
+            "measured": {
+              "MP_Opacity": null,
+              "MP_OpacityMask": null,
+              "MP_WorldPositionOffset": null
+            },
+            "passed": true
+          },
+          "outputs_match_plan": {
+            "expected": {
+              "MP_EmissiveColor": {
+                "expression": "eai",
+                "output": ""
+              }
+            },
+            "measured": {
+              "MP_EmissiveColor": {
+                "expression": "eai",
+                "output": ""
+              }
+            },
+            "passed": true
+          },
+          "parameters_present": {
+            "expected": [
+              "CPD_Fade",
+              "CPD_FxFlash",
+              "CPD_TeamColor",
+              "EmissiveIntensity",
+              "ExposureCompensationAlpha",
+              "LayerColor",
+              "TeamColor",
+              "UseTeamColor"
+            ],
+            "measured": {
+              "listed": [
+                "CPD_Fade",
+                "CPD_FxFlash",
+                "CPD_TeamColor",
+                "EmissiveIntensity",
+                "ExposureCompensationAlpha",
+                "LayerColor",
+                "TeamColor",
+                "UseTeamColor"
+              ],
+              "missing": []
+            },
+            "passed": true
+          },
+          "saved": {
+            "measured": {
+              "dirty": false
+            },
+            "passed": true
+          },
+          "settings_opaque_one_sided_usage": {
+            "expected": {
+              "BlendMode": "BLEND_Opaque",
+              "ShadingModel": "MSM_Unlit",
+              "TwoSided": false,
+              "bUsedWithInstancedStaticMeshes": true,
+              "bUsedWithSkeletalMesh": false
+            },
+            "measured": {
+              "BlendMode": "BLEND_Opaque",
+              "ShadingModel": "MSM_Unlit",
+              "TwoSided": false,
+              "bUsedWithInstancedStaticMeshes": true,
+              "bUsedWithSkeletalMesh": false
+            },
+            "passed": true
+          }
+        },
+        "graph_signature": "1f0cd35d0a98de19b6386ddcba9b8f891e4309d459b14d23c36426ef7126fc40",
+        "passed": true
+      }
+    }
+  },
+  "passed": true,
+  "schema": "unmatched.um-masters-report/1",
+  "spec": "art/um-materials/um-masters.json",
+  "spec_sha256": "789eef60250269f02c1ce9619ff3844c6427c0f36e695b7e0c5223445d1c8a2d",
+  "status_legend": "masters: технически импортировано at most; knobs and palette: предложено",
+  "tool_name_style": "short"
+}

@@ -147,6 +147,18 @@
       "paths": [
         {"path": "docs/game-design/evidence/S04/board-contract.json", "root": "repo", "kind": "file", "expect": "exists", "role": "board contract", "sha256": "98e05a492321036cbb87c1af8ca788daa85a3df82fe174f3e39b54ed441d4336"}
       ]
+    },
+    {
+      "id": "UM-MASTERS",
+      "note": "Мастер-материалы волны 4 (W4-B, меморандум engine-gate §1 п. 4): M_UM_Figure / M_UM_BaseMarker / M_UM_GameLayer, строятся и проверяются `tools/tripo-pipeline/um_masters.py` (граф = граф кандидатов при нейтральных ручках; CPD 0–3 TeamColor, 4 InstanceIndex, 5–8 FxFlash, 9–10 Rim, 11 Fade; hex → FromSRGBColor; без Masked/WPO). Статус — технически импортировано; ручки и палитра — предложено. .uasset в Content (gitignored) добавлены принудительно. Для кандидатов пайплайна заменяет M-DIORAMA-MASTER (S05 не трогается).",
+      "paths": [
+        {"path": "art/um-materials/um-masters.json", "root": "repo", "kind": "file", "expect": "exists", "role": "спецификация мастеров (параметры, CPD, палитра С-11 и предложение)", "sha256": "789eef60250269f02c1ce9619ff3844c6427c0f36e695b7e0c5223445d1c8a2d"},
+        {"path": "tools/tripo-pipeline/um_masters.py", "root": "repo", "kind": "file", "expect": "exists", "role": "build/verify мастеров через MCP"},
+        {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/um-masters-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт build/verify: 3 × PASS, graph_signature"},
+        {"path": "/Game/UM/Materials/M_UM_Figure", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "мастер фигур"},
+        {"path": "/Game/UM/Materials/M_UM_BaseMarker", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "мастер подставок"},
+        {"path": "/Game/UM/Materials/M_UM_GameLayer", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "мастер игрового слоя (unlit, EyeAdaptationInverse)"}
+      ]
     }
   ],
   "excludedFromRegistry": [
@@ -394,6 +406,35 @@
             {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/base-seethrough.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сквозные дыры верха подставок (headless Blender): Medusa T4 — FAIL"}
           ],
           "note": "Редакторные кадры (editor-mcp-viewport) контрольного уровня /Game/ArtTests/P17ControlScene/L_P17ControlScene (локальный, пересоздаётся tools/tripo-pipeline/review/control_scene.py). Статика — T4UmFbxV1 (UM_FBX_v1, лицо +X, байты FBX = CLI-прогон 20260928-cli-um-fbx-v1); Lunge 0–100 % на T4LocalPass: кость 0 и root неподвижны, Weapon у hand_L 2,4372 uu. Находка (ревью T3.1, 2026-09-29): верх подставки T4 (T4UmFbxV1 и T4LocalPass, один меш) сквозной у стоп — дыры-следы 54,8 uu² без фигуры, с фигурой до 27,6 uu² видно в кадрах K2 1,6x/5x и Lunge (model-checklist base_see_through: FAIL); исправление сборки подставки — арт-трек. Не K1/K2-приёмка, не художественная приёмка."
+        },
+        {
+          "layer": "pipeline-candidate CLI 0.6.0 20260929-w4b-um-master (AO в ORM.R, TeamMask одежды, W4-B)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal-um-fbx-v1-um-master.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль /3: /2 + atlas.ao_bake + team_color.mask + ue.material_route um-master (ключи сборки те же)"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-w4b-um-master/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest: preflight/import/verify/atlas/build completed (tool 0.6.0, headless); второй прогон — все стадии skipped"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-w4b-um-master/export/SK_Medusa_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "скелетный FBX; байт в байт = 20260928-cli-um-fbx-v1", "sha256": "35809386bff7716ab8c354970d0683a45ff1f055a2679fd1144d01ccbef47625"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-w4b-um-master/export/SM_Medusa_Base_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "подставка; байт в байт = 20260928-cli-um-fbx-v1", "sha256": "de5ebcac44b23b5335a3a7b7802420802c3738f8958fab104fa0b044d87a0983"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-w4b-um-master/textures", "root": "repo", "kind": "file", "expect": "exists", "role": "атлас: BC/N/N_OpenGL байт в байт = 20260928-cli-um-fbx-v1; ORM с AO в R; TeamMask"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-w4b-um-master/reports/atlas-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "atlas report: гейты orm_occlusion_baked_not_constant и ao_bake_parts_face_outward, покрытие TeamMask"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-w4b-um-master/reports/ao-bake-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "AO bake (Cycles CPU, 128 samples, 0,08 × высоты): хеш каждой части"}
+          ],
+          "note": "W4-B: сборка по профилю /3; FBX и BC/N — те же байты, что у 20260928-cli-um-fbx-v1, ORM.R = запечённый AO; маска: платье tripo_part_0 (hsv-band-cells, v ≤ 0,3, s ≤ 0,4), TeamDye 1 / gain 6; подставка — полоса команды на боковой стенке. Маска и dye — предложено (AD-CNF-58 = b, решение пользователя 2026-09-28)."
+        },
+        {
+          "layer": "ue-editor-import CLI ue-candidate/7 20260929-w4b-um-master (MI от M_UM_Figure / M_UM_BaseMarker, W4-B)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-w4b-um-master/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported; um_masters_current, um_instances_parent_textures_values, import_legacy_fbx_factory, normal_import_method, nanite_disabled"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-w4b-um-master/reports/ue-mcp-calls.json", "root": "repo", "kind": "file", "expect": "exists", "role": "стенограмма вызовов MCP стадии ue-import"},
+            {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "акт W4-B: мастера, маршрут um-master, TeamColor в сером и при deuteranopia до/после"},
+            {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/team-contrast.json", "root": "repo", "kind": "file", "expect": "exists", "role": "различимость команд в сером и при deuteranopia, K2 1,6×, до/после"}
+          ],
+          "note": "UE: /Game/PipelineCandidates/Medusa/20260929-w4b-um-master (MI фигуры и подставки + 4 командные MI, без своего Material) — в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import`; import / повтор skipped / --force / skipped без Name_1. Кадры контрольной сцены P1.7 — editor-mcp-viewport, диагностика, не K1/K2-приёмка."
         }
       ],
       "manifest06": {
@@ -544,6 +585,35 @@
             {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/hero-ue-import-idempotency.json", "root": "repo", "kind": "file", "expect": "exists", "role": "executed / skipped / --force / skipped по каждому герою"}
           ],
           "note": "UE: /Game/PipelineCandidates/KingArthur/20260928-cli-um-fbx-v1 (10 uasset) — только в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import` (логика ue-candidate/6). Все проверки CLI прошли; повтор skipped, --force без Name_1; сокеты Head/Weapon в живом UE совпали с целями build (не больше 0,0006 uu). Кадры контрольной сцены P1.7 — редакторные (editor-mcp-viewport): диагностика, не K1/K2-приёмка, не художественная приёмка, не бюджет."
+        },
+        {
+          "layer": "pipeline-candidate CLI 0.6.0 20260929-w4b-um-master (AO в ORM.R, TeamMask одежды, W4-B)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-segmented-skeletal-um-fbx-v1-um-master.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль /3: /2 + atlas.ao_bake + team_color.mask + ue.material_route um-master (ключи сборки те же)"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-w4b-um-master/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest: preflight/import/verify/atlas/build completed (tool 0.6.0, headless); второй прогон — все стадии skipped"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-w4b-um-master/export/SK_KingArthur_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "скелетный FBX; байт в байт = 20260928-cli-um-fbx-v1", "sha256": "49ef62582ca77efe9787fb9501ee675f3f8646ad38df702ee220c83bf2dab6b0"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-w4b-um-master/export/SM_KingArthur_Base_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "подставка; байт в байт = 20260928-cli-um-fbx-v1", "sha256": "40cd709b4fa6416a2934086324bc7b96a1746d137595d5941e745d338fbc9c52"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-w4b-um-master/textures", "root": "repo", "kind": "file", "expect": "exists", "role": "атлас: BC/N/N_OpenGL байт в байт = 20260928-cli-um-fbx-v1; ORM с AO в R; TeamMask"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-w4b-um-master/reports/atlas-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "atlas report: гейты orm_occlusion_baked_not_constant и ao_bake_parts_face_outward, покрытие TeamMask"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-w4b-um-master/reports/ao-bake-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "AO bake (Cycles CPU, 128 samples, 0,08 × высоты): хеш каждой части"}
+          ],
+          "note": "W4-B: сборка по профилю /3; FBX и BC/N — те же байты, что у 20260928-cli-um-fbx-v1, ORM.R = запечённый AO; маска T3.3 (красная ткань) байт в байт; multiply; подставка — полоса команды на боковой стенке. Маска и dye — предложено (AD-CNF-58 = b, решение пользователя 2026-09-28)."
+        },
+        {
+          "layer": "ue-editor-import CLI ue-candidate/7 20260929-w4b-um-master (MI от M_UM_Figure / M_UM_BaseMarker, W4-B)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-w4b-um-master/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported; um_masters_current, um_instances_parent_textures_values, import_legacy_fbx_factory, normal_import_method, nanite_disabled"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-w4b-um-master/reports/ue-mcp-calls.json", "root": "repo", "kind": "file", "expect": "exists", "role": "стенограмма вызовов MCP стадии ue-import"},
+            {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "акт W4-B: мастера, маршрут um-master, TeamColor в сером и при deuteranopia до/после"},
+            {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/team-contrast.json", "root": "repo", "kind": "file", "expect": "exists", "role": "различимость команд в сером и при deuteranopia, K2 1,6×, до/после"}
+          ],
+          "note": "UE: /Game/PipelineCandidates/KingArthur/20260929-w4b-um-master (MI фигуры и подставки + 4 командные MI, без своего Material) — в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import`; import / повтор skipped / --force / skipped без Name_1. Кадры контрольной сцены P1.7 — editor-mcp-viewport, диагностика, не K1/K2-приёмка."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения по статусу; путь /Game/Meshes/SK/SK_KingArthur — плановый.", "proposedChange": "Нет."},
@@ -673,6 +743,36 @@
             {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/hero-ue-import-idempotency.json", "root": "repo", "kind": "file", "expect": "exists", "role": "executed / skipped / --force / skipped по каждому герою"}
           ],
           "note": "UE: /Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1 (10 uasset) — только в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import` (логика ue-candidate/6). Все проверки CLI прошли; повтор skipped, --force без Name_1; сокеты Head/Weapon в живом UE совпали с целями build (не больше 0,0006 uu). Кадры контрольной сцены P1.7 — редакторные (editor-mcp-viewport): диагностика, не K1/K2-приёмка, не художественная приёмка, не бюджет. Подставка (ревью T3.1, 2026-09-29): в меше дыры-следы 44,4 uu² под мантией; с фигурой видно 0,01 uu² с камеры сцены и до 0,43 uu² сбоку (щели по краю подола) — выше порога-предложения 0,1 uu², скрытый дефект для арт-трека (evidence p17 base-seethrough.json)."
+        },
+        {
+          "layer": "pipeline-candidate CLI 0.6.0 20260929-w4b-um-master (AO в ORM.R, TeamMask одежды, W4-B)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-um-fbx-v1-um-master.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль /3: /2 + atlas.ao_bake + team_color.mask + ue.material_route um-master (ключи сборки те же)"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-w4b-um-master/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest: preflight/import/verify/atlas/build completed (tool 0.6.0, headless); второй прогон — все стадии skipped"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-w4b-um-master/export/SK_Merlin_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "скелетный FBX; байт в байт = 20260928-cli-um-fbx-v1", "sha256": "8e312d9cda3888be70de381cc2b5e132afc2c6cde37eae8795f3ebf5fcfe790d"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-w4b-um-master/export/SM_Merlin_Base_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "подставка; байт в байт = 20260928-cli-um-fbx-v1", "sha256": "bf5c3db2dce7a299e0af53b2bbe2aea7c60d12dee45912c65ffbe47d8dea760f"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-w4b-um-master/textures", "root": "repo", "kind": "file", "expect": "exists", "role": "атлас: BC/N/N_OpenGL байт в байт = 20260928-cli-um-fbx-v1; ORM с AO в R; TeamMask"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-w4b-um-master/textures/T_Merlin_Candidate_Atlas_TeamMask.png", "root": "repo", "kind": "file", "expect": "exists", "role": "маска одежды после исправления ревью W4-B: синяя мантия, капюшон и рукава (hsv-band-cells, покрытие ячеек 75 / 59 / 95 / 98 %); маска T3.3 (бронзовая отделка, sha 94e6dcf9…) заменена", "sha256": "7135a816f37f3539c7773ce57e0dc89e600594eb884dc5f43b00af89ee2dad77"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-w4b-um-master/reports/atlas-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "atlas report: гейты orm_occlusion_baked_not_constant и ao_bake_parts_face_outward, покрытие TeamMask"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-w4b-um-master/reports/ao-bake-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "AO bake (Cycles CPU, 128 samples, 0,08 × высоты): хеш каждой части"}
+          ],
+          "note": "W4-B: сборка по профилю /3; FBX и BC/N — те же байты, что у 20260928-cli-um-fbx-v1, ORM.R = запечённый AO; маска одежды — синяя мантия, капюшон и рукава (hsv-band-cells; исправление ревью W4-B: маска T3.3 покрывала только бронзовую отделку, 8,5 % ячейки мантии), краситель TeamDye 1 / gain 5,5; подставка — полоса команды на боковой стенке. Маска и dye — предложено (AD-CNF-58 = b, решение пользователя 2026-09-28)."
+        },
+        {
+          "layer": "ue-editor-import CLI ue-candidate/7 20260929-w4b-um-master (MI от M_UM_Figure / M_UM_BaseMarker, W4-B)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-w4b-um-master/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported; um_masters_current, um_instances_parent_textures_values, import_legacy_fbx_factory, normal_import_method, nanite_disabled"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-w4b-um-master/reports/ue-mcp-calls.json", "root": "repo", "kind": "file", "expect": "exists", "role": "стенограмма вызовов MCP стадии ue-import"},
+            {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "акт W4-B: мастера, маршрут um-master, TeamColor в сером и при deuteranopia до/после"},
+            {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/team-contrast.json", "root": "repo", "kind": "file", "expect": "exists", "role": "различимость команд в сером и при deuteranopia, K2 1,6×, до/после"}
+          ],
+          "note": "UE: /Game/PipelineCandidates/Merlin/20260929-w4b-um-master (MI фигуры и подставки + 4 командные MI, без своего Material) — в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import`; import / повтор skipped / --force / skipped без Name_1. Кадры контрольной сцены P1.7 — editor-mcp-viewport, диагностика, не K1/K2-приёмка."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения.", "proposedChange": "Нет."},
@@ -778,6 +878,37 @@
             {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/hero-ue-import-idempotency.json", "root": "repo", "kind": "file", "expect": "exists", "role": "executed / skipped / --force / skipped по каждому герою"}
           ],
           "note": "UE: /Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1 (10 uasset) — только в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import` (логика ue-candidate/6). Все проверки CLI прошли; повтор skipped, --force без Name_1; сокеты Head/Weapon в живом UE совпали с целями build (не больше 0,0006 uu). Кадры контрольной сцены P1.7 — редакторные (editor-mcp-viewport): диагностика, не K1/K2-приёмка, не художественная приёмка, не бюджет. Подставка vertex-mask импортирована с вершинными цветами (до исправления рисовалась целиком «горящей»); три экземпляра — MI /Game/ArtTests/P17ControlScene/Materials/MI_P17_Harpy_Base_H{1,2,3}; метки различимы на 5x, не на K1."
+        },
+        {
+          "layer": "pipeline-candidate CLI 0.6.0 20260929-w4b-um-master (AO в ORM.R, TeamMask одежды, W4-B)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-segmented-skeletal-um-fbx-v1-um-master.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль /3: /2 + atlas.ao_bake + team_color.mask + ue.material_route um-master (ключи сборки те же)"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-w4b-um-master/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest: preflight/import/verify/atlas/build completed (tool 0.6.0, headless); второй прогон — все стадии skipped"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-w4b-um-master/export/SK_Harpy_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "скелетный FBX; байт в байт = 20260928-cli-um-fbx-v1", "sha256": "92a8632dc12456e63a745452a71e8e8d98b9c7b5ba88b4d7eaf01848882f36d1"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-w4b-um-master/export/SM_Harpy_Base_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "подставка; байт в байт = 20260928-cli-um-fbx-v1", "sha256": "5ecae266dc2d824754ea78724236a4ef0a652f42805a64642610382e34738a71"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-w4b-um-master/textures", "root": "repo", "kind": "file", "expect": "exists", "role": "атлас: BC/N/N_OpenGL байт в байт = 20260928-cli-um-fbx-v1; ORM с AO в R; TeamMask"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-w4b-um-master/textures/T_Harpy_Candidate_Atlas_ORM.png", "root": "repo", "kind": "file", "expect": "exists", "role": "ORM после исправления ревью W4-B: голова tripo_part_2 запечена с той же пограничной ориентацией, что в build (1 506 граней перевёрнуты по эталону); прежний ORM f28a2603… (40 % площади головы запечено «внутрь») не коммитился", "sha256": "2f397561dc04209dfd3ca1358c2995dd0a5f224b16606a5beacdb6db5f6c1441"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-w4b-um-master/reports/atlas-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "atlas report: гейты orm_occlusion_baked_not_constant и ao_bake_parts_face_outward, покрытие TeamMask"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-w4b-um-master/reports/ao-bake-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "AO bake (Cycles CPU, 128 samples, 0,08 × высоты): хеш каждой части, per_face_reference_fix, orientation_after_flips"},
+            {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/harpy-head-ao-faces.json", "root": "repo", "kind": "file", "expect": "exists", "role": "AO головы по классам граней до/после исправления (грани «внутрь»: 0,51 → 0,82, доля < 0,25: 26 % → 1,5 %)"}
+          ],
+          "note": "W4-B: сборка по профилю /3; FBX и BC/N — те же байты, что у 20260928-cli-um-fbx-v1, ORM.R = запечённый AO (исправление ревью: запекание повторяет пограничную ориентацию build для головы со смешанной намоткой; гейт ao_bake_parts_face_outward); ткани нет: маска — тёмные маховые перья крыльев (hsv-band-cells, v ≤ 0,22), TeamDye 1 / gain 6; номер — вершинная маска подставки + InstanceIndex / CPD 4. Маска и dye — предложено (AD-CNF-58 = b, решение пользователя 2026-09-28)."
+        },
+        {
+          "layer": "ue-editor-import CLI ue-candidate/7 20260929-w4b-um-master (MI от M_UM_Figure / M_UM_BaseMarker, W4-B)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-w4b-um-master/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported; um_masters_current, um_instances_parent_textures_values, import_legacy_fbx_factory, normal_import_method, nanite_disabled"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-w4b-um-master/reports/ue-mcp-calls.json", "root": "repo", "kind": "file", "expect": "exists", "role": "стенограмма вызовов MCP стадии ue-import"},
+            {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "акт W4-B: мастера, маршрут um-master, TeamColor в сером и при deuteranopia до/после"},
+            {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/team-contrast.json", "root": "repo", "kind": "file", "expect": "exists", "role": "различимость команд в сером и при deuteranopia, K2 1,6×, до/после"}
+          ],
+          "note": "UE: /Game/PipelineCandidates/Harpy/20260929-w4b-um-master (MI фигуры и подставки + 4 командные MI, без своего Material) — в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import`; import / повтор skipped / --force / skipped без Name_1. Кадры контрольной сцены P1.7 — editor-mcp-viewport, диагностика, не K1/K2-приёмка."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения.", "proposedChange": "Нет."},
@@ -1132,6 +1263,19 @@
             {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/repro/executor-log.md", "root": "repo", "kind": "file", "expect": "exists", "role": "журнал трёх итераций исполнителя (финальная — 0 отступлений)"}
           ],
           "note": "Сухой повтор инструкции ADDING-AN-ASSET.md без Tripo (0 кредитов). UE: /Game/PipelineCandidates/DecorBarrel/20260928-p17-repro/{Candidate,Passthrough} — только локальный Content. Кадры бочки в контрольной сцене P1.7 (редакторные): K1, K2 1,6x и 5x. Не художественная приёмка."
+        },
+        {
+          "layer": "ue-editor-import static-candidate 20260929-w4b-um-master на M_UM_Figure (W4-B)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/build-profiles/decor-barrel-static-um-fbx-v1-um-master.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль /2: shared_master = /Game/UM/Materials/M_UM_Figure (кандидат 20260928-p15-barrel тот же)"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260929-w4b-um-master/ue-candidate/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest: preflight/adopt/ue-import completed (tool 0.6.0)"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260929-w4b-um-master/ue-candidate/reports/adopt-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "adopt: байты кандидата p15 сверены"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260929-w4b-um-master/ue-candidate/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: MI от M_UM_Figure, shared_master_parameters_current, nanite_disabled, normal_import_method_read_back"}
+          ],
+          "note": "UE: /Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate (MI от M_UM_Figure, TeamColor белый — декор не командный), локальный Content (gitignored)."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "06 предлагает один SM_Decor.fbx, 04 — файл на объект (AD-CNF-19).", "proposedChange": "Нет; для кандидатов пайплайна — файл на объект."},

@@ -25,6 +25,18 @@ Profile options (tool 0.5.0; absent = the 0.4.0 behaviour, byte-identical output
                          cells, Gaussian blur blur_sigma_px, limited to the cells (King Arthur red cloth)
       hsv-smooth-box     smoothstep ramps on hue_deg [lo, hi] (hue_ramp_deg), s_min and v_min (ramp) inside the
                          inner rect of the listed cells, 3x3 box blur (Merlin bronze trim)
+      hsv-band-cells     (0.6.0) inside the inner rect of the listed cells: product of optional smooth bands
+                         hue_deg [lo, hi] (hue_ramp_deg), s_min / s_max and v_min / v_max (ramp), 3x3 box blur
+                         (Medusa dress: the dark cloth of the body cell without its bronze flecks; Harpy: the dark
+                         primary feathers of the wing cells)
+  atlas.ao_bake {...}                  (0.6.0) ORM.R = ambient occlusion baked by Cycles per part (blender/bake_ao.py, run
+                                      by the CLI before this script; params "ao": {"dir", "report"}); the ORM tile of a
+                                      part is then built at the AO size (= the part's BC size) and the constant-fill
+                                      check becomes the gate orm_occlusion_baked_not_constant (range p1..p99 and the
+                                      share of occluded texels inside the cells, thresholds atlas.ao_bake.gate) plus
+                                      ao_bake_parts_face_outward (every baked cell: inward area fraction of the
+                                      ray-escape test after the bake's orientation fixes <= gate.max_inward_area_fraction,
+                                      default 0.02)
 """
 
 import hashlib
@@ -164,8 +176,35 @@ def team_mask(bc_image, cells, size, cfg):
         image = Image.fromarray(np.round(mask * 255).astype(np.uint8), "L").filter(ImageFilter.BoxBlur(1))
         rule = {k: cfg[k] for k in ("hue_deg", "hue_ramp_deg", "s_min", "v_min", "ramp", "cells")}
         considered = sorted(cfg["cells"])
+    elif method == "hsv-band-cells":
+        h, s, v = hsv_masked(bc)
+        ramp = cfg.get("ramp", 0.05)
+        raw = np.ones(h.shape, dtype=np.float64)
+        if cfg.get("hue_deg"):
+            lo, hi = cfg["hue_deg"]
+            ramp_h = cfg.get("hue_ramp_deg", 4.0)
+            raw = raw * smooth((h - lo) / ramp_h) * smooth((hi - h) / ramp_h)
+        if cfg.get("s_min") is not None:
+            raw = raw * smooth((s - cfg["s_min"]) / ramp + 0.5)
+        if cfg.get("s_max") is not None:
+            raw = raw * smooth((cfg["s_max"] - s) / ramp + 0.5)
+        if cfg.get("v_min") is not None:
+            raw = raw * smooth((v - cfg["v_min"]) / ramp + 0.5)
+        if cfg.get("v_max") is not None:
+            raw = raw * smooth((cfg["v_max"] - v) / ramp + 0.5)
+        inside = np.zeros(raw.shape, dtype=bool)
+        for part in cfg["cells"]:
+            c = cells[part]
+            inside[c["y_top"] + c["inset"]:c["y_top"] + c["cell"] - c["inset"],
+                   c["x"] + c["inset"]:c["x"] + c["cell"] - c["inset"]] = True
+        mask = np.where(inside, raw, 0.0)
+        image = Image.fromarray(np.round(mask * 255).astype(np.uint8), "L").filter(ImageFilter.BoxBlur(1))
+        rule = {k: cfg.get(k) for k in ("cells", "hue_deg", "hue_ramp_deg", "s_min", "s_max", "v_min", "v_max", "ramp")
+                if cfg.get(k) is not None}
+        considered = sorted(cfg["cells"])
     else:
-        raise RuntimeError("team_color.mask.method %r is not one of hsv-hard-gaussian, hsv-smooth-box" % method)
+        raise RuntimeError("team_color.mask.method %r is not one of hsv-hard-gaussian, hsv-smooth-box, hsv-band-cells"
+                           % method)
     arr = np.asarray(image)
     coverage = {}
     for name, c in sorted(cells.items(), key=lambda kv: int(kv[0].split("_")[-1])):
@@ -176,6 +215,51 @@ def team_mask(bc_image, cells, size, cfg):
                    "coverage_by_cell_inner_rect_ge_0_5": coverage,
                    "cells_with_coverage_over_1pct": sorted(k for k, v in coverage.items() if v > 0.01),
                    "colour_space": "linear (UE: sRGB off, TC_Grayscale)", "status": "предложено (AD-CNF-58 open)"}
+
+
+def occlusion_check(orm_px, cells, cfg, ao_report):
+    """Without atlas.ao_bake: ORM.R is the constant fill. With it: the gate "not constant" inside the part cells."""
+    if ao_report is None:
+        return {"orm_occlusion_channel_filled": {"passed": bool(np.all(orm_px[:, :, 0] == cfg["orm_occlusion_fill"])),
+                                                 "measured": int(orm_px[:, :, 0].min())}}
+    gate = dict({"min_range_p1_p99": 32, "min_occluded_fraction": 0.02, "occluded_below": 250},
+                **((cfg.get("ao_bake") or {}).get("gate") or {}))
+    inner = np.zeros(orm_px.shape[:2], dtype=bool)
+    per_part = {}
+    for name, c in cells.items():
+        sl = (slice(c["y_top"] + c["inset"], c["y_top"] + c["cell"] - c["inset"]),
+              slice(c["x"] + c["inset"], c["x"] + c["cell"] - c["inset"]))
+        inner[sl] = True
+        r = orm_px[:, :, 0][sl]
+        per_part[name] = {"mean": round(float(r.mean()), 2), "min": int(r.min()), "max": int(r.max())}
+    r = orm_px[:, :, 0][inner].astype(np.float64)
+    p1, p99 = float(np.percentile(r, 1)), float(np.percentile(r, 99))
+    occluded = float((r < gate["occluded_below"]).mean())
+    passed = (p99 - p1) >= gate["min_range_p1_p99"] and occluded >= gate["min_occluded_fraction"]
+    # the range gate cannot see a part baked with inward faces (Harpy's head, W4-B review: AO 0.51 on the inward
+    # faces vs 0.85-0.91 elsewhere passed it), so every baked cell must also have been baked facing outward
+    max_in = float(gate.get("max_inward_area_fraction", 0.02))
+    orient = ao_report.get("orientation_after_flips")
+    baked = sorted(n for n in cells if "note" not in (ao_report["parts"].get(n) or {}))  # "note": constant, not baked
+    inward = {n: (orient.get(n) or {}).get("inward_area_fraction") for n in baked} if orient is not None else None
+    bad = sorted(n for n, v in (inward or {}).items() if v is None or v > max_in)
+    return {"orm_occlusion_baked_not_constant": {
+        "passed": bool(passed),
+        "measured": {"p1": round(p1, 2), "p99": round(p99, 2), "mean": round(float(r.mean()), 2),
+                     "occluded_fraction": round(occluded, 4), "per_part": per_part},
+        "expected": gate,
+        "note": "ORM.R inside the part cells: p99 - p1 >= min_range_p1_p99 and the share below occluded_below >= "
+                "min_occluded_fraction (a constant or empty bake fails)"},
+        "ao_bake_parts_face_outward": {
+        "passed": inward is not None and not bad,
+        "measured": {"inward_area_fraction": inward, "failing": bad,
+                     "per_face_reference_flipped": {n: v.get("flipped_faces") for n, v in
+                                                    ((ao_report.get("per_face_reference_fix") or {}).get("parts")
+                                                     or {}).items()}},
+        "expected": "inward_area_fraction <= %s for every baked cell" % max_in,
+        "note": "ray-escape test of the build (area whose -normal ray escapes while the +normal ray is blocked) on "
+                "the bake scene after the per-face and whole-part flips of bake_ao.py; an inward face bakes as "
+                "occluded (its AO rays start inside the figure)"}}
 
 
 def main():
@@ -218,11 +302,25 @@ def main():
     bg = cfg["background"]
     atlases = {key: Image.new("RGB", (size, size), tuple(bg[key])) for key in ("BC", "N_OpenGL", "ORM")}
     factor = cfg["base_color_factor_expected"]
+    ao_cfg = params.get("ao")
+    ao_report = json.loads(Path(ao_cfg["report"]).read_text(encoding="utf-8")) if ao_cfg else None
+    if ao_report is not None:
+        missing = sorted(set(parts) - set(ao_report["parts"]))
+        if missing:
+            raise RuntimeError("AO bake has no image for %s" % missing)
     for name, (base, rm, normal) in parts.items():
         color = Image.fromarray(np.round(np.asarray(base, dtype=np.float32) * factor).astype(np.uint8))
-        rough_metal = np.asarray(rm)
-        orm = np.empty_like(rough_metal)
-        orm[:, :, 0] = cfg["orm_occlusion_fill"]  # Tripo gives no occlusion map for these parts
+        if ao_report is None:
+            rough_metal = np.asarray(rm)
+            orm = np.empty_like(rough_metal)
+            orm[:, :, 0] = cfg["orm_occlusion_fill"]  # Tripo gives no occlusion map for these parts
+        else:
+            ao = Image.open(Path(ao_cfg["dir"]) / ao_report["parts"][name]["file"]).convert("L")
+            if rm.size != ao.size:
+                rm = rm.resize(ao.size, Image.Resampling.LANCZOS)
+            rough_metal = np.asarray(rm)
+            orm = np.empty_like(rough_metal)
+            orm[:, :, 0] = np.asarray(ao)  # baked ambient occlusion (atlas.ao_bake)
         orm[:, :, 1:] = rough_metal[:, :, 1:]
         for key, image in (("BC", color), ("N_OpenGL", normal), ("ORM", Image.fromarray(orm))):
             paste_with_bleed(atlases[key], image, cells[name])
@@ -303,8 +401,7 @@ def main():
             "passed": bool(np.mean((length > 0.8) & (length < 1.2)) > 0.99),
             "measured": round(float(np.mean((length > 0.8) & (length < 1.2))), 4),
             "note": "fraction of texels inside part cells with |n| in (0.8, 1.2)"},
-        "orm_occlusion_channel_filled": {"passed": bool(np.all(orm_px[:, :, 0] == cfg["orm_occlusion_fill"])),
-                                         "measured": int(orm_px[:, :, 0].min())},
+        **occlusion_check(orm_px, cells, cfg, ao_report),
         "orm_roughness_range_in_cells": {"passed": True, "measured": [int(orm_px[:, :, 1][mask].min()),
                                                                      int(orm_px[:, :, 1][mask].max())],
                                          "note": "informational"},
@@ -336,12 +433,23 @@ def main():
         "excluded_parts": excluded,
         "source_textures": source_textures,
         "team_mask": team,
+        "ao_bake": (dict({k: ao_report[k] for k in ("blender", "engine", "samples", "seed", "distance_rel",
+                                                     "distance_m", "height_m", "margin_px", "occluders_excluded",
+                                                     "flipped_before_bake")},
+                         per_face_reference_flipped={n: v.get("flipped_faces") for n, v in
+                                                     ((ao_report.get("per_face_reference_fix") or {}).get("parts")
+                                                      or {}).items()})
+                    if ao_report else None),
         "files": files,
         "conventions": {
             "BC": "sRGB colour; Tripo baseColorFactor %.3f multiplied in" % factor,
             "N_OpenGL": "linear; OpenGL (+Y) — Blender preview only",
             "N": "linear; DirectX (-Y) — for UE (flip_green_channel = false)",
-            "ORM": "linear; R = occlusion (filled %d, Tripo has none), G = roughness, B = metallic" % cfg["orm_occlusion_fill"],
+            "ORM": ("linear; R = occlusion (filled %d, Tripo has none), G = roughness, B = metallic"
+                    % cfg["orm_occlusion_fill"]) if ao_report is None else
+                   ("linear; R = ambient occlusion baked by Cycles (%s samples, distance %.3f x height, %s), "
+                    "G = roughness, B = metallic (resized to the AO size of the part)"
+                    % (ao_report["samples"], ao_report["distance_rel"], ao_report["engine"])),
             "TeamMask": "linear 8-bit grey (optional, team_color.mask); UE: sRGB off, TC_Grayscale",
         },
         "reference_comparison": reference,

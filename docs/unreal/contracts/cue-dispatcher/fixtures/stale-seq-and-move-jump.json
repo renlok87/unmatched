@@ -1,0 +1,52 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "stale-seq-and-move-jump",
+ "kind": "scenario",
+ "description": "Перемещение seq 60 на 4 клетки (1120 мс) прерывается новым перемещением той же фигуры seq 61 (cut=jump); запоздавшее перемещение seq 59 — stale (seq ниже уже показанного).",
+ "covers": [
+  "INT-003 устаревшее событие",
+  "07 CUE-007 onNewEvent прыжок к финалу"
+ ],
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-007",
+   "subject": "harpy-2",
+   "seq": 60,
+   "steps": 4
+  },
+  {
+   "t": 500,
+   "kind": "cue",
+   "id": "CUE-007",
+   "subject": "harpy-2",
+   "seq": 61,
+   "steps": 1
+  },
+  {
+   "t": 600,
+   "kind": "cue",
+   "id": "CUE-007",
+   "subject": "harpy-1",
+   "seq": 59,
+   "steps": 2
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-007 subject=harpy-2 seq=60 t=0 vfx=missing sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx done id=CUE-007 subject=harpy-2 seq=60 t=500 ms=500 cut=jump",
+  "CUE fx id=CUE-007 subject=harpy-2 seq=61 t=500 vfx=missing sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx id=CUE-007 subject=harpy-1 seq=59 t=600 result=stale",
+  "CUE fx done id=CUE-007 subject=harpy-2 seq=61 t=780 ms=280 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 2,
+  "spawned": 0,
+  "fallback": 2,
+  "duplicate": 0,
+  "stale": 1,
+  "done": 2,
+  "unique_triples": 2
+ }
+}

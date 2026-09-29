@@ -1,4 +1,4 @@
-"""Валидация тестового клипа (FBX/BVH/GLB) против контракта рига. Только чтение.
+"""Валидация тестового клипа (FBX/BVH/GLB) или скелетного меша против контракта рига. Только чтение.
 
 ТОЛЬКО headless (`blender -b`): скрипт вызывает read_factory_settings и завершает
 процесс через os._exit. В живом Blender (MCP :9876/:9877) первое выгружает аддон MCP,
@@ -14,7 +14,12 @@ Exception аддона). Остальные SystemExit ниже достижим
 
 Опции (key=value):
   --contract=docs/art-pipeline/rig/rig-contract.json
-  --skeleton=UM_HUMANOID_17_v1       ключ skeletons в контракте
+  --skeleton=UM_HUMANOID_17_v2       ключ skeletons (по умолчанию contract.default_skeleton);
+                                     UM_HUMANOID_17_v1 закрыт: WARN только для старых файлов по sha256
+  --character=Medusa|Arthur|Merlin|Harpy  персонаж скелета: его кость оружия (weapon.L/weapon.R/нет)
+  --kind=clip|skeletal-mesh          skeletal-mesh: только арматура, кости, оружие и ref-поза (без action)
+  --clip-role=idle|oneshot|terminal  граница клипа: кадр 0 и последний = rest (terminal — только кадр 0);
+                                     по умолчанию idle при --loop=true, иначе oneshot
   --expect-fps=24                    ожидаемый FPS (по умолчанию из контракта)
   --expect-duration=2.333            ожидаемая длительность, с (опционально)
   --duration-tol=0.05                допуск длительности, с (по умолчанию из контракта)
@@ -27,14 +32,15 @@ Exception аддона). Остальные SystemExit ниже достижим
   --bvh-up=Y|Z                       ось «вверх» BVH: Y — стандарт mocap, Z — BVH из Blender
   --out=<report.json>                куда записать отчёт
 
-Проверки: импорт; одна арматура и действие; имя объекта арматуры (= кость 0 UE);
-fps; длительность и число кадров; движение костей (макс. угол поворота и сдвиг
-каждой кости относительно первого кадра); неподвижность/смещение root (объект
-арматуры = кость 0 UE и pose-кость root); видимое изменение позы за клип (пиковый
-сдвиг голов и хвостов костей / рост); шов цикла; масштаб костей; правдоподобие длин
-костей; соответствие имён и иерархии скелету контракта.
+Проверки: импорт; одна арматура; версия скелета (v1 закрыт); имя объекта арматуры (= кость 0 UE);
+соответствие имён и иерархии скелету контракта; кость оружия по стороне; направление ref-позы
+(UM_FBX_v1: лицо +X) и ось root; для клипа — действие, fps, длительность, движение костей,
+неподвижность/смещение root (объект арматуры = кость 0 UE и pose-кость root), граница клипа
+(кадр 0 / последний = rest), видимое изменение позы (пиковый сдвиг голов и хвостов костей / рост),
+шов цикла, масштаб костей, правдоподобие длин костей.
 Рост — габарит только скиненных мешей (с модификатором Armature); служебные объекты
 импортёра glTF (коллекция glTF_not_exported) исключаются.
+Правила v2 без Blender — в rig_rules.py (юнит-тесты tests/test_rig_rules.py).
 Код выхода: 0 — нет FAIL, 1 — есть FAIL, 2 — ошибка запуска. Статус «pass»
 означает техническое соответствие, а не художественную приёмку.
 """
@@ -54,6 +60,11 @@ GLTF_HELPER_COLLECTION = "glTF_not_exported"
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
+sys.path.insert(0, HERE)
+import rig_rules  # noqa: E402  (чистый Python, рядом со скриптом)
+
+LEFT_JOINTS = ("arm_upper.L", "leg_upper.L")
+RIGHT_JOINTS = ("arm_upper.R", "leg_upper.R")
 
 
 def parse_args():
@@ -93,6 +104,11 @@ def check(report, name, status, **kw):
     report["checks"].append({"check": name, "status": status, **kw})
 
 
+def verdict(report, name, result):
+    status, detail = result
+    check(report, name, status, **detail)
+
+
 def quat_angle_deg(q1, q2):
     d = abs(q1.dot(q2))
     return math.degrees(2 * math.acos(min(1.0, d)))
@@ -103,8 +119,12 @@ def main():
     contract_path = opts.get("contract", os.path.join(REPO, "docs/art-pipeline/rig/rig-contract.json"))
     with open(contract_path, encoding="utf-8") as f:
         contract = json.load(f)
-    sk_key = opts.get("skeleton", "UM_HUMANOID_17_v1")
-    skel = contract["skeletons"][sk_key]
+    sk_key, skel = rig_rules.skeleton_entry(contract, opts.get("skeleton"))
+    character = opts.get("character")
+    rig_rules.character_entry(skel, character)  # KeyError на неизвестного персонажа до импорта
+    kind = opts.get("kind", "clip").lower()
+    if kind not in ("clip", "skeletal-mesh"):
+        raise SystemExit(f"--kind: clip|skeletal-mesh, получено {kind}")
     clip_rules = contract.get("clips", {})
     exp_fps = float(opts.get("expect-fps", clip_rules.get("fps", 24)))
     dur_tol = float(opts.get("duration-tol", clip_rules.get("duration_tolerance_s", 0.05)))
@@ -116,12 +136,16 @@ def main():
     rm_tol = contract.get("root_motion", {}).get("in_place_tolerance_of_height", 0.005)
     root_policy = opts.get("root-policy", contract.get("root_motion", {}).get("policy_default", "in_place"))
     loop = opts.get("loop", "").lower() in ("1", "true", "yes")
+    role = rig_rules.default_role(loop, opts.get("clip-role"))
 
     clip_abs = os.path.abspath(src)
     clip_rel = os.path.relpath(clip_abs, REPO) if clip_abs.lower().startswith(REPO.lower()) else clip_abs
-    report = {"schema": "unmatched.clip-validation/1", "clip": clip_rel.replace("\\", "/"),
-              "clip_bytes": os.path.getsize(src), "contract": os.path.relpath(contract_path, REPO).replace("\\", "/"),
-              "skeleton": sk_key, "blender": bpy.app.version_string, "checks": [], "bones": {}}
+    report = {"schema": "unmatched.clip-validation/2", "clip": clip_rel.replace("\\", "/"),
+              "clip_bytes": os.path.getsize(src), "clip_sha256": rig_rules.sha256_file(src),
+              "contract": os.path.relpath(contract_path, REPO).replace("\\", "/"),
+              "contract_revision": contract.get("revision"), "skeleton": sk_key, "character": character,
+              "kind": kind, "clip_role": role if kind == "clip" else None,
+              "blender": bpy.app.version_string, "checks": [], "bones": {}}
     try:
         load_clip(src, opts.get("bvh-up", "Y"))
     except Exception as exc:  # noqa: BLE001 — отчёт об ошибке импорта
@@ -135,22 +159,51 @@ def main():
         return finish(report, opts)
     arm = arms[0]
     check(report, "single_armature", "pass", value=arm.name)
-    # Имя объекта арматуры = имя кости 0 в UE (legacy FBX) и носителя root motion.
-    arm_rule = skel.get("armature_object", {})
-    want_name = arm_rule.get("name")
     ext = os.path.splitext(src)[1].lower()
-    if ext == ".bvh" or opts.get("retarget-map"):
-        check(report, "armature_object_name", "info", value=arm.name, expected=want_name,
-              note="BVH/внешний скелет: имя задаётся при перекладке в контракт")
-    elif not want_name:
-        check(report, "armature_object_name", "info", value=arm.name, note="в контракте нет armature_object.name")
-    elif arm.name == want_name:
-        check(report, "armature_object_name", "pass", value=arm.name)
-    elif arm.name in arm_rule.get("legacy_names", []):
-        check(report, "armature_object_name", "warn", value=arm.name, expected=want_name,
-              note="старое имя существующих тестовых ассетов; несовместимо с общим UE Skeleton")
+    external = ext == ".bvh" or bool(opts.get("retarget-map"))
+    verdict(report, "skeleton_version", rig_rules.skeleton_version_verdict(sk_key, skel, report["clip_sha256"]))
+    # Имя объекта арматуры = имя кости 0 в UE (legacy FBX) и носителя root motion.
+    verdict(report, "armature_object_name",
+            rig_rules.armature_name_verdict(arm.name, skel.get("armature_object", {}), external))
+
+    # --- скелет против контракта -------------------------------------------------
+    names = {b.name: (b.parent.name if b.parent else None) for b in arm.data.bones}
+    report["bone_count"] = len(names)
+    required, optional = rig_rules.expected_bones(skel, character)
+    if opts.get("retarget-map"):
+        rmap = {k: v for k, v in contract["retarget_maps"][opts["retarget-map"]].items()
+                if isinstance(v, str) and k not in ("status", "note")}
+        mapped = {src_b: dst for src_b, dst in rmap.items() if src_b in names}
+        covered = sorted(set(mapped.values()) & set(required))
+        weapon_like = set(rig_rules.weapon_bones(skel)) | set(skel.get("weapon_legacy_names", ["weapon"]))
+        missing = sorted(set(required) - set(covered) - weapon_like)
+        check(report, "skeleton_via_retarget_map", "pass" if not missing else "fail",
+              map=opts["retarget-map"], covered=len(covered), missing=missing,
+              source_bones=len(names))
     else:
-        check(report, "armature_object_name", "fail", value=arm.name, expected=want_name)
+        verdict(report, "skeleton_contract", rig_rules.skeleton_contract_verdict(names, required, optional))
+        verdict(report, "weapon_side", rig_rules.weapon_verdict(names, skel, character))
+
+    # --- ref-поза: направление лица и ось root -----------------------------------
+    ref_pose = skel.get("ref_pose")
+    mw0 = arm.matrix_world
+    left = [tuple(mw0 @ arm.data.bones[n].head_local) for n in LEFT_JOINTS if n in arm.data.bones]
+    right = [tuple(mw0 @ arm.data.bones[n].head_local) for n in RIGHT_JOINTS if n in arm.data.bones]
+    if ref_pose is None:
+        check(report, "ref_pose_facing", "info", note="в скелете нет ref_pose (контракт v1)")
+    elif not left or not right:
+        check(report, "ref_pose_facing", "info" if external else "fail",
+              note="нет пар суставов .L/.R для направления", left=len(left), right=len(right))
+    else:
+        yaw = rig_rules.facing_yaw_deg(left, right)
+        verdict(report, "ref_pose_facing", rig_rules.facing_verdict(yaw, ref_pose, external))
+        if "root" in arm.data.bones:
+            x_axis = tuple((mw0.to_3x3() @ arm.data.bones["root"].matrix_local.to_3x3()).col[0])
+            verdict(report, "ref_pose_root_axis", rig_rules.root_axis_verdict(x_axis, ref_pose, external))
+
+    if kind == "skeletal-mesh":
+        return finish(report, opts)
+
     act = arm.animation_data.action if arm.animation_data else None
     if act is None:
         check(report, "action", "fail", detail="у арматуры нет действия")
@@ -173,29 +226,6 @@ def main():
     if f1i - f0i < 1:
         check(report, "frame_count", "fail", value=f1i - f0i + 1)
         return finish(report, opts)
-
-    # --- скелет против контракта -------------------------------------------------
-    names = {b.name: (b.parent.name if b.parent else None) for b in arm.data.bones}
-    report["bone_count"] = len(names)
-    want = {b["name"]: b["parent"] for b in skel["bones"]}
-    rmap = None
-    if opts.get("retarget-map"):
-        rmap = {k: v for k, v in contract["retarget_maps"][opts["retarget-map"]].items()
-                if isinstance(v, str) and k not in ("status", "note")}
-    if rmap is None:
-        missing = sorted(set(want) - set(names))
-        extra = sorted(set(names) - set(want))
-        parent_bad = sorted(n for n in want if n in names and names[n] != want[n])
-        ok = not missing and not parent_bad
-        check(report, "skeleton_contract", "pass" if ok and not extra else ("warn" if ok else "fail"),
-              missing=missing, extra=extra, parent_mismatch=parent_bad)
-    else:
-        mapped = {src_b: dst for src_b, dst in rmap.items() if src_b in names}
-        covered = sorted(set(mapped.values()) & set(want))
-        missing = sorted(set(want) - set(covered) - {"weapon"})
-        check(report, "skeleton_via_retarget_map", "pass" if not missing else "fail",
-              map=opts["retarget-map"], covered=len(covered), missing=missing,
-              source_bones=len(names))
 
     # --- выборка кадров ------------------------------------------------------------
     frames = list(range(f0i, f1i + 1))
@@ -222,6 +252,9 @@ def main():
                        for b in arm.data.bones) / height
     check(report, "bone_length_plausible", "pass" if bone_len_max <= 1.0 else "warn",
           max_bone_length_of_height=round(bone_len_max, 4), max=1.0)
+    # rest-поза в порядке pose.bones (голова и хвост), в пространстве арматуры
+    rest_local = ([arm.data.bones[pb.name].head_local.copy() for pb in arm.pose.bones]
+                  + [arm.data.bones[pb.name].tail_local.copy() for pb in arm.pose.bones])
     first = {}
     rot_max = {pb.name: 0.0 for pb in arm.pose.bones}
     loc_max = {pb.name: 0.0 for pb in arm.pose.bones}
@@ -231,6 +264,7 @@ def main():
     root_path = []
     first_heads = None
     last_heads = None
+    boundary = {}
     for fr in frames:
         sc.frame_set(fr)
         mw = arm.matrix_world
@@ -239,6 +273,10 @@ def main():
             root_path.append(mw @ arm.pose.bones["root"].head)
         # головы и хвосты костей в мире: хвост ловит поворот концевых костей
         heads = [mw @ pb.head for pb in arm.pose.bones] + [mw @ pb.tail for pb in arm.pose.bones]
+        if fr in (frames[0], frames[-1]):
+            # граница клипа: поза против rest в мире этого же кадра (движение объекта не входит)
+            rest_now = [mw @ p for p in rest_local]
+            boundary[fr] = max((h - r).length for h, r in zip(heads, rest_now)) / height
         if first_heads is None:
             first_heads = heads
         last_heads = heads
@@ -260,6 +298,9 @@ def main():
     check(report, "bones_move", "pass" if moving else "fail", moving_bones=len(moving),
           top=sorted(moving.items(), key=lambda kv: -kv[1])[:8])
     check(report, "bone_scale_unit", "pass" if scale_dev < 1e-3 else "warn", max_deviation=round(scale_dev, 5))
+    verdict(report, "clip_boundary_rest",
+            rig_rules.boundary_verdict(role, boundary[frames[0]], boundary[frames[-1]],
+                                       skel.get("clip_boundaries", {}), external))
 
     # --- root ---------------------------------------------------------------------
     def path_stats(path):
@@ -318,4 +359,9 @@ def finish(report, opts):
     os._exit(1 if fails else 0)
 
 
-main()
+try:
+    main()
+except (KeyError, ValueError) as exc:  # неверные опции (скелет, персонаж, роль) — ошибка запуска, код 2
+    print("CLIP_VALIDATION ERROR", exc)
+    sys.stdout.flush()
+    os._exit(2)

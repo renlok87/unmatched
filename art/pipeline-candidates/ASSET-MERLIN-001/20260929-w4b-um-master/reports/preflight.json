@@ -1,0 +1,161 @@
+{
+  "backend": "headless",
+  "checks": {
+    "atlas_python_deps": {
+      "measured": {
+        "numpy": "2.4.0",
+        "ok": true,
+        "pillow": "12.1.0",
+        "python": "3.13.4"
+      },
+      "passed": true
+    },
+    "backend_known": {
+      "measured": {
+        "backend": "headless",
+        "command": [
+          "blender.exe"
+        ],
+        "isolation": "process"
+      },
+      "passed": true
+    },
+    "blender_runnable": {
+      "backend": "headless",
+      "measured": "5.2.2 LTS",
+      "passed": true
+    },
+    "blender_stage_scripts_present": {
+      "passed": true,
+      "scripts": {
+        "ao_bake": "2558150e37719aa3e2fd65711c9697367dc7f9fb41fe03f4fd6003f6ec3b7504",
+        "build": "e547b2e9e8c6798bfb06ba92db4c3b43e4d9cf7f8855da82944ea40aaa48f177",
+        "export": "50f440a29b0be261c151062d6be81899bf89eace819081fa388fb589ffcd53c2",
+        "import": "b908a5bed1300cbbad452e42cb26a856012c9fadff73c0541bc256c7b1b3bdd6"
+      }
+    },
+    "build_library_present": {
+      "measured": {
+        "library": {
+          "__init__.py": "321edf92bd54d602a51f7606e1196b9efe80ea839e735a3a2b6a24e7c042ef52",
+          "anatomy.py": "057636215a64627dbeeebf85bf18e0a34124db23244ddef44127ed8f408722f5",
+          "base.py": "6e8d379fa8a6316cc714a0f60bea730ce7d285420920c9cb51a6905de8490795",
+          "closure.py": "72c2b0ce92f9179fbc3be49de575a72b8613438637bb87347b8943e5436e5af0",
+          "core.py": "d2a5b9b10e25b0aa188bcdcf50a829174ecf399bf82d813298e2e478b7d24073",
+          "flow_seated.py": "1fbe547b37220891eb597bb5948f224ff0c7b3263f013865c406d9ec32c841f5",
+          "flow_whole_figure.py": "be471bee44c181721707799b0debb6ced9d974c5dd0ffc046d6b5e8ec2aab036",
+          "measure.py": "bfe3538fe3a4c7d18398d8940f16c46093c50dc5272909ca1151605d70aaadef",
+          "mesh_ops.py": "b06311803f9d2891f38fbf66aacf0df57c4c514f01a3b627dcd83d079403af3e",
+          "orientation.py": "bd839e09f689c5e1b86576b1a2088fd46eff2762053e748d1d9a3d9b0617f196",
+          "profile_schema.py": "da090db84baa063fad214491b82e83cf2e598377c327b42dc15203e51c88ec35",
+          "rig.py": "57894f30174b6cdef2089d0f383be6635c84bc2f146242a3940e2c8d56c0843a",
+          "weapon.py": "4fe5ebab666d1090f8d17343e7528f058097a3ef2f1618221ec46a1d2edb0f9d"
+        }
+      },
+      "passed": true
+    },
+    "build_profile_role_is_primary": {
+      "expected": "segmented-retopo-glb",
+      "measured": "segmented-retopo-glb",
+      "passed": true
+    },
+    "build_profile_schema": {
+      "measured": {
+        "flow": "seated-parts",
+        "problems": []
+      },
+      "note": "blender/candidate_build/profile_schema.py (the build stage validates the same way)",
+      "passed": true
+    },
+    "build_profile_valid": {
+      "measured": {
+        "id": "merlin-segmented-skeletal/3",
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-um-fbx-v1-um-master.json",
+        "sha256": "3eeb5f4f5fcb86305c61572bc8c8abf9d3d96572f80f4407350e572d72fe86f3"
+      },
+      "passed": true
+    },
+    "fbx_preset_is_um_fbx_v1": {
+      "expected": {
+        "name": "UM_FBX_v1",
+        "rotation_z": 90.0,
+        "use_triangles": true
+      },
+      "measured": {
+        "name": "UM_FBX_v1",
+        "rel": "blender/_tools/presets/UM_FBX_v1.json",
+        "rotation_z": 90.0,
+        "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+        "use_triangles": true
+      },
+      "note": "axes standard 04-blender-production.md §1 (authored -Y -> UE +X), verified by ART-001",
+      "passed": true
+    },
+    "originals_outside_run_dir": {
+      "offenders": [],
+      "passed": true
+    },
+    "primary_source_registered": {
+      "measured": "tripo-d9ff4260:segmented-retopo-glb",
+      "passed": true
+    },
+    "profile": {
+      "measured": "skeletal-candidate",
+      "passed": true,
+      "required": false
+    },
+    "python_version": {
+      "measured": "3.13",
+      "passed": true
+    },
+    "repo_root_is_git_checkout": {
+      "passed": true
+    },
+    "source_files_present": {
+      "missing": [],
+      "passed": true
+    },
+    "source_files_unchanged_since_registration": {
+      "changed": [],
+      "passed": true,
+      "verified": 9
+    },
+    "sources_registered": {
+      "measured": [
+        "tripo-22cb43f2",
+        "tripo-d9ff4260"
+      ],
+      "passed": true
+    },
+    "tool_has_no_network_imports": {
+      "measured": [],
+      "passed": true
+    },
+    "ue_folder_is_pipeline_candidate": {
+      "measured": "/Game/PipelineCandidates/Merlin/20260929-w4b-um-master",
+      "passed": true
+    },
+    "ue_stage_runnable_with_backend": {
+      "measured": false,
+      "note": "informational; ue-import runs only with --backend mcp (live editor via unreal_mcp.py)",
+      "passed": true,
+      "required": false
+    },
+    "unreal_editor_cmd_present": {
+      "measured": true,
+      "note": "informational; this scaffold never launches UnrealEditor-Cmd",
+      "passed": true,
+      "required": false
+    }
+  },
+  "network": {
+    "paid_tasks_created": 0,
+    "tripo_calls": 0
+  },
+  "passed": true,
+  "stage": "preflight",
+  "tool": {
+    "name": "tripo-pipeline",
+    "version": "0.6.0"
+  }
+}

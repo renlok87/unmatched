@@ -1,0 +1,50 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "dedupe-http-ws",
+ "kind": "scenario",
+ "description": "Один и тот же урон (seq 7) приходит по HTTP и по WS: ровно один показ, второй — duplicate. Ассеты CUE-011 заданы тестовыми путями.",
+ "covers": [
+  "ACC-012",
+  "QA-007",
+  "08 §6.3 повтор ответа HTTP+WS"
+ ],
+ "assets_present": {
+  "CUE-011": {
+   "vfx": "/Game/FX/Test/NS_Test_Hit.NS_Test_Hit",
+   "sfx": "/Game/Audio/Test/SW_Test_Hit.SW_Test_Hit",
+   "clip": "/Game/Anim/Test/AS_Test_HitReact.AS_Test_HitReact"
+  }
+ },
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "medusa",
+   "seq": 7,
+   "channel": "http"
+  },
+  {
+   "t": 40,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "medusa",
+   "seq": 7,
+   "channel": "ws"
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-011 subject=medusa seq=7 t=0 vfx=NS_Test_Hit sfx=SW_Test_Hit clip=AS_Test_HitReact mat=FxFlash socket=Head reduced=0 result=spawned",
+  "CUE fx id=CUE-011 subject=medusa seq=7 t=40 result=duplicate",
+  "CUE fx done id=CUE-011 subject=medusa seq=7 t=900 ms=900 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 1,
+  "spawned": 1,
+  "fallback": 0,
+  "duplicate": 1,
+  "stale": 0,
+  "done": 1,
+  "unique_triples": 1
+ }
+}

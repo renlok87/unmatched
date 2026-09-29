@@ -1,0 +1,60 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "missing-assets-fallback",
+ "kind": "scenario",
+ "description": "Таблица без ассетов (как сейчас): урон и смерть дают result=fallback, VFX/звук/клип missing; тестовый VFX, который не загрузился (assets_unloadable), тоже missing. Длительности и done сохраняются — состояние не ждёт эффекта.",
+ "covers": [
+  "17 §6.5",
+  "07 fallback",
+  "ART-010 missing-report",
+  "ACC-022 состояние не ждёт эффекта"
+ ],
+ "assets_present": {
+  "CUE-014": {
+   "vfx": "/Game/FX/Test/NS_Test_Holy.NS_Test_Holy"
+  }
+ },
+ "assets_unloadable": [
+  "/Game/FX/Test/NS_Test_Holy.NS_Test_Holy"
+ ],
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "merlin",
+   "seq": 30
+  },
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-013",
+   "subject": "merlin",
+   "seq": 30
+  },
+  {
+   "t": 1000,
+   "kind": "cue",
+   "id": "CUE-014",
+   "subject": "arthur",
+   "seq": 31
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-011 subject=merlin seq=30 t=0 vfx=missing sfx=missing clip=missing mat=FxFlash socket=Head reduced=0 result=fallback",
+  "CUE fx id=CUE-013 subject=merlin seq=30 t=0 vfx=missing sfx=missing clip=missing mat=Fade socket=- reduced=0 result=fallback",
+  "CUE fx done id=CUE-011 subject=merlin seq=30 t=900 ms=900 cut=0",
+  "CUE fx done id=CUE-013 subject=merlin seq=30 t=950 ms=950 cut=0",
+  "CUE fx id=CUE-014 subject=arthur seq=31 t=1000 vfx=missing sfx=missing clip=none mat=none socket=Weapon reduced=0 result=fallback",
+  "CUE fx done id=CUE-014 subject=arthur seq=31 t=1800 ms=800 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 3,
+  "spawned": 0,
+  "fallback": 3,
+  "duplicate": 0,
+  "stale": 0,
+  "done": 3,
+  "unique_triples": 3
+ }
+}

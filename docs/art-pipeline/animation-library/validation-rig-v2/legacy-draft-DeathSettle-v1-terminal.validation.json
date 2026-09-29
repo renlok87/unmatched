@@ -1,0 +1,252 @@
+{
+ "schema": "unmatched.clip-validation/2",
+ "clip": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx",
+ "clip_bytes": 1250780,
+ "clip_sha256": "278052b4f48dab53df574646d902ab04259985b1aafffca02bd171f8c544e00f",
+ "contract": "docs/art-pipeline/rig/rig-contract.json",
+ "contract_revision": "v2-2026-09-29",
+ "skeleton": "UM_HUMANOID_17_v1",
+ "character": null,
+ "kind": "clip",
+ "clip_role": "terminal",
+ "blender": "5.2.2 LTS",
+ "checks": [
+  {
+   "check": "import",
+   "status": "pass"
+  },
+  {
+   "check": "single_armature",
+   "status": "pass",
+   "value": "SKEL_Medusa"
+  },
+  {
+   "check": "skeleton_version",
+   "status": "warn",
+   "skeleton": "UM_HUMANOID_17_v1",
+   "grandfathered": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx",
+   "note": "старый тестовый файл, допущен по sha256; новые клипы — только UM_HUMANOID_17_v2"
+  },
+  {
+   "check": "armature_object_name",
+   "status": "warn",
+   "value": "SKEL_Medusa",
+   "expected": "SKEL_UM_Humanoid",
+   "note": "старое имя (кость 0 не совпадёт с общим скелетом); политика контракта: warn"
+  },
+  {
+   "check": "skeleton_contract",
+   "status": "pass",
+   "missing": [],
+   "extra": [],
+   "parent_mismatch": []
+  },
+  {
+   "check": "weapon_side",
+   "status": "info",
+   "note": "в скелете нет weapon_bones (контракт v1): сторона оружия не проверяется"
+  },
+  {
+   "check": "ref_pose_facing",
+   "status": "info",
+   "note": "в скелете нет ref_pose (контракт v1)"
+  },
+  {
+   "check": "action",
+   "status": "pass",
+   "value": "SKEL_Medusa|Scene",
+   "actions_in_file": 1
+  },
+  {
+   "check": "fps",
+   "status": "pass",
+   "value": 24.0,
+   "expected": 24.0
+  },
+  {
+   "check": "duration",
+   "status": "pass",
+   "value": 0.875,
+   "expected": 0.875,
+   "tol": 0.05
+  },
+  {
+   "check": "bone_length_plausible",
+   "status": "pass",
+   "max_bone_length_of_height": 0.3516,
+   "max": 1.0
+  },
+  {
+   "check": "bones_move",
+   "status": "pass",
+   "moving_bones": 2,
+   "top": [
+    [
+     "spine",
+     48.0
+    ],
+    [
+     "head",
+     25.0
+    ]
+   ]
+  },
+  {
+   "check": "bone_scale_unit",
+   "status": "pass",
+   "max_deviation": 0.0
+  },
+  {
+   "check": "clip_boundary_rest",
+   "status": "pass",
+   "role": "terminal",
+   "first_vs_rest_of_height": 0.0,
+   "last_vs_rest_of_height": 0.51203,
+   "tol_of_height": 0.005
+  },
+  {
+   "check": "root_in_place",
+   "status": "pass",
+   "object": {
+    "end_delta": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "end_delta_of_height": 0.0,
+    "max_excursion_of_height": 0.0
+   },
+   "root_bone": {
+    "end_delta": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "end_delta_of_height": 0.0,
+    "max_excursion_of_height": 0.0
+   },
+   "tol_of_height": 0.005
+  },
+  {
+   "check": "visible_pose_change",
+   "status": "pass",
+   "peak_max_joint_shift_of_height": 0.51203,
+   "peak_mean_joint_shift_of_height": 0.07503,
+   "min": 0.02,
+   "mode": "warn",
+   "peak_frame": 23,
+   "note": "макс. сдвиг головы/хвоста кости относительно первого кадра, доля высоты фигуры; порог — предложение, до калибровки по визуальному просмотру ниже порога = WARN"
+  },
+  {
+   "check": "loop_seam",
+   "status": "info",
+   "first_last_shift_of_height": 0.07503
+  }
+ ],
+ "bones": {
+  "root": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "hips": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "spine": {
+   "max_rot_deg": 48.0,
+   "max_loc": 0.0
+  },
+  "head": {
+   "max_rot_deg": 25.0,
+   "max_loc": 0.0
+  },
+  "arm_upper.L": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "arm_lower.L": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "hand.L": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "weapon": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "arm_upper.R": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "arm_lower.R": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "hand.R": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "leg_upper.L": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "leg_lower.L": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "foot.L": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "leg_upper.R": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "leg_lower.R": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  },
+  "foot.R": {
+   "max_rot_deg": 0.0,
+   "max_loc": 0.0
+  }
+ },
+ "bone_count": 17,
+ "fps": 24.0,
+ "frame_start": 2.0,
+ "frame_end": 23.0,
+ "frames": 22,
+ "duration_s": 0.875,
+ "reference_meshes": [
+  "SK_Medusa_Body",
+  "SK_Medusa_Bow"
+ ],
+ "reference_height": 0.51193,
+ "reference_height_source": "skinned_mesh_bbox",
+ "root_object": {
+  "end_delta": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "end_delta_of_height": 0.0,
+  "max_excursion_of_height": 0.0
+ },
+ "root_bone": {
+  "end_delta": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "end_delta_of_height": 0.0,
+  "max_excursion_of_height": 0.0
+ },
+ "result": "pass",
+ "fails": [],
+ "warnings": [
+  "skeleton_version",
+  "armature_object_name"
+ ]
+}

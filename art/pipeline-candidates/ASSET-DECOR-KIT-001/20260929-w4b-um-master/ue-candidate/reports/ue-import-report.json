@@ -1,0 +1,616 @@
+{
+  "assets": [
+    "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Materials/MI_Decor_Barrel_Candidate",
+    "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Meshes/SM_Decor_Barrel",
+    "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_BC",
+    "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_N",
+    "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_ORM"
+  ],
+  "backend": {
+    "backend": "mcp",
+    "client": "unreal_mcp.py",
+    "endpoint": "127.0.0.1:8123/mcp"
+  },
+  "checks": {
+    "asset_classes": {
+      "expected": {
+        "instance": "MaterialInstanceConstant",
+        "static": "StaticMesh",
+        "texture:BC": "Texture2D",
+        "texture:N": "Texture2D",
+        "texture:ORM": "Texture2D"
+      },
+      "measured": {
+        "instance": "MaterialInstanceConstant",
+        "static": "StaticMesh",
+        "texture:BC": "Texture2D",
+        "texture:N": "Texture2D",
+        "texture:ORM": "Texture2D"
+      },
+      "passed": true
+    },
+    "assets_exactly_as_planned": {
+      "expected": [
+        "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Materials/MI_Decor_Barrel_Candidate",
+        "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Meshes/SM_Decor_Barrel",
+        "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_BC",
+        "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_N",
+        "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_ORM"
+      ],
+      "measured": [
+        "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Materials/MI_Decor_Barrel_Candidate",
+        "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Meshes/SM_Decor_Barrel",
+        "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_BC",
+        "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_N",
+        "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_ORM"
+      ],
+      "note": "no stale assets, no importer side products (import_materials/import_textures false)",
+      "passed": true
+    },
+    "assets_saved": {
+      "measured": {
+        "dirty": {
+          "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Materials/MI_Decor_Barrel_Candidate": false,
+          "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Meshes/SM_Decor_Barrel": false,
+          "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_BC": false,
+          "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_N": false,
+          "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_ORM": false
+        },
+        "save_assets": true
+      },
+      "passed": true
+    },
+    "bounds_equal_um_fbx_v1_prediction": {
+      "expected": {
+        "max": [
+          10.708,
+          10.678,
+          26.0
+        ],
+        "min": [
+          -10.708,
+          -10.678,
+          0.0
+        ]
+      },
+      "measured": {
+        "max": [
+          10.7085,
+          10.6777,
+          26
+        ],
+        "min": [
+          -10.7085,
+          -10.6777,
+          0
+        ],
+        "size": [
+          21.417,
+          21.3554,
+          26
+        ]
+      },
+      "note": "fbx-readback bounds (export frame) as UE (x, -y, z) (ART-001); tolerance 0.05 uu",
+      "passed": true
+    },
+    "dimensions_match_candidate_at_import_scale_1": {
+      "expected": [
+        21.417,
+        21.355,
+        26.0
+      ],
+      "measured": {
+        "max": [
+          10.7085,
+          10.6777,
+          26
+        ],
+        "min": [
+          -10.7085,
+          -10.6777,
+          0
+        ],
+        "size": [
+          21.417,
+          21.3554,
+          26
+        ]
+      },
+      "note": "tolerance 1.0% per axis X, Y, Z; MCP import_file has no import scale (1.0)",
+      "passed": true
+    },
+    "folder_empty_before_import": {
+      "measured": [],
+      "passed": true
+    },
+    "instance_parent_and_neutral_team_color": {
+      "expected": {
+        "TeamColor": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "parent": "/Game/UM/Materials/M_UM_Figure"
+      },
+      "measured": {
+        "TeamColor": {
+          "a": 1.0,
+          "b": 1.0,
+          "g": 1.0,
+          "r": 1.0
+        },
+        "base_property_overrides": {
+          "bCastDynamicShadowAsMasked": false,
+          "bCompatibleWithLumenCardSharing": false,
+          "bEnableDisplacementFade": false,
+          "bEnableTessellation": false,
+          "bHasPixelAnimation": false,
+          "bIsThinSurface": false,
+          "bOutputTranslucentVelocity": false,
+          "bOverride_BlendMode": false,
+          "bOverride_CastDynamicShadowAsMasked": false,
+          "bOverride_CompatibleWithLumenCardSharing": false,
+          "bOverride_DisplacementFadeRange": false,
+          "bOverride_DisplacementScaling": false,
+          "bOverride_DitheredLODTransition": false,
+          "bOverride_MaxWorldPositionOffsetDisplacement": false,
+          "bOverride_OpacityMaskClipValue": false,
+          "bOverride_OutputTranslucentVelocity": false,
+          "bOverride_ShadingModel": false,
+          "bOverride_TwoSided": false,
+          "bOverride_UsageFlags": 0,
+          "bOverride_bEnableDisplacementFade": false,
+          "bOverride_bEnableTessellation": false,
+          "bOverride_bHasPixelAnimation": false,
+          "bOverride_bIsThinSurface": false,
+          "blendMode": "BLEND_Opaque",
+          "displacementFadeRange": {
+            "endSizePixels": 1,
+            "startSizePixels": 4
+          },
+          "displacementScaling": {
+            "center": 0.5,
+            "magnitude": 4
+          },
+          "ditheredLODTransition": false,
+          "maxWorldPositionOffsetDisplacement": 0,
+          "opacityMaskClipValue": 0.33329999446868896,
+          "shadingModel": "MSM_DefaultLit",
+          "twoSided": false,
+          "usageFlags": 4194433
+        },
+        "parent": "/Game/UM/Materials/M_UM_Figure.M_UM_Figure",
+        "texture_parameters": {
+          "BC": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_BC",
+          "N": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_N",
+          "ORM": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_ORM"
+        }
+      },
+      "passed": true
+    },
+    "material_bc_normal_orm_wired": {
+      "measured": {
+        "BC": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_BC",
+        "N": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_N",
+        "ORM": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_ORM"
+      },
+      "passed": true
+    },
+    "material_one_sided_opaque": {
+      "expected": {
+        "BlendMode": "BLEND_Opaque",
+        "TwoSided": false
+      },
+      "measured": {
+        "instance_two_sided_override": false,
+        "parent": {
+          "BlendMode": "BLEND_Opaque",
+          "TwoSided": false
+        }
+      },
+      "note": "glTF from Tripo says doubleSided=true; the UE material stays one-sided (prop-barrel-report §5.4)",
+      "passed": true
+    },
+    "material_slots": {
+      "expected": {
+        "assigned": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Materials/MI_Decor_Barrel_Candidate",
+        "count": 1
+      },
+      "measured": {
+        "assigned": {
+          "M_Decor_Barrel": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Materials/MI_Decor_Barrel_Candidate"
+        },
+        "slots": [
+          "M_Decor_Barrel"
+        ]
+      },
+      "passed": true
+    },
+    "nanite_disabled": {
+      "expected": false,
+      "measured": false,
+      "note": "nanite == false (Nanite not enabled; MCP import_file is the legacy FbxFactory without bBuildNanite)",
+      "passed": true
+    },
+    "no_numbered_duplicates": {
+      "measured": [],
+      "passed": true
+    },
+    "no_simple_collision": {
+      "expected": 0,
+      "measured": {
+        "body_setup": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Meshes/SM_Decor_Barrel.SM_Decor_Barrel:BodySetup_0",
+        "collision_trace_flag": "CTF_UseDefault",
+        "elements": {
+          "boxElems": 0,
+          "convexElems": 0,
+          "levelSetElems": 0,
+          "mLLevelSetElems": 0,
+          "skinnedLevelSetElems": 0,
+          "skinnedTriangleMeshElems": 0,
+          "sphereElems": 0,
+          "sphylElems": 0,
+          "taperedCapsuleElems": 0
+        },
+        "simple_elements": 0
+      },
+      "note": "UE 5.8 MCP import_file added 1 simple element(s); removed with remove_collisions",
+      "passed": true
+    },
+    "normal_import_method_read_back": {
+      "expected": "FBXNIM_ImportNormals",
+      "measured": {
+        "asset_import_data": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Meshes/SM_Decor_Barrel.SM_Decor_Barrel:FbxStaticMeshImportData_0",
+        "normal_import_method": "FBXNIM_ImportNormals"
+      },
+      "note": "MCP StaticMeshTools.import_file takes no normal method: the project default for static meshes (ImportNormals) is read back and must stay",
+      "passed": true
+    },
+    "pivot_base_centre": {
+      "expected": {
+        "centre_xy": [
+          0,
+          0
+        ],
+        "min_z": 0,
+        "tolerance_uu": 0.05
+      },
+      "measured": {
+        "max": [
+          10.7085,
+          10.6777,
+          26
+        ],
+        "min": [
+          -10.7085,
+          -10.6777,
+          0
+        ],
+        "size": [
+          21.417,
+          21.3554,
+          26
+        ]
+      },
+      "passed": true
+    },
+    "protrusion_axis_by_bounds": {
+      "expected": "+X",
+      "measured": {
+        "longer_horizontal_axis": "X",
+        "size_x": 21.417,
+        "size_y": 21.3554
+      },
+      "note": "axis only (the bung makes that axis longer); the sign (+X) needs a frame",
+      "passed": true
+    },
+    "shared_master_parameters_current": {
+      "expected": {
+        "parameters": 20
+      },
+      "measured": {
+        "master": "/Game/UM/Materials/M_UM_Figure",
+        "missing": []
+      },
+      "note": "all parameters of art/um-materials/um-masters.json (figure)",
+      "passed": true
+    },
+    "textures_size_colour_space_compression": {
+      "measured": {
+        "BC": {
+          "expected": {
+            "CompressionSettings": "TC_Default",
+            "SRGB": true
+          },
+          "ok": true,
+          "properties": {
+            "CompressionSettings": "TC_Default",
+            "SRGB": true,
+            "bFlipGreenChannel": false
+          },
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        "N": {
+          "expected": {
+            "CompressionSettings": "TC_Normalmap",
+            "SRGB": false,
+            "bFlipGreenChannel": false
+          },
+          "ok": true,
+          "properties": {
+            "CompressionSettings": "TC_Normalmap",
+            "SRGB": false,
+            "bFlipGreenChannel": false
+          },
+          "size": [
+            1024,
+            1024
+          ]
+        },
+        "ORM": {
+          "expected": {
+            "CompressionSettings": "TC_Masks",
+            "SRGB": false
+          },
+          "ok": true,
+          "properties": {
+            "CompressionSettings": "TC_Masks",
+            "SRGB": false,
+            "bFlipGreenChannel": false
+          },
+          "size": [
+            1024,
+            1024
+          ]
+        }
+      },
+      "passed": true
+    },
+    "triangles_lod0_equal_candidate": {
+      "expected": 3790,
+      "measured": 3790,
+      "passed": true
+    }
+  },
+  "destination": {
+    "assets": {
+      "instance": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Materials/MI_Decor_Barrel_Candidate",
+      "static": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Meshes/SM_Decor_Barrel",
+      "texture:BC": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_BC",
+      "texture:N": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_N",
+      "texture:ORM": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_ORM"
+    },
+    "folder": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate"
+  },
+  "deviations": [],
+  "inputs": {
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/SM_Decor_Barrel.fbx": "80153e4c9ccb759ba09d0f255e6066ebee3ba152652cad7c81f8e6c90b91855b",
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_BC.png": "393b0b50d431d94909f4e24d4d0271dd603a7ee53816be747740f7d4a49afde1",
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_N.png": "33f91b4db86fa7e31ead30466a4ba9328d9fcf22d160ec6ba445ed3826fb2c17",
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_ORM.png": "9a66a5581ba08573952d82aafd1987edaf8d890e2bf3a12761db571df98b875c",
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/candidate-report.json": "321f64baf430271fa1d4621eb06b848e6d60746adbf35170c85af5ccf320ac33",
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/fbx-readback.json": "99b8d3f557ffc5a6665611d1654fc622dcd72cf98c21d0add5c7a6bddee83800"
+  },
+  "logic": "ue-static-candidate/2",
+  "measured": {
+    "bounds_uu": {
+      "max": [
+        10.7085,
+        10.6777,
+        26
+      ],
+      "min": [
+        -10.7085,
+        -10.6777,
+        0
+      ],
+      "size": [
+        21.417,
+        21.3554,
+        26
+      ]
+    },
+    "collision_after_import": {
+      "body_setup": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Meshes/SM_Decor_Barrel.SM_Decor_Barrel:BodySetup_0",
+      "collision_trace_flag": "CTF_UseDefault",
+      "elements": {
+        "boxElems": 0,
+        "convexElems": 1,
+        "levelSetElems": 0,
+        "mLLevelSetElems": 0,
+        "skinnedLevelSetElems": 0,
+        "skinnedTriangleMeshElems": 0,
+        "sphereElems": 0,
+        "sphylElems": 0,
+        "taperedCapsuleElems": 0
+      },
+      "simple_elements": 1
+    },
+    "collision_after_stage": {
+      "body_setup": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Meshes/SM_Decor_Barrel.SM_Decor_Barrel:BodySetup_0",
+      "collision_trace_flag": "CTF_UseDefault",
+      "elements": {
+        "boxElems": 0,
+        "convexElems": 0,
+        "levelSetElems": 0,
+        "mLLevelSetElems": 0,
+        "skinnedLevelSetElems": 0,
+        "skinnedTriangleMeshElems": 0,
+        "sphereElems": 0,
+        "sphylElems": 0,
+        "taperedCapsuleElems": 0
+      },
+      "simple_elements": 0
+    },
+    "import_contract": {
+      "asset_import_data": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Meshes/SM_Decor_Barrel.SM_Decor_Barrel:FbxStaticMeshImportData_0",
+      "normal_import_method": "FBXNIM_ImportNormals"
+    },
+    "instance": {
+      "TeamColor": {
+        "a": 1.0,
+        "b": 1.0,
+        "g": 1.0,
+        "r": 1.0
+      },
+      "base_property_overrides": {
+        "bCastDynamicShadowAsMasked": false,
+        "bCompatibleWithLumenCardSharing": false,
+        "bEnableDisplacementFade": false,
+        "bEnableTessellation": false,
+        "bHasPixelAnimation": false,
+        "bIsThinSurface": false,
+        "bOutputTranslucentVelocity": false,
+        "bOverride_BlendMode": false,
+        "bOverride_CastDynamicShadowAsMasked": false,
+        "bOverride_CompatibleWithLumenCardSharing": false,
+        "bOverride_DisplacementFadeRange": false,
+        "bOverride_DisplacementScaling": false,
+        "bOverride_DitheredLODTransition": false,
+        "bOverride_MaxWorldPositionOffsetDisplacement": false,
+        "bOverride_OpacityMaskClipValue": false,
+        "bOverride_OutputTranslucentVelocity": false,
+        "bOverride_ShadingModel": false,
+        "bOverride_TwoSided": false,
+        "bOverride_UsageFlags": 0,
+        "bOverride_bEnableDisplacementFade": false,
+        "bOverride_bEnableTessellation": false,
+        "bOverride_bHasPixelAnimation": false,
+        "bOverride_bIsThinSurface": false,
+        "blendMode": "BLEND_Opaque",
+        "displacementFadeRange": {
+          "endSizePixels": 1,
+          "startSizePixels": 4
+        },
+        "displacementScaling": {
+          "center": 0.5,
+          "magnitude": 4
+        },
+        "ditheredLODTransition": false,
+        "maxWorldPositionOffsetDisplacement": 0,
+        "opacityMaskClipValue": 0.33329999446868896,
+        "shadingModel": "MSM_DefaultLit",
+        "twoSided": false,
+        "usageFlags": 4194433
+      },
+      "parent": "/Game/UM/Materials/M_UM_Figure.M_UM_Figure",
+      "texture_parameters": {
+        "BC": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_BC",
+        "N": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_N",
+        "ORM": "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_ORM"
+      }
+    },
+    "lod0": {
+      "lods": 1,
+      "nanite": false,
+      "triangles": 3790,
+      "vertices": 2430
+    },
+    "material_route": {
+      "deviation": null,
+      "missing_texture_parameters": [],
+      "shared_master": "/Game/UM/Materials/M_UM_Figure",
+      "shared_master_exists": true,
+      "shared_master_parameters": {
+        "AOToBaseColor": "Scalar",
+        "BaseColorTexture": "Texture",
+        "CPD_Fade": "Scalar",
+        "CPD_FxFlash": "Vector",
+        "CPD_RimIntensity": "Scalar",
+        "CPD_RimWidth": "Scalar",
+        "CPD_TeamColor": "Vector",
+        "EmissiveIntensity": "Scalar",
+        "NormalStrength": "Scalar",
+        "NormalTexture": "Texture",
+        "ORMTexture": "Texture",
+        "RimColor": "Vector",
+        "RoughnessMax": "Scalar",
+        "RoughnessMin": "Scalar",
+        "Saturation": "Scalar",
+        "TeamColor": "Vector",
+        "TeamDye": "Scalar",
+        "TeamDyeGain": "Scalar",
+        "TeamMaskTexture": "Texture",
+        "ValueLift": "Scalar"
+      },
+      "used": "shared_master"
+    },
+    "parent_material": {
+      "BlendMode": "BLEND_Opaque",
+      "TwoSided": false
+    },
+    "textures": {
+      "BC": {
+        "expected": {
+          "CompressionSettings": "TC_Default",
+          "SRGB": true
+        },
+        "ok": true,
+        "properties": {
+          "CompressionSettings": "TC_Default",
+          "SRGB": true,
+          "bFlipGreenChannel": false
+        },
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "N": {
+        "expected": {
+          "CompressionSettings": "TC_Normalmap",
+          "SRGB": false,
+          "bFlipGreenChannel": false
+        },
+        "ok": true,
+        "properties": {
+          "CompressionSettings": "TC_Normalmap",
+          "SRGB": false,
+          "bFlipGreenChannel": false
+        },
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      "ORM": {
+        "expected": {
+          "CompressionSettings": "TC_Masks",
+          "SRGB": false
+        },
+        "ok": true,
+        "properties": {
+          "CompressionSettings": "TC_Masks",
+          "SRGB": false,
+          "bFlipGreenChannel": false
+        },
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    }
+  },
+  "not_checked": [
+    "art acceptance, silhouette, lighting, K1/K2/K3 (art track; editor frames are diagnostics only)",
+    "front sign of the bung: bounds give the axis only; see the editor frames of the evidence folder",
+    "UV seams at mips >= 2 and dark grooves (prop-barrel-report §4.3/§4.4): need K-1/K-2 frames",
+    "packaged build / cook of /Game/PipelineCandidates (not in DirectoriesToAlwaysCook)"
+  ],
+  "passed": true,
+  "previous_assets_deleted": [
+    "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Materials/MI_Decor_Barrel_Candidate",
+    "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Meshes/SM_Decor_Barrel",
+    "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_BC",
+    "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_N",
+    "/Game/PipelineCandidates/DecorBarrel/20260929-w4b-um-master/Candidate/Textures/T_Decor_Barrel_ORM"
+  ],
+  "profile": "decor-barrel-static-um-fbx-v1/2",
+  "stage": "ue-import",
+  "status": "technically_imported",
+  "tool_name_style": "short"
+}

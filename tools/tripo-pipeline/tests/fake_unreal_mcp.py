@@ -54,25 +54,55 @@ CONSOLE_SNAPSHOT = ('window "Unmatched" [pos=0,0 size=100,100] [ref=w1]\n  text 
                     '  textbox [pos=22,90 size=60,10] [ref=t7]\n')
 
 
+NORMAL_METHODS = {"FBXNIM_COMPUTE_NORMALS": "FBXNIM_ComputeNormals", "FBXNIM_IMPORT_NORMALS": "FBXNIM_ImportNormals",
+                  "FBXNIM_IMPORT_NORMALS_AND_TANGENTS": "FBXNIM_ImportNormalsAndTangents"}
+
+
 def editor_python(state, text):
-    """`py "<script>" <args.json>` typed into the console: only the CLI's vertex-colour base import is emulated."""
+    """`py "<script>" <args.json>` typed into the console: only the CLI's FBX import (UE_PY_IMPORT_FBX) is emulated.
+    FAKE_UE_EDITOR_PY_DROPS_VC=1: a static import keeps VertexColorImportOption at Ignore (the T3.1 defect);
+    FAKE_UE_NORMAL_METHOD: normal import method the fake records instead of the requested one."""
     m = re.match(r'py "([^"]+)" (\S+)$', text)
     if not m:
         return "unsupported console command"
     script, args_path = Path(m.group(1)), Path(m.group(2))
+    text = script.read_text(encoding="utf-8")
+    if "tripo-pipeline editor-Python launcher" in text:
+        # McpUnreal.editor_python types a launcher: it writes the started marker, then runs the target script
+        Path(re.search(r'with open\(r"([^"]+)"', text).group(1)).write_text("started\n", encoding="utf-8")
+        script = Path(re.search(r'runpy.run_path\(r"([^"]+)"', text).group(1))
     a = json.loads(args_path.read_text(encoding="utf-8"))
-    res = {"vertex_color_import_option": "Replace"}
-    if "static FBX import WITH vertex colours" not in script.read_text(encoding="utf-8"):
+    res = {"kind": a.get("kind"), "factory": "FbxFactory", "normal_import_method": a.get("normal_import_method")}
+    if "FBX import with an explicit legacy FbxFactory" not in script.read_text(encoding="utf-8"):
         res["error"] = "fake editor: unknown script %s" % script.name
     else:
-        vcio = "Ignore" if os.environ.get("FAKE_UE_EDITOR_PY_DROPS_VC") == "1" else "Replace"
-        created, error = mesh_import(state, "editor_toolset.toolsets.static_mesh.StaticMeshTools", a, vcio=vcio)
+        skeletal = a["kind"] == "skeletal"
+        vcio = "Replace" if a.get("vertex_colors") == "replace" else "Ignore"
+        if not skeletal and os.environ.get("FAKE_UE_EDITOR_PY_DROPS_VC") == "1":
+            vcio = "Ignore"
+        toolset = ("editor_toolset.toolsets.skeletal_mesh.SkeletalMeshTools" if skeletal
+                   else "editor_toolset.toolsets.static_mesh.StaticMeshTools")
+        created, error = mesh_import(state, toolset, a, vcio=vcio)
         if error:
             res["error"] = "RuntimeError: %s" % error
         else:
+            method = os.environ.get("FAKE_UE_NORMAL_METHOD") or a.get("normal_import_method")
+            state["assets"][created[0]]["normal_import_method"] = NORMAL_METHODS.get(method, method)
+            state["assets"][created[0]]["import_data_class"] = ("FbxSkeletalMeshImportData" if skeletal
+                                                                else "FbxStaticMeshImportData")
             res["imported"] = [obj(p)["refPath"] for p in created]
+            res["asset_import_data_class"] = state["assets"][created[0]]["import_data_class"]
+            res["normal_import_method_read_back"] = method
     Path(a["out"]).write_text(json.dumps(res), encoding="utf-8")
     return None
+
+
+INPUT_ORDER = {"MaterialExpressionLinearInterpolate": ["A", "B", "Alpha"],
+               "MaterialExpressionDesaturation": ["", "Fraction"],
+               "MaterialExpressionFresnel": ["ExponentIn", "BaseReflectFractionIn", "Normal"],
+               "MaterialExpressionEyeAdaptationInverse": ["LightValueInput", "AlphaInput"]}
+OUTPUT0 = {"MaterialExpressionVectorParameter": "RGB", "MaterialExpressionTextureSampleParameter2D": "RGB",
+           "MaterialExpressionEyeAdaptationInverse": "EyeAdaptationInverse"}
 
 
 def pkg(ref):
@@ -173,9 +203,13 @@ def mesh_import(state, toolset, args, vcio="Ignore"):
                   "slots": ["M_%d" % i for i in range(rt["material_count"])], "source": str(fbx),
                   # the export report already gives the size per UE axis (UM_FBX_v1 export frame)
                   "bounds": {"min": {"x": -x / 2, "y": -y / 2, "z": 0}, "max": {"x": x / 2, "y": y / 2, "z": z}}}
+    # MCP import_file uses the project's FbxImportUI defaults: static ImportNormals, skeletal ComputeNormals
+    # (BaseEditorPerProjectUserSettings.ini; engine gate memo, importer topic); the CLI editor-Python import overrides
+    record["normal_import_method"] = ("FBXNIM_ImportNormals" if record["class"] == "StaticMesh"
+                                      else "FBXNIM_ComputeNormals")
     if record["class"] == "StaticMesh":
         # MCP StaticMeshTools.import_file leaves VertexColorImportOption at Ignore (measured live 2026-09-28, T3.1);
-        # the editor-Python import of the CLI (UE_PY_IMPORT_STATIC_VERTEX_COLOURS) asks for Replace
+        # the editor-Python import of the CLI (UE_PY_IMPORT_FBX) asks for Replace on a vertex-mask base
         record["vcio"] = vcio
     final, error = new_asset(state, args["folder_path"], args["asset_name"], record)
     if error:
@@ -240,6 +274,11 @@ def main(argv):
     if short == "Snapshot":
         return reply(CONSOLE_SNAPSHOT)
     if short == "Type":
+        if os.environ.get("FAKE_UE_TYPE_LOSES_FIRST") == "1" and not state.get("type_lost"):
+            # like SlateInspector without keyboard focus: the command is silently dropped once
+            state["type_lost"] = True
+            return done(True)
+        state["log"].append("Cmd: " + args["text"])
         error = editor_python(state, args["text"])
         if error:
             return reply(error=error)
@@ -282,15 +321,19 @@ def main(argv):
             mesh = assets[pkg(key)]
             agg = {"sphereElems": [], "boxElems": [], "sphylElems": [], "convexElems": [{}] * mesh.get("convex", 0)}
             return reply(json.dumps({"AggGeom": agg, "CollisionTraceFlag": "CTF_UseDefault"}))
-        if key.endswith(":FbxStaticMeshImportData_0"):
-            return reply(json.dumps({p: assets[pkg(key)].get("vcio") if p == "VertexColorImportOption" else None
-                                     for p in args["properties"]}))
+        if key.endswith("ImportData_0"):
+            rec = assets[pkg(key)]
+            vals = {"VertexColorImportOption": rec.get("vcio"), "NormalImportMethod": rec.get("normal_import_method")}
+            return reply(json.dumps({p: vals.get(p) for p in args["properties"]}))
         key = pkg(key) if ":" not in key else key
         values = dict(props.get(key, {}))
         if "BodySetup" in args["properties"] and assets.get(key, {}).get("class") == "StaticMesh":
             values["BodySetup"] = {"refPath": obj(key)["refPath"] + ":BodySetup_0"}
-        if "AssetImportData" in args["properties"] and assets.get(key, {}).get("class") == "StaticMesh":
-            values["AssetImportData"] = {"refPath": obj(key)["refPath"] + ":FbxStaticMeshImportData_0"}
+        if "AssetImportData" in args["properties"] and assets.get(key, {}).get("class") in ("StaticMesh", "SkeletalMesh"):
+            cls = assets[key].get("import_data_class") or ("Fbx%sImportData" % assets[key]["class"])
+            values["AssetImportData"] = {"refPath": obj(key)["refPath"] + ":%s_0" % cls}
+        if "NaniteSettings" in args["properties"] and assets.get(key, {}).get("class") == "SkeletalMesh":
+            values["NaniteSettings"] = {"bEnabled": False}
         return reply(json.dumps({p: values.get(p) for p in args["properties"]}))
     # ---- MaterialTools / MaterialInstanceTools
     if short == "create_material":
@@ -306,8 +349,41 @@ def main(argv):
         n = assets[mat]["expressions"]
         assets[mat]["expressions"] = n + 1
         cls = args["expression_class"]["refPath"].rsplit(".", 1)[-1]
-        return done({"refPath": "%s:%s_%d" % (obj(mat)["refPath"], cls, n)})
-    if short in ("connect_expressions", "recompile"):
+        ref = "%s:%s_%d" % (obj(mat)["refPath"], cls, n)
+        assets[mat].setdefault("graph", []).append(ref)
+        props[ref] = {"MaterialExpressionEditorX": args["x"], "MaterialExpressionEditorY": args["y"]}
+        return done({"refPath": ref})
+    if short == "delete_expression":
+        mat = pkg(args["material_or_function"])
+        ref = args["expression"]["refPath"]
+        assets[mat]["graph"] = [e for e in assets[mat].get("graph", []) if e != ref]
+        assets[mat]["links"] = {d: {i: v for i, v in ins.items() if v[0] != ref}
+                                for d, ins in assets[mat].get("links", {}).items() if d != ref}
+        assets[mat]["outputs"] = {k: v for k, v in assets[mat]["outputs"].items() if v[0] != ref}
+        props.pop(ref, None)
+        return done(None)
+    if short == "get_expressions":
+        return reply([{"refPath": e} for e in assets[pkg(args["material_or_function"])].get("graph", [])])
+    if short == "connect_expressions":
+        dst = args["to_expression"]["refPath"]
+        mat = pkg(dst)
+        assets[mat].setdefault("links", {}).setdefault(dst, {})[args["to_input_name"]] = [
+            args["from_expression"]["refPath"], args["from_output_name"]]
+        return done(None)
+    if short == "get_expression_inputs":
+        dst = args["expression"]["refPath"]
+        ins = assets[pkg(dst)].get("links", {}).get(dst, {})
+        cls = dst.rsplit(":", 1)[-1].rsplit("_", 1)[0]
+        order = INPUT_ORDER.get(cls, ["A", "B", "", "Alpha", "Fraction"])
+        first, out = {}, []
+        for name in sorted(ins, key=lambda k: order.index(k) if k in order else 99):
+            src, o = ins[name]
+            # MaterialEditingLibrary.get_input_node_output_name_for_material_expression reports the output of the
+            # first input wired from the same source (live UE 5.8, 2026-09-29)
+            first.setdefault(src, o or OUTPUT0.get(src.rsplit(":", 1)[-1].rsplit("_", 1)[0], ""))
+            out.append({"input_name": name or "None", "expression": {"refPath": src}, "output_name": first[src]})
+        return reply(out)
+    if short == "recompile":
         return done(None)
     if short == "connect_to_output":
         mat = pkg(args["expression"])
@@ -336,7 +412,22 @@ def main(argv):
         value = assets[pkg(args["instance"])].get("textures", {}).get(args["name"])
         return reply({"refPath": value} if value else None)
     if short == "list_parameters":
-        return reply(assets[pkg(args["material"])].get("parameters", []))
+        target = assets[pkg(args["material"])]
+        if "parameters" in target:
+            return reply(target["parameters"])
+        kinds = {"MaterialExpressionScalarParameter": "Scalar", "MaterialExpressionVectorParameter": "Vector",
+                 "MaterialExpressionTextureSampleParameter2D": "Texture"}
+        found = []
+        for e in target.get("graph", []):
+            cls = e.rsplit(":", 1)[-1].rsplit("_", 1)[0]
+            if cls in kinds and props.get(e, {}).get("ParameterName"):
+                found.append({"type": kinds[cls], "name": props[e]["ParameterName"]})
+        return reply(found)
+    if short == "set_scalar_parameter":
+        assets[pkg(args["instance"])].setdefault("scalars", {})[args["name"]] = args["value"]
+        return done(None)
+    if short == "get_scalar_parameter":
+        return reply(assets[pkg(args["instance"])].get("scalars", {}).get(args["name"]))
     # ---- mesh queries
     mesh = assets.get(pkg(args.get("mesh", {}).get("refPath", "")))
     if mesh is None:

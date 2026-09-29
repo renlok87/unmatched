@@ -1,0 +1,884 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "profile_id": "king-arthur-segmented-skeletal/3",
+  "asset_id": "ASSET-KING-ARTHUR-001",
+  "status": "proposed",
+  "status_note": "W4-B (волна 4, 2026-09-29): тот же технический контракт сборки, что king-arthur-segmented-skeletal/2 (build/анатомия/кости/веса без изменений — FBX байт в байт те же), плюс: atlas.ao_bake (ORM.R = запечённый AO, гейт «не константа»), TeamMask одежды (маска из T3.3 без изменений), UE-маршрут um-master (MI от M_UM_Figure / M_UM_BaseMarker, цвета команд hex С-11 через FromSRGBColor). Не художественная приёмка и не бюджет; маски, dye-ручки и палитра — предложено.",
+  "derived_from": [
+    "tools/tripo-pipeline/blender/build_candidate.py (report format, atlas UV remap, ray-escape orientation, UM_FBX_v1 export, round trip)",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal-um-fbx-v1.json (profile layout)",
+    "docs/art-pipeline/rig/rig-contract.json (UM_HUMANOID_17_v1, armature object SKEL_UM_Humanoid, weapon parent hand.R for Arthur)",
+    "art/pipeline-candidates/ASSET-KING-ARTHUR-001/scripts/build_arthur_candidate.py (/1 builder; its algorithm moved into tools/tripo-pipeline/blender/candidate_build/)"
+  ],
+  "build": {
+    "flow": "seated-parts",
+    "builder": "tools/tripo-pipeline/blender/build_candidate.py (library candidate_build/)",
+    "note": "the CLI build stage runs this profile; no hero-specific script"
+  },
+  "history": {
+    "previous": "king-arthur-segmented-skeletal/2",
+    "previous_profile": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-segmented-skeletal-um-fbx-v1-cli.json",
+    "note": "the previous profile is kept unchanged as the record of its runs (20260928-cli-um-fbx-v1)"
+  },
+  "source_role": "segmented-retopo-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "expected_part_count": 15,
+  "atlas": {
+    "size": 2048,
+    "gutter_px": 4,
+    "texture_prefix": "T_KingArthur_Candidate_Atlas",
+    "base_color_factor_expected": 0.800000011920929,
+    "orm_occlusion_fill": 255,
+    "background": {
+      "BC": [
+        128,
+        128,
+        128
+      ],
+      "N_OpenGL": [
+        128,
+        128,
+        255
+      ],
+      "ORM": [
+        255,
+        220,
+        0
+      ]
+    },
+    "reference_textures": {},
+    "reference_note": "no committed reference atlas for Arthur",
+    "ao_bake": {
+      "samples": 128,
+      "distance_rel": 0.08,
+      "margin_px": 8,
+      "seed": 0,
+      "gate": {
+        "min_range_p1_p99": 32,
+        "min_occluded_fraction": 0.02,
+        "occluded_below": 250
+      },
+      "note": "W4-B (engine gate memo §1 item 5): ORM.R = ambient occlusion baked per atlas part by headless Cycles (tools/tripo-pipeline/blender/bake_ao.py), distance 0.08 x figure height, the whole figure as occluder; gate orm_occlusion_baked_not_constant. ORM.R only acts on indirect/sky light (critic G03): without a SkyLight in the light profile it changes nothing in the frame (proposal, measured in the act)"
+    }
+  },
+  "scale": {
+    "figure_height_m": 0.55,
+    "top_part": "tripo_part_5",
+    "measured_from": "base bottom (z = 0) to the highest vertex of the head part tripo_part_5 (crown). The sword tip is higher and is not the figure height (04 §3.3: height 52-56 uu of the figure; the UCP capsule 36x62 uu includes the sword)",
+    "seat": "body and sword are scaled uniformly about the source base top and placed on the normalised base top (z = base height); the base is normalised separately to its footprint",
+    "choice_note": "0.55 m inside the proposed 52-56 uu of 04 §3.3; same top as the Medusa candidate for the K-1 pair"
+  },
+  "materials": {
+    "atlas": "M_KingArthur_Atlas",
+    "note": "Blender material of the atlas (FBX slot name)"
+  },
+  "meshes": {
+    "body": {
+      "object": "SK_KingArthur_Body",
+      "mesh": "KingArthur_Body",
+      "join": "all parts except the base, the dropped parts and the sword split off tripo_part_12",
+      "active_part": "tripo_part_0"
+    },
+    "weapon": {
+      "object": "SK_KingArthur_Sword",
+      "mesh": "KingArthur_Sword",
+      "mode": "split-from-part",
+      "split_from": "tripo_part_12",
+      "bone": "weapon"
+    },
+    "base": {
+      "object": "SM_KingArthur_Base",
+      "mesh": "KingArthur_Base",
+      "mode": "normalise-part",
+      "part": "tripo_part_1",
+      "footprint_m": [
+        0.3,
+        0.3,
+        0.06
+      ],
+      "pivot": "centre of the base bottom"
+    },
+    "drop_parts": {
+      "tripo_part_14": "4 triangles in a 0.4 x 0.4 mm patch at the neck, 2 loose islands; degenerate Tripo segment (Tripo-stage report)"
+    }
+  },
+  "weapon_split": {
+    "part": "tripo_part_12",
+    "frame": "final metres (after scale and seat)",
+    "axis_fit": {
+      "blade_z_min": 0.445,
+      "pommel_z_max": 0.346
+    },
+    "sword_if_z_at_least": 0.4014,
+    "sword_if_z_below": 0.3547,
+    "between": "sword if the base-colour texel under the polygon is saturated (HSV s > saturation_min and v > value_min: bronze guard/pommel, leather grip) or the polygon centre is within grip_radius_m of the fitted sword axis; otherwise hand (grey gauntlet fist)",
+    "saturation_min": 0.35,
+    "value_min": 0.08,
+    "grip_radius_m": 0.0076,
+    "min_island_polygons": 25,
+    "smoothing": "connected components (welded topology) of one class smaller than min_island_polygons are given to the other class; repeated until stable",
+    "grip_bridge": {
+      "sides": 8,
+      "overlap_m": 0.002,
+      "near_top_m": 0.004,
+      "radius_factor": 1.0,
+      "why": "Tripo modelled no grip inside the fist: after the split the sword is two islands (guard + blade, grip stub + pommel) with a gap hidden by the fist (review frame closeup_sword_only of the first build). An open cylinder on the fitted axis makes the separate weapon whole; UVs sit inside the grip leather texels. Geometric repair, not art-accepted"
+    },
+    "source_thresholds_note": "chosen on the source GLB: guard >= z 0.625, pommel < z 0.545, grip radius 0.013 source units (x 0.58333 + seat)"
+  },
+  "closure": {
+    "why": "verify 2026-09-28 (two independent reviews, major): the Tripo base part tripo_part_1 has 4 open footprint holes in its top (74 boundary edges, ~47 cm2) and the boot soles of tripo_part_3/4 are open (64 boundary edges below z 0.075 m). In the source they sit under the boot walls; after the base normalisation (XY x0.604, Z x1.506 against the figure's uniform x0.583) they no longer match: see-through crescents around the toes at rest with a one-sided material, dark openings in the base top when a foot lifts (LungeAttack step, DeathSettle). The texels of the hole regions are black and the bake left a bronze boot fringe around them. Geometric repair, not art-accepted",
+    "base_top": {
+      "method": "the flat top (z = base height, normal +Z) is one planar UV chart: affine XY->UV fitted on it; flat top faces within region_max_distance_from_hole_m of a hole whose texels are dark (unused, black) or bronze (dilated by mip_bleed_px) are removed with the hole; each resulting boundary loop is capped flat at the top; loop vertices below the top (crack ends) get a raised copy and a vertical wall; cap/wall UVs = the same affine map shifted by the smallest pixel offset that puts the footprint (+ mip_bleed_px) on clean flat-top texels (FFT search); corner normals +Z (walls: face normal)",
+      "top_tolerance_m": 1e-05,
+      "below_top_m": 0.0001,
+      "flat_normal_z_min": 0.999,
+      "affine_max_residual_px": 0.5,
+      "mip_bleed_px": 8,
+      "mip_bleed_note": "8 px = half a mip-4 block: at the game camera the 30 uu base (600 texels) covers ~75 px, i.e. mip ~3",
+      "region_max_distance_from_hole_m": 0.015,
+      "region_note": "a flat face joins the region only if all its vertices are within this distance of a hole vertex: compact caps; keeps the long fan triangles and the dark crack line between the toe holes (a crack of the slab) out",
+      "horizontal_cap_min_area_m2": 1e-06,
+      "horizontal_cap_note": "openings with a smaller area in XY are vertical: short Tripo hole walls left standing as free ribbons once the flat faces around them are removed; those wall faces are removed (below the top, near a hole only)",
+      "tone_ring_px": [
+        12,
+        40
+      ],
+      "tone_tolerance": [
+        0.004,
+        0.02,
+        0.02
+      ],
+      "tone_note": "donor pick: among the clean areas that fit, the nearest whose mean BC luminance and tangent-normal R/G (the Tripo normal map has broad tilted bands on the top) are within tone_tolerance of the median clean texels 12-40 px around the footprint (else the closest by max(|diff|/tol))",
+      "fringe_reuv": {
+        "bronze_dilate_px": 1,
+        "face_min_texels": 4,
+        "uv_scale_steps": [
+          1.0,
+          0.75,
+          0.5
+        ],
+        "note": "kept faces of the top's planar UV chart (flat top and rim chamfer) with a vertex within region_max_distance_from_hole_m of a hole that still sample bronze fringe or black hole texels (long fan triangles) get their UVs moved onto clean stone per edge-connected group; geometry unchanged"
+      },
+      "fold_fix_max_attempts": 6,
+      "fold_fix_note": "the Tripo top has a few overlapping slivers; a cap loop along one needs a flipped triangle: the flat faces next to it are removed too and the caps rebuilt",
+      "uv_scale_steps": [
+        1.0,
+        0.75,
+        0.5,
+        0.35,
+        0.25
+      ],
+      "uv_scale_note": "cap UVs keep the stone's texel density (1.0) unless no clean area fits the footprint; then they are scaled down about their centre (the flat-top stone is nearly uniform)",
+      "dirty_texels": {
+        "dark_value_max": 0.12,
+        "bronze_hue_deg": [
+          15,
+          55
+        ],
+        "bronze_s_min": 0.2,
+        "bronze_v_min": 0.12,
+        "face_min_texels": 16,
+        "face_min_fraction": 0.1
+      },
+      "dirty_note": "measured on the BC flat top: stone v 0.196-0.22 (p1-p95), s 0.02-0.08; bronze fringe hue 20-45, s > 0.3"
+    },
+    "soles": {
+      "parts": [
+        "tripo_part_3",
+        "tripo_part_4"
+      ],
+      "z_max_m": 0.075,
+      "uv_rect_fraction_of_inradius": 0.4,
+      "method": "boundary loops of the foot parts entirely below z_max are filled flat (normal down); UVs a small rectangle inside the UV triangle of the loop's largest neighbour (sole-rim texels, as the grip bridge); weights come from the heat solve of the foot group"
+    },
+    "see_through": {
+      "grid_step_m": 0.0015,
+      "disc_radius_m": 0.12,
+      "pitches_deg": [
+        90,
+        55,
+        30
+      ],
+      "yaw_step_deg": 45,
+      "jitter_m": 2e-05
+    },
+    "diagnostic_weld_m": 1e-06
+  },
+  "weld": {
+    "distance_m": 1e-06,
+    "scope": "inside every part (never across parts), before the split",
+    "normals": "corner normals are captured once after import as a float corner attribute and re-applied after weld/split (custom normals are stored relative to smoothing fans, which topology edits change)"
+  },
+  "orientation": {
+    "method": "ray-escape",
+    "method_note": "per polygon: a ray along +normal and one along -normal (offset 1e-4 of height) against the whole candidate; area where only the +normal ray escapes counts outward, only the -normal ray escapes counts inward; score = (out - in) / (out + in)",
+    "flip_below_score": -0.5,
+    "expected_inside_out_parts": [],
+    "expected_note": "measured on the Tripo GLB 2026-09-28 (headless probe): every part >= 0.997, no inside-out part (unlike Medusa parts 8/10/13/14)",
+    "min_score_after_fix": 0.5,
+    "corner_normal_opposed_max_fraction": 0.02,
+    "fix": "flip polygon winding and negate the custom corner normals (as build_candidate.py)"
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "object_note": "rig-contract.json skeletons.UM_HUMANOID_17_v1.armature_object.name (proposed): one armature object name for every character of the skeleton",
+    "max_influences": 4,
+    "bones": [
+      [
+        "root",
+        null,
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0.045
+        ]
+      ],
+      [
+        "hips",
+        "root",
+        [
+          0,
+          0,
+          0.258
+        ],
+        [
+          0,
+          0,
+          0.33
+        ]
+      ],
+      [
+        "spine",
+        "hips",
+        [
+          0,
+          0,
+          0.33
+        ],
+        [
+          0,
+          0.004,
+          0.45
+        ]
+      ],
+      [
+        "head",
+        "spine",
+        [
+          0,
+          0.004,
+          0.458
+        ],
+        [
+          0,
+          0,
+          0.548
+        ]
+      ],
+      [
+        "arm_upper.L",
+        "spine",
+        [
+          0.058,
+          0.006,
+          0.438
+        ],
+        [
+          0.088,
+          0.012,
+          0.352
+        ]
+      ],
+      [
+        "arm_lower.L",
+        "arm_upper.L",
+        [
+          0.088,
+          0.012,
+          0.352
+        ],
+        [
+          0.1,
+          -0.012,
+          0.3
+        ]
+      ],
+      [
+        "hand.L",
+        "arm_lower.L",
+        [
+          0.1,
+          -0.012,
+          0.3
+        ],
+        [
+          0.097,
+          -0.022,
+          0.248
+        ]
+      ],
+      [
+        "arm_upper.R",
+        "spine",
+        [
+          -0.062,
+          0.006,
+          0.438
+        ],
+        [
+          -0.108,
+          0.01,
+          0.358
+        ]
+      ],
+      [
+        "arm_lower.R",
+        "arm_upper.R",
+        [
+          -0.108,
+          0.01,
+          0.358
+        ],
+        [
+          -0.093,
+          -0.063,
+          0.377
+        ]
+      ],
+      [
+        "hand.R",
+        "arm_lower.R",
+        [
+          -0.093,
+          -0.063,
+          0.377
+        ],
+        [
+          -0.08,
+          -0.079,
+          0.378
+        ]
+      ],
+      [
+        "leg_upper.L",
+        "hips",
+        [
+          0.045,
+          -0.004,
+          0.258
+        ],
+        [
+          0.055,
+          -0.008,
+          0.205
+        ]
+      ],
+      [
+        "leg_lower.L",
+        "leg_upper.L",
+        [
+          0.055,
+          -0.008,
+          0.205
+        ],
+        [
+          0.073,
+          0.004,
+          0.1
+        ]
+      ],
+      [
+        "foot.L",
+        "leg_lower.L",
+        [
+          0.073,
+          0.004,
+          0.1
+        ],
+        [
+          0.084,
+          -0.05,
+          0.065
+        ]
+      ],
+      [
+        "leg_upper.R",
+        "hips",
+        [
+          -0.045,
+          -0.004,
+          0.258
+        ],
+        [
+          -0.056,
+          -0.008,
+          0.205
+        ]
+      ],
+      [
+        "leg_lower.R",
+        "leg_upper.R",
+        [
+          -0.056,
+          -0.008,
+          0.205
+        ],
+        [
+          -0.074,
+          -0.006,
+          0.1
+        ]
+      ],
+      [
+        "foot.R",
+        "leg_lower.R",
+        [
+          -0.074,
+          -0.006,
+          0.1
+        ],
+        [
+          -0.083,
+          -0.062,
+          0.065
+        ]
+      ],
+      [
+        "weapon",
+        "hand.R",
+        [
+          -0.08,
+          -0.079,
+          0.378
+        ],
+        [
+          -0.0937,
+          -0.0805,
+          0.6079
+        ]
+      ]
+    ],
+    "placement_note": "joints measured on this mesh (final metres): slices of the limb parts and orthographic front/side renders with a 5 cm grid; weapon = grip point on the fitted sword axis at fist height -> blade tip (the builder checks both against the geometry)",
+    "weapon_axis_tolerance_m": 0.003
+  },
+  "weights": {
+    "method": "Blender automatic weights (bone heat, parent_set ARMATURE_AUTO) per part group, restricted to the group's bones (other bones use_deform off during the solve); rigid groups 100 % on one bone; then cleanup",
+    "coordinates_frame": "final",
+    "coordinates_frame_note": "height_ramps in final metres (candidate frame after scale and seat)",
+    "clean_below": 0.01,
+    "smoothing_note": "no edge smoothing of weights: tried (2 iterations, factor 0.5) and it raised the probe-pose edge stretch (arm_l_raise max 1.46x -> 3.10x, 17 edges > 1.5x), because Tripo's retopology has long edges joining distant regions",
+    "fallback": "vertices the heat solve leaves unweighted get 1.0 on the nearest allowed bone (point-segment distance); counted per part",
+    "groups": [
+      {
+        "parts": [
+          "tripo_part_5"
+        ],
+        "rigid": "head",
+        "why": "head, hair and crown move as one (rig-contract §9.1)"
+      },
+      {
+        "parts": [
+          "tripo_part_12"
+        ],
+        "rigid": "hand.R",
+        "why": "gauntlet fist without finger bones; the sword is split off"
+      },
+      {
+        "parts": [
+          "tripo_part_6"
+        ],
+        "heat": [
+          "hips",
+          "spine",
+          "head",
+          "arm_upper.L",
+          "arm_upper.R"
+        ]
+      },
+      {
+        "parts": [
+          "tripo_part_2"
+        ],
+        "heat": [
+          "hips",
+          "spine",
+          "leg_upper.L",
+          "leg_upper.R"
+        ],
+        "height_ramps": [
+          {
+            "bones": [
+              "leg_upper.L",
+              "leg_upper.R"
+            ],
+            "zero_above_z": 0.31,
+            "full_below_z": 0.23,
+            "to": "hips"
+          }
+        ],
+        "why": "tassets follow the thighs at the hem only; heat gave leg_upper.R up to 0.76 at belt height (z 0.34) next to hips 0.89 (2.8x edge stretch in the thigh_r_flex probe pose, first build)"
+      },
+      {
+        "parts": [
+          "tripo_part_0"
+        ],
+        "heat": [
+          "hips",
+          "spine",
+          "leg_upper.L",
+          "leg_upper.R"
+        ],
+        "height_ramps": [
+          {
+            "bones": [
+              "leg_upper.L",
+              "leg_upper.R"
+            ],
+            "zero_above_z": 0.26,
+            "full_below_z": 0.15,
+            "to": "hips"
+          },
+          {
+            "bones": [
+              "hips"
+            ],
+            "zero_above_z": 0.4,
+            "full_below_z": 0.3,
+            "to": "spine"
+          }
+        ],
+        "caps": {
+          "leg_upper.L": 0.3,
+          "leg_upper.R": 0.3
+        },
+        "cap_excess_to": "hips",
+        "why": "cloak: rig-contract §9.4 hips with a soft transition to leg_upper at the hem only (ramp: no leg weight above the hip line; heat gave leg_upper.R 0.29 at z 0.41 inside the cloak, 3.8x edge stretch in thigh_r_flex, first build); cap keeps the hem from swinging fully with a thigh; second ramp: the collar hangs from the shoulders on spine (heat mixed hips/spine abruptly there: 2.15x on 3-6 mm collar edges in spine_bend_fwd)"
+      },
+      {
+        "parts": [
+          "tripo_part_11",
+          "tripo_part_13"
+        ],
+        "heat": [
+          "hips",
+          "spine"
+        ]
+      },
+      {
+        "parts": [
+          "tripo_part_8"
+        ],
+        "heat": [
+          "spine",
+          "arm_upper.L",
+          "arm_lower.L"
+        ]
+      },
+      {
+        "parts": [
+          "tripo_part_9"
+        ],
+        "heat": [
+          "spine",
+          "arm_upper.R",
+          "arm_lower.R"
+        ]
+      },
+      {
+        "parts": [
+          "tripo_part_7"
+        ],
+        "heat": [
+          "arm_upper.L",
+          "arm_lower.L",
+          "hand.L"
+        ]
+      },
+      {
+        "parts": [
+          "tripo_part_10"
+        ],
+        "heat": [
+          "arm_upper.R",
+          "arm_lower.R",
+          "hand.R"
+        ]
+      },
+      {
+        "parts": [
+          "tripo_part_3"
+        ],
+        "heat": [
+          "hips",
+          "leg_upper.L",
+          "leg_lower.L",
+          "foot.L"
+        ]
+      },
+      {
+        "parts": [
+          "tripo_part_4"
+        ],
+        "heat": [
+          "hips",
+          "leg_upper.R",
+          "leg_lower.R",
+          "foot.R"
+        ]
+      }
+    ],
+    "part_roles": {
+      "tripo_part_0": "cloak",
+      "tripo_part_1": "base",
+      "tripo_part_2": "tassets, tabard and skirt",
+      "tripo_part_3": "left leg with foot",
+      "tripo_part_4": "right leg with foot",
+      "tripo_part_5": "head, hair, beard and crown",
+      "tripo_part_6": "breastplate, gorget and belt",
+      "tripo_part_7": "left forearm and open left hand",
+      "tripo_part_8": "left upper arm and pauldron",
+      "tripo_part_9": "right upper arm and pauldron",
+      "tripo_part_10": "right forearm",
+      "tripo_part_11": "cloth between the cloak halves at the upper back",
+      "tripo_part_12": "right gauntlet fist + sword (split)",
+      "tripo_part_13": "belt patch at the back",
+      "tripo_part_14": "degenerate (dropped)"
+    }
+  },
+  "anatomy": {
+    "head": "tripo_part_5",
+    "feet": {
+      "L": "tripo_part_3",
+      "R": "tripo_part_4"
+    },
+    "weapon_hand": "tripo_part_12",
+    "feet_sink_m": [
+      -0.003,
+      0.003
+    ],
+    "feet_sink_note": "lowest foot vertex within 3 mm of the base top (source: the feet sink 1.3 mm)",
+    "front": {
+      "feet": {
+        "method": "low_band",
+        "band_m": 0.012,
+        "toe_ahead_of_ankle_m": 0.02,
+        "heel_behind_ankle_max_m": 0.03
+      },
+      "weapon_centroid_y_max_m": -0.02
+    },
+    "side_indicators": [
+      {
+        "what": "weapon",
+        "sign": -1,
+        "min_m": 0.02
+      }
+    ],
+    "export_frame_indicators": [
+      {
+        "what": "weapon",
+        "axis": "front",
+        "min_m": 0.02
+      },
+      {
+        "what": "weapon",
+        "axis": "weapon_side",
+        "min_m": 0.02
+      }
+    ],
+    "note": "part roles named by the profile; the build also detects them from the geometry (report anatomy.auto, disagreements listed). Front: the head part is closed (its mean normal is no front indicator), so the sword ahead of the body and the toes ahead of the ankles are used"
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "blender_weapon_side": "-X",
+    "weapon_side_note": "sword in the character's right hand; .L = +X, so the right hand is -X (rig-contract side_convention)",
+    "front_indicators": "sword centroid in front of the body axis (y < 0) and toe tips in front of the ankles; the head part is closed, its mean normal is not a front indicator (Medusa used the open face part)",
+    "fbx": "fbx_preset (UM_FBX_v1): export_space_rotation_z_degrees 90, -Y forward, Z up, FBX_SCALE_UNITS, data x100, UnitScaleFactor patched to 1.0, Triangulate on",
+    "expected_ue_front": "+X",
+    "expected_ue_weapon_side": "+Y",
+    "expected_ue_front_source": "04-blender-production.md §1 «Оси» + §1.1 preset UM_FBX_v1; verified by ART-001 — a standard, not a proposal; UE map measured on the Medusa candidate: ue(x, y) = (-y_blender, -x_blender)"
+  },
+  "exports": {
+    "skeletal_fbx": "SK_KingArthur_Candidate.fbx",
+    "base_fbx": "SM_KingArthur_Base_Candidate.fbx",
+    "path_mode_note": "STRIP (bare texture names) instead of the preset's AUTO: textures reach UE from the atlas stage, not through the FBX"
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "weapon",
+      "location_uu": [
+        0,
+        0,
+        0
+      ],
+      "purpose": "Holy Avenger VFX (CUE-014); the weapon bone head is the grip point on the fitted sword axis, the bone runs up the blade to the tip",
+      "measured_target_ue_component_uu": [
+        7.9,
+        8.0,
+        37.8
+      ],
+      "target": {
+        "kind": "bone_head"
+      }
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "target": {
+        "kind": "part_bbox_centre",
+        "part": "tripo_part_5"
+      },
+      "purpose": "damage / status VFX",
+      "measured_target_ue_component_uu": [
+        -0.169,
+        0.151,
+        49.921
+      ],
+      "measured_offset_blender_bone_local_uu": [
+        -0.151,
+        4.127,
+        0.048
+      ],
+      "location_uu": null,
+      "location_note": "null: the build predicts the UE bone-space offset (build-report sockets[].location_uu_for_ue = the Blender bone-local target with y negated, because the UE FBX import mirrors Y) and ue-import sets it; verify get_socket_location(Head) = target_ue_component_uu within 0.05 uu in a live frame",
+      "target_note": "bounding-box centre of the head part tripo_part_5 (face, hair, crown)"
+    }
+  ],
+  "team_color": {
+    "status": "предложено",
+    "applicability": "open: AD-CNF-58 (TeamColor only on base/ring per 03 С-11, or on the figure material per 04). The mask is produced as an optional input; the base is a separate mesh and can carry the team colour on its own",
+    "mask_texture": "T_KingArthur_Candidate_Atlas_TeamMask.png",
+    "mask_rule": "red cloth (cloak, tabard, back cloth): HSV hue >= 340 or <= 10 deg, s >= 0.55, v in [0.10, 0.85] on the BC atlas, Gaussian soft edge sigma 1 px, only inside part cells. Measured on this atlas: cloak red hue 340-12, s 0.65-0.76, v 0.26-0.37; skin hue 15-32, s <= 0.58 (head reddish pixels s median 0.39)",
+    "mask_params": {
+      "hue_min_deg": 340,
+      "hue_max_deg": 10,
+      "s_min": 0.55,
+      "v_min": 0.1,
+      "v_max": 0.85,
+      "blur_sigma_px": 1.0
+    },
+    "mask": {
+      "method": "hsv-hard-gaussian",
+      "texture": "T_KingArthur_Candidate_Atlas_TeamMask.png",
+      "hue_min_deg": 340,
+      "hue_max_deg": 10,
+      "s_min": 0.55,
+      "v_min": 0.1,
+      "v_max": 0.85,
+      "blur_sigma_px": 1.0,
+      "note": "built by the atlas stage (candidate/atlas.py) as an atlas output; formerly scripts/team_mask_arthur.py (mask_params above)"
+    }
+  },
+  "ue": {
+    "skeletal_asset": "SK_KingArthur_Candidate",
+    "base_asset": "SM_KingArthur_Base_Candidate",
+    "material_route": "um-master",
+    "material_route_note": "W4-B: MI of /Game/UM/Materials/M_UM_Figure (figure) and M_UM_BaseMarker (base), team MIs as their children; masters built by tools/tripo-pipeline/um_masters.py",
+    "masters": {
+      "figure": "/Game/UM/Materials/M_UM_Figure",
+      "base": "/Game/UM/Materials/M_UM_BaseMarker"
+    },
+    "figure_instance": "MI_KingArthur_Candidate",
+    "base_instance": "MI_KingArthur_Base_Candidate",
+    "teams": {
+      "Gold": "#E8C06A",
+      "Silver": "#9FC2D8"
+    },
+    "teams_note": "03 С-11 hex (Q-304 open); linear only through FLinearColor::FromSRGBColor (AD-OPEN-39 rule)",
+    "default_team": "Gold",
+    "team_instances": {
+      "figure": "MI_KingArthur_Candidate_{team}",
+      "base": "MI_KingArthur_Base_Candidate_{team}"
+    },
+    "team_color_mode": "mask",
+    "team_color_mode_note": "user decision 2026-09-28 (AD-CNF-58 = b): TeamColor on the base band and on the clothing by TeamMask; mask: lerp(BC, BC x TeamColor | dye, TeamMask.R)",
+    "figure_parameters": {
+      "TeamDye": 0.0
+    },
+    "base_marker": {
+      "textures": true,
+      "parameters": {
+        "SideBandWeight": 1.0,
+        "VertexMaskWeight": 0.0
+      },
+      "note": "textured Tripo base: team band = the side wall (local vertex normal |z| < SideBandNormalZMax), flat TeamColor (BandKeepsTexture 0); proposal"
+    },
+    "textures": {
+      "BC": {
+        "file_key": "BC",
+        "srgb": true,
+        "compression": "TC_Default",
+        "asset": "T_KingArthur_Candidate_BC"
+      },
+      "N": {
+        "file_key": "N",
+        "srgb": false,
+        "compression": "TC_Normalmap",
+        "flip_green": false,
+        "asset": "T_KingArthur_Candidate_N"
+      },
+      "ORM": {
+        "file_key": "ORM",
+        "srgb": false,
+        "compression": "TC_Masks",
+        "asset": "T_KingArthur_Candidate_ORM"
+      },
+      "TeamMask": {
+        "asset": "T_KingArthur_Candidate_TeamMask",
+        "file_key": "TeamMask",
+        "srgb": false,
+        "compression": "TC_Grayscale"
+      }
+    }
+  },
+  "expectations": {
+    "triangles": {
+      "SK_KingArthur_Body": 19201,
+      "SK_KingArthur_Sword": 609,
+      "SM_KingArthur_Base": 1528
+    },
+    "bones": 17,
+    "skeletal_material_slots": 1,
+    "base_material_slots": 1,
+    "note": "measured by the build of 2026-09-28 and fixed here. First Blender build: GLB 21 341 tris - 4 (dropped tripo_part_14) - 3 (degenerate faces removed by the weld in parts 3 and 6) + 16 (grip bridge) = 21 350 (body 19 145, base 1 596). Closure rebuild (verify 2026-09-28): body + 56 (4 sole caps: 12 + 17 + 15 + 12) = 19 201; base - 125 flat top faces with dark/bronze texels - 12 hole-wall faces + 69 cap triangles (33 + 36, incl. 2 crack-end wall triangles) = 1 528; total 21 338"
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "04-blender-production.md §1/§3.3/§3.8, 17-art-production-spec.md §4.5 — ПРЕДЛОЖЕНИЕ до решения GD-058, не бюджет",
+    "hero_triangles": [
+      15000,
+      25000
+    ],
+    "texture_px": 2048,
+    "material_slots_max": 2,
+    "height_uu": [
+      52,
+      56
+    ],
+    "base_diameter_uu": 30,
+    "base_height_uu": 6,
+    "capsule_uu": {
+      "diameter": 36,
+      "height": 62
+    }
+  },
+  "review": {
+    "game_camera": {
+      "horizontal_fov_deg": 35,
+      "pitch_deg": -55,
+      "note": "03 §2 start angle; in Blender vertical FOV ~20 deg at 16:9"
+    },
+    "closeups": [
+      "head",
+      "right hand with sword",
+      "left hand",
+      "sword",
+      "base"
+    ]
+  }
+}

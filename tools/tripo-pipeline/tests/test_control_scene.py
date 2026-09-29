@@ -8,6 +8,7 @@ Run from the repo root:  python -m unittest discover -s tools/tripo-pipeline/tes
 """
 
 import importlib.util
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -111,6 +112,72 @@ class VoidHolesTest(unittest.TestCase):
         empty[0, 0] = 200.0
         out = an.void_holes(disc, 1.0, empty, empty, empty)
         self.assertFalse(out["void_empty_ok"])
+
+
+class TeamContrastTest(unittest.TestCase):
+    """W4-B review fix: figure / base split of the team comparison, noise pair, inputs export and recompute."""
+
+    @staticmethod
+    def write_run(root, tag, figure_team_rgb, base_team_rgb, noise=0):
+        from PIL import Image
+        run = root / tag
+        run.mkdir(parents=True)
+        h, w = 120, 160
+        board = np.full((h, w, 3), 60, np.uint8)
+        fig = np.zeros((h, w), bool)
+        fig[20:80, 70:90] = True                          # figure
+        base = np.zeros((h, w), bool)
+        base[80:95, 55:105] = True                        # base below it
+
+        def frame(fig_rgb, base_rgb, show_fig=True, show_base=True):
+            a = board.copy()
+            if show_base:
+                a[base] = base_rgb
+            if show_fig:
+                a[fig] = fig_rgb
+            if noise:
+                a[5, 5] = (a[5, 5].astype(int) + noise) % 255
+            return a
+
+        save = lambda name, a: Image.fromarray(a).save(run / ("p17-%s-ue-editor.png" % name))  # noqa: E731
+        save("mask-k2-1p6-merlin", frame((200, 200, 200), (120, 120, 120)))
+        save("mask-k2-1p6-empty-merlin", board)
+        save("mask-k2-1p6-base-merlin", frame((0, 0, 0), (120, 120, 120), show_fig=False))
+        save("k2-1p6-merlin", frame((90, 80, 40), (200, 160, 60)))                    # Gold
+        save("team-alt-k2-1p6-merlin", frame(figure_team_rgb, base_team_rgb))         # Silver
+        (run / "control-scene-report.json").write_text(json.dumps({"tag": tag, "asset_set": "w4b"}), encoding="utf-8")
+        return run
+
+    def test_regions_noise_and_inputs_round_trip(self):
+        import tempfile
+        tc = load("team_contrast")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trim_only = self.write_run(root, "trim", (90, 80, 40), (100, 150, 190))   # only the base changes team
+            robe = self.write_run(root, "robe", (40, 70, 110), (100, 150, 190))
+            robe2 = self.write_run(root, "robe2", (40, 70, 110), (100, 150, 190), noise=3)
+            runs = [tc.load_run(p) for p in (trim_only, robe, robe2)]
+            res = {r["meta"]["tag"]: tc.analyse(r) for r in runs}
+            trim = res["trim"]["subjects"]["merlin"]["c11_pair"]
+            self.assertEqual(trim["regions"]["figure"]["grey"]["mean_abs_dY"], 0.0, "unchanged figure")
+            self.assertGreater(trim["grey"]["mean_abs_dY"], 0.0, "the silhouette mean hides it")
+            self.assertEqual(trim["base_share_of_sum"]["deuteranopia_dE76"], 1.0)
+            robe_fig = res["robe"]["subjects"]["merlin"]["c11_pair"]["regions"]["figure"]
+            self.assertGreater(robe_fig["deuteranopia"]["mean_dE76"], 5.0)
+            self.assertEqual(res["robe"]["subjects"]["merlin"]["split_source"], "own base-only frame")
+            noise = tc.noise_floor(runs[1], runs[2])["subjects"]["merlin"]["main"]
+            self.assertEqual(noise["grey"]["mean_abs_dY"], 0.0, "pixel (5,5) is outside the silhouette")
+            inputs = root / "inputs"
+            tc.write_inputs(inputs, runs, ["robe", "robe2"])
+            again, noise_tags = tc.load_inputs(inputs)
+            self.assertEqual(noise_tags, ["robe", "robe2"])
+            for before, after in zip(runs, again):
+                a, b = tc.analyse(before), tc.analyse(after)
+                for e in (a, b):
+                    e.pop("run", None), e.pop("inputs", None)
+                    for s in e["subjects"].values():
+                        s.pop("crop_box_px", None)
+                self.assertEqual(a, b, "numbers from the committed crops = numbers from the full frames")
 
 
 if __name__ == "__main__":

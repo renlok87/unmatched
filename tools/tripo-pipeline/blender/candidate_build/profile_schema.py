@@ -15,7 +15,9 @@ TOE_METHODS = ("low_band", "front_quartile")
 SOCKET_TARGETS = ("bone_head", "part_bbox_centre", "foot_tip")
 GROUP_KINDS = ("rigid", "heat", "wing_span", "axis_blend")
 EXPORT_AXES = ("front", "left", "right", "weapon_side")
-TEAM_MASK_METHODS = ("hsv-hard-gaussian", "hsv-smooth-box")
+TEAM_MASK_METHODS = ("hsv-hard-gaussian", "hsv-smooth-box", "hsv-band-cells")
+MATERIAL_ROUTES = ("own-material", "um-master")
+TEAM_MODES = ("multiply", "mask", "none")
 
 
 def flow_of(profile):
@@ -99,6 +101,41 @@ def _common(profile, problems):
     for key, tex in ((_get(profile, "ue.textures") or {}).items()):
         if not tex.get("file_key"):
             problems.append("ue.textures.%s: file_key (atlas output key) is required" % key)
+    if mask is not None and mask.get("method") in ("hsv-smooth-box", "hsv-band-cells"):
+        cells = mask.get("cells")
+        if not (isinstance(cells, list) and cells and all(_part_name(c) for c in cells)):
+            problems.append("team_color.mask.cells must list tripo_part_N names (method %s)" % mask.get("method"))
+    ao = _get(profile, "atlas.ao_bake")
+    if ao is not None:
+        if not isinstance(ao, dict):
+            problems.append("atlas.ao_bake must be an object {samples, distance_rel, margin_px, seed, gate}")
+        else:
+            if not (isinstance(ao.get("samples", 128), int) and ao.get("samples", 128) > 0):
+                problems.append("atlas.ao_bake.samples must be a positive integer")
+            if not (isinstance(ao.get("distance_rel", 0.08), (int, float)) and ao.get("distance_rel", 0.08) > 0):
+                problems.append("atlas.ao_bake.distance_rel must be a positive number (fraction of the figure height)")
+    route = _get(profile, "ue.material_route")
+    if route is not None and route not in MATERIAL_ROUTES:
+        problems.append("ue.material_route must be one of %s" % (MATERIAL_ROUTES,))
+    mode = _get(profile, "ue.team_color_mode")
+    if mode is not None and mode not in TEAM_MODES:
+        problems.append("ue.team_color_mode must be one of %s" % (TEAM_MODES,))
+    if route == "um-master":
+        _require(profile, problems, "ue.figure_instance", "ue.base_instance", "ue.teams", "ue.default_team",
+                 "ue.team_instances.figure", "ue.team_instances.base")
+        teams = _get(profile, "ue.teams") or {}
+        for team, colour in teams.items():
+            ok = isinstance(colour, str) and colour.startswith("#") and len(colour) == 7
+            if not ok and not (isinstance(colour, dict) and isinstance(colour.get("linear"), list)):
+                problems.append("ue.teams.%s must be sRGB hex '#RRGGBB' (FromSRGBColor) or {\"linear\": [...]}" % team)
+        if teams and _get(profile, "ue.default_team") not in teams:
+            problems.append("ue.default_team must be one of ue.teams")
+        for part in ("figure", "base"):
+            pattern = _get(profile, "ue.team_instances.%s" % part)
+            if pattern is not None and "{team}" not in pattern:
+                problems.append("ue.team_instances.%s must contain {team}" % part)
+        if mode == "mask" and not _get(profile, "ue.textures.TeamMask"):
+            problems.append("ue.team_color_mode mask needs ue.textures.TeamMask (team_color.mask of the atlas)")
     return names
 
 

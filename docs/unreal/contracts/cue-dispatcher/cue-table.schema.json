@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unmatched.local/schemas/unmatched.cue-table-1.json",
+  "title": "unmatched.cue-table/1 — данные FS08CueDispatcher",
+  "description": "Таблица презентации CUE: что показать (Niagara, USoundBase, клип, материал, UI, пост-процесс), где (сокет) и как вести себя при повторе, новом событии, реконнекте и сокращённых анимациях. Источник правды для будущего UPrimaryDataAsset. Семантику сверх схемы проверяет tools/s08/cue_contract/cue_contract.py validate-table.",
+  "type": "object",
+  "required": ["schema", "revision", "status", "cues"],
+  "additionalProperties": true,
+  "properties": {
+    "schema": {"const": "unmatched.cue-table/1"},
+    "revision": {"type": "string", "minLength": 1},
+    "status": {"enum": ["предложено", "измерено", "технически импортировано", "художественно принято"]},
+    "cues": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/cue"}}
+  },
+  "$defs": {
+    "softPath": {"type": "string", "pattern": "^/Game/[A-Za-z0-9_/]+\\.[A-Za-z0-9_]+$"},
+    "asset": {
+      "description": "present: путь задан; missing: ассета нет, причина обязательна (строка missing-report)",
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {"enum": ["present", "missing"]},
+        "missing_reason": {"type": "string", "minLength": 1}
+      },
+      "if": {"properties": {"status": {"const": "missing"}}},
+      "then": {"required": ["missing_reason"]}
+    },
+    "vfx": {
+      "allOf": [{"$ref": "#/$defs/asset"}],
+      "type": "object",
+      "required": ["system", "status", "attach", "sim", "deterministic", "prewarm"],
+      "properties": {
+        "system": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/softPath"}]},
+        "attach": {"enum": ["socket", "world"]},
+        "socket": {"type": ["string", "null"]},
+        "sim": {"const": "cpu", "description": "Niagara CPU-симуляция (меморандум: пул, детерминизм, прогрев; GPU-сим не для MVP)"},
+        "deterministic": {"const": true},
+        "prewarm": {"const": true},
+        "note": {"type": "string"}
+      },
+      "if": {"properties": {"attach": {"const": "socket"}}},
+      "then": {"required": ["socket"], "properties": {"socket": {"type": "string", "minLength": 1}}}
+    },
+    "sfx": {
+      "allOf": [{"$ref": "#/$defs/asset"}],
+      "type": "object",
+      "required": ["sound", "status", "sound_class", "priority", "concurrency"],
+      "properties": {
+        "sound": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/softPath"}]},
+        "sound_class": {"enum": ["UI", "SFX", "Music"]},
+        "priority": {"enum": [1, 2, 3]},
+        "concurrency": {
+          "type": "object",
+          "required": ["max_count", "resolution", "retrigger_ms"],
+          "additionalProperties": false,
+          "properties": {
+            "max_count": {"type": ["integer", "null"], "minimum": 1},
+            "resolution": {"enum": ["StopOldest", "PreventNew"]},
+            "retrigger_ms": {"type": "integer", "minimum": 0}
+          }
+        }
+      }
+    },
+    "clip": {
+      "allOf": [{"$ref": "#/$defs/asset"}],
+      "type": "object",
+      "required": ["role", "status"],
+      "properties": {
+        "role": {"enum": ["LungeAttack", "HitReact", "DeathSettle"]},
+        "sequence": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/softPath"}]}
+      }
+    },
+    "cue": {
+      "type": "object",
+      "required": ["id", "event", "source", "trigger", "subject", "duration_ms", "feedback_delay_ms", "blocks_input",
+                   "skippable", "vfx", "sfx", "on_new_event", "replace_scope", "interrupted_by", "on_reconnect", "reduced_motion",
+                   "shake", "fallback", "source_row"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^CUE-[0-9]{3}$"},
+        "event": {"type": "string"},
+        "source": {"enum": ["local", "server", "connection"]},
+        "trigger": {"type": "string", "pattern": "^(input|state|net)\\.[a-z_]+$"},
+        "subject": {"enum": ["fighter", "target", "cursor", "hud", "scene"]},
+        "duration_ms": {"type": ["integer", "null"], "minimum": 0},
+        "duration_per_step_ms": {"type": "integer", "minimum": 1},
+        "feedback_delay_ms": {"type": "integer", "minimum": 0, "maximum": 200},
+        "blocks_input": {"type": "boolean"},
+        "skippable": {"type": "boolean"},
+        "vfx": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/vfx"}]},
+        "sfx": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sfx"}]},
+        "clip": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/clip"}]},
+        "material": {"oneOf": [{"type": "null"}, {"type": "object", "required": ["cpd_param", "cpd_indices"],
+          "properties": {"cpd_param": {"enum": ["FxFlash", "Rim", "Fade"]},
+                         "cpd_indices": {"type": "array", "items": {"type": "integer", "minimum": 0, "maximum": 11}, "minItems": 1}}}]},
+        "ui": {"type": ["object", "null"]},
+        "marker": {"type": ["object", "null"]},
+        "postprocess": {"type": ["object", "null"]},
+        "on_new_event": {"enum": ["replace", "cascade", "jump_to_final", "interrupt", "none"]},
+        "replace_scope": {"enum": ["cue", "subject"], "description": "cue: новый показ обрывает любой активный показ этого CUE (наведение, выбор, баннер); subject: только у того же бойца/объекта (урон, перемещение)"},
+        "interrupted_by": {"type": "array", "items": {"type": "string", "pattern": "^CUE-[0-9]{3}$"}, "uniqueItems": true},
+        "on_reconnect": {"const": "skip", "description": "правило пакета: старая очередь CUE после реконнекта не проигрывается (ACC-012, QA-108)"},
+        "reduced_motion": {
+          "type": "object",
+          "required": ["mode"],
+          "properties": {"mode": {"enum": ["keep", "shorten", "snap"]}, "max_ms": {"type": "integer", "minimum": 0, "maximum": 100}},
+          "if": {"properties": {"mode": {"const": "shorten"}}},
+          "then": {"required": ["max_ms"]}
+        },
+        "shake": {"oneOf": [{"type": "null"}, {"type": "object", "required": ["asset", "disabled_by"],
+          "properties": {"asset": {"$ref": "#/$defs/softPath"}, "disabled_by": {"const": "UI-ACC-005"}}}]},
+        "fallback": {"type": "object", "required": ["behaviour", "log"],
+          "properties": {"behaviour": {"type": "string", "minLength": 1}, "log": {"enum": ["Warning"]}}},
+        "source_row": {"type": "string"}
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "neg-replay-after-reconnect",
+ "kind": "negative-trace",
+ "description": "После реконнекта (recovered_seq=14) показан старый урон seq 12: G3.",
+ "covers": [
+  "QA-108",
+  "ACC-012"
+ ],
+ "trace": [
+  "[2026.09.29-10.00.00:000][  0]LogUnmatched: CUE reconnect recovered_seq=14 t=4000",
+  "[2026.09.29-10.00.00:100][  6]LogUnmatched: CUE fx id=CUE-011 subject=arthur seq=12 t=4100 vfx=missing sfx=missing clip=missing mat=FxFlash socket=Head reduced=0 result=fallback",
+  "[2026.09.29-10.00.01:000][ 60]LogUnmatched: CUE fx done id=CUE-011 subject=arthur seq=12 t=5000 ms=900 cut=0"
+ ],
+ "expect_error_codes": [
+  "G3"
+ ]
+}

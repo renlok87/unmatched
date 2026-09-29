@@ -7,6 +7,12 @@ summary.json. Исходные клипы только читаются. Фик�
 art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/fixtures/ и
 пересоздаются make_fixtures.py. Blender запускается только headless (-b).
 
+Контракт v2 (2026-09-29): черновые клипы и фикстуры P1.6 — файлы скелета UM_HUMANOID_17_v1, который
+закрыт для новых клипов; кейсы ниже проверяют их явно с --skeleton=UM_HUMANOID_17_v1 (WARN
+skeleton_version по sha256) и с ролью границы клипа (DeathSettle — terminal). --out-dir позволяет
+повторить прогон, не переписывая отчёты P1.6 в validation/ (они — свидетельство P1.6 от 2026-09-28).
+Кейсы контракта v2 — run_rig_v2_validation.py.
+
 Код выхода 0 — все кейсы выполнены и дали ожидаемый итог. Код 1 — хотя бы один
 кейс не выполнен (нет входного файла, нет отчёта) или итог не совпал с ожиданием,
 включая перекрёстную проверку ветки GLB против FBX.
@@ -24,23 +30,25 @@ RUN = "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16"
 FIX = RUN + "/fixtures"
 TRIPO_CLIP = FIX + "/tripo-preset-stoya-otdyh-d562/tripo_convert_93b4445d-b871-4057-a0d7-1317f45a1548.fbx"
 
+V1 = "--skeleton=UM_HUMANOID_17_v1"  # закрытый скелет черновиков (контракт v2); WARN skeleton_version по sha256
+
 CASES = [
     # (report name, clip, extra args, expected exit, expected warnings)
     ("AM_Medusa_Idle", "blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx",
-     ["--expect-duration=2.3333", "--loop=true"], 0, ["visible_pose_change"]),
+     [V1, "--expect-duration=2.3333", "--loop=true"], 0, ["visible_pose_change", "skeleton_version"]),
     ("AM_Medusa_LungeAttack", "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx",
-     ["--expect-duration=0.5833"], 0, []),
+     [V1, "--expect-duration=0.5833"], 0, ["skeleton_version"]),
     ("AM_Medusa_HitReact", "blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx",
-     ["--expect-duration=0.375"], 0, []),
+     [V1, "--expect-duration=0.375"], 0, ["skeleton_version"]),
     ("AM_Medusa_DeathSettle", "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx",
-     ["--expect-duration=0.875"], 0, []),
+     [V1, "--expect-duration=0.875", "--clip-role=terminal"], 0, ["skeleton_version"]),
     ("bvh-roundtrip-AM_Medusa_LungeAttack", FIX + "/AM_Medusa_LungeAttack.bvh",
-     ["--bvh-up=Z", "--expect-duration=0.5833"], 0, []),
+     [V1, "--bvh-up=Z", "--expect-duration=0.5833"], 0, ["skeleton_version"]),
     ("glb-roundtrip-AM_Medusa_LungeAttack", FIX + "/AM_Medusa_LungeAttack.glb",
-     ["--expect-duration=0.5833"], 0, []),
+     [V1, "--expect-duration=0.5833"], 0, ["skeleton_version"]),
     ("tripo-preset-stoya-otdyh-d562", TRIPO_CLIP,
      ["--retarget-map=tripo_ue5_mannequin_to_um17", "--loop=true"], 0, []),
-    ("negative-SK_Medusa-static", "blender/ASSET-MEDUSA-001/export/SK_Medusa.fbx", [], 1, []),
+    ("negative-SK_Medusa-static", "blender/ASSET-MEDUSA-001/export/SK_Medusa.fbx", [V1], 1, []),
     ("negative-tripo-preset-direct-contract", TRIPO_CLIP, [], 1, []),
 ]
 
@@ -78,8 +86,10 @@ def glb_cross_check(reports):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--blender", default="C:/Program Files/Blender Foundation/Blender 5.2/blender.exe")
+    ap.add_argument("--out-dir", default=VAL, help="куда писать отчёты и summary.json (по умолчанию validation/)")
     a = ap.parse_args()
-    os.makedirs(VAL, exist_ok=True)
+    val_dir = os.path.abspath(a.out_dir)
+    os.makedirs(val_dir, exist_ok=True)
     summary, reports = [], {}
     bad = 0
     for name, clip, extra, expect_exit, expect_warn in CASES:
@@ -90,7 +100,7 @@ def main():
                             "expectation_met": False})
             print(name, "SKIPPED_MISSING_INPUT", clip)
             continue
-        out = os.path.join(VAL, name + ".validation.json")
+        out = os.path.join(val_dir, name + ".validation.json")
         if os.path.exists(out):
             os.remove(out)  # не читать устаревший отчёт, если Blender упадёт
         cmd = [a.blender, "-b", "--factory-startup", "--python", SCRIPT, "--", clip_abs, *extra, "--out=" + out]
@@ -119,7 +129,7 @@ def main():
     bad += 0 if cross["result"] == "pass" else 1
     print("GLB_CROSS_CHECK", cross["result"].upper(), "height_rel_diff", cross.get("height_rel_diff"),
           "peak_rel_diff", cross.get("peak_rel_diff"))
-    with open(os.path.join(VAL, "summary.json"), "w", encoding="utf-8") as f:
+    with open(os.path.join(val_dir, "summary.json"), "w", encoding="utf-8") as f:
         json.dump({"schema": "unmatched.clip-validation-summary/1", "cases": summary,
                    "glb_cross_check": cross, "result": "pass" if bad == 0 else "fail"},
                   f, ensure_ascii=False, indent=1)

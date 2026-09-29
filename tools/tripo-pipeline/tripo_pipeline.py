@@ -74,7 +74,7 @@ import time
 from pathlib import Path
 
 TOOL_NAME = "tripo-pipeline"
-TOOL_VERSION = "0.5.0"
+TOOL_VERSION = "0.6.0"
 RUN_SCHEMA = "unmatched.tripo-pipeline.run/1"
 SPEC_SCHEMA = "unmatched.tripo-pipeline.source-spec/1"
 REQUEST_SCHEMA = "unmatched.tripo-pipeline.generation-request/1"
@@ -82,13 +82,22 @@ BUILD_PROFILE_SCHEMA = "unmatched.tripo-pipeline.build-profile/1"
 VERIFY_LOGIC_VERSION = "verify/1"
 PREFLIGHT_LOGIC_VERSION = "preflight/4"
 UE_IMPORT_LOGIC_VERSION = "ue-import/2"
-UE_CANDIDATE_LOGIC_VERSION = "ue-candidate/6"  # /4: socket bones use the UE bone name ('.' -> '_');
-# /6: a vertex-mask base is imported with its vertex colours by editor Python (UE_PY_IMPORT_STATIC_VERTEX_COLOURS)
-UE_PY_IMPORT_STATIC_VERTEX_COLOURS = r'''"""tripo-pipeline ue-import: static FBX import WITH vertex colours (run inside the live editor).
+UE_CANDIDATE_LOGIC_VERSION = "ue-candidate/7"  # /4: socket bones use the UE bone name ('.' -> '_');
+# /6: a vertex-mask base is imported with its vertex colours by editor Python;
+# /7 (0.6.0, W4-B): both meshes through UE_PY_IMPORT_FBX (explicit legacy FbxFactory + FbxImportUI, normal import
+# method ImportNormals, Nanite off), material route "um-master" (MI of M_UM_Figure / M_UM_BaseMarker, hex team colours
+# through FLinearColor::FromSRGBColor), checks nanite == false, normal method, factory, parent material
+UE_NORMAL_IMPORT_METHOD = "FBXNIM_IMPORT_NORMALS"  # UM_FBX_v1 writes normals, no tangent layer (use_tspace off)
+UE_PY_IMPORT_FBX = r'''"""tripo-pipeline ue-import: FBX import with an explicit legacy FbxFactory (run inside the live editor).
 
-MCP StaticMeshTools.import_file builds the same FbxImportUI but leaves VertexColorImportOption at its class default
-(Ignore) and has no argument for it; changing the class default through ObjectTools dirties every loaded StaticMesh
-(measured 2026-09-28, stage 3 T3.1). This script sets the option on its own FbxImportUI only.
+Why not MCP import_file (engine gate memo, importer topic; W4-B): MCP StaticMeshTools/SkeletalMeshTools.import_file
+build an FbxImportUI but take no normal import method (the skeletal default is ComputeNormals, while the production
+ArtPreview Medusa was imported with its FBX normals) and no vertex-colour option (a vertex-mask base lost its mask,
+T3.1). AssetTools only switches to Interchange when a task has no factory (AssetTools.cpp), so the explicit FbxFactory
+also pins the legacy importer independently of Interchange.FeatureFlags.Import.FBX. Nothing global is changed: the
+options live on this task's FbxImportUI only (changing a class default dirtied 47 packages in T3.1).
+args: {"kind": "static" | "skeletal", "folder_path", "asset_name", "source_file", "import_materials",
+       "import_textures", "combine_meshes", "vertex_colors": "replace" | "ignore", "normal_import_method", "out"}
 """
 import json
 import sys
@@ -96,22 +105,45 @@ import sys
 import unreal as u
 
 a = json.load(open(sys.argv[-1], encoding="utf-8"))
-res = {"vertex_color_import_option": "Replace"}
+res = {"kind": a["kind"], "factory": "FbxFactory", "normal_import_method": a["normal_import_method"],
+       "vertex_colors": a.get("vertex_colors", "ignore")}
+
+
+def setp(obj, name, value):
+    try:
+        obj.set_editor_property(name, value)
+        return True
+    except Exception:  # noqa: BLE001 - optional property (engine version)
+        return False
+
+
 try:
     if u.EditorAssetLibrary.does_asset_exist("%s/%s" % (a["folder_path"], a["asset_name"])):
         raise RuntimeError("import_asset: %s at %s already exists" % (a["asset_name"], a["folder_path"]))
+    skeletal = a["kind"] == "skeletal"
+    kind = u.FBXImportType.FBXIT_SKELETAL_MESH if skeletal else u.FBXImportType.FBXIT_STATIC_MESH
     o = u.FbxImportUI()
     o.set_editor_property("automated_import_should_detect_type", False)
     o.set_editor_property("import_mesh", True)
-    o.set_editor_property("import_as_skeletal", False)
-    o.set_editor_property("mesh_type_to_import", u.FBXImportType.FBXIT_STATIC_MESH)
-    o.set_editor_property("original_import_type", u.FBXImportType.FBXIT_STATIC_MESH)
+    o.set_editor_property("import_as_skeletal", skeletal)
+    o.set_editor_property("mesh_type_to_import", kind)
+    o.set_editor_property("original_import_type", kind)
     o.set_editor_property("import_materials", bool(a["import_materials"]))
     o.set_editor_property("import_textures", bool(a["import_textures"]))
     o.set_editor_property("import_animations", False)
-    d = o.get_editor_property("static_mesh_import_data")
-    d.set_editor_property("combine_meshes", bool(a["combine_meshes"]))
-    d.set_editor_property("vertex_color_import_option", u.VertexColorImportOption.REPLACE)
+    method = getattr(u.FBXNormalImportMethod, a["normal_import_method"])
+    if skeletal:
+        o.set_editor_property("create_physics_asset", False)
+        d = o.get_editor_property("skeletal_mesh_import_data")
+        setp(d, "import_morph_targets", False)
+    else:
+        d = o.get_editor_property("static_mesh_import_data")
+        d.set_editor_property("combine_meshes", bool(a.get("combine_meshes", True)))
+        d.set_editor_property("vertex_color_import_option", u.VertexColorImportOption.REPLACE
+                              if a.get("vertex_colors") == "replace" else u.VertexColorImportOption.IGNORE)
+    d.set_editor_property("normal_import_method", method)
+    d.set_editor_property("import_uniform_scale", 1.0)
+    res["build_nanite_option_set_false"] = setp(d, "build_nanite", False)
     t = u.AssetImportTask()
     t.set_editor_property("filename", a["source_file"])
     t.set_editor_property("destination_path", a["folder_path"])
@@ -125,12 +157,33 @@ try:
     res["imported"] = [str(x) for x in t.get_editor_property("imported_object_paths")]
     if not res["imported"]:
         raise RuntimeError("the import produced no assets")
+    asset = u.load_asset("%s/%s" % (a["folder_path"], a["asset_name"]))
+    aid = asset.get_editor_property("asset_import_data") if asset else None
+    res["asset_import_data_class"] = aid.get_class().get_name() if aid else None
+    if aid is not None:
+        nim = aid.get_editor_property("normal_import_method")
+        res["normal_import_method_read_back"] = getattr(nim, "name", str(nim))
+    if skeletal and asset is not None:
+        # the skeleton created next to the mesh is part of the import (MCP import_file also returned it)
+        skel = asset.get_editor_property("skeleton")
+        if skel is not None:
+            res["imported"].append(skel.get_path_name())
 except Exception as exc:  # noqa: BLE001 - reported to the CLI
     res["error"] = "%s: %s" % (type(exc).__name__, exc)
 with open(a["out"], "w", encoding="utf-8", newline="\n") as handle:
     handle.write(json.dumps(res, indent=1, sort_keys=True) + "\n")
 '''
-UE_STATIC_LOGIC_VERSION = "ue-static-candidate/1"
+UE_PY_LAUNCHER = r'''"""tripo-pipeline editor-Python launcher: proves to the CLI that the typed command started, then runs
+the target script with the same arguments (McpUnreal.editor_python)."""
+import runpy
+import sys
+
+with open(r"@STARTED@", "w", encoding="utf-8") as handle:
+    handle.write("started\n")
+sys.argv = [r"@TARGET@"] + sys.argv[1:]
+runpy.run_path(r"@TARGET@", run_name="__main__")
+'''
+UE_STATIC_LOGIC_VERSION = "ue-static-candidate/2"  # /2 (0.6.0): checks nanite == false, normal import method, master
 ADOPT_LOGIC_VERSION = "adopt/1"
 
 EXIT_OK = 0
@@ -146,6 +199,7 @@ BLENDER_SCRIPTS = {
     "import": TOOL_DIR / "blender" / "import_source.py",
     "export": TOOL_DIR / "blender" / "export_fbx.py",
     "build": TOOL_DIR / "blender" / "build_candidate.py",
+    "ao_bake": TOOL_DIR / "blender" / "bake_ao.py",  # atlas sub-step (atlas.ao_bake), always headless
 }
 ATLAS_SCRIPT = TOOL_DIR / "candidate" / "atlas.py"
 BUILD_LIBRARY = TOOL_DIR / "blender" / "candidate_build"  # the build stage's library (loaded by build_candidate.py)
@@ -638,18 +692,45 @@ class McpUnreal:
         return True, payload
 
     def editor_python(self, script: Path, args_path: Path, out: Path, timeout: int = 600) -> dict:
-        """Run a Python file in the live editor: `py "<script>" <args>` typed into the editor console (the "Cmd" box)
-        through SlateInspectorToolset, as review/ue_live.py does. The script writes `out` itself."""
-        if out.exists():
-            out.unlink()
-        snap = self.call("slate", "Snapshot", {"ref": "", "maxDepth": 60, "bIncludeSourceLocations": False})
-        text = snap if isinstance(snap, str) else json.dumps(snap)
-        i = text.find('text "Cmd"')
-        m = re.search(r"textbox [^\n]*\[ref=(\w+)\]", text[i:i + 600]) if i >= 0 else None
-        if not m:
-            raise PipelineError("editor console (Cmd box) not found through SlateInspector")
-        self.call("slate", "Type", {"ref": m.group(1), "submit": True,
-                                    "text": 'py "%s" %s' % (script.as_posix(), args_path.as_posix())})
+        """Run a Python file in the live editor: `py "<launcher>" <args>` typed into the editor console (the "Cmd" box)
+        through SlateInspectorToolset, as review/ue_live.py does. The script writes `out` itself.
+
+        The launcher (UE_PY_LAUNCHER) first writes `<out>.started`, then runs the script. SlateInspector's Type only
+        warns ("Could not focus widget for typing") while another application holds the keyboard focus, and the
+        Slate tree is empty while the editor window is not on the current desktop (both measured 2026-09-29 with a
+        parallel session on the same desktop); the editor log does not prove a start either (a typed `py` command that
+        ran had no `Cmd:` line). So: no started file within the grace time -> the command is typed again (at most 5
+        times); a started command is never typed twice."""
+        started = Path(str(out) + ".started")
+        for stale in (out, started):
+            if stale.exists():
+                stale.unlink()
+        launcher = script.with_name(script.stem + ".launch.py")
+        launcher.write_text(UE_PY_LAUNCHER.replace("@STARTED@", started.as_posix()).replace("@TARGET@", script.as_posix()),
+                            encoding="utf-8", newline="\n")
+        command = 'py "%s" %s' % (launcher.as_posix(), args_path.as_posix())
+        grace = float(os.environ.get("TRIPO_PIPELINE_CONSOLE_GRACE_S", "20"))
+        for attempt in range(5):
+            m = None
+            for _ in range(24):
+                snap = self.call("slate", "Snapshot", {"ref": "", "maxDepth": 60, "bIncludeSourceLocations": False})
+                text = snap if isinstance(snap, str) else json.dumps(snap)
+                i = text.find('text "Cmd"')
+                m = re.search(r"textbox [^\n]*\[ref=(\w+)\]", text[i:i + 600]) if i >= 0 else None
+                if m:
+                    break
+                time.sleep(5)
+            if not m:
+                raise PipelineError("editor console (Cmd box) not found through SlateInspector")
+            self.call("slate", "Type", {"ref": m.group(1), "submit": True, "text": command})
+            deadline = time.time() + grace
+            while time.time() < deadline and not (started.exists() or out.exists()):
+                time.sleep(0.25)
+            if started.exists() or out.exists():
+                break
+            self.calls.append({"editor_python_retype": script.name, "attempt": attempt + 1})
+        else:
+            raise PipelineError("the editor console did not start %s after 5 attempts (focus)" % script.name)
         deadline = time.time() + timeout
         while time.time() < deadline:
             if out.exists():
@@ -1226,9 +1307,83 @@ def fp_atlas(ctx: Context) -> dict:
     primary = source_file(m, m["config"]["primary_source"], m["config"]["primary_role"])
     refs = (profile["atlas"].get("reference_textures") or {}).values()
     deps = atlas_python_deps()
-    return {"script": sha256_file(ATLAS_SCRIPT), "deps": {k: deps.get(k) for k in ("python", "pillow", "numpy")},
-            "source_sha256": primary["sha256"], "profile_sha256": sha256_file(ppath),
-            "references": profile_reference_hashes(ctx, profile, sorted(refs))}
+    fp = {"script": sha256_file(ATLAS_SCRIPT), "deps": {k: deps.get(k) for k in ("python", "pillow", "numpy")},
+          "source_sha256": primary["sha256"], "profile_sha256": sha256_file(ppath),
+          "references": profile_reference_hashes(ctx, profile, sorted(refs))}
+    if profile["atlas"].get("ao_bake"):
+        # 0.6.0: the AO bake is part of the atlas stage (headless Blender; its script and version decide the bytes).
+        # It applies the build's orientation fixes with the build library's code (orientation, weld, flip, ray-escape
+        # measure; W4-B review fix) and, for orientation.per_face_reference, reads the registered reference GLB
+        ref_glb = build_reference_file(ctx, profile)
+        fp["ao_bake"] = {"script": sha256_file(BLENDER_SCRIPTS["ao_bake"]),
+                         "library": {k: v for k, v in build_library_hashes().items() if k in AO_BAKE_LIBRARY},
+                         "reference_glb_sha256": ref_glb["sha256"] if ref_glb else None,
+                         "blender": HeadlessBlender(ctx.blender_cmd).version()}
+    return fp
+
+
+# build-library modules the AO bake imports (their bytes are part of the atlas fingerprint)
+AO_BAKE_LIBRARY = ("__init__.py", "core.py", "measure.py", "mesh_ops.py", "orientation.py")
+
+
+def ao_bake_params(profile: dict) -> dict:
+    """atlas.ao_bake -> bake_ao.py params (everything but paths). Parts = the atlas parts (all mesh nodes of the GLB
+    minus atlas.exclude_parts); occluders_excluded = meshes.drop_parts unless the profile names its own list;
+    flip_parts = the whole-part entries of orientation.expected_inside_out_parts (the build flips them);
+    per_face_reference = orientation.per_face_reference with the build's weld distance and seat numbers (flow
+    seated-parts only: the build applies it there, on the welded part in the seat frame)."""
+    cfg = profile["atlas"]["ao_bake"]
+    drops = (profile.get("meshes") or {}).get("drop_parts") or {}
+    ocfg = profile.get("orientation") or {}
+    inside_out = ocfg.get("expected_inside_out_parts") or []
+    out = {"samples": int(cfg.get("samples", 128)), "distance_rel": float(cfg.get("distance_rel", 0.08)),
+           "margin_px": int(cfg.get("margin_px", 8)), "seed": int(cfg.get("seed", 0)),
+           "exclude_parts": sorted(profile["atlas"].get("exclude_parts") or {}),
+           "occluders_excluded": sorted(cfg["occluders_excluded"] if "occluders_excluded" in cfg else drops),
+           "flip_parts": sorted(p for p in inside_out if re.fullmatch(r"tripo_part_\d+", p)),
+           "per_face_reference": None}
+    ref = ocfg.get("per_face_reference")
+    if ref:
+        flow = (profile.get("build") or {}).get("flow")
+        if flow != "seated-parts":
+            raise PipelineError("atlas.ao_bake with orientation.per_face_reference needs build.flow seated-parts "
+                                "(found %r): the bake repeats that flow's per-face fix" % flow, EXIT_USAGE)
+        base = profile["meshes"]["base"]
+        out["per_face_reference"] = {
+            "parts": list(ref["parts"]), "max_reference_distance_m": ref["max_reference_distance_m"],
+            "smoothing_lambda": ref["smoothing_lambda"], "smoothing_max_sweeps": ref["smoothing_max_sweeps"],
+            "weld_distance_m": profile["weld"]["distance_m"],
+            "seat": {"base_part": base["part"] if base["mode"] == "normalise-part" else base["source_part"],
+                     "top_part": profile["scale"]["top_part"], "figure_height_m": profile["scale"]["figure_height_m"],
+                     "base_height_m": base["footprint_m"][2]}}
+    return out
+
+
+def run_ao_bake(ctx: Context, profile: dict, source: Path, staging: Path) -> dict:
+    """Headless Blender Cycles AO per atlas part (blender/bake_ao.py). Always a separate process, also under
+    --backend mcp: it produces bytes and must not touch the live session."""
+    out_dir = staging / "ao"
+    report = staging / "ao-bake-report.json"
+    params = dict(ao_bake_params(profile), source=str(source), out_dir=str(out_dir), report_out=str(report),
+                  lib_dir=str(BLENDER_SCRIPTS["ao_bake"].parent))
+    if params["per_face_reference"]:
+        ref_glb = build_reference_file(ctx, profile)
+        ref_path = ctx.repo_path(ref_glb["path"])
+        if not ref_path.is_file() or sha256_file(ref_path) != ref_glb["sha256"]:
+            raise PipelineError("reference GLB of orientation.per_face_reference missing or changed since "
+                                "registration: %s" % ref_glb["path"])
+        params["per_face_reference"] = dict(params["per_face_reference"], reference_glb=str(ref_path))
+    params_path = staging / "ao-params.json"
+    params_path.write_text(dump_json(params), encoding="utf-8")
+    code, text = HeadlessBlender(ctx.blender_cmd).run_stage("ao_bake", params_path, staging)
+    (staging / "ao_bake.log").write_text(text, encoding="utf-8")
+    if code != 0 or "TRIPO_PIPELINE_STAGE_OK ao_bake" not in text:
+        raise PipelineError("AO bake failed (exit %s); see %s" % (code, staging / "ao_bake.log"))
+    data = json.loads(report.read_text(encoding="utf-8"))
+    for part, info in data["parts"].items():
+        if sha256_file(out_dir / info["file"]) != info["sha256"]:
+            raise PipelineError("AO bake report hash mismatch for %s" % part)
+    return {"dir": str(out_dir), "report": str(report)}
 
 
 def exec_atlas(ctx: Context, staging: Path) -> StageResult:
@@ -1242,6 +1397,9 @@ def exec_atlas(ctx: Context, staging: Path) -> StageResult:
     report = staging / "atlas-report.json"
     params = {"source": str(source), "profile": str(ppath), "out_dir": str(out_dir), "report_out": str(report),
               "repo_root": str(ctx.repo_root)}
+    ao = run_ao_bake(ctx, profile, source, staging) if profile["atlas"].get("ao_bake") else None
+    if ao:
+        params["ao"] = ao
     params_path = staging / "params.json"
     params_path.write_text(dump_json(params), encoding="utf-8")
     log_path = staging / "atlas.log"
@@ -1256,6 +1414,8 @@ def exec_atlas(ctx: Context, staging: Path) -> StageResult:
         raise PipelineError("atlas stage failed (exit %s); see %s" % (code, log_path))
     data = json.loads(report.read_text(encoding="utf-8"))
     outputs = {"reports/atlas-report.json": report}
+    if ao:
+        outputs["reports/ao-bake-report.json"] = Path(ao["report"])
     for key, info in sorted(data["files"].items()):
         path = out_dir / info["file"]
         if sha256_file(path) != info["sha256"]:
@@ -1397,12 +1557,22 @@ def ue_plan(ctx: Context) -> dict:
         u = profile["ue"]
         names = {"skeletal": "%s/Meshes/%s" % (folder, u["skeletal_asset"]),
                  "skeleton": "%s/Meshes/%s_Skeleton" % (folder, u["skeletal_asset"]),
-                 "base": "%s/Meshes/%s" % (folder, u["base_asset"]),
-                 "material": "%s/Materials/%s" % (folder, u["material"])}
-        if u.get("base_material_mode", "atlas-instance") == "vertex-mask":
-            names["base_material"] = "%s/Materials/%s" % (folder, u["base_material"])
-        for name in u["instances"]:
-            names["instance:" + name] = "%s/Materials/%s" % (folder, name)
+                 "base": "%s/Meshes/%s" % (folder, u["base_asset"])}
+        if material_route(u) == "um-master":
+            # 0.6.0 (W4-B): one MI per asset for the figure (parent M_UM_Figure) and one for the base (parent
+            # M_UM_BaseMarker), team MIs as their children; no own Material in the run folder
+            names["figure_instance"] = "%s/Materials/%s" % (folder, u["figure_instance"])
+            names["base_instance"] = "%s/Materials/%s" % (folder, u["base_instance"])
+            for team in u["teams"]:
+                for part in ("figure", "base"):
+                    names["team:%s:%s" % (part, team)] = "%s/Materials/%s" % (
+                        folder, u["team_instances"][part].format(team=team))
+        else:
+            names["material"] = "%s/Materials/%s" % (folder, u["material"])
+            if u.get("base_material_mode", "atlas-instance") == "vertex-mask":
+                names["base_material"] = "%s/Materials/%s" % (folder, u["base_material"])
+            for name in u["instances"]:
+                names["instance:" + name] = "%s/Materials/%s" % (folder, name)
         atlas_path = ctx.run_path("reports/atlas-report.json")
         atlas_files = json.loads(atlas_path.read_text(encoding="utf-8"))["files"] if atlas_path.is_file() else {}
         for key, tex in u["textures"].items():
@@ -1457,6 +1627,200 @@ def within(measured, expected, tolerance) -> bool:
 
 UE_TEAM_COLOR_MODES = ("multiply", "mask", "none")  # skeletal-candidate atlas material (ue.team_color_mode)
 UE_BASE_MATERIAL_MODES = ("atlas-instance", "vertex-mask")  # base material (ue.base_material_mode)
+UE_MATERIAL_ROUTES = ("own-material", "um-master")  # ue.material_route (0.6.0; absent = own-material)
+
+
+def material_route(u: dict) -> str:
+    route = u.get("material_route", "own-material")
+    if route not in UE_MATERIAL_ROUTES:
+        raise PipelineError("ue.material_route must be one of %s" % (UE_MATERIAL_ROUTES,), EXIT_USAGE)
+    return route
+
+
+def um_masters():
+    """tools/tripo-pipeline/um_masters.py (spec, graphs, FromSRGBColor); imported on use."""
+    import um_masters as module
+    return module
+
+
+def team_linear(value) -> list:
+    """Profile team colour ('#RRGGBB' sRGB or {"linear": [...]}) -> linear RGBA (FLinearColor::FromSRGBColor)."""
+    try:
+        return um_masters().colour_value(value)
+    except ValueError as exc:
+        raise PipelineError(str(exc), EXIT_USAGE)
+
+
+def um_master_instances(ue, u, names, textures, tex_path, team_mode, base_mode, track) -> dict:
+    """Route um-master: MI of the figure (parent M_UM_Figure: BC/N/ORM + TeamMask per team_color_mode + scalar
+    knobs), MI of the base (parent M_UM_BaseMarker: atlas textures or flat colour, band/pip parameters) and one team MI
+    per team under each (TeamColor = FromSRGBColor(hex)). Nothing is built in the run folder but these MIs."""
+    um = um_masters()
+    spec, _ = um.load_spec(TOOL_DIR.parents[1])
+    masters = u.get("masters") or {}
+    fig_master = masters.get("figure") or um.master_path(spec, "figure")
+    base_master = masters.get("base") or um.master_path(spec, "base_marker")
+    for m in (fig_master, base_master):
+        if not ue.call("asset", "exists", {"path": m}):
+            raise PipelineError("master %s is missing: build it first (python tools/tripo-pipeline/um_masters.py "
+                                "--backend mcp build --report ...)" % m)
+    plan = {"figure_master": fig_master, "base_master": base_master, "instances": {}}
+
+    def create(key, parent_pkg):
+        pkg = names[key]
+        track(ue.call("instance", "create", {"folder_path": pkg.rsplit("/", 1)[0], "asset_name": pkg.rsplit("/", 1)[1],
+                                             "parent": ue_obj(parent_pkg)}))
+        plan["instances"][key] = {"asset": pkg, "parent": parent_pkg, "textures": {}, "scalars": {}, "vectors": {}}
+        return ue_obj(pkg)
+
+    def set_tex(key, name, tex_pkg):
+        ue.call("instance", "set_texture_parameter", {"instance": ue_obj(names[key]), "name": name,
+                                                      "value": {"refPath": ue_object_path(tex_pkg)}})
+        plan["instances"][key]["textures"][name] = tex_pkg
+
+    def set_scalar(key, name, value):
+        ue.call("instance", "set_scalar_parameter", {"instance": ue_obj(names[key]), "name": name, "value": float(value)})
+        plan["instances"][key]["scalars"][name] = float(value)
+
+    def set_vector(key, name, lin):
+        ue.call("instance", "set_vector_parameter", {"instance": ue_obj(names[key]), "name": name,
+                                                     "value": dict(zip("rgba", lin))})
+        plan["instances"][key]["vectors"][name] = [round(v, 6) for v in lin]
+
+    tex_pkg = {k: names["texture:" + k] for k in textures}
+    # figure
+    create("figure_instance", fig_master)
+    for key, pname in (("BC", "BaseColorTexture"), ("N", "NormalTexture"), ("ORM", "ORMTexture")):
+        set_tex("figure_instance", pname, tex_pkg[key])
+    mask_tex = {"multiply": um.texture_path(spec, "TeamMask"), "none": um.texture_path(spec, "TeamMaskNone")}.get(team_mode)
+    if team_mode == "mask":
+        if "TeamMask" not in textures:
+            raise PipelineError("ue.team_color_mode mask needs the TeamMask texture (team_color.mask of the atlas stage "
+                                "and ue.textures.TeamMask)")
+        mask_tex = tex_pkg["TeamMask"]
+    set_tex("figure_instance", "TeamMaskTexture", mask_tex)
+    for name, value in sorted((u.get("figure_parameters") or {}).items()):
+        set_scalar("figure_instance", name, value)
+    # base
+    bcfg = u.get("base_marker") or {}
+    create("base_instance", base_master)
+    if bcfg.get("textures", base_mode != "vertex-mask"):
+        for key, pname in (("BC", "BaseColorTexture"), ("N", "NormalTexture"), ("ORM", "ORMTexture")):
+            set_tex("base_instance", pname, tex_pkg[key])
+    for name, value in sorted((bcfg.get("parameters") or {}).items()):
+        set_scalar("base_instance", name, value)
+    for name, value in sorted((bcfg.get("vectors") or {}).items()):
+        set_vector("base_instance", name, team_linear(value))
+    # teams
+    for team, colour in sorted(u["teams"].items()):
+        lin = team_linear(colour)
+        for part, parent_key in (("figure", "figure_instance"), ("base", "base_instance")):
+            key = "team:%s:%s" % (part, team)
+            create(key, names[parent_key])
+            set_vector(key, "TeamColor", lin)
+            plan["instances"][key]["team_hex"] = colour if isinstance(colour, str) else None
+    return plan
+
+
+def um_master_checks(ue, u, names, um_plan, getp, check, measured) -> None:
+    """Checks of the um-master route: masters current (parameters of the spec present, Opaque, one-sided, no WPO),
+    each MI's parent, texture, scalar and vector values read back from the editor."""
+    um = um_masters()
+    spec, _ = um.load_spec(TOOL_DIR.parents[1])
+    masters = {}
+    for role, pkg in (("figure", um_plan["figure_master"]), ("base_marker", um_plan["base_master"])):
+        params = ue.call("instance", "list_parameters", {"material": ue_obj(pkg)}) or []
+        have = sorted(p.get("name") for p in params if isinstance(p, dict))
+        want = sorted(um.expected_parameters(spec, role))
+        props = getp(ue_obj(pkg), ["BlendMode", "TwoSided", "ShadingModel"])
+        wpo = (ue.call("material", "get_property_input", {"material": ue_obj(pkg),
+                                                          "material_property": "MP_WorldPositionOffset"}) or {})
+        wpo_ref = wpo.get("expression")
+        wpo_ref = wpo_ref.get("refPath") if isinstance(wpo_ref, dict) else wpo_ref
+        masters[role] = {"asset": pkg, "missing_parameters": [p for p in want if p not in have],
+                         "properties": props, "wpo": None if wpo_ref in (None, "", "None") else wpo_ref,
+                         "graph_signature_planned": um.graph_signature(spec, role)}
+        masters[role]["ok"] = (not masters[role]["missing_parameters"] and props.get("BlendMode") == "BLEND_Opaque"
+                               and props.get("TwoSided") is False and masters[role]["wpo"] is None)
+    measured["um_masters"] = masters
+    check("um_masters_current", all(m["ok"] for m in masters.values()), masters,
+          note="parameters of art/um-materials/um-masters.json present, Opaque, one-sided, no World Position Offset "
+               "(graph node by node: um_masters.py verify)")
+    inst = {}
+    for key, want in sorted(um_plan["instances"].items()):
+        ref = ue_obj(want["asset"])
+        parent = getp(ref, ["Parent"]).get("Parent")
+        parent = parent.get("refPath") if isinstance(parent, dict) else parent
+        got = {"parent": ue_package(parent or ""), "textures": {}, "scalars": {}, "vectors": {}}
+        for name in want["textures"]:
+            got["textures"][name] = ue_package(ue.call("instance", "get_texture_parameter",
+                                                       {"instance": ref, "name": name}) or "")
+        for name in want["scalars"]:
+            got["scalars"][name] = round(float(ue.call("instance", "get_scalar_parameter",
+                                                       {"instance": ref, "name": name}) or 0.0), 5)
+        for name in want["vectors"]:
+            v = ue.call("instance", "get_vector_parameter", {"instance": ref, "name": name}) or {}
+            got["vectors"][name] = [round(float(v.get(k, -1)), 6) for k in "rgba"]
+        ok = (got["parent"] == want["parent"]
+              and all(got["textures"][n] == ue_package(t) for n, t in want["textures"].items())
+              and all(abs(got["scalars"][n] - v) < 1e-4 for n, v in want["scalars"].items())
+              and all(max(abs(a - b) for a, b in zip(got["vectors"][n], v)) < 1e-4 for n, v in want["vectors"].items()))
+        inst[key] = {"planned": want, "read_back": got, "ok": ok}
+    measured["um_instances"] = inst
+    check("um_instances_parent_textures_values", all(i["ok"] for i in inst.values()),
+          {k: {"ok": v["ok"], "parent": v["read_back"]["parent"]} for k, v in inst.items()},
+          note="figure MI -> %s, base MI -> %s, team MIs -> their asset MI; TeamColor = FLinearColor::FromSRGBColor of "
+               "the profile hex (AD-OPEN-39 rule), +-1e-4" % (um_plan["figure_master"], um_plan["base_master"]))
+
+
+def ue_import_fbx(ue, staging: Path, key: str, args: dict) -> dict:
+    """Run UE_PY_IMPORT_FBX in the live editor for one mesh (see its docstring); raises on an editor-side error."""
+    script = staging / "ue_import_fbx.py"
+    if not script.exists():
+        script.write_text(UE_PY_IMPORT_FBX, encoding="utf-8", newline="\n")
+    args_path, out_path = staging / ("ue_import_%s.args.json" % key), staging / ("ue_import_%s.out.json" % key)
+    args_path.write_text(json.dumps(dict(args, out=out_path.as_posix()), indent=1), encoding="utf-8")
+    res = ue.editor_python(script, args_path, out_path)
+    ue.calls.append({"editor_python": script.name, "args": args, "result": res})
+    if res.get("error"):
+        raise PipelineError("%s import failed in the editor: %s" % (key, res["error"]))
+    return res
+
+
+def import_contract_checks(ue, imports, sk, base, getp, check, measured, vertex_mask_base=False) -> None:
+    """Engine gate memo §1 item 5 (W4-B): legacy FbxFactory, the normal import method and Nanite off, read back."""
+    contract = {}
+    for key, mesh, kind in (("skeletal", sk, "skeletal"), ("base", base, "static")):
+        res = imports.get(key) or {}
+        aid = getp(mesh, ["AssetImportData"]).get("AssetImportData")
+        aid = aid if isinstance(aid, dict) else {"refPath": aid}
+        read = getp(aid, ["NormalImportMethod", "VertexColorImportOption"]) if aid.get("refPath") else {}
+        if kind == "static":
+            nanite = ue.call("static", "is_nanite_enabled", {"mesh": mesh})
+        else:
+            ns = getp(mesh, ["NaniteSettings"]).get("NaniteSettings")
+            nanite = (ns or {}).get("bEnabled") if isinstance(ns, dict) else ns
+        contract[key] = {"factory": res.get("factory"), "asset_import_data_class": res.get("asset_import_data_class"),
+                         "asset_import_data": aid.get("refPath"),
+                         "normal_import_method": read.get("NormalImportMethod"),
+                         "vertex_color_import_option": read.get("VertexColorImportOption"),
+                         "nanite_enabled": nanite}
+    measured["import_contract"] = contract
+    want_method = {"FBXNIM_IMPORT_NORMALS": "FBXNIM_ImportNormals"}.get(UE_NORMAL_IMPORT_METHOD, UE_NORMAL_IMPORT_METHOD)
+    check("import_legacy_fbx_factory", all(c["factory"] == "FbxFactory" and str(c["asset_import_data_class"] or "")
+                                           .startswith("Fbx") for c in contract.values()), contract,
+          {"factory": "FbxFactory", "asset_import_data_class": "Fbx*ImportData"},
+          "explicit task.factory = FbxFactory: AssetTools does not route to Interchange (memo, importer topic)")
+    check("normal_import_method", all(c["normal_import_method"] == want_method for c in contract.values()),
+          {k: c["normal_import_method"] for k, c in contract.items()}, want_method,
+          "UM_FBX_v1 FBX carry normals, no tangents (use_tspace off): ImportNormals + MikkTSpace tangents in UE")
+    check("nanite_disabled", all(c["nanite_enabled"] in (False, None) for c in contract.values()) and
+          contract["base"]["nanite_enabled"] is False, {k: c["nanite_enabled"] for k, c in contract.items()}, False,
+          "nanite == false (engine gate: Nanite not enabled, D-07); skeletal read from NaniteSettings.bEnabled")
+    if vertex_mask_base:
+        vc = contract["base"]["vertex_color_import_option"]
+        check("base_vertex_colors_imported_for_mask", vc == "VCIO_Replace" or vc == "Replace", vc, "Replace",
+              "the vertex-mask base material reads the base's vertex colours (AssetImportData of the base)")
 IMPORTER_SIDE_PRODUCT_CLASSES = ("Material", "MaterialInstanceConstant", "Texture2D")
 UE_DELETE_RANK = {"MaterialInstanceConstant": 0, "SkeletalMesh": 1, "StaticMesh": 1, "PhysicsAsset": 1,
                   "Skeleton": 2, "Material": 3, "Texture2D": 4}
@@ -1741,8 +2105,12 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     created = []
 
     def track(result):
+        # ownership is persisted at once (0.6.0): a failure half way (e.g. a lost console command, 2026-09-29) leaves
+        # only assets the manifest owns, so the next attempt deletes them instead of refusing a "foreign" folder
         items = result if isinstance(result, list) else [result]
         created.extend(ue_package(x) for x in items if x)
+        rec["ue_owned_assets"] = sorted(set(created))
+        ctx.save()
 
     def setp(ref, props):
         return ue.call("object", "set_properties", {"instance": ref, "values": json.dumps(props)})
@@ -1769,172 +2137,168 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
         raise PipelineError("ue.team_color_mode must be one of %s" % (UE_TEAM_COLOR_MODES,), EXIT_USAGE)
     if base_mode not in UE_BASE_MATERIAL_MODES:
         raise PipelineError("ue.base_material_mode must be one of %s" % (UE_BASE_MATERIAL_MODES,), EXIT_USAGE)
-    # material: BC [x TeamColor per ue.team_color_mode], DirectX normal, ORM (R AO, G roughness, B metallic)
-    mat_pkg = names["material"]
-    track(ue.call("material", "create_material", {"folder_path": mat_pkg.rsplit("/", 1)[0], "asset_name": u["material"]}))
-    mat = ue_obj(mat_pkg)
-
-    def expr_in(material, cls, x, y, props=None):
-        ref = ue.call("material", "add_expression", {"material_or_function": material, "x": x, "y": y,
-                                                     "expression_class": {"refPath": "/Script/Engine." + cls}})
-        if props:
-            setp(ref, props)
-        return ref
-
-    def expr(cls, x, y, props=None):
-        return expr_in(mat, cls, x, y, props)
-
-    def link(src, out, dst, inp):
-        ue.call("material", "connect_expressions", {"from_expression": src, "from_output_name": out,
-                                                    "to_expression": dst, "to_input_name": inp})
-
+    route = material_route(u)
+    mat = bmat = mat_pkg = None
+    wiring, base_wiring, samplers_used, um = {}, {}, {}, None
     tex_path = {k: ue_object_path(names["texture:" + k]) for k in textures}
-    bc = expr("MaterialExpressionTextureSampleParameter2D", -800, 0,
-              {"ParameterName": "BaseColorTexture", "Texture": tex_path["BC"], "SamplerType": "SAMPLERTYPE_Color"})
-    nrm = expr("MaterialExpressionTextureSampleParameter2D", -800, 420,
-               {"ParameterName": "NormalTexture", "Texture": tex_path["N"], "SamplerType": "SAMPLERTYPE_Normal"})
-    orm = expr("MaterialExpressionTextureSampleParameter2D", -800, 680,
-               {"ParameterName": "ORMTexture", "Texture": tex_path["ORM"], "SamplerType": "SAMPLERTYPE_Masks"})
-    samplers_used = {"BC": bc, "N": nrm, "ORM": orm}
-    if team_mode == "none":
-        base_colour = (bc, "RGB")
+    if route == "um-master":
+        um = um_master_instances(ue, u, names, textures, tex_path, team_mode, base_mode, track)
     else:
-        team = expr("MaterialExpressionVectorParameter", -800, 220,
-                    {"ParameterName": "TeamColor", "DefaultValue": {"R": 1, "G": 1, "B": 1, "A": 1}})
-        mul = expr("MaterialExpressionMultiply", -480, 60)
-        link(bc, "RGB", mul, "A")
-        link(team, "", mul, "B")
-        base_colour = (mul, "")
-        if team_mode == "mask":
-            if "TeamMask" not in textures:
-                raise PipelineError("ue.team_color_mode mask needs the TeamMask texture (team_color.mask of the atlas "
-                                    "stage and ue.textures.TeamMask)")
-            mask = expr("MaterialExpressionTextureSampleParameter2D", -800, 900,
-                        {"ParameterName": "TeamMaskTexture", "Texture": tex_path["TeamMask"],
-                         "SamplerType": "SAMPLERTYPE_LinearGrayscale"})
-            samplers_used["TeamMask"] = mask
-            lerp = expr("MaterialExpressionLinearInterpolate", -240, 60)
-            link(bc, "RGB", lerp, "A")
-            link(mul, "", lerp, "B")
-            link(mask, "R", lerp, "Alpha")
-            base_colour = (lerp, "")
-    wiring = {"MP_BaseColor": base_colour, "MP_Normal": (nrm, "RGB"), "MP_AmbientOcclusion": (orm, "R"),
-              "MP_Roughness": (orm, "G"), "MP_Metallic": (orm, "B")}
-    for prop, (ref, out) in wiring.items():
-        ue.call("material", "connect_to_output", {"expression": ref, "output_name": out, "material_property": prop})
-    setp(mat, {"bUsedWithSkeletalMesh": True})
-    ue.call("material", "recompile", {"material_or_function": mat})
-    # base material (ue.base_material_mode vertex-mask): the parametric base's vertex-colour mask
-    # (R team band, G centre pips, B outer pips; pips lit by InstanceIndex 1: G, 2: B, 3: G + B)
-    bmat, base_wiring = None, {}
-    if base_mode == "vertex-mask":
-        bpar = u.get("base_material_parameters") or {}
-        bmat_pkg = names["base_material"]
-        track(ue.call("material", "create_material", {"folder_path": bmat_pkg.rsplit("/", 1)[0],
-                                                      "asset_name": u["base_material"]}))
-        bmat = ue_obj(bmat_pkg)
+        # material: BC [x TeamColor per ue.team_color_mode], DirectX normal, ORM (R AO, G roughness, B metallic)
+        mat_pkg = names["material"]
+        track(ue.call("material", "create_material", {"folder_path": mat_pkg.rsplit("/", 1)[0], "asset_name": u["material"]}))
+        mat = ue_obj(mat_pkg)
 
-        def bexpr(cls, x, y, props=None):
-            return expr_in(bmat, cls, x, y, props)
+        def expr_in(material, cls, x, y, props=None):
+            ref = ue.call("material", "add_expression", {"material_or_function": material, "x": x, "y": y,
+                                                         "expression_class": {"refPath": "/Script/Engine." + cls}})
+            if props:
+                setp(ref, props)
+            return ref
 
-        def rgba(values):
-            return dict(zip("RGBA", list(values) + [1.0] * (4 - len(values))))
+        def expr(cls, x, y, props=None):
+            return expr_in(mat, cls, x, y, props)
 
-        vc = bexpr("MaterialExpressionVertexColor", -1200, 0)
-        base_col = bexpr("MaterialExpressionVectorParameter", -1200, 200,
-                         {"ParameterName": "BaseColor", "DefaultValue": rgba(bpar.get("BaseColor", [0.03, 0.026, 0.023]))})
-        team_b = bexpr("MaterialExpressionVectorParameter", -1200, 400,
-                       {"ParameterName": "TeamColor", "DefaultValue": {"R": 1, "G": 1, "B": 1, "A": 1}})
-        pip = bexpr("MaterialExpressionVectorParameter", -1200, 600,
-                    {"ParameterName": "PipColor", "DefaultValue": rgba(bpar.get("PipColor", [0.78, 0.74, 0.64]))})
-        index = bexpr("MaterialExpressionScalarParameter", -1200, 800,
-                      {"ParameterName": "InstanceIndex", "DefaultValue": 3.0})
-        emissive = bexpr("MaterialExpressionScalarParameter", -1200, 1000,
-                         {"ParameterName": "PipEmissive", "DefaultValue": float(bpar.get("PipEmissive", 0.35))})
-        # centre pips lit for |Index - 2| > 0.5, outer pips for Index > 1.5 (steep saturated ramps, no If node)
-        d2 = bexpr("MaterialExpressionSubtract", -900, 800, {"ConstB": 2.0})
-        link(index, "", d2, "A")
-        a2 = bexpr("MaterialExpressionAbs", -760, 800)
-        link(d2, "", a2, "")
-        c_off = bexpr("MaterialExpressionSubtract", -620, 800, {"ConstB": 0.5})
-        link(a2, "", c_off, "A")
-        c_k = bexpr("MaterialExpressionMultiply", -480, 800, {"ConstB": 1000.0})
-        link(c_off, "", c_k, "A")
-        centre_on = bexpr("MaterialExpressionSaturate", -340, 800)
-        link(c_k, "", centre_on, "")
-        o_off = bexpr("MaterialExpressionSubtract", -900, 950, {"ConstB": 1.5})
-        link(index, "", o_off, "A")
-        o_k = bexpr("MaterialExpressionMultiply", -760, 950, {"ConstB": 1000.0})
-        link(o_off, "", o_k, "A")
-        outer_on = bexpr("MaterialExpressionSaturate", -620, 950)
-        link(o_k, "", outer_on, "")
-        g_lit = bexpr("MaterialExpressionMultiply", -200, 700)
-        link(vc, "G", g_lit, "A")
-        link(centre_on, "", g_lit, "B")
-        b_lit = bexpr("MaterialExpressionMultiply", -200, 900)
-        link(vc, "B", b_lit, "A")
-        link(outer_on, "", b_lit, "B")
-        lit_sum = bexpr("MaterialExpressionAdd", -60, 800)
-        link(g_lit, "", lit_sum, "A")
-        link(b_lit, "", lit_sum, "B")
-        lit = bexpr("MaterialExpressionSaturate", 80, 800)
-        link(lit_sum, "", lit, "")
-        band = bexpr("MaterialExpressionLinearInterpolate", -900, 300)
-        link(base_col, "", band, "A")
-        link(team_b, "", band, "B")
-        link(vc, "R", band, "Alpha")
-        colour = bexpr("MaterialExpressionLinearInterpolate", 220, 300)
-        link(band, "", colour, "A")
-        link(pip, "", colour, "B")
-        link(lit, "", colour, "Alpha")
-        glow = bexpr("MaterialExpressionMultiply", 220, 600)
-        link(pip, "", glow, "A")
-        link(lit, "", glow, "B")
-        glow_k = bexpr("MaterialExpressionMultiply", 360, 600)
-        link(glow, "", glow_k, "A")
-        link(emissive, "", glow_k, "B")
-        rough = bexpr("MaterialExpressionConstant", 220, 1000, {"R": float(bpar.get("Roughness", 0.6))})
-        base_wiring = {"MP_BaseColor": (colour, ""), "MP_EmissiveColor": (glow_k, ""), "MP_Roughness": (rough, "")}
-        for prop, (ref, out) in base_wiring.items():
+        def link(src, out, dst, inp):
+            ue.call("material", "connect_expressions", {"from_expression": src, "from_output_name": out,
+                                                        "to_expression": dst, "to_input_name": inp})
+
+        bc = expr("MaterialExpressionTextureSampleParameter2D", -800, 0,
+                  {"ParameterName": "BaseColorTexture", "Texture": tex_path["BC"], "SamplerType": "SAMPLERTYPE_Color"})
+        nrm = expr("MaterialExpressionTextureSampleParameter2D", -800, 420,
+                   {"ParameterName": "NormalTexture", "Texture": tex_path["N"], "SamplerType": "SAMPLERTYPE_Normal"})
+        orm = expr("MaterialExpressionTextureSampleParameter2D", -800, 680,
+                   {"ParameterName": "ORMTexture", "Texture": tex_path["ORM"], "SamplerType": "SAMPLERTYPE_Masks"})
+        samplers_used = {"BC": bc, "N": nrm, "ORM": orm}
+        if team_mode == "none":
+            base_colour = (bc, "RGB")
+        else:
+            team = expr("MaterialExpressionVectorParameter", -800, 220,
+                        {"ParameterName": "TeamColor", "DefaultValue": {"R": 1, "G": 1, "B": 1, "A": 1}})
+            mul = expr("MaterialExpressionMultiply", -480, 60)
+            link(bc, "RGB", mul, "A")
+            link(team, "", mul, "B")
+            base_colour = (mul, "")
+            if team_mode == "mask":
+                if "TeamMask" not in textures:
+                    raise PipelineError("ue.team_color_mode mask needs the TeamMask texture (team_color.mask of the atlas "
+                                        "stage and ue.textures.TeamMask)")
+                mask = expr("MaterialExpressionTextureSampleParameter2D", -800, 900,
+                            {"ParameterName": "TeamMaskTexture", "Texture": tex_path["TeamMask"],
+                             "SamplerType": "SAMPLERTYPE_LinearGrayscale"})
+                samplers_used["TeamMask"] = mask
+                lerp = expr("MaterialExpressionLinearInterpolate", -240, 60)
+                link(bc, "RGB", lerp, "A")
+                link(mul, "", lerp, "B")
+                link(mask, "R", lerp, "Alpha")
+                base_colour = (lerp, "")
+        wiring = {"MP_BaseColor": base_colour, "MP_Normal": (nrm, "RGB"), "MP_AmbientOcclusion": (orm, "R"),
+                  "MP_Roughness": (orm, "G"), "MP_Metallic": (orm, "B")}
+        for prop, (ref, out) in wiring.items():
             ue.call("material", "connect_to_output", {"expression": ref, "output_name": out, "material_property": prop})
-        ue.call("material", "recompile", {"material_or_function": bmat})
-    # team colour instances: children of the atlas material, or of the base material when the team colour lives on
-    # the base (vertex-mask); the default instance goes on the base, and on the figure unless it is a base child
-    instances_parent_pkg = names["base_material"] if bmat else mat_pkg
-    for name, color in sorted(u["instances"].items()):
-        pkg = names["instance:" + name]
-        track(ue.call("instance", "create", {"folder_path": pkg.rsplit("/", 1)[0], "asset_name": name,
-                                             "parent": bmat or mat}))
-        ue.call("instance", "set_vector_parameter", {"instance": ue_obj(pkg), "name": "TeamColor",
-                                                     "value": dict(zip("rgba", color))})
-    # meshes
+        setp(mat, {"bUsedWithSkeletalMesh": True})
+        ue.call("material", "recompile", {"material_or_function": mat})
+        # base material (ue.base_material_mode vertex-mask): the parametric base's vertex-colour mask
+        # (R team band, G centre pips, B outer pips; pips lit by InstanceIndex 1: G, 2: B, 3: G + B)
+        bmat, base_wiring = None, {}
+        if base_mode == "vertex-mask":
+            bpar = u.get("base_material_parameters") or {}
+            bmat_pkg = names["base_material"]
+            track(ue.call("material", "create_material", {"folder_path": bmat_pkg.rsplit("/", 1)[0],
+                                                          "asset_name": u["base_material"]}))
+            bmat = ue_obj(bmat_pkg)
+
+            def bexpr(cls, x, y, props=None):
+                return expr_in(bmat, cls, x, y, props)
+
+            def rgba(values):
+                return dict(zip("RGBA", list(values) + [1.0] * (4 - len(values))))
+
+            vc = bexpr("MaterialExpressionVertexColor", -1200, 0)
+            base_col = bexpr("MaterialExpressionVectorParameter", -1200, 200,
+                             {"ParameterName": "BaseColor", "DefaultValue": rgba(bpar.get("BaseColor", [0.03, 0.026, 0.023]))})
+            team_b = bexpr("MaterialExpressionVectorParameter", -1200, 400,
+                           {"ParameterName": "TeamColor", "DefaultValue": {"R": 1, "G": 1, "B": 1, "A": 1}})
+            pip = bexpr("MaterialExpressionVectorParameter", -1200, 600,
+                        {"ParameterName": "PipColor", "DefaultValue": rgba(bpar.get("PipColor", [0.78, 0.74, 0.64]))})
+            index = bexpr("MaterialExpressionScalarParameter", -1200, 800,
+                          {"ParameterName": "InstanceIndex", "DefaultValue": 3.0})
+            emissive = bexpr("MaterialExpressionScalarParameter", -1200, 1000,
+                             {"ParameterName": "PipEmissive", "DefaultValue": float(bpar.get("PipEmissive", 0.35))})
+            # centre pips lit for |Index - 2| > 0.5, outer pips for Index > 1.5 (steep saturated ramps, no If node)
+            d2 = bexpr("MaterialExpressionSubtract", -900, 800, {"ConstB": 2.0})
+            link(index, "", d2, "A")
+            a2 = bexpr("MaterialExpressionAbs", -760, 800)
+            link(d2, "", a2, "")
+            c_off = bexpr("MaterialExpressionSubtract", -620, 800, {"ConstB": 0.5})
+            link(a2, "", c_off, "A")
+            c_k = bexpr("MaterialExpressionMultiply", -480, 800, {"ConstB": 1000.0})
+            link(c_off, "", c_k, "A")
+            centre_on = bexpr("MaterialExpressionSaturate", -340, 800)
+            link(c_k, "", centre_on, "")
+            o_off = bexpr("MaterialExpressionSubtract", -900, 950, {"ConstB": 1.5})
+            link(index, "", o_off, "A")
+            o_k = bexpr("MaterialExpressionMultiply", -760, 950, {"ConstB": 1000.0})
+            link(o_off, "", o_k, "A")
+            outer_on = bexpr("MaterialExpressionSaturate", -620, 950)
+            link(o_k, "", outer_on, "")
+            g_lit = bexpr("MaterialExpressionMultiply", -200, 700)
+            link(vc, "G", g_lit, "A")
+            link(centre_on, "", g_lit, "B")
+            b_lit = bexpr("MaterialExpressionMultiply", -200, 900)
+            link(vc, "B", b_lit, "A")
+            link(outer_on, "", b_lit, "B")
+            lit_sum = bexpr("MaterialExpressionAdd", -60, 800)
+            link(g_lit, "", lit_sum, "A")
+            link(b_lit, "", lit_sum, "B")
+            lit = bexpr("MaterialExpressionSaturate", 80, 800)
+            link(lit_sum, "", lit, "")
+            band = bexpr("MaterialExpressionLinearInterpolate", -900, 300)
+            link(base_col, "", band, "A")
+            link(team_b, "", band, "B")
+            link(vc, "R", band, "Alpha")
+            colour = bexpr("MaterialExpressionLinearInterpolate", 220, 300)
+            link(band, "", colour, "A")
+            link(pip, "", colour, "B")
+            link(lit, "", colour, "Alpha")
+            glow = bexpr("MaterialExpressionMultiply", 220, 600)
+            link(pip, "", glow, "A")
+            link(lit, "", glow, "B")
+            glow_k = bexpr("MaterialExpressionMultiply", 360, 600)
+            link(glow, "", glow_k, "A")
+            link(emissive, "", glow_k, "B")
+            rough = bexpr("MaterialExpressionConstant", 220, 1000, {"R": float(bpar.get("Roughness", 0.6))})
+            base_wiring = {"MP_BaseColor": (colour, ""), "MP_EmissiveColor": (glow_k, ""), "MP_Roughness": (rough, "")}
+            for prop, (ref, out) in base_wiring.items():
+                ue.call("material", "connect_to_output", {"expression": ref, "output_name": out, "material_property": prop})
+            ue.call("material", "recompile", {"material_or_function": bmat})
+        # team colour instances: children of the atlas material, or of the base material when the team colour lives on
+        # the base (vertex-mask); the default instance goes on the base, and on the figure unless it is a base child
+        instances_parent_pkg = names["base_material"] if bmat else mat_pkg
+        for name, color in sorted(u["instances"].items()):
+            pkg = names["instance:" + name]
+            track(ue.call("instance", "create", {"folder_path": pkg.rsplit("/", 1)[0], "asset_name": name,
+                                                 "parent": bmat or mat}))
+            ue.call("instance", "set_vector_parameter", {"instance": ue_obj(pkg), "name": "TeamColor",
+                                                         "value": dict(zip("rgba", color))})
+    # meshes: editor Python with an explicit legacy FbxFactory (UE_PY_IMPORT_FBX): normal import method pinned, Nanite
+    # off, vertex colours only for a vertex-mask base (the MCP import_file takes neither option; T3.1, W4-B)
     sk_pkg, base_pkg = names["skeletal"], names["base"]
-    track(ue.call("skeletal", "import_file", {"folder_path": sk_pkg.rsplit("/", 1)[0], "asset_name": u["skeletal_asset"],
-                                              "source_file": str(ctx.run_path(rels["skeletal"])),
-                                              "import_materials": False, "import_textures": False,
-                                              "import_animations": False, "create_physics_asset": False}))
-    base_args = {"folder_path": base_pkg.rsplit("/", 1)[0], "asset_name": u["base_asset"],
-                 "source_file": str(ctx.run_path(rels["base"])), "import_materials": False, "import_textures": False,
-                 "combine_meshes": True}
-    base_vc = None
-    if bmat:
-        # The vertex-mask base material reads the base's vertex colours (UM_Mask). MCP StaticMeshTools.import_file
-        # leaves VertexColorImportOption at Ignore: the colours were dropped and the whole base rendered lit (measured
-        # live 2026-09-28, T3.1). The base is imported with the same FbxImportUI settings plus Replace, in editor
-        # Python (no editor default is touched).
-        script = staging / "ue_import_static_vertex_colours.py"
-        script.write_text(UE_PY_IMPORT_STATIC_VERTEX_COLOURS, encoding="utf-8", newline="\n")
-        args_path, out_path = staging / "ue_import_base.args.json", staging / "ue_import_base.out.json"
-        args_path.write_text(json.dumps(dict(base_args, out=out_path.as_posix()), indent=1), encoding="utf-8")
-        res = ue.editor_python(script, args_path, out_path)
-        ue.calls.append({"editor_python": script.name, "args": base_args, "result": res})
-        if res.get("error"):
-            raise PipelineError("base import with vertex colours failed in the editor: %s" % res["error"])
+    vertex_mask_base = base_mode == "vertex-mask"
+    imports = {}
+    for key, pkg, asset, rel, kind, vc in (("skeletal", sk_pkg, u["skeletal_asset"], rels["skeletal"], "skeletal", "ignore"),
+                                           ("base", base_pkg, u["base_asset"], rels["base"], "static",
+                                            "replace" if vertex_mask_base else "ignore")):
+        res = ue_import_fbx(ue, staging, key, {
+            "kind": kind, "folder_path": pkg.rsplit("/", 1)[0], "asset_name": asset,
+            "source_file": str(ctx.run_path(rel)), "import_materials": False, "import_textures": False,
+            "combine_meshes": True, "vertex_colors": vc, "normal_import_method": UE_NORMAL_IMPORT_METHOD})
         track([{"refPath": x} for x in res.get("imported") or []])
+        imports[key] = res
+    base_vc = None
+    if vertex_mask_base:
         base_vc = {"import": "editor Python FbxImportUI (VertexColorImportOption Replace) through the MCP console",
-                   "script_sha256": hashlib.sha256(UE_PY_IMPORT_STATIC_VERTEX_COLOURS.encode("utf-8")).hexdigest()}
-    else:
-        track(ue.call("static", "import_file", base_args))
+                   "script_sha256": hashlib.sha256(UE_PY_IMPORT_FBX.encode("utf-8")).hexdigest()}
     after = ue_listing(ue, folder)
     rec["ue_owned_assets"] = sorted(set(after) | set(created))
     ctx.save()
@@ -1947,10 +2311,15 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
         except PipelineError:
             fbx_log = None
     sk, base = ue_obj(sk_pkg), ue_obj(base_pkg)
-    default_mi_pkg = names["instance:" + u["default_instance"]]
+    if um:
+        # um-master: the figure shows the default team MI of the figure, the base the default team MI of the base
+        sk_material_pkg = names["team:figure:" + u["default_team"]]
+        default_mi_pkg = names["team:base:" + u["default_team"]]
+    else:
+        default_mi_pkg = names["instance:" + u["default_instance"]]
+        # the figure shows the default team instance, or the atlas material itself when the instances belong to the base
+        sk_material_pkg = mat_pkg if bmat else default_mi_pkg
     default_mi = ue_obj(default_mi_pkg)
-    # the figure shows the default team instance, or the atlas material itself when the instances belong to the base
-    sk_material_pkg = mat_pkg if bmat else default_mi_pkg
     sk_slots = ue.call("skeletal", "get_material_slots", {"mesh": sk}) or []
     for slot in sk_slots:
         ue.call("skeletal", "set_material", {"mesh": sk, "slot_name": slot, "material": ue_obj(sk_material_pkg)})
@@ -1987,10 +2356,13 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     classes = {}
     for key, pkg in sorted(names.items()):
         classes[key] = str(ue.call("asset", "get_asset_class", {"asset_path": pkg})).rsplit(".", 1)[-1]
-    want = {"skeletal": "SkeletalMesh", "skeleton": "Skeleton", "base": "StaticMesh", "material": "Material"}
+    want = {"skeletal": "SkeletalMesh", "skeleton": "Skeleton", "base": "StaticMesh"}
+    if "material" in names:
+        want["material"] = "Material"
     if "base_material" in names:
         want["base_material"] = "Material"
-    want.update({k: "MaterialInstanceConstant" for k in names if k.startswith("instance:")})
+    want.update({k: "MaterialInstanceConstant" for k in names if k.startswith(("instance:", "team:"))
+                 or k in ("figure_instance", "base_instance")})
     want.update({k: "Texture2D" for k in names if k.startswith("texture:")})
     check("asset_classes", classes == want, classes, want)
     tex = {}
@@ -2008,54 +2380,57 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     check("textures_size_colour_space_compression", all(t["ok"] for t in tex.values()), tex,
           {k: {"size": [atlas["size"]] * 2, "SRGB": c["srgb"], "CompressionSettings": c["compression"]}
            for k, c in textures.items()})
-    graph = {}
-    for prop, (ref, out) in wiring.items():
-        src = ue.call("material", "get_property_input", {"material": mat, "material_property": prop}) or {}
-        graph[prop] = {"expression": (src.get("expression") or {}).get("refPath", "").rsplit(":", 1)[-1],
-                       "output": src.get("output_name"),
-                       "ok": (src.get("expression") or {}).get("refPath") == ref.get("refPath") and
-                             (src.get("output_name") or "") == out}
-    samplers = {k: getp(v, ["ParameterName", "Texture", "SamplerType"]) for k, v in sorted(samplers_used.items())}
-    mat_props = getp(mat, ["bUsedWithSkeletalMesh", "TwoSided", "BlendMode", "ShadingModel"])
-    measured["material"] = {"team_color_mode": team_mode, "outputs": graph, "samplers": samplers, "properties": mat_props}
-    check("material_graph_bc_teamcolor_normal_orm", all(g["ok"] for g in graph.values()) and
-          mat_props.get("bUsedWithSkeletalMesh") is True and mat_props.get("BlendMode") == "BLEND_Opaque",
-          measured["material"], note="BaseColor per ue.team_color_mode %s (%s)" % (team_mode, {
-              "multiply": "BC x TeamColor", "mask": "lerp(BC, BC x TeamColor, TeamMask.R)", "none": "BC"}[team_mode]))
-    if bmat:
-        bgraph = {}
-        for prop, (ref, out) in base_wiring.items():
-            src = ue.call("material", "get_property_input", {"material": bmat, "material_property": prop}) or {}
-            bgraph[prop] = {"expression": (src.get("expression") or {}).get("refPath", "").rsplit(":", 1)[-1],
-                            "output": src.get("output_name"),
-                            "ok": (src.get("expression") or {}).get("refPath") == ref.get("refPath") and
-                                  (src.get("output_name") or "") == out}
-        bprops = getp(bmat, ["BlendMode", "ShadingModel", "TwoSided"])
-        measured["base_material"] = {"mode": base_mode, "outputs": bgraph, "properties": bprops,
-                                     "parameters": ["BaseColor", "TeamColor", "PipColor", "InstanceIndex", "PipEmissive"]}
-        check("base_material_graph_vertex_mask", all(g["ok"] for g in bgraph.values())
-              and bprops.get("BlendMode") in (None, "BLEND_Opaque"), measured["base_material"],
-              note="BaseColor = lerp(lerp(BaseColor, TeamColor, VertexColor.R), PipColor, lit), Emissive = PipColor x "
-                   "lit x PipEmissive, lit = saturate(G x [|InstanceIndex - 2| > 0.5] + B x [InstanceIndex > 1.5]) "
-                   "(base_parametric.mask; live frames: P17 control scene, stage 3 T3.1)")
-        aid = getp(base, ["AssetImportData"]).get("AssetImportData")
-        aid = aid if isinstance(aid, dict) else {"refPath": aid}
-        base_vc = dict(base_vc or {}, asset_import_option=getp(aid, ["VertexColorImportOption"]).get(
-            "VertexColorImportOption") if aid.get("refPath") else None)
-        measured["base_vertex_colors"] = base_vc
-        check("base_vertex_colors_imported", base_vc.get("asset_import_option") == "Replace", base_vc,
-              {"asset_import_option": "Replace"},
-              "the vertex-mask material needs the base's vertex colours (AssetImportData of the base)")
-    inst = {}
-    for name, color in sorted(u["instances"].items()):
-        ref = ue_obj(names["instance:" + name])
-        value = ue.call("instance", "get_vector_parameter", {"instance": ref, "name": "TeamColor"}) or {}
-        parent = getp(ref, ["Parent"]).get("Parent")
-        parent = parent.get("refPath") if isinstance(parent, dict) else parent
-        inst[name] = {"TeamColor": {k: round(float(value.get(k, -1)), 4) for k in "rgba"},
-                      "parent": parent, "ok": all(abs(float(value.get(k, -1)) - c) < 1e-3 for k, c in zip("rgba", color))
-                      and ue_package(parent or "") == instances_parent_pkg}
-    check("team_color_instances", all(i["ok"] for i in inst.values()), inst, {"parent": instances_parent_pkg})
+    if um:
+        um_master_checks(ue, u, names, um, getp, check, measured)
+    else:
+        graph = {}
+        for prop, (ref, out) in wiring.items():
+            src = ue.call("material", "get_property_input", {"material": mat, "material_property": prop}) or {}
+            graph[prop] = {"expression": (src.get("expression") or {}).get("refPath", "").rsplit(":", 1)[-1],
+                           "output": src.get("output_name"),
+                           "ok": (src.get("expression") or {}).get("refPath") == ref.get("refPath") and
+                                 (src.get("output_name") or "") == out}
+        samplers = {k: getp(v, ["ParameterName", "Texture", "SamplerType"]) for k, v in sorted(samplers_used.items())}
+        mat_props = getp(mat, ["bUsedWithSkeletalMesh", "TwoSided", "BlendMode", "ShadingModel"])
+        measured["material"] = {"team_color_mode": team_mode, "outputs": graph, "samplers": samplers, "properties": mat_props}
+        check("material_graph_bc_teamcolor_normal_orm", all(g["ok"] for g in graph.values()) and
+              mat_props.get("bUsedWithSkeletalMesh") is True and mat_props.get("BlendMode") == "BLEND_Opaque",
+              measured["material"], note="BaseColor per ue.team_color_mode %s (%s)" % (team_mode, {
+                  "multiply": "BC x TeamColor", "mask": "lerp(BC, BC x TeamColor, TeamMask.R)", "none": "BC"}[team_mode]))
+        if bmat:
+            bgraph = {}
+            for prop, (ref, out) in base_wiring.items():
+                src = ue.call("material", "get_property_input", {"material": bmat, "material_property": prop}) or {}
+                bgraph[prop] = {"expression": (src.get("expression") or {}).get("refPath", "").rsplit(":", 1)[-1],
+                                "output": src.get("output_name"),
+                                "ok": (src.get("expression") or {}).get("refPath") == ref.get("refPath") and
+                                      (src.get("output_name") or "") == out}
+            bprops = getp(bmat, ["BlendMode", "ShadingModel", "TwoSided"])
+            measured["base_material"] = {"mode": base_mode, "outputs": bgraph, "properties": bprops,
+                                         "parameters": ["BaseColor", "TeamColor", "PipColor", "InstanceIndex", "PipEmissive"]}
+            check("base_material_graph_vertex_mask", all(g["ok"] for g in bgraph.values())
+                  and bprops.get("BlendMode") in (None, "BLEND_Opaque"), measured["base_material"],
+                  note="BaseColor = lerp(lerp(BaseColor, TeamColor, VertexColor.R), PipColor, lit), Emissive = PipColor x "
+                       "lit x PipEmissive, lit = saturate(G x [|InstanceIndex - 2| > 0.5] + B x [InstanceIndex > 1.5]) "
+                       "(base_parametric.mask; live frames: P17 control scene, stage 3 T3.1)")
+            aid = getp(base, ["AssetImportData"]).get("AssetImportData")
+            aid = aid if isinstance(aid, dict) else {"refPath": aid}
+            base_vc = dict(base_vc or {}, asset_import_option=getp(aid, ["VertexColorImportOption"]).get(
+                "VertexColorImportOption") if aid.get("refPath") else None)
+            measured["base_vertex_colors"] = base_vc
+            check("base_vertex_colors_imported", base_vc.get("asset_import_option") == "Replace", base_vc,
+                  {"asset_import_option": "Replace"},
+                  "the vertex-mask material needs the base's vertex colours (AssetImportData of the base)")
+        inst = {}
+        for name, color in sorted(u["instances"].items()):
+            ref = ue_obj(names["instance:" + name])
+            value = ue.call("instance", "get_vector_parameter", {"instance": ref, "name": "TeamColor"}) or {}
+            parent = getp(ref, ["Parent"]).get("Parent")
+            parent = parent.get("refPath") if isinstance(parent, dict) else parent
+            inst[name] = {"TeamColor": {k: round(float(value.get(k, -1)), 4) for k in "rgba"},
+                          "parent": parent, "ok": all(abs(float(value.get(k, -1)) - c) < 1e-3 for k, c in zip("rgba", color))
+                          and ue_package(parent or "") == instances_parent_pkg}
+        check("team_color_instances", all(i["ok"] for i in inst.values()), inst, {"parent": instances_parent_pkg})
 
     bones = ue.call("skeletal", "get_bone_names", {"mesh": sk}) or []
     want_bones = [b[0].replace(".", "_") for b in profile["armature"]["bones"]]
@@ -2184,6 +2559,7 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
           measured["base"], {"min": [-fx / 2, -fy / 2, 0], "max": [fx / 2, fy / 2, fz]})
     check("base_material_slot", len(base_slots) == profile["expectations"]["base_material_slots"] and
           all(v == default_mi_pkg for v in base_mat.values()), base_mat, default_mi_pkg)
+    import_contract_checks(ue, imports, sk, base, getp, check, measured, vertex_mask_base)
     dirty = {a: ue.call("asset", "is_dirty", {"asset_path": a}) for a in after}
     check("assets_saved", bool(saved) and not any(dirty.values()), {"save_assets": saved, "dirty": dirty})
     measured["fbx_import_log"] = fbx_log
@@ -2224,8 +2600,10 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
             "skeletal triangle count inside UE (no MCP tool); Blender round trip is authoritative",
             "packaged build / cook of the candidate folder",
             "selection collision capsule (04 §3.1 proposal)",
-            "shared master material M_DioramaMaster (04 §1): the candidate keeps its own %s, like the production "
-            "import; deviation recorded, not checked" % u["material"],
+            ("M_UM_* graphs: verified by tools/tripo-pipeline/um_masters.py verify (graph signature, CPD layout); this "
+             "stage checks the parents, parameters and texture/colour values of the MIs") if um else
+            ("shared master material (04 §1): the candidate keeps its own %s, like the production import; deviation "
+             "recorded (route own-material; the um-master route uses M_UM_Figure / M_UM_BaseMarker)" % u["material"]),
         ],
     }
     out = staging / "ue-import-report.json"
@@ -2601,6 +2979,26 @@ def exec_ue_static_candidate(ctx: Context, staging: Path) -> StageResult:
                         "lods": ue.call("static", "get_lod_count", {"mesh": sm}),
                         "nanite": ue.call("static", "is_nanite_enabled", {"mesh": sm})}
     check("triangles_lod0_equal_candidate", tris == exp["triangles"], tris, exp["triangles"])
+    # 0.6.0 (ue-static-candidate/2): import contract read back (engine gate memo §1 item 5)
+    check("nanite_disabled", measured["lod0"]["nanite"] is False, measured["lod0"]["nanite"], False,
+          "nanite == false (Nanite not enabled; MCP import_file is the legacy FbxFactory without bBuildNanite)")
+    aid = getp(sm, ["AssetImportData"]).get("AssetImportData")
+    aid = aid if isinstance(aid, dict) else {"refPath": aid}
+    nim = getp(aid, ["NormalImportMethod"]).get("NormalImportMethod") if aid.get("refPath") else None
+    measured["import_contract"] = {"asset_import_data": aid.get("refPath"), "normal_import_method": nim}
+    check("normal_import_method_read_back", nim == "FBXNIM_ImportNormals", measured["import_contract"],
+          "FBXNIM_ImportNormals", "MCP StaticMeshTools.import_file takes no normal method: the project default for "
+          "static meshes (ImportNormals) is read back and must stay")
+    if route["used"] == "shared_master":
+        um = um_masters()
+        spec, _ = um.load_spec(TOOL_DIR.parents[1])
+        role = next((r for r in spec["masters"] if um.master_path(spec, r) == ue_package(master)), None)
+        if role:
+            want = sorted(um.expected_parameters(spec, role))
+            have = sorted((route.get("shared_master_parameters") or {}).keys())
+            missing = [p_ for p_ in want if p_ not in have]
+            check("shared_master_parameters_current", not missing, {"master": master, "missing": missing},
+                  {"parameters": len(want)}, "all parameters of art/um-materials/um-masters.json (%s)" % role)
     lo_u, hi_u = ue_minmax(ue.call("static", "get_bounds", {"mesh": sm}) or {})
     tol = m["config"]["ue"].get("dimension_tolerance") or DEFAULT_UE_DIMENSION_TOLERANCE
     size_uu = [hi_u[i] - lo_u[i] for i in range(3)] if lo_u else None

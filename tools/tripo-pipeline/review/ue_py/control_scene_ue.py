@@ -462,6 +462,8 @@ if op == "build":
         MEL.set_material_instance_parent(inst, load(mi["parent"]))
         for k, v in (mi.get("scalars") or {}).items():
             MEL.set_material_instance_scalar_parameter_value(inst, k, float(v))
+        for k, v in (mi.get("vectors") or {}).items():  # linear values (FromSRGBColor done by the host)
+            MEL.set_material_instance_vector_parameter_value(inst, k, u.LinearColor(*[float(c) for c in v]))
         MEL.update_material_instance(inst)
         out["material_instances"][path] = material_info(inst)
     for change in sc["light_changes"]:

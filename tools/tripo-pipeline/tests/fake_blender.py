@@ -11,6 +11,7 @@ Env:
   FAKE_BLENDER_FAIL   stage name that should crash with a traceback
   FAKE_BLENDER_SLEEP  seconds to sleep inside a stage (for kill tests)
   FAKE_BLENDER_MCP_DOWN  "1": the MCP client behaves like a refused socket
+  FAKE_AO_CONSTANT    "1": the AO bake (bake_ao.py) writes unoccluded constant images (the atlas gate must fail)
 """
 
 import hashlib
@@ -44,6 +45,54 @@ def log_call(tag):
             handle.write(tag + "\n")
 
 
+def fake_ao_bake(params):
+    """Mimics blender/bake_ao.py: one grey PNG per mesh node (minus exclude_parts) at its base colour image size,
+    a deterministic ramp (or constant 255 with FAKE_AO_CONSTANT=1)."""
+    from PIL import Image
+    data = Path(params["source"]).read_bytes()
+    length = struct.unpack_from("<I", data, 12)[0]
+    doc = json.loads(data[20:20 + length])
+    binary = 20 + length + 8
+    out_dir = Path(params["out_dir"])
+    out_dir.mkdir(parents=True, exist_ok=True)
+    report = {"stage": "ao_bake", "source": {"file": Path(params["source"]).name,
+                                             "sha256": hashlib.sha256(data).hexdigest()},
+              "blender": "9.9.9 (fake)", "engine": "CYCLES CPU", "samples": params["samples"], "seed": params["seed"],
+              "distance_rel": params["distance_rel"], "height_m": 1.0, "distance_m": params["distance_rel"],
+              "margin_px": params["margin_px"], "occluders_excluded": list(params.get("occluders_excluded") or []),
+              "flipped_before_bake": list(params.get("flip_parts") or []), "parts": {}, "source_unchanged": True}
+    for node in doc["nodes"]:
+        if "mesh" not in node or node["name"] in (params.get("exclude_parts") or []):
+            continue
+        prim = doc["meshes"][node["mesh"]]["primitives"][0]
+        tex = doc["materials"][prim["material"]]["pbrMetallicRoughness"]["baseColorTexture"]["index"]
+        view = doc["bufferViews"][doc["images"][doc["textures"][tex]["source"]]["bufferView"]]
+        png = data[binary + view.get("byteOffset", 0):binary + view.get("byteOffset", 0) + view["byteLength"]]
+        px = struct.unpack(">I", png[16:20])[0]
+        if os.environ.get("FAKE_AO_CONSTANT") == "1":
+            img = Image.new("L", (px, px), 255)
+        else:
+            img = Image.new("L", (px, px))
+            img.putdata([int(60 + 195 * (x / max(px - 1, 1))) for y in range(px) for x in range(px)])
+        path = out_dir / ("%s.png" % node["name"])
+        img.save(path)
+        report["parts"][node["name"]] = {"file": path.name, "px": px,
+                                         "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+    # orientation after the flips (bake_ao.py): all outward unless FAKE_AO_INWARD=<part>:<fraction>
+    inward = dict(item.split(":") for item in os.environ.get("FAKE_AO_INWARD", "").split(",") if item)
+    report["orientation_after_flips"] = {n: {"inward_area_fraction": float(inward.get(n, 0.0)),
+                                             "outward_area_fraction": 0.9, "polygons": 1, "score": 1.0}
+                                         for n in report["parts"]}
+    ref = params.get("per_face_reference")
+    report["per_face_reference_fix"] = None if not ref else {
+        "reference_glb": {"file": Path(ref["reference_glb"]).name,
+                          "sha256": hashlib.sha256(Path(ref["reference_glb"]).read_bytes()).hexdigest()},
+        "weld_distance_m": ref["weld_distance_m"], "seat": ref["seat"],
+        "parts": {p: {"flipped_faces": 1} for p in ref["parts"]}}
+    Path(params["report_out"]).write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return 0, "TRIPO_PIPELINE_STAGE_OK ao_bake %d parts\n" % len(report["parts"])
+
+
 def run_stage(stage, params, isolation):
     """Returns (exit_code, stdout)."""
     if os.environ.get("FAKE_BLENDER_SLEEP"):
@@ -69,6 +118,8 @@ def run_stage(stage, params, isolation):
         return 0, "TRIPO_PIPELINE_STAGE_OK import %d isolation=%s\n" % (len(meshes), isolation)
     if stage == "build":
         return fake_build(params, isolation)
+    if stage == "ao_bake":
+        return fake_ao_bake(params)
     if not params.get("fbx_preset") or not Path(params["fbx_preset"]).is_file():
         return 1, "Traceback (most recent call last):\nRuntimeError: params.fbx_preset is required\n"
     lines = Path(params["blend"]).read_text(encoding="utf-8").splitlines()
@@ -183,7 +234,8 @@ def headless_main(argv):
         return 0
     script = Path(argv[argv.index("--python") + 1]).name
     params = json.loads(Path(argv[argv.index("--") + 1]).read_text(encoding="utf-8"))
-    stage = {"import_source.py": "import", "export_fbx.py": "export", "build_candidate.py": "build"}[script]
+    stage = {"import_source.py": "import", "export_fbx.py": "export", "build_candidate.py": "build",
+             "bake_ao.py": "ao_bake"}[script]
     log_call(stage)
     code, out = run_stage(stage, params, "process")
     sys.stdout.write(out)

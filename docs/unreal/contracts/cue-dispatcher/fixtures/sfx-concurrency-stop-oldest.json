@@ -1,0 +1,58 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "sfx-concurrency-stop-oldest",
+ "kind": "scenario",
+ "description": "Три урона разным фигурам за 200 мс: третий звук останавливает самый старый (CUE sfx stop), VFX и цифры показываются все три.",
+ "covers": [
+  "07 CUE-011 ≤2 одновременных",
+  "USoundConcurrency MaxCount=2 StopOldest"
+ ],
+ "assets_present": {
+  "CUE-011": {
+   "vfx": "/Game/FX/Test/NS_Test_Hit.NS_Test_Hit",
+   "sfx": "/Game/Audio/Test/SW_Test_Hit.SW_Test_Hit",
+   "clip": "/Game/Anim/Test/AS_Test_HitReact.AS_Test_HitReact"
+  }
+ },
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "harpy-1",
+   "seq": 20
+  },
+  {
+   "t": 100,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "harpy-2",
+   "seq": 20
+  },
+  {
+   "t": 200,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "harpy-3",
+   "seq": 20
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-011 subject=harpy-1 seq=20 t=0 vfx=NS_Test_Hit sfx=SW_Test_Hit clip=AS_Test_HitReact mat=FxFlash socket=Head reduced=0 result=spawned",
+  "CUE fx id=CUE-011 subject=harpy-2 seq=20 t=100 vfx=NS_Test_Hit sfx=SW_Test_Hit clip=AS_Test_HitReact mat=FxFlash socket=Head reduced=0 result=spawned",
+  "CUE sfx stop id=CUE-011 subject=harpy-1 seq=20 t=200 reason=concurrency",
+  "CUE fx id=CUE-011 subject=harpy-3 seq=20 t=200 vfx=NS_Test_Hit sfx=SW_Test_Hit clip=AS_Test_HitReact mat=FxFlash socket=Head reduced=0 result=spawned",
+  "CUE fx done id=CUE-011 subject=harpy-1 seq=20 t=900 ms=900 cut=0",
+  "CUE fx done id=CUE-011 subject=harpy-2 seq=20 t=1000 ms=900 cut=0",
+  "CUE fx done id=CUE-011 subject=harpy-3 seq=20 t=1100 ms=900 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 3,
+  "spawned": 3,
+  "fallback": 0,
+  "duplicate": 0,
+  "stale": 0,
+  "done": 3,
+  "unique_triples": 3
+ }
+}

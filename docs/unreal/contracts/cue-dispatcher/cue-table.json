@@ -1,0 +1,938 @@
+{
+ "schema": "unmatched.cue-table/1",
+ "revision": "w4d-2026-09-29",
+ "status": "предложено",
+ "status_note": "Контракт FS08CueDispatcher (волна 4, W4-D; меморандум engine-gate §1 п.8). Данные 18 CUE из 07-animation-vfx-audio.csv; все ассеты пока отсутствуют — таблица служит missing-report ART-010. Реализация диспетчера — GD-044, эффекты — GD-049. Не художественная приёмка.",
+ "asset_path_rule": "soft object path /Game/...: Niagara — UNiagaraSystem, звук — USoundBase (SoundWave, SoundCue и MetaSoundSource взаимозаменяемы без кода). Пути удерживаются в cook через PrimaryAssetLabel или DirectoriesToAlwaysCook (строки LoadObject кукер не видит — ловушка 5)",
+ "sockets_from": "docs/art-pipeline/rig/rig-contract.json ue_import.sockets_v2 (Weapon, Head) + Root/Base актора",
+ "cues": [
+  {
+   "id": "CUE-001",
+   "event": "Наведение (hover) на фигурку/клетку",
+   "source": "local",
+   "trigger": "input.hover",
+   "subject": "target",
+   "duration_ms": 150,
+   "feedback_delay_ms": 0,
+   "blocks_input": false,
+   "skippable": true,
+   "vfx": null,
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "UI",
+    "priority": 3,
+    "concurrency": {
+     "max_count": 1,
+     "resolution": "StopOldest",
+     "retrigger_ms": 150
+    }
+   },
+   "clip": null,
+   "material": {
+    "cpd_param": "Rim",
+    "cpd_indices": [
+     9,
+     10
+    ]
+   },
+   "ui": {
+    "widget": "UI-CURSOR"
+   },
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "replace",
+   "replace_scope": "cue",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "keep"
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "нет ассета: без контура и звука + Warning-лог",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-001"
+  },
+  {
+   "id": "CUE-002",
+   "event": "Выбор своей фигурки",
+   "source": "local",
+   "trigger": "input.select_own",
+   "subject": "fighter",
+   "duration_ms": 250,
+   "feedback_delay_ms": 0,
+   "blocks_input": false,
+   "skippable": true,
+   "vfx": null,
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "UI",
+    "priority": 2,
+    "concurrency": {
+     "max_count": null,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": null,
+   "marker": {
+    "mesh": "SM_Marker_SelectionRing",
+    "asset_id": "ASSET-MARKERS-001"
+   },
+   "postprocess": null,
+   "on_new_event": "replace",
+   "replace_scope": "cue",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "кольцо заменить debug-цилиндром + лог",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-002"
+  },
+  {
+   "id": "CUE-003",
+   "event": "Допустимый выбор (подтверждение клетки/цели)",
+   "source": "local",
+   "trigger": "input.confirm",
+   "subject": "target",
+   "duration_ms": 250,
+   "feedback_delay_ms": 0,
+   "blocks_input": false,
+   "skippable": true,
+   "vfx": null,
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "UI",
+    "priority": 1,
+    "concurrency": {
+     "max_count": null,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": null,
+   "marker": {
+    "material": "M_HighlightGameLayer"
+   },
+   "postprocess": null,
+   "on_new_event": "replace",
+   "replace_scope": "cue",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "без анимации: состояние применяется сразу + лог",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-003"
+  },
+  {
+   "id": "CUE-004",
+   "event": "Недопустимый выбор",
+   "source": "local",
+   "trigger": "input.reject",
+   "subject": "cursor",
+   "duration_ms": 350,
+   "feedback_delay_ms": 0,
+   "blocks_input": false,
+   "skippable": true,
+   "vfx": null,
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "UI",
+    "priority": 1,
+    "concurrency": {
+     "max_count": 1,
+     "resolution": "StopOldest",
+     "retrigger_ms": 300
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": {
+    "widget": "UI-ICON-ACTION",
+    "reason_keys": "why.* (02 §4.2)"
+   },
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "replace",
+   "replace_scope": "cue",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "текст причины без звука и иконки",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-004"
+  },
+  {
+   "id": "CUE-005",
+   "event": "Взятие карты",
+   "source": "server",
+   "trigger": "state.card_drawn",
+   "subject": "hud",
+   "duration_ms": 350,
+   "feedback_delay_ms": 0,
+   "blocks_input": false,
+   "skippable": true,
+   "vfx": null,
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "SFX",
+    "priority": 2,
+    "concurrency": {
+     "max_count": 2,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": {
+    "widget": "UI-HUD-HAND"
+   },
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "cascade",
+   "replace_scope": "subject",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "карта появляется в руке без полёта + лог",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-005"
+  },
+  {
+   "id": "CUE-006",
+   "event": "Розыгрыш карты",
+   "source": "server",
+   "trigger": "state.card_played",
+   "subject": "scene",
+   "duration_ms": 500,
+   "feedback_delay_ms": 100,
+   "blocks_input": false,
+   "skippable": true,
+   "vfx": {
+    "system": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
+    "attach": "world",
+    "socket": null,
+    "sim": "cpu",
+    "deterministic": true,
+    "prewarm": true,
+    "note": "свечение рамки карты-плоскости"
+   },
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "SFX",
+    "priority": 1,
+    "concurrency": {
+     "max_count": null,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": null,
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "replace",
+   "replace_scope": "cue",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "рамка UI-CARD-FRAME в HUD вместо 3D-карты",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-006"
+  },
+  {
+   "id": "CUE-007",
+   "event": "Перемещение (манёвр/эффект MOVE-PLACE)",
+   "source": "server",
+   "trigger": "state.fighter_moved",
+   "subject": "fighter",
+   "duration_ms": null,
+   "feedback_delay_ms": 0,
+   "blocks_input": false,
+   "skippable": true,
+   "vfx": {
+    "system": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
+    "attach": "world",
+    "socket": null,
+    "sim": "cpu",
+    "deterministic": true,
+    "prewarm": true,
+    "note": "пыль на конечной клетке"
+   },
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "SFX",
+    "priority": 3,
+    "concurrency": {
+     "max_count": 1,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": null,
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "jump_to_final",
+   "replace_scope": "subject",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "snap"
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "телепорт + лог",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-007",
+   "duration_per_step_ms": 280
+  },
+  {
+   "id": "CUE-008",
+   "event": "Объявление атаки",
+   "source": "server",
+   "trigger": "state.attack_declared",
+   "subject": "fighter",
+   "duration_ms": 600,
+   "feedback_delay_ms": 150,
+   "blocks_input": true,
+   "skippable": true,
+   "vfx": {
+    "system": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
+    "attach": "socket",
+    "socket": "Weapon",
+    "sim": "cpu",
+    "deterministic": true,
+    "prewarm": true,
+    "note": "вспышка направления; рамка цели — маркер SM_Marker_TargetRing"
+   },
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "SFX",
+    "priority": 1,
+    "concurrency": {
+     "max_count": null,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": {
+    "role": "LungeAttack",
+    "status": "missing",
+    "missing_reason": "производственного клипа нет: ART-006..008 после GD-058; черновики Medusa — v1, закрыты (RIG-CONTRACT §0)"
+   },
+   "material": null,
+   "ui": null,
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "interrupt",
+   "replace_scope": "subject",
+   "interrupted_by": [
+    "CUE-009",
+    "CUE-010",
+    "CUE-011",
+    "CUE-013"
+   ],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "без клипа: рамка цели + звук; фигурка статична",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-008"
+  },
+  {
+   "id": "CUE-009",
+   "event": "Защита сыграна",
+   "source": "server",
+   "trigger": "state.defense_played",
+   "subject": "fighter",
+   "duration_ms": 500,
+   "feedback_delay_ms": 150,
+   "blocks_input": false,
+   "skippable": true,
+   "vfx": {
+    "system": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
+    "attach": "socket",
+    "socket": "Head",
+    "sim": "cpu",
+    "deterministic": true,
+    "prewarm": true,
+    "note": "мерцание щита"
+   },
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "SFX",
+    "priority": 2,
+    "concurrency": {
+     "max_count": null,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": null,
+   "material": {
+    "cpd_param": "FxFlash",
+    "cpd_indices": [
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   "ui": null,
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "replace",
+   "replace_scope": "subject",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "без звука: только визуальный пульс",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-009"
+  },
+  {
+   "id": "CUE-010",
+   "event": "Раскрытие и резолв боя",
+   "source": "server",
+   "trigger": "state.combat_revealed",
+   "subject": "scene",
+   "duration_ms": 800,
+   "feedback_delay_ms": 200,
+   "blocks_input": true,
+   "skippable": true,
+   "vfx": null,
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "SFX",
+    "priority": 1,
+    "concurrency": {
+     "max_count": null,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": {
+    "widget": "UI-HUD-COMBAT"
+   },
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "replace",
+   "replace_scope": "cue",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "текстовые значения в HUD без 3D-карт",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-010"
+  },
+  {
+   "id": "CUE-011",
+   "event": "Урон",
+   "source": "server",
+   "trigger": "state.fighter_damaged",
+   "subject": "fighter",
+   "duration_ms": 900,
+   "feedback_delay_ms": 200,
+   "blocks_input": true,
+   "skippable": true,
+   "vfx": {
+    "system": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
+    "attach": "socket",
+    "socket": "Head",
+    "sim": "cpu",
+    "deterministic": true,
+    "prewarm": true,
+    "note": "всплеск удара; цифра «−N» — экранный виджет"
+   },
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "SFX",
+    "priority": 1,
+    "concurrency": {
+     "max_count": 2,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": {
+    "role": "HitReact",
+    "status": "missing",
+    "missing_reason": "производственного клипа нет: ART-006..008 после GD-058; черновики Medusa — v1, закрыты (RIG-CONTRACT §0)"
+   },
+   "material": {
+    "cpd_param": "FxFlash",
+    "cpd_indices": [
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   "ui": {
+    "widget": "UI-HUD-BOARD",
+    "element": "цифра над фигурой (экранная, не TextRender)"
+   },
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "replace",
+   "replace_scope": "subject",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "цифра без звука и без клипа (манекен: только цифра)",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-011"
+  },
+  {
+   "id": "CUE-012",
+   "event": "Лечение",
+   "source": "server",
+   "trigger": "state.fighter_healed",
+   "subject": "fighter",
+   "duration_ms": 700,
+   "feedback_delay_ms": 200,
+   "blocks_input": false,
+   "skippable": true,
+   "vfx": {
+    "system": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
+    "attach": "socket",
+    "socket": "Head",
+    "sim": "cpu",
+    "deterministic": true,
+    "prewarm": true,
+    "note": "зелёные частицы"
+   },
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "SFX",
+    "priority": 2,
+    "concurrency": {
+     "max_count": null,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": {
+    "widget": "UI-HUD-BOARD",
+    "element": "цифра над фигурой (экранная, не TextRender)"
+   },
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "replace",
+   "replace_scope": "subject",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "цифра без частиц и звука",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-012"
+  },
+  {
+   "id": "CUE-013",
+   "event": "Смерть фигурки",
+   "source": "server",
+   "trigger": "state.fighter_defeated",
+   "subject": "fighter",
+   "duration_ms": 950,
+   "feedback_delay_ms": 200,
+   "blocks_input": true,
+   "skippable": true,
+   "vfx": {
+    "system": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
+    "attach": "world",
+    "socket": null,
+    "sim": "cpu",
+    "deterministic": true,
+    "prewarm": true,
+    "note": "дым/пепел у фигурки"
+   },
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "SFX",
+    "priority": 1,
+    "concurrency": {
+     "max_count": null,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": {
+    "role": "DeathSettle",
+    "status": "missing",
+    "missing_reason": "производственного клипа нет: ART-006..008 после GD-058; черновики Medusa — v1, закрыты (RIG-CONTRACT §0)"
+   },
+   "material": {
+    "cpd_param": "Fade",
+    "cpd_indices": [
+     11
+    ]
+   },
+   "ui": null,
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "jump_to_final",
+   "replace_scope": "subject",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "мгновенное скрытие фигурки + лог",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-013"
+  },
+  {
+   "id": "CUE-014",
+   "event": "Способность героя",
+   "source": "server",
+   "trigger": "state.ability_triggered",
+   "subject": "fighter",
+   "duration_ms": 800,
+   "feedback_delay_ms": 200,
+   "blocks_input": true,
+   "skippable": true,
+   "vfx": {
+    "system": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
+    "attach": "socket",
+    "socket": "Weapon",
+    "sim": "cpu",
+    "deterministic": true,
+    "prewarm": true,
+    "note": "Arthur — сокет Weapon (weapon_R); Medusa — луч от сокета Head: сокет задаёт строка героя в DataAsset"
+   },
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "SFX",
+    "priority": 1,
+    "concurrency": {
+     "max_count": null,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": null,
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "replace",
+   "replace_scope": "subject",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "иконка способности в HUD без VFX и звука",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-014"
+  },
+  {
+   "id": "CUE-015",
+   "event": "Следующий ход",
+   "source": "server",
+   "trigger": "state.turn_changed",
+   "subject": "hud",
+   "duration_ms": 600,
+   "feedback_delay_ms": 0,
+   "blocks_input": false,
+   "skippable": true,
+   "vfx": null,
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "UI",
+    "priority": 2,
+    "concurrency": {
+     "max_count": null,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": {
+    "widget": "UI-HUD-TOP",
+    "element": "баннер хода"
+   },
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "replace",
+   "replace_scope": "cue",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "текст в HUD без анимации",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-015"
+  },
+  {
+   "id": "CUE-016",
+   "event": "Победа/поражение",
+   "source": "server",
+   "trigger": "state.game_over",
+   "subject": "scene",
+   "duration_ms": 1500,
+   "feedback_delay_ms": 200,
+   "blocks_input": true,
+   "skippable": true,
+   "vfx": null,
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "Music",
+    "priority": 1,
+    "concurrency": {
+     "max_count": null,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": null,
+   "marker": null,
+   "postprocess": {
+    "profile_delta": "CUE-016 victory|defeat (light-profile)"
+   },
+   "on_new_event": "none",
+   "replace_scope": "cue",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "текстовый экран результата в тишине",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-016"
+  },
+  {
+   "id": "CUE-017",
+   "event": "Разрыв связи",
+   "source": "connection",
+   "trigger": "net.disconnected",
+   "subject": "scene",
+   "duration_ms": 0,
+   "feedback_delay_ms": 0,
+   "blocks_input": false,
+   "skippable": false,
+   "vfx": null,
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "UI",
+    "priority": 1,
+    "concurrency": {
+     "max_count": 1,
+     "resolution": "StopOldest",
+     "retrigger_ms": 5000
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": {
+    "widget": "UI-HUD-CONN"
+   },
+   "marker": null,
+   "postprocess": {
+    "desaturation": 0.3
+   },
+   "on_new_event": "none",
+   "replace_scope": "subject",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "keep"
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "без постпроцесса: только HUD-индикатор + лог",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-017"
+  },
+  {
+   "id": "CUE-018",
+   "event": "Восстановление связи",
+   "source": "connection",
+   "trigger": "net.recovered",
+   "subject": "scene",
+   "duration_ms": 800,
+   "feedback_delay_ms": 0,
+   "blocks_input": false,
+   "skippable": true,
+   "vfx": null,
+   "sfx": {
+    "sound": null,
+    "status": "missing",
+    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound_class": "UI",
+    "priority": 2,
+    "concurrency": {
+     "max_count": null,
+     "resolution": "StopOldest",
+     "retrigger_ms": 0
+    }
+   },
+   "clip": null,
+   "material": null,
+   "ui": {
+    "widget": "UI-SCR-RECONNECT",
+    "element": "тост-резюме «позиции обновлены (пропущено N событий)»"
+   },
+   "marker": null,
+   "postprocess": null,
+   "on_new_event": "replace",
+   "replace_scope": "cue",
+   "interrupted_by": [],
+   "on_reconnect": "skip",
+   "reduced_motion": {
+    "mode": "shorten",
+    "max_ms": 100
+   },
+   "shake": null,
+   "fallback": {
+    "behaviour": "без тоста: только визуальное состояние + лог",
+    "log": "Warning"
+   },
+   "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-018"
+  }
+ ]
+}

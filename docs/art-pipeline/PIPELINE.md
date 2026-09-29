@@ -1,6 +1,6 @@
 # tripo-pipeline: исполнимый каркас пайплайна (P0.3 / T3)
 
-Срез: 2026-09-28. Инструмент: `tools/tripo-pipeline/tripo_pipeline.py`, версия 0.5.0.
+Срез: 2026-09-29. Инструмент: `tools/tripo-pipeline/tripo_pipeline.py`, версия 0.6.0.
 
 - T4 добавил профиль `skeletal-candidate` (раздел [Профиль skeletal-candidate](#профиль-skeletal-candidate-t4)).
 - Этап 3, T2.1 добавил профиль `static-candidate` для статических пропсов (раздел [Профиль static-candidate](#профиль-static-candidate-этап-3-t21)).
@@ -11,6 +11,12 @@
 - Этап 3, T3.1: UE-стадия кандидата `ue-candidate/6` (сокеты на костях с точкой, вершинные цвета подставки vertex-mask),
   герои импортированы в живой UE, контрольная сцена P1.7 и пошаговая инструкция
   [ADDING-AN-ASSET.md](ADDING-AN-ASSET.md) (проверена сухим повтором на бочке).
+- Волна 4, W4-B (0.6.0, 2026-09-29): мастер-материалы `M_UM_Figure` / `M_UM_BaseMarker` / `M_UM_GameLayer` строятся
+  скриптом `um_masters.py` (раздел [Мастер-материалы M_UM_*](#мастер-материалы-m_um-060-волна-4-w4-b)); UE-маршрут
+  `um-master` (MI от мастеров, цвета команд hex → `FLinearColor::FromSRGBColor`), TeamColor на одежде по `TeamMask`
+  (решение пользователя 2026-09-28, AD-CNF-58 = b), запечённый AO в `ORM.R` (`atlas.ao_bake`, гейт «не константа»),
+  импорт мешей и клипов с явной legacy `FbxFactory`, проверки `nanite == false`, метода нормалей, родителя MI
+  (`ue-candidate/7`, `ue-static-candidate/2`).
 
 Нужны Python 3.10+ (stdlib) и Blender 5.2 для стадий `import`/`export`/`build`.
 
@@ -168,8 +174,40 @@ UE отображает кадр экспорта Blender как `(x, −y, z)` 
 - `team_color.mask` — необязательная маска TeamColor (8 бит, линейная) по BC-атласу, выход атласа `TeamMask`:
   `hsv-hard-gaussian` (Arthur: красная ткань, оттенок ≥ 340° или ≤ 10°, размытие Гаусса) или `hsv-smooth-box` (Merlin:
   бронза, плавные пороги, только внутренние прямоугольники указанных ячеек, blur 3×3). Статус — предложено (AD-CNF-58).
+- (0.6.0) `team_color.mask.method: hsv-band-cells` — произведение необязательных плавных полос `hue_deg`, `s_min`/`s_max`,
+  `v_min`/`v_max` (рампа `ramp`) внутри внутренних прямоугольников ячеек `cells`, blur 3×3. Medusa: платье — ячейка
+  `tripo_part_0`, `v ≤ 0,3`, `s ≤ 0,4` (бронзовые вкрапления с `s > 0,45` отпадают; покрытие ячейки 98 %); Harpy (ткани
+  нет): тёмные маховые перья ячеек крыльев `tripo_part_0/1`, `v ≤ 0,22`; Merlin (исправление ревью W4-B): синяя ткань —
+  мантия `tripo_part_0`, капюшон `tripo_part_2` (без лица и бороды), рукава `tripo_part_4/5`, оттенок 205–250°, `s ≥ 0,12`
+  (покрытие ячеек 75 / 59 / 95 / 98 %; бронзовая отделка остаётся бронзой). Маска Arthur (T3.3) пересобрана тем же
+  правилом — байт в байт; маска Merlin T3.3 (только бронзовая отделка, 8,5 % ячейки мантии) одежду не покрывала и в
+  профиле `/3` заменена. AD-CNF-58 закрыт решением пользователя (b): база, кольцо и одежда.
+- (0.6.0) `atlas.ao_bake {samples, distance_rel, margin_px, seed, gate}` — `ORM.R` = ambient occlusion, запечённый
+  Cycles на CPU (`blender/bake_ao.py`, всегда отдельный headless-процесс, и при `--backend mcp`: он даёт байты) в
+  собственный UV каждой части, размер = размер BC части; вся фигура — окклюдер (рука над плащом, ступни на подставке),
+  `meshes.drop_parts` из окклюдеров убираются. Ориентация граней при запекании — та же, что в build, и в том же порядке
+  (грань, смотрящая внутрь, запекается затенённой: её лучи AO начинаются внутри фигуры): (1)
+  `orientation.per_face_reference` (часть со смешанной намоткой — голова Harpy `tripo_part_2`): голоса граней против
+  high-poly GLB, сглаживание ICM на сваренной копии части в кадре посадки build (дистанция `weld.distance_m`, масштаб
+  фигуры как во flow seated-parts), переворот тех же граней, что в build (код `candidate_build.orientation`,
+  `mesh_ops.weld_part`, `core.flip_polygons`; для Harpy — те же 1 506 из 1 918 граней, 5 несогласованных рёбер, как в
+  build-report); (2) части `orientation.expected_inside_out_parts` переворачиваются целиком (без этого вывернутая часть
+  запекается чёрной — Medusa, рука `tripo_part_8`: 0,12 вместо 0,71). После переворотов тест ray-escape build
+  (`measure.orientation_scores`) идёт по сцене запекания с плоскостью «пола» под фигурой только для теста (без неё
+  лучи из открытых подошв ступней Harpy уходили вниз и давали ложные 4–7 % «внутрь»); доля площади «внутрь» каждой
+  запечённой части — в `ao-bake-report.json → orientation_after_flips`. Тексели вне UV-островов (дальше `margin_px`)
+  остаются 1,0 (чёрный фон подмешивался бы в края на мипах). ORM-тайл части строится в размере AO (RM ресайзится
+  LANCZOS). Проверку `orm_occlusion_channel_filled` заменяют два гейта: `orm_occlusion_baked_not_constant` (внутри ячеек:
+  `p99 − p1 ≥ 32` и доля `< 250` не меньше 2 %) и `ao_bake_parts_face_outward` (у каждой запечённой ячейки доля площади
+  «внутрь» ≤ `gate.max_inward_area_fraction`, по умолчанию 0,02). Пороги — `atlas.ao_bake.gate`, предложено. Находка
+  ревью W4-B: первый гейт диапазона пропустил голову Harpy, запечённую на 40 % площади «внутрь» (AO этих граней 0,50,
+  26 % площади ниже 0,25; после исправления 0,82 и 2 %) — поэтому второй гейт. Отчёт `reports/ao-bake-report.json` (хеш
+  каждой части, исправление по эталону, ориентация), в отпечатке atlas — хеш `bake_ao.py`, модулей библиотеки build,
+  которые он импортирует, эталонного GLB и версия Blender. Повторный прогон даёт те же байты (Cycles CPU, фиксированные
+  seed и samples, измерено). ORM.R действует только на непрямой свет и SkyLight (критика меморандума G03): в сцене без
+  SkyLight кадр от него не меняется.
 
-Выход: `textures/*.png`, `reports/atlas-report.json`.
+Выход: `textures/*.png`, `reports/atlas-report.json` [+ `reports/ao-bake-report.json`].
 
 ### Стадия build
 
@@ -266,6 +304,33 @@ Harpy ещё `segmented-9-glb` для голосования ориентаци�
 
 Работает в живом UE через MCP.
 
+Маршрут материала — `ue.material_route` (0.6.0): `own-material` (по умолчанию, поведение 0.5.0: собственный материал
+атласа, п. 3 ниже) или `um-master` (W4-B): в папке прогона не строится ни одного Material, создаются
+
+- `ue.figure_instance` — MI от `/Game/UM/Materials/M_UM_Figure`: `BaseColorTexture`/`NormalTexture`/`ORMTexture` атласа,
+  `TeamMaskTexture` по `ue.team_color_mode` (`mask` — `TeamMask` атласа, `multiply` — белая `T_UM_Mask_White`, `none` —
+  чёрная `T_UM_Mask_Black`), скалярные ручки `ue.figure_parameters` (например `TeamDye 1`, `TeamDyeGain 6` для тёмной ткани);
+- `ue.base_instance` — MI от `M_UM_BaseMarker`: текстуры атласа (`base_marker.textures`, у Tripo-подставок) или плоский
+  цвет (`vertex-mask`, Harpy), `base_marker.parameters` (`SideBandWeight 1` — полоса команды на боковой стенке,
+  `VertexMaskWeight 1` — полоса и метки по вершинной маске), `base_marker.vectors`;
+- по одной командной MI на каждую команду `ue.teams` под каждой из двух: `ue.team_instances.figure|base` с `{team}`,
+  `TeamColor` = `FLinearColor::FromSRGBColor(hex)` (правило AD-OPEN-39; hex/255 как linear запрещён). Слоты фигуры и
+  подставки получают MI команды `ue.default_team`.
+
+Меши (0.6.0, `ue-candidate/7`) импортирует editor-Python-скрипт `UE_PY_IMPORT_FBX` (через консоль редактора, как
+`review/ue_live.py`): `task.factory = FbxFactory()` + свой `FbxImportUI`, `normal_import_method = ImportNormals`
+(FBX UM_FBX_v1 несут нормали, слоя тангентов нет — UE строит MikkTSpace), `import_uniform_scale 1.0`, Nanite выключен,
+вершинные цвета — `Replace` только у подставки `vertex-mask`. MCP `import_file` этих опций не принимает (у SK
+по умолчанию был `ComputeNormals`, у производственной ArtPreview Medusa — нормали из FBX: два контракта). Явная
+фабрика не даёт AssetTools уйти в Interchange (он включается только у задачи без фабрики), глобальный CVar не трогается.
+Исключение измерено на клипах (2026-09-29): импорт **поверх существующего** ассета идёт путём reimport и использовал
+Interchange (`InterchangeAssetImportData`) даже с явной фабрикой; поэтому `import_clips.py` удаляет свой прежний клип и
+импортирует заново (`legacy_fbx_import` в отчёте), а стадия ue-import всегда удаляет свои ассеты до импорта.
+Консоль печатает не надёжно (раздел «Ловушки» ADDING-AN-ASSET §8): команда запускает лаунчер `UE_PY_LAUNCHER`, который
+первым делом пишет `<out>.started`; нет файла за 20 с (`TRIPO_PIPELINE_CONSOLE_GRACE_S`) — команда печатается снова (до
+5 раз), запущенная — никогда. Созданные ассеты пишутся в manifest сразу после каждого создания: упавшая посреди стадия
+не оставляет в папке «чужих» для следующей попытки ассетов.
+
 Действия:
 
 1. Удаляет только свои прежние ассеты: материал-инстансы → меши → скелет → материал → текстуры.
@@ -281,7 +346,7 @@ Harpy ещё `segmented-9-glb` для голосования ориентаци�
 6. Подставка `vertex-mask` импортируется с вершинными цветами (`ue-candidate/6`). У MCP `StaticMeshTools.import_file`
    такой опции нет (`FbxImportUI` с `VertexColorImportOption = Ignore`): цвета терялись, и подставка Harpy рисовалась
    целиком «горящей» (белая, метки экземпляров не видны; живой кадр T3.1). Поэтому подставку импортирует скрипт
-   `UE_PY_IMPORT_STATIC_VERTEX_COLOURS` (те же настройки `FbxImportUI` + `Replace`), который CLI пишет в `.staging/` и
+   `UE_PY_IMPORT_STATIC_VERTEX_COLOURS` (с 0.6.0 — общий `UE_PY_IMPORT_FBX` для обоих мешей; те же настройки `FbxImportUI` + `Replace`), который CLI пишет в `.staging/` и
    запускает в живом редакторе командой `py` в консоли (MCP `SlateInspectorToolset` Snapshot/Type, как `review/ue_live.py`).
    Промежуточная версия `/5` меняла class default `Default__FbxStaticMeshImportData` через `ObjectTools.set_properties` —
    это пометило dirty все загруженные StaticMesh (47 пакетов, включая производственный `SM_Medusa_Base`), пакеты
@@ -290,7 +355,14 @@ Harpy ещё `segmented-9-glb` для голосования ориентаци�
 Проверки:
 
 - в папке ровно запланированные ассеты, нет `*_N`, классы верные;
-- текстуры, граф материала, инстансы;
+- текстуры, граф материала, инстансы (маршрут `own-material`);
+- (0.6.0, маршрут `um-master`) `um_masters_current` — у `M_UM_Figure`/`M_UM_BaseMarker` есть все параметры спецификации,
+  Opaque, односторонний, без WPO (граф узел за узлом проверяет `um_masters.py verify`);
+  `um_instances_parent_textures_values` — родитель каждой MI, её текстуры, скаляры и `TeamColor` (±1e-4 от
+  `FromSRGBColor(hex)`), прочитанные из редактора;
+- (0.6.0, оба маршрута) `import_legacy_fbx_factory` (фабрика `FbxFactory`, `AssetImportData` — `Fbx*ImportData`),
+  `normal_import_method` (`FBXNIM_ImportNormals` у SK и подставки), `nanite_disabled` (`is_nanite_enabled` подставки,
+  `NaniteSettings.bEnabled` SK), у `vertex-mask` — `base_vertex_colors_imported_for_mask`;
 - 17 костей профиля + кость 0 = узел арматуры; иерархия;
 - оси:
   - карта осей Blender→UE по границам, фронт = `axes.expected_ue_front` (`front_axis_as_fbx_preset`). Фигура, симметричная
@@ -369,6 +441,12 @@ Harpy ещё `segmented-9-glb` для голосования ориентаци�
   просветы подставок в кадрах. `repro_compare.py` — сверка
   повторного прогона ассета с исходным (байты, отчёты после нормализации имени прогона), `frames_to_jpeg.py` — PNG-кадры
   с sidecar в JPEG 1200 px для `evidence/`. Порядок — ADDING-AN-ASSET.md.
+- (0.6.0) `control_scene.py --asset-set w4b|t31`: `w4b` (по умолчанию) — прогоны `20260929-w4b-um-master` на MI мастеров
+  (своп команды меняет все слоты фигуры и подставку), плюс кадр `team-prop-k2-1p6-<имя>` с предложением палитры
+  `c11_value_split_proposal` (MI сцены, `TeamColor = FromSRGBColor`); `t31` — ассеты T3.1, для повторной съёмки «до».
+  `team_contrast.py --run <cs>/<tag> --out <json> [--derive-dir <dir>]` — команда в сером и при deuteranopia по
+  формулам QA-010 (`qa010lib.color`: Y′ Rec.709, Machado 2009) внутри силуэта K2 1,6×: средний и p90 `|ΔY′|`, доля
+  пикселей с `|ΔY′| ≥ 8`, ΔE76 после deuteranopia.
 - `base_seethrough.py` — сквозные дыры в верхе подставки (headless Blender по FBX подставки и фигуры, 0 кредитов):
   лучи сверху и из камеры −55° с четырёх сторон через диск верха; `base_only` (меш подставки) и `with_figure` (что
   видно при стоящей фигуре), порог-предложение `with_figure` ≤ 0,1 uu². Build-report такие дыры не ловит.
@@ -386,6 +464,53 @@ Harpy ещё `segmented-9-glb` для голосования ориентаци�
 
 Результат на Medusa: [medusa-local-pass-report.md](medusa-local-pass-report.md) и
 [medusa-local-pass-report.json](medusa-local-pass-report.json).
+
+## Мастер-материалы M_UM_* (0.6.0, волна 4, W4-B)
+
+Меморандум engine-gate §1 п. 4 (вне репозитория: `C:/tmp/p0-review/engine-gate-memo.md`). Статус мастеров — «технически
+импортировано»; значения ручек и палитра — «предложено». Решения пользователя 2026-09-28: TeamColor ещё и на одежде
+(AD-CNF-58 = b), DX12 + Lumen, эталон High — мастерам без разницы (Opaque DefaultLit / Unlit, без Substrate).
+
+| Мастер | Модель | Для чего | Параметры (нейтральные значения по умолчанию) |
+|---|---|---|---|
+| `/Game/UM/Materials/M_UM_Figure` | DefaultLit, Opaque, односторонний; usage SkeletalMesh + ISM | фигуры, статичный декор | `BaseColorTexture`/`NormalTexture`/`ORMTexture`/`TeamMaskTexture` (белая), `TeamColor` (1), `TeamDye` 0, `TeamDyeGain` 1, `RoughnessMin/Max` 0/1, `NormalStrength` 1, `AOToBaseColor` 0, `Saturation` 1, `ValueLift` 0, `EmissiveIntensity` 1, `RimColor` (1) |
+| `M_UM_BaseMarker` | DefaultLit, Opaque; usage ISM | подставки | текстуры (белые/плоские), `BaseColor` (1), `PipColor`, `PipEmissive` 0,35, `VertexMaskWeight` 0, `SideBandWeight` 0, `SideBandNormalZMax` 0,35, `BandKeepsTexture` 0, `InstanceIndex` 0 + ручки Figure |
+| `M_UM_GameLayer` | Unlit, Opaque; usage ISM; `EyeAdaptationInverse` | кольца, подсветки, маркеры | `LayerColor` (1), `UseTeamColor` 0, `EmissiveIntensity` 1, `ExposureCompensationAlpha` 1 |
+
+Граф `M_UM_Figure` при нейтральных ручках повторяет граф кандидатов: `BaseColor = lerp(BC, BC × TeamColor, TeamMask.R)`,
+DirectX N, `ORM` R/G/B → AO/Roughness/Metallic. `TeamDye 1` меняет `BC × TeamColor` на «краситель»
+`TeamColor × luminance(BC) × TeamDyeGain` — для тёмной ткани, где умножение цвета не видно (платье Medusa, перья
+Harpy). Полоса команды `M_UM_BaseMarker`: вершинная маска R × `VertexMaskWeight` (Harpy) или боковая стенка
+(`|z|` локальной вершинной нормали < `SideBandNormalZMax`) × `SideBandWeight` (Tripo-подставки); метки G/B горят по
+`InstanceIndex` 1: G, 2: B, 3: G + B (0 — ни одной).
+
+Custom Primitive Data (одинаково во всех трёх; примитив без CPD читает 0, и 0 везде нейтрален): 0–3 `CPD_TeamColor`
+(rgb + a = вес над `TeamColor` MI), 4 `CPD_InstanceIndex` (0 — значение MI), 5–8 `CPD_FxFlash` (rgb + интенсивность),
+9 `CPD_RimIntensity`, 10 `CPD_RimWidth` (экспонента Френеля `lerp(8, 1, width)`), 11 `CPD_Fade` (базовый цвет → яркость ×
+0,25, без Masked). Masked, Translucent и WPO не используются (проверяется).
+
+Данные — `art/um-materials/um-masters.json` (пути, параметры, CPD, дефолтные текстуры `art/um-materials/textures/*.png`,
+палитра `team_palette`: С-11 `#E8C06A`/`#9FC2D8` и предложение `c11_value_split_proposal` `#5A7F9F`). Цвет — только hex
+sRGB → `FLinearColor::FromSRGBColor` (`um_masters.hex_to_linear` = таблица `sRGBToLinearTable` движка, расхождение
+≤ 3,2e-8).
+
+```bash
+python tools/tripo-pipeline/um_masters.py --backend mcp build  --report <report.json> [--force] [--role figure ...]
+python tools/tripo-pipeline/um_masters.py --backend mcp verify --report <report.json>
+python tools/tripo-pipeline/um_masters.py hex "#E8C06A"        # linear, без редактора
+python tools/tripo-pipeline/um_masters.py signature           # SHA-256 канонических графов
+```
+
+- `build` импортирует отсутствующие текстуры по умолчанию (`/Game/UM/Materials/Textures`, сохраняет), создаёт
+  отсутствующие мастера через MCP MaterialTools (add_expression / set_properties / connect / recompile / save) и сразу
+  проверяет их; мастер, чей граф уже равен плану, пропускается (`skipped`). Мастер с другим графом без `--force`
+  — отказ (код 3); с `--force` граф перестраивается **на месте** (выражения удаляются и добавляются заново): ассет
+  остаётся тем же, MI кандидатов и сцен не теряют родителя (удаление ассета обнулило бы ссылки, ловушка §8).
+- `verify` сверяет редактор с планом узел за узлом: класс и позиция в графе (у каждого узла своя), свойства, связи
+  (`get_expression_inputs`, с учётом особенности чтения: при двух входах от одного источника UE сообщает выход первого),
+  выходы, параметры, раскладку CPD, Opaque/односторонность/usage, отсутствие WPO/Opacity, «не dirty».
+- `.uasset` мастеров и текстур лежат в `unreal/Unmatched/Content/UM/**` — Content в `.gitignore`, в коммит только
+  `git add -f` (перечисляются в commit_manifest поимённо).
 
 ## Профиль static-candidate (этап 3, T2.1)
 
@@ -415,12 +540,17 @@ UE как (x, −y, z) от read-back, размер текстур.
 - материал: если `shared_master` существует и у него есть все текстурные параметры, MI создаётся от него. Иначе
   создаётся свой `M_<...>_Candidate` (BC × TeamColor, нормаль, ORM: R→AO, G→Roughness, B→Metallic, TwoSided=false),
   а отклонение пишется в `deviations` отчёта. На 2026-09-28 `M_DioramaMaster` существует, но в нём только
-  векторные и скалярные параметры, текстурных нет (измерено), поэтому бочка идёт по второй ветке;
+  векторные и скалярные параметры, текстурных нет (измерено), поэтому бочка идёт по второй ветке. С 0.6.0 профиль
+  `decor-barrel-static-um-fbx-v1-um-master.json` (`/2`) называет общим мастером `/Game/UM/Materials/M_UM_Figure`
+  (текстурные параметры есть) — бочка идёт по первой ветке: MI от мастера, `TeamColor` белый (декор не командный);
 - импортирует меш с `import_materials=false`, `import_textures=false`, снимает коллизию (`remove_collisions`) и
   назначает MI на единственный слот;
 - проверяет: папка пуста перед импортом, ассеты ровно по плану, нет `Name_1`, классы, свойства текстур,
   граф и односторонность материала, родитель и TeamColor MI, слот, треугольники LOD0, размеры ±1 %, pivot в центре
-  основания, границы по UM_FBX_v1 (±0,05 uu), ось выступа, нет простой коллизии, всё сохранено.
+  основания, границы по UM_FBX_v1 (±0,05 uu), ось выступа, нет простой коллизии, всё сохранено;
+  (0.6.0, `ue-static-candidate/2`) `nanite_disabled`, `normal_import_method_read_back` (метод нормалей `AssetImportData`
+  меша записывается и проверяется: у MCP static import — `FBXNIM_ImportNormals` из настроек проекта), при общем мастере
+  — `shared_master_parameters_current` (все параметры спецификации `um-masters.json` у мастера).
 
 Повторный `ue-import` пропускается, если в папке ровно свои ассеты. `--force` удаляет свои ассеты и импортирует
 заново, `Name_1` не появляется. Проверено вживую на бочке:
@@ -428,7 +558,8 @@ UE как (x, −y, z) от read-back, размер текстур.
 
 ### Поведение UE 5.8 MCP (измерено в T2.1)
 
-- `StaticMeshTools.import_file` (Interchange) возвращает только меш. Материалы и текстуры, созданные импортёром рядом,
+- `StaticMeshTools.import_file` (legacy `FbxFactory` + `FbxImportUI`, не Interchange: исходник плагина EditorToolset,
+  `static_mesh.py`; до 0.6.0 здесь ошибочно стояло «Interchange») возвращает только меш. Материалы и текстуры, созданные импортёром рядом,
   в ответ не попадают. Поэтому проверка passthrough `folder_contains_only_this_import` теперь требует пустую
   папку перед импортом и допускает рядом только побочные продукты импорта (Material, MaterialInstanceConstant,
   Texture2D). Первая живая попытка passthrough на бочке упала именно здесь; отчёт сохранён.
@@ -447,7 +578,9 @@ tools/tripo-pipeline/
   blender/build_candidate.py   стадия build профиля skeletal-candidate (Blender; process/live): грузит библиотеку
   blender/candidate_build/     алгоритм build по профилю (flow whole-figure / seated-parts; anatomy и profile_schema без bpy)
   candidate/atlas.py           стадия atlas профиля skeletal-candidate (Python + Pillow/numpy; exclude_parts,
-                               normal_renormalise, team_color.mask)
+                               normal_renormalise, team_color.mask, ao_bake → ORM.R)
+  blender/bake_ao.py           подшаг atlas.ao_bake: Cycles AO по частям (всегда headless)
+  um_masters.py                мастер-материалы M_UM_* (build/verify через MCP; спецификация art/um-materials/)
   review/                      редакторные кадры Blender/UE и список UE-папки (не стадии)
   check_inputs.py              T2: автопроверки ImageGen-входов (отдельный инструмент)
   validate_registry.py         T1: проверка реестра ассетов (отдельный инструмент)
@@ -665,6 +798,9 @@ $T --backend mcp ue-import --run-dir $R --ue-folder /Game/PipelineCandidates/Med
 $T --backend mcp ue-import --run-dir $R --force   # повторный импорт: те же ассеты, без дублей
 python tools/tripo-pipeline/review/capture_blender_review.py --run-dir $R --out <каталог>   # редакторные кадры
 
+# 7a. (0.6.0) мастера до ue-import по маршруту um-master
+python tools/tripo-pipeline/um_masters.py --backend mcp build --report docs/art-pipeline/evidence/<задача>/um-masters-report.json
+
 # 8. герой (flow seated-parts, 0.5.0): профиль *-cli.json; второй source-spec — high-poly/доп. задачи Tripo
 H=art/pipeline-candidates/ASSET-HARPY-001; RH=$H/<run-id>
 $T init --run-dir $RH --asset-id ASSET-HARPY-001 --primary-source tripo-d500fc84 \
@@ -705,6 +841,24 @@ python -m unittest discover -s tools/tripo-pipeline/tests -v
 ревью T3.1 в `test_control_scene.py`: декор на поверхности, проверка посадки, счёт просветов подставки). В том же
 каталоге лежат ещё 27 тестов T1/T2 (`test_check_inputs.py`, `test_validate_registry.py`); за них отвечают их
 владельцы. С Blender все 127 проходят без пропусков (≈5 мин).
+
+0.6.0 (W4-B) добавил `test_um_master.py` (25 тестов, из них 6 — исправление ревью): правило цвета (`hex_to_linear` = таблица `sRGBToLinearTable`
+движка, hex/255 — не правило, С-11 почти изолюминантны, предложение — нет); графы мастеров (раскладка CPD меморандума,
+0 нейтрален, нет WPO/Masked/Opacity, Figure = граф кандидатов при нейтральных ручках, у каждого узла своя позиция,
+модель особенности чтения связей); build/verify мастера на фейковом редакторе (создан → `skipped` → изменённая
+спецификация без `--force` — отказ 3, с `--force` — перестройка на месте, MI не теряет родителя; удалённая связь
+валит `links_match_plan`); маршрут `um-master` (AO-гейт и маска `hsv-band-cells` на настоящей стадии atlas,
+константный AO валит atlas, MI и их родители/текстуры/`TeamColor`, контракт импорта, неверный метод нормалей валит
+стадию, отсутствующий мастер останавливает до MI, потерянная консольная команда печатается снова); профили `/3`
+добавляют к `/2` только ключи atlas/TeamMask/UE; статика на `M_UM_Figure`; исправление ревью: запекание получает
+пограничное исправление ориентации Harpy (эталон, сварка, посадка — те же числа, что у build), вне flow seated-parts
+оно запрещено, у героев без смешанной намотки параметры прежние, код запекания — модули `candidate_build` (и они в
+отпечатке atlas), зарегистрированный эталонный GLB доходит до запекания, ячейка с гранями «внутрь» валит гейт
+`ao_bake_parts_face_outward`. В `test_control_scene.py` — разделение «фигура / подставка» `team_contrast.py`, шум
+повторов и пересчёт из закоммиченных входов (числа те же). Фейки: `fake_unreal_mcp.py` записывает графы материалов,
+связи, параметры, MI, опции FBX-импорта editor-Python и лаунчер; `fake_blender.py` — двойник `bake_ao.py` (ориентация
+после переворотов, `FAKE_AO_INWARD`). Весь каталог — 174 теста, зелёные (≈11 мин, с Blender); из них 21 — чужие
+`test_rig_rules.py` (W4-D), на долю W4-B без них — 153.
 
 - `test_pipeline.py` — регистрация (no-op, конфликт, хеши evidence, Studio/API-кредиты, batch,
   multi-view, оригиналы вне run-каталога), идемпотентность (второй прогон не меняет ни одного файла,

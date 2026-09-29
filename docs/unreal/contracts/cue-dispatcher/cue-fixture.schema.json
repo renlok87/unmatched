@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://unmatched.local/schemas/unmatched.cue-fixture-1.json",
+  "title": "unmatched.cue-fixture/1 — фикстура FS08CueDispatcher без мира",
+  "description": "scenario: входные события -> точная трасса `CUE fx …` (эталонная модель и будущие C++-тесты GD-044 обязаны дать её побайтно, без префиксов лога). negative-trace: трасса, которую гейт обязан отклонить с перечисленными кодами.",
+  "type": "object",
+  "required": ["schema", "id", "kind", "description", "covers"],
+  "properties": {
+    "schema": {"const": "unmatched.cue-fixture/1"},
+    "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "kind": {"enum": ["scenario", "negative-trace"]},
+    "description": {"type": "string", "minLength": 1},
+    "covers": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "assets_present": {
+      "type": "object",
+      "patternProperties": {"^CUE-[0-9]{3}$": {"type": "object", "additionalProperties": false,
+        "properties": {"vfx": {"type": "string"}, "sfx": {"type": "string"}, "clip": {"type": "string"}}}},
+      "additionalProperties": false
+    },
+    "assets_unloadable": {"type": "array", "items": {"type": "string"}},
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["t", "kind"],
+        "properties": {
+          "t": {"type": "integer", "minimum": 0},
+          "kind": {"enum": ["cue", "reconnect", "settings", "advance"]},
+          "id": {"type": "string", "pattern": "^CUE-[0-9]{3}$"},
+          "subject": {"type": "string", "pattern": "^[A-Za-z0-9_:-]+$"},
+          "seq": {"type": ["integer", "null"], "minimum": 0},
+          "channel": {"enum": ["http", "ws", "local"]},
+          "steps": {"type": "integer", "minimum": 1},
+          "recovered_seq": {"type": "integer", "minimum": 0},
+          "reduced_motion": {"type": "boolean"}
+        },
+        "allOf": [
+          {"if": {"properties": {"kind": {"const": "cue"}}}, "then": {"required": ["id"]}},
+          {"if": {"properties": {"kind": {"const": "reconnect"}}}, "then": {"required": ["recovered_seq"]}},
+          {"if": {"properties": {"kind": {"const": "settings"}}}, "then": {"required": ["reduced_motion"]}}
+        ]
+      }
+    },
+    "expect_trace": {"type": "array", "items": {"type": "string", "pattern": "^CUE "}},
+    "expect_summary": {"type": "object"},
+    "trace": {"type": "array", "items": {"type": "string"}},
+    "expect_error_codes": {"type": "array", "items": {"pattern": "^G[1-9]$"}, "minItems": 1}
+  },
+  "allOf": [
+    {"if": {"properties": {"kind": {"const": "scenario"}}}, "then": {"required": ["events", "expect_trace"]}},
+    {"if": {"properties": {"kind": {"const": "negative-trace"}}}, "then": {"required": ["trace", "expect_error_codes"]}}
+  ]
+}

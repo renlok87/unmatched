@@ -106,11 +106,18 @@ class Ue:
         return value
 
     # ------------------------------------------------------------------ console
-    def _console_box(self):
-        snap = self.call("slate", "Snapshot", {"ref": "", "maxDepth": 60, "bIncludeSourceLocations": False},
-                         record=False)
-        text = snap if isinstance(snap, str) else json.dumps(snap)
-        i = text.find('text "Cmd"')
+    def _console_box(self, wait_s=120):
+        # The Slate tree comes back empty while the editor window is not shown on the current desktop (measured
+        # 2026-09-29: another session switched the desktop); wait for it instead of failing the whole run.
+        deadline = time.time() + wait_s
+        while True:
+            snap = self.call("slate", "Snapshot", {"ref": "", "maxDepth": 60, "bIncludeSourceLocations": False},
+                             record=False)
+            text = snap if isinstance(snap, str) else json.dumps(snap)
+            i = text.find('text "Cmd"')
+            if i >= 0 or time.time() > deadline:
+                break
+            time.sleep(5)
         if i < 0:
             raise UeError("editor console (Cmd box) not found in the Slate tree")
         m = re.search(r"textbox [^\n]*\[ref=(\w+)\]", text[i:i + 600])
@@ -118,11 +125,29 @@ class Ue:
             raise UeError("editor console textbox not found after the Cmd selector")
         return m.group(1)
 
-    def console(self, command):
-        ref = self._console_box()
-        self.call("slate", "Type", {"ref": ref, "text": command, "submit": True}, record=False)
-        self.calls.append({"console": command})
-        time.sleep(0.4)
+    def console(self, command, started=None, attempts=5, grace_s=20.0):
+        """Type `command` into the editor console.
+
+        SlateInspector's Type only warns ("Could not focus widget for typing") while another application holds the
+        keyboard focus, and the command is then lost (measured 2026-09-29, a parallel session on the same desktop).
+        The editor log is no proof either way: typed `py` commands are not always echoed as `Cmd:` lines (a command
+        that ran was missing from LogsToolset.GetLogEntries, 2026-09-29). So a command that can prove it started
+        passes `started` (a file its script writes first, see ue_py/_run.py): no file within grace_s -> typed again,
+        at most `attempts` times. Without `started` the command is typed once."""
+        for attempt in range(attempts):
+            ref = self._console_box()
+            self.call("slate", "Type", {"ref": ref, "text": command, "submit": True}, record=False)
+            time.sleep(0.4)
+            if started is None:
+                break
+            deadline = time.time() + grace_s
+            while time.time() < deadline and not os.path.exists(started):
+                time.sleep(0.25)
+            if os.path.exists(started):
+                break
+        else:
+            raise UeError("console command did not start after %d attempts (editor focus?): %s" % (attempts, command))
+        self.calls.append({"console": command, "attempts": attempt + 1})
 
     def run_task(self, script, out_json, timeout=600, **args):
         """Run a UE-side task script through ue_py/_run.py (errors come back as {"error": ...})."""
@@ -134,17 +159,20 @@ class Ue:
             json.dump(payload, handle, indent=1)
         try:
             data = self.py_file(os.path.join(here, "ue_py", "_run.py"), payload["out"], timeout=timeout,
-                                args=args_path.replace("\\", "/"))
+                                args=args_path.replace("\\", "/"), started=payload["out"] + ".started")
         finally:
             os.remove(args_path)
+            if os.path.exists(payload["out"] + ".started"):
+                os.remove(payload["out"] + ".started")
         if isinstance(data, dict) and data.get("error"):
             raise UeError("UE task %s failed: %s\n%s" % (script, data["error"], data.get("traceback", "")[-2000:]))
         return data
 
-    def py_file(self, script, out_json, timeout=600, args=""):
-        if os.path.exists(out_json):
-            os.remove(out_json)
-        self.console('py "%s"%s' % (script.replace("\\", "/"), (" " + args) if args else ""))
+    def py_file(self, script, out_json, timeout=600, args="", started=None):
+        for stale in (out_json, started):
+            if stale and os.path.exists(stale):
+                os.remove(stale)
+        self.console('py "%s"%s' % (script.replace("\\", "/"), (" " + args) if args else ""), started=started)
         deadline = time.time() + timeout
         while time.time() < deadline:
             if os.path.exists(out_json):

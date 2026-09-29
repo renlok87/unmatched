@@ -1,0 +1,1932 @@
+{
+  "anatomy": {
+    "auto": {
+      "face": "tripo_part_1",
+      "feet": {
+        "L": "tripo_part_5",
+        "R": "tripo_part_6"
+      },
+      "head": "tripo_part_1",
+      "neck": "tripo_part_14",
+      "weapon_hand": "tripo_part_12"
+    },
+    "disagreements": {
+      "face": {
+        "auto": "tripo_part_1",
+        "profile": "tripo_part_10"
+      }
+    },
+    "source": {
+      "face": "profile",
+      "feet": "auto",
+      "head": "auto",
+      "neck": "profile",
+      "weapon_hand": "auto"
+    },
+    "used": {
+      "face": "tripo_part_10",
+      "feet": {
+        "L": "tripo_part_5",
+        "R": "tripo_part_6"
+      },
+      "head": "tripo_part_1",
+      "neck": "tripo_part_14",
+      "weapon_hand": "tripo_part_12"
+    }
+  },
+  "axes": {
+    "bow_centroid_m": [
+      0.1071,
+      -0.06134,
+      0.30538
+    ],
+    "export_frame": {
+      "bow_centroid_m": [
+        0.06134,
+        0.1071,
+        0.30538
+      ],
+      "bow_side_axis": "+Y",
+      "face_mean_normal": [
+        0.4006,
+        0.0007,
+        0.0466
+      ],
+      "front_axis": "+X"
+    },
+    "face_mean_normal": [
+      0.0007,
+      -0.4006,
+      0.0466
+    ]
+  },
+  "blender": "5.2.2 LTS",
+  "body_part_vertex_counts": {
+    "tripo_part_0": 8056,
+    "tripo_part_1": 3555,
+    "tripo_part_10": 795,
+    "tripo_part_11": 597,
+    "tripo_part_12": 715,
+    "tripo_part_13": 748,
+    "tripo_part_14": 367,
+    "tripo_part_3": 1628,
+    "tripo_part_5": 1687,
+    "tripo_part_6": 1679,
+    "tripo_part_7": 1178,
+    "tripo_part_8": 647,
+    "tripo_part_9": 554
+  },
+  "body_parts": [
+    "tripo_part_0",
+    "tripo_part_1",
+    "tripo_part_10",
+    "tripo_part_11",
+    "tripo_part_12",
+    "tripo_part_13",
+    "tripo_part_14",
+    "tripo_part_3",
+    "tripo_part_5",
+    "tripo_part_6",
+    "tripo_part_7",
+    "tripo_part_8",
+    "tripo_part_9"
+  ],
+  "bounds_m": {
+    "base": {
+      "max": [
+        0.15,
+        0.15,
+        0.06
+      ],
+      "min": [
+        -0.15,
+        -0.15,
+        0.0
+      ]
+    },
+    "figure_with_base_height": 0.55,
+    "skeletal": {
+      "max": [
+        0.157143,
+        0.096803,
+        0.55
+      ],
+      "min": [
+        -0.130348,
+        -0.114149,
+        0.038074
+      ]
+    }
+  },
+  "builder": {
+    "flow": "whole-figure",
+    "library": "candidate-build/2",
+    "library_sha256": {
+      "__init__.py": "321edf92bd54d602a51f7606e1196b9efe80ea839e735a3a2b6a24e7c042ef52",
+      "anatomy.py": "057636215a64627dbeeebf85bf18e0a34124db23244ddef44127ed8f408722f5",
+      "base.py": "6e8d379fa8a6316cc714a0f60bea730ce7d285420920c9cb51a6905de8490795",
+      "closure.py": "72c2b0ce92f9179fbc3be49de575a72b8613438637bb87347b8943e5436e5af0",
+      "core.py": "d2a5b9b10e25b0aa188bcdcf50a829174ecf399bf82d813298e2e478b7d24073",
+      "flow_seated.py": "1fbe547b37220891eb597bb5948f224ff0c7b3263f013865c406d9ec32c841f5",
+      "flow_whole_figure.py": "be471bee44c181721707799b0debb6ced9d974c5dd0ffc046d6b5e8ec2aab036",
+      "measure.py": "bfe3538fe3a4c7d18398d8940f16c46093c50dc5272909ca1151605d70aaadef",
+      "mesh_ops.py": "b06311803f9d2891f38fbf66aacf0df57c4c514f01a3b627dcd83d079403af3e",
+      "orientation.py": "bd839e09f689c5e1b86576b1a2088fd46eff2762053e748d1d9a3d9b0617f196",
+      "profile_schema.py": "da090db84baa063fad214491b82e83cf2e598377c327b42dc15203e51c88ec35",
+      "rig.py": "57894f30174b6cdef2089d0f383be6635c84bc2f146242a3940e2c8d56c0843a",
+      "weapon.py": "4fe5ebab666d1090f8d17343e7528f058097a3ef2f1618221ec46a1d2edb0f9d"
+    },
+    "script": "tools/tripo-pipeline/blender/build_candidate.py"
+  },
+  "checks": {
+    "axes_bow_on_plus_x": {
+      "expected": "+X (Blender, bow side; profile axes.blender_bow_side)",
+      "measured": [
+        0.1071,
+        -0.06134,
+        0.30538
+      ],
+      "passed": true
+    },
+    "axes_face_points_minus_y": {
+      "expected": "-Y (Blender front)",
+      "measured": [
+        0.0007,
+        -0.4006,
+        0.0466
+      ],
+      "passed": true
+    },
+    "base_footprint_and_pivot": {
+      "expected": {
+        "bottom_z_m": 0,
+        "centre_xy_m": [
+          0,
+          0
+        ],
+        "dimensions_m": [
+          0.3,
+          0.3,
+          0.06
+        ]
+      },
+      "measured": {
+        "bottom_z_m": 0.0,
+        "centre_xy_m": [
+          0.0,
+          0.0
+        ],
+        "dimensions_m": [
+          0.3,
+          0.3,
+          0.06
+        ]
+      },
+      "passed": true
+    },
+    "bow_bound_only_to_weapon": {
+      "measured": {
+        "weapon": 1469
+      },
+      "passed": true
+    },
+    "every_body_polygon_in_one_atlas_cell": {
+      "measured": {
+        "build": 0,
+        "roundtrip": 0
+      },
+      "passed": true
+    },
+    "export_frame_bow_on_rotated_side": {
+      "expected": "+Y (authored +X rotated)",
+      "measured": [
+        0.06134,
+        0.1071,
+        0.30538
+      ],
+      "passed": true
+    },
+    "export_frame_face_points_along_rotated_front": {
+      "expected": "+X (authored -Y rotated by 90.0 deg about Z)",
+      "measured": {
+        "along_front": 0.4006,
+        "face_mean_normal": [
+          0.4006,
+          0.0007,
+          0.0466
+        ],
+        "largest_horizontal_cross": 0.0007
+      },
+      "note": "area-weighted mean normal of the face part in the re-imported FBX, before undoing the rotation",
+      "passed": true
+    },
+    "face_slot_polygons": {
+      "expected": 587,
+      "measured": 587,
+      "passed": true
+    },
+    "height_m": {
+      "expected": 0.55,
+      "measured": {
+        "figure_with_base": 0.55,
+        "lowest": 0.0,
+        "skeletal_top": 0.55
+      },
+      "passed": true
+    },
+    "neck_polygons": {
+      "expected": 480,
+      "measured": 480,
+      "passed": true
+    },
+    "orientation_all_parts_outward_after_fix": {
+      "expected": ">= 0.5",
+      "measured": {
+        "tripo_part_0": 1.0,
+        "tripo_part_1": 1.0,
+        "tripo_part_10": 0.9782,
+        "tripo_part_11": 1.0,
+        "tripo_part_12": 1.0,
+        "tripo_part_13": 0.997,
+        "tripo_part_14": 1.0,
+        "tripo_part_2": 1.0,
+        "tripo_part_3": 0.988,
+        "tripo_part_4": 0.9983,
+        "tripo_part_5": 1.0,
+        "tripo_part_6": 1.0,
+        "tripo_part_7": 0.9965,
+        "tripo_part_8": 0.9997,
+        "tripo_part_9": 1.0
+      },
+      "passed": true
+    },
+    "orientation_inside_out_parts_as_profile": {
+      "expected": [
+        "tripo_part_10",
+        "tripo_part_13",
+        "tripo_part_14",
+        "tripo_part_8"
+      ],
+      "measured": [
+        "tripo_part_10",
+        "tripo_part_13",
+        "tripo_part_14",
+        "tripo_part_8"
+      ],
+      "note": "ray-escape score < -0.5 on the Tripo geometry",
+      "passed": true
+    },
+    "pivot_root_at_origin": {
+      "measured": {
+        "armature_object_location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "root_bone": "root",
+        "root_head_m": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "passed": true
+    },
+    "reference_base_same_geometry": {
+      "measured": [
+        0,
+        0
+      ],
+      "passed": true
+    },
+    "reference_corner_normals_rotated_consistently": {
+      "expected": {
+        "negated_parts": [
+          "tripo_part_13",
+          "tripo_part_8"
+        ],
+        "other": "only at vertices of near-degenerate triangles (< 0.0001 cm2)"
+      },
+      "measured": {
+        "negated_parts": [
+          "tripo_part_13",
+          "tripo_part_8"
+        ],
+        "other_by_mesh": {
+          "base": {
+            "tripo_part_2": 5
+          },
+          "body": {
+            "tripo_part_0": 1
+          },
+          "bow": {}
+        },
+        "other_detail": {
+          "base": [
+            {
+              "area_cm2": 0.493273049,
+              "dot": 0.9026,
+              "part": "tripo_part_2",
+              "polygon": 310,
+              "touches_near_degenerate": true
+            },
+            {
+              "area_cm2": 0.701015233,
+              "dot": 0.9026,
+              "part": "tripo_part_2",
+              "polygon": 311,
+              "touches_near_degenerate": true
+            },
+            {
+              "area_cm2": 0.484712153,
+              "dot": 0.9026,
+              "part": "tripo_part_2",
+              "polygon": 676,
+              "touches_near_degenerate": true
+            },
+            {
+              "area_cm2": 0.522705614,
+              "dot": 0.9026,
+              "part": "tripo_part_2",
+              "polygon": 677,
+              "touches_near_degenerate": true
+            },
+            {
+              "area_cm2": 1.672e-06,
+              "dot": 0.9026,
+              "part": "tripo_part_2",
+              "polygon": 903,
+              "touches_near_degenerate": true
+            }
+          ],
+          "body": [
+            {
+              "area_cm2": 4.9e-08,
+              "dot": -0.7765,
+              "part": "tripo_part_0",
+              "polygon": 3870,
+              "touches_near_degenerate": true
+            }
+          ],
+          "bow": []
+        }
+      },
+      "note": "corner normals equal the unrotated reference (|dot| > 0.999) after undoing the export rotation, negated only on the parts whose winding this candidate fixes. Exception, reported per corner: the face normal of a sliver triangle is numerically undefined: the export rotation (even an exact axis permutation changes the float summation order) changes it and shifts the exported normals of the corners that share its vertices (measured: not caused by Triangulate)",
+      "passed": true
+    },
+    "reference_v2_same_geometry_uv_material": {
+      "measured": {
+        "body_unmatched": [
+          0,
+          0
+        ],
+        "bones_identical": true,
+        "bow_unmatched": [
+          0,
+          0
+        ]
+      },
+      "note": "read-only comparison with blender/ASSET-MEDUSA-001/variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx",
+      "passed": true
+    },
+    "reference_v2_winding_differs_only_in_new_fixes": {
+      "expected": [
+        "tripo_part_13",
+        "tripo_part_8"
+      ],
+      "measured": {
+        "counts": {
+          "tripo_part_13": 607,
+          "tripo_part_8": 575
+        },
+        "flipped_vs_reference": [
+          "tripo_part_13",
+          "tripo_part_8"
+        ]
+      },
+      "note": "the reference fixed ['tripo_part_10', 'tripo_part_14'] only; any other inside-out part is expected to differ fully",
+      "passed": true
+    },
+    "roundtrip_bone_hierarchy_and_rest_positions": {
+      "measured": {
+        "heads_within_1e-4_m": true,
+        "parents_ok": true
+      },
+      "passed": true
+    },
+    "roundtrip_bones": {
+      "expected": 17,
+      "measured": 17,
+      "passed": true
+    },
+    "roundtrip_material_slots": {
+      "expected": {
+        "base": 1,
+        "skeletal_unique": 2
+      },
+      "measured": {
+        "per_mesh": {
+          "SK_Medusa_Body": [
+            "M_Medusa_Atlas",
+            "M_Medusa_Face"
+          ],
+          "SK_Medusa_Bow": [
+            "M_Medusa_Atlas"
+          ],
+          "SM_Medusa_Base": [
+            "M_Medusa_Atlas"
+          ]
+        },
+        "skeletal_unique": [
+          "M_Medusa_Atlas",
+          "M_Medusa_Face"
+        ]
+      },
+      "passed": true
+    },
+    "roundtrip_one_armature": {
+      "measured": {
+        "base_fbx": 0,
+        "skeletal_fbx": 1
+      },
+      "passed": true
+    },
+    "roundtrip_orientation_all_parts_outward": {
+      "expected": ">= 0.5",
+      "measured": {
+        "tripo_part_0": 1.0,
+        "tripo_part_1": 1.0,
+        "tripo_part_10": 0.9782,
+        "tripo_part_11": 1.0,
+        "tripo_part_12": 1.0,
+        "tripo_part_13": 0.997,
+        "tripo_part_14": 1.0,
+        "tripo_part_2": 1.0,
+        "tripo_part_3": 0.988,
+        "tripo_part_4": 0.9983,
+        "tripo_part_5": 1.0,
+        "tripo_part_6": 1.0,
+        "tripo_part_7": 0.9965,
+        "tripo_part_8": 0.9997,
+        "tripo_part_9": 1.0
+      },
+      "passed": true
+    },
+    "roundtrip_part_polygon_counts": {
+      "measured": {
+        "tripo_part_0": 6853,
+        "tripo_part_1": 2633,
+        "tripo_part_10": 587,
+        "tripo_part_11": 537,
+        "tripo_part_12": 596,
+        "tripo_part_13": 607,
+        "tripo_part_14": 480,
+        "tripo_part_3": 1288,
+        "tripo_part_5": 1312,
+        "tripo_part_6": 1334,
+        "tripo_part_7": 873,
+        "tripo_part_8": 575,
+        "tripo_part_9": 524
+      },
+      "passed": true
+    },
+    "roundtrip_scale_ratio_1": {
+      "measured": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "note": "Blender re-reads the cm FBX (UnitScaleFactor 1.0) as metres",
+      "passed": true
+    },
+    "roundtrip_triangles_preserved": {
+      "expected": {
+        "SK_Medusa_Body": 18199,
+        "SK_Medusa_Bow": 1197,
+        "SM_Medusa_Base": 1780
+      },
+      "measured": {
+        "SK_Medusa_Body": 18199,
+        "SK_Medusa_Bow": 1197,
+        "SM_Medusa_Base": 1780
+      },
+      "passed": true
+    },
+    "roundtrip_uv0": {
+      "measured": {
+        "SK_Medusa_Body": [
+          "UVMap"
+        ],
+        "SK_Medusa_Bow": [
+          "UVMap"
+        ],
+        "SM_Medusa_Base": [
+          "UVMap"
+        ]
+      },
+      "passed": true
+    },
+    "roundtrip_weights": {
+      "measured": {
+        "SK_Medusa_Body": {
+          "max_influences": 2,
+          "unweighted_vertices": 0
+        },
+        "SK_Medusa_Bow": {
+          "max_influences": 1,
+          "unweighted_vertices": 0
+        }
+      },
+      "passed": true
+    },
+    "triangles_as_profile": {
+      "expected": {
+        "SK_Medusa_Body": 18199,
+        "SK_Medusa_Bow": 1197,
+        "SM_Medusa_Base": 1780
+      },
+      "measured": {
+        "SK_Medusa_Body": 18199,
+        "SK_Medusa_Bow": 1197,
+        "SM_Medusa_Base": 1780
+      },
+      "passed": true
+    },
+    "triangulate_changes_no_geometry": {
+      "measured": {
+        "pre_export_polygons_triangles": {
+          "SK_Medusa_Body": [
+            18199,
+            18199
+          ],
+          "SK_Medusa_Bow": [
+            1197,
+            1197
+          ],
+          "SM_Medusa_Base": [
+            1780,
+            1780
+          ]
+        },
+        "roundtrip_polygons_triangles": {
+          "SK_Medusa_Body": [
+            18199,
+            18199
+          ],
+          "SK_Medusa_Bow": [
+            1197,
+            1197
+          ],
+          "SM_Medusa_Base": [
+            1780,
+            1780
+          ]
+        }
+      },
+      "note": "preset use_triangles=True; the meshes are already all triangles, so Triangulate is a no-op",
+      "passed": true
+    },
+    "uv0_inside_own_atlas_cell": {
+      "measured": 0,
+      "note": "every UV corner lies in its part's inner cell rect (gutter kept)",
+      "passed": true
+    },
+    "uv0_inside_unit_square": {
+      "measured": {
+        "SK_Medusa_Body": true,
+        "SK_Medusa_Bow": true,
+        "SM_Medusa_Base": true
+      },
+      "passed": true
+    },
+    "uv0_raster_overlap_measured": {
+      "measured": {
+        "tripo_part_0": 6e-05,
+        "tripo_part_1": 6e-05,
+        "tripo_part_10": 0.00011,
+        "tripo_part_11": 3e-05,
+        "tripo_part_12": 0.0,
+        "tripo_part_13": 0.0002,
+        "tripo_part_14": 0.0,
+        "tripo_part_2": 3e-05,
+        "tripo_part_3": 0.00035,
+        "tripo_part_4": 0.0,
+        "tripo_part_5": 1e-05,
+        "tripo_part_6": 1e-05,
+        "tripo_part_7": 0.0012,
+        "tripo_part_8": 0.0,
+        "tripo_part_9": 0.0
+      },
+      "note": "informational: texels covered by >= 2 triangles / covered texels, per part at atlas resolution",
+      "passed": true
+    },
+    "uv0_single_layer_on_every_mesh": {
+      "measured": {
+        "SK_Medusa_Body": [
+          "UVMap"
+        ],
+        "SK_Medusa_Bow": [
+          "UVMap"
+        ],
+        "SM_Medusa_Base": [
+          "UVMap"
+        ]
+      },
+      "passed": true
+    },
+    "weights_every_vertex_weighted": {
+      "measured": {
+        "body": 0,
+        "bow": 0
+      },
+      "passed": true
+    },
+    "weights_max_influences": {
+      "expected": 2,
+      "measured": 2,
+      "passed": true
+    }
+  },
+  "expected_ue_bounds_uu_at_import_scale_1": {
+    "base_blender_axes": {
+      "max": [
+        15.0,
+        15.0,
+        6.0
+      ],
+      "min": [
+        -15.0,
+        -15.0,
+        0.0
+      ]
+    },
+    "base_export_frame": {
+      "max": [
+        15.0,
+        15.0,
+        6.0
+      ],
+      "min": [
+        -15.0,
+        -15.0,
+        0.0
+      ]
+    },
+    "base_ue_predicted": {
+      "max": [
+        15.0,
+        15.0,
+        6.0
+      ],
+      "min": [
+        -15.0,
+        -15.0,
+        0.0
+      ]
+    },
+    "export_rotation_z_degrees": 90.0,
+    "note": "*_blender_axes: authored Blender frame (front -Y), centimetres; *_export_frame: as written into the FBX (re-imported); *_ue_predicted: export frame mapped as UE (x, -y, z) per ART-001. ue-import measures the real mapping",
+    "skeletal_blender_axes": {
+      "max": [
+        15.714,
+        9.68,
+        55.0
+      ],
+      "min": [
+        -13.035,
+        -11.415,
+        3.807
+      ]
+    },
+    "skeletal_export_frame": {
+      "max": [
+        11.415,
+        15.714,
+        55.0
+      ],
+      "min": [
+        -9.68,
+        -13.035,
+        3.807
+      ]
+    },
+    "skeletal_ue_predicted": {
+      "max": [
+        11.415,
+        13.035,
+        55.0
+      ],
+      "min": [
+        -9.68,
+        -15.714,
+        3.807
+      ]
+    }
+  },
+  "exports": {
+    "base": {
+      "bytes": 79324,
+      "file": "SM_Medusa_Base_Candidate.fbx",
+      "sha256": "de5ebcac44b23b5335a3a7b7802420802c3738f8958fab104fa0b044d87a0983"
+    },
+    "settings": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+      "colors_type": "SRGB",
+      "creation_time_pinned": "2000-01-01T00:00:00",
+      "data_scale": 100.0,
+      "deviations_from_preset": {
+        "bake_anim": "off: the candidate FBX carries no clips",
+        "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+      },
+      "embed_textures": false,
+      "export_space_rotation_z_degrees": 90.0,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "STRIP",
+      "preset": {
+        "name": "UM_FBX_v1",
+        "path": "blender/_tools/presets/UM_FBX_v1.json",
+        "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+        "version": "1.0.0"
+      },
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "unit_scale_factor_after_patch": 1.0,
+      "use_triangles": true
+    },
+    "skeletal": {
+      "bytes": 1166444,
+      "file": "SK_Medusa_Candidate.fbx",
+      "sha256": "35809386bff7716ab8c354970d0683a45ff1f055a2679fd1144d01ccbef47625"
+    }
+  },
+  "figure": {
+    "figure_height_m": 0.55,
+    "figure_top_m": 0.55,
+    "note": "whole-figure flow: the figure (with base) is scaled to the profile height; the skeletal top is the figure top",
+    "skeletal_top_is_figure_top": true,
+    "skeletal_top_m": 0.55,
+    "top_part": null
+  },
+  "flow": "whole-figure",
+  "isolation_note": "process",
+  "materials": {
+    "atlas": "M_Medusa_Atlas",
+    "blender_images": {
+      "BC": {
+        "colorspace": "sRGB",
+        "file": "T_Medusa_Candidate_Atlas_BC.png",
+        "image": "T_Medusa_Candidate_Atlas_BC.png"
+      },
+      "N_OpenGL": {
+        "colorspace": "Non-Color",
+        "file": "T_Medusa_Candidate_Atlas_N_OpenGL.png",
+        "image": "T_Medusa_Candidate_Atlas_N_OpenGL.png"
+      },
+      "ORM": {
+        "colorspace": "Non-Color",
+        "file": "T_Medusa_Candidate_Atlas_ORM.png",
+        "image": "T_Medusa_Candidate_Atlas_ORM.png"
+      }
+    },
+    "face_slot": {
+      "material": "M_Medusa_Face",
+      "note": "second slot kept for parity with face-section-neck-v2; both slots use the same atlas material in UE",
+      "part": "tripo_part_10"
+    }
+  },
+  "meshes_pre_export_m": {
+    "SK_Medusa_Body": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_Medusa_Atlas",
+        "M_Medusa_Face"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 2,
+      "polygons": 18199,
+      "triangles": 18199,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap"
+      ],
+      "vertices": 22206
+    },
+    "SK_Medusa_Bow": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_Medusa_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 0,
+      "polygons": 1197,
+      "triangles": 1197,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap"
+      ],
+      "vertices": 1469
+    },
+    "SM_Medusa_Base": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_Medusa_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 2,
+      "polygons": 1780,
+      "triangles": 1780,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap"
+      ],
+      "vertices": 1141
+    }
+  },
+  "not_checked": [
+    "art acceptance, silhouette, lighting, K1/K2/K3 (art track)",
+    "deformation quality in animation; clips are not built by this stage",
+    "budgets: numbers are measured only (proposals until GD-058)",
+    "UV intra-part island padding (Tripo's own layout inside each cell)",
+    "collision capsule (04 §3.1 UCP_ proposal)",
+    "UE-side facing: measured by ue-import (bounds axis map) and editor frames, not here"
+  ],
+  "orientation": {
+    "after_fix": {
+      "tripo_part_0": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.4671,
+        "polygons": 6853,
+        "score": 1.0
+      },
+      "tripo_part_1": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.7241,
+        "polygons": 2633,
+        "score": 1.0
+      },
+      "tripo_part_10": {
+        "inward_area_fraction": 0.0083,
+        "outward_area_fraction": 0.7482,
+        "polygons": 587,
+        "score": 0.9782
+      },
+      "tripo_part_11": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.5616,
+        "polygons": 537,
+        "score": 1.0
+      },
+      "tripo_part_12": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.7643,
+        "polygons": 596,
+        "score": 1.0
+      },
+      "tripo_part_13": {
+        "inward_area_fraction": 0.0008,
+        "outward_area_fraction": 0.5099,
+        "polygons": 607,
+        "score": 0.997
+      },
+      "tripo_part_14": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.7525,
+        "polygons": 480,
+        "score": 1.0
+      },
+      "tripo_part_2": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.8787,
+        "polygons": 1780,
+        "score": 1.0
+      },
+      "tripo_part_3": {
+        "inward_area_fraction": 0.0038,
+        "outward_area_fraction": 0.6291,
+        "polygons": 1288,
+        "score": 0.988
+      },
+      "tripo_part_4": {
+        "inward_area_fraction": 0.0007,
+        "outward_area_fraction": 0.7724,
+        "polygons": 1197,
+        "score": 0.9983
+      },
+      "tripo_part_5": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.3755,
+        "polygons": 1312,
+        "score": 1.0
+      },
+      "tripo_part_6": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.3734,
+        "polygons": 1334,
+        "score": 1.0
+      },
+      "tripo_part_7": {
+        "inward_area_fraction": 0.0011,
+        "outward_area_fraction": 0.6117,
+        "polygons": 873,
+        "score": 0.9965
+      },
+      "tripo_part_8": {
+        "inward_area_fraction": 0.0001,
+        "outward_area_fraction": 0.7401,
+        "polygons": 575,
+        "score": 0.9997
+      },
+      "tripo_part_9": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.782,
+        "polygons": 524,
+        "score": 1.0
+      }
+    },
+    "before_fix": {
+      "tripo_part_0": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.4671,
+        "polygons": 6853,
+        "score": 1.0
+      },
+      "tripo_part_1": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.7241,
+        "polygons": 2633,
+        "score": 1.0
+      },
+      "tripo_part_10": {
+        "inward_area_fraction": 0.7482,
+        "outward_area_fraction": 0.0083,
+        "polygons": 587,
+        "score": -0.9782
+      },
+      "tripo_part_11": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.5616,
+        "polygons": 537,
+        "score": 1.0
+      },
+      "tripo_part_12": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.7643,
+        "polygons": 596,
+        "score": 1.0
+      },
+      "tripo_part_13": {
+        "inward_area_fraction": 0.5099,
+        "outward_area_fraction": 0.0008,
+        "polygons": 607,
+        "score": -0.997
+      },
+      "tripo_part_14": {
+        "inward_area_fraction": 0.7525,
+        "outward_area_fraction": 0.0,
+        "polygons": 480,
+        "score": -1.0
+      },
+      "tripo_part_2": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.8787,
+        "polygons": 1780,
+        "score": 1.0
+      },
+      "tripo_part_3": {
+        "inward_area_fraction": 0.0038,
+        "outward_area_fraction": 0.6291,
+        "polygons": 1288,
+        "score": 0.988
+      },
+      "tripo_part_4": {
+        "inward_area_fraction": 0.0007,
+        "outward_area_fraction": 0.7724,
+        "polygons": 1197,
+        "score": 0.9983
+      },
+      "tripo_part_5": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.3755,
+        "polygons": 1312,
+        "score": 1.0
+      },
+      "tripo_part_6": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.3734,
+        "polygons": 1334,
+        "score": 1.0
+      },
+      "tripo_part_7": {
+        "inward_area_fraction": 0.0011,
+        "outward_area_fraction": 0.6117,
+        "polygons": 873,
+        "score": 0.9965
+      },
+      "tripo_part_8": {
+        "inward_area_fraction": 0.7401,
+        "outward_area_fraction": 0.0001,
+        "polygons": 575,
+        "score": -0.9997
+      },
+      "tripo_part_9": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.782,
+        "polygons": 524,
+        "score": 1.0
+      }
+    },
+    "flipped_parts": [
+      "tripo_part_10",
+      "tripo_part_13",
+      "tripo_part_14",
+      "tripo_part_8"
+    ],
+    "flipped_polygons": 2249,
+    "method": "ray-escape",
+    "roundtrip": {
+      "tripo_part_0": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.4673,
+        "polygons": 6853,
+        "score": 1.0
+      },
+      "tripo_part_1": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.7241,
+        "polygons": 2633,
+        "score": 1.0
+      },
+      "tripo_part_10": {
+        "inward_area_fraction": 0.0083,
+        "outward_area_fraction": 0.7482,
+        "polygons": 587,
+        "score": 0.9782
+      },
+      "tripo_part_11": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.5616,
+        "polygons": 537,
+        "score": 1.0
+      },
+      "tripo_part_12": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.7643,
+        "polygons": 596,
+        "score": 1.0
+      },
+      "tripo_part_13": {
+        "inward_area_fraction": 0.0008,
+        "outward_area_fraction": 0.5099,
+        "polygons": 607,
+        "score": 0.997
+      },
+      "tripo_part_14": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.7525,
+        "polygons": 480,
+        "score": 1.0
+      },
+      "tripo_part_2": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.8787,
+        "polygons": 1780,
+        "score": 1.0
+      },
+      "tripo_part_3": {
+        "inward_area_fraction": 0.0038,
+        "outward_area_fraction": 0.6291,
+        "polygons": 1288,
+        "score": 0.988
+      },
+      "tripo_part_4": {
+        "inward_area_fraction": 0.0007,
+        "outward_area_fraction": 0.7724,
+        "polygons": 1197,
+        "score": 0.9983
+      },
+      "tripo_part_5": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.3755,
+        "polygons": 1312,
+        "score": 1.0
+      },
+      "tripo_part_6": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.3734,
+        "polygons": 1334,
+        "score": 1.0
+      },
+      "tripo_part_7": {
+        "inward_area_fraction": 0.0011,
+        "outward_area_fraction": 0.6117,
+        "polygons": 873,
+        "score": 0.9965
+      },
+      "tripo_part_8": {
+        "inward_area_fraction": 0.0001,
+        "outward_area_fraction": 0.7401,
+        "polygons": 575,
+        "score": 0.9997
+      },
+      "tripo_part_9": {
+        "inward_area_fraction": 0.0,
+        "outward_area_fraction": 0.782,
+        "polygons": 524,
+        "score": 1.0
+      }
+    }
+  },
+  "passed": true,
+  "pivot": {
+    "armature_object_location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "root_bone": "root",
+    "root_head_m": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "profile": {
+    "id": "medusa-segmented-skeletal/3",
+    "status": "proposed"
+  },
+  "reference_comparison": {
+    "base": {
+      "corner_normals_negated_by_part": {},
+      "corner_normals_other_by_part": {
+        "tripo_part_2": 5
+      },
+      "corner_normals_other_detail": [
+        {
+          "area_cm2": 0.493273049,
+          "dot": 0.9026,
+          "part": "tripo_part_2",
+          "polygon": 310,
+          "touches_near_degenerate": true
+        },
+        {
+          "area_cm2": 0.701015233,
+          "dot": 0.9026,
+          "part": "tripo_part_2",
+          "polygon": 311,
+          "touches_near_degenerate": true
+        },
+        {
+          "area_cm2": 0.484712153,
+          "dot": 0.9026,
+          "part": "tripo_part_2",
+          "polygon": 676,
+          "touches_near_degenerate": true
+        },
+        {
+          "area_cm2": 0.522705614,
+          "dot": 0.9026,
+          "part": "tripo_part_2",
+          "polygon": 677,
+          "touches_near_degenerate": true
+        },
+        {
+          "area_cm2": 1.672e-06,
+          "dot": 0.9026,
+          "part": "tripo_part_2",
+          "polygon": 903,
+          "touches_near_degenerate": true
+        }
+      ],
+      "corner_normals_same_by_part": {
+        "tripo_part_2": 5335
+      },
+      "flipped_winding_by_part": {},
+      "polygons_candidate": 1780,
+      "polygons_reference": 1780,
+      "precision": "positions 1e-4 m, UV 1e-5, material index; corner normals |dot| > 0.999",
+      "same_winding_by_part": {
+        "tripo_part_2": 1780
+      },
+      "unmatched_candidate_polygons": 0,
+      "unmatched_reference_polygons": 0
+    },
+    "base_fbx": "blender/ASSET-MEDUSA-001/export/SM_Medusa_Base.fbx",
+    "base_sha256": "a49bfbbfe6e51856aebcd9d3e7cc9a45bc142f0ff110830f446a28c76997ba4f",
+    "body": {
+      "corner_normals_negated_by_part": {
+        "tripo_part_13": 1821,
+        "tripo_part_8": 1725
+      },
+      "corner_normals_other_by_part": {
+        "tripo_part_0": 1
+      },
+      "corner_normals_other_detail": [
+        {
+          "area_cm2": 4.9e-08,
+          "dot": -0.7765,
+          "part": "tripo_part_0",
+          "polygon": 3870,
+          "touches_near_degenerate": true
+        }
+      ],
+      "corner_normals_same_by_part": {
+        "tripo_part_0": 20558,
+        "tripo_part_1": 7899,
+        "tripo_part_10": 1761,
+        "tripo_part_11": 1611,
+        "tripo_part_12": 1788,
+        "tripo_part_14": 1440,
+        "tripo_part_3": 3864,
+        "tripo_part_5": 3936,
+        "tripo_part_6": 4002,
+        "tripo_part_7": 2619,
+        "tripo_part_9": 1572
+      },
+      "flipped_winding_by_part": {
+        "tripo_part_13": 607,
+        "tripo_part_8": 575
+      },
+      "polygons_candidate": 18199,
+      "polygons_reference": 18199,
+      "precision": "positions 1e-4 m, UV 1e-5, material index; corner normals |dot| > 0.999",
+      "same_winding_by_part": {
+        "tripo_part_0": 6853,
+        "tripo_part_1": 2633,
+        "tripo_part_10": 587,
+        "tripo_part_11": 537,
+        "tripo_part_12": 596,
+        "tripo_part_14": 480,
+        "tripo_part_3": 1288,
+        "tripo_part_5": 1312,
+        "tripo_part_6": 1334,
+        "tripo_part_7": 873,
+        "tripo_part_9": 524
+      },
+      "unmatched_candidate_polygons": 0,
+      "unmatched_reference_polygons": 0
+    },
+    "bone_differences": [],
+    "bones_identical": true,
+    "bow": {
+      "corner_normals_negated_by_part": {},
+      "corner_normals_other_by_part": {},
+      "corner_normals_other_detail": [],
+      "corner_normals_same_by_part": {
+        "tripo_part_4": 3591
+      },
+      "flipped_winding_by_part": {},
+      "polygons_candidate": 1197,
+      "polygons_reference": 1197,
+      "precision": "positions 1e-4 m, UV 1e-5, material index; corner normals |dot| > 0.999",
+      "same_winding_by_part": {
+        "tripo_part_4": 1197
+      },
+      "unmatched_candidate_polygons": 0,
+      "unmatched_reference_polygons": 0
+    },
+    "sha256": "bd125c6bbeb2559b28f6fc4908a1790e0d05fd572b128bd9188c2daeea046592",
+    "sha256_matches_profile": true,
+    "skeletal_fbx": "blender/ASSET-MEDUSA-001/variants/face-section-neck-v2/SK_Medusa_FaceSectionNeck_v2.fbx"
+  },
+  "roundtrip": {
+    "base": {
+      "armature_objects": [],
+      "armatures": 0,
+      "bones": {},
+      "meshes": {
+        "SM_Medusa_Base": {
+          "bounds_m": {
+            "max": [
+              0.15,
+              0.15,
+              0.06
+            ],
+            "min": [
+              -0.15,
+              -0.15,
+              0.0
+            ]
+          },
+          "color_attributes": [],
+          "has_custom_normals": true,
+          "material_slots": [
+            "M_Medusa_Atlas"
+          ],
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 2,
+          "polygons": 1780,
+          "triangles": 1780,
+          "uv0_in_unit_square": true,
+          "uv_layers": [
+            "UVMap"
+          ],
+          "vertices": 1141,
+          "weights": null
+        }
+      }
+    },
+    "scale_ratio": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "skeletal": {
+      "armature_objects": [
+        "SKEL_Medusa"
+      ],
+      "armatures": 1,
+      "bones": {
+        "arm_lower.L": {
+          "head_m": [
+            0.068,
+            -0.013,
+            0.305
+          ],
+          "parent": "arm_upper.L",
+          "tail_m": [
+            0.1,
+            -0.045,
+            0.29
+          ]
+        },
+        "arm_lower.R": {
+          "head_m": [
+            -0.068,
+            -0.018,
+            0.305
+          ],
+          "parent": "arm_upper.R",
+          "tail_m": [
+            -0.05,
+            -0.045,
+            0.305
+          ]
+        },
+        "arm_upper.L": {
+          "head_m": [
+            0.045,
+            0.0,
+            0.355
+          ],
+          "parent": "spine",
+          "tail_m": [
+            0.068,
+            -0.013,
+            0.305
+          ]
+        },
+        "arm_upper.R": {
+          "head_m": [
+            -0.045,
+            -0.0,
+            0.355
+          ],
+          "parent": "spine",
+          "tail_m": [
+            -0.068,
+            -0.018,
+            0.305
+          ]
+        },
+        "foot.L": {
+          "head_m": [
+            0.04,
+            -0.015,
+            0.065
+          ],
+          "parent": "leg_lower.L",
+          "tail_m": [
+            0.04,
+            -0.06086,
+            0.03443
+          ]
+        },
+        "foot.R": {
+          "head_m": [
+            -0.04,
+            -0.015,
+            0.065
+          ],
+          "parent": "leg_lower.R",
+          "tail_m": [
+            -0.04,
+            -0.06086,
+            0.03443
+          ]
+        },
+        "hand.L": {
+          "head_m": [
+            0.1,
+            -0.045,
+            0.29
+          ],
+          "parent": "arm_lower.L",
+          "tail_m": [
+            0.112,
+            -0.06,
+            0.275
+          ]
+        },
+        "hand.R": {
+          "head_m": [
+            -0.05,
+            -0.045,
+            0.305
+          ],
+          "parent": "arm_lower.R",
+          "tail_m": [
+            -0.03202,
+            -0.05998,
+            0.28252
+          ]
+        },
+        "head": {
+          "head_m": [
+            0.0,
+            0.0,
+            0.385
+          ],
+          "parent": "spine",
+          "tail_m": [
+            0.0,
+            0.0,
+            0.5109
+          ]
+        },
+        "hips": {
+          "head_m": [
+            0.0,
+            0.0,
+            0.18
+          ],
+          "parent": "root",
+          "tail_m": [
+            0.0,
+            0.0,
+            0.22275
+          ]
+        },
+        "leg_lower.L": {
+          "head_m": [
+            0.038,
+            -0.012,
+            0.12
+          ],
+          "parent": "leg_upper.L",
+          "tail_m": [
+            0.04,
+            -0.015,
+            0.065
+          ]
+        },
+        "leg_lower.R": {
+          "head_m": [
+            -0.038,
+            -0.012,
+            0.12
+          ],
+          "parent": "leg_upper.R",
+          "tail_m": [
+            -0.04,
+            -0.015,
+            0.065
+          ]
+        },
+        "leg_upper.L": {
+          "head_m": [
+            0.03,
+            0.0,
+            0.19
+          ],
+          "parent": "hips",
+          "tail_m": [
+            0.038,
+            -0.012,
+            0.12
+          ]
+        },
+        "leg_upper.R": {
+          "head_m": [
+            -0.03,
+            -0.0,
+            0.19
+          ],
+          "parent": "hips",
+          "tail_m": [
+            -0.038,
+            -0.012,
+            0.12
+          ]
+        },
+        "root": {
+          "head_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "parent": null,
+          "tail_m": [
+            0.0,
+            0.0,
+            0.18
+          ]
+        },
+        "spine": {
+          "head_m": [
+            0.0,
+            0.0,
+            0.245
+          ],
+          "parent": "hips",
+          "tail_m": [
+            0.0,
+            0.0,
+            0.3709
+          ]
+        },
+        "weapon": {
+          "head_m": [
+            0.112,
+            -0.06,
+            0.275
+          ],
+          "parent": "hand.L",
+          "tail_m": [
+            0.13637,
+            -0.06,
+            0.275
+          ]
+        }
+      },
+      "meshes": {
+        "SK_Medusa_Body": {
+          "bounds_m": {
+            "max": [
+              0.12913,
+              0.0968,
+              0.55
+            ],
+            "min": [
+              -0.13035,
+              -0.08445,
+              0.03807
+            ]
+          },
+          "color_attributes": [],
+          "has_custom_normals": true,
+          "material_slots": [
+            "M_Medusa_Atlas",
+            "M_Medusa_Face"
+          ],
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 2,
+          "polygons": 18199,
+          "triangles": 18199,
+          "uv0_in_unit_square": true,
+          "uv_layers": [
+            "UVMap"
+          ],
+          "vertices": 22206,
+          "weights": {
+            "bones_used": {
+              "arm_lower.L": 418,
+              "arm_lower.R": 833,
+              "arm_upper.L": 448,
+              "arm_upper.R": 546,
+              "foot.L": 1111,
+              "foot.R": 1075,
+              "hand.L": 715,
+              "hand.R": 748,
+              "head": 6345,
+              "hips": 7744,
+              "leg_lower.L": 897,
+              "leg_lower.R": 893,
+              "leg_upper.L": 406,
+              "leg_upper.R": 389,
+              "spine": 2890
+            },
+            "max_influences": 2,
+            "not_normalised_vertices": 0,
+            "unweighted_vertices": 0,
+            "vertices": 22206,
+            "weight_share": {
+              "arm_lower.L": 0.015,
+              "arm_lower.R": 0.032,
+              "arm_upper.L": 0.0141,
+              "arm_upper.R": 0.0199,
+              "foot.L": 0.0408,
+              "foot.R": 0.0401,
+              "hand.L": 0.0322,
+              "hand.R": 0.0337,
+              "head": 0.2857,
+              "hips": 0.3163,
+              "leg_lower.L": 0.0233,
+              "leg_lower.R": 0.0232,
+              "leg_upper.L": 0.0119,
+              "leg_upper.R": 0.0123,
+              "spine": 0.0995
+            }
+          }
+        },
+        "SK_Medusa_Bow": {
+          "bounds_m": {
+            "max": [
+              0.15714,
+              -0.02172,
+              0.50653
+            ],
+            "min": [
+              0.07063,
+              -0.11415,
+              0.12868
+            ]
+          },
+          "color_attributes": [],
+          "has_custom_normals": true,
+          "material_slots": [
+            "M_Medusa_Atlas"
+          ],
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "polygons": 1197,
+          "triangles": 1197,
+          "uv0_in_unit_square": true,
+          "uv_layers": [
+            "UVMap"
+          ],
+          "vertices": 1469,
+          "weights": {
+            "bones_used": {
+              "weapon": 1469
+            },
+            "max_influences": 1,
+            "not_normalised_vertices": 0,
+            "unweighted_vertices": 0,
+            "vertices": 1469,
+            "weight_share": {
+              "weapon": 1.0
+            }
+          }
+        }
+      }
+    }
+  },
+  "scale": {
+    "scale": 0.56105904,
+    "source_bottom": 0.0,
+    "source_top": 0.980289
+  },
+  "source": {
+    "file": "medusa-segmented-retopo.glb",
+    "sha256": "0400f2b44f80b14005e03d997b83453e7d35e54f8ddd537b5dbf7770c0792e56"
+  },
+  "source_part_polygons": {
+    "tripo_part_0": 6853,
+    "tripo_part_1": 2633,
+    "tripo_part_10": 587,
+    "tripo_part_11": 537,
+    "tripo_part_12": 596,
+    "tripo_part_13": 607,
+    "tripo_part_14": 480,
+    "tripo_part_2": 1780,
+    "tripo_part_3": 1288,
+    "tripo_part_4": 1197,
+    "tripo_part_5": 1312,
+    "tripo_part_6": 1334,
+    "tripo_part_7": 873,
+    "tripo_part_8": 575,
+    "tripo_part_9": 524
+  },
+  "stage": "build",
+  "status": "technically_exported_not_art_accepted",
+  "uv": {
+    "tripo_part_0": {
+      "cell_px": 1024,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 6e-05,
+      "raster_covered_px": 469272,
+      "raster_overlap_px": 29,
+      "texel_density_px_per_cm": 14.792,
+      "triangles": 6853,
+      "uv_area_px2": 468983.5,
+      "world_area_cm2": 2143.524
+    },
+    "tripo_part_1": {
+      "cell_px": 512,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 6e-05,
+      "raster_covered_px": 148320,
+      "raster_overlap_px": 9,
+      "texel_density_px_per_cm": 17.005,
+      "triangles": 2633,
+      "uv_area_px2": 148307.7,
+      "world_area_cm2": 512.879
+    },
+    "tripo_part_10": {
+      "cell_px": 256,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 0.00011,
+      "raster_covered_px": 45020,
+      "raster_overlap_px": 5,
+      "texel_density_px_per_cm": 25.041,
+      "triangles": 587,
+      "uv_area_px2": 44936.9,
+      "world_area_cm2": 71.664
+    },
+    "tripo_part_11": {
+      "cell_px": 256,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 3e-05,
+      "raster_covered_px": 33164,
+      "raster_overlap_px": 1,
+      "texel_density_px_per_cm": 25.919,
+      "triangles": 537,
+      "uv_area_px2": 33081.8,
+      "world_area_cm2": 49.245
+    },
+    "tripo_part_12": {
+      "cell_px": 128,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 0.0,
+      "raster_covered_px": 10050,
+      "raster_overlap_px": 0,
+      "texel_density_px_per_cm": 14.835,
+      "triangles": 596,
+      "uv_area_px2": 10071.1,
+      "world_area_cm2": 45.764
+    },
+    "tripo_part_13": {
+      "cell_px": 128,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 0.0002,
+      "raster_covered_px": 9954,
+      "raster_overlap_px": 2,
+      "texel_density_px_per_cm": 15.873,
+      "triangles": 607,
+      "uv_area_px2": 9956.6,
+      "world_area_cm2": 39.518
+    },
+    "tripo_part_14": {
+      "cell_px": 64,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 0.0,
+      "raster_covered_px": 2082,
+      "raster_overlap_px": 0,
+      "texel_density_px_per_cm": 14.783,
+      "triangles": 480,
+      "uv_area_px2": 2077.7,
+      "world_area_cm2": 9.508
+    },
+    "tripo_part_2": {
+      "cell_px": 1024,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 3e-05,
+      "raster_covered_px": 679402,
+      "raster_overlap_px": 18,
+      "texel_density_px_per_cm": 19.14,
+      "triangles": 1780,
+      "uv_area_px2": 679372.8,
+      "world_area_cm2": 1854.419
+    },
+    "tripo_part_3": {
+      "cell_px": 512,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 0.00035,
+      "raster_covered_px": 144597,
+      "raster_overlap_px": 50,
+      "texel_density_px_per_cm": 24.14,
+      "triangles": 1288,
+      "uv_area_px2": 144650.2,
+      "world_area_cm2": 248.225
+    },
+    "tripo_part_4": {
+      "cell_px": 512,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 0.0,
+      "raster_covered_px": 142733,
+      "raster_overlap_px": 0,
+      "texel_density_px_per_cm": 20.932,
+      "triangles": 1197,
+      "uv_area_px2": 143020.6,
+      "world_area_cm2": 326.426
+    },
+    "tripo_part_5": {
+      "cell_px": 512,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 1e-05,
+      "raster_covered_px": 160018,
+      "raster_overlap_px": 1,
+      "texel_density_px_per_cm": 24.396,
+      "triangles": 1312,
+      "uv_area_px2": 160025.1,
+      "world_area_cm2": 268.882
+    },
+    "tripo_part_6": {
+      "cell_px": 512,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 1e-05,
+      "raster_covered_px": 162426,
+      "raster_overlap_px": 2,
+      "texel_density_px_per_cm": 25.055,
+      "triangles": 1334,
+      "uv_area_px2": 162318.5,
+      "world_area_cm2": 258.581
+    },
+    "tripo_part_7": {
+      "cell_px": 256,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 0.0012,
+      "raster_covered_px": 44928,
+      "raster_overlap_px": 54,
+      "texel_density_px_per_cm": 17.541,
+      "triangles": 873,
+      "uv_area_px2": 45057.7,
+      "world_area_cm2": 146.435
+    },
+    "tripo_part_8": {
+      "cell_px": 256,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 0.0,
+      "raster_covered_px": 34368,
+      "raster_overlap_px": 0,
+      "texel_density_px_per_cm": 16.391,
+      "triangles": 575,
+      "uv_area_px2": 34356.8,
+      "world_area_cm2": 127.877
+    },
+    "tripo_part_9": {
+      "cell_px": 256,
+      "loops_outside_cell_inner_rect": 0,
+      "overlap_ratio": 0.0,
+      "raster_covered_px": 37746,
+      "raster_overlap_px": 0,
+      "texel_density_px_per_cm": 21.807,
+      "triangles": 524,
+      "uv_area_px2": 37727.1,
+      "world_area_cm2": 79.334
+    }
+  },
+  "weights": {
+    "body": {
+      "bones_used": {
+        "arm_lower.L": 418,
+        "arm_lower.R": 833,
+        "arm_upper.L": 448,
+        "arm_upper.R": 546,
+        "foot.L": 1111,
+        "foot.R": 1075,
+        "hand.L": 715,
+        "hand.R": 748,
+        "head": 6345,
+        "hips": 7744,
+        "leg_lower.L": 897,
+        "leg_lower.R": 893,
+        "leg_upper.L": 406,
+        "leg_upper.R": 389,
+        "spine": 2890
+      },
+      "max_influences": 2,
+      "not_normalised_vertices": 0,
+      "unweighted_vertices": 0,
+      "vertices": 22206,
+      "weight_share": {
+        "arm_lower.L": 0.015,
+        "arm_lower.R": 0.032,
+        "arm_upper.L": 0.0141,
+        "arm_upper.R": 0.0199,
+        "foot.L": 0.0408,
+        "foot.R": 0.0401,
+        "hand.L": 0.0322,
+        "hand.R": 0.0337,
+        "head": 0.2857,
+        "hips": 0.3163,
+        "leg_lower.L": 0.0233,
+        "leg_lower.R": 0.0232,
+        "leg_upper.L": 0.0119,
+        "leg_upper.R": 0.0123,
+        "spine": 0.0995
+      }
+    },
+    "bow": {
+      "bones_used": {
+        "weapon": 1469
+      },
+      "max_influences": 1,
+      "not_normalised_vertices": 0,
+      "unweighted_vertices": 0,
+      "vertices": 1469,
+      "weight_share": {
+        "weapon": 1.0
+      }
+    }
+  }
+}

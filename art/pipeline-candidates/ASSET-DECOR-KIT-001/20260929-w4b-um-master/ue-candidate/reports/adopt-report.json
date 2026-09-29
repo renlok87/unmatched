@@ -1,0 +1,156 @@
+{
+  "checks": {
+    "candidate_built_from_registered_primary_source": {
+      "expected": "b336bf62ae9cd1518e741d0814824c4e3f5e5d1e4b3a1838a33f72ec59632fc4",
+      "measured": "b336bf62ae9cd1518e741d0814824c4e3f5e5d1e4b3a1838a33f72ec59632fc4",
+      "passed": true
+    },
+    "candidate_not_claimed_art_accepted": {
+      "measured": {
+        "art_accepted": false,
+        "budgets_declared": false,
+        "game_ready": false
+      },
+      "passed": true
+    },
+    "candidate_report_checks_passed": {
+      "measured": {
+        "checks_passed": true,
+        "failed": []
+      },
+      "passed": true
+    },
+    "candidate_report_schema": {
+      "expected": "unmatched.tripo-pipeline.static-prop-candidate/1",
+      "measured": "unmatched.tripo-pipeline.static-prop-candidate/1",
+      "passed": true
+    },
+    "fbx_bytes_match_candidate_report": {
+      "expected": "80153e4c9ccb759ba09d0f255e6066ebee3ba152652cad7c81f8e6c90b91855b",
+      "measured": "80153e4c9ccb759ba09d0f255e6066ebee3ba152652cad7c81f8e6c90b91855b",
+      "passed": true
+    },
+    "fbx_export_settings_equal_preset": {
+      "measured": {
+        "conformance_rows": 16,
+        "differences": {},
+        "preset": "blender/_tools/presets/UM_FBX_v1.json"
+      },
+      "note": "candidate-report export.settings vs blender/_tools/presets/UM_FBX_v1.json",
+      "passed": true
+    },
+    "readback_closed_manifold": {
+      "measured": {
+        "faces_with_inconsistent_winding": 0,
+        "non_manifold_edges": 0,
+        "open_edges": 0
+      },
+      "passed": true
+    },
+    "readback_is_this_fbx": {
+      "expected": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/SM_Decor_Barrel.fbx",
+      "measured": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/SM_Decor_Barrel.fbx",
+      "passed": true
+    },
+    "readback_material_slots_equal_report": {
+      "expected": 1,
+      "measured": [
+        "M_Decor_Barrel"
+      ],
+      "passed": true
+    },
+    "readback_single_mesh_no_armature": {
+      "measured": {
+        "armatures": 0,
+        "mesh_objects": [
+          "SM_Decor_Barrel"
+        ]
+      },
+      "passed": true
+    },
+    "readback_triangles_equal_report": {
+      "expected": 3790,
+      "measured": 3790,
+      "passed": true
+    },
+    "texture_bytes_match_candidate_report": {
+      "measured": {
+        "BC": true,
+        "N": true,
+        "ORM": true
+      },
+      "passed": true
+    },
+    "texture_size": {
+      "expected": [
+        1024,
+        1024
+      ],
+      "measured": {
+        "BC": [
+          1024,
+          1024
+        ],
+        "N": [
+          1024,
+          1024
+        ],
+        "ORM": [
+          1024,
+          1024
+        ]
+      },
+      "passed": true
+    }
+  },
+  "expectations_for_ue": {
+    "material_slots": 1,
+    "protrusion_axis_export_frame": "+X",
+    "protrusion_direction_deg_from_plus_x": 5.8,
+    "size_uu_at_import_scale_1": [
+      21.417,
+      21.355,
+      26.0
+    ],
+    "texture_px": 1024,
+    "triangles": 3790,
+    "ue_bounds_uu_predicted": {
+      "max": [
+        10.708,
+        10.678,
+        26.0
+      ],
+      "min": [
+        -10.708,
+        -10.678,
+        0.0
+      ]
+    }
+  },
+  "inputs": {
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/SM_Decor_Barrel.fbx": "80153e4c9ccb759ba09d0f255e6066ebee3ba152652cad7c81f8e6c90b91855b",
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_BC.png": "393b0b50d431d94909f4e24d4d0271dd603a7ee53816be747740f7d4a49afde1",
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_N.png": "33f91b4db86fa7e31ead30466a4ba9328d9fcf22d160ec6ba445ed3826fb2c17",
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_ORM.png": "9a66a5581ba08573952d82aafd1987edaf8d890e2bf3a12761db571df98b875c",
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/candidate-report.json": "321f64baf430271fa1d4621eb06b848e6d60746adbf35170c85af5ccf320ac33",
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/fbx-readback.json": "99b8d3f557ffc5a6665611d1654fc622dcd72cf98c21d0add5c7a6bddee83800"
+  },
+  "keys": {
+    "fbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/SM_Decor_Barrel.fbx",
+    "readback": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/fbx-readback.json",
+    "report": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/candidate-report.json",
+    "texture:BC": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_BC.png",
+    "texture:N": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_N.png",
+    "texture:ORM": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/T_Decor_Barrel_ORM.png"
+  },
+  "logic": "adopt/1",
+  "note": "the candidate is built outside this tool (static_prop_candidate.py, script sha256 (LF) 6f703427539511afe37740035e55db1bcddbbb92bd2092bfedddc076b7b3d18b); adopt copies nothing and re-hashes it",
+  "passed": true,
+  "profile": {
+    "id": "decor-barrel-static-um-fbx-v1/2",
+    "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/build-profiles/decor-barrel-static-um-fbx-v1-um-master.json",
+    "sha256": "c0ae7684fb51fb2dda72908372ccfb6f1258178173c35059c238887cf27b8687"
+  },
+  "stage": "adopt",
+  "status": "measured"
+}

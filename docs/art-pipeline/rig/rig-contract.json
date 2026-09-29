@@ -1,8 +1,10 @@
 {
-  "schema": "unmatched.rig-contract/1",
-  "revision": "p16-2026-09-28",
+  "schema": "unmatched.rig-contract/2",
+  "revision": "v2-2026-09-29",
+  "previous_revision": "p16-2026-09-28 (schema unmatched.rig-contract/1; скелет UM_HUMANOID_17_v1 сохранён ниже без изменений костей)",
   "status": "предложено",
-  "status_note": "Контракт предложен по итогам P1.6. Базовый скелет измерен на кандидате ASSET-MEDUSA-001 (Blender 5.2.2, UE 5.8 /Game/ART004). Художественно не принят; числа проб не являются бюджетами.",
+  "status_note": "Контракт v2 (волна 4, W4-D, меморандум engine-gate §1 п.6): кость 0 = SKEL_UM_Humanoid у всех (SKEL_Medusa в новых клипах — FAIL), кость оружия по стороне (weapon.L / weapon.R), ref-поза по UM_FBX_v1 (лицо +X), кадр 0 и последний кадр = rest (кроме terminal), bForceRootLock при импорте клипов, цепочки ik_chains для IK Rig / IK Retargeter. Базовый скелет измерен на ASSET-MEDUSA-001 (P1.6) и на кандидатах Arthur/Merlin/Harpy (CLI 20260928-cli-um-fbx-v1). Художественно не принят; числа проб не являются бюджетами.",
+  "default_skeleton": "UM_HUMANOID_17_v2",
   "source_of_truth": {
     "measured_rig": "blender/ASSET-MEDUSA-001/export/SK_Medusa.fbx",
     "builder": "blender/ASSET-MEDUSA-001/build_segmented_medusa.py#make_armature",
@@ -10,7 +12,121 @@
     "brief": "docs/game-design/18-animation-production-brief.md#9"
   },
   "skeletons": {
+    "UM_HUMANOID_17_v2": {
+      "status": "предложено",
+      "applies_to": ["ASSET-MEDUSA-001 (после пересборки по v2)", "ASSET-KING-ARTHUR-001", "ASSET-MERLIN-001", "ASSET-HARPY-001 (крылья = руки, без оружия)"],
+      "applies_to_note": "все новые клипы и все пересборки SK. Существующие файлы v1 (черновики Medusa, SK кандидатов CLI 20260928) остаются на UM_HUMANOID_17_v1 до пересборки",
+      "blender_units": "1 unit = 1 m, Z-up, лицом к -Y (авторский кадр); в экспортированном FBX лицо +X (UM_FBX_v1, ref_pose)",
+      "armature_object": {
+        "name": "SKEL_UM_Humanoid",
+        "status": "предложено",
+        "rule": "одно фиксированное имя объекта арматуры для всех персонажей (Medusa, Arthur, Merlin, Harpy). Legacy FBX-импортёр UE делает из объекта кость 0 — носитель root motion; другое имя кости 0 не совмещается с общим USkeleton и с CompatibleSkeletons",
+        "ue_bone_index": 0,
+        "legacy_names": ["SKEL_Medusa", "SKEL_S05_Medusa", "SKEL_S05_Mannequin"],
+        "legacy_policy": "fail",
+        "legacy_note": "в v2 старые имена — FAIL для любого файла. Старые черновики проверяются только против UM_HUMANOID_17_v1 (там WARN по списку grandfathered_files)",
+        "check": "validate_clip.py armature_object_name (для BVH и --retarget-map — info)"
+      },
+      "bones": [
+        {"name": "root", "parent": null, "role": "опорная кость на полу, pose-ключи = 0"},
+        {"name": "hips", "parent": "root"},
+        {"name": "spine", "parent": "hips"},
+        {"name": "head", "parent": "spine"},
+        {"name": "arm_upper.L", "parent": "spine"},
+        {"name": "arm_lower.L", "parent": "arm_upper.L"},
+        {"name": "hand.L", "parent": "arm_lower.L"},
+        {"name": "arm_upper.R", "parent": "spine"},
+        {"name": "arm_lower.R", "parent": "arm_upper.R"},
+        {"name": "hand.R", "parent": "arm_lower.R"},
+        {"name": "leg_upper.L", "parent": "hips"},
+        {"name": "leg_lower.L", "parent": "leg_upper.L"},
+        {"name": "foot.L", "parent": "leg_lower.L"},
+        {"name": "leg_upper.R", "parent": "hips"},
+        {"name": "leg_lower.R", "parent": "leg_upper.R"},
+        {"name": "foot.R", "parent": "leg_lower.R"},
+        {"name": "weapon.L", "parent": "hand.L", "optional": true, "role": "оружие в левой руке, жёсткий вес 100 %; только у персонажа с characters.*.weapon_bone = weapon.L"},
+        {"name": "weapon.R", "parent": "hand.R", "optional": true, "role": "оружие в правой руке, жёсткий вес 100 %; только у персонажа с characters.*.weapon_bone = weapon.R"}
+      ],
+      "weapon_bones": {
+        "weapon.L": {"parent": "hand.L", "ue_name": "weapon_L"},
+        "weapon.R": {"parent": "hand.R", "ue_name": "weapon_R"}
+      },
+      "weapon_legacy_names": ["weapon"],
+      "weapon_rule": "кость оружия названа по стороне; у героя ровно одна своя (или ни одной). Одно имя weapon с разными родителями запрещено: USkeleton::MergeBonesToBoneTree сверяет цепочку родителей (Skeleton.cpp:1002-1003), и меш с weapon под hand_R не сольётся со скелетом, где weapon под hand_L; ремап по имени для такой кости некорректен. Сокет Weapon остаётся на меше и крепится к своей кости (weapon_L или weapon_R)",
+      "characters": {
+        "Medusa": {"asset_id": "ASSET-MEDUSA-001", "weapon_bone": "weapon.L", "weapon": "лук в левой руке", "ue_weapon_bone": "weapon_L"},
+        "Arthur": {"asset_id": "ASSET-KING-ARTHUR-001", "weapon_bone": "weapon.R", "weapon": "меч в правой руке", "ue_weapon_bone": "weapon_R"},
+        "Merlin": {"asset_id": "ASSET-MERLIN-001", "weapon_bone": "weapon.R", "weapon": "посох в правой руке", "ue_weapon_bone": "weapon_R"},
+        "Harpy": {"asset_id": "ASSET-HARPY-001", "weapon_bone": null, "weapon": "нет (удар когтями)", "note": "в v1-профиле Harpy кость weapon оставлена невзвешенной только ради 17 имён v1; в v2 её нет. Сокет Weapon Harpy (точка удара когтей) крепится к hand.L/hand.R профилем"}
+      },
+      "side_convention": ".L = левая сторона персонажа = +X в Blender при взгляде персонажа в -Y (авторский кадр). После поворота UM_FBX_v1 .L = +Y в кадре FBX",
+      "ue_names": "импортёр UE заменяет '.' на '_' (arm_upper.L -> arm_upper_L, weapon.R -> weapon_R); объект арматуры становится костью 0: 17 костей у Harpy, 18 у героев с оружием",
+      "rest_pose": "поза миниатюры, в которой смоделирован меш (bind pose = rest pose); не T/A-поза",
+      "ref_pose": {
+        "export_preset": "blender/_tools/presets/UM_FBX_v1.json",
+        "export_space_rotation_z_degrees": 90,
+        "rule": "SK и все клипы экспортируются только профилем UM_FBX_v1 с тем же поворотом +90° вокруг Z (EditBone.transform(roll=True) + поворот данных меша). В FBX, открытом в Blender, персонаж смотрит в +X (yaw 0); в UE лицо +X. Клип без поворота (+Y в UE) на скелете с поворотом даёт расхождение root 90° и до 17,97 uu (p1-evidence §3)",
+        "expected_facing_yaw_deg": 0,
+        "facing_tolerance_deg": 10,
+        "facing_method": "анатомически: боковой вектор = среднее голов arm_upper.L, leg_upper.L минус среднее .R в плоскости XY; вперёд = боковой × Z; угол от +X. Не зависит от roll костей",
+        "root_bone_x_axis_yaw_deg": 90,
+        "root_bone_x_axis_note": "вторичная проверка: при жёстком повороте с roll ось X pose-кости root уходит из +X в +Y. Расхождение — WARN",
+        "measured": {
+          "draft_clips_medusa": "AM_Medusa_Idle/LungeAttack/HitReact/DeathSettle.fbx, SK_Medusa.fbx: facing -90° (лицо -Y), ось X root = +X — без поворота UM_FBX_v1 (headless Blender 5.2.2, 2026-09-29)",
+          "um_fbx_v1_exports": "SK_KingArthur_Candidate.fbx (CLI 20260928-cli-um-fbx-v1), SK_Medusa_HeadTilt_v31a_UM_FBX_v1.fbx: facing 0° (лицо +X), ось X root = +Y"
+        },
+        "check": "validate_clip.py ref_pose_facing (FAIL вне допуска), ref_pose_root_axis (WARN)"
+      },
+      "clip_boundaries": {
+        "rule": "кадр 0 — rest-поза у всех клипов; последний кадр — rest-поза у idle и oneshot. terminal (DeathSettle) заканчивается финальной позой, которую держит фигура. Первая и последняя поза Idle совпадают с rest. Тогда single-node без blend почти не даёт скачка при смене клипа",
+        "roles": {
+          "idle": "цикл (Idle): кадр 0 = последний = rest; шов цикла по clips.loop_seam_tolerance_of_height",
+          "oneshot": "LungeAttack, HitReact: кадр 0 = последний = rest",
+          "terminal": "DeathSettle: кадр 0 = rest, последний = финальная поза"
+        },
+        "default_role": "idle при --loop=true, иначе oneshot; DeathSettle задаётся явно --clip-role=terminal",
+        "tolerance_of_height": 0.005,
+        "method": "макс. расстояние голов и хвостов pose-костей от rest-позы в мировых координатах того же кадра (движение объекта арматуры не входит), доля роста",
+        "measured": "черновики Medusa: Idle, LungeAttack, HitReact — кадр 0 и последний = rest (0,0); DeathSettle — последний 0,512 роста (финальная поза)",
+        "check": "validate_clip.py clip_boundary_rest"
+      },
+      "ik_chains": {
+        "status": "предложено, в UE не собрано",
+        "purpose": "имена цепочек для IK Rig UM17 и офлайн IK Retargeter (оценка mocap/библиотечных клипов, варианты Arthur↔Merlin). Автохарактеризация UE 5.8 имена UM17 не знает, поэтому IK Rig собирается скриптом из этого списка (IKRigController), retarget pose — AutoAlign. Blender остаётся источником истины: клип из UE возвращается в FBX/.blend и проходит validate_clip.py",
+        "retarget_root": "hips",
+        "chain_names_note": "имена совпадают с цепочками IK Rig UE5 Manny (Root, Spine, Head, LeftArm, RightArm, LeftLeg, RightLeg), чтобы AutoMapChains мог сопоставить их точно. Не проверено в UE",
+        "chains": [
+          {"name": "Root", "start": "root", "end": "root"},
+          {"name": "Spine", "start": "hips", "end": "spine"},
+          {"name": "Head", "start": "head", "end": "head"},
+          {"name": "LeftArm", "start": "arm_upper.L", "end": "hand.L", "goal": "hand.L"},
+          {"name": "RightArm", "start": "arm_upper.R", "end": "hand.R", "goal": "hand.R"},
+          {"name": "LeftLeg", "start": "leg_upper.L", "end": "foot.L", "goal": "foot.L"},
+          {"name": "RightLeg", "start": "leg_upper.R", "end": "foot.R", "goal": "foot.R"},
+          {"name": "WeaponL", "start": "weapon.L", "end": "weapon.L", "optional": true, "fk_only": true},
+          {"name": "WeaponR", "start": "weapon.R", "end": "weapon.R", "optional": true, "fk_only": true}
+        ],
+        "ue_names": "в IK Rig кости указываются UE-именами (arm_upper_L, hand_L, weapon_R)",
+        "check": "tests/test_rig_rules.py (самосогласованность: кости есть, start — предок end, цель — конец цепочки)"
+      },
+      "bone_scale": 1.0,
+      "max_influences": 4,
+      "leaf_bones": false
+    },
     "UM_HUMANOID_17_v1": {
+      "status": "закрыт для новых клипов (v2, 2026-09-29)",
+      "closed_for_new_clips": true,
+      "superseded_by": "UM_HUMANOID_17_v2",
+      "closure_note": "описание ниже не изменено (P1.6). validate_clip.py --skeleton=UM_HUMANOID_17_v1 даёт WARN skeleton_version только для файлов из grandfathered_files (по sha256), для любого другого файла — FAIL. Кости v1 читают ещё сборка манекена (ASSET-PLACEHOLDER-MANNEQUIN) и SK кандидатов CLI 20260928 — до их пересборки",
+      "grandfathered_files": [
+        {"path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_Idle.fbx", "sha256": "03085e87b313d4be9d6102af3d348871b33d30b58304a5f4dcee883caab52105"},
+        {"path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_LungeAttack.fbx", "sha256": "b985af983166f62d320c95bdc88cbcfba1f897a6c0abcaf87bcf748f994338a8"},
+        {"path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_HitReact.fbx", "sha256": "606b998af967508ee0ddd000e3083b49e135bf9765ce14a313339aa054105af2"},
+        {"path": "blender/ASSET-MEDUSA-001/export/AM_Medusa_DeathSettle.fbx", "sha256": "278052b4f48dab53df574646d902ab04259985b1aafffca02bd171f8c544e00f"},
+        {"path": "blender/ASSET-MEDUSA-001/export/SK_Medusa.fbx", "sha256": "fb9772eaaffd591a221b50b1a6dec17a25a33712449d3c0e95f10ff9a87242aa"},
+        {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/fixtures/AM_Medusa_LungeAttack.bvh", "sha256": "5dbe3c213836521395b0ca58c3e2375dfe13ed1cab57ff4ec8c79db770bbf014"},
+        {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/tripo-rig-20260928-p16/fixtures/AM_Medusa_LungeAttack.glb", "sha256": "8204d33ca1c18299f5ae4e590f028cddd28198b7e43c6b1bee08621017c54bdf"}
+      ],
       "applies_to": ["ASSET-MEDUSA-001", "Arthur (planned)", "Merlin (planned)", "Harpy (planned, arms = wings)"],
       "blender_units": "1 unit = 1 m, Z-up, лицом к -Y",
       "armature_object": {
@@ -103,7 +219,22 @@
     "import_uniform_scale_evidence": "tools/art/import_medusa_candidate.py: skeletal_mesh_import_data и static_mesh_import_data.import_uniform_scale = 1.0 (import_skeletal, import_base); для клипов (import_clip) масштаб не задаётся — значение по умолчанию. Результат: верх SK 55,0 uu (blender/ASSET-MEDUSA-001/ue-import-result.json height_55uu), root_delta_uu = 0 у 4 клипов (ue-animation-report.json); T4: «Коэффициент round-trip 1,0»",
     "import_uniform_scale_conflict": "память S05 (ue-pipeline-traps п.3): FBX_SCALE_UNITS + import_uniform_scale=100 — другой профиль (без патча UnitScaleFactor). Конфликтует с измеренным ART004/T4; не применять, проверить на UE-этапе. Ручной Scale при импорте — дефект (04 §1)",
     "animation_import_options_verified": "только то, что задаёт import_medusa_candidate.py import_clip; animation_length и прочие опции не проверялись",
-    "skeleton_asset": "общий Skeleton на персонажа; общий на гуманоидов — не доказано (бриф §9 п.3)",
+    "clip_import": {
+      "status": "предложено (v2); реализация — import_clips.py и CLI ue-import (волна 4, W4-B), проверка — rig_rules.ue_clip_import_problems по измеренным свойствам AnimSequence",
+      "factory": "FbxFactory",
+      "factory_note": "явная task.factory = unreal.FbxFactory() с FbxImportUI (legacy FBX), без глобального переключения Interchange.FeatureFlags.Import.FBX в живом редакторе",
+      "by_root_policy": {
+        "in_place": {"force_root_lock": true, "enable_root_motion": false},
+        "root_motion": {"force_root_lock": false, "enable_root_motion": true}
+      },
+      "why": "bForceRootLock (AnimSequence.h:328) страхует in-place клип: случайный ключ на кости 0 не сдвинет фигуру с клетки и её ClickCapsule. Root motion включается только для отдельного клипа по решению (флаг клипа + ConsumeRootMotion в акторе)",
+      "import_uniform_scale": "для клипов не задавать (значение по умолчанию), как import_clip в import_medusa_candidate.py"
+    },
+    "sockets_v2": [
+      {"name": "Weapon", "bone_by_character": {"Medusa": "weapon_L", "Arthur": "weapon_R", "Merlin": "weapon_R", "Harpy": "профиль (точка удара когтей на hand_L/hand_R)"}, "offset": [0, 0, 0], "note": "сокет на меше (USkeletalMesh::AddSocket, bAddToSkeleton=false), общий скелет ему не мешает"},
+      {"name": "Head", "bone": "head", "offset": "по правилу socket_offset_rule или профилю героя", "note": "без изменений против v1"}
+    ],
+    "skeleton_asset": "общий Skeleton на персонажа; общий на гуманоидов — не доказано (бриф §9 п.3). v2 снимает два препятствия (кость 0 и родитель оружия), решение об общем скелете / CompatibleSkeletons — после первого принятого клипа, по прототипу",
     "sockets": [
       {"name": "Weapon", "bone": "weapon", "offset": [0, 0, 0], "note": "ART004 кандидат; в S05 сокет стоял на hand_L (0,2,0)"},
       {"name": "Head", "bone": "head", "offset": [0, 0, 4], "note": "ART004 кандидат; в S05 (0,0,8)"}

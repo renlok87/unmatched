@@ -1,0 +1,60 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "hover-retrigger",
+ "kind": "scenario",
+ "description": "Наведение по трём объектам: контур переходит мгновенно (replace по объекту), звук тика не чаще 1 раза в 150 мс (throttled). Локальный CUE без seq.",
+ "covers": [
+  "07 CUE-001 не чаще 1/150 мс",
+  "USoundConcurrency RetriggerTime"
+ ],
+ "assets_present": {
+  "CUE-001": {
+   "sfx": "/Game/Audio/Test/SW_Test_Tick.SW_Test_Tick"
+  }
+ },
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-001",
+   "subject": "cell-2-3"
+  },
+  {
+   "t": 100,
+   "kind": "cue",
+   "id": "CUE-001",
+   "subject": "cell-2-4"
+  },
+  {
+   "t": 160,
+   "kind": "cue",
+   "id": "CUE-001",
+   "subject": "medusa"
+  },
+  {
+   "t": 200,
+   "kind": "cue",
+   "id": "CUE-001",
+   "subject": "medusa"
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-001 subject=cell-2-3 seq=- t=0 vfx=none sfx=SW_Test_Tick clip=none mat=Rim socket=- reduced=0 result=spawned",
+  "CUE fx done id=CUE-001 subject=cell-2-3 seq=- t=100 ms=100 cut=replace",
+  "CUE fx id=CUE-001 subject=cell-2-4 seq=- t=100 vfx=none sfx=throttled clip=none mat=Rim socket=- reduced=0 result=spawned",
+  "CUE fx done id=CUE-001 subject=cell-2-4 seq=- t=160 ms=60 cut=replace",
+  "CUE fx id=CUE-001 subject=medusa seq=- t=160 vfx=none sfx=SW_Test_Tick clip=none mat=Rim socket=- reduced=0 result=spawned",
+  "CUE fx done id=CUE-001 subject=medusa seq=- t=200 ms=40 cut=replace",
+  "CUE fx id=CUE-001 subject=medusa seq=- t=200 vfx=none sfx=throttled clip=none mat=Rim socket=- reduced=0 result=spawned",
+  "CUE fx done id=CUE-001 subject=medusa seq=- t=350 ms=150 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 4,
+  "spawned": 4,
+  "fallback": 0,
+  "duplicate": 0,
+  "stale": 0,
+  "done": 4,
+  "unique_triples": 0
+ }
+}

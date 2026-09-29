@@ -1,6 +1,6 @@
 # Валидация тестового клипа: FBX/BVH/GLB → Blender → отчёт
 
-Срез 2026-09-28, задача P1.6. Скрипт: [validate_clip.py](../../../tools/tripo-pipeline/anim/validate_clip.py). Контракт: [rig-contract.json](../rig/rig-contract.json). Прогон всех кейсов этой задачи: [run_p16_validation.py](../../../tools/tripo-pipeline/anim/run_p16_validation.py). Отчёты лежат в [validation/](validation/).
+Срез 2026-09-28, задача P1.6; дополнено 2026-09-29 (контракт рига v2, волна 4, W4-D — раздел «Контракт v2» ниже). Скрипт: [validate_clip.py](../../../tools/tripo-pipeline/anim/validate_clip.py). Контракт: [rig-contract.json](../rig/rig-contract.json). Прогон всех кейсов этой задачи: [run_p16_validation.py](../../../tools/tripo-pipeline/anim/run_p16_validation.py). Отчёты лежат в [validation/](validation/).
 
 Валидатор только читает клип: он открывает его в пустой сцене headless Blender 5.2 и ничего не сохраняет. **PASS означает техническое соответствие контракту, а не художественную приёмку.** Пример из этого прогона: пресет Tripo на сломанном риге получил PASS, хотя визуально он неприемлем.
 
@@ -23,7 +23,10 @@ B="C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
 
 | Опция | Значение по умолчанию | Что задаёт |
 | --- | --- | --- |
-| `--skeleton=` | `UM_HUMANOID_17_v1` | ключ скелета в контракте |
+| `--skeleton=` | `contract.default_skeleton` = `UM_HUMANOID_17_v2` | ключ скелета в контракте; `UM_HUMANOID_17_v1` закрыт для новых клипов (WARN только файлам из `grandfathered_files`) |
+| `--character=` | нет | `Medusa`, `Arthur`, `Merlin`, `Harpy`: какая кость оружия обязательна (`weapon.L` / `weapon.R` / нет) |
+| `--kind=` | `clip` | `skeletal-mesh`: только арматура, кости, оружие и ref-поза (SK без action) |
+| `--clip-role=` | `idle` при `--loop=true`, иначе `oneshot` | граница клипа: `idle`/`oneshot` — кадр 0 и последний = rest, `terminal` (DeathSettle) — только кадр 0 |
 | `--expect-fps=` | 24 (контракт) | ожидаемый FPS |
 | `--expect-duration=`, `--duration-tol=` | нет / 0,05 с | длительность клипа |
 | `--loop=true` | false | включает проверку шва цикла |
@@ -38,7 +41,12 @@ B="C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
 | Проверка | Как считается | FAIL, если |
 | --- | --- | --- |
 | `import`, `single_armature`, `action` | импорт FBX/BVH/GLB, одна арматура, у неё есть action | импорт упал, арматур не одна, action нет |
-| `armature_object_name` | имя объекта арматуры (= кость 0 в UE) против `armature_object.name` контракта (`SKEL_UM_Humanoid`) | имя другое; для старых имён из `legacy_names` (`SKEL_Medusa`, `SKEL_S05_*`) — WARN; для BVH и `--retarget-map` — info |
+| `skeleton_version` | закрыт ли скелет для новых клипов (`closed_for_new_clips`) и есть ли sha256 файла в `grandfathered_files` | v1 и файл не в списке — FAIL; в списке — WARN; v2 — PASS |
+| `armature_object_name` | имя объекта арматуры (= кость 0 в UE) против `armature_object.name` контракта (`SKEL_UM_Humanoid`) | имя другое; старые имена из `legacy_names` (`SKEL_Medusa`, `SKEL_S05_*`) — по `legacy_policy`: v2 FAIL, v1 WARN; для BVH и `--retarget-map` — info |
+| `weapon_side` | кость оружия по стороне (v2): `weapon.L` под `hand.L`, `weapon.R` под `hand.R`, не больше одной; с `--character` — именно своя | одно имя `weapon`, две кости оружия, чужая сторона, неверный родитель, оружие у Harpy; для v1 — info |
+| `ref_pose_facing` | анатомический yaw ref-позы: боковой вектор `.L − .R` (головы `arm_upper`, `leg_upper`) × Z, угол от +X | вне 0 ± 10° (UM_FBX_v1: лицо +X); для BVH и `--retarget-map` — info |
+| `ref_pose_root_axis` | направление оси X кости `root` в плоскости XY | WARN вне 90 ± 10° (жёсткий поворот UM_FBX_v1 с roll) |
+| `clip_boundary_rest` | макс. расстояние голов и хвостов pose-костей от rest-позы на первом и последнем кадре (в мире того же кадра), доля роста | больше 0,5 % роста на кадре 0 или (для `idle`/`oneshot`) на последнем |
 | `bone_length_plausible` | самая длинная кость в мировых координатах, доля роста | WARN, если длиннее роста: эвристика длин импортёра сломана, сдвиги по хвостам недостоверны |
 | `fps` | `scene.render.fps / fps_base` после импорта | отклонение больше 0,001 |
 | `duration` | (frame_end − frame_start) / fps | вне допуска (если задано ожидание) |
@@ -85,10 +93,30 @@ B="C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
 # tripo -> fixtures/tripo-preset-stoya-otdyh-d562/*.fbx  (из source/*-stoya-otdyh-*.zip, без .fbm)
 ```
 
+## Контракт v2 (2026-09-29)
+
+Контракт: [rig-contract.json](../rig/rig-contract.json) `unmatched.rig-contract/2`, описание — [RIG-CONTRACT.md §0](../rig/RIG-CONTRACT.md). Правила, которые не требуют Blender, вынесены в `tools/tripo-pipeline/anim/rig_rules.py` и покрыты юнит-тестами `tools/tripo-pipeline/tests/test_rig_rules.py` (21 тест: вердикты, самосогласованность `ik_chains`, sha256 старых файлов, профили героев `/4`, уникальность `profile_id`).
+
+Прогон файлов: `python tools/tripo-pipeline/anim/run_rig_v2_validation.py` — 11 кейсов с ожидаемым кодом выхода и **точным** набором FAIL; отчёты — [validation-rig-v2/](validation-rig-v2/summary.json). Позитивная фикстура — синтетический клип `fixtures/rig-contract-v2/AM_RigV2_LungeAttack_weaponL.fbx` (`make_fixtures.py rigv2`: объект `SKEL_UM_Humanoid`, `weapon.L`, rest и меш повёрнуты на +90° как в UM_FBX_v1; побайтно повторяется двумя прогонами, sha256 `1945533a…646b`). Это фикстура проверки, не клип для игры.
+
+| Кейс | Ожидание | Что показывает |
+| --- | --- | --- |
+| `pos-rigv2-Medusa-oneshot` | PASS | все проверки v2 проходят на правильном файле |
+| `neg-rigv2-as-Arthur` | FAIL `skeleton_contract`, `weapon_side` | у Arthur оружие `weapon.R` |
+| `neg-draft-Lunge-v2` | FAIL `armature_object_name`, `weapon_side`, `ref_pose_facing` | черновик Medusa как новый клип: `SKEL_Medusa`, одно имя `weapon`, лицо −Y |
+| `legacy-draft-Lunge-v1-grandfathered` | PASS, WARN `skeleton_version` | старый черновик допущен на закрытом v1 по sha256 |
+| `neg-rigv2-on-closed-v1` | FAIL `skeleton_version`, `skeleton_contract` | новый файл на закрытом v1 |
+| `neg-draft-DeathSettle-v1-as-oneshot` / `legacy-…-terminal` | FAIL `clip_boundary_rest` / PASS | финальная поза допустима только для `terminal` |
+| `neg-sk-Arthur-cli-v1-as-v2`, `neg-sk-Merlin-cli-v1-as-v2` | FAIL `skeleton_contract`, `weapon_side` | SK CLI 20260928 требуют пересборки с `weapon.R` (профили `/4`) |
+| `ext-tripo-preset-retarget-map-v2` | PASS | внешний клип: имя кости 0, ref-поза и граница — info |
+| `err-unknown-character` | код 2 | неверная опция — ошибка запуска |
+
+Черновые клипы P1.6 проверяются явно против закрытого v1: `run_p16_validation.py` передаёт `--skeleton=UM_HUMANOID_17_v1` и роль (`DeathSettle` — `terminal`). Повтор 2026-09-29 в `--out-dir` (без перезаписи отчётов P1.6 от 2026-09-28): 9/9 кейсов с ожидаемым итогом, перекрёстная проверка GLB — PASS (рост 0 %, пик 2,652 %); добавился только WARN `skeleton_version`.
+
 ## Приём клипа в библиотеку
 
 1. Положить FBX (или BVH) и записать источник и лицензию в [clip-manifest.json](clip-manifest.json). Для этого сначала добавить запись в `build()` файла `tools/tripo-pipeline/anim/clip_manifest.py` (по образцу `medusa_draft`/`tripo_test`), затем выполнить `build`.
-2. Запустить `validate_clip.py` с ожиданиями слота (длительность, loop, root policy). Внешнему клипу на чужом скелете сначала нужен ретаргет в контракт. До ретаргета допускается только `--retarget-map`, и это не заменяет перекладку.
+2. Запустить `validate_clip.py` с ожиданиями слота (длительность, loop, root policy) и с `--character=<герой>` и `--clip-role=` (DeathSettle — `terminal`). Внешнему клипу на чужом скелете сначала нужен ретаргет в контракт. До ретаргета допускается только `--retarget-map`, и это не заменяет перекладку.
 3. `python tools/tripo-pipeline/anim/clip_manifest.py check`: схема, наличие файлов, sha256, правило «measured и выше требуют PASS». Файлы клипа и фикстуры должны лежать в отслеживаемом каталоге (`source/`, `fixtures/`), а не в игнорируемом `work/`, иначе после checkout проверка упадёт.
 4. Посмотреть клип глазами: в Blender или на листе. Технический PASS без просмотра не повышает статус выше `measured`.
 5. Импорт в UE — отложен (ниже).

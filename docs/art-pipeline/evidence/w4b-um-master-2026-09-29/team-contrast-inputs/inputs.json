@@ -1,0 +1,658 @@
+{
+ "noise": [
+  "refix-r1",
+  "refix-r2"
+ ],
+ "note": "lossless crops of the EDITOR frames (P1.7 control scene) and the ROI masks team_contrast.py computed on the full frames; `team_contrast.py --from-inputs <this dir>` recomputes the numbers",
+ "run_meta": {
+  "after-r1": {
+   "asset_set": "w4b",
+   "tag": "after-r1",
+   "team_proposal": {
+    "Silver": "#5A7F9F",
+    "linear": [
+     0.102242,
+     0.212231,
+     0.346704,
+     1.0
+    ]
+   }
+  },
+  "before": {
+   "asset_set": "t31",
+   "tag": "before",
+   "team_proposal": null
+  },
+  "refix-r1": {
+   "asset_set": "w4b",
+   "tag": "refix-r1",
+   "team_proposal": {
+    "Silver": "#5A7F9F",
+    "linear": [
+     0.102242,
+     0.212231,
+     0.346704,
+     1.0
+    ]
+   }
+  },
+  "refix-r2": {
+   "asset_set": "w4b",
+   "tag": "refix-r2",
+   "team_proposal": {
+    "Silver": "#5A7F9F",
+    "linear": [
+     0.102242,
+     0.212231,
+     0.346704,
+     1.0
+    ]
+   }
+  }
+ },
+ "runs": [
+  "before",
+  "after-r1",
+  "refix-r1",
+  "refix-r2"
+ ],
+ "schema": "unmatched.w4b-team-contrast-inputs/1",
+ "subjects": {
+  "after-r1": {
+   "arthur": {
+    "crop_box_px": [
+     897,
+     443,
+     1109,
+     705
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-arthur-ue-editor.png",
+      "sha256": "dedd242596c21a03c27a9425ea3ec337d72a54057a670619149bfb7b1691600f"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-arthur-ue-editor.png",
+      "sha256": "e579f70466898d58f592325ef6b8b6de134f0bddb242931b07643981c28fd6ff"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-arthur-ue-editor.png",
+      "sha256": "b1e3c55e195bc55c955394b72f874bac5830722106557cb40602f7398ac9bbac"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-arthur-ue-editor.png",
+      "sha256": "bd40608a14f88321553b783c33bc474804cea81e5bcba7c54b522f09b2c7056b"
+     },
+     "team-prop": {
+      "file": "p17-team-prop-k2-1p6-arthur-ue-editor.png",
+      "sha256": "7339b840e0014f4a121835a58e7b2dadf2cad186b5d23f80bc63bd10d9b44754"
+     }
+    },
+    "split_source": "figure pixels of run refix-r1 (same meshes, cells, camera)",
+    "teams": {
+     "main": "Gold",
+     "team-alt": "Silver",
+     "team-prop": "Silver (value-split proposal)"
+    }
+   },
+   "harpy2": {
+    "crop_box_px": [
+     855,
+     470,
+     1065,
+     629
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "9388b44f8c8527ebb4580438c57fd69b098252fec8bfbd790cf788a1cb2bca60"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "fd5c9b7d26a740f3e30c03b7ff20539d5e647cdd629217b7d3c3d8e7a15790ae"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-harpy2-ue-editor.png",
+      "sha256": "f1c7f10246421f6772ab34886a8a8f979de2082e3e3ebe01b6998a0dc0fe75ae"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "20a2b85e68836dcdf630228c3d583c927b66ee8af1e725b1c78d27c90cb3e1ac"
+     },
+     "team-prop": {
+      "file": "p17-team-prop-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "06b8b06ff43d04c611ccad83908e30e96bc3312b015505509ed67ba45659475d"
+     }
+    },
+    "split_source": "figure pixels of run refix-r1 (same meshes, cells, camera)",
+    "teams": {
+     "main": "Silver",
+     "team-alt": "Gold",
+     "team-prop": "Silver (value-split proposal)"
+    }
+   },
+   "medusa": {
+    "crop_box_px": [
+     898,
+     455,
+     1025,
+     636
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-medusa-ue-editor.png",
+      "sha256": "464d3fc6124754d5b88d3a4b470e6e6e78338305a53b2c63da389aa5d94b64ff"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-medusa-ue-editor.png",
+      "sha256": "104971a5076695b2662c28f29147c8dfac541445b7ed3dcd3882dc7037533612"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-medusa-ue-editor.png",
+      "sha256": "6b2ee170f58c94c46893faffffbd6cb53c09c6cc47c66057b2e55378d5330263"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-medusa-ue-editor.png",
+      "sha256": "71141b4b5991c9fb6f742f443b1cde53a81ca2715a8a5d6a30060860074316bf"
+     },
+     "team-prop": {
+      "file": "p17-team-prop-k2-1p6-medusa-ue-editor.png",
+      "sha256": "dc92f68e062a6d252eadfd7224b37b431cf4743a7c25638fcfff6c58dc2b1642"
+     }
+    },
+    "split_source": "figure pixels of run refix-r1 (same meshes, cells, camera)",
+    "teams": {
+     "main": "Silver",
+     "team-alt": "Gold",
+     "team-prop": "Silver (value-split proposal)"
+    }
+   },
+   "merlin": {
+    "crop_box_px": [
+     682,
+     442,
+     1106,
+     712
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-merlin-ue-editor.png",
+      "sha256": "762d8bcb5b7e82ac739e7319cf948a417b9ea0c9628c99097d907402d8d6a1e7"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-merlin-ue-editor.png",
+      "sha256": "dc502becb3b3bfe48c4a0cb8c3c306a1a80fdedc57273f484e8416408697e497"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-merlin-ue-editor.png",
+      "sha256": "25a045a45643d2750b9e3f67529f7b6b6665f583d21f1730ca313f86ac29531a"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-merlin-ue-editor.png",
+      "sha256": "6da5f0eccb2fed1e7c8e018b6ad2573edabbc3f327bbc02568d333ea6839a227"
+     },
+     "team-prop": {
+      "file": "p17-team-prop-k2-1p6-merlin-ue-editor.png",
+      "sha256": "52d3ea1a4a9c68fcab497a713fbb124dc449f00ab9406a0be27f491cb4c71b23"
+     }
+    },
+    "split_source": "figure pixels of run refix-r1 (same meshes, cells, camera)",
+    "teams": {
+     "main": "Gold",
+     "team-alt": "Silver",
+     "team-prop": "Silver (value-split proposal)"
+    }
+   }
+  },
+  "before": {
+   "arthur": {
+    "crop_box_px": [
+     897,
+     443,
+     1109,
+     705
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-arthur-ue-editor.png",
+      "sha256": "1568cafe6253087482b4d699aab7c04dbf712bce160e78768637930f0bda32b8"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-arthur-ue-editor.png",
+      "sha256": "8f0af591d1d234e007381da4910d0940fd25c00c637d119d19edda4b722d3d05"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-arthur-ue-editor.png",
+      "sha256": "1444486483e31450d7c4fe7d609c483ef1b10bd33174091cdfef630b95a24a82"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-arthur-ue-editor.png",
+      "sha256": "9902bd1c782c66142d2440f5c5fbecd2e8cfb0779400a77fc31914724f66212e"
+     }
+    },
+    "split_source": "figure pixels of run refix-r1 (same meshes, cells, camera)",
+    "teams": {
+     "main": "Gold",
+     "team-alt": "Silver"
+    }
+   },
+   "harpy2": {
+    "crop_box_px": [
+     855,
+     470,
+     1065,
+     629
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "d35908508c1762293b7295849ffae6559d78c68a7e0230b9f1f4977459a87312"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "a905c06057682e33038963806e388cc126434ca7a4d8533c8764cede92a56599"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-harpy2-ue-editor.png",
+      "sha256": "f1c2696f7d1e88488d5c71df1e81ff67aa9c2dc1ab4cea7a8e1abe84540b8c94"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "361674e83a3582385832fb1019479a18ddc33888cc46bdedde36a99942a582ab"
+     }
+    },
+    "split_source": "figure pixels of run refix-r1 (same meshes, cells, camera)",
+    "teams": {
+     "main": "Silver",
+     "team-alt": "Gold"
+    }
+   },
+   "medusa": {
+    "crop_box_px": [
+     898,
+     455,
+     1025,
+     636
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-medusa-ue-editor.png",
+      "sha256": "000055e7078e3a68de37a57d7134c9b5aef9bd85ee25fcc731895ccdded79e11"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-medusa-ue-editor.png",
+      "sha256": "350a2a09c2adde28f93a55d8455403dc0a3333e242fcc4172ac3ff996c343d27"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-medusa-ue-editor.png",
+      "sha256": "596a212d5b6ad22ce997d80001ea9f2ef915d51f50ef5a491ec80ac3a9495d53"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-medusa-ue-editor.png",
+      "sha256": "146d6aef44900dfa2d9ed79116c39518f2bdb33e731899f7c751af990285b828"
+     }
+    },
+    "split_source": "figure pixels of run refix-r1 (same meshes, cells, camera)",
+    "teams": {
+     "main": "Blue",
+     "team-alt": "Red"
+    }
+   },
+   "merlin": {
+    "crop_box_px": [
+     682,
+     442,
+     1106,
+     712
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-merlin-ue-editor.png",
+      "sha256": "a479bc5d5118c70fa4433ac123b61a4061703e464485c5c5fd1cdbd877ae0b7c"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-merlin-ue-editor.png",
+      "sha256": "86861500a9619de31de669faafbf8b80de8c0c2a58b17702f9249f6c199ae055"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-merlin-ue-editor.png",
+      "sha256": "7a316a2f3fb1a1b12e38a5cd2772674a7c4cea81ba2f7564a50b0419b06c53a0"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-merlin-ue-editor.png",
+      "sha256": "8bb90dfbd42f0fe2304dfb576f929ab02c75771d90e2e56b0d6f08f5ab44ad10"
+     }
+    },
+    "split_source": "figure pixels of run refix-r1 (same meshes, cells, camera)",
+    "teams": {
+     "main": "Gold",
+     "team-alt": "Silver"
+    }
+   }
+  },
+  "refix-r1": {
+   "arthur": {
+    "crop_box_px": [
+     897,
+     443,
+     1109,
+     705
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-arthur-ue-editor.png",
+      "sha256": "f7a1cdbe5334789928a15b3166ab4e0deca9a8622dae5eb8145be2818ce20666"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-arthur-ue-editor.png",
+      "sha256": "fa24ad17d6144c66bfa04ed7d216aa8f485eb62d5c3cc7397df75abfd345fa05"
+     },
+     "mask-base": {
+      "file": "p17-mask-k2-1p6-base-arthur-ue-editor.png",
+      "sha256": "7518b99c6c990c2779d0a66573517c92fe1524c67187bb6dfd7c3dede20dab60"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-arthur-ue-editor.png",
+      "sha256": "5d1ff2d282cbfdacf6b68aa1beb383f2f547638d82436d8455125c862888b0e5"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-arthur-ue-editor.png",
+      "sha256": "51434a3f3e1a3c94b427d2814668ee4b1d27037509f545f22696c047e1f12541"
+     },
+     "team-prop": {
+      "file": "p17-team-prop-k2-1p6-arthur-ue-editor.png",
+      "sha256": "fde76a6a76bd3db1bccb939f16be3823b32de78e50288f17d91e4bd22477b98b"
+     }
+    },
+    "split_source": "own base-only frame",
+    "teams": {
+     "main": "Gold",
+     "team-alt": "Silver",
+     "team-prop": "Silver (value-split proposal)"
+    }
+   },
+   "harpy2": {
+    "crop_box_px": [
+     855,
+     470,
+     1065,
+     629
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "f47e842045bc228353b02827afd75d17e1c87ae1aeaf023991f87c14829fcafa"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "b519ae821cfa43cff8b39ee36d6498ca2c26a5611b9a5749c9fb706c1bfa5400"
+     },
+     "mask-base": {
+      "file": "p17-mask-k2-1p6-base-harpy2-ue-editor.png",
+      "sha256": "58c11420ba804dab8986902d46dc8ea6ea4960dd7a2a8296b292e198ca441032"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-harpy2-ue-editor.png",
+      "sha256": "ea9ab39530bff01061ae322fa585b1d04b63427bccda0c7904c562c7b1fba48c"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "ba3aed502ba431ad10fa9219025b57cda5d5ac721c2810d04c7eca5def1b6711"
+     },
+     "team-prop": {
+      "file": "p17-team-prop-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "91baceb87accb80bc8a20e2e275e2f9f66941bf3c9cc33d187b280e2083d9745"
+     }
+    },
+    "split_source": "own base-only frame",
+    "teams": {
+     "main": "Silver",
+     "team-alt": "Gold",
+     "team-prop": "Silver (value-split proposal)"
+    }
+   },
+   "medusa": {
+    "crop_box_px": [
+     898,
+     455,
+     1025,
+     636
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-medusa-ue-editor.png",
+      "sha256": "1817ca095a570738d2f087205d24fd660b906b09a11453ce4e05452cede357e1"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-medusa-ue-editor.png",
+      "sha256": "91f69c031bb56f0824cd6e2b2d2907d2480986e6f791d08441eae0b49788f26c"
+     },
+     "mask-base": {
+      "file": "p17-mask-k2-1p6-base-medusa-ue-editor.png",
+      "sha256": "8519dad25e9202a09853dd5191883f3361e5d5535eddd8eced39c229dc8a1a6a"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-medusa-ue-editor.png",
+      "sha256": "ffcc558c1c3217d6ca1c0f3e49d222df4a92c3c6761b72e438fe1ee8243baed3"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-medusa-ue-editor.png",
+      "sha256": "9d452cf0caeae3f28035616ba5cebdf1044e085dc007a0064d1988bd1e846902"
+     },
+     "team-prop": {
+      "file": "p17-team-prop-k2-1p6-medusa-ue-editor.png",
+      "sha256": "5ea24e9b76bdcde616b21633275a4fdc3058631705dd5e8a152a227a6e01d628"
+     }
+    },
+    "split_source": "own base-only frame",
+    "teams": {
+     "main": "Silver",
+     "team-alt": "Gold",
+     "team-prop": "Silver (value-split proposal)"
+    }
+   },
+   "merlin": {
+    "crop_box_px": [
+     682,
+     442,
+     1106,
+     712
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-merlin-ue-editor.png",
+      "sha256": "e7e4612e0fcb71f6d8b19fc8a60f5c913beb39645d9160e50ab1fca5dea679b1"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-merlin-ue-editor.png",
+      "sha256": "1d464e44f36a01de75220d0826e7d35021248b955ed87905467aabd473b28b62"
+     },
+     "mask-base": {
+      "file": "p17-mask-k2-1p6-base-merlin-ue-editor.png",
+      "sha256": "9ca5a41563f642597c8781df19ccb6f51bd925a5cbabb9f9d81664853ec9502e"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-merlin-ue-editor.png",
+      "sha256": "25a045a45643d2750b9e3f67529f7b6b6665f583d21f1730ca313f86ac29531a"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-merlin-ue-editor.png",
+      "sha256": "c21b4776e8085d57fd3ee69cc78048ab3434eb851265548e1f4bf3870d082ef7"
+     },
+     "team-prop": {
+      "file": "p17-team-prop-k2-1p6-merlin-ue-editor.png",
+      "sha256": "6b818f19aedc03af40ab5c77c2f615e69f1c2ee53c0fa5360d734203112087d9"
+     }
+    },
+    "split_source": "own base-only frame",
+    "teams": {
+     "main": "Gold",
+     "team-alt": "Silver",
+     "team-prop": "Silver (value-split proposal)"
+    }
+   }
+  },
+  "refix-r2": {
+   "arthur": {
+    "crop_box_px": [
+     897,
+     443,
+     1109,
+     705
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-arthur-ue-editor.png",
+      "sha256": "2e37395a20c8b675839f359d2b9d78c03d0aa0b374156e932290fe03040a2fd2"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-arthur-ue-editor.png",
+      "sha256": "1c37e2f11e44d4a36f50fc5b8f34c59d3c368b4165ed27345e5e826732874ae5"
+     },
+     "mask-base": {
+      "file": "p17-mask-k2-1p6-base-arthur-ue-editor.png",
+      "sha256": "8240b2cd00b094d6dc449384e2d66fc357fc329857b8d0fea16744ab961eaf21"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-arthur-ue-editor.png",
+      "sha256": "cfa70db45c8e5990d93037d96b13b6f91f20c71ab817e11ada7016711074846a"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-arthur-ue-editor.png",
+      "sha256": "f868de0be26870f7425e15fe38f70a00e09a7aa0cb3acdf28d91418472b1529a"
+     },
+     "team-prop": {
+      "file": "p17-team-prop-k2-1p6-arthur-ue-editor.png",
+      "sha256": "5beb038b564267573ad5d30856c2ff97fb1ef66941622c4ef277f7c5a765caef"
+     }
+    },
+    "split_source": "own base-only frame",
+    "teams": {
+     "main": "Gold",
+     "team-alt": "Silver",
+     "team-prop": "Silver (value-split proposal)"
+    }
+   },
+   "harpy2": {
+    "crop_box_px": [
+     855,
+     470,
+     1065,
+     629
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "6536777ccb961421322983a8043260021e987e7a50da025f1635b65eca246503"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "920e5ff9f6bae3972139ca78b6fa22fb45b50acce88d44f47cd35393de8814de"
+     },
+     "mask-base": {
+      "file": "p17-mask-k2-1p6-base-harpy2-ue-editor.png",
+      "sha256": "58c11420ba804dab8986902d46dc8ea6ea4960dd7a2a8296b292e198ca441032"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-harpy2-ue-editor.png",
+      "sha256": "ea9ab39530bff01061ae322fa585b1d04b63427bccda0c7904c562c7b1fba48c"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "8f8275ac4e0747c223822a95d290377e1fe602691babec982d491dfff51c8b72"
+     },
+     "team-prop": {
+      "file": "p17-team-prop-k2-1p6-harpy2-ue-editor.png",
+      "sha256": "bbddb3afaae0cf68f053ae08408895ca09cc57a8670cfc9c8468270764d9da79"
+     }
+    },
+    "split_source": "own base-only frame",
+    "teams": {
+     "main": "Silver",
+     "team-alt": "Gold",
+     "team-prop": "Silver (value-split proposal)"
+    }
+   },
+   "medusa": {
+    "crop_box_px": [
+     898,
+     455,
+     1025,
+     636
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-medusa-ue-editor.png",
+      "sha256": "576d2f0baf8cc0ca75d359cf3eb46d5add45309978b7c9bdeb3f82a03061a603"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-medusa-ue-editor.png",
+      "sha256": "91f69c031bb56f0824cd6e2b2d2907d2480986e6f791d08441eae0b49788f26c"
+     },
+     "mask-base": {
+      "file": "p17-mask-k2-1p6-base-medusa-ue-editor.png",
+      "sha256": "e250d8420774e32911a1f198156ce8f4e39834251b48fcd3eaa06fa2cdaaf44c"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-medusa-ue-editor.png",
+      "sha256": "87b553f942e37e1a51398515bb25fbad920e929b4812ca98f08167f89f3caec4"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-medusa-ue-editor.png",
+      "sha256": "86127fe2f9abde0e3a056c68c0e5323d5ae0797db9f9ba6c48eb747fd64fa781"
+     },
+     "team-prop": {
+      "file": "p17-team-prop-k2-1p6-medusa-ue-editor.png",
+      "sha256": "f10113ba88a884e02ec0671b8174f2c6c07f3f2b2b89879474af9a997625c89b"
+     }
+    },
+    "split_source": "own base-only frame",
+    "teams": {
+     "main": "Silver",
+     "team-alt": "Gold",
+     "team-prop": "Silver (value-split proposal)"
+    }
+   },
+   "merlin": {
+    "crop_box_px": [
+     682,
+     442,
+     1106,
+     712
+    ],
+    "source": {
+     "main": {
+      "file": "p17-k2-1p6-merlin-ue-editor.png",
+      "sha256": "92e3b8672e4304c566de5072125ccf353e061ccd1cc74011aee519107a697d76"
+     },
+     "mask": {
+      "file": "p17-mask-k2-1p6-merlin-ue-editor.png",
+      "sha256": "8b225d976d4be07f33359493e239b5cd52e0d71e7042e265e35aafa4d832dd50"
+     },
+     "mask-base": {
+      "file": "p17-mask-k2-1p6-base-merlin-ue-editor.png",
+      "sha256": "9ca5a41563f642597c8781df19ccb6f51bd925a5cbabb9f9d81664853ec9502e"
+     },
+     "mask-empty": {
+      "file": "p17-mask-k2-1p6-empty-merlin-ue-editor.png",
+      "sha256": "0b9d1819047aa517490bab634214fad4fd64f8bddf67abb7122cc11e53d98f16"
+     },
+     "team-alt": {
+      "file": "p17-team-alt-k2-1p6-merlin-ue-editor.png",
+      "sha256": "8d7e49b06bdd841ad9d951ea150f1b7f1c99a09d191a2f7c71d0527cb079b051"
+     },
+     "team-prop": {
+      "file": "p17-team-prop-k2-1p6-merlin-ue-editor.png",
+      "sha256": "470f9e75705510a58f4e6fad2fb7b421b7dd710afbb555074ab5f681369c7adb"
+     }
+    },
+    "split_source": "own base-only frame",
+    "teams": {
+     "main": "Gold",
+     "team-alt": "Silver",
+     "team-prop": "Silver (value-split proposal)"
+    }
+   }
+  }
+ }
+}

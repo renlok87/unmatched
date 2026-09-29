@@ -2,6 +2,7 @@
 capture EDITOR frames of it through the LIVE UnrealEditor (MCP 127.0.0.1:8123), one capture method for all frames.
 
     python tools/tripo-pipeline/review/control_scene.py --out <dir> --tag r1 [--barrel <SM asset>] [--skip-diagnostics]
+        [--asset-set w4b|t31]
 
 Idempotent: every run deletes /Game/ArtTests/P17ControlScene (only packages this script owns; anything else there makes
 it refuse), duplicates the Cobble review level /Game/ArtTests/ART005H/L_ART005H_CornerReview into
@@ -24,6 +25,8 @@ static Medusa on its cell; AM_Medusa_LungeAttack_Draft at 0/25/50/75/100 %.
 Masks (not evidence JPEGs): every subject alone without shadows against the empty board (K1, K2 1.6x silhouettes);
 for figures also 5x base see-through masks (review fix): empty board / figure + base / base alone, then the same three
 with the Cobble static meshes (BOARD_PREFIX) hidden, so holes in the top of a base show the editor void (0,0,0).
+For figures also the base alone at K2 1.6x (mask-k2-1p6-base-<name>, W4-B review fix): review/team_contrast.py splits
+the K2 1.6x silhouette into the visible figure and the base band with it.
 
 Camera = UpdateBoardCamera of the packaged client (S08FlowGameMode.cpp): horizontal FOV 35 (temporary CameraActor piloted
 by the level viewport, MaintainXFOV), pitch -55, yaw -90, location = focus + (0, D cos55, D sin55). K1 overview focus
@@ -35,6 +38,13 @@ CaptureViewport returns the viewport size; the frame is the centred 16:9 crop re
 
 EDITOR frames: *-ue-editor.png with a sidecar <stem>.evidence.json (unmatched.evidence-frame/1, class
 editor-mcp-viewport): diagnostics and QA-009 rows, never K1/K2 acceptance.
+
+Asset sets (--asset-set, W4-B 2026-09-29): "w4b" (default) = the CLI runs 20260929-w4b-um-master of Medusa, Arthur,
+Merlin, Harpy and the barrel, all on MI of the UM masters (M_UM_Figure / M_UM_BaseMarker), team colour on the base band
+and the clothing (TeamMask); "t31" = the stage-3 T3.1 assets (own atlas materials; Medusa T4UmFbxV1), kept so the
+before frames of W4-B can be re-shot. In the w4b set the "team in grey" swap covers every figure slot and the base,
+and a third frame per team subject shows the value-split palette proposal (team_palette.c11_value_split_proposal of
+art/um-materials/um-masters.json: Silver #5A7F9F) through scene-owned MIs (TeamColor = FLinearColor::FromSRGBColor).
 """
 
 import argparse
@@ -114,12 +124,108 @@ SUBJECTS = {
                             "03 §4.4 / ART-009: decor does not cover cells; z = top of the rim under the bottom "
                             "footprint (measured by the build, decor_support)"},
 }
-FIGURES = [k for k in SUBJECTS if k != "barrel"]
 MATERIAL_INSTANCES = [
     {"path": MI_DIR + "/MI_P17_Harpy_Base_H%d" % i, "parent": HERO["harpy"] + "/Materials/MI_Harpy_Candidate_Silver",
      "scalars": {"InstanceIndex": i}} for i in (1, 2, 3)] + [
     {"path": MI_DIR + "/MI_P17_Harpy_Base_H2_Gold", "parent": HERO["harpy"] + "/Materials/MI_Harpy_Candidate_Gold",
      "scalars": {"InstanceIndex": 2}}]
+ASSET_SETS = {"t31": {"subjects": SUBJECTS, "material_instances": MATERIAL_INSTANCES, "barrel": BARREL}}
+
+# ---- W4-B asset set: CLI runs 20260929-w4b-um-master on the UM masters
+W4B_RUN = "20260929-w4b-um-master"
+W4B = {"medusa": PC + "/Medusa/" + W4B_RUN, "arthur": PC + "/KingArthur/" + W4B_RUN, "merlin": PC + "/Merlin/" + W4B_RUN,
+       "harpy": PC + "/Harpy/" + W4B_RUN}
+W4B_SHORT = {"medusa": "Medusa", "arthur": "KingArthur", "merlin": "Merlin", "harpy": "Harpy"}
+W4B_BARREL = PC + "/DecorBarrel/" + W4B_RUN + "/Candidate/Meshes/SM_Decor_Barrel"
+UM_SPEC = Path(__file__).resolve().parents[3] / "art" / "um-materials" / "um-masters.json"
+
+
+def srgb_hex_linear(hex_color):
+    """FLinearColor::FromSRGBColor of '#RRGGBB' (the rule of art/um-materials/um-masters.json, AD-OPEN-39)."""
+    h = hex_color.lstrip("#")
+    out = []
+    for i in (0, 2, 4):
+        c = int(h[i:i + 2], 16) / 255.0
+        out.append(round(c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4, 6))
+    return out + [1.0]
+
+
+def w4b_asset_set():
+    proposal = json.loads(UM_SPEC.read_text(encoding="utf-8"))["team_palette"]["c11_value_split_proposal"]["Silver"]
+    prop_lin = srgb_hex_linear(proposal)
+
+    def mats(hero, kind, team):
+        short = W4B_SHORT[hero]
+        return W4B[hero] + "/Materials/MI_%s%s_Candidate_%s" % (short, "_Base" if kind == "base" else "", team)
+
+    def fig(hero, name):
+        return W4B[hero] + "/Meshes/%s_%s_Candidate" % (name, W4B_SHORT[hero])
+
+    subjects = {
+        # far half: Silver (default team of Medusa and the Harpies), near half: Gold (Arthur, Merlin)
+        "medusa": {"cell": [2, 2], "yaw": 90, "figure": fig("medusa", "SK"),
+                   "base": W4B["medusa"] + "/Meshes/SM_Medusa_Base_Candidate", "team": "Silver",
+                   "team_alt": {"figure": {"0": mats("medusa", "figure", "Gold"), "1": mats("medusa", "figure", "Gold")},
+                                "base": {"0": mats("medusa", "base", "Gold")}},
+                   "team_prop": {"figure": {"0": MI_DIR + "/MI_P17_medusa_Figure_Prop", "1": MI_DIR + "/MI_P17_medusa_Figure_Prop"},
+                                 "base": {"0": MI_DIR + "/MI_P17_medusa_Base_Prop"}}},
+        "harpy1": {"cell": [3, 2], "yaw": 90, "figure": fig("harpy", "SK"),
+                   "base": W4B["harpy"] + "/Meshes/SM_Harpy_Base_Candidate", "team": "Silver",
+                   "base_materials": {"0": MI_DIR + "/MI_P17_Harpy_Base_H1"}},
+        "harpy2": {"cell": [2, 1], "yaw": 90, "figure": fig("harpy", "SK"),
+                   "base": W4B["harpy"] + "/Meshes/SM_Harpy_Base_Candidate", "team": "Silver",
+                   "base_materials": {"0": MI_DIR + "/MI_P17_Harpy_Base_H2"},
+                   "team_alt": {"figure": {"0": mats("harpy", "figure", "Gold")},
+                                "base": {"0": MI_DIR + "/MI_P17_Harpy_Base_H2_Gold"}},
+                   "team_prop": {"figure": {"0": MI_DIR + "/MI_P17_harpy2_Figure_Prop"},
+                                 "base": {"0": MI_DIR + "/MI_P17_harpy2_Base_Prop"}}},
+        "harpy3": {"cell": [1, 2], "yaw": 90, "figure": fig("harpy", "SK"),
+                   "base": W4B["harpy"] + "/Meshes/SM_Harpy_Base_Candidate", "team": "Silver",
+                   "base_materials": {"0": MI_DIR + "/MI_P17_Harpy_Base_H3"}},
+        "arthur": {"cell": [2, 3], "yaw": -90, "figure": fig("arthur", "SK"),
+                   "base": W4B["arthur"] + "/Meshes/SM_KingArthur_Base_Candidate", "team": "Gold",
+                   "team_alt": {"figure": {"0": mats("arthur", "figure", "Silver")},
+                                "base": {"0": mats("arthur", "base", "Silver")}},
+                   "team_prop": {"figure": {"0": MI_DIR + "/MI_P17_arthur_Figure_Prop"},
+                                 "base": {"0": MI_DIR + "/MI_P17_arthur_Base_Prop"}}},
+        "merlin": {"cell": [3, 3], "yaw": -90, "figure": fig("merlin", "SK"),
+                   "base": W4B["merlin"] + "/Meshes/SM_Merlin_Base_Candidate", "team": "Gold",
+                   "team_alt": {"figure": {"0": mats("merlin", "figure", "Silver")},
+                                "base": {"0": mats("merlin", "base", "Silver")}},
+                   "team_prop": {"figure": {"0": MI_DIR + "/MI_P17_merlin_Figure_Prop"},
+                                 "base": {"0": MI_DIR + "/MI_P17_merlin_Base_Prop"}}},
+        "barrel": dict(ASSET_SETS["t31"]["subjects"]["barrel"], static=W4B_BARREL),
+    }
+    instances = [{"path": MI_DIR + "/MI_P17_Harpy_Base_H%d" % i, "parent": mats("harpy", "base", "Silver"),
+                  "scalars": {"InstanceIndex": i}} for i in (1, 2, 3)]
+    instances.append({"path": MI_DIR + "/MI_P17_Harpy_Base_H2_Gold", "parent": mats("harpy", "base", "Gold"),
+                      "scalars": {"InstanceIndex": 2}})
+    for name, hero in (("medusa", "medusa"), ("harpy2", "harpy"), ("arthur", "arthur"), ("merlin", "merlin")):
+        short = W4B_SHORT[hero]
+        instances.append({"path": MI_DIR + "/MI_P17_%s_Figure_Prop" % name,
+                          "parent": W4B[hero] + "/Materials/MI_%s_Candidate" % short,
+                          "vectors": {"TeamColor": prop_lin}, "team_hex": proposal})
+        base_mi = {"path": MI_DIR + "/MI_P17_%s_Base_Prop" % name,
+                   "parent": W4B[hero] + "/Materials/MI_%s_Base_Candidate" % short,
+                   "vectors": {"TeamColor": prop_lin}, "team_hex": proposal}
+        if name == "harpy2":
+            base_mi["scalars"] = {"InstanceIndex": 2}
+        instances.append(base_mi)
+    return {"subjects": subjects, "material_instances": instances, "barrel": W4B_BARREL,
+            "team_proposal": {"Silver": proposal, "linear": prop_lin}}
+
+
+def use_asset_set(name):
+    """Point SUBJECTS / MATERIAL_INSTANCES / BARREL at an asset set (module globals used by the build and shots)."""
+    global SUBJECTS, MATERIAL_INSTANCES, BARREL, FIGURES
+    chosen = w4b_asset_set() if name == "w4b" else ASSET_SETS[name]
+    SUBJECTS, MATERIAL_INSTANCES, BARREL = chosen["subjects"], chosen["material_instances"], chosen["barrel"]
+    FIGURES = [k for k in SUBJECTS if k != "barrel"]
+    return chosen
+
+
+ASSET_SET = "w4b"
+use_asset_set(ASSET_SET)
 
 
 def cell_world(cell):
@@ -232,11 +338,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--tag", required=True)
-    ap.add_argument("--barrel", default=BARREL, help="barrel static mesh (the repro run swaps in its own import)")
+    ap.add_argument("--barrel", default=None, help="barrel static mesh (the repro run swaps in its own import)")
+    ap.add_argument("--asset-set", choices=["w4b", "t31"], default="w4b",
+                    help="w4b: CLI runs 20260929-w4b-um-master on the UM masters; t31: the stage-3 T3.1 assets")
     ap.add_argument("--skip-diagnostics", action="store_true")
     ap.add_argument("--only", choices=["main", "barrel"], default=None,
                     help="barrel: build + K1 and the barrel frames only (repro comparison)")
     a = ap.parse_args()
+    chosen = use_asset_set(a.asset_set)
+    a.barrel = a.barrel or BARREL
     out = (Path(a.out).resolve() / a.tag)
     out.mkdir(parents=True, exist_ok=True)
     ue = Ue()
@@ -256,7 +366,8 @@ def main():
                                "source": "UpdateBoardCamera / SetupCameraForBoard (S08FlowGameMode.cpp)"},
               "exposure": {"ev100": EV100, "luminance": EXPOSURE_LUMINANCE,
                            "calibration": "equals the viewport fixed EV100 1.3 (exposure-calibration.json)"},
-              "console": []}
+              "console": [], "asset_set": a.asset_set, "team_proposal": chosen.get("team_proposal"),
+              "subject_teams": {n: s["team"] for n, s in SUBJECTS.items() if s.get("team")}}
     temp = [L_CAMERA, L_ANIM, L_ANIM_BASE]
     try:
         report["build"] = cap.task("build", timeout=900, scene=spec)
@@ -326,6 +437,12 @@ def main():
                     diag["mask-k2-5x-base-%s" % name] = cap.shot("mask-k2-5x-base-%s" % name, focus_of(name), K2_5X,
                                                                  {"subject": name + " base", "set": "mask",
                                                                   "cast_shadow": False})
+                    # base alone at K2 1.6x (W4-B review fix): team_contrast.py splits the silhouette into the figure
+                    # (visible figure pixels) and the base band, so a team change of the base cannot hide an
+                    # unchanged figure
+                    diag["mask-k2-1p6-base-%s" % name] = cap.shot("mask-k2-1p6-base-%s" % name, focus_of(name),
+                                                                  K2_1P6, {"subject": name + " base", "set": "mask",
+                                                                           "cast_shadow": False})
                     cap.task("set", changes=[{"label_prefix": BOARD_PREFIX, "visible": False}])
                     try:
                         diag["mask-k2-5x-void-base-%s" % name] = cap.shot(
@@ -363,6 +480,25 @@ def main():
                         back.append({"label": "P17 %s %s" % (name, part),
                                      "materials": {k: mats.get(k, report["build"]["actors"]["P17 %s %s" % (name, part)]
                                                                 ["materials"][int(k)]["path"]) for k in alt[part]}})
+                cap.task("set", changes=back)
+            # value-split palette proposal (W4-B): the subject in the proposed Silver, compared with its Gold frame
+            for name in SUBJECTS:
+                prop = SUBJECTS[name].get("team_prop")
+                if not prop:
+                    continue
+                ch = [{"label": "P17 %s %s" % (name, part), "materials": prop[part]} for part in ("figure", "base")
+                      if part in prop]
+                cap.task("set", changes=ch)
+                diag["team-prop-%s" % name] = cap.shot("team-prop-k2-1p6-%s" % name, focus_of(name), K2_1P6,
+                                                       {"subject": name, "set": "team-prop", "materials": prop,
+                                                        "team_hex": (chosen.get("team_proposal") or {}).get("Silver")})
+                back = []
+                for part in ("figure", "base"):
+                    if part in prop:
+                        mats = SUBJECTS[name].get(part + "_materials") or {}
+                        back.append({"label": "P17 %s %s" % (name, part),
+                                     "materials": {k: mats.get(k, report["build"]["actors"]["P17 %s %s" % (name, part)]
+                                                                ["materials"][int(k)]["path"]) for k in prop[part]}})
                 cap.task("set", changes=back)
             # animation test: T4LocalPass (rest pose +Y) on Medusa's cell with LungeAttack
             loc = subject_location("medusa")

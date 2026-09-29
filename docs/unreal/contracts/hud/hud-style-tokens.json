@@ -1,0 +1,50 @@
+{
+ "schema": "unmatched.hud-style-tokens/1",
+ "revision": "w4d-2026-09-29",
+ "status": "предложено",
+ "status_note": "Единая таблица токенов стиля HUD (правило 2 HUD-RULES.md). Значения — предложения документов 02/03, не художественная приёмка; финальные числа фиксирует ART-011 / GD-047. Цвета хранятся hex sRGB; код переводит их только через FLinearColor::FromSRGBColor (AD-OPEN-39, решение по умолчанию в журнале 2026-09-29).",
+ "color_rule": "hex sRGB в данных; в UE — FLinearColor::FromSRGBColor(FColor::FromHex(hex)); прямое hex/255 в FLinearColor запрещено. Пример расхождения (17 AD-OPEN-39, ИЗМЕРЕНО): #3D7BDB/255 = 0.24/0.48/0.86, а MI_S05_ZoneBlue в S05 получил (0.18, 0.36, 0.70) (tools/s05/s05_import_scene.py:417); по кривой sRGB #3D7BDB = 0.047/0.198/0.708 — ни одно из двух значений ему не равно. Таблица: hud_contract.py linear",
+ "colors": {
+  "team.p1": {"hex": "#E8C06A", "status": "предложено", "source": "03 С-11 (Q-304 открыт)", "use": "команда игрока 1: база, кольцо, одежда (TeamColor b), чип плашки"},
+  "team.p2": {"hex": "#9FC2D8", "status": "предложено", "source": "03 С-11 (Q-304 открыт)", "use": "команда игрока 2"},
+  "zone.blue": {"hex": "#3D7BDB", "status": "предложено", "source": "03 С-7"},
+  "zone.green": {"hex": "#3FA65C", "status": "предложено", "source": "03 С-7"},
+  "zone.yellow": {"hex": "#E0B23C", "status": "предложено", "source": "03 С-7"},
+  "zone.purple": {"hex": "#8A56C6", "status": "предложено", "source": "03 С-7"},
+  "zone.red": {"hex": "#D9483F", "status": "предложено", "source": "03 С-7"},
+  "accent.warm": {"hex": "#FFB45C", "status": "предложено", "source": "03 С-6 (нижняя граница #FFB45C–#FFCE8A)", "use": "акцент «ваш ход», тёплая кромка CUE-015"},
+  "light.key": {"hex": "#B8C8E0", "status": "предложено", "source": "03 С-8", "use": "только справка для согласования HUD со сценой; свет задаёт профиль света"},
+  "text.primary": {"hex": "#F2EDE4", "status": "предложено", "source": "составитель W4-D: светлый тёплый на тёмных панелях; проверить контраст ≥ 4.5:1 на UI-PANEL", "use": "основной текст"},
+  "text.secondary": {"hex": "#B9B2A6", "status": "предложено", "source": "составитель W4-D", "use": "подписи, неактивное"},
+  "state.error": {"hex": "#D9483F", "status": "предложено", "source": "совпадает с zone.red (03 С-7); отказ дублируется иконкой UI-ICON-ACTION и текстом why.*", "use": "рамка ошибки UI-PANEL, CUE-004"}
+ },
+ "typography": {
+  "font.family": {"value": "Roboto (движок UE 5.8, кириллица проверена по cmap)", "status": "предложено", "source": "исследование R3.2; фирменный шрифт с кириллицей — AD-OPEN-24"},
+  "size.panel": {"px": 16, "status": "предложено", "source": "02 §8 таблица токенов"},
+  "size.button": {"px": 20, "status": "предложено", "source": "02 §8"},
+  "size.modal_title": {"px": 28, "status": "предложено", "source": "02 §8"},
+  "size.game_result": {"px": 48, "status": "предложено", "source": "02 §8"}
+ },
+ "spacing": {
+  "space.s": {"px": 12, "status": "предложено", "source": "02 §8"},
+  "space.m": {"px": 16, "status": "предложено", "source": "02 §8"},
+  "space.l": {"px": 24, "status": "предложено", "source": "02 §8"},
+  "panel.padding": {"px": 12, "max_px": 16, "status": "предложено", "source": "02 §8 UI-PANEL (12–16 px)"}
+ },
+ "radii": {
+  "radius.s": {"px": 8, "status": "предложено", "source": "02 §8"},
+  "radius.m": {"px": 12, "status": "предложено", "source": "02 §8"},
+  "radius.l": {"px": 16, "status": "предложено", "source": "02 §8"}
+ },
+ "icons": {
+  "icon.s": {"px": 16, "status": "предложено", "source": "02 §8 UI-ICON-RESOURCE"},
+  "icon.m": {"px": 24, "status": "предложено", "source": "02 §8; QA-010 контраст иконки 24 px"},
+  "icon.l": {"px": 32, "status": "предложено", "source": "02 §8"},
+  "icon.xl": {"px": 48, "status": "предложено", "source": "T2.2 иконка 24/32/48"}
+ },
+ "motion": {
+  "hover.ms": {"value": 150, "status": "предложено", "source": "R3.0 (hover 150 мс), 07 CUE-001"},
+  "hp_bar.max_ms": {"value": 400, "status": "предложено", "source": "R3.0 (HP-бар ≤ 400 мс)"},
+  "reduced.max_ms": {"value": 100, "status": "предложено", "source": "02 UI-ACC-006"}
+ }
+}

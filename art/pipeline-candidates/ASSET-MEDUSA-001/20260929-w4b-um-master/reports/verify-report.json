@@ -1,0 +1,207 @@
+{
+  "checks": {
+    "armatures_as_expected": {
+      "expected": 0,
+      "measured": 0,
+      "passed": true
+    },
+    "blender_mesh_count_equals_glb": {
+      "expected": 15,
+      "measured": 15,
+      "passed": true
+    },
+    "blender_triangle_loss_within_tolerance": {
+      "expected": "<= 0.100% of GLB triangles",
+      "measured": {
+        "blender": 21176,
+        "glb": 21177,
+        "lost": 1,
+        "per_mesh_delta": {
+          "tripo_part_3": -1
+        }
+      },
+      "note": "Blender glTF importer can drop degenerate/duplicate triangles; listed per mesh",
+      "passed": true
+    },
+    "bounds_non_degenerate": {
+      "measured": [
+        0.560165,
+        0.485724,
+        0.980289
+      ],
+      "passed": true
+    },
+    "evidence_glb_images": {
+      "expected": 45,
+      "measured": 45,
+      "note": "expected value copied from Tripo evidence JSON",
+      "passed": true
+    },
+    "evidence_glb_materials": {
+      "expected": 15,
+      "measured": 15,
+      "note": "expected value copied from Tripo evidence JSON",
+      "passed": true
+    },
+    "evidence_glb_mesh_count": {
+      "expected": 15,
+      "measured": 15,
+      "note": "expected value copied from Tripo evidence JSON",
+      "passed": true
+    },
+    "evidence_glb_skins": {
+      "expected": 0,
+      "measured": 0,
+      "note": "expected value copied from Tripo evidence JSON",
+      "passed": true
+    },
+    "evidence_glb_triangles": {
+      "expected": 21177,
+      "measured": 21177,
+      "note": "expected value copied from Tripo evidence JSON",
+      "passed": true
+    },
+    "import_report_matches_source": {
+      "measured": "0400f2b44f80b14005e03d997b83453e7d35e54f8ddd537b5dbf7770c0792e56",
+      "passed": true
+    },
+    "source_unchanged": {
+      "measured": "0400f2b44f80b14005e03d997b83453e7d35e54f8ddd537b5dbf7770c0792e56",
+      "passed": true
+    },
+    "uv0_on_every_mesh": {
+      "measured": {
+        "meshes_without_uv": []
+      },
+      "passed": true
+    }
+  },
+  "diagnostics": {
+    "bounds_source_units": {
+      "dimensions": [
+        0.560165,
+        0.485724,
+        0.980289
+      ],
+      "max": [
+        0.280082,
+        0.242862,
+        0.980289
+      ],
+      "min": [
+        -0.280082,
+        -0.242862,
+        0.0
+      ]
+    },
+    "degenerate_faces_total": 2,
+    "weld_1e-7_per_mesh": {
+      "tripo_part_0": {
+        "boundary_edges": 271,
+        "non_manifold_edges": 275,
+        "vertices": 3553
+      },
+      "tripo_part_1": {
+        "boundary_edges": 75,
+        "non_manifold_edges": 75,
+        "vertices": 1351
+      },
+      "tripo_part_10": {
+        "boundary_edges": 75,
+        "non_manifold_edges": 76,
+        "vertices": 331
+      },
+      "tripo_part_11": {
+        "boundary_edges": 33,
+        "non_manifold_edges": 33,
+        "vertices": 285
+      },
+      "tripo_part_12": {
+        "boundary_edges": 42,
+        "non_manifold_edges": 42,
+        "vertices": 318
+      },
+      "tripo_part_13": {
+        "boundary_edges": 41,
+        "non_manifold_edges": 41,
+        "vertices": 322
+      },
+      "tripo_part_14": {
+        "boundary_edges": 49,
+        "non_manifold_edges": 50,
+        "vertices": 265
+      },
+      "tripo_part_2": {
+        "boundary_edges": 72,
+        "non_manifold_edges": 72,
+        "vertices": 912
+      },
+      "tripo_part_3": {
+        "boundary_edges": 93,
+        "non_manifold_edges": 94,
+        "vertices": 685
+      },
+      "tripo_part_4": {
+        "boundary_edges": 52,
+        "non_manifold_edges": 55,
+        "vertices": 617
+      },
+      "tripo_part_5": {
+        "boundary_edges": 56,
+        "non_manifold_edges": 56,
+        "vertices": 682
+      },
+      "tripo_part_6": {
+        "boundary_edges": 78,
+        "non_manifold_edges": 79,
+        "vertices": 704
+      },
+      "tripo_part_7": {
+        "boundary_edges": 33,
+        "non_manifold_edges": 40,
+        "vertices": 440
+      },
+      "tripo_part_8": {
+        "boundary_edges": 45,
+        "non_manifold_edges": 45,
+        "vertices": 310
+      },
+      "tripo_part_9": {
+        "boundary_edges": 48,
+        "non_manifold_edges": 48,
+        "vertices": 286
+      }
+    }
+  },
+  "glb_structure": {
+    "animations": 0,
+    "generator": "Tripo",
+    "images": 45,
+    "materials": 15,
+    "mesh_count": 15,
+    "primitive_modes": [
+      4
+    ],
+    "skins": 0,
+    "triangles": 21177
+  },
+  "logic": "verify/1",
+  "not_checked": [
+    "budgets: numbers are measured only; budgets stay proposals until GD-058 is decided",
+    "art acceptance, silhouette, lighting: art track",
+    "rig, sockets, animation, UE import: later candidate stages"
+  ],
+  "passed": true,
+  "source": {
+    "path": "blender/ASSET-MEDUSA-001/tripo-source/b6253e58/medusa-segmented-retopo.glb",
+    "role": "segmented-retopo-glb",
+    "sha256": "0400f2b44f80b14005e03d997b83453e7d35e54f8ddd537b5dbf7770c0792e56",
+    "source_id": "tripo-b6253e58"
+  },
+  "stage": "verify",
+  "status": "measured",
+  "warnings": [
+    "Blender imported 1 fewer triangles than the GLB declares: {'tripo_part_3': -1}",
+    "open/non-manifold edges after diagnostic weld in 15 mesh(es); informational"
+  ]
+}
