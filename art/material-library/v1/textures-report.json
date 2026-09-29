@@ -1,0 +1,1794 @@
+{
+ "generator": "tools/art/material_library/build_library.py",
+ "generatorVersion": "1.0.0",
+ "normalConvention": "DirectX (UE): tangent-space, G = -dh/drow (+V down the image), 8-bit, z stored",
+ "rmhLayout": {
+  "R": "roughness deviation, 0.5 = none, 0/1 = -/+ preset roughness.variation",
+  "G": "cavity/AO, 1 = open",
+  "B": "height 0..1 (p0.5..p99.5), wear mask source"
+ },
+ "seamFixThreshold": 1.25,
+ "seamMetric": "wrap-pair mean |diff| / p99 of interior pair mean |diff|, per axis (x, y)",
+ "classes": [
+  {
+   "index": 1,
+   "class": "steel_blued",
+   "size": 1024,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/steel_blued/steel_blued_DetailN.png",
+     "sha256": "a00a276b18dfad9771708491806404f28ddd2f60ac525e646b2dfd10beacd9f6",
+     "bytes": 1368198
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/steel_blued/steel_blued_DetailRMH.png",
+     "sha256": "0a1a33041b8c95e8327fecc05e55bdc5205754ed7d7cf2e01754cfa7bd64e703",
+     "bytes": 2220382
+    }
+   ],
+   "sourceFiles": [
+    {
+     "file": "art/material-library/cc0-raw/Metal038/Metal038_2K-JPG_NormalDX.jpg",
+     "sha256": "f859c2196bc022a6c3c5e1a9dfeb20039d4ec0de907eba0db866599f095793fc"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal038/Metal038_2K-JPG_NormalGL.jpg",
+     "sha256": "a3fbbd22b384bbe94baafa21a01e60f0c27a859a9654637eff18eec5a100127f"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal038/Metal038_2K-JPG_Roughness.jpg",
+     "sha256": "05b1b86df140c3bace260190af8d64593f95e6f139ed79605c647ea7a6ac0185"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal038/Metal038_2K-JPG_Displacement.jpg",
+     "sha256": "2ea7419f1d2f242ccde6d9b453a7a164093ab35018bcbb5a9c484e3ffffb13a9"
+    }
+   ],
+   "build": {
+    "source": "Metal038",
+    "convention": {
+     "sourceMaps": {
+      "normal": "Metal038_2K-JPG_NormalDX.jpg",
+      "normalGL": "Metal038_2K-JPG_NormalGL.jpg",
+      "roughness": "Metal038_2K-JPG_Roughness.jpg",
+      "height": "Metal038_2K-JPG_Displacement.jpg",
+      "ao": null
+     },
+     "meanAbs_DX_G_minus_inverted_GL_G": 0.00227,
+     "meanAbs_DX_G_minus_GL_G": 0.03416,
+     "meanAbs_DX_R_minus_GL_R": 0.00322,
+     "corr_DX_G_vs_minus_dHeight_drow": 0.8637,
+     "corr_DX_R_vs_minus_dHeight_dcol": 0.8602,
+     "sourceIsDirectX": true
+    },
+    "sourceRoughness_p5_p50_p95": [
+     0.3412,
+     0.3686,
+     0.3882
+    ],
+    "sourceHeightStd": 0.0237,
+    "roughnessMedian": 0.3667,
+    "roughnessAmplitude": 0.048,
+    "roughnessEncoding": "R = 0.5 + 0.5 * (r - median) / amplitude (clipped); amplitude = max(p99.5 - med, med - p0.5, 0.04)",
+    "heightFlat": false,
+    "cavityMethod": "height cavity: max(blur(h, sigma=8px) - h, 0), 1 - 0.6 * norm(p99.5)",
+    "seamFix": {
+     "offsetBlend": false
+    },
+    "sourceZipSha256": "9c4cd701a53ea208decbc160bcae71e204f6d518e442f6dfcf9d4c9e2af712bf",
+    "license": "CC0 1.0 (ambientCG site-wide)"
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.849,
+      0.968
+     ],
+     "R": [
+      0.853,
+      0.921
+     ],
+     "G": [
+      0.775,
+      0.891
+     ],
+     "B": [
+      0.819,
+      0.916
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      0.998,
+      1.125
+     ],
+     "B": [
+      0.98,
+      1.068
+     ]
+    },
+    "normalLength_p1_p99": [
+     0.997,
+     1.0034
+    ],
+    "normalMeanXY": [
+     0.0002,
+     0.0002
+    ],
+    "normalMinZ": 0.6078,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.5394,
+    "corr_N_R_vs_minus_dB_dcol": 0.5515,
+    "R_mean_std": [
+     0.4943,
+     0.1488
+    ],
+    "G_p1_mean": [
+     0.4706,
+     0.9017
+    ],
+    "B_mean_std": [
+     0.3532,
+     0.1795
+    ]
+   }
+  },
+  {
+   "index": 2,
+   "class": "steel_polished",
+   "size": 1024,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/steel_polished/steel_polished_DetailN.png",
+     "sha256": "d411cb201549f0ba01db4e1749b06ce2388be7a7d5ce604bb247c979fc1897d7",
+     "bytes": 806952
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/steel_polished/steel_polished_DetailRMH.png",
+     "sha256": "06ba402f0e079934c7795aa1165b882488e7e5d9a73da300aa36ba20b1ba0ea4",
+     "bytes": 2255705
+    }
+   ],
+   "sourceFiles": [
+    {
+     "file": "art/material-library/cc0-raw/Metal012/Metal012_2K-JPG_NormalDX.jpg",
+     "sha256": "50459748b6e4bf6469c6dd851b36236702ee0421fee477f8f8ce9db4ed446156"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal012/Metal012_2K-JPG_NormalGL.jpg",
+     "sha256": "326b329f83f7466f0a3c29a055e38b6dd00e68994891adb76ede59db8501f8d7"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal012/Metal012_2K-JPG_Roughness.jpg",
+     "sha256": "4baa2e0d195f056abd3f3aa2c78ee0266e62a3e4856096450a93875d17c5a746"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal012/Metal012_2K-JPG_Displacement.jpg",
+     "sha256": "1946e5be043db147e06b9eeaea4018a51eaac555293eeec1e8dd3cf77033f179"
+    }
+   ],
+   "build": {
+    "source": "Metal012",
+    "convention": {
+     "sourceMaps": {
+      "normal": "Metal012_2K-JPG_NormalDX.jpg",
+      "normalGL": "Metal012_2K-JPG_NormalGL.jpg",
+      "roughness": "Metal012_2K-JPG_Roughness.jpg",
+      "height": "Metal012_2K-JPG_Displacement.jpg",
+      "ao": null
+     },
+     "meanAbs_DX_G_minus_inverted_GL_G": 0.00202,
+     "meanAbs_DX_G_minus_GL_G": 0.01042,
+     "meanAbs_DX_R_minus_GL_R": 0.00401,
+     "corr_DX_G_vs_minus_dHeight_drow": 0.7534,
+     "corr_DX_R_vs_minus_dHeight_dcol": 0.6891,
+     "sourceIsDirectX": true
+    },
+    "sourceRoughness_p5_p50_p95": [
+     0.0431,
+     0.0824,
+     0.1529
+    ],
+    "sourceHeightStd": 0.0586,
+    "roughnessMedian": 0.0824,
+    "roughnessAmplitude": 0.1284,
+    "roughnessEncoding": "R = 0.5 + 0.5 * (r - median) / amplitude (clipped); amplitude = max(p99.5 - med, med - p0.5, 0.04)",
+    "heightFlat": false,
+    "cavityMethod": "height cavity: max(blur(h, sigma=8px) - h, 0), 1 - 0.6 * norm(p99.5)",
+    "seamFix": {
+     "offsetBlend": false
+    },
+    "sourceZipSha256": "68eba86af3ab65a1394cacc84bb35b92cd1006e9459ec5a6a4c9467d51a73d59",
+    "license": "CC0 1.0 (ambientCG site-wide)"
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.96,
+      0.924
+     ],
+     "R": [
+      1.04,
+      0.881
+     ],
+     "G": [
+      0.934,
+      0.823
+     ],
+     "B": [
+      0.977,
+      0.849
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      1.104,
+      1.18
+     ],
+     "B": [
+      1.2,
+      1.231
+     ]
+    },
+    "normalLength_p1_p99": [
+     1.0,
+     1.0004
+    ],
+    "normalMeanXY": [
+     -0.0058,
+     -0.0091
+    ],
+    "normalMinZ": 1.0,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.4105,
+    "corr_N_R_vs_minus_dB_dcol": 0.3877,
+    "R_mean_std": [
+     0.5226,
+     0.1309
+    ],
+    "G_p1_mean": [
+     0.4784,
+     0.9124
+    ],
+    "B_mean_std": [
+     0.2924,
+     0.1934
+    ]
+   }
+  },
+  {
+   "index": 3,
+   "class": "metal_forged",
+   "size": 1024,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/metal_forged/metal_forged_DetailN.png",
+     "sha256": "a12d18a872f2caa16a1d2cf78209b1466112816e586e696a6df27abb6850a249",
+     "bytes": 820316
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/metal_forged/metal_forged_DetailRMH.png",
+     "sha256": "60b1bacdb739f824f10531aa40ec9d8a786228a3ade382abe3b302030d277e64",
+     "bytes": 1961423
+    }
+   ],
+   "sourceFiles": [
+    {
+     "file": "art/material-library/cc0-raw/Metal009/Metal009_2K-JPG_NormalDX.jpg",
+     "sha256": "4c6fcb10e980b3f73e6e942959d33b90d8f0fdd0191850271ac1cc6de5a91513"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal009/Metal009_2K-JPG_NormalGL.jpg",
+     "sha256": "8773d9e97a4b057ced3e538d8ecc6069d27c8948191d61daf79b9ad93d93e3b3"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal009/Metal009_2K-JPG_Roughness.jpg",
+     "sha256": "e802f013b93cb1bd4b55cd91f02a1863233475a7f8bd0e6755cfaa447a729674"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal009/Metal009_2K-JPG_Displacement.jpg",
+     "sha256": "8a7dc69978932952ac0155d7475480b3d9f860cdedd5ccc51db9d202e8f583aa"
+    }
+   ],
+   "build": {
+    "source": "Metal009",
+    "convention": {
+     "sourceMaps": {
+      "normal": "Metal009_2K-JPG_NormalDX.jpg",
+      "normalGL": "Metal009_2K-JPG_NormalGL.jpg",
+      "roughness": "Metal009_2K-JPG_Roughness.jpg",
+      "height": "Metal009_2K-JPG_Displacement.jpg",
+      "ao": null
+     },
+     "meanAbs_DX_G_minus_inverted_GL_G": 0.00223,
+     "meanAbs_DX_G_minus_GL_G": 0.04969,
+     "meanAbs_DX_R_minus_GL_R": 0.00328,
+     "corr_DX_G_vs_minus_dHeight_drow": 0.8191,
+     "corr_DX_R_vs_minus_dHeight_dcol": 0.7138,
+     "sourceIsDirectX": true
+    },
+    "sourceRoughness_p5_p50_p95": [
+     0.3882,
+     0.4667,
+     0.5569
+    ],
+    "sourceHeightStd": 0.1351,
+    "roughnessMedian": 0.4676,
+    "roughnessAmplitude": 0.1275,
+    "roughnessEncoding": "R = 0.5 + 0.5 * (r - median) / amplitude (clipped); amplitude = max(p99.5 - med, med - p0.5, 0.04)",
+    "heightFlat": false,
+    "cavityMethod": "height cavity: max(blur(h, sigma=8px) - h, 0), 1 - 0.6 * norm(p99.5)",
+    "seamFix": {
+     "offsetBlend": false
+    },
+    "sourceZipSha256": "6f79f53d5073e65707c5765316fa9257f4604e1790093be5a51ed8226761a7f0",
+    "license": "CC0 1.0 (ambientCG site-wide)"
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.893,
+      0.74
+     ],
+     "R": [
+      0.863,
+      0.661
+     ],
+     "G": [
+      0.763,
+      0.677
+     ],
+     "B": [
+      0.811,
+      0.618
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      1.005,
+      1.104
+     ],
+     "B": [
+      0.974,
+      0.93
+     ]
+    },
+    "normalLength_p1_p99": [
+     0.9978,
+     1.0034
+    ],
+    "normalMeanXY": [
+     -0.0083,
+     -0.008
+    ],
+    "normalMinZ": 0.9843,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.3448,
+    "corr_N_R_vs_minus_dB_dcol": 0.4113,
+    "R_mean_std": [
+     0.5066,
+     0.177
+    ],
+    "G_p1_mean": [
+     0.4471,
+     0.9001
+    ],
+    "B_mean_std": [
+     0.4788,
+     0.1989
+    ]
+   }
+  },
+  {
+   "index": 4,
+   "class": "gold_antique",
+   "size": 1024,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/gold_antique/gold_antique_DetailN.png",
+     "sha256": "cd831bc85647f058d6ea1607c9a073065cdd8ed73f8f7883190b6aefae936b8e",
+     "bytes": 448194
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/gold_antique/gold_antique_DetailRMH.png",
+     "sha256": "6e1b672df669c8abdb9f9dfd6fb4cdfecbf2680b4e5fb1eda6646b2ae0acab8c",
+     "bytes": 1804307
+    }
+   ],
+   "sourceFiles": [
+    {
+     "file": "art/material-library/cc0-raw/Metal042A/Metal042A_2K-JPG_NormalDX.jpg",
+     "sha256": "668d2dca7779700b08d5341bacdec2b723e0b220604a509fcaa1339137742612"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal042A/Metal042A_2K-JPG_NormalGL.jpg",
+     "sha256": "fda2552d90fc73c09ba078599e8c47bdcedebffeb2798b4b74019edee635b746"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal042A/Metal042A_2K-JPG_Roughness.jpg",
+     "sha256": "c43f4af928d518929739ffba6653450073a5f6090b4242e23ef9a23ae67ed97f"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal042A/Metal042A_2K-JPG_Displacement.jpg",
+     "sha256": "d738d7258cc514aa4e014022ce32a9f75b17270375ad1b7b8f04f843092849c8"
+    }
+   ],
+   "build": {
+    "source": "Metal042A",
+    "convention": {
+     "sourceMaps": {
+      "normal": "Metal042A_2K-JPG_NormalDX.jpg",
+      "normalGL": "Metal042A_2K-JPG_NormalGL.jpg",
+      "roughness": "Metal042A_2K-JPG_Roughness.jpg",
+      "height": "Metal042A_2K-JPG_Displacement.jpg",
+      "ao": null
+     },
+     "meanAbs_DX_G_minus_inverted_GL_G": 0.00224,
+     "meanAbs_DX_G_minus_GL_G": 0.00251,
+     "meanAbs_DX_R_minus_GL_R": 0.00252,
+     "corr_DX_G_vs_minus_dHeight_drow": 0.4756,
+     "corr_DX_R_vs_minus_dHeight_dcol": 0.4012,
+     "sourceIsDirectX": true
+    },
+    "sourceRoughness_p5_p50_p95": [
+     0.1137,
+     0.1176,
+     0.1255
+    ],
+    "sourceHeightStd": 0.1233,
+    "roughnessMedian": 0.1176,
+    "roughnessAmplitude": 0.04,
+    "roughnessEncoding": "R = 0.5 + 0.5 * (r - median) / amplitude (clipped); amplitude = max(p99.5 - med, med - p0.5, 0.04)",
+    "heightFlat": false,
+    "cavityMethod": "height cavity: max(blur(h, sigma=8px) - h, 0), 1 - 0.6 * norm(p99.5)",
+    "seamFix": {
+     "offsetBlend": false
+    },
+    "sourceZipSha256": "bc0b44566026271d4b162252186d051425f5ec3d5b04e61196788f99f6f90f2d",
+    "license": "CC0 1.0 (ambientCG site-wide)"
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.873,
+      0.891
+     ],
+     "R": [
+      0.974,
+      0.989
+     ],
+     "G": [
+      1.025,
+      0.739
+     ],
+     "B": [
+      0.893,
+      0.839
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      0.973,
+      1.0
+     ],
+     "B": [
+      1.069,
+      1.0
+     ]
+    },
+    "normalLength_p1_p99": [
+     1.0,
+     1.0001
+    ],
+    "normalMeanXY": [
+     0.0026,
+     -0.0014
+    ],
+    "normalMinZ": 1.0,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.3467,
+    "corr_N_R_vs_minus_dB_dcol": 0.2987,
+    "R_mean_std": [
+     0.5111,
+     0.0385
+    ],
+    "G_p1_mean": [
+     0.4706,
+     0.9172
+    ],
+    "B_mean_std": [
+     0.4568,
+     0.1823
+    ]
+   }
+  },
+  {
+   "index": 5,
+   "class": "brass",
+   "size": 1024,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/brass/brass_DetailN.png",
+     "sha256": "a6cadb0433dfd1c5b67c181563ec7124480fd2a69627e1637e5b703ff5723dac",
+     "bytes": 339878
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/brass/brass_DetailRMH.png",
+     "sha256": "98998c57032b51708c7e3a21ee4beb875222662ddfbcd9f9a28e97f2959025c4",
+     "bytes": 399817
+    }
+   ],
+   "sourceFiles": [
+    {
+     "file": "art/material-library/cc0-raw/Metal048A/Metal048A_2K-JPG_NormalDX.jpg",
+     "sha256": "051d2d14d39492b4335f5d01ecf24dc6732be65cf7751cc1c70ec4b6ec3a14d3"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal048A/Metal048A_2K-JPG_NormalGL.jpg",
+     "sha256": "ae1865ba7fa35527fb41915ba7dfd0b47c5d6432bc1b09b1d3daec544ae70961"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal048A/Metal048A_2K-JPG_Roughness.jpg",
+     "sha256": "db1f3aba87724dc4de89dea1072c250f4b4c4637e9cc33627b5555bca931c2ec"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal048A/Metal048A_2K-JPG_Displacement.jpg",
+     "sha256": "cc6af63f697e9f678fca78b354b6fcd13afd5650aa3e030deeefc42c8b83152b"
+    }
+   ],
+   "build": {
+    "source": "Metal048A",
+    "convention": {
+     "sourceMaps": {
+      "normal": "Metal048A_2K-JPG_NormalDX.jpg",
+      "normalGL": "Metal048A_2K-JPG_NormalGL.jpg",
+      "roughness": "Metal048A_2K-JPG_Roughness.jpg",
+      "height": "Metal048A_2K-JPG_Displacement.jpg",
+      "ao": null
+     },
+     "meanAbs_DX_G_minus_inverted_GL_G": 0.0021,
+     "meanAbs_DX_G_minus_GL_G": 0.00219,
+     "meanAbs_DX_R_minus_GL_R": 0.00232,
+     "corr_DX_G_vs_minus_dHeight_drow": 0.0,
+     "corr_DX_R_vs_minus_dHeight_dcol": 0.0,
+     "sourceIsDirectX": true
+    },
+    "sourceRoughness_p5_p50_p95": [
+     0.0824,
+     0.0902,
+     0.098
+    ],
+    "sourceHeightStd": 0.0,
+    "roughnessMedian": 0.0902,
+    "roughnessAmplitude": 0.04,
+    "roughnessEncoding": "R = 0.5 + 0.5 * (r - median) / amplitude (clipped); amplitude = max(p99.5 - med, med - p0.5, 0.04)",
+    "heightFlat": true,
+    "cavityMethod": "height cavity: max(blur(h, sigma=8px) - h, 0), 1 - 0.6 * norm(p99.5)",
+    "seamFix": {
+     "offsetBlend": false
+    },
+    "sourceZipSha256": "9de59c0c606592aa8ae13f35bf298cd9ff24efa08f72852e499208139cead1ec",
+    "license": "CC0 1.0 (ambientCG site-wide)"
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.957,
+      0.92
+     ],
+     "R": [
+      0.726,
+      0.948
+     ],
+     "G": [
+      0.0,
+      0.0
+     ],
+     "B": [
+      0.0,
+      0.0
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      1.094,
+      1.09
+     ],
+     "B": [
+      0.0,
+      0.0
+     ]
+    },
+    "normalLength_p1_p99": [
+     1.0,
+     1.0
+    ],
+    "normalMeanXY": [
+     0.0028,
+     -0.0016
+    ],
+    "normalMinZ": 1.0,
+    "heightFlat": true,
+    "corr_N_G_vs_minus_dB_drow": null,
+    "corr_N_R_vs_minus_dB_dcol": null,
+    "R_mean_std": [
+     0.4964,
+     0.0513
+    ],
+    "G_p1_mean": [
+     1.0,
+     1.0
+    ],
+    "B_mean_std": [
+     0.502,
+     0.0
+    ]
+   }
+  },
+  {
+   "index": 6,
+   "class": "bronze",
+   "size": 1024,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/bronze/bronze_DetailN.png",
+     "sha256": "86c258dfae39ee77f01e19b7e50dc9446661d5642f08841dd475b86b04bc64be",
+     "bytes": 946771
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/bronze/bronze_DetailRMH.png",
+     "sha256": "7880179f56d985b84c444a9323a25d7c914f382970d8ed2e1fde4174599665a7",
+     "bytes": 1919156
+    }
+   ],
+   "sourceFiles": [
+    {
+     "file": "art/material-library/cc0-raw/Metal008/Metal008_2K-JPG_NormalDX.jpg",
+     "sha256": "1a3c3cb33bbc46c5ad83692576f88ef2c2cb935751854b746979ba645258e84e"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal008/Metal008_2K-JPG_NormalGL.jpg",
+     "sha256": "af24b809e7863e1fa425d5f19edff24f20c113be65a8ebaf0edbb96c624d7bba"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal008/Metal008_2K-JPG_Roughness.jpg",
+     "sha256": "46960685265bdd477251927fc41cbc7da3973544e529b9be739d9aaedc8de0f3"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Metal008/Metal008_2K-JPG_Displacement.jpg",
+     "sha256": "613c18c81a505bd0d5fa65058ed4289465c5e1984406b0619819e67d947a676a"
+    }
+   ],
+   "build": {
+    "source": "Metal008",
+    "convention": {
+     "sourceMaps": {
+      "normal": "Metal008_2K-JPG_NormalDX.jpg",
+      "normalGL": "Metal008_2K-JPG_NormalGL.jpg",
+      "roughness": "Metal008_2K-JPG_Roughness.jpg",
+      "height": "Metal008_2K-JPG_Displacement.jpg",
+      "ao": null
+     },
+     "meanAbs_DX_G_minus_inverted_GL_G": 0.00188,
+     "meanAbs_DX_G_minus_GL_G": 0.01341,
+     "meanAbs_DX_R_minus_GL_R": 0.00386,
+     "corr_DX_G_vs_minus_dHeight_drow": 0.7238,
+     "corr_DX_R_vs_minus_dHeight_dcol": 0.7063,
+     "sourceIsDirectX": true
+    },
+    "sourceRoughness_p5_p50_p95": [
+     0.1608,
+     0.2314,
+     0.3294
+    ],
+    "sourceHeightStd": 0.02,
+    "roughnessMedian": 0.2304,
+    "roughnessAmplitude": 0.1843,
+    "roughnessEncoding": "R = 0.5 + 0.5 * (r - median) / amplitude (clipped); amplitude = max(p99.5 - med, med - p0.5, 0.04)",
+    "heightFlat": false,
+    "cavityMethod": "height cavity: max(blur(h, sigma=8px) - h, 0), 1 - 0.6 * norm(p99.5)",
+    "seamFix": {
+     "offsetBlend": false
+    },
+    "sourceZipSha256": "2a114375363901ee5713e204c50779d5d95a5af7a7699a13b4079834bdb6de3c",
+    "license": "CC0 1.0 (ambientCG site-wide)"
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.782,
+      0.789
+     ],
+     "R": [
+      0.739,
+      0.827
+     ],
+     "G": [
+      0.575,
+      0.687
+     ],
+     "B": [
+      0.673,
+      0.828
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      1.03,
+      1.06
+     ],
+     "B": [
+      0.896,
+      1.115
+     ]
+    },
+    "normalLength_p1_p99": [
+     1.0,
+     1.0018
+    ],
+    "normalMeanXY": [
+     -0.0039,
+     -0.0074
+    ],
+    "normalMinZ": 0.7333,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.469,
+    "corr_N_R_vs_minus_dB_dcol": 0.4566,
+    "R_mean_std": [
+     0.5142,
+     0.1347
+    ],
+    "G_p1_mean": [
+     0.6118,
+     0.9801
+    ],
+    "B_mean_std": [
+     0.9383,
+     0.107
+    ]
+   }
+  },
+  {
+   "index": 7,
+   "class": "leather_smooth",
+   "size": 1024,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/leather_smooth/leather_smooth_DetailN.png",
+     "sha256": "088a73048b1f2ca1e6b7225cb216704b59c29a16bcedc9026f90583b2ff5420b",
+     "bytes": 1838529
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/leather_smooth/leather_smooth_DetailRMH.png",
+     "sha256": "7aa7c2a428e7590d988445ef4eb4bb847f07404b6ea40238f3060513d7959d7c",
+     "bytes": 2668328
+    }
+   ],
+   "sourceFiles": [
+    {
+     "file": "art/material-library/cc0-raw/Leather026/Leather026_2K-JPG_NormalDX.jpg",
+     "sha256": "b8cf44c615afe183ff3cf403d48b8a0b69c49504e15b4d5ba20f73f00de47ed2"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Leather026/Leather026_2K-JPG_NormalGL.jpg",
+     "sha256": "cb601b2b9eae5b5731905500b0e0b2afcb7bb49ef4d46d32802d3a1533acd693"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Leather026/Leather026_2K-JPG_Roughness.jpg",
+     "sha256": "7b27410b4185eba7915052b1686408c7d50f4a928c96f9190a266a7c40c91eb3"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Leather026/Leather026_2K-JPG_Displacement.jpg",
+     "sha256": "d624890113ae9575fd8dd6766e6ce2af373d85b2a943dc04dbf5bcd6926b5002"
+    }
+   ],
+   "build": {
+    "source": "Leather026",
+    "convention": {
+     "sourceMaps": {
+      "normal": "Leather026_2K-JPG_NormalDX.jpg",
+      "normalGL": "Leather026_2K-JPG_NormalGL.jpg",
+      "roughness": "Leather026_2K-JPG_Roughness.jpg",
+      "height": "Leather026_2K-JPG_Displacement.jpg",
+      "ao": null
+     },
+     "meanAbs_DX_G_minus_inverted_GL_G": 0.00217,
+     "meanAbs_DX_G_minus_GL_G": 0.06853,
+     "meanAbs_DX_R_minus_GL_R": 0.00321,
+     "corr_DX_G_vs_minus_dHeight_drow": 0.9319,
+     "corr_DX_R_vs_minus_dHeight_dcol": 0.9317,
+     "sourceIsDirectX": true
+    },
+    "sourceRoughness_p5_p50_p95": [
+     0.3333,
+     0.3686,
+     0.4078
+    ],
+    "sourceHeightStd": 0.1273,
+    "roughnessMedian": 0.3706,
+    "roughnessAmplitude": 0.053,
+    "roughnessEncoding": "R = 0.5 + 0.5 * (r - median) / amplitude (clipped); amplitude = max(p99.5 - med, med - p0.5, 0.04)",
+    "heightFlat": false,
+    "cavityMethod": "height cavity: max(blur(h, sigma=8px) - h, 0), 1 - 0.6 * norm(p99.5)",
+    "seamFix": {
+     "offsetBlend": true,
+     "seamBefore": {
+      "N": [
+       0.907,
+       0.925
+      ],
+      "R": [
+       1.295,
+       1.247
+      ],
+      "H": [
+       0.944,
+       0.889
+      ]
+     }
+    },
+    "sourceZipSha256": "681d26d63912c849151266a087290a41c2fc5e95789c2cd6669f36c45d70efa6",
+    "license": "CC0 1.0 (ambientCG site-wide)"
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.9,
+      0.943
+     ],
+     "R": [
+      0.981,
+      0.932
+     ],
+     "G": [
+      0.87,
+      0.915
+     ],
+     "B": [
+      0.915,
+      0.926
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      0.965,
+      1.016
+     ],
+     "B": [
+      1.0,
+      1.025
+     ]
+    },
+    "normalLength_p1_p99": [
+     0.9962,
+     1.004
+    ],
+    "normalMeanXY": [
+     0.0001,
+     0.0
+    ],
+    "normalMinZ": 0.9216,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.5958,
+    "corr_N_R_vs_minus_dB_dcol": 0.5898,
+    "R_mean_std": [
+     0.497,
+     0.1859
+    ],
+    "G_p1_mean": [
+     0.451,
+     0.8965
+    ],
+    "B_mean_std": [
+     0.4305,
+     0.1891
+    ]
+   }
+  },
+  {
+   "index": 8,
+   "class": "leather_worn",
+   "size": 1024,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/leather_worn/leather_worn_DetailN.png",
+     "sha256": "000043005f005ee4fad77ffd772fc2a0997c20a0f598205ae1ce3c7b3f599652",
+     "bytes": 1815018
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/leather_worn/leather_worn_DetailRMH.png",
+     "sha256": "71d102fcaebdec0d06a7b2e0e71800f6a53d3b8e1e32c0f88a1272eb3207b794",
+     "bytes": 2783646
+    }
+   ],
+   "sourceFiles": [
+    {
+     "file": "art/material-library/cc0-raw/Leather030/Leather030_2K-JPG_NormalDX.jpg",
+     "sha256": "c80a23a7a083f1ce902df8859d8019779cbe80d1cf50817210797c885b284bc1"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Leather030/Leather030_2K-JPG_NormalGL.jpg",
+     "sha256": "ad32aebc74211b9b23229693977f50d498b967893889147b24388a00b4f8ffc7"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Leather030/Leather030_2K-JPG_Roughness.jpg",
+     "sha256": "a98cbc31585eb8e9853a8e5bfd9e999955cec77940b575001b9b0fca8f51dd59"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Leather030/Leather030_2K-JPG_Displacement.jpg",
+     "sha256": "bf0cd73b6bff0a06b5fa3863792d29c33d9b98bb73652ab6bf67c4d68b0cbfa0"
+    }
+   ],
+   "build": {
+    "source": "Leather030",
+    "convention": {
+     "sourceMaps": {
+      "normal": "Leather030_2K-JPG_NormalDX.jpg",
+      "normalGL": "Leather030_2K-JPG_NormalGL.jpg",
+      "roughness": "Leather030_2K-JPG_Roughness.jpg",
+      "height": "Leather030_2K-JPG_Displacement.jpg",
+      "ao": null
+     },
+     "meanAbs_DX_G_minus_inverted_GL_G": 0.00219,
+     "meanAbs_DX_G_minus_GL_G": 0.06906,
+     "meanAbs_DX_R_minus_GL_R": 0.00321,
+     "corr_DX_G_vs_minus_dHeight_drow": 0.9457,
+     "corr_DX_R_vs_minus_dHeight_dcol": 0.9346,
+     "sourceIsDirectX": true
+    },
+    "sourceRoughness_p5_p50_p95": [
+     0.2196,
+     0.4706,
+     0.7725
+    ],
+    "sourceHeightStd": 0.1583,
+    "roughnessMedian": 0.4725,
+    "roughnessAmplitude": 0.2971,
+    "roughnessEncoding": "R = 0.5 + 0.5 * (r - median) / amplitude (clipped); amplitude = max(p99.5 - med, med - p0.5, 0.04)",
+    "heightFlat": false,
+    "cavityMethod": "height cavity: max(blur(h, sigma=8px) - h, 0), 1 - 0.6 * norm(p99.5)",
+    "seamFix": {
+     "offsetBlend": false
+    },
+    "sourceZipSha256": "4060fd715c5afac0ddebf4675f9e2fd02fd53592d00731fbe214f6367eeeafd6",
+    "license": "CC0 1.0 (ambientCG site-wide)"
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      1.026,
+      0.989
+     ],
+     "R": [
+      1.167,
+      1.157
+     ],
+     "G": [
+      0.82,
+      0.872
+     ],
+     "B": [
+      0.905,
+      0.926
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      1.125,
+      1.12
+     ],
+     "B": [
+      1.034,
+      1.088
+     ]
+    },
+    "normalLength_p1_p99": [
+     0.9962,
+     1.0039
+    ],
+    "normalMeanXY": [
+     0.0002,
+     0.0001
+    ],
+    "normalMinZ": 0.9529,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.4695,
+    "corr_N_R_vs_minus_dB_dcol": 0.6099,
+    "R_mean_std": [
+     0.5133,
+     0.2007
+    ],
+    "G_p1_mean": [
+     0.4392,
+     0.9095
+    ],
+    "B_mean_std": [
+     0.5814,
+     0.2086
+    ]
+   }
+  },
+  {
+   "index": 9,
+   "class": "wool_coarse",
+   "size": 1024,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/wool_coarse/wool_coarse_DetailN.png",
+     "sha256": "72dc214925282f6f2aaf807af88d31705d7bc835dc4b5036416ee30fec84d460",
+     "bytes": 2832333
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/wool_coarse/wool_coarse_DetailRMH.png",
+     "sha256": "0f805a84dd270c4276bb3c4193c7324c4a8bb876bb77a05e3e4b5349005a5227",
+     "bytes": 2785016
+    }
+   ],
+   "sourceFiles": [
+    {
+     "file": "art/material-library/cc0-raw/Fabric030/Fabric030_2K-JPG_NormalDX.jpg",
+     "sha256": "fc6079fb14e01e20b9e0492f95263d6ba76ecf47022f5d514a534fd8f05752df"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Fabric030/Fabric030_2K-JPG_NormalGL.jpg",
+     "sha256": "7c871bf6969e45e5aa11c5d04c7ad141dbc0aadf1124b7eeb9b0b42eb0c8890b"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Fabric030/Fabric030_2K-JPG_Roughness.jpg",
+     "sha256": "ac4806ea54090d5979f5052eb02f72b27cb01762ebfafa82cce2464e5274c1ec"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Fabric030/Fabric030_2K-JPG_Displacement.jpg",
+     "sha256": "7b8e73c76896fc630797396268ddfe40989f75455ab5c35d2415f878c15a41a6"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Fabric030/Fabric030_2K-JPG_AmbientOcclusion.jpg",
+     "sha256": "19d2e4f9f510f8582412120087bc9326fb42aa6b18fff2666d5b1fd56836dc69"
+    }
+   ],
+   "build": {
+    "source": "Fabric030",
+    "convention": {
+     "sourceMaps": {
+      "normal": "Fabric030_2K-JPG_NormalDX.jpg",
+      "normalGL": "Fabric030_2K-JPG_NormalGL.jpg",
+      "roughness": "Fabric030_2K-JPG_Roughness.jpg",
+      "height": "Fabric030_2K-JPG_Displacement.jpg",
+      "ao": "Fabric030_2K-JPG_AmbientOcclusion.jpg"
+     },
+     "meanAbs_DX_G_minus_inverted_GL_G": 0.00216,
+     "meanAbs_DX_G_minus_GL_G": 0.41387,
+     "meanAbs_DX_R_minus_GL_R": 0.00315,
+     "corr_DX_G_vs_minus_dHeight_drow": 0.9473,
+     "corr_DX_R_vs_minus_dHeight_dcol": 0.9516,
+     "sourceIsDirectX": true
+    },
+    "sourceRoughness_p5_p50_p95": [
+     0.5255,
+     0.7216,
+     0.9176
+    ],
+    "sourceHeightStd": 0.1111,
+    "roughnessMedian": 0.7206,
+    "roughnessAmplitude": 0.2137,
+    "roughnessEncoding": "R = 0.5 + 0.5 * (r - median) / amplitude (clipped); amplitude = max(p99.5 - med, med - p0.5, 0.04)",
+    "heightFlat": false,
+    "cavityMethod": "source AmbientOcclusion map (box-downsampled)",
+    "seamFix": {
+     "offsetBlend": false
+    },
+    "sourceZipSha256": "7fc77fde6203911713a2fa41fa54f41f400c2670f7f7a3f4d57567dfdbf733e8",
+    "license": "CC0 1.0 (ambientCG site-wide)"
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.857,
+      0.786
+     ],
+     "R": [
+      1.07,
+      1.061
+     ],
+     "G": [
+      0.988,
+      1.028
+     ],
+     "B": [
+      1.015,
+      0.998
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      0.938,
+      0.883
+     ],
+     "B": [
+      1.296,
+      1.35
+     ]
+    },
+    "normalLength_p1_p99": [
+     0.9953,
+     1.0046
+    ],
+    "normalMeanXY": [
+     -0.0001,
+     -0.0046
+    ],
+    "normalMinZ": 0.349,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.6537,
+    "corr_N_R_vs_minus_dB_dcol": 0.7536,
+    "R_mean_std": [
+     0.5181,
+     0.2703
+    ],
+    "G_p1_mean": [
+     0.6353,
+     0.9248
+    ],
+    "B_mean_std": [
+     0.4753,
+     0.1953
+    ]
+   }
+  },
+  {
+   "index": 10,
+   "class": "linen",
+   "size": 512,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/linen/linen_DetailN.png",
+     "sha256": "084a6879f21d5f72f2f16002d11cb806d6f727f1273a92c318bcae6f0bf9da42",
+     "bytes": 510998
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/linen/linen_DetailRMH.png",
+     "sha256": "0b04439a89fc4bf6b7e6563b44b2d1ae49640e248f363981e58910a7c5411503",
+     "bytes": 659185
+    }
+   ],
+   "sourceFiles": [
+    {
+     "file": "art/material-library/cc0-raw/Fabric061/Fabric061_2K-JPG_NormalDX.jpg",
+     "sha256": "f99be20413ec6954f32acbad9ba396999c253e844d8dfff658c22668793a8690"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Fabric061/Fabric061_2K-JPG_NormalGL.jpg",
+     "sha256": "444d83b9f9298592e68efad443b0820a23be29a48f9803af242cf2d3e8481c93"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Fabric061/Fabric061_2K-JPG_Roughness.jpg",
+     "sha256": "2ae3e3bf9a42f7de2f48072649397be354bea1d509142d41622b98cf427fc292"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Fabric061/Fabric061_2K-JPG_Displacement.jpg",
+     "sha256": "b3a03ac6ce8c3d26416d0554e5d87a86995efe995d0fb2e1b9c25de8c8085ccc"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Fabric061/Fabric061_2K-JPG_AmbientOcclusion.jpg",
+     "sha256": "2305299a22cb3fb9c1be8c69f757649e924618c4d739a1b9ef8f99ea10d05805"
+    }
+   ],
+   "build": {
+    "source": "Fabric061",
+    "convention": {
+     "sourceMaps": {
+      "normal": "Fabric061_2K-JPG_NormalDX.jpg",
+      "normalGL": "Fabric061_2K-JPG_NormalGL.jpg",
+      "roughness": "Fabric061_2K-JPG_Roughness.jpg",
+      "height": "Fabric061_2K-JPG_Displacement.jpg",
+      "ao": "Fabric061_2K-JPG_AmbientOcclusion.jpg"
+     },
+     "meanAbs_DX_G_minus_inverted_GL_G": 0.00217,
+     "meanAbs_DX_G_minus_GL_G": 0.16971,
+     "meanAbs_DX_R_minus_GL_R": 0.00314,
+     "corr_DX_G_vs_minus_dHeight_drow": 0.8381,
+     "corr_DX_R_vs_minus_dHeight_dcol": 0.8608,
+     "sourceIsDirectX": true
+    },
+    "sourceRoughness_p5_p50_p95": [
+     0.7725,
+     0.8431,
+     0.8902
+    ],
+    "sourceHeightStd": 0.1475,
+    "roughnessMedian": 0.8434,
+    "roughnessAmplitude": 0.0858,
+    "roughnessEncoding": "R = 0.5 + 0.5 * (r - median) / amplitude (clipped); amplitude = max(p99.5 - med, med - p0.5, 0.04)",
+    "heightFlat": false,
+    "cavityMethod": "source AmbientOcclusion map (box-downsampled)",
+    "seamFix": {
+     "offsetBlend": false
+    },
+    "sourceZipSha256": "27b729c1bafa7c47f5f89dea8ca43d6107156acd437c1439a30d28e9de0013c2",
+    "license": "CC0 1.0 (ambientCG site-wide)"
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.986,
+      0.96
+     ],
+     "R": [
+      0.586,
+      0.657
+     ],
+     "G": [
+      0.781,
+      0.887
+     ],
+     "B": [
+      0.462,
+      0.454
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      1.45,
+      1.45
+     ],
+     "B": [
+      0.729,
+      0.722
+     ]
+    },
+    "normalLength_p1_p99": [
+     0.9959,
+     1.0041
+    ],
+    "normalMeanXY": [
+     0.0003,
+     0.0002
+    ],
+    "normalMinZ": 0.898,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.7349,
+    "corr_N_R_vs_minus_dB_dcol": 0.846,
+    "R_mean_std": [
+     0.4776,
+     0.1701
+    ],
+    "G_p1_mean": [
+     0.6902,
+     0.7894
+    ],
+    "B_mean_std": [
+     0.3778,
+     0.2411
+    ]
+   }
+  },
+  {
+   "index": 11,
+   "class": "silk",
+   "size": 512,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/silk/silk_DetailN.png",
+     "sha256": "41cdb3ed441e35c38bbd44b37e73f25518c506311bcca35804563929b6c3f796",
+     "bytes": 324658
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/silk/silk_DetailRMH.png",
+     "sha256": "86bcb0e731a6249ad61d3411a5177b7f1ec6b48e27f49164ea4802ae9d2bccc7",
+     "bytes": 406057
+    }
+   ],
+   "sourceFiles": [],
+   "build": {
+    "source": "procedural:satin5",
+    "seed": 11,
+    "recipe": "5-end satin, move 2, 80 warp x 160 weft per tile; warp floats smooth, binding points rough",
+    "heightFlat": false,
+    "cavityMethod": "height cavity (sigma 2 px)",
+    "roughnessEncoding": "procedural deviation, amplitude = preset roughness.variation",
+    "seamFix": {
+     "offsetBlend": false,
+     "reason": "periodic by construction"
+    }
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.975,
+      0.557
+     ],
+     "R": [
+      0.83,
+      0.919
+     ],
+     "G": [
+      0.361,
+      0.972
+     ],
+     "B": [
+      0.392,
+      0.998
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      2.087,
+      0.689
+     ],
+     "B": [
+      0.96,
+      1.428
+     ]
+    },
+    "normalLength_p1_p99": [
+     0.9956,
+     1.0044
+    ],
+    "normalMeanXY": [
+     0.0,
+     -0.0
+    ],
+    "normalMinZ": 0.7098,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.9639,
+    "corr_N_R_vs_minus_dB_dcol": 0.9547,
+    "R_mean_std": [
+     0.5375,
+     0.1557
+    ],
+    "G_p1_mean": [
+     0.4196,
+     0.8857
+    ],
+    "B_mean_std": [
+     0.5804,
+     0.2563
+    ]
+   }
+  },
+  {
+   "index": 12,
+   "class": "feathers",
+   "size": 1024,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/feathers/feathers_DetailN.png",
+     "sha256": "43ced2090bce6187c307b345722df05fcc5717b983851a6719d3887c764de1a1",
+     "bytes": 1847563
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/feathers/feathers_DetailRMH.png",
+     "sha256": "7483dc3761467ff5a98dae2dbd61c533c972fe14ec81e04ff609a3a1da32c6ae",
+     "bytes": 1421579
+    }
+   ],
+   "sourceFiles": [],
+   "build": {
+    "source": "procedural:feathers",
+    "seed": 12,
+    "recipe": "4 x 8 contour feathers per tile, length 3.0 row pitch, ovate tapered tip, barbs 38 deg / 5 px, shingle by max t",
+    "heightFlat": false,
+    "cavityMethod": "height cavity (sigma 10.6667 px)",
+    "roughnessEncoding": "procedural deviation, amplitude = preset roughness.variation",
+    "seamFix": {
+     "offsetBlend": false,
+     "reason": "periodic by construction"
+    }
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.837,
+      0.835
+     ],
+     "R": [
+      0.883,
+      0.291
+     ],
+     "G": [
+      0.826,
+      0.485
+     ],
+     "B": [
+      0.931,
+      0.581
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      0.98,
+      0.978
+     ],
+     "B": [
+      1.197,
+      0.937
+     ]
+    },
+    "normalLength_p1_p99": [
+     0.9958,
+     1.0041
+    ],
+    "normalMeanXY": [
+     0.0001,
+     -0.0005
+    ],
+    "normalMinZ": 0.2706,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.7376,
+    "corr_N_R_vs_minus_dB_dcol": 0.8253,
+    "R_mean_std": [
+     0.4683,
+     0.1183
+    ],
+    "G_p1_mean": [
+     0.4745,
+     0.9543
+    ],
+    "B_mean_std": [
+     0.5825,
+     0.2013
+    ]
+   }
+  },
+  {
+   "index": 13,
+   "class": "skin",
+   "size": 512,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/skin/skin_DetailN.png",
+     "sha256": "912d5df855b85ee881d720f0e6f6db20c721e16d73bca219029e030d1ad830ce",
+     "bytes": 221373
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/skin/skin_DetailRMH.png",
+     "sha256": "a6fac1214bb67f04098a77f35f541652fa0f9c3e569e8853a490c306d593768d",
+     "bytes": 352837
+    }
+   ],
+   "sourceFiles": [],
+   "build": {
+    "source": "procedural:skin",
+    "seed": 13,
+    "recipe": "1100 pores (gauss 1.3 px) + weak ridged band-pass creases +-35 deg (f0 0.035 cyc/px) + undulation",
+    "heightFlat": false,
+    "cavityMethod": "height cavity (sigma 3 px)",
+    "roughnessEncoding": "procedural deviation, amplitude = preset roughness.variation",
+    "seamFix": {
+     "offsetBlend": false,
+     "reason": "periodic by construction"
+    }
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.831,
+      0.948
+     ],
+     "R": [
+      0.817,
+      0.983
+     ],
+     "G": [
+      0.769,
+      0.858
+     ],
+     "B": [
+      0.79,
+      0.877
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      1.107,
+      1.363
+     ],
+     "B": [
+      1.021,
+      1.141
+     ]
+    },
+    "normalLength_p1_p99": [
+     0.9965,
+     1.0036
+    ],
+    "normalMeanXY": [
+     0.0,
+     0.0
+    ],
+    "normalMinZ": 0.8902,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.947,
+    "corr_N_R_vs_minus_dB_dcol": 0.953,
+    "R_mean_std": [
+     0.5875,
+     0.051
+    ],
+    "G_p1_mean": [
+     0.4941,
+     0.9627
+    ],
+    "B_mean_std": [
+     0.484,
+     0.1942
+    ]
+   }
+  },
+  {
+   "index": 14,
+   "class": "stone_base",
+   "size": 1024,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/stone_base/stone_base_DetailN.png",
+     "sha256": "4a3ccd00d5c24ad3974b6e57aff3106445ead007b3845fe6f164825ba6e21bc1",
+     "bytes": 430761
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/stone_base/stone_base_DetailRMH.png",
+     "sha256": "1f6fec417f66e55b0905bbb125ea58eda18aaf503769e9707db408810b6a710a",
+     "bytes": 2429895
+    }
+   ],
+   "sourceFiles": [
+    {
+     "file": "art/material-library/cc0-raw/Marble012/Marble012_2K-JPG_NormalDX.jpg",
+     "sha256": "71971918a1c8b3d1e8bdd9d81af09d61880a47ec894b14cb3f9adef470d05b95"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Marble012/Marble012_2K-JPG_NormalGL.jpg",
+     "sha256": "0e295859c9e55ba2dd147aed37a674aba90decaf91d3622d5aa8386441020649"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Marble012/Marble012_2K-JPG_Roughness.jpg",
+     "sha256": "d4a906a9739f30f386914a8b8393e64100f340851dc50328e5b91e24fa95ce7a"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Marble012/Marble012_2K-JPG_Displacement.jpg",
+     "sha256": "677a47612b1d6f61fbff7951a966150b1787c963b6a7d8d6450b6e471937fad7"
+    }
+   ],
+   "build": {
+    "source": "Marble012",
+    "convention": {
+     "sourceMaps": {
+      "normal": "Marble012_2K-JPG_NormalDX.jpg",
+      "normalGL": "Marble012_2K-JPG_NormalGL.jpg",
+      "roughness": "Marble012_2K-JPG_Roughness.jpg",
+      "height": "Marble012_2K-JPG_Displacement.jpg",
+      "ao": null
+     },
+     "meanAbs_DX_G_minus_inverted_GL_G": 0.00224,
+     "meanAbs_DX_G_minus_GL_G": 0.00246,
+     "meanAbs_DX_R_minus_GL_R": 0.00261,
+     "corr_DX_G_vs_minus_dHeight_drow": 0.3583,
+     "corr_DX_R_vs_minus_dHeight_dcol": 0.3066,
+     "sourceIsDirectX": true
+    },
+    "sourceRoughness_p5_p50_p95": [
+     0.0314,
+     0.0549,
+     0.1294
+    ],
+    "sourceHeightStd": 0.1018,
+    "roughnessMedian": 0.0578,
+    "roughnessAmplitude": 0.1275,
+    "roughnessEncoding": "R = 0.5 + 0.5 * (r - median) / amplitude (clipped); amplitude = max(p99.5 - med, med - p0.5, 0.04)",
+    "heightFlat": false,
+    "cavityMethod": "height cavity: max(blur(h, sigma=8px) - h, 0), 1 - 0.6 * norm(p99.5)",
+    "seamFix": {
+     "offsetBlend": false
+    },
+    "sourceZipSha256": "585c73d1e2dc8747074ef4fa4027795e3556fbe0fa43362c90c90b633f6956db",
+    "license": "CC0 1.0 (ambientCG site-wide)"
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.968,
+      0.884
+     ],
+     "R": [
+      0.894,
+      0.859
+     ],
+     "G": [
+      0.84,
+      0.832
+     ],
+     "B": [
+      0.87,
+      0.849
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      1.059,
+      0.963
+     ],
+     "B": [
+      1.064,
+      0.997
+     ]
+    },
+    "normalLength_p1_p99": [
+     1.0,
+     1.0001
+    ],
+    "normalMeanXY": [
+     0.0029,
+     -0.0015
+    ],
+    "normalMinZ": 1.0,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.1278,
+    "corr_N_R_vs_minus_dB_dcol": 0.0995,
+    "R_mean_std": [
+     0.5313,
+     0.1169
+    ],
+    "G_p1_mean": [
+     0.4667,
+     0.9384
+    ],
+    "B_mean_std": [
+     0.7361,
+     0.186
+    ]
+   }
+  },
+  {
+   "index": 15,
+   "class": "wood",
+   "size": 1024,
+   "outputs": [
+    {
+     "map": "DetailN",
+     "path": "art/material-library/v1/tiles/wood/wood_DetailN.png",
+     "sha256": "d60db9e5c28caaaa9ef02c75af34d7315330282d8041d2a14fe9357a833a9f56",
+     "bytes": 1533973
+    },
+    {
+     "map": "DetailRMH",
+     "path": "art/material-library/v1/tiles/wood/wood_DetailRMH.png",
+     "sha256": "b7e6cebcec58fbc0fa16952460a44b81094c7ef9f7f07659b1fc55967c2fcbf3",
+     "bytes": 2225563
+    }
+   ],
+   "sourceFiles": [
+    {
+     "file": "art/material-library/cc0-raw/Wood051/Wood051_2K-JPG_NormalDX.jpg",
+     "sha256": "ba93c1a4611a705f8cf0b57d462a7dff90975ec55d4df6c03f86bb15dce6285b"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Wood051/Wood051_2K-JPG_NormalGL.jpg",
+     "sha256": "3b175af16c417245ff8fa950de0f7dee6fc77804845825d7d5b988b30946e5e8"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Wood051/Wood051_2K-JPG_Roughness.jpg",
+     "sha256": "b4855f803bbbad6fbe8a78d514f453ba1c9989b2972775f46f835402de302b44"
+    },
+    {
+     "file": "art/material-library/cc0-raw/Wood051/Wood051_2K-JPG_Displacement.jpg",
+     "sha256": "45d7ed4db0f22c37fa7c1f559083ecc364f760abdca8d0c65d16ead163de61c3"
+    }
+   ],
+   "build": {
+    "source": "Wood051",
+    "convention": {
+     "sourceMaps": {
+      "normal": "Wood051_2K-JPG_NormalDX.jpg",
+      "normalGL": "Wood051_2K-JPG_NormalGL.jpg",
+      "roughness": "Wood051_2K-JPG_Roughness.jpg",
+      "height": "Wood051_2K-JPG_Displacement.jpg",
+      "ao": null
+     },
+     "meanAbs_DX_G_minus_inverted_GL_G": 0.00217,
+     "meanAbs_DX_G_minus_GL_G": 0.11468,
+     "meanAbs_DX_R_minus_GL_R": 0.00319,
+     "corr_DX_G_vs_minus_dHeight_drow": 0.9098,
+     "corr_DX_R_vs_minus_dHeight_dcol": 0.9083,
+     "sourceIsDirectX": true
+    },
+    "sourceRoughness_p5_p50_p95": [
+     0.4314,
+     0.5451,
+     0.6549
+    ],
+    "sourceHeightStd": 0.0927,
+    "roughnessMedian": 0.5431,
+    "roughnessAmplitude": 0.1412,
+    "roughnessEncoding": "R = 0.5 + 0.5 * (r - median) / amplitude (clipped); amplitude = max(p99.5 - med, med - p0.5, 0.04)",
+    "heightFlat": false,
+    "cavityMethod": "height cavity: max(blur(h, sigma=8px) - h, 0), 1 - 0.6 * norm(p99.5)",
+    "seamFix": {
+     "offsetBlend": false
+    },
+    "sourceZipSha256": "ef50cd051a1d998bf2a03e243e991474415d948af6d4b76d291c937654c97d4b",
+    "license": "CC0 1.0 (ambientCG site-wide)"
+   },
+   "measured": {
+    "seamRatio": {
+     "N_xy": [
+      0.846,
+      0.795
+     ],
+     "R": [
+      0.884,
+      0.849
+     ],
+     "G": [
+      0.789,
+      0.533
+     ],
+     "B": [
+      0.812,
+      0.677
+     ]
+    },
+    "seamRatioMeanInfo": {
+     "N_xy": [
+      1.006,
+      0.971
+     ],
+     "B": [
+      1.004,
+      0.976
+     ]
+    },
+    "normalLength_p1_p99": [
+     0.9962,
+     1.004
+    ],
+    "normalMeanXY": [
+     0.0002,
+     -0.0002
+    ],
+    "normalMinZ": 0.8588,
+    "heightFlat": false,
+    "corr_N_G_vs_minus_dB_drow": 0.7066,
+    "corr_N_R_vs_minus_dB_dcol": 0.6462,
+    "R_mean_std": [
+     0.5,
+     0.1946
+    ],
+    "G_p1_mean": [
+     0.4392,
+     0.8939
+    ],
+    "B_mean_std": [
+     0.5064,
+     0.2147
+    ]
+   }
+  }
+ ]
+}
