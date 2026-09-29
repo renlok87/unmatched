@@ -1,0 +1,40 @@
+{
+ "schema": "unmatched.w5c-material-channels/1",
+ "method": "editor buffer overview (ShowFlag.VisualizeBuffer 1; the editor ignores r.BufferVisualizationTarget and shows the 4x4 overview). Tiles: Specular (1,0), Roughness (1,3), Metallic (2,3); tile value = sRGB-encoded linear buffer value (calibrated: Specular 0.5 -> 186, encode(0.5) = 187.5). Frames: close-crystal/close-belt-buckle buffer overviews of h2-ue-frames r1",
+ "frames": {},
+ "specular_tile_median": 186.0,
+ "crystal_roughness": {
+  "tile_median": 112.0,
+  "tile_p10_p90": [
+   98.0,
+   117.0
+  ],
+  "expected_linear_ORM": 116.4,
+  "expected_if_ORM_were_sRGB": 44.9,
+  "orm_class_p50": 0.176,
+  "verdict": "linear: matches the ORM value, the sRGB mistake would read ~45"
+ },
+ "buckle_metallic": {
+  "pixels_metallic_gt_0_5": 847,
+  "figure_pixels": 115681,
+  "largest_blob_px": 784,
+  "largest_blob_bbox_tile_px": [
+   211,
+   246,
+   102,
+   139
+  ],
+  "metal_tile_median": 246.0,
+  "rest_of_figure_metallic_p99": 32.0,
+  "verdict": "metal only on the buckle (H2.1 metal class); everything else ~0"
+ },
+ "buckle_roughness": {
+  "tile_median_on_metal": 181.0,
+  "expected_linear_ORM_p50_0_447": 178.3,
+  "expected_if_sRGB": 114.0
+ },
+ "robe_roughness": {
+  "tile_median_bright_cloth": 248.0,
+  "expected_linear_0_96": 250.5
+ }
+}

@@ -1,0 +1,2172 @@
+{
+ "anti_aliasing_method": 4,
+ "assets": {
+  "base": "/Game/PipelineCandidates/KingArthur/H2/Meshes/SM_KingArthur_H2_Base",
+  "base_instance": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base",
+  "figure_instance": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2",
+  "skeletal": "/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2",
+  "skeleton": "/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2_Skeleton",
+  "team:base:Blue": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Blue",
+  "team:base:Red": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Red",
+  "team:figure:Blue": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Blue",
+  "team:figure:Red": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Red",
+  "texture:BC": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_BC",
+  "texture:N": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_N",
+  "texture:ORM": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_ORM",
+  "texture:TeamMask": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_TeamMask"
+ },
+ "buffer_visualization_target_before": "BaseColor",
+ "buffers": {
+  "front": "arthur-h2-front-buffer-overview-ue-editor.jpg",
+  "note": "r.BufferVisualizationTarget is ignored by the level viewport: ShowFlag.VisualizeBuffer 1 draws the buffer OVERVIEW (all G-buffer tiles: base colour, specular, subsurface, world normal / tangent, opacity, AO, roughness, metallic, shading model) for every target; the three captures per view were identical up to TSR/Lumen noise (mean |dRGB| 0.64-0.82), so one overview frame per view is kept",
+  "torso": "arthur-h2-torso-buffer-overview-ue-editor.jpg"
+ },
+ "cell": [
+  0.0,
+  50.0,
+  0.0
+ ],
+ "cleanup": {
+  "destroyed": [
+   "W5cA H2 figure - temporary",
+   "W5cA H2 base - temporary",
+   "W5cA H2 sky - temporary",
+   "W5cA H2 camera FOV35 - temporary"
+  ],
+  "op": "cleanup"
+ },
+ "console": [
+  "sg.ViewDistanceQuality 2",
+  "sg.AntiAliasingQuality 2",
+  "sg.ShadowQuality 2",
+  "sg.GlobalIlluminationQuality 2",
+  "sg.ReflectionQuality 2",
+  "sg.PostProcessQuality 2",
+  "sg.TextureQuality 2",
+  "sg.EffectsQuality 2",
+  "sg.FoliageQuality 2",
+  "sg.ShadingQuality 2",
+  "ShowFlag.Grid 0",
+  "ShowFlag.BillboardSprites 0",
+  "ShowFlag.Volumes 0",
+  "r.BufferVisualizationTarget BaseColor",
+  "ShowFlag.VisualizeBuffer 1",
+  "r.BufferVisualizationTarget Metallic",
+  "ShowFlag.VisualizeBuffer 1",
+  "r.BufferVisualizationTarget Roughness",
+  "ShowFlag.VisualizeBuffer 1",
+  "ShowFlag.VisualizeBuffer 2",
+  "sg.ViewDistanceQuality 3",
+  "sg.AntiAliasingQuality 3",
+  "sg.ShadowQuality 3",
+  "sg.GlobalIlluminationQuality 3",
+  "sg.ReflectionQuality 3",
+  "sg.PostProcessQuality 3",
+  "sg.TextureQuality 3",
+  "sg.EffectsQuality 3",
+  "sg.FoliageQuality 3",
+  "sg.ShadingQuality 3",
+  "r.BufferVisualizationTarget BaseColor",
+  "ShowFlag.Grid 2",
+  "ShowFlag.BillboardSprites 2",
+  "ShowFlag.Volumes 2",
+  "ShowFlag.VisualizeBuffer 2"
+ ],
+ "finished_at": "2026-09-29T13:39:04+00:00",
+ "frames": {
+  "arthur-h2-back-blue-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     -150.0,
+     31.0
+    ],
+    "rotation": [
+     0.0,
+     90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Blue",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Blue"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.8346,
+    1.7607,
+    1.8561
+   ],
+   "sha256": "391966060bda0d3e9c683d3c5aa2f42eebe4212354b2be3a9f73ca44306c56c1",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Blue",
+   "team_hex": "#3F6FD8",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     31.0
+    ],
+    "fov": 35.0,
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-back-red-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     -150.0,
+     31.0
+    ],
+    "rotation": [
+     0.0,
+     90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Red",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Red"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.8339,
+    1.815,
+    1.8343
+   ],
+   "sha256": "c936ce13832b9735d6351aaf1719bcb7ec6defa108ed9789ca0f978317b97b7d",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Red",
+   "team_hex": "#D0453A",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     31.0
+    ],
+    "fov": 35.0,
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-front-blue-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     250.0,
+     31.0
+    ],
+    "rotation": [
+     0.0,
+     -90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Blue",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Blue"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.2452,
+    2.0826,
+    2.5683
+   ],
+   "sha256": "8f86eb828056eb0a9252f9239dac955fd134a6b3de91bd0e5ecbe444d5c9af6c",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Blue",
+   "team_hex": "#3F6FD8",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     31.0
+    ],
+    "fov": 35.0,
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-front-buffer-overview-ue-editor.jpg": {
+   "buffer_visualization": "overview (ShowFlag.VisualizeBuffer 1)",
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     250.0,
+     31.0
+    ],
+    "rotation": [
+     0.0,
+     -90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.9988,
+    0.8557,
+    0.9975
+   ],
+   "sha256": "971bfbb4d3866a760ee459edf79d3f08c745bdb51e6d424c316e1f279dd7e49f",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Blue",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     31.0
+    ],
+    "fov": 35.0,
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-front-red-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     250.0,
+     31.0
+    ],
+    "rotation": [
+     0.0,
+     -90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Red",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Red"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.4823,
+    2.2476,
+    2.536
+   ],
+   "sha256": "77d0a65067e0e6fa5c22a5c81452a65ce9c2e8a9a634ee2932043bee832d90ae",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Red",
+   "team_hex": "#D0453A",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     31.0
+    ],
+    "fov": 35.0,
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-k2-1p6-az0-blue-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     742.3068,
+     1016.7165
+    ],
+    "rotation": [
+     -55.0,
+     -90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Blue",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Blue"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.628,
+    1.4688,
+    1.4436
+   ],
+   "sha256": "0b79fb6ba6ee4085d4b6db2f148dbed0b70d2ed740cbb11d12b5a98ffd792b74",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Blue",
+   "team_hex": "#3F6FD8",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "fov": 35.0,
+    "kind": "game K2 1.6x",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6-az0",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-k2-1p6-az0-red-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     742.3068,
+     1016.7165
+    ],
+    "rotation": [
+     -55.0,
+     -90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Red",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Red"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.4655,
+    1.8019,
+    1.4593
+   ],
+   "sha256": "6aabb4636298bff15f37a894d64b8d3be675fc6116d68f99570ac5b1ce27ee01",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Red",
+   "team_hex": "#D0453A",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "fov": 35.0,
+    "kind": "game K2 1.6x",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6-az0",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-k2-5x-az0-blue-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     271.4005,
+     344.1927
+    ],
+    "rotation": [
+     -55.0,
+     -90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Blue",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Blue"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.2794,
+    2.22,
+    2.2423
+   ],
+   "sha256": "9531107a6241cc8a41a9df163f413c436d5c5263c0771439f1a8ba741071d1a6",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Blue",
+   "team_hex": "#3F6FD8",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "fov": 35.0,
+    "kind": "game K2 5x",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x-az0",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-k2-5x-az0-red-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     271.4005,
+     344.1927
+    ],
+    "rotation": [
+     -55.0,
+     -90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Red",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Red"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.3564,
+    2.3473,
+    2.2153
+   ],
+   "sha256": "58281dd07a44654caab17c3eaeb456858c746da202548c0dd542e24dee1e6c73",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Red",
+   "team_hex": "#D0453A",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "fov": 35.0,
+    "kind": "game K2 5x",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x-az0",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-k2-5x-az180-blue-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     271.4005,
+     344.1927
+    ],
+    "rotation": [
+     -55.0,
+     -90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Blue",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Blue"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.2894,
+    2.314,
+    2.1482
+   ],
+   "sha256": "fdacd638912260d45068689edb6621ee69829e15da8788493e09ebbcaee161e1",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Blue",
+   "team_hex": "#3F6FD8",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "fov": 35.0,
+    "kind": "game K2 5x",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": -90.0
+   },
+   "view_name": "k2-5x-az180",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-k2-5x-az180-red-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     271.4005,
+     344.1927
+    ],
+    "rotation": [
+     -55.0,
+     -90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Red",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Red"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.2145,
+    2.154,
+    2.2039
+   ],
+   "sha256": "052c3d9eb79742f2aaec04d0f14586cf2f42fbee3165e642cd77ca291967f86d",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Red",
+   "team_hex": "#D0453A",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "fov": 35.0,
+    "kind": "game K2 5x",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": -90.0
+   },
+   "view_name": "k2-5x-az180",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-left-blue-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     200.0,
+     50.0,
+     31.0
+    ],
+    "rotation": [
+     0.0,
+     180.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Blue",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Blue"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.8645,
+    1.7768,
+    2.0557
+   ],
+   "sha256": "8b2661df8c4b550fdbb166c5b4029327d5ca14eca4658c2e58305a674b9628ba",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Blue",
+   "team_hex": "#3F6FD8",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     31.0
+    ],
+    "fov": 35.0,
+    "kind": "left side, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "left",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-left-red-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     200.0,
+     50.0,
+     31.0
+    ],
+    "rotation": [
+     0.0,
+     180.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Red",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Red"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.9164,
+    1.6952,
+    1.95
+   ],
+   "sha256": "826f246cc03001e11c9e158ec431dcfff57327a73e86cb7a4ab190bd98be235b",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Red",
+   "team_hex": "#D0453A",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     31.0
+    ],
+    "fov": 35.0,
+    "kind": "left side, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "left",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-torso-blue-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     135.0,
+     42.0
+    ],
+    "rotation": [
+     0.0,
+     -90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Blue",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Blue"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.983,
+    2.7992,
+    2.7157
+   ],
+   "sha256": "58de184c61cefda26d1fd71308ef269f5f601e13595eb88d5e8969aa1c77ac99",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Blue",
+   "team_hex": "#3F6FD8",
+   "view": {
+    "eye": [
+     0.0,
+     135.0,
+     42.0
+    ],
+    "fov": 35.0,
+    "kind": "torso close-up, FOV 35, 85 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "torso",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-torso-buffer-overview-ue-editor.jpg": {
+   "buffer_visualization": "overview (ShowFlag.VisualizeBuffer 1)",
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     135.0,
+     42.0
+    ],
+    "rotation": [
+     0.0,
+     -90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    1.6455,
+    1.5208,
+    1.517
+   ],
+   "sha256": "d24f117f276db2684cb38c0bf99a4062f9c2e29d03f30a3d4ca41bfb230d99b4",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Blue",
+   "view": {
+    "eye": [
+     0.0,
+     135.0,
+     42.0
+    ],
+    "fov": 35.0,
+    "kind": "torso close-up, FOV 35, 85 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "torso",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "arthur-h2-torso-red-ue-editor.jpg": {
+   "camera": {
+    "fov": 35.0,
+    "label": "W5cA H2 camera FOV35 - temporary",
+    "location": [
+     0.0,
+     135.0,
+     42.0
+    ],
+    "rotation": [
+     0.0,
+     -90.0,
+     0.0
+    ]
+   },
+   "capture": "EditorAppToolset.CaptureViewport via MCP 127.0.0.1:8123 (piloted CameraActor, horizontal FOV 35.0, centred 16:9 crop resized to 1920x1080)",
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "jpeg_quality": 90,
+   "materials": {
+    "base": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Red",
+    "figure": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Red"
+   },
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    2.8448,
+    2.5908,
+    2.6896
+   ],
+   "sha256": "271245b41cc1a661d238305b6b1e0bfd5deec8924d62c01f5aee35bb321b6486",
+   "subject": "King Arthur H2.1 (/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2)",
+   "team": "Red",
+   "team_hex": "#D0453A",
+   "view": {
+    "eye": [
+     0.0,
+     135.0,
+     42.0
+    ],
+    "fov": 35.0,
+    "kind": "torso close-up, FOV 35, 85 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "torso",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  }
+ },
+ "gi_reflections": {
+  "r.DynamicGlobalIlluminationMethod": 1,
+  "r.ReflectionMethod": 1
+ },
+ "key_rotation_note": "S08ArtBoardProfiles.json writes the key as \"rotation\": [0, -55, 30] and S08BoardArt.cpp builds FRotator(N[0], N[1], N[2]) = (Pitch 0, Yaw -55, Roll 30): a horizontal key in the packaged client, while the editor probe the profile reproduces has Pitch -55, Yaw 30 (control level). These frames use the editor-probe rotation; the packaged interpretation is reported, not fixed here",
+ "key_rotation_pitch_yaw_roll": [
+  -55.0,
+  30.0,
+  0.0
+ ],
+ "kind": "EDITOR review frames (live UnrealEditor via MCP); not packaged, no HUD, no boardState, no RENDER fingerprint, not K1/K2 acceptance",
+ "light_profile": {
+  "data": {
+   "directional": {
+    "castShadows": true,
+    "intensity": 4.5,
+    "name": "key",
+    "posUU": [
+     -350,
+     -150,
+     600
+    ],
+    "rotation": [
+     0,
+     -55,
+     30
+    ],
+    "shadow": {
+     "cascades": 2,
+     "contactShadowLength": 0.0,
+     "distanceUU": 3000
+    }
+   },
+   "exposure": {
+    "bias": 0.0,
+    "ev100": 1.3,
+    "maxBrightness": 2.46229,
+    "method": "histogram-fixed",
+    "minBrightness": 2.46229
+   },
+   "points": [
+    {
+     "intensity": 85,
+     "name": "warm",
+     "posUU": [
+      260,
+      -300,
+      250
+     ],
+     "radiusUU": 450,
+     "role": "warm"
+    }
+   ],
+   "sky": {
+    "calibration": "W4-A bench: K1 board ROI median luma of the packaged DX12 + Lumen frame matched to the P17 editor K1 (131.2): sky 8 -> 112.1, 12 -> 139.4, 16 -> 159.5; 11.2 = x1.4 (K2 5x cobble corner 105.2 in P17 matched at x1.5)",
+    "colorLinear": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "intensity": 11.2,
+    "lowerHemisphereIsBlack": false,
+    "replaces": "point fill 700 cd at (0,-100,550), radius 1800 (pre-W4)",
+    "source": "cubemap"
+   },
+   "source": "ART-005 editor probe reproduced for the opt-in Cobble review (S08BoardActor before T3.2); measured candidate, not a lighting norm",
+   "units": {
+    "directional": "lux",
+    "point": "candelas"
+   }
+  },
+  "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json lightProfiles.cobble-probe"
+ },
+ "measure_after": {
+  "actor": {
+   "location": [
+    0.0,
+    50.0,
+    0.0
+   ],
+   "yaw": 90.0
+  },
+  "asset_bounds": {
+   "extent": [
+    10.3504,
+    15.2247,
+    27.1254
+   ],
+   "max": [
+    12.683,
+    14.4316,
+    60.0577
+   ],
+   "min": [
+    -8.0178,
+    -16.0178,
+    5.8068
+   ],
+   "origin": [
+    2.3326,
+    -0.7931,
+    32.9323
+   ]
+  },
+  "base_asset_bounds": {
+   "max": [
+    14.7466,
+    14.9927,
+    6.0296
+   ],
+   "min": [
+    -14.7656,
+    -15.0176,
+    0.0
+   ]
+  },
+  "base_materials": [
+   {
+    "TeamColor": [
+     0.049707,
+     0.158961,
+     0.686685,
+     1.0
+    ],
+    "class": "MaterialInstanceConstant",
+    "parent": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base",
+    "path": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Blue",
+    "scalars": {
+     "SideBandWeight": 1.0,
+     "TeamDye": 0.0,
+     "TeamDyeGain": 0.0
+    },
+    "textures": {
+     "BaseColorTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_BC",
+      "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": true
+     },
+     "NormalTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_N",
+      "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": false
+     },
+     "ORMTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_ORM",
+      "compression": "<TextureCompressionSettings.TC_MASKS: 2>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": false
+     },
+     "TeamMaskTexture": null
+    }
+   }
+  ],
+  "bone0": "SKEL_UM_Humanoid",
+  "bones_in_component": 18,
+  "facing": {
+   "front_xy": [
+    12.3527,
+    0.4598
+   ],
+   "front_yaw_deg_component": 2.132,
+   "left_minus_right_xy": [
+    0.4598,
+    -12.3527
+   ],
+   "method": "side = mean(arm_upper, leg_upper) _L - _R in component space; front = side turned +90 deg about Z (UE: X forward, Y right); 0 deg = +X",
+   "weapon_side_y_component": 7.6714
+  },
+  "figure_materials": [
+   {
+    "TeamColor": [
+     0.049707,
+     0.158961,
+     0.686685,
+     1.0
+    ],
+    "class": "MaterialInstanceConstant",
+    "parent": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2",
+    "path": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Blue",
+    "scalars": {
+     "SideBandWeight": 0.0,
+     "TeamDye": 1.0,
+     "TeamDyeGain": 5.65
+    },
+    "textures": {
+     "BaseColorTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_BC",
+      "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": true
+     },
+     "NormalTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_N",
+      "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": false
+     },
+     "ORMTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_ORM",
+      "compression": "<TextureCompressionSettings.TC_MASKS: 2>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": false
+     },
+     "TeamMaskTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_TeamMask",
+      "compression": "<TextureCompressionSettings.TC_GRAYSCALE: 3>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": false
+     }
+    }
+   }
+  ],
+  "lights": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "W5cA H2 sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "op": "measure",
+  "points_component_uu": {
+   "Head": [
+    -0.3038,
+    -0.0283,
+    50.0572
+   ],
+   "Weapon": [
+    6.642,
+    7.6714,
+    37.3319
+   ],
+   "arm_upper_L": [
+    1.8318,
+    -7.1212,
+    42.9105
+   ],
+   "arm_upper_R": [
+    0.9122,
+    7.3465,
+    42.9105
+   ],
+   "foot_L": [
+    1.2187,
+    -7.3664,
+    8.5804
+   ],
+   "foot_R": [
+    -0.0074,
+    7.1626,
+    8.5804
+   ],
+   "hand_R": [
+    4.4065,
+    8.8178,
+    36.7801
+   ],
+   "head": [
+    -0.3038,
+    -0.0283,
+    50.0572
+   ],
+   "hips": [
+    2.7513,
+    -0.0283,
+    22.6802
+   ],
+   "leg_upper_L": [
+    2.7513,
+    -5.0981,
+    22.3737
+   ],
+   "leg_upper_R": [
+    2.7513,
+    5.1396,
+    22.3737
+   ],
+   "root": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "spine": [
+    2.7513,
+    -0.0283,
+    27.5845
+   ],
+   "weapon_R": [
+    6.642,
+    7.6714,
+    37.3319
+   ]
+  }
+ },
+ "measure_yaw0": {
+  "actor": {
+   "location": [
+    0.0,
+    50.0,
+    0.0
+   ],
+   "yaw": 0.0
+  },
+  "asset_bounds": {
+   "extent": [
+    10.3504,
+    15.2247,
+    27.1254
+   ],
+   "max": [
+    12.683,
+    14.4316,
+    60.0577
+   ],
+   "min": [
+    -8.0178,
+    -16.0178,
+    5.8068
+   ],
+   "origin": [
+    2.3326,
+    -0.7931,
+    32.9323
+   ]
+  },
+  "base_asset_bounds": {
+   "max": [
+    14.7466,
+    14.9927,
+    6.0296
+   ],
+   "min": [
+    -14.7656,
+    -15.0176,
+    0.0
+   ]
+  },
+  "base_materials": [
+   {
+    "TeamColor": [
+     0.049707,
+     0.158961,
+     0.686685,
+     1.0
+    ],
+    "class": "MaterialInstanceConstant",
+    "parent": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base",
+    "path": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Blue",
+    "scalars": {
+     "SideBandWeight": 1.0,
+     "TeamDye": 0.0,
+     "TeamDyeGain": 0.0
+    },
+    "textures": {
+     "BaseColorTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_BC",
+      "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": true
+     },
+     "NormalTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_N",
+      "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": false
+     },
+     "ORMTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_ORM",
+      "compression": "<TextureCompressionSettings.TC_MASKS: 2>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": false
+     },
+     "TeamMaskTexture": null
+    }
+   }
+  ],
+  "bone0": "SKEL_UM_Humanoid",
+  "bones_in_component": 18,
+  "facing": {
+   "front_xy": [
+    12.3527,
+    0.4598
+   ],
+   "front_yaw_deg_component": 2.132,
+   "left_minus_right_xy": [
+    0.4598,
+    -12.3527
+   ],
+   "method": "side = mean(arm_upper, leg_upper) _L - _R in component space; front = side turned +90 deg about Z (UE: X forward, Y right); 0 deg = +X",
+   "weapon_side_y_component": 7.6714
+  },
+  "figure_materials": [
+   {
+    "TeamColor": [
+     0.049707,
+     0.158961,
+     0.686685,
+     1.0
+    ],
+    "class": "MaterialInstanceConstant",
+    "parent": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2",
+    "path": "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Blue",
+    "scalars": {
+     "SideBandWeight": 0.0,
+     "TeamDye": 1.0,
+     "TeamDyeGain": 5.65
+    },
+    "textures": {
+     "BaseColorTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_BC",
+      "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": true
+     },
+     "NormalTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_N",
+      "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": false
+     },
+     "ORMTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_ORM",
+      "compression": "<TextureCompressionSettings.TC_MASKS: 2>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": false
+     },
+     "TeamMaskTexture": {
+      "asset": "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_TeamMask",
+      "compression": "<TextureCompressionSettings.TC_GRAYSCALE: 3>",
+      "flip_green": false,
+      "size": [
+       2048,
+       2048
+      ],
+      "srgb": false
+     }
+    }
+   }
+  ],
+  "lights": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "W5cA H2 sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "op": "measure",
+  "points_component_uu": {
+   "Head": [
+    -0.3038,
+    -0.0283,
+    50.0572
+   ],
+   "Weapon": [
+    6.642,
+    7.6714,
+    37.3319
+   ],
+   "arm_upper_L": [
+    1.8318,
+    -7.1212,
+    42.9105
+   ],
+   "arm_upper_R": [
+    0.9122,
+    7.3465,
+    42.9105
+   ],
+   "foot_L": [
+    1.2187,
+    -7.3664,
+    8.5804
+   ],
+   "foot_R": [
+    -0.0074,
+    7.1626,
+    8.5804
+   ],
+   "hand_R": [
+    4.4065,
+    8.8178,
+    36.7801
+   ],
+   "head": [
+    -0.3038,
+    -0.0283,
+    50.0572
+   ],
+   "hips": [
+    2.7513,
+    -0.0283,
+    22.6802
+   ],
+   "leg_upper_L": [
+    2.7513,
+    -5.0981,
+    22.3737
+   ],
+   "leg_upper_R": [
+    2.7513,
+    5.1396,
+    22.3737
+   ],
+   "root": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "spine": [
+    2.7513,
+    -0.0283,
+    27.5845
+   ],
+   "weapon_R": [
+    6.642,
+    7.6714,
+    37.3319
+   ]
+  }
+ },
+ "original_level": "/Game/S08/S08Arena",
+ "profile": "king-arthur-h2-ue-import/1",
+ "restored_level": "/Game/S08/S08Arena",
+ "restored_level_dirty": false,
+ "review_level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+ "review_level_dirty_after_reload": false,
+ "run": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-ue-import",
+ "run_assets_dirty": {
+  "base": false,
+  "base_instance": false,
+  "figure_instance": false,
+  "skeletal": false,
+  "skeleton": false,
+  "team:base:Blue": false,
+  "team:base:Red": false,
+  "team:figure:Blue": false,
+  "team:figure:Red": false,
+  "texture:BC": false,
+  "texture:N": false,
+  "texture:ORM": false,
+  "texture:TeamMask": false
+ },
+ "scalability_after": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_before": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_during": {
+  "sg.AntiAliasingQuality": 2,
+  "sg.EffectsQuality": 2,
+  "sg.FoliageQuality": 2,
+  "sg.GlobalIlluminationQuality": 2,
+  "sg.PostProcessQuality": 2,
+  "sg.ReflectionQuality": 2,
+  "sg.ShadingQuality": 2,
+  "sg.ShadowQuality": 2,
+  "sg.TextureQuality": 2,
+  "sg.ViewDistanceQuality": 2
+ },
+ "schema": "unmatched.h2-ue-review/1",
+ "screen_percentage": {
+  "r.Editor.Viewport.ScreenPercentage": 100,
+  "r.ScreenPercentage": 100
+ },
+ "setup": {
+  "hidden_review_actors": [
+   "P17 arthur base",
+   "P17 arthur figure",
+   "P17 barrel",
+   "P17 harpy1 base",
+   "P17 harpy1 figure",
+   "P17 harpy2 base",
+   "P17 harpy2 figure",
+   "P17 harpy3 base",
+   "P17 harpy3 figure",
+   "P17 medusa base",
+   "P17 medusa figure",
+   "P17 merlin base",
+   "P17 merlin figure"
+  ],
+  "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+  "lights_after": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "W5cA H2 sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "lights_before": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 4,
+    "dynamic_shadow_distance_movable_light": 40000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 700.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "op": "setup"
+ },
+ "sheets": {
+  "arthur-h2-sheet-k2.jpg": {
+   "blender_frames": {
+    "k2-1p6-az0": "game_K2_az0.jpg",
+    "k2-5x-az0": "game_K2S05_az0.jpg",
+    "k2-5x-az180": "game_K2S05_az180.jpg"
+   },
+   "rows": [
+    "k2-5x-az0",
+    "k2-5x-az180",
+    "k2-1p6-az0"
+   ],
+   "sha256": "434a5813bc71d0f15ec1d3227a2b0997d25f17db6259c1681859d2a9ea3311dd"
+  },
+  "arthur-h2-sheet-views.jpg": {
+   "blender_frames": {
+    "back": "ortho_back.jpg",
+    "front": "ortho_front.jpg",
+    "left": "ortho_left.jpg",
+    "torso": "close_torso_az0.jpg"
+   },
+   "rows": [
+    "front",
+    "left",
+    "back",
+    "torso"
+   ],
+   "sha256": "9e79cafdc28fb1998b251c2504fbd3f5b64248180da55c7a6ab509c90628693c"
+  }
+ },
+ "started_at": "2026-09-29T13:34:06+00:00",
+ "tag": "r3",
+ "team_difference": {
+  "back": {
+   "blue_frame_mean_rgb_where_changed": [
+    79.4,
+    101.3,
+    159.4
+   ],
+   "changed_fraction": 0.11997,
+   "changed_px": 248762,
+   "mean_abs_diff_all": 9.1364,
+   "red_frame_mean_rgb_where_changed": [
+    153.7,
+    78.2,
+    67.8
+   ]
+  },
+  "front": {
+   "blue_frame_mean_rgb_where_changed": [
+    93.3,
+    113.8,
+    162.1
+   ],
+   "changed_fraction": 0.07553,
+   "changed_px": 156611,
+   "mean_abs_diff_all": 6.4655,
+   "red_frame_mean_rgb_where_changed": [
+    161.2,
+    92.3,
+    81.7
+   ]
+  },
+  "k2-1p6-az0": {
+   "blue_frame_mean_rgb_where_changed": [
+    133.3,
+    141.3,
+    157.3
+   ],
+   "changed_fraction": 0.00557,
+   "changed_px": 11551,
+   "mean_abs_diff_all": 1.5707,
+   "red_frame_mean_rgb_where_changed": [
+    151.8,
+    137.1,
+    137.7
+   ]
+  },
+  "k2-5x-az0": {
+   "blue_frame_mean_rgb_where_changed": [
+    108.3,
+    121.9,
+    151.9
+   ],
+   "changed_fraction": 0.02105,
+   "changed_px": 43648,
+   "mean_abs_diff_all": 2.9523,
+   "red_frame_mean_rgb_where_changed": [
+    150.4,
+    110.3,
+    104.6
+   ]
+  },
+  "k2-5x-az180": {
+   "blue_frame_mean_rgb_where_changed": [
+    96.8,
+    112.6,
+    153.2
+   ],
+   "changed_fraction": 0.02758,
+   "changed_px": 57196,
+   "mean_abs_diff_all": 3.2969,
+   "red_frame_mean_rgb_where_changed": [
+    147.8,
+    98.3,
+    92.4
+   ]
+  },
+  "left": {
+   "blue_frame_mean_rgb_where_changed": [
+    83.1,
+    107.9,
+    161.5
+   ],
+   "changed_fraction": 0.06284,
+   "changed_px": 130297,
+   "mean_abs_diff_all": 5.9381,
+   "red_frame_mean_rgb_where_changed": [
+    159.1,
+    82.9,
+    73.0
+   ]
+  },
+  "torso": {
+   "blue_frame_mean_rgb_where_changed": [
+    83.0,
+    94.3,
+    138.7
+   ],
+   "changed_fraction": 0.07395,
+   "changed_px": 153352,
+   "mean_abs_diff_all": 5.7861,
+   "red_frame_mean_rgb_where_changed": [
+    136.0,
+    80.9,
+    72.1
+   ]
+  }
+ },
+ "teams": {
+  "Blue": "#3F6FD8",
+  "Red": "#D0453A"
+ },
+ "tool": "tools/tripo-pipeline/review/h2_ue_review.py",
+ "warmup_mean_abs_diff": [
+  2.296,
+  2.2675,
+  2.2444,
+  2.2494,
+  2.1409,
+  2.3619,
+  2.3569,
+  2.2147,
+  2.2458,
+  2.2789,
+  2.2244,
+  2.2497,
+  2.1489,
+  2.3514,
+  2.3526,
+  2.2239,
+  2.2563,
+  2.2694,
+  2.2132,
+  2.2341,
+  2.1285,
+  2.3547,
+  2.3374,
+  2.2069
+ ]
+}

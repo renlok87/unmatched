@@ -26,13 +26,17 @@ Commands:
                      library blender/candidate_build/, no per-asset builder scripts
   adopt              pin an externally built static prop candidate (FBX + BC/N/ORM, e.g. from
                      blender/static_prop_candidate.py) against its candidate/read-back reports
-                     (profile static-candidate); copies nothing
+                     (profile static-candidate); copies nothing. Profile skeletal-adopt: pin an externally
+                     built skeletal candidate (the H2 bake of a hero: SK + base FBX, 2K BC/N/ORM/TeamMask) against
+                     the bake's own reports and normalise them for ue-import (skeletal_adopt.py); copies nothing
   ue-import          UE (only --backend mcp): import into /Game/PipelineCandidates/... without
                      duplicates and measure the import contracts
   run                all stages of the run's profile (skips up-to-date stages):
                        passthrough:        preflight -> import -> verify -> export [-> ue-import]
                        skeletal-candidate: preflight -> import -> verify -> atlas -> build [-> ue-import]
                        static-candidate:   preflight -> adopt [-> ue-import]
+                       skeletal-adopt:     preflight -> adopt [-> ue-import]  (ue-import = the skeletal-candidate
+                                           import on the adopted files: UM master MIs, legacy FbxFactory, sockets)
   resume             continue an interrupted run from the first unfinished stage
   status             print the manifest summary
   snapshot           hash every run file (proof of "no duplicates" between runs)
@@ -74,7 +78,7 @@ import time
 from pathlib import Path
 
 TOOL_NAME = "tripo-pipeline"
-TOOL_VERSION = "0.6.0"
+TOOL_VERSION = "0.7.0"  # 0.7.0 (W5c): profile skeletal-adopt (H2 bakes into UE)
 RUN_SCHEMA = "unmatched.tripo-pipeline.run/1"
 SPEC_SCHEMA = "unmatched.tripo-pipeline.source-spec/1"
 REQUEST_SCHEMA = "unmatched.tripo-pipeline.generation-request/1"
@@ -185,6 +189,42 @@ runpy.run_path(r"@TARGET@", run_name="__main__")
 '''
 UE_STATIC_LOGIC_VERSION = "ue-static-candidate/2"  # /2 (0.6.0): checks nanite == false, normal import method, master
 ADOPT_LOGIC_VERSION = "adopt/1"
+# skeletal-adopt (0.7.0): ue-import of an adopted skeletal candidate = exec_ue_candidate on the adopt report's views,
+# plus the skeletal LOD/triangle measurement in the editor (UE_PY_MEASURE_SKELETAL)
+UE_SKELETAL_ADOPT_LOGIC_VERSION = "ue-skeletal-adopt/1"
+UE_PY_MEASURE_SKELETAL = r'''"""tripo-pipeline ue-import: skeletal mesh measurement (run inside the live editor).
+
+MCP SkeletalMeshTools has no triangle count: LOD triangles are read through GeometryScript
+(copy_mesh_from_skeletal_mesh into a transient DynamicMesh; nothing is created or saved).
+args: {"mesh": "/Game/.../SK_X.SK_X", "lods": <LOD count from MCP>, "out"}
+"""
+import json
+import sys
+
+import unreal as u
+
+a = json.load(open(sys.argv[-1], encoding="utf-8"))
+res = {"mesh": a["mesh"], "triangles": [], "vertices": []}
+try:
+    mesh = u.load_asset(a["mesh"])
+    if mesh is None:
+        raise RuntimeError("asset not found: %s" % a["mesh"])
+    for lod in range(max(1, int(a.get("lods") or 1))):
+        dm = u.DynamicMesh()
+        read = u.GeometryScriptMeshReadLOD()
+        read.set_editor_property("lod_index", lod)
+        _dm, outcome = u.GeometryScript_AssetUtils.copy_mesh_from_skeletal_mesh(
+            mesh, dm, u.GeometryScriptCopyMeshFromAssetOptions(), read)
+        if "SUCCESS" not in str(outcome):
+            raise RuntimeError("LOD %d: %s" % (lod, outcome))
+        res["triangles"].append(int(u.GeometryScript_MeshQueries.get_num_triangle_i_ds(dm)))
+        res["vertices"].append(int(u.GeometryScript_MeshQueries.get_vertex_count(dm)))
+    res["method"] = "GeometryScript_AssetUtils.copy_mesh_from_skeletal_mesh + get_num_triangle_i_ds"
+except Exception as exc:  # noqa: BLE001 - reported to the CLI
+    res["error"] = "%s: %s" % (type(exc).__name__, exc)
+with open(a["out"], "w", encoding="utf-8", newline="\n") as handle:
+    handle.write(json.dumps(res, indent=1, sort_keys=True) + "\n")
+'''
 
 EXIT_OK = 0
 EXIT_FAILED = 1
@@ -215,13 +255,16 @@ BACKENDS = ("headless", "mcp")
 PASSTHROUGH = "passthrough"
 CANDIDATE = "skeletal-candidate"
 STATIC = "static-candidate"
-PROFILES = (PASSTHROUGH, CANDIDATE, STATIC)
-BUILD_PROFILE_KINDS = (CANDIDATE, STATIC)  # profiles that read --build-profile
+SKELETAL_ADOPT = "skeletal-adopt"  # 0.7.0: an externally built skeletal candidate (H2 bake), see skeletal_adopt.py
+PROFILES = (PASSTHROUGH, CANDIDATE, STATIC, SKELETAL_ADOPT)
+BUILD_PROFILE_KINDS = (CANDIDATE, STATIC, SKELETAL_ADOPT)  # profiles that read --build-profile
+SKELETAL_KINDS = (CANDIDATE, SKELETAL_ADOPT)  # profiles whose ue-import is exec_ue_candidate
 STAGES = ("preflight", "import", "verify", "export")  # passthrough profile (T3)
 CANDIDATE_STAGES = ("preflight", "import", "verify", "atlas", "build")
 # static-candidate: the candidate FBX/BC/N/ORM were built outside this tool (static_prop_candidate.py);
 # `adopt` pins their bytes against the candidate report before the UE stage imports them.
 STATIC_STAGES = ("preflight", "adopt")
+SKELETAL_ADOPT_STAGES = ("preflight", "adopt")  # skeletal-adopt: adopt pins the H2 bake (skeletal_adopt.py)
 UE_STAGE = "ue-import"
 ALL_STAGES = STAGES + (UE_STAGE,)
 KNOWN_STAGES = ("preflight", "import", "verify", "export", "atlas", "build", "adopt", UE_STAGE)
@@ -875,7 +918,8 @@ def run_profile(manifest: dict) -> str:
 
 
 def base_stages(manifest: dict) -> tuple:
-    return {CANDIDATE: CANDIDATE_STAGES, STATIC: STATIC_STAGES}.get(run_profile(manifest), STAGES)
+    return {CANDIDATE: CANDIDATE_STAGES, STATIC: STATIC_STAGES,
+            SKELETAL_ADOPT: SKELETAL_ADOPT_STAGES}.get(run_profile(manifest), STAGES)
 
 
 def stage_order(manifest: dict) -> tuple:
@@ -1131,6 +1175,24 @@ def exec_preflight(ctx: Context, staging: Path) -> StageResult:
             check("build_profile_valid", False, error=str(exc))
         check("candidate_scripts_present", ATLAS_SCRIPT.is_file() and BLENDER_SCRIPTS["build"].is_file(),
               scripts={"atlas": sha256_file(ATLAS_SCRIPT) if ATLAS_SCRIPT.is_file() else None})
+    elif run_profile(m) == SKELETAL_ADOPT:
+        try:
+            profile, ppath = load_build_profile(ctx)
+            check("build_profile_valid", profile.get("kind") == SKELETAL_ADOPT,
+                  measured={"path": m["config"]["build_profile"], "id": profile["profile_id"],
+                            "kind": profile.get("kind"), "sha256": sha256_file(ppath)}, expected={"kind": SKELETAL_ADOPT})
+            check("build_profile_role_is_primary", profile["source_role"] == m["config"]["primary_role"],
+                  measured=profile["source_role"], expected=m["config"]["primary_role"])
+            sa = skeletal_adopt()
+            sa.pointers(profile)  # the bake's report format is known
+            missing = [rel for rel in sa.candidate_files(profile).values() if not ctx.repo_path(rel).is_file()]
+            check("skeletal_candidate_files_present", not missing, missing=missing)
+        except (PipelineError, KeyError) as exc:
+            check("build_profile_valid", False, error=str(exc))
+        except Exception as exc:  # noqa: BLE001 - skeletal_adopt.AdoptError (unknown report format)
+            check("build_profile_valid", False, error="%s: %s" % (type(exc).__name__, exc))
+        module = TOOL_DIR / "skeletal_adopt.py"
+        check("skeletal_adopt_module_present", module.is_file(), measured=sha256_file(module) if module.is_file() else None)
     try:
         preset = fbx_preset(ctx)
         check("fbx_preset_is_um_fbx_v1", preset["name"] == FBX_PRESET_NAME and float(preset["rotation_z"]) == 90.0
@@ -1552,7 +1614,7 @@ def ue_plan(ctx: Context) -> dict:
             names["texture:" + key] = "%s/Textures/%s" % (folder, tex["asset"])
         return {"folder": folder, "name": u["static_asset"], "kind": STATIC, "primary": names["static"],
                 "names": names, "profile": profile}
-    if run_profile(m) == CANDIDATE:
+    if run_profile(m) in SKELETAL_KINDS:
         profile, _ = load_build_profile(ctx)
         u = profile["ue"]
         names = {"skeletal": "%s/Meshes/%s" % (folder, u["skeletal_asset"]),
@@ -1573,8 +1635,12 @@ def ue_plan(ctx: Context) -> dict:
                 names["base_material"] = "%s/Materials/%s" % (folder, u["base_material"])
             for name in u["instances"]:
                 names["instance:" + name] = "%s/Materials/%s" % (folder, name)
-        atlas_path = ctx.run_path("reports/atlas-report.json")
-        atlas_files = json.loads(atlas_path.read_text(encoding="utf-8"))["files"] if atlas_path.is_file() else {}
+        if run_profile(m) == SKELETAL_ADOPT:
+            # every texture of the adopted candidate is pinned by adopt (candidate.textures)
+            atlas_files = {k: {"file": v} for k, v in profile["candidate"]["textures"].items()}
+        else:
+            atlas_path = ctx.run_path("reports/atlas-report.json")
+            atlas_files = json.loads(atlas_path.read_text(encoding="utf-8"))["files"] if atlas_path.is_file() else {}
         for key, tex in u["textures"].items():
             if tex.get("optional") and tex["file_key"] not in atlas_files:
                 continue  # optional input the atlas stage did not produce (e.g. no team_color.mask)
@@ -1595,6 +1661,11 @@ def fp_ue_import(ctx: Context) -> dict:
         _, ppath = load_build_profile(ctx)
         return {"logic": UE_STATIC_LOGIC_VERSION, "backend": ctx.backend, "ue": m["config"].get("ue"),
                 "profile_sha256": sha256_file(ppath),
+                "adopt_report": stage_output_sha(m, "adopt", "reports/adopt-report.json")}
+    if run_profile(m) == SKELETAL_ADOPT:
+        _, ppath = load_build_profile(ctx)
+        return {"logic": UE_SKELETAL_ADOPT_LOGIC_VERSION, "candidate_logic": UE_CANDIDATE_LOGIC_VERSION,
+                "backend": ctx.backend, "ue": m["config"].get("ue"), "profile_sha256": sha256_file(ppath),
                 "adopt_report": stage_output_sha(m, "adopt", "reports/adopt-report.json")}
     if run_profile(m) == CANDIDATE:
         profile, ppath = load_build_profile(ctx)
@@ -1787,6 +1858,21 @@ def ue_import_fbx(ue, staging: Path, key: str, args: dict) -> dict:
     return res
 
 
+def ue_editor_measure(ue, staging: Path, key: str, source: str, args: dict) -> dict:
+    """Run a read-only editor-Python measurement (e.g. UE_PY_MEASURE_SKELETAL); the result dict carries "error" on an
+    editor-side failure instead of raising (a measurement never blocks the import itself)."""
+    script = staging / ("ue_measure_%s.py" % key)
+    script.write_text(source, encoding="utf-8", newline="\n")
+    args_path, out_path = staging / ("ue_measure_%s.args.json" % key), staging / ("ue_measure_%s.out.json" % key)
+    args_path.write_text(json.dumps(dict(args, out=out_path.as_posix()), indent=1), encoding="utf-8")
+    try:
+        res = ue.editor_python(script, args_path, out_path)
+    except PipelineError as exc:
+        res = {"error": str(exc)}
+    ue.calls.append({"editor_python": script.name, "args": args, "result": res})
+    return res
+
+
 def import_contract_checks(ue, imports, sk, base, getp, check, measured, vertex_mask_base=False) -> None:
     """Engine gate memo §1 item 5 (W4-B): legacy FbxFactory, the normal import method and Nanite off, read back."""
     contract = {}
@@ -1846,7 +1932,7 @@ def ue_delete_owned(ue, assets) -> list:
 
 def exec_ue_import(ctx: Context, staging: Path) -> StageResult:
     m = ctx.manifest
-    if run_profile(m) == CANDIDATE:
+    if run_profile(m) in SKELETAL_KINDS:
         return exec_ue_candidate(ctx, staging)
     if run_profile(m) == STATIC:
         return exec_ue_static_candidate(ctx, staging)
@@ -2076,18 +2162,25 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     plan = ue_plan(ctx)
     profile, names, folder = plan["profile"], plan["names"], plan["folder"]
     u = profile["ue"]
-    build = json.loads(ctx.run_path("reports/build-report.json").read_text(encoding="utf-8"))
-    atlas = json.loads(ctx.run_path("reports/atlas-report.json").read_text(encoding="utf-8"))
-    rels = candidate_export_rels(profile)
-    inputs = {}
-    for stage in ("atlas", "build"):
-        for rel, info in ((m["stages"].get(stage) or {}).get("outputs") or {}).items():
-            if rel.startswith("work/"):
-                continue
-            path = ctx.run_path(rel)
-            if not path.is_file() or sha256_file(path) != info["sha256"]:
-                raise PipelineError("%s output missing or changed since the %s stage: %s" % (stage, stage, rel))
-            inputs[rel] = info["sha256"]
+    adopted = run_profile(m) == SKELETAL_ADOPT
+    if adopted:
+        # skeletal-adopt (0.7.0): the H2 bake pinned by adopt; its reports normalised into build/atlas views
+        build, atlas, inputs, src_paths = adopted_skeletal_inputs(ctx)
+    else:
+        build = json.loads(ctx.run_path("reports/build-report.json").read_text(encoding="utf-8"))
+        atlas = json.loads(ctx.run_path("reports/atlas-report.json").read_text(encoding="utf-8"))
+        rels = candidate_export_rels(profile)
+        inputs = {}
+        for stage in ("atlas", "build"):
+            for rel, info in ((m["stages"].get(stage) or {}).get("outputs") or {}).items():
+                if rel.startswith("work/"):
+                    continue
+                path = ctx.run_path(rel)
+                if not path.is_file() or sha256_file(path) != info["sha256"]:
+                    raise PipelineError("%s output missing or changed since the %s stage: %s" % (stage, stage, rel))
+                inputs[rel] = info["sha256"]
+        src_paths = {"skeletal": ctx.run_path(rels["skeletal"]), "base": ctx.run_path(rels["base"])}
+        src_paths.update({"texture:" + k: ctx.run_path("textures/" + v["file"]) for k, v in atlas["files"].items()})
 
     owned = set(rec.get("ue_owned_assets") or [])
     before = ue_listing(ue, folder)
@@ -2121,12 +2214,11 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
 
     # textures (the DirectX normal and linear ORM are imported from the atlas stage files; an optional texture such
     # as the TeamMask of team_color.mask only when the atlas stage produced it, see ue_plan)
-    tex_files = {k: v["file"] for k, v in atlas["files"].items()}
     textures = {k: t for k, t in u["textures"].items() if "texture:" + k in names}
     for key, tcfg in sorted(textures.items()):
         pkg = names["texture:" + key]
         track(ue.call("texture", "import_file", {"folder_path": pkg.rsplit("/", 1)[0], "asset_name": tcfg["asset"],
-                                                 "source_file": str(ctx.run_path("textures/" + tex_files[tcfg["file_key"]]))}))
+                                                 "source_file": str(src_paths["texture:" + tcfg["file_key"]])}))
         props = {"SRGB": tcfg["srgb"], "CompressionSettings": tcfg["compression"]}
         if "flip_green" in tcfg:
             props["bFlipGreenChannel"] = tcfg["flip_green"]
@@ -2286,12 +2378,12 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     sk_pkg, base_pkg = names["skeletal"], names["base"]
     vertex_mask_base = base_mode == "vertex-mask"
     imports = {}
-    for key, pkg, asset, rel, kind, vc in (("skeletal", sk_pkg, u["skeletal_asset"], rels["skeletal"], "skeletal", "ignore"),
-                                           ("base", base_pkg, u["base_asset"], rels["base"], "static",
-                                            "replace" if vertex_mask_base else "ignore")):
+    for key, pkg, asset, kind, vc in (("skeletal", sk_pkg, u["skeletal_asset"], "skeletal", "ignore"),
+                                      ("base", base_pkg, u["base_asset"], "static",
+                                       "replace" if vertex_mask_base else "ignore")):
         res = ue_import_fbx(ue, staging, key, {
             "kind": kind, "folder_path": pkg.rsplit("/", 1)[0], "asset_name": asset,
-            "source_file": str(ctx.run_path(rel)), "import_materials": False, "import_textures": False,
+            "source_file": str(src_paths[key]), "import_materials": False, "import_textures": False,
             "combine_meshes": True, "vertex_colors": vc, "normal_import_method": UE_NORMAL_IMPORT_METHOD})
         track([{"refPath": x} for x in res.get("imported") or []])
         imports[key] = res
@@ -2526,6 +2618,24 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
                                  "vertices": ue.call("skeletal", "get_vertex_count", {"mesh": sk, "lod_index": 0}),
                                  "lods": ue.call("skeletal", "get_lod_count", {"mesh": sk}),
                                  "triangles": "not measured: SkeletalMeshTools has no triangle count"}
+    if u.get("measure_skeletal_triangles"):
+        # 0.7.0: triangles per LOD read in the editor (GeometryScript), compared with the build's round trip
+        lods = measured["skeletal_lod0"]["lods"]
+        tri = ue_editor_measure(ue, staging, "skeletal_triangles", UE_PY_MEASURE_SKELETAL,
+                                {"mesh": ue_object_path(sk_pkg), "lods": lods})
+        measured["skeletal_lod0"]["triangles"] = (tri.get("triangles") or [None])[0] if not tri.get("error") \
+            else "not measured: %s" % tri["error"]
+        measured["skeletal_lods"] = tri
+        band = skeletal_adopt().expected_skeletal_triangles(build)
+        t0 = measured["skeletal_lod0"]["triangles"]
+        check("skeletal_triangles_lod0_as_build", isinstance(t0, int) and band["min"] <= t0 <= band["max"],
+              t0, band, "Blender round trip %d (%s); UE's mesh build may drop the near-degenerate slivers the build "
+                        "counted" % (band["max"], " + ".join(band["meshes"])))
+        want_lods = (profile.get("expectations") or {}).get("skeletal_lods")
+        if want_lods is not None:
+            check("skeletal_lod_count", lods == want_lods and len(tri.get("triangles") or []) == want_lods,
+                  {"mcp_get_lod_count": lods, "geometry_script_lods": len(tri.get("triangles") or [])}, want_lods,
+                  "the FBX carries LOD0 only; no LODs are generated at import (proposal: LODs are a later decision)")
     sockets = ue.call("skeletal", "get_socket_names", {"mesh": sk}) or []
     sock_detail = {}
     for s in sockets:
@@ -2586,7 +2696,8 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     }
     passed = all(c["passed"] for c in checks.values())
     report = {
-        "stage": UE_STAGE, "logic": UE_CANDIDATE_LOGIC_VERSION, "profile": profile["profile_id"],
+        "stage": UE_STAGE, "logic": UE_SKELETAL_ADOPT_LOGIC_VERSION if adopted else UE_CANDIDATE_LOGIC_VERSION,
+        "candidate_logic": UE_CANDIDATE_LOGIC_VERSION, "profile": profile["profile_id"], "kind": run_profile(m),
         "backend": ue.describe(), "status": "technically_imported" if passed else "failed",
         "inputs": dict(sorted(inputs.items())),
         "destination": {"folder": folder, "assets": names},
@@ -2597,7 +2708,9 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
         "not_checked": [
             "art acceptance, silhouette, lighting, K1/K2/K3 with HUD and boardState (art track)",
             "animation clips and deformation (no clips are imported by this stage)",
-            "skeletal triangle count inside UE (no MCP tool); Blender round trip is authoritative",
+            ("skeletal triangle count inside UE: measured through GeometryScript (check skeletal_triangles_lod0_as_build)"
+             if u.get("measure_skeletal_triangles") else
+             "skeletal triangle count inside UE (no MCP tool); Blender round trip is authoritative"),
             "packaged build / cook of the candidate folder",
             "selection collision capsule (04 §3.1 proposal)",
             ("M_UM_* graphs: verified by tools/tripo-pipeline/um_masters.py verify (graph signature, CPD layout); this "
@@ -2613,7 +2726,7 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     failed = sorted(k for k, c in checks.items() if not c["passed"])
     return StageResult({"reports/ue-import-report.json": out, "reports/ue-mcp-calls.json": calls},
                        {"passed": passed, "failed_checks": failed, "primary_asset": plan["primary"],
-                        "kind": "skeletal-candidate", "assets": len(after)},
+                        "kind": run_profile(m), "assets": len(after)},
                        passed, None if passed else "ue-import failed: %s" % ", ".join(failed))
 
 
@@ -2635,9 +2748,21 @@ def static_candidate_files(profile: dict) -> dict:
     return files
 
 
+def skeletal_adopt():
+    """tools/tripo-pipeline/skeletal_adopt.py (profile skeletal-adopt); imported on use."""
+    import skeletal_adopt as module
+    return module
+
+
 def fp_adopt(ctx: Context) -> dict:
     m = ctx.manifest
     profile, ppath = load_build_profile(ctx)
+    if run_profile(m) == SKELETAL_ADOPT:
+        sa = skeletal_adopt()
+        files = {key: (sha256_file(ctx.repo_path(rel)) if ctx.repo_path(rel).is_file() else None)
+                 for key, rel in sorted(sa.candidate_files(profile).items())}
+        return {"logic": sa.ADOPT_SKELETAL_LOGIC_VERSION, "module_sha256": sha256_file(TOOL_DIR / "skeletal_adopt.py"),
+                "profile_sha256": sha256_file(ppath), "files": files, "fbx_preset": fbx_preset(ctx)["sha256"]}
     primary = source_file(m, m["config"]["primary_source"], m["config"]["primary_role"])
     files = {}
     for key, rel in sorted(static_candidate_files(profile).items()):
@@ -2653,6 +2778,8 @@ def exec_adopt(ctx: Context, staging: Path) -> StageResult:
     Nothing is copied: the report records repo-relative paths and SHA-256; ue-import re-hashes them.
     """
     m = ctx.manifest
+    if run_profile(m) == SKELETAL_ADOPT:
+        return exec_adopt_skeletal(ctx, staging)
     profile, ppath = load_build_profile(ctx)
     c = profile["candidate"]
     files = static_candidate_files(profile)
@@ -2739,6 +2866,50 @@ def exec_adopt(ctx: Context, staging: Path) -> StageResult:
     return StageResult({"reports/adopt-report.json": path},
                        {"passed": passed, "failed_checks": failed, "inputs": len(hashes)},
                        passed, None if passed else "adopt failed: %s" % ", ".join(failed))
+
+
+def exec_adopt_skeletal(ctx: Context, staging: Path) -> StageResult:
+    """Profile skeletal-adopt: pin the H2 bake (SK + base FBX, 2K BC/N/ORM/TeamMask) against the bake's own reports and
+    write the normalised views ue-import reads (skeletal_adopt.adopt). Copies nothing."""
+    m = ctx.manifest
+    profile, ppath = load_build_profile(ctx)
+    sa = skeletal_adopt()
+    preset = fbx_preset(ctx)
+    try:
+        res = sa.adopt(profile, ctx.repo_path, sha256_file, lambda p: inspect_png(p).get("pixels"),
+                       json.loads(preset["path"].read_text(encoding="utf-8")))
+    except sa.AdoptError as exc:
+        raise PipelineError("adopt: %s" % exc)
+    passed = res["passed"]
+    out = {"stage": "adopt", "logic": sa.ADOPT_SKELETAL_LOGIC_VERSION, "kind": SKELETAL_ADOPT,
+           "status": "measured" if passed else "failed",
+           "profile": {"path": m["config"]["build_profile"], "id": profile["profile_id"], "sha256": sha256_file(ppath)},
+           "fbx_preset": {"path": preset["rel"], "sha256": preset["sha256"]},
+           "bake": res["bake"], "inputs": res["inputs"], "keys": res["keys"], "checks": res["checks"],
+           "passed": passed, "views": res["views"],
+           "note": "the candidate is built outside this tool (%s, profile %s); adopt copies nothing and re-hashes it; "
+                   "views.build / views.atlas are what ue-import reads" % (res["bake"]["report_format"],
+                                                                            res["bake"]["profile_id"])}
+    path = staging / "adopt-report.json"
+    path.write_text(dump_json(out), encoding="utf-8")
+    failed = sorted(k for k, v in res["checks"].items() if not v["passed"])
+    return StageResult({"reports/adopt-report.json": path},
+                       {"passed": passed, "failed_checks": failed, "inputs": len(res["inputs"])},
+                       passed, None if passed else "adopt failed: %s" % ", ".join(failed))
+
+
+def adopted_skeletal_inputs(ctx: Context) -> tuple:
+    """(build view, atlas view, inputs {rel: sha}, paths {"skeletal", "base", "texture:<key>": Path}) of an adopted
+    skeletal candidate; every pinned file is re-hashed (a file changed since adopt blocks the UE stage)."""
+    adopt = json.loads(ctx.run_path("reports/adopt-report.json").read_text(encoding="utf-8"))
+    for rel, digest in adopt["inputs"].items():
+        path = ctx.repo_path(rel)
+        if not path.is_file() or sha256_file(path) != digest:
+            raise PipelineError("adopted candidate file missing or changed since adopt: %s" % rel)
+    keys = adopt["keys"]
+    paths = {"skeletal": ctx.repo_path(keys["fbx:skeletal"]), "base": ctx.repo_path(keys["fbx:base"])}
+    paths.update({k: ctx.repo_path(v) for k, v in keys.items() if k.startswith("texture:")})
+    return adopt["views"]["build"], adopt["views"]["atlas"], dict(adopt["inputs"]), paths
 
 
 def exec_ue_static_candidate(ctx: Context, staging: Path) -> StageResult:
@@ -3339,6 +3510,10 @@ def cmd_ue_import(ctx: Context, args) -> int:
         wanted.update(import_materials=False, import_textures=False,
                       import_note="skeletal-candidate: meshes imported with import_materials=false, "
                                   "import_textures=false; textures come from the atlas stage")
+    elif run_profile(ctx.manifest) == SKELETAL_ADOPT:
+        wanted.update(import_materials=False, import_textures=False,
+                      import_note="skeletal-adopt: meshes imported with import_materials=false, "
+                                  "import_textures=false; textures are the adopted 2K runtime PNGs")
     elif run_profile(ctx.manifest) == STATIC:
         wanted.update(import_materials=False, import_textures=False,
                       import_note="static-candidate: mesh imported with import_materials=false, "
@@ -3555,9 +3730,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--run-id")
     p.add_argument("--triangle-loss-tolerance", type=float, default=DEFAULT_TRIANGLE_LOSS_TOLERANCE)
     p.add_argument("--profile", choices=PROFILES, default=PASSTHROUGH,
-                   help="passthrough (T3 static FBX), skeletal-candidate (atlas + build from --build-profile) or "
-                        "static-candidate (adopt a static prop candidate FBX + BC/N/ORM named by --build-profile)")
-    p.add_argument("--build-profile", help="repo-relative build profile JSON (skeletal-candidate, static-candidate)")
+                   help="passthrough (T3 static FBX), skeletal-candidate (atlas + build from --build-profile), "
+                        "static-candidate (adopt a static prop candidate FBX + BC/N/ORM named by --build-profile) or "
+                        "skeletal-adopt (adopt an H2 bake: SK + base FBX + 2K BC/N/ORM/TeamMask, --build-profile)")
+    p.add_argument("--build-profile", help="repo-relative build profile JSON (skeletal-candidate, static-candidate, "
+                                            "skeletal-adopt)")
     p = with_run(sub.add_parser("register-source"))
     p.add_argument("--spec", required=True)
     for name in [s for s in KNOWN_STAGES if s != UE_STAGE]:

@@ -1,0 +1,125 @@
+{
+  "backend": "headless",
+  "checks": {
+    "backend_known": {
+      "measured": {
+        "backend": "headless",
+        "command": [
+          "blender.exe"
+        ],
+        "isolation": "process"
+      },
+      "passed": true
+    },
+    "blender_runnable": {
+      "backend": "headless",
+      "measured": "5.2.2 LTS",
+      "passed": true
+    },
+    "blender_stage_scripts_present": {
+      "passed": true,
+      "scripts": {
+        "ao_bake": "2558150e37719aa3e2fd65711c9697367dc7f9fb41fe03f4fd6003f6ec3b7504",
+        "build": "e547b2e9e8c6798bfb06ba92db4c3b43e4d9cf7f8855da82944ea40aaa48f177",
+        "export": "50f440a29b0be261c151062d6be81899bf89eace819081fa388fb589ffcd53c2",
+        "import": "b908a5bed1300cbbad452e42cb26a856012c9fadff73c0541bc256c7b1b3bdd6"
+      }
+    },
+    "build_profile_role_is_primary": {
+      "expected": "h2-parts-glb",
+      "measured": "h2-parts-glb",
+      "passed": true
+    },
+    "build_profile_valid": {
+      "expected": {
+        "kind": "skeletal-adopt"
+      },
+      "measured": {
+        "id": "merlin-h2-ue-import/1",
+        "kind": "skeletal-adopt",
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-ue-import.json",
+        "sha256": "f7586cd97de8eb9d0b2fe26b52a264ffb8b56ba6d1a0f4b7ec24e11103692312"
+      },
+      "passed": true
+    },
+    "fbx_preset_is_um_fbx_v1": {
+      "expected": {
+        "name": "UM_FBX_v1",
+        "rotation_z": 90.0,
+        "use_triangles": true
+      },
+      "measured": {
+        "name": "UM_FBX_v1",
+        "rel": "blender/_tools/presets/UM_FBX_v1.json",
+        "rotation_z": 90.0,
+        "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+        "use_triangles": true
+      },
+      "note": "axes standard 04-blender-production.md §1 (authored -Y -> UE +X), verified by ART-001",
+      "passed": true
+    },
+    "originals_outside_run_dir": {
+      "offenders": [],
+      "passed": true
+    },
+    "primary_source_registered": {
+      "measured": "tripo-de0654b5-h2:h2-parts-glb",
+      "passed": true
+    },
+    "profile": {
+      "measured": "skeletal-adopt",
+      "passed": true,
+      "required": false
+    },
+    "python_version": {
+      "measured": "3.13",
+      "passed": true
+    },
+    "repo_root_is_git_checkout": {
+      "passed": true
+    },
+    "skeletal_adopt_module_present": {
+      "measured": "3f5150bc39f23228cad09265eee71a1fa40fab234efe87729da9293c97f7fef9",
+      "passed": true
+    },
+    "skeletal_candidate_files_present": {
+      "missing": [],
+      "passed": true
+    },
+    "source_files_present": {
+      "missing": [],
+      "passed": true
+    },
+    "source_files_unchanged_since_registration": {
+      "changed": [],
+      "passed": true,
+      "verified": 2
+    },
+    "sources_registered": {
+      "measured": [
+        "tripo-de0654b5-h2"
+      ],
+      "passed": true
+    },
+    "tool_has_no_network_imports": {
+      "measured": [],
+      "passed": true
+    },
+    "unreal_editor_cmd_present": {
+      "measured": true,
+      "note": "informational; this scaffold never launches UnrealEditor-Cmd",
+      "passed": true,
+      "required": false
+    }
+  },
+  "network": {
+    "paid_tasks_created": 0,
+    "tripo_calls": 0
+  },
+  "passed": true,
+  "stage": "preflight",
+  "tool": {
+    "name": "tripo-pipeline",
+    "version": "0.7.0"
+  }
+}

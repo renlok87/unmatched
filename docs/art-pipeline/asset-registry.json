@@ -614,6 +614,27 @@
             {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/team-contrast.json", "root": "repo", "kind": "file", "expect": "exists", "role": "различимость команд в сером и при deuteranopia, K2 1,6×, до/после"}
           ],
           "note": "UE: /Game/PipelineCandidates/KingArthur/20260929-w4b-um-master (MI фигуры и подставки + 4 командные MI, без своего Material) — в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import`; import / повтор skipped / --force / skipped без Name_1. Кадры контрольной сцены P1.7 — editor-mcp-viewport, диагностика, не K1/K2-приёмка."
+        },
+        {
+          "layer": "ue-editor-import H2.1 CLI 0.7.0 skeletal-adopt 20260929-h2-ue-import (/Game/PipelineCandidates/KingArthur/H2, W5c-A)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-ue-import.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль импорта H2 (kind skeletal-adopt, king-arthur-h2-ue-import/1, формат отчётов h2-bake-arthur/1): файлы бейка king-arthur-h2-bake/1, кости v2, MI от M_UM_Figure, команды Blue/Red", "sha256": "f8288f30a315522f10c90632a44f095540dea64293e6968eb3f3795166fc6ab0"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-ue-import/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest: preflight/adopt (headless), ue-import (mcp) completed, tool 0.7.0"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-ue-import/reports/adopt-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "adopt: байты FBX и 2K-карт сверены с rig/textures-report, manifest-h2 и validate v2 (нормализатор arthur_h2), конвенции N DirectX / ORM / TeamMask; 13/13 проверок", "sha256": "f78918019ef87eb0c4ba5680a201646621094328fa0b85d3f6e73e569dac99ab"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-ue-import/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report (прогон --force): technically_imported, 25/25 проверок (17 костей v2 + кость 0 SKEL_UM_Humanoid, лицо +X, рост 55,0 uu, треугольники LOD0 38 684, 1 LOD, 1 слот, текстуры 2K sRGB/compression, MI, сокеты)", "sha256": "7c8978640d43294ea9d58a38f29530423ff1a8c3769f556b4b295b1fa942466a"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/export/SK_KingArthur_H2.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "импортированный скелетный FBX H2.1", "sha256": "9f3478122333d6488d4847654583b0e56a54c1a6415923ce658bf61d5356e828"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake/export/SM_KingArthur_H2_Base.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "импортированная подставка H2.1", "sha256": "dc75338c4b4ab543298da1af4c1bea4d6cfc440063c6647df23a40882aa73c0c"},
+            {"path": "/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "скелетный меш в UE (13 uasset папки H2, add -f)", "sha256": "f3ba0fb17b862f74151f78a4eee7cc27a6688196fd42caa865a4ac0be4cd33a9"},
+            {"path": "/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2", "root": "art-worktree", "kind": "ue-asset", "expect": "exists", "role": "та же папка H2 в арт-worktree (13 файлов байт в байт)", "sha256": "f3ba0fb17b862f74151f78a4eee7cc27a6688196fd42caa865a4ac0be4cd33a9"},
+            {"path": "docs/art-pipeline/king-arthur-h2-ue-import.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт W5c-A: импорт, проверки, идемпотентность, кадры Cobble, сравнение с Blender H2.1"},
+            {"path": "docs/art-pipeline/evidence/w5c-arthur-h2-ue-2026-09-29/ue-import-idempotency.json", "root": "repo", "kind": "file", "expect": "exists", "role": "executed / skipped / «already exists» / --force без Name_1 / skipped"},
+            {"path": "docs/art-pipeline/evidence/w5c-arthur-h2-ue-2026-09-29/arthur-h2-sheet-views.jpg", "root": "repo", "kind": "file", "expect": "exists", "role": "лист: Blender H2.1 | UE Blue | UE Red — спереди, слева, сзади, торс (редакторные кадры, свет Cobble, High)", "sha256": "9e79cafdc28fb1998b251c2504fbd3f5b64248180da55c7a6ab509c90628693c"},
+            {"path": "docs/art-pipeline/evidence/w5c-arthur-h2-ue-2026-09-29/arthur-h2-sheet-k2.jpg", "root": "repo", "kind": "file", "expect": "exists", "role": "лист: Blender H2.1 | UE Blue | UE Red — K2 5× (лицом и спиной), K2 1,6×", "sha256": "434a5813bc71d0f15ec1d3227a2b0997d25f17db6259c1681859d2a9ea3311dd"}
+          ],
+          "note": "W5c-A: игровая модель H2.1 (бейк king-arthur-h2-bake/1: тело 36 469 + меч 2 215 tris, подставка 1 500) импортирована CLI-профилем skeletal-adopt в /Game/PipelineCandidates/KingArthur/H2 (13 uasset: SK + Skeleton + SM, 4 текстуры 2K, MI фигуры/подставки + Blue/Red). Кадры — editor-mcp-viewport на контрольной сцене P1.7 со светом Cobble (профиль cobble-probe в памяти: SkyLight 11,2, ключ CSM 3000/2): диагностика, не K1/K2-приёмка и не художественная приёмка; сталь в UE светлее, чем в Blender (яркое небо в отражениях, F0 0,52 — решение пользователя); палитра Blue/Red — тестовая (Q-304 открыт); бюджеты — предложение (GD-058)."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения по статусу; путь /Game/Meshes/SK/SK_KingArthur — плановый.", "proposedChange": "Нет."},
@@ -773,6 +794,26 @@
             {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/team-contrast.json", "root": "repo", "kind": "file", "expect": "exists", "role": "различимость команд в сером и при deuteranopia, K2 1,6×, до/после"}
           ],
           "note": "UE: /Game/PipelineCandidates/Merlin/20260929-w4b-um-master (MI фигуры и подставки + 4 командные MI, без своего Material) — в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import`; import / повтор skipped / --force / skipped без Name_1. Кадры контрольной сцены P1.7 — editor-mcp-viewport, диагностика, не K1/K2-приёмка."
+        },
+        {
+          "layer": "ue-editor-import H2.1 CLI 0.7.0 skeletal-adopt 20260929-h2-ue-import (/Game/PipelineCandidates/Merlin/H2, W5c)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-ue-import.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль импорта H2 (kind skeletal-adopt, merlin-h2-ue-import/1): файлы бейка merlin-h2-bake/2, контракт костей v2, MI от M_UM_Figure, команды Blue/Red"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-ue-import/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest: preflight/adopt (headless), ue-import (mcp) completed, tool 0.7.0"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-ue-import/reports/adopt-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "adopt: байты FBX и 2K-карт сверены с отчётами бейка, конвенции N DirectX / ORM, скелет v2; 14/14 проверок", "sha256": "ce239756e458e22b1b423331c2ad9ca96c6b3b47d48f1b9aba219ac322fa9a7e"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-ue-import/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report (прогон --force): technically_imported, 24/24 проверок (кости v2 + кость 0, лицо +X, рост, треугольники LOD0 33 967, 1 LOD, 1 слот, текстуры sRGB/compression, MI, сокеты)", "sha256": "8789f645065418d27c6d0e939d90f5ff7a09443f1cfe5f3193ba55d8115d3e6d"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "импортированный скелетный FBX H2.1", "sha256": "b1db49c6f7400bcea0bc23e84fef0b77e76f15caed16ab7e8bd611eb32dc38ee"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SM_Merlin_H2_Base.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "импортированная подставка H2.1", "sha256": "79132631c7afd30d6f4519d3696b9f579ad1e34e9537674ec1c08d993ef611db"},
+            {"path": "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "скелетный меш в UE (13 uasset папки H2, add -f)", "sha256": "48974c54b5befe954b38790f287419cb4b3e7682c8cfbe5cea5e2273e89a8b81"},
+            {"path": "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2", "root": "art-worktree", "kind": "ue-asset", "expect": "exists", "role": "та же папка H2 в арт-worktree (байт в байт)", "sha256": "48974c54b5befe954b38790f287419cb4b3e7682c8cfbe5cea5e2273e89a8b81"},
+            {"path": "docs/art-pipeline/merlin-h2-ue-import.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт W5c-A: импорт, проверки, идемпотентность, кадры Cobble, сравнение с Blender"},
+            {"path": "docs/art-pipeline/evidence/w5c-merlin-h2-ue-2026-09-29/ue-import-idempotency.json", "root": "repo", "kind": "file", "expect": "exists", "role": "executed / skipped / «already exists» / --force / skipped без Name_1"},
+            {"path": "docs/art-pipeline/evidence/w5c-merlin-h2-ue-2026-09-29/material-channels.json", "root": "repo", "kind": "file", "expect": "exists", "role": "буферы Metallic/Roughness в редакторе: ORM линейный, металл только на пряжке"}
+          ],
+          "note": "W5c-A: игровая модель H2.1 (бейк merlin-h2-bake/2, 33 967 tris + подставка 2 240) импортирована CLI-профилем skeletal-adopt в /Game/PipelineCandidates/Merlin/H2 (13 uasset: SK + Skeleton + SM, 4 текстуры 2K, MI фигуры/подставки + Blue/Red). Кадры — editor-mcp-viewport на контрольной сцене P1.7 (Cobble): диагностика, не K1/K2-приёмка и не художественная приёмка; палитра Blue/Red — диагностическая (Q-304 открыт). Бюджеты — предложение (GD-058)."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения.", "proposedChange": "Нет."},

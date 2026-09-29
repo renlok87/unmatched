@@ -1,0 +1,16 @@
+{
+ "schema": "unmatched.w5c-fov-probe/1",
+ "date": "2026-09-29",
+ "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene (loaded in memory, nothing saved, S08Arena restored, not dirty)",
+ "method": "two CameraActors piloted in turn (FOV 8 and FOV 35), both at (0,0,1500) looking straight down (pitch -90); EditorAppToolset.CaptureViewport with the same captureTransform; viewport 2033x1216",
+ "result": {
+  "cameraFOV_reported": [
+   8,
+   35
+  ],
+  "mean_abs_rgb_difference_between_frames": 0.2089,
+  "board_playfield_px": "5 cells (500 uu) ~ 1068 px of 2033 in both frames -> 214 px / 100 uu -> 951 uu visible at 1500 uu -> horizontal FOV ~35.2 deg in both"
+ },
+ "conclusion": "the level viewport renders at ~35 deg horizontal whatever FOV the piloted CameraActor has; CaptureViewport only reports the camera FOV. All W5c-A review frames therefore use FOV 35 (the game camera's FOV), the near-orthographic views are perspective at 200 uu",
+ "script": "C:/tmp/w5c_arthur/py/fov_probe.py (scratch, outside the repo)"
+}

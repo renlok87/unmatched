@@ -1,0 +1,114 @@
+{
+ "schema": "unmatched.w5c-ue-idempotency/1",
+ "run": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-ue-import",
+ "ue_folder": "/Game/PipelineCandidates/KingArthur/H2",
+ "sequence": [
+  "1: ue-import -> executed (13 assets created)",
+  "2: ue-import (no --force) -> skipped: fingerprint unchanged, probe: folder listing == owned assets",
+  "3: MCP import_file of the same names -> «already exists», listing unchanged (already-exists-probe.json)",
+  "4: ue-import --force -> previous 13 deleted by ownership, 13 re-created, no Name_1",
+  "5: ue-import after --force -> skipped (probe: listing == owned)"
+ ],
+ "journal": [
+  {
+   "ts": "2026-09-29T11:45:15+00:00",
+   "event": "ue_configured"
+  },
+  {
+   "ts": "2026-09-29T11:45:15+00:00",
+   "event": "stage_started",
+   "stage": "ue-import",
+   "forced": false
+  },
+  {
+   "ts": "2026-09-29T11:45:56+00:00",
+   "event": "ue_assets_owned",
+   "assets": 13,
+   "deleted_previous": 0
+  },
+  {
+   "ts": "2026-09-29T11:50:33+00:00",
+   "event": "stage_completed",
+   "stage": "ue-import",
+   "outputs": {
+    "reports/ue-import-report.json": "new",
+    "reports/ue-mcp-calls.json": "new"
+   }
+  },
+  {
+   "ts": "2026-09-29T11:50:50+00:00",
+   "event": "stage_skipped",
+   "stage": "ue-import",
+   "reason": "completed; fingerprint and output hashes unchanged"
+  },
+  {
+   "ts": "2026-09-29T11:51:31+00:00",
+   "event": "stage_started",
+   "stage": "ue-import",
+   "forced": true
+  },
+  {
+   "ts": "2026-09-29T11:53:45+00:00",
+   "event": "ue_assets_owned",
+   "assets": 13,
+   "deleted_previous": 13
+  },
+  {
+   "ts": "2026-09-29T11:56:03+00:00",
+   "event": "stage_completed",
+   "stage": "ue-import",
+   "outputs": {
+    "reports/ue-import-report.json": "replaced",
+    "reports/ue-mcp-calls.json": "replaced"
+   }
+  },
+  {
+   "ts": "2026-09-29T13:40:51+00:00",
+   "event": "stage_skipped",
+   "stage": "ue-import",
+   "reason": "completed; fingerprint and output hashes unchanged"
+  }
+ ],
+ "after_force": {
+  "assets": [
+   "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2",
+   "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base",
+   "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Blue",
+   "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Red",
+   "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Blue",
+   "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Red",
+   "/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2",
+   "/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2_Skeleton",
+   "/Game/PipelineCandidates/KingArthur/H2/Meshes/SM_KingArthur_H2_Base",
+   "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_BC",
+   "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_N",
+   "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_ORM",
+   "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_TeamMask"
+  ],
+  "previous_assets_deleted": [
+   "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2",
+   "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base",
+   "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Blue",
+   "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Base_Red",
+   "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Blue",
+   "/Game/PipelineCandidates/KingArthur/H2/Materials/MI_KingArthur_H2_Red",
+   "/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2",
+   "/Game/PipelineCandidates/KingArthur/H2/Meshes/SM_KingArthur_H2_Base",
+   "/Game/PipelineCandidates/KingArthur/H2/Meshes/SK_KingArthur_H2_Skeleton",
+   "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_BC",
+   "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_N",
+   "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_ORM",
+   "/Game/PipelineCandidates/KingArthur/H2/Textures/T_KingArthur_H2_TeamMask"
+  ],
+  "same_set": true,
+  "numbered_duplicates": []
+ },
+ "already_exists_probe": {
+  "unchanged": true,
+  "count": 13,
+  "responses": [
+   "import_asset: T_KingArthur_H2_BC at /Game/PipelineCandidates/KingArthur/H2/Textures already exists",
+   "import_asset: SK_KingArthur_H2 at /Game/PipelineCandidates/KingArthur/H2/Meshes already exists"
+  ]
+ }
+}

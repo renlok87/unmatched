@@ -26,6 +26,7 @@ Env:
   FAKE_UE_RETURN_SIDE_PRODUCTS  "1": import_file also returns the materials it created (default: only the
                        mesh and its skeleton, like the real UE 5.8 MCP, measured 2026-09-28)
   FAKE_UE_IMPORT_CONVEX  simple collision elements a static import creates (default 1, like Interchange)
+  FAKE_UE_SK_TRIS_DELTA  integer added to the skeletal LOD triangles of the editor-Python measurement (0.7.0)
 """
 
 import json
@@ -72,6 +73,17 @@ def editor_python(state, text):
         Path(re.search(r'with open\(r"([^"]+)"', text).group(1)).write_text("started\n", encoding="utf-8")
         script = Path(re.search(r'runpy.run_path\(r"([^"]+)"', text).group(1))
     a = json.loads(args_path.read_text(encoding="utf-8"))
+    if "skeletal mesh measurement" in script.read_text(encoding="utf-8"):
+        # UE_PY_MEASURE_SKELETAL (0.7.0): LOD triangles through GeometryScript; FAKE_UE_SK_TRIS_DELTA shifts them
+        mesh = state["assets"].get(a["mesh"].split(".")[0])
+        if mesh is None or "tris" not in mesh:
+            res = {"mesh": a["mesh"], "error": "RuntimeError: asset not found: %s" % a["mesh"]}
+        else:
+            tris = mesh["tris"] + int(os.environ.get("FAKE_UE_SK_TRIS_DELTA", "0"))
+            res = {"mesh": a["mesh"], "triangles": [tris] * max(1, int(a.get("lods") or 1)),
+                   "vertices": [tris // 2] * max(1, int(a.get("lods") or 1)), "method": "fake GeometryScript"}
+        Path(a["out"]).write_text(json.dumps(res), encoding="utf-8")
+        return None
     res = {"kind": a.get("kind"), "factory": "FbxFactory", "normal_import_method": a.get("normal_import_method")}
     if "FBX import with an explicit legacy FbxFactory" not in script.read_text(encoding="utf-8"):
         res["error"] = "fake editor: unknown script %s" % script.name
@@ -160,8 +172,36 @@ def mesh_import(state, toolset, args, vcio="Ignore"):
     state["log"].append("LogFbx: Loading FBX Scene from %s" % fbx.as_posix())
     build_path = run / "reports/build-report.json"
     readback_path = run / "reports/fbx-readback.json"
+    rig_path = run / "reports/rig-report.json"  # h2_bake_arthur bake (skeletal-adopt, format h2-bake-arthur/1)
     static = "static_mesh" in toolset
-    if static and readback_path.exists():
+    if rig_path.exists() and not build_path.exists():
+        # mesh data straight from the bake's FBX read-back (export frame, metres): UE = (x, -y, z) x 100 (ART-001);
+        # deliberately NOT through skeletal_adopt_formats (the adopt views must agree with this independent mapping)
+        rig = json.loads(rig_path.read_text(encoding="utf-8"))
+        is_base = rig["exports"]["base_fbx"]["file"].rsplit("/", 1)[-1] == fbx.name
+        meshes = rig["readback"]["base" if is_base else "skeletal"]["meshes"]
+        los = [m["bounds_m_fbx_frame"]["min"] for m in meshes.values()]
+        his = [m["bounds_m_fbx_frame"]["max"] for m in meshes.values()]
+        lo = [min(v[0] for v in los) * 100, -max(v[1] for v in his) * 100, min(v[2] for v in los) * 100]
+        hi = [max(v[0] for v in his) * 100, -min(v[1] for v in los) * 100, max(v[2] for v in his) * 100]
+        slots = sorted({s for m in meshes.values() for s in m["material_slots"]})
+        if is_base:
+            record = {"class": "StaticMesh", "slots": slots, "source": str(fbx),
+                      "tris": sum(m["triangles"] - m.get("near_degenerate_triangles", 0) for m in meshes.values())
+                      + int(os.environ.get("FAKE_UE_TRIS_DELTA", "0")),
+                      "bounds": {"min": dict(zip("xyz", lo)), "max": dict(zip("xyz", hi))}}
+        else:
+            node = os.environ.get("FAKE_UE_ARMATURE_NODE", "SKEL_Test")
+            bones = rig["readback"]["skeletal"]["bones"]
+            parents = {node: ""}
+            for name, info in bones.items():
+                parents[name.replace(".", "_")] = (info["parent"] or node).replace(".", "_")
+            record = {"class": "SkeletalMesh", "source": str(fbx), "slots": slots,
+                      "tris": sum(m["triangles"] for m in meshes.values()),
+                      "bones": [node] + [n.replace(".", "_") for n in bones], "parents": parents, "sockets": [],
+                      "bounds": {"origin": {k: (lo[i] + hi[i]) / 2 for i, k in enumerate("xyz")},
+                                 "boxExtent": {k: (hi[i] - lo[i]) / 2 for i, k in enumerate("xyz")}}}
+    elif static and readback_path.exists():
         rb = json.loads(readback_path.read_text(encoding="utf-8"))
         lo, hi = rb["bounds_min_uu"], rb["bounds_max_uu"]
         record = {"class": "StaticMesh", "slots": list(rb["material_slots"]), "source": str(fbx),
@@ -169,6 +209,32 @@ def mesh_import(state, toolset, args, vcio="Ignore"):
                   "convex": int(os.environ.get("FAKE_UE_IMPORT_CONVEX", "1")),
                   # export frame shown by UE as (x, -y, z) (ART-001)
                   "bounds": {"min": {"x": lo[0], "y": -hi[1], "z": lo[2]}, "max": {"x": hi[0], "y": -lo[1], "z": hi[2]}}}
+    elif build_path.exists() and "skeletal_fbx" in (json.loads(build_path.read_text(encoding="utf-8"))
+                                                  .get("exports") or {}):
+        # H2 bake report (skeletal-adopt, format h2-bake-rig/1): round-trip bounds in the authored frame (metres)
+        build = json.loads(build_path.read_text(encoding="utf-8"))
+        rot = float(build["exports"]["settings"].get("export_space_rotation_z_degrees", 0))
+        base = fbx.name == Path(build["exports"]["base_fbx"]["path"]).name
+        meshes = build["roundtrip"]["base" if base else "skeletal"]["meshes"]
+        authored = {"min": [min(m["bounds_m"]["min"][i] for m in meshes.values()) * 100.0 for i in range(3)],
+                    "max": [max(m["bounds_m"]["max"][i] for m in meshes.values()) * 100.0 for i in range(3)]}
+        lo, hi = ue_bounds(authored, rot)
+        slots = sorted({s for m in meshes.values() for s in m["material_slots"]})
+        tris = sum(m["triangles"] - (m.get("near_degenerate_triangles") or 0 if base else 0) for m in meshes.values())
+        if base:
+            record = {"class": "StaticMesh", "slots": slots, "source": str(fbx),
+                      "tris": tris + int(os.environ.get("FAKE_UE_TRIS_DELTA", "0")),
+                      "bounds": {"min": dict(zip("xyz", lo)), "max": dict(zip("xyz", hi))}}
+        else:
+            node = os.environ.get("FAKE_UE_ARMATURE_NODE", "SKEL_Test")
+            bones = build["roundtrip"]["skeletal"]["bones"]
+            parents = {node: ""}
+            for name, info in bones.items():
+                parents[name.replace(".", "_")] = (info["parent"] or node).replace(".", "_")
+            record = {"class": "SkeletalMesh", "source": str(fbx), "slots": slots, "tris": tris,
+                      "bones": [node] + [n.replace(".", "_") for n in bones], "parents": parents, "sockets": [],
+                      "bounds": {"origin": {k: (lo[i] + hi[i]) / 2 for i, k in enumerate("xyz")},
+                                 "boxExtent": {k: (hi[i] - lo[i]) / 2 for i, k in enumerate("xyz")}}}
     elif build_path.exists():
         build = json.loads(build_path.read_text(encoding="utf-8"))
         kind = next(k for k, e in build["exports"].items() if isinstance(e, dict) and e.get("file") == fbx.name)

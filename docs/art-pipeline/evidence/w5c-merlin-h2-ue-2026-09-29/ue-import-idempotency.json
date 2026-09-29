@@ -1,0 +1,98 @@
+{
+ "schema": "unmatched.w5c-ue-idempotency/1",
+ "run": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-ue-import",
+ "ue_folder": "/Game/PipelineCandidates/Merlin/H2",
+ "sequence": [
+  {
+   "attempt": "0 (11:25)",
+   "command": "ue-import",
+   "result": "failed: skeletal_lod_count, skeletal_triangles_lod0_as_build — the new editor-Python measurement script had a real newline inside a string literal (SyntaxError in the editor, LogPython); all 22 other checks passed. Fixed (UE_PY_MEASURE_SKELETAL), guarded by test_embedded_editor_scripts_compile"
+  },
+  {
+   "attempt": "1",
+   "command": "ue-import",
+   "result": "executed (failed stage re-run: own 13 assets deleted first, imported again) — technically_imported, 24/24 checks",
+   "report": "docs/art-pipeline/evidence/w5c-merlin-h2-ue-2026-09-29/ue-import-report-run1-executed.json"
+  },
+  {
+   "attempt": "2",
+   "command": "ue-import",
+   "result": "skipped (fingerprint and editor listing unchanged)"
+  },
+  {
+   "attempt": "probe",
+   "command": "UE_PY_IMPORT_FBX + MCP TextureTools.import_file onto existing names",
+   "result": "both refused with 'already exists'; listing unchanged, no *_N assets",
+   "transcript": "docs/art-pipeline/evidence/w5c-merlin-h2-ue-2026-09-29/already-exists-probe.json"
+  },
+  {
+   "attempt": "3",
+   "command": "ue-import --force",
+   "result": "executed: 13 previous assets deleted, the same 13 names imported again, 24/24 checks",
+   "report": "docs/art-pipeline/evidence/w5c-merlin-h2-ue-2026-09-29/ue-import-report-run3-force.json"
+  },
+  {
+   "attempt": "4",
+   "command": "ue-import",
+   "result": "skipped"
+  }
+ ],
+ "listing_after_each_run_identical": true,
+ "assets": [
+  "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2",
+  "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Base",
+  "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Base_Blue",
+  "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Base_Red",
+  "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Blue",
+  "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Red",
+  "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2",
+  "/Game/PipelineCandidates/Merlin/H2/Meshes/SK_Merlin_H2_Skeleton",
+  "/Game/PipelineCandidates/Merlin/H2/Meshes/SM_Merlin_H2_Base",
+  "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_BC",
+  "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_N",
+  "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_ORM",
+  "/Game/PipelineCandidates/Merlin/H2/Textures/T_Merlin_H2_TeamMask"
+ ],
+ "asset_count": 13,
+ "numbered_duplicates": [],
+ "journal_events": [
+  {
+   "ts": "2026-09-29T11:25:05+00:00",
+   "event": "stage_started",
+   "forced": false
+  },
+  {
+   "ts": "2026-09-29T11:37:59+00:00",
+   "event": "stage_failed",
+   "error": "ue-import failed: skeletal_lod_count, skeletal_triangles_lod0_as_build"
+  },
+  {
+   "ts": "2026-09-29T11:39:18+00:00",
+   "event": "stage_started",
+   "forced": false
+  },
+  {
+   "ts": "2026-09-29T11:44:58+00:00",
+   "event": "stage_completed"
+  },
+  {
+   "ts": "2026-09-29T11:46:59+00:00",
+   "event": "stage_skipped",
+   "reason": "completed; fingerprint and output hashes unchanged"
+  },
+  {
+   "ts": "2026-09-29T11:47:30+00:00",
+   "event": "stage_started",
+   "forced": true
+  },
+  {
+   "ts": "2026-09-29T11:54:20+00:00",
+   "event": "stage_completed"
+  },
+  {
+   "ts": "2026-09-29T11:55:52+00:00",
+   "event": "stage_skipped",
+   "reason": "completed; fingerprint and output hashes unchanged"
+  }
+ ]
+}

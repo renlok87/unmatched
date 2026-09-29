@@ -1,0 +1,174 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "kind": "skeletal-adopt",
+  "profile_id": "king-arthur-h2-ue-import/1",
+  "asset_id": "ASSET-KING-ARTHUR-001",
+  "status": "proposed",
+  "status_note": "W5c-A (волна 5c, 2026-09-29): UE-импорт игровой модели H2.1 King Arthur через CLI (профиль skeletal-adopt, tripo-pipeline 0.7.0). Сборка сделана вне CLI модулем tools/tripo-pipeline/blender/h2_bake_arthur (профиль бейка king-arthur-h2-bake/1); stage adopt сверяет байты FBX и 2K-атласа с отчётами бейка (формат h2-bake-arthur/1 -> skeletal_adopt_formats.arthur_h2), ue-import — тот же код, что у skeletal-candidate (MI от M_UM_Figure / M_UM_BaseMarker, явная FbxFactory, сокеты, проверки контрактов). Статус максимум «технически импортировано»; художественная приёмка — волна 6. Цвета команд Blue/Red — тестовые для кадров (палитра Q-304 открыта).",
+  "source_role": "h2-parts-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "candidate": {
+    "report_format": "h2-bake-arthur/1",
+    "report_format_note": "отчёты модуля h2_bake_arthur (rig-report schema unmatched.h2-bake.rig/1, textures-report schema unmatched.h2-bake.textures/2) приводятся к раскладке h2-bake-rig/1 нормализатором tools/tripo-pipeline/skeletal_adopt_formats.py (arthur_h2), затем читаются указателями skeletal_adopt.REPORT_FORMATS",
+    "dir": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-bake",
+    "bake_profile": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-skeletal-um-fbx-v1-h2.json",
+    "bake_profile_id": "king-arthur-h2-bake/1",
+    "build_report": "reports/rig-report.json",
+    "textures_report": "reports/textures-report.json",
+    "extra_reports": {
+      "manifest": "reports/manifest-h2.json",
+      "validate_report": "reports/validate-skeletal-mesh-v2.json"
+    },
+    "fbx": {
+      "skeletal": "export/SK_KingArthur_H2.fbx",
+      "base": "export/SM_KingArthur_H2_Base.fbx"
+    },
+    "body_object": "SK_KingArthur_H2_Body",
+    "top_part": "tripo_part_6",
+    "texture_tier": "runtime_2k",
+    "texture_px": 2048,
+    "textures": {
+      "BC": "textures/runtime_2k/T_KingArthur_H2_BC.png",
+      "N": "textures/runtime_2k/T_KingArthur_H2_N.png",
+      "ORM": "textures/runtime_2k/T_KingArthur_H2_ORM.png",
+      "TeamMask": "textures/runtime_2k/T_KingArthur_H2_TeamMask.png"
+    },
+    "not_imported": {
+      "N_OpenGL": "textures/runtime_2k/T_KingArthur_H2_N_OpenGL.png — нормаль OpenGL (+Y) для Blender; в UE идёт только DirectX-вариант N",
+      "master_4k": "textures/master_4k/* — локальные 4K-мастера, не коммитятся и не импортируются"
+    },
+    "conventions_required": {
+      "BC": "sRGB",
+      "N": "DirectX",
+      "ORM": "R AO, G roughness, B metallic",
+      "TeamMask": "linear: R cloth"
+    }
+  },
+  "armature": {
+    "skeleton": "UM_HUMANOID_17_v2",
+    "object": "SKEL_UM_Humanoid",
+    "object_note": "rig-contract v2: объект арматуры = кость 0 в UE (легаси-импортёр FBX); weapon.R под hand.R у Arthur",
+    "bones": [
+      ["root", null],
+      ["hips", "root"],
+      ["spine", "hips"],
+      ["head", "spine"],
+      ["arm_upper.L", "spine"],
+      ["arm_lower.L", "arm_upper.L"],
+      ["hand.L", "arm_lower.L"],
+      ["arm_upper.R", "spine"],
+      ["arm_lower.R", "arm_upper.R"],
+      ["hand.R", "arm_lower.R"],
+      ["leg_upper.L", "hips"],
+      ["leg_lower.L", "leg_upper.L"],
+      ["foot.L", "leg_lower.L"],
+      ["leg_upper.R", "hips"],
+      ["leg_lower.R", "leg_upper.R"],
+      ["foot.R", "leg_lower.R"],
+      ["weapon.R", "hand.R"]
+    ]
+  },
+  "scale": {
+    "figure_height_m": 0.55,
+    "top_part": "tripo_part_6",
+    "measured_from": "низ подставки (z = 0) до верха короны (часть tripo_part_6); острие меча выше (60,06 uu) и в рост не входит (04 §3.3: 52–56 uu)"
+  },
+  "meshes": {
+    "body": {"object": "SK_KingArthur_H2_Body"},
+    "weapon": {"object": "SK_KingArthur_H2_Sword", "bone": "weapon.R"},
+    "base": {
+      "object": "SM_KingArthur_H2_Base",
+      "footprint_m": [0.29513, 0.30011, 0.0603],
+      "footprint_note": "габарит подставки по отчёту бейка (readback, кадр FBX: x -0,14766…0,14747, y -0,14993…0,15018 м, z 0…0,0603); центр смещён от оси на 0,1–1,3 мм (в допуске проверки 0,05 uu); окружность стенки по МНК — 29,68 × 6,03 uu (rig-report checks.base_30x6_uu)"
+    }
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "expected_ue_front": "+X",
+    "expected_ue_weapon_side": "+Y",
+    "expected_ue_front_source": "04-blender-production.md §1 «Оси» + §1.1 preset UM_FBX_v1; ART-001 — стандарт; бейк измерил лицо в FBX: yaw −2,13° от +X (rig-report checks.readback_face_plus_x)"
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "weapon.R",
+      "location_uu": [0, 0, 0],
+      "purpose": "Holy Avenger VFX (CUE-014): голова кости weapon.R = центр хвата на оси меча",
+      "measured_target_ue_component_uu": [6.642, 7.671, 37.332]
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "location_uu": null,
+      "location_note": "null: смещение в пространстве кости UE берётся из предсказания бейка (rig-report sockets[].location_uu_for_ue = (0; −4,388; −0,603) uu); цель (−0,304; −0,028; 50,057) uu — центр рамки головы tripo_part_6",
+      "purpose": "damage / status VFX"
+    }
+  ],
+  "ue": {
+    "skeletal_asset": "SK_KingArthur_H2",
+    "base_asset": "SM_KingArthur_H2_Base",
+    "material_route": "um-master",
+    "material_route_note": "MI от /Game/UM/Materials/M_UM_Figure (фигура) и M_UM_BaseMarker (подставка), командные MI — их дети; мастера строит um_masters.py (волна 4), этот профиль их только читает",
+    "masters": {
+      "figure": "/Game/UM/Materials/M_UM_Figure",
+      "base": "/Game/UM/Materials/M_UM_BaseMarker"
+    },
+    "figure_instance": "MI_KingArthur_H2",
+    "base_instance": "MI_KingArthur_H2_Base",
+    "teams": {
+      "Blue": "#3F6FD8",
+      "Red": "#D0453A"
+    },
+    "teams_note": "ТЕСТОВЫЕ цвета кадров W5c-A: синий = свой, красный = чужой, как у S08FighterActor; та же пара hex, что у Merlin H2 (merlin-h2-ue-import/1), чтобы кадры героев волны 5c были сравнимы. Линейные значения только через FLinearColor::FromSRGBColor (правило AD-OPEN-39). Палитра команд не решена (Q-304; предложение С-11 Gold #E8C06A / Silver #9FC2D8 — у кандидатов волны 4)",
+    "default_team": "Blue",
+    "team_instances": {
+      "figure": "MI_KingArthur_H2_{team}",
+      "base": "MI_KingArthur_H2_Base_{team}"
+    },
+    "team_color_mode": "mask",
+    "team_color_mode_note": "решение пользователя U-3 (AD-CNF-58 = b): TeamColor на полосе подставки и на одежде по TeamMask.R (плащ, табард, красная подкладка ворота; раскладка волны 4: M_UM_Figure читает только R)",
+    "figure_parameters": {
+      "TeamDye": 1.0,
+      "TeamDyeGain": 5.65
+    },
+    "figure_parameters_note": "предложено: плащ Arthur красный, умножение BC × синий даёт почти чёрную ткань (красная ткань ≈ (0,25; 0,03; 0,03) лин. × синий (0,050; 0,159; 0,687) ≈ (0,012; 0,005; 0,021)), поэтому краситель TeamDye 1: TeamColor × luminance(BC) × gain; gain 5,65 ≈ 1 / luminance(TeamColor) тестовых цветов (синий 0,1738 → 5,75; красный 0,1797 → 5,56): яркость ткани сохраняется в пределах ±2 %, меняется только цвет (как у Merlin 5,5 и Medusa 6 в волне 4)",
+    "base_marker": {
+      "textures": true,
+      "parameters": {
+        "SideBandWeight": 1.0,
+        "VertexMaskWeight": 0.0
+      },
+      "note": "текстурированная подставка Tripo: полоса команды — боковая стенка (|z| нормали < SideBandNormalZMax), плоский TeamColor; G-канал TeamMask (полоса подставки) мастер не читает"
+    },
+    "textures": {
+      "BC": {"file_key": "BC", "srgb": true, "compression": "TC_Default", "asset": "T_KingArthur_H2_BC"},
+      "N": {"file_key": "N", "srgb": false, "compression": "TC_Normalmap", "flip_green": false, "asset": "T_KingArthur_H2_N"},
+      "ORM": {"file_key": "ORM", "srgb": false, "compression": "TC_Masks", "asset": "T_KingArthur_H2_ORM"},
+      "TeamMask": {"file_key": "TeamMask", "srgb": false, "compression": "TC_Grayscale", "asset": "T_KingArthur_H2_TeamMask"}
+    },
+    "textures_note": "N — DirectX-вариант (зелёный инвертирован в бейке), flip_green false; ORM и TeamMask линейные. TeamMask — TC_Grayscale (G8 без сжатия): сэмплер TeamMaskTexture в M_UM_Figure имеет тип LinearGrayscale, TC_Masks дал бы несовпадение типа сэмплера; RGBA -> G8 в UE берёт канал R без потерь (Engine/Source/Runtime/ImageCore/Private/ImageCore.cpp: «blit from RGBA to G8 does NOT grab the gray, it just take the R»)",
+    "measure_skeletal_triangles": true
+  },
+  "expectations": {
+    "triangles": {
+      "SK_KingArthur_H2_Body": 36469,
+      "SK_KingArthur_H2_Sword": 2215,
+      "SM_KingArthur_H2_Base": 1500
+    },
+    "bones": 17,
+    "skeletal_material_slots": 1,
+    "base_material_slots": 1,
+    "skeletal_lods": 1,
+    "note": "числа бейка H2 (rig-report geometry.triangles, readback совпал); 0 почти вырожденных треугольников; FBX несёт только LOD0"
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "предложенный ориентир H2 (профиль бейка king-arthur-h2-bake/1, rig.proposed_limits_for_comparison_only) и 04-blender-production.md §3.3/§3.8 — ПРЕДЛОЖЕНИЕ до решения GD-058, не бюджет",
+    "hero_triangles": [30000, 45000],
+    "texture_px": 2048,
+    "material_slots_max": 2,
+    "height_uu": [52, 56],
+    "base_diameter_uu": 30,
+    "base_height_uu": 6,
+    "capsule_uu": {"diameter": 36, "height": 62}
+  }
+}

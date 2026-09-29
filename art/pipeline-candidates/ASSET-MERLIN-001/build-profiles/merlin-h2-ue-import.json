@@ -1,0 +1,190 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "profile_id": "merlin-h2-ue-import/1",
+  "asset_id": "ASSET-MERLIN-001",
+  "kind": "skeletal-adopt",
+  "status": "proposed",
+  "status_note": "W5c-A (2026-09-29): UE import of the H2.1 game model (bake profile merlin-h2-bake/2) through the CLI profile skeletal-adopt: adopt pins the bake's SK/base FBX and 2K runtime maps against its reports, ue-import runs the skeletal-candidate import (legacy FbxFactory, MI of M_UM_Figure / M_UM_BaseMarker, sockets, contract checks). At most «технически импортировано»; no art acceptance, no budget (GD-058 open); team colours Blue/Red are a diagnostic pair (Q-304 open).",
+  "derived_from": [
+    "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-um-fbx-v1-um-master.json (ue section of W4-B: um-master route, TeamDye 1 / gain 5.5, base side band)",
+    "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json (bake profile merlin-h2-bake/2: armature, scale, axes, sockets, exports)",
+    "docs/art-pipeline/rig/rig-contract.json#UM_HUMANOID_17_v2 (Merlin: weapon.R under hand.R)"
+  ],
+  "source_role": "h2-parts-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "candidate": {
+    "dir": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake",
+    "report_format": "h2-bake-rig/1",
+    "bake_profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json",
+    "bake_profile_id": "merlin-h2-bake/2",
+    "build_report": "reports/build-report.json",
+    "textures_report": "reports/textures-report.json",
+    "fbx": {
+      "skeletal": "export/SK_Merlin_H2.fbx",
+      "base": "export/SM_Merlin_H2_Base.fbx"
+    },
+    "textures": {
+      "BC": "textures/T_Merlin_H2_BC_2K.png",
+      "N": "textures/T_Merlin_H2_N_2K.png",
+      "ORM": "textures/T_Merlin_H2_ORM_2K.png",
+      "TeamMask": "textures/T_Merlin_H2_TeamMask_2K.png"
+    },
+    "textures_note": "2K runtime set only (committed); the 4K masters stay local and are never imported. TeamMaskRGBA (R cloth, G base band, B embroidery) is not imported: M_UM_Figure reads TeamMask.R, the base band of M_UM_BaseMarker comes from the side-wall normal (W4-B)",
+    "texture_px": 2048,
+    "texture_tier": "runtime_2k",
+    "conventions_required": {
+      "BC": "sRGB",
+      "N": "DirectX",
+      "ORM": "R = AO, G = roughness, B = metallic",
+      "TeamMask": "linear"
+    },
+    "top_part": "tripo_part_0"
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "skeleton": "UM_HUMANOID_17_v2",
+    "bones": [
+      ["root", null],
+      ["hips", "root"],
+      ["spine", "hips"],
+      ["head", "spine"],
+      ["arm_upper.L", "spine"],
+      ["arm_lower.L", "arm_upper.L"],
+      ["hand.L", "arm_lower.L"],
+      ["arm_upper.R", "spine"],
+      ["arm_lower.R", "arm_upper.R"],
+      ["hand.R", "arm_lower.R"],
+      ["weapon.R", "hand.R"],
+      ["leg_upper.L", "hips"],
+      ["leg_lower.L", "leg_upper.L"],
+      ["foot.L", "leg_lower.L"],
+      ["leg_upper.R", "hips"],
+      ["leg_lower.R", "leg_upper.R"],
+      ["foot.R", "leg_lower.R"]
+    ],
+    "bones_note": "UM_HUMANOID_17_v2: 16 body bones + weapon.R (Merlin's staff, rigid 100 %). In UE the armature object SKEL_UM_Humanoid becomes bone 0 (18 bones), '.' becomes '_' (weapon_R)"
+  },
+  "scale": {
+    "figure_height_m": 0.45,
+    "top_part": "tripo_part_0",
+    "note": "hood top 45.0 uu above the base bottom (bake measures.hood_top_uu 44.986); the staff crystal is the skeletal top (49.42 uu), not the figure height"
+  },
+  "meshes": {
+    "base": {
+      "object": "SM_Merlin_H2_Base",
+      "footprint_m": [0.24, 0.24, 0.05],
+      "pivot": "centre of the base bottom"
+    }
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "blender_weapon_side": "-X",
+    "expected_ue_front": "+X",
+    "expected_ue_weapon_side": "+Y",
+    "expected_ue_front_source": "04-blender-production.md §1 «Оси» + §1.1 preset UM_FBX_v1 (ART-001); the bake measured the face +3.4 uu ahead of the body centroid along +X in the export frame"
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "weapon.R",
+      "location_uu": [0, 0, 0],
+      "purpose": "rig-contract §7: Weapon on the weapon bone at (0,0,0) = the grip on the staff axis"
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "location_uu": null,
+      "purpose": "damage / status VFX; location = the bake's UE bone-space prediction (face part bbox centre)"
+    }
+  ],
+  "sockets_note": "StaffTip (crystal centre, AD-CNF-59 open) stays a proposal in the bake report and is not created in UE",
+  "expectations": {
+    "triangles": {
+      "SK_Merlin_H2_Body": 30047,
+      "SK_Merlin_H2_Staff": 3920,
+      "SM_Merlin_H2_Base": 2240
+    },
+    "bones": 17,
+    "skeletal_material_slots": 1,
+    "base_material_slots": 1,
+    "skeletal_lods": 1,
+    "note": "numbers of the H2.1 bake (build-report.json of merlin-h2-bake/2); the FBX carries LOD0 only"
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "bake profile budget_proposal (figure 30-45 k tris, 4K master + 2K runtime, <= 2 slots) and 04 §3.4 — ПРЕДЛОЖЕНИЕ до решения GD-058, не бюджет",
+    "hero_triangles": [30000, 45000],
+    "texture_px": 2048,
+    "material_slots_max": 2,
+    "height_uu": [40, 48],
+    "base_diameter_uu": 24,
+    "base_height_uu": 5
+  },
+  "ue": {
+    "folder_note": "run with: ue-import --ue-folder /Game/PipelineCandidates/Merlin/H2",
+    "skeletal_asset": "SK_Merlin_H2",
+    "base_asset": "SM_Merlin_H2_Base",
+    "material_route": "um-master",
+    "masters": {
+      "figure": "/Game/UM/Materials/M_UM_Figure",
+      "base": "/Game/UM/Materials/M_UM_BaseMarker"
+    },
+    "figure_instance": "MI_Merlin_H2",
+    "base_instance": "MI_Merlin_H2_Base",
+    "teams": {
+      "Blue": "#3F6FD8",
+      "Red": "#D0453A"
+    },
+    "teams_note": "diagnostic pair for the W5c frames (task: TeamColor blue and red); С-11 Gold/Silver stays the palette proposal (Q-304 open). Linear only through FLinearColor::FromSRGBColor (AD-OPEN-39 rule). Proposal",
+    "default_team": "Blue",
+    "team_instances": {
+      "figure": "MI_Merlin_H2_{team}",
+      "base": "MI_Merlin_H2_Base_{team}"
+    },
+    "team_color_mode": "mask",
+    "team_color_mode_note": "user decision 2026-09-28 (AD-CNF-58 = b): TeamColor on the clothing by TeamMask.R (H2.1 mask: robe with hood 0.82, sleeves 0.87-0.89; skin, face, staff, crystal, shoes 0) and on the base side band",
+    "figure_parameters": {
+      "TeamDye": 1.0,
+      "TeamDyeGain": 5.5
+    },
+    "figure_parameters_note": "as W4-B: the dark blue cloth is dyed (TeamColor x luminance(BC) x TeamDyeGain). Gain 5.5 kept: measured H2.1 cloth luminance (TeamMask >= 0.5, linear BC 2K) 0.0263 vs 0.0269 of the W4-B atlas, so the Medusa-matched gain would be 0.147 / 0.0263 = 5.58 (+1.5 %). RoughnessMin/Max, NormalStrength, AOToBaseColor stay neutral (bake report 11.4: the H2.1 roughness classes must not shift). Proposal",
+    "base_marker": {
+      "textures": true,
+      "parameters": {
+        "SideBandWeight": 1.0,
+        "VertexMaskWeight": 0.0
+      },
+      "note": "textured H2 base (24 x 24 x 5 uu, same atlas): team band = the side wall (|n.z| < SideBandNormalZMax), flat TeamColor; as W4-B. Proposal"
+    },
+    "textures": {
+      "BC": {
+        "file_key": "BC",
+        "asset": "T_Merlin_H2_BC",
+        "srgb": true,
+        "compression": "TC_Default"
+      },
+      "N": {
+        "file_key": "N",
+        "asset": "T_Merlin_H2_N",
+        "srgb": false,
+        "compression": "TC_Normalmap",
+        "flip_green": false,
+        "note": "DirectX normal of the bake (green of the OpenGL bake inverted); no OpenGL copy exists and none is imported"
+      },
+      "ORM": {
+        "file_key": "ORM",
+        "asset": "T_Merlin_H2_ORM",
+        "srgb": false,
+        "compression": "TC_Masks",
+        "note": "R AO, G roughness, B metallic, linear; TC_Masks keeps the three channels independent (no sRGB curve)"
+      },
+      "TeamMask": {
+        "file_key": "TeamMask",
+        "asset": "T_Merlin_H2_TeamMask",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "note": "single-channel L8 mask: TC_Grayscale stores it uncompressed (G8), no channel is lost; M_UM_Figure samples it as LinearGrayscale (W4-B)"
+      }
+    },
+    "measure_skeletal_triangles": true
+  }
+}
