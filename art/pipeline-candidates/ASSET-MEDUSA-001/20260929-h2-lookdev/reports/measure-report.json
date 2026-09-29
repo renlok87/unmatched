@@ -1,0 +1,1535 @@
+{
+  "Y_ratio_concept_over_ld_per_class": {
+    "gold_antique": 0.848,
+    "leather_smooth": 0.805,
+    "leather_worn": 0.697,
+    "linen": 0.838,
+    "skin": 0.868,
+    "stone_base": 0.53,
+    "wood": 0.572
+  },
+  "exposure": {
+    "class": "linen",
+    "mode": "anchor_class",
+    "note": "экспозиция концепт/кадр Blender — по платью (самая большая зона, TeamColor): отношения тонов остальных классов к платью как в концепте; взвешенное среднее по всем классам (0,72) тянут камень/кожа/дерево, которые в концепте в 2 раза темнее, — оно осветлило бы кожу на 40 %"
+  },
+  "exposure_k_concept_over_ld": 0.8382,
+  "exposure_k_weighted_geomean_all_classes": 0.7436,
+  "gain_suggestion": {
+    "gold_antique": {
+      "current_gain": [
+        1.06,
+        1.065,
+        1.344
+      ],
+      "residual_ratio_concept_over_ld_exposure_normalised": [
+        1.017,
+        1.006,
+        1.067
+      ],
+      "suggested_gain": [
+        1.0782,
+        1.0713,
+        1.434
+      ]
+    },
+    "leather_smooth": {
+      "current_gain": [
+        0.574,
+        0.461,
+        0.341
+      ],
+      "residual_ratio_concept_over_ld_exposure_normalised": [
+        0.956,
+        0.968,
+        0.871
+      ],
+      "suggested_gain": [
+        0.5486,
+        0.4463,
+        0.2971
+      ]
+    },
+    "leather_worn": {
+      "current_gain": [
+        0.423,
+        0.326,
+        0.206
+      ],
+      "residual_ratio_concept_over_ld_exposure_normalised": [
+        0.869,
+        0.816,
+        0.698
+      ],
+      "suggested_gain": [
+        0.3674,
+        0.2661,
+        0.1439
+      ]
+    },
+    "legacy_bake": {
+      "current_gain": [
+        0.444,
+        0.429,
+        0.341
+      ],
+      "residual_ratio_concept_over_ld_exposure_normalised": [
+        0.947,
+        0.932,
+        0.858
+      ],
+      "suggested_gain": [
+        0.4204,
+        0.3998,
+        0.2924
+      ]
+    },
+    "linen": {
+      "current_gain": [
+        0.904,
+        1.054,
+        0.973
+      ],
+      "residual_ratio_concept_over_ld_exposure_normalised": [
+        1.018,
+        0.996,
+        0.99
+      ],
+      "suggested_gain": [
+        0.92,
+        1.0498,
+        0.9637
+      ]
+    },
+    "skin": {
+      "current_gain": [
+        1.442,
+        1.299,
+        1.035
+      ],
+      "residual_ratio_concept_over_ld_exposure_normalised": [
+        1.048,
+        1.034,
+        1.003
+      ],
+      "suggested_gain": [
+        1.511,
+        1.343,
+        1.038
+      ]
+    },
+    "stone_base": {
+      "current_gain": [
+        0.458,
+        0.402,
+        0.376
+      ],
+      "residual_ratio_concept_over_ld_exposure_normalised": [
+        0.625,
+        0.636,
+        0.624
+      ],
+      "suggested_gain": [
+        0.2865,
+        0.2556,
+        0.2345
+      ]
+    },
+    "wood": {
+      "current_gain": [
+        0.406,
+        0.293,
+        0.136
+      ],
+      "residual_ratio_concept_over_ld_exposure_normalised": [
+        0.715,
+        0.671,
+        0.498
+      ],
+      "suggested_gain": [
+        0.2901,
+        0.1966,
+        0.0678
+      ]
+    }
+  },
+  "gates": {
+    "gold_antique": {
+      "hue_deg": [
+        [
+          24,
+          50
+        ]
+      ],
+      "mask_px": 3,
+      "s_min": 0.35,
+      "v_min": 0.2
+    },
+    "leather_smooth": {
+      "hue_deg": [
+        [
+          5,
+          26
+        ]
+      ],
+      "mask_px": 2,
+      "s_min": 0.3,
+      "v_max": 0.55,
+      "v_min": 0.08
+    },
+    "leather_worn": {
+      "hue_deg": [
+        [
+          5,
+          30
+        ]
+      ],
+      "mask_px": 2,
+      "s_min": 0.3,
+      "v_max": 0.6,
+      "v_min": 0.08
+    },
+    "legacy_bake": {
+      "hue_deg": [
+        [
+          38,
+          110
+        ]
+      ],
+      "mask_px": -2,
+      "note": "змеи (зелёные): ворота с обеих сторон — в классе ещё волосы и глаза",
+      "render_gate": true,
+      "s_min": 0.15
+    },
+    "linen": {
+      "hue_deg": [
+        [
+          0,
+          40
+        ],
+        [
+          300,
+          360
+        ]
+      ],
+      "mask_px": -4,
+      "s_max": 0.45,
+      "v_max": 0.5
+    },
+    "note": "цветовые ворота пикселей концепта (HSV, sRGB): зоны модели и концепта сдвинуты на несколько px, ворота оставляют пиксели своего материала; калибровка по точкам концепта front (пояс h29 s0,54, наруч h31 s0,49, ремень h21 s0,56, филёнка лука h24 s0,69, бедро h30 s0,20 v0,74, платье h9 s0,20 v0,14, подставка h12 s0,14 v0,27)",
+    "skin": {
+      "hue_deg": [
+        [
+          15,
+          45
+        ]
+      ],
+      "mask_px": -2,
+      "s_max": 0.4,
+      "s_min": 0.06,
+      "v_min": 0.3
+    },
+    "stone_base": {
+      "mask_px": -4,
+      "s_max": 0.35,
+      "v_max": 0.5
+    },
+    "wood": {
+      "hue_deg": [
+        [
+          5,
+          35
+        ]
+      ],
+      "mask_px": 2,
+      "s_min": 0.3,
+      "v_max": 0.45
+    }
+  },
+  "label": "blender (Cycles, AgX), студийный свет — не игровой; концепт — imagegen (свой свет)",
+  "method": "зоны = проход ID классов H2LD в орто-кадрах, выровненных по концептам; концепт: маска класса (дилатация/эрозия mask_px) И цветовые ворота класса (measure.concept_gates), рендер: точная маска класса (эрозия 1 px); медианы sRGB по пикселям зоны, три вида вместе; экспозиция k — взвешенное по пикселям геометрическое среднее Y(концепт)/Y(H2LD) по классам библиотеки",
+  "stage": "ld_measure",
+  "status": "измерено",
+  "views": {
+    "back": {
+      "gold_antique": {
+        "concept": {
+          "hue_deg": 25.8,
+          "luma_Y_linear": 0.112,
+          "median_srgb": [
+            126.0,
+            85.0,
+            54.0
+          ],
+          "sat": 0.571,
+          "value": 0.494
+        },
+        "h21": {
+          "hue_deg": 31.1,
+          "luma_Y_linear": 0.1812,
+          "median_srgb": [
+            151.0,
+            110.0,
+            66.0
+          ],
+          "sat": 0.563,
+          "value": 0.592
+        },
+        "ld": {
+          "hue_deg": 30.0,
+          "luma_Y_linear": 0.1195,
+          "median_srgb": [
+            125.0,
+            90.0,
+            55.0
+          ],
+          "sat": 0.56,
+          "value": 0.49
+        },
+        "pixels_concept": 4421,
+        "pixels_render": 64382
+      },
+      "leather_smooth": {
+        "concept": {
+          "hue_deg": 21.5,
+          "luma_Y_linear": 0.0545,
+          "median_srgb": [
+            92.0,
+            58.0,
+            39.0
+          ],
+          "sat": 0.576,
+          "value": 0.361
+        },
+        "h21": {
+          "hue_deg": 20.5,
+          "luma_Y_linear": 0.0587,
+          "median_srgb": [
+            91.0,
+            62.0,
+            47.0
+          ],
+          "sat": 0.484,
+          "value": 0.357
+        },
+        "ld": {
+          "hue_deg": 22.5,
+          "luma_Y_linear": 0.0345,
+          "median_srgb": [
+            75.0,
+            45.0,
+            27.0
+          ],
+          "sat": 0.64,
+          "value": 0.294
+        },
+        "pixels_concept": 13367,
+        "pixels_render": 34461
+      },
+      "leather_worn": {
+        "concept": {
+          "hue_deg": 22.9,
+          "luma_Y_linear": 0.0363,
+          "median_srgb": [
+            70.0,
+            49.0,
+            36.0
+          ],
+          "sat": 0.486,
+          "value": 0.275
+        },
+        "h21": {
+          "hue_deg": 28.9,
+          "luma_Y_linear": 0.0579,
+          "median_srgb": [
+            91.0,
+            62.0,
+            35.0
+          ],
+          "sat": 0.615,
+          "value": 0.357
+        },
+        "ld": {
+          "hue_deg": 17.5,
+          "luma_Y_linear": 0.026,
+          "median_srgb": [
+            58.0,
+            41.0,
+            34.0
+          ],
+          "sat": 0.414,
+          "value": 0.227
+        },
+        "pixels_concept": 1572,
+        "pixels_render": 7567
+      },
+      "legacy_bake": {
+        "concept": {
+          "hue_deg": 46.0,
+          "luma_Y_linear": 0.0616,
+          "median_srgb": [
+            77.0,
+            70.0,
+            47.0
+          ],
+          "sat": 0.39,
+          "value": 0.302
+        },
+        "h21": {
+          "hue_deg": 48.0,
+          "luma_Y_linear": 0.1244,
+          "median_srgb": [
+            106.0,
+            99.0,
+            71.0
+          ],
+          "sat": 0.33,
+          "value": 0.416
+        },
+        "ld": {
+          "hue_deg": 47.1,
+          "luma_Y_linear": 0.0667,
+          "median_srgb": [
+            79.0,
+            73.0,
+            51.0
+          ],
+          "sat": 0.354,
+          "value": 0.31
+        },
+        "pixels_concept": 31686,
+        "pixels_render": 56548
+      },
+      "linen": {
+        "concept": {
+          "hue_deg": 9.2,
+          "luma_Y_linear": 0.0519,
+          "median_srgb": [
+            73.0,
+            62.0,
+            60.0
+          ],
+          "sat": 0.178,
+          "value": 0.286
+        },
+        "h21": {
+          "hue_deg": 0.0,
+          "luma_Y_linear": 0.0561,
+          "median_srgb": [
+            77.0,
+            64.0,
+            64.0
+          ],
+          "sat": 0.169,
+          "value": 0.302
+        },
+        "ld": {
+          "hue_deg": 15.0,
+          "luma_Y_linear": 0.0464,
+          "median_srgb": [
+            68.0,
+            59.0,
+            56.0
+          ],
+          "sat": 0.176,
+          "value": 0.267
+        },
+        "pixels_concept": 172895,
+        "pixels_render": 266686
+      },
+      "skin": {
+        "concept": {
+          "hue_deg": 33.9,
+          "luma_Y_linear": 0.3994,
+          "median_srgb": [
+            192.0,
+            165.5,
+            131.0
+          ],
+          "sat": 0.318,
+          "value": 0.753
+        },
+        "h21": {
+          "hue_deg": 28.0,
+          "luma_Y_linear": 0.3262,
+          "median_srgb": [
+            168.0,
+            152.0,
+            138.0
+          ],
+          "sat": 0.179,
+          "value": 0.659
+        },
+        "ld": {
+          "hue_deg": 30.0,
+          "luma_Y_linear": 0.3834,
+          "median_srgb": [
+            184.0,
+            163.0,
+            142.0
+          ],
+          "sat": 0.228,
+          "value": 0.722
+        },
+        "pixels_concept": 1194,
+        "pixels_render": 33074
+      },
+      "stone_base": {
+        "concept": {
+          "hue_deg": 16.4,
+          "luma_Y_linear": 0.0314,
+          "median_srgb": [
+            56.0,
+            48.0,
+            45.0
+          ],
+          "sat": 0.196,
+          "value": 0.22
+        },
+        "h21": {
+          "hue_deg": 7.5,
+          "luma_Y_linear": 0.0621,
+          "median_srgb": [
+            76.0,
+            69.0,
+            68.0
+          ],
+          "sat": 0.105,
+          "value": 0.298
+        },
+        "ld": {
+          "hue_deg": 12.9,
+          "luma_Y_linear": 0.0442,
+          "median_srgb": [
+            68.0,
+            57.0,
+            54.0
+          ],
+          "sat": 0.206,
+          "value": 0.267
+        },
+        "pixels_concept": 109410,
+        "pixels_render": 118896
+      },
+      "wood": {
+        "concept": {
+          "hue_deg": 25.1,
+          "luma_Y_linear": 0.026,
+          "median_srgb": [
+            64.0,
+            39.0,
+            21.0
+          ],
+          "sat": 0.672,
+          "value": 0.251
+        },
+        "h21": {
+          "hue_deg": 22.8,
+          "luma_Y_linear": 0.0701,
+          "median_srgb": [
+            99.0,
+            68.0,
+            49.0
+          ],
+          "sat": 0.505,
+          "value": 0.388
+        },
+        "ld": {
+          "hue_deg": 22.8,
+          "luma_Y_linear": 0.0469,
+          "median_srgb": [
+            85.0,
+            54.0,
+            35.0
+          ],
+          "sat": 0.588,
+          "value": 0.333
+        },
+        "pixels_concept": 2010,
+        "pixels_render": 13261
+      }
+    },
+    "front": {
+      "gold_antique": {
+        "concept": {
+          "hue_deg": 27.8,
+          "luma_Y_linear": 0.099,
+          "median_srgb": [
+            117.0,
+            81.0,
+            50.0
+          ],
+          "sat": 0.573,
+          "value": 0.459
+        },
+        "h21": {
+          "hue_deg": 31.0,
+          "luma_Y_linear": 0.1774,
+          "median_srgb": [
+            152.0,
+            108.0,
+            61.0
+          ],
+          "sat": 0.599,
+          "value": 0.596
+        },
+        "ld": {
+          "hue_deg": 28.8,
+          "luma_Y_linear": 0.1156,
+          "median_srgb": [
+            127.0,
+            87.0,
+            50.0
+          ],
+          "sat": 0.606,
+          "value": 0.498
+        },
+        "pixels_concept": 64625,
+        "pixels_render": 99365
+      },
+      "leather_smooth": {
+        "concept": {
+          "hue_deg": 21.0,
+          "luma_Y_linear": 0.0408,
+          "median_srgb": [
+            77.0,
+            51.0,
+            37.0
+          ],
+          "sat": 0.519,
+          "value": 0.302
+        },
+        "h21": {
+          "hue_deg": 21.3,
+          "luma_Y_linear": 0.1148,
+          "median_srgb": [
+            118.0,
+            89.0,
+            73.0
+          ],
+          "sat": 0.381,
+          "value": 0.463
+        },
+        "ld": {
+          "hue_deg": 21.9,
+          "luma_Y_linear": 0.0936,
+          "median_srgb": [
+            112.0,
+            79.0,
+            60.0
+          ],
+          "sat": 0.464,
+          "value": 0.439
+        },
+        "pixels_concept": 17744,
+        "pixels_render": 25441
+      },
+      "leather_worn": {
+        "concept": {
+          "hue_deg": 23.0,
+          "luma_Y_linear": 0.046,
+          "median_srgb": [
+            83.0,
+            54.0,
+            36.0
+          ],
+          "sat": 0.566,
+          "value": 0.325
+        },
+        "h21": {
+          "hue_deg": 30.7,
+          "luma_Y_linear": 0.1839,
+          "median_srgb": [
+            154.0,
+            110.0,
+            64.0
+          ],
+          "sat": 0.584,
+          "value": 0.604
+        },
+        "ld": {
+          "hue_deg": 20.9,
+          "luma_Y_linear": 0.0979,
+          "median_srgb": [
+            121.0,
+            78.0,
+            55.0
+          ],
+          "sat": 0.545,
+          "value": 0.475
+        },
+        "pixels_concept": 7788,
+        "pixels_render": 9609
+      },
+      "legacy_bake": {
+        "concept": {
+          "hue_deg": 51.1,
+          "luma_Y_linear": 0.0604,
+          "median_srgb": [
+            74.0,
+            70.0,
+            47.0
+          ],
+          "sat": 0.365,
+          "value": 0.29
+        },
+        "h21": {
+          "hue_deg": 45.0,
+          "luma_Y_linear": 0.1757,
+          "median_srgb": [
+            125.0,
+            116.0,
+            89.0
+          ],
+          "sat": 0.288,
+          "value": 0.49
+        },
+        "ld": {
+          "hue_deg": 45.5,
+          "luma_Y_linear": 0.0958,
+          "median_srgb": [
+            94.0,
+            87.0,
+            65.0
+          ],
+          "sat": 0.309,
+          "value": 0.369
+        },
+        "pixels_concept": 27431,
+        "pixels_render": 35801
+      },
+      "linen": {
+        "concept": {
+          "hue_deg": 12.0,
+          "luma_Y_linear": 0.0219,
+          "median_srgb": [
+            47.0,
+            39.0,
+            37.0
+          ],
+          "sat": 0.213,
+          "value": 0.184
+        },
+        "h21": {
+          "hue_deg": 0.0,
+          "luma_Y_linear": 0.0509,
+          "median_srgb": [
+            73.0,
+            61.0,
+            61.0
+          ],
+          "sat": 0.164,
+          "value": 0.286
+        },
+        "ld": {
+          "hue_deg": 13.8,
+          "luma_Y_linear": 0.041,
+          "median_srgb": [
+            65.0,
+            55.0,
+            52.0
+          ],
+          "sat": 0.2,
+          "value": 0.255
+        },
+        "pixels_concept": 142319,
+        "pixels_render": 183865
+      },
+      "skin": {
+        "concept": {
+          "hue_deg": 30.8,
+          "luma_Y_linear": 0.3914,
+          "median_srgb": [
+            184.0,
+            165.0,
+            145.0
+          ],
+          "sat": 0.212,
+          "value": 0.722
+        },
+        "h21": {
+          "hue_deg": 26.4,
+          "luma_Y_linear": 0.4527,
+          "median_srgb": [
+            191.0,
+            177.0,
+            166.0
+          ],
+          "sat": 0.131,
+          "value": 0.749
+        },
+        "ld": {
+          "hue_deg": 29.1,
+          "luma_Y_linear": 0.5082,
+          "median_srgb": [
+            204.0,
+            186.0,
+            169.0
+          ],
+          "sat": 0.172,
+          "value": 0.8
+        },
+        "pixels_concept": 76243,
+        "pixels_render": 93949
+      },
+      "stone_base": {
+        "concept": {
+          "hue_deg": 16.4,
+          "luma_Y_linear": 0.0339,
+          "median_srgb": [
+            58.0,
+            50.0,
+            47.0
+          ],
+          "sat": 0.19,
+          "value": 0.227
+        },
+        "h21": {
+          "hue_deg": 6.0,
+          "luma_Y_linear": 0.1021,
+          "median_srgb": [
+            97.0,
+            88.0,
+            87.0
+          ],
+          "sat": 0.103,
+          "value": 0.38
+        },
+        "ld": {
+          "hue_deg": 10.6,
+          "luma_Y_linear": 0.0909,
+          "median_srgb": [
+            96.0,
+            82.0,
+            79.0
+          ],
+          "sat": 0.177,
+          "value": 0.376
+        },
+        "pixels_concept": 104629,
+        "pixels_render": 118848
+      },
+      "wood": {
+        "concept": {
+          "hue_deg": 24.3,
+          "luma_Y_linear": 0.035,
+          "median_srgb": [
+            72.0,
+            47.0,
+            30.0
+          ],
+          "sat": 0.583,
+          "value": 0.282
+        },
+        "h21": {
+          "hue_deg": 19.6,
+          "luma_Y_linear": 0.1104,
+          "median_srgb": [
+            122.0,
+            85.0,
+            67.0
+          ],
+          "sat": 0.451,
+          "value": 0.478
+        },
+        "ld": {
+          "hue_deg": 19.3,
+          "luma_Y_linear": 0.0801,
+          "median_srgb": [
+            109.0,
+            71.0,
+            53.0
+          ],
+          "sat": 0.514,
+          "value": 0.427
+        },
+        "pixels_concept": 6011,
+        "pixels_render": 17702
+      }
+    },
+    "side": {
+      "gold_antique": {
+        "concept": {
+          "hue_deg": 26.9,
+          "luma_Y_linear": 0.0953,
+          "median_srgb": [
+            116.0,
+            79.0,
+            49.0
+          ],
+          "sat": 0.578,
+          "value": 0.455
+        },
+        "h21": {
+          "hue_deg": 31.4,
+          "luma_Y_linear": 0.1662,
+          "median_srgb": [
+            147.0,
+            105.0,
+            59.0
+          ],
+          "sat": 0.599,
+          "value": 0.576
+        },
+        "ld": {
+          "hue_deg": 29.2,
+          "luma_Y_linear": 0.1135,
+          "median_srgb": [
+            124.0,
+            87.0,
+            52.0
+          ],
+          "sat": 0.581,
+          "value": 0.486
+        },
+        "pixels_concept": 21108,
+        "pixels_render": 68699
+      },
+      "leather_smooth": {
+        "concept": {
+          "hue_deg": 23.1,
+          "luma_Y_linear": 0.0336,
+          "median_srgb": [
+            70.0,
+            46.0,
+            31.0
+          ],
+          "sat": 0.557,
+          "value": 0.275
+        },
+        "h21": {
+          "hue_deg": 23.4,
+          "luma_Y_linear": 0.0766,
+          "median_srgb": [
+            98.0,
+            73.0,
+            57.0
+          ],
+          "sat": 0.418,
+          "value": 0.384
+        },
+        "ld": {
+          "hue_deg": 20.0,
+          "luma_Y_linear": 0.0625,
+          "median_srgb": [
+            91.0,
+            65.0,
+            52.0
+          ],
+          "sat": 0.429,
+          "value": 0.357
+        },
+        "pixels_concept": 12923,
+        "pixels_render": 25815
+      },
+      "leather_worn": {
+        "concept": {
+          "hue_deg": 24.0,
+          "luma_Y_linear": 0.0589,
+          "median_srgb": [
+            92.0,
+            62.0,
+            42.0
+          ],
+          "sat": 0.543,
+          "value": 0.361
+        },
+        "h21": {
+          "hue_deg": 31.0,
+          "luma_Y_linear": 0.192,
+          "median_srgb": [
+            155.0,
+            113.0,
+            68.0
+          ],
+          "sat": 0.561,
+          "value": 0.608
+        },
+        "ld": {
+          "hue_deg": 20.5,
+          "luma_Y_linear": 0.0702,
+          "median_srgb": [
+            96.0,
+            69.0,
+            55.0
+          ],
+          "sat": 0.427,
+          "value": 0.376
+        },
+        "pixels_concept": 3787,
+        "pixels_render": 6804
+      },
+      "legacy_bake": {
+        "concept": {
+          "hue_deg": 45.0,
+          "luma_Y_linear": 0.0517,
+          "median_srgb": [
+            70.0,
+            64.0,
+            46.0
+          ],
+          "sat": 0.343,
+          "value": 0.275
+        },
+        "h21": {
+          "hue_deg": 46.9,
+          "luma_Y_linear": 0.1357,
+          "median_srgb": [
+            110.0,
+            103.0,
+            78.0
+          ],
+          "sat": 0.291,
+          "value": 0.431
+        },
+        "ld": {
+          "hue_deg": 45.0,
+          "luma_Y_linear": 0.0727,
+          "median_srgb": [
+            82.0,
+            76.0,
+            58.0
+          ],
+          "sat": 0.293,
+          "value": 0.322
+        },
+        "pixels_concept": 15017,
+        "pixels_render": 24436
+      },
+      "linen": {
+        "concept": {
+          "hue_deg": 13.8,
+          "luma_Y_linear": 0.0308,
+          "median_srgb": [
+            57.0,
+            47.0,
+            44.0
+          ],
+          "sat": 0.228,
+          "value": 0.224
+        },
+        "h21": {
+          "hue_deg": 5.0,
+          "luma_Y_linear": 0.0301,
+          "median_srgb": [
+            57.0,
+            46.0,
+            45.0
+          ],
+          "sat": 0.211,
+          "value": 0.224
+        },
+        "ld": {
+          "hue_deg": 16.4,
+          "luma_Y_linear": 0.0248,
+          "median_srgb": [
+            50.0,
+            42.0,
+            39.0
+          ],
+          "sat": 0.22,
+          "value": 0.196
+        },
+        "pixels_concept": 66476,
+        "pixels_render": 126180
+      },
+      "skin": {
+        "concept": {
+          "hue_deg": 30.0,
+          "luma_Y_linear": 0.396,
+          "median_srgb": [
+            184.0,
+            166.0,
+            148.0
+          ],
+          "sat": 0.196,
+          "value": 0.722
+        },
+        "h21": {
+          "hue_deg": 27.7,
+          "luma_Y_linear": 0.3677,
+          "median_srgb": [
+            175.0,
+            161.0,
+            149.0
+          ],
+          "sat": 0.149,
+          "value": 0.686
+        },
+        "ld": {
+          "hue_deg": 28.4,
+          "luma_Y_linear": 0.4143,
+          "median_srgb": [
+            189.0,
+            169.0,
+            151.0
+          ],
+          "sat": 0.201,
+          "value": 0.741
+        },
+        "pixels_concept": 18241,
+        "pixels_render": 48086
+      },
+      "stone_base": {
+        "concept": {
+          "hue_deg": 350.0,
+          "luma_Y_linear": 0.0236,
+          "median_srgb": [
+            47.0,
+            41.0,
+            42.0
+          ],
+          "sat": 0.128,
+          "value": 0.184
+        },
+        "h21": {
+          "hue_deg": 7.5,
+          "luma_Y_linear": 0.0694,
+          "median_srgb": [
+            80.0,
+            73.0,
+            72.0
+          ],
+          "sat": 0.1,
+          "value": 0.314
+        },
+        "ld": {
+          "hue_deg": 9.2,
+          "luma_Y_linear": 0.0519,
+          "median_srgb": [
+            73.0,
+            62.0,
+            60.0
+          ],
+          "sat": 0.178,
+          "value": 0.286
+        },
+        "pixels_concept": 108641,
+        "pixels_render": 118542
+      },
+      "wood": {
+        "concept": {
+          "hue_deg": 23.4,
+          "luma_Y_linear": 0.0315,
+          "median_srgb": [
+            69.0,
+            44.0,
+            28.0
+          ],
+          "sat": 0.594,
+          "value": 0.271
+        },
+        "h21": {
+          "hue_deg": 22.0,
+          "luma_Y_linear": 0.054,
+          "median_srgb": [
+            86.0,
+            60.0,
+            45.0
+          ],
+          "sat": 0.477,
+          "value": 0.337
+        },
+        "ld": {
+          "hue_deg": 18.9,
+          "luma_Y_linear": 0.0458,
+          "median_srgb": [
+            79.0,
+            55.0,
+            44.0
+          ],
+          "sat": 0.443,
+          "value": 0.31
+        },
+        "pixels_concept": 5668,
+        "pixels_render": 12796
+      }
+    }
+  },
+  "zones": {
+    "gold_antique": {
+      "concept": {
+        "hue_deg": 28.2,
+        "luma_Y_linear": 0.0989,
+        "median_srgb": [
+          117.0,
+          81.0,
+          49.0
+        ],
+        "sat": 0.581,
+        "value": 0.459
+      },
+      "delta_h21_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.471,
+        "dHue_deg": 2.5,
+        "dSat": 0.006
+      },
+      "delta_ld_vs_concept": {
+        "Y_ratio_exposure_normalised": 0.988,
+        "dHue_deg": 1.0,
+        "dSat": 0.006
+      },
+      "h21": {
+        "hue_deg": 30.7,
+        "luma_Y_linear": 0.1735,
+        "median_srgb": [
+          150.0,
+          107.0,
+          62.0
+        ],
+        "sat": 0.587,
+        "value": 0.588
+      },
+      "ld": {
+        "hue_deg": 29.2,
+        "luma_Y_linear": 0.1166,
+        "median_srgb": [
+          126.0,
+          88.0,
+          52.0
+        ],
+        "sat": 0.587,
+        "value": 0.494
+      },
+      "pixels_concept": 90154,
+      "pixels_h21": 232446,
+      "pixels_ld": 232446
+    },
+    "leather_smooth": {
+      "concept": {
+        "hue_deg": 22.3,
+        "luma_Y_linear": 0.0425,
+        "median_srgb": [
+          79.0,
+          52.0,
+          36.0
+        ],
+        "sat": 0.544,
+        "value": 0.31
+      },
+      "delta_h21_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.515,
+        "dHue_deg": -0.1,
+        "dSat": -0.089
+      },
+      "delta_ld_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.041,
+        "dHue_deg": -2.3,
+        "dSat": -0.033
+      },
+      "h21": {
+        "hue_deg": 22.2,
+        "luma_Y_linear": 0.0768,
+        "median_srgb": [
+          101.0,
+          72.0,
+          55.0
+        ],
+        "sat": 0.455,
+        "value": 0.396
+      },
+      "ld": {
+        "hue_deg": 20.0,
+        "luma_Y_linear": 0.0528,
+        "median_srgb": [
+          88.0,
+          58.0,
+          43.0
+        ],
+        "sat": 0.511,
+        "value": 0.345
+      },
+      "pixels_concept": 44034,
+      "pixels_h21": 85717,
+      "pixels_ld": 85717
+    },
+    "leather_worn": {
+      "concept": {
+        "hue_deg": 23.0,
+        "luma_Y_linear": 0.049,
+        "median_srgb": [
+          85.0,
+          56.0,
+          38.0
+        ],
+        "sat": 0.553,
+        "value": 0.333
+      },
+      "delta_h21_vs_concept": {
+        "Y_ratio_exposure_normalised": 2.595,
+        "dHue_deg": 7.2,
+        "dSat": 0.042
+      },
+      "delta_ld_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.203,
+        "dHue_deg": -1.7,
+        "dSat": -0.068
+      },
+      "h21": {
+        "hue_deg": 30.2,
+        "luma_Y_linear": 0.1517,
+        "median_srgb": [
+          142.0,
+          100.0,
+          57.5
+        ],
+        "sat": 0.595,
+        "value": 0.557
+      },
+      "ld": {
+        "hue_deg": 21.3,
+        "luma_Y_linear": 0.0703,
+        "median_srgb": [
+          99.0,
+          68.0,
+          51.0
+        ],
+        "sat": 0.485,
+        "value": 0.388
+      },
+      "pixels_concept": 13147,
+      "pixels_h21": 23980,
+      "pixels_ld": 23980
+    },
+    "legacy_bake": {
+      "concept": {
+        "hue_deg": 47.1,
+        "luma_Y_linear": 0.0596,
+        "median_srgb": [
+          75.0,
+          69.0,
+          47.0
+        ],
+        "sat": 0.373,
+        "value": 0.294
+      },
+      "delta_h21_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.99,
+        "dHue_deg": -0.4,
+        "dSat": -0.054
+      },
+      "delta_ld_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.072,
+        "dHue_deg": 0.0,
+        "dSat": -0.04
+      },
+      "h21": {
+        "hue_deg": 46.7,
+        "luma_Y_linear": 0.1415,
+        "median_srgb": [
+          113.0,
+          105.0,
+          77.0
+        ],
+        "sat": 0.319,
+        "value": 0.443
+      },
+      "ld": {
+        "hue_deg": 47.1,
+        "luma_Y_linear": 0.0762,
+        "median_srgb": [
+          84.0,
+          78.0,
+          56.0
+        ],
+        "sat": 0.333,
+        "value": 0.329
+      },
+      "pixels_concept": 74134,
+      "pixels_h21": 116785,
+      "pixels_ld": 116785
+    },
+    "linen": {
+      "concept": {
+        "hue_deg": 10.9,
+        "luma_Y_linear": 0.0342,
+        "median_srgb": [
+          59.0,
+          50.0,
+          48.0
+        ],
+        "sat": 0.186,
+        "value": 0.231
+      },
+      "delta_h21_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.235,
+        "dHue_deg": -5.9,
+        "dSat": -0.019
+      },
+      "delta_ld_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.0,
+        "dHue_deg": 0.0,
+        "dSat": -0.014
+      },
+      "h21": {
+        "hue_deg": 5.0,
+        "luma_Y_linear": 0.0504,
+        "median_srgb": [
+          72.0,
+          61.0,
+          60.0
+        ],
+        "sat": 0.167,
+        "value": 0.282
+      },
+      "ld": {
+        "hue_deg": 10.9,
+        "luma_Y_linear": 0.0408,
+        "median_srgb": [
+          64.0,
+          55.0,
+          53.0
+        ],
+        "sat": 0.172,
+        "value": 0.251
+      },
+      "pixels_concept": 381690,
+      "pixels_h21": 576731,
+      "pixels_ld": 576731
+    },
+    "skin": {
+      "concept": {
+        "hue_deg": 30.0,
+        "luma_Y_linear": 0.3918,
+        "median_srgb": [
+          184.0,
+          165.0,
+          146.0
+        ],
+        "sat": 0.207,
+        "value": 0.722
+      },
+      "delta_h21_vs_concept": {
+        "Y_ratio_exposure_normalised": 0.844,
+        "dHue_deg": -4.6,
+        "dSat": -0.063
+      },
+      "delta_ld_vs_concept": {
+        "Y_ratio_exposure_normalised": 0.965,
+        "dHue_deg": -0.8,
+        "dSat": -0.017
+      },
+      "h21": {
+        "hue_deg": 25.4,
+        "luma_Y_linear": 0.3946,
+        "median_srgb": [
+          181.0,
+          166.0,
+          155.0
+        ],
+        "sat": 0.144,
+        "value": 0.71
+      },
+      "ld": {
+        "hue_deg": 29.2,
+        "luma_Y_linear": 0.4512,
+        "median_srgb": [
+          195.0,
+          176.0,
+          158.0
+        ],
+        "sat": 0.19,
+        "value": 0.765
+      },
+      "pixels_concept": 95678,
+      "pixels_h21": 175109,
+      "pixels_ld": 175109
+    },
+    "stone_base": {
+      "concept": {
+        "hue_deg": 12.0,
+        "luma_Y_linear": 0.0292,
+        "median_srgb": [
+          54.0,
+          46.0,
+          44.0
+        ],
+        "sat": 0.185,
+        "value": 0.212
+      },
+      "delta_h21_vs_concept": {
+        "Y_ratio_exposure_normalised": 2.047,
+        "dHue_deg": -4.5,
+        "dSat": -0.086
+      },
+      "delta_ld_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.582,
+        "dHue_deg": -2.8,
+        "dSat": -0.012
+      },
+      "h21": {
+        "hue_deg": 7.5,
+        "luma_Y_linear": 0.0713,
+        "median_srgb": [
+          81.0,
+          74.0,
+          73.0
+        ],
+        "sat": 0.099,
+        "value": 0.318
+      },
+      "ld": {
+        "hue_deg": 9.2,
+        "luma_Y_linear": 0.0551,
+        "median_srgb": [
+          75.0,
+          64.0,
+          62.0
+        ],
+        "sat": 0.173,
+        "value": 0.294
+      },
+      "pixels_concept": 322680,
+      "pixels_h21": 356286,
+      "pixels_ld": 356286
+    },
+    "wood": {
+      "concept": {
+        "hue_deg": 25.1,
+        "luma_Y_linear": 0.0326,
+        "median_srgb": [
+          70.0,
+          45.0,
+          27.0
+        ],
+        "sat": 0.614,
+        "value": 0.275
+      },
+      "delta_h21_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.856,
+        "dHue_deg": -4.7,
+        "dSat": -0.144
+      },
+      "delta_ld_vs_concept": {
+        "Y_ratio_exposure_normalised": 1.466,
+        "dHue_deg": -3.8,
+        "dSat": -0.114
+      },
+      "h21": {
+        "hue_deg": 20.4,
+        "luma_Y_linear": 0.0722,
+        "median_srgb": [
+          100.0,
+          69.0,
+          53.0
+        ],
+        "sat": 0.47,
+        "value": 0.392
+      },
+      "ld": {
+        "hue_deg": 21.3,
+        "luma_Y_linear": 0.057,
+        "median_srgb": [
+          90.0,
+          61.0,
+          45.0
+        ],
+        "sat": 0.5,
+        "value": 0.353
+      },
+      "pixels_concept": 13689,
+      "pixels_h21": 43759,
+      "pixels_ld": 43759
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+ "hero": "Medusa",
+ "run_dir": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue-import",
+ "concept": {
+  "front": "art/imagegen/hero-quality-v1/medusa/medusa-front.png",
+  "side": "art/imagegen/hero-quality-v1/medusa/medusa-side.png",
+  "back": "art/imagegen/hero-quality-v1/medusa/medusa-back.png"
+ },
+ "concept_zones": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/measure-report.json",
+ "variants": {
+  "neutral": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral",
+  "Blue": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Blue",
+  "Red": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Red",
+  "debug": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_DebugClass"
+ },
+ "base_mi": {
+  "neutral": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base",
+  "Blue": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base_Blue",
+  "Red": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base_Red",
+  "debug": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base"
+ },
+ "zones": [
+  "gold_antique",
+  "linen",
+  "skin",
+  "leather_smooth",
+  "leather_worn",
+  "wood",
+  "legacy_bake"
+ ],
+ "key_zones": [
+  "gold_antique",
+  "linen",
+  "skin"
+ ],
+ "tolerance_zones": [
+  "gold_antique",
+  "linen",
+  "skin",
+  "leather_smooth",
+  "leather_worn"
+ ],
+ "anchor_zone": "linen",
+ "tolerance": {
+  "luma_ratio": 0.15,
+  "hue_deg": 12.0,
+  "sat": 0.1
+ },
+ "render_gates": {
+  "legacy_bake": {
+   "hue_deg": [
+    [
+     38,
+     110
+    ]
+   ],
+   "s_min": 0.15
+  }
+ },
+ "min_px": 150,
+ "reading_bias_ev": -1.0,
+ "previous": [
+  {
+   "label": "UE H2LD i0 (LUT Blender) нейтр.",
+   "tag": "i0",
+   "variant": "neutral",
+   "frames_dir": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue/review/i0/frames"
+  }
+ ]
+}

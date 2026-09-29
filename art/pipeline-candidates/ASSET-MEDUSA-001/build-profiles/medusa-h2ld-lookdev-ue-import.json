@@ -1,0 +1,219 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "profile_id": "medusa-h2ld-lookdev-ue-import/1",
+  "asset_id": "ASSET-MEDUSA-001",
+  "kind": "skeletal-adopt",
+  "status": "proposed",
+  "status_note": "LD-medusa-ue (2026-09-29): UE import of the Medusa look-dev run 20260929-h2-lookdev (profile medusa-h2-lookdev/1: H2.1 figure + UV1 in metres, MatID, EdgeMask, graded BC/ORM, TeamMask only on cloth) through the CLI profile skeletal-adopt: adopt pins the look-dev FBX pair, the 2K maps and the hero MatLUT against the look-dev reports (normaliser h2-lookdev/1), ue-import creates MI of /Game/UM/Materials/v2/M_UM_Figure_v2 (MatIDTexture, MatLUT, EdgeMaskTexture, UseUV1Metres) and of M_UM_BaseMarker for the base. At most «технически импортировано»/«измерено»; no art acceptance, no budget (GD-058 open); team colours Blue/Red are a diagnostic pair (Q-304 open).",
+  "derived_from": [
+    "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-ue-import.json (skeletal-adopt ue section of W5c-A)",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-bake-h2.json (H2.1 bake: armature UM_HUMANOID_17_v2 with weapon.L, scale, axes, sockets)",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-lookdev.json (look-dev run: MatID classes, LUT overrides, UV1)",
+    "docs/art-pipeline/material-library/m-um-figure-v2.md (MI parameters of M_UM_Figure_v2)"
+  ],
+  "source_role": "h2-parts-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "candidate": {
+    "dir": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev",
+    "report_format": "h2-lookdev/1",
+    "bake_profile": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-lookdev.json",
+    "bake_profile_id": "medusa-h2-lookdev/1",
+    "build_report": "reports/ld-fbx-report.json",
+    "textures_report": "reports/ld-maps-report.json",
+    "extra_reports": {
+      "run_manifest": "reports/run-manifest.json",
+      "source_rig_report": "../20260929-h2-bake/reports/rig-report.json",
+      "source_textures_report": "../20260929-h2-bake/reports/textures-report.json"
+    },
+    "fbx": {
+      "skeletal": "export/SK_Medusa_H2LD.fbx",
+      "base": "export/SM_Medusa_H2LD_Base.fbx"
+    },
+    "textures": {
+      "BC": "textures/T_Medusa_H2LD_2K_BC.png",
+      "N": "textures/T_Medusa_H2LD_2K_N.png",
+      "ORM": "textures/T_Medusa_H2LD_2K_ORM.png",
+      "TeamMask": "textures/T_Medusa_H2LD_2K_TeamMask.png",
+      "MatID": "textures/T_Medusa_H2LD_2K_MatID.png",
+      "Edge": "textures/T_Medusa_H2LD_2K_Edge.png"
+    },
+    "library_inputs": {
+      "LUT": {
+        "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue/lut/T_UM_MatLUT_Medusa_UE.dds",
+        "sha256": "6df64b5b7c3b72128987ecc8934029c89f7f81125e28cd6810df8a056fe1357f",
+        "note": "hero MatLUT 16 x 16 RGBA16F (build_ue_inputs.py layout, rows 0-9) after the UE look-dev iterations (tools/art/material_library/ue_hero_lookdev.py lut); iteration 0 = the Blender LUT of the look-dev run byte for byte"
+      }
+    },
+    "textures_note": "2K runtime maps only (committed); the 4K masters stay local. N is the byte copy of the H2.1 DirectX map (normaliser check normal_is_the_h21_directx_map)",
+    "texture_px": 2048,
+    "texture_tier": "runtime_2k",
+    "conventions_required": {
+      "BC": "sRGB",
+      "N": "DirectX",
+      "ORM": "R = AO, G = roughness, B = metallic",
+      "TeamMask": "linear",
+      "MatID": "index * 16 + 8",
+      "Edge": "linear"
+    },
+    "top_part": "tripo_part_0"
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "skeleton": "UM_HUMANOID_17_v2",
+    "bones": [
+      ["root", null],
+      ["hips", "root"],
+      ["spine", "hips"],
+      ["head", "spine"],
+      ["arm_upper.L", "spine"],
+      ["arm_lower.L", "arm_upper.L"],
+      ["hand.L", "arm_lower.L"],
+      ["arm_upper.R", "spine"],
+      ["arm_lower.R", "arm_upper.R"],
+      ["hand.R", "arm_lower.R"],
+      ["leg_upper.L", "hips"],
+      ["leg_lower.L", "leg_upper.L"],
+      ["foot.L", "leg_lower.L"],
+      ["leg_upper.R", "hips"],
+      ["leg_lower.R", "leg_upper.R"],
+      ["foot.R", "leg_lower.R"],
+      ["weapon.L", "hand.L"]
+    ],
+    "bones_note": "UM_HUMANOID_17_v2: 16 body bones + weapon.L (Medusa's bow, left hand). In UE the armature object SKEL_UM_Humanoid becomes bone 0 (18 bones), '.' becomes '_' (weapon_L)"
+  },
+  "scale": {
+    "figure_height_m": 0.55,
+    "top_part": "tripo_part_0",
+    "note": "skeletal top 55.009 uu above the base bottom (H2.1 rig report checks.unit_scale_1_and_height)"
+  },
+  "meshes": {
+    "base": {
+      "object": "SM_Medusa_H2_Base",
+      "footprint_m": [0.3, 0.3, 0.05924],
+      "pivot": "centre of the base bottom"
+    }
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "blender_weapon_side": "+X",
+    "expected_ue_front": "+X",
+    "expected_ue_weapon_side": "-Y",
+    "expected_ue_front_source": "04-blender-production.md §1 «Оси» + §1.1 preset UM_FBX_v1 (ART-001); ld_fbx measured the face normal (0.685, 0.032, -0.081) along +X in the export frame"
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "weapon.L",
+      "location_uu": [0, 0, 0],
+      "purpose": "rig-contract §7: Weapon on the weapon bone at (0,0,0) = the bow grip"
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "location_uu": null,
+      "purpose": "damage / status VFX; location = the H2.1 bake's UE bone-space prediction"
+    }
+  ],
+  "expectations": {
+    "triangles": {
+      "SK_Medusa_H2_Body": 38054,
+      "SK_Medusa_H2_Bow": 5000,
+      "SM_Medusa_H2_Base": 1598
+    },
+    "bones": 17,
+    "skeletal_material_slots": 1,
+    "base_material_slots": 1,
+    "skeletal_lods": 1,
+    "note": "numbers of the look-dev read-back (ld-fbx-report triangles_as_h21); the FBX carries LOD0 only"
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "H2 bake budget proposal (figure 30-45 k tris, 4K master + 2K runtime, <= 2 slots) and 04 §3.4 — ПРЕДЛОЖЕНИЕ до решения GD-058, не бюджет",
+    "hero_triangles": [30000, 45000],
+    "texture_px": 2048,
+    "material_slots_max": 2,
+    "height_uu": [40, 60],
+    "base_diameter_uu": 30,
+    "base_height_uu": 6
+  },
+  "ue": {
+    "folder_note": "run with: ue-import --ue-folder /Game/PipelineCandidates/Medusa/H2LD",
+    "skeletal_asset": "SK_Medusa_H2LD",
+    "base_asset": "SM_Medusa_H2LD_Base",
+    "material_route": "um-master",
+    "masters": {
+      "figure": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+      "base": "/Game/UM/Materials/M_UM_BaseMarker"
+    },
+    "masters_note": "figure on M_UM_Figure_v2 (LD-master; v1 knob names and CPD layout kept, so the um-master checks of the v1 parameter spec still apply); the base stays on M_UM_BaseMarker v1 (team side band), its stone reads the graded look-dev BC",
+    "figure_instance": "MI_Medusa_H2LD",
+    "base_instance": "MI_Medusa_H2LD_Base",
+    "teams": {
+      "Blue": "#3F6FD8",
+      "Red": "#D0453A"
+    },
+    "teams_note": "diagnostic pair (as Merlin W5c-A); С-11 Gold/Silver stays the palette proposal (Q-304 open). Linear only through FLinearColor::FromSRGBColor (AD-OPEN-39 rule)",
+    "default_team": "Blue",
+    "team_instances": {
+      "figure": "MI_Medusa_H2LD_{team}",
+      "base": "MI_Medusa_H2LD_Base_{team}"
+    },
+    "team_color_mode": "mask",
+    "team_color_mode_note": "user decision 2026-09-28 (AD-CNF-58 = b) + 5c-A: TeamColor only on the cloth classes (TeamMask.R x teamDyeAllowed of the LUT; the look-dev TeamMask.R is 0 outside linen), never on the gold trim",
+    "figure_parameters": {
+      "TeamDye": 1.0,
+      "TeamDyeGain": 4.5
+    },
+    "figure_parameters_note": "dye target luminance as W4-B (0.147 x TeamColor): 0.147 / 0.033 (ymedClassHero of linen) = 4.45 -> 4.5. Proposal",
+    "figure_textures": {
+      "MatIDTexture": "MatID",
+      "MatLUT": "LUT",
+      "EdgeMaskTexture": "Edge"
+    },
+    "figure_static_switches": {
+      "UseUV1Metres": true
+    },
+    "extra_instances": [
+      {
+        "asset": "MI_Medusa_H2LD_Neutral",
+        "parent": "figure_instance",
+        "scalars": {"TeamDye": 0.0},
+        "vectors": {"TeamColor": {"linear": [1.0, 1.0, 1.0, 1.0]}},
+        "note": "no dye (TeamColor white, TeamDye 0): the look-dev BC as baked, for the comparison with the concept"
+      },
+      {
+        "asset": "MI_Medusa_H2LD_DebugClass",
+        "parent": "figure_instance",
+        "scalars": {"DebugView": 1.0},
+        "note": "MatID zone mask for the measurements (class colours in emissive, surface black)"
+      }
+    ],
+    "base_marker": {
+      "textures": true,
+      "parameters": {
+        "SideBandWeight": 1.0,
+        "VertexMaskWeight": 0.0
+      },
+      "note": "textured H2 base: team band = the side wall, flat TeamColor (W4-B). Proposal"
+    },
+    "base_generate_lightmap_uvs": false,
+    "base_generate_lightmap_uvs_note": "the base FBX carries UV1_m (metres); lightmap UV generation would overwrite UV1 (ld-fbx-report ue_import_notes)",
+    "expect_uv_channels": 2,
+    "textures": {
+      "BC": {"file_key": "BC", "asset": "T_Medusa_H2LD_BC", "srgb": true, "compression": "TC_Default"},
+      "N": {"file_key": "N", "asset": "T_Medusa_H2LD_N", "srgb": false, "compression": "TC_Normalmap", "flip_green": false,
+            "note": "DirectX normal (byte copy of H2.1)"},
+      "ORM": {"file_key": "ORM", "asset": "T_Medusa_H2LD_ORM", "srgb": false, "compression": "TC_Masks"},
+      "TeamMask": {"file_key": "TeamMask", "asset": "T_Medusa_H2LD_TeamMask", "srgb": false, "compression": "TC_Grayscale",
+                   "note": "RGBA mask (R cloth, G base band); M_UM_Figure_v2 samples TeamMaskTexture as LinearGrayscale (as v1), so TC_Grayscale (G8); the dye in the Blue/Red frames shows which channel survived"},
+      "MatID": {"file_key": "MatID", "asset": "T_Medusa_H2LD_MatID", "srgb": false, "compression": "TC_Grayscale",
+                "properties": {"Filter": "TF_Nearest", "MipGenSettings": "TMGS_NoMipmaps", "NeverStream": true},
+                "note": "R8 index x 16 + 8, read with Load (m-um-figure-v2 §3.1): G8, point, no mips, not streamed"},
+      "Edge": {"file_key": "Edge", "asset": "T_Medusa_H2LD_Edge", "srgb": false, "compression": "TC_Grayscale",
+               "note": "linear edge mask (EdgeMaskTexture)"},
+      "LUT": {"file_key": "LUT", "asset": "T_UM_MatLUT_Medusa", "srgb": false, "compression": "TC_HDR", "px": [16, 16],
+              "properties": {"Filter": "TF_Nearest", "MipGenSettings": "TMGS_NoMipmaps", "NeverStream": true},
+              "note": "hero LUT 16 x 16 RGBA16F, Load only: HDR (RGBA16F), point, no mips, not streamed (as T_UM_MatLUT_Global)"}
+    },
+    "measure_skeletal_triangles": true
+  }
+}

@@ -1,0 +1,459 @@
+{
+  "asset_id": "ASSET-MERLIN-001",
+  "claims": {
+    "art_accepted": false,
+    "budgets_declared": false,
+    "game_ready": false,
+    "note": "technical pipeline evidence only"
+  },
+  "config": {
+    "build_profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev-ue-import.json",
+    "export_basename": "SK_Merlin_H2LD",
+    "primary_role": "h2-parts-glb",
+    "primary_source": "tripo-de0654b5-h2",
+    "profile": "skeletal-adopt",
+    "triangle_loss_tolerance": 0.001,
+    "ue": {
+      "asset_name": null,
+      "dimension_tolerance": 0.01,
+      "folder": "/Game/PipelineCandidates/Merlin/H2LD",
+      "import_materials": false,
+      "import_note": "skeletal-adopt: meshes imported with import_materials=false, import_textures=false; textures are the adopted 2K runtime PNGs",
+      "import_textures": false
+    }
+  },
+  "created_at": "2026-09-29T15:32:47+00:00",
+  "exports": [],
+  "generation_requests": [],
+  "network": {
+    "paid_tasks_created": 0,
+    "policy": "no network code; Tripo results are registered from existing local files",
+    "tripo_calls": 0
+  },
+  "run_id": "20260929-h2ld-ue-import",
+  "schema": "unmatched.tripo-pipeline.run/1",
+  "sources": {
+    "tripo-de0654b5-h2": {
+      "evidence": [
+        {
+          "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/reports/tripo-run.json",
+          "sha256": "219b0cfdc592becca98a79d95160a6b4ff723e4a41fc890e574a9cca2c849d21"
+        },
+        {
+          "path": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json",
+          "sha256": "6eec58ae8f7c7e4698af63b6bac3a8fdd88f4d7626c97ab1e5852777fe8c35ca"
+        }
+      ],
+      "files": [
+        {
+          "bytes": 46857420,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+          "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-parts12.glb",
+          "produced_by": "generate",
+          "role": "h2-parts-glb",
+          "sha256": "82c3eff8e73359969decc807a637eccc5e05847df91e5d5c1a8d4377205cd74d",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 0,
+            "materials": 1,
+            "mesh_count": 12,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 1063800
+              },
+              {
+                "name": "meshes[10]",
+                "triangles": 68415
+              },
+              {
+                "name": "meshes[11]",
+                "triangles": 46676
+              },
+              {
+                "name": "meshes[1]",
+                "triangles": 235801
+              },
+              {
+                "name": "meshes[2]",
+                "triangles": 75685
+              },
+              {
+                "name": "meshes[3]",
+                "triangles": 137019
+              },
+              {
+                "name": "meshes[4]",
+                "triangles": 124948
+              },
+              {
+                "name": "meshes[5]",
+                "triangles": 47898
+              },
+              {
+                "name": "meshes[6]",
+                "triangles": 29138
+              },
+              {
+                "name": "meshes[7]",
+                "triangles": 18421
+              },
+              {
+                "name": "meshes[8]",
+                "triangles": 29957
+              },
+              {
+                "name": "meshes[9]",
+                "triangles": 69765
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1947523
+          }
+        },
+        {
+          "bytes": 69793876,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export после текстуры 8K (удалить освещение) и PBR, unmodified",
+          "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-tex8k-pbr.glb",
+          "produced_by": "pbr",
+          "role": "h2-tex8k-pbr-glb",
+          "sha256": "bb970839f3431af1f7bc188a62502ea210dc65210796257f8c391f40fbbfd9d2",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 36,
+            "materials": 12,
+            "mesh_count": 12,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 1063800
+              },
+              {
+                "name": "meshes[10]",
+                "triangles": 68415
+              },
+              {
+                "name": "meshes[11]",
+                "triangles": 46676
+              },
+              {
+                "name": "meshes[1]",
+                "triangles": 235801
+              },
+              {
+                "name": "meshes[2]",
+                "triangles": 75685
+              },
+              {
+                "name": "meshes[3]",
+                "triangles": 137019
+              },
+              {
+                "name": "meshes[4]",
+                "triangles": 124948
+              },
+              {
+                "name": "meshes[5]",
+                "triangles": 47898
+              },
+              {
+                "name": "meshes[6]",
+                "triangles": 29138
+              },
+              {
+                "name": "meshes[7]",
+                "triangles": 18421
+              },
+              {
+                "name": "meshes[8]",
+                "triangles": 29957
+              },
+              {
+                "name": "meshes[9]",
+                "triangles": 69765
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1947523
+          }
+        }
+      ],
+      "generation_inputs": [
+        {
+          "path": "art/imagegen/hero-quality-v1/merlin/merlin-back.png",
+          "present": true,
+          "sha256": "c077b41a260fe937a152d85f560375af7a6632c6769ba7105c6e00b8c043123d",
+          "view": "back"
+        },
+        {
+          "path": "art/imagegen/hero-quality-v1/merlin/merlin-front.png",
+          "present": true,
+          "sha256": "25856808d165affebc0ad26fd774ef589b725d7a92d3fa3c6cdd4757e76db0bf",
+          "view": "front"
+        },
+        {
+          "path": "art/imagegen/hero-quality-v1/merlin/merlin-side.png",
+          "present": true,
+          "sha256": "6a9cadbb5281c26d9adbfed61eac33528ed2eea84cb79d9f1ad8433cd3b3ea8b",
+          "view": "right"
+        }
+      ],
+      "historical_credits_observed": {
+        "studio-credits": 95
+      },
+      "registered_at": "2026-09-29T15:32:47+00:00",
+      "registered_by": "tripo-pipeline 0.8.0",
+      "spec": {
+        "asset_id": "ASSET-MERLIN-001",
+        "date": "2026-09-29",
+        "evidence": [
+          "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/reports/tripo-run.json",
+          "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json"
+        ],
+        "expectations": {
+          "h2-parts-glb": {
+            "armatures": 0,
+            "glb_images": 0,
+            "glb_materials": 1,
+            "glb_mesh_count": 12,
+            "glb_skins": 0,
+            "glb_triangles": 1947523
+          },
+          "h2-tex8k-pbr-glb": {
+            "armatures": 0,
+            "glb_images": 36,
+            "glb_materials": 12,
+            "glb_mesh_count": 12,
+            "glb_skins": 0,
+            "glb_triangles": 1947523
+          }
+        },
+        "files": [
+          {
+            "expected_bytes": 46857420,
+            "expected_sha256": "82c3eff8e73359969decc807a637eccc5e05847df91e5d5c1a8d4377205cd74d",
+            "in_git": false,
+            "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+            "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-parts12.glb",
+            "produced_by": "generate",
+            "role": "h2-parts-glb"
+          },
+          {
+            "expected_bytes": 69793876,
+            "expected_sha256": "bb970839f3431af1f7bc188a62502ea210dc65210796257f8c391f40fbbfd9d2",
+            "in_git": false,
+            "origin": "Studio GLB export после текстуры 8K (удалить освещение) и PBR, unmodified",
+            "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-tex8k-pbr.glb",
+            "produced_by": "pbr",
+            "role": "h2-tex8k-pbr-glb"
+          }
+        ],
+        "generation": {
+          "concept_prompts": "art/imagegen/hero-quality-v1/merlin/prompts.md",
+          "input_manifest": null,
+          "mode": "multi-view",
+          "settings": {
+            "ai_completion": null,
+            "generate_parts": true,
+            "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+            "parts_mode": "Баланс (Balanced)",
+            "pbr": true,
+            "polygon_count": 2000000,
+            "privacy": null,
+            "remove_lighting": true,
+            "seed": null,
+            "settings_note": "texture_8k/remove_lighting/pbr — это последующие шаги генератора текстур и PBR на high-poly, а не настройки генерации геометрии. null = не записано.",
+            "texture_8k": true,
+            "topology": null,
+            "ultra_mesh_quality": true
+          },
+          "slot_note": "Боковой концепт — правый вид (prompts.md), подан в слот RIGHT: согласовано (как у прежнего H3.1 Merlin d9ff4260).",
+          "views": {
+            "back": {
+              "path": "art/imagegen/hero-quality-v1/merlin/merlin-back.png",
+              "sha256": "c077b41a260fe937a152d85f560375af7a6632c6769ba7105c6e00b8c043123d"
+            },
+            "front": {
+              "path": "art/imagegen/hero-quality-v1/merlin/merlin-front.png",
+              "sha256": "25856808d165affebc0ad26fd774ef589b725d7a92d3fa3c6cdd4757e76db0bf"
+            },
+            "left": null,
+            "right": {
+              "path": "art/imagegen/hero-quality-v1/merlin/merlin-side.png",
+              "sha256": "6a9cadbb5281c26d9adbfed61eac33528ed2eea84cb79d9f1ad8433cd3b3ea8b"
+            }
+          }
+        },
+        "git_policy": "Сырые GLB (44–77 МБ) не коммитятся: .gitignore ассета исключает 20260929-h2-tripo/source/*-parts*.glb и *-tex8k-pbr.glb; файл восстанавливается выгрузкой из Studio по task_url и проверяется по expected_sha256/expected_bytes",
+        "iteration": "H2 (проработка героев по концептам hero-quality-v1)",
+        "model_version": {
+          "backend": null,
+          "note": "H3.1 со слов оркестратора; подпись UI не записана",
+          "ui_label": null
+        },
+        "operations": [
+          {
+            "credits": {
+              "balance_after": 24025,
+              "balance_before": 24085,
+              "observed_debit": 60,
+              "quoted": 60,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/reports/tripo-run.json",
+            "history_time": "2026-09-29 07:02",
+            "mode": "Из нескольких видов в модель, по частям (Баланс), ультра-геометрия 2M, без текстуры",
+            "op": "generate"
+          },
+          {
+            "credits": {
+              "balance_after": 23905,
+              "balance_before": 23935,
+              "observed_debit": 30,
+              "quoted": 30,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/reports/tripo-run.json",
+            "history_time": "2026-09-29 07:12",
+            "mode": "Генератор текстур 8K, удалить освещение, на high-poly модели по частям",
+            "op": "texture"
+          },
+          {
+            "credits": {
+              "balance_after": 23860,
+              "balance_before": 23865,
+              "observed_debit": 5,
+              "quoted": 5,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/reports/tripo-run.json",
+            "history_time": "2026-09-29 07:18",
+            "mode": "Генератор PBR после 8K",
+            "op": "pbr"
+          }
+        ],
+        "parent_task_id": null,
+        "schema": "unmatched.tripo-pipeline.source-spec/1",
+        "service": "tripo-studio",
+        "source_id": "tripo-de0654b5-h2",
+        "task_id": "de0654b5-b879-46aa-90fe-62a05e7c6366",
+        "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/de0654b5-b879-46aa-90fe-62a05e7c6366"
+      },
+      "spec_sha256": "74d2ca6d37b49f588d44aeee04db493287a0e95fd1bd1afe67d613397e46626b"
+    }
+  },
+  "stages": {
+    "adopt": {
+      "attempts": 6,
+      "backend": "headless",
+      "fingerprint": "83298aed8b0acb4972e0f092ddcecbd9ed402cc6e0c490b6ebb4b02ea0ade16f",
+      "finished_at": "2026-09-29T18:42:36+00:00",
+      "outputs": {
+        "reports/adopt-report.json": {
+          "bytes": 27476,
+          "sha256": "5d3990d8c82f688eca71c3b26e51f5544f1eaf40174a991ab8478d554d0d7085"
+        }
+      },
+      "started_at": "2026-09-29T18:42:36+00:00",
+      "status": "completed",
+      "summary": {
+        "failed_checks": [],
+        "inputs": 16,
+        "passed": true
+      },
+      "tool_version": "0.8.0"
+    },
+    "preflight": {
+      "attempts": 2,
+      "backend": "headless",
+      "fingerprint": "b373d137d22bfd881fa7fac4f444516c674a48e12daf348aed98750edf95fcf0",
+      "finished_at": "2026-09-29T18:22:32+00:00",
+      "outputs": {
+        "reports/preflight.json": {
+          "bytes": 3839,
+          "sha256": "e4accd3fd4d07f56053ec4bff52508ce45ee6051f45bd7d0c16a2b3126ee6771"
+        }
+      },
+      "started_at": "2026-09-29T15:32:47+00:00",
+      "status": "completed",
+      "summary": {
+        "failed_checks": [],
+        "passed": true,
+        "sources_verified": 2
+      },
+      "tool_version": "0.8.0"
+    },
+    "ue-import": {
+      "attempts": 6,
+      "backend": "mcp",
+      "fingerprint": "7c2484329f7223e602b08c13efd6e4f211b701695171b4ff0638d5b262a323ab",
+      "finished_at": "2026-09-29T18:46:58+00:00",
+      "outputs": {
+        "reports/ue-import-report.json": {
+          "bytes": 53598,
+          "sha256": "c15eae98f3ebe1d08dc9b1f8824ff1b0d867bfa5fb790d1200424ae87f09e605"
+        },
+        "reports/ue-mcp-calls.json": {
+          "bytes": 448911,
+          "sha256": "0c7c857330591083ea80db832a258a81b3b2248b31b314ed0944f6c43a3bca6f"
+        }
+      },
+      "started_at": "2026-09-29T18:42:36+00:00",
+      "status": "completed",
+      "summary": {
+        "assets": 20,
+        "failed_checks": [],
+        "kind": "skeletal-adopt",
+        "passed": true,
+        "primary_asset": "/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD"
+      },
+      "tool_version": "0.8.0",
+      "ue_owned_assets": [
+        "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD",
+        "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base",
+        "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base_Blue",
+        "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base_Red",
+        "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Blue",
+        "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_DebugClasses",
+        "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_DebugZones",
+        "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral",
+        "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Red",
+        "/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD",
+        "/Game/PipelineCandidates/Merlin/H2LD/Meshes/SM_Merlin_H2LD_Base",
+        "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_BC",
+        "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_EdgeMask",
+        "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_MatID",
+        "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_N",
+        "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_ORM",
+        "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_TeamMask",
+        "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_ZoneID_Debug",
+        "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_ZoneLUT_Debug",
+        "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_UM_MatLUT_Merlin"
+      ]
+    }
+  },
+  "status_legend": {
+    "art_accepted": "художественно принято — только решением арт-трека; этот инструмент его не ставит",
+    "measured": "измерено — число получено инструментом из файла",
+    "proposed": "предложено — план или норматив без проверки",
+    "technically_imported": "технически импортировано — файл прочитан/записан без ошибок, контракты проверены"
+  },
+  "tool": {
+    "name": "tripo-pipeline",
+    "version": "0.8.0"
+  }
+}

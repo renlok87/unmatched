@@ -63,12 +63,27 @@ REPORT_FORMATS["h2-bake-arthur/1"] = {  # tools/tripo-pipeline/blender/h2_bake_a
     "build": dict(REPORT_FORMATS["h2-bake-rig/1"]["build"], figure_top_uu="/measures/figure_top_uu"),
     "textures": dict(REPORT_FORMATS["h2-bake-rig/1"]["textures"]),
 }
+REPORT_FORMATS["h2-lookdev/1"] = {  # h2_bake --mode lookdev (LD wave): ld-fbx + ld-maps + run manifest + H2.1 rig report
+    "build": dict(REPORT_FORMATS["h2-bake-rig/1"]["build"], figure_top_uu="/measures/figure_top_uu"),
+    "textures": dict(REPORT_FORMATS["h2-bake-rig/1"]["textures"]),
+}
+
+
+# LD-merlin-ue (2026-09-29): a hero look-dev run (h2_bake_merlin ld_* stages) = the H2.1 rig re-exported with UV1 +
+# the v2 material inputs; skeletal_adopt_lookdev.py joins its reports with the H2.1 build report into h2-bake-rig/1
+REPORT_FORMATS["h2-lookdev-merlin/1"] = {
+    "build": dict(REPORT_FORMATS["h2-bake-rig/1"]["build"]),
+    "textures": dict(REPORT_FORMATS["h2-bake-rig/1"]["textures"]),
+}
 
 
 def normaliser(profile: dict):
-    """The report normaliser of the profile's report_format (skeletal_adopt_formats.NORMALISERS) or None."""
+    """The report normaliser of the profile's report_format (skeletal_adopt_formats.NORMALISERS,
+    skeletal_adopt_lookdev.NORMALISERS) or None."""
     import skeletal_adopt_formats
-    return skeletal_adopt_formats.NORMALISERS.get(profile["candidate"].get("report_format"))
+    import skeletal_adopt_lookdev
+    fmt = profile["candidate"].get("report_format")
+    return skeletal_adopt_formats.NORMALISERS.get(fmt) or skeletal_adopt_lookdev.NORMALISERS.get(fmt)
 # FBX export keys the bake must share with the preset (UM_FBX_v1); path_mode / bake_anim may deviate when the bake
 # records the deviation (deviations_from_preset): textures reach UE from the atlas, not through the FBX
 PRESET_KEYS = ("axis_forward", "axis_up", "export_space_rotation_z_degrees", "apply_unit_scale", "apply_scale_options",
@@ -126,7 +141,22 @@ def candidate_files(profile: dict) -> dict:
         files["report:" + key] = "%s/%s" % (base, rel)
     if c.get("extra_reports") and c.get("bake_profile"):
         files["profile:bake"] = c["bake_profile"]
+    # LD wave (M_UM_Figure_v2): inputs that are not maps of the bake atlas (the hero MatLUT 16 x 16 RGBA16F DDS, tuned
+    # in UE look-dev) - repo-relative paths, pinned by the sha256 the profile records; imported like the textures
+    for key, spec in sorted((c.get("library_inputs") or {}).items()):
+        files["texture:" + key] = spec["path"]
     return files
+
+
+def dds_pixels(path) -> list:
+    """[w, h] from a DDS header (LD-merlin-ue: the class LUT) or None."""
+    import struct
+    with open(path, "rb") as handle:
+        head = handle.read(20)
+    if head[:4] != b"DDS ":
+        return None
+    h, w = struct.unpack("<II", head[12:20])
+    return [w, h]
 
 
 def rotate_z(x: float, y: float, degrees: float) -> tuple:
@@ -211,21 +241,33 @@ def adopt(profile: dict, repo_path, sha256_file, png_pixels, preset: dict) -> di
            for k in fbx})
     tex_files = t("files")
     size = int(c["texture_px"])
+    # LD-merlin-ue: a texture that is not a runtime-tier atlas map (the 16 x 16 class LUT) names its own px and tier
+    exceptions = c.get("texture_exceptions") or {}
     tex = {}
     for key in sorted(c["textures"]):
         rel = files["texture:" + key]
         rec = tex_files.get(Path(rel).name) or {}
-        px = png_pixels(repo_path(rel))
+        px = png_pixels(repo_path(rel)) if not rel.lower().endswith(".dds") else dds_pixels(repo_path(rel))
+        exc = exceptions.get(key) or {}
         tex[key] = {"file": Path(rel).name, "sha256_ok": rec.get("sha256") == hashes["texture:" + key],
                     "same_path": rec.get("path") == rel, "tier": rec.get("tier"), "report_px": rec.get("px"),
-                    "png_px": px}
+                    "png_px": px, "want_tier": exc.get("tier", c.get("texture_tier")),
+                    "want_px": exc.get("px", [size, size])}
     check("texture_bytes_match_textures_report", all(v["sha256_ok"] and v["same_path"] for v in tex.values()),
           {k: {"sha256_ok": v["sha256_ok"], "same_path": v["same_path"]} for k, v in tex.items()})
     tier = c.get("texture_tier")
-    check("textures_are_the_runtime_tier", all(v["tier"] == tier and v["png_px"] == [size, size] and
-                                              v["report_px"] == [size, size] for v in tex.values()),
-          {k: {"tier": v["tier"], "png_px": v["png_px"]} for k, v in tex.items()}, {"tier": tier, "px": [size, size]},
+    check("textures_are_the_runtime_tier", all(v["tier"] == v["want_tier"] and v["png_px"] == v["want_px"] and
+                                              v["report_px"] == v["want_px"] for v in tex.values()),
+          {k: {"tier": v["tier"], "png_px": v["png_px"]} for k, v in tex.items()},
+          dict({"tier": tier, "px": [size, size]}, **({"exceptions": exceptions} if exceptions else {})),
           "only the committed runtime maps reach UE; the local 4K masters are never imported")
+    lib = c.get("library_inputs") or {}
+    if lib:
+        lib_ok = {k: {"sha256_ok": hashes["texture:" + k] == spec.get("sha256"), "file": hashes["texture:" + k],
+                      "profile": spec.get("sha256")} for k, spec in sorted(lib.items())}
+        check("library_inputs_pinned_by_profile", all(v["sha256_ok"] for v in lib_ok.values()), lib_ok,
+              note="inputs outside the bake atlas (e.g. the hero MatLUT of M_UM_Figure_v2): the bytes are the ones "
+                   "the profile pins (candidate.library_inputs.*.sha256)")
     conv = t("conventions")
     want_conv = c.get("conventions_required") or {}
     conv_ok = {k: isinstance(conv.get(k), str) and want in conv[k] for k, want in sorted(want_conv.items())}

@@ -1,0 +1,69 @@
+{
+ "asset_id": "ASSET-MEDUSA-001",
+ "classes": {
+  "gold_antique": {
+   "bc": [
+    0.8632,
+    0.4508,
+    0.1981
+   ],
+   "ymedClassHero": 0.52196
+  },
+  "leather_smooth": {
+   "bc": [
+    0.0595,
+    0.0222,
+    0.013
+   ],
+   "ymedClassHero": 0.02919
+  },
+  "leather_worn": {
+   "bc": [
+    0.0666,
+    0.0212,
+    0.006
+   ],
+   "ymedClassHero": 0.02919
+  },
+  "linen": {
+   "bc": [
+    0.0409,
+    0.0307,
+    0.0284
+   ],
+   "ymedClassHero": 0.03301
+  },
+  "skin": {
+   "bc": [
+    0.6445,
+    0.4125,
+    0.2384
+   ],
+   "ymedClassHero": 0.449
+  },
+  "stone_base": {
+   "bc": [
+    0.0382,
+    0.0242,
+    0.0212
+   ],
+   "ymedClassHero": 0.02693
+  },
+  "wood": {
+   "bc": [
+    0.0648,
+    0.0185,
+    0.004
+   ],
+   "ymedClassHero": 0.02698
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake/lookdev.py (ld_maps)",
+ "hero": "Medusa",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero Medusa --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "тон класса после подгонки к концепту (ld_measure); у металла — F0 героя",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ }
+}

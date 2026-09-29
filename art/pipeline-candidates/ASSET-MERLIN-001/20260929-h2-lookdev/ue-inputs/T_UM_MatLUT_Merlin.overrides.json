@@ -1,0 +1,192 @@
+{
+ "classes": {
+  "bronze": {
+   "bc": [
+    0.3,
+    0.18,
+    0.1
+   ],
+   "roughHi": 0.58,
+   "roughLo": 0.36,
+   "roughTypical": 0.45,
+   "roughVariation": 0.06,
+   "wearStrength": 0.0,
+   "ymedClassHero": 0.17776
+  },
+  "leather_worn": {
+   "bc": [
+    0.06409,
+    0.02997,
+    0.01689
+   ],
+   "luminanceMin": 0.012,
+   "roughHi": 0.8,
+   "roughLo": 0.45,
+   "roughTypical": 0.62,
+   "roughVariation": 0.2,
+   "teamDyeAllowed": 0.0
+  },
+  "silk": {
+   "bc": [
+    0.29619,
+    0.1592,
+    0.07468
+   ],
+   "roughHi": 0.58,
+   "roughLo": 0.32,
+   "roughTypical": 0.42,
+   "roughVariation": 0.08,
+   "sheenIntensity": 0.09,
+   "sheenTint": 1.0,
+   "specular": 0.2,
+   "teamDyeAllowed": 0.0
+  },
+  "skin": {
+   "bc": [
+    0.39056,
+    0.2145,
+    0.12657
+   ],
+   "cavityTintStrength": 0.55,
+   "luminanceMin": 0.02
+  },
+  "stone_base": {
+   "bc": [
+    0.03173,
+    0.02662,
+    0.02834
+   ],
+   "luminanceMin": 0.012
+  },
+  "wood": {
+   "bc": [
+    0.07052,
+    0.03283,
+    0.01562
+   ],
+   "luminanceMin": 0.015
+  },
+  "wool_coarse": {
+   "bc": [
+    0.01482,
+    0.02173,
+    0.07371
+   ],
+   "luminanceMin": 0.012,
+   "sheenIntensity": 0.09
+  }
+ },
+ "generator": "tools/art/material_library/lookdev_ue_inputs.py",
+ "hero": "Merlin",
+ "layers": {
+  "blender_lookdev": {
+   "classes": {
+    "bronze": {
+     "ymedClassHero": 0.17776
+    },
+    "leather_worn": {
+     "bc": [
+      0.06409,
+      0.02997,
+      0.01689
+     ],
+     "teamDyeAllowed": 0.0
+    },
+    "silk": {
+     "bc": [
+      0.29619,
+      0.1592,
+      0.07468
+     ],
+     "roughHi": 0.58,
+     "roughLo": 0.32,
+     "roughTypical": 0.42,
+     "roughVariation": 0.08,
+     "sheenIntensity": 0.5,
+     "sheenTint": 1.0,
+     "teamDyeAllowed": 0.0
+    },
+    "skin": {
+     "bc": [
+      0.39056,
+      0.2145,
+      0.12657
+     ]
+    },
+    "stone_base": {
+     "bc": [
+      0.03173,
+      0.02662,
+      0.02834
+     ]
+    },
+    "wood": {
+     "bc": [
+      0.07052,
+      0.03283,
+      0.01562
+     ]
+    },
+    "wool_coarse": {
+     "bc": [
+      0.01482,
+      0.02173,
+      0.07371
+     ]
+    }
+   },
+   "source": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/reports/ld-lut.json#overrides"
+  },
+  "ue_lookdev": {
+   "classes": {
+    "bronze": {
+     "bc": [
+      0.3,
+      0.18,
+      0.1
+     ],
+     "roughHi": 0.58,
+     "roughLo": 0.36,
+     "roughTypical": 0.45,
+     "roughVariation": 0.06,
+     "wearStrength": 0.0,
+     "why": "UE-1/UE-2 (r1-r3, superseded): F0 (0.68, 0.41, 0.20) -> (0.86, 0.46, 0.20) fitted to a concept box that also caught belt leather; the r3 buckle read as pale grainy gold (review defect). UE-3 (fix pass): the grain behaves like specular/Lumen-reflection noise of a bright smooth metal (preset roughness 0.23) on a 1494-texel island plus bright worn-brass edges (preset wear 0.4, worn BC (0.93, 0.71, 0.48)) over EdgeMask p90 0.86 on the whole buckle; probe p3: MI WearStrength 0 / DetailStrength 0 alone did not remove it, the same torso frame measured 1.10 in r3 and 0.65 in p3. UE-3: aged dark bronze of the concept = the H2 bake (F0 from BC (0.28, 0.16, 0.10), roughness ORM.G 0.45) read as metal: F0 (0.38, 0.23, 0.13) (Y 0.254, below the metal rule Y >= 0.45 of LDD-7 on purpose: oxidised bronze, LDMU-9), roughness 0.45 [0.36, 0.58] variation 0.06, no edge wear on this hero; Ymed modulation kept. Measured against the frame-only concept boxes (ue_measure), probe p5: 0.96-0.99 / +6.0 / -0.02 at EV100 1.3 and 0.97 / +3.1 / +0.07 at -1.5 EV (own k); F0 (0.40, 0.21, 0.10) of p4 was +0.17 sat at -1.5 EV. UE-4 (r4 -> r5): in the two buckle close-ups (r4: 40 uu front and 35 deg) the same F0 read 1.33 and 1.69 (torso 1.00; H2 1.10 / 1.37 / 0.87), median 1.33 at EV100 1.3 and 1.29 at -1.5 EV - F0 scaled by 0.79 to (0.30, 0.18, 0.10), Y 0.200, same hue, about the Y 0.18 of the H2 bake F0"
+    },
+    "leather_worn": {
+     "luminanceMin": 0.012,
+     "roughHi": 0.8,
+     "roughLo": 0.45,
+     "roughTypical": 0.62,
+     "roughVariation": 0.2,
+     "why": "UE-0: belt/boots BC p2 Y 0.015 < 0.02; UE-1: roughness 0.47 [0.22, 0.77] -> 0.62 [0.45, 0.80]: the concept's boots and belt are matte worn leather; the glossier preset reflected the bright dome (boots luma 1.30-1.46, sat -0.22/-0.25 at EV100 1.3)"
+    },
+    "silk": {
+     "sheenIntensity": 0.09,
+     "specular": 0.2,
+     "why": "UE-2: specular 0.5 -> 0.35 (r2 sat -0.245). UE-3 (fix pass): the Cloth fuzz lobe of the Blender-stage sheen 0.5 (tint 1.0) under the Cobble sky dome made the embroidery 1.7x too light at -1.5 EV (probe p3: MI SheenStrength 0 -> embroidery 1.76 -> 1.02 at -1.5 EV, 1.01 -> 0.78 at EV100 1.3) - r3 passed its luma only on the tone-curve shoulder. Sheen 0.5 -> 0.09 and specular 0.35 -> 0.2 (less white on the gold: sat -0.165 -> -0.142 at EV100 1.3 in p4 -> p5). No sheen value passes both exposures (the luma of the embroidery rises ~0.46 per unit of sheen at EV100 1.3 and ~1.5 at -1.5 EV); 0.09 keeps -1.5 EV in tolerance (1.05) with EV100 1.3 at 0.80"
+    },
+    "skin": {
+     "cavityTintStrength": 0.55,
+     "luminanceMin": 0.02,
+     "why": "UE-0: skin BC p2 Y 0.0223 < 0.03. UE-3: cavity tint (subsurfaceApprox, red folds) 0.35 -> 0.55: sat of the face at EV100 1.3 -0.126 -> -0.113 (p4 -> p5), -1.5 EV stays +0.045; the albedo itself is the concept-toned bake (no scale field in the v2 LUT): skin luma is not changed in the material, see LDMU-6"
+    },
+    "stone_base": {
+     "luminanceMin": 0.012,
+     "why": "UE-0: base BC p2 Y 0.0158 < 0.02"
+    },
+    "wood": {
+     "luminanceMin": 0.015,
+     "why": "UE-0: staff BC p2 Y 0.0174 < 0.02"
+    },
+    "wool_coarse": {
+     "luminanceMin": 0.012,
+     "sheenIntensity": 0.09,
+     "why": "UE-0: Merlin wool BC p2 Y 0.0136 < preset floor 0.02; the floor would lift the baked fold shadows of the concept-matched BC; UE-1: sheen 0.35 -> 0.14: under the Cobble sky dome (x11.2) the Fuzz lobe of 0.35 made the deep-blue wool 1.6x too light and greyish (luma ratio 1.62 vs concept; probe p1: SheenStrength 0 -> 0.54, 0.4 -> 0.97, sat -0.01); UE-2: sheen 0.14 -> 0.09: r2 wool luma ratio 1.20 (front 1.25, side 1.49, back 1.13, torso 1.15) at k 0.32; UE-3 (r4, reverted in UE-4): sheen 0.09 -> 0.12: the wool is the dark zone in the toe of the tone curve at -1.5 EV (0.72-0.78, sat +0.12..+0.14 in p3/p4) - a little more fuzz lifts it to 0.83 there while EV100 1.3 stays in tolerance (1.00 -> 1.11, p5); UE-4: back to 0.09 - with the k of r4 (0.334) sheen 0.12 put the wool at 1.156 at EV100 1.3 (outside) and still 0.83 / +0.12 sat at -1.5 EV: the acceptance exposure wins, the -1.5 EV wool stays a residual (tone-curve toe)"
+    }
+   },
+   "source": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev-ue-lut.json#lut.ue_lookdev"
+  }
+ },
+ "rebuild": "python tools/art/material_library/lookdev_ue_inputs.py --config art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev-ue-lut.json",
+ "schema": "unmatched.um-v2-hero-overrides/1"
+}

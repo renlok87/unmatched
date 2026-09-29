@@ -1,7 +1,9 @@
 """Driver of the H2 bake of Merlin (system python). Runs the stages in order as separate processes.
 
 python tools/tripo-pipeline/blender/h2_bake_merlin/run.py --profile <profile.json> [stage ...]
-  stages: source retopo uv bake maps rig probe preview sheets compare compare_sheets  (default: all)
+  stages: source retopo uv bake maps rig probe preview sheets compare compare_sheets  (default: all, or the profile's
+  "stages" list: the look-dev profile merlin-h2-lookdev.json runs ld_export ld_maps ld_render_before ld_tone
+  ld_render_after ld_report on the H2.1 run without changing it)
   compare / compare_sheets (H2.1): H2 vs H2.1 frames; the H2 baseline (profile h21.baseline) is restored from git
   into <run>/work/h2-baseline/ by `git show <rev>:<path>` and checked by sha256 before the Blender stage
   --blender <exe>    Blender executable (default: profile "blender")
@@ -24,8 +26,12 @@ import common as C  # noqa: E402
 
 STAGES = ["source", "retopo", "uv", "bake", "maps", "rig", "probe", "preview", "sheets", "compare", "compare_sheets"]
 BLENDER_STAGES = {"source": "stage_source.py", "retopo": "stage_retopo.py", "uv": "stage_uv.py",
-                  "bake": "stage_bake.py", "rig": "stage_rig.py", "preview": "stage_preview.py", "compare": "stage_compare.py"}
-PYTHON_STAGES = {"maps": "maps.py", "sheets": "sheets.py", "compare_sheets": "compare_sheets.py"}
+                  "bake": "stage_bake.py", "rig": "stage_rig.py", "preview": "stage_preview.py", "compare": "stage_compare.py",
+                  # look-dev v2 (profile merlin-h2-lookdev.json; reads the H2.1 run, writes its own run_dir)
+                  "ld_export": "lookdev_export.py", "ld_render_before": ("lookdev_render.py", "before"),
+                  "ld_render_after": ("lookdev_render.py", "after")}
+PYTHON_STAGES = {"maps": "maps.py", "sheets": "sheets.py", "compare_sheets": "compare_sheets.py",
+                 "ld_maps": "lookdev_maps.py", "ld_tone": "lookdev_tone.py", "ld_report": "lookdev_report.py"}
 
 
 def run(cmd, log, env=None):
@@ -106,7 +112,7 @@ def main():
     a = ap.parse_args()
     prof = C.Profile(a.profile)
     blender = a.blender or prof["blender"]
-    stages = a.stages or STAGES
+    stages = a.stages or prof.get("stages") or STAGES  # a look-dev profile names its own stage list
     logs = prof.run_dir / "logs"
     timings_path = logs / "timings.json"
     timings = json.loads(timings_path.read_text(encoding="utf-8")) if timings_path.exists() else {}
@@ -118,8 +124,9 @@ def main():
                 print("baseline restore failed, see", logs / "compare-baseline.log")
                 return rc
         if stage in BLENDER_STAGES:
+            script, *extra = BLENDER_STAGES[stage] if isinstance(BLENDER_STAGES[stage], tuple) else (BLENDER_STAGES[stage],)
             rc = run([blender, "-b", "--factory-startup", "--python-exit-code", "1", "--python",
-                      str(HERE / BLENDER_STAGES[stage]), "--", str(prof.path)], logs / (stage + ".log"))
+                      str(HERE / script), "--", str(prof.path)] + list(extra), logs / (stage + ".log"))
         elif stage in PYTHON_STAGES:
             rc = run([sys.executable, str(HERE / PYTHON_STAGES[stage]), str(prof.path)], logs / (stage + ".log"))
         elif stage == "probe":

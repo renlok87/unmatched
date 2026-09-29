@@ -32,8 +32,17 @@ Stages (profile: art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-
   report.py          -> docs/art-pipeline/merlin-h2-report.json (checks, host-path audit, K2 basis, determinism)
   determinism.py     compare two run folders file by file -> reports/determinism.json sections
 
+Look-dev v2 (2026-09-29, profile build-profiles/merlin-h2-lookdev.json, own run_dir; reads the H2.1 run, never writes it):
+  ld_export        (Blender) lookdev_export.py: H2.1 rig appended, UV1_m in metres, UM_FBX_v1 re-export, read-back vs H2.1
+  ld_maps          (python)  lookdev_maps.py (+ lookdev_state.py): zones -> MatID 2K, EdgeMask in TeamMaskRGBA.A, beard ORM
+  ld_render_before (Blender) lookdev_render.py before: H2.1 textures lit + zone-ID pass, concept framing
+  ld_tone          (python)  lookdev_tone.py (+ lookdev_lut.py): concept zone medians -> BC tone gains, hero LUT EXR
+  ld_render_after  (Blender) lookdev_render.py after: look-dev textures lit, MatID / UV1 checker frames, EXR read-back
+  ld_report        (python)  lookdev_report.py: metrics vs concept, sheets, textures-report, ld-report
+  report: docs/art-pipeline/merlin-lookdev-v2.md
+
 Driver: python tools/tripo-pipeline/blender/h2_bake_merlin/run.py --profile <profile> [stages...].
 Every Blender stage runs headless only (blender -b --factory-startup); it refuses to run in a live session.
 """
 
-MODULE_VERSION = "h2-bake-merlin/2"  # H2.1: material classes, staff/crystal texel priority, compare stages
+MODULE_VERSION = "h2-bake-merlin/3"  # H2.1: material classes, staff/crystal texel priority, compare stages; look-dev v2 stages ld_*

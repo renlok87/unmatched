@@ -1,0 +1,767 @@
+{
+  "bake": {
+    "normalised": {
+      "checks": {
+        "lookdev_reports_all_checks_passed": {
+          "ld_fbx": {
+            "bone_heads_tails_as_h21": true,
+            "bones_and_parents_as_h21": true,
+            "export_frame_face_points_along_rotated_front_ue_plus_x": true,
+            "positions_and_uv0_per_loop_as_h21": true,
+            "triangles_as_h21": true,
+            "uv1_metres_density_readback": true,
+            "uv_layers_order": true
+          },
+          "ld_maps": {
+            "dielectric_bc_in_class_luminance_range": true,
+            "lut_dds_read_back": true,
+            "lut_metal_f0_plausible": true,
+            "matid_decodes_to_labels_4k": true,
+            "matid_values_valid": true,
+            "orm_metallic_binary_per_class_4k": true,
+            "team_mask_only_on_cloth_classes": true
+          },
+          "passed": true
+        },
+        "normal_is_the_h21_directx_map": {
+          "copied_from": "T_Medusa_H2_2K_N.png",
+          "h21_sha256": "11112739e6d8bbe1341a0fc4a573e2e43fcaaa4a0d1920fe7ae1f339b5345313",
+          "passed": true,
+          "sha256": "11112739e6d8bbe1341a0fc4a573e2e43fcaaa4a0d1920fe7ae1f339b5345313"
+        },
+        "run_manifest_lists_the_adopted_bytes": {
+          "files": {
+            "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/export/SK_Medusa_H2LD.fbx": true,
+            "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/export/SM_Medusa_H2LD_Base.fbx": true,
+            "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_BC.png": true,
+            "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_Edge.png": true,
+            "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_MatID.png": true,
+            "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_N.png": true,
+            "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_ORM.png": true,
+            "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_TeamMask.png": true
+          },
+          "lookdev_profile_sha256": "7b395ee552e2662d56314428cfeb6113555dc6b00fc80e3d6b6481ce00dd36ed",
+          "manifest_profile": {
+            "path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-lookdev.json",
+            "profile_id": "medusa-h2-lookdev/1",
+            "sha256": "7b395ee552e2662d56314428cfeb6113555dc6b00fc80e3d6b6481ce00dd36ed"
+          },
+          "passed": true
+        },
+        "source_rig_report_is_the_pinned_h21": {
+          "passed": true,
+          "pinned_h21_skeletal_fbx": "b1250d8f0d999a71474414607dbc31e8c05ab35669acc04d957f30293ab39be6",
+          "rig_passed": true,
+          "rig_report_fbx": "b1250d8f0d999a71474414607dbc31e8c05ab35669acc04d957f30293ab39be6",
+          "rig_skeleton": "UM_HUMANOID_17_v2"
+        }
+      },
+      "format": "h2-lookdev/1",
+      "lookdev_profile_sha256": "7b395ee552e2662d56314428cfeb6113555dc6b00fc80e3d6b6481ce00dd36ed",
+      "normaliser": "skeletal_adopt_formats.h2_lookdev",
+      "note": "read-back bounds of ld_fbx are in the export frame; they go back to the authored frame (rotation 90 deg about Z); sockets and the figure top are those of the H2.1 rig report (same geometry and rig)",
+      "sources": {
+        "ld_fbx_report": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/ld-fbx-report.json",
+        "ld_maps_report": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/ld-maps-report.json",
+        "lookdev_profile": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-lookdev.json",
+        "run_manifest": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/run-manifest.json",
+        "source_rig_report": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/../20260929-h2-bake/reports/rig-report.json",
+        "source_textures_report": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/../20260929-h2-bake/reports/textures-report.json"
+      }
+    },
+    "profile": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-lookdev.json",
+    "profile_id": "medusa-h2-lookdev/1",
+    "report_format": "h2-lookdev/1"
+  },
+  "checks": {
+    "bake_export_face_plus_x": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake measured the face ahead of the body along +X in the export frame (UE front +X)",
+      "passed": true
+    },
+    "bake_report_passed": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake's own checks (art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/ld-fbx-report.json) all passed",
+      "passed": true
+    },
+    "bake_reports_are_of_the_named_profile": {
+      "expected": "medusa-h2-lookdev/1",
+      "measured": {
+        "build_report": "medusa-h2-lookdev/1",
+        "textures_report": "medusa-h2-lookdev/1"
+      },
+      "passed": true
+    },
+    "fbx_bytes_match_bake_report": {
+      "measured": {
+        "base": {
+          "file": "9c776780ae1b9df1cd5ee025cb3b6f309367cc557301053bd0b38fe98667a133",
+          "report": "9c776780ae1b9df1cd5ee025cb3b6f309367cc557301053bd0b38fe98667a133",
+          "same_path": true
+        },
+        "skeletal": {
+          "file": "f5a49a34610d0d872fe77b2c24e4039e15efc89c54f0a68ea39cf4846fcddcc3",
+          "report": "f5a49a34610d0d872fe77b2c24e4039e15efc89c54f0a68ea39cf4846fcddcc3",
+          "same_path": true
+        }
+      },
+      "passed": true
+    },
+    "fbx_export_settings_equal_preset": {
+      "expected": "UM_FBX_v1",
+      "measured": {
+        "differences": {},
+        "documented_deviations": {
+          "bake_anim": "off: the candidate FBX carries no clips",
+          "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+        },
+        "preset": "UM_FBX_v1",
+        "undocumented": []
+      },
+      "passed": true
+    },
+    "library_inputs_pinned_by_profile": {
+      "measured": {
+        "LUT": {
+          "file": "6df64b5b7c3b72128987ecc8934029c89f7f81125e28cd6810df8a056fe1357f",
+          "profile": "6df64b5b7c3b72128987ecc8934029c89f7f81125e28cd6810df8a056fe1357f",
+          "sha256_ok": true
+        }
+      },
+      "note": "inputs outside the bake atlas (e.g. the hero MatLUT of M_UM_Figure_v2): the bytes are the ones the profile pins (candidate.library_inputs.*.sha256)",
+      "passed": true
+    },
+    "material_slots_as_profile": {
+      "expected": {
+        "base": 1,
+        "skeletal": 1
+      },
+      "measured": {
+        "base": [
+          "M_Medusa_H2_Atlas"
+        ],
+        "skeletal_unique": [
+          "M_Medusa_H2_Atlas"
+        ]
+      },
+      "passed": true
+    },
+    "roundtrip_scale_1": {
+      "expected": [
+        1,
+        1,
+        1
+      ],
+      "measured": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "passed": true
+    },
+    "skeleton_contract": {
+      "expected": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "bones": 17,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "measured": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "bones": 17,
+        "bones_equal_profile": true,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "note": "names and parents of every bone (Blender names; UE turns '.' into '_')",
+      "passed": true
+    },
+    "sockets_have_bake_predictions": {
+      "measured": {
+        "Head": [
+          0.0,
+          -3.7,
+          1.6
+        ]
+      },
+      "note": "a profile socket without location_uu takes the bake's UE bone-space prediction (location_uu_for_ue)",
+      "passed": true
+    },
+    "texture_bytes_match_textures_report": {
+      "measured": {
+        "BC": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "Edge": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "MatID": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "N": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "ORM": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "TeamMask": {
+          "same_path": true,
+          "sha256_ok": true
+        }
+      },
+      "passed": true
+    },
+    "texture_conventions_as_ue_expects": {
+      "expected": {
+        "BC": "sRGB",
+        "Edge": "linear",
+        "MatID": "index * 16 + 8",
+        "N": "DirectX",
+        "ORM": "R = AO, G = roughness, B = metallic",
+        "TeamMask": "linear"
+      },
+      "measured": {
+        "BC": "sRGB 8-bit (ld_maps: baked BC graded per class towards the concept)",
+        "Edge": "linear R8 edge mask (EdgeMaskTexture of M_UM_Figure_v2)",
+        "MatID": "linear R8 MatID: index * 16 + 8 (decode floor(v * 255 / 16)), no mips",
+        "N": "DirectX (byte copy of the H2.1 map T_Medusa_H2_2K_N.png)",
+        "ORM": "linear: R = AO, G = roughness, B = metallic (metallic binary per class)",
+        "TeamMask": "linear: R = cloth (TeamColor) in the cloth classes only, G = base band"
+      },
+      "note": "N DirectX (UE TC_Normalmap, no green flip), ORM R AO / G roughness / B metallic linear, TeamMask linear",
+      "passed": true
+    },
+    "textures_are_the_runtime_tier": {
+      "expected": {
+        "px": [
+          2048,
+          2048
+        ],
+        "tier": "runtime_2k"
+      },
+      "measured": {
+        "BC": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "Edge": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "MatID": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "N": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "ORM": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "TeamMask": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        }
+      },
+      "note": "only the committed runtime maps reach UE; the local 4K masters are never imported",
+      "passed": true
+    },
+    "triangles_as_profile": {
+      "expected": {
+        "SK_Medusa_H2_Body": 38054,
+        "SK_Medusa_H2_Bow": 5000,
+        "SM_Medusa_H2_Base": 1598
+      },
+      "measured": {
+        "SK_Medusa_H2_Body": 38054,
+        "SK_Medusa_H2_Bow": 5000,
+        "SM_Medusa_H2_Base": 1598
+      },
+      "passed": true
+    }
+  },
+  "fbx_preset": {
+    "path": "blender/_tools/presets/UM_FBX_v1.json",
+    "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9"
+  },
+  "inputs": {
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/../20260929-h2-bake/reports/rig-report.json": "12cb6e2154bd07c2ab2dcf02141cc10579674b82e06085d6d9be20646fe8d143",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/../20260929-h2-bake/reports/textures-report.json": "f38932f453c606ef3b8a88ceaf2298d4bee577ccbc2fa4469031f18921f23f4e",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/export/SK_Medusa_H2LD.fbx": "f5a49a34610d0d872fe77b2c24e4039e15efc89c54f0a68ea39cf4846fcddcc3",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/export/SM_Medusa_H2LD_Base.fbx": "9c776780ae1b9df1cd5ee025cb3b6f309367cc557301053bd0b38fe98667a133",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/ld-fbx-report.json": "69d649c829ebf9fcfc778d91635071f1c5c12b2bd343255cebe84a801e5f4214",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/ld-maps-report.json": "8d05fafcdef17ae488bdfc766445d9cdc02212c983ffab5ee0e7c0c7692a29be",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/run-manifest.json": "715ee1d44ec64254cc1d32062326c171c7ec5fed671c6bf6e1a1f7fe4883eeaf",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_BC.png": "385e22df672b909091329d9909b5c06214d95e4e2b1ee4edd9d70e3634334bd2",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_Edge.png": "aadada7e5a023ce4e6c11a8ab5b6a38eb669d8f278ed837d01cc0194088cdfa4",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_MatID.png": "0436f845f3c91528806759a3e31fa359a1077369ad32b66d0c238bbfebadc5ea",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_N.png": "11112739e6d8bbe1341a0fc4a573e2e43fcaaa4a0d1920fe7ae1f339b5345313",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_ORM.png": "885706567c123a9c15a3d9306bb0d90e89709af16f4d9e2b1896ca10dcbab5c4",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_TeamMask.png": "669251f37bba784502d3cbec8b85cd3c364ee44adf136de2afd0ba8d30b95b48",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue/lut/T_UM_MatLUT_Medusa_UE.dds": "6df64b5b7c3b72128987ecc8934029c89f7f81125e28cd6810df8a056fe1357f",
+    "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-lookdev.json": "7b395ee552e2662d56314428cfeb6113555dc6b00fc80e3d6b6481ce00dd36ed"
+  },
+  "keys": {
+    "fbx:base": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/export/SM_Medusa_H2LD_Base.fbx",
+    "fbx:skeletal": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/export/SK_Medusa_H2LD.fbx",
+    "profile:bake": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-lookdev.json",
+    "report:build": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/ld-fbx-report.json",
+    "report:run_manifest": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/run-manifest.json",
+    "report:source_rig_report": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/../20260929-h2-bake/reports/rig-report.json",
+    "report:source_textures_report": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/../20260929-h2-bake/reports/textures-report.json",
+    "report:textures": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/ld-maps-report.json",
+    "texture:BC": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_BC.png",
+    "texture:Edge": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_Edge.png",
+    "texture:LUT": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue/lut/T_UM_MatLUT_Medusa_UE.dds",
+    "texture:MatID": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_MatID.png",
+    "texture:N": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_N.png",
+    "texture:ORM": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_ORM.png",
+    "texture:TeamMask": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_TeamMask.png"
+  },
+  "kind": "skeletal-adopt",
+  "logic": "adopt-skeletal/1",
+  "note": "the candidate is built outside this tool (h2-lookdev/1, profile medusa-h2-lookdev/1); adopt copies nothing and re-hashes it; views.build / views.atlas are what ue-import reads",
+  "passed": true,
+  "profile": {
+    "id": "medusa-h2ld-lookdev-ue-import/1",
+    "path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2ld-lookdev-ue-import.json",
+    "sha256": "cb2bfe622f2ce77a23a58efc19d3cff40d27b34ac4574826276dd0aba1b735aa"
+  },
+  "stage": "adopt",
+  "status": "measured",
+  "views": {
+    "atlas": {
+      "files": {
+        "BC": {
+          "file": "T_Medusa_H2LD_2K_BC.png"
+        },
+        "Edge": {
+          "file": "T_Medusa_H2LD_2K_Edge.png"
+        },
+        "MatID": {
+          "file": "T_Medusa_H2LD_2K_MatID.png"
+        },
+        "N": {
+          "file": "T_Medusa_H2LD_2K_N.png"
+        },
+        "ORM": {
+          "file": "T_Medusa_H2LD_2K_ORM.png"
+        },
+        "TeamMask": {
+          "file": "T_Medusa_H2LD_2K_TeamMask.png"
+        }
+      },
+      "size": 2048
+    },
+    "build": {
+      "checks": {
+        "roundtrip_material_slots": {
+          "measured": {
+            "per_mesh": {
+              "SK_Medusa_H2_Body": [
+                "M_Medusa_H2_Atlas"
+              ],
+              "SK_Medusa_H2_Bow": [
+                "M_Medusa_H2_Atlas"
+              ]
+            },
+            "skeletal_unique": [
+              "M_Medusa_H2_Atlas"
+            ]
+          }
+        }
+      },
+      "expected_ue_bounds_uu_at_import_scale_1": {
+        "base_blender_axes": {
+          "max": [
+            15.002,
+            15.001,
+            5.924
+          ],
+          "min": [
+            -15.002,
+            -15.008,
+            0.004
+          ]
+        },
+        "base_ue_predicted": {
+          "max": [
+            15.008,
+            15.002,
+            5.924
+          ],
+          "min": [
+            -15.001,
+            -15.002,
+            0.004
+          ]
+        },
+        "export_rotation_z_degrees": 90.0,
+        "note": "union of the bake's round-trip bounds (authored frame, front -Y, cm); export frame rotated about Z by the preset; UE = export frame (x, -y, z) (ART-001)",
+        "skeletal_blender_axes": {
+          "max": [
+            16.358,
+            9.29,
+            55.009
+          ],
+          "min": [
+            -10.742,
+            -9.933,
+            5.752
+          ]
+        },
+        "skeletal_export_frame": {
+          "max": [
+            9.933,
+            16.358,
+            55.009
+          ],
+          "min": [
+            -9.29,
+            -10.742,
+            5.752
+          ]
+        },
+        "skeletal_ue_predicted": {
+          "max": [
+            9.933,
+            10.742,
+            55.009
+          ],
+          "min": [
+            -9.29,
+            -16.358,
+            5.752
+          ]
+        }
+      },
+      "exports": {
+        "base": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/export/SM_Medusa_H2LD_Base.fbx",
+        "skeletal": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/export/SK_Medusa_H2LD.fbx"
+      },
+      "figure": {
+        "figure_height_m": 0.55,
+        "figure_top_m": 0.55009,
+        "skeletal_top_m": 0.55009,
+        "top_part": "tripo_part_0"
+      },
+      "meshes_pre_export_m": {
+        "SK_Medusa_H2_Body": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 1,
+          "triangles": 38054
+        },
+        "SK_Medusa_H2_Bow": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 5000
+        },
+        "SM_Medusa_H2_Base": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 1598
+        }
+      },
+      "roundtrip": {
+        "skeletal": {
+          "bones": {
+            "arm_lower.L": {
+              "head_m": [
+                -0.004,
+                0.066,
+                0.334
+              ],
+              "parent": "arm_upper.L",
+              "tail_m": [
+                0.022,
+                0.092,
+                0.321
+              ]
+            },
+            "arm_lower.R": {
+              "head_m": [
+                -0.014,
+                -0.086,
+                0.345
+              ],
+              "parent": "arm_upper.R",
+              "tail_m": [
+                0.021,
+                -0.047,
+                0.334
+              ]
+            },
+            "arm_upper.L": {
+              "head_m": [
+                -0.014,
+                0.04,
+                0.397
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.004,
+                0.066,
+                0.334
+              ]
+            },
+            "arm_upper.R": {
+              "head_m": [
+                -0.015,
+                -0.047,
+                0.398
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.014,
+                -0.086,
+                0.345
+              ]
+            },
+            "foot.L": {
+              "head_m": [
+                -0.004,
+                0.071,
+                0.085
+              ],
+              "parent": "leg_lower.L",
+              "tail_m": [
+                0.10237,
+                0.101,
+                0.03318
+              ]
+            },
+            "foot.R": {
+              "head_m": [
+                -0.004,
+                -0.074,
+                0.085
+              ],
+              "parent": "leg_lower.R",
+              "tail_m": [
+                0.10345,
+                -0.0988,
+                0.03265
+              ]
+            },
+            "hand.L": {
+              "head_m": [
+                0.022,
+                0.092,
+                0.321
+              ],
+              "parent": "arm_lower.L",
+              "tail_m": [
+                0.03312,
+                0.10312,
+                0.31544
+              ]
+            },
+            "hand.R": {
+              "head_m": [
+                0.021,
+                -0.047,
+                0.334
+              ],
+              "parent": "arm_lower.R",
+              "tail_m": [
+                0.04596,
+                -0.00243,
+                0.31795
+              ]
+            },
+            "head": {
+              "head_m": [
+                -0.012,
+                -0.0,
+                0.435
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.012,
+                -0.0,
+                0.53264
+              ]
+            },
+            "hips": {
+              "head_m": [
+                -0.012,
+                -0.0,
+                0.27
+              ],
+              "parent": "root",
+              "tail_m": [
+                -0.012,
+                -0.0,
+                0.31301
+              ]
+            },
+            "leg_lower.L": {
+              "head_m": [
+                -0.008,
+                0.049,
+                0.205
+              ],
+              "parent": "leg_upper.L",
+              "tail_m": [
+                -0.004,
+                0.071,
+                0.085
+              ]
+            },
+            "leg_lower.R": {
+              "head_m": [
+                -0.008,
+                -0.052,
+                0.205
+              ],
+              "parent": "leg_upper.R",
+              "tail_m": [
+                -0.004,
+                -0.074,
+                0.085
+              ]
+            },
+            "leg_upper.L": {
+              "head_m": [
+                -0.01,
+                0.035,
+                0.285
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.008,
+                0.049,
+                0.205
+              ]
+            },
+            "leg_upper.R": {
+              "head_m": [
+                -0.01,
+                -0.038,
+                0.285
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.008,
+                -0.052,
+                0.205
+              ]
+            },
+            "root": {
+              "head_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "parent": null,
+              "tail_m": [
+                0.0,
+                0.0,
+                0.27027
+              ]
+            },
+            "spine": {
+              "head_m": [
+                -0.012,
+                -0.0,
+                0.32
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.012,
+                -0.0,
+                0.41764
+              ]
+            },
+            "weapon.L": {
+              "head_m": [
+                0.033,
+                0.103,
+                0.315
+              ],
+              "parent": "hand.L",
+              "tail_m": [
+                0.033,
+                0.11967,
+                0.315
+              ]
+            }
+          },
+          "meshes": {
+            "SK_Medusa_H2_Body": {
+              "triangles": 38054,
+              "vertices": 22167
+            },
+            "SK_Medusa_H2_Bow": {
+              "triangles": 5000,
+              "vertices": 2520
+            }
+          }
+        }
+      },
+      "sockets": [
+        {
+          "bone": "weapon.L",
+          "location_uu_for_ue": [
+            0,
+            0,
+            0
+          ],
+          "name": "Weapon",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            3.3,
+            -10.3,
+            31.5
+          ]
+        },
+        {
+          "bone": "head",
+          "location_uu_for_ue": [
+            0.0,
+            -3.7,
+            1.6
+          ],
+          "name": "Head",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            0.4,
+            -0.0,
+            47.2
+          ]
+        }
+      ],
+      "source": "normalised by skeletal_adopt.py from art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/ld-fbx-report.json (format h2-lookdev/1)"
+    }
+  }
+}

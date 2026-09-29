@@ -1,0 +1,838 @@
+{
+  "bake": {
+    "normalised": {
+      "checks": {
+        "h21_build_report_pinned": {
+          "expected": "5b078b7276658ea813ab7f87386ebf2bb6d997c043e4f4318ead37553dcdde17",
+          "h21_passed": true,
+          "passed": true,
+          "sha256": "5b078b7276658ea813ab7f87386ebf2bb6d997c043e4f4318ead37553dcdde17"
+        },
+        "lookdev_export_compared_with_these_h21_fbx": {
+          "h21_report_exports": {
+            "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx": "b1db49c6f7400bcea0bc23e84fef0b77e76f15caed16ab7e8bd611eb32dc38ee",
+            "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SM_Merlin_H2_Base.fbx": "79132631c7afd30d6f4519d3696b9f579ad1e34e9537674ec1c08d993ef611db"
+          },
+          "lookdev_source": {
+            "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx": "b1db49c6f7400bcea0bc23e84fef0b77e76f15caed16ab7e8bd611eb32dc38ee",
+            "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SM_Merlin_H2_Base.fbx": "79132631c7afd30d6f4519d3696b9f579ad1e34e9537674ec1c08d993ef611db"
+          },
+          "passed": true
+        },
+        "lookdev_export_equal_h21": {
+          "checks": {
+            "bones_equal_h21": true,
+            "export_face_plus_x": true,
+            "geometry_equal_h21": true,
+            "material_slot_single": true,
+            "source_fbx_sha256": true,
+            "triangles_equal_h21": true,
+            "uv_layers_uvmap_then_uv1": true,
+            "weights_equal_h21": true
+          },
+          "note": "rig, geometry (positions + UV0), weights, triangles, face +X of the look-dev FBX equal the H2.1 FBX (read-back in the look-dev stage)",
+          "passed": true
+        },
+        "lookdev_report_passed": {
+          "passed": true,
+          "passed_value": true,
+          "profile_id": "merlin-h2-lookdev/1"
+        },
+        "ue_inputs_current": {
+          "passed": true,
+          "stale_or_missing_inputs": []
+        },
+        "ue_inputs_of_this_lookdev": {
+          "passed": true,
+          "profile_id": "merlin-h2-lookdev/1",
+          "schema": "unmatched.um-v2-lookdev-ue-inputs/1"
+        }
+      },
+      "format": "h2-lookdev-merlin/1",
+      "normaliser": "skeletal_adopt_lookdev.lookdev_merlin",
+      "note": "bones, sockets, round-trip bounds and measures are the H2.1 build report's: the look-dev export proved rig/geometry/weights equal to H2.1 by read-back; FBX paths/sha256 and export settings are the look-dev export's; UV layers of the look-dev read-back",
+      "sources": {
+        "h21_build_report": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/reports/build-report.json",
+        "ld_export_report": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/reports/ld-export-report.json",
+        "ld_report": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/reports/ld-report.json",
+        "textures_report": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/reports/textures-report.json",
+        "ue_inputs_report": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/ue-inputs-report.json"
+      }
+    },
+    "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json",
+    "profile_id": "merlin-h2-lookdev/1",
+    "report_format": "h2-lookdev-merlin/1"
+  },
+  "checks": {
+    "bake_export_face_plus_x": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake measured the face ahead of the body along +X in the export frame (UE front +X)",
+      "passed": true
+    },
+    "bake_report_passed": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake's own checks (art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/reports/ld-export-report.json) all passed",
+      "passed": true
+    },
+    "bake_reports_are_of_the_named_profile": {
+      "expected": "merlin-h2-lookdev/1",
+      "measured": {
+        "build_report": "merlin-h2-lookdev/1",
+        "textures_report": "merlin-h2-lookdev/1"
+      },
+      "passed": true
+    },
+    "fbx_bytes_match_bake_report": {
+      "measured": {
+        "base": {
+          "file": "bed116b909e8ef9bf2cc987be7509df575dc544c9844212ec39d752d778bea79",
+          "report": "bed116b909e8ef9bf2cc987be7509df575dc544c9844212ec39d752d778bea79",
+          "same_path": true
+        },
+        "skeletal": {
+          "file": "a7a51d01bb58fcc2bcd7f46a3975dcae19654bfbbc52d087b503119b3c59c9c2",
+          "report": "a7a51d01bb58fcc2bcd7f46a3975dcae19654bfbbc52d087b503119b3c59c9c2",
+          "same_path": true
+        }
+      },
+      "passed": true
+    },
+    "fbx_export_settings_equal_preset": {
+      "expected": "UM_FBX_v1",
+      "measured": {
+        "differences": {},
+        "documented_deviations": {
+          "bake_anim": "off: the candidate FBX carries no clips",
+          "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+        },
+        "preset": "UM_FBX_v1",
+        "undocumented": []
+      },
+      "passed": true
+    },
+    "material_slots_as_profile": {
+      "expected": {
+        "base": 1,
+        "skeletal": 1
+      },
+      "measured": {
+        "base": [
+          "M_Merlin_H2_Atlas"
+        ],
+        "skeletal_unique": [
+          "M_Merlin_H2_Atlas"
+        ]
+      },
+      "passed": true
+    },
+    "roundtrip_scale_1": {
+      "expected": [
+        1,
+        1,
+        1
+      ],
+      "measured": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "passed": true
+    },
+    "skeleton_contract": {
+      "expected": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "bones": 17,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "measured": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "bones": 17,
+        "bones_equal_profile": true,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "note": "names and parents of every bone (Blender names; UE turns '.' into '_')",
+      "passed": true
+    },
+    "sockets_have_bake_predictions": {
+      "measured": {
+        "Head": [
+          -0.121,
+          -1.448,
+          2.588
+        ]
+      },
+      "note": "a profile socket without location_uu takes the bake's UE bone-space prediction (location_uu_for_ue)",
+      "passed": true
+    },
+    "texture_bytes_match_textures_report": {
+      "measured": {
+        "BC": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "EdgeMask": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "MatID": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "MatLUT": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "N": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "ORM": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "TeamMask": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "ZoneID": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "ZoneLUT": {
+          "same_path": true,
+          "sha256_ok": true
+        }
+      },
+      "passed": true
+    },
+    "texture_conventions_as_ue_expects": {
+      "expected": {
+        "EdgeMask": "linear",
+        "MatID": "class index x 16 + 8",
+        "MatLUT": "RGBA16F",
+        "N": "DirectX",
+        "ORM": "R AO",
+        "TeamMask": "L = cloth",
+        "ZoneID": "zone + 1",
+        "ZoneLUT": "flat zone colour"
+      },
+      "measured": {
+        "EdgeMask": "linear L8, 1 = convex edge",
+        "MatID": "G8 linear (UE TC_Grayscale, sRGB off, NoMipmaps, Nearest, never streamed); value = class index x 16 + 8; shader: Load(int3(frac(uv0) x size, 0)), id = floor(v x 255 / 16)",
+        "MatLUT": "RGBA16F linear, rows 0-9 of build_ue_inputs.LUT_ROWS, column = class index",
+        "N": "DirectX (-Y), = H2.1",
+        "ORM": "R AO, G roughness (beard remapped), B metallic; linear",
+        "TeamMask": "L = cloth, = H2.1",
+        "ZoneID": "linear L8, value = (zone + 1) x 16 + 8",
+        "ZoneLUT": "RGBA16F debug LUT, row 0 = flat zone colour"
+      },
+      "note": "N DirectX (UE TC_Normalmap, no green flip), ORM R AO / G roughness / B metallic linear, TeamMask linear",
+      "passed": true
+    },
+    "textures_are_the_runtime_tier": {
+      "expected": {
+        "exceptions": {
+          "MatLUT": {
+            "px": [
+              16,
+              16
+            ],
+            "tier": "runtime_lut"
+          },
+          "ZoneLUT": {
+            "px": [
+              16,
+              16
+            ],
+            "tier": "runtime_lut"
+          }
+        },
+        "px": [
+          2048,
+          2048
+        ],
+        "tier": "runtime_2k"
+      },
+      "measured": {
+        "BC": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "EdgeMask": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "MatID": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "MatLUT": {
+          "png_px": [
+            16,
+            16
+          ],
+          "tier": "runtime_lut"
+        },
+        "N": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "ORM": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "TeamMask": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "ZoneID": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "ZoneLUT": {
+          "png_px": [
+            16,
+            16
+          ],
+          "tier": "runtime_lut"
+        }
+      },
+      "note": "only the committed runtime maps reach UE; the local 4K masters are never imported",
+      "passed": true
+    },
+    "triangles_as_profile": {
+      "expected": {
+        "SK_Merlin_H2_Body": 30047,
+        "SK_Merlin_H2_Staff": 3920,
+        "SM_Merlin_H2_Base": 2240
+      },
+      "measured": {
+        "SK_Merlin_H2_Body": 30047,
+        "SK_Merlin_H2_Staff": 3920,
+        "SM_Merlin_H2_Base": 2240
+      },
+      "passed": true
+    }
+  },
+  "fbx_preset": {
+    "path": "blender/_tools/presets/UM_FBX_v1.json",
+    "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9"
+  },
+  "inputs": {
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/export/SK_Merlin_H2LD.fbx": "a7a51d01bb58fcc2bcd7f46a3975dcae19654bfbbc52d087b503119b3c59c9c2",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/export/SM_Merlin_H2LD_Base.fbx": "bed116b909e8ef9bf2cc987be7509df575dc544c9844212ec39d752d778bea79",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/reports/ld-export-report.json": "1116ae49bda0d5dd03250e649f7d8068515b121927264f962e1ae6b982453962",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/reports/ld-report.json": "b8b61f4643d33a4ad0c02b275a1c9aa54d49fef4b486bb266133d1b1fa6dc4a3",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/reports/textures-report.json": "15428203cc32e3e52a194306d66d9735fc2b62637e42b23e3317e2bd0e4592ff",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_BC_2K.png": "935726e64dff7a4704a2edf125de7ed55b8813dba9947a65b5987f6caaed3d16",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_MatID_2K.png": "f5c2f6322cee63ac9575c4a9a84caf708eda9e3f59e1e96feb00df2b9d0959dc",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_N_2K.png": "2f7bfac8acc997f75c1291ea14beecd88558c38878a62f1c060da459fe9fcbfa",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_ORM_2K.png": "0a33ce04ce0a8dd892bc7e5780e0b7e48b4be77887b6589543b3a4e6acaf68b1",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamMask_2K.png": "975297f48c465bf4a09f8eb60c4c43fcda72c7aebc6e0ac2abf076802952388f",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_Merlin_H2LD_EdgeMask_2K.png": "4c051f13573c02b9f881157af176d6784868417c532a0ac4fb0b25545d395024",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_Merlin_H2LD_ZoneID_2K.png": "7a56c03af3977d587356a0d713ed47a5d4ff7d462a8ba680b7e59789d08e9d19",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_Merlin_H2LD_ZoneLUT_Debug.dds": "b14543d64c7301dd0c7031bb45ec8cb607d7a874f9183216b6de2e7d11e72293",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_UM_MatLUT_Merlin.dds": "7fec8d6df274d2231c2ce69cd1af41fddc722cd00f04cf8a7d158c07489ae579",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/ue-inputs-report.json": "add60da60d81998ab13f6ba99bf39b2cd77c6aef1bad5b3fcb8cd8986ceb0392",
+    "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json": "195585132d7982ae5e04451c6a568a1893b2b4e708591021d1e6f0d85120f360"
+  },
+  "keys": {
+    "fbx:base": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/export/SM_Merlin_H2LD_Base.fbx",
+    "fbx:skeletal": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/export/SK_Merlin_H2LD.fbx",
+    "profile:bake": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json",
+    "report:build": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/reports/ld-export-report.json",
+    "report:ld_report": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/reports/ld-report.json",
+    "report:textures": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/reports/textures-report.json",
+    "report:ue_inputs": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/ue-inputs-report.json",
+    "texture:BC": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_BC_2K.png",
+    "texture:EdgeMask": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_Merlin_H2LD_EdgeMask_2K.png",
+    "texture:MatID": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_MatID_2K.png",
+    "texture:MatLUT": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_UM_MatLUT_Merlin.dds",
+    "texture:N": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_N_2K.png",
+    "texture:ORM": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_ORM_2K.png",
+    "texture:TeamMask": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamMask_2K.png",
+    "texture:ZoneID": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_Merlin_H2LD_ZoneID_2K.png",
+    "texture:ZoneLUT": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_Merlin_H2LD_ZoneLUT_Debug.dds"
+  },
+  "kind": "skeletal-adopt",
+  "logic": "adopt-skeletal/1",
+  "note": "the candidate is built outside this tool (h2-lookdev-merlin/1, profile merlin-h2-lookdev/1); adopt copies nothing and re-hashes it; views.build / views.atlas are what ue-import reads",
+  "passed": true,
+  "profile": {
+    "id": "merlin-h2-lookdev-ue-import/1",
+    "path": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev-ue-import.json",
+    "sha256": "a22fd6a9ae5eb7d05bdb128bfc87e515617f1d1401f2a5e7b4110186192c992a"
+  },
+  "stage": "adopt",
+  "status": "measured",
+  "views": {
+    "atlas": {
+      "files": {
+        "BC": {
+          "file": "T_Merlin_H2LD_BC_2K.png"
+        },
+        "EdgeMask": {
+          "file": "T_Merlin_H2LD_EdgeMask_2K.png"
+        },
+        "MatID": {
+          "file": "T_Merlin_H2LD_MatID_2K.png"
+        },
+        "MatLUT": {
+          "file": "T_UM_MatLUT_Merlin.dds"
+        },
+        "N": {
+          "file": "T_Merlin_H2LD_N_2K.png"
+        },
+        "ORM": {
+          "file": "T_Merlin_H2LD_ORM_2K.png"
+        },
+        "TeamMask": {
+          "file": "T_Merlin_H2LD_TeamMask_2K.png"
+        },
+        "ZoneID": {
+          "file": "T_Merlin_H2LD_ZoneID_2K.png"
+        },
+        "ZoneLUT": {
+          "file": "T_Merlin_H2LD_ZoneLUT_Debug.dds"
+        }
+      },
+      "size": 2048
+    },
+    "build": {
+      "checks": {
+        "roundtrip_material_slots": {
+          "measured": {
+            "per_mesh": {
+              "SK_Merlin_H2_Body": [
+                "M_Merlin_H2_Atlas"
+              ],
+              "SK_Merlin_H2_Staff": [
+                "M_Merlin_H2_Atlas"
+              ]
+            },
+            "skeletal_unique": [
+              "M_Merlin_H2_Atlas"
+            ]
+          }
+        }
+      },
+      "expected_ue_bounds_uu_at_import_scale_1": {
+        "base_blender_axes": {
+          "max": [
+            12.0,
+            12.0,
+            5.0
+          ],
+          "min": [
+            -12.0,
+            -12.0,
+            0.0
+          ]
+        },
+        "base_ue_predicted": {
+          "max": [
+            12.0,
+            12.0,
+            5.0
+          ],
+          "min": [
+            -12.0,
+            -12.0,
+            0.0
+          ]
+        },
+        "export_rotation_z_degrees": 90.0,
+        "note": "union of the bake's round-trip bounds (authored frame, front -Y, cm); export frame rotated about Z by the preset; UE = export frame (x, -y, z) (ART-001)",
+        "skeletal_blender_axes": {
+          "max": [
+            12.118,
+            10.302,
+            49.422
+          ],
+          "min": [
+            -11.504,
+            -7.896,
+            4.759
+          ]
+        },
+        "skeletal_export_frame": {
+          "max": [
+            7.896,
+            12.118,
+            49.422
+          ],
+          "min": [
+            -10.302,
+            -11.504,
+            4.759
+          ]
+        },
+        "skeletal_ue_predicted": {
+          "max": [
+            7.896,
+            11.504,
+            49.422
+          ],
+          "min": [
+            -10.302,
+            -12.118,
+            4.759
+          ]
+        }
+      },
+      "exports": {
+        "base": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/export/SM_Merlin_H2LD_Base.fbx",
+        "skeletal": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/export/SK_Merlin_H2LD.fbx"
+      },
+      "figure": {
+        "figure_height_m": 0.45,
+        "figure_top_m": 0.44986,
+        "skeletal_top_m": 0.49422,
+        "top_part": "tripo_part_0"
+      },
+      "meshes_pre_export_m": {
+        "SK_Merlin_H2_Body": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 3,
+          "triangles": 30047
+        },
+        "SK_Merlin_H2_Staff": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 3920
+        },
+        "SM_Merlin_H2_Base": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 2240
+        }
+      },
+      "roundtrip": {
+        "skeletal": {
+          "bones": {
+            "arm_lower.L": {
+              "head_m": [
+                0.06583,
+                0.00505,
+                0.2961
+              ],
+              "parent": "arm_upper.L",
+              "tail_m": [
+                0.03983,
+                -0.03685,
+                0.28872
+              ]
+            },
+            "arm_lower.R": {
+              "head_m": [
+                -0.06543,
+                0.05049,
+                0.2961
+              ],
+              "parent": "arm_upper.R",
+              "tail_m": [
+                -0.0777,
+                0.01191,
+                0.31573
+              ]
+            },
+            "arm_upper.L": {
+              "head_m": [
+                0.04311,
+                0.0101,
+                0.34658
+              ],
+              "parent": "spine",
+              "tail_m": [
+                0.06583,
+                0.00505,
+                0.2961
+              ]
+            },
+            "arm_upper.R": {
+              "head_m": [
+                -0.0417,
+                0.01767,
+                0.34911
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.06543,
+                0.05049,
+                0.2961
+              ]
+            },
+            "foot.L": {
+              "head_m": [
+                0.05336,
+                -0.00611,
+                0.08643
+              ],
+              "parent": "leg_lower.L",
+              "tail_m": [
+                0.06516,
+                -0.06487,
+                0.05643
+              ]
+            },
+            "foot.R": {
+              "head_m": [
+                -0.04337,
+                0.03398,
+                0.08269
+              ],
+              "parent": "leg_lower.R",
+              "tail_m": [
+                -0.07253,
+                -0.02377,
+                0.05368
+              ]
+            },
+            "hand.L": {
+              "head_m": [
+                0.03983,
+                -0.03685,
+                0.28872
+              ],
+              "parent": "arm_lower.L",
+              "tail_m": [
+                -0.00543,
+                -0.0487,
+                0.27147
+              ]
+            },
+            "hand.R": {
+              "head_m": [
+                -0.0777,
+                0.01191,
+                0.31573
+              ],
+              "parent": "arm_lower.R",
+              "tail_m": [
+                -0.08048,
+                -0.00732,
+                0.32937
+              ]
+            },
+            "head": {
+              "head_m": [
+                0.0002,
+                -0.0,
+                0.35415
+              ],
+              "parent": "spine",
+              "tail_m": [
+                0.00185,
+                -0.0055,
+                0.44771
+              ]
+            },
+            "hips": {
+              "head_m": [
+                0.0002,
+                0.00505,
+                0.22289
+              ],
+              "parent": "root",
+              "tail_m": [
+                0.0002,
+                0.00505,
+                0.25384
+              ]
+            },
+            "leg_lower.L": {
+              "head_m": [
+                0.04059,
+                -0.00505,
+                0.15221
+              ],
+              "parent": "leg_upper.L",
+              "tail_m": [
+                0.05336,
+                -0.00611,
+                0.08643
+              ]
+            },
+            "leg_lower.R": {
+              "head_m": [
+                -0.03514,
+                0.02272,
+                0.15221
+              ],
+              "parent": "leg_upper.R",
+              "tail_m": [
+                -0.04337,
+                0.03398,
+                0.08269
+              ]
+            },
+            "leg_upper.L": {
+              "head_m": [
+                0.02544,
+                0.0,
+                0.21784
+              ],
+              "parent": "hips",
+              "tail_m": [
+                0.04059,
+                -0.00505,
+                0.15221
+              ]
+            },
+            "leg_upper.R": {
+              "head_m": [
+                -0.02504,
+                0.0101,
+                0.21784
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.03514,
+                0.02272,
+                0.15221
+              ]
+            },
+            "root": {
+              "head_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "parent": null,
+              "tail_m": [
+                0.0,
+                0.0,
+                0.22295
+              ]
+            },
+            "spine": {
+              "head_m": [
+                0.0002,
+                0.00505,
+                0.26328
+              ],
+              "parent": "hips",
+              "tail_m": [
+                0.0002,
+                0.00229,
+                0.35697
+              ]
+            },
+            "weapon.R": {
+              "head_m": [
+                -0.08048,
+                -0.00732,
+                0.32937
+              ],
+              "parent": "hand.R",
+              "tail_m": [
+                -0.08038,
+                -0.00638,
+                0.35308
+              ]
+            }
+          },
+          "meshes": {
+            "SK_Merlin_H2_Body": {
+              "triangles": 30047,
+              "vertices": 14998
+            },
+            "SK_Merlin_H2_Staff": {
+              "triangles": 3920,
+              "vertices": 1964
+            }
+          }
+        }
+      },
+      "sockets": [
+        {
+          "bone": "weapon.R",
+          "location_uu_for_ue": [
+            0,
+            0,
+            0
+          ],
+          "name": "Weapon",
+          "offset_blender_bone_local_uu": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "status": "предложено",
+          "target_ue_component_uu": [
+            0.732,
+            8.048,
+            32.937
+          ]
+        },
+        {
+          "bone": "head",
+          "location_uu_for_ue": [
+            -0.121,
+            -1.448,
+            2.588
+          ],
+          "name": "Head",
+          "offset_blender_bone_local_uu": [
+            -0.121,
+            1.448,
+            2.588
+          ],
+          "status": "предложено",
+          "target_ue_component_uu": [
+            2.666,
+            0.124,
+            36.712
+          ]
+        },
+        {
+          "bone": "weapon.R",
+          "location_uu_for_ue": [
+            -0.169,
+            -14.19,
+            -0.211
+          ],
+          "name": "StaffTip_proposal",
+          "offset_blender_bone_local_uu": [
+            -0.169,
+            14.19,
+            -0.211
+          ],
+          "status": "предложено (AD-CNF-59 open): crystal centre for the ranged-attack VFX (CUE-008); not created in UE by this run",
+          "target_ue_component_uu": [
+            -0.044,
+            8.16,
+            47.108
+          ]
+        }
+      ],
+      "source": "normalised by skeletal_adopt.py from art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/reports/ld-export-report.json (format h2-lookdev-merlin/1)"
+    }
+  }
+}

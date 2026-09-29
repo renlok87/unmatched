@@ -227,6 +227,80 @@ class SkeletalAdoptTests(McpBackendTestBase):
         self.assertEqual(sorted(again["previous_assets_deleted"]), self.planned())
         self.assertFalse([a for a in self.ue_assets() if a.startswith(self.FOLDER) and a[-2:] == "_1"])
 
+    CANON = "/Game/PipelineCandidates/TestHero/Rig/SK_TestHero_Skeleton"
+
+    def add_canonical_skeleton(self):
+        state = json.loads(self.ue_state.read_text(encoding="utf-8"))
+        state["assets"][self.CANON] = {"class": "Skeleton", "dirty": False}
+        self.ue_state.write_text(json.dumps(state, indent=1, sort_keys=True), encoding="utf-8")
+
+    def set_target_skeleton(self, path):
+        self.profile["ue"]["target_skeleton"] = path
+        self.write_json(self.repo / self.profile_rel, self.profile)
+
+    def test_target_skeleton_imports_onto_the_canonical_skeleton_and_never_deletes_it(self):
+        # 0.8.0: ue.target_skeleton -> the mesh goes onto /Game/.../<Hero>/Rig/SK_<Hero>_Skeleton, no <asset>_Skeleton
+        self.add_canonical_skeleton()
+        self.set_target_skeleton(self.CANON)
+        self.init_run()
+        self.cli("preflight", "--run-dir", str(self.run_dir))
+        self.cli("adopt", "--run-dir", str(self.run_dir))
+        self.ue()
+        report = self.report_json()
+        self.assertTrue(report["passed"], {k: v for k, v in report["checks"].items() if not v["passed"]})
+        want = [a for a in self.planned() if not a.endswith("/Meshes/SK_Test_H2_Skeleton")]
+        self.assertEqual(sorted(report["assets"]), want)
+        self.assertNotIn(self.CANON, report["assets"])
+        self.assertTrue(report["checks"]["skeleton_is_canonical_target"]["passed"])
+        self.assertEqual(report["measured"]["target_skeleton"]["read_back"], self.CANON)
+        assets = self.ue_assets()
+        self.assertEqual(assets[self.FOLDER + "/Meshes/SK_Test_H2"]["skeleton"], self.CANON)
+        manifest = json.loads((self.run_dir / "manifest.json").read_text(encoding="utf-8"))
+        self.assertNotIn(self.CANON, manifest["stages"]["ue-import"]["ue_owned_assets"])
+        # --force: the run's folder is re-created, the canonical skeleton survives
+        self.ue("--force")
+        again = self.report_json()
+        self.assertTrue(again["passed"])
+        self.assertNotIn(self.CANON, again["previous_assets_deleted"])
+        self.assertIn(self.CANON, self.ue_assets())
+        # a second import is skipped (the canonical skeleton is outside the probed folder listing)
+        self.assertIn("skipped", self.ue().stdout)
+
+    def test_switching_an_existing_run_to_the_canonical_skeleton_deletes_only_its_own_skeleton(self):
+        # 5c-A runs created <asset>_Skeleton; a reimport with target_skeleton removes that one, keeps the canonical
+        self.init_run()
+        self.cli("preflight", "--run-dir", str(self.run_dir))
+        self.cli("adopt", "--run-dir", str(self.run_dir))
+        self.ue()
+        self.assertIn(self.FOLDER + "/Meshes/SK_Test_H2_Skeleton", self.ue_assets())
+        self.add_canonical_skeleton()
+        self.set_target_skeleton(self.CANON)
+        self.ue("--force")
+        report = self.report_json()
+        self.assertTrue(report["passed"], {k: v for k, v in report["checks"].items() if not v["passed"]})
+        self.assertIn(self.FOLDER + "/Meshes/SK_Test_H2_Skeleton", report["previous_assets_deleted"])
+        assets = self.ue_assets()
+        self.assertNotIn(self.FOLDER + "/Meshes/SK_Test_H2_Skeleton", assets)
+        self.assertEqual(assets[self.FOLDER + "/Meshes/SK_Test_H2"]["skeleton"], self.CANON)
+
+    def test_missing_target_skeleton_refuses_before_touching_the_editor(self):
+        self.set_target_skeleton(self.CANON)
+        self.init_run()
+        self.cli("preflight", "--run-dir", str(self.run_dir))
+        self.cli("adopt", "--run-dir", str(self.run_dir))
+        before = json.loads(self.ue_state.read_text(encoding="utf-8"))["assets"]
+        proc = self.ue(expect=tp.EXIT_CONFLICT)
+        self.assertIn("does not exist as a Skeleton", proc.stderr)
+        self.assertEqual(json.loads(self.ue_state.read_text(encoding="utf-8"))["assets"], before)
+
+    def test_target_skeleton_inside_the_run_folder_is_a_usage_error(self):
+        self.set_target_skeleton(self.FOLDER + "/Rig/SK_TestHero_Skeleton")
+        self.init_run()
+        self.cli("preflight", "--run-dir", str(self.run_dir))
+        self.cli("adopt", "--run-dir", str(self.run_dir))
+        proc = self.ue(expect=tp.EXIT_USAGE)
+        self.assertIn("outside the run folder", proc.stderr)
+
     def test_bytes_that_differ_from_the_bake_report_fail_adopt(self):
         self.init_run()
         self.cli("preflight", "--run-dir", str(self.run_dir))

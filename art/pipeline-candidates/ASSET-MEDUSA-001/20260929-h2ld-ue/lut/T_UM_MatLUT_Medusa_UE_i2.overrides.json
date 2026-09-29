@@ -1,0 +1,101 @@
+{
+ "asset_id": "ASSET-MEDUSA-001",
+ "classes": {
+  "gold_antique": {
+   "bc": [
+    0.4,
+    0.186,
+    0.074
+   ],
+   "ymedClassHero": 0.52196,
+   "roughTypical": 0.38,
+   "roughLo": 0.28,
+   "roughHi": 0.5,
+   "bakeLuminanceModulation": 0.3,
+   "cavityDarken": 0.7,
+   "wornBC": [
+    0.52,
+    0.24,
+    0.095
+   ]
+  },
+  "leather_smooth": {
+   "bc": [
+    0.0595,
+    0.0222,
+    0.013
+   ],
+   "ymedClassHero": 0.02919,
+   "roughTypical": 0.5,
+   "roughLo": 0.44,
+   "roughHi": 0.58,
+   "specular": 0.4,
+   "luminanceMin": 0.032
+  },
+  "leather_worn": {
+   "bc": [
+    0.0666,
+    0.0212,
+    0.006
+   ],
+   "ymedClassHero": 0.02919,
+   "specular": 0.4,
+   "luminanceMin": 0.032
+  },
+  "linen": {
+   "bc": [
+    0.0409,
+    0.0307,
+    0.0284
+   ],
+   "ymedClassHero": 0.03301,
+   "sheenIntensity": 0.12,
+   "sheenTint": 0.7
+  },
+  "skin": {
+   "bc": [
+    0.6445,
+    0.4125,
+    0.2384
+   ],
+   "ymedClassHero": 0.449
+  },
+  "stone_base": {
+   "bc": [
+    0.0382,
+    0.0242,
+    0.0212
+   ],
+   "ymedClassHero": 0.02693
+  },
+  "wood": {
+   "bc": [
+    0.0648,
+    0.0185,
+    0.004
+   ],
+   "ymedClassHero": 0.02698,
+   "roughTypical": 0.62,
+   "roughLo": 0.5,
+   "roughHi": 0.72,
+   "specular": 0.4,
+   "luminanceMin": 0.035
+  }
+ },
+ "generator": "tools/art/material_library/ue_hero_lookdev.py (LD-medusa-ue iteration i2, UE Cobble light)",
+ "hero": "Medusa",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero Medusa --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "тон класса после подгонки к концепту (ld_measure); у металла — F0 героя",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ },
+ "iteration": "i2",
+ "why_ue": {
+  "gold_antique": "i0: gold 2.6-2.8x brighter than skin relative to the concept, sat 0.38 vs 0.58, hue +6: F0 x (0.62, 0.55, 0.50) -> Y 0.30 (below the library rule 0.45: Cobble sky dome reflection, LDV-11), rougher, stronger bake/cavity modulation, worn edges = darker gold; i2: i1 gold still 1.33 (Cobble) / 1.38 (-1 EV) x the key-zone exposure: F0 x 0.75 -> (0.40, 0.186, 0.074), Y 0.22; worn edges scaled alike",
+  "linen": "i0 Cobble: dress 2.2x too bright vs skin and grey (sat 0.12): weaker, fabric-tinted sheen",
+  "leather_smooth": "i0: sat 0.35 vs 0.54: less white reflection (rougher, specular 0.4); i2: i1 leather 0.69 / 0.58 of the concept luma: class luminance floor 0.02 -> 0.032 (lifts the texels crushed at the floor, LDD-5 toe)",
+  "leather_worn": "as leather_smooth (specular); i2: luminance floor 0.032 (i1 0.81 / 0.67)",
+  "wood": "i0: sat 0.48 vs 0.61: rougher, specular 0.4; i2: i1 wood 0.58 / 0.52: luminance floor 0.035"
+ }
+}

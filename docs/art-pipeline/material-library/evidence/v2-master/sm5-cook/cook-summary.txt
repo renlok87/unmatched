@@ -1,0 +1,15 @@
+# Scratch cook C:/tmp/ldmaster/sm5proj (content-only copy of /Game/UM/Materials incl. v2; Config = RendererSettings + WindowsTargetSettings + ConsoleVariables of unreal/Unmatched)
+# UnrealEditor-Cmd SM5Probe.uproject -run=cook -targetplatform=Windows -cookall -unattended -nop4 -nosplash -noxgeshadercompile
+## run 1 (XGE on: hung on DistributedExecution jobs, stopped; r.XGEController.Enabled=0 was missing from the scratch config)
+LogMaterial: Display: Missing cached shadermap for /Game/UM/Materials/v2/Test/MI_UM_v2_Test_Checker_UV1.MI_UM_v2_Test_Checker_UV1 in PCD3D_SM6, Default, SM6, Game (DDC key hash: 40c555f0879c110704be6eac726c4ba7052d9301), compiling. 
+LogMaterial: Display: Missing cached shadermap for /Game/UM/Materials/v2/M_UM_Figure_v2.M_UM_Figure_v2 in PCD3D_SM6, Default, SM6, Game (DDC key hash: 4e1b3f416f5ead0b50def3b5b70b5ac3f99263b8), compiling. 
+LogMaterial: Display: Missing cached shadermap for /Game/UM/Materials/v2/Test/MI_UM_v2_Test_Checker_UV1.MI_UM_v2_Test_Checker_UV1 in PCD3D_SM5, Default, SM5, Game (DDC key hash: 15c3b123a05da905e12eb97a89820e3e21143716), compiling. 
+LogMaterial: Display: Missing cached shadermap for /Game/UM/Materials/v2/M_UM_Figure_v2.M_UM_Figure_v2 in PCD3D_SM5, Default, SM5, Game (DDC key hash: a421502a729b872a0fb3ade11fc2306064c2218b), compiling. 
+## run 2
+LogCook: Display: Compiling global changed shaders for platform 'Windows'
+LogMaterial: Display: Missing cached shadermap for /Game/UM/Materials/v2/Test/MI_UM_v2_Test_Checker_UV1.MI_UM_v2_Test_Checker_UV1 in PCD3D_SM5, Default, SM5, Game (DDC key hash: 15c3b123a05da905e12eb97a89820e3e21143716), compiling. 
+LogMaterial: Display: Missing cached shadermap for /Game/UM/Materials/v2/M_UM_Figure_v2.M_UM_Figure_v2 in PCD3D_SM5, Default, SM5, Game (DDC key hash: a421502a729b872a0fb3ade11fc2306064c2218b), compiling. 
+LogCook: Display: Cooked packages 634 Packages Remain 0 Total 634
+LogInit: Display: Success - 0 error(s), 0 warning(s)
+## run 3 (repeat: no missing shadermap for v2 in PCD3D_SM5/SM6 = both cached after a successful compile)
+LogInit: Display: Success - 0 error(s), 0 warning(s)

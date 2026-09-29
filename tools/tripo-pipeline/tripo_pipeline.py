@@ -78,7 +78,8 @@ import time
 from pathlib import Path
 
 TOOL_NAME = "tripo-pipeline"
-TOOL_VERSION = "0.7.0"  # 0.7.0 (W5c): profile skeletal-adopt (H2 bakes into UE)
+TOOL_VERSION = "0.8.0"  # 0.8.0 (W5c): skeletal-adopt ue.target_skeleton (mesh onto a canonical hero skeleton)
+# 0.7.0 (W5c): profile skeletal-adopt (H2 bakes into UE)
 RUN_SCHEMA = "unmatched.tripo-pipeline.run/1"
 SPEC_SCHEMA = "unmatched.tripo-pipeline.source-spec/1"
 REQUEST_SCHEMA = "unmatched.tripo-pipeline.generation-request/1"
@@ -101,7 +102,11 @@ T3.1). AssetTools only switches to Interchange when a task has no factory (Asset
 also pins the legacy importer independently of Interchange.FeatureFlags.Import.FBX. Nothing global is changed: the
 options live on this task's FbxImportUI only (changing a class default dirtied 47 packages in T3.1).
 args: {"kind": "static" | "skeletal", "folder_path", "asset_name", "source_file", "import_materials",
-       "import_textures", "combine_meshes", "vertex_colors": "replace" | "ignore", "normal_import_method", "out"}
+       "import_textures", "combine_meshes", "vertex_colors": "replace" | "ignore", "normal_import_method",
+       "skeleton": null | "/Game/.../SK_Hero_Skeleton.SK_Hero_Skeleton", "out"}
+skeleton (0.8.0, profile skeletal-adopt ue.target_skeleton): the skeletal mesh is imported onto that existing
+(canonical) skeleton instead of creating <asset>_Skeleton next to it; the skeleton is read back and reported and
+is never listed as imported (the run does not own it).
 """
 import json
 import sys
@@ -138,6 +143,11 @@ try:
     method = getattr(u.FBXNormalImportMethod, a["normal_import_method"])
     if skeletal:
         o.set_editor_property("create_physics_asset", False)
+        if a.get("skeleton"):
+            target_skel = u.load_asset(a["skeleton"])
+            if target_skel is None or not isinstance(target_skel, u.Skeleton):
+                raise RuntimeError("target skeleton not found: %s" % a["skeleton"])
+            o.set_editor_property("skeleton", target_skel)
         d = o.get_editor_property("skeletal_mesh_import_data")
         setp(d, "import_morph_targets", False)
     else:
@@ -145,6 +155,9 @@ try:
         d.set_editor_property("combine_meshes", bool(a.get("combine_meshes", True)))
         d.set_editor_property("vertex_color_import_option", u.VertexColorImportOption.REPLACE
                               if a.get("vertex_colors") == "replace" else u.VertexColorImportOption.IGNORE)
+        if a.get("generate_lightmap_uvs") is not None:
+            # 0.9.0: a base with an authored UV1 (M_UM_Figure_v2 detail in metres) must not get UV1 overwritten
+            res["generate_lightmap_uvs_set"] = setp(d, "generate_lightmap_u_vs", bool(a["generate_lightmap_uvs"]))
     d.set_editor_property("normal_import_method", method)
     d.set_editor_property("import_uniform_scale", 1.0)
     res["build_nanite_option_set_false"] = setp(d, "build_nanite", False)
@@ -167,11 +180,21 @@ try:
     if aid is not None:
         nim = aid.get_editor_property("normal_import_method")
         res["normal_import_method_read_back"] = getattr(nim, "name", str(nim))
+    if not skeletal and asset is not None:
+        try:  # 0.9.0: UV channels of LOD0 and the lightmap-UV build setting, read back
+            sms = u.get_editor_subsystem(u.StaticMeshEditorSubsystem)
+            res["uv_channels_lod0"] = int(sms.get_num_uv_channels(asset, 0))
+            bs = sms.get_lod_build_settings(asset, 0)
+            res["build_generate_lightmap_uvs"] = bool(bs.get_editor_property("generate_lightmap_u_vs"))
+        except Exception as exc:  # noqa: BLE001 - measurement only
+            res["uv_read_back_error"] = str(exc)
     if skeletal and asset is not None:
         # the skeleton created next to the mesh is part of the import (MCP import_file also returned it)
         skel = asset.get_editor_property("skeleton")
         if skel is not None:
-            res["imported"].append(skel.get_path_name())
+            res["skeleton_read_back"] = skel.get_path_name()
+            if not a.get("skeleton"):
+                res["imported"].append(skel.get_path_name())
 except Exception as exc:  # noqa: BLE001 - reported to the CLI
     res["error"] = "%s: %s" % (type(exc).__name__, exc)
 with open(a["out"], "w", encoding="utf-8", newline="\n") as handle:
@@ -219,6 +242,10 @@ try:
             raise RuntimeError("LOD %d: %s" % (lod, outcome))
         res["triangles"].append(int(u.GeometryScript_MeshQueries.get_num_triangle_i_ds(dm)))
         res["vertices"].append(int(u.GeometryScript_MeshQueries.get_vertex_count(dm)))
+        try:  # 0.9.0: UV sets of the LOD (M_UM_Figure_v2 reads UV1 in metres)
+            res.setdefault("uv_sets", []).append(int(u.GeometryScript_MeshQueries.get_num_uv_sets(dm)))
+        except Exception as exc:  # noqa: BLE001 - measurement only
+            res["uv_sets_error"] = str(exc)
     res["method"] = "GeometryScript_AssetUtils.copy_mesh_from_skeletal_mesh + get_num_triangle_i_ds"
 except Exception as exc:  # noqa: BLE001 - reported to the CLI
     res["error"] = "%s: %s" % (type(exc).__name__, exc)
@@ -1620,6 +1647,11 @@ def ue_plan(ctx: Context) -> dict:
         names = {"skeletal": "%s/Meshes/%s" % (folder, u["skeletal_asset"]),
                  "skeleton": "%s/Meshes/%s_Skeleton" % (folder, u["skeletal_asset"]),
                  "base": "%s/Meshes/%s" % (folder, u["base_asset"])}
+        target_skeleton = target_skeleton_of(u, folder)
+        if target_skeleton:
+            # 0.8.0: the mesh goes onto an existing canonical skeleton outside the run folder; the run never creates,
+            # owns or deletes a Skeleton asset
+            del names["skeleton"]
         if material_route(u) == "um-master":
             # 0.6.0 (W4-B): one MI per asset for the figure (parent M_UM_Figure) and one for the base (parent
             # M_UM_BaseMarker), team MIs as their children; no own Material in the run folder
@@ -1629,6 +1661,9 @@ def ue_plan(ctx: Context) -> dict:
                 for part in ("figure", "base"):
                     names["team:%s:%s" % (part, team)] = "%s/Materials/%s" % (
                         folder, u["team_instances"][part].format(team=team))
+            for extra in u.get("extra_instances") or []:
+                # LD-merlin-ue: further MIs under the figure/base MI (neutral = no dye, debug views of M_UM_Figure_v2)
+                names["extra:" + extra["asset"]] = "%s/Materials/%s" % (folder, extra["asset"])
         else:
             names["material"] = "%s/Materials/%s" % (folder, u["material"])
             if u.get("base_material_mode", "atlas-instance") == "vertex-mask":
@@ -1638,6 +1673,8 @@ def ue_plan(ctx: Context) -> dict:
         if run_profile(m) == SKELETAL_ADOPT:
             # every texture of the adopted candidate is pinned by adopt (candidate.textures)
             atlas_files = {k: {"file": v} for k, v in profile["candidate"]["textures"].items()}
+            atlas_files.update({k: {"file": v["path"]} for k, v in
+                                (profile["candidate"].get("library_inputs") or {}).items()})
         else:
             atlas_path = ctx.run_path("reports/atlas-report.json")
             atlas_files = json.loads(atlas_path.read_text(encoding="utf-8"))["files"] if atlas_path.is_file() else {}
@@ -1646,13 +1683,29 @@ def ue_plan(ctx: Context) -> dict:
                 continue  # optional input the atlas stage did not produce (e.g. no team_color.mask)
             names["texture:" + key] = "%s/Textures/%s" % (folder, tex["asset"])
         return {"folder": folder, "name": u["skeletal_asset"], "kind": "skeletal", "primary": names["skeletal"],
-                "names": names, "profile": profile}
+                "names": names, "profile": profile, "target_skeleton": target_skeleton}
     export_report = json.loads(ctx.run_path("reports/export-report.json").read_text(encoding="utf-8"))
     kind = "skeletal" if export_report["roundtrip_reimport"]["armatures"] else "static"
     name = cfg.get("asset_name") or "%s_%s" % ("SK" if kind == "skeletal" else "SM",
                                                ue_safe(m["config"]["export_basename"]))
     return {"folder": folder, "name": name, "kind": kind, "primary": "%s/%s" % (folder, name),
             "export_report": export_report}
+
+
+def target_skeleton_of(u: dict, folder: str):
+    """ue.target_skeleton of a skeletal-adopt profile (0.8.0): the canonical skeleton of the hero, e.g.
+    /Game/PipelineCandidates/<Hero>/Rig/SK_<Hero>_Skeleton. It must lie under UE_ALLOWED_ROOT and OUTSIDE the run
+    folder (the run deletes and re-creates everything in its folder; a shared skeleton must survive a reimport)."""
+    path = u.get("target_skeleton")
+    if not path:
+        return None
+    path = ue_package(path)
+    if not (path + "/").startswith(UE_ALLOWED_ROOT) or ".." in path:
+        raise PipelineError("ue.target_skeleton must be inside %s: %s" % (UE_ALLOWED_ROOT, path), EXIT_USAGE)
+    if (path + "/").startswith(folder.rstrip("/") + "/"):
+        raise PipelineError("ue.target_skeleton must lie outside the run folder %s (the run deletes its folder "
+                            "content on reimport): %s" % (folder, path), EXIT_USAGE)
+    return path
 
 
 def fp_ue_import(ctx: Context) -> dict:
@@ -1741,7 +1794,8 @@ def um_master_instances(ue, u, names, textures, tex_path, team_mode, base_mode, 
         pkg = names[key]
         track(ue.call("instance", "create", {"folder_path": pkg.rsplit("/", 1)[0], "asset_name": pkg.rsplit("/", 1)[1],
                                              "parent": ue_obj(parent_pkg)}))
-        plan["instances"][key] = {"asset": pkg, "parent": parent_pkg, "textures": {}, "scalars": {}, "vectors": {}}
+        plan["instances"][key] = {"asset": pkg, "parent": parent_pkg, "textures": {}, "scalars": {}, "vectors": {},
+                                  "switches": {}}
         return ue_obj(pkg)
 
     def set_tex(key, name, tex_pkg):
@@ -1772,6 +1826,14 @@ def um_master_instances(ue, u, names, textures, tex_path, team_mode, base_mode, 
     set_tex("figure_instance", "TeamMaskTexture", mask_tex)
     for name, value in sorted((u.get("figure_parameters") or {}).items()):
         set_scalar("figure_instance", name, value)
+    # LD-merlin-ue (M_UM_Figure_v2): extra texture parameters of the figure MI (MatIDTexture, MatLUT, EdgeMaskTexture ->
+    # profile texture keys) and static switches (UseUV1Metres)
+    for pname, key in sorted((u.get("figure_textures") or {}).items()):
+        set_tex("figure_instance", pname, tex_pkg[key])
+    for name, value in sorted((u.get("figure_static_switches") or {}).items()):
+        ue.call("instance", "set_static_switch_parameter", {"instance": ue_obj(names["figure_instance"]), "name": name,
+                                                            "value": bool(value)})
+        plan["instances"]["figure_instance"]["switches"][name] = bool(value)
     # base
     bcfg = u.get("base_marker") or {}
     create("base_instance", base_master)
@@ -1790,6 +1852,15 @@ def um_master_instances(ue, u, names, textures, tex_path, team_mode, base_mode, 
             create(key, names[parent_key])
             set_vector(key, "TeamColor", lin)
             plan["instances"][key]["team_hex"] = colour if isinstance(colour, str) else None
+    for extra in u.get("extra_instances") or []:
+        key = "extra:" + extra["asset"]
+        create(key, names[extra.get("parent", "figure_instance")])
+        for pname, tkey in sorted((extra.get("textures") or {}).items()):
+            set_tex(key, pname, tex_pkg[tkey])
+        for name, value in sorted((extra.get("scalars") or {}).items()):
+            set_scalar(key, name, value)
+        for name, value in sorted((extra.get("vectors") or {}).items()):
+            set_vector(key, name, team_linear(value))
     return plan
 
 
@@ -1822,7 +1893,7 @@ def um_master_checks(ue, u, names, um_plan, getp, check, measured) -> None:
         ref = ue_obj(want["asset"])
         parent = getp(ref, ["Parent"]).get("Parent")
         parent = parent.get("refPath") if isinstance(parent, dict) else parent
-        got = {"parent": ue_package(parent or ""), "textures": {}, "scalars": {}, "vectors": {}}
+        got = {"parent": ue_package(parent or ""), "textures": {}, "scalars": {}, "vectors": {}, "switches": {}}
         for name in want["textures"]:
             got["textures"][name] = ue_package(ue.call("instance", "get_texture_parameter",
                                                        {"instance": ref, "name": name}) or "")
@@ -1832,10 +1903,14 @@ def um_master_checks(ue, u, names, um_plan, getp, check, measured) -> None:
         for name in want["vectors"]:
             v = ue.call("instance", "get_vector_parameter", {"instance": ref, "name": name}) or {}
             got["vectors"][name] = [round(float(v.get(k, -1)), 6) for k in "rgba"]
+        for name in want.get("switches") or {}:
+            got["switches"][name] = bool(ue.call("instance", "get_static_switch_parameter",
+                                                 {"instance": ref, "name": name}))
         ok = (got["parent"] == want["parent"]
               and all(got["textures"][n] == ue_package(t) for n, t in want["textures"].items())
               and all(abs(got["scalars"][n] - v) < 1e-4 for n, v in want["scalars"].items())
-              and all(max(abs(a - b) for a, b in zip(got["vectors"][n], v)) < 1e-4 for n, v in want["vectors"].items()))
+              and all(max(abs(a - b) for a, b in zip(got["vectors"][n], v)) < 1e-4 for n, v in want["vectors"].items())
+              and all(got["switches"][n] == v for n, v in (want.get("switches") or {}).items()))
         inst[key] = {"planned": want, "read_back": got, "ok": ok}
     measured["um_instances"] = inst
     check("um_instances_parent_textures_values", all(i["ok"] for i in inst.values()),
@@ -1912,10 +1987,18 @@ UE_DELETE_RANK = {"MaterialInstanceConstant": 0, "SkeletalMesh": 1, "StaticMesh"
                   "Skeleton": 2, "Material": 3, "Texture2D": 4}
 
 
-def ue_delete_owned(ue, assets) -> list:
+def ue_delete_owned(ue, assets, folder=None, keep=()) -> list:
     """Delete this run's previous assets, referencers first (UE 5.8 MCP `delete` force-deletes and
-    nulls references, so the order only avoids transient dangling references)."""
+    nulls references, so the order only avoids transient dangling references).
+
+    0.8.0: with `folder`, only assets inside that folder are deleted, and never an asset in `keep` (the canonical
+    target skeleton of a skeletal-adopt profile), even if an older manifest listed it as owned."""
     ranked = []
+    if folder is not None:
+        root = folder.rstrip("/") + "/"
+        assets = [a for a in assets if a.startswith(root)]
+    keep = set(keep)
+    assets = [a for a in assets if a not in keep]
     for asset in assets:
         try:
             cls = str(ue.call("asset", "get_asset_class", {"asset_path": asset})).rsplit(".", 1)[-1]
@@ -2182,13 +2265,22 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
         src_paths = {"skeletal": ctx.run_path(rels["skeletal"]), "base": ctx.run_path(rels["base"])}
         src_paths.update({"texture:" + k: ctx.run_path("textures/" + v["file"]) for k, v in atlas["files"].items()})
 
+    target_skeleton = plan.get("target_skeleton")
+    if target_skeleton:
+        skel_class = None
+        if ue.call("asset", "exists", {"path": target_skeleton}):
+            skel_class = str(ue.call("asset", "get_asset_class", {"asset_path": target_skeleton})).rsplit(".", 1)[-1]
+        if skel_class != "Skeleton":
+            raise PipelineError("ue.target_skeleton %s does not exist as a Skeleton (class %s); create the canonical "
+                                "skeleton first (review/ue_py/canonical_skeleton.py)" % (target_skeleton, skel_class),
+                                EXIT_CONFLICT)
     owned = set(rec.get("ue_owned_assets") or [])
     before = ue_listing(ue, folder)
     foreign = [a for a in before if a not in owned]
     if foreign:
         raise PipelineError("UE folder %s holds assets this run did not create: %s; refusing to delete or "
                             "import next to them (use another --ue-folder)" % (folder, foreign[:10]), EXIT_CONFLICT)
-    deleted = ue_delete_owned(ue, before)
+    deleted = ue_delete_owned(ue, before, folder=folder, keep=[target_skeleton] if target_skeleton else [])
     rec["ue_owned_assets"] = []
     ctx.save()
     try:
@@ -2222,6 +2314,9 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
         props = {"SRGB": tcfg["srgb"], "CompressionSettings": tcfg["compression"]}
         if "flip_green" in tcfg:
             props["bFlipGreenChannel"] = tcfg["flip_green"]
+        # LD-merlin-ue: further UTexture properties of the profile (Filter, MipGenSettings, NeverStream, ... for the
+        # MatID / LUT inputs of M_UM_Figure_v2: point sampled, no mips, never streamed)
+        props.update(tcfg.get("properties") or {})
         setp(ue_obj(pkg), props)
     team_mode = u.get("team_color_mode", "multiply")
     base_mode = u.get("base_material_mode", "atlas-instance")
@@ -2381,11 +2476,17 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     for key, pkg, asset, kind, vc in (("skeletal", sk_pkg, u["skeletal_asset"], "skeletal", "ignore"),
                                       ("base", base_pkg, u["base_asset"], "static",
                                        "replace" if vertex_mask_base else "ignore")):
-        res = ue_import_fbx(ue, staging, key, {
+        import_args = {
             "kind": kind, "folder_path": pkg.rsplit("/", 1)[0], "asset_name": asset,
             "source_file": str(src_paths[key]), "import_materials": False, "import_textures": False,
-            "combine_meshes": True, "vertex_colors": vc, "normal_import_method": UE_NORMAL_IMPORT_METHOD})
-        track([{"refPath": x} for x in res.get("imported") or []])
+            "combine_meshes": True, "vertex_colors": vc, "normal_import_method": UE_NORMAL_IMPORT_METHOD}
+        if key == "skeletal" and target_skeleton:
+            import_args["skeleton"] = ue_object_path(target_skeleton)
+        if key == "base" and u.get("base_generate_lightmap_uvs") is not None:
+            import_args["generate_lightmap_uvs"] = bool(u["base_generate_lightmap_uvs"])
+        res = ue_import_fbx(ue, staging, key, import_args)
+        track([{"refPath": x} for x in res.get("imported") or []
+               if not target_skeleton or ue_package(x) != target_skeleton])
         imports[key] = res
     base_vc = None
     if vertex_mask_base:
@@ -2448,12 +2549,14 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     classes = {}
     for key, pkg in sorted(names.items()):
         classes[key] = str(ue.call("asset", "get_asset_class", {"asset_path": pkg})).rsplit(".", 1)[-1]
-    want = {"skeletal": "SkeletalMesh", "skeleton": "Skeleton", "base": "StaticMesh"}
+    want = {"skeletal": "SkeletalMesh", "base": "StaticMesh"}
+    if "skeleton" in names:
+        want["skeleton"] = "Skeleton"
     if "material" in names:
         want["material"] = "Material"
     if "base_material" in names:
         want["base_material"] = "Material"
-    want.update({k: "MaterialInstanceConstant" for k in names if k.startswith(("instance:", "team:"))
+    want.update({k: "MaterialInstanceConstant" for k in names if k.startswith(("instance:", "team:", "extra:"))
                  or k in ("figure_instance", "base_instance")})
     want.update({k: "Texture2D" for k in names if k.startswith("texture:")})
     check("asset_classes", classes == want, classes, want)
@@ -2461,12 +2564,15 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     for key, tcfg in sorted(textures.items()):
         ref = ue_obj(names["texture:" + key])
         size = ue.call("texture", "get_size", {"texture": ref}) or {}
-        props = getp(ref, ["SRGB", "CompressionSettings", "bFlipGreenChannel"])
+        extra_p = tcfg.get("properties") or {}
+        props = getp(ref, ["SRGB", "CompressionSettings", "bFlipGreenChannel"] + sorted(extra_p))
         tex[key] = {"size": [size.get("x"), size.get("y")], "properties": props}
         want_p = {"SRGB": tcfg["srgb"], "CompressionSettings": tcfg["compression"]}
         if "flip_green" in tcfg:
             want_p["bFlipGreenChannel"] = tcfg["flip_green"]
-        tex[key]["ok"] = (tex[key]["size"] == [atlas["size"]] * 2 and
+        want_p.update(extra_p)
+        # LD-merlin-ue: a non-atlas input (the 16 x 16 class LUT) names its own size (ue.textures.<key>.px)
+        tex[key]["ok"] = (tex[key]["size"] == (tcfg.get("px") or [atlas["size"]] * 2) and
                           all(props.get(k) == v for k, v in want_p.items()))
     measured["textures"] = tex
     check("textures_size_colour_space_compression", all(t["ok"] for t in tex.values()), tex,
@@ -2524,6 +2630,14 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
                           and ue_package(parent or "") == instances_parent_pkg}
         check("team_color_instances", all(i["ok"] for i in inst.values()), inst, {"parent": instances_parent_pkg})
 
+    if target_skeleton:
+        read_back = ue_package((imports.get("skeletal") or {}).get("skeleton_read_back") or "")
+        measured["target_skeleton"] = {"planned": target_skeleton, "read_back": read_back,
+                                       "owned_by_run": target_skeleton in (rec.get("ue_owned_assets") or [])}
+        check("skeleton_is_canonical_target", read_back == target_skeleton and
+              not measured["target_skeleton"]["owned_by_run"], measured["target_skeleton"], target_skeleton,
+              "0.8.0: the mesh is imported onto the existing canonical skeleton (ue.target_skeleton); no "
+              "<asset>_Skeleton is created, the skeleton is not owned (a reimport never deletes it)")
     bones = ue.call("skeletal", "get_bone_names", {"mesh": sk}) or []
     want_bones = [b[0].replace(".", "_") for b in profile["armature"]["bones"]]
     extra = [b for b in bones if b not in want_bones]
@@ -2670,6 +2784,19 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     check("base_material_slot", len(base_slots) == profile["expectations"]["base_material_slots"] and
           all(v == default_mi_pkg for v in base_mat.values()), base_mat, default_mi_pkg)
     import_contract_checks(ue, imports, sk, base, getp, check, measured, vertex_mask_base)
+    want_uv = u.get("expect_uv_channels")
+    if want_uv is not None:
+        # 0.9.0: UV0 atlas + UV1 in metres (M_UM_Figure_v2 UseUV1Metres) survive the import on both meshes
+        uv = {"skeletal_lods_uv_sets": (measured.get("skeletal_lods") or {}).get("uv_sets"),
+              "skeletal_uv_error": (measured.get("skeletal_lods") or {}).get("uv_sets_error"),
+              "base_uv_channels_lod0": (imports.get("base") or {}).get("uv_channels_lod0"),
+              "base_build_generate_lightmap_uvs": (imports.get("base") or {}).get("build_generate_lightmap_uvs"),
+              "base_uv_error": (imports.get("base") or {}).get("uv_read_back_error")}
+        measured["uv_channels"] = uv
+        check("uv_channels_as_profile", (uv["skeletal_lods_uv_sets"] or [None])[0] == want_uv and
+              uv["base_uv_channels_lod0"] == want_uv and uv["base_build_generate_lightmap_uvs"] is False, uv,
+              {"uv_channels": want_uv, "base_generate_lightmap_uvs": False},
+              "UV0 atlas + UV1 in metres; the base must not generate lightmap UVs into UV1")
     dirty = {a: ue.call("asset", "is_dirty", {"asset_path": a}) for a in after}
     check("assets_saved", bool(saved) and not any(dirty.values()), {"save_assets": saved, "dirty": dirty})
     measured["fbx_import_log"] = fbx_log

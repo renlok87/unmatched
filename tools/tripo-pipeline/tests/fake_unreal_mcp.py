@@ -94,7 +94,11 @@ def editor_python(state, text):
             vcio = "Ignore"
         toolset = ("editor_toolset.toolsets.skeletal_mesh.SkeletalMeshTools" if skeletal
                    else "editor_toolset.toolsets.static_mesh.StaticMeshTools")
-        created, error = mesh_import(state, toolset, a, vcio=vcio)
+        target_skel = pkg(a["skeleton"]) if skeletal and a.get("skeleton") else None
+        if target_skel and (state["assets"].get(target_skel) or {}).get("class") != "Skeleton":
+            created, error = None, "target skeleton not found: %s" % a["skeleton"]
+        else:
+            created, error = mesh_import(state, toolset, a, vcio=vcio, target_skeleton=target_skel)
         if error:
             res["error"] = "RuntimeError: %s" % error
         else:
@@ -103,6 +107,9 @@ def editor_python(state, text):
             state["assets"][created[0]]["import_data_class"] = ("FbxSkeletalMeshImportData" if skeletal
                                                                 else "FbxStaticMeshImportData")
             res["imported"] = [obj(p)["refPath"] for p in created]
+            if skeletal:
+                # 0.8.0: the editor reads the mesh's skeleton back; with a target skeleton nothing new is created
+                res["skeleton_read_back"] = obj(state["assets"][created[0]].get("skeleton") or "")["refPath"]
             res["asset_import_data_class"] = state["assets"][created[0]]["import_data_class"]
             res["normal_import_method_read_back"] = method
     Path(a["out"]).write_text(json.dumps(res), encoding="utf-8")
@@ -166,7 +173,7 @@ def ue_bounds(authored, theta):
     return [min(xs), min(ys), authored["min"][2]], [max(xs), max(ys), authored["max"][2]]
 
 
-def mesh_import(state, toolset, args, vcio="Ignore"):
+def mesh_import(state, toolset, args, vcio="Ignore", target_skeleton=None):
     fbx = Path(args["source_file"])
     run = fbx.parent.parent
     state["log"].append("LogFbx: Loading FBX Scene from %s" % fbx.as_posix())
@@ -281,10 +288,13 @@ def mesh_import(state, toolset, args, vcio="Ignore"):
     if error:
         return None, error
     created = [final]
-    if record["class"] == "SkeletalMesh" and "bones" in record:
+    if record["class"] == "SkeletalMesh" and "bones" in record and target_skeleton:
+        record["skeleton"] = target_skeleton  # onto the existing (canonical) skeleton: no <asset>_Skeleton
+    elif record["class"] == "SkeletalMesh" and "bones" in record:
         skel, error = new_asset(state, args["folder_path"], args["asset_name"] + "_Skeleton", {"class": "Skeleton"})
         if error:
             return None, error
+        record["skeleton"] = skel
         created.append(skel)
     if args.get("import_materials"):
         for slot in record["slots"]:

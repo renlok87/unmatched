@@ -1,0 +1,407 @@
+{
+ "atlas_px": 4096,
+ "beard_roughness": {
+  "after_p5_p50_p95": [
+   0.686,
+   0.75,
+   0.8484
+  ],
+  "before_p5_p50_p95": [
+   0.4888,
+   0.6167,
+   0.8135
+  ],
+  "tripo_p50": 0.6167
+ },
+ "checks": {
+  "beard_roughness_matte": {
+   "expected": ">= 0.72 p50 (hair of a painted miniature: matte)",
+   "measured": {
+    "after_p5_p50_p95": [
+     0.686,
+     0.75,
+     0.8484
+    ],
+    "before_p5_p50_p95": [
+     0.4888,
+     0.6167,
+     0.8135
+    ]
+   },
+   "passed": true
+  },
+  "edge_mask_range": {
+   "expected": "p99 > 0.5",
+   "measured": {
+    "p50_p95_p99_2k": [
+     0.0263,
+     0.5361,
+     0.8147
+    ],
+    "sigma_1.5_p99": 0.1729,
+    "sigma_4_p99": 0.06919
+   },
+   "passed": true
+  },
+  "every_zone_present": {
+   "expected": "> 0 for every zone",
+   "measured": {
+    "base": 0.06596,
+    "beard": 0.05044,
+    "beard_wrap": 0.00699,
+    "belt": 0.0076,
+    "boots": 0.03844,
+    "buckle": 0.00068,
+    "crystal": 0.03449,
+    "embroidery": 0.05399,
+    "face_skin": 0.01095,
+    "hands_skin": 0.05158,
+    "wood": 0.17481,
+    "wool": 0.50407
+   },
+   "passed": true
+  },
+  "h21_state_reproduced": {
+   "expected": "every 4K master: sha256 = H2.1 textures-report, rebuilt 8-bit pixels equal",
+   "measured": {
+    "BC": {
+     "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_BC_4K.png",
+     "max_abs_lsb": 0,
+     "pixels_equal_rebuilt": true,
+     "sha256_matches_h21_report": true
+    },
+    "N": {
+     "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_N_4K.png",
+     "max_abs_lsb": 0,
+     "pixels_equal_rebuilt": true,
+     "sha256_matches_h21_report": true
+    },
+    "ORM": {
+     "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_ORM_4K.png",
+     "max_abs_lsb": 0,
+     "pixels_equal_rebuilt": true,
+     "sha256_matches_h21_report": true
+    },
+    "TeamMask": {
+     "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_TeamMask_4K.png",
+     "max_abs_lsb": 0,
+     "pixels_equal_rebuilt": true,
+     "sha256_matches_h21_report": true
+    },
+    "TeamMaskRGBA": {
+     "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_TeamMaskRGBA_4K.png",
+     "max_abs_lsb": 0,
+     "pixels_equal_rebuilt": true,
+     "sha256_matches_h21_report": true
+    }
+   },
+   "passed": true
+  },
+  "matid_encoding_roundtrip": {
+   "expected": "value = index x 16 + 8; floor(v / 16) = index",
+   "measured": {
+    "values": [
+     8,
+     104,
+     136,
+     152,
+     184,
+     216,
+     232,
+     248
+    ]
+   },
+   "passed": true
+  },
+  "matid_metal_equals_orm_metallic": {
+   "expected": "disagree <= 2 % of the metal texels (2K)",
+   "measured": {
+    "disagree": 5,
+    "matid_bronze_texels": 1535,
+    "orm_metallic_ge_0_5_texels": 1530
+   },
+   "passed": true
+  },
+  "no_team_dye_class_on_embroidery": {
+   "expected": false,
+   "measured": {
+    "class": "silk",
+    "override_teamDyeAllowed": false
+   },
+   "passed": true
+  },
+  "orm_g_changed_only_on_beard": {
+   "expected": {
+    "outside_beard": 0
+   },
+   "measured": {
+    "changed_texels": 210340,
+    "outside_beard": 0
+   },
+   "passed": true
+  },
+  "team_mask_zero_on_embroidery_core": {
+   "expected": 0,
+   "measured": 0,
+   "note": "TeamMask (cloth) on texels fully in the embroidery zone",
+   "passed": true
+  },
+  "unchanged_channels_equal_h21_2k": {
+   "expected": "N, TeamMask, ORM.R/B, TeamMaskRGBA.RGB = H2.1 2K pixels",
+   "measured": {
+    "N": true,
+    "ORM": true,
+    "TeamMask": true,
+    "TeamMaskRGBA": true
+   },
+   "passed": true
+  },
+  "zone_weights_partition": {
+   "expected": "< 1e-6",
+   "measured": 0.0,
+   "note": "sum of the soft zone weights on every texel of the atlas",
+   "passed": true
+  }
+ },
+ "conventions": {
+  "MatID": "G8 linear (UE TC_Grayscale, sRGB off, NoMipmaps, Nearest, never streamed); value = class index x 16 + 8; shader: Load(int3(frac(uv0) x size, 0)), id = floor(v x 255 / 16)",
+  "N": "DirectX (-Y), = H2.1",
+  "ORM": "R AO, G roughness (beard remapped), B metallic; linear",
+  "TeamMask": "L = cloth, = H2.1",
+  "TeamMaskRGBA": "R cloth (team dye), G base side band, B gold embroidery, A EdgeMask (look-dev v2; A was 255 in H2.1); linear, sRGB off"
+ },
+ "edge_mask": {
+  "channel": "TeamMaskRGBA.A (linear)",
+  "method": "convexity of the baked tangent normal: d(nx)/du + d(ny)/dv inside UV islands at gaussian sigma 1.5 and 4 texels (4K), positive part / p99 of each, mean of the two",
+  "sigma_1.5_p99": 0.1729,
+  "sigma_4_p99": 0.06919
+ },
+ "matid_1k_alternative": {
+  "embroidery_texels_2k_kept_at_1k": 0.9253,
+  "note": "share of the 2K embroidery MatID texels whose 1K MatID is also embroidery"
+ },
+ "matid_class_area_2k": {
+  "0": {
+   "class": "legacy_bake",
+   "share_of_covered": 0.08525,
+   "texels_all": 425628
+  },
+  "11": {
+   "class": "silk",
+   "share_of_covered": 0.05424,
+   "texels_all": 288998
+  },
+  "13": {
+   "class": "skin",
+   "share_of_covered": 0.06284,
+   "texels_all": 340528
+  },
+  "14": {
+   "class": "stone_base",
+   "share_of_covered": 0.06568,
+   "texels_all": 228203
+  },
+  "15": {
+   "class": "wood",
+   "share_of_covered": 0.17449,
+   "texels_all": 744872
+  },
+  "6": {
+   "class": "bronze",
+   "share_of_covered": 0.00068,
+   "texels_all": 1535
+  },
+  "8": {
+   "class": "leather_worn",
+   "share_of_covered": 0.05336,
+   "texels_all": 286403
+  },
+  "9": {
+   "class": "wool_coarse",
+   "share_of_covered": 0.50346,
+   "texels_all": 1878137
+  }
+ },
+ "matid_px": 2048,
+ "passed": true,
+ "previews": {
+  "edge": {
+   "bytes": 473888,
+   "mode": "L",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/preview/ld_edgemask_1K.png",
+   "px": [
+    1024,
+    1024
+   ],
+   "sha256": "2a354ee3d50b3e6328732755436a497a317512968285c7ca977c3fac49eda372"
+  },
+  "matid": {
+   "bytes": 151553,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/preview/ld_matid_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "86a76af9c18ec3d12af1579b9dc11ee76847c1ca0d3b103dd10257b22cbc2fd9"
+  },
+  "zones": {
+   "bytes": 517985,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/preview/ld_zones_1K.png",
+   "px": [
+    1024,
+    1024
+   ],
+   "sha256": "1b670d0c54c9dccf2bf32d2920298924a7719b959e356d6a5eba12c3253d0202"
+  }
+ },
+ "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json",
+ "profile_id": "merlin-h2-lookdev/1",
+ "source_profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json",
+ "stage": "ld_maps",
+ "textures": {
+  "MatID_2K": {
+   "bytes": 105056,
+   "mode": "L",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_MatID_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "f5c2f6322cee63ac9575c4a9a84caf708eda9e3f59e1e96feb00df2b9d0959dc"
+  },
+  "N_2K": {
+   "bytes": 4479767,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_N_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "2f7bfac8acc997f75c1291ea14beecd88558c38878a62f1c060da459fe9fcbfa"
+  },
+  "N_4K": {
+   "bytes": 11992789,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_N_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "addc8e7fe7a5818a224aa41683e3ae6e6f7a89fc0fb7c25343055886d96bd13e"
+  },
+  "ORM_2K": {
+   "bytes": 3380472,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_ORM_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "0a33ce04ce0a8dd892bc7e5780e0b7e48b4be77887b6589543b3a4e6acaf68b1"
+  },
+  "ORM_4K": {
+   "bytes": 10607915,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_ORM_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "870ed168e69a457fc50ff06c12d0db38af4ed4b46cc8c3d357ef33bd48d13951"
+  },
+  "TeamMaskRGBA_2K": {
+   "bytes": 2706718,
+   "mode": "RGBA",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamMaskRGBA_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "c21b002a56f17d06661ce936a2e06e759f7dc331157cb25a267efafe1cf6291a"
+  },
+  "TeamMaskRGBA_4K": {
+   "bytes": 6768289,
+   "mode": "RGBA",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamMaskRGBA_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "dc7714efea2f99b3274cdd83ec42944562a51acb201c9c8129817d9113018277"
+  },
+  "TeamMask_2K": {
+   "bytes": 361395,
+   "mode": "L",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamMask_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "975297f48c465bf4a09f8eb60c4c43fcda72c7aebc6e0ac2abf076802952388f"
+  },
+  "TeamMask_4K": {
+   "bytes": 682577,
+   "mode": "L",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamMask_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "4e67c0facce148581ec4b7e9047f92619b6df35b92164ea813a742978fe4d6b3"
+  }
+ },
+ "zone_area_share_4k": {
+  "base": 0.06596,
+  "beard": 0.05044,
+  "beard_wrap": 0.00699,
+  "belt": 0.0076,
+  "boots": 0.03844,
+  "buckle": 0.00068,
+  "crystal": 0.03449,
+  "embroidery": 0.05399,
+  "face_skin": 0.01095,
+  "hands_skin": 0.05158,
+  "wood": 0.17481,
+  "wool": 0.50407
+ },
+ "zone_class": {
+  "base": "stone_base",
+  "beard": "legacy_bake",
+  "beard_wrap": "leather_worn",
+  "belt": "leather_worn",
+  "boots": "leather_worn",
+  "buckle": "bronze",
+  "crystal": "legacy_bake",
+  "embroidery": "silk",
+  "face_skin": "skin",
+  "hands_skin": "skin",
+  "wood": "wood",
+  "wool": "wool_coarse"
+ },
+ "zone_texture": {
+  "bytes": 241518,
+  "mode": "L",
+  "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/work/lookdev/T_Zone_4K.png",
+  "px": [
+   4096,
+   4096
+  ],
+  "sha256": "8774a7076d253f2ef7e8fe65de9cc3025a30061433b7ef42ff1fc87be55173ef"
+ },
+ "zones": [
+  "wool",
+  "embroidery",
+  "belt",
+  "buckle",
+  "boots",
+  "beard_wrap",
+  "wood",
+  "crystal",
+  "face_skin",
+  "hands_skin",
+  "beard",
+  "base"
+ ]
+}

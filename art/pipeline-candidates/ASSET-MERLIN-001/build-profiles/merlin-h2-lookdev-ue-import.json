@@ -1,0 +1,399 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "profile_id": "merlin-h2-lookdev-ue-import/1",
+  "asset_id": "ASSET-MERLIN-001",
+  "kind": "skeletal-adopt",
+  "status": "proposed",
+  "status_note": "LD-merlin-ue (2026-09-29): UE import of the Merlin look-dev run (merlin-h2-lookdev/1: H2.1 rig + UV1, concept-toned BC, MatID, class LUT, EdgeMask) onto M_UM_Figure_v2 through the CLI profile skeletal-adopt. The figure MI is a child of /Game/UM/Materials/v2/M_UM_Figure_v2 (MatID, hero LUT 16x16, EdgeMask, UV1 in metres); the base keeps M_UM_BaseMarker (team band). At most «технически импортировано / измерено»; no art acceptance, no budget (GD-058 open); Blue/Red diagnostic pair (Q-304 open).",
+  "derived_from": [
+    "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-ue-import.json (W5c-A H2.1 import: armature, sockets, axes, scale, team pair, base marker)",
+    "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json (look-dev stage)",
+    "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev-ue-lut.json (UE inputs: LUT v2 layout, EdgeMask, debug zone ID; UE look-dev layer)",
+    "docs/art-pipeline/material-library/m-um-figure-v2.md (M_UM_Figure_v2 parameters)"
+  ],
+  "source_role": "h2-parts-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "candidate": {
+    "dir": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev",
+    "report_format": "h2-lookdev-merlin/1",
+    "bake_profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json",
+    "bake_profile_id": "merlin-h2-lookdev/1",
+    "build_report": "reports/ld-export-report.json",
+    "textures_report": "reports/textures-report.json",
+    "extra_reports": {
+      "ue_inputs": "ue-inputs/ue-inputs-report.json",
+      "ld_report": "reports/ld-report.json"
+    },
+    "h21_build_report": {
+      "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/reports/build-report.json",
+      "sha256": "5b078b7276658ea813ab7f87386ebf2bb6d997c043e4f4318ead37553dcdde17",
+      "note": "bones, sockets, round-trip bounds of H2.1: the look-dev export proved rig/geometry/weights equal to it"
+    },
+    "fbx": {
+      "skeletal": "export/SK_Merlin_H2LD.fbx",
+      "base": "export/SM_Merlin_H2LD_Base.fbx"
+    },
+    "textures": {
+      "BC": "textures/T_Merlin_H2LD_BC_2K.png",
+      "N": "textures/T_Merlin_H2LD_N_2K.png",
+      "ORM": "textures/T_Merlin_H2LD_ORM_2K.png",
+      "TeamMask": "textures/T_Merlin_H2LD_TeamMask_2K.png",
+      "MatID": "textures/T_Merlin_H2LD_MatID_2K.png",
+      "EdgeMask": "ue-inputs/T_Merlin_H2LD_EdgeMask_2K.png",
+      "MatLUT": "ue-inputs/T_UM_MatLUT_Merlin.dds",
+      "ZoneID": "ue-inputs/T_Merlin_H2LD_ZoneID_2K.png",
+      "ZoneLUT": "ue-inputs/T_Merlin_H2LD_ZoneLUT_Debug.dds"
+    },
+    "textures_note": "2K runtime set of the look-dev run + UE inputs of lookdev_ue_inputs.py (LUT 16x16 v2 layout instead of the EXR 16x8 of the Blender stage, EdgeMask = TeamMaskRGBA.A as its own texture, LDV-1/LDV-8). ZoneID is a DEBUG input: only the debug MI MI_Merlin_H2LD_DebugZones reads it (zone masks of the look-dev measurement). The 4K masters and TeamMaskRGBA are never imported",
+    "texture_px": 2048,
+    "texture_tier": "runtime_2k",
+    "texture_exceptions": {
+      "MatLUT": {
+        "px": [
+          16,
+          16
+        ],
+        "tier": "runtime_lut"
+      },
+      "ZoneLUT": {
+        "px": [
+          16,
+          16
+        ],
+        "tier": "runtime_lut"
+      }
+    },
+    "conventions_required": {
+      "N": "DirectX",
+      "ORM": "R AO",
+      "TeamMask": "L = cloth",
+      "MatID": "class index x 16 + 8",
+      "EdgeMask": "linear",
+      "MatLUT": "RGBA16F",
+      "ZoneID": "zone + 1",
+      "ZoneLUT": "flat zone colour"
+    },
+    "top_part": "tripo_part_0"
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "skeleton": "UM_HUMANOID_17_v2",
+    "bones": [
+      [
+        "root",
+        null
+      ],
+      [
+        "hips",
+        "root"
+      ],
+      [
+        "spine",
+        "hips"
+      ],
+      [
+        "head",
+        "spine"
+      ],
+      [
+        "arm_upper.L",
+        "spine"
+      ],
+      [
+        "arm_lower.L",
+        "arm_upper.L"
+      ],
+      [
+        "hand.L",
+        "arm_lower.L"
+      ],
+      [
+        "arm_upper.R",
+        "spine"
+      ],
+      [
+        "arm_lower.R",
+        "arm_upper.R"
+      ],
+      [
+        "hand.R",
+        "arm_lower.R"
+      ],
+      [
+        "weapon.R",
+        "hand.R"
+      ],
+      [
+        "leg_upper.L",
+        "hips"
+      ],
+      [
+        "leg_lower.L",
+        "leg_upper.L"
+      ],
+      [
+        "foot.L",
+        "leg_lower.L"
+      ],
+      [
+        "leg_upper.R",
+        "hips"
+      ],
+      [
+        "leg_lower.R",
+        "leg_upper.R"
+      ],
+      [
+        "foot.R",
+        "leg_lower.R"
+      ]
+    ],
+    "bones_note": "UM_HUMANOID_17_v2: 16 body bones + weapon.R (Merlin's staff, rigid 100 %). In UE the armature object SKEL_UM_Humanoid becomes bone 0 (18 bones), '.' becomes '_' (weapon_R)"
+  },
+  "scale": {
+    "figure_height_m": 0.45,
+    "top_part": "tripo_part_0",
+    "note": "hood top 45.0 uu above the base bottom (bake measures.hood_top_uu 44.986); the staff crystal is the skeletal top (49.42 uu), not the figure height"
+  },
+  "meshes": {
+    "base": {
+      "object": "SM_Merlin_H2_Base",
+      "footprint_m": [
+        0.24,
+        0.24,
+        0.05
+      ],
+      "pivot": "centre of the base bottom"
+    }
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "blender_weapon_side": "-X",
+    "expected_ue_front": "+X",
+    "expected_ue_weapon_side": "+Y",
+    "expected_ue_front_source": "04-blender-production.md §1 «Оси» + §1.1 preset UM_FBX_v1 (ART-001); the bake measured the face +3.4 uu ahead of the body centroid along +X in the export frame"
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "weapon.R",
+      "location_uu": [
+        0,
+        0,
+        0
+      ],
+      "purpose": "rig-contract §7: Weapon on the weapon bone at (0,0,0) = the grip on the staff axis"
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "location_uu": null,
+      "purpose": "damage / status VFX; location = the bake's UE bone-space prediction (face part bbox centre)"
+    }
+  ],
+  "sockets_note": "StaffTip (crystal centre, AD-CNF-59 open) stays a proposal in the bake report and is not created in UE",
+  "expectations": {
+    "triangles": {
+      "SK_Merlin_H2_Body": 30047,
+      "SK_Merlin_H2_Staff": 3920,
+      "SM_Merlin_H2_Base": 2240
+    },
+    "bones": 17,
+    "skeletal_material_slots": 1,
+    "base_material_slots": 1,
+    "skeletal_lods": 1,
+    "note": "numbers of the H2.1 bake (build-report.json of merlin-h2-bake/2); the FBX carries LOD0 only"
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "bake profile budget_proposal (figure 30-45 k tris, 4K master + 2K runtime, <= 2 slots) and 04 §3.4 — ПРЕДЛОЖЕНИЕ до решения GD-058, не бюджет",
+    "hero_triangles": [
+      30000,
+      45000
+    ],
+    "texture_px": 2048,
+    "material_slots_max": 2,
+    "height_uu": [
+      40,
+      48
+    ],
+    "base_diameter_uu": 24,
+    "base_height_uu": 5
+  },
+  "ue": {
+    "folder_note": "run with: ue-import --ue-folder /Game/PipelineCandidates/Merlin/H2LD",
+    "skeletal_asset": "SK_Merlin_H2LD",
+    "base_asset": "SM_Merlin_H2LD_Base",
+    "material_route": "um-master",
+    "masters": {
+      "figure": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+      "base": "/Game/UM/Materials/M_UM_BaseMarker"
+    },
+    "figure_instance": "MI_Merlin_H2LD",
+    "base_instance": "MI_Merlin_H2LD_Base",
+    "teams": {
+      "Blue": "#3F6FD8",
+      "Red": "#D0453A"
+    },
+    "teams_note": "diagnostic pair for the W5c frames (task: TeamColor blue and red); С-11 Gold/Silver stays the palette proposal (Q-304 open). Linear only through FLinearColor::FromSRGBColor (AD-OPEN-39 rule). Proposal",
+    "default_team": "Blue",
+    "team_instances": {
+      "figure": "MI_Merlin_H2LD_{team}",
+      "base": "MI_Merlin_H2LD_Base_{team}"
+    },
+    "team_color_mode": "mask",
+    "team_color_mode_note": "user decision 2026-09-28 (AD-CNF-58 = b): TeamColor on the clothing by TeamMask.R (H2.1 mask: robe with hood 0.82, sleeves 0.87-0.89; skin, face, staff, crystal, shoes 0) and on the base side band",
+    "figure_parameters": {
+      "TeamDye": 1.0,
+      "TeamDyeGain": 5.5
+    },
+    "figure_parameters_note": "as H2.1 (W5c-A): TeamColor x luminance(BC) x 5.5 on the wool (the only teamDyeAllowed class of the Merlin LUT: silk embroidery, leather, skin, wood, bronze are never dyed, LDM-1/LDV-7). Other v2 knobs at the master defaults. Look-dev changes are recorded in the LD-merlin-ue decisions",
+    "base_marker": {
+      "textures": true,
+      "parameters": {
+        "SideBandWeight": 1.0,
+        "VertexMaskWeight": 0.0
+      },
+      "note": "textured H2 base (24 x 24 x 5 uu, same atlas): team band = the side wall (|n.z| < SideBandNormalZMax), flat TeamColor; as W4-B. Proposal"
+    },
+    "textures": {
+      "BC": {
+        "file_key": "BC",
+        "asset": "T_Merlin_H2LD_BC",
+        "srgb": true,
+        "compression": "TC_Default"
+      },
+      "N": {
+        "file_key": "N",
+        "asset": "T_Merlin_H2LD_N",
+        "srgb": false,
+        "compression": "TC_Normalmap",
+        "flip_green": false,
+        "note": "DirectX normal of the bake (green of the OpenGL bake inverted); no OpenGL copy exists and none is imported"
+      },
+      "ORM": {
+        "file_key": "ORM",
+        "asset": "T_Merlin_H2LD_ORM",
+        "srgb": false,
+        "compression": "TC_Masks",
+        "note": "R AO, G roughness, B metallic, linear; TC_Masks keeps the three channels independent (no sRGB curve)"
+      },
+      "TeamMask": {
+        "file_key": "TeamMask",
+        "asset": "T_Merlin_H2LD_TeamMask",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "note": "single-channel L8 mask: TC_Grayscale stores it uncompressed (G8), no channel is lost; M_UM_Figure samples it as LinearGrayscale (W4-B)"
+      },
+      "MatID": {
+        "file_key": "MatID",
+        "asset": "T_Merlin_H2LD_MatID",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "properties": {
+          "Filter": "TF_Nearest",
+          "MipGenSettings": "TMGS_NoMipmaps",
+          "NeverStream": true
+        },
+        "note": "G8 class id x16+8, read with Load (LDM-4: 2K)"
+      },
+      "EdgeMask": {
+        "file_key": "EdgeMask",
+        "asset": "T_Merlin_H2LD_EdgeMask",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "note": "L8 convexity (TeamMaskRGBA.A of the look-dev run), EdgeMaskTexture of M_UM_Figure_v2"
+      },
+      "MatLUT": {
+        "file_key": "MatLUT",
+        "asset": "T_UM_MatLUT_Merlin",
+        "srgb": false,
+        "compression": "TC_HDR",
+        "px": [
+          16,
+          16
+        ],
+        "properties": {
+          "Filter": "TF_Nearest",
+          "MipGenSettings": "TMGS_NoMipmaps",
+          "NeverStream": true
+        },
+        "note": "hero LUT 16x16 RGBA16F (DDS), read with Load"
+      },
+      "ZoneID": {
+        "file_key": "ZoneID",
+        "asset": "T_Merlin_H2LD_ZoneID_Debug",
+        "srgb": false,
+        "compression": "TC_Grayscale",
+        "properties": {
+          "Filter": "TF_Nearest",
+          "MipGenSettings": "TMGS_NoMipmaps",
+          "NeverStream": true
+        },
+        "note": "DEBUG: look-dev zone id for MI_Merlin_H2LD_DebugZones only"
+      },
+      "ZoneLUT": {
+        "file_key": "ZoneLUT",
+        "asset": "T_Merlin_H2LD_ZoneLUT_Debug",
+        "srgb": false,
+        "compression": "TC_HDR",
+        "px": [
+          16,
+          16
+        ],
+        "properties": {
+          "Filter": "TF_Nearest",
+          "MipGenSettings": "TMGS_NoMipmaps",
+          "NeverStream": true
+        },
+        "note": "DEBUG: flat zone colours (metal path, row 0) for MI_Merlin_H2LD_DebugZones only"
+      }
+    },
+    "measure_skeletal_triangles": true,
+    "target_skeleton": "/Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton",
+    "target_skeleton_note": "волна 5c (H2Anim, CLI 0.8.0): меш H2 импортируется на канонический скелет героя (создан tools/tripo-pipeline/anim/h2anim_ue.py skeleton из SK_Merlin_H2.fbx), клипы H2Anim привязаны к нему же; своего SK_Merlin_H2_Skeleton прогон больше не создаёт, повторный импорт канонический скелет не удаляет",
+    "masters_note": "figure on M_UM_Figure_v2 (library v1 classes: MatID + hero LUT + detail arrays, Cloth per pixel, dye only on teamDyeAllowed classes); base stays on M_UM_BaseMarker v1 (team side band for board readability, W4-B/5b-R); M_UM_Figure_v2 keeps every v1 parameter name, so um_masters_current checks the v1 spec parameters on it",
+    "figure_textures": {
+      "MatIDTexture": "MatID",
+      "MatLUT": "MatLUT",
+      "EdgeMaskTexture": "EdgeMask"
+    },
+    "figure_static_switches": {
+      "UseUV1Metres": true
+    },
+    "figure_static_switches_note": "the look-dev FBX carries UV1 in metres (LDM-8): 2 detail samples instead of the 6 of the triplanar fallback, wood grain along U on the rotated staff islands (tangent of UV1 from derivatives, LDV-4)",
+    "extra_instances": [
+      {
+        "asset": "MI_Merlin_H2LD_Neutral",
+        "parent": "figure_instance",
+        "vectors": {
+          "TeamColor": "#FFFFFF"
+        },
+        "scalars": {
+          "TeamDye": 0.0
+        },
+        "purpose": "no dye: TeamColor white x TeamDye 0 = the baked concept tone (concept comparison)"
+      },
+      {
+        "asset": "MI_Merlin_H2LD_DebugClasses",
+        "parent": "figure_instance",
+        "scalars": {
+          "DebugView": 1.0
+        },
+        "purpose": "debug: class colour of the MatID (emissive only)"
+      },
+      {
+        "asset": "MI_Merlin_H2LD_DebugZones",
+        "parent": "figure_instance",
+        "textures": {
+          "MatIDTexture": "ZoneID",
+          "MatLUT": "ZoneLUT"
+        },
+        "scalars": {
+          "DebugView": 7.0,
+          "DebugBakeFromLUT": 1.0
+        },
+        "purpose": "debug: look-dev zone colours (ZoneID in the MatID slot) = zone masks of the UE-vs-concept measurement"
+      }
+    ]
+  }
+}

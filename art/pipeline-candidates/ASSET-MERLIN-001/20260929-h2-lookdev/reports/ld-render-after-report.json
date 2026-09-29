@@ -1,0 +1,78 @@
+{
+ "blender": "5.2.2 LTS",
+ "checks": {
+  "lut_exr_blender_readback": {
+   "expected": {
+    "max_abs_diff": 0.0,
+    "size": [
+     16,
+     8
+    ]
+   },
+   "measured": {
+    "file_format": "OPEN_EXR",
+    "max_abs_diff": 0.0,
+    "size": [
+     16,
+     8
+    ]
+   },
+   "passed": true
+  }
+ },
+ "frames_sha256": {
+  "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/preview/ld_render_matid_front.png": "b05bc48ebca276703a70973cb5b41a47842dc890d6155617f353dbbe3ce7bc13",
+  "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/preview/ld_render_uv1_checker_front.png": "ad52edef8e360086fef91d342472ff94b7ea3f7fd175f71602b533e96e7b1abb",
+  "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/preview/ld_render_uv1_checker_staff.png": "b9559fe9a755f6f2517922a91f49b2e21deeba55802ac0dfd1b8f6e6accec304",
+  "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/work/lookdev/render/back_lit_after.png": "e0b482a425ad597c2c921617f8bbca69faead44d6a6f2f16718d2ce848e50a96",
+  "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/work/lookdev/render/front_lit_after.png": "1d7211e58bd2bdc9a572a894fdcc888c384ee3378f387ad1dbff2fd39767dffc",
+  "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/work/lookdev/render/right_lit_after.png": "25e3f2a3c61c0df534a2c3a505a0d2435f485e9c6a63df8a5cec3ce914a4d828"
+ },
+ "framing": {
+  "back": [
+   0.042,
+   0.935
+  ],
+  "front": [
+   0.058,
+   0.945
+  ],
+  "right": [
+   0.042,
+   0.935
+  ]
+ },
+ "inputs": {
+  "after_BC": {
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_BC_2K.png",
+   "sha256": "935726e64dff7a4704a2edf125de7ed55b8813dba9947a65b5987f6caaed3d16"
+  },
+  "after_N": {
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_N_2K.png",
+   "sha256": "2f7bfac8acc997f75c1291ea14beecd88558c38878a62f1c060da459fe9fcbfa"
+  },
+  "after_ORM": {
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_ORM_2K.png",
+   "sha256": "0a33ce04ce0a8dd892bc7e5780e0b7e48b4be77887b6589543b3a4e6acaf68b1"
+  },
+  "lut_exr": {
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_MatLUT.exr",
+   "sha256": "87882ed6dcac1c855e12c2b1fb17dfabd8525fa7ba1c00ca64fceabab8e2f514"
+  }
+ },
+ "light": "H2.1 preview studio (3 suns, near-black world)",
+ "passed": true,
+ "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json",
+ "profile_id": "merlin-h2-lookdev/1",
+ "renderer": "BLENDER_EEVEE",
+ "resolution": [
+  1200,
+  1333
+ ],
+ "stage": "ld_render_after",
+ "views": [
+  "front",
+  "right",
+  "back"
+ ]
+}

@@ -1,0 +1,117 @@
+{
+ "schema": "unmatched.tripo-pipeline.h2-lookdev-profile/1",
+ "profile_id": "merlin-h2-lookdev/1",
+ "asset_id": "ASSET-MERLIN-001",
+ "status": "proposed",
+ "status_note": "Look-dev v2 (2026-09-29, wave LD): the H2.1 game model of Merlin moved onto the UM material library v1 (docs/art-pipeline/material-library/README.md): MatID (R8, index x 16 + 8, no mips), hero LUT 16 x 8 RGBA16F, UV1 in metres for the detail tiles, EdgeMask (convexity) in TeamMaskRGBA.A, BC tone matched to the concept by zone. Rig, skeleton and geometry are those of the H2.1 run (appended from its work/h2-rig.blend and checked against its FBX). Status: technically built and measured, not art acceptance; UE import is the next wave.",
+ "run_dir": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev",
+ "blender": "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe",
+ "stages": ["ld_export", "ld_maps", "ld_render_before", "ld_tone", "ld_render_after", "ld_report"],
+ "lookdev": {
+  "source_profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json",
+  "source_note": "H2.1 bake run (profile merlin-h2-bake/2): work/h2-rig.blend (rigged low-poly in the authored frame, saved by stage_rig just before its export), work/uv/*.npz and work/bake/*.npy (local, git-ignored) are read, never written. The committed H2.1 FBX and 2K textures are the references of the read-back checks.",
+  "source_fbx_sha256": {
+   "SK_Merlin_H2.fbx": "b1db49c6f7400bcea0bc23e84fef0b77e76f15caed16ab7e8bd611eb32dc38ee",
+   "SM_Merlin_H2_Base.fbx": "79132631c7afd30d6f4519d3696b9f579ad1e34e9537674ec1c08d993ef611db"
+  },
+  "presets": "docs/art-pipeline/material-library/um-material-presets-v1.json",
+  "exports": {"skeletal_fbx": "SK_Merlin_H2LD.fbx", "base_fbx": "SM_Merlin_H2LD_Base.fbx"},
+  "prefix": "T_Merlin_H2LD",
+  "matid_px": 2048,
+  "matid_px_note": "README §3 proposes MatID at half the atlas (1K for 2K). Merlin's gold embroidery is 2-6 texel lines at 2K: at 1K 7.5 % of its texels fall to the wool by majority and every class edge steps in 2 x 2 blocks of the BC (measured in ld-maps-report matid_1k_alternative). MatID is written at the runtime atlas size 2K (G8 without mips: 4 MB instead of 1 MB)",
+  "uv1": {
+   "layer_name": "UV1_m",
+   "units": "metres of the exported object (final frame; UE uu / 100)",
+   "rotate_classes": ["wood"],
+   "rotate_note": "UV1 of an island = UV0 of the island x its own scale (sqrt(3D area / UV area)) + an offset: a similarity without rotation keeps the UV0 tangent frame, so the detail normal can be blended in the UV0 tangent space of the hero normal map. Only wood islands are also rotated so the staff axis (3D direction of the island's main axis) runs along U = the grain of the wood tile; their detail normal needs the UV1 tangent frame (shader: derivative tangent, see the report) or reads with a rotated relief",
+   "offset": "island bounding-box centre to (0, 0): |UV1| stays below half the island size (the min-corner variant gave |UV1| 0.39 m = 0.24 mm step of a 16-bit UE UV, ~1 px of the wool tile); Use Full Precision UVs is then not needed"
+  },
+  "zones": {
+   "order": ["wool", "embroidery", "belt", "buckle", "boots", "beard_wrap", "wood", "crystal", "face_skin", "hands_skin", "beard", "base"],
+   "class_of": {"wool": "wool_coarse", "embroidery": "silk", "belt": "leather_worn", "buckle": "bronze", "boots": "leather_worn",
+                "beard_wrap": "leather_worn", "wood": "wood", "crystal": "legacy_bake", "face_skin": "skin", "hands_skin": "skin",
+                "beard": "legacy_bake", "base": "stone_base"},
+   "parts": {"cloth": ["tripo_part_0", "tripo_part_3", "tripo_part_4"], "face_beard": ["tripo_part_9"], "hands": ["tripo_part_6", "tripo_part_8"],
+             "boots": ["tripo_part_5", "tripo_part_11"], "wood": ["tripo_part_2", "tripo_part_10"], "crystal": ["tripo_part_7"], "base": ["tripo_part_1"]},
+   "cloth_rule": "H2.1 classes of maps.materials_h21: buckle = metal_buckle, belt = leather_belt, embroidery = embroidery (TeamMaskRGBA.B), wool = the rest of the cloth parts",
+   "face_beard": {"skin_s_min": 0.22, "s_soft": 0.08, "wrap_z_max_m": 0.70, "z_soft_m": 0.01,
+                  "note": "part 9 = face + tied beard (measured 2026-09-29 on the H2.1 BC): hair/beard/brows s p50 0.09 (grey-white), skin s >= 0.22 (h 22, V 0.62) above source z 0.70; the saturated brown below z 0.70 (h 25, s 0.48, V 0.35) is the leather wrap of the beard (concept: brown tie at the chest) -> leather_worn"}
+  },
+  "beard_roughness": {"target_p50": 0.75, "scale": 0.5, "range": [0.68, 0.85],
+                      "note": "beard stays MatID 0 (legacy_bake: no hair class in v1). The Tripo roughness of the beard is p5/p50/p95 0.49/0.62/0.82: hair of a painted miniature reads matte; ORM.G of the beard = clamp(target_p50 + scale x (r - p50_tripo), range)"},
+  "lut_overrides": {
+   "silk": {"teamDyeAllowed": false,
+            "roughness": {"typical": 0.42, "range": [0.32, 0.58], "variation": 0.08, "sourceKind": "art", "note": "Merlin: gold-thread embroidery (couched metal-wrapped yarn): glossier than wool, not the smooth silk plateau; H2.1 had 0.55-0.65 without the Cloth lobe"},
+            "cloth": {"sheenColor": {"intensity": 0.5, "tint": 1.0}},
+            "note": "Merlin: embroidery = cloth with gold thread, NOT metal and NOT team-dyed (user rule 5c-A: TeamColor only on cloth classes, never on the gold border)"},
+   "leather_worn": {"teamDyeAllowed": false, "note": "Merlin: belt, boots, beard wrap are brown leather in the concept; the team mask already excludes them"}
+  },
+  "concept_zones": {
+   "note": "boxes [x0, y0, x1, y1] in concept pixels (1190 x 1322) + an HSV filter on the concept pixel (sRGB): the concept is a lit render, so only pixels of the zone's material inside a box are measured. Checked on the overlay preview/ld_concept_zones_*.png",
+   "filters": {
+    "blue": {"hue": [205, 262], "s_min": 0.25, "v_min": 0.08},
+    "gold": {"hue": [22, 55], "s_min": 0.3, "v_min": 0.38},
+    "brown": {"hue": [5, 45], "s_min": 0.2, "v_max": 0.55, "v_min": 0.06},
+    "skin": {"hue": [3, 40], "s_min": 0.15, "v_min": 0.38},
+    "white": {"s_max": 0.18, "v_min": 0.38},
+    "gem": {"hue": [200, 250], "s_min": 0.35},
+    "stone": {"s_max": 0.35, "v_max": 0.6}
+   },
+   "front": [
+    {"zone": "wool", "box": [545, 760, 640, 1000], "filter": "blue"},
+    {"zone": "wool", "box": [690, 480, 790, 640], "filter": "blue"},
+    {"zone": "embroidery", "box": [450, 540, 520, 1000], "filter": "gold"},
+    {"zone": "embroidery", "box": [640, 560, 715, 1000], "filter": "gold"},
+    {"zone": "belt", "box": [545, 538, 620, 568], "filter": "brown"},
+    {"zone": "belt", "box": [598, 575, 622, 740], "filter": "brown"},
+    {"zone": "face_skin", "box": [560, 240, 640, 300], "filter": "skin"},
+    {"zone": "hands_skin", "box": [612, 520, 690, 600], "filter": "skin"},
+    {"zone": "hands_skin", "box": [358, 405, 395, 470], "filter": "skin"},
+    {"zone": "beard", "box": [540, 300, 640, 470], "filter": "white"},
+    {"zone": "beard_wrap", "box": [570, 405, 610, 425], "filter": "brown"},
+    {"zone": "wood", "box": [395, 480, 440, 1060], "filter": "brown"},
+    {"zone": "crystal", "box": [352, 52, 438, 162], "filter": "gem"},
+    {"zone": "boots", "box": [378, 1040, 500, 1110], "filter": "brown"},
+    {"zone": "boots", "box": [680, 1030, 800, 1110], "filter": "brown"},
+    {"zone": "base", "box": [330, 1140, 860, 1225], "filter": "stone"}
+   ],
+   "side": [
+    {"zone": "wool", "box": [380, 700, 470, 880], "filter": "blue"},
+    {"zone": "wool", "box": [470, 330, 560, 430], "filter": "blue"},
+    {"zone": "embroidery", "box": [622, 540, 680, 1000], "filter": "gold"},
+    {"zone": "wood", "box": [582, 480, 628, 1040], "filter": "brown"},
+    {"zone": "face_skin", "box": [655, 240, 700, 290], "filter": "skin"},
+    {"zone": "hands_skin", "box": [550, 380, 630, 470], "filter": "skin"},
+    {"zone": "beard", "box": [650, 280, 705, 440], "filter": "white"},
+    {"zone": "crystal", "box": [548, 50, 612, 148], "filter": "gem"},
+    {"zone": "boots", "box": [480, 1030, 640, 1100], "filter": "brown"},
+    {"zone": "base", "box": [345, 1125, 835, 1210], "filter": "stone"}
+   ],
+   "back": [
+    {"zone": "wool", "box": [440, 560, 760, 800], "filter": "blue"},
+    {"zone": "wool", "box": [470, 180, 650, 260], "filter": "blue"},
+    {"zone": "embroidery", "box": [370, 940, 820, 1010], "filter": "gold"},
+    {"zone": "belt", "box": [492, 474, 660, 500], "filter": "brown"},
+    {"zone": "wood", "box": [722, 150, 790, 380], "filter": "brown"},
+    {"zone": "wood", "box": [755, 660, 790, 800], "filter": "brown"},
+    {"zone": "crystal", "box": [718, 38, 792, 132], "filter": "gem"},
+    {"zone": "boots", "box": [388, 1030, 482, 1075], "filter": "brown"},
+    {"zone": "boots", "box": [655, 1030, 772, 1075], "filter": "brown"},
+    {"zone": "base", "box": [330, 1110, 840, 1195], "filter": "stone"}
+   ]
+  },
+  "tone": {
+   "method": "gain_zone = chroma x luma: chroma = (concept / render zone median per linear channel) normalised to keep the zone's luminance, luma = zone luminance ratio / k (k = median over zones: the concept's exposure is unknown), clamped; render = the H2.1 model in the same Blender studio light and the concept framing (ortho front/right/back), zone pixels from an ID pass of the same camera; per zone the median over the views that see it",
+   "min_views_pixels": 150,
+   "dead_band": 0.06,
+   "chroma_clamp": [0.6, 1.6],
+   "luma_clamp": [0.75, 1.35],
+   "luma_note": "measured 2026-09-29: luminance ratios concept / model of one material differ by light (skin: face 0.84-1.18, hands 1.71-1.78), so the luminance part of a zone gain is clamped to [0.75, 1.35]; hue and saturation (chroma) are matched fully within [0.6, 1.6] per channel",
+   "quantize": 0.01,
+   "skip_zones": ["buckle"],
+   "note": "zones whose |gain - 1| < dead_band in every channel keep the H2.1 BC; gains are applied in linear light to the zone's texels (zone map blurred 3 x 3 at 4K so the change has no hard seam); the buckle is a metal (preset F0, Ymed modulation in the shader): its BC is not tone-matched"
+  },
+  "render": {"ortho_resolution": [1200, 1333], "framing": {"front": [0.058, 0.945], "right": [0.042, 0.935], "back": [0.042, 0.935]},
+             "id_erode_px": 2}
+ }
+}

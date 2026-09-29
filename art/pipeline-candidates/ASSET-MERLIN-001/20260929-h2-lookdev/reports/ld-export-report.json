@@ -1,0 +1,570 @@
+{
+ "blender": "5.2.2 LTS",
+ "checks": {
+  "appended_skinning_intact": {
+   "expected": {
+    "base": [],
+    "body": [
+     [
+      "ARMATURE",
+      "SKEL_UM_Humanoid"
+     ]
+    ],
+    "staff": [
+     [
+      "ARMATURE",
+      "SKEL_UM_Humanoid"
+     ]
+    ]
+   },
+   "measured": {
+    "base": [],
+    "body": [
+     [
+      "ARMATURE",
+      "SKEL_UM_Humanoid"
+     ]
+    ],
+    "staff": [
+     [
+      "ARMATURE",
+      "SKEL_UM_Humanoid"
+     ]
+    ]
+   },
+   "passed": true
+  },
+  "bones_equal_h21": {
+   "expected": {
+    "armature": "SKEL_UM_Humanoid",
+    "bones": 17
+   },
+   "measured": {
+    "armature_objects": [
+     "SKEL_UM_Humanoid"
+    ],
+    "bones": 17,
+    "names_parents_heads_tails_equal": true
+   },
+   "passed": true
+  },
+  "export_face_plus_x": {
+   "expected": "face ahead of the body centroid along +X (> 0.5 uu), lateral yaw 0 +- 10 deg",
+   "measured": {
+    "face_minus_body_x_uu": 2.915,
+    "staff_minus_body_y_uu": -7.467,
+    "yaw_deg": -5.1
+   },
+   "passed": true
+  },
+  "export_no_host_path": {
+   "expected": 0,
+   "measured": {
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/export/SK_Merlin_H2LD.fbx": 0,
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/export/SM_Merlin_H2LD_Base.fbx": 0
+   },
+   "passed": true
+  },
+  "export_staff_side_ue_plus_y": {
+   "expected": "< -2 uu (= UE +Y)",
+   "measured": -7.467,
+   "passed": true
+  },
+  "geometry_equal_h21": {
+   "expected": "all polygons matched (positions 1e-4 m + UV0 1e-5), vertex arrays equal (<= 1e-6 m)",
+   "measured": {
+    "SK_Merlin_H2_Body": {
+     "max_vertex_delta_m": 0.0,
+     "polygons_candidate": 30047,
+     "polygons_reference": 30047,
+     "unmatched_candidate_polygons": 0,
+     "unmatched_reference_polygons": 0,
+     "vertices": [
+      14998,
+      14998
+     ]
+    },
+    "SK_Merlin_H2_Staff": {
+     "max_vertex_delta_m": 0.0,
+     "polygons_candidate": 3920,
+     "polygons_reference": 3920,
+     "unmatched_candidate_polygons": 0,
+     "unmatched_reference_polygons": 0,
+     "vertices": [
+      1964,
+      1964
+     ]
+    },
+    "SM_Merlin_H2_Base": {
+     "max_vertex_delta_m": 0.0,
+     "polygons_candidate": 2240,
+     "polygons_reference": 2240,
+     "unmatched_candidate_polygons": 0,
+     "unmatched_reference_polygons": 0,
+     "vertices": [
+      1122,
+      1122
+     ]
+    }
+   },
+   "passed": true
+  },
+  "material_slot_single": {
+   "expected": "M_Merlin_H2_Atlas",
+   "measured": {
+    "SK_Merlin_H2_Body": [
+     "M_Merlin_H2_Atlas"
+    ],
+    "SK_Merlin_H2_Staff": [
+     "M_Merlin_H2_Atlas"
+    ],
+    "SM_Merlin_H2_Base": [
+     "M_Merlin_H2_Atlas"
+    ]
+   },
+   "passed": true
+  },
+  "session_blend_path_empty": {
+   "expected": false,
+   "measured": false,
+   "passed": true
+  },
+  "source_fbx_sha256": {
+   "expected": {
+    "SK_Merlin_H2.fbx": "b1db49c6f7400bcea0bc23e84fef0b77e76f15caed16ab7e8bd611eb32dc38ee",
+    "SM_Merlin_H2_Base.fbx": "79132631c7afd30d6f4519d3696b9f579ad1e34e9537674ec1c08d993ef611db"
+   },
+   "measured": {
+    "SK_Merlin_H2.fbx": "b1db49c6f7400bcea0bc23e84fef0b77e76f15caed16ab7e8bd611eb32dc38ee",
+    "SM_Merlin_H2_Base.fbx": "79132631c7afd30d6f4519d3696b9f579ad1e34e9537674ec1c08d993ef611db"
+   },
+   "passed": true
+  },
+  "triangles_equal_h21": {
+   "expected": "equal",
+   "measured": {
+    "h21": {
+     "SK_Merlin_H2_Body": 30047,
+     "SK_Merlin_H2_Staff": 3920,
+     "SM_Merlin_H2_Base": 2240
+    },
+    "lookdev": {
+     "SK_Merlin_H2_Body": 30047,
+     "SK_Merlin_H2_Staff": 3920,
+     "SM_Merlin_H2_Base": 2240
+    }
+   },
+   "passed": true
+  },
+  "uv1_half_precision": {
+   "expected": "<= 0.25 mm (UE stores UVs as 16-bit floats unless Use Full Precision UVs)",
+   "measured": {
+    "half_float_step_mm_at_max": 0.12207,
+    "uv1_abs_max_m": 0.1973
+   },
+   "passed": true
+  },
+  "uv1_metres_per_island": {
+   "expected": "UV1 area / 3D area = 1 +- 0.001 per island",
+   "measured": {
+    "base": {
+     "island_area_ratio_uv1_over_3d_min_max": [
+      1.0,
+      1.0
+     ],
+     "island_scale_min_max": [
+      1.8332,
+      7.3355
+     ],
+     "islands": 31,
+     "mirrored_uv0_triangles": 0,
+     "rotated_islands": 0,
+     "rotation_deg_of_rotated": [],
+     "triangle_area_ratio_p5_p50_p95": [
+      0.8806,
+      1.0006,
+      1.1723
+     ],
+     "uv1_abs_max_m": 0.1556
+    },
+    "body": {
+     "island_area_ratio_uv1_over_3d_min_max": [
+      1.0,
+      1.0
+     ],
+     "island_scale_min_max": [
+      0.458,
+      3.6644
+     ],
+     "islands": 909,
+     "mirrored_uv0_triangles": 0,
+     "rotated_islands": 0,
+     "rotation_deg_of_rotated": [],
+     "triangle_area_ratio_p5_p50_p95": [
+      0.6116,
+      0.9999,
+      1.3869
+     ],
+     "uv1_abs_max_m": 0.1973
+    },
+    "staff": {
+     "island_area_ratio_uv1_over_3d_min_max": [
+      1.0,
+      1.0
+     ],
+     "island_scale_min_max": [
+      0.458,
+      1.9807
+     ],
+     "islands": 223,
+     "mirrored_uv0_triangles": 0,
+     "rotated_islands": 113,
+     "rotation_deg_of_rotated": [
+      -134.97,
+      -132.8,
+      86.7,
+      -136.1,
+      176.22,
+      -133.73,
+      95.0,
+      -7.33,
+      162.62,
+      -179.53,
+      -27.08,
+      -1.71,
+      112.12,
+      89.93,
+      6.77,
+      4.01,
+      24.14,
+      -85.93,
+      76.98,
+      84.72,
+      6.39,
+      82.33,
+      2.13,
+      30.81,
+      71.87,
+      99.3,
+      -1.29,
+      98.72,
+      177.2,
+      179.28,
+      50.91,
+      -3.33,
+      95.78,
+      177.46,
+      164.17,
+      -85.77,
+      -10.15,
+      -92.64,
+      175.42,
+      -2.53
+     ],
+     "triangle_area_ratio_p5_p50_p95": [
+      0.7076,
+      1.0,
+      1.2869
+     ],
+     "uv1_abs_max_m": 0.13165
+    }
+   },
+   "passed": true
+  },
+  "uv1_readback_equals_authored": {
+   "expected": "<= 1e-5",
+   "measured": {
+    "SK_Merlin_H2_Body": 0.0,
+    "SK_Merlin_H2_Staff": 0.0,
+    "SM_Merlin_H2_Base": 0.0
+   },
+   "passed": true
+  },
+  "uv_layers_uvmap_then_uv1": {
+   "expected": [
+    "UVMap",
+    "UV1_m"
+   ],
+   "measured": {
+    "SK_Merlin_H2_Body": [
+     "UVMap",
+     "UV1_m"
+    ],
+    "SK_Merlin_H2_Staff": [
+     "UVMap",
+     "UV1_m"
+    ],
+    "SM_Merlin_H2_Base": [
+     "UVMap",
+     "UV1_m"
+    ]
+   },
+   "passed": true
+  },
+  "weights_equal_h21": {
+   "expected": "same bones per vertex, |dw| <= 1e-6",
+   "measured": {
+    "SK_Merlin_H2_Body": {
+     "max_abs_weight_delta": 0.0,
+     "same_bones_per_vertex": true
+    },
+    "SK_Merlin_H2_Staff": {
+     "max_abs_weight_delta": 0.0,
+     "same_bones_per_vertex": true
+    }
+   },
+   "passed": true
+  },
+  "wood_islands_rotated": {
+   "expected": "> 0",
+   "measured": 113,
+   "passed": true
+  }
+ },
+ "export_frame": {
+  "face_minus_body_x_uu": 2.915,
+  "staff_minus_body_y_uu": -7.467,
+  "yaw_deg": -5.1
+ },
+ "exports": {
+  "base_fbx": {
+   "bytes": 110028,
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/export/SM_Merlin_H2LD_Base.fbx",
+   "sha256": "bed116b909e8ef9bf2cc987be7509df575dc544c9844212ec39d752d778bea79"
+  },
+  "settings": {
+   "add_leaf_bones": false,
+   "apply_scale_options": "FBX_SCALE_UNITS",
+   "apply_unit_scale": true,
+   "axis_forward": "-Y",
+   "axis_up": "Z",
+   "bake_anim": false,
+   "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+   "colors_type": "SRGB",
+   "creation_time_pinned": "2000-01-01T00:00:00",
+   "data_scale": 100.0,
+   "deviations_from_preset": {
+    "bake_anim": "off: the candidate FBX carries no clips",
+    "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+   },
+   "embed_textures": false,
+   "export_space_rotation_z_degrees": 90.0,
+   "mesh_smooth_type": "FACE",
+   "path_mode": "STRIP",
+   "preset": {
+    "name": "UM_FBX_v1",
+    "path": "blender/_tools/presets/UM_FBX_v1.json",
+    "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+    "version": "1.0.0"
+   },
+   "primary_bone_axis": "Y",
+   "secondary_bone_axis": "X",
+   "unit_scale_factor_after_patch": 1.0,
+   "use_triangles": true
+  },
+  "skeletal_fbx": {
+   "bytes": 1757132,
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/export/SK_Merlin_H2LD.fbx",
+   "sha256": "a7a51d01bb58fcc2bcd7f46a3975dcae19654bfbbc52d087b503119b3c59c9c2"
+  }
+ },
+ "passed": true,
+ "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json",
+ "profile_id": "merlin-h2-lookdev/1",
+ "readback": {
+  "geometry_vs_h21": {
+   "SK_Merlin_H2_Body": {
+    "max_vertex_delta_m": 0.0,
+    "polygons_candidate": 30047,
+    "polygons_reference": 30047,
+    "unmatched_candidate_polygons": 0,
+    "unmatched_reference_polygons": 0,
+    "vertices": [
+     14998,
+     14998
+    ]
+   },
+   "SK_Merlin_H2_Staff": {
+    "max_vertex_delta_m": 0.0,
+    "polygons_candidate": 3920,
+    "polygons_reference": 3920,
+    "unmatched_candidate_polygons": 0,
+    "unmatched_reference_polygons": 0,
+    "vertices": [
+     1964,
+     1964
+    ]
+   },
+   "SM_Merlin_H2_Base": {
+    "max_vertex_delta_m": 0.0,
+    "polygons_candidate": 2240,
+    "polygons_reference": 2240,
+    "unmatched_candidate_polygons": 0,
+    "unmatched_reference_polygons": 0,
+    "vertices": [
+     1122,
+     1122
+    ]
+   }
+  },
+  "triangles": {
+   "SK_Merlin_H2_Body": 30047,
+   "SK_Merlin_H2_Staff": 3920,
+   "SM_Merlin_H2_Base": 2240
+  },
+  "uv1_readback_max_abs": {
+   "SK_Merlin_H2_Body": 0.0,
+   "SK_Merlin_H2_Staff": 0.0,
+   "SM_Merlin_H2_Base": 0.0
+  },
+  "uv_layers": {
+   "SK_Merlin_H2_Body": [
+    "UVMap",
+    "UV1_m"
+   ],
+   "SK_Merlin_H2_Staff": [
+    "UVMap",
+    "UV1_m"
+   ],
+   "SM_Merlin_H2_Base": [
+    "UVMap",
+    "UV1_m"
+   ]
+  },
+  "weights_vs_h21": {
+   "SK_Merlin_H2_Body": {
+    "max_abs_weight_delta": 0.0,
+    "same_bones_per_vertex": true
+   },
+   "SK_Merlin_H2_Staff": {
+    "max_abs_weight_delta": 0.0,
+    "same_bones_per_vertex": true
+   }
+  }
+ },
+ "source": {
+  "h21_fbx": {
+   "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx": "b1db49c6f7400bcea0bc23e84fef0b77e76f15caed16ab7e8bd611eb32dc38ee",
+   "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SM_Merlin_H2_Base.fbx": "79132631c7afd30d6f4519d3696b9f579ad1e34e9537674ec1c08d993ef611db"
+  },
+  "rig_blend": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/work/h2-rig.blend",
+  "rig_blend_sha256": "2267ed6e726084e1fc7f6f00d2c9f5c23b2fe59a105272f5bd05bd1adca60caf"
+ },
+ "stage": "ld_export",
+ "uv1": {
+  "layer_name": "UV1_m",
+  "offset": "island bounding-box centre to (0, 0): |UV1| stays below half the island size (the min-corner variant gave |UV1| 0.39 m = 0.24 mm step of a 16-bit UE UV, ~1 px of the wool tile); Use Full Precision UVs is then not needed",
+  "rotate_classes": [
+   "wood"
+  ],
+  "rotate_note": "UV1 of an island = UV0 of the island x its own scale (sqrt(3D area / UV area)) + an offset: a similarity without rotation keeps the UV0 tangent frame, so the detail normal can be blended in the UV0 tangent space of the hero normal map. Only wood islands are also rotated so the staff axis (3D direction of the island's main axis) runs along U = the grain of the wood tile; their detail normal needs the UV1 tangent frame (shader: derivative tangent, see the report) or reads with a rotated relief",
+  "rotate_parts": [
+   "tripo_part_2",
+   "tripo_part_10"
+  ],
+  "stats": {
+   "base": {
+    "island_area_ratio_uv1_over_3d_min_max": [
+     1.0,
+     1.0
+    ],
+    "island_scale_min_max": [
+     1.8332,
+     7.3355
+    ],
+    "islands": 31,
+    "mirrored_uv0_triangles": 0,
+    "rotated_islands": 0,
+    "rotation_deg_of_rotated": [],
+    "triangle_area_ratio_p5_p50_p95": [
+     0.8806,
+     1.0006,
+     1.1723
+    ],
+    "uv1_abs_max_m": 0.1556
+   },
+   "body": {
+    "island_area_ratio_uv1_over_3d_min_max": [
+     1.0,
+     1.0
+    ],
+    "island_scale_min_max": [
+     0.458,
+     3.6644
+    ],
+    "islands": 909,
+    "mirrored_uv0_triangles": 0,
+    "rotated_islands": 0,
+    "rotation_deg_of_rotated": [],
+    "triangle_area_ratio_p5_p50_p95": [
+     0.6116,
+     0.9999,
+     1.3869
+    ],
+    "uv1_abs_max_m": 0.1973
+   },
+   "staff": {
+    "island_area_ratio_uv1_over_3d_min_max": [
+     1.0,
+     1.0
+    ],
+    "island_scale_min_max": [
+     0.458,
+     1.9807
+    ],
+    "islands": 223,
+    "mirrored_uv0_triangles": 0,
+    "rotated_islands": 113,
+    "rotation_deg_of_rotated": [
+     -134.97,
+     -132.8,
+     86.7,
+     -136.1,
+     176.22,
+     -133.73,
+     95.0,
+     -7.33,
+     162.62,
+     -179.53,
+     -27.08,
+     -1.71,
+     112.12,
+     89.93,
+     6.77,
+     4.01,
+     24.14,
+     -85.93,
+     76.98,
+     84.72,
+     6.39,
+     82.33,
+     2.13,
+     30.81,
+     71.87,
+     99.3,
+     -1.29,
+     98.72,
+     177.2,
+     179.28,
+     50.91,
+     -3.33,
+     95.78,
+     177.46,
+     164.17,
+     -85.77,
+     -10.15,
+     -92.64,
+     175.42,
+     -2.53
+    ],
+    "triangle_area_ratio_p5_p50_p95": [
+     0.7076,
+     1.0,
+     1.2869
+    ],
+    "uv1_abs_max_m": 0.13165
+   }
+  },
+  "units": "metres of the exported object (final frame; UE uu / 100)"
+ }
+}

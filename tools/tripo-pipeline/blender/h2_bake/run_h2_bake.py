@@ -12,6 +12,10 @@ exploratory triangles -> deviation curve, reports/decimation-curve.json; run it 
 Tripo sources are only read (sha256 checked by prepare). The run directory gets export/, textures/, preview/,
 reports/ (all deterministic) and work/ (blend files, npy composites, raw frames: not for git).
 --compare-with: byte comparison of every output with another run of the same profile (reports/determinism-report.json).
+
+Look-dev mode (material library v1 on a finished H2.1 run; lookdev.py, st_lookdev.py):
+  python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode lookdev       --profile art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-lookdev.json       --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev [--stages ld_maps,ld_fbx,...]
+Stages: ld_maps ld_fbx ld_preview ld_measure ld_compose ld_manifest (`all`). The source run is only read (sha256 pins).
 """
 
 import argparse
@@ -32,6 +36,9 @@ ORDER = ["prepare", "retopo", "close", "uv", "bake", "aux", "textures", "rig", "
 OPTIONAL = ["curve"]  # not in `all`
 BLENDER_STAGES = {"prepare", "retopo", "close", "uv", "bake", "aux", "rig", "seams", "preview", "curve"}
 SCHEMA = "unmatched.h2-bake-run/1"
+LD_ORDER = ["ld_maps", "ld_fbx", "ld_preview", "ld_measure", "ld_compose", "ld_manifest"]
+LD_BLENDER = {"ld_fbx", "ld_preview"}
+LD_SCHEMA = "unmatched.h2-lookdev-run/1"
 
 
 def load_local(name):
@@ -166,6 +173,63 @@ def compare(run_dir, other):
             "summary": summary, "files": rows}
 
 
+def run_lookdev(a):
+    """--mode lookdev: stages of lookdev.py (plain Python) and st_lookdev.py (Blender)."""
+    run_dir = Path(a.run_dir).resolve()
+    for d in ("work", "logs", "reports", "export", "textures", "preview"):
+        (run_dir / d).mkdir(parents=True, exist_ok=True)
+    ld = json.loads(Path(a.profile).read_text(encoding="utf-8"))
+    if ld.get("schema") != "unmatched.h2-lookdev-profile/1":
+        raise ValueError("--mode lookdev needs a unmatched.h2-lookdev-profile/1 profile")
+    src_profile = REPO / ld["source"]["profile"]
+    profile = load_local("profile").load(src_profile)
+    lookdev = load_local("lookdev")
+    stages = LD_ORDER if a.stages == "all" else [s for s in LD_ORDER if s in a.stages.split(",")]
+    timings = {}
+    for stage in stages:
+        t0 = time.time()
+        print("[h2-lookdev] %s ..." % stage, flush=True)
+        if stage in LD_BLENDER:
+            params = {"stage": stage, "profile": str(src_profile), "lookdev": str(Path(a.profile).resolve()),
+                      "run_dir": str(run_dir), "repo_root": str(REPO), "run_rel": rel(run_dir)}
+            pfile = run_dir / "work" / "params" / ("%s.json" % stage)
+            pfile.parent.mkdir(parents=True, exist_ok=True)
+            pfile.write_text(json.dumps(params, indent=2), encoding="utf-8")
+            blender(a.blender, HERE / "blender_entry.py", [pfile], run_dir / "logs" / ("%s.log" % stage))
+        elif stage == "ld_maps":
+            lookdev.run_maps(run_dir, ld, REPO)
+        elif stage == "ld_measure":
+            lookdev.run_measure(run_dir, ld, REPO)
+        elif stage == "ld_compose":
+            lookdev.run_compose(run_dir, ld, REPO)
+        elif stage == "ld_manifest":
+            ver = subprocess.run([a.blender, "-b", "--factory-startup", "--version"], capture_output=True, text=True,
+                                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout.splitlines()
+            lib = REPO / "tools" / "art" / "material_library" / "build_ue_inputs.py"
+            manifest = {"schema": LD_SCHEMA, "tool": load_local("__init__").VERSION, "asset_id": ld["asset_id"],
+                        "profile": {"path": rel(a.profile), "sha256": sha256(a.profile), "profile_id": ld["profile_id"]},
+                        "source_profile": {"path": rel(src_profile), "sha256": sha256(src_profile)},
+                        "source_run": {"path": ld["source"]["run"], "pinned_sha256": ld["source"]["sha256"]},
+                        "blender": next((l.strip() for l in ver if l.startswith("Blender")), None),
+                        "modules": dict({p.name: sha256(p) for p in sorted(HERE.glob("*.py"))}, **{rel(lib): sha256(lib)}),
+                        "material_library": {rel(REPO / "docs/art-pipeline/material-library/um-material-presets-v1.json"):
+                                             sha256(REPO / "docs/art-pipeline/material-library/um-material-presets-v1.json")},
+                        "outputs": {k: v for k, v in outputs(run_dir).items() if k not in NOT_COMPARED},
+                        "network": {"tripo_calls": 0, "paid_tasks_created": 0},
+                        "claims": {"art_accepted": False, "game_ready": False, "budgets_declared": False},
+                        "status": "измерено"}
+            (run_dir / "reports" / "run-manifest.json").write_text(
+                json.dumps(manifest, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+        timings[stage] = round(time.time() - t0, 1)
+        print("[h2-lookdev] %s done in %.1f s" % (stage, timings[stage]), flush=True)
+    (run_dir / "work" / "timings.json").write_text(json.dumps(timings, indent=2), encoding="utf-8")
+    if a.compare_with:
+        rep = compare(run_dir, Path(a.compare_with).resolve())
+        (run_dir / "reports" / "determinism-report.json").write_text(
+            json.dumps(rep, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+        print("[h2-lookdev] determinism:", rep["summary"], flush=True)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--profile", required=True)
@@ -173,7 +237,10 @@ def main():
     ap.add_argument("--stages", default="all")
     ap.add_argument("--blender", default=os.environ.get("H2_BAKE_BLENDER", DEFAULT_BLENDER))
     ap.add_argument("--compare-with")
+    ap.add_argument("--mode", choices=("h2", "lookdev"), default="h2")
     a = ap.parse_args()
+    if a.mode == "lookdev":
+        return run_lookdev(a)
     run_dir = Path(a.run_dir).resolve()
     for d in ("work", "logs", "reports", "export", "textures", "preview"):
         (run_dir / d).mkdir(parents=True, exist_ok=True)

@@ -435,6 +435,32 @@
             {"path": "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/team-contrast.json", "root": "repo", "kind": "file", "expect": "exists", "role": "различимость команд в сером и при deuteranopia, K2 1,6×, до/после"}
           ],
           "note": "UE: /Game/PipelineCandidates/Medusa/20260929-w4b-um-master (MI фигуры и подставки + 4 командные MI, без своего Material) — в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import`; import / повтор skipped / --force / skipped без Name_1. Кадры контрольной сцены P1.7 — editor-mcp-viewport, диагностика, не K1/K2-приёмка."
+        },
+        {
+          "layer": "ue-editor-import H2LD look-dev CLI skeletal-adopt 20260929-h2ld-ue-import (/Game/PipelineCandidates/Medusa/H2LD, M_UM_Figure_v2, LD-medusa-ue)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2ld-lookdev-ue-import.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль импорта H2LD (kind skeletal-adopt, medusa-h2ld-lookdev-ue-import/1, формат отчётов h2-lookdev/1): прогон look-dev medusa-h2-lookdev/1, LUT героя в library_inputs (sha256), MI от M_UM_Figure_v2 (MatID/LUT/Edge, UseUV1Metres), Neutral/DebugClass, Blue/Red", "sha256": "cb2bfe622f2ce77a23a58efc19d3cff40d27b34ac4574826276dd0aba1b735aa"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue-import/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest: preflight/adopt (headless), ue-import (mcp) completed"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue-import/reports/adopt-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "adopt: байты FBX, 2K-карт (BC/N/ORM/TeamMask/MatID/Edge) и LUT сверены (нормализатор h2_lookdev 4/4 + 14 канонических + library_inputs_pinned_by_profile)", "sha256": "04fc19d7ee1e7288cf30d0ce7af8cafa904d3cfe97d84d786b2c00bc4288d4a6"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue-import/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported, 25/25 (кость 0 + 17 v2, лицо +X, 55.009 uu, LOD0 43 054 tris, 2 UV на обоих мешах, текстуры MatID/LUT point/no-mips, MI v2, сокеты)", "sha256": "bb91d0b34ada7500139da6caa5c2dec2a8158274ca7d9fad8b718cfc4a5be750"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue/lut/T_UM_MatLUT_Medusa_UE.dds", "root": "repo", "kind": "file", "expect": "exists", "role": "LUT героя после UE look-dev (= i3), 16 × 16 RGBA16F", "sha256": "6df64b5b7c3b72128987ecc8934029c89f7f81125e28cd6810df8a056fe1357f"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue/lut/T_UM_MatLUT_Medusa_UE_i3.overrides.json", "root": "repo", "kind": "file", "expect": "exists", "role": "переопределения LUT i3 с обоснованиями (why_ue)", "sha256": "c5599d555ec89c29c1154be12eb72962585d12e5dbb7c5e34890d83d82ea74eb"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue/review-config.json", "root": "repo", "kind": "file", "expect": "exists", "role": "конфиг обзора: варианты MI, зоны, допуски, экспозиция чтения −1.0 EV"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue/review/i3/measure-i3.json", "root": "repo", "kind": "file", "expect": "exists", "role": "замер зон концепт против UE (Cobble, −1 EV, Blue, Red), допуски", "sha256": "a31c8267deb59323183117ed8f5b30c101c6e21536922d44138814709cc8076b"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue/review/i3/medusa-lookdev-sheet-i3.jpg", "root": "repo", "kind": "file", "expect": "exists", "role": "лист: концепт | UE i0 | UE i3 нейтр. | −1 EV | Blue | Red — front/side/back (редакторные кадры, Cobble, High)", "sha256": "b26ea45b773627475bf91165b42df06c8a311dc53cfaee1b71f7f820ed18db25"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue/review/i3/medusa-lookdev-k2-i3.jpg", "root": "repo", "kind": "file", "expect": "exists", "role": "лист K2 5× и 1.6×: нейтр. | Blue | Red", "sha256": "fd7824406a66e54caf4d5e2e04db66a0c800aa226fa78aaa19a125cdf64723b1"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue/review/i3v/measure-i3v.json", "root": "repo", "kind": "file", "expect": "exists", "role": "перепроверка i3 (повторная съёмка и замер той же LUT после исправления манифеста): вердикты допусков нейтр./−1 EV те же, что в i3; разброс Y/k ≤ 0.064, тон ≤ 4.4°, нас. ≤ 0.02", "sha256": "0805d68faf1ba330031e46230f241fa779a8dd18143af0bf39be73b44dac23d8"},
+            {"path": "tools/tripo-pipeline/skeletal_adopt_lookdev.py", "root": "repo", "kind": "file", "expect": "exists", "role": "зависимость: skeletal_adopt.normaliser() импортирует модуль безусловно (добавлен LD-merlin-ue); без него любой skeletal-adopt падает ImportError"},
+            {"path": "/Game/UM/Materials/v2/M_UM_Figure_v2", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "зависимость: родитель MI фигуры H2LD (LD-master, папка /Game/UM/Materials/v2, add -f вместе с H2LD)"},
+            {"path": "tools/art/material_library/ue_hero_lookdev.py", "root": "repo", "kind": "file", "expect": "exists", "role": "инструмент look-dev героя в UE: lut / review / measure / sheets"},
+            {"path": "docs/art-pipeline/medusa-lookdev-v2.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт look-dev Medusa, раздел 8 «UE»"},
+            {"path": "/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "скелетный меш H2LD в UE (18 uasset папки H2LD, add -f)", "sha256": "195e8f6d7d7170aba579f0a767362bc71cdfd52e1a4d30670fe1a283c003c87a"},
+            {"path": "/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD", "root": "art-worktree", "kind": "ue-asset", "expect": "exists", "role": "та же папка H2LD в арт-worktree (18 файлов байт в байт)", "sha256": "195e8f6d7d7170aba579f0a767362bc71cdfd52e1a4d30670fe1a283c003c87a"}
+          ],
+          "note": "LD-medusa-ue: прогон look-dev 20260929-h2-lookdev (H2.1 + UV1 в метрах, MatID, EdgeMask, грейд BC) импортирован CLI-профилем skeletal-adopt (формат h2-lookdev/1) в /Game/PipelineCandidates/Medusa/H2LD: 18 uasset, MI фигуры от M_UM_Figure_v2, подставка на M_UM_BaseMarker. Три итерации LUT героя под светом Cobble (High, SP 100): золото, платье и кожа персонажа в допуске (±15 % яркости, ±12° тона, ±0.10 насыщенности) при экспозиции −1 EV; под EV100 1.3 доски платье светлее на 32 %, кожа в плече тонмаппера; кожаные зоны и дерево темнее при −1 EV — числа в отчёте §8.4. F0 золота героя Y 0.22 ниже правила 0.45 (LDDU-6, до правки света 5b-R). Кадры editor-mcp-viewport: диагностика, не K1/K2 и не художественная приёмка."
         }
       ],
       "manifest06": {
@@ -814,6 +840,173 @@
             {"path": "docs/art-pipeline/evidence/w5c-merlin-h2-ue-2026-09-29/material-channels.json", "root": "repo", "kind": "file", "expect": "exists", "role": "буферы Metallic/Roughness в редакторе: ORM линейный, металл только на пряжке"}
           ],
           "note": "W5c-A: игровая модель H2.1 (бейк merlin-h2-bake/2, 33 967 tris + подставка 2 240) импортирована CLI-профилем skeletal-adopt в /Game/PipelineCandidates/Merlin/H2 (13 uasset: SK + Skeleton + SM, 4 текстуры 2K, MI фигуры/подставки + Blue/Red). Кадры — editor-mcp-viewport на контрольной сцене P1.7 (Cobble): диагностика, не K1/K2-приёмка и не художественная приёмка; палитра Blue/Red — диагностическая (Q-304 открыт). Бюджеты — предложение (GD-058)."
+        },
+        {
+          "layer": "ue-editor-import H2LD look-dev v2 CLI skeletal-adopt 20260929-h2ld-ue-import (/Game/PipelineCandidates/Merlin/H2LD, M_UM_Figure_v2, LD-merlin-ue)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {
+              "path": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev-ue-import.json",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "профиль импорта (skeletal-adopt, merlin-h2-lookdev-ue-import/1): формат h2-lookdev-merlin/1, MI от M_UM_Figure_v2 (MatID, LUT героя, EdgeMask, UseUV1Metres), Neutral и отладочные MI",
+              "sha256": "a22fd6a9ae5eb7d05bdb128bfc87e515617f1d1401f2a5e7b4110186192c992a"
+            },
+            {
+              "path": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev-ue-lut.json",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "конфиг входов UE, слой UE look-dev LUT (итерации UE-0..UE-4) и прямоугольники замера пряжки (ue_measure)",
+              "sha256": "ae8ef303277097f30b827fd35282e127dc2651f433884aaa431c06b004ba384e"
+            },
+            {
+              "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2ld-ue-import/manifest.json",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "run manifest: preflight/adopt (headless), ue-import (mcp) completed"
+            },
+            {
+              "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2ld-ue-import/reports/adopt-report.json",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "adopt 13/13: байты look-dev и входов UE, H2.1 пин, скелет v2",
+              "sha256": "5d3990d8c82f688eca71c3b26e51f5544f1eaf40174a991ab8478d554d0d7085"
+            },
+            {
+              "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2ld-ue-import/reports/ue-import-report.json",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "ue-import 25/25 (MI v2 параметры, static switch, текстуры Nearest/NoMips/NeverStream)",
+              "sha256": "c15eae98f3ebe1d08dc9b1f8824ff1b0d867bfa5fb790d1200424ae87f09e605"
+            },
+            {
+              "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/ue-inputs-report.json",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "отчёт lookdev_ue_inputs.py: LUT 16x16, EdgeMask, ZoneID, ZoneLUT",
+              "sha256": "add60da60d81998ab13f6ba99bf39b2cd77c6aef1bad5b3fcb8cd8986ceb0392"
+            },
+            {
+              "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_UM_MatLUT_Merlin.dds",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "LUT героя 16x16 RGBA16F (формат v2, LDV-1), итерация UE-4",
+              "sha256": "7fec8d6df274d2231c2ce69cd1af41fddc722cd00f04cf8a7d158c07489ae579"
+            },
+            {
+              "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/export/SK_Merlin_H2LD.fbx",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "импортированный скелетный FBX look-dev (UV0 + UV1 в метрах)",
+              "sha256": "a7a51d01bb58fcc2bcd7f46a3975dcae19654bfbbc52d087b503119b3c59c9c2"
+            },
+            {
+              "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/work/lookdev/T_Zone_4K.png",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "4K карта зон look-dev (вход ZoneID; папка work/ игнорируется git — коммитить с -f)",
+              "sha256": "8774a7076d253f2ef7e8fe65de9cc3025a30061433b7ef42ff1fc87be55173ef"
+            },
+            {
+              "path": "/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD",
+              "root": "repo",
+              "kind": "ue-asset",
+              "expect": "exists",
+              "role": "скелетный меш H2LD (20 uasset папки H2LD, add -f; скелет — канонический /Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton волны H2Anim)",
+              "sha256": "e4411f5e62dfef71fa631d88ded12e918a74d95536ec3c8aae459c30bc8a45f9"
+            },
+            {
+              "path": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD",
+              "root": "repo",
+              "kind": "ue-asset",
+              "expect": "exists",
+              "role": "MI фигуры, родитель M_UM_Figure_v2",
+              "sha256": "e791ca483d8ba65e516d6fc957159d0764b6a6d29c80b4e456a4a16d861b2328"
+            },
+            {
+              "path": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_UM_MatLUT_Merlin",
+              "root": "repo",
+              "kind": "ue-asset",
+              "expect": "exists",
+              "role": "LUT героя в UE (UE-4)",
+              "sha256": "803c8d1863df6c152074609a44f2af43eb3158d3a64cf8c0bfa5c99bdc6eed3f"
+            },
+            {
+              "path": "/Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton",
+              "root": "repo",
+              "kind": "ue-asset",
+              "expect": "exists",
+              "role": "канонический скелет (волна H2Anim), от него зависит SK_Merlin_H2LD (папка Rig игнорируется git — add -f)",
+              "sha256": "7a920115670aa039403c8e4af0276c6b8e43be2ec9d0674a79197f832e0f9c2f"
+            },
+            {
+              "path": "/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD",
+              "root": "art-worktree",
+              "kind": "ue-asset",
+              "expect": "exists",
+              "role": "та же папка H2LD в арт-worktree (байт в байт)",
+              "sha256": "e4411f5e62dfef71fa631d88ded12e918a74d95536ec3c8aae459c30bc8a45f9"
+            },
+            {
+              "path": "/Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton",
+              "root": "art-worktree",
+              "kind": "ue-asset",
+              "expect": "exists",
+              "role": "копия Rig в арт-worktree (байт в байт)",
+              "sha256": "7a920115670aa039403c8e4af0276c6b8e43be2ec9d0674a79197f832e0f9c2f"
+            },
+            {
+              "path": "docs/art-pipeline/merlin-lookdev-v2.md",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "отчёт, раздел «UE» (LD-merlin-ue): импорт, замер против концепта на двух экспозициях, итерации, остатки"
+            },
+            {
+              "path": "docs/art-pipeline/evidence/ld-merlin-ue-2026-09-29/r5/h2ld-lookdev-metrics-r5.json",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "метрики зон UE против концепта (итог r5: EV100 1.3 и −1.5 EV, пряжка в 3 ракурсах)",
+              "sha256": "e6e326ff33c99577650ea1a60a13fdb8a0d1a9ec33a87b75aa790d55224c1922"
+            },
+            {
+              "path": "docs/art-pipeline/evidence/ld-merlin-ue-2026-09-29/r5/merlin-h2ld-sheet-concept-r5.jpg",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "лист концепт | UE H2 | UE H2LD",
+              "sha256": "55c3301d173707d7a01510560a3e4ba7752d0c8d6bfce5fe2df5754116149955"
+            },
+            {
+              "path": "docs/art-pipeline/evidence/ld-merlin-ue-2026-09-29/r5/merlin-h2ld-sheet-buckle-r5.jpg",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "пряжка крупно: H2 | H2LD | H2LD −1.5 EV | маска",
+              "sha256": "40803c7c2d02a7cb7de44e883b2c1ada6b1de6f255606990fa46533f171117f1"
+            },
+            {
+              "path": "docs/art-pipeline/evidence/ld-merlin-ue-2026-09-29/r5/merlin-h2ld-sheet-concept-ev2-r5.jpg",
+              "root": "repo",
+              "kind": "file",
+              "expect": "exists",
+              "role": "лист концепт | UE H2 | UE H2LD при −1.5 EV",
+              "sha256": "0aa695d032a28b7a83a7a892906bac724d3ef5c81d8d8e016a178c7ad07534a2"
+            }
+          ],
+          "note": "LD-merlin-ue (исправленный проход r5): look-dev v2 Merlin импортирован CLI skeletal-adopt в /Game/PipelineCandidates/Merlin/H2LD на M_UM_Figure_v2. Допуски ±15 % / ±12° / ±0.10, яркость / Δтон / Δнасыщенность. EV100 1.3 (k 0.338): wool 1.05 / +2.2° / +0.03 PASS; embroidery 0.83 / +6.8° / -0.14 FAIL; buckle 1.04 / +5.5° / -0.03 PASS; face_skin 0.76 / +3.2° / -0.11 FAIL; hands_skin 0.71 / +3.7° / -0.20 FAIL. −1.5 EV (свой k 1.258): wool 0.76 / +4.6° / +0.13 FAIL; embroidery 1.08 / +1.4° / +0.04 PASS; buckle 0.94 / +5.3° / +0.08 PASS; face_skin 0.95 / -0.5° / +0.05 PASS; hands_skin 1.29 / +2.3° / -0.02 FAIL. Ни одна зона, кроме пряжки, не проходит обе экспозиции; остаток — контраст тоновой кривой против концепта и частично материал (см. LDMU-6, отчёт §U6). Кадры editor-mcp-viewport: диагностика, не K1/K2 и не художественная приёмка."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения.", "proposedChange": "Нет."},
