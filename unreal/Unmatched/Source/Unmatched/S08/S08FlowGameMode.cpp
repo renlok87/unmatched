@@ -563,6 +563,8 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
     BoardActor = GetWorld()->SpawnActor<AS08BoardActor>(
         AS08BoardActor::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, Params);
     if (BoardActor) {
+      // T3.2: the room's Board row id selects the -ArtPreview board profile.
+      BoardActor->SetRoomBoardId(Flow->GetRoom().BoardId);
       BoardActor->Rebuild(BoardModel);
       SetupCameraForBoard();
       // INT-019 control points (evidence line, also asserted by automation
@@ -580,6 +582,7 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
       FS08Trace::Write(Line);
     }
   } else {
+    BoardActor->SetRoomBoardId(Flow->GetRoom().BoardId);
     BoardActor->Rebuild(BoardModel);
   }
   if (BoardActor) {
@@ -4920,8 +4923,9 @@ void AS08FlowGameMode::RefreshUi() {
 
 // ---- ART-004 stage 3 T2.2: art HUD, zoom input and QA-010 traces -----------
 //
-// Everything below is active only on the live Cobble art board
-// (BoardActor->IsArtActive(), i.e. -ArtPreview on the 5x6 review board);
+// Everything below is active only on a live art board
+// (BoardActor->IsArtActive(), i.e. -ArtPreview on a board with a profile in
+// Config/ArtBoards/S08ArtBoardProfiles.json - Cobble 5x6 or a T3.2 fixture);
 // the grey S08/S09 paths never build a plate or an icon. Colors that a pixel
 // gate may look for are sRGB bytes through FLinearColor(FColor(...)) (memory
 // ue-pipeline-traps 9): SColorBlock/SBorder tints are linear and the back

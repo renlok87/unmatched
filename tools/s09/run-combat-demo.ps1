@@ -6,7 +6,24 @@
   [string]$ShotMode = "request",
   [switch]$ArtPreview,
   [switch]$FullHd,
-  [int]$ClientFps = 30
+  [int]$ClientFps = 30,
+  # Stage 3 T3.2 port of the run-phase2-demo art-board flags (all opt-in,
+  # -ArtPreview only). -ArtPreviewBoardId: a Board row id registered in
+  # unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json; the host
+  # creates the room on it, the game row is verified and both traces must show
+  # 'BOARD WxH' of that registration. Without it the backend default board
+  # (first created row) is used as before.
+  [string]$ArtPreviewBoardId = "",
+  # Both clients load this isolated /Game/ArtPreview Medusa candidate; passed
+  # to the clients only when given explicitly (as in run-phase2-demo).
+  [ValidateSet('face-neck-v2', 'head-tilt-v3')][string]$ArtPreviewMedusaVariant = 'face-neck-v2',
+  # Host-only flag selection of its own hero at ArtPreviewShotAfter-2 (input
+  # emulation, traced 'INPUT select src=flag'); -ArtPreviewFocusZoom (> 1)
+  # additionally zooms the board camera toward it (traced 'CAMERA focus
+  # src=flag'). The S09 combat plan itself is unchanged.
+  [switch]$ArtPreviewSelectOwnHero,
+  [double]$ArtPreviewFocusZoom = 0,
+  [ValidateRange(0, 600)][int]$ArtPreviewShotAfter = 0
 )
 # GD-034 two-client packaged COMBAT demo against the S09 worktree-local
 # backend (attack -> defense -> resolve against authoritative snapshots):
@@ -27,6 +44,38 @@
 # checks, seq convergence between both clients.
 $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+# --- T3.2 art-board flag guards (before any process or network call) ---
+$MedusaVariantExplicit = $PSBoundParameters.ContainsKey('ArtPreviewMedusaVariant')
+if (($ArtPreviewBoardId -or $MedusaVariantExplicit -or $ArtPreviewSelectOwnHero -or $ArtPreviewFocusZoom -gt 0 -or
+     $ArtPreviewShotAfter -gt 0) -and -not $ArtPreview) {
+  throw 'ArtPreviewBoardId / ArtPreviewMedusaVariant / ArtPreviewSelectOwnHero / ArtPreviewFocusZoom / ArtPreviewShotAfter require -ArtPreview'
+}
+if ($ArtPreviewFocusZoom -gt 0 -and ($ArtPreviewFocusZoom -le 1 -or -not $ArtPreviewSelectOwnHero)) {
+  throw 'ArtPreviewFocusZoom requires -ArtPreviewSelectOwnHero and a zoom greater than 1'
+}
+if ($ArtPreviewSelectOwnHero -and $ArtPreviewShotAfter -lt 4) {
+  throw 'ArtPreviewSelectOwnHero requires ArtPreviewShotAfter >= 4 (the client selects at ShotAfter-2)'
+}
+if ($ArtPreviewShotAfter -gt 0 -and $RunSeconds -lt ($ArtPreviewShotAfter + 10)) {
+  throw "RunSeconds=$RunSeconds must be at least ArtPreviewShotAfter+10 ($($ArtPreviewShotAfter + 10))"
+}
+$ArtBoard = $null
+$ArtBoardSize = $null
+if ($ArtPreviewBoardId) {
+  if ($ArtPreviewBoardId -cnotmatch '^c[a-z0-9]{24}$') {
+    throw "ArtPreviewBoardId '$ArtPreviewBoardId' is not a Board row id (cuid); content slugs such as 'cobble-city' are refused"
+  }
+  $ArtBoardsPath = Join-Path $RepoRoot 'unreal\Unmatched\Config\ArtBoards\S08ArtBoardProfiles.json'
+  if (-not (Test-Path -LiteralPath $ArtBoardsPath)) { throw "art board registry missing: $ArtBoardsPath" }
+  $ArtBoardsDoc = [System.IO.File]::ReadAllText($ArtBoardsPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+  $ArtBoard = @($ArtBoardsDoc.boards | Where-Object { @($_.match.boardIds) -ccontains $ArtPreviewBoardId }) | Select-Object -First 1
+  if (-not $ArtBoard) {
+    $known = (@($ArtBoardsDoc.boards | ForEach-Object { "$($_.id)=$(@($_.match.boardIds) -join '|')" }) -join ', ')
+    throw "ArtPreviewBoardId '$ArtPreviewBoardId' is not a registered art board ($known)"
+  }
+  $ArtBoardSize = "$($ArtBoard.match.width)x$($ArtBoard.match.height)"
+  Write-Output "art board: profile=$($ArtBoard.id) size=$ArtBoardSize light=$($ArtBoard.light)"
+}
 if (-not $Exe) { $Exe = Join-Path $RepoRoot 'unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched.exe' }
 if (-not $EvidenceDir) { $EvidenceDir = Join-Path $RepoRoot 'docs\game-design\evidence\S09\run' }
 
@@ -59,6 +108,9 @@ function Set-StagedResolution([string]$ExePath, [int]$W, [int]$H) {
 }
 $ShotWidth = if ($FullHd) { 1920 } else { 1280 }
 $ShotHeight = if ($FullHd) { 1080 } else { 720 }
+# Never write a staged GameUserSettings next to a missing exe (a wrong -Exe
+# would otherwise create <exe dir>\Unmatched\Saved\Config anywhere on disk).
+if (-not (Test-Path -LiteralPath $Exe)) { throw "packaged exe not found: $Exe" }
 Set-StagedResolution $Exe $ShotWidth $ShotHeight
 
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -209,9 +261,16 @@ function Invoke-CombatDemo {
     "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode", "-ExecCmds=t.MaxFPS $ClientFps")
   if ($ArtPreview) { $common += '-ArtPreview' }
   if ($FullHd) { $common += '-ForceRes' }
+  if ($MedusaVariantExplicit) { $common += "-ArtPreviewMedusaVariant=$ArtPreviewMedusaVariant" }
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
     "-S09Flow", "-S09Combat=attack", "-S09ShotDir=$hostShots", "-S08ExitAfter=$RunSeconds")
+  if ($ArtPreviewBoardId) { $hostArgs += "-ArtPreviewBoardId=$ArtPreviewBoardId" }
+  if ($ArtPreviewShotAfter -gt 0) { $hostArgs += "-ArtPreviewShotAfter=$ArtPreviewShotAfter" }
+  if ($ArtPreviewSelectOwnHero) { $hostArgs += '-ArtPreviewSelectOwnHero' }
+  if ($ArtPreviewFocusZoom -gt 0) {
+    $hostArgs += ('-ArtPreviewFocusZoom={0}' -f $ArtPreviewFocusZoom.ToString('0.###', [Globalization.CultureInfo]::InvariantCulture))
+  }
   $joinArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08HeroId=$heroB", "-S08Trace=$joinTrace",
     "-S09Flow", "-S09Combat=defend+resolve", "-S09ShotDir=$joinShots", "-S08ExitAfter=$RunSeconds")
@@ -252,6 +311,18 @@ function Invoke-CombatDemo {
     }
     if (-not $code) { throw "no room code found in host trace" }
     Write-Output "room created by this run (code redacted from output; id=$Script:ThisRunGameId)"
+    if ($ArtPreviewBoardId) {
+      $loginBody = @{ query = 'mutation L($input: LoginDto!) { login(input: $input) { accessToken } }'; variables = @{ input = @{ email = $AccountA.email; password = $AccountA.password } } } | ConvertTo-Json -Depth 5
+      $login = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Body $loginBody
+      Assert-GqlOk $login 'art-board host login'
+      $lookup = @{ query = 'query G($id: String!) { game(id: $id) { id boardId } }'; variables = @{ id = $Script:ThisRunGameId } } | ConvertTo-Json -Depth 5
+      $game = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Headers @{ authorization = "Bearer $($login.data.login.accessToken)" } -Body $lookup
+      Assert-GqlOk $game 'art-board lookup'
+      if ($game.data.game.boardId -cne $ArtPreviewBoardId) {
+        throw "created room has boardId=$($game.data.game.boardId), expected $ArtPreviewBoardId"
+      }
+      Write-Output 'art board id verified against the authoritative game row'
+    }
 
     $joinStartUtc = [DateTime]::UtcNow
     $joinProc = Start-S09Client $joinArgs $AccountB.email $AccountB.password $code
@@ -407,6 +478,34 @@ function Invoke-CombatDemo {
         if (-not $text.Contains($needle)) { throw "$Who trace missing '$needle'" }
       }
     }
+    if ($ArtPreviewBoardId) {
+      # T3.2 gate: the registered W x H, the board profile chosen by THIS row
+      # id with its expectation met, and the light profile applied - on both
+      # clients, before any combat assertion.
+      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        if (-not (Select-String -LiteralPath $pair[1] -SimpleMatch -Pattern "BOARD $ArtBoardSize cells" -Quiet)) {
+          $seen = Select-String -LiteralPath $pair[1] -Pattern 'BOARD \d+x\d+ cells' | Select-Object -First 1
+          throw "$($pair[0]) trace has no 'BOARD $ArtBoardSize' for $($ArtBoard.id): $(if ($seen) { $seen.Line } else { 'no BOARD line' })"
+        }
+        $active = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW board active profile=' + [regex]::Escape($ArtBoard.id) + ' ' + $ArtBoardSize + ' .* expectOk=(\d)') | Select-Object -Last 1
+        if (-not $active -or $active.Matches[0].Groups[1].Value -ne '1') {
+          throw "$($pair[0]) board art does not match its registration: $(if ($active) { $active.Line } else { 'no active line' })"
+        }
+        Assert-Trace $pair[1] @("ARTPREVIEW board profile=$($ArtBoard.id) match=boardId board=$ArtBoardSize boardId=$ArtPreviewBoardId",
+          "ARTPREVIEW lights applied profile=$($ArtBoard.light) directional=1 shadow=1 ") "$($pair[0]) art board"
+      }
+    }
+    if ($MedusaVariantExplicit) {
+      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        Assert-Trace $pair[1] @("ARTPREVIEW medusa candidate variant=$ArtPreviewMedusaVariant ") "$($pair[0]) Medusa variant"
+      }
+    }
+    if ($ArtPreviewSelectOwnHero) {
+      Assert-Trace $hostTrace @('ARTPREVIEW selection ownHero=1 selected=1', 'INPUT select src=flag') 'host flag selection'
+    }
+    if ($ArtPreviewFocusZoom -gt 0) {
+      Assert-Trace $hostTrace @('ARTPREVIEW camera focus requested zoom=', 'INPUT zoom src=flag', 'CAMERA focus src=flag') 'host focus zoom'
+    }
     Assert-Trace $hostTrace @(
       'SNAPSHOT applied', 'SUBSCRIBED gameStateUpdated', 'HUD seq=',
       'S09AUTO attack (', 'ATTACK sent', 'ATTACK done seq=',
@@ -531,6 +630,8 @@ function Invoke-CombatDemo {
     $manifest = [ordered]@{
       stamp   = $Stamp
       verdict = "GD-034 P1: live attack->defense->resolve two-client demo, defense/resolve/result state-marker shots at exact ${ShotWidth}x${ShotHeight} with swap/negative controls, role-gated traces, privacy-clean logs, seq convergence; artPreview=$([bool]$ArtPreview); clientFpsCap=$ClientFps"
+      artBoard = if ($ArtBoard) { [ordered]@{ boardId = $ArtPreviewBoardId; profile = $ArtBoard.id; size = $ArtBoardSize; light = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture } } else { $null }
+      artPreviewFlags = [ordered]@{ medusaVariant = $(if ($MedusaVariantExplicit) { $ArtPreviewMedusaVariant } else { '(default)' }); selectOwnHero = [bool]$ArtPreviewSelectOwnHero; focusZoom = $ArtPreviewFocusZoom; shotAfter = $ArtPreviewShotAfter }
       revealProof = $RevealProof
       files   = @()
     }

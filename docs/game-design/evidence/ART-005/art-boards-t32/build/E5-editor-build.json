@@ -1,0 +1,72 @@
+{
+  "schema": "unmatched.t22-editor-build/1",
+  "label": "E5",
+  "target": "UnmatchedEditor Win64 Development",
+  "startedLocal": "2026-09-28T19:34:17+05:00",
+  "flags": [
+    "-WaitMutex",
+    "-NoXGE",
+    "-NoUBA",
+    "-MaxParallelActions=2",
+    "-NoHotReloadFromIDE"
+  ],
+  "freeCommitGB": 12.9,
+  "liveCodingMutexBefore": {
+    "name": "Global\\LiveCoding_C++Program Files+Epic Games+UE_5.8+Engine+Binaries+Win64+UnrealEditor.exe",
+    "exists": true
+  },
+  "command": "Build.bat UnmatchedEditor Win64 Development <uproject> -WaitMutex -NoXGE -NoUBA -MaxParallelActions=2 -NoHotReloadFromIDE",
+  "launcher": "powershell Start-Process -WindowStyle Hidden -Wait (no console window)",
+  "why": "the live main-checkout editor holds the Live Coding mutex of the shared UnrealEditor.exe; -NoHotReloadFromIDE skips that UBT check only and keeps WITH_LIVE_CODING 1 (not -NoLiveCoding, R3)",
+  "log": "docs/game-design/evidence/ART-005/art-boards-t32/build/E5-editor-build.log",
+  "sharedDefinitionsBefore": {
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Core/SharedDefinitions.Core.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/CoreUObject/SharedDefinitions.CoreUObject.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/CoreUObject/SharedDefinitions.CoreUObject.RTTI.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Engine/SharedDefinitions.Engine.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Engine/SharedDefinitions.Engine.Project.ValApi.ValExpApi.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Slate/SharedDefinitions.Slate.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/UnrealEd/SharedDefinitions.UnrealEd.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/UnrealEd/SharedDefinitions.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/UnrealEd/SharedDefinitions.UnrealEd.RTTI.Cpp20.h": 1
+  },
+  "dllBefore": {
+    "sha256": "46b957afd0b4f508b8c397b5584bc41c9ce1adde8c7d8c589c330458d9a8b4a9",
+    "mtime": "2026-09-28T19:28:05+05:00"
+  },
+  "exitCode": 0,
+  "durationS": 28.5,
+  "finishedLocal": "2026-09-28T19:34:46+05:00",
+  "resultLines": [
+    "Result: Succeeded"
+  ],
+  "errorLines": [],
+  "warningLines": [
+    "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Source\\Unmatched\\S08\\S08BoardActor.cpp(558,18): warning C4996: 'UInstancedStaticMeshComponent::AddInstanceWorldSpace': Use AddInstance or AddInstances with bWorldSpace set to true. - Please update your code to the new API before upgrading to the next release, otherwise your project will no longer compile.",
+    "C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Source\\Unmatched\\S08\\S08BoardActor.cpp(575,15): warning C4996: 'UInstancedStaticMeshComponent::AddInstanceWorldSpace': Use AddInstance or AddInstances with bWorldSpace set to true. - Please update your code to the new API before upgrading to the next release, otherwise your project will no longer compile."
+  ],
+  "result": "Succeeded",
+  "sharedDefinitionsAfter": {
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Core/SharedDefinitions.Core.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/CoreUObject/SharedDefinitions.CoreUObject.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/CoreUObject/SharedDefinitions.CoreUObject.RTTI.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Engine/SharedDefinitions.Engine.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Engine/SharedDefinitions.Engine.Project.ValApi.ValExpApi.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/Slate/SharedDefinitions.Slate.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/UnrealEd/SharedDefinitions.UnrealEd.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/UnrealEd/SharedDefinitions.UnrealEd.Project.ValApi.ValExpApi.Cpp20.h": 1,
+    "Intermediate/Build/Win64/x64/UnmatchedEditor/Development/UnrealEd/SharedDefinitions.UnrealEd.RTTI.Cpp20.h": 1
+  },
+  "withLiveCodingValues": [
+    1
+  ],
+  "dll": {
+    "path": "unreal/Unmatched/Binaries/Win64/UnrealEditor-Unmatched.dll",
+    "sha256": "ea6a48546b108f704645cbc8414e0fbca78508c7f36a09f024207472c4b8375d",
+    "mtime": "2026-09-28T19:34:45+05:00"
+  },
+  "liveCodingMutexAfter": {
+    "name": "Global\\LiveCoding_C++Program Files+Epic Games+UE_5.8+Engine+Binaries+Win64+UnrealEditor.exe",
+    "exists": true
+  }
+}

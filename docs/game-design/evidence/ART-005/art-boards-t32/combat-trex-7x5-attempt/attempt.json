@@ -1,0 +1,36 @@
+{
+  "schema": "unmatched.t32-combat-attempt/1",
+  "status": "измерено (прогон не прошёл гейт боя; не K3-доказательство)",
+  "command": "tools/s09/run-combat-demo.ps1 -ArtPreview -FullHd -ClientFps 30 -ArtPreviewBoardId c70e9f624617750c2a2b856fd -ArtPreviewMedusaVariant face-neck-v2 -ArtPreviewSelectOwnHero -ArtPreviewShotAfter 30 -ArtPreviewFocusZoom 1.6 -RunSeconds 240",
+  "build": {
+    "record": "docs/game-design/evidence/ART-005/art-boards-t32/build/G3-build.json",
+    "package": "docs/game-design/evidence/ART-005/art-boards-t32/build/P3-package.json"
+  },
+  "demoExit": 1,
+  "failure": "evidence shot missing for joiner: s09-combat-defense-open.png - no combat happened: the S09 auto plan (S08FlowGameMode.cpp, greedy one-step approach, trace \"S09AUTO approach: no improving legal step\") could not move Medusa off the start cell (obstacle (3,2) + own Harpies on the other neighbours), both decks ran out and the game ended GAME_OVER by exhaustion (seq 156, room FINISHED)",
+  "portedFlagsObserved": {
+    "boardIdVerifiedAgainstGameRow": true,
+    "boardGate": "BOARD 7x5 cells + ARTPREVIEW board active profile=t-rex-paddock-art-fixture ... expectOk=1 (both clients)",
+    "medusaVariant": "ARTPREVIEW medusa candidate variant=face-neck-v2 ... requested=face-neck-v2",
+    "selectOwnHero": "ARTPREVIEW selection ownHero=1 selected=1 + INPUT select src=flag",
+    "focusZoom": "ARTPREVIEW camera focus requested zoom=1.60 + CAMERA focus src=flag zoom=1.60"
+  },
+  "roomCleanup": [
+    "cleanup: game cmulcu7q7008dwip4op3wmchg already terminal (FINISHED)"
+  ],
+  "followup": "T5.2 K3 on the fixture boards needs a multi-step approach in the S09 auto plan (FS08BoardModel::BuildManeuverPath toward a cell adjacent to the nearest enemy) or authored start cells; not changed in T3.2 (scope: board data/code + flag port)",
+  "files": [
+    {
+      "name": "combat-client-host.trace.log",
+      "bytes": 250060,
+      "sha256": "76deefff1a280fa0fd6bc7253854178e115d02fdcbb03dd5c72424ba62e8653a",
+      "roomCodeRedacted": true
+    },
+    {
+      "name": "combat-client-joiner.trace.log",
+      "bytes": 183135,
+      "sha256": "0930826e980ee694845ed6e3a0909ddcfde8eab6dcb43ed984925694083bcd46",
+      "roomCodeRedacted": true
+    }
+  ]
+}

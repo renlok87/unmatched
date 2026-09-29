@@ -78,6 +78,17 @@ DEMO = REPO / "tools" / "s08" / "run-phase2-demo.ps1"
 PACKAGE = REPO / "tools" / "s08" / "package-client.ps1"
 BACKEND_ENV = REPO / "backend" / ".env"
 REVIEW_BOARD_ID = "cmuhgs4b2001mwik4f2b2xtf8"  # Board row of the 5x6 Cobble review board
+# T3.2: every art board (Cobble + the art fixtures) is registered in the client's own data file;
+# run accepts exactly the Board row ids listed there (boards[].match.boardIds).
+ART_BOARDS = PROJECT_DIR / "Config" / "ArtBoards" / "S08ArtBoardProfiles.json"
+
+
+def registered_art_board(board_id: str) -> dict | None:
+    doc = json.loads(ART_BOARDS.read_text(encoding="utf-8"))
+    for b in doc.get("boards", []):
+        if board_id in (b.get("match", {}).get("boardIds") or []):
+            return b
+    return None
 API = "http://localhost:3120/graphql"
 MESH = {"face-neck-v2": "SK_Medusa_FaceNeck_v2Candidate", "head-tilt-v3": "SK_Medusa_HeadTilt_v3Candidate"}
 NO_WINDOW = 0x08000000  # CREATE_NO_WINDOW
@@ -541,8 +552,9 @@ def find_client_pids(since: float) -> list[dict]:
 
 
 def cmd_run(a) -> int:
-    if a.board_id != REVIEW_BOARD_ID:
-        print(f"REFUSED: board id {a.board_id!r} is not the 5x6 Cobble review Board row {REVIEW_BOARD_ID}")
+    art_board = registered_art_board(a.board_id)
+    if art_board is None:
+        print(f"REFUSED: board id {a.board_id!r} is not a registered art board ({rel(ART_BOARDS)} boards[].match.boardIds)")
         return 2
     evidence = Path(a.evidence_dir).resolve()
     evidence.mkdir(parents=True, exist_ok=True)
@@ -572,7 +584,11 @@ def cmd_run(a) -> int:
               "credentials": "S08_DEMO_* from backend/.env injected into the child environment only (not argv)",
               "backend": {"port": 3120, "pid": backend[0], "process": process_info(backend[0])},
               "variantFlag": a.variant, "expectedMesh": MESH.get(a.variant if a.variant != "none" else "face-neck-v2"),
-              "zoom": a.zoom, "shotAfter": a.shot_after, "runSeconds": a.run_seconds, "clientFps": a.client_fps}
+              "zoom": a.zoom, "shotAfter": a.shot_after, "runSeconds": a.run_seconds, "clientFps": a.client_fps,
+              "artBoard": {"boardId": a.board_id, "profile": art_board.get("id"),
+                           "size": f"{art_board['match'].get('width')}x{art_board['match'].get('height')}",
+                           "light": art_board.get("light"), "artFixture": bool(art_board.get("artFixture")),
+                           "registry": rel(ART_BOARDS), "registrySha256": sha256_file(ART_BOARDS)}}
     samplers = Samplers(work)
     t_start = time.time()
     samplers.start()

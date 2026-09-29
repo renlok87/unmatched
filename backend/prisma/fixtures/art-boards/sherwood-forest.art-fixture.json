@@ -1,0 +1,849 @@
+{
+ "schema": "unmatched.art-board-fixture/1",
+ "artFixture": true,
+ "label": "art fixture, не правила",
+ "status": "предложено",
+ "key": "sherwood-forest",
+ "boardId": "c37a3b6643a96c45fa71f10de",
+ "name": "ART FIXTURE · Sherwood Forest",
+ "set": "art-fixture",
+ "generator": {
+  "tool": "tools/art/art_board_fixtures.py",
+  "fixtureVersion": 1
+ },
+ "source": {
+  "mapsJson": "scraped-data/api/maps.json (gitignored; main checkout only)",
+  "mapsJsonSha256": "476eb21b5d3d62a4eb3ad963941c6dd3dcb02f8467557b1f2869948e4ce7cd6e",
+  "mapId": 7,
+  "mapKey": "sherwood-forest",
+  "mapName": "Sherwood Forest",
+  "mapSizeClass": "sm",
+  "spacesCount": 30,
+  "zonesCount": 7,
+  "zoneKeys": [
+   "gray",
+   "light-gray",
+   "green",
+   "brown",
+   "light-green",
+   "orange",
+   "yellow"
+  ],
+  "zoneColors": {
+   "gray": "#CACDCE",
+   "light-gray": "#D4D0C4",
+   "green": "#C1D7C1",
+   "brown": "#DFC4B9",
+   "light-green": "#CED5C4",
+   "orange": "#E4BEB4",
+   "yellow": "#E4D1B4"
+  },
+  "image": {
+   "sha256": "24f84b2dc91eee28a942f568be8e24a14b479bdaac51c11a2fc3dc9382b51162",
+   "sizePx": [
+    1337,
+    742
+   ],
+   "recordedIn": "docs/game-design/evidence/ART-002/PROMPTS.md",
+   "rule": "только sha256: изображение не скачивается, не кукается и не коммитится"
+  }
+ },
+ "method": {
+  "spaces": "circle = single-zone space; half-disk / wedge path = one zone's share of a multizone space; pieces within 20 px are one space",
+  "grid": "optimal assignment of space centres to a W x H lattice over their bounding box; smallest max displacement among 4-connected lattices (W 6..10, H 4..6)",
+  "nonSpaceCells": "isObstacle (not a space on the real map)",
+  "notRules": "adjacency, ranges and zones of the real map graph are NOT reproduced; art review only",
+  "candidates": [
+   {
+    "grid": "6x5",
+    "maxDisplacementCells": 0.9513,
+    "meanSquaredDisplacementCells": 0.2527,
+    "connected4": true
+   },
+   {
+    "grid": "6x6",
+    "maxDisplacementCells": 1.0048,
+    "meanSquaredDisplacementCells": 0.2106,
+    "connected4": true
+   },
+   {
+    "grid": "7x5",
+    "maxDisplacementCells": 0.9098,
+    "meanSquaredDisplacementCells": 0.177,
+    "connected4": true
+   },
+   {
+    "grid": "7x6",
+    "maxDisplacementCells": 0.8217,
+    "meanSquaredDisplacementCells": 0.1897,
+    "connected4": true
+   },
+   {
+    "grid": "8x4",
+    "maxDisplacementCells": 0.7944,
+    "meanSquaredDisplacementCells": 0.1924,
+    "connected4": true
+   },
+   {
+    "grid": "8x5",
+    "maxDisplacementCells": 0.5907,
+    "meanSquaredDisplacementCells": 0.1402,
+    "connected4": true
+   },
+   {
+    "grid": "8x6",
+    "maxDisplacementCells": 0.6086,
+    "meanSquaredDisplacementCells": 0.1599,
+    "connected4": false
+   },
+   {
+    "grid": "9x4",
+    "maxDisplacementCells": 0.8308,
+    "meanSquaredDisplacementCells": 0.1642,
+    "connected4": true
+   },
+   {
+    "grid": "9x5",
+    "maxDisplacementCells": 0.5706,
+    "meanSquaredDisplacementCells": 0.1221,
+    "connected4": false
+   },
+   {
+    "grid": "9x6",
+    "maxDisplacementCells": 0.5237,
+    "meanSquaredDisplacementCells": 0.1438,
+    "connected4": false
+   },
+   {
+    "grid": "10x4",
+    "maxDisplacementCells": 0.6233,
+    "meanSquaredDisplacementCells": 0.1412,
+    "connected4": false
+   },
+   {
+    "grid": "10x5",
+    "maxDisplacementCells": 0.6781,
+    "meanSquaredDisplacementCells": 0.1177,
+    "connected4": false
+   },
+   {
+    "grid": "10x6",
+    "maxDisplacementCells": 0.677,
+    "meanSquaredDisplacementCells": 0.1394,
+    "connected4": false
+   }
+  ]
+ },
+ "grid": {
+  "width": 8,
+  "height": 5,
+  "maxDisplacementCells": 0.5907,
+  "meanSquaredDisplacementCells": 0.1402
+ },
+ "summary": {
+  "cells": 40,
+  "spaceCells": 30,
+  "obstacleCells": 10,
+  "zoneCells": 30,
+  "multizoneCells": 14,
+  "tripleZoneCells": 3,
+  "zoneCellCounts": {
+   "gray": 6,
+   "light-gray": 5,
+   "green": 6,
+   "brown": 6,
+   "light-green": 6,
+   "orange": 6,
+   "yellow": 12
+  },
+  "connected4": true
+ },
+ "cells": [
+  {
+   "x": 0,
+   "y": 0,
+   "isObstacle": true
+  },
+  {
+   "x": 1,
+   "y": 0,
+   "zones": [
+    "light-green",
+    "orange"
+   ]
+  },
+  {
+   "x": 2,
+   "y": 0,
+   "zones": [
+    "orange"
+   ]
+  },
+  {
+   "x": 3,
+   "y": 0,
+   "zones": [
+    "gray",
+    "orange"
+   ]
+  },
+  {
+   "x": 4,
+   "y": 0,
+   "zones": [
+    "green",
+    "orange"
+   ]
+  },
+  {
+   "x": 5,
+   "y": 0,
+   "zones": [
+    "green",
+    "orange"
+   ]
+  },
+  {
+   "x": 6,
+   "y": 0,
+   "zones": [
+    "light-gray",
+    "green",
+    "orange"
+   ]
+  },
+  {
+   "x": 7,
+   "y": 0,
+   "isObstacle": true
+  },
+  {
+   "x": 0,
+   "y": 1,
+   "isObstacle": true
+  },
+  {
+   "x": 1,
+   "y": 1,
+   "zones": [
+    "brown",
+    "light-green"
+   ]
+  },
+  {
+   "x": 2,
+   "y": 1,
+   "isObstacle": true
+  },
+  {
+   "x": 3,
+   "y": 1,
+   "zones": [
+    "gray"
+   ]
+  },
+  {
+   "x": 4,
+   "y": 1,
+   "zones": [
+    "gray"
+   ]
+  },
+  {
+   "x": 5,
+   "y": 1,
+   "isObstacle": true
+  },
+  {
+   "x": 6,
+   "y": 1,
+   "zones": [
+    "green"
+   ]
+  },
+  {
+   "x": 7,
+   "y": 1,
+   "zones": [
+    "light-gray",
+    "green"
+   ]
+  },
+  {
+   "x": 0,
+   "y": 2,
+   "zones": [
+    "light-green"
+   ]
+  },
+  {
+   "x": 1,
+   "y": 2,
+   "zones": [
+    "brown"
+   ]
+  },
+  {
+   "x": 2,
+   "y": 2,
+   "zones": [
+    "brown"
+   ]
+  },
+  {
+   "x": 3,
+   "y": 2,
+   "zones": [
+    "brown",
+    "yellow"
+   ]
+  },
+  {
+   "x": 4,
+   "y": 2,
+   "zones": [
+    "gray",
+    "brown",
+    "yellow"
+   ]
+  },
+  {
+   "x": 5,
+   "y": 2,
+   "zones": [
+    "gray"
+   ]
+  },
+  {
+   "x": 6,
+   "y": 2,
+   "isObstacle": true
+  },
+  {
+   "x": 7,
+   "y": 2,
+   "zones": [
+    "light-gray",
+    "green"
+   ]
+  },
+  {
+   "x": 0,
+   "y": 3,
+   "zones": [
+    "light-green"
+   ]
+  },
+  {
+   "x": 1,
+   "y": 3,
+   "isObstacle": true
+  },
+  {
+   "x": 2,
+   "y": 3,
+   "isObstacle": true
+  },
+  {
+   "x": 3,
+   "y": 3,
+   "zones": [
+    "yellow"
+   ]
+  },
+  {
+   "x": 4,
+   "y": 3,
+   "isObstacle": true
+  },
+  {
+   "x": 5,
+   "y": 3,
+   "zones": [
+    "gray",
+    "brown",
+    "yellow"
+   ]
+  },
+  {
+   "x": 6,
+   "y": 3,
+   "zones": [
+    "yellow"
+   ]
+  },
+  {
+   "x": 7,
+   "y": 3,
+   "zones": [
+    "light-gray",
+    "yellow"
+   ]
+  },
+  {
+   "x": 0,
+   "y": 4,
+   "isObstacle": true
+  },
+  {
+   "x": 1,
+   "y": 4,
+   "zones": [
+    "light-green"
+   ]
+  },
+  {
+   "x": 2,
+   "y": 4,
+   "zones": [
+    "light-green",
+    "yellow"
+   ]
+  },
+  {
+   "x": 3,
+   "y": 4,
+   "zones": [
+    "yellow"
+   ]
+  },
+  {
+   "x": 4,
+   "y": 4,
+   "zones": [
+    "yellow"
+   ]
+  },
+  {
+   "x": 5,
+   "y": 4,
+   "zones": [
+    "yellow"
+   ]
+  },
+  {
+   "x": 6,
+   "y": 4,
+   "zones": [
+    "yellow"
+   ]
+  },
+  {
+   "x": 7,
+   "y": 4,
+   "zones": [
+    "light-gray",
+    "yellow"
+   ]
+  }
+ ],
+ "spaces": [
+  {
+   "cell": [
+    1,
+    0
+   ],
+   "mapPx": [
+    290.95,
+    144.59
+   ],
+   "zones": [
+    "light-green",
+    "orange"
+   ]
+  },
+  {
+   "cell": [
+    2,
+    0
+   ],
+   "mapPx": [
+    445.0,
+    91.0
+   ],
+   "zones": [
+    "orange"
+   ]
+  },
+  {
+   "cell": [
+    3,
+    0
+   ],
+   "mapPx": [
+    597.33,
+    78.89
+   ],
+   "zones": [
+    "gray",
+    "orange"
+   ]
+  },
+  {
+   "cell": [
+    4,
+    0
+   ],
+   "mapPx": [
+    750.63,
+    74.59
+   ],
+   "zones": [
+    "green",
+    "orange"
+   ]
+  },
+  {
+   "cell": [
+    5,
+    0
+   ],
+   "mapPx": [
+    903.63,
+    84.59
+   ],
+   "zones": [
+    "green",
+    "orange"
+   ]
+  },
+  {
+   "cell": [
+    6,
+    0
+   ],
+   "mapPx": [
+    1070.56,
+    77.6
+   ],
+   "zones": [
+    "light-gray",
+    "green",
+    "orange"
+   ]
+  },
+  {
+   "cell": [
+    1,
+    1
+   ],
+   "mapPx": [
+    222.38,
+    271.61
+   ],
+   "zones": [
+    "brown",
+    "light-green"
+   ]
+  },
+  {
+   "cell": [
+    3,
+    1
+   ],
+   "mapPx": [
+    655.0,
+    207.0
+   ],
+   "zones": [
+    "gray"
+   ]
+  },
+  {
+   "cell": [
+    4,
+    1
+   ],
+   "mapPx": [
+    771.0,
+    289.0
+   ],
+   "zones": [
+    "gray"
+   ]
+  },
+  {
+   "cell": [
+    6,
+    1
+   ],
+   "mapPx": [
+    1001.0,
+    206.0
+   ],
+   "zones": [
+    "green"
+   ]
+  },
+  {
+   "cell": [
+    7,
+    1
+   ],
+   "mapPx": [
+    1163.33,
+    205.89
+   ],
+   "zones": [
+    "light-gray",
+    "green"
+   ]
+  },
+  {
+   "cell": [
+    0,
+    2
+   ],
+   "mapPx": [
+    112.0,
+    371.0
+   ],
+   "zones": [
+    "light-green"
+   ]
+  },
+  {
+   "cell": [
+    1,
+    2
+   ],
+   "mapPx": [
+    351.0,
+    343.0
+   ],
+   "zones": [
+    "brown"
+   ]
+  },
+  {
+   "cell": [
+    2,
+    2
+   ],
+   "mapPx": [
+    489.0,
+    389.0
+   ],
+   "zones": [
+    "brown"
+   ]
+  },
+  {
+   "cell": [
+    3,
+    2
+   ],
+   "mapPx": [
+    635.76,
+    408.61
+   ],
+   "zones": [
+    "brown",
+    "yellow"
+   ]
+  },
+  {
+   "cell": [
+    4,
+    2
+   ],
+   "mapPx": [
+    778.17,
+    443.38
+   ],
+   "zones": [
+    "gray",
+    "brown",
+    "yellow"
+   ]
+  },
+  {
+   "cell": [
+    5,
+    2
+   ],
+   "mapPx": [
+    905.0,
+    349.0
+   ],
+   "zones": [
+    "gray"
+   ]
+  },
+  {
+   "cell": [
+    7,
+    2
+   ],
+   "mapPx": [
+    1234.33,
+    339.89
+   ],
+   "zones": [
+    "light-gray",
+    "green"
+   ]
+  },
+  {
+   "cell": [
+    0,
+    3
+   ],
+   "mapPx": [
+    104.0,
+    516.0
+   ],
+   "zones": [
+    "light-green"
+   ]
+  },
+  {
+   "cell": [
+    3,
+    3
+   ],
+   "mapPx": [
+    598.0,
+    547.0
+   ],
+   "zones": [
+    "yellow"
+   ]
+  },
+  {
+   "cell": [
+    5,
+    3
+   ],
+   "mapPx": [
+    919.17,
+    487.38
+   ],
+   "zones": [
+    "gray",
+    "brown",
+    "yellow"
+   ]
+  },
+  {
+   "cell": [
+    6,
+    3
+   ],
+   "mapPx": [
+    1062.0,
+    518.0
+   ],
+   "zones": [
+    "yellow"
+   ]
+  },
+  {
+   "cell": [
+    7,
+    3
+   ],
+   "mapPx": [
+    1214.33,
+    492.89
+   ],
+   "zones": [
+    "light-gray",
+    "yellow"
+   ]
+  },
+  {
+   "cell": [
+    1,
+    4
+   ],
+   "mapPx": [
+    214.0,
+    615.0
+   ],
+   "zones": [
+    "light-green"
+   ]
+  },
+  {
+   "cell": [
+    2,
+    4
+   ],
+   "mapPx": [
+    360.95,
+    643.59
+   ],
+   "zones": [
+    "light-green",
+    "yellow"
+   ]
+  },
+  {
+   "cell": [
+    3,
+    4
+   ],
+   "mapPx": [
+    512.0,
+    661.0
+   ],
+   "zones": [
+    "yellow"
+   ]
+  },
+  {
+   "cell": [
+    4,
+    4
+   ],
+   "mapPx": [
+    675.0,
+    670.0
+   ],
+   "zones": [
+    "yellow"
+   ]
+  },
+  {
+   "cell": [
+    5,
+    4
+   ],
+   "mapPx": [
+    829.0,
+    668.0
+   ],
+   "zones": [
+    "yellow"
+   ]
+  },
+  {
+   "cell": [
+    6,
+    4
+   ],
+   "mapPx": [
+    980.0,
+    654.0
+   ],
+   "zones": [
+    "yellow"
+   ]
+  },
+  {
+   "cell": [
+    7,
+    4
+   ],
+   "mapPx": [
+    1144.33,
+    640.89
+   ],
+   "zones": [
+    "light-gray",
+    "yellow"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,53 @@
+# T3.2 script guard probes (offline: nonexistent exe, no backend). 2026-09-28T19:51:38+05:00
+## run-phase2-demo.ps1 -Exe C:/nonexistent.exe -ArtPreviewBoardId cobble-city -RunSeconds 50 -ArtPreviewShotAfter 36
+ArtPreviewBoardId 'cobble-city' is not a Board row id (cuid); content slugs such as 'cobble-city' are refused. Use a Bo
+ard row id registered in unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json (e.g. the 5x6 Cobble review board c
+muhgs4b2001mwik4f2b2xtf8).
+## run-phase2-demo.ps1 -Exe C:/nonexistent.exe -ArtPreviewBoardId c000000000000000000000000 -RunSeconds 50 -ArtPreviewShotAfter 36
+ArtPreviewBoardId 'c000000000000000000000000' is not a registered art board (cobble-city=cmuhgs4b2001mwik4f2b2xtf8, she
+rwood-forest-art-fixture=c37a3b6643a96c45fa71f10de, t-rex-paddock-art-fixture=c70e9f624617750c2a2b856fd); the backend w
+ould build an unrelated grid
+## run-phase2-demo.ps1 -Exe C:/nonexistent.exe -ArtPreviewBoardId c37a3b6643a96c45fa71f10de -RunSeconds 50 -ArtPreviewShotAfter 36
+art board: profile=sherwood-forest-art-fixture size=8x5 light=forest-probe legacyCobble=False
+packaged exe not found: C:/nonexistent.exe
+## run-phase2-demo.ps1 -Exe C:/nonexistent.exe -ArtPreviewBoardId c70e9f624617750c2a2b856fd -RunSeconds 50 -ArtPreviewShotAfter 36
+art board: profile=t-rex-paddock-art-fixture size=7x5 light=paddock-probe legacyCobble=False
+packaged exe not found: C:/nonexistent.exe
+## run-phase2-demo.ps1 -Exe C:/nonexistent.exe -ArtPreviewBoardId cmuhgs4b2001mwik4f2b2xtf8 -RunSeconds 50 -ArtPreviewShotAfter 36
+art board: profile=cobble-city size=5x6 light=cobble-probe legacyCobble=True
+packaged exe not found: C:/nonexistent.exe
+## run-combat-demo.ps1 -Exe C:/nonexistent.exe -ArtPreviewBoardId c37a3b6643a96c45fa71f10de
+ArtPreviewBoardId / ArtPreviewMedusaVariant / ArtPreviewSelectOwnHero / ArtPreviewFocusZoom / ArtPreviewShotAfter requi
+re -ArtPreview
+   oom / ArtPreviewShotAfter require -ArtPreview
+## run-combat-demo.ps1 -Exe C:/nonexistent.exe -ArtPreview -ArtPreviewBoardId cobble-city
+ArtPreviewBoardId 'cobble-city' is not a Board row id (cuid); content slugs such as 'cobble-city' are refused
+   ble-city' are refused
+## run-combat-demo.ps1 -Exe C:/nonexistent.exe -ArtPreview -ArtPreviewBoardId c000000000000000000000000
+ArtPreviewBoardId 'c000000000000000000000000' is not a registered art board (cobble-city=cmuhgs4b2001mwik4f2b2xtf8, she
+rwood-forest-art-fixture=c37a3b6643a96c45fa71f10de, t-rex-paddock-art-fixture=c70e9f624617750c2a2b856fd)
+   =cmuhgs4b2001mwik4f2b2xtf8, sherwood-forest-art-fixture=c37a3b6643a96c45fa71f10de, t-rex-paddock-art-fixture=c70e9  
+## run-combat-demo.ps1 -Exe C:/nonexistent.exe -ArtPreview -ArtPreviewFocusZoom 1.6
+ArtPreviewFocusZoom requires -ArtPreviewSelectOwnHero and a zoom greater than 1
+## run-combat-demo.ps1 -Exe C:/nonexistent.exe -ArtPreview -ArtPreviewSelectOwnHero
+ArtPreviewSelectOwnHero requires ArtPreviewShotAfter >= 4 (the client selects at ShotAfter-2)
+   er-2)
+## run-combat-demo.ps1 -Exe C:/nonexistent.exe -ArtPreview -ArtPreviewSelectOwnHero -ArtPreviewShotAfter 300 -RunSeconds 240
+RunSeconds=240 must be at least ArtPreviewShotAfter+10 (310)
+## run-combat-demo.ps1 -Exe C:/nonexistent.exe -ArtPreview -ArtPreviewBoardId c70e9f624617750c2a2b856fd -ArtPreviewSelectOwnHero -ArtPreviewShotAfter 30 -ArtPreviewFocusZoom 1.6 -ArtPreviewMedusaVariant face-neck-v2
+art board: profile=t-rex-paddock-art-fixture size=7x5 light=paddock-probe
+packaged exe not found: C:/nonexistent.exe
+## run-phase2-demo.ps1 -ProbeCleanupOnly
+PROBE PASS  success: validated ownership + ABORTED abort passes
+PROBE PASS  HTTP-200 errors[] on the game lookup fails the cleanup
+PROBE PASS  HTTP-200 errors[] on abortGame fails the cleanup
+PROBE PASS  HTTP-200 errors[] on login fails the cleanup
+PROBE PASS  non-terminal abort status is caught by the re-query
+PROBE PASS  abortGame answering for a foreign game id fails the cleanup
+CLEANUP PROBE OK: 6/6 cases
+exit=0
+## seed guard: DATABASE_URL on 5433 / foreign host
+ART_FIXTURE_SEED_FAILED: REFUSED: art fixtures go only to the isolated test DB (127.0.0.1|localhost:55434), got 127.0.0.1:5433 - the main dev DB is never written
+exit=1
+ART_FIXTURE_SEED_FAILED: REFUSED: art fixtures go only to the isolated test DB (127.0.0.1|localhost:55434), got db.example.com:55434 - the main dev DB is never written
+exit=1

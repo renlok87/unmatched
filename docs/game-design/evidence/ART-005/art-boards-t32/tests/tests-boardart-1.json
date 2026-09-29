@@ -1,0 +1,61 @@
+{
+  "schema": "unmatched.t22-ue-tests/1",
+  "label": "boardart-1",
+  "filter": "Unmatched.S08.BoardArt",
+  "startedLocal": "2026-09-28T19:15:43+05:00",
+  "durationS": 15.4,
+  "exitCode": 255,
+  "log": "docs/game-design/evidence/ART-005/art-boards-t32/tests/tests-boardart-1.log",
+  "editorDll": {
+    "sha256": "625e400dbead2df35b194f2da0fa7dd69401b2d110ebd446ef9c6651f52bad78"
+  },
+  "found": [
+    6
+  ],
+  "results": [
+    {
+      "result": "Success",
+      "name": " Rex fixtures decode to their profiles",
+      "path": "Unmatched.S08.BoardArt.Committed Sherwood and T. Rex fixtures decode to their profiles"
+    },
+    {
+      "result": "Success",
+      "name": "Cobble 5x6 keeps the ART-005 marks, counts and probe lights",
+      "path": "Unmatched.S08.BoardArt.Cobble 5x6 keeps the ART-005 marks, counts and probe lights"
+    },
+    {
+      "result": "Success",
+      "name": "Multizone cells keep every zone on its own side and glyph slot",
+      "path": "Unmatched.S08.BoardArt.Multizone cells keep every zone on its own side and glyph slot"
+    },
+    {
+      "result": "Success",
+      "name": "Parser validates light budgets, shapes and colours",
+      "path": "Unmatched.S08.BoardArt.Parser validates light budgets, shapes and colours"
+    },
+    {
+      "result": "Fail",
+      "name": "Profile selection by board id then by W x H and zone keys",
+      "path": "Unmatched.S08.BoardArt.Profile selection by board id then by W x H and zone keys"
+    },
+    {
+      "result": "Success",
+      "name": "Shipped profiles parse with budgets and per-board unique zone shapes",
+      "path": "Unmatched.S08.BoardArt.Shipped profiles parse with budgets and per-board unique zone shapes"
+    }
+  ],
+  "passed": 5,
+  "failed": [
+    {
+      "result": "Fail",
+      "name": "Profile selection by board id then by W x H and zone keys",
+      "path": "Unmatched.S08.BoardArt.Profile selection by board id then by W x H and zone keys"
+    }
+  ],
+  "errorLines": [
+    "[2026.09.28-14.15.41:711][313]LogAutomationController: Error: Test Completed. Result={Fail} Name={Profile selection by board id then by W x H and zone keys} Path={Unmatched.S08.BoardArt.Profile selection by board id then by W x H and zone keys}",
+    "[2026.09.28-14.15.41:711][313]LogAutomationController: Error: Expected 'but the expect check reports the difference' to be true. [C:\\Users\\ren\\.codex\\worktrees\\art-foundation\\unmached\\unreal\\Unmatched\\Source\\Unmatched\\S08\\S08BoardArtTests.cpp(225)]"
+  ],
+  "startupNoiseErrorLines": 17,
+  "command": "UnrealEditor-Cmd <art uproject> -ExecCmds=\"Automation RunTests <filter>; Quit\" -unattended -nosplash -nullrhi -nullaudio (MCP auto-start off)"
+}
