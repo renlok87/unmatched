@@ -8,6 +8,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "S08BoardModel.h"
+#include "S08BoardArt.h"
 #include "S08ArtHud.h"
 #include "S08BoardActor.generated.h"
 
@@ -29,6 +30,13 @@ public:
    *  signature changes (width/height/cell types), so same-seq merges are
    *  cheap. Returns false when the board could not be decoded. */
   bool Rebuild(const FS08BoardModel& Board);
+
+  /** Board row id of the current room (FS08RoomState::BoardId). Selects the
+   *  -ArtPreview board profile before the boardState signature (T3.2); a
+   *  change forces the next Rebuild to re-select. */
+  void SetRoomBoardId(const FString& BoardId) { RoomBoardId = BoardId; }
+  /** Active -ArtPreview board profile id (empty = grey board). */
+  const FString& GetArtProfileId() const { return ActiveProfile.Id; }
 
   /** Syncs fighter actors with the latest decoded fighters (spawn/move/
    *  re-label by stable fighter id; dead fighters hide instantly). */
@@ -98,22 +106,69 @@ private:
   UPROPERTY()
   TObjectPtr<UInstancedStaticMeshComponent> UnderlayTiles;
 
-  // ART-005 pilot: decorative Cobble is visible only for the matching 5x6
-  // live board contract. The original tiles stay as exact click surfaces.
+  // ART-005 / T3.2 -ArtPreview board art, selected per board from the data in
+  // Config/ArtBoards/S08ArtBoardProfiles.json (S08BoardArt.h). Surface
+  // 'cobble-5x6-mesh' keeps the ART-005 Cobble slab; 'tiles' dresses the
+  // parametric tiles of any W x H board. The instanced tiles always stay the
+  // exact click surfaces.
   UPROPERTY()
   TObjectPtr<UStaticMeshComponent> ArtBoard;
   UPROPERTY()
   TObjectPtr<UInstancedStaticMeshComponent> ArtCorners;
+  // 'tiles' surface: one lit stone slab per passable cell + four wood frame
+  // bars as plain static mesh components. The ART-005 probe materials carry
+  // no InstancedStaticMeshes usage, and a cooked build renders them as the
+  // default material on an ISM (seen in the first T3.2 packaged smoke).
   UPROPERTY()
-  TObjectPtr<UInstancedStaticMeshComponent> ArtBlueZones;
+  TArray<TObjectPtr<UStaticMeshComponent>> ArtSurfaceParts;
+  // One stroke ISM per zone KEY (created on demand; palette from the data).
   UPROPERTY()
-  TObjectPtr<UInstancedStaticMeshComponent> ArtRedZones;
+  TMap<FString, TObjectPtr<UInstancedStaticMeshComponent>> ArtZoneStrokes;
   UPROPERTY()
   TObjectPtr<UInstancedStaticMeshComponent> ArtZoneGlyphs;
-  bool bArtAssetsReady = false;
+  bool bArtAssetsReady = false;   // shared art assets + Medusa candidate + board data
+  bool bCobbleMeshReady = false;  // ART-005 Cobble slab and its two material slots
+  bool bTileArtReady = false;     // stone/wood probe materials + dark void tint for 'tiles'
   bool bArtActive = false;
+  bool bArtTiles = false;
   UPROPERTY()
   TArray<TObjectPtr<AActor>> ArtLights;
+  FString ActiveLightProfileId;
+
+  UPROPERTY()
+  TObjectPtr<UMaterialInterface> GreyTileMaterial;
+  UPROPERTY()
+  TObjectPtr<UMaterialInstanceDynamic> GreyBlockerMaterial;
+  UPROPERTY()
+  TObjectPtr<UMaterialInstanceDynamic> GreyUnderlayMaterial;
+  UPROPERTY()
+  TObjectPtr<UMaterialInstanceDynamic> ArtVoidMaterial;  // 'tiles': grooves + non-space voids
+  UPROPERTY()
+  TObjectPtr<UMaterialInterface> ArtStoneTileMaterial;
+  UPROPERTY()
+  TObjectPtr<UMaterialInterface> ArtWoodMaterial;
+  UPROPERTY()
+  TObjectPtr<UMaterialInterface> ArtSolidMaterial;  // unlit 'Tint' base for zone colours
+  UPROPERTY()
+  TMap<FString, TObjectPtr<UMaterialInterface>> ArtZoneMaterials;
+  UPROPERTY()
+  TMap<FString, TObjectPtr<UMaterialInstanceDynamic>> ArtZoneTints;
+
+  FS08BoardArtData ArtData;
+  bool bArtDataLoaded = false;
+  FS08BoardArtProfile ActiveProfile;
+  FString RoomBoardId;
+  FString BuiltForBoardId;
+
+  UInstancedStaticMeshComponent* ZoneStrokeComponent(const FS08ZoneStyle& Style);
+  /** Authored material when it supports instancing (or on the legacy Cobble
+   *  profile, kept exact), else an unlit tint of the data colour. */
+  UMaterialInterface* ZoneMaterialFor(const FS08ZoneStyle& Style, bool& bOutAuthored, bool& bOutIsmUsage);
+  void ClearArtSurface();
+  void AddArtSurfacePart(UMaterialInterface* Material, const FTransform& Transform);
+  void ClearArtLights();
+  void ApplyArtLights(const FS08LightProfile& Light, bool bLegacyCobbleTrace);
+  void ApplySurfaceMaterials();
 
   UPROPERTY()
   TObjectPtr<AActor> IllegalCell;

@@ -12,10 +12,12 @@
 #include "Engine/PointLight.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/StaticMesh.h"
+#include "Materials/Material.h"
 #include "Materials/MaterialInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "Misc/Paths.h"
 #include "UObject/ConstructorHelpers.h"
 
 namespace {
@@ -27,13 +29,16 @@ UMaterialInterface* LoadTileMaterial() {
                       nullptr, TEXT("/Engine/BasicShapes/BasicShapeMaterial"));
 }
 
-bool SupportsCobbleArt(const FS08BoardModel& Board) {
-  if (Board.Width != 5 || Board.Height != 6 || Board.Cells.Num() != 30) return false;
-  for (const FS08Cell& Cell : Board.Cells) {
-    if (Cell.Type != ES08CellType::Normal || Cell.Zones.Num() != 1 ||
-        (Cell.Zones[0] != TEXT("blue") && Cell.Zones[0] != TEXT("red"))) return false;
-  }
-  return true;
+// T3.2: the Cobble-only SupportsCobbleArt (5x6, one blue/red zone per cell)
+// became data: FS08BoardArtData::Select picks a profile per board row id or
+// boardState signature, S08BuildZoneMarks lays out any zone keys/multizones.
+constexpr float ArtTileScaleXY = 0.92f;  // 'tiles' surface: 8 uu stone groove
+constexpr float ArtFrameUU = 24.0f;      // 'tiles' surface: wood frame width
+
+FString ZoneComponentName(const FString& Key) {
+  FString Safe;
+  for (const TCHAR C : Key) Safe.AppendChar(FChar::IsAlnum(C) ? C : TEXT('_'));
+  return TEXT("ArtZone_") + Safe;
 }
 } // namespace
 
@@ -73,17 +78,6 @@ AS08BoardActor::AS08BoardActor() {
   ArtCorners->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   ArtCorners->SetVisibility(false);
 
-  ArtBlueZones = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("ArtBlueZones"));
-  ArtBlueZones->SetupAttachment(RootComponent);
-  ArtBlueZones->SetStaticMesh(Cube);
-  ArtBlueZones->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-  ArtBlueZones->SetVisibility(false);
-
-  ArtRedZones = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("ArtRedZones"));
-  ArtRedZones->SetupAttachment(RootComponent);
-  ArtRedZones->SetStaticMesh(Cube);
-  ArtRedZones->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-  ArtRedZones->SetVisibility(false);
 
   ArtZoneGlyphs = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("ArtZoneGlyphs"));
   ArtZoneGlyphs->SetupAttachment(RootComponent);
@@ -95,15 +89,40 @@ AS08BoardActor::AS08BoardActor() {
 void AS08BoardActor::BeginPlay() {
   Super::BeginPlay();
   if (UMaterialInterface* Tile = LoadTileMaterial()) {
+    GreyTileMaterial = Tile;
     NormalTiles->SetMaterial(0, Tile);
-    UMaterialInstanceDynamic* BlockerMid = UMaterialInstanceDynamic::Create(Tile, this);
-    BlockerMid->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.22f, 0.22f, 0.24f));
-    BlockerTiles->SetMaterial(0, BlockerMid);
-    UMaterialInstanceDynamic* UnderlayMid = UMaterialInstanceDynamic::Create(Tile, this);
-    UnderlayMid->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.07f, 0.07f, 0.09f));
-    UnderlayTiles->SetMaterial(0, UnderlayMid);
+    GreyBlockerMaterial = UMaterialInstanceDynamic::Create(Tile, this);
+    GreyBlockerMaterial->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.22f, 0.22f, 0.24f));
+    BlockerTiles->SetMaterial(0, GreyBlockerMaterial);
+    GreyUnderlayMaterial = UMaterialInstanceDynamic::Create(Tile, this);
+    GreyUnderlayMaterial->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.07f, 0.07f, 0.09f));
+    UnderlayTiles->SetMaterial(0, GreyUnderlayMaterial);
+    // 'tiles' art surface: near-black unlit underlay so the stone grooves and
+    // the non-space (obstacle) cells read as voids under the lit slabs.
+    ArtVoidMaterial = UMaterialInstanceDynamic::Create(Tile, this);
+    ArtVoidMaterial->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.012f, 0.012f, 0.016f));
   }
   if (!FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) return;
+
+  // T3.2 board data: zone palette/glyphs per key, light profiles, board
+  // profiles. Without valid data no board gets art (grey board, traced).
+  {
+    TArray<FString> Errors;
+    bArtDataLoaded = ArtData.LoadFile(FS08BoardArtData::DefaultPath(), Errors);
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW board profiles loaded=%d revision=%d boards=%d zoneStyles=%d lightProfiles=%d errors=%d path=Config/ArtBoards/S08ArtBoardProfiles.json"),
+        bArtDataLoaded ? 1 : 0, ArtData.Revision, ArtData.Boards.Num(), ArtData.ZoneStyles.Num(),
+        ArtData.Lights.Num(), Errors.Num()));
+    for (int32 I = 0; I < Errors.Num() && I < 8; ++I) {
+      FS08Trace::Write(TEXT("ARTPREVIEW board profiles error: ") + Errors[I]);
+    }
+    if (!bArtDataLoaded) {
+      UE_LOG(LogTemp, Warning, TEXT("ARTPREVIEW board profiles invalid; keeping grey board"));
+      FS08Trace::Write(TEXT("ARTPREVIEW board profiles invalid; keeping grey board"));
+      return;
+    }
+  }
+
   UStaticMesh* Board = LoadObject<UStaticMesh>(nullptr,
       TEXT("/Game/ArtTests/ART005F/Meshes/SM_ART005_BoardStoneV4_WoodUV"));
   UStaticMesh* Corner = LoadObject<UStaticMesh>(nullptr,
@@ -114,10 +133,6 @@ void AS08BoardActor::BeginPlay() {
       TEXT("/Game/ArtTests/ART005G/Materials/M_ART005G_Wood_DiffuseOnly"));
   UMaterialInterface* Iron = LoadObject<UMaterialInterface>(nullptr,
       TEXT("/Game/ArtTests/ART005H/Materials/M_ART005H_IronCorner_Review"));
-  UMaterialInterface* Blue = LoadObject<UMaterialInterface>(nullptr,
-      TEXT("/Game/ArtTests/ART005/Materials/M_ART005_BlueSection_Review"));
-  UMaterialInterface* Red = LoadObject<UMaterialInterface>(nullptr,
-      TEXT("/Game/ArtTests/ART005/Materials/M_ART005_RedSection_Review"));
   UMaterialInterface* Glyph = LoadObject<UMaterialInterface>(nullptr,
       TEXT("/Game/ArtTests/ART005/Materials/M_ART005_ZoneGlyph_Review"));
   const FS08MedusaCandidate MedusaCandidate = S08SelectMedusaCandidate();
@@ -130,43 +145,68 @@ void AS08BoardActor::BeginPlay() {
       TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_Blue"));
   UMaterialInterface* TeamRed = LoadObject<UMaterialInterface>(nullptr,
       TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_Red"));
-  if (!Board || !Corner || !Stone || !Wood || !Iron || !Blue || !Red || !Glyph ||
-      !Medusa || !Medusa->GetSkeleton() || !Pedestal || !TeamBlue || !TeamRed) {
+  // Zone colours: the blue/red review materials of the Cobble data plus the
+  // unlit 'Tint' material for every other key (FLinearColor(FColor) = sRGB).
+  for (const TPair<FString, FS08ZoneStyle>& Style : ArtData.ZoneStyles) {
+    if (Style.Value.MaterialPath.IsEmpty()) continue;
+    if (UMaterialInterface* M = LoadObject<UMaterialInterface>(nullptr, *Style.Value.MaterialPath)) {
+      ArtZoneMaterials.Add(Style.Key, M);
+    } else {
+      FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW zone material missing key=%s path=%s (tint fallback)"),
+                                       *Style.Key, *Style.Value.MaterialPath));
+    }
+  }
+  ArtSolidMaterial = LoadObject<UMaterialInterface>(nullptr, TEXT("/Game/S08/M_S08_Solid.M_S08_Solid"));
+  ArtStoneTileMaterial = LoadObject<UMaterialInterface>(nullptr,
+      TEXT("/Game/ArtTests/ART005/Materials/M_ART005_Stone_Probe"));
+  ArtWoodMaterial = LoadObject<UMaterialInterface>(nullptr,
+      TEXT("/Game/ArtTests/ART005/Materials/M_ART005_Wood_Probe"));
+  const bool bShared = Corner && Iron && Glyph && ArtSolidMaterial;
+  const bool bMedusa = Medusa && Medusa->GetSkeleton() && Pedestal && TeamBlue && TeamRed;
+  if (!bShared || !bMedusa) {
     UE_LOG(LogTemp, Warning, TEXT("ARTPREVIEW Cobble assets missing; keeping grey board"));
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW Cobble assets missing medusaVariant=%s requested=%s medusa=%d; keeping grey board"),
-        MedusaCandidate.Variant, *MedusaCandidate.Requested,
-        Medusa && Medusa->GetSkeleton() ? 1 : 0));
+        MedusaCandidate.Variant, *MedusaCandidate.Requested, bMedusa ? 1 : 0));
     return;
   }
-  const int32 StoneSlot = Board->GetMaterialIndex(TEXT("M_ART005_Stone_AtlasB_Provisional"));
-  const int32 WoodSlot = Board->GetMaterialIndex(TEXT("M_ART005_Wood_Provisional"));
-  if (StoneSlot < 0 || WoodSlot < 0) {
-    UE_LOG(LogTemp, Warning, TEXT("ARTPREVIEW Cobble material slots changed; keeping grey board"));
+  bCobbleMeshReady = false;
+  if (Board && Stone && Wood) {
+    const int32 StoneSlot = Board->GetMaterialIndex(TEXT("M_ART005_Stone_AtlasB_Provisional"));
+    const int32 WoodSlot = Board->GetMaterialIndex(TEXT("M_ART005_Wood_Provisional"));
+    if (StoneSlot >= 0 && WoodSlot >= 0) {
+      ArtBoard->SetStaticMesh(Board);
+      ArtBoard->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+      ArtBoard->SetMaterial(StoneSlot, Stone);
+      ArtBoard->SetMaterial(WoodSlot, Wood);
+      bCobbleMeshReady = true;
+    } else {
+      UE_LOG(LogTemp, Warning, TEXT("ARTPREVIEW Cobble material slots changed; no cobble-5x6-mesh surface"));
+    }
+  }
+  bTileArtReady = ArtStoneTileMaterial && ArtWoodMaterial && ArtVoidMaterial;
+  if (!bCobbleMeshReady && !bTileArtReady) {
+    FS08Trace::Write(TEXT("ARTPREVIEW board surfaces missing cobbleMesh=0 tiles=0; keeping grey board"));
     return;
   }
-  ArtBoard->SetStaticMesh(Board);
-  ArtBoard->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-  ArtBoard->SetMaterial(StoneSlot, Stone);
-  ArtBoard->SetMaterial(WoodSlot, Wood);
   ArtCorners->SetStaticMesh(Corner);
   ArtCorners->SetMaterial(0, Iron);
-  ArtBlueZones->SetMaterial(0, Blue);
-  ArtRedZones->SetMaterial(0, Red);
   ArtZoneGlyphs->SetMaterial(0, Glyph);
   bArtAssetsReady = true;
-  UE_LOG(LogTemp, Display, TEXT("ARTPREVIEW Cobble assets ready"));
-  FS08Trace::Write(TEXT("ARTPREVIEW Cobble assets ready"));
+  if (bCobbleMeshReady) {
+    UE_LOG(LogTemp, Display, TEXT("ARTPREVIEW Cobble assets ready"));
+    FS08Trace::Write(TEXT("ARTPREVIEW Cobble assets ready"));
+  }
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW board assets ready cobbleMesh=%d tiles=%d zoneMaterials=%d"),
+                                   bCobbleMeshReady ? 1 : 0, bTileArtReady ? 1 : 0, ArtZoneMaterials.Num()));
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW medusa candidate variant=%s mesh=%s requested=%s"),
                                    MedusaCandidate.Variant, *Medusa->GetName(),
                                    *MedusaCandidate.Requested));
 }
 
 void AS08BoardActor::EndPlay(const EEndPlayReason::Type Reason) {
-  for (AActor* Light : ArtLights) {
-    if (Light) Light->Destroy();
-  }
-  ArtLights.Reset();
+  ClearArtLights();
+  ClearArtSurface();
   ClearChildren();
   Super::EndPlay(Reason);
 }
@@ -289,10 +329,151 @@ void AS08BoardActor::ClearChildren() {
   FighterActors.Reset();
 }
 
+UInstancedStaticMeshComponent* AS08BoardActor::ZoneStrokeComponent(const FS08ZoneStyle& Style) {
+  if (TObjectPtr<UInstancedStaticMeshComponent>* Found = ArtZoneStrokes.Find(Style.Key)) {
+    if (*Found) return *Found;
+  }
+  UInstancedStaticMeshComponent* Component = NewObject<UInstancedStaticMeshComponent>(
+      this, FName(*ZoneComponentName(Style.Key)));
+  Component->SetupAttachment(RootComponent);
+  Component->SetStaticMesh(BlockerTiles->GetStaticMesh());
+  Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  Component->RegisterComponent();
+  ArtZoneStrokes.Add(Style.Key, Component);
+  return Component;
+}
+
+UMaterialInterface* AS08BoardActor::ZoneMaterialFor(const FS08ZoneStyle& Style, bool& bOutAuthored,
+                                                    bool& bOutIsmUsage) {
+  bOutAuthored = false;
+  bOutIsmUsage = false;
+  if (TObjectPtr<UMaterialInterface>* Authored = ArtZoneMaterials.Find(Style.Key)) {
+    const UMaterial* Base = *Authored ? (*Authored)->GetMaterial() : nullptr;
+    bOutIsmUsage = Base && Base->GetUsageByFlag(MATUSAGE_InstancedStaticMeshes);
+    // The ART-005 review materials lack the instancing usage (cooked builds
+    // fall back to the default material); the legacy Cobble profile keeps
+    // them for byte-compatible evidence, every other board uses the tint.
+    if (*Authored && (bOutIsmUsage || ActiveProfile.bLegacyCobbleTrace)) {
+      bOutAuthored = true;
+      return *Authored;
+    }
+  }
+  if (TObjectPtr<UMaterialInstanceDynamic>* Cached = ArtZoneTints.Find(Style.Key)) {
+    if (*Cached) return *Cached;
+  }
+  if (!ArtSolidMaterial) return nullptr;
+  UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ArtSolidMaterial, this);
+  // sRGB bytes of the data survive the back buffer (memory trap 9).
+  Mid->SetVectorParameterValue(TEXT("Tint"), FLinearColor(Style.Color));
+  ArtZoneTints.Add(Style.Key, Mid);
+  return Mid;
+}
+
+void AS08BoardActor::ClearArtSurface() {
+  for (UStaticMeshComponent* Part : ArtSurfaceParts) {
+    if (Part) Part->DestroyComponent();
+  }
+  ArtSurfaceParts.Reset();
+}
+
+void AS08BoardActor::AddArtSurfacePart(UMaterialInterface* Material, const FTransform& Transform) {
+  UStaticMeshComponent* Part = NewObject<UStaticMeshComponent>(this);
+  Part->SetupAttachment(RootComponent);
+  Part->SetStaticMesh(BlockerTiles->GetStaticMesh());
+  Part->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  Part->SetRelativeTransform(Transform);
+  if (Material) Part->SetMaterial(0, Material);
+  Part->RegisterComponent();
+  ArtSurfaceParts.Add(Part);
+}
+
+void AS08BoardActor::ClearArtLights() {
+  for (AActor* Light : ArtLights) {
+    if (Light) Light->Destroy();
+  }
+  ArtLights.Reset();
+  ActiveLightProfileId.Reset();
+}
+
+void AS08BoardActor::ApplyArtLights(const FS08LightProfile& Light, bool bLegacyCobbleTrace) {
+  if (ActiveLightProfileId == Light.Id && !ArtLights.IsEmpty()) return;
+  ClearArtLights();
+  // S08Arena has no scene lights, so a PBR board would be black. Profile data:
+  // 1 directional with shadow + <= 6 point lights without shadow (budget
+  // validated on load). Measured probe candidates, not lighting norms.
+  const TArray<FS08PlacedLight> Placed = S08PlaceLights(Light, BoardModel);
+  bool bOk = true;
+  float Key = 0.0f, Fill = 0.0f, Warm = 0.0f;
+  int32 Points = 0, PointShadows = 0;
+  for (const FS08PlacedLight& P : Placed) {
+    if (P.Spec.bDirectional) {
+      ADirectionalLight* Dir = GetWorld()->SpawnActor<ADirectionalLight>(P.Position, P.Spec.Rotation);
+      if (!Dir) {
+        bOk = false;
+        break;
+      }
+      Dir->GetLightComponent()->SetMobility(EComponentMobility::Movable);
+      Dir->GetLightComponent()->SetIntensity(P.Spec.Intensity);
+      Dir->GetLightComponent()->SetCastShadows(P.Spec.bCastShadows);
+      if (P.Spec.bHasColor) Dir->GetLightComponent()->SetLightColor(P.Spec.Color);
+      ArtLights.Add(Dir);
+      Key = P.Spec.Intensity;
+    } else {
+      APointLight* Point = GetWorld()->SpawnActor<APointLight>(P.Position, FRotator::ZeroRotator);
+      if (!Point) {
+        bOk = false;
+        break;
+      }
+      UPointLightComponent* Component = CastChecked<UPointLightComponent>(Point->GetLightComponent());
+      Component->SetMobility(EComponentMobility::Movable);
+      Component->SetIntensity(P.Spec.Intensity);
+      Component->SetAttenuationRadius(P.Spec.RadiusUU);
+      Component->SetCastShadows(P.Spec.bCastShadows);
+      if (P.Spec.bHasColor) Component->SetLightColor(P.Spec.Color);
+      ArtLights.Add(Point);
+      ++Points;
+      PointShadows += P.Spec.bCastShadows ? 1 : 0;
+      if (P.Spec.Name == TEXT("fill")) Fill = P.Spec.Intensity;
+      if (P.Spec.Name == TEXT("warm")) Warm = P.Spec.Intensity;
+    }
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW light profile=%s name=%s role=%s kind=%s at=(%.0f,%.0f,%.0f) intensity=%g radius=%g color=(%.2f,%.2f,%.2f) shadow=%d"),
+        *Light.Id, *P.Spec.Name, *P.Spec.Role, P.Spec.bDirectional ? TEXT("directional") : TEXT("point"),
+        P.Position.X, P.Position.Y, P.Position.Z, P.Spec.Intensity, P.Spec.RadiusUU,
+        P.Spec.Color.R, P.Spec.Color.G, P.Spec.Color.B, P.Spec.bCastShadows ? 1 : 0));
+  }
+  if (!bOk) {
+    ClearArtLights();
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW lights profile=%s failed"), *Light.Id));
+    if (bLegacyCobbleTrace) FS08Trace::Write(TEXT("ARTPREVIEW Cobble probe lights failed"));
+    return;
+  }
+  ActiveLightProfileId = Light.Id;
+  FString Budget;
+  const bool bBudget = Light.BudgetOk(Budget);
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW lights applied profile=%s directional=%d shadow=%d points=%d pointShadows=%d budgetOk=%d"),
+      *Light.Id, Light.bHasDirectional ? 1 : 0, Light.Directional.bCastShadows ? 1 : 0, Points, PointShadows,
+      bBudget ? 1 : 0));
+  if (bLegacyCobbleTrace) {
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW Cobble probe lights key=%g fill=%g warm=%g"), Key, Fill, Warm));
+  }
+}
+
+void AS08BoardActor::ApplySurfaceMaterials() {
+  // The instanced tiles keep their grey materials in every mode; on an art
+  // board they are hidden click surfaces (the art surface draws instead) and
+  // the dark underlay stays visible on 'tiles' (grooves + non-space voids).
+  if (GreyTileMaterial) NormalTiles->SetMaterial(0, GreyTileMaterial);
+  if (GreyBlockerMaterial) BlockerTiles->SetMaterial(0, GreyBlockerMaterial);
+  UMaterialInterface* Underlay = bArtTiles && ArtVoidMaterial ? ArtVoidMaterial.Get() : GreyUnderlayMaterial.Get();
+  if (Underlay) UnderlayTiles->SetMaterial(0, Underlay);
+}
+
 bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
   if (Board.Width <= 0 || Board.Height <= 0) return false;
   if (BoardModel.Width == Board.Width && BoardModel.Height == Board.Height &&
-      BoardModel.Cells.Num() == Board.Cells.Num()) {
+      BoardModel.Cells.Num() == Board.Cells.Num() && BuiltForBoardId == RoomBoardId) {
     bool bSameTypes = true;
     for (int32 i = 0; i < BoardModel.Cells.Num(); ++i) {
       if (BoardModel.Cells[i].Type != Board.Cells[i].Type ||
@@ -305,59 +486,69 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
     if (bSameTypes) return true; // geometry unchanged: tiles stay as-is
   }
   BoardModel = Board;
-  bArtActive = bArtAssetsReady && SupportsCobbleArt(Board);
-  if (!bArtActive) {
-    for (AActor* Light : ArtLights) {
-      if (Light) Light->Destroy();
-    }
-    ArtLights.Reset();
-  } else if (ArtLights.IsEmpty()) {
-    // ART-005 editor probe lighting, reproduced only for this opt-in Cobble
-    // review. S08Arena has no scene lights, so the PBR board would be black.
-    // These measured candidates are not lighting settings for other maps.
-    ADirectionalLight* Key = GetWorld()->SpawnActor<ADirectionalLight>(
-        FVector(-350, -150, 600), FRotator(0, -55, 30));
-    APointLight* Ambient = GetWorld()->SpawnActor<APointLight>(
-        FVector(0, -100, 550), FRotator::ZeroRotator);
-    APointLight* Warm = GetWorld()->SpawnActor<APointLight>(
-        FVector(260, -300, 250), FRotator::ZeroRotator);
-    if (Key && Ambient && Warm) {
-      Key->GetLightComponent()->SetMobility(EComponentMobility::Movable);
-      Key->GetLightComponent()->SetIntensity(4.5f);
-      auto ConfigureFill = [](APointLight* Light, float Intensity, float Radius) {
-        UPointLightComponent* Component = CastChecked<UPointLightComponent>(Light->GetLightComponent());
-        Component->SetMobility(EComponentMobility::Movable);
-        Component->SetIntensity(Intensity);
-        Component->SetAttenuationRadius(Radius);
-        Component->SetCastShadows(false);
-      };
-      ConfigureFill(Ambient, 700.0f, 1800.0f);
-      ConfigureFill(Warm, 85.0f, 450.0f);
-      ArtLights.Add(Key);
-      ArtLights.Add(Ambient);
-      ArtLights.Add(Warm);
-      FS08Trace::Write(TEXT("ARTPREVIEW Cobble probe lights key=4.5 fill=700 warm=85"));
+  BuiltForBoardId = RoomBoardId;
+  const FS08BoardSummary Summary = S08SummarizeBoard(Board);
+
+  // T3.2 profile selection: board row id, else W x H + exact zone-key set.
+  bArtActive = false;
+  bArtTiles = false;
+  ActiveProfile = FS08BoardArtProfile();
+  if (bArtAssetsReady) {
+    ES08ProfileMatch Match = ES08ProfileMatch::None;
+    const FS08BoardArtProfile* Profile = ArtData.Select(Board, RoomBoardId, Match);
+    if (!Profile) {
+      FS08Trace::Write(FString::Printf(
+          TEXT("ARTPREVIEW board profile=none match=none board=%dx%d boardId=%s zoneKeys=%s; keeping grey board"),
+          Board.Width, Board.Height, RoomBoardId.IsEmpty() ? TEXT("-") : *RoomBoardId,
+          *FString::Join(Summary.ZoneKeys, TEXT("+"))));
     } else {
-      if (Key) Key->Destroy();
-      if (Ambient) Ambient->Destroy();
-      if (Warm) Warm->Destroy();
-      FS08Trace::Write(TEXT("ARTPREVIEW Cobble probe lights failed"));
+      ES08BoardSurface Surface = Profile->Surface;
+      if (Surface == ES08BoardSurface::Cobble5x6Mesh &&
+          (!bCobbleMeshReady || Board.Width != 5 || Board.Height != 6)) {
+        FS08Trace::Write(FString::Printf(
+            TEXT("ARTPREVIEW board surface cobble-5x6-mesh unavailable (mesh=%d board=%dx%d); using tiles"),
+            bCobbleMeshReady ? 1 : 0, Board.Width, Board.Height));
+        Surface = ES08BoardSurface::Tiles;
+      }
+      if (Surface == ES08BoardSurface::Tiles && !bTileArtReady) {
+        FS08Trace::Write(TEXT("ARTPREVIEW board surface tiles unavailable (probe materials missing); keeping grey board"));
+      } else {
+        ActiveProfile = *Profile;
+        ActiveProfile.Surface = Surface;
+        bArtActive = true;
+        bArtTiles = Surface == ES08BoardSurface::Tiles;
+        FS08Trace::Write(FString::Printf(
+            TEXT("ARTPREVIEW board profile=%s match=%s board=%dx%d boardId=%s surface=%s light=%s artFixture=%d"),
+            *ActiveProfile.Id, S08ProfileMatchName(Match), Board.Width, Board.Height,
+            RoomBoardId.IsEmpty() ? TEXT("-") : *RoomBoardId, S08BoardSurfaceName(Surface),
+            *ActiveProfile.LightId, ActiveProfile.bArtFixture ? 1 : 0));
+      }
     }
   }
+  if (!bArtActive) {
+    ClearArtLights();
+  } else if (const FS08LightProfile* Light = ArtData.LightFor(ActiveProfile)) {
+    ApplyArtLights(*Light, ActiveProfile.bLegacyCobbleTrace);
+  }
+  const bool bCobbleMesh = bArtActive && !bArtTiles;
   NormalTiles->ClearInstances();
   BlockerTiles->ClearInstances();
   UnderlayTiles->ClearInstances();
   ArtCorners->ClearInstances();
-  ArtBlueZones->ClearInstances();
-  ArtRedZones->ClearInstances();
+  ClearArtSurface();
   ArtZoneGlyphs->ClearInstances();
+  for (TPair<FString, TObjectPtr<UInstancedStaticMeshComponent>>& Stroke : ArtZoneStrokes) {
+    if (Stroke.Value) {
+      Stroke.Value->ClearInstances();
+      Stroke.Value->SetVisibility(bArtActive);
+    }
+  }
+  ApplySurfaceMaterials();
   NormalTiles->SetVisibility(!bArtActive);
   BlockerTiles->SetVisibility(!bArtActive);
-  UnderlayTiles->SetVisibility(!bArtActive);
-  ArtBoard->SetVisibility(bArtActive);
+  UnderlayTiles->SetVisibility(!bCobbleMesh);
+  ArtBoard->SetVisibility(bCobbleMesh);
   ArtCorners->SetVisibility(bArtActive);
-  ArtBlueZones->SetVisibility(bArtActive);
-  ArtRedZones->SetVisibility(bArtActive);
   ArtZoneGlyphs->SetVisibility(bArtActive);
   // Full-board dark slab: top at z=-0.5 (just under the tile tops at z=0)
   // so grooves and the outer frame read dark; spans exactly the INT-019
@@ -368,8 +559,6 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
       FRotator::ZeroRotator, FVector(0.0f, 0.0f, -0.5f - SlabHalfZ),
       FVector(static_cast<float>(Board.Width),
               static_cast<float>(Board.Height), 0.02f)));
-  int32 BlueZoneCells = 0;
-  int32 RedZoneCells = 0;
   for (int32 Y = 0; Y < Board.Height; ++Y) {
     for (int32 X = 0; X < Board.Width; ++X) {
       const FS08Cell* Cell = Board.CellAt(X, Y);
@@ -384,56 +573,96 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
                                    : FVector(TileVisualScaleXY,
                                              TileVisualScaleXY, 0.1f));
       Target->AddInstanceWorldSpace(Instance);
-      if (bArtActive) {
-        const bool bBlue = Cell->Zones[0] == TEXT("blue");
-        // The continuous blue edge and three separated red strokes remain
-        // different when hue is lost. Counts below refer to board cells, not
-        // to the number of decorative mesh instances.
-        if (bBlue) {
-          ++BlueZoneCells;
-          ArtBlueZones->AddInstance(FTransform(
-              FRotator::ZeroRotator, World + FVector(0, 46, 0.28f),
-              FVector(0.96f, 0.04f, 0.004f)), true);
-        } else {
-          ++RedZoneCells;
-          for (const float Offset : {-32.0f, 0.0f, 32.0f}) {
-            ArtRedZones->AddInstance(FTransform(
-                FRotator::ZeroRotator, World + FVector(Offset, 46, 0.28f),
-                FVector(0.28f, 0.045f, 0.004f)), true);
-          }
-        }
-        const FVector GlyphAt = World + FVector(-32, 32, 0.28f);
-        if (bBlue) {
-          ArtZoneGlyphs->AddInstance(FTransform(
-              FRotator(0, 45, 0), GlyphAt, FVector(0.18f, 0.18f, 0.004f)), true);
-        } else {
-          for (const float Offset : {-6.0f, 6.0f}) {
-            ArtZoneGlyphs->AddInstance(FTransform(
-                FRotator::ZeroRotator, GlyphAt + FVector(Offset, 0, 0),
-                FVector(0.05f, 0.20f, 0.004f)), true);
-          }
-        }
+      if (bArtTiles && !bBlocker) {
+        // Lit stone slab with a narrow dark groove; a non-space (obstacle)
+        // cell gets no slab and reads as a dark void of the underlay.
+        AddArtSurfacePart(ArtStoneTileMaterial,
+                          FTransform(FRotator::ZeroRotator, World - FVector(0, 0, 5.0f),
+                                     FVector(ArtTileScaleXY, ArtTileScaleXY, 0.1f)));
       }
     }
   }
   if (bArtActive) {
+    // Zone strokes/glyphs from the data: every zone of every cell, multizone
+    // cells on separate sides/slots (03 section 4.5: composite outline + glyphs).
+    const FS08ZoneMarkLayout Marks = S08BuildZoneMarks(Board, ArtData);
+    for (const FString& Key : Summary.ZoneKeys) {
+      const FS08ZoneStyle Style = ArtData.StyleFor(Key);
+      if (UInstancedStaticMeshComponent* Component = ZoneStrokeComponent(Style)) {
+        bool bAuthored = false, bIsm = false;
+        Component->SetMaterial(0, ZoneMaterialFor(Style, bAuthored, bIsm));
+        Component->SetVisibility(true);
+      }
+    }
+    for (const FS08ZoneMarkPiece& Piece : Marks.Strokes) {
+      if (UInstancedStaticMeshComponent* Component = ZoneStrokeComponent(ArtData.StyleFor(Piece.Key))) {
+        Component->AddInstance(Piece.Transform, true);
+      }
+    }
+    // Glyphs in the zone colour (default) or the ART-005 review material.
+    for (const FS08ZoneMarkPiece& Piece : Marks.Glyphs) {
+      UInstancedStaticMeshComponent* Target = ActiveProfile.bZoneColorGlyphs
+          ? ZoneStrokeComponent(ArtData.StyleFor(Piece.Key)) : ArtZoneGlyphs.Get();
+      if (Target) Target->AddInstance(Piece.Transform, true);
+    }
+    const float HalfX = Board.Width * FS08BoardModel::CellSizeUU * 0.5f;
+    const float HalfY = Board.Height * FS08BoardModel::CellSizeUU * 0.5f;
     for (const TPair<FVector, float>& Corner : {
-             TPair<FVector, float>(FVector(250, 300, 0), 180),
-             TPair<FVector, float>(FVector(-250, 300, 0), -90),
-             TPair<FVector, float>(FVector(-250, -300, 0), 0),
-             TPair<FVector, float>(FVector(250, -300, 0), 90)}) {
+             TPair<FVector, float>(FVector(HalfX, HalfY, 0), 180),
+             TPair<FVector, float>(FVector(-HalfX, HalfY, 0), -90),
+             TPair<FVector, float>(FVector(-HalfX, -HalfY, 0), 0),
+             TPair<FVector, float>(FVector(HalfX, -HalfY, 0), 90)}) {
       ArtCorners->AddInstance(FTransform(
           FRotator(0, Corner.Value, 0), Corner.Key, FVector::OneVector), true);
     }
-    const int32 ZoneCells = BlueZoneCells + RedZoneCells;
-    UE_LOG(LogTemp, Display,
-           TEXT("ARTPREVIEW Cobble active 5x6 zones=%d blue=%d red=%d blueMarks=%d redMarks=%d"),
-           ZoneCells, BlueZoneCells, RedZoneCells,
-           ArtBlueZones->GetInstanceCount(), ArtRedZones->GetInstanceCount());
+    if (bArtTiles) {
+      const float Half = ArtFrameUU * 0.5f;
+      const float SpanX = (Board.Width * FS08BoardModel::CellSizeUU + 2.0f * ArtFrameUU) / 100.0f;
+      const float SpanY = Board.Height * FS08BoardModel::CellSizeUU / 100.0f;
+      const float T = ArtFrameUU / 100.0f;
+      for (const FTransform& Bar : {
+               FTransform(FRotator::ZeroRotator, FVector(0, HalfY + Half, -3.0f), FVector(SpanX, T, 0.14f)),
+               FTransform(FRotator::ZeroRotator, FVector(0, -HalfY - Half, -3.0f), FVector(SpanX, T, 0.14f)),
+               FTransform(FRotator::ZeroRotator, FVector(-HalfX - Half, 0, -3.0f), FVector(T, SpanY, 0.14f)),
+               FTransform(FRotator::ZeroRotator, FVector(HalfX + Half, 0, -3.0f), FVector(T, SpanY, 0.14f))}) {
+        AddArtSurfacePart(ArtWoodMaterial, Bar);
+      }
+    }
+    const FString Mismatch = S08ExpectMismatch(ActiveProfile, Summary);
+    if (ActiveProfile.bLegacyCobbleTrace) {
+      // ART-005 evidence line kept byte-compatible for the existing demo gates.
+      const FString Legacy = FString::Printf(
+          TEXT("ARTPREVIEW Cobble active %dx%d zones=%d blue=%d red=%d blueMarks=%d redMarks=%d"),
+          Board.Width, Board.Height, Summary.ZoneCells, Marks.CellsByKey.FindRef(TEXT("blue")),
+          Marks.CellsByKey.FindRef(TEXT("red")), Marks.StrokePiecesByKey.FindRef(TEXT("blue")),
+          Marks.StrokePiecesByKey.FindRef(TEXT("red")));
+      UE_LOG(LogTemp, Display, TEXT("%s"), *Legacy);
+      FS08Trace::Write(Legacy);
+    }
     FS08Trace::Write(FString::Printf(
-        TEXT("ARTPREVIEW Cobble active 5x6 zones=%d blue=%d red=%d blueMarks=%d redMarks=%d"),
-        ZoneCells, BlueZoneCells, RedZoneCells,
-        ArtBlueZones->GetInstanceCount(), ArtRedZones->GetInstanceCount()));
+        TEXT("ARTPREVIEW board active profile=%s %dx%d surface=%s cells=%d zoneCells=%d multizone=%d triple=%d obstacles=%d zoneKeys=%d strokes=%d glyphs=%d surfaceParts=%d glyphMaterial=%s expectOk=%d%s"),
+        *ActiveProfile.Id, Board.Width, Board.Height, S08BoardSurfaceName(ActiveProfile.Surface), Summary.Cells,
+        Summary.ZoneCells, Summary.MultizoneCells, Summary.TripleZoneCells, Summary.Obstacles,
+        Summary.ZoneKeys.Num(), Marks.Strokes.Num(), Marks.Glyphs.Num(), ArtSurfaceParts.Num(),
+        ActiveProfile.bZoneColorGlyphs ? TEXT("zone") : TEXT("review"), Mismatch.IsEmpty() ? 1 : 0,
+        Mismatch.IsEmpty() ? TEXT("") : *(TEXT(" mismatch=") + Mismatch)));
+    for (const FString& Key : Summary.ZoneKeys) {
+      const FS08ZoneStyle Style = ArtData.StyleFor(Key);
+      bool bAuthored = false, bIsm = false;
+      ZoneMaterialFor(Style, bAuthored, bIsm);
+      FS08Trace::Write(FString::Printf(
+          TEXT("ARTPREVIEW board zone key=%s cells=%d stroke=%s glyph=%s %s=%s ismUsage=%d strokePieces=%d glyphPieces=%d fallback=%d"),
+          *Key, Marks.CellsByKey.FindRef(Key), S08ZoneStrokeName(Style.Stroke), S08ZoneGlyphName(Style.Glyph),
+          bAuthored ? TEXT("material") : TEXT("color"),
+          bAuthored ? *FPaths::GetBaseFilename(Style.MaterialPath) : *Style.ColorHex(),
+          bAuthored ? (bIsm ? 1 : 0) : 1, Marks.StrokePiecesByKey.FindRef(Key),
+          Marks.GlyphPiecesByKey.FindRef(Key), Style.bFallback ? 1 : 0));
+    }
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW board multizone cells=%d zonesListed=%d zonesMarked=%d"),
+                                     Marks.MultizoneCells, Marks.MultizoneZonesListed, Marks.MultizoneZonesMarked));
+    for (const FString& Line : Marks.MultizoneLines) {
+      FS08Trace::Write(TEXT("ARTPREVIEW board multizone cell=") + Line);
+    }
   }
   ClearChildren();
   return true;

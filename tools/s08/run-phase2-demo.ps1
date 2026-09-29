@@ -6,8 +6,11 @@ param(
   [ValidateRange(1, 60)][int]$ClientFps = 30,
   [int]$JoinerDropWsAfter = 12,
   [int]$HostManeuverAfter = 25,
-  # Opt-in ART-004/005 review on an explicitly selected 5x6 Cobble board.
-  # The default S08 20x20 regression path remains unchanged.
+  # Opt-in ART-004/005 review on an explicitly selected art board: a Board row
+  # id registered in unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json
+  # (boards[].match.boardIds: the 5x6 Cobble review board or a T3.2 art
+  # fixture). Its W x H, zone counts and light profile come from that data and
+  # gate the traces ('BOARD WxH'). The default S08 20x20 path is unchanged.
   [string]$ArtPreviewBoardId = "",
   # Optional K2 review: zoom toward the selected host hero while the joiner
   # stays at K1. 1.6 is the written proposal; larger values are diagnostic.
@@ -94,7 +97,26 @@ if (($ArtPreviewMedusaVariant -ne 'face-neck-v2' -or $MedusaVariantExplicit) -an
 # string but silently builds an empty 20x20 grid when no Board row has that id,
 # so a content slug such as 'cobble-city' is refused up front.
 if ($ArtPreviewBoardId -and $ArtPreviewBoardId -cnotmatch '^c[a-z0-9]{24}$') {
-  throw "ArtPreviewBoardId '$ArtPreviewBoardId' is not a Board row id (cuid); content slugs such as 'cobble-city' are refused. Use the Board row id of the 5x6 Cobble review board (cmuhgs4b2001mwik4f2b2xtf8)."
+  throw "ArtPreviewBoardId '$ArtPreviewBoardId' is not a Board row id (cuid); content slugs such as 'cobble-city' are refused. Use a Board row id registered in unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json (e.g. the 5x6 Cobble review board cmuhgs4b2001mwik4f2b2xtf8)."
+}
+# T3.2: the art board registry is the client's own data file (one source of
+# truth): the profile that lists this Board row id gives the expected W x H,
+# zone/multizone/obstacle counts and the light profile the traces must show.
+$ArtBoard = $null
+if ($ArtPreviewBoardId) {
+  $ArtBoardsPath = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path 'unreal\Unmatched\Config\ArtBoards\S08ArtBoardProfiles.json'
+  if (-not (Test-Path -LiteralPath $ArtBoardsPath)) { throw "art board registry missing: $ArtBoardsPath" }
+  $ArtBoardsDoc = [System.IO.File]::ReadAllText($ArtBoardsPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+  $ArtBoard = @($ArtBoardsDoc.boards | Where-Object { @($_.match.boardIds) -ccontains $ArtPreviewBoardId }) | Select-Object -First 1
+  if (-not $ArtBoard) {
+    $known = (@($ArtBoardsDoc.boards | ForEach-Object { "$($_.id)=$(@($_.match.boardIds) -join '|')" }) -join ', ')
+    throw "ArtPreviewBoardId '$ArtPreviewBoardId' is not a registered art board ($known); the backend would build an unrelated grid"
+  }
+  $ArtLight = $ArtBoardsDoc.lightProfiles.($ArtBoard.light)
+  if (-not $ArtLight) { throw "art board '$($ArtBoard.id)' names a missing light profile '$($ArtBoard.light)'" }
+  $ArtBoardSize = "$($ArtBoard.match.width)x$($ArtBoard.match.height)"
+  $ArtBoardLegacy = [bool]$ArtBoard.legacyCobbleTrace
+  Write-Output "art board: profile=$($ArtBoard.id) size=$ArtBoardSize light=$($ArtBoard.light) legacyCobble=$ArtBoardLegacy"
 }
 if (($ArtPreviewAllMedusa -or $ArtPreviewInputPlan -or $ArtPreviewIconSize -gt 0 -or $ArtPreviewIconProbe) -and -not $ArtPreviewBoardId) {
   throw 'ArtPreviewAllMedusa / ArtPreviewInputPlan / ArtPreviewIconSize / ArtPreviewIconProbe require ArtPreviewBoardId'
@@ -487,8 +509,9 @@ function Invoke-Phase2Demo {
         if (-not (Test-Path -LiteralPath $pair[1])) {
           throw "$($pair[0]) trace missing: $($pair[1]). The client likely crashed before AS08FlowGameMode::BeginPlay; copy $(Join-Path (Split-Path -Parent $Exe) 'Unmatched\Saved\Logs')\Unmatched*.log before the next package step wipes it"
         }
-        if (-not (Select-String -LiteralPath $pair[1] -SimpleMatch -Pattern 'BOARD 5x6' -Quiet)) {
-          throw "$($pair[0]) trace has no 'BOARD 5x6': ArtPreviewBoardId=$ArtPreviewBoardId is not the 5x6 Cobble review board"
+        if (-not (Select-String -LiteralPath $pair[1] -SimpleMatch -Pattern "BOARD $ArtBoardSize cells" -Quiet)) {
+          $seen = Select-String -LiteralPath $pair[1] -Pattern 'BOARD \d+x\d+ cells' | Select-Object -First 1
+          throw "$($pair[0]) trace has no 'BOARD $ArtBoardSize': ArtPreviewBoardId=$ArtPreviewBoardId is registered as $($ArtBoard.id) $ArtBoardSize, the client built '$(if ($seen) { $seen.Line } else { 'no BOARD line' })'"
         }
       }
     }
@@ -502,20 +525,57 @@ function Invoke-Phase2Demo {
         if (-not $text.Contains($needle)) { throw "$Who trace missing '$needle'" }
       }
     }
-    $expectedBoard = if ($ArtPreviewBoardId) { 'BOARD 5x6' } else { 'BOARD 20x20' }
+    $expectedBoard = if ($ArtPreviewBoardId) { "BOARD $ArtBoardSize cells" } else { 'BOARD 20x20' }
     if ($ArtPreviewBoardId) {
-      Assert-Trace $hostTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
-        'ARTPREVIEW Cobble assets ready', 'ARTPREVIEW Cobble active 5x6 zones=30 blue=15 red=15 blueMarks=15 redMarks=45',
-        'ARTPREVIEW Cobble probe lights key=4.5 fill=700 warm=85',
+      # T3.2 data-driven board art: profile chosen by THIS Board row id, the
+      # decoded board equals the registered expectation (expectOk=1), every
+      # zone of every multizone cell marked, the light profile applied within
+      # budget (1 directional with shadow + <= 6 points without shadow).
+      $exp = $ArtBoard.expect
+      $pointCount = @($ArtLight.points).Count
+      $artLines = @(
+        'ARTPREVIEW board profiles loaded=1',
+        "ARTPREVIEW board profile=$($ArtBoard.id) match=boardId board=$ArtBoardSize boardId=$ArtPreviewBoardId surface=$($ArtBoard.surface) light=$($ArtBoard.light)",
+        "ARTPREVIEW board active profile=$($ArtBoard.id) $ArtBoardSize surface=$($ArtBoard.surface) cells=$($exp.cells) zoneCells=$($exp.zoneCells) multizone=$($exp.multizoneCells) ",
+        "obstacles=$($exp.obstacles) zoneKeys=$(@($ArtBoard.match.zoneKeys).Count) ",
+        "ARTPREVIEW lights applied profile=$($ArtBoard.light) directional=1 shadow=1 points=$pointCount pointShadows=0 budgetOk=1",
+        "ARTPREVIEW board multizone cells=$($exp.multizoneCells) ")
+      if ($ArtBoardLegacy) {
+        # ART-005 Cobble evidence lines stay byte-compatible.
+        $artLines += @('ARTPREVIEW Cobble assets ready', 'ARTPREVIEW Cobble active 5x6 zones=30 blue=15 red=15 blueMarks=15 redMarks=45',
+          'ARTPREVIEW Cobble probe lights key=4.5 fill=700 warm=85')
+      } else {
+        $artLines += @('ARTPREVIEW board assets ready cobbleMesh=', ' tiles=1 ')
+      }
+      Assert-Trace $hostTrace (@('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
         'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1',
         'ARTPREVIEW selection ownHero=1 selected=1 fighter=Medusa',
-        'ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing',
-        'ARTPREVIEW reachable corners cells=13 placed=1') 'host'
-      Assert-Trace $joinTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
+        'ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing') + $artLines) 'host'
+      Assert-Trace $joinTrace (@('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
         'WS DROPPED', 'WS closed', 'WS reconnect attempt', 'WS reconnected',
-        'ARTPREVIEW Cobble assets ready', 'ARTPREVIEW Cobble active 5x6 zones=30 blue=15 red=15 blueMarks=15 redMarks=45',
-        'ARTPREVIEW Cobble probe lights key=4.5 fill=700 warm=85',
-        'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1') 'joiner'
+        'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1') + $artLines) 'joiner'
+      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        $active = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW board active profile=' + [regex]::Escape($ArtBoard.id) + ' .* expectOk=(\d)') | Select-Object -Last 1
+        if (-not $active -or $active.Matches[0].Groups[1].Value -ne '1') {
+          throw "$($pair[0]) board art does not match its registered expectation: $(if ($active) { $active.Line } else { 'no active line' })"
+        }
+        $mz = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW board multizone cells=(\d+) zonesListed=(\d+) zonesMarked=(\d+)' | Select-Object -Last 1
+        if (-not $mz -or $mz.Matches[0].Groups[2].Value -ne $mz.Matches[0].Groups[3].Value) {
+          throw "$($pair[0]) multizone cells lost zones: $(if ($mz) { $mz.Line } else { 'no multizone line' })"
+        }
+        foreach ($key in @($ArtBoard.match.zoneKeys)) {
+          $zoneLine = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW board zone key=' + [regex]::Escape($key) + ' cells=(\d+) .* fallback=0') | Select-Object -Last 1
+          $want = $exp.zoneCellCounts.$key
+          if (-not $zoneLine -or [int]$zoneLine.Matches[0].Groups[1].Value -ne [int]$want) {
+            throw "$($pair[0]) zone '$key' expected $want cells: $(if ($zoneLine) { $zoneLine.Line } else { 'no zone line' })"
+          }
+        }
+      }
+      if ($ArtBoardLegacy) {
+        Assert-Trace $hostTrace @('ARTPREVIEW reachable corners cells=13 placed=1') 'host Cobble reachable'
+      } elseif (-not (Select-String -LiteralPath $hostTrace -Pattern 'ARTPREVIEW reachable corners cells=[1-9]\d* placed=1' -Quiet)) {
+        throw 'host trace has no placed reachable-corner highlights for the selected hero'
+      }
       $requestedLabel = if ($MedusaVariantExplicit) { $ArtPreviewMedusaVariant } else { '(default)' }
       foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
         Assert-Trace $pair[1] @("ARTPREVIEW medusa candidate variant=$ArtPreviewMedusaVariant mesh=$ExpectedMedusaMesh requested=$requestedLabel",
@@ -572,7 +632,7 @@ function Invoke-Phase2Demo {
     }
     if ($ArtPreviewBoardId) {
       [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'),
-        (([ordered]@{ boardId = $ArtPreviewBoardId; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = 30; joinerLiveZones = 30; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe }) | ConvertTo-Json), $Utf8NoBom)
+        (([ordered]@{ boardId = $ArtPreviewBoardId; artBoardProfile = $ArtBoard.id; boardSize = $ArtBoardSize; lightProfile = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture; multizoneCells = $ArtBoard.expect.multizoneCells; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = $ArtBoard.expect.zoneCells; joinerLiveZones = $ArtBoard.expect.zoneCells; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe }) | ConvertTo-Json), $Utf8NoBom)
     }
 
     # ProjectWorldLocationToScreen can return true even for offscreen pixels.
@@ -678,9 +738,9 @@ function Invoke-Phase2Demo {
       stamp   = $Stamp
       verdict = if ($ArtPreviewBoardId) {
         if ($ArtPreviewFocusZoom -gt 0) {
-          'ART PREVIEW K2 PROBE: live 5x6 board + selected host hero projected + joiner six fighters + HUD/board pixel gate; visual K2 review still required'
+          "ART PREVIEW K2 PROBE: live $ArtBoardSize board ($($ArtBoard.id)) + selected host hero projected + joiner six fighters + HUD/board pixel gate; visual K2 review still required"
         } else {
-          'ART PREVIEW: live 5x6 board + 30 zones + six projected fighters + HUD/board pixel gate; visual K1 review still required'
+          "ART PREVIEW: live $ArtBoardSize board ($($ArtBoard.id)) + $($ArtBoard.expect.zoneCells) zone cells / $($ArtBoard.expect.multizoneCells) multizone + light profile $($ArtBoard.light) + six projected fighters + HUD/board pixel gate; visual K1 review still required"
         }
       } else {
         'TRACES OK + SHOTS PRESENT + GRID VERIFIED + SIX FIGHTERS (trace: n=6, all projected in frame)'
@@ -756,7 +816,7 @@ function Invoke-Phase2Demo {
       if ($ArtPreviewFocusZoom -gt 0) {
         Write-Output 'ART PREVIEW K2 PROBE: host selected hero in frame at the requested zoom; joiner K1 has six fighters in frame. Visual art review remains separate.'
       } else {
-        Write-Output 'ART PREVIEW: live 5x6 board and 30 zones, two 1920x1080 HUD shots, six fighter centers in frame; visual art review remains separate.'
+        Write-Output "ART PREVIEW: live $ArtBoardSize board ($($ArtBoard.id)), $($ArtBoard.expect.zoneCells) zone cells, light profile $($ArtBoard.light), two 1920x1080 HUD shots, six fighter centers in frame; visual art review remains separate."
       }
       Write-Output 'NOTE: the pixel gate checks a lit textured board and HUD regions; it does not prove K1 readability or color-blind access.'
     } else {

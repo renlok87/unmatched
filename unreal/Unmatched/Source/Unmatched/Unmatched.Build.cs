@@ -12,5 +12,10 @@ public class Unmatched : ModuleRules {
     // target links them implicitly; the modular UnmatchedEditor target (T2.2
     // automation tests) needs the explicit private dependencies.
     PrivateDependencyModuleNames.AddRange(new string[] { "RHI", "RenderCore" });
+    // ART-005 / stage 3 T3.2: the -ArtPreview board profiles (zone palette and
+    // glyphs per zone key, light profiles, board matches) are data read at
+    // runtime from <Project>/Config/ArtBoards; staged into the pak (UFS) so
+    // the packaged client reads the same file (S08BoardArt.h).
+    RuntimeDependencies.Add("$(ProjectDir)/Config/ArtBoards/S08ArtBoardProfiles.json", StagedFileType.UFS);
   }
 }

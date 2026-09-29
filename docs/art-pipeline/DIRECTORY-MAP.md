@@ -47,6 +47,8 @@
 | `tools/art/*.py`, `*.ps1` (отслеживаемое) | art-chat | импорт/кадры/проверки арт-трека | да |
 | `tools/art/{art004_capture,art004_inspect_component,art004_inspect_pose_api,inspect_medusa_animation_api,inspect_medusa_sockets}.py` | user-untracked | чужие неотслеживаемые скрипты | нет |
 | `/Game/ART004/Medusa/*` | art-chat | Blender-кандидат Medusa | нет, воспроизводится `tools/art/import_medusa_candidate.py` |
+| `unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json` | art-chat | данные арта досок -ArtPreview (T3.2): палитра/штрих/глиф по ключу зоны, профили света (1 directional с тенью + ≤ 6 point), профили досок с ожидаемыми числами; реестр досок и для демо-скриптов; в пак — `RuntimeDependencies` (UFS) | да; `.gitattributes`: `-text` |
+| `backend/prisma/fixtures/art-boards/`, `backend/prisma/seed-art-fixture-boards.ts`, `tools/art/art_board_fixtures.py` | art-chat | арт-фикстуры карт T3.2 («art fixture, не правила»): Sherwood Forest 8×5 и T. Rex Paddock 7×5 из `scraped-data/api/maps.json`, сид только в изолированную БД S09 (:55434), изображения карт — только sha256 | да; фикстуры `-text` (проверка побайтной воспроизводимости) |
 | `/Game/ArtPreview/Medusa/*` | art-chat | визуальный кандидат v2 | **да**, добавлен принудительно |
 | `/Game/ArtTests/{ART003,ART005*,ARTMarkers}/*` | art-chat | редакторные пробы | да, добавлены принудительно |
 | `/Game/ArtTests/{ART004,ART004Face}/*` | art-chat | сцена клипов, пробы лица | нет |
