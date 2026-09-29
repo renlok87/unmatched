@@ -1,6 +1,6 @@
 {
   "schema": "unmatched.h2-bake-profile/1",
-  "profile_id": "medusa-h2-bake/1",
+  "profile_id": "medusa-h2-bake/2",
   "asset_id": "ASSET-MEDUSA-001",
   "status": "предложено",
   "status_note": "Итерация H2 (2026-09-29): игровая модель Medusa из high-poly Tripo 40c4d1cd (по частям, ~1,86M tris) и его 8K/PBR-двойника: ретопология по частям, атлас 4K мастер + 2K рантайм, запекание N/AO/BC/RM, риг UM_HUMANOID_17_v2, UM_FBX_v1. Не художественная приёмка и не бюджет; текущий игровой кандидат v2/v3.1 остаётся до приёмки H2.",
@@ -546,7 +546,27 @@
     },
     "hit_check": {
       "max_miss_share_warn": 0.01
-    }
+    },
+    "ao_exclusions": [
+      {
+        "name": "dress_without_fist",
+        "part": "tripo_part_0",
+        "hide_occluders": [
+          "tripo_part_13"
+        ],
+        "control": true,
+        "note": "H2.1: правый кулак (tripo_part_13) в анимации отходит от пояса; тень кулака, запечённая в покое в AO платья/пояса, в позе оставалась тёмным пятном. AO платья переснимается без кулака (стадия aux), текстуры берут его для tripo_part_0; control — тот же бейк без скрытия (шумовой порог GPU)"
+      },
+      {
+        "name": "fist_without_dress",
+        "part": "tripo_part_13",
+        "hide_occluders": [
+          "tripo_part_0"
+        ],
+        "control": false,
+        "note": "H2.1: обратная сторона того же контакта — тень пояса/платья на ладони кулака, запечённая в покое; в позе arm_r_raise ладонь открыта. В покое ладонь прижата к поясу и не видна"
+      }
+    ]
   },
   "textures": {
     "prefix": "T_Medusa_H2",
@@ -580,7 +600,275 @@
       "blur": 3,
       "note": "предложено: формат маски волны 4 = TeamMask.R (TC_Grayscale); G — предложение для подставки (M_UM_BaseMarker сейчас берёт полосу по нормалям вершин)"
     },
-    "edge_extend_px": 16
+    "edge_extend_px": 16,
+    "materials": {
+      "note": "H2.1 (2026-09-29): золото Tripo (metallic ≈ 0,095, roughness ≈ 0,75) читалось персиковой глиной. Маска металла по данным: оттенок/насыщенность/яркость BC (текселя и локального среднего радиуса local_radius_px внутри части) + принадлежность частям Tripo + 3D-ворота по карте положений стадии aux (диадема и серьги головы, колчан без стрел). Металл: BC -> target_srgb × яркостная деталь BC Tripo, metallic 0,9–1,0, roughness 0,32–0,45; вне маски metallic 0. Ткань: roughness Tripo (≈ 0,97) оставлена — 0,80–0,90 проверено и отклонено (cloth_roughness.note). Статус — предложено, художественно не принято",
+      "ao_exclusions": [
+        "tripo_part_0",
+        "tripo_part_13"
+      ],
+      "rim_filters": [
+        {
+          "contact": "dress_under_fist",
+          "keep_hsv": {
+            "v_max": 0.4,
+            "s_max": 0.34,
+            "ao_min": 0.35
+          },
+          "note": "под кулаком продолжается ткань платья: отсчёты кромки с кожей кулака и золотом кромки пояса (проекция Tripo на линии контакта) выбрасываются; ao_min 0,35 — без складки под нависающим поясом (AO без кулака: медиана отсчётов ткани 0,36, p10 0,03), иначе крышка темнее соседней ткани (0,40 против 0,61)"
+        },
+        {
+          "contact": "fist_palm",
+          "keep_hsv": {
+            "v_min": 0.45,
+            "s_max": 0.34
+          },
+          "note": "ладонь кулака: только отсчёты кожи (на линии контакта Tripo нанёс ткань и золото пояса)"
+        }
+      ],
+      "metal": {
+        "hue_deg": [
+          12,
+          45
+        ],
+        "hue_ramp_deg": 4,
+        "ramp": 0.04,
+        "local_radius_px": 6,
+        "close_px": 2,
+        "blur": 1,
+        "parts": {
+          "tripo_part_0": {
+            "terms": [
+              {
+                "kind": "local",
+                "radius_px": 6,
+                "hue_deg": [
+                  25,
+                  45
+                ],
+                "hue_ramp_deg": 1,
+                "s_min": 0.38,
+                "v_min": 0.45,
+                "name": "belt_buckles"
+              },
+              {
+                "kind": "local",
+                "radius_px": 3,
+                "hue_deg": [
+                  25,
+                  45
+                ],
+                "hue_ramp_deg": 1,
+                "s_min": 0.36,
+                "v_min": 0.42,
+                "s_max": 0.52,
+                "name": "hem_trim"
+              }
+            ],
+            "min_component_px": 60,
+            "note": "пояс, пряжки, броши, кайма подола; кожаный ремень колчана краснее (локальный оттенок ≈ 24° против ≈ 27° у пояса и каймы) и насыщеннее каймы — остаётся кожей"
+          },
+          "tripo_part_1": {
+            "hue_max": 36,
+            "local": {
+              "s_min": 0.4,
+              "v_min": 0.4
+            },
+            "texel": {
+              "s_min": 0.42,
+              "v_min": 0.45
+            },
+            "boxes": [
+              {
+                "name": "diadem_front",
+                "min_m": [
+                  -0.045,
+                  -0.03,
+                  0.472
+                ],
+                "max_m": [
+                  0.035,
+                  0.0,
+                  0.52
+                ]
+              },
+              {
+                "name": "diadem_back",
+                "min_m": [
+                  -0.045,
+                  0.0,
+                  0.456
+                ],
+                "max_m": [
+                  0.035,
+                  0.024,
+                  0.52
+                ]
+              },
+              {
+                "name": "earring_r",
+                "min_m": [
+                  -0.029,
+                  0.002,
+                  0.437
+                ],
+                "max_m": [
+                  -0.017,
+                  0.017,
+                  0.458
+                ]
+              },
+              {
+                "name": "earring_l",
+                "min_m": [
+                  0.006,
+                  0.003,
+                  0.437
+                ],
+                "max_m": [
+                  0.017,
+                  0.016,
+                  0.457
+                ]
+              }
+            ],
+            "note": "только диадема и серьги (кластеры замерены по карте положений); змеи, глаза и губы — не металл"
+          },
+          "tripo_part_3": {
+            "local": {
+              "s_min": 0.38,
+              "v_min": 0.45
+            },
+            "texel": {
+              "s_min": 0.4,
+              "v_min": 0.45
+            },
+            "note": "лук: золотая рама, змеи-накладки, кольца и головы-наконечники; тёмные филёнки (дерево) и обмотка рукояти (кожа) — не металл, как в концепте"
+          },
+          "tripo_part_4": {
+            "local": {
+              "s_min": 0.33,
+              "v_min": 0.25
+            },
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_5": {
+            "local": {
+              "s_min": 0.33,
+              "v_min": 0.25
+            },
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_8": {
+            "local": {
+              "s_min": 0.33,
+              "v_min": 0.25
+            },
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_11": {
+            "local": {
+              "s_min": 0.33,
+              "v_min": 0.25
+            },
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_10": {
+            "local": {
+              "s_min": 0.38,
+              "v_min": 0.45
+            },
+            "half_spaces": [
+              {
+                "name": "below_arrows",
+                "point_m": [
+                  -0.0509,
+                  0.0546,
+                  0.4109
+                ],
+                "normal": [
+                  0.413,
+                  -0.196,
+                  -0.89
+                ],
+                "min_m": -0.021
+              }
+            ],
+            "note": "колчан: только золотые обоймы; кожа тела и стрелы (оперение) — не металл; ось колчана — PCA положений части"
+          },
+          "tripo_part_14": {
+            "local": {
+              "s_min": 0.33,
+              "v_min": 0.25
+            },
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_15": {
+            "local": {
+              "s_min": 0.33,
+              "v_min": 0.25
+            },
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          },
+          "tripo_part_16": {
+            "local": {
+              "s_min": 0.33,
+              "v_min": 0.25
+            },
+            "texel_floor": {
+              "v_min": 0.12
+            }
+          }
+        },
+        "parts_note": "поножи, наручи и сандалии — металл целиком (в BC Tripo ремни сандалий того же золота, задание H2.1 относит «поножи-сандалии» к золоту); кожа (s < 0,33) и чёрные подошвы/щели (v < 0,12) исключены",
+        "basecolor": {
+          "target_srgb": "#E7AC6A",
+          "detail_gamma": 1.0,
+          "detail_clip": [
+            0.25,
+            1.4
+          ],
+          "note": "цветность = золото концепта (линейное соотношение R:G:B ≈ 1 : 0,52 : 0,18 — между средними тонами 1 : 0,51 : 0,18 и бликами 1 : 0,58 : 0,19 концепта), яркость R 0,80 linear — в диапазоне металла; деталь = яркость BC Tripo / медиана по маске (ограничение 0,25–1,4): кромки и рельеф светлее, впадины темнее, как в концепте"
+        },
+        "metallic": {
+          "min": 0.9,
+          "max": 1.0
+        },
+        "roughness": {
+          "min": 0.32,
+          "max": 0.45,
+          "detail_weight": 0.6,
+          "note": "0,32 на выпуклом светлом металле, 0,45 во впадинах; 60 % — яркостная деталь BC, 40 % — ранг roughness Tripo внутри маски"
+        }
+      },
+      "cloth_roughness": {
+        "apply": false,
+        "lo": 0.8,
+        "hi": 0.9,
+        "note": "проверено и НЕ применено: roughness ткани 0,80–0,90 (предложение задачи H2.1) в студийном кадре делает платье светлее и серее (медиана v 0,286 → 0,298, s 0,181 → 0,169; 0,70 → 0,310 / 0,160; то же сбоку, сзади и в K2). Причина серости — белый спекуляр F0 0,04 при альбедо ткани 3–4 %: диагностика Specular 0,25 → v 0,263, s 0,211. Roughness ткани остаётся от Tripo (≈ 0,97)"
+      },
+      "checks": {
+        "metal_core_metallic_min": 0.89,
+        "metal_core_roughness": [
+          0.3,
+          0.46
+        ],
+        "non_metal_metallic_max_8bit": 1,
+        "metal_core_bc_linear_max_channel_p50_min": 0.5
+      }
+    }
   },
   "rig": {
     "skeleton": "UM_HUMANOID_17_v2",
@@ -1483,7 +1771,67 @@
         "ortho_m": 0.08
       }
     ],
-    "backface_culling": true
+    "backface_culling": true,
+    "baseline": {
+      "textures_dir": "work/h2-baseline/textures",
+      "prefix": "T_Medusa_H2",
+      "label": "H2 (до H2.1)",
+      "sha256": {
+        "BC": "90ae70b5b468face319ff7a006560b4dc32c104b9f7004836d1a6c2627091da1",
+        "N_OpenGL": "a00b08c404b0a4b30b145dc25784b66156d037b85ea0c4d2c32fd07a614b0e5e",
+        "ORM": "36817003257d6a0494093832606f468d9848bcf6930865dd258d93dd5abcefd5"
+      },
+      "note": "локальная копия 4K-текстур H2 до прохода материалов (sha256 = reports/textures-report.json коммита 9a2a5184); стадия preview отказывает при несовпадении. Копия: work/h2-baseline/textures (в git не идёт)"
+    },
+    "pose_closeups": [
+      {
+        "name": "fist_front",
+        "pose": "arm_r_raise",
+        "target_m": [
+          -0.03,
+          -0.02,
+          0.33
+        ],
+        "dir": [
+          -0.4,
+          -1,
+          0.15
+        ],
+        "ortho_m": 0.13
+      },
+      {
+        "name": "fist_q34",
+        "pose": "arm_r_raise",
+        "target_m": [
+          -0.03,
+          -0.02,
+          0.33
+        ],
+        "dir": [
+          -1,
+          -0.8,
+          0.2
+        ],
+        "ortho_m": 0.13
+      }
+    ],
+    "channel_views": [
+      {
+        "name": "metallic",
+        "channel": "Blue",
+        "view": "front"
+      },
+      {
+        "name": "metallic",
+        "channel": "Blue",
+        "view": "back"
+      },
+      {
+        "name": "roughness",
+        "channel": "Green",
+        "view": "front"
+      }
+    ]
   },
   "proposed_budget": {
     "status": "предложено",
@@ -1504,6 +1852,7 @@
     "previous_profiles": [
       "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal-um-fbx-v1-um-master.json"
     ],
-    "note": "H2 — отдельная схема (unmatched.h2-bake-profile/1) и отдельный модуль tools/tripo-pipeline/blender/h2_bake; CLI tripo_pipeline.py её пока не читает (интеграция — followup)"
+    "note": "H2 — отдельная схема (unmatched.h2-bake-profile/1) и отдельный модуль tools/tripo-pipeline/blender/h2_bake; CLI tripo_pipeline.py её пока не читает (интеграция — followup)",
+    "h21": "2026-09-29, H2.1 (модуль h2-bake/0.3.0): bake.ao_exclusions + стадия aux (карта положений, AO без кулака/без платья для пары кулак↔пояс), textures.materials (маска металла, перенастройка BC/ORM, фильтры кромки крышек контакта), preview.baseline/pose_closeups/channel_views (кадры H2 | H2.1). Профиль medusa-h2-bake/1 (H2) — в истории git, коммит 9a2a5184"
   }
 }

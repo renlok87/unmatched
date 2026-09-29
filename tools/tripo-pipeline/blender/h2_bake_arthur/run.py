@@ -2,7 +2,8 @@
 """Driver of the King Arthur H2 bake (system python; Blender stages run headless, one process at a time).
 
     python tools/tripo-pipeline/blender/h2_bake_arthur/run.py --profile <profile.json> --run-dir <dir>
-        [--stages inspect,lowpoly,uvcheck,bake,textures,rig,probe,review,sheets,manifest] [--from STAGE]
+        [--stages inspect,lowpoly,uvcheck,bake,textures,rig,probe,review,sheets,compare,sheets_h21,manifest]
+        [--from STAGE]
 
 Every stage writes logs/<stage>.log; a Blender stage counts as done only if its log has the H2_BAKE_STAGE_OK marker
 (Blender exits 0 even when the script raised). No paid service is called; the Tripo GLBs are only read.
@@ -19,10 +20,11 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import pure as P  # noqa: E402
 
-ORDER = ["inspect", "lowpoly", "uvcheck", "bake", "textures", "rig", "probe", "review", "sheets", "manifest"]
+ORDER = ["inspect", "lowpoly", "uvcheck", "bake", "textures", "rig", "probe", "review", "sheets", "compare", "sheets_h21",
+         "manifest"]
 BLENDER_STAGES = {"inspect": "stage_inspect.py", "lowpoly": "stage_lowpoly.py", "bake": "stage_bake.py",
                   "rig": "stage_rig.py", "review": "stage_review.py"}
-PY_STAGES = {"uvcheck": "uvcheck.py", "textures": "textures.py", "sheets": "sheets.py"}
+PY_STAGES = {"uvcheck": "uvcheck.py", "textures": "textures.py", "sheets": "sheets.py", "sheets_h21": "sheets_h21.py"}
 ANIM = P.REPO / "tools" / "tripo-pipeline" / "anim"
 FBX_TO_BLEND = P.REPO / "art" / "pipeline-candidates" / "ASSET-KING-ARTHUR-001" / "scripts" / "fbx_to_authored_blend.py"
 NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
@@ -80,6 +82,37 @@ def stage_probe(profile, paths, logs):
     return out
 
 
+def stage_compare(profile, paths, logs):
+    """H2.1 before/after frames (stage_compare.py): the H2 runtime textures of the baseline commit (git show, sha256
+    checked against review_h21.baseline) and the current runtime textures on the same mesh, light and cameras; the
+    H2 review light for a few views; the material class raster flat on the mesh. Raw PNG -> work/h21_png/."""
+    rc = profile["review_h21"]
+    base = rc["baseline"]
+    prefix = profile["textures"]["prefix"]
+    bdir = paths["work"] / "h2-baseline-runtime-2k"
+    bdir.mkdir(parents=True, exist_ok=True)
+    for key, sha in base["runtime_2k_sha256"].items():
+        f = bdir / ("%s_%s.png" % (prefix, key))
+        if not f.exists() or P.sha256(f) != sha:
+            src = "%s:%s" % (base["commit"], P.rel(paths["textures"] / "runtime_2k" / f.name))
+            f.write_bytes(subprocess.run(["git", "-C", str(P.REPO), "show", src], capture_output=True, check=True,
+                                         creationflags=NO_WINDOW).stdout)
+        if P.sha256(f) != sha:
+            raise SystemExit("baseline texture %s: sha256 %s, expected %s" % (f, P.sha256(f), sha))
+    out = paths["work"] / "h21_png"
+    cur = paths["textures"] / "runtime_2k"
+    script = HERE / "stage_compare.py"
+    sets = ["--set", "h2=%s" % bdir, "--set", "h21=%s" % cur]
+    t = {"studio_env": run(blender(script, profile["_path"], paths["run"], out / "studio_env", *sets, "--light", "studio_env"),
+                           logs / "compare-studio_env.log", P.STAGE_MARKER),
+         "studio": run(blender(script, profile["_path"], paths["run"], out / "studio", *sets, "--light", "studio",
+                               "--views", ",".join(rc["studio_views"])), logs / "compare-studio.log", P.STAGE_MARKER),
+         "classes": run(blender(script, profile["_path"], paths["run"], out / "classes", "--set", "classes=%s" % cur,
+                                "--debug-bc", paths["work"] / "materials-classes-2k.png", "--views",
+                                ",".join(rc["classes_views"])), logs / "compare-classes.log", P.STAGE_MARKER)}
+    return t
+
+
 def stage_manifest(profile, paths):
     files = []
     for sub in ("export", "textures", "reports", "preview"):
@@ -119,6 +152,8 @@ def main():
                              P.STAGE_MARKER)
         elif st == "probe":
             timing[st] = stage_probe(profile, paths, paths["logs"])
+        elif st == "compare":
+            timing[st] = stage_compare(profile, paths, paths["logs"])
         elif st == "manifest":
             stage_manifest(profile, paths)
         print("stage", st, timing.get(st), flush=True)

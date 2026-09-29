@@ -272,4 +272,5 @@ def main():
     print("H2_STAGE_OK preview")
 
 
-main()
+if __name__ == "__main__":  # stage_compare.py imports the helpers above
+    main()

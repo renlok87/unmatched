@@ -12,11 +12,13 @@ Stages (profile: art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-
   retopo   (Blender)  weld, per-part sequential collapse decimation, caps/bridge, beautify, deviation
                        high<->low per part                                      -> work/h2-retopo.blend
   uv       (Blender)  Smart UV per part, uniform density x td_priority, one 4K pack; UV triangles for checks
-                                                                                -> work/h2-uv.blend, work/uv/*.npz
+                       (+ corner positions per triangle, H2.1)             -> work/h2-uv.blend, work/uv/*.npz
   bake     (Blender)  Cycles selected-to-active per part: normal (OpenGL tangent), AO, base colour,
                        roughness, metallic (emission rewire of the Tripo PBR)   -> work/bake/*.npy
   maps     (python)   gutter fill, N (DirectX), ORM, BC, TeamMask (L) + TeamMaskRGBA, 4K + 2K,
-                       padding / texel-density / miss checks                    -> textures/*.png
+                       padding / texel-density / miss checks; H2.1 material classes (embroidery, leather belt,
+                       metal buckle, crystal, wood; metallic 0 elsewhere)       -> textures/*.png,
+                       reports/textures-report.json, preview/h21_material_classes_1K.png
   rig      (Blender)  final frame, base normalisation, UM_HUMANOID_17_v2 armature, weights with seam sync,
                        sockets, UM_FBX_v1 export (SK + base) from a factory session (no host path in the
                        FBX), FBX readback checks                               -> export/*.fbx
@@ -24,6 +26,9 @@ Stages (profile: art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-
                        the FBX (fbx_to_authored_blend); PNG render stamps dropped
   preview  (Blender)  EEVEE PBR frames (ortho front/right/back, close-ups, K2 game camera, previous candidate)
   sheets   (python)   side-by-side sheets with the H2 concepts, labelled "blender"
+  compare  (Blender)  H2.1: H2 (restored from git by run.py, sha256-checked) and H2.1 in one scene, 2K runtime set,
+                       studio and studio_env light                             -> work/compare/*.png
+  compare_sheets (python) concept | H2 | H2.1 sheets, K2 crops, material close-ups -> preview/h21_*.png
   report.py          -> docs/art-pipeline/merlin-h2-report.json (checks, host-path audit, K2 basis, determinism)
   determinism.py     compare two run folders file by file -> reports/determinism.json sections
 
@@ -31,4 +36,4 @@ Driver: python tools/tripo-pipeline/blender/h2_bake_merlin/run.py --profile <pro
 Every Blender stage runs headless only (blender -b --factory-startup); it refuses to run in a live session.
 """
 
-MODULE_VERSION = "h2-bake-merlin/1"
+MODULE_VERSION = "h2-bake-merlin/2"  # H2.1: material classes, staff/crystal texel priority, compare stages

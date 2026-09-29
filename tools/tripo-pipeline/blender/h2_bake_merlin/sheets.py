@@ -57,6 +57,7 @@ def main():
     rt = C.load_json(prof.reports / "build-report.json")
     tris = rt["measures"]["figure_triangles"]
     concept = prof["concepts"]
+    it = (prof.get("h21") or {}).get("iteration", "H2")
     for view, key in (("front", "front"), ("right", "side"), ("back", "back")):
         cpath = C.repo_path(concept[key])
         inputs[key] = {"path": concept[key], "sha256": C.sha256(cpath)}
@@ -65,7 +66,7 @@ def main():
         h = 1100
         panels = [label(fit_h(c, h), "CONCEPT H2 (imagegen, %s)" % key, "art/imagegen/hero-quality-v1/merlin"),
                   label(fit_h(r, h), "BLENDER render (EEVEE, studio light - not the game light)",
-                        "H2 game mesh %d tris (SK) + 4K atlas, exported FBX read back" % tris)]
+                        "%s game mesh %d tris (SK) + 4K atlas, exported FBX read back" % (it, tris))]
         if view == "front":
             q = C.repo_path(concept["quality_reference"])
             inputs["quality_reference"] = {"path": concept["quality_reference"], "sha256": C.sha256(q)}
@@ -98,7 +99,7 @@ def main():
             ca = a.crop(box).resize((side * up, side * up), Image.NEAREST)
             cb = b.crop(box).resize((side * up, side * up), Image.NEAREST)
             zoom = "crop %dx%d px of the 1920x1080 frame, nearest x%d (figure height in frame: %d px)" % (side, side, up, y1 - y0)
-            sheet = hstack([label(ca, "BLENDER K2 %s %s - H2 (2K runtime atlas)" % (tag, view), zoom),
+            sheet = hstack([label(ca, "BLENDER K2 %s %s - %s (2K runtime atlas)" % (tag, view, it), zoom),
                             label(cb, "BLENDER K2 %s %s - previous CLI candidate (2K)" % (tag, view), zoom)])
             save(label(sheet, "game camera K2: horizontal FOV 35, pitch -55, D %s uu; Blender studio light, not the game light" %
                        ("1207" if tag == "1p6" else "386")), pv / ("sbs_k2_%s_%s.png" % (tag, view)), outputs)

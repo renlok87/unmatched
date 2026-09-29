@@ -12,10 +12,16 @@ work/phantom-points.npy (stage lowpoly).
                   other misses: take the nearest valid texel of their OWN UV island (EDT per island; an island
                     without a hit takes the nearest valid texel of the same part in 3D, POS) - never another island
   repaint       phantom zone (mirror donor), phantom misses + feather ring and boxes (mirror_cloth or plain donor)
+  cleanup       (H2.1, phantom_repaint.cloth_cleanup) residue boxes of the cloak: non-band texels take the clean
+                cloth chromaticity with their own luminance clamped to the clean cloth range (cloth_cleanup)
   fill          gutters and the empty atlas take the nearest covered texel (full dilation: clean mips, no black seams)
+  materials     (H2.1, textures.materials; materials.py) metal mask by part group + colour rules + regions; metal
+                texels get a PBR base colour (steel neutral grey, gold) and steel/gold roughness, non-metal keeps the
+                painted colour with the Tripo roughness clamped per class; the TeamMask colour rule and the residue
+                check read the painted colour (before this pass)
   BC            linear -> sRGB 8-bit
   N_OpenGL      decode 2c-1, renormalise, encode (Blender/OpenGL, +Y up); N = DirectX for UE (green inverted)
-  ORM           R = AO, G = roughness (Tripo MR.G), B = metallic (Tripo MR.B), linear 8-bit
+  ORM           R = AO, G = roughness, B = metallic (material pass; without it Tripo MR.G / MR.B), linear 8-bit
   TeamMask      RGBA 8-bit linear: R = cloth (cloth parts AND the cloth colour rule; soft edge = normalised Gaussian
                 convolution inside the cloth parts' coverage, gauss(cloth * cov) / gauss(cov), then the same atlas
                 fill as BC, so an island edge keeps its own value in every mip), G = base band (side wall of the base,
@@ -36,6 +42,7 @@ from scipy import ndimage
 from scipy.spatial import cKDTree
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import materials as M  # noqa: E402
 import pure as P  # noqa: E402
 import uvcheck  # noqa: E402
 
@@ -466,6 +473,65 @@ def repaint(raw, pid, names, valid, pos, phantom, rp, cloth_ok, gold_ok, miss_ph
     return log, in_zone
 
 
+def cloth_cleanup(raw, pid, names, pos, valid, in_zone, cfg, rule):
+    """H2.1 residue cleanup of the repainted cloak (profile textures.phantom_repaint.cloth_cleanup): inside a
+    Tripo-frame box (smoothstep over feather_m) the texels of the part that are not part of a border band take the
+    colour of the part's clean red cloth around the box: chromaticity = median chromaticity of the reference, luminance
+    = the texel's own luminance clamped to the reference percentiles lum_clamp_pct. Nothing moves (no donor lookup,
+    so no stretched weave): gold/brown smudges and the phantom tab turn red, dark dashes and bright smears are clamped
+    into the cloth range, the weave variation inside that range stays; the normal is not touched (the dark dashes
+    left on the strip fold are geometry slits, not paint). Band = large gold components of the painted colour
+    (>= band_component_min_texels) dilated band_dilate_px (their dark outlines too): weight 0, the band keeps its
+    paint. Reference = valid texels of the part that pass the cloth colour rule, outside every repaint zone and the
+    band, farther than feather_m and nearer than shell_m from the box."""
+    lumw = np.array([0.2126, 0.7152, 0.0722], dtype=np.float32)
+    log = {}
+    cloth_ok, gold_ok, _g = colour_classes(raw["BC"], rule)     # painted colour before the cleanup
+    for c in cfg:
+        part_m = pid == names.index(c["part"]) + 1
+        gl, _n = ndimage.label(part_m & gold_ok, structure=np.ones((3, 3), dtype=bool))
+        sizes = np.bincount(gl.ravel())
+        sizes[0] = 0
+        band = ndimage.binary_dilation(sizes[gl] >= int(c.get("band_component_min_texels", 2000)),
+                                       iterations=int(c.get("band_dilate_px", 6))) & part_m
+        lo, hi = np.array(c["min_m"]), np.array(c["max_m"])
+        f = float(c["feather_m"])
+        out = np.full(pid.shape, np.inf, dtype=np.float32)
+        out[part_m] = np.linalg.norm(np.maximum(np.maximum(lo - pos[part_m], pos[part_m] - hi), 0.0), axis=1)
+        w = np.where(part_m & ~band, smoothstep((f - out) / f), 0.0).astype(np.float32)
+        ref = part_m & cloth_ok & valid & ~in_zone & ~band & (out > f) & (out < float(c["shell_m"]))
+        bc = raw["BC"]
+        lum = bc @ lumw
+        plo, phi = np.percentile(lum[ref], c["lum_clamp_pct"])
+        chroma = np.median(bc[ref] / np.maximum(lum[ref], 1e-6)[:, None], axis=0)
+        tgt = w > 0
+        wt = w[tgt][:, None]
+        before = bc[tgt].copy()
+        full = (w >= 1)
+        r2, r98 = np.percentile(lum[ref], [2, 98])
+        cv_ref = float(lum[ref].std() / max(lum[ref].mean(), 1e-6))
+
+        def residue(sel):
+            cl = colour_classes(bc[sel][None], rule)[0][0]
+            lm = bc[sel] @ lumw
+            return {"not_cloth_colour_share": P.r(1.0 - cl.mean(), 4),
+                    "lum_outside_ref_p2_p98_share": P.r(((lm < r2) | (lm > r98)).mean(), 4),
+                    "lum_cv": P.r(lm.std() / max(lm.mean(), 1e-6), 4)}
+        res_before = residue(full)
+        new = chroma[None, :] * np.clip(lum[tgt], plo, phi)[:, None]
+        bc[tgt] = before * (1 - wt) + new * wt
+        entry = {"box_min_m": c["min_m"], "box_max_m": c["max_m"], "texels": int(tgt.sum()),
+                 "full_weight_texels": int((w >= 1).sum()), "band_texels_kept": int((band & (out <= f)).sum()),
+                 "reference_texels": int(ref.sum()), "lum_clamp_linear": [P.r(plo, 5), P.r(phi, 5)],
+                 "chroma_linear": [P.r(x, 4) for x in chroma],
+                 "changed_texels_gt_1pct": int((np.abs(bc[tgt] - before).max(axis=1) > 0.01 * np.maximum(before.max(axis=1), 1e-3)).sum()),
+                 "residue_full_weight_texels": {"before": res_before, "after": residue(full),
+                                                "reference": {"lum_cv": P.r(cv_ref, 4), "lum_p2_p98": [P.r(r2, 5), P.r(r98, 5)]}},
+                 "why": c.get("why", "")}
+        log[c["name"]] = entry
+    return log
+
+
 def mip_chain(x, levels):
     out = [x]
     for _ in range(levels):
@@ -597,12 +663,24 @@ def main():
         rep["phantom_repaint"]["phantom_miss_texels_outside_repaint"] = left
         if left:
             raise RuntimeError("%d phantom miss texels were not repainted" % left)
+        if rp.get("cloth_cleanup"):
+            rep["cloth_cleanup"] = cloth_cleanup(raw, pid, names, pos, valid, in_zone, rp["cloth_cleanup"], rule)
     maps = {key: nearest_fill(raw[key], covered) for key in raw}
     maps["NORMAL"] = normals_encode(maps["NORMAL"])
+    # painted colour (Tripo + repaint): the TeamMask colour rule and the residue check read it, not the material BC
+    bc_paint = maps["BC"]
+    # ------------------------------------------------ H2.1 material pass (metal mask, PBR BC / roughness / metallic)
+    mcfg = tcfg.get("materials")
+    classes = None
+    if mcfg:
+        maps["BC"], maps["MR"], rep["materials"], classes = M.apply_materials(
+            bc_paint, maps["MR"], pid, names, pos, covered, mcfg)
+        maps["BC"] = nearest_fill(maps["BC"], covered)
+        maps["MR"] = nearest_fill(maps["MR"], covered)
     # ------------------------------------------------ TeamMask
     cloth_idx = [names.index(p) + 1 for p in rule["cloth_parts"] if p in names]
     in_cloth = np.isin(pid, cloth_idx)
-    colour_ok = colour_classes(maps["BC"], rule)[0]
+    colour_ok = colour_classes(bc_paint, rule)[0]
     cloth_hard = in_cloth & colour_ok
     sigma = float(rule["blur_sigma_px"])
     # normalised convolution inside the cloth parts' coverage: an island edge is not pulled down by the empty
@@ -636,7 +714,7 @@ def main():
     # ------------------------------------------------ residue of the phantom paint on the cloak
     if rp and rp.get("residue_check"):
         rc = rp["residue_check"]
-        rep["residue_check"] = residue_check(maps["BC"], pid, names, pos, phantom, rule, float(rp["mirror_plane_x_m"]),
+        rep["residue_check"] = residue_check(bc_paint, pid, names, pos, phantom, rule, float(rp["mirror_plane_x_m"]),
                                              miss_phantom, rc["part"], float(rc["radius_m"]))
     # ------------------------------------------------ encode + save 4K and 2K
     prefix = tcfg["prefix"]
@@ -671,6 +749,18 @@ def main():
     dbg[in_zone] = (dbg[in_zone] * 0.5 + np.array([0, 160, 255]) * 0.5).astype(np.uint8)
     dbg[miss_phantom] = (dbg[miss_phantom] * 0.4 + np.array([255, 0, 255]) * 0.6).astype(np.uint8)
     Image.fromarray(dbg).save(paths["work"] / "repaint-zones-4k.png", format="PNG", compress_level=1)
+    if classes is not None:
+        # material class raster (inspection, work/): rendered flat on the mesh by stage compare (class-map frames)
+        ras = nearest_fill(M.class_raster(classes, covered), covered)
+        Image.fromarray(ras).save(paths["work"] / "materials-classes-4k.png", format="PNG", compress_level=1)
+        Image.fromarray(q8(box2(ras.astype(np.float32) / 255.0))).save(paths["work"] / "materials-classes-2k.png",
+                                                                       format="PNG", compress_level=6)
+        # TeamMask vs metal: a texel painted as team cloth must not be metal
+        tm2 = box2(team[..., 0])
+        met2 = box2(maps["MR"][..., 2])
+        rep["materials"]["teammask_metal_overlap_2k"] = {
+            "texels_teammask_gt_0.5_and_metallic_gt_0.5": int(((tm2 > 0.5) & (met2 > 0.5)).sum()),
+            "texels_teammask_gt_0.5": int((tm2 > 0.5).sum())}
     P.write_json(paths["reports"] / "textures-report.json", rep)
     print(P.STAGE_MARKER, "textures", rep["misses_total"], rep["stats"], "team edge passed:",
           rep["team_mask"]["edge_check"]["passed_cloth"])

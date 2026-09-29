@@ -2,7 +2,7 @@
 
   blender -b --factory-startup --python-exit-code 1 --python tools/tripo-pipeline/blender/h2_bake/blender_entry.py -- <params.json>
 
-params: {"stage": prepare|retopo|close|uv|bake|rig|seams|preview|curve, "profile": <json>, "run_dir": <dir>, "repo_root": <dir>, ...}.
+params: {"stage": prepare|retopo|close|uv|bake|aux|rig|seams|preview|curve, "profile": <json>, "run_dir": <dir>, "repo_root": <dir>, ...}.
 The package is imported fresh from its directory (the parent directory also provides candidate_build, read-only)."""
 
 import importlib
@@ -19,7 +19,7 @@ if not bpy.app.background:
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 
-STAGES = {"prepare": "st_prepare", "retopo": "st_retopo", "close": "st_close", "uv": "st_uv", "bake": "st_bake",
+STAGES = {"prepare": "st_prepare", "retopo": "st_retopo", "close": "st_close", "uv": "st_uv", "bake": "st_bake", "aux": "st_aux",
           "rig": "st_rig", "seams": "st_seams", "preview": "st_preview", "curve": "st_curve"}
 
 

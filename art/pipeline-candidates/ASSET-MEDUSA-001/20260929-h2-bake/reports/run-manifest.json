@@ -7,25 +7,27 @@
     "game_ready": false
   },
   "modules": {
-    "__init__.py": "d6ea47a0acd7745cd57902e7971cfe98572e598814a7f17c4e860e9b182239bd",
+    "__init__.py": "73b7c3fb280c051d1057222dd3e3802e2bcd7f110329f9312257ad989ea29141",
     "bl_util.py": "59a464eb9280a3fd98ff5668f30ad0a24c3052459cc984b9602b441fe3692875",
-    "blender_entry.py": "fd4205e9c218019d74a091cf7f547f360c51fc28a707d173f1a87fd067e88ea8",
+    "blender_entry.py": "247e45277c910b1f41d62f48cbddbb327337da60ae460728f065062d3d1a50f5",
     "charts.py": "98eb7fbfaeb7bd8e624afa2610c73a183790008cf1b8184c19f0c84c5647ea94",
-    "compose.py": "fddb400bb5300f63a2bd6a40bcac76366bbc2ec649751b8b919eec6dbb39a00c",
+    "compose.py": "08f97c78cf806c10db7e8e9e491ba930c78d692729effd1808ac08cc00f65658",
     "fbx_authored.py": "aeb563398b3b5ec338d41ed39bd2694f6c0876786956fcbf04b008b7b23cc602",
+    "materials.py": "f66ac2d9b9cc00153d95a2437607e5058ea1f7e30151969f407bb2190ad1a378",
     "profile.py": "99b73f0e264f89bd5156c0497fceccbb66dbb9ecb3b17a5d2cb2ea5efd3929c1",
     "raycam.py": "5ba7d3e650b29a6cd9bc972fbc4b03f9fe22d9ed509d452b8138dbc23389bd32",
-    "run_h2_bake.py": "0311224401fe8ef7420e2d002b9a136e1de369b70d0b56a538da3c3aa9c6288e",
+    "run_h2_bake.py": "3e23f9ee7379c04ea6a729df64ed76738e1808a04be73fe056f93daed7ac62b5",
+    "st_aux.py": "3a18c87a05b5853570b1e2b0f42a53e5ca4266d9717f336d11d25b28994d4d94",
     "st_bake.py": "cc925f645472f85b0cf7e415bc27e78c5652396a721095933769fda071ce2b0f",
     "st_close.py": "f161aa6502231d154e143171c3a204314819e43e160c1af8f6cf4c3f25b940b2",
     "st_curve.py": "3bb37a16b0461f94e5164f838a047779dcd4e7a209b8956c716a062b4c60bf1c",
     "st_prepare.py": "8f2a98c3008eab7556d7ce157267a8b1bc1ed2274b68b7970cb543fb91729221",
-    "st_preview.py": "cb5e1bfa43242bb4aea3e5fbd95b532e3051455bf1a171288f9729dffcb86c7c",
+    "st_preview.py": "f6bf3d916be4ed79210c4d1eeab61d3370ee817422f86ee8661204e74c211cb0",
     "st_retopo.py": "5e69c04e3e461dac372b64794d23ecdf67b961f013eefb94877446f91c73ee7a",
     "st_rig.py": "4080385686ac19051b8933a965a5d350848e92ddd2458b968bff386edf502d90",
     "st_seams.py": "0e8e4e01a3d29500ff6286e790395a0ca862e5edeb99d9a8ed86e82299a7a7f7",
     "st_uv.py": "296cb5e2762f428ba8b02d77d2739466df35aa92db317a0b7e40e8d91a3d26a9",
-    "textures.py": "1776bcfd4bcb88aac004bcdab6f921f8fe134c7f4683f6a0fe390d178f5ff8ff"
+    "textures.py": "197516cc8dde1bc61e5ee0d7daeb01e4ea8397f54dfd6bb5346379a05d88eb68"
   },
   "network": {
     "paid_tasks_created": 0,
@@ -40,29 +42,57 @@
       "bytes": 84668,
       "sha256": "87fe88733ab8832c7f2a3ede0912a153d097b30164f70bb7bfd060b5fc42abc4"
     },
+    "preview/channels-h2-vs-h21.jpg": {
+      "bytes": 360440,
+      "sha256": "ef536136886fed5d7138c96eb9c758c38ab16267b2be03680440ad2c6e6b951b"
+    },
+    "preview/closeups-h2-vs-h21.jpg": {
+      "bytes": 1513675,
+      "sha256": "3b3766f1b8e9d8524f88d94fa6113b0b11894ed2ced5c478821f48eb336e81a4"
+    },
     "preview/closeups-hp-vs-h2.jpg": {
-      "bytes": 1538214,
-      "sha256": "fceeea9e24fb267ab2a55f96afebe25577724b1d786f864f06a87d371c3f3d0e"
+      "bytes": 1562304,
+      "sha256": "6e2d5206d5acd0b795737a49bc29e86e28eafabefdaf5a63a77b5a320eaa1c94"
     },
     "preview/compare-back.jpg": {
-      "bytes": 681204,
-      "sha256": "e2b4bd046b7406e09af01390b0e05622974c756fc1fabcd7a01adc0331a2a80b"
+      "bytes": 687231,
+      "sha256": "ec8442596e862bb045d99e8d7cae46f321a6b3117c4551907107d49ce8ee4aa1"
     },
     "preview/compare-front.jpg": {
-      "bytes": 761714,
-      "sha256": "6f9e1d4c2bebfcba42a9d215ab4e528aab861cdc4bb234551e0b1c5d4fbf16b9"
+      "bytes": 766600,
+      "sha256": "c594305f07a07520b2a5aa22977ccb95c65c51cd9929d2f8757e981129a46954"
+    },
+    "preview/compare-h21-back.jpg": {
+      "bytes": 568006,
+      "sha256": "3ac49c67d6844366dd760bd06cfbdf432cdec2dd6118b1da925694ae287c1e36"
+    },
+    "preview/compare-h21-front.jpg": {
+      "bytes": 625589,
+      "sha256": "32e644e977163d8ccffc7c38e960617e9f4b261c0a7a86cbf83692666ba04701"
+    },
+    "preview/compare-h21-k2-1p6.jpg": {
+      "bytes": 190147,
+      "sha256": "d97123f0b2fca840c11e69e2ce11aa7c98acf613e1e183d2e577046468aaae8c"
+    },
+    "preview/compare-h21-k2-5x.jpg": {
+      "bytes": 195610,
+      "sha256": "c608cfc665bc675a0b235a7ae8ab0da7c43b088b132ec68cc18271816a9052f2"
+    },
+    "preview/compare-h21-side.jpg": {
+      "bytes": 447732,
+      "sha256": "344a9e14839efdd340068e2c41ff1d82c1c72c91c0e7ae3507b6e3c665ab85dc"
     },
     "preview/compare-k2-1p6.jpg": {
-      "bytes": 88195,
-      "sha256": "ca8957e7109e75c1fcb84a4c7025faf8d8e1767222a8cbea1ee01d5f07d06014"
+      "bytes": 88963,
+      "sha256": "135b40e1d9b8e9b3e8f62ae4e618421d2e9d1e5c9f6a566a56da1fe28557bb67"
     },
     "preview/compare-k2-5x.jpg": {
-      "bytes": 95246,
-      "sha256": "a0c37e9247ac62217d06b34995ca242e7a4cbf2f9b8d2938a0ee37e0de160c67"
+      "bytes": 96949,
+      "sha256": "4752f75eec7f9d5deaad3eb6d80670a75b1a04ff6ca9e380db7af4cbc8a340bb"
     },
     "preview/compare-side.jpg": {
-      "bytes": 547092,
-      "sha256": "0a84b39bf4bcf63b8bf6cd96e804f373e44105a2ff0827dc5d06afbf782b848c"
+      "bytes": 553752,
+      "sha256": "9575a017dcc118ac1792e7201db0db3e546146d0afa325c3069cf59d1e3f3380"
     },
     "preview/deform-medusa-h2-blend.jpg": {
       "bytes": 449847,
@@ -73,24 +103,32 @@
       "sha256": "53bf2de968b952667eaeee458dfbacda03a89d372febd717f594f1cd2bb19a9c"
     },
     "preview/frame-k2-1p6.jpg": {
-      "bytes": 67665,
-      "sha256": "eccab524ae75b7e0cbb44b4c4e804a0a82b3fb1a61af22372324494a1a9758fc"
+      "bytes": 67770,
+      "sha256": "b6acfabb0485ef1a8c7bf8d8e4750a806c68e6cb0f628eb42049b424dc5eb0a6"
     },
     "preview/frame-k2-5x.jpg": {
-      "bytes": 87887,
-      "sha256": "e2306ec180985401a6bafa23b70d00b0eb4159f6238b9da04d87e06f3ee6da01"
+      "bytes": 88585,
+      "sha256": "a5f1d4b10c9052cdb8769102e0c10fc04b6f90de1e2b81597f238e1c6b488c90"
+    },
+    "preview/pose-h2-vs-h21.jpg": {
+      "bytes": 733304,
+      "sha256": "8e3d749ef4103d9a489d83a03108b4bec376f53993be38b25e29f40b04c4aa34"
     },
     "preview/probe-culled-closeups.jpg": {
-      "bytes": 1445935,
-      "sha256": "4c5d9ac8842188094f515c935c95f151ba392306ffbae2ea1600edd51aaab8f4"
+      "bytes": 1486987,
+      "sha256": "2ea743966da918c9fdbfd959317f80de5f3229210bd397e64eb8b5506f8b8e70"
     },
     "preview/probe-culled-k2.jpg": {
-      "bytes": 334839,
-      "sha256": "75f4a7c9613acd73d70679a9aa6169d73ac0a066e1a4fd598e02511bb11a42df"
+      "bytes": 345151,
+      "sha256": "a9821f6fc982f716aacf59d457e8d8639843c05aed8cef55184aab8cff7d471a"
     },
     "preview/uv-layout-1024.png": {
       "bytes": 133757,
       "sha256": "f86a68939438c5ef72044f01006e40a031c3d74efb08ada16164047e2aed8366"
+    },
+    "reports/aux-report.json": {
+      "bytes": 3342,
+      "sha256": "4e5c2c8bf9323bf5bd1b1ba70a5bd8d18525cbdd0127b1588445f65f7efce098"
     },
     "reports/bake-report.json": {
       "bytes": 27689,
@@ -101,8 +139,8 @@
       "sha256": "9a8d73fc68f9a9f6dcf6f5f11ad84332481c9eb101f254af0088695e219b4c17"
     },
     "reports/compose-report.json": {
-      "bytes": 2591,
-      "sha256": "c666ebc99523e55d4bfae7e2942e9d19e1b8a44cf0e5dbc062f63f5f64e5040f"
+      "bytes": 4203,
+      "sha256": "42870f623cea493ad7500e7c0fb384c480fc4ce796b1099b2d2f8a775e58d841"
     },
     "reports/decimation-curve.json": {
       "bytes": 21236,
@@ -121,8 +159,8 @@
       "sha256": "f9a1c18044e03b4be3d2eec48e6f4f58c0090318cb6cd56c63bd0207091cde8d"
     },
     "reports/preview-report.json": {
-      "bytes": 5700,
-      "sha256": "6f678aba75d89a30a48dd2fb41eb7021fe2c4f9a2924270e116770d43542cc52"
+      "bytes": 9441,
+      "sha256": "2c6d43e30f936edeefb5b40866a5f832bdd4bf19b9641a17917aea6a09af3f41"
     },
     "reports/probes-report.json": {
       "bytes": 842,
@@ -141,8 +179,8 @@
       "sha256": "06e534718871697cc59adbde37e6e24447323dfa7f56a9619b80f165c766b144"
     },
     "reports/textures-report.json": {
-      "bytes": 5789,
-      "sha256": "a5cade8efb4306582790e0c418420aeaa80f39cc1f06bf4e1ec6435b202c684e"
+      "bytes": 25888,
+      "sha256": "f38932f453c606ef3b8a88ceaf2298d4bee577ccbc2fa4469031f18921f23f4e"
     },
     "reports/uv-report.json": {
       "bytes": 31475,
@@ -153,8 +191,8 @@
       "sha256": "a457d5dc67d59046f20ab584b617306f6e961a71d1c1770747f39e938a8f6b58"
     },
     "textures/T_Medusa_H2_2K_BC.png": {
-      "bytes": 4692189,
-      "sha256": "8faf853b74d17bfc776b0d7663043bb1473dd76b22a1fa08885cdc4d5f5662b2"
+      "bytes": 4640251,
+      "sha256": "284947f3c013f054ea94bb518939a538d913b0289c2238e2d43b3eb0b6c0ede5"
     },
     "textures/T_Medusa_H2_2K_N.png": {
       "bytes": 4897846,
@@ -165,16 +203,16 @@
       "sha256": "7944e386130634a7e43c6ea5eb3163551f10ba836f6c8f64fe9ebe0cae4d82e0"
     },
     "textures/T_Medusa_H2_2K_ORM.png": {
-      "bytes": 4404085,
-      "sha256": "3aa8f3fc1b63017e0197d12accfb90fe7738a2adf8a268c4fb801200d0cede74"
+      "bytes": 4262404,
+      "sha256": "a7eb8ba6023b009f20c45538d0aa09c2142a20ad28de66dd1a8b037a3db19cff"
     },
     "textures/T_Medusa_H2_2K_TeamMask.png": {
-      "bytes": 1033112,
-      "sha256": "3d784aa8918f9b9a0ddab182bfb87dc0b2fe5285c7c2490788fe54acf9718fbb"
+      "bytes": 1024816,
+      "sha256": "b85c21218564a7bc576204ef6e06a2eac19865c0a5d56d64a31c827206d9a4f4"
     },
     "textures/T_Medusa_H2_BC.png": {
-      "bytes": 14807007,
-      "sha256": "90ae70b5b468face319ff7a006560b4dc32c104b9f7004836d1a6c2627091da1"
+      "bytes": 14288883,
+      "sha256": "11adde9e656537da25b61ea8a6a50f77071819341f7aebe269b8bfd10397e392"
     },
     "textures/T_Medusa_H2_N.png": {
       "bytes": 14330460,
@@ -185,18 +223,18 @@
       "sha256": "a00b08c404b0a4b30b145dc25784b66156d037b85ea0c4d2c32fd07a614b0e5e"
     },
     "textures/T_Medusa_H2_ORM.png": {
-      "bytes": 13488023,
-      "sha256": "36817003257d6a0494093832606f468d9848bcf6930865dd258d93dd5abcefd5"
+      "bytes": 12952602,
+      "sha256": "b70c493c95329b69fa1c58fc9f2c854f1af482bcd6c98c821e84fa5614d8f147"
     },
     "textures/T_Medusa_H2_TeamMask.png": {
-      "bytes": 2821157,
-      "sha256": "e1c768918a29098f3b578da5ea0116a44b11d281da0f02e5a3064edd988fd505"
+      "bytes": 2796113,
+      "sha256": "ee7098de90b6abb65f59362ae334ed4b00af460506399cf69df3bad6b884aa7f"
     }
   },
   "profile": {
     "path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-bake-h2.json",
-    "profile_id": "medusa-h2-bake/1",
-    "sha256": "fc7b3bebac00f96be8e8ff9ae219dc36a17e5a03108f09c1a0cdd5ab4a3730ab"
+    "profile_id": "medusa-h2-bake/2",
+    "sha256": "5c8d6d61629aa2ef302f56497402f86bb7e33b23a173ca9f43c886d68b701de5"
   },
   "read_only_dependencies": {
     "blender/_tools/presets/UM_FBX_v1.json": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
@@ -220,5 +258,5 @@
     }
   },
   "status": "измерено",
-  "tool": "h2-bake/0.2.0"
+  "tool": "h2-bake/0.3.0"
 }

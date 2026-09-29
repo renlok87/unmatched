@@ -1,0 +1,133 @@
+{
+  "ao_exclusions": [
+    {
+      "ao_delta_vs_bake": {
+        "max": 0.8828,
+        "mean": 0.00296,
+        "min": 0.0,
+        "p99": 0.0859,
+        "texels_gt_16_255": 39279,
+        "texels_gt_1_255": 96699
+      },
+      "baked_texels": 3176789,
+      "cage_extrusion_m": 0.000859,
+      "control_baked_texels": 3176789,
+      "control_delta_vs_bake": {
+        "max_abs": 0.0,
+        "note": "the same bake with nothing hidden: GPU noise floor of the AO bake",
+        "texels_gt_1_255": 0
+      },
+      "hidden_occluders": [
+        "tripo_part_13"
+      ],
+      "name": "dress_without_fist",
+      "part": "tripo_part_0"
+    },
+    {
+      "ao_delta_vs_bake": {
+        "max": 0.9609,
+        "mean": 0.24239,
+        "min": 0.0,
+        "p99": 0.8047,
+        "texels_gt_16_255": 75266,
+        "texels_gt_1_255": 97704
+      },
+      "baked_texels": 124005,
+      "cage_extrusion_m": 0.0006,
+      "hidden_occluders": [
+        "tripo_part_0"
+      ],
+      "name": "fist_without_dress",
+      "part": "tripo_part_13"
+    }
+  ],
+  "checks": {
+    "position_covers_uv_raster": {
+      "expected": "every UV-raster texel has a position (the same triangles and pixel-centre rule as the uv stage)",
+      "measured": {
+        "position_outside_uv_raster": 0,
+        "uv_texels": 7335527,
+        "uv_texels_without_position": 0
+      },
+      "passed": true
+    }
+  },
+  "device": "GPU:OPTIX:NVIDIA GeForce RTX 4090",
+  "passed": true,
+  "position": {
+    "frame": "final (authored) frame, metres, rest pose",
+    "per_part": {
+      "tripo_part_0": {
+        "texels_written": 3286463,
+        "triangles": 10260
+      },
+      "tripo_part_1": {
+        "texels_written": 969001,
+        "triangles": 9000
+      },
+      "tripo_part_10": {
+        "texels_written": 201338,
+        "triangles": 2000
+      },
+      "tripo_part_11": {
+        "texels_written": 98462,
+        "triangles": 1998
+      },
+      "tripo_part_12": {
+        "texels_written": 134292,
+        "triangles": 1220
+      },
+      "tripo_part_13": {
+        "texels_written": 125563,
+        "triangles": 1345
+      },
+      "tripo_part_14": {
+        "texels_written": 23398,
+        "triangles": 500
+      },
+      "tripo_part_15": {
+        "texels_written": 20848,
+        "triangles": 499
+      },
+      "tripo_part_16": {
+        "texels_written": 6606,
+        "triangles": 250
+      },
+      "tripo_part_2": {
+        "texels_written": 554185,
+        "triangles": 1598
+      },
+      "tripo_part_3": {
+        "texels_written": 1031674,
+        "triangles": 5000
+      },
+      "tripo_part_4": {
+        "texels_written": 222720,
+        "triangles": 3033
+      },
+      "tripo_part_5": {
+        "texels_written": 254205,
+        "triangles": 2855
+      },
+      "tripo_part_6": {
+        "texels_written": 104350,
+        "triangles": 1192
+      },
+      "tripo_part_7": {
+        "texels_written": 107050,
+        "triangles": 1180
+      },
+      "tripo_part_8": {
+        "texels_written": 71703,
+        "triangles": 1500
+      },
+      "tripo_part_9": {
+        "texels_written": 123669,
+        "triangles": 1222
+      }
+    }
+  },
+  "resolution": 4096,
+  "stage": "aux",
+  "status": "измерено"
+}

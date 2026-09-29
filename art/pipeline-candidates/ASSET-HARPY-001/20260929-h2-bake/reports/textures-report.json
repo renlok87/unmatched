@@ -7,19 +7,113 @@
     "note": "W4-B gate orm_occlusion_baked_not_constant (proposal)",
     "occluded_below": 250
    },
-   "occluded_fraction": 0.8657,
-   "p1": 4.0,
+   "occluded_fraction": 0.8668,
+   "p1": 0.0,
    "p99": 255.0,
    "passed": true
   },
   "bc_linear_mean_covered": [
-   0.1287,
-   0.0688,
-   0.0416
+   0.1282,
+   0.0686,
+   0.0415
   ],
+  "materials": {
+   "face_cavity": {
+    "face_texels": 704385,
+    "factor_p1_p50": [
+     0.45,
+     0.9798
+    ],
+    "luminance_p5_before_after": [
+     0.0168,
+     0.0133
+    ],
+    "luminance_std_before_after": [
+     0.117,
+     0.1165
+    ],
+    "rule": {
+     "cavity_gain": 4.0,
+     "cavity_sigma_px": 6,
+     "cavity_strength": 0.5,
+     "contrast_strength": 0.6,
+     "density_factor_min": 2.0,
+     "detail_sigma_px": 3,
+     "min_factor": 0.45,
+     "parts": [
+      "tripo_part_0"
+     ],
+     "why": "face islands (UV priority x2): base colour x (1 - 0.5 cavity - 0.6 dark detail), cavity = local AO deficit (gaussian 6 px of the 4K bake), dark detail = relative luminance below a 3 px blur (brows, lids, nostrils, lip line): darkening only, so the painted features keep their shape and survive the 2K mips at K2"
+    }
+   },
+   "feathers": {
+    "metallic_max": 0.273,
+    "metallic_max_feather_ge_0_99": 0.0012,
+    "metallic_note": "texels with metallic > 0 inside the feather mask are the 3x3 soft edge of the gold bands (textures.metal_rule)",
+    "roughness_p1_p50_p99": [
+     0.7035,
+     0.7665,
+     0.833
+    ],
+    "rule": {
+     "ao_weight": 0.5,
+     "parts": [
+      "tripo_part_0",
+      "tripo_part_1",
+      "tripo_part_2",
+      "tripo_part_3",
+      "tripo_part_4",
+      "tripo_part_5",
+      "tripo_part_6",
+      "tripo_part_8",
+      "cap_100",
+      "fill_102"
+     ],
+     "roughness": [
+      0.7,
+      0.85
+     ],
+     "skin": {
+      "parts": [
+       "tripo_part_0"
+      ],
+      "s_max": 0.4,
+      "v_min": 0.45
+     },
+     "why": "Tripo roughness 0.65-0.94 per part (p5-p95), mean 0.77, metallic 0: remapped into 0.70-0.85, half the part's own Tripo rank, half the baked AO (exposed vanes smoother, occluded roots rougher); face/ear skin (v > 0.45, s < 0.4 on the head part), the gold bands and the talons excluded"
+    },
+    "skin_texels_over_0_5": 537002,
+    "texels_feather_over_0_5_metallic_over_0_05": 12796,
+    "texels_over_0_5": 14748823
+   },
+   "talons": {
+    "coverage_by_part": {
+     "tripo_part_10": 0.1789,
+     "tripo_part_9": 0.1719
+    },
+    "roughness_mean": 0.5011,
+    "rule": {
+     "bc_scale": 0.75,
+     "open_px": 3,
+     "parts": [
+      "tripo_part_9",
+      "tripo_part_10"
+     ],
+     "ramp": 0.06,
+     "roughness": [
+      0.4,
+      0.55
+     ],
+     "s_max": 0.3,
+     "v_max": 0.4,
+     "why": "the claws are the desaturated dark texels of the feet parts (Tripo sRGB v 0.16-0.35, s < 0.3; the scale crevices are saturated brown): roughness 0.40 (dark) - 0.55 (lighter), metallic 0, base colour x0.75 toward the black horn of the concept"
+    },
+    "texels_over_0_5": 214948
+   }
+  },
   "metal_rule": {
    "coverage_by_part": {
-    "tripo_part_11": 0.5541,
+    "tripo_part_11": 0.5546,
     "tripo_part_6": 0.0309
    },
    "rule": {
@@ -39,58 +133,59 @@
     "s_min": 0.45,
     "v_min": 0.45
    },
-   "texels_over_0_5": 77132
+   "texels_over_0_5": 70819
   },
   "missed_by_part": {
-   "cap_100": 7,
-   "patch_101": 1535,
-   "tripo_part_0": 16893,
-   "tripo_part_1": 11368,
-   "tripo_part_10": 4668,
-   "tripo_part_11": 432,
-   "tripo_part_2": 5709,
-   "tripo_part_3": 5415,
-   "tripo_part_4": 1366,
-   "tripo_part_5": 1432,
-   "tripo_part_6": 3324,
-   "tripo_part_8": 1735,
-   "tripo_part_9": 3179
+   "cap_100": 39,
+   "fill_102": 7584,
+   "tripo_part_0": 16670,
+   "tripo_part_1": 10928,
+   "tripo_part_10": 4533,
+   "tripo_part_11": 427,
+   "tripo_part_2": 5539,
+   "tripo_part_3": 5294,
+   "tripo_part_4": 1306,
+   "tripo_part_5": 1382,
+   "tripo_part_6": 3253,
+   "tripo_part_8": 1702,
+   "tripo_part_9": 3084
   },
-  "normal_inward_fraction": 0.019157,
+  "normal_inward_fraction": 0.022688,
   "normal_tilt_over_60deg_by_part": {
-   "cap_100": 0.0296,
-   "patch_101": 0.04427,
-   "tripo_part_0": 0.04831,
-   "tripo_part_1": 0.02817,
-   "tripo_part_10": 0.02735,
-   "tripo_part_11": 0.05213,
-   "tripo_part_2": 0.03139,
-   "tripo_part_3": 0.02983,
-   "tripo_part_4": 0.0036,
-   "tripo_part_5": 0.00248,
-   "tripo_part_6": 0.02524,
-   "tripo_part_8": 0.01537,
-   "tripo_part_9": 0.01893
+   "cap_100": 0.02908,
+   "fill_102": 0.22781,
+   "tripo_part_0": 0.0483,
+   "tripo_part_1": 0.02828,
+   "tripo_part_10": 0.0272,
+   "tripo_part_11": 0.05403,
+   "tripo_part_2": 0.03151,
+   "tripo_part_3": 0.02988,
+   "tripo_part_4": 0.00367,
+   "tripo_part_5": 0.00253,
+   "tripo_part_6": 0.02503,
+   "tripo_part_8": 0.01533,
+   "tripo_part_9": 0.01852
   },
-  "normal_tilt_over_60deg_fraction": 0.026774,
+  "normal_tilt_over_60deg_fraction": 0.03177,
+  "roughness_mean_covered_after": 0.7531,
   "team_mask": {
    "coverage_by_part": {
     "cap_100": 0.0,
-    "patch_101": 0.0,
+    "fill_102": 0.0,
     "tripo_part_0": 0.0,
     "tripo_part_1": 0.0,
     "tripo_part_10": 0.0,
     "tripo_part_11": 0.0,
-    "tripo_part_2": 0.0447,
+    "tripo_part_2": 0.0446,
     "tripo_part_3": 0.0421,
     "tripo_part_4": 0.527,
-    "tripo_part_5": 0.5063,
+    "tripo_part_5": 0.5062,
     "tripo_part_6": 0.0,
     "tripo_part_8": 0.0,
     "tripo_part_9": 0.0
    },
-   "coverage_of_cells": 0.2826,
-   "coverage_of_figure": 0.1254,
+   "coverage_of_cells": 0.2825,
+   "coverage_of_figure": 0.1241,
    "rule": {
     "blur": "3x3",
     "method": "hsv-band-parts",
@@ -105,68 +200,139 @@
     "v_max": 0.22
    }
   },
-  "texels_covered_by_uv": 8216700,
-  "texels_covered_not_written": 57063,
-  "texels_covered_not_written_fraction": 0.006945,
-  "texels_written_by_bake": 8159940,
+  "texels_covered_by_uv": 8071170,
+  "texels_covered_not_written": 61741,
+  "texels_covered_not_written_fraction": 0.00765,
+  "texels_written_by_bake": 8009677,
   "tripo_metallic_fraction_over_0_5": 0.0,
-  "tripo_metallic_mean_covered": 0.0248,
-  "tripo_roughness_mean_covered": 0.7678
+  "tripo_metallic_mean_covered": 0.0245,
+  "tripo_roughness_mean_covered": 0.7679
  },
  "inputs": {
-  "ao": "01d20798c1ce438be76624c889d333c633502e34547abe6cc7a4226eaf7eb166",
-  "bc": "75b271ca43f10b94ad3fc2c32094a086887b37dfba173af9ae38dbd1f26ecf37",
-  "normal": "82fc278f91a6a2dc85835d297b2f808509be8d790726e64d6a3b479298a2faf7",
-  "rm": "8df703fbbd9ead08c14e1d51a6aaebe52fe2c58b33f7c7a154c07bdbc577deae"
+  "ao": "8074c2559433394600af5185a26abe3131eedada031a7fd7de8229762ac535b9",
+  "bc": "db974ebb80903dfe2c3f8511119c6702c049cd3df2474c09e7157f1f02e087b2",
+  "normal": "f70e2b8d4cdd7ed3a83a51ad14cf33f83ed1e246bbc133f277eb9c3aea33b356",
+  "rm": "4c6d9bd67e88ff30e8f9913f03a42b2abdfdd06382715958673402faedf1932d"
  },
  "master_px": 4096,
  "outputs": {
+  "base": {
+   "BC": {
+    "bytes": 368385,
+    "mode": "RGB",
+    "path": "textures/base_1k/T_Harpy_H2_Base_BC.png",
+    "sha256": "b92f1ce0249833b70c0f5232a5b910b6873fb3d3d377ab665978598823160a8d",
+    "size": [
+     1024,
+     1024
+    ]
+   },
+   "N": {
+    "bytes": 418163,
+    "mode": "RGB",
+    "path": "textures/base_1k/T_Harpy_H2_Base_N.png",
+    "sha256": "b671edc08f8dcf70c6449db552f6a8ec2b36c930cf1409c485881686ac1fd9e6",
+    "size": [
+     1024,
+     1024
+    ]
+   },
+   "N_OpenGL": {
+    "bytes": 417982,
+    "mode": "RGB",
+    "path": "textures/base_1k/T_Harpy_H2_Base_N_OpenGL.png",
+    "sha256": "ce8e9f70dbe773e9b84a67e08789311658148018fc48f6a9e715c30b4920b577",
+    "size": [
+     1024,
+     1024
+    ]
+   },
+   "ORM": {
+    "bytes": 260113,
+    "mode": "RGB",
+    "path": "textures/base_1k/T_Harpy_H2_Base_ORM.png",
+    "sha256": "851849946137daf7074c00ecf7fa71d999614c840db759943babfbad8a61f0cf",
+    "size": [
+     1024,
+     1024
+    ]
+   },
+   "_stats": {
+    "band": {
+     "bc_linear_mean": [
+      0.7778,
+      0.5183,
+      0.1595
+     ],
+     "metallic": 1.0,
+     "roughness_mean": 0.3473,
+     "roughness_p1_p99": [
+      0.3078,
+      0.3843
+     ]
+    },
+    "normal_tilt_p99_deg": 3.23,
+    "top": {
+     "bc_linear_mean": [
+      0.2959,
+      0.1874,
+      0.0643
+     ],
+     "metallic": 1.0,
+     "roughness_mean": 0.3842,
+     "roughness_p1_p99": [
+      0.339,
+      0.4304
+     ]
+    }
+   }
+  },
   "master": {
    "BC": {
-    "bytes": 14520129,
+    "bytes": 14718277,
     "mode": "RGB",
     "path": "textures/4k/T_Harpy_H2_BC.png",
-    "sha256": "6c39cc81410c470863b409ccf5fa5679fe6df02da0111c842bff329be2133203",
+    "sha256": "4705c2d57981643af6633a53330df93f7d16b85f4e99976bc9231feb91bd047f",
     "size": [
      4096,
      4096
     ]
    },
    "N": {
-    "bytes": 15039033,
+    "bytes": 15082417,
     "mode": "RGB",
     "path": "textures/4k/T_Harpy_H2_N.png",
-    "sha256": "f172622fc4c628dac9131e04e4506b1b00473efc37426711ecc1e6519a84149d",
+    "sha256": "bcf08cd1439afd1dbc80a492970c4598df9fb83637c889df673e2de9eb428155",
     "size": [
      4096,
      4096
     ]
    },
    "N_OpenGL": {
-    "bytes": 15043560,
+    "bytes": 15086512,
     "mode": "RGB",
     "path": "textures/4k/T_Harpy_H2_N_OpenGL.png",
-    "sha256": "97c10313a443ea5a906b0281d9d10f8aaef1c6e8aca4bf3a722bb552ecc15455",
+    "sha256": "196211137e30d3dcf8c3b5c70e1a9bd097cd2d832adb4f66a56969959bc14aeb",
     "size": [
      4096,
      4096
     ]
    },
    "ORM": {
-    "bytes": 11664238,
+    "bytes": 10023871,
     "mode": "RGB",
     "path": "textures/4k/T_Harpy_H2_ORM.png",
-    "sha256": "1dfaaddb8d646b9315110dfa91d62872ea531c188120bc0915541178d74d2e71",
+    "sha256": "61fcca962cd1eff3b22f05d9174dceaf1b04b40fea879435da19dc0607e6a940",
     "size": [
      4096,
      4096
     ]
    },
    "TeamMask": {
-    "bytes": 2175857,
+    "bytes": 2135857,
     "mode": "L",
     "path": "textures/4k/T_Harpy_H2_TeamMask.png",
-    "sha256": "51c18a6f62c4965361e36da2155b5e9cfac282eddef310f62fe7643556b9884e",
+    "sha256": "328eb32ed243cb3fc4262375b52f0effef1cf1d88c3cb27f3d015c59b8a2b51f",
     "size": [
      4096,
      4096
@@ -180,50 +346,50 @@
   },
   "runtime": {
    "BC": {
-    "bytes": 5210163,
+    "bytes": 5246050,
     "mode": "RGB",
     "path": "textures/2k/T_Harpy_H2_BC.png",
-    "sha256": "c01417784bfa20abc883fa82d4a81de37d680e5e26df9c58e990f52a267b8ddd",
+    "sha256": "a23a55c652e84536f73f451c41f41caa6c990aa00a590bb044f8957e29197019",
     "size": [
      2048,
      2048
     ]
    },
    "N": {
-    "bytes": 5750269,
+    "bytes": 5781825,
     "mode": "RGB",
     "path": "textures/2k/T_Harpy_H2_N.png",
-    "sha256": "b5853e84ac116e34422ea6d24e5e5a4e00f77a71515c6dcbaa94af00ef109cf0",
+    "sha256": "3cd4d36df8bc7a13c97aaf056fbf94e8ddc715f50514223cf2f4aa0851b9963b",
     "size": [
      2048,
      2048
     ]
    },
    "N_OpenGL": {
-    "bytes": 5751613,
+    "bytes": 5782997,
     "mode": "RGB",
     "path": "textures/2k/T_Harpy_H2_N_OpenGL.png",
-    "sha256": "2069ac5b66133702e9481496568e478bb57f5bbdcebadf815e3d0f568a509d46",
+    "sha256": "1abb165f47204694acbfe349d5858b55e8012e778ecbd3e94025d2b86810bc40",
     "size": [
      2048,
      2048
     ]
    },
    "ORM": {
-    "bytes": 4261655,
+    "bytes": 3692215,
     "mode": "RGB",
     "path": "textures/2k/T_Harpy_H2_ORM.png",
-    "sha256": "1a5dadbbbe3f50f25c4b333242651df0b82006133c095d3622985ea6fdd45577",
+    "sha256": "e0530962214e70b360fc6a9abae6f24eb4382e657494f09fe3fbb758f7a6eb0d",
     "size": [
      2048,
      2048
     ]
    },
    "TeamMask": {
-    "bytes": 799569,
+    "bytes": 783623,
     "mode": "L",
     "path": "textures/2k/T_Harpy_H2_TeamMask.png",
-    "sha256": "49bc1d88378207b022440df592638071c8a49ea6c86cbdf0d703fdbbbf7b4064",
+    "sha256": "5dd50297f04257b42b1caa26ed49f1631add0e230e29580fd7fd2cd6fecd4ad6",
     "size": [
      2048,
      2048
@@ -236,7 +402,7 @@
    }
   }
  },
- "profile_sha256": "290171af1526825c1b9960bcaaa432c90cdfa0889451dc73e7ed3edde8670ad3",
+ "profile_sha256": "e24a0b51101ccfd7da6c73177d21d83eef98341f7a24acc975ee1a72c9dbf252",
  "runtime_px": 2048,
  "schema": "unmatched.h2-bake.textures-report/1"
 }

@@ -1,5 +1,22 @@
 {
   "backface_culling_game_models": true,
+  "baseline": {
+    "label": "H2 (до H2.1)",
+    "sha256": {
+      "BC": "90ae70b5b468face319ff7a006560b4dc32c104b9f7004836d1a6c2627091da1",
+      "N_OpenGL": "a00b08c404b0a4b30b145dc25784b66156d037b85ea0c4d2c32fd07a614b0e5e",
+      "ORM": "36817003257d6a0494093832606f468d9848bcf6930865dd258d93dd5abcefd5"
+    },
+    "textures_dir": "work/h2-baseline/textures"
+  },
+  "channel_views": [
+    "channel-metallic-front-h2",
+    "channel-metallic-front-base",
+    "channel-metallic-back-h2",
+    "channel-metallic-back-base",
+    "channel-roughness-front-h2",
+    "channel-roughness-front-base"
+  ],
   "denoise": true,
   "device": "GPU:OPTIX:NVIDIA GeForce RTX 4090",
   "h2_bounds_m": [
@@ -23,6 +40,11 @@
     "fov_deg_horizontal": 35,
     "pitch_deg": -55,
     "silhouettes": {
+      "k2-1p6/base": {
+        "height_px": 116,
+        "silhouette_px": 6072,
+        "width_px": 79
+      },
       "k2-1p6/h2": {
         "height_px": 116,
         "silhouette_px": 6072,
@@ -32,6 +54,11 @@
         "height_px": 116,
         "silhouette_px": 6090,
         "width_px": 77
+      },
+      "k2-5x/base": {
+        "height_px": 362,
+        "silhouette_px": 57795,
+        "width_px": 246
       },
       "k2-5x/h2": {
         "height_px": 362,
@@ -56,6 +83,16 @@
       1540
     ]
   },
+  "pose_closeups": [
+    "pose-fist_front-arm_r_raise-h2",
+    "pose-fist_front-arm_r_raise-base",
+    "pose-fist_front-arm_r_raise-ao-h2",
+    "pose-fist_front-arm_r_raise-ao-base",
+    "pose-fist_q34-arm_r_raise-h2",
+    "pose-fist_q34-arm_r_raise-base",
+    "pose-fist_q34-arm_r_raise-ao-h2",
+    "pose-fist_q34-arm_r_raise-ao-base"
+  ],
   "samples": 64,
   "shots": [
     {
@@ -89,6 +126,16 @@
       ]
     },
     {
+      "name": "ortho-front-base",
+      "px": [
+        1021,
+        1540
+      ],
+      "sets": [
+        "BASE"
+      ]
+    },
+    {
       "name": "ortho-side-h2",
       "px": [
         1021,
@@ -116,6 +163,16 @@
       ],
       "sets": [
         "PREV"
+      ]
+    },
+    {
+      "name": "ortho-side-base",
+      "px": [
+        1021,
+        1540
+      ],
+      "sets": [
+        "BASE"
       ]
     },
     {
@@ -149,6 +206,16 @@
       ]
     },
     {
+      "name": "ortho-back-base",
+      "px": [
+        1021,
+        1540
+      ],
+      "sets": [
+        "BASE"
+      ]
+    },
+    {
       "name": "closeup-face_front-h2",
       "px": [
         900,
@@ -166,6 +233,16 @@
       ],
       "sets": [
         "HP"
+      ]
+    },
+    {
+      "name": "closeup-face_front-base",
+      "px": [
+        900,
+        900
+      ],
+      "sets": [
+        "BASE"
       ]
     },
     {
@@ -189,6 +266,16 @@
       ]
     },
     {
+      "name": "closeup-face_3q-base",
+      "px": [
+        900,
+        900
+      ],
+      "sets": [
+        "BASE"
+      ]
+    },
+    {
       "name": "closeup-crown-h2",
       "px": [
         900,
@@ -206,6 +293,16 @@
       ],
       "sets": [
         "HP"
+      ]
+    },
+    {
+      "name": "closeup-crown-base",
+      "px": [
+        900,
+        900
+      ],
+      "sets": [
+        "BASE"
       ]
     },
     {
@@ -229,6 +326,16 @@
       ]
     },
     {
+      "name": "closeup-hand_r-base",
+      "px": [
+        900,
+        900
+      ],
+      "sets": [
+        "BASE"
+      ]
+    },
+    {
       "name": "closeup-hand_l_grip-h2",
       "px": [
         900,
@@ -246,6 +353,16 @@
       ],
       "sets": [
         "HP"
+      ]
+    },
+    {
+      "name": "closeup-hand_l_grip-base",
+      "px": [
+        900,
+        900
+      ],
+      "sets": [
+        "BASE"
       ]
     },
     {
@@ -269,6 +386,16 @@
       ]
     },
     {
+      "name": "closeup-bow_upper-base",
+      "px": [
+        900,
+        900
+      ],
+      "sets": [
+        "BASE"
+      ]
+    },
+    {
       "name": "closeup-quiver_back-h2",
       "px": [
         900,
@@ -286,6 +413,16 @@
       ],
       "sets": [
         "HP"
+      ]
+    },
+    {
+      "name": "closeup-quiver_back-base",
+      "px": [
+        900,
+        900
+      ],
+      "sets": [
+        "BASE"
       ]
     },
     {
@@ -309,6 +446,16 @@
       ]
     },
     {
+      "name": "closeup-sandal_l-base",
+      "px": [
+        900,
+        900
+      ],
+      "sets": [
+        "BASE"
+      ]
+    },
+    {
       "name": "k2-5x-h2",
       "px": [
         1920,
@@ -329,6 +476,16 @@
       ]
     },
     {
+      "name": "k2-5x-base",
+      "px": [
+        1920,
+        1080
+      ],
+      "sets": [
+        "BASE"
+      ]
+    },
+    {
       "name": "k2-1p6-h2",
       "px": [
         1920,
@@ -346,6 +503,56 @@
       ],
       "sets": [
         "PREV"
+      ]
+    },
+    {
+      "name": "k2-1p6-base",
+      "px": [
+        1920,
+        1080
+      ],
+      "sets": [
+        "BASE"
+      ]
+    },
+    {
+      "name": "pose-fist_front-arm_r_raise-h2",
+      "px": [
+        900,
+        900
+      ],
+      "sets": [
+        "H2"
+      ]
+    },
+    {
+      "name": "pose-fist_front-arm_r_raise-base",
+      "px": [
+        900,
+        900
+      ],
+      "sets": [
+        "BASE"
+      ]
+    },
+    {
+      "name": "pose-fist_q34-arm_r_raise-h2",
+      "px": [
+        900,
+        900
+      ],
+      "sets": [
+        "H2"
+      ]
+    },
+    {
+      "name": "pose-fist_q34-arm_r_raise-base",
+      "px": [
+        900,
+        900
+      ],
+      "sets": [
+        "BASE"
       ]
     }
   ],

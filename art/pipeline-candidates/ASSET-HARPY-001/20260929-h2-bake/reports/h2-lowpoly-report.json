@@ -1,73 +1,87 @@
 {
  "blender": "5.2.2 LTS",
- "input_blend_sha256": "12994b6c75983ce129c0eb0d889c19b7da40ab868453a955468ff1a58768b3b3",
+ "input_blend_sha256": "1628d5a373ee54d0c16c1d1d28b4b96d79a4514441d7170f56a6d2e75bba4eef",
+ "nonmanifold_fix": {
+  "tripo_part_10": {
+   "edges_before": 1,
+   "faces_removed": 0,
+   "left": 0,
+   "vertex_splits": 2
+  },
+  "tripo_part_6": {
+   "edges_before": 2,
+   "faces_removed": 0,
+   "left": 0,
+   "vertex_splits": 2
+  }
+ },
  "output_blend": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/work/h2-lowpoly.blend",
  "parts": {
   "cap_100": {
-   "decimate_ratio": 0.976562,
+   "decimate_ratio": 0.488281,
    "distance_high_to_low": {
-    "max_mm": 0.008,
-    "p50_mm": 0.0,
-    "p95_mm": 0.0,
-    "p99_mm": 0.001
+    "max_mm": 0.344,
+    "p50_mm": 0.027,
+    "p95_mm": 0.116,
+    "p99_mm": 0.173
    },
    "distance_low_to_high": {
-    "max_mm": 0.009,
-    "p50_mm": 0.0,
-    "p95_mm": 0.0,
-    "p99_mm": 0.001
+    "max_mm": 0.269,
+    "p50_mm": 0.027,
+    "p95_mm": 0.114,
+    "p99_mm": 0.163
    },
-   "faces_flipped_vs_highpoly_fraction": 0.0,
+   "faces_flipped_vs_highpoly_fraction": 0.0018,
    "factor_search": [],
    "inconsistent_winding_edges": 0,
    "loose_vertices": 0,
-   "min_triangle_area_mm2": 0.741655,
+   "min_triangle_area_mm2": 0.871224,
    "non_manifold_edges": 0,
    "open_edges": 0,
    "priority_regions": {},
    "role": "neck cap (repair of the trimmed hood / dropped Janus face part)",
    "side": "C",
-   "target_triangles": 500,
-   "triangles": 874,
+   "target_triangles": 250,
+   "triangles": 436,
    "triangles_below_1e-4_cm2_at_final_scale": 0,
    "triangles_highpoly": 512,
    "vertex_group_factor": null,
-   "vertices": 439,
+   "vertices": 220,
    "vertices_highpoly_split": 450,
    "vertices_highpoly_welded": 450
   },
-  "patch_101": {
-   "decimate_ratio": 0.01873,
+  "fill_102": {
+   "decimate_ratio": 0.011949,
    "distance_high_to_low": {
-    "max_mm": 1.92,
-    "p50_mm": 0.263,
-    "p95_mm": 0.881,
-    "p99_mm": 1.241
+    "max_mm": 14.862,
+    "p50_mm": 0.514,
+    "p95_mm": 2.659,
+    "p99_mm": 5.656
    },
    "distance_low_to_high": {
-    "max_mm": 1.814,
-    "p50_mm": 0.247,
-    "p95_mm": 0.813,
-    "p99_mm": 0.973
+    "max_mm": 3.56,
+    "p50_mm": 0.274,
+    "p95_mm": 1.294,
+    "p99_mm": 1.883
    },
-   "faces_flipped_vs_highpoly_fraction": 0.0289,
+   "faces_flipped_vs_highpoly_fraction": 0.1667,
    "factor_search": [],
    "inconsistent_winding_edges": 0,
    "loose_vertices": 0,
-   "min_triangle_area_mm2": 0.279485,
+   "min_triangle_area_mm2": 0.150431,
    "non_manifold_edges": 0,
-   "open_edges": 605,
+   "open_edges": 713,
    "priority_regions": {},
-   "role": "nape feathers: copy of the head's back feathers over the cap, with backing sheet (repair)",
+   "role": "nape feathers: 14 conformed copies of dark collar feathers over the neck cap (repair.fills, H2.1)",
    "side": "C",
-   "target_triangles": 800,
-   "triangles": 799,
+   "target_triangles": 1400,
+   "triangles": 1399,
    "triangles_below_1e-4_cm2_at_final_scale": 0,
-   "triangles_highpoly": 42712,
+   "triangles_highpoly": 117165,
    "vertex_group_factor": null,
-   "vertices": 726,
-   "vertices_highpoly_split": 22736,
-   "vertices_highpoly_welded": 22736
+   "vertices": 1067,
+   "vertices_highpoly_split": 66257,
+   "vertices_highpoly_welded": 61042
   },
   "tripo_part_0": {
    "decimate_ratio": 0.014978,
@@ -217,11 +231,11 @@
    },
    "faces_flipped_vs_highpoly_fraction": 0.0039,
    "factor_search": [],
-   "inconsistent_winding_edges": 1,
+   "inconsistent_winding_edges": 0,
    "loose_vertices": 0,
    "min_triangle_area_mm2": 0.15354,
-   "non_manifold_edges": 1,
-   "open_edges": 186,
+   "non_manifold_edges": 0,
+   "open_edges": 189,
    "priority_regions": {
     "talons": {
      "min_triangles": null,
@@ -229,7 +243,7 @@
      "triangles_lowpoly": 1317,
      "uv_density_factor": 1.5,
      "vertices_highpoly": 34366,
-     "vertices_lowpoly": 743
+     "vertices_lowpoly": 745
     }
    },
    "role": "left foot: scaled tarsus, toes, talons",
@@ -239,7 +253,7 @@
    "triangles_below_1e-4_cm2_at_final_scale": 0,
    "triangles_highpoly": 68017,
    "vertex_group_factor": null,
-   "vertices": 743,
+   "vertices": 745,
    "vertices_highpoly_split": 35600,
    "vertices_highpoly_welded": 34366
   },
@@ -424,11 +438,11 @@
    },
    "faces_flipped_vs_highpoly_fraction": 0.0046,
    "factor_search": [],
-   "inconsistent_winding_edges": 5,
+   "inconsistent_winding_edges": 3,
    "loose_vertices": 0,
    "min_triangle_area_mm2": 0.056255,
-   "non_manifold_edges": 2,
-   "open_edges": 200,
+   "non_manifold_edges": 0,
+   "open_edges": 201,
    "priority_regions": {},
    "role": "left leg: feathered thigh, shin, gold ankle band",
    "side": "L",
@@ -437,7 +451,7 @@
    "triangles_below_1e-4_cm2_at_final_scale": 0,
    "triangles_highpoly": 108233,
    "vertex_group_factor": null,
-   "vertices": 921,
+   "vertices": 923,
    "vertices_highpoly_split": 56257,
    "vertices_highpoly_welded": 54411
   },
@@ -517,8 +531,8 @@
    "vertices_highpoly_welded": 31877
   }
  },
- "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2-bake-h2.json",
- "profile_sha256": "290171af1526825c1b9960bcaaa432c90cdfa0889451dc73e7ed3edde8670ad3",
+ "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2-bake-h21.json",
+ "profile_sha256": "e24a0b51101ccfd7da6c73177d21d83eef98341f7a24acc975ee1a72c9dbf252",
  "repair": {
   "caps": {
    "cap_100": {
@@ -603,64 +617,331 @@
     "why": "front-concept face of the Janus head (source -Y); after the 180 deg turn it would be a second face on the back of the head. Its neck sat in the hood/neck column of tripo_part_1 (see repair.trim)"
    }
   },
-  "occluder_only_parts": {
-   "tripo_part_7": "Tripo base (gold cylinder, source Ø0.321 m): AO occluder under the feet only; the game base is the parametric SM_Harpy_Base (instance pips, team band)"
-  },
-  "patches": {
-   "patch_101": {
-    "area_m2": 0.0242017,
+  "fills": {
+   "fill_102": {
+    "area_m2": 0.0692046,
     "boxes": [
      {
       "max": [
-       0.052,
-       0.0,
-       0.54
+       -0.02,
+       0.1,
+       0.465
       ],
       "min": [
-       -0.052,
-       -0.065,
-       0.43
+       -0.066,
+       0.0,
+       0.395
       ]
      }
     ],
-    "faces": 42712,
-    "faces_sheet": 21356,
-    "matrix": [
-     [
-      1.0,
-      0.0,
-      0.0,
-      0.0
-     ],
-     [
-      0.0,
-      1.0,
-      0.0,
-      0.045
-     ],
-     [
-      0.0,
-      0.0,
-      1.0,
-      -0.045
-     ],
-     [
-      0.0,
-      0.0,
-      0.0,
-      1.0
-     ]
+    "copies": 14,
+    "faces": 117165,
+    "faces_per_copy": 10893,
+    "height_scale": 0.7,
+    "lift_m": 0.001,
+    "ray_misses": 20967,
+    "source": "HP_tripo_part_1",
+    "source_centre_m": [
+     -0.0449,
+     0.0298,
+     0.4251
     ],
-    "solidify_m": 0.002,
-    "source": "HP_tripo_part_0",
-    "translate": [
-     0.0,
-     0.045,
-     -0.045
+    "source_height_range_m": 0.0325,
+    "source_normal": [
+     -0.067,
+     0.8153,
+     0.5752
     ],
-    "why": "the head's own back feathers (tripo_part_0 faces with centroid behind y -0.065, z 0.43..0.54, |x| <= 0.052; Tripo UVs and material kept) copied 4.5 cm back and 4.5 cm down over the cap's upper half, so the crest continues into the collar as on the back concept instead of a smooth dark shape; a reversed backing sheet 2 mm behind it (no rim) keeps its back side from showing culled faces toward the front camera (without it: 20-35 px see-through at azimuth 320-340). Proposal"
+    "surface": "cap_100",
+    "targets": [
+     {
+      "at": [
+       -0.045,
+       0.012,
+       0.435
+      ],
+      "faces_dropped_outside": 451,
+      "normal": [
+       -0.4835,
+       0.2357,
+       -0.843
+      ],
+      "on_surface": [
+       -0.0402,
+       0.0096,
+       0.4435
+      ],
+      "scale": 0.6,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.045,
+       0.012,
+       0.435
+      ],
+      "faces_dropped_outside": 1075,
+      "normal": [
+       0.4592,
+       0.3011,
+       -0.8358
+      ],
+      "on_surface": [
+       0.0416,
+       0.0098,
+       0.4412
+      ],
+      "scale": 0.6,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       -0.03,
+       0.0,
+       0.46
+      ],
+      "faces_dropped_outside": 1703,
+      "normal": [
+       0.0443,
+       0.0746,
+       0.9962
+      ],
+      "on_surface": [
+       -0.0302,
+       -0.0004,
+       0.4545
+      ],
+      "scale": 0.8,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.0,
+       0.0,
+       0.465
+      ],
+      "faces_dropped_outside": 153,
+      "normal": [
+       -0.1423,
+       0.1695,
+       0.9752
+      ],
+      "on_surface": [
+       -0.0006,
+       -0.0019,
+       0.4535
+      ],
+      "scale": 0.8,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.03,
+       0.0,
+       0.46
+      ],
+      "faces_dropped_outside": 2303,
+      "normal": [
+       -0.1876,
+       0.2613,
+       0.9468
+      ],
+      "on_surface": [
+       0.031,
+       -0.0015,
+       0.4547
+      ],
+      "scale": 0.8,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       -0.015,
+       0.03,
+       0.43
+      ],
+      "faces_dropped_outside": 1003,
+      "normal": [
+       -0.0088,
+       0.9726,
+       0.2325
+      ],
+      "on_surface": [
+       -0.0149,
+       0.0238,
+       0.4285
+      ],
+      "scale": 0.75,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.015,
+       0.03,
+       0.43
+      ],
+      "faces_dropped_outside": 1704,
+      "normal": [
+       -0.1264,
+       0.9691,
+       0.2117
+      ],
+      "on_surface": [
+       0.0156,
+       0.0254,
+       0.429
+      ],
+      "scale": 0.75,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.0,
+       0.045,
+       0.4
+      ],
+      "faces_dropped_outside": 2380,
+      "normal": [
+       -0.0278,
+       0.8725,
+       0.4878
+      ],
+      "on_surface": [
+       0.0002,
+       0.0389,
+       0.3966
+      ],
+      "scale": 0.7,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       -0.05,
+       0.0,
+       0.456
+      ],
+      "faces_dropped_outside": 3491,
+      "normal": [
+       -0.3204,
+       -0.2424,
+       0.9158
+      ],
+      "on_surface": [
+       -0.0501,
+       -0.0001,
+       0.4563
+      ],
+      "scale": 0.55,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.05,
+       0.0,
+       0.456
+      ],
+      "faces_dropped_outside": 3558,
+      "normal": [
+       0.2106,
+       -0.349,
+       0.9131
+      ],
+      "on_surface": [
+       0.0497,
+       0.0005,
+       0.4546
+      ],
+      "scale": 0.55,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       -0.042,
+       0.028,
+       0.456
+      ],
+      "faces_dropped_outside": 6148,
+      "normal": [
+       -0.4037,
+       0.8922,
+       -0.2027
+      ],
+      "on_surface": [
+       -0.0422,
+       0.0284,
+       0.4559
+      ],
+      "scale": 0.55,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.042,
+       0.028,
+       0.456
+      ],
+      "faces_dropped_outside": 3915,
+      "normal": [
+       -0.1911,
+       -0.1601,
+       0.9684
+      ],
+      "on_surface": [
+       0.042,
+       0.028,
+       0.4559
+      ],
+      "scale": 0.55,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       -0.022,
+       -0.025,
+       0.455
+      ],
+      "faces_dropped_outside": 4289,
+      "normal": [
+       -0.1132,
+       -0.3553,
+       0.9279
+      ],
+      "on_surface": [
+       -0.022,
+       -0.0249,
+       0.4547
+      ],
+      "scale": 0.55,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.022,
+       -0.025,
+       0.455
+      ],
+      "faces_dropped_outside": 3164,
+      "normal": [
+       0.1788,
+       -0.3357,
+       0.9249
+      ],
+      "on_surface": [
+       0.0218,
+       -0.0246,
+       0.4539
+      ],
+      "scale": 0.55,
+      "turn_deg": 0.0
+     }
+    ],
+    "why": "H2.1 nape: the smooth dark cap_100 read as a bald hood inside the collar from every game camera (scratch HP probe 2026-09-29: cap pixels 210 441 over 8 game azimuths at pitch -55, ortho 0.22 m). The dark collar feathers right of the neck (tripo_part_1, box above; Tripo UVs and texture, 10.9k HP faces) are laid 14 times on the cap (8 on the dome and the V down the back, 6 around the rim lip), each copy conformed to the cap surface with its relief (x0.7) and turned so its feathers point down the nape / out over the collar; faces of a copy that fall wholly beyond the cap are dropped. Probe: cap pixels 210 441 -> 13 441 (-94 %). Proposal"
    }
   },
+  "occluder_only_parts": {
+   "tripo_part_7": "Tripo base (gold cylinder, source Ø0.321 m): AO occluder under the feet only; the game base is the parametric SM_Harpy_Base (instance pips, team band)"
+  },
+  "patches": {},
   "plugs": {},
   "rotate_z_deg": 180.0,
   "trims": {
@@ -742,7 +1023,7 @@
   "why": "Janus head of Tripo task 330872a3 (measured 2026-09-29, work/probe sheets): the side concept (drawn over ortho_left, face looking left) went into the RIGHT slot, so Tripo fitted a face on BOTH sides of the head (-Y: tripo_part_12 from the front concept; +Y: tripo_part_0 from the mirrored side profile) and swept the wings toward -Y. Turning the high-poly 180 deg about Z makes the side-consistent face (tripo_part_0, with a real nose/chin profile) the front and sweeps the wings back as in the side concept; the front-concept face part tripo_part_12 is dropped. The dropped face sat inside a feathered hood of the TORSO part tripo_part_1 (its neck column behind the head, authored y -0.026..0.070, rising to z 0.534 = eye level): that hood stays hollow after the drop (open toward +Y, its inside faces the viewer from behind) and reads from the elevated game camera as a smooth bald dome behind the crest (harpy-h2-bake/1 review, verifier frames 2026-09-29). Profile /2 trims it (repair.trim), closes the torso's neck opening with a closed cap (repair.caps) and covers the cap's upper half with a copy of the head's own back feathers (repair.patches). The back of tripo_part_0 itself is a closed feathered surface. The second ankle band tripo_part_11 (right leg after the turn) is kept because it is structural (see kept_parts_note). Repair of a generation defect, proposal; regeneration with the side view in the LEFT slot is the clean fix (followup)"
  },
  "schema": "unmatched.h2-bake.lowpoly-report/1",
- "seconds": 35.2,
+ "seconds": 50.7,
  "settings": {
   "decimate": "COLLAPSE, use_collapse_triangulate, vertex group h2_priority (factor 1)",
   "distance_samples_per_part": 20000,
@@ -1357,12 +1638,12 @@
     }
    ]
   },
-  "seconds": 2.9,
+  "seconds": 3.7,
   "settings": {
    "enabled": true,
    "exclude_parts": [
     "cap_100",
-    "patch_101"
+    "fill_102"
    ],
    "junctions": true,
    "max_edge_factor": 1.5,
@@ -1469,5 +1750,5 @@
    "tripo_part_9": 55
   }
  },
- "triangles_total": 28458
+ "triangles_total": 28620
 }

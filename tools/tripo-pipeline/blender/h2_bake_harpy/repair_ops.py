@@ -223,6 +223,149 @@ def copy_patch(src, name, boxes, pivot=(0.0, 0.0, 0.0), scale=(1.0, 1.0, 1.0), r
     return obj, info
 
 
+def _frame(n, flow):
+    """Orthonormal (d, e, n): d = flow projected onto the plane of n (fallback -Z, then +Y), e = n x d."""
+    n = np.asarray(n, np.float64)
+    n = n / np.linalg.norm(n)
+    for f in (flow, (0.0, 0.0, -1.0), (0.0, 1.0, 0.0)):
+        d = np.asarray(f, np.float64) - np.dot(f, n) * n
+        if np.linalg.norm(d) > 1e-6:
+            d = d / np.linalg.norm(d)
+            return d, np.cross(n, d), n
+    raise RuntimeError("_frame: degenerate flow")
+
+
+def conform_fill(src, name, boxes, surface, targets, exclude_boxes=(), source_flow=(0.0, 0.0, -1.0),
+                 lift_m=0.001, height_scale=1.0, probe_m=0.05, drop_outside=False):
+    """Feather clusters laid on a repair surface (H2.1 nape fill). The faces of `src` whose centroid lies in `boxes`
+    (and in no exclude box) are one source cluster with its Tripo UVs and material; its frame is the area-weighted
+    centroid c_s, mean normal n_s and the flow d_s = source_flow in the cluster plane. Each target
+    {"at": point, "flow": direction, "scale": s, "turn_deg": a} is projected onto the nearest point of `surface`
+    (closed repair cap: its outside), and the cluster is laid there: a vertex with cluster coordinates (a, b, h) goes
+    to S(t + s*(a d_t + b e_t) rotated by turn_deg about n_t) + N * (lift_m + height_scale * s * (h - h_min)), where S
+    is the surface point hit by a ray along -n_t (the plane point where the ray misses) and N the surface normal
+    there, so the lowest point of every copy sits lift_m above the surface and the feathers keep their relief and their
+    own flow direction (down the nape). drop_outside: faces of a copy whose corners all miss the surface (beyond its
+    rim, where the tangent plane would carry them away from the surface) are removed. All copies are one new object
+    `name`. Deterministic (explicit orders). Returns (obj, info)."""
+    from mathutils.bvhtree import BVHTree
+    me_src = src.data.copy()
+    cen = face_centroids(me_src)
+    keep = np.zeros(len(cen), bool)
+    for box in boxes:
+        keep |= in_box(cen, box)
+    for box in exclude_boxes:
+        keep &= ~in_box(cen, box)
+    bm = bmesh.new()
+    bm.from_mesh(me_src)
+    bm.faces.ensure_lookup_table()
+    bmesh.ops.delete(bm, geom=[bm.faces[i] for i in np.nonzero(~keep)[0].tolist()], context="FACES_ONLY")
+    bmesh.ops.delete(bm, geom=[e for e in bm.edges if not e.link_faces], context="EDGES")
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
+    bm.to_mesh(me_src)
+    bm.free()
+    drop_custom_normals(me_src)
+    me_src.update()
+    co = np.empty(len(me_src.vertices) * 3, np.float32)
+    me_src.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3).astype(np.float64)
+    fc = face_centroids(me_src)
+    fa = np.empty(len(me_src.polygons), np.float32)
+    me_src.polygons.foreach_get("area", fa)
+    fn = np.empty(len(me_src.polygons) * 3, np.float32)
+    me_src.polygons.foreach_get("normal", fn)
+    fn = fn.reshape(-1, 3).astype(np.float64)
+    fa = fa.astype(np.float64)
+    c_s = (fc * fa[:, None]).sum(0) / fa.sum()
+    n_s = (fn * fa[:, None]).sum(0)
+    d_s, e_s, n_s = _frame(n_s, source_flow)
+    rel_ = co - c_s
+    la, lb, lh = rel_ @ d_s, rel_ @ e_s, rel_ @ n_s
+    h_min = float(lh.min())
+    sv, st = [], []
+    sme = surface.data
+    sco = np.empty(len(sme.vertices) * 3, np.float32)
+    sme.vertices.foreach_get("co", sco)
+    sco = sco.reshape(-1, 3).astype(np.float64)
+    sme.calc_loop_triangles()
+    stri = np.empty(len(sme.loop_triangles) * 3, np.int32)
+    sme.loop_triangles.foreach_get("vertices", stri)
+    bvh = BVHTree.FromPolygons(sco.tolist(), stri.reshape(-1, 3).tolist(), all_triangles=True)
+    parts_me = []
+    info_t = []
+    misses = 0
+    for k, tg in enumerate(targets):
+        hit = bvh.find_nearest(Vector(tg["at"]))
+        t_c, n_t = np.array(hit[0]), np.array(hit[1])
+        d_t, e_t, n_t = _frame(n_t, tg.get("flow", (0.0, 0.0, -1.0)))
+        ang = math.radians(float(tg.get("turn_deg", 0.0)))
+        d_r = d_t * math.cos(ang) + e_t * math.sin(ang)
+        e_r = np.cross(n_t, d_r)
+        s = float(tg.get("scale", 1.0))
+        new = np.empty_like(co)
+        missed = np.zeros(len(co), bool)
+        for i in range(len(co)):
+            q = t_c + s * (la[i] * d_r + lb[i] * e_r)
+            loc, nrm, _idx, _d = bvh.ray_cast(Vector(q + n_t * probe_m), Vector(-n_t), 2 * probe_m)
+            if loc is None:
+                misses += 1
+                missed[i] = True
+                base, nn = q, n_t
+            else:
+                base, nn = np.array(loc), np.array(nrm)
+                if nn @ n_t < 0:
+                    nn = -nn
+            new[i] = base + nn * (lift_m + float(tg.get("height_scale", height_scale)) * s * (lh[i] - h_min))
+        m = me_src.copy()
+        m.vertices.foreach_set("co", new.astype(np.float32).reshape(-1))
+        m.update()
+        dropped = 0
+        if drop_outside and missed.any():
+            bmd = bmesh.new()
+            bmd.from_mesh(m)
+            bmd.faces.ensure_lookup_table()
+            gone = [f for f in bmd.faces if all(missed[v.index] for v in f.verts)]
+            dropped = len(gone)
+            bmesh.ops.delete(bmd, geom=gone, context="FACES_ONLY")
+            bmesh.ops.delete(bmd, geom=[e for e in bmd.edges if not e.link_faces], context="EDGES")
+            bmesh.ops.delete(bmd, geom=[v for v in bmd.verts if not v.link_faces], context="VERTS")
+            bmd.to_mesh(m)
+            bmd.free()
+            m.update()
+        parts_me.append(m)
+        info_t.append({"at": [round(float(x), 4) for x in tg["at"]], "on_surface": [round(float(x), 4) for x in t_c],
+                       "normal": [round(float(x), 4) for x in n_t], "scale": s, "turn_deg": float(tg.get("turn_deg", 0.0)),
+                       "faces_dropped_outside": dropped})
+    # join the copies (explicit order) into one mesh
+    bm = bmesh.new()
+    for m in parts_me:
+        bm.from_mesh(m)
+    out = bpy.data.meshes.new(name)
+    bm.to_mesh(out)
+    bm.free()
+    for m in parts_me:
+        bpy.data.meshes.remove(m)
+    for mat in me_src.materials:
+        # own copy of the source material (same images): stage_bake rewires the emission of each HP part's material, and a
+        # recolour rule of the source part (bake.recolor) must not be undone by, or leak into, the fill
+        mc = mat.copy()
+        mc.name = "M_H2_%s" % name.replace("HP_", "")
+        out.materials.append(mc)
+    for poly in out.polygons:
+        poly.use_smooth = True
+    out.update()
+    bpy.data.meshes.remove(me_src)
+    obj = bpy.data.objects.new(name, out)
+    area = np.empty(len(out.polygons), np.float32)
+    out.polygons.foreach_get("area", area)
+    info = {"source": src.name, "boxes": boxes, "faces_per_copy": int(keep.sum()), "faces": len(out.polygons),
+            "copies": len(targets), "source_centre_m": [round(float(x), 4) for x in c_s],
+            "source_normal": [round(float(x), 4) for x in n_s], "source_height_range_m": round(float(lh.max() - h_min), 4),
+            "ray_misses": int(misses), "lift_m": lift_m, "height_scale": height_scale,
+            "area_m2": round(float(area.sum()), 7), "targets": info_t}
+    return obj, info
+
+
 def boundary_loops_ordered(me, weld=1e-6):
     """Open boundary loops of a mesh as ordered position arrays (welded copy). At a branch point (more than two
     boundary edges) the walk takes the unvisited edge that continues straightest."""

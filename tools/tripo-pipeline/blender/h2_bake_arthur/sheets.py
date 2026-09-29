@@ -93,13 +93,14 @@ def main():
     storage = {}
     what = {"ortho": "орто", "close": "крупный план", "game": "игровая камера",
             "teamdye": "TeamDye"}
+    tex_label = profile["review"].get("textures_label", "H2 bake (атлас 2K)")
     for name, fr in sorted(rev["frames"].items()):
         png = P.REPO / fr["png"]
         kind = name.split("_")[0]
         cam = ("FOV %s, %.2f m" % (fr["horizontal_fov_deg"], fr["distance_m"])) if fr["horizontal_fov_deg"] else "орто"
-        txt = "blender · EEVEE · H2 bake (атлас 2K) · %s · %s · %s" % (what.get(kind, kind), name, cam)
+        txt = "blender · EEVEE · %s · %s · %s · %s" % (tex_label, what.get(kind, kind), name, cam)
         if "prev" in name:
-            txt = txt.replace("H2 bake (атлас 2K)", "прежний кандидат CLI 2026-09-28")
+            txt = txt.replace(tex_label, "прежний кандидат CLI 2026-09-28")
         img = label(Image.open(png), txt)
         storage[name] = {"raw_png_sha256": P.sha256(png), "raw_png_bytes": png.stat().st_size} | save_jpg(img, frames_dir / (name + ".jpg"))
     concepts = profile["sources"]["concepts"]
@@ -108,7 +109,7 @@ def main():
         c = Image.open(P.repo_path(concepts[view])).convert("RGB")
         r = Image.open(raw / (fname + ".png")).convert("RGB").resize(c.size, Image.LANCZOS)
         sheet = hstack([label(c, "концепт H2 (Codex imagegen) · %s" % view, 22),
-                        label(r, "blender · EEVEE · H2 bake %s tris, атлас 2K · %s" % (tris_k, fname), 22)])
+                        label(r, "blender · EEVEE · %s · %s tris · %s" % (tex_label, tris_k, fname), 22)])
         sheets["compare_" + view] = save_jpg(sheet, out_dir / ("compare_%s.jpg" % view))
     tiles = []
     for name in sorted(n for n in rev["frames"] if n.startswith("close_")):
@@ -136,13 +137,13 @@ def main():
             k = 4 if cam == "K1" else 3
             big = hstack([a.resize((a.width * k, a.height * k), Image.NEAREST), b.resize((b.width * k, b.height * k), Image.NEAREST)])
             cells.append(label(vstack([hstack([a, b]), big]),
-                               "blender · %s az %d · H2 | прежний CLI 09-28 · 1:1 и x%d (nearest)" % (cam, az, k), 13))
+                               "blender · %s az %d · %s | прежний CLI 09-28 · 1:1 и x%d (nearest)" % (cam, az, tex_label, k), 13))
         rows.append(hstack(cells, gap=14))
     sheets["game_scale"] = save_jpg(vstack(rows, gap=14), out_dir / "game_scale.jpg")
     k2 = []
     for az in profile["review"]["game_azimuths"]:
         a, b = pair_crop("K2S05", az)
-        k2.append(label(hstack([a, b]), "blender · K2 S05 (FOV 20, 3 m) az %d · H2 | прежний CLI 09-28" % az, 16))
+        k2.append(label(hstack([a, b]), "blender · K2 S05 (FOV 20, 3 m) az %d · %s | прежний CLI 09-28" % (az, tex_label), 16))
     sheets["game_K2S05"] = save_jpg(vstack(k2, gap=10), out_dir / "game_K2S05.jpg")
     # back views at the game cameras: textured | TeamDye (lerp(BC, blue, TeamMask.R)), same crop
     back_rows = []
@@ -155,7 +156,7 @@ def main():
         arr = np.asarray(ia).astype(np.int32)
         ys, xs = np.nonzero(np.abs(arr - arr[2, 2]).sum(axis=2) > 20)
         box = (max(xs.min() - 10, 0), max(ys.min() - 10, 0), min(xs.max() + 10, ia.width), min(ys.max() + 10, ia.height))
-        cells = [label(ia.crop(box), "blender · %s az %d · H2 bake, атлас 2K" % (cam, az), 16)]
+        cells = [label(ia.crop(box), "blender · %s az %d · %s" % (cam, az, tex_label), 16)]
         if b.exists():
             cells.append(label(Image.open(b).convert("RGB").crop(box),
                                "blender · %s az %d · TeamDye lerp(BC, синий, TeamMask.R)" % (cam, az), 16))
@@ -164,7 +165,7 @@ def main():
         name = "teamdye_close_%s_az%d" % (profile["review"]["teamdye"]["close_name"], az)
         plain = raw / ("close_%s_az%d.png" % (profile["review"]["teamdye"]["close_name"], az))
         if (raw / (name + ".png")).exists() and plain.exists():
-            back_rows.append(hstack([label(Image.open(plain), "blender · %s · H2 bake, атлас 2K" % plain.stem, 16),
+            back_rows.append(hstack([label(Image.open(plain), "blender · %s · %s" % (plain.stem, tex_label), 16),
                                      label(Image.open(raw / (name + ".png")), "blender · %s · TeamDye" % name, 16)], gap=10))
     if back_rows:
         sheets["back_teamdye"] = save_jpg(vstack(back_rows, gap=10), out_dir / "back_teamdye.jpg")

@@ -1,53 +1,22 @@
 {
- "note": "Hand-written part of the H2 Harpy report (docs/art-pipeline/harpy-h2-report.md), revision 2 (harpy-h2-bake/2, after the verification of revision 1). Statuses: measured numbers are in the stage reports; everything here is an observation on Blender frames (label blender) or a proposal. Not art-accepted, not UE-imported.",
- "revision": {
-  "id": "harpy-h2-bake/2",
-  "date": "2026-09-29",
-  "previous": "harpy-h2-bake/1 (same run folder, rebuilt from the same Tripo GLBs; its frames are not in git)",
-  "verified_defects_fixed": [
-   {
-    "id": "V1-HOOD",
-    "severity": "major",
-    "defect": "the Janus repair left a hollow hood of the TORSO part tripo_part_1 behind the head (the feathered cowl that framed the dropped face tripo_part_12): open toward +Y, its inside faced the viewer from behind (back faces culled with TwoSided=false, cavity in any two-sided render), undisclosed",
-    "fix": "repair.trim removes the 15 829 high-poly faces of tripo_part_1 with centroid above z 0.455 behind the head (x -0.055..0.057, y -0.026..0.070, z 0.455..0.534 authored source frame), in the high-poly and therefore in the game mesh; the torso's neck opening that remains (one open loop, 0.65 m) is closed by the cap cap_100 and covered by patch_101 (below)",
-    "evidence": "preview/fix/before_after_nape_game_back.jpg, before_after_neck_back_ortho.jpg, cmp_closeup_nape_back_game.jpg, cmp_closeup_nape_back3q_game.jpg"
-   },
-   {
-    "id": "V1-BALD-DOME",
-    "severity": "major",
-    "defect": "the same hood read from the elevated game camera (front, pitch -55) as a smooth bald tan dome rising behind the crest to eye level (tripo_part_1 max z 0.534 source) - a 'second bald head' at K2; hidden in the level ortho frames; repair.why misattributed it to tripo_part_0",
-    "fix": "same trim; profile repair.why rewritten (the dome is tripo_part_1's hood; the back of tripo_part_0 is a closed feathered surface). From the front the crest is the top of the figure again; a thin dark edge of the cap/nape patch shows between two crest spikes up close (crest_front_game)",
-    "evidence": "preview/fix/before_after_k2_front.jpg, before_after_k2close_front.jpg, before_after_teamcolor_game3q.jpg, cmp_closeup_crest_front_game.jpg"
-   },
-   {
-    "id": "V1-K2-BACK-LABEL",
-    "severity": "major (review tooling)",
-    "defect": "compose_review.py labelled all K2 crops 'left = previous, right = H2', but from behind (azimuth 180) the H2 figure (x = +0.5) is on the LEFT; the file k2close_back_prev_left_h2_right and the report's back assessment described the previous candidate as H2",
-    "fix": "review_h2.py names every K2 frame from the projected figure centres (…_prev_left_h2_right or …_h2_left_prev_right) and records left_to_right in review-frames-k2.json; compose_review.py labels the crops from that record; new frames k2/k2close_back_h2_left_prev_right and k2close_back3q_h2_left_prev_right (azimuth 140); the old mislabelled files are gone; the back assessment below is written from the H2 figure",
-    "evidence": "preview/crop_k2close_back_h2_left_prev_right.png, preview/crop_k2close_back3q_h2_left_prev_right.png, preview/k2/review-frames-k2.json"
-   },
-   {
-    "id": "V1-NECK-SEE-THROUGH",
-    "severity": "major",
-    "defect": "with back faces culled the background showed through the neck from behind: 119-130 px at azimuth 180 / 4.8 m (components of 69 and 44 px), 42-47 px at 7.5 m; the ellipsoid plug_100 closed only the lower back of the opening; not disclosed",
-    "fix": "the ellipsoid is replaced by cap_100, a closed domed cap built on the neck loop itself (skirt 12 % outside and 4 mm under the rim, lip 3 mm above it, closed underside); new automatic gate see_through.py in run_all.sh (18 azimuths x 4.8 / 7.5 m, one-sided vs two-sided Workbench masks). Measured on the game mesh: 0 openings (no component >= 4 px) at every azimuth; largest component 3 px; the neck gap is gone. The strict gate of the verifier (0 px at azimuths 120-240) is NOT met: isolated 1-3 px pinholes remain (worst frame 4 px in the gated range, 6 px over all azimuths, 50 px over all 36 frames; revision 1: 676 px, worst 130). They are sub-millimetre cracks between Tripo parts that the per-part decimation opened; lowpoly.stitch now welds the shared cuts geometrically (213 -> 50 px before/after stitching), the rest sits at non-shared boundary pieces",
-    "evidence": "reports/see-through.json, preview/see-through/*.png (red = see-through pixels), preview/fix/before_after_see_through_az180.jpg"
-   }
-  ],
-  "other_remarks_addressed": [
-   "logs: 20 stage logs in logs/ (the revision-1 manifest said 20 but there were 18; now run_all.sh also writes preview-shape, see-through and k2-projection logs; counted after the final run)",
-   "the Harpy asset .gitignore (the orchestrator's rules for the raw H2 GLBs) is listed in the commit manifest: it has to be committed with this run or before it, together with 20260929-h2-tripo/reports/tripo-run.json and source-specs/tripo-330872a3-h2.json",
-   "reports/determinism.json has no local paths any more (determinism_check.py writes repo-relative paths or 'scratch:<name>')",
-   "payload: the task rule is 'raw GLBs > 50 MB stay out, everything else goes into the commit manifest', so the 4K masters (5 PNG, ~58 MB) stay in the manifest; the total size is stated there; pinning them by sha256 instead (or LFS) is left to the orchestrator (followup). The single close-ups review/closeup_*.jpg are no longer stored: both halves are in the cmp_closeup_* sheets (store_preview.py records their sha256)",
-   "the H2 GLB table no longer blames the 50 MB policy for parts13.glb (47.3 MB, under 50 MB): both GLBs are excluded by the orchestrator's rules in the asset .gitignore and pinned by sha256 in the source-spec",
-   "the manifest lists the module's .py files one by one (__pycache__ is ignored by the root .gitignore)"
-  ],
-  "found_during_the_fix": [
-   "the per-part decimation opened sub-millimetre cracks along every cut Tripo shares between two parts (36 shared chains between 12 part pairs); stitch.py makes both boundaries the same polyline on the high-poly cut (1 297 vertices inserted, 56 three-part corners closed, 1 sliver collapsed and 1 rotated)",
-   "the first build of the nape patch had a determinism bug (bmesh duplicate's vert_map maps both ways, the loop iterated a set of BMesh elements): the same-path rebuild caught it (patch 798 vs 799 triangles); fixed before the two final builds",
-   "revision 1 counted 1 texel 'covered twice' once the geometry changed: a shared edge through a texel centre (inclusive rasteriser tie); uv_check.py now reports texels_overlapping_strict (strictly inside two triangles) next to the raw count"
-  ]
+ "budget_proposal": {
+  "harpy_triangles": "20-30k (this candidate 28.5k figure + 0.9k base; revision 1: 26.0k; stitching adds ~1.3k). Budget probe of revision 2 (reports/budget-probe.json, same build at x0.5 / x0.75 / x1.5 of the part targets): worst-part p99 surface deviation 0.65 / 0.49 / 0.39 / 0.28 px at K2 7.5 m for 15.0k / 21.7k / 28.5k / 41.7k triangles; the worst-part MAX is 1.36 / 1.25 / 1.06 / 0.55 px, dominated by tripo_part_1 around the trimmed hood rim (hidden under the neck cap); returns diminish above ~20k, 28.5k keeps the face at 1.2k triangles",
+  "hero_triangles": "30-45k (orchestrator's H2 target); not measured on Harpy",
+  "memory_estimate": "2K BC (BC1) + N (BC5) + ORM (BC1) + TeamMask (G8) with mips ~ 16 MB per Harpy material, shared by the three instances",
+  "slots": "2 (body atlas + base), <= 2",
+  "status": "предложено (не бюджет; решение GD-058)",
+  "textures": "4K master (bake target, archive) + 2K runtime; at 2K the body carries 18.5 px/cm, face 36.8 px/cm, talons 27.6 px/cm"
  },
+ "determinism": "see reports/determinism.json",
+ "falls_short": [
+  "the neck cap is a smooth dark area inside the collar (the patch covers its upper half); not sculpted feathers",
+  "1-3 px see-through pinholes remain at every azimuth (50 px over 36 game frames, worst 6 px per frame): the verifier's strict gate (0 px behind the figure) is not met; no opening (component >= 4 px) remains",
+  "two ankle bands (concept: one)",
+  "faceted jaw and crest spikes in extreme close-ups",
+  "head turn 35 deg opens a 3.0 cm gap between head and collar (limit Idle head turns to ~15 deg, as the previous candidate)",
+  "flat roughness; material contrast below the Medusa quality reference",
+  "UV atlas fill 49 % (1.27k islands from Tripo's charts): a dedicated packer would raise texel density by ~20 %"
+ ],
  "findings": [
   {
    "evidence": [
@@ -85,6 +54,110 @@
    "what": "Tripo PBR left the gold bands non-metallic (0 texels with metallic > 0.5); a colour rule (textures.metal_rule) sets metallic 1 / roughness 0.35 on the gold texels of the two band-carrying parts (proposal)."
   }
  ],
+ "h21": {
+  "budget": {
+   "breakdown": "tripo parts unchanged 26 785 (+ lips 363, slivers 33, reversed copies 248); cap 874 -> 436; patch_101 799 -> 0; fill_102 1 399 + 416 copies; core 558",
+   "figure_triangles": 30238,
+   "h2": 28458,
+   "status": "предложено: 0.8 % above the 30k end of the proposed 20-30k"
+  },
+  "done": [
+   {
+    "brief": "(a) smooth neck cap reads as a bald hood",
+    "frames": [
+     "preview/h21/cmp_h21_nape_visibility_masks.jpg",
+     "preview/h21/cmp_h21_nape_game_az{140,180,220}.jpg",
+     "preview/h21/cmp_h21_k2_5x.jpg",
+     "preview/h21/cmp_h21_concept_back.jpg"
+    ],
+    "honest": "at the game distances the nape reads as dark feathers continuing the crest; in the 0.2 m close-ups the fill looks broken up / shard-like (117k HP faces of overlapping feathers decimated to 1.4k triangles, the bake smears across layers) and a few small dark bits of the cap still show between the copies",
+    "id": "H21-NAPE",
+    "measured": "visible cap pixels (nape_visibility.py, 18 azimuths x 3.86/4.8/7.5/12.07 m, back faces culled): 35 719 -> 3 594 (-90 %); worst frame K2 5x 1 699 -> 154 px, K2 1.6x 163 -> 17 px",
+    "what": "patch_101 dropped (it lay mostly under the cap's plane); repair.fills fill_102: the dark collar feathers right of the neck (tripo_part_1, 10 893 HP faces, Tripo UVs and texture) laid 14 times on cap_100 by repair_ops.conform_fill (8 on the dome and the V down the back, 6 around the rim lip), relief x0.7, feathers pointing down the nape / out over the collar; 1 399 game triangles + 416 reversed copies of its triangles whose back is seen from a game direction"
+   },
+   {
+    "brief": "(b) 1-3 px pinholes at azimuths 120-240",
+    "frames": [
+     "preview/see-through-holdout/*.png",
+     "reports/see-through*.json"
+    ],
+    "id": "H21-SEETHROUGH",
+    "measured": "see_through.py: 0 px on all 72 gate frames (18 azimuths x 3.86/4.8/7.5/12.07 m; H2 on the same frames 120 px, 5 holes >= 4 px); strict gate (0 px, azimuths 120-240, 4.8/7.5 m) PASS. Holdout frames never used for tuning (azimuths 10..350, 3.86/4.3/6.0/10 m): 2 px on 2 of 72 frames (H2: 144 px, 3 holes); the core shows through cracks on 99 px of the 72 frames (worst 7 px, where H2 showed background)",
+    "what": "seal.py in stage_rig: sliver fans where the stitch skipped an insertion (33 triangles), contact lips on non-shared boundary edges within 2.5 mm of another part (363), a closed occluder core inside head/torso/thighs (voxels 5 mm, 3 mm from the surface, remesh + decimate to 558 triangles, triangles crossing a body surface pulled in or removed, one dark texel of the cap island, weights from the nearest body vertex) and reversed copies of triangles whose back is exposed along a game direction (all parts, 360 directions, 664 triangles incl. the fill)"
+   },
+   {
+    "brief": "(c) 3 non-manifold edges after the stitch",
+    "id": "H21-NONMANIFOLD",
+    "measured": "lowpoly: 3 -> 0 (tripo_part_6 2, tripo_part_10 1); whole body after the seal: 0 (new rig check)",
+    "what": "seal.fix_nonmanifold after the stitch (vertex fan split, same positions)"
+   },
+   {
+    "brief": "materials: base, talons, feathers",
+    "frames": [
+     "preview/h21/cmp_h21_base_band.jpg",
+     "preview/h21/cmp_h21_talons_3q.jpg",
+     "preview/h21/cmp_h21_teamcolor.jpg",
+     "preview/h21/cmp_h21_concept_front.jpg"
+    ],
+    "honest": "the base now reads as metal; it is darker and more even than the bright gold leaf of the concept (kept darker on purpose: lit pip - top luma margin 65-119 of 255 against the gate 40; H2 97-181). The UE look depends on the Lumen reflections: not verified (UE not touched)",
+    "id": "H21-MATERIALS",
+    "measured": "feathers roughness p1/p50/p99 0.70/0.77/0.83 on 14.7M texels (4K), metallic 0 except the 3x3 soft edge of the bands; talons 215k texels (17-18 % of the feet parts), mean roughness 0.50; base top roughness 0.34-0.43, wall 0.31-0.38, metallic 1",
+    "what": "textures.materials: feathers metallic 0, roughness remapped into 0.70-0.85 (half the part's own Tripo rank, half the baked AO); talons (desaturated dark texels of the feet parts) roughness 0.40-0.55, metallic 0, BC x0.75; gold bands unchanged (metal_rule, metallic 1, roughness 0.35); metal base: own UV layout and a 1K set T_Harpy_H2_Base_{BC,N,ORM}, metallic 1, top antique gold (linear BC 0.30/0.19/0.064, roughness 0.34-0.43), wall gold (0.78/0.52/0.16, roughness 0.31-0.38), smooth wall normals"
+   },
+   {
+    "brief": "face readability at K2",
+    "frames": [
+     "preview/h21/cmp_h21_face.jpg",
+     "preview/h21/cmp_h21_face_headpitch_probe.jpg"
+    ],
+    "honest": "at the game pitch -55 the crest overhangs the face: from K2 5x only the forehead, the brows and the nose tip show, the eyes are hidden; the texture tweak does not change that. Pose probe (head bone +12 deg chin up, not a mesh change): brows, eyes, nose and mouth read at K2 5x",
+    "id": "H21-FACE",
+    "measured": "face luminance std 0.117 -> 0.1165, p5 0.0168 -> 0.0133: a small effect",
+    "what": "face islands: BC x (1 - 0.5 cavity - 0.6 dark detail), darkening only"
+   }
+  ],
+  "falls_short": [
+   "nape fill looks shard-like in close-ups (fine at K2): a cleaner nape needs native feathers (regeneration) or a hand-made feather card set",
+   "holdout see-through: 2 single pixels on 2 of 72 frames that the tuning never used",
+   "face not readable at K2 in the rest pose (crest overhang); pose change is a follow-up",
+   "two ankle bands (Tripo) kept, the concept has one",
+   "3 cm opening between head and collar at a 35 deg head turn (unchanged)",
+   "base darker than the concept's gold leaf; UE Lumen look not verified"
+  ],
+  "manifest_fixes": [
+   {
+    "evidence": "reports/determinism.json (previous_build_other_profile_hash)",
+    "fix": "two full rebuilds of the committed profile into the same run folder (A: import -> rig, B: import -> review21); every stage report now carries e24a0b51; determinism_check.py records the profile hash of both runs (same_profile true). Build A against the earlier build: FBX and all 14 PNG byte-identical, reports differ only in profile_sha256; all measurement reports (see-through, holdout, nape, k2, instances, rig checks) equal after removing times and blend hashes",
+    "id": "H21-M-PROFILE-HASH",
+    "remark": "stage reports carried profile_sha256 37ab9e37 (profile before the review.see_through_holdout block was added), the committed profile is e24a0b51"
+   },
+   {
+    "evidence": "preview/frames-storage.json",
+    "fix": "store_preview.py re-hashes every PNG kept lossless on each run and drops entries whose stored file is gone or no longer matches; frames-storage.json: 144 -> 122 entries (47 JPEG, 39 PNG kept, 36 removed single frames), every stored file matches its recorded sha256, no entry under see-through/",
+    "id": "H21-M-FRAMES-STORAGE",
+    "remark": "preview/frames-storage.json kept 22 entries of deleted see-through/*.png and 36 PNG entries with the H2 sha256 (store_preview.py setdefault)"
+   },
+   {
+    "fix": "intentional: at H2.1 the gate frames have 0 see-through px, see_through.py writes no mask; stage them as removals (git rm / git add -A on the exact paths), never git add -A on the asset folder (untracked files of other tasks: 20260928-blender-um-fbx-v1/logs/, 20260928-tripo-h31/source/*.glb)",
+    "id": "H21-M-DELETIONS",
+    "remark": "the 22 preview/see-through/seethrough_*.png of H2 are deletions, not new files"
+   },
+   {
+    "fix": "not changed: raw Blender/Python output, same pattern as the H2 logs at 9a2a5184; the JSON reports carry no local paths",
+    "id": "H21-M-LOG-PATHS",
+    "remark": "committed stage logs contain local absolute paths (Blender output)"
+   }
+  ],
+  "revision": {
+   "credits": 0,
+   "date": "2026-09-29",
+   "id": "harpy-h2-bake/3",
+   "previous": "harpy-h2-bake/2 (H2, commit 9a2a5184)",
+   "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2-bake-h21.json"
+  },
+  "tripo_regen": "Tripo Studio multi-view, parts Balanced, ultra 2M, then 8K texture + PBR (as task 330872a3: 60 + 30 + PBR credits): harpy-front.png in FRONT, harpy-side.png in LEFT (it is drawn over ortho_left; 330872a3 had it in RIGHT, which made the Janus head), harpy-back.png in BACK, RIGHT empty; check before paying the texture step: one face (front only), a feathered nape in the back view, one ankle band. Optional concept tweak for the K2 face: crest swept back / face tilted 10-15 deg up in the front and side views"
+ },
+ "note": "Hand-written part of the Harpy report (docs/art-pipeline/harpy-h2-report.md). Revision 3 = H2.1 (harpy-h2-bake/3, section 'h21'); the other keys describe revision 2 (H2) and are kept as history. Statuses: measured numbers are in the stage reports; everything here is an observation on Blender frames (label blender) or a proposal. Not art-accepted, not imported into UE.",
  "repair": [
   "180 deg turn of the whole high-poly about Z: the side-consistent face (tripo_part_0) becomes the front, wings sweep back as in the side concept",
   "tripo_part_12 (front-concept face) dropped",
@@ -94,30 +167,60 @@
   "recolour of the torso's skin-coloured V at the back of the neck to the dark feather tone (bake.recolor, now two boxes: the V and its light tip below the cap)",
   "all are proposals, recorded in the profile (repair, bake.recolor); the clean fix is a Tripo regeneration with the side concept in the LEFT slot (paid, orchestrator decision)"
  ],
+ "revision": {
+  "date": "2026-09-29",
+  "found_during_the_fix": [
+   "the per-part decimation opened sub-millimetre cracks along every cut Tripo shares between two parts (36 shared chains between 12 part pairs); stitch.py makes both boundaries the same polyline on the high-poly cut (1 297 vertices inserted, 56 three-part corners closed, 1 sliver collapsed and 1 rotated)",
+   "the first build of the nape patch had a determinism bug (bmesh duplicate's vert_map maps both ways, the loop iterated a set of BMesh elements): the same-path rebuild caught it (patch 798 vs 799 triangles); fixed before the two final builds",
+   "revision 1 counted 1 texel 'covered twice' once the geometry changed: a shared edge through a texel centre (inclusive rasteriser tie); uv_check.py now reports texels_overlapping_strict (strictly inside two triangles) next to the raw count"
+  ],
+  "id": "harpy-h2-bake/2",
+  "other_remarks_addressed": [
+   "logs: 20 stage logs in logs/ (the revision-1 manifest said 20 but there were 18; now run_all.sh also writes preview-shape, see-through and k2-projection logs; counted after the final run)",
+   "the Harpy asset .gitignore (the orchestrator's rules for the raw H2 GLBs) is listed in the commit manifest: it has to be committed with this run or before it, together with 20260929-h2-tripo/reports/tripo-run.json and source-specs/tripo-330872a3-h2.json",
+   "reports/determinism.json has no local paths any more (determinism_check.py writes repo-relative paths or 'scratch:<name>')",
+   "payload: the task rule is 'raw GLBs > 50 MB stay out, everything else goes into the commit manifest', so the 4K masters (5 PNG, ~58 MB) stay in the manifest; the total size is stated there; pinning them by sha256 instead (or LFS) is left to the orchestrator (followup). The single close-ups review/closeup_*.jpg are no longer stored: both halves are in the cmp_closeup_* sheets (store_preview.py records their sha256)",
+   "the H2 GLB table no longer blames the 50 MB policy for parts13.glb (47.3 MB, under 50 MB): both GLBs are excluded by the orchestrator's rules in the asset .gitignore and pinned by sha256 in the source-spec",
+   "the manifest lists the module's .py files one by one (__pycache__ is ignored by the root .gitignore)"
+  ],
+  "previous": "harpy-h2-bake/1 (same run folder, rebuilt from the same Tripo GLBs; its frames are not in git)",
+  "verified_defects_fixed": [
+   {
+    "defect": "the Janus repair left a hollow hood of the TORSO part tripo_part_1 behind the head (the feathered cowl that framed the dropped face tripo_part_12): open toward +Y, its inside faced the viewer from behind (back faces culled with TwoSided=false, cavity in any two-sided render), undisclosed",
+    "evidence": "preview/fix/before_after_nape_game_back.jpg, before_after_neck_back_ortho.jpg, cmp_closeup_nape_back_game.jpg, cmp_closeup_nape_back3q_game.jpg",
+    "fix": "repair.trim removes the 15 829 high-poly faces of tripo_part_1 with centroid above z 0.455 behind the head (x -0.055..0.057, y -0.026..0.070, z 0.455..0.534 authored source frame), in the high-poly and therefore in the game mesh; the torso's neck opening that remains (one open loop, 0.65 m) is closed by the cap cap_100 and covered by patch_101 (below)",
+    "id": "V1-HOOD",
+    "severity": "major"
+   },
+   {
+    "defect": "the same hood read from the elevated game camera (front, pitch -55) as a smooth bald tan dome rising behind the crest to eye level (tripo_part_1 max z 0.534 source) - a 'second bald head' at K2; hidden in the level ortho frames; repair.why misattributed it to tripo_part_0",
+    "evidence": "preview/fix/before_after_k2_front.jpg, before_after_k2close_front.jpg, before_after_teamcolor_game3q.jpg, cmp_closeup_crest_front_game.jpg",
+    "fix": "same trim; profile repair.why rewritten (the dome is tripo_part_1's hood; the back of tripo_part_0 is a closed feathered surface). From the front the crest is the top of the figure again; a thin dark edge of the cap/nape patch shows between two crest spikes up close (crest_front_game)",
+    "id": "V1-BALD-DOME",
+    "severity": "major"
+   },
+   {
+    "defect": "compose_review.py labelled all K2 crops 'left = previous, right = H2', but from behind (azimuth 180) the H2 figure (x = +0.5) is on the LEFT; the file k2close_back_prev_left_h2_right and the report's back assessment described the previous candidate as H2",
+    "evidence": "preview/crop_k2close_back_h2_left_prev_right.png, preview/crop_k2close_back3q_h2_left_prev_right.png, preview/k2/review-frames-k2.json",
+    "fix": "review_h2.py names every K2 frame from the projected figure centres (…_prev_left_h2_right or …_h2_left_prev_right) and records left_to_right in review-frames-k2.json; compose_review.py labels the crops from that record; new frames k2/k2close_back_h2_left_prev_right and k2close_back3q_h2_left_prev_right (azimuth 140); the old mislabelled files are gone; the back assessment below is written from the H2 figure",
+    "id": "V1-K2-BACK-LABEL",
+    "severity": "major (review tooling)"
+   },
+   {
+    "defect": "with back faces culled the background showed through the neck from behind: 119-130 px at azimuth 180 / 4.8 m (components of 69 and 44 px), 42-47 px at 7.5 m; the ellipsoid plug_100 closed only the lower back of the opening; not disclosed",
+    "evidence": "reports/see-through.json, preview/see-through/*.png (red = see-through pixels), preview/fix/before_after_see_through_az180.jpg",
+    "fix": "the ellipsoid is replaced by cap_100, a closed domed cap built on the neck loop itself (skirt 12 % outside and 4 mm under the rim, lip 3 mm above it, closed underside); new automatic gate see_through.py in run_all.sh (18 azimuths x 4.8 / 7.5 m, one-sided vs two-sided Workbench masks). Measured on the game mesh: 0 openings (no component >= 4 px) at every azimuth; largest component 3 px; the neck gap is gone. The strict gate of the verifier (0 px at azimuths 120-240) is NOT met: isolated 1-3 px pinholes remain (worst frame 4 px in the gated range, 6 px over all azimuths, 50 px over all 36 frames; revision 1: 676 px, worst 130). They are sub-millimetre cracks between Tripo parts that the per-part decimation opened; lowpoly.stitch now welds the shared cuts geometrically (213 -> 50 px before/after stitching), the rest sits at non-shared boundary pieces",
+    "id": "V1-NECK-SEE-THROUGH",
+    "severity": "major"
+   }
+  ]
+ },
  "visual_assessment_vs_concept": {
-  "front": "silhouette, crest, pointed ears and palette follow the concept closely; the face is the strongest element; the crest is again the top of the figure (revision 1 showed the tan hood as a bald dome behind it); up close at the game pitch a thin dark edge of the nape cap/patch shows between two crest spikes; the neutral preview light flattens the wings compared with the concept's studio light; two gold bands instead of one; the parametric instance base instead of the concept's gold cylinder (deliberate)",
-  "side": "after the repair turn the side silhouette matches the concept: face profile left, crest swept back, wings swept back and raised, band on the near (left) leg",
   "back": "the crest now continues into the collar through the copied back-of-head feathers, close to the back concept's dark nape; below them the cap reads as a smooth dark area inside the collar ruff (about 2 x 3 cm at the final scale), with the recoloured V under it - darker and flatter than the concept's feathers up close, a dark nape at game distance; no cavity, no light gap",
   "closeups": "bake fidelity against the Tripo high-poly is high on face, talons, bands and wing feathers; faceted jawline and some crest spikes up close (face region 1.2k triangles); thin light slivers at a few feather edges",
+  "front": "silhouette, crest, pointed ears and palette follow the concept closely; the face is the strongest element; the crest is again the top of the figure (revision 1 showed the tan hood as a bald dome behind it); up close at the game pitch a thin dark edge of the nape cap/patch shows between two crest spikes; the neutral preview light flattens the wings compared with the concept's studio light; two gold bands instead of one; the parametric instance base instead of the concept's gold cylinder (deliberate)",
   "k2": "at K2 (7.5 m, FOV 35, pitch -55) the figure projects to 262 x 146 px and the face region to 36 x 27 px (k2-projection.json). From the front the dome above the crest is gone (before_after_k2_front). From behind (4.8 m, H2 = LEFT figure, crop_k2close_back_h2_left_prev_right): crest, dark nape and collar read as one dark feather mass, wings layered and lighter than the previous candidate's; a small light spot of the torso shows between the legs; the previous candidate reads flatter and darker. The three instances stay distinguishable without colour in all six K1/K2 frames",
+  "side": "after the repair turn the side silhouette matches the concept: face profile left, crest swept back, wings swept back and raised, band on the near (left) leg",
   "vs_medusa_reference": "the reference is a painted collectible with strong value contrast and specular breakup; H2 Harpy reaches its sculpt density in the high-poly and keeps most of it in the bake, but the material response is flatter (Tripo roughness ~0.77 almost everywhere, no specular variation in the feathers) and the colours lighter; the repaired nape is smoother than the rest of the plumage"
- },
- "falls_short": [
-  "the neck cap is a smooth dark area inside the collar (the patch covers its upper half); not sculpted feathers",
-  "1-3 px see-through pinholes remain at every azimuth (50 px over 36 game frames, worst 6 px per frame): the verifier's strict gate (0 px behind the figure) is not met; no opening (component >= 4 px) remains",
-  "two ankle bands (concept: one)",
-  "faceted jaw and crest spikes in extreme close-ups",
-  "head turn 35 deg opens a 3.0 cm gap between head and collar (limit Idle head turns to ~15 deg, as the previous candidate)",
-  "flat roughness; material contrast below the Medusa quality reference",
-  "UV atlas fill 49 % (1.27k islands from Tripo's charts): a dedicated packer would raise texel density by ~20 %"
- ],
- "budget_proposal": {
-  "status": "предложено (не бюджет; решение GD-058)",
-  "harpy_triangles": "20-30k (this candidate 28.5k figure + 0.9k base; revision 1: 26.0k; stitching adds ~1.3k). Budget probe of revision 2 (reports/budget-probe.json, same build at x0.5 / x0.75 / x1.5 of the part targets): worst-part p99 surface deviation 0.65 / 0.49 / 0.39 / 0.28 px at K2 7.5 m for 15.0k / 21.7k / 28.5k / 41.7k triangles; the worst-part MAX is 1.36 / 1.25 / 1.06 / 0.55 px, dominated by tripo_part_1 around the trimmed hood rim (hidden under the neck cap); returns diminish above ~20k, 28.5k keeps the face at 1.2k triangles",
-  "hero_triangles": "30-45k (orchestrator's H2 target); not measured on Harpy",
-  "textures": "4K master (bake target, archive) + 2K runtime; at 2K the body carries 18.5 px/cm, face 36.8 px/cm, talons 27.6 px/cm",
-  "slots": "2 (body atlas + base), <= 2",
-  "memory_estimate": "2K BC (BC1) + N (BC5) + ORM (BC1) + TeamMask (G8) with mips ~ 16 MB per Harpy material, shared by the three instances"
- },
- "determinism": "see reports/determinism.json"
+ }
 }

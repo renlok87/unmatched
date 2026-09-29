@@ -1,0 +1,255 @@
+{
+ "conventions": {
+  "BC": "sRGB 8-bit (UE TC_Default, sRGB)",
+  "N": "DirectX (-Y): green of the OpenGL bake inverted; no N_OpenGL file is written (the Blender preview inverts G of N in its shader; a derived copy added 16.5 MB to git) (UE TC_Normalmap, flip_green false)",
+  "ORM": "R = AO, G = roughness, B = metallic (linear) (UE TC_Masks, sRGB off)",
+  "TeamMask": "L 8-bit linear = cloth (compatible with W4-B M_UM_Figure: lerp by TeamMask.R, TC_Grayscale)",
+  "TeamMaskRGBA": "R = cloth (same as TeamMask), G = base side band, B = gold trim/embroidery on the cloth parts, A = 255; proposal for wave 4 (TC_Masks/TC_Default); H2.1: B = embroidery class (trim x (1 - leather) x (1 - metal)); in H2 the brown belt, its hanging end and the buckle fell into the trim hue band and were marked as gold trim",
+  "downscale": "2x2 box (BC in linear light, normals renormalised)"
+ },
+ "count": 10,
+ "iteration": "H2.1",
+ "material_classes": {
+  "after": {
+   "crystal": {
+    "bc_srgb_mean": [
+     0.178,
+     0.273,
+     0.529
+    ],
+    "hsv_s_p50": 0.695,
+    "hsv_v_p50": 0.517,
+    "metallic_p50_max": [
+     0.0,
+     0.0
+    ],
+    "roughness_p5_p50_p95": [
+     0.12,
+     0.176,
+     0.18
+    ],
+    "texels": 309004
+   },
+   "embroidery": {
+    "bc_srgb_mean": [
+     0.528,
+     0.411,
+     0.321
+    ],
+    "hsv_s_p50": 0.394,
+    "hsv_v_p50": 0.539,
+    "metallic_p50_max": [
+     0.0,
+     0.0
+    ],
+    "roughness_p5_p50_p95": [
+     0.55,
+     0.613,
+     0.769
+    ],
+    "texels": 483572
+   },
+   "leather_belt": {
+    "bc_srgb_mean": [
+     0.346,
+     0.249,
+     0.189
+    ],
+    "hsv_s_p50": 0.461,
+    "hsv_v_p50": 0.335,
+    "metallic_p50_max": [
+     0.0,
+     0.499
+    ],
+    "roughness_p5_p50_p95": [
+     0.64,
+     0.674,
+     0.719
+    ],
+    "texels": 67946
+   },
+   "metal_buckle": {
+    "bc_srgb_mean": [
+     0.582,
+     0.455,
+     0.368
+    ],
+    "hsv_s_p50": 0.396,
+    "hsv_v_p50": 0.563,
+    "metallic_p50_max": [
+     1.0,
+     1.0
+    ],
+    "roughness_p5_p50_p95": [
+     0.35,
+     0.447,
+     0.568
+    ],
+    "texels": 6123
+   },
+   "wood": {
+    "bc_srgb_mean": [
+     0.306,
+     0.227,
+     0.172
+    ],
+    "hsv_s_p50": 0.459,
+    "hsv_v_p50": 0.288,
+    "metallic_p50_max": [
+     0.0,
+     0.0
+    ],
+    "roughness_p5_p50_p95": [
+     0.792,
+     0.843,
+     0.891
+    ],
+    "texels": 1565958
+   }
+  },
+  "class_map": {
+   "bytes": 455725,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/preview/h21_material_classes_1K.png",
+   "px": [
+    1024,
+    1024
+   ],
+   "sha256": "861dbad911d5f949f3a0f994dbc3b19c9c5f527b0035fca37708cea0147f7d7d"
+  },
+  "rules": "profile maps.materials",
+  "texels_ge_0_5": {
+   "crystal": 309004,
+   "embroidery": 483572,
+   "leather_belt": 67946,
+   "metal_buckle": 6123,
+   "wood": 1565958
+  }
+ },
+ "note": "sha256 of the 4K masters pins the local build; they are reproducible with run.py (stages uv..maps, CPU bake)",
+ "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json",
+ "profile_id": "merlin-h2-bake/2",
+ "stage": "maps",
+ "textures": {
+  "T_Merlin_H2_BC_2K.png": {
+   "bytes": 4690183,
+   "git": "committed",
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_BC_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "e09ea267ebc4b93b94adfd2fbefeec9bac7435078c43f6b41c46ad0a3215b2b4",
+   "tier": "runtime_2k"
+  },
+  "T_Merlin_H2_BC_4K.png": {
+   "bytes": 13463111,
+   "git": "ignored by ASSET-MERLIN-001/.gitignore (20260929-h2-bake/textures/*_4K.png), local only",
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_BC_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "f997e2811c0477a811034ef6af60fd03b07b1dfa33832342a9cb1c03872ecb5f",
+   "tier": "master_4k"
+  },
+  "T_Merlin_H2_N_2K.png": {
+   "bytes": 4479767,
+   "git": "committed",
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_N_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "2f7bfac8acc997f75c1291ea14beecd88558c38878a62f1c060da459fe9fcbfa",
+   "tier": "runtime_2k"
+  },
+  "T_Merlin_H2_N_4K.png": {
+   "bytes": 11992789,
+   "git": "ignored by ASSET-MERLIN-001/.gitignore (20260929-h2-bake/textures/*_4K.png), local only",
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_N_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "addc8e7fe7a5818a224aa41683e3ae6e6f7a89fc0fb7c25343055886d96bd13e",
+   "tier": "master_4k"
+  },
+  "T_Merlin_H2_ORM_2K.png": {
+   "bytes": 3392477,
+   "git": "committed",
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_ORM_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "3ce2794356b4d3ee8cdf7411e19eb3fb67cfd2adbfc08743c0d741911a0e2d52",
+   "tier": "runtime_2k"
+  },
+  "T_Merlin_H2_ORM_4K.png": {
+   "bytes": 10639086,
+   "git": "ignored by ASSET-MERLIN-001/.gitignore (20260929-h2-bake/textures/*_4K.png), local only",
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_ORM_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "6b46aa75487c2cddd6f874294c98d32cc6cf0adba032029fa34a8ef40dadfb44",
+   "tier": "master_4k"
+  },
+  "T_Merlin_H2_TeamMaskRGBA_2K.png": {
+   "bytes": 947881,
+   "git": "committed",
+   "mode": "RGBA",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_TeamMaskRGBA_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "7ba724e784dbf8100628ce9b480976f25bce2804164f1dfa78af92191afb3772",
+   "tier": "runtime_2k"
+  },
+  "T_Merlin_H2_TeamMaskRGBA_4K.png": {
+   "bytes": 2070744,
+   "git": "ignored by ASSET-MERLIN-001/.gitignore (20260929-h2-bake/textures/*_4K.png), local only",
+   "mode": "RGBA",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_TeamMaskRGBA_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "3e1ee77c733e35d3e279102c7222bfc58e4d0718ed5d62b7bded82353af29e0e",
+   "tier": "master_4k"
+  },
+  "T_Merlin_H2_TeamMask_2K.png": {
+   "bytes": 361395,
+   "git": "committed",
+   "mode": "L",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_TeamMask_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "975297f48c465bf4a09f8eb60c4c43fcda72c7aebc6e0ac2abf076802952388f",
+   "tier": "runtime_2k"
+  },
+  "T_Merlin_H2_TeamMask_4K.png": {
+   "bytes": 682577,
+   "git": "ignored by ASSET-MERLIN-001/.gitignore (20260929-h2-bake/textures/*_4K.png), local only",
+   "mode": "L",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_TeamMask_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "4e67c0facce148581ec4b7e9047f92619b6df35b92164ea813a742978fe4d6b3",
+   "tier": "master_4k"
+  }
+ }
+}

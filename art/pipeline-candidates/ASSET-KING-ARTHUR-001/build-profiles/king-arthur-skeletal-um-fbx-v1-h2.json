@@ -3,7 +3,7 @@
   "profile_id": "king-arthur-h2-bake/1",
   "asset_id": "ASSET-KING-ARTHUR-001",
   "status": "proposed",
-  "status_note": "Технический профиль H2-запекания King Arthur (2026-09-29): Tripo high-poly по частям (c24eeff0) -> игровая модель + атлас 4K/2K + риг UM_HUMANOID_17 (v2: weapon.R). Числа треугольников и плотности текселей — предложенный ориентир H2 (герой 30–45k tris, атлас 4K мастер + 2K рантайм, ≤ 2 слота), не бюджет (GD-058 открыт). Художественной приёмки нет.",
+  "status_note": "Технический профиль H2-запекания King Arthur (2026-09-29): Tripo high-poly по частям (c24eeff0) -> игровая модель + атлас 4K/2K + риг UM_HUMANOID_17 (v2: weapon.R). Числа треугольников и плотности текселей — предложенный ориентир H2 (герой 30–45k tris, атлас 4K мастер + 2K рантайм, ≤ 2 слота), не бюджет (GD-058 открыт). Художественной приёмки нет. H2.1 (2026-09-29): маска металла и PBR-значения (textures.materials), чистка остатков плаща (phantom_repaint.cloth_cleanup), кадры до/после (review_h21).",
   "module": "tools/tripo-pipeline/blender/h2_bake_arthur (run.py)",
   "sources": {
     "parts_glb": {
@@ -363,7 +363,252 @@
       "band_component_min_texels": 2000,
       "phantom_zone_modes_note": "cloak phantom zone: 1 730 of its 56 034 hit texels are gold, 629 of them in large gold components (the right border band where it reaches the shoulder, z 0.70-0.75: Tripo painted it correctly up to the shoulder, only the medallion hole beside it is defective), 1 101 in small fragments (phantom paint). An unrestricted mirror stamped the left band about 2 cm off next to the right band (a broken double band at the shoulder, a knot fragment at the knee-plate zone). Now the hit texels of large gold components (dilated 2 px) keep the Tripo paint (weight 0) and all other zone texels take red-cloth donors",
       "normal_transfer": "detail",
-      "normal_transfer_note": "the first builds blended the repainted normal to flat: the weave came back in BC but the repainted areas read smoother than the untouched cloth in close_cloak_back; now the donor's tangent normal is moved as detail relief (donor frame -> object space -> mirror -> minimal rotation onto the target normal -> target frame; frames from the POS gradients); normals that disagree (dot < 0.2) stay flat"
+      "normal_transfer_note": "the first builds blended the repainted normal to flat: the weave came back in BC but the repainted areas read smoother than the untouched cloth in close_cloak_back; now the donor's tangent normal is moved as detail relief (donor frame -> object space -> mirror -> minimal rotation onto the target normal -> target frame; frames from the POS gradients); normals that disagree (dot < 0.2) stay flat",
+      "cloth_cleanup": [
+        {
+          "name": "strip_fold",
+          "part": "tripo_part_0",
+          "min_m": [
+            -0.11,
+            0.02,
+            0.27
+          ],
+          "max_m": [
+            -0.086,
+            0.2,
+            0.545
+          ],
+          "feather_m": 0.004,
+          "shell_m": 0.03,
+          "lum_clamp_pct": [
+            10,
+            90
+          ],
+          "why": "H2 residual 1b: stretched weave with dark dashes on the fold at the right edge of the former phantom strip (BC ladder, close_strip_az180); the dashes that stay are geometry slits of the fold (Workbench grey render), not paint"
+        },
+        {
+          "name": "strip_top_tab",
+          "part": "tripo_part_0",
+          "min_m": [
+            -0.1,
+            0.0,
+            0.528
+          ],
+          "max_m": [
+            -0.078,
+            0.2,
+            0.572
+          ],
+          "feather_m": 0.003,
+          "shell_m": 0.03,
+          "lum_clamp_pct": [
+            10,
+            90
+          ],
+          "why": "H2 residual 1d: gold-brown tab above the strip (paint on a raised bump, x -0.086, z 0.540-0.554); a mirror-donor box made a smeared patch larger than the tab (H2 rev. 2), recolouring keeps the texels in place"
+        },
+        {
+          "name": "medallion_hole",
+          "part": "tripo_part_0",
+          "min_m": [
+            -0.102,
+            0.02,
+            0.69
+          ],
+          "max_m": [
+            -0.064,
+            0.2,
+            0.765
+          ],
+          "feather_m": 0.004,
+          "shell_m": 0.03,
+          "lum_clamp_pct": [
+            25,
+            75
+          ],
+          "why": "H2 residual 1c: darker smeared patch with a ghost of the medallion/band paint in the filled medallion hole at the right shoulder; clamp tighter (25-75 %) so the ghost pattern does not survive as luminance"
+        }
+      ],
+      "cloth_cleanup_note": "H2.1 (2026-09-29): recolour in place (textures.cloth_cleanup) instead of another donor lookup: the three H2 residuals are mostly paint that is out of the cloth range; large gold components (the right border band) dilated 6 px keep their paint"
+    },
+    "materials": {
+      "status": "измерено (H2.1, 2026-09-29): маска металла и PBR-значения по классам; художественной приёмки нет",
+      "why": "Tripo metallicRoughness gave the armour almost no metal (H2: metallic mean 0.074 over the atlas, > 0.5 on 0.27 % of the texels): plate, crown, sword and the gold trims rendered as paint. Concept: steel plate and blade, gold trims/crown/hilt, red cloth with gold embroidery, leather belt",
+      "method": "materials.py: soft class weights from the painted BC (sRGB HSV ramps, no hard edges), per part group; metal texels get a PBR base colour (= specular reflectance F0: steel neutral grey, gold) keeping the painted luminance detail, metallic = metal weight; roughness steel / gold ranges with cavities rougher; non-metal keeps the painted colour, roughness = Tripo roughness clamped per class",
+      "groups": {
+        "armour": [
+          "tripo_part_1",
+          "tripo_part_2",
+          "tripo_part_3",
+          "tripo_part_7",
+          "tripo_part_8",
+          "tripo_part_9",
+          "tripo_part_10",
+          "tripo_part_12",
+          "tripo_part_15",
+          "tripo_part_17",
+          "LP_grip_bridge"
+        ],
+        "cloth": [
+          "tripo_part_0",
+          "tripo_part_5"
+        ],
+        "head": [
+          "tripo_part_6"
+        ],
+        "stone": [
+          "tripo_part_4"
+        ]
+      },
+      "groups_note": "armour: metal by default except red (collar lining, red gems) and the leather regions; cloth (cloak, tabard): non-metal except gold (embroidery, borders: gold thread read as gold metal); head: non-metal (skin, hair, beard) except strict gold inside the crown / neck-ring regions; stone: the base, never metal",
+      "colour_rules": {
+        "red": {
+          "hue_deg": [
+            330,
+            15
+          ],
+          "hue_soft_deg": 6,
+          "s_ramp": [
+            0.4,
+            0.5
+          ]
+        },
+        "gold": {
+          "hue_deg": [
+            18,
+            58
+          ],
+          "hue_soft_deg": 6,
+          "s_ramp": [
+            0.2,
+            0.32
+          ],
+          "v_ramp": [
+            0.1,
+            0.2
+          ]
+        },
+        "gold_strict": {
+          "hue_deg": [
+            23,
+            50
+          ],
+          "hue_soft_deg": 3,
+          "s_ramp": [
+            0.42,
+            0.48
+          ],
+          "v_ramp": [
+            0.4,
+            0.5
+          ]
+        },
+        "leather": {
+          "hue_deg": [
+            8,
+            36
+          ],
+          "hue_soft_deg": 6,
+          "s_ramp": [
+            0.22,
+            0.32
+          ],
+          "v_max_ramp": [
+            0.4,
+            0.5
+          ]
+        }
+      },
+      "colour_rules_note": "sRGB HSV of the painted BC; hue windows in degrees (330..15 wraps), smoothstep over hue_soft_deg outside; s_ramp / v_ramp = smoothstep from a to b; v_max_ramp = 1 - smoothstep. Measured H2 BC (4K): cloak red s p50 0.75, v 0.34-0.47; armour gold hue 24-32, s 0.45-0.53, v ~0.6; warm dark steel hue 0-30, s ~0.3, v ~0.28 (stays steel inside the metal: gold share only, metallic 1 either way); skin hue 19-21, s 0.28-0.36 (gold_strict excludes it: hue >= 23, s >= 0.42, v >= 0.40); crown gold hue 26-32, s 0.46-0.53, v 0.56-0.73",
+      "leather_regions": [
+        {
+          "part": "tripo_part_1",
+          "z_min_m": 0.497,
+          "z_max_m": 0.593,
+          "feather_m": 0.004
+        }
+      ],
+      "leather_note": "the belt band of the torso part (Tripo frame z 0.497-0.593, measured: brown texels 43-65 % there, hue ~21-26, s ~0.46, v ~0.3); the lion buckle and the studs are bright gold (v > 0.5) and stay metal",
+      "head_metal_regions": [
+        {
+          "z_min_m": 0.84,
+          "feather_m": 0.003
+        },
+        {
+          "z_max_m": 0.757,
+          "feather_m": 0.003
+        }
+      ],
+      "head_regions_note": "crown from Tripo z 0.840 (gold share 0.22 -> 0.86 over z 0.840-0.850; the forehead below is skin: a first rule with z 0.842 and the loose gold rule made a metallic strip on the forehead, fixed by gold_strict); neck ring below z 0.757 (gold 94-100 %)",
+      "metal": {
+        "steel": {
+          "bc_target_linear": 0.52,
+          "gamma": 1.0,
+          "bc_clamp": [
+            0.06,
+            0.68
+          ],
+          "chroma_keep": 0.1,
+          "roughness": [
+            0.38,
+            0.55
+          ],
+          "roughness_detail_ratio": [
+            0.45,
+            2.2
+          ],
+          "own_reference_parts": [
+            "tripo_part_10"
+          ]
+        },
+        "gold": {
+          "reference_linear": [
+            1.0,
+            0.72,
+            0.32
+          ],
+          "chroma_to_reference": 0.5,
+          "bc_target_linear_lum": 0.45,
+          "gamma": 0.7,
+          "bc_lum_clamp": [
+            0.12,
+            0.75
+          ],
+          "channel_max": 0.95,
+          "roughness": [
+            0.3,
+            0.45
+          ],
+          "roughness_on_cloth": [
+            0.38,
+            0.45
+          ],
+          "roughness_detail_ratio": [
+            0.45,
+            2.2
+          ]
+        }
+      },
+      "metal_note": "steel: F0 of iron is ~0.56 linear. The median luminance of the steel core texels (metal >= 0.95, gold share <= 0.05; measured, reported as refs) maps to bc_target_linear 0.52; the blade has its own reference (painted 6.7x brighter than the plate). gamma 1 keeps the painted contrast (engraving, mail), clamp [0.06, 0.68], 10 % of the painted chromaticity kept. Tried first (Blender, studio.exr / courtyard.exr worlds): gamma 0.45 with target 0.56 washed the engraving out and read as chrome; targets 0.35-0.40 (darker than PBR steel) changed the look little under an environment (the reflection dominates) and leave the stated 0.5-0.65 range, so the median stays at 0.52. gold: chromaticity 50 % toward (1.0, 0.72, 0.32) (the Tripo gold is orange, hue 24-30), luminance target 0.45 for the median gold core texel, gamma 0.7. Roughness: detail = log(lum / ref) mapped over roughness_detail_ratio; texels darker than 0.45 x ref take the rough end, brighter than 2.2 x ref the smooth end",
+      "non_metal_roughness": {
+        "cloth": [
+          0.75,
+          0.9
+        ],
+        "leather": [
+          0.75,
+          0.9
+        ],
+        "head": [
+          0.55,
+          0.8
+        ],
+        "stone": [
+          0.0,
+          1.0
+        ]
+      },
+      "non_metal_note": "Tripo roughness clamped: cloth (and the red/non-metal texels of armour parts) 0.75-0.9, leather 0.75-0.9, head (skin/hair/beard) 0.55-0.8 (H2 had hair at 0.45-0.54: a glassy dome inside the crown), stone unchanged (only metallic -> 0)"
     }
   },
   "rig": {
@@ -1248,6 +1493,168 @@
         "K2",
         180
       ]
-    ]
+    ],
+    "textures_label": "H2.1 (атлас 2K)",
+    "textures_label_note": "burned into the H2 review frames by stage sheets; H2.1 (2026-09-29) textures with the material pass; the H2 rev. 2 frames are in git at 9a2a5184"
+  },
+  "review_h21": {
+    "eevee_samples": 32,
+    "lights": {
+      "studio_env": {
+        "world_image": "studio.exr",
+        "world_strength": 1.0,
+        "world_rotation_z_deg": 0,
+        "note": "the H2 review suns + Blender's bundled studio light 'studio.exr' as the world (reflections, ambient), camera background dark grey; chosen over courtyard.exr (bright sky: plates read as chrome) and interior.exr (similar to studio, warmer). Not the game light: UE board = DX12/Lumen + sky light (render-reference.json)"
+      }
+    },
+    "k2_distance_m": {
+      "1p6": 12.07,
+      "5x": 3.86
+    },
+    "k2_focus_z_m": 0.28,
+    "k2_azimuths": [
+      0,
+      -40,
+      180
+    ],
+    "closeups": [
+      {
+        "name": "torso",
+        "part": "tripo_part_1",
+        "azimuths": [
+          0
+        ],
+        "margin": 1.1
+      },
+      {
+        "name": "blade",
+        "object": "weapon",
+        "azimuths": [
+          0
+        ],
+        "margin": 1.05
+      },
+      {
+        "name": "head",
+        "part": "tripo_part_6",
+        "azimuths": [
+          0,
+          180
+        ],
+        "margin": 1.15
+      },
+      {
+        "name": "legs",
+        "part": "tripo_part_2",
+        "azimuths": [
+          0
+        ],
+        "margin": 1.3
+      },
+      {
+        "name": "cloak_back",
+        "part": "tripo_part_0",
+        "azimuths": [
+          180
+        ],
+        "margin": 1.05
+      },
+      {
+        "name": "left_hand",
+        "part": "tripo_part_15",
+        "azimuths": [
+          0
+        ],
+        "margin": 1.5
+      },
+      {
+        "name": "strip",
+        "box_tripo_m": [
+          [
+            -0.135,
+            0.04,
+            0.29
+          ],
+          [
+            -0.035,
+            0.05,
+            0.58
+          ]
+        ],
+        "azimuths": [
+          180,
+          -150
+        ],
+        "margin": 1.08
+      },
+      {
+        "name": "medallion",
+        "box_tripo_m": [
+          [
+            -0.15,
+            0.04,
+            0.64
+          ],
+          [
+            -0.03,
+            0.05,
+            0.79
+          ]
+        ],
+        "azimuths": [
+          180,
+          -150
+        ],
+        "margin": 1.1
+      },
+      {
+        "name": "forearm_under",
+        "box_tripo_m": [
+          [
+            -0.21,
+            -0.06,
+            0.54
+          ],
+          [
+            -0.12,
+            0.03,
+            0.6
+          ]
+        ],
+        "azimuths": [
+          -90,
+          -30
+        ],
+        "elevation_deg": -45,
+        "margin": 1.4,
+        "hide": [
+          "base"
+        ]
+      }
+    ],
+    "baseline": {
+      "commit": "9a2a5184",
+      "what": "H2 rev. 2 runtime textures (committed), rendered with the same mesh/light/cameras as the H2.1 textures",
+      "runtime_2k_sha256": {
+        "BC": "e5939b67084010e1da1886064a69e03d1af7b6c9998d9f4786655d9bb5eaa373",
+        "N_OpenGL": "96e33a82ab7e60f09f7a7319634804da59860b7d7ae33849aa06a6da0d733ae6",
+        "ORM": "ca225b1694f78e3f8bbaf8971b09ba2062691ec0ef72d21d68ba9138a2de5a4f"
+      }
+    },
+    "studio_views": [
+      "ortho_front",
+      "ortho_back",
+      "close_torso_az0",
+      "k2_5x_az0",
+      "k2_5x_az180"
+    ],
+    "classes_views": [
+      "ortho_front",
+      "ortho_left",
+      "ortho_back",
+      "close_head_az0",
+      "close_torso_az0"
+    ],
+    "k2_note": "K2 as in the Medusa/Merlin H2 reports: FOV 35 horizontal, pitch -55, 1207 uu (1.6x) and 386 uu (5x), focus +28 uu; the H2 review cameras of this module (K1 12.18 m, K2 7.6 m, K2S05) stay in stage review"
   }
 }

@@ -38,6 +38,7 @@ from mathutils.bvhtree import BVHTree
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import common as C  # noqa: E402
 import repair_ops as R  # noqa: E402
+import seal as SL  # noqa: E402
 import stitch as SX  # noqa: E402
 
 C.require_background("stage_lowpoly.py")
@@ -133,9 +134,22 @@ for pa in REP.get("patches", []):
     hp[pa["name"]] = o
     info.update({"why": pa.get("why"), "boxes": pa["boxes"], "translate": pa.get("translate")})
     patches[pa["name"]] = info
+# fills (H2.1): feather clusters of a part laid on a repair cap (repair_ops.conform_fill), e.g. the nape over cap_100
+fills = {}
+for fi in REP.get("fills", []):
+    o, info = R.conform_fill(hp[fi["source"]], "HP_" + fi["name"], fi["boxes"], hp[fi["surface"]], fi["targets"],
+                             fi.get("exclude_boxes", ()), fi.get("source_flow", (0.0, 0.0, -1.0)),
+                             float(fi.get("lift_m", 0.001)), float(fi.get("height_scale", 1.0)),
+                             drop_outside=bool(fi.get("drop_outside", False)))
+    o.name = "HP_" + fi["name"]
+    scene.collection.objects.link(o)
+    o["h2_role"] = "highpoly"
+    hp[fi["name"]] = o
+    info.update({"why": fi.get("why"), "surface": fi["surface"]})
+    fills[fi["name"]] = info
 report["repair"] = {"rotate_z_deg": float(REP.get("rotate_z_deg", 0.0)), "dropped_parts": dropped,
                     "occluder_only_parts": REP.get("occluder_only_parts", {}), "trims": trims, "plugs": plugs,
-                    "caps": caps, "patches": patches,
+                    "caps": caps, "patches": patches, "fills": fills,
                     "corner_normals_min_dot_after_turn": cn_check, "why": REP.get("why")}
 
 
@@ -333,6 +347,21 @@ if ST_CFG.get("enabled"):
     stitch_report["settings"] = ST_CFG
     stitch_report["seconds"] = C.r(time.time() - t_s, 1)
 report["stitch"] = stitch_report
+
+# ---------------------------------------------------------------- non-manifold edges (H2.1, seal.fix_nonmanifold)
+nm_report = {}
+if LPC.get("fix_nonmanifold"):
+    for part in sorted(pending, key=lambda n: int(n.rsplit("_", 1)[1])):
+        me = pending[part]["me"]
+        bm = bmesh.new()
+        bm.from_mesh(me)
+        res = SL.fix_nonmanifold(bm)
+        if res["edges_before"]:
+            bm.to_mesh(me)
+            me.update()
+            nm_report[part] = res
+        bm.free()
+report["nonmanifold_fix"] = nm_report if LPC.get("fix_nonmanifold") else None
 
 for part in sorted(pending, key=lambda n: int(n.rsplit("_", 1)[1])):
     st = pending[part]

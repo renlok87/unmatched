@@ -13,7 +13,8 @@ blender -b --factory-startup --python-exit-code 1 --python stage_uv.py -- <profi
 4. island scale x td_priority of its part (x cap_td_factor for cap/bridge islands);
 5. one pack of all islands (concave shapes, rotation) into 0..1 with pack_margin_px of atlas_px;
 6. export per-triangle data for the pixel checks and the maps stage: work/uv/<object>.npz
-   (uv[T,3,2], part[T], cap[T], island[T], area3d_m2[T], normal[T,3]).
+   (uv[T,3,2], part[T], cap[T], island[T], area3d_m2[T], normal[T,3], pos[T,3,3] = corner positions in the source
+   frame, H2.1: the maps stage interpolates them per texel for the 3D material regions).
 Output: work/h2-uv.blend, reports/uv-report.json.
 """
 
@@ -270,7 +271,7 @@ def export_triangles(obj, path):
     bm.free()
     isl = np.asarray(island, np.int64)[polys]
     path.parent.mkdir(parents=True, exist_ok=True)
-    np.savez(path, uv=uv, part=part, cap=cap, island=isl, area3d_m2=area3d, normal=normal)
+    np.savez(path, uv=uv, part=part, cap=cap, island=isl, area3d_m2=area3d, normal=normal, pos=P)
     return {"triangles": int(T), "islands": int(isl.max() + 1) if T else 0}
 
 

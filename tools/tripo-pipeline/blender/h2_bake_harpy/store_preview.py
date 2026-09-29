@@ -9,6 +9,10 @@
 * the single rig_deform_probe frames are removed (their sheets stay), as in the T3.3 candidates; so are the single
   close-ups review/closeup_*.png once their cmp_closeup_<name> sheet (high-poly | game mesh) exists;
 * preview/frames-storage.json records sha256, bytes and size of every original PNG and of the stored file.
+  A PNG kept lossless is re-hashed on every run (a rebuild into the same run folder rewrites it); an entry whose stored
+  file is gone (e.g. see-through masks the gate no longer writes) or no longer matches its recorded sha256 is dropped,
+  so the manifest describes exactly the files in preview/. Entries of removed frames (stored null) stay: the stage that
+  renders the frame again refreshes them.
 Idempotent: a second run finds no PNG to convert and keeps the manifest.
 """
 
@@ -32,7 +36,7 @@ def sha(p):
 def keep_png(p):
     n = p.name
     return (n.endswith("_gray.png") or "_crop_" in n or n.startswith("sheet_") and "gray" in n or n.startswith("crop_")
-            or n == "uv_layout_parts.png" or p.parent.name == "see-through" or n.startswith("before_after_see_through"))
+            or n == "uv_layout_parts.png" or p.parent.name.startswith("see-through") or n.startswith("before_after_see_through"))
 
 
 for p in sorted(prev.rglob("*.png")):
@@ -50,7 +54,8 @@ for p in sorted(prev.rglob("*.png")):
         p.unlink()
         continue
     if keep_png(p):
-        manifest["frames"].setdefault(rel, {"png_sha256": sha(p), "png_bytes": p.stat().st_size, "stored": rel})
+        # always the current bytes: setdefault kept the sha256 of an earlier build of the same run folder
+        manifest["frames"][rel] = {"png_sha256": sha(p), "png_bytes": p.stat().st_size, "stored": rel}
         continue
     im = Image.open(p)
     info = {"png_sha256": sha(p), "png_bytes": p.stat().st_size, "size": list(im.size), "mode": im.mode}
@@ -64,6 +69,17 @@ for p in sorted(prev.rglob("*.png")):
                  "format": "JPEG q92 4:4:4"})
     manifest["frames"][rel] = info
     p.unlink()
+dropped = []
+for rel, entry in sorted(manifest["frames"].items()):
+    stored = entry.get("stored")
+    if stored is None:
+        continue
+    f = prev / stored
+    if not f.exists() or sha(f) != entry.get("stored_sha256", entry.get("png_sha256")):
+        dropped.append(rel)
+        del manifest["frames"][rel]
+if dropped:
+    print("DROPPED_STALE", len(dropped), " ".join(dropped))
 manifest["note"] = ("frames are Blender renders (label blender), analysed as PNG before storage; colour frames stored as "
                     "JPEG q92, grayscale analysis frames and nearest crops stay PNG")
 manifest_path.write_text(json.dumps(manifest, indent=1, sort_keys=True) + "\n", encoding="utf-8")

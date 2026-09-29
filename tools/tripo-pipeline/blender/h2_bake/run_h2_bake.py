@@ -1,11 +1,12 @@
-"""Driver of the H2 bake (plain Python 3.10+, numpy + Pillow; Blender 5.2 headless for the Blender stages).
+"""Driver of the H2 bake (plain Python 3.10+, numpy + Pillow, scipy for the H2.1 material pass; Blender 5.2 headless
+for the Blender stages).
 
   python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py \
       --profile art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-bake-h2.json \
       --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-bake [--stages all|a,b,...] \
       [--blender "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"] [--compare-with <another run dir>]
 
-Stages: prepare retopo close uv bake textures rig probes seams preview compose manifest (`all`); optional: curve (the
+Stages: prepare retopo close uv bake aux textures rig probes seams preview compose manifest (`all`); optional: curve (the
 exploratory triangles -> deviation curve, reports/decimation-curve.json; run it with --stages curve). Every Blender stage is a separate
 `blender -b --factory-startup --python-exit-code 1` process (no live Blender, no network, no paid Tripo call).
 Tripo sources are only read (sha256 checked by prepare). The run directory gets export/, textures/, preview/,
@@ -27,9 +28,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[3]
 DEFAULT_BLENDER = "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe"
-ORDER = ["prepare", "retopo", "close", "uv", "bake", "textures", "rig", "probes", "seams", "preview", "compose", "manifest"]
+ORDER = ["prepare", "retopo", "close", "uv", "bake", "aux", "textures", "rig", "probes", "seams", "preview", "compose", "manifest"]
 OPTIONAL = ["curve"]  # not in `all`
-BLENDER_STAGES = {"prepare", "retopo", "close", "uv", "bake", "rig", "seams", "preview", "curve"}
+BLENDER_STAGES = {"prepare", "retopo", "close", "uv", "bake", "aux", "rig", "seams", "preview", "curve"}
 SCHEMA = "unmatched.h2-bake-run/1"
 
 

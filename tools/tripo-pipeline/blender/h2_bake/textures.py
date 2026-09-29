@@ -14,12 +14,18 @@ cap_ids.npy; close stage): their texels are not taken from the bake (no high-pol
 AO of every cap vertex = its rim samples (bilinear, from the composites without the cap texels, 4-step dilation for
 cage-miss specks) combined with the uv-stage weights, interpolated over the cap triangles (barycentric); the
 tangent-space normal of a cap is flat (0.5, 0.5, 1). The composites are then filled with the cap texels as valid.
+H2.1 (profile textures.materials, module materials.py): AO of the listed parts from work/bake/AO_EX.npy (stage aux)
+before the footprints/caps read their rim; rim filters of named contacts (keep only the rim samples of the surface
+that continues under the contact); after the caps, the metal mask and the BC/ORM remap (metal, cloth roughness).
+Without textures.materials the stage is the H2 stage unchanged.
 PNG writing: Pillow, compress_level 6, no metadata -> identical bytes for identical pixels."""
 
 import argparse
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 from PIL import Image
@@ -229,6 +235,23 @@ def blur3(a, n):
     return a
 
 
+def load_sibling(name):
+    spec = importlib.util.spec_from_file_location("h2_" + name, Path(__file__).resolve().parent / (name + ".py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def contact_labels(run_dir, part_names, names):
+    """Labels (part index * 1000 + cap index, the uv-stage encoding) of named contact caps (close-report.json)."""
+    close = json.loads((Path(run_dir) / "reports" / "close-report.json").read_text(encoding="utf-8"))
+    out = []
+    for n in names:
+        rec = next(c for c in close["caps"] if c["name"] == n)
+        out.append(part_names.index(rec["part"]) * 1000 + int(rec["cap_index"]))
+    return out
+
+
 def run(run_dir, profile):
     run_dir = Path(run_dir)
     w = run_dir / "work"
@@ -248,18 +271,41 @@ def run(run_dir, profile):
     cap_path = w / "uv" / "caps.npz"
     cap_mask = np.load(w / "uv" / "cap_ids.npy") > 0 if (w / "uv" / "cap_ids.npy").exists() else np.zeros_like(uv_cov)
     cap_stats = None
+    mcfg = tcfg.get("materials")
+    mat = load_sibling("materials") if mcfg else None
+    tx = SimpleNamespace(rgb_to_hsv=rgb_to_hsv, bilinear=bilinear, dilate=dilate, blur3=blur3)
+    mstats = {}
+    if mcfg and mcfg.get("ao_exclusions"):
+        mstats["ao_exclusions"] = mat.ao_exclusions(maps, alpha, part_ids, part_names, run_dir, mcfg["ao_exclusions"])
+    rim_filters = (mcfg or {}).get("rim_filters", [])
     fp_path = w / "uv" / "footprints.npz"
     fp_stats = None
     if fp_path.exists():
         fp = dict(np.load(fp_path))
         if len(fp["tri_px"]):
+            if rim_filters:
+                fp, mstats["rim_filters_footprints"] = mat.filter_rim(
+                    fp, maps, alpha, cap_mask, contact_labels(run_dir, part_names, [f["contact"] for f in rim_filters]),
+                    [f["keep_hsv"] for f in rim_filters], tx)
             _painted, fp_stats = region_paint(maps, alpha, fp, cap_mask)
     stats["footprints"] = fp_stats
     valid_maps = {k: alpha[k] for k in ("NORMAL", "AO", "BC", "RM")}
     if cap_path.exists() and cap_mask.any():
         caps = dict(np.load(cap_path))
+        if rim_filters:
+            caps, mstats["rim_filters_caps"] = mat.filter_rim(
+                caps, maps, alpha, cap_mask, contact_labels(run_dir, part_names, [f["contact"] for f in rim_filters]),
+                [f["keep_hsv"] for f in rim_filters], tx)
         valid_maps, cap_stats = cap_fill(maps, alpha, caps, cap_mask, edge_px)
     stats["caps"] = cap_stats
+    metal_m = None
+    if mcfg and mcfg.get("metal"):
+        pos = np.load(w / "uv" / "position.npy")
+        vb = valid_maps["BC"] & uv_cov
+        metal_m, mstats["metal_mask"] = mat.metal_mask(maps["BC"], vb, part_ids, part_names, pos, mcfg["metal"], tx)
+        del pos
+        cloth_w = mat.cloth_weight(maps["BC"], part_ids, part_names, tcfg["team_mask"], tx) * (1.0 - metal_m)
+        mstats["remap"] = mat.remap(maps, vb & valid_maps["RM"], metal_m, cloth_w, mcfg)
     filled = {}
     for k in ("NORMAL", "AO", "BC", "RM"):
         filled[k] = fill(maps[k], valid_maps[k], edge_px)
@@ -341,6 +387,40 @@ def run(run_dir, profile):
             "measured": cap_stats, "expected": "every cap texel of the uv raster painted, none outside"}
     checks["team_mask_cloth_share"] = {"passed": 0.5 <= cloth_share <= 0.98, "measured": round(cloth_share, 4),
                                        "expected": "0.5..0.98 of the cloth part's texels (gold trim, belt, strap stay out)"}
+    if metal_m is not None:  # H2.1: measured on the written 8-bit 4K maps
+        ck = mcfg.get("checks", {})
+        core = (metal_m >= 0.99) & uv_cov
+        other = (metal_m <= 0) & uv_cov & valid_maps["RM"]  # no metal influence (the 3x3 edge blur excluded)
+        met8 = m4["ORM"][..., 2]
+        rough8 = m4["ORM"][..., 1].astype(np.float32) / 255.0
+        bc_lin_max = mat.lin(m4["BC"][core].astype(np.float32) / 255.0).max(-1)
+        lo_r, hi_r = ck.get("metal_core_roughness", [0.3, 0.46])
+        checks["h21_metal_core_metallic"] = {
+            "passed": bool(np.percentile(met8[core], 1) / 255.0 >= ck.get("metal_core_metallic_min", 0.89)),
+            "measured": {"texels": int(core.sum()), "p1": round(float(np.percentile(met8[core], 1)) / 255.0, 4),
+                         "median": round(float(np.median(met8[core])) / 255.0, 4)},
+            "expected": "metal core (mask >= 0.99): metallic p1 >= %s" % ck.get("metal_core_metallic_min", 0.89)}
+        checks["h21_metal_core_roughness"] = {
+            "passed": bool(np.percentile(rough8[core], 1) >= lo_r and np.percentile(rough8[core], 99) <= hi_r),
+            "measured": {"p1": round(float(np.percentile(rough8[core], 1)), 4), "p50": round(float(np.median(rough8[core])), 4),
+                         "p99": round(float(np.percentile(rough8[core], 99)), 4)},
+            "expected": "metal core roughness p1..p99 within %s..%s (varied, not a constant)" % (lo_r, hi_r)}
+        checks["h21_non_metal_metallic_zero"] = {
+            "passed": bool(met8[other].max() <= ck.get("non_metal_metallic_max_8bit", 1)),
+            "measured": {"texels": int(other.sum()), "max_8bit": int(met8[other].max())},
+            "expected": "cloth, skin, leather, wood, snakes, base (mask 0): metallic <= %d/255" % ck.get("non_metal_metallic_max_8bit", 1)}
+        checks["h21_metal_basecolor_plausible"] = {
+            "passed": bool(np.median(bc_lin_max) >= ck.get("metal_core_bc_linear_max_channel_p50_min", 0.5)),
+            "measured": {"linear_max_channel_p5_p50_p95": [round(float(x), 4) for x in np.percentile(bc_lin_max, [5, 50, 95])],
+                         "srgb_mean": [round(float(x), 1) for x in m4["BC"][core].mean(0)]},
+            "expected": "metal BaseColor = reflectance: linear max channel median >= %s (cavities darker by the Tripo detail)"
+                        % ck.get("metal_core_bc_linear_max_channel_p50_min", 0.5)}
+        rf = mstats.get("rim_filters_caps", []) + mstats.get("rim_filters_footprints", [])
+        checks["h21_rim_filters_applied"] = {
+            "passed": all(r["vertices"] > 0 and r["rim_samples_kept"] > 0 for r in mstats.get("rim_filters_caps", [])),
+            "measured": [{k: r[k] for k in ("label", "vertices", "rim_samples", "rim_samples_kept", "vertices_without_kept_sample")
+                          if k in r} for r in rf],
+            "expected": "every filtered contact cap found, with kept rim samples"}
     for tag, m, sz in (("4k", m4, size), ("2k", m2, size // 2)):
         checks["sizes_%s" % tag] = {"passed": all(a.shape[0] == a.shape[1] == sz for a in m.values()), "measured": sz}
     bc_in = m4["BC"][uv_cov].astype(np.float64)
@@ -351,6 +431,12 @@ def run(run_dir, profile):
                             "cloth_parts": tm["cloth_parts"], "hsv": hsv, "cloth_share_of_cloth_texels": round(cloth_share, 4),
                             "base_band_texels": int(base_band.sum())},
               "outputs": outputs, "checks": checks, "passed": all(c["passed"] for c in checks.values()), "status": "измерено"}
+    if mcfg:
+        report["materials"] = {"config": mcfg, "stats": mstats,
+                               "note": "H2.1: маска металла и перенастройка BC/ORM (materials.py); статус — измерено, "
+                                       "художественно не принято"}
+    if metal_m is not None:
+        np.save(w / "uv" / "metal_mask.npy", metal_m.astype(np.float32))
     out = run_dir / "reports" / "textures-report.json"
     out.write_text(json.dumps(report, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
     if not report["passed"]:

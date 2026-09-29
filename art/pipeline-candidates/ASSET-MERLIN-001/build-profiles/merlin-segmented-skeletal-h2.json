@@ -1,9 +1,9 @@
 {
   "schema": "unmatched.tripo-pipeline.h2-bake-profile/1",
-  "profile_id": "merlin-h2-bake/1",
+  "profile_id": "merlin-h2-bake/2",
   "asset_id": "ASSET-MERLIN-001",
   "status": "proposed",
-  "status_note": "H2 iteration (2026-09-29): game mesh retopologised from the Tripo H3.1 parts high-poly (task de0654b5), 4K atlas baked from the Tripo 8K/PBR high-poly, UM_HUMANOID_17_v2 rig. Technical candidate, not art acceptance; budgets below are proposals (GD-058 open). Driver: tools/tripo-pipeline/blender/h2_bake_merlin/run.py (does not touch tripo_pipeline.py / candidate_build / candidate/atlas.py / the rig contract: wave 4 owns them).",
+  "status_note": "H2 iteration (2026-09-29): game mesh retopologised from the Tripo H3.1 parts high-poly (task de0654b5), 4K atlas baked from the Tripo 8K/PBR high-poly, UM_HUMANOID_17_v2 rig. Technical candidate, not art acceptance; budgets below are proposals (GD-058 open). H2.1 (2026-09-29, profile /2): texel-density priority of the staff (x1.85) and the crystal (x2.0) raised, material classes in maps.materials (gold embroidery = cloth with lower roughness, leather belt, metal buckle, crystal, wood; metallic 0 outside the buckle) - see the h21 block. Driver: tools/tripo-pipeline/blender/h2_bake_merlin/run.py (does not touch tripo_pipeline.py / candidate_build / candidate/atlas.py / the rig contract: wave 4 owns them).",
   "run_dir": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake",
   "blender": "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe",
   "sources": {
@@ -56,12 +56,12 @@
     "tripo_part_8": {"role": "left fist at the belt", "object": "body", "tris": 1700, "td_priority": 1.75, "team": null},
     "tripo_part_5": {"role": "left shoe", "object": "body", "tris": 800, "td_priority": 1.0, "team": null},
     "tripo_part_11": {"role": "right shoe", "object": "body", "tris": 800, "td_priority": 1.0, "team": null},
-    "tripo_part_2": {"role": "staff, lower shaft (below the fist)", "object": "staff", "tris": 1500, "td_priority": 1.5, "team": null},
-    "tripo_part_10": {"role": "staff, carved upper shaft and crystal claw (above the fist)", "object": "staff", "tris": 1700, "td_priority": 1.5, "team": null},
-    "tripo_part_7": {"role": "staff crystal", "object": "staff", "tris": 400, "td_priority": 1.5, "team": null},
+    "tripo_part_2": {"role": "staff, lower shaft (below the fist)", "object": "staff", "tris": 1500, "td_priority": 1.85, "team": null},
+    "tripo_part_10": {"role": "staff, carved upper shaft and crystal claw (above the fist)", "object": "staff", "tris": 1700, "td_priority": 1.85, "team": null},
+    "tripo_part_7": {"role": "staff crystal", "object": "staff", "tris": 400, "td_priority": 2.0, "team": null},
     "tripo_part_1": {"role": "base (dark stone)", "object": "base", "tris": 2000, "td_priority": 0.5, "team": "base"}
   },
-  "parts_note": "Roles measured 2026-09-29 on the H2 GLBs (part-coloured x-ray renders and shared boundary loops, work/explore). Tris = proposed decimation target per part (collapse), before caps/bridges. td_priority = linear texel-density factor over the uniform world density (face x2, hands x1.75, staff/crystal x1.5, base x0.5).",
+  "parts_note": "Roles measured 2026-09-29 on the H2 GLBs (part-coloured x-ray renders and shared boundary loops, work/explore). Tris = proposed decimation target per part (collapse), before caps/bridges. td_priority = linear texel-density factor over the uniform world density (face x2, hands x1.75, staff x1.85, crystal x2.0, base x0.5). H2.1: staff/crystal were x1.5 in H2 and measured x1.43-1.49 of the robe (ABF area distortion ~ -5 %), below the x1.5-2 target for the weapon; raised to 1.85 / 2.0 (expected ~x1.75-1.9).",
   "objects": {
     "body": {
       "name": "SK_Merlin_H2_Body", "mesh": "Merlin_H2_Body",
@@ -153,7 +153,52 @@
       "cloth": {"parts_team": "cloth", "hue_deg": [195.0, 265.0], "s_min": 0.25, "v_max": 0.75, "soft": 0.06,
                 "note": "midnight-blue woven robe, hood and sleeves: blue hue on the cloth parts; the gold trim, the brown belt and the stars fall outside the hue band"},
       "trim": {"parts_team": "cloth", "hue_deg": [20.0, 60.0], "s_min": 0.25, "v_min": 0.18, "soft": 0.06},
-      "base_band": {"parts_team": "base", "normal_z_abs_max": 0.5, "note": "side wall of the base (face normal |z| < 0.5)"}
+      "base_band": {"parts_team": "base", "normal_z_abs_max": 0.5, "note": "side wall of the base (face normal |z| < 0.5)"},
+      "rgba_b_h21": "H2.1: B = embroidery class (trim x (1 - leather) x (1 - metal)); in H2 the brown belt, its hanging end and the buckle fell into the trim hue band and were marked as gold trim"
+    },
+    "materials": {
+      "iteration": "H2.1",
+      "note": "H2.1 (2026-09-29): Tripo PBR has one material per part, so the robe part carries wool, gold embroidery, the leather belt and the buckle with one roughness (p50 0.96) and metallic ~0.02 everywhere. Classes are computed on the 4K raster from the baked BC (HSV), the part map, the team masks and the per-texel position in the source frame (Tripo metres, Z up, face -Y; interpolated from work/uv/<object>.npz pos). Regions were measured 2026-09-29 on the H2 bake (work/explore: front/back projections of the texels, Workbench renders of the high-poly buckle). Deterministic rules, no hand-painted texels. AO and N are not changed.",
+      "metallic_default": 0.0,
+      "metallic_default_note": "Tripo metallic (p50 0.013-0.034, p95 0.03-0.13 by part) is the noise of a dielectric: every texel outside the metal class gets 0",
+      "embroidery": {
+        "from": "team_mask.trim x (1 - leather) x (1 - metal)",
+        "roughness": [0.55, 0.65], "value_ramp": [0.35, 0.35],
+        "note": "gold-thread embroidery (stoles, cuffs, hood border, hem, stars) is cloth: metallic 0, glossier than the wool (0.96). roughness = hi - (hi - lo) x ramp(V of the BC in sRGB, v0, dv): bright threads 0.55, dark thread gaps 0.65"
+      },
+      "leather_belt": {
+        "part": "tripo_part_0",
+        "band": {"z_center_m": 0.577, "z_tilt_m": 0.013, "half_height_m": 0.0165, "soft_m": 0.003,
+                 "note": "belt around the waist: brown texels centred at z 0.564 in front and 0.590 at the back -> z_c = z_center + z_tilt x y / hypot(x, y)"},
+        "exclude_boxes": [{"x": [-0.106, -0.041], "y": [-1.0, -0.02], "why": "right stole hanging over the belt in front"},
+                          {"x": [0.033, 0.081], "y": [-1.0, -0.02], "why": "left stole hanging over the belt in front"}],
+        "strap_box": {"x": [0.003, 0.023], "y": [-1.0, -0.02], "z": [0.38, 0.556], "why": "hanging belt end in front (to z 0.40)"},
+        "soft_m": 0.0015,
+        "brown": {"hue_deg": [5.0, 48.0], "hue_soft": 8.0, "s_min": 0.22, "s_soft": 0.06, "v_max": 0.75, "v_soft": 0.06},
+        "roughness": [0.64, 0.72], "value_ramp": [0.22, 0.2],
+        "note": "worn leather (not in the H2.1 task list; needed so the belt leaves the embroidery class and TeamMaskRGBA.B): glossier than wool, rougher than the thread; the shoes keep the Tripo roughness (p50 0.79)"
+      },
+      "metal_buckle": {
+        "part": "tripo_part_0",
+        "boxes_xz": [{"x": [-0.0228, -0.0148], "z": [0.548, 0.5792], "why": "left bar of the frame"},
+                     {"x": [-0.0228, 0.005], "z": [0.5728, 0.5792], "why": "top bar (its right end runs under the strap)"},
+                     {"x": [-0.0228, 0.003], "z": [0.548, 0.554], "why": "bottom bar"},
+                     {"x": [-0.0228, -0.009], "z": [0.5602, 0.5663], "why": "prong"}],
+        "y_max": -0.03, "soft_m": 0.0008, "exclude_cloth_mask": true,
+        "metallic": 1.0,
+        "roughness": [0.35, 0.5], "value_ramp": [0.2, 0.25],
+        "bc_linear_luminance_p50": 0.18, "bc_linear_max": 0.85,
+        "note": "the only metal of the concept: the belt buckle (dark antique bronze frame + prong). The concept has no rings and no staff fittings (the crystal claw is carved wood). The frame is a raised C-shaped bar on the high-poly (outer x -0.0223..0.0045, z 0.5485..0.5788, bars ~6 mm; prong z 0.561-0.5655); the belt strap passes through it. BC of a metal is its F0: the Tripo brown (linear luminance ~0.06) is scaled with hue and saturation kept so that the median luminance of the class is bc_linear_luminance_p50 (dark antique bronze; 0.25 was tried on the H2 bake and read lighter than the concept's buckle); roughness = hi - (hi - lo) x ramp(V): bright worn edges 0.35, dark grime 0.50"
+      },
+      "crystal": {
+        "part": "tripo_part_7", "metallic": 0.0, "roughness": [0.12, 0.18], "roughness_from_tripo_ramp": [0.25, 0.6],
+        "bc_saturation_gain": 1.1, "bc_saturation_max": 0.85, "bc_value_gain": 0.95,
+        "note": "faceted sapphire: dielectric gem, glossy (the Tripo roughness p50 0.58 read as matte plastic); roughness = lo + (hi - lo) x ramp(Tripo roughness) keeps a little variation; BC saturation x1.1 (cap 0.85) and value x0.95 in sRGB HSV (deeper blue; the painted facet glints of Tripo stay). No emission here: glow/depth is a UE material decision (recommendation in the report)"
+      },
+      "wood": {
+        "parts": ["tripo_part_2", "tripo_part_10"], "metallic": 0.0,
+        "note": "staff and crystal claw: carved wood; the Tripo roughness (p50 0.85 / 0.84) is kept, metallic 0"
+      }
     }
   },
   "scale": {
@@ -231,6 +276,42 @@
     "figure_triangles": [30000, 45000],
     "atlas": "4K master + 2K runtime, <= 2 slots",
     "base_triangles_note": "the base is a separate static mesh (SM); its triangles are not counted in the figure budget"
+  },
+  "h21": {
+    "iteration": "H2.1",
+    "date": "2026-09-29",
+    "changes": ["parts.tripo_part_2/10 td_priority 1.5 -> 1.85, tripo_part_7 1.5 -> 2.0 (UV repack, full rebake)",
+                "maps.materials: embroidery / leather belt / metal buckle / crystal / wood classes; metallic 0 outside the buckle",
+                "TeamMaskRGBA.B = embroidery class (belt and buckle removed)",
+                "stage_uv exports per-triangle positions (pos) for the 3D material regions",
+                "stages compare + compare_sheets: concept | H2 | H2.1 frames"],
+    "baseline": {
+      "label": "H2",
+      "git_rev": "9a2a5184",
+      "note": "committed H2 outputs restored by the compare stage with `git show <git_rev>:<path>` into work/h2-baseline/ and checked by sha256 (the H2 4K masters were local only, so both sides of the comparison use the 2K runtime set)",
+      "files": {
+        "sk_fbx": {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SK_Merlin_H2.fbx", "sha256": "c1e29b68192c01b2116cf0dee3eaf53eab164adf95e1ca076d23923e645ca87a"},
+        "base_fbx": {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/export/SM_Merlin_H2_Base.fbx", "sha256": "6214e7bb97bfdf909c5c5545aafad59791423617a8c3ebb957ff1cc482fee3d8"},
+        "BC_2K": {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_BC_2K.png", "sha256": "1403368ecd85d6e39473b5faad9cebd9d18a02bb0a4bf311cc846fc3ff7f8e06"},
+        "ORM_2K": {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_ORM_2K.png", "sha256": "9f6620c04470dd8d4a82faca2cf517cd875a45826c553541c5ba21245c295268"},
+        "N_2K": {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_N_2K.png", "sha256": "76db74d9135efddd76bf8fa63b3520249b95a347bb3a8f4618b4e03da5969860"},
+        "TeamMaskRGBA_2K": {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/textures/T_Merlin_H2_TeamMaskRGBA_2K.png", "sha256": "784cf249570691e04b156445a066b9383f009e29dbacb63cf49bc0c5e7ada10d"},
+        "maps_report": {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/reports/maps-report.json", "sha256": "e214b5dde790a5427bd48d7485d5afe17d95300d9ea56f852fd2d5eb41bf3a25"}
+      }
+    },
+    "compare": {
+      "texture_set": "2K runtime for H2 and H2.1",
+      "ortho_resolution": [1200, 1333],
+      "lights": {
+        "studio": "the preview stage light: three suns + near-black world (as the H2 frames)",
+        "studio_env": "the same suns + a soft grey gradient environment (strength env_strength) that lights the model but is not seen by the camera (film transparent, composited on the preview background): metal and the glossy crystal need something to reflect; still Blender EEVEE, not the game light"
+      },
+      "env_strength": 0.6,
+      "material_closeups": ["crystal", "buckle", "stole", "staff"],
+      "concept_crops_px": {"crystal": ["front", 393, 108, 62], "buckle": ["front", 583, 552, 50], "stole": ["front", 487, 700, 60],
+                           "staff": ["side", 600, 330, 120]},
+      "concept_crops_note": "[concept view, centre x, centre y, half size] in the 1190 x 1322 concept images; reference crops only (the renders are ortho close-ups of the model)"
+    }
   },
   "review": {
     "resolution": [1200, 1333],

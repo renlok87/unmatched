@@ -298,6 +298,12 @@
   },
   "triangles": 864
  },
+ "base_uv": {
+  "band": 144,
+  "bottom": 72,
+  "pip": 288,
+  "top": 72
+ },
  "blender": "5.2.2 LTS",
  "checks": {
   "all_triangles": {
@@ -325,7 +331,7 @@
    "passed": true
   },
   "body_triangles": {
-   "measured": 28458,
+   "measured": 30238,
    "passed": true
   },
   "bone_count": {
@@ -336,17 +342,17 @@
   "export_frame_face_points_plus_x": {
    "expected": "+X (UM_FBX_v1 ref pose: FBX opened in Blender faces +X)",
    "measured": [
-    10.531,
-    -0.541,
-    7.1
+    10.621,
+    -0.423,
+    6.509
    ],
    "passed": true
   },
   "face_ahead_of_body_minus_y": {
    "expected": "face y < body y - 0.02",
    "measured": {
-    "body_centroid_y": 0.02046,
-    "face_centroid_y": -0.08485
+    "body_centroid_y": 0.02176,
+    "face_centroid_y": -0.08444
    },
    "passed": true
   },
@@ -358,6 +364,11 @@
   "max_influences": {
    "expected": 4,
    "measured": 4,
+   "passed": true
+  },
+  "no_non_manifold_edges_body": {
+   "expected": 0,
+   "measured": 0,
    "passed": true
   },
   "no_triangles_below_1e-4_cm2": {
@@ -489,8 +500,8 @@
    "passed": true
   },
   "roundtrip_triangles": {
-   "expected": 28458,
-   "measured": 28458,
+   "expected": 30238,
+   "measured": 30238,
    "passed": true
   },
   "roundtrip_uv0": {
@@ -503,9 +514,9 @@
  "checks_failed": [],
  "exports": {
   "base_fbx": {
-   "bytes": 35948,
+   "bytes": 40252,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/export/SM_Harpy_H2_Base.fbx",
-   "sha256": "aadc891599ac714e889c3cf43a47f0bb48413564b226fa3cf4cbc43c7defc157"
+   "sha256": "3521d17a8bd84da6702b32ab375fe72ac38f59a2f32ed6810e14b71be54e73b9"
   },
   "settings": {
    "add_leaf_bones": false,
@@ -538,17 +549,17 @@
    "use_triangles": true
   },
   "skeletal_fbx": {
-   "bytes": 1290060,
+   "bytes": 1376508,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/export/SK_Harpy_H2.fbx",
-   "sha256": "62ae4761c2550e5079f6bae75f0ca15186c00695ba33f36f1dd0a1dd14674e57"
+   "sha256": "4a615a91fff510e23f26a028389de096f9e2bb4e02d7a9ce4978c74d2fa8984f"
   }
  },
- "input_blend_sha256": "3d8f48668f648e918e42ef18f4d1ac845fea85326d4aaecced88c76d570f22dc",
+ "input_blend_sha256": "f9579669123b6bb85e0277285d036a89d746b2a2ae8c8bb14da0860deb0eeb49",
  "measure": {
   "body_centroid_m": [
-   0.00243,
-   0.02046,
-   0.24486
+   0.00117,
+   0.02176,
+   0.25037
   ],
   "bounds_body_m": {
    "max": [
@@ -575,16 +586,16 @@
    ]
   },
   "face_centroid_m": [
-   -0.00298,
-   -0.08485,
-   0.31586
+   -0.00307,
+   -0.08444,
+   0.31546
   ],
   "height_with_base_uu": 42.0,
   "radial_core_uu": 11.9,
   "radial_max_uu": 36.96,
   "span_uu": 64.5,
   "triangles_base": 864,
-  "triangles_body": 28458,
+  "triangles_body": 30238,
   "ue_predicted_bounds_uu": {
    "max": [
     11.902,
@@ -597,17 +608,315 @@
     4.775
    ]
   },
-  "vertices_body": 16709
+  "vertices_body": 19377
  },
- "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2-bake-h2.json",
- "profile_sha256": "290171af1526825c1b9960bcaaa432c90cdfa0889451dc73e7ed3edde8670ad3",
+ "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2-bake-h21.json",
+ "profile_sha256": "e24a0b51101ccfd7da6c73177d21d83eef98341f7a24acc975ee1a72c9dbf252",
  "roundtrip": {
   "bones": 16,
   "triangles_base": 864,
-  "triangles_body": 28458,
-  "vertices_body": 16709
+  "triangles_body": 30238,
+  "vertices_body": 19377
  },
  "schema": "unmatched.h2-bake.rig-report/1",
+ "seal": {
+  "core": {
+   "crossing_faces_removed": 40,
+   "grid": [
+    53,
+    66,
+    99
+   ],
+   "margin_m": 0.003,
+   "min_distance_to_surface_m": 0.00044,
+   "min_inside_votes": 12,
+   "min_triangle_area_m2": 6.202462827786803e-05,
+   "nonmanifold_fix": {
+    "duplicate_faces_removed": 2,
+    "edges_before": 0,
+    "faces_removed": 0,
+    "left": 0,
+    "vertex_splits": 0
+   },
+   "rays": 14,
+   "triangles": 558,
+   "triangles_remesh": 69854,
+   "triangles_voxel": 56336,
+   "uv": [
+    0.908945,
+    0.084257
+   ],
+   "uv_from_part": "cap_100",
+   "vertex_moves_against_crossing": 2203,
+   "vertices_pulled_in": 198,
+   "voxel_m": 0.005,
+   "voxels_inside": 56483
+  },
+  "exposed": {
+   "fill_102": 416,
+   "tripo_part_0": 51,
+   "tripo_part_1": 112,
+   "tripo_part_10": 3,
+   "tripo_part_11": 0,
+   "tripo_part_2": 19,
+   "tripo_part_3": 48,
+   "tripo_part_4": 5,
+   "tripo_part_5": 1,
+   "tripo_part_6": 4,
+   "tripo_part_8": 3,
+   "tripo_part_9": 2
+  },
+  "lips": {
+   "tripo_part_0": {
+    "boundary_edges": 372,
+    "lip_edges": 24,
+    "lip_faces": 23,
+    "lip_triangles": 28,
+    "lip_vertices_welded": 9,
+    "tiny_triangles_dropped": 0,
+    "twin_edges_skipped": 0
+   },
+   "tripo_part_1": {
+    "boundary_edges": 832,
+    "lip_edges": 132,
+    "lip_faces": 131,
+    "lip_triangles": 239,
+    "lip_vertices_welded": 97,
+    "tiny_triangles_dropped": 0,
+    "twin_edges_skipped": 0
+   },
+   "tripo_part_10": {
+    "boundary_edges": 189,
+    "lip_edges": 7,
+    "lip_faces": 6,
+    "lip_triangles": 6,
+    "lip_vertices_welded": 2,
+    "tiny_triangles_dropped": 0,
+    "twin_edges_skipped": 2
+   },
+   "tripo_part_11": {
+    "boundary_edges": 103,
+    "lip_edges": 2,
+    "lip_faces": 2,
+    "lip_triangles": 2,
+    "lip_vertices_welded": 1,
+    "tiny_triangles_dropped": 0,
+    "twin_edges_skipped": 0
+   },
+   "tripo_part_2": {
+    "boundary_edges": 697,
+    "lip_edges": 23,
+    "lip_faces": 22,
+    "lip_triangles": 26,
+    "lip_vertices_welded": 10,
+    "tiny_triangles_dropped": 0,
+    "twin_edges_skipped": 0
+   },
+   "tripo_part_3": {
+    "boundary_edges": 649,
+    "lip_edges": 23,
+    "lip_faces": 19,
+    "lip_triangles": 22,
+    "lip_vertices_welded": 11,
+    "tiny_triangles_dropped": 0,
+    "twin_edges_skipped": 0
+   },
+   "tripo_part_4": {
+    "boundary_edges": 447,
+    "lip_edges": 16,
+    "lip_faces": 16,
+    "lip_triangles": 22,
+    "lip_vertices_welded": 10,
+    "tiny_triangles_dropped": 0,
+    "twin_edges_skipped": 0
+   },
+   "tripo_part_5": {
+    "boundary_edges": 511,
+    "lip_edges": 8,
+    "lip_faces": 8,
+    "lip_triangles": 10,
+    "lip_vertices_welded": 4,
+    "tiny_triangles_dropped": 0,
+    "twin_edges_skipped": 0
+   },
+   "tripo_part_6": {
+    "boundary_edges": 201,
+    "lip_edges": 4,
+    "lip_faces": 3,
+    "lip_triangles": 4,
+    "lip_vertices_welded": 1,
+    "tiny_triangles_dropped": 0,
+    "twin_edges_skipped": 0
+   },
+   "tripo_part_8": {
+    "boundary_edges": 185,
+    "lip_edges": 2,
+    "lip_faces": 2,
+    "lip_triangles": 2,
+    "lip_vertices_welded": 1,
+    "tiny_triangles_dropped": 0,
+    "twin_edges_skipped": 0
+   },
+   "tripo_part_9": {
+    "boundary_edges": 196,
+    "lip_edges": 2,
+    "lip_faces": 2,
+    "lip_triangles": 2,
+    "lip_vertices_welded": 0,
+    "tiny_triangles_dropped": 0,
+    "twin_edges_skipped": 0
+   }
+  },
+  "seconds": 349.6,
+  "settings": {
+   "core": {
+    "box_parts": [
+     "tripo_part_0",
+     "tripo_part_1",
+     "tripo_part_6",
+     "tripo_part_8"
+    ],
+    "enabled": true,
+    "margin_m": 0.003,
+    "min_inside_votes": 12,
+    "name": "core_103",
+    "rays": 14,
+    "remesh_voxel_m": 0.003,
+    "target_triangles": 600,
+    "uv_from_part": "cap_100",
+    "voxel_m": 0.005,
+    "why": "closed occluder inside head/torso/thighs: a ray that slips through a crack between parts meets its front face (one dark texel of the cap island) instead of culled back faces; weights copied from the nearest body vertex (weights.copy_nearest)"
+   },
+   "exclude_parts": [
+    "fill_102"
+   ],
+   "exposed": {
+    "azimuth_step_deg": 5.0,
+    "bary_steps": 3,
+    "elevations_deg": [
+     42.0,
+     48.0,
+     55.0,
+     62.0,
+     68.0
+    ],
+    "enabled": true,
+    "parts": [
+     "fill_102",
+     "tripo_part_0",
+     "tripo_part_1",
+     "tripo_part_2",
+     "tripo_part_3",
+     "tripo_part_4",
+     "tripo_part_5",
+     "tripo_part_6",
+     "tripo_part_8",
+     "tripo_part_9",
+     "tripo_part_10",
+     "tripo_part_11"
+    ],
+    "why": "the nape fill is an open sheet laid on the cap: its triangles whose back side is seen from a game direction (ray to the camera escapes) get a detached reversed copy"
+   },
+   "lips": {
+    "contact_m": 0.0025,
+    "enabled": true,
+    "exclude_parts": [],
+    "max_uv_px": 2.0,
+    "min_len_m": 0.0004,
+    "mode": "nearest",
+    "overshoot_m": 0.0005,
+    "targets_only": [
+     "cap_100"
+    ],
+    "tuck_m": 0.0002,
+    "why": "non-shared boundary edges within 2.5 mm of another part get a lip to 0.5 mm past the neighbour"
+   },
+   "note": "H2.1 see-through seal (seal.py), after the UV stage in stage_rig (authored frame, source metres). Scratch measurements 2026-09-29 on the H2.1 low-poly (see_through, 18 azimuths x 3.86/4.8/7.5/12.07 m): no seal 943 px (the nape fill's backs against the sky from the front, 1-8 px pinholes elsewhere); contact lips alone 902; exposed back faces alone 61; core + fill back faces 7; core + fill back faces + slivers + lips 0. Proposal",
+   "slivers": {
+    "enabled": true,
+    "exclude_parts": [],
+    "why": "boundary edges with both ends on a neighbour's boundary vertices but another path between them (stitch skipped the insertion, max_edge_factor): the sliver is filled by a fan of the part"
+   }
+  },
+  "slivers": {
+   "cap_100": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_0": {
+    "slivers": 3,
+    "tiny_triangles_dropped": 1,
+    "triangles": 3
+   },
+   "tripo_part_1": {
+    "slivers": 5,
+    "tiny_triangles_dropped": 0,
+    "triangles": 9
+   },
+   "tripo_part_10": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_11": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_2": {
+    "slivers": 11,
+    "tiny_triangles_dropped": 0,
+    "triangles": 14
+   },
+   "tripo_part_3": {
+    "slivers": 5,
+    "tiny_triangles_dropped": 0,
+    "triangles": 5
+   },
+   "tripo_part_4": {
+    "slivers": 1,
+    "tiny_triangles_dropped": 0,
+    "triangles": 1
+   },
+   "tripo_part_5": {
+    "slivers": 1,
+    "tiny_triangles_dropped": 0,
+    "triangles": 1
+   },
+   "tripo_part_6": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_8": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   },
+   "tripo_part_9": {
+    "slivers": 0,
+    "tiny_triangles_dropped": 0,
+    "triangles": 0
+   }
+  },
+  "triangles_after": {
+   "cap_100": 436,
+   "core_103": 558,
+   "fill_102": 1815,
+   "tripo_part_0": 5181,
+   "tripo_part_1": 3649,
+   "tripo_part_10": 1326,
+   "tripo_part_11": 329,
+   "tripo_part_2": 3128,
+   "tripo_part_3": 2921,
+   "tripo_part_4": 3136,
+   "tripo_part_5": 3322,
+   "tripo_part_6": 1665,
+   "tripo_part_8": 1454,
+   "tripo_part_9": 1318
+  }
+ },
  "seam_gap_probe": {
   "after_harmonise": {
    "arm_l_raise": {
@@ -641,9 +950,9 @@
    "spine_bend_fwd": {
     "between": [
      "tripo_part_1",
-     "tripo_part_6"
+     "tripo_part_8"
     ],
-    "max_opening_m": 0.00017
+    "max_opening_m": 0.0002
    },
    "thigh_l_flex": {
     "between": [
@@ -661,7 +970,7 @@
    }
   },
   "pair_distance_m": 0.003,
-  "pairs": 2190,
+  "pairs": 2772,
   "per_part_weights_only": {
    "arm_l_raise": {
     "between": [
@@ -696,7 +1005,7 @@
      "tripo_part_1",
      "tripo_part_8"
     ],
-    "max_opening_m": 0.01009
+    "max_opening_m": 0.01101
    },
    "thigh_l_flex": {
     "between": [
@@ -726,7 +1035,7 @@
   "source_base_top_z_m": 0.07351,
   "source_figure_top_z_m": 0.63422
  },
- "seconds": 3.1,
+ "seconds": 354.0,
  "sockets": [
   {
    "bone": "head",
@@ -767,48 +1076,55 @@
    "bone": "foot.R",
    "location_source": "predicted: UE bone space = (x, -y, z) of the Blender bone-local offset (RIG-CONTRACT §7); verify with a live get_socket_location against target_ue_component_uu",
    "location_uu_for_ue": [
-    0.02,
-    -6.932,
-    -0.005
+    0.017,
+    -6.914,
+    0.007
    ],
    "name": "Weapon",
    "offset_blender_bone_local_uu": [
-    0.02,
-    6.932,
-    -0.005
+    0.017,
+    6.914,
+    0.007
    ],
    "offset_ue_bone_local_uu_predicted": [
-    0.02,
-    -6.932,
-    -0.005
+    0.017,
+    -6.914,
+    0.007
    ],
    "purpose": "talon strike point (LungeAttack VFX); RIG-CONTRACT v2 characters.Harpy: the talon socket is attached by the profile (its text names hand.L/hand.R); kept on foot.R as in the previous candidate, see the report followups",
    "status": "предложено",
    "target_blender_m": [
-    -0.03028,
-    -0.03534,
-    0.05722
+    -0.03032,
+    -0.03513,
+    0.05725
    ],
    "target_kind": "part_front_quartile",
    "target_part": "tripo_part_9",
    "target_ue_component_uu": [
-    3.534,
-    3.028,
-    5.722
+    3.513,
+    3.032,
+    5.725
    ],
    "ue_bone": "foot_R"
   }
  ],
  "status": "измерено (technically exported, not art-accepted)",
+ "topology_body": {
+  "loose_vertices": 0,
+  "non_manifold_edges": 0,
+  "open_edges": 7232
+ },
  "weights": {
   "cleanup": {
    "cap_100": {},
-   "patch_101": {},
+   "core_103": {},
+   "fill_102": {},
    "tripo_part_0": {
     "foreign_weights_removed": 2735
    },
    "tripo_part_1": {
-    "ramped_z": 1538
+    "fallback_nearest_bone": 2540,
+    "ramped_z": 315
    },
    "tripo_part_10": {},
    "tripo_part_11": {},
@@ -817,12 +1133,23 @@
    "tripo_part_4": {},
    "tripo_part_5": {},
    "tripo_part_6": {
-    "ramped_z": 287
+    "ramped_z": 301
    },
    "tripo_part_8": {
-    "ramped_z": 141
+    "ramped_z": 142
    },
    "tripo_part_9": {}
+  },
+  "copy_nearest": {
+   "core_103": {
+    "from": [
+     "tripo_part_0",
+     "tripo_part_1",
+     "tripo_part_6",
+     "tripo_part_8"
+    ],
+    "vertices": 300
+   }
   },
   "harmonise": {
    "distance_m_final": 0.0066,
@@ -884,65 +1211,71 @@
      "tripo_part_0"
     ],
     [
-     "patch_101",
-     "tripo_part_0"
+     "fill_102",
+     "cap_100"
     ],
     [
-     "cap_100",
-     "patch_101"
+     "fill_102",
+     "tripo_part_1"
+    ],
+    [
+     "fill_102",
+     "tripo_part_0"
     ]
    ],
    "vertices_blended": {
-    "cap_100<-patch_101": 117,
+    "cap_100<-fill_102": 186,
     "cap_100<-tripo_part_0": 0,
-    "cap_100<-tripo_part_1": 206,
-    "patch_101<-cap_100": 169,
-    "patch_101<-tripo_part_0": 0,
+    "cap_100<-tripo_part_1": 127,
+    "fill_102<-cap_100": 1064,
+    "fill_102<-tripo_part_0": 18,
+    "fill_102<-tripo_part_1": 1025,
     "tripo_part_0<-cap_100": 0,
-    "tripo_part_0<-patch_101": 0,
-    "tripo_part_0<-tripo_part_1": 314,
-    "tripo_part_0<-tripo_part_2": 99,
-    "tripo_part_0<-tripo_part_3": 135,
-    "tripo_part_10<-tripo_part_6": 83,
+    "tripo_part_0<-fill_102": 4,
+    "tripo_part_0<-tripo_part_1": 393,
+    "tripo_part_0<-tripo_part_2": 131,
+    "tripo_part_0<-tripo_part_3": 215,
+    "tripo_part_10<-tripo_part_6": 98,
     "tripo_part_11<-tripo_part_8": 72,
-    "tripo_part_11<-tripo_part_9": 68,
-    "tripo_part_1<-cap_100": 146,
-    "tripo_part_1<-tripo_part_0": 270,
-    "tripo_part_1<-tripo_part_2": 144,
-    "tripo_part_1<-tripo_part_3": 160,
-    "tripo_part_1<-tripo_part_6": 186,
-    "tripo_part_1<-tripo_part_8": 172,
-    "tripo_part_2<-tripo_part_0": 97,
-    "tripo_part_2<-tripo_part_1": 146,
-    "tripo_part_2<-tripo_part_5": 584,
-    "tripo_part_3<-tripo_part_0": 121,
-    "tripo_part_3<-tripo_part_1": 161,
-    "tripo_part_3<-tripo_part_4": 518,
-    "tripo_part_4<-tripo_part_3": 515,
-    "tripo_part_5<-tripo_part_2": 573,
-    "tripo_part_6<-tripo_part_1": 183,
-    "tripo_part_6<-tripo_part_10": 79,
-    "tripo_part_8<-tripo_part_1": 173,
+    "tripo_part_11<-tripo_part_9": 69,
+    "tripo_part_1<-cap_100": 486,
+    "tripo_part_1<-fill_102": 513,
+    "tripo_part_1<-tripo_part_0": 331,
+    "tripo_part_1<-tripo_part_2": 175,
+    "tripo_part_1<-tripo_part_3": 193,
+    "tripo_part_1<-tripo_part_6": 192,
+    "tripo_part_1<-tripo_part_8": 186,
+    "tripo_part_2<-tripo_part_0": 122,
+    "tripo_part_2<-tripo_part_1": 173,
+    "tripo_part_2<-tripo_part_5": 625,
+    "tripo_part_3<-tripo_part_0": 202,
+    "tripo_part_3<-tripo_part_1": 169,
+    "tripo_part_3<-tripo_part_4": 541,
+    "tripo_part_4<-tripo_part_3": 543,
+    "tripo_part_5<-tripo_part_2": 583,
+    "tripo_part_6<-tripo_part_1": 184,
+    "tripo_part_6<-tripo_part_10": 94,
+    "tripo_part_8<-tripo_part_1": 183,
     "tripo_part_8<-tripo_part_11": 69,
-    "tripo_part_9<-tripo_part_11": 80
+    "tripo_part_9<-tripo_part_11": 88
    }
   },
   "share_by_bone": {
-   "arm_lower.L": 0.0924,
-   "arm_lower.R": 0.0868,
-   "arm_upper.L": 0.0628,
-   "arm_upper.R": 0.0592,
-   "foot.L": 0.053,
-   "foot.R": 0.0577,
-   "hand.L": 0.0692,
-   "hand.R": 0.0629,
-   "head": 0.1485,
-   "hips": 0.0328,
-   "leg_lower.L": 0.0138,
-   "leg_lower.R": 0.015,
-   "leg_upper.L": 0.0281,
-   "leg_upper.R": 0.0285,
-   "spine": 0.1892
+   "arm_lower.L": 0.0806,
+   "arm_lower.R": 0.0767,
+   "arm_upper.L": 0.0581,
+   "arm_upper.R": 0.0587,
+   "foot.L": 0.0475,
+   "foot.R": 0.0504,
+   "hand.L": 0.0603,
+   "hand.R": 0.0549,
+   "head": 0.1388,
+   "hips": 0.0343,
+   "leg_lower.L": 0.0123,
+   "leg_lower.R": 0.0134,
+   "leg_upper.L": 0.0252,
+   "leg_upper.R": 0.0259,
+   "spine": 0.2629
   },
   "wing_span": {
    "tripo_part_2": {
@@ -952,10 +1285,10 @@
      0.0
     ],
     "dominant_bone_vertices": {
-     "arm_lower.L": 934,
-     "arm_upper.L": 759,
-     "hand.L": 149,
-     "spine": 34
+     "arm_lower.L": 952,
+     "arm_upper.L": 809,
+     "hand.L": 156,
+     "spine": 46
     },
     "joint_band_m": 0.03299,
     "root_band_m": 0.03959,
@@ -971,9 +1304,9 @@
      0.0
     ],
     "dominant_bone_vertices": {
-     "arm_lower.R": 873,
-     "arm_upper.R": 745,
-     "hand.R": 115,
+     "arm_lower.R": 893,
+     "arm_upper.R": 884,
+     "hand.R": 116,
      "spine": 12
     },
     "joint_band_m": 0.03299,
@@ -990,9 +1323,9 @@
      0.0
     ],
     "dominant_bone_vertices": {
-     "arm_lower.R": 623,
-     "arm_upper.R": 252,
-     "hand.R": 903
+     "arm_lower.R": 647,
+     "arm_upper.R": 253,
+     "hand.R": 906
     },
     "joint_band_m": 0.03299,
     "root_band_m": 0.03959,
@@ -1009,8 +1342,8 @@
     ],
     "dominant_bone_vertices": {
      "arm_lower.L": 635,
-     "arm_upper.L": 284,
-     "hand.L": 992
+     "arm_upper.L": 291,
+     "hand.L": 995
     },
     "joint_band_m": 0.03299,
     "root_band_m": 0.03959,

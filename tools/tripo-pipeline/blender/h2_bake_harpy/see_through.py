@@ -37,7 +37,8 @@ from mathutils import Vector
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import common as C  # noqa: E402
 
-DEFAULTS = {"azimuths_deg": list(range(0, 360, 20)), "distances_m": [4.8, 7.5], "gate_azimuth_range_deg": [120, 240],
+DEFAULTS = {"azimuths_deg": list(range(0, 360, 20)), "distances_m": [4.8, 7.5], "gate_strict_distances_m": None,
+            "gate_azimuth_range_deg": [120, 240],
             "gate_max_px": 0, "hole_min_px": 4, "gate_max_holes": 0, "resolution": [1920, 1080], "fov_h_deg": 35.0,
             "pitch_deg": -55.0, "target_m": [0.0, 0.0, 0.12]}
 
@@ -146,10 +147,13 @@ def measure(scene, cam, cfg, tmp_dir, frames_dir=None, tag=""):
         p = tmp_dir / f
         if p.exists():
             p.unlink()
+    sd = cfg.get("gate_strict_distances_m") or cfg["distances_m"]
+    for r in rows:
+        r["gated"] = bool(r["gated"] and any(abs(r["distance_m"] - x) < 1e-9 for x in sd))
     gated = [r for r in rows if r["gated"]]
     return {"frames": rows,
             # the verifier's strict gate: no see-through pixel at all behind the figure (reported, see pass_strict)
-            "gate_strict": {"azimuth_range_deg": [lo, hi], "distances_m": cfg["distances_m"], "max_px": cfg["gate_max_px"],
+            "gate_strict": {"azimuth_range_deg": [lo, hi], "distances_m": sd, "max_px": cfg["gate_max_px"],
                             "worst_px": max((r["see_through_px"] for r in gated), default=0),
                             "pass": all(r["see_through_px"] <= cfg["gate_max_px"] for r in gated)},
             # the stage gate: no opening = no 8-connected see-through component of hole_min_px or more, all azimuths
@@ -157,6 +161,11 @@ def measure(scene, cam, cfg, tmp_dir, frames_dir=None, tag=""):
                      "max_holes": cfg["gate_max_holes"], "holes": int(sum(r["holes"] for r in rows)),
                      "largest_component_px": max((r["components_px"][0] for r in rows if r["components_px"]), default=0),
                      "pass": sum(r["holes"] for r in rows) <= cfg["gate_max_holes"]},
+            "strict_all_distances": {"azimuth_range_deg": [lo, hi], "distances_m": cfg["distances_m"],
+                                     "worst_px": max((r["see_through_px"] for r in rows if lo <= r["azimuth_deg"] % 360 <= hi),
+                                                     default=0)},
+            "by_distance_total_px": {str(d): int(sum(r["see_through_px"] for r in rows if r["distance_m"] == d))
+                                     for d in cfg["distances_m"]},
             "all_azimuths_worst_px": max((r["see_through_px"] for r in rows), default=0),
             "all_azimuths_total_px": int(sum(r["see_through_px"] for r in rows))}
 
@@ -180,8 +189,9 @@ def main():
     blend = Path(a[a.index("--blend") + 1]).resolve() if "--blend" in a else run / "work" / "h2-candidate.blend"
     out = Path(a[a.index("--out") + 1]).resolve() if "--out" in a else run / "reports" / "see-through.json"
     frames_dir = Path(a[a.index("--frames") + 1]).resolve() if "--frames" in a else run / "preview" / "see-through"
+    key = a[a.index("--config-key") + 1] if "--config-key" in a else "see_through"
     cfg = dict(DEFAULTS)
-    cfg.update({k: v for k, v in P.get("review", {}).get("see_through", {}).items() if k in DEFAULTS})
+    cfg.update({k: v for k, v in P.get("review", {}).get(key, {}).items() if k in DEFAULTS})
     bpy.ops.wm.open_mainfile(filepath=str(blend))
     scene = bpy.context.scene
     N_ = P["names"]
@@ -195,7 +205,11 @@ def main():
             o.hide_render = True
     cam = setup(scene, cfg)
     res = measure(scene, cam, cfg, run / "work" / "see-through-tmp", frames_dir)
-    res.update({"schema": "unmatched.h2-bake.see-through/1", "blend": C.rel(blend), "blend_sha256": C.sha256(blend),
+    blend_label = C.rel(blend)
+    if ":" in blend_label or blend_label.startswith("/"):  # outside the repository (a local copy of an older run)
+        blend_label = "external:" + "/".join(blend.parts[-3:])
+    res.update({"schema": "unmatched.h2-bake.see-through/1", "config_key": key, "blend": blend_label,
+                "blend_sha256": C.sha256(blend),
                 "label": "blender Workbench mask (flat, no AA), not an UE frame",
                 "camera": {k: cfg[k] for k in ("resolution", "fov_h_deg", "pitch_deg", "target_m")},
                 "method": "see_through_px = covered with both face sides AND NOT covered with back faces culled "

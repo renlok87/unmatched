@@ -51,7 +51,9 @@ for lab in ("h2-blend", "h2-fbx"):
 
 report = {
     "schema": "unmatched.h2-bake.hero-report/1",
-    "asset_id": P["asset_id"], "date": "2026-09-29", "iteration": "H2 (проработка героев по концептам hero-quality-v1)",
+    "asset_id": P["asset_id"], "date": "2026-09-29",
+    "iteration": ("H2.1 (точечная доводка: затылок, просветы, non-manifold, материалы; ревизия 3, %s)" % P["profile_id"]
+                  if P.get("seal") else "H2 (проработка героев по концептам hero-quality-v1)"),
     "status": "измерено", "claims": {"art_accepted": False, "game_ready": False, "budgets_declared": False,
                                      "ue_imported": False},
     "credits": {"tripo": 0, "paid_operations": 0, "note": "only local Blender/Python; the Tripo stage was paid earlier by the orchestrator"},
@@ -114,13 +116,38 @@ report = {
     "determinism": det,
     "assessment": notes,
 }
+if P.get("seal"):
+    base_nape = None
+    if "--baseline-nape" in sys.argv:
+        base_nape = json.loads(Path(sys.argv[sys.argv.index("--baseline-nape") + 1]).read_text(encoding="utf-8"))
+    nape = load("nape-visibility.json")
+
+    def nape_summary(d):
+        return None if not d else {"total_cap_px": d["total_cap_px"], "by_distance": d["by_distance"],
+                                   "labelled_faces": d["labelled_faces"]}
+
+    report["h21"] = {
+        "nonmanifold_fix_lowpoly": low.get("nonmanifold_fix"),
+        "fills": low["repair"].get("fills"),
+        "seal": rig.get("seal"), "topology_body": rig.get("topology_body"),
+        "nape_visibility": {"h21": nape_summary(nape), "h2_baseline": nape_summary(base_nape),
+                            "frames": [(f["azimuth_deg"], f["distance_m"], f["cap_px"]) for f in nape["frames"]] if nape else None},
+        "materials": tex["checks"].get("materials"), "roughness_mean_covered_after": tex["checks"].get("roughness_mean_covered_after"),
+        "base": {"uv": rig.get("base_uv"), "textures": tex["outputs"].get("base"), "profile": P.get("base_material")},
+        "review_frames": json.loads((run / "preview" / "h21" / "review-frames-h21.json").read_text(encoding="utf-8"))
+        if (run / "preview" / "h21" / "review-frames-h21.json").exists() else None,
+    }
 files = []
 skip_dirs = {"work"}
 for p in sorted(run.rglob("*")):
     if p.is_dir() or skip_dirs & set(p.relative_to(run).parts):
         continue
     size = p.stat().st_size
-    files.append({"path": rel(p), "bytes": size, "sha256": sha(p), "commit": size < 50 * 1024 * 1024})
+    local = "4k" in p.relative_to(run).parts or "master_4k" in p.relative_to(run).parts or p.name.endswith("_4K.png")
+    item = {"path": rel(p), "bytes": size, "sha256": sha(p), "commit": size < 50 * 1024 * 1024 and not local}
+    if local:
+        item["note"] = "4K master: local only (asset .gitignore), sha256 pinned here and in reports/textures-report.json"
+    files.append(item)
 report["files"] = files
 report["files_total_bytes"] = sum(f["bytes"] for f in files)
 out.write_text(json.dumps(report, indent=1, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")

@@ -4,6 +4,9 @@ python report.py <profile.json> <out.json> [--determinism <determinism.json>]
 Only reads reports/artifacts; writes one JSON (sorted keys). Numbers are measured; budgets are proposals.
 --determinism defaults to <run>/reports/determinism.json (committed; its sections are written by determinism.py).
 Also scans every artifact (export, textures, reports, preview) for absolute host paths (check artifacts.no_host_paths).
+H2.1 (profile h21 block): adds the section `h21` (texel density and atlas before/after against the H2 baseline maps
+report restored by the compare stage into work/h2-baseline/, material classes, textures-report, comparison sheets,
+UE material notes, the H2.1 commit set `commit`).
 """
 
 import argparse
@@ -32,14 +35,10 @@ DEFERRED_UE_STEPS = [
 ]
 
 FOLLOWUPS = [
-    "commit order: commit this candidate together with or after wave 4 W4-D. validate-skeletal-mesh.json (PASS on "
-    "UM_HUMANOID_17_v2) and the probe stage need the uncommitted W4-D files tools/tripo-pipeline/anim/validate_clip.py "
-    "(modified), tools/tripo-pipeline/anim/rig_rules.py (untracked) and docs/art-pipeline/rig/rig-contract.json + "
-    "RIG-CONTRACT.md (v2); at HEAD validate_clip knows only v1 and fails on --skeleton=UM_HUMANOID_17_v2",
-    "commit in the same commit as this manifest (the profile, the source stage and the sheets reference them): "
-    "source-specs/tripo-de0654b5-h2.json, 20260929-h2-tripo/reports/tripo-run.json, ASSET-MERLIN-001/.gitignore (ignores "
-    "the >50 MB GLBs and 20260929-h2-bake/logs/), art/imagegen/hero-quality-v1/merlin/{merlin-front,merlin-side,merlin-back}.png "
-    "+ prompts.md and art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png",
+    "commit (H2.1): the outside-the-run dependencies are already in git (wave 4 W4-D rig contract v2 in 917a524d; H2 "
+    "source-spec, tripo-run.json, .gitignore, concepts and the Medusa reference in 9a2a5184; see commit_dependencies). "
+    "Commit the H2.1 set of h21.commit by explicit paths (no blanket git add: h21.commit.keep_out lists an untracked "
+    "63.8 MB GLB of the older h31 run in the same asset folder)",
     "merge the per-hero H2 modules (tools/tripo-pipeline/blender/h2_bake_merlin and the parallel h2_bake_<hero>) into one "
     "h2_bake library + a CLI route in tripo_pipeline.py (stages source/retopo/uv/bake/maps/rig/probe/preview) and a "
     "profile_schema validator for unmatched.tripo-pipeline.h2-bake-profile/1 (wave 4 owns tripo_pipeline.py/candidate_build)",
@@ -51,6 +50,15 @@ FOLLOWUPS = [
     "art: gold spiral inlay on the staff, lighter laced boots, rough stone base (all are Tripo BC limits), crystal depth/glow "
     "in the master material (emission/fresnel), blue-grey streaks on the left hand BC; the face under the hood is unreadable "
     "at K2 -55 deg (hood/light decision)",
+    "H2.1 crystal glow (UE material decision, not baked): M_UM_Figure has no texture-driven emissive (Emissive = FxFlash + "
+    "Rim from Custom Primitive Data). Options: (a) a crystal mask (the tripo_part_7 islands; e.g. TeamMaskRGBA.A, today a "
+    "constant 255) + an emissive term BC x mask x CrystalGlow in the master; (b) a point light / VFX on the proposed StaffTip "
+    "socket (AD-CNF-59, CUE-008) only while casting. A second material slot for the crystal would break the 1-slot budget",
+    "H2.1 UE check: the ORM now carries metallic 1 only on the buckle and roughness 0.12-0.18 on the crystal, 0.55-0.65 on "
+    "the gold embroidery; keep M_UM_Figure RoughnessMin/Max at the neutral 0/1 (they remap ORM.G) and verify under DX12 + "
+    "Lumen High that the buckle reads as metal and the crystal as a glossy gem (Blender EEVEE frames only so far)",
+    "TeamMaskRGBA.B changed in H2.1: the belt, its hanging end and the buckle are no longer marked as gold trim; if wave 4 "
+    "adopts TeamMaskRGBA, the B channel is the gold-embroidery class",
     "budget decision GD-058: H2 heroes 30-45k LOD0 + LOD1 x0.5 and 4K master / 2K runtime (proposal, measured basis in k2_basis) "
     "vs 04/17 card 8-15k / 1K for a sidekick",
     "Tripo self-contacts left in the body (6 non-manifold + 13 inconsistent-winding edges at the hood back and the back hem, "
@@ -58,22 +66,28 @@ FOLLOWUPS = [
 ]
 
 COMMIT_DEPENDENCIES = {
-    "note": "files outside the run folder that the build or its checks read; state on 2026-09-29 (not queried from git "
-            "by this script, so the report stays deterministic)",
+    "note": "files outside the run folder that the build or its checks read; state on 2026-09-29 after the H2.1 build "
+            "(HEAD 9a2a5184; not queried from git by this script, so the report stays deterministic)",
     "orchestrator_h2_tripo_stage": {
         "files": ["art/pipeline-candidates/ASSET-MERLIN-001/source-specs/tripo-de0654b5-h2.json",
                   "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/reports/tripo-run.json",
                   "art/pipeline-candidates/ASSET-MERLIN-001/.gitignore"],
-        "state": "untracked / modified; commit with this candidate"},
+        "state": "tracked since 9a2a5184 (H2 commit); not changed by H2.1"},
     "concepts_and_reference": {
         "files": ["art/imagegen/hero-quality-v1/merlin/merlin-front.png", "art/imagegen/hero-quality-v1/merlin/merlin-side.png",
                   "art/imagegen/hero-quality-v1/merlin/merlin-back.png", "art/imagegen/hero-quality-v1/merlin/prompts.md",
                   "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png"],
-        "state": "untracked; commit with this candidate (profile concepts/quality_reference, sheets sbs_*, source-spec sha256)"},
+        "state": "tracked since 9a2a5184 (H2 commit); not changed by H2.1 (profile concepts/quality_reference, sheets sbs_* "
+                 "and h21_sbs_*, source-spec sha256)"},
     "wave4_w4d_rig_contract_v2": {
         "files": ["tools/tripo-pipeline/anim/validate_clip.py", "tools/tripo-pipeline/anim/rig_rules.py",
                   "docs/art-pipeline/rig/rig-contract.json", "docs/art-pipeline/rig/RIG-CONTRACT.md"],
-        "state": "wave 4 (W4-D), uncommitted; validate_clip v2 PASS is reproducible only with them: commit with or after W4-D"},
+        "state": "tracked since 917a524d (wave 4 W4-D, rig contract v2); validate_clip at HEAD knows UM_HUMANOID_17_v2"},
+    "h2_baseline_for_compare": {
+        "files": ["git 9a2a5184: 20260929-h2-bake/export/{SK_Merlin_H2,SM_Merlin_H2_Base}.fbx, "
+                  "textures/T_Merlin_H2_{BC,N,ORM,TeamMaskRGBA}_2K.png, reports/maps-report.json (7 files)"],
+        "state": "read from git by the compare stage (git show 9a2a5184:<path>, sha256 pinned in profile h21.baseline); "
+                 "needs 9a2a5184 in the local history"},
     "raw_sources_not_committed": {
         "files": ["art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-parts12.glb",
                   "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-tripo/source/merlin-h2-tripo-de0654b5-tex8k-pbr.glb"],
@@ -81,8 +95,41 @@ COMMIT_DEPENDENCIES = {
 }
 
 NOT_DONE = ["UE import and live frames (live UE and Blender :9876 belong to wave 4)", "LOD1", "animation clips",
+            "H2.1: crystal emission (UE material decision, recommendation in followups)",
+            "H2.1: gold spiral inlay of the concept staff (not in the Tripo BC; no hand-painted texels)",
             "Tripo auto-rig", "art acceptance", "edits of tripo_pipeline.py / candidate_build / candidate/atlas.py / rig contract / "
             "PIPELINE.md / ADDING-AN-ASSET.md / registry (wave 4)"]
+
+# H2.1 commit set (state on 2026-09-29 against HEAD 9a2a5184; written as constants, not queried from git)
+_RUN = "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/"
+H21_COMMIT = {
+    "note": "58 files; stage them by explicit paths. Not queried from git by this script (the report stays deterministic)",
+    "commit": {
+        "module": ["tools/tripo-pipeline/blender/h2_bake_merlin/{__init__,maps,report,run,sheets,stage_preview,stage_uv}.py "
+                   "(modified)", "tools/tripo-pipeline/blender/h2_bake_merlin/{stage_compare,compare_sheets}.py (new)"],
+        "profile": ["art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json (merlin-h2-bake/2)"],
+        "export": [_RUN + "export/SK_Merlin_H2.fbx", _RUN + "export/SM_Merlin_H2_Base.fbx"],
+        "textures_2k": [_RUN + "textures/T_Merlin_H2_{BC,N,ORM,TeamMask,TeamMaskRGBA}_2K.png (5)"],
+        "reports": [_RUN + "reports/{bake,build,maps,sheets,uv}-report.json, validate-skeletal-mesh.json (modified)",
+                    _RUN + "reports/{textures,compare,compare-sheets}-report.json (new)"],
+        "preview": [_RUN + "preview/{closeup_*,closeups_sheet,k2_*_h2,ortho_*,sbs_*}.png (22, re-shot on H2.1)",
+                    _RUN + "preview/h21_*.png (8, new)"],
+        "docs": ["docs/art-pipeline/merlin-h2-report.md", "docs/art-pipeline/merlin-h2-report.json"],
+    },
+    "local_only": [
+        _RUN + "textures/*_4K.png (5 masters; ASSET-MERLIN-001/.gitignore line 17; sha256 in reports/textures-report.json)",
+        _RUN + "work/ and " + _RUN + "logs/ (ASSET-MERLIN-001/.gitignore)",
+    ],
+    "unchanged_bytes": "preview/deform/* (22 probe PNG/JSON) and reports/preview-report.json were rewritten by the H2.1 run "
+                       "but are byte-identical to 9a2a5184, so they are not in the change set",
+    "keep_out": [{
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/source/merlin-tripo-h31-d9ff4260-source.glb",
+        "bytes": 63829324,
+        "state": "untracked and not git-ignored; raw source of the older 2026-09-28 h31 run (pinned by "
+                 "source-specs/tripo-d9ff4260.json), not read by H2 or H2.1, over the 50 MB policy. Not part of the H2.1 "
+                 "commit; whether to commit, ignore or keep it local is the user's decision",
+    }],
+}
 
 
 def files_in(d, patterns):
@@ -91,6 +138,54 @@ def files_in(d, patterns):
         for p in sorted(Path(d).glob(pat)):
             if p.is_file():
                 out.append({"path": C.rel(p), "sha256": C.sha256(p), "bytes": p.stat().st_size})
+    return out
+
+
+def h21_section(prof, R):
+    """H2.1 before/after: the H2 maps report is the baseline file restored (sha256-checked) by the compare stage."""
+    h21 = prof["h21"]
+    bfile = h21["baseline"]["files"]["maps_report"]
+    bpath = prof.work / "h2-baseline" / Path(bfile["path"]).name
+    if C.sha256(bpath) != bfile["sha256"]:
+        raise SystemExit("baseline maps report %s does not match its sha256 (run the compare stage)" % bpath)
+    before = C.load_json(bpath)
+    after = R["maps"]
+    td = {}
+    for part in sorted(after["texel_density"], key=C.part_index):
+        b, a = before["texel_density"][part], after["texel_density"][part]
+        td[part] = {"td_priority": [b["td_priority"], a["td_priority"]], "px_per_uu_at_4k": [b["px_per_uu_at_4k"], a["px_per_uu_at_4k"]],
+                    "relative_to_robe": [b["relative_to_robe"], a["relative_to_robe"]]}
+    mat = dict(after["materials_h21"])
+    mat.pop("rules", None)
+    textures = prof.reports / "textures-report.json"
+    out = {
+        "iteration": h21["iteration"], "changes": h21["changes"], "baseline": {"git_rev": h21["baseline"]["git_rev"], "maps_report": bfile},
+        "texel_density_before_after": td,
+        "atlas_before_after": {"utilisation": [before["utilisation"], after["utilisation"]],
+                               "min_island_gap_px": [before["min_island_gap_px"], after["min_island_gap_px"]],
+                               "uv_overlap_texels": [before["uv_overlap_texels"], after["uv_overlap_texels"]],
+                               "surface_miss_share": {m: [before["misses"][m]["surface_share"], after["misses"][m]["surface_share"]]
+                                                      for m in after["misses"]}},
+        "part_stats_before_after": {p: {"before": before["part_stats"][p], "after": after["part_stats"][p]} for p in sorted(after["part_stats"], key=C.part_index)},
+        "team_mask_coverage_before_after": {p: {"before": before["team_mask_coverage"][p], "after": after["team_mask_coverage"][p]}
+                                            for p in sorted(after["team_mask_coverage"], key=C.part_index)},
+        "materials": mat,
+        "material_rules": "profile maps.materials",
+        "textures_report": {"path": C.rel(textures), "sha256": C.sha256(textures)},
+        "textures_before_after_sha256": {k: [before["textures"][k]["sha256"], after["textures"][k]["sha256"]] for k in sorted(after["textures"])},
+        "ue_material_notes": [
+            "M_UM_Figure: Metallic = ORM.B, Roughness = lerp(RoughnessMin, RoughnessMax, ORM.G), AO = ORM.R; keep RoughnessMin/Max 0/1",
+            "TeamMask (L) = cloth only: the gold embroidery, belt, buckle, crystal and staff are not team-tinted",
+            "crystal: no emission baked; see followups (mask + CrystalGlow in the master, or a StaffTip light/VFX)",
+        ],
+    }
+    if "compare" in R:
+        out["compare"] = {"report": C.rel(prof.reports / "compare-report.json"), "lights": R["compare"]["lights"],
+                          "env_strength": R["compare"]["env_strength"], "texture_set": R["compare"]["texture_set"],
+                          "inputs": R["compare"]["inputs"]}
+    if "compare-sheets" in R:
+        out["compare_sheets"] = R["compare-sheets"]["outputs"]
+    out["commit"] = H21_COMMIT
     return out
 
 
@@ -103,6 +198,9 @@ def main():
     prof = C.Profile(a.profile)
     R = {n: C.load_json(prof.reports / ("%s-report.json" % n)) for n in
          ("source", "retopo", "uv", "bake", "maps", "build", "preview", "sheets")}
+    for n in ("compare", "compare-sheets"):
+        if (prof.reports / ("%s-report.json" % n)).exists():
+            R[n] = C.load_json(prof.reports / ("%s-report.json" % n))
     val = C.load_json(prof.reports / "validate-skeletal-mesh.json")
     probes = {l: C.load_json(prof.preview / "deform" / ("%s-deform.json" % l)) for l in ("merlin-h2-blend", "merlin-h2-fbx")}
     checks = {}
@@ -130,11 +228,16 @@ def main():
                    "retopo_p99_deviation_px": C.r(max(d2["high_to_low"]["p99_mm"] for o in R["retopo"]["objects"].values()
                                                     for d2 in o["deviation_mm_source"].values()) * R["maps"]["game_frame_scale_from_source"] / 10.0 * ppu, 3)}
     b = R["build"]
+    h21 = prof.get("h21")
     rep = {
         "schema": "unmatched.art-pipeline.h2-candidate-report/1",
-        "asset_id": prof["asset_id"], "iteration": "H2", "date": "2026-09-29",
+        "asset_id": prof["asset_id"], "iteration": h21["iteration"] if h21 else "H2", "date": "2026-09-29",
         "status": "измерено",
-        "status_note": "технический кандидат H2: сборка, запекание, риг и экспорт измерены в headless Blender; UE-импорт не делался (живой UE занят волной 4); художественной приёмки нет; бюджеты — только предложение",
+        "status_note": ("технический кандидат H2.1 (доводка материалов H2): перепаковка UV с приоритетом посоха/кристалла, полное "
+                        "перезапекание на CPU, классы материалов в ORM/BC; сборка, запекание, риг и экспорт измерены в headless "
+                        "Blender; UE-импорт не делался (живой UE занят волной 5a); художественной приёмки нет; бюджеты — только "
+                        "предложение") if h21 else
+                       "технический кандидат H2: сборка, запекание, риг и экспорт измерены в headless Blender; UE-импорт не делался (живой UE занят волной 4); художественной приёмки нет; бюджеты — только предложение",
         "profile": {"path": C.rel(prof.path), "sha256": C.sha256(prof.path), "profile_id": prof["profile_id"]},
         "module": {"path": "tools/tripo-pipeline/blender/h2_bake_merlin", "files": files_in(C.HERE, ["*.py"])},
         "sources": R["source"]["files"],
@@ -172,6 +275,8 @@ def main():
                             "scope": "export/, textures/, reports/, preview/ of the run: repo root, user home, <drive>:/Users/"},
         "commit_dependencies": COMMIT_DEPENDENCIES,
     }
+    if h21:
+        rep["h21"] = h21_section(prof, R)
     det_path = Path(a.determinism) if a.determinism else prof.reports / "determinism.json"
     if det_path.exists():
         det = C.load_json(det_path)

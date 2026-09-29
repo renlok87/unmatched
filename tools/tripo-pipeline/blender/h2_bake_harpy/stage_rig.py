@@ -29,13 +29,16 @@ import sys
 import time
 from pathlib import Path
 
+import bmesh
 import bpy
 import numpy as np
 from mathutils import Matrix, Vector
 from mathutils.kdtree import KDTree
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import base_gold as BG  # noqa: E402
 import common as C  # noqa: E402
+import seal as SL  # noqa: E402
 from candidate_build import core as CORE  # noqa: E402
 from candidate_build.base import base_material, build_parametric_base  # noqa: E402
 from candidate_build.mesh_ops import join_objects  # noqa: E402
@@ -63,6 +66,67 @@ for m in [m for m in bpy.data.meshes if m.users == 0]:
     bpy.data.meshes.remove(m)
 for im in [i for i in bpy.data.images if i.users == 0]:
     bpy.data.images.remove(im)
+
+# ------------------------------------------------------------------ 0. seal (H2.1, profile "seal"; authored frame, source m)
+SE = P.get("seal") or {}
+seal_report = None
+if SE:
+    t_seal = time.time()
+    seal_report = {}
+    min_area = 1.2e-8 / float(S["expected_scale"]) ** 2  # 1.2 x the export check (1e-4 cm2 final) in source m2
+    ex_all = tuple(SE.get("exclude_parts", []))
+    if (SE.get("slivers") or {}).get("enabled"):
+        seal_report["slivers"] = SL.fill_slivers(parts, exclude=ex_all + tuple(SE["slivers"].get("exclude_parts", [])),
+                                                 min_area_m2=min_area)
+    if (SE.get("lips") or {}).get("enabled"):
+        Lc = SE["lips"]
+        seal_report["lips"] = SL.add_lips(parts, contact_m=float(Lc["contact_m"]), overshoot_m=float(Lc["overshoot_m"]),
+                                          tuck_m=float(Lc["tuck_m"]), min_len_m=float(Lc.get("min_len_m", 0.0004)),
+                                          atlas_px=int(P["uv"]["atlas_px"]), max_uv_px=float(Lc.get("max_uv_px", 2.0)),
+                                          exclude=ex_all + tuple(Lc.get("exclude_parts", [])),
+                                          targets_only=tuple(Lc.get("targets_only", [])), mode=Lc.get("mode", "nearest"),
+                                          min_area_m2=min_area)
+    if (SE.get("core") or {}).get("enabled"):
+        K = SE["core"]
+        cme, cinfo = SL.inner_core(parts, K["box_parts"], voxel_m=float(K["voxel_m"]), margin_m=float(K["margin_m"]),
+                                   rays=int(K.get("rays", 14)), min_inside_votes=int(K.get("min_inside_votes", 12)))
+        if cme is None:
+            raise RuntimeError("seal.core: no inside voxels")
+        cme, finfo = SL.finish_core(scene, cme, int(K["target_triangles"]), list(parts.values()), float(K["margin_m"]),
+                                    float(K.get("remesh_voxel_m", 0.003)))
+        # one texel of a dark island for the whole core (only ever seen through sub-millimetre cracks)
+        src_me = parts[K["uv_from_part"]].data
+        sco = np.array([tuple(v.co) for v in src_me.vertices])
+        vi = int(np.argmin(np.linalg.norm(sco - sco.mean(0), axis=1)))
+        li = min(l.index for l in src_me.loops if l.vertex_index == vi)
+        uv0 = tuple(src_me.uv_layers[0].data[li].uv)
+        layer = cme.uv_layers.new(name="UVMap")
+        for d in layer.data:
+            d.uv = uv0
+        for poly in cme.polygons:
+            poly.use_smooth = True
+        cme.name = "LP_" + K["name"]
+        cobj = bpy.data.objects.new("LP_" + K["name"], cme)
+        scene.collection.objects.link(cobj)
+        parts[K["name"]] = cobj
+        order.append(K["name"])
+        tri_area = np.array([pl.area for pl in cme.polygons])
+        seal_report["core"] = {**cinfo, **finfo, "uv": [round(c, 6) for c in uv0], "uv_from_part": K["uv_from_part"],
+                               "min_triangle_area_m2": float(tri_area.min())}
+    if (SE.get("exposed") or {}).get("enabled"):
+        X = SE["exposed"]
+        dirs = SL.game_directions(float(X.get("azimuth_step_deg", 10.0)), tuple(X.get("elevations_deg", (45.0, 55.0, 65.0))))
+        only = set(X["parts"])
+        exp = SL.exposed_backfaces(parts, dirs, bary_steps=int(X.get("bary_steps", 3)),
+                                   exclude=tuple(p for p in parts if p not in only))
+        seal_report["exposed"] = {}
+        for p in sorted(only):
+            if exp.get(p):
+                SL.duplicate_reversed(parts[p], exp[p])
+            seal_report["exposed"][p] = len(exp.get(p, []))
+    seal_report["triangles_after"] = {p: sum(len(q.vertices) - 2 for q in parts[p].data.polygons) for p in order}
+    seal_report["seconds"] = C.r(time.time() - t_seal, 1)
+    seal_report["settings"] = SE
 
 # ------------------------------------------------------------------ 1. seat
 rco = np.array([tuple(v.co) for v in ref.data.vertices])
@@ -133,7 +197,17 @@ if best is None:
 pc["sector_azimuths_deg"] = [a + best[0] for a in base_sectors]
 pc["ring_radius_m"] = best[1]
 base, base_info = build_parametric_base(scene, bcfg, bcfg["mask"], P["names"]["base_object"], P["names"]["base_mesh"])
-base.data.materials.append(base_material(bcfg))
+BMAT = P.get("base_material")
+base_uv_report = None
+if BMAT:  # H2.1 metal base: own UV layout + textures (base_gold / base_textures)
+    base_uv_report = BG.uv_layout(base, {**bcfg, **BMAT}, pip_centres(pc["sector_azimuths_deg"], pc["ring_radius_m"]),
+                                  pc["pip_radius_m"])
+    tdir = RUN / "textures" / ("base_%dk" % max(1, int(BMAT["texture_px"]) // 1024))
+    base.data.materials.append(BG.preview_material(
+        {**BMAT, "material": bcfg["material"], "mask_attribute": bcfg["mask"]["attribute"]},
+        {k: tdir / ("%s_%s.png" % (BMAT["texture_prefix"], k)) for k in ("BC", "N_OpenGL", "ORM")}))
+else:
+    base.data.materials.append(base_material(bcfg))
 pip_clear = clearance(pc["sector_azimuths_deg"], pc["ring_radius_m"])
 checks("base_pips_clear_of_feet", bool(pip_clear.min() > pc["clearance"]["min_m"]),
        {"offset_deg": best[0], "ring_radius_m": best[1], "min_xy_clearance_m": C.r(pip_clear.min(), 5),
@@ -292,6 +366,25 @@ if H:
             clean.append({n: val / tot for n, val in kept.items()})
         write_weights(parts[p], clean)
     harmonise_report = {"distance_m_final": C.r(dist, 5), "pairs": H["pairs"], "vertices_blended": moved}
+# H2.1: parts that take the weights of the nearest vertex of other parts (the seal core deforms with the body)
+copy_report = {}
+for tgt, srcs in sorted((W.get("copy_nearest") or {}).items()):
+    if tgt not in parts:
+        continue
+    kd = KDTree(sum(len(parts[q].data.vertices) for q in srcs))
+    lut = []
+    for q in srcs:
+        wq = read_weights(parts[q])
+        for v in parts[q].data.vertices:
+            kd.insert(v.co, len(lut))
+            lut.append(wq[v.index])
+    kd.balance()
+    ws = []
+    for v in parts[tgt].data.vertices:
+        _c, j, _d = kd.find(v.co)
+        ws.append(dict(lut[j]))
+    write_weights(parts[tgt], ws)
+    copy_report[tgt] = {"from": srcs, "vertices": len(ws)}
 gaps_after = seam_gaps(parts, pairs)
 
 # ------------------------------------------------------------------ 5. join, material, sockets
@@ -401,6 +494,13 @@ checks("max_influences", max(infl) <= P["armature"]["max_influences"], max(infl)
 checks("no_unweighted_vertices", min(infl) >= 1, min(infl), ">= 1")
 checks("no_triangles_below_1e-4_cm2", int((tri_area_cm2 < CORE.DEGENERATE_AREA_CM2).sum()) == 0,
        int((tri_area_cm2 < CORE.DEGENERATE_AREA_CM2).sum()), 0)
+_bm_top = bmesh.new()
+_bm_top.from_mesh(me)
+topo_body = {"non_manifold_edges": sum(1 for e in _bm_top.edges if len(e.link_faces) > 2),
+             "open_edges": sum(1 for e in _bm_top.edges if len(e.link_faces) == 1),
+             "loose_vertices": sum(1 for v in _bm_top.verts if not v.link_faces)}
+_bm_top.free()
+checks("no_non_manifold_edges_body", topo_body["non_manifold_edges"] == 0, topo_body["non_manifold_edges"], 0)
 checks("one_material_slot_body", len(body.material_slots) == 1, len(body.material_slots), 1)
 checks("one_uv_layer_body", len(me.uv_layers) == 1, [l.name for l in me.uv_layers], ["UVMap"])
 checks("bone_count", len(arm.data.bones) == len(P["armature"]["bones"]), len(arm.data.bones), len(P["armature"]["bones"]))
@@ -487,7 +587,9 @@ report = {
     "seat": seat_report, "base": {"pips": base_info, "search_best": {"offset_deg": best[0], "ring_radius_m": best[1]},
                                   "clearance_m": C.r(pip_clear.min(), 5), "triangles": n_tris_base},
     "armature": {"object": P["armature"]["object"], "skeleton": P["armature"]["skeleton"], "bones_final_m": bones_final},
-    "weights": {"wing_span": wing_info, "cleanup": cleanup, "harmonise": harmonise_report, "share_by_bone": weights_share},
+    "weights": {"wing_span": wing_info, "cleanup": cleanup, "harmonise": harmonise_report, "share_by_bone": weights_share,
+                "copy_nearest": copy_report},
+    "seal": seal_report, "topology_body": topo_body, "base_uv": base_uv_report,
     "seam_gap_probe": {"pairs": len(pairs), "pair_distance_m": W.get("seam_probe_pair_distance_m", 0.003),
                        "per_part_weights_only": gaps_before, "after_harmonise": gaps_after},
     "sockets": sockets,

@@ -1,10 +1,11 @@
 """Byte comparison of two H2 bake runs of the same profile (system Python).
 
-    python determinism_check.py <run_a> <run_b> <out.json>
+    python determinism_check.py <run_a> <run_b> <out.json> [--meta meta.json]
 
 Compares sha256 of: export/*.fbx, textures/**/*.png, work/uv-tris.npz, work/uv-labels.npz, work/bake/*.npy, and the
 stage reports with volatile keys removed (seconds, absolute paths, blend hashes that embed paths). Writes the table and
-the list of differing files.
+the list of differing files, plus the profile_sha256 every stage report of each run carries (same_profile: one value,
+equal in both runs). --meta merges descriptive keys (method, summary, earlier findings) into the output.
 """
 
 import hashlib
@@ -12,7 +13,13 @@ import json
 import sys
 from pathlib import Path
 
-a, b, out = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve(), Path(sys.argv[3])
+args = sys.argv[1:]
+meta = {}
+if "--meta" in args:
+    i = args.index("--meta")
+    meta = json.loads(Path(args[i + 1]).read_text(encoding="utf-8"))
+    del args[i:i + 2]
+a, b, out = Path(args[0]).resolve(), Path(args[1]).resolve(), Path(args[2])
 VOLATILE = {"seconds", "seconds_total", "import_seconds", "bvh_seconds", "seconds_per_part", "output_blend",
             "highpoly_blend", "authored_blend", "input_blend_sha256", "npy", "path", "preview"}
 
@@ -56,8 +63,22 @@ def where(p):
         return "scratch:" + p.name
 
 
-res = {"run_a": where(a), "run_b": where(b), "all_equal": all(r["equal"] for r in rows.values()),
-       "differs": sorted(k for k, r in rows.items() if not r["equal"]), "files": rows}
+
+
+def profile_hashes(run):
+    found = set()
+    for f in sorted((run / "reports").glob("*.json")):
+        v = json.loads(f.read_text(encoding="utf-8")).get("profile_sha256")
+        if v:
+            found.add(v)
+    return sorted(found)
+
+
+prof = {"a": profile_hashes(a), "b": profile_hashes(b)}
+prof["same_profile"] = len(prof["a"]) == 1 and prof["a"] == prof["b"]
+res = dict(meta)
+res.update({"run_a": where(a), "run_b": where(b), "all_equal": all(r["equal"] for r in rows.values()),
+            "differs": sorted(k for k, r in rows.items() if not r["equal"]), "files": rows, "profile_sha256": prof})
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps(res, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-print("DETERMINISM", res["all_equal"], res["differs"])
+print("DETERMINISM", res["all_equal"], res["differs"], "same_profile", prof["same_profile"])

@@ -1,7 +1,9 @@
 """Driver of the H2 bake of Merlin (system python). Runs the stages in order as separate processes.
 
 python tools/tripo-pipeline/blender/h2_bake_merlin/run.py --profile <profile.json> [stage ...]
-  stages: source retopo uv bake maps rig probe preview sheets  (default: all)
+  stages: source retopo uv bake maps rig probe preview sheets compare compare_sheets  (default: all)
+  compare / compare_sheets (H2.1): H2 vs H2.1 frames; the H2 baseline (profile h21.baseline) is restored from git
+  into <run>/work/h2-baseline/ by `git show <rev>:<path>` and checked by sha256 before the Blender stage
   --blender <exe>    Blender executable (default: profile "blender")
 
 Every Blender stage runs `blender -b --factory-startup --python-exit-code 1 --python <stage> -- <profile>`; its
@@ -20,10 +22,10 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import common as C  # noqa: E402
 
-STAGES = ["source", "retopo", "uv", "bake", "maps", "rig", "probe", "preview", "sheets"]
+STAGES = ["source", "retopo", "uv", "bake", "maps", "rig", "probe", "preview", "sheets", "compare", "compare_sheets"]
 BLENDER_STAGES = {"source": "stage_source.py", "retopo": "stage_retopo.py", "uv": "stage_uv.py",
-                  "bake": "stage_bake.py", "rig": "stage_rig.py", "preview": "stage_preview.py"}
-PYTHON_STAGES = {"maps": "maps.py", "sheets": "sheets.py"}
+                  "bake": "stage_bake.py", "rig": "stage_rig.py", "preview": "stage_preview.py", "compare": "stage_compare.py"}
+PYTHON_STAGES = {"maps": "maps.py", "sheets": "sheets.py", "compare_sheets": "compare_sheets.py"}
 
 
 def run(cmd, log, env=None):
@@ -32,6 +34,28 @@ def run(cmd, log, env=None):
         proc = subprocess.run(cmd, stdout=handle, stderr=subprocess.STDOUT, env=env,
                               creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
     return proc.returncode
+
+
+def restore_baseline(prof, logs):
+    """H2 baseline files for the compare stage: `git show <rev>:<path>` into work/h2-baseline/, sha256 checked."""
+    base = prof["h21"]["baseline"]
+    out = prof.work / "h2-baseline"
+    out.mkdir(parents=True, exist_ok=True)
+    lines = []
+    for key, f in sorted(base["files"].items()):
+        dst = out / Path(f["path"]).name
+        if not dst.exists() or C.sha256(dst) != f["sha256"]:
+            proc = subprocess.run(["git", "-C", str(C.REPO), "show", "%s:%s" % (base["git_rev"], f["path"])],
+                                  capture_output=True, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+            if proc.returncode:
+                lines.append("%s: git show failed: %s" % (key, proc.stderr.decode("utf-8", "replace").strip()))
+                continue
+            dst.write_bytes(proc.stdout)
+        ok = C.sha256(dst) == f["sha256"]
+        lines.append("%s %s %s" % (key, "ok" if ok else "SHA256 MISMATCH", dst.name))
+    logs.mkdir(parents=True, exist_ok=True)
+    (logs / "compare-baseline.log").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return 0 if all(line.split(" ")[1] == "ok" for line in lines) else 1
 
 
 def probe(prof, blender, logs):
@@ -88,6 +112,11 @@ def main():
     timings = json.loads(timings_path.read_text(encoding="utf-8")) if timings_path.exists() else {}
     for stage in stages:
         t0 = time.time()
+        if stage == "compare":
+            rc = restore_baseline(prof, logs)
+            if rc:
+                print("baseline restore failed, see", logs / "compare-baseline.log")
+                return rc
         if stage in BLENDER_STAGES:
             rc = run([blender, "-b", "--factory-startup", "--python-exit-code", "1", "--python",
                       str(HERE / BLENDER_STAGES[stage]), "--", str(prof.path)], logs / (stage + ".log"))

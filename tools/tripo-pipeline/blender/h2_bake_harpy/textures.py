@@ -24,7 +24,8 @@ from scipy import ndimage
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from textures_common import sha256, write_json  # noqa: E402
+from textures_common import rasterise, sha256, write_json  # noqa: E402
+import base_textures as BT  # noqa: E402
 
 profile_path, run = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve()
 P = json.loads(profile_path.read_text(encoding="utf-8"))
@@ -130,6 +131,103 @@ if mr:
                                       "coverage_by_part": {q: round(float(metal_mask[part_lab == parts.index(q)].mean()), 4)
                                                            for q in mr["parts"]}}
 
+# ------------------------------------------------------------------ H2.1 material rules (textures.materials, proposal)
+MAT = T.get("materials")
+mat_report = {}
+if MAT:
+    bs_ = srgb(bc_lin)
+    vv = bs_.max(-1)
+    ss = np.where(vv > 1e-6, (vv - bs_.min(-1)) / np.maximum(vv, 1e-6), 0.0)
+
+    def ramp_below(x, hi, w):
+        return np.clip((hi - x) / w + 0.5, 0, 1)
+
+    def ramp_above(x, lo_, w):
+        return np.clip((x - lo_) / w + 0.5, 0, 1)
+
+    def in_parts(names):
+        return np.isin(part_full, [parts.index(q) for q in names if q in parts])
+
+    mm = metal_mask if mr else np.zeros((N, N))
+    # talons: dark, desaturated keratin of the feet parts
+    tl = MAT.get("talons")
+    talon = np.zeros((N, N))
+    if tl:
+        talon = (ramp_below(ss, tl["s_max"], tl.get("ramp", 0.06)) * ramp_below(vv, tl["v_max"], tl.get("ramp", 0.06))
+                 * in_parts(tl["parts"]))
+        talon = ndimage.grey_opening(talon, size=(int(tl.get("open_px", 3)),) * 2)
+        talon = ndimage.uniform_filter(talon, size=3, mode="nearest")
+        vn = np.clip((vv - tl["v_max"] * 0.25) / max(tl["v_max"] * 0.75, 1e-6), 0, 1)
+        r_t = tl["roughness"][0] + (tl["roughness"][1] - tl["roughness"][0]) * (1.0 - vn)
+        rough = rough * (1 - talon) + r_t * talon
+        metal = metal * (1 - talon)
+        bc_lin = bc_lin * (1 - talon[..., None]) + bc_lin * float(tl.get("bc_scale", 1.0)) * talon[..., None]
+        mat_report["talons"] = {"rule": tl, "texels_over_0_5": int((talon > 0.5).sum()),
+                                "coverage_by_part": {q: round(float(talon[part_lab == parts.index(q)].mean()), 4)
+                                                     for q in tl["parts"] if q in parts},
+                                "roughness_mean": round(float(rough[talon > 0.5].mean()), 4) if (talon > 0.5).any() else None}
+    # feathers: metallic 0, roughness remapped into [lo, hi]: half the part's own Tripo roughness rank, half the
+    # baked AO (exposed vanes smoother, occluded roots rougher) - a specular breakup instead of one flat value
+    fr = MAT.get("feathers")
+    if fr:
+        skin = np.zeros((N, N))
+        if fr.get("skin"):
+            sk = fr["skin"]
+            skin = (ramp_above(vv, sk["v_min"], 0.05) * ramp_below(ss, sk["s_max"], 0.05) * in_parts(sk["parts"]))
+            skin = ndimage.uniform_filter(skin, size=3, mode="nearest")
+        feather = in_parts(fr["parts"]) * (1 - skin) * (1 - mm) * (1 - talon)
+        lo_r, hi_r = fr["roughness"]
+        t_r = np.zeros((N, N))
+        for q in fr["parts"]:
+            if q not in parts:
+                continue
+            m_ = part_full == parts.index(q)
+            if not m_.any():
+                continue
+            p5, p95 = np.percentile(rough[m_], [5, 95])
+            t_r[m_] = np.clip((rough[m_] - p5) / max(p95 - p5, 1e-4), 0, 1)
+        a5, a95 = np.percentile(ao[covered], [5, 95])
+        t_ao = 1.0 - np.clip((ao - a5) / max(a95 - a5, 1e-4), 0, 1)
+        w_ao = float(fr.get("ao_weight", 0.5))
+        r_f = lo_r + (hi_r - lo_r) * np.clip((1 - w_ao) * t_r + w_ao * t_ao, 0, 1)
+        rough = rough * (1 - feather) + r_f * feather
+        metal = metal * (1 - feather)
+        fm = feather > 0.5
+        mat_report["feathers"] = {"rule": fr, "texels_over_0_5": int(fm.sum()),
+                                  "roughness_p1_p50_p99": [round(float(x), 4) for x in np.percentile(rough[fm], [1, 50, 99])],
+                                  "metallic_max": round(float(metal[fm].max()), 4),
+                                  "metallic_max_feather_ge_0_99": round(float(metal[feather >= 0.99].max()), 4),
+                                  "texels_feather_over_0_5_metallic_over_0_05": int((fm & (metal > 0.05)).sum()),
+                                  "metallic_note": "texels with metallic > 0 inside the feather mask are the 3x3 soft edge "
+                                                   "of the gold bands (textures.metal_rule)",
+                                  "skin_texels_over_0_5": int((skin > 0.5).sum())}
+    # face readability: cavity from the baked AO and a darkening-only local contrast of the painted features
+    fc = MAT.get("face_cavity")
+    if fc:
+        tris = np.load(run / "work" / "uv-tris.npz")
+        sel = (tris["density_factor"] >= float(fc.get("density_factor_min", 2.0))) &               np.isin(tris["part"], [parts.index(q) for q in fc["parts"]])
+        flab, _fcov = rasterise(tris["uv"][sel], np.ones(int(sel.sum()), np.int32), N)
+        face = (flab >= 0).astype(np.float64)
+        face = ndimage.uniform_filter(ndimage.binary_dilation(face > 0, iterations=2).astype(np.float64), size=5)
+        lum = bc_lin @ np.array([0.2126, 0.7152, 0.0722])
+        cav = np.clip((ndimage.gaussian_filter(ao, float(fc.get("cavity_sigma_px", 6))) - ao) *
+                      float(fc.get("cavity_gain", 4.0)), 0, 1)
+        det = lum - ndimage.gaussian_filter(lum, float(fc.get("detail_sigma_px", 3)))
+        dark = np.clip(-det / np.maximum(lum, 1e-3), 0, 1)
+        k = 1.0 - face * (float(fc.get("cavity_strength", 0.5)) * cav + float(fc.get("contrast_strength", 0.6)) * dark)
+        k = np.clip(k, float(fc.get("min_factor", 0.45)), 1.0)
+        lum_before = lum[face > 0.5]
+        bc_lin = bc_lin * k[..., None]
+        lum_after = (bc_lin @ np.array([0.2126, 0.7152, 0.0722]))[face > 0.5]
+        mat_report["face_cavity"] = {"rule": fc, "face_texels": int((face > 0.5).sum()),
+                                     "factor_p1_p50": [round(float(x), 4) for x in np.percentile(k[face > 0.5], [1, 50])],
+                                     "luminance_std_before_after": [round(float(lum_before.std()), 4),
+                                                                    round(float(lum_after.std()), 4)],
+                                     "luminance_p5_before_after": [round(float(np.percentile(lum_before, 5)), 4),
+                                                                   round(float(np.percentile(lum_after, 5)), 4)]}
+    report["checks"]["materials"] = mat_report
+    report["checks"]["roughness_mean_covered_after"] = round(float(rough[covered].mean()), 4)
+
 # ------------------------------------------------------------------ TeamMask (W4-B hsv-band-cells on the sRGB BC)
 tm = T["team_mask"]
 bc_s = srgb(bc_lin)
@@ -207,6 +305,20 @@ for level, fac in levels.items():
         "normal_length_within_0_02_fraction": round(float((np.abs(ln - 1) < 0.02).mean()), 5),
         "orm_r_is_baked_ao_not_constant": bool(back["ORM"][..., 0].std() > 1.0)}
     report["outputs"][level] = outs
+
+# ------------------------------------------------------------------ H2.1 metal base textures (base_material)
+BM = P.get("base_material")
+if BM:
+    bt = BT.make(BM, int(BM["texture_px"]))
+    d = run / "textures" / ("base_%dk" % max(1, int(BM["texture_px"]) // 1024))
+    outs = {}
+    bprefix = BM["texture_prefix"]
+    outs["BC"] = save(bt["BC"][::-1], d / ("%s_BC.png" % bprefix), "RGB")
+    outs["N_OpenGL"] = save(bt["N_OpenGL"][::-1], d / ("%s_N_OpenGL.png" % bprefix), "RGB")
+    outs["N"] = save(bt["N"][::-1], d / ("%s_N.png" % bprefix), "RGB")
+    outs["ORM"] = save(bt["ORM"][::-1], d / ("%s_ORM.png" % bprefix), "RGB")
+    outs["_stats"] = bt["stats"]
+    report["outputs"]["base"] = outs
 
 # small preview of the four maps (for the report; 1K JPEG)
 prev = run / "preview"

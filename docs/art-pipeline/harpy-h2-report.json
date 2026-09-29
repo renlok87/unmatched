@@ -55,7 +55,110 @@
     "what": "Tripo PBR left the gold bands non-metallic (0 texels with metallic > 0.5); a colour rule (textures.metal_rule) sets metallic 1 / roughness 0.35 on the gold texels of the two band-carrying parts (proposal)."
    }
   ],
-  "note": "Hand-written part of the H2 Harpy report (docs/art-pipeline/harpy-h2-report.md), revision 2 (harpy-h2-bake/2, after the verification of revision 1). Statuses: measured numbers are in the stage reports; everything here is an observation on Blender frames (label blender) or a proposal. Not art-accepted, not UE-imported.",
+  "h21": {
+   "budget": {
+    "breakdown": "tripo parts unchanged 26 785 (+ lips 363, slivers 33, reversed copies 248); cap 874 -> 436; patch_101 799 -> 0; fill_102 1 399 + 416 copies; core 558",
+    "figure_triangles": 30238,
+    "h2": 28458,
+    "status": "предложено: 0.8 % above the 30k end of the proposed 20-30k"
+   },
+   "done": [
+    {
+     "brief": "(a) smooth neck cap reads as a bald hood",
+     "frames": [
+      "preview/h21/cmp_h21_nape_visibility_masks.jpg",
+      "preview/h21/cmp_h21_nape_game_az{140,180,220}.jpg",
+      "preview/h21/cmp_h21_k2_5x.jpg",
+      "preview/h21/cmp_h21_concept_back.jpg"
+     ],
+     "honest": "at the game distances the nape reads as dark feathers continuing the crest; in the 0.2 m close-ups the fill looks broken up / shard-like (117k HP faces of overlapping feathers decimated to 1.4k triangles, the bake smears across layers) and a few small dark bits of the cap still show between the copies",
+     "id": "H21-NAPE",
+     "measured": "visible cap pixels (nape_visibility.py, 18 azimuths x 3.86/4.8/7.5/12.07 m, back faces culled): 35 719 -> 3 594 (-90 %); worst frame K2 5x 1 699 -> 154 px, K2 1.6x 163 -> 17 px",
+     "what": "patch_101 dropped (it lay mostly under the cap's plane); repair.fills fill_102: the dark collar feathers right of the neck (tripo_part_1, 10 893 HP faces, Tripo UVs and texture) laid 14 times on cap_100 by repair_ops.conform_fill (8 on the dome and the V down the back, 6 around the rim lip), relief x0.7, feathers pointing down the nape / out over the collar; 1 399 game triangles + 416 reversed copies of its triangles whose back is seen from a game direction"
+    },
+    {
+     "brief": "(b) 1-3 px pinholes at azimuths 120-240",
+     "frames": [
+      "preview/see-through-holdout/*.png",
+      "reports/see-through*.json"
+     ],
+     "id": "H21-SEETHROUGH",
+     "measured": "see_through.py: 0 px on all 72 gate frames (18 azimuths x 3.86/4.8/7.5/12.07 m; H2 on the same frames 120 px, 5 holes >= 4 px); strict gate (0 px, azimuths 120-240, 4.8/7.5 m) PASS. Holdout frames never used for tuning (azimuths 10..350, 3.86/4.3/6.0/10 m): 2 px on 2 of 72 frames (H2: 144 px, 3 holes); the core shows through cracks on 99 px of the 72 frames (worst 7 px, where H2 showed background)",
+     "what": "seal.py in stage_rig: sliver fans where the stitch skipped an insertion (33 triangles), contact lips on non-shared boundary edges within 2.5 mm of another part (363), a closed occluder core inside head/torso/thighs (voxels 5 mm, 3 mm from the surface, remesh + decimate to 558 triangles, triangles crossing a body surface pulled in or removed, one dark texel of the cap island, weights from the nearest body vertex) and reversed copies of triangles whose back is exposed along a game direction (all parts, 360 directions, 664 triangles incl. the fill)"
+    },
+    {
+     "brief": "(c) 3 non-manifold edges after the stitch",
+     "id": "H21-NONMANIFOLD",
+     "measured": "lowpoly: 3 -> 0 (tripo_part_6 2, tripo_part_10 1); whole body after the seal: 0 (new rig check)",
+     "what": "seal.fix_nonmanifold after the stitch (vertex fan split, same positions)"
+    },
+    {
+     "brief": "materials: base, talons, feathers",
+     "frames": [
+      "preview/h21/cmp_h21_base_band.jpg",
+      "preview/h21/cmp_h21_talons_3q.jpg",
+      "preview/h21/cmp_h21_teamcolor.jpg",
+      "preview/h21/cmp_h21_concept_front.jpg"
+     ],
+     "honest": "the base now reads as metal; it is darker and more even than the bright gold leaf of the concept (kept darker on purpose: lit pip - top luma margin 65-119 of 255 against the gate 40; H2 97-181). The UE look depends on the Lumen reflections: not verified (UE not touched)",
+     "id": "H21-MATERIALS",
+     "measured": "feathers roughness p1/p50/p99 0.70/0.77/0.83 on 14.7M texels (4K), metallic 0 except the 3x3 soft edge of the bands; talons 215k texels (17-18 % of the feet parts), mean roughness 0.50; base top roughness 0.34-0.43, wall 0.31-0.38, metallic 1",
+     "what": "textures.materials: feathers metallic 0, roughness remapped into 0.70-0.85 (half the part's own Tripo rank, half the baked AO); talons (desaturated dark texels of the feet parts) roughness 0.40-0.55, metallic 0, BC x0.75; gold bands unchanged (metal_rule, metallic 1, roughness 0.35); metal base: own UV layout and a 1K set T_Harpy_H2_Base_{BC,N,ORM}, metallic 1, top antique gold (linear BC 0.30/0.19/0.064, roughness 0.34-0.43), wall gold (0.78/0.52/0.16, roughness 0.31-0.38), smooth wall normals"
+    },
+    {
+     "brief": "face readability at K2",
+     "frames": [
+      "preview/h21/cmp_h21_face.jpg",
+      "preview/h21/cmp_h21_face_headpitch_probe.jpg"
+     ],
+     "honest": "at the game pitch -55 the crest overhangs the face: from K2 5x only the forehead, the brows and the nose tip show, the eyes are hidden; the texture tweak does not change that. Pose probe (head bone +12 deg chin up, not a mesh change): brows, eyes, nose and mouth read at K2 5x",
+     "id": "H21-FACE",
+     "measured": "face luminance std 0.117 -> 0.1165, p5 0.0168 -> 0.0133: a small effect",
+     "what": "face islands: BC x (1 - 0.5 cavity - 0.6 dark detail), darkening only"
+    }
+   ],
+   "falls_short": [
+    "nape fill looks shard-like in close-ups (fine at K2): a cleaner nape needs native feathers (regeneration) or a hand-made feather card set",
+    "holdout see-through: 2 single pixels on 2 of 72 frames that the tuning never used",
+    "face not readable at K2 in the rest pose (crest overhang); pose change is a follow-up",
+    "two ankle bands (Tripo) kept, the concept has one",
+    "3 cm opening between head and collar at a 35 deg head turn (unchanged)",
+    "base darker than the concept's gold leaf; UE Lumen look not verified"
+   ],
+   "manifest_fixes": [
+    {
+     "evidence": "reports/determinism.json (previous_build_other_profile_hash)",
+     "fix": "two full rebuilds of the committed profile into the same run folder (A: import -> rig, B: import -> review21); every stage report now carries e24a0b51; determinism_check.py records the profile hash of both runs (same_profile true). Build A against the earlier build: FBX and all 14 PNG byte-identical, reports differ only in profile_sha256; all measurement reports (see-through, holdout, nape, k2, instances, rig checks) equal after removing times and blend hashes",
+     "id": "H21-M-PROFILE-HASH",
+     "remark": "stage reports carried profile_sha256 37ab9e37 (profile before the review.see_through_holdout block was added), the committed profile is e24a0b51"
+    },
+    {
+     "evidence": "preview/frames-storage.json",
+     "fix": "store_preview.py re-hashes every PNG kept lossless on each run and drops entries whose stored file is gone or no longer matches; frames-storage.json: 144 -> 122 entries (47 JPEG, 39 PNG kept, 36 removed single frames), every stored file matches its recorded sha256, no entry under see-through/",
+     "id": "H21-M-FRAMES-STORAGE",
+     "remark": "preview/frames-storage.json kept 22 entries of deleted see-through/*.png and 36 PNG entries with the H2 sha256 (store_preview.py setdefault)"
+    },
+    {
+     "fix": "intentional: at H2.1 the gate frames have 0 see-through px, see_through.py writes no mask; stage them as removals (git rm / git add -A on the exact paths), never git add -A on the asset folder (untracked files of other tasks: 20260928-blender-um-fbx-v1/logs/, 20260928-tripo-h31/source/*.glb)",
+     "id": "H21-M-DELETIONS",
+     "remark": "the 22 preview/see-through/seethrough_*.png of H2 are deletions, not new files"
+    },
+    {
+     "fix": "not changed: raw Blender/Python output, same pattern as the H2 logs at 9a2a5184; the JSON reports carry no local paths",
+     "id": "H21-M-LOG-PATHS",
+     "remark": "committed stage logs contain local absolute paths (Blender output)"
+    }
+   ],
+   "revision": {
+    "credits": 0,
+    "date": "2026-09-29",
+    "id": "harpy-h2-bake/3",
+    "previous": "harpy-h2-bake/2 (H2, commit 9a2a5184)",
+    "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2-bake-h21.json"
+   },
+   "tripo_regen": "Tripo Studio multi-view, parts Balanced, ultra 2M, then 8K texture + PBR (as task 330872a3: 60 + 30 + PBR credits): harpy-front.png in FRONT, harpy-side.png in LEFT (it is drawn over ortho_left; 330872a3 had it in RIGHT, which made the Janus head), harpy-back.png in BACK, RIGHT empty; check before paying the texture step: one face (front only), a feathered nape in the back view, one ankle band. Optional concept tweak for the K2 face: crest swept back / face tilted 10-15 deg up in the front and side views"
+  },
+  "note": "Hand-written part of the Harpy report (docs/art-pipeline/harpy-h2-report.md). Revision 3 = H2.1 (harpy-h2-bake/3, section 'h21'); the other keys describe revision 2 (H2) and are kept as history. Statuses: measured numbers are in the stage reports; everything here is an observation on Blender frames (label blender) or a proposal. Not art-accepted, not imported into UE.",
   "repair": [
    "180 deg turn of the whole high-poly about Z: the side-consistent face (tripo_part_0) becomes the front, wings sweep back as in the side concept",
    "tripo_part_12 (front-concept face) dropped",
@@ -186,49 +289,49 @@
     "vertices_masked": 2919
    }
   },
-  "seconds": 268.0,
+  "seconds": 315.6,
   "seed": 0,
   "size": 4096
  },
  "bake_passes": {
   "ao": {
    "rgb_mean_written": [
-    0.68598,
-    0.68598,
-    0.68598
+    0.67389,
+    0.67389,
+    0.67389
    ],
    "samples": 128,
-   "texels_written": 8159940,
+   "texels_written": 8009677,
    "type": "AO"
   },
   "bc": {
    "rgb_mean_written": [
-    0.12903,
-    0.06896,
-    0.04165
+    0.12839,
+    0.06873,
+    0.04156
    ],
    "samples": 16,
-   "texels_written": 8159940,
+   "texels_written": 8009677,
    "type": "EMIT"
   },
   "normal": {
    "rgb_mean_written": [
-    0.50042,
-    0.49999,
-    0.97721
+    0.5001,
+    0.49947,
+    0.97369
    ],
    "samples": 16,
-   "texels_written": 8159940,
+   "texels_written": 8009677,
    "type": "NORMAL"
   },
   "rm": {
    "rgb_mean_written": [
-    0.98464,
-    0.76297,
-    0.02488
+    0.98479,
+    0.7596,
+    0.02452
    ],
    "samples": 16,
-   "texels_written": 8159940,
+   "texels_written": 8009677,
    "type": "EMIT"
   }
  },
@@ -630,19 +733,21 @@
   ],
   "earlier_findings": [
    "revision 1: 3 texels differed across 3 of the 10 PNGs (one OptiX AO ray, CPU normal summation); revision 2 has none",
-   "revision 2 development: the first same-path rebuild caught a determinism bug in the nape patch (bmesh duplicate's vert_map maps both ways, a set of BMesh elements was iterated): patch_101 798 vs 799 triangles; fixed (repair_ops.copy_patch), then both final builds"
+   "revision 2 development: the first same-path rebuild caught a determinism bug in the nape patch (bmesh duplicate's vert_map maps both ways, a set of BMesh elements was iterated): patch_101 798 vs 799 triangles; fixed (repair_ops.copy_patch), then both final builds",
+   "H2 (harpy-h2-bake/2): same result - only work/bake/normal.npy differed (|diff| <= 2.4e-7), all PNG and FBX equal",
+   "H2.1 first pair (profile sha256 37ab9e37, before the holdout block was added): same result - only work/bake/normal.npy differed (|diff| <= 3.0e-7 on 24 525 texels), FBX and all 14 PNG equal"
   ],
   "files": {
    "export/SK_Harpy_H2.fbx": {
-    "a": "62ae4761c2550e50",
-    "b": "62ae4761c2550e50",
-    "bytes": 1290060,
+    "a": "4a615a91fff510e2",
+    "b": "4a615a91fff510e2",
+    "bytes": 1376508,
     "equal": true
    },
    "export/SM_Harpy_H2_Base.fbx": {
-    "a": "aadc891599ac714e",
-    "b": "aadc891599ac714e",
-    "bytes": 35948,
+    "a": "3521d17a8bd84da6",
+    "b": "3521d17a8bd84da6",
+    "bytes": 40252,
     "equal": true
    },
    "reports/h2-bake-report.json (volatile keys removed)": {
@@ -672,127 +777,202 @@
     "equal": true
    },
    "textures/2k/T_Harpy_H2_BC.png": {
-    "a": "c01417784bfa20ab",
-    "b": "c01417784bfa20ab",
-    "bytes": 5210163,
+    "a": "a23a55c652e84536",
+    "b": "a23a55c652e84536",
+    "bytes": 5246050,
     "equal": true
    },
    "textures/2k/T_Harpy_H2_N.png": {
-    "a": "b5853e84ac116e34",
-    "b": "b5853e84ac116e34",
-    "bytes": 5750269,
+    "a": "3cd4d36df8bc7a13",
+    "b": "3cd4d36df8bc7a13",
+    "bytes": 5781825,
     "equal": true
    },
    "textures/2k/T_Harpy_H2_N_OpenGL.png": {
-    "a": "2069ac5b66133702",
-    "b": "2069ac5b66133702",
-    "bytes": 5751613,
+    "a": "1abb165f47204694",
+    "b": "1abb165f47204694",
+    "bytes": 5782997,
     "equal": true
    },
    "textures/2k/T_Harpy_H2_ORM.png": {
-    "a": "1a5dadbbbe3f50f2",
-    "b": "1a5dadbbbe3f50f2",
-    "bytes": 4261655,
+    "a": "e0530962214e70b3",
+    "b": "e0530962214e70b3",
+    "bytes": 3692215,
     "equal": true
    },
    "textures/2k/T_Harpy_H2_TeamMask.png": {
-    "a": "49bc1d88378207b0",
-    "b": "49bc1d88378207b0",
-    "bytes": 799569,
+    "a": "5dd50297f04257b4",
+    "b": "5dd50297f04257b4",
+    "bytes": 783623,
     "equal": true
    },
    "textures/4k/T_Harpy_H2_BC.png": {
-    "a": "6c39cc81410c4708",
-    "b": "6c39cc81410c4708",
-    "bytes": 14520129,
+    "a": "4705c2d57981643a",
+    "b": "4705c2d57981643a",
+    "bytes": 14718277,
     "equal": true
    },
    "textures/4k/T_Harpy_H2_N.png": {
-    "a": "f172622fc4c628da",
-    "b": "f172622fc4c628da",
-    "bytes": 15039033,
+    "a": "bcf08cd1439afd1d",
+    "b": "bcf08cd1439afd1d",
+    "bytes": 15082417,
     "equal": true
    },
    "textures/4k/T_Harpy_H2_N_OpenGL.png": {
-    "a": "97c10313a443ea5a",
-    "b": "97c10313a443ea5a",
-    "bytes": 15043560,
+    "a": "196211137e30d3dc",
+    "b": "196211137e30d3dc",
+    "bytes": 15086512,
     "equal": true
    },
    "textures/4k/T_Harpy_H2_ORM.png": {
-    "a": "1dfaaddb8d646b93",
-    "b": "1dfaaddb8d646b93",
-    "bytes": 11664238,
+    "a": "61fcca962cd1eff3",
+    "b": "61fcca962cd1eff3",
+    "bytes": 10023871,
     "equal": true
    },
    "textures/4k/T_Harpy_H2_TeamMask.png": {
-    "a": "51c18a6f62c49653",
-    "b": "51c18a6f62c49653",
-    "bytes": 2175857,
+    "a": "328eb32ed243cb3f",
+    "b": "328eb32ed243cb3f",
+    "bytes": 2135857,
+    "equal": true
+   },
+   "textures/base_1k/T_Harpy_H2_Base_BC.png": {
+    "a": "b92f1ce0249833b7",
+    "b": "b92f1ce0249833b7",
+    "bytes": 368385,
+    "equal": true
+   },
+   "textures/base_1k/T_Harpy_H2_Base_N.png": {
+    "a": "b671edc08f8dcf70",
+    "b": "b671edc08f8dcf70",
+    "bytes": 418163,
+    "equal": true
+   },
+   "textures/base_1k/T_Harpy_H2_Base_N_OpenGL.png": {
+    "a": "ce8e9f70dbe773e9",
+    "b": "ce8e9f70dbe773e9",
+    "bytes": 417982,
+    "equal": true
+   },
+   "textures/base_1k/T_Harpy_H2_Base_ORM.png": {
+    "a": "851849946137daf7",
+    "b": "851849946137daf7",
+    "bytes": 260113,
     "equal": true
    },
    "work/bake/ao.npy": {
-    "a": "01d20798c1ce438b",
-    "b": "01d20798c1ce438b",
+    "a": "8074c25594333946",
+    "b": "8074c25594333946",
     "bytes": 268435584,
     "equal": true
    },
    "work/bake/bc.npy": {
-    "a": "75b271ca43f10b94",
-    "b": "75b271ca43f10b94",
+    "a": "db974ebb80903dfe",
+    "b": "db974ebb80903dfe",
     "bytes": 268435584,
     "equal": true
    },
    "work/bake/normal.npy": {
-    "a": "b15bd017627fd07a",
-    "b": "82fc278f91a6a2dc",
+    "a": "8840075d0e865600",
+    "b": "f70e2b8d4cdd7ed3",
     "bytes": 268435584,
     "equal": false
    },
    "work/bake/rm.npy": {
-    "a": "8df703fbbd9ead08",
-    "b": "8df703fbbd9ead08",
+    "a": "4c6d9bd67e88ff30",
+    "b": "4c6d9bd67e88ff30",
     "bytes": 268435584,
     "equal": true
    },
    "work/uv-labels.npz": {
-    "a": "d2e49816bb82721c",
-    "b": "d2e49816bb82721c",
-    "bytes": 1421270,
+    "a": "58378ec91d153810",
+    "b": "58378ec91d153810",
+    "bytes": 1396845,
     "equal": true
    },
    "work/uv-tris.npz": {
-    "a": "8317f04c4cbaaf7b",
-    "b": "8317f04c4cbaaf7b",
-    "bytes": 698553,
+    "a": "d18e165b1d73140d",
+    "b": "d18e165b1d73140d",
+    "bytes": 703769,
     "equal": true
    }
   },
-  "method": "two full builds of the same profile at the SAME path (the FBX exporter writes the file path into the FBX): build A (lowpoly..review) was moved to a scratch folder, build B ran from import (GLBs) into the run folder; determinism_check.py compares sha256 of export/*.fbx, textures/**/*.png, work/uv-*.npz, work/bake/*.npy and the stage reports with volatile keys (times, paths, blend hashes) removed",
-  "profile": "harpy-h2-bake/2",
-  "run_a": "scratch:runA_final",
+  "method": "two full builds of the committed profile into the same run path: build A (import -> rig) copied to a scratch directory (export, textures incl. the local 4K masters, work/uv-*.npz, work/bake/*.npy, reports), build B rebuilt from the Tripo GLBs (import -> review21, the final state of the run folder); determinism_check.py compares the bytes and records the profile_sha256 every stage report carries",
+  "normal_npy_difference": {
+   "max_abs": 2.68e-07,
+   "note": "float32 CPU Cycles normal buffer, summation order; below one 8-bit step: all PNG normals equal",
+   "texels": 16777216,
+   "texels_differing": 28316
+  },
+  "previous_build_other_profile_hash": {
+   "differing_keys": {
+    "reports/h2-bake-report.json (volatile keys removed)": [
+     "profile_sha256"
+    ],
+    "reports/h2-lowpoly-report.json (volatile keys removed)": [
+     "profile_sha256"
+    ],
+    "reports/h2-rig-report.json (volatile keys removed)": [
+     "profile_sha256"
+    ],
+    "reports/h2-uv-stage.json (volatile keys removed)": [
+     "profile_sha256"
+    ],
+    "reports/textures-report.json (volatile keys removed)": [
+     "inputs",
+     "profile_sha256"
+    ]
+   },
+   "differs": [
+    "reports/h2-bake-report.json (volatile keys removed)",
+    "reports/h2-lowpoly-report.json (volatile keys removed)",
+    "reports/h2-rig-report.json (volatile keys removed)",
+    "reports/h2-uv-stage.json (volatile keys removed)",
+    "reports/textures-report.json (volatile keys removed)",
+    "work/bake/normal.npy"
+   ],
+   "result": "FBX and all 14 PNG byte-identical; the reports differ only in profile_sha256 (and textures-report.inputs, the normal.npy sha256); so the holdout block changes nothing the build stages produce",
+   "what": "the H2.1 build before this fix ran with profile sha256 37ab9e37 (the same profile without the review.see_through_holdout block, added afterwards for the holdout measurement); its stage reports did not match the committed profile e24a0b51. Build A of the committed profile compared with that build:"
+  },
+  "profile": "harpy-h2-bake/3 (H2.1), art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2-bake-h21.json as committed",
+  "profile_sha256": {
+   "a": [
+    "e24a0b51101ccfd7da6c73177d21d83eef98341f7a24acc975ee1a72c9dbf252"
+   ],
+   "b": [
+    "e24a0b51101ccfd7da6c73177d21d83eef98341f7a24acc975ee1a72c9dbf252"
+   ],
+   "same_profile": true
+  },
+  "run_a": "scratch:detA_h211",
   "run_b": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake",
-  "schema": "unmatched.h2-bake.determinism/2",
-  "summary": "byte-identical: both FBX, all 10 texture PNGs (4K and 2K), uv-tris/uv-labels, the AO/BC/RM bake buffers and every stage report; differs: only the float32 normal bake buffer work/bake/normal.npy (CPU Cycles, max |diff| 2.4e-7 on 25 967 of 16.8 M texels, summation order) - below one 8-bit step, so the normal PNGs are identical - and textures-report.json 'inputs', which records that buffer's sha256"
+  "schema": "unmatched.h2-bake.determinism/3",
+  "summary": "both FBX (SK 1 376 508 bytes, base 40 252 bytes), all 14 PNG (4K master, 2K runtime, 1K base set), uv-tris/uv-labels and the AO/BC/RM bake buffers are byte-identical; every stage report carries the committed profile's sha256 in both builds and the reports are equal once volatile keys are removed, except textures-report.inputs (sha256 of work/bake/normal.npy)"
  },
  "files": [
   {
-   "bytes": 1290060,
+   "bytes": 1376508,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/export/SK_Harpy_H2.fbx",
-   "sha256": "62ae4761c2550e5079f6bae75f0ca15186c00695ba33f36f1dd0a1dd14674e57"
+   "sha256": "4a615a91fff510e23f26a028389de096f9e2bb4e02d7a9ce4978c74d2fa8984f"
   },
   {
-   "bytes": 35948,
+   "bytes": 40252,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/export/SM_Harpy_H2_Base.fbx",
-   "sha256": "aadc891599ac714e889c3cf43a47f0bb48413564b226fa3cf4cbc43c7defc157"
+   "sha256": "3521d17a8bd84da6702b32ab375fe72ac38f59a2f32ed6810e14b71be54e73b9"
   },
   {
    "bytes": 4467,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/bake.log",
-   "sha256": "c6a268795044ceee26b90bb91e73e320bb284f7c183464456bf263ea72e69cd8"
+   "sha256": "3e2efa389802d376ea527d6a52dabd28b4497621e0a676c8afa86eaabce75fd6"
+  },
+  {
+   "bytes": 407,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/compose-h21.log",
+   "sha256": "8817cb75a691e0c30b6ce68e678e4c2d955474f6f4b71288a9db38858114b745"
   },
   {
    "bytes": 856,
@@ -801,16 +981,16 @@
    "sha256": "aea39aec928369bf2ee4e2eb251d0489b33d85229726bde925f876133d5ad864"
   },
   {
-   "bytes": 2017,
+   "bytes": 2018,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/deform-blend.log",
-   "sha256": "ad8eb6688f06d64d939fd8385ddbda004b1d15ce8c36bd4ea4e6164c203d9b31"
+   "sha256": "1ccdb2b44464e575f7d8cf19defa47d2a13849c64dfb91337e05cc9186715a0d"
   },
   {
-   "bytes": 2089,
+   "bytes": 2090,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/deform-fbx.log",
-   "sha256": "23af4377454d4594654926771a578c204ebbbff08d89db514a88083fff09b6c4"
+   "sha256": "a453258bad7f03aee448c34128ba351535b68209d7a635b3d5739ee27f87edac"
   },
   {
    "bytes": 330,
@@ -822,7 +1002,7 @@
    "bytes": 2356,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/import.log",
-   "sha256": "8fce4d6a8289e3f2d09b0106794310fec886b94cf7fdc2a5b73ac69d028065e9"
+   "sha256": "5ec41473385278fb69fdcab14c9169d474bd887fdc22d0dbd32ccc533d6a482d"
   },
   {
    "bytes": 605,
@@ -834,13 +1014,25 @@
    "bytes": 733,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/k2-projection.log",
-   "sha256": "b84a9c4673f107376c82611d53648bbbf360026b664349ee02ee093f553e1684"
+   "sha256": "b0b9d75f75057153aebde83286b687ae25ccfe410d928f5374d31318277dbaa2"
   },
   {
-   "bytes": 1545,
+   "bytes": 1551,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/lowpoly.log",
-   "sha256": "eb6317322ae77b4f6020ce26db599894e77074f11babe0bc77fb3107d6cff9e6"
+   "sha256": "a56c516e92fa6b7251fa3a985ac195105d9cee72b74676994ec911d21cba93c0"
+  },
+  {
+   "bytes": 8084,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/nape-baseline.log",
+   "sha256": "50f17d6a54da2da61d7c1f68218bad1140886e7b0a3704b60d808bcb53937f51"
+  },
+  {
+   "bytes": 13688,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/nape-visibility.log",
+   "sha256": "64aa169d0949e561936bdeba18750c0d66d1dd6acbb276b63d6a2e960449408b"
   },
   {
    "bytes": 322,
@@ -852,55 +1044,79 @@
    "bytes": 3702,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/preview-shape.log",
-   "sha256": "288d04d5e946ade9f627e19ab19debb6a68dd1e74467c49dd78c7b280a111027"
+   "sha256": "dfc454d07a88f54dee8e03d25f8e6f3d6a0ac39285fa9d6e4e0c85774f2e4a7c"
   },
   {
    "bytes": 5380,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/review-concept.log",
-   "sha256": "5246877e7b4b159b90c5299fea68e9f9581eb2ccf78e028a76a8ef4b4af64b9a"
+   "sha256": "6bdfd7706acfacab72ac1678c9eb7642c8fe0fb0a25b3a76067d02946a8d14e5"
   },
   {
    "bytes": 1423,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/review-instances.log",
-   "sha256": "67770ebd662dfe43f3bd33b7df4b5754c5ce6aa951d07d1d00188bdcc468be87"
+   "sha256": "3d79c1f48ceddb24433e277cbb9b7e73daff2aa96d0d570c1d492039e550581d"
   },
   {
    "bytes": 1659,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/review-k2.log",
-   "sha256": "d9fabcafe10d0a58fb606b087d276b0c5e8a750495153043049a80d9cb0e6b4f"
+   "sha256": "11812f8230d42adc2e4b4e59de1d53d1dadd28c03502c1d47350e4dc410eaeae"
   },
   {
-   "bytes": 1021,
+   "bytes": 7458,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/review21-frames.log",
+   "sha256": "59cbee5904b3b31bc1ff1d38e676c67c4e46c9a9a7be2e14304a026f28fd0e77"
+  },
+  {
+   "bytes": 1098,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/rig.log",
-   "sha256": "2248d2bbadc8e2e9399bea227ee90c6eda9e751f8fcf6ee63db7643340fbe787"
+   "sha256": "00eeb68e1bdd113cd9ce08bf6f022b5981173e44d7dee580bdc2b2f238d7464f"
   },
   {
-   "bytes": 13868,
+   "bytes": 16224,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/see-through-baseline.log",
+   "sha256": "fb17213eb3e724fddbfb9e1397c85b08af0e23fb440831e143ba8f0a39805cb7"
+  },
+  {
+   "bytes": 16209,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/see-through-holdout-baseline.log",
+   "sha256": "21c7259b1ea1bf258203e942af8010a3a31aaedb784c445b3092c418afbcd043"
+  },
+  {
+   "bytes": 27228,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/see-through-holdout.log",
+   "sha256": "8b61d7d5fedcbee51da3cae60414113cd18c39e5fd12f0f9464167feeac59824"
+  },
+  {
+   "bytes": 27242,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/see-through.log",
-   "sha256": "e2109c8ae2eb39523217d9e2f664981b63b2553478ca36d0111ebaa7eec5f2f0"
+   "sha256": "d4a1556f40618da18de54b02076991748c177a56fea505b4888f24e2effb1820"
   },
   {
    "bytes": 1514,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/textures.log",
-   "sha256": "b931aac1661d1cdc79abe8848501bfb818869b70ac46e0cb06c256770e4d3aa7"
+   "sha256": "a70b9f1aec9dfef4d287a076844f46c344d264f48df7459424208688a00f1c7b"
   },
   {
    "bytes": 396,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/uv.log",
-   "sha256": "d9e61c261a115a7e556be42b90ef53f3a9b581e7e9b0e8edf4a7390d06ae9ff1"
+   "sha256": "48b57843a1bd354c0bf8b84d33fa6d9cd081005bd38a52890b2341e60877cd02"
   },
   {
    "bytes": 427,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/logs/uvcheck.log",
-   "sha256": "68b1b184d7cf308e2b2798e660ee53ac7b62c542241fde10ce11b11dd6b27e7d"
+   "sha256": "e6f88728c5cf7bdcb90bed0480c816c32899dc8ceb5c3a42a038edfa57b14e21"
   },
   {
    "bytes": 157,
@@ -909,136 +1125,136 @@
    "sha256": "cfa85f0755677e67ccab829f6807a02d70391d4cb2d2f133397793fdbd9bd5b0"
   },
   {
-   "bytes": 346918,
+   "bytes": 349893,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/atlas_BC_1k.jpg",
-   "sha256": "ab66b769e8a1a1854aa2f69347823c7f52ea06d5a38e5ed6decc44b10715d2fa"
+   "sha256": "662d4edc868aeba6c41e1080da8691d1f27b8bddcd36769566eea86bd09f7984"
   },
   {
-   "bytes": 475748,
+   "bytes": 484017,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/atlas_N_1k.jpg",
-   "sha256": "bca35530af292a35707dcd54db1fcaee4a89895769ac0eb5330d7f6837f87b26"
+   "sha256": "12978415f632546aece813ad8d0d7546afeb5db9b366dc74250afb4a29ca1fad"
   },
   {
-   "bytes": 329569,
+   "bytes": 307142,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/atlas_ORM_1k.jpg",
-   "sha256": "f50fad79ae32777d8f5a9de9c3e6ba57d65ce8cbce885688e4cc16752ca67492"
+   "sha256": "ae4e00f412f0799d5d952f510b73b039191733154e542d447fcae86cbe49929a"
   },
   {
-   "bytes": 248052,
+   "bytes": 244626,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/atlas_TeamMask_1k.jpg",
-   "sha256": "fe9c4c4919bacee08ed73099a741d39c498713d8db0bedd4b28083ee7932182c"
+   "sha256": "91d52fa02c628ed409beb46e08d0cc05d9051a9e97a67cad8db3a13b8eb67dfc"
   },
   {
-   "bytes": 440430,
+   "bytes": 448108,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_crest_front_game.jpg",
-   "sha256": "75d44a31c9eed5e74e28a2d7ae0461a50318573295f5c6f9425d541b1da2923d"
+   "sha256": "b28d80e745e800d8dad453164ec6b88fd4fcf730a89b462b3da264136c38d902"
   },
   {
-   "bytes": 454440,
+   "bytes": 460024,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_face_3q.jpg",
-   "sha256": "c2ccf94cdc2626d8f00c545a2c4e4717f5f9cbef6aeb32c03321faafc714f0a9"
+   "sha256": "8d1a6054c18092ac7d851c51590910a2764fbc2439c89e12c01499fdc0c6dcfd"
   },
   {
-   "bytes": 461602,
+   "bytes": 466720,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_face_front.jpg",
-   "sha256": "ce43f38b260a0b7d1b7305f6f21ba31f8fb7086678357892b3c7f747c8c9ebc6"
+   "sha256": "d7e855ca71081c2bfbd4830cb4d79a3eb07e17a6739bd53c018389f23f75a22b"
   },
   {
-   "bytes": 466703,
+   "bytes": 490573,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_nape_back3q_game.jpg",
-   "sha256": "7ab2deeedacd9d1011f39148497396fa102971504e86363bb3d3fe84b8b51bcd"
+   "sha256": "d1c765df01067e9273020958101a526691ed4b034ab62486fd0e878143613f5c"
   },
   {
-   "bytes": 414829,
+   "bytes": 441297,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_nape_back_game.jpg",
-   "sha256": "05f50415180bf90e2435a881c3a66496374beee95dcee78cb23b41545f036e75"
+   "sha256": "53085d495bda683c67d80ee56befda0175ddb02e7517e750044730a73e6dfc23"
   },
   {
-   "bytes": 393389,
+   "bytes": 414987,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_neck_back.jpg",
-   "sha256": "2df103d84a3f4421251e301c88143aae519fac97f5b9f32bce56278e134965df"
+   "sha256": "c447216fb4db73626a7be7c125a1ee4635b06fd3d21640d97ed568b5ce5d7eaf"
   },
   {
-   "bytes": 326296,
+   "bytes": 330197,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_talons_3q_left.jpg",
-   "sha256": "1bb865e44415d682f5113ec90e1ef1c922c1f8e761775b6e18bb480759dea1ee"
+   "sha256": "d4f46527ab7b490819030850f4662460bc953ed9e2d42d75d7b1462d0966d84c"
   },
   {
-   "bytes": 331379,
+   "bytes": 332539,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_talons_front.jpg",
-   "sha256": "d9ae8601b6cc4a76624908f68232cab06afcef6900cd9d4dd6ebcd819694544b"
+   "sha256": "87c39d0987437f397643c737731f74a77d0f23b0bb46531da2808aa516fb3b90"
   },
   {
-   "bytes": 355542,
+   "bytes": 355208,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_wing_front_left.jpg",
-   "sha256": "aa0b16716d32c09cd60769cb7a46d99a0ff852a7a8a47dcff80390fa1ed167d5"
+   "sha256": "c4b059cf36511dc4f5cd0756c8efffc247edb39beb087025e2968c8511413cc7"
   },
   {
-   "bytes": 339968,
+   "bytes": 339760,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_closeup_wing_primaries_left_back.jpg",
-   "sha256": "e52c4871315d64c9f084d69571dd7062e21915630f8c275284f7af4798acb6ce"
+   "sha256": "059304b9bdb9ba445634cfe15d6fdf785c8b5aa45d5d812cc6e08fed8425658a"
   },
   {
-   "bytes": 572507,
+   "bytes": 574951,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_concept_back.jpg",
-   "sha256": "f7f1a9554adf9404009225b0a3eca4699dddf975b3e00482fb70be9d0a8f326b"
+   "sha256": "84b8428a654b5bd0b7176e493400423ad978aa8354147233d500f19b5e32f899"
   },
   {
-   "bytes": 581741,
+   "bytes": 582315,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_concept_front.jpg",
-   "sha256": "5de3d1f01429580793e7e123e6623ed6fe7cde34752f0cb6fe82bc46006c0032"
+   "sha256": "fb3b0210a244a30ff70b5536c5e35345d5a99c6a965bf5d22a87b982199335b5"
   },
   {
-   "bytes": 360800,
+   "bytes": 361054,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/cmp_concept_side.jpg",
-   "sha256": "34020d35c11b5abb612264e031e44aee83e9e457691be5aca9b56ff280560dbf"
+   "sha256": "d3162078f34386c27e371adc071f46cb77cb53e4d8076c87f9df2c346cdcd8be"
   },
   {
-   "bytes": 256081,
+   "bytes": 256519,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/crop_k2_3q_prev_left_h2_right.png",
-   "sha256": "249a8d05cf13f335d545328ffef609772c2c106f29f0d97231e9f4f86355a2bd"
+   "sha256": "b79be28e131292ece2d9720a1f633f536fc545d1694d9d264db1e50ff0544493"
   },
   {
-   "bytes": 260315,
+   "bytes": 259800,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/crop_k2_front_prev_left_h2_right.png",
-   "sha256": "744e53c97cd656365707c448c7620095568a815e671cb496900537a69399b6df"
+   "sha256": "46813d75615788b644561c95f636fcf36bcc06787505b3747be3ef9be6241d11"
   },
   {
-   "bytes": 474394,
+   "bytes": 478081,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/crop_k2close_back3q_h2_left_prev_right.png",
-   "sha256": "b3d3675d834e1becc9357599024e78f8e2d05e54643bb8abb21fda4d808bc852"
+   "sha256": "a17b848f687fef4a7d9e9916b536d4c3baeee5768040ee86ab280207ffedb1f3"
   },
   {
-   "bytes": 506407,
+   "bytes": 511475,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/crop_k2close_back_h2_left_prev_right.png",
-   "sha256": "5389a62563a0fe137519a8b82e667bc4a3876bdc31dd04f2ec0e606a571843c9"
+   "sha256": "b825f6ac03899bd280bce3681dd9c40f500a8d9748cebfab0ebf517064980acc"
   },
   {
-   "bytes": 494206,
+   "bytes": 494675,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/crop_k2close_front_prev_left_h2_right.png",
-   "sha256": "ac65d277b6d2082a83b756d1e2ebe42e194e7d88ff13e0adb36ebe3adea3ca7c"
+   "sha256": "5426f0dfb1a67fe9443c321bf82fa14aad2fd6268caa719a010530c5992bdae5"
   },
   {
    "bytes": 8693,
@@ -1047,16 +1263,16 @@
    "sha256": "e482c8aa5a5bf2e47945b819daf5cda325045a7feb23271ad86036ef93d7a510"
   },
   {
-   "bytes": 2816,
+   "bytes": 2817,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/deform/h2-blend-deform.json",
-   "sha256": "aac33c65350422a7686c8c171999d9f7b7cfc76207814e699ba7f3f81d5a080e"
+   "sha256": "7d2449589947325d5ab89b22928ce7f2a20b5187780f2d0d07f347d56c12a690"
   },
   {
-   "bytes": 619037,
+   "bytes": 597952,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/deform/h2-blend-sheet.jpg",
-   "sha256": "1d739cacf9fec1710df30e15e724c2c68f8ea9cd236b6a3eedae806331ffa778"
+   "sha256": "c7e1d800b8f8632a03a48a4a290a5254002bcbeedc52b3b64ac4fe9e04a3df1f"
   },
   {
    "bytes": 8683,
@@ -1065,16 +1281,16 @@
    "sha256": "542f38d5d53145017579dd41f099a4d5c881a382b58f7332b069439ec5516f26"
   },
   {
-   "bytes": 2820,
+   "bytes": 2821,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/deform/h2-fbx-deform.json",
-   "sha256": "858b28e7daaf0222ef49baeaf5cb249ea73731ee8bbdff3ad698216e73c9a7fb"
+   "sha256": "21bd7154cc782b7890d683e2736bbbb4fd63301794bbdc9a6f471b231f0c12be"
   },
   {
-   "bytes": 624636,
+   "bytes": 610219,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/deform/h2-fbx-sheet.jpg",
-   "sha256": "f2dcc9fccbc66fb16158ddaf07635f8f48a23dca5c3c940e5d8a94f85512d68d"
+   "sha256": "485593f3efdd3f3e8f060c03eaff157b3535de7a7c2212d38ee8e1ade99d024b"
   },
   {
    "bytes": 2111,
@@ -1191,16 +1407,112 @@
    "sha256": "08d5964bc7c7434d6d0f6d5376f207aa6b4995c27a94de630a3fe552dbdf1454"
   },
   {
-   "bytes": 42627,
+   "bytes": 38337,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/frames-storage.json",
-   "sha256": "828b93720db7f6d60f4bfcc1c94bee7af11019a02be189527c1badb4074f1fa2"
+   "sha256": "03a4c5c23a63076d4d402c6116dc0f2e2c58c790b19f9a5aca7b83491900053d"
   },
   {
-   "bytes": 43664,
+   "bytes": 224013,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_base_band.jpg",
+   "sha256": "5a2f7456fef45ffb947901ac46d43ec2c53f2befa7e9524061f9c8491c43da0d"
+  },
+  {
+   "bytes": 373781,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_concept_back.jpg",
+   "sha256": "f127a0b8a2b00faae66a05909e867915dd12f46342583fc74811dc1dba7e3dc7"
+  },
+  {
+   "bytes": 387476,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_concept_front.jpg",
+   "sha256": "97cfecc0193dc57bacf20fcf546318c3f2a2b54a0b1e4d3879d2d6c0002056b1"
+  },
+  {
+   "bytes": 242148,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_concept_side.jpg",
+   "sha256": "cf8051b0d6c747345a8591c28c865c077779258c4f2227dbd286177c8c8344ed"
+  },
+  {
+   "bytes": 607408,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_face.jpg",
+   "sha256": "f6fbbb50864ee5a1860825f242936510d9f559476b46a417a92e9682e0226338"
+  },
+  {
+   "bytes": 107900,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_face_headpitch_probe.jpg",
+   "sha256": "c6d014ddec20fad88741b07e759144b7c7838d14dda3475e4e59da62ab74597d"
+  },
+  {
+   "bytes": 455923,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_k2_1p6x.jpg",
+   "sha256": "1e034577a442b8ba1753926ca812aa19dde6ba31ffa3e778ba377a2d674cab0a"
+  },
+  {
+   "bytes": 436716,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_k2_5x.jpg",
+   "sha256": "91b619307ebf0ccf93bfc8702f07a073a89d8dbbe42df21f2e0d41664b735247"
+  },
+  {
+   "bytes": 428846,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_nape_game_az140.jpg",
+   "sha256": "20e4cf144a67e54fb4f13e37e02fc8845c2817c5b21afef0e40e304a1fb2ecf8"
+  },
+  {
+   "bytes": 386254,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_nape_game_az180.jpg",
+   "sha256": "9ffc4b4fc0df0e53267c8c91754d4f7231561c4bf0f0bf47ee03b25c861b67b8"
+  },
+  {
+   "bytes": 418703,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_nape_game_az220.jpg",
+   "sha256": "12a9bfd3f3b12dc51e05be3aaea0df97f7b8454775323a3607eb814b2e4deaa1"
+  },
+  {
+   "bytes": 332826,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_nape_visibility_masks.jpg",
+   "sha256": "d3573b8a0485b7999ea0e756d90bf349dc26612966f6e7c86c67326fcc4a07b8"
+  },
+  {
+   "bytes": 309438,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_talons_3q.jpg",
+   "sha256": "9b6633e4dbcdd5d8f38b5271b58abadc2386387ca06e84a9812aca8517d9d4ac"
+  },
+  {
+   "bytes": 91432,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/cmp_h21_teamcolor.jpg",
+   "sha256": "3b508adbb20059f09c2a71c0a8a40c0fe2d8a9a2c81b6b8ed43c848714b27333"
+  },
+  {
+   "bytes": 4163,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/frames-storage-h21.json",
+   "sha256": "b8f3aef992f56a45958575355a14fe096b8bd823dfee6ac8ec26b8c0bff21a9b"
+  },
+  {
+   "bytes": 10538,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/h21/review-frames-h21.json",
+   "sha256": "03fab722106f7a4d25f99957bedeccab258e7016dedd9c1ba77e843ae01637ec"
+  },
+  {
+   "bytes": 43650,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances-analysis.json",
-   "sha256": "d5773192ff2ccd300d5e9f297ad3dbc6f3d462ed2c3074829562226d2cd7dd38"
+   "sha256": "9f48836cc1c18652b62cea97a87f2b82e1ba559832983e877e7165c306ab2417"
   },
   {
    "bytes": 35642,
@@ -1209,184 +1521,184 @@
    "sha256": "65028b420eaed0c1f12d887cd047626970bca4cf1ccadba0ad69638113b4d015"
   },
   {
-   "bytes": 68190,
+   "bytes": 66971,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k1.jpg",
-   "sha256": "e4c86bf40fff0ac101c9fc31ca2e18cbc9cb5989af1a720247ef5cbb40299bfa"
+   "sha256": "0ecafdd18d098b326a3583eaa0c718bd733bdddc4019cc6c8efda3e915690e6b"
   },
   {
-   "bytes": 6758,
+   "bytes": 6498,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k1_crop_1.png",
-   "sha256": "25a133072d8a36d003a8c5e23a51b63cde2a44d9ca0e3024b3b8465f33bfeba9"
+   "sha256": "d5586fba07932882a241201fd9828794a5825624230161ce006633d08fded791"
   },
   {
-   "bytes": 6840,
+   "bytes": 6584,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k1_crop_2.png",
-   "sha256": "454410b5fa4b2afefd2c9c1bd24366bcfd0095198fe21224dca1e22a77381c13"
+   "sha256": "5b2e95469ff619b5305028783bcdec3dc5a7b6fc7743900a6c7cb31e51b6ae9f"
   },
   {
-   "bytes": 6882,
+   "bytes": 6687,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k1_crop_3.png",
-   "sha256": "c2105e8591593a6eb9e09e6f25fc9097638cfdc46556c0d28bcd1e55425c8b13"
+   "sha256": "fae60dd8df2a77e8faa89b3bfcc1cc5c1db413833d7915cea2139fa6e3940cef"
   },
   {
-   "bytes": 478812,
+   "bytes": 478191,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k1_gray.png",
-   "sha256": "1f28129c0f42dd67fab84d13c87456e24513419397638aa03e925785c6d5ecea"
+   "sha256": "b3936076154c022a71579a3bb8eedc413f586daba5e6928b87cb6c1ba18924f0"
   },
   {
-   "bytes": 100722,
+   "bytes": 99342,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2.jpg",
-   "sha256": "123ae0f2f8b894488599c44f5e0e0ee9baf649eab2c14e0a1fa484922e6cf6c4"
+   "sha256": "8e6eb6fd89193313bd0c54f69aa0f3a4ad81cf8a3494fe3e4d4d7761bfa05354"
   },
   {
-   "bytes": 8209,
+   "bytes": 7882,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2_crop_1.png",
-   "sha256": "0231cfc9350a46ea9a5a37faa3af4f0b43ce819c748071a112daee72310e4be6"
+   "sha256": "57dd4b7967f1414b0ef95e569566797a1df42a382a8395f9462c94583d0b360b"
   },
   {
-   "bytes": 8404,
+   "bytes": 8108,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2_crop_2.png",
-   "sha256": "c65481f5cabefe366c40b63c188895923908ae203359620de03da6afcac94352"
+   "sha256": "39db0dd428961bf6ba9e6b9e874e74a4b13b303ab6efc20c94766732461c9d8f"
   },
   {
-   "bytes": 8538,
+   "bytes": 8414,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2_crop_3.png",
-   "sha256": "be22b33b7a53e3ecc3dbd206ba0795a62009e9a6796d04a6faef55358027830a"
+   "sha256": "b9bbbe94b2fdd1e975acab8b4d987dbebdace0b2f8876a21262282ee304a9803"
   },
   {
-   "bytes": 511737,
+   "bytes": 511209,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2_gray.png",
-   "sha256": "9cca2027e1c8f922285e416ecbcdc9bc6a8074ac318f8184a6bdec857acbaf34"
+   "sha256": "c740f3a6ab993ee814b5901ff1e16c5d496385ab7eedef5a76a55a4f250ed3a6"
   },
   {
-   "bytes": 141778,
+   "bytes": 139591,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2close.jpg",
-   "sha256": "7efc627bb6f1343ed690d24117391e87ddc6cfa37865eb12b1a0d27589e59018"
+   "sha256": "dcfe653617944355ad1a910f724be120a288a6b4630be88bc03b026a1ac51388"
   },
   {
-   "bytes": 17535,
+   "bytes": 16945,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2close_crop_1.png",
-   "sha256": "bf0f4349a66260f95c5dadcc12aac90a058903efccef213f6b6c187b1635f827"
+   "sha256": "64725a0543455a76249c1d6de33f7e63c4884b5969da003737bfee2b564fbfb5"
   },
   {
-   "bytes": 18032,
+   "bytes": 17691,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2close_crop_2.png",
-   "sha256": "595527fe49b5d9628e0bcc585a03f9506ded5e17111ce17af1d5bde8757e90a1"
+   "sha256": "4feced2c790df08f8d1cadca3540bc9dfc6403156d19fc17201650536921f9ad"
   },
   {
-   "bytes": 18373,
+   "bytes": 18824,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2close_crop_3.png",
-   "sha256": "8f5010a5ba7e15993de117555e3eb6d5491eaa382ff2a95e6b30d84d25d5f907"
+   "sha256": "07c1fb0f32b2ab52a2871dfa859dbfb486398ce3f4554595a6c29b9aec47c0b8"
   },
   {
-   "bytes": 555871,
+   "bytes": 555759,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_facing_k2close_gray.png",
-   "sha256": "801ca42257860c5fb192635253d9385f21dd301d3f8a4a10fb4785304174ba5a"
+   "sha256": "eb580ff1e446fd6cae1e96cb26f8990bb9802abb3aa1a5f1a9af027ccf9093ce"
   },
   {
-   "bytes": 67397,
+   "bytes": 66263,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k1.jpg",
-   "sha256": "701974e677ef59a75cb2c84eb982c4a84427f3bbeeb675b6b377aaa4f59b8685"
+   "sha256": "b50c7da185e78d042605038fc7443c86a13f0aac8fce4c61ef0a57fe6d8eb6c9"
   },
   {
-   "bytes": 6700,
+   "bytes": 6452,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k1_crop_1.png",
-   "sha256": "5a8f691acd38b7beb4f781fc4a60dff3ed13eefee231c60f27f77aaada5e3aa0"
+   "sha256": "7afd3b15003df3bfbb8506ed17360a460e5521190a8305c32d2db9877cc67266"
   },
   {
-   "bytes": 6471,
+   "bytes": 6212,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k1_crop_2.png",
-   "sha256": "ea2f1b68b7bc83ec1722bdf76302c02e44d53174cecbdcc36b598a5492772f0c"
+   "sha256": "e9b85a589a0e18a3d96e9468a5f123b804e8bed97a52fb31870da0818e1cc91b"
   },
   {
-   "bytes": 6912,
+   "bytes": 6712,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k1_crop_3.png",
-   "sha256": "394abd96adf0ad300818f398be5ff82240b469f2979fc6f5ba64ff7f211c8a9f"
+   "sha256": "9c3e4988d08d22e826595874f7d21df8731d3fae7fb2364a29d4aeec68cf7741"
   },
   {
-   "bytes": 478889,
+   "bytes": 478301,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k1_gray.png",
-   "sha256": "67a1ad4af7221970034addb4f6d67c18f74b7e4f3154ef67004033cd676065b9"
+   "sha256": "c4d077ea77c1112dcb2496ec13d626cfffa2b6141ead08245d7550424eb4ddc8"
   },
   {
-   "bytes": 100084,
+   "bytes": 98479,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2.jpg",
-   "sha256": "82f4c94a3b94c4dc18a76664a240aad803438f54745609e49ebe75f48556689e"
+   "sha256": "6924969cfa04a5c8ad97b6769c84f8dbcbeabc2b96aa42bbc8c165e65abd5406"
   },
   {
-   "bytes": 7995,
+   "bytes": 7759,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2_crop_1.png",
-   "sha256": "9c497683411371da110afaf45b632bc755bd5a345628a8059e7fb5ced7283e6a"
+   "sha256": "b57ea9e38cf414988d6f4822427a9399e51ab039420495d317ddbddcfd5c41bb"
   },
   {
-   "bytes": 7294,
+   "bytes": 7088,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2_crop_2.png",
-   "sha256": "0db18444458062b6c3c8685daf8c2fbdda8ef0246db9226c465fcd10e9c69d24"
+   "sha256": "c19a3e3f34f58a2232f35c09d02cf6db76c371282fa3f58d1c721e84271b1c5f"
   },
   {
-   "bytes": 8242,
+   "bytes": 8263,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2_crop_3.png",
-   "sha256": "dc2469bc9b22d1fc775b62d874e7634db399eb2ced7ed7ade2a979527ed59710"
+   "sha256": "2d7d87b42565e565922627d91d3b167726d92a459bc0bd496894ba8f1cc9ef23"
   },
   {
-   "bytes": 512489,
+   "bytes": 511949,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2_gray.png",
-   "sha256": "7f2aa030e8a14cab2c644f99916d7992a1a36183c5a18f85bba61e48123d22e8"
+   "sha256": "b6e492bd39b3152eacfc48d02e50c2a47c5d9308fcf8d2b7a7bdfc13c3ea7e49"
   },
   {
-   "bytes": 142052,
+   "bytes": 140227,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2close.jpg",
-   "sha256": "e94e4339d2798d69d03b84bcf814885357d07d7a8dbabb365aeb853af6fd2576"
+   "sha256": "f60dd77b1e87de0298b65efc91a663d9e3ab98a046b43244ae7bebd749e4d2c3"
   },
   {
-   "bytes": 18278,
+   "bytes": 17649,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2close_crop_1.png",
-   "sha256": "dfdce681cfbdd81d15070fc0ae1cc0541cda5e76648f27f45f877a47aa277249"
+   "sha256": "f7fca422b0ac91fefe8ada985e96fb4e2182a8cccb543904dc057a8a3be5a25d"
   },
   {
-   "bytes": 13568,
+   "bytes": 13417,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2close_crop_2.png",
-   "sha256": "e8ca966fff45555ad114a738ddd90cf40829f6e0eb82a15067cf1fbd825c62d0"
+   "sha256": "c6cb98b4046595df4ed25ae1bbd8bbf56386fdb732129582de31deeb3f81b86f"
   },
   {
-   "bytes": 18234,
+   "bytes": 18962,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2close_crop_3.png",
-   "sha256": "76d8d15a0a33ad2e49a9b80079cade3b2f3da8683f71342c5650edf46e04b630"
+   "sha256": "e1bad0650c9887abc20179497433a7f93365cc0fd032dd4b044c74698d3e4f91"
   },
   {
-   "bytes": 560327,
+   "bytes": 560317,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/instances_mixed_yaw_k2close_gray.png",
-   "sha256": "2a60d509333bfd1eb9fb7c765d02d460cf33444bff48d45315e1b58133b240a3"
+   "sha256": "5a7ad047fab7b205b6ebf42a41700d97ac5cd3b823571c664618ce7f3a0d8d98"
   },
   {
    "bytes": 2082,
@@ -1395,76 +1707,76 @@
    "sha256": "e6e9f59123cdffe804fee98ec98f3a56949014c084323b8a31ae504b20f2c4d7"
   },
   {
-   "bytes": 18263,
+   "bytes": 17647,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/sheet_facing_k1_gray_crops.png",
-   "sha256": "84243789873e127d722a372a9c57696bd6ca7fc930150a795be50516788721f7"
+   "sha256": "8c72d166a20536f914e361ea06113799732f8ed35feb2d44f0909afcb979d7ca"
   },
   {
-   "bytes": 22701,
+   "bytes": 22058,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/sheet_facing_k2_gray_crops.png",
-   "sha256": "89c49a0742373f074b42663d0ca0f151a5e8df8b940c99bc71453fc8ae8916b7"
+   "sha256": "16473acb2625cbfebda5b62668add705b54a4d0b1031e52b86748a021671a432"
   },
   {
-   "bytes": 50338,
+   "bytes": 49988,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/sheet_facing_k2close_gray_crops.png",
-   "sha256": "f86dd4eb7340a1497dd9d3e5e7b0e9e071a82aa88069010ec52f2a4110bca48b"
+   "sha256": "829fe8a6de4dc00a141ea25d1dede5c4be7c0ef7455250284bd15fe69d4c011a"
   },
   {
-   "bytes": 18000,
+   "bytes": 17480,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/sheet_mixed_yaw_k1_gray_crops.png",
-   "sha256": "c8702f9e463314e944b41d701068bc12394be7c56b57a87aabcc014aa4460675"
+   "sha256": "8b3741deb38c0eb81c1e201addd441374fbd4a9ab0fec145f5db8fbacd43583e"
   },
   {
-   "bytes": 21502,
+   "bytes": 21090,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/sheet_mixed_yaw_k2_gray_crops.png",
-   "sha256": "5357d294116758ce8ec15f752d99df79af0ba25369f87abe530e223e458481bc"
+   "sha256": "718f51310a4a0c6514f728d8dc500803b7b5e0b7d3e24d585799799248ab843d"
   },
   {
-   "bytes": 47471,
+   "bytes": 47361,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/instances/sheet_mixed_yaw_k2close_gray_crops.png",
-   "sha256": "2134b1e0a2fd86e0a9306afb1c8edc9a2675e81f6edb669e277c0c0523d4cbe1"
+   "sha256": "e7eea0be0a05ede292ba4adcd11901ae17670f9671b3b074d66ff14581cafc23"
   },
   {
-   "bytes": 58530,
+   "bytes": 57690,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/k1_gamescale_front_prev_left_h2_right.jpg",
-   "sha256": "bcb028bbcd3f8647da77561a41a1782ae3c019a8768f26bd3b490ebc1584b13d"
+   "sha256": "c9357ca050016bc536be1eac340f6a78d2b0037344ef36664fc885f4847a7102"
   },
   {
-   "bytes": 108346,
+   "bytes": 107464,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/k2_3q_prev_left_h2_right.jpg",
-   "sha256": "e84f62cfb30ac6e7c543daa5e79d029124bcf3f4112a29b36129d0e6a705b427"
+   "sha256": "03c49ebcf9ec12735cc5f05eb857d4d330dfd844001daae343e67cdca77d570b"
   },
   {
-   "bytes": 83929,
+   "bytes": 82793,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/k2_front_prev_left_h2_right.jpg",
-   "sha256": "68ed7ba8fa33ef975a460c38a18bb7aac7a4ef6935c3902f4359ebb19d3639fb"
+   "sha256": "b02c86aa21bbb71789ad32f02f3611def05d5ab7f106eb35a2cd08ca704bdf0a"
   },
   {
-   "bytes": 132226,
+   "bytes": 134489,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/k2close_back3q_h2_left_prev_right.jpg",
-   "sha256": "ec41718b9da5727d7273664f152260aa0868b937227a1e6d27370e372118db01"
+   "sha256": "cc303747826615c44e554fa512436f91af2173fce53a2548f1b6d515a56a16af"
   },
   {
-   "bytes": 115014,
+   "bytes": 115791,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/k2close_back_h2_left_prev_right.jpg",
-   "sha256": "a8fe513cea1580604500816283257c9a2176184d0ab18eb4c1df19814f39620f"
+   "sha256": "984edf0f768546eaa9607d22395423b3cbfc4869d2b801423ba67420a192c71e"
   },
   {
-   "bytes": 109218,
+   "bytes": 107630,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/k2/k2close_front_prev_left_h2_right.jpg",
-   "sha256": "0025657448ca9d80343fbc1b762bc35300b5acee00133e31078fb8b02949f294"
+   "sha256": "fee2f901c4e8a818fbec5a4b38f807d92845ffa0b1b8b349a61c81e2a5dbe1a3"
   },
   {
    "bytes": 3100,
@@ -1473,250 +1785,130 @@
    "sha256": "57fc93fb45931ff13cd64015d766bf3bf9192c6a8abba645d56f71e6f71ca609"
   },
   {
-   "bytes": 202193,
+   "bytes": 204552,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/concept_frame_back.jpg",
-   "sha256": "e7dd625f6f11537446a6fd476e7a47d13087320f711145861776ee1711b8df79"
+   "sha256": "0d1787e024ca3cc29cfcc642b7cef4027f7ea482b7a7370a69bd035f791605da"
   },
   {
-   "bytes": 219329,
+   "bytes": 219805,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/concept_frame_front.jpg",
-   "sha256": "bd1a17d471d74532d0b8111ae79fd6cb3b86e83132b873ce9f8304a0e40ddc7c"
+   "sha256": "2907cfae6826b4b06c8cb58264e26ef3997029698286819922ea608e81d2bc02"
   },
   {
-   "bytes": 123576,
+   "bytes": 124165,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/concept_frame_side.jpg",
-   "sha256": "25196920f521f09f82388a0d83d6c249bbfb442c5ce001770e53ccae6b47c1af"
+   "sha256": "c0ad07fc928e14793da372ecde4b1c19c7c326b799698965656f2763d59da245"
   },
   {
-   "bytes": 6966,
+   "bytes": 6964,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/review-frames-concept.json",
-   "sha256": "9f1f90e7f9a67c96399c9b773622d00d2bdd4b96905ee9f6d43d0dc67474d5de"
+   "sha256": "2fe8d8dfa6202b741b7a0713d83c5fea2cddc2351dc16c30c932a32c9357787d"
   },
   {
-   "bytes": 115569,
+   "bytes": 114579,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/teamcolor_gold_front.jpg",
-   "sha256": "2d5d2015fecffca585b165f81fcfa648a5d65ddad49f00ad1ce38bace2b40bde"
+   "sha256": "89c7ececcb74afc6f5004bbd51630de14d50814a988a5b2862382dd8e6e6736f"
   },
   {
-   "bytes": 84676,
+   "bytes": 85359,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/teamcolor_gold_game3q.jpg",
-   "sha256": "b4a5389caf903ac0772bcc1d818b9144eae908f8c8703e76db1b1c2747cf54ac"
+   "sha256": "a16d47f573b50cfc7f5065082299c2ee4831096589c732316a571b7dca46cdb9"
   },
   {
-   "bytes": 119038,
+   "bytes": 118745,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/teamcolor_silver_front.jpg",
-   "sha256": "f70f99a020262e109f3c5cb9dd53f944d0ae4d5ca326f19c1c32b52d1db73a70"
+   "sha256": "b8495f28c0420d083028ef3ec7cc0e38cdb07d2a3c869e6c8590879de2352ead"
   },
   {
-   "bytes": 84483,
+   "bytes": 86640,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/review/teamcolor_silver_game3q.jpg",
-   "sha256": "1a5ae6d118b7e09b30794069191fef11cca0292b2a8e5143391409bc5beb840c"
+   "sha256": "206a7ad20046396b3da195ea7c162828c375dc5603b1b1662b922d3c554315b2"
   },
   {
-   "bytes": 33622,
+   "bytes": 33662,
    "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az000_d4.8.png",
-   "sha256": "bd9643697e6ae71bfc79ad09df95cd43b228d4ea9bd0ea45a822e63fe0f8e716"
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through-holdout/seethrough_az110_d4.3.png",
+   "sha256": "202e702e6602c974219568b537f3e4c9a07cb27b7e5b43ee2e6290c33e26ae51"
   },
   {
-   "bytes": 33504,
+   "bytes": 33107,
    "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az080_d4.8.png",
-   "sha256": "c9b92f434d2404d12a76cc8f13255013dfe2c8edaa8e5281561a520677c243d8"
-  },
-  {
-   "bytes": 33505,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az100_d4.8.png",
-   "sha256": "24235bc387927569997ebd5c5692c212787486a69508546cb90b5118b0494af3"
-  },
-  {
-   "bytes": 33276,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az120_d4.8.png",
-   "sha256": "139fca1c1511ada31b0e736effd242196fe883b9a8f185c63cff4f61a7e24f69"
-  },
-  {
-   "bytes": 33309,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az140_d4.8.png",
-   "sha256": "0ba35bdb03233d58c0536629bda33644786985c51f52eca4376efa74ebe25ff3"
-  },
-  {
-   "bytes": 33591,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az160_d4.8.png",
-   "sha256": "2ab7945fa11e7095bf2fcf2da5462c0f0ab93e1fffd9741340cd54b31ad1c42c"
-  },
-  {
-   "bytes": 32748,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az160_d7.5.png",
-   "sha256": "8879c456523f29afdb3657e63866006841fe5957ffe2349fb11a36638217a149"
-  },
-  {
-   "bytes": 34521,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az180_d4.8.png",
-   "sha256": "c5d515ecfb4e6aa5b26a537cc19700192d0a758f56cb9a58d0475599d73353c2"
-  },
-  {
-   "bytes": 34359,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az200_d4.8.png",
-   "sha256": "6208662e7e4a9912282a62cd0b8ec650d6ac907050eb86c2d3e28846fd0ca2a7"
-  },
-  {
-   "bytes": 32919,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az200_d7.5.png",
-   "sha256": "5237c99dd4d75b6be412f7e28547cd57547539d0326ed3ca5f4866d903ccdcfb"
-  },
-  {
-   "bytes": 33599,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az220_d4.8.png",
-   "sha256": "a29064a3adb97e7dd7d7903393996f5a5a36306794d1608e02d745683f40d985"
-  },
-  {
-   "bytes": 32488,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az220_d7.5.png",
-   "sha256": "ef5bd3644fe9e76de524df59a8191408dbb6d4a5e915972d24cdcb17d5325a50"
-  },
-  {
-   "bytes": 33248,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az240_d4.8.png",
-   "sha256": "921c98747ea900f771d04ed2e2a1bfaf0935f3a5d9e056497efcbb95b3ce7833"
-  },
-  {
-   "bytes": 33436,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az260_d4.8.png",
-   "sha256": "3777f1896f40322909168979ab6c11eb64aaf102353b1c8a310b89f22ba30a57"
-  },
-  {
-   "bytes": 32305,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az260_d7.5.png",
-   "sha256": "7f9d05bdfbf974754b5cbaa373983b1357be12e7e095f96008f64d01424c84ff"
-  },
-  {
-   "bytes": 33598,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az280_d4.8.png",
-   "sha256": "c4f346b81c73114d7e8fe5b29cb1013719bf6177ea95c8bb9248481e4a9e5380"
-  },
-  {
-   "bytes": 33453,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az300_d4.8.png",
-   "sha256": "31fc7ea35d987ea14be1ca114d880a7ecf788b0dd85f8eb194923edc4a2d075b"
-  },
-  {
-   "bytes": 32398,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az300_d7.5.png",
-   "sha256": "93f0a067abd2c269fb00eef7655eccb7ca2bdd2fa47e16d1abcac85f326056b4"
-  },
-  {
-   "bytes": 33476,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az320_d4.8.png",
-   "sha256": "0630a99883c2e560ddab14d6a42078912c1a03cf2cde5d873dc268ee08be5332"
-  },
-  {
-   "bytes": 32326,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az320_d7.5.png",
-   "sha256": "27ba977d4ca7fb99fc749a296abd64d3e603b2703395de73eea2502af8da647b"
-  },
-  {
-   "bytes": 33707,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az340_d4.8.png",
-   "sha256": "816524ec371aaa9eb765770a9ee7bb6feab5eefd52e9bffbf6ae4090f4ffadf0"
-  },
-  {
-   "bytes": 32579,
-   "commit": true,
-   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through/seethrough_az340_d7.5.png",
-   "sha256": "0974f572bbd94994744f2af3479201f1176277980dd84075f7d5dd16051fcb5d"
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/see-through-holdout/seethrough_az210_d6.0.png",
+   "sha256": "c2752cb45a51657716a5fc1d3af87a1827c6092933483f3c7bced5be3652b185"
   },
   {
    "bytes": 4062,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/preview-lowpoly.json",
-   "sha256": "9e8c4eeddc98327ccda06637701b8f3868441187d9e8ec6a24cfef7051e6ab8e"
+   "sha256": "2c44cd663cc131a053e982b2ccd2b6054b359325550aad86f00476b36058a3bf"
   },
   {
-   "bytes": 284166,
+   "bytes": 286710,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_back.jpg",
-   "sha256": "196714f0f6e966bb74e513c892a530d9cd565da5b5e3c4ad89eca1097f935144"
+   "sha256": "2d7a7dd2bfb031139bad89035f3dd2d8ff7204aa5bf348f29a6a66631ee195d0"
   },
   {
-   "bytes": 136059,
+   "bytes": 136038,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_feet_front.jpg",
-   "sha256": "b7b65720d91c5b09d4f9d5df7f6a34afe17115995722abdc38fb44f163ce90ff"
+   "sha256": "2c649032a0952dc6094c85769d33bb24798ad614e4001e64f6abe31771e63d43"
   },
   {
-   "bytes": 259440,
+   "bytes": 259460,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_front.jpg",
-   "sha256": "b43e805960e21e42291d75eb1856325e1bc1ec8290ae41aab038d150c38d9cc0"
+   "sha256": "3529d5daf93454c802822181d05583e9aa3016a7561c8cad26ce7f94f32830f6"
   },
   {
-   "bytes": 217627,
+   "bytes": 217623,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_head_3q.jpg",
-   "sha256": "81d4c5ffb3e2d3ab583ac848696f7c32788373372500ff5718c93d2ae5948380"
+   "sha256": "ca74dcc9c8134e9a0286c8e136b5636d6e98321e30a2994c31c435a4a40f98f2"
   },
   {
-   "bytes": 248012,
+   "bytes": 248278,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_head_front.jpg",
-   "sha256": "c57b742e2f306822ffeb825f1db07a4e12a8c12a583cfe9c2a83526aed34e33c"
+   "sha256": "b75853264733890fc23432e7d542f2c62650d93c18239feaf116d85d38a0c332"
   },
   {
-   "bytes": 194124,
+   "bytes": 194282,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_side_left.jpg",
-   "sha256": "971b5acb57c2a60aa8b0214ec98256fb6d2a51e9236401aa83694a0fb98dd774"
+   "sha256": "0a18bd48749eeec1c511b73311dbb9290a035afa40d73949b407f63a61280812"
   },
   {
-   "bytes": 125487,
+   "bytes": 127656,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_top.jpg",
-   "sha256": "18119c210d1c4b74ff5edd343445f6c319a3c6f8e1c362c94fccf29a2266e49d"
+   "sha256": "af9746d6a8fd6e42e55e5b204cc6b2779f396af7662b8c163a66c202f5488e4c"
   },
   {
-   "bytes": 212327,
+   "bytes": 212386,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/shape/shape_wing_tip_back.jpg",
-   "sha256": "449cae81f6e16047bf95b72f42769ee9f5c19548a8a3a12d8f173e355b792586"
+   "sha256": "84dd1ef69ce7d0788827b738a52a10a6a1968d953c8a959b824a30548a757ff8"
   },
   {
-   "bytes": 204140,
+   "bytes": 206594,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/preview/uv_layout_parts.png",
-   "sha256": "bce088d406f4ee34695ff27c8a008a989dc8736f0595f804cf08985381482c6f"
+   "sha256": "a1462a8015d448027d9d4ff8f90fb1aff13bf0bb09e3ea282f2673e3f5e1e6be"
   },
   {
-   "bytes": 14731,
+   "bytes": 23381,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/assessment-notes.json",
-   "sha256": "3280937e52175379c564432f659b50444a68181111f44afa15e5946e5adae77f"
+   "sha256": "7de8a151d34edc13923a7a572ff96d6772738f240250acf4a138c24a36755d21"
   },
   {
    "bytes": 7429,
@@ -1725,184 +1917,243 @@
    "sha256": "eb8dc61e9a5d193b4ba56e400a7dfbe003c437300c02f28787a23748c58e3c14"
   },
   {
-   "bytes": 4787,
+   "bytes": 7618,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/determinism.json",
-   "sha256": "ca5b8a5b944d7e3d7eabeff5be678c76de0e8ac2c3b81476aca4d4200baca624"
+   "sha256": "49a34e40388f274119a85f136dec32b0492b4f62cbace3f4e56b22aa86453b8a"
   },
   {
-   "bytes": 4739,
+   "bytes": 4736,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/h2-bake-report.json",
-   "sha256": "ad912905e9db7d5b2b1578fa4c0266b6102d185eec45aab9a6469b73b1e0cc16"
+   "sha256": "1b8b323ba766ad8339b2925d2794de35080f7539ade466faa12ab60d70e03840"
   },
   {
-   "bytes": 28615,
+   "bytes": 28616,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/h2-import-report.json",
-   "sha256": "754f6de7a9c10e851a3d05691dd1b47d9f076da188f6b9888ebeba78401c4681"
+   "sha256": "4925417deb6f8ebe592044d8ec4660807f04e12088c425381517dc8da9da2a7f"
   },
   {
-   "bytes": 37036,
+   "bytes": 42000,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/h2-lowpoly-report.json",
-   "sha256": "f0ce02b06ae2b3c7a51e9eb872b92400a62d6d45ab7e963ecf277afa6e78f64e"
+   "sha256": "0ae80c31c4f1303cff4d560da4e23ec02d29feb6ebaac3c71daf0f2436e05933"
   },
   {
-   "bytes": 19408,
+   "bytes": 27597,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/h2-rig-report.json",
-   "sha256": "237f2286b2a3ee41805c6b1a0be404a0e7acd1979ebc70bb00a37c3253275c53"
+   "sha256": "0c609ca9954fb707415cdfaa1b6c2b14797e64afe5ffd45c85a38700a8b4ea5a"
   },
   {
-   "bytes": 4500,
+   "bytes": 4495,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/h2-uv-stage.json",
-   "sha256": "12722e72d09d8a6d80e2fc7ec0aa62232c7a9553f108a0ebea95ec9936a246d4"
+   "sha256": "0a2d75a0ec1939b1b0874debd2d2cb4b371baf201c44f8014af9b7435f23f95c"
   },
   {
    "bytes": 921,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/k2-projection.json",
-   "sha256": "964ba0ac6aff21af94f4875447cdca4882904567d5145a5128db79bc4a805269"
+   "sha256": "c262c6401a5664deed176460e8bdd135b9dbccf1537bfbbf52ab04a239dc9baf"
   },
   {
-   "bytes": 11410,
+   "bytes": 11175,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/nape-visibility-h2-baseline.json",
+   "sha256": "bdaf34301dcfa4d15c0b459ab020d766d2f212ab773b66223d5d4732076a5a44"
+  },
+  {
+   "bytes": 11187,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/nape-visibility.json",
+   "sha256": "305d225797f1453538204f7ceb9fcd329f9f89845f2ad2853859a0e65c7fda33"
+  },
+  {
+   "bytes": 22094,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/see-through-h2-baseline.json",
+   "sha256": "d4808d83c9740367f2e2eb929b3e8b7ae6451095026a3892024ae4f1acc956fe"
+  },
+  {
+   "bytes": 22216,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/see-through-holdout-h2-baseline.json",
+   "sha256": "bc35a081b604035e19930d1c3511f802b7facf8a23998e058d2b9fbe7c078bf6"
+  },
+  {
+   "bytes": 16891,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/see-through-holdout.json",
+   "sha256": "802ba9df6a2305dbf55fd8cdcbdff46a63c7470337433dc0397754fad7d87b04"
+  },
+  {
+   "bytes": 16657,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/see-through.json",
-   "sha256": "80f4558a591be6767708adb3f7324089d1fcaf9c99ebc3478e672d5cb1441db1"
+   "sha256": "d1493d0e415b46c203e527c5ddafed45d820c93b9271e10f9794d8fe38e01d38"
   },
   {
-   "bytes": 6602,
+   "bytes": 10922,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/textures-report.json",
-   "sha256": "d9858c10a847006e4f36242b1c8efd7ff422c558db6ddc63933c39db007b9d7b"
+   "sha256": "0d43aa6a800c26a0290b78da476022400f5b0bb42537706376c57cfe8e1b648e"
   },
   {
-   "bytes": 4357,
+   "bytes": 4360,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/uv-report.json",
-   "sha256": "6db7a8d89a41492a63f95e88816da593a2fe63086c11a8e8b796a44c3bf387cb"
+   "sha256": "5995cbfb604dd6d34779aec42dc1a7d04a758d64379e8971a8487c1799fa0215"
   },
   {
    "bytes": 1524,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/reports/validate-skeletal-mesh-v2.json",
-   "sha256": "cd27d09dc51b87ccc2fd7d810f33982c64faee87332a72a5d384b430cdbea2cd"
+   "sha256": "65053bcf615c6c9710b902b665e58f1cd4fde6ce865614f3002f097b2ef972d0"
   },
   {
-   "bytes": 5210163,
+   "bytes": 5246050,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/2k/T_Harpy_H2_BC.png",
-   "sha256": "c01417784bfa20abc883fa82d4a81de37d680e5e26df9c58e990f52a267b8ddd"
+   "sha256": "a23a55c652e84536f73f451c41f41caa6c990aa00a590bb044f8957e29197019"
   },
   {
-   "bytes": 5750269,
+   "bytes": 5781825,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/2k/T_Harpy_H2_N.png",
-   "sha256": "b5853e84ac116e34422ea6d24e5e5a4e00f77a71515c6dcbaa94af00ef109cf0"
+   "sha256": "3cd4d36df8bc7a13c97aaf056fbf94e8ddc715f50514223cf2f4aa0851b9963b"
   },
   {
-   "bytes": 5751613,
+   "bytes": 5782997,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/2k/T_Harpy_H2_N_OpenGL.png",
-   "sha256": "2069ac5b66133702e9481496568e478bb57f5bbdcebadf815e3d0f568a509d46"
+   "sha256": "1abb165f47204694acbfe349d5858b55e8012e778ecbd3e94025d2b86810bc40"
   },
   {
-   "bytes": 4261655,
+   "bytes": 3692215,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/2k/T_Harpy_H2_ORM.png",
-   "sha256": "1a5dadbbbe3f50f25c4b333242651df0b82006133c095d3622985ea6fdd45577"
+   "sha256": "e0530962214e70b360fc6a9abae6f24eb4382e657494f09fe3fbb758f7a6eb0d"
   },
   {
-   "bytes": 799569,
+   "bytes": 783623,
    "commit": true,
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/2k/T_Harpy_H2_TeamMask.png",
-   "sha256": "49bc1d88378207b022440df592638071c8a49ea6c86cbdf0d703fdbbbf7b4064"
+   "sha256": "5dd50297f04257b42b1caa26ed49f1631add0e230e29580fd7fd2cd6fecd4ad6"
   },
   {
-   "bytes": 14520129,
-   "commit": true,
+   "bytes": 14718277,
+   "commit": false,
+   "note": "4K master: local only (asset .gitignore), sha256 pinned here and in reports/textures-report.json",
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_BC.png",
-   "sha256": "6c39cc81410c470863b409ccf5fa5679fe6df02da0111c842bff329be2133203"
+   "sha256": "4705c2d57981643af6633a53330df93f7d16b85f4e99976bc9231feb91bd047f"
   },
   {
-   "bytes": 15039033,
-   "commit": true,
+   "bytes": 15082417,
+   "commit": false,
+   "note": "4K master: local only (asset .gitignore), sha256 pinned here and in reports/textures-report.json",
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_N.png",
-   "sha256": "f172622fc4c628dac9131e04e4506b1b00473efc37426711ecc1e6519a84149d"
+   "sha256": "bcf08cd1439afd1dbc80a492970c4598df9fb83637c889df673e2de9eb428155"
   },
   {
-   "bytes": 15043560,
-   "commit": true,
+   "bytes": 15086512,
+   "commit": false,
+   "note": "4K master: local only (asset .gitignore), sha256 pinned here and in reports/textures-report.json",
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_N_OpenGL.png",
-   "sha256": "97c10313a443ea5a906b0281d9d10f8aaef1c6e8aca4bf3a722bb552ecc15455"
+   "sha256": "196211137e30d3dcf8c3b5c70e1a9bd097cd2d832adb4f66a56969959bc14aeb"
   },
   {
-   "bytes": 11664238,
-   "commit": true,
+   "bytes": 10023871,
+   "commit": false,
+   "note": "4K master: local only (asset .gitignore), sha256 pinned here and in reports/textures-report.json",
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_ORM.png",
-   "sha256": "1dfaaddb8d646b9315110dfa91d62872ea531c188120bc0915541178d74d2e71"
+   "sha256": "61fcca962cd1eff3b22f05d9174dceaf1b04b40fea879435da19dc0607e6a940"
   },
   {
-   "bytes": 2175857,
-   "commit": true,
+   "bytes": 2135857,
+   "commit": false,
+   "note": "4K master: local only (asset .gitignore), sha256 pinned here and in reports/textures-report.json",
    "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_TeamMask.png",
-   "sha256": "51c18a6f62c4965361e36da2155b5e9cfac282eddef310f62fe7643556b9884e"
+   "sha256": "328eb32ed243cb3fc4262375b52f0effef1cf1d88c3cb27f3d015c59b8a2b51f"
+  },
+  {
+   "bytes": 368385,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/base_1k/T_Harpy_H2_Base_BC.png",
+   "sha256": "b92f1ce0249833b70c0f5232a5b910b6873fb3d3d377ab665978598823160a8d"
+  },
+  {
+   "bytes": 418163,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/base_1k/T_Harpy_H2_Base_N.png",
+   "sha256": "b671edc08f8dcf70c6449db552f6a8ec2b36c930cf1409c485881686ac1fd9e6"
+  },
+  {
+   "bytes": 417982,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/base_1k/T_Harpy_H2_Base_N_OpenGL.png",
+   "sha256": "ce8e9f70dbe773e9b84a67e08789311658148018fc48f6a9e715c30b4920b577"
+  },
+  {
+   "bytes": 260113,
+   "commit": true,
+   "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/base_1k/T_Harpy_H2_Base_ORM.png",
+   "sha256": "851849946137daf7074c00ecf7fa71d999614c840db759943babfbad8a61f0cf"
   }
  ],
- "files_total_bytes": 103598897,
+ "files_total_bytes": 107691275,
  "game_mesh": {
   "parts": {
    "cap_100": {
     "distance_high_to_low": {
-     "max_mm": 0.008,
-     "p50_mm": 0.0,
-     "p95_mm": 0.0,
-     "p99_mm": 0.001
+     "max_mm": 0.344,
+     "p50_mm": 0.027,
+     "p95_mm": 0.116,
+     "p99_mm": 0.173
     },
     "distance_low_to_high": {
-     "max_mm": 0.009,
-     "p50_mm": 0.0,
-     "p95_mm": 0.0,
-     "p99_mm": 0.001
+     "max_mm": 0.269,
+     "p50_mm": 0.027,
+     "p95_mm": 0.114,
+     "p99_mm": 0.163
     },
-    "faces_flipped_vs_highpoly_fraction": 0.0,
+    "faces_flipped_vs_highpoly_fraction": 0.0018,
     "inconsistent_winding_edges": 0,
     "non_manifold_edges": 0,
     "open_edges": 0,
     "priority_regions": {},
     "role": "neck cap (repair of the trimmed hood / dropped Janus face part)",
     "side": "C",
-    "target_triangles": 500,
-    "triangles": 874,
+    "target_triangles": 250,
+    "triangles": 436,
     "vertex_group_factor": null,
-    "vertices": 439
+    "vertices": 220
    },
-   "patch_101": {
+   "fill_102": {
     "distance_high_to_low": {
-     "max_mm": 1.92,
-     "p50_mm": 0.263,
-     "p95_mm": 0.881,
-     "p99_mm": 1.241
+     "max_mm": 14.862,
+     "p50_mm": 0.514,
+     "p95_mm": 2.659,
+     "p99_mm": 5.656
     },
     "distance_low_to_high": {
-     "max_mm": 1.814,
-     "p50_mm": 0.247,
-     "p95_mm": 0.813,
-     "p99_mm": 0.973
+     "max_mm": 3.56,
+     "p50_mm": 0.274,
+     "p95_mm": 1.294,
+     "p99_mm": 1.883
     },
-    "faces_flipped_vs_highpoly_fraction": 0.0289,
+    "faces_flipped_vs_highpoly_fraction": 0.1667,
     "inconsistent_winding_edges": 0,
     "non_manifold_edges": 0,
-    "open_edges": 605,
+    "open_edges": 713,
     "priority_regions": {},
-    "role": "nape feathers: copy of the head's back feathers over the cap, with backing sheet (repair)",
+    "role": "nape feathers: 14 conformed copies of dark collar feathers over the neck cap (repair.fills, H2.1)",
     "side": "C",
-    "target_triangles": 800,
-    "triangles": 799,
+    "target_triangles": 1400,
+    "triangles": 1399,
     "vertex_group_factor": null,
-    "vertices": 726
+    "vertices": 1067
    },
    "tripo_part_0": {
     "distance_high_to_low": {
@@ -1977,9 +2228,9 @@
      "p99_mm": 1.211
     },
     "faces_flipped_vs_highpoly_fraction": 0.0039,
-    "inconsistent_winding_edges": 1,
-    "non_manifold_edges": 1,
-    "open_edges": 186,
+    "inconsistent_winding_edges": 0,
+    "non_manifold_edges": 0,
+    "open_edges": 189,
     "priority_regions": {
      "talons": {
       "min_triangles": null,
@@ -1987,7 +2238,7 @@
       "triangles_lowpoly": 1317,
       "uv_density_factor": 1.5,
       "vertices_highpoly": 34366,
-      "vertices_lowpoly": 743
+      "vertices_lowpoly": 745
      }
     },
     "role": "left foot: scaled tarsus, toes, talons",
@@ -1995,7 +2246,7 @@
     "target_triangles": 1300,
     "triangles": 1317,
     "vertex_group_factor": null,
-    "vertices": 743
+    "vertices": 745
    },
    "tripo_part_11": {
     "distance_high_to_low": {
@@ -2136,16 +2387,16 @@
      "p99_mm": 1.177
     },
     "faces_flipped_vs_highpoly_fraction": 0.0046,
-    "inconsistent_winding_edges": 5,
-    "non_manifold_edges": 2,
-    "open_edges": 200,
+    "inconsistent_winding_edges": 3,
+    "non_manifold_edges": 0,
+    "open_edges": 201,
     "priority_regions": {},
     "role": "left leg: feathered thigh, shin, gold ankle band",
     "side": "L",
     "target_triangles": 1600,
     "triangles": 1657,
     "vertex_group_factor": null,
-    "vertices": 921
+    "vertices": 923
    },
    "tripo_part_8": {
     "distance_high_to_low": {
@@ -2216,10 +2467,10 @@
   },
   "silhouette_iou_vs_highpoly": {
    "back": {
-    "hp_px": 590210,
-    "iou": 0.98863,
-    "lp_px": 589200,
-    "xor_px": 6742
+    "hp_px": 590296,
+    "iou": 0.98866,
+    "lp_px": 589206,
+    "xor_px": 6726
    },
    "feet_front": {
     "hp_px": 343160,
@@ -2228,10 +2479,10 @@
     "xor_px": 8098
    },
    "front": {
-    "hp_px": 590060,
-    "iou": 0.98838,
-    "lp_px": 589018,
-    "xor_px": 6890
+    "hp_px": 590092,
+    "iou": 0.98835,
+    "lp_px": 589025,
+    "xor_px": 6907
    },
    "head_3q": {
     "hp_px": 794915,
@@ -2240,22 +2491,22 @@
     "xor_px": 39242
    },
    "head_front": {
-    "hp_px": 771726,
+    "hp_px": 771725,
     "iou": 0.92279,
-    "lp_px": 780846,
-    "xor_px": 62342
+    "lp_px": 780837,
+    "xor_px": 62346
    },
    "side_left": {
-    "hp_px": 401186,
-    "iou": 0.98876,
-    "lp_px": 400797,
-    "xor_px": 4531
+    "hp_px": 401181,
+    "iou": 0.98872,
+    "lp_px": 400786,
+    "xor_px": 4547
    },
    "top": {
-    "hp_px": 283586,
-    "iou": 0.98443,
-    "lp_px": 283097,
-    "xor_px": 4447
+    "hp_px": 283569,
+    "iou": 0.98422,
+    "lp_px": 283121,
+    "xor_px": 4506
    },
    "wing_tip_back": {
     "hp_px": 493877,
@@ -2265,7 +2516,2050 @@
    }
   },
   "triangles_base": 864,
-  "triangles_figure": 28458
+  "triangles_figure": 28620
+ },
+ "h21": {
+  "base": {
+   "profile": {
+    "dents": 900,
+    "normal_strength": 1.5,
+    "note": "H2.1 metal base (proposal; UE not touched): the parametric base keeps its mesh, pips and vertex mask; UV0 re-laid by base_gold.uv_layout, own 1K texture set T_Harpy_H2_Base_{BC,N,ORM} (base_textures.py). UE route: M_UM_BaseMarker MI with BaseColorTexture/NormalTexture/ORMTexture = these, BaseColor (1,1,1), VertexMaskWeight 1 (team band + pips from the vertex mask), SideBandWeight 0, BandKeepsTexture 0, PipColor / PipEmissive as before. M_UM_BaseMarker takes Metallic = ORM.B and Roughness = lerp(RoughnessMin, RoughnessMax, ORM.G), so the texture carries the metal",
+    "preview": {
+     "BaseColor": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "PipColor": [
+      0.78,
+      0.74,
+      0.64
+     ],
+     "PipEmissive": 0.35,
+     "VertexMaskWeight": 1.0
+    },
+    "seed": 21,
+    "surfaces": {
+     "band": {
+      "colour_linear": [
+       0.78,
+       0.52,
+       0.16
+      ],
+      "patina_amount": 0.25,
+      "patina_linear": [
+       0.45,
+       0.29,
+       0.09
+      ],
+      "roughness_max": 0.4,
+      "roughness_min": 0.3,
+      "value_variation": 0.12,
+      "why": "bright gold (shows only with BandKeepsTexture 1; the default flat team band takes its ORM: metal)"
+     },
+     "top": {
+      "colour_linear": [
+       0.3,
+       0.19,
+       0.065
+      ],
+      "patina_amount": 0.35,
+      "patina_linear": [
+       0.16,
+       0.1,
+       0.04
+      ],
+      "roughness_max": 0.45,
+      "roughness_min": 0.32,
+      "value_variation": 0.18,
+      "why": "antique gold / bronze leaf of the concept base (concept front, base median sRGB (0.66, 0.50, 0.26) = linear (0.39, 0.21, 0.06) as lit); kept darker than the lit pips (instance read: pip - top >= 40 luma, analyse_instances.py)"
+     }
+    },
+    "texture_prefix": "T_Harpy_H2_Base",
+    "texture_px": 1024,
+    "uv_layout": {
+     "band_v": [
+      0.01,
+      0.085
+     ],
+     "bottom_uv": [
+      0.02,
+      0.97
+     ],
+     "side_normal_z_max": 0.9,
+     "top_centre_uv": [
+      0.5,
+      0.55
+     ],
+     "top_radius_uv": 0.43
+    }
+   },
+   "textures": {
+    "BC": {
+     "bytes": 368385,
+     "mode": "RGB",
+     "path": "textures/base_1k/T_Harpy_H2_Base_BC.png",
+     "sha256": "b92f1ce0249833b70c0f5232a5b910b6873fb3d3d377ab665978598823160a8d",
+     "size": [
+      1024,
+      1024
+     ]
+    },
+    "N": {
+     "bytes": 418163,
+     "mode": "RGB",
+     "path": "textures/base_1k/T_Harpy_H2_Base_N.png",
+     "sha256": "b671edc08f8dcf70c6449db552f6a8ec2b36c930cf1409c485881686ac1fd9e6",
+     "size": [
+      1024,
+      1024
+     ]
+    },
+    "N_OpenGL": {
+     "bytes": 417982,
+     "mode": "RGB",
+     "path": "textures/base_1k/T_Harpy_H2_Base_N_OpenGL.png",
+     "sha256": "ce8e9f70dbe773e9b84a67e08789311658148018fc48f6a9e715c30b4920b577",
+     "size": [
+      1024,
+      1024
+     ]
+    },
+    "ORM": {
+     "bytes": 260113,
+     "mode": "RGB",
+     "path": "textures/base_1k/T_Harpy_H2_Base_ORM.png",
+     "sha256": "851849946137daf7074c00ecf7fa71d999614c840db759943babfbad8a61f0cf",
+     "size": [
+      1024,
+      1024
+     ]
+    },
+    "_stats": {
+     "band": {
+      "bc_linear_mean": [
+       0.7778,
+       0.5183,
+       0.1595
+      ],
+      "metallic": 1.0,
+      "roughness_mean": 0.3473,
+      "roughness_p1_p99": [
+       0.3078,
+       0.3843
+      ]
+     },
+     "normal_tilt_p99_deg": 3.23,
+     "top": {
+      "bc_linear_mean": [
+       0.2959,
+       0.1874,
+       0.0643
+      ],
+      "metallic": 1.0,
+      "roughness_mean": 0.3842,
+      "roughness_p1_p99": [
+       0.339,
+       0.4304
+      ]
+     }
+    }
+   },
+   "uv": {
+    "band": 144,
+    "bottom": 72,
+    "pip": 288,
+    "top": 72
+   }
+  },
+  "fills": {
+   "fill_102": {
+    "area_m2": 0.0692046,
+    "boxes": [
+     {
+      "max": [
+       -0.02,
+       0.1,
+       0.465
+      ],
+      "min": [
+       -0.066,
+       0.0,
+       0.395
+      ]
+     }
+    ],
+    "copies": 14,
+    "faces": 117165,
+    "faces_per_copy": 10893,
+    "height_scale": 0.7,
+    "lift_m": 0.001,
+    "ray_misses": 20967,
+    "source": "HP_tripo_part_1",
+    "source_centre_m": [
+     -0.0449,
+     0.0298,
+     0.4251
+    ],
+    "source_height_range_m": 0.0325,
+    "source_normal": [
+     -0.067,
+     0.8153,
+     0.5752
+    ],
+    "surface": "cap_100",
+    "targets": [
+     {
+      "at": [
+       -0.045,
+       0.012,
+       0.435
+      ],
+      "faces_dropped_outside": 451,
+      "normal": [
+       -0.4835,
+       0.2357,
+       -0.843
+      ],
+      "on_surface": [
+       -0.0402,
+       0.0096,
+       0.4435
+      ],
+      "scale": 0.6,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.045,
+       0.012,
+       0.435
+      ],
+      "faces_dropped_outside": 1075,
+      "normal": [
+       0.4592,
+       0.3011,
+       -0.8358
+      ],
+      "on_surface": [
+       0.0416,
+       0.0098,
+       0.4412
+      ],
+      "scale": 0.6,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       -0.03,
+       0.0,
+       0.46
+      ],
+      "faces_dropped_outside": 1703,
+      "normal": [
+       0.0443,
+       0.0746,
+       0.9962
+      ],
+      "on_surface": [
+       -0.0302,
+       -0.0004,
+       0.4545
+      ],
+      "scale": 0.8,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.0,
+       0.0,
+       0.465
+      ],
+      "faces_dropped_outside": 153,
+      "normal": [
+       -0.1423,
+       0.1695,
+       0.9752
+      ],
+      "on_surface": [
+       -0.0006,
+       -0.0019,
+       0.4535
+      ],
+      "scale": 0.8,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.03,
+       0.0,
+       0.46
+      ],
+      "faces_dropped_outside": 2303,
+      "normal": [
+       -0.1876,
+       0.2613,
+       0.9468
+      ],
+      "on_surface": [
+       0.031,
+       -0.0015,
+       0.4547
+      ],
+      "scale": 0.8,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       -0.015,
+       0.03,
+       0.43
+      ],
+      "faces_dropped_outside": 1003,
+      "normal": [
+       -0.0088,
+       0.9726,
+       0.2325
+      ],
+      "on_surface": [
+       -0.0149,
+       0.0238,
+       0.4285
+      ],
+      "scale": 0.75,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.015,
+       0.03,
+       0.43
+      ],
+      "faces_dropped_outside": 1704,
+      "normal": [
+       -0.1264,
+       0.9691,
+       0.2117
+      ],
+      "on_surface": [
+       0.0156,
+       0.0254,
+       0.429
+      ],
+      "scale": 0.75,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.0,
+       0.045,
+       0.4
+      ],
+      "faces_dropped_outside": 2380,
+      "normal": [
+       -0.0278,
+       0.8725,
+       0.4878
+      ],
+      "on_surface": [
+       0.0002,
+       0.0389,
+       0.3966
+      ],
+      "scale": 0.7,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       -0.05,
+       0.0,
+       0.456
+      ],
+      "faces_dropped_outside": 3491,
+      "normal": [
+       -0.3204,
+       -0.2424,
+       0.9158
+      ],
+      "on_surface": [
+       -0.0501,
+       -0.0001,
+       0.4563
+      ],
+      "scale": 0.55,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.05,
+       0.0,
+       0.456
+      ],
+      "faces_dropped_outside": 3558,
+      "normal": [
+       0.2106,
+       -0.349,
+       0.9131
+      ],
+      "on_surface": [
+       0.0497,
+       0.0005,
+       0.4546
+      ],
+      "scale": 0.55,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       -0.042,
+       0.028,
+       0.456
+      ],
+      "faces_dropped_outside": 6148,
+      "normal": [
+       -0.4037,
+       0.8922,
+       -0.2027
+      ],
+      "on_surface": [
+       -0.0422,
+       0.0284,
+       0.4559
+      ],
+      "scale": 0.55,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.042,
+       0.028,
+       0.456
+      ],
+      "faces_dropped_outside": 3915,
+      "normal": [
+       -0.1911,
+       -0.1601,
+       0.9684
+      ],
+      "on_surface": [
+       0.042,
+       0.028,
+       0.4559
+      ],
+      "scale": 0.55,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       -0.022,
+       -0.025,
+       0.455
+      ],
+      "faces_dropped_outside": 4289,
+      "normal": [
+       -0.1132,
+       -0.3553,
+       0.9279
+      ],
+      "on_surface": [
+       -0.022,
+       -0.0249,
+       0.4547
+      ],
+      "scale": 0.55,
+      "turn_deg": 0.0
+     },
+     {
+      "at": [
+       0.022,
+       -0.025,
+       0.455
+      ],
+      "faces_dropped_outside": 3164,
+      "normal": [
+       0.1788,
+       -0.3357,
+       0.9249
+      ],
+      "on_surface": [
+       0.0218,
+       -0.0246,
+       0.4539
+      ],
+      "scale": 0.55,
+      "turn_deg": 0.0
+     }
+    ],
+    "why": "H2.1 nape: the smooth dark cap_100 read as a bald hood inside the collar from every game camera (scratch HP probe 2026-09-29: cap pixels 210 441 over 8 game azimuths at pitch -55, ortho 0.22 m). The dark collar feathers right of the neck (tripo_part_1, box above; Tripo UVs and texture, 10.9k HP faces) are laid 14 times on the cap (8 on the dome and the V down the back, 6 around the rim lip), each copy conformed to the cap surface with its relief (x0.7) and turned so its feathers point down the nape / out over the collar; faces of a copy that fall wholly beyond the cap are dropped. Probe: cap pixels 210 441 -> 13 441 (-94 %). Proposal"
+   }
+  },
+  "materials": {
+   "face_cavity": {
+    "face_texels": 704385,
+    "factor_p1_p50": [
+     0.45,
+     0.9798
+    ],
+    "luminance_p5_before_after": [
+     0.0168,
+     0.0133
+    ],
+    "luminance_std_before_after": [
+     0.117,
+     0.1165
+    ],
+    "rule": {
+     "cavity_gain": 4.0,
+     "cavity_sigma_px": 6,
+     "cavity_strength": 0.5,
+     "contrast_strength": 0.6,
+     "density_factor_min": 2.0,
+     "detail_sigma_px": 3,
+     "min_factor": 0.45,
+     "parts": [
+      "tripo_part_0"
+     ],
+     "why": "face islands (UV priority x2): base colour x (1 - 0.5 cavity - 0.6 dark detail), cavity = local AO deficit (gaussian 6 px of the 4K bake), dark detail = relative luminance below a 3 px blur (brows, lids, nostrils, lip line): darkening only, so the painted features keep their shape and survive the 2K mips at K2"
+    }
+   },
+   "feathers": {
+    "metallic_max": 0.273,
+    "metallic_max_feather_ge_0_99": 0.0012,
+    "metallic_note": "texels with metallic > 0 inside the feather mask are the 3x3 soft edge of the gold bands (textures.metal_rule)",
+    "roughness_p1_p50_p99": [
+     0.7035,
+     0.7665,
+     0.833
+    ],
+    "rule": {
+     "ao_weight": 0.5,
+     "parts": [
+      "tripo_part_0",
+      "tripo_part_1",
+      "tripo_part_2",
+      "tripo_part_3",
+      "tripo_part_4",
+      "tripo_part_5",
+      "tripo_part_6",
+      "tripo_part_8",
+      "cap_100",
+      "fill_102"
+     ],
+     "roughness": [
+      0.7,
+      0.85
+     ],
+     "skin": {
+      "parts": [
+       "tripo_part_0"
+      ],
+      "s_max": 0.4,
+      "v_min": 0.45
+     },
+     "why": "Tripo roughness 0.65-0.94 per part (p5-p95), mean 0.77, metallic 0: remapped into 0.70-0.85, half the part's own Tripo rank, half the baked AO (exposed vanes smoother, occluded roots rougher); face/ear skin (v > 0.45, s < 0.4 on the head part), the gold bands and the talons excluded"
+    },
+    "skin_texels_over_0_5": 537002,
+    "texels_feather_over_0_5_metallic_over_0_05": 12796,
+    "texels_over_0_5": 14748823
+   },
+   "talons": {
+    "coverage_by_part": {
+     "tripo_part_10": 0.1789,
+     "tripo_part_9": 0.1719
+    },
+    "roughness_mean": 0.5011,
+    "rule": {
+     "bc_scale": 0.75,
+     "open_px": 3,
+     "parts": [
+      "tripo_part_9",
+      "tripo_part_10"
+     ],
+     "ramp": 0.06,
+     "roughness": [
+      0.4,
+      0.55
+     ],
+     "s_max": 0.3,
+     "v_max": 0.4,
+     "why": "the claws are the desaturated dark texels of the feet parts (Tripo sRGB v 0.16-0.35, s < 0.3; the scale crevices are saturated brown): roughness 0.40 (dark) - 0.55 (lighter), metallic 0, base colour x0.75 toward the black horn of the concept"
+    },
+    "texels_over_0_5": 214948
+   }
+  },
+  "nape_visibility": {
+   "frames": [
+    [
+     0,
+     3.86,
+     20
+    ],
+    [
+     20,
+     3.86,
+     23
+    ],
+    [
+     40,
+     3.86,
+     42
+    ],
+    [
+     60,
+     3.86,
+     83
+    ],
+    [
+     80,
+     3.86,
+     105
+    ],
+    [
+     100,
+     3.86,
+     109
+    ],
+    [
+     120,
+     3.86,
+     116
+    ],
+    [
+     140,
+     3.86,
+     132
+    ],
+    [
+     160,
+     3.86,
+     144
+    ],
+    [
+     180,
+     3.86,
+     149
+    ],
+    [
+     200,
+     3.86,
+     151
+    ],
+    [
+     220,
+     3.86,
+     154
+    ],
+    [
+     240,
+     3.86,
+     127
+    ],
+    [
+     260,
+     3.86,
+     119
+    ],
+    [
+     280,
+     3.86,
+     101
+    ],
+    [
+     300,
+     3.86,
+     98
+    ],
+    [
+     320,
+     3.86,
+     79
+    ],
+    [
+     340,
+     3.86,
+     41
+    ],
+    [
+     0,
+     4.8,
+     13
+    ],
+    [
+     20,
+     4.8,
+     13
+    ],
+    [
+     40,
+     4.8,
+     31
+    ],
+    [
+     60,
+     4.8,
+     61
+    ],
+    [
+     80,
+     4.8,
+     66
+    ],
+    [
+     100,
+     4.8,
+     67
+    ],
+    [
+     120,
+     4.8,
+     75
+    ],
+    [
+     140,
+     4.8,
+     92
+    ],
+    [
+     160,
+     4.8,
+     92
+    ],
+    [
+     180,
+     4.8,
+     101
+    ],
+    [
+     200,
+     4.8,
+     97
+    ],
+    [
+     220,
+     4.8,
+     92
+    ],
+    [
+     240,
+     4.8,
+     87
+    ],
+    [
+     260,
+     4.8,
+     69
+    ],
+    [
+     280,
+     4.8,
+     66
+    ],
+    [
+     300,
+     4.8,
+     57
+    ],
+    [
+     320,
+     4.8,
+     47
+    ],
+    [
+     340,
+     4.8,
+     27
+    ],
+    [
+     0,
+     7.5,
+     7
+    ],
+    [
+     20,
+     7.5,
+     7
+    ],
+    [
+     40,
+     7.5,
+     13
+    ],
+    [
+     60,
+     7.5,
+     22
+    ],
+    [
+     80,
+     7.5,
+     26
+    ],
+    [
+     100,
+     7.5,
+     28
+    ],
+    [
+     120,
+     7.5,
+     24
+    ],
+    [
+     140,
+     7.5,
+     32
+    ],
+    [
+     160,
+     7.5,
+     43
+    ],
+    [
+     180,
+     7.5,
+     35
+    ],
+    [
+     200,
+     7.5,
+     39
+    ],
+    [
+     220,
+     7.5,
+     37
+    ],
+    [
+     240,
+     7.5,
+     32
+    ],
+    [
+     260,
+     7.5,
+     29
+    ],
+    [
+     280,
+     7.5,
+     29
+    ],
+    [
+     300,
+     7.5,
+     25
+    ],
+    [
+     320,
+     7.5,
+     25
+    ],
+    [
+     340,
+     7.5,
+     11
+    ],
+    [
+     0,
+     12.07,
+     3
+    ],
+    [
+     20,
+     12.07,
+     4
+    ],
+    [
+     40,
+     12.07,
+     8
+    ],
+    [
+     60,
+     12.07,
+     5
+    ],
+    [
+     80,
+     12.07,
+     9
+    ],
+    [
+     100,
+     12.07,
+     12
+    ],
+    [
+     120,
+     12.07,
+     14
+    ],
+    [
+     140,
+     12.07,
+     12
+    ],
+    [
+     160,
+     12.07,
+     14
+    ],
+    [
+     180,
+     12.07,
+     17
+    ],
+    [
+     200,
+     12.07,
+     16
+    ],
+    [
+     220,
+     12.07,
+     12
+    ],
+    [
+     240,
+     12.07,
+     15
+    ],
+    [
+     260,
+     12.07,
+     11
+    ],
+    [
+     280,
+     12.07,
+     10
+    ],
+    [
+     300,
+     12.07,
+     11
+    ],
+    [
+     320,
+     12.07,
+     7
+    ],
+    [
+     340,
+     12.07,
+     4
+    ]
+   ],
+   "h21": {
+    "by_distance": {
+     "12.07": {
+      "cap_px": 184,
+      "figure_px": 105248,
+      "worst_frame_cap_px": 17
+     },
+     "3.86": {
+      "cap_px": 1793,
+      "figure_px": 1063094,
+      "worst_frame_cap_px": 154
+     },
+     "4.8": {
+      "cap_px": 1153,
+      "figure_px": 680815,
+      "worst_frame_cap_px": 101
+     },
+     "7.5": {
+      "cap_px": 464,
+      "figure_px": 274804,
+      "worst_frame_cap_px": 43
+     }
+    },
+    "labelled_faces": {
+     "cap": 436,
+     "core": 558,
+     "mark": 1815,
+     "other": 27429
+    },
+    "total_cap_px": 3594
+   },
+   "h2_baseline": {
+    "by_distance": {
+     "12.07": {
+      "cap_px": 1780,
+      "figure_px": 105126,
+      "worst_frame_cap_px": 163
+     },
+     "3.86": {
+      "cap_px": 17873,
+      "figure_px": 1061881,
+      "worst_frame_cap_px": 1699
+     },
+     "4.8": {
+      "cap_px": 11430,
+      "figure_px": 680046,
+      "worst_frame_cap_px": 1078
+     },
+     "7.5": {
+      "cap_px": 4636,
+      "figure_px": 274497,
+      "worst_frame_cap_px": 436
+     }
+    },
+    "labelled_faces": {
+     "cap": 874,
+     "core": 0,
+     "mark": 799,
+     "other": 26785
+    },
+    "total_cap_px": 35719
+   }
+  },
+  "nonmanifold_fix_lowpoly": {
+   "tripo_part_10": {
+    "edges_before": 1,
+    "faces_removed": 0,
+    "left": 0,
+    "vertex_splits": 2
+   },
+   "tripo_part_6": {
+    "edges_before": 2,
+    "faces_removed": 0,
+    "left": 0,
+    "vertex_splits": 2
+   }
+  },
+  "review_frames": {
+   "baseline_run": "harpy-h2-bake/2 (local copy)",
+   "frames": {
+    "_images": {
+     "baseline": [
+      "baseline:textures/4k/T_Harpy_H2_BC.png",
+      "baseline:textures/4k/T_Harpy_H2_N_OpenGL.png",
+      "baseline:textures/4k/T_Harpy_H2_ORM.png"
+     ],
+     "run": [
+      "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/base_1k/T_Harpy_H2_Base_BC.png",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/base_1k/T_Harpy_H2_Base_N_OpenGL.png",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/base_1k/T_Harpy_H2_Base_ORM.png",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_BC.png",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_N_OpenGL.png",
+      "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/textures/4k/T_Harpy_H2_ORM.png"
+     ]
+    },
+    "h21_base_band": {
+     "direction": [
+      0.3137,
+      -0.8962,
+      0.3137
+     ],
+     "label": "blender",
+     "ortho": 0.2,
+     "res": [
+      1000,
+      1000
+     ],
+     "target_m": [
+      0.0,
+      -0.06,
+      0.04
+     ]
+    },
+    "h21_concept_back": {
+     "direction": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "label": "blender",
+     "ortho": 0.7247752808988763,
+     "res": [
+      1470,
+      1070
+     ],
+     "target_m": [
+      0,
+      0,
+      0.20897699304440875
+     ]
+    },
+    "h21_concept_front": {
+     "direction": [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     "label": "blender",
+     "ortho": 0.7247752808988763,
+     "res": [
+      1470,
+      1070
+     ],
+     "target_m": [
+      0,
+      0,
+      0.20897699304440875
+     ]
+    },
+    "h21_concept_side": {
+     "direction": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "label": "blender",
+     "ortho": 0.7247752808988763,
+     "res": [
+      1470,
+      1070
+     ],
+     "target_m": [
+      0,
+      0,
+      0.20897699304440875
+     ]
+    },
+    "h21_face_game_az000": {
+     "direction": [
+      0.0,
+      -0.5736,
+      0.8192
+     ],
+     "label": "blender",
+     "ortho": 0.09,
+     "res": [
+      1000,
+      1000
+     ],
+     "target_m": [
+      -0.0030700000934302807,
+      -0.08444000035524368,
+      0.3204599964618683
+     ]
+    },
+    "h21_headpitch00_k2_5x_az000": {
+     "direction": [
+      0.0,
+      -0.5736,
+      0.8192
+     ],
+     "distance": 3.86,
+     "fov_h": 35,
+     "label": "blender, pose probe (head bone pitched 0 deg up), not a mesh change",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h21_headpitch12_k2_5x_az000": {
+     "direction": [
+      0.0,
+      -0.5736,
+      0.8192
+     ],
+     "distance": 3.86,
+     "fov_h": 35,
+     "label": "blender, pose probe (head bone pitched 12 deg up), not a mesh change",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h21_k2_1p6x_az000": {
+     "direction": [
+      0.0,
+      -0.5736,
+      0.8192
+     ],
+     "distance": 12.07,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h21_k2_1p6x_az040": {
+     "direction": [
+      0.3687,
+      -0.4394,
+      0.8192
+     ],
+     "distance": 12.07,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h21_k2_1p6x_az140": {
+     "direction": [
+      0.3687,
+      0.4394,
+      0.8192
+     ],
+     "distance": 12.07,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h21_k2_1p6x_az180": {
+     "direction": [
+      0.0,
+      0.5736,
+      0.8192
+     ],
+     "distance": 12.07,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h21_k2_5x_az000": {
+     "direction": [
+      0.0,
+      -0.5736,
+      0.8192
+     ],
+     "distance": 3.86,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h21_k2_5x_az040": {
+     "direction": [
+      0.3687,
+      -0.4394,
+      0.8192
+     ],
+     "distance": 3.86,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h21_k2_5x_az140": {
+     "direction": [
+      0.3687,
+      0.4394,
+      0.8192
+     ],
+     "distance": 3.86,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h21_k2_5x_az180": {
+     "direction": [
+      0.0,
+      0.5736,
+      0.8192
+     ],
+     "distance": 3.86,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h21_nape_game_az140": {
+     "direction": [
+      0.3687,
+      0.4394,
+      0.8192
+     ],
+     "label": "blender",
+     "ortho": 0.2,
+     "res": [
+      1000,
+      1000
+     ],
+     "target_m": [
+      0,
+      0.02,
+      0.29
+     ]
+    },
+    "h21_nape_game_az180": {
+     "direction": [
+      0.0,
+      0.5736,
+      0.8192
+     ],
+     "label": "blender",
+     "ortho": 0.2,
+     "res": [
+      1000,
+      1000
+     ],
+     "target_m": [
+      0,
+      0.02,
+      0.29
+     ]
+    },
+    "h21_nape_game_az220": {
+     "direction": [
+      -0.3687,
+      0.4394,
+      0.8192
+     ],
+     "label": "blender",
+     "ortho": 0.2,
+     "res": [
+      1000,
+      1000
+     ],
+     "target_m": [
+      0,
+      0.02,
+      0.29
+     ]
+    },
+    "h21_talons_3q": {
+     "direction": [
+      0.6767,
+      -0.6767,
+      0.29
+     ],
+     "label": "blender",
+     "ortho": 0.14,
+     "res": [
+      1000,
+      1000
+     ],
+     "target_m": [
+      0.035,
+      -0.03,
+      0.085
+     ]
+    },
+    "h21_team_gold_k2_5x": {
+     "direction": [
+      0.3687,
+      -0.4394,
+      0.8192
+     ],
+     "distance": 3.86,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h21_team_silver_k2_5x": {
+     "direction": [
+      0.3687,
+      -0.4394,
+      0.8192
+     ],
+     "distance": 3.86,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h2_base_band": {
+     "direction": [
+      0.3137,
+      -0.8962,
+      0.3137
+     ],
+     "label": "blender",
+     "ortho": 0.2,
+     "res": [
+      1000,
+      1000
+     ],
+     "target_m": [
+      0.0,
+      -0.06,
+      0.04
+     ]
+    },
+    "h2_concept_back": {
+     "direction": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "label": "blender",
+     "ortho": 0.7247752808988763,
+     "res": [
+      1470,
+      1070
+     ],
+     "target_m": [
+      0,
+      0,
+      0.20897699304440875
+     ]
+    },
+    "h2_concept_front": {
+     "direction": [
+      0.0,
+      -1.0,
+      0.0
+     ],
+     "label": "blender",
+     "ortho": 0.7247752808988763,
+     "res": [
+      1470,
+      1070
+     ],
+     "target_m": [
+      0,
+      0,
+      0.20897699304440875
+     ]
+    },
+    "h2_concept_side": {
+     "direction": [
+      1.0,
+      0.0,
+      0.0
+     ],
+     "label": "blender",
+     "ortho": 0.7247752808988763,
+     "res": [
+      1470,
+      1070
+     ],
+     "target_m": [
+      0,
+      0,
+      0.20897699304440875
+     ]
+    },
+    "h2_face_game_az000": {
+     "direction": [
+      0.0,
+      -0.5736,
+      0.8192
+     ],
+     "label": "blender",
+     "ortho": 0.09,
+     "res": [
+      1000,
+      1000
+     ],
+     "target_m": [
+      -0.0030700000934302807,
+      -0.08444000035524368,
+      0.3204599964618683
+     ]
+    },
+    "h2_k2_1p6x_az000": {
+     "direction": [
+      0.0,
+      -0.5736,
+      0.8192
+     ],
+     "distance": 12.07,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h2_k2_1p6x_az040": {
+     "direction": [
+      0.3687,
+      -0.4394,
+      0.8192
+     ],
+     "distance": 12.07,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h2_k2_1p6x_az140": {
+     "direction": [
+      0.3687,
+      0.4394,
+      0.8192
+     ],
+     "distance": 12.07,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h2_k2_1p6x_az180": {
+     "direction": [
+      0.0,
+      0.5736,
+      0.8192
+     ],
+     "distance": 12.07,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h2_k2_5x_az000": {
+     "direction": [
+      0.0,
+      -0.5736,
+      0.8192
+     ],
+     "distance": 3.86,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h2_k2_5x_az040": {
+     "direction": [
+      0.3687,
+      -0.4394,
+      0.8192
+     ],
+     "distance": 3.86,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h2_k2_5x_az140": {
+     "direction": [
+      0.3687,
+      0.4394,
+      0.8192
+     ],
+     "distance": 3.86,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h2_k2_5x_az180": {
+     "direction": [
+      0.0,
+      0.5736,
+      0.8192
+     ],
+     "distance": 3.86,
+     "fov_h": 35,
+     "label": "blender",
+     "res": [
+      1920,
+      1080
+     ],
+     "target_m": [
+      0,
+      0,
+      0.12
+     ]
+    },
+    "h2_nape_game_az140": {
+     "direction": [
+      0.3687,
+      0.4394,
+      0.8192
+     ],
+     "label": "blender",
+     "ortho": 0.2,
+     "res": [
+      1000,
+      1000
+     ],
+     "target_m": [
+      0,
+      0.02,
+      0.29
+     ]
+    },
+    "h2_nape_game_az180": {
+     "direction": [
+      0.0,
+      0.5736,
+      0.8192
+     ],
+     "label": "blender",
+     "ortho": 0.2,
+     "res": [
+      1000,
+      1000
+     ],
+     "target_m": [
+      0,
+      0.02,
+      0.29
+     ]
+    },
+    "h2_nape_game_az220": {
+     "direction": [
+      -0.3687,
+      0.4394,
+      0.8192
+     ],
+     "label": "blender",
+     "ortho": 0.2,
+     "res": [
+      1000,
+      1000
+     ],
+     "target_m": [
+      0,
+      0.02,
+      0.29
+     ]
+    },
+    "h2_talons_3q": {
+     "direction": [
+      0.6767,
+      -0.6767,
+      0.29
+     ],
+     "label": "blender",
+     "ortho": 0.14,
+     "res": [
+      1000,
+      1000
+     ],
+     "target_m": [
+      0.035,
+      -0.03,
+      0.085
+     ]
+    }
+   },
+   "k2_distances_m": {
+    "1.6x": 12.07,
+    "5x": 3.86
+   },
+   "label": "blender EEVEE preview light, back faces culled; not an UE frame"
+  },
+  "roughness_mean_covered_after": 0.7531,
+  "seal": {
+   "core": {
+    "crossing_faces_removed": 40,
+    "grid": [
+     53,
+     66,
+     99
+    ],
+    "margin_m": 0.003,
+    "min_distance_to_surface_m": 0.00044,
+    "min_inside_votes": 12,
+    "min_triangle_area_m2": 6.202462827786803e-05,
+    "nonmanifold_fix": {
+     "duplicate_faces_removed": 2,
+     "edges_before": 0,
+     "faces_removed": 0,
+     "left": 0,
+     "vertex_splits": 0
+    },
+    "rays": 14,
+    "triangles": 558,
+    "triangles_remesh": 69854,
+    "triangles_voxel": 56336,
+    "uv": [
+     0.908945,
+     0.084257
+    ],
+    "uv_from_part": "cap_100",
+    "vertex_moves_against_crossing": 2203,
+    "vertices_pulled_in": 198,
+    "voxel_m": 0.005,
+    "voxels_inside": 56483
+   },
+   "exposed": {
+    "fill_102": 416,
+    "tripo_part_0": 51,
+    "tripo_part_1": 112,
+    "tripo_part_10": 3,
+    "tripo_part_11": 0,
+    "tripo_part_2": 19,
+    "tripo_part_3": 48,
+    "tripo_part_4": 5,
+    "tripo_part_5": 1,
+    "tripo_part_6": 4,
+    "tripo_part_8": 3,
+    "tripo_part_9": 2
+   },
+   "lips": {
+    "tripo_part_0": {
+     "boundary_edges": 372,
+     "lip_edges": 24,
+     "lip_faces": 23,
+     "lip_triangles": 28,
+     "lip_vertices_welded": 9,
+     "tiny_triangles_dropped": 0,
+     "twin_edges_skipped": 0
+    },
+    "tripo_part_1": {
+     "boundary_edges": 832,
+     "lip_edges": 132,
+     "lip_faces": 131,
+     "lip_triangles": 239,
+     "lip_vertices_welded": 97,
+     "tiny_triangles_dropped": 0,
+     "twin_edges_skipped": 0
+    },
+    "tripo_part_10": {
+     "boundary_edges": 189,
+     "lip_edges": 7,
+     "lip_faces": 6,
+     "lip_triangles": 6,
+     "lip_vertices_welded": 2,
+     "tiny_triangles_dropped": 0,
+     "twin_edges_skipped": 2
+    },
+    "tripo_part_11": {
+     "boundary_edges": 103,
+     "lip_edges": 2,
+     "lip_faces": 2,
+     "lip_triangles": 2,
+     "lip_vertices_welded": 1,
+     "tiny_triangles_dropped": 0,
+     "twin_edges_skipped": 0
+    },
+    "tripo_part_2": {
+     "boundary_edges": 697,
+     "lip_edges": 23,
+     "lip_faces": 22,
+     "lip_triangles": 26,
+     "lip_vertices_welded": 10,
+     "tiny_triangles_dropped": 0,
+     "twin_edges_skipped": 0
+    },
+    "tripo_part_3": {
+     "boundary_edges": 649,
+     "lip_edges": 23,
+     "lip_faces": 19,
+     "lip_triangles": 22,
+     "lip_vertices_welded": 11,
+     "tiny_triangles_dropped": 0,
+     "twin_edges_skipped": 0
+    },
+    "tripo_part_4": {
+     "boundary_edges": 447,
+     "lip_edges": 16,
+     "lip_faces": 16,
+     "lip_triangles": 22,
+     "lip_vertices_welded": 10,
+     "tiny_triangles_dropped": 0,
+     "twin_edges_skipped": 0
+    },
+    "tripo_part_5": {
+     "boundary_edges": 511,
+     "lip_edges": 8,
+     "lip_faces": 8,
+     "lip_triangles": 10,
+     "lip_vertices_welded": 4,
+     "tiny_triangles_dropped": 0,
+     "twin_edges_skipped": 0
+    },
+    "tripo_part_6": {
+     "boundary_edges": 201,
+     "lip_edges": 4,
+     "lip_faces": 3,
+     "lip_triangles": 4,
+     "lip_vertices_welded": 1,
+     "tiny_triangles_dropped": 0,
+     "twin_edges_skipped": 0
+    },
+    "tripo_part_8": {
+     "boundary_edges": 185,
+     "lip_edges": 2,
+     "lip_faces": 2,
+     "lip_triangles": 2,
+     "lip_vertices_welded": 1,
+     "tiny_triangles_dropped": 0,
+     "twin_edges_skipped": 0
+    },
+    "tripo_part_9": {
+     "boundary_edges": 196,
+     "lip_edges": 2,
+     "lip_faces": 2,
+     "lip_triangles": 2,
+     "lip_vertices_welded": 0,
+     "tiny_triangles_dropped": 0,
+     "twin_edges_skipped": 0
+    }
+   },
+   "seconds": 349.6,
+   "settings": {
+    "core": {
+     "box_parts": [
+      "tripo_part_0",
+      "tripo_part_1",
+      "tripo_part_6",
+      "tripo_part_8"
+     ],
+     "enabled": true,
+     "margin_m": 0.003,
+     "min_inside_votes": 12,
+     "name": "core_103",
+     "rays": 14,
+     "remesh_voxel_m": 0.003,
+     "target_triangles": 600,
+     "uv_from_part": "cap_100",
+     "voxel_m": 0.005,
+     "why": "closed occluder inside head/torso/thighs: a ray that slips through a crack between parts meets its front face (one dark texel of the cap island) instead of culled back faces; weights copied from the nearest body vertex (weights.copy_nearest)"
+    },
+    "exclude_parts": [
+     "fill_102"
+    ],
+    "exposed": {
+     "azimuth_step_deg": 5.0,
+     "bary_steps": 3,
+     "elevations_deg": [
+      42.0,
+      48.0,
+      55.0,
+      62.0,
+      68.0
+     ],
+     "enabled": true,
+     "parts": [
+      "fill_102",
+      "tripo_part_0",
+      "tripo_part_1",
+      "tripo_part_2",
+      "tripo_part_3",
+      "tripo_part_4",
+      "tripo_part_5",
+      "tripo_part_6",
+      "tripo_part_8",
+      "tripo_part_9",
+      "tripo_part_10",
+      "tripo_part_11"
+     ],
+     "why": "the nape fill is an open sheet laid on the cap: its triangles whose back side is seen from a game direction (ray to the camera escapes) get a detached reversed copy"
+    },
+    "lips": {
+     "contact_m": 0.0025,
+     "enabled": true,
+     "exclude_parts": [],
+     "max_uv_px": 2.0,
+     "min_len_m": 0.0004,
+     "mode": "nearest",
+     "overshoot_m": 0.0005,
+     "targets_only": [
+      "cap_100"
+     ],
+     "tuck_m": 0.0002,
+     "why": "non-shared boundary edges within 2.5 mm of another part get a lip to 0.5 mm past the neighbour"
+    },
+    "note": "H2.1 see-through seal (seal.py), after the UV stage in stage_rig (authored frame, source metres). Scratch measurements 2026-09-29 on the H2.1 low-poly (see_through, 18 azimuths x 3.86/4.8/7.5/12.07 m): no seal 943 px (the nape fill's backs against the sky from the front, 1-8 px pinholes elsewhere); contact lips alone 902; exposed back faces alone 61; core + fill back faces 7; core + fill back faces + slivers + lips 0. Proposal",
+    "slivers": {
+     "enabled": true,
+     "exclude_parts": [],
+     "why": "boundary edges with both ends on a neighbour's boundary vertices but another path between them (stitch skipped the insertion, max_edge_factor): the sliver is filled by a fan of the part"
+    }
+   },
+   "slivers": {
+    "cap_100": {
+     "slivers": 0,
+     "tiny_triangles_dropped": 0,
+     "triangles": 0
+    },
+    "tripo_part_0": {
+     "slivers": 3,
+     "tiny_triangles_dropped": 1,
+     "triangles": 3
+    },
+    "tripo_part_1": {
+     "slivers": 5,
+     "tiny_triangles_dropped": 0,
+     "triangles": 9
+    },
+    "tripo_part_10": {
+     "slivers": 0,
+     "tiny_triangles_dropped": 0,
+     "triangles": 0
+    },
+    "tripo_part_11": {
+     "slivers": 0,
+     "tiny_triangles_dropped": 0,
+     "triangles": 0
+    },
+    "tripo_part_2": {
+     "slivers": 11,
+     "tiny_triangles_dropped": 0,
+     "triangles": 14
+    },
+    "tripo_part_3": {
+     "slivers": 5,
+     "tiny_triangles_dropped": 0,
+     "triangles": 5
+    },
+    "tripo_part_4": {
+     "slivers": 1,
+     "tiny_triangles_dropped": 0,
+     "triangles": 1
+    },
+    "tripo_part_5": {
+     "slivers": 1,
+     "tiny_triangles_dropped": 0,
+     "triangles": 1
+    },
+    "tripo_part_6": {
+     "slivers": 0,
+     "tiny_triangles_dropped": 0,
+     "triangles": 0
+    },
+    "tripo_part_8": {
+     "slivers": 0,
+     "tiny_triangles_dropped": 0,
+     "triangles": 0
+    },
+    "tripo_part_9": {
+     "slivers": 0,
+     "tiny_triangles_dropped": 0,
+     "triangles": 0
+    }
+   },
+   "triangles_after": {
+    "cap_100": 436,
+    "core_103": 558,
+    "fill_102": 1815,
+    "tripo_part_0": 5181,
+    "tripo_part_1": 3649,
+    "tripo_part_10": 1326,
+    "tripo_part_11": 329,
+    "tripo_part_2": 3128,
+    "tripo_part_3": 2921,
+    "tripo_part_4": 3136,
+    "tripo_part_5": 3322,
+    "tripo_part_6": 1665,
+    "tripo_part_8": 1454,
+    "tripo_part_9": 1318
+   }
+  },
+  "topology_body": {
+   "loose_vertices": 0,
+   "non_manifold_edges": 0,
+   "open_edges": 7232
+  }
  },
  "import": {
   "geometry_files_match": true,
@@ -2584,7 +4878,7 @@
       1
      ],
      "lit_slots": 3,
-     "min_lit_delta": 161.9,
+     "min_lit_delta": 107.1,
      "pip_radius_px": 2.27,
      "visible_slots": 7
     },
@@ -2593,7 +4887,7 @@
       2
      ],
      "lit_slots": 5,
-     "min_lit_delta": 154.1,
+     "min_lit_delta": 103.0,
      "pip_radius_px": 2.27,
      "visible_slots": 7
     },
@@ -2602,7 +4896,7 @@
       3
      ],
      "lit_slots": 7,
-     "min_lit_delta": 155.7,
+     "min_lit_delta": 102.0,
      "pip_radius_px": 2.27,
      "visible_slots": 7
     }
@@ -2616,7 +4910,7 @@
       1
      ],
      "lit_slots": 3,
-     "min_lit_delta": 177.3,
+     "min_lit_delta": 115.5,
      "pip_radius_px": 3.62,
      "visible_slots": 7
     },
@@ -2625,7 +4919,7 @@
       2
      ],
      "lit_slots": 5,
-     "min_lit_delta": 157.5,
+     "min_lit_delta": 103.5,
      "pip_radius_px": 3.62,
      "visible_slots": 7
     },
@@ -2634,7 +4928,7 @@
       3
      ],
      "lit_slots": 6,
-     "min_lit_delta": 157.6,
+     "min_lit_delta": 90.2,
      "pip_radius_px": 3.62,
      "visible_slots": 6
     }
@@ -2648,7 +4942,7 @@
       1
      ],
      "lit_slots": 3,
-     "min_lit_delta": 157.5,
+     "min_lit_delta": 94.9,
      "pip_radius_px": 5.63,
      "visible_slots": 8
     },
@@ -2657,7 +4951,7 @@
       2
      ],
      "lit_slots": 5,
-     "min_lit_delta": 156.5,
+     "min_lit_delta": 104.0,
      "pip_radius_px": 5.63,
      "visible_slots": 7
     },
@@ -2666,7 +4960,7 @@
       3
      ],
      "lit_slots": 6,
-     "min_lit_delta": 177.0,
+     "min_lit_delta": 85.1,
      "pip_radius_px": 5.63,
      "visible_slots": 6
     }
@@ -2680,7 +4974,7 @@
       1
      ],
      "lit_slots": 2,
-     "min_lit_delta": 157.6,
+     "min_lit_delta": 111.3,
      "pip_radius_px": 2.2,
      "visible_slots": 6
     },
@@ -2689,7 +4983,7 @@
       2
      ],
      "lit_slots": 5,
-     "min_lit_delta": 128.8,
+     "min_lit_delta": 86.9,
      "pip_radius_px": 1.97,
      "visible_slots": 8
     },
@@ -2698,7 +4992,7 @@
       3
      ],
      "lit_slots": 6,
-     "min_lit_delta": 158.4,
+     "min_lit_delta": 110.9,
      "pip_radius_px": 2.22,
      "visible_slots": 6
     }
@@ -2712,7 +5006,7 @@
       1
      ],
      "lit_slots": 2,
-     "min_lit_delta": 169.7,
+     "min_lit_delta": 117.6,
      "pip_radius_px": 3.57,
      "visible_slots": 6
     },
@@ -2721,7 +5015,7 @@
       2
      ],
      "lit_slots": 5,
-     "min_lit_delta": 114.8,
+     "min_lit_delta": 77.2,
      "pip_radius_px": 3.15,
      "visible_slots": 8
     },
@@ -2730,7 +5024,7 @@
       3
      ],
      "lit_slots": 6,
-     "min_lit_delta": 181.1,
+     "min_lit_delta": 114.9,
      "pip_radius_px": 3.59,
      "visible_slots": 6
     }
@@ -2744,7 +5038,7 @@
       1
      ],
      "lit_slots": 2,
-     "min_lit_delta": 163.6,
+     "min_lit_delta": 113.2,
      "pip_radius_px": 5.69,
      "visible_slots": 6
     },
@@ -2753,7 +5047,7 @@
       2
      ],
      "lit_slots": 5,
-     "min_lit_delta": 97.4,
+     "min_lit_delta": 65.4,
      "pip_radius_px": 4.9,
      "visible_slots": 7
     },
@@ -2762,14 +5056,14 @@
       3
      ],
      "lit_slots": 6,
-     "min_lit_delta": 180.5,
+     "min_lit_delta": 119.4,
      "pip_radius_px": 5.68,
      "visible_slots": 6
     }
    }
   }
  },
- "iteration": "H2 (проработка героев по концептам hero-quality-v1)",
+ "iteration": "H2.1 (точечная доводка: затылок, просветы, non-manifold, материалы; ревизия 3, harpy-h2-bake/3)",
  "k2_frames": {
   "k1_gamescale_front_prev_left_h2_right": {
    "azimuth_deg": 0,
@@ -2848,7 +5142,7 @@
     ],
     "face_region_bbox_px": [
      22.2,
-     16.9
+     17.1
     ],
     "figure_bbox_px": [
      163.5,
@@ -2863,7 +5157,7 @@
     ],
     "face_region_bbox_px": [
      36.1,
-     27.3
+     27.6
     ],
     "figure_bbox_px": [
      262.3,
@@ -2878,7 +5172,7 @@
     ],
     "face_region_bbox_px": [
      57.7,
-     43.4
+     43.9
     ],
     "figure_bbox_px": [
      411.5,
@@ -2891,9 +5185,9 @@
  },
  "module": "tools/tripo-pipeline/blender/h2_bake_harpy/",
  "profile": {
-  "path": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2-bake-h2.json",
-  "profile_id": "harpy-h2-bake/2",
-  "sha256": "290171af1526825c1b9960bcaaa432c90cdfa0889451dc73e7ed3edde8670ad3"
+  "path": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2-bake-h21.json",
+  "profile_id": "harpy-h2-bake/3",
+  "sha256": "e24a0b51101ccfd7da6c73177d21d83eef98341f7a24acc975ee1a72c9dbf252"
  },
  "repair": {
   "evidence_frames": [
@@ -2994,64 +5288,331 @@
      "why": "front-concept face of the Janus head (source -Y); after the 180 deg turn it would be a second face on the back of the head. Its neck sat in the hood/neck column of tripo_part_1 (see repair.trim)"
     }
    },
-   "occluder_only_parts": {
-    "tripo_part_7": "Tripo base (gold cylinder, source Ø0.321 m): AO occluder under the feet only; the game base is the parametric SM_Harpy_Base (instance pips, team band)"
-   },
-   "patches": {
-    "patch_101": {
-     "area_m2": 0.0242017,
+   "fills": {
+    "fill_102": {
+     "area_m2": 0.0692046,
      "boxes": [
       {
        "max": [
-        0.052,
-        0.0,
-        0.54
+        -0.02,
+        0.1,
+        0.465
        ],
        "min": [
-        -0.052,
-        -0.065,
-        0.43
+        -0.066,
+        0.0,
+        0.395
        ]
       }
      ],
-     "faces": 42712,
-     "faces_sheet": 21356,
-     "matrix": [
-      [
-       1.0,
-       0.0,
-       0.0,
-       0.0
-      ],
-      [
-       0.0,
-       1.0,
-       0.0,
-       0.045
-      ],
-      [
-       0.0,
-       0.0,
-       1.0,
-       -0.045
-      ],
-      [
-       0.0,
-       0.0,
-       0.0,
-       1.0
-      ]
+     "copies": 14,
+     "faces": 117165,
+     "faces_per_copy": 10893,
+     "height_scale": 0.7,
+     "lift_m": 0.001,
+     "ray_misses": 20967,
+     "source": "HP_tripo_part_1",
+     "source_centre_m": [
+      -0.0449,
+      0.0298,
+      0.4251
      ],
-     "solidify_m": 0.002,
-     "source": "HP_tripo_part_0",
-     "translate": [
-      0.0,
-      0.045,
-      -0.045
+     "source_height_range_m": 0.0325,
+     "source_normal": [
+      -0.067,
+      0.8153,
+      0.5752
      ],
-     "why": "the head's own back feathers (tripo_part_0 faces with centroid behind y -0.065, z 0.43..0.54, |x| <= 0.052; Tripo UVs and material kept) copied 4.5 cm back and 4.5 cm down over the cap's upper half, so the crest continues into the collar as on the back concept instead of a smooth dark shape; a reversed backing sheet 2 mm behind it (no rim) keeps its back side from showing culled faces toward the front camera (without it: 20-35 px see-through at azimuth 320-340). Proposal"
+     "surface": "cap_100",
+     "targets": [
+      {
+       "at": [
+        -0.045,
+        0.012,
+        0.435
+       ],
+       "faces_dropped_outside": 451,
+       "normal": [
+        -0.4835,
+        0.2357,
+        -0.843
+       ],
+       "on_surface": [
+        -0.0402,
+        0.0096,
+        0.4435
+       ],
+       "scale": 0.6,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        0.045,
+        0.012,
+        0.435
+       ],
+       "faces_dropped_outside": 1075,
+       "normal": [
+        0.4592,
+        0.3011,
+        -0.8358
+       ],
+       "on_surface": [
+        0.0416,
+        0.0098,
+        0.4412
+       ],
+       "scale": 0.6,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        -0.03,
+        0.0,
+        0.46
+       ],
+       "faces_dropped_outside": 1703,
+       "normal": [
+        0.0443,
+        0.0746,
+        0.9962
+       ],
+       "on_surface": [
+        -0.0302,
+        -0.0004,
+        0.4545
+       ],
+       "scale": 0.8,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        0.0,
+        0.0,
+        0.465
+       ],
+       "faces_dropped_outside": 153,
+       "normal": [
+        -0.1423,
+        0.1695,
+        0.9752
+       ],
+       "on_surface": [
+        -0.0006,
+        -0.0019,
+        0.4535
+       ],
+       "scale": 0.8,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        0.03,
+        0.0,
+        0.46
+       ],
+       "faces_dropped_outside": 2303,
+       "normal": [
+        -0.1876,
+        0.2613,
+        0.9468
+       ],
+       "on_surface": [
+        0.031,
+        -0.0015,
+        0.4547
+       ],
+       "scale": 0.8,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        -0.015,
+        0.03,
+        0.43
+       ],
+       "faces_dropped_outside": 1003,
+       "normal": [
+        -0.0088,
+        0.9726,
+        0.2325
+       ],
+       "on_surface": [
+        -0.0149,
+        0.0238,
+        0.4285
+       ],
+       "scale": 0.75,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        0.015,
+        0.03,
+        0.43
+       ],
+       "faces_dropped_outside": 1704,
+       "normal": [
+        -0.1264,
+        0.9691,
+        0.2117
+       ],
+       "on_surface": [
+        0.0156,
+        0.0254,
+        0.429
+       ],
+       "scale": 0.75,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        0.0,
+        0.045,
+        0.4
+       ],
+       "faces_dropped_outside": 2380,
+       "normal": [
+        -0.0278,
+        0.8725,
+        0.4878
+       ],
+       "on_surface": [
+        0.0002,
+        0.0389,
+        0.3966
+       ],
+       "scale": 0.7,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        -0.05,
+        0.0,
+        0.456
+       ],
+       "faces_dropped_outside": 3491,
+       "normal": [
+        -0.3204,
+        -0.2424,
+        0.9158
+       ],
+       "on_surface": [
+        -0.0501,
+        -0.0001,
+        0.4563
+       ],
+       "scale": 0.55,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        0.05,
+        0.0,
+        0.456
+       ],
+       "faces_dropped_outside": 3558,
+       "normal": [
+        0.2106,
+        -0.349,
+        0.9131
+       ],
+       "on_surface": [
+        0.0497,
+        0.0005,
+        0.4546
+       ],
+       "scale": 0.55,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        -0.042,
+        0.028,
+        0.456
+       ],
+       "faces_dropped_outside": 6148,
+       "normal": [
+        -0.4037,
+        0.8922,
+        -0.2027
+       ],
+       "on_surface": [
+        -0.0422,
+        0.0284,
+        0.4559
+       ],
+       "scale": 0.55,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        0.042,
+        0.028,
+        0.456
+       ],
+       "faces_dropped_outside": 3915,
+       "normal": [
+        -0.1911,
+        -0.1601,
+        0.9684
+       ],
+       "on_surface": [
+        0.042,
+        0.028,
+        0.4559
+       ],
+       "scale": 0.55,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        -0.022,
+        -0.025,
+        0.455
+       ],
+       "faces_dropped_outside": 4289,
+       "normal": [
+        -0.1132,
+        -0.3553,
+        0.9279
+       ],
+       "on_surface": [
+        -0.022,
+        -0.0249,
+        0.4547
+       ],
+       "scale": 0.55,
+       "turn_deg": 0.0
+      },
+      {
+       "at": [
+        0.022,
+        -0.025,
+        0.455
+       ],
+       "faces_dropped_outside": 3164,
+       "normal": [
+        0.1788,
+        -0.3357,
+        0.9249
+       ],
+       "on_surface": [
+        0.0218,
+        -0.0246,
+        0.4539
+       ],
+       "scale": 0.55,
+       "turn_deg": 0.0
+      }
+     ],
+     "why": "H2.1 nape: the smooth dark cap_100 read as a bald hood inside the collar from every game camera (scratch HP probe 2026-09-29: cap pixels 210 441 over 8 game azimuths at pitch -55, ortho 0.22 m). The dark collar feathers right of the neck (tripo_part_1, box above; Tripo UVs and texture, 10.9k HP faces) are laid 14 times on the cap (8 on the dome and the V down the back, 6 around the rim lip), each copy conformed to the cap surface with its relief (x0.7) and turned so its feathers point down the nape / out over the collar; faces of a copy that fall wholly beyond the cap are dropped. Probe: cap pixels 210 441 -> 13 441 (-94 %). Proposal"
     }
    },
+   "occluder_only_parts": {
+    "tripo_part_7": "Tripo base (gold cylinder, source Ø0.321 m): AO occluder under the feet only; the game base is the parametric SM_Harpy_Base (instance pips, team band)"
+   },
+   "patches": {},
    "plugs": {},
    "rotate_z_deg": 180.0,
    "trims": {
@@ -3178,39 +5739,228 @@
    "drop_parts": {
     "tripo_part_12": "front-concept face of the Janus head (source -Y); after the 180 deg turn it would be a second face on the back of the head. Its neck sat in the hood/neck column of tripo_part_1 (see repair.trim)"
    },
+   "fills": [
+    {
+     "boxes": [
+      {
+       "max": [
+        -0.02,
+        0.1,
+        0.465
+       ],
+       "min": [
+        -0.066,
+        0.0,
+        0.395
+       ]
+      }
+     ],
+     "drop_outside": true,
+     "height_scale": 0.7,
+     "lift_m": 0.001,
+     "name": "fill_102",
+     "source": "tripo_part_1",
+     "source_flow": [
+      0,
+      0,
+      -1
+     ],
+     "surface": "cap_100",
+     "targets": [
+      {
+       "at": [
+        -0.045,
+        0.012,
+        0.435
+       ],
+       "flow": [
+        -0.5,
+        0.5,
+        -1
+       ],
+       "scale": 0.6
+      },
+      {
+       "at": [
+        0.045,
+        0.012,
+        0.435
+       ],
+       "flow": [
+        0.5,
+        0.5,
+        -1
+       ],
+       "scale": 0.6
+      },
+      {
+       "at": [
+        -0.03,
+        0.0,
+        0.46
+       ],
+       "flow": [
+        0,
+        0.6,
+        -1
+       ],
+       "scale": 0.8
+      },
+      {
+       "at": [
+        0.0,
+        0.0,
+        0.465
+       ],
+       "flow": [
+        0,
+        0.6,
+        -1
+       ],
+       "scale": 0.8
+      },
+      {
+       "at": [
+        0.03,
+        0.0,
+        0.46
+       ],
+       "flow": [
+        0,
+        0.6,
+        -1
+       ],
+       "scale": 0.8
+      },
+      {
+       "at": [
+        -0.015,
+        0.03,
+        0.43
+       ],
+       "flow": [
+        0,
+        0.6,
+        -1
+       ],
+       "scale": 0.75
+      },
+      {
+       "at": [
+        0.015,
+        0.03,
+        0.43
+       ],
+       "flow": [
+        0,
+        0.6,
+        -1
+       ],
+       "scale": 0.75
+      },
+      {
+       "at": [
+        0.0,
+        0.045,
+        0.4
+       ],
+       "flow": [
+        0,
+        0.3,
+        -1
+       ],
+       "scale": 0.7
+      },
+      {
+       "at": [
+        -0.05,
+        0.0,
+        0.456
+       ],
+       "flow": [
+        -0.051,
+        -0.01,
+        -0.03
+       ],
+       "scale": 0.55
+      },
+      {
+       "at": [
+        0.05,
+        0.0,
+        0.456
+       ],
+       "flow": [
+        0.049,
+        -0.01,
+        -0.03
+       ],
+       "scale": 0.55
+      },
+      {
+       "at": [
+        -0.042,
+        0.028,
+        0.456
+       ],
+       "flow": [
+        -0.043,
+        0.018,
+        -0.03
+       ],
+       "scale": 0.55
+      },
+      {
+       "at": [
+        0.042,
+        0.028,
+        0.456
+       ],
+       "flow": [
+        0.041,
+        0.018,
+        -0.03
+       ],
+       "scale": 0.55
+      },
+      {
+       "at": [
+        -0.022,
+        -0.025,
+        0.455
+       ],
+       "flow": [
+        -0.011,
+        0.6,
+        -1
+       ],
+       "scale": 0.55
+      },
+      {
+       "at": [
+        0.022,
+        -0.025,
+        0.455
+       ],
+       "flow": [
+        0.011,
+        0.6,
+        -1
+       ],
+       "scale": 0.55
+      }
+     ],
+     "why": "H2.1 nape: the smooth dark cap_100 read as a bald hood inside the collar from every game camera (scratch HP probe 2026-09-29: cap pixels 210 441 over 8 game azimuths at pitch -55, ortho 0.22 m). The dark collar feathers right of the neck (tripo_part_1, box above; Tripo UVs and texture, 10.9k HP faces) are laid 14 times on the cap (8 on the dome and the V down the back, 6 around the rim lip), each copy conformed to the cap surface with its relief (x0.7) and turned so its feathers point down the nape / out over the collar; faces of a copy that fall wholly beyond the cap are dropped. Probe: cap pixels 210 441 -> 13 441 (-94 %). Proposal"
+    }
+   ],
    "kept_parts_note": {
     "tripo_part_11": "second ankle band (on the RIGHT leg after the turn; the concept has one band, on the LEFT leg). Kept: it bridges the 2.2 cm (source) gap between the right shin (tripo_part_8, bottom z 0.166) and the right tarsus (tripo_part_9, top z 0.144); dropping it opened the leg (measured in the first low-poly front frame 2026-09-29). Deviation from the concept, recorded in the report"
    },
    "occluder_only_parts": {
     "tripo_part_7": "Tripo base (gold cylinder, source Ø0.321 m): AO occluder under the feet only; the game base is the parametric SM_Harpy_Base (instance pips, team band)"
    },
-   "patches": [
-    {
-     "boxes": [
-      {
-       "max": [
-        0.052,
-        0.0,
-        0.54
-       ],
-       "min": [
-        -0.052,
-        -0.065,
-        0.43
-       ]
-      }
-     ],
-     "name": "patch_101",
-     "solidify_m": 0.002,
-     "source": "tripo_part_0",
-     "translate": [
-      0.0,
-      0.045,
-      -0.045
-     ],
-     "why": "the head's own back feathers (tripo_part_0 faces with centroid behind y -0.065, z 0.43..0.54, |x| <= 0.052; Tripo UVs and material kept) copied 4.5 cm back and 4.5 cm down over the cap's upper half, so the crest continues into the collar as on the back concept instead of a smooth dark shape; a reversed backing sheet 2 mm behind it (no rim) keeps its back side from showing culled faces toward the front camera (without it: 20-35 px see-through at azimuth 320-340). Proposal"
-    }
-   ],
+   "patches": [],
+   "patches_note": "harpy-h2-bake/2 had patch_101 (the head's back feathers copied 4.5 cm back/down with a backing sheet): measured 2026-09-29 (scratch HP probe) it lay mostly UNDER the cap's plane - only 2-3 spikes showed, the cap stayed a smooth dark dome from every game azimuth. Replaced by repair.fills (H2.1)",
    "plugs": [],
    "rotate_z_deg": 180.0,
    "trim": [
@@ -3562,7 +6312,7 @@
     "passed": true
    },
    "body_triangles": {
-    "measured": 28458,
+    "measured": 30238,
     "passed": true
    },
    "bone_count": {
@@ -3573,17 +6323,17 @@
    "export_frame_face_points_plus_x": {
     "expected": "+X (UM_FBX_v1 ref pose: FBX opened in Blender faces +X)",
     "measured": [
-     10.531,
-     -0.541,
-     7.1
+     10.621,
+     -0.423,
+     6.509
     ],
     "passed": true
    },
    "face_ahead_of_body_minus_y": {
     "expected": "face y < body y - 0.02",
     "measured": {
-     "body_centroid_y": 0.02046,
-     "face_centroid_y": -0.08485
+     "body_centroid_y": 0.02176,
+     "face_centroid_y": -0.08444
     },
     "passed": true
    },
@@ -3595,6 +6345,11 @@
    "max_influences": {
     "expected": 4,
     "measured": 4,
+    "passed": true
+   },
+   "no_non_manifold_edges_body": {
+    "expected": 0,
+    "measured": 0,
     "passed": true
    },
    "no_triangles_below_1e-4_cm2": {
@@ -3726,8 +6481,8 @@
     "passed": true
    },
    "roundtrip_triangles": {
-    "expected": 28458,
-    "measured": 28458,
+    "expected": 30238,
+    "measured": 30238,
     "passed": true
    },
    "roundtrip_uv0": {
@@ -3740,9 +6495,9 @@
   "checks_failed": [],
   "exports": {
    "base_fbx": {
-    "bytes": 35948,
+    "bytes": 40252,
     "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/export/SM_Harpy_H2_Base.fbx",
-    "sha256": "aadc891599ac714e889c3cf43a47f0bb48413564b226fa3cf4cbc43c7defc157"
+    "sha256": "3521d17a8bd84da6702b32ab375fe72ac38f59a2f32ed6810e14b71be54e73b9"
    },
    "settings": {
     "add_leaf_bones": false,
@@ -3775,16 +6530,16 @@
     "use_triangles": true
    },
    "skeletal_fbx": {
-    "bytes": 1290060,
+    "bytes": 1376508,
     "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake/export/SK_Harpy_H2.fbx",
-    "sha256": "62ae4761c2550e5079f6bae75f0ca15186c00695ba33f36f1dd0a1dd14674e57"
+    "sha256": "4a615a91fff510e23f26a028389de096f9e2bb4e02d7a9ce4978c74d2fa8984f"
    }
   },
   "measure": {
    "body_centroid_m": [
-    0.00243,
-    0.02046,
-    0.24486
+    0.00117,
+    0.02176,
+    0.25037
    ],
    "bounds_body_m": {
     "max": [
@@ -3811,16 +6566,16 @@
     ]
    },
    "face_centroid_m": [
-    -0.00298,
-    -0.08485,
-    0.31586
+    -0.00307,
+    -0.08444,
+    0.31546
    ],
    "height_with_base_uu": 42.0,
    "radial_core_uu": 11.9,
    "radial_max_uu": 36.96,
    "span_uu": 64.5,
    "triangles_base": 864,
-   "triangles_body": 28458,
+   "triangles_body": 30238,
    "ue_predicted_bounds_uu": {
     "max": [
      11.902,
@@ -3833,13 +6588,13 @@
      4.775
     ]
    },
-   "vertices_body": 16709
+   "vertices_body": 19377
   },
   "roundtrip": {
    "bones": 16,
    "triangles_base": 864,
-   "triangles_body": 28458,
-   "vertices_body": 16709
+   "triangles_body": 30238,
+   "vertices_body": 19377
   },
   "seam_gap_probe": {
    "after_harmonise": {
@@ -3874,9 +6629,9 @@
     "spine_bend_fwd": {
      "between": [
       "tripo_part_1",
-      "tripo_part_6"
+      "tripo_part_8"
      ],
-     "max_opening_m": 0.00017
+     "max_opening_m": 0.0002
     },
     "thigh_l_flex": {
      "between": [
@@ -3894,7 +6649,7 @@
     }
    },
    "pair_distance_m": 0.003,
-   "pairs": 2190,
+   "pairs": 2772,
    "per_part_weights_only": {
     "arm_l_raise": {
      "between": [
@@ -3929,7 +6684,7 @@
       "tripo_part_1",
       "tripo_part_8"
      ],
-     "max_opening_m": 0.01009
+     "max_opening_m": 0.01101
     },
     "thigh_l_flex": {
      "between": [
@@ -3999,34 +6754,34 @@
     "bone": "foot.R",
     "location_source": "predicted: UE bone space = (x, -y, z) of the Blender bone-local offset (RIG-CONTRACT §7); verify with a live get_socket_location against target_ue_component_uu",
     "location_uu_for_ue": [
-     0.02,
-     -6.932,
-     -0.005
+     0.017,
+     -6.914,
+     0.007
     ],
     "name": "Weapon",
     "offset_blender_bone_local_uu": [
-     0.02,
-     6.932,
-     -0.005
+     0.017,
+     6.914,
+     0.007
     ],
     "offset_ue_bone_local_uu_predicted": [
-     0.02,
-     -6.932,
-     -0.005
+     0.017,
+     -6.914,
+     0.007
     ],
     "purpose": "talon strike point (LungeAttack VFX); RIG-CONTRACT v2 characters.Harpy: the talon socket is attached by the profile (its text names hand.L/hand.R); kept on foot.R as in the previous candidate, see the report followups",
     "status": "предложено",
     "target_blender_m": [
-     -0.03028,
-     -0.03534,
-     0.05722
+     -0.03032,
+     -0.03513,
+     0.05725
     ],
     "target_kind": "part_front_quartile",
     "target_part": "tripo_part_9",
     "target_ue_component_uu": [
-     3.534,
-     3.028,
-     5.722
+     3.513,
+     3.032,
+     5.725
     ],
     "ue_bone": "foot_R"
    }
@@ -4034,12 +6789,14 @@
   "weights": {
    "cleanup": {
     "cap_100": {},
-    "patch_101": {},
+    "core_103": {},
+    "fill_102": {},
     "tripo_part_0": {
      "foreign_weights_removed": 2735
     },
     "tripo_part_1": {
-     "ramped_z": 1538
+     "fallback_nearest_bone": 2540,
+     "ramped_z": 315
     },
     "tripo_part_10": {},
     "tripo_part_11": {},
@@ -4048,12 +6805,23 @@
     "tripo_part_4": {},
     "tripo_part_5": {},
     "tripo_part_6": {
-     "ramped_z": 287
+     "ramped_z": 301
     },
     "tripo_part_8": {
-     "ramped_z": 141
+     "ramped_z": 142
     },
     "tripo_part_9": {}
+   },
+   "copy_nearest": {
+    "core_103": {
+     "from": [
+      "tripo_part_0",
+      "tripo_part_1",
+      "tripo_part_6",
+      "tripo_part_8"
+     ],
+     "vertices": 300
+    }
    },
    "harmonise": {
     "distance_m_final": 0.0066,
@@ -4115,65 +6883,71 @@
       "tripo_part_0"
      ],
      [
-      "patch_101",
-      "tripo_part_0"
+      "fill_102",
+      "cap_100"
      ],
      [
-      "cap_100",
-      "patch_101"
+      "fill_102",
+      "tripo_part_1"
+     ],
+     [
+      "fill_102",
+      "tripo_part_0"
      ]
     ],
     "vertices_blended": {
-     "cap_100<-patch_101": 117,
+     "cap_100<-fill_102": 186,
      "cap_100<-tripo_part_0": 0,
-     "cap_100<-tripo_part_1": 206,
-     "patch_101<-cap_100": 169,
-     "patch_101<-tripo_part_0": 0,
+     "cap_100<-tripo_part_1": 127,
+     "fill_102<-cap_100": 1064,
+     "fill_102<-tripo_part_0": 18,
+     "fill_102<-tripo_part_1": 1025,
      "tripo_part_0<-cap_100": 0,
-     "tripo_part_0<-patch_101": 0,
-     "tripo_part_0<-tripo_part_1": 314,
-     "tripo_part_0<-tripo_part_2": 99,
-     "tripo_part_0<-tripo_part_3": 135,
-     "tripo_part_10<-tripo_part_6": 83,
+     "tripo_part_0<-fill_102": 4,
+     "tripo_part_0<-tripo_part_1": 393,
+     "tripo_part_0<-tripo_part_2": 131,
+     "tripo_part_0<-tripo_part_3": 215,
+     "tripo_part_10<-tripo_part_6": 98,
      "tripo_part_11<-tripo_part_8": 72,
-     "tripo_part_11<-tripo_part_9": 68,
-     "tripo_part_1<-cap_100": 146,
-     "tripo_part_1<-tripo_part_0": 270,
-     "tripo_part_1<-tripo_part_2": 144,
-     "tripo_part_1<-tripo_part_3": 160,
-     "tripo_part_1<-tripo_part_6": 186,
-     "tripo_part_1<-tripo_part_8": 172,
-     "tripo_part_2<-tripo_part_0": 97,
-     "tripo_part_2<-tripo_part_1": 146,
-     "tripo_part_2<-tripo_part_5": 584,
-     "tripo_part_3<-tripo_part_0": 121,
-     "tripo_part_3<-tripo_part_1": 161,
-     "tripo_part_3<-tripo_part_4": 518,
-     "tripo_part_4<-tripo_part_3": 515,
-     "tripo_part_5<-tripo_part_2": 573,
-     "tripo_part_6<-tripo_part_1": 183,
-     "tripo_part_6<-tripo_part_10": 79,
-     "tripo_part_8<-tripo_part_1": 173,
+     "tripo_part_11<-tripo_part_9": 69,
+     "tripo_part_1<-cap_100": 486,
+     "tripo_part_1<-fill_102": 513,
+     "tripo_part_1<-tripo_part_0": 331,
+     "tripo_part_1<-tripo_part_2": 175,
+     "tripo_part_1<-tripo_part_3": 193,
+     "tripo_part_1<-tripo_part_6": 192,
+     "tripo_part_1<-tripo_part_8": 186,
+     "tripo_part_2<-tripo_part_0": 122,
+     "tripo_part_2<-tripo_part_1": 173,
+     "tripo_part_2<-tripo_part_5": 625,
+     "tripo_part_3<-tripo_part_0": 202,
+     "tripo_part_3<-tripo_part_1": 169,
+     "tripo_part_3<-tripo_part_4": 541,
+     "tripo_part_4<-tripo_part_3": 543,
+     "tripo_part_5<-tripo_part_2": 583,
+     "tripo_part_6<-tripo_part_1": 184,
+     "tripo_part_6<-tripo_part_10": 94,
+     "tripo_part_8<-tripo_part_1": 183,
      "tripo_part_8<-tripo_part_11": 69,
-     "tripo_part_9<-tripo_part_11": 80
+     "tripo_part_9<-tripo_part_11": 88
     }
    },
    "share_by_bone": {
-    "arm_lower.L": 0.0924,
-    "arm_lower.R": 0.0868,
-    "arm_upper.L": 0.0628,
-    "arm_upper.R": 0.0592,
-    "foot.L": 0.053,
-    "foot.R": 0.0577,
-    "hand.L": 0.0692,
-    "hand.R": 0.0629,
-    "head": 0.1485,
-    "hips": 0.0328,
-    "leg_lower.L": 0.0138,
-    "leg_lower.R": 0.015,
-    "leg_upper.L": 0.0281,
-    "leg_upper.R": 0.0285,
-    "spine": 0.1892
+    "arm_lower.L": 0.0806,
+    "arm_lower.R": 0.0767,
+    "arm_upper.L": 0.0581,
+    "arm_upper.R": 0.0587,
+    "foot.L": 0.0475,
+    "foot.R": 0.0504,
+    "hand.L": 0.0603,
+    "hand.R": 0.0549,
+    "head": 0.1388,
+    "hips": 0.0343,
+    "leg_lower.L": 0.0123,
+    "leg_lower.R": 0.0134,
+    "leg_upper.L": 0.0252,
+    "leg_upper.R": 0.0259,
+    "spine": 0.2629
    },
    "wing_span": {
     "tripo_part_2": {
@@ -4183,10 +6957,10 @@
       0.0
      ],
      "dominant_bone_vertices": {
-      "arm_lower.L": 934,
-      "arm_upper.L": 759,
-      "hand.L": 149,
-      "spine": 34
+      "arm_lower.L": 952,
+      "arm_upper.L": 809,
+      "hand.L": 156,
+      "spine": 46
      },
      "joint_band_m": 0.03299,
      "root_band_m": 0.03959,
@@ -4202,9 +6976,9 @@
       0.0
      ],
      "dominant_bone_vertices": {
-      "arm_lower.R": 873,
-      "arm_upper.R": 745,
-      "hand.R": 115,
+      "arm_lower.R": 893,
+      "arm_upper.R": 884,
+      "hand.R": 116,
       "spine": 12
      },
      "joint_band_m": 0.03299,
@@ -4221,9 +6995,9 @@
       0.0
      ],
      "dominant_bone_vertices": {
-      "arm_lower.R": 623,
-      "arm_upper.R": 252,
-      "hand.R": 903
+      "arm_lower.R": 647,
+      "arm_upper.R": 253,
+      "hand.R": 906
      },
      "joint_band_m": 0.03299,
      "root_band_m": 0.03959,
@@ -4240,8 +7014,8 @@
      ],
      "dominant_bone_vertices": {
       "arm_lower.L": 635,
-      "arm_upper.L": 284,
-      "hand.L": 992
+      "arm_upper.L": 291,
+      "hand.L": 995
      },
      "joint_band_m": 0.03299,
      "root_band_m": 0.03959,
@@ -4256,89 +7030,89 @@
  "rig_deform_probe": {
   "h2-blend": {
    "arm_l_raise": {
-    "centroid_x_norm": 0.499,
-    "centroid_z_norm": 0.598,
-    "moved_vertices": 3891,
+    "centroid_x_norm": 0.489,
+    "centroid_z_norm": 0.599,
+    "moved_vertices": 4048,
     "status": "plausible"
    },
    "arm_r_raise": {
-    "centroid_x_norm": -0.495,
-    "centroid_z_norm": 0.603,
-    "moved_vertices": 3696,
+    "centroid_x_norm": -0.484,
+    "centroid_z_norm": 0.605,
+    "moved_vertices": 3917,
     "status": "plausible"
    },
    "forearm_l_bend": {
     "centroid_x_norm": 0.584,
-    "centroid_z_norm": 0.609,
-    "moved_vertices": 2989,
+    "centroid_z_norm": 0.61,
+    "moved_vertices": 3019,
     "status": "plausible"
    },
    "head_turn": {
-    "centroid_x_norm": -0.006,
-    "centroid_z_norm": 0.749,
-    "moved_vertices": 2854,
+    "centroid_x_norm": -0.015,
+    "centroid_z_norm": 0.739,
+    "moved_vertices": 3256,
     "status": "plausible"
    },
    "spine_bend_fwd": {
-    "centroid_x_norm": 0.01,
-    "centroid_z_norm": 0.63,
-    "moved_vertices": 12825,
+    "centroid_x_norm": 0.005,
+    "centroid_z_norm": 0.636,
+    "moved_vertices": 15282,
     "status": "plausible"
    },
    "thigh_l_flex": {
     "centroid_x_norm": 0.122,
-    "centroid_z_norm": 0.18,
-    "moved_vertices": 1698,
+    "centroid_z_norm": 0.181,
+    "moved_vertices": 1767,
     "status": "plausible"
    },
    "thigh_r_flex": {
     "centroid_x_norm": -0.112,
-    "centroid_z_norm": 0.174,
-    "moved_vertices": 1778,
+    "centroid_z_norm": 0.178,
+    "moved_vertices": 1834,
     "status": "plausible"
    }
   },
   "h2-fbx": {
    "arm_l_raise": {
-    "centroid_x_norm": 0.499,
-    "centroid_z_norm": 0.598,
-    "moved_vertices": 3891,
+    "centroid_x_norm": 0.489,
+    "centroid_z_norm": 0.599,
+    "moved_vertices": 4048,
     "status": "plausible"
    },
    "arm_r_raise": {
-    "centroid_x_norm": -0.495,
-    "centroid_z_norm": 0.603,
-    "moved_vertices": 3696,
+    "centroid_x_norm": -0.484,
+    "centroid_z_norm": 0.605,
+    "moved_vertices": 3917,
     "status": "plausible"
    },
    "forearm_l_bend": {
     "centroid_x_norm": 0.584,
-    "centroid_z_norm": 0.609,
-    "moved_vertices": 2989,
+    "centroid_z_norm": 0.61,
+    "moved_vertices": 3019,
     "status": "plausible"
    },
    "head_turn": {
-    "centroid_x_norm": -0.006,
-    "centroid_z_norm": 0.749,
-    "moved_vertices": 2854,
+    "centroid_x_norm": -0.015,
+    "centroid_z_norm": 0.739,
+    "moved_vertices": 3256,
     "status": "plausible"
    },
    "spine_bend_fwd": {
-    "centroid_x_norm": 0.01,
-    "centroid_z_norm": 0.63,
-    "moved_vertices": 12825,
+    "centroid_x_norm": 0.005,
+    "centroid_z_norm": 0.636,
+    "moved_vertices": 15282,
     "status": "plausible"
    },
    "thigh_l_flex": {
     "centroid_x_norm": 0.122,
-    "centroid_z_norm": 0.18,
-    "moved_vertices": 1698,
+    "centroid_z_norm": 0.181,
+    "moved_vertices": 1767,
     "status": "plausible"
    },
    "thigh_r_flex": {
     "centroid_x_norm": -0.112,
-    "centroid_z_norm": 0.174,
-    "moved_vertices": 1778,
+    "centroid_z_norm": 0.178,
+    "moved_vertices": 1834,
     "status": "plausible"
    }
   }
@@ -4346,8 +7120,8 @@
  "run_dir": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2-bake",
  "schema": "unmatched.h2-bake.hero-report/1",
  "see_through": {
-  "all_azimuths_total_px": 50,
-  "all_azimuths_worst_px": 6,
+  "all_azimuths_total_px": 0,
+  "all_azimuths_worst_px": 0,
   "camera": {
    "fov_h_deg": 35.0,
    "pitch_deg": -55.0,
@@ -4364,11 +7138,117 @@
   "frames_azimuth_distance_px_components": [
    [
     0,
+    3.86,
+    0,
+    []
+   ],
+   [
+    20,
+    3.86,
+    0,
+    []
+   ],
+   [
+    40,
+    3.86,
+    0,
+    []
+   ],
+   [
+    60,
+    3.86,
+    0,
+    []
+   ],
+   [
+    80,
+    3.86,
+    0,
+    []
+   ],
+   [
+    100,
+    3.86,
+    0,
+    []
+   ],
+   [
+    120,
+    3.86,
+    0,
+    []
+   ],
+   [
+    140,
+    3.86,
+    0,
+    []
+   ],
+   [
+    160,
+    3.86,
+    0,
+    []
+   ],
+   [
+    180,
+    3.86,
+    0,
+    []
+   ],
+   [
+    200,
+    3.86,
+    0,
+    []
+   ],
+   [
+    220,
+    3.86,
+    0,
+    []
+   ],
+   [
+    240,
+    3.86,
+    0,
+    []
+   ],
+   [
+    260,
+    3.86,
+    0,
+    []
+   ],
+   [
+    280,
+    3.86,
+    0,
+    []
+   ],
+   [
+    300,
+    3.86,
+    0,
+    []
+   ],
+   [
+    320,
+    3.86,
+    0,
+    []
+   ],
+   [
+    340,
+    3.86,
+    0,
+    []
+   ],
+   [
+    0,
     4.8,
-    1,
-    [
-     1
-    ]
+    0,
+    []
    ],
    [
     20,
@@ -4391,130 +7271,86 @@
    [
     80,
     4.8,
-    3,
-    [
-     1,
-     1,
-     1
-    ]
+    0,
+    []
    ],
    [
     100,
     4.8,
-    1,
-    [
-     1
-    ]
+    0,
+    []
    ],
    [
     120,
     4.8,
-    2,
-    [
-     1,
-     1
-    ]
+    0,
+    []
    ],
    [
     140,
     4.8,
-    1,
-    [
-     1
-    ]
+    0,
+    []
    ],
    [
     160,
     4.8,
-    3,
-    [
-     3
-    ]
+    0,
+    []
    ],
    [
     180,
     4.8,
-    4,
-    [
-     2,
-     1,
-     1
-    ]
+    0,
+    []
    ],
    [
     200,
     4.8,
-    2,
-    [
-     1,
-     1
-    ]
+    0,
+    []
    ],
    [
     220,
     4.8,
-    2,
-    [
-     1,
-     1
-    ]
+    0,
+    []
    ],
    [
     240,
     4.8,
-    3,
-    [
-     2,
-     1
-    ]
+    0,
+    []
    ],
    [
     260,
     4.8,
-    3,
-    [
-     2,
-     1
-    ]
+    0,
+    []
    ],
    [
     280,
     4.8,
-    2,
-    [
-     1,
-     1
-    ]
+    0,
+    []
    ],
    [
     300,
     4.8,
-    2,
-    [
-     1,
-     1
-    ]
+    0,
+    []
    ],
    [
     320,
     4.8,
-    4,
-    [
-     3,
-     1
-    ]
+    0,
+    []
    ],
    [
     340,
     4.8,
-    6,
-    [
-     2,
-     1,
-     1,
-     1,
-     1
-    ]
+    0,
+    []
    ],
    [
     0,
@@ -4567,10 +7403,8 @@
    [
     160,
     7.5,
-    1,
-    [
-     1
-    ]
+    0,
+    []
    ],
    [
     180,
@@ -4581,20 +7415,14 @@
    [
     200,
     7.5,
-    1,
-    [
-     1
-    ]
+    0,
+    []
    ],
    [
     220,
     7.5,
-    3,
-    [
-     1,
-     1,
-     1
-    ]
+    0,
+    []
    ],
    [
     240,
@@ -4605,10 +7433,8 @@
    [
     260,
     7.5,
-    1,
-    [
-     1
-    ]
+    0,
+    []
    ],
    [
     280,
@@ -4619,27 +7445,128 @@
    [
     300,
     7.5,
-    1,
-    [
-     1
-    ]
+    0,
+    []
    ],
    [
     320,
     7.5,
-    2,
-    [
-     2
-    ]
+    0,
+    []
    ],
    [
     340,
     7.5,
-    2,
-    [
-     1,
-     1
-    ]
+    0,
+    []
+   ],
+   [
+    0,
+    12.07,
+    0,
+    []
+   ],
+   [
+    20,
+    12.07,
+    0,
+    []
+   ],
+   [
+    40,
+    12.07,
+    0,
+    []
+   ],
+   [
+    60,
+    12.07,
+    0,
+    []
+   ],
+   [
+    80,
+    12.07,
+    0,
+    []
+   ],
+   [
+    100,
+    12.07,
+    0,
+    []
+   ],
+   [
+    120,
+    12.07,
+    0,
+    []
+   ],
+   [
+    140,
+    12.07,
+    0,
+    []
+   ],
+   [
+    160,
+    12.07,
+    0,
+    []
+   ],
+   [
+    180,
+    12.07,
+    0,
+    []
+   ],
+   [
+    200,
+    12.07,
+    0,
+    []
+   ],
+   [
+    220,
+    12.07,
+    0,
+    []
+   ],
+   [
+    240,
+    12.07,
+    0,
+    []
+   ],
+   [
+    260,
+    12.07,
+    0,
+    []
+   ],
+   [
+    280,
+    12.07,
+    0,
+    []
+   ],
+   [
+    300,
+    12.07,
+    0,
+    []
+   ],
+   [
+    320,
+    12.07,
+    0,
+    []
+   ],
+   [
+    340,
+    12.07,
+    0,
+    []
    ]
   ],
   "gate": {
@@ -4648,12 +7575,14 @@
     360
    ],
    "distances_m": [
+    3.86,
     4.8,
-    7.5
+    7.5,
+    12.07
    ],
    "hole_min_px": 4,
    "holes": 0,
-   "largest_component_px": 3,
+   "largest_component_px": 0,
    "max_holes": 0,
    "pass": true
   },
@@ -4667,8 +7596,8 @@
     7.5
    ],
    "max_px": 0,
-   "pass": false,
-   "worst_px": 4
+   "pass": true,
+   "worst_px": 0
   },
   "label": "blender Workbench mask (flat, no AA), not an UE frame",
   "method": "see_through_px = covered with both face sides AND NOT covered with back faces culled (M_UM_Figure TwoSided=false)"
@@ -4758,7 +7687,7 @@
    "enabled": true,
    "exclude_parts": [
     "cap_100",
-    "patch_101"
+    "fill_102"
    ],
    "junctions": true,
    "max_edge_factor": 1.5,
@@ -4804,19 +7733,113 @@
      "note": "W4-B gate orm_occlusion_baked_not_constant (proposal)",
      "occluded_below": 250
     },
-    "occluded_fraction": 0.8657,
-    "p1": 4.0,
+    "occluded_fraction": 0.8668,
+    "p1": 0.0,
     "p99": 255.0,
     "passed": true
    },
    "bc_linear_mean_covered": [
-    0.1287,
-    0.0688,
-    0.0416
+    0.1282,
+    0.0686,
+    0.0415
    ],
+   "materials": {
+    "face_cavity": {
+     "face_texels": 704385,
+     "factor_p1_p50": [
+      0.45,
+      0.9798
+     ],
+     "luminance_p5_before_after": [
+      0.0168,
+      0.0133
+     ],
+     "luminance_std_before_after": [
+      0.117,
+      0.1165
+     ],
+     "rule": {
+      "cavity_gain": 4.0,
+      "cavity_sigma_px": 6,
+      "cavity_strength": 0.5,
+      "contrast_strength": 0.6,
+      "density_factor_min": 2.0,
+      "detail_sigma_px": 3,
+      "min_factor": 0.45,
+      "parts": [
+       "tripo_part_0"
+      ],
+      "why": "face islands (UV priority x2): base colour x (1 - 0.5 cavity - 0.6 dark detail), cavity = local AO deficit (gaussian 6 px of the 4K bake), dark detail = relative luminance below a 3 px blur (brows, lids, nostrils, lip line): darkening only, so the painted features keep their shape and survive the 2K mips at K2"
+     }
+    },
+    "feathers": {
+     "metallic_max": 0.273,
+     "metallic_max_feather_ge_0_99": 0.0012,
+     "metallic_note": "texels with metallic > 0 inside the feather mask are the 3x3 soft edge of the gold bands (textures.metal_rule)",
+     "roughness_p1_p50_p99": [
+      0.7035,
+      0.7665,
+      0.833
+     ],
+     "rule": {
+      "ao_weight": 0.5,
+      "parts": [
+       "tripo_part_0",
+       "tripo_part_1",
+       "tripo_part_2",
+       "tripo_part_3",
+       "tripo_part_4",
+       "tripo_part_5",
+       "tripo_part_6",
+       "tripo_part_8",
+       "cap_100",
+       "fill_102"
+      ],
+      "roughness": [
+       0.7,
+       0.85
+      ],
+      "skin": {
+       "parts": [
+        "tripo_part_0"
+       ],
+       "s_max": 0.4,
+       "v_min": 0.45
+      },
+      "why": "Tripo roughness 0.65-0.94 per part (p5-p95), mean 0.77, metallic 0: remapped into 0.70-0.85, half the part's own Tripo rank, half the baked AO (exposed vanes smoother, occluded roots rougher); face/ear skin (v > 0.45, s < 0.4 on the head part), the gold bands and the talons excluded"
+     },
+     "skin_texels_over_0_5": 537002,
+     "texels_feather_over_0_5_metallic_over_0_05": 12796,
+     "texels_over_0_5": 14748823
+    },
+    "talons": {
+     "coverage_by_part": {
+      "tripo_part_10": 0.1789,
+      "tripo_part_9": 0.1719
+     },
+     "roughness_mean": 0.5011,
+     "rule": {
+      "bc_scale": 0.75,
+      "open_px": 3,
+      "parts": [
+       "tripo_part_9",
+       "tripo_part_10"
+      ],
+      "ramp": 0.06,
+      "roughness": [
+       0.4,
+       0.55
+      ],
+      "s_max": 0.3,
+      "v_max": 0.4,
+      "why": "the claws are the desaturated dark texels of the feet parts (Tripo sRGB v 0.16-0.35, s < 0.3; the scale crevices are saturated brown): roughness 0.40 (dark) - 0.55 (lighter), metallic 0, base colour x0.75 toward the black horn of the concept"
+     },
+     "texels_over_0_5": 214948
+    }
+   },
    "metal_rule": {
     "coverage_by_part": {
-     "tripo_part_11": 0.5541,
+     "tripo_part_11": 0.5546,
      "tripo_part_6": 0.0309
     },
     "rule": {
@@ -4836,58 +7859,59 @@
      "s_min": 0.45,
      "v_min": 0.45
     },
-    "texels_over_0_5": 77132
+    "texels_over_0_5": 70819
    },
    "missed_by_part": {
-    "cap_100": 7,
-    "patch_101": 1535,
-    "tripo_part_0": 16893,
-    "tripo_part_1": 11368,
-    "tripo_part_10": 4668,
-    "tripo_part_11": 432,
-    "tripo_part_2": 5709,
-    "tripo_part_3": 5415,
-    "tripo_part_4": 1366,
-    "tripo_part_5": 1432,
-    "tripo_part_6": 3324,
-    "tripo_part_8": 1735,
-    "tripo_part_9": 3179
+    "cap_100": 39,
+    "fill_102": 7584,
+    "tripo_part_0": 16670,
+    "tripo_part_1": 10928,
+    "tripo_part_10": 4533,
+    "tripo_part_11": 427,
+    "tripo_part_2": 5539,
+    "tripo_part_3": 5294,
+    "tripo_part_4": 1306,
+    "tripo_part_5": 1382,
+    "tripo_part_6": 3253,
+    "tripo_part_8": 1702,
+    "tripo_part_9": 3084
    },
-   "normal_inward_fraction": 0.019157,
+   "normal_inward_fraction": 0.022688,
    "normal_tilt_over_60deg_by_part": {
-    "cap_100": 0.0296,
-    "patch_101": 0.04427,
-    "tripo_part_0": 0.04831,
-    "tripo_part_1": 0.02817,
-    "tripo_part_10": 0.02735,
-    "tripo_part_11": 0.05213,
-    "tripo_part_2": 0.03139,
-    "tripo_part_3": 0.02983,
-    "tripo_part_4": 0.0036,
-    "tripo_part_5": 0.00248,
-    "tripo_part_6": 0.02524,
-    "tripo_part_8": 0.01537,
-    "tripo_part_9": 0.01893
+    "cap_100": 0.02908,
+    "fill_102": 0.22781,
+    "tripo_part_0": 0.0483,
+    "tripo_part_1": 0.02828,
+    "tripo_part_10": 0.0272,
+    "tripo_part_11": 0.05403,
+    "tripo_part_2": 0.03151,
+    "tripo_part_3": 0.02988,
+    "tripo_part_4": 0.00367,
+    "tripo_part_5": 0.00253,
+    "tripo_part_6": 0.02503,
+    "tripo_part_8": 0.01533,
+    "tripo_part_9": 0.01852
    },
-   "normal_tilt_over_60deg_fraction": 0.026774,
+   "normal_tilt_over_60deg_fraction": 0.03177,
+   "roughness_mean_covered_after": 0.7531,
    "team_mask": {
     "coverage_by_part": {
      "cap_100": 0.0,
-     "patch_101": 0.0,
+     "fill_102": 0.0,
      "tripo_part_0": 0.0,
      "tripo_part_1": 0.0,
      "tripo_part_10": 0.0,
      "tripo_part_11": 0.0,
-     "tripo_part_2": 0.0447,
+     "tripo_part_2": 0.0446,
      "tripo_part_3": 0.0421,
      "tripo_part_4": 0.527,
-     "tripo_part_5": 0.5063,
+     "tripo_part_5": 0.5062,
      "tripo_part_6": 0.0,
      "tripo_part_8": 0.0,
      "tripo_part_9": 0.0
     },
-    "coverage_of_cells": 0.2826,
-    "coverage_of_figure": 0.1254,
+    "coverage_of_cells": 0.2825,
+    "coverage_of_figure": 0.1241,
     "rule": {
      "blur": "3x3",
      "method": "hsv-band-parts",
@@ -4902,68 +7926,139 @@
      "v_max": 0.22
     }
    },
-   "texels_covered_by_uv": 8216700,
-   "texels_covered_not_written": 57063,
-   "texels_covered_not_written_fraction": 0.006945,
-   "texels_written_by_bake": 8159940,
+   "texels_covered_by_uv": 8071170,
+   "texels_covered_not_written": 61741,
+   "texels_covered_not_written_fraction": 0.00765,
+   "texels_written_by_bake": 8009677,
    "tripo_metallic_fraction_over_0_5": 0.0,
-   "tripo_metallic_mean_covered": 0.0248,
-   "tripo_roughness_mean_covered": 0.7678
+   "tripo_metallic_mean_covered": 0.0245,
+   "tripo_roughness_mean_covered": 0.7679
   },
   "inputs": {
-   "ao": "01d20798c1ce438be76624c889d333c633502e34547abe6cc7a4226eaf7eb166",
-   "bc": "75b271ca43f10b94ad3fc2c32094a086887b37dfba173af9ae38dbd1f26ecf37",
-   "normal": "82fc278f91a6a2dc85835d297b2f808509be8d790726e64d6a3b479298a2faf7",
-   "rm": "8df703fbbd9ead08c14e1d51a6aaebe52fe2c58b33f7c7a154c07bdbc577deae"
+   "ao": "8074c2559433394600af5185a26abe3131eedada031a7fd7de8229762ac535b9",
+   "bc": "db974ebb80903dfe2c3f8511119c6702c049cd3df2474c09e7157f1f02e087b2",
+   "normal": "f70e2b8d4cdd7ed3a83a51ad14cf33f83ed1e246bbc133f277eb9c3aea33b356",
+   "rm": "4c6d9bd67e88ff30e8f9913f03a42b2abdfdd06382715958673402faedf1932d"
   },
   "master_px": 4096,
   "outputs": {
+   "base": {
+    "BC": {
+     "bytes": 368385,
+     "mode": "RGB",
+     "path": "textures/base_1k/T_Harpy_H2_Base_BC.png",
+     "sha256": "b92f1ce0249833b70c0f5232a5b910b6873fb3d3d377ab665978598823160a8d",
+     "size": [
+      1024,
+      1024
+     ]
+    },
+    "N": {
+     "bytes": 418163,
+     "mode": "RGB",
+     "path": "textures/base_1k/T_Harpy_H2_Base_N.png",
+     "sha256": "b671edc08f8dcf70c6449db552f6a8ec2b36c930cf1409c485881686ac1fd9e6",
+     "size": [
+      1024,
+      1024
+     ]
+    },
+    "N_OpenGL": {
+     "bytes": 417982,
+     "mode": "RGB",
+     "path": "textures/base_1k/T_Harpy_H2_Base_N_OpenGL.png",
+     "sha256": "ce8e9f70dbe773e9b84a67e08789311658148018fc48f6a9e715c30b4920b577",
+     "size": [
+      1024,
+      1024
+     ]
+    },
+    "ORM": {
+     "bytes": 260113,
+     "mode": "RGB",
+     "path": "textures/base_1k/T_Harpy_H2_Base_ORM.png",
+     "sha256": "851849946137daf7074c00ecf7fa71d999614c840db759943babfbad8a61f0cf",
+     "size": [
+      1024,
+      1024
+     ]
+    },
+    "_stats": {
+     "band": {
+      "bc_linear_mean": [
+       0.7778,
+       0.5183,
+       0.1595
+      ],
+      "metallic": 1.0,
+      "roughness_mean": 0.3473,
+      "roughness_p1_p99": [
+       0.3078,
+       0.3843
+      ]
+     },
+     "normal_tilt_p99_deg": 3.23,
+     "top": {
+      "bc_linear_mean": [
+       0.2959,
+       0.1874,
+       0.0643
+      ],
+      "metallic": 1.0,
+      "roughness_mean": 0.3842,
+      "roughness_p1_p99": [
+       0.339,
+       0.4304
+      ]
+     }
+    }
+   },
    "master": {
     "BC": {
-     "bytes": 14520129,
+     "bytes": 14718277,
      "mode": "RGB",
      "path": "textures/4k/T_Harpy_H2_BC.png",
-     "sha256": "6c39cc81410c470863b409ccf5fa5679fe6df02da0111c842bff329be2133203",
+     "sha256": "4705c2d57981643af6633a53330df93f7d16b85f4e99976bc9231feb91bd047f",
      "size": [
       4096,
       4096
      ]
     },
     "N": {
-     "bytes": 15039033,
+     "bytes": 15082417,
      "mode": "RGB",
      "path": "textures/4k/T_Harpy_H2_N.png",
-     "sha256": "f172622fc4c628dac9131e04e4506b1b00473efc37426711ecc1e6519a84149d",
+     "sha256": "bcf08cd1439afd1dbc80a492970c4598df9fb83637c889df673e2de9eb428155",
      "size": [
       4096,
       4096
      ]
     },
     "N_OpenGL": {
-     "bytes": 15043560,
+     "bytes": 15086512,
      "mode": "RGB",
      "path": "textures/4k/T_Harpy_H2_N_OpenGL.png",
-     "sha256": "97c10313a443ea5a906b0281d9d10f8aaef1c6e8aca4bf3a722bb552ecc15455",
+     "sha256": "196211137e30d3dcf8c3b5c70e1a9bd097cd2d832adb4f66a56969959bc14aeb",
      "size": [
       4096,
       4096
      ]
     },
     "ORM": {
-     "bytes": 11664238,
+     "bytes": 10023871,
      "mode": "RGB",
      "path": "textures/4k/T_Harpy_H2_ORM.png",
-     "sha256": "1dfaaddb8d646b9315110dfa91d62872ea531c188120bc0915541178d74d2e71",
+     "sha256": "61fcca962cd1eff3b22f05d9174dceaf1b04b40fea879435da19dc0607e6a940",
      "size": [
       4096,
       4096
      ]
     },
     "TeamMask": {
-     "bytes": 2175857,
+     "bytes": 2135857,
      "mode": "L",
      "path": "textures/4k/T_Harpy_H2_TeamMask.png",
-     "sha256": "51c18a6f62c4965361e36da2155b5e9cfac282eddef310f62fe7643556b9884e",
+     "sha256": "328eb32ed243cb3fc4262375b52f0effef1cf1d88c3cb27f3d015c59b8a2b51f",
      "size": [
       4096,
       4096
@@ -4977,50 +8072,50 @@
    },
    "runtime": {
     "BC": {
-     "bytes": 5210163,
+     "bytes": 5246050,
      "mode": "RGB",
      "path": "textures/2k/T_Harpy_H2_BC.png",
-     "sha256": "c01417784bfa20abc883fa82d4a81de37d680e5e26df9c58e990f52a267b8ddd",
+     "sha256": "a23a55c652e84536f73f451c41f41caa6c990aa00a590bb044f8957e29197019",
      "size": [
       2048,
       2048
      ]
     },
     "N": {
-     "bytes": 5750269,
+     "bytes": 5781825,
      "mode": "RGB",
      "path": "textures/2k/T_Harpy_H2_N.png",
-     "sha256": "b5853e84ac116e34422ea6d24e5e5a4e00f77a71515c6dcbaa94af00ef109cf0",
+     "sha256": "3cd4d36df8bc7a13c97aaf056fbf94e8ddc715f50514223cf2f4aa0851b9963b",
      "size": [
       2048,
       2048
      ]
     },
     "N_OpenGL": {
-     "bytes": 5751613,
+     "bytes": 5782997,
      "mode": "RGB",
      "path": "textures/2k/T_Harpy_H2_N_OpenGL.png",
-     "sha256": "2069ac5b66133702e9481496568e478bb57f5bbdcebadf815e3d0f568a509d46",
+     "sha256": "1abb165f47204694acbfe349d5858b55e8012e778ecbd3e94025d2b86810bc40",
      "size": [
       2048,
       2048
      ]
     },
     "ORM": {
-     "bytes": 4261655,
+     "bytes": 3692215,
      "mode": "RGB",
      "path": "textures/2k/T_Harpy_H2_ORM.png",
-     "sha256": "1a5dadbbbe3f50f25c4b333242651df0b82006133c095d3622985ea6fdd45577",
+     "sha256": "e0530962214e70b360fc6a9abae6f24eb4382e657494f09fe3fbb758f7a6eb0d",
      "size": [
       2048,
       2048
      ]
     },
     "TeamMask": {
-     "bytes": 799569,
+     "bytes": 783623,
      "mode": "L",
      "path": "textures/2k/T_Harpy_H2_TeamMask.png",
-     "sha256": "49bc1d88378207b022440df592638071c8a49ea6c86cbdf0d703fdbbbf7b4064",
+     "sha256": "5dd50297f04257b42b1caa26ed49f1631add0e230e29580fd7fd2cd6fecd4ad6",
      "size": [
       2048,
       2048
@@ -5033,7 +8128,7 @@
     }
    }
   },
-  "profile_sha256": "290171af1526825c1b9960bcaaa432c90cdfa0889451dc73e7ed3edde8670ad3",
+  "profile_sha256": "e24a0b51101ccfd7da6c73177d21d83eef98341f7a24acc975ee1a72c9dbf252",
   "runtime_px": 2048,
   "schema": "unmatched.h2-bake.textures-report/1"
  },
@@ -5042,166 +8137,166 @@
    "atlas_px": 4096,
    "closest_pair": {
     "islands": [
-     834,
-     141
+     1044,
+     1041
     ],
     "texel": [
-     831,
-     1813
+     1403,
+     465
     ]
    },
    "density_regions": {
     "density_factor_1": {
-     "area_cm2_final": 4810.12,
+     "area_cm2_final": 4871.25,
      "ratio_to_base": 1.0,
-     "texel_density_px_per_cm_master": 37.07,
-     "triangles": 24466
+     "texel_density_px_per_cm_master": 36.55,
+     "triangles": 24628
     },
     "density_factor_1.5": {
      "area_cm2_final": 270.02,
      "ratio_to_base": 1.49,
-     "texel_density_px_per_cm_master": 55.24,
+     "texel_density_px_per_cm_master": 54.47,
      "triangles": 2631
     },
     "density_factor_2": {
      "area_cm2_final": 136.8,
      "ratio_to_base": 1.987,
-     "texel_density_px_per_cm_master": 73.67,
+     "texel_density_px_per_cm_master": 72.64,
      "triangles": 1361
     }
    },
-   "fill_ratio": 0.4898,
+   "fill_ratio": 0.4811,
    "gap_search_px": 40,
-   "islands": 1266,
-   "min_texel_distance_between_islands_px": 10.44,
-   "min_texel_distance_between_parts_px": 10.44,
+   "islands": 1383,
+   "min_texel_distance_between_islands_px": 10.77,
+   "min_texel_distance_between_parts_px": 11.0,
    "padding_ok": true,
    "padding_requirement": "free texels between islands >= 8 at 4096 px (texel centre distance >= 9)",
    "parts": {
     "cap_100": {
-     "area_cm2_final": 91.25,
-     "islands": 43,
-     "texel_density_px_per_cm_master": 37.14,
-     "texel_density_px_per_cm_runtime": 18.57,
-     "texels": 125345,
-     "triangles": 874
+     "area_cm2_final": 91.16,
+     "islands": 36,
+     "texel_density_px_per_cm_master": 36.65,
+     "texel_density_px_per_cm_runtime": 18.32,
+     "texels": 121829,
+     "triangles": 436
     },
-    "patch_101": {
-     "area_cm2_final": 97.2,
-     "islands": 129,
-     "texel_density_px_per_cm_master": 37.06,
-     "texel_density_px_per_cm_runtime": 18.53,
-     "texels": 133544,
-     "triangles": 799
+    "fill_102": {
+     "area_cm2_final": 158.41,
+     "islands": 253,
+     "texel_density_px_per_cm_master": 35.25,
+     "texel_density_px_per_cm_runtime": 17.62,
+     "texels": 211618,
+     "triangles": 1399
     },
     "tripo_part_0": {
      "area_cm2_final": 890.39,
      "islands": 301,
-     "texel_density_px_per_cm_master": 37.86,
-     "texel_density_px_per_cm_runtime": 18.93,
-     "texels": 1809363,
+     "texel_density_px_per_cm_master": 37.33,
+     "texel_density_px_per_cm_runtime": 18.67,
+     "texels": 1759484,
      "triangles": 5099
     },
     "tripo_part_1": {
      "area_cm2_final": 671.01,
      "islands": 187,
-     "texel_density_px_per_cm_master": 37.06,
-     "texel_density_px_per_cm_runtime": 18.53,
-     "texels": 922014,
+     "texel_density_px_per_cm_master": 36.55,
+     "texel_density_px_per_cm_runtime": 18.27,
+     "texels": 896165,
      "triangles": 3289
     },
     "tripo_part_10": {
      "area_cm2_final": 139.63,
      "islands": 31,
-     "texel_density_px_per_cm_master": 55.49,
-     "texel_density_px_per_cm_runtime": 27.74,
-     "texels": 431575,
+     "texel_density_px_per_cm_master": 54.71,
+     "texel_density_px_per_cm_runtime": 27.36,
+     "texels": 419547,
      "triangles": 1317
     },
     "tripo_part_11": {
      "area_cm2_final": 32.42,
      "islands": 5,
-     "texel_density_px_per_cm_master": 36.83,
-     "texel_density_px_per_cm_runtime": 18.41,
-     "texels": 44559,
+     "texel_density_px_per_cm_master": 36.32,
+     "texel_density_px_per_cm_runtime": 18.16,
+     "texels": 43306,
      "triangles": 327
     },
     "tripo_part_2": {
      "area_cm2_final": 689.62,
      "islands": 181,
-     "texel_density_px_per_cm_master": 37.07,
-     "texel_density_px_per_cm_runtime": 18.53,
-     "texels": 947092,
+     "texel_density_px_per_cm_master": 36.55,
+     "texel_density_px_per_cm_runtime": 18.28,
+     "texels": 921229,
      "triangles": 3069
     },
     "tripo_part_3": {
      "area_cm2_final": 621.75,
      "islands": 117,
-     "texel_density_px_per_cm_master": 37.07,
-     "texel_density_px_per_cm_runtime": 18.54,
-     "texels": 854057,
+     "texel_density_px_per_cm_master": 36.56,
+     "texel_density_px_per_cm_runtime": 18.28,
+     "texels": 830672,
      "triangles": 2846
     },
     "tripo_part_4": {
      "area_cm2_final": 640.73,
      "islands": 89,
-     "texel_density_px_per_cm_master": 37.06,
-     "texel_density_px_per_cm_runtime": 18.53,
-     "texels": 880356,
+     "texel_density_px_per_cm_master": 36.55,
+     "texel_density_px_per_cm_runtime": 18.27,
+     "texels": 855791,
      "triangles": 3108
     },
     "tripo_part_5": {
      "area_cm2_final": 701.78,
      "islands": 98,
-     "texel_density_px_per_cm_master": 37.06,
-     "texel_density_px_per_cm_runtime": 18.53,
-     "texels": 964090,
+     "texel_density_px_per_cm_master": 36.55,
+     "texel_density_px_per_cm_runtime": 18.27,
+     "texels": 937368,
      "triangles": 3310
     },
     "tripo_part_6": {
      "area_cm2_final": 271.3,
      "islands": 36,
-     "texel_density_px_per_cm_master": 37.06,
-     "texel_density_px_per_cm_runtime": 18.53,
-     "texels": 372700,
+     "texel_density_px_per_cm_master": 36.55,
+     "texel_density_px_per_cm_runtime": 18.27,
+     "texels": 362387,
      "triangles": 1657
     },
     "tripo_part_8": {
      "area_cm2_final": 239.47,
      "islands": 31,
-     "texel_density_px_per_cm_master": 37.08,
-     "texel_density_px_per_cm_runtime": 18.54,
-     "texels": 328914,
+     "texel_density_px_per_cm_master": 36.56,
+     "texel_density_px_per_cm_runtime": 18.28,
+     "texels": 319903,
      "triangles": 1449
     },
     "tripo_part_9": {
      "area_cm2_final": 130.38,
      "islands": 18,
-     "texel_density_px_per_cm_master": 55.13,
-     "texel_density_px_per_cm_runtime": 27.57,
-     "texels": 403091,
+     "texel_density_px_per_cm_master": 54.36,
+     "texel_density_px_per_cm_runtime": 27.18,
+     "texels": 391871,
      "triangles": 1314
     }
    },
    "preview": "preview/uv_layout_parts.png",
    "runtime_px": 2048,
-   "texels_covered": 8216700,
+   "texels_covered": 8071170,
    "texels_covered_by_two_islands": 0,
    "texels_covered_twice": 0,
    "texels_covered_twice_detail": [],
    "texels_covered_twice_note": "texels_covered_twice counts every texel centre the inclusive pixel-centre rasteriser gives to two triangles; texels_overlapping_strict counts only those strictly inside two triangles (a shared edge through a texel centre is a tie, not an overlap)",
    "texels_overlapping_strict": 0,
-   "triangles": 28458,
+   "triangles": 28620,
    "triangles_outside_0_1": 0,
-   "uv_tris_sha256": "8317f04c4cbaaf7b351d807488b97d858528d1399a3ea4d0193c7123318609ca"
+   "uv_tris_sha256": "d18e165b1d73140daa461ea74ca66991bbf73ce4114797b4c7f1d3344f185d72"
   },
   "stage": {
    "charts": {
     "cap_100": {
      "tripo_islands_after_decimation": 1
     },
-    "patch_101": {
-     "tripo_islands_after_decimation": 129
+    "fill_102": {
+     "tripo_islands_after_decimation": 248
     },
     "tripo_part_0": {
      "tripo_islands_after_decimation": 286
@@ -5228,7 +8323,7 @@
      "tripo_islands_after_decimation": 94
     },
     "tripo_part_6": {
-     "tripo_islands_after_decimation": 33
+     "tripo_islands_after_decimation": 34
     },
     "tripo_part_8": {
      "tripo_islands_after_decimation": 31
@@ -5239,13 +8334,13 @@
    },
    "fallback_smart_project_faces_per_round": {
     "cap_100": [
-     874,
-     865,
-     21
+     436,
+     431,
+     4
     ],
-    "patch_101": [
-     82,
-     0,
+    "fill_102": [
+     184,
+     6,
      0
     ],
     "tripo_part_0": [
@@ -5289,7 +8384,7 @@
      0
     ],
     "tripo_part_6": [
-     655,
+     652,
      2,
      0
     ],
@@ -5305,8 +8400,8 @@
     ]
    },
    "islands": {
-    "cap_100": 43,
-    "patch_101": 129,
+    "cap_100": 36,
+    "fill_102": 253,
     "tripo_part_0": 301,
     "tripo_part_1": 187,
     "tripo_part_10": 31,
@@ -5319,7 +8414,7 @@
     "tripo_part_8": 31,
     "tripo_part_9": 18
    },
-   "islands_total": 1266,
+   "islands_total": 1383,
    "priority_scaled": {
     "tripo_part_0": {
      "islands": 301,
@@ -5336,7 +8431,7 @@
    },
    "uv_flipped_faces_after": {
     "cap_100": 0,
-    "patch_101": 0,
+    "fill_102": 0,
     "tripo_part_0": 0,
     "tripo_part_1": 0,
     "tripo_part_10": 0,
@@ -5351,7 +8446,7 @@
    },
    "uv_self_overlap_faces_after": {
     "cap_100": 0,
-    "patch_101": 0,
+    "fill_102": 0,
     "tripo_part_0": 0,
     "tripo_part_1": 0,
     "tripo_part_10": 0,

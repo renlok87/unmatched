@@ -21,9 +21,14 @@ Stages (driver: run_h2_bake.py; Blender stages run headless: blender -b --factor
   bake      Cycles selected-to-active per part (only the part's own high-poly is a ray target;
             the whole high-poly figure occludes AO): Normal (tangent, OpenGL), AO, BaseColor and
             Roughness/Metallic from the Tripo PBR maps (emission pass-through)    -> work/bake/*.npy
+  aux       (H2.1) rest-position map of every texel (UV raster of the low-poly) and the AO of parts re-baked
+            without occluders that move away in the animation (bake.ao_exclusions: the fist on the belt)
+                                                                                 -> work/uv/position.npy, work/bake/AO_EX.npy
   textures  (plain Python, numpy + Pillow) composite, pad, DX/OpenGL normals, ORM, TeamMask,
             footprints and cap texels from their surroundings (BC/ORM harmonic from rim samples; caps: flat N),
-            4K master + 2K runtime
+            4K master + 2K runtime; H2.1 material pass (materials.py, profile textures.materials): AO without the
+            fist, rim filters of contact caps, metal mask from BC hue/sat/value + Tripo parts + 3D gates, BC/ORM
+            remap of metal (metallic 0.9-1, roughness 0.32-0.45), metallic 0 elsewhere
                                                                                  -> textures/*.png
   rig       UM_HUMANOID_17_v2 armature, positional chain weights (+ junction bands: collar), UM_FBX_v1 export
             + read-back
@@ -39,4 +44,4 @@ Stages (driver: run_h2_bake.py; Blender stages run headless: blender -b --factor
 Statuses: every number is "измерено" at most; budgets are "предложено"; nothing here is art-accepted.
 """
 
-VERSION = "h2-bake/0.2.0"
+VERSION = "h2-bake/0.3.0"
