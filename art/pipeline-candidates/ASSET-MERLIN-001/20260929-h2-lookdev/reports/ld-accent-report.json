@@ -1,0 +1,916 @@
+{
+ "checks": {
+  "cobble_exposure_calibrated": {
+   "expected": "|p50 - 131.2| <= 0.75",
+   "measured": {
+    "exposure_offset_stops": -1.0,
+    "k1_board_p50": 131.0
+   },
+   "passed": true
+  },
+  "deprecated_team_mask_unchanged": {
+   "expected": true,
+   "measured": {
+    "MatID_2K": true,
+    "TeamMaskRGBA_2K": true,
+    "TeamMask_2K": true
+   },
+   "note": "TeamMask / TeamMaskRGBA / MatID 2K = the ld_maps outputs (sha256): the deprecated mask is kept for the v1 MIs",
+   "passed": true
+  },
+  "embroidery_not_dyed_in_render": {
+   "expected": "median <= 2.0",
+   "measured": {
+    "k2_5x_az0": [
+     0.0,
+     0.0
+    ],
+    "k2_5x_az180": [
+     0.0,
+     0.0
+    ]
+   },
+   "note": "ΔE of the gold embroidery pixels (ID, eroded 1 px) dyed vs no dye",
+   "passed": true
+  },
+  "geometry_rig_uv_and_maps_read_only": {
+   "expected": true,
+   "measured": {
+    "BC_2K": true,
+    "MatID_2K": true,
+    "N_2K": true,
+    "ORM_2K": true,
+    "SK_fbx": true,
+    "SM_fbx": true,
+    "TeamMaskRGBA_2K": true,
+    "TeamMask_2K": true,
+    "atlas_coverage_equals_h21_raster": true
+   },
+   "note": "export FBX (geometry, rig UM_HUMANOID_17_v2, UV0 + UV1) = ld-export-report sha256; BC/N/ORM/MatID/TeamMask* 2K = textures-report sha256; the accent lives on UV0 texels of the H2.1 atlas raster",
+   "passed": true
+  },
+  "h21_state_reproduced": {
+   "expected": true,
+   "measured": {
+    "state_key": "60560c34b94d792eeba583c8c172a37877529a23c4594dbedb34214b3b23c4a5"
+   },
+   "note": "the 4K state = the H2.1 4K masters (lookdev_state.check_against_h21), as ld_maps",
+   "passed": true
+  },
+  "palette_is_c11_active": {
+   "expected": [
+    "#E8C06A",
+    "#5A7F9F"
+   ],
+   "measured": {
+    "P1": "#E8C06A",
+    "P2": "#5A7F9F",
+    "active": "c11_value_split_proposal"
+   },
+   "passed": true
+  },
+  "robe_stays_blue_in_render": {
+   "expected": ">= 0.8",
+   "measured": {
+    "k2_5x_az0": [
+     0.9405,
+     1.0079
+    ],
+    "k2_5x_az180": [
+     0.9885,
+     1.0044
+    ]
+   },
+   "note": "blue share of all wool-ID pixels (accent included) with P1 / P2 vs without dye",
+   "passed": true
+  },
+  "robe_stays_blue_per_part": {
+   "expected": "<= max per part",
+   "measured": {
+    "tripo_part_0": {
+     "accent_ge_0_5_share": 0.0499,
+     "max": 0.1,
+     "wool_core_texels_4k": 3487064
+    },
+    "tripo_part_3": {
+     "accent_ge_0_5_share": 0.0992,
+     "max": 0.2,
+     "wool_core_texels_4k": 425636
+    },
+    "tripo_part_4": {
+     "accent_ge_0_5_share": 0.1255,
+     "max": 0.2,
+     "wool_core_texels_4k": 371767
+    }
+   },
+   "note": "share of the wool core texels of each cloth part that carry the accent (>= 0.5)",
+   "passed": true
+  },
+  "team_accent_area_share": {
+   "expected": [
+    0.05,
+    0.12
+   ],
+   "measured": {
+    "belt": 0.0103,
+    "hood_lining": 0.0081,
+    "robe_hem": 0.0165,
+    "sleeve_hem": 0.0149,
+    "total": 0.0522
+   },
+   "note": "share of the figure's 3D surface (body + staff, no base)",
+   "passed": true
+  },
+  "team_accent_reads_at_k2": {
+   "expected": {
+    "delta_e_accent_vs_wool": ">= 15",
+    "delta_e_p1_vs_p2": ">= 20",
+    "screen_share": ">= 0.01"
+   },
+   "measured": {
+    "min_delta_e_accent_vs_wool": 25.2,
+    "min_delta_e_p1_vs_p2": 42.4,
+    "min_screen_share_of_figure": 0.0338,
+    "views": [
+     "k2_5x_az0",
+     "k2_5x_az180"
+    ]
+   },
+   "note": "CIELAB of the Cobble frames; accent / wool pixels from the ID frames",
+   "passed": true
+  },
+  "team_accent_zero_outside_wool_and_belt": {
+   "expected": "0 (8-bit, 4K) on the core texels of the embroidery, buckle, boots, beard wrap, skin, beard, wood, crystal, base",
+   "measured": {
+    "base": 0,
+    "beard": 0,
+    "beard_wrap": 0,
+    "boots": 0,
+    "buckle": 0,
+    "crystal": 0,
+    "embroidery": 0,
+    "face_skin": 0,
+    "hands_skin": 0,
+    "wood": 0
+   },
+   "passed": true
+  },
+  "zones_equal_ld_maps": {
+   "expected": 0,
+   "measured": 0,
+   "note": "hard zone ids of this stage vs work/lookdev/state.npz of ld_maps",
+   "passed": true
+  }
+ },
+ "conventions": {
+  "TeamAccent": "L8 linear (UE TC_Grayscale, sRGB off, mips on): 0 = concept colour, 1 = full team dye; goes into the TeamMaskTexture slot of the v2 MI",
+  "TeamMask": "L8 = H2.1 cloth (all the blue wool): DEPRECATED, kept byte-identical for the v1 MIs",
+  "TeamMaskRGBA": "R = TeamMask (deprecated), G base band, B embroidery, A EdgeMask: unchanged"
+ },
+ "dye": {
+  "gain_rule": {
+   "Y_p50": 0.0295,
+   "Y_p95": 0.0998,
+   "accent_texels_2k_ge_0_5": 183085,
+   "by_team": {
+    "P1": {
+     "bound_by": "p95",
+     "gain_unrounded": 11.178,
+     "median_dyed_albedo_over_team": 0.325,
+     "p95_dyed_max_channel": 0.886,
+     "team_dye_gain": 11.0,
+     "team_max_channel_linear": 0.807
+    },
+    "P2": {
+     "bound_by": "p95",
+     "gain_unrounded": 26.017,
+     "median_dyed_albedo_over_team": 0.768,
+     "p95_dyed_max_channel": 0.899,
+     "team_dye_gain": 26.0,
+     "team_max_channel_linear": 0.3467
+    }
+   },
+   "note": "per team: the p95 condition is on the dyed albedo = TeamColor x Y x gain, so it depends on the team colour; one gain for both (the brightest channel of the palette, P1) would leave the P2 accent at 0.32 x TeamColor (median) - measured 2026-09-30: dE P2 accent vs the blue wool 6-13 at K2",
+   "one_gain_for_both_teams_would_be": 11.0
+  },
+  "palette_active": "c11_value_split_proposal",
+  "palette_linear": {
+   "P1": [
+    0.807,
+    0.5271,
+    0.1441
+   ],
+   "P2": [
+    0.1022,
+    0.2122,
+    0.3467
+   ]
+  },
+  "team_dye": 1.0,
+  "team_dye_gain": {
+   "P1": 11.0,
+   "P2": 26.0
+  }
+ },
+ "frames": {
+  "close_back_az180": {
+   "accent_px": 23316,
+   "delta_e_p1_vs_p2": 40.6,
+   "embroidery_px": 10184,
+   "figure_px_without_base": 539212,
+   "ld": {
+    "accent_lab": [
+     29.0,
+     8.5,
+     5.1
+    ],
+    "blue_share_of_wool_px": 0.9771,
+    "delta_e_accent_vs_wool": 17.4,
+    "wool_next_to_it_lab": [
+     19.8,
+     3.4,
+     -8.7
+    ]
+   },
+   "ld_p1": {
+    "accent_lab": [
+     55.2,
+     2.6,
+     26.0
+    ],
+    "blue_share_of_wool_px": 0.9621,
+    "blue_share_ratio_vs_no_dye": 0.9847,
+    "changed_px_share_of_figure": 0.0551,
+    "delta_e_accent_vs_wool": 42.8,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     2.71
+    ],
+    "wool_next_to_it_lab": [
+     24.1,
+     3.3,
+     -3.3
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.0
+    ]
+   },
+   "ld_p2": {
+    "accent_lab": [
+     53.8,
+     -4.7,
+     -13.9
+    ],
+    "blue_share_of_wool_px": 0.9821,
+    "blue_share_ratio_vs_no_dye": 1.0052,
+    "changed_px_share_of_figure": 0.0564,
+    "delta_e_accent_vs_wool": 30.8,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     5.23
+    ],
+    "wool_next_to_it_lab": [
+     23.7,
+     1.7,
+     -11.7
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.0
+    ]
+   },
+   "screen_share_of_figure": 0.0432,
+   "wool_px": 460769
+  },
+  "close_hood_az0": {
+   "accent_px": 42231,
+   "delta_e_p1_vs_p2": 42.4,
+   "embroidery_px": 26935,
+   "figure_px_without_base": 458317,
+   "ld": {
+    "accent_lab": [
+     19.6,
+     3.6,
+     -16.1
+    ],
+    "blue_share_of_wool_px": 0.9053,
+    "delta_e_accent_vs_wool": 1.3,
+    "wool_next_to_it_lab": [
+     20.6,
+     3.9,
+     -16.9
+    ]
+   },
+   "ld_p1": {
+    "accent_lab": [
+     41.8,
+     3.5,
+     26.6
+    ],
+    "blue_share_of_wool_px": 0.739,
+    "blue_share_ratio_vs_no_dye": 0.8163,
+    "changed_px_share_of_figure": 0.1012,
+    "delta_e_accent_vs_wool": 42.2,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.55
+    ],
+    "wool_next_to_it_lab": [
+     23.6,
+     3.8,
+     -11.4
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.32
+    ]
+   },
+   "ld_p2": {
+    "accent_lab": [
+     40.2,
+     -4.6,
+     -15.0
+    ],
+    "blue_share_of_wool_px": 0.9072,
+    "blue_share_ratio_vs_no_dye": 1.0021,
+    "changed_px_share_of_figure": 0.099,
+    "delta_e_accent_vs_wool": 18.4,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.57
+    ],
+    "wool_next_to_it_lab": [
+     23.3,
+     2.5,
+     -16.7
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.0
+    ]
+   },
+   "screen_share_of_figure": 0.0921,
+   "wool_px": 257935
+  },
+  "close_torso_az0": {
+   "accent_px": 68213,
+   "delta_e_p1_vs_p2": 42.8,
+   "embroidery_px": 64968,
+   "figure_px_without_base": 670280,
+   "ld": {
+    "accent_lab": [
+     25.2,
+     5.7,
+     -10.1
+    ],
+    "blue_share_of_wool_px": 0.9427,
+    "delta_e_accent_vs_wool": 4.6,
+    "wool_next_to_it_lab": [
+     21.5,
+     4.1,
+     -12.2
+    ]
+   },
+   "ld_p1": {
+    "accent_lab": [
+     50.1,
+     3.3,
+     27.0
+    ],
+    "blue_share_of_wool_px": 0.8137,
+    "blue_share_ratio_vs_no_dye": 0.8632,
+    "changed_px_share_of_figure": 0.1248,
+    "delta_e_accent_vs_wool": 39.8,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.82
+    ],
+    "wool_next_to_it_lab": [
+     26.4,
+     3.8,
+     -4.9
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.8
+    ]
+   },
+   "ld_p2": {
+    "accent_lab": [
+     48.5,
+     -4.7,
+     -15.0
+    ],
+    "blue_share_of_wool_px": 0.9518,
+    "blue_share_ratio_vs_no_dye": 1.0097,
+    "changed_px_share_of_figure": 0.1254,
+    "delta_e_accent_vs_wool": 23.5,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     1.52
+    ],
+    "wool_next_to_it_lab": [
+     26.0,
+     1.9,
+     -14.2
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.72
+    ]
+   },
+   "screen_share_of_figure": 0.1018,
+   "wool_px": 383452
+  },
+  "k2_1p6_az-40": {
+   "accent_px": 185,
+   "embroidery_px": 7,
+   "figure_px_without_base": 2884,
+   "ld": {
+    "blue_share_of_wool_px": 0.9423
+   },
+   "ld_p1": {
+    "blue_share_of_wool_px": 0.8736,
+    "blue_share_ratio_vs_no_dye": 0.9271,
+    "changed_px_share_of_figure": 0.1605,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.68,
+     13.51
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.81
+    ]
+   },
+   "ld_p2": {
+    "blue_share_of_wool_px": 0.9433,
+    "blue_share_ratio_vs_no_dye": 1.0011,
+    "changed_px_share_of_figure": 0.1529,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.59,
+     11.69
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.67
+    ]
+   },
+   "screen_share_of_figure": 0.0641,
+   "wool_px": 1005
+  },
+  "k2_1p6_az0": {
+   "accent_px": 178,
+   "embroidery_px": 4,
+   "figure_px_without_base": 3007,
+   "ld": {
+    "blue_share_of_wool_px": 0.9361
+   },
+   "ld_p1": {
+    "blue_share_of_wool_px": 0.8929,
+    "blue_share_ratio_vs_no_dye": 0.9538,
+    "changed_px_share_of_figure": 0.144,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.54,
+     2.15
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.68
+    ]
+   },
+   "ld_p2": {
+    "blue_share_of_wool_px": 0.9388,
+    "blue_share_ratio_vs_no_dye": 1.0029,
+    "changed_px_share_of_figure": 0.1407,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     1.02,
+     2.42
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.67
+    ]
+   },
+   "screen_share_of_figure": 0.0592,
+   "wool_px": 1111
+  },
+  "k2_1p6_az180": {
+   "accent_px": 109,
+   "embroidery_px": 2,
+   "figure_px_without_base": 3080,
+   "ld": {
+    "blue_share_of_wool_px": 0.9685
+   },
+   "ld_p1": {
+    "blue_share_of_wool_px": 0.9611,
+    "blue_share_ratio_vs_no_dye": 0.9923,
+    "changed_px_share_of_figure": 0.1032,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     11.81,
+     13.5
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.3
+    ]
+   },
+   "ld_p2": {
+    "blue_share_of_wool_px": 0.9703,
+    "blue_share_ratio_vs_no_dye": 1.0019,
+    "changed_px_share_of_figure": 0.1084,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     8.92,
+     10.2
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.0
+    ]
+   },
+   "screen_share_of_figure": 0.0354,
+   "wool_px": 2157
+  },
+  "k2_5x_az-40": {
+   "accent_px": 1847,
+   "delta_e_p1_vs_p2": 43.3,
+   "embroidery_px": 724,
+   "figure_px_without_base": 27568,
+   "ld": {
+    "accent_lab": [
+     25.4,
+     6.2,
+     -7.6
+    ],
+    "blue_share_of_wool_px": 0.9517,
+    "delta_e_accent_vs_wool": 3.9,
+    "wool_next_to_it_lab": [
+     26.4,
+     4.6,
+     -11.0
+    ]
+   },
+   "ld_p1": {
+    "accent_lab": [
+     50.7,
+     3.3,
+     27.7
+    ],
+    "blue_share_of_wool_px": 0.876,
+    "blue_share_ratio_vs_no_dye": 0.9205,
+    "changed_px_share_of_figure": 0.1186,
+    "delta_e_accent_vs_wool": 42.8,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.65
+    ],
+    "wool_next_to_it_lab": [
+     28.0,
+     4.5,
+     -8.6
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.29
+    ]
+   },
+   "ld_p2": {
+    "accent_lab": [
+     49.1,
+     -4.7,
+     -14.8
+    ],
+    "blue_share_of_wool_px": 0.9606,
+    "blue_share_ratio_vs_no_dye": 1.0094,
+    "changed_px_share_of_figure": 0.1148,
+    "delta_e_accent_vs_wool": 23.1,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.68
+    ],
+    "wool_next_to_it_lab": [
+     27.9,
+     3.9,
+     -11.7
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.31
+    ]
+   },
+   "screen_share_of_figure": 0.067,
+   "wool_px": 12809
+  },
+  "k2_5x_az0": {
+   "accent_px": 1681,
+   "delta_e_p1_vs_p2": 44.1,
+   "embroidery_px": 806,
+   "figure_px_without_base": 28792,
+   "ld": {
+    "accent_lab": [
+     27.0,
+     6.5,
+     -7.6
+    ],
+    "blue_share_of_wool_px": 0.9594,
+    "delta_e_accent_vs_wool": 3.9,
+    "wool_next_to_it_lab": [
+     27.2,
+     4.7,
+     -11.1
+    ]
+   },
+   "ld_p1": {
+    "accent_lab": [
+     53.4,
+     3.2,
+     28.2
+    ],
+    "blue_share_of_wool_px": 0.9024,
+    "blue_share_ratio_vs_no_dye": 0.9405,
+    "changed_px_share_of_figure": 0.1083,
+    "delta_e_accent_vs_wool": 44.6,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.71
+    ],
+    "wool_next_to_it_lab": [
+     28.7,
+     4.7,
+     -8.8
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.0
+    ]
+   },
+   "ld_p2": {
+    "accent_lab": [
+     51.9,
+     -4.9,
+     -15.1
+    ],
+    "blue_share_of_wool_px": 0.967,
+    "blue_share_ratio_vs_no_dye": 1.0079,
+    "changed_px_share_of_figure": 0.1057,
+    "delta_e_accent_vs_wool": 25.2,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.71
+    ],
+    "wool_next_to_it_lab": [
+     28.5,
+     4.1,
+     -11.7
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.31
+    ]
+   },
+   "screen_share_of_figure": 0.0584,
+   "wool_px": 13513
+  },
+  "k2_5x_az180": {
+   "accent_px": 1003,
+   "delta_e_p1_vs_p2": 42.4,
+   "embroidery_px": 60,
+   "figure_px_without_base": 29689,
+   "ld": {
+    "accent_lab": [
+     31.7,
+     10.2,
+     5.9
+    ],
+    "blue_share_of_wool_px": 0.9782,
+    "delta_e_accent_vs_wool": 19.3,
+    "wool_next_to_it_lab": [
+     26.7,
+     4.7,
+     -11.9
+    ]
+   },
+   "ld_p1": {
+    "accent_lab": [
+     60.5,
+     2.6,
+     27.7
+    ],
+    "blue_share_of_wool_px": 0.967,
+    "blue_share_ratio_vs_no_dye": 0.9885,
+    "changed_px_share_of_figure": 0.074,
+    "delta_e_accent_vs_wool": 49.1,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     4.62
+    ],
+    "wool_next_to_it_lab": [
+     28.4,
+     4.6,
+     -9.5
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.0
+    ]
+   },
+   "ld_p2": {
+    "accent_lab": [
+     59.1,
+     -4.8,
+     -14.0
+    ],
+    "blue_share_of_wool_px": 0.9825,
+    "blue_share_ratio_vs_no_dye": 1.0044,
+    "changed_px_share_of_figure": 0.0739,
+    "delta_e_accent_vs_wool": 32.1,
+    "embroidery_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     6.48
+    ],
+    "wool_next_to_it_lab": [
+     28.2,
+     4.0,
+     -12.8
+    ],
+    "wool_outside_accent_delta_e_vs_no_dye_p50_p95": [
+     0.0,
+     0.0
+    ]
+   },
+   "screen_share_of_figure": 0.0338,
+   "wool_px": 22749
+  }
+ },
+ "frames_note": "raw frames in work/lookdev/accent/render (local); the dye is the v2 formula applied to the 2K BC; Principled BSDF, not the M_UM_Figure_v2 core; Blender EEVEE, not UE",
+ "passed": true,
+ "previews": {
+  "accent_atlas": {
+   "bytes": 1565392,
+   "mode": "RGB",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/preview/ld_teamaccent_1K.png",
+   "px": [
+    1024,
+    1024
+   ],
+   "sha256": "593e5031c4854a5f48efaf40f017b55238f96bce37f94c126169811c0c47510a"
+  }
+ },
+ "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json",
+ "profile_id": "merlin-h2-lookdev/1",
+ "rules": {
+  "belt": {
+   "note": "zone belt of ld_maps (H2.1 class leather_belt: waist band + hanging end); the bronze buckle is zone buckle and stays out",
+   "zone": "belt"
+  },
+  "blur_sigma_px": 1.0,
+  "hood_lining": {
+   "band_emb_min": 0.5,
+   "cleanup_note": "hard mask components < 1500 4K texels dropped (specks of accent in the blue field between the gold motifs of the hood band, where the face-side test flickers), holes closed by 2 px on the wool of the region",
+   "close_px": 2,
+   "face_parts": [
+    "tripo_part_9"
+   ],
+   "feather_m": 0.006,
+   "margin_m": 0.002,
+   "min_component_texels": 1500,
+   "note": "narrow hood lining round the face opening: wool of the robe part above z 0.68 m (source; the hood starts at the shoulders), front of y 0.03 m, within 35 mm (17.7 mm game) of the face / beard part and on the face side of the gold hood band (closer to the face than the nearest band texel by >= 2 mm): the gold band and the outer hood stay blue. Measured 2026-09-30: without the face-side condition a 30 mm rule dyed the blue field of the embroidered hood band (2.2 % of the figure) - the band read as a team-coloured border, not as a lining",
+   "part": "tripo_part_0",
+   "width_m": 0.035,
+   "y_max_m": 0.03,
+   "z_min_m": 0.68
+  },
+  "robe_hem": {
+   "band_component_min_texels": 1000,
+   "band_emb_min": 0.5,
+   "band_z_max_m": 0.3,
+   "feather_m": 0.004,
+   "margin_m": 0.001,
+   "normal_min": 0.3,
+   "note": "rev 2 (2026-09-30): edge of the robe hem = wool of the robe part below the gold hem band (lower than the nearest band texel by >= 1 mm; band = embroidery components >= 1000 4K texels below source z 0.30 m: the hem band and the lower ends of the front bands; stars are < 1000 texels), within 15 mm (7.6 mm game) of it, outer face only (normal . band normal >= 0.3; the inside of the skirt is not seen and would only inflate the area). Measured 2026-09-30: this strip saturates at ~2.0-2.2 % of the figure at 15-20 mm (it reaches the lower edge of the robe); without the normal condition 4.6-6.0 % (the inside of the skirt); the blue field inside the hem band was measured at 4.0-6.7 % (run 3) and is not taken: the hem band stays blue with gold as in the concept",
+   "part": "tripo_part_0",
+   "width_m": 0.015
+  },
+  "sleeve_hem": {
+   "band_component_min_texels": 3000,
+   "band_emb_min": 0.5,
+   "feather_m": 0.004,
+   "note": "cuff hem of both sleeves: wool within 15 mm (7.6 mm game) of the gold cuff band = 8-connected embroidery components of >= 3000 4K texels on that sleeve (the cuff band; the small scattered motifs of the sleeve are 200-2500 texels and stay out), both faces of the cuff shell (outer strip + inner lining of the bell cuff). Measured 2026-09-30: with a normal-agreement condition (Arthur's rule) the strip broke into patches; components >= 200 texels caught the whole sleeve (7.8-10 %)",
+   "parts": [
+    "tripo_part_3",
+    "tripo_part_4"
+   ],
+   "rev2_note": "review 2026-09-30 (major): 35 mm (run 3) dyed 24.6 / 29.8 % of the sleeve wool cores (the sleeve end from about the elbow, not a trim) and passed only on a relaxed 35 % per-part threshold. Rev 2: 15 mm source (7.6 mm game) on both sides of the band -> each sleeve <= 20 % of its wool core (Arthur rule of team-accent.md); the lost area is made up by the robe hem edge (robe_hem), not by a wider cuff",
+   "width_m": 0.015
+  }
+ },
+ "sheets": {
+  "closeups": {
+   "bytes": 752037,
+   "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/preview/ld_accent_closeups_cobble.jpg",
+   "sha256": "4118c221d17b813d9b641949f96f5644f4b358fbc70c00b4077fa1884beb30b2"
+  },
+  "id": {
+   "bytes": 659266,
+   "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/preview/ld_accent_id.jpg",
+   "sha256": "f44f8e4c6c8e4a5980bd297fabaa912e4e6c05b03b72c4c16a73cff12219bb7a"
+  },
+  "k2_5x": {
+   "bytes": 459682,
+   "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/preview/ld_accent_k2_5x_cobble.jpg",
+   "sha256": "88c30dd541060ffde313ac360553da9cf875942cc3323540f0ee10101d578495"
+  },
+  "k2_more": {
+   "bytes": 365078,
+   "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/preview/ld_accent_k2_more_cobble.jpg",
+   "sha256": "a1c85d94fc943694b44045d1edf6c48fbb247d285acb6364d1f015e2d4197142"
+  }
+ },
+ "stage": "ld_accent",
+ "team_accent": {
+  "area_method": "texel area = 3D area of its UV triangle / the triangle's UV area in 4K texels (work/uv/*.npz area3d_m2, source frame; a ratio, so the frame scale cancels); figure = body + staff, without the base part",
+  "hood_lining": {
+   "band_texels_4k": 31835,
+   "candidate_texels_4k": 348749,
+   "components_kept": 9,
+   "face_texels_4k": 612553,
+   "texels_dropped_small_components": 15471,
+   "texels_filled_by_closing": 491
+  },
+  "robe_hem": {
+   "band_components": 56,
+   "band_texels_4k": 158620,
+   "candidate_texels_4k": 1848046,
+   "texels_below_and_outer_within_width": 134684
+  },
+  "share_3d": {
+   "belt": 0.0103,
+   "hood_lining": 0.0081,
+   "robe_hem": 0.0165,
+   "sleeve_hem": 0.0149
+  },
+  "share_3d_by_part": {
+   "tripo_part_0": 0.0371,
+   "tripo_part_3": 0.0072,
+   "tripo_part_4": 0.0079
+  },
+  "share_3d_total": 0.0522,
+  "sleeve_hem": {
+   "tripo_part_3": {
+    "band_components": 2,
+    "band_texels_4k": 13811,
+    "component_texels": [
+     7034,
+     6777
+    ]
+   },
+   "tripo_part_4": {
+    "band_components": 1,
+    "band_texels_4k": 13024,
+    "component_texels": [
+     13024
+    ]
+   }
+  },
+  "texels_4k_ge_0_5": 349816,
+  "wool_core_share_by_part": {
+   "tripo_part_0": {
+    "accent_ge_0_5_share": 0.0499,
+    "max": 0.1,
+    "wool_core_texels_4k": 3487064
+   },
+   "tripo_part_3": {
+    "accent_ge_0_5_share": 0.0992,
+    "max": 0.2,
+    "wool_core_texels_4k": 425636
+   },
+   "tripo_part_4": {
+    "accent_ge_0_5_share": 0.1255,
+    "max": 0.2,
+    "wool_core_texels_4k": 371767
+   }
+  }
+ },
+ "textures": {
+  "TeamAccent_2K": {
+   "bytes": 183815,
+   "mode": "L",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamAccent_2K.png",
+   "px": [
+    2048,
+    2048
+   ],
+   "sha256": "75972ad3e6baa49fca950cb00c602a2355875da7e589fb3f6a56395676c367df"
+  },
+  "TeamAccent_4K": {
+   "bytes": 444243,
+   "mode": "L",
+   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamAccent_4K.png",
+   "px": [
+    4096,
+    4096
+   ],
+   "sha256": "2c53752ff94a4a708a0464591ff5a34f6254e7fce4065568c342964cdde105c3"
+  }
+ }
+}

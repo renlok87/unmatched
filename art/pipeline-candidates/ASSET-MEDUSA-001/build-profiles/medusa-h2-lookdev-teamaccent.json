@@ -1,0 +1,229 @@
+{
+ "schema": "unmatched.h2-lookdev-teamaccent-profile/1",
+ "profile_id": "medusa-h2-lookdev-teamaccent/1",
+ "asset_id": "ASSET-MEDUSA-001",
+ "status": "предложено",
+ "status_note": "TeamAccent Medusa (2026-09-30): маска акцентов цвета команды по team-accent.md вместо TeamMask W4-B (всё платье). Решение пользователя 2026-09-29 «Акценты + кольцо»: платье остаётся сливово-угольным как в концепте, цвет команды — узкая полоса ткани у золотой каймы подола и разрезов + перевязь (кожаный ремень колчана через грудь и спину); золото меандра, пояс и панель под поясом не красятся (5c-A). Прогон look-dev только читается (профиль, отчёты и текстуры запинены импортом LD-medusa-ue). Не художественная приёмка, в UE не проверено.",
+ "prefix": "T_Medusa_H2LD",
+ "lookdev_profile": {
+  "path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-lookdev.json",
+  "sha256": "7b395ee552e2662d56314428cfeb6113555dc6b00fc80e3d6b6481ce00dd36ed"
+ },
+ "lookdev_run": {
+  "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev",
+  "files": {
+   "MatID": "textures/T_Medusa_H2LD_MatID.png",
+   "2K_MatID": "textures/T_Medusa_H2LD_2K_MatID.png",
+   "BC": "textures/T_Medusa_H2LD_BC.png",
+   "ORM": "textures/T_Medusa_H2LD_ORM.png",
+   "N_OpenGL": "textures/T_Medusa_H2LD_N_OpenGL.png",
+   "TeamMask": "textures/T_Medusa_H2LD_TeamMask.png",
+   "2K_TeamMask": "textures/T_Medusa_H2LD_2K_TeamMask.png",
+   "LUT_dds": "textures/T_UM_MatLUT_Medusa.dds"
+  },
+  "sha256": {
+   "MatID": "b11d13b400b0f359df89154cbba613b9724a67fbd72160d8889a10304ddbabb1",
+   "2K_MatID": "0436f845f3c91528806759a3e31fa359a1077369ad32b66d0c238bbfebadc5ea",
+   "BC": "a5e4e1ec63d376cc485f10aef2c826d9f3fcbac8cffc00e24d0307a607a55184",
+   "ORM": "a1be61b8f3a3573f0c4b4b94072aabc387cfe4bf46f70b5dfdd6470b2fc82ba4",
+   "N_OpenGL": "a00b08c404b0a4b30b145dc25784b66156d037b85ea0c4d2c32fd07a614b0e5e",
+   "TeamMask": "a22a5bcae9452ea1ccdcfe71d4d082c17660bd39cbedd31eedb84aea0a3926cd",
+   "2K_TeamMask": "669251f37bba784502d3cbec8b85cd3c364ee44adf136de2afd0ba8d30b95b48",
+   "LUT_dds": "328648695d44fb1bd52dd77e2cb366d3b34c44fd2f17c18cce38f70d27b6a26c"
+  },
+  "note": "4K-мастера (BC, ORM, N_OpenGL, MatID, TeamMask) — локальные файлы прогона, sha256 те же, что в reports/ld-maps-report.json"
+ },
+ "source_run_files": [
+  "part_ids",
+  "position"
+ ],
+ "team_accent": {
+  "hem": {
+   "parts": [
+    0
+   ],
+   "cloth_class": "linen",
+   "band_class": "gold_antique",
+   "band_z_max_m": 0.3,
+   "band_exclude_boxes": [
+    {
+     "name": "sash_panel",
+     "min_m": [
+      -0.022,
+      -0.06,
+      0.262
+     ],
+     "max_m": [
+      0.022,
+      -0.012,
+      0.4
+     ],
+     "note": "золотая панель под поясом (кушак-подвеска с колосом): не кайма подола"
+    }
+   ],
+   "width_m": 0.01,
+   "feather_m": 0.002,
+   "normal_agree_min": 0.3,
+   "search_max_m": 0.02,
+   "note": "ткань платья (класс linen части 0) в пределах width_m 3D-расстояния (кадр автора = игровой масштаб, метры) от тексела золотой каймы юбки (gold_antique части 0 ниже z 0,30 м: подол и края разрезов; пояс и панель под ним исключены), нормаль тексела каймы смотрит так же (скалярное >= normal_agree_min: изнанка ткани не считается); мягкий край smoothstep по feather_m. Само золото меандра не красится. Ширина 10 мм выбрана замером площади (6 мм — 2,2 %, 8 мм — 3,4 %, 10 мм — 4,9 % фигуры; с перевязью нужно >= 5 %)"
+  },
+  "ribbon": {
+   "parts": [
+    0
+   ],
+   "class": "leather_smooth",
+   "z_min_m": 0.3,
+   "open_radius_px": 8,
+   "voxel_m": 0.002,
+   "min_component_opened_texels": 5000,
+   "reconstruct_px": 10,
+   "note": "перевязь — кожаный ремень колчана через грудь (спереди) и спину: кожа части 0 выше z 0,30 м; UV-открытие диском r 8 px (4K, ~2 мм) убирает тонкие кожаные углубления золотого пояса, панели и ободки кайм; 3D-компоненты открытых текселей (воксель 2 мм), остаются компоненты >= 5000 текселей (передний и задний отрезки ремня; дуга горловины сзади — 3 тыс., не проходит), затем геодезическое наращивание на 10 px внутри кожи. Пряжка ремня — золото, не красится"
+  },
+  "blur_sigma_px": 1.0,
+  "never_classes": [
+   "gold_antique",
+   "skin",
+   "legacy_bake",
+   "stone_base",
+   "wood",
+   "leather_worn"
+  ],
+  "figure_exclude_parts": [
+   2
+  ],
+  "area_share_range": [
+   0.05,
+   0.12
+  ],
+  "dress_parts": {
+   "dress": 0
+  },
+  "dress_core_share_max": 0.2,
+  "palette": {
+   "P1": "#E8C06A",
+   "P2": "#5A7F9F",
+   "source": "art/um-materials/um-masters.json team_palette.active = c11_value_split_proposal (W5b-R, Q-304 open)"
+  },
+  "team_dye": 1.0,
+  "previous_team_dye_gain": 4.5,
+  "team_dye_gain_rule": {
+   "median_target": 0.8,
+   "p95_max_albedo": 0.9,
+   "round_to": 0.5,
+   "note": "team-accent.md: TeamDyeGain героя = min(0,8 / Y_p50, 0,9 / (макс. канал палитры x Y_p95)) по текселям акцента (>= 0,5) BC look-dev, Y в [0,02; 0,8], вниз до шага 0,5"
+  }
+ },
+ "cobble": {
+  "light": {
+   "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json lightProfiles.cobble-probe (read-only): directional key 4.5 lux, rotation pitch -55 yaw 30, no colour (white, 6500 K off; labelled 'cool scene key'); sky = TC_S08_AmbientDome x 11.2, colour (1, 1, 1); exposure histogram-fixed EV100 1.3; warm point 85 cd at (260, -300, 250) uu, radius 450",
+   "key_lux": 4.5,
+   "key_pitch_deg": -55.0,
+   "key_yaw_deg": 30.0,
+   "key_colour_linear": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "key_source_angle_deg": 0.5357,
+   "sky_intensity": 11.2,
+   "sky_colour_linear": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "ev100": 1.3,
+   "view_transform": "AgX",
+   "board_albedo_linear": [
+    0.119,
+    0.121,
+    0.121
+   ],
+   "board_roughness": 0.85,
+   "not_included": "the warm point (85 cd, attenuation radius 450 uu) does not reach the figure cell: the P17 figure stands at (0, 50, 0) uu, 502 uu from the light; UE Lumen GI / reflections, TSR and the UE tonemapper are approximated by EEVEE ray tracing and the AgX view transform; the board is a flat plane with the mean albedo of the cobblestone texture (no stones, no normal map)",
+   "units_note": "UE lux / cd/m2 and Blender sun strength / world strength use the same convention (a white Lambertian surface under a uniform world of radiance L renders L; under a sun of E renders E / pi), so the numbers go 1:1; exposure = 1 / (1.2 * 2^EV100) (the saturation-based EV100 convention of UE / Frostbite)",
+   "copied_from": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-skeletal-um-fbx-v1-h2.json review_h22.lights.cobble (read-only; exposure_offset_stops / calibration dropped: the offset is calibrated here)"
+  },
+  "exposure_calibration": {
+   "method": "W4-A anchor (cobble-probe sky.calibration): K1 board ROI p50 of Rec.709 luma of the 8-bit sRGB frame = 131.2; figure hidden, 40 m board of the cobblestone mean albedo, K1 camera; the exposure offset (stops, added to log2(1 / (1.2 * 2^EV100))) bisected until |p50 - target| <= tolerance (review_h3.py rev. 2, same numbers)",
+   "target_board_p50_luma": 131.2,
+   "tolerance_luma": 0.75,
+   "roi_px": [
+    600,
+    700,
+    1360,
+    940
+   ],
+   "camera": {
+    "fov_h_deg": 35.0,
+    "distance_m": 19.31,
+    "pitch_deg": -55.0,
+    "azimuth_deg": 0.0
+   },
+   "res": [
+    1920,
+    1080
+   ],
+   "calibration_board_size_m": 40.0,
+   "search_stops": [
+    -4.0,
+    2.0
+   ],
+   "max_iterations": 16
+  },
+  "board_size_m": 8.0,
+  "note": "тот же свет и та же калибровка, что у look-dev King Arthur (h2_bake_arthur/lookdev_render.py): якорь W4-A, K1-доска p50 131,2"
+ },
+ "render": {
+  "eevee_samples": 32,
+  "k2_distance_m": {
+   "5x": 3.86,
+   "1p6": 12.07
+  },
+  "azimuths": [
+   0,
+   180
+  ],
+  "views": [
+   "k2_5x_az0",
+   "k2_5x_az180",
+   "k2_1p6_az0",
+   "k2_1p6_az180"
+  ],
+  "sheet_views": {
+   "k2_5x": [
+    [
+     "k2_5x_az0",
+     "front"
+    ],
+    [
+     "k2_5x_az180",
+     "back"
+    ]
+   ],
+   "k2_1p6": [
+    [
+     "k2_1p6_az0",
+     "front"
+    ],
+    [
+     "k2_1p6_az180",
+     "back"
+    ]
+   ]
+  },
+  "near_px": 6,
+  "readability": {
+   "delta_e_accent_vs_dress_min": 15,
+   "delta_e_p1_vs_p2_min": 20,
+   "screen_share_min": 0.01,
+   "dress_unchanged_share_min": 0.9,
+   "gold_median_delta_e_max": 2.0,
+   "note": "пороги как у Arthur (ld_report: dE >= 15 к ткани рядом, >= 20 между P1 и P2); видимость — доля пикселей акцента >= 1 % фигуры без подставки спереди и сзади на K2 5x"
+  },
+  "note": "камеры K2 из профиля H2 (preview.k2: FOV 35 по горизонтали, pitch -55, фокус z 0,28 м); азимут 0 — спереди, 180 — сзади"
+ },
+ "concepts": {
+  "front": "art/imagegen/hero-quality-v1/medusa/medusa-front.png",
+  "back": "art/imagegen/hero-quality-v1/medusa/medusa-back.png"
+ }
+}

@@ -39,6 +39,9 @@ Look-dev v2 (2026-09-29, profile build-profiles/merlin-h2-lookdev.json, own run_
   ld_tone          (python)  lookdev_tone.py (+ lookdev_lut.py): concept zone medians -> BC tone gains, hero LUT EXR
   ld_render_after  (Blender) lookdev_render.py after: look-dev textures lit, MatID / UV1 checker frames, EXR read-back
   ld_report        (python)  lookdev_report.py: metrics vs concept, sheets, textures-report, ld-report
+  ld_accent        (python + Blender) lookdev_accent.py (+ lookdev_accent_state.py, lookdev_accent_render.py): TeamAccent
+                   mask (belt, hood lining, narrow sleeve cuff trim, robe hem edge; TeamMask deprecated), per-team TeamDyeGain,
+                   Cobble K2 frames
   report: docs/art-pipeline/merlin-lookdev-v2.md
 
 Driver: python tools/tripo-pipeline/blender/h2_bake_merlin/run.py --profile <profile> [stages...].

@@ -16,6 +16,11 @@ reports/ (all deterministic) and work/ (blend files, npy composites, raw frames:
 Look-dev mode (material library v1 on a finished H2.1 run; lookdev.py, st_lookdev.py):
   python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode lookdev       --profile art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-lookdev.json       --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev [--stages ld_maps,ld_fbx,...]
 Stages: ld_maps ld_fbx ld_preview ld_measure ld_compose ld_manifest (`all`). The source run is only read (sha256 pins).
+
+TeamAccent mode (team-accent.md: team colour on accents, not on the whole dress; lookdev_accent.py, st_team.py):
+  python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent       --profile art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-lookdev-teamaccent.json       --run-dir art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev [--stages ta_maps,...]
+Stages: ta_maps ta_render ta_report ta_manifest (`all`). The look-dev run and its profile are only read (sha256 pins);
+new files only (textures/<prefix>_TeamAccent_{2K,4K}.png, reports/ld-team-*.json, preview/ld_team_*).
 """
 
 import argparse
@@ -39,6 +44,8 @@ SCHEMA = "unmatched.h2-bake-run/1"
 LD_ORDER = ["ld_maps", "ld_fbx", "ld_preview", "ld_measure", "ld_compose", "ld_manifest"]
 LD_BLENDER = {"ld_fbx", "ld_preview"}
 LD_SCHEMA = "unmatched.h2-lookdev-run/1"
+TA_ORDER = ["ta_maps", "ta_render", "ta_report", "ta_manifest"]
+TA_BLENDER = {"ta_render"}
 
 
 def load_local(name):
@@ -230,6 +237,44 @@ def run_lookdev(a):
         print("[h2-lookdev] determinism:", rep["summary"], flush=True)
 
 
+def run_teamaccent(a):
+    """--mode teamaccent: stages of lookdev_accent.py (plain Python) and st_team.py (Blender)."""
+    run_dir = Path(a.run_dir).resolve()
+    for d in ("work", "logs", "reports", "textures", "preview"):
+        (run_dir / d).mkdir(parents=True, exist_ok=True)
+    ta = json.loads(Path(a.profile).read_text(encoding="utf-8"))
+    if ta.get("schema") != "unmatched.h2-lookdev-teamaccent-profile/1":
+        raise ValueError("--mode teamaccent needs a unmatched.h2-lookdev-teamaccent-profile/1 profile")
+    ld = json.loads((REPO / ta["lookdev_profile"]["path"]).read_text(encoding="utf-8"))
+    src_profile = REPO / ld["source"]["profile"]
+    acc = load_local("lookdev_accent")
+    stages = TA_ORDER if a.stages == "all" else [s for s in TA_ORDER if s in a.stages.split(",")]
+    timings = {}
+    for stage in stages:
+        t0 = time.time()
+        print("[h2-teamaccent] %s ..." % stage, flush=True)
+        if stage in TA_BLENDER:
+            params = {"stage": stage, "profile": str(src_profile), "teamaccent": str(Path(a.profile).resolve()),
+                      "run_dir": str(run_dir), "repo_root": str(REPO), "run_rel": rel(run_dir)}
+            pfile = run_dir / "work" / "params" / ("%s.json" % stage)
+            pfile.parent.mkdir(parents=True, exist_ok=True)
+            pfile.write_text(json.dumps(params, indent=2), encoding="utf-8")
+            blender(a.blender, HERE / "blender_entry.py", [pfile], run_dir / "logs" / ("%s.log" % stage))
+        elif stage == "ta_maps":
+            acc.run_maps(run_dir, ta, REPO)
+        elif stage == "ta_report":
+            acc.run_report(run_dir, ta, REPO)
+        elif stage == "ta_manifest":
+            ver = subprocess.run([a.blender, "-b", "--factory-startup", "--version"], capture_output=True, text=True,
+                                 creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout.splitlines()
+            acc.run_manifest(run_dir, ta, Path(a.profile).resolve(), REPO,
+                             next((l.strip() for l in ver if l.startswith("Blender")), None))
+        timings[stage] = round(time.time() - t0, 1)
+        print("[h2-teamaccent] %s done in %.1f s" % (stage, timings[stage]), flush=True)
+    (run_dir / "work" / "ta").mkdir(parents=True, exist_ok=True)
+    (run_dir / "work" / "ta" / "timings.json").write_text(json.dumps(timings, indent=2), encoding="utf-8")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--profile", required=True)
@@ -237,10 +282,12 @@ def main():
     ap.add_argument("--stages", default="all")
     ap.add_argument("--blender", default=os.environ.get("H2_BAKE_BLENDER", DEFAULT_BLENDER))
     ap.add_argument("--compare-with")
-    ap.add_argument("--mode", choices=("h2", "lookdev"), default="h2")
+    ap.add_argument("--mode", choices=("h2", "lookdev", "teamaccent"), default="h2")
     a = ap.parse_args()
     if a.mode == "lookdev":
         return run_lookdev(a)
+    if a.mode == "teamaccent":
+        return run_teamaccent(a)
     run_dir = Path(a.run_dir).resolve()
     for d in ("work", "logs", "reports", "export", "textures", "preview"):
         (run_dir / d).mkdir(parents=True, exist_ok=True)

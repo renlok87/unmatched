@@ -1,0 +1,87 @@
+{
+ "deprecated": {
+  "TeamMask": "T_Merlin_H2LD_TeamMask_2K.png (all the blue wool, 65.7 % of the figure, 3D): v1 MIs only",
+  "TeamMaskRGBA.R": "same as TeamMask"
+ },
+ "lut_if_master_unchanged": {
+  "leather_worn": {
+   "teamDyeAllowed": true,
+   "why": "only if the master keeps the class gate: the belt (leather_worn) must be allowed; the boots and the beard wrap are leather_worn too but TeamAccent is 0 there (check team_accent_zero_outside_wool_and_belt)"
+  },
+  "note": "not written into build-profiles/merlin-h2-lookdev-ue-lut.json or ld-lut.json (UE wave input, not touched here)",
+  "silk": {
+   "teamDyeAllowed": false,
+   "why": "unchanged: the gold embroidery is never dyed"
+  },
+  "wool_coarse": {
+   "teamDyeAllowed": true,
+   "why": "unchanged (1): the robe stays blue because TeamAccent is 0 outside the accents"
+  }
+ },
+ "master_change": {
+  "file": "tools/art/material_library/ue/um_v2_core.hlsl (M_UM_Figure_v2), next UE wave",
+  "now": "class >= 1: bc = lerp(bc, dyed, TeamMask * L7.a)  (L7.a = teamDyeAllowed of the class); class 0: lerp(bc, teamed, TeamMask)",
+  "proposed": "bc = lerp(bc, dyed, TeamAccent) for every class: the dye is decided by the TeamAccent texture alone (static switch UseTeamAccent, default on for the v2 heroes; off = the current TeamMask x teamDyeAllowed path for the v1 MIs). teamDyeAllowed stays in the LUT as a data rule of the mask authoring (the accent is 0 on metal, skin, embroidery - checked in ld-accent-report), not as a shader gate",
+  "why": "with TeamMask x teamDyeAllowed a class decides the dye: Merlin's wool_coarse is teamDyeAllowed = 1, so the W4-B TeamMask dyed the whole robe; and the belt (leather_worn, teamDyeAllowed = 0 in the Merlin LUT) could never carry the accent. TeamAccent carries exactly the accent texels"
+ },
+ "mi_parameters": {
+  "TeamColor": {
+   "P1": [
+    0.807,
+    0.5271,
+    0.1441
+   ],
+   "P2": [
+    0.1022,
+    0.2122,
+    0.3467
+   ]
+  },
+  "TeamDye": 1.0,
+  "TeamDyeGain": {
+   "P1": 11.0,
+   "P2": 26.0
+  },
+  "TeamDyeGain_note": "per team MI: P1 (gold) and P2 (steel blue) differ, both by the same rule",
+  "TeamMaskTexture": "T_Merlin_H2LD_TeamAccent",
+  "note": "the MIs of the H2LD import (Neutral / Blue / Red; P1 / P2 of the active palette): the TeamMaskTexture slot takes TeamAccent instead of the deprecated TeamMask; TeamDyeGain by the team-accent.md rule",
+  "team_dye_gain_rule": {
+   "Y_p50": 0.0295,
+   "Y_p95": 0.0998,
+   "accent_texels_2k_ge_0_5": 183085,
+   "by_team": {
+    "P1": {
+     "bound_by": "p95",
+     "gain_unrounded": 11.178,
+     "median_dyed_albedo_over_team": 0.325,
+     "p95_dyed_max_channel": 0.886,
+     "team_dye_gain": 11.0,
+     "team_max_channel_linear": 0.807
+    },
+    "P2": {
+     "bound_by": "p95",
+     "gain_unrounded": 26.017,
+     "median_dyed_albedo_over_team": 0.768,
+     "p95_dyed_max_channel": 0.899,
+     "team_dye_gain": 26.0,
+     "team_max_channel_linear": 0.3467
+    }
+   },
+   "note": "per team: the p95 condition is on the dyed albedo = TeamColor x Y x gain, so it depends on the team colour; one gain for both (the brightest channel of the palette, P1) would leave the P2 accent at 0.32 x TeamColor (median) - measured 2026-09-30: dE P2 accent vs the blue wool 6-13 at K2",
+   "one_gain_for_both_teams_would_be": 11.0
+  }
+ },
+ "schema": "unmatched.merlin-lookdev.team-accent-ue/1",
+ "status": "proposed (data of the next UE wave; UE not touched)",
+ "texture": {
+  "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamAccent_2K.png",
+  "settings": {
+   "CompressionSettings": "TC_Grayscale",
+   "Filter": "Default",
+   "MipGenSettings": "FromTextureGroup",
+   "SRGB": false
+  },
+  "sha256": "75972ad3e6baa49fca950cb00c602a2355875da7e589fb3f6a56395676c367df",
+  "ue_asset": "/Game/PipelineCandidates/Merlin/H2LD/T_Merlin_H2LD_TeamAccent"
+ }
+}

@@ -44,4 +44,4 @@ Stages (driver: run_h2_bake.py; Blender stages run headless: blender -b --factor
 Statuses: every number is "измерено" at most; budgets are "предложено"; nothing here is art-accepted.
 """
 
-VERSION = "h2-bake/0.4.0"  # 0.4.0: --mode lookdev (lookdev.py, st_lookdev.py); the h2 stages are unchanged
+VERSION = "h2-bake/0.5.0"  # 0.5.0: --mode teamaccent (lookdev_accent.py, st_team.py); 0.4.0: --mode lookdev; the h2 stages are unchanged

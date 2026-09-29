@@ -3,7 +3,7 @@
 python tools/tripo-pipeline/blender/h2_bake_merlin/run.py --profile <profile.json> [stage ...]
   stages: source retopo uv bake maps rig probe preview sheets compare compare_sheets  (default: all, or the profile's
   "stages" list: the look-dev profile merlin-h2-lookdev.json runs ld_export ld_maps ld_render_before ld_tone
-  ld_render_after ld_report on the H2.1 run without changing it)
+  ld_render_after ld_report ld_accent on the H2.1 run without changing it; ld_accent = TeamAccent, 2026-09-30)
   compare / compare_sheets (H2.1): H2 vs H2.1 frames; the H2 baseline (profile h21.baseline) is restored from git
   into <run>/work/h2-baseline/ by `git show <rev>:<path>` and checked by sha256 before the Blender stage
   --blender <exe>    Blender executable (default: profile "blender")
@@ -31,7 +31,8 @@ BLENDER_STAGES = {"source": "stage_source.py", "retopo": "stage_retopo.py", "uv"
                   "ld_export": "lookdev_export.py", "ld_render_before": ("lookdev_render.py", "before"),
                   "ld_render_after": ("lookdev_render.py", "after")}
 PYTHON_STAGES = {"maps": "maps.py", "sheets": "sheets.py", "compare_sheets": "compare_sheets.py",
-                 "ld_maps": "lookdev_maps.py", "ld_tone": "lookdev_tone.py", "ld_report": "lookdev_report.py"}
+                 "ld_maps": "lookdev_maps.py", "ld_tone": "lookdev_tone.py", "ld_report": "lookdev_report.py",
+                 "ld_accent": "lookdev_accent.py"}
 
 
 def run(cmd, log, env=None):

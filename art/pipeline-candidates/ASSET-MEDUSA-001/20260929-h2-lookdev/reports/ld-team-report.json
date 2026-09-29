@@ -1,0 +1,561 @@
+{
+  "checks": {
+    "cobble_exposure_calibrated_to_w4a": {
+      "expected": "K1 board ROI p50 = 131.2 +- 0.75",
+      "measured": 130.787,
+      "note": "",
+      "passed": true
+    },
+    "dress_outside_accent_unchanged_by_dye": {
+      "expected": ">= 0.9 of the dress pixels outside the accent change by dE < 3 with P1 / P2",
+      "measured": {
+        "k2_1p6_az0": {
+          "ld_p1": 0.9072,
+          "ld_p2": 0.9469
+        },
+        "k2_1p6_az180": {
+          "ld_p1": 0.9766,
+          "ld_p2": 0.9919
+        },
+        "k2_5x_az0": {
+          "ld_p1": 0.9576,
+          "ld_p2": 0.9782
+        },
+        "k2_5x_az180": {
+          "ld_p1": 0.9789,
+          "ld_p2": 0.9902
+        }
+      },
+      "note": "the dress stays in the concept colour; the rest is the anti-aliased rim of the accent and the dyed bounce light",
+      "passed": true
+    },
+    "gold_unchanged_by_dye": {
+      "expected": "median dE of the gold pixels (meander, belt) with P1 / P2 against no dye <= 2.0",
+      "measured": {
+        "k2_1p6_az0": {
+          "ld_p1": 0.44,
+          "ld_p2": 0.0
+        },
+        "k2_1p6_az180": {
+          "ld_p1": 0.0,
+          "ld_p2": 0.0
+        },
+        "k2_5x_az0": {
+          "ld_p1": 0.43,
+          "ld_p2": 0.0
+        },
+        "k2_5x_az180": {
+          "ld_p1": 0.0,
+          "ld_p2": 0.0
+        }
+      },
+      "note": "",
+      "passed": true
+    },
+    "ta_maps_passed": {
+      "expected": [],
+      "measured": [],
+      "note": "",
+      "passed": true
+    },
+    "team_accent_reads_at_k2": {
+      "expected": "CIELAB dE >= 15 against the dress next to it, >= 20 between P1 and P2 (Cobble, k2_5x_az0, k2_5x_az180, k2_1p6_az0, k2_1p6_az180)",
+      "measured": {
+        "min_delta_e_accent_vs_dress": 21.3,
+        "min_delta_e_p1_vs_p2": 34.4
+      },
+      "note": "",
+      "passed": true
+    },
+    "team_accent_visible_k2_5x_front_and_back": {
+      "expected": ">= 0.01 of the figure pixels (without the base) on K2 5x front and back",
+      "measured": {
+        "k2_5x_az0": 0.0636,
+        "k2_5x_az180": 0.0809
+      },
+      "note": "",
+      "passed": true
+    }
+  },
+  "label": "blender (EEVEE) кадры, эмуляция красителя v2 на BC look-dev; не UE, не художественная приёмка",
+  "passed": true,
+  "per_view": {
+    "k2_1p6_az0": {
+      "accent_changed_ld_p1": {
+        "median_delta_e_vs_no_dye": 30.7
+      },
+      "accent_changed_ld_p2": {
+        "median_delta_e_vs_no_dye": 20.7
+      },
+      "accent_px": 218,
+      "delta_e_p1_vs_p2_accent": 34.4,
+      "dress_px_without_accent": 377,
+      "dress_unchanged_ld_p1": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 0.9072
+      },
+      "dress_unchanged_ld_p2": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 0.9469
+      },
+      "figure_px_without_base": 3384,
+      "gold_unchanged_ld_p1": {
+        "median_delta_e": 0.44,
+        "share_delta_e_lt_3": 1.0
+      },
+      "gold_unchanged_ld_p2": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 1.0
+      },
+      "ld": {
+        "accent_lab": [
+          27.3,
+          5.2,
+          7.9
+        ],
+        "accent_median_srgb": [
+          70,
+          57,
+          50
+        ],
+        "delta_e_accent_vs_dress": 9.0,
+        "delta_e_accent_vs_gold_trim_next_to_it": 33.9,
+        "dress_next_to_it_lab": [
+          20.2,
+          2.8,
+          2.9
+        ]
+      },
+      "ld_p1": {
+        "accent_lab": [
+          50.5,
+          4.1,
+          25.2
+        ],
+        "accent_median_srgb": [
+          146,
+          118,
+          74
+        ],
+        "delta_e_accent_vs_dress": 36.5,
+        "delta_e_accent_vs_gold_trim_next_to_it": 8.6,
+        "dress_next_to_it_lab": [
+          21.0,
+          2.9,
+          3.8
+        ]
+      },
+      "ld_p2": {
+        "accent_lab": [
+          39.3,
+          -0.7,
+          -7.0
+        ],
+        "accent_median_srgb": [
+          78,
+          91,
+          104
+        ],
+        "delta_e_accent_vs_dress": 21.3,
+        "delta_e_accent_vs_gold_trim_next_to_it": 35.9,
+        "dress_next_to_it_lab": [
+          20.5,
+          2.6,
+          2.4
+        ]
+      },
+      "screen_share_of_figure": 0.0644
+    },
+    "k2_1p6_az180": {
+      "accent_changed_ld_p1": {
+        "median_delta_e_vs_no_dye": 35.9
+      },
+      "accent_changed_ld_p2": {
+        "median_delta_e_vs_no_dye": 23.2
+      },
+      "accent_px": 289,
+      "delta_e_p1_vs_p2_accent": 37.8,
+      "dress_px_without_accent": 1110,
+      "dress_unchanged_ld_p1": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 0.9766
+      },
+      "dress_unchanged_ld_p2": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 0.9919
+      },
+      "figure_px_without_base": 3435,
+      "gold_unchanged_ld_p1": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 1.0
+      },
+      "gold_unchanged_ld_p2": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 1.0
+      },
+      "ld": {
+        "accent_lab": [
+          26.4,
+          4.7,
+          7.1
+        ],
+        "accent_median_srgb": [
+          71,
+          58,
+          52
+        ],
+        "delta_e_accent_vs_dress": 7.0,
+        "delta_e_accent_vs_gold_trim_next_to_it": null,
+        "dress_next_to_it_lab": [
+          21.1,
+          2.8,
+          2.9
+        ]
+      },
+      "ld_p1": {
+        "accent_lab": [
+          53.1,
+          3.8,
+          26.6
+        ],
+        "accent_median_srgb": [
+          153,
+          126,
+          81
+        ],
+        "delta_e_accent_vs_dress": 39.3,
+        "delta_e_accent_vs_gold_trim_next_to_it": null,
+        "dress_next_to_it_lab": [
+          21.5,
+          2.8,
+          3.3
+        ]
+      },
+      "ld_p2": {
+        "accent_lab": [
+          40.6,
+          -1.5,
+          -8.7
+        ],
+        "accent_median_srgb": [
+          82,
+          98,
+          111
+        ],
+        "delta_e_accent_vs_dress": 22.8,
+        "delta_e_accent_vs_gold_trim_next_to_it": null,
+        "dress_next_to_it_lab": [
+          21.3,
+          2.7,
+          2.7
+        ]
+      },
+      "screen_share_of_figure": 0.0841
+    },
+    "k2_5x_az0": {
+      "accent_changed_ld_p1": {
+        "median_delta_e_vs_no_dye": 46.9
+      },
+      "accent_changed_ld_p2": {
+        "median_delta_e_vs_no_dye": 31.9
+      },
+      "accent_px": 2109,
+      "delta_e_p1_vs_p2_accent": 47.1,
+      "dress_px_without_accent": 5680,
+      "dress_unchanged_ld_p1": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 0.9576
+      },
+      "dress_unchanged_ld_p2": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 0.9782
+      },
+      "figure_px_without_base": 33154,
+      "gold_unchanged_ld_p1": {
+        "median_delta_e": 0.43,
+        "share_delta_e_lt_3": 0.9818
+      },
+      "gold_unchanged_ld_p2": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 0.9998
+      },
+      "ld": {
+        "accent_lab": [
+          25.3,
+          5.7,
+          6.3
+        ],
+        "accent_median_srgb": [
+          66,
+          54,
+          50
+        ],
+        "delta_e_accent_vs_dress": 6.6,
+        "delta_e_accent_vs_gold_trim_next_to_it": 29.3,
+        "dress_next_to_it_lab": [
+          20.5,
+          2.9,
+          2.7
+        ]
+      },
+      "ld_p1": {
+        "accent_lab": [
+          63.2,
+          2.9,
+          27.9
+        ],
+        "accent_median_srgb": [
+          176,
+          151,
+          103
+        ],
+        "delta_e_accent_vs_dress": 48.6,
+        "delta_e_accent_vs_gold_trim_next_to_it": 14.9,
+        "dress_next_to_it_lab": [
+          21.1,
+          2.9,
+          3.5
+        ]
+      },
+      "ld_p2": {
+        "accent_lab": [
+          46.1,
+          -4.8,
+          -15.3
+        ],
+        "accent_median_srgb": [
+          80,
+          112,
+          135
+        ],
+        "delta_e_accent_vs_dress": 31.8,
+        "delta_e_accent_vs_gold_trim_next_to_it": 39.7,
+        "dress_next_to_it_lab": [
+          20.7,
+          2.8,
+          2.4
+        ]
+      },
+      "screen_share_of_figure": 0.0636
+    },
+    "k2_5x_az180": {
+      "accent_changed_ld_p1": {
+        "median_delta_e_vs_no_dye": 48.6
+      },
+      "accent_changed_ld_p2": {
+        "median_delta_e_vs_no_dye": 32.7
+      },
+      "accent_px": 2727,
+      "delta_e_p1_vs_p2_accent": 48.7,
+      "dress_px_without_accent": 12730,
+      "dress_unchanged_ld_p1": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 0.9789
+      },
+      "dress_unchanged_ld_p2": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 0.9902
+      },
+      "figure_px_without_base": 33689,
+      "gold_unchanged_ld_p1": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 0.9963
+      },
+      "gold_unchanged_ld_p2": {
+        "median_delta_e": 0.0,
+        "share_delta_e_lt_3": 1.0
+      },
+      "ld": {
+        "accent_lab": [
+          23.6,
+          4.3,
+          4.6
+        ],
+        "accent_median_srgb": [
+          66,
+          55,
+          52
+        ],
+        "delta_e_accent_vs_dress": 3.4,
+        "delta_e_accent_vs_gold_trim_next_to_it": 32.8,
+        "dress_next_to_it_lab": [
+          21.1,
+          2.8,
+          2.8
+        ]
+      },
+      "ld_p1": {
+        "accent_lab": [
+          63.7,
+          2.7,
+          28.5
+        ],
+        "accent_median_srgb": [
+          181,
+          156,
+          108
+        ],
+        "delta_e_accent_vs_dress": 49.1,
+        "delta_e_accent_vs_gold_trim_next_to_it": 15.8,
+        "dress_next_to_it_lab": [
+          21.6,
+          2.8,
+          3.4
+        ]
+      },
+      "ld_p2": {
+        "accent_lab": [
+          46.0,
+          -5.1,
+          -16.2
+        ],
+        "accent_median_srgb": [
+          83,
+          117,
+          140
+        ],
+        "delta_e_accent_vs_dress": 32.0,
+        "delta_e_accent_vs_gold_trim_next_to_it": 43.4,
+        "dress_next_to_it_lab": [
+          21.3,
+          2.7,
+          2.5
+        ]
+      },
+      "screen_share_of_figure": 0.0809
+    }
+  },
+  "profile_id": "medusa-h2-lookdev-teamaccent/1",
+  "render": {
+    "frames": {
+      "cobble/ld/k2_1p6_az0": "work/ta/render/cobble/ld/k2_1p6_az0.png",
+      "cobble/ld/k2_1p6_az180": "work/ta/render/cobble/ld/k2_1p6_az180.png",
+      "cobble/ld/k2_5x_az0": "work/ta/render/cobble/ld/k2_5x_az0.png",
+      "cobble/ld/k2_5x_az180": "work/ta/render/cobble/ld/k2_5x_az180.png",
+      "cobble/ld_p1/k2_1p6_az0": "work/ta/render/cobble/ld_p1/k2_1p6_az0.png",
+      "cobble/ld_p1/k2_1p6_az180": "work/ta/render/cobble/ld_p1/k2_1p6_az180.png",
+      "cobble/ld_p1/k2_5x_az0": "work/ta/render/cobble/ld_p1/k2_5x_az0.png",
+      "cobble/ld_p1/k2_5x_az180": "work/ta/render/cobble/ld_p1/k2_5x_az180.png",
+      "cobble/ld_p2/k2_1p6_az0": "work/ta/render/cobble/ld_p2/k2_1p6_az0.png",
+      "cobble/ld_p2/k2_1p6_az180": "work/ta/render/cobble/ld_p2/k2_1p6_az180.png",
+      "cobble/ld_p2/k2_5x_az0": "work/ta/render/cobble/ld_p2/k2_5x_az0.png",
+      "cobble/ld_p2/k2_5x_az180": "work/ta/render/cobble/ld_p2/k2_5x_az180.png",
+      "id/k2_1p6_az0": "work/ta/render/id/k2_1p6_az0.png",
+      "id/k2_1p6_az180": "work/ta/render/id/k2_1p6_az180.png",
+      "id/k2_5x_az0": "work/ta/render/id/k2_5x_az0.png",
+      "id/k2_5x_az180": "work/ta/render/id/k2_5x_az180.png"
+    },
+    "lights": {
+      "cobble": {
+        "backface_culling": true,
+        "blender_exposure": -2.563,
+        "board": {
+          "albedo_linear": [
+            0.119,
+            0.121,
+            0.121
+          ],
+          "roughness": 0.85,
+          "size_m": 8.0
+        },
+        "dome_sha256": "389961f05066d780c4d1dd3fef8de61f30f4feb7ae7a7416108df4ed66f0ef71",
+        "eevee_raytracing": true,
+        "eevee_samples": 32,
+        "ev100": 1.3,
+        "exposure_offset_stops": -1.0,
+        "k1_board_p50": 130.787,
+        "key_lux": 4.5,
+        "key_travel_dir": [
+          0.2868,
+          0.4967,
+          -0.8192
+        ],
+        "not_included": "the warm point (85 cd, attenuation radius 450 uu) does not reach the figure cell: the P17 figure stands at (0, 50, 0) uu, 502 uu from the light; UE Lumen GI / reflections, TSR and the UE tonemapper are approximated by EEVEE ray tracing and the AgX view transform; the board is a flat plane with the mean albedo of the cobblestone texture (no stones, no normal map)",
+        "sky_intensity": 11.2,
+        "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json lightProfiles.cobble-probe (read-only): directional key 4.5 lux, rotation pitch -55 yaw 30, no colour (white, 6500 K off; labelled 'cool scene key'); sky = TC_S08_AmbientDome x 11.2, colour (1, 1, 1); exposure histogram-fixed EV100 1.3; warm point 85 cd at (260, -300, 250) uu, radius 450",
+        "view_transform": "AgX"
+      }
+    },
+    "views": {
+      "k2_1p6_az0": {
+        "dir": [
+          0.0,
+          -0.573576436351046,
+          0.8191520442889918
+        ],
+        "dist": 12.07,
+        "fov": 35.0,
+        "res": [
+          1920,
+          1080
+        ],
+        "target": [
+          0.0,
+          0.0,
+          0.28
+        ]
+      },
+      "k2_1p6_az180": {
+        "dir": [
+          7.024285468436541e-17,
+          0.573576436351046,
+          0.8191520442889918
+        ],
+        "dist": 12.07,
+        "fov": 35.0,
+        "res": [
+          1920,
+          1080
+        ],
+        "target": [
+          0.0,
+          0.0,
+          0.28
+        ]
+      },
+      "k2_5x_az0": {
+        "dir": [
+          0.0,
+          -0.573576436351046,
+          0.8191520442889918
+        ],
+        "dist": 3.86,
+        "fov": 35.0,
+        "res": [
+          1920,
+          1080
+        ],
+        "target": [
+          0.0,
+          0.0,
+          0.28
+        ]
+      },
+      "k2_5x_az180": {
+        "dir": [
+          7.024285468436541e-17,
+          0.573576436351046,
+          0.8191520442889918
+        ],
+        "dist": 3.86,
+        "fov": 35.0,
+        "res": [
+          1920,
+          1080
+        ],
+        "target": [
+          0.0,
+          0.0,
+          0.28
+        ]
+      }
+    }
+  },
+  "sheets": {
+    "ld_team_id_k2.jpg": "f3495bf0f94be7bb7c2d5edb95961b290c39f2e60243e6d6709a7863b612661b",
+    "ld_team_k2_1p6_cobble.jpg": "09daf161328be6acd033d415f947d890a64eaf6250f62b81ad47a78226ce5d33",
+    "ld_team_k2_5x_cobble.jpg": "6fca59c36db539924afa20867086250b464194ec92ef047e9e26c0a2614dca23"
+  },
+  "stage": "ta_report",
+  "status": "измерено"
+}

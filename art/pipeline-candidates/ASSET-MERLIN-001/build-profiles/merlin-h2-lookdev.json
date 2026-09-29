@@ -6,7 +6,7 @@
  "status_note": "Look-dev v2 (2026-09-29, wave LD): the H2.1 game model of Merlin moved onto the UM material library v1 (docs/art-pipeline/material-library/README.md): MatID (R8, index x 16 + 8, no mips), hero LUT 16 x 8 RGBA16F, UV1 in metres for the detail tiles, EdgeMask (convexity) in TeamMaskRGBA.A, BC tone matched to the concept by zone. Rig, skeleton and geometry are those of the H2.1 run (appended from its work/h2-rig.blend and checked against its FBX). Status: technically built and measured, not art acceptance; UE import is the next wave.",
  "run_dir": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev",
  "blender": "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe",
- "stages": ["ld_export", "ld_maps", "ld_render_before", "ld_tone", "ld_render_after", "ld_report"],
+ "stages": ["ld_export", "ld_maps", "ld_render_before", "ld_tone", "ld_render_after", "ld_report", "ld_accent"],
  "lookdev": {
   "source_profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-h2.json",
   "source_note": "H2.1 bake run (profile merlin-h2-bake/2): work/h2-rig.blend (rigged low-poly in the authored frame, saved by stage_rig just before its export), work/uv/*.npz and work/bake/*.npy (local, git-ignored) are read, never written. The committed H2.1 FBX and 2K textures are the references of the read-back checks.",
@@ -112,6 +112,66 @@
    "note": "zones whose |gain - 1| < dead_band in every channel keep the H2.1 BC; gains are applied in linear light to the zone's texels (zone map blurred 3 x 3 at 4K so the change has no hard seam); the buckle is a metal (preset F0, Ymed modulation in the shader): its BC is not tone-matched"
   },
   "render": {"ortho_resolution": [1200, 1333], "framing": {"front": [0.058, 0.945], "right": [0.042, 0.935], "back": [0.042, 0.935]},
-             "id_erode_px": 2}
+             "id_erode_px": 2},
+  "team_accent": {
+   "note": "TeamAccent (docs/art-pipeline/material-library/team-accent.md, stage ld_accent = lookdev_accent.py, 2026-09-30): the robe stays BLUE as in the concept; the team colour goes to the belt (with its hanging end) and to narrow accents only; the gold embroidery, the buckle, skin, beard, boots, wood, crystal and the base are never in the mask. All positions / widths are in the SOURCE frame (Tripo metres, Z up, face -Y) of the H2.1 texel state; x scale_source_to_final (0.504853) = game metres",
+   "scale_source_to_final": 0.504853,
+   "belt": {"zone": "belt", "note": "zone belt of ld_maps (H2.1 class leather_belt: waist band + hanging end); the bronze buckle is zone buckle and stays out"},
+   "hood_lining": {
+    "part": "tripo_part_0", "face_parts": ["tripo_part_9"],
+    "z_min_m": 0.68, "y_max_m": 0.03,
+    "band_emb_min": 0.5, "width_m": 0.035, "feather_m": 0.006, "margin_m": 0.002, "min_component_texels": 1500, "close_px": 2,
+    "cleanup_note": "hard mask components < 1500 4K texels dropped (specks of accent in the blue field between the gold motifs of the hood band, where the face-side test flickers), holes closed by 2 px on the wool of the region",
+    "note": "narrow hood lining round the face opening: wool of the robe part above z 0.68 m (source; the hood starts at the shoulders), front of y 0.03 m, within 35 mm (17.7 mm game) of the face / beard part and on the face side of the gold hood band (closer to the face than the nearest band texel by >= 2 mm): the gold band and the outer hood stay blue. Measured 2026-09-30: without the face-side condition a 30 mm rule dyed the blue field of the embroidered hood band (2.2 % of the figure) - the band read as a team-coloured border, not as a lining"
+   },
+   "sleeve_hem": {
+    "parts": ["tripo_part_3", "tripo_part_4"],
+    "band_emb_min": 0.5, "band_component_min_texels": 3000,
+    "width_m": 0.015, "feather_m": 0.004,
+    "rev2_note": "review 2026-09-30 (major): 35 mm (run 3) dyed 24.6 / 29.8 % of the sleeve wool cores (the sleeve end from about the elbow, not a trim) and passed only on a relaxed 35 % per-part threshold. Rev 2: 15 mm source (7.6 mm game) on both sides of the band -> each sleeve <= 20 % of its wool core (Arthur rule of team-accent.md); the lost area is made up by the robe hem edge (robe_hem), not by a wider cuff",
+    "note": "cuff hem of both sleeves: wool within 15 mm (7.6 mm game) of the gold cuff band = 8-connected embroidery components of >= 3000 4K texels on that sleeve (the cuff band; the small scattered motifs of the sleeve are 200-2500 texels and stay out), both faces of the cuff shell (outer strip + inner lining of the bell cuff). Measured 2026-09-30: with a normal-agreement condition (Arthur's rule) the strip broke into patches; components >= 200 texels caught the whole sleeve (7.8-10 %)"
+   },
+   "robe_hem": {
+    "part": "tripo_part_0", "band_z_max_m": 0.30, "band_emb_min": 0.5, "band_component_min_texels": 1000,
+    "width_m": 0.015, "feather_m": 0.004, "margin_m": 0.001, "normal_min": 0.3,
+    "note": "rev 2 (2026-09-30): edge of the robe hem = wool of the robe part below the gold hem band (lower than the nearest band texel by >= 1 mm; band = embroidery components >= 1000 4K texels below source z 0.30 m: the hem band and the lower ends of the front bands; stars are < 1000 texels), within 15 mm (7.6 mm game) of it, outer face only (normal . band normal >= 0.3; the inside of the skirt is not seen and would only inflate the area). Measured 2026-09-30: this strip saturates at ~2.0-2.2 % of the figure at 15-20 mm (it reaches the lower edge of the robe); without the normal condition 4.6-6.0 % (the inside of the skirt); the blue field inside the hem band was measured at 4.0-6.7 % (run 3) and is not taken: the hem band stays blue with gold as in the concept"
+   },
+   "blur_sigma_px": 1.0,
+   "area_share_range": [0.05, 0.12],
+   "figure_excludes_part": "tripo_part_1",
+   "blue_parts_max_core_share": {"tripo_part_0": 0.1, "tripo_part_3": 0.2, "tripo_part_4": 0.2},
+   "blue_parts_note": "per part (Arthur review 2026-09-29: a mean over parts hid a dyed tabard): share of the wool core texels (zone weight >= 0.999, eroded 2) with accent >= 0.5. The robe with the hood (part 0, hood lining + hem edge) is the main colour of the hero: <= 10 %; the sleeves: <= 20 % each = the Arthur rule of team-accent.md (run 3 had a relaxed 35 % - review 2026-09-30, reverted)",
+   "palette": {"P1": "#E8C06A", "P2": "#5A7F9F", "masters": "art/um-materials/um-masters.json", "source": "team_palette.active = c11_value_split_proposal (read at run time, checked against P1 / P2 here)"},
+   "team_dye": 1.0,
+   "team_dye_gain_rule": {"median_target": 0.8, "p95_max_albedo": 0.9, "round_to": 0.5, "y_clamp": [0.02, 0.8],
+                          "per_team": true, "note": "team-accent.md: gain_t = min(0.8 / Y_p50, 0.9 / (max channel of TeamColor_t x Y_p95)) over the accent texels (weight >= 0.5) of the look-dev BC (2K), Y clamped to y_clamp, rounded down to round_to; evaluated PER TEAM (each team MI carries its TeamDyeGain): with one gain bound by P1 (max channel 0.807) the P2 accent stayed at 0.26 x TeamColor and read dE 6-13 against the blue wool at K2 (run 1, 2026-09-30)"},
+   "frames": {
+    "eevee_samples": 32,
+    "readability": {"views": ["k2_5x_az0", "k2_5x_az180"], "min_delta_e_accent_vs_wool": 15, "min_delta_e_p1_vs_p2": 20,
+                    "min_screen_share": 0.01, "blue_share_min_ratio": 0.8, "embroidery_max_median_delta_e": 2.0,
+                    "note": "thresholds of the Arthur look-dev (ΔE accent vs the cloth next to it >= 15, P1 vs P2 >= 20); the robe stays blue: blue share of all wool pixels with the dye >= 0.8 x without; the gold is not dyed: median ΔE of the embroidery pixels <= 2"},
+    "k2_distance_uu": {"5x": 386.0, "1p6": 1207.0},
+    "k2_azimuths": [0, 180, -40],
+    "k2_pitch_deg": -55.0, "k2_hfov_deg": 35.0, "k2_focus_above_cell_uu": 28.0, "k2_resolution": [1920, 1080],
+    "closeups": {
+     "close_hood_az0": {"bone": "head", "t": 0.5, "direction": "front", "scale_m": 0.13, "res": [900, 900]},
+     "close_torso_az0": {"bone": "hips", "t": 0.0, "offset_m": [0.0, 0.0, 0.07], "direction": "front", "scale_m": 0.2, "res": [900, 900]},
+     "close_back_az180": {"bone": "head", "t": 0.0, "offset_m": [0.0, 0.0, -0.06], "direction": "back", "scale_m": 0.24, "res": [900, 900]}
+    },
+    "cobble": {
+     "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json lightProfiles.cobble-probe (read-only), the numbers of review_h22.lights.cobble of the King Arthur H2 profile and of the Arthur / Harpy look-dev frames",
+     "key_lux": 4.5, "key_pitch_deg": -55.0, "key_yaw_deg": 30.0, "key_colour_linear": [1.0, 1.0, 1.0], "key_source_angle_deg": 0.5357,
+     "sky_intensity": 11.2, "sky_colour_linear": [1.0, 1.0, 1.0], "ev100": 1.3, "view_transform": "AgX",
+     "board_albedo_linear": [0.119, 0.121, 0.121], "board_roughness": 0.85, "board_size_m": 8.0,
+     "not_included": "the warm point light of cobble-probe (does not reach the figure cell); UE Lumen GI / reflections, TSR and the UE tonemapper are approximated by EEVEE ray tracing and AgX; flat board of the cobblestone mean albedo; the M_UM_Figure_v2 core (LUT classes, detail tiles, Cloth / Fuzz) is not evaluated - Principled BSDF on the look-dev BC / ORM / N",
+     "exposure_calibration": {
+      "method": "W4-A anchor (cobble-probe sky.calibration): K1 board ROI p50 of Rec.709 luma of the 8-bit sRGB frame = 131.2; figure hidden, 40 m board of the cobblestone mean albedo, K1 camera; the exposure offset (stops, added to log2(1 / (1.2 * 2^EV100))) bisected until |p50 - target| <= tolerance (as the Arthur / Harpy look-dev)",
+      "target_board_p50_luma": 131.2, "tolerance_luma": 0.75, "roi_px": [600, 700, 1360, 940],
+      "camera": {"fov_h_deg": 35.0, "distance_m": 19.31, "pitch_deg": -55.0, "azimuth_deg": 0.0},
+      "res": [1920, 1080], "calibration_board_size_m": 40.0, "search_stops": [-4.0, 2.0], "max_iterations": 16
+     }
+    }
+   }
+  }
  }
 }
