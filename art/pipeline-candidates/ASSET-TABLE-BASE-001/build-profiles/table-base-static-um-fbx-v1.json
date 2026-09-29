@@ -1,0 +1,82 @@
+{
+ "schema": "unmatched.tripo-pipeline.build-profile/1",
+ "profile_id": "table-base-static-um-fbx-v1/1",
+ "asset_id": "ASSET-TABLE-BASE-001",
+ "kind": "static-candidate",
+ "status": "proposed",
+ "note": "UE import contract of the diorama tray candidate. The candidate is built by art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_candidate.py (static_prop_candidate.py helpers, table-base pivot: board centre, flat top at Z=-3 uu, whole tray below). The adopt stage pins its bytes against reports/candidate-report.json + reports/fbx-readback.json. Not usable before the Tripo step: the candidate files do not exist yet. KNOWN GAP: ue-import (tripo_pipeline.py exec_ue_static_candidate) hard-codes the check pivot_base_centre (min Z = 0, bounds centred), which a tray below its top plane fails by design; expectations.pivot below is not read by the CLI yet (followup). Numbers are measurements or PROPOSED values, not budgets.",
+ "source_role": "smartuv-tex2k-pbr-glb",
+ "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+ "candidate": {
+  "dir": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31",
+  "fbx": "export/SM_TableBase.fbx",
+  "report": "reports/candidate-report.json",
+  "readback": "reports/fbx-readback.json",
+  "report_schema": "unmatched.tripo-pipeline.table-base-candidate/1",
+  "textures": {
+   "BC": "export/T_TableBase_BC.png",
+   "N": "export/T_TableBase_N.png",
+   "ORM": "export/T_TableBase_ORM.png"
+  }
+ },
+ "ue": {
+  "static_asset": "SM_TableBase",
+  "material": "M_TableBase_Candidate",
+  "instance": "MI_TableBase_Candidate",
+  "team_color": [
+   1,
+   1,
+   1,
+   1
+  ],
+  "team_color_note": "the diorama base is not team-owned: TeamColor stays neutral white",
+  "collision": "none",
+  "collision_note": "04 3.6: not interactive, no collision; the board keeps its own UBX selection collision (04 3.5), clicks go to L1 hit surfaces",
+  "two_sided": false,
+  "shared_master": {
+   "asset": "/Game/S05/M_DioramaMaster",
+   "texture_parameters": {
+    "BC": "BaseColorTexture",
+    "N": "NormalTexture",
+    "ORM": "ORMTexture"
+   },
+   "note": "04 1 names M_DioramaMaster as the shared master; it is used only if it exposes these texture parameters, otherwise the deviation is recorded and the candidate keeps its own material"
+  },
+  "textures": {
+   "BC": {
+    "asset": "T_TableBase_BC",
+    "srgb": true,
+    "compression": "TC_Default"
+   },
+   "N": {
+    "asset": "T_TableBase_N",
+    "srgb": false,
+    "compression": "TC_Normalmap",
+    "flip_green": false
+   },
+   "ORM": {
+    "asset": "T_TableBase_ORM",
+    "srgb": false,
+    "compression": "TC_Masks"
+   }
+  }
+ },
+ "axes": {
+  "protrusion_axis_ue": "X",
+  "long_axis_ue": "X",
+  "source": "long side of the tray = long side of the ART-005 board mesh (656 x 556 x 36 uu, long along export X = UE X; reports/board-art005-fbx-bounds.json). Place the tray actor with the same rotation as the board actor."
+ },
+ "expectations": {
+  "pivot_tolerance_uu": 0.05,
+  "pivot": {
+   "kind": "top-outline-centre",
+   "top_z_uu": -3.0,
+   "note": "PROPOSED (04 3.6: top at Z=0 or 2-4 uu lower). Not read by tripo_pipeline.py yet"
+  },
+  "top_outline_uu_ue": [
+   756,
+   656
+  ],
+  "top_outline_note": "PROPOSED: board 656 x 556 + rim 50 uu on every side (04 3.6: rim 40-60)"
+ }
+}

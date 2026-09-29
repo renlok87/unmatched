@@ -1,0 +1,152 @@
+{
+  "schema": "unmatched.tripo-stage-plan/1",
+  "asset": "ASSET-TABLE-BASE-001",
+  "runId": "20260928-table-base-tripo-h31",
+  "status": "blocked: платный шаг не выполнен. Подтверждение траты есть только в тексте задачи оркестратора (цитата пользователя), напрямую от пользователя в этой сессии его нет. Все бесплатные шаги выполнены",
+  "creditsSpent": 0,
+  "syntxSpent": 0,
+  "idempotencyCheck": {
+    "observedAt": "2026-09-28 ~22:25 (локально)",
+    "tripoBalanceUi": 24335,
+    "ledgerTripoBalanceEnd": 24335,
+    "ledgerEntriesForAsset": 0,
+    "studioAssetListNewest": "09-28 10:55 (время UI Studio). Совпадает с последней записью журнала 15:55:40 (Harpy PBR) при сдвиге UTC+5",
+    "conclusion": "Баланс в UI равен balanceEndUi журнала. Записей ASSET-TABLE-BASE-001 в журнале нет. Самая новая строка в списке ассетов Studio — Harpy. Значит, платных заданий основания сегодня не было. Studio открывалась только на чтение, в своей вкладке: без загрузок и без кликов по платным кнопкам. Вкладка закрыта. Чужую вкладку группы (task 5cb29330…) не трогал."
+  },
+  "boardSizeAssumption": {
+    "status": "предложено",
+    "source": "ART-005 wood-uv-ue-report.json: у SM_ART005_BoardStoneV4_WoodUV bounds_uu [656, 556, 36]. README ART-005: клетка 100 uu (S04 5×6), игровая плоскость Z=0, неровность ≤1,2 uu и не выше Z=0; после поворота актора длинная сторона = 6 рядов",
+    "board": {
+      "lengthUu": 656,
+      "widthUu": 556,
+      "thicknessUu": 36,
+      "assumedZRangeUu": [
+        -36,
+        0
+      ]
+    },
+    "tray": {
+      "rimUu": 50,
+      "outerUu": [
+        756,
+        656
+      ],
+      "topZUu": -3,
+      "rimRangeUu": "40–60 (04 §3.6, предложено)",
+      "topZRangeUu": "0…−4 (04 §3.6, предложено)"
+    },
+    "note": "Финальный габарит доски не зафиксирован (AD-OPEN-36). Если он изменится, на Blender-этапе меняется только масштаб XY. Скала аморфна, поэтому неравномерный масштаб XY до ~4 % допустим. Pivot — центр доски, Z=0."
+  },
+  "inputDecision": {
+    "slots": {
+      "front": "ref-table-base-v3-front.png",
+      "left": "ref-table-base-v3-side.png",
+      "back": null,
+      "right": null
+    },
+    "threeQuarter": "только референс для человека",
+    "variantChosen": "rock-white",
+    "why": [
+      "Генерируется только скальный низ (реестр sourceImages.note; generation-inputs selectionNote). У доски ART-005 уже есть своя деревянная рамка с уголками, рамка подноса их бы продублировала. Поэтому всё выше низа рамки и её контактной тени заменено фоном: front y<768, side y<767.",
+      "WARN T2 (серая кромка на фоне #808080) снят локально, без перерисовки. Фон исходников ровно #808080: так окрашены 100 % пикселей по краю кадра. Фон — область, связная с краем кадра, где max|RGB−128|≤2. Внутренние серые пиксели скалы (60 и 127 шт.) с краем не связаны и остаются частью объекта. Фон заменён на #FFFFFF, и у новой кромки 0 % пикселей ближе 30 к фону.",
+      "SYNTX и imagegen не понадобились: пиксельно точная маска бесплатна и не меняет форму скалы.",
+      "Оба вида сдвинуты на одинаковые dy=−330 px, масштаб не менялся. Согласованность ширины и базовой линии T2 сохранена: ширина скалы front 655 px, side 787 px, отношение 1,20 = 6:5."
+    ],
+    "alternatives": {
+      "rock-alpha": "та же маска, но RGBA с прозрачным фоном — если подтвердится, что Studio берёт альфу",
+      "full-white": "рамка сохранена. Запасной путь, если скала без рамки выйдет со вздутым верхом; рамку тогда срезать в Blender по плоскости низа рамки"
+    },
+    "metricNote": "originalInnerEdgeCloseTo808080Frac в inputs-report.json считается по кольцу 1 px, куда входит сглаживание краёв. Это не метрика T2 (18 % / 12,8 %), сравнивать их нельзя.",
+    "files": {
+      "front": {
+        "rock-white": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-front-rock-white.png",
+          "sha256": "0129a50cf3fe644866b22f4a4d61bc04826d2f798429fb9a13de774d43063236",
+          "innerEdgeCloseToBgFrac": 0.0
+        },
+        "rock-alpha": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-front-rock-alpha.png",
+          "sha256": "f5a64dbf450086f6b67f54252d85f832caed8f07e6b39ca8d5398843aace4cfb",
+          "innerEdgeCloseToBgFrac": null
+        },
+        "full-white": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-front-full-white.png",
+          "sha256": "2cca035d640f74657d81a00f7c569367712ab3e65b4414de76bb5ca6c66a422b",
+          "innerEdgeCloseToBgFrac": 0.0
+        }
+      },
+      "left": {
+        "rock-white": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-left-rock-white.png",
+          "sha256": "048b3f90e994b6430eb3a777dad2ad1c9955b17786fbe2e9349f72ca7e30dc0c",
+          "innerEdgeCloseToBgFrac": 0.0
+        },
+        "rock-alpha": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-left-rock-alpha.png",
+          "sha256": "f7f456d784adfce75c3f7af1962a8842b7dc9dd0829f824507db87a4b9db8802",
+          "innerEdgeCloseToBgFrac": null
+        },
+        "full-white": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-left-full-white.png",
+          "sha256": "1f2427c014ca3116c6a568ede59163dc9625585c7c30704af7d3b9c93c7e62c4",
+          "innerEdgeCloseToBgFrac": 0.0
+        }
+      }
+    },
+    "sourceSha256Verified": true,
+    "checkInputs": "tools/tripo-pipeline/check_inputs.py --check-only: recommended PASS 297 / WARN 3 / FAIL 0. WARN основания — контраст кромки; вариант rock-white его снимает",
+    "dryRunPackage": {
+      "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/generation-request/generation-requests/ebc1825353e8bd8d.json",
+      "requestKey": "ebc1825353e8bd8de44c54a3d4b0fbfebc73907178d325e8aba7fcd6ecd95a72",
+      "exit": 0,
+      "problems": 0,
+      "duplicates": 0,
+      "note": "prepare-generation работает только в run-каталоге после init. У ассета ещё нет исходника, поэтому run generation-request создан с --primary-source tripo-pending — только ради пакета. Для CLI-прогонов кандидата нужен новый run-каталог"
+    },
+    "preview": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/input-variants-sheet.jpg"
+  },
+  "targets": {
+    "trianglesLod0": "10–20k (04 §3.6, предложено)",
+    "retopologyTarget": "Quad, Smart Mesh, цель ≈7 000 faces (≈14k tris после триангуляции). Решение исполнителя: середина бюджета 10–20k. Шипы скалы — главный силуэт при отдалении 0,65× и при слежении за ближним рядом (в K1 16:9 скала спереди за кадром — замер Blender-этапа), плюс нужен запас на срез и крышку в Blender",
+    "textures": "2K (04 §3.6: «2K; 1 материал»), BC/N/ORM",
+    "slots": "1 (скала). В 04 §3.6 противоречие: «1–2 слота» и «1 материал» (AD-CNF-18). На входе только скала, второй слот не нужен",
+    "depth": "На входах глубина скалы ≈150 px, то есть ≈150 uu при масштабе ширины ~1 uu/px. 04 §3.6 предлагает толщину 30–50 uu и обрыв края в 30–60 uu от игровой плоскости. Конфликт референса и 04 решается Z-масштабом на Blender-этапе по кадрам игровой камеры 16:9 (K1, зум 0,65×, слежение за ближним рядом на 1,2×; см. blender-stage-plan.json)",
+    "pivot": "центр доски, Z=0 (04 §3.6); верх подноса Z=−3",
+    "collision": "нет (04 §3.6)"
+  },
+  "paidPlanQuotesFromPriorRuns": {
+    "note": "Цены взяты из журнала прошлых прогонов (Merlin, Harpy, бочка), а не с кнопки. Перед каждым кликом прочитать цену с кнопки. В режиме по умолчанию (одно изображение, текущие настройки) кнопка «Создать» при чтении показывала 65",
+    "multiviewH31": 55,
+    "segment": "пропустить: нужен цельный меш, а Smart UV отказывает многочастным моделям (опыт Merlin/Harpy)",
+    "retopologyQuad": 40,
+    "smartUv": 20,
+    "texture2k": 10,
+    "pbr": 5,
+    "expectedTotal": 130,
+    "cap": 250,
+    "regenerationRule": "Перегенерация — только с записанной причиной (срезана кромка или вздут верх → вариант full-white). С ней итог ≤185"
+  },
+  "runbook": [
+    "0. Выполняет сессия, в которой пользователь сам подтвердил трату. Одна своя вкладка Chrome; чужую вкладку группы не трогать.",
+    "1. studio.tripo3d.ai/ru/workspace/generate: записать текущие настройки Studio, чтобы вернуть их в конце. Баланс должен равняться balanceEndUi журнала (было 24 335), записей ASSET-TABLE-BASE-001 в журнале быть не должно.",
+    "2. Изображение → несколько видов: front ← inputs/table-base-v3-front-rock-white.png, left ← inputs/table-base-v3-left-rock-white.png, back и right пустые. H3.1, «Приватный», текстура 2K + PBR, Triangle; «по частям» и 8K выключены. Цену с кнопки → в журнал как quoted → клик → баланс после → scripts/tripo_ledger_append.py.",
+    "3. Осмотр: верх плоский (не вздут), кромка не срезана, шипы смотрят вниз, в плане пропорции ≈6:5. Если верх вздут или форма не читается — одна перегенерация на full-white, причину записать в журнал.",
+    "4. Ремеш → Quad, Smart Mesh, цель 7 000 (цену с кнопки → в журнал).",
+    "5. Smart UV (цену → в журнал).",
+    "6. Текстура 2K, несколько видов front/left, удалить освещение → PBR (цены → в журнал).",
+    "7. Экспорт GLB каждой стадии, по одному (h31-source, retopo, smartuv-tex2k-pbr): Downloads/<guid>.tmp → длина из GLB-заголовка равна размеру файла, обход чанков → source/table-base-tripo-<task8>-<role>.glb → sha256. Save-диалог закрыть. Сырой GLB >50 МБ не коммитить, его sha записать в source-spec.",
+    "8. source-specs/tripo-<task8>.json (unmatched.tripo-pipeline.source-spec/1) → новый run: $T init --run-dir <R>/ue-passthrough … --primary-source tripo-<task8>; затем $T register-source ….",
+    "9. Вернуть настройки Studio, закрыть свою вкладку. В отчёт этапа: task id, цены, баланс до и после."
+  ],
+  "ledgerHelper": {
+    "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/tripo_ledger_append.py",
+    "tested": "на копии журнала (CREDITS_LEDGER=C:/tmp/…): добавилась 1 запись, spent 710→765, обновлены byTask и balanceEndUi. Настоящий журнал не менялся",
+    "why": "tools/art/syntx_video_refs/ledger_append.py пишет только в syntx.window"
+  },
+  "blenderStagePreview": [
+    "Импортировать GLB, отцентровать по XY, масштабировать XY до 756×656 uu (кайма 50). Верх — плоскость Z=−3: всё выше срезать, крышку закрыть плоско (в центре она скрыта под доской, видна только кайма 50 uu).",
+    "Z-масштаб выбрать по кадрам игровой камеры 16:9 — K1, зум 0,65× и слежение за ближним рядом на 1,2× (конфликт: 150 uu у референса против 30–50 uu в 04).",
+    "Длинную сторону подноса выровнять с длинной стороной доски (6 рядов); ориентацию брать по актору доски в /Game/ArtTests/ART005F.",
+    "Экспорт UM_FBX_v1 SM_TableBase: 1 слот, T_TableBase_{BC,N,ORM} 2K; static_prop_candidate.py, профиль static-candidate. UE — отложено."
+  ]
+}

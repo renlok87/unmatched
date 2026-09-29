@@ -15,10 +15,15 @@ Commands:
   verify             check the import against GLB structure and spec expectations
   export             Blender: deterministic FBX (preset UM_FBX_v1) + round-trip re-import check
                      (profile passthrough)
-  atlas              Python/Pillow: pack part textures into BC/N/ORM atlas (profile skeletal-candidate)
+  atlas              Python/Pillow: pack part textures into BC/N/ORM atlas (profile skeletal-candidate);
+                     profile options: atlas.exclude_parts, atlas.normal_renormalise, team_color.mask (TeamMask)
   build              Blender: skeletal candidate + separate base from a build profile, deterministic
                      FBX with the profile's preset (UM_FBX_v1: face -Y -> +X), round-trip and
-                     reference checks (profile skeletal-candidate)
+                     reference checks (profile skeletal-candidate). The algorithm is chosen and
+                     parameterised by the profile (build.flow: whole-figure = Medusa T4, seated-parts =
+                     heroes: weapon split/parts/none, normalised or parametric base, closure caps,
+                     per-face orientation vote, heat/rigid/wing/axis weights, anatomy, sockets);
+                     library blender/candidate_build/, no per-asset builder scripts
   adopt              pin an externally built static prop candidate (FBX + BC/N/ORM, e.g. from
                      blender/static_prop_candidate.py) against its candidate/read-back reports
                      (profile static-candidate); copies nothing
@@ -69,7 +74,7 @@ import time
 from pathlib import Path
 
 TOOL_NAME = "tripo-pipeline"
-TOOL_VERSION = "0.4.0"
+TOOL_VERSION = "0.5.0"
 RUN_SCHEMA = "unmatched.tripo-pipeline.run/1"
 SPEC_SCHEMA = "unmatched.tripo-pipeline.source-spec/1"
 REQUEST_SCHEMA = "unmatched.tripo-pipeline.generation-request/1"
@@ -77,7 +82,54 @@ BUILD_PROFILE_SCHEMA = "unmatched.tripo-pipeline.build-profile/1"
 VERIFY_LOGIC_VERSION = "verify/1"
 PREFLIGHT_LOGIC_VERSION = "preflight/4"
 UE_IMPORT_LOGIC_VERSION = "ue-import/2"
-UE_CANDIDATE_LOGIC_VERSION = "ue-candidate/2"
+UE_CANDIDATE_LOGIC_VERSION = "ue-candidate/6"  # /4: socket bones use the UE bone name ('.' -> '_');
+# /6: a vertex-mask base is imported with its vertex colours by editor Python (UE_PY_IMPORT_STATIC_VERTEX_COLOURS)
+UE_PY_IMPORT_STATIC_VERTEX_COLOURS = r'''"""tripo-pipeline ue-import: static FBX import WITH vertex colours (run inside the live editor).
+
+MCP StaticMeshTools.import_file builds the same FbxImportUI but leaves VertexColorImportOption at its class default
+(Ignore) and has no argument for it; changing the class default through ObjectTools dirties every loaded StaticMesh
+(measured 2026-09-28, stage 3 T3.1). This script sets the option on its own FbxImportUI only.
+"""
+import json
+import sys
+
+import unreal as u
+
+a = json.load(open(sys.argv[-1], encoding="utf-8"))
+res = {"vertex_color_import_option": "Replace"}
+try:
+    if u.EditorAssetLibrary.does_asset_exist("%s/%s" % (a["folder_path"], a["asset_name"])):
+        raise RuntimeError("import_asset: %s at %s already exists" % (a["asset_name"], a["folder_path"]))
+    o = u.FbxImportUI()
+    o.set_editor_property("automated_import_should_detect_type", False)
+    o.set_editor_property("import_mesh", True)
+    o.set_editor_property("import_as_skeletal", False)
+    o.set_editor_property("mesh_type_to_import", u.FBXImportType.FBXIT_STATIC_MESH)
+    o.set_editor_property("original_import_type", u.FBXImportType.FBXIT_STATIC_MESH)
+    o.set_editor_property("import_materials", bool(a["import_materials"]))
+    o.set_editor_property("import_textures", bool(a["import_textures"]))
+    o.set_editor_property("import_animations", False)
+    d = o.get_editor_property("static_mesh_import_data")
+    d.set_editor_property("combine_meshes", bool(a["combine_meshes"]))
+    d.set_editor_property("vertex_color_import_option", u.VertexColorImportOption.REPLACE)
+    t = u.AssetImportTask()
+    t.set_editor_property("filename", a["source_file"])
+    t.set_editor_property("destination_path", a["folder_path"])
+    t.set_editor_property("destination_name", a["asset_name"])
+    t.set_editor_property("replace_existing", False)
+    t.set_editor_property("automated", True)
+    t.set_editor_property("save", False)
+    t.set_editor_property("factory", u.FbxFactory())
+    t.set_editor_property("options", o)
+    u.AssetToolsHelpers.get_asset_tools().import_asset_tasks([t])
+    res["imported"] = [str(x) for x in t.get_editor_property("imported_object_paths")]
+    if not res["imported"]:
+        raise RuntimeError("the import produced no assets")
+except Exception as exc:  # noqa: BLE001 - reported to the CLI
+    res["error"] = "%s: %s" % (type(exc).__name__, exc)
+with open(a["out"], "w", encoding="utf-8", newline="\n") as handle:
+    handle.write(json.dumps(res, indent=1, sort_keys=True) + "\n")
+'''
 UE_STATIC_LOGIC_VERSION = "ue-static-candidate/1"
 ADOPT_LOGIC_VERSION = "adopt/1"
 
@@ -96,6 +148,7 @@ BLENDER_SCRIPTS = {
     "build": TOOL_DIR / "blender" / "build_candidate.py",
 }
 ATLAS_SCRIPT = TOOL_DIR / "candidate" / "atlas.py"
+BUILD_LIBRARY = TOOL_DIR / "blender" / "candidate_build"  # the build stage's library (loaded by build_candidate.py)
 DEFAULT_FBX_PRESET = "blender/_tools/presets/UM_FBX_v1.json"  # repo-relative; ART-001 PASS 2026-09-27
 FBX_PRESET_NAME = "UM_FBX_v1"
 FBX_PRESET_KEYS = ("name", "axis_forward", "axis_up", "export_space_rotation_z_degrees", "temporary_data_scale",
@@ -128,6 +181,7 @@ UE_TOOLSETS = {
     "instance": "editor_toolset.toolsets.material_instance.MaterialInstanceTools",
     "object": "editor_toolset.toolsets.object.ObjectTools",
     "logs": "EditorToolset.LogsToolset",
+    "slate": "SlateInspectorToolset.SlateInspectorToolset",
 }
 ATLAS_TIMEOUT_S = 600
 DEFAULT_UE_DIMENSION_TOLERANCE = 0.01  # fraction of the Blender-measured size
@@ -583,6 +637,30 @@ class McpUnreal:
                 payload = {"text": texts[0]}
         return True, payload
 
+    def editor_python(self, script: Path, args_path: Path, out: Path, timeout: int = 600) -> dict:
+        """Run a Python file in the live editor: `py "<script>" <args>` typed into the editor console (the "Cmd" box)
+        through SlateInspectorToolset, as review/ue_live.py does. The script writes `out` itself."""
+        if out.exists():
+            out.unlink()
+        snap = self.call("slate", "Snapshot", {"ref": "", "maxDepth": 60, "bIncludeSourceLocations": False})
+        text = snap if isinstance(snap, str) else json.dumps(snap)
+        i = text.find('text "Cmd"')
+        m = re.search(r"textbox [^\n]*\[ref=(\w+)\]", text[i:i + 600]) if i >= 0 else None
+        if not m:
+            raise PipelineError("editor console (Cmd box) not found through SlateInspector")
+        self.call("slate", "Type", {"ref": m.group(1), "submit": True,
+                                    "text": 'py "%s" %s' % (script.as_posix(), args_path.as_posix())})
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            if out.exists():
+                time.sleep(0.3)
+                try:
+                    return json.loads(out.read_text(encoding="utf-8"))
+                except ValueError:
+                    pass
+            time.sleep(0.5)
+        raise PipelineError("editor python %s wrote no %s within %ss" % (script.name, out.name, timeout))
+
     def call(self, toolset_key: str, tool: str, args: dict):
         toolset = UE_TOOLSETS[toolset_key]
         styles = [self.tool_name_style] if self.tool_name_style else ["short", "qualified"]
@@ -740,6 +818,34 @@ def load_build_profile(ctx: "Context") -> tuple:
     return profile, path
 
 
+_PROFILE_SCHEMA = {}
+
+
+def profile_schema():
+    """blender/candidate_build/profile_schema.py (stdlib only; shared with the Blender build stage)."""
+    if "module" not in _PROFILE_SCHEMA:
+        import importlib.util
+        path = BUILD_LIBRARY / "profile_schema.py"
+        spec = importlib.util.spec_from_file_location("tripo_pipeline_profile_schema", path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        _PROFILE_SCHEMA["module"] = module
+    return _PROFILE_SCHEMA["module"]
+
+
+def build_library_hashes() -> dict:
+    """SHA-256 of every module of the build library (part of the build fingerprint)."""
+    return {p.name: sha256_file(p) for p in sorted(BUILD_LIBRARY.glob("*.py"))}
+
+
+def build_reference_file(ctx: "Context", profile: dict):
+    """The registered reference GLB of orientation.per_face_reference (None when the profile has none)."""
+    ref = (profile.get("orientation") or {}).get("per_face_reference")
+    if not ref:
+        return None
+    return source_file(ctx.manifest, ref["source_id"], ref["role"])
+
+
 def profile_reference_hashes(ctx: "Context", profile: dict, keys) -> dict:
     """SHA-256 of the read-only reference files a profile compares against (None if absent)."""
     out = {}
@@ -843,7 +949,8 @@ def fp_preflight(ctx: Context) -> dict:
         "tool": TOOL_VERSION,
         "blender": blender,
         "backend": ctx.backend,
-        "scripts": {k: sha256_file(v) for k, v in sorted(BLENDER_SCRIPTS.items())},
+        "scripts": dict({k: sha256_file(v) for k, v in sorted(BLENDER_SCRIPTS.items())},
+                        **{"build_library/" + k: v for k, v in build_library_hashes().items()}),
         "sources": {sid: {f["role"]: f["sha256"] for f in s["files"]} for sid, s in sorted(m["sources"].items())},
         "config": m["config"],
     }
@@ -910,8 +1017,23 @@ def exec_preflight(ctx: Context, staging: Path) -> StageResult:
                                                          "id": profile["profile_id"], "sha256": sha256_file(ppath)})
             check("build_profile_role_is_primary", profile["source_role"] == m["config"]["primary_role"],
                   measured=profile["source_role"], expected=m["config"]["primary_role"])
+            problems = profile_schema().validate(profile)
+            check("build_profile_schema", not problems, measured={"flow": profile_schema().flow_of(profile),
+                                                                  "problems": problems},
+                  note="blender/candidate_build/profile_schema.py (the build stage validates the same way)")
+            ref = (profile.get("orientation") or {}).get("per_face_reference")
+            if ref:
+                try:
+                    ref_file = build_reference_file(ctx, profile)
+                    check("build_reference_source_registered", True,
+                          measured="%s:%s %s" % (ref["source_id"], ref["role"], ref_file["path"]))
+                except PipelineError as exc:
+                    check("build_reference_source_registered", False, error=str(exc),
+                          note="orientation.per_face_reference names a source that register-source must add first")
         except PipelineError as exc:
             check("build_profile_valid", False, error=str(exc))
+        check("build_library_present", (BUILD_LIBRARY / "__init__.py").is_file() and BLENDER_SCRIPTS["build"].is_file(),
+              measured={"library": build_library_hashes()})
         deps = atlas_python_deps()
         check("atlas_python_deps", deps.get("ok"), measured=deps)
     elif run_profile(m) == STATIC:
@@ -1155,8 +1277,11 @@ def fp_build(ctx: Context) -> dict:
     primary = source_file(m, m["config"]["primary_source"], m["config"]["primary_role"])
     atlas_outputs = (m["stages"].get("atlas") or {}).get("outputs") or {}
     ref = profile.get("reference") or {}
-    return {"script": sha256_file(BLENDER_SCRIPTS["build"]), "blender": ctx.blender_version(), "backend": ctx.backend,
+    ref_glb = build_reference_file(ctx, profile)
+    return {"script": sha256_file(BLENDER_SCRIPTS["build"]), "library": build_library_hashes(),
+            "blender": ctx.blender_version(), "backend": ctx.backend,
             "source_sha256": primary["sha256"], "profile_sha256": sha256_file(ppath),
+            "reference_glb_sha256": ref_glb["sha256"] if ref_glb else None,
             "atlas_outputs": {k: v["sha256"] for k, v in sorted(atlas_outputs.items())},
             "references": profile_reference_hashes(ctx, profile, sorted(v for k, v in ref.items()
                                                                         if k in ("skeletal_fbx", "base_fbx"))),
@@ -1181,10 +1306,20 @@ def exec_build(ctx: Context, staging: Path) -> StageResult:
     base = staging / Path(rels["base"]).name
     blend = staging / "work.blend"
     report = staging / "build-report.json"
+    problems = profile_schema().validate(profile)
+    if problems:
+        raise PipelineError("build profile invalid (%s): %s" % (m["config"]["build_profile"], "; ".join(problems)))
     params = {"source": str(source), "profile": str(ppath), "atlas_report": str(ctx.run_path("reports/atlas-report.json")),
               "textures_dir": str(ctx.run_path("textures")), "repo_root": str(ctx.repo_root),
               "blend_out": str(blend), "sk_fbx_out": str(sk), "base_fbx_out": str(base), "report_out": str(report),
-              "fbx_preset": str(fbx_preset(ctx)["path"])}
+              "fbx_preset": str(fbx_preset(ctx)["path"]), "lib_dir": str(BLENDER_SCRIPTS["build"].parent)}
+    ref_glb = build_reference_file(ctx, profile)
+    if ref_glb:
+        ref_path = ctx.repo_path(ref_glb["path"])
+        if not ref_path.is_file() or sha256_file(ref_path) != ref_glb["sha256"]:
+            raise PipelineError("reference GLB of orientation.per_face_reference missing or changed since "
+                                "registration: %s" % ref_glb["path"])
+        params["reference_glb"] = str(ref_path)
     run_blender(ctx, "build", params, staging, "TRIPO_PIPELINE_STAGE_OK build")
     data = json.loads(report.read_text(encoding="utf-8"))
     for key, path in (("skeletal", sk), ("base", base)):
@@ -1194,10 +1329,14 @@ def exec_build(ctx: Context, staging: Path) -> StageResult:
     return StageResult({rels["skeletal"]: sk, rels["base"]: base, candidate_blend_rel(m): blend,
                         "reports/build-report.json": report},
                        {"passed": data["passed"], "failed_checks": failed,
+                        "flow": data.get("flow"),
                         "skeletal_fbx_sha256": data["exports"]["skeletal"]["sha256"],
                         "base_fbx_sha256": data["exports"]["base"]["sha256"],
                         "flipped_parts": data["orientation"]["flipped_parts"],
-                        "export_front_axis": ((data.get("axes") or {}).get("export_frame") or {}).get("front_axis"),
+                        "export_front_axis": ((data.get("axes") or {}).get("export_frame") or {}).get("front_axis")
+                        or (data.get("axes") or {}).get("export_front_axis"),
+                        "figure_top_m": (data.get("figure") or {}).get("figure_top_m"),
+                        "skeletal_top_m": (data.get("figure") or {}).get("skeletal_top_m"),
                         "live_name_collisions": data.get("live_name_collisions")},
                        data["passed"], None if data["passed"] else "build checks failed: %s" % ", ".join(failed))
 
@@ -1260,9 +1399,15 @@ def ue_plan(ctx: Context) -> dict:
                  "skeleton": "%s/Meshes/%s_Skeleton" % (folder, u["skeletal_asset"]),
                  "base": "%s/Meshes/%s" % (folder, u["base_asset"]),
                  "material": "%s/Materials/%s" % (folder, u["material"])}
+        if u.get("base_material_mode", "atlas-instance") == "vertex-mask":
+            names["base_material"] = "%s/Materials/%s" % (folder, u["base_material"])
         for name in u["instances"]:
             names["instance:" + name] = "%s/Materials/%s" % (folder, name)
+        atlas_path = ctx.run_path("reports/atlas-report.json")
+        atlas_files = json.loads(atlas_path.read_text(encoding="utf-8"))["files"] if atlas_path.is_file() else {}
         for key, tex in u["textures"].items():
+            if tex.get("optional") and tex["file_key"] not in atlas_files:
+                continue  # optional input the atlas stage did not produce (e.g. no team_color.mask)
             names["texture:" + key] = "%s/Textures/%s" % (folder, tex["asset"])
         return {"folder": folder, "name": u["skeletal_asset"], "kind": "skeletal", "primary": names["skeletal"],
                 "names": names, "profile": profile}
@@ -1310,6 +1455,8 @@ def within(measured, expected, tolerance) -> bool:
     return expected is not None and measured is not None and abs(measured - expected) <= abs(expected) * tolerance
 
 
+UE_TEAM_COLOR_MODES = ("multiply", "mask", "none")  # skeletal-candidate atlas material (ue.team_color_mode)
+UE_BASE_MATERIAL_MODES = ("atlas-instance", "vertex-mask")  # base material (ue.base_material_mode)
 IMPORTER_SIDE_PRODUCT_CLASSES = ("Material", "MaterialInstanceConstant", "Texture2D")
 UE_DELETE_RANK = {"MaterialInstanceConstant": 0, "SkeletalMesh": 1, "StaticMesh": 1, "PhysicsAsset": 1,
                   "Skeleton": 2, "Material": 3, "Texture2D": 4}
@@ -1475,6 +1622,36 @@ def ue_obj(package: str) -> dict:
     return {"refPath": ue_object_path(package)}
 
 
+def ue_bone_name(bone: str) -> str:
+    """Blender bone name -> UE bone name: the FBX import turns '.' into '_' (foot.R -> foot_R; measured live on the
+    Harpy candidate 2026-09-28: add_socket on "foot.R" failed with 'Bone "foot.R" not found')."""
+    return bone.replace(".", "_")
+
+
+def candidate_socket_plan(profile: dict, build: dict) -> list:
+    """Sockets for UE: [{"name", "bone", "ue_bone", "location_uu", "source"}]. `bone` is the profile (Blender) name,
+    `ue_bone` the UE name the socket is attached to. Location = profile sockets[].location_uu when given, else the
+    build report's UE bone-space prediction (sockets[].location_uu_for_ue: the Blender bone-local target with y
+    negated, the UE FBX import mirrors Y)."""
+    from_build = {s["name"]: s for s in build.get("sockets") or []}
+    plan = []
+    for sock in profile["sockets"]:
+        loc = sock.get("location_uu")
+        if isinstance(loc, list):
+            plan.append({"name": sock["name"], "bone": sock["bone"], "ue_bone": ue_bone_name(sock["bone"]),
+                         "location_uu": list(loc), "source": "profile"})
+            continue
+        predicted = from_build.get(sock["name"])
+        if not predicted or not isinstance(predicted.get("location_uu_for_ue"), list):
+            raise PipelineError("socket %s has no location_uu in the profile and the build report predicts none "
+                                "(rebuild with tool >= 0.5.0)" % sock["name"])
+        plan.append({"name": sock["name"], "bone": sock["bone"], "ue_bone": ue_bone_name(sock["bone"]),
+                     "location_uu": list(predicted["location_uu_for_ue"]),
+                     "source": "build prediction", "target_ue_component_uu": predicted.get("target_ue_component_uu"),
+                     "offset_blender_bone_local_uu": predicted.get("offset_blender_bone_local_uu")})
+    return plan
+
+
 def ue_minmax(bounds: dict):
     if not bounds:
         return None, None
@@ -1574,9 +1751,11 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
         raw = ue.call("object", "get_properties", {"instance": ref, "properties": props})
         return json.loads(raw) if isinstance(raw, str) else raw
 
-    # textures (the DirectX normal and linear ORM are imported from the atlas stage files)
+    # textures (the DirectX normal and linear ORM are imported from the atlas stage files; an optional texture such
+    # as the TeamMask of team_color.mask only when the atlas stage produced it, see ue_plan)
     tex_files = {k: v["file"] for k, v in atlas["files"].items()}
-    for key, tcfg in sorted(u["textures"].items()):
+    textures = {k: t for k, t in u["textures"].items() if "texture:" + k in names}
+    for key, tcfg in sorted(textures.items()):
         pkg = names["texture:" + key]
         track(ue.call("texture", "import_file", {"folder_path": pkg.rsplit("/", 1)[0], "asset_name": tcfg["asset"],
                                                  "source_file": str(ctx.run_path("textures/" + tex_files[tcfg["file_key"]]))}))
@@ -1584,41 +1763,148 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
         if "flip_green" in tcfg:
             props["bFlipGreenChannel"] = tcfg["flip_green"]
         setp(ue_obj(pkg), props)
-    # material: BC x TeamColor, DirectX normal, ORM (R AO, G roughness, B metallic)
+    team_mode = u.get("team_color_mode", "multiply")
+    base_mode = u.get("base_material_mode", "atlas-instance")
+    if team_mode not in UE_TEAM_COLOR_MODES:
+        raise PipelineError("ue.team_color_mode must be one of %s" % (UE_TEAM_COLOR_MODES,), EXIT_USAGE)
+    if base_mode not in UE_BASE_MATERIAL_MODES:
+        raise PipelineError("ue.base_material_mode must be one of %s" % (UE_BASE_MATERIAL_MODES,), EXIT_USAGE)
+    # material: BC [x TeamColor per ue.team_color_mode], DirectX normal, ORM (R AO, G roughness, B metallic)
     mat_pkg = names["material"]
     track(ue.call("material", "create_material", {"folder_path": mat_pkg.rsplit("/", 1)[0], "asset_name": u["material"]}))
     mat = ue_obj(mat_pkg)
 
-    def expr(cls, x, y, props=None):
-        ref = ue.call("material", "add_expression", {"material_or_function": mat, "x": x, "y": y,
+    def expr_in(material, cls, x, y, props=None):
+        ref = ue.call("material", "add_expression", {"material_or_function": material, "x": x, "y": y,
                                                      "expression_class": {"refPath": "/Script/Engine." + cls}})
         if props:
             setp(ref, props)
         return ref
 
-    tex_path = {k: ue_object_path(names["texture:" + k]) for k in u["textures"]}
+    def expr(cls, x, y, props=None):
+        return expr_in(mat, cls, x, y, props)
+
+    def link(src, out, dst, inp):
+        ue.call("material", "connect_expressions", {"from_expression": src, "from_output_name": out,
+                                                    "to_expression": dst, "to_input_name": inp})
+
+    tex_path = {k: ue_object_path(names["texture:" + k]) for k in textures}
     bc = expr("MaterialExpressionTextureSampleParameter2D", -800, 0,
               {"ParameterName": "BaseColorTexture", "Texture": tex_path["BC"], "SamplerType": "SAMPLERTYPE_Color"})
-    team = expr("MaterialExpressionVectorParameter", -800, 220,
-                {"ParameterName": "TeamColor", "DefaultValue": {"R": 1, "G": 1, "B": 1, "A": 1}})
-    mul = expr("MaterialExpressionMultiply", -480, 60)
     nrm = expr("MaterialExpressionTextureSampleParameter2D", -800, 420,
                {"ParameterName": "NormalTexture", "Texture": tex_path["N"], "SamplerType": "SAMPLERTYPE_Normal"})
     orm = expr("MaterialExpressionTextureSampleParameter2D", -800, 680,
                {"ParameterName": "ORMTexture", "Texture": tex_path["ORM"], "SamplerType": "SAMPLERTYPE_Masks"})
-    ue.call("material", "connect_expressions", {"from_expression": bc, "from_output_name": "RGB",
-                                                "to_expression": mul, "to_input_name": "A"})
-    ue.call("material", "connect_expressions", {"from_expression": team, "from_output_name": "",
-                                                "to_expression": mul, "to_input_name": "B"})
-    wiring = {"MP_BaseColor": (mul, ""), "MP_Normal": (nrm, "RGB"), "MP_AmbientOcclusion": (orm, "R"),
+    samplers_used = {"BC": bc, "N": nrm, "ORM": orm}
+    if team_mode == "none":
+        base_colour = (bc, "RGB")
+    else:
+        team = expr("MaterialExpressionVectorParameter", -800, 220,
+                    {"ParameterName": "TeamColor", "DefaultValue": {"R": 1, "G": 1, "B": 1, "A": 1}})
+        mul = expr("MaterialExpressionMultiply", -480, 60)
+        link(bc, "RGB", mul, "A")
+        link(team, "", mul, "B")
+        base_colour = (mul, "")
+        if team_mode == "mask":
+            if "TeamMask" not in textures:
+                raise PipelineError("ue.team_color_mode mask needs the TeamMask texture (team_color.mask of the atlas "
+                                    "stage and ue.textures.TeamMask)")
+            mask = expr("MaterialExpressionTextureSampleParameter2D", -800, 900,
+                        {"ParameterName": "TeamMaskTexture", "Texture": tex_path["TeamMask"],
+                         "SamplerType": "SAMPLERTYPE_LinearGrayscale"})
+            samplers_used["TeamMask"] = mask
+            lerp = expr("MaterialExpressionLinearInterpolate", -240, 60)
+            link(bc, "RGB", lerp, "A")
+            link(mul, "", lerp, "B")
+            link(mask, "R", lerp, "Alpha")
+            base_colour = (lerp, "")
+    wiring = {"MP_BaseColor": base_colour, "MP_Normal": (nrm, "RGB"), "MP_AmbientOcclusion": (orm, "R"),
               "MP_Roughness": (orm, "G"), "MP_Metallic": (orm, "B")}
     for prop, (ref, out) in wiring.items():
         ue.call("material", "connect_to_output", {"expression": ref, "output_name": out, "material_property": prop})
     setp(mat, {"bUsedWithSkeletalMesh": True})
     ue.call("material", "recompile", {"material_or_function": mat})
+    # base material (ue.base_material_mode vertex-mask): the parametric base's vertex-colour mask
+    # (R team band, G centre pips, B outer pips; pips lit by InstanceIndex 1: G, 2: B, 3: G + B)
+    bmat, base_wiring = None, {}
+    if base_mode == "vertex-mask":
+        bpar = u.get("base_material_parameters") or {}
+        bmat_pkg = names["base_material"]
+        track(ue.call("material", "create_material", {"folder_path": bmat_pkg.rsplit("/", 1)[0],
+                                                      "asset_name": u["base_material"]}))
+        bmat = ue_obj(bmat_pkg)
+
+        def bexpr(cls, x, y, props=None):
+            return expr_in(bmat, cls, x, y, props)
+
+        def rgba(values):
+            return dict(zip("RGBA", list(values) + [1.0] * (4 - len(values))))
+
+        vc = bexpr("MaterialExpressionVertexColor", -1200, 0)
+        base_col = bexpr("MaterialExpressionVectorParameter", -1200, 200,
+                         {"ParameterName": "BaseColor", "DefaultValue": rgba(bpar.get("BaseColor", [0.03, 0.026, 0.023]))})
+        team_b = bexpr("MaterialExpressionVectorParameter", -1200, 400,
+                       {"ParameterName": "TeamColor", "DefaultValue": {"R": 1, "G": 1, "B": 1, "A": 1}})
+        pip = bexpr("MaterialExpressionVectorParameter", -1200, 600,
+                    {"ParameterName": "PipColor", "DefaultValue": rgba(bpar.get("PipColor", [0.78, 0.74, 0.64]))})
+        index = bexpr("MaterialExpressionScalarParameter", -1200, 800,
+                      {"ParameterName": "InstanceIndex", "DefaultValue": 3.0})
+        emissive = bexpr("MaterialExpressionScalarParameter", -1200, 1000,
+                         {"ParameterName": "PipEmissive", "DefaultValue": float(bpar.get("PipEmissive", 0.35))})
+        # centre pips lit for |Index - 2| > 0.5, outer pips for Index > 1.5 (steep saturated ramps, no If node)
+        d2 = bexpr("MaterialExpressionSubtract", -900, 800, {"ConstB": 2.0})
+        link(index, "", d2, "A")
+        a2 = bexpr("MaterialExpressionAbs", -760, 800)
+        link(d2, "", a2, "")
+        c_off = bexpr("MaterialExpressionSubtract", -620, 800, {"ConstB": 0.5})
+        link(a2, "", c_off, "A")
+        c_k = bexpr("MaterialExpressionMultiply", -480, 800, {"ConstB": 1000.0})
+        link(c_off, "", c_k, "A")
+        centre_on = bexpr("MaterialExpressionSaturate", -340, 800)
+        link(c_k, "", centre_on, "")
+        o_off = bexpr("MaterialExpressionSubtract", -900, 950, {"ConstB": 1.5})
+        link(index, "", o_off, "A")
+        o_k = bexpr("MaterialExpressionMultiply", -760, 950, {"ConstB": 1000.0})
+        link(o_off, "", o_k, "A")
+        outer_on = bexpr("MaterialExpressionSaturate", -620, 950)
+        link(o_k, "", outer_on, "")
+        g_lit = bexpr("MaterialExpressionMultiply", -200, 700)
+        link(vc, "G", g_lit, "A")
+        link(centre_on, "", g_lit, "B")
+        b_lit = bexpr("MaterialExpressionMultiply", -200, 900)
+        link(vc, "B", b_lit, "A")
+        link(outer_on, "", b_lit, "B")
+        lit_sum = bexpr("MaterialExpressionAdd", -60, 800)
+        link(g_lit, "", lit_sum, "A")
+        link(b_lit, "", lit_sum, "B")
+        lit = bexpr("MaterialExpressionSaturate", 80, 800)
+        link(lit_sum, "", lit, "")
+        band = bexpr("MaterialExpressionLinearInterpolate", -900, 300)
+        link(base_col, "", band, "A")
+        link(team_b, "", band, "B")
+        link(vc, "R", band, "Alpha")
+        colour = bexpr("MaterialExpressionLinearInterpolate", 220, 300)
+        link(band, "", colour, "A")
+        link(pip, "", colour, "B")
+        link(lit, "", colour, "Alpha")
+        glow = bexpr("MaterialExpressionMultiply", 220, 600)
+        link(pip, "", glow, "A")
+        link(lit, "", glow, "B")
+        glow_k = bexpr("MaterialExpressionMultiply", 360, 600)
+        link(glow, "", glow_k, "A")
+        link(emissive, "", glow_k, "B")
+        rough = bexpr("MaterialExpressionConstant", 220, 1000, {"R": float(bpar.get("Roughness", 0.6))})
+        base_wiring = {"MP_BaseColor": (colour, ""), "MP_EmissiveColor": (glow_k, ""), "MP_Roughness": (rough, "")}
+        for prop, (ref, out) in base_wiring.items():
+            ue.call("material", "connect_to_output", {"expression": ref, "output_name": out, "material_property": prop})
+        ue.call("material", "recompile", {"material_or_function": bmat})
+    # team colour instances: children of the atlas material, or of the base material when the team colour lives on
+    # the base (vertex-mask); the default instance goes on the base, and on the figure unless it is a base child
+    instances_parent_pkg = names["base_material"] if bmat else mat_pkg
     for name, color in sorted(u["instances"].items()):
         pkg = names["instance:" + name]
-        track(ue.call("instance", "create", {"folder_path": pkg.rsplit("/", 1)[0], "asset_name": name, "parent": mat}))
+        track(ue.call("instance", "create", {"folder_path": pkg.rsplit("/", 1)[0], "asset_name": name,
+                                             "parent": bmat or mat}))
         ue.call("instance", "set_vector_parameter", {"instance": ue_obj(pkg), "name": "TeamColor",
                                                      "value": dict(zip("rgba", color))})
     # meshes
@@ -1627,9 +1913,28 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
                                               "source_file": str(ctx.run_path(rels["skeletal"])),
                                               "import_materials": False, "import_textures": False,
                                               "import_animations": False, "create_physics_asset": False}))
-    track(ue.call("static", "import_file", {"folder_path": base_pkg.rsplit("/", 1)[0], "asset_name": u["base_asset"],
-                                            "source_file": str(ctx.run_path(rels["base"])),
-                                            "import_materials": False, "import_textures": False, "combine_meshes": True}))
+    base_args = {"folder_path": base_pkg.rsplit("/", 1)[0], "asset_name": u["base_asset"],
+                 "source_file": str(ctx.run_path(rels["base"])), "import_materials": False, "import_textures": False,
+                 "combine_meshes": True}
+    base_vc = None
+    if bmat:
+        # The vertex-mask base material reads the base's vertex colours (UM_Mask). MCP StaticMeshTools.import_file
+        # leaves VertexColorImportOption at Ignore: the colours were dropped and the whole base rendered lit (measured
+        # live 2026-09-28, T3.1). The base is imported with the same FbxImportUI settings plus Replace, in editor
+        # Python (no editor default is touched).
+        script = staging / "ue_import_static_vertex_colours.py"
+        script.write_text(UE_PY_IMPORT_STATIC_VERTEX_COLOURS, encoding="utf-8", newline="\n")
+        args_path, out_path = staging / "ue_import_base.args.json", staging / "ue_import_base.out.json"
+        args_path.write_text(json.dumps(dict(base_args, out=out_path.as_posix()), indent=1), encoding="utf-8")
+        res = ue.editor_python(script, args_path, out_path)
+        ue.calls.append({"editor_python": script.name, "args": base_args, "result": res})
+        if res.get("error"):
+            raise PipelineError("base import with vertex colours failed in the editor: %s" % res["error"])
+        track([{"refPath": x} for x in res.get("imported") or []])
+        base_vc = {"import": "editor Python FbxImportUI (VertexColorImportOption Replace) through the MCP console",
+                   "script_sha256": hashlib.sha256(UE_PY_IMPORT_STATIC_VERTEX_COLOURS.encode("utf-8")).hexdigest()}
+    else:
+        track(ue.call("static", "import_file", base_args))
     after = ue_listing(ue, folder)
     rec["ue_owned_assets"] = sorted(set(after) | set(created))
     ctx.save()
@@ -1642,17 +1947,21 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
         except PipelineError:
             fbx_log = None
     sk, base = ue_obj(sk_pkg), ue_obj(base_pkg)
-    default_mi = ue_obj(names["instance:" + u["default_instance"]])
+    default_mi_pkg = names["instance:" + u["default_instance"]]
+    default_mi = ue_obj(default_mi_pkg)
+    # the figure shows the default team instance, or the atlas material itself when the instances belong to the base
+    sk_material_pkg = mat_pkg if bmat else default_mi_pkg
     sk_slots = ue.call("skeletal", "get_material_slots", {"mesh": sk}) or []
     for slot in sk_slots:
-        ue.call("skeletal", "set_material", {"mesh": sk, "slot_name": slot, "material": default_mi})
+        ue.call("skeletal", "set_material", {"mesh": sk, "slot_name": slot, "material": ue_obj(sk_material_pkg)})
     base_slots = ue.call("static", "get_material_slots", {"mesh": base}) or []
     for slot in base_slots:
         ue.call("static", "set_material", {"mesh": base, "slot_name": slot, "material": default_mi})
     for sock in ue.call("skeletal", "get_socket_names", {"mesh": sk}) or []:
         ue.call("skeletal", "remove_socket", {"mesh": sk, "socket_name": sock})
-    for sock in profile["sockets"]:
-        ue.call("skeletal", "add_socket", {"mesh": sk, "socket_name": sock["name"], "bone_name": sock["bone"]})
+    planned_sockets = candidate_socket_plan(profile, build)
+    for sock in planned_sockets:
+        ue.call("skeletal", "add_socket", {"mesh": sk, "socket_name": sock["name"], "bone_name": sock["ue_bone"]})
         x, y, z = sock["location_uu"]
         ue.call("skeletal", "set_socket_transform", {"mesh": sk, "socket_name": sock["name"], "transform": {
             "location": {"x": x, "y": y, "z": z}, "rotation": {"pitch": 0, "yaw": 0, "roll": 0},
@@ -1679,11 +1988,13 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     for key, pkg in sorted(names.items()):
         classes[key] = str(ue.call("asset", "get_asset_class", {"asset_path": pkg})).rsplit(".", 1)[-1]
     want = {"skeletal": "SkeletalMesh", "skeleton": "Skeleton", "base": "StaticMesh", "material": "Material"}
+    if "base_material" in names:
+        want["base_material"] = "Material"
     want.update({k: "MaterialInstanceConstant" for k in names if k.startswith("instance:")})
     want.update({k: "Texture2D" for k in names if k.startswith("texture:")})
     check("asset_classes", classes == want, classes, want)
     tex = {}
-    for key, tcfg in sorted(u["textures"].items()):
+    for key, tcfg in sorted(textures.items()):
         ref = ue_obj(names["texture:" + key])
         size = ue.call("texture", "get_size", {"texture": ref}) or {}
         props = getp(ref, ["SRGB", "CompressionSettings", "bFlipGreenChannel"])
@@ -1696,7 +2007,7 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     measured["textures"] = tex
     check("textures_size_colour_space_compression", all(t["ok"] for t in tex.values()), tex,
           {k: {"size": [atlas["size"]] * 2, "SRGB": c["srgb"], "CompressionSettings": c["compression"]}
-           for k, c in u["textures"].items()})
+           for k, c in textures.items()})
     graph = {}
     for prop, (ref, out) in wiring.items():
         src = ue.call("material", "get_property_input", {"material": mat, "material_property": prop}) or {}
@@ -1704,13 +2015,37 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
                        "output": src.get("output_name"),
                        "ok": (src.get("expression") or {}).get("refPath") == ref.get("refPath") and
                              (src.get("output_name") or "") == out}
-    samplers = {k: getp(v, ["ParameterName", "Texture", "SamplerType"]) for k, v in
-                (("BC", bc), ("N", nrm), ("ORM", orm))}
+    samplers = {k: getp(v, ["ParameterName", "Texture", "SamplerType"]) for k, v in sorted(samplers_used.items())}
     mat_props = getp(mat, ["bUsedWithSkeletalMesh", "TwoSided", "BlendMode", "ShadingModel"])
-    measured["material"] = {"outputs": graph, "samplers": samplers, "properties": mat_props}
+    measured["material"] = {"team_color_mode": team_mode, "outputs": graph, "samplers": samplers, "properties": mat_props}
     check("material_graph_bc_teamcolor_normal_orm", all(g["ok"] for g in graph.values()) and
           mat_props.get("bUsedWithSkeletalMesh") is True and mat_props.get("BlendMode") == "BLEND_Opaque",
-          measured["material"])
+          measured["material"], note="BaseColor per ue.team_color_mode %s (%s)" % (team_mode, {
+              "multiply": "BC x TeamColor", "mask": "lerp(BC, BC x TeamColor, TeamMask.R)", "none": "BC"}[team_mode]))
+    if bmat:
+        bgraph = {}
+        for prop, (ref, out) in base_wiring.items():
+            src = ue.call("material", "get_property_input", {"material": bmat, "material_property": prop}) or {}
+            bgraph[prop] = {"expression": (src.get("expression") or {}).get("refPath", "").rsplit(":", 1)[-1],
+                            "output": src.get("output_name"),
+                            "ok": (src.get("expression") or {}).get("refPath") == ref.get("refPath") and
+                                  (src.get("output_name") or "") == out}
+        bprops = getp(bmat, ["BlendMode", "ShadingModel", "TwoSided"])
+        measured["base_material"] = {"mode": base_mode, "outputs": bgraph, "properties": bprops,
+                                     "parameters": ["BaseColor", "TeamColor", "PipColor", "InstanceIndex", "PipEmissive"]}
+        check("base_material_graph_vertex_mask", all(g["ok"] for g in bgraph.values())
+              and bprops.get("BlendMode") in (None, "BLEND_Opaque"), measured["base_material"],
+              note="BaseColor = lerp(lerp(BaseColor, TeamColor, VertexColor.R), PipColor, lit), Emissive = PipColor x "
+                   "lit x PipEmissive, lit = saturate(G x [|InstanceIndex - 2| > 0.5] + B x [InstanceIndex > 1.5]) "
+                   "(base_parametric.mask; live frames: P17 control scene, stage 3 T3.1)")
+        aid = getp(base, ["AssetImportData"]).get("AssetImportData")
+        aid = aid if isinstance(aid, dict) else {"refPath": aid}
+        base_vc = dict(base_vc or {}, asset_import_option=getp(aid, ["VertexColorImportOption"]).get(
+            "VertexColorImportOption") if aid.get("refPath") else None)
+        measured["base_vertex_colors"] = base_vc
+        check("base_vertex_colors_imported", base_vc.get("asset_import_option") == "Replace", base_vc,
+              {"asset_import_option": "Replace"},
+              "the vertex-mask material needs the base's vertex colours (AssetImportData of the base)")
     inst = {}
     for name, color in sorted(u["instances"].items()):
         ref = ue_obj(names["instance:" + name])
@@ -1719,8 +2054,8 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
         parent = parent.get("refPath") if isinstance(parent, dict) else parent
         inst[name] = {"TeamColor": {k: round(float(value.get(k, -1)), 4) for k in "rgba"},
                       "parent": parent, "ok": all(abs(float(value.get(k, -1)) - c) < 1e-3 for k, c in zip("rgba", color))
-                      and ue_package(parent or "") == mat_pkg}
-    check("team_color_instances", all(i["ok"] for i in inst.values()), inst)
+                      and ue_package(parent or "") == instances_parent_pkg}
+    check("team_color_instances", all(i["ok"] for i in inst.values()), inst, {"parent": instances_parent_pkg})
 
     bones = ue.call("skeletal", "get_bone_names", {"mesh": sk}) or []
     want_bones = [b[0].replace(".", "_") for b in profile["armature"]["bones"]]
@@ -1749,10 +2084,13 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     maps = match_axis_map(exp_b["min"], exp_b["max"], lo_u, hi_u, tol_uu) if lo_u else []
     measured["skeletal_bounds_uu"] = {"min": [round(v, 4) for v in lo_u], "max": [round(v, 4) for v in hi_u]} if lo_u else None
     measured["axis_mapping"] = maps
-    check("skeletal_bounds_match_build_under_one_axis_map", len(maps) == 1, maps,
-          note="authored Blender bounds from the build report (cm, front -Y) mapped onto UE bounds, "
-               "tolerance %.2f uu" % tol_uu)
-    front = maps[0]["blender_front_minus_y_becomes"] if len(maps) == 1 else None
+    fronts = sorted({mp["blender_front_minus_y_becomes"] for mp in maps})
+    check("skeletal_bounds_match_build_front_unambiguous", len(maps) >= 1 and len(fronts) == 1,
+          {"maps": maps, "fronts": fronts},
+          note="authored Blender bounds from the build report (cm, front -Y) mapped onto UE bounds, tolerance "
+               "%.2f uu. A figure symmetric left/right within the tolerance (Harpy's wings) matches a map and its "
+               "mirror; bounds cannot tell them apart, but every matching map must send the front to one axis" % tol_uu)
+    front = fronts[0] if len(fronts) == 1 else None
     axes_cfg = profile.get("axes") or {}
     want_front = axes_cfg.get("expected_ue_front")
     check("front_axis_as_fbx_preset", want_front is not None and front == want_front,
@@ -1763,9 +2101,21 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
           all(abs(a - b) <= tol_uu for a, b in zip(predicted["min"] + predicted["max"], lo_u + hi_u)),
           measured["skeletal_bounds_uu"], predicted,
           "build report: export-frame bounds mapped as UE (x, -y, z) (ART-001); tolerance %.2f uu" % tol_uu)
+    # height by profile: the UE bounds top is the skeletal top of the build (a weapon or a crystal may reach above
+    # the figure); the figure top (scale.top_part) is checked against scale.figure_height_m from the build report
     height_uu = profile["scale"]["figure_height_m"] * 100.0
-    check("skeletal_top_at_figure_height", hi_u is not None and abs(hi_u[2] - height_uu) <= tol_uu,
-          round(hi_u[2], 4) if hi_u else None, height_uu)
+    figure = build.get("figure") or {}
+    skeletal_top_uu = exp_b["max"][2]
+    figure_top_uu = round(figure["figure_top_m"] * 100.0, 4) if figure.get("figure_top_m") is not None else skeletal_top_uu
+    measured["height"] = {"ue_skeletal_top_uu": round(hi_u[2], 4) if hi_u else None,
+                          "build_skeletal_top_uu": skeletal_top_uu, "build_figure_top_uu": figure_top_uu,
+                          "top_part": figure.get("top_part"), "profile_figure_height_uu": height_uu}
+    check("skeletal_top_as_build", hi_u is not None and abs(hi_u[2] - skeletal_top_uu) <= tol_uu,
+          measured["height"], skeletal_top_uu,
+          "UE bounds top = highest skeletal vertex of the build (body and weapon), tolerance %.2f uu" % tol_uu)
+    check("figure_height_as_profile", abs(figure_top_uu - height_uu) <= tol_uu, measured["height"], height_uu,
+          "figure top (profile scale.top_part %s; whole-figure flow: the skeletal top) = scale.figure_height_m"
+          % figure.get("top_part"))
     ref_cfg = u.get("reference_skeletal_for_axes")
     if isinstance(ref_cfg, str):
         ref_cfg = {"asset": ref_cfg}
@@ -1795,8 +2145,8 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
                  for s in sk_slots}
     want_slots = build["checks"]["roundtrip_material_slots"]["measured"]["skeletal_unique"]
     check("skeletal_material_slots", sorted(sk_slots) == sorted(want_slots) and
-          all(v == names["instance:" + u["default_instance"]] for v in slot_mats.values()),
-          {"slots": sk_slots, "assigned": slot_mats}, want_slots)
+          all(v == sk_material_pkg for v in slot_mats.values()),
+          {"slots": sk_slots, "assigned": slot_mats}, {"slots": want_slots, "material": sk_material_pkg})
     measured["skeletal_lod0"] = {"sections": ue.call("skeletal", "get_section_count", {"mesh": sk, "lod_index": 0}),
                                  "vertices": ue.call("skeletal", "get_vertex_count", {"mesh": sk, "lod_index": 0}),
                                  "lods": ue.call("skeletal", "get_lod_count", {"mesh": sk}),
@@ -1806,11 +2156,14 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     for s in sockets:
         sock_detail[s] = {"bone": ue.call("skeletal", "get_socket_bone", {"mesh": sk, "socket_name": s}),
                           "transform": ue.call("skeletal", "get_socket_transform", {"mesh": sk, "socket_name": s})}
-    sock_ok = sockets == [s["name"] for s in profile["sockets"]] and all(
-        sock_detail[s["name"]]["bone"] == s["bone"] and
+    sock_ok = sockets == [s["name"] for s in planned_sockets] and all(
+        sock_detail[s["name"]]["bone"] == s["ue_bone"] and
         all(abs(sock_detail[s["name"]]["transform"]["location"][k] - v) < 1e-4
-            for k, v in zip("xyz", s["location_uu"])) for s in profile["sockets"])
-    check("sockets_weapon_head", sock_ok, sock_detail, {s["name"]: s for s in profile["sockets"]})
+            for k, v in zip("xyz", s["location_uu"])) for s in planned_sockets)
+    measured["sockets_plan"] = planned_sockets
+    check("sockets_weapon_head", sock_ok, sock_detail, {s["name"]: s for s in planned_sockets},
+          "location per socket: profile location_uu, else the build's UE bone-space prediction "
+          "(sockets[].location_uu_for_ue); world placement against target_ue_component_uu needs a live frame")
     base_tris = ue.call("static", "get_triangle_count", {"mesh": base, "lod_index": 0})
     base_bounds = ue.call("static", "get_bounds", {"mesh": base}) or {}
     b_lo, b_hi = ue_minmax(base_bounds)
@@ -1830,7 +2183,7 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
           all(abs(a - b) <= tol_uu for a, b in zip(b_lo + b_hi, [-fx / 2, -fy / 2, 0, fx / 2, fy / 2, fz])),
           measured["base"], {"min": [-fx / 2, -fy / 2, 0], "max": [fx / 2, fy / 2, fz]})
     check("base_material_slot", len(base_slots) == profile["expectations"]["base_material_slots"] and
-          all(v == names["instance:" + u["default_instance"]] for v in base_mat.values()), base_mat)
+          all(v == default_mi_pkg for v in base_mat.values()), base_mat, default_mi_pkg)
     dirty = {a: ue.call("asset", "is_dirty", {"asset_path": a}) for a in after}
     check("assets_saved", bool(saved) and not any(dirty.values()), {"save_assets": saved, "dirty": dirty})
     measured["fbx_import_log"] = fbx_log
@@ -1839,17 +2192,19 @@ def exec_ue_candidate(ctx: Context, staging: Path) -> StageResult:
     lim = profile.get("proposed_limits_for_comparison_only") or {}
     sk_tris = sum(build["roundtrip"]["skeletal"]["meshes"][n]["triangles"] for n in build["roundtrip"]["skeletal"]["meshes"])
     all_tris = sk_tris + (base_tris or 0)
+    tri_key = next((k for k in ("hero_triangles", "sidekick_triangles") if lim.get(k)), "hero_triangles")
     proposals = {
         "source": lim.get("source"),
         "hero_triangles": {"measured_skeletal": sk_tris, "measured_with_base": all_tris,
-                           "proposed": lim.get("hero_triangles"),
-                           "within": bool(lim.get("hero_triangles")) and lim["hero_triangles"][0] <= all_tris <= lim["hero_triangles"][1]},
+                           "proposed": lim.get(tri_key), "proposed_key": tri_key,
+                           "within": bool(lim.get(tri_key)) and lim[tri_key][0] <= all_tris <= lim[tri_key][1]},
         "material_slots": {"measured_skeletal": len(sk_slots), "measured_base": len(base_slots),
                            "proposed_max": lim.get("material_slots_max"),
                            "within": len(sk_slots) <= lim.get("material_slots_max", 99)},
         "texture_px": {"measured": atlas["size"], "proposed": lim.get("texture_px")},
-        "height_uu": {"measured": round(hi_u[2], 3) if hi_u else None, "proposed": lim.get("height_uu"),
-                      "within": bool(hi_u) and lim.get("height_uu", [0, 0])[0] <= hi_u[2] <= lim.get("height_uu", [0, 0])[1]},
+        "height_uu": {"measured_figure_top": figure_top_uu, "measured_skeletal_top": round(hi_u[2], 3) if hi_u else None,
+                      "proposed": lim.get("height_uu"),
+                      "within": lim.get("height_uu", [0, 0])[0] <= figure_top_uu <= lim.get("height_uu", [0, 0])[1]},
         "base_uu": {"measured": [round(fx, 3), round(fy, 3), round(fz, 3)],
                     "proposed_diameter": lim.get("base_diameter_uu"), "proposed_height": lim.get("base_height_uu")},
     }

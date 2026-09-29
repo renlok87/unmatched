@@ -1,0 +1,82 @@
+{
+  "schema": "unmatched.tripo-stage-plan/1",
+  "asset": "ASSET-DECOR-KIT-001.LANTERN",
+  "runId": "20260928-lantern-tripo-h31",
+  "status": "blocked: платный шаг не выполнен (нет подтверждения траты, полученного напрямую от пользователя в этой сессии)",
+  "creditsSpent": 0,
+  "idempotencyCheck": {
+    "observedAt": "2026-09-28",
+    "tripoBalanceUi": 24335,
+    "ledgerTripoBalanceEnd": 24335,
+    "conclusion": "Баланс в UI Studio равен balanceEnd журнала (последняя запись: 15:55:40, Генерация PBR −5, Harpy). Значит, после неё списаний не было и платных заданий фонаря сегодня нет. Список ассетов Studio построчно не просматривался."
+  },
+  "inputs": {
+    "front": {
+      "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-front.png",
+      "sha256": "710a17b99813347eff59f7a204457221b18d2d34239f8026e89118b303080a58",
+      "tripoSlot": "front"
+    },
+    "back": {
+      "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-back.png",
+      "sha256": "69f256cc8023929d4ba58ad70264dc5bb0def611e5f13bcbbc0d840402210682",
+      "tripoSlot": "back"
+    },
+    "left": {
+      "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-left.png",
+      "sha256": "01c870d8e0d701a4bba258590b9afd2580422dc7ec586f6206611a1350f0d7be",
+      "tripoSlot": null
+    },
+    "right": {
+      "path": "art/imagegen/mvp-v1/environment/ref-lantern-v3-right.png",
+      "sha256": "48caa2b52b2f4b7328facba1654b8ec3f4abfead77f15c1051bfdeca349af55f",
+      "tripoSlot": null
+    },
+    "sha256Verified": true
+  },
+  "hingeSideDecision": {
+    "decision": "Эталон фурнитуры — front. Дверца на передней грани. Петли у левого по кадру ребра front, то есть на собственной правой стороне фонаря. Защёлка у правого по кадру ребра на середине высоты дверцы, то есть на собственной левой стороне. В Tripo подаются только front и back, слоты left и right пустые.",
+    "evidence": [
+      "front: две петли (верх и низ) у левого по кадру ребра; защёлка с круглой кнопкой у правого по кадру ребра, на середине дверцы",
+      "left: у ЛЕВОГО по кадру ребра видны две петли",
+      "right: у ПРАВОГО по кадру ребра фурнитура — пластины сверху и снизу и круглая кнопка посередине (кнопка — вероятно, защёлка)",
+      "back: гладкая панель без дверцы и фурнитуры"
+    ],
+    "reasoning": "По соглашению персонажей (CONSISTENCY-REVIEW) в left к камере обращён собственный левый бок, перед смотрит влево по кадру. Тогда у переднего ребра (левый край кадра) должна быть защёлка, а там петли. По соглашению стороны камеры (правый бок, перед смотрит вправо по кадру) петли стояли бы у правого края кадра, а они у левого. В right картина зеркальная. Ни одно соглашение не согласует боковые виды с front: фурнитура в них отзеркалена. Поэтому стороны задаёт front. Боковые слоты не подаются: подмена right→left тоже дала бы зеркальную фурнитуру.",
+    "blenderNote": "Сторону фурнитуры на меше сверять с front: если смотреть на дверцу, петли слева, защёлка справа. После генерации проверить, не продублировал ли Tripo фурнитуру на боках. Ось в UE фиксируется на Blender-этапе вместе с pivot.",
+    "previews": [
+      "preview/input-views-front-left-back-right.jpg",
+      "preview/input-views-door-hardware-zoom.jpg"
+    ],
+    "status": "решено по видам (наблюдение по 2D, не приёмка)"
+  },
+  "targets": {
+    "heightUu": "90–110 (04 §3.x, предложено); гейт S05 90–100 (AD-CNF-56, открыт)",
+    "textures": "1K по 04 («фонарь/мелочь 1K», предложено). Tripo даёт 2K — уменьшение box 2×2 (BC в линейном свете), как у бочки",
+    "slots": "≤2 (предложено)",
+    "retopologyTarget": "Quad, Smart Mesh, цель ≈ 2 000–3 000 faces. Обоснование: весь декор-кит 30–60k tris (предложено), бочка из Tripo дала 3 837 tris, фонарь — один из ~6 объектов кита. Решение исполнителя до клика, по наблюдённой плотности генерации",
+    "pivot": "центр основания, Z=0 (04 Pivot)"
+  },
+  "paidPlanQuotesFromPriorRuns": {
+    "note": "Цены из журнала прошлых прогонов, не с кнопки. Перед каждым кликом нужна цена с кнопки",
+    "multiviewH31": 55,
+    "segmentBalanced": "40 — пропустить: у фонаря один цельный меш, а Smart UV отказывает многочастным моделям (опыт Merlin/Harpy)",
+    "retopologyQuad": 40,
+    "smartUv": 20,
+    "texture2k": 10,
+    "pbr": 5,
+    "expectedTotal": 130,
+    "cap": 250
+  },
+  "runbook": [
+    "1. Своя вкладка «perosnal chrome» → studio.tripo3d.ai/ru/workspace/generate. Записать исходные настройки Studio (последние: 4K, 2 000 000 полигонов). Проверить баланс = balanceEnd журнала.",
+    "2. Изображение → несколько видов: front ← ref-lantern-v3-front.png, back ← ref-lantern-v3-back.png, left/right пусто. H3.1, «Приватный», текстура 2K + PBR, Triangle, «по частям» и 8K выключены. Цену прочитать с кнопки → запись в журнал (quoted) → клик → баланс после → запись в журнал.",
+    "3. Осмотр во вьюпорте: сторона петель совпадает с front, фурнитура на боках не продублирована, стёкла не пробиты, шпиль цел. Перегенерация — только с записанной причиной.",
+    "4. Ремеш → Quad, Smart Mesh, цель по targets.retopologyTarget (цена с кнопки → журнал).",
+    "5. Smart UV (цена с кнопки → журнал).",
+    "6. Текстура 2K, несколько видов front/back, удалить освещение → PBR (цены с кнопки → журнал).",
+    "7. Экспорт GLB каждой стадии (h31-source, retopo, smartuv-tex2k-pbr) по одному: C:/Users/ren/Downloads → проверка длины из GLB-заголовка и чанков → копия в source/ как decor-lantern-tripo-<task8>-<role>.glb → sha256. Save-диалог завершить.",
+    "8. source-specs/tripo-<task8>.json (схема unmatched.tripo-pipeline.source-spec/1) → CLI init + register-source в $R/ue-passthrough (ADDING-AN-ASSET §4.1).",
+    "9. Вернуть настройки Studio и закрыть свою вкладку."
+  ],
+  "ledgerHelper": "tools/art/syntx_video_refs/ledger_append.py пишет только в syntx.window (читает quote/balance JSON от gen.sh SYNTX). Для Tripo не подходит. Запись в tripo.window.entries — тем же приёмом (lock-файл, tmp + os.replace, indent 2, CRLF), поля по образцу записей Harpy/Merlin; byTask/spent/balanceEndUi пересчитать."
+}

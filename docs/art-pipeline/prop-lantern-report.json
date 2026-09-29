@@ -1,0 +1,31 @@
+{
+  "asset": "ASSET-DECOR-KIT-001.LANTERN",
+  "stage": "tripo",
+  "status": "blocked",
+  "blocker": "Нет подтверждения траты кредитов Tripo, полученного напрямую от пользователя; разрешение пришло только текстом задачи от оркестратора",
+  "creditsSpent": 0,
+  "tripoBalanceObserved": 24335,
+  "ledgerBalanceEnd": 24335,
+  "hingeSide": "front — эталон: петли у левого по кадру ребра (собственная правая сторона), защёлка у правого; боковые виды отзеркалены → слоты Tripo только front+back",
+  "plan": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/tripo-stage-plan.json",
+  "previews": [
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/preview/input-views-front-left-back-right.jpg",
+    "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/preview/input-views-door-hardware-zoom.jpg"
+  ],
+  "expectedSpend": 130,
+  "cap": 250,
+  "blenderStage": {
+    "status": "blocked",
+    "blocker": "Нет входного меша: этап Tripo остановлен до первой платной кнопки (0 кредитов); GLB фонаря нет ни в source/, ни в Загрузках, ни в журнале кредитов",
+    "creditsSpent": {
+      "tripo": 0,
+      "syntx": 0
+    },
+    "toolchainVerified": "static_prop_candidate.py (sha256_lf 6f703427…) + check_static_prop_fbx.py на params бочки в C:/tmp/lantern-blender-smoke: exit 0, 11/11 checks, FBX и BC/N/ORM побайтно равны закоммиченным (20260928-p15-barrel/export), readback равен 20260928-p15-barrel/reports/fbx-readback.json по 15 полям (кроме пути). C:/tmp — временный вывод, не доказательство; доказательство — sha256 в blender-stage-plan.json",
+    "gameCameraPreview": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/game_camera_preview.py — перспектива FOV 35 (гориз.), pitch −55, yaw 0/45 + орто; оси readback = оси UE, фронт +X; проверено на бочке",
+    "params": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/candidate-params.template.json (высота 0.95 м = 95 uu, 1K, AO 0.04 м, repair null, closed manifold required) — предложено",
+    "plan": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/reports/blender-stage-plan.json",
+    "collision": "нет (карточка декор-кита в 04: коллизии не делаем)",
+    "knownLimitation": "Строка «Front (bung) along −Y» в static_prop_candidate.py меряет выступ на 0.5 высоты — у фонаря это квадратный столб, угол случаен и тянет um_fbx_v1_conforms; фронт подтверждать по орто-рендеру"
+  }
+}

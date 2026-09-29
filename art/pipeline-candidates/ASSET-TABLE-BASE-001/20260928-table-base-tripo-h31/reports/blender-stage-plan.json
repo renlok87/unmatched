@@ -1,0 +1,143 @@
+{
+  "schema": "unmatched.blender-stage-plan/1",
+  "asset": "ASSET-TABLE-BASE-001",
+  "runId": "20260928-table-base-tripo-h31",
+  "stage": "blender",
+  "status": "blocked: нет исходного меша. Этап Tripo остановлен до первой платной кнопки (0 кредитов), GLB основания нет. Кандидат (FBX, BC/N/ORM) не собирался, статус ассета не повышался (реестр: предложено). Сделаны бесплатные шаги: замер доски, проверка z-fighting для верха подноса, скрипты Blender-этапа и их прогон на синтетическом входе",
+  "creditsSpent": {
+    "tripo": 0,
+    "syntx": 0
+  },
+  "sourceSearch": {
+    "runDirSource": "каталога source/ нет",
+    "downloads": "в «Загрузках» самые новые GLB — Medusa от 2026-09-27; GLB основания нет",
+    "creditsLedger": "записей ASSET-TABLE-BASE-001 нет (поиск по «table»)",
+    "conclusion": "исходника для Blender-этапа нет; в этом этапе ничего платного не запускалось"
+  },
+  "boardMeasured": {
+    "status": "измерено",
+    "file": "reports/board-art005-fbx-bounds.json",
+    "script": "scripts/measure_board_fbx.py",
+    "fbx": "blender/ASSET-BOARD-COBBLE-001/variants/B-atlas-v4-woodUV/export/SM_ART005_BoardStoneV4_WoodUV.fbx",
+    "fbxSha256": "445f514ac9b6a5899746c8c6db64cd25a793b5ed3fa505303cf27d296df030c2",
+    "fbxSha256MatchesRegistry": true,
+    "frame": "FBX, прочитанный обратно в Blender (кадр экспорта UM_FBX_v1); UE показывает его как (x, −y, z)",
+    "meshParts": 35,
+    "sizeUu": [656.0, 556.0, 36.0],
+    "boundsUu": {"min": [-328.0, -278.0, -31.0], "max": [328.0, 278.0, 5.0]},
+    "longAxis": "X (кадр экспорта = UE X)",
+    "parts": {
+      "Rock_Undertray": "656×556, Z −31…−7 (собственный скальный низ доски)",
+      "Frame_*": "внешний край ±323×±273, Z −11…+5",
+      "StoneTile_* (30)": "верх Z −1,2…0; зазоры между плитками 1,5 uu; нижних граней нет"
+    },
+    "correctionToTripoStage": "Tripo-этап взял Z доски −36…0. Замер FBX даёт −31…+5: рама на 5 uu выше игровой плоскости. Габарит XY 656×556 подтверждён. Допущение подноса не меняется"
+  },
+  "trayAssumption": {
+    "status": "предложено",
+    "outerUuUe": [756, 656],
+    "outerUuBlendXY": [656, 756],
+    "rimUu": 50,
+    "topZUu": -3.0,
+    "pivot": "центр доски (0,0), Z=0 — игровая плоскость; весь поднос ниже Z=−3",
+    "collision": "нет (04 §3.6). Коллизия выбора остаётся у доски (UBX, 04 §3.5)",
+    "slots": 1,
+    "textures": "T_TableBase_{BC,N,ORM} 2K; BC sRGB, N и ORM Linear, нормали DirectX"
+  },
+  "zFightingPrecheck": {
+    "status": "измерено",
+    "method": "горизонтальные грани доски (|n.z|>0,99), сгруппированные по Z с шагом 0,1 uu, против плоскости верха подноса",
+    "trayTopZUu": -3.0,
+    "nearestBoardFaces": [
+      {"zUu": -1.2, "facing": "up", "part": "StoneTile", "gapUu": 1.8},
+      {"zUu": -7.0, "facing": "up", "part": "Rock_Undertray", "gapUu": 4.0},
+      {"zUu": -11.0, "facing": "down", "part": "Frame", "gapUu": 8.0}
+    ],
+    "thresholdUu": 0.5,
+    "result": "компланарных граней нет; ближайшая горизонталь доски на 1,8 uu выше верха подноса",
+    "notes": [
+      "Рама выступает над верхом подноса на 8 uu (+5 против −3). 04 §3.6 допускает такой лёгкий выступ",
+      "Rock_Undertray доски (Z −31…−7) окажется внутри подноса. Его закрытость по бокам меряется в отчёте кандидата (board_undertray_enclosed)",
+      "В зазорах между плитками (1,5 uu) будет виден верх подноса на −3, а не верх Rock_Undertray на −7. Оба — скала; проверять на K2"
+    ]
+  },
+  "tools": [
+    {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_candidate.py", "sha256Lf": "b3ebabac44533b315030860e0571ba9d46462b20d2c39eccd78f29b1b6764072", "role": "сборка кандидата: чистка, winding, поворот длинной стороной по .blend Y, подгонка XY по контуру верха, Z по depth_uu, плоский верх на −3, нормали через обратную транспонированную, BC/N/ORM, AO, UV-проверка, UM_FBX_v1, round trip, замеры каймы и связи с доской. Помощники берёт из static_prop_candidate.py без правки (выполняет файл без последней строки main())"},
+    {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_preview.py", "sha256Lf": "f9766d8721106b1af67db4aa94791f33a595af8854317e2b269c5ffe48108515", "role": "превью из экспортированного FBX с доской ART-005. Кадры игровой камеры 16:9 1200×675 (FOV_h 35, sensor_fit HORIZONTAL, половина FOV_v 10,06°, pitch −55): K1 = k1-south-d12m; game-north/east-d12m (осмотр, не K1); game-south-zoom065-d18.5m; game-south-zoom{12,16}-follow-nearrow (слежение за ближним рядом, 03 §2). context4x3-notK1-south-d{12,18.5}m — 1200×900 с затемнением вне полосы 16:9, не K1. Орто 1200×900. <имя>_preview.json — замер кадра (срезы, углы краёв, near_skirt_limit, видимая полоса игровой плоскости). Прежняя версия 9cfc6fc2… рендерила «K1» в 4:3 — дефект исправлен"},
+    {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/measure_board_fbx.py", "sha256Lf": "7e8c48bac61d36c5e1f4cfb34c8f4c67e5f692584c2258945029018a27e8a088", "role": "габарит доски по всем 35 частям и уровни горизонтальных граней"},
+    {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/smoke_synthetic_tray_glb.py", "sha256Lf": "faca0a66a7d3238217b8a96d6202554478d7a4b718b081886d35fc4a4a2533a7", "role": "ТОЛЬКО для проверки скриптов: синтетический Tripo-подобный GLB (не кандидат, не арт)"},
+    {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_params.template.json", "role": "шаблон параметров; source_glb заполнить после Tripo"},
+    {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/build-profiles/table-base-static-um-fbx-v1.json", "role": "build profile static-candidate для adopt (status proposed)"},
+    {"path": "tools/tripo-pipeline/blender/static_prop_candidate.py", "sha256Lf": "6f703427539511afe37740035e55db1bcddbbb92bd2092bfedddc076b7b3d18b", "role": "помощники (не изменялся)"},
+    {"path": "tools/tripo-pipeline/blender/check_static_prop_fbx.py", "sha256Lf": "d5a17b94b76641842ee0b01ddf7c5a2150c301a5d2b477c92b0dcd3a6d2e3b8f", "role": "независимая проверка FBX (не изменялся)"}
+  ],
+  "smokeTest": {
+    "what": "Проверка скриптов на синтетическом Tripo-подобном GLB: 1 узел, 1 меш с NORMAL и TEXCOORD_0, 3 изображения 2048 (basecolor, rm, normal), 6 936 квадов = 13 872 tris, Smart UV. НЕ кандидат и НЕ арт. Все выходы вне репозитория: C:/tmp/table-base-blender/smoke",
+    "blender": "5.2.2 LTS d13f752e3b9c, headless -b --factory-startup",
+    "runs": [
+      {
+        "name": "run (как в шаблоне: depth_uu null, top_band_frac 0,03)",
+        "sourceSha256": "2542ba996bc8feccfdf4f7064cf129abf0390bff54335e36237a4ebdfe9f586c",
+        "wallSeconds": 25,
+        "checksPassed": true,
+        "checks": "13/13: single_mesh, triangles_preserved, one_material_slot, uv0_present, no_armature, top_at_top_z, top_outline_matches_footprint_1uu, top_outline_centred, no_folded_faces_in_top_plane, no_board_horizontal_face_near_top_plane, source_unchanged, um_fbx_v1_conforms, closed_manifold_consistent_winding",
+        "roundtripSizeUu": [797.677, 689.573, 260.408],
+        "topOutlineUu": [756.0, 656.0],
+        "rimFlatTopUu": {"min": 49.5, "p50": 49.5, "resolution": 0.5},
+        "boardUndertrayEnclosed": "144/144",
+        "flatten": "1 365 вершин опущено, до 8,05 uu, сложенных граней 0",
+        "fbxSha256": "21e4621256301e4c91aaac6679fcf40cc47909791372d4aadec02845ca934479",
+        "bcSha256": "1201f0077dee30cb8cdd2a27af51d52351adc4b3519b161adc09845593a6a201",
+        "nSha256": "9f4c030d8554b94c9acd5c745b28dfff815a2bce4131306ae75741578a6adcd9",
+        "ormSha256": "016fd10e87e3e31c3431b8407b1dc441f6c380bbc54c77c88e1042b32eda143c"
+      },
+      {
+        "name": "run-repeat (те же параметры)",
+        "result": "FBX, BC, N, ORM побайтно совпали с run: сборка детерминирована"
+      },
+      {
+        "name": "run-longx-depth60 (длинная сторона источника по X, depth_uu 60)",
+        "sourceSha256": "de55ad22e2a9c7815d3120865e40d0a669cbdd4c0de37f939c319bb89db1d053",
+        "checksPassed": true,
+        "result": "поворот на 90° сработал, глубина ниже верха ровно 60,0 uu, контур верха 756×656"
+      }
+    ],
+    "readback": "check_static_prop_fbx.py: 1 меш SM_TableBase, 13 872 tris, 1 слот, UV0, 0 открытых / 0 неманифолдных рёбер / 0 граней с несогласованной ориентацией, max Z −3,0 uu",
+    "previews": "ИСПРАВЛЕНО. Первая версия table_base_preview.py рендерила «K1» в 4:3 1200×900 (половина FOV_v 13,30°), игровой кадр — 16:9 (половина 10,06°, 04 §4.4). Вывод «на 12 м режется только ближний край подноса; на 18,5 м поднос целиком» был неверен. Перерендер 16:9 (C:/tmp/table-base-blender/preview16x9, вне репозитория), просмотрен через Read: BC/N/ORM подключены, шипы вниз, доска лежит на подносе. Замер — gameFrame16x9",
+    "gameFrame16x9": {
+      "status": "измерено на синтетике по шаблону (контур верха 756×656, низ −263); геометрия кадра от меша не зависит",
+      "bandCheck": "центральные 675 строк кадра 4:3 = кадр 16:9: средняя |разница| 1,08…1,16 (JPEG), при сдвиге на 20 строк 7,6…9,2",
+      "k1_south_12m": "контур верха подноса срезан со всех сторон (ближний −14,93°, дальний +10,87°, боковые ±20,44° при полукадре ±10,06°/±17,5°; в кадре 69 % вершин контура); скала спереди не видна; ближний край доски срезан (bbox y −278 z +5: −12,24°), рама спереди за кадром; ближний ряд клеток срезан на ≈18 uu (плоскость видна по центральной колонке y −231,1…+296,7, клетки ±249,25)",
+      "zoom065_south_18_5m": "контур верха и доска целиком в кадре (−9,25°…+7,47°); скала спереди в кадре до 56,3 uu ниже верха (Z −59,3 на краю y −328); Z −150 — 11,26° ниже оси, нижняя точка синтетики — 12,92°",
+      "follow_nearrow_zoom12_10m": "цель (0, −199,25, 0), 03 §2: слежение при зуме ≥1,2×; скала спереди в кадре до 134,3 uu ниже верха (Z −137,3); ближний край верха −6,58°",
+      "follow_nearrow_zoom16_7_5m": "скала спереди в кадре до 30,7 uu ниже верха (Z −33,7)",
+      "depth60Synthetic": "контур до y −333: 44,9 uu на 18,5 м; целиком (до −63) на 1,2× со слежением; 19,4 uu на 1,6×",
+      "conclusion": "глубину выбирать не по K1 (там скалы спереди нет): решающие кадры — 0,65× (верхние ≈45–56 uu) и слежение за ближним рядом на 1,2× (до ≈134 uu)"
+    },
+    "recheckAfterPreviewFix": "table_base_candidate.py по шаблону на той же синтетике: 13/13; FBX, BC, N, ORM побайтно те же (21e46212…, 1201f007…, 9f4c030d…, 016fd10e…); check_static_prop_fbx.py: 1 меш, 0 открытых/неманифолдных рёбер, верх −3,0",
+    "notCommittedEvidence": "выходы в C:/tmp/table-base-blender/ — не закоммиченное доказательство; воспроизводятся из закоммиченных скриптов, хэши выше",
+    "adoptCompatibility": "отчёт кандидата содержит все ключи, которые читает adopt в tripo_pipeline.py (schema, checks_passed, claims, source/export/texture sha256, export.settings, um_fbx_v1_conformance, roundtrip.triangles, expected_ue_dimensions_uu_at_import_scale_1, material_slots, params.texture_size)",
+    "notMeasuredBySmoke": "качество Tripo-меша: сгибы верха, открытые рёбра, UV-растяжение, реальный контур и кайма. Это только на настоящем GLB"
+  },
+  "runbook": [
+    "0. Предусловие: этап Tripo выполнен по reports/tripo-stage-plan.json (только в сессии, где пользователь сам подтвердил трату); GLB smartuv-tex2k-pbr лежит в source/, его sha256 записан в source-spec. B=\"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe\", cwd = корень репозитория.",
+    "1. cp art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_params.template.json <R>/reports/candidate-params.json, где <R> = art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31; вписать source_glb; удалить _note по желанию. Первый проход — depth_uu null.",
+    "2. \"$B\" -b --factory-startup --python-exit-code 1 --python art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_candidate.py -- <R>/reports/candidate-params.json → work/SM_TableBase.blend, export/SM_TableBase.fbx + T_TableBase_{BC,N,ORM}.png, reports/candidate-report.json, preview/SM_TableBase_uv0_layout.jpg. Код выхода 1 = не прошла проверка (отчёт всё равно записан).",
+    "3. Прочитать candidate-report.json: checks; fit.turned_90deg_about_z и footprint_aspect_*; fit.xy_nonuniformity_pct (Tripo-этап допускал ~4 %); fit.flatten (folded 0, смещение); geometry.after_fit_flatten; uv0 (overlap, flipped, min_gutter_px_estimate, stretch); textures.channel_stats; board_relation (rim_flat_top, board_undertray_enclosed).",
+    "4. Независимая проверка: \"$B\" -b --factory-startup --python-exit-code 1 --python tools/tripo-pipeline/blender/check_static_prop_fbx.py -- <R>/export/SM_TableBase.fbx <R>/reports/fbx-readback.json (пути относительные: adopt сверяет поле fbx).",
+    "5. Превью: \"$B\" -b --factory-startup --python-exit-code 1 --python art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_preview.py -- <R>/export/SM_TableBase.fbx <R>/export/T_TableBase <R>/preview blender/ASSET-BOARD-COBBLE-001/variants/B-atlas-v4-woodUV/export/SM_ART005_BoardStoneV4_WoodUV.fbx; каждый JPG открыть через Read. Игровой кадр — только JPG 16:9 (1200×675); context4x3-notK1 — контекст, не K1. Замер кадра — preview/SM_TableBase_preview.json.",
+    "6. Глубина: выбрать depth_uu по кадрам 16:9 и near_skirt_limit из SM_TableBase_preview.json (04: толщина 30–50 uu; референс ≈150 uu). В K1 (12 м) скалы спереди нет в кадре; решающие кадры — game-south-zoom065-d18.5m (видны верхние ≈45–56 uu) и game-south-zoom12-follow-nearrow-d10.0m (до ≈134 uu). Повторить шаги 2–5, причину записать в отчёт.",
+    "7. Если проверка не прошла: folded > 0 — уменьшить top_band_frac; closed_manifold false — смотреть geometry.flagged_face_centres_uu (починка отдельным шагом, с записью); кайма min < 40 — контур рваный, решить: увеличить footprint_uu_blend_xy или принять (запись); неожиданный поворот — сверить footprint_aspect_y_over_x_source с 1,2 (6:5).",
+    "8. CLI: init static-candidate run с --build-profile art/pipeline-candidates/ASSET-TABLE-BASE-001/build-profiles/table-base-static-um-fbx-v1.json → adopt. ue-import отложен; кроме того, сейчас он упадёт на жёсткой проверке pivot_base_centre (см. followups)."
+  ],
+  "openDecisions": [
+    "Глубина Z: 04 §3.6 — толщина 30–50 uu и обрыв края в 30–60 uu от игровой плоскости; на референсе ≈150 uu. Решать на реальном меше по кадрам 16:9: в K1 скала спереди за кадром, на 0,65× видны верхние ≈45–56 uu, при слежении за ближним рядом на 1,2× — до ≈134 uu",
+    "Rock_Undertray доски (656×556, −31…−7) дублирует поднос под доской. Убрать его из доски — решение ART-005, не этого ассета",
+    "Кайма меряется только по плоскому верху (лучи вниз с шагом 0,5 uu от контура доски); скос ниже верха в неё не входит"
+  ],
+  "deferredUe": [
+    "ue-import в /Game/PipelineCandidates/TableBase/<run>/{Passthrough,Candidate} (после Tripo и Blender); коллизия none; TC_Normalmap/TC_Masks для N/ORM",
+    "Кадр K1 16:9 в контрольной сцене P1.7 (плюс зум 0,65× и слежение за ближним рядом на 1,2×): за краем подноса нет читаемых объектов; подтвердить замер Blender, что K1 режет ближний край доски и ≈18 uu ближнего ряда клеток; нет z-fighting с доской ART-005 (верх подноса −3 против ближайшей горизонтали доски −1,2)",
+    "Поставить поднос с тем же поворотом актора, что у доски ART005F; замерить кайму в UE (предложено 40–60, допущение 50)"
+  ]
+}

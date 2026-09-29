@@ -122,14 +122,33 @@ def fake_build(params, isolation):
     m = profile["meshes"]
     tris = profile["expectations"]["triangles"]
     fail = os.environ.get("FAKE_BUILD_FAIL_CHECK")
-    checks = {"roundtrip_material_slots": {"passed": True, "measured": {"skeletal_unique": ["M_Atlas", "M_Face"]}},
+    flow = (profile.get("build") or {}).get("flow", "whole-figure")
+    weapon = m.get("bow") if flow == "whole-figure" else m.get("weapon")
+    slots = ["M_Atlas", "M_Face"][:profile["expectations"]["skeletal_material_slots"]]
+    checks = {"roundtrip_material_slots": {"passed": True, "measured": {"skeletal_unique": slots}},
               "orientation_all_parts_outward_after_fix": {"passed": fail != "orientation", "measured": {}}}
     fx, fy, fz = [v * 100 for v in m["base"]["footprint_m"]]
     h = profile["scale"]["figure_height_m"] * 100
-    authored = {"min": [-13.0, -11.4, 3.8], "max": [15.7, 9.7, h]}
+    # seated flow: a weapon reaches 5 uu above the figure top (the height check must use the figure top)
+    top = h + 5.0 if (flow == "seated-parts" and weapon) else h
+    authored = {"min": [-13.0, -11.4, 3.8], "max": [15.7, 9.7, top]}
     base_authored = {"min": [-fx / 2, -fy / 2, 0.0], "max": [fx / 2, fy / 2, fz]}
+    sockets = []
+    for i, sock in enumerate(profile.get("sockets") or []):
+        predicted = [0.25 * i, -4.0 - i, 0.05]
+        loc = sock.get("location_uu")
+        sockets.append({"name": sock["name"], "bone": sock["bone"], "offset_blender_bone_local_uu": [0.25 * i, 4.0 + i, 0.05],
+                        "offset_ue_bone_local_uu_predicted": predicted, "target_ue_component_uu": [1.0, 2.0, 40.0 + i],
+                        "location_uu_for_ue": list(loc) if isinstance(loc, list) else predicted})
+    skeletal_meshes = {m["body"]["object"]: {"triangles": tris[m["body"]["object"]]}}
+    if weapon:
+        skeletal_meshes[weapon["object"]] = {"triangles": tris[weapon["object"]]}
     report = {
-        "stage": "build", "passed": all(c["passed"] for c in checks.values()), "checks": checks,
+        "stage": "build", "flow": flow, "passed": all(c["passed"] for c in checks.values()), "checks": checks,
+        "fake_params_seen": {k: (Path(v).name if k in ("lib_dir", "reference_glb") else True) for k, v in sorted(params.items())},
+        "figure": {"top_part": profile["scale"].get("top_part"), "figure_height_m": profile["scale"]["figure_height_m"],
+                   "figure_top_m": h / 100.0, "skeletal_top_m": top / 100.0},
+        "sockets": sockets,
         "exports": {"skeletal": {"file": sk.name, "sha256": hashlib.sha256(sk.read_bytes()).hexdigest()},
                     "base": {"file": base.name, "sha256": hashlib.sha256(base.read_bytes()).hexdigest()},
                     "settings": {"preset": {"name": preset["name"]}, "export_space_rotation_z_degrees": theta,
@@ -150,8 +169,7 @@ def fake_build(params, isolation):
                                   "bow_side_axis": axis_of(rotate_xy(1, 0, theta))}},
         "roundtrip": {"skeletal": {
             "bones": {b[0]: {"parent": b[1]} for b in profile["armature"]["bones"]},
-            "meshes": {m["body"]["object"]: {"triangles": tris[m["body"]["object"]]},
-                       m["bow"]["object"]: {"triangles": tris[m["bow"]["object"]]}}}},
+            "meshes": skeletal_meshes}},
     }
     Path(params["report_out"]).write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     if not report["passed"]:

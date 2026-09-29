@@ -1,0 +1,962 @@
+{
+ "schema": "unmatched.decor-crate.build/1",
+ "status": "measured",
+ "claims": {
+  "art_accepted": false,
+  "game_ready": false,
+  "budgets_declared": false,
+  "ue_imported": false
+ },
+ "asset_id": "ASSET-DECOR-KIT-001.CRATE",
+ "run_id": "20260928-crate-manual-v1",
+ "blender_version": "5.2.2 LTS",
+ "script": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/crate_build.py",
+ "script_sha256_lf": "c594071504d697ce70982301c39b02be305fdc003440dacd18199f97029f988b",
+ "helpers": {
+  "path": "tools/tripo-pipeline/blender/static_prop_candidate.py",
+  "sha256_lf": "6f703427539511afe37740035e55db1bcddbbb92bd2092bfedddc076b7b3d18b",
+  "used": [
+   "export_fbx",
+   "make_fbx_deterministic",
+   "patch_fbx_units",
+   "fbx_kwargs",
+   "um_fbx_v1_conformance",
+   "geometry_stats",
+   "uv_analysis",
+   "raster_triangles",
+   "build_material",
+   "save_png",
+   "png_chunks",
+   "image_array",
+   "srgb_to_lin",
+   "lin_to_srgb"
+  ]
+ },
+ "params": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/crate_params.json",
+ "params_sha256_lf": "10df67ffd51060bde7c62b2dc875171cf65ed4e15e4ad041be34e9edfa8f67d1",
+ "reference": {
+  "path": "art/imagegen/mvp-v1/environment/ref-crate.png",
+  "sha256": "c00523e78d62d013ecc745295d104094c626031e3be0e5af2e4a9d87c625f440",
+  "use": "visual reference only (proportions: X-brace on front, 4 horizontal planks on the side, corner posts with iron studs, planked top; colour sampling). Nothing is traced or projected from it."
+ },
+ "fbx_preset": {
+  "path": "blender/_tools/presets/UM_FBX_v1.json",
+  "sha256_lf": "06cb69892de24ec48c662bf3ed54b6d711e45c68b65cb51e625bf6a5b94f86f3"
+ },
+ "units": "Blender metres; uu = cm = FBX numbers (UnitScaleFactor 1.0)",
+ "asset_name": "SM_Decor_Crate",
+ "parts": {
+  "count": 61,
+  "by_kind": {
+   "post": 4,
+   "cap": 8,
+   "stud": 18,
+   "plank": 16,
+   "rail": 4,
+   "brace": 6,
+   "top_plank": 4,
+   "bottom": 1
+  },
+  "list": [
+   {
+    "name": "post_-1-1",
+    "kind": "post",
+    "rand": 0.530409,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "cap_bottom_-1-1",
+    "kind": "cap",
+    "rand": 0.054355,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "stud_bottom_-1-1_x",
+    "kind": "stud",
+    "rand": 0.319712,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "stud_bottom_-1-1_y",
+    "kind": "stud",
+    "rand": 0.424005,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "cap_top_-1-1",
+    "kind": "cap",
+    "rand": 0.777286,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "stud_top_-1-1_x",
+    "kind": "stud",
+    "rand": 0.311262,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "stud_top_-1-1_y",
+    "kind": "stud",
+    "rand": 0.045241,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "post_-1+1",
+    "kind": "post",
+    "rand": 0.578286,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "cap_bottom_-1+1",
+    "kind": "cap",
+    "rand": 0.20375,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "stud_bottom_-1+1_x",
+    "kind": "stud",
+    "rand": 0.002361,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "stud_bottom_-1+1_y",
+    "kind": "stud",
+    "rand": 0.632236,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "cap_top_-1+1",
+    "kind": "cap",
+    "rand": 0.783706,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "stud_top_-1+1_x",
+    "kind": "stud",
+    "rand": 0.453569,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "stud_top_-1+1_y",
+    "kind": "stud",
+    "rand": 0.987118,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "post_+1-1",
+    "kind": "post",
+    "rand": 0.589872,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "cap_bottom_+1-1",
+    "kind": "cap",
+    "rand": 0.155672,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "stud_bottom_+1-1_x",
+    "kind": "stud",
+    "rand": 0.134108,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "stud_bottom_+1-1_y",
+    "kind": "stud",
+    "rand": 0.783249,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "cap_top_+1-1",
+    "kind": "cap",
+    "rand": 0.902389,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "stud_top_+1-1_x",
+    "kind": "stud",
+    "rand": 0.997058,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "stud_top_+1-1_y",
+    "kind": "stud",
+    "rand": 0.123783,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "post_+1+1",
+    "kind": "post",
+    "rand": 0.217588,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "cap_bottom_+1+1",
+    "kind": "cap",
+    "rand": 0.774008,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "stud_bottom_+1+1_x",
+    "kind": "stud",
+    "rand": 0.69239,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "stud_bottom_+1+1_y",
+    "kind": "stud",
+    "rand": 0.756559,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "cap_top_+1+1",
+    "kind": "cap",
+    "rand": 0.060972,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "stud_top_+1+1_x",
+    "kind": "stud",
+    "rand": 0.406819,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "stud_top_+1+1_y",
+    "kind": "stud",
+    "rand": 0.760058,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "plank_front_0",
+    "kind": "plank",
+    "rand": 0.231142,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_left_0",
+    "kind": "plank",
+    "rand": 0.777566,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_back_0",
+    "kind": "plank",
+    "rand": 0.948542,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_right_0",
+    "kind": "plank",
+    "rand": 0.549271,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_front_1",
+    "kind": "plank",
+    "rand": 0.728453,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_left_1",
+    "kind": "plank",
+    "rand": 0.448011,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_back_1",
+    "kind": "plank",
+    "rand": 0.984182,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_right_1",
+    "kind": "plank",
+    "rand": 0.254847,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_front_2",
+    "kind": "plank",
+    "rand": 0.663761,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_left_2",
+    "kind": "plank",
+    "rand": 0.418269,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_back_2",
+    "kind": "plank",
+    "rand": 0.142139,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_right_2",
+    "kind": "plank",
+    "rand": 0.792672,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_front_3",
+    "kind": "plank",
+    "rand": 0.564758,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_left_3",
+    "kind": "plank",
+    "rand": 0.950903,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_back_3",
+    "kind": "plank",
+    "rand": 0.07994,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "plank_right_3",
+    "kind": "plank",
+    "rand": 0.187288,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "rail_front_bottom",
+    "kind": "rail",
+    "rand": 0.980495,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "rail_front_top",
+    "kind": "rail",
+    "rand": 0.413247,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "rail_back_bottom",
+    "kind": "rail",
+    "rand": 0.904559,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "rail_back_top",
+    "kind": "rail",
+    "rand": 0.53522,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "brace_front_main",
+    "kind": "brace",
+    "rand": 0.479291,
+    "faces_before_triangulation": 38
+   },
+   {
+    "name": "brace_front_split0",
+    "kind": "brace",
+    "rand": 0.093531,
+    "faces_before_triangulation": 32
+   },
+   {
+    "name": "brace_front_split1",
+    "kind": "brace",
+    "rand": 0.931058,
+    "faces_before_triangulation": 32
+   },
+   {
+    "name": "stud_brace_front",
+    "kind": "stud",
+    "rand": 0.499832,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "brace_back_main",
+    "kind": "brace",
+    "rand": 0.766427,
+    "faces_before_triangulation": 38
+   },
+   {
+    "name": "brace_back_split0",
+    "kind": "brace",
+    "rand": 0.306335,
+    "faces_before_triangulation": 32
+   },
+   {
+    "name": "brace_back_split1",
+    "kind": "brace",
+    "rand": 0.631533,
+    "faces_before_triangulation": 32
+   },
+   {
+    "name": "stud_brace_back",
+    "kind": "stud",
+    "rand": 0.555768,
+    "faces_before_triangulation": 33,
+    "base_face_smooth": false
+   },
+   {
+    "name": "top_0",
+    "kind": "top_plank",
+    "rand": 0.087492,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "top_1",
+    "kind": "top_plank",
+    "rand": 0.905555,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "top_2",
+    "kind": "top_plank",
+    "rand": 0.60969,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "top_3",
+    "kind": "top_plank",
+    "rand": 0.115372,
+    "faces_before_triangulation": 26
+   },
+   {
+    "name": "bottom_board",
+    "kind": "bottom",
+    "rand": 0.302883,
+    "faces_before_triangulation": 26
+   }
+  ]
+ },
+ "faces_before_triangulation": 1760,
+ "triangles": 3104,
+ "triangles_by_kind": {
+  "post": 176,
+  "cap": 352,
+  "stud": 1116,
+  "plank": 704,
+  "rail": 176,
+  "brace": 360,
+  "top_plank": 176,
+  "bottom": 44
+ },
+ "vertices": 1674,
+ "geometry_welded_1e-6m": {
+  "vertices_as_stored": 1674,
+  "vertices_welded_1e-6m": 1674,
+  "faces": 3104,
+  "triangles": 3104,
+  "welded_boundary_edges": 0,
+  "welded_non_manifold_edges": 0,
+  "wire_edges": 0,
+  "loose_vertices": 0,
+  "degenerate_faces_area_lt_1e-12": 0,
+  "faces_with_inconsistent_winding": 0,
+  "connected_shells": 61,
+  "signed_volume_m3": 0.003753501,
+  "raw_vertex_count_before_weld": 1674
+ },
+ "topology_per_shell_unwelded": {
+  "open_edges": 0,
+  "non_manifold_edges": 0,
+  "faces_with_inconsistent_winding": 0
+ },
+ "smooth_faces": 1008,
+ "smooth_note": "stud domes smooth (base flat); all wood/iron boards flat-shaded (chamfers are real geometry)",
+ "hidden_faces": {
+  "faces": 1760,
+  "hidden_faces": 896,
+  "ray_casts": 11553289,
+  "samples": 502920,
+  "directions_upper_hemisphere": 128,
+  "sample_spacing_uu": 0.5,
+  "sample_pull_to_triangle_centre_uu": 0.05,
+  "ray_origin_offset_along_normal_uu": 0.001,
+  "method": "BVH ray casts (max 1 m) from a barycentric sample grid (<= sample_spacing_uu) over each face, directions = upper half of a Fibonacci sphere inside the face's hemisphere (normal first); rays with a downward component count as blocked by the ground (z = 0). Hidden = no ray escapes from any sample. First run with 5 samples per face missed plank areas visible between the X braces (red in the hidden-check preview) -> grid sampling.",
+  "area_uu2_total": 8514.32,
+  "area_uu2_hidden": 3634.74,
+  "hidden_area_fraction": 0.4269
+ },
+ "bounds_min_uu": [
+  -12.5,
+  -12.5,
+  0.0
+ ],
+ "bounds_max_uu": [
+  12.5,
+  12.5,
+  25.0
+ ],
+ "dimensions_uu_x_y_z": [
+  25.0,
+  25.0,
+  25.0
+ ],
+ "pivot": {
+  "origin": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "rule": "04 §1: decor crate = centre of the base",
+  "min_z_uu": 0.0,
+  "x_centre_offset_uu": 0.0,
+  "y_centre_offset_uu": 0.0
+ },
+ "front": {
+  "rule": "04 §1: front = -Y in Blender (-> +X in UE)",
+  "x_brace_sides_blender": [
+   "+Y",
+   "-Y"
+  ],
+  "note": "X braces on the front (-Y) and the back (+Y): the crate reads the same after a 180 deg turn; plain planks on +-X."
+ },
+ "material_slots": [
+  "M_Decor_Crate"
+ ],
+ "uv_unwrap": {
+  "method": "per-part box projection (exact planes) + stud-axis projection for visible stud domes",
+  "projection_groups": 455,
+  "stud_dome_faces_axis_projected": 720,
+  "islands": 475,
+  "hidden_only_islands_scaled": 282,
+  "islands_mixing_hidden_and_visible_faces": 0,
+  "pack": {
+   "packer": "in-script skyline (deterministic)",
+   "scale_px_per_projection_metre": 1131.9768,
+   "margin_px_between_islands_min": 8,
+   "edge_padding_px_min": 4,
+   "boxes": 475
+  },
+  "pack_margin_px_at_1024": 8,
+  "hidden_island_scale": 0.25
+ },
+ "uv0": {
+  "uv_layers": [
+   "UVMap"
+  ],
+  "raster_size_px": 1024,
+  "islands": 475,
+  "triangles_out_of_0_1": 0,
+  "uv_bounds": [
+   0.003906,
+   0.003906,
+   0.996094,
+   0.980745
+  ],
+  "uv_area_used_fraction": 0.5879,
+  "raster_coverage_fraction": 0.5887,
+  "overlap_pixels_between_islands": 0,
+  "overlap_fraction_of_covered": 0.0,
+  "overlap_pixels_inside_islands_strict": 0,
+  "flipped_uv_triangles_vs_island_majority": 0,
+  "zero_area_uv_triangles": 0,
+  "texel_density_px_per_m_at_raster": 850.9,
+  "stretch_area_ratio_p05_p50_p95": [
+   0.078,
+   1.252,
+   1.77
+  ],
+  "stretch_anisotropy_sigma_max_over_min_p50_p95_max": [
+   1.0,
+   1.414,
+   2.889
+  ],
+  "stretch_sigma_max_norm_p95": 1.33,
+  "stretch_sigma_min_norm_p05": 0.235,
+  "min_gutter_px_estimate": 9,
+  "island_pairs_closer_than_4px": 0,
+  "note": "min_gutter_px_estimate / island_pairs_closer_than_4px: 4-neighbour growth at raster_size_px (odd/even estimate +-1 px). raster_metrics: Euclidean distance between centres of pixels of different islands (another metric, counts differ), plus strict in-island overlap from flipped UV triangles; at raster_size_px and 2x.",
+  "raster_metrics": [
+   {
+    "raster_size_px": 1024,
+    "overlap_pixels_between_islands": 0,
+    "overlap_pixels_inside_islands_strict": 0,
+    "raster_coverage_fraction": 0.5887,
+    "min_island_centre_distance_px": ">8",
+    "island_pairs_centre_distance_lt_4px": 0,
+    "island_pairs_centre_distance_lt_8px": 0,
+    "mip_where_min_distance_drops_below_1_texel": null
+   },
+   {
+    "raster_size_px": 2048,
+    "overlap_pixels_between_islands": 0,
+    "overlap_pixels_inside_islands_strict": 0,
+    "raster_coverage_fraction": 0.5882,
+    "min_island_centre_distance_px": ">8",
+    "island_pairs_centre_distance_lt_4px": 0,
+    "island_pairs_centre_distance_lt_8px": 0,
+    "mip_where_min_distance_drops_below_1_texel": null
+   }
+  ]
+ },
+ "uv0_by_visibility": {
+  "visible": {
+   "triangles": 1504,
+   "area_uu2": 4879.57,
+   "uv_area_fraction": 0.5615,
+   "px_per_uu": 10.985,
+   "stretch_area_ratio_p05_p50_p95": [
+    0.751,
+    1.062,
+    1.062
+   ],
+   "stretch_anisotropy_p50_p95_max": [
+    1.0,
+    1.414,
+    2.889
+   ]
+  },
+  "hidden": {
+   "triangles": 1600,
+   "area_uu2": 3634.74,
+   "uv_area_fraction": 0.0264,
+   "px_per_uu": 2.758
+  }
+ },
+ "uv_mirrored_faces": 0,
+ "textures": {
+  "BC": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/textures/T_Decor_Crate_BC.png",
+   "colorspace": "sRGB",
+   "ue": "sRGB, TC_Default",
+   "png_color_chunks": [
+    "cHRM",
+    "gAMA",
+    "sRGB"
+   ],
+   "sha256": "32b836dd98eb05ba968d6dbc205d1f1a57193bd223fffb7abe15444dfe6242f9"
+  },
+  "N": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/textures/T_Decor_Crate_N.png",
+   "colorspace": "Linear (Non-Color)",
+   "convention": "DirectX (green flipped from Blender's OpenGL tangent bake)",
+   "ue": "TC_Normalmap, flip_green false",
+   "png_color_chunks": [],
+   "sha256": "bd38f837e52c6057400e0fa435762f0d92566a47a77af49117b270e4a4f7db95"
+  },
+  "ORM": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/textures/T_Decor_Crate_ORM.png",
+   "colorspace": "Linear (Non-Color)",
+   "channels": {
+    "R": "AO baked in Cycles (64 spp, 4 uu, ground plane z=0)",
+    "G": "roughness (procedural)",
+    "B": "metallic (iron caps/studs 0.60, else 0)"
+   },
+   "ue": "TC_Masks, sRGB off",
+   "png_color_chunks": [],
+   "sha256": "4b8ab44840328c3e8d24bdd5f3fc9cc5ca788631fe471ee48beb08476d1954c1"
+  }
+ },
+ "texture_measurements": {
+  "size_px": 1024,
+  "texels_covered_all_faces": 617256,
+  "texels_covered_visible_faces": 589780,
+  "bc_srgb8_median_visible": [
+   72,
+   62,
+   55
+  ],
+  "bc_srgb8_median_visible_wood": [
+   73,
+   62,
+   54
+  ],
+  "bc_srgb8_median_visible_iron": [
+   62,
+   61,
+   63
+  ],
+  "bc_srgb8_p05_p95_luma_visible": [
+   48.2,
+   105.2
+  ],
+  "normal_tilt_deg_p50_p95_max_covered": [
+   0.55,
+   8.35,
+   17.08
+  ],
+  "ao_visible_p05_p50_mean": [
+   0.0,
+   0.906,
+   0.686
+  ],
+  "roughness_visible_mean": 0.832,
+  "roughness_ge_0_6_fraction_visible_texels": 0.9921,
+  "metallic_visible_mean": 0.0469,
+  "metallic_gt_0_3_fraction_visible_texels": 0.0782,
+  "note": "Visible texels = UV raster of faces not classified hidden; uniform density on them, so texel fractions ~ area fractions."
+ },
+ "bake": {
+  "device": "CPU",
+  "seed": 0,
+  "margin_px": 16,
+  "emit_samples": 16,
+  "normal_samples": 16,
+  "ao_samples": 64,
+  "ao_distance_m": 0.04,
+  "ao_in_basecolor_strength": 0.35,
+  "ao_note": "С-4: light/shadow baked into albedo moderately -> BC x (1 - 0.35 x (1 - AO)); ORM.R keeps the full AO (UE uses material AO only for indirect/sky light).",
+  "engine": "Cycles"
+ },
+ "collision": "none (04 §3.7: decor not interactive; clicks go through to L1). UE import: no collision (build profile collision: none).",
+ "um_fbx_v1_rows": [
+  {
+   "setting": "Forward / Up (04 1.1)",
+   "standard": [
+    "-Y",
+    "Z"
+   ],
+   "used": [
+    "-Y",
+    "Z"
+   ],
+   "conforms": true
+  },
+  {
+   "setting": "Apply Scalings (04 1.1)",
+   "standard": "FBX_SCALE_UNITS",
+   "used": "FBX_SCALE_UNITS",
+   "conforms": true
+  },
+  {
+   "setting": "Apply Unit (04 1.1)",
+   "standard": true,
+   "used": true,
+   "conforms": true
+  },
+  {
+   "setting": "Apply Transform (04 1.1)",
+   "standard": false,
+   "used": false,
+   "conforms": true
+  },
+  {
+   "setting": "Triangulate Faces (04 1.1)",
+   "standard": true,
+   "used": true,
+   "conforms": true
+  },
+  {
+   "setting": "Smoothing (04 1.1)",
+   "standard": "FACE",
+   "used": "FACE",
+   "conforms": true
+  },
+  {
+   "setting": "Object Types (04 1.1)",
+   "standard": [
+    "ARMATURE",
+    "MESH"
+   ],
+   "used": [
+    "ARMATURE",
+    "MESH"
+   ],
+   "conforms": true
+  },
+  {
+   "setting": "Loose Edges / Custom Properties (04 1.1)",
+   "standard": [
+    false,
+    false
+   ],
+   "used": [
+    false,
+    false
+   ],
+   "conforms": true
+  },
+  {
+   "setting": "Leaf bones / bone axes (04 1.1, preset)",
+   "standard": [
+    false,
+    "Y",
+    "X"
+   ],
+   "used": [
+    false,
+    "Y",
+    "X"
+   ],
+   "conforms": true
+  },
+  {
+   "setting": "Bake Animation (04 1.1: skeletal clips only)",
+   "standard": false,
+   "used": false,
+   "conforms": true
+  },
+  {
+   "setting": "Path Mode, textures not embedded (04 1.1)",
+   "standard": [
+    "AUTO",
+    false
+   ],
+   "used": [
+    "AUTO",
+    false
+   ],
+   "conforms": true
+  },
+  {
+   "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+   "standard": [
+    90.0,
+    100.0,
+    1.0
+   ],
+   "used": [
+    90.0,
+    100.0,
+    1.0
+   ],
+   "conforms": true
+  },
+  {
+   "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+   "standard": [
+    "METRIC",
+    1.0
+   ],
+   "used": [
+    "METRIC",
+    1.0
+   ],
+   "conforms": true
+  },
+  {
+   "setting": "Transforms applied: object matrix identity (04 1)",
+   "standard": true,
+   "used": true,
+   "conforms": true
+  },
+  {
+   "setting": "Pivot: base centre, min Z = 0 (04 1, decor: centre of base)",
+   "standard": true,
+   "used": true,
+   "conforms": true
+  }
+ ],
+ "um_fbx_v1_conforms": true,
+ "build_attributes_removed_before_export": [
+  "part_id",
+  "hidden"
+ ],
+ "export": {
+  "fbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/export/SM_Decor_Crate.fbx",
+  "sha256": "3c3e45fc435dbfc37495810c4174198b2c7e5edfc0221ff295958db6e9e33b98",
+  "bytes": 103132,
+  "absolute_path_leaks": [],
+  "texture_refs": [
+   "../textures/T_Decor_Crate_BC.png"
+  ]
+ },
+ "checks": {
+  "single_mesh_no_armature": true,
+  "closed_shells_consistent_winding_unwelded": true,
+  "closed_manifold_welded_1e-6m": true,
+  "shells_equal_parts": true,
+  "no_degenerate_faces": true,
+  "size_25_uu_proposed_all_axes": true,
+  "pivot_base_centre": true,
+  "x_brace_on_front_and_back_only": true,
+  "material_slots_le_2": true,
+  "uv0_in_0_1_no_overlap": true,
+  "uv_not_mirrored": true,
+  "min_gutter_ge_4px_at_1024": true,
+  "texture_1k": true,
+  "n_orm_no_png_color_chunks": true,
+  "roughness_ge_0_6_on_ge_90pct_visible": true,
+  "no_absolute_paths_in_fbx": true,
+  "um_fbx_v1_conforms": true,
+  "hidden_faces_not_visible_in_4_views": true
+ },
+ "checks_passed": true,
+ "hidden_face_check": {
+  "red_pixels_per_view_900x900": {
+   "front-right-30": 0,
+   "back-left-30": 0,
+   "side-low-5": 0,
+   "top-down-80": 0
+  },
+  "threshold_srgb": "R>170, G<70, B<70",
+  "views": "yaw/elevation 35/30, 215/30, 100/5, 10/80 deg around the crate, persp 20 deg"
+ },
+ "k1_exact_frame_analysis": {
+  "crate_location_m": [
+   3.27,
+   1.25,
+   0.0
+  ],
+  "projected_bbox_px_at_1920x1080": [
+   82.1,
+   85.3
+  ],
+  "bbox_centre_ndc": [
+   0.9111,
+   0.7449
+  ],
+  "in_frame": true,
+  "texel_density_needed_at_k1_px_per_uu": 3.286
+ },
+ "previews": {
+  "uv0_layout": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_uv0-layout.jpg"
+  },
+  "front-ortho": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_front-ortho.jpg"
+  },
+  "side-ortho": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_side-ortho.jpg"
+  },
+  "top-ortho": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_top-ortho.jpg"
+  },
+  "3q": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_3q-front-right.jpg"
+  },
+  "wire": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_3q-wireframe.jpg"
+  },
+  "hidden_check_front-right-30": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_hidden-check_front-right-30.jpg"
+  },
+  "hidden_check_back-left-30": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_hidden-check_back-left-30.jpg"
+  },
+  "hidden_check_side-low-5": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_hidden-check_side-low-5.jpg"
+  },
+  "hidden_check_top-down-80": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_hidden-check_top-down-80.jpg"
+  },
+  "k1_exact": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_game-k1-exact-12m.jpg"
+  },
+  "k1_crop4": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_game-k1-same-camera-crop4x.jpg"
+  },
+  "game_close": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_game-angles-close-1p4m-with-barrel.jpg"
+  }
+ },
+ "preview_note": "EEVEE, neutral sun key (shadowed) + fill, not the P1.7 control scene. Ortho/3q/wire on a grey backdrop like the concept. Game shots: FOV 35 deg horizontal, pitch -55 deg, 12 m (03 §2), 16:9, board 6x5 tiles of 94 uu, crate and the P1.5 barrel FBX on the east tray margin by the far row (layout suggestion only). crop4x = same camera position and projection, lens x4 with shift (more pixels, not what K-1 shows). UV layout: yellow = visible-face triangles, blue = hidden-only islands (packed at 1/4 density).",
+ "work_blend": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/work/decor-crate.blend (transient, gitignored)"
+}

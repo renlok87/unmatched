@@ -1,0 +1,267 @@
+{
+  "algorithm": "pack_segmented_atlas.py port (quadtree cells, LANCZOS resize, edge bleed); atlas.exclude_parts left out; normal texels renormalised after the resize",
+  "cells": {
+    "tripo_part_0": {
+      "cell": 1024,
+      "inset": 4,
+      "x": 0,
+      "y_top": 0
+    },
+    "tripo_part_1": {
+      "cell": 1024,
+      "inset": 4,
+      "x": 1024,
+      "y_top": 0
+    },
+    "tripo_part_2": {
+      "cell": 1024,
+      "inset": 4,
+      "x": 0,
+      "y_top": 1024
+    },
+    "tripo_part_3": {
+      "cell": 512,
+      "inset": 4,
+      "x": 1024,
+      "y_top": 1024
+    },
+    "tripo_part_5": {
+      "cell": 512,
+      "inset": 4,
+      "x": 1536,
+      "y_top": 1024
+    },
+    "tripo_part_6": {
+      "cell": 512,
+      "inset": 4,
+      "x": 1024,
+      "y_top": 1536
+    },
+    "tripo_part_7": {
+      "cell": 256,
+      "inset": 4,
+      "x": 1536,
+      "y_top": 1536
+    },
+    "tripo_part_8": {
+      "cell": 256,
+      "inset": 4,
+      "x": 1792,
+      "y_top": 1536
+    }
+  },
+  "checks": {
+    "cell_coverage_of_atlas": {
+      "measured": 0.9688,
+      "note": "informational",
+      "passed": true
+    },
+    "cell_inner_px_vs_source_px": {
+      "measured": {
+        "tripo_part_0": [
+          1024,
+          1016
+        ],
+        "tripo_part_1": [
+          1024,
+          1016
+        ],
+        "tripo_part_2": [
+          1024,
+          1016
+        ],
+        "tripo_part_3": [
+          512,
+          504
+        ],
+        "tripo_part_5": [
+          512,
+          504
+        ],
+        "tripo_part_6": [
+          512,
+          504
+        ],
+        "tripo_part_7": [
+          256,
+          248
+        ],
+        "tripo_part_8": [
+          256,
+          248
+        ]
+      },
+      "note": "informational: [source BC px, inner cell px]; the tile is LANCZOS-resized into the inner rect (cell minus 2 x gutter)",
+      "passed": true
+    },
+    "cells_do_not_overlap": {
+      "measured": 0,
+      "passed": true
+    },
+    "cells_inside_atlas": {
+      "measured": 2048,
+      "passed": true
+    },
+    "gutter_px_between_parts": {
+      "measured": 8,
+      "note": "each cell keeps an edge-bleed inset on all sides: >= 2*inset px between islands of different parts",
+      "passed": true
+    },
+    "normal_directx_is_opengl_with_inverted_green": {
+      "measured": "G_dx == 255 - G_gl; R, B equal",
+      "passed": true
+    },
+    "normal_renormalised_texels": {
+      "measured": {
+        "changed": 3569837,
+        "flat_replaced": 22
+      },
+      "note": "informational: texels changed by atlas.normal_renormalise",
+      "passed": true
+    },
+    "normal_vectors_unit_length_in_cells": {
+      "measured": 1.0,
+      "note": "fraction of texels inside part cells with |n| in (0.8, 1.2)",
+      "passed": true
+    },
+    "orm_metallic_range_in_cells": {
+      "measured": [
+        0,
+        153
+      ],
+      "note": "informational",
+      "passed": true
+    },
+    "orm_occlusion_channel_filled": {
+      "measured": 255,
+      "passed": true
+    },
+    "orm_roughness_range_in_cells": {
+      "measured": [
+        0,
+        255
+      ],
+      "note": "informational",
+      "passed": true
+    },
+    "part_count": {
+      "measured": 8,
+      "note": "atlas parts; excluded (atlas.exclude_parts): ['tripo_part_4']",
+      "passed": true
+    },
+    "source_unchanged": {
+      "measured": "dd5403dfff75256dbe5ec74f89b321bec458483b66b835b3f9ac5065b7d2d8cf",
+      "passed": true
+    }
+  },
+  "conventions": {
+    "BC": "sRGB colour; Tripo baseColorFactor 0.800 multiplied in",
+    "N": "linear; DirectX (-Y) \u2014 for UE (flip_green_channel = false)",
+    "N_OpenGL": "linear; OpenGL (+Y) \u2014 Blender preview only",
+    "ORM": "linear; R = occlusion (filled 255, Tripo has none), G = roughness, B = metallic",
+    "TeamMask": "linear 8-bit grey (optional, team_color.mask); UE: sRGB off, TC_Grayscale"
+  },
+  "excluded_parts": {
+    "tripo_part_4": {
+      "base_px": 512,
+      "normal_px": 256,
+      "reason": "Tripo base: replaced by the parametric base of meshes.base (no textures, 04 \u00a73.8); its 512^2 set would not fit the 2K atlas at native size",
+      "rm_px": 256
+    }
+  },
+  "files": {
+    "BC": {
+      "bytes": 3866674,
+      "file": "T_Harpy_Candidate_Atlas_BC.png",
+      "mode": "RGB",
+      "pixels": [
+        2048,
+        2048
+      ],
+      "sha256": "6c91809f85d49983538c846b6dd952888527f24cc97f4bf19caedff07609ea65"
+    },
+    "N": {
+      "bytes": 4018291,
+      "file": "T_Harpy_Candidate_Atlas_N.png",
+      "mode": "RGB",
+      "pixels": [
+        2048,
+        2048
+      ],
+      "sha256": "b83a9f922e6f4e1c5aed955d14479c66e68c630d276573f8fe99b86f4ff0c4b8"
+    },
+    "N_OpenGL": {
+      "bytes": 4017659,
+      "file": "T_Harpy_Candidate_Atlas_N_OpenGL.png",
+      "mode": "RGB",
+      "pixels": [
+        2048,
+        2048
+      ],
+      "sha256": "0620a86f868d8ca1164f102097ea52e5da74af908d0ea44dc8bcea84f321aebd"
+    },
+    "ORM": {
+      "bytes": 2253030,
+      "file": "T_Harpy_Candidate_Atlas_ORM.png",
+      "mode": "RGB",
+      "pixels": [
+        2048,
+        2048
+      ],
+      "sha256": "cf9c4081528c05cce717b831f61b501237e452b6155b698ee66e7dca3f7a83ee"
+    }
+  },
+  "gutter_px": 4,
+  "passed": true,
+  "profile": "harpy-segmented-skeletal/2",
+  "reference_comparison": {},
+  "size": 2048,
+  "source": {
+    "file": "harpy-tripo-d500fc84-segmented-retopo.glb",
+    "sha256": "dd5403dfff75256dbe5ec74f89b321bec458483b66b835b3f9ac5065b7d2d8cf"
+  },
+  "source_textures": {
+    "tripo_part_0": {
+      "base_px": 1024,
+      "normal_px": 512,
+      "rm_px": 512
+    },
+    "tripo_part_1": {
+      "base_px": 1024,
+      "normal_px": 512,
+      "rm_px": 512
+    },
+    "tripo_part_2": {
+      "base_px": 1024,
+      "normal_px": 512,
+      "rm_px": 512
+    },
+    "tripo_part_3": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_5": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_6": {
+      "base_px": 512,
+      "normal_px": 256,
+      "rm_px": 256
+    },
+    "tripo_part_7": {
+      "base_px": 256,
+      "normal_px": 128,
+      "rm_px": 128
+    },
+    "tripo_part_8": {
+      "base_px": 256,
+      "normal_px": 128,
+      "rm_px": 128
+    }
+  },
+  "stage": "atlas",
+  "team_mask": null
+}

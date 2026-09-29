@@ -1,0 +1,115 @@
+{
+ "bisection": {
+  "final_mean": 124.028,
+  "luminance_match": 2.46149,
+  "steps": [
+   {
+    "lum": 1.37625,
+    "mean": 165.126
+   },
+   {
+    "lum": 2.28329,
+    "mean": 129.416
+   },
+   {
+    "lum": 2.94099,
+    "mean": 111.484
+   },
+   {
+    "lum": 2.59136,
+    "mean": 120.369
+   },
+   {
+    "lum": 2.43246,
+    "mean": 124.871
+   },
+   {
+    "lum": 2.51065,
+    "mean": 122.615
+   },
+   {
+    "lum": 2.47124,
+    "mean": 123.749
+   },
+   {
+    "lum": 2.45177,
+    "mean": 124.312
+   }
+  ],
+  "target_mean": 124.004
+ },
+ "date": "2026-09-28",
+ "first_pass": {
+  "frames_mean_rgb_roi": {
+   "A": [
+    92.491,
+    93.228,
+    98.009
+   ],
+   "A2": [
+    92.491,
+    93.228,
+    98.007
+   ],
+   "B": [
+    121.738,
+    122.513,
+    127.761
+   ],
+   "C": [
+    216.139,
+    215.881,
+    217.897
+   ],
+   "D": [
+    121.738,
+    122.513,
+    127.761
+   ]
+  },
+  "legend": {
+   "A/A2": "volume L = 1.2/0.78*2^1.3 = 3.788, Game settings",
+   "B": "no volume, viewport fixed EV100 1.3 (reference)",
+   "C": "no volume, Game settings (project default exposure)",
+   "D": "volume on + viewport fixed EV100 1.3 (fixed viewport overrides the volume: D == B)"
+  },
+  "mean_abs_diff_vs_A_full": {
+   "A": 0.0,
+   "A2": 0.107,
+   "B": 10.409,
+   "C": 45.1377,
+   "D": 10.4089
+  },
+  "viewport_before": {
+   "ev100": "1,0",
+   "game_settings": "checked"
+  },
+  "viewport_fixed": {
+   "ev100": "1,3",
+   "game_settings": "unchecked"
+  },
+  "viewport_restored": {
+   "ev100": "1,0",
+   "game_settings": "checked"
+  }
+ },
+ "frames_kept_outside_git": [
+  "C:/tmp/t31/calib",
+  "C:/tmp/t31/calib2"
+ ],
+ "method": "K1 frame of L_P17ControlScene (CaptureViewport, FOV 35, 16:9 crop to 1920x1080), mean RGB of the board ROI rows 200-900, cols 560-1360. Reference B: viewport exposure 'Game settings' off, EV100 1.3 (set through the viewport Perspective menu via SlateInspector), exposure volume disabled. Then the volume (histogram, min = max brightness L, bias 0) with 'Game settings' on; L bisected in log space until the ROI mean matched B.",
+ "project_cvars": {
+  "r.DefaultFeature.AutoExposure": 0,
+  "r.DefaultFeature.AutoExposure.ExtendDefaultLuminanceRange": 0,
+  "r.EyeAdaptation.LensAttenuation": 0.78,
+  "r.EyeAdaptationQuality": 2
+ },
+ "question": "which post-process exposure of the control level reproduces the viewport's fixed 'EV100 1.3' (head-tilt v3 A1 editor frames; stage-3 plan T3.1)",
+ "restored": "viewport exposure back to 'Game settings' (EV100 field 1.0), level /Game/S08/S08Arena, show flags 2",
+ "result": {
+  "luminance": 2.46229,
+  "note": "the match is 2^EV100 (2.4615 bisected vs 2^1.3 = 2.4623); control_scene.py uses EXPOSURE_LUMINANCE = 2^1.3. The formula 1.2/LensAttenuation*2^EV100 (3.788) is 0.9 stop darker."
+ },
+ "schema": "unmatched.p17-exposure-calibration/1",
+ "status": "измерено"
+}

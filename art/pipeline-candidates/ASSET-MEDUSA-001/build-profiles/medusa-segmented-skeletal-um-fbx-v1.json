@@ -10,6 +10,11 @@
     "tools/art/art004_face_skeletal_export.py (ART004_FACE_RESTORE_NORMALS=1, ART004_FACE_SLOT=1, ART004_FACE_NECK_BACK=1)",
     "tools/art/import_medusa_candidate.py (sockets, TeamColor material)"
   ],
+  "build": {
+    "flow": "whole-figure",
+    "builder": "tools/tripo-pipeline/blender/build_candidate.py (library candidate_build/)",
+    "note": "the T4 algorithm of tool 0.4.0 unchanged; tool 0.5.0 reads the part names it used to hard-code from anatomy, axes.blender_bow_side and reference.parts_fixed_in_reference (same FBX bytes)"
+  },
   "source_role": "segmented-retopo-glb",
   "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
   "expected_part_count": 15,
@@ -93,6 +98,11 @@
     "expected_note": "measured on the Tripo GLB 2026-09-28 (live Blender MCP probe): part_10 face -0.978, part_14 rear neck -1.0 (both fixed in v2), part_8 left arm -1.0 and part_13 right hand -0.997 (NOT fixed in v2)",
     "min_score_after_fix": 0.5,
     "fix": "flip polygon winding and negate the custom corner normals (as art004_face_skeletal_export.py RESTORE_NORMALS)"
+  },
+  "anatomy": {
+    "face": "tripo_part_10",
+    "neck": "tripo_part_14",
+    "note": "face = the open face part (also materials.face_slot.part), neck = the rear neck part; hard-coded in build_candidate.py 0.4.0 (checks face_slot_polygons, neck_polygons)"
   },
   "armature": {
     "object": "SKEL_Medusa",
@@ -537,6 +547,10 @@
     "skeletal_fbx_sha256": "bd125c6bbeb2559b28f6fc4908a1790e0d05fd572b128bd9188c2daeea046592",
     "base_fbx": "blender/ASSET-MEDUSA-001/export/SM_Medusa_Base.fbx",
     "base_fbx_sha256": "a49bfbbfe6e51856aebcd9d3e7cc9a45bc142f0ff110830f446a28c76997ba4f",
+    "parts_fixed_in_reference": [
+      "tripo_part_10",
+      "tripo_part_14"
+    ],
     "note": "read-only structural comparison (Blender re-import of both FBX); the reference is never written"
   },
   "expectations": {

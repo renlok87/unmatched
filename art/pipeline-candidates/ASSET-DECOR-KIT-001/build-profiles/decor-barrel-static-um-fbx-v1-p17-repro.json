@@ -1,0 +1,71 @@
+{
+ "schema": "unmatched.tripo-pipeline.build-profile/1",
+ "profile_id": "decor-barrel-static-um-fbx-v1-p17-repro/1",
+ "asset_id": "ASSET-DECOR-KIT-001.BARREL",
+ "kind": "static-candidate",
+ "status": "proposed",
+ "note": "UE import contract of the P1.5 barrel candidate (docs/art-pipeline/prop-barrel-report.md §6). The candidate is built by tools/tripo-pipeline/blender/static_prop_candidate.py; the adopt stage pins its bytes, ue-import creates the textures, material instance and static mesh. Numbers are measurements, not budgets.",
+ "source_role": "smartuv-tex2k-pbr-glb",
+ "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+ "candidate": {
+  "dir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p17-repro",
+  "fbx": "export/SM_Decor_Barrel.fbx",
+  "report": "reports/candidate-report.json",
+  "readback": "reports/fbx-readback.json",
+  "report_schema": "unmatched.tripo-pipeline.static-prop-candidate/1",
+  "textures": {
+   "BC": "export/T_Decor_Barrel_BC.png",
+   "N": "export/T_Decor_Barrel_N.png",
+   "ORM": "export/T_Decor_Barrel_ORM.png"
+  }
+ },
+ "ue": {
+  "static_asset": "SM_Decor_Barrel",
+  "material": "M_Decor_Barrel_Candidate",
+  "instance": "MI_Decor_Barrel_Candidate",
+  "team_color": [
+   1,
+   1,
+   1,
+   1
+  ],
+  "team_color_note": "decor L3 is not team-owned (04 §3.7): TeamColor stays neutral white",
+  "collision": "none",
+  "two_sided": false,
+  "shared_master": {
+   "asset": "/Game/S05/M_DioramaMaster",
+   "texture_parameters": {
+    "BC": "BaseColorTexture",
+    "N": "NormalTexture",
+    "ORM": "ORMTexture"
+   },
+   "note": "04 §1 names M_DioramaMaster as the shared master; it is used only if it exposes these texture parameters, otherwise the deviation is recorded and the candidate keeps its own material"
+  },
+  "textures": {
+   "BC": {
+    "asset": "T_Decor_Barrel_BC",
+    "srgb": true,
+    "compression": "TC_Default"
+   },
+   "N": {
+    "asset": "T_Decor_Barrel_N",
+    "srgb": false,
+    "compression": "TC_Normalmap",
+    "flip_green": false
+   },
+   "ORM": {
+    "asset": "T_Decor_Barrel_ORM",
+    "srgb": false,
+    "compression": "TC_Masks"
+   }
+  }
+ },
+ "axes": {
+  "expected_ue_front": "+X",
+  "protrusion_axis_ue": "+X",
+  "source": "UM_FBX_v1 (04 §1.1, ART-001); fbx-readback: bung 5.8 deg from +X in the export frame"
+ },
+ "expectations": {
+  "pivot_tolerance_uu": 0.05
+ }
+}

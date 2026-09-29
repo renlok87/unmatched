@@ -1,0 +1,910 @@
+{
+ "schema": "unmatched.p17-model-checklist/1",
+ "date": "2026-09-28",
+ "revised": "2026-09-29 (исправления ревью T3.1): добавлен пункт base_see_through по каждому ассету; бочка поставлена на верх борта; все числа пересняты (повторы r1–r3 после исправления)",
+ "task": "stage 3 T3.1 (P1.7)",
+ "status_rule": "каждый пункт — «измерено» (число из measurements.json/base-seethrough.json/отчётов) или «визуально» (агент-суррогат); ничего не «художественно принято»",
+ "frames_class": "editor-mcp-viewport (classify-evidence.json): диагностика, не K1/K2-приёмка",
+ "camera": "UpdateBoardCamera: FOV 35, pitch -55, yaw -90; K1 1931 uu, K2 1207 uu (1,6x), 386 uu (5x), фокус клетка + 28 uu; EV100 1,3",
+ "items": [
+  "front_back",
+  "weapon",
+  "hands",
+  "feet_on_base",
+  "base_see_through",
+  "clipping_pairs",
+  "team_colour_in_grey",
+  "silhouette_game_camera"
+ ],
+ "assets": {
+  "medusa": {
+   "asset_id": "ASSET-MEDUSA-001",
+   "ue": "/Game/PipelineCandidates/Medusa/T4UmFbxV1 (SK_Medusa_Candidate + SM_Medusa_Base_Candidate, MI Blue)",
+   "why_this_import": "T4UmFbxV1 = стандарт UM_FBX_v1 (лицо +X, как у героев) и те же байты FBX, что CLI-прогон 20260928-cli-um-fbx-v1 (T3.3); T4LocalPass (+Y) — только для анимационного теста: черновые клипы привязаны к его скелету (T2.1: на скелете T4UmFbxV1 кадр 0 расходится на 90°)",
+   "cell": "2:2 (0,-50), дальняя половина → лицом к камере (yaw 90)",
+   "front_back": {
+    "frames": {
+     "front": "frames/p17-front-5x-medusa-ue-editor.jpg",
+     "back": "frames/p17-back-5x-medusa-ue-editor.jpg",
+     "k2_1p6": "frames/p17-k2-1p6-medusa-ue-editor.jpg",
+     "k2_5x": "frames/p17-k2-5x-medusa-ue-editor.jpg"
+    },
+    "status": "визуально",
+    "note": "спереди видны лицо, корона змей, лук в левой руке; сзади — плащ, лук, колчан. На обоих кадрах на верхе подставки у стоп светлые пятна цвета доски — сквозные дыры (см. base_see_through). визуально, агент-суррогат по редакторным кадрам 5x (386 uu) и K2 1,6x; не художественная приёмка"
+   },
+   "weapon": {
+    "status": "измерено",
+    "bones": {
+     "Head": "head",
+     "Weapon": "weapon"
+    },
+    "component_uu": {
+     "Head": [
+      4.0,
+      0.0,
+      38.5
+     ],
+     "Weapon": [
+      6.0,
+      -11.2,
+      27.5
+     ]
+    },
+    "note": "лук на кости weapon (Weapon = голова кости, (0,0,0)); цель сокета в профиле T4 не задана — только замер. Анимационный тест: Weapon ↔ hand_L 2,4372 uu во всех 5 позах Lunge"
+   },
+   "hands": {
+    "status": "визуально",
+    "note": "левая кисть держит лук, правая у пояса; разрывов на 5x не видно. визуально, агент-суррогат по редакторным кадрам 5x (386 uu) и K2 1,6x; не художественная приёмка"
+   },
+   "feet_on_base": {
+    "status": "измерено + визуально",
+    "base_top_uu": 6.0,
+    "figure_bottom_uu": 3.8074,
+    "feet_below_base_top_uu": 2.1926,
+    "note": "подставка T4 поднята в стопы/подол (известно: сборка T4 растягивает подставку к стопам, heroes-отчёт Arthur) — низ фигуры на 2,19 uu ниже верха подставки; стопы стоят на подставке без зазора, но верх подставки вокруг стоп сквозной — это отдельный пункт base_see_through (FAIL)"
+   },
+   "base_see_through": {
+    "status": "измерено + визуально",
+    "blender": {
+     "file": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1/export/SM_Medusa_Base_Candidate.fbx",
+     "sha256": "de5ebcac44b23b5335a3a7b7802420802c3738f8958fab104fa0b044d87a0983",
+     "figure": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-t4-um-fbx-v1/export/SK_Medusa_Candidate.fbx",
+     "open_edges": 502,
+     "open_edge_loops": 42,
+     "open_loops_in_top_20pct": 30,
+     "base_only_uu2": {
+      "cam55_from_+X": 54.56,
+      "cam55_from_+Y": 54.51,
+      "cam55_from_-X": 54.47,
+      "cam55_from_-Y": 54.6,
+      "top_down": 54.78
+     },
+     "with_figure_uu2": {
+      "cam55_from_+X": 27.63,
+      "cam55_from_+Y": 10.83,
+      "cam55_from_-X": 17.2,
+      "cam55_from_-Y": 15.38,
+      "top_down": 14.57
+     },
+     "base_only_max_uu2": 54.78,
+     "with_figure_max_uu2": 27.63,
+     "threshold_with_figure_uu2": 0.1,
+     "pass": false,
+     "method": "base-seethrough.json (tools/tripo-pipeline/review/base_seethrough.py, headless Blender): лучи сверху и из камеры -55° с четырёх сторон через диск 93 % радиуса верха; cam55_from_+X = со стороны лица меша UM_FBX_v1"
+    },
+    "ue_frames_5x": {
+     "medusa": {
+      "camera_side_in_mesh_space": "+X (front of a UM_FBX_v1 mesh)",
+      "base_only_void_px": 2286,
+      "base_only_uu2_est": 49.61,
+      "with_figure_void_px": 1105,
+      "with_figure_uu2_est": 23.98,
+      "disc_px": 28174,
+      "void_empty_ok": true,
+      "frames": {
+       "base_only": "p17-mask-k2-5x-void-base-medusa-ue-editor.png",
+       "visual_board_background": [
+        "p17-mask-k2-5x-base-medusa-ue-editor.png",
+        "p17-mask-k2-5x-medusa-ue-editor.png"
+       ],
+       "void_empty": "p17-mask-k2-5x-void-empty-medusa-ue-editor.png",
+       "with_figure": "p17-mask-k2-5x-void-medusa-ue-editor.png"
+      }
+     }
+    },
+    "frames": {
+     "k2_1p6": "frames/p17-k2-1p6-medusa-ue-editor.jpg",
+     "k2_5x": "frames/p17-k2-5x-medusa-ue-editor.jpg",
+     "front_5x": "frames/p17-front-5x-medusa-ue-editor.jpg",
+     "back_5x": "frames/p17-back-5x-medusa-ue-editor.jpg",
+     "anim_lunge": "frames/p17-anim-lunge-p000..p100-k2-{1p6,5x}-ue-editor.jpg (T4LocalPass, тот же меш подставки: 54,8 uu² без фигуры)",
+     "crop": "frames/p17-crop-base-holes-k2-5x-ue-editor.jpg"
+    },
+    "verdict": "FAIL (находка для арт-трека; исправление сборки подставки T4 — вне этой задачи)",
+    "note": "в меше подставки 502 открытых рёбер в 42 петлях, 30 петель в верхних 20 % высоты (дыры-следы стоп: две крупные у z 5,92–6,0 uu, x −3,8…5,6 / y −11,6…−6,0 и x 0,1…5,7 / y 6,7…11,3 в осях Blender); без фигуры сквозь верх видно 54,8 uu², с фигурой — 27,6 uu² со стороны лица (кадры K2 и front-5x), 17,2 uu² со спины (back-5x), 14,6 uu² сверху; видны на K2 1,6x, 5x и во всех кадрах Lunge как светлые пятна цвета доски у стоп. Тот же класс дефекта, что «дыры-следы под ступнями» у Arthur (исправлены в его сборке)",
+    "ue_frames_5x_method": "measurements.json base_see_through_frames: 5x, доска скрыта (пустота редактора = (0,0,0)); пиксели пустоты внутри проекции диска 93 % радиуса верха подставки (эрозия 2 px) = просвет; площадь = доля диска x площадь диска. Кадры на фоне доски (mask-k2-5x-base-*) — только наглядность"
+   },
+   "clipping_pairs": {
+    "status": "частично измерено",
+    "pairs": [
+     {
+      "pair": "корона × колчан",
+      "measured": "1,07 см (v2, Blender; thresholds.json V31-06)",
+      "in_ue": "не мерилось"
+     },
+     {
+      "pair": "голова/корона × плащ в Lunge",
+      "measured": "голова смещается до 3,04 uu (anim_test)",
+      "in_ue": "визуально на 5x пересечений не видно"
+     },
+     {
+      "pair": "стопы × верх подставки (дыры-следы)",
+      "measured": "с фигурой до 27,6 uu² сквозного верха (base_see_through)",
+      "in_ue": "видно на K2 1,6x и 5x (светлые пятна доски у стоп)"
+     }
+    ]
+   },
+   "team_colour_in_grey": {
+    "status": "измерено",
+    "materials_swapped": {
+     "base": {
+      "0": "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Materials/MI_Medusa_Candidate_Red"
+     },
+     "figure": {
+      "0": "/Game/PipelineCandidates/Medusa/T4UmFbxV1/Materials/MI_Medusa_Candidate_Red"
+     }
+    },
+    "changed_px_k2_1p6": 4689,
+    "mean_luma_default": 90.24,
+    "mean_luma_swapped": 89.44,
+    "delta_luma_0_255": 0.8,
+    "mean_rgb_default": [
+     91.83,
+     90.06,
+     87.28
+    ],
+    "mean_rgb_swapped": [
+     103.41,
+     86.54,
+     77.02
+    ],
+    "finding": "Blue→Red меняет BC×TeamColor всей фигуры (4689 px), но в сером |Δ luma| 0,8/255: команду в сером не различить"
+   },
+   "silhouette_game_camera": {
+    "status": "измерено",
+    "k1_px": {
+     "height": 75,
+     "width": 50,
+     "area": 2437
+    },
+    "k2_1p6_px": {
+     "height": 117,
+     "width": 79,
+     "area": 6076
+    },
+    "min_gap_to_other_figures_k1_px": {
+     "arthur-medusa": 45.12,
+     "harpy1-medusa": 85.07,
+     "harpy2-medusa": 54.0,
+     "harpy3-medusa": 88.28,
+     "medusa-merlin": 155.9
+    },
+    "method": "маска = фигура одна, тени выкл., против пустой доски, окно по проекции границ, наибольшая связная компонента (measurements.json silhouettes)"
+   }
+  },
+  "arthur": {
+   "asset_id": "ASSET-KING-ARTHUR-001",
+   "ue": "/Game/PipelineCandidates/KingArthur/20260928-cli-um-fbx-v1 (MI Gold)",
+   "cell": "2:3 (0,50), ближняя половина → спиной к камере (yaw -90)",
+   "front_back": {
+    "frames": {
+     "front": "frames/p17-front-5x-arthur-ue-editor.jpg",
+     "back": "frames/p17-back-5x-arthur-ue-editor.jpg",
+     "k2_1p6": "frames/p17-k2-1p6-arthur-ue-editor.jpg",
+     "k2_5x": "frames/p17-k2-5x-arthur-ue-editor.jpg"
+    },
+    "status": "визуально",
+    "note": "спереди лицо с короной, доспех, меч в правой руке перед корпусом; клинок на кадрах почти чёрный; сзади — красный плащ, конец меча над плечом. визуально, агент-суррогат по редакторным кадрам 5x (386 uu) и K2 1,6x; не художественная приёмка"
+   },
+   "weapon": {
+    "status": "измерено",
+    "bones": {
+     "Head": "head",
+     "Weapon": "weapon"
+    },
+    "component_uu": {
+     "Head": [
+      -0.1688,
+      0.151,
+      49.9208
+     ],
+     "Weapon": [
+      7.9,
+      8.0,
+      37.8
+     ]
+    },
+    "targets": {
+     "Head": {
+      "target": [
+       -0.169,
+       0.151,
+       49.921
+      ],
+      "distance_uu": 0.0003,
+      "within_0_05_uu": true,
+      "source": "build target (ue-import plan)"
+     },
+     "Weapon": {
+      "target": [
+       7.9,
+       8.0,
+       37.8
+      ],
+      "distance_uu": 0.0,
+      "within_0_05_uu": true,
+      "source": "profile measured target"
+     }
+    },
+    "note": "меч отдельной частью на кости weapon (ребёнок hand.R); Weapon = рукоять"
+   },
+   "hands": {
+    "status": "визуально",
+    "note": "правая кисть на рукояти, левая у пояса; на 5x разрывов не видно. визуально, агент-суррогат по редакторным кадрам 5x (386 uu) и K2 1,6x; не художественная приёмка"
+   },
+   "feet_on_base": {
+    "status": "измерено + визуально",
+    "base_top_uu": 6.0,
+    "figure_bottom_uu": 5.869,
+    "feet_below_base_top_uu": 0.131,
+    "note": "стопы на 0,13 uu в подставке (посадка build, крышки подошв); зазора нет"
+   },
+   "base_see_through": {
+    "status": "измерено + визуально",
+    "blender": {
+     "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/export/SM_KingArthur_Base_Candidate.fbx",
+     "sha256": "40cd709b4fa6416a2934086324bc7b96a1746d137595d5941e745d338fbc9c52",
+     "figure": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/export/SK_KingArthur_Candidate.fbx",
+     "open_edges": 0,
+     "open_edge_loops": 0,
+     "open_loops_in_top_20pct": 0,
+     "base_only_uu2": {
+      "cam55_from_+X": 0.04,
+      "cam55_from_+Y": 0.0,
+      "cam55_from_-X": 0.04,
+      "cam55_from_-Y": 0.08,
+      "top_down": 0.0
+     },
+     "with_figure_uu2": {
+      "cam55_from_+X": 0.06,
+      "cam55_from_+Y": 0.0,
+      "cam55_from_-X": 0.0,
+      "cam55_from_-Y": 0.0,
+      "top_down": 0.01
+     },
+     "base_only_max_uu2": 0.08,
+     "with_figure_max_uu2": 0.06,
+     "threshold_with_figure_uu2": 0.1,
+     "pass": true,
+     "method": "base-seethrough.json (tools/tripo-pipeline/review/base_seethrough.py, headless Blender): лучи сверху и из камеры -55° с четырёх сторон через диск 93 % радиуса верха; cam55_from_+X = со стороны лица меша UM_FBX_v1"
+    },
+    "ue_frames_5x": {
+     "arthur": {
+      "camera_side_in_mesh_space": "-X (back)",
+      "base_only_void_px": 0,
+      "base_only_uu2_est": 0.0,
+      "with_figure_void_px": 0,
+      "with_figure_uu2_est": 0.0,
+      "disc_px": 28174,
+      "void_empty_ok": true,
+      "frames": {
+       "base_only": "p17-mask-k2-5x-void-base-arthur-ue-editor.png",
+       "visual_board_background": [
+        "p17-mask-k2-5x-base-arthur-ue-editor.png",
+        "p17-mask-k2-5x-arthur-ue-editor.png"
+       ],
+       "void_empty": "p17-mask-k2-5x-void-empty-arthur-ue-editor.png",
+       "with_figure": "p17-mask-k2-5x-void-arthur-ue-editor.png"
+      }
+     }
+    },
+    "frames": {
+     "front_5x": "frames/p17-front-5x-arthur-ue-editor.jpg",
+     "back_5x": "frames/p17-back-5x-arthur-ue-editor.jpg",
+     "k2_5x": "frames/p17-k2-5x-arthur-ue-editor.jpg"
+    },
+    "verdict": "PASS",
+    "note": "меш подставки замкнут (0 открытых рёбер; дыры-следы исправлены в сборке Arthur); единичные лучи проходят по общим рёбрам (≤ 0,1 uu²)",
+    "ue_frames_5x_method": "measurements.json base_see_through_frames: 5x, доска скрыта (пустота редактора = (0,0,0)); пиксели пустоты внутри проекции диска 93 % радиуса верха подставки (эрозия 2 px) = просвет; площадь = доля диска x площадь диска. Кадры на фоне доски (mask-k2-5x-base-*) — только наглядность"
+   },
+   "clipping_pairs": {
+    "status": "визуально",
+    "pairs": [
+     {
+      "pair": "меч × лицо в ¾ справа-спереди",
+      "measured": "известно из Blender-отчёта (арт-трек)",
+      "in_ue": "в кадрах спереди меч проходит перед корпусом, лицо открыто"
+     },
+     {
+      "pair": "наплечник × плащ при подъёме руки",
+      "measured": "не проверялось (клипов Arthur нет)"
+     }
+    ]
+   },
+   "team_colour_in_grey": {
+    "status": "измерено",
+    "materials_swapped": {
+     "base": {
+      "0": "/Game/PipelineCandidates/KingArthur/20260928-cli-um-fbx-v1/Materials/MI_KingArthur_Candidate_Silver"
+     },
+     "figure": {
+      "0": "/Game/PipelineCandidates/KingArthur/20260928-cli-um-fbx-v1/Materials/MI_KingArthur_Candidate_Silver"
+     }
+    },
+    "changed_px_k2_1p6": 1582,
+    "mean_luma_default": 81.27,
+    "mean_luma_swapped": 79.45,
+    "delta_luma_0_255": 1.82,
+    "mean_rgb_default": [
+     108.85,
+     73.78,
+     74.34
+    ],
+    "mean_rgb_swapped": [
+     99.81,
+     73.54,
+     78.06
+    ],
+    "finding": "маска TeamColor покрывает красную ткань; Gold→Silver меняет 1582 px, |Δ luma| 1,8/255 — в сером почти неразличимо"
+   },
+   "silhouette_game_camera": {
+    "status": "измерено",
+    "k1_px": {
+     "height": 88,
+     "width": 50,
+     "area": 2883
+    },
+    "k2_1p6_px": {
+     "height": 138,
+     "width": 78,
+     "area": 6950
+    },
+    "min_gap_to_other_figures_k1_px": {
+     "arthur-harpy1": 135.06,
+     "arthur-harpy2": 172.24,
+     "arthur-harpy3": 150.6,
+     "arthur-medusa": 45.12,
+     "arthur-merlin": 116.0
+    },
+    "method": "маска = фигура одна, тени выкл., против пустой доски, окно по проекции границ, наибольшая связная компонента (measurements.json silhouettes)"
+   }
+  },
+  "merlin": {
+   "asset_id": "ASSET-MERLIN-001",
+   "ue": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1 (MI Gold)",
+   "cell": "3:3 (100,50), ближняя половина → спиной к камере (yaw -90)",
+   "front_back": {
+    "frames": {
+     "front": "frames/p17-front-5x-merlin-ue-editor.jpg",
+     "back": "frames/p17-back-5x-merlin-ue-editor.jpg",
+     "k2_1p6": "frames/p17-k2-1p6-merlin-ue-editor.jpg",
+     "k2_5x": "frames/p17-k2-5x-merlin-ue-editor.jpg"
+    },
+    "status": "визуально",
+    "note": "спереди под капюшоном видны лицо и борода, посох с кристаллом в правой руке; сзади — капюшон и мантия. визуально, агент-суррогат по редакторным кадрам 5x (386 uu) и K2 1,6x; не художественная приёмка"
+   },
+   "weapon": {
+    "status": "измерено",
+    "bones": {
+     "Head": "head",
+     "Weapon": "weapon"
+    },
+    "component_uu": {
+     "Head": [
+      0.1953,
+      -0.019,
+      37.8925
+     ],
+     "Weapon": [
+      0.3369,
+      8.0006,
+      32.045
+     ]
+    },
+    "targets": {
+     "Head": {
+      "target": [
+       0.195,
+       -0.019,
+       37.893
+      ],
+      "distance_uu": 0.0006,
+      "within_0_05_uu": true,
+      "source": "build target (ue-import plan)"
+     }
+    },
+    "note": "Weapon на кости weapon = хват на оси посоха; замер (0,337; 8,001; 32,045) = цель отчёта Blender ≈ (0,34; 8,00; 32,05)"
+   },
+   "hands": {
+    "status": "визуально",
+    "note": "правая кисть на посохе (вставка стержня в кулак, heroes-отчёт), левая у пояса. визуально, агент-суррогат по редакторным кадрам 5x (386 uu) и K2 1,6x; не художественная приёмка"
+   },
+   "feet_on_base": {
+    "status": "измерено + визуально",
+    "base_top_uu": 5.0,
+    "figure_bottom_uu": 4.7966,
+    "feet_below_base_top_uu": 0.2034,
+    "note": "подол/обувь на 0,20 uu в подставке; зазора нет"
+   },
+   "base_see_through": {
+    "status": "измерено + визуально",
+    "blender": {
+     "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/export/SM_Merlin_Base_Candidate.fbx",
+     "sha256": "bf5c3db2dce7a299e0af53b2bbe2aea7c60d12dee45912c65ffbe47d8dea760f",
+     "figure": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/export/SK_Merlin_Candidate.fbx",
+     "open_edges": 65,
+     "open_edge_loops": 3,
+     "open_loops_in_top_20pct": 3,
+     "base_only_uu2": {
+      "cam55_from_+X": 44.27,
+      "cam55_from_+Y": 44.43,
+      "cam55_from_-X": 44.14,
+      "cam55_from_-Y": 44.28,
+      "top_down": 44.23
+     },
+     "with_figure_uu2": {
+      "cam55_from_+X": 0.3,
+      "cam55_from_+Y": 0.11,
+      "cam55_from_-X": 0.01,
+      "cam55_from_-Y": 0.43,
+      "top_down": 0.01
+     },
+     "base_only_max_uu2": 44.43,
+     "with_figure_max_uu2": 0.43,
+     "threshold_with_figure_uu2": 0.1,
+     "pass": false,
+     "method": "base-seethrough.json (tools/tripo-pipeline/review/base_seethrough.py, headless Blender): лучи сверху и из камеры -55° с четырёх сторон через диск 93 % радиуса верха; cam55_from_+X = со стороны лица меша UM_FBX_v1"
+    },
+    "ue_frames_5x": {
+     "merlin": {
+      "camera_side_in_mesh_space": "-X (back)",
+      "base_only_void_px": 1725,
+      "base_only_uu2_est": 37.89,
+      "with_figure_void_px": 39,
+      "with_figure_uu2_est": 0.86,
+      "disc_px": 17811,
+      "void_empty_ok": true,
+      "frames": {
+       "base_only": "p17-mask-k2-5x-void-base-merlin-ue-editor.png",
+       "visual_board_background": [
+        "p17-mask-k2-5x-base-merlin-ue-editor.png",
+        "p17-mask-k2-5x-merlin-ue-editor.png"
+       ],
+       "void_empty": "p17-mask-k2-5x-void-empty-merlin-ue-editor.png",
+       "with_figure": "p17-mask-k2-5x-void-merlin-ue-editor.png"
+      }
+     }
+    },
+    "frames": {
+     "front_5x": "frames/p17-front-5x-merlin-ue-editor.jpg",
+     "back_5x": "frames/p17-back-5x-merlin-ue-editor.jpg",
+     "k2_5x": "frames/p17-k2-5x-merlin-ue-editor.jpg",
+     "crop": "frames/p17-crop-base-holes-k2-5x-ue-editor.jpg"
+    },
+    "verdict": "FAIL по порогу-предложению (скрытый дефект: дыры под мантией, по краю подола щели)",
+    "note": "в меше подставки дыры-следы 44,4 uu² (65 открытых рёбер, 3 петли в верхних 20 %), мантия их закрывает: с фигурой 0,01 uu² со спины (кадры сцены, камера со стороны −X), 0,30 uu² спереди, до 0,43 uu² сбоку — щели по краю подола; в кадрах front/back-5x просветов не видно. Откроются при движении подола в клипах",
+    "ue_frames_5x_method": "measurements.json base_see_through_frames: 5x, доска скрыта (пустота редактора = (0,0,0)); пиксели пустоты внутри проекции диска 93 % радиуса верха подставки (эрозия 2 px) = просвет; площадь = доля диска x площадь диска. Кадры на фоне доски (mask-k2-5x-base-*) — только наглядность"
+   },
+   "clipping_pairs": {
+    "status": "визуально",
+    "pairs": [
+     {
+      "pair": "посох × корпус в ¾",
+      "measured": "известно из Blender-отчёта: сливается в силуэте",
+      "in_ue": "в кадрах спереди/сзади посох отделён"
+     },
+     {
+      "pair": "швы частей в позах 35–45°",
+      "measured": "2–9 см в Blender-пробах; клипов Merlin нет"
+     }
+    ]
+   },
+   "team_colour_in_grey": {
+    "status": "измерено",
+    "materials_swapped": {
+     "base": {
+      "0": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Silver"
+     },
+     "figure": {
+      "0": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Silver"
+     }
+    },
+    "changed_px_k2_1p6": 573,
+    "mean_luma_default": 107.59,
+    "mean_luma_swapped": 107.43,
+    "delta_luma_0_255": 0.16,
+    "mean_rgb_default": [
+     108.27,
+     106.88,
+     112.66
+    ],
+    "mean_rgb_swapped": [
+     107.98,
+     106.73,
+     112.74
+    ],
+    "finding": "маска TeamColor — бронзовая отделка (8,4 % ячейки); Gold→Silver меняет 573 px, |Δ luma| 0,2/255 — в сером неразличимо"
+   },
+   "silhouette_game_camera": {
+    "status": "измерено",
+    "k1_px": {
+     "height": 62,
+     "width": 41,
+     "area": 1772
+    },
+    "k2_1p6_px": {
+     "height": 97,
+     "width": 61,
+     "area": 4182
+    },
+    "min_gap_to_other_figures_k1_px": {
+     "arthur-merlin": 116.0,
+     "harpy1-merlin": 72.01,
+     "harpy2-merlin": 247.61,
+     "harpy3-merlin": 293.26,
+     "medusa-merlin": 155.9
+    },
+    "method": "маска = фигура одна, тени выкл., против пустой доски, окно по проекции границ, наибольшая связная компонента (measurements.json silhouettes)"
+   }
+  },
+  "harpy": {
+   "asset_id": "ASSET-HARPY-001",
+   "ue": "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1; экземпляры — MI /Game/ArtTests/P17ControlScene/Materials/MI_P17_Harpy_Base_H{1,2,3} (родитель MI_Harpy_Candidate_Silver, InstanceIndex 1/2/3)",
+   "cells": {
+    "harpy1": "3:2 (100,-50)",
+    "harpy2": "2:1 (0,-150)",
+    "harpy3": "1:2 (-100,-50)",
+    "facing": "дальняя половина → лицом к камере"
+   },
+   "front_back": {
+    "frames": {
+     "front": "frames/p17-front-5x-harpy2-ue-editor.jpg",
+     "back": "frames/p17-back-5x-harpy2-ue-editor.jpg",
+     "k2_1p6": "frames/p17-k2-1p6-harpy2-ue-editor.jpg",
+     "k2_5x": "frames/p17-k2-5x-harpy2-ue-editor.jpg"
+    },
+    "status": "визуально",
+    "note": "спереди голова и раскрытые крылья, когти на подставке; сзади — спина и крылья. визуально, агент-суррогат по редакторным кадрам 5x (386 uu) и K2 1,6x; не художественная приёмка"
+   },
+   "weapon": {
+    "status": "измерено",
+    "bones": {
+     "Head": "head",
+     "Weapon": "foot_R"
+    },
+    "component_uu": {
+     "Head": [
+      5.2324,
+      0.4848,
+      33.0634
+     ],
+     "Weapon": [
+      4.7352,
+      4.0108,
+      5.3775
+     ]
+    },
+    "targets": {
+     "Head": {
+      "target": [
+       5.232,
+       0.485,
+       33.063
+      ],
+      "distance_uu": 0.0006,
+      "within_0_05_uu": true,
+      "source": "build target (ue-import plan)"
+     },
+     "Weapon": {
+      "target": [
+       4.735,
+       4.011,
+       5.377
+      ],
+      "distance_uu": 0.0006,
+      "within_0_05_uu": true,
+      "source": "build target (ue-import plan)"
+     }
+    },
+    "note": "оружия нет; Weapon на foot.R (UE foot_R) = точка удара когтями (предложение)"
+   },
+   "hands": {
+    "status": "не применимо",
+    "note": "руки = крылья (arm_*/hand)"
+   },
+   "feet_on_base": {
+    "status": "измерено + визуально",
+    "base_top_uu": 5.04,
+    "figure_bottom_uu": 4.5088,
+    "feet_below_base_top_uu": 0.5312,
+    "note": "когти на 0,53 uu в подставке (крышки подошв в build); зазора нет"
+   },
+   "base_see_through": {
+    "status": "измерено + визуально",
+    "blender": {
+     "file": "art/pipeline-candidates/ASSET-HARPY-001/20260928-cli-um-fbx-v1/export/SM_Harpy_Base_Candidate.fbx",
+     "sha256": "5ecae266dc2d824754ea78724236a4ef0a652f42805a64642610382e34738a71",
+     "figure": "art/pipeline-candidates/ASSET-HARPY-001/20260928-cli-um-fbx-v1/export/SK_Harpy_Candidate.fbx",
+     "open_edges": 144,
+     "open_edge_loops": 9,
+     "open_loops_in_top_20pct": 9,
+     "base_only_uu2": {
+      "cam55_from_+X": 0.0,
+      "cam55_from_+Y": 0.0,
+      "cam55_from_-X": 0.0,
+      "cam55_from_-Y": 0.0,
+      "top_down": 0.0
+     },
+     "with_figure_uu2": {
+      "cam55_from_+X": 0.0,
+      "cam55_from_+Y": 0.0,
+      "cam55_from_-X": 0.0,
+      "cam55_from_-Y": 0.0,
+      "top_down": 0.0
+     },
+     "base_only_max_uu2": 0.0,
+     "with_figure_max_uu2": 0.0,
+     "threshold_with_figure_uu2": 0.1,
+     "pass": true,
+     "method": "base-seethrough.json (tools/tripo-pipeline/review/base_seethrough.py, headless Blender): лучи сверху и из камеры -55° с четырёх сторон через диск 93 % радиуса верха; cam55_from_+X = со стороны лица меша UM_FBX_v1"
+    },
+    "ue_frames_5x": {
+     "harpy1": {
+      "camera_side_in_mesh_space": "+X (front of a UM_FBX_v1 mesh)",
+      "base_only_void_px": 0,
+      "base_only_uu2_est": 0.0,
+      "with_figure_void_px": 0,
+      "with_figure_uu2_est": 0.0,
+      "disc_px": 14908,
+      "void_empty_ok": true,
+      "frames": {
+       "base_only": "p17-mask-k2-5x-void-base-harpy1-ue-editor.png",
+       "visual_board_background": [
+        "p17-mask-k2-5x-base-harpy1-ue-editor.png",
+        "p17-mask-k2-5x-harpy1-ue-editor.png"
+       ],
+       "void_empty": "p17-mask-k2-5x-void-empty-harpy1-ue-editor.png",
+       "with_figure": "p17-mask-k2-5x-void-harpy1-ue-editor.png"
+      }
+     },
+     "harpy2": {
+      "camera_side_in_mesh_space": "+X (front of a UM_FBX_v1 mesh)",
+      "base_only_void_px": 0,
+      "base_only_uu2_est": 0.0,
+      "with_figure_void_px": 0,
+      "with_figure_uu2_est": 0.0,
+      "disc_px": 14908,
+      "void_empty_ok": true,
+      "frames": {
+       "base_only": "p17-mask-k2-5x-void-base-harpy2-ue-editor.png",
+       "visual_board_background": [
+        "p17-mask-k2-5x-base-harpy2-ue-editor.png",
+        "p17-mask-k2-5x-harpy2-ue-editor.png"
+       ],
+       "void_empty": "p17-mask-k2-5x-void-empty-harpy2-ue-editor.png",
+       "with_figure": "p17-mask-k2-5x-void-harpy2-ue-editor.png"
+      }
+     },
+     "harpy3": {
+      "camera_side_in_mesh_space": "+X (front of a UM_FBX_v1 mesh)",
+      "base_only_void_px": 0,
+      "base_only_uu2_est": 0.0,
+      "with_figure_void_px": 0,
+      "with_figure_uu2_est": 0.0,
+      "disc_px": 14908,
+      "void_empty_ok": true,
+      "frames": {
+       "base_only": "p17-mask-k2-5x-void-base-harpy3-ue-editor.png",
+       "visual_board_background": [
+        "p17-mask-k2-5x-base-harpy3-ue-editor.png",
+        "p17-mask-k2-5x-harpy3-ue-editor.png"
+       ],
+       "void_empty": "p17-mask-k2-5x-void-empty-harpy3-ue-editor.png",
+       "with_figure": "p17-mask-k2-5x-void-harpy3-ue-editor.png"
+      }
+     }
+    },
+    "frames": {
+     "front_5x": "frames/p17-front-5x-harpy2-ue-editor.jpg",
+     "back_5x": "frames/p17-back-5x-harpy2-ue-editor.jpg",
+     "k2_5x": "frames/p17-k2-5x-harpy2-ue-editor.jpg"
+    },
+    "verdict": "PASS",
+    "note": "144 открытых ребра в 9 петлях верха — края плоских меток экземпляров на верхе, не дыры (сквозь верх 0 uu²)",
+    "ue_frames_5x_method": "measurements.json base_see_through_frames: 5x, доска скрыта (пустота редактора = (0,0,0)); пиксели пустоты внутри проекции диска 93 % радиуса верха подставки (эрозия 2 px) = просвет; площадь = доля диска x площадь диска. Кадры на фоне доски (mask-k2-5x-base-*) — только наглядность"
+   },
+   "clipping_pairs": {
+    "status": "визуально",
+    "pairs": [
+     {
+      "pair": "голова × торс (шов сегментации)",
+      "measured": "две тонкие щели на шее в ¾ (Blender-отчёт)",
+      "in_ue": "на 5x не видны"
+     },
+     {
+      "pair": "крыло × соседняя гарпия",
+      "measured": "K1: минимальный зазор силуэтов {'harpy1-harpy2': 112.61, 'harpy1-harpy3': 212.0, 'harpy2-harpy3': 110.39} px"
+     }
+    ]
+   },
+   "instances": {
+    "status": "измерено + визуально",
+    "base_vertex_colours": "импорт с VertexColorImportOption Replace (ue-candidate/6); до исправления подставка рисовалась целиком «горящей»",
+    "marks": "1 / 2 / 3 метки на передней стороне подставки различимы на 5x (frames/p17-crop-harpy-instance-marks-k2-5x-ue-editor.jpg); на K1 метки ≈ 1–2 px — не читаются (силуэт 67×99 px)",
+    "silhouettes_k1_min_gap_px": {
+     "harpy1-harpy2": 112.61,
+     "harpy1-harpy3": 212.0,
+     "harpy2-harpy3": 110.39
+    }
+   },
+   "team_colour_in_grey": {
+    "status": "измерено",
+    "materials_swapped": {
+     "base": {
+      "0": "/Game/ArtTests/P17ControlScene/Materials/MI_P17_Harpy_Base_H2_Gold"
+     }
+    },
+    "changed_px_k2_1p6": 1060,
+    "mean_luma_default": 134.23,
+    "mean_luma_swapped": 135.57,
+    "delta_luma_0_255": -1.35,
+    "mean_rgb_default": [
+     124.94,
+     135.95,
+     144.51
+    ],
+    "mean_rgb_swapped": [
+     143.36,
+     135.73,
+     111.06
+    ],
+    "finding": "команда только на полосе подставки; Silver→Gold меняет 1060 px, |Δ luma| 1,4/255 — в сером неразличимо (различие по оттенку)"
+   },
+   "silhouette_game_camera": {
+    "harpy1": {
+     "status": "измерено",
+     "k1_px": {
+      "height": 68,
+      "width": 100,
+      "area": 2346
+     },
+     "k2_1p6_px": {
+      "height": 109,
+      "width": 162,
+      "area": 5610
+     },
+     "min_gap_to_other_figures_k1_px": {
+      "arthur-harpy1": 135.06,
+      "harpy1-harpy2": 112.61,
+      "harpy1-harpy3": 212.0,
+      "harpy1-medusa": 85.07,
+      "harpy1-merlin": 72.01
+     },
+     "method": "маска = фигура одна, тени выкл., против пустой доски, окно по проекции границ, наибольшая связная компонента (measurements.json silhouettes)"
+    },
+    "harpy2": {
+     "status": "измерено",
+     "k1_px": {
+      "height": 67,
+      "width": 99,
+      "area": 2312
+     },
+     "k2_1p6_px": {
+      "height": 109,
+      "width": 162,
+      "area": 5630
+     },
+     "min_gap_to_other_figures_k1_px": {
+      "arthur-harpy2": 172.24,
+      "harpy1-harpy2": 112.61,
+      "harpy2-harpy3": 110.39,
+      "harpy2-medusa": 54.0,
+      "harpy2-merlin": 247.61
+     },
+     "method": "маска = фигура одна, тени выкл., против пустой доски, окно по проекции границ, наибольшая связная компонента (measurements.json silhouettes)"
+    },
+    "harpy3": {
+     "status": "измерено",
+     "k1_px": {
+      "height": 68,
+      "width": 101,
+      "area": 2276
+     },
+     "k2_1p6_px": {
+      "height": 109,
+      "width": 162,
+      "area": 5549
+     },
+     "min_gap_to_other_figures_k1_px": {
+      "arthur-harpy3": 150.6,
+      "harpy1-harpy3": 212.0,
+      "harpy2-harpy3": 110.39,
+      "harpy3-medusa": 88.28,
+      "harpy3-merlin": 293.26
+     },
+     "method": "маска = фигура одна, тени выкл., против пустой доски, окно по проекции границ, наибольшая связная компонента (measurements.json silhouettes)"
+    }
+   }
+  },
+  "barrel": {
+   "asset_id": "ASSET-DECOR-KIT-001.BARREL",
+   "ue": "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel/Candidate/Meshes/SM_Decor_Barrel",
+   "placement": "декор на правом деревянном борту (264,-200), вне клеток (03 §4.4 / ART-009); z = верх борта под нижним контуром (замер build, decor_support)",
+   "front_back": {
+    "frames": {
+     "front": "frames/p17-front-5x-barrel-ue-editor.jpg",
+     "back": "frames/p17-back-5x-barrel-ue-editor.jpg",
+     "k2_1p6": "frames/p17-k2-1p6-barrel-ue-editor.jpg",
+     "k2_5x": "frames/p17-k2-5x-barrel-ue-editor.jpg"
+    },
+    "status": "визуально",
+    "note": "спереди (+X к камере) видна металлическая пробка, сзади — доски и обручи; нижний обруч целиком над бортом. визуально, агент-суррогат по редакторным кадрам 5x (386 uu) и K2 1,6x; не художественная приёмка"
+   },
+   "weapon": {
+    "status": "не применимо"
+   },
+   "hands": {
+    "status": "не применимо"
+   },
+   "feet_on_base": {
+    "status": "измерено + визуально",
+    "support": "борт доски /Game/ArtTests/ART005F/Meshes/SM_ART005_BoardStoneV4_WoodUV",
+    "support_z_uu": 5.0,
+    "support_spread_uu": 0.0,
+    "footprint_samples": 256,
+    "actor_z_uu": 5.0,
+    "bottom_z_uu": 5.0,
+    "sunk_into_support_uu": 0.0,
+    "on_surface": true,
+    "size_uu": [
+     21.417,
+     21.355,
+     26.0
+    ],
+    "frames": {
+     "k2_5x": "frames/p17-k2-5x-barrel-ue-editor.jpg",
+     "k2_1p6": "frames/p17-k2-1p6-barrel-ue-editor.jpg"
+    },
+    "note": "исправлено по ревью: прежде z был зашит 0 при верхе борта 5,0 uu — бочка уходила в борт на 5 uu (19 % высоты), нижний обруч срезан; «низ 0,0 uu» записывался как годная посадка. Теперь z = верх опоры под нижним контуром (256 лучей, разброс 0,00 uu), низ бочки = 5,00 uu, погружение 0,00 uu; на кадре 5x нижний обруч над бортом"
+   },
+   "base_see_through": {
+    "status": "не применимо",
+    "note": "у декора нет подставки; посадка на поверхность — feet_on_base (decor_support)"
+   },
+   "clipping_pairs": {
+    "status": "измерено",
+    "barrel_over_cells_k1_px": 0,
+    "note": "silhouette pixels of the barrel inside the projected 5 x 6 cell area (500 x 600 uu at z 0) of the K1 frame"
+   },
+   "team_colour_in_grey": {
+    "status": "не применимо",
+    "note": "декор L3 не командный: TeamColor белый"
+   },
+   "silhouette_game_camera": {
+    "status": "измерено",
+    "k1_px": {
+     "height": 45,
+     "width": 34,
+     "area": 1141
+    },
+    "k2_1p6_px": {
+     "height": 74,
+     "width": 54,
+     "area": 3063
+    },
+    "min_gap_to_other_figures_k1_px": {},
+    "method": "маска = фигура одна, тени выкл., против пустой доски, окно по проекции границ, наибольшая связная компонента (measurements.json silhouettes)"
+   }
+  }
+ }
+}

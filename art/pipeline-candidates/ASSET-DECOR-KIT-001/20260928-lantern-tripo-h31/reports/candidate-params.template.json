@@ -1,0 +1,19 @@
+{
+  "_purpose": "TEMPLATE for tools/tripo-pipeline/blender/static_prop_candidate.py. Copy to reports/candidate-params.json and replace <task8> with the Tripo task id prefix once source/decor-lantern-tripo-<task8>-smartuv-tex2k-pbr.glb exists (runbook step 7 of tripo-stage-plan.json). Until then the source path does not exist and the script fails at load, which is intended. All numbers are proposals, not accepted values.",
+  "_target_height_m": "0.95 = inside both the 04 card range 90-110 uu (proposed) and the S05 gate 90-100 uu (AD-CNF-56, open)",
+  "_ao_distance_m": "0.04: barrel used 0.03 at 26 uu height; lantern detail (rivets, frame bars, roof edge) has a similar absolute size, so AO distance is not scaled with height (0.11 would darken the whole post). Check the ORM R channel preview",
+  "_geometry_repair": "null: nothing to repair is known before the generation exists; add a region only after inspecting the mesh",
+  "source_glb": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31/source/decor-lantern-tripo-<task8>-smartuv-tex2k-pbr.glb",
+  "out_dir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31",
+  "asset_name": "SM_Decor_Lantern",
+  "texture_prefix": "T_Decor_Lantern",
+  "material_name": "M_Decor_Lantern",
+  "target_height_m": 0.95,
+  "texture_size": 1024,
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "bake_ao": true,
+  "ao_samples": 64,
+  "ao_distance_m": 0.04,
+  "geometry_repair": null,
+  "require_closed_manifold": true
+}

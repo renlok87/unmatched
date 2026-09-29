@@ -1,0 +1,876 @@
+{
+  "assets": [
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Gold",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Silver",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/M_Merlin_Candidate_Atlas",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SK_Merlin_Candidate",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SK_Merlin_Candidate_Skeleton",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SM_Merlin_Base_Candidate",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_BC",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_N",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_ORM",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_TeamMask"
+  ],
+  "backend": {
+    "backend": "mcp",
+    "client": "unreal_mcp.py",
+    "endpoint": "127.0.0.1:8123/mcp"
+  },
+  "checks": {
+    "asset_classes": {
+      "expected": {
+        "base": "StaticMesh",
+        "instance:MI_Merlin_Candidate_Gold": "MaterialInstanceConstant",
+        "instance:MI_Merlin_Candidate_Silver": "MaterialInstanceConstant",
+        "material": "Material",
+        "skeletal": "SkeletalMesh",
+        "skeleton": "Skeleton",
+        "texture:BC": "Texture2D",
+        "texture:N": "Texture2D",
+        "texture:ORM": "Texture2D",
+        "texture:TeamMask": "Texture2D"
+      },
+      "measured": {
+        "base": "StaticMesh",
+        "instance:MI_Merlin_Candidate_Gold": "MaterialInstanceConstant",
+        "instance:MI_Merlin_Candidate_Silver": "MaterialInstanceConstant",
+        "material": "Material",
+        "skeletal": "SkeletalMesh",
+        "skeleton": "Skeleton",
+        "texture:BC": "Texture2D",
+        "texture:N": "Texture2D",
+        "texture:ORM": "Texture2D",
+        "texture:TeamMask": "Texture2D"
+      },
+      "passed": true
+    },
+    "assets_exactly_as_planned": {
+      "expected": [
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Gold",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Silver",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/M_Merlin_Candidate_Atlas",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SK_Merlin_Candidate",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SK_Merlin_Candidate_Skeleton",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SM_Merlin_Base_Candidate",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_BC",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_N",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_ORM",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_TeamMask"
+      ],
+      "measured": [
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Gold",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Silver",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/M_Merlin_Candidate_Atlas",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SK_Merlin_Candidate",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SK_Merlin_Candidate_Skeleton",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SM_Merlin_Base_Candidate",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_BC",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_N",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_ORM",
+        "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_TeamMask"
+      ],
+      "note": "no stale assets, no extra imports",
+      "passed": true
+    },
+    "assets_saved": {
+      "measured": {
+        "dirty": {
+          "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Gold": false,
+          "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Silver": false,
+          "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/M_Merlin_Candidate_Atlas": false,
+          "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SK_Merlin_Candidate": false,
+          "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SK_Merlin_Candidate_Skeleton": false,
+          "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SM_Merlin_Base_Candidate": false,
+          "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_BC": false,
+          "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_N": false,
+          "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_ORM": false,
+          "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_TeamMask": false
+        },
+        "save_assets": true
+      },
+      "passed": true
+    },
+    "base_footprint_pivot": {
+      "expected": {
+        "max": [
+          12.0,
+          12.0,
+          5.0
+        ],
+        "min": [
+          -12.0,
+          -12.0,
+          0
+        ]
+      },
+      "measured": {
+        "max": [
+          12,
+          12,
+          5
+        ],
+        "min": [
+          -12,
+          -12,
+          0
+        ],
+        "slots": {
+          "M_Merlin_Atlas": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Gold"
+        },
+        "triangles_lod0": 1155,
+        "vertices_lod0": 745
+      },
+      "passed": true
+    },
+    "base_material_slot": {
+      "expected": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Gold",
+      "measured": {
+        "M_Merlin_Atlas": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Gold"
+      },
+      "passed": true
+    },
+    "base_triangles": {
+      "expected": 1155,
+      "measured": 1155,
+      "note": "Blender 1155 minus 0 near-degenerate slivers (area < 0.0001 cm2) that UE's mesh build removes",
+      "passed": true
+    },
+    "bone0_is_armature_object_node": {
+      "expected": {
+        "bone0": "SKEL_UM_Humanoid",
+        "total": 18
+      },
+      "measured": {
+        "bone0": "SKEL_UM_Humanoid",
+        "bones_in_order": [
+          "SKEL_UM_Humanoid",
+          "root",
+          "hips",
+          "spine",
+          "head",
+          "arm_upper_L",
+          "arm_lower_L",
+          "hand_L",
+          "arm_upper_R",
+          "arm_lower_R",
+          "hand_R",
+          "weapon",
+          "leg_upper_L",
+          "leg_lower_L",
+          "foot_L",
+          "leg_upper_R",
+          "leg_lower_R",
+          "foot_R"
+        ],
+        "count": 18,
+        "extra_bones": [
+          "SKEL_UM_Humanoid"
+        ],
+        "root_parent": "SKEL_UM_Humanoid"
+      },
+      "note": "legacy FBX importer turns the Blender armature object into bone 0 (same as /Game/ART004 and v2 imports); root motion is read from this bone (ue-pipeline-traps)",
+      "passed": true
+    },
+    "bones_profile_17_present_with_hierarchy": {
+      "expected": 17,
+      "measured": {
+        "hierarchy_ok": true,
+        "profile_bones_found": 17
+      },
+      "passed": true
+    },
+    "figure_height_as_profile": {
+      "expected": 45.0,
+      "measured": {
+        "build_figure_top_uu": 45.0,
+        "build_skeletal_top_uu": 49.741,
+        "profile_figure_height_uu": 45.0,
+        "top_part": "tripo_part_2",
+        "ue_skeletal_top_uu": 49.7414
+      },
+      "note": "figure top (profile scale.top_part tripo_part_2; whole-figure flow: the skeletal top) = scale.figure_height_m",
+      "passed": true
+    },
+    "front_axis_as_fbx_preset": {
+      "expected": "+X",
+      "measured": {
+        "authored_front_minus_y_becomes": "+X"
+      },
+      "note": "04-blender-production.md §1 «Оси» + §1.1 preset UM_FBX_v1; verified by ART-001 — a standard, not a proposal; UE map measured on the Medusa candidate: ue(x, y) = (-y_blender, -x_blender)",
+      "passed": true
+    },
+    "material_graph_bc_teamcolor_normal_orm": {
+      "measured": {
+        "outputs": {
+          "MP_AmbientOcclusion": {
+            "expression": "MaterialExpressionTextureSampleParameter2D_2",
+            "ok": true,
+            "output": "R"
+          },
+          "MP_BaseColor": {
+            "expression": "MaterialExpressionLinearInterpolate_0",
+            "ok": true,
+            "output": ""
+          },
+          "MP_Metallic": {
+            "expression": "MaterialExpressionTextureSampleParameter2D_2",
+            "ok": true,
+            "output": "B"
+          },
+          "MP_Normal": {
+            "expression": "MaterialExpressionTextureSampleParameter2D_1",
+            "ok": true,
+            "output": "RGB"
+          },
+          "MP_Roughness": {
+            "expression": "MaterialExpressionTextureSampleParameter2D_2",
+            "ok": true,
+            "output": "G"
+          }
+        },
+        "properties": {
+          "BlendMode": "BLEND_Opaque",
+          "ShadingModel": "MSM_DefaultLit",
+          "TwoSided": false,
+          "bUsedWithSkeletalMesh": true
+        },
+        "samplers": {
+          "BC": {
+            "ParameterName": "BaseColorTexture",
+            "SamplerType": "SAMPLERTYPE_Color",
+            "Texture": {
+              "refPath": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_BC.T_Merlin_Candidate_BC"
+            }
+          },
+          "N": {
+            "ParameterName": "NormalTexture",
+            "SamplerType": "SAMPLERTYPE_Normal",
+            "Texture": {
+              "refPath": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_N.T_Merlin_Candidate_N"
+            }
+          },
+          "ORM": {
+            "ParameterName": "ORMTexture",
+            "SamplerType": "SAMPLERTYPE_Masks",
+            "Texture": {
+              "refPath": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_ORM.T_Merlin_Candidate_ORM"
+            }
+          },
+          "TeamMask": {
+            "ParameterName": "TeamMaskTexture",
+            "SamplerType": "SAMPLERTYPE_LinearGrayscale",
+            "Texture": {
+              "refPath": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_TeamMask.T_Merlin_Candidate_TeamMask"
+            }
+          }
+        },
+        "team_color_mode": "mask"
+      },
+      "note": "BaseColor per ue.team_color_mode mask (lerp(BC, BC x TeamColor, TeamMask.R))",
+      "passed": true
+    },
+    "no_numbered_duplicates": {
+      "measured": [],
+      "passed": true
+    },
+    "skeletal_bounds_equal_um_fbx_v1_prediction": {
+      "expected": {
+        "max": [
+          7.947,
+          10.879,
+          49.741
+        ],
+        "min": [
+          -10.09,
+          -11.605,
+          4.797
+        ]
+      },
+      "measured": {
+        "max": [
+          7.9473,
+          10.8793,
+          49.7414
+        ],
+        "min": [
+          -10.0896,
+          -11.605,
+          4.7966
+        ]
+      },
+      "note": "build report: export-frame bounds mapped as UE (x, -y, z) (ART-001); tolerance 0.05 uu",
+      "passed": true
+    },
+    "skeletal_bounds_match_build_front_unambiguous": {
+      "measured": {
+        "fronts": [
+          "+X"
+        ],
+        "maps": [
+          {
+            "blender_front_minus_y_becomes": "+X",
+            "map": "ue(x,y)=(+0x-1y, -1x+0y)",
+            "max_error_uu": 0.0004
+          }
+        ]
+      },
+      "note": "authored Blender bounds from the build report (cm, front -Y) mapped onto UE bounds, tolerance 0.05 uu. A figure symmetric left/right within the tolerance (Harpy's wings) matches a map and its mirror; bounds cannot tell them apart, but every matching map must send the front to one axis",
+      "passed": true
+    },
+    "skeletal_material_slots": {
+      "expected": {
+        "material": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Gold",
+        "slots": [
+          "M_Merlin_Atlas"
+        ]
+      },
+      "measured": {
+        "assigned": {
+          "M_Merlin_Atlas": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Gold"
+        },
+        "slots": [
+          "M_Merlin_Atlas"
+        ]
+      },
+      "passed": true
+    },
+    "skeletal_top_as_build": {
+      "expected": 49.741,
+      "measured": {
+        "build_figure_top_uu": 45.0,
+        "build_skeletal_top_uu": 49.741,
+        "profile_figure_height_uu": 45.0,
+        "top_part": "tripo_part_2",
+        "ue_skeletal_top_uu": 49.7414
+      },
+      "note": "UE bounds top = highest skeletal vertex of the build (body and weapon), tolerance 0.05 uu",
+      "passed": true
+    },
+    "sockets_weapon_head": {
+      "expected": {
+        "Head": {
+          "bone": "head",
+          "location_uu": [
+            0.019,
+            -2.026,
+            0.255
+          ],
+          "name": "Head",
+          "offset_blender_bone_local_uu": [
+            0.019,
+            2.026,
+            0.255
+          ],
+          "source": "build prediction",
+          "target_ue_component_uu": [
+            0.195,
+            -0.019,
+            37.893
+          ],
+          "ue_bone": "head"
+        },
+        "Weapon": {
+          "bone": "weapon",
+          "location_uu": [
+            0,
+            0,
+            0
+          ],
+          "name": "Weapon",
+          "source": "profile",
+          "ue_bone": "weapon"
+        }
+      },
+      "measured": {
+        "Head": {
+          "bone": "head",
+          "transform": {
+            "location": {
+              "x": 0.019,
+              "y": -2.026,
+              "z": 0.255
+            },
+            "rotation": {
+              "pitch": 0,
+              "roll": 0,
+              "yaw": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            }
+          }
+        },
+        "Weapon": {
+          "bone": "weapon",
+          "transform": {
+            "location": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "rotation": {
+              "pitch": 0,
+              "roll": 0,
+              "yaw": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            }
+          }
+        }
+      },
+      "note": "location per socket: profile location_uu, else the build's UE bone-space prediction (sockets[].location_uu_for_ue); world placement against target_ue_component_uu needs a live frame",
+      "passed": true
+    },
+    "team_color_instances": {
+      "expected": {
+        "parent": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/M_Merlin_Candidate_Atlas"
+      },
+      "measured": {
+        "MI_Merlin_Candidate_Gold": {
+          "TeamColor": {
+            "a": 1.0,
+            "b": 0.42,
+            "g": 0.76,
+            "r": 0.91
+          },
+          "ok": true,
+          "parent": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/M_Merlin_Candidate_Atlas.M_Merlin_Candidate_Atlas"
+        },
+        "MI_Merlin_Candidate_Silver": {
+          "TeamColor": {
+            "a": 1.0,
+            "b": 0.85,
+            "g": 0.76,
+            "r": 0.62
+          },
+          "ok": true,
+          "parent": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/M_Merlin_Candidate_Atlas.M_Merlin_Candidate_Atlas"
+        }
+      },
+      "passed": true
+    },
+    "textures_size_colour_space_compression": {
+      "expected": {
+        "BC": {
+          "CompressionSettings": "TC_Default",
+          "SRGB": true,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        "N": {
+          "CompressionSettings": "TC_Normalmap",
+          "SRGB": false,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        "ORM": {
+          "CompressionSettings": "TC_Masks",
+          "SRGB": false,
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        "TeamMask": {
+          "CompressionSettings": "TC_Grayscale",
+          "SRGB": false,
+          "size": [
+            2048,
+            2048
+          ]
+        }
+      },
+      "measured": {
+        "BC": {
+          "ok": true,
+          "properties": {
+            "CompressionSettings": "TC_Default",
+            "SRGB": true,
+            "bFlipGreenChannel": false
+          },
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        "N": {
+          "ok": true,
+          "properties": {
+            "CompressionSettings": "TC_Normalmap",
+            "SRGB": false,
+            "bFlipGreenChannel": false
+          },
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        "ORM": {
+          "ok": true,
+          "properties": {
+            "CompressionSettings": "TC_Masks",
+            "SRGB": false,
+            "bFlipGreenChannel": false
+          },
+          "size": [
+            2048,
+            2048
+          ]
+        },
+        "TeamMask": {
+          "ok": true,
+          "properties": {
+            "CompressionSettings": "TC_Grayscale",
+            "SRGB": false,
+            "bFlipGreenChannel": false
+          },
+          "size": [
+            2048,
+            2048
+          ]
+        }
+      },
+      "passed": true
+    }
+  },
+  "comparison_with_proposals_not_budgets": {
+    "base_uu": {
+      "measured": [
+        24.0,
+        24.0,
+        5.0
+      ],
+      "proposed_diameter": 24,
+      "proposed_height": 5
+    },
+    "height_uu": {
+      "measured_figure_top": 45.0,
+      "measured_skeletal_top": 49.741,
+      "proposed": [
+        40,
+        48
+      ],
+      "within": true
+    },
+    "hero_triangles": {
+      "measured_skeletal": 12925,
+      "measured_with_base": 14080,
+      "proposed": [
+        8000,
+        15000
+      ],
+      "proposed_key": "hero_triangles",
+      "within": true
+    },
+    "material_slots": {
+      "measured_base": 1,
+      "measured_skeletal": 1,
+      "proposed_max": 2,
+      "within": true
+    },
+    "source": "04-blender-production.md §1/§3.4/§3.8, 17-art-production-spec.md §4.7.4 — ПРЕДЛОЖЕНИЕ до решения GD-058, не бюджет",
+    "texture_px": {
+      "measured": 2048,
+      "proposed": 1024
+    }
+  },
+  "destination": {
+    "assets": {
+      "base": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SM_Merlin_Base_Candidate",
+      "instance:MI_Merlin_Candidate_Gold": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Gold",
+      "instance:MI_Merlin_Candidate_Silver": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Silver",
+      "material": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/M_Merlin_Candidate_Atlas",
+      "skeletal": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SK_Merlin_Candidate",
+      "skeleton": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SK_Merlin_Candidate_Skeleton",
+      "texture:BC": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_BC",
+      "texture:N": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_N",
+      "texture:ORM": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_ORM",
+      "texture:TeamMask": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_TeamMask"
+    },
+    "folder": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1"
+  },
+  "inputs": {
+    "export/SK_Merlin_Candidate.fbx": "8e312d9cda3888be70de381cc2b5e132afc2c6cde37eae8795f3ebf5fcfe790d",
+    "export/SM_Merlin_Base_Candidate.fbx": "bf5c3db2dce7a299e0af53b2bbe2aea7c60d12dee45912c65ffbe47d8dea760f",
+    "reports/atlas-report.json": "aaa784a71e70ed63b8ee4474131a9e3fd2f837b3b20b0b3aff3d70a68aef1b54",
+    "reports/build-report.json": "9c315f0bc6f9ff107ceea03ef113a51679c7007b4407dd5503b8ccc46dbf6d78",
+    "textures/T_Merlin_Candidate_Atlas_BC.png": "2ff0e2c50fb1a8ac47d9ee37b9c0a64da04e2cda2393a072ecc445c4b4b81f44",
+    "textures/T_Merlin_Candidate_Atlas_N.png": "d73b43adefef113dd672c96f6165da338c64c6176a7d340e9c4b371a44905069",
+    "textures/T_Merlin_Candidate_Atlas_N_OpenGL.png": "fbe92d56417ef97c53c9aa22f2e10befd865ccf6b1148c5b1d753e44f3dbedfc",
+    "textures/T_Merlin_Candidate_Atlas_ORM.png": "d8977c4ecf8d053085e104bc1d9a8ed35e6bcf65df238977ebe35f9ff653be65",
+    "textures/T_Merlin_Candidate_Atlas_TeamMask.png": "94e6dcf97837027bad1dabdafb9d57f84373c7fe0eb76f7f49b68bfa2c09fabc"
+  },
+  "logic": "ue-candidate/6",
+  "measured": {
+    "axis_mapping": [
+      {
+        "blender_front_minus_y_becomes": "+X",
+        "map": "ue(x,y)=(+0x-1y, -1x+0y)",
+        "max_error_uu": 0.0004
+      }
+    ],
+    "base": {
+      "max": [
+        12,
+        12,
+        5
+      ],
+      "min": [
+        -12,
+        -12,
+        0
+      ],
+      "slots": {
+        "M_Merlin_Atlas": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Gold"
+      },
+      "triangles_lod0": 1155,
+      "vertices_lod0": 745
+    },
+    "fbx_import_log": [
+      "LogFbx: Loading FBX Scene from C:/Users/ren/WebstormProjects/unmached/unmached/art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/export/SK_Merlin_Candidate.fbx",
+      "LogFbx: FBX Scene Loaded Succesfully",
+      "LogFbx: Valid bind pose for Pose (Merlin_Body.001) - SK_Merlin_Body",
+      "LogFbx: Valid bind pose for Pose (Merlin_Staff.001) - SK_Merlin_Body",
+      "LogFbx: Bones digested - 18  Depth of hierarchy - 8",
+      "LogFbx: Loading FBX Scene from C:/Users/ren/WebstormProjects/unmached/unmached/art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/export/SM_Merlin_Base_Candidate.fbx",
+      "LogFbx: FBX Scene Loaded Succesfully"
+    ],
+    "height": {
+      "build_figure_top_uu": 45.0,
+      "build_skeletal_top_uu": 49.741,
+      "profile_figure_height_uu": 45.0,
+      "top_part": "tripo_part_2",
+      "ue_skeletal_top_uu": 49.7414
+    },
+    "material": {
+      "outputs": {
+        "MP_AmbientOcclusion": {
+          "expression": "MaterialExpressionTextureSampleParameter2D_2",
+          "ok": true,
+          "output": "R"
+        },
+        "MP_BaseColor": {
+          "expression": "MaterialExpressionLinearInterpolate_0",
+          "ok": true,
+          "output": ""
+        },
+        "MP_Metallic": {
+          "expression": "MaterialExpressionTextureSampleParameter2D_2",
+          "ok": true,
+          "output": "B"
+        },
+        "MP_Normal": {
+          "expression": "MaterialExpressionTextureSampleParameter2D_1",
+          "ok": true,
+          "output": "RGB"
+        },
+        "MP_Roughness": {
+          "expression": "MaterialExpressionTextureSampleParameter2D_2",
+          "ok": true,
+          "output": "G"
+        }
+      },
+      "properties": {
+        "BlendMode": "BLEND_Opaque",
+        "ShadingModel": "MSM_DefaultLit",
+        "TwoSided": false,
+        "bUsedWithSkeletalMesh": true
+      },
+      "samplers": {
+        "BC": {
+          "ParameterName": "BaseColorTexture",
+          "SamplerType": "SAMPLERTYPE_Color",
+          "Texture": {
+            "refPath": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_BC.T_Merlin_Candidate_BC"
+          }
+        },
+        "N": {
+          "ParameterName": "NormalTexture",
+          "SamplerType": "SAMPLERTYPE_Normal",
+          "Texture": {
+            "refPath": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_N.T_Merlin_Candidate_N"
+          }
+        },
+        "ORM": {
+          "ParameterName": "ORMTexture",
+          "SamplerType": "SAMPLERTYPE_Masks",
+          "Texture": {
+            "refPath": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_ORM.T_Merlin_Candidate_ORM"
+          }
+        },
+        "TeamMask": {
+          "ParameterName": "TeamMaskTexture",
+          "SamplerType": "SAMPLERTYPE_LinearGrayscale",
+          "Texture": {
+            "refPath": "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_TeamMask.T_Merlin_Candidate_TeamMask"
+          }
+        }
+      },
+      "team_color_mode": "mask"
+    },
+    "skeletal_bounds_uu": {
+      "max": [
+        7.9473,
+        10.8793,
+        49.7414
+      ],
+      "min": [
+        -10.0896,
+        -11.605,
+        4.7966
+      ]
+    },
+    "skeletal_lod0": {
+      "lods": 1,
+      "sections": 1,
+      "triangles": "not measured: SkeletalMeshTools has no triangle count",
+      "vertices": 15518
+    },
+    "skeleton": {
+      "bone0": "SKEL_UM_Humanoid",
+      "bones_in_order": [
+        "SKEL_UM_Humanoid",
+        "root",
+        "hips",
+        "spine",
+        "head",
+        "arm_upper_L",
+        "arm_lower_L",
+        "hand_L",
+        "arm_upper_R",
+        "arm_lower_R",
+        "hand_R",
+        "weapon",
+        "leg_upper_L",
+        "leg_lower_L",
+        "foot_L",
+        "leg_upper_R",
+        "leg_lower_R",
+        "foot_R"
+      ],
+      "count": 18,
+      "extra_bones": [
+        "SKEL_UM_Humanoid"
+      ],
+      "root_parent": "SKEL_UM_Humanoid"
+    },
+    "sockets_plan": [
+      {
+        "bone": "weapon",
+        "location_uu": [
+          0,
+          0,
+          0
+        ],
+        "name": "Weapon",
+        "source": "profile",
+        "ue_bone": "weapon"
+      },
+      {
+        "bone": "head",
+        "location_uu": [
+          0.019,
+          -2.026,
+          0.255
+        ],
+        "name": "Head",
+        "offset_blender_bone_local_uu": [
+          0.019,
+          2.026,
+          0.255
+        ],
+        "source": "build prediction",
+        "target_ue_component_uu": [
+          0.195,
+          -0.019,
+          37.893
+        ],
+        "ue_bone": "head"
+      }
+    ],
+    "textures": {
+      "BC": {
+        "ok": true,
+        "properties": {
+          "CompressionSettings": "TC_Default",
+          "SRGB": true,
+          "bFlipGreenChannel": false
+        },
+        "size": [
+          2048,
+          2048
+        ]
+      },
+      "N": {
+        "ok": true,
+        "properties": {
+          "CompressionSettings": "TC_Normalmap",
+          "SRGB": false,
+          "bFlipGreenChannel": false
+        },
+        "size": [
+          2048,
+          2048
+        ]
+      },
+      "ORM": {
+        "ok": true,
+        "properties": {
+          "CompressionSettings": "TC_Masks",
+          "SRGB": false,
+          "bFlipGreenChannel": false
+        },
+        "size": [
+          2048,
+          2048
+        ]
+      },
+      "TeamMask": {
+        "ok": true,
+        "properties": {
+          "CompressionSettings": "TC_Grayscale",
+          "SRGB": false,
+          "bFlipGreenChannel": false
+        },
+        "size": [
+          2048,
+          2048
+        ]
+      }
+    }
+  },
+  "not_checked": [
+    "art acceptance, silhouette, lighting, K1/K2/K3 with HUD and boardState (art track)",
+    "animation clips and deformation (no clips are imported by this stage)",
+    "skeletal triangle count inside UE (no MCP tool); Blender round trip is authoritative",
+    "packaged build / cook of the candidate folder",
+    "selection collision capsule (04 §3.1 proposal)",
+    "shared master material M_DioramaMaster (04 §1): the candidate keeps its own M_Merlin_Candidate_Atlas, like the production import; deviation recorded, not checked"
+  ],
+  "passed": true,
+  "previous_assets_deleted": [
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Gold",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/MI_Merlin_Candidate_Silver",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SK_Merlin_Candidate",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SM_Merlin_Base_Candidate",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Meshes/SK_Merlin_Candidate_Skeleton",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Materials/M_Merlin_Candidate_Atlas",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_BC",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_N",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_ORM",
+    "/Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1/Textures/T_Merlin_Candidate_TeamMask"
+  ],
+  "profile": "merlin-segmented-skeletal/2",
+  "stage": "ue-import",
+  "status": "technically_imported",
+  "tool_name_style": "short"
+}

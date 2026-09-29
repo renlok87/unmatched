@@ -365,6 +365,35 @@
             {"path": "tools/art/analyze_video_ref.py", "root": "repo", "kind": "file", "expect": "exists", "role": "замеры камеры/фона/силуэта роликов"}
           ],
           "note": "Статус по словарю — «предложено» (есть только референсы): ни один ролик не является клипом, не импортирован в Blender/UE и не принят художественно; pose-трекинг не запускался. SYNTX: 24 токена (4 генерации по 6) при лимите задачи 120 и лимите окна 150; баланс 685,5 → 661,5. Лицензия роликов Kling через SYNTX юристом не проверена."
+        },
+        {
+          "layer": "pipeline-candidate CLI 0.5.0 20260928-cli-um-fbx-v1 (build через профиль, flow whole-figure)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-segmented-skeletal-um-fbx-v1.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль сборки (flow whole-figure): всё, что собирает CLI, задано профилем"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-cli-um-fbx-v1/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest: preflight/import/verify/atlas/build completed (tool 0.5.0, headless)"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-cli-um-fbx-v1/export/SK_Medusa_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "скелетный FBX, собран CLI; байт в байт = 20260928-t4-um-fbx-v1", "sha256": "35809386bff7716ab8c354970d0683a45ff1f055a2679fd1144d01ccbef47625"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-cli-um-fbx-v1/export/SM_Medusa_Base_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "подставка, собрана CLI; байт в байт = 20260928-t4-um-fbx-v1", "sha256": "de5ebcac44b23b5335a3a7b7802420802c3738f8958fab104fa0b044d87a0983"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-cli-um-fbx-v1/textures", "root": "repo", "kind": "file", "expect": "exists", "role": "атлас CLI-стадии atlas; байт в байт = 20260928-t4-um-fbx-v1/textures"},
+            {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260928-cli-um-fbx-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "build report (flow whole-figure, анатомия, сокеты с прогнозом UE bone space)"},
+            {"path": "docs/art-pipeline/evidence/t33-cli-build-2026-09-28/comparison.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сверка T3.3: FBX и атлас байт в байт, числа геометрии/UV/весов/костей без расхождений"}
+          ],
+          "note": "Пересборка T4-кандидата через CLI 0.5.0 (flow whole-figure, имена частей из профиля вместо зашитых в 0.4.0): build completed, FBX и атлас байт в байт = 20260928-t4-um-fbx-v1 (T3.3). Не художественная приёмка; в UE не импортировался (UE-кандидат — слой T4UmFbxV1)."
+        },
+        {
+          "layer": "control-scene P1.7 (T3.1): T4UmFbxV1 в сцене, T4LocalPass в анимационном тесте",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "акт T3.1"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/measurements.json", "root": "repo", "kind": "file", "expect": "exists", "role": "замеры сцены: масштаб, сокеты, материалы, силуэты, команда в сером, тест Lunge"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/noise.json", "root": "repo", "kind": "file", "expect": "exists", "role": "шум повторов E2 и порог 2 x шум"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/base-seethrough.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сквозные дыры верха подставок (headless Blender): Medusa T4 — FAIL"}
+          ],
+          "note": "Редакторные кадры (editor-mcp-viewport) контрольного уровня /Game/ArtTests/P17ControlScene/L_P17ControlScene (локальный, пересоздаётся tools/tripo-pipeline/review/control_scene.py). Статика — T4UmFbxV1 (UM_FBX_v1, лицо +X, байты FBX = CLI-прогон 20260928-cli-um-fbx-v1); Lunge 0–100 % на T4LocalPass: кость 0 и root неподвижны, Weapon у hand_L 2,4372 uu. Находка (ревью T3.1, 2026-09-29): верх подставки T4 (T4UmFbxV1 и T4LocalPass, один меш) сквозной у стоп — дыры-следы 54,8 uu² без фигуры, с фигурой до 27,6 uu² видно в кадрах K2 1,6x/5x и Lunge (model-checklist base_see_through: FAIL); исправление сборки подставки — арт-трек. Не K1/K2-приёмка, не художественная приёмка."
         }
       ],
       "manifest06": {
@@ -485,6 +514,36 @@
             {"path": "/Game/ArtTests/ART003/Meshes/SM_ART003_Arthur", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE блок-аут"}
           ],
           "note": "Блок-аут — только габарит и силуэт; не производственная модель."
+        },
+        {
+          "layer": "pipeline-candidate CLI 0.5.0 20260928-cli-um-fbx-v1 (build через профиль, flow seated-parts)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-segmented-skeletal-um-fbx-v1-cli.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль сборки (flow seated-parts): всё, что собирает CLI, задано профилем"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest: preflight/import/verify/atlas/build completed (tool 0.5.0, headless)"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/export/SK_KingArthur_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "скелетный FBX, собран CLI; байт в байт = 20260928-blender-um-fbx-v1", "sha256": "49ef62582ca77efe9787fb9501ee675f3f8646ad38df702ee220c83bf2dab6b0"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/export/SM_KingArthur_Base_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "подставка, собрана CLI; байт в байт = 20260928-blender-um-fbx-v1", "sha256": "40cd709b4fa6416a2934086324bc7b96a1746d137595d5941e745d338fbc9c52"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/textures", "root": "repo", "kind": "file", "expect": "exists", "role": "атлас CLI-стадии atlas; байт в байт = 20260928-blender-um-fbx-v1/textures"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "build report (flow seated-parts, анатомия, сокеты с прогнозом UE bone space)"},
+            {"path": "docs/art-pipeline/evidence/t33-cli-build-2026-09-28/comparison.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сверка T3.3: FBX и атлас байт в байт, числа геометрии/UV/весов/костей без расхождений"}
+          ],
+          "note": "Пересборка кандидата через CLI tools/tripo-pipeline 0.5.0 без собственного скрипта героя (T3.3): build completed в manifest; FBX и атлас байт в байт равны прогону 20260928-blender-um-fbx-v1 (собран скриптом scripts/build_*_candidate.py 2026-09-28, его manifest оставляет build pending). Не художественная приёмка, не импорт в UE, не бюджет. Слой Blender-этапа 20260928-blender-um-fbx-v1 в реестр ещё не внесён (закрытие T7.2)."
+        },
+        {
+          "layer": "ue-editor-import CLI ue-candidate/6 20260928-cli-um-fbx-v1 + контрольная сцена P1.7 (T3.1)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported, все проверки прошли"},
+            {"path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/reports/ue-mcp-calls.json", "root": "repo", "kind": "file", "expect": "exists", "role": "стенограмма вызовов MCP стадии ue-import"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "акт T3.1: импорт, идемпотентность, живые сокеты, контрольная сцена"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/model-checklist.json", "root": "repo", "kind": "file", "expect": "exists", "role": "чек-лист модели (спереди/сзади, оружие, кисти, ноги, клиппинг, команда в сером, силуэт)"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/hero-ue-import-idempotency.json", "root": "repo", "kind": "file", "expect": "exists", "role": "executed / skipped / --force / skipped по каждому герою"}
+          ],
+          "note": "UE: /Game/PipelineCandidates/KingArthur/20260928-cli-um-fbx-v1 (10 uasset) — только в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import` (логика ue-candidate/6). Все проверки CLI прошли; повтор skipped, --force без Name_1; сокеты Head/Weapon в живом UE совпали с целями build (не больше 0,0006 uu). Кадры контрольной сцены P1.7 — редакторные (editor-mcp-viewport): диагностика, не K1/K2-приёмка, не художественная приёмка, не бюджет."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения по статусу; путь /Game/Meshes/SK/SK_KingArthur — плановый.", "proposedChange": "Нет."},
@@ -584,6 +643,36 @@
             {"path": "/Game/ArtTests/ART003/Meshes/SM_ART003_Merlin", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE блок-аут"}
           ],
           "note": "Только габарит/силуэт."
+        },
+        {
+          "layer": "pipeline-candidate CLI 0.5.0 20260928-cli-um-fbx-v1 (build через профиль, flow seated-parts)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-segmented-skeletal-um-fbx-v1-cli.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль сборки (flow seated-parts): всё, что собирает CLI, задано профилем"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest: preflight/import/verify/atlas/build completed (tool 0.5.0, headless)"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/export/SK_Merlin_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "скелетный FBX, собран CLI; байт в байт = 20260928-blender-um-fbx-v1", "sha256": "8e312d9cda3888be70de381cc2b5e132afc2c6cde37eae8795f3ebf5fcfe790d"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/export/SM_Merlin_Base_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "подставка, собрана CLI; байт в байт = 20260928-blender-um-fbx-v1", "sha256": "bf5c3db2dce7a299e0af53b2bbe2aea7c60d12dee45912c65ffbe47d8dea760f"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/textures", "root": "repo", "kind": "file", "expect": "exists", "role": "атлас CLI-стадии atlas; байт в байт = 20260928-blender-um-fbx-v1/textures"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "build report (flow seated-parts, анатомия, сокеты с прогнозом UE bone space)"},
+            {"path": "docs/art-pipeline/evidence/t33-cli-build-2026-09-28/comparison.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сверка T3.3: FBX и атлас байт в байт, числа геометрии/UV/весов/костей без расхождений"}
+          ],
+          "note": "Пересборка кандидата через CLI tools/tripo-pipeline 0.5.0 без собственного скрипта героя (T3.3): build completed в manifest; FBX и атлас байт в байт равны прогону 20260928-blender-um-fbx-v1 (собран скриптом scripts/build_*_candidate.py 2026-09-28, его manifest оставляет build pending). Не художественная приёмка, не импорт в UE, не бюджет. Слой Blender-этапа 20260928-blender-um-fbx-v1 в реестр ещё не внесён (закрытие T7.2)."
+        },
+        {
+          "layer": "ue-editor-import CLI ue-candidate/6 20260928-cli-um-fbx-v1 + контрольная сцена P1.7 (T3.1)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported, все проверки прошли"},
+            {"path": "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/reports/ue-mcp-calls.json", "root": "repo", "kind": "file", "expect": "exists", "role": "стенограмма вызовов MCP стадии ue-import"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "акт T3.1: импорт, идемпотентность, живые сокеты, контрольная сцена"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/model-checklist.json", "root": "repo", "kind": "file", "expect": "exists", "role": "чек-лист модели (спереди/сзади, оружие, кисти, ноги, клиппинг, команда в сером, силуэт)"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/hero-ue-import-idempotency.json", "root": "repo", "kind": "file", "expect": "exists", "role": "executed / skipped / --force / skipped по каждому герою"}
+          ],
+          "note": "UE: /Game/PipelineCandidates/Merlin/20260928-cli-um-fbx-v1 (10 uasset) — только в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import` (логика ue-candidate/6). Все проверки CLI прошли; повтор skipped, --force без Name_1; сокеты Head/Weapon в живом UE совпали с целями build (не больше 0,0006 uu). Кадры контрольной сцены P1.7 — редакторные (editor-mcp-viewport): диагностика, не K1/K2-приёмка, не художественная приёмка, не бюджет. Подставка (ревью T3.1, 2026-09-29): в меше дыры-следы 44,4 uu² под мантией; с фигурой видно 0,01 uu² с камеры сцены и до 0,43 uu² сбоку (щели по краю подола) — выше порога-предложения 0,1 uu², скрытый дефект для арт-трека (evidence p17 base-seethrough.json)."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения.", "proposedChange": "Нет."},
@@ -659,6 +748,36 @@
             {"path": "/Game/ArtTests/ART003/Meshes/SM_ART003_Harpy", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE блок-аут"}
           ],
           "note": "Номера трёх гарпий временные (ART-003)."
+        },
+        {
+          "layer": "pipeline-candidate CLI 0.5.0 20260928-cli-um-fbx-v1 (build через профиль, flow seated-parts)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-segmented-skeletal-um-fbx-v1-cli.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль сборки (flow seated-parts): всё, что собирает CLI, задано профилем"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-cli-um-fbx-v1/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "run manifest: preflight/import/verify/atlas/build completed (tool 0.5.0, headless)"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-cli-um-fbx-v1/export/SK_Harpy_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "скелетный FBX, собран CLI; байт в байт = 20260928-blender-um-fbx-v1", "sha256": "92a8632dc12456e63a745452a71e8e8d98b9c7b5ba88b4d7eaf01848882f36d1"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-cli-um-fbx-v1/export/SM_Harpy_Base_Candidate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "подставка, собрана CLI; байт в байт = 20260928-blender-um-fbx-v1", "sha256": "5ecae266dc2d824754ea78724236a4ef0a652f42805a64642610382e34738a71"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-cli-um-fbx-v1/textures", "root": "repo", "kind": "file", "expect": "exists", "role": "атлас CLI-стадии atlas; байт в байт = 20260928-blender-um-fbx-v1/textures"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-cli-um-fbx-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "build report (flow seated-parts, анатомия, сокеты с прогнозом UE bone space)"},
+            {"path": "docs/art-pipeline/evidence/t33-cli-build-2026-09-28/comparison.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сверка T3.3: FBX и атлас байт в байт, числа геометрии/UV/весов/костей без расхождений"}
+          ],
+          "note": "Пересборка кандидата через CLI tools/tripo-pipeline 0.5.0 без собственного скрипта героя (T3.3): build completed в manifest; FBX и атлас байт в байт равны прогону 20260928-blender-um-fbx-v1 (собран скриптом scripts/build_*_candidate.py 2026-09-28, его manifest оставляет build pending). Не художественная приёмка, не импорт в UE, не бюджет. Слой Blender-этапа 20260928-blender-um-fbx-v1 в реестр ещё не внесён (закрытие T7.2)."
+        },
+        {
+          "layer": "ue-editor-import CLI ue-candidate/6 20260928-cli-um-fbx-v1 + контрольная сцена P1.7 (T3.1)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-cli-um-fbx-v1/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import report: technically_imported, все проверки прошли"},
+            {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-cli-um-fbx-v1/reports/ue-mcp-calls.json", "root": "repo", "kind": "file", "expect": "exists", "role": "стенограмма вызовов MCP стадии ue-import"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "акт T3.1: импорт, идемпотентность, живые сокеты, контрольная сцена"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/model-checklist.json", "root": "repo", "kind": "file", "expect": "exists", "role": "чек-лист модели (спереди/сзади, оружие, кисти, ноги, клиппинг, команда в сером, силуэт)"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/hero-ue-import-idempotency.json", "root": "repo", "kind": "file", "expect": "exists", "role": "executed / skipped / --force / skipped по каждому герою"}
+          ],
+          "note": "UE: /Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1 (10 uasset) — только в локальном Content главного checkout (gitignored), воспроизводится `tripo_pipeline.py --backend mcp ue-import` (логика ue-candidate/6). Все проверки CLI прошли; повтор skipped, --force без Name_1; сокеты Head/Weapon в живом UE совпали с целями build (не больше 0,0006 uu). Кадры контрольной сцены P1.7 — редакторные (editor-mcp-viewport): диагностика, не K1/K2-приёмка, не художественная приёмка, не бюджет. Подставка vertex-mask импортирована с вершинными цветами (до исправления рисовалась целиком «горящей»); три экземпляра — MI /Game/ArtTests/P17ControlScene/Materials/MI_P17_Harpy_Base_H{1,2,3}; метки различимы на 5x, не на K1."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения.", "proposedChange": "Нет."},
@@ -998,6 +1117,21 @@
             {"path": "/Game/PipelineCandidates/DecorBarrel/20260928-p15-barrel", "root": "repo", "kind": "ue-asset", "expect": "planned", "role": "UE-импорт отложен (T2.1 этапа 3)"}
           ],
           "note": "Статус по prop-barrel-report (после исправлений P1): измерено; UE не запускался, художественной приёмки нет. Измерено: 3 790 tris (у источника 3 837; складка крышки исправлена), 1 оболочка, 0 открытых/неманифолдных рёбер, 0 несогласованных нормалей, 21,4×21,4×26 uu, 1 слот, UV0 36 островов / 75,6 %, 0 перекрытий, мин. зазор 3 px на 1K (18 пар < 4 px — риск мипов), пробка на +X по UM_FBX_v1. Открыто: 80 углов с нормалью внутрь в пазах, крышка додумана Tripo, материал в UE должен быть односторонним, AD-CNF-19. Числа не являются бюджетом."
+        },
+        {
+          "layer": "dry-repeat 20260928-p17-repro по ADDING-AN-ASSET.md (T3.1)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p17-repro/export/SM_Decor_Barrel.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "кандидат повтора: байт в байт = 20260928-p15-barrel", "sha256": "80153e4c9ccb759ba09d0f255e6066ebee3ba152652cad7c81f8e6c90b91855b"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p17-repro/ue-candidate/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import повтора (static-candidate): technically_imported"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p17-repro/ue-passthrough/reports/ue-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "ue-import passthrough повтора"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/build-profiles/decor-barrel-static-um-fbx-v1-p17-repro.json", "root": "repo", "kind": "file", "expect": "exists", "role": "build-профиль повтора (тот же контракт, candidate.dir = run повтора)"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/repro/repro-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сверка с p15: байты и 8 отчётов равны, кадры в пределах порога E2"},
+            {"path": "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/repro/executor-log.md", "root": "repo", "kind": "file", "expect": "exists", "role": "журнал трёх итераций исполнителя (финальная — 0 отступлений)"}
+          ],
+          "note": "Сухой повтор инструкции ADDING-AN-ASSET.md без Tripo (0 кредитов). UE: /Game/PipelineCandidates/DecorBarrel/20260928-p17-repro/{Candidate,Passthrough} — только локальный Content. Кадры бочки в контрольной сцене P1.7 (редакторные): K1, K2 1,6x и 5x. Не художественная приёмка."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "06 предлагает один SM_Decor.fbx, 04 — файл на объект (AD-CNF-19).", "proposedChange": "Нет; для кандидатов пайплайна — файл на объект."},

@@ -1,0 +1,89 @@
+{
+ "schema": "unmatched.process-inventory/1",
+ "task": "stage 3 T3.1",
+ "before_2026-09-28T15:4x": [
+  {
+   "ProcessId": 33220,
+   "ParentProcessId": 3316,
+   "Name": "blender.exe",
+   "CommandLine": "\"C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe\"  --python C:\\tmp\\blender_mcp_start.py"
+  },
+  {
+   "ProcessId": 19540,
+   "ParentProcessId": 41156,
+   "Name": "UnrealEditor.exe",
+   "CommandLine": "\"C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Binaries\\Win64\\UnrealEditor.exe\"  C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Unmatched.uproject -ModelContextProtocolPort=8123 \"-ExecCmds=ModelContextProtocol.StartServer 8123\" -log"
+  },
+  {
+   "ProcessId": 3388,
+   "ParentProcessId": 13416,
+   "Name": "UnrealTraceServer.exe",
+   "CommandLine": "UnrealTraceServer.exe daemon -d  --sponsor 19540"
+  },
+  {
+   "ProcessId": 25816,
+   "ParentProcessId": 36384,
+   "Name": "blender.exe",
+   "CommandLine": "\"C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe\"  --python C:\\tmp\\blender_mcp_start_9877.py"
+  }
+ ],
+ "after_2026-09-28T18:4x": [
+  {
+   "ProcessId": 33220,
+   "ParentProcessId": 3316,
+   "Name": "blender.exe",
+   "CommandLine": "\"C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe\"  --python C:\\tmp\\blender_mcp_start.py"
+  },
+  {
+   "ProcessId": 25816,
+   "ParentProcessId": 36384,
+   "Name": "blender.exe",
+   "CommandLine": "\"C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe\"  --python C:\\tmp\\blender_mcp_start_9877.py"
+  },
+  {
+   "ProcessId": 46136,
+   "ParentProcessId": 44380,
+   "Name": "UnrealEditor.exe",
+   "CommandLine": "\"C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Binaries\\Win64\\UnrealEditor.exe\" C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Unmatched.uproject -ModelContextProtocolPort=8123 \"-ExecCmds=ModelContextProtocol.StartServer 8123\" -log "
+  },
+  {
+   "ProcessId": 48112,
+   "ParentProcessId": 15344,
+   "Name": "CrashReportClientEditor.exe",
+   "CommandLine": "\"C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Binaries\\Win64\\CrashReportClientEditor.exe\" \"../../../Engine/Binaries/Win64/CrashReportClientEditor.exe\"  -READ=596 -WRITE=608 -MONITOR=46136 -ProcessGroupId=26C0D71E433A02AEBBEE71982D73A215 -ConcertServer=\"7FA24CC444689524B8AA9E882E25551F\" -RespawnedInstance"
+  },
+  {
+   "ProcessId": 44636,
+   "ParentProcessId": 13416,
+   "Name": "UnrealTraceServer.exe",
+   "CommandLine": "UnrealTraceServer.exe daemon -d  --sponsor 46136"
+  },
+  {
+   "ProcessId": 48272,
+   "ParentProcessId": 12372,
+   "Name": "mcp-for-blender.exe",
+   "CommandLine": "\"C:\\Users\\ren\\.claude\\mcp-servers\\blender-mcp\\.venv\\Scripts\\mcp-for-blender.exe\""
+  }
+ ],
+ "notes": [
+  "UnrealEditor 19540 crashed during this task (editor-incidents.json I1) and was relaunched with the same command line as 46136 (MCP :8123)",
+  "UnrealTraceServer 3388 (sponsor 19540) was replaced by 44636 (sponsor 46136) — started by the editor, not by this task",
+  "CrashReportClientEditor 48112 is the normal companion of 46136; the crash-report instance 4388 and the duplicate editor 9924 (+ its companion) are gone",
+  "Blender 33220 (:9876) and 25816 (:9877) were not used by this task and are unchanged; headless Blender processes of the dry repeat exited",
+  "processes started by this task and still running: none except the relaunched editor 46136 (the live editor the plan requires)"
+ ],
+ "review_fix_2026-09-29": {
+  "started_by_this_round": [
+   "headless Blender 5.2 (blender -b --factory-startup) for base_seethrough.py and two probes — exited",
+   "python control_scene.py (test-barrel, superseded r1/r2, r1, r2, r3, repro) — exited; the loop of the superseded batch was stopped after r2 by ending its bash parent only, r2 finished and restored the editor",
+   "python ue_content_snapshot.py / control_scene_analyze.py / repro_compare.py / classify_evidence.py — exited"
+  ],
+  "running_after": [
+   "UnrealEditor 46136 (live editor, MCP :8123, open level /Game/S08/S08Arena, dirty 0) with CrashReportClientEditor 48112 and UnrealTraceServer 44636 — unchanged from the end of T3.1",
+   "Blender 33220 (:9876) and 25816 (:9877) — not used, unchanged",
+   "mcp-for-blender 48272 — not ours, unchanged"
+  ],
+  "stopped_by_this_round": [],
+  "left_running_by_this_round": []
+ }
+}

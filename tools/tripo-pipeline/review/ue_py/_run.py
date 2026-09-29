@@ -1,7 +1,8 @@
 """UE editor Python runner: `py "<this file>" <args.json>`; args.json = {"script": <path>, "out": <path>, ...}.
 
 Executes the script with ARGS (the parsed args.json) in its globals. Any exception is written to
-args["out"] as {"error": ..., "traceback": ...}, so the host never waits for a missing file.
+args["out"] as {"error": ..., "traceback": ...}, so the host never waits for a missing file. The globals are
+garbage-collected afterwards (no Python reference may keep a level's actors alive across a map change).
 """
 import json
 import sys
@@ -19,3 +20,8 @@ except Exception as exc:  # noqa: BLE001 - reported to the host
         handle.write(json.dumps({"error": "%s: %s" % (type(exc).__name__, exc),
                                  "traceback": traceback.format_exc()}, indent=1) + "\n")
     u.log_error("TRIPO_UE_PY_FAILED %s" % ARGS["script"])
+finally:
+    # Drop the task's globals now: UE Python wrappers keep actors (and so their world) alive, and a world that is
+    # still referenced when the editor loads another map is a fatal "World Memory Leaks" error (EditorServer.cpp).
+    import gc
+    gc.collect()

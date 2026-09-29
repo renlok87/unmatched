@@ -1,12 +1,15 @@
 """Snapshot of protected content folders in the LIVE editor + on disk (before/after evidence).
 
     python tools/tripo-pipeline/review/ue_content_snapshot.py <out.json> [--compare <before.json>]
+        [--extra-folder /Game/ArtTests ...]
 
 For every folder in FOLDERS: MCP AssetTools.find_assets (recursive) and is_dirty per asset, plus
 SHA-256/size of every file under the matching unreal/Unmatched/Content/<dir>. The editor state
 (dirty packages, current level, Interchange cvars) comes from ue_py/editor_state.py run through
 the editor console. With --compare, prints and stores the difference against an earlier snapshot
 (new/removed/changed assets and files) and exits 1 if a PROTECTED folder changed.
+--extra-folder adds more folders to the snapshot and the diff (read the same way; stage 3 T3.1 uses
+/Game/ArtTests and /Game/S08 to show that only its own control-scene folder changed).
 Read only: nothing is loaded for editing, saved or deleted.
 """
 
@@ -46,10 +49,10 @@ def disk(folder):
     return files
 
 
-def take(ue, out_json):
+def take(ue, out_json, folders=FOLDERS):
     data = {"taken_at": dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat(),
             "tool": "tools/tripo-pipeline/review/ue_content_snapshot.py", "folders": {}}
-    for folder in FOLDERS:
+    for folder in folders:
         assets = sorted(ue.call("asset", "find_assets", {"folder_path": folder, "name": "", "recursive": True},
                                 record=False) or [])
         dirty = sorted(a for a in assets if ue.call("asset", "is_dirty", {"asset_path": a}, record=False))
@@ -62,7 +65,7 @@ def take(ue, out_json):
 
 def diff(before, after):
     out = {}
-    for folder in FOLDERS:
+    for folder in sorted(set(before["folders"]) | set(after["folders"])):
         b, a = before["folders"].get(folder, {}), after["folders"].get(folder, {})
         ba, aa = set(b.get("assets", [])), set(a.get("assets", []))
         bf, af = b.get("disk_files", {}), a.get("disk_files", {})
@@ -80,9 +83,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("out")
     ap.add_argument("--compare")
+    ap.add_argument("--extra-folder", action="append", default=[])
     args = ap.parse_args()
     ue = Ue()
-    data = take(ue, args.out)
+    folders = FOLDERS + tuple(f.rstrip("/") for f in args.extra_folder if f.rstrip("/") not in FOLDERS)
+    data = take(ue, args.out, folders)
     rc = 0
     if args.compare:
         before = json.loads(Path(args.compare).read_text(encoding="utf-8"))
@@ -91,7 +96,7 @@ def main():
         rc = 0 if data["compare"]["protected_unchanged"] else 1
     Path(args.out).write_text(json.dumps(data, indent=1, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8",
                               newline="\n")
-    summary = {f: data["folders"][f]["count"] for f in FOLDERS}
+    summary = {f: data["folders"][f]["count"] for f in folders}
     summary["editor_dirty"] = {"maps": data["editor"]["dirty_maps"], "content": data["editor"]["dirty_content"]}
     if args.compare:
         summary["protected_unchanged"] = data["compare"]["protected_unchanged"]

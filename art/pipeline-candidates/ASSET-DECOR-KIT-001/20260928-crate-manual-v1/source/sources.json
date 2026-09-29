@@ -1,0 +1,23 @@
+{
+ "schema": "unmatched.decor-crate.sources/1",
+ "asset_id": "ASSET-DECOR-KIT-001.CRATE",
+ "run_id": "20260928-crate-manual-v1",
+ "note": "No 3D source: the mesh is built from parameters (scripts/crate_params.json) by scripts/crate_build.py. The concept collage is a read-only visual reference; it stays where it is (committed) and is not copied. crate_build.py verifies its sha256 before the run. No Tripo/SYNTX operation: 0 credits, no ledger entry.",
+ "sources": [
+  {
+   "role": "visual-reference",
+   "path": "art/imagegen/mvp-v1/environment/ref-crate.png",
+   "sha256": "c00523e78d62d013ecc745295d104094c626031e3be0e5af2e4a9d87c625f440",
+   "bytes": 1776928,
+   "size_px": [1536, 1024],
+   "kind": "imagegen concept collage (art/imagegen/mvp-v1, commit 23368eea): front, side and 3/4 view on grey",
+   "used_for": "proportions (X brace on the front, 4 horizontal side planks, corner posts with iron studs, planked top) and colour sampling (median sRGB: side planks 75,68,62; front X board 84,74,67; stud highlight ~115,109,105)",
+   "not_used_for": "no tracing, projection or texture transfer"
+  }
+ ],
+ "deviations_from_reference": [
+  "Iron corner caps (8) instead of bare post ends: the task brief for style B asks for iron-bound corners; the concept shows only iron studs on the posts. The caps also mark the corners from the top-down game camera.",
+  "X brace on the back as well as the front (concept shows one X face): the crate reads the same after a 180 deg turn.",
+  "Top: 4 boards along the front-back axis, inset flush with the wall tops; no separate top battens."
+ ]
+}

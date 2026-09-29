@@ -1,0 +1,906 @@
+{
+  "asset_id": "ASSET-HARPY-001",
+  "claims": {
+    "art_accepted": false,
+    "budgets_declared": false,
+    "game_ready": false,
+    "note": "technical pipeline evidence only"
+  },
+  "config": {
+    "build_profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-segmented-skeletal-um-fbx-v1-cli.json",
+    "export_basename": "ASSET-HARPY-001_segmented-retopo-glb",
+    "primary_role": "segmented-retopo-glb",
+    "primary_source": "tripo-d500fc84",
+    "profile": "skeletal-candidate",
+    "triangle_loss_tolerance": 0.001,
+    "ue": {
+      "asset_name": null,
+      "dimension_tolerance": 0.01,
+      "folder": "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1",
+      "import_materials": false,
+      "import_note": "skeletal-candidate: meshes imported with import_materials=false, import_textures=false; textures come from the atlas stage",
+      "import_textures": false
+    }
+  },
+  "created_at": "2026-09-28T15:04:58+00:00",
+  "exports": [
+    {
+      "bytes": 634908,
+      "path": "export/SK_Harpy_Candidate.fbx",
+      "sha256": "92a8632dc12456e63a745452a71e8e8d98b9c7b5ba88b4d7eaf01848882f36d1",
+      "stage": "build",
+      "stage_fingerprint": "e250e393f075b0a9630185842a86173fb25d9b5044ffe00dc1c11c9d6ca5e9e4",
+      "status": "technically_exported_not_art_accepted",
+      "written_at": "2026-09-28T15:05:20+00:00"
+    },
+    {
+      "bytes": 35852,
+      "path": "export/SM_Harpy_Base_Candidate.fbx",
+      "sha256": "5ecae266dc2d824754ea78724236a4ef0a652f42805a64642610382e34738a71",
+      "stage": "build",
+      "stage_fingerprint": "e250e393f075b0a9630185842a86173fb25d9b5044ffe00dc1c11c9d6ca5e9e4",
+      "status": "technically_exported_not_art_accepted",
+      "written_at": "2026-09-28T15:05:20+00:00"
+    }
+  ],
+  "generation_requests": [],
+  "network": {
+    "paid_tasks_created": 0,
+    "policy": "no network code; Tripo results are registered from existing local files",
+    "tripo_calls": 0
+  },
+  "run_id": "20260928-cli-um-fbx-v1",
+  "schema": "unmatched.tripo-pipeline.run/1",
+  "sources": {
+    "tripo-c756522c": {
+      "evidence": [
+        {
+          "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+          "sha256": "a3ac731891aa105ade2af144fcd1f2adff4940f759da16b153ca579805ac1ef7"
+        }
+      ],
+      "files": [
+        {
+          "bytes": 9517764,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export of the single-part clone after Quad retopology, 4k tier, unmodified",
+          "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-c756522c-retopo-6800.glb",
+          "produced_by": "retopology",
+          "role": "retopo-6800-glb",
+          "sha256": "3063cc6b8abac74f85c80da521ba31fce46471fda0d824bfb4cafc7c66560463",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 3,
+            "materials": 1,
+            "mesh_count": 1,
+            "meshes": [
+              {
+                "name": "tripo_node_75091185-4037-4651-ad4b-12b35e2bc847",
+                "triangles": 13011
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 13011
+          }
+        },
+        {
+          "bytes": 9029056,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export after Smart UV + texture 2K, 2k tier, unmodified",
+          "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-c756522c-smartuv-tex2k.glb",
+          "produced_by": "texture",
+          "role": "smartuv-tex2k-glb",
+          "sha256": "4a3d3b7039bf4e179a3a91693e06421c8b6fd808b5097027c88f47c65eb19cd0",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 2,
+            "materials": 1,
+            "mesh_count": 1,
+            "meshes": [
+              {
+                "name": "tripo_node_75091185-4037-4651-ad4b-12b35e2bc847",
+                "triangles": 13009
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 13009
+          }
+        },
+        {
+          "bytes": 12981200,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export after PBR, 2k tier, unmodified",
+          "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-c756522c-smartuv-tex2k-pbr.glb",
+          "produced_by": "pbr",
+          "role": "smartuv-tex2k-pbr-glb",
+          "sha256": "462425ed297ed7cfd06af37302ae4725fec601a0ca02f342bead68964d720113",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 3,
+            "materials": 1,
+            "mesh_count": 1,
+            "meshes": [
+              {
+                "name": "tripo_node_75091185-4037-4651-ad4b-12b35e2bc847",
+                "triangles": 13009
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 13009
+          }
+        },
+        {
+          "bytes": 546548,
+          "hash_check": "matches_evidence",
+          "origin": "extracted from the PBR GLB without re-encoding",
+          "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/textures/harpy-tripo-c756522c-smartuv-tex2k-pbr_basecolor.jpg",
+          "produced_by": "export",
+          "role": "texture-smartuv-tex2k-pbr_basecolor",
+          "sha256": "9205de7ba2e6253176e5a4c84b0c1105a58c93dc5b99df2c463ed32bd7635abb",
+          "structure": {
+            "format": "jpeg",
+            "pixels": [
+              2048,
+              2048
+            ]
+          }
+        },
+        {
+          "bytes": 8045819,
+          "hash_check": "matches_evidence",
+          "origin": "extracted from the PBR GLB without re-encoding",
+          "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/textures/harpy-tripo-c756522c-smartuv-tex2k-pbr_normal.png",
+          "produced_by": "export",
+          "role": "texture-smartuv-tex2k-pbr_normal",
+          "sha256": "a8b7d2129ffd3bd8c620bc7e5c7de9022a8e31a146a91eac82b3ba8c678e11c7",
+          "structure": {
+            "bit_depth": 8,
+            "color_type": 6,
+            "format": "png",
+            "pixels": [
+              2048,
+              2048
+            ]
+          }
+        },
+        {
+          "bytes": 3951954,
+          "hash_check": "matches_evidence",
+          "origin": "extracted from the PBR GLB without re-encoding",
+          "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/textures/harpy-tripo-c756522c-smartuv-tex2k-pbr_rm.png",
+          "produced_by": "export",
+          "role": "texture-smartuv-tex2k-pbr_rm",
+          "sha256": "5ba541398c16c9255d2db8bc481b67347e865b31ac5ace34ecde788e9126df8c",
+          "structure": {
+            "bit_depth": 8,
+            "color_type": 6,
+            "format": "png",
+            "pixels": [
+              2048,
+              2048
+            ]
+          }
+        }
+      ],
+      "generation_inputs": [],
+      "historical_credits_observed": {
+        "studio-credits": 75
+      },
+      "registered_at": "2026-09-28T15:04:59+00:00",
+      "registered_by": "tripo-pipeline 0.5.0",
+      "spec": {
+        "asset_id": "ASSET-HARPY-001",
+        "date": "2026-09-28",
+        "evidence": [
+          "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json"
+        ],
+        "expectations": {
+          "retopo-6800-glb": {
+            "glb_images": 3,
+            "glb_materials": 1,
+            "glb_mesh_count": 1,
+            "glb_skins": 0,
+            "glb_triangles": 13011
+          },
+          "smartuv-tex2k-glb": {
+            "glb_images": 2,
+            "glb_materials": 1,
+            "glb_mesh_count": 1,
+            "glb_skins": 0,
+            "glb_triangles": 13009
+          },
+          "smartuv-tex2k-pbr-glb": {
+            "armatures": 0,
+            "glb_images": 3,
+            "glb_materials": 1,
+            "glb_mesh_count": 1,
+            "glb_skins": 0,
+            "glb_triangles": 13009
+          }
+        },
+        "files": [
+          {
+            "expected_bytes": 9517764,
+            "expected_sha256": "3063cc6b8abac74f85c80da521ba31fce46471fda0d824bfb4cafc7c66560463",
+            "origin": "Studio GLB export of the single-part clone after Quad retopology, 4k tier, unmodified",
+            "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-c756522c-retopo-6800.glb",
+            "produced_by": "retopology",
+            "role": "retopo-6800-glb"
+          },
+          {
+            "expected_bytes": 9029056,
+            "expected_sha256": "4a3d3b7039bf4e179a3a91693e06421c8b6fd808b5097027c88f47c65eb19cd0",
+            "origin": "Studio GLB export after Smart UV + texture 2K, 2k tier, unmodified",
+            "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-c756522c-smartuv-tex2k.glb",
+            "produced_by": "texture",
+            "role": "smartuv-tex2k-glb"
+          },
+          {
+            "expected_bytes": 12981200,
+            "expected_sha256": "462425ed297ed7cfd06af37302ae4725fec601a0ca02f342bead68964d720113",
+            "origin": "Studio GLB export after PBR, 2k tier, unmodified",
+            "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-c756522c-smartuv-tex2k-pbr.glb",
+            "produced_by": "pbr",
+            "role": "smartuv-tex2k-pbr-glb"
+          },
+          {
+            "expected_sha256": "9205de7ba2e6253176e5a4c84b0c1105a58c93dc5b99df2c463ed32bd7635abb",
+            "origin": "extracted from the PBR GLB without re-encoding",
+            "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/textures/harpy-tripo-c756522c-smartuv-tex2k-pbr_basecolor.jpg",
+            "produced_by": "export",
+            "role": "texture-smartuv-tex2k-pbr_basecolor"
+          },
+          {
+            "expected_sha256": "a8b7d2129ffd3bd8c620bc7e5c7de9022a8e31a146a91eac82b3ba8c678e11c7",
+            "origin": "extracted from the PBR GLB without re-encoding",
+            "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/textures/harpy-tripo-c756522c-smartuv-tex2k-pbr_normal.png",
+            "produced_by": "export",
+            "role": "texture-smartuv-tex2k-pbr_normal"
+          },
+          {
+            "expected_sha256": "5ba541398c16c9255d2db8bc481b67347e865b31ac5ace34ecde788e9126df8c",
+            "origin": "extracted from the PBR GLB without re-encoding",
+            "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/textures/harpy-tripo-c756522c-smartuv-tex2k-pbr_rm.png",
+            "produced_by": "export",
+            "role": "texture-smartuv-tex2k-pbr_rm"
+          }
+        ],
+        "generation": null,
+        "model_version": {
+          "backend": null,
+          "ui_label": "clone of H3.1 Triangle original (d500fc84, version 15:39) via History -> Save as new model"
+        },
+        "operations": [
+          {
+            "credits": {
+              "balance_after": 24410,
+              "balance_before": 24410,
+              "observed_debit": 0,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+            "note": "Smart UV rejects multi-part models (re-checked on the segmented retopo, no debit), so a single-part branch was cloned",
+            "op": "clone"
+          },
+          {
+            "credits": {
+              "balance_after": 24370,
+              "balance_before": 24410,
+              "observed_debit": 40,
+              "quoted": 40,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+            "history_time": "2026-09-28 15:50:31",
+            "op": "retopology",
+            "settings": {
+              "smart_mesh": "P1.0 on",
+              "target_polygons": 6800,
+              "topology": "Quad"
+            }
+          },
+          {
+            "credits": {
+              "balance_after": 24350,
+              "balance_before": 24370,
+              "observed_debit": 20,
+              "quoted": 20,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+            "history_time": "2026-09-28 15:52:39",
+            "note": "full price (the free x1 trial was already used by King Arthur); UV fill 35.3% -> 69.2%",
+            "op": "smart-uv"
+          },
+          {
+            "credits": {
+              "balance_after": 24340,
+              "balance_before": 24350,
+              "observed_debit": 10,
+              "quoted": 10,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+            "history_time": "2026-09-28 15:54:06",
+            "op": "texture",
+            "settings": {
+              "multi_view": "front+left+back v5",
+              "remove_lighting": true,
+              "resolution": "2K"
+            }
+          },
+          {
+            "credits": {
+              "balance_after": 24335,
+              "balance_before": 24340,
+              "observed_debit": 5,
+              "quoted": 5,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+            "history_time": "2026-09-28 15:55:40",
+            "op": "pbr"
+          }
+        ],
+        "parent_task_id": "d500fc84-26d7-4cb5-8537-1e53788a5dd6",
+        "schema": "unmatched.tripo-pipeline.source-spec/1",
+        "service": "tripo-studio",
+        "source_id": "tripo-c756522c",
+        "task_id": "c756522c-e19c-4ceb-88ae-80c5a2aadbb0",
+        "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/c756522c-e19c-4ceb-88ae-80c5a2aadbb0"
+      },
+      "spec_sha256": "c92451a3bfe177d19b90ec9b3f1bb66fdf7e9e2adc76b3f2af70ebc092967c8a"
+    },
+    "tripo-d500fc84": {
+      "evidence": [
+        {
+          "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+          "sha256": "a3ac731891aa105ade2af144fcd1f2adff4940f759da16b153ca579805ac1ef7"
+        }
+      ],
+      "files": [
+        {
+          "bytes": 65361688,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export after Balanced segmentation + part save, 4k tier, compact UV off, unmodified",
+          "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-d500fc84-segmented-9.glb",
+          "produced_by": "segment",
+          "role": "segmented-9-glb",
+          "sha256": "974ea77584590ef57a3e1a49f1e826bf0738d4718259107f140803e7619c599c",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 27,
+            "materials": 9,
+            "mesh_count": 9,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 450857
+              },
+              {
+                "name": "meshes[1]",
+                "triangles": 163401
+              },
+              {
+                "name": "meshes[2]",
+                "triangles": 261401
+              },
+              {
+                "name": "meshes[3]",
+                "triangles": 66392
+              },
+              {
+                "name": "meshes[4]",
+                "triangles": 110055
+              },
+              {
+                "name": "meshes[5]",
+                "triangles": 442140
+              },
+              {
+                "name": "meshes[6]",
+                "triangles": 152736
+              },
+              {
+                "name": "meshes[7]",
+                "triangles": 205547
+              },
+              {
+                "name": "meshes[8]",
+                "triangles": 65733
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1918262
+          }
+        },
+        {
+          "bytes": 3033040,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export after Quad retopology of the segmented state, 4k tier, compact UV off, unmodified",
+          "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-d500fc84-segmented-retopo.glb",
+          "produced_by": "retopology",
+          "role": "segmented-retopo-glb",
+          "sha256": "dd5403dfff75256dbe5ec74f89b321bec458483b66b835b3f9ac5065b7d2d8cf",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 27,
+            "materials": 9,
+            "mesh_count": 9,
+            "meshes": [
+              {
+                "name": "tripo_part_0",
+                "triangles": 3262
+              },
+              {
+                "name": "tripo_part_1",
+                "triangles": 3042
+              },
+              {
+                "name": "tripo_part_2",
+                "triangles": 1918
+              },
+              {
+                "name": "tripo_part_3",
+                "triangles": 1258
+              },
+              {
+                "name": "tripo_part_4",
+                "triangles": 976
+              },
+              {
+                "name": "tripo_part_5",
+                "triangles": 1241
+              },
+              {
+                "name": "tripo_part_6",
+                "triangles": 928
+              },
+              {
+                "name": "tripo_part_7",
+                "triangles": 684
+              },
+              {
+                "name": "tripo_part_8",
+                "triangles": 584
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 13893
+          }
+        },
+        {
+          "bytes": 61970000,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export, 4k texture tier, unmodified",
+          "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-h31-d500fc84-source.glb",
+          "produced_by": "generate",
+          "role": "source-glb",
+          "sha256": "326ecb9a06c69a004f844d3cc4fbc5211124a686f0c62850cfdd85c67d04b1c0",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 3,
+            "materials": 1,
+            "mesh_count": 1,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 1918262
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1918262
+          }
+        }
+      ],
+      "generation_inputs": [
+        {
+          "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-back.png",
+          "present": true,
+          "sha256": "bcb59c7c3ce126c931372d72bda4c657635fba01ea7059f56eabab7a2d67c789",
+          "view": "back"
+        },
+        {
+          "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-front.png",
+          "present": true,
+          "sha256": "0a27b796aebe2b859baac4c249913bf804d8de1f9bc02688f971ba9183250e4c",
+          "view": "front"
+        },
+        {
+          "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-left.png",
+          "present": true,
+          "sha256": "cc347722811849932bef3e0371852e50d7e0adfa159d5f175d6db48f719bdc6f",
+          "view": "left"
+        }
+      ],
+      "historical_credits_observed": {
+        "studio-credits": 135
+      },
+      "registered_at": "2026-09-28T15:04:59+00:00",
+      "registered_by": "tripo-pipeline 0.5.0",
+      "spec": {
+        "asset_id": "ASSET-HARPY-001",
+        "date": "2026-09-28",
+        "evidence": [
+          "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json"
+        ],
+        "expectations": {
+          "segmented-9-glb": {
+            "glb_images": 27,
+            "glb_materials": 9,
+            "glb_mesh_count": 9,
+            "glb_skins": 0,
+            "glb_triangles": 1918262
+          },
+          "segmented-retopo-glb": {
+            "armatures": 0,
+            "glb_images": 27,
+            "glb_materials": 9,
+            "glb_mesh_count": 9,
+            "glb_skins": 0,
+            "glb_triangles": 13893
+          },
+          "source-glb": {
+            "glb_images": 3,
+            "glb_materials": 1,
+            "glb_mesh_count": 1,
+            "glb_skins": 0,
+            "glb_triangles": 1918262
+          }
+        },
+        "files": [
+          {
+            "expected_bytes": 61970000,
+            "expected_sha256": "326ecb9a06c69a004f844d3cc4fbc5211124a686f0c62850cfdd85c67d04b1c0",
+            "origin": "Studio GLB export, 4k texture tier, unmodified",
+            "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-h31-d500fc84-source.glb",
+            "produced_by": "generate",
+            "role": "source-glb"
+          },
+          {
+            "expected_bytes": 65361688,
+            "expected_sha256": "974ea77584590ef57a3e1a49f1e826bf0738d4718259107f140803e7619c599c",
+            "origin": "Studio GLB export after Balanced segmentation + part save, 4k tier, compact UV off, unmodified",
+            "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-d500fc84-segmented-9.glb",
+            "produced_by": "segment",
+            "role": "segmented-9-glb"
+          },
+          {
+            "expected_bytes": 3033040,
+            "expected_sha256": "dd5403dfff75256dbe5ec74f89b321bec458483b66b835b3f9ac5065b7d2d8cf",
+            "origin": "Studio GLB export after Quad retopology of the segmented state, 4k tier, compact UV off, unmodified",
+            "path": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/source/harpy-tripo-d500fc84-segmented-retopo.glb",
+            "produced_by": "retopology",
+            "role": "segmented-retopo-glb"
+          }
+        ],
+        "generation": {
+          "input_manifest": "docs/art-pipeline/imagegen-inputs/manifest.json",
+          "mode": "multi-view",
+          "settings": {
+            "ai_completion": false,
+            "generate_parts": false,
+            "output": "geometry and texture",
+            "pbr": true,
+            "polygon_count": 2000000,
+            "privacy": "private",
+            "remove_lighting": true,
+            "seed": null,
+            "texture_8k": false,
+            "texture_quality": "4K",
+            "topology": "triangle",
+            "ultra_mesh_quality": true
+          },
+          "views": {
+            "back": {
+              "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-back.png",
+              "sha256": "bcb59c7c3ce126c931372d72bda4c657635fba01ea7059f56eabab7a2d67c789"
+            },
+            "front": {
+              "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-front.png",
+              "sha256": "0a27b796aebe2b859baac4c249913bf804d8de1f9bc02688f971ba9183250e4c"
+            },
+            "left": {
+              "path": "art/imagegen/mvp-v1/characters/ref-harpy-v5-left.png",
+              "sha256": "cc347722811849932bef3e0371852e50d7e0adfa159d5f175d6db48f719bdc6f"
+            },
+            "right": null
+          }
+        },
+        "model_version": {
+          "backend": null,
+          "ui_label": "H3.1 - Макс.кач. Ожидание дольше"
+        },
+        "operations": [
+          {
+            "credits": {
+              "balance_after": 24490,
+              "balance_before": 24545,
+              "observed_debit": 55,
+              "quoted": 55,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+            "history_time": "2026-09-28 15:39:16",
+            "mode": "multi-view HD model",
+            "op": "generate"
+          },
+          {
+            "credits": {
+              "balance_after": 24450,
+              "balance_before": 24490,
+              "observed_debit": 40,
+              "quoted": 40,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+            "history_time": "2026-09-28 15:42:58",
+            "note": "9 parts (wings, head, torso, 2 legs, 2 feet, base); saved as a new version of the same task; part save (15:45 version) had no debit",
+            "op": "segment",
+            "settings": {
+              "level": "Balanced (6-15 parts)"
+            }
+          },
+          {
+            "credits": {
+              "balance_after": 24410,
+              "balance_before": 24450,
+              "observed_debit": 40,
+              "quoted": 40,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/reports/tripo-run.json",
+            "history_time": "2026-09-28 15:47:19",
+            "note": "applied to the segmented state; result stays multi-part; parts tripo_part_2 (head) and tripo_part_6 (left leg) have inverted winding",
+            "op": "retopology",
+            "settings": {
+              "smart_mesh": "P1.0 on",
+              "target_polygons": 6800,
+              "topology": "Quad"
+            }
+          }
+        ],
+        "parent_task_id": null,
+        "schema": "unmatched.tripo-pipeline.source-spec/1",
+        "service": "tripo-studio",
+        "source_id": "tripo-d500fc84",
+        "task_id": "d500fc84-26d7-4cb5-8537-1e53788a5dd6",
+        "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/d500fc84-26d7-4cb5-8537-1e53788a5dd6"
+      },
+      "spec_sha256": "ab462f54148f052f3f74beb65200e32dba0dff0fbbcd03a69a819682ca13a93b"
+    }
+  },
+  "stages": {
+    "atlas": {
+      "attempts": 1,
+      "backend": "headless",
+      "fingerprint": "6fbbb61348a9571d6d790db7ab2856199d2dd8f7a3c381f55cf58650cd4f9f26",
+      "finished_at": "2026-09-28T15:05:15+00:00",
+      "outputs": {
+        "reports/atlas-report.json": {
+          "bytes": 6561,
+          "sha256": "7687ed72f3e80354d04c7ae5bd54b2adb0b48a5b4e51db944ba42b5e13f0dd75"
+        },
+        "textures/T_Harpy_Candidate_Atlas_BC.png": {
+          "bytes": 3866674,
+          "sha256": "6c91809f85d49983538c846b6dd952888527f24cc97f4bf19caedff07609ea65"
+        },
+        "textures/T_Harpy_Candidate_Atlas_N.png": {
+          "bytes": 4018291,
+          "sha256": "b83a9f922e6f4e1c5aed955d14479c66e68c630d276573f8fe99b86f4ff0c4b8"
+        },
+        "textures/T_Harpy_Candidate_Atlas_N_OpenGL.png": {
+          "bytes": 4017659,
+          "sha256": "0620a86f868d8ca1164f102097ea52e5da74af908d0ea44dc8bcea84f321aebd"
+        },
+        "textures/T_Harpy_Candidate_Atlas_ORM.png": {
+          "bytes": 2253030,
+          "sha256": "cf9c4081528c05cce717b831f61b501237e452b6155b698ee66e7dca3f7a83ee"
+        }
+      },
+      "started_at": "2026-09-28T15:05:01+00:00",
+      "status": "completed",
+      "summary": {
+        "files": {
+          "BC": "6c91809f85d4",
+          "N": "b83a9f922e6f",
+          "N_OpenGL": "0620a86f868d",
+          "ORM": "cf9c4081528c"
+        },
+        "passed": true,
+        "reference_bytes_identical": {}
+      },
+      "tool_version": "0.5.0"
+    },
+    "build": {
+      "attempts": 1,
+      "backend": "headless",
+      "fingerprint": "e250e393f075b0a9630185842a86173fb25d9b5044ffe00dc1c11c9d6ca5e9e4",
+      "finished_at": "2026-09-28T15:05:20+00:00",
+      "outputs": {
+        "export/SK_Harpy_Candidate.fbx": {
+          "bytes": 634908,
+          "sha256": "92a8632dc12456e63a745452a71e8e8d98b9c7b5ba88b4d7eaf01848882f36d1"
+        },
+        "export/SM_Harpy_Base_Candidate.fbx": {
+          "bytes": 35852,
+          "sha256": "5ecae266dc2d824754ea78724236a4ef0a652f42805a64642610382e34738a71"
+        },
+        "reports/build-report.json": {
+          "bytes": 77088,
+          "sha256": "4199c828a0c31253f6f23d702066d1d59ae0f78b07f7d0e9f05504d6c05bee30"
+        },
+        "work/ASSET-HARPY-001_segmented-retopo-glb-candidate.blend": {
+          "bytes": 1917695,
+          "sha256": "34c246c5f06e4bf907c6633d8eb0631daa8ea44572c005dcc22f680a1ef8098c"
+        }
+      },
+      "started_at": "2026-09-28T15:05:15+00:00",
+      "status": "completed",
+      "summary": {
+        "base_fbx_sha256": "5ecae266dc2d824754ea78724236a4ef0a652f42805a64642610382e34738a71",
+        "export_front_axis": "+X",
+        "failed_checks": [],
+        "figure_top_m": 0.42,
+        "flipped_parts": [
+          "tripo_part_6"
+        ],
+        "flow": "seated-parts",
+        "live_name_collisions": null,
+        "passed": true,
+        "skeletal_fbx_sha256": "92a8632dc12456e63a745452a71e8e8d98b9c7b5ba88b4d7eaf01848882f36d1",
+        "skeletal_top_m": 0.42
+      },
+      "tool_version": "0.5.0"
+    },
+    "import": {
+      "attempts": 1,
+      "backend": "headless",
+      "fingerprint": "d7389f727257346aa6b3f04f588fe180f690c1df5a506635b37013851191371b",
+      "finished_at": "2026-09-28T15:05:01+00:00",
+      "outputs": {
+        "reports/import-report.json": {
+          "bytes": 10465,
+          "sha256": "58796e19229c8f4dfcbb1ae49d59918cd5ea4ba24fd817072ee751006bc12901"
+        },
+        "work/ASSET-HARPY-001_segmented-retopo-glb.blend": {
+          "bytes": 4438480,
+          "sha256": "0f88a9e073d1b3e9624ac7c027cdf9262b001f10cdd394e0cff4cee4964bf89b"
+        }
+      },
+      "started_at": "2026-09-28T15:05:00+00:00",
+      "status": "completed",
+      "summary": {
+        "images": 27,
+        "materials": 9,
+        "mesh_count": 9,
+        "triangles_total": 13893
+      },
+      "tool_version": "0.5.0"
+    },
+    "preflight": {
+      "attempts": 1,
+      "backend": "headless",
+      "fingerprint": "de93c10cf16bc14d8af9f7d9ec020bb876392e254a6b49fa1fd8a3ed8ae5e1f9",
+      "finished_at": "2026-09-28T15:05:00+00:00",
+      "outputs": {
+        "reports/preflight.json": {
+          "bytes": 5121,
+          "sha256": "a05a129a02bcb6de834d6086923607885d3f59c6e6f6acd4d0521112e25ca581"
+        }
+      },
+      "started_at": "2026-09-28T15:05:00+00:00",
+      "status": "completed",
+      "summary": {
+        "failed_checks": [],
+        "passed": true,
+        "sources_verified": 9
+      },
+      "tool_version": "0.5.0"
+    },
+    "ue-import": {
+      "attempts": 7,
+      "backend": "mcp",
+      "fingerprint": "86153a2064ab2e4fce6f803e6f5aee189be9559f32c02cf5b71b610d84def6ba",
+      "finished_at": "2026-09-28T17:34:04+00:00",
+      "outputs": {
+        "reports/ue-import-report.json": {
+          "bytes": 31821,
+          "sha256": "2b2f0f42e316cc77b6400b326b620ffe28fe057cb67f93f486d7e6073e304518"
+        },
+        "reports/ue-mcp-calls.json": {
+          "bytes": 157931,
+          "sha256": "33f512d65fabcc11aca78db9c0e285606878bd88442139aa3507f4b4686cea8b"
+        }
+      },
+      "started_at": "2026-09-28T17:30:36+00:00",
+      "status": "completed",
+      "summary": {
+        "assets": 10,
+        "failed_checks": [],
+        "kind": "skeletal-candidate",
+        "passed": true,
+        "primary_asset": "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1/Meshes/SK_Harpy_Candidate"
+      },
+      "tool_version": "0.5.0",
+      "ue_owned_assets": [
+        "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1/Materials/MI_Harpy_Candidate_Gold",
+        "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1/Materials/MI_Harpy_Candidate_Silver",
+        "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1/Materials/M_Harpy_Base_Candidate",
+        "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1/Materials/M_Harpy_Candidate_Atlas",
+        "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1/Meshes/SK_Harpy_Candidate",
+        "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1/Meshes/SK_Harpy_Candidate_Skeleton",
+        "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1/Meshes/SM_Harpy_Base_Candidate",
+        "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1/Textures/T_Harpy_Candidate_BC",
+        "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1/Textures/T_Harpy_Candidate_N",
+        "/Game/PipelineCandidates/Harpy/20260928-cli-um-fbx-v1/Textures/T_Harpy_Candidate_ORM"
+      ]
+    },
+    "verify": {
+      "attempts": 1,
+      "backend": "headless",
+      "fingerprint": "0a68583570814c604519c22bf1aba5145139906867894ccdda0b9a6d53db7f6b",
+      "finished_at": "2026-09-28T15:05:01+00:00",
+      "outputs": {
+        "reports/verify-report.json": {
+          "bytes": 4511,
+          "sha256": "84d1b51d65c3d1fd7729d5c7f39a022262f0781234d54051cdf992092b2ba67e"
+        }
+      },
+      "started_at": "2026-09-28T15:05:01+00:00",
+      "status": "completed",
+      "summary": {
+        "failed_checks": [],
+        "passed": true,
+        "warnings": 1
+      },
+      "tool_version": "0.5.0"
+    }
+  },
+  "status_legend": {
+    "art_accepted": "художественно принято — только решением арт-трека; этот инструмент его не ставит",
+    "measured": "измерено — число получено инструментом из файла",
+    "proposed": "предложено — план или норматив без проверки",
+    "technically_imported": "технически импортировано — файл прочитан/записан без ошибок, контракты проверены"
+  },
+  "tool": {
+    "name": "tripo-pipeline",
+    "version": "0.5.0"
+  }
+}

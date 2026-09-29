@@ -1,0 +1,51 @@
+{
+  "schema": "unmatched.blender-stage-plan/1",
+  "asset": "ASSET-DECOR-KIT-001.LANTERN",
+  "runId": "20260928-lantern-tripo-h31",
+  "status": "blocked: no input mesh. The Tripo stage stopped before the first paid step (0 credits); source/ has no GLB, Downloads has no lantern GLB, the credits ledger has no lantern entry (checked 2026-09-28 ~22:25)",
+  "creditsSpent": {"tripo": 0, "syntx": 0},
+  "decisionNotTaken": "No substitute mesh was built (no hand-modelled or procedural lantern): the task is a Tripo-pipeline candidate, and a Blender-only lantern would be a different asset route that needs its own decision",
+  "toolchainVerified": {
+    "what": "static_prop_candidate.py + check_static_prop_fbx.py rerun on the committed barrel params into C:/tmp/lantern-blender-smoke (out_dir redirected, nothing in the repo written)",
+    "blender": "5.2.2 LTS (hash d13f752e3b9c)",
+    "script_sha256_lf": "6f703427539511afe37740035e55db1bcddbbb92bd2092bfedddc076b7b3d18b (same as barrel candidate-report.json)",
+    "result": "exit 0, all 11 candidate checks true; byte-identical to the committed barrel: SM_Decor_Barrel.fbx 80153e4c9ccb759b..., T_Decor_Barrel_BC 393b0b50d431d949..., _N 33f91b4db86fa7e3..., _ORM 9a66a5581ba08573...; independent FBX readback equal to art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/reports/fbx-readback.json on all 15 fields except the fbx path (3790 tris, 1 slot, UVMap, scale 0.01, 0 open/non-manifold/inconsistent)",
+    "runtime_s": 23,
+    "evidenceNote": "C:/tmp/lantern-blender-smoke is scratch output outside the repo (to be deleted, see followups); it is not preserved evidence. The durable evidence is the sha256 values recorded here, which match the committed barrel files art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/{SM_Decor_Barrel.fbx,T_Decor_Barrel_BC.png,T_Decor_Barrel_N.png,T_Decor_Barrel_ORM.png}, and the commands below, which reproduce the run",
+    "recheckedAt": "2026-09-28, fix pass without Blender: the scratch FBX and BC/N/ORM are sha256-equal to the committed barrel files; the scratch readback equals the committed fbx-readback.json on 15 of 16 top-level fields (only fbx differs, it is the file path); static_prop_candidate.py sha256_lf is still 6f703427..., the file is unmodified in git"
+  },
+  "gameCameraPreview": {
+    "script": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/game_camera_preview.py",
+    "why": "static_prop_candidate.py renders only ortho views; its game-3q-55deg shot is orthographic. This script renders the delivered FBX with a perspective camera, horizontal FOV 35 (UE convention), pitch -55, yaw 0/45, plus ortho front/side, 1200x900 JPEG, material rebuilt from the BC/N/ORM triplet (N DirectX flipped back to OpenGL, so a wrong normal convention shows as inverted relief)",
+    "axes": "The FBX is read back in UE axes: asset front = +X (UM_FBX_v1 turns .blend -Y into +X). Looking at the front, frame-left = -Y and frame-right = +Y in the readback. Verified on the barrel: bung faces the +X camera, moves to frame-left at yaw +45",
+    "tested": "barrel reproduction FBX, exit 0, images viewed with Read (bung centred in ortho-front-plusX; relief reads outward)"
+  },
+  "dependsOn": "reports/tripo-stage-plan.json (hinge-side decision and runbook) and preview/input-views-front-left-back-right.jpg, preview/input-views-door-hardware-zoom.jpg (hinge evidence) of this run; commit them together with this plan",
+  "params": "reports/candidate-params.template.json (copy to candidate-params.json, replace <task8>; fails safely at load while the GLB is missing - checked, exit 1, nothing created)",
+  "targets": {
+    "height": "0.95 m in .blend = 95 uu (04 card 90-110 proposed; S05 gate 90-100, AD-CNF-56 open)",
+    "pivot": "centre of base, min Z = 0 (04 Pivot: lantern = centre of base); checked by the script row 'Pivot: base centre'",
+    "textures": "1K (04: lantern/small 1K, proposed). Tripo gives 2K -> box 2x2 in linear light, recorded by the script as source_size_px/target_size_px",
+    "colourSpaces": "BC sRGB; N Linear, DirectX (G flipped from glTF); ORM Linear, R = AO baked, G = roughness, B = metallic",
+    "slots": "1 (04 decor card: <=2)",
+    "trianglesExpectation": "retopology target 2-3k faces (Tripo plan) -> about 4-6k tris; decor kit sum 30-60k (proposed). Measure, do not accept",
+    "collision": "none. 04 ASSET-DECOR-KIT-001 card: decor gets no collision (not interactive; clicks go through to L1). No UCX_/UBX_ in the FBX; build-profile collision: none",
+    "uv": "script uv0 section: stretch, overlap (per-island winding), padding; Smart UV from Tripo is expected, so overlaps should be 0"
+  },
+  "commands": [
+    "B=\"C:/Program Files/Blender Foundation/Blender 5.2/blender.exe\"; R=art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31",
+    "sed \"s/<task8>/$TASK8/\" $R/reports/candidate-params.template.json > $R/reports/candidate-params.json",
+    "\"$B\" -b --factory-startup --python-exit-code 1 --python tools/tripo-pipeline/blender/static_prop_candidate.py -- $R/reports/candidate-params.json",
+    "\"$B\" -b --factory-startup --python-exit-code 1 --python tools/tripo-pipeline/blender/check_static_prop_fbx.py -- $R/export/SM_Decor_Lantern.fbx $R/reports/fbx-readback.json 0.70",
+    "\"$B\" -b --factory-startup --python-exit-code 1 --python art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/game_camera_preview.py -- $R/export/SM_Decor_Lantern.fbx $R/export/T_Decor_Lantern $R/preview",
+    "Downscale any preview PNG over 1200 px to JPG before committing; view every preview with Read"
+  ],
+  "lanternSpecificChecks": [
+    "Hinge side (decided in tripo-stage-plan.json from the front view): in *_ortho-front-plusX.jpg the door faces the camera, hinges at frame-left (readback -Y), latch at frame-right (readback +Y) at mid door height. In the .blend: door at -Y, hinges at -X. Tripo may duplicate hardware on the sides: check *_ortho-side-plusY.jpg and the yaw-45 shot",
+    "Front conformance row of static_prop_candidate.py ('Front (bung) along -Y') samples the most protruding vertex at 0.5 of the height. For the lantern that band is the square post, so the angle is arbitrary (corner or rivet); the row can fail or pass by chance and pulls um_fbx_v1_conforms with it. Treat that row as not applicable, confirm the front visually from the ortho-front render, and record it. check_static_prop_fbx.py is given 0.70 (lamp head, latch height from the front view ~0.70 of the height) but corner rivets may still win: read the protrusion angle as a hint only",
+    "Glass panes: Tripo bakes them opaque (blue-grey). 04/03 C-8: in UE a warm point light without shadows sits in the lamp head. The panes will not glow without an emissive mask: not a Blender-stage blocker, see followups",
+    "require_closed_manifold is true: a retopologised Tripo mesh may keep open edges at the spire or roof. If the run fails on it, record the counts and decide on geometry_repair after looking at the mesh, not before",
+    "Thin parts (frame bars, spire) after the 2-3k-face retopology: check silhouette in the game-camera shots; a regeneration needs a written reason"
+  ],
+  "afterBlender": "ADDING-AN-ASSET.md 4.1 steps 1, 3, 4 (passthrough, build-profile with collision: none and N flip_green: false, CLI adopt), then UE import (section 5) - deferred"
+}

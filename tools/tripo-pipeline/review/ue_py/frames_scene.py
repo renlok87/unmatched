@@ -32,7 +32,7 @@ out = {"op": args["op"]}
 if args["op"] == "setup":
     out["actors"] = {}
     for spec in args["actors"]:
-        rot = u.Rotator(0.0, float(spec.get("yaw", 0.0)), 0.0)
+        rot = u.Rotator(roll=0.0, pitch=0.0, yaw=float(spec.get("yaw", 0.0)))  # UE Python order is (roll, pitch, yaw)
         if spec["kind"] == "static":
             a = actors_sub.spawn_actor_from_class(u.StaticMeshActor, vec(spec["location"]), rot)
             a.static_mesh_component.set_static_mesh(u.load_asset(spec["asset"]))
@@ -71,7 +71,7 @@ elif args["op"] == "sockets":
 elif args["op"] == "camera":
     a = find(args["label"])
     r = args["rotation"]
-    a.set_actor_location_and_rotation(vec(args["location"]), u.Rotator(float(r[0]), float(r[1]), float(r[2])), False, False)
+    a.set_actor_location_and_rotation(vec(args["location"]), u.Rotator(roll=float(r[2]), pitch=float(r[0]), yaw=float(r[1])), False, False)
     level_sub.pilot_level_actor(a)
     out["camera"] = {"label": args["label"], "fov": a.camera_component.get_editor_property("field_of_view"),
                      "location": args["location"], "rotation": r}

@@ -1,0 +1,420 @@
+{
+ "schema": "unmatched.decor-crate.report/1",
+ "asset_id": "ASSET-DECOR-KIT-001.CRATE",
+ "date": "2026-09-28",
+ "status": "measured",
+ "claims": {
+  "art_accepted": false,
+  "technically_imported": false,
+  "budgets_declared": false,
+  "ue_imported": false
+ },
+ "human_report": "docs/art-pipeline/crate-report.md",
+ "run_dir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1",
+ "tripo_stage": {
+  "used": false,
+  "reason": "registry nextStep: simple manual model 25 uu",
+  "credits_spent": 0,
+  "ledger_entries": 0,
+  "syntx_used": false
+ },
+ "reference": {
+  "path": "art/imagegen/mvp-v1/environment/ref-crate.png",
+  "sha256": "c00523e78d62d013ecc745295d104094c626031e3be0e5af2e4a9d87c625f440",
+  "use": "visual reference only (proportions: X-brace on front, 4 horizontal planks on the side, corner posts with iron studs, planked top; colour sampling). Nothing is traced or projected from it."
+ },
+ "scripts": {
+  "build": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/crate_build.py",
+   "sha256_lf": "c594071504d697ce70982301c39b02be305fdc003440dacd18199f97029f988b"
+  },
+  "readback": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/crate_readback.py",
+   "sha256_lf": "d8286dee4a1d0e0ea93a697823a5b791f7ea0111cec5612662ebd300c46d5cac"
+  },
+  "params": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/crate_params.json",
+   "sha256_lf": "10df67ffd51060bde7c62b2dc875171cf65ed4e15e4ad041be34e9edfa8f67d1"
+  },
+  "helpers_unmodified": {
+   "path": "tools/tripo-pipeline/blender/static_prop_candidate.py",
+   "sha256_lf": "6f703427539511afe37740035e55db1bcddbbb92bd2092bfedddc076b7b3d18b"
+  },
+  "check_static_prop_fbx_unmodified": {
+   "path": "tools/tripo-pipeline/blender/check_static_prop_fbx.py",
+   "sha256_lf": "d5a17b94b76641842ee0b01ddf7c5a2150c301a5d2b477c92b0dcd3a6d2e3b8f"
+  }
+ },
+ "blender_version": "5.2.2 LTS",
+ "outputs": {
+  "fbx": {
+   "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/export/SM_Decor_Crate.fbx",
+   "sha256": "3c3e45fc435dbfc37495810c4174198b2c7e5edfc0221ff295958db6e9e33b98",
+   "bytes": 103132,
+   "texture_refs": [
+    "../textures/T_Decor_Crate_BC.png"
+   ],
+   "absolute_path_leaks": []
+  },
+  "textures": {
+   "BC": {
+    "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/textures/T_Decor_Crate_BC.png",
+    "sha256": "32b836dd98eb05ba968d6dbc205d1f1a57193bd223fffb7abe15444dfe6242f9",
+    "colorspace": "sRGB",
+    "ue": "sRGB, TC_Default",
+    "png_color_chunks": [
+     "cHRM",
+     "gAMA",
+     "sRGB"
+    ]
+   },
+   "N": {
+    "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/textures/T_Decor_Crate_N.png",
+    "sha256": "bd38f837e52c6057400e0fa435762f0d92566a47a77af49117b270e4a4f7db95",
+    "colorspace": "Linear (Non-Color)",
+    "ue": "TC_Normalmap, flip_green false",
+    "png_color_chunks": []
+   },
+   "ORM": {
+    "path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/textures/T_Decor_Crate_ORM.png",
+    "sha256": "4b8ab44840328c3e8d24bdd5f3fc9cc5ca788631fe471ee48beb08476d1954c1",
+    "colorspace": "Linear (Non-Color)",
+    "ue": "TC_Masks, sRGB off",
+    "png_color_chunks": []
+   }
+  },
+  "reports": {
+   "build": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/reports/build-report.json",
+   "crate_readback": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/reports/crate-readback.json",
+   "fbx_readback": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/reports/fbx-readback.json"
+  },
+  "source_manifest": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/source/sources.json",
+  "build_profile_proposed": "art/pipeline-candidates/ASSET-DECOR-KIT-001/build-profiles/decor-crate-static-um-fbx-v1.json",
+  "previews": [
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_3q-front-right.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_3q-wireframe.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_front-ortho.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_game-angles-close-1p4m-with-barrel.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_game-k1-exact-12m.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_game-k1-same-camera-crop4x.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_hidden-check_back-left-30.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_hidden-check_front-right-30.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_hidden-check_side-low-5.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_hidden-check_top-down-80.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_side-ortho.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_top-ortho.jpg",
+   "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/preview/SM_Decor_Crate_uv0-layout.jpg"
+  ],
+  "work_transient": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/work/decor-crate.blend (transient, gitignored)"
+ },
+ "geometry": {
+  "dimensions_uu": [
+   25.0,
+   25.0,
+   25.0
+  ],
+  "bounds_min_uu": [
+   -12.5,
+   -12.5,
+   0.0
+  ],
+  "bounds_max_uu": [
+   12.5,
+   12.5,
+   25.0
+  ],
+  "pivot": {
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "rule": "04 §1: decor crate = centre of the base",
+   "min_z_uu": 0.0,
+   "x_centre_offset_uu": 0.0,
+   "y_centre_offset_uu": 0.0
+  },
+  "front": {
+   "rule": "04 §1: front = -Y in Blender (-> +X in UE)",
+   "x_brace_sides_blender": [
+    "+Y",
+    "-Y"
+   ],
+   "note": "X braces on the front (-Y) and the back (+Y): the crate reads the same after a 180 deg turn; plain planks on +-X."
+  },
+  "triangles": 3104,
+  "triangles_by_kind": {
+   "post": 176,
+   "cap": 352,
+   "stud": 1116,
+   "plank": 704,
+   "rail": 176,
+   "brace": 360,
+   "top_plank": 176,
+   "bottom": 44
+  },
+  "vertices": 1674,
+  "parts": {
+   "count": 61,
+   "by_kind": {
+    "post": 4,
+    "cap": 8,
+    "stud": 18,
+    "plank": 16,
+    "rail": 4,
+    "brace": 6,
+    "top_plank": 4,
+    "bottom": 1
+   }
+  },
+  "welded_1e-6m": {
+   "vertices_as_stored": 1674,
+   "vertices_welded_1e-6m": 1674,
+   "welded_boundary_edges": 0,
+   "welded_non_manifold_edges": 0,
+   "faces_with_inconsistent_winding": 0,
+   "connected_shells": 61,
+   "degenerate_faces_area_lt_1e-12": 0
+  },
+  "smooth_faces": 1008,
+  "material_slots": [
+   "M_Decor_Crate"
+  ],
+  "collision": "none (04 §3.7: decor not interactive; clicks go through to L1). UE import: no collision (build profile collision: none).",
+  "kit_triangles_so_far": {
+   "crate": 3104,
+   "barrel_p15": 3790,
+   "facades_abc": 872,
+   "proposed_kit_budget": "30-60k (04 §1, proposal)"
+  }
+ },
+ "hidden_faces": {
+  "faces": 1760,
+  "hidden_faces": 896,
+  "hidden_area_fraction": 0.4269,
+  "area_uu2_total": 8514.32,
+  "area_uu2_hidden": 3634.74,
+  "ray_casts": 11553289,
+  "samples": 502920,
+  "sample_spacing_uu": 0.5,
+  "directions_upper_hemisphere": 128
+ },
+ "hidden_face_check": {
+  "red_pixels_per_view_900x900": {
+   "front-right-30": 0,
+   "back-left-30": 0,
+   "side-low-5": 0,
+   "top-down-80": 0
+  },
+  "threshold_srgb": "R>170, G<70, B<70",
+  "views": "yaw/elevation 35/30, 215/30, 100/5, 10/80 deg around the crate, persp 20 deg"
+ },
+ "uv0": {
+  "method": "per-part box projection (exact planes) + stud-axis projection for visible stud domes",
+  "pack": {
+   "packer": "in-script skyline (deterministic)",
+   "scale_px_per_projection_metre": 1131.9768,
+   "margin_px_between_islands_min": 8,
+   "edge_padding_px_min": 4,
+   "boxes": 475
+  },
+  "islands": 475,
+  "raster_coverage_fraction_1024": 0.5887,
+  "by_visibility": {
+   "visible": {
+    "triangles": 1504,
+    "area_uu2": 4879.57,
+    "uv_area_fraction": 0.5615,
+    "px_per_uu": 10.985,
+    "stretch_area_ratio_p05_p50_p95": [
+     0.751,
+     1.062,
+     1.062
+    ],
+    "stretch_anisotropy_p50_p95_max": [
+     1.0,
+     1.414,
+     2.889
+    ]
+   },
+   "hidden": {
+    "triangles": 1600,
+    "area_uu2": 3634.74,
+    "uv_area_fraction": 0.0264,
+    "px_per_uu": 2.758
+   }
+  },
+  "overlap_pixels_between_islands": 0,
+  "overlap_pixels_inside_islands_strict": 0,
+  "mirrored_faces": 0,
+  "zero_area_uv_triangles": 0,
+  "min_gutter_px_estimate_1024": 9,
+  "note": "whole-mesh stretch percentiles in build-report uv0 include hidden faces (x0.25 density, 43 % of the area); use by_visibility for the visible surface",
+  "tried_and_dropped": [
+   "Smart UV 66 deg (plank faces anisotropy p50 ~1.28 once counted visible)",
+   "bpy.ops.uv.pack_islands CONCAVE/AABB (~47 % coverage, ~1e-6 jitter between runs -> bytes not reproducible)",
+   "5 samples per face for hidden-face classification (missed plank areas between the braces)"
+  ]
+ },
+ "textures": {
+  "size_px": 1024,
+  "texels_covered_all_faces": 617256,
+  "texels_covered_visible_faces": 589780,
+  "bc_srgb8_median_visible": [
+   72,
+   62,
+   55
+  ],
+  "bc_srgb8_median_visible_wood": [
+   73,
+   62,
+   54
+  ],
+  "bc_srgb8_median_visible_iron": [
+   62,
+   61,
+   63
+  ],
+  "bc_srgb8_p05_p95_luma_visible": [
+   48.2,
+   105.2
+  ],
+  "normal_tilt_deg_p50_p95_max_covered": [
+   0.55,
+   8.35,
+   17.08
+  ],
+  "ao_visible_p05_p50_mean": [
+   0.0,
+   0.906,
+   0.686
+  ],
+  "roughness_visible_mean": 0.832,
+  "roughness_ge_0_6_fraction_visible_texels": 0.9921,
+  "metallic_visible_mean": 0.0469,
+  "metallic_gt_0_3_fraction_visible_texels": 0.0782,
+  "note": "Visible texels = UV raster of faces not classified hidden; uniform density on them, so texel fractions ~ area fractions."
+ },
+ "bake": {
+  "device": "CPU",
+  "seed": 0,
+  "margin_px": 16,
+  "emit_samples": 16,
+  "normal_samples": 16,
+  "ao_samples": 64,
+  "ao_distance_m": 0.04,
+  "ao_in_basecolor_strength": 0.35,
+  "ao_note": "С-4: light/shadow baked into albedo moderately -> BC x (1 - 0.35 x (1 - AO)); ORM.R keeps the full AO (UE uses material AO only for indirect/sky light).",
+  "engine": "Cycles"
+ },
+ "um_fbx_v1": {
+  "conforms": true,
+  "rows": 15
+ },
+ "k1_exact_frame_analysis": {
+  "crate_location_m": [
+   3.27,
+   1.25,
+   0.0
+  ],
+  "projected_bbox_px_at_1920x1080": [
+   82.1,
+   85.3
+  ],
+  "bbox_centre_ndc": [
+   0.9111,
+   0.7449
+  ],
+  "in_frame": true,
+  "texel_density_needed_at_k1_px_per_uu": 3.286
+ },
+ "readback": {
+  "crate_readback_checks": {
+   "one_mesh_no_armature": true,
+   "fbx_bytes_as_built": true,
+   "triangles_as_built": true,
+   "one_slot_named": true,
+   "uv0_present_in_0_1": true,
+   "no_colour_attributes": true,
+   "size_25_uu_1pct": true,
+   "pivot_base_centre": true,
+   "object_scale_0_01_no_rotation": true,
+   "closed_after_1um_weld": true,
+   "shells_as_built": true,
+   "x_braces_on_plus_minus_x": true,
+   "smooth_faces_as_built": true,
+   "texture_paths_relative_and_present": true,
+   "textures_as_built": true,
+   "n_orm_without_colour_chunks": true
+  },
+  "crate_readback_passed": true,
+  "x_brace_edge_area_uu2_by_side": {
+   "+X": 11.339,
+   "-X": 11.339,
+   "+Y": 0.0,
+   "-Y": 0.0
+  },
+  "check_static_prop_fbx": {
+   "triangles": 3104,
+   "dimensions_uu": [
+    25.0,
+    25.0,
+    25.0
+   ],
+   "topology_welded_1um": {
+    "open_edges": 0,
+    "non_manifold_edges": 0,
+    "faces_with_inconsistent_winding": 0
+   },
+   "protrusion_direction_deg_from_plus_x_ccw": 39.3,
+   "protrusion_note": "barrel measure (bung); on the crate the corner caps/studs protrude most -> diagonal, not the front; the front is the X-brace test of crate_readback"
+  }
+ },
+ "build_checks": {
+  "single_mesh_no_armature": true,
+  "closed_shells_consistent_winding_unwelded": true,
+  "closed_manifold_welded_1e-6m": true,
+  "shells_equal_parts": true,
+  "no_degenerate_faces": true,
+  "size_25_uu_proposed_all_axes": true,
+  "pivot_base_centre": true,
+  "x_brace_on_front_and_back_only": true,
+  "material_slots_le_2": true,
+  "uv0_in_0_1_no_overlap": true,
+  "uv_not_mirrored": true,
+  "min_gutter_ge_4px_at_1024": true,
+  "texture_1k": true,
+  "n_orm_no_png_color_chunks": true,
+  "roughness_ge_0_6_on_ge_90pct_visible": true,
+  "no_absolute_paths_in_fbx": true,
+  "um_fbx_v1_conforms": true,
+  "hidden_faces_not_visible_in_4_views": true
+ },
+ "build_checks_passed": true,
+ "reproducibility": {
+  "fbx_bc_n_orm_uv_layout_byte_identical_runs": 3,
+  "perturbations": [
+   "PYTHONHASHSEED=4242",
+   "other output dir",
+   "params with +5000 chars of note"
+  ],
+  "not_byte_stable": "EEVEE preview JPEGs (GPU render)"
+ },
+ "deviations_from_reference": [
+  "Iron corner caps (8) instead of bare post ends: the task brief for style B asks for iron-bound corners; the concept shows only iron studs on the posts. The caps also mark the corners from the top-down game camera.",
+  "X brace on the back as well as the front (concept shows one X face): the crate reads the same after a 180 deg turn.",
+  "Top: 4 boards along the front-back axis, inset flush with the wall tops; no separate top battens."
+ ],
+ "limitations": [
+  "Visible texel density 10.99 px/uu at 1K vs barrel 18.5 px/uu: 475 islands without overlaps on one 1K map; K-1 needs ~3.3 px/uu",
+  "Normal map = bake of a procedural bump (weak: tilt p95 8 deg), not a high-poly bake",
+  "AO counted twice: moderately in BC (x (1 - 0.35 (1 - AO))) and fully in ORM.R",
+  "CLI static-candidate adopt not run: it needs a registered Tripo primary source and a static-prop-candidate/1 report"
+ ],
+ "deferred_ue_steps": [
+  "ue-import SM_Decor_Crate (UM_FBX_v1, scale 1.0, collision none; BC sRGB/TC_Default, N TC_Normalmap no flip, ORM TC_Masks; MI from M_DioramaMaster if it exposes BC/N/ORM) into /Game/PipelineCandidates/DecorCrate/20260928-crate-manual-v1",
+  "verify in UE: 3104 tris LOD0, 1 slot, 25x25x25 uu +-1 %, base-centre pivot, X brace towards +X, no Name_1 duplicates",
+  "P1.7 control scene: add the crate to SUBJECTS (decor spot outside cells), 3 runs; tone vs tray (C-9), roughness (C-3), K-1 no cell covered (ART-009)",
+  "minimum-settings decor switch-off (03 §1.2)"
+ ]
+}

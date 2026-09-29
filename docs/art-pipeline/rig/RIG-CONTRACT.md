@@ -109,6 +109,8 @@ bake_anim_force_startend_keying=True, mesh_smooth_type="FACE"
 | `Weapon` | `weapon` | (0, 0, 0) | кандидат ART004. В S05 сокет был на `hand_L` (0, 2, 0). У Arthur/Merlin `weapon` — ребёнок `hand.R` |
 | `Head` | `head` | (0, 0, 4) | кандидат ART004. В S05 было (0, 0, 8) |
 
+Смещение в пространстве кости UE (предложено, CLI 0.5.0, этап 3 T3.3). UM_FBX_v1 не корректирует оси костей (primary Y, secondary X), экспорт поворачивает rest-позу жёстко (`roll=True`), а импорт FBX в UE зеркалит Y каждой локальной трансформы. Поэтому смещение сокета в UE bone space = (x, −y, z) смещения в пространстве кости Blender. С живым замером Medusa это согласуется: UE (0, 0, 4) на вертикальной кости `head` дало точку в 4 uu впереди. Знак вдоль кости (y) пока не измерен. Build героев пишет цель, смещение в кости Blender и прогноз (`sockets[].offset_ue_bone_local_uu_predicted`); ue-import ставит прогноз, если в профиле `location_uu: null`. Head, uu: Arthur (-0,151; 4,127; 0,048) → (-0,151; -4,127; 0,048) (цель в UE (-0,169; 0,151; 49,921)); Merlin (0,019; 2,026; 0,255) → (0,019; -2,026; 0,255) (цель в UE (0,195; -0,019; 37,893)); Harpy (-0,406; 4,028; 2,226) → (-0,406; -4,028; 2,226) (цель в UE (5,232; 0,485; 33,063)). Проверка — живой `get_socket_location(Head)` против цели ±0,05 uu на UE-этапе героев.
+
 ## 8. Совместимость с UE Mannequin и автоматическими ригами
 
 - Скелет **не совместим напрямую** с UE5 Mannequin (у Manny около 90 костей) и с Mixamo. Клипы оттуда переносятся только ретаргетом: IK Retargeter в UE или перекладка в Blender. Карты имён лежат в `rig-contract.json` → `retarget_maps` (`tripo_ue5_mannequin_to_um17`, `mixamo_to_um17`, `smpl_to_um17`). Лишние кости (spine_01/02, neck, clavicle, twist, пальцы) сворачиваются в родителя.

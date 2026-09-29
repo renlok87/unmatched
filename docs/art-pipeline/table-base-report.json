@@ -1,0 +1,250 @@
+{
+  "schema": "unmatched.asset-stage-report/1",
+  "asset": "ASSET-TABLE-BASE-001",
+  "stage": "tripo",
+  "runDir": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31",
+  "status": "blocked (0 кредитов); статусы ассета не повышались — реестр: предложено",
+  "blockedReason": "blocked: платный шаг не выполнен. Подтверждение траты есть только в тексте задачи оркестратора (цитата пользователя), напрямую от пользователя в этой сессии его нет. Все бесплатные шаги выполнены",
+  "creditsSpent": {
+    "tripo": 0,
+    "syntx": 0
+  },
+  "idempotencyCheck": {
+    "observedAt": "2026-09-28 ~22:25 (локально)",
+    "tripoBalanceUi": 24335,
+    "ledgerTripoBalanceEnd": 24335,
+    "ledgerEntriesForAsset": 0,
+    "studioAssetListNewest": "09-28 10:55 (время UI Studio). Совпадает с последней записью журнала 15:55:40 (Harpy PBR) при сдвиге UTC+5",
+    "conclusion": "Баланс в UI равен balanceEndUi журнала. Записей ASSET-TABLE-BASE-001 в журнале нет. Самая новая строка в списке ассетов Studio — Harpy. Значит, платных заданий основания сегодня не было. Studio открывалась только на чтение, в своей вкладке: без загрузок и без кликов по платным кнопкам. Вкладка закрыта. Чужую вкладку группы (task 5cb29330…) не трогал."
+  },
+  "boardSizeAssumption": {
+    "status": "предложено",
+    "source": "ART-005 wood-uv-ue-report.json: у SM_ART005_BoardStoneV4_WoodUV bounds_uu [656, 556, 36]. README ART-005: клетка 100 uu (S04 5×6), игровая плоскость Z=0, неровность ≤1,2 uu и не выше Z=0; после поворота актора длинная сторона = 6 рядов",
+    "board": {
+      "lengthUu": 656,
+      "widthUu": 556,
+      "thicknessUu": 36,
+      "assumedZRangeUu": [
+        -36,
+        0
+      ],
+      "measuredZRangeUu": [
+        -31.0,
+        5.0
+      ],
+      "measuredNote": "Blender-этап: замер FBX по всем 35 частям (blenderStage.boardMeasured). assumedZRangeUu оставлен как запись Tripo-этапа"
+    },
+    "tray": {
+      "rimUu": 50,
+      "outerUu": [
+        756,
+        656
+      ],
+      "topZUu": -3,
+      "rimRangeUu": "40–60 (04 §3.6, предложено)",
+      "topZRangeUu": "0…−4 (04 §3.6, предложено)"
+    },
+    "note": "Финальный габарит доски не зафиксирован (AD-OPEN-36). Если он изменится, на Blender-этапе меняется только масштаб XY. Скала аморфна, поэтому неравномерный масштаб XY до ~4 % допустим. Pivot — центр доски, Z=0."
+  },
+  "inputs": {
+    "chosen": "rock-white",
+    "files": {
+      "front": {
+        "rock-white": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-front-rock-white.png",
+          "sha256": "0129a50cf3fe644866b22f4a4d61bc04826d2f798429fb9a13de774d43063236",
+          "innerEdgeCloseToBgFrac": 0.0
+        },
+        "rock-alpha": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-front-rock-alpha.png",
+          "sha256": "f5a64dbf450086f6b67f54252d85f832caed8f07e6b39ca8d5398843aace4cfb",
+          "innerEdgeCloseToBgFrac": null
+        },
+        "full-white": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-front-full-white.png",
+          "sha256": "2cca035d640f74657d81a00f7c569367712ab3e65b4414de76bb5ca6c66a422b",
+          "innerEdgeCloseToBgFrac": 0.0
+        }
+      },
+      "left": {
+        "rock-white": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-left-rock-white.png",
+          "sha256": "048b3f90e994b6430eb3a777dad2ad1c9955b17786fbe2e9349f72ca7e30dc0c",
+          "innerEdgeCloseToBgFrac": 0.0
+        },
+        "rock-alpha": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-left-rock-alpha.png",
+          "sha256": "f7f456d784adfce75c3f7af1962a8842b7dc9dd0829f824507db87a4b9db8802",
+          "innerEdgeCloseToBgFrac": null
+        },
+        "full-white": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-left-full-white.png",
+          "sha256": "1f2427c014ca3116c6a568ede59163dc9625585c7c30704af7d3b9c93c7e62c4",
+          "innerEdgeCloseToBgFrac": 0.0
+        }
+      }
+    },
+    "why": [
+      "Генерируется только скальный низ (реестр sourceImages.note; generation-inputs selectionNote). У доски ART-005 уже есть своя деревянная рамка с уголками, рамка подноса их бы продублировала. Поэтому всё выше низа рамки и её контактной тени заменено фоном: front y<768, side y<767.",
+      "WARN T2 (серая кромка на фоне #808080) снят локально, без перерисовки. Фон исходников ровно #808080: так окрашены 100 % пикселей по краю кадра. Фон — область, связная с краем кадра, где max|RGB−128|≤2. Внутренние серые пиксели скалы (60 и 127 шт.) с краем не связаны и остаются частью объекта. Фон заменён на #FFFFFF, и у новой кромки 0 % пикселей ближе 30 к фону.",
+      "SYNTX и imagegen не понадобились: пиксельно точная маска бесплатна и не меняет форму скалы.",
+      "Оба вида сдвинуты на одинаковые dy=−330 px, масштаб не менялся. Согласованность ширины и базовой линии T2 сохранена: ширина скалы front 655 px, side 787 px, отношение 1,20 = 6:5."
+    ],
+    "dryRunPackage": {
+      "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/generation-request/generation-requests/ebc1825353e8bd8d.json",
+      "requestKey": "ebc1825353e8bd8de44c54a3d4b0fbfebc73907178d325e8aba7fcd6ecd95a72",
+      "exit": 0,
+      "problems": 0,
+      "duplicates": 0,
+      "note": "prepare-generation работает только в run-каталоге после init. У ассета ещё нет исходника, поэтому run generation-request создан с --primary-source tripo-pending — только ради пакета. Для CLI-прогонов кандидата нужен новый run-каталог"
+    }
+  },
+  "targets": {
+    "trianglesLod0": "10–20k (04 §3.6, предложено)",
+    "retopologyTarget": "Quad, Smart Mesh, цель ≈7 000 faces (≈14k tris после триангуляции). Решение исполнителя: середина бюджета 10–20k. Шипы скалы — главный силуэт при отдалении 0,65× и при слежении за ближним рядом (в K1 скала спереди за кадром, см. blenderStage.gameFrame16x9), плюс нужен запас на срез и крышку в Blender",
+    "textures": "2K (04 §3.6: «2K; 1 материал»), BC/N/ORM",
+    "slots": "1 (скала). В 04 §3.6 противоречие: «1–2 слота» и «1 материал» (AD-CNF-18). На входе только скала, второй слот не нужен",
+    "depth": "На входах глубина скалы ≈150 px, то есть ≈150 uu при масштабе ширины ~1 uu/px. 04 §3.6 предлагает толщину 30–50 uu и обрыв края в 30–60 uu от игровой плоскости. Конфликт референса и 04 решается Z-масштабом на Blender-этапе по кадрам игровой камеры 16:9 (K1, зум 0,65×, слежение за ближним рядом на 1,2×; blenderStage.gameFrame16x9)",
+    "pivot": "центр доски, Z=0 (04 §3.6); верх подноса Z=−3",
+    "collision": "нет (04 §3.6)"
+  },
+  "paidPlan": {
+    "note": "Цены взяты из журнала прошлых прогонов (Merlin, Harpy, бочка), а не с кнопки. Перед каждым кликом прочитать цену с кнопки. В режиме по умолчанию (одно изображение, текущие настройки) кнопка «Создать» при чтении показывала 65",
+    "multiviewH31": 55,
+    "segment": "пропустить: нужен цельный меш, а Smart UV отказывает многочастным моделям (опыт Merlin/Harpy)",
+    "retopologyQuad": 40,
+    "smartUv": 20,
+    "texture2k": 10,
+    "pbr": 5,
+    "expectedTotal": 130,
+    "cap": 250,
+    "regenerationRule": "Перегенерация — только с записанной причиной (срезана кромка или вздут верх → вариант full-white). С ней итог ≤185"
+  },
+  "stagePlan": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/tripo-stage-plan.json",
+  "scripts": [
+    "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/make_tripo_inputs.py",
+    "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/tripo_ledger_append.py"
+  ],
+  "deferredUe": [
+    "ue-import в /Game/PipelineCandidates/TableBase/<run> (коллизия none)",
+    "кадр K1 в 16:9 (плюс зум 0,65× и слежение за ближним рядом на 1,2×): за краем нет читаемых объектов, нет z-fighting с доской (верх −3 против ближайшей горизонтали доски −1,2)",
+    "поворот актора подноса как у доски ART005F; замер каймы 40–60 uu"
+  ],
+  "stagesCovered": [
+    "tripo",
+    "blender"
+  ],
+  "blenderStage": {
+    "status": "blocked: исходного меша нет (этап Tripo остановлен, 0 кредитов). Кандидат не собирался; статус ассета не повышался",
+    "creditsSpent": {
+      "tripo": 0,
+      "syntx": 0
+    },
+    "sourceSearch": "нет source/ в run-каталоге; в «Загрузках» GLB основания нет (самые новые — Medusa 09-27); записей в журнале кредитов нет",
+    "plan": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/blender-stage-plan.json",
+    "boardMeasured": {
+      "status": "измерено",
+      "file": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/board-art005-fbx-bounds.json",
+      "fbxSha256": "445f514ac9b6a5899746c8c6db64cd25a793b5ed3fa505303cf27d296df030c2",
+      "sizeUu": [
+        656.0,
+        556.0,
+        36.0
+      ],
+      "boundsUu": {
+        "min": [
+          -328.0,
+          -278.0,
+          -31.0
+        ],
+        "max": [
+          328.0,
+          278.0,
+          5.0
+        ]
+      },
+      "longAxis": "X (кадр экспорта = UE X)",
+      "correction": "Tripo-этап взял Z доски −36…0; замер FBX: −31…+5 (рама на 5 uu выше игровой плоскости). XY 656×556 подтверждён, допущение подноса не меняется"
+    },
+    "zFightingPrecheck": {
+      "status": "измерено",
+      "trayTopZUu": -3.0,
+      "nearestBoardHorizontalFacesUu": [
+        {
+          "z": -1.2,
+          "part": "StoneTile",
+          "gap": 1.8
+        },
+        {
+          "z": -7.0,
+          "part": "Rock_Undertray",
+          "gap": 4.0
+        },
+        {
+          "z": -11.0,
+          "part": "Frame (низ)",
+          "gap": 8.0
+        }
+      ],
+      "thresholdUu": 0.5,
+      "result": "компланарных граней нет"
+    },
+    "tools": {
+      "candidate": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_candidate.py",
+      "preview": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_preview.py",
+      "boardMeasure": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/measure_board_fbx.py",
+      "smokeInputOnly": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/smoke_synthetic_tray_glb.py",
+      "paramsTemplate": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_params.template.json",
+      "buildProfile": "art/pipeline-candidates/ASSET-TABLE-BASE-001/build-profiles/table-base-static-um-fbx-v1.json",
+      "readback": "tools/tripo-pipeline/blender/check_static_prop_fbx.py (не изменялся)",
+      "helpers": "tools/tripo-pipeline/blender/static_prop_candidate.py (не изменялся)"
+    },
+    "smokeTest": {
+      "note": "синтетический Tripo-подобный GLB — не кандидат и не арт; выходы вне репозитория (C:/tmp/table-base-blender/smoke, превью 16:9 — C:/tmp/table-base-blender/preview16x9). Это не закоммиченное доказательство: воспроизводится из закоммиченных скриптов, хэши в blender-stage-plan.json",
+      "checks": "13/13 (шаблонные параметры) и 13/13 (длинная сторона по X + depth_uu 60)",
+      "deterministic": "повторный прогон: FBX и BC/N/ORM побайтно совпали",
+      "readback": "1 меш, 13 872 tris, 1 слот, UV0, 0 открытых/неманифолдных рёбер, верх −3,0 uu",
+      "rimFlatTopUu": {
+        "min": 49.5,
+        "p50": 49.5,
+        "resolution": 0.5
+      },
+      "previews": "Исправлено 2026-09-28: первая версия превью рендерила «K1» в 4:3 (1200×900, половина вертикального FOV 13,30°), а игровой кадр 16:9 (половина 10,06°). Прежний вывод «на 12 м K1 режет только ближний край подноса, на 18,5 м поднос виден целиком» неверен. Теперь кадры игровой камеры 16:9 (1200×675), 4:3 — только контекст с пометкой notK1 и полосой 16:9. Просмотрены через Read: BC/N/ORM подключены, шипы вниз, доска лежит на подносе. Замер кадра — blenderStage.gameFrame16x9",
+      "recheckAfterPreviewFix": "table_base_candidate.py по шаблону на той же синтетике: 13/13, FBX 21e46212…, BC 1201f007…, N 9f4c030d…, ORM 016fd10e… — побайтно как раньше; check_static_prop_fbx.py: 1 меш, 0 открытых/неманифолдных рёбер, верх −3,0"
+    },
+    "openDecisions": [
+      "Глубина Z по кадрам 16:9 на реальном меше (near_skirt_limit в <имя>_preview.json): 04 — 30–50 uu, референс ≈150 uu. В K1 скала спереди за кадром; на 0,65× видны верхние ≈45–56 uu; при слежении за ближним рядом на 1,2× — до ≈134 uu",
+      "Rock_Undertray доски дублирует поднос под доской — решение ART-005",
+      "ue-import CLI жёстко проверяет pivot «низ = 0, центр габарита» — для подноса нужна доработка tripo_pipeline.py (followup)"
+    ],
+    "gameFrame16x9": {
+      "status": "измерено (синтетика по шаблону; геометрия кадра от меша не зависит, доли вершин — зависят)",
+      "script": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_preview.py → <имя>_preview.json (measure по каждому кадру 16:9)",
+      "frame": "16:9 1200×675, FOV_h 35 (sensor_fit HORIZONTAL), FOV_v 20,11°, половина 10,06°; pitch −55; камера на экспортной −Y; поворот актора доски не применён. Источник: 03 §2 (предложено), 04 §4.4",
+      "defectFixed": "прежние кадры «K1» были 4:3 (половина FOV_v 13,30°): по высоте на 25 % больше игрового кадра",
+      "bandCheck": "центральная полоса 675 строк кадра 4:3 = кадр 16:9: средняя |разница| 1,08…1,16 (шум JPEG), при сдвиге на 20 строк 7,6…9,2",
+      "k1_south_12m": {
+        "trayTopOutline": "срезан со всех четырёх сторон: ближний край −14,93°, дальний +10,87°, боковые ±20,44° (полукадр ±10,06° / ±17,5°); в кадре 69 % вершин контура",
+        "nearSkirt": "не видна: ближний край верха (y −328) уже за нижним краем кадра",
+        "board": "ближний край срезан: край bbox (y −278, z +5) −12,24°; рама спереди за кадром; дальний край bbox +9,66° в кадре; в кадре 94 % вершин доски",
+        "boardTiles": "ближний ряд клеток срезан: игровая плоскость видна по центральной колонке от y −231,1 до +296,7 uu, клетки −249,25…+249,25 (≈18 uu ближнего ряда за кадром); в кадре 96 % вершин клеток"
+      },
+      "zoom065_south_18_5m": {
+        "trayTopOutline": "целиком в кадре: −9,25°…+7,47°",
+        "nearSkirt": "в кадре до 56,3 uu ниже верха (Z −59,3 на краю y −328); Z −150 на том же краю — 11,26° ниже оси; нижняя точка синтетики (−263) — 12,92°",
+        "board": "целиком в кадре"
+      },
+      "follow_nearrow_zoom12_10m": {
+        "target": "центр ближнего ряда клеток (0, −199,25, 0); 03 §2: при зуме ≥1,2× камера центрируется на выбранном объекте; дистанция 12/1,2",
+        "nearSkirt": "в кадре до 134,3 uu ниже верха (Z −137,3)",
+        "trayTopOutline": "ближний край в кадре (−6,58°), дальний и боковые срезаны"
+      },
+      "follow_nearrow_zoom16_7_5m": {
+        "nearSkirt": "в кадре до 30,7 uu ниже верха (Z −33,7)",
+        "trayTopOutline": "ближний край в кадре (−8,98°), дальний и боковые срезаны"
+      },
+      "depth60Synthetic": "контур до y −333: скала спереди в кадре до 44,9 uu ниже верха на 18,5 м, целиком (до −63) на 1,2× со слежением, до 19,4 uu на 1,6×",
+      "conclusion": "при камере на центре доски скалу спереди видно только на отдалении (верхние ≈45–56 uu); глубже всего её показывает слежение за ближним рядом на 1,2× (до ≈134 uu). Глубину выбирать по этим кадрам, не по K1"
+    }
+  }
+}

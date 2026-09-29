@@ -29,6 +29,7 @@ Env:
 """
 
 import json
+import re
 import math
 import os
 import struct
@@ -47,6 +48,31 @@ def load():
 
 def save(state):
     Path(os.environ["FAKE_UE_STATE"]).write_text(json.dumps(state, indent=1, sort_keys=True), encoding="utf-8")
+
+
+CONSOLE_SNAPSHOT = ('window "Unmatched" [pos=0,0 size=100,100] [ref=w1]\n  text "Cmd" [pos=1,90 size=20,10] [ref=x1]\n'
+                    '  textbox [pos=22,90 size=60,10] [ref=t7]\n')
+
+
+def editor_python(state, text):
+    """`py "<script>" <args.json>` typed into the console: only the CLI's vertex-colour base import is emulated."""
+    m = re.match(r'py "([^"]+)" (\S+)$', text)
+    if not m:
+        return "unsupported console command"
+    script, args_path = Path(m.group(1)), Path(m.group(2))
+    a = json.loads(args_path.read_text(encoding="utf-8"))
+    res = {"vertex_color_import_option": "Replace"}
+    if "static FBX import WITH vertex colours" not in script.read_text(encoding="utf-8"):
+        res["error"] = "fake editor: unknown script %s" % script.name
+    else:
+        vcio = "Ignore" if os.environ.get("FAKE_UE_EDITOR_PY_DROPS_VC") == "1" else "Replace"
+        created, error = mesh_import(state, "editor_toolset.toolsets.static_mesh.StaticMeshTools", a, vcio=vcio)
+        if error:
+            res["error"] = "RuntimeError: %s" % error
+        else:
+            res["imported"] = [obj(p)["refPath"] for p in created]
+    Path(a["out"]).write_text(json.dumps(res), encoding="utf-8")
+    return None
 
 
 def pkg(ref):
@@ -98,7 +124,7 @@ def ue_bounds(authored, theta):
     return [min(xs), min(ys), authored["min"][2]], [max(xs), max(ys), authored["max"][2]]
 
 
-def mesh_import(state, toolset, args):
+def mesh_import(state, toolset, args, vcio="Ignore"):
     fbx = Path(args["source_file"])
     run = fbx.parent.parent
     state["log"].append("LogFbx: Loading FBX Scene from %s" % fbx.as_posix())
@@ -147,6 +173,10 @@ def mesh_import(state, toolset, args):
                   "slots": ["M_%d" % i for i in range(rt["material_count"])], "source": str(fbx),
                   # the export report already gives the size per UE axis (UM_FBX_v1 export frame)
                   "bounds": {"min": {"x": -x / 2, "y": -y / 2, "z": 0}, "max": {"x": x / 2, "y": y / 2, "z": z}}}
+    if record["class"] == "StaticMesh":
+        # MCP StaticMeshTools.import_file leaves VertexColorImportOption at Ignore (measured live 2026-09-28, T3.1);
+        # the editor-Python import of the CLI (UE_PY_IMPORT_STATIC_VERTEX_COLOURS) asks for Replace
+        record["vcio"] = vcio
     final, error = new_asset(state, args["folder_path"], args["asset_name"], record)
     if error:
         return None, error
@@ -206,6 +236,14 @@ def main(argv):
         return done(ok)
     if short == "is_dirty":
         return reply(bool(assets.get(pkg(args["asset_path"]), {}).get("dirty")))
+    # ---- SlateInspectorToolset (editor console)
+    if short == "Snapshot":
+        return reply(CONSOLE_SNAPSHOT)
+    if short == "Type":
+        error = editor_python(state, args["text"])
+        if error:
+            return reply(error=error)
+        return done(True)
     # ---- LogsToolset
     if short == "GetLogEntries":
         return reply(list(state["log"]))
@@ -244,10 +282,15 @@ def main(argv):
             mesh = assets[pkg(key)]
             agg = {"sphereElems": [], "boxElems": [], "sphylElems": [], "convexElems": [{}] * mesh.get("convex", 0)}
             return reply(json.dumps({"AggGeom": agg, "CollisionTraceFlag": "CTF_UseDefault"}))
+        if key.endswith(":FbxStaticMeshImportData_0"):
+            return reply(json.dumps({p: assets[pkg(key)].get("vcio") if p == "VertexColorImportOption" else None
+                                     for p in args["properties"]}))
         key = pkg(key) if ":" not in key else key
         values = dict(props.get(key, {}))
         if "BodySetup" in args["properties"] and assets.get(key, {}).get("class") == "StaticMesh":
             values["BodySetup"] = {"refPath": obj(key)["refPath"] + ":BodySetup_0"}
+        if "AssetImportData" in args["properties"] and assets.get(key, {}).get("class") == "StaticMesh":
+            values["AssetImportData"] = {"refPath": obj(key)["refPath"] + ":FbxStaticMeshImportData_0"}
         return reply(json.dumps({p: values.get(p) for p in args["properties"]}))
     # ---- MaterialTools / MaterialInstanceTools
     if short == "create_material":
@@ -330,6 +373,9 @@ def main(argv):
     if short == "get_socket_names":
         return reply([s["name"] for s in mesh["sockets"]])
     if short == "add_socket":
+        if "bones" in mesh and args["bone_name"] not in mesh["bones"]:
+            # live UE 5.8 (Harpy candidate 2026-09-28): 'Bone "foot.R" not found on SK_Harpy_Candidate.'
+            return reply(error='Bone "%s" not found on %s.' % (args["bone_name"], pkg(args["mesh"]).rsplit("/", 1)[-1]))
         mesh["sockets"].append({"name": args["socket_name"], "bone": args["bone_name"],
                                 "transform": {"location": {"x": 0, "y": 0, "z": 0},
                                               "rotation": {"pitch": 0, "yaw": 0, "roll": 0},

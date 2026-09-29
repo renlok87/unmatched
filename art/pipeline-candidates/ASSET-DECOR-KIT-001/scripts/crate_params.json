@@ -1,0 +1,62 @@
+{
+  "schema": "unmatched.decor-crate.params/1",
+  "asset_id": "ASSET-DECOR-KIT-001.CRATE",
+  "run_id": "20260928-crate-manual-v1",
+  "out_dir": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "reference": {
+    "path": "art/imagegen/mvp-v1/environment/ref-crate.png",
+    "sha256": "c00523e78d62d013ecc745295d104094c626031e3be0e5af2e4a9d87c625f440",
+    "use": "visual reference only (proportions: X-brace on front, 4 horizontal planks on the side, corner posts with iron studs, planked top; colour sampling). Nothing is traced or projected from it."
+  },
+  "note": "Hand-built (scripted) Blender model, no Tripo/SYNTX (registry nextStep: 'Простая ручная модель 25 uu'). All sizes are PROPOSED (04:241 'ящик (25 uu)', 17:734), not budgets. Units below: uu (= cm); the script builds in Blender metres. Blender frame: front = -Y (04 §1) -> +X in UE after UM_FBX_v1. Style B Painted Miniature (03, ART-002): large chamfers, painted wood with light worn edges, iron corner caps and studs as the only metal accent.",
+  "asset_name": "SM_Decor_Crate",
+  "material_name": "M_Decor_Crate",
+  "texture_prefix": "T_Decor_Crate",
+  "texture_px": 1024,
+  "size_uu": 25.0,
+  "geometry_uu": {
+    "post": {"outer": 11.8, "inner": 9.0, "z": [0.25, 24.75], "bevel": 0.45},
+    "cap": {"outer": 12.05, "inner_overlap": 0.2, "height": 3.0, "bevel": 0.3},
+    "plank": {"outer": 11.0, "inner": 10.0, "span": 9.3, "z": [0.5, 24.3], "count": 4, "bevel": 0.3},
+    "rail": {"outer": 11.6, "inner": 10.9, "span": 9.3, "bottom_z": [0.5, 4.0], "top_z": [20.8, 24.3], "bevel": 0.3},
+    "brace": {"outer_main": 11.45, "outer_split": 11.35, "inner": 10.9, "width": 2.6, "tuck": 0.3, "split_under": 0.2, "bevel": 0.2},
+    "top_plank": {"z": [23.3, 24.3], "extent": 10.0, "count": 4, "bevel": 0.3},
+    "stud": {"segments": 8, "sink": 0.1, "base_r": 0.75, "profile_r_h": [[0.7, 0.0], [0.62, 0.2], [0.4, 0.38]], "apex_h": 0.45}
+  },
+  "hidden_faces": {
+    "method": "BVH ray casts (max 1 m) from a barycentric sample grid (<= sample_spacing_uu) over each face, directions = upper half of a Fibonacci sphere inside the face's hemisphere (normal first); rays with a downward component count as blocked by the ground (z = 0). Hidden = no ray escapes from any sample. First run with 5 samples per face missed plank areas visible between the X braces (red in the hidden-check preview) -> grid sampling.",
+    "directions": 256,
+    "sample_spacing_uu": 0.5,
+    "uv_scale_for_hidden_only_islands": 0.25
+  },
+  "uv": {"pack_margin_px": 8,
+         "note": "Exact per-part box projection: each face onto the plane of the part-frame axis closest to its normal (unmirrored); visible stud domes one projection along the stud axis; island key (part, axis, sign, hidden) so no island mixes hidden and visible faces; hidden-only islands x0.25; pack. Smart UV (66 deg) was tried first: its averaged projection vectors gave flat plank faces anisotropy ~1.28 (p50) once they counted as visible. Packing: in-script deterministic skyline packer (>= 8 px between island boxes, >= 4 px to the edge); bpy.ops.uv.pack_islands (CONCAVE and AABB both ~47 % coverage) jittered at ~1e-6 between runs, so FBX/PNG bytes were not reproducible."},
+  "bake": {
+    "device": "CPU", "seed": 0, "margin_px": 16,
+    "emit_samples": 16, "normal_samples": 16, "ao_samples": 64, "ao_distance_m": 0.04,
+    "ao_in_basecolor_strength": 0.35,
+    "ao_note": "С-4: light/shadow baked into albedo moderately -> BC x (1 - 0.35 x (1 - AO)); ORM.R keeps the full AO (UE uses material AO only for indirect/sky light)."
+  },
+  "palette_srgb": {
+    "wood_mid": [84, 72, 62],
+    "wood_blotch": [68, 58, 51],
+    "wood_dark": [50, 43, 38],
+    "wood_light": [148, 128, 108],
+    "iron_dark": [50, 50, 53],
+    "iron_mid": [70, 69, 71],
+    "iron_light": [128, 124, 120],
+    "note": "Ref crate (lit concept) side planks median sRGB 75,68,62, front X board 84,74,67, stud highlight ~115,109,105; 03 С-5 old wood #4A3A2C-#5C4838 (74,58,44 - 92,72,56). Wood mid sits between them; low saturation for С-9 (decor cooler/muted than the game layer)."
+  },
+  "surface": {
+    "roughness_wood": 0.84, "roughness_wood_streak_add": 0.06, "roughness_worn_edge_sub": 0.08,
+    "roughness_iron": 0.64, "metallic_iron": 0.6,
+    "note": "С-3: roughness >= 0.6 on >= 90 % of the area, metallic 0 except the iron accent."
+  },
+  "preview": {
+    "board_tile_uu": 94, "board_tiles_x": 6, "board_tiles_y": 5,
+    "crate_xy_m": [3.27, 1.25], "barrel_xy_m": [3.29, 1.57], "close_up_distance_m": 1.4,
+    "barrel_fbx": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p15-barrel/export/SM_Decor_Barrel.fbx",
+    "note": "Crate and barrel on the east tray margin (tiles end at x = 3.0 m), in the far half so the exact K-1 frame shows them; the barrel stands behind the crate (camera looks along +Y) so it does not hide the crate (03 §4.4: no vertical decor on the near side). A layout suggestion for the preview only; placement belongs to ART-009 / AD-OPEN-16."
+  }
+}
