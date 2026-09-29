@@ -14,19 +14,19 @@
 //   - input plan parsing for the flag-driven input emulation (src=flag),
 //     combat icon size parsing (24/32/48 px), exactly-once damage numbers per
 //     (fighter, seq), all-Medusa eligibility.
-// FS08ArtHudRuntime holds the Slate widgets and per-frame state of the game
-// mode; it has no reflection and no UObject references of its own.
+// FS08ArtHudRuntime holds the views (W4-C: UMG widget classes by default, the
+// T2.2 Slate widgets behind -ArtHudImpl=slate - S08ArtHudViews.h) and the
+// per-frame state of the game mode; it has no reflection and no UObject
+// references of its own (the game mode keeps the UMG widgets referenced).
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Styling/SlateBrush.h"
 #include "Widgets/Layout/SConstraintCanvas.h"
 
-class SBorder;
-class SBox;
-class SImage;
-class STextBlock;
-class SVerticalBox;
+class IS08ArtIconView;
+class IS08ArtPlateView;
+class SWidget;
 
 // ---------------------------------------------------------------- camera zoom
 
@@ -199,6 +199,13 @@ FString FormatCells(const TArray<FIntPoint>& Cells);
 FString FormatRect(const FS08ScreenRect& Rect);
 /** Stable cell order for traces: row-major (y, then x). */
 void SortCells(TArray<FIntPoint>& Cells);
+/** W4-C trace gate line of one painted widget part:
+ *  "SHOT widget id=<id> impl=<umg|slate> state=<state> fighter=<id|none>
+ *   bbox=(x0,y0,x1,y1) geom=<painted|unpainted> visible=0|1 twin=0|1 source=<src>"
+ *  (unpainted -> zero bbox, never a pass). "SHOT widget" deliberately shares
+ *  no prefix with the qa010 lines (SHOT plate/icon/reachable, PLATE, ICON). */
+FString FormatWidgetLine(const FString& Id, const TCHAR* Impl, const TCHAR* State, const FString& Fighter,
+                         const FS08ScreenRect& Rect, bool bPainted, bool bTwin, const FString& Source);
 
 /** The plate/selection rule: destination cells = legal cells minus the
  *  selected fighter's own cell (the zero-step resolve is not a click target:
@@ -253,24 +260,42 @@ struct FS08SeqDedupe {
   bool Accept(const FString& FighterId, int32 Seq);
 };
 
-/** Plate status chips (ASCII: the default Slate font path, no Cyrillic risk). */
+/** Plate status CODES (HERO, SIDEKICK, MELEE, ATTACKER, TARGET, effects): the
+ *  trace keeps them as is; the plate shows their string-table text
+ *  (S08ArtHudText::PlateStatuses, W4-C). */
 TArray<FString> S08PlateStatuses(bool bIsHero, bool bOwn, const FString& AttackType,
                                  bool bAttacker, bool bTarget,
                                  const TArray<FString>& Effects);
 
 // ------------------------------------------------------------------ runtime
 
-/** Slate widgets + per-frame state of the art HUD (owned by the game mode). */
+/** Views + per-frame state of the art HUD (owned by the game mode). */
 struct FS08ArtHudRuntime {
+  // W4-C: -ArtHudImpl=umg (default) | slate | compare | alternate. [0] shown
+  // (alternate: [ActiveView]); compare: [1] = Slate twin (opacity 0, same slot
+  // geometry) whose parts are traced next to the UMG ones on every SHOT.
+  uint8 Impl = 0;                     // ES08ArtHudImpl
+  TArray<TSharedPtr<IS08ArtPlateView>> PlateViews;
+  TArray<TSharedPtr<IS08ArtIconView>> IconViews;
+  bool bTextTableReady = false;
+  // Compare mode: periodic same-frame parity samples ("HUD sample=N SHOT widget ...").
+  int32 CompareSamples = 0;
+  float NextCompareSampleAt = 0.0f;
+  // Alternate mode: index of the visible view pair (0 = UMG, 1 = Slate), the
+  // next swap time, frames since the last swap (perf skips the first frames).
+  int32 ActiveView = 0;
+  float AlternateSeconds = 3.0f;
+  float AlternateStartAt = 0.0f;     // no A/B before (the evidence shot + settle)
+  int32 AlternateFirst = 0;          // 0 = UMG first, 1 = Slate first
+  bool bAlternateStarted = false;
+  float NextSwapAt = -1.0f;
+  int32 FramesSinceSwap = 0;
+  int32 Swaps = 0;
+  /** Views drawn to the viewer: all in umg/slate/compare (the compare twin is
+   *  drawn at opacity 0), only ActiveView in alternate. */
+  bool IsViewShown(int32 Index, bool bAlternate) const { return !bAlternate || Index == ActiveView; }
+
   // Plate (name / HP / statuses) of the selected or hovered fighter.
-  TSharedPtr<SBorder> PlateBorder;
-  SConstraintCanvas::FSlot* PlateSlot = nullptr;
-  TSharedPtr<STextBlock> PlateName;
-  TSharedPtr<STextBlock> PlateHp;
-  TSharedPtr<SBox> PlateHpFill;
-  TSharedPtr<SBorder> PlateTeamChip;
-  TSharedPtr<STextBlock> PlateTeamText;
-  TSharedPtr<STextBlock> PlateStatusText;
   FString PlateFighterId;
   FString PlateContentKey;
   FString PlateSignature;             // inputs of the last placement search
@@ -286,9 +311,7 @@ struct FS08ArtHudRuntime {
   float PlateLastTraceAt = -1.0f;
 
   // Screen-space combat icon (24/32/48 px, exact-size texture, no mips).
-  TSharedPtr<SImage> Icon;
-  SConstraintCanvas::FSlot* IconSlot = nullptr;
-  FSlateBrush IconBrush;
+  FSlateBrush IconBrush;              // source brush; each icon view draws a copy
   int32 IconSize = 32;
   bool bIconTextureReady = false;
   bool bIconProbe = false;
@@ -302,7 +325,7 @@ struct FS08ArtHudRuntime {
   FVector2D FirstMouse = FVector2D(-1.0, -1.0);
   bool bMouseMoved = false;
 
-  // HUD panels as soft obstacles.
+  // HUD panels (S09 Slate HUD, GD-047 moves them to UMG) as soft obstacles.
   TWeakPtr<SWidget> CommandPanel;
   TWeakPtr<SWidget> SidePanel;
   TWeakPtr<SWidget> HandPanel;

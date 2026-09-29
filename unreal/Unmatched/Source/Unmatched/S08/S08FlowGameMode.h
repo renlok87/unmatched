@@ -29,6 +29,7 @@ class SVerticalBox;
 class SHorizontalBox;
 class AS08BoardActor;
 class ACameraActor;
+class UUserWidget;
 
 /** Bounded auto-send accounting for one command head (S10 review P1(1)):
  *  attempts are counted ONLY when the command actually left the client - a
@@ -246,6 +247,10 @@ private:
   void RunArtPreviewInputPlan();
   void EmulateInputStep(ES08InputStep Step);
   void WriteArtHudShotLines();
+  /** W4-C: `SHOT widget id=<ui-id> impl=<umg|slate> ...` painted bboxes of
+   *  every plate/icon part of every view (compare mode: UMG + Slate twin).
+   *  Prefix "HUD sample=N " = the compare-mode periodic parity samples. */
+  void WriteArtHudWidgetLines(const FString& Prefix = FString());
   /** Viewport-pixel projection (same call as the SHOT fighter lines). */
   bool ProjectToViewport(const FVector& World, FVector2D& OutScreen) const;
   /** On-screen box of a fighter's visible figure (base disc to figure top). */
@@ -423,6 +428,14 @@ private:
   float S10AbortLobbyShotAtElapsed = -1.0f;
   float S10AbortLobbyNotBeforeElapsed = -1.0f; // toast cleared + settle beat
   bool bS10AbortProofComplete = false;    // early exit fired exactly once
+  // W4-A -Bench: backend-less render bench on a captured Cobble game state
+  // (Config/Bench/S08BenchCobble.json): warm-up, per-view frame/GPU timing,
+  // ProfileGPU, optional CSV GPU stats and one shot per view (K1, K2 5x) with
+  // the RENDER fingerprint. Driver: tools/art/render/render_bench.py.
+  bool bBench = false;
+  FString BenchViewerId;   // fixture player whose fighters are "own" (blue)
+  FString BenchBoardId;    // Board row id of the fixture (art profile match)
+  void RunRenderBench();
   // -S09HudProbe=<dir>: backend-less packaged probe - renders the fixture-04
   // HUD states and captures UI-inclusive shots + a Slate key-input check.
   bool bS09Probe = false;
@@ -452,6 +465,9 @@ private:
   // Keeps the exact-size combat icon textures alive while the brush uses them.
   UPROPERTY()
   TArray<TObjectPtr<UObject>> ArtHudAssets;
+  // W4-C: the UMG art HUD widgets (plate, icon) hosted in HudCanvas slots.
+  UPROPERTY()
+  TArray<TObjectPtr<UUserWidget>> ArtHudWidgets;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

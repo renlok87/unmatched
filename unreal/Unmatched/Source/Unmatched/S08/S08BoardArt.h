@@ -61,11 +61,49 @@ struct UNMATCHED_API FS08LightSpec {
   bool bCastShadows = false;
 };
 
+/** W4-A: Movable SkyLight of a profile (replaces the point "ambient", memo §1
+ *  item 3). The cubemap is a long-lat TextureCube; intensity scales it. */
+struct UNMATCHED_API FS08SkySpec {
+  bool bSet = false;
+  FString CubemapPath;
+  float Intensity = 1.0f;
+  FLinearColor Color = FLinearColor::White;  // linear
+  bool bLowerHemisphereIsBlack = false;
+  FLinearColor LowerHemisphereColor = FLinearColor::Black;
+};
+
+/** W4-A: fixed exposure of a profile (unbound post-process volume, histogram
+ *  with min == max brightness + bias; the range is never widened). */
+struct UNMATCHED_API FS08ExposureSpec {
+  bool bSet = false;
+  float MinBrightness = 1.0f;
+  float MaxBrightness = 1.0f;
+  float Bias = 0.0f;
+  float Ev100 = 0.0f;  // informational: 2^Ev100 == brightness (ExtendDefaultLuminanceRange off)
+};
+
+/** W4-A: key-light CSM fitted to the diorama camera (optional). */
+struct UNMATCHED_API FS08KeyShadowSpec {
+  bool bSet = false;
+  float DistanceUU = 0.0f;       // DynamicShadowDistanceMovableLight
+  int32 Cascades = 0;            // DynamicShadowCascades
+  float ContactShadowLength = 0.0f;
+};
+
 struct UNMATCHED_API FS08LightProfile {
   FString Id;
   bool bHasDirectional = false;
   FS08LightSpec Directional;
   TArray<FS08LightSpec> Points;
+  /** W4-A G01 units: "candelas" for points, "lux" for the directional. Both
+   *  empty = a pre-W4 profile: points spawn Unitless as the old packaged
+   *  builds did (x1/625 against the editor probes) - legacy, never reference. */
+  FString PointUnits;
+  FString DirectionalUnits;
+  bool HasPhysicalUnits() const { return PointUnits == TEXT("candelas") && DirectionalUnits == TEXT("lux"); }
+  FS08SkySpec Sky;
+  FS08ExposureSpec Exposure;
+  FS08KeyShadowSpec KeyShadow;
   /** 1 directional with shadow + <= 6 points without shadows. */
   bool BudgetOk(FString& OutReason) const;
 };
@@ -113,6 +151,8 @@ class UNMATCHED_API FS08BoardArtData {
 public:
   int32 Revision = 0;
   FString Status;
+  /** sha256 of the loaded file bytes (RENDER fingerprint), empty for ParseJson. */
+  FString SourceSha256;
   TMap<FString, FS08ZoneStyle> ZoneStyles;
   FS08ZoneStyle FallbackStyle;
   TMap<FString, FS08LightProfile> Lights;
@@ -121,6 +161,10 @@ public:
   /** <ProjectConfigDir>/ArtBoards/S08ArtBoardProfiles.json (staged as a UFS
    *  runtime dependency of the Unmatched module, see Unmatched.Build.cs). */
   static FString DefaultPath();
+  /** DefaultPath(), or -ArtBoardProfiles=<abs path> (diagnostic override:
+   *  calibration and the pre-W4 bench leg; the fingerprint marks it, and
+   *  the evidence tools never accept such frames as reference). */
+  static FString ResolvePath(bool& bOutOverride);
   /** Parses and validates the whole document. Invalid entries are reported;
    *  a light profile over budget or a board pointing at a missing light
    *  profile makes the document invalid (false). */

@@ -512,6 +512,38 @@ def check_profiles(fixtures: list[dict], profiles: dict) -> list[str]:
             errs.append(f"light {lid}: {len(pts)} point lights > 6")
         if any(p.get("castShadows") for p in pts):
             errs.append(f"light {lid}: point lights must not cast shadows")
+        errs += check_render_blocks(lid, lp)
+    return errs
+
+
+def check_render_blocks(lid: str, lp: dict) -> list[str]:
+    """W4-A render rules (engine gate memo §1 items 1 and 3, G01): explicit
+    units (points in candelas, directional in lux), a Movable SkyLight from a
+    /Game/ cubemap instead of a point 'fill' ambient, a fixed exposure
+    (histogram, min == max brightness, bias) and, if present, a CSM block."""
+    errs = []
+    units = lp.get("units") or {}
+    if units.get("point") != "candelas" or units.get("directional") != "lux":
+        errs.append(f"light {lid}: units must be {{point: candelas, directional: lux}} (G01), got {units or None}")
+    sky = lp.get("sky") or {}
+    if (sky.get("source") != "cubemap" or not str(sky.get("cubemap", "")).startswith("/Game/")
+            or not isinstance(sky.get("intensity"), (int, float)) or sky.get("intensity") <= 0):
+        errs.append(f"light {lid}: sky needs source=cubemap, a /Game/ cubemap and intensity > 0")
+    if any(p.get("role") == "fill" for p in lp.get("points") or []):
+        errs.append(f"light {lid}: a point 'fill' ambient is replaced by the SkyLight (memo §1 item 3)")
+    ex = lp.get("exposure") or {}
+    mn, mx = ex.get("minBrightness"), ex.get("maxBrightness")
+    if (ex.get("method") != "histogram-fixed" or not isinstance(mn, (int, float)) or not isinstance(mx, (int, float))
+            or mn <= 0 or abs(mn - mx) > 1e-6 or not isinstance(ex.get("bias"), (int, float))):
+        errs.append(f"light {lid}: exposure needs method=histogram-fixed, minBrightness == maxBrightness > 0 and bias")
+    elif isinstance(ex.get("ev100"), (int, float)) and abs(2 ** ex["ev100"] - mn) > 1e-3:
+        errs.append(f"light {lid}: exposure ev100 {ex['ev100']} != log2(minBrightness {mn})")
+    sh = (lp.get("directional") or {}).get("shadow")
+    if sh is not None:
+        if not (isinstance(sh.get("distanceUU"), (int, float)) and sh["distanceUU"] > 0
+                and isinstance(sh.get("cascades"), int) and 1 <= sh["cascades"] <= 4
+                and 0 <= float(sh.get("contactShadowLength", 0.0)) <= 0.1):
+            errs.append(f"light {lid}: directional.shadow needs distanceUU > 0, cascades 1..4, contactShadowLength 0..0.1")
     return errs
 
 

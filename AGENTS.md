@@ -167,7 +167,16 @@ only hides the windows; it does not avoid GPU rendering. Check effective FPS
 and GPU frame time in a packaged Development build and record GPU utilization
 for both clients together before claiming an improvement.
 
-Do not use `r.DynamicRes.TargetedGPUHeadRoomPercentage` as a GPU-usage limit
-while the project uses DX11 (`DefaultGraphicsRHI_DX11`). UE's Windows dynamic
-resolution support requires DX12 or Vulkan; even there, this setting is a
-per-process frame-time target, not a hard cap on the combined GPU percentage.
+Rendering (user decision 2026-09-28, W4-A): the project runs DX12/SM6 with
+Lumen GI and reflections (`DefaultGraphicsRHI_DX12`, PCD3D_SM6 + PCD3D_SM5
+cooked); High (`sg.*=2`) is the acceptance reference for K1-K3 and ACC-022,
+screen percentage is pinned to 100. Machines without SM6 start on the SM5
+fallback without Lumen. Every evidence SHOT carries a `RENDER` fingerprint;
+frames off `docs/art-pipeline/render-reference.json` do not count.
+Do not use `r.DynamicRes.TargetedGPUHeadRoomPercentage` as a GPU-usage limit.
+Dynamic resolution is technically available on DX12, but it is a per-process
+frame-time target that changes the screen percentage (and so every acceptance
+frame), not a hard cap on the combined GPU percentage of the two clients;
+the 60/30 FPS caps above remain the only GPU-load limits. Compare render cost
+with `tools/art/render/render_bench.py` (packaged `-Bench`, no FPS cap,
+ProfileGPU / CSV per pass), never with capped `gpuMs`.

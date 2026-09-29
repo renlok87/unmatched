@@ -45,7 +45,16 @@ def sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-TRACE = """2026.09.28-01.38.55 --- S08 trace open 2026.09.28-01.38.55 ---
+def render_line(**over) -> str:
+    """A W4-A RENDER fingerprint equal to docs/art-pipeline/render-reference.json (+ overrides)."""
+    ref = json.loads((ce.REPO_ROOT / "docs" / "art-pipeline" / "render-reference.json").read_text(encoding="utf-8"))
+    kv = {k: str(v) for k, v in ref["requires"].items()}
+    kv["profilesSha256"] = "b" * 64
+    kv.update({k: str(v) for k, v in over.items()})
+    return "RENDER tag=SHOT " + " ".join(f"{k}={v}" for k, v in kv.items())
+
+
+TRACE_PRE_W4 = """2026.09.28-01.38.55 --- S08 trace open 2026.09.28-01.38.55 ---
 2026.09.28-01.39.13 BOARD 5x6 cells | control points
 2026.09.28-01.39.13 ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1 mesh=SK_Medusa_FaceNeck_v2Candidate
 2026.09.28-01.39.13 FIGHTERS synced n=6 alive=6 own=4 enemy=2
@@ -53,6 +62,8 @@ TRACE = """2026.09.28-01.38.55 --- S08 trace open 2026.09.28-01.38.55 ---
 2026.09.28-01.39.25 SHOT requested: FScreenshotRequest(bShowUI) -> C:\\Temp\\s08\\phase2-board-host-1920x1080.png
 2026.09.28-01.39.33 --- S08 trace close ---
 """
+# W4-A: the same trace with a reference RENDER fingerprint inside the SHOT block.
+TRACE = TRACE_PRE_W4.replace("rot=(-55,-90,0)\n", "rot=(-55,-90,0)\n2026.09.28-01.39.25 " + render_line() + "\n")
 
 
 class LiveRun:
@@ -118,7 +129,8 @@ class SelfTest(unittest.TestCase):
     def test_cli_self_test_exit_code(self):
         ok, results = ce.self_test()
         self.assertTrue(ok, results)
-        self.assertEqual([c["case"] for c in results], ["positive", "positive", "positive", "negative"])
+        self.assertEqual([c["case"] for c in results],
+                         ["positive", "positive", "positive", "negative-render", "negative"])
 
 
 class SyntheticRules(unittest.TestCase):
@@ -136,6 +148,32 @@ class SyntheticRules(unittest.TestCase):
         run.write_sidecar()
         r = ce.classify_frame(run.png, expect_mesh="SK_Medusa_FaceNeck_v2Candidate")
         self.assertEqual((r["class"], r["grade"]), ("packaged-live", "strict"))
+
+    def test_render_fingerprint_is_strict_s5(self):
+        # W4-A: a pre-W4 trace (no RENDER line) never reaches strict; --render-reference rejects it.
+        run = LiveRun(self.tmp, trace=TRACE_PRE_W4)
+        run.write_sidecar()
+        r = ce.classify_frame(run.png, expect_mesh="SK_Medusa_FaceNeck_v2Candidate")
+        self.assertEqual((r["class"], r["grade"]), ("packaged-live", "legacy"))
+        self.assertEqual(r["live"]["missingStrict"], ["S5_render_reference"])
+        r = ce.classify_frame(run.png, render_reference=True)
+        self.assertTrue(r["rejected"])
+        self.assertIn("no RENDER fingerprint", r["reasons"][-1])
+
+    def test_render_fingerprint_off_reference_rejected(self):
+        for over in ({"rhi": "D3D11", "featureLevel": "SM5", "gi": "lumen-unsupported"},
+                     {"sg.shadow": "3"}, {"screenPct": "73.0"}, {"lightUnits": "unitless-legacy"},
+                     {"profilesSource": "override"}, {"profilesSha256": "-"}):
+            with self.subTest(over=over):
+                sub = self.tmp / "_".join(over)
+                sub.mkdir()
+                run = LiveRun(sub, trace=TRACE_PRE_W4.replace(
+                    "rot=(-55,-90,0)\n", "rot=(-55,-90,0)\n2026.09.28-01.39.25 " + render_line(**over) + "\n"))
+                run.write_sidecar()
+                r = ce.classify_frame(run.png, render_reference=True)
+                self.assertEqual(r["class"], "packaged-live")
+                self.assertTrue(r["rejected"], r["reasons"])
+                self.assertFalse(r["live"]["render"]["reference"])
 
     def test_strict_rejects_nolivecoding_and_stub_exe(self):
         run = LiveRun(self.tmp)
@@ -227,6 +265,12 @@ class SyntheticRules(unittest.TestCase):
         self.assertEqual(cli("--require", "packaged-live", "--strict"), 3)
         run.write_sidecar()
         self.assertEqual(cli("--require", "packaged-live", "--strict"), 0)
+        # a pre-W4 run: --strict rejects it (exit 2 rejected before the --require check result 3)
+        pre = LiveRun(self.tmp / "pre", trace=TRACE_PRE_W4)
+        pre.write_sidecar()
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(ce.main([str(pre.dir), "--require", "packaged-live", "--strict"]), 3)
+            self.assertEqual(ce.main([str(pre.dir), "--render-reference"]), 2)
 
 
 class RepositoryExtras(unittest.TestCase):

@@ -1,0 +1,56 @@
+{
+  "schema": "unmatched.render-reference/1",
+  "revision": 1,
+  "status": "решение пользователя 2026-09-28 (DX12/SM6 + Lumen сейчас; High как эталон приёмки K1–K3 и ACC-022); реализация W4-A 2026-09-29",
+  "sources": [
+    "C:/tmp/p0-review/engine-gate-memo.md §1 п.1–2, §3 п.1–2 (ответы пользователя)",
+    "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29.md",
+    "unreal/Unmatched/Config/DefaultEngine.ini, DefaultScalability.ini, DefaultGameUserSettings.ini",
+    "unreal/Unmatched/Source/Unmatched/S08/S08Render.cpp (строка RENDER)"
+  ],
+  "fingerprint": "Каждый SHOT пишет в трассу строку 'RENDER tag=SHOT key=value ...' между 'SHOT ctx' и 'SHOT requested'. Кадр без неё или с отличием от requires не засчитывается в K1–K3 / QA-010 / GD-058 / ACC-022 (tools/art/classify_evidence.py --strict / --render-reference, tools/art/qa010 render + checklist).",
+  "requires": {
+    "rhi": "D3D12",
+    "featureLevel": "SM6",
+    "gi": "lumen",
+    "refl": "lumen",
+    "shadows": "csm",
+    "sg.view": "2",
+    "sg.aa": "2",
+    "sg.shadow": "2",
+    "sg.gi": "2",
+    "sg.refl": "2",
+    "sg.pp": "2",
+    "sg.tex": "2",
+    "sg.fx": "2",
+    "sg.foliage": "2",
+    "sg.shading": "2",
+    "screenPct": "100.0",
+    "aa": "TSR",
+    "exposure": "fixed-histogram",
+    "lightUnits": "candelas",
+    "sky": "1",
+    "profilesSource": "pak",
+    "legacyRender": "0",
+    "gameLayer": "unlit-eyeadaptinv",
+    "substrate": "0",
+    "viewport": "1920x1080"
+  },
+  "requiresPattern": {
+    "profilesSha256": "^[0-9a-f]{64}$"
+  },
+  "recordedNotGated": {
+    "tMaxFPS": "лимит кадров зависит от прогона (пара клиентов по 30 FPS, бенч без лимита)",
+    "vsync": "то же",
+    "frameRateLimit": "GameUserSettings; фиксируется для ACC-022",
+    "profile": "id профиля света доски",
+    "keyShadow": "CSM профиля",
+    "expMin": "значение экспозиции профиля (EV100 1,3 для всех трёх профилей W4-A)",
+    "reference": "самооценка клиента; решает этот файл, а не поле клиента"
+  },
+  "notes": [
+    "Nanite и Substrate не используются: 0 Nanite-мешей, r.Substrate=0. r.Nanite.ProjectEnabled оставлен включённым только потому, что поддержка VSM на платформе требует его.",
+    "Машины без SM6 (DX12 без SM 6.6 / 64-битных атомиков или без DX12) стартуют на SM5 (PCD3D_SM5 кукается тоже): Lumen недоступен, fingerprint даёт featureLevel=SM5 gi=lumen-unsupported — такие кадры не эталон по определению.",
+    "Статус эталона: принят пользователем как решение; сами кадры K1–K3 на нём — «измерено», художественная приёмка отдельно."
+  ]
+}

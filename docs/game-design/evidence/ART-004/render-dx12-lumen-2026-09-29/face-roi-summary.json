@@ -1,0 +1,3582 @@
+{
+  "schema": "unmatched.w4a-face-roi/1",
+  "status": "измерено (RTX 4090, не D-07); диагностика, не порог",
+  "rule": {
+    "faceRoi": {
+      "centre": [
+        -3.95,
+        9.7
+      ],
+      "half": [
+        3.5,
+        1.7
+      ],
+      "what": "face: below the diadem tip down to the chin"
+    },
+    "faceNeckRoi": {
+      "centre": [
+        -4.25,
+        8.9
+      ],
+      "half": [
+        3.4,
+        3.0
+      ],
+      "what": "face plus the throat below the chin"
+    },
+    "units": "u = headPx / 12 px (screen length of 1 uu along world Z at the traced Head socket); centre = Head projection + (dx right, dz up) u; screen offsets for the board camera only",
+    "minHeadPx": 40.0,
+    "withdrawnFirstRuleBox": [
+      946,
+      461,
+      974,
+      490
+    ],
+    "withdrawnWhy": "centred on the socket's screen X: covered the right third of the face, the robe and the black gap by the neck (bimodal)",
+    "boardK1": "p50 of Rec.709 luma in x 600-1360, y 700-940",
+    "luma": "Rec.709 of the sRGB 8-bit frame, 0-255",
+    "significance": "noise = max - min over repeats; significant if |delta| > max(2 x max(noise), 0.5 luma); a set with n = 1 -> null"
+  },
+  "placementCheck": "face-roi-contact-sheet.jpg (every K2 5x frame below with the boxes)",
+  "sets": {
+    "p17-editor": {
+      "n": 1,
+      "aggregate": {
+        "faceMean": {
+          "n": 1,
+          "mean": 148.44,
+          "min": 148.44,
+          "max": 148.44,
+          "noise": 0.0
+        },
+        "faceP5": {
+          "n": 1,
+          "mean": 62.22,
+          "min": 62.22,
+          "max": 62.22,
+          "noise": 0.0
+        },
+        "faceP50": {
+          "n": 1,
+          "mean": 160.72,
+          "min": 160.72,
+          "max": 160.72,
+          "noise": 0.0
+        },
+        "faceP95": {
+          "n": 1,
+          "mean": 196.43,
+          "min": 196.43,
+          "max": 196.43,
+          "noise": 0.0
+        },
+        "faceSpread": {
+          "n": 1,
+          "mean": 134.21,
+          "min": 134.21,
+          "max": 134.21,
+          "noise": 0.0
+        },
+        "faceNeckMean": {
+          "n": 1,
+          "mean": 160.19,
+          "min": 160.19,
+          "max": 160.19,
+          "noise": 0.0
+        },
+        "withdrawnMean": {
+          "n": 1,
+          "mean": 123.2,
+          "min": 123.2,
+          "max": 123.2,
+          "noise": 0.0
+        },
+        "boardK1P50": {
+          "n": 1,
+          "mean": 131.22,
+          "min": 131.22,
+          "max": 131.22,
+          "noise": 0.0
+        }
+      },
+      "frames": [
+        {
+          "set": "p17-editor",
+          "k2": "C:/tmp/t31fix/cs/r1/p17-k2-5x-medusa-ue-editor.png",
+          "k2Sha256": "858e89fa0587ad8f923421e52222f16844662e53ef6f98d6a57fc5af23400c7c",
+          "head": null,
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 148.44,
+            "p5": 62.22,
+            "p50": 160.72,
+            "p95": 196.43,
+            "std": 42.47
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 160.19,
+            "p5": 71.98,
+            "p50": 172.29,
+            "p95": 198.11,
+            "std": 39.95
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 123.2,
+            "p5": 68.03,
+            "p50": 101.58,
+            "p95": 202.29,
+            "std": 48.7
+          },
+          "faceSpread": 134.21,
+          "k1": "C:/tmp/t31fix/cs/r1/p17-k1-overview-ue-editor.png",
+          "k1Sha256": "5e0e8a791d961695b0813c3b7a513f2b521c9e424e1c30edcafb56426cf2d173",
+          "boardK1P50": 131.22,
+          "note": "editor frame, mesh T4 (not v2), DX11, candelas, EV100 1.3, point fill; no traced socket: the live K2 5x pixel boxes (same board camera)"
+        }
+      ]
+    },
+    "live-dx11-old": {
+      "n": 3,
+      "aggregate": {
+        "faceMean": {
+          "n": 3,
+          "mean": 156.9967,
+          "min": 156.9,
+          "max": 157.07,
+          "noise": 0.17
+        },
+        "faceP5": {
+          "n": 3,
+          "mean": 113.6967,
+          "min": 113.23,
+          "max": 114.14,
+          "noise": 0.91
+        },
+        "faceP50": {
+          "n": 3,
+          "mean": 163.53,
+          "min": 163.29,
+          "max": 163.72,
+          "noise": 0.43
+        },
+        "faceP95": {
+          "n": 3,
+          "mean": 185.22,
+          "min": 185.01,
+          "max": 185.46,
+          "noise": 0.45
+        },
+        "faceSpread": {
+          "n": 3,
+          "mean": 71.5233,
+          "min": 71.05,
+          "max": 72.23,
+          "noise": 1.18
+        },
+        "faceNeckMean": {
+          "n": 3,
+          "mean": 163.3233,
+          "min": 163.26,
+          "max": 163.36,
+          "noise": 0.1
+        },
+        "withdrawnMean": {
+          "n": 3,
+          "mean": 106.16,
+          "min": 106.13,
+          "max": 106.21,
+          "noise": 0.08
+        },
+        "boardK1P50": {
+          "n": 3,
+          "mean": 81.94,
+          "min": 81.94,
+          "max": 81.94,
+          "noise": 0.0
+        }
+      },
+      "frames": [
+        {
+          "set": "live-dx11-old",
+          "k2": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx11-old/run-20260929-055538/phase2-board-host-1920x1080.png",
+          "k2Sha256": "28c399a48c006a01fe6a446c6ebb0c028d2a8a238f817f4d2514d789cb6bffb4",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 157.02,
+            "p5": 114.14,
+            "p50": 163.58,
+            "p95": 185.19,
+            "std": 22.95
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 163.36,
+            "p5": 111.88,
+            "p50": 170.86,
+            "p95": 193.04,
+            "std": 26.71
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 106.21,
+            "p5": 12.02,
+            "p50": 85.25,
+            "p95": 185.65,
+            "std": 56.21
+          },
+          "faceSpread": 71.05,
+          "k1": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx11-old/run-20260929-055538/phase2-board-joiner-1920x1080.png",
+          "k1Sha256": "6c8bf188fd6d3ff0f2b5d0368dd0740ee3f3c0df39a9c6a6f416b13ebfc43a0a",
+          "boardK1P50": 81.94
+        },
+        {
+          "set": "live-dx11-old",
+          "k2": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx11-old/run-20260929-055653/phase2-board-host-1920x1080.png",
+          "k2Sha256": "a60d8563dcc9216d2cb106b234696a37ed379adc8256c74e1b8a8458e6060b4d",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 157.07,
+            "p5": 113.23,
+            "p50": 163.72,
+            "p95": 185.46,
+            "std": 23.11
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 163.35,
+            "p5": 111.02,
+            "p50": 170.89,
+            "p95": 193.09,
+            "std": 26.82
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 106.13,
+            "p5": 9.72,
+            "p50": 86.36,
+            "p95": 185.84,
+            "std": 56.41
+          },
+          "faceSpread": 72.23,
+          "k1": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx11-old/run-20260929-055653/phase2-board-joiner-1920x1080.png",
+          "k1Sha256": "c6ac849ea462111b1c9e640d8b57683b8f7294488bcb1df6912452f264e1be14",
+          "boardK1P50": 81.94
+        },
+        {
+          "set": "live-dx11-old",
+          "k2": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx11-old/run-20260929-055809/phase2-board-host-1920x1080.png",
+          "k2Sha256": "c08b1af78da0c796fd4f23501ed2f2e02a8327b305b2ac6e20d13ade12f1a2be",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 156.9,
+            "p5": 113.72,
+            "p50": 163.29,
+            "p95": 185.01,
+            "std": 23.01
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 163.26,
+            "p5": 110.2,
+            "p50": 170.82,
+            "p95": 193.09,
+            "std": 26.75
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 106.14,
+            "p5": 10.12,
+            "p50": 85.77,
+            "p95": 185.65,
+            "std": 56.29
+          },
+          "faceSpread": 71.29,
+          "k1": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx11-old/run-20260929-055809/phase2-board-joiner-1920x1080.png",
+          "k1Sha256": "47287c19be4db21681c255e77d2862ff147b835c61b0d53bc67ac634d64c83c4",
+          "boardK1P50": 81.94
+        }
+      ]
+    },
+    "live-dx12-lumen-high": {
+      "n": 3,
+      "aggregate": {
+        "faceMean": {
+          "n": 3,
+          "mean": 153.6133,
+          "min": 153.5,
+          "max": 153.69,
+          "noise": 0.19
+        },
+        "faceP5": {
+          "n": 3,
+          "mean": 129.9233,
+          "min": 129.72,
+          "max": 130.18,
+          "noise": 0.46
+        },
+        "faceP50": {
+          "n": 3,
+          "mean": 153.09,
+          "min": 152.94,
+          "max": 153.18,
+          "noise": 0.24
+        },
+        "faceP95": {
+          "n": 3,
+          "mean": 176.96,
+          "min": 176.48,
+          "max": 177.2,
+          "noise": 0.72
+        },
+        "faceSpread": {
+          "n": 3,
+          "mean": 47.0367,
+          "min": 46.76,
+          "max": 47.33,
+          "noise": 0.57
+        },
+        "faceNeckMean": {
+          "n": 3,
+          "mean": 155.1533,
+          "min": 155.07,
+          "max": 155.21,
+          "noise": 0.14
+        },
+        "withdrawnMean": {
+          "n": 3,
+          "mean": 115.95,
+          "min": 115.94,
+          "max": 115.96,
+          "noise": 0.02
+        },
+        "boardK1P50": {
+          "n": 3,
+          "mean": 134.43,
+          "min": 134.43,
+          "max": 134.43,
+          "noise": 0.0
+        }
+      },
+      "frames": [
+        {
+          "set": "live-dx12-lumen-high",
+          "k2": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx12-lumen/run-20260929-071937/phase2-board-host-1920x1080.png",
+          "k2Sha256": "469bbb955f349fddcf57543884f6d985fee5d5e957f4265fbe40b1acb5817555",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 153.5,
+            "p5": 129.72,
+            "p50": 152.94,
+            "p95": 176.48,
+            "std": 14.35
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 155.07,
+            "p5": 120.51,
+            "p50": 158.37,
+            "p95": 176.33,
+            "std": 19.27
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 115.94,
+            "p5": 58.25,
+            "p50": 113.21,
+            "p95": 177.11,
+            "std": 46.07
+          },
+          "faceSpread": 46.76,
+          "k1": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx12-lumen/run-20260929-071937/phase2-board-joiner-1920x1080.png",
+          "k1Sha256": "d5a1a9a3c37d79078643135568372786ff3b76d540d40cafb836eee4841b4f71",
+          "boardK1P50": 134.43
+        },
+        {
+          "set": "live-dx12-lumen-high",
+          "k2": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx12-lumen/run-20260929-072058/phase2-board-host-1920x1080.png",
+          "k2Sha256": "bed88350c4ce57a7cf09634143572b967b91d92116ff553cf80628220b8fcbbf",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 153.65,
+            "p5": 129.87,
+            "p50": 153.15,
+            "p95": 177.2,
+            "std": 14.3
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 155.18,
+            "p5": 120.88,
+            "p50": 158.33,
+            "p95": 176.9,
+            "std": 19.25
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 115.95,
+            "p5": 58.0,
+            "p50": 112.04,
+            "p95": 177.22,
+            "std": 46.11
+          },
+          "faceSpread": 47.33,
+          "k1": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx12-lumen/run-20260929-072058/phase2-board-joiner-1920x1080.png",
+          "k1Sha256": "aac30990b31f24dfae0cdb652783d15b076a83cad2a02913b5854134eaa97195",
+          "boardK1P50": 134.43
+        },
+        {
+          "set": "live-dx12-lumen-high",
+          "k2": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx12-lumen/run-20260929-072215/phase2-board-host-1920x1080.png",
+          "k2Sha256": "c4237c9ff3a391d1bf9a889004822d1deea23a5f5b88d03899709bc27dc4e125",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 153.69,
+            "p5": 130.18,
+            "p50": 153.18,
+            "p95": 177.2,
+            "std": 14.3
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 155.21,
+            "p5": 120.88,
+            "p50": 158.33,
+            "p95": 176.9,
+            "std": 19.25
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 115.96,
+            "p5": 58.0,
+            "p50": 112.04,
+            "p95": 177.18,
+            "std": 46.11
+          },
+          "faceSpread": 47.02,
+          "k1": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx12-lumen/run-20260929-072215/phase2-board-joiner-1920x1080.png",
+          "k1Sha256": "1198b38de74977f6a5ce7cb1cc30cb9eb9db521a2999e0735d978d40ecd09046",
+          "boardK1P50": 134.43
+        }
+      ]
+    },
+    "bench:dx12sm5-legacy": {
+      "n": 3,
+      "aggregate": {
+        "faceMean": {
+          "n": 3,
+          "mean": 157.7567,
+          "min": 157.73,
+          "max": 157.78,
+          "noise": 0.05
+        },
+        "faceP5": {
+          "n": 3,
+          "mean": 112.0967,
+          "min": 111.75,
+          "max": 112.6,
+          "noise": 0.85
+        },
+        "faceP50": {
+          "n": 3,
+          "mean": 164.7667,
+          "min": 164.72,
+          "max": 164.79,
+          "noise": 0.07
+        },
+        "faceP95": {
+          "n": 3,
+          "mean": 187.57,
+          "min": 187.44,
+          "max": 187.65,
+          "noise": 0.21
+        },
+        "faceSpread": {
+          "n": 3,
+          "mean": 75.4733,
+          "min": 75.02,
+          "max": 75.71,
+          "noise": 0.69
+        },
+        "faceNeckMean": {
+          "n": 3,
+          "mean": 164.0067,
+          "min": 163.99,
+          "max": 164.03,
+          "noise": 0.04
+        },
+        "withdrawnMean": {
+          "n": 3,
+          "mean": 106.5333,
+          "min": 106.52,
+          "max": 106.54,
+          "noise": 0.02
+        },
+        "boardK1P50": {
+          "n": 3,
+          "mean": 81.9367,
+          "min": 81.93,
+          "max": 81.94,
+          "noise": 0.01
+        }
+      },
+      "frames": [
+        {
+          "set": "bench:dx12sm5-legacy",
+          "k2": "C:/tmp/w4a/bench/dx12sm5-legacy/r1/bench-K2x5-1920x1080.png",
+          "k2Sha256": "b0d4b829444311e6ec9a1e647568be27ab7d338fff22a12df27d6bd5ca317fec",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 157.73,
+            "p5": 111.75,
+            "p50": 164.79,
+            "p95": 187.44,
+            "std": 23.77
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 163.99,
+            "p5": 109.36,
+            "p50": 171.68,
+            "p95": 193.45,
+            "std": 27.49
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 106.54,
+            "p5": 9.75,
+            "p50": 86.04,
+            "p95": 187.08,
+            "std": 57.25
+          },
+          "faceSpread": 75.69,
+          "k1": "C:/tmp/w4a/bench/dx12sm5-legacy/r1/bench-K1-1920x1080.png",
+          "k1Sha256": "d9047ab225b1a90d636d6c932b74e64f86f2da0d4b3468836de78e61ca0fd433",
+          "boardK1P50": 81.94
+        },
+        {
+          "set": "bench:dx12sm5-legacy",
+          "k2": "C:/tmp/w4a/bench/dx12sm5-legacy/r2/bench-K2x5-1920x1080.png",
+          "k2Sha256": "1f8824ef26a248cc15a7071777c725a0073692140abe0fafff11635f8299bba4",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 157.78,
+            "p5": 111.94,
+            "p50": 164.72,
+            "p95": 187.65,
+            "std": 23.86
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 164.03,
+            "p5": 109.65,
+            "p50": 171.86,
+            "p95": 193.47,
+            "std": 27.54
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 106.54,
+            "p5": 9.43,
+            "p50": 86.14,
+            "p95": 187.0,
+            "std": 57.27
+          },
+          "faceSpread": 75.71,
+          "k1": "C:/tmp/w4a/bench/dx12sm5-legacy/r2/bench-K1-1920x1080.png",
+          "k1Sha256": "3f0ee7cdf8d5a520dfc188a312e3727499a962a2ce9efbae29dcc1dfcdb96c41",
+          "boardK1P50": 81.94
+        },
+        {
+          "set": "bench:dx12sm5-legacy",
+          "k2": "C:/tmp/w4a/bench/dx12sm5-legacy/r3/bench-K2x5-1920x1080.png",
+          "k2Sha256": "36797c42c6867c988b7f0543bf97fddf1fe6f11c9f5094ff4cdbca244fe269f1",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 157.76,
+            "p5": 112.6,
+            "p50": 164.79,
+            "p95": 187.62,
+            "std": 23.8
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 164.0,
+            "p5": 109.84,
+            "p50": 171.75,
+            "p95": 193.43,
+            "std": 27.5
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 106.52,
+            "p5": 9.75,
+            "p50": 86.53,
+            "p95": 187.13,
+            "std": 57.27
+          },
+          "faceSpread": 75.02,
+          "k1": "C:/tmp/w4a/bench/dx12sm5-legacy/r3/bench-K1-1920x1080.png",
+          "k1Sha256": "f8840063795442451e0dd4db228e291d2d33530877c6a1781273bc023661c8de",
+          "boardK1P50": 81.93
+        }
+      ]
+    },
+    "bench:dx11-legacy": {
+      "n": 3,
+      "aggregate": {
+        "faceMean": {
+          "n": 3,
+          "mean": 157.73,
+          "min": 157.7,
+          "max": 157.77,
+          "noise": 0.07
+        },
+        "faceP5": {
+          "n": 3,
+          "mean": 112.1867,
+          "min": 111.95,
+          "max": 112.36,
+          "noise": 0.41
+        },
+        "faceP50": {
+          "n": 3,
+          "mean": 164.8467,
+          "min": 164.72,
+          "max": 164.93,
+          "noise": 0.21
+        },
+        "faceP95": {
+          "n": 3,
+          "mean": 187.3567,
+          "min": 187.31,
+          "max": 187.38,
+          "noise": 0.07
+        },
+        "faceSpread": {
+          "n": 3,
+          "mean": 75.17,
+          "min": 74.95,
+          "max": 75.43,
+          "noise": 0.48
+        },
+        "faceNeckMean": {
+          "n": 3,
+          "mean": 163.9833,
+          "min": 163.97,
+          "max": 164.0,
+          "noise": 0.03
+        },
+        "withdrawnMean": {
+          "n": 3,
+          "mean": 106.5,
+          "min": 106.47,
+          "max": 106.55,
+          "noise": 0.08
+        },
+        "boardK1P50": {
+          "n": 3,
+          "mean": 81.94,
+          "min": 81.94,
+          "max": 81.94,
+          "noise": 0.0
+        }
+      },
+      "frames": [
+        {
+          "set": "bench:dx11-legacy",
+          "k2": "C:/tmp/w4a/bench/dx11-legacy/r1/bench-K2x5-1920x1080.png",
+          "k2Sha256": "926a3ac769574fabbd9b7305f87f3a6bbfa11405c47d350bc5210862a7a61306",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 157.72,
+            "p5": 111.95,
+            "p50": 164.72,
+            "p95": 187.38,
+            "std": 23.85
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 163.98,
+            "p5": 110.19,
+            "p50": 171.65,
+            "p95": 193.61,
+            "std": 27.52
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 106.47,
+            "p5": 9.75,
+            "p50": 86.4,
+            "p95": 186.78,
+            "std": 57.28
+          },
+          "faceSpread": 75.43,
+          "k1": "C:/tmp/w4a/bench/dx11-legacy/r1/bench-K1-1920x1080.png",
+          "k1Sha256": "b3d5514297aadb485714417a341b5ea91b0f8a84337c7685e44c908ed9b79748",
+          "boardK1P50": 81.94
+        },
+        {
+          "set": "bench:dx11-legacy",
+          "k2": "C:/tmp/w4a/bench/dx11-legacy/r2/bench-K2x5-1920x1080.png",
+          "k2Sha256": "54fbc30e7688bd16e3e09274595ed940a7f0ac6cee7e4f5762a51cc6e587f18f",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 157.77,
+            "p5": 112.25,
+            "p50": 164.93,
+            "p95": 187.38,
+            "std": 23.8
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 164.0,
+            "p5": 110.02,
+            "p50": 171.5,
+            "p95": 193.47,
+            "std": 27.48
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 106.55,
+            "p5": 9.75,
+            "p50": 86.5,
+            "p95": 187.0,
+            "std": 57.27
+          },
+          "faceSpread": 75.13,
+          "k1": "C:/tmp/w4a/bench/dx11-legacy/r2/bench-K1-1920x1080.png",
+          "k1Sha256": "405619a9646a8fa6ffd06200d9b8f34b63927ea9fedc34abb6b5256029384519",
+          "boardK1P50": 81.94
+        },
+        {
+          "set": "bench:dx11-legacy",
+          "k2": "C:/tmp/w4a/bench/dx11-legacy/r3/bench-K2x5-1920x1080.png",
+          "k2Sha256": "65b3c952eb664bb92acf0fdbb280cfa284d7f3cb1f40d6edbb269adde100d05f",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 157.7,
+            "p5": 112.36,
+            "p50": 164.89,
+            "p95": 187.31,
+            "std": 23.86
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 163.97,
+            "p5": 110.19,
+            "p50": 171.68,
+            "p95": 193.43,
+            "std": 27.53
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 106.48,
+            "p5": 9.39,
+            "p50": 86.43,
+            "p95": 186.79,
+            "std": 57.27
+          },
+          "faceSpread": 74.95,
+          "k1": "C:/tmp/w4a/bench/dx11-legacy/r3/bench-K1-1920x1080.png",
+          "k1Sha256": "57ea1e582c72dd679368de2f8b9f2bc93c8c899d384a7282519719b4ee9c5c9f",
+          "boardK1P50": 81.94
+        }
+      ]
+    },
+    "bench:dx12-lumen-high": {
+      "n": 3,
+      "aggregate": {
+        "faceMean": {
+          "n": 3,
+          "mean": 153.7367,
+          "min": 153.53,
+          "max": 153.86,
+          "noise": 0.33
+        },
+        "faceP5": {
+          "n": 3,
+          "mean": 128.2667,
+          "min": 127.74,
+          "max": 128.58,
+          "noise": 0.84
+        },
+        "faceP50": {
+          "n": 3,
+          "mean": 153.29,
+          "min": 153.25,
+          "max": 153.36,
+          "noise": 0.11
+        },
+        "faceP95": {
+          "n": 3,
+          "mean": 178.2267,
+          "min": 178.1,
+          "max": 178.34,
+          "noise": 0.24
+        },
+        "faceSpread": {
+          "n": 3,
+          "mean": 49.96,
+          "min": 49.62,
+          "max": 50.6,
+          "noise": 0.98
+        },
+        "faceNeckMean": {
+          "n": 3,
+          "mean": 155.38,
+          "min": 155.17,
+          "max": 155.52,
+          "noise": 0.35
+        },
+        "withdrawnMean": {
+          "n": 3,
+          "mean": 115.9967,
+          "min": 115.89,
+          "max": 116.05,
+          "noise": 0.16
+        },
+        "boardK1P50": {
+          "n": 3,
+          "mean": 134.43,
+          "min": 134.43,
+          "max": 134.43,
+          "noise": 0.0
+        }
+      },
+      "frames": [
+        {
+          "set": "bench:dx12-lumen-high",
+          "k2": "C:/tmp/w4a/bench/dx12-lumen-high/r1/bench-K2x5-1920x1080.png",
+          "k2Sha256": "11204823336c63f892b16856a3549812aff660a68ca91f44e5365a74807d39c3",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 153.86,
+            "p5": 128.58,
+            "p50": 153.26,
+            "p95": 178.24,
+            "std": 15.07
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 155.45,
+            "p5": 119.58,
+            "p50": 158.93,
+            "p95": 178.19,
+            "std": 19.97
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 116.05,
+            "p5": 56.97,
+            "p50": 109.86,
+            "p95": 178.46,
+            "std": 46.84
+          },
+          "faceSpread": 49.66,
+          "k1": "C:/tmp/w4a/bench/dx12-lumen-high/r1/bench-K1-1920x1080.png",
+          "k1Sha256": "591a75c67cb83da7017fcdc564723aa1696cc88d75cc5e3ac944c94f932a0c2f",
+          "boardK1P50": 134.43
+        },
+        {
+          "set": "bench:dx12-lumen-high",
+          "k2": "C:/tmp/w4a/bench/dx12-lumen-high/r2/bench-K2x5-1920x1080.png",
+          "k2Sha256": "dbc70422332238245819fa511ff586ab2a0869cbb7ac208be89d785a3baa30f2",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 153.53,
+            "p5": 128.48,
+            "p50": 153.25,
+            "p95": 178.1,
+            "std": 15.15
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 155.17,
+            "p5": 118.79,
+            "p50": 158.57,
+            "p95": 178.09,
+            "std": 20.07
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 115.89,
+            "p5": 57.19,
+            "p50": 109.83,
+            "p95": 178.11,
+            "std": 46.85
+          },
+          "faceSpread": 49.62,
+          "k1": "C:/tmp/w4a/bench/dx12-lumen-high/r2/bench-K1-1920x1080.png",
+          "k1Sha256": "630882b38baf9cde6a1afa4758d7215c7cae05d873804ecc76703663703cd861",
+          "boardK1P50": 134.43
+        },
+        {
+          "set": "bench:dx12-lumen-high",
+          "k2": "C:/tmp/w4a/bench/dx12-lumen-high/r3/bench-K2x5-1920x1080.png",
+          "k2Sha256": "aed703dd658d0c50d85fc8f214d7988dd09a1a389b6a53c5b50dbd6bdd6c33f3",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 153.82,
+            "p5": 127.74,
+            "p50": 153.36,
+            "p95": 178.34,
+            "std": 15.11
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 155.52,
+            "p5": 118.83,
+            "p50": 158.72,
+            "p95": 178.2,
+            "std": 19.95
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 116.05,
+            "p5": 57.09,
+            "p50": 110.28,
+            "p95": 178.06,
+            "std": 46.9
+          },
+          "faceSpread": 50.6,
+          "k1": "C:/tmp/w4a/bench/dx12-lumen-high/r3/bench-K1-1920x1080.png",
+          "k1Sha256": "88be30a36b800f65a926c20ed8cb7dc75966b036d8880b9fbbb52c5ad88a7503",
+          "boardK1P50": 134.43
+        }
+      ]
+    },
+    "bench:dx12-lumen-high-vsm": {
+      "n": 3,
+      "aggregate": {
+        "faceMean": {
+          "n": 3,
+          "mean": 154.3833,
+          "min": 154.16,
+          "max": 154.59,
+          "noise": 0.43
+        },
+        "faceP5": {
+          "n": 3,
+          "mean": 129.11,
+          "min": 128.12,
+          "max": 129.97,
+          "noise": 1.85
+        },
+        "faceP50": {
+          "n": 3,
+          "mean": 153.74,
+          "min": 153.5,
+          "max": 153.89,
+          "noise": 0.39
+        },
+        "faceP95": {
+          "n": 3,
+          "mean": 178.7833,
+          "min": 178.69,
+          "max": 178.88,
+          "noise": 0.19
+        },
+        "faceSpread": {
+          "n": 3,
+          "mean": 49.6733,
+          "min": 48.81,
+          "max": 50.57,
+          "noise": 1.76
+        },
+        "faceNeckMean": {
+          "n": 3,
+          "mean": 155.7467,
+          "min": 155.5,
+          "max": 156.0,
+          "noise": 0.5
+        },
+        "withdrawnMean": {
+          "n": 3,
+          "mean": 116.8033,
+          "min": 116.64,
+          "max": 116.95,
+          "noise": 0.31
+        },
+        "boardK1P50": {
+          "n": 3,
+          "mean": 134.44,
+          "min": 134.44,
+          "max": 134.44,
+          "noise": 0.0
+        }
+      },
+      "frames": [
+        {
+          "set": "bench:dx12-lumen-high-vsm",
+          "k2": "C:/tmp/w4a/bench/dx12-lumen-high-vsm/r1/bench-K2x5-1920x1080.png",
+          "k2Sha256": "92b5c0a7a80c2343a11e811746cca88a77e27867e070a604a22ac3c7d5edeac8",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 154.59,
+            "p5": 129.24,
+            "p50": 153.89,
+            "p95": 178.88,
+            "std": 15.04
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 156.0,
+            "p5": 118.36,
+            "p50": 159.33,
+            "p95": 178.58,
+            "std": 19.86
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 116.95,
+            "p5": 57.16,
+            "p50": 113.75,
+            "p95": 179.79,
+            "std": 47.53
+          },
+          "faceSpread": 49.64,
+          "k1": "C:/tmp/w4a/bench/dx12-lumen-high-vsm/r1/bench-K1-1920x1080.png",
+          "k1Sha256": "c277e85396825bb5eb7d5f1a484c677b80aa4abeb7657f65694564de16a001c8",
+          "boardK1P50": 134.44
+        },
+        {
+          "set": "bench:dx12-lumen-high-vsm",
+          "k2": "C:/tmp/w4a/bench/dx12-lumen-high-vsm/r2/bench-K2x5-1920x1080.png",
+          "k2Sha256": "d0e10100a1968c685bff4ff5059490a6e54959c1864690e6ce9ebb4448f1ff3f",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 154.16,
+            "p5": 128.12,
+            "p50": 153.5,
+            "p95": 178.69,
+            "std": 15.16
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 155.5,
+            "p5": 117.52,
+            "p50": 158.86,
+            "p95": 178.43,
+            "std": 19.96
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 116.64,
+            "p5": 56.9,
+            "p50": 112.11,
+            "p95": 179.75,
+            "std": 47.49
+          },
+          "faceSpread": 50.57,
+          "k1": "C:/tmp/w4a/bench/dx12-lumen-high-vsm/r2/bench-K1-1920x1080.png",
+          "k1Sha256": "988ca8d3ee055fc19e62088778fdd994a4736d52a70dc19770a04632c4348f03",
+          "boardK1P50": 134.44
+        },
+        {
+          "set": "bench:dx12-lumen-high-vsm",
+          "k2": "C:/tmp/w4a/bench/dx12-lumen-high-vsm/r3/bench-K2x5-1920x1080.png",
+          "k2Sha256": "512ec1824846c17d1a5b005b67840d98342d73c510f2ebae7337bd542660e486",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 154.4,
+            "p5": 129.97,
+            "p50": 153.83,
+            "p95": 178.78,
+            "std": 15.03
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 155.74,
+            "p5": 119.22,
+            "p50": 159.22,
+            "p95": 178.82,
+            "std": 19.85
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 116.82,
+            "p5": 57.25,
+            "p50": 113.57,
+            "p95": 179.93,
+            "std": 47.46
+          },
+          "faceSpread": 48.81,
+          "k1": "C:/tmp/w4a/bench/dx12-lumen-high-vsm/r3/bench-K1-1920x1080.png",
+          "k1Sha256": "92eaefbf171d9cb6212f88fd0f4a47e2273923a12df6840b353faee502e1b688",
+          "boardK1P50": 134.44
+        }
+      ]
+    },
+    "bench:dx12-lumen-high-csmdefault": {
+      "n": 3,
+      "aggregate": {
+        "faceMean": {
+          "n": 3,
+          "mean": 153.62,
+          "min": 153.56,
+          "max": 153.68,
+          "noise": 0.12
+        },
+        "faceP5": {
+          "n": 3,
+          "mean": 127.3567,
+          "min": 127.28,
+          "max": 127.47,
+          "noise": 0.19
+        },
+        "faceP50": {
+          "n": 3,
+          "mean": 153.0033,
+          "min": 153.0,
+          "max": 153.01,
+          "noise": 0.01
+        },
+        "faceP95": {
+          "n": 3,
+          "mean": 178.05,
+          "min": 177.72,
+          "max": 178.29,
+          "noise": 0.57
+        },
+        "faceSpread": {
+          "n": 3,
+          "mean": 50.6933,
+          "min": 50.25,
+          "max": 51.01,
+          "noise": 0.76
+        },
+        "faceNeckMean": {
+          "n": 3,
+          "mean": 155.23,
+          "min": 155.19,
+          "max": 155.28,
+          "noise": 0.09
+        },
+        "withdrawnMean": {
+          "n": 3,
+          "mean": 115.9033,
+          "min": 115.88,
+          "max": 115.92,
+          "noise": 0.04
+        },
+        "boardK1P50": {
+          "n": 3,
+          "mean": 134.4567,
+          "min": 134.43,
+          "max": 134.5,
+          "noise": 0.07
+        }
+      },
+      "frames": [
+        {
+          "set": "bench:dx12-lumen-high-csmdefault",
+          "k2": "C:/tmp/w4a/bench/dx12-lumen-high-csmdefault/r1/bench-K2x5-1920x1080.png",
+          "k2Sha256": "df6849f81ffed289bcebe20a0f50788016f93961be67802f472fb0d666fd0830",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 153.68,
+            "p5": 127.47,
+            "p50": 153.01,
+            "p95": 177.72,
+            "std": 15.24
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 155.28,
+            "p5": 117.36,
+            "p50": 158.93,
+            "p95": 177.86,
+            "std": 20.11
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 115.91,
+            "p5": 56.93,
+            "p50": 109.36,
+            "p95": 178.08,
+            "std": 46.95
+          },
+          "faceSpread": 50.25,
+          "k1": "C:/tmp/w4a/bench/dx12-lumen-high-csmdefault/r1/bench-K1-1920x1080.png",
+          "k1Sha256": "4ac614360b9aecc50bd65c8e9f42e73e304415a1853ad603659e6c9c4b678224",
+          "boardK1P50": 134.5
+        },
+        {
+          "set": "bench:dx12-lumen-high-csmdefault",
+          "k2": "C:/tmp/w4a/bench/dx12-lumen-high-csmdefault/r2/bench-K2x5-1920x1080.png",
+          "k2Sha256": "88de94521e17172424b56dadb66029f7da49f21d18f1c870cbf536b704ff1c3b",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 153.56,
+            "p5": 127.32,
+            "p50": 153.0,
+            "p95": 178.14,
+            "std": 15.26
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 155.19,
+            "p5": 117.49,
+            "p50": 158.86,
+            "p95": 177.72,
+            "std": 20.16
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 115.88,
+            "p5": 56.77,
+            "p50": 108.61,
+            "p95": 178.21,
+            "std": 46.96
+          },
+          "faceSpread": 50.82,
+          "k1": "C:/tmp/w4a/bench/dx12-lumen-high-csmdefault/r2/bench-K1-1920x1080.png",
+          "k1Sha256": "880d68b0d2a136cdff37177de1693f16658c119058438bd3093ba773bf105168",
+          "boardK1P50": 134.43
+        },
+        {
+          "set": "bench:dx12-lumen-high-csmdefault",
+          "k2": "C:/tmp/w4a/bench/dx12-lumen-high-csmdefault/r3/bench-K2x5-1920x1080.png",
+          "k2Sha256": "9e2fb2e8de8a3ee2c55389e3c642dd5c9d5e0f0d8dca7d886b502754eada3db0",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 153.62,
+            "p5": 127.28,
+            "p50": 153.0,
+            "p95": 178.29,
+            "std": 15.26
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 155.22,
+            "p5": 116.53,
+            "p50": 158.9,
+            "p95": 177.76,
+            "std": 20.07
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 115.92,
+            "p5": 56.97,
+            "p50": 110.47,
+            "p95": 178.11,
+            "std": 46.9
+          },
+          "faceSpread": 51.01,
+          "k1": "C:/tmp/w4a/bench/dx12-lumen-high-csmdefault/r3/bench-K1-1920x1080.png",
+          "k1Sha256": "e860ccf4a47cd9ea386538b9a5d53bd540db21d99b6dd9147904f22862dca22a",
+          "boardK1P50": 134.44
+        }
+      ]
+    },
+    "bench:dx12-medium": {
+      "n": 3,
+      "aggregate": {
+        "faceMean": {
+          "n": 3,
+          "mean": 168.99,
+          "min": 168.97,
+          "max": 169.02,
+          "noise": 0.05
+        },
+        "faceP5": {
+          "n": 3,
+          "mean": 140.91,
+          "min": 140.17,
+          "max": 141.41,
+          "noise": 1.24
+        },
+        "faceP50": {
+          "n": 3,
+          "mean": 170.7867,
+          "min": 170.68,
+          "max": 170.86,
+          "noise": 0.18
+        },
+        "faceP95": {
+          "n": 3,
+          "mean": 189.9433,
+          "min": 189.72,
+          "max": 190.13,
+          "noise": 0.41
+        },
+        "faceSpread": {
+          "n": 3,
+          "mean": 49.0333,
+          "min": 48.57,
+          "max": 49.55,
+          "noise": 0.98
+        },
+        "faceNeckMean": {
+          "n": 3,
+          "mean": 171.2767,
+          "min": 171.24,
+          "max": 171.3,
+          "noise": 0.06
+        },
+        "withdrawnMean": {
+          "n": 3,
+          "mean": 133.7467,
+          "min": 133.72,
+          "max": 133.79,
+          "noise": 0.07
+        },
+        "boardK1P50": {
+          "n": 3,
+          "mean": 136.8,
+          "min": 136.8,
+          "max": 136.8,
+          "noise": 0.0
+        }
+      },
+      "frames": [
+        {
+          "set": "bench:dx12-medium",
+          "k2": "C:/tmp/w4a/bench/dx12-medium/r1/bench-K2x5-1920x1080.png",
+          "k2Sha256": "5da1d9d31c80d3e22f30d317f5ddab53c4b99122b2fc51ec9d8451fa8ab5833b",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 168.98,
+            "p5": 140.17,
+            "p50": 170.82,
+            "p95": 189.72,
+            "std": 14.9
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 171.3,
+            "p5": 137.09,
+            "p50": 175.04,
+            "p95": 193.72,
+            "std": 20.26
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 133.79,
+            "p5": 78.04,
+            "p50": 127.46,
+            "p95": 197.36,
+            "std": 45.4
+          },
+          "faceSpread": 49.55,
+          "k1": "C:/tmp/w4a/bench/dx12-medium/r1/bench-K1-1920x1080.png",
+          "k1Sha256": "a114d71c334eeec573bd1d928fe1c21b60a638bc68668ec6cf042cd3ab63699c",
+          "boardK1P50": 136.8
+        },
+        {
+          "set": "bench:dx12-medium",
+          "k2": "C:/tmp/w4a/bench/dx12-medium/r2/bench-K2x5-1920x1080.png",
+          "k2Sha256": "59bc45cddc3c8a2c3df0b40893abd7b9fc1fd91faf6edc4b7693396f6f07c7d8",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 168.97,
+            "p5": 141.15,
+            "p50": 170.86,
+            "p95": 190.13,
+            "std": 14.88
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 171.29,
+            "p5": 136.33,
+            "p50": 175.22,
+            "p95": 193.47,
+            "std": 20.29
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 133.72,
+            "p5": 78.01,
+            "p50": 127.5,
+            "p95": 197.2,
+            "std": 45.34
+          },
+          "faceSpread": 48.98,
+          "k1": "C:/tmp/w4a/bench/dx12-medium/r2/bench-K1-1920x1080.png",
+          "k1Sha256": "3196bb307c637f570fc8bca187b15540dbcc0dccdb9df69ad0407f258ee28dab",
+          "boardK1P50": 136.8
+        },
+        {
+          "set": "bench:dx12-medium",
+          "k2": "C:/tmp/w4a/bench/dx12-medium/r3/bench-K2x5-1920x1080.png",
+          "k2Sha256": "c9ec92b9c6c0cf34d9f3f5756567b0208d8202aa0f72cbb45938d4552b5cb852",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 169.02,
+            "p5": 141.41,
+            "p50": 170.68,
+            "p95": 189.98,
+            "std": 14.73
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 171.24,
+            "p5": 135.7,
+            "p50": 175.28,
+            "p95": 193.47,
+            "std": 20.28
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 133.73,
+            "p5": 78.07,
+            "p50": 127.03,
+            "p95": 198.01,
+            "std": 45.34
+          },
+          "faceSpread": 48.57,
+          "k1": "C:/tmp/w4a/bench/dx12-medium/r3/bench-K1-1920x1080.png",
+          "k1Sha256": "bc02cdd3afc0faca77f93c2b0051cacd5201dc03a81da6bc130b1f05133980a0",
+          "boardK1P50": 136.8
+        }
+      ]
+    },
+    "bench:dx12-low": {
+      "n": 3,
+      "aggregate": {
+        "faceMean": {
+          "n": 3,
+          "mean": 172.0333,
+          "min": 172.03,
+          "max": 172.04,
+          "noise": 0.01
+        },
+        "faceP5": {
+          "n": 3,
+          "mean": 148.4867,
+          "min": 148.01,
+          "max": 148.75,
+          "noise": 0.74
+        },
+        "faceP50": {
+          "n": 3,
+          "mean": 172.71,
+          "min": 172.58,
+          "max": 172.9,
+          "noise": 0.32
+        },
+        "faceP95": {
+          "n": 3,
+          "mean": 191.4867,
+          "min": 191.45,
+          "max": 191.51,
+          "noise": 0.06
+        },
+        "faceSpread": {
+          "n": 3,
+          "mean": 43.0,
+          "min": 42.75,
+          "max": 43.49,
+          "noise": 0.74
+        },
+        "faceNeckMean": {
+          "n": 3,
+          "mean": 175.15,
+          "min": 175.14,
+          "max": 175.16,
+          "noise": 0.02
+        },
+        "withdrawnMean": {
+          "n": 3,
+          "mean": 137.8767,
+          "min": 137.87,
+          "max": 137.88,
+          "noise": 0.01
+        },
+        "boardK1P50": {
+          "n": 3,
+          "mean": 132.87,
+          "min": 132.87,
+          "max": 132.87,
+          "noise": 0.0
+        }
+      },
+      "frames": [
+        {
+          "set": "bench:dx12-low",
+          "k2": "C:/tmp/w4a/bench/dx12-low/r1/bench-K2x5-1920x1080.png",
+          "k2Sha256": "38ecb04090984150c2639fac5c4ede8ee3bd6b5399fc723822b02330f309acd1",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 172.03,
+            "p5": 148.01,
+            "p50": 172.9,
+            "p95": 191.5,
+            "std": 13.51
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 175.15,
+            "p5": 144.29,
+            "p50": 178.79,
+            "p95": 195.58,
+            "std": 18.95
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 137.87,
+            "p5": 83.93,
+            "p50": 141.43,
+            "p95": 199.65,
+            "std": 43.93
+          },
+          "faceSpread": 43.49,
+          "k1": "C:/tmp/w4a/bench/dx12-low/r1/bench-K1-1920x1080.png",
+          "k1Sha256": "9e5ca64c59e608b8da19f2ce22b6fe96cff8109ec547c706ea6a732cf5448868",
+          "boardK1P50": 132.87
+        },
+        {
+          "set": "bench:dx12-low",
+          "k2": "C:/tmp/w4a/bench/dx12-low/r2/bench-K2x5-1920x1080.png",
+          "k2Sha256": "baa91a006a1bfcf858c15f2262be36c5f9931a41820389cbf8da1cc16f757798",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 172.03,
+            "p5": 148.7,
+            "p50": 172.58,
+            "p95": 191.45,
+            "std": 13.5
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 175.14,
+            "p5": 144.22,
+            "p50": 178.72,
+            "p95": 195.52,
+            "std": 18.94
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 137.88,
+            "p5": 83.93,
+            "p50": 142.89,
+            "p95": 199.65,
+            "std": 43.9
+          },
+          "faceSpread": 42.75,
+          "k1": "C:/tmp/w4a/bench/dx12-low/r2/bench-K1-1920x1080.png",
+          "k1Sha256": "72315d84d96824a1dce84136aa7f92f807eca50043ac85c7d95303bab0cb1fbd",
+          "boardK1P50": 132.87
+        },
+        {
+          "set": "bench:dx12-low",
+          "k2": "C:/tmp/w4a/bench/dx12-low/r3/bench-K2x5-1920x1080.png",
+          "k2Sha256": "758b43e1c96610dd63a0dd141436f243bf57314beb1955aa846715e07bcd1ac4",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 172.04,
+            "p5": 148.75,
+            "p50": 172.65,
+            "p95": 191.51,
+            "std": 13.51
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 175.16,
+            "p5": 143.89,
+            "p50": 178.76,
+            "p95": 195.58,
+            "std": 18.94
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 137.88,
+            "p5": 83.93,
+            "p50": 142.35,
+            "p95": 199.65,
+            "std": 43.94
+          },
+          "faceSpread": 42.76,
+          "k1": "C:/tmp/w4a/bench/dx12-low/r3/bench-K1-1920x1080.png",
+          "k1Sha256": "8dd179e661810b3a5f809bbaf4cb037d5c5922c7d6356936dcf6b8ffa2b1b5f3",
+          "boardK1P50": 132.87
+        }
+      ]
+    },
+    "bench:dx12-sm5-fallback": {
+      "n": 3,
+      "aggregate": {
+        "faceMean": {
+          "n": 3,
+          "mean": 166.1233,
+          "min": 166.06,
+          "max": 166.17,
+          "noise": 0.11
+        },
+        "faceP5": {
+          "n": 3,
+          "mean": 134.3667,
+          "min": 134.06,
+          "max": 134.73,
+          "noise": 0.67
+        },
+        "faceP50": {
+          "n": 3,
+          "mean": 166.41,
+          "min": 166.33,
+          "max": 166.54,
+          "noise": 0.21
+        },
+        "faceP95": {
+          "n": 3,
+          "mean": 193.6233,
+          "min": 193.57,
+          "max": 193.65,
+          "noise": 0.08
+        },
+        "faceSpread": {
+          "n": 3,
+          "mean": 59.2567,
+          "min": 58.92,
+          "max": 59.59,
+          "noise": 0.67
+        },
+        "faceNeckMean": {
+          "n": 3,
+          "mean": 172.15,
+          "min": 172.11,
+          "max": 172.18,
+          "noise": 0.07
+        },
+        "withdrawnMean": {
+          "n": 3,
+          "mean": 139.2533,
+          "min": 139.23,
+          "max": 139.28,
+          "noise": 0.05
+        },
+        "boardK1P50": {
+          "n": 3,
+          "mean": 140.7867,
+          "min": 140.78,
+          "max": 140.8,
+          "noise": 0.02
+        }
+      },
+      "frames": [
+        {
+          "set": "bench:dx12-sm5-fallback",
+          "k2": "C:/tmp/w4a/bench/dx12-sm5-fallback/r1/bench-K2x5-1920x1080.png",
+          "k2Sha256": "f13e7cd840a39984527fb68920a7ea6a6da00a2f1a2a8e32fd6a09a4b8d79e7b",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 166.17,
+            "p5": 134.31,
+            "p50": 166.33,
+            "p95": 193.57,
+            "std": 18.07
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 172.18,
+            "p5": 132.22,
+            "p50": 175.44,
+            "p95": 199.43,
+            "std": 22.76
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 139.28,
+            "p5": 86.47,
+            "p50": 134.32,
+            "p95": 202.68,
+            "std": 41.43
+          },
+          "faceSpread": 59.26,
+          "k1": "C:/tmp/w4a/bench/dx12-sm5-fallback/r1/bench-K1-1920x1080.png",
+          "k1Sha256": "9e702b5f41b2a217e29e32d1c4b54124f68cfd5fedf38dec3d3b7461e12beb68",
+          "boardK1P50": 140.8
+        },
+        {
+          "set": "bench:dx12-sm5-fallback",
+          "k2": "C:/tmp/w4a/bench/dx12-sm5-fallback/r2/bench-K2x5-1920x1080.png",
+          "k2Sha256": "3986d9569281069d8af73d4dbd41d6fc6296be2c088b060aab2eedc82b5238d4",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 166.14,
+            "p5": 134.06,
+            "p50": 166.54,
+            "p95": 193.65,
+            "std": 18.09
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 172.16,
+            "p5": 132.17,
+            "p50": 175.44,
+            "p95": 199.45,
+            "std": 22.8
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 139.25,
+            "p5": 86.36,
+            "p50": 134.22,
+            "p95": 202.53,
+            "std": 41.42
+          },
+          "faceSpread": 59.59,
+          "k1": "C:/tmp/w4a/bench/dx12-sm5-fallback/r2/bench-K1-1920x1080.png",
+          "k1Sha256": "e755039e765ad4a528c0d4b42fb6c6bbd888f347978dc5263160c74ddc6cebd5",
+          "boardK1P50": 140.78
+        },
+        {
+          "set": "bench:dx12-sm5-fallback",
+          "k2": "C:/tmp/w4a/bench/dx12-sm5-fallback/r3/bench-K2x5-1920x1080.png",
+          "k2Sha256": "5b090e704b8f5cc0c2fc34bc2dafe1eeec3871571fde85bedcaabecf9e3906c2",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 166.06,
+            "p5": 134.73,
+            "p50": 166.36,
+            "p95": 193.65,
+            "std": 18.15
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 172.11,
+            "p5": 131.74,
+            "p50": 175.72,
+            "p95": 199.45,
+            "std": 22.82
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 139.23,
+            "p5": 86.68,
+            "p50": 134.68,
+            "p95": 202.72,
+            "std": 41.4
+          },
+          "faceSpread": 58.92,
+          "k1": "C:/tmp/w4a/bench/dx12-sm5-fallback/r3/bench-K1-1920x1080.png",
+          "k1Sha256": "cbee1acf71451096fc36d0521e5b5ccd0491bc9d5699673daa6011acf3081d49",
+          "boardK1P50": 140.78
+        }
+      ]
+    },
+    "bench:dx11-fallback": {
+      "n": 1,
+      "aggregate": {
+        "faceMean": {
+          "n": 1,
+          "mean": 166.1,
+          "min": 166.1,
+          "max": 166.1,
+          "noise": 0.0
+        },
+        "faceP5": {
+          "n": 1,
+          "mean": 134.06,
+          "min": 134.06,
+          "max": 134.06,
+          "noise": 0.0
+        },
+        "faceP50": {
+          "n": 1,
+          "mean": 166.79,
+          "min": 166.79,
+          "max": 166.79,
+          "noise": 0.0
+        },
+        "faceP95": {
+          "n": 1,
+          "mean": 193.55,
+          "min": 193.55,
+          "max": 193.55,
+          "noise": 0.0
+        },
+        "faceSpread": {
+          "n": 1,
+          "mean": 59.49,
+          "min": 59.49,
+          "max": 59.49,
+          "noise": 0.0
+        },
+        "faceNeckMean": {
+          "n": 1,
+          "mean": 172.12,
+          "min": 172.12,
+          "max": 172.12,
+          "noise": 0.0
+        },
+        "withdrawnMean": {
+          "n": 1,
+          "mean": 139.25,
+          "min": 139.25,
+          "max": 139.25,
+          "noise": 0.0
+        },
+        "boardK1P50": {
+          "n": 1,
+          "mean": 140.77,
+          "min": 140.77,
+          "max": 140.77,
+          "noise": 0.0
+        }
+      },
+      "frames": [
+        {
+          "set": "bench:dx11-fallback",
+          "k2": "C:/tmp/w4a/bench/dx11-fallback/r1/bench-K2x5-1920x1080.png",
+          "k2Sha256": "2fc2efb3086b7a60f3dda9df8648d3ca69ac37afc632dd9ac31bbf1e46c90238",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 166.1,
+            "p5": 134.06,
+            "p50": 166.79,
+            "p95": 193.55,
+            "std": 18.12
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 172.12,
+            "p5": 132.11,
+            "p50": 175.61,
+            "p95": 199.52,
+            "std": 22.83
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 139.25,
+            "p5": 86.43,
+            "p50": 134.58,
+            "p95": 202.79,
+            "std": 41.4
+          },
+          "faceSpread": 59.49,
+          "k1": "C:/tmp/w4a/bench/dx11-fallback/r1/bench-K1-1920x1080.png",
+          "k1Sha256": "54aa338cfa1e5e8ea9e798c6cd0a280dfa8a016e89740a672686395363e841d5",
+          "boardK1P50": 140.77
+        }
+      ]
+    },
+    "calib:sky-1.5": {
+      "n": 1,
+      "aggregate": {
+        "faceMean": {
+          "n": 1,
+          "mean": 157.69,
+          "min": 157.69,
+          "max": 157.69,
+          "noise": 0.0
+        },
+        "faceP5": {
+          "n": 1,
+          "mean": 132.34,
+          "min": 132.34,
+          "max": 132.34,
+          "noise": 0.0
+        },
+        "faceP50": {
+          "n": 1,
+          "mean": 157.15,
+          "min": 157.15,
+          "max": 157.15,
+          "noise": 0.0
+        },
+        "faceP95": {
+          "n": 1,
+          "mean": 181.15,
+          "min": 181.15,
+          "max": 181.15,
+          "noise": 0.0
+        },
+        "faceSpread": {
+          "n": 1,
+          "mean": 48.81,
+          "min": 48.81,
+          "max": 48.81,
+          "noise": 0.0
+        },
+        "faceNeckMean": {
+          "n": 1,
+          "mean": 159.18,
+          "min": 159.18,
+          "max": 159.18,
+          "noise": 0.0
+        },
+        "withdrawnMean": {
+          "n": 1,
+          "mean": 119.68,
+          "min": 119.68,
+          "max": 119.68,
+          "noise": 0.0
+        },
+        "boardK1P50": {
+          "n": 1,
+          "mean": 139.36,
+          "min": 139.36,
+          "max": 139.36,
+          "noise": 0.0
+        }
+      },
+      "frames": [
+        {
+          "set": "calib:sky-1.5",
+          "k2": "C:/tmp/w4a/calib/sky-1.5/r1/bench-K2x5-1920x1080.png",
+          "k2Sha256": "90eca24502d3e974663b9b111736e0e160ebf081d8a9ae1d1303b4e14d0d7ecc",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 157.69,
+            "p5": 132.34,
+            "p50": 157.15,
+            "p95": 181.15,
+            "std": 14.87
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 159.18,
+            "p5": 122.62,
+            "p50": 162.54,
+            "p95": 181.22,
+            "std": 19.83
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 119.68,
+            "p5": 59.65,
+            "p50": 116.75,
+            "p95": 181.61,
+            "std": 47.2
+          },
+          "faceSpread": 48.81,
+          "k1": "C:/tmp/w4a/calib/sky-1.5/r1/bench-K1-1920x1080.png",
+          "k1Sha256": "f3bbc1a13b4b5f36eb696c8c650f03a3b5cffe8db6dd68775cf42da2c72a0c0a",
+          "boardK1P50": 139.36
+        }
+      ]
+    },
+    "calib:sky-2": {
+      "n": 1,
+      "aggregate": {
+        "faceMean": {
+          "n": 1,
+          "mean": 173.72,
+          "min": 173.72,
+          "max": 173.72,
+          "noise": 0.0
+        },
+        "faceP5": {
+          "n": 1,
+          "mean": 149.72,
+          "min": 149.72,
+          "max": 149.72,
+          "noise": 0.0
+        },
+        "faceP50": {
+          "n": 1,
+          "mean": 173.72,
+          "min": 173.72,
+          "max": 173.72,
+          "noise": 0.0
+        },
+        "faceP95": {
+          "n": 1,
+          "mean": 194.7,
+          "min": 194.7,
+          "max": 194.7,
+          "noise": 0.0
+        },
+        "faceSpread": {
+          "n": 1,
+          "mean": 44.98,
+          "min": 44.98,
+          "max": 44.98,
+          "noise": 0.0
+        },
+        "faceNeckMean": {
+          "n": 1,
+          "mean": 174.59,
+          "min": 174.59,
+          "max": 174.59,
+          "noise": 0.0
+        },
+        "withdrawnMean": {
+          "n": 1,
+          "mean": 134.77,
+          "min": 134.77,
+          "max": 134.77,
+          "noise": 0.0
+        },
+        "boardK1P50": {
+          "n": 1,
+          "mean": 159.5,
+          "min": 159.5,
+          "max": 159.5,
+          "noise": 0.0
+        }
+      },
+      "frames": [
+        {
+          "set": "calib:sky-2",
+          "k2": "C:/tmp/w4a/calib/sky-2/r1/bench-K2x5-1920x1080.png",
+          "k2Sha256": "dbf4f9961abc6bb9ac897b7996328b82cd1e7e8bcc14c57fa5ede205f9c56f5a",
+          "head": {
+            "mesh": "SK_Medusa_FaceNeck_v2Candidate",
+            "screen": "(960.0,517.7)",
+            "headPx": "56.4"
+          },
+          "faceRoi": {
+            "box": [
+              925,
+              464,
+              958,
+              480
+            ],
+            "pixels": 528,
+            "mean": 173.72,
+            "p5": 149.72,
+            "p50": 173.72,
+            "p95": 194.7,
+            "std": 13.47
+          },
+          "faceNeckRoi": {
+            "box": [
+              924,
+              462,
+              956,
+              490
+            ],
+            "pixels": 896,
+            "mean": 174.59,
+            "p5": 141.04,
+            "p50": 178.01,
+            "p95": 194.65,
+            "std": 18.79
+          },
+          "withdrawnFirstRule": {
+            "box": [
+              946,
+              461,
+              974,
+              490
+            ],
+            "pixels": 812,
+            "mean": 134.77,
+            "p5": 72.5,
+            "p50": 134.65,
+            "p95": 195.13,
+            "std": 47.67
+          },
+          "faceSpread": 44.98,
+          "k1": "C:/tmp/w4a/calib/sky-2/r1/bench-K1-1920x1080.png",
+          "k1Sha256": "20ccee066077f1b532c0042e0bcd5b760b92003383691655ffc2516ddebcc546",
+          "boardK1P50": 159.5
+        }
+      ]
+    }
+  },
+  "comparisons": {
+    "live-dx11-old -> live-dx12-lumen-high": {
+      "faceMean": {
+        "a": 156.9967,
+        "b": 153.6133,
+        "delta": -3.38,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "faceP5": {
+        "a": 113.6967,
+        "b": 129.9233,
+        "delta": 16.23,
+        "threshold2xNoise": 1.82,
+        "significant": true
+      },
+      "faceP50": {
+        "a": 163.53,
+        "b": 153.09,
+        "delta": -10.44,
+        "threshold2xNoise": 0.86,
+        "significant": true
+      },
+      "faceP95": {
+        "a": 185.22,
+        "b": 176.96,
+        "delta": -8.26,
+        "threshold2xNoise": 1.44,
+        "significant": true
+      },
+      "faceSpread": {
+        "a": 71.5233,
+        "b": 47.0367,
+        "delta": -24.49,
+        "threshold2xNoise": 2.36,
+        "significant": true
+      },
+      "faceNeckMean": {
+        "a": 163.3233,
+        "b": 155.1533,
+        "delta": -8.17,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "withdrawnMean": {
+        "a": 106.16,
+        "b": 115.95,
+        "delta": 9.79,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "boardK1P50": {
+        "a": 81.94,
+        "b": 134.43,
+        "delta": 52.49,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      }
+    },
+    "bench:dx12sm5-legacy -> bench:dx12-lumen-high": {
+      "faceMean": {
+        "a": 157.7567,
+        "b": 153.7367,
+        "delta": -4.02,
+        "threshold2xNoise": 0.66,
+        "significant": true
+      },
+      "faceP5": {
+        "a": 112.0967,
+        "b": 128.2667,
+        "delta": 16.17,
+        "threshold2xNoise": 1.7,
+        "significant": true
+      },
+      "faceP50": {
+        "a": 164.7667,
+        "b": 153.29,
+        "delta": -11.48,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "faceP95": {
+        "a": 187.57,
+        "b": 178.2267,
+        "delta": -9.34,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "faceSpread": {
+        "a": 75.4733,
+        "b": 49.96,
+        "delta": -25.51,
+        "threshold2xNoise": 1.96,
+        "significant": true
+      },
+      "faceNeckMean": {
+        "a": 164.0067,
+        "b": 155.38,
+        "delta": -8.63,
+        "threshold2xNoise": 0.7,
+        "significant": true
+      },
+      "withdrawnMean": {
+        "a": 106.5333,
+        "b": 115.9967,
+        "delta": 9.46,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "boardK1P50": {
+        "a": 81.9367,
+        "b": 134.43,
+        "delta": 52.49,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      }
+    },
+    "bench:dx11-legacy -> bench:dx12sm5-legacy": {
+      "faceMean": {
+        "a": 157.73,
+        "b": 157.7567,
+        "delta": 0.03,
+        "threshold2xNoise": 0.5,
+        "significant": false
+      },
+      "faceP5": {
+        "a": 112.1867,
+        "b": 112.0967,
+        "delta": -0.09,
+        "threshold2xNoise": 1.7,
+        "significant": false
+      },
+      "faceP50": {
+        "a": 164.8467,
+        "b": 164.7667,
+        "delta": -0.08,
+        "threshold2xNoise": 0.5,
+        "significant": false
+      },
+      "faceP95": {
+        "a": 187.3567,
+        "b": 187.57,
+        "delta": 0.21,
+        "threshold2xNoise": 0.5,
+        "significant": false
+      },
+      "faceSpread": {
+        "a": 75.17,
+        "b": 75.4733,
+        "delta": 0.3,
+        "threshold2xNoise": 1.38,
+        "significant": false
+      },
+      "faceNeckMean": {
+        "a": 163.9833,
+        "b": 164.0067,
+        "delta": 0.02,
+        "threshold2xNoise": 0.5,
+        "significant": false
+      },
+      "withdrawnMean": {
+        "a": 106.5,
+        "b": 106.5333,
+        "delta": 0.03,
+        "threshold2xNoise": 0.5,
+        "significant": false
+      },
+      "boardK1P50": {
+        "a": 81.94,
+        "b": 81.9367,
+        "delta": -0.0,
+        "threshold2xNoise": 0.5,
+        "significant": false
+      }
+    },
+    "live-dx11-old -> bench:dx12sm5-legacy": {
+      "faceMean": {
+        "a": 156.9967,
+        "b": 157.7567,
+        "delta": 0.76,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "faceP5": {
+        "a": 113.6967,
+        "b": 112.0967,
+        "delta": -1.6,
+        "threshold2xNoise": 1.82,
+        "significant": false
+      },
+      "faceP50": {
+        "a": 163.53,
+        "b": 164.7667,
+        "delta": 1.24,
+        "threshold2xNoise": 0.86,
+        "significant": true
+      },
+      "faceP95": {
+        "a": 185.22,
+        "b": 187.57,
+        "delta": 2.35,
+        "threshold2xNoise": 0.9,
+        "significant": true
+      },
+      "faceSpread": {
+        "a": 71.5233,
+        "b": 75.4733,
+        "delta": 3.95,
+        "threshold2xNoise": 2.36,
+        "significant": true
+      },
+      "faceNeckMean": {
+        "a": 163.3233,
+        "b": 164.0067,
+        "delta": 0.68,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "withdrawnMean": {
+        "a": 106.16,
+        "b": 106.5333,
+        "delta": 0.37,
+        "threshold2xNoise": 0.5,
+        "significant": false
+      },
+      "boardK1P50": {
+        "a": 81.94,
+        "b": 81.9367,
+        "delta": -0.0,
+        "threshold2xNoise": 0.5,
+        "significant": false
+      }
+    },
+    "live-dx12-lumen-high -> bench:dx12-lumen-high": {
+      "faceMean": {
+        "a": 153.6133,
+        "b": 153.7367,
+        "delta": 0.12,
+        "threshold2xNoise": 0.66,
+        "significant": false
+      },
+      "faceP5": {
+        "a": 129.9233,
+        "b": 128.2667,
+        "delta": -1.66,
+        "threshold2xNoise": 1.68,
+        "significant": false
+      },
+      "faceP50": {
+        "a": 153.09,
+        "b": 153.29,
+        "delta": 0.2,
+        "threshold2xNoise": 0.5,
+        "significant": false
+      },
+      "faceP95": {
+        "a": 176.96,
+        "b": 178.2267,
+        "delta": 1.27,
+        "threshold2xNoise": 1.44,
+        "significant": false
+      },
+      "faceSpread": {
+        "a": 47.0367,
+        "b": 49.96,
+        "delta": 2.92,
+        "threshold2xNoise": 1.96,
+        "significant": true
+      },
+      "faceNeckMean": {
+        "a": 155.1533,
+        "b": 155.38,
+        "delta": 0.23,
+        "threshold2xNoise": 0.7,
+        "significant": false
+      },
+      "withdrawnMean": {
+        "a": 115.95,
+        "b": 115.9967,
+        "delta": 0.05,
+        "threshold2xNoise": 0.5,
+        "significant": false
+      },
+      "boardK1P50": {
+        "a": 134.43,
+        "b": 134.43,
+        "delta": 0.0,
+        "threshold2xNoise": 0.5,
+        "significant": false
+      }
+    },
+    "bench:dx12-lumen-high -> bench:dx12-lumen-high-vsm": {
+      "faceMean": {
+        "a": 153.7367,
+        "b": 154.3833,
+        "delta": 0.65,
+        "threshold2xNoise": 0.86,
+        "significant": false
+      },
+      "faceP5": {
+        "a": 128.2667,
+        "b": 129.11,
+        "delta": 0.84,
+        "threshold2xNoise": 3.7,
+        "significant": false
+      },
+      "faceP50": {
+        "a": 153.29,
+        "b": 153.74,
+        "delta": 0.45,
+        "threshold2xNoise": 0.78,
+        "significant": false
+      },
+      "faceP95": {
+        "a": 178.2267,
+        "b": 178.7833,
+        "delta": 0.56,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "faceSpread": {
+        "a": 49.96,
+        "b": 49.6733,
+        "delta": -0.29,
+        "threshold2xNoise": 3.52,
+        "significant": false
+      },
+      "faceNeckMean": {
+        "a": 155.38,
+        "b": 155.7467,
+        "delta": 0.37,
+        "threshold2xNoise": 1.0,
+        "significant": false
+      },
+      "withdrawnMean": {
+        "a": 115.9967,
+        "b": 116.8033,
+        "delta": 0.81,
+        "threshold2xNoise": 0.62,
+        "significant": true
+      },
+      "boardK1P50": {
+        "a": 134.43,
+        "b": 134.44,
+        "delta": 0.01,
+        "threshold2xNoise": 0.5,
+        "significant": false
+      }
+    },
+    "bench:dx12-lumen-high -> bench:dx12-medium": {
+      "faceMean": {
+        "a": 153.7367,
+        "b": 168.99,
+        "delta": 15.25,
+        "threshold2xNoise": 0.66,
+        "significant": true
+      },
+      "faceP5": {
+        "a": 128.2667,
+        "b": 140.91,
+        "delta": 12.64,
+        "threshold2xNoise": 2.48,
+        "significant": true
+      },
+      "faceP50": {
+        "a": 153.29,
+        "b": 170.7867,
+        "delta": 17.5,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "faceP95": {
+        "a": 178.2267,
+        "b": 189.9433,
+        "delta": 11.72,
+        "threshold2xNoise": 0.82,
+        "significant": true
+      },
+      "faceSpread": {
+        "a": 49.96,
+        "b": 49.0333,
+        "delta": -0.93,
+        "threshold2xNoise": 1.96,
+        "significant": false
+      },
+      "faceNeckMean": {
+        "a": 155.38,
+        "b": 171.2767,
+        "delta": 15.9,
+        "threshold2xNoise": 0.7,
+        "significant": true
+      },
+      "withdrawnMean": {
+        "a": 115.9967,
+        "b": 133.7467,
+        "delta": 17.75,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "boardK1P50": {
+        "a": 134.43,
+        "b": 136.8,
+        "delta": 2.37,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      }
+    },
+    "bench:dx12-lumen-high -> bench:dx12-low": {
+      "faceMean": {
+        "a": 153.7367,
+        "b": 172.0333,
+        "delta": 18.3,
+        "threshold2xNoise": 0.66,
+        "significant": true
+      },
+      "faceP5": {
+        "a": 128.2667,
+        "b": 148.4867,
+        "delta": 20.22,
+        "threshold2xNoise": 1.68,
+        "significant": true
+      },
+      "faceP50": {
+        "a": 153.29,
+        "b": 172.71,
+        "delta": 19.42,
+        "threshold2xNoise": 0.64,
+        "significant": true
+      },
+      "faceP95": {
+        "a": 178.2267,
+        "b": 191.4867,
+        "delta": 13.26,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "faceSpread": {
+        "a": 49.96,
+        "b": 43.0,
+        "delta": -6.96,
+        "threshold2xNoise": 1.96,
+        "significant": true
+      },
+      "faceNeckMean": {
+        "a": 155.38,
+        "b": 175.15,
+        "delta": 19.77,
+        "threshold2xNoise": 0.7,
+        "significant": true
+      },
+      "withdrawnMean": {
+        "a": 115.9967,
+        "b": 137.8767,
+        "delta": 21.88,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "boardK1P50": {
+        "a": 134.43,
+        "b": 132.87,
+        "delta": -1.56,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      }
+    },
+    "bench:dx12-lumen-high -> bench:dx12-sm5-fallback": {
+      "faceMean": {
+        "a": 153.7367,
+        "b": 166.1233,
+        "delta": 12.39,
+        "threshold2xNoise": 0.66,
+        "significant": true
+      },
+      "faceP5": {
+        "a": 128.2667,
+        "b": 134.3667,
+        "delta": 6.1,
+        "threshold2xNoise": 1.68,
+        "significant": true
+      },
+      "faceP50": {
+        "a": 153.29,
+        "b": 166.41,
+        "delta": 13.12,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "faceP95": {
+        "a": 178.2267,
+        "b": 193.6233,
+        "delta": 15.4,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "faceSpread": {
+        "a": 49.96,
+        "b": 59.2567,
+        "delta": 9.3,
+        "threshold2xNoise": 1.96,
+        "significant": true
+      },
+      "faceNeckMean": {
+        "a": 155.38,
+        "b": 172.15,
+        "delta": 16.77,
+        "threshold2xNoise": 0.7,
+        "significant": true
+      },
+      "withdrawnMean": {
+        "a": 115.9967,
+        "b": 139.2533,
+        "delta": 23.26,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      },
+      "boardK1P50": {
+        "a": 134.43,
+        "b": 140.7867,
+        "delta": 6.36,
+        "threshold2xNoise": 0.5,
+        "significant": true
+      }
+    },
+    "bench:dx12-lumen-high -> calib:sky-1.5": {
+      "faceMean": {
+        "a": 153.7367,
+        "b": 157.69,
+        "delta": 3.95,
+        "threshold2xNoise": 0.66,
+        "significant": null
+      },
+      "faceP5": {
+        "a": 128.2667,
+        "b": 132.34,
+        "delta": 4.07,
+        "threshold2xNoise": 1.68,
+        "significant": null
+      },
+      "faceP50": {
+        "a": 153.29,
+        "b": 157.15,
+        "delta": 3.86,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "faceP95": {
+        "a": 178.2267,
+        "b": 181.15,
+        "delta": 2.92,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "faceSpread": {
+        "a": 49.96,
+        "b": 48.81,
+        "delta": -1.15,
+        "threshold2xNoise": 1.96,
+        "significant": null
+      },
+      "faceNeckMean": {
+        "a": 155.38,
+        "b": 159.18,
+        "delta": 3.8,
+        "threshold2xNoise": 0.7,
+        "significant": null
+      },
+      "withdrawnMean": {
+        "a": 115.9967,
+        "b": 119.68,
+        "delta": 3.68,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "boardK1P50": {
+        "a": 134.43,
+        "b": 139.36,
+        "delta": 4.93,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      }
+    },
+    "bench:dx12-lumen-high -> calib:sky-2": {
+      "faceMean": {
+        "a": 153.7367,
+        "b": 173.72,
+        "delta": 19.98,
+        "threshold2xNoise": 0.66,
+        "significant": null
+      },
+      "faceP5": {
+        "a": 128.2667,
+        "b": 149.72,
+        "delta": 21.45,
+        "threshold2xNoise": 1.68,
+        "significant": null
+      },
+      "faceP50": {
+        "a": 153.29,
+        "b": 173.72,
+        "delta": 20.43,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "faceP95": {
+        "a": 178.2267,
+        "b": 194.7,
+        "delta": 16.47,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "faceSpread": {
+        "a": 49.96,
+        "b": 44.98,
+        "delta": -4.98,
+        "threshold2xNoise": 1.96,
+        "significant": null
+      },
+      "faceNeckMean": {
+        "a": 155.38,
+        "b": 174.59,
+        "delta": 19.21,
+        "threshold2xNoise": 0.7,
+        "significant": null
+      },
+      "withdrawnMean": {
+        "a": 115.9967,
+        "b": 134.77,
+        "delta": 18.77,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "boardK1P50": {
+        "a": 134.43,
+        "b": 159.5,
+        "delta": 25.07,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      }
+    },
+    "p17-editor -> live-dx11-old": {
+      "faceMean": {
+        "a": 148.44,
+        "b": 156.9967,
+        "delta": 8.56,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "faceP5": {
+        "a": 62.22,
+        "b": 113.6967,
+        "delta": 51.48,
+        "threshold2xNoise": 1.82,
+        "significant": null
+      },
+      "faceP50": {
+        "a": 160.72,
+        "b": 163.53,
+        "delta": 2.81,
+        "threshold2xNoise": 0.86,
+        "significant": null
+      },
+      "faceP95": {
+        "a": 196.43,
+        "b": 185.22,
+        "delta": -11.21,
+        "threshold2xNoise": 0.9,
+        "significant": null
+      },
+      "faceSpread": {
+        "a": 134.21,
+        "b": 71.5233,
+        "delta": -62.69,
+        "threshold2xNoise": 2.36,
+        "significant": null
+      },
+      "faceNeckMean": {
+        "a": 160.19,
+        "b": 163.3233,
+        "delta": 3.13,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "withdrawnMean": {
+        "a": 123.2,
+        "b": 106.16,
+        "delta": -17.04,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "boardK1P50": {
+        "a": 131.22,
+        "b": 81.94,
+        "delta": -49.28,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      }
+    },
+    "p17-editor -> live-dx12-lumen-high": {
+      "faceMean": {
+        "a": 148.44,
+        "b": 153.6133,
+        "delta": 5.17,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "faceP5": {
+        "a": 62.22,
+        "b": 129.9233,
+        "delta": 67.7,
+        "threshold2xNoise": 0.92,
+        "significant": null
+      },
+      "faceP50": {
+        "a": 160.72,
+        "b": 153.09,
+        "delta": -7.63,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "faceP95": {
+        "a": 196.43,
+        "b": 176.96,
+        "delta": -19.47,
+        "threshold2xNoise": 1.44,
+        "significant": null
+      },
+      "faceSpread": {
+        "a": 134.21,
+        "b": 47.0367,
+        "delta": -87.17,
+        "threshold2xNoise": 1.14,
+        "significant": null
+      },
+      "faceNeckMean": {
+        "a": 160.19,
+        "b": 155.1533,
+        "delta": -5.04,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "withdrawnMean": {
+        "a": 123.2,
+        "b": 115.95,
+        "delta": -7.25,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      },
+      "boardK1P50": {
+        "a": 131.22,
+        "b": 134.43,
+        "delta": 3.21,
+        "threshold2xNoise": 0.5,
+        "significant": null
+      }
+    }
+  }
+}

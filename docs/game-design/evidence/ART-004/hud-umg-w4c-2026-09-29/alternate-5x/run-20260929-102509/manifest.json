@@ -1,0 +1,120 @@
+{
+  "stamp": "20260929-102509",
+  "verdict": "ART PREVIEW K2 PROBE: live 5x6 board (cobble-city) + selected host hero projected + joiner six fighters + HUD/board pixel gate; visual K2 review still required",
+  "files": [
+    {
+      "name": "phase2-client-host.trace.log",
+      "bytes": 26502,
+      "sha256": "528fa282e86ad52e53ccdfa679d8a221e13481a50975db558570e3091791ff3a"
+    },
+    {
+      "name": "phase2-client-joiner.trace.log",
+      "bytes": 19475,
+      "sha256": "5fb40bb24b950ee11cab3aca8670ba95b181caf638c938f9d528aa4bf45fa57a"
+    },
+    {
+      "name": "phase2-board-host-1920x1080.png",
+      "bytes": 2801365,
+      "sha256": "a593f1d9b854bab238c58683fd4f3fe52a3f1fd414632a6422efd0686e461cb7"
+    },
+    {
+      "name": "phase2-board-joiner-1920x1080.png",
+      "bytes": 1571278,
+      "sha256": "be9d11ac78029f255b43a7dd6554b70fe0bbca49c8fd6aa836312d9918018e14"
+    },
+    {
+      "name": "phase2-board-host-1920x1080-artcheck.json",
+      "bytes": 308,
+      "sha256": "c4c99a633e0a8739d1dce168df3a429c5d534a71cf889cae04884924b1066ef6"
+    },
+    {
+      "name": "phase2-board-joiner-1920x1080-artcheck.json",
+      "bytes": 310,
+      "sha256": "519f9b8f41e27853f1f34131f83d83bd8e4f16f17bef1a95ccc14b083a98a1e9"
+    },
+    {
+      "name": "art-preview-status.json",
+      "bytes": 631,
+      "sha256": "de08a2d53291e065add868c4fa39ca28f96e11e4c21d884a3e97126e33723d8f"
+    },
+    {
+      "name": "client-logs/Unmatched.log",
+      "bytes": 119566,
+      "sha256": "2671322172c26d601d787ced43f538dcb66aa7a159dbbff8b59b24d1a317eb24"
+    },
+    {
+      "name": "client-logs/Unmatched_2.log",
+      "bytes": 119286,
+      "sha256": "5086bc9c2d7ea8b20f98cfb4fb0dcbaae85a9d0834cf0fdcd0de9c04a7ec1ef8"
+    },
+    {
+      "name": "demo.stdout.txt",
+      "bytes": 8609,
+      "sha256": "2748ce777f7cb861e23bbcac1e9ffbc479c91500df11a54bf661a8943df1ece7"
+    },
+    {
+      "name": "nvidia-smi-gpu.csv",
+      "bytes": 13489,
+      "sha256": "40954d07a48158f49ea306e10da032163d716cb6110f62776272f61367a8d185"
+    },
+    {
+      "name": "perf-csv.json",
+      "bytes": 5753,
+      "sha256": "c8f431853d576377239914b17c75d52fddd2366eb0ead787bf3c6e1f97cfa7e3"
+    },
+    {
+      "name": "perf.json",
+      "bytes": 33297,
+      "sha256": "747f23f2852a9190dce8def211e7b3013f004849f8676067cff63d28a1554ba7"
+    },
+    {
+      "name": "phase2-board-host-1920x1080.evidence.json",
+      "bytes": 1303,
+      "sha256": "f5a567122f00bdd58564ad6eb30d7a82c63786ba6c5259fcfc4beee2d0d6749b"
+    },
+    {
+      "name": "phase2-board-joiner-1920x1080.evidence.json",
+      "bytes": 1305,
+      "sha256": "301a8fdd7dca7a17ad78da8a17b8e944076526851db3491303d8d95140f1e2f0"
+    },
+    {
+      "name": "run-record.json",
+      "bytes": 6766,
+      "sha256": "5cee468364e0a46aaa96c503effed4caa2f4dfdca743a3d2e3069f64985854ba"
+    },
+    {
+      "name": "timing.json",
+      "bytes": 1624,
+      "sha256": "e149f40c3deae4e17ced40107ae0ce6f2d2153923ade72c31fbcc13d53cee12f"
+    },
+    {
+      "name": "qa010/icon.json",
+      "bytes": 3116,
+      "sha256": "3dafbbbc84193e6771792bc968acb07149f5685d8c0dc1c86f868fa4f5a7ac1f"
+    },
+    {
+      "name": "qa010/plate.json",
+      "bytes": 4764,
+      "sha256": "e281aa76bc44cb7fb20fa0eed28961e6c9611b48cd2ff412418caec635976ac7"
+    },
+    {
+      "name": "qa010/qa-summary.json",
+      "bytes": 2942,
+      "sha256": "49bc86efb0f9a1f5e8f60b843f0358b27453a4ac95360c5005299f6774b2cd78"
+    }
+  ],
+  "extendedBy": "tools/art/art004_live_k2.py run (client logs, perf, timing, sidecars, nvidia-smi, stdout)",
+  "qa010By": "tools/art/art004_hud_t22.py qa (qa010 plate/icon + #C8A0FF plate marker gate)",
+  "omittedFromGit": [
+    {
+      "name": "qa010/plate-overlay.png",
+      "bytes": 2384156,
+      "sha256": "34951783580f4bf80347cc0fb56fae955cd25d853015d444ef15538d9882c5a9",
+      "why": "diagnostic qa010 plate overlay of a timing-only alternate run (evidence size); the qa010 plate result stays in qa010/plate.json and qa010/qa-summary.json",
+      "regenerate": "python tools/art/qa010/qa010.py plate --trace docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29/alternate-5x/run-20260929-102509/phase2-client-host.trace.log --frame docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29/alternate-5x/run-20260929-102509/phase2-board-host-1920x1080.png --overlay <out.png> --json <out.json>",
+      "regeneratedByteIdentical": true,
+      "checkedLocal": "2026-09-29",
+      "keptOutsideGit": "C:/tmp/w4c/superseded/alternate-overlays/run-20260929-102509/qa010/plate-overlay.png"
+    }
+  ]
+}

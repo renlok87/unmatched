@@ -11,6 +11,7 @@
 #include "S08BoardArt.h"
 #include "S08BoardModel.h"
 #include "S08Contracts.h"
+#include "S08Render.h"
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
 #include "HAL/FileManager.h"
@@ -128,7 +129,16 @@ bool FS08BoardArtShippedTest::RunTest(const FString&) {
     FString Reason;
     TestTrue(FString::Printf(TEXT("light %s budget: %s"), *Light.Key, *Reason), Light.Value.BudgetOk(Reason));
     TestTrue(FString::Printf(TEXT("light %s <= 6 points"), *Light.Key), Light.Value.Points.Num() <= 6);
+    // W4-A: candela/lux units, SkyLight instead of a point fill, fixed exposure.
+    TestTrue(FString::Printf(TEXT("light %s units candelas/lux"), *Light.Key), Light.Value.HasPhysicalUnits());
+    TestTrue(FString::Printf(TEXT("light %s has a SkyLight"), *Light.Key), Light.Value.Sky.bSet);
+    TestTrue(FString::Printf(TEXT("light %s fixed exposure"), *Light.Key),
+             Light.Value.Exposure.bSet && Light.Value.Exposure.MinBrightness == Light.Value.Exposure.MaxBrightness);
+    for (const FS08LightSpec& Point : Light.Value.Points) {
+      TestFalse(FString::Printf(TEXT("light %s: no point fill ambient"), *Light.Key), Point.Role == TEXT("fill"));
+    }
   }
+  TestEqual("profile sha256 recorded", Data.SourceSha256.Len(), 64);
   for (const FS08BoardArtProfile& B : Data.Boards) {
     TSet<ES08ZoneStroke> Strokes;
     TSet<ES08ZoneGlyph> Glyphs;
@@ -196,6 +206,64 @@ bool FS08BoardArtParserTest::RunTest(const FString&) {
   Expect(TEXT("unknown glyph material"), TEXT("\"surface\":\"tiles\","), TEXT("\"surface\":\"tiles\",\"glyphs\":\"neon\","),
          TEXT("is not zone|review"));
     Expect(TEXT("wrong schema"), TEXT("s08-art-board-profiles/1"), TEXT("s08-art-board-profiles/9"), TEXT("schema"));
+  // W4-A render blocks: valid ones parse, broken ones reject the profile.
+  const FString Blocks = TEXT("\"L\":{\"units\":{\"point\":\"candelas\",\"directional\":\"lux\"},")
+      TEXT("\"sky\":{\"source\":\"cubemap\",\"cubemap\":\"/Game/S08/Render/TC_S08_AmbientDome\",\"intensity\":8,")
+      TEXT("\"colorLinear\":[1,0.9,0.8]},\"exposure\":{\"method\":\"histogram-fixed\",\"ev100\":1.3,")
+      TEXT("\"minBrightness\":2.46229,\"maxBrightness\":2.46229,\"bias\":0},");
+  const FString Shadow = TEXT("\"castShadows\":true,\"shadow\":{\"distanceUU\":3000,\"cascades\":2,\"contactShadowLength\":0.02}");
+  FString Render = MinimalDoc;
+  Render.ReplaceInline(TEXT("\"L\":{"), *Blocks);
+  Render.ReplaceInline(TEXT("\"castShadows\":true"), *Shadow);
+  {
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    TestTrue(TEXT("render blocks parse: ") + FString::Join(Errors, TEXT(" | ")), Data.ParseJson(Render, Errors));
+    const FS08LightProfile* L = Data.Lights.Find(TEXT("L"));
+    if (TestNotNull("light L with render blocks", L)) {
+      TestTrue("units", L->HasPhysicalUnits());
+      TestTrue("sky", L->Sky.bSet && FMath::IsNearlyEqual(L->Sky.Intensity, 8.0f) &&
+                          FMath::IsNearlyEqual(L->Sky.Color.B, 0.8f));
+      TestTrue("exposure", L->Exposure.bSet && FMath::IsNearlyEqual(L->Exposure.MinBrightness, 2.46229f) &&
+                               FMath::IsNearlyEqual(L->Exposure.Ev100, 1.3f));
+      TestTrue("key csm", L->KeyShadow.bSet && L->KeyShadow.Cascades == 2 &&
+                              FMath::IsNearlyEqual(L->KeyShadow.DistanceUU, 3000.0f));
+    }
+    FS08BoardArtData Legacy;
+    TestTrue("a profile without units still parses (pre-W4 data, legacy)", Legacy.ParseJson(MinimalDoc, Errors));
+    const FS08LightProfile* LegacyLight = Legacy.Lights.Find(TEXT("L"));
+    TestTrue("legacy profile has no physical units", LegacyLight && !LegacyLight->HasPhysicalUnits());
+  }
+  auto ExpectRender = [this, &Render](const FString& Name, const FString& From, const FString& To, const FString& ErrorPart) {
+    FString Doc = Render;
+    TestTrue(Name + TEXT(": patch applies"), Doc.Contains(From));
+    Doc.ReplaceInline(*From, *To);
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    Data.ParseJson(Doc, Errors);
+    TestFalse(Name + TEXT(": profile rejected"), Data.Lights.Contains(TEXT("L")));
+    TestTrue(Name + TEXT(": reason '") + ErrorPart + TEXT("' in ") + FString::Join(Errors, TEXT(" | ")),
+             FString::Join(Errors, TEXT(" | ")).Contains(ErrorPart));
+  };
+  ExpectRender(TEXT("unitless points"), TEXT("\"point\":\"candelas\""), TEXT("\"point\":\"unitless\""), TEXT("units must be"));
+  ExpectRender(TEXT("engine cubemap"), TEXT("/Game/S08/Render/TC_S08_AmbientDome"), TEXT("/Engine/X"), TEXT("sky needs"));
+  ExpectRender(TEXT("exposure range"), TEXT("\"maxBrightness\":2.46229"), TEXT("\"maxBrightness\":8"), TEXT("exposure needs"));
+  ExpectRender(TEXT("too many cascades"), TEXT("\"cascades\":2"), TEXT("\"cascades\":9"), TEXT("directional.shadow needs"));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08RenderSha256Test,
+    "Unmatched.S08.Render.Sha256 of the profile bytes matches the FIPS 180-2 vectors",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08RenderSha256Test::RunTest(const FString&) {
+  auto Hash = [](const char* Text) {
+    return S08Sha256Hex(reinterpret_cast<const uint8*>(Text), static_cast<int64>(FCStringAnsi::Strlen(Text)));
+  };
+  TestEqual("empty", Hash(""), FString(TEXT("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")));
+  TestEqual("abc", Hash("abc"), FString(TEXT("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")));
+  TestEqual("56-byte message (two padding blocks)",
+            Hash("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"),
+            FString(TEXT("248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1")));
   return true;
 }
 
@@ -276,22 +344,26 @@ bool FS08BoardArtCobbleLegacyTest::RunTest(const FString&) {
     TestTrue("diamond at the near-left slot", Diamond->Transform.GetTranslation().Equals(BlueWorld + FVector(-32, 32, 0.28f), 0.0f));
     TestTrue("diamond rotated 45", Diamond->Transform.Rotator().Equals(FRotator(0, 45, 0), 0.01f));
   }
-  // Probe lights: key 4.5 at (-350,-150,600) rot (0,-55,30) with shadow; fill 700; warm 85.
+  // Probe lights: key 4.5 lux at (-350,-150,600) rot (0,-55,30) with shadow;
+  // warm 85 cd. W4-A: the point fill (700) became the SkyLight, units are
+  // candelas/lux, exposure fixed at EV100 1.3, key CSM 3000 uu / 2 cascades.
   const FS08LightProfile* Light = Data.LightFor(*P);
   if (TestNotNull("cobble light profile", Light)) {
     const TArray<FS08PlacedLight> Placed = S08PlaceLights(*Light, Board);
-    if (TestEqual("1 directional + 2 points", Placed.Num(), 3)) {
+    if (TestEqual("1 directional + 1 point", Placed.Num(), 2)) {
       TestTrue("key", Placed[0].Spec.bDirectional && Placed[0].Position.Equals(FVector(-350, -150, 600)) &&
                           Placed[0].Spec.Rotation.Equals(FRotator(0, -55, 30)) &&
                           FMath::IsNearlyEqual(Placed[0].Spec.Intensity, 4.5f) && Placed[0].Spec.bCastShadows &&
                           !Placed[0].Spec.bHasColor);
-      TestTrue("fill", Placed[1].Position.Equals(FVector(0, -100, 550)) &&
-                           FMath::IsNearlyEqual(Placed[1].Spec.Intensity, 700.0f) &&
-                           FMath::IsNearlyEqual(Placed[1].Spec.RadiusUU, 1800.0f) && !Placed[1].Spec.bCastShadows);
-      TestTrue("warm", Placed[2].Position.Equals(FVector(260, -300, 250)) &&
-                           FMath::IsNearlyEqual(Placed[2].Spec.Intensity, 85.0f) &&
-                           FMath::IsNearlyEqual(Placed[2].Spec.RadiusUU, 450.0f));
+      TestTrue("warm", Placed[1].Position.Equals(FVector(260, -300, 250)) &&
+                           FMath::IsNearlyEqual(Placed[1].Spec.Intensity, 85.0f) &&
+                           FMath::IsNearlyEqual(Placed[1].Spec.RadiusUU, 450.0f));
     }
+    TestTrue("candelas/lux", Light->HasPhysicalUnits());
+    TestTrue("sky from the ambient dome", Light->Sky.bSet && Light->Sky.CubemapPath == TEXT("/Game/S08/Render/TC_S08_AmbientDome"));
+    TestTrue("exposure EV100 1.3 fixed", Light->Exposure.bSet && FMath::IsNearlyEqual(Light->Exposure.MinBrightness, 2.46229f) &&
+                                             FMath::IsNearlyEqual(Light->Exposure.Bias, 0.0f));
+    TestTrue("key csm", Light->KeyShadow.bSet && Light->KeyShadow.Cascades == 2);
   }
   return true;
 }

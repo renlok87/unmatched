@@ -1,0 +1,949 @@
+{
+  "schema": "unmatched.w4a-pair-summary/1",
+  "status": "измерено (RTX 4090, не D-07)",
+  "rule": "шум = max - min по прогонам; разница значима, если |Δ| > 2 × max(шум)",
+  "sets": {
+    "dx11-old": {
+      "dir": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx11-old",
+      "runs": [
+        {
+          "run": "run-20260929-055538",
+          "gpuTotal": {
+            "n": 110,
+            "mean": 41.45,
+            "p50": 42.0,
+            "p95": 46.0,
+            "max": 47.0
+          },
+          "clients": {
+            "host": {
+              "fps": 29.79,
+              "frameMsP95": 33.33,
+              "gpuMsAvg": 28.45,
+              "renderMsAvg": 2.42
+            },
+            "joiner": {
+              "fps": 29.91,
+              "frameMsP95": 33.33,
+              "gpuMsAvg": 27.97,
+              "renderMsAvg": 2.53
+            }
+          },
+          "hostK2": {
+            "frame": {
+              "p10": 26.16,
+              "p50": 72.22,
+              "p90": 122.93,
+              "mean": 73.43
+            },
+            "center": 73.26,
+            "faceRoi": {
+              "box": [
+                925,
+                464,
+                958,
+                480
+              ],
+              "pixels": 528,
+              "mean": 157.02,
+              "p5": 114.14,
+              "p50": 163.58,
+              "p95": 185.19,
+              "std": 22.95,
+              "pxPerUU": 4.7,
+              "rule": "face: below the diadem tip down to the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-3.95, 9.7) u, 7 x 3.4 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+            },
+            "faceNeckRoi": {
+              "box": [
+                924,
+                462,
+                956,
+                490
+              ],
+              "pixels": 896,
+              "mean": 163.36,
+              "p5": 111.88,
+              "p50": 170.86,
+              "p95": 193.04,
+              "std": 26.71,
+              "pxPerUU": 4.7,
+              "rule": "face plus the throat below the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-4.25, 8.9) u, 6.8 x 6 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+            }
+          },
+          "joinerK1": {
+            "frame": {
+              "p10": 0.0,
+              "p50": 0.0,
+              "p90": 91.0,
+              "mean": 33.55
+            },
+            "center": 95.62,
+            "faceRoiSkipped": "no projected Head socket (none traced or none passed)"
+          },
+          "render": {
+            "host": {
+              "reference": false,
+              "reasons": [
+                "no RENDER fingerprint for this SHOT"
+              ],
+              "fingerprint": null
+            },
+            "joiner": {
+              "reference": false,
+              "reasons": [
+                "no RENDER fingerprint for this SHOT"
+              ],
+              "fingerprint": null
+            }
+          }
+        },
+        {
+          "run": "run-20260929-055653",
+          "gpuTotal": {
+            "n": 116,
+            "mean": 41.15,
+            "p50": 42.0,
+            "p95": 46.0,
+            "max": 49.0
+          },
+          "clients": {
+            "host": {
+              "fps": 29.78,
+              "frameMsP95": 33.33,
+              "gpuMsAvg": 30.47,
+              "renderMsAvg": 2.73
+            },
+            "joiner": {
+              "fps": 29.88,
+              "frameMsP95": 33.37,
+              "gpuMsAvg": 30.92,
+              "renderMsAvg": 2.8
+            }
+          },
+          "hostK2": {
+            "frame": {
+              "p10": 26.16,
+              "p50": 72.51,
+              "p90": 122.93,
+              "mean": 73.58
+            },
+            "center": 73.23,
+            "faceRoi": {
+              "box": [
+                925,
+                464,
+                958,
+                480
+              ],
+              "pixels": 528,
+              "mean": 157.07,
+              "p5": 113.23,
+              "p50": 163.72,
+              "p95": 185.46,
+              "std": 23.11,
+              "pxPerUU": 4.7,
+              "rule": "face: below the diadem tip down to the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-3.95, 9.7) u, 7 x 3.4 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+            },
+            "faceNeckRoi": {
+              "box": [
+                924,
+                462,
+                956,
+                490
+              ],
+              "pixels": 896,
+              "mean": 163.35,
+              "p5": 111.02,
+              "p50": 170.89,
+              "p95": 193.09,
+              "std": 26.82,
+              "pxPerUU": 4.7,
+              "rule": "face plus the throat below the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-4.25, 8.9) u, 6.8 x 6 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+            }
+          },
+          "joinerK1": {
+            "frame": {
+              "p10": 0.0,
+              "p50": 0.0,
+              "p90": 91.01,
+              "mean": 33.58
+            },
+            "center": 95.62,
+            "faceRoiSkipped": "no projected Head socket (none traced or none passed)"
+          },
+          "render": {
+            "host": {
+              "reference": false,
+              "reasons": [
+                "no RENDER fingerprint for this SHOT"
+              ],
+              "fingerprint": null
+            },
+            "joiner": {
+              "reference": false,
+              "reasons": [
+                "no RENDER fingerprint for this SHOT"
+              ],
+              "fingerprint": null
+            }
+          }
+        },
+        {
+          "run": "run-20260929-055809",
+          "gpuTotal": {
+            "n": 108,
+            "mean": 41.13,
+            "p50": 42.0,
+            "p95": 46.0,
+            "max": 49.0
+          },
+          "clients": {
+            "host": {
+              "fps": 29.69,
+              "frameMsP95": 33.5,
+              "gpuMsAvg": 31.74,
+              "renderMsAvg": 3.08
+            },
+            "joiner": {
+              "fps": 29.82,
+              "frameMsP95": 33.46,
+              "gpuMsAvg": 31.88,
+              "renderMsAvg": 3.07
+            }
+          },
+          "hostK2": {
+            "frame": {
+              "p10": 25.72,
+              "p50": 72.14,
+              "p90": 123.0,
+              "mean": 73.37
+            },
+            "center": 73.26,
+            "faceRoi": {
+              "box": [
+                925,
+                464,
+                958,
+                480
+              ],
+              "pixels": 528,
+              "mean": 156.9,
+              "p5": 113.72,
+              "p50": 163.29,
+              "p95": 185.01,
+              "std": 23.01,
+              "pxPerUU": 4.7,
+              "rule": "face: below the diadem tip down to the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-3.95, 9.7) u, 7 x 3.4 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+            },
+            "faceNeckRoi": {
+              "box": [
+                924,
+                462,
+                956,
+                490
+              ],
+              "pixels": 896,
+              "mean": 163.26,
+              "p5": 110.2,
+              "p50": 170.82,
+              "p95": 193.09,
+              "std": 26.75,
+              "pxPerUU": 4.7,
+              "rule": "face plus the throat below the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-4.25, 8.9) u, 6.8 x 6 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+            }
+          },
+          "joinerK1": {
+            "frame": {
+              "p10": 0.0,
+              "p50": 0.0,
+              "p90": 90.94,
+              "mean": 33.26
+            },
+            "center": 95.64,
+            "faceRoiSkipped": "no projected Head socket (none traced or none passed)"
+          },
+          "render": {
+            "host": {
+              "reference": false,
+              "reasons": [
+                "no RENDER fingerprint for this SHOT"
+              ],
+              "fingerprint": null
+            },
+            "joiner": {
+              "reference": false,
+              "reasons": [
+                "no RENDER fingerprint for this SHOT"
+              ],
+              "fingerprint": null
+            }
+          }
+        }
+      ],
+      "aggregate": {
+        "gpuTotalMean": {
+          "n": 3,
+          "mean": 41.2433,
+          "min": 41.13,
+          "max": 41.45,
+          "noise": 0.32
+        },
+        "gpuTotalP95": {
+          "n": 3,
+          "mean": 46.0,
+          "min": 46.0,
+          "max": 46.0,
+          "noise": 0.0
+        },
+        "idleBaselineMean": {
+          "n": 2,
+          "mean": 37.45,
+          "min": 37.29,
+          "max": 37.61,
+          "noise": 0.32
+        },
+        "hostFps": {
+          "n": 3,
+          "mean": 29.7533,
+          "min": 29.69,
+          "max": 29.79,
+          "noise": 0.1
+        },
+        "joinerFps": {
+          "n": 3,
+          "mean": 29.87,
+          "min": 29.82,
+          "max": 29.91,
+          "noise": 0.09
+        },
+        "hostFrameP95": {
+          "n": 3,
+          "mean": 33.3867,
+          "min": 33.33,
+          "max": 33.5,
+          "noise": 0.17
+        },
+        "joinerFrameP95": {
+          "n": 3,
+          "mean": 33.3867,
+          "min": 33.33,
+          "max": 33.46,
+          "noise": 0.13
+        },
+        "hostGpuMsAvg": {
+          "n": 3,
+          "mean": 30.22,
+          "min": 28.45,
+          "max": 31.74,
+          "noise": 3.29
+        },
+        "hostFaceRoi": {
+          "n": 3,
+          "mean": 156.9967,
+          "min": 156.9,
+          "max": 157.07,
+          "noise": 0.17
+        },
+        "hostFaceRoiP5": {
+          "n": 3,
+          "mean": 113.6967,
+          "min": 113.23,
+          "max": 114.14,
+          "noise": 0.91
+        },
+        "hostFaceRoiP95": {
+          "n": 3,
+          "mean": 185.22,
+          "min": 185.01,
+          "max": 185.46,
+          "noise": 0.45
+        },
+        "hostFaceNeckRoi": {
+          "n": 3,
+          "mean": 163.3233,
+          "min": 163.26,
+          "max": 163.36,
+          "noise": 0.1
+        },
+        "hostFrameP50": {
+          "n": 3,
+          "mean": 72.29,
+          "min": 72.14,
+          "max": 72.51,
+          "noise": 0.37
+        },
+        "hostFrameP10": {
+          "n": 3,
+          "mean": 26.0133,
+          "min": 25.72,
+          "max": 26.16,
+          "noise": 0.44
+        },
+        "joinerFrameP50": {
+          "n": 3,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "noise": 0.0
+        },
+        "joinerCenter": {
+          "n": 3,
+          "mean": 95.6267,
+          "min": 95.62,
+          "max": 95.64,
+          "noise": 0.02
+        },
+        "pairAddsOverIdlePct": 3.79
+      }
+    },
+    "dx12-lumen-high": {
+      "dir": "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/live-pair-dx12-lumen",
+      "runs": [
+        {
+          "run": "run-20260929-071937",
+          "gpuTotal": {
+            "n": 107,
+            "mean": 50.68,
+            "p50": 51.0,
+            "p95": 57.0,
+            "max": 60.0
+          },
+          "clients": {
+            "host": {
+              "fps": 29.67,
+              "frameMsP95": 33.36,
+              "gpuMsAvg": 1.92,
+              "renderMsAvg": 4.07
+            },
+            "joiner": {
+              "fps": 29.71,
+              "frameMsP95": 33.36,
+              "gpuMsAvg": 1.81,
+              "renderMsAvg": 3.85
+            }
+          },
+          "hostK2": {
+            "frame": {
+              "p10": 49.24,
+              "p50": 113.94,
+              "p90": 141.51,
+              "mean": 108.78
+            },
+            "center": 88.98,
+            "faceRoi": {
+              "box": [
+                925,
+                464,
+                958,
+                480
+              ],
+              "pixels": 528,
+              "mean": 153.5,
+              "p5": 129.72,
+              "p50": 152.94,
+              "p95": 176.48,
+              "std": 14.35,
+              "pxPerUU": 4.7,
+              "rule": "face: below the diadem tip down to the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-3.95, 9.7) u, 7 x 3.4 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+            },
+            "faceNeckRoi": {
+              "box": [
+                924,
+                462,
+                956,
+                490
+              ],
+              "pixels": 896,
+              "mean": 155.07,
+              "p5": 120.51,
+              "p50": 158.37,
+              "p95": 176.33,
+              "std": 19.27,
+              "pxPerUU": 4.7,
+              "rule": "face plus the throat below the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-4.25, 8.9) u, 6.8 x 6 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+            }
+          },
+          "joinerK1": {
+            "frame": {
+              "p10": 0.0,
+              "p50": 0.0,
+              "p90": 143.07,
+              "mean": 50.4
+            },
+            "center": 126.92,
+            "faceRoiSkipped": "no projected Head socket (none traced or none passed)"
+          },
+          "render": {
+            "host": {
+              "reference": true,
+              "reasons": [],
+              "fingerprint": {
+                "rhi": "D3D12",
+                "featureLevel": "SM6",
+                "gi": "lumen",
+                "refl": "lumen",
+                "preset": "High",
+                "screenPct": "100.0",
+                "tMaxFPS": "30.0",
+                "lightUnits": "candelas"
+              }
+            },
+            "joiner": {
+              "reference": true,
+              "reasons": [],
+              "fingerprint": {
+                "rhi": "D3D12",
+                "featureLevel": "SM6",
+                "gi": "lumen",
+                "refl": "lumen",
+                "preset": "High",
+                "screenPct": "100.0",
+                "tMaxFPS": "30.0",
+                "lightUnits": "candelas"
+              }
+            }
+          }
+        },
+        {
+          "run": "run-20260929-072058",
+          "gpuTotal": {
+            "n": 108,
+            "mean": 50.15,
+            "p50": 51.0,
+            "p95": 55.0,
+            "max": 58.0
+          },
+          "clients": {
+            "host": {
+              "fps": 29.8,
+              "frameMsP95": 33.33,
+              "gpuMsAvg": 1.89,
+              "renderMsAvg": 3.32
+            },
+            "joiner": {
+              "fps": 29.87,
+              "frameMsP95": 33.33,
+              "gpuMsAvg": 1.79,
+              "renderMsAvg": 3.21
+            }
+          },
+          "hostK2": {
+            "frame": {
+              "p10": 48.16,
+              "p50": 113.91,
+              "p90": 141.44,
+              "mean": 108.7
+            },
+            "center": 88.99,
+            "faceRoi": {
+              "box": [
+                925,
+                464,
+                958,
+                480
+              ],
+              "pixels": 528,
+              "mean": 153.65,
+              "p5": 129.87,
+              "p50": 153.15,
+              "p95": 177.2,
+              "std": 14.3,
+              "pxPerUU": 4.7,
+              "rule": "face: below the diadem tip down to the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-3.95, 9.7) u, 7 x 3.4 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+            },
+            "faceNeckRoi": {
+              "box": [
+                924,
+                462,
+                956,
+                490
+              ],
+              "pixels": 896,
+              "mean": 155.18,
+              "p5": 120.88,
+              "p50": 158.33,
+              "p95": 176.9,
+              "std": 19.25,
+              "pxPerUU": 4.7,
+              "rule": "face plus the throat below the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-4.25, 8.9) u, 6.8 x 6 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+            }
+          },
+          "joinerK1": {
+            "frame": {
+              "p10": 0.0,
+              "p50": 0.0,
+              "p90": 143.15,
+              "mean": 50.78
+            },
+            "center": 127.06,
+            "faceRoiSkipped": "no projected Head socket (none traced or none passed)"
+          },
+          "render": {
+            "host": {
+              "reference": true,
+              "reasons": [],
+              "fingerprint": {
+                "rhi": "D3D12",
+                "featureLevel": "SM6",
+                "gi": "lumen",
+                "refl": "lumen",
+                "preset": "High",
+                "screenPct": "100.0",
+                "tMaxFPS": "30.0",
+                "lightUnits": "candelas"
+              }
+            },
+            "joiner": {
+              "reference": true,
+              "reasons": [],
+              "fingerprint": {
+                "rhi": "D3D12",
+                "featureLevel": "SM6",
+                "gi": "lumen",
+                "refl": "lumen",
+                "preset": "High",
+                "screenPct": "100.0",
+                "tMaxFPS": "30.0",
+                "lightUnits": "candelas"
+              }
+            }
+          }
+        },
+        {
+          "run": "run-20260929-072215",
+          "gpuTotal": {
+            "n": 110,
+            "mean": 51.46,
+            "p50": 52.0,
+            "p95": 56.0,
+            "max": 63.0
+          },
+          "clients": {
+            "host": {
+              "fps": 29.82,
+              "frameMsP95": 33.33,
+              "gpuMsAvg": 1.94,
+              "renderMsAvg": 3.39
+            },
+            "joiner": {
+              "fps": 29.9,
+              "frameMsP95": 33.33,
+              "gpuMsAvg": 1.84,
+              "renderMsAvg": 3.22
+            }
+          },
+          "hostK2": {
+            "frame": {
+              "p10": 47.09,
+              "p50": 113.87,
+              "p90": 141.44,
+              "mean": 108.43
+            },
+            "center": 88.98,
+            "faceRoi": {
+              "box": [
+                925,
+                464,
+                958,
+                480
+              ],
+              "pixels": 528,
+              "mean": 153.69,
+              "p5": 130.18,
+              "p50": 153.18,
+              "p95": 177.2,
+              "std": 14.3,
+              "pxPerUU": 4.7,
+              "rule": "face: below the diadem tip down to the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-3.95, 9.7) u, 7 x 3.4 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+            },
+            "faceNeckRoi": {
+              "box": [
+                924,
+                462,
+                956,
+                490
+              ],
+              "pixels": 896,
+              "mean": 155.21,
+              "p5": 120.88,
+              "p50": 158.33,
+              "p95": 176.9,
+              "std": 19.25,
+              "pxPerUU": 4.7,
+              "rule": "face plus the throat below the chin; SK_Medusa_FaceNeck_v2Candidate: centre Head + (-4.25, 8.9) u, 6.8 x 6 u, u = headPx/12 = 4.700 px (screen offsets, board camera only); Rec.709 luma of the sRGB frame"
+            }
+          },
+          "joinerK1": {
+            "frame": {
+              "p10": 0.0,
+              "p50": 0.0,
+              "p90": 143.08,
+              "mean": 50.57
+            },
+            "center": 127.06,
+            "faceRoiSkipped": "no projected Head socket (none traced or none passed)"
+          },
+          "render": {
+            "host": {
+              "reference": true,
+              "reasons": [],
+              "fingerprint": {
+                "rhi": "D3D12",
+                "featureLevel": "SM6",
+                "gi": "lumen",
+                "refl": "lumen",
+                "preset": "High",
+                "screenPct": "100.0",
+                "tMaxFPS": "30.0",
+                "lightUnits": "candelas"
+              }
+            },
+            "joiner": {
+              "reference": true,
+              "reasons": [],
+              "fingerprint": {
+                "rhi": "D3D12",
+                "featureLevel": "SM6",
+                "gi": "lumen",
+                "refl": "lumen",
+                "preset": "High",
+                "screenPct": "100.0",
+                "tMaxFPS": "30.0",
+                "lightUnits": "candelas"
+              }
+            }
+          }
+        }
+      ],
+      "aggregate": {
+        "gpuTotalMean": {
+          "n": 3,
+          "mean": 50.7633,
+          "min": 50.15,
+          "max": 51.46,
+          "noise": 1.31
+        },
+        "gpuTotalP95": {
+          "n": 3,
+          "mean": 56.0,
+          "min": 55.0,
+          "max": 57.0,
+          "noise": 2.0
+        },
+        "idleBaselineMean": {
+          "n": 2,
+          "mean": 38.235,
+          "min": 37.78,
+          "max": 38.69,
+          "noise": 0.91
+        },
+        "hostFps": {
+          "n": 3,
+          "mean": 29.7633,
+          "min": 29.67,
+          "max": 29.82,
+          "noise": 0.15
+        },
+        "joinerFps": {
+          "n": 3,
+          "mean": 29.8267,
+          "min": 29.71,
+          "max": 29.9,
+          "noise": 0.19
+        },
+        "hostFrameP95": {
+          "n": 3,
+          "mean": 33.34,
+          "min": 33.33,
+          "max": 33.36,
+          "noise": 0.03
+        },
+        "joinerFrameP95": {
+          "n": 3,
+          "mean": 33.34,
+          "min": 33.33,
+          "max": 33.36,
+          "noise": 0.03
+        },
+        "hostGpuMsAvg": {
+          "n": 3,
+          "mean": 1.9167,
+          "min": 1.89,
+          "max": 1.94,
+          "noise": 0.05
+        },
+        "hostFaceRoi": {
+          "n": 3,
+          "mean": 153.6133,
+          "min": 153.5,
+          "max": 153.69,
+          "noise": 0.19
+        },
+        "hostFaceRoiP5": {
+          "n": 3,
+          "mean": 129.9233,
+          "min": 129.72,
+          "max": 130.18,
+          "noise": 0.46
+        },
+        "hostFaceRoiP95": {
+          "n": 3,
+          "mean": 176.96,
+          "min": 176.48,
+          "max": 177.2,
+          "noise": 0.72
+        },
+        "hostFaceNeckRoi": {
+          "n": 3,
+          "mean": 155.1533,
+          "min": 155.07,
+          "max": 155.21,
+          "noise": 0.14
+        },
+        "hostFrameP50": {
+          "n": 3,
+          "mean": 113.9067,
+          "min": 113.87,
+          "max": 113.94,
+          "noise": 0.07
+        },
+        "hostFrameP10": {
+          "n": 3,
+          "mean": 48.1633,
+          "min": 47.09,
+          "max": 49.24,
+          "noise": 2.15
+        },
+        "joinerFrameP50": {
+          "n": 3,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "noise": 0.0
+        },
+        "joinerCenter": {
+          "n": 3,
+          "mean": 127.0133,
+          "min": 126.92,
+          "max": 127.06,
+          "noise": 0.14
+        },
+        "pairAddsOverIdlePct": 12.53
+      }
+    }
+  },
+  "comparison": {
+    "gpuTotalMean": {
+      "dx11-old": 41.2433,
+      "dx12-lumen-high": 50.7633,
+      "delta": 9.52,
+      "threshold2xNoise": 2.62,
+      "significant": true
+    },
+    "gpuTotalP95": {
+      "dx11-old": 46.0,
+      "dx12-lumen-high": 56.0,
+      "delta": 10.0,
+      "threshold2xNoise": 4.0,
+      "significant": true
+    },
+    "idleBaselineMean": {
+      "dx11-old": 37.45,
+      "dx12-lumen-high": 38.235,
+      "delta": 0.785,
+      "threshold2xNoise": 1.82,
+      "significant": false
+    },
+    "hostFps": {
+      "dx11-old": 29.7533,
+      "dx12-lumen-high": 29.7633,
+      "delta": 0.01,
+      "threshold2xNoise": 0.3,
+      "significant": false
+    },
+    "joinerFps": {
+      "dx11-old": 29.87,
+      "dx12-lumen-high": 29.8267,
+      "delta": -0.043,
+      "threshold2xNoise": 0.38,
+      "significant": false
+    },
+    "hostFrameP95": {
+      "dx11-old": 33.3867,
+      "dx12-lumen-high": 33.34,
+      "delta": -0.047,
+      "threshold2xNoise": 0.34,
+      "significant": false
+    },
+    "joinerFrameP95": {
+      "dx11-old": 33.3867,
+      "dx12-lumen-high": 33.34,
+      "delta": -0.047,
+      "threshold2xNoise": 0.26,
+      "significant": false
+    },
+    "hostGpuMsAvg": {
+      "dx11-old": 30.22,
+      "dx12-lumen-high": 1.9167,
+      "delta": -28.303,
+      "threshold2xNoise": 6.58,
+      "significant": true
+    },
+    "hostFaceRoi": {
+      "dx11-old": 156.9967,
+      "dx12-lumen-high": 153.6133,
+      "delta": -3.383,
+      "threshold2xNoise": 0.38,
+      "significant": true
+    },
+    "hostFaceRoiP5": {
+      "dx11-old": 113.6967,
+      "dx12-lumen-high": 129.9233,
+      "delta": 16.227,
+      "threshold2xNoise": 1.82,
+      "significant": true
+    },
+    "hostFaceRoiP95": {
+      "dx11-old": 185.22,
+      "dx12-lumen-high": 176.96,
+      "delta": -8.26,
+      "threshold2xNoise": 1.44,
+      "significant": true
+    },
+    "hostFaceNeckRoi": {
+      "dx11-old": 163.3233,
+      "dx12-lumen-high": 155.1533,
+      "delta": -8.17,
+      "threshold2xNoise": 0.28,
+      "significant": true
+    },
+    "hostFrameP50": {
+      "dx11-old": 72.29,
+      "dx12-lumen-high": 113.9067,
+      "delta": 41.617,
+      "threshold2xNoise": 0.74,
+      "significant": true
+    },
+    "hostFrameP10": {
+      "dx11-old": 26.0133,
+      "dx12-lumen-high": 48.1633,
+      "delta": 22.15,
+      "threshold2xNoise": 4.3,
+      "significant": true
+    },
+    "joinerFrameP50": {
+      "dx11-old": 0.0,
+      "dx12-lumen-high": 0.0,
+      "delta": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+    },
+    "joinerCenter": {
+      "dx11-old": 95.6267,
+      "dx12-lumen-high": 127.0133,
+      "delta": 31.387,
+      "threshold2xNoise": 0.28,
+      "significant": true
+    }
+  }
+}

@@ -1,0 +1,357 @@
+{
+  "schema": "unmatched.w4c-fixup-rebuild/1",
+  "dateLocal": "2026-09-29",
+  "why": "review remark: S08ArtHud.h was edited at 10:47:54 local (comment only, 3 lines -> 3 lines) after the final E5/G4 builds (10:10-10:11) and the final test run (10:42); the committed header was not byte-identical to the compiled one",
+  "header": {
+    "path": "unreal/Unmatched/Source/Unmatched/S08/S08ArtHud.h",
+    "final": {
+      "sha256": "5ea8306ff230c3c0fb7db3f5d20606d9407bf4bc0c1c57b96c630be69f3e682f",
+      "md5": "7b29d208b63ae2f437174715a5ce4a35",
+      "bytes": 16149,
+      "lines": 343
+    },
+    "compiledIntoE5G4": {
+      "sha256": "a87aa382fbcea1fde5eb02934f8d9a1c9daab97a0d50ae0d8d83c7f6bd18469a",
+      "md5": "00ad767725576cddaa320fac72ab1770",
+      "bytes": 16140,
+      "lines": 343
+    },
+    "reconstruction": "final header with the 10:47:54 comment replacement reversed (transcript of the W4-C worker)",
+    "differingLines": [
+      {
+        "line": 274,
+        "pre": "  // W4-C: -ArtHudImpl=umg (default) | slate | compare. Views [0] are shown;",
+        "final": "  // W4-C: -ArtHudImpl=umg (default) | slate | compare | alternate. [0] shown"
+      },
+      {
+        "line": 275,
+        "pre": "  // in compare mode [1] is the Slate twin (render opacity 0, same slot",
+        "final": "  // (alternate: [ActiveView]); compare: [1] = Slate twin (opacity 0, same slot"
+      }
+    ],
+    "onlyCommentLinesDiffer": true,
+    "proof": "MSVC stores a SHA-256 of every source file in the .debug$S FILECHKSMS subsection of each object",
+    "objectsBeforeRebuild": [
+      {
+        "obj": "Intermediate/Build/Win64/x64/UnrealEditor/Development/Unmatched/S08ArtHud.cpp.obj",
+        "checksumFound": [
+          "preEdit:sha256"
+        ]
+      },
+      {
+        "obj": "Intermediate/Build/Win64/x64/UnrealGame/Development/Unmatched/S08ArtHud.cpp.obj",
+        "checksumFound": [
+          "preEdit:sha256"
+        ]
+      },
+      {
+        "obj": "Intermediate/Build/Win64/x64/UnrealEditor/Development/Unmatched/S08ArtHudUmgTests.cpp.obj",
+        "checksumFound": [
+          "preEdit:sha256"
+        ]
+      },
+      {
+        "obj": "Intermediate/Build/Win64/x64/UnrealGame/Development/Unmatched/S08ArtHudViews.cpp.obj"
+      },
+      {
+        "obj": "Intermediate/Build/Win64/x64/UnrealGame/Development/Unmatched/Module.Unmatched.cpp.obj",
+        "checksumFound": [
+          "preEdit:sha256"
+        ]
+      }
+    ],
+    "objectsAfterRebuild": [
+      {
+        "obj": "Intermediate/Build/Win64/x64/UnrealEditor/Development/Unmatched/S08ArtHud.cpp.obj",
+        "checksumFound": [
+          "final:sha256"
+        ]
+      },
+      {
+        "obj": "Intermediate/Build/Win64/x64/UnrealGame/Development/Unmatched/S08ArtHud.cpp.obj",
+        "checksumFound": [
+          "final:sha256"
+        ]
+      },
+      {
+        "obj": "Intermediate/Build/Win64/x64/UnrealEditor/Development/Unmatched/S08ArtHudUmgTests.cpp.obj",
+        "checksumFound": [
+          "final:sha256"
+        ]
+      },
+      {
+        "obj": "Intermediate/Build/Win64/x64/UnrealGame/Development/Unmatched/Module.Unmatched.cpp.obj",
+        "checksumFound": [
+          "final:sha256"
+        ]
+      }
+    ]
+  },
+  "rebuild": {
+    "E6": {
+      "record": "build/E6-editor-build.json",
+      "dllSha256": "2c13d668a6e94d7a3c550a59387f84f8a1300220bf63acfa868dba2b4c7e299b",
+      "result": "Succeeded",
+      "withLiveCoding": [
+        1
+      ]
+    },
+    "G5": {
+      "record": "build/G5-build.json",
+      "exeSha256": "9c12120d4b66a70911284723193c5aa0d3436cc997a75d3777d572e71f67dde5",
+      "result": "Succeeded",
+      "flags": [
+        "-WaitMutex",
+        "-NoXGE",
+        "-NoUBA",
+        "-MaxParallelActions=2"
+      ],
+      "withLiveCoding": [
+        1
+      ]
+    },
+    "P5": {
+      "record": "build/P5-package.json",
+      "exe": {
+        "binariesSha256": "9c12120d4b66a70911284723193c5aa0d3436cc997a75d3777d572e71f67dde5",
+        "stagedInnerSha256": "9c12120d4b66a70911284723193c5aa0d3436cc997a75d3777d572e71f67dde5",
+        "stagedRootStubSha256": "1d70715ffd5478c7a3cd620db247488cea8baaaef21b5cac84b10a62d7b027bc",
+        "stagedInnerPath": "unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched/Binaries/Win64/Unmatched.exe",
+        "note": "the staged ROOT Unmatched.exe is a launcher stub; only the inner Binaries/Win64 exe is compared",
+        "innerEqualsBinaries": true
+      },
+      "assetRegistrySha256": "a1dff70329a4d9484b6c6677d1e2e5651fad990836fb38dc98f24293b9a93206",
+      "assetRegistryEqualsP4": true,
+      "stringTableInPak": "Unmatched/Content/Localization/StringTables/S08ArtHud.csv (UnrealPak -List)"
+    },
+    "compiledTranslationUnits": [
+      "Module.Unmatched.cpp",
+      "S08ArtHud.cpp",
+      "S08ArtHudTests.cpp",
+      "S08ArtHudUmgTests.cpp",
+      "S08BoardActor.cpp",
+      "S08FighterActor.cpp",
+      "S08FlowGameMode.cpp",
+      "S08Phase2Tests.cpp",
+      "S09HudTests.cpp",
+      "S10RecoveryTests.cpp",
+      "S10VsAiClientTests.cpp"
+    ],
+    "otherSourceChangesSinceG4": "none (find Source Config Content/S08/UI Content/Localization -newer 10:10: only S08ArtHud.h)"
+  },
+  "codeIdentity": {
+    "G4_vs_G5_exe": {
+      "a": {
+        "path": "G4-Unmatched.exe",
+        "sha256": "9bc2f9a494bad1d68e7a3cc17eb9e6576dbef92919e1e752491b9b669112ea32",
+        "bytes": 338407936
+      },
+      "b": {
+        "path": "C:/Users/ren/.codex/worktrees/art-foundation/unmached/unreal/Unmatched/Binaries/Win64/Unmatched.exe",
+        "sha256": "9c12120d4b66a70911284723193c5aa0d3436cc997a75d3777d572e71f67dde5",
+        "bytes": 338407936
+      },
+      "sameSize": true,
+      "sameSectionLayout": true,
+      "differingBytes": 24,
+      "explainedBy": {
+        "COFF.TimeDateStamp": 2,
+        "debugdir[0].TimeDateStamp": 2,
+        "debugdir[1].TimeDateStamp": 2,
+        "debugdir[2].TimeDateStamp": 2,
+        "debugdir[0].RSDS.GUID+Age": 16
+      },
+      "unexplainedBytes": 0,
+      "identicalSections": [
+        ".text",
+        ".uedbg",
+        ".data",
+        ".pdata",
+        ".detourc",
+        ".detourd",
+        ".msvcjmc",
+        ".rodata",
+        "_RDATA",
+        ".rsrc",
+        ".reloc"
+      ],
+      "sectionsWithBuildIdentityOnly": [
+        ".rdata"
+      ],
+      "verdict": "CODE_IDENTICAL"
+    },
+    "E5_vs_E6_dll": {
+      "a": {
+        "path": "E5-UnrealEditor-Unmatched.dll",
+        "sha256": "a1dde56c3dff3325f3c8a2007f513056e525c5c37adbb28303d8cdc7a939f01f",
+        "bytes": 2997760
+      },
+      "b": {
+        "path": "C:/Users/ren/.codex/worktrees/art-foundation/unmached/unreal/Unmatched/Binaries/Win64/UnrealEditor-Unmatched.dll",
+        "sha256": "2c13d668a6e94d7a3c550a59387f84f8a1300220bf63acfa868dba2b4c7e299b",
+        "bytes": 2997760
+      },
+      "sameSize": true,
+      "sameSectionLayout": true,
+      "differingBytes": 24,
+      "explainedBy": {
+        "COFF.TimeDateStamp": 2,
+        "debugdir[0].TimeDateStamp": 2,
+        "debugdir[1].TimeDateStamp": 2,
+        "debugdir[2].TimeDateStamp": 2,
+        "debugdir[0].RSDS.GUID+Age": 16
+      },
+      "unexplainedBytes": 0,
+      "identicalSections": [
+        ".text",
+        ".uedbg",
+        ".data",
+        ".pdata",
+        "_RDATA",
+        ".rsrc",
+        ".reloc"
+      ],
+      "sectionsWithBuildIdentityOnly": [
+        ".rdata"
+      ],
+      "verdict": "CODE_IDENTICAL"
+    },
+    "conclusion": "G5/E6 compiled from the committed header are byte-identical to G4/E5 except the link timestamp, the debug-directory timestamps and the PDB GUID; every packaged run of this act (binary G4) and every test result of E5 therefore holds for the committed sources"
+  },
+  "testsOnE6": {
+    "Unmatched.S08": {
+      "file": "tests/tests-final-Unmatched.S08.json",
+      "filter": "Unmatched.S08",
+      "exitCode": 0,
+      "found": [
+        68
+      ],
+      "passed": 68,
+      "failed": 0,
+      "editorDllSha256": "2c13d668a6e94d7a3c550a59387f84f8a1300220bf63acfa868dba2b4c7e299b"
+    },
+    "Unmatched.S08.ArtHud (subset of S08)": {
+      "passed": 15,
+      "total": 15
+    },
+    "Unmatched.S10": {
+      "file": "tests/tests-final-Unmatched.S10.json",
+      "filter": "Unmatched.S10",
+      "exitCode": 0,
+      "found": [
+        50
+      ],
+      "passed": 50,
+      "failed": 0,
+      "editorDllSha256": "2c13d668a6e94d7a3c550a59387f84f8a1300220bf63acfa868dba2b4c7e299b"
+    },
+    "Unmatched.S09 without the double-fire test": {
+      "file": "tests/tests-final-Unmatched.S09-without-double-fire.json",
+      "filter": "Unmatched.S09.COMBAT+Unmatched.S09.HUD+Unmatched.S09.PENDING+Unmatched.S09.RESULT+Unmatched.S09.SCHEME+Unmatched.S09.CMD begin+Unmatched.S09.CMD boost+Unmatched.S09.CMD cancel+Unmatched.S09.CMD destinations+Unmatched.S09.CMD discard+Unmatched.S09.CMD multi-fighter+Unmatched.S09.CMD regression+Unmatched.S09.CMD zero-move",
+      "exitCode": 0,
+      "found": [
+        43
+      ],
+      "passed": 43,
+      "failed": 0,
+      "editorDllSha256": "2c13d668a6e94d7a3c550a59387f84f8a1300220bf63acfa868dba2b4c7e299b"
+    },
+    "Unmatched.S09 double-fire test alone": {
+      "file": "tests/tests-final-Unmatched.S09-double-fire-alone.json",
+      "filter": "Unmatched.S09.CMD double-fire",
+      "exitCode": 0,
+      "found": [
+        1
+      ],
+      "passed": 1,
+      "failed": 0,
+      "editorDllSha256": "2c13d668a6e94d7a3c550a59387f84f8a1300220bf63acfa868dba2b4c7e299b"
+    },
+    "Unmatched.S09 full-suite attempts": [
+      {
+        "label": "attempt1",
+        "exitCode": 255,
+        "found": [
+          44
+        ],
+        "passed": 43,
+        "failedTests": [
+          "Unmatched.S09.SCHEME snapshot staleness: turn end / pending open close the picker"
+        ],
+        "notReported": 0,
+        "crash": "handled ensure (MTAccessDetector)",
+        "unmatchedFrames": [
+          "FS08FlowController::Trace()",
+          "`FS08FlowController::SubmitManeuver'::`2'::<lambda_1>::operator()()"
+        ],
+        "doubleFireTestCompleted": "2026.09.29-06.08.39:070",
+        "lateHttpToPort9": [
+          {
+            "at": "2026.09.29-06.08.41:095",
+            "afterS": 2.03
+          },
+          {
+            "at": "2026.09.29-06.08.41:095",
+            "afterS": 2.03
+          }
+        ],
+        "logKeptOutsideGit": "C:/tmp/w4c/fixup/tests/tests-e6-attempt1-Unmatched.S09.log"
+      },
+      {
+        "label": "attempt2",
+        "exitCode": 3,
+        "found": [
+          44
+        ],
+        "passed": 40,
+        "failedTests": [],
+        "notReported": 4,
+        "crash": "access violation",
+        "unmatchedFrames": [
+          "FS08FlowController::Trace()",
+          "`FS08FlowController::DiscardToLimit'::`2'::<lambda_1>::operator()()"
+        ],
+        "doubleFireTestCompleted": "2026.09.29-06.10.10:697",
+        "lateHttpToPort9": [
+          {
+            "at": "2026.09.29-06.10.12:683",
+            "afterS": 2.02
+          }
+        ],
+        "logKeptOutsideGit": "C:/tmp/w4c/fixup/tests/tests-e6-attempt2-Unmatched.S09.log"
+      },
+      {
+        "label": "attempt3",
+        "exitCode": 255,
+        "found": [
+          44
+        ],
+        "passed": 43,
+        "failedTests": [
+          "Unmatched.S09.SCHEME two legal schemes: exact-instance select, switch and confirm"
+        ],
+        "notReported": 0,
+        "crash": "handled ensure (MTAccessDetector)",
+        "unmatchedFrames": [
+          "FS08FlowController::Trace()",
+          "`FS08FlowController::SubmitManeuver'::`2'::<lambda_1>::operator()()"
+        ],
+        "doubleFireTestCompleted": "2026.09.29-06.10.49:888",
+        "lateHttpToPort9": [
+          {
+            "at": "2026.09.29-06.10.51:911",
+            "afterS": 2.04
+          },
+          {
+            "at": "2026.09.29-06.10.51:911",
+            "afterS": 2.04
+          }
+        ],
+        "logKeptOutsideGit": "C:/tmp/w4c/fixup/tests/tests-e6-attempt3-Unmatched.S09.log"
+      }
+    ],
+    "s09Flake": "known since T2.2 (hud-input-t22-2026-09-28.md): FS09DoubleFireGateTest (S09ManeuverFlowTests.cpp) sends real HTTP to http://127.0.0.1:9/graphql from a controller on the stack; the refusal arrives about 2.03 s later and the SubmitManeuver/DiscardToLimit lambda calls FS08FlowController::Trace() on the destroyed controller (access violation or MTAccessDetector ensure in whatever test runs then). The E5 full run at 10:42 passed 44/44 because it ended before the late response (double-fire test done 2026.09.29-05.42.28:498, run complete 2026.09.29-05.42.30:143, late response due about 2.03 s after the test; the log has no 127.0.0.1:9 line); no W4-C code is on these stacks",
+    "supersededE5Results": "C:/tmp/w4c/superseded/tests-E5/ (E5 S08 68/68, S09 44/44, S10 50/50)"
+  },
+  "status": "технически: собрано из коммитуемых исходников, код идентичен измеренному G4; художественно не принято"
+}

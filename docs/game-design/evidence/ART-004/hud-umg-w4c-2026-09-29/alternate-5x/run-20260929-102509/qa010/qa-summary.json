@@ -1,0 +1,118 @@
+{
+  "schema": "unmatched.t22-qa/1",
+  "run": "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29/alternate-5x/run-20260929-102509",
+  "checkedLocal": "2026-09-29T10:40:33+05:00",
+  "commands": {
+    "plate": {
+      "exit": 0,
+      "status": "measured",
+      "result": "pass",
+      "argv": [
+        "python",
+        "tools/art/qa010/qa010.py",
+        "plate",
+        "--trace",
+        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29/alternate-5x/run-20260929-102509/phase2-client-host.trace.log",
+        "--frame",
+        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29/alternate-5x/run-20260929-102509/phase2-board-host-1920x1080.png",
+        "--overlay",
+        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29/alternate-5x/run-20260929-102509/qa010/plate-overlay.png",
+        "--json",
+        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29/alternate-5x/run-20260929-102509/qa010/plate.json"
+      ],
+      "clientCrossCheck": {
+        "client_overlapReachable": 0,
+        "tool_overlap_count": 0,
+        "agree": true
+      },
+      "checkedCells": {
+        "source": "trace:shot-block@line99",
+        "count": 13,
+        "visible": 5,
+        "offscreen": [
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ],
+          [
+            3,
+            0
+          ],
+          [
+            0,
+            2
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            4,
+            3
+          ],
+          [
+            1,
+            4
+          ]
+        ]
+      }
+    },
+    "icon": {
+      "exit": 1,
+      "status": "measured",
+      "result": "fail",
+      "argv": [
+        "python",
+        "tools/art/qa010/qa010.py",
+        "icon",
+        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29/alternate-5x/run-20260929-102509/phase2-board-host-1920x1080.png",
+        "--trace",
+        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29/alternate-5x/run-20260929-102509/phase2-client-host.trace.log",
+        "--json",
+        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29/alternate-5x/run-20260929-102509/qa010/icon.json"
+      ],
+      "sizes": [
+        {
+          "size_px": 24,
+          "contrast_ratio": 2.793,
+          "pass": false,
+          "upscaled": false
+        },
+        {
+          "size_px": 32,
+          "contrast_ratio": 2.93,
+          "pass": false,
+          "upscaled": false
+        },
+        {
+          "size_px": 48,
+          "contrast_ratio": 2.927,
+          "pass": false,
+          "upscaled": false
+        }
+      ]
+    }
+  },
+  "plateMarkerGate": {
+    "marker": "#C8A0FF",
+    "tolerance": 16,
+    "bbox": [
+      1139,
+      494,
+      1311,
+      548
+    ],
+    "stripInside": 516,
+    "stripExpected": 516,
+    "outside": 0,
+    "passed": true
+  }
+}

@@ -1,0 +1,86 @@
+{
+ "schema": "unmatched.s08-art-board-profiles/1",
+ "revision": 1,
+ "status": "предложено",
+ "note": "ART-005 / stage 3 T3.2: data-driven -ArtPreview board art. Zone palette and glyphs are keyed by zone KEY (never by board); lighting is one profile per board. Budget per profile: exactly 1 directional light with shadow + at most 6 point lights without shadows. Light sections are not gameplay zones: point lights sit at authored board-relative spots and a section (cells within half a light's radius) never coincides with one zone (tools/art/art_board_fixtures.py check: Jaccard < 0.5). Colors: zone 'color' is sRGB hex (FLinearColor(FColor) in code), light 'colorLinear' is linear RGB. Nothing here is artistically accepted.",
+ "staging": "unreal/Unmatched/Source/Unmatched/Unmatched.Build.cs RuntimeDependencies (UFS) -> <Project>/Config/ArtBoards/S08ArtBoardProfiles.json in the packaged pak",
+ "zoneEdgeOrder": "zone i of a cell draws its stroke on side i: 0 near (+Y), 1 left (-X), 2 far (-Y), 3 right (+X); glyph slot i: 0 near-left, 1 far-right, 2 far-left, 3 near-right; a fifth zone reuses side/slot i % 4 (never dropped)",
+ "zoneStyles": {
+  "blue": {"stroke": "solid", "glyph": "diamond", "color": "#3B78D8", "material": "/Game/ArtTests/ART005/Materials/M_ART005_BlueSection_Review", "source": "ART-005 Cobble review (blue continuous edge + diamond)"},
+  "red": {"stroke": "dash3", "glyph": "bars2", "color": "#D8453B", "material": "/Game/ArtTests/ART005/Materials/M_ART005_RedSection_Review", "source": "ART-005 Cobble review (three red strokes + two bars)"},
+  "gray": {"stroke": "dots5", "glyph": "square", "color": "#D2D7DC"},
+  "light-gray": {"stroke": "double", "glyph": "hbars2", "color": "#F1E8D2"},
+  "green": {"stroke": "dash2", "glyph": "cross", "color": "#46B45A"},
+  "light-green": {"stroke": "dashdot", "glyph": "bar1", "color": "#A6DC66"},
+  "brown": {"stroke": "solid", "glyph": "x", "color": "#B9784A"},
+  "orange": {"stroke": "dash3", "glyph": "tee", "color": "#F2933A"},
+  "yellow": {"stroke": "dash4", "glyph": "chevron", "color": "#F4D24A"},
+  "blue-green": {"stroke": "double", "glyph": "bars3", "color": "#34C3B6"},
+  "purple": {"stroke": "dashdot", "glyph": "ring", "color": "#A070DC"}
+ },
+ "fallbackZoneStyle": {"stroke": "dots5", "glyph": "bar1", "color": "#FFFFFF", "note": "unknown zone key: drawn and traced as fallback; add the key above"},
+ "lightProfiles": {
+  "cobble-probe": {
+   "source": "ART-005 editor probe reproduced for the opt-in Cobble review (S08BoardActor before T3.2); measured candidate, not a lighting norm",
+   "directional": {"name": "key", "posUU": [-350, -150, 600], "rotation": [0, -55, 30], "intensity": 4.5, "castShadows": true},
+   "points": [
+    {"name": "fill", "role": "fill", "posUU": [0, -100, 550], "intensity": 700, "radiusUU": 1800},
+    {"name": "warm", "role": "warm", "posUU": [260, -300, 250], "intensity": 85, "radiusUU": 450}
+   ]
+  },
+  "forest-probe": {
+   "source": "ART-005I forest profile (docs/game-design/evidence/ART-005/lighting-stress-ue-report.json, editor probe on Cobble 5x6) adapted to board-relative spots; Sherwood Forest colour condition only (green canopy shade + amber pools), not map lighting",
+   "directional": {"name": "key", "posUU": [-350, -150, 600], "rotation": [0, -55, 30], "intensity": 4.0, "colorLinear": [0.73, 0.82, 0.74], "castShadows": true},
+   "points": [
+    {"name": "fill", "role": "fill", "at": [0.0, -0.17, 550], "intensity": 950, "radiusUU": 1800, "colorLinear": [0.88, 0.94, 0.88]},
+    {"name": "warm-pool-a", "role": "warm", "at": [-0.30, -0.30, 250], "intensity": 150, "radiusUU": 430, "colorLinear": [1.0, 0.62, 0.32]},
+    {"name": "warm-pool-b", "role": "warm", "at": [0.30, 0.05, 230], "intensity": 110, "radiusUU": 330, "colorLinear": [1.0, 0.67, 0.35]},
+    {"name": "canopy-shade", "role": "cool", "at": [-0.20, 0.35, 260], "intensity": 80, "radiusUU": 380, "colorLinear": [0.55, 0.80, 0.60]}
+   ]
+  },
+  "paddock-probe": {
+   "source": "ART-005I paddock profile (docs/game-design/evidence/ART-005/lighting-stress-ue-report.json, editor probe on Cobble 5x6) adapted to board-relative spots; T. Rex Paddock colour condition only (blue-indigo night, cyan rim, one warm practical), not map lighting",
+   "directional": {"name": "key", "posUU": [-350, -150, 600], "rotation": [0, -55, 30], "intensity": 3.5, "colorLinear": [0.62, 0.69, 0.88], "castShadows": true},
+   "points": [
+    {"name": "fill", "role": "fill", "at": [0.0, -0.17, 550], "intensity": 1150, "radiusUU": 1800, "colorLinear": [0.84, 0.88, 0.96]},
+    {"name": "warm-practical", "role": "warm", "at": [0.15, -0.45, 250], "intensity": 130, "radiusUU": 430, "colorLinear": [1.0, 0.59, 0.30]},
+    {"name": "cyan-rim", "role": "cool", "at": [-0.45, -0.45, 250], "intensity": 85, "radiusUU": 420, "colorLinear": [0.55, 0.80, 1.0]},
+    {"name": "indigo-pool", "role": "cool", "at": [0.35, 0.40, 240], "intensity": 70, "radiusUU": 360, "colorLinear": [0.45, 0.50, 0.95]}
+   ]
+  }
+ },
+ "boards": [
+  {
+   "id": "cobble-city",
+   "label": "Cobble City 5x6 review board (isolated S09 DB row)",
+   "match": {"boardIds": ["cmuhgs4b2001mwik4f2b2xtf8"], "width": 5, "height": 6, "zoneKeys": ["blue", "red"]},
+   "surface": "cobble-5x6-mesh",
+   "glyphs": "review",
+   "light": "cobble-probe",
+   "legacyCobbleTrace": true,
+   "expect": {"cells": 30, "zoneCells": 30, "multizoneCells": 0, "obstacles": 0, "zoneCellCounts": {"blue": 15, "red": 15}}
+  },
+  {
+   "id": "sherwood-forest-art-fixture",
+   "label": "ART FIXTURE · Sherwood Forest 8x5 grid approximation (art fixture, не правила)",
+   "artFixture": true,
+   "fixture": "backend/prisma/fixtures/art-boards/sherwood-forest.art-fixture.json",
+   "match": {"boardIds": ["c37a3b6643a96c45fa71f10de"], "width": 8, "height": 5, "zoneKeys": ["gray", "light-gray", "green", "brown", "light-green", "orange", "yellow"]},
+   "surface": "tiles",
+   "glyphs": "zone",
+   "light": "forest-probe",
+   "expect": {"cells": 40, "zoneCells": 30, "multizoneCells": 14, "obstacles": 10, "zoneCellCounts": {"gray": 6, "light-gray": 5, "green": 6, "brown": 6, "light-green": 6, "orange": 6, "yellow": 12}}
+  },
+  {
+   "id": "t-rex-paddock-art-fixture",
+   "label": "ART FIXTURE · T. Rex Paddock 7x5 grid approximation (art fixture, не правила)",
+   "artFixture": true,
+   "fixture": "backend/prisma/fixtures/art-boards/t-rex-paddock.art-fixture.json",
+   "match": {"boardIds": ["c70e9f624617750c2a2b856fd"], "width": 7, "height": 5, "zoneKeys": ["blue", "gray", "green", "blue-green", "purple", "yellow"]},
+   "surface": "tiles",
+   "glyphs": "zone",
+   "light": "paddock-probe",
+   "expect": {"cells": 35, "zoneCells": 26, "multizoneCells": 13, "obstacles": 9, "zoneCellCounts": {"blue": 6, "gray": 7, "green": 8, "blue-green": 7, "purple": 4, "yellow": 7}}
+  }
+ ]
+}
