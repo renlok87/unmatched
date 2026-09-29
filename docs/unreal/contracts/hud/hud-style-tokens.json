@@ -1,12 +1,14 @@
 {
  "schema": "unmatched.hud-style-tokens/1",
- "revision": "w4d-2026-09-29",
+ "revision": "w5br-2026-09-29",
  "status": "предложено",
- "status_note": "Единая таблица токенов стиля HUD (правило 2 HUD-RULES.md). Значения — предложения документов 02/03, не художественная приёмка; финальные числа фиксирует ART-011 / GD-047. Цвета хранятся hex sRGB; код переводит их только через FLinearColor::FromSRGBColor (AD-OPEN-39, решение по умолчанию в журнале 2026-09-29).",
+ "status_note": "Единая таблица токенов стиля HUD (правило 2 HUD-RULES.md). Значения — предложения документов 02/03, не художественная приёмка; финальные числа фиксирует ART-011 / GD-047. Цвета хранятся hex sRGB; код переводит их только через FLinearColor::FromSRGBColor (AD-OPEN-39, решение по умолчанию в журнале 2026-09-29). W5b-R (2026-09-29): team.p2 → #5A7F9F, новые mark.keyline, tag.*, damage.text, icon.token.* — решения советника D-1…D-5, подтверждение пользователем на шаге 9.",
  "color_rule": "hex sRGB в данных; в UE — FLinearColor::FromSRGBColor(FColor::FromHex(hex)); прямое hex/255 в FLinearColor запрещено. Пример расхождения (17 AD-OPEN-39, ИЗМЕРЕНО): #3D7BDB/255 = 0.24/0.48/0.86, а MI_S05_ZoneBlue в S05 получил (0.18, 0.36, 0.70) (tools/s05/s05_import_scene.py:417); по кривой sRGB #3D7BDB = 0.047/0.198/0.708 — ни одно из двух значений ему не равно. Таблица: hud_contract.py linear",
  "colors": {
-  "team.p1": {"hex": "#E8C06A", "status": "предложено", "source": "03 С-11 (Q-304 открыт)", "use": "команда игрока 1: база, кольцо, одежда (TeamColor b), чип плашки"},
-  "team.p2": {"hex": "#9FC2D8", "status": "предложено", "source": "03 С-11 (Q-304 открыт)", "use": "команда игрока 2"},
+  "team.p1": {"hex": "#E8C06A", "status": "предложено", "source": "03 С-11; решение советника D-2 2026-09-29 (абсолютно по SeatOrder: место 0 / хост), Q-304 открыт", "use": "команда игрока 1 (место 0 / хост): заливка кольца, чип тега/плашки, TeamColor одежды"},
+  "team.p2": {"hex": "#5A7F9F", "status": "предложено", "source": "W4-B c11_value_split_proposal (art/um-materials/um-masters.json team_palette); решение советника D-2 2026-09-29 (docs/game-design/decisions/2026-09-29-board-readability-decisions.md), ждёт подтверждения пользователя — Q-304 открыт; было #9FC2D8 (03 С-11)", "use": "команда игрока 2 (место 1): заливка кольца, чип тега/плашки, TeamColor одежды; абсолютно по SeatOrder"},
+  "team.p1.screen": {"hex": "#DAC576", "status": "измерено", "source": "калибровка W5b-R 2026-09-29 (docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/diag/editor-diag.json): экранные байты заливки кольца team.p1 (unlit + EyeAdaptationInverse проходит тонмаппер, ΔE76 9,45 к #E8C06A)", "use": "цвет чипа команды P1 в теге/плашке — чип совпадает с кольцом для зрителя (решение советника D-3); кольцо само рисует team.p1 через FromSRGBColor"},
+  "team.p2.screen": {"hex": "#5786A8", "status": "измерено", "source": "калибровка W5b-R (тот же файл): экранные байты заливки кольца team.p2 (ΔE76 3,58 к #5A7F9F)", "use": "цвет чипа команды P2 в теге/плашке"},
   "zone.blue": {"hex": "#3D7BDB", "status": "предложено", "source": "03 С-7"},
   "zone.green": {"hex": "#3FA65C", "status": "предложено", "source": "03 С-7"},
   "zone.yellow": {"hex": "#E0B23C", "status": "предложено", "source": "03 С-7"},
@@ -16,20 +18,31 @@
   "light.key": {"hex": "#B8C8E0", "status": "предложено", "source": "03 С-8", "use": "только справка для согласования HUD со сценой; свет задаёт профиль света"},
   "text.primary": {"hex": "#F2EDE4", "status": "предложено", "source": "составитель W4-D: светлый тёплый на тёмных панелях; проверить контраст ≥ 4.5:1 на UI-PANEL", "use": "основной текст"},
   "text.secondary": {"hex": "#B9B2A6", "status": "предложено", "source": "составитель W4-D", "use": "подписи, неактивное"},
-  "state.error": {"hex": "#D9483F", "status": "предложено", "source": "совпадает с zone.red (03 С-7); отказ дублируется иконкой UI-ICON-ACTION и текстом why.*", "use": "рамка ошибки UI-PANEL, CUE-004"}
+  "state.error": {"hex": "#D9483F", "status": "предложено", "source": "совпадает с zone.red (03 С-7); отказ дублируется иконкой UI-ICON-ACTION и текстом why.*", "use": "рамка ошибки UI-PANEL, CUE-004"},
+  "mark.keyline": {"hex": "#111317", "status": "предложено", "source": "решения советника D-3/D-4 2026-09-29 (W5b-R): тёмная кромка 1,5 uu под заливкой кольца команды и под штрихами/глифами зон", "use": "кромка игрового слоя (кольцо команды, метки зон)"},
+  "tag.background": {"hex": "#161A28", "status": "предложено", "source": "решение советника D-1 2026-09-29: подложка тега бойца = фон плашки T2.2 (22,26,40)", "use": "непрозрачная подложка экранного тега бойца и капсулы числа урона"},
+  "tag.text": {"hex": "#F2ECDE", "status": "предложено", "source": "решение советника D-1: текст плашки T2.2 (242,236,222); расчёт WCAG против tag.background 14,7 : 1", "use": "имя и HP в теге бойца"},
+  "damage.text": {"hex": "#FFE0AF", "status": "предложено", "source": "решение советника D-1: цвет числа урона T2.2 (255,224,175); расчёт против tag.background 13,6 : 1", "use": "число урона «−N»"},
+  "icon.token.body": {"hex": "#161A28", "status": "предложено", "source": "решение советника D-5 2026-09-29: тёмный жетон иконки цели", "use": "тело жетона T_UI_Action_AttackToken_*"},
+  "icon.token.rim": {"hex": "#F2ECDE", "status": "предложено", "source": "решение советника D-5: ободок 1 px", "use": "ободок жетона"}
  },
  "typography": {
   "font.family": {"value": "Roboto (движок UE 5.8, кириллица проверена по cmap)", "status": "предложено", "source": "исследование R3.2; фирменный шрифт с кириллицей — AD-OPEN-24"},
   "size.panel": {"px": 16, "status": "предложено", "source": "02 §8 таблица токенов"},
   "size.button": {"px": 20, "status": "предложено", "source": "02 §8"},
   "size.modal_title": {"px": 28, "status": "предложено", "source": "02 §8"},
-  "size.game_result": {"px": 48, "status": "предложено", "source": "02 §8"}
+  "size.game_result": {"px": 48, "status": "предложено", "source": "02 §8"},
+  "size.tag.name": {"px": 12, "status": "предложено", "source": "решение советника D-1: Bold 12 su (≥ 11 su при 1920×1080)"},
+  "size.tag.hp": {"px": 11, "status": "предложено", "source": "решение советника D-1: Bold 11 su"},
+  "size.damage": {"px": 18, "status": "предложено", "source": "решение советника D-1: Bold 18 su ≈ 18,66 px bold — «крупный текст» WCAG"}
  },
  "spacing": {
   "space.s": {"px": 12, "status": "предложено", "source": "02 §8"},
   "space.m": {"px": 16, "status": "предложено", "source": "02 §8"},
   "space.l": {"px": 24, "status": "предложено", "source": "02 §8"},
-  "panel.padding": {"px": 12, "max_px": 16, "status": "предложено", "source": "02 §8 UI-PANEL (12–16 px)"}
+  "panel.padding": {"px": 12, "max_px": 16, "status": "предложено", "source": "02 §8 UI-PANEL (12–16 px)"},
+  "tag.padding.x": {"px": 4, "status": "предложено", "source": "решение советника D-1: отступы тега 4×2 su"},
+  "tag.padding.y": {"px": 2, "status": "предложено", "source": "решение советника D-1: отступы тега 4×2 su"}
  },
  "radii": {
   "radius.s": {"px": 8, "status": "предложено", "source": "02 §8"},
@@ -40,7 +53,8 @@
   "icon.s": {"px": 16, "status": "предложено", "source": "02 §8 UI-ICON-RESOURCE"},
   "icon.m": {"px": 24, "status": "предложено", "source": "02 §8; QA-010 контраст иконки 24 px"},
   "icon.l": {"px": 32, "status": "предложено", "source": "02 §8"},
-  "icon.xl": {"px": 48, "status": "предложено", "source": "T2.2 иконка 24/32/48"}
+  "icon.xl": {"px": 48, "status": "предложено", "source": "T2.2 иконка 24/32/48"},
+  "icon.team_shape": {"px": 12, "status": "предложено", "source": "решение советника D-3: значок команды ● (P1) / ⬡ (P2) в чипе тега и плашки, текстура 12×12 без mip"}
  },
  "motion": {
   "hover.ms": {"value": 150, "status": "предложено", "source": "R3.0 (hover 150 мс), 07 CUE-001"},

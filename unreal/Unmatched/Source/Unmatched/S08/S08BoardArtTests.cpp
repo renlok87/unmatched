@@ -12,6 +12,10 @@
 
 #include "S08BoardArt.h"
 #include "S08BoardModel.h"
+#include "S08FighterActor.h"
+#include "S08Team.h"
+#include "Engine/Engine.h"
+#include "Engine/World.h"
 #include "S08Contracts.h"
 #include "S08Render.h"
 #include "Dom/JsonObject.h"
@@ -360,12 +364,13 @@ bool FS08BoardArtCobbleLegacyTest::RunTest(const FString&) {
   TestEqual("blueMarks", L.StrokePiecesByKey.FindRef(TEXT("blue")), 15);
   TestEqual("redMarks", L.StrokePiecesByKey.FindRef(TEXT("red")), 45);
   TestEqual("glyph pieces 15 diamonds + 30 bars", L.Glyphs.Num(), 45);
-  // Exact legacy transforms (S08BoardActor before T3.2) for one blue and one red cell.
+  // Legacy counts above stay exact; W5b-R D-4 moved the strokes inside the slab (Solid centre 41.5, Dash3 41.25:
+  // fill + 1.5-uu keyline <= 45 uu) and the glyphs above the strokes (z 0.38). The scales are the legacy ones.
   const FVector BlueWorld = Board.CellToWorld(1, 0);
   const FS08ZoneMarkPiece* BlueStroke = L.Strokes.FindByPredicate(
       [](const FS08ZoneMarkPiece& M) { return M.Cell == FIntPoint(1, 0); });
   if (TestNotNull("blue stroke", BlueStroke)) {
-    TestTrue("blue edge position", BlueStroke->Transform.GetTranslation().Equals(BlueWorld + FVector(0, 46, 0.28f), 0.0f));
+    TestTrue("blue edge position", BlueStroke->Transform.GetTranslation().Equals(BlueWorld + FVector(0, 41.5f, 0.28f), 1e-4f));
     TestTrue("blue edge scale", BlueStroke->Transform.GetScale3D().Equals(FVector(0.96f, 0.04f, 0.004f), 0.0f));
   }
   const FVector RedWorld = Board.CellToWorld(3, 4);
@@ -373,14 +378,14 @@ bool FS08BoardArtCobbleLegacyTest::RunTest(const FString&) {
   for (const FS08ZoneMarkPiece& M : L.Strokes) {
     if (M.Cell != FIntPoint(3, 4)) continue;
     const float Offset = -32.0f + 32.0f * RedPieces++;
-    TestTrue("red stroke position", M.Transform.GetTranslation().Equals(RedWorld + FVector(Offset, 46, 0.28f), 0.0f));
+    TestTrue("red stroke position", M.Transform.GetTranslation().Equals(RedWorld + FVector(Offset, 41.25f, 0.28f), 1e-4f));
     TestTrue("red stroke scale", M.Transform.GetScale3D().Equals(FVector(0.28f, 0.045f, 0.004f), 0.0f));
   }
   TestEqual("three red strokes", RedPieces, 3);
   const FS08ZoneMarkPiece* Diamond = L.Glyphs.FindByPredicate(
       [](const FS08ZoneMarkPiece& M) { return M.Cell == FIntPoint(1, 0); });
   if (TestNotNull("blue diamond", Diamond)) {
-    TestTrue("diamond at the near-left slot", Diamond->Transform.GetTranslation().Equals(BlueWorld + FVector(-32, 32, 0.28f), 0.0f));
+    TestTrue("diamond at the near-left slot", Diamond->Transform.GetTranslation().Equals(BlueWorld + FVector(-32, 32, 0.38f), 1e-4f));
     TestTrue("diamond rotated 45", Diamond->Transform.Rotator().Equals(FRotator(0, 45, 0), 0.01f));
   }
   // Probe lights: key 4.5 lux at (-350,-150,600) rot (0,-55,30) with shadow;
@@ -700,6 +705,305 @@ bool FS08BoardArtAutoApproachTest::RunTest(const FString&) {
   for (int32 Y = 0; Y < 6; ++Y) Walled.Cells[Y * 5 + 2].Type = ES08CellType::Wall;
   TestFalse(TEXT("walled off: nothing improves"),
             FS08BoardModel::PickApproachDestination(Walled, Duel, TEXT("h"), 2, Dest, From, To, Steps));
+  return true;
+}
+
+
+// ---- W5b-R (advisor decisions D-2/D-3/D-4, docs/game-design/decisions/2026-09-29-board-readability-decisions.md)
+namespace {
+/** The four corners (XY, uu) of one cube piece: the engine cube (+-50) scaled, yawed, translated. */
+TArray<FVector2D> PieceCorners(const FTransform& T) {
+  TArray<FVector2D> Out;
+  for (const FVector& C : {FVector(-50, -50, 0), FVector(50, -50, 0), FVector(50, 50, 0), FVector(-50, 50, 0)}) {
+    const FVector W = T.TransformPosition(C);
+    Out.Add(FVector2D(W.X, W.Y));
+  }
+  return Out;
+}
+
+double PointSegmentDistance(const FVector2D& P, const FVector2D& A, const FVector2D& B) {
+  const FVector2D AB = B - A;
+  const double Len2 = AB.SizeSquared();
+  const double T = Len2 > 0.0 ? FMath::Clamp(FVector2D::DotProduct(P - A, AB) / Len2, 0.0, 1.0) : 0.0;
+  return FVector2D::Distance(P, A + AB * T);
+}
+
+bool SegmentsIntersect(const FVector2D& A, const FVector2D& B, const FVector2D& C, const FVector2D& D) {
+  auto Cross = [](const FVector2D& O, const FVector2D& X, const FVector2D& Y) {
+    return (X.X - O.X) * (Y.Y - O.Y) - (X.Y - O.Y) * (Y.X - O.X);
+  };
+  const double D1 = Cross(C, D, A), D2 = Cross(C, D, B), D3 = Cross(A, B, C), D4 = Cross(A, B, D);
+  return ((D1 > 0) != (D2 > 0)) && ((D3 > 0) != (D4 > 0));
+}
+
+/** Min distance between a convex quad and a segment (0 when they touch or cross). */
+double QuadSegmentDistance(const TArray<FVector2D>& Q, const FVector2D& A, const FVector2D& B) {
+  double Best = TNumericLimits<double>::Max();
+  for (int32 I = 0; I < Q.Num(); ++I) {
+    const FVector2D& P0 = Q[I];
+    const FVector2D& P1 = Q[(I + 1) % Q.Num()];
+    if (SegmentsIntersect(P0, P1, A, B)) return 0.0;
+    Best = FMath::Min(Best, FMath::Min(PointSegmentDistance(P0, A, B), PointSegmentDistance(P1, A, B)));
+    Best = FMath::Min(Best, FMath::Min(PointSegmentDistance(A, P0, P1), PointSegmentDistance(B, P0, P1)));
+  }
+  return Best;
+}
+
+const ES08ZoneGlyph AllGlyphs[] = {ES08ZoneGlyph::Diamond, ES08ZoneGlyph::Bar1,  ES08ZoneGlyph::Bars2,
+                                   ES08ZoneGlyph::Bars3,   ES08ZoneGlyph::HBars2, ES08ZoneGlyph::Square,
+                                   ES08ZoneGlyph::Cross,   ES08ZoneGlyph::X,      ES08ZoneGlyph::Tee,
+                                   ES08ZoneGlyph::Chevron, ES08ZoneGlyph::Ring};
+const ES08ZoneStroke AllStrokes[] = {ES08ZoneStroke::Solid, ES08ZoneStroke::Dash2, ES08ZoneStroke::Dash3,
+                                     ES08ZoneStroke::Dash4, ES08ZoneStroke::Dots5, ES08ZoneStroke::Double,
+                                     ES08ZoneStroke::DashDot};
+
+double MaxRadialExtent(const FTransform& T) {
+  double Out = 0.0;
+  for (const FVector2D& C : PieceCorners(T)) Out = FMath::Max(Out, FMath::Max(FMath::Abs(C.X), FMath::Abs(C.Y)));
+  return Out;
+}
+}  // namespace
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtTeamRingTest,
+    "Unmatched.S08.BoardArt.TeamRing W5b-R team ring: above the marks, clear of the target arcs and the zone glyphs, meshes = spec",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtTeamRingTest::RunTest(const FString&) {
+  using namespace S08TeamRingSpec;
+  // 1) height: above every zone mark (glyph fill top 0.58) and the tile top z = 0 (T5.2 z-fighting)
+  const float GlyphTop = S08ZoneMarkSpec::GlyphZ + S08ZoneMarkSpec::GlyphDepth * 50.0f;
+  TestTrue(FString::Printf(TEXT("ring zMin %.2f >= 0.5"), ZMin), ZMin >= 0.5f);
+  TestTrue(FString::Printf(TEXT("ring zMin %.2f above the glyph fill top %.2f"), ZMin, GlyphTop), ZMin > GlyphTop);
+  TestTrue("ring zMax 1.2 below the L-corners (1.8) and the selection/target rings (2.2)", ZMax < 1.8f);
+  // 2) fill band vs the target arcs (outer 23 uu) and the selection ring (outer 20 uu), both scaled like the ring
+  TestTrue(FString::Printf(TEXT("P1 fill inner %.1f > target arcs outer %.1f"), P1Fill0, TargetArcOuterUU),
+           P1Fill0 > TargetArcOuterUU);
+  TestTrue(FString::Printf(TEXT("P2 fill inner apothem %.1f >= target arcs outer %.1f (touch at the flats only)"), P2Fill0,
+                           TargetArcOuterUU),
+           P2Fill0 >= TargetArcOuterUU);
+  TestTrue("selection ring outer inside the keyline", SelectionRingOuterUU < FMath::Min(P1KeylineIn0, P2KeylineIn0));
+  TestTrue("band widths: keyline 1.5, fill 3 (P2 outer keyline 1.0, the plan's fallback)",
+           FMath::IsNearlyEqual(P1Fill0 - P1KeylineIn0, 1.5f) && FMath::IsNearlyEqual(P1Fill1 - P1Fill0, 3.0f) &&
+               FMath::IsNearlyEqual(P1KeylineOut1 - P1Fill1, 1.5f) && FMath::IsNearlyEqual(P2Fill1 - P2Fill0, 3.0f) &&
+               FMath::IsNearlyEqual(P2KeylineOut1 - P2Fill1, 1.0f));
+  // 3) clearance to the zone glyphs: outer ring edge + 1 uu <= the nearest glyph FILL piece (exact rotated rects of
+  //    S08GlyphPieces in all four slots; the glyph AABB would over-count the diamond), for heroes and sidekicks
+  for (const ES08TeamSlot Slot : {ES08TeamSlot::P1, ES08TeamSlot::P2}) {
+    TArray<TPair<FVector2D, FVector2D>> Edges;
+    OuterEdges(Slot, Edges);
+    for (const float Scale : {1.0f, SidekickScale}) {
+      double Nearest = TNumericLimits<double>::Max();
+      FString Where;
+      for (const ES08ZoneGlyph G : AllGlyphs) {
+        for (int32 GlyphSlot = 0; GlyphSlot < 4; ++GlyphSlot) {
+          TArray<FTransform> Pieces;
+          S08GlyphPieces(G, GlyphSlot, Pieces);
+          for (const FTransform& Piece : Pieces) {
+            const TArray<FVector2D> Q = PieceCorners(Piece);
+            for (const TPair<FVector2D, FVector2D>& E : Edges) {
+              const double D = QuadSegmentDistance(Q, E.Key * Scale, E.Value * Scale);
+              if (D < Nearest) {
+                Nearest = D;
+                Where = FString::Printf(TEXT("%s slot %d"), S08ZoneGlyphName(G), GlyphSlot);
+              }
+            }
+          }
+        }
+      }
+      AddInfo(FString::Printf(TEXT("%s scale %.2f: nearest glyph %s at %.2f uu"), S08TeamSlotName(Slot), Scale, *Where,
+                              Nearest));
+      TestTrue(FString::Printf(TEXT("%s scale %.2f: >= 1 uu to the nearest glyph (%s, %.2f)"), S08TeamSlotName(Slot),
+                               Scale, *Where, Nearest),
+               Nearest >= 1.0);
+    }
+  }
+  // 4) the imported meshes = the spec (bounds, slots) and the MIs = the palette on the game-layer master
+  for (const ES08TeamSlot Slot : {ES08TeamSlot::P1, ES08TeamSlot::P2}) {
+    UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, MeshPath(Slot));
+    if (!TestNotNull(FString(TEXT("mesh ")) + MeshPath(Slot), Mesh)) continue;
+    const FBox B = Mesh->GetBoundingBox();
+    TestTrue(FString::Printf(TEXT("%s z %.2f..%.2f"), S08TeamSlotName(Slot), B.Min.Z, B.Max.Z),
+             FMath::IsNearlyEqual(B.Min.Z, ZMin, 0.01) && FMath::IsNearlyEqual(B.Max.Z, ZMax, 0.01));
+    const double Reach = Slot == ES08TeamSlot::P1 ? P1KeylineOut1 : P2KeylineOut1;
+    TestTrue(FString::Printf(TEXT("%s XY reach %.2f / %.2f"), S08TeamSlotName(Slot), B.Max.Y, Reach),
+             FMath::IsNearlyEqual(B.Max.Y, Reach, 0.02) && FMath::IsNearlyEqual(-B.Min.Y, Reach, 0.02));
+    TestEqual(FString(S08TeamSlotName(Slot)) + TEXT(": two material slots"), Mesh->GetStaticMaterials().Num(), 2);
+#if WITH_EDITOR
+    TestFalse(FString(S08TeamSlotName(Slot)) + TEXT(": Nanite off"), Mesh->IsNaniteEnabled());
+#endif
+  }
+  for (const TCHAR* Path : {KeylineMaterialPath, FillMaterialPath}) {
+    UMaterialInstance* MI = LoadObject<UMaterialInstance>(nullptr, Path);
+    if (!TestNotNull(FString(TEXT("MI ")) + Path, MI)) continue;
+    TestTrue(FString(Path) + TEXT(": parent M_UM_GameLayer"),
+             MI->Parent && MI->Parent->GetPathName() == TEXT("/Game/UM/Materials/M_UM_GameLayer.M_UM_GameLayer"));
+    FLinearColor Got;
+    MI->GetVectorParameterValue(FHashedMaterialParameterInfo(TEXT("LayerColor")), Got);
+    const FLinearColor Want = Path == KeylineMaterialPath ? S08TeamPalette::Keyline()
+                                                          : S08TeamPalette::RingFill(ES08TeamSlot::P1);
+    TestTrue(FString::Printf(TEXT("%s LayerColor %s == %s"), Path, *Got.ToString(), *Want.ToString()),
+             Got.Equals(Want, 1e-5f));
+  }
+  // 5) an art figure (the grey blockout of Arthur) shows the team ring and hides the grey base disc; P2 = hexagon
+  UWorld* World = UWorld::CreateWorld(EWorldType::Game, false, FName(TEXT("S08BoardArtTeamRing")));
+  if (TestNotNull("test world", World)) {
+    FWorldContext& Context = GEngine->CreateNewWorldContext(EWorldType::Game);
+    Context.SetCurrentWorld(World);
+    AS08FighterActor* Actor = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass());
+    if (TestNotNull("fighter actor", Actor)) {
+      TestTrue("team ring assets load", Actor->LoadTeamRingAssets());
+      FS08BoardFighter F;
+      F.Id = TEXT("f-1-hero");
+      F.OwnerId = TEXT("guest");
+      F.Name = TEXT("King Arthur");
+      F.Label = TEXT("King Arthur");
+      F.bIsHero = true;
+      F.Health = F.MaxHealth = 18;
+      F.X = 1;
+      F.Y = 1;
+      Actor->SetTeam(ES08TeamSlot::P2, ES08TeamSlot::P2, ES08TeamColorMode::Absolute);
+      Actor->ApplyFighter(F, FVector::ZeroVector, false, true);
+      TestTrue("blockout = art figure", Actor->HasArtFigure() && Actor->IsBlockout());
+      TestTrue("team ring shown", Actor->HasTeamRing() && Actor->IsTeamRingVisible());
+      TestFalse("grey base disc hidden under an art figure", Actor->IsBaseVisible());
+      TestTrue("P2 look = hexagon mesh", Actor->GetTeamRingMesh() &&
+                                             Actor->GetTeamRingMesh()->GetName() == TEXT("SM_Marker_TeamRing_P2"));
+      F.Id = TEXT("f-0-sk0");
+      F.Name = TEXT("Harpies");
+      F.bIsHero = false;
+      AS08FighterActor* Side = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass());
+      Side->LoadTeamRingAssets();
+      Side->SetTeam(ES08TeamSlot::P1, ES08TeamSlot::P1, ES08TeamColorMode::Absolute);
+      Side->ApplyFighter(F, FVector::ZeroVector, true, true);
+      TestTrue("sidekick ring scaled 0.78 in XY only",
+               Side->GetTeamRingScale().Equals(FVector(SidekickScale, SidekickScale, 1.0f), 1e-4));
+      TestTrue("P1 look = circle mesh", Side->GetTeamRingMesh() &&
+                                            Side->GetTeamRingMesh()->GetName() == TEXT("SM_Marker_TeamRing_P1"));
+      // the grey path (no -ArtPreview board) keeps the disc
+      AS08FighterActor* Grey = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass());
+      Grey->LoadTeamRingAssets();
+      Grey->ApplyFighter(F, FVector::ZeroVector, true, false);
+      TestTrue("grey path: base disc kept, no team ring", Grey->IsBaseVisible() && !Grey->IsTeamRingVisible());
+    }
+    GEngine->DestroyWorldContext(World);
+    World->DestroyWorld(false);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtKeylineTest,
+    "Unmatched.S08.BoardArt.Keylines W5b-R zone keylines: strokes + keylines <= 45 uu, layering, double gap, data, content",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtKeylineTest::RunTest(const FString&) {
+  using namespace S08ZoneMarkSpec;
+  // 1) every stroke type on every side: fill and keyline stay within MaxOuterUU (1 uu inside the 46-uu slab edge)
+  for (const ES08ZoneStroke Stroke : AllStrokes) {
+    for (int32 Side = 0; Side < 4; ++Side) {
+      TArray<FTransform> Fill, Key;
+      S08StrokePieces(Stroke, Side, Fill);
+      S08StrokeKeylinePieces(Stroke, Side, Key);
+      if (!TestEqual(FString::Printf(TEXT("%s side %d: one keyline piece per fill piece"), S08ZoneStrokeName(Stroke), Side),
+                     Key.Num(), Fill.Num())) {
+        continue;
+      }
+      double Outer = 0.0, KeyOuter = 0.0;
+      for (int32 I = 0; I < Fill.Num(); ++I) {
+        Outer = FMath::Max(Outer, MaxRadialExtent(Fill[I]));
+        KeyOuter = FMath::Max(KeyOuter, MaxRadialExtent(Key[I]));
+        const FVector Grow = Key[I].GetScale3D() - Fill[I].GetScale3D();
+        TestTrue(FString::Printf(TEXT("%s: keyline grown 1.5 uu per side"), S08ZoneStrokeName(Stroke)),
+                 FMath::IsNearlyEqual(Grow.X, 0.03, 1e-5) && FMath::IsNearlyEqual(Grow.Y, 0.03, 1e-5));
+        TestTrue(FString::Printf(TEXT("%s: keyline under the fill"), S08ZoneStrokeName(Stroke)),
+                 Key[I].GetTranslation().Z + Key[I].GetScale3D().Z * 50.0 <
+                     Fill[I].GetTranslation().Z + Fill[I].GetScale3D().Z * 50.0 - 0.1);
+      }
+      // the across-extent of a side (distance from the centre perpendicular to the side) must be <= 45
+      double Across = 0.0;
+      for (const FTransform& K : Key) {
+        for (const FVector2D& C : PieceCorners(K)) Across = FMath::Max(Across, Side % 2 ? FMath::Abs(C.X) : FMath::Abs(C.Y));
+      }
+      TestTrue(FString::Printf(TEXT("%s side %d: keyline across-extent %.2f <= %.1f"), S08ZoneStrokeName(Stroke), Side,
+                               Across, MaxOuterUU),
+               Across <= MaxOuterUU + 1e-3);
+      TestTrue(FString::Printf(TEXT("%s: centre line <= 42"), S08ZoneStrokeName(Stroke)),
+               S08ZoneStrokeCenterUU(Stroke) <= EdgeUU + 1e-4);
+      (void)Outer;
+      (void)KeyOuter;
+    }
+  }
+  // 2) the double stroke: two 3-uu lines, a 3-uu gap exactly filled by the two keylines (1.5 + 1.5)
+  {
+    TArray<FTransform> Fill, Key;
+    S08StrokePieces(ES08ZoneStroke::Double, 0, Fill);
+    S08StrokeKeylinePieces(ES08ZoneStroke::Double, 0, Key);
+    if (TestEqual("double: two lines", Fill.Num(), 2)) {
+      const double Y0 = Fill[0].GetTranslation().Y, Y1 = Fill[1].GetTranslation().Y;
+      const double Thick = Fill[0].GetScale3D().Y * 100.0;
+      TestTrue("double: 3-uu lines", FMath::IsNearlyEqual(Thick, 3.0, 1e-3));
+      TestTrue("double: 3-uu gap", FMath::IsNearlyEqual(FMath::Abs(Y1 - Y0) - Thick, 3.0, 1e-3));
+      const double KeyInner0 = FMath::Min(Y0, Y1) + Key[0].GetScale3D().Y * 50.0;
+      const double KeyInner1 = FMath::Max(Y0, Y1) - Key[1].GetScale3D().Y * 50.0;
+      TestTrue("double: the keylines meet in the gap", KeyInner0 >= KeyInner1 - 1e-3);
+    }
+  }
+  // 3) layering of the top faces: stroke keyline < stroke fill < glyph keyline < glyph fill < team ring
+  const float StrokeKeyTop = StrokeKeylineZ + KeylineDepth * 50.0f, StrokeTop = StrokeZ + StrokeDepth * 50.0f;
+  const float GlyphKeyTop = GlyphZ + KeylineDepth * 50.0f, GlyphTop = GlyphZ + GlyphDepth * 50.0f;
+  TestTrue(FString::Printf(TEXT("layering %.2f < %.2f < %.2f < %.2f < %.2f"), StrokeKeyTop, StrokeTop, GlyphKeyTop,
+                           GlyphTop, S08TeamRingSpec::ZMin),
+           StrokeKeyTop + 0.05f <= StrokeTop + 1e-4f && StrokeTop + 0.05f <= GlyphKeyTop + 1e-4f &&
+               GlyphKeyTop + 0.05f <= GlyphTop + 1e-4f && GlyphTop < S08TeamRingSpec::ZMin);
+  // 4) glyph FILL stays on the slab (<= 46 uu); glyph keylines may reach into the dark groove (dark on dark)
+  for (const ES08ZoneGlyph G : AllGlyphs) {
+    for (int32 Slot = 0; Slot < 4; ++Slot) {
+      TArray<FTransform> Fill;
+      S08GlyphPieces(G, Slot, Fill);
+      double Outer = 0.0;
+      for (const FTransform& T : Fill) Outer = FMath::Max(Outer, MaxRadialExtent(T));
+      TestTrue(FString::Printf(TEXT("glyph %s slot %d fill %.2f <= slab %.0f"), S08ZoneGlyphName(G), Slot, Outer,
+                               SlabHalfUU),
+               Outer <= SlabHalfUU + 1e-3);
+    }
+  }
+  // 5) the layout: keylines are never part of the zone counts (legacy Cobble trace byte-compatible)
+  FS08BoardArtData Data;
+  TArray<FString> Errors;
+  if (!TestTrue("shipped data", LoadShipped(Data, Errors))) return false;
+  const FS08BoardModel Board = CobbleBoard();
+  const FS08ZoneMarkLayout L = S08BuildZoneMarks(Board, Data);
+  TestEqual("stroke keylines = stroke pieces", L.StrokeKeylines.Num(), L.Strokes.Num());
+  TestEqual("glyph keylines = glyph pieces", L.GlyphKeylines.Num(), L.Glyphs.Num());
+  TestEqual("blueMarks unchanged", L.StrokePiecesByKey.FindRef(TEXT("blue")), 15);
+  TestEqual("redMarks unchanged", L.StrokePiecesByKey.FindRef(TEXT("red")), 45);
+  // 6) the data (profile rev 4) and the content
+  TestTrue("revision >= 4", Data.Revision >= 4);
+  TestTrue("zoneKeyline block", Data.Keyline.bSet && Data.Keyline.Color == FColor(17, 19, 23, 255));
+  TestEqual("gray -> #7F868E (D-4)", Data.StyleFor(TEXT("gray")).ColorHex(), FString(TEXT("#7F868E")));
+  TestEqual("keyline mesh per glyph", Data.Keyline.GlyphMeshPaths.Num(), 11);
+  UMaterialInstance* KeyMI = LoadObject<UMaterialInstance>(nullptr, *Data.Keyline.MaterialInstancePath);
+  if (TestNotNull(TEXT("keyline MI ") + Data.Keyline.MaterialInstancePath, KeyMI)) {
+    FLinearColor Got;
+    KeyMI->GetVectorParameterValue(FHashedMaterialParameterInfo(TEXT("LayerColor")), Got);
+    TestTrue(FString::Printf(TEXT("keyline LayerColor %s = FromSRGBColor(#111317)"), *Got.ToString()),
+             Got.Equals(FLinearColor::FromSRGBColor(FColor(17, 19, 23)), 1e-5f));
+  }
+  for (const TPair<FString, FString>& Path : Data.Keyline.GlyphMeshPaths) {
+    ES08ZoneGlyph G;
+    if (!TestTrue(Path.Key + TEXT(": glyph name"), S08ParseZoneGlyph(Path.Key, G))) continue;
+    UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *Path.Value);
+    if (!TestNotNull(Path.Key + TEXT(": keyline mesh ") + Path.Value, Mesh)) continue;
+    TArray<FTransform> Pieces;
+    S08GlyphKeylinePieces(G, 0, Pieces);
+    FBox Want(ForceInit);
+    for (const FTransform& T : Pieces) {
+      for (int32 C = 0; C < 8; ++C) {
+        const FVector Corner((C & 1) ? 50.0 : -50.0, (C & 2) ? 50.0 : -50.0, (C & 4) ? 50.0 : -50.0);
+        Want += T.TransformPosition(Corner) - S08GlyphAnchor(0);
+      }
+    }
+    const FBox Got = Mesh->GetBoundingBox();
+    TestTrue(FString::Printf(TEXT("%s: keyline mesh bounds %s == pieces %s"), *Path.Key, *Got.ToString(), *Want.ToString()),
+             Got.Min.Equals(Want.Min, 0.01) && Got.Max.Equals(Want.Max, 0.01));
+  }
   return true;
 }
 

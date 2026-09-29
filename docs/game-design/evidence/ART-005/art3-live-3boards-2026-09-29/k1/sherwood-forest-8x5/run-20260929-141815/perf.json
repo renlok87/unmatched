@@ -1,6 +1,6 @@
 {
   "schema": "unmatched.art004-perf/1",
-  "status": "измерено",
+  "status": "измерено; ЗАГРЯЗНЕНО фоном H2 (headless Blender/Cycles параллельной линии героев) — не для ACC-022",
   "scope": "текущий ПК разработки (RTX 4090), не целевой ПК D-07; ACC-022 не заявляется",
   "clientFpsCap": 30,
   "clients": {
@@ -789,7 +789,7 @@
       "max": 47.0
     }
   },
-  "concurrentGpuUsers": "UnrealEditor PID 19540 (main checkout, orchestrator, idle viewport) and Blender MCP sessions 9876/9877 were running; see perProcessSmPct and gpu-baseline.json",
+  "concurrentGpuUsers": "живой UnrealEditor PID 31756 (главный checkout, MCP :8123), Blender MCP :9876/:9877 и headless-процессы линии героев H2; см. perProcessSmPct (эррата W5b-R: прежний текст называл PID 19540 — строка-шаблон art004_live_k2 T1.1)",
   "frameRateLimit": {
     "defaultGameUserSettings": "60.000000",
     "stagedGameUserSettings": null,
@@ -812,5 +812,12 @@
         "rhi": "D3D12"
       }
     }
+  },
+  "errata": {
+    "date": "2026-09-29",
+    "ref": "эррата W5b-R (docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md §9; art3-live-3boards-2026-09-29.md §9.1)",
+    "previousStatus": "измерено",
+    "why": "метка фона H2 добавлена после съёмки: K1 и K3 T5.2 снимались при одном фоне (акт T5.2 §3), в K3 метка стояла с начала",
+    "previousConcurrentGpuUsers": "UnrealEditor PID 19540 (main checkout, orchestrator, idle viewport) and Blender MCP sessions 9876/9877 were running; see perProcessSmPct and gpu-baseline.json"
   }
 }

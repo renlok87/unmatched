@@ -47,6 +47,10 @@
     {
       "k": "K3",
       "path": "render-joiner-s09-combat-resolve-revealed.json"
+    },
+    {
+      "k": "K1",
+      "path": "plate-k1-host.json"
     }
   ],
   "manual": {
@@ -69,7 +73,7 @@
       "note": "метка зоны против плитки (WCAG ≥ 3:1, зарегистрировано до съёмки) — не проходят: blue, blue-green, gray, green, purple, yellow; форма (штрих+глиф) у всех пар соседних зон разная; буквы зон не реализованы — zone-contrast.json"
     },
     "K3.attack_result": {
-      "note": "COMBAT-RESULT и числа урона сходятся у обоих клиентов (validation.json); цель — кольцо-дуги и иконка; иконка висит над целью и ложится на подставку фигуры в клетке за ней (k3-icon-bbox-crops.png); на s09-combat-result.png иконки в пикселях нет, хотя трасса пишет visible=1; атакующий — без позы (клипы не подключены). Число урона: совпадение CUE = число — это счёт, не видимость; читаемость и столкновения с подписями — labels-damage.json"
+      "note": "COMBAT-RESULT и числа урона сходятся у обоих клиентов (validation.json); цель — кольцо-дуги и иконка; иконка висит над целью и ложится на подставку фигуры в клетке за ней (k3-icon-bbox-crops.png); на s09-combat-result.png иконки в пикселях нет, хотя трасса пишет visible=1; атакующий — без позы (клипы не подключены). Число урона: совпадение CUE = число — это счёт, не видимость; читаемость и столкновения с подписями — labels-damage.json | Эррата W5b-R — строка делится на два вердикта: «рамка/дуги цели и итог в HUD» — есть с оговоркой (агент); «иконка цели» — нет (строка K3.icon_sizes, метод rev 2). Кадр числа урона s09-damage-number.png — способность/эффект (урон раньше первого COMBAT_RESOLVE): CUE damage f-1-hero -1 seq=10, первый COMBAT_RESOLVE seq=12 (трасса присоединившегося). HUD-панели K3: панель боя в левом верхнем углу закрывает часть клеток (0,0), (1,0) и (0,1), панель руки — край нижнего ряда (агент, по кадру); строк SHOT panel в трассах T5.2 нет, перекрытие не измерялось"
     },
     "K3.icon_sizes": {
       "note": "метод иконки rev 2 (W5-live3): явная маска иконки (analysis/icon-mask-template-32.png), auto-Otsu заменён — на светлой плитке он берёт тёмный передний план (рукояти + подставка соседней фигуры); icon-k3-guard.json"
@@ -176,5 +180,21 @@
       "status": "есть",
       "reason": "числа урона: ARTPREVIEW damage-number = CUE damage ровно по одному (validation.json); итог боя — панель результата S09 (кадр s09-combat-result.png)"
     }
-  ]
+  ],
+  "errata": {
+    "date": "2026-09-29",
+    "ref": "эррата W5b-R (docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md §9; art3-live-3boards-2026-09-29.md §9.1)",
+    "firstDamage": {
+      "damageFighter": "f-1-hero",
+      "damageAmount": 1,
+      "damageSeq": 10,
+      "firstCombatResolveSeq": 12,
+      "source": "способность/эффект (урон раньше первого COMBAT_RESOLVE)"
+    },
+    "changes": [
+      "results: + plate-k1-host.json (k=K1; сама строка K2.plate — задача T5.1)",
+      "K3.attack_result: разделена (рамка/дуги vs иконка), кадр урона помечен",
+      "K1.selected: плашка под King Arthur (только Cobble)"
+    ]
+  }
 }

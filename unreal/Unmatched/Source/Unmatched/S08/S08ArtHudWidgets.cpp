@@ -12,10 +12,13 @@
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
+#include "Brushes/SlateRoundedBoxBrush.h"
 #include "Styling/CoreStyle.h"
 
 const TCHAR* const US08ArtPlateWidget::WidgetBlueprintPath = TEXT("/Game/S08/UI/ArtHud/WBP_S08ArtPlate");
 const TCHAR* const US08ArtIconWidget::WidgetBlueprintPath = TEXT("/Game/S08/UI/ArtHud/WBP_S08ArtIcon");
+const TCHAR* const US08ArtTagWidget::WidgetBlueprintPath = TEXT("/Game/S08/UI/ArtHud/WBP_S08ArtTag");
+const TCHAR* const US08ArtDamageWidget::WidgetBlueprintPath = TEXT("/Game/S08/UI/ArtHud/WBP_S08ArtDamage");
 
 namespace {
 // FSlateColorBrush(White): no resource, so it serializes into a WBP as is and
@@ -113,9 +116,10 @@ bool US08ArtPlateWidget::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget At
     Slot->SetHorizontalAlignment(HAlign_Fill);
     Slot->SetVerticalAlignment(VAlign_Center);
   }
+  // W5b-R D-3: the chip is the team shape (on-screen team colour) + YOURS/ENEMY on the plate background.
   UBorder* Chip = S08Make<UBorder>(Tree, TEXT("TeamChip"));
   Chip->SetBrush(S08WhiteBrush());
-  Chip->SetBrushColor(Style.ChipColor(true));
+  Chip->SetBrushColor(FS08ArtHudPlateStyle::Linear(Style.Background));
   Chip->SetPadding(S08ArtHudLayout::ChipPadding);
   Chip->SetHorizontalAlignment(HAlign_Fill);
   Chip->SetVerticalAlignment(VAlign_Fill);
@@ -125,8 +129,29 @@ bool US08ArtPlateWidget::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget At
     Slot->SetHorizontalAlignment(HAlign_Fill);
     Slot->SetVerticalAlignment(VAlign_Center);
   }
+  UHorizontalBox* ChipRow = S08Make<UHorizontalBox>(Tree, TEXT("ChipRow"));
+  if (!Attach(ChipRow, Chip)) return Fail(TEXT("ChipRow"));
+  USizeBox* ShapeBox = S08Make<USizeBox>(Tree, TEXT("TeamShapeBox"));
+  ShapeBox->SetWidthOverride(Style.TeamShapeSu);
+  ShapeBox->SetHeightOverride(Style.TeamShapeSu);
+  if (!Attach(ShapeBox, ChipRow)) return Fail(TEXT("TeamShapeBox"));
+  if (UHorizontalBoxSlot* Slot = Cast<UHorizontalBoxSlot>(ShapeBox->Slot)) {
+    Slot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
+    Slot->SetPadding(FMargin(0.0f, 0.0f, 3.0f, 0.0f));
+    Slot->SetHorizontalAlignment(HAlign_Fill);
+    Slot->SetVerticalAlignment(VAlign_Center);
+  }
+  UImage* Shape = S08Make<UImage>(Tree, TEXT("TeamShape"));
+  Shape->SetBrush(S08WhiteBrush());
+  Shape->SetColorAndOpacity(Style.TeamChipColor(0));
+  if (!Attach(Shape, ShapeBox)) return Fail(TEXT("TeamShape"));
   UTextBlock* Team = S08MakeText(Tree, TEXT("TeamText"), Style.TeamFont, Style.NameText);
-  if (!Attach(Team, Chip)) return Fail(TEXT("TeamText"));
+  if (!Attach(Team, ChipRow)) return Fail(TEXT("TeamText"));
+  if (UHorizontalBoxSlot* Slot = Cast<UHorizontalBoxSlot>(Team->Slot)) {
+    Slot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
+    Slot->SetHorizontalAlignment(HAlign_Fill);
+    Slot->SetVerticalAlignment(VAlign_Center);
+  }
   Chip->SetPadding(S08ArtHudLayout::ChipPadding);
 
   // HP bar + HP text.
@@ -194,6 +219,7 @@ bool US08ArtPlateWidget::Initialize() {
     NameText = S08Find<UTextBlock>(Tree, TEXT("NameText"));
     TeamChip = S08Find<UBorder>(Tree, TEXT("TeamChip"));
     TeamText = S08Find<UTextBlock>(Tree, TEXT("TeamText"));
+    TeamShape = S08Find<UImage>(Tree, TEXT("TeamShape"));
     HpBar = S08Find<USizeBox>(Tree, TEXT("HpBar"));
     HpBack = S08Find<UImage>(Tree, TEXT("HpBack"));
     HpFill = S08Find<USizeBox>(Tree, TEXT("HpFill"));
@@ -223,13 +249,25 @@ void US08ArtPlateWidget::ApplyStyle() {
 }
 
 void US08ArtPlateWidget::ApplyDynamic() {
-  if (TeamChip) TeamChip->SetBrushColor(Style.ChipColor(bOwn));
+  if (TeamChip) TeamChip->SetBrushColor(FS08ArtHudPlateStyle::Linear(Style.Background));
+  if (TeamShape) {
+    if (bShapeBrushes) TeamShape->SetBrush(ShapeBrushes[TeamSlot ? 1 : 0]);
+    TeamShape->SetColorAndOpacity(Style.TeamChipColor(TeamSlot));
+  }
   // Same rule as the Slate plate: at least 1 su of fill.
   if (HpFill) HpFill->SetWidthOverride(FMath::Max(1.0f, Style.HpBarWidthSu * HpFraction));
 }
 
+void US08ArtPlateWidget::SetTeamShapeBrushes(const FSlateBrush& Circle, const FSlateBrush& Hex) {
+  ShapeBrushes[0] = Circle;
+  ShapeBrushes[1] = Hex;
+  bShapeBrushes = true;
+  ApplyDynamic();
+}
+
 void US08ArtPlateWidget::ApplyTexts(const FS08PlateTexts& Texts) {
   bOwn = Texts.bOwn;
+  TeamSlot = Texts.TeamSlot;
   HpFraction = Texts.HpFraction;
   if (NameText) NameText->SetText(Texts.Name);
   if (TeamText) TeamText->SetText(Texts.Team);
@@ -245,6 +283,7 @@ bool US08ArtPlateWidget::HasAllParts(FString* OutMissing) const {
   if (!NameText) Missing.Add(TEXT("NameText"));
   if (!TeamChip) Missing.Add(TEXT("TeamChip"));
   if (!TeamText) Missing.Add(TEXT("TeamText"));
+  if (!TeamShape) Missing.Add(TEXT("TeamShape"));
   if (!HpBar) Missing.Add(TEXT("HpBar"));
   if (!HpBack) Missing.Add(TEXT("HpBack"));
   if (!HpFill) Missing.Add(TEXT("HpFill"));
@@ -264,6 +303,7 @@ void US08ArtPlateWidget::CollectParts(TArray<FS08WidgetPart>& Out) const {
   S08AddPart(Out, S08ArtHudIds::PlateHpFill, HpFill);
   S08AddPart(Out, S08ArtHudIds::PlateHp, HpText);
   S08AddPart(Out, S08ArtHudIds::PlateStatus, StatusText);
+  S08AddPart(Out, S08ArtHudIds::PlateTeamShape, TeamShape);
 }
 
 // -------------------------------------------------------------------- icon
@@ -306,4 +346,260 @@ bool US08ArtIconWidget::HasAllParts(FString* OutMissing) const {
 
 void US08ArtIconWidget::CollectParts(TArray<FS08WidgetPart>& Out) const {
   Out.Add({S08ArtHudIds::Icon, GetCachedWidget()});
+}
+
+FVector2D S08ArtHudPrepassSize(UWidget& Widget) {
+  const TSharedRef<SWidget> Slate = Widget.TakeWidget();
+  Slate->SlatePrepass(1.0f);
+  return Slate->GetDesiredSize();
+}
+
+// ------------------------------------------------------------------- tag (W5b-R D-1)
+
+bool US08ArtTagWidget::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget Attach, FString* OutError) {
+  const FS08ArtHudTagStyle Style;
+  auto Fail = [OutError](const TCHAR* What) {
+    if (OutError) *OutError = FString::Printf(TEXT("attach failed: %s"), What);
+    return false;
+  };
+  auto HSlot = [](UWidget* Child, const FMargin& SlotPadding) {
+    if (UHorizontalBoxSlot* Slot = Cast<UHorizontalBoxSlot>(Child->Slot)) {
+      Slot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
+      Slot->SetPadding(SlotPadding);
+      Slot->SetHorizontalAlignment(HAlign_Left);
+      Slot->SetVerticalAlignment(VAlign_Center);
+    }
+  };
+  UBorder* Background = S08Make<UBorder>(Tree, TEXT("TagBackground"));
+  Background->SetBrush(S08WhiteBrush());
+  Background->SetBrushColor(FS08ArtHudPlateStyle::Linear(Style.Background));
+  Background->SetPadding(Style.Padding);
+  Background->SetHorizontalAlignment(HAlign_Fill);
+  Background->SetVerticalAlignment(VAlign_Fill);
+  if (!Attach(Background, nullptr)) return Fail(TEXT("TagBackground"));
+  UHorizontalBox* Row = S08Make<UHorizontalBox>(Tree, TEXT("TagRow"));
+  if (!Attach(Row, Background)) return Fail(TEXT("TagRow"));
+  USizeBox* Chip = S08Make<USizeBox>(Tree, TEXT("ChipBox"));
+  Chip->SetWidthOverride(Style.ChipSu);
+  Chip->SetHeightOverride(Style.ChipSu);
+  if (!Attach(Chip, Row)) return Fail(TEXT("ChipBox"));
+  HSlot(Chip, FMargin(0.0f, 0.0f, Style.GapSu, 0.0f));
+  UImage* Shape = S08Make<UImage>(Tree, TEXT("TeamShape"));
+  Shape->SetBrush(S08WhiteBrush());
+  if (!Attach(Shape, Chip)) return Fail(TEXT("TeamShape"));
+  UVerticalBox* Column = S08Make<UVerticalBox>(Tree, TEXT("TagColumn"));
+  if (!Attach(Column, Row)) return Fail(TEXT("TagColumn"));
+  HSlot(Column, FMargin(0.0f));
+  UTextBlock* Name = S08MakeText(Tree, TEXT("NameText"), Style.NameFont, Style.Text);
+  if (!Attach(Name, Column)) return Fail(TEXT("NameText"));
+  if (UVerticalBoxSlot* Slot = Cast<UVerticalBoxSlot>(Name->Slot)) {
+    Slot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
+    Slot->SetHorizontalAlignment(HAlign_Left);
+  }
+  UHorizontalBox* HpRow = S08Make<UHorizontalBox>(Tree, TEXT("HpRow"));
+  if (!Attach(HpRow, Column)) return Fail(TEXT("HpRow"));
+  if (UVerticalBoxSlot* Slot = Cast<UVerticalBoxSlot>(HpRow->Slot)) {
+    Slot->SetSize(FSlateChildSize(ESlateSizeRule::Automatic));
+    Slot->SetHorizontalAlignment(HAlign_Left);
+  }
+  USizeBox* Bar = S08Make<USizeBox>(Tree, TEXT("HpBar"));
+  Bar->SetWidthOverride(Style.BarWidthSu);
+  Bar->SetHeightOverride(Style.BarHeightSu);
+  if (!Attach(Bar, HpRow)) return Fail(TEXT("HpBar"));
+  HSlot(Bar, FMargin(0.0f, 0.0f, Style.GapSu, 0.0f));
+  UOverlay* BarLayers = S08Make<UOverlay>(Tree, TEXT("HpBarLayers"));
+  if (!Attach(BarLayers, Bar)) return Fail(TEXT("HpBarLayers"));
+  UImage* Back = S08MakeBlock(Tree, TEXT("HpBack"), Style.HpBack);
+  if (!Attach(Back, BarLayers)) return Fail(TEXT("HpBack"));
+  if (UOverlaySlot* Slot = Cast<UOverlaySlot>(Back->Slot)) {
+    Slot->SetHorizontalAlignment(HAlign_Fill);
+    Slot->SetVerticalAlignment(VAlign_Fill);
+  }
+  USizeBox* Fill = S08Make<USizeBox>(Tree, TEXT("HpFill"));
+  Fill->SetWidthOverride(Style.BarWidthSu);
+  if (!Attach(Fill, BarLayers)) return Fail(TEXT("HpFill"));
+  if (UOverlaySlot* Slot = Cast<UOverlaySlot>(Fill->Slot)) {
+    Slot->SetHorizontalAlignment(HAlign_Left);
+    Slot->SetVerticalAlignment(VAlign_Fill);
+  }
+  UImage* FillImage = S08MakeBlock(Tree, TEXT("HpFillImage"), Style.HpFill);
+  if (!Attach(FillImage, Fill)) return Fail(TEXT("HpFillImage"));
+  UTextBlock* Hp = S08MakeText(Tree, TEXT("HpText"), Style.HpFont, Style.Text);
+  if (!Attach(Hp, HpRow)) return Fail(TEXT("HpText"));
+  HSlot(Hp, FMargin(0.0f));
+  return true;
+}
+
+bool US08ArtTagWidget::Initialize() {
+  const bool bFirst = Super::Initialize();
+  if (bFirst && WidgetTree && !WidgetTree->RootWidget) {
+    FString Error;
+    UWidgetTree* Tree = WidgetTree;
+    bCodeDefaultTree = BuildDefaultTree(*Tree, [Tree](UWidget* Child, UPanelWidget* Parent) {
+      if (!Parent) {
+        Tree->RootWidget = Child;
+        return true;
+      }
+      return Parent->AddChild(Child) != nullptr;
+    }, &Error);
+    if (!bCodeDefaultTree) UE_LOG(LogTemp, Error, TEXT("S08 art HUD tag default tree: %s"), *Error);
+    TagBackground = S08Find<UBorder>(Tree, TEXT("TagBackground"));
+    ChipBox = S08Find<USizeBox>(Tree, TEXT("ChipBox"));
+    TeamShape = S08Find<UImage>(Tree, TEXT("TeamShape"));
+    NameText = S08Find<UTextBlock>(Tree, TEXT("NameText"));
+    HpBar = S08Find<USizeBox>(Tree, TEXT("HpBar"));
+    HpBack = S08Find<UImage>(Tree, TEXT("HpBack"));
+    HpFill = S08Find<USizeBox>(Tree, TEXT("HpFill"));
+    HpFillImage = S08Find<UImage>(Tree, TEXT("HpFillImage"));
+    HpText = S08Find<UTextBlock>(Tree, TEXT("HpText"));
+  }
+  return bFirst;
+}
+
+void US08ArtTagWidget::NativePreConstruct() {
+  Super::NativePreConstruct();
+  ApplyStyle();
+}
+
+void US08ArtTagWidget::ApplyStyle() {
+  if (TagBackground) {
+    TagBackground->SetBrushColor(FS08ArtHudPlateStyle::Linear(Style.Background));
+    TagBackground->SetPadding(Style.Padding);
+  }
+  if (ChipBox) {
+    ChipBox->SetWidthOverride(Style.ChipSu);
+    ChipBox->SetHeightOverride(Style.ChipSu);
+  }
+  S08StyleText(NameText, Style.NameFont, Style.Text);
+  S08StyleText(HpText, Style.HpFont, Style.Text);
+  if (HpBack) HpBack->SetColorAndOpacity(FS08ArtHudPlateStyle::Linear(Style.HpBack));
+  if (HpFillImage) HpFillImage->SetColorAndOpacity(FS08ArtHudPlateStyle::Linear(Style.HpFill));
+  if (HpBar) {
+    HpBar->SetWidthOverride(Style.BarWidthSu);
+    HpBar->SetHeightOverride(Style.BarHeightSu);
+  }
+  ApplyDynamic();
+}
+
+void US08ArtTagWidget::ApplyDynamic() {
+  if (TeamShape) {
+    if (bShapeBrushes) TeamShape->SetBrush(ShapeBrushes[TeamSlot ? 1 : 0]);
+    FS08ArtHudPlateStyle Plate;
+    TeamShape->SetColorAndOpacity(Plate.TeamChipColor(TeamSlot));
+  }
+  if (NameText) {
+    NameText->SetVisibility(Mode == ES08TagMode::Full ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+  }
+  if (HpFill) HpFill->SetWidthOverride(FMath::Max(1.0f, Style.BarWidthSu * HpFraction));
+}
+
+void US08ArtTagWidget::SetTeamShapeBrushes(const FSlateBrush& Circle, const FSlateBrush& Hex) {
+  ShapeBrushes[0] = Circle;
+  ShapeBrushes[1] = Hex;
+  bShapeBrushes = true;
+  ApplyDynamic();
+}
+
+void US08ArtTagWidget::ApplyModel(const FS08TagTexts& Texts) {
+  TeamSlot = Texts.TeamSlot;
+  HpFraction = FMath::Clamp(Texts.HpFraction, 0.0f, 1.0f);
+  Mode = Texts.Mode;
+  if (NameText) NameText->SetText(Texts.Name);
+  if (HpText) HpText->SetText(Texts.Hp);
+  ApplyDynamic();
+}
+
+bool US08ArtTagWidget::HasAllParts(FString* OutMissing) const {
+  TArray<FString> Missing;
+  if (!TagBackground) Missing.Add(TEXT("TagBackground"));
+  if (!ChipBox) Missing.Add(TEXT("ChipBox"));
+  if (!TeamShape) Missing.Add(TEXT("TeamShape"));
+  if (!NameText) Missing.Add(TEXT("NameText"));
+  if (!HpBar) Missing.Add(TEXT("HpBar"));
+  if (!HpBack) Missing.Add(TEXT("HpBack"));
+  if (!HpFill) Missing.Add(TEXT("HpFill"));
+  if (!HpFillImage) Missing.Add(TEXT("HpFillImage"));
+  if (!HpText) Missing.Add(TEXT("HpText"));
+  if (OutMissing) *OutMissing = FString::Join(Missing, TEXT(","));
+  return Missing.Num() == 0;
+}
+
+void US08ArtTagWidget::CollectParts(TArray<FS08WidgetPart>& Out) const {
+  Out.Add({S08ArtHudIds::Tag, GetCachedWidget()});
+  if (Mode == ES08TagMode::Full) S08AddPart(Out, S08ArtHudIds::TagName, NameText);
+  S08AddPart(Out, S08ArtHudIds::TagHp, HpText);
+  S08AddPart(Out, S08ArtHudIds::TagBar, HpBar);
+  S08AddPart(Out, S08ArtHudIds::TagChip, ChipBox);
+}
+
+// ------------------------------------------------------------------- damage number (W5b-R D-1)
+
+bool US08ArtDamageWidget::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget Attach, FString* OutError) {
+  const FS08ArtHudDamageStyle Style;
+  UBorder* Background = S08Make<UBorder>(Tree, TEXT("DamageBackground"));
+  Background->SetBrush(FSlateRoundedBoxBrush(FLinearColor::White, Style.CornerRadiusSu));
+  Background->SetBrushColor(FS08ArtHudPlateStyle::Linear(Style.Background));
+  Background->SetPadding(Style.Padding);
+  Background->SetHorizontalAlignment(HAlign_Center);
+  Background->SetVerticalAlignment(VAlign_Center);
+  if (!Attach(Background, nullptr)) {
+    if (OutError) *OutError = TEXT("attach failed: DamageBackground");
+    return false;
+  }
+  UTextBlock* Text = S08MakeText(Tree, TEXT("DamageText"), Style.Font, Style.Text);
+  if (!Attach(Text, Background)) {
+    if (OutError) *OutError = TEXT("attach failed: DamageText");
+    return false;
+  }
+  return true;
+}
+
+bool US08ArtDamageWidget::Initialize() {
+  const bool bFirst = Super::Initialize();
+  if (bFirst && WidgetTree && !WidgetTree->RootWidget) {
+    FString Error;
+    UWidgetTree* Tree = WidgetTree;
+    bCodeDefaultTree = BuildDefaultTree(*Tree, [Tree](UWidget* Child, UPanelWidget* Parent) {
+      if (!Parent) {
+        Tree->RootWidget = Child;
+        return true;
+      }
+      return Parent->AddChild(Child) != nullptr;
+    }, &Error);
+    if (!bCodeDefaultTree) UE_LOG(LogTemp, Error, TEXT("S08 art HUD damage default tree: %s"), *Error);
+    DamageBackground = S08Find<UBorder>(Tree, TEXT("DamageBackground"));
+    DamageText = S08Find<UTextBlock>(Tree, TEXT("DamageText"));
+  }
+  return bFirst;
+}
+
+void US08ArtDamageWidget::NativePreConstruct() {
+  Super::NativePreConstruct();
+  ApplyStyle();
+}
+
+void US08ArtDamageWidget::ApplyStyle() {
+  if (DamageBackground) {
+    DamageBackground->SetBrush(FSlateRoundedBoxBrush(FLinearColor::White, Style.CornerRadiusSu));
+    DamageBackground->SetBrushColor(FS08ArtHudPlateStyle::Linear(Style.Background));
+    DamageBackground->SetPadding(Style.Padding);
+  }
+  S08StyleText(DamageText, Style.Font, Style.Text);
+}
+
+void US08ArtDamageWidget::ApplyAmount(const FText& Text) {
+  if (DamageText) DamageText->SetText(Text);
+}
+
+bool US08ArtDamageWidget::HasAllParts(FString* OutMissing) const {
+  TArray<FString> Missing;
+  if (!DamageBackground) Missing.Add(TEXT("DamageBackground"));
+  if (!DamageText) Missing.Add(TEXT("DamageText"));
+  if (OutMissing) *OutMissing = FString::Join(Missing, TEXT(","));
+  return Missing.Num() == 0;
+}
+
+void US08ArtDamageWidget::CollectParts(TArray<FS08WidgetPart>& Out) const {
+  Out.Add({S08ArtHudIds::Damage, GetCachedWidget()});
+  S08AddPart(Out, S08ArtHudIds::DamageText, DamageText);
 }

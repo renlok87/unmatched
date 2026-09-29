@@ -57,9 +57,26 @@ param(
   # Fail the run unless both clients' SHOT fingerprints are on the reference
   # (docs/art-pipeline/render-reference.json; acceptance runs pass this).
   [switch]$RequireRenderReference,
+  # W5b-R: require the pixel provenance line of every published frame (SHOT captured, t53-thresholds shotCaptured).
+  [switch]$RequireShotCaptured,
   # Extra client arguments, '+'-separated (diagnostics only, e.g. -dx11+-S08LegacyRender).
   [string]$ClientExtraArgs = ''
 )
+
+# W5b-R (t53-thresholds.json shotCaptured): every published frame must carry its pixel provenance line
+# "SHOT captured file=<name> frame=<N> px=WxH sha256=<hex> order=BGRA saved=1" (UGameViewportClient::OnScreenshotCaptured;
+# the client writes the PNG itself) and the late SHOT block of the same file ("SHOT late begin file=<name> frame=<M>")
+# with |N - M| <= 1.
+function Assert-ShotCaptured([string]$TracePath, [string]$Name, [string]$Who) {
+  $cap = Select-String -LiteralPath $TracePath -Pattern ('SHOT captured file=' + [regex]::Escape($Name) + ' frame=(\d+) px=(\d+)x(\d+) sha256=([0-9a-f]{64}) order=BGRA saved=1') | Select-Object -Last 1
+  if (-not $cap) { throw "$Who trace has no 'SHOT captured file=$Name ... saved=1' line (pixel provenance)" }
+  $late = Select-String -LiteralPath $TracePath -Pattern ('SHOT late begin file=' + [regex]::Escape($Name) + ' frame=(\d+)') | Select-Object -Last 1
+  if (-not $late) { throw "$Who trace has no end-of-frame SHOT block for $Name" }
+  $capFrame = [long]$cap.Matches[0].Groups[1].Value
+  $lateFrame = [long]$late.Matches[0].Groups[1].Value
+  if ([Math]::Abs($capFrame - $lateFrame) -gt 1) { throw "$Who ${Name}: captured frame $capFrame vs late SHOT frame $lateFrame (> 1)" }
+  Write-Output ("shot captured {0} {1}: frame={2} lateFrame={3} px={4}x{5} sha256={6}" -f $Who, $Name, $capFrame, $lateFrame, $cap.Matches[0].Groups[2].Value, $cap.Matches[0].Groups[3].Value, $cap.Matches[0].Groups[4].Value.Substring(0, 12))
+}
 # GD-030/GD-031 two-client packaged demo: both clients hidden (-RenderOffScreen)
 # against the SAME real backend. Sequence under test:
 #   host   -> login, create, hero, ready, start, ONE legal maneuver
@@ -621,6 +638,10 @@ function Invoke-Phase2Demo {
         if ($RequireRenderReference) {
           if (-not $render) { throw "$($pair[0]) trace has no RENDER fingerprint at its SHOT" }
           if ($render.Matches[0].Groups[1].Value -ne '1') { throw "$($pair[0]) SHOT is off the render reference: $($render.Line)" }
+        }
+        if ($RequireShotCaptured) {
+          $shotName = if ($pair[0] -eq 'host') { Split-Path -Leaf $hostShot } else { Split-Path -Leaf $joinShot }
+          Assert-ShotCaptured $pair[1] $shotName $pair[0]
         }
       }
       # ART-004 T2.2: zoom config, flag-marked input and the QA-010 selection/

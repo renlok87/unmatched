@@ -27,6 +27,8 @@
 class IS08ArtIconView;
 class IS08ArtPlateView;
 class SWidget;
+class US08ArtTagWidget;
+class US08ArtDamageWidget;
 
 // ---------------------------------------------------------------- camera zoom
 
@@ -175,6 +177,10 @@ struct FPlacementInput {
   int32 Rings = 60;                   // search out to Gap + Rings * Step
   float Margin = 4.0f;                // forbidden test uses the rect grown by this
   float EdgeMargin = 6.0f;            // keep the plate this far inside the viewport
+  // W5b-R: when set, a clean plate is also strictly nearer (rect-to-rect gap) to BindTarget (the owner's figure) than
+  // to every rect of BindOthers (T5.2 errata: the Medusa plate sat under King Arthur and read as his).
+  FS08ScreenRect BindTarget;
+  TArray<FS08ScreenRect> BindOthers;
 };
 
 struct FPlacementResult {
@@ -185,7 +191,8 @@ struct FPlacementResult {
   double ForbiddenArea = 0.0;
   double SoftArea = 0.0;
   int32 Tested = 0;
-  bool bClean = false;                // no forbidden and no soft overlap
+  bool bClean = false;                // no forbidden and no soft overlap (and bound, when a BindTarget is set)
+  bool bBound = true;
 };
 
 /** Nearest plate position around the anchor (ring by ring; each ring slides
@@ -193,12 +200,108 @@ struct FPlacementResult {
  *  obstacle; otherwise the least bad one (forbidden count, area, soft area). */
 FPlacementResult ChoosePlateRect(const FPlacementInput& In);
 
+// ---- W5b-R D-1/D-5: screen tags, the damage number and the combat icon anchors (deterministic, world-free)
+
+/** Area of the part of A inside the union of Others (sum of pairwise intersections; rects are small and rarely
+ *  overlap each other, the sum is an upper bound - 0 means clean). */
+double OverlapArea(const FS08ScreenRect& A, const TArray<FS08ScreenRect>& Others);
+
+struct FLabelPlacementInput {
+  FVector2D Viewport = FVector2D::ZeroVector;
+  FVector2D Size = FVector2D::ZeroVector;  // label size in px
+  FS08ScreenRect Anchor;                   // the fighter's FigureScreenRect (with the team ring)
+  TArray<FS08ScreenRect> Hard;             // placed tags, icon, plate, damage number, HUD panels
+  TArray<FS08ScreenRect> Soft;             // other fighters' figure rects
+  float Gap = 2.0f;                        // distance to the anchor on the first ring
+  float Step = 6.0f;                       // ring step and slide step (px)
+  int32 Rings = 24;
+  float EdgeMargin = 4.0f;
+  bool bRightFirst = false;                // damage number: right, above, left, below
+  // W5b-R (t53-thresholds damage.binding): when set, a candidate counts only if its centre is strictly closer to
+  // BindTarget (the target's FigureScreenRect) than to every rect of BindOthers (the other fighters' figures).
+  FS08ScreenRect BindTarget;
+  TArray<FS08ScreenRect> BindOthers;
+  // W5b-R r3 (t53 revision 1, tags.binding): after the ring-0 above/right/left/below candidates, one "inset"
+  // candidate - centred, flush with the top of the anchor, i.e. over the empty band of the owner's own
+  // FigureScreenRect above the figure (the box reaches the far side of the team ring at the figure's height).
+  // A fighter boxed in by neighbours (Cobble: Medusa at (2,2), harpies left/right/behind, King Arthur in front)
+  // has no bound spot outside its own box: every outside candidate is nearer a neighbour.
+  bool bInset = false;
+  // W5b-R r3: when > 0, once ring NearRings-1 is done the bound hard-clean candidate with the least soft overlap
+  // (other figures) wins over searching further rings for a fully clean spot (T5.2/W5b-R G3: the Medusa tag went
+  // out to ring 16, 98 px from Medusa and next to the Harpies 2 tag).
+  int32 NearRings = 0;
+};
+
+struct FLabelPlacementResult {
+  FS08ScreenRect Rect;
+  FString Candidate = TEXT("none");  // above | right | left | below (+ ring)
+  int32 Ring = -1;
+  double HardArea = 0.0;
+  double SoftArea = 0.0;
+  bool bHardClean = false;
+  bool bClean = false;
+  bool bBound = true;  // the binding rule held (always true without a BindTarget)
+  int32 Tested = 0;
+};
+
+/** Distance from a point to a rect (0 inside). */
+double PointRectDistance(const FVector2D& P, const FS08ScreenRect& R);
+/** True when P is strictly closer to Target than to every rect of Others (or Target is empty). */
+bool IsBoundTo(const FVector2D& P, const FS08ScreenRect& Target, const TArray<FS08ScreenRect>& Others);
+/** Gap between two rects (0 when they touch or overlap). */
+double RectGap(const FS08ScreenRect& A, const FS08ScreenRect& B);
+/** True when the gap of R to Target is strictly smaller than its gap to every rect of Others (or Target is empty). */
+bool IsRectBoundTo(const FS08ScreenRect& R, const FS08ScreenRect& Target, const TArray<FS08ScreenRect>& Others);
+
+/** Tag / damage placement: ring by ring around the anchor, candidates in the order above (centred, then sliding
+ *  left/right), right (top-aligned, sliding down), left, below; the first candidate that overlaps neither a hard nor
+ *  a soft obstacle wins; if none is fully clean, the first hard-clean one with the least soft area; if none is
+ *  hard-clean, the least hard area. With bInset, ring 0 ends with the inset candidate; with NearRings, the search
+ *  stops after that many rings when a hard-clean candidate exists. A bound rule (BindTarget) is part of hard-clean.
+ *  Deterministic for the same input. */
+FLabelPlacementResult ChooseLabelRect(const FLabelPlacementInput& In);
+
+/** W5b-R r3 tag policy (t53-thresholds revision 1, tags.binding): the tag of the fighter with FigureScreenRect Owner
+ *  is bound to it (centre strictly nearer Owner than any rect of Others), the other figures are soft obstacles, Hard
+ *  holds the placed tags / icon / plate / damage number / HUD panels, the inset candidate is on and the search keeps
+ *  to the first two rings when a bound hard-clean candidate exists there. The game mode and the tests use this one
+ *  builder. */
+FLabelPlacementInput MakeTagPlacementInput(const FVector2D& Viewport, const FVector2D& Size, const FS08ScreenRect& Owner,
+                                           const TArray<FS08ScreenRect>& Others, const TArray<FS08ScreenRect>& Hard);
+
+struct FIconAnchorInput {
+  FVector2D Viewport = FVector2D::ZeroVector;
+  float Size = 32.0f;
+  FS08ScreenRect Target;           // target FigureScreenRect (with the ring)
+  TArray<FS08ScreenRect> Figures;  // OTHER fighters' figure rects (hard)
+  TArray<FS08ScreenRect> Hard;     // placed tags, plate, HUD panels
+  float Gap = 3.0f;
+  float EdgeMargin = 2.0f;
+};
+
+struct FIconAnchorResult {
+  FS08ScreenRect Rect;
+  FString Anchor = TEXT("none");  // right | left | below | above
+  bool bFallback = false;         // every anchor overlapped: "above" kept, overlap recorded
+  double OverlapArea = 0.0;
+  int32 Tested = 0;
+};
+
+/** D-5 icon anchors in order: right of the target at 35 % of its height, left, below (in front of the ring), above;
+ *  the first inside the viewport that overlaps no other fighter, placed tag, plate or HUD panel; else "above". */
+FIconAnchorResult ChooseIconAnchor(const FIconAnchorInput& In);
+
 /** "(x,y)(x,y)..." - the qa010 `cells=` list (order as given). */
 FString FormatCells(const TArray<FIntPoint>& Cells);
 /** "(x0,y0,x1,y1)" rounded to whole pixels - the qa010 `bbox=` value. */
 FString FormatRect(const FS08ScreenRect& Rect);
 /** Stable cell order for traces: row-major (y, then x). */
 void SortCells(TArray<FIntPoint>& Cells);
+/** FormatWidgetLine + " <Extra>" (W5b-R: frame=, mode=, shape=, font=, placement= fields). */
+FString FormatWidgetLineEx(const FString& Id, const TCHAR* Impl, const TCHAR* State, const FString& Fighter,
+                           const FS08ScreenRect& Rect, bool bPainted, bool bVisible, const FString& Source,
+                           const FString& Extra);
 /** W4-C trace gate line of one painted widget part:
  *  "SHOT widget id=<id> impl=<umg|slate> state=<state> fighter=<id|none>
  *   bbox=(x0,y0,x1,y1) geom=<painted|unpainted> visible=0|1 twin=0|1 source=<src>"
@@ -340,4 +443,55 @@ struct FS08ArtHudRuntime {
 
   bool bEnabled = true;               // -ArtPreviewNoPlate disables plate + icon
   bool bConfigTraced = false;
+
+  // ---- W5b-R D-1: screen tags + damage number (UMG), D-5 icon anchor, honest end-of-frame SHOT lines
+  struct FTagSlot {
+    TObjectPtr<US08ArtTagWidget> Widget = nullptr;  // referenced by the game mode (ArtHudWidgets)
+    SConstraintCanvas::FSlot* Slot = nullptr;
+    FString FighterId;
+    FString ContentKey;
+    uint8 Mode = 0;       // ES08TagMode
+    uint8 TeamSlot = 0;   // look slot of the chip
+    FS08ScreenRect Planned;
+    FS08ScreenRect Figure;
+    FString Candidate;
+    int32 Ring = -1;
+    double SoftArea = 0.0;
+    double HardArea = 0.0;
+    int32 Order = -1;     // placement order in the frame
+    bool bBound = true;   // W5b-R r3: centre nearer the owner's figure than any other figure (tags.binding)
+    bool bShown = false;
+  };
+  TArray<FTagSlot> Tags;
+  bool bTagsEnabled = false;          // -ArtPreview board with the UMG tag widgets (not -S08LegacyRender)
+  bool bTagNamesAll = false;          // -ArtPreviewTagNames=all
+  FString LabelSignature;             // inputs of the last tag/icon/damage layout
+  TObjectPtr<US08ArtDamageWidget> DamageWidget = nullptr;
+  SConstraintCanvas::FSlot* DamageSlot = nullptr;
+  FString DamageFighterId;
+  int32 DamageSeq = -1;
+  int32 DamageAmount = 0;
+  FS08ScreenRect DamagePlanned;
+  FString DamageCandidate;
+  bool bDamageVisible = false;
+  int32 DamageStableFrames = 0;
+  FString IconAnchor = TEXT("none");
+  bool bIconFallback = false;
+  double IconOverlap = 0.0;
+  FString IconTexturePath;           // W5b-R D-5: T_UI_Action_AttackToken_N (T_UI_Action_Attack_N fallback)
+  FSlateBrush ChipCircleBrush;
+  FSlateBrush ChipHexBrush;
+  bool bChipBrushes = false;
+  uint8 TeamColorMode = 0;            // ES08TeamColorMode
+  // End-of-frame SHOT lines (FCoreDelegates::OnEndFrame) of the shots requested this frame.
+  struct FLateShot {
+    FString File;
+    uint64 RequestFrame = 0;
+  };
+  TArray<FLateShot> LateShots;
+  FString PendingCapturePath;         // FScreenshotRequest path; the OnScreenshotCaptured delegate saves it
+  uint64 PendingCaptureRequestFrame = 0;
+  // Combat damage frame (host evidence of the first combat's damage number).
+  FString AwaitCombatDamageTarget;
+  float AwaitCombatDamageUntil = -1.0f;
 };

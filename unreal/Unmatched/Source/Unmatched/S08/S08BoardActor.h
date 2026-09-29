@@ -11,6 +11,7 @@
 #include "S08BoardArt.h"
 #include "S08ArtHud.h"
 #include "S08Render.h"
+#include "S08Team.h"
 #include "S08BoardActor.generated.h"
 
 class UInstancedStaticMeshComponent;
@@ -47,6 +48,22 @@ public:
    *  re-label by stable fighter id; dead fighters hide instantly). */
   void SyncFighters(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
                     const FString& OwnOwnerId);
+  /** W5b-R D-2: the owner id of team P1 (room seat 0 / host; empty = fighter id prefix) and the colour mode of the
+   *  art team rings; call before SyncFighters. */
+  void SetTeamMapping(const FString& P1OwnerId, ES08TeamColorMode Mode) {
+    TeamP1OwnerId = P1OwnerId;
+    TeamColorMode = Mode;
+  }
+  ES08TeamColorMode GetTeamColorMode() const { return TeamColorMode; }
+  /** Absolute team (P1/P2) and the drawn look of a fighter (-S08TeamColorMode). */
+  ES08TeamSlot TeamOfFighter(const FS08BoardFighter& Fighter) const;
+  /** W5b-R D-1: the screen tag layer replaces the world TextRender labels and the
+   *  world damage-number text (the damage actor stays: lifetime, dedupe, trace). */
+  void SetScreenLabelMode(bool bScreen);
+  bool IsScreenLabelMode() const { return bScreenLabelMode; }
+  /** Seq of the live damage number of a fighter (-1 when none). */
+  int32 GetDamageNumberSeq(const FString& FighterId) const;
+  int32 GetDamageNumberAmount(const FString& FighterId) const;
 
   const FS08BoardModel& GetBoard() const { return BoardModel; }
   bool IsArtActive() const { return bArtActive; }
@@ -167,6 +184,17 @@ private:
   TMap<FString, TObjectPtr<UMaterialInterface>> ArtZoneInstances;
   UPROPERTY()
   TMap<FString, TObjectPtr<UStaticMesh>> ArtGlyphMeshes;
+  // W5b-R D-4 keylines: one ISM for the stroke keylines (+ cube-piece glyph keylines of glyphs without a keyline
+  // mesh), one ISM per glyph keyline mesh, all with the keyline MI (or a tint MID of the keyline colour).
+  UPROPERTY()
+  TObjectPtr<UInstancedStaticMeshComponent> ArtZoneKeylines;
+  UPROPERTY()
+  TMap<FString, TObjectPtr<UInstancedStaticMeshComponent>> ArtZoneGlyphKeylines;
+  UPROPERTY()
+  TMap<FString, TObjectPtr<UStaticMesh>> ArtGlyphKeylineMeshes;
+  UPROPERTY()
+  TObjectPtr<UMaterialInterface> ArtKeylineMaterial;
+  FString ArtKeylineMaterialName;
 
   FS08BoardArtData ArtData;
   bool bArtDataLoaded = false;
@@ -194,6 +222,10 @@ private:
   UPROPERTY()
   TArray<TObjectPtr<AS08FighterActor>> FighterActors;
   TMap<FString, TWeakObjectPtr<AActor>> DamageNumbers;
+  TMap<FString, FIntPoint> DamageNumberInfo;  // fighter id -> (amount, seq) of the live number
+  FString TeamP1OwnerId;
+  ES08TeamColorMode TeamColorMode = ES08TeamColorMode::Absolute;
+  bool bScreenLabelMode = false;
   FS08SeqDedupe DamageDedupe;
   FString LabelPlateFighterId;
   bool bScreenIconMode = false;

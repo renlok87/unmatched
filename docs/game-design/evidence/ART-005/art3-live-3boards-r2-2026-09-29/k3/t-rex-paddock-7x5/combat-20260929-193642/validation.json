@@ -1,0 +1,42 @@
+{
+  "schema": "unmatched.t52-combat-validation/1",
+  "rules": "tools/art/check_art003_combat_evidence.py check_trace (CUE damage == ARTPREVIEW damage-number exactly once, target icon bound and cleared, first COMBAT-RESULT damage > 0 and equal to its CUE, authoritative seq) + host/joiner convergence",
+  "trace": {
+    "host": {
+      "damage_cues": 19,
+      "unique_damage_numbers": 19,
+      "cues_equal_numbers": true,
+      "no_duplicate_number": true,
+      "target_icon_bound": true,
+      "target_icon_cleared": true,
+      "combat_results": 9,
+      "max_seq": 143,
+      "first_combat_result": {
+        "seq": 14,
+        "damage": 3
+      },
+      "first_result_matches_cue": true,
+      "first_result_matches_cue_prev2": true
+    },
+    "joiner": {
+      "damage_cues": 19,
+      "unique_damage_numbers": 19,
+      "cues_equal_numbers": true,
+      "no_duplicate_number": true,
+      "target_icon_bound": true,
+      "target_icon_cleared": true,
+      "combat_results": 9,
+      "max_seq": 143,
+      "first_combat_result": {
+        "seq": 14,
+        "damage": 3
+      },
+      "first_result_matches_cue": true,
+      "first_result_matches_cue_prev2": true
+    }
+  },
+  "problems": [],
+  "seqConverged": true,
+  "firstResultAgrees": true,
+  "status": "pass_technical_evidence_only"
+}

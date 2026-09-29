@@ -5,7 +5,9 @@
 #include "S08ArtHudText.h"
 #include "S08ArtHudViews.h"
 #include "S08ArtHudWidgets.h"
+#include "S08Team.h"
 #include "Blueprint/UserWidget.h"
+#include "Misc/CoreDelegates.h"
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "Dom/JsonObject.h"
@@ -211,6 +213,11 @@ void AS08FlowGameMode::BeginPlay() {
   Flow->OnCues.AddUObject(this, &AS08FlowGameMode::HandleCues);
 
   BuildUi();
+  // W5b-R: SHOT lines of the HUD layer at the END of the requesting frame (actual visibility + painted geometry) and
+  // the pixel provenance of every capture (the engine hands the pixels to this delegate instead of writing the PNG).
+  EndFrameHandle = FCoreDelegates::OnEndFrame.AddUObject(this, &AS08FlowGameMode::HandleEndFrame);
+  ScreenshotCapturedHandle =
+      UGameViewportClient::OnScreenshotCaptured().AddUObject(this, &AS08FlowGameMode::HandleScreenshotCaptured);
 
   // CLI: -S08Auto [-S08Create] [-S08HeroId=prisma-id]
   //      [-S08Maneuver] [-S08Shot=abs path] [-S08DropWsAfter=seconds]
@@ -572,6 +579,19 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
   LastCombatResult.ShownAt = Elapsed;
   FS08Trace::Write(FString::Printf(TEXT("COMBAT-RESULT seq=%d damage=%d role=%s"),
                                    Snapshot.SequenceNumber, LastCombatResult.Damage, ResultRole));
+  // W5b-R: a combat whose damage CUE arrived before its combat state (reconnect / merged snapshots): take the combat
+  // damage frame if the target's number is still alive and belongs to this combat (<= 2 snapshots before the result).
+  if (BoardActor && BoardActor->IsArtActive() && ArtHud.bTagsEnabled && !bS09ShotDamageCombat &&
+      DamageCombatShotAtElapsed < 0.0f && !S09ShotDir.IsEmpty()) {
+    const int32 NumberSeq = BoardActor->GetDamageNumberSeq(LastCombatResult.TargetFighterId);
+    if (NumberSeq >= 0 && NumberSeq >= Snapshot.SequenceNumber - 2) {
+      DamageCombatShotAtElapsed = Elapsed + 0.2f;
+      DamageCombatShotDeadline = Elapsed + 0.8f;
+      FS08Trace::Write(FString::Printf(
+          TEXT("S09AUTO damage-combat scheduled fighter=%s seq=%d resultSeq=%d source=combat-result"),
+          *LastCombatResult.TargetFighterId, NumberSeq, Snapshot.SequenceNumber));
+    }
+  }
   if (!S09ShotDir.IsEmpty() && !bS09ShotResult) {
     bS09ShotResult = true;
     S09ShotResultPath = S09ShotDir / TEXT("s09-combat-result.png");
@@ -615,6 +635,27 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
     BoardActor->Rebuild(BoardModel);
   }
   if (BoardActor) {
+    // W5b-R D-2: absolute teams by the room seat order (P1 = seat 0 / host); the bench has no room (fighter prefix).
+    {
+      const FString P1Owner = (!bBench && Flow.IsValid())
+          ? S08TeamP1OwnerId(Flow->GetRoom().Players, Flow->GetRoom().HostId) : FString();
+      const ES08TeamColorMode Mode = static_cast<ES08TeamColorMode>(ArtHud.TeamColorMode);
+      BoardActor->SetTeamMapping(P1Owner, Mode);
+      TArray<FString> P1, P2;
+      for (const FS08BoardFighter& F : Fighters) {
+        (BoardActor->TeamOfFighter(F) == ES08TeamSlot::P1 ? P1 : P2).Add(F.Id);
+      }
+      const FString Mapping = FString::Printf(
+          TEXT("ARTPREVIEW team mapping mode=%s source=%s viewerTeam=%s p1=%s p2=%s"), S08TeamColorModeName(Mode),
+          bBench ? TEXT("fighter-prefix") : (Flow.IsValid() && Flow->GetRoom().Players.Num() > 0 ? TEXT("seatOrder")
+                                                                                              : TEXT("host")),
+          P1Owner.IsEmpty() ? TEXT("-") : (P1Owner == ViewerId ? TEXT("P1") : TEXT("P2")),
+          *FString::Join(P1, TEXT(",")), *FString::Join(P2, TEXT(",")));
+      if (Mapping != LastTeamMappingLine) {
+        LastTeamMappingLine = Mapping;
+        FS08Trace::Write(Mapping);
+      }
+    }
     BoardActor->SyncFighters(BoardModel, Fighters, ViewerId);
     SyncCombatFocus();
     // GD-030 six-fighter evidence line: the projection's roster, split into
@@ -771,6 +812,27 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
         if (BoardActor->IsArtActive() && !bS09ShotDamage &&
             DamageShotAtElapsed < 0.0f && !S09ShotDir.IsEmpty()) {
           DamageShotAtElapsed = Elapsed + 0.2f;
+        }
+        // W5b-R: the damage number of the first COMBAT (the first damage of a game can be an ability's). The CUE of
+        // a combat usually arrives with the snapshot that already closed it (COMBAT-RESULT is traced first, the
+        // live combat state is gone): the just-closed combat's target within 2 snapshots counts too. A terminal
+        // snapshot (GAME_OVER) is skipped - the result panel owns the screen and the number is not painted.
+        const bool bLiveCombatTarget = CommandUi.Combat.bPresent && CommandUi.Combat.TargetFighterId == Cue.FighterId;
+        const bool bClosedCombatTarget = LastCombatResult.bValid &&
+                                         LastCombatResult.TargetFighterId == Cue.FighterId &&
+                                         FMath::Abs(Cue.SequenceNumber - LastCombatResult.SequenceNumber) <= 2;
+        const bool bTerminal = Hud.bGameOver ||
+                               (Flow.IsValid() && Flow->GetAppliedSnapshot().Phase == TEXT("GAME_OVER"));
+        if (BoardActor->IsArtActive() && ArtHud.bTagsEnabled && !bS09ShotDamageCombat &&
+            DamageCombatShotAtElapsed < 0.0f && !S09ShotDir.IsEmpty() && !bTerminal &&
+            (bLiveCombatTarget || bClosedCombatTarget)) {
+          DamageCombatShotAtElapsed = Elapsed + 0.2f;
+          DamageCombatShotDeadline = Elapsed + 0.8f;
+          FS08Trace::Write(FString::Printf(
+              TEXT("S09AUTO damage-combat scheduled fighter=%s amount=%d seq=%d source=%s combatResultSeq=%d"),
+              *Cue.FighterId, Cue.Damage, Cue.SequenceNumber,
+              bLiveCombatTarget ? TEXT("cue-on-live-combat-target") : TEXT("cue-on-closed-combat-target"),
+              LastCombatResult.bValid ? LastCombatResult.SequenceNumber : -1));
         }
       }
     }
@@ -2657,11 +2719,22 @@ void AS08FlowGameMode::RunS09Auto() {
 
 void AS08FlowGameMode::TakeS09Shots() {
   if (!bAutoS09 || !Flow.IsValid() || S09ShotDir.IsEmpty()) return;
-  if (!bS09ShotDamage && DamageShotAtElapsed >= 0.0f &&
-      Elapsed >= DamageShotAtElapsed) {
+  // W5b-R: the screen damage number must have painted at its place for >= 2 frames (geom=painted) before the frame;
+  // at most 0.6 s later the frame is taken anyway (the number lives 0.9 s) and the trace says so.
+  const bool bDamagePainted = !ArtHud.bTagsEnabled || ArtHud.DamageStableFrames >= 2;
+  if (!bS09ShotDamage && DamageShotAtElapsed >= 0.0f && Elapsed >= DamageShotAtElapsed &&
+      (bDamagePainted || Elapsed >= DamageShotAtElapsed + 0.6f) && !FScreenshotRequest::IsScreenshotRequested()) {
     bS09ShotDamage = true;
-    FS08Trace::Write(TEXT("S09AUTO damage-number shot"));
+    FS08Trace::Write(FString::Printf(TEXT("S09AUTO damage-number shot stableFrames=%d"), ArtHud.DamageStableFrames));
     TakeEvidenceShot(S09ShotDir / TEXT("s09-damage-number.png"));
+  }
+  if (!bS09ShotDamageCombat && DamageCombatShotAtElapsed >= 0.0f && Elapsed >= DamageCombatShotAtElapsed &&
+      (ArtHud.DamageStableFrames >= 2 || Elapsed >= DamageCombatShotDeadline) &&
+      !FScreenshotRequest::IsScreenshotRequested()) {
+    bS09ShotDamageCombat = true;
+    FS08Trace::Write(FString::Printf(TEXT("S09AUTO damage-combat shot fighter=%s stableFrames=%d"),
+                                     *ArtHud.DamageFighterId, ArtHud.DamageStableFrames));
+    TakeEvidenceShot(S09ShotDir / TEXT("s09-damage-combat.png"));
   }
   const FS08Snapshot& Snap = Flow->GetAppliedSnapshot();
   // Shot 1: first confirmed maneuver settled (begin+submit applied, HUD live).
@@ -3269,9 +3342,9 @@ void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
             FVector2D::Distance(TopScreen, BottomScreen), (bHead && bTop && bBottom) ? 1 : 0));
       }
     }
-    // ART-004 T2.2 / QA-010: selection, plate, icon, compact-label and
-    // damage-number boxes of THIS frame in viewport pixels (format:
-    // docs/art-pipeline/qa010/README.md "Новая трасса").
+    // ART-004 T2.2 / QA-010: selection, reachable and plate boxes of THIS frame in viewport pixels (format:
+    // docs/art-pipeline/qa010/README.md "Новая трасса"). W5b-R: the icon / widget / tag / damage lines moved to the
+    // END of this frame (WriteArtHudLateLines) - they report what the capture really contains.
     WriteArtHudShotLines();
   }
   // UI-INCLUSIVE evidence capture (GD-032/033): the old SceneCapture and
@@ -3302,6 +3375,12 @@ void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
   } else {
     FScreenshotRequest::RequestScreenshot(BasePath, /*bShowUI=*/true,
                                           /*bAddFilenameSuffix=*/false);
+    // W5b-R: HandleScreenshotCaptured saves exactly this path; the late SHOT lines run at the end of this frame.
+    ArtHud.PendingCapturePath = BasePath;
+    ArtHud.PendingCaptureRequestFrame = GFrameCounter;
+    ArtHud.LateShots.Add({FPaths::GetCleanFilename(BasePath), GFrameCounter});
+    FS08Trace::Write(FString::Printf(TEXT("SHOT request file=%s frame=%llu"), *FPaths::GetCleanFilename(BasePath),
+                                     static_cast<unsigned long long>(GFrameCounter)));
     const FString Line =
         FString::Printf(TEXT("SHOT requested: FScreenshotRequest(bShowUI) -> %s"), *BasePath);
     TraceLines.Add(Line);
@@ -3558,6 +3637,8 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
 }
 
 void AS08FlowGameMode::EndPlay(const EEndPlayReason::Type Reason) {
+  FCoreDelegates::OnEndFrame.Remove(EndFrameHandle);
+  UGameViewportClient::OnScreenshotCaptured().Remove(ScreenshotCapturedHandle);
   FS08Trace::Close();
   if (Flow.IsValid()) Flow.Reset();
   Super::EndPlay(Reason);
@@ -5036,6 +5117,21 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
   FString SizeText;
   FParse::Value(Cmd, TEXT("ArtPreviewIconSize="), SizeText);
   ArtHud.IconSize = S08ParseIconSize(SizeText, 32);
+  // W5b-R D-2 / D-1 flags.
+  {
+    FString ModeText;
+    FParse::Value(Cmd, TEXT("S08TeamColorMode="), ModeText);
+    ES08TeamColorMode Mode = ES08TeamColorMode::Absolute;
+    if (!S08ParseTeamColorMode(ModeText, Mode)) {
+      ArtHud.PendingTrace.Add(FString::Printf(
+          TEXT("HUD team colour mode '%s' refused (absolute/relative only) - using absolute"), *ModeText));
+      Mode = ES08TeamColorMode::Absolute;
+    }
+    ArtHud.TeamColorMode = static_cast<uint8>(Mode);
+    FString Names;
+    FParse::Value(Cmd, TEXT("ArtPreviewTagNames="), Names);
+    ArtHud.bTagNamesAll = Names.Equals(TEXT("all"), ESearchCase::IgnoreCase);
+  }
   if (ArtHud.IconSize == 0) {
     ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD icon size '%s' refused (24/32/48 only) - using 32"), *SizeText));
     ArtHud.IconSize = 32;
@@ -5044,9 +5140,36 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
   // drawn at 24 px without mips aliases badly, so each size is its own
   // pre-filtered texture (tools/art/art004_hud_icon_import.py).
   if (bArtPreview) {
-    const FString Path = FString::Printf(TEXT("/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_Attack_%d"),
-                                         ArtHud.IconSize);
-    UTexture2D* Texture = LoadObject<UTexture2D>(nullptr, *Path);
+    // W5b-R D-5: the opaque target token (dark body, light rim); the T2.2 concept size stays the fallback.
+    const FString TokenPath = FString::Printf(TEXT("/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_AttackToken_%d"),
+                                              ArtHud.IconSize);
+    const FString ConceptPath = FString::Printf(TEXT("/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_Attack_%d"),
+                                                ArtHud.IconSize);
+    UTexture2D* Texture = S08LegacyRender() ? nullptr : LoadObject<UTexture2D>(nullptr, *TokenPath);
+    const FString Path = Texture ? TokenPath : ConceptPath;
+    if (!Texture) Texture = LoadObject<UTexture2D>(nullptr, *ConceptPath);
+    ArtHud.IconTexturePath = Texture ? Path : FString(TEXT("none"));
+    // W5b-R D-3: team shape chips (circle P1 / hexagon P2), 12 px exact-size, tinted by the chip colour.
+    bool bChips = !S08LegacyRender();
+    for (int32 I = 0; I < 2 && bChips; ++I) {
+      UTexture2D* Chip = LoadObject<UTexture2D>(nullptr, I == 0
+          ? TEXT("/Game/ArtTests/ARTMarkers/Textures/T_UI_TeamShape_Circle_12")
+          : TEXT("/Game/ArtTests/ARTMarkers/Textures/T_UI_TeamShape_Hex_12"));
+      if (!Chip) {
+        bChips = false;
+        break;
+      }
+      ArtHudAssets.Add(Chip);
+      FSlateBrush& Brush = I == 0 ? ArtHud.ChipCircleBrush : ArtHud.ChipHexBrush;
+      Brush.SetResourceObject(Chip);
+      Brush.ImageSize = FVector2D(12.0, 12.0);
+      Brush.DrawAs = ESlateBrushDrawType::Image;
+      Brush.Tiling = ESlateBrushTileType::NoTile;
+    }
+    ArtHud.bChipBrushes = bChips;
+    ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD team chips ready=%d mode=%s tagNames=%s"), bChips ? 1 : 0,
+                                            S08TeamColorModeName(static_cast<ES08TeamColorMode>(ArtHud.TeamColorMode)),
+                                            ArtHud.bTagNamesAll ? TEXT("all") : TEXT("rule")));
     ArtHud.bIconTextureReady = Texture != nullptr;
     if (Texture) {
       ArtHudAssets.Add(Texture);
@@ -5131,6 +5254,7 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
         .Expose(View->Slot)[View->GetRoot()];
     View->SetShown(false);
     View->SetTwin(bTwin);
+    if (ArtHud.bChipBrushes) View->SetTeamShapeBrushes(ArtHud.ChipCircleBrush, ArtHud.ChipHexBrush);
     ArtHud.PlateViews.Add(View);
   };
   auto AddIcon = [&](const TSharedRef<IS08ArtIconView>& View, bool bTwin) {
@@ -5152,6 +5276,42 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
         Class ? *Class->GetPathName() : TEXT("none"), bParts ? 1 : 0, Missing.IsEmpty() ? TEXT("-") : *Missing,
         bCodeDefault ? 1 : 0));
   };
+  // W5b-R D-1: screen tags FIRST (they paint under the plate, the icon and the damage number).
+  if (World && !S08LegacyRender()) {
+    UClass* TagClass = S08LoadArtHudWidgetClass(US08ArtTagWidget::WidgetBlueprintPath, US08ArtTagWidget::StaticClass());
+    UClass* TagUse = TagClass ? TagClass : US08ArtTagWidget::StaticClass();
+    int32 Made = 0;
+    FString MissingAll;
+    bool bCodeDefault = false;
+    for (int32 I = 0; I < 8; ++I) {
+      US08ArtTagWidget* Tag = CreateWidget<US08ArtTagWidget>(World, TagUse);
+      if (!Tag) break;
+      FString Missing;
+      if (!Tag->HasAllParts(&Missing)) {
+        MissingAll = Missing;
+        break;
+      }
+      bCodeDefault = Tag->UsesCodeDefaultTree();
+      ArtHudWidgets.Add(Tag);
+      if (ArtHud.bChipBrushes) Tag->SetTeamShapeBrushes(ArtHud.ChipCircleBrush, ArtHud.ChipHexBrush);
+      Tag->SetVisibility(ESlateVisibility::Collapsed);
+      FS08ArtHudRuntime::FTagSlot TagSlot;
+      TagSlot.Widget = Tag;
+      Canvas->AddSlot()
+          .Anchors(FAnchors(0.0f, 0.0f))
+          .Alignment(FVector2D(0.0f, 0.0f))
+          .AutoSize(true)
+          .Offset(FMargin(0.0f, 0.0f, 0.0f, 0.0f))
+          .Expose(TagSlot.Slot)[Tag->TakeWidget()];
+      ArtHud.Tags.Add(TagSlot);
+      ++Made;
+    }
+    ArtHud.bTagsEnabled = Made == 8;
+    ArtHud.PendingTrace.Add(FString::Printf(
+        TEXT("HUD art widget tag impl=umg source=%s class=%s count=%d missing=%s codeDefaultTree=%d"),
+        TagClass ? US08ArtTagWidget::WidgetBlueprintPath : TEXT("code-default"), *TagUse->GetPathName(), Made,
+        MissingAll.IsEmpty() ? TEXT("-") : *MissingAll, bCodeDefault ? 1 : 0));
+  }
   bool bUmgPlate = false;
   bool bUmgIcon = false;
   if (bUmg && World) {
@@ -5193,6 +5353,30 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
   }
   if (bSlate || !bUmgIcon) {
     AddIcon(S08MakeSlateIconView(), bUmgIcon && bTwinSlate);
+  }
+  // W5b-R D-1: the damage number LAST (above the tags, the plate and the icon).
+  if (World && ArtHud.bTagsEnabled) {
+    UClass* DamageClass =
+        S08LoadArtHudWidgetClass(US08ArtDamageWidget::WidgetBlueprintPath, US08ArtDamageWidget::StaticClass());
+    UClass* DamageUse = DamageClass ? DamageClass : US08ArtDamageWidget::StaticClass();
+    US08ArtDamageWidget* Damage = CreateWidget<US08ArtDamageWidget>(World, DamageUse);
+    FString Missing;
+    if (Damage && Damage->HasAllParts(&Missing)) {
+      ArtHudWidgets.Add(Damage);
+      Damage->SetVisibility(ESlateVisibility::Collapsed);
+      ArtHud.DamageWidget = Damage;
+      Canvas->AddSlot()
+          .Anchors(FAnchors(0.0f, 0.0f))
+          .Alignment(FVector2D(0.0f, 0.0f))
+          .AutoSize(true)
+          .Offset(FMargin(0.0f, 0.0f, 0.0f, 0.0f))
+          .Expose(ArtHud.DamageSlot)[Damage->TakeWidget()];
+    }
+    ArtHud.PendingTrace.Add(FString::Printf(
+        TEXT("HUD art widget damage impl=umg source=%s class=%s parts=%d missing=%s codeDefaultTree=%d"),
+        DamageClass ? US08ArtDamageWidget::WidgetBlueprintPath : TEXT("code-default"), *DamageUse->GetPathName(),
+        ArtHud.DamageWidget ? 1 : 0, Missing.IsEmpty() ? TEXT("-") : *Missing,
+        (Damage && Damage->UsesCodeDefaultTree()) ? 1 : 0));
   }
 }
 
@@ -5241,7 +5425,11 @@ bool AS08FlowGameMode::FigureScreenRect(const FString& FighterId, FS08ScreenRect
   if (!Fighter || !Fighter->IsAlive() || !BoardActor) return false;
   const AS08FighterActor* Actor = BoardActor->FindFighterActor(FighterId);
   const float Height = Actor ? Actor->GetFigureHeightUU() : 60.0f;
-  const float Radius = (Actor && Actor->HasArtFigure()) ? (Fighter->bIsHero ? 20.0f : 16.0f) : 30.0f;
+  // W5b-R D-3: an art figure's box includes its team ring (outer edge 28 uu hero / 21.84 sidekick), so the plate,
+  // the icon and the tags keep off the rings (T5.2: the Medusa plate touched Arthur's ring on Cobble).
+  const float Radius = (Actor && Actor->HasArtFigure())
+      ? (Fighter->bIsHero ? S08TeamRingSpec::HeroRectRadiusUU : S08TeamRingSpec::SidekickRectRadiusUU)
+      : 30.0f;
   const FVector Base = BoardModel.CellToWorld(Fighter->X, Fighter->Y);
   TArray<FVector2D> Points;
   for (const float Z : {0.0f, Height}) {
@@ -5405,8 +5593,8 @@ void AS08FlowGameMode::UpdateArtHud(float DeltaSeconds) {
     RunArtPreviewInputPlan();
     UpdateHover();
   }
-  UpdateCombatIcon(bActive);
   UpdatePlate(bActive);
+  UpdateCombatIcon(bActive);
   // W4-C alternate mode: one view pair visible at a time, swapped every
   // AlternateSeconds while the plate is on screen (the same-process A/B of
   // the game-thread cost; PERF skips the first frames after each swap).
@@ -5453,6 +5641,8 @@ void AS08FlowGameMode::UpdateArtHud(float DeltaSeconds) {
   }
   if (BoardActor) {
     BoardActor->SetLabelPresentation(bActive && ArtHud.bPlateVisible ? ArtHud.PlateFighterId : FString());
+    // W5b-R D-1: the screen tag layer replaces the world TextRender labels / damage text on the art board.
+    BoardActor->SetScreenLabelMode(ArtHud.bTagsEnabled && bBoard);
   }
 }
 
@@ -5485,86 +5675,11 @@ void AS08FlowGameMode::UpdateCombatIcon(bool bActive) {
     }
   }
   if (BoardActor) BoardActor->SetScreenIconMode(bActive && ArtHud.bIconTextureReady);
-  FS08ScreenRect Figure;
-  const float Ppu = HudPixelsPerUnit();
-  if (Target.IsEmpty() || !ArtHud.bIconTextureReady || Ppu <= 0.0f || !FigureScreenRect(Target, Figure)) {
-    if (ArtHud.bIconVisible) {
-      for (const TSharedPtr<IS08ArtIconView>& View : ArtHud.IconViews) View->SetShown(false);
-      ArtHud.bIconVisible = false;
-      FS08Trace::Write(FString::Printf(TEXT("HUD icon hidden fighter=%s"), *ArtHud.IconFighterId));
-      ArtHud.IconFighterId.Reset();
-    }
-    return;
-  }
-  // N px square, whole pixels, centred above the figure top (the plate is
-  // placed around it afterwards).
-  FVector2D ViewportPx(0.0, 0.0);
-  GEngine->GameViewport->GetViewportSize(ViewportPx);
-  const float N = static_cast<float>(ArtHud.IconSize);
-  float X0 = FMath::RoundToFloat(static_cast<float>(Figure.Center().X) - N * 0.5f);
-  float Y0 = FMath::RoundToFloat(Figure.Y0 - 6.0f - N);
-  X0 = FMath::Clamp(X0, 0.0f, FMath::Max(0.0f, static_cast<float>(ViewportPx.X) - N));
-  Y0 = FMath::Clamp(Y0, 0.0f, FMath::Max(0.0f, static_cast<float>(ViewportPx.Y) - N));
-  // Keep the target's own name/HP label readable: an icon that would sit on
-  // it moves just above the label (the K3 overview frames of 2026-09-28).
-  bool bLabelAvoid = false;
-  if (const AS08FighterActor* TargetActor = BoardActor ? BoardActor->FindFighterActor(Target) : nullptr) {
-    FBox LabelBox;
-    if (TargetActor->GetVisibleLabelBox(LabelBox)) {
-      TArray<FVector2D> Corners;
-      for (int32 C = 0; C < 8; ++C) {
-        FVector2D S;
-        const FVector P((C & 1) ? LabelBox.Max.X : LabelBox.Min.X, (C & 2) ? LabelBox.Max.Y : LabelBox.Min.Y,
-                        (C & 4) ? LabelBox.Max.Z : LabelBox.Min.Z);
-        if (ProjectToViewport(P, S)) Corners.Add(S);
-      }
-      const FS08ScreenRect Label = Corners.Num() == 8 ? FS08ScreenRect::FromPoints(Corners) : FS08ScreenRect();
-      if (!Label.IsEmpty() && FS08ScreenRect(X0, Y0, X0 + N, Y0 + N).Expand(2.0f).IntersectionArea(Label) > 0.0) {
-        Y0 = FMath::Clamp(FMath::RoundToFloat(Label.Y0 - 4.0f - N), 0.0f,
-                          FMath::Max(0.0f, static_cast<float>(ViewportPx.Y) - N));
-        bLabelAvoid = true;
-      }
-    }
-  }
-  // The HUD panels paint over this layer: an icon under the hand strip (a
-  // target near the bottom edge at K2 5x) moves just above/below the panel.
-  bool bHudAvoid = false;
-  for (const TWeakPtr<SWidget>& Panel : {ArtHud.CommandPanel, ArtHud.SidePanel, ArtHud.HandPanel}) {
-    FS08ScreenRect P;
-    if (!WidgetViewportRect(Panel.Pin(), P) || P.IsEmpty()) continue;
-    if (FS08ScreenRect(X0, Y0, X0 + N, Y0 + N).Expand(2.0f).IntersectionArea(P) <= 0.0) continue;
-    Y0 = P.Center().Y > ViewportPx.Y * 0.5 ? P.Y0 - 4.0f - N : P.Y1 + 4.0f;
-    Y0 = FMath::Clamp(Y0, 0.0f, FMath::Max(0.0f, static_cast<float>(ViewportPx.Y) - N));
-    bHudAvoid = true;
-  }
-  const FS08ScreenRect Rect(X0, Y0, X0 + N, Y0 + N);
-  const FVector2D ImageSize(N / Ppu, N / Ppu);
-  const bool bBrushChanged = !FMath::IsNearlyEqual(static_cast<double>(ArtHud.IconBrush.ImageSize.X), ImageSize.X, 1e-4) ||
-                             !FMath::IsNearlyEqual(static_cast<double>(ArtHud.IconBrush.ImageSize.Y), ImageSize.Y, 1e-4);
-  ArtHud.IconBrush.ImageSize = ImageSize;
-  const bool bAlternate = static_cast<ES08ArtHudImpl>(ArtHud.Impl) == ES08ArtHudImpl::Alternate;
-  for (int32 Index = 0; Index < ArtHud.IconViews.Num(); ++Index) {
-    const TSharedPtr<IS08ArtIconView>& View = ArtHud.IconViews[Index];
-    View->Slot->SetOffset(FMargin(X0 / Ppu, Y0 / Ppu, N / Ppu, N / Ppu));
-    if (bBrushChanged) View->SetIconBrush(ArtHud.IconBrush);
-    if (!ArtHud.bIconVisible) View->SetShown(ArtHud.IsViewShown(Index, bAlternate));
-  }
-  const bool bChanged = !ArtHud.bIconVisible || ArtHud.IconFighterId != Target ||
-                        !FMath::IsNearlyEqual(ArtHud.IconPlanned.X0, Rect.X0) ||
-                        !FMath::IsNearlyEqual(ArtHud.IconPlanned.Y0, Rect.Y0);
-  const bool bTargetChanged = ArtHud.IconFighterId != Target;
-  ArtHud.bIconVisible = true;
-  ArtHud.IconFighterId = Target;
-  ArtHud.IconSource = Source;
-  ArtHud.IconPlanned = Rect;
-  if (bTargetChanged && Source == TEXT("flag")) {
+  const FString PrevIconFighter = ArtHud.IconFighterId;
+  UpdateBoardLabels(bActive, Target, Source);
+  if (!Target.IsEmpty() && Source == TEXT("flag") && PrevIconFighter != Target && ArtHud.bIconVisible) {
     FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW icon probe src=flag target=%s size=%d"), *Target,
                                      ArtHud.IconSize));
-  }
-  if (bChanged && CameraZoom.IsSettled()) {
-    FS08Trace::Write(FString::Printf(TEXT("ICON fighter=%s bbox=%s size=%d src=%s labelAvoid=%d hudAvoid=%d"),
-                                     *Target, *S08ArtHud::FormatRect(Rect), ArtHud.IconSize, *Source,
-                                     bLabelAvoid ? 1 : 0, bHudAvoid ? 1 : 0));
   }
 }
 
@@ -5594,18 +5709,25 @@ void AS08FlowGameMode::UpdatePlate(bool bActive) {
                                                     Fighter->Id == AttackerId, Fighter->Id == TargetId,
                                                     Fighter->Effects);
   const FString PlateStatusLine = FString::Join(Statuses, TEXT("  |  "));
-  const FString ContentKey = FString::Printf(TEXT("%s|%s|%d|%d|%d|%s"), *Fighter->Id, *Fighter->Label,
-                                             Fighter->Health, Fighter->MaxHealth, bOwn ? 1 : 0, *PlateStatusLine);
+  const ES08TeamSlot PlateTeam = BoardActor ? BoardActor->TeamOfFighter(*Fighter) : ES08TeamSlot::P1;
+  const ES08TeamSlot PlateLook =
+      S08TeamLook(PlateTeam, bOwn, static_cast<ES08TeamColorMode>(ArtHud.TeamColorMode));
+  const FString ContentKey = FString::Printf(TEXT("%s|%s|%d|%d|%d|%s|%d"), *Fighter->Id, *Fighter->Label,
+                                             Fighter->Health, Fighter->MaxHealth, bOwn ? 1 : 0, *PlateStatusLine,
+                                             static_cast<int32>(PlateLook));
   if (ContentKey != ArtHud.PlateContentKey) {
     ArtHud.PlateContentKey = ContentKey;
     // W4-C: the views show string-table text (S08ArtHudText); the trace
     // below keeps the English codes byte for byte.
-    const FS08PlateTexts Texts =
+    FS08PlateTexts Texts =
         S08ArtHudText::PlateTexts(Fighter->Label, Fighter->Health, Fighter->MaxHealth, bOwn, Statuses);
+    Texts.TeamSlot = PlateLook == ES08TeamSlot::P1 ? 0 : 1;
     for (const TSharedPtr<IS08ArtPlateView>& View : ArtHud.PlateViews) View->ApplyTexts(Texts);
-    FS08Trace::Write(FString::Printf(TEXT("HUD plate content fighter=%s name=%s hp=%d/%d team=%s statuses=%s"),
-                                     *Fighter->Id, *Fighter->Label, Fighter->Health, Fighter->MaxHealth,
-                                     bOwn ? TEXT("own") : TEXT("enemy"), *PlateStatusLine));
+    FS08Trace::Write(FString::Printf(
+        TEXT("HUD plate content fighter=%s name=%s hp=%d/%d team=%s statuses=%s teamSlot=%s look=%s shape=%s chip=%s"),
+        *Fighter->Id, *Fighter->Label, Fighter->Health, Fighter->MaxHealth, bOwn ? TEXT("own") : TEXT("enemy"),
+        *PlateStatusLine, S08TeamSlotName(PlateTeam), S08TeamSlotName(PlateLook), S08TeamShapeName(PlateLook),
+        PlateLook == ES08TeamSlot::P1 ? S08TeamPalette::P1ScreenHex : S08TeamPalette::P2ScreenHex));
   }
   // ---- placement: never over a destination cell of the current selection
   FString SelectedId;
@@ -5623,14 +5745,23 @@ void AS08FlowGameMode::UpdatePlate(bool bActive) {
   In.PlateSize = FVector2D(FMath::RoundToFloat(PlateSizeSu.X * Ppu), FMath::RoundToFloat(PlateSizeSu.Y * Ppu));
   In.Anchor = Anchor;
   In.Forbidden = ProjectCells(Destinations);
-  // Soft obstacles: every visible figure (incl. the owner), labels, the combat
-  // icon, live damage numbers and the HUD panels.
+  // Soft obstacles: every visible figure incl. the owner (W5b-R: the box includes the team ring) and the HUD panels.
+  // W5b-R D-1: the screen tags, the icon and the damage number are placed AFTER the plate and avoid it as a hard
+  // obstacle (a plate that also avoided them would chase them frame to frame).
   for (const FS08BoardFighter& F : Fighters) {
     FS08ScreenRect R;
-    if (F.IsAlive() && FigureScreenRect(F.Id, R)) In.Soft.Add(R);
-    if (const AS08FighterActor* Actor = BoardActor ? BoardActor->FindFighterActor(F.Id) : nullptr) {
+    if (F.IsAlive() && FigureScreenRect(F.Id, R)) {
+      In.Soft.Add(R);
+      if (F.Id != Id) In.BindOthers.Add(R);
+    }
+  }
+  In.BindTarget = Anchor;  // W5b-R: the plate reads as its owner's (rect gap to the owner < gap to any other figure)
+  if (!ArtHud.bTagsEnabled) {
+    // pre-W5b behaviour (-S08LegacyRender): world labels, the icon and live damage numbers are soft obstacles too
+    for (const FS08BoardFighter& F : Fighters) {
+      const AS08FighterActor* Actor = BoardActor ? BoardActor->FindFighterActor(F.Id) : nullptr;
       FBox Box;
-      if (F.Id != Id && Actor->GetVisibleLabelBox(Box)) {
+      if (Actor && F.Id != Id && Actor->GetVisibleLabelBox(Box)) {
         TArray<FVector2D> Corners;
         for (int32 C = 0; C < 8; ++C) {
           FVector2D S;
@@ -5641,19 +5772,7 @@ void AS08FlowGameMode::UpdatePlate(bool bActive) {
         if (Corners.Num() == 8) In.Soft.Add(FS08ScreenRect::FromPoints(Corners));
       }
     }
-  }
-  if (ArtHud.bIconVisible) In.Soft.Add(ArtHud.IconPlanned);
-  for (const FString& DamageId : BoardActor->GetActiveDamageNumberIds()) {
-    FBox Box;
-    if (!BoardActor->GetDamageNumberWorldBox(DamageId, Box)) continue;
-    TArray<FVector2D> Corners;
-    for (int32 C = 0; C < 8; ++C) {
-      FVector2D S;
-      const FVector P((C & 1) ? Box.Max.X : Box.Min.X, (C & 2) ? Box.Max.Y : Box.Min.Y,
-                      (C & 4) ? Box.Max.Z : Box.Min.Z);
-      if (ProjectToViewport(P, S)) Corners.Add(S);
-    }
-    if (Corners.Num() == 8) In.Soft.Add(FS08ScreenRect::FromPoints(Corners));
+    if (ArtHud.bIconVisible) In.Soft.Add(ArtHud.IconPlanned);
   }
   for (const TWeakPtr<SWidget>& Panel : {ArtHud.CommandPanel, ArtHud.SidePanel, ArtHud.HandPanel}) {
     FS08ScreenRect R;
@@ -5696,14 +5815,471 @@ void AS08FlowGameMode::UpdatePlate(bool bActive) {
   if (CameraZoom.IsSettled()) {
     const int32 Overlap = S08ArtHud::CountOverlaps(Rect, In.Forbidden, S08ArtHud::OverlapEpsilonPx2);
     const FString Line = FString::Printf(
-        TEXT("PLATE fighter=%s bbox=%s overlapReachable=%d placement=%s ring=%d gap=%.0f selection=%s destinations=%d clean=%d softPx2=%.0f tested=%d"),
+        TEXT("PLATE fighter=%s bbox=%s overlapReachable=%d placement=%s ring=%d gap=%.0f selection=%s destinations=%d clean=%d softPx2=%.0f tested=%d bound=%d"),
         *Id, *S08ArtHud::FormatRect(Rect), Overlap, *Result.Candidate, Result.Ring, S08RectGap(Rect, Anchor),
         SelectedId.IsEmpty() ? TEXT("none") : *SelectedId, Destinations.Num(), Result.bClean ? 1 : 0,
-        Result.SoftArea, Result.Tested);
+        Result.SoftArea, Result.Tested, Result.bBound ? 1 : 0);
     if (Line != ArtHud.PlateLastTraced) {
       ArtHud.PlateLastTraced = Line;
       FS08Trace::Write(Line);
     }
+  }
+}
+
+TMap<FString, FS08ScreenRect> AS08FlowGameMode::FigureScreenRects() const {
+  TMap<FString, FS08ScreenRect> Out;
+  for (const FS08BoardFighter& F : Fighters) {
+    FS08ScreenRect R;
+    if (F.IsAlive() && FigureScreenRect(F.Id, R)) Out.Add(F.Id, R);
+  }
+  return Out;
+}
+
+void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget, const FString& IconSource) {
+  FVector2D ViewportPx(0.0, 0.0);
+  if (GEngine && GEngine->GameViewport) GEngine->GameViewport->GetViewportSize(ViewportPx);
+  const float Ppu = HudPixelsPerUnit();
+  const bool bBoard = BoardActor && BoardActor->IsArtActive() && Flow.IsValid() &&
+                      Flow->GetStage() == ES08Stage::Started && Ppu > 0.0f;
+  const bool bTagsActive = ArtHud.bTagsEnabled && bBoard && !Hud.bGameOver;
+  const TMap<FString, FS08ScreenRect> Figures = bBoard ? FigureScreenRects() : TMap<FString, FS08ScreenRect>();
+  TArray<FS08ScreenRect> Panels;
+  for (const TWeakPtr<SWidget>& Panel : {ArtHud.CommandPanel, ArtHud.SidePanel, ArtHud.HandPanel}) {
+    FS08ScreenRect R;
+    if (WidgetViewportRect(Panel.Pin(), R) && !R.IsEmpty()) Panels.Add(R);
+  }
+  const FString ViewerId = Flow.IsValid() ? Flow->GetUserId() : FString();
+  const bool bK2 = CameraZoom.IsReady() &&
+                   CameraZoom.ZoomOf(CameraZoom.Current) >= CameraZoom.Config.FollowFromZoom - 0.01f;
+  FString SelectedId;
+  TSet<uint64> Legal;
+  CurrentSelection(SelectedId, Legal);
+
+  // ---- tag content (pushed on change only, HUD-RULES P2)
+  TArray<const FS08BoardFighter*> Alive;
+  for (const FS08BoardFighter& F : Fighters) {
+    if (F.IsAlive() && Figures.Contains(F.Id)) Alive.Add(&F);
+  }
+  FString Signature = FString::Printf(TEXT("%d|%d|%.0fx%.0f|%s|%s|%d|%d|"), bTagsActive ? 1 : 0, bActive ? 1 : 0,
+                                      ViewportPx.X, ViewportPx.Y, *IconTarget, *IconSource, ArtHud.IconSize,
+                                      bK2 ? 1 : 0);
+  for (int32 I = 0; I < ArtHud.Tags.Num(); ++I) {
+    FS08ArtHudRuntime::FTagSlot& T = ArtHud.Tags[I];
+    const FS08BoardFighter* F = (bTagsActive && I < Alive.Num()) ? Alive[I] : nullptr;
+    if (!F) {
+      T.FighterId.Reset();
+      T.Planned = FS08ScreenRect();
+      continue;
+    }
+    const AS08FighterActor* Actor = BoardActor->FindFighterActor(F->Id);
+    // D-1 mode rule: the plate owner is hidden (the plate shows the same); -ArtPreviewTagNames=all -> full; K2 ->
+    // compact; hover / selection -> full; a grey blockout (no art sculpt) -> full; the art sculpt -> compact.
+    // W5b-R r3 (t53 revision 1, tags.mode): the plate owner is hidden only while the plate reads as the owner's
+    // (ChoosePlateRect bound); a plate pushed away by K-2 (Cobble: reachable cells all around Medusa, the plate
+    // lands next to Merlin) keeps a compact tag at the figure, so the HP stays next to it on both clients.
+    ES08TagMode Mode = ES08TagMode::Compact;
+    if (ArtHud.bPlateVisible && F->Id == ArtHud.PlateFighterId) {
+      Mode = ArtHud.PlateResult.bBound ? ES08TagMode::Hidden : ES08TagMode::Compact;
+    } else if (ArtHud.bTagNamesAll) {
+      Mode = ES08TagMode::Full;
+    } else if (bK2) {
+      Mode = ES08TagMode::Compact;
+    } else if (F->Id == ArtHud.HoveredFighterId || F->Id == SelectedId) {
+      Mode = ES08TagMode::Full;
+    } else if (!Actor || !Actor->HasMedusaCandidate()) {
+      Mode = ES08TagMode::Full;
+    }
+    const ES08TeamSlot Team = BoardActor->TeamOfFighter(*F);
+    const ES08TeamSlot Look =
+        S08TeamLook(Team, F->OwnerId == ViewerId, static_cast<ES08TeamColorMode>(ArtHud.TeamColorMode));
+    const FString Key = FString::Printf(TEXT("%s|%s|%d|%d|%d|%d"), *F->Id, *F->Label, F->Health, F->MaxHealth,
+                                        static_cast<int32>(Mode), static_cast<int32>(Look));
+    if (Key != T.ContentKey && T.Widget) {
+      FS08TagTexts Texts;
+      Texts.Name = FText::FromString(F->Label);  // fighter label: server data
+      Texts.Hp = S08ArtHudText::HpLabel(F->Health, F->MaxHealth);
+      Texts.HpFraction = F->MaxHealth > 0 ? static_cast<float>(F->Health) / F->MaxHealth : 0.0f;
+      Texts.TeamSlot = Look == ES08TeamSlot::P1 ? 0 : 1;
+      Texts.Mode = Mode;
+      T.Widget->ApplyModel(Texts);
+      T.ContentKey = Key;
+    }
+    T.FighterId = F->Id;
+    T.Mode = static_cast<uint8>(Mode);
+    T.TeamSlot = Look == ES08TeamSlot::P1 ? 0 : 1;
+    T.Figure = Figures[F->Id];
+    Signature += Key + S08ArtHud::FormatRect(T.Figure);
+  }
+  // ---- the live damage number (the latest seq)
+  FString DamageId;
+  int32 DamageSeq = -1, DamageAmount = 0;
+  if (bTagsActive && ArtHud.DamageWidget) {
+    for (const FString& Id : BoardActor->GetActiveDamageNumberIds()) {
+      const int32 Seq = BoardActor->GetDamageNumberSeq(Id);
+      if (Seq > DamageSeq) {
+        DamageSeq = Seq;
+        DamageId = Id;
+        DamageAmount = BoardActor->GetDamageNumberAmount(Id);
+      }
+    }
+  }
+  Signature += FString::Printf(TEXT("|dmg=%s@%d|plate=%s|"), *DamageId, DamageSeq,
+                               ArtHud.bPlateVisible ? *S08ArtHud::FormatRect(ArtHud.PlatePlanned) : TEXT("-"));
+  for (const FS08ScreenRect& P : Panels) Signature += S08ArtHud::FormatRect(P);
+  if (!IconTarget.IsEmpty() && Figures.Contains(IconTarget)) Signature += S08ArtHud::FormatRect(Figures[IconTarget]);
+
+  const bool bRelayout = Signature != ArtHud.LabelSignature;
+  if (!bRelayout) {
+    if (ArtHud.bDamageVisible) ++ArtHud.DamageStableFrames;
+    return;
+  }
+  ArtHud.LabelSignature = Signature;
+
+  // ---- deterministic layout: plate (placed) -> priority tags -> icon -> damage number -> other tags (far first)
+  TArray<FS08ScreenRect> Hard = Panels;
+  if (ArtHud.bPlateVisible) Hard.Add(ArtHud.PlatePlanned);
+  auto OthersOf = [&Figures](const FString& Id) {
+    TArray<FS08ScreenRect> Out;
+    for (const TPair<FString, FS08ScreenRect>& Pair : Figures) {
+      if (Pair.Key != Id) Out.Add(Pair.Value);
+    }
+    return Out;
+  };
+  int32 Order = 0;
+  auto PlaceTag = [&](FS08ArtHudRuntime::FTagSlot& T) {
+    const FVector2D Desired = T.Widget ? S08ArtHudPrepassSize(*T.Widget) : FVector2D::ZeroVector;
+    // W5b-R r3 (t53 revision 1, tags.binding): bound to the owner's figure, inset fallback, first two rings
+    const S08ArtHud::FLabelPlacementInput In = S08ArtHud::MakeTagPlacementInput(
+        ViewportPx, FVector2D(FMath::CeilToFloat(Desired.X * Ppu), FMath::CeilToFloat(Desired.Y * Ppu)), T.Figure,
+        OthersOf(T.FighterId), Hard);
+    const S08ArtHud::FLabelPlacementResult R = S08ArtHud::ChooseLabelRect(In);
+    T.Planned = R.Rect;
+    T.Candidate = R.Candidate;
+    T.Ring = R.Ring;
+    T.SoftArea = R.SoftArea;
+    T.HardArea = R.HardArea;
+    T.bBound = R.bBound;
+    T.Order = Order++;
+    if (!R.Rect.IsEmpty()) Hard.Add(R.Rect);
+  };
+  TSet<int32> Placed;
+  auto SlotOf = [this](const FString& Id) -> int32 {
+    for (int32 I = 0; I < ArtHud.Tags.Num(); ++I) {
+      if (!Id.IsEmpty() && ArtHud.Tags[I].FighterId == Id &&
+          static_cast<ES08TagMode>(ArtHud.Tags[I].Mode) != ES08TagMode::Hidden) {
+        return I;
+      }
+    }
+    return INDEX_NONE;
+  };
+  for (const FString& Priority : {IconTarget, DamageId}) {
+    const int32 I = SlotOf(Priority);
+    if (I != INDEX_NONE && !Placed.Contains(I)) {
+      PlaceTag(ArtHud.Tags[I]);
+      Placed.Add(I);
+    }
+  }
+  // D-5 icon anchors: right / left / below / above, avoiding other figures (with rings), placed tags, plate, panels.
+  FS08ScreenRect IconRect;
+  if (bActive && !IconTarget.IsEmpty() && ArtHud.bIconTextureReady && Figures.Contains(IconTarget)) {
+    S08ArtHud::FIconAnchorInput In;
+    In.Viewport = ViewportPx;
+    In.Size = static_cast<float>(ArtHud.IconSize);
+    In.Target = Figures[IconTarget];
+    In.Figures = OthersOf(IconTarget);
+    In.Hard = Hard;
+    const S08ArtHud::FIconAnchorResult R = S08ArtHud::ChooseIconAnchor(In);
+    IconRect = R.Rect;
+    ArtHud.IconAnchor = R.Anchor;
+    ArtHud.bIconFallback = R.bFallback;
+    ArtHud.IconOverlap = R.OverlapArea;
+    if (!IconRect.IsEmpty()) Hard.Add(IconRect);
+  }
+  // D-1 damage number: right of the target's tag, above it, left; never over a tag, the icon, the plate or the
+  // target's figure; priority over the tags of uninvolved fighters (placed below). W5b-R: bound to the target
+  // (centre nearer the target's figure than any other figure; T5.2 r1 rehearsal: above Arthur's left tag it sat
+  // nearer a harpy).
+  FS08ScreenRect DamageRect;
+  FString DamageCandidate = TEXT("none");
+  if (!DamageId.IsEmpty() && ArtHud.DamageWidget) {
+    ArtHud.DamageWidget->ApplyAmount(S08ArtHudText::DamageNumber(DamageAmount));
+    const FVector2D Desired = S08ArtHudPrepassSize(*ArtHud.DamageWidget);
+    const int32 TagIndex = SlotOf(DamageId);
+    FS08ScreenRect Anchor = TagIndex != INDEX_NONE ? ArtHud.Tags[TagIndex].Planned : FS08ScreenRect();
+    FS08ScreenRect TargetFigure;
+    if (const FS08ScreenRect* Fig = Figures.Find(DamageId)) {
+      TargetFigure = *Fig;
+    } else if (const FS08BoardFighter* Dead = FindFighter(DamageId)) {
+      // a fighter the damage defeated: its cell (a figure-sized box at the cell) is the anchor
+      FVector2D C;
+      if (Dead->X >= 0 && ProjectToViewport(BoardModel.CellToWorld(Dead->X, Dead->Y), C)) {
+        TargetFigure = FS08ScreenRect(C.X - 30.0f, C.Y - 60.0f, C.X + 30.0f, C.Y + 10.0f);
+      }
+    }
+    if (Anchor.IsEmpty()) Anchor = TargetFigure;
+    if (!Anchor.IsEmpty()) {
+      S08ArtHud::FLabelPlacementInput In;
+      In.Viewport = ViewportPx;
+      In.Size = FVector2D(FMath::CeilToFloat(Desired.X * Ppu), FMath::CeilToFloat(Desired.Y * Ppu));
+      In.Anchor = Anchor;
+      In.Hard = Hard;
+      if (!TargetFigure.IsEmpty()) In.Hard.Add(TargetFigure);
+      In.Soft = OthersOf(DamageId);
+      In.bRightFirst = true;
+      // t53 damage.binding: the number reads as the target's - its centre nearer the target figure than any other
+      In.BindTarget = TargetFigure;
+      In.BindOthers = OthersOf(DamageId);
+      const S08ArtHud::FLabelPlacementResult R = S08ArtHud::ChooseLabelRect(In);
+      DamageRect = R.Rect;
+      DamageCandidate = R.Candidate + FString::Printf(TEXT(" ring=%d hardPx2=%.0f softPx2=%.0f"), R.Ring, R.HardArea,
+                                                      R.SoftArea);
+      if (!DamageRect.IsEmpty()) Hard.Add(DamageRect);
+    }
+  }
+  // the other tags, far (small screen Y) to near
+  TArray<int32> Rest;
+  for (int32 I = 0; I < ArtHud.Tags.Num(); ++I) {
+    const FS08ArtHudRuntime::FTagSlot& T = ArtHud.Tags[I];
+    if (!Placed.Contains(I) && !T.FighterId.IsEmpty() && static_cast<ES08TagMode>(T.Mode) != ES08TagMode::Hidden) {
+      Rest.Add(I);
+    }
+  }
+  Rest.Sort([this](int32 A, int32 B) {
+    const FS08ArtHudRuntime::FTagSlot& TA = ArtHud.Tags[A];
+    const FS08ArtHudRuntime::FTagSlot& TB = ArtHud.Tags[B];
+    return TA.Figure.Y0 != TB.Figure.Y0 ? TA.Figure.Y0 < TB.Figure.Y0 : TA.FighterId < TB.FighterId;
+  });
+  for (const int32 I : Rest) PlaceTag(ArtHud.Tags[I]);
+
+  // ---- apply: tags
+  const bool bSettled = CameraZoom.IsSettled();
+  for (FS08ArtHudRuntime::FTagSlot& T : ArtHud.Tags) {
+    const bool bShow = !T.FighterId.IsEmpty() && static_cast<ES08TagMode>(T.Mode) != ES08TagMode::Hidden &&
+                       !T.Planned.IsEmpty();
+    if (T.Slot && bShow) T.Slot->SetOffset(FMargin(T.Planned.X0 / Ppu, T.Planned.Y0 / Ppu, 0.0f, 0.0f));
+    if (T.Widget && bShow != T.bShown) {
+      T.Widget->SetVisibility(bShow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+    }
+    T.bShown = bShow;
+    if (bShow && bSettled) {
+      FS08Trace::Write(FString::Printf(
+          TEXT("TAG fighter=%s bbox=%s mode=%s look=%s placement=%s ring=%d hardPx2=%.0f softPx2=%.0f order=%d bound=%d"),
+          *T.FighterId, *S08ArtHud::FormatRect(T.Planned), S08TagModeName(static_cast<ES08TagMode>(T.Mode)),
+          T.TeamSlot ? TEXT("P2") : TEXT("P1"), *T.Candidate, T.Ring, T.HardArea, T.SoftArea, T.Order,
+          T.bBound ? 1 : 0));
+    }
+  }
+  // ---- apply: icon (views keep the exact-size brush)
+  if (IconRect.IsEmpty()) {
+    if (ArtHud.bIconVisible) {
+      for (const TSharedPtr<IS08ArtIconView>& View : ArtHud.IconViews) View->SetShown(false);
+      ArtHud.bIconVisible = false;
+      FS08Trace::Write(FString::Printf(TEXT("HUD icon hidden fighter=%s"), *ArtHud.IconFighterId));
+      ArtHud.IconFighterId.Reset();
+    }
+  } else {
+    const float N = static_cast<float>(ArtHud.IconSize);
+    const FVector2D ImageSize(N / Ppu, N / Ppu);
+    const bool bBrushChanged = !FMath::IsNearlyEqual(static_cast<double>(ArtHud.IconBrush.ImageSize.X), ImageSize.X, 1e-4) ||
+                               !FMath::IsNearlyEqual(static_cast<double>(ArtHud.IconBrush.ImageSize.Y), ImageSize.Y, 1e-4);
+    ArtHud.IconBrush.ImageSize = ImageSize;
+    const bool bAlternate = static_cast<ES08ArtHudImpl>(ArtHud.Impl) == ES08ArtHudImpl::Alternate;
+    for (int32 Index = 0; Index < ArtHud.IconViews.Num(); ++Index) {
+      const TSharedPtr<IS08ArtIconView>& View = ArtHud.IconViews[Index];
+      View->Slot->SetOffset(FMargin(IconRect.X0 / Ppu, IconRect.Y0 / Ppu, N / Ppu, N / Ppu));
+      if (bBrushChanged) View->SetIconBrush(ArtHud.IconBrush);
+      if (!ArtHud.bIconVisible) View->SetShown(ArtHud.IsViewShown(Index, bAlternate));
+    }
+    ArtHud.bIconVisible = true;
+    ArtHud.IconFighterId = IconTarget;
+    ArtHud.IconSource = IconSource;
+    ArtHud.IconPlanned = IconRect;
+    if (bSettled) {
+      FS08Trace::Write(FString::Printf(
+          TEXT("ICON fighter=%s bbox=%s size=%d src=%s anchor=%s fallback=%d overlapPx2=%.0f texture=%s"), *IconTarget,
+          *S08ArtHud::FormatRect(IconRect), ArtHud.IconSize, *IconSource, *ArtHud.IconAnchor,
+          ArtHud.bIconFallback ? 1 : 0, ArtHud.IconOverlap, *ArtHud.IconTexturePath));
+    }
+  }
+  // ---- apply: damage number
+  const bool bShowDamage = !DamageRect.IsEmpty();
+  if (ArtHud.DamageWidget) {
+    if (bShowDamage && ArtHud.DamageSlot) {
+      ArtHud.DamageSlot->SetOffset(FMargin(DamageRect.X0 / Ppu, DamageRect.Y0 / Ppu, 0.0f, 0.0f));
+    }
+    if (bShowDamage != ArtHud.bDamageVisible) {
+      ArtHud.DamageWidget->SetVisibility(bShowDamage ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+    }
+  }
+  const bool bDamageMoved = bShowDamage != ArtHud.bDamageVisible || ArtHud.DamageFighterId != DamageId ||
+                            ArtHud.DamageSeq != DamageSeq ||
+                            !FMath::IsNearlyEqual(ArtHud.DamagePlanned.X0, DamageRect.X0, 0.5f) ||
+                            !FMath::IsNearlyEqual(ArtHud.DamagePlanned.Y0, DamageRect.Y0, 0.5f);
+  ArtHud.DamageStableFrames = bShowDamage ? (bDamageMoved ? 0 : ArtHud.DamageStableFrames + 1) : 0;
+  if (bShowDamage && bDamageMoved) {
+    FS08Trace::Write(FString::Printf(TEXT("DAMAGE fighter=%s bbox=%s amount=%d seq=%d placement=%s"), *DamageId,
+                                     *S08ArtHud::FormatRect(DamageRect), DamageAmount, DamageSeq, *DamageCandidate));
+  }
+  ArtHud.bDamageVisible = bShowDamage;
+  ArtHud.DamageFighterId = DamageId;
+  ArtHud.DamageSeq = DamageSeq;
+  ArtHud.DamageAmount = DamageAmount;
+  ArtHud.DamagePlanned = DamageRect;
+  ArtHud.DamageCandidate = DamageCandidate;
+}
+
+void AS08FlowGameMode::HandleEndFrame() {
+  if (ArtHud.LateShots.Num() == 0) return;
+  const TArray<FS08ArtHudRuntime::FLateShot> Shots = MoveTemp(ArtHud.LateShots);
+  ArtHud.LateShots.Reset();
+  for (const FS08ArtHudRuntime::FLateShot& Shot : Shots) WriteArtHudLateLines(Shot.File, Shot.RequestFrame);
+}
+
+void AS08FlowGameMode::WriteArtHudLateLines(const FString& File, uint64 RequestFrame) {
+  const unsigned long long Frame = static_cast<unsigned long long>(GFrameCounter);
+  const FString FrameField = FString::Printf(TEXT("frame=%llu"), Frame);
+  FS08Trace::Write(FString::Printf(TEXT("SHOT late begin file=%s frame=%llu requestFrame=%llu"), *File, Frame,
+                                   static_cast<unsigned long long>(RequestFrame)));
+  if (BoardActor && BoardActor->IsArtActive()) {
+    auto Painted = [this](const TSharedPtr<SWidget>& Widget, const FS08ScreenRect& Planned, FS08ScreenRect& Out) {
+      return Widget.IsValid() && Widget->GetVisibility().IsVisible() && WidgetViewportRect(Widget, Out) &&
+             !Out.IsEmpty() && (Planned.IsEmpty() || (FMath::Abs(Out.X0 - Planned.X0) <= 1.5f &&
+                                                      FMath::Abs(Out.Y0 - Planned.Y0) <= 1.5f));
+    };
+    // combat icon: a line only when the icon is REALLY on screen at the end of this frame
+    if (ArtHud.IconViews.Num() > 0) {
+      const TSharedPtr<SWidget> Root = ArtHud.IconViews[S08ShownViewIndex(ArtHud, ArtHud.IconViews.Num())]->GetRoot();
+      FS08ScreenRect Rect;
+      const bool bVisible = ArtHud.bIconVisible && Root->GetVisibility().IsVisible();
+      if (bVisible) {
+        const bool bPainted = Painted(Root, ArtHud.IconPlanned, Rect);
+        FS08Trace::Write(FString::Printf(
+            TEXT("SHOT icon fighter=%s bbox=%s size=%d src=%s planned=%s geom=%s visible=1 anchor=%s fallback=%d overlapPx2=%.0f texture=%s %s"),
+            *ArtHud.IconFighterId, *S08ArtHud::FormatRect(bPainted ? Rect : ArtHud.IconPlanned), ArtHud.IconSize,
+            *ArtHud.IconSource, *S08ArtHud::FormatRect(ArtHud.IconPlanned), bPainted ? TEXT("painted") : TEXT("planned"),
+            *ArtHud.IconAnchor, ArtHud.bIconFallback ? 1 : 0, ArtHud.IconOverlap, *ArtHud.IconTexturePath, *FrameField));
+      } else {
+        FS08Trace::Write(FString::Printf(TEXT("SHOT iconstate visible=0 lastFighter=%s %s"),
+                                         ArtHud.IconFighterId.IsEmpty() ? TEXT("none") : *ArtHud.IconFighterId,
+                                         *FrameField));
+      }
+    }
+    WriteArtHudWidgetLines(FString(), /*bLate=*/true);
+    // screen tags
+    for (const FS08ArtHudRuntime::FTagSlot& T : ArtHud.Tags) {
+      if (!T.Widget || T.FighterId.IsEmpty()) continue;
+      TArray<FS08WidgetPart> Parts;
+      T.Widget->CollectParts(Parts);
+      const TSharedPtr<SWidget> Root = T.Widget->GetCachedWidget();
+      FS08ScreenRect RootRect;
+      const bool bRootPainted = T.bShown && Painted(Root, T.Planned, RootRect);
+      const ES08TagMode Mode = static_cast<ES08TagMode>(T.Mode);
+      for (const FS08WidgetPart& Part : Parts) {
+        FS08ScreenRect Rect;
+        const bool bVisible = T.bShown && Part.Widget.IsValid() && Part.Widget->GetVisibility().IsVisible() &&
+                              Root.IsValid() && Root->GetVisibility().IsVisible();
+        const bool bPainted = bVisible && bRootPainted && WidgetViewportRect(Part.Widget, Rect) && !Rect.IsEmpty();
+        FString Extra = FString::Printf(
+            TEXT("mode=%s look=%s shape=%s placement=%s ring=%d order=%d bound=%d softPx2=%.0f planned=%s %s"),
+            S08TagModeName(Mode), T.TeamSlot ? TEXT("P2") : TEXT("P1"), T.TeamSlot ? TEXT("hex") : TEXT("circle"),
+            *T.Candidate, T.Ring, T.Order, T.bBound ? 1 : 0, T.SoftArea, *S08ArtHud::FormatRect(T.Planned),
+            *FrameField);
+        if (Part.Id == S08ArtHudIds::TagName) Extra += FString::Printf(TEXT(" font=%d"), T.Widget->NameFontSize());
+        if (Part.Id == S08ArtHudIds::TagHp) Extra += FString::Printf(TEXT(" font=%d"), T.Widget->HpFontSize());
+        FS08Trace::Write(S08ArtHud::FormatWidgetLineEx(Part.Id, TEXT("umg"), S08TagModeName(Mode), T.FighterId, Rect,
+                                                       bPainted, bVisible, US08ArtTagWidget::WidgetBlueprintPath, Extra));
+      }
+    }
+    // damage number
+    if (ArtHud.DamageWidget && ArtHud.bDamageVisible) {
+      TArray<FS08WidgetPart> Parts;
+      ArtHud.DamageWidget->CollectParts(Parts);
+      const TSharedPtr<SWidget> Root = ArtHud.DamageWidget->GetCachedWidget();
+      FS08ScreenRect RootRect;
+      const bool bRootPainted = Painted(Root, ArtHud.DamagePlanned, RootRect);
+      for (const FS08WidgetPart& Part : Parts) {
+        FS08ScreenRect Rect;
+        const bool bVisible = Part.Widget.IsValid() && Part.Widget->GetVisibility().IsVisible() && Root.IsValid() &&
+                              Root->GetVisibility().IsVisible();
+        const bool bPainted = bVisible && bRootPainted && WidgetViewportRect(Part.Widget, Rect) && !Rect.IsEmpty();
+        FString Extra = FString::Printf(TEXT("amount=%d seq=%d placement=%s stableFrames=%d planned=%s %s"),
+                                        ArtHud.DamageAmount, ArtHud.DamageSeq, *ArtHud.DamageCandidate.Replace(TEXT(" "), TEXT("_")),
+                                        ArtHud.DamageStableFrames, *S08ArtHud::FormatRect(ArtHud.DamagePlanned),
+                                        *FrameField);
+        if (Part.Id == S08ArtHudIds::DamageText) Extra += FString::Printf(TEXT(" font=%d"), ArtHud.DamageWidget->FontSize());
+        FS08Trace::Write(S08ArtHud::FormatWidgetLineEx(Part.Id, TEXT("umg"), TEXT("damage"), ArtHud.DamageFighterId, Rect,
+                                                       bPainted, bVisible, US08ArtDamageWidget::WidgetBlueprintPath, Extra));
+      }
+      if (bRootPainted) {
+        // qa010 / t52 vocabulary: the painted box of the number
+        FS08Trace::Write(FString::Printf(TEXT("SHOT damage fighter=%s bbox=%s %s"), *ArtHud.DamageFighterId,
+                                         *S08ArtHud::FormatRect(RootRect), *FrameField));
+      }
+    }
+    // HUD panels (K3 rule D-10)
+    const TCHAR* PanelIds[] = {TEXT("hud.command"), TEXT("hud.side"), TEXT("hud.hand")};
+    const TWeakPtr<SWidget> PanelWidgets[] = {ArtHud.CommandPanel, ArtHud.SidePanel, ArtHud.HandPanel};
+    for (int32 I = 0; I < 3; ++I) {
+      const TSharedPtr<SWidget> Panel = PanelWidgets[I].Pin();
+      FS08ScreenRect Rect;
+      const bool bVisible = Panel.IsValid() && Panel->GetVisibility().IsVisible();
+      const bool bPainted = bVisible && WidgetViewportRect(Panel, Rect) && !Rect.IsEmpty();
+      FS08Trace::Write(FString::Printf(TEXT("SHOT panel id=%s bbox=%s geom=%s visible=%d %s"), PanelIds[I],
+                                       *S08ArtHud::FormatRect(bPainted ? Rect : FS08ScreenRect()),
+                                       bPainted ? TEXT("painted") : TEXT("unpainted"), bVisible ? 1 : 0, *FrameField));
+    }
+    // world labels (grey path / -S08LegacyRender): what is really visible now
+    for (const FS08BoardFighter& F : Fighters) {
+      const AS08FighterActor* Actor = BoardActor->FindFighterActor(F.Id);
+      FBox Box;
+      if (!Actor || !F.IsAlive() || !Actor->GetVisibleLabelBox(Box)) continue;
+      TArray<FVector2D> Corners;
+      for (int32 C = 0; C < 8; ++C) {
+        FVector2D S;
+        const FVector P((C & 1) ? Box.Max.X : Box.Min.X, (C & 2) ? Box.Max.Y : Box.Min.Y,
+                        (C & 4) ? Box.Max.Z : Box.Min.Z);
+        if (ProjectToViewport(P, S)) Corners.Add(S);
+      }
+      if (Corners.Num() != 8) continue;
+      const ES08FighterLabelMode Mode = Actor->GetLabelMode();
+      FS08Trace::Write(FString::Printf(TEXT("SHOT label fighter=%s mode=%s bbox=%s %s"), *F.Id,
+                                       Mode == ES08FighterLabelMode::Compact ? TEXT("compact")
+                                       : Mode == ES08FighterLabelMode::Hidden ? TEXT("hidden") : TEXT("full"),
+                                       *S08ArtHud::FormatRect(FS08ScreenRect::FromPoints(Corners)), *FrameField));
+    }
+  }
+  FS08Trace::Write(FString::Printf(TEXT("SHOT late end file=%s frame=%llu"), *File, Frame));
+}
+
+void AS08FlowGameMode::HandleScreenshotCaptured(int32 Width, int32 Height, const TArray<FColor>& Colors) {
+  // The engine calls this INSTEAD of writing the PNG (GameViewportClient.cpp ProcessScreenShots: a bound delegate
+  // receives the pixels, alpha forced to 255). Save them to the requested path and write the provenance line:
+  // sha256 over the raw pixel bytes in memory order B,G,R,A (FColor on little-endian Windows).
+  const FString Path = ArtHud.PendingCapturePath;
+  const uint64 RequestFrame = ArtHud.PendingCaptureRequestFrame;
+  ArtHud.PendingCapturePath.Reset();
+  const FString Sha = S08Sha256Hex(reinterpret_cast<const uint8*>(Colors.GetData()),
+                                   static_cast<int64>(Colors.Num()) * static_cast<int64>(sizeof(FColor)));
+  bool bSaved = false;
+  if (!Path.IsEmpty() && Colors.Num() == Width * Height) {
+    TArray64<uint8> Png;
+    FImageUtils::PNGCompressImageArray(Width, Height, Colors, Png);
+    bSaved = Png.Num() > 0 && FFileHelper::SaveArrayToFile(Png, *Path);
+  }
+  const FString Line = FString::Printf(TEXT("SHOT captured file=%s frame=%llu px=%dx%d sha256=%s order=BGRA saved=%d"),
+                                       Path.IsEmpty() ? TEXT("-") : *FPaths::GetCleanFilename(Path),
+                                       static_cast<unsigned long long>(GFrameCounter), Width, Height, *Sha,
+                                       bSaved ? 1 : 0);
+  TraceLines.Add(Line);
+  FS08Trace::Write(Line);
+  // W5b-R: the late SHOT section of THIS capture. FSlateApplication::TakeScreenshot has just painted the window for
+  // these pixels, so the cached widget geometry and the icon / tag / damage state are exactly what the PNG shows.
+  // A request whose capture slips to the next frame (T5.2 combat-result: the icon was hidden in between) got an
+  // end-of-frame section for the request frame already; this second section supersedes it (parsers take the last).
+  if (!Path.IsEmpty()) {
+    const FString File = FPaths::GetCleanFilename(Path);
+    ArtHud.LateShots.RemoveAll([&File](const FS08ArtHudRuntime::FLateShot& S) { return S.File == File; });
+    WriteArtHudLateLines(File, RequestFrame);
   }
 }
 
@@ -5850,52 +6426,24 @@ void AS08FlowGameMode::WriteArtHudShotLines() {
         *S08ArtHud::FormatRect(ArtHud.PlatePlanned), bPainted ? TEXT("painted") : TEXT("unpainted"),
         ArtHud.PlateStableFrames));
   }
-  if (ArtHud.bIconVisible) {
-    FS08ScreenRect Painted;
-    const bool bPainted = WidgetViewportRect(TSharedPtr<SWidget>(ArtHud.IconViews[S08ShownViewIndex(ArtHud, ArtHud.IconViews.Num())]->GetRoot()), Painted) &&
-                          !Painted.IsEmpty();
-    FS08Trace::Write(FString::Printf(TEXT("SHOT icon fighter=%s bbox=%s size=%d src=%s planned=%s geom=%s"),
-                                     *ArtHud.IconFighterId, *S08ArtHud::FormatRect(bPainted ? Painted : ArtHud.IconPlanned),
-                                     ArtHud.IconSize, *ArtHud.IconSource, *S08ArtHud::FormatRect(ArtHud.IconPlanned),
-                                     bPainted ? TEXT("painted") : TEXT("planned")));
-  }
-  WriteArtHudWidgetLines();
+  // W5b-R: each fighter's on-screen box (FigureScreenRect: base to figure top, with the team ring) - the "figure"
+  // obstacle of the plate / icon / tag / damage rules and of the qa010 checks.
   for (const FS08BoardFighter& F : Fighters) {
+    FS08ScreenRect R;
+    if (!F.IsAlive() || !FigureScreenRect(F.Id, R)) continue;
     const AS08FighterActor* Actor = BoardActor->FindFighterActor(F.Id);
-    FBox Box;
-    if (!Actor || !F.IsAlive() || !Actor->GetVisibleLabelBox(Box)) continue;
-    TArray<FVector2D> Corners;
-    for (int32 C = 0; C < 8; ++C) {
-      FVector2D S;
-      const FVector P((C & 1) ? Box.Max.X : Box.Min.X, (C & 2) ? Box.Max.Y : Box.Min.Y,
-                      (C & 4) ? Box.Max.Z : Box.Min.Z);
-      if (ProjectToViewport(P, S)) Corners.Add(S);
-    }
-    if (Corners.Num() != 8) continue;
-    const ES08FighterLabelMode Mode = Actor->GetLabelMode();
-    FS08Trace::Write(FString::Printf(TEXT("SHOT label fighter=%s mode=%s bbox=%s"), *F.Id,
-                                     Mode == ES08FighterLabelMode::Compact ? TEXT("compact")
-                                     : Mode == ES08FighterLabelMode::Hidden ? TEXT("hidden") : TEXT("full"),
-                                     *S08ArtHud::FormatRect(FS08ScreenRect::FromPoints(Corners))));
-  }
-  for (const FString& DamageId : BoardActor->GetActiveDamageNumberIds()) {
-    FBox Box;
-    if (!BoardActor->GetDamageNumberWorldBox(DamageId, Box)) continue;
-    TArray<FVector2D> Corners;
-    for (int32 C = 0; C < 8; ++C) {
-      FVector2D S;
-      const FVector P((C & 1) ? Box.Max.X : Box.Min.X, (C & 2) ? Box.Max.Y : Box.Min.Y,
-                      (C & 4) ? Box.Max.Z : Box.Min.Z);
-      if (ProjectToViewport(P, S)) Corners.Add(S);
-    }
-    if (Corners.Num() == 8) {
-      FS08Trace::Write(FString::Printf(TEXT("SHOT damage fighter=%s bbox=%s"), *DamageId,
-                                       *S08ArtHud::FormatRect(FS08ScreenRect::FromPoints(Corners))));
-    }
+    const ES08TeamSlot Team = BoardActor->TeamOfFighter(F);
+    FS08Trace::Write(FString::Printf(
+        TEXT("SHOT figure fighter=%s bbox=%s ringR=%.2f art=%d blockout=%d team=%s look=%s ring=%d"), *F.Id,
+        *S08ArtHud::FormatRect(R),
+        (Actor && Actor->HasArtFigure()) ? (F.bIsHero ? S08TeamRingSpec::HeroRectRadiusUU
+                                                      : S08TeamRingSpec::SidekickRectRadiusUU) : 30.0f,
+        Actor && Actor->HasArtFigure() ? 1 : 0, Actor && Actor->IsBlockout() ? 1 : 0, S08TeamSlotName(Team),
+        Actor ? S08TeamSlotName(Actor->GetLook()) : TEXT("-"), Actor && Actor->HasTeamRing() ? 1 : 0));
   }
 }
 
-void AS08FlowGameMode::WriteArtHudWidgetLines(const FString& Prefix) {
+void AS08FlowGameMode::WriteArtHudWidgetLines(const FString& Prefix, bool bLate) {
   // W4-C trace gate (engine gate memo, HUD row "gates by SHOT widget traces"):
   // the painted viewport-pixel bbox of every part of every view, one line per
   // part. Format (docs/art-pipeline/qa010/README.md):
@@ -5904,11 +6452,20 @@ void AS08FlowGameMode::WriteArtHudWidgetLines(const FString& Prefix) {
   // twin=1 is the compare-mode Slate twin (render opacity 0, same slot
   // geometry): "bbox UMG = Slate +-1 px" compares the two on the SAME frame.
   // A part is "painted" once its view has kept its place for 2 frames.
-  auto Emit = [this, &Prefix](const FS08WidgetPart& Part, const TCHAR* Impl, const TCHAR* State,
-                              const FString& Fighter, bool bStable, bool bTwin, const FString& Source) {
+  auto Emit = [this, &Prefix, bLate](const FS08WidgetPart& Part, const TCHAR* Impl, const TCHAR* State,
+                                     const FString& Fighter, bool bStable, bool bTwin, const FString& Source) {
     FS08ScreenRect Rect;
-    const bool bPainted = bStable && WidgetViewportRect(Part.Widget, Rect) && !Rect.IsEmpty();
-    FS08Trace::Write(Prefix + S08ArtHud::FormatWidgetLine(Part.Id, Impl, State, Fighter, Rect, bPainted, bTwin, Source));
+    if (!bLate) {
+      const bool bPainted = bStable && WidgetViewportRect(Part.Widget, Rect) && !Rect.IsEmpty();
+      FS08Trace::Write(Prefix + S08ArtHud::FormatWidgetLine(Part.Id, Impl, State, Fighter, Rect, bPainted, bTwin, Source));
+      return;
+    }
+    // W5b-R end of the requesting frame: the widget's ACTUAL visibility and painted geometry.
+    const bool bVisible = Part.Widget.IsValid() && Part.Widget->GetVisibility().IsVisible() && !bTwin;
+    const bool bPainted = bVisible && bStable && WidgetViewportRect(Part.Widget, Rect) && !Rect.IsEmpty();
+    FS08Trace::Write(Prefix + S08ArtHud::FormatWidgetLineEx(
+        Part.Id, Impl, State, Fighter, Rect, bPainted, bVisible, Source,
+        FString::Printf(TEXT("frame=%llu"), static_cast<unsigned long long>(GFrameCounter))));
   };
   const bool bAlternate = static_cast<ES08ArtHudImpl>(ArtHud.Impl) == ES08ArtHudImpl::Alternate;
   if (ArtHud.bPlateVisible) {

@@ -92,6 +92,11 @@ AS08FighterActor::AS08FighterActor() {
   Ring->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   Ring->SetVisibility(false);
 
+  TeamRing = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TeamRing"));
+  TeamRing->SetupAttachment(RootComponent);
+  TeamRing->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  TeamRing->SetVisibility(false);
+
   TargetRing = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TargetRing"));
   TargetRing->SetupAttachment(RootComponent);
   TargetRing->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -163,6 +168,7 @@ void AS08FighterActor::BeginPlay() {
       TargetIcon->SetRelativeScale3D(FVector(0.042f));
       bArtTargetIconLoaded = true;
     }
+    LoadTeamRingAssets();
   }
   // W4-A game layer: rings, team base and labels cast no shadow and stay out
   // of Lumen / distance-field lighting (the art figure and pedestal do not).
@@ -171,7 +177,8 @@ void AS08FighterActor::BeginPlay() {
                                          static_cast<UPrimitiveComponent*>(Base.Get()),
                                          static_cast<UPrimitiveComponent*>(Label.Get()),
                                          static_cast<UPrimitiveComponent*>(HpLabel.Get()),
-                                         static_cast<UPrimitiveComponent*>(TargetIcon.Get())}) {
+                                         static_cast<UPrimitiveComponent*>(TargetIcon.Get()),
+                                         static_cast<UPrimitiveComponent*>(TeamRing.Get())}) {
     S08ApplyGameLayerPrimitive(GameLayer);
   }
   // Text faces the camera (+Y side, camera yaw -90 looks along -Y).
@@ -183,6 +190,19 @@ void AS08FighterActor::BeginPlay() {
     TargetMid->SetVectorParameterValue(TEXT("Tint"), FLinearColor(1.4f, 0.18f, 0.06f));
     TargetRing->SetMaterial(0, TargetMid);
   }
+}
+
+bool AS08FighterActor::LoadTeamRingAssets() {
+  // W5b-R D-3: team ring meshes + keyline / fill MIs (game-layer master); -S08LegacyRender keeps the pre-W5b disc.
+  if (S08LegacyRender()) return false;
+  TeamRingMeshP1 = LoadObject<UStaticMesh>(nullptr, S08TeamRingSpec::MeshPath(ES08TeamSlot::P1));
+  TeamRingMeshP2 = LoadObject<UStaticMesh>(nullptr, S08TeamRingSpec::MeshPath(ES08TeamSlot::P2));
+  TeamRingKeyline = LoadObject<UMaterialInterface>(nullptr, S08TeamRingSpec::KeylineMaterialPath);
+  TeamRingFill = LoadObject<UMaterialInterface>(nullptr, S08TeamRingSpec::FillMaterialPath);
+  bTeamRingReady = TeamRingMeshP1 && TeamRingMeshP2 && TeamRingKeyline && TeamRingFill;
+  if (bTeamRingReady && !TeamRingFillMid) TeamRingFillMid = UMaterialInstanceDynamic::Create(TeamRingFill, this);
+  bTeamRingReady = bTeamRingReady && TeamRingFillMid;
+  return bTeamRingReady;
 }
 
 void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
@@ -210,9 +230,16 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
         : nullptr;
     UStaticMesh* Pedestal = LoadObject<UStaticMesh>(nullptr,
         TEXT("/Game/ArtPreview/Medusa/Meshes/SM_Medusa_Base_v2Candidate"));
-    UMaterialInterface* TeamMaterial = LoadObject<UMaterialInterface>(nullptr,
-        bOwn ? TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_Blue")
-             : TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_Red"));
+    // W5b-R D-2: the TeamColor MI by the team look (MI_Medusa_P1 Gold / _P2 Silver, pastel of the hue); the former
+    // own/enemy MI_Medusa_Blue/_Red stay the fallback and the -S08LegacyRender look.
+    UMaterialInterface* TeamMaterial = S08LegacyRender() ? nullptr : LoadObject<UMaterialInterface>(nullptr,
+        Look == ES08TeamSlot::P1 ? TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_P1")
+                                 : TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_P2"));
+    if (!TeamMaterial) {
+      TeamMaterial = LoadObject<UMaterialInterface>(nullptr,
+          bOwn ? TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_Blue")
+               : TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_Red"));
+    }
     bVisualArt = Mesh && Mesh->GetSkeleton() && Pedestal && TeamMaterial;
     if (bVisualArt) {
       CandidateMesh = Mesh;
@@ -234,11 +261,12 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
         const UMaterialInterface* Slot1 = ArtBody->GetMaterial(1);
         const UMaterialInterface* BaseMaterial = ArtBase->GetMaterial(0);
         FS08Trace::Write(FString::Printf(
-            TEXT("ARTPREVIEW medusa materials fighter=%s team=%s mesh=%s slots=%d mi=%s slot1=%s base=%s parent=%s params=%d miSha256=%s"),
+            TEXT("ARTPREVIEW medusa materials fighter=%s team=%s mesh=%s slots=%d mi=%s slot1=%s base=%s parent=%s params=%d miSha256=%s teamSlot=%s look=%s mode=%s"),
             *Fighter.Id, bOwn ? TEXT("own") : TEXT("enemy"), *Mesh->GetName(), ArtBody->GetNumMaterials(),
             ArtBody->GetMaterial(0) ? *ArtBody->GetMaterial(0)->GetPathName() : TEXT("-"),
             Slot1 ? *Slot1->GetPathName() : TEXT("-"),
-            BaseMaterial ? *BaseMaterial->GetPathName() : TEXT("-"), *Parent, Params, *Digest));
+            BaseMaterial ? *BaseMaterial->GetPathName() : TEXT("-"), *Parent, Params, *Digest,
+            S08TeamSlotName(Team), S08TeamSlotName(Look), S08TeamColorModeName(TeamMode)));
       }
     }
   }
@@ -268,6 +296,7 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   ArtPlaceholder->SetVisibility(bVisualBlockout);
   bArtFigureVisible = bArtFigure;
   bMedusaVisual = bVisualArt;
+  bBlockoutVisible = bVisualBlockout;
 
   // ART-004 T2.2 click volume. The hidden grey Body box (60x60x120 uu for a
   // hero) kept catching visibility traces far above the 55-uu sculpt; an art
@@ -380,6 +409,34 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
     Label->SetRelativeLocation(FVector(0, 0, Fighter.bIsHero ? 82.0f : 65.0f));
     HpLabel->SetRelativeLocation(FVector(0, 0, Fighter.bIsHero ? 66.0f : 52.0f));
   }
+  // W5b-R D-3: the authored team ring replaces the grey disc of an art figure (the T5.2 disc top lay in the tile
+  // plane z = 0 and z-fought with it: A/B in the live editor, act W5b-R). The disc keeps its query collision (click
+  // volume of the grey path); only its rendering goes. Grey S08/S09 (no art figure) keep the blue/red disc.
+  bTeamRingShown = bArtFigure && bTeamRingReady;
+  if (bTeamRingShown) {
+    const float FigureScale = Fighter.bIsHero ? 1.0f : S08TeamRingSpec::SidekickScale;
+    TeamRing->SetStaticMesh(Look == ES08TeamSlot::P1 ? TeamRingMeshP1.Get() : TeamRingMeshP2.Get());
+    TeamRing->SetRelativeLocation(FVector::ZeroVector);
+    TeamRing->SetRelativeScale3D(FVector(FigureScale, FigureScale, 1.0f));
+    TeamRing->SetMaterial(0, TeamRingKeyline);
+    TeamRingFillMid->SetVectorParameterValue(TEXT("LayerColor"), S08TeamPalette::RingFill(Look));
+    TeamRing->SetMaterial(1, TeamRingFillMid);
+  }
+  TeamRing->SetVisibility(bTeamRingShown);
+  Base->SetVisibility(!bTeamRingShown);
+  if (bArtPreview && !bTeamRingTraced) {
+    bTeamRingTraced = true;
+    const FLinearColor Fill = S08TeamPalette::RingFill(Look);
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW team ring fighter=%s team=%s look=%s mode=%s shape=%s shown=%d mesh=%s fill=%s keyline=%s fillLinear=(%.4f,%.4f,%.4f) zMin=%.2f zMax=%.2f scale=%.2f base=%s blockout=%d art=%d"),
+        *Fighter.Id, S08TeamSlotName(Team), S08TeamSlotName(Look), S08TeamColorModeName(TeamMode),
+        S08TeamShapeName(Look), bTeamRingShown ? 1 : 0,
+        bTeamRingShown ? *TeamRing->GetStaticMesh()->GetName() : TEXT("none"),
+        Look == ES08TeamSlot::P1 ? S08TeamPalette::P1Hex : S08TeamPalette::P2Hex, S08TeamPalette::KeylineHex,
+        Fill.R, Fill.G, Fill.B, S08TeamRingSpec::ZMin, S08TeamRingSpec::ZMax,
+        Fighter.bIsHero ? 1.0f : S08TeamRingSpec::SidekickScale, bTeamRingShown ? TEXT("hidden") : TEXT("shown"),
+        bVisualBlockout ? 1 : 0, bVisualArt ? 1 : 0));
+  }
 
   // SetupCameraForBoard pulls the camera back to fit bigger boards, which
   // shrinks on-screen text; grow both lines back with the camera distance
@@ -473,7 +530,18 @@ void AS08FighterActor::SetLabelMode(ES08FighterLabelMode Mode) {
   ApplyLabelVisibility();
 }
 
+void AS08FighterActor::SetWorldLabelsSuppressed(bool bSuppressed) {
+  if (bWorldLabelsSuppressed == bSuppressed) return;
+  bWorldLabelsSuppressed = bSuppressed;
+  ApplyLabelVisibility();
+}
+
 void AS08FighterActor::ApplyLabelVisibility() {
+  if (bWorldLabelsSuppressed) {
+    Label->SetVisibility(false);
+    HpLabel->SetVisibility(false);
+    return;
+  }
   const float Ratio = LastLabelRatio > 0.0f ? LastLabelRatio : 1.0f;
   if (LabelMode == ES08FighterLabelMode::Compact) {
     // One short line "Label HP" at the name height: neighbours of the plate
@@ -505,4 +573,14 @@ bool AS08FighterActor::GetVisibleLabelBox(FBox& OutBox) const {
 
 float AS08FighterActor::GetFigureHeightUU() const {
   return FigureHeightUU;
+}
+
+bool AS08FighterActor::IsBaseVisible() const { return Base && Base->IsVisible(); }
+
+bool AS08FighterActor::IsTeamRingVisible() const { return TeamRing && TeamRing->IsVisible(); }
+
+const UStaticMesh* AS08FighterActor::GetTeamRingMesh() const { return TeamRing ? TeamRing->GetStaticMesh() : nullptr; }
+
+FVector AS08FighterActor::GetTeamRingScale() const {
+  return TeamRing ? TeamRing->GetRelativeScale3D() : FVector::ZeroVector;
 }

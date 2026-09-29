@@ -22,6 +22,7 @@ struct FS08PlateTexts {
   FText Statuses;
   float HpFraction = 0.0f;  // 0..1
   bool bOwn = true;
+  uint8 TeamSlot = 0;       // W5b-R: team LOOK slot of the chip (0 = P1 circle, 1 = P2 hexagon)
 };
 
 namespace S08ArtHudText {

@@ -19,6 +19,20 @@ block, i.e. between `SHOT ctx` and `SHOT requested`, at capture time:
 A standalone `PLATE fighter=ID bbox=(...) [overlapReachable=N]` or
 `REACHABLE fighter=ID n=N cells=...` line (outside a block) is accepted as the
 latest state for the next shot, and marked source="standalone-latest".
+
+W5b-R (honest SHOT lines, t53-thresholds.json shotCaptured): a W5b-R client writes
+  SHOT figure fighter=ID bbox=(...) ringR=R art=0|1 blockout=0|1 team=P1|P2 look=P1|P2 ring=0|1   (in the block)
+  SHOT request file=NAME frame=N                                                             (in the block)
+  SHOT captured file=NAME frame=N px=WxH sha256=HEX order=BGRA saved=1        (capture delegate, after the block)
+  SHOT late begin file=NAME frame=N requestFrame=M
+    SHOT icon fighter=ID bbox=(...) ... visible=1 ... frame=N   | SHOT iconstate visible=0 ...
+    SHOT widget id=... frame=N        SHOT panel id=... bbox=(...) geom=... visible=...
+    SHOT damage fighter=ID bbox=(...) frame=N        SHOT label ... frame=N
+  SHOT late end file=NAME frame=N
+The late section belongs to the block named NAME: its icon comes ONLY from the late section (the request-time
+state may be hidden later in the same tick - T5.2: visible=1 without the icon in the pixels), never from a
+standalone ICON line. A client writes a second late section from the capture delegate (the state painted into
+the captured pixels) when the capture slipped past the request frame; the LAST section of a file wins.
 """
 
 from __future__ import annotations
@@ -48,6 +62,30 @@ NEW_PLATE = re.compile(rf"^(?:SHOT plate|PLATE) fighter=(\S+) bbox={BBOX}(?: ove
 NEW_ICON = re.compile(rf"^(?:SHOT icon|ICON) fighter=(\S+) bbox={BBOX}")
 SELECTION = re.compile(r"^ARTPREVIEW selection ownHero=(\d) selected=(\d) fighter=(.+?) reachable=(\d+)(?: fighterId=(\S+))?")
 FOCUS = re.compile(rf"^ARTPREVIEW camera focus requested zoom=({NUM}) overview=({NUM}) target=({NUM})")
+SHOT_FIGURE = re.compile(rf"^SHOT figure fighter=(\S+) bbox={BBOX}(.*)$")
+SHOT_REQUEST_FRAME = re.compile(r"^SHOT request file=(\S+) frame=(\d+)")
+SHOT_CAPTURED = re.compile(r"^SHOT captured file=(\S+) frame=(\d+) px=(\d+)x(\d+) sha256=([0-9a-f]{64}) "
+                           r"order=(\w+) saved=(\d)")
+SHOT_LATE_BEGIN = re.compile(r"^SHOT late begin file=(\S+) frame=(\d+)")
+SHOT_LATE_END = re.compile(r"^SHOT late end file=(\S+)")
+SHOT_WIDGET = re.compile(r"^SHOT widget (.*)$")
+SHOT_PANEL = re.compile(rf"^SHOT panel id=(\S+) bbox={BBOX} geom=(\w+) visible=(\d)")
+SHOT_DAMAGE = re.compile(rf"^SHOT damage fighter=(\S+) bbox={BBOX}")
+KV = re.compile(r"(\w[\w.]*)=(\([^)]*\)|\S+)")
+
+
+def parse_kv(text: str) -> dict:
+    """key=value fields of a trace line; bbox values '(x0,y0,x1,y1)' become float tuples."""
+    out: dict = {}
+    for k, v in KV.findall(text):
+        if v.startswith("(") and v.endswith(")"):
+            try:
+                out[k] = tuple(float(x) for x in v[1:-1].split(","))
+                continue
+            except ValueError:
+                pass
+        out[k] = v
+    return out
 
 
 class TraceError(ValueError):
@@ -117,6 +155,16 @@ class ShotBlock:
     icon: Optional[Tagged] = None        # value: dict(fighter, bbox)
     selection: Optional[dict] = None     # latest ARTPREVIEW selection before shot
     focus: Optional[dict] = None         # latest ARTPREVIEW camera focus before shot
+    # W5b-R: figure boxes (request time), the request frame, the capture provenance and the late section
+    figures: dict = field(default_factory=dict)   # fighter id -> dict(bbox, fields)
+    request_frame: Optional[int] = None
+    captured: Optional[dict] = None
+    late: bool = False
+    late_frame: Optional[int] = None
+    widgets: list = field(default_factory=list)   # dicts of the late 'SHOT widget' lines
+    panels: list = field(default_factory=list)
+    damage: list = field(default_factory=list)
+    icon_hidden_late: bool = False
 
     @property
     def name(self) -> str:
@@ -180,6 +228,14 @@ def parse_trace_text(text: str, path: str = "<memory>") -> Trace:
     latest_sel: Optional[dict] = None
     latest_focus: Optional[dict] = None
     unknown_new: list[str] = []
+    late: Optional[ShotBlock] = None
+
+    def by_name(name: str) -> Optional[ShotBlock]:
+        base = re.split(r"[\\/]", name)[-1]
+        for blk in reversed(shots + ([cur] if cur is not None else [])):
+            if blk.name == base:
+                return blk
+        return None
 
     def close(block: ShotBlock) -> None:
         if block.plate is None and latest_plate is not None:
@@ -214,6 +270,61 @@ def parse_trace_text(text: str, path: str = "<memory>") -> Trace:
         if (mm := FOCUS.match(payload)):
             latest_focus = {"line": line_no, "zoom": float(mm.group(1)),
                             "overview": float(mm.group(2)), "target": float(mm.group(3))}
+            continue
+        # ---- W5b-R late section / capture provenance (attached by file name)
+        if (mm := SHOT_LATE_BEGIN.match(payload)):
+            late = by_name(mm.group(1))
+            if late is not None:
+                late.late = True
+                late.late_frame = int(mm.group(2))
+                late.icon = None  # the late section is the only source of the captured icon
+                late.icon_hidden_late = False
+                # a later section of the same file (written by the capture delegate when the capture slipped to the
+                # next frame) supersedes the earlier one completely
+                late.widgets, late.panels, late.damage = [], [], []
+            continue
+        if SHOT_LATE_END.match(payload):
+            late = None
+            continue
+        if (mm := SHOT_CAPTURED.match(payload)):
+            blk = by_name(mm.group(1))
+            if blk is not None:
+                blk.captured = {"frame": int(mm.group(2)), "px": (int(mm.group(3)), int(mm.group(4))),
+                                "sha256": mm.group(5), "order": mm.group(6), "saved": mm.group(7) == "1",
+                                "line": line_no}
+            continue
+        if late is not None:
+            if (mm := NEW_ICON.match(payload)) and payload.startswith("SHOT "):
+                g = mm.groups()
+                late.icon = Tagged({"fighter": g[0], "bbox": _f(g[1], g[2], g[3], g[4]),
+                                    **{k: v for k, v in parse_kv(payload).items() if k not in ("fighter", "bbox")}},
+                                   line_no, "shot-late")
+                continue
+            if payload.startswith("SHOT iconstate"):
+                late.icon = None
+                late.icon_hidden_late = True
+                continue
+            if (mm := SHOT_WIDGET.match(payload)):
+                late.widgets.append({**parse_kv(mm.group(1)), "line": line_no})
+                continue
+            if (mm := SHOT_PANEL.match(payload)):
+                g = mm.groups()
+                late.panels.append({"id": g[0], "bbox": _f(g[1], g[2], g[3], g[4]), "geom": g[5],
+                                    "visible": g[6] == "1", "line": line_no})
+                continue
+            if (mm := SHOT_DAMAGE.match(payload)):
+                g = mm.groups()
+                late.damage.append({"fighter": g[0], "bbox": _f(g[1], g[2], g[3], g[4]), "line": line_no})
+                continue
+            continue  # other late lines (labels, ...) are informational
+        if (mm := SHOT_FIGURE.match(payload)):
+            if cur is not None:
+                g = mm.groups()
+                cur.figures[g[0]] = {"bbox": _f(g[1], g[2], g[3], g[4]), **parse_kv(g[5])}
+            continue
+        if (mm := SHOT_REQUEST_FRAME.match(payload)):
+            if cur is not None:
+                cur.request_frame = int(mm.group(2))
             continue
         if (mm := SHOT_CTX.match(payload)):
             if cur is not None:

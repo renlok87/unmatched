@@ -8,9 +8,7 @@
 #include "Misc/Paths.h"
 
 namespace {
-constexpr float MarkZ = 0.28f;   // above the play plane (tile tops at z=0)
-constexpr float EdgeUU = 46.0f;  // stroke centre line from the cell centre
-constexpr float MarkDepth = 0.004f;
+using namespace S08ZoneMarkSpec;
 constexpr int32 MaxPointLights = 6;
 
 struct FStrokeSeg {
@@ -38,7 +36,9 @@ void StrokeSegments(ES08ZoneStroke Stroke, TArray<FStrokeSeg>& Out) {
       for (const float A : {-40.0f, -20.0f, 0.0f, 20.0f, 40.0f}) Out.Add({A, 0.08f, 0.0f, 0.05f});
       break;
     case ES08ZoneStroke::Double:
-      for (const float C : {-3.0f, 3.0f}) Out.Add({0.0f, 0.96f, C, 0.02f});
+      // W5b-R D-4: two 3-uu lines with a 3-uu gap (was 2 uu each) - the 1.5-uu keylines of the two lines meet in
+      // the gap and fill it dark.
+      for (const float C : {-3.0f, 3.0f}) Out.Add({0.0f, 0.96f, C, 0.03f});
       break;
     case ES08ZoneStroke::DashDot:
       Out.Add({-24.0f, 0.44f, 0.0f, 0.04f});
@@ -420,6 +420,43 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
   }
   FallbackStyle.bFallback = true;
 
+  // W5b-R D-4: the dark keyline under zone strokes and glyphs (optional block; absent = no keylines, rev <= 3).
+  Keyline = FS08ZoneKeyline();
+  const TSharedPtr<FJsonObject>* KeylineObj = nullptr;
+  if (Root->TryGetObjectField(TEXT("zoneKeyline"), KeylineObj) && KeylineObj && KeylineObj->IsValid()) {
+    FString Color;
+    double Grow = 0.0;
+    if (!(*KeylineObj)->TryGetStringField(TEXT("color"), Color) || !ParseHexColor(Color, Keyline.Color)) {
+      OutErrors.Add(FString::Printf(TEXT("zoneKeyline: color '%s' is not #RRGGBB"), *Color));
+    } else if (!(*KeylineObj)->TryGetNumberField(TEXT("growUU"), Grow) ||
+               !FMath::IsNearlyEqual(Grow, static_cast<double>(KeylineGrowUU), 1e-3)) {
+      OutErrors.Add(FString::Printf(TEXT("zoneKeyline: growUU %.3f != %.1f (the C++ geometry, S08ZoneMarkSpec)"), Grow,
+                                    KeylineGrowUU));
+    } else {
+      Keyline.bSet = true;
+      Keyline.GrowUU = static_cast<float>(Grow);
+      (*KeylineObj)->TryGetStringField(TEXT("materialInstance"), Keyline.MaterialInstancePath);
+      if (!Keyline.MaterialInstancePath.IsEmpty() && !Keyline.MaterialInstancePath.StartsWith(TEXT("/Game/"))) {
+        OutErrors.Add(FString::Printf(TEXT("zoneKeyline: materialInstance '%s' is not a /Game/ path"),
+                                      *Keyline.MaterialInstancePath));
+        Keyline.bSet = false;
+      }
+      const TSharedPtr<FJsonObject>* KeyMeshes = nullptr;
+      if ((*KeylineObj)->TryGetObjectField(TEXT("glyphMeshes"), KeyMeshes) && KeyMeshes && KeyMeshes->IsValid()) {
+        for (const TPair<FString, TSharedPtr<FJsonValue>>& Pair : (*KeyMeshes)->Values) {
+          ES08ZoneGlyph Glyph;
+          FString Path;
+          if (!S08ParseZoneGlyph(Pair.Key, Glyph) || !Pair.Value.IsValid() || !Pair.Value->TryGetString(Path) ||
+              !Path.StartsWith(TEXT("/Game/")) || Path.Contains(TEXT(" "))) {
+            OutErrors.Add(FString::Printf(TEXT("zoneKeyline.glyphMeshes %s: bad entry"), *Pair.Key));
+            continue;
+          }
+          Keyline.GlyphMeshPaths.Add(Pair.Key, Path);
+        }
+      }
+    }
+  }
+
   // T4.2 glyph meshes: glyph name -> /Game/ static mesh package (one per glyph shape).
   GlyphMeshPaths.Reset();
   const TSharedPtr<FJsonObject>* GlyphMeshes = nullptr;
@@ -609,27 +646,49 @@ FString S08ExpectMismatch(const FS08BoardArtProfile& Profile, const FS08BoardSum
   return FString::Join(Out, TEXT(","));
 }
 
-void S08StrokePieces(ES08ZoneStroke Stroke, int32 Side, TArray<FTransform>& Out) {
+float S08ZoneStrokeHalfExtentUU(ES08ZoneStroke Stroke) {
   TArray<FStrokeSeg> Segs;
   StrokeSegments(Stroke, Segs);
+  float Half = 0.0f;
+  for (const FStrokeSeg& S : Segs) Half = FMath::Max(Half, FMath::Abs(S.Across) + S.Thick * 50.0f);
+  return Half;
+}
+
+float S08ZoneStrokeCenterUU(ES08ZoneStroke Stroke) {
+  // D-4: the nominal 42-uu centre line, pulled further in so that the fill plus the keyline of every stroke type
+  // stays <= MaxOuterUU (1 uu inside the 46-uu slab edge; the T5.2 strokes at 46 were half in the dark groove).
+  return FMath::Min(EdgeUU, MaxOuterUU - KeylineGrowUU - S08ZoneStrokeHalfExtentUU(Stroke));
+}
+
+float S08ZoneStrokeOuterUU(ES08ZoneStroke Stroke, bool bKeyline) {
+  return S08ZoneStrokeCenterUU(Stroke) + S08ZoneStrokeHalfExtentUU(Stroke) + (bKeyline ? KeylineGrowUU : 0.0f);
+}
+
+namespace {
+void StrokePiecesAt(ES08ZoneStroke Stroke, int32 Side, float GrowUU, float Z, float Depth, TArray<FTransform>& Out) {
+  TArray<FStrokeSeg> Segs;
+  StrokeSegments(Stroke, Segs);
+  const float Edge = S08ZoneStrokeCenterUU(Stroke);
+  const float G = 2.0f * GrowUU / 100.0f;
   for (const FStrokeSeg& S : Segs) {
     FVector Pos;
     FVector Scale;
     switch (Side % 4) {
-      case 0: Pos = FVector(S.Along, EdgeUU + S.Across, MarkZ); Scale = FVector(S.Length, S.Thick, MarkDepth); break;
-      case 1: Pos = FVector(-EdgeUU - S.Across, S.Along, MarkZ); Scale = FVector(S.Thick, S.Length, MarkDepth); break;
-      case 2: Pos = FVector(S.Along, -EdgeUU - S.Across, MarkZ); Scale = FVector(S.Length, S.Thick, MarkDepth); break;
-      default: Pos = FVector(EdgeUU + S.Across, S.Along, MarkZ); Scale = FVector(S.Thick, S.Length, MarkDepth); break;
+      case 0: Pos = FVector(S.Along, Edge + S.Across, Z); Scale = FVector(S.Length + G, S.Thick + G, Depth); break;
+      case 1: Pos = FVector(-Edge - S.Across, S.Along, Z); Scale = FVector(S.Thick + G, S.Length + G, Depth); break;
+      case 2: Pos = FVector(S.Along, -Edge - S.Across, Z); Scale = FVector(S.Length + G, S.Thick + G, Depth); break;
+      default: Pos = FVector(Edge + S.Across, S.Along, Z); Scale = FVector(S.Thick + G, S.Length + G, Depth); break;
     }
     Out.Add(FTransform(FRotator::ZeroRotator, Pos, Scale));
   }
 }
 
-void S08GlyphPieces(ES08ZoneGlyph Glyph, int32 Slot, TArray<FTransform>& Out) {
+void GlyphPiecesAt(ES08ZoneGlyph Glyph, int32 Slot, float GrowUU, float Z, float Depth, TArray<FTransform>& Out) {
   const FVector2D P2 = GlyphSlot(Slot);
-  const FVector P(P2.X, P2.Y, MarkZ);
+  const FVector P(P2.X, P2.Y, Z);
+  const float G = 2.0f * GrowUU / 100.0f;
   auto Add = [&](float Yaw, const FVector& Offset, float SX, float SY) {
-    Out.Add(FTransform(FRotator(0.0f, Yaw, 0.0f), P + Offset, FVector(SX, SY, MarkDepth)));
+    Out.Add(FTransform(FRotator(0.0f, Yaw, 0.0f), P + Offset, FVector(SX + G, SY + G, Depth)));
   };
   switch (Glyph) {
     case ES08ZoneGlyph::Diamond: Add(45.0f, FVector::ZeroVector, 0.18f, 0.18f); break;  // ART-005 blue
@@ -668,10 +727,27 @@ void S08GlyphPieces(ES08ZoneGlyph Glyph, int32 Slot, TArray<FTransform>& Out) {
       break;
   }
 }
+}  // namespace
+
+void S08StrokePieces(ES08ZoneStroke Stroke, int32 Side, TArray<FTransform>& Out) {
+  StrokePiecesAt(Stroke, Side, 0.0f, StrokeZ, StrokeDepth, Out);
+}
+
+void S08StrokeKeylinePieces(ES08ZoneStroke Stroke, int32 Side, TArray<FTransform>& Out) {
+  StrokePiecesAt(Stroke, Side, KeylineGrowUU, StrokeKeylineZ, KeylineDepth, Out);
+}
+
+void S08GlyphPieces(ES08ZoneGlyph Glyph, int32 Slot, TArray<FTransform>& Out) {
+  GlyphPiecesAt(Glyph, Slot, 0.0f, GlyphZ, GlyphDepth, Out);
+}
+
+void S08GlyphKeylinePieces(ES08ZoneGlyph Glyph, int32 Slot, TArray<FTransform>& Out) {
+  GlyphPiecesAt(Glyph, Slot, KeylineGrowUU, GlyphZ, KeylineDepth, Out);
+}
 
 FVector S08GlyphAnchor(int32 Slot) {
   const FVector2D P2 = GlyphSlot(Slot);
-  return FVector(P2.X, P2.Y, MarkZ);
+  return FVector(P2.X, P2.Y, GlyphZ);
 }
 
 FS08ZoneMarkLayout S08BuildZoneMarks(const FS08BoardModel& Board, const FS08BoardArtData& Data) {
@@ -689,9 +765,22 @@ FS08ZoneMarkLayout S08BuildZoneMarks(const FS08BoardModel& Board, const FS08Boar
         const FS08ZoneStyle Style = Data.StyleFor(Key);
         if (Style.bFallback) L.FallbackKeys.AddUnique(Key);
         L.CellsByKey.FindOrAdd(Key) += 1;
-        TArray<FTransform> Strokes, Glyphs;
+        TArray<FTransform> Strokes, Glyphs, StrokeKeys, GlyphKeys;
         S08StrokePieces(Style.Stroke, I, Strokes);
         S08GlyphPieces(Style.Glyph, I, Glyphs);
+        // W5b-R D-4 keylines (never counted in *PiecesByKey: the legacy Cobble trace stays byte-compatible)
+        S08StrokeKeylinePieces(Style.Stroke, I, StrokeKeys);
+        S08GlyphKeylinePieces(Style.Glyph, I, GlyphKeys);
+        for (const FTransform& T : StrokeKeys) {
+          FTransform W = T;
+          W.SetTranslation(World + T.GetTranslation());
+          L.StrokeKeylines.Add({Key, FIntPoint(X, Y), I, W});
+        }
+        for (const FTransform& T : GlyphKeys) {
+          FTransform W = T;
+          W.SetTranslation(World + T.GetTranslation());
+          L.GlyphKeylines.Add({Key, FIntPoint(X, Y), I, W});
+        }
         for (const FTransform& T : Strokes) {
           FTransform W = T;
           W.SetTranslation(World + T.GetTranslation());

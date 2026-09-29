@@ -255,6 +255,23 @@ bool FS08ArtHudPlacementTest::RunTest(const FString&) {
   TestTrue("clean", Moved.bClean);
   TestTrue("not below (soft obstacle)", Moved.Candidate != TEXT("below"));
   TestTrue("first clean candidate is above", Moved.Candidate == TEXT("above") && Moved.Ring == 0);
+
+  // W5b-R binding (T5.2 errata "plate under King Arthur"): a neighbour figure right below the owner's slot.
+  // Without binding the plate goes below both (clean of soft overlap); with binding it must stay nearer its owner.
+  S08ArtHud::FPlacementInput Bind;
+  Bind.Viewport = FVector2D(1920, 1080);
+  Bind.PlateSize = FVector2D(172, 54);
+  Bind.Anchor = FS08ScreenRect(915, 389, 1005, 512);                    // owner (Medusa)
+  const FS08ScreenRect Neighbour(914, 517, 1006, 643);                   // King Arthur below the owner
+  Bind.Soft = {Bind.Anchor, Neighbour, FS08ScreenRect(1081, 410, 1154, 504), FS08ScreenRect(766, 410, 839, 504)};
+  Bind.BindTarget = Bind.Anchor;
+  Bind.BindOthers = {Neighbour, FS08ScreenRect(1081, 410, 1154, 504), FS08ScreenRect(766, 410, 839, 504)};
+  const S08ArtHud::FPlacementResult Bound = S08ArtHud::ChoosePlateRect(Bind);
+  TestTrue("bound plate", Bound.bBound);
+  TestTrue("nearer the owner than King Arthur",
+           S08ArtHud::RectGap(Bound.Rect, Bind.Anchor) < S08ArtHud::RectGap(Bound.Rect, Neighbour));
+  TestTrue("rect gap of touching rects is 0",
+           S08ArtHud::RectGap(FS08ScreenRect(0, 0, 10, 10), FS08ScreenRect(10, 0, 20, 10)) == 0.0);
   return true;
 }
 

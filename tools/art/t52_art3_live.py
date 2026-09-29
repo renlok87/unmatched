@@ -35,7 +35,16 @@ art004_live_k2.py build/package) and the art-worktree backend on :3120.
             W5-live3: crop sheets of the per-fighter team rings and of the
             world labels / damage numbers measured by 'analyze'.
 
+  errata-w5br
+            W5b-R errata of the T5.2 checklists (no re-shoot, no re-measure):
+            plate-k1-host.json joins the results, the K3 row is split
+            (target frame/arcs vs icon), the damage frame is marked as an
+            ability's damage (CUE seq before the first COMBAT_RESOLVE, from the
+            joiner trace), the Cobble plate under King Arthur and the combat
+            panel over the board are noted; the checklists are regenerated.
+
 W5-live3 order: icon-template -> analyze (each board) -> readability-sheets.
+W5b-R: errata-w5br (after analyze; 'analyze' applies the same errata itself).
 
 Statuses stay honest: «измерено», never «принято». Thresholds are the ones
 registered before the shots (<evidence>/t52-thresholds.json).
@@ -182,7 +191,7 @@ def cmd_k3(a) -> int:
     cmd = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(COMBAT),
            "-Api", L.API, "-EvidenceDir", str(evidence), "-ArtPreview", "-FullHd", "-ClientFps", str(a.client_fps),
            "-ArtPreviewBoardId", a.board_id, "-ArtPreviewMedusaVariant", a.variant, "-RunSeconds", str(a.run_seconds),
-           "-ClientRenderPreset", "High", "-RequireRenderReference", "-ClientPerf"]
+           "-ClientRenderPreset", "High", "-RequireRenderReference", "-ClientPerf"] + list(a.extra_demo_arg or [])
     record = {"schema": "unmatched.t52-k3-run/1", "label": a.label, "startedLocal": L.now_local(),
               "argv": [c if not c.startswith(str(REPO)) else rel(Path(c)) for c in cmd],
               "credentials": "S08_DEMO_* from backend/.env injected as S09_DEMO_* into the child environment only",
@@ -850,6 +859,7 @@ def cmd_analyze(a) -> int:
                        "панель результата S09 (кадр s09-combat-result.png)"},
         ],
     }
+    apply_errata_w5br(cfg, key, k3)
     L.write_json(out / "checklist-config.json", cfg)
     ck = subprocess.run([sys.executable, str(QA010), "checklist", "--config", rel(out / "checklist-config.json"),
                          "--out-md", rel(out / "qa010-checklist.md"), "--out-json", rel(out / "qa010-checklist.json")],
@@ -861,6 +871,144 @@ def cmd_analyze(a) -> int:
     L.write_json(out / "summary.json", summary)
     print(json.dumps({k: summary[k] for k in ("board", "frames", "icon", "plate")}, ensure_ascii=False)[:1500])
     return 0
+
+
+# ---------------------------------------------------------------- W5b-R errata of T5.2 (checklists)
+ERRATA_W5BR_DATE = "2026-09-29"
+ERRATA_W5BR_REF = ("эррата W5b-R (docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md §9; "
+                   "art3-live-3boards-2026-09-29.md §9.1)")
+ERRATA_PLATE_UNDER = {
+    "cobble-5x6": "Эррата W5b-R: плашка Medusa на K1 хоста лежит сразу под фигурой King Arthur (2,3) и читается как его "
+                  "плашка; пересечение плашки с фигурами в T5.2 не мерилось (правило plateVsFigures и привязка плашки "
+                  "к владельцу — W5b-R)",
+}
+ERRATA_PANEL = {
+    "cobble-5x6": "панель боя в левом верхнем углу доходит до рамки доски; клетки не закрывает (агент, по кадру)",
+    "sherwood-forest-8x5": "панель боя в левом верхнем углу закрывает часть клеток (0,0) и (1,0), панель руки — край "
+                           "нижнего ряда (агент, по кадру)",
+    "t-rex-paddock-7x5": "панель боя в левом верхнем углу закрывает часть клеток (0,0), (1,0) и (0,1), панель руки — "
+                         "край нижнего ряда (агент, по кадру)",
+}
+
+
+def first_damage_vs_combat(trace: Path) -> dict:
+    """Seq of the first CUE damage and of the first COMBAT_RESOLVE snapshot in a combat client trace."""
+    text = trace.read_text(encoding="utf-8", errors="replace") if trace.is_file() else ""
+    dmg = re.search(r"CUE damage (\S+) -(\d+) seq=(\d+)", text)
+    res = re.search(r"SNAPSHOT applied seq=(\d+) phase=COMBAT_RESOLVE", text)
+    out = {"damageFighter": dmg.group(1) if dmg else None, "damageAmount": int(dmg.group(2)) if dmg else None,
+           "damageSeq": int(dmg.group(3)) if dmg else None, "firstCombatResolveSeq": int(res.group(1)) if res else None}
+    out["source"] = ("способность/эффект (урон раньше первого COMBAT_RESOLVE)"
+                     if out["damageSeq"] is not None and out["firstCombatResolveSeq"] is not None
+                     and out["damageSeq"] < out["firstCombatResolveSeq"] else "бой или не определено")
+    return out
+
+
+def apply_errata_w5br(cfg: dict, key: str, k3_run: Path | None) -> dict:
+    """W5b-R errata of a T5.2 checklist config (idempotent)."""
+    res = cfg.setdefault("results", [])
+    if not any(r.get("path") == "plate-k1-host.json" for r in res):
+        res.append({"k": "K1", "path": "plate-k1-host.json"})
+    fd = first_damage_vs_combat(k3_run / "combat-client-joiner.trace.log") if k3_run else {}
+    notes = {
+        "K3.attack_result": (
+            "Эррата W5b-R — строка делится на два вердикта: «рамка/дуги цели и итог в HUD» — есть с оговоркой (агент); "
+            "«иконка цели» — нет (строка K3.icon_sizes, метод rev 2). Кадр числа урона s09-damage-number.png — "
+            f"{fd.get('source', 'не определено')}: CUE damage {fd.get('damageFighter')} -{fd.get('damageAmount')} "
+            f"seq={fd.get('damageSeq')}, первый COMBAT_RESOLVE seq={fd.get('firstCombatResolveSeq')} (трасса "
+            f"присоединившегося). HUD-панели K3: {ERRATA_PANEL.get(key, 'не проверялось')}; строк SHOT panel в "
+            "трассах T5.2 нет, перекрытие не измерялось"),
+    }
+    if key in ERRATA_PLATE_UNDER:
+        notes["K1.selected"] = ERRATA_PLATE_UNDER[key]
+    manual = cfg.setdefault("manual", {})
+    for row, note in notes.items():
+        m = manual.setdefault(row, {})
+        base = m.get("note", "")
+        if "Эррата W5b-R" in base:
+            base = base.split(" | Эррата W5b-R")[0]
+        m["note"] = (base + " | " if base else "") + note
+    cfg["errata"] = {"date": ERRATA_W5BR_DATE, "ref": ERRATA_W5BR_REF, "firstDamage": fd,
+                     "changes": ["results: + plate-k1-host.json (k=K1; сама строка K2.plate — задача T5.1)",
+                                 "K3.attack_result: разделена (рамка/дуги vs иконка), кадр урона помечен",
+                                 "K1.selected: плашка под King Arthur (только Cobble)"]}
+    return cfg
+
+
+PERF_H2 = "измерено; ЗАГРЯЗНЕНО фоном H2 (headless Blender/Cycles параллельной линии героев) — не для ACC-022"
+
+
+def errata_k1_perf(evidence: Path) -> list[dict]:
+    """W5b-R errata: the K1 perf.json / perf-csv.json of T5.2 lacked the H2 background label (the K3 ones had it) and
+    named a stale editor PID; relabel them and re-hash their manifest.json entries (idempotent)."""
+    out = []
+    for run in sorted((evidence / "k1").glob("*/run-*")):
+        man_p = run / "manifest.json"
+        if not man_p.is_file():
+            continue
+        man = json.loads(man_p.read_text(encoding="utf-8"))
+        changed = []
+        for name in ("perf.json", "perf-csv.json"):
+            fp = run / name
+            if not fp.is_file():
+                continue
+            doc = json.loads(fp.read_text(encoding="utf-8"))
+            before = L.sha256_file(fp)
+            if doc.get("status") != PERF_H2:
+                doc["errata"] = {"date": ERRATA_W5BR_DATE, "ref": ERRATA_W5BR_REF,
+                                 "previousStatus": doc.get("status"),
+                                 "why": "метка фона H2 добавлена после съёмки: K1 и K3 T5.2 снимались при одном фоне "
+                                        "(акт T5.2 §3), в K3 метка стояла с начала"}
+                doc["status"] = PERF_H2
+                if "concurrentGpuUsers" in doc:
+                    doc["errata"]["previousConcurrentGpuUsers"] = doc["concurrentGpuUsers"]
+                    doc["concurrentGpuUsers"] = ("живой UnrealEditor PID 31756 (главный checkout, MCP :8123), Blender MCP "
+                                                 ":9876/:9877 и headless-процессы линии героев H2; см. perProcessSmPct "
+                                                 "(эррата W5b-R: прежний текст называл PID 19540 — строка-шаблон "
+                                                 "art004_live_k2 T1.1)")
+                L.write_json(fp, doc)
+            after = L.sha256_file(fp)
+            for e in man.get("files", []):
+                if e.get("name") == name and (e.get("sha256") != after or e.get("bytes") != fp.stat().st_size):
+                    e["sha256"], e["bytes"] = after, fp.stat().st_size
+                    changed.append({"name": name, "before": before, "after": after})
+        if changed:
+            man.setdefault("errata", []).append({"date": ERRATA_W5BR_DATE, "ref": ERRATA_W5BR_REF, "rehashed": changed})
+            L.write_json(man_p, man)
+        out.append({"run": rel(run), "rehashed": changed})
+    return out
+
+
+def cmd_errata_w5br(a) -> int:
+    evidence = Path(a.evidence).resolve()
+    print(json.dumps({"k1Perf": errata_k1_perf(evidence)}, ensure_ascii=False))
+    rc = 0
+    for key in BOARDS:
+        out = evidence / "analysis" / key
+        cfg_p = out / "checklist-config.json"
+        if not cfg_p.is_file():
+            print(f"skip {key}: no checklist-config.json")
+            continue
+        k3_dirs = sorted((evidence / "k3" / key).glob("combat-*"))
+        cfg = json.loads(cfg_p.read_text(encoding="utf-8"))
+        apply_errata_w5br(cfg, key, k3_dirs[-1] if k3_dirs else None)
+        L.write_json(cfg_p, cfg)
+        ck = subprocess.run([sys.executable, str(QA010), "checklist", "--config", rel(cfg_p),
+                             "--out-md", rel(out / "qa010-checklist.md"), "--out-json", rel(out / "qa010-checklist.json")],
+                            capture_output=True, text=True, encoding="utf-8", errors="replace", cwd=str(REPO),
+                            creationflags=L.NO_WINDOW)
+        rc = max(rc, 0 if ck.returncode in (0, 1) else ck.returncode)
+        sp = out / "summary.json"
+        if sp.is_file():
+            summary = json.loads(sp.read_text(encoding="utf-8"))
+            summary["checklist"] = {"exit": ck.returncode, "md": rel(out / "qa010-checklist.md"),
+                                    "statusCounts": json.loads((out / "qa010-checklist.json").read_text(
+                                        encoding="utf-8")).get("status_counts"),
+                                    "errata": cfg["errata"]}
+            L.write_json(sp, summary)
+        print(json.dumps({"board": key, "checklistExit": ck.returncode, "firstDamage": cfg["errata"]["firstDamage"]},
+                         ensure_ascii=False))
+    return rc
 
 
 def cmd_mi(a) -> int:
@@ -1440,6 +1588,8 @@ def main(argv=None) -> int:
     k.add_argument("--client-fps", type=int, default=30)
     k.add_argument("--build-record", required=True)
     k.add_argument("--package-record", required=True)
+    k.add_argument("--extra-demo-arg", action="append",
+                   help="W5b-R: extra run-combat-demo.ps1 token per occurrence (use --extra-demo-arg=-Flag)")
     rv = sub.add_parser("revalidate", help="recompute validation.json of a published combat run")
     rv.add_argument("run_dir")
     an = sub.add_parser("analyze", help="QA-010 measurements of one board")
@@ -1456,12 +1606,14 @@ def main(argv=None) -> int:
     it.add_argument("--evidence", required=True)
     it.add_argument("--run", default=ICON_TEMPLATE_RUN, help="K3 run dir relative to the evidence dir")
     it.add_argument("--threshold", type=int, default=ICON_DIFF_THRESHOLD)
+    er = sub.add_parser("errata-w5br", help="W5b-R errata of the T5.2 checklists (no re-measure)")
+    er.add_argument("--evidence", required=True)
     rs = sub.add_parser("readability-sheets", help="crop sheets of team rings and labels (after 'analyze')")
     rs.add_argument("--evidence", required=True)
     a = ap.parse_args(argv)
     return {"k3": cmd_k3, "revalidate": cmd_revalidate, "analyze": cmd_analyze, "mi": cmd_mi,
             "icon-crops": cmd_icon_crops, "icon-template": cmd_icon_template,
-            "readability-sheets": cmd_readability_sheets}[a.cmd](a)
+            "readability-sheets": cmd_readability_sheets, "errata-w5br": cmd_errata_w5br}[a.cmd](a)
 
 
 if __name__ == "__main__":

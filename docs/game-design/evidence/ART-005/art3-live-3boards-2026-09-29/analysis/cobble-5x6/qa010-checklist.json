@@ -1,7 +1,7 @@
 {
   "command": "checklist",
   "tool": "qa010-tools 1.1.0",
-  "generated_utc": "2026-09-29T10:29:31Z",
+  "generated_utc": "2026-09-29T12:54:47Z",
   "title": "QA-010 чек-лист T5.2 — cobble-5x6 (cobble-city): K1 + K3 (K2 — задача T5.1). Не приёмка",
   "run": {
     "задача": "этап 3 T5.2 «Арт 3 живьём»",
@@ -77,7 +77,7 @@
       "norm_status": "НОРМАТИВ",
       "kind": "manual",
       "status": "открыто (ручная проверка)",
-      "detail": "хост: ARTPREVIEW selection ownHero=1 selected=1 fighter=Medusa reachable=14 fighterId=f-0-hero"
+      "detail": "хост: ARTPREVIEW selection ownHero=1 selected=1 fighter=Medusa reachable=14 fighterId=f-0-hero | Эррата W5b-R: плашка Medusa на K1 хоста лежит сразу под фигурой King Arthur (2,3) и читается как его плашка; пересечение плашки с фигурами в T5.2 не мерилось (правило plateVsFigures и привязка плашки к владельцу — W5b-R)"
     },
     {
       "id": "K1.zones_deut",
@@ -137,7 +137,7 @@
       "norm_status": "НОРМАТИВ",
       "kind": "manual",
       "status": "открыто (ручная проверка)",
-      "detail": "COMBAT-RESULT и числа урона сходятся у обоих клиентов (validation.json); цель — кольцо-дуги и иконка; иконка висит над целью и ложится на подставку фигуры в клетке за ней (k3-icon-bbox-crops.png); на s09-combat-result.png иконки в пикселях нет, хотя трасса пишет visible=1; атакующий — без позы (клипы не подключены). Число урона: совпадение CUE = число — это счёт, не видимость; читаемость и столкновения с подписями — labels-damage.json"
+      "detail": "COMBAT-RESULT и числа урона сходятся у обоих клиентов (validation.json); цель — кольцо-дуги и иконка; иконка висит над целью и ложится на подставку фигуры в клетке за ней (k3-icon-bbox-crops.png); на s09-combat-result.png иконки в пикселях нет, хотя трасса пишет visible=1; атакующий — без позы (клипы не подключены). Число урона: совпадение CUE = число — это счёт, не видимость; читаемость и столкновения с подписями — labels-damage.json | Эррата W5b-R — строка делится на два вердикта: «рамка/дуги цели и итог в HUD» — есть с оговоркой (агент); «иконка цели» — нет (строка K3.icon_sizes, метод rev 2). Кадр числа урона s09-damage-number.png — способность/эффект (урон раньше первого COMBAT_RESOLVE): CUE damage f-1-hero -1 seq=30, первый COMBAT_RESOLVE seq=54 (трасса присоединившегося). HUD-панели K3: панель боя в левом верхнем углу доходит до рамки доски; клетки не закрывает (агент, по кадру); строк SHOT panel в трассах T5.2 нет, перекрытие не измерялось"
     },
     {
       "id": "K3.icon_sizes",

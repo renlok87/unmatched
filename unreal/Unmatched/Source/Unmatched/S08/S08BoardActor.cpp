@@ -90,6 +90,13 @@ AS08BoardActor::AS08BoardActor() {
   ArtZoneGlyphs->SetStaticMesh(Cube);
   ArtZoneGlyphs->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   ArtZoneGlyphs->SetVisibility(false);
+
+  // W5b-R D-4: stroke keylines (and cube glyph keylines) under the zone fills.
+  ArtZoneKeylines = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("ArtZoneKeylines"));
+  ArtZoneKeylines->SetupAttachment(RootComponent);
+  ArtZoneKeylines->SetStaticMesh(Cube);
+  ArtZoneKeylines->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  ArtZoneKeylines->SetVisibility(false);
 }
 
 void AS08BoardActor::BeginPlay() {
@@ -203,11 +210,43 @@ void AS08BoardActor::BeginPlay() {
     }
     FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW zone content instances=%d/%d glyphMeshes=%d/%d"), Loaded,
                                      Wanted, MeshesLoaded, ArtData.GlyphMeshPaths.Num()));
+    // W5b-R D-4 keylines: the keyline MI and the glyph keyline meshes of the data (profile rev 4 "zoneKeyline").
+    if (ArtData.Keyline.bSet) {
+      if (!ArtData.Keyline.MaterialInstancePath.IsEmpty()) {
+        ArtKeylineMaterial = LoadObject<UMaterialInterface>(nullptr, *ArtData.Keyline.MaterialInstancePath);
+      }
+      int32 KeyMeshes = 0;
+      for (const TPair<FString, FString>& Path : ArtData.Keyline.GlyphMeshPaths) {
+        if (UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *Path.Value)) {
+          ArtGlyphKeylineMeshes.Add(Path.Key, Mesh);
+          ++KeyMeshes;
+        } else {
+          FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW zone keyline content missing glyph=%s mesh=%s (cube pieces)"),
+                                           *Path.Key, *Path.Value));
+        }
+      }
+      FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW zone keyline content mi=%s glyphKeyMeshes=%d/%d color=#%02X%02X%02X"),
+                                       ArtKeylineMaterial ? *ArtKeylineMaterial->GetName() : TEXT("missing(tint)"),
+                                       KeyMeshes, ArtData.Keyline.GlyphMeshPaths.Num(), ArtData.Keyline.Color.R,
+                                       ArtData.Keyline.Color.G, ArtData.Keyline.Color.B));
+    } else {
+      FS08Trace::Write(TEXT("ARTPREVIEW zone keyline content none (profile without zoneKeyline)"));
+    }
   }
   // W4-A game layer: unlit + EyeAdaptationInverse (M_S08_GameLayerUnlit);
   // -S08LegacyRender or a missing asset keeps the pre-W4 M_S08_Solid.
   ArtSolidMaterial = S08GameLayerMaterial();
   S08ApplyGameLayerPrimitive(ArtZoneGlyphs);
+  S08ApplyGameLayerPrimitive(ArtZoneKeylines);
+  if (!ArtKeylineMaterial && ArtData.Keyline.bSet && ArtSolidMaterial && !S08LegacyRender()) {
+    UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(ArtSolidMaterial, this);
+    Mid->SetVectorParameterValue(TEXT("Tint"), FLinearColor::FromSRGBColor(ArtData.Keyline.Color));
+    ArtKeylineMaterial = Mid;
+  }
+  if (ArtKeylineMaterial) {
+    ArtZoneKeylines->SetMaterial(0, ArtKeylineMaterial);
+    ArtKeylineMaterialName = ArtKeylineMaterial->GetName();
+  }
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW game layer material=%s unlitEyeAdaptInv=%d legacyRender=%d"),
                                    ArtSolidMaterial ? *ArtSolidMaterial->GetName() : TEXT("none"),
                                    S08GameLayerIsUnlit() ? 1 : 0, S08LegacyRender() ? 1 : 0));
@@ -289,6 +328,38 @@ void AS08BoardActor::SetLabelPresentation(const FString& PlateFighterId) {
   }
 }
 
+ES08TeamSlot AS08BoardActor::TeamOfFighter(const FS08BoardFighter& Fighter) const {
+  return S08TeamOf(Fighter.Id, Fighter.OwnerId, TeamP1OwnerId);
+}
+
+void AS08BoardActor::SetScreenLabelMode(bool bScreen) {
+  if (bScreenLabelMode == bScreen) return;
+  bScreenLabelMode = bScreen;
+  for (AS08FighterActor* Actor : FighterActors) {
+    if (Actor) Actor->SetWorldLabelsSuppressed(bScreen);
+  }
+  for (const TPair<FString, TWeakObjectPtr<AActor>>& Entry : DamageNumbers) {
+    if (!Entry.Value.IsValid()) continue;
+    if (USceneComponent* Root = Entry.Value.Get()->GetRootComponent()) Root->SetVisibility(!bScreen);
+  }
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW screen labels=%d (world TextRender labels and damage text %s)"),
+                                   bScreen ? 1 : 0, bScreen ? TEXT("hidden") : TEXT("shown")));
+}
+
+int32 AS08BoardActor::GetDamageNumberSeq(const FString& FighterId) const {
+  const TWeakObjectPtr<AActor>* Number = DamageNumbers.Find(FighterId);
+  if (!Number || !Number->IsValid()) return -1;
+  const FIntPoint* Info = DamageNumberInfo.Find(FighterId);
+  return Info ? Info->Y : -1;
+}
+
+int32 AS08BoardActor::GetDamageNumberAmount(const FString& FighterId) const {
+  const TWeakObjectPtr<AActor>* Number = DamageNumbers.Find(FighterId);
+  if (!Number || !Number->IsValid()) return 0;
+  const FIntPoint* Info = DamageNumberInfo.Find(FighterId);
+  return Info ? Info->X : 0;
+}
+
 void AS08BoardActor::SetScreenIconMode(bool bScreen) {
   bScreenIconMode = bScreen;
   for (AS08FighterActor* Actor : FighterActors) {
@@ -356,10 +427,14 @@ void AS08BoardActor::ShowDamageNumber(const FString& FighterId, int32 Damage,
   Text->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   S08ApplyGameLayerPrimitive(Text);
   Text->RegisterComponent();
+  // W5b-R D-1: with the screen tag layer the number is drawn by the HUD (US08ArtDamageWidget); this actor keeps the
+  // 0.9 s lifetime, the exactly-once dedupe and the trace line.
+  Text->SetVisibility(!bScreenLabelMode);
   Number->SetActorLocation(Position);
   Number->SetActorRotation(FRotator(0.0f, 90.0f, 0.0f));
   Number->SetLifeSpan(0.9f);
   DamageNumbers.Add(FighterId, Number);
+  DamageNumberInfo.Add(FighterId, FIntPoint(Damage, SequenceNumber));
   FS08Trace::Write(FString::Printf(
       TEXT("ARTPREVIEW damage-number fighter=%s amount=%d seq=%d cell=(%d,%d)"),
       *FighterId, Damage, SequenceNumber, Target->X, Target->Y));
@@ -370,6 +445,7 @@ void AS08BoardActor::ClearChildren() {
     if (Entry.Value.IsValid()) Entry.Value.Get()->Destroy();
   }
   DamageNumbers.Reset();
+  DamageNumberInfo.Reset();
   for (AActor* Child : HighlightTiles) {
     if (Child) Child->Destroy();
   }
@@ -726,6 +802,13 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
   ArtCorners->ClearInstances();
   ClearArtSurface();
   ArtZoneGlyphs->ClearInstances();
+  ArtZoneKeylines->ClearInstances();
+  for (TPair<FString, TObjectPtr<UInstancedStaticMeshComponent>>& Key : ArtZoneGlyphKeylines) {
+    if (Key.Value) {
+      Key.Value->ClearInstances();
+      Key.Value->SetVisibility(bArtActive);
+    }
+  }
   for (TPair<FString, TObjectPtr<UInstancedStaticMeshComponent>>& Stroke : ArtZoneStrokes) {
     if (Stroke.Value) {
       Stroke.Value->ClearInstances();
@@ -745,6 +828,8 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
   ArtBoard->SetVisibility(bCobbleMesh);
   ArtCorners->SetVisibility(bArtActive);
   ArtZoneGlyphs->SetVisibility(bArtActive);
+  const bool bKeylines = bArtActive && ArtData.Keyline.bSet && ArtKeylineMaterial && !S08LegacyRender();
+  ArtZoneKeylines->SetVisibility(bKeylines);
   // Full-board dark slab: top at z=-0.5 (just under the tile tops at z=0)
   // so grooves and the outer frame read dark; spans exactly the INT-019
   // cell boundaries, so a trace landing in a groove still resolves to the
@@ -823,6 +908,47 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
     }
     int32 GlyphMeshTotal = 0;
     for (const TPair<FString, int32>& Count : GlyphMeshInstances) GlyphMeshTotal += Count.Value;
+    // W5b-R D-4 keylines under every stroke and glyph (never part of the zone counts above).
+    if (bKeylines) {
+      int32 StrokeKeyPieces = 0, GlyphKeyInstances = 0, GlyphKeyCubePieces = 0;
+      for (const FS08ZoneMarkPiece& Piece : Marks.StrokeKeylines) {
+        ArtZoneKeylines->AddInstance(Piece.Transform, true);
+        ++StrokeKeyPieces;
+      }
+      TSet<FString> MeshKeys;
+      for (const FS08ZoneMarkPiece& Anchor : Marks.GlyphAnchors) {
+        const FS08ZoneStyle Style = ArtData.StyleFor(Anchor.Key);
+        const FString GlyphName = S08ZoneGlyphName(Style.Glyph);
+        const TObjectPtr<UStaticMesh>* Mesh = ArtGlyphKeylineMeshes.Find(GlyphName);
+        if (!Mesh || !*Mesh) continue;
+        TObjectPtr<UInstancedStaticMeshComponent>& Component = ArtZoneGlyphKeylines.FindOrAdd(GlyphName);
+        if (!Component) {
+          Component = NewObject<UInstancedStaticMeshComponent>(this, FName(*(TEXT("ArtZoneGlyphKey_") + GlyphName)));
+          Component->SetupAttachment(RootComponent);
+          Component->SetStaticMesh(*Mesh);
+          Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+          S08ApplyGameLayerPrimitive(Component);
+          Component->RegisterComponent();
+        }
+        Component->SetMaterial(0, ArtKeylineMaterial);
+        Component->SetVisibility(true);
+        Component->AddInstance(Anchor.Transform, true);
+        MeshKeys.Add(Anchor.Key);
+        ++GlyphKeyInstances;
+      }
+      for (const FS08ZoneMarkPiece& Piece : Marks.GlyphKeylines) {
+        if (MeshKeys.Contains(Piece.Key)) continue;
+        ArtZoneKeylines->AddInstance(Piece.Transform, true);
+        ++GlyphKeyCubePieces;
+      }
+      FS08Trace::Write(FString::Printf(
+          TEXT("ARTPREVIEW board zone keylines pieces=%d glyphKeys=%d glyphKeyCubePieces=%d mi=%s growUU=%.1f edgeUU=%.1f maxOuterUU=%.1f"),
+          StrokeKeyPieces, GlyphKeyInstances, GlyphKeyCubePieces, *ArtKeylineMaterialName, ArtData.Keyline.GrowUU,
+          S08ZoneMarkSpec::EdgeUU, S08ZoneMarkSpec::MaxOuterUU));
+    } else if (bArtActive) {
+      FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW board zone keylines none (data=%d material=%d legacyRender=%d)"),
+                                       ArtData.Keyline.bSet ? 1 : 0, ArtKeylineMaterial ? 1 : 0, S08LegacyRender() ? 1 : 0));
+    }
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW board glyph meshes instances=%d keys=%d/%d cubePieces=%d anchors=%d"), GlyphMeshTotal,
         GlyphMeshInstances.Num(), Summary.ZoneKeys.Num(), CubeGlyphPieces, Marks.GlyphAnchors.Num()));
@@ -929,8 +1055,11 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
     }
     if (Actor) {
       Actor->SetScreenIconMode(bScreenIconMode);
-      Actor->ApplyFighter(Fighter, Board.CellToWorld(Fighter.X, Fighter.Y),
-                          Fighter.OwnerId == OwnOwnerId, bArtActive);
+      Actor->SetWorldLabelsSuppressed(bScreenLabelMode);
+      const bool bOwn = Fighter.OwnerId == OwnOwnerId;
+      const ES08TeamSlot Team = TeamOfFighter(Fighter);
+      Actor->SetTeam(Team, S08TeamLook(Team, bOwn, TeamColorMode), TeamColorMode);
+      Actor->ApplyFighter(Fighter, Board.CellToWorld(Fighter.X, Fighter.Y), bOwn, bArtActive);
       Actor->SetSelected(Fighter.Id == SelectedFighterId);
       Actor->SetCombatMarkers(Fighter.Id == CombatAttackerId,
                               Fighter.Id == CombatTargetId);

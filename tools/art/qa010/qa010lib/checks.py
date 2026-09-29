@@ -299,3 +299,88 @@ def check_icon(rgb_u8: np.ndarray, bbox: tuple[int, int, int, int], params: Icon
                    "min_fg_fraction_status": "ПРЕДЛОЖЕНИЕ инструмента (нормы нет)",
                    "background": params.background, "sizes_status": "02 стр. 894 UI-ICON-ACTION 24/32/48; «проверка в 24 px обязательна»"},
     }
+
+
+# ---------------------------------------------------------------- icon rev 3 (W5b-R, decision D-5)
+
+def _outer_ring(shape: np.ndarray) -> np.ndarray:
+    """Pixels of `shape` with a 4-neighbour outside it (or on the image border): the 1 px rim."""
+    pad = np.pad(shape, 1, constant_values=False)
+    inner = pad[1:-1, 1:-1] & pad[:-2, 1:-1] & pad[2:, 1:-1] & pad[1:-1, :-2] & pad[1:-1, 2:]
+    return shape & ~inner
+
+
+def check_icon_token(rgb_u8: np.ndarray, bbox: tuple[int, int, int, int], glyph_alpha: np.ndarray,
+                     token_rgba: np.ndarray, mask_alpha: float = 0.5, min_contrast: float = 3.0,
+                     surround_px: int = 8, guard_min_ncc: float = 0.9, guard_min_iou: float = 0.6,
+                     guard_max_drgb: int = 16) -> dict:
+    """Icon rev 3 (t53-thresholds.json icon): the opaque target TOKEN measured at its NATIVE size with masks taken
+    from the texture that is drawn - glyph = glyph-mask alpha >= mask_alpha, token shape = token alpha >= 0.5,
+    rim = the outer 1 px of the shape, body = shape - glyph - rim. Glyph vs body (colour, gray, deuteranopia), the
+    two-tone edge max(rim vs surround, body vs surround) and a presence guard (NCC of the crop against the token
+    RGB over the shape, IoU of the matching pixels with the shape). No resampling: the bbox must be N x N."""
+    h, w = rgb_u8.shape[:2]
+    x0, y0, x1, y1 = (int(round(v)) for v in bbox)
+    n = token_rgba.shape[0]
+    if token_rgba.shape[:2] != (n, n) or glyph_alpha.shape != (n, n):
+        return {"status": "insufficient_input", "reason": f"texture {token_rgba.shape} / mask {glyph_alpha.shape} not N x N"}
+    if (x1 - x0, y1 - y0) != (n, n):
+        return {"status": "insufficient_input",
+                "reason": f"painted bbox {x1 - x0}x{y1 - y0} != texture {n}x{n} (native size only, no resampling)"}
+    if x0 < 0 or y0 < 0 or x1 > w or y1 > h:
+        return {"status": "insufficient_input", "reason": f"bbox {bbox} outside the frame"}
+    crop = rgb_u8[y0:y1, x0:x1]
+    glyph = glyph_alpha >= mask_alpha
+    shape = token_rgba[..., 3] >= 128
+    rim = _outer_ring(shape)
+    body = shape & ~glyph & ~rim
+    sx0, sy0, sx1, sy1 = max(0, x0 - surround_px), max(0, y0 - surround_px), min(w, x1 + surround_px), min(h, y1 + surround_px)
+    sur = np.ones((sy1 - sy0, sx1 - sx0), dtype=bool)
+    sur[y0 - sy0:y1 - sy0, x0 - sx0:x1 - sx0] = False
+    variants = {"color": crop, "gray": color.grayscale(crop), "deuteranopia": color.deuteranopia(crop)}
+    surround_img = rgb_u8[sy0:sy1, sx0:sx1]
+    sur_variants = {"color": surround_img, "gray": color.grayscale(surround_img),
+                    "deuteranopia": color.deuteranopia(surround_img)}
+    out_v = {}
+    ok = True
+    for vn, img in variants.items():
+        lum = color.relative_luminance(img)
+        slum = color.relative_luminance(sur_variants[vn])
+        lg, lb, lr = float(np.median(lum[glyph])), float(np.median(lum[body])), float(np.median(lum[rim]))
+        ls = float(np.median(slum[sur])) if sur.any() else None
+        cr = float(color.wcag_contrast_ratio(lg, lb))
+        p10 = float(color.wcag_contrast_ratio(float(np.percentile(lum[glyph], 10)), lb))
+        edge_rim = float(color.wcag_contrast_ratio(lr, ls)) if ls is not None else None
+        edge_body = float(color.wcag_contrast_ratio(lb, ls)) if ls is not None else None
+        edge = max(x for x in (edge_rim, edge_body) if x is not None) if ls is not None else None
+        passed = cr >= min_contrast and edge is not None and edge >= min_contrast
+        ok &= passed
+        out_v[vn] = {"glyph_vs_body": round(cr, 3), "glyph_p10_vs_body": round(p10, 3),
+                     "edge_rim_vs_surround": round(edge_rim, 3) if edge_rim is not None else None,
+                     "edge_body_vs_surround": round(edge_body, 3) if edge_body is not None else None,
+                     "edge": round(edge, 3) if edge is not None else None,
+                     "glyph_rel_luminance": round(lg, 5), "body_rel_luminance": round(lb, 5),
+                     "rim_rel_luminance": round(lr, 5), "surround_rel_luminance": round(ls, 5) if ls is not None else None,
+                     "pass": passed}
+    # presence guard: the crop IS the opaque token (no scene behind the shape)
+    a = crop[shape].astype(np.float64).ravel()
+    b = token_rgba[..., :3][shape].astype(np.float64).ravel()
+    a0, b0 = a - a.mean(), b - b.mean()
+    den = float(np.sqrt((a0 * a0).sum() * (b0 * b0).sum()))
+    ncc = float((a0 * b0).sum() / den) if den > 0 else 0.0
+    match = shape & (np.abs(crop.astype(int) - token_rgba[..., :3].astype(int)).max(axis=-1) <= guard_max_drgb)
+    union = int((match | shape).sum())
+    iou = float((match & shape).sum()) / union if union else 0.0
+    guard = {"ncc": round(ncc, 4), "iou": round(iou, 4), "min_ncc": guard_min_ncc, "min_iou": guard_min_iou,
+             "max_drgb": guard_max_drgb, "present": ncc >= guard_min_ncc and iou >= guard_min_iou}
+    status = "measured" if guard["present"] else "no_data"
+    return {"status": status,
+            "result": ("pass" if ok else "fail") if guard["present"] else "no data (icon not confirmed in the pixels)",
+            "bbox": [x0, y0, x1, y1], "size_px": n, "upscaled": False,
+            "pixels": {"glyph": int(glyph.sum()), "body": int(body.sum()), "rim": int(rim.sum()),
+                       "surround": int(sur.sum())},
+            "mask_alpha": mask_alpha, "min_contrast": min_contrast, "variants": out_v, "guard": guard,
+            "sizes": [{"size_px": n, "upscaled": False, "contrast_ratio": out_v["color"]["glyph_vs_body"],
+                       "contrast_ratio_gray": out_v["gray"]["glyph_vs_body"],
+                       "contrast_ratio_deuteranopia": out_v["deuteranopia"]["glyph_vs_body"],
+                       "edge": out_v["color"]["edge"], "pass": ok and guard["present"]}]}
