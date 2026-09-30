@@ -23,7 +23,7 @@ import re
 import time
 import urllib.request
 
-URL = "http://127.0.0.1:8123/mcp"
+URL = os.environ.get("UE_MCP_URL", "http://127.0.0.1:8123/mcp")  # second editor: set UE_MCP_URL
 TOOLSETS = {
     "asset": "editor_toolset.toolsets.asset.AssetTools",
     "static": "editor_toolset.toolsets.static_mesh.StaticMeshTools",

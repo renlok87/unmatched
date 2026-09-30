@@ -10,6 +10,7 @@ Layout of the graph:
   DetailN / DetailRMH arrays (TextureObject, SampleGrad)          --+     -> base colour, roughness, metallic,
   PreSkinnedPosition / PreSkinnedNormal via VertexInterpolator    --+        specular, AO, normal, cloth, fuzz,
   UV0, UV1 (StaticSwitch UseUV1Metres), knobs, team colour (CPD)  --+        IsCloth, debug emissive
+  dye mask: StaticSwitch UseTeamAccent (v2.1, default on) -> TeamAccentTexture.R | TeamMaskTexture.R (v2.0 path)
   cue chain of v1 (CPD FxFlash / Rim / Fade) on top of the core base colour; If(IsCloth) -> ShadingModel
   everything -> MakeMaterialAttributes (ClearCoat pin = CustomData0 = Cloth, SubsurfaceColor = Fuzz Color)
 """
@@ -31,9 +32,9 @@ V1TEX = "/Game/UM/Materials/Textures"
 LUMA = (0.2126, 0.7152, 0.0722)
 
 CORE_INPUTS = ["MatIDTex", "LUTTex", "DetN", "DetRMH", "UV0", "UV1", "UseUV1", "P", "N0", "LocalUnitM", "BCh", "Nh",
-               "ORMh", "TeamMask", "Edge", "Team", "TeamDye", "TeamDyeGain", "RoughMin", "RoughMax", "DetailStrength",
+               "ORMh", "DyeMask", "Edge", "Team", "TeamDye", "TeamDyeGain", "RoughMin", "RoughMax", "DetailStrength",
                "WearStrength", "SheenStrength", "AOToBC", "Saturation", "ValueLift", "DebugView", "MatIDOverride",
-               "BakeFromLUT"]
+               "BakeFromLUT", "UseAccent", "TeamDyeCeiling"]
 CORE_OUTPUTS = [("Rough", "CMOT_FLOAT1"), ("Metal", "CMOT_FLOAT1"), ("Spec", "CMOT_FLOAT1"), ("AO", "CMOT_FLOAT1"),
                 ("NormalTS", "CMOT_FLOAT3"), ("Cloth", "CMOT_FLOAT1"), ("Fuzz", "CMOT_FLOAT3"),
                 ("IsCloth", "CMOT_FLOAT1"), ("DebugE", "CMOT_FLOAT3")]
@@ -44,8 +45,10 @@ V2_SCALARS = [
     ("WearStrength", 1.0, "Library", "edge wear of the classes (EdgeMaskTexture x class strength)"),
     ("SheenStrength", 1.0, "Library", "cloth sheen (Fuzz Color) scale over the preset"),
     ("MetresPerLocalUnit", 0.01, "Library", "pre-skinned local unit -> metres (figures imported x100: 1 uu = 1 cm)"),
+    ("TeamDyeCeiling", 0.0, "Team", "v2.1, UseTeamAccent only: > 0 caps the gain per team colour, "
+                                     "gain = min(TeamDyeGain, TeamDyeCeiling / maxChannel(team)) (0 = TeamDyeGain)"),
     ("DebugView", 0.0, "Debug", "0 off; 1 class, 2 roughness, 3 metallic, 4 detail normal, 5 wear, 6 final normal, "
-                                "7 albedo, 8 fuzz, 9 tile RMH (emissive, surface black)"),
+                                "7 albedo, 8 fuzz, 9 tile RMH, 10 dye weight (emissive, surface black)"),
     ("DebugMatIDOverride", -1.0, "Debug", "-1 = MatID texture; 0..15 = whole material one class"),
     ("DebugBakeFromLUT", 0.0, "Debug", "1 = bake albedo replaced by the class typical colour (tests without a bake)"),
 ]
@@ -118,7 +121,9 @@ def figure_v2_graph(spec: dict) -> Graph:
                                           ("t_n", "NormalTexture", "N", "SAMPLERTYPE_NORMAL", 1),
                                           ("t_orm", "ORMTexture", "ORM", "SAMPLERTYPE_MASKS", 2),
                                           ("t_mask", "TeamMaskTexture", "TeamMask", "SAMPLERTYPE_LINEAR_GRAYSCALE", 3),
-                                          ("t_edge", "EdgeMaskTexture", "TeamMaskNone", "SAMPLERTYPE_LINEAR_GRAYSCALE", 4)):
+                                          ("t_edge", "EdgeMaskTexture", "TeamMaskNone", "SAMPLERTYPE_LINEAR_GRAYSCALE", 4),
+                                          ("t_accent", "TeamAccentTexture", "TeamMaskNone", "SAMPLERTYPE_LINEAR_GRAYSCALE",
+                                           5)):
         g.add(nid, "TextureSampleParameter2D", {"parameter_name": name, "texture": "%s/%s" % (V1TEX, dt[key]["asset"]),
                                                 "sampler_type": sampler, "group": "Textures", "sort_priority": sort}, 0)
     g.add("t_matid", "TextureObjectParameter", {"parameter_name": "MatIDTexture",
@@ -150,6 +155,17 @@ def figure_v2_graph(spec: dict) -> Graph:
     g.add("psn", "PreSkinnedNormal", {}, 1)
     g.add("vi_p", "VertexInterpolator", {}, 2)
     g.add("vi_n", "VertexInterpolator", {}, 2)
+    # v2.1 dye mask (LDV-12): UseTeamAccent on (default; new MIs) = TeamAccentTexture.R for every class; off = the
+    # v2.0 path TeamMaskTexture.R x teamDyeAllowed. The switch prunes the unused texture, so each permutation keeps
+    # one mask sampler
+    g.add("sw_dye", "StaticSwitchParameter", {"parameter_name": "UseTeamAccent", "default_value": True,
+                                              "group": "Team", "sort_priority": 0}, 2)
+    g.link("t_accent", "R", "sw_dye", "True")
+    g.link("t_mask", "R", "sw_dye", "False")
+    g.add("sw_dyef", "StaticSwitchParameter", {"parameter_name": "UseTeamAccent", "default_value": True,
+                                               "group": "Team", "sort_priority": 0}, 2)
+    g.link("one", "", "sw_dyef", "True")
+    g.link("zero", "", "sw_dyef", "False")
     g.link("psp", "", "vi_p", "VS")
     g.link("psn", "", "vi_n", "VS")
     # ---- knobs (v1 names/defaults) and v2 knobs
@@ -181,13 +197,14 @@ def figure_v2_graph(spec: dict) -> Graph:
     wires = {"MatIDTex": ("t_matid", ""), "LUTTex": ("t_lut", ""), "DetN": ("t_detn", ""), "DetRMH": ("t_detrmh", ""),
              "UV0": ("uv0", ""), "UV1": ("sw_uv1", ""), "UseUV1": ("sw_uv1f", ""), "P": ("vi_p", "PS"),
              "N0": ("vi_n", "PS"), "LocalUnitM": ("p_MetresPerLocalUnit", ""), "BCh": ("t_bc", "RGB"),
-             "Nh": ("n_str", ""), "ORMh": ("t_orm", "RGB"), "TeamMask": ("t_mask", "R"), "Edge": ("t_edge", "R"),
+             "Nh": ("n_str", ""), "ORMh": ("t_orm", "RGB"), "DyeMask": ("sw_dye", ""), "Edge": ("t_edge", "R"),
              "Team": ("team", ""), "TeamDye": ("p_dye", ""), "TeamDyeGain": ("p_dyegain", ""),
              "RoughMin": ("p_rmin", ""), "RoughMax": ("p_rmax", ""), "DetailStrength": ("p_DetailStrength", ""),
              "WearStrength": ("p_WearStrength", ""), "SheenStrength": ("p_SheenStrength", ""),
              "AOToBC": ("p_ao2bc", ""), "Saturation": ("p_sat", ""), "ValueLift": ("p_lift", ""),
              "DebugView": ("p_DebugView", ""), "MatIDOverride": ("p_DebugMatIDOverride", ""),
-             "BakeFromLUT": ("p_DebugBakeFromLUT", "")}
+             "BakeFromLUT": ("p_DebugBakeFromLUT", ""), "UseAccent": ("sw_dyef", ""),
+             "TeamDyeCeiling": ("p_TeamDyeCeiling", "")}
     for inp in CORE_INPUTS:
         src, out = wires[inp]
         g.link(src, out, "core", inp)
@@ -262,7 +279,16 @@ def test_instances() -> list:
         mis.append({"asset": "%s/MI_UM_v2_Test_Class%02d_Red" % (TESTS, i), "parent": MASTER,
                     "scalars": dict(common, DebugMatIDOverride=float(i), DebugBakeFromLUT=1.0, TeamDye=1.0,
                                     TeamDyeGain=1.0), "vectors": {"TeamColor": red},
-                    "textures": {"EdgeMaskTexture": TESTS + "/T_UM_Test_EdgeRamp"}, "switches": {}})
+                    "textures": {"EdgeMaskTexture": TESTS + "/T_UM_Test_EdgeRamp"},
+                    "switches": {"UseTeamAccent": False},
+                    "note": "v2.0 dye path (UseTeamAccent off): TeamMask (default white) x teamDyeAllowed"})
+        mis.append({"asset": "%s/MI_UM_v2_Test_Class%02d_Accent" % (TESTS, i), "parent": MASTER,
+                    "scalars": dict(common, DebugMatIDOverride=float(i), DebugBakeFromLUT=1.0, TeamDye=1.0,
+                                    TeamDyeGain=1.0), "vectors": {"TeamColor": red},
+                    "textures": {"EdgeMaskTexture": TESTS + "/T_UM_Test_EdgeRamp",
+                                 "TeamAccentTexture": TESTS + "/T_UM_Test_AccentHalf"},
+                    "switches": {"UseTeamAccent": True},
+                    "note": "v2.1: TeamAccent = 1 on v < 0.5 only; the dye must follow the mask on every class"})
     mis.append({"asset": TESTS + "/MI_UM_v2_Test_Checker", "parent": MASTER, "scalars": dict(common),
                 "vectors": {}, "switches": {},
                 "textures": {"MatIDTexture": TESTS + "/T_UM_Test_MatIDChecker",
@@ -277,8 +303,66 @@ def test_instances() -> list:
                 "textures": {"MatIDTexture": TESTS + "/T_UM_Test_MatIDChecker",
                              "BaseColorTexture": TESTS + "/T_UM_Test_BCChecker"}})
     mis.append({"asset": TESTS + "/MI_UM_v2_Test_LegacyMerlin_Red", "parent": MASTER, "scalars": {}, "vectors": {},
-                "textures": {}, "switches": {}, "copy_from": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Red",
-                "note": "regression: Merlin H2 red-team MI values on the v2 master, MatID legacy = v1 path"})
+                "textures": {}, "switches": {"UseTeamAccent": False},
+                "copy_from": "/Game/PipelineCandidates/Merlin/H2/Materials/MI_Merlin_H2_Red",
+                "note": "regression: Merlin H2 red-team MI values on the v2 master, MatID legacy = v1 path (v2.0 dye)"})
+    mis += accent_test_instances(common, red)
+    return mis
+
+
+# v2.1 (UseTeamAccent) tests. Checker spheres: every class on one sphere, the dye weight (DebugView 10) with the
+# accent (must follow the mask on every class) and with the v2.0 path (TeamMask white x teamDyeAllowed).
+# Albedo spheres (DebugView 7: final albedo as emissive, independent of the sphere position and the lighting), class 7
+# (dark, dyeable), TeamDye 1: the gain rule. Equal pairs must match within the capture noise, E must differ.
+MERLIN_P1 = [0.807, 0.5271, 0.1441, 1.0]     # C-11 active palette, linear (ld-team-accent-ue.json of Merlin)
+MERLIN_P2 = [0.1022, 0.2122, 0.3467, 1.0]
+ALBEDO_TESTS = {
+    # name: (switch UseTeamAccent or None = inherited, TeamColor, TeamDyeGain, TeamDyeCeiling, mask texture)
+    "Neutral": (None, None, None, None, None),
+    "AccentDefault_Red": (None, "red", 1.0, None, "TeamMask:white"),   # old mask white, no accent: nothing dyed
+    "GainA": (True, "red", 20.0, None, "accent:white"),
+    "GainB": (True, "red", 100.0, 16.0, "accent:white"),     # min(100, 16 / 0.8) = 20 = GainA
+    "GainC": (True, "red", 20.0, 100.0, "accent:white"),     # ceiling not binding: 20 = GainA
+    "GainD": (False, "red", 20.0, 4.0, "TeamMask:white"),    # v2.0 path ignores the ceiling: 20 = GainA
+    "GainE": (True, "red", 10.0, None, "accent:white"),      # sensitivity: must differ from GainA
+    "MerlinP1": (True, "p1", 27.12, 9.018, "accent:white"),  # min(27.12, 9.018 / 0.807) = 11.175
+    "MerlinP1Ref": (True, "p1", 11.175, None, "accent:white"),
+    "MerlinP2": (True, "p2", 27.12, 9.018, "accent:white"),  # min(27.12, 9.018 / 0.3467) = 26.01
+    "MerlinP2Ref": (True, "p2", 26.01, None, "accent:white"),
+}
+ALBEDO_CLASS = 7
+V1_WHITE = V1TEX + "/T_UM_Mask_White"
+
+
+def accent_test_instances(common: dict, red: list) -> list:
+    colours = {"red": red, "p1": MERLIN_P1, "p2": MERLIN_P2}
+    checker = {"MatIDTexture": TESTS + "/T_UM_Test_MatIDChecker", "BaseColorTexture": TESTS + "/T_UM_Test_BCChecker"}
+    mis = [{"asset": TESTS + "/MI_UM_v2_Test_Checker_Accent", "parent": MASTER,
+            "scalars": dict(common, TeamDye=1.0, TeamDyeGain=1.0), "vectors": {"TeamColor": red},
+            "textures": dict(checker, TeamAccentTexture=TESTS + "/T_UM_Test_AccentHalf"),
+            "switches": {"UseTeamAccent": True}},
+           {"asset": TESTS + "/MI_UM_v2_Test_Checker_AccentW", "parent": MASTER,
+            "scalars": dict(common, DebugView=10.0), "vectors": {}, "switches": {"UseTeamAccent": True},
+            "textures": dict(checker, TeamAccentTexture=TESTS + "/T_UM_Test_AccentHalf")},
+           {"asset": TESTS + "/MI_UM_v2_Test_Checker_LegacyW", "parent": MASTER,
+            "scalars": dict(common, DebugView=10.0), "vectors": {}, "switches": {"UseTeamAccent": False},
+            "textures": dict(checker, TeamMaskTexture=V1_WHITE)}]
+    for name, (switch, colour, gain, ceiling, mask) in ALBEDO_TESTS.items():
+        sc = dict(common, DebugMatIDOverride=float(ALBEDO_CLASS), DebugBakeFromLUT=1.0, DebugView=7.0)
+        vec, tex = {}, {}
+        if colour:
+            sc["TeamDye"] = 1.0
+            vec["TeamColor"] = colours[colour]
+        if gain is not None:
+            sc["TeamDyeGain"] = gain
+        if ceiling is not None:
+            sc["TeamDyeCeiling"] = ceiling
+        if mask:
+            kind, _ = mask.split(":")
+            tex["TeamAccentTexture" if kind == "accent" else "TeamMaskTexture"] = V1_WHITE
+        mis.append({"asset": "%s/MI_UM_v2_Test_Alb_%s" % (TESTS, name), "parent": MASTER, "scalars": sc,
+                    "vectors": vec, "textures": tex,
+                    "switches": {} if switch is None else {"UseTeamAccent": bool(switch)}})
     return mis
 
 

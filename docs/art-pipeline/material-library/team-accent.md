@@ -18,13 +18,17 @@
 | Классы | ненулевые значения только на классах с `teamDyeAllowed` (ткань, кожа снаряжения, перья); металлы, камень, дерево — всегда 0 (правило 5c-A: металл не красится); кожа персонажа и `horn_claw` (диэлектрики — части тела, `teamDyeAllowed` = false; `horn_claw` — не металл, metallic 0) — тоже всегда 0 |
 | Площадь | 5–12 % площади фигуры (по 3D-площади, не по текселям), читается с K2 5× |
 
-Формула красителя — та же, что у `M_UM_Figure_v2` сейчас (`um_v2_core.hlsl`):
-`dyed = lerp(BC · Team, Team · Y(BC) · TeamDyeGain, TeamDye)`, `BC = lerp(BC, dyed, TeamAccent · teamDyeAllowed(класс))`.
+Формула красителя — `M_UM_Figure_v2.1` (`um_v2_core.hlsl`, static switch `UseTeamAccent` = true, LDV-12):
+`dyed = lerp(BC · Team, Team · Y(BC) · gain, TeamDye)`, `BC = lerp(BC, dyed, TeamAccent)` — для любого класса;
+`teamDyeAllowed` — правило разметки этой маски (строка «Классы» выше), в шейдере не участвует.
 Рекомендуемые параметры MI: `TeamDye 1`, `TeamDyeGain` — по герою (записан в отчёте ld-maps героя): его выбирают так,
 чтобы медиана окрашенного альбедо акцента была ≈ 0,8 × TeamColor, а 95-й перцентиль ≤ 0,9 (альбедо в пределах 0,02–0,9).
 
-**Подключение в UE (следующий этап).** Мастер v2 уже умножает `TeamMaskTexture.R` на `teamDyeAllowed` класса, поэтому
-отдельного входа не нужно: в MI v2 героя `TeamMaskTexture = T_<Hero>_…LD_TeamAccent`. Палитра — активная
+**Подключение в UE (v2.1, 2026-09-30).** У мастера отдельный вход `TeamAccentTexture` (R, `TC_Grayscale`, sRGB выкл.)
+и static switch `UseTeamAccent` (по умолчанию true): в MI героя `TeamAccentTexture = T_<Hero>_…LD_TeamAccent`,
+`TeamMaskTexture` не нужен. Усиление по правилу выше задаётся одним MI на обе команды: `TeamDyeGain = 0.8 / Y_p50`,
+`TeamDyeCeiling = 0.9 / Y_p95`; шейдер берёт `gain = min(TeamDyeGain, TeamDyeCeiling / maxChannel(TeamColor))` (LDV-13).
+Можно и иначе: MI команды с готовым `TeamDyeGain` из `ld-team-accent-ue.json` и `TeamDyeCeiling` 0. Палитра — активная
 `c11_value_split_proposal` из `art/um-materials/um-masters.json`: P1 `#E8C06A`, P2 `#5A7F9F`.
 
 **Прежний TeamMask (W4-B) — deprecated.** Он красил всю одежду (у Harpy — все тёмные маховые, 14–16 % фигуры), что
@@ -151,7 +155,8 @@
   (`lut_if_master_unchanged`). Сапоги и обмотка тоже `leather_worn`, но TeamAccent на них 0. В `ld-lut.json` и
   UE-конфиг LUT это **не записано**: это входы волны UE.
 - MI: `TeamMaskTexture = T_Merlin_H2LD_TeamAccent`, `TeamDye 1`, `TeamDyeGain` P1 11,0 / P2 26,0; текстура
-  `TC_Grayscale`, sRGB выкл., мипы обычные.
+  `TC_Grayscale`, sRGB выкл., мипы обычные. С мастером v2.1 (2026-09-30) слот — `TeamAccentTexture`, а P1/P2 даёт один
+  MI: `TeamDyeGain` 27,12 + `TeamDyeCeiling` 9,018 (§1, LDV-13).
 - Прежний TeamMask (синяя шерсть мантии, капюшона и рукавов — 65,7 % фигуры по 3D) и `TeamMaskRGBA.R` — **deprecated**. Они не изменены (sha256 =
   `ld-maps-report`), остаются только для MI v1.
 - Кадры (`20260929-h2-lookdev/preview/`): `ld_accent_k2_5x_cobble.jpg` — концепт | без красителя | P1 | P2, K2 5×
@@ -195,6 +200,8 @@
   `TeamMaskTexture` = `T_Medusa_H2LD_TeamAccent` вместо `T_Medusa_H2LD_2K_TeamMask`, `TeamDyeGain` 19, `TeamDye` 1.
   Так как маска ненулевая только на классах с `teamDyeAllowed`, `TeamAccent × teamDyeAllowed = TeamAccent`. Нужная правка
   мастера v2 (v2.1): отдельный вход `TeamAccentTexture` (по умолчанию чёрный) и вес красителя **= TeamAccent**, а не
-  `TeamMask × teamDyeAllowed` — подробно в medusa-lookdev-v2.md §9.4.
+  `TeamMask × teamDyeAllowed` — подробно в medusa-lookdev-v2.md §9.4. **Сделано в v2.1 (2026-09-30)**: слот
+  `TeamAccentTexture`, static switch `UseTeamAccent`; один MI на обе команды — `TeamDyeGain` 22,93 + `TeamDyeCeiling`
+  15,54 (P1 19,26 / P2 22,93; §1, LDV-13).
 - Кадры: `20260929-h2-lookdev/preview/ld_team_k2_5x_cobble.jpg` (концепт | без красителя | P1 | P2, front/back),
   `ld_team_k2_1p6_cobble.jpg`, `ld_team_id_k2.jpg` (ID акцента), атлас маски — `ld_teamaccent_1K.png`.

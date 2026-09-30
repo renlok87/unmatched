@@ -1,0 +1,17 @@
+# Scratch cook C:/tmp/ldc-m/sm5proj (content-only copy of /Game/UM/Materials/Textures + /Game/UM/Materials/v2 of the main checkout after the v2.1 rebuild; MI_UM_v2_Test_LegacyMerlin_Red left out: it references Merlin H2 textures outside the copy). Config = the LD-master scratch config (RendererSettings + WindowsTargetSettings D3D12TargetedShaderFormats PCD3D_SM6 + PCD3D_SM5 + ConsoleVariables of unreal/Unmatched)
+# UnrealEditor-Cmd SM5Probe.uproject -run=cook -targetplatform=Windows -cookall -unattended -nop4 -nosplash -noxgeshadercompile
+## run 1
+LogMaterial: Display: Missing cached shadermap for /Game/UM/Materials/v2/Test/MI_UM_v2_Test_Checker_LegacyW.MI_UM_v2_Test_Checker_LegacyW in PCD3D_SM6, Default, SM6, Game (DDC key hash: 77c2fd89741ab86165912d6613fb2847ca8ea4f8), c
+LogMaterial: Display: Missing cached shadermap for /Game/UM/Materials/v2/Test/MI_UM_v2_Test_Checker_LegacyW.MI_UM_v2_Test_Checker_LegacyW in PCD3D_SM5, Default, SM5, Game (DDC key hash: 5d8fef2e5def496adf179ef4bc3af791143b3266), c
+LogMaterial: Display: Missing cached shadermap for /Game/UM/Materials/v2/Test/MI_UM_v2_Test_Checker_AccentW.MI_UM_v2_Test_Checker_AccentW in PCD3D_SM6, Default, SM6, Game (DDC key hash: 2789e225374e3a64a678ac0eb07153cd8b2ecdd5), c
+LogMaterial: Display: Missing cached shadermap for /Game/UM/Materials/v2/Test/MI_UM_v2_Test_Class03_Accent.MI_UM_v2_Test_Class03_Accent in PCD3D_SM5, Default, SM5, Game (DDC key hash: 0df01aca824beb661e5291192f5025e3783b24b4), com
+LogMaterial: Display: Missing cached shadermap for /Game/UM/Materials/v2/Test/MI_UM_v2_Test_Checker_UV1.MI_UM_v2_Test_Checker_UV1 in PCD3D_SM6, Default, SM6, Game (DDC key hash: 9c8bfa52a7015bbe6f7042b85cd85df9b36caddf), compiling
+LogMaterial: Display: Missing cached shadermap for /Game/UM/Materials/v2/Test/MI_UM_v2_Test_Checker_UV1.MI_UM_v2_Test_Checker_UV1 in PCD3D_SM5, Default, SM5, Game (DDC key hash: d1e5910ae00f0c8af55790f7973ea7ec11984c05), compiling
+LogCook: Display: Cooked packages 665 Packages Remain 0 Total 665
+LogInit: Display: Success - 0 error(s), 0 warning(s)
+## run 2 (repeat: no missing shadermap for v2 in PCD3D_SM5/SM6 = all permutations cached after a successful compile)
+LogCook: Display: Cooked packages 665 Packages Remain 0 Total 665
+LogInit: Display: Success - 0 error(s), 0 warning(s)
+## shader compile errors/warnings in both logs
+C:/tmp/ldc-m/sm5cook.log:0
+C:/tmp/ldc-m/sm5cook-r2.log:0

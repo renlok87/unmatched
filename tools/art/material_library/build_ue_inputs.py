@@ -332,6 +332,10 @@ def small_textures(cols: dict) -> dict:
                                   "pattern)")
     ramp = np.tile(np.clip((np.arange(256) / 255.0 - 0.25) * 2.0, 0, 1)[None, :], (256, 1))
     out["T_UM_Test_EdgeRamp"] = (encode_unorm8(ramp), "L", "test: edge mask ramp along U (0 for u < 0.25, 1 for u > 0.75)")
+    half = np.zeros((256, 256), np.uint8)
+    half[:128, :] = 255
+    out["T_UM_Test_AccentHalf"] = (half, "L", "test (v2.1 UseTeamAccent): TeamAccent 1 for v < 0.5, 0 for v >= 0.5 "
+                                              "(hard edge; imported point-filtered without mips)")
     return out
 
 

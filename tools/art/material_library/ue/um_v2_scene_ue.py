@@ -10,6 +10,12 @@ ARGS {"op": ...}
           Transform(Local -> Tangent) (emissive R = |error| with +grad v as tangent Y, G = with -grad v) and puts it
           on one more sphere. Nothing is saved; the host reloads the previous level at the end.
   drop_probe  deletes /Game/UM/Materials/v2/_probe (never saved).
+  accent_probe {"textures": {key: png}, "instances": [{"name", "parent", "scalars", "vectors", "textures", "switches"}]}
+          (v2.1 test, ue_v2_accent.py) imports hero TeamAccent PNGs into /Game/UM/Materials/v2/_probe (TC_Grayscale,
+          sRGB off, NeverStream) and creates UNSAVED child MIs of the hero MIs there (static switch UseTeamAccent needs
+          a constant MI, not a MID); a texture value "probe:<key>" is the imported PNG. Deleted by drop_probe, never
+          saved.
+  figure  spawns a SkeletalMeshActor; the material goes on every slot of the mesh.
 Camera / materials / cleanup: tools/tripo-pipeline/review/ue_py/control_scene_ue.py (ops by actor label).
 """
 import json
@@ -251,9 +257,51 @@ elif op == "figure":
     comp = a.skeletal_mesh_component
     comp.set_skinned_asset_and_update(load(args["asset"]))
     comp.set_collision_enabled(u.CollisionEnabled.NO_COLLISION)
-    comp.set_material(0, load(args["material"]))
+    for i in range(max(1, comp.get_num_materials())):
+        comp.set_material(i, load(args["material"]))
     a.set_actor_label(args["label"])
+    out["slots"] = int(comp.get_num_materials())
     out["figure"] = {"label": args["label"], "materials": [m.get_path_name().split(".")[0] for m in comp.get_materials() if m]}
+elif op == "accent_probe":
+    at = u.AssetToolsHelpers.get_asset_tools()
+    if EAL.does_directory_exist(PROBE_DIR):
+        EAL.delete_directory(PROBE_DIR)
+    texs = {}
+    for key, png in sorted(args["textures"].items()):
+        task = u.AssetImportTask()
+        task.set_editor_property("filename", png)
+        task.set_editor_property("destination_path", PROBE_DIR)
+        task.set_editor_property("destination_name", "T_Probe_" + key)
+        task.set_editor_property("automated", True)
+        task.set_editor_property("replace_existing", True)
+        task.set_editor_property("save", False)
+        at.import_asset_tasks([task])
+        paths = list(task.get_editor_property("imported_object_paths"))
+        if len(paths) != 1:
+            raise RuntimeError("probe import of %s gave %r" % (png, paths))
+        t = u.load_asset(paths[0])
+        t.set_editor_property("compression_settings", u.TextureCompressionSettings.TC_GRAYSCALE)
+        t.set_editor_property("srgb", False)
+        # all mips resident: a freshly imported streaming texture starts at a low mip and streams in while the
+        # frames are taken (2026-09-30: blurred dye weight around the accents in the first probe frames)
+        t.set_editor_property("never_stream", True)
+        texs[key] = t
+    out["textures"] = {k: [t.get_path_name(), t.blueprint_get_size_x(), t.blueprint_get_size_y()] for k, t in texs.items()}
+    out["instances"] = {}
+    for spec in args["instances"]:
+        mi = at.create_asset(spec["name"], PROBE_DIR, u.MaterialInstanceConstant,
+                             u.MaterialInstanceConstantFactoryNew())
+        MEL.set_material_instance_parent(mi, load(spec["parent"]))
+        for k, v in (spec.get("scalars") or {}).items():
+            MEL.set_material_instance_scalar_parameter_value(mi, k, float(v))
+        for k, v in (spec.get("vectors") or {}).items():
+            MEL.set_material_instance_vector_parameter_value(mi, k, u.LinearColor(*[float(x) for x in v]))
+        for k, v in (spec.get("textures") or {}).items():
+            MEL.set_material_instance_texture_parameter_value(mi, k, texs[v[6:]] if v.startswith("probe:") else load(v))
+        for k, v in (spec.get("switches") or {}).items():
+            MEL.set_material_instance_static_switch_parameter_value(mi, k, bool(v))
+        MEL.update_material_instance(mi)
+        out["instances"][spec["name"]] = mi.get_path_name().split(".")[0]
 elif op == "drop_probe":
     if EAL.does_directory_exist(PROBE_DIR):
         EAL.delete_directory(PROBE_DIR)

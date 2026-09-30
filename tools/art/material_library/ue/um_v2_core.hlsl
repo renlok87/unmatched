@@ -1,11 +1,15 @@
 // M_UM_Figure_v2 core (Custom node "UM_V2_Core"; body of the generated function, returns the base colour).
 // Architecture: docs/art-pipeline/material-library/README.md sections 3-6; this graph: m-um-figure-v2.md.
 // Inputs  MatIDTex LUTTex (Texture2D, Load only), DetN DetRMH (Texture2DArray, SampleGrad), UV0 UV1 UseUV1,
-//         P N0 (pre-skinned local position/normal through vertex interpolators), LocalUnitM, BCh Nh ORMh TeamMask Edge,
+//         P N0 (pre-skinned local position/normal through vertex interpolators), LocalUnitM, BCh Nh ORMh DyeMask Edge,
 //         Team TeamDye TeamDyeGain RoughMin RoughMax DetailStrength WearStrength SheenStrength AOToBC Saturation
-//         ValueLift DebugView MatIDOverride BakeFromLUT
+//         ValueLift DebugView MatIDOverride BakeFromLUT UseAccent TeamDyeCeiling
 // Outputs (inout) Rough Metal Spec AO NormalTS Cloth Fuzz IsCloth DebugE
 // Class 0 (legacy bake) repeats the v1 M_UM_Figure graph exactly: BC (TeamMask dye), ORM, hero normal.
+// v2.1 (LDV-12): static switch UseTeamAccent. On (UseAccent = 1, DyeMask = TeamAccentTexture.R): the dye weight is the
+// TeamAccent mask alone, for every class (teamDyeAllowed is a mask-authoring rule, not a shader gate), and
+// TeamDyeCeiling > 0 caps the gain per team colour. Off (UseAccent = 0, DyeMask = TeamMaskTexture.R): the v2.0 path,
+// TeamMask x teamDyeAllowed of the class, gain = TeamDyeGain (bit for bit as before).
 const float3 LUMA = float3(0.2126, 0.7152, 0.0722);
 
 // ---- class id: MatID R8, value = index * 16 + 8 (Load, no filtering; README section 3)
@@ -44,14 +48,25 @@ Rough = 0.5; Metal = 0.0; Spec = 0.5; AO = ORMh.r; Cloth = 0.0; IsCloth = 0.0; F
 NormalTS = Nh;
 DebugE = float3(0.0, 0.0, 0.0);
 
+// ---- team dye gain (LDV-13): TeamDyeGain, or with TeamAccent and TeamDyeCeiling > 0 the team-accent.md rule
+// gain = min(0.8 / Y_p50, 0.9 / (maxChannel(team) x Y_p95)) = min(TeamDyeGain, TeamDyeCeiling / maxChannel(team)):
+// one hero MI gives every team colour (MI TeamColor or CPD_TeamColor) its own gain
+float gain = TeamDyeGain;
+if (UseAccent > 0.5 && TeamDyeCeiling > 0.0)
+{
+    gain = min(TeamDyeGain, TeamDyeCeiling / max(max(Team.r, max(Team.g, Team.b)), 1e-3));
+}
+float dyeW = 0.0;
+
 [branch] if (id == 0)
 {
     // v1 path (M_UM_Figure): roughness range, ORM metallic, lerp(BC, team, TeamMask)
     Rough = lerp(RoughMin, RoughMax, ORMh.g);
     Metal = ORMh.b;
     float yl = dot(bc, LUMA);
-    float3 teamed = lerp(bc * Team, Team * yl * TeamDyeGain, TeamDye);
-    bc = lerp(bc, teamed, TeamMask);
+    float3 teamed = lerp(bc * Team, Team * yl * gain, TeamDye);
+    dyeW = DyeMask;
+    bc = lerp(bc, teamed, dyeW);
 }
 else
 {
@@ -136,10 +151,12 @@ else
         float3 aoc = lerp(L9.rgb, float3(1.0, 1.0, 1.0), saturate(AO));   // skin: red cavities (subsurfaceApprox)
         bc *= lerp(float3(1.0, 1.0, 1.0), aoc, L9.a);
     }
-    // TeamColor: only classes with teamDyeAllowed (cloth, leather, feathers), inside the hero TeamMask
+    // TeamColor. UseTeamAccent on: the TeamAccent mask alone decides (any class). Off (v2.0): only classes with
+    // teamDyeAllowed (cloth, leather, feathers), inside the hero TeamMask
     float yd = dot(bc, LUMA);
-    float3 dyed = lerp(bc * Team, Team * yd * TeamDyeGain, TeamDye);
-    bc = lerp(bc, dyed, TeamMask * L7.a);
+    float3 dyed = lerp(bc * Team, Team * yd * gain, TeamDye);
+    dyeW = UseAccent > 0.5 ? DyeMask : DyeMask * L7.a;
+    bc = lerp(bc, dyed, dyeW);
     // edge wear: hero convexity mask x class strength, broken up by the tile height, kept out of occlusion
     if (L5.r > 0.0)
     {
@@ -185,6 +202,7 @@ if (DebugView > 0.5)
     else if (dv == 7) { v = bc; }
     else if (dv == 8) { v = Fuzz; }
     else if (dv == 9) { v = rmh.rgb; }
+    else if (dv == 10) { v = dyeW.xxx; }
     DebugE = v;
     bc = float3(0.0, 0.0, 0.0); Metal = 0.0; Spec = 0.0; Rough = 1.0; IsCloth = 0.0; Cloth = 0.0;
     Fuzz = float3(0.0, 0.0, 0.0);
