@@ -234,7 +234,93 @@ bool ParseRenderBlocks(const FString& ProfileId, const TSharedPtr<FJsonObject>& 
   }
   return bOk;
 }
+
+// ENV-MAPS track S: the "mapImage" block of a 'map-image' board. Asset paths are soft /Game/EnvMaps/ packages
+// (checked here so a typo fails the document, not the frame); the assets themselves are out of git and may be
+// missing in a checkout without the import (the actor falls back, traced).
+bool ParseMapImage(const FString& BoardId, const TSharedPtr<FJsonObject>& Object, FS08MapImageSpec& Out,
+                   TArray<FString>& Errors) {
+  Out = FS08MapImageSpec();
+  bool bOk = true;
+  if (!Object->TryGetStringField(TEXT("name"), Out.Name) || Out.Name.IsEmpty()) {
+    Errors.Add(FString::Printf(TEXT("board %s: mapImage.name missing"), *BoardId));
+    bOk = false;
+  }
+  for (const TCHAR C : Out.Name) {
+    if (!FChar::IsAlnum(C)) {
+      Errors.Add(FString::Printf(TEXT("board %s: mapImage.name '%s' is not alphanumeric"), *BoardId, *Out.Name));
+      bOk = false;
+      break;
+    }
+  }
+  auto ReadPath = [&](const TCHAR* Field, FString& Path) {
+    if (!Object->TryGetStringField(Field, Path) || !Path.StartsWith(S08MapSurfaceSpec::AssetRoot) ||
+        Path.Contains(TEXT(" ")) || Path.Contains(TEXT("."))) {
+      Errors.Add(FString::Printf(TEXT("board %s: mapImage.%s '%s' is not a %s package path"), *BoardId, Field,
+                                 *Path, S08MapSurfaceSpec::AssetRoot));
+      bOk = false;
+    }
+  };
+  ReadPath(TEXT("bc"), Out.BaseColorPath);
+  ReadPath(TEXT("mask"), Out.MaskPath);
+  ReadPath(TEXT("sdf"), Out.SdfPath);
+  ReadPath(TEXT("id"), Out.SpaceIdPath);
+  ReadPath(TEXT("materialInstance"), Out.MaterialInstancePath);
+  Object->TryGetStringField(TEXT("manifest"), Out.ManifestPath);
+  TArray<double> N;
+  if (!ReadNumberArray(Object, TEXT("srcSize"), 2, N) || N[0] < 1.0 || N[1] < 1.0 ||
+      N[0] != FMath::RoundToDouble(N[0]) || N[1] != FMath::RoundToDouble(N[1])) {
+    Errors.Add(FString::Printf(TEXT("board %s: mapImage.srcSize needs [width, height] in whole px > 0"), *BoardId));
+    bOk = false;
+  } else {
+    Out.SrcSizePx = FIntPoint(static_cast<int32>(N[0]), static_cast<int32>(N[1]));
+  }
+  double Value = 0.0;
+  if (!Object->TryGetNumberField(TEXT("uuPerPx"), Value) || Value <= 0.0) {
+    Errors.Add(FString::Printf(TEXT("board %s: mapImage.uuPerPx must be > 0"), *BoardId));
+    bOk = false;
+  } else {
+    Out.UuPerPx = static_cast<float>(Value);
+  }
+  if (Object->TryGetNumberField(TEXT("frameUU"), Value)) {
+    if (Value < 0.0) {
+      Errors.Add(FString::Printf(TEXT("board %s: mapImage.frameUU must be >= 0"), *BoardId));
+      bOk = false;
+    } else {
+      Out.FrameUU = static_cast<float>(Value);
+    }
+  }
+  if (Object->HasField(TEXT("trayOffsetUU"))) {
+    if (!ReadNumberArray(Object, TEXT("trayOffsetUU"), 2, N)) {
+      Errors.Add(FString::Printf(TEXT("board %s: mapImage.trayOffsetUU needs [x, y]"), *BoardId));
+      bOk = false;
+    } else {
+      Out.TrayOffsetUU = FVector2D(N[0], N[1]);
+    }
+  }
+  Out.bSet = bOk;
+  return bOk;
+}
 }  // namespace
+
+FVector FS08MapImageSpec::PxToWorld(const FVector2D& Px) const {
+  const double W = SrcSizePx.X, H = SrcSizePx.Y;
+  return FVector((Px.X / W - 0.5) * W * UuPerPx, (Px.Y / H - 0.5) * H * UuPerPx, 0.0);
+}
+
+TArray<FString> FS08MapImageSpec::AssetPaths() const {
+  return {BaseColorPath, MaskPath, SdfPath, SpaceIdPath, MaterialInstancePath};
+}
+
+bool FS08MapImageSpec::MatchesLayoutFrame(const FS08LayoutFrame& Frame) const {
+  return FMath::IsNearlyEqual(static_cast<double>(SrcSizePx.X), Frame.SrcSize.X, 1e-3) &&
+         FMath::IsNearlyEqual(static_cast<double>(SrcSizePx.Y), Frame.SrcSize.Y, 1e-3) &&
+         FMath::IsNearlyEqual(UuPerPx, Frame.UuPerPx, 1e-6f);
+}
+
+bool FS08MapImageSpec::MatchesDefaultLayoutFrame() const {
+  return MatchesLayoutFrame(FS08LayoutFrame());
+}
 
 const TCHAR* S08ZoneStrokeName(ES08ZoneStroke Stroke) {
   switch (Stroke) {
@@ -267,7 +353,11 @@ const TCHAR* S08ZoneGlyphName(ES08ZoneGlyph Glyph) {
 }
 
 const TCHAR* S08BoardSurfaceName(ES08BoardSurface Surface) {
-  return Surface == ES08BoardSurface::Cobble5x6Mesh ? TEXT("cobble-5x6-mesh") : TEXT("tiles");
+  switch (Surface) {
+    case ES08BoardSurface::Cobble5x6Mesh: return TEXT("cobble-5x6-mesh");
+    case ES08BoardSurface::MapImage: return TEXT("map-image");
+    default: return TEXT("tiles");
+  }
 }
 
 const TCHAR* S08ProfileMatchName(ES08ProfileMatch Match) {
@@ -353,6 +443,16 @@ FS08BoardSummary S08SummarizeBoard(const FS08BoardModel& Board) {
   }
   S.ZoneCellCounts.GenerateKeyArray(S.ZoneKeys);
   S.ZoneKeys.Sort();
+  // ENV-MAPS: the topology view of the board (track U model: bHasTopology, bHasLayout, StartSlot, Neighbours).
+  S.bTopology = Board.bHasTopology;
+  if (S.bTopology) {
+    for (const FS08Cell& Cell : Board.Cells) {
+      if (!Cell.bHasLayout) continue;
+      ++S.Spaces;
+      if (Cell.StartSlot > 0) ++S.Starts;
+    }
+    S.Links = S08BoardLinkPairs(Board).Num();
+  }
   return S;
 }
 
@@ -538,9 +638,30 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
         B.Surface = ES08BoardSurface::Cobble5x6Mesh;
       } else if (Surface == TEXT("tiles")) {
         B.Surface = ES08BoardSurface::Tiles;
+      } else if (Surface == TEXT("map-image")) {
+        B.Surface = ES08BoardSurface::MapImage;
       } else {
         OutErrors.Add(FString::Printf(TEXT("board %s: unknown surface '%s'"), *B.Id, *Surface));
         continue;
+      }
+      if (B.Surface == ES08BoardSurface::MapImage) {
+        // ENV-MAPS: a map-image board is selected by its Board row id only (a W x H signature would also catch
+        // any grid of the same lattice size) and needs the "mapImage" block.
+        const TSharedPtr<FJsonObject>* MapObj = nullptr;
+        if (!(*Obj)->TryGetObjectField(TEXT("mapImage"), MapObj) || !MapObj || !MapObj->IsValid()) {
+          OutErrors.Add(FString::Printf(TEXT("board %s: surface map-image needs a mapImage block"), *B.Id));
+          continue;
+        }
+        if (!ParseMapImage(B.Id, *MapObj, B.Map, OutErrors)) continue;
+        if (B.MatchBoardIds.Num() == 0) {
+          OutErrors.Add(FString::Printf(TEXT("board %s: map-image needs match.boardIds (selected by id only)"), *B.Id));
+          continue;
+        }
+        if (B.MatchWidth > 0 || B.MatchHeight > 0 || B.MatchZoneKeys.Num() > 0) {
+          OutErrors.Add(FString::Printf(TEXT("board %s: map-image match takes no width/height/zoneKeys signature"),
+                                        *B.Id));
+          continue;
+        }
       }
       (*Obj)->TryGetStringField(TEXT("light"), B.LightId);
       if (!Lights.Contains(B.LightId)) {
@@ -568,6 +689,10 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
         ReadInt(TEXT("zoneCells"), B.Expect.ZoneCells);
         ReadInt(TEXT("multizoneCells"), B.Expect.MultizoneCells);
         ReadInt(TEXT("obstacles"), B.Expect.Obstacles);
+        ReadInt(TEXT("spaces"), B.Expect.Spaces);
+        ReadInt(TEXT("links"), B.Expect.Links);
+        (*Expect)->TryGetStringArrayField(TEXT("zones"), B.Expect.Zones);
+        B.Expect.Zones.Sort();
         const TSharedPtr<FJsonObject>* Counts = nullptr;
         if ((*Expect)->TryGetObjectField(TEXT("zoneCellCounts"), Counts) && Counts) {
           for (const TPair<FString, TSharedPtr<FJsonValue>>& C : (*Counts)->Values) {
@@ -606,6 +731,9 @@ const FS08BoardArtProfile* FS08BoardArtData::Select(const FS08BoardModel& Board,
       }
     }
   }
+  // ENV-MAPS: a topology board is matched by its Board row id only - a W x H + zone-key signature describes a
+  // grid and would dress the space graph with lattice tiles.
+  if (Board.bHasTopology) return nullptr;
   const FS08BoardSummary Summary = S08SummarizeBoard(Board);
   for (const FS08BoardArtProfile& B : Boards) {
     if (B.MatchWidth > 0 && B.MatchHeight > 0 && B.MatchZoneKeys.Num() > 0 &&
@@ -632,6 +760,14 @@ FString S08ExpectMismatch(const FS08BoardArtProfile& Profile, const FS08BoardSum
   Check(TEXT("zoneCells"), E.ZoneCells, Summary.ZoneCells);
   Check(TEXT("multizone"), E.MultizoneCells, Summary.MultizoneCells);
   Check(TEXT("obstacles"), E.Obstacles, Summary.Obstacles);
+  // ENV-MAPS map-image expect: the space graph instead of the W x H lattice.
+  if ((E.Spaces >= 0 || E.Links >= 0) && !Summary.bTopology) Out.Add(TEXT("topology 0!=1"));
+  Check(TEXT("spaces"), E.Spaces, Summary.Spaces);
+  Check(TEXT("links"), E.Links, Summary.Links);
+  if (E.Zones.Num() > 0 && E.Zones != Summary.ZoneKeys) {
+    Out.Add(FString::Printf(TEXT("zones %s!=%s"), *FString::Join(Summary.ZoneKeys, TEXT("+")),
+                            *FString::Join(E.Zones, TEXT("+"))));
+  }
   if (E.ZoneCellCounts.Num() > 0) {
     TArray<FString> Keys;
     E.ZoneCellCounts.GenerateKeyArray(Keys);
@@ -826,4 +962,104 @@ TArray<FS08PlacedLight> S08PlaceLights(const FS08LightProfile& Profile, const FS
   if (Profile.bHasDirectional) Place(Profile.Directional);
   for (const FS08LightSpec& Spec : Profile.Points) Place(Spec);
   return Out;
+}
+
+TArray<FS08PlacedLight> S08PlaceLights(const FS08LightProfile& Profile, const FVector2D& BoardSizeUU) {
+  TArray<FS08PlacedLight> Out;
+  auto Place = [&](const FS08LightSpec& Spec) {
+    FS08PlacedLight P;
+    P.Spec = Spec;
+    P.Position = Spec.bHasPosUU ? Spec.PosUU
+                                : FVector(Spec.At.X * BoardSizeUU.X, Spec.At.Y * BoardSizeUU.Y, Spec.AtZ);
+    Out.Add(P);
+  };
+  if (Profile.bHasDirectional) Place(Profile.Directional);
+  for (const FS08LightSpec& Spec : Profile.Points) Place(Spec);
+  return Out;
+}
+
+// ---- ENV-MAPS track S --------------------------------------------------------------------------------------
+
+FVector2D S08BoardHalfExtentUU(const FS08BoardModel& Board) {
+  if (Board.bHasTopology) return Board.LayoutFrame.ExtentUU() * 0.5;
+  // The grid value exactly as SetupCameraForBoard computed it before ENV-MAPS (float, same operation order).
+  const float ExtentX = Board.Width * FS08BoardModel::CellSizeUU * 0.5f;
+  const float ExtentY = Board.Height * FS08BoardModel::CellSizeUU * 0.5f;
+  return FVector2D(ExtentX, ExtentY);
+}
+
+float S08K1FitDistanceUU(const FVector2D& HalfExtentUU) {
+  // UE's FOVAngle is the HORIZONTAL fov: the vertical half-tan is the horizontal one divided by the aspect.
+  const float Hfov = 35.0f;
+  const float Aspect = 16.0f / 9.0f;
+  const float HalfH = FMath::Tan(FMath::DegreesToRadians(Hfov * 0.5f));
+  const float HalfV = HalfH / Aspect;
+  const float ExtentY = static_cast<float>(HalfExtentUU.Y);
+  const float ExtentX = static_cast<float>(HalfExtentUU.X);
+  // Vertical screen span covers the board's Y extent tilted by the pitch.
+  const float SinPitch = FMath::Sin(FMath::DegreesToRadians(55.0f));
+  const float NeedV = (ExtentY * SinPitch + 60.0f) / HalfV;
+  const float NeedH = (ExtentX + 60.0f) / HalfH;
+  return FMath::Max(NeedV, NeedH) * 1.12f;
+}
+
+TArray<TPair<FIntPoint, FIntPoint>> S08BoardLinkPairs(const FS08BoardModel& Board) {
+  TArray<TPair<FIntPoint, FIntPoint>> Out;
+  if (!Board.bHasTopology) return Out;
+  for (int32 Y = 0; Y < Board.Height; ++Y) {
+    for (int32 X = 0; X < Board.Width; ++X) {
+      const int32 Index = Y * Board.Width + X;
+      for (const FIntPoint& N : Board.Neighbours(FIntPoint(X, Y))) {
+        // each undirected link once: from the row-major smaller cell (Neighbours is symmetrised)
+        if (N.Y * Board.Width + N.X > Index) Out.Add(TPair<FIntPoint, FIntPoint>(FIntPoint(X, Y), N));
+      }
+    }
+  }
+  Out.Sort([W = Board.Width](const TPair<FIntPoint, FIntPoint>& A, const TPair<FIntPoint, FIntPoint>& B) {
+    const int32 A0 = A.Key.Y * W + A.Key.X, B0 = B.Key.Y * W + B.Key.X;
+    if (A0 != B0) return A0 < B0;
+    return A.Value.Y * W + A.Value.X < B.Value.Y * W + B.Value.X;
+  });
+  return Out;
+}
+
+FTransform S08MapPlaneTransform(const FVector2D& SizeUU, float Z) {
+  // /Engine/BasicShapes/Plane spans +-50 uu in X and Y; scale 1 = 100 uu. Yaw 0: its X / Y axes are the world
+  // X / Y (the MapPlaneUV test checks that UV (0,0) lands on (-X, -Y) and u runs along +X). Read from the UE 5.8
+  // Plane.uasset LOD0 mesh description (2026-09-30, Oodle-decoded offline): local (-50,-50) -> uv (0,0),
+  // (50,-50) -> (1,0), (-50,50) -> (0,1), (50,50) -> (1,1), normal +Z - u along +X, v along +Y, no rotation.
+  return FTransform(FRotator::ZeroRotator, FVector(0.0, 0.0, Z), FVector(SizeUU.X / 100.0, SizeUU.Y / 100.0, 1.0));
+}
+
+FString S08MapImageMissingLine(const FString& Path) {
+  return TEXT("ARTPREVIEW map-image missing ") + Path;
+}
+
+void S08RingPieces(float RadiusUU, float WidthUU, int32 Segments, float Z, float DepthScale, TArray<FTransform>& Out) {
+  if (Segments < 3 || RadiusUU <= 0.0f || WidthUU <= 0.0f) return;
+  const float Step = 360.0f / Segments;
+  // Tangent pieces of the circumscribed polygon of the OUTER edge: adjacent pieces overlap at the inner edge
+  // and meet at the outer corners, so the ring shows no gaps.
+  const float Outer = RadiusUU + WidthUU * 0.5f;
+  const float Length = 2.0f * Outer * FMath::Tan(FMath::DegreesToRadians(Step * 0.5f));
+  for (int32 I = 0; I < Segments; ++I) {
+    const float Angle = Step * I;
+    const float Rad = FMath::DegreesToRadians(Angle);
+    const FVector Centre(RadiusUU * FMath::Cos(Rad), RadiusUU * FMath::Sin(Rad), Z);
+    // piece X = along the tangent (yaw Angle + 90), piece Y = radial width
+    Out.Add(FTransform(FRotator(0.0f, Angle + 90.0f, 0.0f), Centre,
+                       FVector(Length / 100.0f, WidthUU / 100.0f, DepthScale)));
+  }
+}
+
+bool S08LinkBarTransform(const FVector& A, const FVector& B, float TrimUU, float WidthUU, float Z, float DepthScale,
+                         FTransform& Out) {
+  const FVector2D D(B.X - A.X, B.Y - A.Y);
+  const double Dist = D.Size();
+  const double Length = Dist - 2.0 * TrimUU;
+  if (Length <= 1.0) return false;
+  const FVector Mid((A.X + B.X) * 0.5, (A.Y + B.Y) * 0.5, Z);
+  const double Yaw = FMath::RadiansToDegrees(FMath::Atan2(D.Y, D.X));
+  Out = FTransform(FRotator(0.0, Yaw, 0.0), Mid, FVector(Length / 100.0, WidthUU / 100.0, DepthScale));
+  return true;
 }

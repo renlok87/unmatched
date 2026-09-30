@@ -19,6 +19,7 @@ class UInstancedStaticMeshComponent;
 class UStaticMeshComponent;
 class UStaticMesh;
 class UTextRenderComponent;
+class UBoxComponent;
 class AS08FighterActor;
 class UMaterialInterface;
 class UMaterialInstanceDynamic;
@@ -50,8 +51,42 @@ public:
    *  a no-op without -ArtPreview -ArtPreviewDiorama). Returns true when the tray component exists. */
   bool EnsureDioramaTray(bool bArtPreview);
   /** Wave 5c-B: shows the tray fitted to a board frame of world half extent BoardHalf (S08Diorama::FitTray), or
-   *  hides it; writes the 'ARTPREVIEW diorama tray=' line. Public for the automation test. */
-  void PlaceDioramaTray(bool bVisible, const FVector2D& BoardHalf, const TCHAR* Surface);
+   *  hides it; writes the 'ARTPREVIEW diorama tray=' line. Public for the automation test.
+   *  ENV-MAPS (ENV-O8 T1): Offset shifts the tray (extra rim on one side), Waiver names the exception the
+   *  placeholder stretch runs under ('T1-placeholder' on the map-image surface; nullptr = the old line). */
+  void PlaceDioramaTray(bool bVisible, const FVector2D& BoardHalf, const TCHAR* Surface,
+                        const FVector2D& Offset = FVector2D::ZeroVector, const TCHAR* Waiver = nullptr);
+
+  // ---- ENV-MAPS track S (topology boards, 'map-image' surface) ----
+  /** True when the last Rebuild got a topology board (FS08BoardModel::bHasTopology). */
+  bool IsTopologyBoard() const { return bTopologyBoard; }
+  /** True when the active art profile draws the original map illustration. */
+  bool IsMapImageActive() const { return bMapImageActive; }
+  /** Half extent the K1 camera / lights / tray fit: the active map-image profile's map, else the board's
+   *  S08BoardHalfExtentUU (map canvas of a topology board, W x H x 50 of a grid). */
+  FVector2D GetBoardHalfExtentUU() const;
+  /** Map plane (map-image surface, or the dark canvas of the grey topology view); nullptr until a topology board. */
+  const UStaticMeshComponent* GetMapPlane() const { return MapPlane; }
+  /** Invisible QueryOnly (Visibility) cursor-trace box over the map of a topology board (nullptr on grids). */
+  const UBoxComponent* GetMapPickBox() const { return MapPickBox; }
+  /** Grey topology view: one disc per space / one bar per link (nullptr until needed). */
+  const UInstancedStaticMeshComponent* GetTopologyDiscs() const { return TopologyDiscs; }
+  const UInstancedStaticMeshComponent* GetTopologyLinkBars() const { return TopologyLinkBars; }
+  /** Instance counts of the lattice ISMs (normal + blocker + underlay): 0 on a topology board. */
+  int32 GetLatticeInstanceCount() const;
+  /** Art surface parts (wood frame bars / 'tiles' slabs) of the last Rebuild. */
+  int32 GetArtSurfacePartCount() const { return ArtSurfaceParts.Num(); }
+  int32 GetArtCornerCount() const;
+  /** Asset paths the last map-image activation could not load (the fallback reason; empty when none). */
+  const TArray<FString>& GetMapImageMissing() const { return MapImageMissing; }
+  /** Loads the map material instance + BC / mask of a map-image spec (the SDF / ID packages are only checked
+   *  for existence, and only in uncooked runs: they are never cooked); every missing path is traced 'ARTPREVIEW map-image missing <path>'. False when a required
+   *  asset (MI, BC, mask) is missing. On success MapPlaneMaterial is a MID of the MI with BaseColor / GameMask
+   *  bound to the spec's textures. */
+  bool LoadMapImageAssets(const FS08MapImageSpec& Spec);
+  /** Automation only: board profile data without BeginPlay / -ArtPreview (art assets treated as ready; the
+   *  map-image path loads its own assets and falls back when they are missing). */
+  void SetArtDataForTest(const FS08BoardArtData& Data);
 
   /** Syncs fighter actors with the latest decoded fighters (spawn/move/
    *  re-label by stable fighter id; dead fighters hide instantly). */
@@ -249,6 +284,31 @@ private:
   // Wave 5c-B -ArtPreviewDiorama (S08Diorama.h): created at runtime only with the flag, nullptr otherwise.
   UPROPERTY()
   TObjectPtr<UStaticMeshComponent> DioramaTray;
+
+  // ENV-MAPS track S: created on demand by the first topology board (a grid board creates none of them).
+  UPROPERTY()
+  TObjectPtr<UStaticMesh> PlaneMesh;     // /Engine/BasicShapes/Plane (constructor finder)
+  UPROPERTY()
+  TObjectPtr<UStaticMesh> CylinderMesh;  // /Engine/BasicShapes/Cylinder (discs)
+  UPROPERTY()
+  TObjectPtr<UStaticMeshComponent> MapPlane;  // map-image plane, or the dark canvas of the grey topology view
+  UPROPERTY()
+  TObjectPtr<UBoxComponent> MapPickBox;       // invisible QueryOnly / Visibility cursor surface over the map
+  UPROPERTY()
+  TObjectPtr<UInstancedStaticMeshComponent> TopologyDiscs;     // grey view: one disc per space
+  UPROPERTY()
+  TObjectPtr<UInstancedStaticMeshComponent> TopologyLinkBars;  // grey view: one bar per link
+  UPROPERTY()
+  TObjectPtr<UMaterialInstanceDynamic> MapPlaneMaterial;  // MID of MI_<Name>_MapBoard (textures bound)
+  TArray<FString> MapImageMissing;
+  bool bTopologyBoard = false;
+  bool bMapImageActive = false;
+  void EnsureTopologyComponents();
+  /** Grey topology view (no art, or map assets missing): dark canvas + discs + link bars, pick box. */
+  void BuildGreyTopology(const FS08BoardModel& Board);
+  /** 'map-image' surface: the map plane, frame, corners and pick box (no lattice, no zone marks). */
+  void BuildMapImageSurface(const FS08BoardModel& Board, const FS08BoardSummary& Summary);
+  void HideTopologyComponents();
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

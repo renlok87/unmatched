@@ -133,9 +133,54 @@ bool FS09CommandUi::SchemePlayableByLivingFighters(
   return !bKnownInGame;
 }
 
+bool FS09CommandUi::IsRangedAttacker(const FS08BoardFighter& Attacker) {
+  const FString Type = Attacker.AttackType.TrimStartAndEnd();
+  return Type == TEXT("ranged") || Type == TEXT("range");
+}
+
+bool FS09CommandUi::IsTargetInAttackRange(const FS08BoardModel& Board,
+                                          const FS08BoardFighter& Attacker,
+                                          const FS08BoardFighter& Target) {
+  if (Attacker.X < 0 || Attacker.Y < 0 || Target.X < 0 || Target.Y < 0) return false;
+  const FIntPoint From(Attacker.X, Attacker.Y);
+  const FIntPoint To(Target.X, Target.Y);
+  if (From == To) return false;
+  if (Board.IsAdjacent(From, To)) return true;
+  return IsRangedAttacker(Attacker) && Board.SharesZone(From, To);
+}
+
+bool FS09CommandUi::IsZoneOnlyTarget(const FS08BoardModel& Board,
+                                     const FS08BoardFighter& Attacker,
+                                     const FS08BoardFighter& Target) {
+  return IsTargetInAttackRange(Board, Attacker, Target) &&
+         !Board.IsAdjacent(FIntPoint(Attacker.X, Attacker.Y), FIntPoint(Target.X, Target.Y));
+}
+
+TArray<FString> FS09CommandUi::LegalAttackTargets(const FS08BoardModel& Board,
+                                                  const TArray<FS08BoardFighter>& Fighters,
+                                                  const FString& AttackerId) {
+  TArray<FString> Out;
+  const FS08BoardFighter* Attacker = nullptr;
+  for (const FS08BoardFighter& Fighter : Fighters) {
+    if (Fighter.Id == AttackerId) {
+      Attacker = &Fighter;
+      break;
+    }
+  }
+  if (!Attacker || !Attacker->IsAlive()) return Out;
+  for (const FS08BoardFighter& Other : Fighters) {
+    if (Other.OwnerId == Attacker->OwnerId || !Other.IsAlive()) continue;
+    if (IsTargetInAttackRange(Board, *Attacker, Other)) Out.Add(Other.Id);
+  }
+  return Out;
+}
+
 bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                                const TArray<FS08BoardFighter>& Fighters) {
   const ES09CommandMode OldMode = Mode;
+  // ENV-O6: attack range of the board-less draft overloads follows the
+  // latest authoritative board (links + zones).
+  SnapshotBoard = Board;
 
   // GD-036: terminal state closes every local draft - gameplay input is
   // dead on the result screen (the server would reject it anyway: executor
@@ -615,7 +660,7 @@ bool FS09CommandUi::CanOpenAttackDraft(const FS08Snapshot& Snapshot,
   return true;
 }
 
-bool FS09CommandUi::SelectAttacker(const FString& FighterId,
+bool FS09CommandUi::SelectAttacker(const FString& FighterId, const FS08BoardModel& Board,
                                    const TArray<FS08BoardFighter>& Fighters,
                                    FString& OutReason) {
   OutReason.Reset();
@@ -628,17 +673,20 @@ bool FS09CommandUi::SelectAttacker(const FString& FighterId,
     OutReason = TEXT("attacker must be one of your living fighters");
     return false;
   }
-  // An attacker without an adjacent living enemy can never confirm.
-  bool bHasAdjacentEnemy = false;
+  // An attacker without a living enemy in range can never confirm (melee:
+  // adjacent; ranged: adjacent or same zone - the server's legal set).
+  bool bHasEnemyInRange = false;
   for (const FS08BoardFighter& Other : Fighters) {
     if (Other.OwnerId == ViewerId || !Other.IsAlive()) continue;
-    if (FMath::Abs(Other.X - Fighter->X) + FMath::Abs(Other.Y - Fighter->Y) == 1) {
-      bHasAdjacentEnemy = true;
+    if (IsTargetInAttackRange(Board, *Fighter, Other)) {
+      bHasEnemyInRange = true;
       break;
     }
   }
-  if (!bHasAdjacentEnemy) {
-    OutReason = TEXT("attacker has no adjacent enemy (melee adjacency)");
+  if (!bHasEnemyInRange) {
+    OutReason = IsRangedAttacker(*Fighter)
+                    ? TEXT("attacker has no enemy in range (ranged: adjacent or same zone)")
+                    : TEXT("attacker has no adjacent enemy (melee adjacency)");
     return false;
   }
   if (AttackAttackerId != FighterId) {
@@ -650,7 +698,7 @@ bool FS09CommandUi::SelectAttacker(const FString& FighterId,
   return true;
 }
 
-bool FS09CommandUi::SelectTarget(const FString& FighterId,
+bool FS09CommandUi::SelectTarget(const FString& FighterId, const FS08BoardModel& Board,
                                  const TArray<FS08BoardFighter>& Fighters,
                                  FString& OutReason) {
   OutReason.Reset();
@@ -668,8 +716,10 @@ bool FS09CommandUi::SelectTarget(const FString& FighterId,
     OutReason = TEXT("target must be a living enemy fighter");
     return false;
   }
-  if (FMath::Abs(Target->X - Attacker->X) + FMath::Abs(Target->Y - Attacker->Y) != 1) {
-    OutReason = TEXT("target must be adjacent to the attacker");
+  if (!IsTargetInAttackRange(Board, *Attacker, *Target)) {
+    OutReason = IsRangedAttacker(*Attacker)
+                    ? TEXT("target must be adjacent to the attacker or share a zone with it (ranged)")
+                    : TEXT("target must be adjacent to the attacker");
     return false;
   }
   AttackTargetId = FighterId;
@@ -705,7 +755,7 @@ bool FS09CommandUi::ToggleAttackCard(const FString& InstanceId, const FS08Snapsh
   return false;
 }
 
-bool FS09CommandUi::ConfirmAttack(const FS08Snapshot& Snapshot,
+bool FS09CommandUi::ConfirmAttack(const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                                   const TArray<FS08BoardFighter>& Fighters,
                                   FS09AttackCommand& OutCommand,
                                   FString& OutReason) const {
@@ -720,11 +770,11 @@ bool FS09CommandUi::ConfirmAttack(const FS08Snapshot& Snapshot,
     return false;
   }
   if (AttackAttackerId.IsEmpty() || AttackTargetId.IsEmpty() || AttackCardId.IsEmpty()) {
-    OutReason = TEXT("attack needs attacker + adjacent target + legal card");
+    OutReason = TEXT("attack needs attacker + target in range + legal card");
     return false;
   }
   // Re-derive every leg from the AUTHORITATIVE snapshot (no draft-stale
-  // confirm): adjacency, ownership, banner legality.
+  // confirm): attack range, ownership, banner legality.
   const FS08BoardFighter* Attacker = FindFighter(Fighters, AttackAttackerId);
   if (!Attacker || Attacker->OwnerId != ViewerId || !Attacker->IsAlive()) {
     OutReason = TEXT("drafted attacker is no longer legal");
@@ -732,8 +782,8 @@ bool FS09CommandUi::ConfirmAttack(const FS08Snapshot& Snapshot,
   }
   const FS08BoardFighter* Target = FindFighter(Fighters, AttackTargetId);
   if (!Target || !Target->IsAlive() || Target->OwnerId == ViewerId ||
-      FMath::Abs(Target->X - Attacker->X) + FMath::Abs(Target->Y - Attacker->Y) != 1) {
-    OutReason = TEXT("drafted target is no longer adjacent/alive");
+      !IsTargetInAttackRange(Board, *Attacker, *Target)) {
+    OutReason = TEXT("drafted target is no longer in range/alive");
     return false;
   }
   const TArray<const TCHAR*> Types = {TEXT("ATTACK"), TEXT("VERSATILE"), TEXT("UNIVERSAL")};
@@ -960,11 +1010,11 @@ TSet<uint64> FS09CommandUi::PendingMoveCells(const FS08BoardModel& Board,
   for (int32 Step = 0; Step < Allowance && Frontier.Num() > 0; Step++) {
     TArray<TPair<int32, int32>> Next;
     for (const TPair<int32, int32>& Cell : Frontier) {
-      const int32 DX[4] = {1, -1, 0, 0};
-      const int32 DY[4] = {0, 0, 1, -1};
-      for (int32 i = 0; i < 4; i++) {
-        const int32 NX = Cell.Key + DX[i];
-        const int32 NY = Cell.Value + DY[i];
+      // Board neighbours (links on an original-map board, orthogonal on a
+      // grid) - the server getReachableCells graph.
+      for (const FIntPoint& Neighbour : Board.Neighbours(FIntPoint(Cell.Key, Cell.Value))) {
+        const int32 NX = Neighbour.X;
+        const int32 NY = Neighbour.Y;
         const uint64 Key = FS08BoardModel::CellKey(NX, NY);
         if (Visited.Contains(Key)) continue;
         const FS08Cell* BoardCell = Board.CellAt(NX, NY);
@@ -1033,15 +1083,15 @@ TSet<uint64> FS09CommandUi::ComputePendingCells(const FS08Snapshot& Snapshot,
       }
       return Out;
     }
-    // Stage 2: the 4 orthogonal neighbours of the stage-1 anchor.
+    // Stage 2: the board neighbours of the stage-1 anchor (server isAdjacent:
+    // linked spaces on an original map, the 4 orthogonal cells on a grid).
     if (PendingChoice.bHasAnchor) {
-      const int32 DX[4] = {1, -1, 0, 0};
-      const int32 DY[4] = {0, 0, 1, -1};
-      for (int32 i = 0; i < 4; i++) {
-        const int32 X = PendingChoice.AnchorX + DX[i];
-        const int32 Y = PendingChoice.AnchorY + DY[i];
-        const FS08Cell* Cell = Board.CellAt(X, Y);
-        if (Cell && Cell->IsPassable()) Out.Add(FS08BoardModel::CellKey(X, Y));
+      for (const FIntPoint& Neighbour :
+           Board.Neighbours(FIntPoint(PendingChoice.AnchorX, PendingChoice.AnchorY))) {
+        const FS08Cell* Cell = Board.CellAt(Neighbour.X, Neighbour.Y);
+        if (Cell && Cell->IsPassable()) {
+          Out.Add(FS08BoardModel::CellKey(Neighbour.X, Neighbour.Y));
+        }
       }
     }
     return Out;

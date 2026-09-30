@@ -31,9 +31,10 @@ public:
   AS08FighterActor();
 
   /** Positions the mannequin at the cell center (Z=0) and applies the
-   *  grey-slice visual distinctions. */
+   *  grey-slice visual distinctions. bTopologyBoard (ENV-MAPS original map):
+   *  the target icon side follows the world X instead of the lattice column. */
   void ApplyFighter(const FS08BoardFighter& Fighter, const FVector& CellCenter,
-                    bool bOwn, bool bArtPreview);
+                    bool bOwn, bool bArtPreview, bool bTopologyBoard = false);
   /** W5b-R D-2/D-3: absolute team and the drawn look (ring shape/colour, Medusa MI); call before ApplyFighter. */
   void SetTeam(ES08TeamSlot InTeam, ES08TeamSlot InLook, ES08TeamColorMode InMode) {
     Team = InTeam;

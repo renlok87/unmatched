@@ -33,4 +33,12 @@ FTrayFit FitTray(const FVector2D& BoardHalf) {
   return Fit;
 }
 
+FTrayFit FitTray(const FVector2D& BoardHalf, const FVector2D& Offset) {
+  // Grow the fitted half extent by |offset| per axis, then move the pivot by the offset: the board frame stays
+  // inside the tray with at least RimUU on every side (ENV-O8 T1 placeholder; a zero offset = FitTray(BoardHalf)).
+  FTrayFit Fit = FitTray(FVector2D(BoardHalf.X + FMath::Abs(Offset.X), BoardHalf.Y + FMath::Abs(Offset.Y)));
+  Fit.Location = Offset;
+  return Fit;
+}
+
 }  // namespace S08Diorama

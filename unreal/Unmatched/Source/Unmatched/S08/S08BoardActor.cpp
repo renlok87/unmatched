@@ -5,6 +5,7 @@
 #include "S08FighterActor.h"
 #include "S08Render.h"
 #include "S08TraceLog.h"
+#include "Components/BoxComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/DirectionalLightComponent.h"
@@ -20,10 +21,12 @@
 #include "Engine/PointLight.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/StaticMesh.h"
+#include "Engine/Texture.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/CommandLine.h"
+#include "Misc/PackageName.h"
 #include "Misc/Parse.h"
 #include "Misc/Paths.h"
 #include "UObject/ConstructorHelpers.h"
@@ -57,6 +60,12 @@ AS08BoardActor::AS08BoardActor() {
   static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeFinder(
       TEXT("/Engine/BasicShapes/Cube.Cube"));
   UStaticMesh* Cube = CubeFinder.Object;
+  // ENV-MAPS track S: the map plane / grey canvas and the space discs of topology boards (components are
+  // created on demand by the first topology board; a grid board never creates them).
+  static ConstructorHelpers::FObjectFinder<UStaticMesh> PlaneFinder(S08MapSurfaceSpec::PlaneMeshPath);
+  static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderFinder(S08MapSurfaceSpec::CylinderMeshPath);
+  PlaneMesh = PlaneFinder.Object;
+  CylinderMesh = CylinderFinder.Object;
 
   NormalTiles = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("NormalTiles"));
   NormalTiles->SetupAttachment(RootComponent);
@@ -585,7 +594,10 @@ void AS08BoardActor::ApplyArtLights(const FS08LightProfile& Light, bool bLegacyC
   // without "units" (pre-W4 data) or -S08LegacyRender keeps Unitless.
   const bool bLegacy = S08LegacyRender();
   const bool bCandelas = Light.HasPhysicalUnits() && !bLegacy;
-  const TArray<FS08PlacedLight> Placed = S08PlaceLights(Light, BoardModel);
+  // ENV-MAPS: board-relative spots of a map-image profile scale by the map (891.333 x 577.333 uu), never by
+  // the W x H lattice of the topology contract; grids keep the old placement.
+  const TArray<FS08PlacedLight> Placed = bMapImageActive ? S08PlaceLights(Light, ActiveProfile.Map.SizeUU())
+                                                         : S08PlaceLights(Light, BoardModel);
   bool bOk = true;
   float Key = 0.0f, Fill = 0.0f, Warm = 0.0f;
   int32 Points = 0, PointShadows = 0, ShadowCasters = 0;
@@ -765,32 +777,47 @@ bool AS08BoardActor::EnsureDioramaTray(bool bArtPreview) {
   return true;
 }
 
-void AS08BoardActor::PlaceDioramaTray(bool bVisible, const FVector2D& BoardHalf, const TCHAR* Surface) {
+void AS08BoardActor::PlaceDioramaTray(bool bVisible, const FVector2D& BoardHalf, const TCHAR* Surface,
+                                      const FVector2D& Offset, const TCHAR* Waiver) {
   if (!DioramaTray) return;
   if (!bVisible) {
     DioramaTray->SetVisibility(false);
     FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW diorama tray hidden surface=%s (no art board)"), Surface));
     return;
   }
-  const S08Diorama::FTrayFit Fit = S08Diorama::FitTray(BoardHalf);
-  DioramaTray->SetRelativeLocationAndRotation(FVector::ZeroVector, FRotator(0.0f, Fit.YawDeg, 0.0f));
+  const S08Diorama::FTrayFit Fit = S08Diorama::FitTray(BoardHalf, Offset);
+  DioramaTray->SetRelativeLocationAndRotation(FVector(Fit.Location.X, Fit.Location.Y, 0.0),
+                                              FRotator(0.0f, Fit.YawDeg, 0.0f));
   DioramaTray->SetRelativeScale3D(Fit.Scale);
   DioramaTray->SetVisibility(true);
   const UStaticMesh* Mesh = DioramaTray->GetStaticMesh();
   const FBox Box = Mesh ? Mesh->GetBoundingBox().TransformBy(DioramaTray->GetComponentTransform()) : FBox(ForceInit);
   const UMaterialInterface* Mi = DioramaTray->GetMaterial(0);
   const FVector Size = Box.GetSize();
+  // ENV-MAPS (ENV-O8 T1): the map-image surface appends offset / anisotropy / the waiver it runs under; every
+  // other surface writes the 5c-B2 line unchanged.
+  const FString Extra = Waiver ? FString::Printf(TEXT(" offset=(%.1f,%.1f) anisotropy=%.3f waiver=%s"), Offset.X,
+                                                 Offset.Y, Fit.Anisotropy(), Waiver)
+                               : FString();
   FS08Trace::Write(FString::Printf(
-      TEXT("ARTPREVIEW diorama tray=%s mi=%s surface=%s yaw=%.1f scale=%.3fx%.3fx%.3f bounds=(%.1f,%.1f,%.1f)..(%.1f,%.1f,%.1f) size=%.1fx%.1fx%.1f topZ=%.1f boardHalf=%.1fx%.1f rimUU=%.1f collision=none"),
+      TEXT("ARTPREVIEW diorama tray=%s mi=%s surface=%s yaw=%.1f scale=%.3fx%.3fx%.3f bounds=(%.1f,%.1f,%.1f)..(%.1f,%.1f,%.1f) size=%.1fx%.1fx%.1f topZ=%.1f boardHalf=%.1fx%.1f rimUU=%.1f collision=none%s"),
       Mesh ? *Mesh->GetPathName() : TEXT("-"), Mi ? *Mi->GetName() : TEXT("-"), Surface, Fit.YawDeg, Fit.Scale.X,
       Fit.Scale.Y, Fit.Scale.Z, Box.Min.X, Box.Min.Y, Box.Min.Z, Box.Max.X, Box.Max.Y, Box.Max.Z, Size.X, Size.Y,
-      Size.Z, Box.Max.Z, BoardHalf.X, BoardHalf.Y, S08Diorama::RimUU));
+      Size.Z, Box.Max.Z, BoardHalf.X, BoardHalf.Y, S08Diorama::RimUU, *Extra));
 }
 
 void AS08BoardActor::UpdateDioramaTray(const FS08BoardModel& Board) {
   if (!DioramaTray) return;
   if (!bArtActive) {
     PlaceDioramaTray(false, FVector2D::ZeroVector, TEXT("grey"));
+    return;
+  }
+  if (bMapImageActive) {
+    // ENV-O8 T1 placeholder (explicit waiver, S08Diorama.h): the Cobble-sized SM_TableBase is stretched
+    // non-uniformly (~1.37 x 1.11) around the map + wooden frame until the T2 modular skirt replaces it. The
+    // <= 5 % non-uniformity rule of the tray is waived for this placeholder only, and the trace line says so.
+    PlaceDioramaTray(true, ActiveProfile.Map.FrameHalfUU(), S08BoardSurfaceName(ES08BoardSurface::MapImage),
+                     ActiveProfile.Map.TrayOffsetUU, S08MapSurfaceSpec::TrayWaiver);
     return;
   }
   FVector2D Half = S08Diorama::TilesFrameHalf(Board.Width, Board.Height, FS08BoardModel::CellSizeUU, ArtFrameUU);
@@ -805,12 +832,17 @@ void AS08BoardActor::UpdateDioramaTray(const FS08BoardModel& Board) {
 bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
   if (Board.Width <= 0 || Board.Height <= 0) return false;
   if (BoardModel.Width == Board.Width && BoardModel.Height == Board.Height &&
-      BoardModel.Cells.Num() == Board.Cells.Num() && BuiltForBoardId == RoomBoardId) {
+      BoardModel.Cells.Num() == Board.Cells.Num() && BuiltForBoardId == RoomBoardId &&
+      BoardModel.bHasTopology == Board.bHasTopology) {
     bool bSameTypes = true;
     for (int32 i = 0; i < BoardModel.Cells.Num(); ++i) {
       if (BoardModel.Cells[i].Type != Board.Cells[i].Type ||
           BoardModel.Cells[i].bIsOpen != Board.Cells[i].bIsOpen ||
-          BoardModel.Cells[i].Zones != Board.Cells[i].Zones) {
+          BoardModel.Cells[i].Zones != Board.Cells[i].Zones ||
+          // ENV-MAPS: the space graph and the layout are geometry too (always equal on grids)
+          BoardModel.Cells[i].Links != Board.Cells[i].Links ||
+          BoardModel.Cells[i].bHasLayout != Board.Cells[i].bHasLayout ||
+          BoardModel.Cells[i].Layout != Board.Cells[i].Layout) {
         bSameTypes = false;
         break;
       }
@@ -820,10 +852,12 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
   BoardModel = Board;
   BuiltForBoardId = RoomBoardId;
   const FS08BoardSummary Summary = S08SummarizeBoard(Board);
+  bTopologyBoard = Board.bHasTopology;
 
   // T3.2 profile selection: board row id, else W x H + exact zone-key set.
   bArtActive = false;
   bArtTiles = false;
+  bMapImageActive = false;
   ActiveProfile = FS08BoardArtProfile();
   if (bArtAssetsReady) {
     ES08ProfileMatch Match = ES08ProfileMatch::None;
@@ -833,6 +867,47 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
           TEXT("ARTPREVIEW board profile=none match=none board=%dx%d boardId=%s zoneKeys=%s; keeping grey board"),
           Board.Width, Board.Height, RoomBoardId.IsEmpty() ? TEXT("-") : *RoomBoardId,
           *FString::Join(Summary.ZoneKeys, TEXT("+"))));
+    } else if (Profile->Surface == ES08BoardSurface::MapImage || Board.bHasTopology) {
+      // ENV-MAPS track S: a topology board only ever gets the map-image surface (lattice tiles would sit on
+      // the lattice while the figures stand on the layout), and a map-image profile needs a topology board
+      // whose layout frame is the one the game mode's CellToWorld uses. Missing map assets (a checkout
+      // without tools/art/map_surface/ue_import_map_surface.py) -> the grey topology view, traced.
+      FString Refused;
+      if (Profile->Surface != ES08BoardSurface::MapImage) {
+        Refused = FString::Printf(TEXT("surface %s on a topology board"), S08BoardSurfaceName(Profile->Surface));
+      } else if (!Board.bHasTopology) {
+        Refused = TEXT("map-image needs a topology board (cells with links)");
+      } else if (!Profile->Map.MatchesLayoutFrame(Board.LayoutFrame)) {
+        // The board model's own frame (defaults, or FS08BoardModel::SetLayoutFrame on the game mode's model):
+        // CellToWorld / WorldToCell use it, so the map plane must match it, not the static defaults.
+        Refused = FString::Printf(TEXT("map frame %dx%d@%.7f != layout frame %.0fx%.0f@%.7f"),
+                                  Profile->Map.SrcSizePx.X, Profile->Map.SrcSizePx.Y, Profile->Map.UuPerPx,
+                                  Board.LayoutFrame.SrcSize.X, Board.LayoutFrame.SrcSize.Y,
+                                  Board.LayoutFrame.UuPerPx);
+      } else if (!LoadMapImageAssets(Profile->Map)) {
+        Refused = FString::Printf(TEXT("map-image assets missing=%d (run tools/art/map_surface/ue_import_map_surface.py)"),
+                                  MapImageMissing.Num());
+      }
+      if (!Refused.IsEmpty()) {
+        // Display, not Warning: the S08 trace line below is the contract, and the automation fallback test
+        // (Unmatched.S08.BoardArt.MapActor) must not collect log warnings.
+        UE_LOG(LogTemp, Display, TEXT("ARTPREVIEW board profile=%s refused: %s; grey topology view"), *Profile->Id,
+               *Refused);
+        FS08Trace::Write(FString::Printf(
+            TEXT("ARTPREVIEW board profile=%s match=%s board=%dx%d boardId=%s surface=%s refused=%s; keeping grey %s"),
+            *Profile->Id, S08ProfileMatchName(Match), Board.Width, Board.Height,
+            RoomBoardId.IsEmpty() ? TEXT("-") : *RoomBoardId, S08BoardSurfaceName(Profile->Surface), *Refused,
+            Board.bHasTopology ? TEXT("topology view") : TEXT("board")));
+      } else {
+        ActiveProfile = *Profile;
+        bArtActive = true;
+        bMapImageActive = true;
+        FS08Trace::Write(FString::Printf(
+            TEXT("ARTPREVIEW board profile=%s match=%s board=%dx%d boardId=%s surface=%s light=%s artFixture=%d map=%s"),
+            *ActiveProfile.Id, S08ProfileMatchName(Match), Board.Width, Board.Height,
+            RoomBoardId.IsEmpty() ? TEXT("-") : *RoomBoardId, S08BoardSurfaceName(ActiveProfile.Surface),
+            *ActiveProfile.LightId, ActiveProfile.bArtFixture ? 1 : 0, *ActiveProfile.Map.Name));
+      }
     } else {
       ES08BoardSurface Surface = Profile->Surface;
       if (Surface == ES08BoardSurface::Cobble5x6Mesh &&
@@ -862,7 +937,10 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
   } else if (const FS08LightProfile* Light = ArtData.LightFor(ActiveProfile)) {
     ApplyArtLights(*Light, ActiveProfile.bLegacyCobbleTrace);
   }
-  const bool bCobbleMesh = bArtActive && !bArtTiles;
+  const bool bCobbleMesh = bArtActive && !bArtTiles && !bMapImageActive;
+  // ENV-MAPS: the map-image surface draws no zone marks (the zones are the painted ones); on grids this is
+  // bArtActive as before.
+  const bool bZoneMarks = bArtActive && !bMapImageActive;
   NormalTiles->ClearInstances();
   BlockerTiles->ClearInstances();
   UnderlayTiles->ClearInstances();
@@ -873,30 +951,43 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
   for (TPair<FString, TObjectPtr<UInstancedStaticMeshComponent>>& Key : ArtZoneGlyphKeylines) {
     if (Key.Value) {
       Key.Value->ClearInstances();
-      Key.Value->SetVisibility(bArtActive);
+      Key.Value->SetVisibility(bZoneMarks);
     }
   }
   for (TPair<FString, TObjectPtr<UInstancedStaticMeshComponent>>& Stroke : ArtZoneStrokes) {
     if (Stroke.Value) {
       Stroke.Value->ClearInstances();
-      Stroke.Value->SetVisibility(bArtActive);
+      Stroke.Value->SetVisibility(bZoneMarks);
     }
   }
   for (TPair<FString, TObjectPtr<UInstancedStaticMeshComponent>>& Glyph : ArtZoneGlyphMeshes) {
     if (Glyph.Value) {
       Glyph.Value->ClearInstances();
-      Glyph.Value->SetVisibility(bArtActive);
+      Glyph.Value->SetVisibility(bZoneMarks);
     }
   }
   ApplySurfaceMaterials();
-  NormalTiles->SetVisibility(!bArtActive);
-  BlockerTiles->SetVisibility(!bArtActive);
-  UnderlayTiles->SetVisibility(!bCobbleMesh);
+  // A topology board draws no lattice at all: the lattice ISMs get no instances, so their QueryOnly collision
+  // never catches a cursor trace (the invisible map pick box does, see BuildGreyTopology / BuildMapImageSurface).
+  NormalTiles->SetVisibility(!bArtActive && !bTopologyBoard);
+  BlockerTiles->SetVisibility(!bArtActive && !bTopologyBoard);
+  UnderlayTiles->SetVisibility(!bCobbleMesh && !bTopologyBoard);
   ArtBoard->SetVisibility(bCobbleMesh);
   ArtCorners->SetVisibility(bArtActive);
-  ArtZoneGlyphs->SetVisibility(bArtActive);
-  const bool bKeylines = bArtActive && ArtData.Keyline.bSet && ArtKeylineMaterial && !S08LegacyRender();
+  ArtZoneGlyphs->SetVisibility(bZoneMarks);
+  const bool bKeylines = bZoneMarks && ArtData.Keyline.bSet && ArtKeylineMaterial && !S08LegacyRender();
   ArtZoneKeylines->SetVisibility(bKeylines);
+  if (bTopologyBoard) {
+    if (bMapImageActive) {
+      BuildMapImageSurface(Board, Summary);
+    } else {
+      BuildGreyTopology(Board);
+    }
+    UpdateDioramaTray(Board);
+    ClearChildren();
+    return true;
+  }
+  HideTopologyComponents();  // a grid after a topology board: the map plane / discs / pick box go away
   // Full-board dark slab: top at z=-0.5 (just under the tile tops at z=0)
   // so grooves and the outer frame read dark; spans exactly the INT-019
   // cell boundaries, so a trace landing in a groove still resolves to the
@@ -1127,7 +1218,8 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
       const bool bOwn = Fighter.OwnerId == OwnOwnerId;
       const ES08TeamSlot Team = TeamOfFighter(Fighter);
       Actor->SetTeam(Team, S08TeamLook(Team, bOwn, TeamColorMode), TeamColorMode);
-      Actor->ApplyFighter(Fighter, Board.CellToWorld(Fighter.X, Fighter.Y), bOwn, bArtActive);
+      Actor->ApplyFighter(Fighter, Board.CellToWorld(Fighter.X, Fighter.Y), bOwn, bArtActive,
+                          Board.bHasTopology);
       Actor->SetSelected(Fighter.Id == SelectedFighterId);
       Actor->SetCombatMarkers(Fighter.Id == CombatAttackerId,
                               Fighter.Id == CombatTargetId);
@@ -1203,6 +1295,8 @@ void AS08BoardActor::SetSelectedFighter(const FString& FighterId,
     // The authored ring already marks the selected unit; avoid covering its
     // sculpt and name with a second cell overlay in the art review.
     if (bArtActive && bOwnCell) continue;
+    // ENV-MAPS: only map spaces of a topology board carry a highlight (every cell of a grid).
+    if (!BoardModel.IsBoardSpace(X, Y)) continue;
     const FVector CellCenter = BoardModel.CellToWorld(X, Y);
     AActor* Tile = GetWorld()->SpawnActor<AActor>(AActor::StaticClass(),
                                                   CellCenter,
@@ -1236,7 +1330,32 @@ void AS08BoardActor::SetSelectedFighter(const FString& FighterId,
       S08ApplyGameLayerPrimitive(Mesh);
       Mesh->RegisterComponent();
     };
-    if (bArtActive) {
+    // ENV-MAPS: a highlight piece with its own mesh and rotation (ring pieces, discs of a topology board).
+    auto AddHighlightMesh = [&](UStaticMesh* PieceMesh, const FTransform& Relative) {
+      UStaticMeshComponent* Mesh = NewObject<UStaticMeshComponent>(Tile);
+      Mesh->SetupAttachment(Root);
+      Mesh->SetStaticMesh(PieceMesh);
+      Mesh->SetRelativeTransform(Relative);
+      Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+      if (Mid) Mesh->SetMaterial(0, Mid);
+      S08ApplyGameLayerPrimitive(Mesh);
+      Mesh->RegisterComponent();
+    };
+    if (bTopologyBoard) {
+      if (bArtActive) {
+        // A ring inside the painted circle (the map keeps its zone colours readable under it).
+        TArray<FTransform> Pieces;
+        S08RingPieces(S08MapSurfaceSpec::RingRadiusUU, S08MapSurfaceSpec::RingWidthUU,
+                      S08MapSurfaceSpec::RingSegments, S08MapSurfaceSpec::RingZ, S08MapSurfaceSpec::RingDepth,
+                      Pieces);
+        for (const FTransform& Piece : Pieces) AddHighlightMesh(BlockerTiles->GetStaticMesh(), Piece);
+      } else {
+        const float Disc = S08MapSurfaceSpec::MarkDiscDiameterUU / 100.0f;
+        AddHighlightMesh(CylinderMesh, FTransform(FRotator::ZeroRotator,
+                                                  FVector(0, 0, S08MapSurfaceSpec::MarkDiscZ),
+                                                  FVector(Disc, Disc, S08MapSurfaceSpec::MarkDiscDepth)));
+      }
+    } else if (bArtActive) {
       // Two diagonal L-shaped corner ticks keep cobble, labels and occupied
       // fighters visible. Their shape differs from the zone diamond/bars.
       for (int32 Corner = 0; Corner < 2; ++Corner) {
@@ -1252,7 +1371,11 @@ void AS08BoardActor::SetSelectedFighter(const FString& FighterId,
     }
     HighlightTiles.Add(Tile);
   }
-  if (bArtActive) {
+  if (bArtActive && bTopologyBoard) {
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW reachable rings cells=%d placed=%d radiusUU=%.0f segments=%d"), ArtOutlineCells,
+        bArtOutlinePositionsCorrect ? 1 : 0, S08MapSurfaceSpec::RingRadiusUU, S08MapSurfaceSpec::RingSegments));
+  } else if (bArtActive) {
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW reachable corners cells=%d placed=%d"),
         ArtOutlineCells, bArtOutlinePositionsCorrect ? 1 : 0));
@@ -1271,8 +1394,11 @@ void AS08BoardActor::ShowIllegalCell(int32 X, int32 Y) {
                                                FRotator::ZeroRotator);
   if (!IllegalCell) return;
   UStaticMeshComponent* Mesh = NewObject<UStaticMeshComponent>(IllegalCell, TEXT("Illegal"));
-  Mesh->SetStaticMesh(BlockerTiles->GetStaticMesh());
-  Mesh->SetWorldScale3D(FVector(0.85f, 0.85f, 0.02f));
+  // ENV-MAPS: a topology board marks the illegal space with a disc (its circle), a grid with the square.
+  const bool bDisc = bTopologyBoard && CylinderMesh;
+  const float Disc = S08MapSurfaceSpec::MarkDiscDiameterUU / 100.0f;
+  Mesh->SetStaticMesh(bDisc ? CylinderMesh.Get() : BlockerTiles->GetStaticMesh().Get());
+  Mesh->SetWorldScale3D(bDisc ? FVector(Disc, Disc, S08MapSurfaceSpec::MarkDiscDepth) : FVector(0.85f, 0.85f, 0.02f));
   Mesh->SetRelativeLocation(FVector(0, 0, 1.5f));
   Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   if (Solid) {
@@ -1283,11 +1409,247 @@ void AS08BoardActor::ShowIllegalCell(int32 X, int32 Y) {
   IllegalCell->SetRootComponent(Mesh);
   S08ApplyGameLayerPrimitive(Mesh);
   Mesh->RegisterComponent();
+  // The spawn location of a root-less actor is lost: the mesh root above would sit at (0,0,1.5) - the board
+  // centre - whatever cell was illegal. Move the marker onto its cell (INT-019 centre or the space's layout).
+  IllegalCell->SetActorLocation(BoardModel.CellToWorld(X, Y) + FVector(0, 0, 1.5f));
 }
 
 void AS08BoardActor::HideIllegalCell() {
   if (IllegalCell) {
     IllegalCell->Destroy();
     IllegalCell = nullptr;
+  }
+}
+
+// ---- ENV-MAPS track S: topology boards ('map-image' surface and the grey topology view) --------------------
+
+FVector2D AS08BoardActor::GetBoardHalfExtentUU() const {
+  return bMapImageActive ? ActiveProfile.Map.HalfUU() : S08BoardHalfExtentUU(BoardModel);
+}
+
+int32 AS08BoardActor::GetLatticeInstanceCount() const {
+  return NormalTiles->GetInstanceCount() + BlockerTiles->GetInstanceCount() + UnderlayTiles->GetInstanceCount();
+}
+
+int32 AS08BoardActor::GetArtCornerCount() const {
+  return ArtCorners->GetInstanceCount();
+}
+
+void AS08BoardActor::SetArtDataForTest(const FS08BoardArtData& Data) {
+  ArtData = Data;
+  bArtDataLoaded = true;
+  bArtAssetsReady = true;
+  BoardModel = FS08BoardModel();  // the next Rebuild selects again
+  MapPlaneMaterial = nullptr;
+  MapImageMissing.Reset();
+}
+
+bool AS08BoardActor::LoadMapImageAssets(const FS08MapImageSpec& Spec) {
+  MapImageMissing.Reset();
+  MapPlaneMaterial = nullptr;
+  UMaterialInterface* Mi = LoadObject<UMaterialInterface>(nullptr, *Spec.MaterialInstancePath, nullptr, LOAD_NoWarn);
+  UTexture* Bc = LoadObject<UTexture>(nullptr, *Spec.BaseColorPath, nullptr, LOAD_NoWarn);
+  UTexture* Mask = LoadObject<UTexture>(nullptr, *Spec.MaskPath, nullptr, LOAD_NoWarn);
+  // The SDF (4K RGBA16F) and the space-ID map are not sampled by M_MapBoard yet: existence only, never loaded
+  // into memory for nothing. Their absence is traced but does not force the fallback. They live under
+  // S08MapSurfaceSpec::DataRoot, which DefaultGame.ini never cooks: a cooked build does not check them (no
+  // 'missing' line; the assets trace reports sdf=-1 id=-1).
+  const bool bCheckData = !FPlatformProperties::RequiresCookedData();
+  const bool bSdf = !bCheckData || FPackageName::DoesPackageExist(Spec.SdfPath);
+  const bool bId = !bCheckData || FPackageName::DoesPackageExist(Spec.SpaceIdPath);
+  auto Report = [&](bool bFound, const FString& Path) {
+    if (bFound) return;
+    MapImageMissing.Add(Path);
+    const FString Line = S08MapImageMissingLine(Path);
+    UE_LOG(LogTemp, Display, TEXT("%s"), *Line);
+    FS08Trace::Write(Line);
+  };
+  Report(Bc != nullptr, Spec.BaseColorPath);
+  Report(Mask != nullptr, Spec.MaskPath);
+  Report(bSdf, Spec.SdfPath);
+  Report(bId, Spec.SpaceIdPath);
+  Report(Mi != nullptr, Spec.MaterialInstancePath);
+  if (!Mi || !Bc || !Mask) return false;
+  // A MID of the map MI with the profile's textures bound explicitly (the MI was saved with them by the import
+  // script; binding again keeps the profile the single source of which texture the board shows).
+  UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Mi, this);
+  Mid->SetTextureParameterValue(FName(S08MapSurfaceSpec::ParamBaseColor), Bc);
+  Mid->SetTextureParameterValue(FName(S08MapSurfaceSpec::ParamGameMask), Mask);
+  UTexture* BoundBc = nullptr;
+  UTexture* BoundMask = nullptr;
+  Mid->GetTextureParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamBaseColor), BoundBc);
+  Mid->GetTextureParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamGameMask), BoundMask);
+  const UMaterial* Base = Mi->GetMaterial();
+  MapPlaneMaterial = Mid;
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW map-image assets map=%s mi=%s material=%s bc=%s mask=%s boundBc=%d boundMask=%d sdf=%d id=%d"),
+      *Spec.Name, *Mi->GetName(), Base ? *Base->GetName() : TEXT("-"), *Bc->GetName(), *Mask->GetName(),
+      BoundBc == Bc ? 1 : 0, BoundMask == Mask ? 1 : 0, bCheckData ? (bSdf ? 1 : 0) : -1,
+      bCheckData ? (bId ? 1 : 0) : -1));
+  return true;
+}
+
+void AS08BoardActor::EnsureTopologyComponents() {
+  if (!MapPlane) {
+    MapPlane = NewObject<UStaticMeshComponent>(this, TEXT("MapPlane"));
+    MapPlane->SetupAttachment(RootComponent);
+    MapPlane->SetStaticMesh(PlaneMesh);
+    MapPlane->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    MapPlane->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+    MapPlane->SetGenerateOverlapEvents(false);
+    MapPlane->SetCanEverAffectNavigation(false);
+    MapPlane->SetCastShadow(false);  // flat on the tray; it still receives the figures' shadows
+    MapPlane->SetVisibility(false);
+    MapPlane->RegisterComponent();
+  }
+  if (!MapPickBox) {
+    // The only cursor surface of a topology board: invisible, QueryOnly, blocks Visibility only. The hit point
+    // goes through FS08BoardModel::WorldToCell (the space whose painted circle contains it).
+    MapPickBox = NewObject<UBoxComponent>(this, TEXT("MapPickBox"));
+    MapPickBox->SetupAttachment(RootComponent);
+    MapPickBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    MapPickBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+    MapPickBox->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+    MapPickBox->SetGenerateOverlapEvents(false);
+    MapPickBox->SetCanEverAffectNavigation(false);
+    MapPickBox->SetHiddenInGame(true);
+    MapPickBox->RegisterComponent();
+  }
+  if (!TopologyDiscs) {
+    TopologyDiscs = NewObject<UInstancedStaticMeshComponent>(this, TEXT("TopologyDiscs"));
+    TopologyDiscs->SetupAttachment(RootComponent);
+    TopologyDiscs->SetStaticMesh(CylinderMesh);
+    TopologyDiscs->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    TopologyDiscs->SetVisibility(false);
+    TopologyDiscs->RegisterComponent();
+  }
+  if (!TopologyLinkBars) {
+    TopologyLinkBars = NewObject<UInstancedStaticMeshComponent>(this, TEXT("TopologyLinkBars"));
+    TopologyLinkBars->SetupAttachment(RootComponent);
+    TopologyLinkBars->SetStaticMesh(BlockerTiles->GetStaticMesh());
+    TopologyLinkBars->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    TopologyLinkBars->SetVisibility(false);
+    TopologyLinkBars->RegisterComponent();
+  }
+}
+
+void AS08BoardActor::HideTopologyComponents() {
+  if (MapPlane) MapPlane->SetVisibility(false);
+  if (MapPickBox) MapPickBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  if (TopologyDiscs) {
+    TopologyDiscs->ClearInstances();
+    TopologyDiscs->SetVisibility(false);
+  }
+  if (TopologyLinkBars) {
+    TopologyLinkBars->ClearInstances();
+    TopologyLinkBars->SetVisibility(false);
+  }
+}
+
+namespace {
+void PlaceMapPickBox(UBoxComponent* Box, const FVector2D& Half) {
+  // Top face on the play plane (z = 0) over the whole map canvas; a hit between the circles resolves to
+  // "no cell" in WorldToCell (as a click beside the board did on a grid).
+  Box->SetBoxExtent(FVector(Half.X, Half.Y, S08MapSurfaceSpec::PickBoxHalfZ), false);
+  Box->SetRelativeLocation(FVector(0.0, 0.0, -S08MapSurfaceSpec::PickBoxHalfZ));
+  Box->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+  Box->UpdateBounds();
+}
+}  // namespace
+
+void AS08BoardActor::BuildGreyTopology(const FS08BoardModel& Board) {
+  using namespace S08MapSurfaceSpec;
+  EnsureTopologyComponents();
+  const FVector2D Half = S08BoardHalfExtentUU(Board);  // the map canvas (FS08LayoutFrame)
+  // Dark canvas of the map size (the grey board's underlay tint): debug readable, no lattice squares.
+  MapPlane->SetStaticMesh(PlaneMesh);
+  MapPlane->SetRelativeTransform(S08MapPlaneTransform(Half * 2.0, PlaneZ));
+  MapPlane->SetMaterial(0, GreyUnderlayMaterial.Get());
+  MapPlane->SetVisibility(true);
+  // One disc per space (the painted circle size), one thin bar per link trimmed to the disc edges.
+  TopologyDiscs->ClearInstances();
+  TopologyDiscs->SetStaticMesh(CylinderMesh);
+  if (GreyTileMaterial) TopologyDiscs->SetMaterial(0, GreyTileMaterial);
+  const float DiscScale = GreyDiscDiameterUU / 100.0f;
+  int32 Spaces = 0;
+  for (int32 Y = 0; Y < Board.Height; ++Y) {
+    for (int32 X = 0; X < Board.Width; ++X) {
+      if (!Board.IsBoardSpace(X, Y)) continue;
+      TopologyDiscs->AddInstance(FTransform(FRotator::ZeroRotator,
+                                            Board.CellToWorld(X, Y) - FVector(0, 0, GreyDiscDepth * 50.0f),
+                                            FVector(DiscScale, DiscScale, GreyDiscDepth)),
+                                 true);
+      ++Spaces;
+    }
+  }
+  TopologyDiscs->SetVisibility(true);
+  TopologyLinkBars->ClearInstances();
+  if (GreyBlockerMaterial) TopologyLinkBars->SetMaterial(0, GreyBlockerMaterial);
+  const TArray<TPair<FIntPoint, FIntPoint>> Links = S08BoardLinkPairs(Board);
+  for (const TPair<FIntPoint, FIntPoint>& Link : Links) {
+    FTransform Bar;
+    if (S08LinkBarTransform(Board.CellToWorld(Link.Key.X, Link.Key.Y), Board.CellToWorld(Link.Value.X, Link.Value.Y),
+                            GreyDiscDiameterUU * 0.5f, GreyLinkWidthUU, GreyLinkZ, GreyLinkDepth, Bar)) {
+      TopologyLinkBars->AddInstance(Bar, true);
+    }
+  }
+  TopologyLinkBars->SetVisibility(true);
+  PlaceMapPickBox(MapPickBox, Half);
+  FS08Trace::Write(FString::Printf(
+      TEXT("BOARD topology grey view %dx%d spaces=%d links=%d discs=%d bars=%d canvas=%.1fx%.1f pick=QueryOnly lattice=%d"),
+      Board.Width, Board.Height, Spaces, Links.Num(), TopologyDiscs->GetInstanceCount(),
+      TopologyLinkBars->GetInstanceCount(), Half.X * 2.0, Half.Y * 2.0, GetLatticeInstanceCount()));
+}
+
+void AS08BoardActor::BuildMapImageSurface(const FS08BoardModel& Board, const FS08BoardSummary& Summary) {
+  using namespace S08MapSurfaceSpec;
+  EnsureTopologyComponents();
+  const FS08MapImageSpec& Map = ActiveProfile.Map;
+  const FVector2D Size = Map.SizeUU();
+  const FVector2D Half = Map.HalfUU();
+  // ENV-U1: the whole illustration as one flat plane above the tray top (-3) and under the figures.
+  MapPlane->SetStaticMesh(PlaneMesh);
+  MapPlane->SetRelativeTransform(S08MapPlaneTransform(Size, PlaneZ));
+  MapPlane->SetMaterial(0, MapPlaneMaterial.Get());
+  MapPlane->SetVisibility(true);
+  TopologyDiscs->ClearInstances();
+  TopologyDiscs->SetVisibility(false);
+  TopologyLinkBars->ClearInstances();
+  TopologyLinkBars->SetVisibility(false);
+  // The wooden frame of the 'tiles' surface (ArtFrameUU look: bars centred on z -3, 14 uu deep) around the map
+  // and the ART-005 iron corner brackets on the map corners.
+  if (Map.FrameUU > 0.0f) {
+    const double F = Map.FrameUU;
+    const double SpanX = (Size.X + 2.0 * F) / 100.0;
+    const double SpanY = Size.Y / 100.0;
+    const double T = F / 100.0;
+    for (const FTransform& Bar : {
+             FTransform(FRotator::ZeroRotator, FVector(0, Half.Y + F * 0.5, FrameCentreZ), FVector(SpanX, T, 0.14)),
+             FTransform(FRotator::ZeroRotator, FVector(0, -Half.Y - F * 0.5, FrameCentreZ), FVector(SpanX, T, 0.14)),
+             FTransform(FRotator::ZeroRotator, FVector(-Half.X - F * 0.5, 0, FrameCentreZ), FVector(T, SpanY, 0.14)),
+             FTransform(FRotator::ZeroRotator, FVector(Half.X + F * 0.5, 0, FrameCentreZ), FVector(T, SpanY, 0.14))}) {
+      AddArtSurfacePart(ArtWoodMaterial, Bar);
+    }
+  }
+  for (const TPair<FVector, float>& Corner : {
+           TPair<FVector, float>(FVector(Half.X, Half.Y, 0), 180),
+           TPair<FVector, float>(FVector(-Half.X, Half.Y, 0), -90),
+           TPair<FVector, float>(FVector(-Half.X, -Half.Y, 0), 0),
+           TPair<FVector, float>(FVector(Half.X, -Half.Y, 0), 90)}) {
+    ArtCorners->AddInstance(FTransform(FRotator(0, Corner.Value, 0), Corner.Key, FVector::OneVector), true);
+  }
+  PlaceMapPickBox(MapPickBox, Half);
+  const FString Mismatch = S08ExpectMismatch(ActiveProfile, Summary);
+  const UMaterialInterface* Mi = MapPlaneMaterial ? MapPlaneMaterial->Parent.Get() : nullptr;
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW board active profile=%s %dx%d surface=map-image map=%s spaces=%d links=%d starts=%d zoneKeys=%d multizone=%d triple=%d obstacles=%d size=%.1fx%.1f src=%dx%d uuPerPx=%.7f frameUU=%.0f surfaceParts=%d corners=%d zoneMarks=0 lattice=%d pick=%.1fx%.1f mi=%s wood=%d expectOk=%d%s"),
+      *ActiveProfile.Id, Board.Width, Board.Height, *Map.Name, Summary.Spaces, Summary.Links, Summary.Starts,
+      Summary.ZoneKeys.Num(), Summary.MultizoneCells, Summary.TripleZoneCells, Summary.Obstacles, Size.X, Size.Y,
+      Map.SrcSizePx.X, Map.SrcSizePx.Y, Map.UuPerPx, Map.FrameUU, ArtSurfaceParts.Num(), ArtCorners->GetInstanceCount(),
+      GetLatticeInstanceCount(), Half.X, Half.Y, Mi ? *Mi->GetName() : TEXT("-"), ArtWoodMaterial ? 1 : 0,
+      Mismatch.IsEmpty() ? 1 : 0, Mismatch.IsEmpty() ? TEXT("") : *(TEXT(" mismatch=") + Mismatch)));
+  for (const FString& Key : Summary.ZoneKeys) {
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW board map zone key=%s spaces=%d (painted, no zone marks)"), *Key,
+                                     Summary.ZoneCellCounts.FindRef(Key)));
   }
 }

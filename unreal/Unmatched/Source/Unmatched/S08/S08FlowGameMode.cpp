@@ -644,6 +644,31 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
           FVector::Dist(NeighborA, NeighborB));
       TraceLines.Add(Line);
       FS08Trace::Write(Line);
+      if (BoardModel.bHasTopology) {
+        // ENV-MAPS evidence: the client plays this board on its link graph.
+        int32 Spaces = 0, LinkEnds = 0;
+        FString Starts;
+        for (int32 Y = 0; Y < BoardModel.Height; ++Y) {
+          for (int32 X = 0; X < BoardModel.Width; ++X) {
+            const FS08Cell* Cell = BoardModel.CellAt(X, Y);
+            if (!Cell || !Cell->bHasLayout) continue;
+            ++Spaces;
+            LinkEnds += BoardModel.Neighbours(FIntPoint(X, Y)).Num();
+            if (Cell->StartSlot > 0) {
+              Starts += FString::Printf(TEXT("%s%d:%s"), Starts.IsEmpty() ? TEXT("") : TEXT(","),
+                                        Cell->StartSlot, *BoardModel.CellLabel(X, Y));
+            }
+          }
+        }
+        const FS08LayoutFrame& Frame = BoardModel.LayoutFrame;
+        const FString TopologyLine = FString::Printf(
+            TEXT("BOARD topology spaces=%d links=%d starts=%s frame=%.0fx%.0fpx uuPerPx=%.4f radius=%.1fuu (%s)"),
+            Spaces, LinkEnds / 2, Starts.IsEmpty() ? TEXT("-") : *Starts, Frame.SrcSize.X,
+            Frame.SrcSize.Y, Frame.UuPerPx, Frame.SpaceRadiusUU(),
+            Frame.bSet ? TEXT("profile") : TEXT("default"));
+        TraceLines.Add(TopologyLine);
+        FS08Trace::Write(TopologyLine);
+      }
     }
   } else {
     BoardActor->SetRoomBoardId(RoomBoardId);
@@ -724,18 +749,20 @@ void AS08FlowGameMode::SetupCameraForBoard() {
   // (treating it as vertical shrinks the real vertical fov to ~20 degrees
   // and the near board corner with its fighters falls out of frame).
   const float Hfov = 35.0f;
-  const float Aspect = 16.0f / 9.0f;
-  const float HalfH = FMath::Tan(FMath::DegreesToRadians(Hfov * 0.5f));
-  const float HalfV = HalfH / Aspect;
-  const float ExtentY = BoardModel.Height * FS08BoardModel::CellSizeUU * 0.5f;
-  const float ExtentX = BoardModel.Width * FS08BoardModel::CellSizeUU * 0.5f;
-  // Vertical screen span covers the board's Y extent tilted by the pitch.
+  // ENV-MAPS (ENV-O10): the same K1 formula (S08K1FitDistanceUU: margin 60, x1.12) on the board half extent:
+  // a topology board frames its map canvas (the active map-image profile's map, 891.333 x 577.333 uu at 2/3 uu
+  // per px -> 1872 uu), never the W x H lattice of the topology contract; a grid keeps W x H x 50 (1931 uu on
+  // Cobble 5x6, bit for bit).
+  const FVector2D BoardHalf = BoardActor ? BoardActor->GetBoardHalfExtentUU() : S08BoardHalfExtentUU(BoardModel);
   const float SinPitch = FMath::Sin(FMath::DegreesToRadians(55.0f));
   const float CosPitch = FMath::Cos(FMath::DegreesToRadians(55.0f));
-  const float NeedV = (ExtentY * SinPitch + 60.0f) / HalfV;
-  const float NeedH = (ExtentX + 60.0f) / HalfH;
-  const float Distance = FMath::Max(NeedV, NeedH) * 1.12f;
+  const float Distance = S08K1FitDistanceUU(BoardHalf);
   const FVector Location(0.0f, Distance * CosPitch, Distance * SinPitch);
+  if (BoardModel.bHasTopology) {
+    FS08Trace::Write(FString::Printf(TEXT("CAMERA extents source=%s half=%.1fx%.1f dist=%.1f"),
+                                     BoardActor && BoardActor->IsMapImageActive() ? TEXT("map-image") : TEXT("map-canvas"),
+                                     BoardHalf.X, BoardHalf.Y, Distance));
+  }
   // ART-004 T2.2: zoom parameters from one config (defaults <- game ini
   // [Unmatched.Camera] <- -S08Camera*= overrides), traced once per board.
   CameraZoom.Config = FS08CameraZoomConfig();
@@ -792,6 +819,13 @@ void AS08FlowGameMode::UpdateBoardCamera(float DeltaSeconds) {
                       FVector(0.0f, 0.0f, 28.0f);
         break;
       }
+    }
+    // ENV-MAPS: on a topology board CellToWorld is the space's layout point; the follow focus stays on the map
+    // extents the overview was fitted to (grids are untouched: their cell centres lie inside W x H x 50 anyway).
+    if (BoardModel.bHasTopology) {
+      const FVector2D Half = BoardActor ? BoardActor->GetBoardHalfExtentUU() : S08BoardHalfExtentUU(BoardModel);
+      FocusTarget.X = FMath::Clamp(FocusTarget.X, -Half.X, Half.X);
+      FocusTarget.Y = FMath::Clamp(FocusTarget.Y, -Half.Y, Half.Y);
     }
   }
   CameraZoom.SetFocusTarget(FocusTarget);
@@ -964,10 +998,30 @@ void AS08FlowGameMode::HandleClick() {
       const FS08BoardFighter& Fighter = FighterActor->GetFighter();
       FString Reason;
       const bool bOwn = Fighter.OwnerId == CommandUi.ViewerId;
-      if (bOwn ? CommandUi.SelectAttacker(Fighter.Id, Fighters, Reason)
-               : CommandUi.SelectTarget(Fighter.Id, Fighters, Reason)) {
+      if (bOwn ? CommandUi.SelectAttacker(Fighter.Id, BoardModel, Fighters, Reason)
+               : CommandUi.SelectTarget(Fighter.Id, BoardModel, Fighters, Reason)) {
         Toast = FString::Printf(TEXT("attack draft: %s = %s"),
                                 bOwn ? TEXT("attacker") : TEXT("target"), *Fighter.Label);
+        if (bOwn) {
+          // ENV-O6 / GAP-023: the offered target set IS the server's legal
+          // set (melee: linked/adjacent; ranged: + shared zone).
+          FString Offer;
+          for (const FString& TargetId :
+               FS09CommandUi::LegalAttackTargets(BoardModel, Fighters, Fighter.Id)) {
+            const FS08BoardFighter* Target = FindFighter(TargetId);
+            if (!Target) continue;
+            const bool bZone = FS09CommandUi::IsZoneOnlyTarget(BoardModel, Fighter, *Target);
+            Offer += FString::Printf(TEXT("%s%s@%s(%s)"), Offer.IsEmpty() ? TEXT("") : TEXT(" "),
+                                     *TargetId, *BoardModel.CellLabel(Target->X, Target->Y),
+                                     bZone ? TEXT("zone") : TEXT("adjacent"));
+          }
+          FS08Trace::Write(FString::Printf(TEXT("ATTACK draft attacker=%s type=%s at=%s legal=[%s]"),
+                                           *Fighter.Id,
+                                           FS09CommandUi::IsRangedAttacker(Fighter) ? TEXT("ranged")
+                                                                                    : TEXT("melee"),
+                                           *BoardModel.CellLabel(Fighter.X, Fighter.Y), *Offer));
+          Toast += FString::Printf(TEXT(" - targets: %s"), Offer.IsEmpty() ? TEXT("-") : *Offer);
+        }
       } else {
         Toast = TEXT("attack pick rejected: ") + Reason;
       }
@@ -1070,7 +1124,9 @@ void AS08FlowGameMode::HandleClick() {
   }
   int32 CellX, CellY;
   if (!BoardActor->WorldToCell(Hit.ImpactPoint, CellX, CellY)) {
-    Toast = TEXT("click outside the board - ignored");
+    // Original maps: only a space circle is a cell (WorldToCell hit radius).
+    Toast = BoardModel.bHasTopology ? TEXT("click outside every space circle - ignored")
+                                    : TEXT("click outside the board - ignored");
     ToastUntil = Elapsed + 3.0f;
     RefreshUi();
     return;
@@ -1447,7 +1503,7 @@ void AS08FlowGameMode::BeginAttackDraft() {
   CommandUi.AttackAttackerId.Reset();
   CommandUi.AttackTargetId.Reset();
   CommandUi.AttackCardId.Reset();
-  Toast = TEXT("attack draft open: click an own fighter next to an enemy, pick a card (1-9)");
+  Toast = TEXT("attack draft open: click an own fighter with an enemy in range, pick a card (1-9)");
   ToastUntil = Elapsed + 4.0f;
   RefreshHud();
 }
@@ -1598,7 +1654,7 @@ bool AS08FlowGameMode::ConfirmCombat() {
   FString Reason;
   if (CommandUi.Mode == ES09CommandMode::AttackDraft) {
     FS09AttackCommand Command;
-    if (!CommandUi.ConfirmAttack(Snap, Fighters, Command, Reason)) {
+    if (!CommandUi.ConfirmAttack(Snap, BoardModel, Fighters, Command, Reason)) {
       Toast = TEXT("attack rejected: ") + Reason;
       ToastUntil = Elapsed + 3.0f;
       RefreshHud();
@@ -1802,8 +1858,9 @@ void AS08FlowGameMode::HandleHudKeys() {
 // ---- GD-033 auto drive -----------------------------------------------------
 
 namespace {
-// One orthogonal step for FighterId into a reachable neighbor cell; returns
-// false when no neighbor is legal (blocked board edge case).
+// One step for FighterId into a reachable board neighbour (a linked space on
+// an original map, the orthogonal cells +X/-X/+Y/-Y on a grid); returns
+// false when no neighbour is legal (blocked board edge case).
 bool StepOneCell(FS09CommandUi& Ui, const FS08Snapshot& Snap, const FS08BoardModel& Board,
                  const TArray<FS08BoardFighter>& Fighters, const FString& FighterId) {
   Ui.SelectFighter(FighterId, Snap, Board, Fighters);
@@ -1812,12 +1869,9 @@ bool StepOneCell(FS09CommandUi& Ui, const FS08Snapshot& Snap, const FS08BoardMod
     if (Entry.Id == FighterId) Fighter = &Entry;
   }
   if (!Fighter) return false;
-  static const int32 Dx[4] = {1, -1, 0, 0};
-  static const int32 Dy[4] = {0, 0, 1, -1};
   FString Reason;
-  for (int32 Dir = 0; Dir < 4; ++Dir) {
-    if (Ui.SetDestination(FighterId, Fighter->X + Dx[Dir], Fighter->Y + Dy[Dir], Snap, Board,
-                          Fighters, Reason)) {
+  for (const FIntPoint& Next : Board.Neighbours(FIntPoint(Fighter->X, Fighter->Y))) {
+    if (Ui.SetDestination(FighterId, Next.X, Next.Y, Snap, Board, Fighters, Reason)) {
       return true;
     }
   }
@@ -2475,17 +2529,41 @@ void AS08FlowGameMode::RunS09Auto() {
       for (const FS08BoardFighter& Candidate : Fighters) {
         if (Candidate.OwnerId != CommandUi.ViewerId || !Candidate.IsAlive()) continue;
         FString Why;
-        if (!CommandUi.SelectAttacker(Candidate.Id, Fighters, Why)) continue;
+        if (!CommandUi.SelectAttacker(Candidate.Id, BoardModel, Fighters, Why)) continue;
+        // Melee pick first: a board-adjacent enemy (linked space; on a grid
+        // manhattan 1 in the old order). ENV-O6: on an original-map board a
+        // ranged attacker without an adjacent enemy takes the first enemy it
+        // shares a zone with (server ranged rule). Grids keep the old
+        // melee-only auto pick so the recorded Cobble / art-fixture S09AUTO
+        // sequence stays unchanged; manual drafts offer ranged everywhere.
         const FS08BoardFighter* Target = nullptr;
+        bool bZoneTarget = false;
         for (const FS08BoardFighter& Enemy : Fighters) {
           if (Enemy.OwnerId == CommandUi.ViewerId || !Enemy.IsAlive()) continue;
-          if (FMath::Abs(Enemy.X - Candidate.X) + FMath::Abs(Enemy.Y - Candidate.Y) == 1) {
+          if (BoardModel.IsAdjacent(FIntPoint(Candidate.X, Candidate.Y),
+                                    FIntPoint(Enemy.X, Enemy.Y))) {
             Target = &Enemy;
             break;
           }
         }
+        if (!Target && BoardModel.bHasTopology) {
+          for (const FS08BoardFighter& Enemy : Fighters) {
+            if (Enemy.OwnerId == CommandUi.ViewerId || !Enemy.IsAlive()) continue;
+            if (FS09CommandUi::IsZoneOnlyTarget(BoardModel, Candidate, Enemy)) {
+              Target = &Enemy;
+              bZoneTarget = true;
+              break;
+            }
+          }
+        }
         if (!Target) continue;
-        if (!CommandUi.SelectTarget(Target->Id, Fighters, Why)) continue;
+        if (!CommandUi.SelectTarget(Target->Id, BoardModel, Fighters, Why)) continue;
+        if (bZoneTarget) {
+          FS08Trace::Write(FString::Printf(
+              TEXT("S09AUTO ranged target attacker=%s at=%s target=%s at=%s via=shared-zone (not linked)"),
+              *Candidate.Id, *BoardModel.CellLabel(Candidate.X, Candidate.Y), *Target->Id,
+              *BoardModel.CellLabel(Target->X, Target->Y)));
+        }
         if (!Own) break;
         // Prefer a "You may BOOST this attack" card (Second Shot / Noble
         // Sacrifice): after the reveal the server pauses on the owner's
@@ -3253,7 +3331,8 @@ void AS08FlowGameMode::RunAutoManeuver() {
   // S10/GD-040: never attempt a maneuver in an interrupted room - the gate
   // would reject it every poll tick (blocked-trace spam in the live run).
   if (Flow->IsRoomAborted()) return;
-  // Pick the own hero; move one orthogonal step to a legal adjacent cell.
+  // Pick the own hero; move one step to a legal board neighbour (a linked
+  // space on an original map, orthogonal +X/-X/+Y/-Y on a grid).
   const FS08BoardFighter* Hero = nullptr;
   for (const FS08BoardFighter& Entry : Fighters) {
     if (Entry.OwnerId == Flow->GetUserId() && Entry.bIsHero && Entry.IsAlive()) {
@@ -3265,14 +3344,10 @@ void AS08FlowGameMode::RunAutoManeuver() {
   const TSet<uint64> Reachable = FS08BoardModel::ComputeReachableCells(
       BoardModel, Fighters, Hero->Id, Hero->Movement);
   int32 TargetX = -1, TargetY = -1;
-  static const int32 Dx[4] = {1, -1, 0, 0};
-  static const int32 Dy[4] = {0, 0, 1, -1};
-  for (int32 Dir = 0; Dir < 4; ++Dir) {
-    const int32 NX = Hero->X + Dx[Dir];
-    const int32 NY = Hero->Y + Dy[Dir];
-    if (Reachable.Contains(FS08BoardModel::CellKey(NX, NY))) {
-      TargetX = NX;
-      TargetY = NY;
+  for (const FIntPoint& Next : BoardModel.Neighbours(FIntPoint(Hero->X, Hero->Y))) {
+    if (Reachable.Contains(FS08BoardModel::CellKey(Next.X, Next.Y))) {
+      TargetX = Next.X;
+      TargetY = Next.Y;
       break;
     }
   }
@@ -4568,7 +4643,22 @@ void AS08FlowGameMode::RefreshHud() {
                             *FighterLabel(CommandUi.AttackAttackerId),
                             *FighterLabel(CommandUi.AttackTargetId),
                             CommandUi.AttackCardId.IsEmpty() ? TEXT("-") : TEXT("picked")));
-    AddLine(TEXT("click an own fighter next to an enemy, click the enemy, pick 1-9; Enter attacks; A/Esc closes"));
+    if (!CommandUi.AttackAttackerId.IsEmpty()) {
+      // ENV-O6 / GAP-023: exactly the set SelectTarget/ConfirmAttack accept.
+      const FS08BoardFighter* Attacker = FindFighter(CommandUi.AttackAttackerId);
+      FString InRange;
+      for (const FString& TargetId :
+           FS09CommandUi::LegalAttackTargets(BoardModel, Fighters, CommandUi.AttackAttackerId)) {
+        const FS08BoardFighter* Target = FindFighter(TargetId);
+        if (!Attacker || !Target) continue;
+        InRange += FString::Printf(
+            TEXT("%s%s (%s)"), InRange.IsEmpty() ? TEXT("") : TEXT(", "), *Target->Label,
+            FS09CommandUi::IsZoneOnlyTarget(BoardModel, *Attacker, *Target) ? TEXT("same zone")
+                                                                            : TEXT("adjacent"));
+      }
+      AddLine(FString::Printf(TEXT("targets in range: %s"), InRange.IsEmpty() ? TEXT("-") : *InRange));
+    }
+    AddLine(TEXT("click an own fighter with an enemy in range (melee: adjacent; ranged: adjacent or same zone), click the enemy, pick 1-9; Enter attacks; A/Esc closes"));
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
@@ -5684,7 +5774,12 @@ void AS08FlowGameMode::UpdateCombatIcon(bool bActive) {
       int32 BestDist = MAX_int32;
       for (const FS08BoardFighter& F : Fighters) {
         if (!F.IsAlive() || F.OwnerId == Flow->GetUserId()) continue;
-        const int32 Dist = OwnHero ? FMath::Abs(F.X - OwnHero->X) + FMath::Abs(F.Y - OwnHero->Y) : 0;
+        // Spaces between (links on an original map, manhattan on a grid); an
+        // unreachable enemy still ranks, after every reachable one.
+        const int32 Dist = OwnHero ? FMath::Min(BoardModel.GraphDistance(FIntPoint(OwnHero->X, OwnHero->Y),
+                                                                         FIntPoint(F.X, F.Y)),
+                                                MAX_int32 - 1)
+                                   : 0;
         if (Dist < BestDist) {
           BestDist = Dist;
           Target = F.Id;

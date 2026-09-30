@@ -7,7 +7,8 @@
 // Maneuver contract (ACC-006 / GD-013):
 //   beginManeuver  -> server draws ONE card, opens metadata.pendingManeuver;
 //   local draft    -> zero or more own fighters, one destination each
-//                     (orthogonal path built from the board model), optional
+//                     (neighbour path built from the board model: links on
+//                     an original-map board, orthogonal on a grid), optional
 //                     boost = any exact own-hand instance id (the card drawn
 //                     by begin is legal - it is already in the hand);
 //   confirm        -> maneuver(maneuverId, moves, boostCardId?). Zero moves
@@ -60,8 +61,9 @@ struct UNMATCHED_API FS09DiscardCommand {
   TArray<FString> CardInstanceIds; // EXACTLY pending.count unique own ids
 };
 
-/** GD-034 attack intent: attacker + target are adjacent living fighters
- *  (attacker owned by the viewer), card is a viewer-hand instance of type
+/** GD-034 attack intent: attacker + target are living fighters in attack
+ *  range (melee: adjacent; ranged: adjacent or sharing a zone - ENV-O6),
+ *  attacker owned by the viewer, card is a viewer-hand instance of type
  *  ATTACK/VERSATILE/UNIVERSAL whose banner the attacker satisfies. */
 struct UNMATCHED_API FS09AttackCommand {
   FString AttackerFighterId;
@@ -114,6 +116,33 @@ public:
                                              const TArray<FS08BoardFighter>& Fighters,
                                              const FString& ViewerId);
 
+  // ---- ENV-O6 / GAP-023: attack range = the server's legal set ----------
+  /** Server normalizeAttackType: 'ranged' / 'range' is ranged, anything else
+   *  (absent, 'melee', unknown) is melee. The fighter projection carries
+   *  attackType for heroes and sidekicks (Hero.properties / sidekick data). */
+  static bool IsRangedAttacker(const FS08BoardFighter& Attacker);
+  /** Mirror of game-action-executor executeAttack range: the target is
+   *  ADJACENT (board neighbour - a link on original-map boards, manhattan 1
+   *  on grids), or the attacker is ranged and the two cells share at least
+   *  one zone (multizone spaces are in all their zones; a zoneless cell
+   *  shares none). Hero range abilities of the server registry
+   *  (canAttackAtRange, e.g. Ms. Marvel / Muhammad Ali) are NOT mirrored -
+   *  none of the Medusa/Harpy/Arthur/Merlin roster has one. Positions only:
+   *  aliveness/ownership are the caller's gates. */
+  static bool IsTargetInAttackRange(const FS08BoardModel& Board,
+                                    const FS08BoardFighter& Attacker,
+                                    const FS08BoardFighter& Target);
+  /** True when the pair is legal only through a shared zone (not adjacent):
+   *  the ranged-through-zone case the HUD/trace calls out. */
+  static bool IsZoneOnlyTarget(const FS08BoardModel& Board, const FS08BoardFighter& Attacker,
+                               const FS08BoardFighter& Target);
+  /** Living fighters of the OTHER owner that AttackerId may legally attack,
+   *  in Fighters order - the offer/highlight set of the draft, equal to what
+   *  the server accepts. Empty for an unknown/dead attacker. */
+  static TArray<FString> LegalAttackTargets(const FS08BoardModel& Board,
+                                            const TArray<FS08BoardFighter>& Fighters,
+                                            const FString& AttackerId);
+
   ES09CommandMode Mode = ES09CommandMode::None;
 
   // Maneuver draft state
@@ -157,6 +186,9 @@ public:
   // Live inputs (pushed by the owner every applied snapshot)
   FString ViewerId;
   bool bCommandInFlight = false;
+  /** Board of the last OnSnapshot (attack-range basis of the board-less
+   *  overloads). Callers holding the live model pass it explicitly. */
+  FS08BoardModel SnapshotBoard;
 
   /** Feed one authoritative applied snapshot. Clears/resumes drafts strictly
    *  from the server state (pending appeared -> draft open; pending gone ->
@@ -206,20 +238,36 @@ public:
   // ---- GD-034: attack draft ----
   /** True when the viewer may OPEN an attack draft: own turn, action phase,
    *  no open server pending, nothing in flight. (The draft itself also needs
-   *  an adjacent enemy + legal card - see EnumerateAttackPairs.) */
+   *  an enemy in range + legal card - see LegalAttackTargets.) */
   bool CanOpenAttackDraft(const FS08Snapshot& Snapshot, FString& OutReason) const;
-  /** Attack draft ops. SelectAttacker/SelectTarget validate adjacency and
-   *  ownership against the authoritative snapshot. */
+  /** Attack draft ops. SelectAttacker/SelectTarget validate attack range
+   *  (IsTargetInAttackRange over Board) and ownership against the
+   *  authoritative snapshot. */
+  bool SelectAttacker(const FString& FighterId, const FS08BoardModel& Board,
+                      const TArray<FS08BoardFighter>& Fighters, FString& OutReason);
+  bool SelectTarget(const FString& FighterId, const FS08BoardModel& Board,
+                    const TArray<FS08BoardFighter>& Fighters, FString& OutReason);
+  /** Pre-ENV overloads: use the board of the last OnSnapshot (an empty grid
+   *  before the first snapshot = the old manhattan-1 melee rule). */
   bool SelectAttacker(const FString& FighterId, const TArray<FS08BoardFighter>& Fighters,
-                      FString& OutReason);
+                      FString& OutReason) {
+    return SelectAttacker(FighterId, SnapshotBoard, Fighters, OutReason);
+  }
   bool SelectTarget(const FString& FighterId, const TArray<FS08BoardFighter>& Fighters,
-                    FString& OutReason);
+                    FString& OutReason) {
+    return SelectTarget(FighterId, SnapshotBoard, Fighters, OutReason);
+  }
   /** Attack card toggle: hand instance of type ATTACK/VERSATILE/UNIVERSAL
    *  whose banner the drafted attacker satisfies. */
   bool ToggleAttackCard(const FString& InstanceId, const FS08Snapshot& Snapshot,
                         const TArray<FS08BoardFighter>& Fighters, FString& OutReason);
-  bool ConfirmAttack(const FS08Snapshot& Snapshot, const TArray<FS08BoardFighter>& Fighters,
+  bool ConfirmAttack(const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
+                     const TArray<FS08BoardFighter>& Fighters,
                      FS09AttackCommand& OutCommand, FString& OutReason) const;
+  bool ConfirmAttack(const FS08Snapshot& Snapshot, const TArray<FS08BoardFighter>& Fighters,
+                     FS09AttackCommand& OutCommand, FString& OutReason) const {
+    return ConfirmAttack(Snapshot, SnapshotBoard, Fighters, OutCommand, OutReason);
+  }
 
   // ---- GD-034: defense window (COMBAT, viewer is defender) ----
   /** Defense card toggle: DEFENSE/VERSATILE/UNIVERSAL hand instance whose

@@ -6,14 +6,26 @@
 // art-boards) decoded through FS08BoardModel::Decode against their profiles.
 // T4.2: the zone MI / glyph mesh fields of the data, the glyph anchors, and
 // (ZoneContent, editor assets) the MIs and glyph meshes themselves.
+// ENV-MAPS track S: the 'map-image' surface (MapImageParser, MapProfiles on the committed topology fixtures
+// backend/prisma/fixtures/boards, MapCamera K1 distance, MapGeometry, MapPlaneUV on the engine plane,
+// MapActor grey topology view + missing-asset fallback, MapAssets once the out-of-git import ran).
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     -ExecCmds="Automation RunTests Unmatched.S08.BoardArt; Quit" -unattended -nosplash -nullrhi
 #if WITH_AUTOMATION_TESTS
 
+#include "S08BoardActor.h"
 #include "S08BoardArt.h"
 #include "S08BoardModel.h"
+#include "S08Diorama.h"
 #include "S08FighterActor.h"
 #include "S08Team.h"
+#include "Components/BoxComponent.h"
+#include "Components/InstancedStaticMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/Texture2D.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Misc/PackageName.h"
+#include "StaticMeshResources.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "S08Contracts.h"
@@ -134,7 +146,8 @@ bool FS08BoardArtShippedTest::RunTest(const FString&) {
   for (const FString& E : Errors) AddError(E);
   TestTrue("shipped Config/ArtBoards/S08ArtBoardProfiles.json parses without errors", bOk);
   TestTrue("revision >= 1", Data.Revision >= 1);
-  TestEqual("three board profiles (Cobble + 2 fixtures)", Data.Boards.Num(), 3);
+  // ENV-MAPS (profile rev 6): + the map-image profiles of Marmoreal and Sarpedon.
+  TestEqual("five board profiles (Cobble + 2 fixtures + 2 original maps)", Data.Boards.Num(), 5);
   for (const TPair<FString, FS08LightProfile>& Light : Data.Lights) {
     FString Reason;
     TestTrue(FString::Printf(TEXT("light %s budget: %s"), *Light.Key, *Reason), Light.Value.BudgetOk(Reason));
@@ -156,7 +169,49 @@ bool FS08BoardArtShippedTest::RunTest(const FString&) {
     }
   }
   TestEqual("profile sha256 recorded", Data.SourceSha256.Len(), 64);
+  int32 MapProfiles = 0;
   for (const FS08BoardArtProfile& B : Data.Boards) {
+    TestNotNull(FString::Printf(TEXT("%s: light profile present"), *B.Id), Data.LightFor(B));
+    if (B.Surface == ES08BoardSurface::MapImage) {
+      // ENV-MAPS map-image schema: matched by id only, the source size / scale of the client's layout frame,
+      // /Game/EnvMaps/<Name>/ asset paths (the assets are out of git: no uasset / zone MI required here), the
+      // space graph in expect instead of W x H cells. The zone keys are the painted ones (no zone styles needed).
+      ++MapProfiles;
+      const FS08MapImageSpec& M = B.Map;
+      TestTrue(FString::Printf(TEXT("%s: mapImage block parsed"), *B.Id), M.bSet);
+      TestTrue(FString::Printf(TEXT("%s: matched by Board row id only"), *B.Id),
+               B.MatchBoardIds.Num() == 1 && B.MatchWidth == 0 && B.MatchHeight == 0 && B.MatchZoneKeys.Num() == 0);
+      TestTrue(FString::Printf(TEXT("%s: srcSize 1337x866"), *B.Id), M.SrcSizePx == FIntPoint(1337, 866));
+      TestTrue(FString::Printf(TEXT("%s: uuPerPx 2/3 (ENV-O1)"), *B.Id), FMath::IsNearlyEqual(M.UuPerPx, 2.0f / 3.0f, 1e-6f));
+      TestTrue(FString::Printf(TEXT("%s: map frame == FS08LayoutFrame defaults (CellToWorld)"), *B.Id),
+               M.MatchesDefaultLayoutFrame());
+      TestTrue(FString::Printf(TEXT("%s: map 891.333 x 577.333 uu"), *B.Id),
+               M.SizeUU().Equals(FVector2D(891.3333, 577.3333), 0.01));
+      TestTrue(FString::Printf(TEXT("%s: frameUU 24 (the 'tiles' frame look)"), *B.Id),
+               FMath::IsNearlyEqual(M.FrameUU, S08MapSurfaceSpec::DefaultFrameUU));
+      const FString Folder = FString(S08MapSurfaceSpec::AssetRoot) + M.Name + TEXT("/");
+      // SDF / space ID (not sampled yet) under the never-cooked data root (DefaultGame.ini DirectoriesToNeverCook)
+      const FString DataFolder = FString(S08MapSurfaceSpec::DataRoot) + M.Name + TEXT("/");
+      TArray<TPair<FString, FString>> Expected;
+      Expected.Add(TPair<FString, FString>(M.BaseColorPath, Folder + FString::Printf(TEXT("T_%s_Map_BC_4K"), *M.Name)));
+      Expected.Add(TPair<FString, FString>(M.MaskPath, Folder + FString::Printf(TEXT("T_%s_Map_GameMask_4K"), *M.Name)));
+      Expected.Add(TPair<FString, FString>(M.SdfPath, DataFolder + FString::Printf(TEXT("T_%s_Map_GameSDF_4K"), *M.Name)));
+      Expected.Add(TPair<FString, FString>(M.SpaceIdPath, DataFolder + FString::Printf(TEXT("T_%s_Map_SpaceID_4K"), *M.Name)));
+      Expected.Add(TPair<FString, FString>(M.MaterialInstancePath, Folder + FString::Printf(TEXT("MI_%s_MapBoard"), *M.Name)));
+      for (const TPair<FString, FString>& Path : Expected) {
+        TestEqual(FString::Printf(TEXT("%s: asset path %s"), *B.Id, *Path.Key), Path.Key, Path.Value);
+      }
+      TestTrue(FString::Printf(TEXT("%s: manifest %s"), *B.Id, *M.ManifestPath),
+               M.ManifestPath.StartsWith(TEXT("tools/art/map_surface/manifest.")) && M.ManifestPath.EndsWith(TEXT(".json")) &&
+                   FPaths::FileExists(FPaths::Combine(FPaths::ProjectDir(), TEXT("../.."), M.ManifestPath)));
+      TestTrue(FString::Printf(TEXT("%s: expect spaces / links / zones / multizone"), *B.Id),
+               B.Expect.Spaces > 0 && B.Expect.Links >= B.Expect.Spaces - 1 && B.Expect.Zones.Num() > 0 &&
+                   B.Expect.MultizoneCells >= 0);
+      TestTrue(FString::Printf(TEXT("%s: no W x H expect (cells / obstacles)"), *B.Id),
+               B.Expect.Cells < 0 && B.Expect.Obstacles < 0);
+      TestFalse(FString::Printf(TEXT("%s: no legacy Cobble trace"), *B.Id), B.bLegacyCobbleTrace);
+      continue;
+    }
     TSet<ES08ZoneStroke> Strokes;
     TSet<ES08ZoneGlyph> Glyphs;
     for (const FString& Key : B.MatchZoneKeys) {
@@ -167,8 +222,20 @@ bool FS08BoardArtShippedTest::RunTest(const FString&) {
     }
     TestEqual(FString::Printf(TEXT("%s: strokes unique per board"), *B.Id), Strokes.Num(), B.MatchZoneKeys.Num());
     TestEqual(FString::Printf(TEXT("%s: glyphs unique per board"), *B.Id), Glyphs.Num(), B.MatchZoneKeys.Num());
-    TestNotNull(FString::Printf(TEXT("%s: light profile present"), *B.Id), Data.LightFor(B));
     TestEqual(FString::Printf(TEXT("%s: expect.cells = W*H"), *B.Id), B.Expect.Cells, B.MatchWidth * B.MatchHeight);
+  }
+  TestEqual("two map-image profiles", MapProfiles, 2);
+  struct FMapProfileId {
+    const TCHAR* Profile;
+    const TCHAR* BoardId;  // backend/prisma/fixtures/boards/<key>.topology.json boardId
+  };
+  for (const FMapProfileId& Map : {FMapProfileId{TEXT("marmoreal-original"), TEXT("c121b47f8d6eb28daccb76d05")},
+                                   FMapProfileId{TEXT("sarpedon-original"), TEXT("c7fa64a26c29a0835f2383e63")}}) {
+    const FS08BoardArtProfile* P = Data.Boards.FindByPredicate([&](const FS08BoardArtProfile& B) { return B.Id == Map.Profile; });
+    if (TestNotNull(FString(Map.Profile) + TEXT(" profile"), P)) {
+      TestTrue(FString(Map.Profile) + TEXT(": map-image surface matched by the topology fixture's board id"),
+               P->Surface == ES08BoardSurface::MapImage && P->MatchBoardIds.Contains(Map.BoardId));
+    }
   }
   const FS08BoardArtProfile* Cobble = Data.Boards.FindByPredicate(
       [](const FS08BoardArtProfile& B) { return B.Id == TEXT("cobble-city"); });
@@ -1024,6 +1091,631 @@ bool FS08BoardArtKeylineTest::RunTest(const FString&) {
     TestTrue(FString::Printf(TEXT("%s: keyline mesh bounds %s == pieces %s"), *Path.Key, *Got.ToString(), *Want.ToString()),
              Got.Min.Equals(Want.Min, 0.01) && Got.Max.Equals(Want.Max, 0.01));
   }
+  return true;
+}
+
+// ---- ENV-MAPS track S: the 'map-image' surface of the original maps (docs/art-pipeline/ENV-MAPS-PLAN.md) --------
+namespace S08MapTest {
+FString TopologyFixtureDir() {
+  return FPaths::ConvertRelativePathToFull(
+      FPaths::Combine(FPaths::ProjectDir(), TEXT("../../backend/prisma/fixtures/boards")));
+}
+
+/** Topology fixture (unmatched.board-topology/1, flat backend Board.cells) -> the boardState projection that
+ *  buildBoardState sends: rows cells[y][x] with type normal/obstacle, zones + zone, and the space fields
+ *  spaceId / layout / start / links copied as they are. */
+bool TopologyBoardState(const FString& File, TSharedPtr<FJsonValue>& OutState, FString& OutBoardId,
+                        TSharedPtr<FJsonObject>& OutRoot) {
+  FString Text;
+  if (!FFileHelper::LoadFileToString(Text, *File)) return false;
+  TSharedPtr<FJsonObject> Root;
+  FString Problem;
+  if (!FS08Contracts::TryParseJsonObject(Text, Root, Problem) || !Root.IsValid()) return false;
+  OutRoot = Root;
+  OutBoardId = Root->GetStringField(TEXT("boardId"));
+  const TSharedPtr<FJsonObject> Lattice = Root->GetObjectField(TEXT("lattice"));
+  const int32 W = static_cast<int32>(Lattice->GetNumberField(TEXT("width")));
+  const int32 H = static_cast<int32>(Lattice->GetNumberField(TEXT("height")));
+  TArray<TArray<TSharedPtr<FJsonValue>>> Rows;
+  Rows.SetNum(H);
+  for (int32 Y = 0; Y < H; ++Y) Rows[Y].SetNum(W);
+  for (const TSharedPtr<FJsonValue>& V : Root->GetArrayField(TEXT("cells"))) {
+    const TSharedPtr<FJsonObject> C = V->AsObject();
+    const int32 X = static_cast<int32>(C->GetNumberField(TEXT("x")));
+    const int32 Y = static_cast<int32>(C->GetNumberField(TEXT("y")));
+    if (X < 0 || Y < 0 || X >= W || Y >= H) return false;
+    TSharedRef<FJsonObject> Cell = MakeShared<FJsonObject>();
+    bool bObstacle = false;
+    C->TryGetBoolField(TEXT("isObstacle"), bObstacle);
+    Cell->SetStringField(TEXT("type"), bObstacle ? TEXT("obstacle") : TEXT("normal"));
+    Cell->SetNumberField(TEXT("x"), X);
+    Cell->SetNumberField(TEXT("y"), Y);
+    const TArray<TSharedPtr<FJsonValue>>* Zones = nullptr;
+    if (C->TryGetArrayField(TEXT("zones"), Zones) && Zones && Zones->Num() > 0) {
+      Cell->SetArrayField(TEXT("zones"), *Zones);
+      Cell->SetStringField(TEXT("zone"), (*Zones)[0]->AsString());
+    }
+    for (const TCHAR* Field : {TEXT("spaceId"), TEXT("layout"), TEXT("start"), TEXT("links")}) {
+      if (C->HasField(Field)) Cell->SetField(Field, C->TryGetField(Field));
+    }
+    Rows[Y][X] = MakeShared<FJsonValueObject>(Cell);
+  }
+  TArray<TSharedPtr<FJsonValue>> RowValues;
+  for (const TArray<TSharedPtr<FJsonValue>>& Row : Rows) RowValues.Add(MakeShared<FJsonValueArray>(Row));
+  TSharedRef<FJsonObject> State = MakeShared<FJsonObject>();
+  State->SetNumberField(TEXT("width"), W);
+  State->SetNumberField(TEXT("height"), H);
+  State->SetArrayField(TEXT("cells"), RowValues);
+  State->SetObjectField(TEXT("doors"), MakeShared<FJsonObject>());
+  OutState = MakeShared<FJsonValueObject>(State);
+  return true;
+}
+
+/** 3 x 2 lattice: spaces T01 (0,0) / T02 (1,0) / T03 (2,1) at map px (200,200) / (500,200) / (800,500), linked
+ *  T01-T02-T03 (T01 and T03 are lattice-far, T02-T03 is a diagonal link), zones a / a+b / b, starts 1 and 2;
+ *  the other three cells are obstacles. */
+const TCHAR* SyntheticTopologyJson = TEXT(
+    "{\"width\":3,\"height\":2,\"doors\":{},\"cells\":["
+    "[{\"type\":\"normal\",\"x\":0,\"y\":0,\"zones\":[\"a\"],\"zone\":\"a\",\"spaceId\":\"T01\",\"layout\":{\"x\":200,\"y\":200},"
+    "\"start\":1,\"links\":[{\"x\":1,\"y\":0}]},"
+    "{\"type\":\"normal\",\"x\":1,\"y\":0,\"zones\":[\"a\",\"b\"],\"zone\":\"a\",\"spaceId\":\"T02\",\"layout\":{\"x\":500,\"y\":200},"
+    "\"links\":[{\"x\":0,\"y\":0},{\"x\":2,\"y\":1}]},"
+    "{\"type\":\"obstacle\",\"x\":2,\"y\":0}],"
+    "[{\"type\":\"obstacle\",\"x\":0,\"y\":1},{\"type\":\"obstacle\",\"x\":1,\"y\":1},"
+    "{\"type\":\"normal\",\"x\":2,\"y\":1,\"zones\":[\"b\"],\"zone\":\"b\",\"spaceId\":\"T03\",\"layout\":{\"x\":800,\"y\":500},"
+    "\"start\":2,\"links\":[{\"x\":1,\"y\":0}]}]]}");
+
+bool SyntheticTopology(FS08BoardModel& Out) {
+  TSharedPtr<FJsonObject> Obj;
+  FString Problem;
+  if (!FS08Contracts::TryParseJsonObject(SyntheticTopologyJson, Obj, Problem) || !Obj.IsValid()) return false;
+  return Out.Decode(MakeShared<FJsonValueObject>(Obj));
+}
+
+/** MinimalDoc + one map-image board ("map", Board row id cidMap) whose assets do not exist. */
+const TCHAR* MapBoardJson = TEXT(
+    ",{\"id\":\"map\",\"match\":{\"boardIds\":[\"cidMap\"]},\"surface\":\"map-image\",\"light\":\"L\","
+    "\"mapImage\":{\"name\":\"NoSuchTest\",\"bc\":\"/Game/EnvMaps/NoSuchTest/T_NoSuchTest_Map_BC_4K\","
+    "\"mask\":\"/Game/EnvMaps/NoSuchTest/T_NoSuchTest_Map_GameMask_4K\",\"sdf\":\"/Game/EnvMaps/NoSuchTest/T_NoSuchTest_Map_GameSDF_4K\","
+    "\"id\":\"/Game/EnvMaps/NoSuchTest/T_NoSuchTest_Map_SpaceID_4K\",\"materialInstance\":\"/Game/EnvMaps/NoSuchTest/MI_NoSuchTest_MapBoard\","
+    "\"srcSize\":[1337,866],\"uuPerPx\":0.6666667,\"frameUU\":24,\"trayOffsetUU\":[10,-20]},"
+    "\"expect\":{\"spaces\":3,\"links\":2,\"zones\":[\"b\",\"a\"],\"multizoneCells\":1}}");
+
+FString MapDoc() {
+  FString Doc = MinimalDoc;
+  Doc.RemoveFromEnd(TEXT("]}"));
+  return Doc + MapBoardJson + TEXT("]}");
+}
+
+const FVector2D MapHalf(445.66667, 288.66667);  // 1337 x 866 px at 2/3 uu per px, halved
+}  // namespace S08MapTest
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtMapImageParserTest,
+    "Unmatched.S08.BoardArt.MapImageParser map-image surface: the mapImage block, id-only match, space-graph expect",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtMapImageParserTest::RunTest(const FString&) {
+  using namespace S08MapTest;
+  FS08BoardArtData Data;
+  TArray<FString> Errors;
+  if (!TestTrue(TEXT("map doc parses: ") + FString::Join(Errors, TEXT(" | ")), Data.ParseJson(MapDoc(), Errors))) {
+    return false;
+  }
+  const FS08BoardArtProfile* P = Data.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("map"); });
+  if (!TestNotNull("map profile", P)) return false;
+  TestTrue("surface map-image", P->Surface == ES08BoardSurface::MapImage);
+  TestEqual("surface name", FString(S08BoardSurfaceName(P->Surface)), FString(TEXT("map-image")));
+  const FS08MapImageSpec& M = P->Map;
+  TestTrue("mapImage parsed", M.bSet && M.Name == TEXT("NoSuchTest"));
+  TestEqual("bc path", M.BaseColorPath, FString(TEXT("/Game/EnvMaps/NoSuchTest/T_NoSuchTest_Map_BC_4K")));
+  TestEqual("mi path", M.MaterialInstancePath, FString(TEXT("/Game/EnvMaps/NoSuchTest/MI_NoSuchTest_MapBoard")));
+  TestEqual("five asset paths", M.AssetPaths().Num(), 5);
+  TestTrue("srcSize", M.SrcSizePx == FIntPoint(1337, 866));
+  TestTrue("uuPerPx = the layout frame default", M.MatchesDefaultLayoutFrame());
+  TestTrue(FString::Printf(TEXT("size %s = 891.333 x 577.333"), *M.SizeUU().ToString()),
+           M.SizeUU().Equals(FVector2D(891.3333, 577.3333), 0.01));
+  TestTrue("frame half = map half + 24", M.FrameHalfUU().Equals(MapHalf + FVector2D(24.0, 24.0), 0.01));
+  TestTrue("tray offset", M.TrayOffsetUU.Equals(FVector2D(10.0, -20.0), 1e-6));
+  TestTrue("expect spaces/links", P->Expect.Spaces == 3 && P->Expect.Links == 2);
+  TestTrue("expect zones sorted", P->Expect.Zones == TArray<FString>({TEXT("a"), TEXT("b")}));
+  TestTrue("no W x H expect", P->Expect.Cells < 0);
+  // Selection: the topology board by id only; the grid profile "one" (3x2, {a,b}) never signature-matches it.
+  FS08BoardModel Topo;
+  if (TestTrue("synthetic topology board decodes", SyntheticTopology(Topo))) {
+    TestTrue("synthetic board has topology", Topo.bHasTopology);
+    ES08ProfileMatch Match;
+    const FS08BoardArtProfile* ById = Data.Select(Topo, TEXT("cidMap"), Match);
+    TestTrue("topology board by id -> map", ById && ById->Id == TEXT("map") && Match == ES08ProfileMatch::BoardId);
+    TestNull("topology board without id -> no profile (no signature)", Data.Select(Topo, FString(), Match));
+    TestNull("topology board, unknown id -> no profile", Data.Select(Topo, TEXT("other"), Match));
+    if (ById) {
+      const FS08BoardSummary S = S08SummarizeBoard(Topo);
+      TestTrue(FString::Printf(TEXT("summary spaces=%d links=%d starts=%d"), S.Spaces, S.Links, S.Starts),
+               S.bTopology && S.Spaces == 3 && S.Links == 2 && S.Starts == 2);
+      TestEqual("expect met", S08ExpectMismatch(*ById, S), FString());
+      FS08BoardArtProfile Wrong = *ById;
+      Wrong.Expect.Links = 3;
+      Wrong.Expect.Zones = {TEXT("a"), TEXT("c")};
+      const FString Mismatch = S08ExpectMismatch(Wrong, S);
+      TestTrue(TEXT("links / zones mismatch reported: ") + Mismatch,
+               Mismatch.Contains(TEXT("links 2!=3")) && Mismatch.Contains(TEXT("zones a+b!=a+c")));
+    }
+  }
+  FS08BoardModel Grid = MakeBoard(3, 2);
+  for (FS08Cell& Cell : Grid.Cells) Cell.Zones = {Cell.X == 0 ? TEXT("a") : TEXT("b")};
+  ES08ProfileMatch GridMatch;
+  const FS08BoardArtProfile* GridProfile = Data.Select(Grid, FString(), GridMatch);
+  TestTrue("a 3x2 grid still signature-matches the grid profile", GridProfile && GridProfile->Id == TEXT("one"));
+  const FS08BoardArtProfile* GridById = Data.Select(Grid, TEXT("cidMap"), GridMatch);
+  TestTrue("a grid carrying the map's row id still selects it by id (the board actor refuses: no topology)",
+           GridById && GridById->Id == TEXT("map") && GridMatch == ES08ProfileMatch::BoardId);
+  // Broken map-image boards reject the document.
+  auto Expect = [this](const FString& Name, const FString& From, const FString& To, const FString& ErrorPart) {
+    FString Doc = MapDoc();
+    TestTrue(Name + TEXT(": patch applies"), Doc.Contains(From));
+    Doc.ReplaceInline(*From, *To);
+    FS08BoardArtData Broken;
+    TArray<FString> Errs;
+    TestFalse(Name + TEXT(": rejected"), Broken.ParseJson(Doc, Errs));
+    TestTrue(Name + TEXT(": reason '") + ErrorPart + TEXT("' in ") + FString::Join(Errs, TEXT(" | ")),
+             FString::Join(Errs, TEXT(" | ")).Contains(ErrorPart));
+  };
+  Expect(TEXT("no mapImage block"), TEXT("\"mapImage\":{"), TEXT("\"mapImageX\":{"), TEXT("needs a mapImage block"));
+  Expect(TEXT("no board id"), TEXT("\"boardIds\":[\"cidMap\"]"), TEXT("\"boardIds\":[]"), TEXT("selected by id only"));
+  Expect(TEXT("signature on a map"), TEXT("\"boardIds\":[\"cidMap\"]"), TEXT("\"boardIds\":[\"cidMap\"],\"width\":3,\"height\":2"),
+         TEXT("no width/height/zoneKeys signature"));
+  Expect(TEXT("asset outside /Game/EnvMaps"), TEXT("/Game/EnvMaps/NoSuchTest/T_NoSuchTest_Map_BC_4K"),
+         TEXT("/Game/Other/T_BC"), TEXT("mapImage.bc"));
+  Expect(TEXT("asset path with an object suffix"), TEXT("MI_NoSuchTest_MapBoard\""),
+         TEXT("MI_NoSuchTest_MapBoard.MI_NoSuchTest_MapBoard\""), TEXT("mapImage.materialInstance"));
+  Expect(TEXT("srcSize not whole px"), TEXT("\"srcSize\":[1337,866]"), TEXT("\"srcSize\":[1337.5,866]"), TEXT("mapImage.srcSize"));
+  Expect(TEXT("uuPerPx 0"), TEXT("\"uuPerPx\":0.6666667"), TEXT("\"uuPerPx\":0"), TEXT("mapImage.uuPerPx"));
+  Expect(TEXT("tray offset not a pair"), TEXT("\"trayOffsetUU\":[10,-20]"), TEXT("\"trayOffsetUU\":[10]"),
+         TEXT("mapImage.trayOffsetUU"));
+  Expect(TEXT("unknown surface"), TEXT("\"surface\":\"map-image\""), TEXT("\"surface\":\"map-photo\""), TEXT("unknown surface"));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtMapProfilesTest,
+    "Unmatched.S08.BoardArt.MapProfiles Marmoreal and Sarpedon topology fixtures decode to their map-image profiles",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtMapProfilesTest::RunTest(const FString&) {
+  using namespace S08MapTest;
+  FS08BoardArtData Data;
+  TArray<FString> Errors;
+  if (!TestTrue("shipped data", LoadShipped(Data, Errors))) return false;
+  TArray<FString> Files;
+  IFileManager::Get().FindFiles(Files, *FPaths::Combine(TopologyFixtureDir(), TEXT("*.topology.json")), true, false);
+  Files.Sort();
+  if (!TestEqual(TEXT("two topology fixtures in ") + TopologyFixtureDir(), Files.Num(), 2)) return false;
+  for (const FString& Name : Files) {
+    TSharedPtr<FJsonValue> State;
+    TSharedPtr<FJsonObject> Root;
+    FString BoardId;
+    if (!TestTrue(Name + TEXT(": fixture -> boardState"),
+                  TopologyBoardState(FPaths::Combine(TopologyFixtureDir(), Name), State, BoardId, Root))) {
+      continue;
+    }
+    FS08BoardModel Board;
+    if (!TestTrue(Name + TEXT(": FS08BoardModel::Decode"), Board.Decode(State))) continue;
+    TestTrue(Name + TEXT(": topology board"), Board.bHasTopology);
+    ES08ProfileMatch Match;
+    const FS08BoardArtProfile* P = Data.Select(Board, BoardId, Match);
+    if (!TestTrue(Name + TEXT(": map-image profile by board id"),
+                  P && Match == ES08ProfileMatch::BoardId && P->Surface == ES08BoardSurface::MapImage)) {
+      continue;
+    }
+    TestNull(Name + TEXT(": no profile without the id"), Data.Select(Board, FString(), Match));
+    const FS08BoardSummary S = S08SummarizeBoard(Board);
+    TestEqual(Name + TEXT(": expect met"), S08ExpectMismatch(*P, S), FString());
+    const TSharedPtr<FJsonObject> FixtureSummary = Root->GetObjectField(TEXT("summary"));
+    TestEqual(Name + TEXT(": spaces = fixture"), S.Spaces, static_cast<int32>(FixtureSummary->GetNumberField(TEXT("spaces"))));
+    TestEqual(Name + TEXT(": links = fixture edges"), S.Links, static_cast<int32>(FixtureSummary->GetNumberField(TEXT("edges"))));
+    TestEqual(Name + TEXT(": four start spaces"), S.Starts, 4);
+    // The figures stand on the painted circles: the client's CellToWorld (FS08LayoutFrame) == the map plane's
+    // px -> world for every space, and every space lies on the map plane.
+    const FS08MapImageSpec& M = P->Map;
+    double Drift = 0.0;
+    int32 Outside = 0, Hits = 0, Spaces = 0;
+    for (int32 Y = 0; Y < Board.Height; ++Y) {
+      for (int32 X = 0; X < Board.Width; ++X) {
+        const FS08Cell* Cell = Board.CellAt(X, Y);
+        if (!Cell || !Cell->bHasLayout) continue;
+        ++Spaces;
+        const FVector World = Board.CellToWorld(X, Y);
+        Drift = FMath::Max(Drift, FVector::Dist(World, M.PxToWorld(Cell->Layout)));
+        Outside += (FMath::Abs(World.X) > M.HalfUU().X || FMath::Abs(World.Y) > M.HalfUU().Y) ? 1 : 0;
+        int32 HX = -1, HY = -1;
+        Hits += (Board.WorldToCell(World + FVector(5.0, -5.0, 0.0), HX, HY) && HX == X && HY == Y) ? 1 : 0;
+      }
+    }
+    TestTrue(FString::Printf(TEXT("%s: layout drift %.4f uu <= 0.01 (CellToWorld vs the map plane)"), *Name, Drift), Drift <= 0.01);
+    TestEqual(Name + TEXT(": every space on the map plane"), Outside, 0);
+    TestEqual(Name + TEXT(": a click 7 uu off a space centre picks that space (pick box -> WorldToCell)"), Hits, Spaces);
+    // K1 fitted to the map (ENV-O10), not to the lattice.
+    const FVector2D Half = S08BoardHalfExtentUU(Board);
+    TestTrue(FString::Printf(TEXT("%s: board half extent %s = the map half"), *Name, *Half.ToString()), Half.Equals(M.HalfUU(), 0.01));
+    const float K1 = S08K1FitDistanceUU(Half);
+    TestTrue(FString::Printf(TEXT("%s: K1 distance %.2f = 1872 +- 1"), *Name, K1), FMath::Abs(K1 - 1872.0f) <= 1.0f);
+    // Night light placeholder: spots scale by the MAP size and sit on / around the map, warm and cool present.
+    const FS08LightProfile* Light = Data.LightFor(*P);
+    if (TestNotNull(Name + TEXT(": light profile"), Light)) {
+      const TArray<FS08PlacedLight> Placed = S08PlaceLights(*Light, M.SizeUU());
+      int32 Warm = 0, Cool = 0;
+      for (const FS08PlacedLight& Pl : Placed) {
+        Warm += Pl.Spec.Role == TEXT("warm");
+        Cool += Pl.Spec.Role == TEXT("cool");
+        if (Pl.Spec.bDirectional || Pl.Spec.bHasPosUU) continue;
+        TestTrue(FString::Printf(TEXT("%s: spot %s (%.0f,%.0f) within 1.2 x the map half"), *Name, *Pl.Spec.Name,
+                                 Pl.Position.X, Pl.Position.Y),
+                 FMath::Abs(Pl.Position.X) <= Half.X * 1.2 && FMath::Abs(Pl.Position.Y) <= Half.Y * 1.2);
+      }
+      TestTrue(Name + TEXT(": warm and cool spots"), Warm >= 1 && Cool >= 1);
+      TestTrue(Name + TEXT(": budget"), Placed.Num() <= 7);
+    }
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtMapCameraTest,
+    "Unmatched.S08.BoardArt.MapCamera K1 distance: grids unchanged (Cobble 1931), map canvas 1872",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtMapCameraTest::RunTest(const FString&) {
+  using namespace S08MapTest;
+  // The pre-ENV-MAPS SetupCameraForBoard formula, verbatim: grids must keep the exact float.
+  auto Legacy = [](int32 W, int32 H) {
+    const float Hfov = 35.0f;
+    const float Aspect = 16.0f / 9.0f;
+    const float HalfH = FMath::Tan(FMath::DegreesToRadians(Hfov * 0.5f));
+    const float HalfV = HalfH / Aspect;
+    const float ExtentY = H * FS08BoardModel::CellSizeUU * 0.5f;
+    const float ExtentX = W * FS08BoardModel::CellSizeUU * 0.5f;
+    const float SinPitch = FMath::Sin(FMath::DegreesToRadians(55.0f));
+    const float NeedV = (ExtentY * SinPitch + 60.0f) / HalfV;
+    const float NeedH = (ExtentX + 60.0f) / HalfH;
+    return FMath::Max(NeedV, NeedH) * 1.12f;
+  };
+  for (const FIntPoint Size : {FIntPoint(5, 6), FIntPoint(7, 6), FIntPoint(9, 6), FIntPoint(8, 5), FIntPoint(20, 20)}) {
+    const FS08BoardModel Grid = MakeBoard(Size.X, Size.Y);
+    const FVector2D Half = S08BoardHalfExtentUU(Grid);
+    TestTrue(FString::Printf(TEXT("%dx%d grid half = W x H x 50"), Size.X, Size.Y),
+             Half.Equals(FVector2D(Size.X * 50.0, Size.Y * 50.0), 1e-6));
+    TestEqual(FString::Printf(TEXT("%dx%d grid K1 = the pre-ENV-MAPS formula"), Size.X, Size.Y), S08K1FitDistanceUU(Half),
+              Legacy(Size.X, Size.Y));
+  }
+  TestTrue(FString::Printf(TEXT("Cobble 5x6 K1 %.1f = 1931 +- 1"), S08K1FitDistanceUU(S08BoardHalfExtentUU(MakeBoard(5, 6)))),
+           FMath::Abs(S08K1FitDistanceUU(S08BoardHalfExtentUU(MakeBoard(5, 6))) - 1931.0f) <= 1.0f);
+  FS08BoardModel Topo;
+  if (TestTrue("synthetic topology board", SyntheticTopology(Topo))) {
+    const FVector2D Half = S08BoardHalfExtentUU(Topo);
+    TestTrue(FString::Printf(TEXT("topology half %s = the map canvas 445.667 x 288.667 (not the 3x2 lattice)"), *Half.ToString()),
+             Half.Equals(MapHalf, 0.01));
+    const float K1 = S08K1FitDistanceUU(Half);
+    // tools/art/map_surface/manifest.<key>.json k1.camera.distance_uu = 1872.156 (the same formula in Python)
+    TestTrue(FString::Printf(TEXT("map K1 %.3f = 1872.156 +- 0.5 (manifest) and 1872 +- 1"), K1),
+             FMath::Abs(K1 - 1872.156f) <= 0.5f && FMath::Abs(K1 - 1872.0f) <= 1.0f);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtMapGeometryTest,
+    "Unmatched.S08.BoardArt.MapGeometry map plane, reachable ring, grey discs / link bars and layering",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtMapGeometryTest::RunTest(const FString&) {
+  using namespace S08MapSurfaceSpec;
+  using namespace S08MapTest;
+  // Map plane: the engine plane (+-50 uu) stretched to the map, on PlaneZ; its corners are the map corners.
+  const FVector2D Size = MapHalf * 2.0;
+  const FTransform Plane = S08MapPlaneTransform(Size, PlaneZ);
+  const FVector Far = Plane.TransformPosition(FVector(-50.0, -50.0, 0.0));
+  const FVector Near = Plane.TransformPosition(FVector(50.0, 50.0, 0.0));
+  TestTrue(FString::Printf(TEXT("plane corners %s .. %s = the map"), *Far.ToString(), *Near.ToString()),
+           FVector2D(FMath::Min(Far.X, Near.X), FMath::Min(Far.Y, Near.Y)).Equals(-MapHalf, 0.01) &&
+               FVector2D(FMath::Max(Far.X, Near.X), FMath::Max(Far.Y, Near.Y)).Equals(MapHalf, 0.01));
+  TestTrue("plane on z -0.5", FMath::IsNearlyEqual(Plane.GetTranslation().Z, -0.5, 1e-6));
+  // Px -> world = FS08LayoutFrame::ToWorld (the figures' CellToWorld).
+  FS08MapImageSpec Spec;
+  const FS08LayoutFrame Frame;
+  for (const FVector2D Px : {FVector2D(0, 0), FVector2D(668.5, 433.0), FVector2D(1337, 866), FVector2D(190.4, 90.5)}) {
+    TestTrue(FString::Printf(TEXT("px %s -> %s == layout frame %s"), *Px.ToString(), *Spec.PxToWorld(Px).ToString(),
+                             *Frame.ToWorld(Px).ToString()),
+             Spec.PxToWorld(Px).Equals(Frame.ToWorld(Px), 0.001));
+  }
+  TestTrue("px (0,0) = far-left map corner", Spec.PxToWorld(FVector2D(0, 0)).Equals(FVector(-MapHalf.X, -MapHalf.Y, 0.0), 0.01));
+  TestTrue("default spec = layout frame", Spec.MatchesDefaultLayoutFrame());
+  // Rebuild compares the profile with the board model's own frame (FS08BoardModel::SetLayoutFrame), not the
+  // static defaults: a changed model frame refuses the default profile, a profile of that frame matches it.
+  FS08BoardModel Custom;
+  TestTrue("custom model frame set", Custom.SetLayoutFrame(FVector2D(1000.0, 500.0), 0.5f));
+  TestTrue("default spec = default model frame", Spec.MatchesLayoutFrame(FS08BoardModel().LayoutFrame));
+  TestFalse("default spec != a changed model frame", Spec.MatchesLayoutFrame(Custom.LayoutFrame));
+  FS08MapImageSpec CustomSpec;
+  CustomSpec.SrcSizePx = FIntPoint(1000, 500);
+  CustomSpec.UuPerPx = 0.5f;
+  TestTrue("spec of the changed frame matches it", CustomSpec.MatchesLayoutFrame(Custom.LayoutFrame));
+  TestFalse("spec of the changed frame != defaults", CustomSpec.MatchesDefaultLayoutFrame());
+  // Layering: tray top (-3) < map plane < grey link bar top < disc / play plane (0) < team ring < reachable ring.
+  const float LinkTop = GreyLinkZ + GreyLinkDepth * 50.0f;
+  const float LinkBottom = GreyLinkZ - GreyLinkDepth * 50.0f;
+  TestTrue(FString::Printf(TEXT("layering tray %.1f < plane %.1f < link %.2f..%.2f < disc top 0 < team ring %.1f..%.1f < ring %.2f"),
+                           S08Diorama::TopZ, PlaneZ, LinkBottom, LinkTop, S08TeamRingSpec::ZMin, S08TeamRingSpec::ZMax,
+                           RingZ - RingDepth * 50.0f),
+           S08Diorama::TopZ < PlaneZ && PlaneZ < LinkBottom && LinkTop < 0.0f &&
+               S08TeamRingSpec::ZMax < RingZ - RingDepth * 50.0f);
+  // Reachable ring: 12 tangent pieces on r = 36, inside the painted rim (41.6 uu) and outside the team ring (28.5).
+  TArray<FTransform> Ring;
+  S08RingPieces(RingRadiusUU, RingWidthUU, RingSegments, RingZ, RingDepth, Ring);
+  if (TestEqual("12 ring pieces", Ring.Num(), RingSegments)) {
+    double MinInner = TNumericLimits<double>::Max(), MaxOuter = 0.0;
+    for (const FTransform& Piece : Ring) {
+      TestTrue("piece centre on r 36", FMath::IsNearlyEqual(FVector2D(Piece.GetTranslation()).Size(), RingRadiusUU, 1e-3));
+      for (const FVector& C : {FVector(-50, -50, 0), FVector(50, -50, 0), FVector(50, 50, 0), FVector(-50, 50, 0)}) {
+        MaxOuter = FMath::Max(MaxOuter, FVector2D(Piece.TransformPosition(C)).Size());
+      }
+      // the inner edge midpoint (radial distance of the inner face)
+      const FVector Inward = Piece.TransformPosition(FVector(0, -50, 0));
+      const FVector Outward = Piece.TransformPosition(FVector(0, 50, 0));
+      MinInner = FMath::Min(MinInner, FMath::Min(FVector2D(Inward).Size(), FVector2D(Outward).Size()));
+    }
+    TestTrue(FString::Printf(TEXT("ring outer reach %.2f < painted rim 41.6 - 1"), MaxOuter), MaxOuter < 40.6);
+    TestTrue(FString::Printf(TEXT("ring inner %.2f > team ring outer %.2f + 1"), MinInner, S08TeamRingSpec::P1RimOut1),
+             MinInner > S08TeamRingSpec::P1RimOut1 + 1.0);
+  }
+  // Grey link bar: trimmed to the disc edges; overlapping discs give no bar.
+  FTransform Bar;
+  if (TestTrue("bar between discs 200 uu apart", S08LinkBarTransform(FVector(0, 0, 0), FVector(200, 0, 0), 42.0f, 5.0f,
+                                                                     GreyLinkZ, GreyLinkDepth, Bar))) {
+    TestTrue("bar length 116, centre (100,0)", FMath::IsNearlyEqual(Bar.GetScale3D().X, 1.16, 1e-4) &&
+                                                   Bar.GetTranslation().Equals(FVector(100, 0, GreyLinkZ), 1e-3));
+  }
+  TestTrue("diagonal bar yaw 45", S08LinkBarTransform(FVector(0, 0, 0), FVector(200, 200, 0), 42.0f, 5.0f, GreyLinkZ,
+                                                      GreyLinkDepth, Bar) &&
+                                      FMath::IsNearlyEqual(Bar.Rotator().Yaw, 45.0, 1e-3));
+  TestFalse("touching discs: no bar", S08LinkBarTransform(FVector(0, 0, 0), FVector(84, 0, 0), 42.0f, 5.0f, GreyLinkZ,
+                                                          GreyLinkDepth, Bar));
+  // The fallback trace line.
+  TestEqual("missing line", S08MapImageMissingLine(TEXT("/Game/EnvMaps/X/T_X")),
+            FString(TEXT("ARTPREVIEW map-image missing /Game/EnvMaps/X/T_X")));
+  // Link pairs of the synthetic board: T01-T02 and T02-T03 once each (symmetrised), grids none.
+  FS08BoardModel Topo;
+  if (TestTrue("synthetic topology board", SyntheticTopology(Topo))) {
+    const TArray<TPair<FIntPoint, FIntPoint>> Links = S08BoardLinkPairs(Topo);
+    TestTrue("two links (0,0)-(1,0) and (1,0)-(2,1)",
+             Links.Num() == 2 && Links[0].Key == FIntPoint(0, 0) && Links[0].Value == FIntPoint(1, 0) &&
+                 Links[1].Key == FIntPoint(1, 0) && Links[1].Value == FIntPoint(2, 1));
+  }
+  TestEqual("a grid has no link pairs", S08BoardLinkPairs(MakeBoard(5, 6)).Num(), 0);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtMapPlaneUvTest,
+    "Unmatched.S08.BoardArt.MapPlaneUV the engine plane under S08MapPlaneTransform puts UV (0,0) on the far-left corner, u along +X, v along +Y",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtMapPlaneUvTest::RunTest(const FString&) {
+  UStaticMesh* Plane = LoadObject<UStaticMesh>(nullptr, S08MapSurfaceSpec::PlaneMeshPath);
+  if (!TestNotNull("engine plane /Engine/BasicShapes/Plane", Plane)) return false;
+  // LOD0 render data (the editor keeps the CPU copy of the engine basic shapes; without it the check is skipped
+  // with a warning, never passed silently).
+  FStaticMeshRenderData* Render = Plane->GetRenderData();
+  if (!Render || Render->LODResources.Num() == 0) {
+    AddWarning(TEXT("engine plane has no render data here: UV orientation NOT checked"));
+    return true;
+  }
+  FStaticMeshLODResources& Lod = Render->LODResources[0];
+  FPositionVertexBuffer& Positions = Lod.VertexBuffers.PositionVertexBuffer;
+  FStaticMeshVertexBuffer& Uvs = Lod.VertexBuffers.StaticMeshVertexBuffer;
+  if (Positions.GetNumVertices() == 0 || !Positions.GetVertexData() || !Uvs.GetTexCoordData()) {
+    AddWarning(TEXT("engine plane vertex buffers have no CPU copy: UV orientation NOT checked"));
+    return true;
+  }
+  const FVector2D Size = S08MapTest::MapHalf * 2.0;
+  // For every vertex: world = S08MapPlaneTransform(local), and the manifest mapping X = (u - 0.5) * W,
+  // Y = (v - 0.5) * H must hold. The observed mapping is reported so a failing build can fix the transform.
+  const FTransform T = S08MapPlaneTransform(Size, S08MapSurfaceSpec::PlaneZ);
+  double Worst = 0.0;
+  FString Observed;
+  const uint32 Count = Positions.GetNumVertices();
+  for (uint32 I = 0; I < Count; ++I) {
+    const FVector3f Local = Positions.VertexPosition(I);
+    const FVector2f UV = Uvs.GetVertexUV(I, 0);
+    const FVector World = T.TransformPosition(FVector(Local));
+    const FVector2D Want((UV.X - 0.5) * Size.X, (UV.Y - 0.5) * Size.Y);
+    Worst = FMath::Max(Worst, FVector2D::Distance(FVector2D(World.X, World.Y), Want));
+    if (I < 4) Observed += FString::Printf(TEXT(" local(%.0f,%.0f)->uv(%.2f,%.2f)"), Local.X, Local.Y, UV.X, UV.Y);
+  }
+  AddInfo(TEXT("engine plane UV:") + Observed);
+  TestTrue("plane has vertices", Count >= 4);
+  TestTrue(FString::Printf(TEXT("map UV orientation: worst %.3f uu <= 0.5 (observed%s)"), Worst, *Observed), Worst <= 0.5);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtMapActorTest,
+    "Unmatched.S08.BoardArt.MapActor topology board: grey discs / links + pick box, no lattice; missing map assets fall back",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtMapActorTest::RunTest(const FString&) {
+  using namespace S08MapTest;
+  FS08BoardModel Topo;
+  if (!TestTrue("synthetic topology board", SyntheticTopology(Topo))) return false;
+  UWorld* World = UWorld::CreateWorld(EWorldType::Game, false, FName(TEXT("S08BoardArtMapActor")));
+  if (!TestNotNull("test world", World)) return false;
+  FWorldContext& Context = GEngine->CreateNewWorldContext(EWorldType::Game);
+  Context.SetCurrentWorld(World);
+  // 1) Grey topology view (no art data): one disc per space, one bar per link, the dark canvas of the map size,
+  //    the invisible QueryOnly pick box - and no lattice instance at all (their collision would pick squares).
+  AS08BoardActor* Grey = World->SpawnActor<AS08BoardActor>(AS08BoardActor::StaticClass(), FVector::ZeroVector,
+                                                           FRotator::ZeroRotator);
+  if (TestNotNull("board actor", Grey)) {
+    TestTrue("rebuild topology", Grey->Rebuild(Topo));
+    TestTrue("topology board", Grey->IsTopologyBoard());
+    TestFalse("no art (grey)", Grey->IsArtActive() || Grey->IsMapImageActive());
+    TestEqual("no lattice instances", Grey->GetLatticeInstanceCount(), 0);
+    const UInstancedStaticMeshComponent* Discs = Grey->GetTopologyDiscs();
+    const UInstancedStaticMeshComponent* Bars = Grey->GetTopologyLinkBars();
+    TestTrue("3 discs", Discs && Discs->GetInstanceCount() == 3 && Discs->IsVisible());
+    TestTrue("2 link bars", Bars && Bars->GetInstanceCount() == 2 && Bars->IsVisible());
+    if (Discs && Discs->GetInstanceCount() == 3) {
+      FTransform First;
+      Discs->GetInstanceTransform(0, First, true);
+      TestTrue(FString::Printf(TEXT("disc 0 at T01 %s"), *First.GetTranslation().ToString()),
+               FVector2D(First.GetTranslation()).Equals(FVector2D(Topo.CellToWorld(0, 0)), 0.01));
+    }
+    const UStaticMeshComponent* Canvas = Grey->GetMapPlane();
+    TestTrue("dark canvas plane visible, map sized",
+             Canvas && Canvas->IsVisible() &&
+                 Canvas->GetRelativeScale3D().Equals(FVector(MapHalf.X / 50.0, MapHalf.Y / 50.0, 1.0), 0.01));
+    const UBoxComponent* Pick = Grey->GetMapPickBox();
+    if (TestNotNull("pick box", Pick)) {
+      TestTrue("pick box QueryOnly", Pick->GetCollisionEnabled() == ECollisionEnabled::QueryOnly);
+      TestTrue("pick box blocks Visibility only", Pick->GetCollisionResponseToChannel(ECC_Visibility) == ECR_Block &&
+                                                      Pick->GetCollisionResponseToChannel(ECC_Camera) == ECR_Ignore &&
+                                                      Pick->GetCollisionResponseToChannel(ECC_WorldStatic) == ECR_Ignore);
+      TestTrue(FString::Printf(TEXT("pick box extent %s = the map half"), *Pick->GetUnscaledBoxExtent().ToString()),
+               FVector2D(Pick->GetUnscaledBoxExtent()).Equals(MapHalf, 0.01) &&
+                   FMath::IsNearlyEqual(Pick->GetRelativeLocation().Z + Pick->GetUnscaledBoxExtent().Z, 0.0, 1e-3));
+    }
+    TestTrue("half extent = the map canvas", Grey->GetBoardHalfExtentUU().Equals(MapHalf, 0.01));
+    int32 X = -1, Y = -1;
+    TestTrue("the actor's WorldToCell picks T02 in its circle",
+             Grey->WorldToCell(Topo.CellToWorld(1, 0) + FVector(20, 10, 0), X, Y) && X == 1 && Y == 0);
+    TestFalse("between the circles: no cell", Grey->WorldToCell(FVector(0.0, 250.0, 0.0), X, Y));
+    // Reachable / illegal marks on a topology board: discs on the spaces (no square corners).
+    Grey->SetSelectedFighter(TEXT("nobody"), {FS08BoardModel::CellKey(1, 0), FS08BoardModel::CellKey(2, 1),
+                                              FS08BoardModel::CellKey(2, 0)});  // (2,0) is an obstacle: skipped
+    // A grid after the topology board: lattice back, topology components off.
+    TestTrue("rebuild 5x6 grid", Grey->Rebuild(MakeBoard(5, 6)));
+    TestFalse("grid: not topology", Grey->IsTopologyBoard());
+    TestEqual("grid: 30 tiles + 1 underlay", Grey->GetLatticeInstanceCount(), 31);
+    TestTrue("grid: canvas hidden, discs cleared", Canvas && !Canvas->IsVisible() && Discs && Discs->GetInstanceCount() == 0);
+    TestTrue("grid: pick box off", Pick && Pick->GetCollisionEnabled() == ECollisionEnabled::NoCollision);
+    TestTrue("grid half extent unchanged", Grey->GetBoardHalfExtentUU().Equals(FVector2D(250.0, 300.0), 1e-6));
+    Grey->Destroy();
+  }
+  // 2) Missing map assets (a checkout without the import): the map-image profile is refused, the board keeps the
+  //    grey topology view and every missing package is reported ('ARTPREVIEW map-image missing <path>').
+  FS08BoardArtData Data;
+  TArray<FString> Errors;
+  if (TestTrue(TEXT("map doc parses: ") + FString::Join(Errors, TEXT(" | ")), Data.ParseJson(MapDoc(), Errors))) {
+    AS08BoardActor* Missing = World->SpawnActor<AS08BoardActor>(AS08BoardActor::StaticClass(), FVector::ZeroVector,
+                                                                FRotator::ZeroRotator);
+    if (TestNotNull("board actor (missing assets)", Missing)) {
+      Missing->SetArtDataForTest(Data);
+      Missing->SetRoomBoardId(TEXT("cidMap"));
+      TestTrue("rebuild", Missing->Rebuild(Topo));
+      TestFalse("map-image refused", Missing->IsArtActive() || Missing->IsMapImageActive());
+      TestTrue("grey topology view instead", Missing->GetTopologyDiscs() && Missing->GetTopologyDiscs()->GetInstanceCount() == 3);
+      TestEqual("no lattice", Missing->GetLatticeInstanceCount(), 0);
+      const FS08BoardArtProfile* P = Data.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("map"); });
+      if (P) {
+        TestEqual("all five packages reported missing", Missing->GetMapImageMissing().Num(), 5);
+        for (const FString& Path : P->Map.AssetPaths()) {
+          TestTrue(TEXT("missing: ") + S08MapImageMissingLine(Path), Missing->GetMapImageMissing().Contains(Path));
+        }
+      }
+      TestTrue("half extent = the map canvas (grey)", Missing->GetBoardHalfExtentUU().Equals(MapHalf, 0.01));
+      Missing->Destroy();
+    }
+  }
+  // 3) The shipped Marmoreal profile once tools/art/map_surface/ue_import_map_surface.py ran (assets out of git).
+  FS08BoardArtData Shipped;
+  Errors.Reset();
+  if (TestTrue("shipped data", LoadShipped(Shipped, Errors))) {
+    const FS08BoardArtProfile* Marmoreal =
+        Shipped.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("marmoreal-original"); });
+    TSharedPtr<FJsonValue> State;
+    TSharedPtr<FJsonObject> Root;
+    FString BoardId;
+    FS08BoardModel Board;
+    const bool bBoard = TopologyBoardState(FPaths::Combine(TopologyFixtureDir(), TEXT("marmoreal.topology.json")), State,
+                                           BoardId, Root) &&
+                        Board.Decode(State);
+    if (!Marmoreal || !bBoard) {
+      AddError(TEXT("marmoreal-original profile or fixture missing"));
+    } else if (!FPackageName::DoesPackageExist(Marmoreal->Map.MaterialInstancePath)) {
+      AddWarning(FString::Printf(TEXT("map assets not imported (%s): run tools/art/map_surface/ue_import_map_surface.py "
+                                      "(ENV-U3: out of git); the map-image path of this test was NOT exercised"),
+                                 *Marmoreal->Map.MaterialInstancePath));
+    } else {
+      AS08BoardActor* Map = World->SpawnActor<AS08BoardActor>(AS08BoardActor::StaticClass(), FVector::ZeroVector,
+                                                              FRotator::ZeroRotator);
+      if (TestNotNull("board actor (map-image)", Map)) {
+        Map->SetArtDataForTest(Shipped);
+        Map->SetRoomBoardId(BoardId);
+        TestTrue("rebuild Marmoreal", Map->Rebuild(Board));
+        TestTrue("map-image active", Map->IsArtActive() && Map->IsMapImageActive());
+        TestEqual("nothing missing", Map->GetMapImageMissing().Num(), 0);
+        const UStaticMeshComponent* PlaneComp = Map->GetMapPlane();
+        TestTrue("map plane visible with the MI", PlaneComp && PlaneComp->IsVisible() && PlaneComp->GetMaterial(0) &&
+                                                      PlaneComp->GetMaterial(0)->GetMaterial());
+        if (PlaneComp) {
+          const UMaterialInstanceDynamic* Mid = Cast<UMaterialInstanceDynamic>(PlaneComp->GetMaterial(0));
+          TestTrue("plane material = MID of MI_Marmoreal_MapBoard",
+                   Mid && Mid->Parent && Mid->Parent->GetName() == TEXT("MI_Marmoreal_MapBoard"));
+          TestTrue("plane sized to the map", PlaneComp->GetRelativeScale3D().Equals(FVector(MapHalf.X / 50.0, MapHalf.Y / 50.0, 1.0), 0.01));
+        }
+        TestEqual("no lattice", Map->GetLatticeInstanceCount(), 0);
+        TestEqual("4 frame bars", Map->GetArtSurfacePartCount(), 4);
+        TestEqual("4 iron corners", Map->GetArtCornerCount(), 4);
+        TestTrue("no grey discs", !Map->GetTopologyDiscs() || Map->GetTopologyDiscs()->GetInstanceCount() == 0);
+        TestTrue("half extent = the map", Map->GetBoardHalfExtentUU().Equals(MapHalf, 0.01));
+        TestTrue("pick box on the map", Map->GetMapPickBox() &&
+                                            Map->GetMapPickBox()->GetCollisionEnabled() == ECollisionEnabled::QueryOnly);
+        // reachable rings (art): no crash, rings only on spaces
+        Map->SetSelectedFighter(TEXT("nobody"), {FS08BoardModel::CellKey(0, 0)});
+        Map->Destroy();
+      }
+    }
+  }
+  GEngine->DestroyWorldContext(World);
+  World->DestroyWorld(false);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtMapAssetsTest,
+    "Unmatched.S08.BoardArt.MapAssets imported map textures / M_MapBoard / MI per map match the import contract (out of git)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtMapAssetsTest::RunTest(const FString&) {
+  FS08BoardArtData Data;
+  TArray<FString> Errors;
+  if (!TestTrue("shipped data", LoadShipped(Data, Errors))) return false;
+  int32 Checked = 0;
+  for (const FS08BoardArtProfile& B : Data.Boards) {
+    if (B.Surface != ES08BoardSurface::MapImage) continue;
+    const FS08MapImageSpec& M = B.Map;
+    if (!FPackageName::DoesPackageExist(M.MaterialInstancePath)) {
+      AddWarning(FString::Printf(TEXT("%s: map assets not imported (%s) - run tools/art/map_surface/ue_import_map_surface.py"),
+                                 *B.Id, *M.MaterialInstancePath));
+      continue;
+    }
+    ++Checked;
+    UTexture2D* Bc = LoadObject<UTexture2D>(nullptr, *M.BaseColorPath);
+    UTexture2D* Mask = LoadObject<UTexture2D>(nullptr, *M.MaskPath);
+    UTexture2D* Sdf = LoadObject<UTexture2D>(nullptr, *M.SdfPath);
+    UTexture2D* Id = LoadObject<UTexture2D>(nullptr, *M.SpaceIdPath);
+    UMaterialInstance* Mi = LoadObject<UMaterialInstance>(nullptr, *M.MaterialInstancePath);
+    if (!TestTrue(B.Id + TEXT(": four textures and the MI load"), Bc && Mask && Sdf && Id && Mi)) continue;
+    TestTrue(B.Id + TEXT(": BC sRGB, default compression"), Bc->SRGB && Bc->CompressionSettings == TC_Default);
+    TestTrue(B.Id + TEXT(": mask linear grayscale"), !Mask->SRGB && Mask->CompressionSettings == TC_Grayscale);
+    TestTrue(B.Id + TEXT(": SDF linear HDR (RGBA16F, 16-bit codes kept)"), !Sdf->SRGB && Sdf->CompressionSettings == TC_HDR);
+    TestTrue(B.Id + TEXT(": space ID linear half float, nearest"), !Id->SRGB && Id->CompressionSettings == TC_HalfFloat &&
+                                                                       Id->Filter == TF_Nearest);
+#if WITH_EDITORONLY_DATA
+    TestTrue(B.Id + TEXT(": space ID without mips"), Id->MipGenSettings == TMGS_NoMipmaps);
+    TestTrue(B.Id + TEXT(": 4096 source"), Bc->Source.GetSizeX() == 4096 && Bc->Source.GetSizeY() == 4096);
+#endif
+    TestTrue(B.Id + TEXT(": parent /Game/EnvMaps/M_MapBoard"),
+             Mi->Parent && Mi->Parent->GetPathName() == TEXT("/Game/EnvMaps/M_MapBoard.M_MapBoard"));
+    UTexture* Bound = nullptr;
+    TestTrue(B.Id + TEXT(": BaseColor bound"), Mi->GetTextureParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamBaseColor), Bound) && Bound == Bc);
+    TestTrue(B.Id + TEXT(": GameMask bound"), Mi->GetTextureParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamGameMask), Bound) && Bound == Mask);
+    float Value = 0.0f;
+    TestTrue(B.Id + TEXT(": NightEV -0.7"), Mi->GetScalarParameterValue(FHashedMaterialParameterInfo(TEXT("NightEV")), Value) && FMath::IsNearlyEqual(Value, -0.7f, 1e-4f));
+    TestTrue(B.Id + TEXT(": NightSaturation 0.7"), Mi->GetScalarParameterValue(FHashedMaterialParameterInfo(TEXT("NightSaturation")), Value) && FMath::IsNearlyEqual(Value, 0.7f, 1e-4f));
+    TestTrue(B.Id + TEXT(": Lift 0.35"), Mi->GetScalarParameterValue(FHashedMaterialParameterInfo(TEXT("Lift")), Value) && FMath::IsNearlyEqual(Value, 0.35f, 1e-4f));
+    FLinearColor Tint;
+    TestTrue(B.Id + TEXT(": NightTint"), Mi->GetVectorParameterValue(FHashedMaterialParameterInfo(TEXT("NightTint")), Tint));
+    const UMaterial* Base = Mi->GetMaterial();
+    TestTrue(B.Id + TEXT(": lit surface material"), Base && Base->GetShadingModels().HasShadingModel(MSM_DefaultLit));
+  }
+  AddInfo(FString::Printf(TEXT("map-image profiles checked against imported assets: %d"), Checked));
   return true;
 }
 

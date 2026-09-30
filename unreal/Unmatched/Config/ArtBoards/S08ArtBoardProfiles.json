@@ -1,6 +1,6 @@
 {
  "schema": "unmatched.s08-art-board-profiles/1",
- "revision": 5,
+ "revision": 6,
  "status": "предложено",
  "note": "ART-005 / stage 3 T3.2: data-driven -ArtPreview board art. Zone palette and glyphs are keyed by zone KEY (never by board); lighting is one profile per board. Budget per profile: exactly 1 directional light with shadow + at most 6 point lights without shadows. Light sections are not gameplay zones: point lights sit at authored board-relative spots and a section (cells within half a light's radius) never coincides with one zone (tools/art/art_board_fixtures.py check: Jaccard < 0.5). Colors: zone 'color' is sRGB hex (FLinearColor(FColor) in code), light 'colorLinear' is linear RGB. Nothing here is artistically accepted.",
  "renderNote": "W4-A (2026-09-29, user decision DX12/SM6 + Lumen, High reference): every light profile declares units (points in candelas = the editor probe values, P17/ART-004 lights were CANDELAS; the pre-W4 packaged client spawned them Unitless, x1/625 = 9.3 EV darker - G01), a Movable SkyLight from /Game/S08/Render/TC_S08_AmbientDome that replaces the former point 'fill' ambient, the fixed exposure of the editor control scene (histogram min = max brightness 2^1.3 = 2.46229, bias 0, EV100 1.3) and a key CSM fitted to the diorama camera. Sky intensities are calibrated in the W4-A bench (docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29.md); status stays 'предложено'.",
@@ -8,6 +8,7 @@
  "readabilityNote": "rev 4 (W5b-R, 2026-09-29): zone gray -> #7F868E and zoneKeyline (advisor decision D-4); letters of the zones (02 §7.4 / UI-ICON-ZONE A-L) are deferred to a separate wave.",
  "readabilityNoteRev5": "rev 5 (5c-B1, 2026-09-30, plan C:/tmp/p0-review/5cb1-plan.md rev 2, advisor decision D-4 refinement): zone red #D8453B -> #EC6650 (red fill vs keyline in gray 2.89 -> 4.72 forecast) and gray #7F868E -> #6B727A (the fixture tiles darken to Y′ ≈ 157 under the rev 5 light; ΔY′ to the tile ≈ 19 -> ≈ 45); colorRev4 keeps the rev 4 value. MI_ART005_Zone_Red/_Gray LayerColor follow (FromSRGBColor).",
  "lightNote": "rev 5 (5c-B1, 2026-09-30, plan C:/tmp/p0-review/5cb1-plan.md rev 2 §2, board-readability decision D-9): in all three light profiles the key rotation [0,-55,30] (parsed as FRotator(Pitch 0, Yaw -55, Roll 30): a horizontal key) -> [-55,30,0] = FRotator(Pitch -55, Yaw 30, Roll 0) as in the probes and look-dev, and the fixed exposure EV100 1.3 -> 2.05 (min = max brightness 2^2.05 = 4.14106, bias 0): the figures leave the shoulder of the Filmic curve (look-dev C zones in tolerance 4/21 -> 17/21 forecast). Key lux, sky intensities and points are unchanged: the sky lights both the figures and the board, so compensating it would undo the effect. The board gets darker (K1 p50 forecast Cobble 131 -> ≈ 102, fixtures ≈ 184 -> ≈ 157); the game layer and UMG do not depend on the exposure. Status: предложено.",
+ "envMapsNoteRev6": "rev 6 (ENV-MAPS track S, 2026-09-30, docs/art-pipeline/ENV-MAPS-PLAN.md, user decisions ENV-U1/U3/U7): surface 'map-image' for the original maps Marmoreal and Sarpedon played on their space graph (boardState cells with links/layout, FS08BoardModel::bHasTopology). The WHOLE illustration 1337x866 px lies flat on the stone tray at 2/3 uu per px (891.333 x 577.333 uu, ENV-O1) with the 24-uu wooden frame and the ART-005 iron corners; no lattice tiles, slab or zone marks (the zones are the painted ones). The map textures and M_MapBoard / MI_<Name>_MapBoard are OUT of git (Content/ is gitignored): tools/art/map_surface/ue_import_map_surface.py imports them into /Game/EnvMaps/<Name>/ (the not yet sampled SDF / space-ID maps into /Game/EnvMaps/Data/<Name>/, which DefaultGame.ini never cooks) after checking their sha256 against tools/art/map_surface/manifest.<key>.json; a checkout without the import falls back to the grey topology view (trace 'ARTPREVIEW map-image missing <path>'). A map-image profile is selected by the Board row id only; its expect block counts spaces / links / zones (no W x H cells); srcSize/uuPerPx MUST equal the FS08LayoutFrame defaults of the client's CellToWorld. The night light profiles are uncalibrated placeholders within the budget (key kept at (-55,30,0), EV100 2.05); their board-relative spots scale by the MAP size, not W x H x 100. Status: предложено.",
  "staging": "unreal/Unmatched/Source/Unmatched/Unmatched.Build.cs RuntimeDependencies (UFS) -> <Project>/Config/ArtBoards/S08ArtBoardProfiles.json in the packaged pak",
  "zoneEdgeOrder": "zone i of a cell draws its stroke on side i: 0 near (+Y), 1 left (-X), 2 far (-Y), 3 right (+X); glyph slot i: 0 near-left, 1 far-right, 2 far-left, 3 near-right; a fifth zone reuses side/slot i % 4 (never dropped)",
  "zoneStyles": {
@@ -60,6 +61,32 @@
     {"name": "cyan-rim", "role": "cool", "at": [-0.45, -0.45, 250], "intensity": 85, "radiusUU": 420, "colorLinear": [0.55, 0.80, 1.0]},
     {"name": "indigo-pool", "role": "cool", "at": [0.35, 0.40, 240], "intensity": 70, "radiusUU": 360, "colorLinear": [0.45, 0.50, 0.95]}
    ]
+  },
+  "marmoreal-night": {
+   "source": "ENV-MAPS track S placeholder (2026-09-30): night marble-palace garden (concept ENV-U8) - cool moon key, lamp pools on the far corners and the near edge OUTSIDE the map (on the frame / tray rim, never centred on the 21 multizone spaces), one cool moon pool. Uncalibrated: the map material carries its own night grade (M_MapBoard NightEV -0.7, NightSaturation 0.7, Lift 0.35 inside the game-layer mask); calibrate key/sky in the ENV-MAPS A pass (render_bench.py, K1 map ROI) before any art review",
+   "units": {"point": "candelas", "directional": "lux"},
+   "directional": {"name": "key", "posUU": [-350, -150, 600], "rotation": [-55, 30, 0], "intensity": 3.0, "colorLinear": [0.62, 0.70, 0.90], "castShadows": true, "shadow": {"distanceUU": 3000, "cascades": 2, "contactShadowLength": 0.0}},
+   "sky": {"source": "cubemap", "cubemap": "/Game/S08/Render/TC_S08_AmbientDome", "lowerHemisphereIsBlack": false, "intensity": 12.5, "colorLinear": [0.80, 0.85, 0.97], "calibration": "placeholder, not measured (paddock-probe 14.1 lowered ~1/8 EV for the night grade)"},
+   "exposure": {"method": "histogram-fixed", "ev100": 2.05, "minBrightness": 4.14106, "maxBrightness": 4.14106, "bias": 0.0},
+   "points": [
+    {"name": "lamp-far-left", "role": "warm", "at": [-0.47, -0.52, 220], "intensity": 110, "radiusUU": 420, "colorLinear": [1.0, 0.66, 0.36]},
+    {"name": "lamp-far-right", "role": "warm", "at": [0.47, -0.52, 220], "intensity": 110, "radiusUU": 420, "colorLinear": [1.0, 0.66, 0.36]},
+    {"name": "lamp-near", "role": "warm", "at": [0.0, 0.56, 200], "intensity": 90, "radiusUU": 380, "colorLinear": [1.0, 0.68, 0.40]},
+    {"name": "moon-pool", "role": "cool", "at": [0.20, 0.05, 280], "intensity": 60, "radiusUU": 420, "colorLinear": [0.60, 0.72, 1.0]}
+   ]
+  },
+  "sarpedon-night": {
+   "source": "ENV-MAPS track S placeholder (2026-09-30): night bay (concept ENV-U8) - cool moon key, a campfire pool by the forest/palisade side, two ship lanterns on the bay side, a cool water rim; every spot sits on the map edge or outside it (frame / tray rim). Uncalibrated (see marmoreal-night)",
+   "units": {"point": "candelas", "directional": "lux"},
+   "directional": {"name": "key", "posUU": [-350, -150, 600], "rotation": [-55, 30, 0], "intensity": 3.0, "colorLinear": [0.60, 0.70, 0.92], "castShadows": true, "shadow": {"distanceUU": 3000, "cascades": 2, "contactShadowLength": 0.0}},
+   "sky": {"source": "cubemap", "cubemap": "/Game/S08/Render/TC_S08_AmbientDome", "lowerHemisphereIsBlack": false, "intensity": 13.0, "colorLinear": [0.78, 0.86, 0.98], "calibration": "placeholder, not measured (paddock-probe 14.1 lowered for the night grade)"},
+   "exposure": {"method": "histogram-fixed", "ev100": 2.05, "minBrightness": 4.14106, "maxBrightness": 4.14106, "bias": 0.0},
+   "points": [
+    {"name": "campfire", "role": "warm", "at": [-0.46, 0.30, 200], "intensity": 130, "radiusUU": 420, "colorLinear": [1.0, 0.55, 0.25]},
+    {"name": "ship-lantern-a", "role": "warm", "at": [0.50, -0.20, 230], "intensity": 100, "radiusUU": 380, "colorLinear": [1.0, 0.66, 0.36]},
+    {"name": "ship-lantern-b", "role": "warm", "at": [0.44, 0.52, 220], "intensity": 90, "radiusUU": 360, "colorLinear": [1.0, 0.66, 0.36]},
+    {"name": "water-rim", "role": "cool", "at": [0.10, -0.54, 260], "intensity": 70, "radiusUU": 440, "colorLinear": [0.50, 0.72, 1.0]}
+   ]
   }
  },
  "boards": [
@@ -94,6 +121,50 @@
    "glyphs": "zone",
    "light": "paddock-probe",
    "expect": {"cells": 35, "zoneCells": 26, "multizoneCells": 13, "obstacles": 9, "zoneCellCounts": {"blue": 6, "gray": 7, "green": 8, "blue-green": 7, "purple": 4, "yellow": 7}}
+  },
+  {
+   "id": "marmoreal-original",
+   "label": "Marmoreal (Battle of Legends vol. 1) - the original map illustration on the stone tray, played on its space graph (31 spaces / 42 links)",
+   "fixture": "backend/prisma/fixtures/boards/marmoreal.topology.json",
+   "match": {"boardIds": ["c121b47f8d6eb28daccb76d05"]},
+   "surface": "map-image",
+   "light": "marmoreal-night",
+   "mapImage": {
+    "name": "Marmoreal",
+    "bc": "/Game/EnvMaps/Marmoreal/T_Marmoreal_Map_BC_4K",
+    "mask": "/Game/EnvMaps/Marmoreal/T_Marmoreal_Map_GameMask_4K",
+    "sdf": "/Game/EnvMaps/Data/Marmoreal/T_Marmoreal_Map_GameSDF_4K",
+    "id": "/Game/EnvMaps/Data/Marmoreal/T_Marmoreal_Map_SpaceID_4K",
+    "materialInstance": "/Game/EnvMaps/Marmoreal/MI_Marmoreal_MapBoard",
+    "manifest": "tools/art/map_surface/manifest.marmoreal.json",
+    "srcSize": [1337, 866],
+    "uuPerPx": 0.6666667,
+    "frameUU": 24,
+    "trayOffsetUU": [0, 0]
+   },
+   "expect": {"spaces": 31, "links": 42, "zones": ["blue", "brown", "gray", "green", "purple", "red", "violet", "yellow"], "multizoneCells": 21, "zoneCellCounts": {"blue": 14, "brown": 7, "gray": 6, "green": 14, "purple": 5, "red": 4, "violet": 4, "yellow": 5}}
+  },
+  {
+   "id": "sarpedon-original",
+   "label": "Sarpedon (Battle of Legends vol. 1) - the original map illustration on the stone tray, played on its space graph (38 spaces / 61 links)",
+   "fixture": "backend/prisma/fixtures/boards/sarpedon.topology.json",
+   "match": {"boardIds": ["c7fa64a26c29a0835f2383e63"]},
+   "surface": "map-image",
+   "light": "sarpedon-night",
+   "mapImage": {
+    "name": "Sarpedon",
+    "bc": "/Game/EnvMaps/Sarpedon/T_Sarpedon_Map_BC_4K",
+    "mask": "/Game/EnvMaps/Sarpedon/T_Sarpedon_Map_GameMask_4K",
+    "sdf": "/Game/EnvMaps/Data/Sarpedon/T_Sarpedon_Map_GameSDF_4K",
+    "id": "/Game/EnvMaps/Data/Sarpedon/T_Sarpedon_Map_SpaceID_4K",
+    "materialInstance": "/Game/EnvMaps/Sarpedon/MI_Sarpedon_MapBoard",
+    "manifest": "tools/art/map_surface/manifest.sarpedon.json",
+    "srcSize": [1337, 866],
+    "uuPerPx": 0.6666667,
+    "frameUU": 24,
+    "trayOffsetUU": [0, 0]
+   },
+   "expect": {"spaces": 38, "links": 61, "zones": ["blue", "brown", "green", "purple", "red", "yellow"], "multizoneCells": 4, "zoneCellCounts": {"blue": 6, "brown": 5, "green": 8, "purple": 11, "red": 6, "yellow": 8}}
   }
  ]
 }

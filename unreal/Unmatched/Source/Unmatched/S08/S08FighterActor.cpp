@@ -212,7 +212,7 @@ bool AS08FighterActor::LoadTeamRingAssets() {
 
 void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
                                     const FVector& CellCenter, bool bOwn,
-                                    bool bArtPreview) {
+                                    bool bArtPreview, bool bTopologyBoard) {
   // Wave 5c-B: a v2 figure that was alive plays DeathSettle on the spot and holds the final pose
   // (DeathHoldSeconds) before the usual hide; the defeated fighter's cell (X = -1) is not used.
   const bool bWasAlive = bHasApplied && Fighter.IsAlive();
@@ -412,7 +412,15 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   Ring->SetRelativeLocation(FVector(0, 0, 1.0f));
   TargetRing->SetRelativeScale3D(FVector(Fighter.bIsHero ? 1.0f : 0.78f));
   TargetRing->SetRelativeLocation(FVector::ZeroVector);
-  TargetIcon->SetRelativeLocation(FVector(Fighter.X >= 4 ? -20.0f : 20.0f, 0.0f,
+  // Grid boards keep the column rule `Fighter.X >= 4` (Cobble and the
+  // Sherwood / T-Rex art-fixture frames unchanged). On an original map
+  // (topology board) the lattice column means nothing on screen: the world
+  // target icon leans towards the board centre (x = 0 in world) once the
+  // figure stands more than 1.5 cell pitches right of it.
+  const bool bRightBand = bTopologyBoard
+                              ? CellCenter.X > 1.5f * FS08BoardModel::CellSizeUU
+                              : Fighter.X >= 4;
+  TargetIcon->SetRelativeLocation(FVector(bRightBand ? -20.0f : 20.0f, 0.0f,
       Fighter.bIsHero ? 112.0f : 90.0f));
   if (bArtFigure) {
     // The 30-uu pedestal remains a separate visual mesh. The original

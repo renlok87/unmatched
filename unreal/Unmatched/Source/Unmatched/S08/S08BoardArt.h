@@ -18,6 +18,16 @@
 // a pure function of the data and the decoded board (automation-tested in
 // S08BoardArtTests.cpp); AS08BoardActor only turns the layouts into ISM
 // instances and light actors.
+//
+// ENV-MAPS track S (docs/art-pipeline/ENV-MAPS-PLAN.md, user decisions ENV-U1/U3/U7): a topology board
+// (FS08BoardModel::bHasTopology - Marmoreal / Sarpedon on their original space graph) gets the surface
+// 'map-image': the WHOLE original illustration (1337 x 866 px) as one flat plane at 2/3 uu per px
+// (891.333 x 577.333 uu, ENV-O1) on the stone tray, a wooden frame and the ART-005 iron corners around it,
+// no lattice tiles, no slab, no zone marks (the zones are the painted ones). Such a profile is selected by
+// the Board row id only (no W x H signature) and its expect block counts spaces / links / zones instead of
+// W x H cells. The map textures stay OUT of git: tools/art/map_surface/ue_import_map_surface.py imports
+// them into /Game/EnvMaps/<Name>/ (Content/ is gitignored); without the import the board falls back to the
+// grey topology view (traced 'ARTPREVIEW map-image missing <path>').
 #pragma once
 
 #include "CoreMinimal.h"
@@ -39,9 +49,50 @@ constexpr float GlyphZ = 0.38f;          // glyph anchor / fill centre (depth 0.
 constexpr float GlyphDepth = 0.004f;
 }  // namespace S08ZoneMarkSpec
 
+/** ENV-MAPS track S: the map-image surface and the topology game layer (uu; z relative to the play plane z = 0
+ *  where the figures stand). The tray top is S08Diorama::TopZ = -3. */
+namespace S08MapSurfaceSpec {
+constexpr float PlaneZ = -0.5f;            // map plane: above the tray top (-3), under the figures (no z-fight)
+constexpr float DefaultFrameUU = 24.0f;    // wooden frame around the map (the 'tiles' ArtFrameUU look)
+constexpr float FrameCentreZ = -3.0f;      // frame bars: same height / depth as the 'tiles' frame (top +4)
+// Reachable ring of a topology board (art): 12 cube pieces on a circle INSIDE the painted rim (rim centre line
+// 62.4 px = 41.6 uu), clear of the team ring (outer 28.5 uu), at the L-corner height of the grid boards.
+constexpr float RingRadiusUU = 36.0f;
+constexpr float RingWidthUU = 3.0f;
+constexpr int32 RingSegments = 12;
+constexpr float RingZ = 1.8f;
+constexpr float RingDepth = 0.005f;        // cube z scale (0.5 uu)
+// Grey topology view (no art profile or map assets missing): one disc per space (the painted circle size
+// 2 x 63 px = 84 uu), thin link bars between the linked spaces, all on a dark canvas plane of the map size.
+constexpr float GreyDiscDiameterUU = 84.0f;
+constexpr float GreyDiscDepth = 0.02f;     // cylinder z scale (2 uu: -2..0, top on the play plane)
+constexpr float GreyLinkWidthUU = 5.0f;
+constexpr float GreyLinkZ = -0.3f;         // bar centre (depth 0.2 uu: -0.4..-0.2, above the canvas -0.5)
+constexpr float GreyLinkDepth = 0.002f;
+// Reachable (grey) and illegal (grey and art) marks of a topology board: a flat disc instead of a square.
+constexpr float MarkDiscDiameterUU = 70.0f;
+constexpr float MarkDiscZ = 1.5f;
+constexpr float MarkDiscDepth = 0.02f;
+// Invisible cursor-trace box over the map (QueryOnly, Visibility): top face on the play plane.
+constexpr float PickBoxHalfZ = 1.0f;
+inline const TCHAR* const AssetRoot = TEXT("/Game/EnvMaps/");
+/** The SDF and space-ID textures (not sampled by M_MapBoard yet) live under <DataRoot><Name>/, which
+ *  DefaultGame.ini never cooks (DirectoriesToNeverCook /Game/EnvMaps/Data): ~0.4 GB of 4K float data stays out of
+ *  the pak. Move them out (and drop that line) once M_MapBoard samples them - the cooker drops a never-cook
+ *  package even when a cooked asset references it. */
+inline const TCHAR* const DataRoot = TEXT("/Game/EnvMaps/Data/");
+inline const TCHAR* const PlaneMeshPath = TEXT("/Engine/BasicShapes/Plane.Plane");
+inline const TCHAR* const CylinderMeshPath = TEXT("/Engine/BasicShapes/Cylinder.Cylinder");
+/** M_MapBoard texture parameters (tools/art/map_surface/ue_import_map_surface.py builds the material). */
+inline const TCHAR* const ParamBaseColor = TEXT("BaseColor");
+inline const TCHAR* const ParamGameMask = TEXT("GameMask");
+/** ENV-O8 T1: the placeholder tray is stretched non-uniformly under a map (see S08Diorama.h). */
+inline const TCHAR* const TrayWaiver = TEXT("T1-placeholder");
+}  // namespace S08MapSurfaceSpec
+
 enum class ES08ZoneStroke : uint8 { Solid, Dash2, Dash3, Dash4, Dots5, Double, DashDot };
 enum class ES08ZoneGlyph : uint8 { Diamond, Bar1, Bars2, Bars3, HBars2, Square, Cross, X, Tee, Chevron, Ring };
-enum class ES08BoardSurface : uint8 { Tiles, Cobble5x6Mesh };
+enum class ES08BoardSurface : uint8 { Tiles, Cobble5x6Mesh, MapImage };
 enum class ES08ProfileMatch : uint8 { None, BoardId, Signature };
 
 UNMATCHED_API const TCHAR* S08ZoneStrokeName(ES08ZoneStroke Stroke);
@@ -79,7 +130,7 @@ struct UNMATCHED_API FS08LightSpec {
   bool bDirectional = false;
   bool bHasPosUU = false;
   FVector PosUU = FVector::ZeroVector;  // absolute world position
-  FVector2D At = FVector2D::ZeroVector; // board-relative: world XY = At * (W, H) * 100
+  FVector2D At = FVector2D::ZeroVector; // board-relative: world XY = At * (W, H) * 100 (map-image: At * map size uu)
   float AtZ = 0.0f;
   FRotator Rotation = FRotator::ZeroRotator;  // directional: FRotator(Pitch, Yaw, Roll)
   float Intensity = 0.0f;
@@ -142,6 +193,46 @@ struct UNMATCHED_API FS08BoardExpect {
   int32 MultizoneCells = -1;
   int32 Obstacles = -1;
   TMap<FString, int32> ZoneCellCounts;
+  /** ENV-MAPS (map-image profiles): spaces (cells with a layout), undirected links and the exact zone-key set
+   *  (sorted); -1 / empty = not checked. A map-image expect never states W x H cells (the lattice is a server
+   *  detail of the topology contract). */
+  int32 Spaces = -1;
+  int32 Links = -1;
+  TArray<FString> Zones;
+};
+
+/** ENV-MAPS track S: the 'map-image' surface data of a board profile ("mapImage" block). Every asset path is a
+ *  /Game/EnvMaps/<Name>/ package (SDF / space ID: /Game/EnvMaps/Data/<Name>/, never cooked) imported by
+ *  tools/art/map_surface/ue_import_map_surface.py (out of git, ENV-U3/U7); the source size and the scale MUST equal the FS08LayoutFrame defaults the game mode's board model
+ *  uses for CellToWorld (the Shipped test pins it), so the figures stand on the painted circles. */
+struct UNMATCHED_API FS08MapImageSpec {
+  bool bSet = false;
+  FString Name;                  // 'Marmoreal' | 'Sarpedon' (asset folder and trace)
+  FString BaseColorPath;         // "bc": T_<Name>_Map_BC_4K (sRGB)
+  FString MaskPath;              // "mask": T_<Name>_Map_GameMask_4K (linear)
+  FString SdfPath;               // "sdf": Data/<Name>/T_<Name>_Map_GameSDF_4K (RGBA16F, not sampled by M_MapBoard yet; never cooked)
+  FString SpaceIdPath;           // "id": Data/<Name>/T_<Name>_Map_SpaceID_4K (R16F, nearest, no mips; not sampled yet; never cooked)
+  FString MaterialInstancePath;  // "materialInstance": MI_<Name>_MapBoard (parent /Game/EnvMaps/M_MapBoard)
+  FString ManifestPath;          // "manifest": tools/art/map_surface/manifest.<key>.json (sha256 of the sources)
+  FIntPoint SrcSizePx = FIntPoint(1337, 866);
+  float UuPerPx = FS08LayoutFrame::DefaultUuPerPx;
+  float FrameUU = S08MapSurfaceSpec::DefaultFrameUU;
+  /** ENV-O8 T1: optional XY shift of the tray under the map (extra rim on one side, S08Diorama::FitTray). */
+  FVector2D TrayOffsetUU = FVector2D::ZeroVector;
+
+  FVector2D SizeUU() const { return FVector2D(SrcSizePx.X * UuPerPx, SrcSizePx.Y * UuPerPx); }
+  FVector2D HalfUU() const { return SizeUU() * 0.5; }
+  /** Half extent of the map plus its wooden frame (the tray fits around this). */
+  FVector2D FrameHalfUU() const { return HalfUU() + FVector2D(FrameUU, FrameUU); }
+  /** Map px (continuous, x right / y down as the topology layout) -> world (map centre at the origin, Z = 0):
+   *  X = (px.x / W - 0.5) * W * UuPerPx, Y = (px.y / H - 0.5) * H * UuPerPx (= FS08LayoutFrame::ToWorld). */
+  FVector PxToWorld(const FVector2D& Px) const;
+  /** bc, mask, sdf, id, materialInstance (in this order). */
+  TArray<FString> AssetPaths() const;
+  /** True when SrcSizePx / UuPerPx equal the given layout frame (the board model's CellToWorld frame). */
+  bool MatchesLayoutFrame(const FS08LayoutFrame& Frame) const;
+  /** True when SrcSizePx / UuPerPx equal the FS08LayoutFrame defaults (the game mode's CellToWorld frame). */
+  bool MatchesDefaultLayoutFrame() const;
 };
 
 struct UNMATCHED_API FS08BoardArtProfile {
@@ -158,6 +249,8 @@ struct UNMATCHED_API FS08BoardArtProfile {
    *  "review" = the ART-005 review glyph material (Cobble, kept exact). */
   bool bZoneColorGlyphs = true;
   FS08BoardExpect Expect;
+  /** ENV-MAPS: the "mapImage" block (bSet only on surface 'map-image'). */
+  FS08MapImageSpec Map;
 };
 
 /** Counts of one decoded board (what the art and the trace describe). */
@@ -171,6 +264,12 @@ struct UNMATCHED_API FS08BoardSummary {
   int32 Obstacles = 0;       // wall/obstacle/closed door/unknown
   TArray<FString> ZoneKeys;  // sorted, unique
   TMap<FString, int32> ZoneCellCounts;
+  /** ENV-MAPS: FS08BoardModel::bHasTopology; Spaces = cells with a layout, Links = undirected pairs of the
+   *  symmetrised neighbour lists, Starts = spaces with a start number (all 0 on a grid). */
+  bool bTopology = false;
+  int32 Spaces = 0;
+  int32 Links = 0;
+  int32 Starts = 0;
 };
 
 UNMATCHED_API FS08BoardSummary S08SummarizeBoard(const FS08BoardModel& Board);
@@ -208,7 +307,8 @@ public:
   /** Style of a zone key; unknown keys get the fallback style (bFallback). */
   FS08ZoneStyle StyleFor(const FString& Key) const;
   const FS08LightProfile* LightFor(const FS08BoardArtProfile& Profile) const;
-  /** Board row id first, then W x H + exact zone-key set; nullptr = no art. */
+  /** Board row id first, then W x H + exact zone-key set (grids only: a topology board matches by id or not at
+   *  all); nullptr = no art. */
   const FS08BoardArtProfile* Select(const FS08BoardModel& Board, const FString& BoardId,
                                     ES08ProfileMatch& OutMatch) const;
 };
@@ -272,3 +372,34 @@ struct UNMATCHED_API FS08PlacedLight {
 
 /** World placement of a light profile on a board (directional first). */
 UNMATCHED_API TArray<FS08PlacedLight> S08PlaceLights(const FS08LightProfile& Profile, const FS08BoardModel& Board);
+/** ENV-MAPS: the same with the board-relative spots scaled by an explicit board size in uu (a map-image profile
+ *  passes its map size 891.333 x 577.333, never the W x H lattice); posUU spots stay absolute. */
+UNMATCHED_API TArray<FS08PlacedLight> S08PlaceLights(const FS08LightProfile& Profile, const FVector2D& BoardSizeUU);
+
+// ---- ENV-MAPS track S: world-free helpers of the map-image surface and the topology game layer -------------
+
+/** Half extent (uu) the K1 camera, the light spots and the tray are fitted to: a topology board -> its map
+ *  canvas (FS08LayoutFrame::ExtentUU / 2 = 445.667 x 288.667 by default), a grid -> W x H x 50 (the old value,
+ *  bit for bit). */
+UNMATCHED_API FVector2D S08BoardHalfExtentUU(const FS08BoardModel& Board);
+/** K1 overview distance of AS08FlowGameMode::SetupCameraForBoard for a board half extent: horizontal FOV 35,
+ *  16:9, pitch -55, 60 uu margin, x1.12 (Cobble 5x6 -> 1931 uu, the map canvas 891.333 x 577.333 -> 1872 uu). */
+UNMATCHED_API float S08K1FitDistanceUU(const FVector2D& HalfExtentUU);
+/** Undirected links of a topology board (FS08BoardModel::Neighbours, symmetrised), each pair once with the
+ *  row-major smaller cell first, sorted; empty on a grid. */
+UNMATCHED_API TArray<TPair<FIntPoint, FIntPoint>> S08BoardLinkPairs(const FS08BoardModel& Board);
+/** Relative transform of /Engine/BasicShapes/Plane (100 x 100 uu, pivot centre, normal +Z) that lays a map of
+ *  SizeUU at height Z with UV (0,0) on the far-left corner (-X, -Y), u along +X and v along +Y (manifest
+ *  "X = (u - 0.5) * W, Y = (v - 0.5) * H"). The engine plane's UV orientation is pinned by the editor test
+ *  Unmatched.S08.BoardArt.MapPlaneUV (it reports the observed mapping if this ever disagrees). */
+UNMATCHED_API FTransform S08MapPlaneTransform(const FVector2D& SizeUU, float Z);
+/** The fallback trace line: 'ARTPREVIEW map-image missing <path>'. */
+UNMATCHED_API FString S08MapImageMissingLine(const FString& Path);
+/** A ring of Segments cube pieces (engine cube, 100 uu) around the origin: centre line RadiusUU, width WidthUU,
+ *  each piece tangent (outer edge = the circumscribed polygon, no gaps), top face at Z + DepthScale * 50. */
+UNMATCHED_API void S08RingPieces(float RadiusUU, float WidthUU, int32 Segments, float Z, float DepthScale,
+                                 TArray<FTransform>& Out);
+/** A cube bar from A to B (XY), shortened by TrimUU at both ends (the disc radius), width WidthUU at height Z;
+ *  false when nothing is left between the discs. */
+UNMATCHED_API bool S08LinkBarTransform(const FVector& A, const FVector& B, float TrimUU, float WidthUU, float Z,
+                                       float DepthScale, FTransform& Out);

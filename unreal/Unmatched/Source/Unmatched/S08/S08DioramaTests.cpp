@@ -40,7 +40,9 @@ FS08BoardModel MakeBoard(int32 W, int32 H) {
 
 // World half extent of the ART-005 Cobble slab frame (report: +-278 x +-328 at yaw -90).
 const FVector2D CobbleHalf(278.0, 328.0);
-constexpr float TilesFrameUU = 24.0f;  // S08BoardActor.cpp ArtFrameUU
+constexpr float TilesFrameUU = 24.0f;  // S08BoardActor.cpp ArtFrameUU (= S08MapSurfaceSpec::DefaultFrameUU)
+// ENV-MAPS: half of the original map plane (1337 x 866 px at 2/3 uu per px).
+const FVector2D MapHalf(445.66667, 288.66667);
 }  // namespace S08DioramaTest
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08DioramaFitTest,
@@ -91,6 +93,38 @@ bool FS08DioramaFitTest::RunTest(const FString&) {
     TestTrue(FString::Printf(TEXT("%dx%d top stays on Z -3, Z scale 1"), C.W, C.H),
              FMath::IsNearlyEqual(Box.Max.Z, TopZ, 0.01) && Fit.Scale.Z == 1.0);
   }
+  // ENV-MAPS 'map-image' (ENV-O8 T1, explicit waiver): the original map 891.333 x 577.333 uu + the 24 uu wooden
+  // frame. The Cobble-sized tray is stretched non-uniformly (~1.375 x 1.106): allowed only for this placeholder.
+  {
+    const FVector2D MapFrameHalf = MapHalf + FVector2D(TilesFrameUU, TilesFrameUU);
+    const FTrayFit Fit = FitTray(MapFrameHalf);
+    TestEqual("map: yaw 0 (the long map side along X)", Fit.YawDeg, 0.0f);
+    AddInfo(FString::Printf(TEXT("map: scale %.4f x %.4f anisotropy %.3f"), Fit.Scale.X, Fit.Scale.Y, Fit.Anisotropy()));
+    TestTrue(FString::Printf(TEXT("map: scale %s = (519.667/378, 362.667/328)"), *Fit.Scale.ToString()),
+             Fit.Scale.Equals(FVector((MapFrameHalf.X + RimUU) / MeshHalfX, (MapFrameHalf.Y + RimUU) / MeshHalfY, 1.0), 1e-4));
+    TestTrue(FString::Printf(TEXT("map: anisotropy %.3f in 1.2..1.3 (> 1.05: runs under the traced T1 waiver)"), Fit.Anisotropy()),
+             Fit.Anisotropy() > 1.2 && Fit.Anisotropy() < 1.3);
+    const FBox Box = FBox(FVector(-MeshHalfX, -MeshHalfY, BottomZ), FVector(MeshHalfX, MeshHalfY, TopZ))
+                         .TransformBy(FTransform(FRotator(0.0f, Fit.YawDeg, 0.0f), FVector::ZeroVector, Fit.Scale));
+    TestTrue("map: rim 50 uu around map + frame",
+             FMath::IsNearlyEqual(Box.Max.X - MapFrameHalf.X, RimUU, 0.01) && FMath::IsNearlyEqual(Box.Max.Y - MapFrameHalf.Y, RimUU, 0.01));
+    TestTrue("map: covers the map + frame", Box.Min.X < -MapFrameHalf.X && Box.Min.Y < -MapFrameHalf.Y);
+    // The optional profile offset: the tray moves by it, the rim stays >= 50 on every side (50 + 2|offset| opposite).
+    const FTrayFit Zero = FitTray(MapFrameHalf, FVector2D::ZeroVector);
+    TestTrue("zero offset = FitTray(half)", Zero.Scale.Equals(Fit.Scale, 1e-6) && Zero.Location.IsZero() && Zero.YawDeg == Fit.YawDeg);
+    const FTrayFit Shifted = FitTray(MapFrameHalf, FVector2D(0.0, 40.0));
+    const FBox ShiftedBox = FBox(FVector(-MeshHalfX, -MeshHalfY, BottomZ), FVector(MeshHalfX, MeshHalfY, TopZ))
+                                .TransformBy(FTransform(FRotator(0.0f, Shifted.YawDeg, 0.0f),
+                                                        FVector(Shifted.Location.X, Shifted.Location.Y, 0.0), Shifted.Scale));
+    AddInfo(FString::Printf(TEXT("map + offset (0,40): tray %s"), *ShiftedBox.ToString()));
+    TestTrue("offset: location (0,40)", Shifted.Location.Equals(FVector2D(0.0, 40.0), 1e-6));
+    TestTrue("offset: rim 50 on -Y, 130 on +Y, 50 on X",
+             FMath::IsNearlyEqual(-MapFrameHalf.Y - ShiftedBox.Min.Y, RimUU, 0.01) &&
+                 FMath::IsNearlyEqual(ShiftedBox.Max.Y - MapFrameHalf.Y, RimUU + 80.0, 0.01) &&
+                 FMath::IsNearlyEqual(ShiftedBox.Max.X - MapFrameHalf.X, RimUU, 0.01));
+  }
+  // The Cobble slab keeps the report placement: a uniform tray.
+  TestTrue("Cobble 5x6 anisotropy 1", FMath::IsNearlyEqual(FitTray(CobbleHalf).Anisotropy(), 1.0, 1e-4));
   return true;
 }
 
@@ -170,7 +204,8 @@ bool FS08DioramaActorTest::RunTest(const FString&) {
         const UMaterialInterface* Mi = Tray->GetMaterial(0);
         TestTrue("tray MI_TableBase_Candidate", Mi && Mi->GetPathName().StartsWith(MaterialPath));
         // Grey board (no art data in a test world): Rebuild keeps the tray hidden.
-        Actor->Rebuild(MakeBoard(5, 6));
+        // qualified: S08BoardArtTests.cpp has its own MakeBoard (unity builds may put both files in one TU)
+        Actor->Rebuild(S08DioramaTest::MakeBoard(5, 6));
         TestFalse("grey board: tray hidden", Tray->IsVisible());
         // Cobble 5x6 slab placement: (0,0,0), yaw -90, scale 1, top on Z -3, 50 uu rim.
         Actor->PlaceDioramaTray(true, CobbleHalf, TEXT("cobble-5x6-mesh"));
@@ -189,6 +224,15 @@ bool FS08DioramaActorTest::RunTest(const FString&) {
         AddInfo(FString::Printf(TEXT("8x5 tray world bounds %s"), *Wide.ToString()));
         TestTrue(FString::Printf(TEXT("8x5 bounds %s == (-474,-324,-153)..(474,324,-3) +-0.5"), *Wide.ToString()),
                  Wide.Min.Equals(FVector(-474.0, -324.0, -153.0), 0.5) && Wide.Max.Equals(FVector(474.0, 324.0, -3.0), 0.5));
+        // ENV-MAPS map-image (ENV-O8 T1 waiver): stretched around map + frame, shifted by a profile offset (0,40).
+        Actor->PlaceDioramaTray(true, MapHalf + FVector2D(TilesFrameUU, TilesFrameUU), TEXT("map-image"), FVector2D(0.0, 40.0),
+                                TEXT("T1-placeholder"));
+        const FBox MapTray = Tray->GetStaticMesh()->GetBoundingBox().TransformBy(Tray->GetComponentTransform());
+        AddInfo(FString::Printf(TEXT("map-image tray world bounds %s"), *MapTray.ToString()));
+        TestTrue(FString::Printf(TEXT("map tray bounds %s == (-519.7,-362.7,-153)..(519.7,442.7,-3) +-0.5"), *MapTray.ToString()),
+                 MapTray.Min.Equals(FVector(-519.667, -362.667, -153.0), 0.5) &&
+                     MapTray.Max.Equals(FVector(519.667, 442.667, -3.0), 0.5));
+        TestTrue("map tray pivot moved by the offset", Tray->GetComponentLocation().Equals(FVector(0.0, 40.0, 0.0), 1e-3));
         Actor->PlaceDioramaTray(false, FVector2D::ZeroVector, TEXT("grey"));
         TestFalse("hidden again", Tray->IsVisible());
       }

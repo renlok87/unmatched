@@ -13,6 +13,15 @@
 // Cobble 5x6 mesh this is exactly yaw -90 / scale 1 (the report placement); the 'tiles' art-fixture boards
 // (8x5, 7x5) get yaw 0 and a traced XY scale (a measured technical fit, no art acceptance).
 // Trace: "ARTPREVIEW diorama tray=<mesh path> mi=<name> surface=<s> yaw=<deg> scale=<x>x<y>x<z> bounds=(..)..(..) ..."
+//
+// ENV-MAPS (ENV-O8 T1, explicit waiver): under the 'map-image' surface (map 891.333 x 577.333 uu + 24 uu wooden
+// frame, aspect 1.50) the Cobble-sized tray (aspect 1.15) is stretched NON-UNIFORMLY, ~1.375 x 1.106 (anisotropy
+// ~1.24): the rock skirt and the rim texels stretch along X. The Blender stage limits the non-uniformity of the
+// tray body to 5 %; the map-image surface runs under an explicit, traced waiver of that rule (field
+// 'waiver=T1-placeholder' of the tray line) as the plan's T1 placeholder, until the T2 modular skirt (corners +
+// segments, Blender) replaces it. (The 5c-B2 'tiles' art fixtures carry their own measured technical fit.) An
+// optional XY offset of the profile shifts the tray: the rim stays RimUU on the side the offset points away from
+// and grows by 2 |offset| on the other.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -45,13 +54,23 @@ UNMATCHED_API void ResetFlagOverrideForTest();
 struct FTrayFit {
   float YawDeg = 0.0f;
   FVector Scale = FVector::OneVector;
-  /** World half extent of the tray top after yaw and scale (board frame half + rim). */
+  /** World half extent of the tray top after yaw and scale (board frame half + rim [+ |offset|]). */
   FVector2D WorldHalf = FVector2D::ZeroVector;
+  /** ENV-MAPS: world XY of the tray pivot (the profile offset; zero for every grid board). */
+  FVector2D Location = FVector2D::ZeroVector;
+  /** max(scale X, scale Y) / min(...): 1 = uniform; > 1.05 breaks the Blender-stage rule (T1 waiver only). */
+  double Anisotropy() const {
+    const double Lo = FMath::Min(Scale.X, Scale.Y);
+    return Lo > 0.0 ? FMath::Max(Scale.X, Scale.Y) / Lo : 0.0;
+  }
 };
 
 /** Yaw / scale for a board frame of world half extent BoardHalf (X, Y): mesh X (the long side) goes along
  *  the longer board axis (yaw -90 when Y >= X, else 0), the XY scale keeps RimUU around the frame, Z = 1. */
 UNMATCHED_API FTrayFit FitTray(const FVector2D& BoardHalf);
+/** ENV-MAPS: the same with the tray shifted by Offset (world XY): the half extent grows by |Offset| per axis so
+ *  the rim is RimUU on one side and RimUU + 2 |Offset| on the other; Location = Offset. */
+UNMATCHED_API FTrayFit FitTray(const FVector2D& BoardHalf, const FVector2D& Offset);
 
 /** World half extent of the 'tiles' art surface frame of a W x H board (cells 100 uu + wood frame FrameUU). */
 inline FVector2D TilesFrameHalf(int32 Width, int32 Height, float CellUU, float FrameUU) {
