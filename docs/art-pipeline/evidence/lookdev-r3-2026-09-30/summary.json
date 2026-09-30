@@ -1,0 +1,1215 @@
+{
+ "schema": "unmatched.lookdev-r3-ue/1",
+ "date": "2026-09-30",
+ "status": "измерено (редакторные кадры b3.x, editor-mcp-viewport, основной редактор :8123, DX12/SM6+Lumen, High, SP100; не K1-K3 и не художественная приёмка)",
+ "against": "концепт art/imagegen/hero-quality-v1/<hero>/<hero>-{front,side,back}.png (concept-zones*.json); допуски luma ±15 %, тон ±12°, нас. ±0,10; определения зон не менялись",
+ "exposures": {
+  "reading": "EV100 1.3 + bias -0.75 = EV100 2.05 (свет доски rev 5)",
+  "neutral": "EV100 1.3 (экспозиция Cobble look-dev C)"
+ },
+ "method": "итерации в UE: правка источника (профиль/LUT/BC скриптами репо) -> ue_h5cb1.py reimport-r3 -> review --tag b3.N (прогрев до плато) -> замер; прогнозная модель lookdev_r2 не использовалась для решения",
+ "iterations": {
+  "r3.1": {
+   "plan": "docs/art-pipeline/evidence/lookdev-r3-2026-09-30/reimport-plan-r3.1.json",
+   "capture": "b3.1",
+   "changes": {
+    "harpy": "LUT r3.1: feathers specular 0.575 -> 0.35; gold_antique F0 x1.15",
+    "medusa": "BC leather_smooth x0.76 (grade.final_gains_r3) + UE LUT r3 leather_smooth luminanceMin 0.058 -> 0.03; MI TeamDyeGain 21.5885 / TeamDyeCeiling 13.2859 (LDV-13)",
+    "merlin": "BC leather_worn (belt, boots, beard_wrap) x (0.85, 1.13, 1.35) (tone.ue_feedback_r3) + UE LUT строка 0 столбца 8; MI без изменений (p50/p95 акцента < 0.3 %)"
+   }
+  },
+  "r3.2": {
+   "plan": "docs/art-pipeline/evidence/lookdev-r3-2026-09-30/reimport-plan-r3.2.json",
+   "capture": "b3.2",
+   "changes": {
+    "harpy": "BC кожа x0.85 (lookdev.ue_feedback_r3 skin_r3) + LUT r3.2: gold_antique F0 x1.10 от r2 (вместо x1.15), feathers specular 0.35",
+    "arthur": "ассеты не менялись — съёмка регрессии"
+   }
+  }
+ },
+ "heroes": {
+  "arthur": {
+   "review_run": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2ld-ue/review",
+   "criterion_reading": ">=5/6 (регрессия)",
+   "best": "b3.2",
+   "captures": {
+    "b2": {
+     "reading": {
+      "k": 0.5736,
+      "within": 6,
+      "of": 6,
+      "zones": {
+       "belt": {
+        "Y": 1.005,
+        "dHue": 0.0,
+        "dSat": 0.054,
+        "ok": true
+       },
+       "cloth": {
+        "Y": 1.075,
+        "dHue": -0.2,
+        "dSat": 0.051,
+        "ok": true
+       },
+       "embroidery": {
+        "Y": 1.024,
+        "dHue": 3.8,
+        "dSat": 0.015,
+        "ok": true
+       },
+       "face_skin": {
+        "Y": 0.946,
+        "dHue": 2.6,
+        "dSat": 0.045,
+        "ok": true
+       },
+       "gold": {
+        "Y": 1.022,
+        "dHue": 3.1,
+        "dSat": 0.07,
+        "ok": true
+       },
+       "hair": {
+        "Y": 0.253,
+        "dHue": 41.5,
+        "dSat": -0.267,
+        "ok": false
+       },
+       "steel": {
+        "Y": 0.962,
+        "dHue": -16.5,
+        "dSat": 0.018,
+        "ok": true
+       }
+      }
+     },
+     "neutral": {
+      "k": 0.3153,
+      "within": 2,
+      "of": 6,
+      "zones": {
+       "belt": {
+        "Y": 1.17,
+        "dHue": 1.1,
+        "dSat": 0.012,
+        "ok": false
+       },
+       "cloth": {
+        "Y": 1.232,
+        "dHue": 0.5,
+        "dSat": -0.012,
+        "ok": false
+       },
+       "embroidery": {
+        "Y": 0.819,
+        "dHue": 7.2,
+        "dSat": -0.104,
+        "ok": false
+       },
+       "face_skin": {
+        "Y": 0.843,
+        "dHue": 5.3,
+        "dSat": -0.062,
+        "ok": false
+       },
+       "gold": {
+        "Y": 0.886,
+        "dHue": 6.7,
+        "dSat": -0.012,
+        "ok": true
+       },
+       "hair": {
+        "Y": 0.315,
+        "dHue": 41.5,
+        "dSat": -0.288,
+        "ok": false
+       },
+       "steel": {
+        "Y": 1.086,
+        "dHue": -12.0,
+        "dSat": 0.005,
+        "ok": true
+       }
+      }
+     },
+     "warmup_last3": [
+      0.5617,
+      0.5578,
+      0.5582
+     ],
+     "warmup_grabs": 39,
+     "restored_level": "/Game/S08/S08Arena",
+     "restored_level_dirty": false,
+     "frames": 25
+    },
+    "b3.2": {
+     "reading": {
+      "k": 0.5732,
+      "within": 6,
+      "of": 6,
+      "zones": {
+       "belt": {
+        "Y": 1.057,
+        "dHue": 1.4,
+        "dSat": 0.048,
+        "ok": true
+       },
+       "cloth": {
+        "Y": 1.074,
+        "dHue": -0.2,
+        "dSat": 0.051,
+        "ok": true
+       },
+       "embroidery": {
+        "Y": 1.024,
+        "dHue": 3.5,
+        "dSat": 0.01,
+        "ok": true
+       },
+       "face_skin": {
+        "Y": 0.946,
+        "dHue": 2.1,
+        "dSat": 0.04,
+        "ok": true
+       },
+       "gold": {
+        "Y": 1.021,
+        "dHue": 3.1,
+        "dSat": 0.07,
+        "ok": true
+       },
+       "hair": {
+        "Y": 0.252,
+        "dHue": 41.5,
+        "dSat": -0.267,
+        "ok": false
+       },
+       "steel": {
+        "Y": 0.964,
+        "dHue": -24.0,
+        "dSat": 0.003,
+        "ok": true
+       }
+      }
+     },
+     "neutral": {
+      "k": 0.3154,
+      "within": 2,
+      "of": 6,
+      "zones": {
+       "belt": {
+        "Y": 1.207,
+        "dHue": 0.0,
+        "dSat": 0.004,
+        "ok": false
+       },
+       "cloth": {
+        "Y": 1.232,
+        "dHue": 0.5,
+        "dSat": -0.012,
+        "ok": false
+       },
+       "embroidery": {
+        "Y": 0.819,
+        "dHue": 7.2,
+        "dSat": -0.104,
+        "ok": false
+       },
+       "face_skin": {
+        "Y": 0.843,
+        "dHue": 5.8,
+        "dSat": -0.058,
+        "ok": false
+       },
+       "gold": {
+        "Y": 0.886,
+        "dHue": 6.7,
+        "dSat": -0.012,
+        "ok": true
+       },
+       "hair": {
+        "Y": 0.315,
+        "dHue": 41.5,
+        "dSat": -0.288,
+        "ok": false
+       },
+       "steel": {
+        "Y": 1.087,
+        "dHue": -12.0,
+        "dSat": 0.005,
+        "ok": true
+       }
+      }
+     },
+     "warmup_last3": [
+      0.5638,
+      0.5559,
+      0.5519
+     ],
+     "warmup_grabs": 39,
+     "restored_level": "/Game/S08/S08Arena",
+     "restored_level_dirty": false,
+     "frames": 25
+    }
+   },
+   "criterion_met": true
+  },
+  "harpy": {
+   "review_run": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review",
+   "criterion_reading": ">=4/5 хотя бы по одному определению (отчёт по обоим)",
+   "best": "b3.2",
+   "best_note": "b3.2 — лучшая из снятых итераций по счёту зон, но не без регрессий против b2 (см. regressions_vs_b2); компромисс принят как остаток",
+   "captures": {
+    "b2": {
+     "reading": {
+      "k": 0.9704,
+      "within": 3,
+      "of": 5,
+      "zones": {
+       "claw": {
+        "Y": 0.951,
+        "dHue": 90.0,
+        "dSat": 0.0,
+        "ok": true
+       },
+       "dark": {
+        "Y": 0.935,
+        "dHue": 0.0,
+        "dSat": 0.124,
+        "ok": false
+       },
+       "gold": {
+        "Y": 0.835,
+        "dHue": -3.2,
+        "dSat": 0.02,
+        "ok": false
+       },
+       "orange": {
+        "Y": 0.973,
+        "dHue": 0.5,
+        "dSat": -0.022,
+        "ok": true
+       },
+       "skin": {
+        "Y": 1.1,
+        "dHue": 0.6,
+        "dSat": 0.001,
+        "ok": true
+       }
+      }
+     },
+     "neutral": {
+      "k": 0.5091,
+      "within": 4,
+      "of": 5,
+      "zones": {
+       "claw": {
+        "Y": 1.077,
+        "dHue": 120.0,
+        "dSat": -0.009,
+        "ok": true
+       },
+       "dark": {
+        "Y": 1.069,
+        "dHue": -0.4,
+        "dSat": 0.091,
+        "ok": true
+       },
+       "gold": {
+        "Y": 0.751,
+        "dHue": -0.3,
+        "dSat": -0.042,
+        "ok": false
+       },
+       "orange": {
+        "Y": 0.996,
+        "dHue": 2.1,
+        "dSat": -0.083,
+        "ok": true
+       },
+       "skin": {
+        "Y": 0.94,
+        "dHue": 2.5,
+        "dSat": -0.076,
+        "ok": true
+       }
+      }
+     },
+     "warmup_last3": [
+      0.5425,
+      0.5421,
+      0.5442
+     ],
+     "warmup_grabs": 39,
+     "restored_level": "/Game/S08/S08Arena",
+     "restored_level_dirty": false,
+     "frames": 25,
+     "definition_r2": {
+      "reading": {
+       "k": 0.8538,
+       "within": 2,
+       "of": 5,
+       "zones": {
+        "claw": {
+         "Y": 0.837,
+         "dHue": 90.0,
+         "dSat": 0.0,
+         "ok": false
+        },
+        "dark": {
+         "Y": 1.208,
+         "dHue": -7.3,
+         "dSat": -0.017,
+         "ok": false
+        },
+        "gold": {
+         "Y": 0.734,
+         "dHue": -3.2,
+         "dSat": 0.02,
+         "ok": false
+        },
+        "orange": {
+         "Y": 0.856,
+         "dHue": 0.5,
+         "dSat": -0.022,
+         "ok": true
+        },
+        "skin": {
+         "Y": 0.968,
+         "dHue": 0.6,
+         "dSat": 0.001,
+         "ok": true
+        }
+       }
+      },
+      "neutral": {
+       "k": 0.447,
+       "within": 2,
+       "of": 5,
+       "zones": {
+        "claw": {
+         "Y": 0.946,
+         "dHue": 120.0,
+         "dSat": -0.009,
+         "ok": true
+        },
+        "dark": {
+         "Y": 1.386,
+         "dHue": -4.1,
+         "dSat": -0.037,
+         "ok": false
+        },
+        "gold": {
+         "Y": 0.659,
+         "dHue": -0.3,
+         "dSat": -0.042,
+         "ok": false
+        },
+        "orange": {
+         "Y": 0.874,
+         "dHue": 2.1,
+         "dSat": -0.083,
+         "ok": true
+        },
+        "skin": {
+         "Y": 0.825,
+         "dHue": 2.5,
+         "dSat": -0.076,
+         "ok": false
+        }
+       }
+      }
+     }
+    },
+    "b3.1": {
+     "reading": {
+      "k": 1.0966,
+      "within": 3,
+      "of": 5,
+      "zones": {
+       "claw": {
+        "Y": 1.075,
+        "dHue": 90.0,
+        "dSat": 0.0,
+        "ok": true
+       },
+       "dark": {
+        "Y": 0.783,
+        "dHue": 0.0,
+        "dSat": 0.164,
+        "ok": false
+       },
+       "gold": {
+        "Y": 1.107,
+        "dHue": -2.7,
+        "dSat": 0.011,
+        "ok": true
+       },
+       "orange": {
+        "Y": 1.038,
+        "dHue": 1.2,
+        "dSat": 0.009,
+        "ok": true
+       },
+       "skin": {
+        "Y": 1.23,
+        "dHue": -0.6,
+        "dSat": 0.001,
+        "ok": false
+       }
+      }
+     },
+     "neutral": {
+      "k": 0.5627,
+      "within": 3,
+      "of": 5,
+      "zones": {
+       "claw": {
+        "Y": 1.169,
+        "dHue": 96.0,
+        "dSat": -0.004,
+        "ok": false
+       },
+       "dark": {
+        "Y": 0.919,
+        "dHue": 3.9,
+        "dSat": 0.146,
+        "ok": false
+       },
+       "gold": {
+        "Y": 0.931,
+        "dHue": 2.0,
+        "dSat": -0.057,
+        "ok": true
+       },
+       "orange": {
+        "Y": 1.046,
+        "dHue": 2.4,
+        "dSat": -0.046,
+        "ok": true
+       },
+       "skin": {
+        "Y": 1.039,
+        "dHue": 1.9,
+        "dSat": -0.081,
+        "ok": true
+       }
+      }
+     },
+     "warmup_last3": [
+      0.5408,
+      0.5394,
+      0.5429
+     ],
+     "warmup_grabs": 39,
+     "restored_level": "/Game/S08/S08Arena",
+     "restored_level_dirty": false,
+     "frames": 25,
+     "definition_r2": {
+      "reading": {
+       "k": 0.96,
+       "within": 5,
+       "of": 5,
+       "zones": {
+        "claw": {
+         "Y": 0.941,
+         "dHue": 90.0,
+         "dSat": 0.0,
+         "ok": true
+        },
+        "dark": {
+         "Y": 1.022,
+         "dHue": -2.4,
+         "dSat": 0.028,
+         "ok": true
+        },
+        "gold": {
+         "Y": 0.969,
+         "dHue": -2.7,
+         "dSat": 0.011,
+         "ok": true
+        },
+        "orange": {
+         "Y": 0.909,
+         "dHue": 1.2,
+         "dSat": 0.009,
+         "ok": true
+        },
+        "skin": {
+         "Y": 1.077,
+         "dHue": -0.6,
+         "dSat": 0.001,
+         "ok": true
+        }
+       }
+      },
+      "neutral": {
+       "k": 0.4946,
+       "within": 3,
+       "of": 5,
+       "zones": {
+        "claw": {
+         "Y": 1.028,
+         "dHue": 96.0,
+         "dSat": -0.004,
+         "ok": true
+        },
+        "dark": {
+         "Y": 1.19,
+         "dHue": -1.3,
+         "dSat": 0.007,
+         "ok": false
+        },
+        "gold": {
+         "Y": 0.818,
+         "dHue": 2.0,
+         "dSat": -0.057,
+         "ok": false
+        },
+        "orange": {
+         "Y": 0.92,
+         "dHue": 2.4,
+         "dSat": -0.046,
+         "ok": true
+        },
+        "skin": {
+         "Y": 0.914,
+         "dHue": 1.9,
+         "dSat": -0.081,
+         "ok": true
+        }
+       }
+      }
+     }
+    },
+    "b3.2": {
+     "reading": {
+      "k": 1.1627,
+      "within": 4,
+      "of": 5,
+      "zones": {
+       "claw": {
+        "Y": 1.139,
+        "dHue": 90.0,
+        "dSat": 0.0,
+        "ok": true
+       },
+       "dark": {
+        "Y": 0.83,
+        "dHue": 0.0,
+        "dSat": 0.164,
+        "ok": false
+       },
+       "gold": {
+        "Y": 1.112,
+        "dHue": -2.7,
+        "dSat": 0.015,
+        "ok": true
+       },
+       "orange": {
+        "Y": 1.1,
+        "dHue": 1.2,
+        "dSat": 0.009,
+        "ok": true
+       },
+       "skin": {
+        "Y": 1.094,
+        "dHue": 0.0,
+        "dSat": 0.019,
+        "ok": true
+       }
+      }
+     },
+     "neutral": {
+      "k": 0.5881,
+      "within": 3,
+      "of": 5,
+      "zones": {
+       "claw": {
+        "Y": 1.219,
+        "dHue": 90.0,
+        "dSat": -0.009,
+        "ok": false
+       },
+       "dark": {
+        "Y": 0.961,
+        "dHue": 3.9,
+        "dSat": 0.146,
+        "ok": false
+       },
+       "gold": {
+        "Y": 0.934,
+        "dHue": 0.8,
+        "dSat": -0.049,
+        "ok": true
+       },
+       "orange": {
+        "Y": 1.094,
+        "dHue": 2.4,
+        "dSat": -0.046,
+        "ok": true
+       },
+       "skin": {
+        "Y": 0.952,
+        "dHue": 0.6,
+        "dSat": -0.059,
+        "ok": true
+       }
+      }
+     },
+     "warmup_last3": [
+      0.5324,
+      0.5375,
+      0.5328
+     ],
+     "warmup_grabs": 39,
+     "restored_level": "/Game/S08/S08Arena",
+     "restored_level_dirty": false,
+     "frames": 25,
+     "definition_r2": {
+      "reading": {
+       "k": 1.0179,
+       "within": 5,
+       "of": 5,
+       "zones": {
+        "claw": {
+         "Y": 0.997,
+         "dHue": 90.0,
+         "dSat": 0.0,
+         "ok": true
+        },
+        "dark": {
+         "Y": 1.084,
+         "dHue": -2.4,
+         "dSat": 0.028,
+         "ok": true
+        },
+        "gold": {
+         "Y": 0.974,
+         "dHue": -2.7,
+         "dSat": 0.015,
+         "ok": true
+        },
+        "orange": {
+         "Y": 0.963,
+         "dHue": 1.2,
+         "dSat": 0.009,
+         "ok": true
+        },
+        "skin": {
+         "Y": 0.958,
+         "dHue": 0.0,
+         "dSat": 0.019,
+         "ok": true
+        }
+       }
+      },
+      "neutral": {
+       "k": 0.5169,
+       "within": 2,
+       "of": 5,
+       "zones": {
+        "claw": {
+         "Y": 1.071,
+         "dHue": 90.0,
+         "dSat": -0.009,
+         "ok": true
+        },
+        "dark": {
+         "Y": 1.243,
+         "dHue": -1.3,
+         "dSat": 0.007,
+         "ok": false
+        },
+        "gold": {
+         "Y": 0.821,
+         "dHue": 0.8,
+         "dSat": -0.049,
+         "ok": false
+        },
+        "orange": {
+         "Y": 0.961,
+         "dHue": 2.4,
+         "dSat": -0.046,
+         "ok": true
+        },
+        "skin": {
+         "Y": 0.837,
+         "dHue": 0.6,
+         "dSat": -0.059,
+         "ok": false
+        }
+       }
+      }
+     }
+    }
+   },
+   "criterion_met": true,
+   "no_regression_vs_b2": false,
+   "regressions_vs_b2": {
+    "definition_5cB1": [
+     {
+      "exposure": "reading (-0.75 EV)",
+      "zone": "dark",
+      "what": "«тёмные» = все перья с v <= 0.45, в основном затенённые рыжие перья тела; самая большая зона фигуры (399756 px в b2, 427807 px в b3.2)",
+      "b2": {
+       "Y": 0.935,
+       "dSat": 0.124,
+       "luma_ok": true,
+       "median_srgb": [
+        53,
+        43,
+        39
+       ],
+       "Y_linear": 0.0263
+      },
+      "b3.2": {
+       "Y": 0.83,
+       "dSat": 0.164,
+       "luma_ok": false,
+       "median_srgb": [
+        46,
+        36,
+        32
+       ],
+       "Y_linear": 0.0195
+      },
+      "concept_srgb": [
+       50,
+       45,
+       43
+      ],
+      "note": "яркость вышла из полосы 0.85–1.15, насыщенность ухудшилась; абсолютная Y зоны −26 % (темнее в пикселях, не только от сдвига k)"
+     },
+     {
+      "exposure": "neutral (EV100 1.3)",
+      "within_b2": 4,
+      "within_b3.2": 3,
+      "zones": {
+       "claw": {
+        "b2": 1.077,
+        "b3.2": 1.219,
+        "ok_b2": true,
+        "ok_b3.2": false,
+        "note": "пиксели те же (93 91 91 -> 92 90 91), рост от k 0.509 -> 0.588"
+       },
+       "dark": {
+        "b2_dSat": 0.091,
+        "b3.2_dSat": 0.146,
+        "ok_b2": true,
+        "ok_b3.2": false,
+        "median_srgb_b2": [
+         78,
+         65,
+         60
+        ],
+        "median_srgb_b3.2": [
+         70,
+         57,
+         50
+        ]
+       },
+       "gold": {
+        "b2": 0.751,
+        "b3.2": 0.934,
+        "ok_b2": false,
+        "ok_b3.2": true
+       }
+      }
+     },
+     {
+      "exposure": "P2",
+      "within_b2": 3,
+      "within_b3.2": 3,
+      "note": "«тёмные» P2: в b2 вне допуска по яркости (1.239), в b3.2 по насыщенности (+0.069 -> +0.123); счёт не изменился"
+     }
+    ],
+    "definition_r2": "регрессий нет: ни одна зона не вышла из допуска относительно b2 при -0.75 EV и EV100 1.3 (EV100 1.3 2/5 -> 2/5, маховые 1.39 -> 1.24, золото 0.66 -> 0.82; P1 0/5 -> 0/5, P2 0/5 -> 1/5)",
+    "cause": "общий specular 0.35 в столбце LUT класса feathers (r3.1): маховые и рыжие перья делят один класс MatID/строку LUT; между b2 и b3.1 у перьев менялся только specular, пиксели зоны «тёмные» в b3.1 и b3.2 совпадают",
+    "decision": "компромисс принят как остаток (цель раунда — маховые — закрыта по определению r2 5/5); новых итераций цвета при исправлении отчёта не было",
+    "next_step": "выделить маховые в свой класс MatID + строку LUT (specular 0.35), рыжим перьям вернуть 0.575; переимпорт, съёмка b3.3, замер по обоим определениям"
+   },
+   "criterion_met_note": "≥4/5 при -0.75 EV выполнено по счёту зон (r2 5/5, 5c-B1 4/5), но с регрессией зоны «тёмные» 5c-B1 и нейтрали 5c-B1 4/5 -> 3/5 против b2"
+  },
+  "merlin": {
+   "review_run": "art/pipeline-candidates/ASSET-MERLIN-001/20260930-h2ld-ldc-ue/review",
+   "criterion_reading": ">=3/5, leather_worn в допуске",
+   "best": "b3.1",
+   "captures": {
+    "b2": {
+     "reading": {
+      "k": 0.8341,
+      "within": 3,
+      "of": 5,
+      "zones": {
+       "leather_worn": {
+        "Y": 0.888,
+        "dHue": -2.6,
+        "dSat": 0.121,
+        "ok": false
+       },
+       "silk": {
+        "Y": 1.068,
+        "dHue": 1.8,
+        "dSat": 0.003,
+        "ok": true
+       },
+       "skin": {
+        "Y": 1.073,
+        "dHue": 1.6,
+        "dSat": -0.02,
+        "ok": true
+       },
+       "wood": {
+        "Y": 0.829,
+        "dHue": -1.0,
+        "dSat": 0.047,
+        "ok": false
+       },
+       "wool_coarse": {
+        "Y": 0.873,
+        "dHue": 5.6,
+        "dSat": 0.067,
+        "ok": true
+       }
+      }
+     },
+     "neutral": {
+      "k": 0.462,
+      "within": 3,
+      "of": 5,
+      "zones": {
+       "leather_worn": {
+        "Y": 1.068,
+        "dHue": -2.1,
+        "dSat": 0.074,
+        "ok": true
+       },
+       "silk": {
+        "Y": 0.99,
+        "dHue": 5.0,
+        "dSat": -0.092,
+        "ok": true
+       },
+       "skin": {
+        "Y": 0.924,
+        "dHue": 3.4,
+        "dSat": -0.121,
+        "ok": false
+       },
+       "wood": {
+        "Y": 0.984,
+        "dHue": 0.4,
+        "dSat": 0.012,
+        "ok": true
+       },
+       "wool_coarse": {
+        "Y": 1.093,
+        "dHue": 5.0,
+        "dSat": 0.017,
+        "ok": true
+       }
+      }
+     },
+     "warmup_last3": [
+      0.4863,
+      0.4806,
+      0.4838
+     ],
+     "warmup_grabs": 39,
+     "restored_level": "/Game/S08/S08Arena",
+     "restored_level_dirty": false,
+     "frames": 25
+    },
+    "b3.1": {
+     "reading": {
+      "k": 0.827,
+      "within": 4,
+      "of": 5,
+      "zones": {
+       "leather_worn": {
+        "Y": 0.889,
+        "dHue": 3.5,
+        "dSat": 0.033,
+        "ok": true
+       },
+       "silk": {
+        "Y": 1.086,
+        "dHue": 2.4,
+        "dSat": 0.0,
+        "ok": true
+       },
+       "skin": {
+        "Y": 1.064,
+        "dHue": 1.6,
+        "dSat": -0.02,
+        "ok": true
+       },
+       "wood": {
+        "Y": 0.822,
+        "dHue": -1.0,
+        "dSat": 0.047,
+        "ok": false
+       },
+       "wool_coarse": {
+        "Y": 0.865,
+        "dHue": 5.6,
+        "dSat": 0.067,
+        "ok": true
+       }
+      }
+     },
+     "neutral": {
+      "k": 0.4588,
+      "within": 3,
+      "of": 5,
+      "zones": {
+       "leather_worn": {
+        "Y": 1.054,
+        "dHue": 2.7,
+        "dSat": -0.011,
+        "ok": true
+       },
+       "silk": {
+        "Y": 0.995,
+        "dHue": 5.0,
+        "dSat": -0.094,
+        "ok": true
+       },
+       "skin": {
+        "Y": 0.925,
+        "dHue": 4.5,
+        "dSat": -0.121,
+        "ok": false
+       },
+       "wood": {
+        "Y": 0.978,
+        "dHue": 0.4,
+        "dSat": 0.012,
+        "ok": true
+       },
+       "wool_coarse": {
+        "Y": 1.086,
+        "dHue": 5.0,
+        "dSat": 0.017,
+        "ok": true
+       }
+      }
+     },
+     "warmup_last3": [
+      0.4715,
+      0.448,
+      0.4773
+     ],
+     "warmup_grabs": 39,
+     "restored_level": "/Game/S08/S08Arena",
+     "restored_level_dirty": false,
+     "frames": 25
+    }
+   },
+   "criterion_met": true
+  },
+  "medusa": {
+   "review_run": "art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/review",
+   "criterion_reading": "5/5",
+   "best": "b3.1",
+   "captures": {
+    "b2": {
+     "reading": {
+      "k": 1.1356,
+      "within": 4,
+      "of": 5,
+      "zones": {
+       "gold_antique": {
+        "Y": 1.105,
+        "dHue": -1.4,
+        "dSat": 0.052,
+        "ok": true
+       },
+       "leather_smooth": {
+        "Y": 1.226,
+        "dHue": 5.2,
+        "dSat": 0.049,
+        "ok": false
+       },
+       "leather_worn": {
+        "Y": 0.89,
+        "dHue": -3.4,
+        "dSat": 0.06,
+        "ok": true
+       },
+       "linen": {
+        "Y": 0.887,
+        "dHue": 2.4,
+        "dSat": -0.01,
+        "ok": true
+       },
+       "skin": {
+        "Y": 1.021,
+        "dHue": -2.0,
+        "dSat": 0.043,
+        "ok": true
+       },
+       "wood": {
+        "Y": 0.819,
+        "dHue": -5.1,
+        "dSat": 0.113,
+        "ok": false
+       }
+      }
+     },
+     "neutral": {
+      "k": 0.6018,
+      "within": 3,
+      "of": 5,
+      "zones": {
+       "gold_antique": {
+        "Y": 1.132,
+        "dHue": -0.2,
+        "dSat": 0.001,
+        "ok": true
+       },
+       "leather_smooth": {
+        "Y": 1.405,
+        "dHue": 6.8,
+        "dSat": 0.013,
+        "ok": false
+       },
+       "leather_worn": {
+        "Y": 1.019,
+        "dHue": -2.1,
+        "dSat": 0.026,
+        "ok": true
+       },
+       "linen": {
+        "Y": 1.08,
+        "dHue": 2.9,
+        "dSat": -0.019,
+        "ok": true
+       },
+       "skin": {
+        "Y": 0.818,
+        "dHue": -0.9,
+        "dSat": -0.039,
+        "ok": false
+       },
+       "wood": {
+        "Y": 0.936,
+        "dHue": -3.9,
+        "dSat": 0.07,
+        "ok": true
+       }
+      }
+     },
+     "warmup_last3": [
+      0.5102,
+      0.5107,
+      0.5163
+     ],
+     "warmup_grabs": 39,
+     "restored_level": "/Game/S08/S08Arena",
+     "restored_level_dirty": false,
+     "frames": 25
+    },
+    "b3.1": {
+     "reading": {
+      "k": 1.1356,
+      "within": 5,
+      "of": 5,
+      "zones": {
+       "gold_antique": {
+        "Y": 1.105,
+        "dHue": -1.4,
+        "dSat": 0.052,
+        "ok": true
+       },
+       "leather_smooth": {
+        "Y": 0.874,
+        "dHue": 4.7,
+        "dSat": 0.044,
+        "ok": true
+       },
+       "leather_worn": {
+        "Y": 0.89,
+        "dHue": -3.4,
+        "dSat": 0.06,
+        "ok": true
+       },
+       "linen": {
+        "Y": 0.887,
+        "dHue": 2.4,
+        "dSat": -0.01,
+        "ok": true
+       },
+       "skin": {
+        "Y": 1.021,
+        "dHue": -2.0,
+        "dSat": 0.043,
+        "ok": true
+       },
+       "wood": {
+        "Y": 0.819,
+        "dHue": -5.1,
+        "dSat": 0.113,
+        "ok": false
+       }
+      }
+     },
+     "neutral": {
+      "k": 0.6018,
+      "within": 4,
+      "of": 5,
+      "zones": {
+       "gold_antique": {
+        "Y": 1.132,
+        "dHue": -0.2,
+        "dSat": 0.001,
+        "ok": true
+       },
+       "leather_smooth": {
+        "Y": 0.997,
+        "dHue": 4.9,
+        "dSat": -0.003,
+        "ok": true
+       },
+       "leather_worn": {
+        "Y": 1.019,
+        "dHue": -2.1,
+        "dSat": 0.026,
+        "ok": true
+       },
+       "linen": {
+        "Y": 1.08,
+        "dHue": 2.9,
+        "dSat": -0.019,
+        "ok": true
+       },
+       "skin": {
+        "Y": 0.818,
+        "dHue": -0.9,
+        "dSat": -0.039,
+        "ok": false
+       },
+       "wood": {
+        "Y": 0.936,
+        "dHue": -3.9,
+        "dSat": 0.07,
+        "ok": true
+       }
+      }
+     },
+     "warmup_last3": [
+      0.5151,
+      0.5103,
+      0.5236
+     ],
+     "warmup_grabs": 39,
+     "restored_level": "/Game/S08/S08Arena",
+     "restored_level_dirty": false,
+     "frames": 25
+    }
+   },
+   "criterion_met": true
+  }
+ }
+}

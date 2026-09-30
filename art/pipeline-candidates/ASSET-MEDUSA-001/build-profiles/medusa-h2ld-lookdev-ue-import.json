@@ -39,8 +39,8 @@
     },
     "library_inputs": {
       "LUT": {
-        "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/lut/T_UM_MatLUT_Medusa_UE_c3.dds",
-        "sha256": "e650565d9ba3de6943d6d99a472e29d388ae55f234cb3ca93b3325f1f51fc522",
+        "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/lut/T_UM_MatLUT_Medusa_UE_r3.dds",
+        "sha256": "ec57314fec5efa5faaed182a93816966deaa76083d0c7c41048b9ed2b17822af",
         "note": "hero MatLUT 16 x 16 RGBA16F (build_ue_inputs.py layout, rows 0-9) after the UE look-dev iterations (tools/art/material_library/ue_hero_lookdev.py lut); iteration 0 = the Blender LUT of the look-dev run byte for byte"
       },
       "TeamAccent": {
@@ -168,11 +168,12 @@
     "team_color_mode_note": "rev 2: M_UM_Figure_v2.1 dyes by TeamAccentTexture (static switch UseTeamAccent = true); the v2.0 TeamMask path is off, TeamMaskTexture = T_UM_Mask_Black (mode none) so no MI can fall back to dyeing the whole dress; the deprecated W4-B TeamMask stays a pinned candidate file only (adopt), it is not imported",
     "figure_parameters": {
       "TeamDye": 1.0,
-      "TeamDyeGain": 21.4821,
-      "TeamDyeCeiling": 11.0741
+      "TeamDyeGain": 21.5885,
+      "TeamDyeCeiling": 13.2859
     },
     "figure_parameters_note": "rev 2, team-accent.md rule (LDV-13) as one MI for both teams: TeamDyeGain = 0.8 / Y_p50 (0.03489), TeamDyeCeiling = 0.9 / Y_p95 (0.05792) of the accent texels (ld-team-accent-report.json); effective gain min(22.93, 15.54 / maxc(team)) = P1 19.26, P2 22.93 (v2.1 accent report hero-medusa)",
     "reimport_r2": {"note": "Пины переимпорта look-dev раунда 2 (2026-09-30, ue_h5cb1.py reimport-r2 в живом редакторе :8123 поверх ассетов прогона, AssetImportTask replace existing, источники сверены с reimport-plan.json; остальные ассеты прогона не менялись). Прежние значения: {\"TeamDyeGain\": 22.9292, \"TeamDyeCeiling\": 15.5387}", "plan": "docs/art-pipeline/evidence/lookdev-r2-2026-09-30/reimport-plan.json", "report": "art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-r2-ue/reimport-r2.json", "sources": {"T_Medusa_H2LD_BC": {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_BC.png", "sha256": "31f62322def1a2ac70146f11aa301625e4d355ee90fe266de6315bbde1e304c9"}}, "uasset_sha256": {"BC": "eb5bd620190e630c1112fc8999ca7ccf7fecec9484f57ad654ace1f6ad775bf6", "MI": "56eed6fe9642e9368c3990eb2c44261d6d603524d0374cafe4ee9e20a8066f1a"}, "measured": "art/pipeline-candidates/…/review/b2 (docs/art-pipeline/evidence/lookdev-r2-2026-09-30/ue-b2-summary.json)"},
+    "reimport_r3": {"note": "Пины переимпорта look-dev раунда 3, итерация r3.1 (2026-09-30, ue_h5cb1.py reimport-r3 в живом редакторе :8123 поверх ассетов прогона, AssetImportTask replace existing, источники сверены с планом итерации; остальные ассеты прогона не менялись). Прежние значения MI: {\"TeamDyeGain\": 21.4821, \"TeamDyeCeiling\": 11.0741}", "plan": "docs/art-pipeline/evidence/lookdev-r3-2026-09-30/reimport-plan-r3.1.json", "report": "art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-r3-ue/reimport-r3.1.json", "sources": {"T_Medusa_H2LD_BC": {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_BC.png", "sha256": "b6fa3077e7c953dcc1a42e3624cc8493647880f05c9f51ee2a3de8d28acbeda2"}, "T_UM_MatLUT_Medusa": {"path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/lut/T_UM_MatLUT_Medusa_UE_r3.dds", "sha256": "ec57314fec5efa5faaed182a93816966deaa76083d0c7c41048b9ed2b17822af"}}, "uasset_sha256": {"MI_Medusa_H2LD": "33cb9495dd8ebc897345b55280c1b862e3723fccc724a0ef70b8a88c31acbf70", "T_Medusa_H2LD_BC": "a260c1d7ad50f76127c7341c54e241f61b373d00c472b6e972c56264c37f9b35", "T_UM_MatLUT_Medusa": "7ad568c6c01effd48a19f0995d29767ca393c104111018149fade1240179345f"}},
     "figure_textures": {
       "MatIDTexture": "MatID",
       "MatLUT": "LUT",

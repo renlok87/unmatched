@@ -1,0 +1,49 @@
+{
+ "schema": "unmatched.lookdev-r3-reimport-plan/1",
+ "date": "2026-09-30",
+ "iteration": "r3.2",
+ "status": "план итерации r3.2 (только Harpy; Medusa b3.1 5/5 — оставлена; решает съёмка UE b3.2)",
+ "how": "python tools/art/material_library/ue_h5cb1.py reimport-r3 --iter r3.2 --hero harpy; затем review --tag b3.2",
+ "heroes": {
+  "harpy": {
+   "textures": [
+    {
+     "asset": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_BC",
+     "file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_BC.png",
+     "sha256": "824b11f1ab10d88b7a00e4f882897533810ec66725add8de22604e2f1851c50a",
+     "was_sha256": "dae99d8ff44524db409eb8963cde59fd914077a330fd1c5c4024cf0b28c2dde2",
+     "settings": {
+      "srgb": true,
+      "compression_settings": "TC_DEFAULT",
+      "mip_gen_settings": "FromTextureGroup",
+      "px": [
+       2048,
+       2048
+      ]
+     },
+     "note": "профиль lookdev.ue_feedback_r3 skin_r3: кожа x0.85 (равномерно)"
+    },
+    {
+     "asset": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_UM_MatLUT_Harpy",
+     "file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/lut/T_UM_MatLUT_Harpy_UE_r3.2.dds",
+     "sha256": "4386eb6198119bf1e1bfa0c65f11f86e51cf54164bc51f3311cda260df246b0b",
+     "was_sha256": "526897de060cf2c33cc56f483f13ec1f5b2aa0117e4d6ba306b780b464f06fb5",
+     "settings": {
+      "srgb": false,
+      "compression_settings": "TC_HDR",
+      "filter": "TF_NEAREST",
+      "mip_gen_settings": "TMGS_NO_MIPMAPS",
+      "never_stream": true,
+      "px": [
+       16,
+       16
+      ]
+     },
+     "note": "от r3.1: gold_antique F0 x1.10 от r2 (вместо x1.15); feathers specular 0.35 как в r3.1"
+    }
+   ],
+   "mi": {},
+   "unchanged": "MatID, N, ORM, Edge, TeamAccent, FBX, MI"
+  }
+ }
+}

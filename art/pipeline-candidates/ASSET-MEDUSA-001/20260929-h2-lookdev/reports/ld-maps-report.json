@@ -5,14 +5,14 @@
       "measured": {
         "leather_smooth": {
           "Y_p5_p95": [
-            0.0496,
-            0.36
+            0.0377,
+            0.2732
           ],
           "range": [
             0.02,
             0.45
           ],
-          "share_outside": 0.0293
+          "share_outside": 0.0115
         },
         "leather_worn": {
           "Y_p5_p95": [
@@ -74,7 +74,7 @@
     },
     "lut_dds_read_back": {
       "measured": {
-        "dds_sha256": "856818db34051267ca359d4cb4bf6e53e78b38f67fb71939e8fbc53457f11743"
+        "dds_sha256": "009efc4675196cb8c874aa05cde5601bb5435d0d105efde6d264154d2bd1859b"
       },
       "passed": true
     },
@@ -144,14 +144,14 @@
     },
     "leather_smooth": {
       "Y_p5_p50_p95": [
-        0.0496,
-        0.0676,
-        0.36
+        0.0377,
+        0.0514,
+        0.2732
       ],
       "bc_linear_median": [
-        0.1119,
-        0.0595,
-        0.0356
+        0.0844,
+        0.0452,
+        0.0273
       ],
       "bc_linear_median_before_grade": [
         0.0844,
@@ -162,7 +162,7 @@
       "share_of_islands": 0.0655,
       "team_r_mean": 0.0,
       "texels_4k": 480301,
-      "ymedClassHero": 0.06762
+      "ymedClassHero": 0.05138
     },
     "leather_worn": {
       "Y_p5_p50_p95": [
@@ -397,6 +397,31 @@
           1.261
         ],
         "texels_4k": 1555713
+      }
+    },
+    "final_gains_r3": {
+      "leather_smooth": {
+        "bc_gain": [
+          0.76,
+          0.76,
+          0.76
+        ],
+        "why": "b2: Y/k 1,23 при −0,75 EV (1,41 при EV100 1,3); цель ≈ 1,0: × 0,76 по Y, тон и насыщенность в допуске и не меняются"
+      },
+      "note": "look-dev round 3 (2026-09-30, после съёмки UE b2): линейные множители BC класса ПОСЛЕ final_gains_r2 (lookdev.py run_maps). b2 −0,75 EV: leather_smooth (колчан, перевязь) Y/k 1,23 · +5,2° · +0,049 — светлее концепта; равномерный множитель (цветность не меняется) вместе с полом UE LUT r3 (0,058 → 0,03, иначе пол вернул бы тексели). Решает съёмка UE b3.x, не прогноз"
+    },
+    "final_gains_r3_applied": {
+      "leather_smooth": {
+        "Y_median_before_after": [
+          0.06546,
+          0.04975
+        ],
+        "bc_gain": [
+          0.76,
+          0.76,
+          0.76
+        ],
+        "texels_4k": 1086702
       }
     },
     "gains": {
@@ -635,15 +660,15 @@
         "class": "leather_smooth",
         "field": "bc",
         "value": [
-          0.1119,
-          0.0595,
-          0.0356
+          0.0844,
+          0.0452,
+          0.0273
         ]
       },
       {
         "class": "leather_smooth",
         "field": "ymedClassHero",
-        "value": 0.06762
+        "value": 0.05138
       },
       {
         "class": "leather_worn",
@@ -718,10 +743,10 @@
     ],
     "builder": "tools/art/material_library/build_ue_inputs.py 2.0.0 (imported, main() not run)",
     "dds": "T_UM_MatLUT_Medusa.dds",
-    "dds_sha256": "856818db34051267ca359d4cb4bf6e53e78b38f67fb71939e8fbc53457f11743",
+    "dds_sha256": "009efc4675196cb8c874aa05cde5601bb5435d0d105efde6d264154d2bd1859b",
     "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index",
     "overrides_json": "T_UM_MatLUT_Medusa.overrides.json",
-    "overrides_sha256": "e31288a16ece8f7edc9106fc6b5a671a6f57c2a73c3dd3a5392d666eec06a699",
+    "overrides_sha256": "e84eb36ae180e94814a57a3bea2a0b8fb9e669c5719ed30d03c6c9b305602d12",
     "read_back_equals_half": true
   },
   "matid": {
@@ -733,13 +758,13 @@
   },
   "outputs": {
     "T_Medusa_H2LD_2K_BC.png": {
-      "bytes": 4827465,
+      "bytes": 4804503,
       "mode": "RGB",
       "px": [
         2048,
         2048
       ],
-      "sha256": "31f62322def1a2ac70146f11aa301625e4d355ee90fe266de6315bbde1e304c9"
+      "sha256": "b6fa3077e7c953dcc1a42e3624cc8493647880f05c9f51ee2a3de8d28acbeda2"
     },
     "T_Medusa_H2LD_2K_Edge.png": {
       "bytes": 971674,
@@ -788,13 +813,13 @@
       "sha256": "669251f37bba784502d3cbec8b85cd3c364ee44adf136de2afd0ba8d30b95b48"
     },
     "T_Medusa_H2LD_BC.png": {
-      "bytes": 15188837,
+      "bytes": 15115946,
       "mode": "RGB",
       "px": [
         4096,
         4096
       ],
-      "sha256": "9f2e489658edbd2e81a7bcea9de09e61ce656a4f879cbe6cc51fbca08d2d04a7"
+      "sha256": "af39ab66f63ac8d34f22bc01b5045ec3667eb594e9a3900eb1c976cbd232893f"
     },
     "T_Medusa_H2LD_Edge.png": {
       "bytes": 2641903,
@@ -844,11 +869,11 @@
     },
     "T_UM_MatLUT_Medusa.dds": {
       "bytes": 2196,
-      "sha256": "856818db34051267ca359d4cb4bf6e53e78b38f67fb71939e8fbc53457f11743"
+      "sha256": "009efc4675196cb8c874aa05cde5601bb5435d0d105efde6d264154d2bd1859b"
     },
     "T_UM_MatLUT_Medusa.overrides.json": {
       "bytes": 1259,
-      "sha256": "e31288a16ece8f7edc9106fc6b5a671a6f57c2a73c3dd3a5392d666eec06a699"
+      "sha256": "e84eb36ae180e94814a57a3bea2a0b8fb9e669c5719ed30d03c6c9b305602d12"
     }
   },
   "passed": true,

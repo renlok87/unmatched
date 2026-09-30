@@ -1,0 +1,126 @@
+{
+ "schema": "unmatched.lookdev-r3-reimport-plan/1",
+ "date": "2026-09-30",
+ "iteration": "r3.1",
+ "status": "план итерации r3.1 (источники построены скриптами репо; решает съёмка UE b3.1)",
+ "how": "python tools/art/material_library/ue_h5cb1.py reimport-r3 --iter r3.1 --hero <hero>; затем review --tag b3.1",
+ "heroes": {
+  "harpy": {
+   "textures": [
+    {
+     "asset": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_UM_MatLUT_Harpy",
+     "file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/lut/T_UM_MatLUT_Harpy_UE_r3.dds",
+     "sha256": "526897de060cf2c33cc56f483f13ec1f5b2aa0117e4d6ba306b780b464f06fb5",
+     "was_sha256": "60d5b91298c0bcaef494d320674c9e1827dafb4946da3a5ce3ea03c71c5286b5",
+     "settings": {
+      "srgb": false,
+      "compression_settings": "TC_HDR",
+      "filter": "TF_NEAREST",
+      "mip_gen_settings": "TMGS_NO_MIPMAPS",
+      "never_stream": true,
+      "px": [
+       16,
+       16
+      ]
+     },
+     "note": "от r2: строка 2 столбец 12 (feathers) specular 0.575 -> 0.35; строка 0 столбец 4 (gold_antique, металл) F0 x1.15"
+    }
+   ],
+   "mi": {},
+   "unchanged": "BC, MatID, N, ORM, Edge, TeamAccent, FBX, MI"
+  },
+  "medusa": {
+   "textures": [
+    {
+     "asset": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_BC",
+     "file": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_BC.png",
+     "sha256": "b6fa3077e7c953dcc1a42e3624cc8493647880f05c9f51ee2a3de8d28acbeda2",
+     "was_sha256": "31f62322def1a2ac70146f11aa301625e4d355ee90fe266de6315bbde1e304c9",
+     "settings": {
+      "srgb": true,
+      "compression_settings": "TC_DEFAULT",
+      "mip_gen_settings": "FromTextureGroup",
+      "px": [
+       2048,
+       2048
+      ]
+     },
+     "note": "профиль grade.final_gains_r3: leather_smooth x0.76 (Y p50 4K 0.0655 -> 0.0498)"
+    },
+    {
+     "asset": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_UM_MatLUT_Medusa",
+     "file": "art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/lut/T_UM_MatLUT_Medusa_UE_r3.dds",
+     "sha256": "ec57314fec5efa5faaed182a93816966deaa76083d0c7c41048b9ed2b17822af",
+     "was_sha256": "e650565d9ba3de6943d6d99a472e29d388ae55f234cb3ca93b3325f1f51fc522",
+     "settings": {
+      "srgb": false,
+      "compression_settings": "TC_HDR",
+      "filter": "TF_NEAREST",
+      "mip_gen_settings": "TMGS_NO_MIPMAPS",
+      "never_stream": true,
+      "px": [
+       16,
+       16
+      ]
+     },
+     "note": "от c3: строка 7 столбец 7 (leather_smooth) luminanceMin 0.058 -> 0.03"
+    }
+   ],
+   "mi": {
+    "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD": {
+     "scalars": {
+      "TeamDyeGain": 21.5885,
+      "TeamDyeCeiling": 13.2859
+     },
+     "was": {
+      "TeamDyeGain": 21.4821,
+      "TeamDyeCeiling": 11.0741
+     },
+     "rule": "LDV-13, пересчёт отношением p50/p95 акцента 2K (TeamAccent > 0.5; 0.03730/0.08488 -> 0.03712/0.07075: перевязь leather_smooth под акцентом темнее)"
+    }
+   },
+   "unchanged": "MatID, N, ORM, Edge, TeamAccent, FBX"
+  },
+  "merlin": {
+   "textures": [
+    {
+     "asset": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_BC",
+     "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_BC_2K.png",
+     "sha256": "cab139f5ec9cd4df79b236dba705008bf370edd32c815a05b3b3c42ee7b6f703",
+     "was_sha256": "5fa2eb5d8f21d957f0584602a6ce6a2859aaed3fe0b131ecb6e4cbb5781d2073",
+     "settings": {
+      "srgb": true,
+      "compression_settings": "TC_DEFAULT",
+      "mip_gen_settings": "FromTextureGroup",
+      "px": [
+       2048,
+       2048
+      ]
+     },
+     "note": "профиль lookdev.tone.ue_feedback_r3: зоны belt/boots/beard_wrap (leather_worn) x (0.85, 1.13, 1.35)"
+    },
+    {
+     "asset": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_UM_MatLUT_Merlin",
+     "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_UM_MatLUT_Merlin.dds",
+     "sha256": "5d597063e66adc338628df7abcd379ad23f71517b01f6149754ff3c5acdba205",
+     "was_sha256": "6227033e1d2f0dba24720fd3273597081d4fcaed5db3d4a2cfb7808573cdddf6",
+     "settings": {
+      "srgb": false,
+      "compression_settings": "TC_HDR",
+      "filter": "TF_NEAREST",
+      "mip_gen_settings": "TMGS_NO_MIPMAPS",
+      "never_stream": true,
+      "px": [
+       16,
+       16
+      ]
+     },
+     "note": "lookdev_ue_inputs.py: только строка 0 столбца 8 (типичное BC leather_worn, работает лишь при BakeFromLUT)"
+    }
+   ],
+   "mi": {},
+   "mi_note": "LDV-13: p50/p95 акцента 2K 0.02984/0.16273 -> 0.02984/0.16319 (< 0.3 %%), MI не меняется",
+   "unchanged": "MI, MatID, N, ORM, TeamAccent, EdgeMask, ZoneID, ZoneLUT, FBX"
+  }
+ }
+}

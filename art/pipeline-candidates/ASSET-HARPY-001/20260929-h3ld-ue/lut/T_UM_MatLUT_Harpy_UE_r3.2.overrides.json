@@ -1,0 +1,122 @@
+{
+ "asset_id": "ASSET-HARPY-001",
+ "classes": {
+  "brass": {
+   "bakeLuminanceModulation": 0.0,
+   "bc": [
+    0.0262,
+    0.02,
+    0.0235
+   ],
+   "bcMode": 0.0,
+   "cavityDarken": 0.0,
+   "cavityTintB": 0.0,
+   "cavityTintG": 0.0,
+   "cavityTintR": 0.0,
+   "cavityTintStrength": 0.0,
+   "clothAmount": 0.0,
+   "luminanceMax": 0.55,
+   "luminanceMin": 0.02,
+   "maxChannel": 0.9,
+   "metallic": 0.0,
+   "normalStrength": 0.3,
+   "roughHi": 0.5,
+   "roughLo": 0.22,
+   "roughTypical": 0.28,
+   "roughVariation": 0.06,
+   "shadingModel": 0.0,
+   "sheenIntensity": 0.0,
+   "sheenRoughness": 0.0,
+   "sheenTint": 0.0,
+   "slice": 14.0,
+   "specular": 0.35,
+   "teamDyeAllowed": 0.0,
+   "tilesPerMeter": 12.0,
+   "wearStrength": 0.25,
+   "wornBCB": 0.0,
+   "wornBCG": 0.0,
+   "wornBCMode": 0.0,
+   "wornBCR": 0.0,
+   "wornBCScale": 1.4,
+   "wornRoughness": -1.0,
+   "wornRoughnessDelta": -0.08,
+   "ymedClassHero": 0.02012
+  },
+  "feathers": {
+   "bc": [
+    0.0816,
+    0.0418,
+    0.026
+   ],
+   "luminanceMin": 0.008,
+   "specular": 0.35,
+   "ymedClassHero": 0.04946
+  },
+  "gold_antique": {
+   "bc": [
+    0.726,
+    0.297,
+    0.066
+   ],
+   "roughHi": 0.42,
+   "roughLo": 0.2,
+   "roughTypical": 0.3,
+   "ymedClassHero": 0.63156
+  },
+  "leather_smooth": {
+   "bc": [
+    0.0385,
+    0.017,
+    0.0025
+   ],
+   "ymedClassHero": 0.02
+  },
+  "skin": {
+   "bc": [
+    0.3645,
+    0.2319,
+    0.143
+   ],
+   "luminanceMin": 0.08,
+   "specular": 0.5,
+   "ymedClassHero": 0.25347
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake_harpy/lookdev_maps.py (ld_maps)",
+ "hero": "Harpy",
+ "heroSlots": {
+  "brass": "horn_claw"
+ },
+ "heroSlotsNote": "column of the library class brass (5) carries the extension class horn_claw (all fields, detail slice 14 = stone_base); MatID of the talons = 88 (README §3a)",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero Harpy --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "ue_lookdev_c": {
+  "iteration": "i3",
+  "why": {
+   "kept_from_i2": "gold F0 (0.66, 0.27, 0.06) at the preset roughness 0.30 [0.20, 0.42] (-1 EV in tolerance); horn_claw specular 0.35 / roughness 0.28 (both exposures in tolerance)",
+   "skin": "i2: face 0.76 (Cobble) / 0.83 (-1 EV), the only zone outside at both exposures apart from the feather saturation: specular 0.35 -> 0.5 (more of the dome on the cheeks), floor of the bake-clamped luminance 0.03 -> 0.08 (lifts the painted shadow side of the face; brows / lips are filled with skin in ld_maps, eyes stay above 0.08)"
+  }
+ },
+ "ue_lookdev_r2": {
+  "base": "T_UM_MatLUT_Harpy_UE_i3.overrides.json (i3, look-dev C)",
+  "iteration": "r2",
+  "unchanged": "all other fields of i3 (skin specular 0.5 / luminanceMin 0.08, gold F0, horn_claw)",
+  "why": {
+   "feathers": "look-dev round 2 (2026-09-30): luminanceMin 0.02 -> 0.008. The dark primaries of the round-2 BC (profile harpy-h3-lookdev.json ue_feedback_r2 dark_primaries_r2: effective albedo x (0.70, 0.67, 0.68), Y p50 0.0200 -> 0.0145) lie below the preset floor; with 0.02 the v2 core would lift them back (5c-B1: 89 % of the primary texels on the floor, the BC edit of 5c-B0 could not darken them). Every other feather texel is >= 0.02 in the texture (clamped by ld_maps), so nothing else moves."
+  }
+ },
+ "ue_lookdev_r3": {
+  "base": "T_UM_MatLUT_Harpy_UE_r3.overrides.json r3.1 (from r2)",
+  "iteration": "r3.2",
+  "unchanged": "all other fields of r2",
+  "why": {
+   "feathers": "look-dev round 3 (2026-09-30): specular 0.575 -> 0.35 (F0 0.046 -> 0.028). b2: the dark primaries at albedo x0.67-0.70 got only x0.906 in the frame -> ~70 % of their light is not diffuse (dome specular; no sheen in the class). Shared with the orange feathers (same class, ~20 % specular share there): lowers the primaries relative to the orange feathers",
+   "gold_antique": "look-dev round 3: r3.1 F0 x1.15 of r2 gave gold 1.11 (5c-B1 zones) / 0.97 (r2 zones) at b3.1; r3.2 lowers the skin (BC x0.85, key zone) which raises every non-key zone by ~0.85^(-1/3): F0 x1.10 of r2 (0.66, 0.27, 0.06) -> (0.726, 0.297, 0.066)",
+   "note": "measured by UE capture b3.x, not by forecast"
+  }
+ },
+ "why": {
+  "bc": "медиана класса в BC героя (DebugBakeFromLUT); у gold_antique — F0 героя, тон концепта",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ }
+}

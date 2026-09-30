@@ -52,15 +52,15 @@
   },
   "beard_wrap": {
    "after": {
-    "hue_deg": 23.9,
+    "hue_deg": 27.2,
     "linear": [
-     0.21762,
-     0.0727,
-     0.02286
+     0.1852,
+     0.08208,
+     0.03086
     ],
-    "luma_Y": 0.09991,
-    "sat": 0.6754,
-    "value": 0.5038
+    "luma_Y": 0.10031,
+    "sat": 0.5879,
+    "value": 0.4675
    },
    "before": {
     "hue_deg": 21.5,
@@ -77,15 +77,15 @@
   },
   "belt": {
    "after": {
-    "hue_deg": 24.8,
+    "hue_deg": 28.6,
     "linear": [
-     0.25897,
-     0.08974,
-     0.02727
+     0.22027,
+     0.1014,
+     0.03651
     ],
-    "luma_Y": 0.1212,
-    "sat": 0.6699,
-    "value": 0.5459
+    "luma_Y": 0.12199,
+    "sat": 0.5843,
+    "value": 0.5067
    },
    "before": {
     "hue_deg": 22.6,
@@ -102,15 +102,15 @@
   },
   "boots": {
    "after": {
-    "hue_deg": 25.5,
+    "hue_deg": 29.7,
     "linear": [
-     0.13588,
-     0.05608,
-     0.02142
+     0.1155,
+     0.06337,
+     0.02891
     ],
-    "luma_Y": 0.07054,
-    "sat": 0.61,
-    "value": 0.4043
+    "luma_Y": 0.07196,
+    "sat": 0.5029,
+    "value": 0.3742
    },
    "before": {
     "hue_deg": 25.0,
@@ -127,15 +127,15 @@
   },
   "buckle": {
    "after": {
-    "hue_deg": 22.9,
+    "hue_deg": 23.2,
     "linear": [
-     0.2868,
-     0.15903,
-     0.10122
+     0.28464,
+     0.15977,
+     0.1016
     ],
-    "luma_Y": 0.18202,
-    "sat": 0.3859,
-    "value": 0.572
+    "luma_Y": 0.18212,
+    "sat": 0.3827,
+    "value": 0.57
    },
    "before": {
     "hue_deg": 23.0,
@@ -403,19 +403,19 @@
    1.32
   ],
   "beard_wrap": [
-   2.23,
-   1.436,
-   0.718
+   1.895,
+   1.622,
+   0.97
   ],
   "belt": [
-   2.84,
-   1.941,
-   0.992
+   2.414,
+   2.193,
+   1.34
   ],
   "boots": [
-   2.018,
-   1.436,
-   0.888
+   1.716,
+   1.622,
+   1.198
   ],
   "buckle": [
    1.0,
@@ -455,7 +455,7 @@
  },
  "lut": {
   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_MatLUT.exr",
-  "sha256": "8de8d37d2ee96eadda715ddb9fadd0bf5c0a198996a73a24645bf0a4d1328dd9"
+  "sha256": "1a8d713bd8072a59f5d15de5571ba6b78e1b9f144a09675e8dcf9a84addd3c51"
  },
  "method": "gain_zone = chroma x luma: chroma = (concept / render zone median per linear channel) normalised to keep the zone's luminance, luma = zone luminance ratio / k (k = median over zones: the concept's exposure is unknown), clamped; render = the H2.1 model in the same Blender studio light and the concept framing (ortho front/right/back), zone pixels from an ID pass of the same camera; per zone the median over the views that see it",
  "passed": true,
@@ -464,24 +464,24 @@
  "stage": "ld_tone",
  "textures": {
   "BC_2K": {
-   "bytes": 4911961,
+   "bytes": 4911414,
    "mode": "RGB",
    "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_BC_2K.png",
    "px": [
     2048,
     2048
    ],
-   "sha256": "5fa2eb5d8f21d957f0584602a6ce6a2859aaed3fe0b131ecb6e4cbb5781d2073"
+   "sha256": "cab139f5ec9cd4df79b236dba705008bf370edd32c815a05b3b3c42ee7b6f703"
   },
   "BC_4K": {
-   "bytes": 14609257,
+   "bytes": 14607484,
    "mode": "RGB",
    "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_BC_4K.png",
    "px": [
     4096,
     4096
    ],
-   "sha256": "6cb635a1605764848c5da8f16763fc9db3537097f3ae29a8ae7f905f74121a72"
+   "sha256": "8b7e685d0ae0f25bda65b8021e5ebd65558a981c11cdbbb11e0029966b61ea37"
   }
  },
  "zones": {
@@ -685,9 +685,9 @@
     0.6957
    ],
    "gain": [
-    2.2298,
-    1.4356,
-    0.7182
+    1.8953,
+    1.6222,
+    0.9696
    ],
    "gain_before_ue_feedback": [
     0.95,
@@ -698,6 +698,11 @@
     1.1581,
     0.734,
     0.4417
+   ],
+   "gain_before_ue_feedback_r3": [
+    2.2298,
+    1.4356,
+    0.7182
    ],
    "luma_gain": 0.7866,
    "luma_gain_unclamped": 0.7866,
@@ -719,6 +724,11 @@
     1.9254,
     1.9558,
     1.6259
+   ],
+   "ue_feedback_r3_gain": [
+    0.85,
+    1.13,
+    1.35
    ],
    "views": {
     "back": {
@@ -778,9 +788,9 @@
     0.74
    ],
    "gain": [
-    2.84,
-    1.9409,
-    0.9923
+    2.414,
+    2.1932,
+    1.3396
    ],
    "gain_before_ue_feedback": [
     1.21,
@@ -791,6 +801,11 @@
     1.475,
     0.9924,
     0.6103
+   ],
+   "gain_before_ue_feedback_r3": [
+    2.84,
+    1.9409,
+    0.9923
    ],
    "luma_gain": 1.0304,
    "luma_gain_unclamped": 1.0304,
@@ -813,6 +828,11 @@
     1.9254,
     1.9558,
     1.6259
+   ],
+   "ue_feedback_r3_gain": [
+    0.85,
+    1.13,
+    1.35
    ],
    "views": {
     "back": {
@@ -894,9 +914,9 @@
     0.9035
    ],
    "gain": [
-    2.0184,
-    1.4356,
-    0.8877
+    1.7156,
+    1.6222,
+    1.1984
    ],
    "gain_before_ue_feedback": [
     0.86,
@@ -907,6 +927,11 @@
     1.0483,
     0.734,
     0.546
+   ],
+   "gain_before_ue_feedback_r3": [
+    2.0184,
+    1.4356,
+    0.8877
    ],
    "luma_gain": 0.75,
    "luma_gain_unclamped": 0.5944,
@@ -930,6 +955,11 @@
     1.9254,
     1.9558,
     1.6259
+   ],
+   "ue_feedback_r3_gain": [
+    0.85,
+    1.13,
+    1.35
    ],
    "views": {
     "back": {
