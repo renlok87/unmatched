@@ -55,7 +55,8 @@ PALETTE = {"P1": [0.807, 0.5271, 0.1441, 1.0], "P2": [0.1022, 0.2122, 0.3467, 1.
 HEROES = {
     "Merlin": {"mesh": "/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD",
                "neutral": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral",
-               "debug": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_DebugClasses",
+               # rev 2 of the H2LD import (look-dev C group A): MI_Merlin_H2LD_DebugClasses -> _DebugClass
+               "debug": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_DebugClass",
                "accent": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamAccent_2K.png",
                "y_p50_p95": [0.0295, 0.0998],
                "source": "ld-team-accent-ue.json (Merlin): P1 11.0 / P2 26.0 by the team-accent.md rule"},

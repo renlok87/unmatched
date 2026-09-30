@@ -75,6 +75,16 @@ REPORT_FORMATS["h2-lookdev-merlin/1"] = {
     "build": dict(REPORT_FORMATS["h2-bake-rig/1"]["build"]),
     "textures": dict(REPORT_FORMATS["h2-bake-rig/1"]["textures"]),
 }
+# look-dev C (2026-09-30): King Arthur (h2_bake_arthur ld_*) and Harpy (h2_bake_harpy lookdev_*) look-dev runs, joined
+# with their H2 / H3 bake reports by skeletal_adopt_lookdev.lookdev_arthur / lookdev_harpy
+REPORT_FORMATS["h2-lookdev-arthur/1"] = {
+    "build": dict(REPORT_FORMATS["h2-bake-rig/1"]["build"], figure_top_uu="/measures/figure_top_uu"),
+    "textures": dict(REPORT_FORMATS["h2-bake-rig/1"]["textures"]),
+}
+REPORT_FORMATS["h3-lookdev-harpy/1"] = {
+    "build": dict(REPORT_FORMATS["h2-bake-rig/1"]["build"], figure_top_uu="/measures/figure_top_uu"),
+    "textures": dict(REPORT_FORMATS["h2-bake-rig/1"]["textures"]),
+}
 
 
 def normaliser(profile: dict):

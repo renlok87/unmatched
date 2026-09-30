@@ -112,6 +112,17 @@
       },
       "passed": true
     },
+    "library_inputs_pinned_by_profile": {
+      "measured": {
+        "TeamAccent": {
+          "file": "75972ad3e6baa49fca950cb00c602a2355875da7e589fb3f6a56395676c367df",
+          "profile": "75972ad3e6baa49fca950cb00c602a2355875da7e589fb3f6a56395676c367df",
+          "sha256_ok": true
+        }
+      },
+      "note": "inputs outside the bake atlas (e.g. the hero MatLUT of M_UM_Figure_v2): the bytes are the ones the profile pins (candidate.library_inputs.*.sha256)",
+      "passed": true
+    },
     "material_slots_as_profile": {
       "expected": {
         "base": 1,
@@ -354,13 +365,14 @@
     "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_MatID_2K.png": "f5c2f6322cee63ac9575c4a9a84caf708eda9e3f59e1e96feb00df2b9d0959dc",
     "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_N_2K.png": "2f7bfac8acc997f75c1291ea14beecd88558c38878a62f1c060da459fe9fcbfa",
     "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_ORM_2K.png": "0a33ce04ce0a8dd892bc7e5780e0b7e48b4be77887b6589543b3a4e6acaf68b1",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamAccent_2K.png": "75972ad3e6baa49fca950cb00c602a2355875da7e589fb3f6a56395676c367df",
     "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamMask_2K.png": "975297f48c465bf4a09f8eb60c4c43fcda72c7aebc6e0ac2abf076802952388f",
     "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_Merlin_H2LD_EdgeMask_2K.png": "4c051f13573c02b9f881157af176d6784868417c532a0ac4fb0b25545d395024",
     "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_Merlin_H2LD_ZoneID_2K.png": "7a56c03af3977d587356a0d713ed47a5d4ff7d462a8ba680b7e59789d08e9d19",
     "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_Merlin_H2LD_ZoneLUT_Debug.dds": "b14543d64c7301dd0c7031bb45ec8cb607d7a874f9183216b6de2e7d11e72293",
-    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_UM_MatLUT_Merlin.dds": "7fec8d6df274d2231c2ce69cd1af41fddc722cd00f04cf8a7d158c07489ae579",
-    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/ue-inputs-report.json": "add60da60d81998ab13f6ba99bf39b2cd77c6aef1bad5b3fcb8cd8986ceb0392",
-    "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json": "195585132d7982ae5e04451c6a568a1893b2b4e708591021d1e6f0d85120f360"
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_UM_MatLUT_Merlin.dds": "c7f09bc631fb7ebe58248e4f938882159c8e926122fd5365a3a07775a47107e5",
+    "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/ue-inputs-report.json": "dc48c60c668ae431e63957a69160600f8186d221f63e0e9b3548c04a8132c8ec",
+    "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json": "955366bcd960bd36f35479292d9c19e1c6534ff47cacb2c8c087ec1fbbaca849"
   },
   "keys": {
     "fbx:base": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/export/SM_Merlin_H2LD_Base.fbx",
@@ -376,6 +388,7 @@
     "texture:MatLUT": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_UM_MatLUT_Merlin.dds",
     "texture:N": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_N_2K.png",
     "texture:ORM": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_ORM_2K.png",
+    "texture:TeamAccent": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamAccent_2K.png",
     "texture:TeamMask": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamMask_2K.png",
     "texture:ZoneID": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_Merlin_H2LD_ZoneID_2K.png",
     "texture:ZoneLUT": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_Merlin_H2LD_ZoneLUT_Debug.dds"
@@ -385,9 +398,9 @@
   "note": "the candidate is built outside this tool (h2-lookdev-merlin/1, profile merlin-h2-lookdev/1); adopt copies nothing and re-hashes it; views.build / views.atlas are what ue-import reads",
   "passed": true,
   "profile": {
-    "id": "merlin-h2-lookdev-ue-import/1",
+    "id": "merlin-h2-lookdev-ue-import/2",
     "path": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev-ue-import.json",
-    "sha256": "a22fd6a9ae5eb7d05bdb128bfc87e515617f1d1401f2a5e7b4110186192c992a"
+    "sha256": "b973005f057162c43dfbc5e721334967ccb833b3b771b407cdf1f36bc26826f3"
   },
   "stage": "adopt",
   "status": "measured",

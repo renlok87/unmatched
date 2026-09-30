@@ -1,0 +1,25 @@
+{
+ "hero": "KingArthur",
+ "concept": {
+  "front": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-front.png",
+  "side": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-side.png",
+  "back": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-back.png"
+ },
+ "sources": [
+  {"profile": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-lookdev.json",
+   "pointer": "/lookdev/concept_zones"},
+  {"profile": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-skeletal-um-fbx-v1-h2.json",
+   "pointer": "/review_h22/steel_check/concept_zones", "as_zone": "steel",
+   "gate": {"s_max": 0.3, "v_min": 0.03},
+   "note": "steel polygons of the H2.2 steel check (inside the armour silhouette), gate of that check (gold, red cloth, leather, black gaps out)"}
+ ],
+ "zones": {
+  "steel": {"class": "steel_blued", "from": ["steel"]},
+  "gold": {"class": "gold_antique", "from": ["gold"]},
+  "embroidery": {"class": "silk", "from": ["embroidery"]},
+  "cloth": {"class": "wool_coarse", "from": ["cloth"]},
+  "belt": {"class": "leather_worn", "from": ["belt"]},
+  "face_skin": {"class": "skin", "from": ["face_skin"]},
+  "hair": {"class": "legacy_bake", "from": ["hair"]}
+ }
+}

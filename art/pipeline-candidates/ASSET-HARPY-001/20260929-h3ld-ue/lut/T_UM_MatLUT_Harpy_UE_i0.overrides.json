@@ -1,0 +1,90 @@
+{
+ "asset_id": "ASSET-HARPY-001",
+ "classes": {
+  "brass": {
+   "bakeLuminanceModulation": 0.0,
+   "bc": [
+    0.0262,
+    0.02,
+    0.0235
+   ],
+   "bcMode": 0.0,
+   "cavityDarken": 0.0,
+   "cavityTintB": 0.0,
+   "cavityTintG": 0.0,
+   "cavityTintR": 0.0,
+   "cavityTintStrength": 0.0,
+   "clothAmount": 0.0,
+   "luminanceMax": 0.55,
+   "luminanceMin": 0.02,
+   "maxChannel": 0.9,
+   "metallic": 0.0,
+   "normalStrength": 0.3,
+   "roughHi": 0.5,
+   "roughLo": 0.22,
+   "roughTypical": 0.33,
+   "roughVariation": 0.06,
+   "shadingModel": 0.0,
+   "sheenIntensity": 0.0,
+   "sheenRoughness": 0.0,
+   "sheenTint": 0.0,
+   "slice": 14.0,
+   "specular": 0.575,
+   "teamDyeAllowed": 0.0,
+   "tilesPerMeter": 12.0,
+   "wearStrength": 0.25,
+   "wornBCB": 0.0,
+   "wornBCG": 0.0,
+   "wornBCMode": 0.0,
+   "wornBCR": 0.0,
+   "wornBCScale": 1.4,
+   "wornRoughness": -1.0,
+   "wornRoughnessDelta": -0.08,
+   "ymedClassHero": 0.02012
+  },
+  "feathers": {
+   "bc": [
+    0.0816,
+    0.0418,
+    0.026
+   ],
+   "ymedClassHero": 0.04946
+  },
+  "gold_antique": {
+   "bc": [
+    1.0,
+    0.4371,
+    0.1032
+   ],
+   "ymedClassHero": 0.63156
+  },
+  "leather_smooth": {
+   "bc": [
+    0.0385,
+    0.017,
+    0.0025
+   ],
+   "ymedClassHero": 0.02
+  },
+  "skin": {
+   "bc": [
+    0.3645,
+    0.2319,
+    0.143
+   ],
+   "ymedClassHero": 0.25347
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake_harpy/lookdev_maps.py (ld_maps)",
+ "hero": "Harpy",
+ "heroSlots": {
+  "brass": "horn_claw"
+ },
+ "heroSlotsNote": "column of the library class brass (5) carries the extension class horn_claw (all fields, detail slice 14 = stone_base); MatID of the talons = 88 (README §3a)",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero Harpy --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "медиана класса в BC героя (DebugBakeFromLUT); у gold_antique — F0 героя, тон концепта",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ }
+}

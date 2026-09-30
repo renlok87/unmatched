@@ -560,3 +560,179 @@ LUT в Blender — LUT прогона look-dev (i0), не UE-итерация i3
   (доля акцента 6,4 % против 8,1 %).
 - Кадры Blender: EEVEE, Principled вместо Cloth-модели UE, без тайлов детали, LUT i0. Тон окрашенного акцента в UE
   будет другим (кавити тайла, sheen ткани).
+
+## 10. UE (look-dev C, группа A, 2026-09-30)
+
+Статус: **технически импортировано и измерено** в живом редакторе главного checkout (UnrealEditor PID 31756, MCP :8123,
+DX12/SM6 + Lumen, High `sg.* = 2`, screen percentage 100, TSR). Это не художественная приёмка и не K1–K3: кадры —
+`editor-mcp-viewport`, без отпечатка RENDER. Каждый шаг в редакторе шёл под общей блокировкой `C:/tmp/ue-editor.lock`
+(owner `look-dev-C-A`): импорт, съёмка и замер — одним шагом, после каждого открыт `/Game/S08/S08Arena` (не dirty,
+уровень не сохранялся). Второй редактор (:8124, группа B) и папки KingArthur/Harpy не трогались. Платных операций нет,
+Blender не запускался. Реестр не менялся (нужные записи — §10.7).
+
+### 10.1 Что сделано
+
+- **Переимпорт на канонический скелет.** Профиль импорта ред. 2
+  ([`medusa-h2ld-lookdev-ue-import.json`](../../art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2ld-lookdev-ue-import.json),
+  `medusa-h2ld-lookdev-ue-import/2`): `ue.target_skeleton = /Game/PipelineCandidates/Medusa/Rig/SK_Medusa_Skeleton`
+  (CLI 0.8.0). Прогон `20260929-h2ld-ue-import` пройден с `--force`: adopt — все проверки, ue-import **26/26**, среди них
+  `skeleton_is_canonical_target` и `uv_channels_as_profile`. Прежний собственный `SK_Medusa_H2LD_Skeleton` стал ненужным
+  (на него ссылался только сам меш), прогон удалил его вместе с остальными своими ассетами. Канонический скелет и
+  `Rig/SK_Medusa` не изменились: байты на диске те же, в редакторе они не dirty.
+- **TeamAccent в UE.** `T_Medusa_H2LD_TeamAccent`: 2048², `TC_Grayscale`, sRGB выкл., мипы `FromTextureGroup`. Вход
+  `candidate.library_inputs.TeamAccent` запинен sha256 `40f2db9a…` (= `ld-team-accent-report.json`). Прежний TeamMask W4-B
+  больше не импортируется: остался только запиненным файлом adopt. `TeamMaskTexture` = `T_UM_Mask_Black`
+  (`team_color_mode none`), поэтому ни один MI не может снова покрасить всё платье.
+- **MI на мастере v2.1.** `MI_Medusa_H2LD` (родитель `M_UM_Figure_v2`): `TeamAccentTexture`, `UseTeamAccent = true`,
+  `UseUV1Metres = true`, `TeamDye 1`, `TeamDyeGain 22.9292`, `TeamDyeCeiling 15.5387`. Это правило LDV-13, один MI на обе
+  команды; эффективное усиление P1 19.26, P2 22.93. Дети:
+  - `MI_Medusa_H2LD_P1` — TeamColor #E8C06A, линейный (0.807, 0.527, 0.144);
+  - `MI_Medusa_H2LD_P2` — #5A7F9F, линейный (0.102, 0.212, 0.347);
+  - `MI_Medusa_H2LD_Neutral` — TeamDye 0, TeamColor белый;
+  - `MI_Medusa_H2LD_DebugClass` — DebugView 1;
+  - подставка `MI_Medusa_H2LD_Base_P1/_P2`.
+
+  `Blue`/`Red` удалены: палитра — активная C-11, решение «Акценты + кольцо».
+- **LUT героя: две итерации** (c2, c3) поверх i3 look-dev A (§10.4). Импортируется
+  `20260930-h2ld-ldc-ue/lut/T_UM_MatLUT_Medusa_UE_c3.dds` (sha256 `e650565d…`). Пересборка i3 тем же инструментом
+  совпала байт в байт (`6df64b5b…`). Текстуры запекания, маска и `TeamDyeGain` не менялись.
+
+Папка `/Game/PipelineCandidates/Medusa/H2LD` — 17 uasset (было 18). Новые: `MI_Medusa_H2LD_P1`, `_P2`, `_Base_P1`,
+`_Base_P2`, `T_Medusa_H2LD_TeamAccent`. Удалены: `MI_Medusa_H2LD_Blue`, `_Red`, `_Base_Blue`, `_Base_Red`,
+`SK_Medusa_H2LD_Skeleton`, `T_Medusa_H2LD_TeamMask`. Копия в арт-worktree совпадает с главным checkout 17/17 по sha256,
+удалённые файлы удалены и там. Например, `SK_Medusa_H2LD.uasset` — `13b95d4e…`.
+
+### 10.2 Проверки в UE (`20260930-h2ld-ldc-ue/verify/verify-final.json`, 14/14)
+
+Проверки прочитаны из редактора независимо от отчёта CLI: задача `tools/art/material_library/ue/ldc_verify_ue.py`, а
+клипы — через `review/ue_py/measure_clips.py` на меше H2LD.
+
+| Проверка | Результат |
+|---|---|
+| Скелет | `Rig/SK_Medusa_Skeleton` (канонический); в папке H2LD скелетов нет |
+| Кость 0 и иерархия v2 | кость 0 `SKEL_UM_Humanoid`, 18 костей v2 с `weapon_L`; иерархия — проверка CLI `bones_profile_17_present_with_hierarchy` |
+| Лицо +X | проверки CLI `front_axis_as_fbx_preset` и `skeletal_bounds_match_build_front_unambiguous`; границы (−9.29, −16.36, 5.75)…(9.93, 10.74, 55.01) — как у H2.1 |
+| Треугольники, LOD, слоты | LOD0 43 054 tris, 1 LOD, 1 слот → `MI_Medusa_H2LD_P1` |
+| UV | у скелетного меша 2 набора (UV0 атлас + UV1 в метрах); у подставки 2 канала, `Generate Lightmap UVs` выкл. |
+| Текстуры | BC sRGB `TC_Default`; N `TC_Normalmap`; ORM `TC_Masks`; TeamAccent `TC_Grayscale`, sRGB выкл., мипы из группы; MatID `TC_Grayscale` + `TF_Nearest` + без мипов + NeverStream; LUT 16 × 16 `TC_HDR` + `TF_Nearest` + без мипов + NeverStream |
+| MI | родитель, текстуры, скаляры, векторы и свитчи всех 7 MI = план профиля |
+| Дубли | нумерованных копий нет, одноимённых пакетов нет; пакеты папки = план импорта |
+| Клипы H2Anim | 4 клипа `AM_Medusa_*` на том же скелете. Пик смещения костей совпадает с замером волны H2Anim на `Rig/SK_Medusa` до 0.02 uu: Idle 0.83, HitReact 4.35, LungeAttack 16.6, DeathSettle 13.3 uu. Сокеты меша Weapon/Head вычисляются, Weapon смещается на 0.3–15.9 uu |
+| Dirty | ни один пакет папки и канонический скелет не dirty |
+
+### 10.3 Как снимали и мерили
+
+Инструмент [`ue_hero_lookdev.py`](../../tools/art/material_library/ue_hero_lookdev.py) (`review` / `measure` / `sheets`),
+конфиг
+[`20260930-h2ld-ldc-ue/review-config.json`](../../art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/review-config.json).
+
+- Сцена, свет и ракурсы — как в §8.2: P1.7, `cobble-probe`, EV100 1.3, High, SP 100.
+  - Front, side, back на 200 uu. Side — сторона лука, лицо влево, как в концепте.
+  - K2 5× и 1.6×.
+  - Варианты: нейтральный, P1, P2, DebugClass и кадр без фигуры.
+  - Отладочные кадры и кадры без фигуры сняты с `ShowFlag.Bloom 0` (LDV-16).
+- Концепт — медианы классов `20260929-h2-lookdev/reports/measure-report.json`.
+- Экспозиции: EV100 1.3 (доска) и «чтение» −1.0 EV. У каждой свой k — геом. среднее «концепт / UE» по золоту, платью и
+  коже.
+- Допуски: яркость ±15 %, тон ±12°, насыщенность ±0.10.
+- Вердикт зоны: если расхождение при EV100 1.3 исчезает на −1.0 EV, это **свет доски** (свет не менялся).
+- Акцент команды на экране: пиксели фигуры, где кадры P1 и P2 различаются больше чем на 40 уровней. Порог 12 уровней
+  отмечал всю фигуру: у живого Lumen/TSR зерно 10–20 уровней.
+
+### 10.4 Итерации (не больше трёх)
+
+| Итер. | Правка LUT героя | Почему |
+|---|---|---|
+| c1 | нет (i3 look-dev A) — базовый замер после переимпорта | нейтральные золото, платье и кожа — как у i3 в пределах шума (1.08 / 1.32 / 0.70 против 1.05 / 1.32 / 0.72) |
+| c2 | `leather_smooth.luminanceMin` 0.04 → 0.058; `leather_worn` 0.032 → 0.040 | c1: кожа гладкая 0.88 (EV100 1.3) / 0.675 (−1 EV). Годный общий множитель — 1.26–1.31 (отклик пола ≈ floor^0.65, замер i2) |
+| **c3** | `leather_worn.luminanceMin` → 0.050; `wood.luminanceMin` 0.045 → 0.050 | c2: сандалии 1.02 / 0.770 (пол 0.040 поднял только экспозицию доски); дерево 0.842 — чуть ниже допуска |
+
+### 10.5 Замер c3 против концепта (нейтральный MI)
+
+Ячейка: Y/k · Δтон° · Δнас.
+
+| Зона | EV100 1.3 (k 0.420) | −1.0 EV (k 0.928) | Вердикт |
+|---|---|---|---|
+| золото | 1.08 · +2.1 · −0.050 ✓ | 1.03 · −0.5 · +0.038 ✓ | в допуске на обеих |
+| кожа гладкая (колчан, перевязь) | 1.17 · −2.6 · −0.033 ✗ | 0.92 · −3.2 · +0.029 ✓ | свет доски |
+| ремни сандалий | 1.17 · −1.2 · −0.068 ✗ | 0.96 · −3.0 · −0.008 ✓ | свет доски |
+| платье (лён) | 1.32 · +5.1 · −0.037 ✗ | 0.98 · +7.1 · −0.017 ✓ | свет доски |
+| кожа персонажа | 0.70 · +4.5 · −0.030 ✗ | 0.99 · +3.6 · +0.096 ✓ | свет доски (плечо тонмаппера) |
+| дерево (справочно) | 1.11 · −3.1 · −0.007 ✓ | 0.80 · −5.5 · +0.043 ✗ | только −1 EV |
+
+Все пять зон допуска проходят на −1.0 EV. На c1 и c2 не проходили две и одна зона соответственно: кожа гладкая 0.68
+и ремни 0.77 на c1, ремни 0.77 на c2. При EV100 1.3 кожаные зоны на c3 на 2 % выше допуска, на c2 они проходили.
+Расхождения, которые исчезают на −1.0 EV, отнесены к свету доски по правилу задачи. Дерево на c1 было 0.75, на c3 —
+0.80; разброс между прогонами, по i2/i2b, до ±0.06. Змеи (`legacy_bake`) в нейтральном кадре не набрали порога
+пикселей, а в P1 — 0.04: ворота тона легаси-класса ловят мало пикселей. Это прежний остаток §8.6.
+
+**Акцент команды (c3).** Нейтральный кадр:
+
+| Вид | Доля акцента от пикселей фигуры | Акцент P1 / P2 / нейтр. (sRGB, медиана) | Классы без красителя, изменились > 40 уровней: P1 / P2 |
+|---|---|---|---|
+| front | 12.2 % | (205, 181, 126) / (130, 148, 165) / (106, 87, 79) | 4.5 % / 1.5 % |
+| side | 9.6 % | (205, 182, 129) / (135, 151, 165) / (114, 97, 86) | 3.5 % / 1.8 % |
+| back | 13.0 % | (221, 202, 146) / (149, 170, 190) / (122, 102, 93) | 7.4 % / 2.8 % |
+
+- Тон окрашенного акцента совпадает с командой: P1 ≈ 42° (#E8C06A — 41°), P2 ≈ 209° (#5A7F9F — 208°). Насыщенность ниже,
+  чем у цвета команды: около 0.39 против 0.54 у P1 и 0.21 против 0.43 у P2. Это свет доски и правило медианы альбедо
+  ≈ 0.66–0.8 × TeamColor.
+- В кадре с «изменившимися» пикселями классов без красителя это отражения и отскок Lumen от яркого акцента и подставки,
+  плюс зерно. Без освещения краситель на этих классах = 0: это доказано тестом v2.1 `hero-medusa`.
+- В кадре платье, золото и кожа P1/P2 не отличаются от нейтрального. Меняются полоса у каймы подола и разрезов, перевязь
+  и кольцо подставки (`medusa-lookdev-sheet-c3.jpg`).
+- Спереди полосы у разрезов читаются крупными пятнами, а не каймой: в кадре front их доля 12 %, в Blender на K2 — 6.4 %.
+  Это вопрос маски (стадия `ta_maps`, 10 мм от каймы разрезов), а не UE. Маску эта волна не меняла.
+
+### 10.6 Файлы
+
+- `20260930-h2ld-ldc-ue/review/c3/medusa-lookdev-sheet-c3.jpg` — **концепт | UE нейтр. | P1 | P2 | нейтр. −1.0 EV**,
+  front/side/back.
+- `medusa-lookdev-k2-c3.jpg` — K2 5× и 1.6×: нейтр. | P1 | P2.
+- Замер: `measure-c3.json` — зоны, `verdicts`, `team_accent`. Съёмка: `review-c3.json` — блокировка, уровень до/после,
+  scalability, консоль.
+- Ключевые кадры — JPEG в `review/c3/key/`. Итерации c1 и c2 лежат в своих каталогах.
+- PNG кадров лежат локально: они в `.gitignore`, sha256 записаны в `.evidence.json`.
+
+Воспроизвести:
+
+```bash
+export UE_LOCK_OWNER=look-dev-C-A MSYS_NO_PATHCONV=1
+RUN=art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue-import; TP="python tools/tripo-pipeline/tripo_pipeline.py"
+python tools/art/material_library/ue_hero_lookdev.py lut --overrides art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/lut/T_UM_MatLUT_Medusa_UE_c3.overrides.json \
+    --out art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/lut/T_UM_MatLUT_Medusa_UE_c3.dds
+$TP preflight --run-dir $RUN && $TP adopt --run-dir $RUN
+python tools/art/material_library/ue_lock.py --step "ue-import Medusa H2LD" -- $TP --backend mcp ue-import --run-dir $RUN \
+    --ue-folder /Game/PipelineCandidates/Medusa/H2LD --force
+CFG=art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/review-config.json
+python tools/art/material_library/ue_hero_lookdev.py verify --config $CFG --out art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/verify --tag final
+python tools/art/material_library/ue_hero_lookdev.py review --config $CFG --out art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/review/c3 --tag c3
+```
+
+### 10.7 Остатки и записи реестра
+
+- **Свет доски** (EV100 1.3, купол × 11.2): платье +32 %, кожа персонажа 0.70, кожаные зоны +17 %. Это задача 5c-B.
+  После неё перемерить; F0 золота Y 0.22 так и остаётся отступлением LDDU-6.
+- Дерево на −1.0 EV — 0.80. Змеи — legacy без рычагов LUT. Пятна акцента спереди на разрезах — маска Blender-стадии.
+- Кадры редакторные; packaged-кадры с RENDER, K1–K3 и `render_bench.py` не делались. `/Game/PipelineCandidates` не
+  кукается.
+- `validate_registry.py` сейчас — FAIL: расхождение sha в слое «ue-editor-import H2LD … LD-medusa-ue». Нужно
+  (оркестратору):
+  - обновить sha256 путей:
+    - `build-profiles/medusa-h2ld-lookdev-ue-import.json` → `3110346f…`;
+    - `20260929-h2ld-ue-import/reports/adopt-report.json` → `796511bc…`;
+    - `…/ue-import-report.json` → `7acace78…`;
+    - `/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD` в обоих checkout → `13b95d4e…`;
+  - LUT слоя: `20260930-h2ld-ldc-ue/lut/T_UM_MatLUT_Medusa_UE_c3.dds` (`e650565d…`) вместо `…/20260929-h2ld-ue/lut/T_UM_MatLUT_Medusa_UE.dds`
+    (файл i3 остаётся и не изменён);
+  - добавить слой или пути look-dev C:
+    - `20260930-h2ld-ldc-ue/review-config.json`;
+    - `verify/verify-final.json` (`27b49c07…`);
+    - `review/c3/measure-c3.json` (`87aeb013…`);
+    - `medusa-lookdev-sheet-c3.jpg` (`af5a654e…`);
+    - `medusa-lookdev-k2-c3.jpg` (`28b7cb06…`);
+    - `/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_TeamAccent` (`3dedd4cc…`);
+    - `…/Materials/MI_Medusa_H2LD` (`f7451a3a…`);
+    - `/Game/PipelineCandidates/Medusa/Rig/SK_Medusa_Skeleton` — зависимость;
+  - в описании слоя заменить «18 uasset, Blue/Red, собственный скелет» на «17 uasset, P1/P2, канонический скелет,
+    UseTeamAccent».

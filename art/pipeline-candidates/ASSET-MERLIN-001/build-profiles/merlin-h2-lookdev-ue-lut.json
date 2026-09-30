@@ -16,7 +16,8 @@
    },
    "leather_worn": {
     "luminanceMin": 0.012,
-    "why": "UE-0: belt/boots BC p2 Y 0.015 < 0.02; UE-1: roughness 0.47 [0.22, 0.77] -> 0.62 [0.45, 0.80]: the concept's boots and belt are matte worn leather; the glossier preset reflected the bright dome (boots luma 1.30-1.46, sat -0.22/-0.25 at EV100 1.3)",
+    "why": "UE-0: belt/boots BC p2 Y 0.015 < 0.02; UE-1: roughness 0.47 [0.22, 0.77] -> 0.62 [0.45, 0.80]: the concept's boots and belt are matte worn leather; the glossier preset reflected the bright dome (boots luma 1.30-1.46, sat -0.22/-0.25 at EV100 1.3); UE-5 (look-dev C group A, 2026-09-30, class measurement by DebugClass on the rev 2 import): leather_worn (belt + boots + beard wrap) 1.27 / sat -0.17 at EV100 1.3 and 0.96 / sat -0.12 at -1.0 EV: the desaturation stays on the reading exposure, so it is material (white specular of the dome on matte leather), not board light: specular 0.5 -> 0.3 (the Medusa leather fix of LD-medusa-ue i3); UE-6 (c3): with 0.3 (c2) the EV100 1.3 luma came into tolerance (0.95) and the -1.0 EV saturation too (-0.07), but the -1.0 EV luma fell to 0.72 and the EV100 1.3 saturation stayed -0.12 (tone-curve shoulder); the luminance floor is no lever here (the class median 0.035 sits above any floor that keeps the fold detail), so the midpoint specular 0.4",
+   "specular": 0.4,
     "roughTypical": 0.62,
     "roughLo": 0.45,
     "roughHi": 0.8,

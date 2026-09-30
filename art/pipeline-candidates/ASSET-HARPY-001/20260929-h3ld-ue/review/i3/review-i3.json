@@ -1,0 +1,1704 @@
+{
+ "anti_aliasing_method": 4,
+ "assets": {
+  "base": "/Game/PipelineCandidates/Harpy/H3LD/Meshes/SM_Harpy_H3LD_Base",
+  "base_instance": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base",
+  "extra:MI_Harpy_H3LD_DebugClass": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_DebugClass",
+  "extra:MI_Harpy_H3LD_Neutral": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Neutral",
+  "figure_instance": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD",
+  "skeletal": "/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD",
+  "team:base:P1": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base_P1",
+  "team:base:P2": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base_P2",
+  "team:figure:P1": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1",
+  "team:figure:P2": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P2",
+  "texture:BC": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_BC",
+  "texture:BaseBC": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_Base_BC",
+  "texture:BaseN": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_Base_N",
+  "texture:BaseORM": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_Base_ORM",
+  "texture:Edge": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_Edge",
+  "texture:LUT": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_UM_MatLUT_Harpy",
+  "texture:MatID": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_MatID",
+  "texture:N": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_N",
+  "texture:ORM": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_ORM",
+  "texture:TeamAccent": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_TeamAccent"
+ },
+ "cell": [
+  0.0,
+  50.0,
+  0.0
+ ],
+ "cleanup": {
+  "destroyed": [
+   "LDue figure - temporary",
+   "LDue base - temporary",
+   "LDue sky - temporary",
+   "LDue camera - temporary"
+  ],
+  "op": "cleanup"
+ },
+ "config": {
+  "anchor_zone": "orange",
+  "base_mi": {
+   "P1": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base_P1",
+   "P2": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base_P2",
+   "debug": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base",
+   "neutral": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base"
+  },
+  "concept": {
+   "back": "art/imagegen/hero-quality-v1/harpy/harpy-back.png",
+   "front": "art/imagegen/hero-quality-v1/harpy/harpy-front.png",
+   "side": "art/imagegen/hero-quality-v1/harpy/harpy-side.png"
+  },
+  "concept_zones": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/concept-zones.json",
+  "debug_calibration": {
+   "0": [
+    16.1,
+    16.4,
+    16.3
+   ],
+   "1": [
+    145.9,
+    186.9,
+    219.2
+   ],
+   "10": [
+    219.9,
+    224.0,
+    159.6
+   ],
+   "11": [
+    220.9,
+    153.8,
+    220.2
+   ],
+   "12": [
+    165.0,
+    220.0,
+    202.0
+   ],
+   "13": [
+    223.9,
+    177.7,
+    146.8
+   ],
+   "14": [
+    145.1,
+    164.7,
+    219.3
+   ],
+   "15": [
+    187.9,
+    220.5,
+    149.7
+   ],
+   "2": [
+    203.3,
+    222.2,
+    154.1
+   ],
+   "3": [
+    227.7,
+    148.4,
+    214.8
+   ],
+   "4": [
+    168.0,
+    220.0,
+    214.0
+   ],
+   "5": [
+    224.5,
+    205.9,
+    154.9
+   ],
+   "6": [
+    185.3,
+    155.9,
+    221.9
+   ],
+   "7": [
+    158.1,
+    223.7,
+    152.2
+   ],
+   "8": [
+    228.6,
+    147.7,
+    188.0
+   ],
+   "9": [
+    158.8,
+    209.9,
+    221.2
+   ]
+  },
+  "debug_calibration_note": "12 (feathers) and 4 (gold_antique) re-measured on harpy-i0-front-debug.png (mode of the wing / bracelet rim pixels): the wall values (159,218,198) / (166,220,215) are 12 levels apart and split the wing between the two classes",
+  "debug_calibration_source": "docs/art-pipeline/material-library/evidence/v2.1-accent/wall/um-v2-accent-report.json measurements.debug_class_calibration_srgb (look-dev C, M_UM_Figure_v2.1 DebugView 1 on the P1.7 Cobble scene, EV100 1.3; the hue decode cannot split steel_blued 1 from wool_coarse 9)",
+  "decode_classes": [
+   "feathers",
+   "skin",
+   "brass",
+   "gold_antique",
+   "leather_smooth"
+  ],
+  "gate_on_variant": "neutral",
+  "hero": "Harpy",
+  "key_zones": [
+   "orange",
+   "dark",
+   "skin"
+  ],
+  "min_px": 150,
+  "previous": [],
+  "reading_bias_ev": -1.0,
+  "render_gates": {
+   "dark": {
+    "v_max": 0.45
+   },
+   "orange": {
+    "hue_deg": [
+     [
+      10,
+      45
+     ]
+    ],
+    "s_min": 0.3,
+    "v_min": 0.5
+   }
+  },
+  "render_gates_note": "feathers split on the NEUTRAL Cobble frame (gate_on_variant): the value histogram of the feather class is bimodal (peaks v ~0.33 and ~0.70); concept gates orange v>=0.35 s>=0.35 hue 15-38 / dark v<=0.3 at the concept exposure; UE boundary at the gap 0.45-0.50 (UE Cobble frame ~1.6x brighter), the gap pixels are left out",
+  "run_dir": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue-import",
+  "sheet_label": "UE H3LD",
+  "shots": {
+   "P1": [
+    "front",
+    "side",
+    "back",
+    "k2-5x",
+    "k2-1p6"
+   ],
+   "P2": [
+    "front",
+    "side",
+    "back",
+    "k2-5x",
+    "k2-1p6"
+   ],
+   "debug": [
+    "front",
+    "side",
+    "back"
+   ],
+   "neutral": [
+    "front",
+    "side",
+    "back",
+    "k2-5x",
+    "k2-1p6"
+   ],
+   "plate": [
+    "front",
+    "side",
+    "back"
+   ],
+   "reading": [
+    "front",
+    "side",
+    "back",
+    "k2-5x"
+   ]
+  },
+  "team_variants": [
+   "P1",
+   "P2"
+  ],
+  "tolerance": {
+   "hue_deg": 12.0,
+   "hue_min_sat": 0.1,
+   "luma_ratio": 0.15,
+   "sat": 0.1
+  },
+  "tolerance_zones": [
+   "orange",
+   "dark",
+   "skin",
+   "gold",
+   "claw"
+  ],
+  "variants": {
+   "P1": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1",
+   "P2": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P2",
+   "debug": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_DebugClass",
+   "neutral": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Neutral"
+  },
+  "zone_class": {
+   "claw": "brass",
+   "dark": "feathers",
+   "gold": "gold_antique",
+   "orange": "feathers",
+   "skin": "skin"
+  },
+  "zones": [
+   "orange",
+   "dark",
+   "skin",
+   "gold",
+   "claw"
+  ]
+ },
+ "console": [
+  "sg.ViewDistanceQuality 2",
+  "sg.AntiAliasingQuality 2",
+  "sg.ShadowQuality 2",
+  "sg.GlobalIlluminationQuality 2",
+  "sg.ReflectionQuality 2",
+  "sg.PostProcessQuality 2",
+  "sg.TextureQuality 2",
+  "sg.EffectsQuality 2",
+  "sg.FoliageQuality 2",
+  "sg.ShadingQuality 2",
+  "ShowFlag.Grid 0",
+  "ShowFlag.BillboardSprites 0",
+  "ShowFlag.Volumes 0",
+  "sg.ViewDistanceQuality 3",
+  "sg.AntiAliasingQuality 3",
+  "sg.ShadowQuality 3",
+  "sg.GlobalIlluminationQuality 3",
+  "sg.ReflectionQuality 3",
+  "sg.PostProcessQuality 3",
+  "sg.TextureQuality 3",
+  "sg.EffectsQuality 3",
+  "sg.FoliageQuality 3",
+  "sg.ShadingQuality 3",
+  "ShowFlag.Grid 2",
+  "ShowFlag.BillboardSprites 2",
+  "ShowFlag.Volumes 2"
+ ],
+ "exposure_reading": {
+  "exposure": {
+   "auto_exposure_bias": -1.0,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "exposure_restored": {
+  "exposure": {
+   "auto_exposure_bias": 0.0,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "finished_at": "2026-09-30T04:27:49+00:00",
+ "frames": {
+  "back-debug": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-back-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4287,
+    0.3725,
+    0.3763
+   ],
+   "sha256": "519d8ec26cf2160a95f6e32ab5798c4c6ad750883f0c2bf55197c08fbf663874",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "back-neutral": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-back-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5319,
+    0.505,
+    0.5099
+   ],
+   "sha256": "bc53c1e557885bcc107408e45caab10898d999736332d6e4ef800fc1b25f10e2",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "back-p1": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-back-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5179,
+    0.5271,
+    0.5098
+   ],
+   "sha256": "bebb662ccfd0a51d36d74bcccacfe8c3fa6690cfce080b54768220df0db7dcb3",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "back-p2": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-back-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5491,
+    0.5064,
+    0.5117
+   ],
+   "sha256": "bcdc7ee7cda8f8b496f3b19d5503dca4790685bab689160a284815090ec76606",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "back-plate": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-back-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3848,
+    0.3542,
+    0.3489
+   ],
+   "sha256": "823ff68f90d12be6d9221010c717d13785e89b9567f792163994c0493a402e77",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "back-reading": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "exposure": "EV100 1.3 fixed + bias -1.0 (reading frame)",
+   "file": "harpy-i3-back-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4163,
+    0.3916,
+    0.3779
+   ],
+   "sha256": "73592498e3984e204f24077d9dad2ef894738a5a49e530a16d3ada1d959fb995",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "front-debug": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-front-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4854,
+    0.4208,
+    0.4584
+   ],
+   "sha256": "99b18a7ada4949c73784210e3e246f44a6130502aaa12d0b84c88c0c4c1ba714",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "front-neutral": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-front-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5473,
+    0.529,
+    0.5347
+   ],
+   "sha256": "0eaa2caa247d417337326665f7ed607370196efb178ef42aa921da8645038008",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "front-p1": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-front-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5821,
+    0.5231,
+    0.5191
+   ],
+   "sha256": "7ff99605810fa807f17ac2bbbfcffbbe0aef5947b576e986d60f89b2fd414f65",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "front-p2": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-front-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5833,
+    0.5409,
+    0.5278
+   ],
+   "sha256": "40919fbd18847036deab82db42b39444e3e84072413114b762395408b8bfba64",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "front-plate": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-front-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4318,
+    0.4298,
+    0.4265
+   ],
+   "sha256": "f6533d88ccdf5ee1ae501947076630e61ac05c87c7707dfe3dd8810600b60b15",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "front-reading": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "exposure": "EV100 1.3 fixed + bias -1.0 (reading frame)",
+   "file": "harpy-i3-front-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4399,
+    0.421,
+    0.4155
+   ],
+   "sha256": "821e81e1f43075b13d4a6bcd617a1df8ae55015fc08d44737ebfd1bbda6a2872",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "k2-1p6-neutral": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-k2-1p6-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6151,
+    0.5986,
+    0.5859
+   ],
+   "sha256": "eecc5c59992d853e6d1a022eddd8e4fe9bf51441338323b1b9d0b51d22330c63",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "k2-1p6-p1": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-k2-1p6-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6183,
+    0.6011,
+    0.6029
+   ],
+   "sha256": "47ad309a81d2a14fb56f39a948d68fe42ecea821da5dfb40f5b63a08860edb8b",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "k2-1p6-p2": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-k2-1p6-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5832,
+    0.6014,
+    0.5942
+   ],
+   "sha256": "a3c5351c0a5bca960f0229203b89b09ea8c8cea816f5cb692fb814e6a8d49173",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "k2-5x-neutral": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-k2-5x-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6766,
+    0.6608,
+    0.6547
+   ],
+   "sha256": "1f464a0e7ea9810620100b2e5ab13a513ce5a151411ecc3bed98d50dddaaa8e8",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "k2-5x-p1": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-k2-5x-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.6884,
+    0.7217,
+    0.7239
+   ],
+   "sha256": "e6c64b9a897cf70c083dcc0c5c7f7a100fb16f4d49fb12a12fce5f0034924882",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "k2-5x-p2": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-k2-5x-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.738,
+    0.7219,
+    0.7205
+   ],
+   "sha256": "9e7f006225775c611ca00c8d4fa30e3c376896c4d315c2ae57a987ac7c708207",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "k2-5x-reading": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "exposure": "EV100 1.3 fixed + bias -1.0 (reading frame)",
+   "file": "harpy-i3-k2-5x-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4643,
+    0.4466,
+    0.4405
+   ],
+   "sha256": "bfb12ea5eab84f5c0fa64cb581cf2d9287df86ca16f8a4c172fef928935ae289",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "side-debug": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-side-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3362,
+    0.2956,
+    0.3335
+   ],
+   "sha256": "0098a1edc93debf36398ef668c3ef32b84f619abcedbe498d493db0c185730ce",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (bow side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "side-neutral": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-side-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4072,
+    0.3858,
+    0.3883
+   ],
+   "sha256": "c9ea0073e2675c12e3d9316fefc75d2e27fa65154589ecaff9947162f70785e5",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (bow side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "side-p1": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-side-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4117,
+    0.3676,
+    0.3889
+   ],
+   "sha256": "facc52175f109f2cebcbfedfc787032a499c4886f1a02027db5764127116028f",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (bow side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "side-p2": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-side-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3817,
+    0.3635,
+    0.3673
+   ],
+   "sha256": "57813e6203b8fd4cd255956bd85f7485af1bb908f21a2ed760eebe1347771714",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (bow side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "side-plate": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "file": "harpy-i3-side-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3162,
+    0.298,
+    0.2718
+   ],
+   "sha256": "1c3c4046ad3f2caa5235e3e9ee1b393c55b94f1375d36da24a592fabc6c35f05",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (bow side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  },
+  "side-reading": {
+   "crop_px": [
+    0,
+    102,
+    1797,
+    1113
+   ],
+   "exposure": "EV100 1.3 fixed + bias -1.0 (reading frame)",
+   "file": "harpy-i3-side-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3298,
+    0.2998,
+    0.3171
+   ],
+   "sha256": "8c032bb9e794733412b6e9ab0d6c8127b194f46c26ebe117a4d58cd3f7f35ab3",
+   "subject": "Harpy (/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (bow side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    1797,
+    1216
+   ]
+  }
+ },
+ "gi_reflections": {
+  "r.DynamicGlobalIlluminationMethod": 1,
+  "r.ReflectionMethod": 1
+ },
+ "key_rotation_pitch_yaw_roll": [
+  -55.0,
+  30.0,
+  0.0
+ ],
+ "kind": "EDITOR review frames (live UnrealEditor via MCP): not packaged, no HUD, no RENDER fingerprint, not K1/K2 acceptance",
+ "light_profile": {
+  "data": {
+   "directional": {
+    "castShadows": true,
+    "intensity": 4.5,
+    "name": "key",
+    "posUU": [
+     -350,
+     -150,
+     600
+    ],
+    "rotation": [
+     0,
+     -55,
+     30
+    ],
+    "shadow": {
+     "cascades": 2,
+     "contactShadowLength": 0.0,
+     "distanceUU": 3000
+    }
+   },
+   "exposure": {
+    "bias": 0.0,
+    "ev100": 1.3,
+    "maxBrightness": 2.46229,
+    "method": "histogram-fixed",
+    "minBrightness": 2.46229
+   },
+   "points": [
+    {
+     "intensity": 85,
+     "name": "warm",
+     "posUU": [
+      260,
+      -300,
+      250
+     ],
+     "radiusUU": 450,
+     "role": "warm"
+    }
+   ],
+   "sky": {
+    "calibration": "W4-A bench: K1 board ROI median luma of the packaged DX12 + Lumen frame matched to the P17 editor K1 (131.2): sky 8 -> 112.1, 12 -> 139.4, 16 -> 159.5; 11.2 = x1.4 (K2 5x cobble corner 105.2 in P17 matched at x1.5)",
+    "colorLinear": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "intensity": 11.2,
+    "lowerHemisphereIsBlack": false,
+    "replaces": "point fill 700 cd at (0,-100,550), radius 1800 (pre-W4)",
+    "source": "cubemap"
+   },
+   "source": "ART-005 editor probe reproduced for the opt-in Cobble review (S08BoardActor before T3.2); measured candidate, not a lighting norm",
+   "units": {
+    "directional": "lux",
+    "point": "candelas"
+   }
+  },
+  "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json lightProfiles.cobble-probe"
+ },
+ "original_level": "/Game/S08/S08Arena",
+ "restored_level": "/Game/S08/S08Arena",
+ "restored_level_dirty": false,
+ "review_level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+ "review_level_dirty_after_reload": false,
+ "run_assets_dirty": {
+  "base": false,
+  "base_instance": false,
+  "extra:MI_Harpy_H3LD_DebugClass": false,
+  "extra:MI_Harpy_H3LD_Neutral": false,
+  "figure_instance": false,
+  "skeletal": false,
+  "team:base:P1": false,
+  "team:base:P2": false,
+  "team:figure:P1": false,
+  "team:figure:P2": false,
+  "texture:BC": false,
+  "texture:BaseBC": false,
+  "texture:BaseN": false,
+  "texture:BaseORM": false,
+  "texture:Edge": false,
+  "texture:LUT": false,
+  "texture:MatID": false,
+  "texture:N": false,
+  "texture:ORM": false,
+  "texture:TeamAccent": false
+ },
+ "scalability_after": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_before": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_during": {
+  "sg.AntiAliasingQuality": 2,
+  "sg.EffectsQuality": 2,
+  "sg.FoliageQuality": 2,
+  "sg.GlobalIlluminationQuality": 2,
+  "sg.PostProcessQuality": 2,
+  "sg.ReflectionQuality": 2,
+  "sg.ShadingQuality": 2,
+  "sg.ShadowQuality": 2,
+  "sg.TextureQuality": 2,
+  "sg.ViewDistanceQuality": 2
+ },
+ "schema": "unmatched.um-v2-hero-lookdev/1",
+ "screen_percentage": {
+  "r.Editor.Viewport.ScreenPercentage": 100,
+  "r.ScreenPercentage": 100
+ },
+ "setup": {
+  "hidden_review_actors": [
+   "P17 arthur base",
+   "P17 arthur figure",
+   "P17 barrel",
+   "P17 harpy1 base",
+   "P17 harpy1 figure",
+   "P17 harpy2 base",
+   "P17 harpy2 figure",
+   "P17 harpy3 base",
+   "P17 harpy3 figure",
+   "P17 medusa base",
+   "P17 medusa figure",
+   "P17 merlin base",
+   "P17 merlin figure"
+  ],
+  "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+  "lights_after": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "LDue sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "lights_before": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 4,
+    "dynamic_shadow_distance_movable_light": 40000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 700.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "op": "setup"
+ },
+ "started_at": "2026-09-30T04:23:37+00:00",
+ "tag": "i3",
+ "tool": "tools/art/material_library/ue_hero_lookdev.py",
+ "warmup_mean_abs_diff": [
+  0.6861,
+  0.5817,
+  0.5561,
+  0.5827,
+  0.5735,
+  0.5553,
+  0.5556,
+  0.579,
+  0.5925,
+  0.5833,
+  0.5574,
+  0.5772,
+  0.5509,
+  0.5857,
+  0.5742,
+  0.5714,
+  0.583,
+  0.5902,
+  0.5718,
+  0.5793,
+  0.5859,
+  0.5779,
+  0.5655,
+  0.5518,
+  0.5895,
+  0.5583,
+  0.5708,
+  0.5812,
+  0.5515,
+  0.5649,
+  0.5564,
+  0.565,
+  0.5815,
+  0.5761,
+  0.5665,
+  0.5776,
+  0.5595,
+  0.5626,
+  0.5814
+ ]
+}

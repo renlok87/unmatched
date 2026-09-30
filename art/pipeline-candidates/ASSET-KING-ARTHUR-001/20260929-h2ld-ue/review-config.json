@@ -1,0 +1,202 @@
+{
+ "hero": "KingArthur",
+ "run_dir": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2ld-ue-import",
+ "concept": {
+  "front": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-front.png",
+  "side": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-side.png",
+  "back": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-back.png"
+ },
+ "concept_zones": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2ld-ue/concept-zones.json",
+ "variants": {
+  "neutral": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral",
+  "P1": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P1",
+  "P2": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P2",
+  "debug": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_DebugClass"
+ },
+ "base_mi": {
+  "neutral": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base",
+  "P1": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base_P1",
+  "P2": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base_P2",
+  "debug": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base"
+ },
+ "zones": [
+  "steel",
+  "gold",
+  "embroidery",
+  "cloth",
+  "belt",
+  "face_skin",
+  "hair"
+ ],
+ "zone_class": {
+  "steel": "steel_blued",
+  "gold": "gold_antique",
+  "embroidery": "silk",
+  "cloth": "wool_coarse",
+  "belt": "leather_worn",
+  "face_skin": "skin",
+  "hair": "legacy_bake"
+ },
+ "decode_classes": [
+  "steel_blued",
+  "steel_polished",
+  "gold_antique",
+  "silk",
+  "wool_coarse",
+  "leather_worn",
+  "skin"
+ ],
+ "key_zones": [
+  "steel",
+  "gold",
+  "cloth",
+  "face_skin"
+ ],
+ "tolerance_zones": [
+  "steel",
+  "gold",
+  "embroidery",
+  "cloth",
+  "belt",
+  "face_skin"
+ ],
+ "anchor_zone": "cloth",
+ "tolerance": {
+  "luma_ratio": 0.15,
+  "hue_deg": 12.0,
+  "sat": 0.1,
+  "hue_min_sat": 0.1
+ },
+ "render_gates": {},
+ "gate_on_variant": "neutral",
+ "min_px": 150,
+ "reading_bias_ev": -1.0,
+ "team_variants": [
+  "P1",
+  "P2"
+ ],
+ "sheet_label": "UE H2LD",
+ "shots": {
+  "neutral": [
+   "front",
+   "side",
+   "back",
+   "k2-5x",
+   "k2-1p6"
+  ],
+  "P1": [
+   "front",
+   "side",
+   "back",
+   "k2-5x",
+   "k2-1p6"
+  ],
+  "P2": [
+   "front",
+   "side",
+   "back",
+   "k2-5x",
+   "k2-1p6"
+  ],
+  "debug": [
+   "front",
+   "side",
+   "back"
+  ],
+  "plate": [
+   "front",
+   "side",
+   "back"
+  ],
+  "reading": [
+   "front",
+   "side",
+   "back",
+   "k2-5x"
+  ]
+ },
+ "previous": [],
+ "debug_calibration": {
+  "0": [
+   16.1,
+   16.4,
+   16.3
+  ],
+  "1": [
+   145.9,
+   186.9,
+   219.2
+  ],
+  "10": [
+   219.9,
+   224.0,
+   159.6
+  ],
+  "11": [
+   220.9,
+   153.8,
+   220.2
+  ],
+  "12": [
+   159.1,
+   218.4,
+   198.0
+  ],
+  "13": [
+   223.9,
+   177.7,
+   146.8
+  ],
+  "14": [
+   145.1,
+   164.7,
+   219.3
+  ],
+  "15": [
+   187.9,
+   220.5,
+   149.7
+  ],
+  "2": [
+   203.3,
+   222.2,
+   154.1
+  ],
+  "3": [
+   227.7,
+   148.4,
+   214.8
+  ],
+  "4": [
+   166.1,
+   219.9,
+   214.6
+  ],
+  "5": [
+   224.5,
+   205.9,
+   154.9
+  ],
+  "6": [
+   185.3,
+   155.9,
+   221.9
+  ],
+  "7": [
+   158.1,
+   223.7,
+   152.2
+  ],
+  "8": [
+   228.6,
+   147.7,
+   188.0
+  ],
+  "9": [
+   158.8,
+   209.9,
+   221.2
+  ]
+ },
+ "debug_calibration_source": "docs/art-pipeline/material-library/evidence/v2.1-accent/wall/um-v2-accent-report.json measurements.debug_class_calibration_srgb (look-dev C, M_UM_Figure_v2.1 DebugView 1 on the P1.7 Cobble scene, EV100 1.3; the hue decode cannot split steel_blued 1 from wool_coarse 9)"
+}

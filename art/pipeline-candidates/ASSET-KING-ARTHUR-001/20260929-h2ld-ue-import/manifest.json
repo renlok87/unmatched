@@ -1,0 +1,528 @@
+{
+  "asset_id": "ASSET-KING-ARTHUR-001",
+  "claims": {
+    "art_accepted": false,
+    "budgets_declared": false,
+    "game_ready": false,
+    "note": "technical pipeline evidence only"
+  },
+  "config": {
+    "build_profile": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2ld-lookdev-ue-import.json",
+    "export_basename": "SK_KingArthur_H2LD",
+    "primary_role": "h2-parts-glb",
+    "primary_source": "tripo-c24eeff0-h2",
+    "profile": "skeletal-adopt",
+    "triangle_loss_tolerance": 0.001,
+    "ue": {
+      "asset_name": null,
+      "dimension_tolerance": 0.01,
+      "folder": "/Game/PipelineCandidates/KingArthur/H2LD",
+      "import_materials": false,
+      "import_note": "skeletal-adopt: meshes imported with import_materials=false, import_textures=false; textures are the adopted 2K runtime PNGs",
+      "import_textures": false
+    }
+  },
+  "created_at": "2026-09-30T03:01:28+00:00",
+  "exports": [],
+  "generation_requests": [],
+  "network": {
+    "paid_tasks_created": 0,
+    "policy": "no network code; Tripo results are registered from existing local files",
+    "tripo_calls": 0
+  },
+  "run_id": "20260929-h2ld-ue-import",
+  "schema": "unmatched.tripo-pipeline.run/1",
+  "sources": {
+    "tripo-c24eeff0-h2": {
+      "evidence": [
+        {
+          "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/reports/tripo-run.json",
+          "sha256": "d3f98f8e2cc76b7383043f59d04a104099c083a0dc9feeb297e57978740e8752"
+        },
+        {
+          "path": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json",
+          "sha256": "6eec58ae8f7c7e4698af63b6bac3a8fdd88f4d7626c97ab1e5852777fe8c35ca"
+        }
+      ],
+      "files": [
+        {
+          "bytes": 47962564,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+          "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/source/king-arthur-h2-tripo-c24eeff0-parts21.glb",
+          "produced_by": "generate",
+          "role": "h2-parts-glb",
+          "sha256": "9920f86fb91bbc24e66a143b3ea0136ead2e85f664c0930a7332d5a07309c466",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 0,
+            "materials": 1,
+            "mesh_count": 21,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 648280
+              },
+              {
+                "name": "meshes[10]",
+                "triangles": 43826
+              },
+              {
+                "name": "meshes[11]",
+                "triangles": 43377
+              },
+              {
+                "name": "meshes[12]",
+                "triangles": 48485
+              },
+              {
+                "name": "meshes[13]",
+                "triangles": 30913
+              },
+              {
+                "name": "meshes[14]",
+                "triangles": 24542
+              },
+              {
+                "name": "meshes[15]",
+                "triangles": 20588
+              },
+              {
+                "name": "meshes[16]",
+                "triangles": 17073
+              },
+              {
+                "name": "meshes[17]",
+                "triangles": 12000
+              },
+              {
+                "name": "meshes[18]",
+                "triangles": 11806
+              },
+              {
+                "name": "meshes[19]",
+                "triangles": 8344
+              },
+              {
+                "name": "meshes[1]",
+                "triangles": 214969
+              },
+              {
+                "name": "meshes[20]",
+                "triangles": 3989
+              },
+              {
+                "name": "meshes[2]",
+                "triangles": 139983
+              },
+              {
+                "name": "meshes[3]",
+                "triangles": 112180
+              },
+              {
+                "name": "meshes[4]",
+                "triangles": 206396
+              },
+              {
+                "name": "meshes[5]",
+                "triangles": 113005
+              },
+              {
+                "name": "meshes[6]",
+                "triangles": 95643
+              },
+              {
+                "name": "meshes[7]",
+                "triangles": 78002
+              },
+              {
+                "name": "meshes[8]",
+                "triangles": 60336
+              },
+              {
+                "name": "meshes[9]",
+                "triangles": 56625
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1990362
+          }
+        },
+        {
+          "bytes": 76905596,
+          "hash_check": "matches_evidence",
+          "origin": "Studio GLB export после текстуры 8K (удалить освещение) и PBR, unmodified",
+          "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/source/king-arthur-h2-tripo-c24eeff0-tex8k-pbr.glb",
+          "produced_by": "pbr",
+          "role": "h2-tex8k-pbr-glb",
+          "sha256": "60633dd9d1e5ea10c059d646c24bb1ea0d969c4ae1f0d47df4218b62252d4b82",
+          "structure": {
+            "animations": 0,
+            "format": "glb",
+            "generator": "Tripo",
+            "gltf_version": 2,
+            "images": 63,
+            "materials": 21,
+            "mesh_count": 21,
+            "meshes": [
+              {
+                "name": "meshes[0]",
+                "triangles": 648280
+              },
+              {
+                "name": "meshes[10]",
+                "triangles": 43826
+              },
+              {
+                "name": "meshes[11]",
+                "triangles": 43377
+              },
+              {
+                "name": "meshes[12]",
+                "triangles": 48485
+              },
+              {
+                "name": "meshes[13]",
+                "triangles": 30913
+              },
+              {
+                "name": "meshes[14]",
+                "triangles": 24542
+              },
+              {
+                "name": "meshes[15]",
+                "triangles": 20588
+              },
+              {
+                "name": "meshes[16]",
+                "triangles": 17073
+              },
+              {
+                "name": "meshes[17]",
+                "triangles": 12000
+              },
+              {
+                "name": "meshes[18]",
+                "triangles": 11806
+              },
+              {
+                "name": "meshes[19]",
+                "triangles": 8344
+              },
+              {
+                "name": "meshes[1]",
+                "triangles": 214969
+              },
+              {
+                "name": "meshes[20]",
+                "triangles": 3989
+              },
+              {
+                "name": "meshes[2]",
+                "triangles": 139983
+              },
+              {
+                "name": "meshes[3]",
+                "triangles": 112180
+              },
+              {
+                "name": "meshes[4]",
+                "triangles": 206396
+              },
+              {
+                "name": "meshes[5]",
+                "triangles": 113005
+              },
+              {
+                "name": "meshes[6]",
+                "triangles": 95643
+              },
+              {
+                "name": "meshes[7]",
+                "triangles": 78002
+              },
+              {
+                "name": "meshes[8]",
+                "triangles": 60336
+              },
+              {
+                "name": "meshes[9]",
+                "triangles": 56625
+              }
+            ],
+            "primitive_modes": [
+              4
+            ],
+            "skins": 0,
+            "triangles": 1990362
+          }
+        }
+      ],
+      "generation_inputs": [
+        {
+          "path": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-back.png",
+          "present": true,
+          "sha256": "6e00c1c20ae82ca771a5c1ca22d5afc7234a9955fee892d4dba7feac3c64de55",
+          "view": "back"
+        },
+        {
+          "path": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-front.png",
+          "present": true,
+          "sha256": "26399f6fa7a52178b022902a871be689c91570c75b5d8e7e313b13c67227d2c5",
+          "view": "front"
+        },
+        {
+          "path": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-side.png",
+          "present": true,
+          "sha256": "3bb174aa58df24dea8ac9589562cc1cc376e58b6fed5fcb2c56494bd0a5bbe7b",
+          "view": "right"
+        }
+      ],
+      "historical_credits_observed": {
+        "studio-credits": 95
+      },
+      "registered_at": "2026-09-30T03:01:28+00:00",
+      "registered_by": "tripo-pipeline 0.8.0",
+      "spec": {
+        "asset_id": "ASSET-KING-ARTHUR-001",
+        "date": "2026-09-29",
+        "evidence": [
+          "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/reports/tripo-run.json",
+          "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json"
+        ],
+        "expectations": {
+          "h2-parts-glb": {
+            "armatures": 0,
+            "glb_images": 0,
+            "glb_materials": 1,
+            "glb_mesh_count": 21,
+            "glb_skins": 0,
+            "glb_triangles": 1990362
+          },
+          "h2-tex8k-pbr-glb": {
+            "armatures": 0,
+            "glb_images": 63,
+            "glb_materials": 21,
+            "glb_mesh_count": 21,
+            "glb_skins": 0,
+            "glb_triangles": 1990362
+          }
+        },
+        "files": [
+          {
+            "expected_bytes": 47962564,
+            "expected_sha256": "9920f86fb91bbc24e66a143b3ea0136ead2e85f664c0930a7332d5a07309c466",
+            "in_git": false,
+            "origin": "Studio GLB export, high-poly по частям без текстуры, unmodified",
+            "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/source/king-arthur-h2-tripo-c24eeff0-parts21.glb",
+            "produced_by": "generate",
+            "role": "h2-parts-glb"
+          },
+          {
+            "expected_bytes": 76905596,
+            "expected_sha256": "60633dd9d1e5ea10c059d646c24bb1ea0d969c4ae1f0d47df4218b62252d4b82",
+            "in_git": false,
+            "origin": "Studio GLB export после текстуры 8K (удалить освещение) и PBR, unmodified",
+            "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/source/king-arthur-h2-tripo-c24eeff0-tex8k-pbr.glb",
+            "produced_by": "pbr",
+            "role": "h2-tex8k-pbr-glb"
+          }
+        ],
+        "generation": {
+          "concept_prompts": "art/imagegen/hero-quality-v1/king-arthur/prompts.md",
+          "input_manifest": null,
+          "mode": "multi-view",
+          "settings": {
+            "ai_completion": null,
+            "generate_parts": true,
+            "output": "геометрия без текстуры (текстура — отдельным шагом 8K)",
+            "parts_mode": "Баланс (Balanced)",
+            "pbr": true,
+            "polygon_count": 2000000,
+            "privacy": null,
+            "remove_lighting": true,
+            "seed": null,
+            "settings_note": "texture_8k/remove_lighting/pbr — это последующие шаги генератора текстур и PBR на high-poly, а не настройки генерации геометрии. null = не записано.",
+            "texture_8k": true,
+            "topology": null,
+            "ultra_mesh_quality": true
+          },
+          "slot_note": "РАСХОЖДЕНИЕ: по prompts.md боковой концепт нарисован поверх ortho_left (левый вид), а по журналу кредитов и заданию оркестратора подан в слот RIGHT. Прежний H3.1 Arthur (75e27ee8) шёл через слот LEFT. Влияние на геометрию не проверялось; проверить в Blender-этапе сторону меча и контур плаща против front/back (при зеркальной ошибке рука с мечом и складки не совпадут с концептом).",
+          "views": {
+            "back": {
+              "path": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-back.png",
+              "sha256": "6e00c1c20ae82ca771a5c1ca22d5afc7234a9955fee892d4dba7feac3c64de55"
+            },
+            "front": {
+              "path": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-front.png",
+              "sha256": "26399f6fa7a52178b022902a871be689c91570c75b5d8e7e313b13c67227d2c5"
+            },
+            "left": null,
+            "right": {
+              "path": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-side.png",
+              "sha256": "3bb174aa58df24dea8ac9589562cc1cc376e58b6fed5fcb2c56494bd0a5bbe7b"
+            }
+          }
+        },
+        "git_policy": "Сырые GLB (44–77 МБ) не коммитятся: .gitignore ассета исключает 20260929-h2-tripo/source/*-parts*.glb и *-tex8k-pbr.glb; файл восстанавливается выгрузкой из Studio по task_url и проверяется по expected_sha256/expected_bytes",
+        "iteration": "H2 (проработка героев по концептам hero-quality-v1)",
+        "model_version": {
+          "backend": null,
+          "note": "H3.1 со слов оркестратора; подпись UI не записана",
+          "ui_label": null
+        },
+        "operations": [
+          {
+            "credits": {
+              "balance_after": 24085,
+              "balance_before": 24145,
+              "observed_debit": 60,
+              "quoted": 60,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/reports/tripo-run.json",
+            "history_time": "2026-09-29 07:01",
+            "mode": "Из нескольких видов в модель, по частям (Баланс), ультра-геометрия 2M, без текстуры",
+            "op": "generate"
+          },
+          {
+            "credits": {
+              "balance_after": 23935,
+              "balance_before": 23965,
+              "observed_debit": 30,
+              "quoted": 30,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/reports/tripo-run.json",
+            "history_time": "2026-09-29 07:12",
+            "mode": "Генератор текстур 8K, удалить освещение, на high-poly модели по частям",
+            "op": "texture"
+          },
+          {
+            "credits": {
+              "balance_after": 23865,
+              "balance_before": 23870,
+              "observed_debit": 5,
+              "quoted": 5,
+              "unit": "studio-credits"
+            },
+            "evidence": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-tripo/reports/tripo-run.json",
+            "history_time": "2026-09-29 07:18",
+            "mode": "Генератор PBR после 8K",
+            "op": "pbr"
+          }
+        ],
+        "parent_task_id": null,
+        "schema": "unmatched.tripo-pipeline.source-spec/1",
+        "service": "tripo-studio",
+        "source_id": "tripo-c24eeff0-h2",
+        "task_id": "c24eeff0-9b29-4968-8b21-1daa39ead4d8",
+        "task_url": "https://studio.tripo3d.ai/ru/workspace/generate/c24eeff0-9b29-4968-8b21-1daa39ead4d8"
+      },
+      "spec_sha256": "032da3dd98906a9db6036928cca52c275f8142ebbbd37a614d08d1f6a1a958bc"
+    }
+  },
+  "stages": {
+    "adopt": {
+      "attempts": 3,
+      "backend": "headless",
+      "fingerprint": "0ee19374659fc0e2316aceb66c8f4dc7123efb0309131576572e60271ce8f6ca",
+      "finished_at": "2026-09-30T03:40:03+00:00",
+      "outputs": {
+        "reports/adopt-report.json": {
+          "bytes": 28654,
+          "sha256": "caa6408d3abf29bbde9a05e5d99d58d7dd1add0d4aa9251d9fb4ddc013d83426"
+        }
+      },
+      "started_at": "2026-09-30T03:40:03+00:00",
+      "status": "completed",
+      "summary": {
+        "failed_checks": [],
+        "inputs": 15,
+        "passed": true
+      },
+      "tool_version": "0.8.0"
+    },
+    "preflight": {
+      "attempts": 3,
+      "backend": "headless",
+      "fingerprint": "318539d37671ccee6cb11ae55a542e833ec98da2e1f5476f18525de3811c103c",
+      "finished_at": "2026-09-30T03:40:03+00:00",
+      "outputs": {
+        "reports/preflight.json": {
+          "bytes": 3862,
+          "sha256": "f5a8612cba3c9a3f135e4e1fa11c5d1815da52bc3da1101d4956a38160c6a71c"
+        }
+      },
+      "started_at": "2026-09-30T03:01:29+00:00",
+      "status": "completed",
+      "summary": {
+        "failed_checks": [],
+        "passed": true,
+        "sources_verified": 2
+      },
+      "tool_version": "0.8.0"
+    },
+    "ue-import": {
+      "attempts": 3,
+      "backend": "mcp",
+      "fingerprint": "8bf6a89998195f6ed8ef177e5f2ae72016f113cb027745b65a813d56a32602a6",
+      "finished_at": "2026-09-30T03:44:00+00:00",
+      "outputs": {
+        "reports/ue-import-report.json": {
+          "bytes": 50717,
+          "sha256": "c7d182e55680f75b03ec7161caa7966bef906f40fa666e6f2a51825a29e6efa1"
+        },
+        "reports/ue-mcp-calls.json": {
+          "bytes": 206749,
+          "sha256": "7b45b330ccbad9186dbdcfdd88d7303502e83273d0ea67fc68cfa4f18320860c"
+        }
+      },
+      "started_at": "2026-09-30T03:40:03+00:00",
+      "status": "completed",
+      "summary": {
+        "assets": 17,
+        "failed_checks": [],
+        "kind": "skeletal-adopt",
+        "passed": true,
+        "primary_asset": "/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD"
+      },
+      "tool_version": "0.8.0",
+      "ue_owned_assets": [
+        "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base_P1",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base_P2",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_DebugClass",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P1",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P2",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SM_KingArthur_H2LD_Base",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_KingArthur_H2LD_BC",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_KingArthur_H2LD_EdgeMask",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_KingArthur_H2LD_MatID",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_KingArthur_H2LD_N",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_KingArthur_H2LD_ORM",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_KingArthur_H2LD_TeamAccent",
+        "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_UM_MatLUT_Arthur"
+      ]
+    }
+  },
+  "status_legend": {
+    "art_accepted": "художественно принято — только решением арт-трека; этот инструмент его не ставит",
+    "measured": "измерено — число получено инструментом из файла",
+    "proposed": "предложено — план или норматив без проверки",
+    "technically_imported": "технически импортировано — файл прочитан/записан без ошибок, контракты проверены"
+  },
+  "tool": {
+    "name": "tripo-pipeline",
+    "version": "0.8.0"
+  }
+}

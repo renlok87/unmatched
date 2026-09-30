@@ -1,0 +1,232 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "profile_id": "king-arthur-h2ld-lookdev-ue-import/1",
+  "asset_id": "ASSET-KING-ARTHUR-001",
+  "kind": "skeletal-adopt",
+  "status": "proposed",
+  "status_note": "Look-dev C, группа B (2026-09-30): UE-импорт прогона look-dev Arthur 20260929-h2-lookdev (профиль king-arthur-h2-lookdev/1: геометрия и риг H2.2 без изменений + UV1 в метрах, MatID, EdgeMask, BC по концепту, TeamAccent ред. 2) через CLI skeletal-adopt (tripo-pipeline 0.8.0) на канонический скелет героя. adopt сверяет FBX, карты 2K и LUT героя с отчётами look-dev (нормализатор h2-lookdev-arthur/1, skeletal_adopt_lookdev.lookdev_arthur; кости, сокеты и границы — вид H2 бейка через профиль W5c-A king-arthur-h2-ue-import/1), ue-import создаёт MI мастера /Game/UM/Materials/v2/M_UM_Figure_v2 (v2.1: UseTeamAccent, TeamAccentTexture, TeamDyeCeiling) и M_UM_BaseMarker. Командные MI — палитра C-11 P1 #E8C06A / P2 #5A7F9F (решение «Акценты + кольцо»: цвет команды только на акцентах TeamAccent). Статус максимум «технически импортировано»/«измерено»; художественной приёмки нет, бюджета нет (GD-058 открыт).",
+  "derived_from": [
+    "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2ld-lookdev-ue-import.json (skeletal-adopt ue-раздел look-dev A на M_UM_Figure_v2)",
+    "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-ue-import.json (W5c-A: риг, сокеты, оси, подставка, target_skeleton)",
+    "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-lookdev.json (look-dev: классы MatID, LUT, UV1, TeamAccent)",
+    "docs/art-pipeline/material-library/m-um-figure-v2.md (параметры MI M_UM_Figure_v2.1), docs/art-pipeline/material-library/team-accent.md (правило усиления)"
+  ],
+  "source_role": "h2-parts-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "candidate": {
+    "dir": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev",
+    "report_format": "h2-lookdev-arthur/1",
+    "bake_profile": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-lookdev.json",
+    "bake_profile_id": "king-arthur-h2-lookdev/1",
+    "build_report": "reports/ld-export-report.json",
+    "textures_report": "reports/textures-report.json",
+    "extra_reports": {
+      "ue_inputs": "ue-inputs/ue-inputs-report.json",
+      "ld_report": "reports/ld-report.json",
+      "ld_manifest": "reports/manifest-ld.json"
+    },
+    "h2_adopt_profile": {
+      "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-ue-import.json",
+      "sha256": "87ba1d3f2555fcde65d44dabf9de6bae1849187b59f735f00c0fa28e45869b1c",
+      "note": "W5c-A профиль H2: нормализатор arthur_h2 читает по нему rig-report / textures-report / manifest / validate бейка 20260929-h2-bake (кости, сокеты, границы round-trip, верх фигуры)"
+    },
+    "fbx": {
+      "skeletal": "export/SK_KingArthur_H2LD.fbx",
+      "base": "export/SM_KingArthur_H2LD_Base.fbx"
+    },
+    "body_object": "SK_KingArthur_H2_Body",
+    "top_part": "tripo_part_6",
+    "textures": {
+      "BC": "textures/T_KingArthur_H2LD_BC_2K.png",
+      "N": "textures/T_KingArthur_H2LD_N_2K.png",
+      "ORM": "textures/T_KingArthur_H2LD_ORM_2K.png",
+      "MatID": "textures/T_KingArthur_H2LD_MatID_2K.png",
+      "EdgeMask": "ue-inputs/T_KingArthur_H2LD_EdgeMask_2K.png",
+      "TeamAccent": "textures/T_KingArthur_H2LD_TeamAccent_2K.png"
+    },
+    "textures_note": "только карты 2K (коммит); 4K-мастера локальные. EdgeMask — выход lookdev_ue_inputs.py (TeamMaskRGBA.A), как предлагает look-dev (king-arthur-lookdev-v2.md §10). Прежний TeamMask (вся красная ткань) deprecated и не импортируется: MI v2.1 красит по TeamAccentTexture, TeamMaskTexture = T_UM_Mask_Black (team_color_mode none)",
+    "library_inputs": {
+      "LUT": {
+        "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2ld-ue/lut/T_UM_MatLUT_Arthur_UE.dds",
+        "sha256": "011b1518b3501a972ba23ba50c3455bef46098f3cb31a04b935680c59d9d7f87",
+        "note": "LUT героя 16 x 16 RGBA16F (раскладка build_ue_inputs.py, строки 0-9) текущей итерации UE look-dev (ue_hero_lookdev.py lut); i0 = ue-inputs/T_UM_MatLUT_Arthur.dds look-dev байт в байт"
+      }
+    },
+    "texture_px": 2048,
+    "texture_tier": "runtime_2k",
+    "conventions_required": {
+      "BC": "sRGB",
+      "N": "DirectX",
+      "ORM": "R AO, G roughness, B metallic",
+      "MatID": "x 16 + 8",
+      "EdgeMask": "linear",
+      "TeamAccent": "linear"
+    }
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "skeleton": "UM_HUMANOID_17_v2",
+    "bones": [
+      ["root", null],
+      ["hips", "root"],
+      ["spine", "hips"],
+      ["head", "spine"],
+      ["arm_upper.L", "spine"],
+      ["arm_lower.L", "arm_upper.L"],
+      ["hand.L", "arm_lower.L"],
+      ["arm_upper.R", "spine"],
+      ["arm_lower.R", "arm_upper.R"],
+      ["hand.R", "arm_lower.R"],
+      ["leg_upper.L", "hips"],
+      ["leg_lower.L", "leg_upper.L"],
+      ["foot.L", "leg_lower.L"],
+      ["leg_upper.R", "hips"],
+      ["leg_lower.R", "leg_upper.R"],
+      ["foot.R", "leg_lower.R"],
+      ["weapon.R", "hand.R"]
+    ],
+    "bones_note": "UM_HUMANOID_17_v2: 16 костей тела + weapon.R (меч в правой руке). В UE объект арматуры становится костью 0 (18 костей), '.' -> '_'"
+  },
+  "scale": {
+    "figure_height_m": 0.55,
+    "top_part": "tripo_part_6",
+    "note": "низ подставки -> верх короны (tripo_part_6); острие меча выше (60,06 uu) и в рост не входит"
+  },
+  "meshes": {
+    "body": {"object": "SK_KingArthur_H2_Body"},
+    "weapon": {"object": "SK_KingArthur_H2_Sword", "bone": "weapon.R"},
+    "base": {
+      "object": "SM_KingArthur_H2_Base",
+      "footprint_m": [0.29513, 0.30011, 0.0603],
+      "pivot": "centre of the base bottom",
+      "footprint_note": "как у W5c-A (геометрия подставки look-dev = H2 по каждому полигону, ld-export-report geometry_equal_h2)"
+    }
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "expected_ue_front": "+X",
+    "expected_ue_weapon_side": "+Y",
+    "expected_ue_front_source": "04-blender-production.md §1 «Оси» + §1.1 preset UM_FBX_v1; ld_export измерил фронт по костям −2,13° от +X (как H2)"
+  },
+  "sockets": [
+    {
+      "name": "Weapon",
+      "bone": "weapon.R",
+      "location_uu": [0, 0, 0],
+      "purpose": "Holy Avenger VFX (CUE-014): голова кости weapon.R = центр хвата"
+    },
+    {
+      "name": "Head",
+      "bone": "head",
+      "location_uu": null,
+      "purpose": "damage / status VFX; смещение = предсказание бейка H2 (rig-report sockets[].location_uu_for_ue)"
+    }
+  ],
+  "expectations": {
+    "triangles": {
+      "SK_KingArthur_H2_Body": 36469,
+      "SK_KingArthur_H2_Sword": 2215,
+      "SM_KingArthur_H2_Base": 1500
+    },
+    "bones": 17,
+    "skeletal_material_slots": 1,
+    "base_material_slots": 1,
+    "skeletal_lods": 1,
+    "note": "треугольники look-dev = H2 (ld-export-report triangles_equal_h2); FBX несёт только LOD0"
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "ориентир H2 (king-arthur-h2-ue-import.json) — ПРЕДЛОЖЕНИЕ до решения GD-058, не бюджет",
+    "hero_triangles": [30000, 45000],
+    "texture_px": 2048,
+    "material_slots_max": 2,
+    "height_uu": [52, 56],
+    "base_diameter_uu": 30,
+    "base_height_uu": 6
+  },
+  "ue": {
+    "folder_note": "запуск: ue-import --ue-folder /Game/PipelineCandidates/KingArthur/H2LD (второй редактор арт-worktree, UE_MCP_URL=http://127.0.0.1:8124/mcp)",
+    "skeletal_asset": "SK_KingArthur_H2LD",
+    "base_asset": "SM_KingArthur_H2LD_Base",
+    "material_route": "um-master",
+    "masters": {
+      "figure": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+      "base": "/Game/UM/Materials/M_UM_BaseMarker"
+    },
+    "masters_note": "фигура на M_UM_Figure_v2 (v2.1, static switch UseTeamAccent); подставка на M_UM_BaseMarker v1 (полоса команды на боковой стенке)",
+    "figure_instance": "MI_KingArthur_H2LD",
+    "base_instance": "MI_KingArthur_H2LD_Base",
+    "teams": {
+      "P1": "#E8C06A",
+      "P2": "#5A7F9F"
+    },
+    "teams_note": "активная палитра C-11 (art/um-materials/um-masters.json team_palette c11_value_split_proposal), как у TeamAccent look-dev; линейные значения только через FLinearColor::FromSRGBColor (AD-OPEN-39)",
+    "default_team": "P1",
+    "team_instances": {
+      "figure": "MI_KingArthur_H2LD_{team}",
+      "base": "MI_KingArthur_H2LD_Base_{team}"
+    },
+    "team_color_mode": "none",
+    "team_color_mode_note": "v2.1: краситель по TeamAccentTexture (UseTeamAccent = true), TeamMaskTexture = T_UM_Mask_Black; решение пользователя «Акценты + кольцо»: плащ и табард красные, цвет команды — полоса вдоль кайм плаща и пояс (TeamAccent ред. 2, 5,53 % фигуры)",
+    "figure_parameters": {
+      "TeamDye": 1.0,
+      "TeamDyeGain": 19.8955,
+      "TeamDyeCeiling": 9.9437
+    },
+    "figure_parameters_note": "team-accent.md (v2.1, LDV-13): TeamDyeGain = 0.8 / Y_p50, TeamDyeCeiling = 0.9 / Y_p95 по BC под акцентом (ld-tone-report.json team_dye_gain.accent_Y_p50_p95 = 0.04021 / 0.09051); шейдер берёт min(gain, ceiling / maxChannel(TeamColor)): P1 (max 0.807) -> 12.32 (= Blender-предложение 12), P2 (max 0.347) -> 19.90. ld-team-accent-ue.json у Arthur нет — числа из ld-tone-report",
+    "figure_textures": {
+      "MatIDTexture": "MatID",
+      "MatLUT": "LUT",
+      "EdgeMaskTexture": "EdgeMask",
+      "TeamAccentTexture": "TeamAccent"
+    },
+    "figure_static_switches": {
+      "UseUV1Metres": true,
+      "UseTeamAccent": true
+    },
+    "extra_instances": [
+      {
+        "asset": "MI_KingArthur_H2LD_Neutral",
+        "parent": "figure_instance",
+        "scalars": {"TeamDye": 0.0},
+        "vectors": {"TeamColor": {"linear": [1.0, 1.0, 1.0, 1.0]}},
+        "note": "без красителя (TeamColor белый, TeamDye 0 -> dyed = BC): BC look-dev как есть, для сравнения с концептом"
+      },
+      {
+        "asset": "MI_KingArthur_H2LD_DebugClass",
+        "parent": "figure_instance",
+        "scalars": {"DebugView": 1.0},
+        "note": "маска классов MatID для замера зон (цвет класса в emissive, поверхность чёрная)"
+      }
+    ],
+    "base_marker": {
+      "textures": true,
+      "parameters": {
+        "SideBandWeight": 1.0,
+        "VertexMaskWeight": 0.0
+      },
+      "note": "текстурированная подставка (атлас фигуры, как W5c-A): полоса команды — боковая стенка, плоский TeamColor"
+    },
+    "base_generate_lightmap_uvs": false,
+    "base_generate_lightmap_uvs_note": "FBX подставки несёт UV1_m (метры); генерация lightmap UV перезаписала бы UV1",
+    "expect_uv_channels": 2,
+    "target_skeleton": "/Game/PipelineCandidates/KingArthur/Rig/SK_KingArthur_Skeleton",
+    "target_skeleton_note": "канонический скелет героя (H2Anim, tools/tripo-pipeline/anim/h2anim_ue.py skeleton); клипы /Game/PipelineCandidates/KingArthur/H2Anim/AM_* привязаны к нему; прогон его не создаёт и не удаляет",
+    "textures": {
+      "BC": {"file_key": "BC", "asset": "T_KingArthur_H2LD_BC", "srgb": true, "compression": "TC_Default"},
+      "N": {"file_key": "N", "asset": "T_KingArthur_H2LD_N", "srgb": false, "compression": "TC_Normalmap", "flip_green": false,
+            "note": "DirectX (= H2.2)"},
+      "ORM": {"file_key": "ORM", "asset": "T_KingArthur_H2LD_ORM", "srgb": false, "compression": "TC_Masks"},
+      "MatID": {"file_key": "MatID", "asset": "T_KingArthur_H2LD_MatID", "srgb": false, "compression": "TC_Grayscale",
+                "properties": {"Filter": "TF_Nearest", "MipGenSettings": "TMGS_NoMipmaps", "NeverStream": true},
+                "note": "R8 индекс x 16 + 8, читается Load (m-um-figure-v2 §3.1): G8, point, без мипов, не стримится"},
+      "EdgeMask": {"file_key": "EdgeMask", "asset": "T_KingArthur_H2LD_EdgeMask", "srgb": false, "compression": "TC_Grayscale",
+                   "note": "линейная маска кромок (EdgeMaskTexture)"},
+      "TeamAccent": {"file_key": "TeamAccent", "asset": "T_KingArthur_H2LD_TeamAccent", "srgb": false, "compression": "TC_Grayscale",
+                     "note": "TeamAccent L8 линейная, мипы обычные (маска фильтруется; team-accent.md §1)"},
+      "LUT": {"file_key": "LUT", "asset": "T_UM_MatLUT_Arthur", "srgb": false, "compression": "TC_HDR", "px": [16, 16],
+              "properties": {"Filter": "TF_Nearest", "MipGenSettings": "TMGS_NoMipmaps", "NeverStream": true},
+              "note": "LUT героя 16 x 16 RGBA16F, только Load: HDR, point, без мипов, не стримится"}
+    },
+    "measure_skeletal_triangles": true
+  }
+}

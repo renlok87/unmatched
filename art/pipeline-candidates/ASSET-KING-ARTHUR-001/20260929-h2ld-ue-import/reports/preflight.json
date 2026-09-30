@@ -1,0 +1,135 @@
+{
+  "backend": "headless",
+  "checks": {
+    "backend_known": {
+      "measured": {
+        "backend": "headless",
+        "command": [
+          "blender.exe"
+        ],
+        "isolation": "process"
+      },
+      "passed": true
+    },
+    "blender_runnable": {
+      "backend": "headless",
+      "measured": "5.2.2 LTS",
+      "passed": true
+    },
+    "blender_stage_scripts_present": {
+      "passed": true,
+      "scripts": {
+        "ao_bake": "65c52d16fd0889ad1aecea2bf2e626fc62a5db489256678ce9d41e5467156357",
+        "build": "aa06c507ed4a152f15bb926f5cf45bbed413fc6996eafaec22626c23152851bf",
+        "export": "50f440a29b0be261c151062d6be81899bf89eace819081fa388fb589ffcd53c2",
+        "import": "e19cbd5d59db3fa4a48ea7d790fc02ad2cbd2bfde11e78bb91df19c8ae73f49d"
+      }
+    },
+    "build_profile_role_is_primary": {
+      "expected": "h2-parts-glb",
+      "measured": "h2-parts-glb",
+      "passed": true
+    },
+    "build_profile_valid": {
+      "expected": {
+        "kind": "skeletal-adopt"
+      },
+      "measured": {
+        "id": "king-arthur-h2ld-lookdev-ue-import/1",
+        "kind": "skeletal-adopt",
+        "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2ld-lookdev-ue-import.json",
+        "sha256": "87325d68998daae18fab4f485095085d196eb5ffb32fb7ef1090e18b1975d121"
+      },
+      "passed": true
+    },
+    "fbx_preset_is_um_fbx_v1": {
+      "expected": {
+        "name": "UM_FBX_v1",
+        "rotation_z": 90.0,
+        "use_triangles": true
+      },
+      "measured": {
+        "name": "UM_FBX_v1",
+        "rel": "blender/_tools/presets/UM_FBX_v1.json",
+        "rotation_z": 90.0,
+        "sha256": "06cb69892de24ec48c662bf3ed54b6d711e45c68b65cb51e625bf6a5b94f86f3",
+        "use_triangles": true
+      },
+      "note": "axes standard 04-blender-production.md §1 (authored -Y -> UE +X), verified by ART-001",
+      "passed": true
+    },
+    "originals_outside_run_dir": {
+      "offenders": [],
+      "passed": true
+    },
+    "primary_source_registered": {
+      "measured": "tripo-c24eeff0-h2:h2-parts-glb",
+      "passed": true
+    },
+    "profile": {
+      "measured": "skeletal-adopt",
+      "passed": true,
+      "required": false
+    },
+    "python_version": {
+      "measured": "3.13",
+      "passed": true
+    },
+    "repo_root_is_git_checkout": {
+      "passed": true
+    },
+    "skeletal_adopt_module_present": {
+      "measured": "d64798c7e21732c9b95f0f9bbff7c1a70981e1867a9ae735f7e1a35366abe13a",
+      "passed": true
+    },
+    "skeletal_candidate_files_present": {
+      "missing": [],
+      "passed": true
+    },
+    "source_files_present": {
+      "missing": [],
+      "passed": true
+    },
+    "source_files_unchanged_since_registration": {
+      "changed": [],
+      "passed": true,
+      "verified": 2
+    },
+    "sources_registered": {
+      "measured": [
+        "tripo-c24eeff0-h2"
+      ],
+      "passed": true
+    },
+    "tool_has_no_network_imports": {
+      "measured": [],
+      "passed": true
+    },
+    "ue_folder_is_pipeline_candidate": {
+      "measured": "/Game/PipelineCandidates/KingArthur/H2LD",
+      "passed": true
+    },
+    "ue_stage_runnable_with_backend": {
+      "measured": false,
+      "note": "informational; ue-import runs only with --backend mcp (live editor via unreal_mcp.py)",
+      "passed": true,
+      "required": false
+    },
+    "unreal_editor_cmd_present": {
+      "measured": true,
+      "note": "informational; this scaffold never launches UnrealEditor-Cmd",
+      "passed": true,
+      "required": false
+    }
+  },
+  "network": {
+    "paid_tasks_created": 0,
+    "tripo_calls": 0
+  },
+  "passed": true,
+  "stage": "preflight",
+  "tool": {
+    "name": "tripo-pipeline",
+    "version": "0.8.0"
+  }
+}

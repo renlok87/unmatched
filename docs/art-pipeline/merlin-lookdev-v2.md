@@ -719,3 +719,169 @@ k: r3 0.324 (EV100 1.3), 1.199 (−1.5 EV); r5 0.338 и 1.258. Столбцы H2
 - `/Game/PipelineCandidates` не кукается. Packaged-кадры с RENDER, K1–K3 и художественная приёмка не делались.
 - Зависимость от канонического скелета H2Anim (U3). `Rig` входит в манифест этой задачи с `-f`. Если волна H2Anim
   переимпортирует его, копию в арт-worktree и пины реестра нужно обновить.
+
+---
+
+# UE (look-dev C, группа A, 2026-09-30)
+
+Статус: **технически импортировано и измерено** в живом редакторе главного checkout (UnrealEditor PID 31756, MCP :8123,
+DX12/SM6 + Lumen, High `sg.* = 2`, screen percentage 100, TSR). Это не художественная приёмка и не K1–K3: кадры —
+`editor-mcp-viewport`, без отпечатка RENDER. Каждый шаг в редакторе шёл под общей блокировкой `C:/tmp/ue-editor.lock`
+(owner `look-dev-C-A`). После каждого шага открыт `/Game/S08/S08Arena` (не dirty, уровень не сохранялся). Второй
+редактор (:8124) не трогался. Платных операций нет, Blender не запускался. Реестр не менялся (нужные записи — C7).
+
+## C1. Что сделано
+
+- **Скелет.** Меш H2LD уже стоял на каноническом `/Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton` с look-dev A
+  (§U3). Собственного скелета H2LD нет и не было, удалять нечего. Переимпорт ред. 2 оставил его на том же каноническом
+  скелете: проверка `skeleton_is_canonical_target`.
+- **Профиль импорта ред. 2**
+  ([`merlin-h2-lookdev-ue-import.json`](../../art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev-ue-import.json),
+  `merlin-h2-lookdev-ue-import/2`):
+  - `candidate.library_inputs.TeamAccent` — `T_Merlin_H2LD_TeamAccent_2K.png`, sha256 `75972ad3…`
+    (= `ld-accent-report.json`);
+  - `T_Merlin_H2LD_TeamAccent`: `TC_Grayscale`, sRGB выкл., мипы `FromTextureGroup`;
+  - прежний TeamMask W4-B больше не импортируется: `team_color_mode none`, `TeamMaskTexture = T_UM_Mask_Black`;
+  - MI фигуры: `TeamAccentTexture`, `UseTeamAccent = true`, `UseUV1Metres = true`, `TeamDye 1`, `TeamDyeGain 27.1186`,
+    `TeamDyeCeiling 9.018` — правило LDV-13, один MI на обе команды; эффективное усиление P1 11.17, P2 26.01;
+  - команды — активная палитра C-11: `MI_Merlin_H2LD_P1` (#E8C06A) и `_P2` (#5A7F9F), подставки `_Base_P1/_P2`;
+  - `MI_Merlin_H2LD_Neutral`; отладочный MI классов переименован `DebugClasses` → **`DebugClass`**, как у Medusa;
+    `DebugZones` оставлен.
+- Прогон `20260929-h2ld-ue-import` запущен с `--force`: adopt — все проверки, ue-import **25/25**. Папка
+  `/Game/PipelineCandidates/Merlin/H2LD` — 20 uasset.
+  - Новые: `MI_Merlin_H2LD_P1`, `_P2`, `_Base_P1`, `_Base_P2`, `_DebugClass`, `T_Merlin_H2LD_TeamAccent`.
+  - Удалены: `_Blue`, `_Red`, `_Base_Blue`, `_Base_Red`, `_DebugClasses`, `T_Merlin_H2LD_TeamMask`.
+  - Копия в арт-worktree совпадает 20/20 по sha256, удалённые файлы удалены и там.
+- **LUT: две итерации** (UE-5, UE-6) в слое `lut.ue_lookdev` конфига
+  [`merlin-h2-lookdev-ue-lut.json`](../../art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev-ue-lut.json).
+  Входы UE пересобраны `lookdev_ue_inputs.py`; без правки пересборка даёт те же байты. Итог:
+  `ue-inputs/T_UM_MatLUT_Merlin.dds` `c7f09bc6…`, `ue-inputs-report.json` `dc48c60c…`.
+
+## C2. Проверки в UE (`20260930-h2ld-ldc-ue/verify/verify-final.json`, 14/14)
+
+| Проверка | Результат |
+|---|---|
+| Скелет | `Rig/SK_Merlin_Skeleton`, в папке H2LD скелетов нет |
+| Кость 0 и иерархия v2 | кость 0 `SKEL_UM_Humanoid`, 18 костей v2 с `weapon_R`; иерархия — проверка CLI `bones_profile_17_present_with_hierarchy` |
+| Лицо +X | проверки CLI `front_axis_as_fbx_preset` и `skeletal_bounds_match_build_front_unambiguous`; границы (−10.30, −12.12, 4.76)…(7.90, 11.50, 49.42) |
+| Треугольники, LOD, слоты | LOD0 33 967 tris, 1 LOD, 1 слот → `MI_Merlin_H2LD_P1` |
+| UV | скелетный меш — 2 набора (UV0 + UV1 в метрах); подставка — 2 канала, но `Generate Lightmap UVs` = **вкл.** (см. C6) |
+| Текстуры | BC sRGB `TC_Default`; N `TC_Normalmap`; ORM `TC_Masks`; TeamAccent `TC_Grayscale`, мипы из группы; MatID `TC_Grayscale` + `TF_Nearest` + без мипов + NeverStream; LUT 16 × 16 `TC_HDR` + `TF_Nearest` + без мипов + NeverStream |
+| MI | родитель, текстуры, скаляры, векторы и свитчи 7 MI = план профиля |
+| Дубли | нумерованных копий и одноимённых пакетов нет; пакеты папки = план импорта |
+| Клипы H2Anim | 4 клипа `AM_Merlin_*` на том же скелете. Пик смещения костей на меше H2LD = замер волны H2Anim на `SK_Merlin_H2` до 0.02 uu: Idle 0.66, HitReact 2.96, LungeAttack 9.87, DeathSettle 9.47 uu. Сокеты Weapon/Head вычисляются. Посох (Weapon) движется только в LungeAttack (6.9 uu); в остальных клипах он неподвижен, как и в замере H2Anim |
+| Dirty | ни один пакет папки и канонический скелет не dirty |
+
+## C3. Как снимали и мерили
+
+- Инструмент тот же, что у Medusa: [`ue_hero_lookdev.py`](../../tools/art/material_library/ue_hero_lookdev.py). Конфиг —
+  [`20260930-h2ld-ldc-ue/review-config.json`](../../art/pipeline-candidates/ASSET-MERLIN-001/20260930-h2ld-ldc-ue/review-config.json).
+- Сцена: P1.7, `cobble-probe`, EV100 1.3, High, SP 100; bloom выключен в отладочных кадрах и кадрах без фигуры.
+- Ракурсы:
+  - front, back — на 200 uu;
+  - **side** — сторона посоха, лицо вправо, как в концепте. Камера на −X (`side_camera "-X"`, новое в инструменте);
+  - K2 5× и 1.6×.
+- Варианты: нейтральный, P1, P2, DebugClass и кадр без фигуры. «Чтение» — −1.0 EV.
+- **Зоны — классы MatID** (DebugClass). Прежний замер r1–r5 шёл по отладочным зонам look-dev.
+  - Концепт по классам: команда `ue_hero_lookdev.py concept` объединяет прямоугольники и HSV-фильтры
+    `lookdev.concept_zones` по классу зоны. Рамка пряжки берётся из `ue_measure`. Итог —
+    `20260930-h2ld-ldc-ue/concept-classes.json`.
+  - Соответствие зон и классов:
+    - шерсть → `wool_coarse`;
+    - вышивка → `silk`;
+    - пряжка → `bronze` (299 px, Y 0.0666, тон 24.0°, нас. 0.435 — как в r5);
+    - пояс, сапоги, обмотка бороды → `leather_worn`;
+    - лицо и кисти → `skin`;
+    - посох → `wood`.
+  - Кристалл и борода (оба `legacy_bake`) и подставка не входят.
+- k — по шерсти, вышивке и коже. Допуски ±15 % / ±12° / ±0.10. Вердикт «свет доски» — как у Medusa.
+
+## C4. Итерации
+
+| Итер. | Правка слоя `lut.ue_lookdev` | Почему |
+|---|---|---|
+| c1 | нет (r5 look-dev A) | базовый замер после переимпорта |
+| c2 (UE-5) | `leather_worn.specular` 0.5 → 0.3 | c1: пояс, сапоги и обмотка — 1.27 / −0.17 нас. при EV100 1.3 и 0.96 / −0.12 нас. при −1.0 EV. Насыщенность не проходит и на экспозиции чтения, значит это материал: белый блик купола на матовой коже |
+| **c3** (UE-6) | `specular` → 0.4 | c2: при EV100 1.3 яркость вошла в допуск (0.95), при −1.0 EV — насыщенность (−0.07), но яркость при −1.0 EV упала до 0.72. Пол яркости класса здесь не рычаг: медиана BC класса 0.035 выше любого пола, который сохраняет складки. Поэтому середина |
+
+## C5. Замер c3 против концепта (нейтральный MI)
+
+| Зона | EV100 1.3 (k 0.394) | −1.0 EV (k 0.825) | Вердикт |
+|---|---|---|---|
+| шерсть | 1.19 · +3.7 · +0.009 ✗ | 0.86 · +4.7 · +0.083 ✓ | свет доски |
+| вышивка (`silk`) | 0.92 · +5.6 · −0.146 ✗ | 1.01 · +2.3 · −0.021 ✓ | свет доски |
+| кожа (лицо + кисти) | 0.91 · +3.6 · −0.180 ✗ | 1.15 · +2.2 · −0.058 ✗ (Y 1.154) | на границе шума: на c2 при том же материале кожи — 1.14 ✓ |
+| пояс, сапоги, обмотка | 1.13 · −1.6 · −0.151 ✗ | 0.83 · −0.7 · −0.099 ✗ | материал / тоновая кривая (остаток) |
+| пряжка (`bronze`) | не измерена | не измерена | < 150 px на 200 uu; крупные планы r5 — 1.04 / 0.94, LUT бронзы не менялся |
+| дерево (справочно) | 1.37 · +1.0 · −0.039 ✗ | 1.01 · +0.1 · +0.020 ✓ | свет доски |
+
+Кожаный класс по итерациям (EV100 1.3 / −1.0 EV):
+
+| Итерация | EV100 1.3 | −1.0 EV |
+|---|---|---|
+| c1 | 1.27 / −0.17 | 0.96 / −0.12 |
+| c2 | 0.95 / −0.12 | 0.72 / −0.07 |
+| c3 | 1.13 / −0.15 | 0.83 / −0.10 |
+
+Ни одно значение `specular` не держит яркость и насыщенность на обеих экспозициях. c3 ближе всех к концепту на −1.0 EV:
+не хватает 0.02 яркости, насыщенность на границе. Вышивка, шерсть и посох на −1.0 EV в допуске, их расхождение при
+EV100 1.3 — свет доски. Замер шерсти, вышивки и кожи на c1 и c3 почти совпал (разница Y ≤ 0.001): захват при неизменном материале
+повторяется.
+
+**Акцент команды (c3).**
+
+| Вид | Доля акцента от пикселей фигуры | Акцент P1 / P2 / нейтр. (sRGB) | Классы без красителя, изменились > 40: P1 / P2 |
+|---|---|---|---|
+| front | 8.7 % | (193, 171, 122) / (136, 166, 189) / (90, 89, 118) | 1.8 % / 1.9 % |
+| side | 8.7 % | (195, 173, 124) / (140, 168, 190) / (96, 92, 121) | 2.4 % / 3.2 % |
+| back | 5.2 % | (195, 173, 128) / (147, 170, 192) / (116, 98, 101) | 4.3 % / 5.9 % |
+
+- Мантия синяя в обеих командах. Команду несут пояс, подкладка капюшона, кайма манжет и кромка подола. Вышивка, пряжка,
+  кожа и посох не меняются: в освещённом кадре меняется не больше 1.8–5.9 % пикселей этих классов, и это отскок Lumen и
+  зерно. Без освещения краситель там 0 — тест v2.1 `hero-merlin`.
+- Тон акцента: P1 ≈ 41°, P2 ≈ 206°, у команд 41° и 208°.
+- На K2 1.6× акцент — это 1–2 пикселя. Команду держит кольцо подставки (`merlin-lookdev-k2-c3.jpg`).
+
+## C6. Файлы, остатки, реестр
+
+- Листы:
+  - `20260930-h2ld-ldc-ue/review/c3/merlin-lookdev-sheet-c3.jpg` — **концепт | UE нейтр. | P1 | P2 | нейтр. −1.0 EV**,
+    front/side/back;
+  - `merlin-lookdev-k2-c3.jpg` — K2 5× / 1.6×.
+- Замер: `measure-c3.json` — зоны, `verdicts`, `team_accent`. Ключевые кадры — JPEG в `review/c3/key/`. Итерации c1, c2 —
+  в своих каталогах. PNG лежат локально, их sha256 — в `.evidence.json`.
+- Воспроизведение — как у Medusa (medusa-lookdev-v2.md §10.6). Для Merlin LUT пересобирается `lookdev_ue_inputs.py
+  --config …/merlin-h2-lookdev-ue-lut.json`, остальные шаги с путями `ASSET-MERLIN-001`.
+- **Остатки:**
+  - свет доски: при EV100 1.3 шерсть +19 %, посох +37 %, а кожа и вышивка теряют насыщенность на плече кривой — задача
+    5c-B;
+  - кожаный класс — материал против контраста кривой;
+  - пряжку на 200 uu не измерить;
+  - `Generate Lightmap UVs` у подставки Merlin включён (профиль не задаёт `base_generate_lightmap_uvs`), поэтому UV1
+    подставки — световая развёртка, а не метры. Подставка стоит на `M_UM_BaseMarker` v1 и UV1 не читает. Если подставку
+    переведут на v2, нужен `base_generate_lightmap_uvs: false` и `expect_uv_channels: 2`;
+  - `tools/tripo-pipeline/review/h2ld_ue_lookdev.py` (инструмент r1–r5) ищет `DebugClasses` и Blue/Red. На ред. 2 он
+    без правки не запустится; актуальный инструмент — `ue_hero_lookdev.py`;
+  - packaged-кадры с RENDER, K1–K3 и `render_bench.py` не делались.
+- **Реестр** (`validate_registry.py` — FAIL из-за расхождения sha в слое «ue-editor-import H2LD look-dev v2 … LD-merlin-ue»).
+  Нужно обновить sha256:
+  - `merlin-h2-lookdev-ue-import.json` → `b973005f…`;
+  - `merlin-h2-lookdev-ue-lut.json` → `4aaee22a…`;
+  - `20260929-h2ld-ue-import/reports/adopt-report.json` → `ecaf1ccf…`;
+  - `…/ue-import-report.json` → `f1646c65…`;
+  - `20260929-h2-lookdev/ue-inputs/ue-inputs-report.json` → `dc48c60c…`;
+  - `…/ue-inputs/T_UM_MatLUT_Merlin.dds` → `c7f09bc6…`;
+  - `/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD` (оба checkout) → `f58e078c…`;
+  - `…/Materials/MI_Merlin_H2LD` → `874a2a2f…`;
+  - `…/Textures/T_UM_MatLUT_Merlin` → `5d0a2d12…`.
+
+  Добавить пути look-dev C:
+  - `20260930-h2ld-ldc-ue/review-config.json`;
+  - `concept-classes.json` (`73c4f198…`);
+  - `verify/verify-final.json` (`4253ff63…`);
+  - `review/c3/measure-c3.json` (`1b70d004…`);
+  - `merlin-lookdev-sheet-c3.jpg` (`9a233767…`);
+  - `merlin-lookdev-k2-c3.jpg` (`cc7401e5…`);
+  - `/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_TeamAccent` (`4deeb1b6…`).
+
+  В описании слоя заменить Blue/Red на P1/P2 и `UseTeamAccent`.

@@ -1,10 +1,10 @@
 {
   "schema": "unmatched.tripo-pipeline.build-profile/1",
-  "profile_id": "medusa-h2ld-lookdev-ue-import/1",
+  "profile_id": "medusa-h2ld-lookdev-ue-import/2",
   "asset_id": "ASSET-MEDUSA-001",
   "kind": "skeletal-adopt",
   "status": "proposed",
-  "status_note": "LD-medusa-ue (2026-09-29): UE import of the Medusa look-dev run 20260929-h2-lookdev (profile medusa-h2-lookdev/1: H2.1 figure + UV1 in metres, MatID, EdgeMask, graded BC/ORM, TeamMask only on cloth) through the CLI profile skeletal-adopt: adopt pins the look-dev FBX pair, the 2K maps and the hero MatLUT against the look-dev reports (normaliser h2-lookdev/1), ue-import creates MI of /Game/UM/Materials/v2/M_UM_Figure_v2 (MatIDTexture, MatLUT, EdgeMaskTexture, UseUV1Metres) and of M_UM_BaseMarker for the base. At most «технически импортировано»/«измерено»; no art acceptance, no budget (GD-058 open); team colours Blue/Red are a diagnostic pair (Q-304 open).",
+  "status_note": "LD-medusa-ue (2026-09-29): UE import of the Medusa look-dev run 20260929-h2-lookdev (profile medusa-h2-lookdev/1: H2.1 figure + UV1 in metres, MatID, EdgeMask, graded BC/ORM, TeamMask only on cloth) through the CLI profile skeletal-adopt: adopt pins the look-dev FBX pair, the 2K maps and the hero MatLUT against the look-dev reports (normaliser h2-lookdev/1), ue-import creates MI of /Game/UM/Materials/v2/M_UM_Figure_v2 (MatIDTexture, MatLUT, EdgeMaskTexture, UseUV1Metres) and of M_UM_BaseMarker for the base. At most «технически импортировано»/«измерено»; no art acceptance, no budget (GD-058 open); team colours Blue/Red are a diagnostic pair (Q-304 open). Rev 2 (look-dev C, group A, 2026-09-30): the mesh goes onto the canonical skeleton /Game/PipelineCandidates/Medusa/Rig/SK_Medusa_Skeleton (ue.target_skeleton, CLI 0.8.0; the former own SK_Medusa_H2LD_Skeleton is deleted by the run), master v2.1 UseTeamAccent with the TeamAccent mask of the look-dev run (library_inputs.TeamAccent), one gain rule for both teams (TeamDyeGain 0.8 / Y_p50 + TeamDyeCeiling 0.9 / Y_p95), teams = the active C-11 palette P1 #E8C06A / P2 #5A7F9F (user decision «Акценты + кольцо»); the deprecated W4-B TeamMask is no longer imported (TeamMaskTexture = T_UM_Mask_Black, team_color_mode none).",
   "derived_from": [
     "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-ue-import.json (skeletal-adopt ue section of W5c-A)",
     "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2-bake-h2.json (H2.1 bake: armature UM_HUMANOID_17_v2 with weapon.L, scale, axes, sockets)",
@@ -39,9 +39,14 @@
     },
     "library_inputs": {
       "LUT": {
-        "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue/lut/T_UM_MatLUT_Medusa_UE.dds",
-        "sha256": "6df64b5b7c3b72128987ecc8934029c89f7f81125e28cd6810df8a056fe1357f",
+        "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/lut/T_UM_MatLUT_Medusa_UE_c3.dds",
+        "sha256": "e650565d9ba3de6943d6d99a472e29d388ae55f234cb3ca93b3325f1f51fc522",
         "note": "hero MatLUT 16 x 16 RGBA16F (build_ue_inputs.py layout, rows 0-9) after the UE look-dev iterations (tools/art/material_library/ue_hero_lookdev.py lut); iteration 0 = the Blender LUT of the look-dev run byte for byte"
+      },
+      "TeamAccent": {
+        "path": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_TeamAccent_2K.png",
+        "sha256": "40f2db9aaafef3cac50f8b41b48edce7b1ffcf93401491e1e993bf2cad971be0",
+        "note": "rev 2: TeamAccent L8 linear 2048^2 of the look-dev run (LD-medusa-accent, f8dfb423; sha256 = reports/ld-team-accent-report.json): hem band + baldric, 5.41 % of the figure; TeamAccentTexture of M_UM_Figure_v2.1"
       }
     },
     "textures_note": "2K runtime maps only (committed); the 4K masters stay local. N is the byte copy of the H2.1 DirectX map (normaliser check normal_is_the_h21_directx_map)",
@@ -138,6 +143,8 @@
   "ue": {
     "folder_note": "run with: ue-import --ue-folder /Game/PipelineCandidates/Medusa/H2LD",
     "skeletal_asset": "SK_Medusa_H2LD",
+    "target_skeleton": "/Game/PipelineCandidates/Medusa/Rig/SK_Medusa_Skeleton",
+    "target_skeleton_note": "rev 2: canonical hero skeleton of the H2Anim wave (16d0bd69; H2Anim clips AM_Medusa_* are on it); the run keeps it (0.8.0 keep) and no longer creates its own SK_Medusa_H2LD_Skeleton",
     "base_asset": "SM_Medusa_H2LD_Base",
     "material_route": "um-master",
     "masters": {
@@ -148,29 +155,32 @@
     "figure_instance": "MI_Medusa_H2LD",
     "base_instance": "MI_Medusa_H2LD_Base",
     "teams": {
-      "Blue": "#3F6FD8",
-      "Red": "#D0453A"
+      "P1": "#E8C06A",
+      "P2": "#5A7F9F"
     },
-    "teams_note": "diagnostic pair (as Merlin W5c-A); С-11 Gold/Silver stays the palette proposal (Q-304 open). Linear only through FLinearColor::FromSRGBColor (AD-OPEN-39 rule)",
-    "default_team": "Blue",
+    "teams_note": "rev 2: the active C-11 palette c11_value_split_proposal of art/um-materials/um-masters.json (P1 gold #E8C06A, P2 steel blue #5A7F9F), user decision «Акценты + кольцо» (team colour only on the accents and the base ring). Linear only through FLinearColor::FromSRGBColor (AD-OPEN-39 rule)",
+    "default_team": "P1",
     "team_instances": {
       "figure": "MI_Medusa_H2LD_{team}",
       "base": "MI_Medusa_H2LD_Base_{team}"
     },
-    "team_color_mode": "mask",
-    "team_color_mode_note": "user decision 2026-09-28 (AD-CNF-58 = b) + 5c-A: TeamColor only on the cloth classes (TeamMask.R x teamDyeAllowed of the LUT; the look-dev TeamMask.R is 0 outside linen), never on the gold trim",
+    "team_color_mode": "none",
+    "team_color_mode_note": "rev 2: M_UM_Figure_v2.1 dyes by TeamAccentTexture (static switch UseTeamAccent = true); the v2.0 TeamMask path is off, TeamMaskTexture = T_UM_Mask_Black (mode none) so no MI can fall back to dyeing the whole dress; the deprecated W4-B TeamMask stays a pinned candidate file only (adopt), it is not imported",
     "figure_parameters": {
       "TeamDye": 1.0,
-      "TeamDyeGain": 4.5
+      "TeamDyeGain": 22.9292,
+      "TeamDyeCeiling": 15.5387
     },
-    "figure_parameters_note": "dye target luminance as W4-B (0.147 x TeamColor): 0.147 / 0.033 (ymedClassHero of linen) = 4.45 -> 4.5. Proposal",
+    "figure_parameters_note": "rev 2, team-accent.md rule (LDV-13) as one MI for both teams: TeamDyeGain = 0.8 / Y_p50 (0.03489), TeamDyeCeiling = 0.9 / Y_p95 (0.05792) of the accent texels (ld-team-accent-report.json); effective gain min(22.93, 15.54 / maxc(team)) = P1 19.26, P2 22.93 (v2.1 accent report hero-medusa)",
     "figure_textures": {
       "MatIDTexture": "MatID",
       "MatLUT": "LUT",
-      "EdgeMaskTexture": "Edge"
+      "EdgeMaskTexture": "Edge",
+      "TeamAccentTexture": "TeamAccent"
     },
     "figure_static_switches": {
-      "UseUV1Metres": true
+      "UseUV1Metres": true,
+      "UseTeamAccent": true
     },
     "extra_instances": [
       {
@@ -203,8 +213,8 @@
       "N": {"file_key": "N", "asset": "T_Medusa_H2LD_N", "srgb": false, "compression": "TC_Normalmap", "flip_green": false,
             "note": "DirectX normal (byte copy of H2.1)"},
       "ORM": {"file_key": "ORM", "asset": "T_Medusa_H2LD_ORM", "srgb": false, "compression": "TC_Masks"},
-      "TeamMask": {"file_key": "TeamMask", "asset": "T_Medusa_H2LD_TeamMask", "srgb": false, "compression": "TC_Grayscale",
-                   "note": "RGBA mask (R cloth, G base band); M_UM_Figure_v2 samples TeamMaskTexture as LinearGrayscale (as v1), so TC_Grayscale (G8); the dye in the Blue/Red frames shows which channel survived"},
+      "TeamAccent": {"file_key": "TeamAccent", "asset": "T_Medusa_H2LD_TeamAccent", "srgb": false, "compression": "TC_Grayscale",
+                     "note": "rev 2: TeamAccent L8 linear, mips normal (the mask is filtered), TeamAccentTexture of M_UM_Figure_v2.1 (team-accent.md). Replaces the deprecated W4-B TeamMask import"},
       "MatID": {"file_key": "MatID", "asset": "T_Medusa_H2LD_MatID", "srgb": false, "compression": "TC_Grayscale",
                 "properties": {"Filter": "TF_Nearest", "MipGenSettings": "TMGS_NoMipmaps", "NeverStream": true},
                 "note": "R8 index x 16 + 8, read with Load (m-um-figure-v2 §3.1): G8, point, no mips, not streamed"},

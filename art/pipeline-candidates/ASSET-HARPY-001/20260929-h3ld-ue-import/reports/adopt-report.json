@@ -1,0 +1,865 @@
+{
+  "bake": {
+    "normalised": {
+      "base_bounds_from": {
+        "base_parametric": {
+          "height_m": 0.05,
+          "pips_raise_m": 0.0004,
+          "radius_bottom_m": 0.11
+        },
+        "note": "no read-back bounds of the parametric base in the reports; UE measures them"
+      },
+      "checks": {
+        "bones_from_contract_equal_h3_rig": {
+          "bones": 16,
+          "passed": true,
+          "rig_bones": 16,
+          "weapon_bone": null
+        },
+        "h3_rig_contract_validation_pass": {
+          "contract_revision": "v2-2026-09-29",
+          "passed": true,
+          "result": "pass",
+          "skeleton_contract": {
+            "check": "skeleton_contract",
+            "extra": [],
+            "missing": [],
+            "parent_mismatch": [],
+            "status": "pass"
+          }
+        },
+        "h3_rig_report_all_checks_passed": {
+          "bake_profile_sha256_now": "35efe89bd51b770e000f4a96234876882ad535e1b2979fe81d2d1fa45a07adba",
+          "checks": 25,
+          "checks_failed": [],
+          "note": "the H3 bake profile was edited after the rig stage (texture stages); the rig FBX bytes are pinned by the look-dev export instead (source.h3_fbx = rig exports)",
+          "passed": true,
+          "rig_profile_sha256": "86e3195fa7fd5011f419f088ae64fa91fec4ad3ed3a9518f6600a54d0b49ee81"
+        },
+        "lookdev_fbx_all_checks_passed": {
+          "all_checks": 14,
+          "equality": {
+            "appended_skinning_intact": true,
+            "bone_heads_tails_as_h3": true,
+            "bones_and_parents_as_h3": true,
+            "export_frame_face_along_plus_x": true,
+            "positions_and_uv0_per_loop_as_h3": true,
+            "source_fbx_sha256": true,
+            "triangles_as_h3": true,
+            "uv_layers_order": true,
+            "weights_as_h3": true
+          },
+          "passed": true
+        },
+        "lookdev_fbx_compared_with_the_h3_fbx_of_the_rig_report": {
+          "h3_rig_exports": {
+            "SK_Harpy_H3.fbx": "ba841a77f26b9c99e333dc7c9e08094cbea2e6c7755b12c2401d1e4eab2ac2c4",
+            "SM_Harpy_H3_Base.fbx": "77fc45deb2b2d0715e0874bdffde68fd3c4f4c88317572e9b8a36ccdddc4476b"
+          },
+          "lookdev_source": {
+            "SK_Harpy_H3.fbx": "ba841a77f26b9c99e333dc7c9e08094cbea2e6c7755b12c2401d1e4eab2ac2c4",
+            "SM_Harpy_H3_Base.fbx": "77fc45deb2b2d0715e0874bdffde68fd3c4f4c88317572e9b8a36ccdddc4476b"
+          },
+          "passed": true
+        },
+        "lookdev_maps_all_checks_passed": {
+          "checks": {
+            "bc_changed_only_by_rules": true,
+            "dielectric_bc_in_class_range": true,
+            "h3_state_reproduced": true,
+            "lut_dds_read_back": true,
+            "matid_decode_roundtrip_2k": true,
+            "matid_values_valid": true,
+            "orm_metallic_binary_4k": true,
+            "orm_metallic_matches_preset_class": true,
+            "source_fbx_sha256": true,
+            "team_accent_area_share": true,
+            "team_accent_zero_on_non_dye_classes": true
+          },
+          "passed": true,
+          "profile_id": "harpy-h3-lookdev/1"
+        },
+        "lookdev_maps_pin_this_bake_profile": {
+          "now": "35efe89bd51b770e000f4a96234876882ad535e1b2979fe81d2d1fa45a07adba",
+          "passed": true,
+          "pinned": "35efe89bd51b770e000f4a96234876882ad535e1b2979fe81d2d1fa45a07adba"
+        },
+        "lookdev_profile_is_the_named_one": {
+          "passed": true,
+          "profile_id": "harpy-h3-lookdev/1"
+        },
+        "normal_is_the_h3_directx_map": {
+          "copied_from": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/textures/2k/T_Harpy_H3_N.png",
+          "h3_sha256": "8fa9aaafd24381b3700f3bbf62fe90dff0b572cd5b27b3c5aea851b99dc05509",
+          "passed": true,
+          "sha256": "8fa9aaafd24381b3700f3bbf62fe90dff0b572cd5b27b3c5aea851b99dc05509"
+        }
+      },
+      "format": "h3-lookdev-harpy/1",
+      "normaliser": "skeletal_adopt_lookdev.lookdev_harpy",
+      "note": "bones = rig contract (validated on the H3 FBX) with the H3 heads/tails; body bounds, figure top and sockets = H3 rig report; FBX bytes, settings, UV layers, triangles and slots = ld-fbx-report",
+      "sources": {
+        "h3_bake_profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-bake.json",
+        "h3_rig_report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/../20260929-h3-bake/reports/h2-rig-report.json",
+        "h3_textures_report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/../20260929-h3-bake/reports/textures-report.json",
+        "h3_validate_report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/../20260929-h3-bake/reports/validate-skeletal-mesh-v2.json",
+        "ld_fbx_report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/reports/ld-fbx-report.json",
+        "ld_maps_report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/reports/ld-maps-report.json",
+        "rig_contract": "docs/art-pipeline/rig/rig-contract.json"
+      }
+    },
+    "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-lookdev.json",
+    "profile_id": "harpy-h3-lookdev/1",
+    "report_format": "h3-lookdev-harpy/1"
+  },
+  "checks": {
+    "bake_export_face_plus_x": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake measured the face ahead of the body along +X in the export frame (UE front +X)",
+      "passed": true
+    },
+    "bake_report_passed": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake's own checks (art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/reports/ld-fbx-report.json) all passed",
+      "passed": true
+    },
+    "bake_reports_are_of_the_named_profile": {
+      "expected": "harpy-h3-lookdev/1",
+      "measured": {
+        "build_report": "harpy-h3-lookdev/1",
+        "textures_report": "harpy-h3-lookdev/1"
+      },
+      "passed": true
+    },
+    "fbx_bytes_match_bake_report": {
+      "measured": {
+        "base": {
+          "file": "57197cc5a4e65052546363f2d013f4da596d727d9ff971f4226464075abf35e7",
+          "report": "57197cc5a4e65052546363f2d013f4da596d727d9ff971f4226464075abf35e7",
+          "same_path": true
+        },
+        "skeletal": {
+          "file": "9998ba1066206c96ee88d4f6e0013eab6660fdf973e542195545e79e7c859300",
+          "report": "9998ba1066206c96ee88d4f6e0013eab6660fdf973e542195545e79e7c859300",
+          "same_path": true
+        }
+      },
+      "passed": true
+    },
+    "fbx_export_settings_equal_preset": {
+      "expected": "UM_FBX_v1",
+      "measured": {
+        "differences": {},
+        "documented_deviations": {
+          "bake_anim": "off: the candidate FBX carries no clips",
+          "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+        },
+        "preset": "UM_FBX_v1",
+        "undocumented": []
+      },
+      "passed": true
+    },
+    "library_inputs_pinned_by_profile": {
+      "measured": {
+        "LUT": {
+          "file": "e98447bd48ec9d7d5617088005365bc340e746edfd7a1b181a772706acd95780",
+          "profile": "e98447bd48ec9d7d5617088005365bc340e746edfd7a1b181a772706acd95780",
+          "sha256_ok": true
+        }
+      },
+      "note": "inputs outside the bake atlas (e.g. the hero MatLUT of M_UM_Figure_v2): the bytes are the ones the profile pins (candidate.library_inputs.*.sha256)",
+      "passed": true
+    },
+    "material_slots_as_profile": {
+      "expected": {
+        "base": 1,
+        "skeletal": 1
+      },
+      "measured": {
+        "base": [
+          "M_Harpy_Base"
+        ],
+        "skeletal_unique": [
+          "M_Harpy_H3_Atlas"
+        ]
+      },
+      "passed": true
+    },
+    "roundtrip_scale_1": {
+      "expected": [
+        1,
+        1,
+        1
+      ],
+      "measured": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "passed": true
+    },
+    "skeleton_contract": {
+      "expected": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "bones": 16,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "measured": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "bones": 16,
+        "bones_equal_profile": true,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "note": "names and parents of every bone (Blender names; UE turns '.' into '_')",
+      "passed": true
+    },
+    "sockets_have_bake_predictions": {
+      "measured": {
+        "Head": [
+          -0.352,
+          -6.495,
+          0.673
+        ],
+        "Weapon": [
+          0.053,
+          -7.809,
+          0.04
+        ]
+      },
+      "note": "a profile socket without location_uu takes the bake's UE bone-space prediction (location_uu_for_ue)",
+      "passed": true
+    },
+    "texture_bytes_match_textures_report": {
+      "measured": {
+        "BC": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "BaseBC": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "BaseN": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "BaseORM": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "Edge": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "MatID": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "N": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "ORM": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "TeamAccent": {
+          "same_path": true,
+          "sha256_ok": true
+        }
+      },
+      "passed": true
+    },
+    "texture_conventions_as_ue_expects": {
+      "expected": {
+        "BC": "sRGB",
+        "BaseN": "DirectX",
+        "Edge": "linear",
+        "MatID": "x 16 + 8",
+        "N": "DirectX",
+        "ORM": "R AO, G roughness",
+        "TeamAccent": "linear"
+      },
+      "measured": {
+        "BC": "sRGB 8-bit (H3 BC; cord and dielectric clamp per ld_maps)",
+        "BaseN": "DirectX (base 1K; N_OpenGL is the Blender copy)",
+        "Edge": "R8 linear: EdgeMaskTexture of the v2 master",
+        "MatID": "G8 linear (TC_Grayscale, sRGB off, NoMipmaps, Nearest, never streamed); value = column x 16 + 8",
+        "N": "DirectX, = H3; N_OpenGL = H3",
+        "ORM": "R AO, G roughness (H3; ignored by library classes), B metallic binary = preset metallic of the class in the column (horn_claw 0)",
+        "TeamAccent": "R8 linear (TC_Grayscale, sRGB off): 1 = TeamColor dye (UE: TeamMaskTexture of the v2 MI = TeamAccent; dye only on classes with teamDyeAllowed)"
+      },
+      "note": "N DirectX (UE TC_Normalmap, no green flip), ORM R AO / G roughness / B metallic linear, TeamMask linear",
+      "passed": true
+    },
+    "textures_are_the_runtime_tier": {
+      "expected": {
+        "exceptions": {
+          "BaseBC": {
+            "px": [
+              1024,
+              1024
+            ],
+            "tier": "base_1k"
+          },
+          "BaseN": {
+            "px": [
+              1024,
+              1024
+            ],
+            "tier": "base_1k"
+          },
+          "BaseORM": {
+            "px": [
+              1024,
+              1024
+            ],
+            "tier": "base_1k"
+          }
+        },
+        "px": [
+          2048,
+          2048
+        ],
+        "tier": "runtime_2k"
+      },
+      "measured": {
+        "BC": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "BaseBC": {
+          "png_px": [
+            1024,
+            1024
+          ],
+          "tier": "base_1k"
+        },
+        "BaseN": {
+          "png_px": [
+            1024,
+            1024
+          ],
+          "tier": "base_1k"
+        },
+        "BaseORM": {
+          "png_px": [
+            1024,
+            1024
+          ],
+          "tier": "base_1k"
+        },
+        "Edge": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "MatID": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "N": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "ORM": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "TeamAccent": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        }
+      },
+      "note": "only the committed runtime maps reach UE; the local 4K masters are never imported",
+      "passed": true
+    },
+    "triangles_as_profile": {
+      "expected": {
+        "SK_Harpy_Body": 37177,
+        "SM_Harpy_Base": 864
+      },
+      "measured": {
+        "SK_Harpy_Body": 37177,
+        "SM_Harpy_Base": 864
+      },
+      "passed": true
+    }
+  },
+  "fbx_preset": {
+    "path": "blender/_tools/presets/UM_FBX_v1.json",
+    "sha256": "06cb69892de24ec48c662bf3ed54b6d711e45c68b65cb51e625bf6a5b94f86f3"
+  },
+  "inputs": {
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/../20260929-h3-bake/reports/h2-rig-report.json": "da6dc227de8d82ea37fb9316b748238f63db040af89bdefed22f1df7c22a0924",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/../20260929-h3-bake/reports/textures-report.json": "2973b9ea4cba3a78ab3ac30159c4fd7586ca26f6e15d48e2516bb77d80740366",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/../20260929-h3-bake/reports/validate-skeletal-mesh-v2.json": "7cc7e63ddd1d7d64b84e188eda99c6f1b270fe9ff7d75940889d1e50bb2e433c",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/export/SK_Harpy_H3LD.fbx": "9998ba1066206c96ee88d4f6e0013eab6660fdf973e542195545e79e7c859300",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/export/SM_Harpy_H3LD_Base.fbx": "57197cc5a4e65052546363f2d013f4da596d727d9ff971f4226464075abf35e7",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/reports/ld-fbx-report.json": "285c0ad34987f79651c080b417af8f78f7f231a2195e99e5e3cb66f38a9ec061",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/reports/ld-maps-report.json": "b8eba896f11b80183bed689e8eee60832d5e2d8e9f5a313392c015830f5c6d79",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_BC.png": "0a32c05341796c3b833e94225d56ba8f0b30b4bd2026b6c7067e078153a4132a",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_Edge.png": "2ae7f4a2adf56eed264fc9b93dba2fb2c4979081a32c4b43d25acb3ef185b759",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_MatID.png": "1f62aede2a0db49637e9211e1a56dd6bfb6e028d7128f61c412810780662f883",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_N.png": "8fa9aaafd24381b3700f3bbf62fe90dff0b572cd5b27b3c5aea851b99dc05509",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_ORM.png": "6cc539b8741d5a762345781b2b003127d43e16bb889a8c64463b112d691d97ad",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_TeamAccent.png": "360d918bee586e8ff5073003bdd3b2256694c0792dc4eba24ce8fad489c66e9d",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/base_1k/T_Harpy_H3LD_Base_BC.png": "ad1564babcaca25abd5ce826528d85f1ddcc89555f922cba065a0599dd75d642",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/base_1k/T_Harpy_H3LD_Base_N.png": "b671edc08f8dcf70c6449db552f6a8ec2b36c930cf1409c485881686ac1fd9e6",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/base_1k/T_Harpy_H3LD_Base_ORM.png": "d70f488de7d6bf52455821844e05b8d9631f26ec1102fc8f225b9ad59517e117",
+    "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/lut/T_UM_MatLUT_Harpy_UE.dds": "e98447bd48ec9d7d5617088005365bc340e746edfd7a1b181a772706acd95780",
+    "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-lookdev.json": "dfb8333711ddec9e6f1f049e3945dbcaaabb1735127d1b38c0b66503c6998835"
+  },
+  "keys": {
+    "fbx:base": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/export/SM_Harpy_H3LD_Base.fbx",
+    "fbx:skeletal": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/export/SK_Harpy_H3LD.fbx",
+    "profile:bake": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-lookdev.json",
+    "report:build": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/reports/ld-fbx-report.json",
+    "report:h3_rig_report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/../20260929-h3-bake/reports/h2-rig-report.json",
+    "report:h3_textures_report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/../20260929-h3-bake/reports/textures-report.json",
+    "report:h3_validate_report": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/../20260929-h3-bake/reports/validate-skeletal-mesh-v2.json",
+    "report:textures": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/reports/ld-maps-report.json",
+    "texture:BC": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_BC.png",
+    "texture:BaseBC": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/base_1k/T_Harpy_H3LD_Base_BC.png",
+    "texture:BaseN": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/base_1k/T_Harpy_H3LD_Base_N.png",
+    "texture:BaseORM": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/base_1k/T_Harpy_H3LD_Base_ORM.png",
+    "texture:Edge": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_Edge.png",
+    "texture:LUT": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/lut/T_UM_MatLUT_Harpy_UE.dds",
+    "texture:MatID": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_MatID.png",
+    "texture:N": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_N.png",
+    "texture:ORM": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_ORM.png",
+    "texture:TeamAccent": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_TeamAccent.png"
+  },
+  "kind": "skeletal-adopt",
+  "logic": "adopt-skeletal/1",
+  "note": "the candidate is built outside this tool (h3-lookdev-harpy/1, profile harpy-h3-lookdev/1); adopt copies nothing and re-hashes it; views.build / views.atlas are what ue-import reads",
+  "passed": true,
+  "profile": {
+    "id": "harpy-h3ld-lookdev-ue-import/1",
+    "path": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3ld-lookdev-ue-import.json",
+    "sha256": "7a15d498ce1c8501d479989e825e83be8a4d9b647915bef25b1db4d5bfec59d1"
+  },
+  "stage": "adopt",
+  "status": "measured",
+  "views": {
+    "atlas": {
+      "files": {
+        "BC": {
+          "file": "T_Harpy_H3LD_BC.png"
+        },
+        "BaseBC": {
+          "file": "T_Harpy_H3LD_Base_BC.png"
+        },
+        "BaseN": {
+          "file": "T_Harpy_H3LD_Base_N.png"
+        },
+        "BaseORM": {
+          "file": "T_Harpy_H3LD_Base_ORM.png"
+        },
+        "Edge": {
+          "file": "T_Harpy_H3LD_Edge.png"
+        },
+        "MatID": {
+          "file": "T_Harpy_H3LD_MatID.png"
+        },
+        "N": {
+          "file": "T_Harpy_H3LD_N.png"
+        },
+        "ORM": {
+          "file": "T_Harpy_H3LD_ORM.png"
+        },
+        "TeamAccent": {
+          "file": "T_Harpy_H3LD_TeamAccent.png"
+        }
+      },
+      "size": 2048
+    },
+    "build": {
+      "checks": {
+        "roundtrip_material_slots": {
+          "measured": {
+            "per_mesh": {
+              "SK_Harpy_Body": [
+                "M_Harpy_H3_Atlas"
+              ]
+            },
+            "skeletal_unique": [
+              "M_Harpy_H3_Atlas"
+            ]
+          }
+        }
+      },
+      "expected_ue_bounds_uu_at_import_scale_1": {
+        "base_blender_axes": {
+          "max": [
+            11.0,
+            11.0,
+            5.04
+          ],
+          "min": [
+            -11.0,
+            -11.0,
+            0.0
+          ]
+        },
+        "base_ue_predicted": {
+          "max": [
+            11.0,
+            11.0,
+            5.04
+          ],
+          "min": [
+            -11.0,
+            -11.0,
+            0.0
+          ]
+        },
+        "export_rotation_z_degrees": 90.0,
+        "note": "union of the bake's round-trip bounds (authored frame, front -Y, cm); export frame rotated about Z by the preset; UE = export frame (x, -y, z) (ART-001)",
+        "skeletal_blender_axes": {
+          "max": [
+            32.022,
+            18.976,
+            42.0
+          ],
+          "min": [
+            -31.936,
+            -12.61,
+            4.795
+          ]
+        },
+        "skeletal_export_frame": {
+          "max": [
+            12.61,
+            32.022,
+            42.0
+          ],
+          "min": [
+            -18.976,
+            -31.936,
+            4.795
+          ]
+        },
+        "skeletal_ue_predicted": {
+          "max": [
+            12.61,
+            31.936,
+            42.0
+          ],
+          "min": [
+            -18.976,
+            -32.022,
+            4.795
+          ]
+        }
+      },
+      "exports": {
+        "base": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/export/SM_Harpy_H3LD_Base.fbx",
+        "skeletal": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/export/SK_Harpy_H3LD.fbx"
+      },
+      "figure": {
+        "figure_height_m": 0.42,
+        "figure_top_m": 0.42,
+        "skeletal_top_m": 0.42,
+        "top_part": null
+      },
+      "meshes_pre_export_m": {
+        "SK_Harpy_Body": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 37177
+        },
+        "SM_Harpy_Base": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 864
+        }
+      },
+      "roundtrip": {
+        "skeletal": {
+          "bones": {
+            "arm_lower.L": {
+              "head_m": [
+                0.11494,
+                0.04019,
+                0.31525
+              ],
+              "parent": "arm_upper.L",
+              "tail_m": [
+                0.19411,
+                0.08924,
+                0.38106
+              ]
+            },
+            "arm_lower.R": {
+              "head_m": [
+                -0.11494,
+                0.04,
+                0.31512
+              ],
+              "parent": "arm_upper.R",
+              "tail_m": [
+                -0.19457,
+                0.08924,
+                0.38099
+              ]
+            },
+            "arm_upper.L": {
+              "head_m": [
+                0.05018,
+                2e-05,
+                0.26739
+              ],
+              "parent": "spine",
+              "tail_m": [
+                0.11494,
+                0.04019,
+                0.31525
+              ]
+            },
+            "arm_upper.R": {
+              "head_m": [
+                -0.04979,
+                -0.0003,
+                0.26713
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.11494,
+                0.04,
+                0.31512
+              ]
+            },
+            "foot.L": {
+              "head_m": [
+                0.03003,
+                0.01998,
+                0.10455
+              ],
+              "parent": "leg_lower.L",
+              "tail_m": [
+                0.03832,
+                -0.044,
+                0.05929
+              ]
+            },
+            "foot.R": {
+              "head_m": [
+                -0.03049,
+                0.01861,
+                0.1052
+              ],
+              "parent": "leg_lower.R",
+              "tail_m": [
+                -0.0389,
+                -0.04126,
+                0.05935
+              ]
+            },
+            "hand.L": {
+              "head_m": [
+                0.19411,
+                0.08924,
+                0.38106
+              ],
+              "parent": "arm_lower.L",
+              "tail_m": [
+                0.30602,
+                0.17623,
+                0.28447
+              ]
+            },
+            "hand.R": {
+              "head_m": [
+                -0.19457,
+                0.08924,
+                0.38099
+              ],
+              "parent": "arm_lower.R",
+              "tail_m": [
+                -0.30569,
+                0.1761,
+                0.28493
+              ]
+            },
+            "head": {
+              "head_m": [
+                0.00017,
+                -0.0303,
+                0.27802
+              ],
+              "parent": "spine",
+              "tail_m": [
+                0.00017,
+                -0.05965,
+                0.39866
+              ]
+            },
+            "hips": {
+              "head_m": [
+                0.00017,
+                0.00557,
+                0.16389
+              ],
+              "parent": "root",
+              "tail_m": [
+                0.00017,
+                0.00883,
+                0.20954
+              ]
+            },
+            "leg_lower.L": {
+              "head_m": [
+                0.0556,
+                -0.03682,
+                0.14433
+              ],
+              "parent": "leg_upper.L",
+              "tail_m": [
+                0.03003,
+                0.01998,
+                0.10455
+              ]
+            },
+            "leg_lower.R": {
+              "head_m": [
+                -0.05527,
+                -0.03682,
+                0.14433
+              ],
+              "parent": "leg_upper.R",
+              "tail_m": [
+                -0.03049,
+                0.01861,
+                0.1052
+              ]
+            },
+            "leg_upper.L": {
+              "head_m": [
+                0.02625,
+                0.0023,
+                0.19324
+              ],
+              "parent": "hips",
+              "tail_m": [
+                0.0556,
+                -0.03682,
+                0.14433
+              ]
+            },
+            "leg_upper.R": {
+              "head_m": [
+                -0.02592,
+                0.0023,
+                0.19324
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.05527,
+                -0.03682,
+                0.14433
+              ]
+            },
+            "root": {
+              "head_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "parent": null,
+              "tail_m": [
+                0.0,
+                0.0,
+                0.04
+              ]
+            },
+            "spine": {
+              "head_m": [
+                0.00017,
+                0.00883,
+                0.20954
+              ],
+              "parent": "hips",
+              "tail_m": [
+                0.00017,
+                -0.0303,
+                0.27802
+              ]
+            }
+          },
+          "meshes": {
+            "SK_Harpy_Body": {
+              "triangles": 37177,
+              "vertices": 21932
+            }
+          }
+        }
+      },
+      "sockets": [
+        {
+          "bone": "head",
+          "location_uu_for_ue": [
+            -0.352,
+            -6.495,
+            0.673
+          ],
+          "name": "Head",
+          "offset_blender_bone_local_uu": [
+            -0.352,
+            6.495,
+            0.673
+          ],
+          "status": "предложено",
+          "target_ue_component_uu": [
+            5.219,
+            0.335,
+            33.953
+          ]
+        },
+        {
+          "bone": "foot.R",
+          "location_uu_for_ue": [
+            0.053,
+            -7.809,
+            0.04
+          ],
+          "name": "Weapon",
+          "offset_blender_bone_local_uu": [
+            0.053,
+            7.809,
+            0.04
+          ],
+          "status": "предложено",
+          "target_ue_component_uu": [
+            4.27,
+            3.877,
+            5.755
+          ]
+        }
+      ],
+      "source": "normalised by skeletal_adopt.py from art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/reports/ld-fbx-report.json (format h3-lookdev-harpy/1)"
+    }
+  }
+}

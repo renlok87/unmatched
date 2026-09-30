@@ -1,0 +1,102 @@
+{
+ "asset_id": "ASSET-HARPY-001",
+ "classes": {
+  "brass": {
+   "bakeLuminanceModulation": 0.0,
+   "bc": [
+    0.0262,
+    0.02,
+    0.0235
+   ],
+   "bcMode": 0.0,
+   "cavityDarken": 0.0,
+   "cavityTintB": 0.0,
+   "cavityTintG": 0.0,
+   "cavityTintR": 0.0,
+   "cavityTintStrength": 0.0,
+   "clothAmount": 0.0,
+   "luminanceMax": 0.55,
+   "luminanceMin": 0.02,
+   "maxChannel": 0.9,
+   "metallic": 0.0,
+   "normalStrength": 0.3,
+   "roughHi": 0.5,
+   "roughLo": 0.22,
+   "roughTypical": 0.28,
+   "roughVariation": 0.06,
+   "shadingModel": 0.0,
+   "sheenIntensity": 0.0,
+   "sheenRoughness": 0.0,
+   "sheenTint": 0.0,
+   "slice": 14.0,
+   "specular": 0.35,
+   "teamDyeAllowed": 0.0,
+   "tilesPerMeter": 12.0,
+   "wearStrength": 0.25,
+   "wornBCB": 0.0,
+   "wornBCG": 0.0,
+   "wornBCMode": 0.0,
+   "wornBCR": 0.0,
+   "wornBCScale": 1.4,
+   "wornRoughness": -1.0,
+   "wornRoughnessDelta": -0.08,
+   "ymedClassHero": 0.02012
+  },
+  "feathers": {
+   "bc": [
+    0.0816,
+    0.0418,
+    0.026
+   ],
+   "ymedClassHero": 0.04946
+  },
+  "gold_antique": {
+   "bc": [
+    0.66,
+    0.27,
+    0.06
+   ],
+   "ymedClassHero": 0.63156,
+   "roughTypical": 0.3,
+   "roughLo": 0.2,
+   "roughHi": 0.42
+  },
+  "leather_smooth": {
+   "bc": [
+    0.0385,
+    0.017,
+    0.0025
+   ],
+   "ymedClassHero": 0.02
+  },
+  "skin": {
+   "bc": [
+    0.3645,
+    0.2319,
+    0.143
+   ],
+   "ymedClassHero": 0.25347,
+   "specular": 0.5,
+   "luminanceMin": 0.08
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake_harpy/lookdev_maps.py (ld_maps)",
+ "hero": "Harpy",
+ "heroSlots": {
+  "brass": "horn_claw"
+ },
+ "heroSlotsNote": "column of the library class brass (5) carries the extension class horn_claw (all fields, detail slice 14 = stone_base); MatID of the talons = 88 (README §3a)",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero Harpy --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "медиана класса в BC героя (DebugBakeFromLUT); у gold_antique — F0 героя, тон концепта",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ },
+ "ue_lookdev_c": {
+  "iteration": "i3",
+  "why": {
+   "skin": "i2: face 0.76 (Cobble) / 0.83 (-1 EV), the only zone outside at both exposures apart from the feather saturation: specular 0.35 -> 0.5 (more of the dome on the cheeks), floor of the bake-clamped luminance 0.03 -> 0.08 (lifts the painted shadow side of the face; brows / lips are filled with skin in ld_maps, eyes stay above 0.08)",
+   "kept_from_i2": "gold F0 (0.66, 0.27, 0.06) at the preset roughness 0.30 [0.20, 0.42] (-1 EV in tolerance); horn_claw specular 0.35 / roughness 0.28 (both exposures in tolerance)"
+  }
+ }
+}

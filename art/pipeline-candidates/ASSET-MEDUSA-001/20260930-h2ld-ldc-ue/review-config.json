@@ -1,0 +1,246 @@
+{
+ "hero": "Medusa",
+ "note": "look-dev C group A (2026-09-30): H2LD rev 2 on the canonical skeleton, M_UM_Figure_v2.1 UseTeamAccent, teams P1/P2 of the active C-11 palette. Frames: P1.7 Cobble control level, light profile cobble-probe, High, SP 100; neutral / P1 / P2 / DebugClass / plate, reading exposure -1.0 EV. Editor frames (diagnostic), not K1/K2 acceptance",
+ "run_dir": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue-import",
+ "concept": {
+  "front": "art/imagegen/hero-quality-v1/medusa/medusa-front.png",
+  "side": "art/imagegen/hero-quality-v1/medusa/medusa-side.png",
+  "back": "art/imagegen/hero-quality-v1/medusa/medusa-back.png"
+ },
+ "concept_zones": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/measure-report.json",
+ "side_camera": "+X",
+ "teams": [
+  "P1",
+  "P2"
+ ],
+ "variants": {
+  "neutral": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral",
+  "P1": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P1",
+  "P2": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P2",
+  "debug": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_DebugClass"
+ },
+ "base_mi": {
+  "neutral": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base",
+  "P1": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base_P1",
+  "P2": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base_P2",
+  "debug": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base"
+ },
+ "zones": [
+  "gold_antique",
+  "linen",
+  "skin",
+  "leather_smooth",
+  "leather_worn",
+  "wood",
+  "legacy_bake"
+ ],
+ "key_zones": [
+  "gold_antique",
+  "linen",
+  "skin"
+ ],
+ "tolerance_zones": [
+  "gold_antique",
+  "linen",
+  "skin",
+  "leather_smooth",
+  "leather_worn"
+ ],
+ "never_dye_zones": [
+  "gold_antique",
+  "skin",
+  "wood",
+  "leather_worn"
+ ],
+ "anchor_zone": "linen",
+ "tolerance": {
+  "luma_ratio": 0.15,
+  "hue_deg": 12.0,
+  "sat": 0.1
+ },
+ "render_gates": {
+  "legacy_bake": {
+   "hue_deg": [
+    [
+     38,
+     110
+    ]
+   ],
+   "s_min": 0.15
+  }
+ },
+ "min_px": 150,
+ "reading_bias_ev": -1.0,
+ "restore_level": "/Game/S08/S08Arena",
+ "verify": {
+  "skeleton": "/Game/PipelineCandidates/Medusa/Rig/SK_Medusa_Skeleton",
+  "folder": "/Game/PipelineCandidates/Medusa/H2LD",
+  "hero_root": "/Game/PipelineCandidates/Medusa",
+  "clips_folder": "/Game/PipelineCandidates/Medusa/H2Anim",
+  "height_uu": 55.0,
+  "default_mi_key": "team:figure:P1",
+  "expect": {
+   "bones": 18,
+   "bone_names": [
+    "SKEL_UM_Humanoid",
+    "root",
+    "hips",
+    "spine",
+    "head",
+    "arm_upper_L",
+    "arm_lower_L",
+    "hand_L",
+    "weapon_L",
+    "arm_upper_R",
+    "arm_lower_R",
+    "hand_R",
+    "leg_upper_L",
+    "leg_lower_L",
+    "foot_L",
+    "leg_upper_R",
+    "leg_lower_R",
+    "foot_R"
+   ],
+   "triangles": 43054,
+   "base_uv_channels": 2,
+   "clips": 4
+  },
+  "textures": {
+   "BC": {
+    "srgb": "True",
+    "compression_settings": "TC_DEFAULT"
+   },
+   "N": {
+    "srgb": "False",
+    "compression_settings": "TC_NORMALMAP"
+   },
+   "ORM": {
+    "srgb": "False",
+    "compression_settings": "TC_MASKS"
+   },
+   "TeamAccent": {
+    "srgb": "False",
+    "compression_settings": "TC_GRAYSCALE",
+    "mip_gen_settings": "TMGS_FROM_TEXTURE_GROUP",
+    "size": [
+     2048,
+     2048
+    ]
+   },
+   "MatID": {
+    "srgb": "False",
+    "compression_settings": "TC_GRAYSCALE",
+    "filter": "TF_NEAREST",
+    "mip_gen_settings": "TMGS_NO_MIPMAPS",
+    "never_stream": "True"
+   },
+   "LUT": {
+    "srgb": "False",
+    "compression_settings": "TC_HDR",
+    "filter": "TF_NEAREST",
+    "mip_gen_settings": "TMGS_NO_MIPMAPS",
+    "never_stream": "True",
+    "size": [
+     16,
+     16
+    ]
+   },
+   "Edge": {
+    "srgb": "False",
+    "compression_settings": "TC_GRAYSCALE"
+   }
+  },
+  "instances": {
+   "figure_instance": {
+    "parent": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+    "textures": {
+     "TeamAccentTexture": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_TeamAccent",
+     "TeamMaskTexture": "/Game/UM/Materials/Textures/T_UM_Mask_Black",
+     "MatIDTexture": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_MatID",
+     "MatLUT": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_UM_MatLUT_Medusa",
+     "EdgeMaskTexture": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_Edge"
+    },
+    "scalars": {
+     "TeamDye": 1.0,
+     "TeamDyeGain": 22.9292,
+     "TeamDyeCeiling": 15.5387
+    },
+    "switches": {
+     "UseTeamAccent": true,
+     "UseUV1Metres": true
+    }
+   },
+   "team:figure:P1": {
+    "parent": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD",
+    "vectors": {
+     "TeamColor": [
+      0.807,
+      0.5271,
+      0.1441,
+      1.0
+     ]
+    },
+    "switches": {
+     "UseTeamAccent": true
+    }
+   },
+   "team:figure:P2": {
+    "parent": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD",
+    "vectors": {
+     "TeamColor": [
+      0.1022,
+      0.2122,
+      0.3467,
+      1.0
+     ]
+    },
+    "switches": {
+     "UseTeamAccent": true
+    }
+   },
+   "extra:MI_Medusa_H2LD_Neutral": {
+    "parent": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD",
+    "scalars": {
+     "TeamDye": 0.0
+    },
+    "vectors": {
+     "TeamColor": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ]
+    }
+   },
+   "extra:MI_Medusa_H2LD_DebugClass": {
+    "parent": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD",
+    "scalars": {
+     "DebugView": 1.0
+    }
+   },
+   "team:base:P1": {
+    "parent": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base",
+    "vectors": {
+     "TeamColor": [
+      0.807,
+      0.5271,
+      0.1441,
+      1.0
+     ]
+    }
+   },
+   "team:base:P2": {
+    "parent": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base",
+    "vectors": {
+     "TeamColor": [
+      0.1022,
+      0.2122,
+      0.3467,
+      1.0
+     ]
+    }
+   }
+  },
+  "clips_reference": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/reports/ue-measure-clips.json"
+ }
+}

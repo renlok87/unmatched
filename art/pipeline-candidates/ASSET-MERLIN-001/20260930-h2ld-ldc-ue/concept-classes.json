@@ -1,0 +1,478 @@
+{
+ "hero": "Merlin",
+ "method": "boxes + HSV filters of lookdev.concept_zones (+ ue_measure extra boxes), pooled by MatID class over front/side/back; per-channel sRGB median, HSV and linear Y of the median (hsv_stats)",
+ "replace_zones_by_extra": [
+  "buckle"
+ ],
+ "schema": "unmatched.um-v2-hero-concept-classes/1",
+ "sources": {
+  "concept": {
+   "back": {
+    "path": "art/imagegen/hero-quality-v1/merlin/merlin-back.png",
+    "sha256": "c077b41a260fe937a152d85f560375af7a6632c6769ba7105c6e00b8c043123d"
+   },
+   "front": {
+    "path": "art/imagegen/hero-quality-v1/merlin/merlin-front.png",
+    "sha256": "25856808d165affebc0ad26fd774ef589b725d7a92d3fa3c6cdd4757e76db0bf"
+   },
+   "side": {
+    "path": "art/imagegen/hero-quality-v1/merlin/merlin-side.png",
+    "sha256": "6a9cadbb5281c26d9adbfed61eac33528ed2eea84cb79d9f1ad8433cd3b3ea8b"
+   }
+  },
+  "extra_profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev-ue-lut.json",
+  "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json",
+  "profile_sha256": "955366bcd960bd36f35479292d9c19e1c6534ff47cacb2c8c087ec1fbbaca849"
+ },
+ "tool": "tools/art/material_library/ue_hero_lookdev.py concept",
+ "zone_class": {
+  "beard_wrap": "leather_worn",
+  "belt": "leather_worn",
+  "boots": "leather_worn",
+  "buckle": "bronze",
+  "embroidery": "silk",
+  "face_skin": "skin",
+  "hands_skin": "skin",
+  "wood": "wood",
+  "wool": "wool_coarse"
+ },
+ "zones": {
+  "bronze": {
+   "boxes": [
+    {
+     "box": [
+      566,
+      535,
+      599,
+      540
+     ],
+     "pixels": 121,
+     "view": "front",
+     "zone": "buckle"
+    },
+    {
+     "box": [
+      565,
+      538,
+      572,
+      568
+     ],
+     "pixels": 159,
+     "view": "front",
+     "zone": "buckle"
+    },
+    {
+     "box": [
+      566,
+      564,
+      589,
+      570
+     ],
+     "pixels": 48,
+     "view": "front",
+     "zone": "buckle"
+    }
+   ],
+   "concept": {
+    "hue_deg": 24.0,
+    "luma_Y_linear": 0.0666,
+    "median_srgb": [
+     92.0,
+     68.0,
+     52.0
+    ],
+    "sat": 0.435,
+    "value": 0.361
+   },
+   "pixels_concept": 299
+  },
+  "leather_worn": {
+   "boxes": [
+    {
+     "box": [
+      545,
+      538,
+      620,
+      568
+     ],
+     "pixels": 1877,
+     "view": "front",
+     "zone": "belt"
+    },
+    {
+     "box": [
+      598,
+      575,
+      622,
+      740
+     ],
+     "pixels": 3260,
+     "view": "front",
+     "zone": "belt"
+    },
+    {
+     "box": [
+      570,
+      405,
+      610,
+      425
+     ],
+     "pixels": 665,
+     "view": "front",
+     "zone": "beard_wrap"
+    },
+    {
+     "box": [
+      378,
+      1040,
+      500,
+      1110
+     ],
+     "pixels": 6427,
+     "view": "front",
+     "zone": "boots"
+    },
+    {
+     "box": [
+      680,
+      1030,
+      800,
+      1110
+     ],
+     "pixels": 6084,
+     "view": "front",
+     "zone": "boots"
+    },
+    {
+     "box": [
+      480,
+      1030,
+      640,
+      1100
+     ],
+     "pixels": 9971,
+     "view": "side",
+     "zone": "boots"
+    },
+    {
+     "box": [
+      492,
+      474,
+      660,
+      500
+     ],
+     "pixels": 3853,
+     "view": "back",
+     "zone": "belt"
+    },
+    {
+     "box": [
+      388,
+      1030,
+      482,
+      1075
+     ],
+     "pixels": 3701,
+     "view": "back",
+     "zone": "boots"
+    },
+    {
+     "box": [
+      655,
+      1030,
+      772,
+      1075
+     ],
+     "pixels": 4536,
+     "view": "back",
+     "zone": "boots"
+    }
+   ],
+   "concept": {
+    "hue_deg": 23.6,
+    "luma_Y_linear": 0.0279,
+    "median_srgb": [
+     60.0,
+     43.0,
+     32.0
+    ],
+    "sat": 0.467,
+    "value": 0.235
+   },
+   "pixels_concept": 40374
+  },
+  "silk": {
+   "boxes": [
+    {
+     "box": [
+      450,
+      540,
+      520,
+      1000
+     ],
+     "pixels": 10375,
+     "view": "front",
+     "zone": "embroidery"
+    },
+    {
+     "box": [
+      640,
+      560,
+      715,
+      1000
+     ],
+     "pixels": 9984,
+     "view": "front",
+     "zone": "embroidery"
+    },
+    {
+     "box": [
+      622,
+      540,
+      680,
+      1000
+     ],
+     "pixels": 10818,
+     "view": "side",
+     "zone": "embroidery"
+    },
+    {
+     "box": [
+      370,
+      940,
+      820,
+      1010
+     ],
+     "pixels": 4653,
+     "view": "back",
+     "zone": "embroidery"
+    }
+   ],
+   "concept": {
+    "hue_deg": 29.6,
+    "luma_Y_linear": 0.2044,
+    "median_srgb": [
+     157.0,
+     117.0,
+     78.0
+    ],
+    "sat": 0.503,
+    "value": 0.616
+   },
+   "pixels_concept": 35830
+  },
+  "skin": {
+   "boxes": [
+    {
+     "box": [
+      560,
+      240,
+      640,
+      300
+     ],
+     "pixels": 2210,
+     "view": "front",
+     "zone": "face_skin"
+    },
+    {
+     "box": [
+      612,
+      520,
+      690,
+      600
+     ],
+     "pixels": 4387,
+     "view": "front",
+     "zone": "hands_skin"
+    },
+    {
+     "box": [
+      358,
+      405,
+      395,
+      470
+     ],
+     "pixels": 1738,
+     "view": "front",
+     "zone": "hands_skin"
+    },
+    {
+     "box": [
+      655,
+      240,
+      700,
+      290
+     ],
+     "pixels": 881,
+     "view": "side",
+     "zone": "face_skin"
+    },
+    {
+     "box": [
+      550,
+      380,
+      630,
+      470
+     ],
+     "pixels": 4110,
+     "view": "side",
+     "zone": "hands_skin"
+    }
+   ],
+   "concept": {
+    "hue_deg": 24.5,
+    "luma_Y_linear": 0.2498,
+    "median_srgb": [
+     168.0,
+     129.0,
+     102.0
+    ],
+    "sat": 0.393,
+    "value": 0.659
+   },
+   "pixels_concept": 13326
+  },
+  "wood": {
+   "boxes": [
+    {
+     "box": [
+      395,
+      480,
+      440,
+      1060
+     ],
+     "pixels": 18406,
+     "view": "front",
+     "zone": "wood"
+    },
+    {
+     "box": [
+      582,
+      480,
+      628,
+      1040
+     ],
+     "pixels": 20971,
+     "view": "side",
+     "zone": "wood"
+    },
+    {
+     "box": [
+      722,
+      150,
+      790,
+      380
+     ],
+     "pixels": 8566,
+     "view": "back",
+     "zone": "wood"
+    },
+    {
+     "box": [
+      755,
+      660,
+      790,
+      800
+     ],
+     "pixels": 28,
+     "view": "back",
+     "zone": "wood"
+    }
+   ],
+   "concept": {
+    "hue_deg": 22.8,
+    "luma_Y_linear": 0.0328,
+    "median_srgb": [
+     65.0,
+     47.0,
+     36.0
+    ],
+    "sat": 0.446,
+    "value": 0.255
+   },
+   "pixels_concept": 47971
+  },
+  "wool_coarse": {
+   "boxes": [
+    {
+     "box": [
+      545,
+      760,
+      640,
+      1000
+     ],
+     "pixels": 22591,
+     "view": "front",
+     "zone": "wool"
+    },
+    {
+     "box": [
+      690,
+      480,
+      790,
+      640
+     ],
+     "pixels": 11434,
+     "view": "front",
+     "zone": "wool"
+    },
+    {
+     "box": [
+      380,
+      700,
+      470,
+      880
+     ],
+     "pixels": 7429,
+     "view": "side",
+     "zone": "wool"
+    },
+    {
+     "box": [
+      470,
+      330,
+      560,
+      430
+     ],
+     "pixels": 6739,
+     "view": "side",
+     "zone": "wool"
+    },
+    {
+     "box": [
+      440,
+      560,
+      760,
+      800
+     ],
+     "pixels": 67643,
+     "view": "back",
+     "zone": "wool"
+    },
+    {
+     "box": [
+      470,
+      180,
+      650,
+      260
+     ],
+     "pixels": 10195,
+     "view": "back",
+     "zone": "wool"
+    }
+   ],
+   "concept": {
+    "hue_deg": 228.0,
+    "luma_Y_linear": 0.0322,
+    "median_srgb": [
+     42.0,
+     49.0,
+     77.0
+    ],
+    "sat": 0.455,
+    "value": 0.302
+   },
+   "pixels_concept": 126031
+  }
+ }
+}

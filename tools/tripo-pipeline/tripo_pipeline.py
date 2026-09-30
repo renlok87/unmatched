@@ -1838,7 +1838,10 @@ def um_master_instances(ue, u, names, textures, tex_path, team_mode, base_mode, 
     bcfg = u.get("base_marker") or {}
     create("base_instance", base_master)
     if bcfg.get("textures", base_mode != "vertex-mask"):
-        for key, pname in (("BC", "BaseColorTexture"), ("N", "NormalTexture"), ("ORM", "ORMTexture")):
+        # look-dev C (Harpy): a base with its own texture set names the profile texture keys per parameter
+        # (ue.base_marker.texture_keys); default = the figure atlas (BC / N / ORM)
+        keys = bcfg.get("texture_keys") or {"BaseColorTexture": "BC", "NormalTexture": "N", "ORMTexture": "ORM"}
+        for pname, key in sorted(keys.items()):
             set_tex("base_instance", pname, tex_pkg[key])
     for name, value in sorted((bcfg.get("parameters") or {}).items()):
         set_scalar("base_instance", name, value)

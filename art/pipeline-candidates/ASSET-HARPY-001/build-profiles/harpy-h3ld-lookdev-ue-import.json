@@ -1,0 +1,238 @@
+{
+  "schema": "unmatched.tripo-pipeline.build-profile/1",
+  "profile_id": "harpy-h3ld-lookdev-ue-import/1",
+  "asset_id": "ASSET-HARPY-001",
+  "kind": "skeletal-adopt",
+  "status": "proposed",
+  "status_note": "Look-dev C, группа B (2026-09-30): первый UE-импорт Harpy H3 — прогон look-dev 20260929-h3-lookdev (профиль harpy-h3-lookdev/1: геометрия и риг H3 без изменений + UV1 в метрах, MatID с классом расширения horn_claw в столбце brass, EdgeMask, TeamAccent, LUT героя, текстуры подставки 1K) через CLI skeletal-adopt (tripo-pipeline 0.8.0) на канонический скелет героя. adopt сверяет FBX, карты и LUT с отчётами look-dev (нормализатор h3-lookdev-harpy/1, skeletal_adopt_lookdev.lookdev_harpy: кости — из валидации контракта рига на FBX H3, сокеты/границы/верх — отчёт рига H3), ue-import создаёт MI мастера /Game/UM/Materials/v2/M_UM_Figure_v2 (v2.1, UseTeamAccent) и M_UM_BaseMarker с собственными текстурами подставки. Палитра C-11 P1 #E8C06A / P2 #5A7F9F, цвет команды только на акцентах (кончики маховых + шнур браслета). Статус максимум «технически импортировано»/«измерено».",
+  "derived_from": [
+    "art/pipeline-candidates/ASSET-MEDUSA-001/build-profiles/medusa-h2ld-lookdev-ue-import.json (skeletal-adopt ue-раздел look-dev A)",
+    "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-bake.json (H3: base_material — UE-маршрут подставки, base_parametric)",
+    "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-lookdev.json (look-dev: классы, LUT, UV1, TeamAccent)",
+    "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h2anim.json (канонический скелет Rig/SK_Harpy_Skeleton)"
+  ],
+  "source_role": "h3-parts-glb",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "candidate": {
+    "dir": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev",
+    "report_format": "h3-lookdev-harpy/1",
+    "bake_profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-lookdev.json",
+    "bake_profile_id": "harpy-h3-lookdev/1",
+    "build_report": "reports/ld-fbx-report.json",
+    "textures_report": "reports/ld-maps-report.json",
+    "extra_reports": {
+      "h3_rig_report": "../20260929-h3-bake/reports/h2-rig-report.json",
+      "h3_validate_report": "../20260929-h3-bake/reports/validate-skeletal-mesh-v2.json",
+      "h3_textures_report": "../20260929-h3-bake/reports/textures-report.json"
+    },
+    "rig_contract": "docs/art-pipeline/rig/rig-contract.json",
+    "character": "Harpy",
+    "fbx": {
+      "skeletal": "export/SK_Harpy_H3LD.fbx",
+      "base": "export/SM_Harpy_H3LD_Base.fbx"
+    },
+    "body_object": "SK_Harpy_Body",
+    "top_part": null,
+    "textures": {
+      "BC": "textures/2k/T_Harpy_H3LD_BC.png",
+      "N": "textures/2k/T_Harpy_H3LD_N.png",
+      "ORM": "textures/2k/T_Harpy_H3LD_ORM.png",
+      "MatID": "textures/2k/T_Harpy_H3LD_MatID.png",
+      "Edge": "textures/2k/T_Harpy_H3LD_Edge.png",
+      "TeamAccent": "textures/2k/T_Harpy_H3LD_TeamAccent.png",
+      "BaseBC": "textures/base_1k/T_Harpy_H3LD_Base_BC.png",
+      "BaseN": "textures/base_1k/T_Harpy_H3LD_Base_N.png",
+      "BaseORM": "textures/base_1k/T_Harpy_H3LD_Base_ORM.png"
+    },
+    "texture_exceptions": {
+      "BaseBC": {"px": [1024, 1024], "tier": "base_1k"},
+      "BaseN": {"px": [1024, 1024], "tier": "base_1k"},
+      "BaseORM": {"px": [1024, 1024], "tier": "base_1k"}
+    },
+    "textures_note": "карты фигуры 2K (коммит) + текстуры подставки 1K (UV0 подставки свой, harpy-h3-bake.json base_material); 4K-мастера локальные. Прежний TeamMask (все тёмные маховые) deprecated и не импортируется",
+    "library_inputs": {
+      "LUT": {
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/lut/T_UM_MatLUT_Harpy_UE.dds",
+        "sha256": "e98447bd48ec9d7d5617088005365bc340e746edfd7a1b181a772706acd95780",
+        "note": "LUT героя 16 x 16 RGBA16F текущей итерации UE look-dev; i0 = textures/T_UM_MatLUT_Harpy.dds look-dev байт в байт (столбец 5 = horn_claw)"
+      }
+    },
+    "texture_px": 2048,
+    "texture_tier": "runtime_2k",
+    "conventions_required": {
+      "BC": "sRGB",
+      "N": "DirectX",
+      "ORM": "R AO, G roughness",
+      "MatID": "x 16 + 8",
+      "Edge": "linear",
+      "TeamAccent": "linear",
+      "BaseN": "DirectX"
+    }
+  },
+  "armature": {
+    "object": "SKEL_UM_Humanoid",
+    "skeleton": "UM_HUMANOID_17_v2",
+    "bones": [
+      ["root", null],
+      ["hips", "root"],
+      ["spine", "hips"],
+      ["head", "spine"],
+      ["arm_upper.L", "spine"],
+      ["arm_lower.L", "arm_upper.L"],
+      ["hand.L", "arm_lower.L"],
+      ["arm_upper.R", "spine"],
+      ["arm_lower.R", "arm_upper.R"],
+      ["hand.R", "arm_lower.R"],
+      ["leg_upper.L", "hips"],
+      ["leg_lower.L", "leg_upper.L"],
+      ["foot.L", "leg_lower.L"],
+      ["leg_upper.R", "hips"],
+      ["leg_lower.R", "leg_upper.R"],
+      ["foot.R", "leg_lower.R"]
+    ],
+    "bones_note": "UM_HUMANOID_17_v2 без кости оружия (контракт characters.Harpy.weapon_bone = null; крылья = руки). В UE объект арматуры — кость 0 (17 костей)"
+  },
+  "scale": {
+    "figure_height_m": 0.42,
+    "top_part": null,
+    "note": "верх фигуры 42,0 uu над низом подставки (H3 rig report checks.figure_top_m)"
+  },
+  "meshes": {
+    "body": {"object": "SK_Harpy_Body"},
+    "base": {
+      "object": "SM_Harpy_Base",
+      "footprint_m": [0.22, 0.22, 0.0504],
+      "pivot": "centre of the base bottom",
+      "footprint_note": "параметрическая подставка H3 (harpy-h3-bake.json base_parametric: радиус низа 0,11 м, высота 0,05 м + подъём меток 0,0004 м); read-back границ подставки в отчётах нет — их измеряет UE (base_footprint_pivot)"
+    }
+  },
+  "axes": {
+    "blender_front": "-Y",
+    "expected_ue_front": "+X",
+    "expected_ue_front_source": "04-blender-production.md §1 «Оси» + §1.1 preset UM_FBX_v1; ld_fbx измерил нормаль лица (0,653; −0,016; −0,199) вдоль +X кадра экспорта"
+  },
+  "sockets": [
+    {
+      "name": "Head",
+      "bone": "head",
+      "location_uu": null,
+      "purpose": "damage / status VFX; смещение = предсказание рига H3"
+    },
+    {
+      "name": "Weapon",
+      "bone": "foot.R",
+      "location_uu": null,
+      "purpose": "точка удара когтями (LungeAttack VFX) на foot.R, как H2/H3 (RIG-CONTRACT v2 characters.Harpy)"
+    }
+  ],
+  "expectations": {
+    "triangles": {
+      "SK_Harpy_Body": 37177,
+      "SM_Harpy_Base": 864
+    },
+    "bones": 16,
+    "skeletal_material_slots": 1,
+    "base_material_slots": 1,
+    "skeletal_lods": 1,
+    "note": "треугольники look-dev = H3 (ld-fbx-report triangles_as_h3); FBX несёт только LOD0"
+  },
+  "proposed_limits_for_comparison_only": {
+    "source": "ориентир H2/H3 — ПРЕДЛОЖЕНИЕ до решения GD-058, не бюджет",
+    "hero_triangles": [30000, 45000],
+    "texture_px": 2048,
+    "material_slots_max": 2,
+    "height_uu": [40, 60]
+  },
+  "ue": {
+    "folder_note": "запуск: ue-import --ue-folder /Game/PipelineCandidates/Harpy/H3LD (второй редактор арт-worktree, UE_MCP_URL=http://127.0.0.1:8124/mcp)",
+    "skeletal_asset": "SK_Harpy_H3LD",
+    "base_asset": "SM_Harpy_H3LD_Base",
+    "material_route": "um-master",
+    "masters": {
+      "figure": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+      "base": "/Game/UM/Materials/M_UM_BaseMarker"
+    },
+    "figure_instance": "MI_Harpy_H3LD",
+    "base_instance": "MI_Harpy_H3LD_Base",
+    "teams": {
+      "P1": "#E8C06A",
+      "P2": "#5A7F9F"
+    },
+    "teams_note": "активная палитра C-11 (um-masters.json team_palette); FLinearColor::FromSRGBColor (AD-OPEN-39)",
+    "default_team": "P1",
+    "team_instances": {
+      "figure": "MI_Harpy_H3LD_{team}",
+      "base": "MI_Harpy_H3LD_Base_{team}"
+    },
+    "team_color_mode": "none",
+    "team_color_mode_note": "v2.1: краситель по TeamAccentTexture (UseTeamAccent = true), TeamMaskTexture = T_UM_Mask_Black; перья в цветах концепта",
+    "figure_parameters": {
+      "TeamDye": 1.0,
+      "TeamDyeGain": 40.0,
+      "TeamDyeCeiling": 33.0882
+    },
+    "figure_parameters_note": "team-accent.md (LDV-13): TeamDyeGain = 0.8 / Y_p50 = 0.8 / 0.020, TeamDyeCeiling = 0.9 / Y_p95 = 0.9 / 0.0272 (ld-maps-report.json team_accent accent_median_Y_bc / accent_p95_Y_bc); P1 (max 0.807) -> min(40, 41.0) = 40, P2 -> 40 (= Blender-предложение 40). ld-team-accent-ue.json у Harpy нет",
+    "figure_textures": {
+      "MatIDTexture": "MatID",
+      "MatLUT": "LUT",
+      "EdgeMaskTexture": "Edge",
+      "TeamAccentTexture": "TeamAccent"
+    },
+    "figure_static_switches": {
+      "UseUV1Metres": true,
+      "UseTeamAccent": true
+    },
+    "extra_instances": [
+      {
+        "asset": "MI_Harpy_H3LD_Neutral",
+        "parent": "figure_instance",
+        "scalars": {"TeamDye": 0.0},
+        "vectors": {"TeamColor": {"linear": [1.0, 1.0, 1.0, 1.0]}},
+        "note": "без красителя: BC look-dev как есть, для сравнения с концептом"
+      },
+      {
+        "asset": "MI_Harpy_H3LD_DebugClass",
+        "parent": "figure_instance",
+        "scalars": {"DebugView": 1.0},
+        "note": "маска классов MatID для замера зон"
+      }
+    ],
+    "base_material_mode": "vertex-mask",
+    "base_material_mode_note": "параметрическая подставка H3 несёт маску в цветах вершин (UM_Mask: R полоса, G/B метки); импорт цветов вершин Replace",
+    "base_marker": {
+      "textures": true,
+      "texture_keys": {
+        "BaseColorTexture": "BaseBC",
+        "NormalTexture": "BaseN",
+        "ORMTexture": "BaseORM"
+      },
+      "parameters": {
+        "VertexMaskWeight": 1.0,
+        "SideBandWeight": 0.0,
+        "BandKeepsTexture": 0.0
+      },
+      "note": "UE-маршрут подставки H3 (harpy-h3-bake.json base_material): свои текстуры 1K, полоса команды и метки из маски вершин"
+    },
+    "base_generate_lightmap_uvs": false,
+    "base_generate_lightmap_uvs_note": "FBX подставки несёт UV1_m; генерация lightmap UV перезаписала бы UV1 (ld-fbx-report ue_import_notes)",
+    "expect_uv_channels": 2,
+    "target_skeleton": "/Game/PipelineCandidates/Harpy/Rig/SK_Harpy_Skeleton",
+    "target_skeleton_note": "канонический скелет героя (H2Anim, h2anim_ue.py skeleton из SK_Harpy_H3.fbx); клипы /Game/PipelineCandidates/Harpy/H2Anim/AM_* привязаны к нему",
+    "textures": {
+      "BC": {"file_key": "BC", "asset": "T_Harpy_H3LD_BC", "srgb": true, "compression": "TC_Default"},
+      "N": {"file_key": "N", "asset": "T_Harpy_H3LD_N", "srgb": false, "compression": "TC_Normalmap", "flip_green": false,
+            "note": "DirectX (= H3)"},
+      "ORM": {"file_key": "ORM", "asset": "T_Harpy_H3LD_ORM", "srgb": false, "compression": "TC_Masks"},
+      "MatID": {"file_key": "MatID", "asset": "T_Harpy_H3LD_MatID", "srgb": false, "compression": "TC_Grayscale",
+                "properties": {"Filter": "TF_Nearest", "MipGenSettings": "TMGS_NoMipmaps", "NeverStream": true}},
+      "Edge": {"file_key": "Edge", "asset": "T_Harpy_H3LD_Edge", "srgb": false, "compression": "TC_Grayscale"},
+      "TeamAccent": {"file_key": "TeamAccent", "asset": "T_Harpy_H3LD_TeamAccent", "srgb": false, "compression": "TC_Grayscale"},
+      "BaseBC": {"file_key": "BaseBC", "asset": "T_Harpy_H3LD_Base_BC", "srgb": true, "compression": "TC_Default", "px": [1024, 1024]},
+      "BaseN": {"file_key": "BaseN", "asset": "T_Harpy_H3LD_Base_N", "srgb": false, "compression": "TC_Normalmap", "flip_green": false, "px": [1024, 1024]},
+      "BaseORM": {"file_key": "BaseORM", "asset": "T_Harpy_H3LD_Base_ORM", "srgb": false, "compression": "TC_Masks", "px": [1024, 1024]},
+      "LUT": {"file_key": "LUT", "asset": "T_UM_MatLUT_Harpy", "srgb": false, "compression": "TC_HDR", "px": [16, 16],
+              "properties": {"Filter": "TF_Nearest", "MipGenSettings": "TMGS_NoMipmaps", "NeverStream": true}}
+    },
+    "measure_skeletal_triangles": true
+  }
+}

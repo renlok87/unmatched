@@ -1,0 +1,182 @@
+{
+ "classes": {
+  "gold_antique": {
+   "bakeLuminanceModulation": 0.3,
+   "bc": [
+    0.62,
+    0.2607,
+    0.0685
+   ],
+   "ymedClassHero": 0.44619,
+   "roughTypical": 0.38,
+   "roughLo": 0.28,
+   "roughHi": 0.5,
+   "cavityDarken": 0.7
+  },
+  "leather_worn": {
+   "bc": [
+    0.10946,
+    0.04971,
+    0.02519
+   ],
+   "luminanceMin": 0.05,
+   "specular": 0.4
+  },
+  "silk": {
+   "bc": [
+    0.61721,
+    0.20508,
+    0.06663
+   ],
+   "roughHi": 0.58,
+   "roughLo": 0.32,
+   "roughTypical": 0.42,
+   "roughVariation": 0.08,
+   "sheenIntensity": 0.25,
+   "sheenTint": 1.0,
+   "teamDyeAllowed": 0.0,
+   "specular": 0.35
+  },
+  "skin": {
+   "bc": [
+    0.4452,
+    0.18447,
+    0.09531
+   ]
+  },
+  "steel_blued": {
+   "bakeLuminanceModulation": 0.5,
+   "bc": [
+    0.15,
+    0.148,
+    0.155
+   ],
+   "roughHi": 0.56,
+   "roughLo": 0.38,
+   "roughTypical": 0.46,
+   "roughVariation": 0.048,
+   "wearStrength": 0.12,
+   "ymedClassHero": 0.15017
+  },
+  "steel_polished": {
+   "ymedClassHero": 0.51621
+  },
+  "stone_base": {
+   "bc": [
+    0.0319,
+    0.03071,
+    0.0331
+   ]
+  },
+  "wool_coarse": {
+   "bc": [
+    0.15896,
+    0.00651,
+    0.00913
+   ],
+   "sheenIntensity": 0.1,
+   "sheenTint": 0.7,
+   "specular": 0.3
+  }
+ },
+ "generator": "tools/art/material_library/lookdev_ue_inputs.py",
+ "hero": "Arthur",
+ "layers": {
+  "blender_lookdev": {
+   "classes": {
+    "gold_antique": {
+     "bc": [
+      1.0,
+      0.474,
+      0.137
+     ],
+     "ymedClassHero": 0.44619
+    },
+    "leather_worn": {
+     "bc": [
+      0.10946,
+      0.04971,
+      0.02519
+     ]
+    },
+    "silk": {
+     "bc": [
+      0.61721,
+      0.20508,
+      0.06663
+     ],
+     "roughHi": 0.58,
+     "roughLo": 0.32,
+     "roughTypical": 0.42,
+     "roughVariation": 0.08,
+     "sheenIntensity": 0.5,
+     "sheenTint": 1.0,
+     "teamDyeAllowed": 0.0
+    },
+    "skin": {
+     "bc": [
+      0.4452,
+      0.18447,
+      0.09531
+     ]
+    },
+    "steel_blued": {
+     "bc": [
+      0.159,
+      0.147,
+      0.134
+     ],
+     "roughHi": 0.56,
+     "roughLo": 0.38,
+     "roughTypical": 0.46,
+     "roughVariation": 0.048,
+     "ymedClassHero": 0.15017
+    },
+    "steel_polished": {
+     "ymedClassHero": 0.51621
+    },
+    "stone_base": {
+     "bc": [
+      0.0319,
+      0.03071,
+      0.0331
+     ]
+    },
+    "wool_coarse": {
+     "bc": [
+      0.15896,
+      0.00651,
+      0.00913
+     ]
+    }
+   },
+   "source": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/reports/ld-lut.json#overrides"
+  },
+  "ue_lookdev": {
+   "classes": {
+    "gold_antique": {
+     "bakeLuminanceModulation": 0.3,
+     "why": "the gold trims carry painted relief (lion heads, knotwork): +-30 % instead of +-12 %"
+    },
+    "steel_blued": {
+     "bakeLuminanceModulation": 0.5,
+     "wearStrength": 0.12,
+     "why": "engraving and the lighter gauntlets live in the bake luminance (H2.2 BC p10 / p90 = 0.47 / 1.51 of the median, gauntlets 1.5x the plate): the preset's +-15 % would flatten them; wear: the concept plate edges are gold trims, the EdgeMask of the Tripo normal also lights the engraving ridges -> 0.12 instead of 0.35 (a hint of bare iron on the ridges)"
+    }
+   },
+   "source": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-lookdev-ue-lut.json#lut.ue_lookdev"
+  },
+  "ue_lookdev_c": {
+   "iteration": "i1",
+   "why": {
+    "gold_antique": "i0: saturation 0.35 vs concept 0.58, hue +13 deg (Cobble sky whitens the metal), -1 EV luma 1.42: F0 x (0.62, 0.55, 0.50) as Medusa i1, roughness 0.38 [0.28, 0.50], cavityDarken 0.7",
+    "wool_coarse": "i0: cloth 1.79 (Cobble) / 1.45 (-1 EV) of the concept relative to the other zones, saturation -0.17: Cloth sheen 0.35 of the preset under the dome x 11.2 greys and lifts the red; sheen 0.10, tint 0.7, specular 0.3 (Merlin UE-1..4, Medusa i1)",
+    "silk": "i0: embroidery saturation -0.20 at Cobble (sheen tint 1.0 x 0.5 whitens the thread): sheen 0.25, specular 0.35",
+    "steel_blued": "i0: steel saturation 0.25 vs 0.10 of the concept at the same hue: F0 chroma made neutral-cool (0.150, 0.148, 0.155), same Y",
+    "leather_worn": "i0: belt 0.68 / 0.50: floor of the bake-clamped luminance 0.02 -> 0.05, specular 0.4"
+   }
+  }
+ },
+ "rebuild": "python tools/art/material_library/lookdev_ue_inputs.py --config art/pipeline-candidates/ASSET-KING-ARTHUR-001/build-profiles/king-arthur-h2-lookdev-ue-lut.json",
+ "schema": "unmatched.um-v2-hero-overrides/1"
+}

@@ -25,7 +25,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 LOCK = Path(os.environ.get("UE_EDITOR_LOCK", "C:/tmp/ue-editor.lock"))  # one lock file per live editor
-OWNER = "look-dev-C"
+OWNER = os.environ.get("UE_LOCK_OWNER", "look-dev-C")  # parallel groups name themselves (e.g. look-dev-C-A)
 POLL_S = 20.0
 STALE_S = 25 * 60.0
 EVENTS = []   # stale takeovers etc. of this process (for the reports)

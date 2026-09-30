@@ -1,10 +1,10 @@
 {
   "schema": "unmatched.tripo-pipeline.build-profile/1",
-  "profile_id": "merlin-h2-lookdev-ue-import/1",
+  "profile_id": "merlin-h2-lookdev-ue-import/2",
   "asset_id": "ASSET-MERLIN-001",
   "kind": "skeletal-adopt",
   "status": "proposed",
-  "status_note": "LD-merlin-ue (2026-09-29): UE import of the Merlin look-dev run (merlin-h2-lookdev/1: H2.1 rig + UV1, concept-toned BC, MatID, class LUT, EdgeMask) onto M_UM_Figure_v2 through the CLI profile skeletal-adopt. The figure MI is a child of /Game/UM/Materials/v2/M_UM_Figure_v2 (MatID, hero LUT 16x16, EdgeMask, UV1 in metres); the base keeps M_UM_BaseMarker (team band). At most «технически импортировано / измерено»; no art acceptance, no budget (GD-058 open); Blue/Red diagnostic pair (Q-304 open).",
+  "status_note": "LD-merlin-ue (2026-09-29): UE import of the Merlin look-dev run (merlin-h2-lookdev/1: H2.1 rig + UV1, concept-toned BC, MatID, class LUT, EdgeMask) onto M_UM_Figure_v2 through the CLI profile skeletal-adopt. The figure MI is a child of /Game/UM/Materials/v2/M_UM_Figure_v2 (MatID, hero LUT 16x16, EdgeMask, UV1 in metres); the base keeps M_UM_BaseMarker (team band). At most «технически импортировано / измерено»; no art acceptance, no budget (GD-058 open); Blue/Red diagnostic pair (Q-304 open). Rev 2 (look-dev C, group A, 2026-09-30): master v2.1 UseTeamAccent with the TeamAccent mask of the look-dev run (library_inputs.TeamAccent: belt, hood lining, cuff bands, hem edge; 5.22 % of the figure), one gain rule for both teams (TeamDyeGain 0.8 / Y_p50 + TeamDyeCeiling 0.9 / Y_p95), teams = the active C-11 palette P1 #E8C06A / P2 #5A7F9F (user decision «Акценты + кольцо»: the robe stays concept blue in both teams); the deprecated W4-B TeamMask is no longer imported (TeamMaskTexture = T_UM_Mask_Black, team_color_mode none); MI names Neutral / P1 / P2 / DebugClass (+ DebugZones). The mesh stays on the canonical skeleton /Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton.",
   "derived_from": [
     "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-ue-import.json (W5c-A H2.1 import: armature, sockets, axes, scale, team pair, base marker)",
     "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json (look-dev stage)",
@@ -43,6 +43,13 @@
       "MatLUT": "ue-inputs/T_UM_MatLUT_Merlin.dds",
       "ZoneID": "ue-inputs/T_Merlin_H2LD_ZoneID_2K.png",
       "ZoneLUT": "ue-inputs/T_Merlin_H2LD_ZoneLUT_Debug.dds"
+    },
+    "library_inputs": {
+      "TeamAccent": {
+        "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_TeamAccent_2K.png",
+        "sha256": "75972ad3e6baa49fca950cb00c602a2355875da7e589fb3f6a56395676c367df",
+        "note": "rev 2: TeamAccent L8 linear 2048^2 of the look-dev run (LD-merlin-accent, f8dfb423; sha256 = reports/ld-accent-report.json textures.TeamAccent_2K); TeamAccentTexture of M_UM_Figure_v2.1"
+      }
     },
     "textures_note": "2K runtime set of the look-dev run + UE inputs of lookdev_ue_inputs.py (LUT 16x16 v2 layout instead of the EXR 16x8 of the Blender stage, EdgeMask = TeamMaskRGBA.A as its own texture, LDV-1/LDV-8). ZoneID is a DEBUG input: only the debug MI MI_Merlin_H2LD_DebugZones reads it (zone masks of the look-dev measurement). The 4K masters and TeamMaskRGBA are never imported",
     "texture_px": 2048,
@@ -231,22 +238,23 @@
     "figure_instance": "MI_Merlin_H2LD",
     "base_instance": "MI_Merlin_H2LD_Base",
     "teams": {
-      "Blue": "#3F6FD8",
-      "Red": "#D0453A"
+      "P1": "#E8C06A",
+      "P2": "#5A7F9F"
     },
-    "teams_note": "diagnostic pair for the W5c frames (task: TeamColor blue and red); С-11 Gold/Silver stays the palette proposal (Q-304 open). Linear only through FLinearColor::FromSRGBColor (AD-OPEN-39 rule). Proposal",
-    "default_team": "Blue",
+    "teams_note": "rev 2: the active C-11 palette c11_value_split_proposal of art/um-materials/um-masters.json (P1 gold #E8C06A, P2 steel blue #5A7F9F), user decision «Акценты + кольцо» (team colour only on the accents and the base ring). Linear only through FLinearColor::FromSRGBColor (AD-OPEN-39 rule)",
+    "default_team": "P1",
     "team_instances": {
       "figure": "MI_Merlin_H2LD_{team}",
       "base": "MI_Merlin_H2LD_Base_{team}"
     },
-    "team_color_mode": "mask",
-    "team_color_mode_note": "user decision 2026-09-28 (AD-CNF-58 = b): TeamColor on the clothing by TeamMask.R (H2.1 mask: robe with hood 0.82, sleeves 0.87-0.89; skin, face, staff, crystal, shoes 0) and on the base side band",
+    "team_color_mode": "none",
+    "team_color_mode_note": "rev 2: M_UM_Figure_v2.1 dyes by TeamAccentTexture (static switch UseTeamAccent = true); the v2.0 TeamMask path is off and TeamMaskTexture = T_UM_Mask_Black (mode none), so no MI can fall back to dyeing the whole robe; the deprecated W4-B TeamMask stays a pinned candidate file only (adopt), it is not imported. The base keeps its team side band (M_UM_BaseMarker)",
     "figure_parameters": {
       "TeamDye": 1.0,
-      "TeamDyeGain": 5.5
+      "TeamDyeGain": 27.1186,
+      "TeamDyeCeiling": 9.018
     },
-    "figure_parameters_note": "as H2.1 (W5c-A): TeamColor x luminance(BC) x 5.5 on the wool (the only teamDyeAllowed class of the Merlin LUT: silk embroidery, leather, skin, wood, bronze are never dyed, LDM-1/LDV-7). Other v2 knobs at the master defaults. Look-dev changes are recorded in the LD-merlin-ue decisions",
+    "figure_parameters_note": "rev 2, team-accent.md rule (LDV-13) as one MI for both teams: TeamDyeGain = 0.8 / Y_p50 (0.0295), TeamDyeCeiling = 0.9 / Y_p95 (0.0998) of the accent texels (reports/ld-team-accent-ue.json); effective gain min(27.12, 9.018 / maxc(team)) = P1 11.17, P2 26.01 (v2.1 accent report hero-merlin). Other v2 knobs at the master defaults",
     "base_marker": {
       "textures": true,
       "parameters": {
@@ -277,12 +285,12 @@
         "compression": "TC_Masks",
         "note": "R AO, G roughness, B metallic, linear; TC_Masks keeps the three channels independent (no sRGB curve)"
       },
-      "TeamMask": {
-        "file_key": "TeamMask",
-        "asset": "T_Merlin_H2LD_TeamMask",
+      "TeamAccent": {
+        "file_key": "TeamAccent",
+        "asset": "T_Merlin_H2LD_TeamAccent",
         "srgb": false,
         "compression": "TC_Grayscale",
-        "note": "single-channel L8 mask: TC_Grayscale stores it uncompressed (G8), no channel is lost; M_UM_Figure samples it as LinearGrayscale (W4-B)"
+        "note": "rev 2: TeamAccent L8 linear, mips normal (the mask is filtered), TeamAccentTexture of M_UM_Figure_v2.1 (team-accent.md). Replaces the deprecated W4-B TeamMask import"
       },
       "MatID": {
         "file_key": "MatID",
@@ -355,10 +363,12 @@
     "figure_textures": {
       "MatIDTexture": "MatID",
       "MatLUT": "MatLUT",
-      "EdgeMaskTexture": "EdgeMask"
+      "EdgeMaskTexture": "EdgeMask",
+      "TeamAccentTexture": "TeamAccent"
     },
     "figure_static_switches": {
-      "UseUV1Metres": true
+      "UseUV1Metres": true,
+      "UseTeamAccent": true
     },
     "figure_static_switches_note": "the look-dev FBX carries UV1 in metres (LDM-8): 2 detail samples instead of the 6 of the triplanar fallback, wood grain along U on the rotated staff islands (tangent of UV1 from derivatives, LDV-4)",
     "extra_instances": [
@@ -374,7 +384,7 @@
         "purpose": "no dye: TeamColor white x TeamDye 0 = the baked concept tone (concept comparison)"
       },
       {
-        "asset": "MI_Merlin_H2LD_DebugClasses",
+        "asset": "MI_Merlin_H2LD_DebugClass",
         "parent": "figure_instance",
         "scalars": {
           "DebugView": 1.0
