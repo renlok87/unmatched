@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
+import { planAttackTypePatch } from './backfill-attack-type';
 
 const prisma = new PrismaClient();
 
@@ -270,7 +271,21 @@ async function importHero(heroKey: string) {
     });
 
     if (existingHero) {
-      console.log(`⏭️  Пропуск: ${hero.name} (уже существует)`);
+      // Колоду и прочие поля существующего героя не трогаем, но тип атаки (герой и помощники) сверяем со скрейпом:
+      // без поля движок даёт 'melee' — Medusa (attack=range) играла ближним бойцом (GD-058 interim §8 п. 9).
+      const patch = planAttackTypePatch(existingHero, {
+        attack: hero.attack,
+        sidekicks: (hero.sidekicks || []).map((sk: any) => ({ name: sk.name, attack: sk.attackType })),
+      });
+      if (patch) {
+        const data: Record<string, any> = {};
+        if (patch.properties) data.properties = patch.properties;
+        if (patch.sidekicks !== undefined) data.sidekicks = patch.sidekicks;
+        await prisma.hero.update({ where: { id: existingHero.id }, data });
+        console.log(`🏹 ${hero.name} (уже существует): ${patch.changes.join('; ')}`);
+      } else {
+        console.log(`⏭️  Пропуск: ${hero.name} (уже существует)`);
+      }
       return;
     }
 

@@ -181,6 +181,12 @@ struct FPlacementInput {
   // to every rect of BindOthers (T5.2 errata: the Medusa plate sat under King Arthur and read as his).
   FS08ScreenRect BindTarget;
   TArray<FS08ScreenRect> BindOthers;
+  // W7 (GD-058 interim 2026-09-30 §8 item 13): when no clean place exists and the least bad one around the anchor is
+  // not bound to BindTarget (Cobble: the destination cells ring the owner and its neighbours touch it, so the old
+  // fallback landed 126-214 px away, right under Merlin / King Arthur), the plate may sit ON the anchor box ("on-owner"):
+  // off every destination cell, strictly nearer to the owner than to any other figure, as close as possible to
+  // "right above the figure, centred" (the base and the team ring stay visible). false = the pre-W7 fallback (kept for the regression test).
+  bool bAllowOnOwner = true;
 };
 
 struct FPlacementResult {
@@ -197,7 +203,9 @@ struct FPlacementResult {
 
 /** Nearest plate position around the anchor (ring by ring; each ring slides
  *  the plate along the four sides) that covers no forbidden cell and no soft
- *  obstacle; otherwise the least bad one (forbidden count, area, soft area). */
+ *  obstacle; otherwise (W7, bAllowOnOwner) a bound "on-owner" place over the
+ *  anchor box when the ring search has no forbidden-free bound one; otherwise
+ *  the least bad one (forbidden count, area, soft area). */
 FPlacementResult ChoosePlateRect(const FPlacementInput& In);
 
 // ---- W5b-R D-1/D-5: screen tags, the damage number and the combat icon anchors (deterministic, world-free)

@@ -1,0 +1,312 @@
+{
+  "schema": "unmatched.gd058-interim-perf/1",
+  "date": "2026-09-30",
+  "status": "измерено; dev-PC (RTX 4090, i9-13900F), не D-07; параллельная сессия пользователя активна: да — ACC-022 и perf-gate GD-058 этими числами не закрываются",
+  "marking": "dev-PC, не D-07, параллельная сессия пользователя активна: да",
+  "machine": {
+    "gpu": "RTX 4090",
+    "cpu": "i9-13900F",
+    "background": "GPU без клиентов p50 25 %, p95 35 % (gpu-baseline, 20 с: dwm.exe ≈ 23 % SM, claude.exe ≈ 19 %, chrome.exe ≈ 6 %); Blender GUI :9876/:9877 открыты без рендера; UnrealEditor закрыт; пользователь за машиной (GetLastInputInfo idle 3–37 с на всех замерах)",
+    "baseline": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/gpu-baseline/gpu-baseline.json"
+  },
+  "binary": {
+    "stagedInnerExeSha256": "f8accb3da116f7e3d3dde930dd61e90bd20d1d6e04c070223feab9ecb9939178",
+    "pakSha256": "84e68fbe1bf31c1931cb1bc0860957310b5c2fa22e0a66f12cc8b6da097e347b"
+  },
+  "singleClient60": {
+    "what": "один packaged-клиент, эффективные 60 FPS (-BenchFps=60 → t.MaxFPS 60, как FrameRateLimit=60 по умолчанию), render_bench вариант dx12-lumen-high-v2-fps60: герои v2 + поднос, High, SP100, 1920×1080 offscreen, воспроизведение состояния Cobble 5×6 (Config/Bench/S08BenchCobble.json) без бэкенда и HUD; 65 с на вид",
+    "run": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/perf/bench/dx12-lumen-high-v2-fps60/r1/",
+    "views": {
+      "K1": {
+        "windowS": 65.0,
+        "fps": 60.0,
+        "frames": 3900,
+        "frameMs": {
+          "avg": 16.67,
+          "p50": 16.67,
+          "p95": 16.67,
+          "p99": 16.67,
+          "max": 17.02
+        },
+        "gpuMs": {
+          "avg": 1.89,
+          "p50": 1.85,
+          "p95": 2.07
+        },
+        "hitches50": 0,
+        "nvidiaSmiInWindow": {
+          "n": 127,
+          "utilP50": 40.0,
+          "utilP95": 43.0,
+          "memUsedMiBMax": 6887.0,
+          "powerWP50": 120.1
+        }
+      },
+      "K2x2.5": {
+        "windowS": 65.0,
+        "fps": 59.97,
+        "frames": 3899,
+        "frameMs": {
+          "avg": 16.67,
+          "p50": 16.67,
+          "p95": 16.67,
+          "p99": 16.67,
+          "max": 30.2
+        },
+        "gpuMs": {
+          "avg": 2.04,
+          "p50": 2.0,
+          "p95": 2.27
+        },
+        "hitches50": 0,
+        "nvidiaSmiInWindow": {
+          "n": 127,
+          "utilP50": 41.0,
+          "utilP95": 44.0,
+          "memUsedMiBMax": 6955.0,
+          "powerWP50": 125.3
+        }
+      }
+    },
+    "note": "gpuMs снят при ограничении FPS — по AGENTS.md не для сравнения стоимости; стоимость — uncappedCost. Профиль света бенча cobble-city (фикстура бенча), в живых прогонах — cobble-probe"
+  },
+  "pair30": {
+    "what": "пара offscreen-клиентов по 30 FPS (run-phase2-demo -ClientFps 30), герои v2 + поднос, прогоны B (K1/K2 Cobble, K1 фикстур)",
+    "summary": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/perf/pair-30fps-perf-summary.json",
+    "aggregate": {
+      "fpsMin": 29.68,
+      "fpsMax": 29.85,
+      "frameMsP95Max": 33.33,
+      "gpuBusyMsP50Range": [
+        1.0601,
+        1.172
+      ],
+      "gpuTotalUtilMeanRange": [
+        37.85,
+        41.09
+      ],
+      "gpuTotalUtilP95Max": 46.0,
+      "baselineGpuUtil": {
+        "n": 40,
+        "mean": 25.55,
+        "p50": 25.0,
+        "p95": 35.0,
+        "max": 40.0
+      },
+      "baselinePowerW": {
+        "n": 40,
+        "mean": 56.49,
+        "p50": 49.24,
+        "p95": 76.54,
+        "max": 77.11
+      }
+    },
+    "k3": {
+      "B-K3-cobble-5x6-v2": {
+        "gpuTotalP50": 38.0,
+        "gpuTotalP95": 43.0,
+        "fpsMedianHost": 30.0,
+        "fpsMedianJoiner": 30.0,
+        "fpsMinWindowJoiner": 26.28
+      },
+      "B-K3-sherwood-forest-8x5-v2": {
+        "gpuTotalP50": 43.0,
+        "gpuTotalP95": 48.0,
+        "fpsMedianHost": 30.0,
+        "fpsMedianJoiner": 28.95,
+        "fpsMinWindowJoiner": 25.51
+      },
+      "B-K3-t-rex-paddock-7x5-v2": {
+        "gpuTotalP50": 42.0,
+        "gpuTotalP95": 47.0,
+        "fpsMedianHost": 30.0,
+        "fpsMedianJoiner": 29.515,
+        "fpsMinWindowJoiner": 26.12
+      }
+    }
+  },
+  "uncappedCost": {
+    "what": "render_bench packaged -Bench без ограничения FPS, CSV -csvGpuStats по проходам, 2 повтора на вариант: dx12-lumen-high (эталон без героев v2 и подноса) против dx12-lumen-high-v2",
+    "summary": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/perf/bench/bench-summary.json",
+    "gpuWindows": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/perf/bench/bench-gpu-windows.json",
+    "views": {
+      "K1": {
+        "fps": {
+          "ref": 186.52,
+          "v2": 183.75
+        },
+        "csv": {
+          "GPUTime": {
+            "refMs": 1.7614,
+            "v2Ms": 1.8292,
+            "deltaMs": 0.0678,
+            "noiseMs": 0.0045,
+            "significant": true
+          },
+          "GPU/LumenReflections": {
+            "refMs": 0.055,
+            "v2Ms": 0.1182,
+            "deltaMs": 0.0632,
+            "noiseMs": 0.0007,
+            "significant": true
+          },
+          "GPU/RenderDeferredLighting": {
+            "refMs": 0.2629,
+            "v2Ms": 0.2004,
+            "deltaMs": -0.0625,
+            "noiseMs": 0.004,
+            "significant": true
+          },
+          "GPU/LumenSceneUpdate": {
+            "refMs": 0.0479,
+            "v2Ms": 0.0635,
+            "deltaMs": 0.0156,
+            "noiseMs": 0.0002,
+            "significant": true
+          },
+          "GPU/Basepass": {
+            "refMs": 0.0655,
+            "v2Ms": 0.0789,
+            "deltaMs": 0.0134,
+            "noiseMs": 0.0003,
+            "significant": true
+          },
+          "GPU/ShadowDepths": {
+            "refMs": 0.0386,
+            "v2Ms": 0.0493,
+            "deltaMs": 0.0107,
+            "noiseMs": 0.0002,
+            "significant": true
+          },
+          "GPU/TemporalSuperResolution": {
+            "refMs": 0.3632,
+            "v2Ms": 0.3629,
+            "deltaMs": -0.0003,
+            "noiseMs": 0.0063,
+            "significant": false
+          },
+          "FrameTime": {
+            "refMs": 5.3619,
+            "v2Ms": 5.4422,
+            "deltaMs": 0.0803,
+            "noiseMs": 0.1103,
+            "significant": false
+          },
+          "RenderThreadTime": {
+            "refMs": 5.3607,
+            "v2Ms": 5.4411,
+            "deltaMs": 0.0804,
+            "noiseMs": 0.1114,
+            "significant": false
+          },
+          "GameThreadTime": {
+            "refMs": 1.2546,
+            "v2Ms": 1.2555,
+            "deltaMs": 0.0009,
+            "noiseMs": 0.073,
+            "significant": false
+          }
+        },
+        "nvidiaSmiUtilP50": {
+          "ref": [
+            95.0,
+            95.0
+          ],
+          "v2": [
+            95.0,
+            94.0
+          ]
+        }
+      },
+      "K2x5": {
+        "fps": {
+          "ref": 175.73,
+          "v2": 173.245
+        },
+        "csv": {
+          "GPUTime": {
+            "refMs": 1.9261,
+            "v2Ms": 2.0707,
+            "deltaMs": 0.1446,
+            "noiseMs": 0.0017,
+            "significant": true
+          },
+          "GPU/LumenReflections": {
+            "refMs": 0.0568,
+            "v2Ms": 0.1323,
+            "deltaMs": 0.0755,
+            "noiseMs": 0.0005,
+            "significant": true
+          },
+          "GPU/RenderDeferredLighting": {
+            "refMs": 0.2782,
+            "v2Ms": 0.2314,
+            "deltaMs": -0.0468,
+            "noiseMs": 0.0017,
+            "significant": true
+          },
+          "GPU/LumenSceneUpdate": {
+            "refMs": 0.0602,
+            "v2Ms": 0.0541,
+            "deltaMs": -0.0061,
+            "noiseMs": 0.0001,
+            "significant": true
+          },
+          "GPU/Basepass": {
+            "refMs": 0.0839,
+            "v2Ms": 0.0982,
+            "deltaMs": 0.0143,
+            "noiseMs": 0.0003,
+            "significant": true
+          },
+          "GPU/ShadowDepths": {
+            "refMs": 0.0734,
+            "v2Ms": 0.0914,
+            "deltaMs": 0.018,
+            "noiseMs": 0.0002,
+            "significant": true
+          },
+          "GPU/TemporalSuperResolution": {
+            "refMs": 0.3854,
+            "v2Ms": 0.4466,
+            "deltaMs": 0.0612,
+            "noiseMs": 0.0254,
+            "significant": true
+          },
+          "FrameTime": {
+            "refMs": 5.6905,
+            "v2Ms": 5.7727,
+            "deltaMs": 0.0822,
+            "noiseMs": 0.1055,
+            "significant": false
+          },
+          "RenderThreadTime": {
+            "refMs": 5.6891,
+            "v2Ms": 5.7718,
+            "deltaMs": 0.0827,
+            "noiseMs": 0.105,
+            "significant": false
+          },
+          "GameThreadTime": {
+            "refMs": 1.2429,
+            "v2Ms": 1.2652,
+            "deltaMs": 0.0223,
+            "noiseMs": 0.1298,
+            "significant": false
+          }
+        },
+        "nvidiaSmiUtilP50": {
+          "ref": [
+            95.0,
+            94.0
+          ],
+          "v2": [
+            95.0,
+            95.0
+          ]
+        }
+      }
+    },
+    "rule": "значимо, если |Δ| > 2 × шум (шум = max − min по повторам); 2 повтора вместо 3 — оценка шума грубее"
+  }
+}

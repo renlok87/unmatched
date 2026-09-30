@@ -1,0 +1,39 @@
+{
+  "schema": "unmatched.gd058-t43-real-input/1",
+  "task": "T4.3 реальный ввод (клик по фигурке, колесо зума, Space через SendInput в окне packaged-клиента, DPI-aware)",
+  "status": "не выполнено: пользователь активен",
+  "rule": "делегирование 2026-09-29: реальный ввод T4.3 — только если пользователь бездействует ≥ 10 мин по GetLastInputInfo, прерывать при вводе пользователя; не имитировать",
+  "method": "C:/tmp/gd058-runs/idle.ps1 (user32 GetLastInputInfo, Environment.TickCount - dwTime), замеры в течение этапа RUNS",
+  "thresholdSeconds": 600,
+  "samples": [
+    {
+      "local": "2026-09-30T21:02:39+05:00",
+      "idleSeconds": 15.7
+    },
+    {
+      "local": "2026-09-30T21:16:10+05:00",
+      "idleSeconds": 3.1
+    },
+    {
+      "local": "2026-09-30T21:23:38+05:00",
+      "idleSeconds": 2.7
+    },
+    {
+      "local": "2026-09-30T21:39:50+05:00",
+      "idleSeconds": 26.3
+    },
+    {
+      "local": "2026-09-30T22:01:02+05:00",
+      "idleSeconds": 37.4
+    },
+    {
+      "local": "2026-09-30T22:02:57+05:00",
+      "idleSeconds": 32.7
+    }
+  ],
+  "maxIdleSeconds": 37.4,
+  "decision": "ни один замер не достиг 600 с (максимум 37,4 с): SendInput не запускался, окно клиента не открывалось, эмуляция флагами не выдаётся за реальный ввод",
+  "runner": "раннера SendInput/DPI-aware в репозитории по-прежнему нет (PLAN-STATUS T4.3); на этом этапе не писался, так как условие запуска не выполнено",
+  "flagInputStillUsed": "выбор своего героя (-ArtPreviewSelectOwnHero) и зум K2 (-ArtPreviewFocusZoom) в кадрах B — тестовые флаги, в трассах 'INPUT ... src=flag'",
+  "hoverState": "наведение (hover) срабатывает только от реального движения курсора ОС (AS08FlowGameMode::UpdateHover, 'INPUT hover src=os'); флага нет — третье состояние QA-010 «наведение» в наборе B не снято и относится к T4.3"
+}

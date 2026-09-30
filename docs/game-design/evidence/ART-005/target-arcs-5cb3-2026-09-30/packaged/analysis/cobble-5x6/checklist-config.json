@@ -1,0 +1,183 @@
+{
+  "title": "QA-010 чек-лист W5b-R — cobble-5x6: K1 + K3 (K2 — задача T5.1). Не приёмка",
+  "run": {
+    "задача": "W5b-R «Исправление читаемости доски»",
+    "доска": "cobble-5x6 boardId=cmuhgs4b2001mwik4f2b2xtf8",
+    "K1_хост": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k1/cobble-5x6/run-20260930-210906/phase2-board-host-1920x1080.png",
+    "K1_присоединившийся": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k1/cobble-5x6/run-20260930-210906/phase2-board-joiner-1920x1080.png",
+    "K3": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-210705/joiner/s09-combat-resolve-revealed.png",
+    "пороги": "t53-thresholds.json (зарегистрированы до съёмки)"
+  },
+  "frames": {
+    "K1": {
+      "path": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k1/cobble-5x6/run-20260930-210906/phase2-board-host-1920x1080.png",
+      "provenance": "packaged-live strict + render-reference + SHOT captured (tools/art/classify_evidence.py --strict --render-reference --require-captured)"
+    },
+    "K3": {
+      "path": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-210705/joiner/s09-combat-resolve-revealed.png",
+      "provenance": "packaged-live strict + render-reference + SHOT captured (tools/art/classify_evidence.py --strict --render-reference --require-captured)"
+    }
+  },
+  "results": [
+    {
+      "k": "K1..K3",
+      "path": "derive-manifest.json"
+    },
+    {
+      "k": "K1..K3",
+      "path": "luma-frames.json"
+    },
+    {
+      "k": "K1",
+      "path": "c9-K1_host-all.json"
+    },
+    {
+      "k": "K3",
+      "path": "icon-K3.json"
+    },
+    {
+      "k": "K1",
+      "path": "project-k1-host.json"
+    },
+    {
+      "k": "K1",
+      "path": "plate-k1-host.json"
+    },
+    {
+      "k": "K1",
+      "path": "render-K1_host.json"
+    },
+    {
+      "k": "K3",
+      "path": "render-K3.json"
+    }
+  ],
+  "manual": {
+    "K1.cells_all": {
+      "note": "клетки целиком в кадре — project-k1-host.json; различимость — глазами (агент)"
+    },
+    "K1.multizone": {
+      "note": "мультизонных клеток на доске нет"
+    },
+    "K1.hero_helper": {
+      "note": "экранные теги (UMG, подложка tag.background): 36 тегов на кадрах, мин. контраст текста 14.704 : 1, провалов 0 (tags-damage-r2.json); фигуры: Medusa-кандидат + серые блок-ауты; привязка тега к владельцу (t53 revision 1, все поздние секции SHOT): 150/150 тегов, режим владельца плашки — pass (tag-binding.json)"
+    },
+    "K1.teams_gray": {
+      "note": "кольца команды rev 2 (team-rings-r2.json): доля заливки [0.5611, 0.7038], ниже порога 0; форма (круг P1 / шестигранник P2) не распознана у 12; кромка/плитка < 3 : 1 у 18 (эталон плитки < 50 px у 0: светлая плитка ≈ цвет зоны light-gray исключается методом; диагностика после съёмки, не гейт: [2.471, 2.934]); команды в сером |ΔY′| K1_host 69.0, K1_joiner 69.0, K3 67.0"
+    },
+    "K1.selected": {
+      "note": "плашка vs фигуры: True (перекрытий 0 px²), привязка к владельцу (не гейт): False; плашка vs достижимые: pass"
+    },
+    "K1.zones_deut": {
+      "note": "t53 zones rev 2 по зонам (цвет / серый / deuteranopia, кромка/плитка): blue: 3.698 / 3.676 / 3.682; red: 3.286 / 3.334 / 3.244; буквы зон — отложено"
+    },
+    "K3.attack_result": {
+      "note": "рамка/дуги цели и итог — кольцо атакующего, дуги цели, панель HUD; иконка — строка K3.icon_sizes; HUD-панели K3 (D-10) против клеток атакующего/цели/достижимых: pass; числа урона: damage_first_joiner King Arthur текст 13.636 / 13.561 / 14.021 привязка True; damage_combat_host King Arthur текст 13.636 / 13.561 / 14.021 привязка True; damage_combat_joiner King Arthur текст 13.636 / 13.561 / 14.021 привязка True"
+    },
+    "K3.icon_sizes": {
+      "note": "иконка rev 3 (жетон): K3 32 px: глиф/тело 8.743 / 8.774 / 8.853, край 5.592 / 5.574 / 5.619, guard True"
+    }
+  },
+  "viewer": {
+    "kind": "agent",
+    "note": "самоприёмка агента W5b-R, требует взгляда пользователя"
+  },
+  "elements": [
+    {
+      "frame": "K1",
+      "id": "facade",
+      "status": "отложено",
+      "reason": "фасадов в сцене нет"
+    },
+    {
+      "frame": "K1",
+      "id": "lantern",
+      "status": "отложено",
+      "reason": "фонаря в сцене нет"
+    },
+    {
+      "frame": "K1",
+      "id": "tray_darkness",
+      "status": "есть",
+      "reason": "рама и тёмный фон профиля доски"
+    },
+    {
+      "frame": "K1",
+      "id": "fog",
+      "status": "отложено",
+      "reason": "туман не задан"
+    },
+    {
+      "frame": "K1",
+      "id": "vignette",
+      "status": "отложено",
+      "reason": "виньетка не задана"
+    },
+    {
+      "frame": "K1",
+      "id": "zone_pictograms",
+      "status": "отложено",
+      "reason": "буквы/пиктограммы зон — отдельная волна (D-9)"
+    },
+    {
+      "frame": "K1",
+      "id": "hud",
+      "status": "есть",
+      "reason": "UMG-гибрид + экранные теги W5b-R"
+    },
+    {
+      "frame": "K1",
+      "id": "shadow_casters_1",
+      "status": "есть",
+      "reason": "RENDER shadowCasters=1"
+    },
+    {
+      "frame": "K1",
+      "id": "six_fighters",
+      "status": "есть",
+      "reason": "Medusa v2 + блок-ауты, кольца команды"
+    },
+    {
+      "frame": "K2",
+      "id": "facade_hidden",
+      "status": "отложено",
+      "reason": "K2 — T5.1"
+    },
+    {
+      "frame": "K2",
+      "id": "plate",
+      "status": "отложено",
+      "reason": "K2 — T5.1; плашка измерена на K1 хоста"
+    },
+    {
+      "frame": "K2",
+      "id": "base_profile",
+      "status": "отложено",
+      "reason": "K2 — T5.1"
+    },
+    {
+      "frame": "K3",
+      "id": "poses",
+      "status": "отложено",
+      "reason": "клипы боя не подключены"
+    },
+    {
+      "frame": "K3",
+      "id": "inspector_2d",
+      "status": "отложено",
+      "reason": "инспектор 2D не реализован (D-09)"
+    },
+    {
+      "frame": "K3",
+      "id": "target_frame_icon",
+      "status": "есть",
+      "reason": "дуги цели + жетон атаки (icon rev 3)"
+    },
+    {
+      "frame": "K3",
+      "id": "damage_result",
+      "status": "есть",
+      "reason": "экранное число урона (UMG-капсула) + панель итога"
+    }
+  ]
+}

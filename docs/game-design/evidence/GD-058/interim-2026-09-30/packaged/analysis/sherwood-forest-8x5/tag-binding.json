@@ -1,0 +1,4157 @@
+{
+  "schema": "unmatched.t53-tag-binding/1",
+  "status": "измерено",
+  "thresholdsRevision": 1,
+  "rule": {
+    "rule": "центр painted-bbox тега (строка SHOT widget id=board.tag geom=painted) строго ближе к FigureScreenRect владельца (строка SHOT figure того же SHOT-блока), чем к FigureScreenRect любого другого живого бойца; расстояние точка–прямоугольник (0 внутри) — то же правило, что damage.binding",
+    "pass": "100 % нарисованных тегов",
+    "frames": "ВСЕ поздние секции SHOT трасс обоих клиентов r3 — каждый захваченный кадр (последний блок имени), а не только кадры анализа и не только опубликованные в git: K1 хоста и присоединившегося, все кадры K3 (включая кадры урона и кадры, которые K3 не копирует в evidence), зонды 24/48",
+    "recordedNotGated": "мягкое перекрытие тега с FigureScreenRect другого бойца (softPx2 трассы и JSON), зазор тега до владельца, кандидат и кольцо раскладчика"
+  },
+  "modeRule": {
+    "rule": "как в rev 2 (блок-аут → full, арт-фигура → compact, K2 → compact, -ArtPreviewTagNames=all → full), кроме владельца плашки: hidden, только если плашка привязана к владельцу (зазор прямоугольников до владельца строго меньше, чем до любой другой фигуры — правило ChoosePlateRect/IsRectBoundTo, трасса PLATE … bound=); иначе compact (HP остаётся у фигуры, имя — на плашке)",
+    "pass": "100 %"
+  },
+  "traces": [
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/sherwood-forest-8x5/run-20260930-212237/phase2-client-host.trace.log",
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/sherwood-forest-8x5/run-20260930-212237/phase2-client-joiner.trace.log",
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log",
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log"
+  ],
+  "sections": 25,
+  "paintedTags": 144,
+  "bindingFail": [
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log s09-hud-after-first-maneuver.png Harpies 3 centre→owner 13.0 vs Medusa 13.0",
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log s09-pending-TARGET_FIGHTER.png Harpies 3 centre→owner 13.0 vs Medusa 13.0",
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log s09-damage-number.png Harpies 3 centre→owner 13.0 vs Medusa 13.0",
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log s09-discard-open.png Harpies 3 centre→owner 13.0 vs Medusa 13.0",
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log s09-maneuver-draft-open.png Harpies 3 centre→owner 13.0 vs Medusa 13.0",
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log s09-hud-after-first-maneuver.png Harpies 3 centre→owner 13.0 vs Medusa 13.0",
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log s09-damage-number.png Harpies 3 centre→owner 13.0 vs Medusa 13.0",
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log s09-discard-open.png Harpies 3 centre→owner 13.0 vs Medusa 13.0"
+  ],
+  "plateOwnerModeFail": [],
+  "pass": false,
+  "placements": {
+    "above ring 0": 124,
+    "right ring 0": 12,
+    "below ring 0": 8
+  },
+  "gapToOwnerMax": 2.0,
+  "frames": [
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/sherwood-forest-8x5/run-20260930-212237/phase2-client-host.trace.log",
+      "frame": "phase2-board-host-1920x1080.png",
+      "lateFrame": 1079,
+      "published": true,
+      "plate": {
+        "owner": "f-0-hero",
+        "bbox": [
+          589.0,
+          589.0,
+          761.0,
+          643.0
+        ],
+        "bound": true,
+        "source": "painted",
+        "traceBound": true
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "hidden",
+          "painted": false,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "plateOwner": true,
+          "plateBound": true,
+          "expectedPlateOwnerMode": "hidden",
+          "plateOwnerModePass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            825.0,
+            438.0,
+            909.0,
+            460.0
+          ],
+          "centre": [
+            867.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 124.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1188.0,
+            409.0,
+            1290.0,
+            431.0
+          ],
+          "centre": [
+            1239.0,
+            420.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 150.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "right",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1298.0,
+            608.0,
+            1382.0,
+            630.0
+          ],
+          "centre": [
+            1340.0,
+            619.0
+          ],
+          "centreToOwner": 44.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 55.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/sherwood-forest-8x5/run-20260930-212237/phase2-client-joiner.trace.log",
+      "frame": "phase2-board-joiner-1920x1080.png",
+      "lateFrame": 1079,
+      "published": true,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            631.0,
+            414.0,
+            733.0,
+            436.0
+          ],
+          "centre": [
+            682.0,
+            425.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 139.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            825.0,
+            438.0,
+            909.0,
+            460.0
+          ],
+          "centre": [
+            867.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 124.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1188.0,
+            409.0,
+            1290.0,
+            431.0
+          ],
+          "centre": [
+            1239.0,
+            420.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 150.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "right",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1298.0,
+            608.0,
+            1382.0,
+            630.0
+          ],
+          "centre": [
+            1340.0,
+            619.0
+          ],
+          "centreToOwner": 44.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 55.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log",
+      "frame": "s09-maneuver-draft-open.png",
+      "lateFrame": 582,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            631.0,
+            414.0,
+            733.0,
+            436.0
+          ],
+          "centre": [
+            682.0,
+            425.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 139.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            825.0,
+            438.0,
+            909.0,
+            460.0
+          ],
+          "centre": [
+            867.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 124.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1188.0,
+            409.0,
+            1290.0,
+            431.0
+          ],
+          "centre": [
+            1239.0,
+            420.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 150.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "right",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1298.0,
+            608.0,
+            1382.0,
+            630.0
+          ],
+          "centre": [
+            1340.0,
+            619.0
+          ],
+          "centreToOwner": 44.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 55.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log",
+      "frame": "s09-hud-after-first-maneuver.png",
+      "lateFrame": 617,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            999.0,
+            271.0,
+            1101.0,
+            293.0
+          ],
+          "centre": [
+            1050.0,
+            282.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 180.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            825.0,
+            438.0,
+            909.0,
+            460.0
+          ],
+          "centre": [
+            867.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 130.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 326.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 13.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": false
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1188.0,
+            409.0,
+            1290.0,
+            431.0
+          ],
+          "centre": [
+            1239.0,
+            420.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 136.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "right",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1298.0,
+            608.0,
+            1382.0,
+            630.0
+          ],
+          "centre": [
+            1340.0,
+            619.0
+          ],
+          "centreToOwner": 44.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 55.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log",
+      "frame": "s09-pending-TARGET_FIGHTER.png",
+      "lateFrame": 711,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            999.0,
+            271.0,
+            1101.0,
+            293.0
+          ],
+          "centre": [
+            1050.0,
+            282.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 180.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            825.0,
+            438.0,
+            909.0,
+            460.0
+          ],
+          "centre": [
+            867.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 130.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 326.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 13.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": false
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1188.0,
+            409.0,
+            1290.0,
+            431.0
+          ],
+          "centre": [
+            1239.0,
+            420.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 136.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "right",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1298.0,
+            608.0,
+            1382.0,
+            630.0
+          ],
+          "centre": [
+            1340.0,
+            619.0
+          ],
+          "centreToOwner": 44.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 55.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log",
+      "frame": "s09-damage-number.png",
+      "lateFrame": 721,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            999.0,
+            271.0,
+            1101.0,
+            293.0
+          ],
+          "centre": [
+            1050.0,
+            282.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 180.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            825.0,
+            438.0,
+            909.0,
+            460.0
+          ],
+          "centre": [
+            867.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 130.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 326.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 13.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": false
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1188.0,
+            409.0,
+            1290.0,
+            431.0
+          ],
+          "centre": [
+            1239.0,
+            420.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 136.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "right",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1298.0,
+            608.0,
+            1382.0,
+            630.0
+          ],
+          "centre": [
+            1340.0,
+            619.0
+          ],
+          "centreToOwner": 44.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 55.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log",
+      "frame": "s09-discard-open.png",
+      "lateFrame": 789,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            999.0,
+            271.0,
+            1101.0,
+            293.0
+          ],
+          "centre": [
+            1050.0,
+            282.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 180.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            825.0,
+            438.0,
+            909.0,
+            460.0
+          ],
+          "centre": [
+            867.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 130.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 326.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 13.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": false
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1188.0,
+            409.0,
+            1290.0,
+            431.0
+          ],
+          "centre": [
+            1239.0,
+            420.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 136.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "right",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1298.0,
+            608.0,
+            1382.0,
+            630.0
+          ],
+          "centre": [
+            1340.0,
+            619.0
+          ],
+          "centreToOwner": 44.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 55.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log",
+      "frame": "s09-pending-BOOST_CHOICE.png",
+      "lateFrame": 1118,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1187.0,
+            414.0,
+            1289.0,
+            436.0
+          ],
+          "centre": [
+            1238.0,
+            425.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 147.7,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "below",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1198.0,
+            743.0,
+            1300.0,
+            765.0
+          ],
+          "centre": [
+            1249.0,
+            754.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-sk0",
+          "centreToNearestOther": 139.1,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1396.0,
+            584.0,
+            1480.0,
+            606.0
+          ],
+          "centre": [
+            1438.0,
+            595.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 127.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log",
+      "frame": "s09-combat-result.png",
+      "lateFrame": 1243,
+      "published": true,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1187.0,
+            414.0,
+            1289.0,
+            436.0
+          ],
+          "centre": [
+            1238.0,
+            425.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 147.7,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "below",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1198.0,
+            743.0,
+            1300.0,
+            765.0
+          ],
+          "centre": [
+            1249.0,
+            754.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-sk0",
+          "centreToNearestOther": 139.1,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1396.0,
+            584.0,
+            1480.0,
+            606.0
+          ],
+          "centre": [
+            1438.0,
+            595.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 127.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log",
+      "frame": "s09-damage-combat.png",
+      "lateFrame": 1246,
+      "published": true,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1187.0,
+            414.0,
+            1289.0,
+            436.0
+          ],
+          "centre": [
+            1238.0,
+            425.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 147.7,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "below",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1198.0,
+            743.0,
+            1300.0,
+            765.0
+          ],
+          "centre": [
+            1249.0,
+            754.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-sk0",
+          "centreToNearestOther": 139.1,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1396.0,
+            584.0,
+            1480.0,
+            606.0
+          ],
+          "centre": [
+            1438.0,
+            595.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 127.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log",
+      "frame": "s09-combat-resolve-revealed.png",
+      "lateFrame": 2189,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1197.0,
+            568.0,
+            1299.0,
+            590.0
+          ],
+          "centre": [
+            1248.0,
+            579.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 153.1,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 196.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1412.0,
+            728.0,
+            1505.0,
+            750.0
+          ],
+          "centre": [
+            1458.5,
+            739.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 148.5,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log",
+      "frame": "s09-resolve-blocked-PLACE.png",
+      "lateFrame": 2190,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1197.0,
+            568.0,
+            1299.0,
+            590.0
+          ],
+          "centre": [
+            1248.0,
+            579.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 153.1,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 196.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1412.0,
+            728.0,
+            1505.0,
+            750.0
+          ],
+          "centre": [
+            1458.5,
+            739.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 148.5,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-host.trace.log",
+      "frame": "s09-resolve-blocked-MOVE.png",
+      "lateFrame": 2481,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            996.0,
+            137.0,
+            1098.0,
+            159.0
+          ],
+          "centre": [
+            1047.0,
+            148.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 123.2,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 151.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            826.0,
+            131.0,
+            919.0,
+            153.0
+          ],
+          "centre": [
+            872.5,
+            142.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 125.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log",
+      "frame": "s09-maneuver-draft-open.png",
+      "lateFrame": 503,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            999.0,
+            271.0,
+            1101.0,
+            293.0
+          ],
+          "centre": [
+            1050.0,
+            282.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 180.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            825.0,
+            438.0,
+            909.0,
+            460.0
+          ],
+          "centre": [
+            867.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 130.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 326.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 13.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": false
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1188.0,
+            409.0,
+            1290.0,
+            431.0
+          ],
+          "centre": [
+            1239.0,
+            420.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 136.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "right",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1298.0,
+            608.0,
+            1382.0,
+            630.0
+          ],
+          "centre": [
+            1340.0,
+            619.0
+          ],
+          "centreToOwner": 44.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 55.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log",
+      "frame": "s09-hud-after-first-maneuver.png",
+      "lateFrame": 538,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            999.0,
+            271.0,
+            1101.0,
+            293.0
+          ],
+          "centre": [
+            1050.0,
+            282.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 180.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            825.0,
+            438.0,
+            909.0,
+            460.0
+          ],
+          "centre": [
+            867.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 130.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 326.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 13.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": false
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1188.0,
+            409.0,
+            1290.0,
+            431.0
+          ],
+          "centre": [
+            1239.0,
+            420.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 136.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "right",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1298.0,
+            608.0,
+            1382.0,
+            630.0
+          ],
+          "centre": [
+            1340.0,
+            619.0
+          ],
+          "centreToOwner": 44.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 55.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log",
+      "frame": "s09-damage-number.png",
+      "lateFrame": 560,
+      "published": true,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            999.0,
+            271.0,
+            1101.0,
+            293.0
+          ],
+          "centre": [
+            1050.0,
+            282.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 180.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            825.0,
+            438.0,
+            909.0,
+            460.0
+          ],
+          "centre": [
+            867.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 130.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 326.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 13.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": false
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1188.0,
+            409.0,
+            1290.0,
+            431.0
+          ],
+          "centre": [
+            1239.0,
+            420.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 136.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "right",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1298.0,
+            608.0,
+            1382.0,
+            630.0
+          ],
+          "centre": [
+            1340.0,
+            619.0
+          ],
+          "centreToOwner": 44.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 55.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log",
+      "frame": "s09-discard-open.png",
+      "lateFrame": 715,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            999.0,
+            271.0,
+            1101.0,
+            293.0
+          ],
+          "centre": [
+            1050.0,
+            282.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 180.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            825.0,
+            438.0,
+            909.0,
+            460.0
+          ],
+          "centre": [
+            867.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 130.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 326.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 13.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": false
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1188.0,
+            409.0,
+            1290.0,
+            431.0
+          ],
+          "centre": [
+            1239.0,
+            420.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 136.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "right",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1298.0,
+            608.0,
+            1382.0,
+            630.0
+          ],
+          "centre": [
+            1340.0,
+            619.0
+          ],
+          "centreToOwner": 44.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 55.3,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log",
+      "frame": "s09-combat-defense-open.png",
+      "lateFrame": 937,
+      "published": true,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1187.0,
+            414.0,
+            1289.0,
+            436.0
+          ],
+          "centre": [
+            1238.0,
+            425.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 147.7,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "below",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1198.0,
+            743.0,
+            1300.0,
+            765.0
+          ],
+          "centre": [
+            1249.0,
+            754.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-sk0",
+          "centreToNearestOther": 139.1,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1396.0,
+            584.0,
+            1480.0,
+            606.0
+          ],
+          "centre": [
+            1438.0,
+            595.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 127.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log",
+      "frame": "s09-combat-resolve-window.png",
+      "lateFrame": 941,
+      "published": true,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1187.0,
+            414.0,
+            1289.0,
+            436.0
+          ],
+          "centre": [
+            1238.0,
+            425.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 147.7,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "below",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1198.0,
+            743.0,
+            1300.0,
+            765.0
+          ],
+          "centre": [
+            1249.0,
+            754.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-sk0",
+          "centreToNearestOther": 139.1,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1396.0,
+            584.0,
+            1480.0,
+            606.0
+          ],
+          "centre": [
+            1438.0,
+            595.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 127.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log",
+      "frame": "s09-combat-resolve-revealed.png",
+      "lateFrame": 946,
+      "published": true,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1187.0,
+            414.0,
+            1289.0,
+            436.0
+          ],
+          "centre": [
+            1238.0,
+            425.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 147.7,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "below",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1198.0,
+            743.0,
+            1300.0,
+            765.0
+          ],
+          "centre": [
+            1249.0,
+            754.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-sk0",
+          "centreToNearestOther": 139.1,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1396.0,
+            584.0,
+            1480.0,
+            606.0
+          ],
+          "centre": [
+            1438.0,
+            595.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 127.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log",
+      "frame": "s09-resolve-blocked-BOOST_CHOICE.png",
+      "lateFrame": 1573,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1197.0,
+            568.0,
+            1299.0,
+            590.0
+          ],
+          "centre": [
+            1248.0,
+            579.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-sk0",
+          "centreToNearestOther": 141.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 196.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "right",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1530.0,
+            752.0,
+            1623.0,
+            774.0
+          ],
+          "centre": [
+            1576.5,
+            763.0
+          ],
+          "centreToOwner": 48.5,
+          "nearestOther": "f-1-sk0",
+          "centreToNearestOther": 91.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1396.0,
+            584.0,
+            1480.0,
+            606.0
+          ],
+          "centre": [
+            1438.0,
+            595.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 128.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log",
+      "frame": "s09-combat-result.png",
+      "lateFrame": 1065,
+      "published": true,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1187.0,
+            414.0,
+            1289.0,
+            436.0
+          ],
+          "centre": [
+            1238.0,
+            425.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 147.7,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "below",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1198.0,
+            743.0,
+            1300.0,
+            765.0
+          ],
+          "centre": [
+            1249.0,
+            754.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-sk0",
+          "centreToNearestOther": 139.1,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1396.0,
+            584.0,
+            1480.0,
+            606.0
+          ],
+          "centre": [
+            1438.0,
+            595.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 127.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log",
+      "frame": "s09-damage-combat.png",
+      "lateFrame": 1068,
+      "published": true,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1187.0,
+            414.0,
+            1289.0,
+            436.0
+          ],
+          "centre": [
+            1238.0,
+            425.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 147.7,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 126.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "below",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1198.0,
+            743.0,
+            1300.0,
+            765.0
+          ],
+          "centre": [
+            1249.0,
+            754.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-sk0",
+          "centreToNearestOther": 139.1,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1396.0,
+            584.0,
+            1480.0,
+            606.0
+          ],
+          "centre": [
+            1438.0,
+            595.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 127.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log",
+      "frame": "s09-pending-PLACE.png",
+      "lateFrame": 2000,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1197.0,
+            568.0,
+            1299.0,
+            590.0
+          ],
+          "centre": [
+            1248.0,
+            579.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk2",
+          "centreToNearestOther": 153.1,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 196.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1412.0,
+            728.0,
+            1505.0,
+            750.0
+          ],
+          "centre": [
+            1458.5,
+            739.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 148.5,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    },
+    {
+      "trace": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/combat-client-joiner.trace.log",
+      "frame": "s09-pending-MOVE.png",
+      "lateFrame": 2298,
+      "published": false,
+      "plate": {
+        "owner": null,
+        "bbox": null,
+        "bound": null,
+        "source": null
+      },
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            996.0,
+            137.0,
+            1098.0,
+            159.0
+          ],
+          "centre": [
+            1047.0,
+            148.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-1-hero",
+          "centreToNearestOther": 123.2,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            641.0,
+            438.0,
+            725.0,
+            460.0
+          ],
+          "centre": [
+            683.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk1",
+          "centreToNearestOther": 135.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            457.0,
+            438.0,
+            541.0,
+            460.0
+          ],
+          "centre": [
+            499.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-sk0",
+          "centreToNearestOther": 138.6,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            1011.0,
+            438.0,
+            1095.0,
+            460.0
+          ],
+          "centre": [
+            1053.0,
+            449.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 151.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "placement": "above",
+          "ring": "0",
+          "traceBound": "1",
+          "softPx2": "0",
+          "bbox": [
+            826.0,
+            131.0,
+            919.0,
+            153.0
+          ],
+          "centre": [
+            872.5,
+            142.0
+          ],
+          "centreToOwner": 13.0,
+          "nearestOther": "f-0-hero",
+          "centreToNearestOther": 125.0,
+          "gapToOwner": 2.0,
+          "overlapOtherFiguresPx2": 0.0,
+          "bindingPass": true
+        }
+      ]
+    }
+  ]
+}

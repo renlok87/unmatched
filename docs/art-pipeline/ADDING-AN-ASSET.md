@@ -2,7 +2,8 @@
 
 Срез: 2026-09-28, этап 3, T3.1 (исправления ревью 2026-09-29: посадка декора — §6, сквозные дыры подставки — §4.2 п. 4
 и §6); волна 4, W4-B 2026-09-29: мастер-материалы `M_UM_*` (§5.0), TeamColor на одежде (`TeamMask`, §4.2 п. 5), AO в
-`ORM.R` (§4.2 п. 1), явная `FbxFactory` для мешей и клипов (§5), различимость команд в сером (§6). Инструмент:
+`ORM.R` (§4.2 п. 1), явная `FbxFactory` для мешей и клипов (§5), различимость команд в сером (§6); волны 5c-B…7
+2026-09-30: ассет в игре за флагом S08 (§5a), look-dev по съёмке, ловушки (§8). Инструмент:
 `tools/tripo-pipeline/tripo_pipeline.py` 0.6.0 (логика UE-стадии `ue-candidate/7`, статика `ue-static-candidate/2`). Подробности каждой стадии — в [PIPELINE.md](PIPELINE.md); этот документ — порядок действий и правила
 остановки. Проверен сухим повтором на бочке (раздел 11): каждое отступление исполнителя от текста считалось дефектом
 инструкции и правилось здесь.
@@ -281,6 +282,26 @@ python -c "import json,sys; s=json.load(open(sys.argv[1],encoding='utf-8')); [pr
    значение 100 из S05 дало ×100 на кости 0 (T2.1).
 4. Снимок после с `--compare <evidence>/snapshot-before.json`: `protected_unchanged: true`, добавлены только свои ассеты.
 
+## 5a. Ассет в игре S08 (за флагом) — по образцу героев v2 и подноса
+
+Так в игру попали герои v2 (`-ArtPreviewHeroesV2`, `S08HeroesV2.*`) и поднос (`-ArtPreviewDiorama`, `S08Diorama.*`).
+Подробности — [PIPELINE.md](PIPELINE.md), раздел «Герои v2 и поднос в S08».
+
+1. **Флаг только opt-in**, вместе с `-ArtPreview`. Без флага трасса и кадры байт в байт прежние: прежние пороги и
+   наборы кадров остаются сравнимыми.
+2. **Вся логика в одном месте без мира**: пути, MI по команде, yaw, масштаб, выбор клипа. Автотест
+   `Unmatched.S08.<Имя>.*` проверяет математику, наличие ассетов и поведение актора с флагом и без.
+3. **Кук.** `LoadObject` по строке — мягкая ссылка, кукер её выбросит. Папку ассета нужно добавить в
+   `+DirectoriesToAlwaysCook` (`Config/DefaultGame.ini`). Проверять по listing пака (`UnrealPak -List`) и
+   packaged-прогону, а не по `Saved/Cooked`.
+4. **Трасса.** Для каждого решения — строка `ARTPREVIEW <имя> …` (путь, MI, yaw, scale или bounds) и строка
+   `… missing`, если ассета нет в паке. Демо-скрипт (`run-phase2-demo.ps1`, `run-combat-demo.ps1`) получает switch,
+   передаёт флаг обоим клиентам и падает, если в трассе клиента нет нужной строки или есть `missing`.
+5. **`.uasset` в git** — `git add -f` поимённо (Content игнорируется). Тогда путь `/Game/...` можно внести в реестр с
+   `expect: exists`, валидатор увидит его как отслеживаемый.
+6. **Кадры** — отдельный набор packaged-live strict с RENDER (поднос меняет освещённую сцену). Пороги регистрируются
+   до съёмки (PIPELINE.md, «Пороги 5c-B»), статус — максимум «технически импортировано».
+
 ## 6. Контрольная сцена P1.7
 
 `tools/tripo-pipeline/review/control_scene.py` строит `/Game/ArtTests/P17ControlScene/L_P17ControlScene` с нуля при
@@ -344,7 +365,8 @@ python tools/tripo-pipeline/review/team_contrast.py --run C:/tmp/<task>/cs/<befo
    `python tools/tripo-pipeline/review/frames_to_jpeg.py --src C:/tmp/<task>/cs/r1 --out <evidence>/frames --png-kept-at C:/tmp/<task>/cs/r1 --exclude 'p17-mask-*'`.
 2. Реестр: новый слой (`stage: ue-editor-import` / `ue-editor-frames`, статус максимум «технически импортировано», пути
    отчётов run-каталога — `kind: file`; UE-ассеты `/Game/PipelineCandidates/...` существуют только в локальном Content,
-   поэтому в пути с `expect: exists` их не вносить, а назвать в `note`). Если меняешь файл с `sha256` в реестре — обнови
+   поэтому в пути с `expect: exists` их не вносить, а назвать в `note`; исключение — `.uasset`, добавленные в git
+   через `git add -f`, как у героев v2 и подноса, §5a п. 5). Если меняешь файл с `sha256` в реестре — обнови
    sha. `python tools/tripo-pipeline/validate_registry.py` → PASS.
 3. [DIRECTORY-MAP.md](DIRECTORY-MAP.md) — новые каталоги; PIPELINE.md — если изменилось поведение инструмента.
 4. Коммит — только списком путей (`commit_manifest`), `git -c core.longpaths=true add --dry-run` по списку. Не
@@ -378,6 +400,10 @@ python tools/tripo-pipeline/review/team_contrast.py --run C:/tmp/<task>/cs/<befo
 | дыры-следы в подставке | сборка вырезает контур стоп из верха подставки; где контур шире стоп, в кадре −55° видна доска (Medusa T4 — до 27,6 uu²), под мантией дыры скрыты (Merlin — 44,4 uu² в меше) | `base_seethrough.py` (`with_figure` ≤ 0,1 uu²) + маски сцены `mask-k2-5x-void-*` (`base_see_through_frames`) |
 | кость 0 | legacy-FBX делает объект арматуры костью 0; root motion читается с неё | анимировать объект арматуры (ue-pipeline-traps п. 2) |
 | Build.bat | exit 0 при ошибке компиляции | искать `Result: Failed` в логе (UTF-16) |
+| Restore Packages (2026-09-30) | редактор убит `/F` с dirty-пакетами → `Saved/Autosaves/PackageRestoreData.json`; следующий запуск висит в модальном «Restore Packages», MCP-порт не открывается | если диск = HEAD — перенести json в `C:/tmp/ue-restore-backup/` и перезапустить свой PID; не убивать редактор с dirty-пакетами |
+| CRLF и sha регистрации (2026-09-30) | JSON с зарегистрированным sha (пороги t5cb) в checkout с `autocrlf=true` получает CRLF → sha на диске не совпадает | хэшировать LF-байты (как blob в git); sha256 в реестре — для бинарных файлов |
+| Docker и postgres-сьюты | без Docker и env-переменных 4 postgres-сьюты бэкенда молча пропускаются | смотреть «Test Suites: N skipped»; поднять `codex-s0x-postgres` и задать `S04_PG_URL` / `S09_PG_URL` / `S10_TEST_DB_URL` |
+| прогноз вместо съёмки | прогноз look-dev (`lookdev_r2.py forecast`) выше реального эффекта: блик и Lumen он не отделяет | решение по материалу — только по сошедшейся съёмке (`ue_h5cb1.py review --tag …`) |
 | консоль редактора и фокус (W4-B) | рабочий стол общий с другими сессиями: SlateInspector `Snapshot` пуст, пока окно редактора не на текущем рабочем столе; `Type` лишь предупреждает «Could not focus widget for typing», команда теряется; строка `Cmd: py …` в логе появляется не всегда (запущенный импорт её не оставил) — по логу нельзя судить, стартовала ли команда | CLI печатает лаунчер, который первым делом пишет `<out>.started` (`review/ue_py/_run.py` — так же); нет файла за 20 с — печатать снова (до 5 раз), стартовавшую — никогда; ждать Cmd-бокс до 2 мин |
 | падение посреди ue-import | ассеты, созданные до сбоя, не числились в manifest → следующая попытка отказывала («чужие ассеты», 2026-09-29) | с 0.6.0 владение пишется сразу после каждого созданного ассета; прежние сироты удалить `ue_delete_owned` по списку папки (только своя папка прогона) |
 | `get_expression_inputs` | два входа узла от одного источника читаются с выходом первого (`lerp(TeamColor, CPD.rgb, CPD.a)` → оба `RGB`); соединение при этом верное | сравнивать связи с учётом этого (`um_masters.reported_links`) |

@@ -1,0 +1,438 @@
+{
+  "schema": "unmatched.art004-perf-summary/1",
+  "status": "измерено",
+  "scope": "текущий ПК разработки (RTX 4090, i9-13900F), Development packaged, два offscreen-клиента по 30 FPS (-ClientFps 30 -> t.MaxFPS 30); не целевой ПК D-07; ACC-022 и perf-gate GD-058 не заявляются",
+  "thresholdsRef": "thresholds.json perf.PERF-02 (p95FrameTimeMsEach <= 33.3; GPU utilization only recorded)",
+  "aggregate": {
+    "fpsMin": 29.68,
+    "fpsMax": 29.85,
+    "frameMsP95Max": 33.33,
+    "gpuBusyMsP50Range": [
+      1.0601,
+      1.172
+    ],
+    "gpuTotalUtilMeanRange": [
+      37.85,
+      41.09
+    ],
+    "gpuTotalUtilP95Max": 46.0,
+    "baselineGpuUtil": {
+      "n": 40,
+      "mean": 25.55,
+      "p50": 25.0,
+      "p95": 35.0,
+      "max": 40.0
+    },
+    "baselinePowerW": {
+      "n": 40,
+      "mean": 56.49,
+      "p50": 49.24,
+      "p95": 76.54,
+      "max": 77.11
+    }
+  },
+  "runs": [
+    {
+      "run": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1-probe32/cobble-5x6/run-20260930-211728",
+      "variant": "face-neck-v2",
+      "explicit": true,
+      "zoom": 0,
+      "gpuTotalUtilPct": {
+        "n": 90,
+        "mean": 38.43,
+        "p50": 38.0,
+        "p95": 43.0,
+        "max": 53.0
+      },
+      "gpuTotalPowerW": {
+        "n": 90,
+        "mean": 104.55,
+        "p50": 111.23,
+        "p95": 120.22,
+        "max": 120.63
+      },
+      "gpuMemUsedMiB": {
+        "n": 90,
+        "mean": 8064.39,
+        "p50": 8264.0,
+        "p95": 8300.0,
+        "max": 8305.0
+      },
+      "startGameS": 18.0,
+      "cameraSettledS": null,
+      "clients": {
+        "host": {
+          "traceStarted": {
+            "fps": 29.83,
+            "frameMsP95": 33.33,
+            "frameMsMax": 162.88,
+            "hitches50": 2.0,
+            "gameMsAvg": 1.77,
+            "renderMsAvg": 3.15,
+            "gpuFrameIntervalMsAvg": 1.88
+          },
+          "csv": {
+            "effectiveFps": 29.85,
+            "frameTimeP95": 33.6288,
+            "gpuBusyMsP50": 1.0601,
+            "gpuBusyMsP95": 1.1913999999999998,
+            "gpuBusyMsMean": 1.03
+          }
+        },
+        "joiner": {
+          "traceStarted": {
+            "fps": 29.81,
+            "frameMsP95": 33.33,
+            "frameMsMax": 161.42,
+            "hitches50": 3.0,
+            "gameMsAvg": 1.61,
+            "renderMsAvg": 3.06,
+            "gpuFrameIntervalMsAvg": 2.0
+          },
+          "csv": {
+            "effectiveFps": 29.86,
+            "frameTimeP95": 33.5525,
+            "gpuBusyMsP50": 1.0726999999999998,
+            "gpuBusyMsP95": 1.2625999999999997,
+            "gpuBusyMsMean": 1.06
+          }
+        }
+      }
+    },
+    {
+      "run": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/cobble-5x6/run-20260930-211621",
+      "variant": "face-neck-v2",
+      "explicit": true,
+      "zoom": 0,
+      "gpuTotalUtilPct": {
+        "n": 88,
+        "mean": 39.02,
+        "p50": 39.0,
+        "p95": 44.0,
+        "max": 66.0
+      },
+      "gpuTotalPowerW": {
+        "n": 88,
+        "mean": 111.35,
+        "p50": 117.98,
+        "p95": 124.12,
+        "max": 124.41
+      },
+      "gpuMemUsedMiB": {
+        "n": 88,
+        "mean": 8079.94,
+        "p50": 8264.0,
+        "p95": 8297.0,
+        "max": 8305.0
+      },
+      "startGameS": 19.0,
+      "cameraSettledS": null,
+      "clients": {
+        "host": {
+          "traceStarted": {
+            "fps": 29.83,
+            "frameMsP95": 33.33,
+            "frameMsMax": 164.15,
+            "hitches50": 2.0,
+            "gameMsAvg": 1.84,
+            "renderMsAvg": 3.12,
+            "gpuFrameIntervalMsAvg": 1.89
+          },
+          "csv": {
+            "effectiveFps": 29.86,
+            "frameTimeP95": 33.7121,
+            "gpuBusyMsP50": 1.0725,
+            "gpuBusyMsP95": 1.2774,
+            "gpuBusyMsMean": 1.04
+          }
+        },
+        "joiner": {
+          "traceStarted": {
+            "fps": 29.85,
+            "frameMsP95": 33.33,
+            "frameMsMax": 155.62,
+            "hitches50": 3.0,
+            "gameMsAvg": 1.7,
+            "renderMsAvg": 2.98,
+            "gpuFrameIntervalMsAvg": 1.99
+          },
+          "csv": {
+            "effectiveFps": 29.86,
+            "frameTimeP95": 33.7006,
+            "gpuBusyMsP50": 1.0728,
+            "gpuBusyMsP95": 1.3074999999999999,
+            "gpuBusyMsMean": 1.05
+          }
+        }
+      }
+    },
+    {
+      "run": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/sherwood-forest-8x5/run-20260930-212237",
+      "variant": "face-neck-v2",
+      "explicit": true,
+      "zoom": 0,
+      "gpuTotalUtilPct": {
+        "n": 90,
+        "mean": 38.47,
+        "p50": 39.0,
+        "p95": 42.0,
+        "max": 55.0
+      },
+      "gpuTotalPowerW": {
+        "n": 90,
+        "mean": 110.1,
+        "p50": 120.16,
+        "p95": 124.61,
+        "max": 125.0
+      },
+      "gpuMemUsedMiB": {
+        "n": 90,
+        "mean": 8087.22,
+        "p50": 8289.0,
+        "p95": 8305.0,
+        "max": 8313.0
+      },
+      "startGameS": 18.0,
+      "cameraSettledS": null,
+      "clients": {
+        "host": {
+          "traceStarted": {
+            "fps": 29.72,
+            "frameMsP95": 33.33,
+            "frameMsMax": 234.61,
+            "hitches50": 3.0,
+            "gameMsAvg": 1.89,
+            "renderMsAvg": 3.44,
+            "gpuFrameIntervalMsAvg": 2.01
+          },
+          "csv": {
+            "effectiveFps": 29.79,
+            "frameTimeP95": 33.7059,
+            "gpuBusyMsP50": 1.1648999999999998,
+            "gpuBusyMsP95": 1.4315,
+            "gpuBusyMsMean": 1.11
+          }
+        },
+        "joiner": {
+          "traceStarted": {
+            "fps": 29.76,
+            "frameMsP95": 33.33,
+            "frameMsMax": 236.59,
+            "hitches50": 3.0,
+            "gameMsAvg": 1.74,
+            "renderMsAvg": 3.43,
+            "gpuFrameIntervalMsAvg": 2.09
+          },
+          "csv": {
+            "effectiveFps": 29.79,
+            "frameTimeP95": 33.6597,
+            "gpuBusyMsP50": 1.172,
+            "gpuBusyMsP95": 1.3901,
+            "gpuBusyMsMean": 1.14
+          }
+        }
+      }
+    },
+    {
+      "run": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/t-rex-paddock-7x5/run-20260930-212540",
+      "variant": "face-neck-v2",
+      "explicit": true,
+      "zoom": 0,
+      "gpuTotalUtilPct": {
+        "n": 88,
+        "mean": 41.09,
+        "p50": 41.0,
+        "p95": 46.0,
+        "max": 57.0
+      },
+      "gpuTotalPowerW": {
+        "n": 88,
+        "mean": 111.63,
+        "p50": 121.08,
+        "p95": 123.62,
+        "max": 123.92
+      },
+      "gpuMemUsedMiB": {
+        "n": 88,
+        "mean": 8077.22,
+        "p50": 8275.0,
+        "p95": 8287.0,
+        "max": 8287.0
+      },
+      "startGameS": 18.0,
+      "cameraSettledS": null,
+      "clients": {
+        "host": {
+          "traceStarted": {
+            "fps": 29.78,
+            "frameMsP95": 33.33,
+            "frameMsMax": 215.36,
+            "hitches50": 2.0,
+            "gameMsAvg": 1.85,
+            "renderMsAvg": 3.28,
+            "gpuFrameIntervalMsAvg": 2.02
+          },
+          "csv": {
+            "effectiveFps": 29.81,
+            "frameTimeP95": 33.6413,
+            "gpuBusyMsP50": 1.0871000000000002,
+            "gpuBusyMsP95": 1.2703000000000002,
+            "gpuBusyMsMean": 1.06
+          }
+        },
+        "joiner": {
+          "traceStarted": {
+            "fps": 29.82,
+            "frameMsP95": 33.33,
+            "frameMsMax": 193.07,
+            "hitches50": 2.0,
+            "gameMsAvg": 1.61,
+            "renderMsAvg": 3.23,
+            "gpuFrameIntervalMsAvg": 2.05
+          },
+          "csv": {
+            "effectiveFps": 29.83,
+            "frameTimeP95": 33.6312,
+            "gpuBusyMsP50": 1.1021999999999998,
+            "gpuBusyMsP95": 1.2308,
+            "gpuBusyMsMean": 1.07
+          }
+        }
+      }
+    },
+    {
+      "run": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k2-zoom-1.6/cobble-5x6/run-20260930-211835",
+      "variant": "face-neck-v2",
+      "explicit": true,
+      "zoom": 1.6,
+      "gpuTotalUtilPct": {
+        "n": 88,
+        "mean": 37.85,
+        "p50": 38.0,
+        "p95": 42.0,
+        "max": 47.0
+      },
+      "gpuTotalPowerW": {
+        "n": 88,
+        "mean": 101.1,
+        "p50": 103.06,
+        "p95": 123.92,
+        "max": 126.21
+      },
+      "gpuMemUsedMiB": {
+        "n": 88,
+        "mean": 8069.15,
+        "p50": 8262.0,
+        "p95": 8296.0,
+        "max": 8302.0
+      },
+      "startGameS": 18.0,
+      "cameraSettledS": 34.18,
+      "clients": {
+        "host": {
+          "traceStarted": {
+            "fps": 29.73,
+            "frameMsP95": 33.33,
+            "frameMsMax": 254.3,
+            "hitches50": 3.0,
+            "gameMsAvg": 1.91,
+            "renderMsAvg": 3.18,
+            "gpuFrameIntervalMsAvg": 2.01
+          },
+          "csv": {
+            "effectiveFps": 29.78,
+            "frameTimeP95": 33.711,
+            "gpuBusyMsP50": 1.0994,
+            "gpuBusyMsP95": 1.3512,
+            "gpuBusyMsMean": 1.09
+          }
+        },
+        "joiner": {
+          "traceStarted": {
+            "fps": 29.81,
+            "frameMsP95": 33.33,
+            "frameMsMax": 170.78,
+            "hitches50": 3.0,
+            "gameMsAvg": 1.67,
+            "renderMsAvg": 3.14,
+            "gpuFrameIntervalMsAvg": 2.0
+          },
+          "csv": {
+            "effectiveFps": 29.85,
+            "frameTimeP95": 33.6423,
+            "gpuBusyMsP50": 1.1200999999999999,
+            "gpuBusyMsP95": 1.3564999999999998,
+            "gpuBusyMsMean": 1.11
+          }
+        }
+      }
+    },
+    {
+      "run": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k2-zoom-2.5/cobble-5x6/run-20260930-211942",
+      "variant": "face-neck-v2",
+      "explicit": true,
+      "zoom": 2.5,
+      "gpuTotalUtilPct": {
+        "n": 88,
+        "mean": 38.34,
+        "p50": 38.0,
+        "p95": 43.0,
+        "max": 55.0
+      },
+      "gpuTotalPowerW": {
+        "n": 88,
+        "mean": 101.34,
+        "p50": 98.0,
+        "p95": 124.78,
+        "max": 125.37
+      },
+      "gpuMemUsedMiB": {
+        "n": 88,
+        "mean": 8060.91,
+        "p50": 8282.0,
+        "p95": 8300.0,
+        "max": 8300.0
+      },
+      "startGameS": 18.0,
+      "cameraSettledS": 34.18,
+      "clients": {
+        "host": {
+          "traceStarted": {
+            "fps": 29.68,
+            "frameMsP95": 33.33,
+            "frameMsMax": 279.37,
+            "hitches50": 3.0,
+            "gameMsAvg": 1.93,
+            "renderMsAvg": 3.31,
+            "gpuFrameIntervalMsAvg": 2.0
+          },
+          "csv": {
+            "effectiveFps": 29.76,
+            "frameTimeP95": 33.6267,
+            "gpuBusyMsP50": 1.1152,
+            "gpuBusyMsP95": 1.305,
+            "gpuBusyMsMean": 1.09
+          }
+        },
+        "joiner": {
+          "traceStarted": {
+            "fps": 29.82,
+            "frameMsP95": 33.33,
+            "frameMsMax": 166.29,
+            "hitches50": 3.0,
+            "gameMsAvg": 1.63,
+            "renderMsAvg": 3.08,
+            "gpuFrameIntervalMsAvg": 1.94
+          },
+          "csv": {
+            "effectiveFps": 29.85,
+            "frameTimeP95": 33.6069,
+            "gpuBusyMsP50": 1.1088,
+            "gpuBusyMsP95": 1.3478999999999999,
+            "gpuBusyMsMean": 1.09
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # tripo-pipeline: исполнимый каркас пайплайна (P0.3 / T3)
 
-Срез: 2026-09-29. Инструмент: `tools/tripo-pipeline/tripo_pipeline.py`, версия 0.6.0.
+Срез: 2026-09-29, дополнен 2026-09-30 (волна 7). Инструмент: `tools/tripo-pipeline/tripo_pipeline.py`, версия 0.6.0.
 
 - T4 добавил профиль `skeletal-candidate` (раздел [Профиль skeletal-candidate](#профиль-skeletal-candidate-t4)).
 - Этап 3, T2.1 добавил профиль `static-candidate` для статических пропсов (раздел [Профиль static-candidate](#профиль-static-candidate-этап-3-t21)).
@@ -17,6 +17,10 @@
   (решение пользователя 2026-09-28, AD-CNF-58 = b), запечённый AO в `ORM.R` (`atlas.ao_bake`, гейт «не константа»),
   импорт мешей и клипов с явной legacy `FbxFactory`, проверки `nanite == false`, метода нормалей, родителя MI
   (`ue-candidate/7`, `ue-static-candidate/2`).
+- Волны 5c-B…7 (2026-09-30): герои v2 и поднос в игре за флагами S08, циклы look-dev r2/r3 в живом UE, пороги
+  досок, зарегистрированные до съёмки, и ловушки этих волн — раздел
+  [Герои v2 и поднос в S08, look-dev r2/r3, пороги 5c-B](#герои-v2-и-поднос-в-s08-look-dev-r2r3-пороги-5c-b-волны-5c-b7).
+  CLI при этом не менялся (0.6.0).
 
 Нужны Python 3.10+ (stdlib) и Blender 5.2 для стадий `import`/`export`/`build`.
 
@@ -567,6 +571,86 @@ UE как (x, −y, z) от read-back, размер текстур.
 - В MCP нет инструмента консоли и полноценного Python: sandbox `ProgrammaticToolset` разрешает только
   json/math/re/… Для FBX-анимаций, консольных переменных и замеров AnimSequence используется `py "<файл>"` в поле
   Cmd редактора, через `review/ue_live.py` (SlateInspector → Type).
+
+## Герои v2 и поднос в S08, look-dev r2/r3, пороги 5c-B (волны 5c-B…7)
+
+Статусы всего ниже — «технически импортировано» / «измерено». Художественной приёмки нет: GD-058 принят только
+промежуточно по делегированию пользователя, без окружения и оригинальных карт
+([акт](../game-design/evidence/GD-058/interim-2026-09-30/gd058-interim-2026-09-30.md)).
+
+**Герои v2 в игре** (`unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2.{h,cpp}`, автотесты `S08HeroesV2Tests.cpp`).
+- Флаг `-ArtPreviewHeroesV2` работает только вместе с `-ArtPreview`. Без флага доска байт в байт прежняя.
+- Маппинг «боец → меш / подставка / MI по команде (P1 → `*_P1`, P2 → `*_P2`) / 4 клипа H2Anim / канонический скелет»
+  собран в одном месте. Меши: `Medusa|KingArthur|Merlin/H2LD`, `Harpy/H3LD`; скелеты — `*/Rig`; клипы — `*/H2Anim`.
+- Rig v2 смотрит вдоль +X, прежний кандидат — вдоль +Y. Поэтому yaw = прежний yaw + 90 (`FacingYawOffsetDeg`, знак
+  доказан тестом).
+- Масштаб: видимая высота фигуры приводится к бюджету высоты героя.
+- Клипы по событиям: Idle — петля с фазой на бойца; LungeAttack и HitReact возвращаются в Idle; DeathSettle держит
+  последнюю позу 2 с.
+- Трасса: `ARTPREVIEW heroesV2 fighter=… mesh=… mi=… yaw=… scale=…`, `ARTPREVIEW heroesV2 summary fighters=6
+  mapped=6 v2=6`, `ARTPREVIEW anim fighter=… clip=… len=…`.
+- Меши грузятся через `LoadObject`, кукеру это мягкие ссылки. Поэтому все папки героев перечислены в
+  `DirectoriesToAlwaysCook` (`Config/DefaultGame.ini`).
+
+**Поднос** (`S08Diorama.{h,cpp}`, `S08DioramaTests.cpp`; ассет — [table-base-report.md](table-base-report.md)).
+- Флаг `-ArtPreviewDiorama` (вместе с `-ArtPreview`). Компонент `ArtDioramaTray` на акторе доски: `NoCollision`,
+  `SM_TableBase` + `MI_TableBase_Candidate`.
+- `FitTray`: длинная сторона подноса идёт вдоль длинной оси рамки, кайма 50 uu, Z не масштабируется, верх на −3.
+  На серой доске поднос скрыт.
+- Трасса: `ARTPREVIEW diorama requested|tray=…|tray hidden|tray missing`.
+- Поднос меняет освещённую сцену (Lumen GI). Поэтому кадры с ним — отдельный набор («B» в акте GD-058), пороги
+  набора A он не заменяет.
+
+**Демо-скрипты.** `tools/s08/run-phase2-demo.ps1` и `tools/s09/run-combat-demo.ps1` принимают `-ArtPreviewHeroesV2` и
+`-ArtPreviewDiorama` (оба требуют `-ArtPreviewBoardId`). Скрипты передают флаги обоим клиентам и проверяют строки трассы
+каждого (`summary … v2=6`, `tray=`, отсутствие `missing`).
+
+**Цикл look-dev в живом UE** (`tools/art/material_library/`; редактор `:8123`, всё под `C:/tmp/ue-editor.lock` через
+`ue_lock.py`, один герой или один клип на лок).
+1. Правка в источнике: BC-множители в профиле героя (`lookdev.ue_feedback_r2` / `ue_feedback_r3`) или UE LUT класса
+   MatID (`T_UM_MatLUT_<Hero>_UE_r*.{overrides.json,dds}`), ручки MI.
+2. Переимпорт: `python tools/art/material_library/ue_h5cb1.py reimport-r3 --hero <hero>` (есть также `reimport` и
+   `reimport-r2`). План переимпорта — `docs/art-pipeline/evidence/lookdev-r*-2026-09-30/reimport-plan*.json`.
+3. Съёмка: `ue_h5cb1.py review --hero <hero> --tag b3.N`. Она прогревает экспозицию до сходимости и снимает при двух
+   экспозициях: чтение EV100 2,05 (свет доски rev 5 = 1,3 − 0,75 EV) и нейтральной 1,3. Съёмка, уборка и возврат
+   `/Game/S08/S08Arena` (не dirty) идут одним шагом.
+4. Замер против концепта `art/imagegen/hero-quality-v1/<hero>/` по зонам (luma ±15 %, тон ±12°, насыщенность
+   ±0,10). Листы — `art/pipeline-candidates/<ASSET>/<run>/review/<tag>/*-lookdev-sheet-*.jpg`, сводка —
+   `evidence/lookdev-r3-2026-09-30/summary.json`.
+
+**Решения — только по съёмке, не по прогнозу.** `lookdev_r2.py forecast` — линейная диффузная модель: блик, sheen и
+отскок Lumen она не отделяет, поэтому это верхняя граница изменения. В r2 прогноз оказался оптимистичным у всех трёх
+героев (`evidence/lookdev-r2-2026-09-30/realized-ratios.json`). В r3 каждое решение принималось по сошедшейся съёмке
+b3.x. `measure` и `fit` годятся для выбора рычага, но не для вердикта.
+
+Итог r3 при EV100 2,05: Medusa 5/5, Arthur 6/6, Merlin 4/5, Harpy 5/5 по зонам r2 и 4/5 по зонам 5c-B1. Остаток Harpy —
+рыжие перья в тени темнее: у них общий specular с маховыми. Нужен отдельный класс MatID для маховых.
+
+**Доски: свет rev 5, кольца, дуги прицела.**
+- Профили света `Config/ArtBoards/S08ArtBoardProfiles.json`, rev 5: ключ pitch −55, EV100 2,05. У кадров эталона
+  `RENDER expMin=4.14106`, High, SP100.
+- Кольцо команды двухтонное со светлым ободком `#FFFFFF` (`S08Team.h`, `RimHex`).
+- Дуги прицела рисуются в масштабе 0,92 по XY (`TargetArcScale`): так чёрная внутренняя кромка отделяет их от
+  серебряной заливки P2 в сером.
+- Классификатор формы колец rev 3: 54/54 во всех вариантах (цвет, серый, deuteranopia).
+
+**Пороги 5c-B — регистрируются до съёмки.**
+- Файл `docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/t5cb-thresholds.json`: регистрация B1-0 и
+  ревизии. У ревизии `base.sha256` — это sha копии регистрации `t5cb-thresholds.registration-b1-0.json`.
+- Менять пороги можно только новой ревизией до съёмки. Анализ (`tools/art/t5cb2_b18.py`, `t53_readability.py`)
+  читает байт-в-байт копию порогов из каталога доказательств прогона.
+- Тест `tools/art/tests/test_t5cb1.py::B1Thresholds` сверяет sha.
+
+**Ловушки волн 5c-B…7**
+
+| Ловушка | Что происходит | Что делать |
+|---|---|---|
+| Restore Packages | редактор убит `/F` с dirty-пакетами → `Saved/Autosaves/PackageRestoreData.json` (UTF-16) → следующий запуск висит на кадре 0 в модальном «Restore Packages», порт MCP не открывается | если диск = HEAD: остановить свой PID, перенести json в `C:/tmp/ue-restore-backup/`, перезапустить; проверять оба checkout до запуска |
+| Build.bat | exit 0 при ошибке компиляции — пакуется старый exe | искать `Result: Failed` в логе (UTF-16); сверять хэш внутреннего exe `Binaries/Win64` (корневой — стаб) |
+| CRLF и sha регистрации | `core.autocrlf=true` переписывает JSON регистрации на CRLF → sha файла на диске ≠ зарегистрированному (так падал `test_t5cb1`) | хэшировать LF-байты (`read_bytes().replace(b"\r\n", b"\n")`), как blob в git; sha в реестре — только для бинарных файлов или для каталогов с `-text` |
+| Docker и postgres-сьюты | без Docker/env 4 postgres-сьюты бэкенда (s04-concurrency, s09-terminal, s10-journal, s10-vs-ai-full-match) молча SKIP — зелёный jest ≠ полный | проверять «Test Suites: N skipped»; поднять `codex-s0x-postgres` и задать `S04_PG_URL` / `S09_PG_URL` / `S10_TEST_DB_URL` |
+| общий редактор | два агента в одном `L_P17ControlScene` — дубли светов, S08Arena dirty | только под `ue-editor.lock`, S08Arena не сохранять |
+| прогноз за замер | прогноз r2 выше реального эффекта (блик, Lumen) | решение — по съёмке b*.N |
 
 ## Схема каталогов
 

@@ -1,0 +1,317 @@
+{
+  "schema": "unmatched.art004-live-run/1",
+  "label": "W7-K1-cobble-5x6-v2",
+  "startedLocal": "2026-09-30T23:00:53+05:00",
+  "argv": [
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "tools/s08/run-phase2-demo.ps1",
+    "-Api",
+    "http://localhost:3120/graphql",
+    "-EvidenceDir",
+    "docs/game-design/evidence/GD-058/interim-2026-09-30/fix-w7/packaged/k1/cobble-5x6",
+    "-ArtPreviewBoardId",
+    "cmuhgs4b2001mwik4f2b2xtf8",
+    "-RunSeconds",
+    "50",
+    "-ClientFps",
+    "30",
+    "-ArtPreviewShotAfter",
+    "36",
+    "-ClientPerf",
+    "-ClientCsvFrames",
+    "1200",
+    "-ArtPreviewMedusaVariant",
+    "face-neck-v2",
+    "-ArtPreviewHeroesV2",
+    "-ArtPreviewDiorama"
+  ],
+  "credentials": "S08_DEMO_* from backend/.env injected into the child environment only (not argv)",
+  "backend": {
+    "port": 3120,
+    "pid": 52496,
+    "process": {
+      "pid": 52496,
+      "parent": 17432,
+      "name": "node.exe",
+      "exe": "C:\\nvm4w\\nodejs\\node.exe",
+      "cmd": "\"C:\\nvm4w\\nodejs\\node.exe\" -r dotenv/config dist/src/main.js ",
+      "created": "2026-09-30T23:00:25.9632370+05:00"
+    }
+  },
+  "variantFlag": "face-neck-v2",
+  "expectedMesh": "SK_Medusa_FaceNeck_v2Candidate",
+  "zoom": 0.0,
+  "shotAfter": 36,
+  "runSeconds": 50,
+  "clientFps": 30,
+  "artBoard": {
+    "boardId": "cmuhgs4b2001mwik4f2b2xtf8",
+    "profile": "cobble-city",
+    "size": "5x6",
+    "light": "cobble-probe",
+    "artFixture": false,
+    "registry": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json",
+    "registrySha256": "1ecc1e9281845655acf8b31f1dcf52a7510abfc8ba8505525ad72ee8f4ce3c4c"
+  },
+  "demoExit": 0,
+  "finishedLocal": "2026-09-30T23:02:00+05:00",
+  "durationS": 65.7,
+  "staging": "C:\\Users\\ren\\AppData\\Local\\Temp\\s08-phase2-20260930-230057-49308",
+  "roomAborted": true,
+  "cleanupLine": "cleanup: aborted THIS run's game id=cmuoevpkg000dwii8m4zuxxbw status=ABORTED (verified)",
+  "runDir": "docs/game-design/evidence/GD-058/interim-2026-09-30/fix-w7/packaged/k1/cobble-5x6/run-20260930-230057",
+  "clientLogs": [
+    {
+      "name": "Unmatched.log",
+      "bytes": 118583,
+      "sha256": "82298e618e7d5cae6594ebdb741a5d05772ce26558d405efd5a5f165b3d4ca5b"
+    },
+    {
+      "name": "Unmatched_2.log",
+      "bytes": 118278,
+      "sha256": "740befec8f522e8c80fdb0df9c5b4e4120eb7773f248e674c9fdaca4f66308ad"
+    }
+  ],
+  "clientCsv": [
+    {
+      "role": "host",
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260930-230057/client-csv/host-Profile-20260930_230057.csv",
+      "bytes": 2514019,
+      "sha256": "4f1671395419297cc53b7e99fed01ce9f859848eaa43a698a91d56934dd41a21"
+    },
+    {
+      "role": "joiner",
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260930-230057/client-csv/joiner-Profile-20260930_230103.csv",
+      "bytes": 2526207,
+      "sha256": "f49425f6fa1787e8d248e23d8aa1f4eb25f9bc9af4d9369168cd961b75a520a4"
+    }
+  ],
+  "rawOutsideGit": [
+    {
+      "role": "host",
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260930-230057/client-csv/host-Profile-20260930_230057.csv",
+      "bytes": 2514019,
+      "sha256": "4f1671395419297cc53b7e99fed01ce9f859848eaa43a698a91d56934dd41a21"
+    },
+    {
+      "role": "joiner",
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260930-230057/client-csv/joiner-Profile-20260930_230103.csv",
+      "bytes": 2526207,
+      "sha256": "f49425f6fa1787e8d248e23d8aa1f4eb25f9bc9af4d9369168cd961b75a520a4"
+    },
+    {
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260930-230057/nvidia-smi-pmon.txt",
+      "bytes": 300525,
+      "sha256": "b4b47e1a435f9b4a6ec25078c4b0911907af8015ccfc3566a9ae104048cd54fb"
+    }
+  ],
+  "crashLines": [],
+  "clientProcesses": [
+    {
+      "pid": 45640,
+      "parent": 49308,
+      "exe": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-30T23:00:57.3880640+05:00"
+    },
+    {
+      "pid": 45160,
+      "parent": 45640,
+      "exe": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-30T23:00:57.4180580+05:00"
+    },
+    {
+      "pid": 47668,
+      "parent": 49308,
+      "exe": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-30T23:01:03.1257050+05:00"
+    },
+    {
+      "pid": 13524,
+      "parent": 47668,
+      "exe": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-30T23:01:03.1357430+05:00"
+    }
+  ],
+  "timing": {
+    "host": {
+      "traceOpenUtc": "2026-09-30T18:00:59+00:00",
+      "startGameS": 18.0,
+      "board5x6S": 18.0,
+      "selectionS": 34.0,
+      "focusRequestedS": null,
+      "cameraSettledS": null,
+      "shotS": 36.0,
+      "traceCloseS": 50.0,
+      "cameraSettledElapsed": null,
+      "shotCamera": {
+        "dist": "1930.8",
+        "target": "1930.8",
+        "overview": "1930.8",
+        "errPct": "0.000",
+        "focusErr": "0.00",
+        "settled": "1",
+        "zoom": "1.00"
+      },
+      "shotHeads": [
+        {
+          "fighter": "f-0-hero",
+          "socket": "Head",
+          "mesh": "SK_Medusa_H2LD",
+          "world": "(0.4,-48.7,47.1)",
+          "screen": "(960.7,433.9)",
+          "top": "(960.7,428.1)",
+          "bottom": "(960.7,439.6)",
+          "headPx": "11.5",
+          "projected": "1"
+        },
+        {
+          "fighter": "f-0-sk0",
+          "socket": "Head",
+          "mesh": "SK_Harpy_H3LD",
+          "world": "(99.6,-45.1,34.3)",
+          "screen": "(1117.3,450.6)",
+          "top": "(1117.7,444.9)",
+          "bottom": "(1116.9,456.2)",
+          "headPx": "11.4",
+          "projected": "1"
+        },
+        {
+          "fighter": "f-0-sk1",
+          "socket": "Head",
+          "mesh": "SK_Harpy_H3LD",
+          "world": "(-0.7,-144.7,34.0)",
+          "screen": "(958.9,328.4)",
+          "top": "(958.8,322.5)",
+          "bottom": "(958.9,334.1)",
+          "headPx": "11.6",
+          "projected": "1"
+        },
+        {
+          "fighter": "f-0-sk2",
+          "socket": "Head",
+          "mesh": "SK_Harpy_H3LD",
+          "world": "(-100.2,-44.7,34.0)",
+          "screen": "(801.8,451.4)",
+          "top": "(801.4,445.7)",
+          "bottom": "(802.2,457.0)",
+          "headPx": "11.3",
+          "projected": "1"
+        },
+        {
+          "fighter": "f-1-hero",
+          "socket": "Head",
+          "mesh": "SK_KingArthur_H2LD",
+          "world": "(0.2,49.0,50.1)",
+          "screen": "(960.3,558.7)",
+          "top": "(960.3,553.1)",
+          "bottom": "(960.3,564.3)",
+          "headPx": "11.2",
+          "projected": "1"
+        },
+        {
+          "fighter": "f-1-sk0",
+          "socket": "Head",
+          "mesh": "SK_Merlin_H2LD",
+          "world": "(100.3,46.9,36.5)",
+          "screen": "(1123.0,568.4)",
+          "top": "(1123.5,562.9)",
+          "bottom": "(1122.6,573.9)",
+          "headPx": "11.1",
+          "projected": "1"
+        }
+      ]
+    },
+    "joiner": {
+      "traceOpenUtc": "2026-09-30T18:01:04+00:00",
+      "startGameS": null,
+      "board5x6S": 16.0,
+      "selectionS": null,
+      "focusRequestedS": null,
+      "cameraSettledS": null,
+      "shotS": 37.0,
+      "traceCloseS": 51.0,
+      "cameraSettledElapsed": null,
+      "shotCamera": {
+        "dist": "1930.8",
+        "target": "1930.8",
+        "overview": "1930.8",
+        "errPct": "0.000",
+        "focusErr": "0.00",
+        "settled": "1",
+        "zoom": "1.00"
+      },
+      "shotHeads": [
+        {
+          "fighter": "f-0-hero",
+          "socket": "Head",
+          "mesh": "SK_Medusa_H2LD",
+          "world": "(-0.7,-49.1,47.0)",
+          "screen": "(958.9,433.5)",
+          "top": "(958.9,427.8)",
+          "bottom": "(958.9,439.2)",
+          "headPx": "11.5",
+          "projected": "1"
+        },
+        {
+          "fighter": "f-0-sk0",
+          "socket": "Head",
+          "mesh": "SK_Harpy_H3LD",
+          "world": "(99.9,-44.7,34.0)",
+          "screen": "(1117.8,451.5)",
+          "top": "(1118.2,445.8)",
+          "bottom": "(1117.4,457.2)",
+          "headPx": "11.3",
+          "projected": "1"
+        },
+        {
+          "fighter": "f-0-sk1",
+          "socket": "Head",
+          "mesh": "SK_Harpy_H3LD",
+          "world": "(-0.0,-144.8,34.2)",
+          "screen": "(960.0,328.1)",
+          "top": "(960.0,322.3)",
+          "bottom": "(960.0,333.9)",
+          "headPx": "11.6",
+          "projected": "1"
+        },
+        {
+          "fighter": "f-0-sk2",
+          "socket": "Head",
+          "mesh": "SK_Harpy_H3LD",
+          "world": "(-100.6,-44.9,34.2)",
+          "screen": "(801.1,451.0)",
+          "top": "(800.7,445.3)",
+          "bottom": "(801.5,456.6)",
+          "headPx": "11.3",
+          "projected": "1"
+        },
+        {
+          "fighter": "f-1-hero",
+          "socket": "Head",
+          "mesh": "SK_KingArthur_H2LD",
+          "world": "(-0.6,49.3,50.1)",
+          "screen": "(959.0,559.1)",
+          "top": "(959.0,553.5)",
+          "bottom": "(959.0,564.7)",
+          "headPx": "11.2",
+          "projected": "1"
+        },
+        {
+          "fighter": "f-1-sk0",
+          "socket": "Head",
+          "mesh": "SK_Merlin_H2LD",
+          "world": "(100.4,47.0,36.5)",
+          "screen": "(1123.1,568.5)",
+          "top": "(1123.5,563.0)",
+          "bottom": "(1122.7,574.0)",
+          "headPx": "11.1",
+          "projected": "1"
+        }
+      ]
+    }
+  }
+}

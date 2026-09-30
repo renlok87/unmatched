@@ -1,0 +1,124 @@
+{
+  "command": "derive",
+  "tool": "qa010-tools 1.1.0",
+  "method": {
+    "gray": "Rec.709 luma Y' = 0.2126R'+0.7152G'+0.0722B' on 8-bit sRGB values, round half up, replicated to RGB",
+    "deuteranopia": "Machado, Oliveira, Fernandes 2009, severity 1.0; IEC 61966-2-1 sRGB decode -> matrix on linear RGB -> clip [0,1] -> sRGB encode -> round half up",
+    "matrix": [
+      [
+        0.367322,
+        0.860646,
+        -0.227968
+      ],
+      [
+        0.280085,
+        0.672501,
+        0.047413
+      ],
+      [
+        -0.01182,
+        0.04294,
+        0.968881
+      ]
+    ],
+    "alpha": "ignored (not composited)"
+  },
+  "entries": [
+    {
+      "input": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k1/cobble-5x6/run-20260930-210906/phase2-board-host-1920x1080.png",
+      "input_sha256": "eed39b73539dfebce7da0717f9279e55833271f746ff3c0e74a5cf7056b22fea",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-A/cobble-5x6/phase2-board-host-1920x1080.gray.png",
+        "sha256": "0552cac7bbf0a9d43d1bbb99ff5285bdbc06f3b75724f986d54e52bc5df9cd51"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-A/cobble-5x6/phase2-board-host-1920x1080.deuteranopia.png",
+        "sha256": "899d671f43c84845242666307600fcfba080a243343a1827a1d9f96c53c71d30"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k1/cobble-5x6/run-20260930-210906/phase2-board-joiner-1920x1080.png",
+      "input_sha256": "fdbf198d26f4420c80e31492cbf83a9a0f732edf40bc7aa56a98a26766d71b52",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-A/cobble-5x6/phase2-board-joiner-1920x1080.gray.png",
+        "sha256": "ad7bb6e8df0001362775355eb5403fdfecdfec480c48ce4393dc8f6a61292fc7"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-A/cobble-5x6/phase2-board-joiner-1920x1080.deuteranopia.png",
+        "sha256": "6651ce891e2899e437a0562d2c008457f59f21e5295f891c19c1d87feced00e3"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-210705/joiner/s09-combat-resolve-revealed.png",
+      "input_sha256": "573d045d2a44ea583a2908a342867dae0109cd9478540eb3446d8da71fa5f1a9",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-A/cobble-5x6/s09-combat-resolve-revealed.gray.png",
+        "sha256": "7db47ff750a251f08b315b23c1ad7141aff89874d9a95908abafc51c55b4c34b"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-A/cobble-5x6/s09-combat-resolve-revealed.deuteranopia.png",
+        "sha256": "3752436b8738edcd1a54eff705da9e0b35592a785fe1f25cd6855dbd260ca5c4"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-210705/joiner/s09-damage-number.png",
+      "input_sha256": "edc91943731b57302a62aa5910768af699b03d8e4a23bf78ba77fe650cd0f4dd",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-A/cobble-5x6/s09-damage-number.gray.png",
+        "sha256": "17309b86c66171a4500fd52a2822efa66be5b5aade879c9b12fb2651c5590cbe"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-A/cobble-5x6/s09-damage-number.deuteranopia.png",
+        "sha256": "a03db4629d720a70da878fac7a85365157d6bd64e13da66c622f29bd75af4566"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-210705/host/s09-damage-combat.png",
+      "input_sha256": "1a777b8f40cee6838d8b79cbb8bc6e4ef4ea55c8ec4fe884bdf926e0c7965ea7",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-A/cobble-5x6/host/s09-damage-combat.gray.png",
+        "sha256": "3985af8adb2ef1c5285d7ad78b0fe35f90cec2488948ef82045106c6a901e546"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-A/cobble-5x6/host/s09-damage-combat.deuteranopia.png",
+        "sha256": "957ce049454e98be27d4fa50ef39fab485065887ea35924b2d8f5640bc64af03"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-210705/joiner/s09-damage-combat.png",
+      "input_sha256": "973ee1d504486cab21b518a9b7d9f36d9cf86c6f54e88804c4029a4a35229b2e",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-A/cobble-5x6/joiner/s09-damage-combat.gray.png",
+        "sha256": "426e5d059fa5631dbbd462f0c7db8f875bd6b5b54a07f5b0b5c725e40e454b65"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-A/cobble-5x6/joiner/s09-damage-combat.deuteranopia.png",
+        "sha256": "f52e6c02d82b182ff48eca0267cf33f5654b51d4b88eaf395289f392dab96127"
+      }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "schema": "unmatched-plan-status/v1",
-  "generated": "2026-09-30T07:15:00Z",
-  "head": "341528031e5f857ff4c062669470553f9aa9102f",
+  "generated": "2026-09-30T23:30:00Z",
+  "head": "c52b96c66929f16a44444daf07573424a3b2c18a",
   "sources": [
     {
       "id": "handover",
@@ -45,8 +45,8 @@
     },
     {
       "id": "session",
-      "path": "git log 2026-09-28..341528031e5f",
-      "title": "Коммиты с 2026-09-28 и цель сессии 2026-09-30 (/goal: реестр слоёв, 5c-B, волны 6–7)"
+      "path": "git log 2026-09-28..c52b96c6",
+      "title": "Коммиты с 2026-09-28 и цель сессии 2026-09-30 (/goal: реестр слоёв, акцент Arthur, 5c-B, волны 6–7); итог — SESSION-CLOSEOUT-2026-09-30.md"
     }
   ],
   "tasks": [
@@ -62,7 +62,7 @@
         "docs/art-pipeline/DIRECTORY-MAP.md",
         "tools/tripo-pipeline/validate_registry.py"
       ],
-      "next": "Реестр отстаёт от факта: добавить слои Arthur H2LD, Harpy H3LD, канонические Rig/SK_<Hero>_Skeleton, клипы H2Anim, мастер M_UM_Figure_v2.1; верхний статус героев поднять с «предложено» до «технически импортировано» по слоям (ART-017, трек registry этой сессии).",
+      "next": "Реестр догнал факт (ART-017, волна 7): слои H2LD/H3LD, Rig, H2Anim, мастер v2.1, look-dev r2/r3; ASSET-TABLE-BASE-001 — «технически импортировано» (Tripo c2e5e3bf → Blender → UE → S08 -ArtPreviewDiorama), фасады и ящик — «измерено». Дальше — слои по факту новых прогонов (сессия карт ENV).",
       "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
@@ -76,8 +76,8 @@
         "ASSET-PROPS-CARDS-001",
         "ASSET-PLACEHOLDER-MANNEQUIN"
       ],
-      "updated": "2026-09-30T07:15:00Z",
-      "note": "Сделано в коммите 10cd855f. У героев Arthur/Merlin/Harpy верхний статус «предложено», у их слоёв — «технически импортировано»; у фасадов и ящика — «предложено», хотя есть измеренные Blender-кандидаты."
+      "updated": "2026-09-30T23:30:00Z",
+      "note": "Сделано в коммите 10cd855f; с волны 7 статусы записей совпадают со слоями (validate_registry PASS)."
     },
     {
       "id": "P0-2",
@@ -295,28 +295,33 @@
       "evidence": [
         "docs/game-design/evidence/ART-004/hud-input-t22-2026-09-28.md",
         "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29.md",
-        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md"
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/fix-w7/fix-w7-2026-09-30.md"
       ],
-      "next": "Реальный ввод (T4.3) в окне пользователя; решение по пределу зума K2 (Q-302) в волне 6.",
+      "next": "Реальный ввод (T4.3) в окне пользователя; HUD-долг: теги на шве/void (§8 п. 14), отладочный текст (п. 16), компактная плашка или выноска (цена исправления п. 13 на K1); предел зума K2 (Q-302).",
       "blocker": "Реальный клик/колесо/Space не проверены: все прогоны src=flag; нужно окно пользователя ≥10 мин; раннер SendInput в репо не подготовлен.",
       "assets": [
         "ASSET-MARKERS-001"
       ],
-      "updated": "2026-09-30T07:15:00Z",
-      "note": "HUD переведён на гибрид UMG (решение пользователя); в 5b-R добавлены UMG-теги WBP_S08ArtTag, привязка урона и плашки, кейлайн иконки."
+      "updated": "2026-09-30T23:30:00Z",
+      "note": "HUD переведён на гибрид UMG (решение пользователя); в 5b-R добавлены UMG-теги WBP_S08ArtTag, привязка урона и плашки, кейлайн иконки. Волна 7: плашка выбранной фигуры ставится на её рамку (проход on-owner ChoosePlateRect), 0 px² с клетками сохранено; автотест S08 на геометрии K1 Cobble."
     },
     {
       "id": "ART-5",
       "title": "Повторная приёмка: K1/K2/K3, QA-009/010, решение GD-058",
       "track": "closing",
       "source": "handover",
-      "status": "open",
-      "art_status": null,
+      "status": "in_progress",
+      "art_status": "измерено",
       "evidence": [
-        "docs/game-design/evidence/GD-058/acceptance-review-2026-09-28.md"
+        "docs/game-design/evidence/GD-058/acceptance-review-2026-09-28.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/gd058-interim-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/k1-k3-acts-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/qa009-report-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/qa010-report-2026-09-30.md"
       ],
-      "next": "Волна 6 после 5c-B2: одна сборка, один sha256 exe, K1–K3 packaged-live, QA-009/010, акт GD-058.",
-      "blocker": "5c-B0/B1/B2 не завершены; замер ACC-022 на классе D-07 невозможен (нет целевого ПК) — только цифры ПК разработки с пометкой.",
+      "next": "Промежуточно принято по делегированию пользователя (без личного просмотра пользователя; без окружения и оригинальных карт), 2026-09-30 — вердикт панели 4/4, §9 акта GD-058. «Художественно принято» не ставится. Финальная приёмка — после ENV; остатки — §8/§9 акта GD-058 и SESSION-CLOSEOUT-2026-09-30.md (волна 7 закрыла §8 п. 9, 12, 13).",
+      "blocker": "ACC-022 на D-07 недоступен; T4.3 ждёт простоя пользователя ≥ 10 мин; окружение и оригинальные карты — ENV.",
       "assets": [
         "ASSET-MEDUSA-001",
         "ASSET-KING-ARTHUR-001",
@@ -329,7 +334,7 @@
         "ASSET-PROPS-CARDS-001",
         "ASSET-PLACEHOLDER-MANNEQUIN"
       ],
-      "updated": "2026-09-30T07:15:00Z"
+      "updated": "2026-09-30T23:30:00Z"
     },
     {
       "id": "GEN-REQ",
@@ -342,9 +347,10 @@
         "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/model-checklist.json",
         "docs/art-pipeline/material-library/README.md",
         "docs/art-pipeline/material-library/team-accent.md",
-        "docs/game-design/decisions/2026-09-29-render-ui-user-decisions.md"
+        "docs/game-design/decisions/2026-09-29-render-ui-user-decisions.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/qa009-report-2026-09-30.md"
       ],
-      "next": "Заполнить model-checklist для каждого героя v2 в игровой камере (обе стороны, оружие, кисти, ноги, подставка, клиппинг, команда в сером) в волне 6.",
+      "next": "QA-009 REPORT героев v2 и подноса заполнен (волна 6). Открыто: клик мышью по капсулам (T4.3), бюджеты tris выше 04, номера гарпий, поворот к сопернику.",
       "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
@@ -358,7 +364,7 @@
         "ASSET-PROPS-CARDS-001",
         "ASSET-PLACEHOLDER-MANNEQUIN"
       ],
-      "updated": "2026-09-30T07:15:00Z",
+      "updated": "2026-09-30T22:30:00Z",
       "note": "Оригиналы Tripo хранятся отдельно (source/, большие GLB локально с sha в source-specs); 4K-мастера текстур локально, в git — 2K рантайм. TeamColor по решению пользователя «акценты + кольцо»: краска только на маске TeamAccent, а не на всей ткани (W4-B и LD-A красили ткань целиком — исправлено в LD-C)."
     },
     {
@@ -588,14 +594,16 @@
       "status": "blocked",
       "art_status": null,
       "evidence": [
-        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29.md"
+        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/t43-real-input.json"
       ],
-      "next": "Подготовить раннер SendInput/DPI-aware (в репо его нет) и выполнить при простое пользователя ≥10 мин; до этого кадры с -ArtPreviewFocusZoom помечаются «тестовый флаг».",
+      "next": "Раннер SendInput/DPI-aware не написан (условие запуска ни разу не выполнилось). Выполнить при простое пользователя ≥ 10 мин: клик по фигуре (капсула), колесо зума, Space, наведение (третье состояние QA-010).",
       "blocker": "Нужно окно пользователя (делегирование 2026-09-29: только при простое пользователя).",
       "assets": [
         "ASSET-MARKERS-001"
       ],
-      "updated": "2026-09-30T07:15:00Z"
+      "updated": "2026-09-30T22:30:00Z",
+      "note": "Волна 6 (2026-09-30): шесть замеров GetLastInputInfo, максимум простоя 37,4 с < 600 с — SendInput не запускался, флаговая эмуляция за реальный ввод не выдаётся."
     },
     {
       "id": "T5.1",
@@ -663,13 +671,18 @@
       "title": "Арт 5: K1/K2/K3, QA-009/010, GD-058",
       "track": "closing",
       "source": "stage3",
-      "status": "open",
-      "art_status": null,
+      "status": "in_progress",
+      "art_status": "измерено",
       "evidence": [
-        "docs/game-design/evidence/GD-058/acceptance-review-2026-09-28.md"
+        "docs/game-design/evidence/GD-058/acceptance-review-2026-09-28.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/gd058-interim-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/k1-k3-acts-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/qa009-report-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/qa010-report-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/runs-2026-09-30.md"
       ],
-      "next": "Волна 6 (делегирована): после 5c-B2.",
-      "blocker": "5c-B0/B1/B2; целевой ПК D-07 недоступен.",
+      "next": "Промежуточно принято по делегированию пользователя (без личного просмотра пользователя; без окружения и оригинальных карт), 2026-09-30 — вердикт панели 4/4, §9 акта GD-058. «Художественно принято» не ставится. Финальный проход — после ENV. Волна 7: §8 п. 9/12/13 акта закрыты (измерено).",
+      "blocker": "Целевой ПК D-07 недоступен; T4.3 не выполнен; ENV.",
       "assets": [
         "ASSET-MEDUSA-001",
         "ASSET-KING-ARTHUR-001",
@@ -682,7 +695,7 @@
         "ASSET-PROPS-CARDS-001",
         "ASSET-PLACEHOLDER-MANNEQUIN"
       ],
-      "updated": "2026-09-30T07:15:00Z"
+      "updated": "2026-09-30T23:30:00Z"
     },
     {
       "id": "T7.1",
@@ -708,14 +721,17 @@
       "title": "Закрытие: реестр, DIRECTORY-MAP, PIPELINE, интеграция, процессы",
       "track": "closing",
       "source": "stage3",
-      "status": "open",
+      "status": "done",
       "art_status": null,
       "evidence": [
         "docs/art-pipeline/DIRECTORY-MAP.md",
-        "docs/art-pipeline/PIPELINE.md"
+        "docs/art-pipeline/PIPELINE.md",
+        "docs/art-pipeline/ADDING-AN-ASSET.md",
+        "docs/art-pipeline/asset-registry.json",
+        "docs/art-pipeline/SESSION-CLOSEOUT-2026-09-30.md"
       ],
-      "next": "Волна 7 после волны 6: реестр/карта/ArtHub, инвентарь процессов по PID, memory.",
-      "blocker": "Волна 6.",
+      "next": "Сделано: реестр, DIRECTORY-MAP, PIPELINE, ADDING-AN-ASSET, план, ArtHub, итоговая сводка. Интеграция — коммит оркестратора в fix/admin-panel по commit_manifest; процессы — только свои по PID.",
+      "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
         "ASSET-KING-ARTHUR-001",
@@ -728,7 +744,8 @@
         "ASSET-PROPS-CARDS-001",
         "ASSET-PLACEHOLDER-MANNEQUIN"
       ],
-      "updated": "2026-09-30T07:15:00Z"
+      "updated": "2026-09-30T23:30:00Z",
+      "note": "Волна 7 (2026-09-30): трек FIX (attackType Medusa, плашка на владельце) + трек DOCS/CLOSING."
     },
     {
       "id": "HEROES-V1",
@@ -1163,15 +1180,17 @@
         "docs/game-design/evidence/ART-005/README.md",
         "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md",
         "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/art3-live-3boards-r3-2026-09-30.md",
-        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/packaged-5cb2-runs-2026-09-30.md"
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/packaged-5cb2-runs-2026-09-30.md",
+        "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/target-arcs-packaged-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/k1-k3-acts-2026-09-30.md"
       ],
-      "next": "Свет rev 5 и остатки 5b-R пересняты (5c-B2, B1-8): кольца край ≥ 4,14 у 54/54, red Cobble в сером 4,65, мультизоны 14/14 и 13/13. Открыто: форма P2 на K3 в сером (дуги прицела ≈ серебро, 2/54), запас кромки зон Cobble 0,20; далее волна 6 (GD-058).",
+      "next": "Форма P2 на K3 в сером закрыта дугами 0,92 (54/54 во всех вариантах, Arthur-цель 0,599 на Cobble). Открыто: запас кромки зон Cobble 0,20; финальный участок — после ENV (Cobble остаётся регрессионной доской).",
       "blocker": null,
       "assets": [
         "ASSET-BOARD-COBBLE-001"
       ],
-      "updated": "2026-09-30T13:30:00Z",
-      "note": "B1-8 по зарегистрированным t5cb-thresholds.json: FAIL только «форма кольца 100 % во всех вариантах» (52/54). Художественная приёмка не выставлялась."
+      "updated": "2026-09-30T22:30:00Z",
+      "note": "Волна 6, набор A (packaged f8accb3d…): край кольца ≥ 4,27, заливка ≥ 0,673/0,561, зоны blue 11/11 red 13/13, мультизоны 14/14 и 13/13, K1 p50 100/152/154. Художественная приёмка не выставлялась."
     },
     {
       "id": "ART-006",
@@ -1243,16 +1262,17 @@
         "docs/art-pipeline/facades-report.md",
         "docs/art-pipeline/crate-report.md",
         "docs/art-pipeline/table-base-report.md",
-        "docs/game-design/evidence/ART-005/corner-bracket-review-2026-09-28.md"
+        "docs/game-design/evidence/ART-005/corner-bracket-review-2026-09-28.md",
+        "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md"
       ],
-      "next": "Основание-поднос: платный шаг Tripo (tripo_requests); фонарь/фасады/ящик — UE-импорт через CLI static-candidate.",
-      "blocker": "Основание заблокировано перед платным шагом Tripo (выполняет оркестратор).",
+      "next": "Поднос SM_TableBase — «технически импортировано», в игре за -ArtPreviewDiorama (5c-B2, 6B); художественная приёмка подноса (кромка, тон, чёрная юбка в свете Cobble) и масштаб под оригинальные карты — сессия ENV. Фонарь/фасады/ящик — UE-импорт (CLI static-candidate) и размещение по решению окружения ENV.",
+      "blocker": null,
       "assets": [
         "ASSET-DECOR-KIT-001",
         "ASSET-TABLE-BASE-001",
         "ASSET-BOARD-COBBLE-001"
       ],
-      "updated": "2026-09-30T07:15:00Z"
+      "updated": "2026-09-30T23:30:00Z"
     },
     {
       "id": "ART-010",
@@ -1294,9 +1314,12 @@
       "evidence": [
         "docs/game-design/decisions/2026-09-29-anim-v2-decisions.md",
         "docs/art-pipeline/rig/RIG-CONTRACT.md",
-        "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md"
+        "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/runs-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/k1-k3-acts-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/fix-w7/fix-w7-2026-09-30.md"
       ],
-      "next": "Правило yaw «лицом к сопернику» на фикстурах (сейчас по знаку Y клетки: на Sherwood все 6 фигур yaw 270); свет фигур Arthur (сталь темнее, плащ светлее концепта на K2 — свет доски/ракурс).",
+      "next": "Правило yaw «лицом к сопернику» на фикстурах и конфликт с «лицо к камере D-10» (P2 на Cobble спиной к камере); номера экземпляров гарпий в кадре не различимы (AD-OPEN-06).",
       "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
@@ -1304,8 +1327,8 @@
         "ASSET-MERLIN-001",
         "ASSET-HARPY-001"
       ],
-      "updated": "2026-09-30T13:30:00Z",
-      "note": "5c-B2: packaged K1/K3 трёх досок с -ArtPreviewHeroesV2 -ArtPreviewDiorama — 6/6 фигур v2, Idle 6/6, missing 0, поднос виден, 30/30 кадров packaged-live strict."
+      "updated": "2026-09-30T23:30:00Z",
+      "note": "Волна 6 (набор B): 18/18 клиентов — 6/6 фигур v2, Idle 6/6, missing 0, поднос SM_TableBase виден; 36/36 кадров packaged-live strict; K2 1,6×/2,5× на Medusa."
     },
     {
       "id": "ART-013",
@@ -1317,9 +1340,10 @@
       "evidence": [
         "docs/art-pipeline/animation-library/clip-manifest.json",
         "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md",
-        "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/clip-pixel-diff-k3.json"
+        "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/clip-pixel-diff-k3.json",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/analysis/clip-pixel-diff-k3.json"
       ],
-      "next": "Пиксельная проверка LungeAttack и DeathSettle (опубликованных кадров нет); root motion в packaged не мерился.",
+      "next": "Пиксельная проверка LungeAttack и DeathSettle (кадров внутри клипа нет); root motion в packaged; набор клипов Harpy (AD-CNF-30).",
       "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
@@ -1327,8 +1351,8 @@
         "ASSET-MERLIN-001",
         "ASSET-HARPY-001"
       ],
-      "updated": "2026-09-30T13:30:00Z",
-      "note": "5c-B2: клипы по событиям (LungeAttack = бои, HitReact = CUE урона кроме смертельного, DeathSettle hold 2,875), длительности = clip-manifest ±0,05 с; HitReact меняет силуэт цели (12–14 % пикселей на Cobble/Sherwood)."
+      "updated": "2026-09-30T22:30:00Z",
+      "note": "Волна 6 (набор B): по событиям LungeAttack/HitReact/DeathSettle — Cobble 6/11/1, Sherwood 9/14/2, T. Rex 8/15/1 (HitReact + DeathSettle = CUE урона); HitReact меняет силуэт цели на 10,9–13,4 % пикселей, остальные ≤ 3,6 %."
     },
     {
       "id": "ART-014",
@@ -1342,9 +1366,11 @@
         "docs/game-design/decisions/2026-09-29-lookdev-v2-decisions.md",
         "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/art3-live-3boards-r3-2026-09-30.md",
         "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md",
-        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/5cb1-editor-2026-09-30.md"
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/5cb1-editor-2026-09-30.md",
+        "docs/art-pipeline/evidence/lookdev-r3-2026-09-30/summary.json",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/k1-k3-acts-2026-09-30.md"
       ],
-      "next": "Материал: кожа Medusa и тёмные перья Harpy (Blender, ART-016); свет фигур Arthur на K2 (сталь/плащ); B1-5 look-dev: Medusa 3/5, Harpy 3/5 ниже критерия.",
+      "next": "Свет фигур Arthur на K2 (сталь темнее, плащ светлее — свет доски/ракурс); тёмные перья Harpy — материал (отдельный класс MatID для маховых); на оригинальных картах свет — ENV.",
       "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
@@ -1353,8 +1379,8 @@
         "ASSET-HARPY-001",
         "ASSET-BOARD-COBBLE-001"
       ],
-      "updated": "2026-09-30T13:30:00Z",
-      "note": "Свет rev 5 (ключ Pitch −55, EV100 2,05) в игре: RENDER expMin 4,14106 на всех кадрах, K1 p50 100/152/154 (в коридорах). Look-dev b1 при 2,05 — 15/21; на K2 5× (прокси по цвету) кожа Medusa и Harpy в допуске, тёмные перья Harpy — нет (материал)."
+      "updated": "2026-09-30T22:30:00Z",
+      "note": "Look-dev r3 при EV100 2,05: Medusa 5/5, Arthur 6/6, Merlin 4/5, Harpy 4/5 (5c-B1) / 5/5 (r2) — критерии выполнены, у Harpy регрессия «тёмных» перьев против b2. В игре прокси по цвету не пересчитывался на r3 (K2 2,5× r2/r3 глазом неотличимы)."
     },
     {
       "id": "ART-015",
@@ -1366,17 +1392,19 @@
       "evidence": [
         "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md",
         "docs/art-pipeline/evidence/s3-baseline-2026-09-28/production-baseline.json",
-        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/art3-live-3boards-r3-2026-09-30.md"
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/art3-live-3boards-r3-2026-09-30.md",
+        "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/target-arcs-packaged-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/k1-k3-acts-2026-09-30.md"
       ],
-      "next": "Форма P2 на K3 в сером: дуги прицела вплотную к заливке и равны ей по яркости в сером — развести/перекрасить дуги или новой регистрацией исключить их из профиля.",
+      "next": "Остатки 5b-R закрыты числами. Остаётся запас кромки зон Cobble 0,20 (светлый ободок у меток — вариант) и привязка тега соседних фигур (K3 Sherwood v2 136/144, запись).",
       "blocker": null,
       "assets": [
         "ASSET-MARKERS-001",
         "ASSET-BOARD-COBBLE-001",
         "ASSET-MEDUSA-001"
       ],
-      "updated": "2026-09-30T13:30:00Z",
-      "note": "Три неудачи 5b-R: кромка кольца Cobble — закрыта (край 4,14–4,98 по ободку); red Cobble в сером — закрыта (4,65–5,13, 13/13); классификатор формы — 54/54 в цвете, 52/54 во всех вариантах (FAIL на K3). MI_Medusa_P1/P2 заменены (miSha256 605ba814…)."
+      "updated": "2026-09-30T22:30:00Z",
+      "note": "Три неудачи 5b-R: кромка кольца Cobble — закрыта (4,27–4,96); red Cobble в сером — закрыта (4,65–5,13, 13/13); классификатор формы — закрыта (54/54 во всех вариантах после дуг 0,92, волна 6). MI_Medusa_P1/P2 заменены (miSha256 605ba814…)."
     },
     {
       "id": "ART-016",
@@ -1389,30 +1417,33 @@
         "docs/art-pipeline/king-arthur-lookdev-v2.md",
         "docs/art-pipeline/harpy-lookdev-v2.md",
         "docs/art-pipeline/merlin-lookdev-v2.md",
-        "docs/art-pipeline/material-library/team-accent.md"
+        "docs/art-pipeline/material-library/team-accent.md",
+        "docs/art-pipeline/evidence/lookdev-r3-2026-09-30/summary.json",
+        "docs/art-pipeline/evidence/lookdev-r3-2026-09-30/reimport-plan-r3.2.json"
       ],
-      "next": "Blender-правка (5c-B0, трек blender) → переимпорт текстур в UE (5c-B1) → замер против концепта.",
+      "next": "Harpy: выделить маховые в свой класс MatID + строку LUT (specular 0,35), рыжим перьям вернуть 0,575; переимпорт, съёмка b3.3, замер по обоим определениям.",
       "blocker": null,
       "assets": [
         "ASSET-KING-ARTHUR-001",
         "ASSET-HARPY-001",
         "ASSET-MERLIN-001"
       ],
-      "updated": "2026-09-30T07:15:00Z",
-      "note": "Новая задача: полоса 14 мм TeamAccent Arthur через мипы красит всю кайму плаща; пояс Arthur +0,18 и тёмные первичные Harpy +0,16 по насыщенности; кожа Merlin."
+      "updated": "2026-09-30T22:30:00Z",
+      "note": "Маска акцента Arthur и BC пояса — 5c-B1; look-dev r3 (1d0e6f20): Medusa 5/5, Merlin 4/5 (потёртая кожа в допуске), Harpy 4/5 с регрессией «тёмных» перьев; дерево лука/посоха и волосы Arthur — материал вне счёта зон."
     },
     {
       "id": "ART-017",
       "title": "Реестр: слои H2LD/H3LD, Rig, H2Anim, мастер v2.1",
       "track": "pipeline",
       "source": "session",
-      "status": "in_progress",
+      "status": "done",
       "art_status": null,
       "evidence": [
         "docs/art-pipeline/asset-registry.json",
-        "tools/tripo-pipeline/validate_registry.py"
+        "tools/tripo-pipeline/validate_registry.py",
+        "docs/art-pipeline/SESSION-CLOSEOUT-2026-09-30.md"
       ],
-      "next": "Трек registry этой сессии; после 5c-B1 — пересчёт sha текстур Arthur/Harpy/Merlin.",
+      "next": "Сделано. Новые слои — по мере прогонов (ENV, Harpy MatID маховых).",
       "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
@@ -1420,8 +1451,8 @@
         "ASSET-MERLIN-001",
         "ASSET-HARPY-001"
       ],
-      "updated": "2026-09-30T07:15:00Z",
-      "note": "Новая задача (п. 1 цели сессии)."
+      "updated": "2026-09-30T23:30:00Z",
+      "note": "Слои героев — 4af9f7b8 (5c-B1), 251b677b (r2), 1d0e6f20 (r3, 14 перепривязок sha); волна 7: TABLE-BASE (технически импортировано, 5 слоёв до live-packaged), CRATE и FACADES (измерено, по своим отчётам). validate_registry: RESULT PASS, 472 sha без расхождений."
     },
     {
       "id": "ART-018",
@@ -1434,10 +1465,12 @@
         "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md",
         "docs/game-design/evidence/ART-018/long-k2-2026-09-30.md",
         "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md",
-        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/art3-live-3boards-r3-2026-09-30.md"
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/art3-live-3boards-r3-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/runs-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/k1-k3-acts-2026-09-30.md"
       ],
-      "next": "«Один прогон ≥ 240 с до FINISHED» дословно не выполнен (партия 52–88 с, одна фокусировка на процесс): нужен код (серия зумов в одном процессе или длинная партия). K2-метрики для SK_Medusa_H2LD — нужна ID-маска H2LD.",
-      "blocker": "ART-012…016.",
+      "next": "Вход волны 6 отснят (набор B). Открыто: «один прогон ≥ 240 с до FINISHED» дословно; K2-метрики для SK_Medusa_H2LD (нужна ID-маска H2LD); серый/deuteranopia для K2.",
+      "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
         "ASSET-KING-ARTHUR-001",
@@ -1445,7 +1478,7 @@
         "ASSET-HARPY-001",
         "ASSET-BOARD-COBBLE-001"
       ],
-      "updated": "2026-09-30T13:30:00Z",
+      "updated": "2026-09-30T22:30:00Z",
       "note": "5c-B2: C1 бой до FINISHED (71 с, seq 133/133), C2 K2 1,6×/2,5×/3,5×/5× (голова 17,8–58,8 px), C3 живая сессия 262 с с K2 5× на 245 с; пересъёмка трёх досок с героями v2 — ART-012. Perf пары 30 FPS, dev-PC, не D-07."
     },
     {
@@ -1453,13 +1486,19 @@
       "title": "Ранний визуальный эталон перед серией (gate)",
       "track": "closing",
       "source": "backlog",
-      "status": "open",
-      "art_status": null,
+      "status": "in_progress",
+      "art_status": "измерено",
       "evidence": [
-        "docs/game-design/evidence/GD-058/acceptance-review-2026-09-28.md"
+        "docs/game-design/evidence/GD-058/acceptance-review-2026-09-28.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/gd058-interim-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/k1-k3-acts-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/qa009-report-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/qa010-report-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/runs-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/fix-w7/fix-w7-2026-09-30.md"
       ],
-      "next": "Акт в волне 6: «визуально принято / perf-gate открыт» или «не принято».",
-      "blocker": "Волны 5c-B; ACC-022 на D-07 не измерить без целевого ПК.",
+      "next": "Промежуточно принято по делегированию пользователя (без личного просмотра пользователя; без окружения и оригинальных карт), 2026-09-30 — вердикт панели 4/4, §9 акта GD-058. «Художественно принято» не ставится. Финальный GD-058 — в сессии карт после волны ENV, на диораме оригинальной карты (передано: SESSION-CLOSEOUT-2026-09-30.md). Волна 7 закрыла §8 п. 9 и п. 13 (измерено) и п. 12 (реестр); открыты п. 14–16 (теги на шве/void, разметка зон, отладочный текст HUD), п. 17 (postgres-сьюты), гейт attackType в K3.",
+      "blocker": "ACC-022 на D-07 не измерен (целевого ПК нет); T4.3 не выполнен (пользователь активен); окружение и оригинальные карты — сессия ENV.",
       "assets": [
         "ASSET-MEDUSA-001",
         "ASSET-KING-ARTHUR-001",
@@ -1472,20 +1511,24 @@
         "ASSET-PROPS-CARDS-001",
         "ASSET-PLACEHOLDER-MANNEQUIN"
       ],
-      "updated": "2026-09-30T07:15:00Z"
+      "updated": "2026-09-30T23:30:00Z",
+      "note": "2026-09-30: одна сборка f8accb3d…/84e68fbe…, 15/15 прогонов, 66/66 кадров packaged-live strict; три неудачи 5b-R/5c-B закрыты (форма колец 54/54); открыто: номера гарпий H1–H3 в кадре, лицо на K2 1,6×, поворот к сопернику, perf на D-07, реальный ввод. «Художественно принято» не ставится. Волна 6B: MELEE у Medusa подтверждён по трассам (сервер отдавал melee; бои K3 законны и по правилам ranged); плашка на Cobble ближе к чужой фигуре (Merlin 3 px / Medusa 126 px) — HUD-долг. Волна 7 (трек FIX): attackType Medusa = range на стенде S09, плашка «HERO | RANGED»; плашка стоит на своей фигуре (packaged K1/K2 1,6× Cobble, зазор 0)."
     },
     {
       "id": "ART-HUB",
       "title": "Актуализация страницы ArtHub (админка :5480)",
       "track": "closing",
       "source": "session",
-      "status": "in_progress",
+      "status": "done",
       "art_status": null,
       "evidence": [
         "admin/art-hub/README.md",
-        "admin/art-hub/aggregate.ts"
+        "admin/art-hub/aggregate.ts",
+        "admin/art-hub/overview.ts",
+        "admin/art-hub/__tests__/aggregate.test.ts",
+        "admin/art-hub/__tests__/overview.test.ts"
       ],
-      "next": "Трек hub этой сессии: разделы плана (plan-status.json), look-dev, библиотека материалов, слои UE, решения.",
+      "next": "Сделано; агрегатор не менялся. Снимок и dev-сервер :5480 показывают новый реестр (поднос «технически импортировано», ящик/фасады «измерено»), листы look-dev r3 (b3.1/b3.2) и план волны 7.",
       "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
@@ -1499,7 +1542,31 @@
         "ASSET-PROPS-CARDS-001",
         "ASSET-PLACEHOLDER-MANNEQUIN"
       ],
-      "updated": "2026-09-30T07:15:00Z"
+      "updated": "2026-09-30T23:30:00Z",
+      "note": "Волна 7: vitest admin/art-hub 3 файла, 102/102; art-hub:snapshot — 4 персонажа, 12 пропсов, 50 прогонов, 0 предупреждений; живой /__art-hub/data на :5480 — 200, те же статусы."
+    },
+    {
+      "id": "W7-FIX",
+      "title": "Волна 7, трек FIX: тип атаки Medusa (§8 п. 9) и плашка у своей фигуры (§8 п. 13)",
+      "track": "tech",
+      "source": "session",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/fix-w7/fix-w7-2026-09-30.md",
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/gd058-interim-2026-09-30.md",
+        "backend/prisma/backfill-attack-type.ts",
+        "tools/s09/bootstrap-s09-stack.cjs",
+        "unreal/Unmatched/Source/Unmatched/S08/S08ArtHud.cpp"
+      ],
+      "next": "Гейт attackType в K3-прогонах не сделан; цена исправления плашки на K1 — плашка закрывает скульптуру Medusa (видны кольцо и основание): нужна компактная плашка или выноска (решение HUD).",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-MARKERS-001"
+      ],
+      "updated": "2026-09-30T23:30:00Z",
+      "note": "Стенд S09: у 84/84 героев не было Hero.properties.attackType → backfill идемпотентен (--dry-run/--check), seed-scraped сверяет тип атаки, bootstrap с шагом и гейтом; Medusa range, Merlin range, Arthur melee, Harpies melee; плашка «HERO | RANGED». ChoosePlateRect: проход on-owner; S08 86/86, S09 44/44, S10 50/50; packaged K1/K2 1,6× Cobble — ближайшая фигура Medusa (зазор 0)."
     },
     {
       "id": "PLAN-SYNC",
@@ -1654,7 +1721,7 @@
     {
       "id": "5c-B0",
       "title": "Код героев v2 и клипов в S08, Blender-правки акцентов, план света и остатков 5b-R; сессия: план/реестр/ArtHub",
-      "status": "in_progress",
+      "status": "done",
       "tasks": [
         "ART-012",
         "ART-013",
@@ -1669,7 +1736,7 @@
     {
       "id": "5c-B1",
       "title": "UE: переимпорт текстур, свет доски, остатки 5b-R, MI Medusa, sha реестра",
-      "status": "in_progress",
+      "status": "done",
       "tasks": [
         "ART-014",
         "ART-015",
@@ -1680,8 +1747,8 @@
     },
     {
       "id": "5c-B2",
-      "title": "Packaged: пересъёмка 3 досок с героями v2, длинный K2 ≥240 с на High",
-      "status": "in_progress",
+      "title": "Packaged: пересъёмка 3 досок с героями v2, длинный K2 ≥240 с на High (закрыта 2026-09-30; «один прогон ≥ 240 с до FINISHED» дословно — остаток T5.1)",
+      "status": "done",
       "tasks": [
         "ART-018",
         "T5.1",
@@ -1690,8 +1757,8 @@
     },
     {
       "id": "W6",
-      "title": "Приёмка: K1–K3, QA-009/010, GD-058 (делегировано)",
-      "status": "open",
+      "title": "Приёмка: K1–K3, QA-009/010, GD-058 — промежуточно принято по делегированию пользователя 2026-09-30 (без личного просмотра, без окружения и оригинальных карт; панель 4/4). Финальный GD-058, ACC-022 на D-07 и T4.3 — открыты (сессия карт ENV / простой пользователя)",
+      "status": "done",
       "tasks": [
         "T6",
         "ART-5",
@@ -1702,11 +1769,14 @@
     },
     {
       "id": "W7",
-      "title": "Закрытие: реестр, карта каталогов, ArtHub, процессы, memory",
-      "status": "open",
+      "title": "Закрытие: трек FIX (attackType, плашка), реестр, карта каталогов, PIPELINE, ArtHub, план, итоговая сводка",
+      "status": "done",
       "tasks": [
         "T7.2",
-        "T7.1"
+        "T7.1",
+        "W7-FIX",
+        "ART-017",
+        "ART-HUB"
       ]
     }
   ],
@@ -1743,7 +1813,7 @@
       "scope": "один тип × 3 экземпляра, крылья, браслет, метки экземпляров",
       "candidate": "/Game/PipelineCandidates/Harpy/H3LD",
       "art_status": "технически импортировано",
-      "gap": "тёмные первичные +0,16; носитель номера AD-OPEN-06; швы в деформации",
+      "gap": "тёмные рыжие перья (отдельный класс MatID для маховых); носитель номера AD-OPEN-06",
       "action": "ART-016, ART-008",
       "tripo": false
     },
@@ -1752,7 +1822,7 @@
       "scope": "подставки P1/P2, кольца выбора/цели, кольца команды",
       "candidate": "blender/ASSET-MARKERS-001 + TeamRing 5b-R",
       "art_status": "технически импортировано",
-      "gap": "кейлайн <3:1 на Cobble, классификатор 20/54; дубль подставок (у героев свои SM_<Hero>_Base)",
+      "gap": "дубль подставок (у героев свои SM_<Hero>_Base); запас кромки зон Cobble 0,20",
       "action": "ART-015",
       "tripo": false
     },
@@ -1768,11 +1838,11 @@
     {
       "asset": "ASSET-TABLE-BASE-001",
       "scope": "основание-поднос диорамы",
-      "candidate": "нет меша (есть блок-аут S05 и входы Tripo)",
-      "art_status": "предложено",
-      "gap": "единственный обязательный 3D-ассет без кандидата",
-      "action": "tripo_requests[0]",
-      "tripo": true
+      "candidate": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31 (SM_TableBase, Tripo c2e5e3bf)",
+      "art_status": "технически импортировано",
+      "gap": "юбка скалы почти чёрная в свете Cobble; кромка без сколов; масштаб под оригинальные карты; художественной приёмки нет",
+      "action": "ART-009 / сессия ENV",
+      "tripo": false
     },
     {
       "asset": "ASSET-DECOR-KIT-001.BARREL",
@@ -1847,7 +1917,9 @@
       "cap_credits": 250,
       "cost_basis": "журнал credits-ledger.json: multi-view H3.1 55 + ретопология 40 + Smart UV 20 + текстура 2K 10 + PBR 5 = 130 (как фонарь 26bb832e); повтор с full-white только при срезанной кромке → ≤185",
       "runbook": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/tripo-stage-plan.json",
-      "after": "Blender-этап одной командой (reports/blender-stage-plan.json): срез верха на Z=−3, XY 756×656 uu, экспорт SM_TableBase 2K; UE через CLI static-candidate."
+      "after": "Blender-этап одной командой (reports/blender-stage-plan.json): срез верха на Z=−3, XY 756×656 uu, экспорт SM_TableBase 2K; UE через CLI static-candidate.",
+      "status": "done",
+      "result": "Выполнено оркестратором 2026-09-30: задача c2e5e3bf, 105 Studio-кредитов из плановых 130; Blender (прямая кромка 756×656) → UE → S08 -ArtPreviewDiorama; table-base-report.md."
     }
   ]
 }

@@ -5991,6 +5991,8 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
     // W5b-R r3 (t53 revision 1, tags.mode): the plate owner is hidden only while the plate reads as the owner's
     // (ChoosePlateRect bound); a plate pushed away by K-2 (Cobble: reachable cells all around Medusa, the plate
     // lands next to Merlin) keeps a compact tag at the figure, so the HP stays next to it on both clients.
+    // W7: ChoosePlateRect's on-owner fallback now keeps that Cobble plate bound (over the owner's head); an unbound
+    // plate is left only when no forbidden-free bound place exists at all.
     ES08TagMode Mode = ES08TagMode::Compact;
     if (ArtHud.bPlateVisible && F->Id == ArtHud.PlateFighterId) {
       Mode = ArtHud.PlateResult.bBound ? ES08TagMode::Hidden : ES08TagMode::Compact;
