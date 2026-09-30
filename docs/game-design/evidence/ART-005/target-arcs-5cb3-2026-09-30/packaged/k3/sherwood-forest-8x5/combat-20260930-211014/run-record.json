@@ -1,0 +1,121 @@
+{
+  "schema": "unmatched.t52-k3-run/1",
+  "label": "A-K3-sherwood-forest-8x5",
+  "startedLocal": "2026-09-30T21:10:10+05:00",
+  "argv": [
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "tools/s09/run-combat-demo.ps1",
+    "-Api",
+    "http://localhost:3120/graphql",
+    "-EvidenceDir",
+    "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/sherwood-forest-8x5",
+    "-ArtPreview",
+    "-FullHd",
+    "-ClientFps",
+    "30",
+    "-ArtPreviewBoardId",
+    "c37a3b6643a96c45fa71f10de",
+    "-ArtPreviewMedusaVariant",
+    "face-neck-v2",
+    "-RunSeconds",
+    "240",
+    "-ClientRenderPreset",
+    "High",
+    "-RequireRenderReference",
+    "-ClientPerf",
+    "-RequireShotCaptured"
+  ],
+  "credentials": "S08_DEMO_* from backend/.env injected as S09_DEMO_* into the child environment only",
+  "backend": {
+    "port": 3120,
+    "pid": 52824,
+    "process": {
+      "pid": 52824,
+      "parent": 45708,
+      "name": "node.exe",
+      "exe": "C:\\nvm4w\\nodejs\\node.exe",
+      "cmd": "\"C:\\nvm4w\\nodejs\\node.exe\" -r dotenv/config dist/src/main.js ",
+      "created": "2026-09-30T21:03:43.2653710+05:00"
+    }
+  },
+  "artBoard": {
+    "boardId": "c37a3b6643a96c45fa71f10de",
+    "profile": "sherwood-forest-art-fixture",
+    "size": "8x5",
+    "light": "forest-probe",
+    "artFixture": true
+  },
+  "clientFps": 30,
+  "runSeconds": 240,
+  "variant": "face-neck-v2",
+  "staged": {
+    "global.ucas": "f112ef2d5efe4c8a3b0f2f790ca4151f2473db21b7bf059dd0fd959d52278799",
+    "global.utoc": "5004628eb157c5e5469dad19739ddf475653405e394fb9276bc96ec18c2efc49",
+    "Unmatched-Windows.pak": "84e68fbe1bf31c1931cb1bc0860957310b5c2fa22e0a66f12cc8b6da097e347b",
+    "Unmatched-Windows.ucas": "76837b6ec40cb26f386da745c7a3ae34ff5b90f80dd5b6fcf07e849e2b0105e0",
+    "Unmatched-Windows.utoc": "43d2eed21082620eaf0ff956a3c133c647632a3acb84661e37cf0d3ea9960763",
+    "Unmatched.exe(inner)": "f8accb3da116f7e3d3dde930dd61e90bd20d1d6e04c070223feab9ecb9939178"
+  },
+  "demoExit": 0,
+  "finishedLocal": "2026-09-30T21:12:08+05:00",
+  "durationS": 117.1,
+  "staging": "C:\\Users\\ren\\AppData\\Local\\Temp\\s09-combat-20260930-211014-26936",
+  "cleanupLine": "cleanup: game cmuoaxbkg009vwirc6su9w472 already terminal (FINISHED)",
+  "roomStatus": "FINISHED",
+  "runDir": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-211014",
+  "clientLogs": [
+    {
+      "name": "Unmatched.log",
+      "bytes": 161020,
+      "sha256": "ab411e46180dfcaa3b19d43a8a1490038de62ff3f185b24581bebc63ddc20339",
+      "roomCodeRedacted": false
+    },
+    {
+      "name": "Unmatched_2.log",
+      "bytes": 183218,
+      "sha256": "701500f196279d2c983dbcf05b470c85f1b12dc7c989de496750df6893b9015f",
+      "roomCodeRedacted": false
+    }
+  ],
+  "rawOutsideGit": [
+    {
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/t52-combat-20260930-211014/nvidia-smi-pmon.txt",
+      "sha256": "7966a4b7a4160373fe12bd361b0ec36163f631d13ddd276e26627c1833e82245"
+    }
+  ],
+  "crashLines": [],
+  "clientProcesses": [
+    {
+      "pid": 57324,
+      "parent": 26936,
+      "exe": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-30T21:10:14.0752320+05:00"
+    },
+    {
+      "pid": 44072,
+      "parent": 57324,
+      "exe": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-30T21:10:14.0847920+05:00"
+    },
+    {
+      "pid": 31076,
+      "parent": 26936,
+      "exe": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-30T21:10:19.8039170+05:00"
+    },
+    {
+      "pid": 11212,
+      "parent": 31076,
+      "exe": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-30T21:10:19.8160810+05:00"
+    }
+  ],
+  "validation": {
+    "status": "pass_with_note",
+    "problems": []
+  }
+}

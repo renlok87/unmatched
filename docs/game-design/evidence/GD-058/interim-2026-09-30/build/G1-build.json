@@ -1,0 +1,65 @@
+{
+  "schema": "unmatched.art004-build/1",
+  "label": "G1",
+  "wave": "6 (GD-058 промежуточная приёмка), этап BUILD+PACKAGE",
+  "target": "Unmatched Win64 Development",
+  "checkout": "C:/Users/ren/WebstormProjects/unmached/unmached (fix/admin-panel, HEAD 1d0e6f20, рабочее дерево Source/Config чистое)",
+  "reason": "сборка с дугами прицела 0.92 XY (S08Team.h TargetArcScale, S08FighterActor.cpp, тест TeamRing в S08BoardArtTests.cpp; коммит 251b677b) — до этого не собирались",
+  "flags": [
+    "-WaitMutex",
+    "-NoHotReloadFromIDE",
+    "-MaxParallelActions=6"
+  ],
+  "maxParallelActions": 6,
+  "command": "Build.bat Unmatched Win64 Development <uproject> -WaitMutex -NoHotReloadFromIDE -MaxParallelActions=6 (обёртка helpers/ubt.cjs: скрытый cmd, полный вывод в лог)",
+  "startedLocal": "2026-09-30T20:34:21+05:00",
+  "finishedLocal": "2026-09-30T20:34:49+05:00",
+  "durationS": 27.5,
+  "log": "docs/game-design/evidence/GD-058/interim-2026-09-30/build/G1-game-build.log",
+  "logSha256": "3496ff746073cfe046e0c8e8f4ca4983d5cb4c2d2cf4939bbf451ede36e6e84c",
+  "exitCode": 0,
+  "resultLines": [
+    "Result: Succeeded"
+  ],
+  "errorLines": [],
+  "warnings": [
+    "C4996 UInstancedStaticMeshComponent::AddInstanceWorldSpace deprecated (S08BoardActor.cpp:905, :922) — известное, не новое",
+    "UBT: License not activated (build system warning)"
+  ],
+  "compiledUnits": [
+    "Compile [x64] S08HeroesV2.cpp",
+    "Compile [x64] S08Team.cpp",
+    "Compile [x64] S08DioramaTests.cpp",
+    "Compile [x64] S08ArtHudTests.cpp",
+    "Compile [x64] S08FighterActor.cpp",
+    "Compile [x64] S08HeroesV2Tests.cpp",
+    "Compile [x64] S08BoardArtTests.cpp",
+    "Compile [x64] S08Phase2Tests.cpp",
+    "Compile [x64] Module.Unmatched.cpp",
+    "Compile [x64] S08BoardActor.cpp",
+    "Compile [x64] S08ArtHudUmgTests.cpp",
+    "Compile [x64] S08FlowGameMode.cpp",
+    "Link [x64] Unmatched.exe"
+  ],
+  "result": "Succeeded",
+  "sharedDefinitionsWithLiveCoding": {
+    "Core/SharedDefinitions.Core.Cpp20.h": 1,
+    "Core/SharedDefinitions.Core.Exceptions.Cpp20.h": 1,
+    "CoreUObject/SharedDefinitions.CoreUObject.Cpp20.h": 1,
+    "CoreUObject/SharedDefinitions.CoreUObject.RTTI.Exceptions.Cpp20.h": 1,
+    "Engine/SharedDefinitions.Engine.Cpp20.h": 1,
+    "Engine/SharedDefinitions.Engine.Exceptions.Cpp20.h": 1,
+    "Engine/SharedDefinitions.Engine.Project.ValApi.ValExpApi.Cpp20.h": 1,
+    "Slate/SharedDefinitions.Slate.Cpp20.h": 1
+  },
+  "withLiveCodingValues": [
+    1
+  ],
+  "noLiveCodingGuard": "в SharedDefinitions игрового таргета нет «#define WITH_LIVE_CODING 0» — guard -SkipBuild в package-client.ps1 проходит",
+  "output": {
+    "path": "unreal/Unmatched/Binaries/Win64/Unmatched.exe",
+    "sha256": "f8accb3da116f7e3d3dde930dd61e90bd20d1d6e04c070223feab9ecb9939178",
+    "mtimeLocal": "2026-09-30T20:34:46+05:00",
+    "previousSha256_5cb2": "8d228fae4f60c78002d6009b4fef1c0ec308275146fad5b6244c7a1b846d3b35"
+  }
+}

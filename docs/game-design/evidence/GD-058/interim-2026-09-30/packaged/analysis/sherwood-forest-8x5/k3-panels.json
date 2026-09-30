@@ -1,0 +1,65 @@
+{
+  "schema": "unmatched.t53-k3-panels/1",
+  "rule": "D-10: HUD-панели (строки SHOT panel … geom=painted) ∩ (FigureScreenRect живых бойцов ∪ проекции клеток атакующего и цели ∪ достижимые клетки) = 0 px² — гейт; перекрытие прочих клеток записывается в px², не гейт. При провале — перенос панели в слот баннеров 02 §4.1 (порт UMG), не камера.",
+  "frame": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/joiner/s09-combat-resolve-revealed.png",
+  "panels": [
+    {
+      "id": "hud.command",
+      "bbox": [
+        0.0,
+        0.0,
+        698.0,
+        278.0
+      ]
+    },
+    {
+      "id": "hud.side",
+      "bbox": [
+        1431.0,
+        0.0,
+        1920.0,
+        121.0
+      ]
+    },
+    {
+      "id": "hud.hand",
+      "bbox": [
+        300.0,
+        985.0,
+        1620.0,
+        1080.0
+      ]
+    }
+  ],
+  "attacker": "f-0-hero",
+  "target": "f-1-hero",
+  "gatedOverlaps": [],
+  "pass": true,
+  "otherCellOverlaps": [
+    {
+      "panel": "hud.command",
+      "cell": [
+        0,
+        0
+      ],
+      "px2": 13723.3
+    },
+    {
+      "panel": "hud.command",
+      "cell": [
+        1,
+        0
+      ],
+      "px2": 13723.3
+    },
+    {
+      "panel": "hud.command",
+      "cell": [
+        2,
+        0
+      ],
+      "px2": 6219.9
+    }
+  ],
+  "otherCellOverlapPx2": 33666.5
+}

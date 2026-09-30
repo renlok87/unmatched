@@ -1,0 +1,124 @@
+{
+  "command": "derive",
+  "tool": "qa010-tools 1.1.0",
+  "method": {
+    "gray": "Rec.709 luma Y' = 0.2126R'+0.7152G'+0.0722B' on 8-bit sRGB values, round half up, replicated to RGB",
+    "deuteranopia": "Machado, Oliveira, Fernandes 2009, severity 1.0; IEC 61966-2-1 sRGB decode -> matrix on linear RGB -> clip [0,1] -> sRGB encode -> round half up",
+    "matrix": [
+      [
+        0.367322,
+        0.860646,
+        -0.227968
+      ],
+      [
+        0.280085,
+        0.672501,
+        0.047413
+      ],
+      [
+        -0.01182,
+        0.04294,
+        0.968881
+      ]
+    ],
+    "alpha": "ignored (not composited)"
+  },
+  "entries": [
+    {
+      "input": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/sherwood-forest-8x5/run-20260930-212237/phase2-board-host-1920x1080.png",
+      "input_sha256": "29c1c3604eda2d172c7b6e92850f553ce252b0e7a10762e8cb7059b84db2667b",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-B/sherwood-forest-8x5/phase2-board-host-1920x1080.gray.png",
+        "sha256": "ddf404060dfb44863cd53a00feef143da7586b32a0ebe776e013ce653e77c6e1"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-B/sherwood-forest-8x5/phase2-board-host-1920x1080.deuteranopia.png",
+        "sha256": "0e68435fc3c4138f3210bfa9c8e40c417344d32ec8ed78cad1a068920ef51a1c"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/sherwood-forest-8x5/run-20260930-212237/phase2-board-joiner-1920x1080.png",
+      "input_sha256": "1fc254ade28c46e454999282be94fa5b4f5708bff46d158a8655587f08fc8223",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-B/sherwood-forest-8x5/phase2-board-joiner-1920x1080.gray.png",
+        "sha256": "027c4217d186c49cd79a10030d048d9f3480ab73cc16ceb694e63dad72106c76"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-B/sherwood-forest-8x5/phase2-board-joiner-1920x1080.deuteranopia.png",
+        "sha256": "23406d9591f9c6d0d4a7e71568607de2eff7e020eb5ef27771a2cc4fc651f739"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/joiner/s09-combat-resolve-revealed.png",
+      "input_sha256": "b9d3fe4f30f8adc798047cf5438ac4b785f944429904783bfa056a8249fe9180",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-B/sherwood-forest-8x5/s09-combat-resolve-revealed.gray.png",
+        "sha256": "8eb1fc958bd5a1ff844fac8b4649943eaf5e97378546cd788ea7297776349039"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-B/sherwood-forest-8x5/s09-combat-resolve-revealed.deuteranopia.png",
+        "sha256": "733ebac812033c561b6eda7deaf361aae9276d02820e47a8e908ba216e6a2885"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/joiner/s09-damage-number.png",
+      "input_sha256": "da0a0cf749f66098779b1c63f6001bb35062c2f9df4d6a29b4f0f904472d774c",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-B/sherwood-forest-8x5/s09-damage-number.gray.png",
+        "sha256": "f6dcdeb6bd7e38e0a8abb70ca9ec106b7129eacf9f9e56600c5d5ae5dc9e31be"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-B/sherwood-forest-8x5/s09-damage-number.deuteranopia.png",
+        "sha256": "15401369d3c690797e2bb340a356c995f3e67863a8b2e9d802312cb8ae176202"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/host/s09-damage-combat.png",
+      "input_sha256": "e1f4c9bcf661b01754b3fb6053dd2cabc81e9a97ba6f7329fb75bc6fbac7993c",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-B/sherwood-forest-8x5/host/s09-damage-combat.gray.png",
+        "sha256": "814a61a5bad98a9abbb413cef9a207251ad3e95761c5458bff2ced5c14135734"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-B/sherwood-forest-8x5/host/s09-damage-combat.deuteranopia.png",
+        "sha256": "3632c0e7dca0a320f1e94ecd33f94d864ef9ea8112b4b44f97621d68e5205ffc"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-212345/joiner/s09-damage-combat.png",
+      "input_sha256": "17521db0e5afb312bccb4f3f64effdd61fb6449588daf2c8aa12b909e551ea89",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-B/sherwood-forest-8x5/joiner/s09-damage-combat.gray.png",
+        "sha256": "9674424bf5786aab500d931c42308ac2b97095d589b9b3849c4829d0b07557e9"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-B/sherwood-forest-8x5/joiner/s09-damage-combat.deuteranopia.png",
+        "sha256": "abea6c06ad5a9f945696e073407aa9c19a824533b7c1d003e4ea652524f8aade"
+      }
+    }
+  ]
+}

@@ -14,6 +14,8 @@ frame and takes one 1920x1080 SHOT with the RENDER fingerprint.
 
 Variants (one binary; the pre-W4 look is emulated with -S08LegacyRender):
   dx12-lumen-high      reference: DX12 SM6, Lumen GI + reflections, sg.* = 2, SP 100, profile rev 2
+  dx12-lumen-high-v2   reference + -ArtPreviewHeroesV2 -ArtPreviewDiorama (5c-B heroes and diorama tray)
+  dx12-lumen-high-v2-fps60  the same capped at 60 FPS (-BenchFps=60): effective FPS of one client
   dx12-lumen-high-vsm  same + r.Shadow.Virtual.Enable 1 (VSM instead of the profile CSM)
   dx12-lumen-high-csmdefault  profile CSM block removed (engine default 40000 uu / 4 cascades)
   dx11-legacy          -dx11 -S08LegacyRender + profile rev 1 (Unitless points + point fill, no sky,
@@ -101,6 +103,16 @@ def variant_args(name: str, out: Path) -> tuple[list[str], list[str], dict]:
     """(client args, extra ExecCmds, notes)."""
     if name == "dx12-lumen-high":
         return ["-S08RenderPreset=High"], [], {"rhi": "default DX12", "profiles": "pak rev 2"}
+    if name in ("dx12-lumen-high-v2", "dx12-lumen-high-v2-fps60"):
+        # Wave 6 (GD-058 interim): the reference plus the 5c-B look-dev heroes (-ArtPreviewHeroesV2) and the
+        # diorama tray (-ArtPreviewDiorama) on the same Cobble bench state; -fps60 caps the single client at
+        # 60 FPS (-BenchFps=60, the packaged default) to record the effective frame rate, not the pass cost.
+        args = ["-S08RenderPreset=High", "-ArtPreviewHeroesV2", "-ArtPreviewDiorama"]
+        notes = {"heroesV2": True, "diorama": True, "profiles": "pak rev 2"}
+        if name.endswith("-fps60"):
+            args.append("-BenchFps=60")
+            notes["fpsCap"] = "t.MaxFPS 60 (-BenchFps=60): effective FPS of one client, not a pass-cost number"
+        return args, [], notes
     if name == "dx12-lumen-high-vsm":
         return ["-S08RenderPreset=High"], ["r.Shadow.Virtual.Enable 1"], {"shadows": "VSM (runtime cvar)"}
     if name == "dx12-lumen-high-csmdefault":
@@ -143,7 +155,8 @@ def variant_args(name: str, out: Path) -> tuple[list[str], list[str], dict]:
     raise SystemExit(f"unknown variant {name!r}")
 
 
-VARIANTS = ["dx12-lumen-high", "dx12-lumen-high-vsm", "dx12-lumen-high-csmdefault", "dx11-legacy",
+VARIANTS = ["dx12-lumen-high", "dx12-lumen-high-v2", "dx12-lumen-high-v2-fps60", "dx12-lumen-high-vsm",
+            "dx12-lumen-high-csmdefault", "dx11-legacy",
             "dx12sm5-legacy", "dx12-medium", "dx12-low", "dx12-sm5-fallback", "dx11-fallback", "sky-<k>"]
 
 
@@ -410,7 +423,8 @@ def run_one(variant: str, rdir: Path, a) -> dict:
 
 
 def cmd_run(a) -> int:
-    out = Path(a.out) / a.variant
+    # absolute: the client resolves -BenchOut / -S08Trace / -abslog against its own Binaries/Win64 directory
+    out = Path(a.out).resolve() / a.variant
     lock = Path(r"C:\tmp\unmatched-gpu.lock")
     if not lock.is_file():
         print("REFUSED: take the GPU token first (C:/tmp/unmatched-gpu.lock)")

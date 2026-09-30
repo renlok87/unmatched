@@ -1,0 +1,1856 @@
+{
+  "schema": "unmatched.t53-tags-damage/2",
+  "status": "измерено",
+  "method": {
+    "tags": {
+      "rev": 2,
+      "frames": "три доски × K1 хоста, K1 присоединившегося, K3, кадры урона; цвет, серый, deuteranopia",
+      "textVsBackground": {
+        "method": "ядро текста = пиксели painted-bbox строки (SHOT widget id=board.tag.name / board.tag.hp) с ΔE76 ≤ 10 к байтам tag.text (242,236,222) — сглаженные края букв сюда не входят; подложка = пиксели painted-bbox тега с ΔE76 ≤ 6 к tag.background (22,26,40); WCAG медиан",
+        "minWcag": 4.5,
+        "pass": "100 % строк 100 % тегов",
+        "predicted": 14.7
+      },
+      "backgroundIntegrity": {
+        "rule": "≥ 98 % пикселей painted-bbox тега вне bbox текста, HP-бара (board.tag.bar) и чипа (board.tag.chip) — цвет подложки (ΔE76 ≤ 6)",
+        "min": 0.98
+      },
+      "overlaps": {
+        "rule": "tag∩tag, tag∩icon, tag∩plate, tag∩damage, tag∩HUD-панель (SHOT panel) = 0 px² (ε 0,5) по painted-bbox; tag∩FigureScreenRect другого бойца — записывается, не гейт",
+        "epsilonPx2": 0.5
+      },
+      "textHeight": {
+        "rule": "кегль строки (поле font= строки SHOT widget) ≥ 11 su при 1920×1080",
+        "minSu": 11
+      },
+      "mode": {
+        "rule": "режим тега совпадает с правилом: блок-аут (без арт-фигуры) → full, арт-фигура (Medusa) → compact, владелец плашки → hidden, K2 → compact; -ArtPreviewTagNames=all → full",
+        "pass": "100 %"
+      },
+      "geom": "bbox только из geom=painted"
+    },
+    "damage": {
+      "rev": 2,
+      "textVsCapsule": {
+        "method": "ядро текста ΔE76 ≤ 10 к damage.text (255,224,175), капсула ΔE76 ≤ 6 к (22,26,40), WCAG медиан",
+        "minWcag": 4.5,
+        "predicted": 13.6,
+        "variants": [
+          "color",
+          "gray",
+          "deuteranopia"
+        ]
+      },
+      "overlaps": {
+        "rule": "пересечение bbox числа с любым тегом, иконкой, плашкой = 0 px² (было 25–27 %)",
+        "epsilonPx2": 0.5
+      },
+      "binding": {
+        "rule": "центр числа ближе к FigureScreenRect цели (строка SHOT figure), чем к FigureScreenRect любого другого бойца",
+        "pass": "100 % кадров"
+      },
+      "geom": "geom=painted; счёт CUE = ARTPREVIEW damage-number ровно по одному на обеих сторонах сохраняется (validation.json)",
+      "twoFrames": "в акте два кадра урона: способность (помечено) и бой"
+    }
+  },
+  "frames": {
+    "K1_host": {
+      "frame": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/cobble-5x6/run-20260930-211621/phase2-board-host-1920x1080.png",
+      "client": "host",
+      "plateOwner": "f-0-hero",
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            909.0,
+            389.0,
+            1011.0,
+            411.0
+          ],
+          "placement": "inset",
+          "plateBound": false,
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 102,
+              "bgPx": 1718,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0.0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 0.0,
+            "nearestOther": "f-0-sk1",
+            "centreToNearestOther": 19.0,
+            "gapToOwner": 0.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            1075.0,
+            385.0,
+            1159.0,
+            407.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0.0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-hero",
+            "centreToNearestOther": 111.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            918.0,
+            264.0,
+            1002.0,
+            286.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0.0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-hero",
+            "centreToNearestOther": 114.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            761.0,
+            385.0,
+            845.0,
+            407.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0.0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-hero",
+            "centreToNearestOther": 111.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            909.0,
+            646.0,
+            1011.0,
+            668.0
+          ],
+          "placement": "below",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 108,
+              "bgPx": 1710,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0.0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-sk0",
+            "centreToNearestOther": 125.9,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            1080.0,
+            507.0,
+            1164.0,
+            529.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 60,
+              "bgPx": 1444,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0.0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-sk0",
+            "centreToNearestOther": 14.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        }
+      ],
+      "damage": []
+    },
+    "K1_joiner": {
+      "frame": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/cobble-5x6/run-20260930-211621/phase2-board-joiner-1920x1080.png",
+      "client": "joiner",
+      "plateOwner": null,
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            909.0,
+            389.0,
+            1011.0,
+            411.0
+          ],
+          "placement": "inset",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 102,
+              "bgPx": 1718,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 0.0,
+            "nearestOther": "f-0-sk1",
+            "centreToNearestOther": 19.0,
+            "gapToOwner": 0.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            1075.0,
+            385.0,
+            1159.0,
+            407.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-hero",
+            "centreToNearestOther": 111.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            918.0,
+            264.0,
+            1002.0,
+            286.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-hero",
+            "centreToNearestOther": 114.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            761.0,
+            385.0,
+            845.0,
+            407.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-hero",
+            "centreToNearestOther": 111.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            909.0,
+            646.0,
+            1011.0,
+            668.0
+          ],
+          "placement": "below",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 108,
+              "bgPx": 1710,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-sk0",
+            "centreToNearestOther": 125.9,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            1080.0,
+            507.0,
+            1164.0,
+            529.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 60,
+              "bgPx": 1444,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-sk0",
+            "centreToNearestOther": 14.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        }
+      ],
+      "damage": []
+    },
+    "K3": {
+      "frame": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-212050/joiner/s09-combat-resolve-revealed.png",
+      "client": "joiner",
+      "plateOwner": null,
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            909.0,
+            493.0,
+            1011.0,
+            515.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 102,
+              "bgPx": 1718,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-hero",
+            "centreToNearestOther": 113.4,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            1232.0,
+            385.0,
+            1316.0,
+            407.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-sk0",
+            "centreToNearestOther": 135.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            918.0,
+            264.0,
+            1002.0,
+            286.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-sk2",
+            "centreToNearestOther": 179.9,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            761.0,
+            385.0,
+            845.0,
+            407.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-hero",
+            "centreToNearestOther": 117.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            643.0,
+            513.0,
+            745.0,
+            535.0
+          ],
+          "placement": "left",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 96,
+              "bgPx": 1736,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 53.0,
+            "nearestOther": "f-0-sk2",
+            "centreToNearestOther": 73.8,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            1242.0,
+            507.0,
+            1326.0,
+            529.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 60,
+              "bgPx": 1444,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-sk0",
+            "centreToNearestOther": 14.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        }
+      ],
+      "damage": []
+    },
+    "damage_first_joiner": {
+      "frame": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-212050/joiner/s09-damage-number.png",
+      "client": "joiner",
+      "plateOwner": null,
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            909.0,
+            493.0,
+            1011.0,
+            515.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 102,
+              "bgPx": 1718,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-hero",
+            "centreToNearestOther": 113.4,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            1232.0,
+            385.0,
+            1316.0,
+            407.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-sk0",
+            "centreToNearestOther": 135.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            918.0,
+            264.0,
+            1002.0,
+            286.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-sk2",
+            "centreToNearestOther": 179.9,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            761.0,
+            385.0,
+            845.0,
+            407.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-hero",
+            "centreToNearestOther": 117.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            643.0,
+            513.0,
+            745.0,
+            535.0
+          ],
+          "placement": "left",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 96,
+              "bgPx": 1736,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 53.0,
+            "nearestOther": "f-0-sk2",
+            "centreToNearestOther": 73.8,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            1242.0,
+            507.0,
+            1326.0,
+            529.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 60,
+              "bgPx": 1444,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-sk0",
+            "centreToNearestOther": 14.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        }
+      ],
+      "damage": [
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "bbox": [
+            674.0,
+            483.0,
+            714.0,
+            511.0
+          ],
+          "amount": "1",
+          "seq": "30",
+          "placement": "above_ring=0_hardPx2=0_softPx2=0",
+          "stableFrames": "6",
+          "contrast": {
+            "textPx": 70,
+            "bgPx": 859,
+            "color": 13.636,
+            "gray": 13.561,
+            "deuteranopia": 14.021
+          },
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0
+          },
+          "nearestFigure": "f-1-hero",
+          "bindingPass": true,
+          "overlapPass": true,
+          "textPass": true
+        }
+      ]
+    },
+    "damage_combat_host": {
+      "frame": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-212050/host/s09-damage-combat.png",
+      "client": "host",
+      "plateOwner": null,
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            909.0,
+            493.0,
+            1011.0,
+            515.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 102,
+              "bgPx": 1718,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-hero",
+            "centreToNearestOther": 113.4,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            1232.0,
+            385.0,
+            1316.0,
+            407.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-sk0",
+            "centreToNearestOther": 135.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            918.0,
+            264.0,
+            1002.0,
+            286.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-sk2",
+            "centreToNearestOther": 179.9,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            761.0,
+            385.0,
+            845.0,
+            407.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-hero",
+            "centreToNearestOther": 117.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            643.0,
+            513.0,
+            745.0,
+            535.0
+          ],
+          "placement": "left",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 105,
+              "bgPx": 1714,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 53.0,
+            "nearestOther": "f-0-sk2",
+            "centreToNearestOther": 73.8,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            1242.0,
+            507.0,
+            1326.0,
+            529.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 60,
+              "bgPx": 1444,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-sk0",
+            "centreToNearestOther": 14.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        }
+      ],
+      "damage": [
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "bbox": [
+            674.0,
+            483.0,
+            714.0,
+            511.0
+          ],
+          "amount": "1",
+          "seq": "34",
+          "placement": "above_ring=0_hardPx2=0_softPx2=0",
+          "stableFrames": "3",
+          "contrast": {
+            "textPx": 70,
+            "bgPx": 858,
+            "color": 13.636,
+            "gray": 13.561,
+            "deuteranopia": 14.021
+          },
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0
+          },
+          "nearestFigure": "f-1-hero",
+          "bindingPass": true,
+          "overlapPass": true,
+          "textPass": true
+        }
+      ]
+    },
+    "damage_combat_joiner": {
+      "frame": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-212050/joiner/s09-damage-combat.png",
+      "client": "joiner",
+      "plateOwner": null,
+      "tags": [
+        {
+          "fighter": "f-0-hero",
+          "name": "Medusa",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            909.0,
+            493.0,
+            1011.0,
+            515.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 102,
+              "bgPx": 1718,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-hero",
+            "centreToNearestOther": 113.4,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk0",
+          "name": "Harpies 1",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            1232.0,
+            385.0,
+            1316.0,
+            407.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-sk0",
+            "centreToNearestOther": 135.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk1",
+          "name": "Harpies 2",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            918.0,
+            264.0,
+            1002.0,
+            286.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-sk2",
+            "centreToNearestOther": 179.9,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-0-sk2",
+          "name": "Harpies 3",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            761.0,
+            385.0,
+            845.0,
+            407.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 38,
+              "bgPx": 1452,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-1-hero",
+            "centreToNearestOther": 117.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            643.0,
+            513.0,
+            745.0,
+            535.0
+          ],
+          "placement": "left",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 105,
+              "bgPx": 1714,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 53.0,
+            "nearestOther": "f-0-sk2",
+            "centreToNearestOther": 73.8,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        },
+        {
+          "fighter": "f-1-sk0",
+          "name": "Merlin",
+          "mode": "compact",
+          "painted": true,
+          "bbox": [
+            1242.0,
+            507.0,
+            1326.0,
+            529.0
+          ],
+          "placement": "above",
+          "expectedMode": "compact",
+          "modePass": true,
+          "lines": {
+            "board.tag.hp": {
+              "textPx": 60,
+              "bgPx": 1444,
+              "color": 14.704,
+              "gray": 14.732,
+              "deuteranopia": 14.823,
+              "font": 11
+            }
+          },
+          "backgroundIntegrity": 1.0,
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0,
+            "damage": 0.0,
+            "panel": 0.0
+          },
+          "overlapOtherFigures": 0.0,
+          "overlapPass": true,
+          "textPass": true,
+          "heightPass": true,
+          "integrityPass": true,
+          "pass": true,
+          "binding": {
+            "centreToOwner": 13.0,
+            "nearestOther": "f-0-sk0",
+            "centreToNearestOther": 14.0,
+            "gapToOwner": 2.0
+          },
+          "bindingPass": true
+        }
+      ],
+      "damage": [
+        {
+          "fighter": "f-1-hero",
+          "name": "King Arthur",
+          "bbox": [
+            674.0,
+            483.0,
+            714.0,
+            511.0
+          ],
+          "amount": "1",
+          "seq": "34",
+          "placement": "above_ring=0_hardPx2=0_softPx2=0",
+          "stableFrames": "3",
+          "contrast": {
+            "textPx": 70,
+            "bgPx": 858,
+            "color": 13.636,
+            "gray": 13.561,
+            "deuteranopia": 14.021
+          },
+          "overlaps": {
+            "tag": 0.0,
+            "icon": 0.0,
+            "plate": 0
+          },
+          "nearestFigure": "f-1-hero",
+          "bindingPass": true,
+          "overlapPass": true,
+          "textPass": true
+        }
+      ]
+    }
+  }
+}

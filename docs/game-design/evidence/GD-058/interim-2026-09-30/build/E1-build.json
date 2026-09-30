@@ -1,0 +1,51 @@
+{
+  "schema": "unmatched.art004-build/1",
+  "label": "E1",
+  "wave": "6 (GD-058 промежуточная приёмка), этап BUILD+PACKAGE",
+  "target": "UnmatchedEditor Win64 Development",
+  "checkout": "C:/Users/ren/WebstormProjects/unmached/unmached (fix/admin-panel, HEAD 1d0e6f20, рабочее дерево Source/Config чистое)",
+  "reason": "сборка с дугами прицела 0.92 XY (S08Team.h TargetArcScale, S08FighterActor.cpp, тест TeamRing в S08BoardArtTests.cpp; коммит 251b677b) — до этого не собирались",
+  "flags": [
+    "-WaitMutex",
+    "-NoHotReloadFromIDE",
+    "-MaxParallelActions=6"
+  ],
+  "maxParallelActions": 6,
+  "command": "Build.bat UnmatchedEditor Win64 Development <uproject> -WaitMutex -NoHotReloadFromIDE -MaxParallelActions=6 (обёртка helpers/ubt.cjs: скрытый cmd, полный вывод в лог)",
+  "startedLocal": "2026-09-30T20:33:53+05:00",
+  "finishedLocal": "2026-09-30T20:34:16+05:00",
+  "durationS": 23.8,
+  "log": "docs/game-design/evidence/GD-058/interim-2026-09-30/build/E1-editor-build.log",
+  "logSha256": "37dfc085c06538ac4d804d666ff4a0c74f78ab4ea09a11bcb512ad79a2f7b7ac",
+  "exitCode": 0,
+  "resultLines": [
+    "Result: Succeeded"
+  ],
+  "errorLines": [],
+  "warnings": [
+    "C4996 UInstancedStaticMeshComponent::AddInstanceWorldSpace deprecated (S08BoardActor.cpp:905, :922) — известное, не новое",
+    "UBT: License not activated (build system warning)"
+  ],
+  "compiledUnits": [
+    "Compile [x64] S08HeroesV2.cpp",
+    "Compile [x64] S08Team.cpp",
+    "Compile [x64] S08ArtHudTests.cpp",
+    "Compile [x64] S08DioramaTests.cpp",
+    "Compile [x64] S08HeroesV2Tests.cpp",
+    "Compile [x64] S08FighterActor.cpp",
+    "Compile [x64] S08BoardArtTests.cpp",
+    "Compile [x64] S08Phase2Tests.cpp",
+    "Compile [x64] S08BoardActor.cpp",
+    "Compile [x64] S08ArtHudUmgTests.cpp",
+    "Compile [x64] Module.Unmatched.cpp",
+    "Compile [x64] S08FlowGameMode.cpp",
+    "Link [x64] UnrealEditor-Unmatched.lib",
+    "Link [x64] UnrealEditor-Unmatched.dll"
+  ],
+  "result": "Succeeded",
+  "output": {
+    "path": "unreal/Unmatched/Binaries/Win64/UnrealEditor-Unmatched.dll",
+    "sha256": "55654738856b2c2ac99cf294f77a50bc70f0846dc1a78e7354b715d34f09b980",
+    "mtimeLocal": "2026-09-30T20:34:13+05:00"
+  }
+}

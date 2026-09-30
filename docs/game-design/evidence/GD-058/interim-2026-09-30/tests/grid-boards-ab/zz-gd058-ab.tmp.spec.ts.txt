@@ -1,0 +1,53 @@
+/* GD-058 interim, temporary A/B probe (not committed): grid boards start as before. */
+import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { GameInitializationService } from './game-initialization.service';
+import { AdjacencyService } from '../../game-engine/engine/adjacency.service';
+import { boardRowFor, loadFixture, FIXTURE_DIR } from '../../../prisma/seed-art-fixture-boards';
+
+const root = resolve(__dirname, '../../../..');
+const heroes: Record<string, any> = {
+  medusa: { id: 'medusa', name: 'Medusa', health: 16, movement: 3, properties: { attackType: 'ranged' }, sidekicks: [{ name: 'Harpy', count: 3, health: 1 }] },
+  arthur: { id: 'arthur', name: 'King Arthur', health: 18, movement: 2, sidekicks: [{ name: 'Merlin', health: 7, attackType: 'ranged' }] },
+};
+async function initialize(board: any, order: string[]) {
+  const prisma = {
+    game: { findUnique: async () => ({ boardId: board.id }) },
+    board: { findUnique: async () => board },
+    gamePlayer: { findMany: async () => order.map((heroId, seatOrder) => ({ heroId, seatOrder, userId: `seat-${seatOrder}` })) },
+    hero: { findUnique: async ({ where }: any) => ({ ...heroes[where.id], cards: [{ id: `${where.id}-fixture`, name: 'Fixture', cardType: 'VERSATILE', count: 30, effects: [] }] }) },
+  };
+  const service = new GameInitializationService(prisma as any, { saveState: async () => undefined } as any);
+  return service.initializeGameState('gd058-ab');
+}
+it('dumps grid-board start + adjacency for A/B', async () => {
+  const adj: any = new AdjacencyService();
+  const boards: Record<string, any> = {
+    'cobble-city': load('docs/game-design/evidence/S01/content-board.json').adminBoard,
+  };
+  for (const key of ['sherwood-forest', 't-rex-paddock']) {
+    const file = resolve(FIXTURE_DIR, `${key}.art-fixture.json`);
+    const { fixture, sha256 } = loadFixture(file);
+    boards[key] = JSON.parse(JSON.stringify(boardRowFor(fixture, sha256, file)));
+  }
+  const out: Record<string, any> = {};
+  for (const [key, board] of Object.entries(boards)) {
+    for (const order of [['medusa', 'arthur'], ['arthur', 'medusa']]) {
+      const st: any = await initialize(board, order);
+      const bs = st.boardState;
+      const cells = bs.cells.flat();
+      const adjacency: Record<string, string[]> = {};
+      const reach: Record<string, string[]> = {};
+      for (const c of cells) {
+        const p = { x: c.x, y: c.y };
+        adjacency[`${c.x}:${c.y}`] = adj.getAdjacentCells(bs, p).map((a: any) => `${a.position.x}:${a.position.y}:${a.isBlocked ? 'B' : ''}`).sort();
+        reach[`${c.x}:${c.y}`] = [...adj.getReachableCells(bs, p, 3).entries()].map(([k, r]: any) => `${k}=${r.position.x}:${r.position.y}@${r.cost}`).sort();
+      }
+      const fighters = (st.players ?? []).flatMap((pl: any) => (pl.fighters ?? []).map((f: any) => ({ id: f.id, owner: pl.id ?? pl.userId, heroId: f.heroId, name: f.name, position: f.position, hp: f.currentHealth ?? f.health })));
+      out[`${key}|${order.join('>')}`] = { boardState: bs, fighters, fightersRaw: st.fighters ?? null, adjacency, reach3: reach };
+    }
+  }
+  writeFileSync(process.env.GD058_AB_OUT || resolve(__dirname, 'gd058-ab.out.json'), JSON.stringify(out));
+  expect(Object.keys(out).length).toBe(6);
+});
+function load(p: string) { return JSON.parse(readFileSync(resolve(root, p), 'utf8')); }

@@ -1,0 +1,59 @@
+Using bundled DotNet SDK version: 10.0 win-x64
+Running UnrealBuildTool: dotnet "..\..\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll" Unmatched Win64 Development C:/Users/ren/WebstormProjects/unmached/unmached/unreal/Unmatched/Unmatched.uproject -WaitMutex -NoHotReloadFromIDE -MaxParallelActions=6
+Log file: C:\Users\ren\AppData\Local\UnrealBuildTool\Log.txt
+Building Unmatched...
+===== Toolchain Information =====
+Using ISPC compiler (C:\Program Files\Epic Games\UE_5.8\Engine\Source\ThirdParty\Intel\ISPC\bin\Windows\ispc.exe)
+  Intel(r) Implicit SPMD Program Compiler (Intel(r) ISPC), 1.24.0 (build commit  @ 20250404, LLVM 18.1.2) 
+Using Visual Studio 14.44.35228 toolchain (C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+[Adaptive Build] Excluded from Unmatched unity file: SmokeGameMode.cpp, S08ArtHud.cpp, S08ArtHudAuthoring.cpp, S08ArtHudStyle.cpp, S08ArtHudTests.cpp, S08ArtHudText.cpp, S08ArtHudUmgTests.cpp, S08ArtHudViews.cpp, S08ArtHudWidgets.cpp, S08BoardActor.cpp, S08BoardArt.cpp, S08BoardArtTests.cpp, S08BoardModel.cpp, S08Contracts.cpp, S08ContractTests.cpp, S08Diorama.cpp, S08DioramaTests.cpp, S08FighterActor.cpp, S08FlowController.cpp, S08FlowGameMode.cpp, S08GraphqlClient.cpp, S08GraphqlWs.cpp, S08HeroesV2.cpp, S08HeroesV2Tests.cpp, S08LeaveLifecycleTests.cpp, S08LeaveRoomTests.cpp, S08Phase2Tests.cpp, S08Render.cpp, S08RoomEntryGuardTests.cpp, S08StaleResponseGuardsTests.cpp, S08Team.cpp, S08TraceLog.cpp, S08WsOpRecoveryTests.cpp, S10AuthRecoveryTests.cpp, S10RecoveryTests.cpp, S10VsAiClientTests.cpp, S09CombatTests.cpp, S09HudModel.cpp, S09HudTests.cpp, S09ManeuverFlowTests.cpp, S09ManeuverUi.cpp, S09PendingTests.cpp, S09ResultTests.cpp, S09SchemeUiTests.cpp
+=================================
+Executing up to 6 actions based on MaxProcessorCount override
+Using XGE executor to run 14 action(s)
+Distributing 14 actions to XGE
+UnrealBuildTool Compile
+
+--------------------Build System Warning---------------------------------------
+License not activated:
+    License is not activated. Please activate the license in the coordinator.
+    This build will run in standalone mode.
+
+-------------------------------------------------------------------------------
+ 
+Build ID: {48976CF2-4449-46E1-A551-265185FF7F5D}
+ 
+--------------------Project: Default-------------------------------------------
+[1/14] Compile [x64] S08HeroesV2.cpp (0:05.31 at +0:00)
+[2/14] Compile [x64] S08Team.cpp (0:05.32 at +0:00)
+[3/14] Compile [x64] S08DioramaTests.cpp (0:05.82 at +0:00)
+[4/14] Compile [x64] S08ArtHudTests.cpp (0:06.01 at +0:00)
+[5/14] Compile [x64] S08FighterActor.cpp (0:06.18 at +0:00)
+[6/14] Compile [x64] S08HeroesV2Tests.cpp (0:06.32 at +0:00)
+[7/14] Compile [x64] S08BoardArtTests.cpp (0:06.57 at +0:00)
+[8/14] Compile [x64] S08Phase2Tests.cpp (0:06.67 at +0:00)
+[9/14] Compile [x64] Module.Unmatched.cpp (0:07.81 at +0:00)
+[10/14] Compile [x64] S08BoardActor.cpp (0:08.03 at +0:00)
+C:\Users\ren\WebstormProjects\unmached\unmached\unreal\Unmatched\Source\Unmatched\S08\S08BoardActor.cpp(905,18): warning C4996: 'UInstancedStaticMeshComponent::AddInstanceWorldSpace': Use AddInstance or AddInstances with bWorldSpace set to true. - Please update your code to the new API before upgrading to the next release, otherwise your project will no longer compile.
+  UnderlayTiles->AddInstanceWorldSpace(FTransform(
+                 ^
+[11/14] Compile [x64] S08ArtHudUmgTests.cpp (0:08.06 at +0:00)
+[12/14] Compile [x64] S08FlowGameMode.cpp (0:14.98 at +0:00)
+[13/14] Link [x64] Unmatched.exe (0:08.36 at +0:15)
+[14/14] WriteMetadata Unmatched.target (0:00.45 at +0:23)
+C:\Users\ren\WebstormProjects\unmached\unmached\unreal\Unmatched\Source\Unmatched\S08\S08BoardActor.cpp(922,15): warning C4996: 'UInstancedStaticMeshComponent::AddInstanceWorldSpace': Use AddInstance or AddInstances with bWorldSpace set to true. - Please update your code to the new API before upgrading to the next release, otherwise your project will no longer compile.
+      Target->AddInstanceWorldSpace(Instance);
+              ^
+   ��������� ������⥪� C:\Users\ren\WebstormProjects\unmached\unmached\unreal\Unmatched\Binaries\Win64\Unmatched.lib � ��ꥪ� C:\Users\ren\WebstormProjects\unmached\unmached\unreal\Unmatched\Binaries\Win64\Unmatched.exp
+---------------------- Done ----------------------
+ 
+    Rebuild All: 1 succeeded, 0 failed, 0 skipped
+ 
+1 build system warning(s):
+   - License not activated
+ 
+Total time in XGE executor: 26.24 seconds
+Output binary: C:\Users\ren\WebstormProjects\unmached\unmached\unreal\Unmatched\Binaries\Win64\Unmatched.exe
+
+Result: Succeeded
+Total execution time: 27.29 seconds
+Trace written to file C:\Users\ren\AppData\Local\UnrealBuildTool\Trace.uba with size 2.9kb

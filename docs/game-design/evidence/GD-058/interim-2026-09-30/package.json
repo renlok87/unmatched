@@ -1,0 +1,370 @@
+{
+  "schema": "unmatched.gd058-interim-package/1",
+  "label": "GD058-I-P1",
+  "wave": "6 — промежуточная приёмка GD-058 (герои, HUD, читаемость на текущих досках Cobble и фикстурах; без окружения и оригинальных карт), этап BUILD+PACKAGE",
+  "date": "2026-09-30",
+  "status": "измерено: UnmatchedEditor и Unmatched (Development) собраны с дугами прицела 0.92 XY; автотесты S08/S09/S10, pytest и jest зелёные; кук и пакет Development собраны. Художественная приёмка этим актом не выставляется",
+  "authority": "делегирование пользователя: 2026-09-29 «делай все без меня»; 2026-09-30 цель «4. Приёмка (волна 6) и закрытие (волна 7).», выбран вариант «Промежуточная здесь (Recommended)»",
+  "checkout": "C:/Users/ren/WebstormProjects/unmached/unmached (fix/admin-panel, HEAD 1d0e6f20c978937f0c30d706565dbb96afb2c747; в Source/Config/Content нет незакоммиченных правок)",
+  "inputsSince5cb2": [
+    "251b677b: дуги прицела 0.92 XY (S08Team.h S08TeamRingSpec::TargetArcScale, S08FighterActor.cpp, тест Unmatched.S08.BoardArt.TeamRing) + look-dev r2 (uasset)",
+    "1d0e6f20: look-dev r3 героев (uasset: MI/BC/MatLUT Medusa, Merlin, Harpy)",
+    "6f270bb5/8dbc823f: бэкенд из ветки карт (графовая топология Marmoreal/Sarpedon)"
+  ],
+  "build": {
+    "editor": {
+      "json": "docs/game-design/evidence/GD-058/interim-2026-09-30/build/E1-build.json",
+      "log": "docs/game-design/evidence/GD-058/interim-2026-09-30/build/E1-editor-build.log",
+      "logSha256": "37dfc085c06538ac4d804d666ff4a0c74f78ab4ea09a11bcb512ad79a2f7b7ac",
+      "result": "Succeeded",
+      "exitCode": 0,
+      "durationS": 23.8,
+      "dll": {
+        "path": "unreal/Unmatched/Binaries/Win64/UnrealEditor-Unmatched.dll",
+        "sha256": "55654738856b2c2ac99cf294f77a50bc70f0846dc1a78e7354b715d34f09b980"
+      }
+    },
+    "game": {
+      "json": "docs/game-design/evidence/GD-058/interim-2026-09-30/build/G1-build.json",
+      "log": "docs/game-design/evidence/GD-058/interim-2026-09-30/build/G1-game-build.log",
+      "logSha256": "3496ff746073cfe046e0c8e8f4ca4983d5cb4c2d2cf4939bbf451ede36e6e84c",
+      "result": "Succeeded",
+      "exitCode": 0,
+      "durationS": 27.5,
+      "exeSha256": "f8accb3da116f7e3d3dde930dd61e90bd20d1d6e04c070223feab9ecb9939178",
+      "exeMtimeLocal": "2026-09-30T20:34:46+05:00",
+      "liveCoding": "WITH_LIVE_CODING 1 во всех 8 SharedDefinitions игрового таргета (собран без -NoLiveCoding)"
+    },
+    "note": "Build.bat отдаёт exit 0 и при ошибке компиляции, поэтому проверены строки «Result: Succeeded» и отсутствие error C/LNK в обоих логах. S08FighterActor.cpp, S08Team.cpp и S08BoardArtTests.cpp перекомпилированы в обоих таргетах"
+  },
+  "tests": {
+    "ue": {
+      "runner": "tools/s08/run-ue-tests.cjs <фильтр> <лог> (UnrealEditor-Cmd -nullrhi, по одному фильтру за запуск)",
+      "S08": {
+        "found": 85,
+        "success": 85,
+        "notSuccess": 0,
+        "exitCode": 0,
+        "log": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/ue-S08.log",
+        "summary": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/ue-S08.summary.json",
+        "teamRing": [
+          "Success: Unmatched.S08.BoardArt.TeamRing W5b-R team ring: above the marks, clear of the target arcs and the zone glyphs, meshes = spec"
+        ]
+      },
+      "S09": {
+        "found": 44,
+        "success": 44,
+        "notSuccess": 0,
+        "exitCode": 0,
+        "log": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/ue-S09.log",
+        "summary": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/ue-S09.summary.json"
+      },
+      "S10": {
+        "found": 50,
+        "success": 50,
+        "notSuccess": 0,
+        "exitCode": 0,
+        "log": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/ue-S10.log",
+        "summary": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/ue-S10.summary.json"
+      },
+      "noise": "в каждом логе 17 строк «LogAutomationTest: Error: Condition failed» на кадре 0, до «Initializing Engine» (это самопроверка движка UE::UnifiedErrorTest) и до «Found N automation tests»; после начала тестов строк LogAutomationTest: Error нет"
+    },
+    "pytestArt": {
+      "command": "python -m pytest tools/art/tests -q -p no:cacheprovider",
+      "result": "186 passed, 69 subtests passed, 0 failed",
+      "exit": 0,
+      "out": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/pytest-art.txt",
+      "note": "коммит 8dbc823f упоминал CRLF-поломку test_t5cb1; в этом прогоне тест проходит"
+    },
+    "pytestTripoPipeline": {
+      "command": "python -m pytest tools/tripo-pipeline/tests -q -p no:cacheprovider",
+      "result": "229 passed, 17 subtests passed, 0 failed (584 с; headless blender -b --factory-startup, GUI-экземпляры :9876/:9877 не использовались)",
+      "exit": 0,
+      "out": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/pytest-tripo-pipeline.txt"
+    },
+    "backendJest": {
+      "command": "cd backend && npx jest --ci --silent --json",
+      "suites": "82 passed, 4 skipped, 0 failed из 86",
+      "tests": "1441 passed, 22 skipped, 0 failed из 1463",
+      "success": true,
+      "summary": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/backend-jest-summary.json",
+      "tail": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/backend-jest-tail.txt",
+      "boardSuites": [
+        "game-engine/engine/board-topology.guard.spec.ts 7/0",
+        "content/validators/board-geometry.validator.spec.ts 12/0",
+        "games/services/env-maps-board-seed.spec.ts 22/0",
+        "content/mappers/content.mapper.zones.spec.ts 5/0",
+        "game-engine/engine/board-topology.spec.ts 43/0",
+        "content/validators/board-geometry.topology.spec.ts 12/0",
+        "game-engine/models/fighter.model.spec.ts 3/0",
+        "games/services/env-maps-board-contract.spec.ts 32/0",
+        "games/game-state.topology-serialization.spec.ts 10/0",
+        "game-engine/services/s04-gd015-movement-ranged.spec.ts 13/0",
+        "game-engine/movement/movement-rules.spec.ts 16/0",
+        "games/services/s04-path-boundary.spec.ts 8/0",
+        "game-engine/abilities/ability-configs.integration.spec.ts 92/0",
+        "games/services/s04-board-contract.spec.ts 5/0",
+        "game-engine/abilities/ability-configs.e2e.spec.ts 45/0",
+        "game-engine/services/s04-ai-queue.spec.ts 9/0",
+        "game-engine/services/s04-pending-queue.spec.ts 12/0",
+        "games/services/env-maps-board-guards.spec.ts 6/0",
+        "games/services/s04-start-selection.spec.ts 6/0"
+      ],
+      "boardSuitesVerdict": "все сьюты по доскам, топологии, соседству, движению и старту passed, 0 failed",
+      "skipped": "4 postgres-сьюты молча пропущены без S04_PG_URL/S09_PG_URL/S10_TEST_DB_URL (s04-concurrency-postgres, s09-terminal-postgres, s10-journal-pagination, s10-vs-ai-full-match; 22 теста): Docker daemon не запущен. С досками они связаны лишь косвенно — ограничение этапа"
+    },
+    "backendTsc": {
+      "command": "cd backend && npx tsc --noEmit -p tsconfig.json",
+      "exit": 0,
+      "out": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/backend-tsc.txt"
+    },
+    "artBoardFixtures": {
+      "command": "python tools/art/art_board_fixtures.py check --maps scraped-data/api/maps.json",
+      "result": "sherwood-forest и t-rex-paddock PASS, профили PASS, обе фикстуры побайтно воспроизводятся из maps.json",
+      "exit": 0,
+      "out": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/art-board-fixtures-check.txt",
+      "note": "фикстуры не менялись с 53952a00"
+    },
+    "gridBoardsAB": {
+      "json": "docs/game-design/evidence/GD-058/interim-2026-09-30/tests/grid-boards-ab/ab-result.json",
+      "identical": true,
+      "verdict": "совпадает побайтно: старт (поле, 6 бойцов, позиции), соседство и достижимость на 3 шага не изменились; ключей топологии (links/layout/start/spaceId) на сеточных досках нет",
+      "baseline": "bd60e1e415924bbd153c7c10a6ca3c1d755fc578",
+      "limits": "проверен движок бэкенда в процессе jest; живой старт матча через GraphQL/БД (изолированный S09 postgres :55434) на этом этапе не выполнялся — Docker daemon не запущен; это проверяют прогоны пакета на этапе RUNS"
+    }
+  },
+  "package": {
+    "startedLocal": "2026-09-30T20:52:28+05:00",
+    "finishedLocal": "2026-09-30T20:53:34+05:00",
+    "lock": "C:/tmp/unmatched-package.lock: до запуска файла не было; взят в 20:52:24, снят в 20:56:52 после проверки пака",
+    "mode": "tools/s08/package-client.ps1 -SkipBuild (BuildCookRun -cook -stage -pak -package -compressed -skipbuild, Win64 Development)",
+    "whySkipBuild": "игровой таргет собран на этом этапе (G1, Result: Succeeded, exe 20:34:46); файлов в Source/Config новее Unmatched.exe нет; guard -SkipBuild (нет WITH_LIVE_CODING 0) пройден",
+    "log": "docs/game-design/evidence/GD-058/interim-2026-09-30/build/P1-package.log",
+    "logSha256": "cde9a5fcf88ebc87c6d8780bf8fe1faa674001007b60e384606ca2c15d08b36b",
+    "stderr": "docs/game-design/evidence/GD-058/interim-2026-09-30/build/P1-package.log.err (пустой)",
+    "cookCommandletLog": {
+      "copy": "docs/game-design/evidence/GD-058/interim-2026-09-30/build/P1-cook-commandlet.log",
+      "sha256": "95aac8a9ba07ca899cede9549b80d2ff88efe06828f797580df903c84722656f",
+      "original": "%APPDATA%/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.8/Cook-2026.09.30-20.52.54.txt"
+    },
+    "uatExit": 0,
+    "scriptOutput": "UAT_EXIT=0",
+    "buildSuccessful": true,
+    "uatDuration": "0h 1m 2s",
+    "cook": {
+      "commandTimeS": 22.51,
+      "packagesCooked": 770,
+      "packagesIncrementallySkipped": 0,
+      "packagesSkippedByPlatform": 7,
+      "totalPackages": 777,
+      "commandletResult": "Success - 0 error(s), 0 warning(s)",
+      "logCounts": {
+        "warningLines": 0,
+        "errorLines": 0,
+        "failedToCompile": 0,
+        "doesNotExist": 1
+      },
+      "shadersCompiled": 0,
+      "knownNonBlocking": "LogCook Display: SK_Medusa_FaceNeck_v2Candidate ссылается на несуществующий _PhysicsAsset. Та же строка была в 5c-B2 P1, это не warning. Пакетов героев v2, TableBase и UM v2 в missing нет",
+      "note": "все 770 пакетов сварены в этом запуске из текущих исходников (Incrementally Skipped 0); шейдеры целиком взяты из DDC (ShadersCompiled=0)"
+    },
+    "shaderLibrary": {
+      "method": "ShaderAssetInfo-Unmatched-PCD3D_SM6/SM5.assetinfo.json в Saved/Cooked/Windows/Unmatched/Content",
+      "SM6": "M_UM_Figure_v2, MI_KingArthur_H2LD, MI_Merlin_H2LD, MI_Medusa_H2LD, MI_Harpy_H3LD, M_UM_BaseMarker — по 1 записи",
+      "SM5": "те же 6 — по 1 записи",
+      "MI_TableBase_Candidate": "отдельной записи нет (у инстанса нет своей shadermap; в 5c-B2 это отдельно не проверялось)"
+    },
+    "contentInPak": {
+      "method": "UnrealPak <Unmatched-Windows.utoc> -List: полный путь каждого .uasset исходного каталога найден в листинге (build/P1-utoc-project-content.txt, 374 файла Unmatched/Content), пакет есть в Metadata/ReferencedSet.txt; подробности в build/P1-pak-content.json",
+      "dirs": {
+        "PipelineCandidates/KingArthur/H2LD": {
+          "source": 17,
+          "inReferencedSet": 17,
+          "missingInUtoc": 0
+        },
+        "PipelineCandidates/KingArthur/Rig": {
+          "source": 2,
+          "inReferencedSet": 2,
+          "missingInUtoc": 0
+        },
+        "PipelineCandidates/KingArthur/H2Anim": {
+          "source": 4,
+          "inReferencedSet": 4,
+          "missingInUtoc": 0
+        },
+        "PipelineCandidates/Merlin/H2LD": {
+          "source": 20,
+          "inReferencedSet": 20,
+          "missingInUtoc": 0
+        },
+        "PipelineCandidates/Merlin/Rig": {
+          "source": 2,
+          "inReferencedSet": 2,
+          "missingInUtoc": 0
+        },
+        "PipelineCandidates/Merlin/H2Anim": {
+          "source": 4,
+          "inReferencedSet": 4,
+          "missingInUtoc": 0
+        },
+        "PipelineCandidates/Medusa/H2LD": {
+          "source": 17,
+          "inReferencedSet": 17,
+          "missingInUtoc": 0
+        },
+        "PipelineCandidates/Medusa/Rig": {
+          "source": 2,
+          "inReferencedSet": 2,
+          "missingInUtoc": 0
+        },
+        "PipelineCandidates/Medusa/H2Anim": {
+          "source": 4,
+          "inReferencedSet": 4,
+          "missingInUtoc": 0
+        },
+        "PipelineCandidates/Harpy/H3LD": {
+          "source": 20,
+          "inReferencedSet": 20,
+          "missingInUtoc": 0
+        },
+        "PipelineCandidates/Harpy/Rig": {
+          "source": 2,
+          "inReferencedSet": 2,
+          "missingInUtoc": 0
+        },
+        "PipelineCandidates/Harpy/H2Anim": {
+          "source": 4,
+          "inReferencedSet": 4,
+          "missingInUtoc": 0
+        },
+        "PipelineCandidates/TableBase/20260928-table-base-tripo-h31": {
+          "source": 5,
+          "inReferencedSet": 5,
+          "missingInUtoc": 0
+        },
+        "UM/Materials/v2": {
+          "source": 6,
+          "inReferencedSet": 6,
+          "missingInUtoc": 0
+        },
+        "UM/Materials/v2/Test": {
+          "sourceAssets": 70,
+          "inReferencedSet": 0,
+          "inUtoc": 0,
+          "note": "исключён DirectoriesToNeverCook: ни одного из 70 пакетов нет в ReferencedSet и в листинге .utoc"
+        }
+      },
+      "lookdevChangedSince5cb2": {
+        "PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD.uasset": {
+          "sourceSha256": "d7c657467000abc7b438471c48740326aff42a760c31b1424de49975aed818d2",
+          "sourceEqualsHEAD": true,
+          "inUtoc": true,
+          "utocChunkSha1": "e8506170eb05385cb7ac92862ddb9e2252aa4756",
+          "inReferencedSet": true
+        },
+        "PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_BC.uasset": {
+          "sourceSha256": "2bf735c55571ce630d557c5618c303eb8d42a04f87c2b4260f76d7e67a075ca2",
+          "sourceEqualsHEAD": true,
+          "inUtoc": true,
+          "utocChunkSha1": "757471ebd3ca86a22b03a9de089689d65f621aef",
+          "inReferencedSet": true
+        },
+        "PipelineCandidates/Harpy/H3LD/Textures/T_UM_MatLUT_Harpy.uasset": {
+          "sourceSha256": "0c5c0bca3178c65e3de0bf337e327e2718fb657324b3c68242f65e930f48793c",
+          "sourceEqualsHEAD": true,
+          "inUtoc": true,
+          "utocChunkSha1": "b9bb55873a55d574ec5c5c9ac295c0f7cdd47843",
+          "inReferencedSet": true
+        },
+        "PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD.uasset": {
+          "sourceSha256": "33cb9495dd8ebc897345b55280c1b862e3723fccc724a0ef70b8a88c31acbf70",
+          "sourceEqualsHEAD": true,
+          "inUtoc": true,
+          "utocChunkSha1": "af0e2dd5d4bc2a9fec47117c3213736ca3ac2f4b",
+          "inReferencedSet": true
+        },
+        "PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_BC.uasset": {
+          "sourceSha256": "a260c1d7ad50f76127c7341c54e241f61b373d00c472b6e972c56264c37f9b35",
+          "sourceEqualsHEAD": true,
+          "inUtoc": true,
+          "utocChunkSha1": "9298c4ca68b50643ca7edbb7209f6dbfac8a53b1",
+          "inReferencedSet": true
+        },
+        "PipelineCandidates/Medusa/H2LD/Textures/T_UM_MatLUT_Medusa.uasset": {
+          "sourceSha256": "7ad568c6c01effd48a19f0995d29767ca393c104111018149fade1240179345f",
+          "sourceEqualsHEAD": true,
+          "inUtoc": true,
+          "utocChunkSha1": "14dc0c62a4c61c3f4e1c046c5e980f93b29fdfd5",
+          "inReferencedSet": true
+        },
+        "PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD.uasset": {
+          "sourceSha256": "045719cab28badd73ef47de2439e4389c4faf32d20b13dd169d62ddfb7966350",
+          "sourceEqualsHEAD": true,
+          "inUtoc": true,
+          "utocChunkSha1": "9d6108875184e9b3c0e7faec55be49da99fd43ec",
+          "inReferencedSet": true
+        },
+        "PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_BC.uasset": {
+          "sourceSha256": "eb8ef8451029017b6f404f4ab17dbaae214b96d7123a4167d9e0c8a9ff9eb2ea",
+          "sourceEqualsHEAD": true,
+          "inUtoc": true,
+          "utocChunkSha1": "5fbb77d8c461b39f2c40be6aeed99df753590c07",
+          "inReferencedSet": true
+        },
+        "PipelineCandidates/Merlin/H2LD/Textures/T_UM_MatLUT_Merlin.uasset": {
+          "sourceSha256": "e359a10fa1ea52300e0b4b5cc7bd2a251b2517bf5f32c355628f207a891978ec",
+          "sourceEqualsHEAD": true,
+          "inUtoc": true,
+          "utocChunkSha1": "d8d5d0ce645acb59723ab6b0c61adc880baf770d",
+          "inReferencedSet": true
+        }
+      }
+    },
+    "assetRegistry": {
+      "path": "unreal/Unmatched/Saved/Cooked/Windows/Unmatched/Metadata/DevelopmentAssetRegistry.bin",
+      "sha256": "559b8bd3931412fb2dd141aaf2e558f3a7e4ca7112f71af6895090e690733ad9"
+    },
+    "paks": {
+      "Unmatched-Windows.pak": "84e68fbe1bf31c1931cb1bc0860957310b5c2fa22e0a66f12cc8b6da097e347b",
+      "Unmatched-Windows.ucas": "76837b6ec40cb26f386da745c7a3ae34ff5b90f80dd5b6fcf07e849e2b0105e0",
+      "Unmatched-Windows.utoc": "43d2eed21082620eaf0ff956a3c133c647632a3acb84661e37cf0d3ea9960763",
+      "global.ucas": "f112ef2d5efe4c8a3b0f2f790ca4151f2473db21b7bf059dd0fd959d52278799",
+      "global.utoc": "5004628eb157c5e5469dad19739ddf475653405e394fb9276bc96ec18c2efc49"
+    },
+    "paksNote": "Unmatched-Windows.pak (ini и прочие не-uasset файлы) и global.ucas/utoc совпадают с 5c-B2 P1; .ucas/.utoc изменились (look-dev r2/r3); дуги 0.92 — в exe",
+    "exe": {
+      "binariesSha256": "f8accb3da116f7e3d3dde930dd61e90bd20d1d6e04c070223feab9ecb9939178",
+      "stagedInnerSha256": "f8accb3da116f7e3d3dde930dd61e90bd20d1d6e04c070223feab9ecb9939178",
+      "stagedRootStubSha256": "1d70715ffd5478c7a3cd620db247488cea8baaaef21b5cac84b10a62d7b027bc",
+      "stagedInnerPath": "unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched/Binaries/Win64/Unmatched.exe",
+      "innerEqualsBinaries": true,
+      "previousInner5cb2": "8d228fae4f60c78002d6009b4fef1c0ec308275146fad5b6244c7a1b846d3b35",
+      "note": "корневой staged Unmatched.exe — стаб-лаунчер (sha совпадает с 5c-B2); сравнивается только внутренний Binaries/Win64 exe"
+    },
+    "frameRateLimit": {
+      "defaultGameUserSettings": "60.000000",
+      "defaultGameUserSettingsSha256": "69ab7cda46545edf1ffaa7db8680703168c48081c71900ca722b325fab2f09c6",
+      "inPak": "UnrealPak -Extract: Unmatched/Config/DefaultGameUserSettings.ini (384 байта, sha1 a3d32b93…) — FrameRateLimit=60.000000, [ScalabilityGroups] sg.*=2, sg.ResolutionQuality=100; от исходника отличается только снятыми при стейджинге комментариями",
+      "stagedSavedGameUserSettingsBefore": "до пакета лежал Saved/StagedBuilds/Windows/Unmatched/Saved/Config/Windows/GameUserSettings.ini от 17:03 (прогоны ART-018). В нём не было FrameRateLimit и ScalabilityGroups, так что 60 он не перекрывал. Копия: C:/tmp/gd058-interim/staged-GameUserSettings.before-package.ini",
+      "stagedSavedGameUserSettingsAfter": false,
+      "localAppDataSavedGameUserSettingsExists": false,
+      "effective": "60: сохранённых GameUserSettings, способных перекрыть значение, нет (стейджинг очистил staged Saved). В паре S08 run-phase2-demo ставит 30 FPS на клиента"
+    },
+    "config": {
+      "DefaultGame.ini": "40409f8a902b6792f8dc4663477cb5c94bab1b71601403316a9e448a2d91530e",
+      "DefaultEngine.ini": "3158a3b1663a6a9053bb569e37aaf1507f16adcab25b8e19eb603d9ad6f51157",
+      "render": "DefaultGraphicsRHI_DX12, D3D12 SM6+SM5, r.ScreenPercentage=100 (без изменений с 5c-B2)"
+    },
+    "smoke": "клиент на этом этапе не запускался: кадры, RENDER-отпечатки и 30 FPS на каждого клиента пары проверяют прогоны run-phase2-demo.ps1 на следующем этапе"
+  },
+  "machine": {
+    "cpu": "13th Gen Intel Core i9-13900F (24 ядра / 32 потока), RAM 64 ГБ (на старте свободно ~40 ГБ)",
+    "parallelLoad": "во время сборки и тестов работала параллельная сессия пользователя (worktree C:/tmp/wt-envmaps): headless Blender env_kit_build.py (PID 20592, к куку завершился), Blender GUI :9876/:9877, dev-сервер админки :5480. Перф на этом этапе не измерялся; для будущих perf-замеров машина не «тихая»"
+  },
+  "processesLeft": "нет: UnrealEditor-Cmd (сборки, автотесты, кук), UAT, ShaderCompileWorker, UnrealPak, jest и pytest завершились сами. Docker, бэкенд и клиенты не запускались. Blender GUI, dev-сервер :5480, MCP-службы и worktree C:/tmp/wt-envmaps не трогались",
+  "nextSteps": [
+    "прогоны пакета на Cobble 5×6 и фикстурах Sherwood/T.Rex: K1/K3, HUD, дуги 0.92 (пара offscreen-клиентов по 30 FPS, -RequireRenderReference -RequireShotCaptured), затем панель промежуточной приёмки",
+    "живой старт матча Cobble/Sherwood/T.Rex через изолированный S09-стек (Docker) — подтвердит A/B-проверку движка на реальном GraphQL"
+  ],
+  "sideEffects": "полный jest (s05/s06-registry.spec) переписал docs/game-design/evidence/S06/s06-card-registry.json, s06-full-game-1.json и s06-full-game-2.json с LF вместо CRLF, содержимое не изменилось (git diff --stat пуст); все три файла возвращены через git checkout. Временная A/B-спека удалена из backend/src, временное дерево bd60e1e4 и junction node_modules удалены (сам node_modules цел)"
+}

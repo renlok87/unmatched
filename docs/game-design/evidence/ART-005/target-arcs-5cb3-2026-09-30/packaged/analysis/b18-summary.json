@@ -1,0 +1,2182 @@
+{
+ "schema": "unmatched.t5cb2-b18/1",
+ "status": "измерено (не приёмка)",
+ "thresholds": {
+  "thresholds": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/t5cb-thresholds.json",
+  "base": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/t53-thresholds.json"
+ },
+ "acceptancePlan": {
+  "heroesLookdev": "B1-5",
+  "boardLumaK1JoinerPassableP50": {
+   "cobble-5x6": [
+    96,
+    108
+   ],
+   "sherwood-forest-8x5": [
+    150,
+    164
+   ],
+   "t-rex-paddock-7x5": [
+    150,
+    164
+   ],
+   "note": "прогноз 102.4 / 157.4 / 157.2 (±6); запись, не гейт; тени ключа Pitch −55 модель не учитывает"
+  },
+  "rings": {
+   "fraction": "как rev 2 (0.60 герой / 0.45 помощник); прогноз для геометрии B1-3 мин. 0.69 / 0.57 (заливка уже на 0.5 / 0.75 uu)",
+   "shapeRev2": "100 % в цвете / сером / deuteranopia (на r3 новым методом 54/54; прогноз для B1-3 36/36 и с ограничителем-ободком, и без него)",
+   "edgeVsTileRev3": "≥ 3.0 : 1 у 100 %, эталон ≥ 50 px, у засчитанной стороны ≥ 10 px ядра (прогноз мин.: Cobble 3.53 по ободку, фикстуры 5.75 по кромке)",
+   "fillVsKeyline": "≥ 3.0 (прогноз для B1-3 ≥ 4.48; на r3 было 4.07–10.7)",
+   "chipShape": "совпадает с кольцом у 100 %"
+  },
+  "zones": {
+   "cobble": "blue 11/11, red 13/13; red заливка/кромка в сером ≥ 3.0 (прогноз 4.72); кромка/плитка ≥ 3.0 (прогноз blue 3.86, red 3.46)",
+   "fixtures": "мультизоны 14/14 и 13/13; кромка/плитка ≥ 3.0 (прогноз ≥ 5.8)",
+   "grayVsTile": "|ΔY′| между заливкой gray и плиткой своей клетки ≥ 35 на фикстурах (запись)"
+  },
+  "teams": "|ΔY′| ≥ 40, ΔE76 ≥ 20 (игровой слой от экспозиции не зависит)",
+  "tagsDamageIconPanels": "как W5b-R r3: теги 14.7 : 1 и привязка 100 %, число 13.6 : 1, край иконки ≥ 3.0 на всех досках (риск — Cobble: край против потемневшей плитки), панели K3 0 px²",
+  "render": "RENDER reference=1, exposure=fixed-histogram, expMin=4.14106 на всех кадрах"
+ },
+ "boards": {
+  "cobble-5x6": {
+   "frames": {
+    "K1_host": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k1/cobble-5x6/run-20260930-210906/phase2-board-host-1920x1080.png",
+    "K1_joiner": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k1/cobble-5x6/run-20260930-210906/phase2-board-joiner-1920x1080.png",
+    "K3": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-210705/joiner/s09-combat-resolve-revealed.png",
+    "damage_first_joiner": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-210705/joiner/s09-damage-number.png",
+    "damage_combat_host": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-210705/host/s09-damage-combat.png",
+    "damage_combat_joiner": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/cobble-5x6/combat-20260930-210705/joiner/s09-damage-combat.png"
+   },
+   "classify": {
+    "exit": 0,
+    "n": 6,
+    "strict": 6
+   },
+   "render": {
+    "K1_host": true,
+    "K1_joiner": true,
+    "K3": true,
+    "damage_first_joiner": true,
+    "damage_combat_host": true,
+    "damage_combat_joiner": true
+   },
+   "rings": {
+    "n": 18,
+    "fractionHero": [
+     0.673,
+     0.704
+    ],
+    "fractionSidekick": [
+     0.561,
+     0.64
+    ],
+    "fractionFail": [],
+    "shapeRev3Color": 18,
+    "shapeRev3AllVariants": 18,
+    "shapeFail": [],
+    "edgeRev3Pass": 18,
+    "edgeRev3Min": 4.266,
+    "tilePxMin": 1215,
+    "edgeCarriedBy": {
+     "keyline": 0,
+     "rim": 54
+    },
+    "keylineVsTileRev3Range": [
+     2.471,
+     2.967
+    ],
+    "rimVsTileRange": [
+     4.266,
+     4.962
+    ],
+    "fillVsKeylineRange": [
+     4.118,
+     10.673
+    ],
+    "fillVsKeylineFail": [],
+    "viewIndependenceFail": 0,
+    "sameColourFail": 0,
+    "rev2ShapeUnclassified": 12,
+    "rev2KeylineVsTileFail": 18
+   },
+   "teams": {
+    "K1_host": {
+     "grayY": [
+      193.5,
+      124.5
+     ],
+     "absDeltaY": 69.0,
+     "colorDeltaE76": 68.92,
+     "deutDeltaE76": 70.78,
+     "pass": true
+    },
+    "K1_joiner": {
+     "grayY": [
+      193.5,
+      124.5
+     ],
+     "absDeltaY": 69.0,
+     "colorDeltaE76": 68.89,
+     "deutDeltaE76": 70.78,
+     "pass": true
+    },
+    "K3": {
+     "grayY": [
+      189.0,
+      122.0
+     ],
+     "absDeltaY": 67.0,
+     "colorDeltaE76": 69.17,
+     "deutDeltaE76": 70.65,
+     "pass": true
+    }
+   },
+   "chips": {
+    "n": 19,
+    "colourPass": 19,
+    "shapePass": 19,
+    "deltaE76Max": 3.47,
+    "fail": []
+   },
+   "zones": {
+    "blue": {
+     "pass": "11/11",
+     "keylineVsTile": {
+      "color": [
+       3.321,
+       3.76
+      ],
+      "gray": [
+       3.314,
+       3.748
+      ],
+      "deuteranopia": [
+       3.314,
+       3.749
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       4.19,
+       4.732
+      ],
+      "gray": [
+       3.724,
+       4.218
+      ],
+      "deuteranopia": [
+       3.89,
+       4.402
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 3.698,
+       "fillVsKeyline": 4.601
+      },
+      "gray": {
+       "keylineVsTile": 3.676,
+       "fillVsKeyline": 4.071
+      },
+      "deuteranopia": {
+       "keylineVsTile": 3.682,
+       "fillVsKeyline": 4.256
+      }
+     }
+    },
+    "red": {
+     "pass": "13/13",
+     "keylineVsTile": {
+      "color": [
+       3.254,
+       3.338
+      ],
+      "gray": [
+       3.289,
+       3.377
+      ],
+      "deuteranopia": [
+       3.199,
+       3.292
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       5.466,
+       5.957
+      ],
+      "gray": [
+       4.65,
+       5.125
+      ],
+      "deuteranopia": [
+       6.135,
+       6.639
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 3.286,
+       "fillVsKeyline": 5.771
+      },
+      "gray": {
+       "keylineVsTile": 3.334,
+       "fillVsKeyline": 4.953
+      },
+      "deuteranopia": {
+       "keylineVsTile": 3.244,
+       "fillVsKeyline": 6.442
+      }
+     }
+    }
+   },
+   "multizone": {
+    "K1_joiner": "0/0",
+    "K1_host": "0/0",
+    "K3": "0/0"
+   },
+   "grayVsTile": {
+    "slots": 0,
+    "note": "на доске нет зоны gray"
+   },
+   "tags": {
+    "painted": 36,
+    "fail": 0,
+    "minText": 14.704,
+    "binding": "150/150",
+    "plateOwnerModeFail": 0,
+    "sections": 25
+   },
+   "damage": [
+    {
+     "frame": "damage_first_joiner",
+     "name": "King Arthur",
+     "amount": "2",
+     "seq": "7",
+     "text": [
+      13.636,
+      13.561,
+      14.021
+     ],
+     "binding": true,
+     "overlapPass": true
+    },
+    {
+     "frame": "damage_combat_host",
+     "name": "King Arthur",
+     "amount": "2",
+     "seq": "7",
+     "text": [
+      13.636,
+      13.561,
+      14.021
+     ],
+     "binding": true,
+     "overlapPass": true
+    },
+    {
+     "frame": "damage_combat_joiner",
+     "name": "King Arthur",
+     "amount": "2",
+     "seq": "7",
+     "text": [
+      13.636,
+      13.561,
+      14.021
+     ],
+     "binding": true,
+     "overlapPass": true
+    }
+   ],
+   "icon": {
+    "K3": {
+     "size": 32,
+     "result": "pass",
+     "glyphVsBody": [
+      8.743,
+      8.774,
+      8.853
+     ],
+     "edge": [
+      5.592,
+      5.574,
+      5.619
+     ],
+     "ncc": 0.9971,
+     "iou": 0.9775,
+     "anchor": "right",
+     "binding": true,
+     "overlap": true
+    }
+   },
+   "iconPresence": {
+    "frames": 8,
+    "traced": 3,
+    "tracedButAbsent": []
+   },
+   "k3Panels": {
+    "pass": true,
+    "gatedOverlaps": [],
+    "otherCellOverlapPx2": 9682.3,
+    "attacker": "f-0-hero",
+    "target": "f-1-hero"
+   },
+   "plate": {
+    "vsFigures": true,
+    "vsReachable": {
+     "exit": 0,
+     "result": "pass",
+     "cells": 13,
+     "violations": 0
+    },
+    "bound": false,
+    "gapToOwner": 126.4
+   },
+   "k1PassableLuma": {
+    "p50": 100.0,
+    "p90": 121.6,
+    "registeredRange": [
+     96,
+     108
+    ]
+   },
+   "c9": {
+    "K1_host/all": 0.6489,
+    "K1_host/passable": 0.6489,
+    "K1_joiner/all": 0.6166,
+    "K1_joiner/passable": 0.6166,
+    "K3/all": 0.6454,
+    "K3/passable": 0.6454
+   },
+   "medusaMi": [
+    "/Game/ArtPreview/Medusa/Materials/MI_Medusa_P1.MI_Medusa_P1 605ba81410e0"
+   ]
+  },
+  "sherwood-forest-8x5": {
+   "frames": {
+    "K1_host": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k1/sherwood-forest-8x5/run-20260930-211211/phase2-board-host-1920x1080.png",
+    "K1_joiner": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k1/sherwood-forest-8x5/run-20260930-211211/phase2-board-joiner-1920x1080.png",
+    "K3": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-211014/joiner/s09-combat-resolve-revealed.png",
+    "damage_first_joiner": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-211014/joiner/s09-damage-number.png",
+    "damage_combat_host": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-211014/host/s09-damage-combat.png",
+    "damage_combat_joiner": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/sherwood-forest-8x5/combat-20260930-211014/joiner/s09-damage-combat.png"
+   },
+   "classify": {
+    "exit": 0,
+    "n": 6,
+    "strict": 6
+   },
+   "render": {
+    "K1_host": true,
+    "K1_joiner": true,
+    "K3": true,
+    "damage_first_joiner": true,
+    "damage_combat_host": true,
+    "damage_combat_joiner": true
+   },
+   "rings": {
+    "n": 18,
+    "fractionHero": [
+     0.749,
+     0.806
+    ],
+    "fractionSidekick": [
+     0.672,
+     0.735
+    ],
+    "fractionFail": [],
+    "shapeRev3Color": 18,
+    "shapeRev3AllVariants": 18,
+    "shapeFail": [],
+    "edgeRev3Pass": 18,
+    "edgeRev3Min": 5.707,
+    "tilePxMin": 1339,
+    "edgeCarriedBy": {
+     "keyline": 54,
+     "rim": 0
+    },
+    "keylineVsTileRev3Range": [
+     5.707,
+     7.257
+    ],
+    "rimVsTileRange": [
+     1.725,
+     2.05
+    ],
+    "fillVsKeylineRange": [
+     3.911,
+     10.108
+    ],
+    "fillVsKeylineFail": [],
+    "viewIndependenceFail": 0,
+    "sameColourFail": 0,
+    "rev2ShapeUnclassified": 13,
+    "rev2KeylineVsTileFail": 0
+   },
+   "teams": {
+    "K1_host": {
+     "grayY": [
+      194.5,
+      123.5
+     ],
+     "absDeltaY": 71.0,
+     "colorDeltaE76": 68.58,
+     "deutDeltaE76": 70.59,
+     "pass": true
+    },
+    "K1_joiner": {
+     "grayY": [
+      194.5,
+      124.0
+     ],
+     "absDeltaY": 70.5,
+     "colorDeltaE76": 68.41,
+     "deutDeltaE76": 69.92,
+     "pass": true
+    },
+    "K3": {
+     "grayY": [
+      194.5,
+      121.0
+     ],
+     "absDeltaY": 73.5,
+     "colorDeltaE76": 68.88,
+     "deutDeltaE76": 70.97,
+     "pass": true
+    }
+   },
+   "chips": {
+    "n": 18,
+    "colourPass": 18,
+    "shapePass": 18,
+    "deltaE76Max": 3.61,
+    "fail": []
+   },
+   "zones": {
+    "brown": {
+     "pass": "1/1",
+     "keylineVsTile": {
+      "color": [
+       8.073,
+       8.073
+      ],
+      "gray": [
+       8.116,
+       8.116
+      ],
+      "deuteranopia": [
+       8.174,
+       8.174
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       4.704,
+       4.704
+      ],
+      "gray": [
+       4.407,
+       4.407
+      ],
+      "deuteranopia": [
+       5.069,
+       5.069
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 8.073,
+       "fillVsKeyline": 4.704
+      },
+      "gray": {
+       "keylineVsTile": 8.116,
+       "fillVsKeyline": 4.407
+      },
+      "deuteranopia": {
+       "keylineVsTile": 8.174,
+       "fillVsKeyline": 5.069
+      }
+     }
+    },
+    "gray": {
+     "pass": "3/3",
+     "keylineVsTile": {
+      "color": [
+       7.146,
+       7.6
+      ],
+      "gray": [
+       7.149,
+       7.568
+      ],
+      "deuteranopia": [
+       7.148,
+       7.575
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       3.747,
+       3.883
+      ],
+      "gray": [
+       3.777,
+       3.885
+      ],
+      "deuteranopia": [
+       3.726,
+       3.837
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 7.146,
+       "fillVsKeyline": 3.761
+      },
+      "gray": {
+       "keylineVsTile": 7.149,
+       "fillVsKeyline": 3.777
+      },
+      "deuteranopia": {
+       "keylineVsTile": 7.148,
+       "fillVsKeyline": 3.73
+      }
+     }
+    },
+    "green": {
+     "pass": "6/6",
+     "keylineVsTile": {
+      "color": [
+       6.885,
+       6.952
+      ],
+      "gray": [
+       6.908,
+       6.963
+      ],
+      "deuteranopia": [
+       6.895,
+       6.965
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       6.674,
+       7.661
+      ],
+      "gray": [
+       5.793,
+       6.767
+      ],
+      "deuteranopia": [
+       6.313,
+       7.222
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 6.923,
+       "fillVsKeyline": 7.14
+      },
+      "gray": {
+       "keylineVsTile": 6.949,
+       "fillVsKeyline": 6.186
+      },
+      "deuteranopia": {
+       "keylineVsTile": 6.927,
+       "fillVsKeyline": 6.744
+      }
+     }
+    },
+    "light-gray": {
+     "pass": "5/5",
+     "keylineVsTile": {
+      "color": [
+       6.163,
+       6.439
+      ],
+      "gray": [
+       6.138,
+       6.413
+      ],
+      "deuteranopia": [
+       6.146,
+       6.421
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       11.319,
+       11.757
+      ],
+      "gray": [
+       11.313,
+       11.74
+      ],
+      "deuteranopia": [
+       11.319,
+       11.757
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 6.232,
+       "fillVsKeyline": 11.507
+      },
+      "gray": {
+       "keylineVsTile": 6.195,
+       "fillVsKeyline": 11.499
+      },
+      "deuteranopia": {
+       "keylineVsTile": 6.206,
+       "fillVsKeyline": 11.499
+      }
+     }
+    },
+    "light-green": {
+     "pass": "6/6",
+     "keylineVsTile": {
+      "color": [
+       7.231,
+       7.706
+      ],
+      "gray": [
+       7.208,
+       7.666
+      ],
+      "deuteranopia": [
+       7.213,
+       7.715
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       9.736,
+       10.377
+      ],
+      "gray": [
+       9.409,
+       10.144
+      ],
+      "deuteranopia": [
+       9.58,
+       10.298
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 7.438,
+       "fillVsKeyline": 10.011
+      },
+      "gray": {
+       "keylineVsTile": 7.413,
+       "fillVsKeyline": 9.719
+      },
+      "deuteranopia": {
+       "keylineVsTile": 7.421,
+       "fillVsKeyline": 9.884
+      }
+     }
+    },
+    "orange": {
+     "pass": "6/6",
+     "keylineVsTile": {
+      "color": [
+       7.417,
+       7.777
+      ],
+      "gray": [
+       7.434,
+       7.816
+      ],
+      "deuteranopia": [
+       7.415,
+       7.795
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       7.457,
+       8.157
+      ],
+      "gray": [
+       6.935,
+       7.632
+      ],
+      "deuteranopia": [
+       7.973,
+       8.725
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 7.594,
+       "fillVsKeyline": 8.02
+      },
+      "gray": {
+       "keylineVsTile": 7.664,
+       "fillVsKeyline": 7.475
+      },
+      "deuteranopia": {
+       "keylineVsTile": 7.588,
+       "fillVsKeyline": 8.58
+      }
+     }
+    },
+    "yellow": {
+     "pass": "9/9",
+     "keylineVsTile": {
+      "color": [
+       6.774,
+       7.065
+      ],
+      "gray": [
+       6.741,
+       7.02
+      ],
+      "deuteranopia": [
+       6.726,
+       7.03
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       10.469,
+       11.283
+      ],
+      "gray": [
+       10.104,
+       10.885
+      ],
+      "deuteranopia": [
+       10.708,
+       11.549
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 6.879,
+       "fillVsKeyline": 10.924
+      },
+      "gray": {
+       "keylineVsTile": 6.837,
+       "fillVsKeyline": 10.58
+      },
+      "deuteranopia": {
+       "keylineVsTile": 6.843,
+       "fillVsKeyline": 11.204
+      }
+     }
+    }
+   },
+   "multizone": {
+    "K1_joiner": "14/14",
+    "K1_host": "14/14",
+    "K3": "14/14"
+   },
+   "grayVsTile": {
+    "slots": 6,
+    "min": 46.0,
+    "median": 52.0,
+    "atLeast35": 6,
+    "rows": [
+     {
+      "cell": [
+       3,
+       0
+      ],
+      "fillPx": 1093,
+      "tilePx": 1339,
+      "tileOwnCell": true,
+      "fillY": 115.0,
+      "tileY": 168.0,
+      "absDeltaY": 53.0
+     },
+     {
+      "cell": [
+       3,
+       1
+      ],
+      "fillPx": 780,
+      "tilePx": 1278,
+      "tileOwnCell": true,
+      "fillY": 117.0,
+      "tileY": 170.0,
+      "absDeltaY": 53.0
+     },
+     {
+      "cell": [
+       4,
+       1
+      ],
+      "fillPx": 989,
+      "tilePx": 1165,
+      "tileOwnCell": true,
+      "fillY": 117.0,
+      "tileY": 163.0,
+      "absDeltaY": 46.0
+     },
+     {
+      "cell": [
+       4,
+       2
+      ],
+      "fillPx": 2214,
+      "tilePx": 3782,
+      "tileOwnCell": false,
+      "fillY": 118.0,
+      "tileY": 167.0,
+      "absDeltaY": 49.0
+     },
+     {
+      "cell": [
+       5,
+       2
+      ],
+      "fillPx": 1383,
+      "tilePx": 3782,
+      "tileOwnCell": false,
+      "fillY": 116.0,
+      "tileY": 167.0,
+      "absDeltaY": 51.0
+     },
+     {
+      "cell": [
+       5,
+       3
+      ],
+      "fillPx": 1895,
+      "tilePx": 3782,
+      "tileOwnCell": false,
+      "fillY": 114.0,
+      "tileY": 167.0,
+      "absDeltaY": 53.0
+     }
+    ],
+    "rule": "запись |ΔY′| ≥ 35",
+    "status": "запись, не гейт"
+   },
+   "tags": {
+    "painted": 35,
+    "fail": 0,
+    "minText": 14.704,
+    "binding": "161/161",
+    "plateOwnerModeFail": 0,
+    "sections": 27
+   },
+   "damage": [
+    {
+     "frame": "damage_first_joiner",
+     "name": "King Arthur",
+     "amount": "1",
+     "seq": "10",
+     "text": [
+      13.636,
+      13.561,
+      14.021
+     ],
+     "binding": true,
+     "overlapPass": true
+    },
+    {
+     "frame": "damage_combat_host",
+     "name": "King Arthur",
+     "amount": "1",
+     "seq": "38",
+     "text": [
+      13.636,
+      13.561,
+      14.021
+     ],
+     "binding": true,
+     "overlapPass": true
+    },
+    {
+     "frame": "damage_combat_joiner",
+     "name": "King Arthur",
+     "amount": "1",
+     "seq": "38",
+     "text": [
+      13.636,
+      13.561,
+      14.021
+     ],
+     "binding": true,
+     "overlapPass": true
+    }
+   ],
+   "icon": {
+    "K3": {
+     "size": 32,
+     "result": "pass",
+     "glyphVsBody": [
+      8.743,
+      8.774,
+      8.853
+     ],
+     "edge": [
+      5.039,
+      4.78,
+      5.421
+     ],
+     "ncc": 0.9978,
+     "iou": 0.9795,
+     "anchor": "right",
+     "binding": true,
+     "overlap": true
+    }
+   },
+   "iconPresence": {
+    "frames": 8,
+    "traced": 3,
+    "tracedButAbsent": []
+   },
+   "k3Panels": {
+    "pass": true,
+    "gatedOverlaps": [],
+    "otherCellOverlapPx2": 33666.5,
+    "attacker": "f-0-hero",
+    "target": "f-1-hero"
+   },
+   "plate": {
+    "vsFigures": true,
+    "vsReachable": {
+     "exit": 0,
+     "result": "pass",
+     "cells": 9,
+     "violations": 0
+    },
+    "bound": true,
+    "gapToOwner": 6.0
+   },
+   "k1PassableLuma": {
+    "p50": 152.3,
+    "p90": 179.4,
+    "registeredRange": [
+     150,
+     164
+    ]
+   },
+   "c9": {
+    "K1_host/all": 1.0528,
+    "K1_host/passable": 1.4439,
+    "K1_joiner/all": 1.0483,
+    "K1_joiner/passable": 1.4411,
+    "K3/all": 1.0397,
+    "K3/passable": 1.428
+   },
+   "medusaMi": [
+    "/Game/ArtPreview/Medusa/Materials/MI_Medusa_P1.MI_Medusa_P1 605ba81410e0"
+   ]
+  },
+  "t-rex-paddock-7x5": {
+   "frames": {
+    "K1_host": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k1/t-rex-paddock-7x5/run-20260930-211514/phase2-board-host-1920x1080.png",
+    "K1_joiner": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k1/t-rex-paddock-7x5/run-20260930-211514/phase2-board-joiner-1920x1080.png",
+    "K3": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/t-rex-paddock-7x5/combat-20260930-211319/joiner/s09-combat-resolve-revealed.png",
+    "damage_first_joiner": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/t-rex-paddock-7x5/combat-20260930-211319/joiner/s09-damage-number.png",
+    "damage_combat_host": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/t-rex-paddock-7x5/combat-20260930-211319/host/s09-damage-combat.png",
+    "damage_combat_joiner": "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/k3/t-rex-paddock-7x5/combat-20260930-211319/joiner/s09-damage-combat.png"
+   },
+   "classify": {
+    "exit": 0,
+    "n": 6,
+    "strict": 6
+   },
+   "render": {
+    "K1_host": true,
+    "K1_joiner": true,
+    "K3": true,
+    "damage_first_joiner": true,
+    "damage_combat_host": true,
+    "damage_combat_joiner": true
+   },
+   "rings": {
+    "n": 18,
+    "fractionHero": [
+     0.727,
+     0.805
+    ],
+    "fractionSidekick": [
+     0.642,
+     0.716
+    ],
+    "fractionFail": [],
+    "shapeRev3Color": 18,
+    "shapeRev3AllVariants": 18,
+    "shapeFail": [],
+    "edgeRev3Pass": 18,
+    "edgeRev3Min": 5.737,
+    "tilePxMin": 1128,
+    "edgeCarriedBy": {
+     "keyline": 54,
+     "rim": 0
+    },
+    "keylineVsTileRev3Range": [
+     5.737,
+     7.368
+    ],
+    "rimVsTileRange": [
+     1.711,
+     2.067
+    ],
+    "fillVsKeylineRange": [
+     4.132,
+     10.346
+    ],
+    "fillVsKeylineFail": [],
+    "viewIndependenceFail": 0,
+    "sameColourFail": 0,
+    "rev2ShapeUnclassified": 10,
+    "rev2KeylineVsTileFail": 0
+   },
+   "teams": {
+    "K1_host": {
+     "grayY": [
+      193.5,
+      124.0
+     ],
+     "absDeltaY": 69.5,
+     "colorDeltaE76": 68.33,
+     "deutDeltaE76": 70.77,
+     "pass": true
+    },
+    "K1_joiner": {
+     "grayY": [
+      193.0,
+      124.0
+     ],
+     "absDeltaY": 69.0,
+     "colorDeltaE76": 68.29,
+     "deutDeltaE76": 70.77,
+     "pass": true
+    },
+    "K3": {
+     "grayY": [
+      192.5,
+      124.0
+     ],
+     "absDeltaY": 68.5,
+     "colorDeltaE76": 68.31,
+     "deutDeltaE76": 70.08,
+     "pass": true
+    }
+   },
+   "chips": {
+    "n": 18,
+    "colourPass": 18,
+    "shapePass": 18,
+    "deltaE76Max": 2.32,
+    "fail": []
+   },
+   "zones": {
+    "blue": {
+     "pass": "5/5",
+     "keylineVsTile": {
+      "color": [
+       7.432,
+       7.723
+      ],
+      "gray": [
+       7.454,
+       7.71
+      ],
+      "deuteranopia": [
+       7.44,
+       7.706
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       3.788,
+       4.198
+      ],
+      "gray": [
+       3.227,
+       3.647
+      ],
+      "deuteranopia": [
+       3.49,
+       3.872
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 7.629,
+       "fillVsKeyline": 4.041
+      },
+      "gray": {
+       "keylineVsTile": 7.613,
+       "fillVsKeyline": 3.571
+      },
+      "deuteranopia": {
+       "keylineVsTile": 7.608,
+       "fillVsKeyline": 3.737
+      }
+     }
+    },
+    "blue-green": {
+     "pass": "6/6",
+     "keylineVsTile": {
+      "color": [
+       7.652,
+       8.028
+      ],
+      "gray": [
+       7.723,
+       8.078
+      ],
+      "deuteranopia": [
+       7.649,
+       8.044
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       8.117,
+       8.489
+      ],
+      "gray": [
+       7.079,
+       7.632
+      ],
+      "deuteranopia": [
+       7.59,
+       8.0
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 7.821,
+       "fillVsKeyline": 8.285
+      },
+      "gray": {
+       "keylineVsTile": 7.879,
+       "fillVsKeyline": 7.319
+      },
+      "deuteranopia": {
+       "keylineVsTile": 7.829,
+       "fillVsKeyline": 7.78
+      }
+     }
+    },
+    "gray": {
+     "pass": "5/5",
+     "keylineVsTile": {
+      "color": [
+       7.887,
+       8.255
+      ],
+      "gray": [
+       7.88,
+       8.286
+      ],
+      "deuteranopia": [
+       7.88,
+       8.279
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       3.61,
+       3.89
+      ],
+      "gray": [
+       3.624,
+       3.894
+      ],
+      "deuteranopia": [
+       3.579,
+       3.85
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 8.229,
+       "fillVsKeyline": 3.804
+      },
+      "gray": {
+       "keylineVsTile": 8.223,
+       "fillVsKeyline": 3.813
+      },
+      "deuteranopia": {
+       "keylineVsTile": 8.221,
+       "fillVsKeyline": 3.769
+      }
+     }
+    },
+    "green": {
+     "pass": "5/5",
+     "keylineVsTile": {
+      "color": [
+       7.89,
+       8.565
+      ],
+      "gray": [
+       7.935,
+       8.609
+      ],
+      "deuteranopia": [
+       7.918,
+       8.601
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       6.676,
+       7.579
+      ],
+      "gray": [
+       5.764,
+       6.71
+      ],
+      "deuteranopia": [
+       6.354,
+       7.181
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 8.37,
+       "fillVsKeyline": 7.078
+      },
+      "gray": {
+       "keylineVsTile": 8.399,
+       "fillVsKeyline": 6.15
+      },
+      "deuteranopia": {
+       "keylineVsTile": 8.396,
+       "fillVsKeyline": 6.686
+      }
+     }
+    },
+    "purple": {
+     "pass": "4/4",
+     "keylineVsTile": {
+      "color": [
+       7.169,
+       7.358
+      ],
+      "gray": [
+       7.221,
+       7.382
+      ],
+      "deuteranopia": [
+       7.134,
+       7.303
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       5.01,
+       5.784
+      ],
+      "gray": [
+       4.755,
+       5.542
+      ],
+      "deuteranopia": [
+       5.083,
+       5.892
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 7.298,
+       "fillVsKeyline": 5.335
+      },
+      "gray": {
+       "keylineVsTile": 7.356,
+       "fillVsKeyline": 5.11
+      },
+      "deuteranopia": {
+       "keylineVsTile": 7.248,
+       "fillVsKeyline": 5.431
+      }
+     }
+    },
+    "yellow": {
+     "pass": "3/3",
+     "keylineVsTile": {
+      "color": [
+       7.794,
+       8.222
+      ],
+      "gray": [
+       7.845,
+       8.231
+      ],
+      "deuteranopia": [
+       7.835,
+       8.231
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       10.97,
+       11.248
+      ],
+      "gray": [
+       10.728,
+       10.915
+      ],
+      "deuteranopia": [
+       11.295,
+       11.515
+      ]
+     },
+     "median": {
+      "color": {
+       "keylineVsTile": 8.05,
+       "fillVsKeyline": 11.212
+      },
+      "gray": {
+       "keylineVsTile": 8.081,
+       "fillVsKeyline": 10.826
+      },
+      "deuteranopia": {
+       "keylineVsTile": 8.015,
+       "fillVsKeyline": 11.439
+      }
+     }
+    }
+   },
+   "multizone": {
+    "K1_joiner": "13/13",
+    "K1_host": "13/13",
+    "K3": "13/13"
+   },
+   "grayVsTile": {
+    "slots": 7,
+    "min": 56.0,
+    "median": 59.0,
+    "atLeast35": 7,
+    "rows": [
+     {
+      "cell": [
+       4,
+       0
+      ],
+      "fillPx": 1151,
+      "tilePx": 1369,
+      "tileOwnCell": true,
+      "fillY": 115.0,
+      "tileY": 183.0,
+      "absDeltaY": 68.0
+     },
+     {
+      "cell": [
+       5,
+       1
+      ],
+      "fillPx": 1365,
+      "tilePx": 907,
+      "tileOwnCell": true,
+      "fillY": 114.0,
+      "tileY": 173.0,
+      "absDeltaY": 59.0
+     },
+     {
+      "cell": [
+       4,
+       2
+      ],
+      "fillPx": 2110,
+      "tilePx": 5730,
+      "tileOwnCell": false,
+      "fillY": 117.0,
+      "tileY": 173.0,
+      "absDeltaY": 56.0
+     },
+     {
+      "cell": [
+       5,
+       2
+      ],
+      "fillPx": 2113,
+      "tilePx": 5730,
+      "tileOwnCell": false,
+      "fillY": 114.0,
+      "tileY": 173.0,
+      "absDeltaY": 59.0
+     },
+     {
+      "cell": [
+       3,
+       4
+      ],
+      "fillPx": 2511,
+      "tilePx": 1137,
+      "tileOwnCell": true,
+      "fillY": 112.0,
+      "tileY": 168.0,
+      "absDeltaY": 56.0
+     },
+     {
+      "cell": [
+       4,
+       4
+      ],
+      "fillPx": 2573,
+      "tilePx": 1154,
+      "tileOwnCell": true,
+      "fillY": 112.0,
+      "tileY": 169.0,
+      "absDeltaY": 57.0
+     },
+     {
+      "cell": [
+       5,
+       4
+      ],
+      "fillPx": 2282,
+      "tilePx": 1163,
+      "tileOwnCell": true,
+      "fillY": 108.0,
+      "tileY": 169.0,
+      "absDeltaY": 61.0
+     }
+    ],
+    "rule": "запись |ΔY′| ≥ 35",
+    "status": "запись, не гейт"
+   },
+   "tags": {
+    "painted": 35,
+    "fail": 0,
+    "minText": 14.704,
+    "binding": "142/142",
+    "plateOwnerModeFail": 0,
+    "sections": 25
+   },
+   "damage": [
+    {
+     "frame": "damage_first_joiner",
+     "name": "King Arthur",
+     "amount": "1",
+     "seq": "10",
+     "text": [
+      13.636,
+      13.561,
+      14.021
+     ],
+     "binding": true,
+     "overlapPass": true
+    },
+    {
+     "frame": "damage_combat_host",
+     "name": "Merlin",
+     "amount": "4",
+     "seq": "14",
+     "text": [
+      13.636,
+      13.561,
+      14.021
+     ],
+     "binding": true,
+     "overlapPass": true
+    },
+    {
+     "frame": "damage_combat_joiner",
+     "name": "Merlin",
+     "amount": "4",
+     "seq": "14",
+     "text": [
+      13.636,
+      13.561,
+      14.021
+     ],
+     "binding": true,
+     "overlapPass": true
+    }
+   ],
+   "icon": {
+    "K3": {
+     "size": 32,
+     "result": "pass",
+     "glyphVsBody": [
+      8.743,
+      8.774,
+      8.853
+     ],
+     "edge": [
+      5.324,
+      5.244,
+      5.311
+     ],
+     "ncc": 0.9969,
+     "iou": 0.9785,
+     "anchor": "left",
+     "binding": true,
+     "overlap": true
+    }
+   },
+   "iconPresence": {
+    "frames": 8,
+    "traced": 5,
+    "tracedButAbsent": []
+   },
+   "k3Panels": {
+    "pass": true,
+    "gatedOverlaps": [],
+    "otherCellOverlapPx2": 26804.8,
+    "attacker": "f-0-hero",
+    "target": "f-1-sk0"
+   },
+   "plate": {
+    "vsFigures": true,
+    "vsReachable": {
+     "exit": 0,
+     "result": "pass",
+     "cells": 10,
+     "violations": 0
+    },
+    "bound": true,
+    "gapToOwner": 6.0
+   },
+   "k1PassableLuma": {
+    "p50": 154.4,
+    "p90": 180.7,
+    "registeredRange": [
+     150,
+     164
+    ]
+   },
+   "c9": {
+    "K1_host/all": 0.7437,
+    "K1_host/passable": 1.1603,
+    "K1_joiner/all": 0.7321,
+    "K1_joiner/passable": 1.155,
+    "K3/all": 0.7077,
+    "K3/passable": 1.1316
+   },
+   "medusaMi": [
+    "/Game/ArtPreview/Medusa/Materials/MI_Medusa_P1.MI_Medusa_P1 605ba81410e0"
+   ]
+  }
+ },
+ "r3": {
+  "cobble-5x6": {
+   "rings": {
+    "fractionRange": [
+     0.6278,
+     0.7588
+    ],
+    "shapeRev1Unclassified": 12,
+    "keylineVsTileRev2Fail": 16,
+    "rev3MethodsOnR3Frames": {
+     "rings": 18,
+     "shapeColorRev2": 6,
+     "shapeColorRev3": 18,
+     "shapeAllVariantsRev3": 18,
+     "edgeVsTileRev3Pass": 18,
+     "edgeVsTileRev3Min": 3.89,
+     "tilePxMin": 1221
+    }
+   },
+   "zones": {
+    "blue": {
+     "pass": "11/11",
+     "keylineVsTile": {
+      "color": [
+       5.392,
+       5.962
+      ],
+      "gray": [
+       5.452,
+       6.004
+      ],
+      "deuteranopia": [
+       5.382,
+       5.936
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       4.245,
+       4.643
+      ],
+      "gray": [
+       3.832,
+       4.13
+      ],
+      "deuteranopia": [
+       3.947,
+       4.317
+      ]
+     }
+    },
+    "red": {
+     "pass": "3/13",
+     "keylineVsTile": {
+      "color": [
+       5.199,
+       5.426
+      ],
+      "gray": [
+       5.256,
+       5.479
+      ],
+      "deuteranopia": [
+       5.12,
+       5.356
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       3.823,
+       4.153
+      ],
+      "gray": [
+       2.724,
+       3.049
+      ],
+      "deuteranopia": [
+       4.444,
+       4.81
+      ]
+     }
+    }
+   },
+   "multizone": {
+    "K1_joiner": "0/0",
+    "K1_host": "0/0",
+    "K3": "0/0"
+   },
+   "k1PassableLumaP50": 131.0,
+   "icon": {
+    "K3": {
+     "edge": [
+      4.436,
+      4.468,
+      4.417
+     ]
+    },
+    "probe24": {
+     "edge": [
+      3.881,
+      4.014,
+      4.045
+     ]
+    },
+    "probe48": {
+     "edge": [
+      4.387,
+      4.347,
+      4.343
+     ]
+    }
+   },
+   "tagsMinText": 14.704
+  },
+  "sherwood-forest-8x5": {
+   "rings": {
+    "fractionRange": [
+     0.7255,
+     0.8449
+    ],
+    "shapeRev1Unclassified": 12,
+    "keylineVsTileRev2Fail": 0,
+    "rev3MethodsOnR3Frames": {
+     "rings": 18,
+     "shapeColorRev2": 6,
+     "shapeColorRev3": 18,
+     "shapeAllVariantsRev3": 18,
+     "edgeVsTileRev3Pass": 18,
+     "edgeVsTileRev3Min": 8.231,
+     "tilePxMin": 1507
+    }
+   },
+   "zones": {
+    "brown": {
+     "pass": "1/1",
+     "keylineVsTile": {
+      "color": [
+       10.795,
+       10.795
+      ],
+      "gray": [
+       10.838,
+       10.838
+      ],
+      "deuteranopia": [
+       10.903,
+       10.903
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       4.768,
+       4.768
+      ],
+      "gray": [
+       4.529,
+       4.529
+      ],
+      "deuteranopia": [
+       5.137,
+       5.137
+      ]
+     }
+    },
+    "gray": {
+     "pass": "3/3",
+     "keylineVsTile": {
+      "color": [
+       9.862,
+       9.909
+      ],
+      "gray": [
+       9.875,
+       9.979
+      ],
+      "deuteranopia": [
+       9.868,
+       9.958
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       5.215,
+       5.43
+      ],
+      "gray": [
+       5.19,
+       5.452
+      ],
+      "deuteranopia": [
+       5.192,
+       5.393
+      ]
+     }
+    },
+    "green": {
+     "pass": "6/6",
+     "keylineVsTile": {
+      "color": [
+       9.556,
+       9.759
+      ],
+      "gray": [
+       9.632,
+       9.806
+      ],
+      "deuteranopia": [
+       9.602,
+       9.789
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       6.504,
+       7.508
+      ],
+      "gray": [
+       5.668,
+       6.651
+      ],
+      "deuteranopia": [
+       6.169,
+       7.114
+      ]
+     }
+    },
+    "light-gray": {
+     "pass": "5/5",
+     "keylineVsTile": {
+      "color": [
+       8.877,
+       9.277
+      ],
+      "gray": [
+       8.863,
+       9.287
+      ],
+      "deuteranopia": [
+       8.869,
+       9.268
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       11.066,
+       11.523
+      ],
+      "gray": [
+       11.05,
+       11.513
+      ],
+      "deuteranopia": [
+       11.059,
+       11.523
+      ]
+     }
+    },
+    "light-green": {
+     "pass": "6/6",
+     "keylineVsTile": {
+      "color": [
+       9.852,
+       10.379
+      ],
+      "gray": [
+       9.874,
+       10.361
+      ],
+      "deuteranopia": [
+       9.862,
+       10.371
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       9.506,
+       10.025
+      ],
+      "gray": [
+       9.206,
+       9.767
+      ],
+      "deuteranopia": [
+       9.375,
+       9.912
+      ]
+     }
+    },
+    "orange": {
+     "pass": "6/6",
+     "keylineVsTile": {
+      "color": [
+       9.93,
+       10.563
+      ],
+      "gray": [
+       9.874,
+       10.542
+      ],
+      "deuteranopia": [
+       9.873,
+       10.55
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       7.225,
+       8.02
+      ],
+      "gray": [
+       6.709,
+       7.522
+      ],
+      "deuteranopia": [
+       7.69,
+       8.495
+      ]
+     }
+    },
+    "yellow": {
+     "pass": "9/9",
+     "keylineVsTile": {
+      "color": [
+       9.268,
+       9.742
+      ],
+      "gray": [
+       9.268,
+       9.749
+      ],
+      "deuteranopia": [
+       9.254,
+       9.738
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       10.141,
+       10.82
+      ],
+      "gray": [
+       9.749,
+       10.402
+      ],
+      "deuteranopia": [
+       10.373,
+       11.08
+      ]
+     }
+    }
+   },
+   "multizone": {
+    "K1_joiner": "14/14",
+    "K1_host": "14/14",
+    "K3": "14/14"
+   },
+   "k1PassableLumaP50": 183.9,
+   "icon": {
+    "K3": {
+     "edge": [
+      5.161,
+      4.91,
+      5.548
+     ]
+    },
+    "probe24": {
+     "edge": [
+      16.508,
+      16.452,
+      16.582
+     ]
+    },
+    "probe48": {
+     "edge": [
+      17.024,
+      16.953,
+      17.079
+     ]
+    }
+   },
+   "tagsMinText": 14.704
+  },
+  "t-rex-paddock-7x5": {
+   "rings": {
+    "fractionRange": [
+     0.6928,
+     0.8512
+    ],
+    "shapeRev1Unclassified": 10,
+    "keylineVsTileRev2Fail": 8,
+    "rev3MethodsOnR3Frames": {
+     "rings": 18,
+     "shapeColorRev2": 8,
+     "shapeColorRev3": 18,
+     "shapeAllVariantsRev3": 18,
+     "edgeVsTileRev3Pass": 18,
+     "edgeVsTileRev3Min": 8.326,
+     "tilePxMin": 1319
+    }
+   },
+   "zones": {
+    "blue": {
+     "pass": "5/5",
+     "keylineVsTile": {
+      "color": [
+       10.186,
+       10.619
+      ],
+      "gray": [
+       10.144,
+       10.57
+      ],
+      "deuteranopia": [
+       10.218,
+       10.633
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       3.685,
+       4.141
+      ],
+      "gray": [
+       3.216,
+       3.649
+      ],
+      "deuteranopia": [
+       3.435,
+       3.841
+      ]
+     }
+    },
+    "blue-green": {
+     "pass": "6/6",
+     "keylineVsTile": {
+      "color": [
+       10.442,
+       11.037
+      ],
+      "gray": [
+       10.484,
+       11.106
+      ],
+      "deuteranopia": [
+       10.468,
+       11.064
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       8.048,
+       8.355
+      ],
+      "gray": [
+       7.068,
+       7.522
+      ],
+      "deuteranopia": [
+       7.567,
+       7.869
+      ]
+     }
+    },
+    "gray": {
+     "pass": "5/5",
+     "keylineVsTile": {
+      "color": [
+       9.888,
+       10.721
+      ],
+      "gray": [
+       9.964,
+       10.715
+      ],
+      "deuteranopia": [
+       9.86,
+       10.794
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       4.933,
+       5.274
+      ],
+      "gray": [
+       4.924,
+       5.28
+      ],
+      "deuteranopia": [
+       4.906,
+       5.223
+      ]
+     }
+    },
+    "green": {
+     "pass": "5/5",
+     "keylineVsTile": {
+      "color": [
+       10.638,
+       11.031
+      ],
+      "gray": [
+       10.728,
+       11.05
+      ],
+      "deuteranopia": [
+       10.706,
+       11.135
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       6.405,
+       7.33
+      ],
+      "gray": [
+       5.544,
+       6.547
+      ],
+      "deuteranopia": [
+       6.093,
+       7.007
+      ]
+     }
+    },
+    "purple": {
+     "pass": "4/4",
+     "keylineVsTile": {
+      "color": [
+       9.829,
+       10.229
+      ],
+      "gray": [
+       9.854,
+       10.297
+      ],
+      "deuteranopia": [
+       9.758,
+       10.189
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       4.899,
+       5.586
+      ],
+      "gray": [
+       4.679,
+       5.331
+      ],
+      "deuteranopia": [
+       4.989,
+       5.666
+      ]
+     }
+    },
+    "yellow": {
+     "pass": "3/3",
+     "keylineVsTile": {
+      "color": [
+       10.477,
+       10.714
+      ],
+      "gray": [
+       10.509,
+       10.727
+      ],
+      "deuteranopia": [
+       10.414,
+       10.721
+      ]
+     },
+     "fillVsKeyline": {
+      "color": [
+       10.776,
+       11.056
+      ],
+      "gray": [
+       10.509,
+       10.728
+      ],
+      "deuteranopia": [
+       10.983,
+       11.329
+      ]
+     }
+    }
+   },
+   "multizone": {
+    "K1_joiner": "13/13",
+    "K1_host": "13/13",
+    "K3": "13/13"
+   },
+   "k1PassableLumaP50": 185.4,
+   "icon": {
+    "K3": {
+     "edge": [
+      7.764,
+      7.234,
+      7.504
+     ]
+    },
+    "probe24": {
+     "edge": [
+      14.914,
+      14.882,
+      15.009
+     ]
+    },
+    "probe48": {
+     "edge": [
+      3.894,
+      4.612,
+      4.139
+     ]
+    }
+   },
+   "tagsMinText": 14.704
+  }
+ },
+ "sheets": [
+  "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/analysis/r3-vs-5cb2-k1_joiner.jpg",
+  "docs/game-design/evidence/ART-005/target-arcs-5cb3-2026-09-30/packaged/analysis/r3-vs-5cb2-k3.jpg"
+ ]
+}

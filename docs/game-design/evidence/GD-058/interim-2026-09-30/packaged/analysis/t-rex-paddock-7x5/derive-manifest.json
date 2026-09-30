@@ -1,0 +1,124 @@
+{
+  "command": "derive",
+  "tool": "qa010-tools 1.1.0",
+  "method": {
+    "gray": "Rec.709 luma Y' = 0.2126R'+0.7152G'+0.0722B' on 8-bit sRGB values, round half up, replicated to RGB",
+    "deuteranopia": "Machado, Oliveira, Fernandes 2009, severity 1.0; IEC 61966-2-1 sRGB decode -> matrix on linear RGB -> clip [0,1] -> sRGB encode -> round half up",
+    "matrix": [
+      [
+        0.367322,
+        0.860646,
+        -0.227968
+      ],
+      [
+        0.280085,
+        0.672501,
+        0.047413
+      ],
+      [
+        -0.01182,
+        0.04294,
+        0.968881
+      ]
+    ],
+    "alpha": "ignored (not composited)"
+  },
+  "entries": [
+    {
+      "input": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/t-rex-paddock-7x5/run-20260930-212540/phase2-board-host-1920x1080.png",
+      "input_sha256": "2c614ac285f60bc02a75472dd1091c95ceed2e97df458eac9121ffe5797bbb52",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-B/t-rex-paddock-7x5/phase2-board-host-1920x1080.gray.png",
+        "sha256": "a46a7e5f7bf1f77cb4bfccb1c13e84e7c70e8818fe0e6eca59c64a3e5f3a3ef7"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-B/t-rex-paddock-7x5/phase2-board-host-1920x1080.deuteranopia.png",
+        "sha256": "a0d569d860698b145f890747d317249ca9500348b8bef1322ee1b3bb72171550"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k1/t-rex-paddock-7x5/run-20260930-212540/phase2-board-joiner-1920x1080.png",
+      "input_sha256": "b16232c5bb896aaefbe023f7c9ad3fc175c25d0142f851634bfd99f68038a4c8",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-B/t-rex-paddock-7x5/phase2-board-joiner-1920x1080.gray.png",
+        "sha256": "7527f1a013643b59be298c92e4d965aa7c3d36f312e8b8e59c23f4c0bf308a15"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-B/t-rex-paddock-7x5/phase2-board-joiner-1920x1080.deuteranopia.png",
+        "sha256": "10114975f8c77a6c305a2d0c817a5d86b5b7d722dee37591a9cd2fc496cd3197"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/t-rex-paddock-7x5/combat-20260930-212647/joiner/s09-combat-resolve-revealed.png",
+      "input_sha256": "beb560c10fbaf29747492d705f8a8dcfad0b549c4324bfaebc90259ca1c96d93",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-B/t-rex-paddock-7x5/s09-combat-resolve-revealed.gray.png",
+        "sha256": "06b2f4388867d7645111e5f5c5c6d15a60159b82b5d83012a234b53bed60f8c3"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-B/t-rex-paddock-7x5/s09-combat-resolve-revealed.deuteranopia.png",
+        "sha256": "ab8dbf9c8e7552e9b757739fad16d51dbdd057327931bfab29169839b148183a"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/t-rex-paddock-7x5/combat-20260930-212647/joiner/s09-damage-number.png",
+      "input_sha256": "8300ac5545628269a3bf52e2e892071fe9948cd8be96dd23c1553f067dd72ccf",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-B/t-rex-paddock-7x5/s09-damage-number.gray.png",
+        "sha256": "6154c3a3c80f3c19b297b31c3ba19b54805d4111e70a5198d8f50c1a3e3bdd0e"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-B/t-rex-paddock-7x5/s09-damage-number.deuteranopia.png",
+        "sha256": "54d46304b4c91480854cfec8d5c8e409d35051b0eee66526da79c00345b3bddc"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/t-rex-paddock-7x5/combat-20260930-212647/host/s09-damage-combat.png",
+      "input_sha256": "75c0ce5f4932d1033f1dadecc373d346497e3c24354200362d0a65c295ce8343",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-B/t-rex-paddock-7x5/host/s09-damage-combat.gray.png",
+        "sha256": "3d269ad7c4c081059b1f0e2f659a0374a6c78df7af5f0d17f17b698823275fac"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-B/t-rex-paddock-7x5/host/s09-damage-combat.deuteranopia.png",
+        "sha256": "56af25ef5839c8666535c89b41fd5b8d678f36638ec4b8a77c44da8ce2a49c76"
+      }
+    },
+    {
+      "input": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/k3/t-rex-paddock-7x5/combat-20260930-212647/joiner/s09-damage-combat.png",
+      "input_sha256": "b855bd03188b657b5a4be9c963b45835b72b9ecdd5714d177249dbe2b679120a",
+      "size": [
+        1920,
+        1080
+      ],
+      "gray": {
+        "path": "C:/tmp/gd058-analysis/derived-B/t-rex-paddock-7x5/joiner/s09-damage-combat.gray.png",
+        "sha256": "7aeca1ce004bd6dffd8eab02e4c6c09340b7cb0e75d79a76147363af24aede47"
+      },
+      "deuteranopia": {
+        "path": "C:/tmp/gd058-analysis/derived-B/t-rex-paddock-7x5/joiner/s09-damage-combat.deuteranopia.png",
+        "sha256": "82422313c9eb047df28fc35db6464b8be886b2e7084b6625482dfbae467463bc"
+      }
+    }
+  ]
+}

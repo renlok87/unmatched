@@ -1,0 +1,32 @@
+{
+  "schema": "unmatched.gd058-interim-run-package-record/1",
+  "label": "GD058-I-P1",
+  "status": "плоская выжимка этапа PACKAGE для инструментов прогонов (art004_live_k2 / t52_art3_live читают exe.* и paks на верхнем уровне); источник истины — package.json",
+  "source": "docs/game-design/evidence/GD-058/interim-2026-09-30/package.json",
+  "buildRecord": "docs/game-design/evidence/GD-058/interim-2026-09-30/build/G1-build.json",
+  "exe": {
+    "binariesSha256": "f8accb3da116f7e3d3dde930dd61e90bd20d1d6e04c070223feab9ecb9939178",
+    "stagedInnerSha256": "f8accb3da116f7e3d3dde930dd61e90bd20d1d6e04c070223feab9ecb9939178",
+    "stagedRootStubSha256": "1d70715ffd5478c7a3cd620db247488cea8baaaef21b5cac84b10a62d7b027bc",
+    "stagedInnerPath": "unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched/Binaries/Win64/Unmatched.exe",
+    "innerEqualsBinaries": true,
+    "previousInner5cb2": "8d228fae4f60c78002d6009b4fef1c0ec308275146fad5b6244c7a1b846d3b35",
+    "note": "корневой staged Unmatched.exe — стаб-лаунчер (sha совпадает с 5c-B2); сравнивается только внутренний Binaries/Win64 exe"
+  },
+  "paks": {
+    "Unmatched-Windows.pak": "84e68fbe1bf31c1931cb1bc0860957310b5c2fa22e0a66f12cc8b6da097e347b",
+    "Unmatched-Windows.ucas": "76837b6ec40cb26f386da745c7a3ae34ff5b90f80dd5b6fcf07e849e2b0105e0",
+    "Unmatched-Windows.utoc": "43d2eed21082620eaf0ff956a3c133c647632a3acb84661e37cf0d3ea9960763",
+    "global.ucas": "f112ef2d5efe4c8a3b0f2f790ca4151f2473db21b7bf059dd0fd959d52278799",
+    "global.utoc": "5004628eb157c5e5469dad19739ddf475653405e394fb9276bc96ec18c2efc49"
+  },
+  "frameRateLimit": {
+    "defaultGameUserSettings": "60.000000",
+    "defaultGameUserSettingsSha256": "69ab7cda46545edf1ffaa7db8680703168c48081c71900ca722b325fab2f09c6",
+    "inPak": "UnrealPak -Extract: Unmatched/Config/DefaultGameUserSettings.ini (384 байта, sha1 a3d32b93…) — FrameRateLimit=60.000000, [ScalabilityGroups] sg.*=2, sg.ResolutionQuality=100; от исходника отличается только снятыми при стейджинге комментариями",
+    "stagedSavedGameUserSettingsBefore": "до пакета лежал Saved/StagedBuilds/Windows/Unmatched/Saved/Config/Windows/GameUserSettings.ini от 17:03 (прогоны ART-018). В нём не было FrameRateLimit и ScalabilityGroups, так что 60 он не перекрывал. Копия: C:/tmp/gd058-interim/staged-GameUserSettings.before-package.ini",
+    "stagedSavedGameUserSettingsAfter": false,
+    "localAppDataSavedGameUserSettingsExists": false,
+    "effective": "60: сохранённых GameUserSettings, способных перекрыть значение, нет (стейджинг очистил staged Saved). В паре S08 run-phase2-demo ставит 30 FPS на клиента"
+  }
+}
