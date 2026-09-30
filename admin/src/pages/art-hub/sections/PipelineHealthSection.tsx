@@ -5,6 +5,7 @@ import { fileUrl } from '../api';
 import { FileActions, FileTable, LongText, StageTag, StatusTag, useArtHubUi } from '../components/common';
 import { formatBytes, formatTime, timeAgo } from '../format';
 import { LedgerTable } from './SoundsCreditsSections';
+import { UeMatrix } from './UeLayersSection';
 
 const { Text } = Typography;
 
@@ -20,7 +21,21 @@ export const PipelineHealthSection: React.FC<{ data: ArtHubData }> = ({ data }) 
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12} xl={6}>
           <Card size="small">
-            <Statistic title="Записей в реестре" value={h.registry.total} suffix={h.registry.snapshotDate ? <Text type="secondary" style={{ fontSize: 12 }}>срез {h.registry.snapshotDate}</Text> : null} />
+            <Statistic title="Записей в реестре" value={h.registry.total} />
+            <div data-testid="art-hub-registry-dates" style={{ fontSize: 12 }}>
+              <Text type="secondary">
+                срез в файле: {h.registry.snapshotDate ?? '—'}
+                {h.registry.fileMtime ? ` · файл изменён ${formatTime(h.registry.fileMtime)}` : ''}
+                {h.registry.latestLayerDate ? ` · свежий слой ${h.registry.latestLayerDate}` : ''}
+              </Text>
+              {h.registry.snapshotDate && h.registry.latestLayerDate && h.registry.latestLayerDate > h.registry.snapshotDate ? (
+                <Tooltip title="Поле snapshotDate реестра старше самых свежих слоёв: слои дописаны, дата среза не обновлена">
+                  <Tag color="orange" style={{ marginLeft: 4 }}>
+                    срез старше слоёв
+                  </Tag>
+                </Tooltip>
+              ) : null}
+            </div>
             <Space wrap size={[4, 4]} style={{ marginTop: 8 }}>
               {h.registry.byStatus.map((s) => (
                 <span key={s.status}>
@@ -60,6 +75,8 @@ export const PipelineHealthSection: React.FC<{ data: ArtHubData }> = ({ data }) 
       {c.tripo.limitNote || c.syntx.limitNote ? (
         <Alert type="info" showIcon message="Лимиты" description={<LongText text={[c.tripo.limitNote, c.syntx.limitNote].filter(Boolean).join('\n')} rows={2} />} />
       ) : null}
+
+      <UeMatrix characters={data.characters} />
 
       <Card size="small" title="Покрытие слотов клипов (clip-manifest, производство)">
         <Table

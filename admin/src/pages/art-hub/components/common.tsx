@@ -225,12 +225,16 @@ export const FileTable: React.FC<{
 
 // ------------------------------------------------------------------ gallery
 
-export const Gallery: React.FC<{ images: FileRef[]; size?: number; emptyText?: string; caption?: boolean }> = ({
-  images,
-  size = 150,
-  emptyText = 'изображений нет',
-  caption = true,
-}) => {
+export const Gallery: React.FC<{
+  images: FileRef[];
+  size?: number;
+  emptyText?: string;
+  caption?: boolean;
+  /** `contain` keeps wide sheets (концепт | UE) uncropped */
+  fit?: 'cover' | 'contain';
+  /** height / width of a thumbnail */
+  aspect?: number;
+}> = ({ images, size = 150, emptyText = 'изображений нет', caption = true, fit = 'cover', aspect = 0.75 }) => {
   const servable = images.filter((f) => f.servable);
   const hidden = images.length - servable.length;
   if (images.length === 0) return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={emptyText} />;
@@ -244,8 +248,8 @@ export const Gallery: React.FC<{ images: FileRef[]; size?: number; emptyText?: s
                 src={fileUrl(f)}
                 loading="lazy"
                 width={size}
-                height={Math.round(size * 0.75)}
-                style={{ objectFit: 'cover', borderRadius: 6, background: '#f5f5f5' }}
+                height={Math.round(size * aspect)}
+                style={{ objectFit: fit, borderRadius: 6, background: '#f5f5f5' }}
                 alt={basename(f.path)}
               />
               {caption ? (

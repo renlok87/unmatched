@@ -83,6 +83,14 @@ export function makeFixtureRepo(): FixtureRepo {
   write('docs/secret.txt', 'top secret');
   write('private/secret.txt', 'private secret');
 
+  // decision logs: markdown is served, anything else under decisions/ is not
+  write(
+    'docs/game-design/decisions/2026-01-02-hero-decisions.md',
+    '# Журнал решений: герой\n\n**Происхождение.** Решения принял оркестратор по делегированию.\n\n## D-1. Первое\n\n## D-2. Второе\n',
+  );
+  write('docs/game-design/decisions/notes.json', '{"secret": "decisions json"}');
+  // UE project: only stat-ed by the hub, never served
+  write('unreal/Unmatched/Content/PipelineCandidates/Hero/Rig/SK_Hero_Rig.uasset', 'uasset-rig');
   write('docs/game-design/evidence/ART-100/act-2026.md', '# Акт героя\n\n**Решение:** доработать (v2).\n');
   write('docs/game-design/evidence/ART-100/frame-k2.png', pngBytes);
   write('docs/art-pipeline/hero-candidate-report.md', '# Отчёт по герою\n');
@@ -340,4 +348,71 @@ export function makeFixtureRepo(): FixtureRepo {
     write,
     cleanup: () => fs.rmSync(root, { recursive: true, force: true }),
   };
+}
+
+/**
+ * Adds look-dev, material library, UE layer and concept fixtures to a fixture
+ * repo (overview sections). Patches the registry (H2LD layer dated 20260102)
+ * and the clip manifest (H2Anim target path).
+ */
+export function addOverviewFixtures(repo: FixtureRepo): void {
+  const { write } = repo;
+  const json = (rel: string, v: unknown) => write(rel, JSON.stringify(v, null, 2));
+  const read = (rel: string) => JSON.parse(fs.readFileSync(path.join(repo.root, ...rel.split('/')), 'utf8')) as Record<string, any>;
+  const png = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 9, 9]);
+
+  const sheet = `art/pipeline-candidates/${HERO}/20260101-run/review/i1/hero-lookdev-sheet-i1.jpg`;
+  write(sheet, png);
+  write(`art/pipeline-candidates/${HERO}/20260101-run/preview/ld_sheet_concept_front.jpg`, png);
+  write('art/imagegen/hero-quality-v1/hero/hero-front.png', png);
+  write('art/imagegen/hero-quality-v1/hero/prompts.md', '# prompts');
+  write('art/imagegen/hero-quality-v1/reference/quality-reference.png', png);
+  write(
+    'docs/art-pipeline/hero-lookdev-v2.md',
+    '# Hero look-dev v2\n\nДата: 2026-01-02. Статус: **измерено**, в UE технически импортировано.\n\n' +
+      'Скелет `/Game/PipelineCandidates/Hero/Rig`, меш `/Game/PipelineCandidates/Hero/H2LD/SK_Hero_H2LD`.\n\n' +
+      '## 1. Что выпущено\n\n```bash\n## не заголовок (код)\n```\n\n## 2. UE\n',
+  );
+  write('unreal/Unmatched/Content/PipelineCandidates/Hero/H2LD/SK_Hero_H2LD.uasset', 'uasset-h2ld');
+
+  const reg = read('docs/art-pipeline/asset-registry.json');
+  const hero = reg.assets.find((a: { id: string }) => a.id === HERO);
+  hero.layers.push({
+    layer: 'ue-editor-import H2LD 20260102-h2ld-ue-import (/Game/PipelineCandidates/Hero/H2LD)',
+    stage: 'ue-editor-import',
+    status: 'технически импортировано',
+    owner: 'pipeline',
+    paths: [{ path: sheet, root: 'repo', kind: 'file', expect: 'exists', role: 'лист look-dev' }],
+  });
+  json('docs/art-pipeline/asset-registry.json', reg);
+
+  const cm = read('docs/art-pipeline/animation-library/clip-manifest.json');
+  cm.clips[0].ue = { status: 'technically_imported', target_path: '/Game/PipelineCandidates/Hero/H2Anim/AM_Hero_Idle' };
+  json('docs/art-pipeline/animation-library/clip-manifest.json', cm);
+
+  const ml = 'docs/art-pipeline/material-library';
+  write(`${ml}/README.md`, '# Библиотека материалов\n\nДата: 2026-01-02. Статус: **предложено**.\n\n## 1. Зачем\n');
+  json(`${ml}/um-material-presets-v1.json`, {
+    schema: 'um-material-presets/1',
+    version: 'v1',
+    date: '2026-01-02',
+    status: 'предложено',
+    classes: [
+      { index: 1, id: 'steel', nameRu: 'сталь', family: 'metal', metallic: 1, shadingModel: 'DefaultLit', baseColor: { typicalLinear: [0.5, 0.5, 0.5] }, roughness: { typical: 0.3 } },
+      { index: 11, id: 'silk', nameRu: 'шёлк', family: 'dielectric', metallic: 0, shadingModel: 'Cloth' },
+    ],
+    extensionClasses: [{ index: 16, id: 'horn', nameRu: 'рог', family: 'dielectric', metallic: 0 }],
+  });
+  json(`${ml}/sources.json`, {
+    schema: 'um-material-library-sources/1',
+    licenseNote: 'ambientCG — CC0 1.0',
+    sets: [
+      { id: 'Metal001', status: 'используется', class: 'steel', license: 'CC0 1.0 (ambientCG site-wide)', page: 'https://ambientcg.com/view?id=Metal001' },
+      { id: 'Bad001', status: 'не используется', class: null, license: 'CC-BY 4.0' },
+    ],
+    procedural: [{ class: 'silk', generator: 'procedural:satin5', reason: 'нет CC0-шёлка' }],
+  });
+  write('art/material-library/v1/tiles/steel/steel_DetailN.png', png);
+  write(`${ml}/evidence/v2/master/um-sheet-wall.jpg`, png);
+  write(`${ml}/evidence/v2/master/probe.json`, '{}');
 }

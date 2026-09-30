@@ -417,6 +417,171 @@ export interface AssetPage {
   sounds: SoundSection | null;
   credits: CreditsSection;
   lastModified?: string;
+  /**
+   * Freshest registry layer of the page's own entry (by the date in the layer
+   * name/paths, ties → later in the list). Its status is shown next to the
+   * entry status; the entry status itself is never changed.
+   */
+  latestLayer?: LatestLayerView;
+  /** UE layers /Game/PipelineCandidates/<Folder>/{H2,H2LD,H3LD,Rig,H2Anim,…} (characters only; text only). */
+  ueLayers: UeLayersSection | null;
+}
+
+export interface LatestLayerView {
+  entryId: string;
+  layer: string;
+  status?: string;
+  stage?: string;
+  /** YYYY-MM-DD taken from the layer text/paths (run id), when present */
+  date?: string;
+  /** position in the entry's layers[] */
+  index: number;
+  /** entry status in the registry (for comparison) */
+  entryStatus: string | null;
+}
+
+export interface UeLayerView {
+  /** folder name under /Game/PipelineCandidates/<Folder>/ (H2, H2LD, Rig…) */
+  key: string;
+  gamePath: string;
+  /** one of the standard hero layers H2 / H2LD / H3LD / Rig / H2Anim */
+  standard: boolean;
+  /** folder exists in unreal/Unmatched/Content (only checked, never served); null = UE project not found */
+  onDisk: boolean | null;
+  uassetCount?: number;
+  /** registry layers that name this UE path (status copied verbatim) */
+  registry: { entryId: string; layer: string; status?: string; stage?: string }[];
+  /** clip-manifest slots whose ue.target_path is inside this folder: status → count */
+  clipStatuses?: Record<string, number>;
+  /** repo documents/reports that mention this UE path */
+  mentions: FileRef[];
+  mentionsTotal: number;
+  /** runs (art/pipeline-candidates/<ASSET>/<run>) whose manifest/reports mention it */
+  runs: string[];
+}
+
+export interface UeLayersSection {
+  folder: string;
+  /** how the folder was found: registry / clip-manifest / name */
+  folderSource: string;
+  layers: UeLayerView[];
+}
+
+// ------------------------------------------------------------------ overview sections
+
+export interface DocView {
+  file: FileRef;
+  title?: string;
+  /** YYYY-MM-DD from the file name or a «Дата:» line */
+  date?: string;
+  /** first «Дата: … Статус: …» line, verbatim (cut) */
+  statusLine?: string;
+  headings: string[];
+}
+
+export interface PlanTaskView {
+  id: string;
+  title: string;
+  track?: string;
+  source?: string;
+  status: string;
+  artStatus: string | null;
+  evidence: FileRef[];
+  next?: string;
+  blocker?: string | null;
+  assets: string[];
+  updated?: string;
+  /** problems with the task record (art status outside vocabulary, acceptance without evidence…) */
+  warnings: string[];
+}
+
+export interface PlanView {
+  file: FileRef;
+  exists: boolean;
+  error?: string;
+  schema?: string;
+  generated?: string;
+  head?: string;
+  sources: { id: string; path: string; title?: string; file?: FileRef }[];
+  tasks: PlanTaskView[];
+  waves: { id: string; title?: string; status?: string; tasks: string[] }[];
+  statusCounts: { status: string; count: number }[];
+}
+
+export interface LookdevSheet {
+  run: string;
+  /** review iteration (i0, c1…) or «preview» for Blender sheets */
+  iteration: string;
+  file: FileRef;
+}
+
+export interface LookdevHeroView {
+  /** folder name under art/imagegen/hero-quality-v1/ (medusa, king-arthur…) */
+  key: string;
+  name: string;
+  pageId?: string;
+  concepts: FileRef[];
+  conceptPrompts?: FileRef;
+  docs: DocView[];
+  /** UE look-dev sheets «концепт | UE» (review/<iter>/*-lookdev-sheet-*.jpg), newest first */
+  ueSheets: LookdevSheet[];
+  /** Blender look-dev sheets / comparisons (preview/ld_sheet_*, compare-ld-*, ld_concept_zones_*) */
+  blenderSheets: LookdevSheet[];
+  /** sheets from docs/art-pipeline/evidence/<…hero…>/ */
+  evidenceSheets: FileRef[];
+}
+
+export interface LookdevOverview {
+  conceptRoot: string;
+  references: FileRef[];
+  heroes: LookdevHeroView[];
+}
+
+export interface MaterialClassView {
+  index?: number;
+  id: string;
+  nameRu?: string;
+  family?: string;
+  metallic?: number;
+  shadingModel?: string;
+  baseColorLinear?: number[];
+  roughness?: number;
+  teamDyeAllowed?: string;
+  extension: boolean;
+  /** CC0 sets mapped to the class in sources.json */
+  sets: string[];
+  /** procedural generator when no CC0 set exists */
+  procedural?: string;
+  tiles: FileRef[];
+}
+
+export interface MaterialSetView {
+  id: string;
+  status?: string;
+  class?: string | null;
+  license?: string;
+  page?: string;
+  reason?: string;
+  cc0: boolean;
+}
+
+export interface MaterialLibraryView {
+  root: string;
+  docs: DocView[];
+  presets?: { file: FileRef; version?: string; date?: string; status?: string };
+  classes: MaterialClassView[];
+  sources?: { file: FileRef; note?: string; licenseNote?: string; allCC0: boolean };
+  sets: MaterialSetView[];
+  procedural: { class: string; generator?: string; reason?: string }[];
+  tilesSheet?: FileRef;
+  evidenceGroups: { group: string; count: number }[];
+  evidenceImages: FileRef[];
+  evidenceTotal: number;
+}
+
+export interface DecisionView extends DocView {
+  /** «Происхождение» paragraph (who decided), cut */
+  origin?: string;
 }
 
 export interface CreditsOverview {
@@ -461,6 +626,10 @@ export interface PipelineHealth {
   registry: {
     file: FileRef;
     snapshotDate?: string;
+    /** mtime of asset-registry.json */
+    fileMtime?: string;
+    /** newest date named by any registry layer (YYYY-MM-DD) */
+    latestLayerDate?: string;
     total: number;
     byStatus: { status: string; count: number }[];
     byStage: { stage: string; count: number }[];
@@ -487,5 +656,10 @@ export interface ArtHubData {
   props: AssetPage[];
   credits: CreditsOverview;
   pipelineHealth: PipelineHealth;
+  /** docs/art-pipeline/plan-status.json (written by the plan track) */
+  plan: PlanView;
+  lookdev: LookdevOverview;
+  materials: MaterialLibraryView;
+  decisions: DecisionView[];
   warnings: string[];
 }

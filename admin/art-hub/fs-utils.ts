@@ -83,6 +83,7 @@ export class FileCache {
   private jsonCache = new Map<string, CacheSlot<{ value?: unknown; error?: string }>>();
   private textCache = new Map<string, CacheSlot<string | undefined>>();
   private shaCache = new Map<string, CacheSlot<string>>();
+  private derivedCache = new Map<string, CacheSlot<unknown>>();
   private statMemo = new Map<string, StatInfo>();
 
   /** Clears the per-run stat memo (call at the start of each aggregation). */
@@ -146,6 +147,33 @@ export class FileCache {
       value = undefined;
     }
     this.textCache.set(abs, { key, value });
+    return value;
+  }
+
+  /**
+   * Value derived from a text file (e.g. regex matches), cached by mtime/size.
+   * Only the derived value is kept, not the text itself.
+   */
+  derive<T>(abs: string, tag: string, fn: (text: string) => T, maxBytes = 1024 * 1024): T | undefined {
+    const key = this.key(abs);
+    if (key === null) return undefined;
+    const slotKey = `${tag}\0${abs}`;
+    const hit = this.derivedCache.get(slotKey);
+    if (hit && hit.key === key) return hit.value as T;
+    let value: T | undefined;
+    try {
+      const fd = fs.openSync(abs, 'r');
+      try {
+        const buf = Buffer.alloc(Math.min(maxBytes, this.stat(abs).bytes ?? maxBytes));
+        const n = fs.readSync(fd, buf, 0, buf.length, 0);
+        value = fn(buf.subarray(0, n).toString('utf8'));
+      } finally {
+        fs.closeSync(fd);
+      }
+    } catch {
+      value = undefined;
+    }
+    this.derivedCache.set(slotKey, { key, value });
     return value;
   }
 

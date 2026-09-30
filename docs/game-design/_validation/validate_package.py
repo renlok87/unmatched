@@ -47,7 +47,7 @@ acceptance = (PACKAGE / '15-rules-and-release-acceptance.md').read_text(encoding
 acc = set(re.findall(r'^## (ACC-\d{3})', acceptance, re.M))
 assert acc == {f'ACC-{i:03}' for i in range(1, 23)}
 all_ids = {row['id'] for row in backlog}
-assert all_ids == ({f'GD-{i:03}' for i in range(1, 59)} | {f'ART-{i:03}' for i in range(1, 12)})
+assert all_ids == ({f'GD-{i:03}' for i in range(1, 59)} | {f'ART-{i:03}' for i in range(1, 19)})
 by_id = {row['id']: row for row in backlog}
 covered_sources = set()
 covered_acc = set()
@@ -85,7 +85,7 @@ for row in backlog:
 assert legacy_tasks <= covered_sources, f'Unmapped old tasks: {legacy_tasks - covered_sources}'
 assert covered_acc == acc, f'Acceptance without task: {acc - covered_acc}'
 assert len(loads) == 14 and all(effort <= 8 for effort in loads.values())
-assert sum(loads.values()) == 103 and art_load == 35
+assert sum(loads.values()) == 103 and art_load == 46.5
 
 visited, active = set(), set()
 

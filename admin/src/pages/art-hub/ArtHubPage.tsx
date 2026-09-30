@@ -7,13 +7,18 @@ import React, { Suspense, useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Alert, Badge, Button, Card, Col, Empty, Menu, Modal, Result, Row, Space, Spin, Switch, Tabs, Tag, Tooltip, Typography } from 'antd';
 import type { MenuProps } from 'antd';
-import { DashboardOutlined, ReloadOutlined } from '@ant-design/icons';
-import type { AssetPage, FileRef } from '../../../art-hub/types';
+import { BgColorsOutlined, BookOutlined, DashboardOutlined, EyeOutlined, ProjectOutlined, ReloadOutlined } from '@ant-design/icons';
+import type { ArtHubData, AssetPage, FileRef, LookdevHeroView } from '../../../art-hub/types';
 import { IS_DEV, useArtHubData } from './api';
 import { ArtHubUiContext, StageTag, StatusTag, type ArtHubUi } from './components/common';
 import { TextPreview } from './components/TextPreview';
 import { formatTime, timeAgo } from './format';
 import { ClipsSection } from './sections/ClipsSection';
+import { DecisionsSection } from './sections/DecisionsSection';
+import { HeroLookdev, LookdevSection } from './sections/LookdevSection';
+import { MaterialsSection } from './sections/MaterialsSection';
+import { PlanSection } from './sections/PlanSection';
+import { UeLayersTable } from './sections/UeLayersSection';
 import { LazyModelViewer, ModelsSection } from './sections/ModelsSection';
 import { PipelineHealthSection } from './sections/PipelineHealthSection';
 import { RigSection } from './sections/RigSection';
@@ -25,6 +30,34 @@ import { VideoToMotionSection } from './sections/VideoToMotionSection';
 const { Title, Text } = Typography;
 const HEALTH = 'health';
 
+/** Overview pages (not tied to one asset). */
+const OVERVIEW: { key: string; label: string; icon: React.ReactNode }[] = [
+  { key: HEALTH, label: 'Состояние пайплайна', icon: <DashboardOutlined /> },
+  { key: 'plan', label: 'План и задачи', icon: <ProjectOutlined /> },
+  { key: 'lookdev', label: 'Look-dev и концепты', icon: <EyeOutlined /> },
+  { key: 'materials', label: 'Библиотека материалов', icon: <BgColorsOutlined /> },
+  { key: 'decisions', label: 'Решения', icon: <BookOutlined /> },
+];
+
+/**
+ * Status shown for a page: the freshest registry layer when it differs from the
+ * entry status (the entry status stays visible; nothing is upgraded).
+ */
+const PageStatus: React.FC<{ page: AssetPage; compact?: boolean }> = ({ page, compact }) => {
+  const l = page.latestLayer;
+  if (!l?.status || l.status === page.status) return <StatusTag status={page.status} />;
+  return (
+    <Tooltip title={`Статус самого свежего слоя реестра${l.date ? ` (${l.date})` : ''}: «${l.layer}». Статус записи в реестре: «${page.status ?? '—'}».`}>
+      <span data-testid={`art-hub-latest-${page.id}`}>
+        <StatusTag status={l.status} label={compact ? l.status : `${l.status} (свежий слой${l.date ? ` ${l.date}` : ''})`} />
+        <Text type="secondary" style={{ fontSize: 11 }}>
+          {compact ? <br /> : ' '}запись: {page.status ?? '—'}
+        </Text>
+      </span>
+    </Tooltip>
+  );
+};
+
 const NavLabel: React.FC<{ page: AssetPage }> = ({ page }) => (
   <div data-testid={`art-hub-nav-${page.id}`} style={{ lineHeight: 1.25, whiteSpace: 'normal', padding: '4px 0' }}>
     <div style={{ fontWeight: 500 }}>
@@ -32,18 +65,40 @@ const NavLabel: React.FC<{ page: AssetPage }> = ({ page }) => (
       {page.instances > 1 ? <Text type="secondary"> ×{page.instances}</Text> : null}
     </div>
     <div style={{ marginTop: 2 }}>
-      <StatusTag status={page.status} />
+      <PageStatus page={page} compact />
     </div>
   </div>
 );
 
-const AssetView: React.FC<{ page: AssetPage; tab: string; onTab: (t: string) => void }> = ({ page, tab, onTab }) => {
+const OverviewView: React.FC<{ item: string; data: ArtHubData }> = ({ item, data }) => {
+  switch (item) {
+    case 'plan':
+      return <PlanSection data={data} />;
+    case 'lookdev':
+      return <LookdevSection lookdev={data.lookdev} />;
+    case 'materials':
+      return <MaterialsSection materials={data.materials} />;
+    case 'decisions':
+      return <DecisionsSection decisions={data.decisions} />;
+    default:
+      return <PipelineHealthSection data={data} />;
+  }
+};
+
+const AssetView: React.FC<{ page: AssetPage; tab: string; onTab: (t: string) => void; lookdev?: LookdevHeroView }> = ({ page, tab, onTab, lookdev }) => {
+  const ueFound = page.ueLayers?.layers.filter((l) => l.onDisk || l.registry.length || l.clipStatuses).length ?? 0;
   const videoCount = page.videoRefs?.cues.reduce((n, c) => n + c.takes.filter((t) => t.video).length, 0) ?? 0;
   const items = [
     { key: 'summary', label: 'Сводка', children: <SummarySection page={page} /> },
     { key: 'models', label: `Модели (${page.models.models.length})`, children: <ModelsSection page={page} /> },
     ...(page.kind === 'character'
       ? [
+          { key: 'ue', label: `UE-слои (${ueFound})`, children: page.ueLayers ? <UeLayersTable ue={page.ueLayers} /> : <Empty description="нет записи в реестре" /> },
+          {
+            key: 'lookdev',
+            label: 'Look-dev и концепт',
+            children: lookdev ? <HeroLookdev hero={lookdev} showTitle={false} /> : <Empty description="look-dev данных нет" />,
+          },
           { key: 'rig', label: 'Риг', children: page.rig ? <RigSection page={page} rig={page.rig} /> : <Empty /> },
           {
             key: 'clips',
@@ -81,7 +136,7 @@ const AssetView: React.FC<{ page: AssetPage; tab: string; onTab: (t: string) => 
             <Text type="secondary" copyable>
               {page.id}
             </Text>
-            <StatusTag status={page.status} />
+            <PageStatus page={page} />
             <StageTag stage={page.stage} />
             {page.backlog.map((b) => (
               <Tag key={b}>{b}</Tag>
@@ -139,12 +194,18 @@ export const ArtHubPage: React.FC = () => {
 
   const pages = useMemo(() => (data ? [...data.characters, ...data.props] : []), [data]);
   const current = pages.find((p) => p.id === item);
+  const overviewItem = OVERVIEW.some((o) => o.key === item) ? item : HEALTH;
 
   const menuItems: MenuProps['items'] = useMemo(() => {
     if (!data) return [];
     const itemStyle = { height: 'auto', lineHeight: 1.25, paddingTop: 4, paddingBottom: 4 };
     return [
-      { key: HEALTH, icon: <DashboardOutlined />, label: <span data-testid="art-hub-nav-health">Состояние пайплайна</span> },
+      {
+        type: 'group',
+        key: 'g-overview',
+        label: 'Обзор',
+        children: OVERVIEW.map((o) => ({ key: o.key, icon: o.icon, label: <span data-testid={`art-hub-nav-${o.key}`}>{o.label}</span> })),
+      },
       {
         type: 'group',
         key: 'g-chars',
@@ -177,7 +238,10 @@ export const ArtHubPage: React.FC = () => {
           <Title level={3} style={{ margin: 0 }}>
             Арт-хаб
           </Title>
-          <Text type="secondary">Живое отражение файлов арт-пайплайна: модели, риг, клипы, видео-референсы, звуки, кредиты. Только чтение.</Text>
+          <Text type="secondary">
+            Живое отражение файлов арт-пайплайна: план, модели, UE-слои, look-dev, материалы, риг, клипы, видео-референсы, звуки, кредиты,
+            решения. Только чтение.
+          </Text>
         </Col>
         <Col>
           <Space wrap>
@@ -238,7 +302,7 @@ export const ArtHubPage: React.FC = () => {
               <Card size="small" styles={{ body: { padding: 4 } }} style={{ position: 'sticky', top: 12 }}>
                 <Menu
                   mode="inline"
-                  selectedKeys={[current ? current.id : HEALTH]}
+                  selectedKeys={[current ? current.id : overviewItem]}
                   items={menuItems}
                   onClick={({ key }) => openPage(key)}
                   style={{ borderInlineEnd: 'none' }}
@@ -247,11 +311,17 @@ export const ArtHubPage: React.FC = () => {
             </Col>
             <Col flex="auto" style={{ minWidth: 0 }}>
               {current ? (
-                <AssetView key={current.id} page={current} tab={tab} onTab={setTab} />
+                <AssetView
+                  key={current.id}
+                  page={current}
+                  tab={tab}
+                  onTab={setTab}
+                  lookdev={data.lookdev?.heroes.find((h) => h.pageId === current.id)}
+                />
               ) : (
                 <>
-                  {item !== HEALTH ? <Alert style={{ marginBottom: 12 }} type="warning" message={`Ассет «${item}» не найден — показано состояние пайплайна`} /> : null}
-                  <PipelineHealthSection data={data} />
+                  {item !== overviewItem ? <Alert style={{ marginBottom: 12 }} type="warning" message={`Раздел «${item}» не найден — показано состояние пайплайна`} /> : null}
+                  <OverviewView item={overviewItem} data={data} />
                 </>
               )}
             </Col>

@@ -1,9 +1,34 @@
 # Арт-хаб (admin/art-hub)
 
-Страница админки `/art-hub` — живое отражение файлов арт-пайплайна: модели, риг,
-скелетные клипы, видео-референсы, конвейер «видео → скелет», звуки и кредиты по
-каждому персонажу (Medusa, King Arthur, Merlin, Harpy ×3) и по пропсам/окружению.
+Страница админки `/art-hub` — живое отражение файлов арт-пайплайна: модели, UE-слои,
+look-dev, риг, скелетные клипы, видео-референсы, конвейер «видео → скелет», звуки и
+кредиты по каждому персонажу (Medusa, King Arthur, Merlin, Harpy ×3) и по
+пропсам/окружению, плюс обзорные разделы: «Состояние пайплайна», «План и задачи»,
+«Look-dev и концепты», «Библиотека материалов», «Решения».
 Только чтение: хаб ничего не пишет в данные пайплайна и не повышает статусы.
+
+## Разделы (меню «Обзор»)
+
+| Раздел (`?item=`) | Источник | Что показывает |
+| --- | --- | --- |
+| Состояние пайплайна (`health`) | реестр, прогоны, clip-manifest, журнал кредитов | счётчики; дата среза **из файла** (`snapshotDate`), время изменения реестра и дата самого свежего слоя (метка «срез старше слоёв», если слои новее); матрица «герой × UE-слой» |
+| План и задачи (`plan`) | `docs/art-pipeline/plan-status.json` (`unmatched-plan-status/v1`, пишет трек plan) | волны, задачи с фильтрами по треку/статусу, арт-статус, доказательства (раскрываются в таблицу файлов), следующий шаг/блокер. Пока файла нет — заглушка. Проверки: арт-статус вне словаря, «художественно принято» без акта `docs/game-design/evidence/(ART\|GD)-…/*.md`, отсутствующие файлы доказательств. Пути вне репо (`C:/tmp/…`) — только текст |
+| Look-dev и концепты (`lookdev`) | `art/imagegen/hero-quality-v1/<герой>/`, `docs/art-pipeline/<герой>-lookdev*.md`, `art/pipeline-candidates/<ASSET>/<run>/review/<итерация>/*-lookdev-sheet-*`, `…/preview/{ld_sheet_*,compare-ld-*,ld_concept_zones_*}`, листы `docs/art-pipeline/evidence/<…герой…>/*sheet*` | концепт (front/side/back + prompts.md), отчёты look-dev (заголовок, строка «Дата/Статус», разделы), листы «концепт \| UE» по прогонам и итерациям, свежие первыми |
+| Библиотека материалов (`materials`) | `docs/art-pipeline/material-library/{*.md,um-material-presets-v1.json,sources.json,evidence/}`, `art/material-library/v1/{tiles,preview/tiles-sheet.png}` | классы и расширения (образец цвета из `typicalLinear`, metallic/roughness/shading), CC0-наборы с лицензиями (не-CC0 → предупреждение), процедурные классы, тайлы, кадры доказательств |
+| Решения (`decisions`) | `docs/game-design/decisions/*.md` | заголовок, дата из имени файла, разделы `##`, абзац «Происхождение» |
+
+На странице персонажа добавлены вкладки **«UE-слои»** и **«Look-dev и концепт»**. Статус в
+навигации и в шапке — статус **самого свежего слоя** записи (дата из имени слоя/путей: run id
+`20260929-…` или ISO-дата; при равенстве — более поздний в `layers[]`); статус самой записи
+реестра показан рядом («запись: …») и не меняется.
+
+UE-слои: папка героя `/Game/PipelineCandidates/<Folder>/` берётся из путей реестра (иначе из
+`ue.target_path` clip-manifest, иначе из имени). Для H2 / H2LD / H3LD / Rig / H2Anim и других
+папок героя показываются: наличие папки в `unreal/Unmatched/Content` и число `.uasset`
+(только `stat`/`readdir`, файлы не отдаются), слои реестра, где упомянут путь (статус как есть),
+статусы `ue.status` клипов clip-manifest, прогоны и документы-упоминания (md в
+`docs/art-pipeline/**`, журналы решений, корневые json/md прогонов, `reports/*.json`,
+`build-profiles/*.json`). Статус слою, которого нет в реестре/clip-manifest, не присваивается.
 
 ## Как открыть
 
@@ -28,7 +53,8 @@ npm run art-hub:snapshot -- --out <файл>
 
 | Файл | Что делает |
 | --- | --- |
-| `aggregate.ts` | Агрегатор (Node, без БД): собирает `ArtHubData` из файлов репо. Кэш по mtime/size: JSON разбирается заново только при изменении файла, результат целиком переиспользуется, пока отпечаток отслеживаемых файлов не изменился |
+| `aggregate.ts` | Агрегатор (Node, без БД): собирает `ArtHubData` из файлов репо. Кэш по mtime/size: JSON разбирается заново только при изменении файла, результат целиком переиспользуется, пока отпечаток отслеживаемых файлов не изменился (в отпечаток входит и дерево `unreal/Unmatched/Content/PipelineCandidates/*/*` — mtime каталогов двух уровней) |
+| `overview.ts` | Обзорные разделы: план, look-dev и концепты, библиотека материалов, решения, UE-слои героя, свежий слой. Упоминания UE-путей ищутся одним проходом; результат по каждому файлу кэшируется по mtime (`FileCache.derive`) |
 | `types.ts` | Модель данных, общая для агрегатора и страницы (без Node-импортов) |
 | `fs-utils.ts` | Обход каталогов (без symlink), кэши JSON/текста/sha256, CSV, разбор markdown (акты, таблицы) |
 | `path-guard.ts` | Белый список путей, защита от traversal, MIME, разбор `Range` |
@@ -49,7 +75,11 @@ npm run art-hub:snapshot -- --out <файл>
 ### Белый список `/__art-hub/file`
 
 `art/`, `docs/art-pipeline/`, `docs/game-design/evidence/`,
+`docs/game-design/decisions/*.md` (только markdown — прочие файлы там 403),
 `blender/<ASSET>/{preview,export,textures,variants,tripo-source}/`.
+Концепты (`art/imagegen/…`), библиотека материалов и `plan-status.json` уже внутри `art/` и
+`docs/art-pipeline/` — отдельного расширения не требуют. Прочие файлы `docs/game-design/`
+(13-sprint-plan.md, 14-sprint-backlog.csv, 06/05…) не отдаются: на странице — только путь.
 `tripo-source` добавлен к списку из задания: там лежат исходные Tripo GLB Medusa, их нужно
 смотреть в 3D. Отказ: пустой путь, NUL, абсолютные пути (POSIX, `C:`, UNC), любой сегмент
 `..`, скрытые сегменты (`.git`, `.env`), `:` (ADS), пути вне списка (403) и
@@ -73,6 +103,9 @@ symlink/junction, чей реальный путь выходит из спис�
 | `docs/game-design/evidence/ART-*` | акты (строка `**Решение…**`), свежие кадры — если id бэклога однозначно принадлежит ассету |
 | `blender/<ASSET>/{preview,export,textures,variants,tripo-source}` | превью, FBX/GLB, текстуры |
 | `docs/game-design/07-animation-vfx-audio.csv` | запланированные звуковые CUE (по CUE слотов клипа и по упоминанию персонажа) |
+| `docs/art-pipeline/plan-status.json` | раздел «План и задачи» (см. выше) |
+| `docs/game-design/decisions/*.md` | раздел «Решения» (отслеживаются в отпечатке кэша) |
+| `unreal/Unmatched/Content/PipelineCandidates/<Folder>/<Layer>/` | только наличие папки и число `.uasset` для вкладки «UE-слои» |
 | `art/`, `public/`, `src/`, `scraped-data/`, `unreal/Unmatched/Content`, `docs/art-pipeline` | поиск аудиофайлов персонажа (wav/mp3/ogg/flac/m4a/aac/opus; SoundWave-uasset в папках audio/sound/sfx) |
 
 Правила отнесения файлов к странице: каталог `blender/<ID>`, `art/pipeline-candidates/<ID>`,
@@ -100,12 +133,14 @@ symlink/junction, чей реальный путь выходит из спис�
 4. Нарисуйте секцию в `src/pages/art-hub/sections/` и добавьте вкладку в `AssetView`
    (`ArtHubPage.tsx`). Общие компоненты: `FileTable`, `Gallery`, `StatusTag`, `ClipStatusTag`,
    `FileActions` (3D/текст/открыть/скачать).
-5. Тест на фикстуре: дополните `__tests__/fixture-repo.ts` и `aggregate.test.ts`.
+5. Тест на фикстуре: дополните `__tests__/fixture-repo.ts` и `aggregate.test.ts`
+   (обзорные разделы — `addOverviewFixtures()` и `overview.test.ts`).
 
 ## Проверки
 
 ```bash
 npm test                     # vitest (art-hub + существующие тесты src)
+npx vitest run art-hub       # только тесты арт-хаба (агрегатор, обзор, path-guard, эндпоинты)
 npm run typecheck:art-hub    # tsc для Node-части (агрегатор, плагин, vite.config.ts)
 npx tsc -b                   # tsc для страницы
 ```

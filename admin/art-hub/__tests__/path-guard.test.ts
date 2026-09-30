@@ -39,6 +39,20 @@ describe('normalizeRelPath / isAllowedRelPath', () => {
     ['blender/ASSET-MEDUSA-001/medusa.blend', false],
     ['blender/ASSET-MEDUSA-001/export', false],
     ['docs/game-design/06-asset-manifest.csv', false],
+    ['docs/game-design/decisions/2026-09-29-lookdev-v2-decisions.md', true],
+    ['docs/game-design/decisions/2026-09-29-lookdev-v2-decisions.MD', true],
+    ['docs/game-design/decisions/notes.json', false],
+    ['docs/game-design/decisions/sub/x.png', false],
+    ['docs/game-design/decisions', false],
+    ['docs/game-design/decisions/', false],
+    ['docs/game-design/decisionsX/a.md', false],
+    ['docs/game-design/13-sprint-plan.md', false],
+    ['docs/game-design/14-sprint-backlog.csv', false],
+    ['art/imagegen/hero-quality-v1/medusa/medusa-front.png', true],
+    ['docs/art-pipeline/material-library/sources.json', true],
+    ['docs/art-pipeline/plan-status.json', true],
+    ['unreal/Unmatched/Content/PipelineCandidates/Merlin/H2LD/SK_Merlin_H2LD.uasset', false],
+    ['unreal/Unmatched/Config/DefaultEngine.ini', false],
     ['docs/secret.txt', false],
     ['unreal/Unmatched/Content/x.uasset', false],
     ['backend/.env', false],
@@ -203,6 +217,9 @@ describe('dev endpoints (/__art-hub)', () => {
     ['private/secret.txt', 403],
     [`blender/${HERO}/hero.blend`, 403],
     ['docs/game-design/07-animation-vfx-audio.csv', 403],
+    ['docs/game-design/decisions/notes.json', 403],
+    ['docs/game-design/decisions/../evidence/x.md', 400],
+    ['unreal/Unmatched/Content/PipelineCandidates/Hero/Rig/SK_Hero_Rig.uasset', 403],
     ['art/missing.png', 404],
     ['art/animation-refs', 404],
   ])('rejects %j with %i', async (p, status) => {
@@ -211,6 +228,13 @@ describe('dev endpoints (/__art-hub)', () => {
     expect(res.status).toBe(status);
     const text = await res.text();
     expect(text).not.toMatch(/secret/);
+  });
+
+  it('serves decision logs (markdown only) as text', async () => {
+    const res = await file('docs/game-design/decisions/2026-01-02-hero-decisions.md');
+    expect(res.status).toBe(200);
+    expect(res.headers.get('content-type')).toMatch(/^text\/markdown/);
+    expect(await res.text()).toMatch(/Журнал решений: герой/);
   });
 
   it('rejects requests without a path and non-GET methods', async () => {

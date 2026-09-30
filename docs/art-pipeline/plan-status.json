@@ -1,0 +1,1838 @@
+{
+  "schema": "unmatched-plan-status/v1",
+  "generated": "2026-09-30T07:15:00Z",
+  "head": "341528031e5f857ff4c062669470553f9aa9102f",
+  "sources": [
+    {
+      "id": "handover",
+      "path": "C:/tmp/p0-review/handover-plan.md",
+      "title": "Бриф передачи задач по арт-дизайну и 3D-пайплайну (срез 2026-09-28): P0×4, P1×3, арт 1–5, общие требования, очередь дня"
+    },
+    {
+      "id": "stage3",
+      "path": "C:/tmp/p0-review/stage3-final.md",
+      "title": "Итоговый план этапа 3 (волны 0–7, T0…T7.2)"
+    },
+    {
+      "id": "backlog",
+      "path": "docs/game-design/14-sprint-backlog.csv",
+      "title": "Бэклог спринтов (GD-001…058, ART-001…018)"
+    },
+    {
+      "id": "sprint-plan",
+      "path": "docs/game-design/13-sprint-plan.md",
+      "title": "План спринтов и арт-поток A01–A03"
+    },
+    {
+      "id": "manifest06",
+      "path": "docs/game-design/06-asset-manifest.csv",
+      "title": "Манифест ассетов MVP"
+    },
+    {
+      "id": "content05",
+      "path": "docs/game-design/05-content-matrix.csv",
+      "title": "Матрица контента"
+    },
+    {
+      "id": "registry",
+      "path": "docs/art-pipeline/asset-registry.json",
+      "title": "Реестр 3D-ассетов пайплайна"
+    },
+    {
+      "id": "decisions",
+      "path": "docs/game-design/decisions/",
+      "title": "Журналы решений 2026-09-29 (рендер/UI, читаемость доски, look-dev v2, anim v2)"
+    },
+    {
+      "id": "session",
+      "path": "git log 2026-09-28..341528031e5f",
+      "title": "Коммиты с 2026-09-28 и цель сессии 2026-09-30 (/goal: реестр слоёв, 5c-B, волны 6–7)"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "P0-1",
+      "title": "Зафиксировать состав MVP-ассетов и владение файлами",
+      "track": "pipeline",
+      "source": "handover",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "docs/art-pipeline/asset-registry.json",
+        "docs/art-pipeline/DIRECTORY-MAP.md",
+        "tools/tripo-pipeline/validate_registry.py"
+      ],
+      "next": "Реестр отстаёт от факта: добавить слои Arthur H2LD, Harpy H3LD, канонические Rig/SK_<Hero>_Skeleton, клипы H2Anim, мастер M_UM_Figure_v2.1; верхний статус героев поднять с «предложено» до «технически импортировано» по слоям (ART-017, трек registry этой сессии).",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-MARKERS-001",
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-DECOR-KIT-001",
+        "ASSET-PROPS-CARDS-001",
+        "ASSET-PLACEHOLDER-MANNEQUIN"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Сделано в коммите 10cd855f. У героев Arthur/Merlin/Harpy верхний статус «предложено», у их слоёв — «технически импортировано»; у фасадов и ящика — «предложено», хотя есть измеренные Blender-кандидаты."
+    },
+    {
+      "id": "P0-2",
+      "title": "Подготовить входы ImageGen → Tripo (manifest, SHA-256, проверки)",
+      "track": "pipeline",
+      "source": "handover",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/imagegen-inputs/manifest.json",
+        "docs/art-pipeline/imagegen-inputs/checks-report.json",
+        "docs/art-pipeline/imagegen-inputs/CONSISTENCY-REVIEW.md",
+        "tools/tripo-pipeline/check_inputs.py",
+        "art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png"
+      ],
+      "next": "Внести концепты hero-quality-v1 (front/side/back четырёх героев) в manifest входов с sha256 при следующем обновлении реестра.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Сделано иначе: героев H2 генерировали не по тройкам mvp-v1, а по новым paintover-концептам Codex (art/imagegen/hero-quality-v1/<hero>/); их sha есть в source-specs H2, но не в imagegen-inputs/manifest.json."
+    },
+    {
+      "id": "P0-3",
+      "title": "Исполнимый идемпотентный каркас Tripo-пайплайна",
+      "track": "pipeline",
+      "source": "handover",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "tools/tripo-pipeline/tripo_pipeline.py",
+        "docs/art-pipeline/PIPELINE.md",
+        "docs/art-pipeline/evidence/t3-idempotency-2026-09-28/summary.json",
+        "tools/tripo-pipeline/tests/"
+      ],
+      "next": "Импорт клипов (сейчас review/ue_py/import_clips.py вне CLI) перенести в CLI, когда клипов станет больше.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-MARKERS-001",
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-DECOR-KIT-001",
+        "ASSET-PROPS-CARDS-001",
+        "ASSET-PLACEHOLDER-MANNEQUIN"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "CLI вырос до 0.8.0: профили сборки, skeletal-adopt, ue.target_skeleton (канонический скелет), static-candidate. Платные шаги Tripo оркестратор делает сам в Chrome, журнал — credits-ledger.json."
+    },
+    {
+      "id": "P0-4",
+      "title": "Провести Medusa через полный локальный путь",
+      "track": "pipeline",
+      "source": "handover",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/medusa-local-pass-report.md",
+        "docs/art-pipeline/evidence/t4-medusa-local-pass-2026-09-28/",
+        "docs/art-pipeline/evidence/t4-um-fbx-v1-2026-09-28/"
+      ],
+      "next": "Не требуется: проверка технологии закрыта; игровой путь Medusa идёт через H2LD (ART-012).",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "P1-5",
+      "title": "Проверить один статический пропс (бочка)",
+      "track": "pipeline",
+      "source": "handover",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/prop-barrel-report.md",
+        "docs/art-pipeline/evidence/p15-barrel-2026-09-28/",
+        "docs/art-pipeline/evidence/p1-ue-import-2026-09-28/README.md"
+      ],
+      "next": "Художественная проверка бочки в сцене доски — вместе с ART-009 (найдено в P1.7: бочка утоплена в раму).",
+      "blocker": null,
+      "assets": [
+        "ASSET-DECOR-KIT-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "P1-6",
+      "title": "Контракт рига и библиотека анимаций",
+      "track": "pipeline",
+      "source": "handover",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/rig/RIG-CONTRACT.md",
+        "docs/art-pipeline/rig/rig-contract.json",
+        "docs/art-pipeline/animation-library/clip-manifest.json",
+        "docs/art-pipeline/animation-library/VIDEO-TO-MOTION.md",
+        "docs/art-pipeline/animation-library/validation-h2anim/",
+        "docs/game-design/decisions/2026-09-29-anim-v2-decisions.md"
+      ],
+      "next": "Проигрывание клипов в S08 (ART-013); длительности HitReact 0,417 с и DeathSettle — предложение, решение в волне 6.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Сделано иначе и шире плана: контракт v1 → v2 (UM_HUMANOID_17_v2, лицо +X, weapon.L/R); 16 клипов (4 героя × Idle/LungeAttack/HitReact/DeathSettle) авторены ретаргетом в headless Blender по видео-референсам SYNTX/Kling, а не через сервис video-to-motion; Tripo-авториг отклонён; черновые AM_Medusa_* (v1) — только draft_test."
+    },
+    {
+      "id": "P1-7",
+      "title": "Контрольная сцена, доказательства, инструкция добавления ассета",
+      "track": "pipeline",
+      "source": "handover",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/README.md",
+        "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/model-checklist.json",
+        "docs/art-pipeline/ADDING-AN-ASSET.md",
+        "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-p17-repro/"
+      ],
+      "next": "Редакторные кадры остаются диагностикой; игровые кадры — волна 5c-B2 и 6.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-DECOR-KIT-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "ART-1",
+      "title": "Medusa v3: сравнение с v2 и решение по статическому кандидату",
+      "track": "art",
+      "source": "handover",
+      "status": "superseded",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-004/head-tilt-v3-self-acceptance-2026-09-28.md",
+        "docs/game-design/evidence/ART-004/head-tilt-v31-self-acceptance-2026-09-28.md",
+        "docs/art-pipeline/medusa-h2-report.md",
+        "docs/art-pipeline/medusa-lookdev-v2.md"
+      ],
+      "next": "Medusa H2LD в игре за флагом (ART-012) и её приёмка в волне 6.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Заменено: v3 → «доработать v3.1»; v3.1a прошёл пороги Blender (T1.2), но в UE не импортирован (T4.1 не выполнялась). Направление заменено проходом качества героев: Tripo «по частям» по новым концептам → H2 → H2.1 → H2LD на M_UM_Figure_v2.1. В игре до флага 5c-B0 по-прежнему v2 (/Game/ArtPreview/Medusa)."
+    },
+    {
+      "id": "ART-2",
+      "title": "Живой K2: packaged-прогон с HUD и boardState, лицо/змеи/лук",
+      "track": "art",
+      "source": "handover",
+      "status": "in_progress",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2-measured-2026-09-28.md",
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/",
+        "docs/game-design/evidence/ART-004/v3-live-hookup-diagnosis-2026-09-28.md"
+      ],
+      "next": "Длинный packaged K2 ≥240 с на High с героями v2 (волна 5c-B2 = ART-018).",
+      "blocker": "Нужны код 5c-B0 (герои v2 и клипы в S08) и UE-этап 5c-B1.",
+      "assets": [
+        "ASSET-MEDUSA-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Причина падения v3 в live найдена и обойдена (T1.1): 22 кадра packaged-live strict. Прогон ≥240 с до FINISHED не сделан."
+    },
+    {
+      "id": "ART-3",
+      "title": "Сцена и свет: Cobble City и две реальные карты",
+      "track": "art",
+      "source": "handover",
+      "status": "in_progress",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-005/art-boards-t32-2026-09-28.md",
+        "docs/game-design/evidence/ART-005/content-maps-t42-2026-09-29.md",
+        "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29.md",
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md",
+        "docs/game-design/decisions/2026-09-29-board-readability-decisions.md",
+        "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29.md"
+      ],
+      "next": "Свет доски для фигур (ART-014) и остатки 5b-R (ART-015), затем пересъёмка трёх досок с героями v2 (ART-018).",
+      "blocker": null,
+      "assets": [
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-MARKERS-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Сделано иначе: карты Sherwood Forest 8×5 и T. Rex Paddock 7×5 — арт-фикстуры (вариант а), не правила; рендер переведён на DX12/SM6 + Lumen, эталон High (решение пользователя 2026-09-28). В look-dev найдено: яркие зоны фигур выбиваются в свете доски (EV100 1,3) и проходят только при −1,0 EV."
+    },
+    {
+      "id": "ART-4",
+      "title": "HUD и выбор: плашка, подписи, иконка, урон, клик, зум, Space",
+      "track": "art",
+      "source": "handover",
+      "status": "in_progress",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-004/hud-input-t22-2026-09-28.md",
+        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29.md",
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md"
+      ],
+      "next": "Реальный ввод (T4.3) в окне пользователя; решение по пределу зума K2 (Q-302) в волне 6.",
+      "blocker": "Реальный клик/колесо/Space не проверены: все прогоны src=flag; нужно окно пользователя ≥10 мин; раннер SendInput в репо не подготовлен.",
+      "assets": [
+        "ASSET-MARKERS-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "HUD переведён на гибрид UMG (решение пользователя); в 5b-R добавлены UMG-теги WBP_S08ArtTag, привязка урона и плашки, кейлайн иконки."
+    },
+    {
+      "id": "ART-5",
+      "title": "Повторная приёмка: K1/K2/K3, QA-009/010, решение GD-058",
+      "track": "closing",
+      "source": "handover",
+      "status": "open",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/evidence/GD-058/acceptance-review-2026-09-28.md"
+      ],
+      "next": "Волна 6 после 5c-B2: одна сборка, один sha256 exe, K1–K3 packaged-live, QA-009/010, акт GD-058.",
+      "blocker": "5c-B0/B1/B2 не завершены; замер ACC-022 на классе D-07 невозможен (нет целевого ПК) — только цифры ПК разработки с пометкой.",
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-MARKERS-001",
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-DECOR-KIT-001",
+        "ASSET-PROPS-CARDS-001",
+        "ASSET-PLACEHOLDER-MANNEQUIN"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "GEN-REQ",
+      "title": "Общие требования к моделям и сцене (оригиналы, normals/UV/bake, TeamColor, игровая камера)",
+      "track": "art",
+      "source": "handover",
+      "status": "in_progress",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/model-checklist.json",
+        "docs/art-pipeline/material-library/README.md",
+        "docs/art-pipeline/material-library/team-accent.md",
+        "docs/game-design/decisions/2026-09-29-render-ui-user-decisions.md"
+      ],
+      "next": "Заполнить model-checklist для каждого героя v2 в игровой камере (обе стороны, оружие, кисти, ноги, подставка, клиппинг, команда в сером) в волне 6.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-MARKERS-001",
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-DECOR-KIT-001",
+        "ASSET-PROPS-CARDS-001",
+        "ASSET-PLACEHOLDER-MANNEQUIN"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Оригиналы Tripo хранятся отдельно (source/, большие GLB локально с sha в source-specs); 4K-мастера текстур локально, в git — 2K рантайм. TeamColor по решению пользователя «акценты + кольцо»: краска только на маске TeamAccent, а не на всей ткани (W4-B и LD-A красили ткань целиком — исправлено в LD-C)."
+    },
+    {
+      "id": "DAY-QUEUE",
+      "title": "Очередь работы на ближайший день (7 шагов пайплайна + 6 шагов арт-чата)",
+      "track": "pipeline",
+      "source": "handover",
+      "status": "in_progress",
+      "art_status": null,
+      "evidence": [
+        "docs/art-pipeline/asset-registry.json",
+        "docs/art-pipeline/ADDING-AN-ASSET.md",
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2-measured-2026-09-28.md"
+      ],
+      "next": "Колонка пайплайна 1–7 выполнена. Колонка арт-чата: 1 заменён H2, 2–3 измерены (T1.1), 4 измерен (T5.2/5b-R), 5 — остатки 5b-R, 6 (QA-009/010, GD-058) — волна 6.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-MARKERS-001",
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-DECOR-KIT-001",
+        "ASSET-PROPS-CARDS-001",
+        "ASSET-PLACEHOLDER-MANNEQUIN"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "T0",
+      "title": "Gate старта: интеграция, базовый снимок, протокол доказательств",
+      "track": "pipeline",
+      "source": "stage3",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "docs/art-pipeline/evidence/s3-baseline-2026-09-28/production-baseline.json",
+        "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json",
+        "docs/art-pipeline/evidence/s3-baseline-2026-09-28/thresholds.json",
+        "tools/art/classify_evidence.py"
+      ],
+      "next": "snapshot_baseline держит 4 известных отличия (MI_Medusa_P1/P2 из 5b-R D-2) — снять при замене MI (ART-015).",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-MARKERS-001",
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-DECOR-KIT-001",
+        "ASSET-PROPS-CARDS-001",
+        "ASSET-PLACEHOLDER-MANNEQUIN"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "T1.1",
+      "title": "Де-риск packaged: hookup-патч, контроль v2, живой v3",
+      "track": "tech",
+      "source": "stage3",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2-measured-2026-09-28.md",
+        "docs/game-design/evidence/ART-004/live-v2-k2-control/",
+        "docs/game-design/evidence/ART-004/v3-live-hookup.patch"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "T1.2",
+      "title": "Medusa v3.1 в Blender",
+      "track": "art",
+      "source": "stage3",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-004/head-tilt-v31-self-acceptance-2026-09-28.md",
+        "docs/game-design/evidence/ART-004/head-tilt-v31-probe-2026-09-28/"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Результат (v3.1a) не пошёл дальше: заменён H2 (см. T4.1)."
+    },
+    {
+      "id": "T1.3",
+      "title": "Инструменты QA-010",
+      "track": "tech",
+      "source": "stage3",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "tools/art/qa010/qa010.py",
+        "docs/art-pipeline/qa010/README.md"
+      ],
+      "next": "Использовать в волне 6.",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "T2.1",
+      "title": "P1: бочка и тестовый клип в живой UE",
+      "track": "pipeline",
+      "source": "stage3",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/evidence/p1-ue-import-2026-09-28/README.md",
+        "docs/art-pipeline/evidence/p1-ue-import-2026-09-28/ue-anim-report.json"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-DECOR-KIT-001",
+        "ASSET-MEDUSA-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "T2.2",
+      "title": "Арт 4: код HUD и ввода",
+      "track": "tech",
+      "source": "stage3",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-004/hud-input-t22-2026-09-28.md"
+      ],
+      "next": "Реальный ввод — T4.3.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MARKERS-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "T3.1",
+      "title": "Контрольная сцена P1.7, ADDING-AN-ASSET.md, сухой повтор",
+      "track": "pipeline",
+      "source": "stage3",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/evidence/p17-control-scene-2026-09-28/README.md",
+        "docs/art-pipeline/ADDING-AN-ASSET.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-DECOR-KIT-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "T3.2",
+      "title": "Арт 3: данные и код карт (арт-фикстуры, свет как данные)",
+      "track": "tech",
+      "source": "stage3",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-005/art-boards-t32-2026-09-28.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-BOARD-COBBLE-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "T4.1",
+      "title": "v3.1: три света в UE, самоприёмка, игровой импорт",
+      "track": "art",
+      "source": "stage3",
+      "status": "superseded",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/evidence/ART-004/README.md",
+        "docs/art-pipeline/medusa-lookdev-v2.md"
+      ],
+      "next": "Заменено ART-012 (H2LD за флагом S08).",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Не выполнялась: вместо доводки v3.1 запущен проход качества героев H2 (2026-09-29, решение оркестратора по делегированию). Medusa H2LD технически импортирована в /Game/PipelineCandidates/Medusa/H2LD."
+    },
+    {
+      "id": "T4.2",
+      "title": "Контент карт в UE (MI зон, глифы, DirectoriesToAlwaysCook)",
+      "track": "tech",
+      "source": "stage3",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/evidence/ART-005/content-maps-t42-2026-09-29.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-BOARD-COBBLE-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "T4.3",
+      "title": "Реальный ввод (SendInput, DPI-aware) в окне пользователя",
+      "track": "tech",
+      "source": "stage3",
+      "status": "blocked",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29.md"
+      ],
+      "next": "Подготовить раннер SendInput/DPI-aware (в репо его нет) и выполнить при простое пользователя ≥10 мин; до этого кадры с -ArtPreviewFocusZoom помечаются «тестовый флаг».",
+      "blocker": "Нужно окно пользователя (делегирование 2026-09-29: только при простое пользователя).",
+      "assets": [
+        "ASSET-MARKERS-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "T5.1",
+      "title": "Арт 2: длинный packaged K2 ≥240 с",
+      "track": "art",
+      "source": "stage3",
+      "status": "open",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2-measured-2026-09-28.md"
+      ],
+      "next": "Перенесено в волну 5c-B2 (ART-018) — уже с героями v2 и клипами.",
+      "blocker": "5c-B0/5c-B1.",
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "T5.2",
+      "title": "Арт 3 живьём: 3 доски × (K1+K3)",
+      "track": "art",
+      "source": "stage3",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-005/art3-live-3boards-2026-09-29.md",
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md"
+      ],
+      "next": "Повтор с героями v2 — ART-018; FAIL-остатки — ART-015.",
+      "blocker": null,
+      "assets": [
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-MARKERS-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Честные FAIL r2: форма колец 20/54, кейлайн кольца на Cobble <3:1 (16/18), красная зона Cobble сливается в сером; perf загрязнён (GPU p95 96 %)."
+    },
+    {
+      "id": "T5.3",
+      "title": "Подготовка ассетов без кредитов (манекен, 4-видовой gate, бюджеты, риг гуманоидов)",
+      "track": "pipeline",
+      "source": "stage3",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/placeholder-mannequin-report.md",
+        "docs/art-pipeline/imagegen-inputs/CONSISTENCY-REVIEW.md",
+        "docs/art-pipeline/rig/RIG-CONTRACT.md"
+      ],
+      "next": "Манекен в UE и подмена фигурки (QA-012) — при интеграции fallback (GD-053).",
+      "blocker": null,
+      "assets": [
+        "ASSET-PLACEHOLDER-MANNEQUIN"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Риг новых гуманоидов сделан сразу по контракту v2, Harpy — крылья на arm-костях."
+    },
+    {
+      "id": "T6",
+      "title": "Арт 5: K1/K2/K3, QA-009/010, GD-058",
+      "track": "closing",
+      "source": "stage3",
+      "status": "open",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/evidence/GD-058/acceptance-review-2026-09-28.md"
+      ],
+      "next": "Волна 6 (делегирована): после 5c-B2.",
+      "blocker": "5c-B0/B1/B2; целевой ПК D-07 недоступен.",
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-MARKERS-001",
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-DECOR-KIT-001",
+        "ASSET-PROPS-CARDS-001",
+        "ASSET-PLACEHOLDER-MANNEQUIN"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "T7.1",
+      "title": "Пилот: фонарь через Tripo",
+      "track": "pipeline",
+      "source": "stage3",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/prop-lantern-report.md",
+        "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json"
+      ],
+      "next": "UE-этап фонаря (ue-passthrough → static-candidate → /Game/PipelineCandidates) — в ART-009.",
+      "blocker": null,
+      "assets": [
+        "ASSET-DECOR-KIT-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Потрачено 130 кредитов при плане ≤100 (tripo-stage-plan фонаря задавал 130, cap 250). Героев вопреки T7.1 («героев не начинать»; журнал: tripo.stage3Plan.heroesHarpy «ждут решения пользователя») начали ещё 2026-09-28 в 14:32 — серия v1 (HEROES-V1, 610 кредитов) — на основании «можно на полную использовать лимиты для триппо и синтакс» (разрешение пользователя в чате 2026-09-28; credits-ledger.json → tripo.window.limitNote, syntx.window.limitNote; покупки запрещены); фраза «делай все без меня» прозвучала позже (2026-09-29) и относится к H2/H3."
+    },
+    {
+      "id": "T7.2",
+      "title": "Закрытие: реестр, DIRECTORY-MAP, PIPELINE, интеграция, процессы",
+      "track": "closing",
+      "source": "stage3",
+      "status": "open",
+      "art_status": null,
+      "evidence": [
+        "docs/art-pipeline/DIRECTORY-MAP.md",
+        "docs/art-pipeline/PIPELINE.md"
+      ],
+      "next": "Волна 7 после волны 6: реестр/карта/ArtHub, инвентарь процессов по PID, memory.",
+      "blocker": "Волна 6.",
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-MARKERS-001",
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-DECOR-KIT-001",
+        "ASSET-PROPS-CARDS-001",
+        "ASSET-PLACEHOLDER-MANNEQUIN"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "HEROES-V1",
+      "title": "Серия героев v1 (2026-09-28): Arthur, Merlin, Harpy — Tripo H3.1 → Blender UM_FBX_v1 → UE через CLI; видео-референсы SYNTX",
+      "track": "art",
+      "source": "session",
+      "status": "superseded",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/king-arthur-candidate-report.md",
+        "docs/art-pipeline/merlin-candidate-report.md",
+        "docs/art-pipeline/harpy-candidate-report.md",
+        "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-tripo-h31/",
+        "art/pipeline-candidates/ASSET-MERLIN-001/20260928-tripo-h31/",
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-tripo-h31/",
+        "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-blender-um-fbx-v1/",
+        "art/pipeline-candidates/ASSET-MERLIN-001/20260928-blender-um-fbx-v1/",
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-blender-um-fbx-v1/",
+        "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260928-cli-um-fbx-v1/reports/ue-import-report.json",
+        "art/pipeline-candidates/ASSET-MERLIN-001/20260928-cli-um-fbx-v1/reports/ue-import-report.json",
+        "art/pipeline-candidates/ASSET-HARPY-001/20260928-cli-um-fbx-v1/reports/ue-import-report.json",
+        "art/animation-refs/ASSET-KING-ARTHUR-001/",
+        "art/animation-refs/ASSET-MERLIN-001/",
+        "art/animation-refs/ASSET-HARPY-001/",
+        "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json"
+      ],
+      "next": "Заменено проходом качества H2 → H2.1/H2.2 (Arthur, Merlin) и H2 → H3 (Harpy) → H2LD/H3LD на M_UM_Figure_v2.1 (LD-C). Слои v1 /Game/PipelineCandidates/<Hero>/20260928-cli-um-fbx-v1 в реестре пометить как заменённые (ART-017); удалять не нужно.",
+      "blocker": null,
+      "assets": [
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Коммит de252a25 (2026-09-28 17:20): Tripo H3.1 multi-view → сегментация Balanced → Quad-ретопология → Smart UV → текстура 2K + PBR — 610 Studio-кредитов (Arthur 190, Merlin 210, Harpy 210; крупнейший блок журнала, записи окна 2026-09-28 14:32–15:55); Blender-кандидаты UM_FBX_v1 на UM_HUMANOID_17_v1 — «измерено»; видео-референсы SYNTX/Kling героев (с ретейками Medusa) — 133,5 токена. Коммит 6c994bd0 (2026-09-29 05:29, «heroes in UE», T3.3/T3.1): все три импортированы через CLI в /Game/PipelineCandidates/<Hero>/20260928-cli-um-fbx-v1 (18 костей, лицо +X) — «технически импортировано» (это и есть арт-статус задачи). Основание траты — «можно на полную использовать лимиты для триппо и синтакс» (разрешение пользователя в чате 2026-09-28; credits-ledger.json → tripo.window.limitNote, syntx.window.limitNote; покупки запрещены). В плане этапа 3 этого не было: T7.1 запрещал героев, журнал (tripo.stage3Plan.heroesHarpy) числил их «ждут решения пользователя». Видео-референсы v1 позже стали источником ретаргета клипов H2Anim (ANIM-V2)."
+    },
+    {
+      "id": "W4-A",
+      "title": "Рендер DX12/SM6 + Lumen, эталон High, отпечаток RENDER, бенч",
+      "track": "tech",
+      "source": "decisions",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29.md",
+        "docs/art-pipeline/render-reference.json"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Решение пользователя 2026-09-28; риск ACC-022 на High для D-07 высокий."
+    },
+    {
+      "id": "W4-B",
+      "title": "Мастер-материалы M_UM_* и TeamColor на одежде",
+      "track": "art",
+      "source": "decisions",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/evidence/w4b-um-master-2026-09-29/README.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "TeamColor «на всей одежде» заменён решением пользователя «акценты + кольцо» (мастер v2.1, TeamAccent)."
+    },
+    {
+      "id": "W4-C",
+      "title": "HUD: гибрид UMG",
+      "track": "tech",
+      "source": "decisions",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "W4-D",
+      "title": "Контракт рига v2, контракты CUE/HUD, журнал решений",
+      "track": "pipeline",
+      "source": "decisions",
+      "status": "done",
+      "art_status": "предложено",
+      "evidence": [
+        "docs/art-pipeline/evidence/rig-contract-v2-2026-09-29/README.md",
+        "docs/game-design/decisions/2026-09-29-render-ui-user-decisions.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "W5-EDITOR",
+      "title": "Перезапуск редактора на DX12/SM6 + Lumen",
+      "track": "tech",
+      "source": "session",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "docs/art-pipeline/evidence/w5-editor-dx12-2026-09-29.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "W5b-R",
+      "title": "Читаемость доски: кольца команд, UMG-теги, урон, иконка цели, кейлайны зон",
+      "track": "art",
+      "source": "decisions",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md",
+        "docs/game-design/decisions/2026-09-29-board-readability-decisions.md"
+      ],
+      "next": "Остатки — ART-015.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MARKERS-001",
+        "ASSET-BOARD-COBBLE-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "H2",
+      "title": "Проход качества героев H2 (концепты Codex → Tripo по частям → bake high→low)",
+      "track": "art",
+      "source": "session",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/medusa-h2-report.md",
+        "docs/art-pipeline/king-arthur-h2-report.md",
+        "docs/art-pipeline/merlin-h2-report.md",
+        "docs/art-pipeline/harpy-h2-report.md",
+        "art/imagegen/hero-quality-v1/"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Не было в плане этапа 3 (T7.1 запрещал героев без решения пользователя); героев начали раньше, 2026-09-28, серией v1 (HEROES-V1) по разрешению «можно на полную использовать лимиты для триппо и синтакс» (разрешение пользователя в чате 2026-09-28; credits-ledger.json → tripo.window.limitNote, syntx.window.limitNote; покупки запрещены); H2 запущен 2026-09-29 (делегирование «делай все без меня») и заменил v1. Tripo H2: 350 кредитов (Medusa 65, Arthur 95, Merlin 95, Harpy 95)."
+    },
+    {
+      "id": "H2.1-H2.2",
+      "title": "H2.1 металл-маски и полировка; H2.2 сталь Arthur",
+      "track": "art",
+      "source": "session",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/king-arthur-h2-report.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "H2.1 дал светлую «хромовую» сталь Arthur (ошибка промпта), H2.2 ред. 2 вернул воронёную сталь; финальная сталь — пресет библиотеки steel_blued."
+    },
+    {
+      "id": "H3-HARPY",
+      "title": "Harpy H3: повторная генерация Tripo (одно лицо, перья затылка)",
+      "track": "art",
+      "source": "session",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/harpy-h3-report.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Tripo 95 кредитов (bca735a3)."
+    },
+    {
+      "id": "MATLIB",
+      "title": "Библиотека материалов v1 из CC0 ambientCG",
+      "track": "art",
+      "source": "session",
+      "status": "done",
+      "art_status": "предложено",
+      "evidence": [
+        "docs/art-pipeline/material-library/README.md",
+        "docs/art-pipeline/material-library/um-material-presets-v1.json",
+        "docs/art-pipeline/material-library/sources.json"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "LD-A",
+      "title": "Look-dev A: мастер M_UM_Figure_v2, Merlin и Medusa H2LD в UE",
+      "track": "art",
+      "source": "decisions",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/decisions/2026-09-29-lookdev-v2-decisions.md",
+        "docs/art-pipeline/merlin-lookdev-v2.md",
+        "docs/art-pipeline/medusa-lookdev-v2.md",
+        "docs/art-pipeline/material-library/m-um-figure-v2.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-MERLIN-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "LD-B",
+      "title": "Look-dev B: Arthur и Harpy на библиотеке v1 + маски TeamAccent (Blender)",
+      "track": "art",
+      "source": "session",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/king-arthur-lookdev-v2.md",
+        "docs/art-pipeline/harpy-lookdev-v2.md",
+        "docs/art-pipeline/material-library/team-accent.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "ACC-MASK-MM",
+      "title": "Маски TeamAccent Merlin и Medusa",
+      "track": "art",
+      "source": "session",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/material-library/team-accent.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-MERLIN-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "ANIM-V2",
+      "title": "Библиотека клипов rig v2 H2Anim (16 клипов)",
+      "track": "art",
+      "source": "decisions",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/animation-library/clip-manifest.json",
+        "docs/art-pipeline/animation-library/validation-h2anim/",
+        "docs/game-design/decisions/2026-09-29-anim-v2-decisions.md",
+        "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/",
+        "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/",
+        "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2anim/",
+        "art/pipeline-candidates/ASSET-HARPY-001/20260929-h2anim/"
+      ],
+      "next": "Проигрывание в S08 — ART-013.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Честные WARN: limb_body_R Arthur Lunge/Death, skin_stretch у 11 клипов, подол ниже верха подставки 0,72–0,76 % роста."
+    },
+    {
+      "id": "MASTER-V21",
+      "title": "Мастер M_UM_Figure_v2.1: переключатель UseTeamAccent",
+      "track": "art",
+      "source": "decisions",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/material-library/m-um-figure-v2.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "LD-C",
+      "title": "Look-dev C в UE: все четыре героя на v2.1, TeamAccent, канонические скелеты",
+      "track": "art",
+      "source": "session",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/medusa-lookdev-v2.md",
+        "docs/art-pipeline/merlin-lookdev-v2.md",
+        "docs/art-pipeline/king-arthur-lookdev-v2.md",
+        "docs/art-pipeline/harpy-lookdev-v2.md",
+        "art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/",
+        "art/pipeline-candidates/ASSET-MERLIN-001/20260930-h2ld-ldc-ue/",
+        "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2ld-ue/",
+        "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/"
+      ],
+      "next": "Остатки: маска акцента Arthur и насыщенность (ART-016), свет фигур (ART-014), реестр (ART-017).",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Кадры — editor-mcp-viewport без отпечатка RENDER: это не K1–K3."
+    },
+    {
+      "id": "5c-A",
+      "title": "H2.1 Arthur и Merlin в UE через CLI skeletal-adopt",
+      "track": "pipeline",
+      "source": "session",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/evidence/w5c-arthur-h2-ue-2026-09-29/",
+        "docs/art-pipeline/evidence/w5c-merlin-h2-ue-2026-09-29/",
+        "docs/art-pipeline/king-arthur-h2-ue-import.md",
+        "docs/art-pipeline/merlin-h2-ue-import.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "ART-003",
+      "title": "Силуэты и габариты четырёх типов фигурок (бэклог)",
+      "track": "art",
+      "source": "backlog",
+      "status": "in_progress",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/evidence/ART-003/README.md"
+      ],
+      "next": "Авторский просмотр силуэтов на героях v2 в волне 6; блок-ауты ART003 в игре заменяются флагом ART-012.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "ART-004",
+      "title": "Эталон Medusa с лёгким ригом (бэклог)",
+      "track": "art",
+      "source": "backlog",
+      "status": "in_progress",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/evidence/ART-004/README.md",
+        "docs/art-pipeline/medusa-lookdev-v2.md"
+      ],
+      "next": "ART-012/013 → ART-018 → волна 6.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "ART-005",
+      "title": "Эталонный участок Cobble City (бэклог)",
+      "track": "art",
+      "source": "backlog",
+      "status": "in_progress",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-005/README.md",
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md"
+      ],
+      "next": "ART-014/015 → ART-018 → волна 6.",
+      "blocker": null,
+      "assets": [
+        "ASSET-BOARD-COBBLE-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "ART-006",
+      "title": "Arthur по принятому эталону (бэклог)",
+      "track": "art",
+      "source": "backlog",
+      "status": "in_progress",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/king-arthur-lookdev-v2.md",
+        "docs/art-pipeline/king-arthur-h2-report.md"
+      ],
+      "next": "ART-016 (маска акцента, пояс), ART-012/013, приёмка после GD-058.",
+      "blocker": "Формально зависит от GD-058 (не принят).",
+      "assets": [
+        "ASSET-KING-ARTHUR-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Начато до GD-058: серия v1 2026-09-28 (HEROES-V1, по разрешению пользователя 2026-09-28 тратить лимиты Tripo/SYNTX), затем H2/H2.1 и look-dev по делегированию 2026-09-29; в бэклоге статус planned → in_progress."
+    },
+    {
+      "id": "ART-007",
+      "title": "Merlin по принятому эталону (бэклог)",
+      "track": "art",
+      "source": "backlog",
+      "status": "in_progress",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/merlin-lookdev-v2.md",
+        "docs/art-pipeline/merlin-h2-report.md"
+      ],
+      "next": "ART-016 (кожа), ART-012/013, приёмка после GD-058.",
+      "blocker": "Формально зависит от GD-058 (не принят).",
+      "assets": [
+        "ASSET-MERLIN-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Начато до GD-058: серия v1 2026-09-28 (HEROES-V1), затем H2 и look-dev по делегированию 2026-09-29."
+    },
+    {
+      "id": "ART-008",
+      "title": "Одна Harpy для трёх экземпляров (бэклог)",
+      "track": "art",
+      "source": "backlog",
+      "status": "in_progress",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/harpy-lookdev-v2.md",
+        "docs/art-pipeline/harpy-h3-report.md"
+      ],
+      "next": "ART-016 (тёмные первичные), ART-012/013; носитель номера экземпляра (AD-OPEN-06).",
+      "blocker": "Формально зависит от GD-058; AD-OPEN-06.",
+      "assets": [
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Начато до GD-058: серия v1 2026-09-28 (HEROES-V1), затем H2 → H3 и look-dev по делегированию 2026-09-29; метки экземпляров на подставке измерены (analyse_instances ALL)."
+    },
+    {
+      "id": "ART-009",
+      "title": "Доска, основание и ограниченный декор (бэклог)",
+      "track": "art",
+      "source": "backlog",
+      "status": "in_progress",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/prop-barrel-report.md",
+        "docs/art-pipeline/prop-lantern-report.md",
+        "docs/art-pipeline/facades-report.md",
+        "docs/art-pipeline/crate-report.md",
+        "docs/art-pipeline/table-base-report.md",
+        "docs/game-design/evidence/ART-005/corner-bracket-review-2026-09-28.md"
+      ],
+      "next": "Основание-поднос: платный шаг Tripo (tripo_requests); фонарь/фасады/ящик — UE-импорт через CLI static-candidate.",
+      "blocker": "Основание заблокировано перед платным шагом Tripo (выполняет оркестратор).",
+      "assets": [
+        "ASSET-DECOR-KIT-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-BOARD-COBBLE-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "ART-010",
+      "title": "VFX и минимальный звук для 18 CUE (бэклог)",
+      "track": "art",
+      "source": "backlog",
+      "status": "open",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/07-animation-vfx-audio.csv"
+      ],
+      "next": "После GD-058.",
+      "blocker": "GD-058.",
+      "assets": [],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "ART-011",
+      "title": "UI-семейства в нужных состояниях (бэклог)",
+      "track": "art",
+      "source": "backlog",
+      "status": "open",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/evidence/ART-004/hud-umg-w4c-2026-09-29.md"
+      ],
+      "next": "После GD-058; гибрид UMG уже даёт каркас виджетов.",
+      "blocker": "GD-058.",
+      "assets": [],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "ART-012",
+      "title": "Герои v2 в игре за флагом S08 (+X, масштаб, cook)",
+      "track": "tech",
+      "source": "session",
+      "status": "in_progress",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/decisions/2026-09-29-anim-v2-decisions.md",
+        "docs/art-pipeline/rig/RIG-CONTRACT.md"
+      ],
+      "next": "Завершить 5c-B0 (код в рабочем дереве: S08HeroesV2.*, S08FighterActor.*, S08BoardActor.*, DefaultGame.ini — не закоммичен), сборка editor+game, автотесты.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Новая задача: в S08 не было ни проигрывания анимаций, ни героев v2 — только Medusa v2 и блок-ауты ART003."
+    },
+    {
+      "id": "ART-013",
+      "title": "Проигрывание клипов H2Anim в S08",
+      "track": "tech",
+      "source": "session",
+      "status": "in_progress",
+      "art_status": null,
+      "evidence": [
+        "docs/art-pipeline/animation-library/clip-manifest.json"
+      ],
+      "next": "Idle / LungeAttack на атаке / HitReact на уроне / DeathSettle на смерти по seq; проверка в 5c-B2.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Новая задача."
+    },
+    {
+      "id": "ART-014",
+      "title": "Свет доски для фигур (калибровка экспозиции зон фигур)",
+      "track": "art",
+      "source": "session",
+      "status": "in_progress",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/medusa-lookdev-v2.md",
+        "docs/game-design/decisions/2026-09-29-lookdev-v2-decisions.md"
+      ],
+      "next": "План значений света (5c-B0, трек plan) → применение в UE (5c-B1) → кадры с RENDER.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-BOARD-COBBLE-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Новая задача из look-dev A/C: при EV100 1,3 и небе 11,2 кожа/вышивка/платье уходят в плечо тонмаппера, металлы клипуются; проходят при −1,0 EV."
+    },
+    {
+      "id": "ART-015",
+      "title": "Остатки 5b-R и замена MI_Medusa_P1/P2",
+      "track": "art",
+      "source": "session",
+      "status": "in_progress",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md",
+        "docs/art-pipeline/evidence/s3-baseline-2026-09-28/production-baseline.json"
+      ],
+      "next": "Причины и правки инструментов (5c-B0 plan) → UE (5c-B1) → пересъёмка (5c-B2).",
+      "blocker": null,
+      "assets": [
+        "ASSET-MARKERS-001",
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-MEDUSA-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Новая задача: кейлайн кольца на Cobble <3:1, красная зона Cobble сливается в сером, классификатор формы 20/54, MI_Medusa_P1/P2 (пастельная ткань, D-2) противоречат решению «акценты + кольцо»."
+    },
+    {
+      "id": "ART-016",
+      "title": "Маска акцента Arthur (мипы) и насыщенность зон героев",
+      "track": "art",
+      "source": "session",
+      "status": "in_progress",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/art-pipeline/king-arthur-lookdev-v2.md",
+        "docs/art-pipeline/harpy-lookdev-v2.md",
+        "docs/art-pipeline/merlin-lookdev-v2.md",
+        "docs/art-pipeline/material-library/team-accent.md"
+      ],
+      "next": "Blender-правка (5c-B0, трек blender) → переимпорт текстур в UE (5c-B1) → замер против концепта.",
+      "blocker": null,
+      "assets": [
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-HARPY-001",
+        "ASSET-MERLIN-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Новая задача: полоса 14 мм TeamAccent Arthur через мипы красит всю кайму плаща; пояс Arthur +0,18 и тёмные первичные Harpy +0,16 по насыщенности; кожа Merlin."
+    },
+    {
+      "id": "ART-017",
+      "title": "Реестр: слои H2LD/H3LD, Rig, H2Anim, мастер v2.1",
+      "track": "pipeline",
+      "source": "session",
+      "status": "in_progress",
+      "art_status": null,
+      "evidence": [
+        "docs/art-pipeline/asset-registry.json",
+        "tools/tripo-pipeline/validate_registry.py"
+      ],
+      "next": "Трек registry этой сессии; после 5c-B1 — пересчёт sha текстур Arthur/Harpy/Merlin.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Новая задача (п. 1 цели сессии)."
+    },
+    {
+      "id": "ART-018",
+      "title": "Длинный packaged K2 и пересъёмка трёх досок с героями v2",
+      "track": "art",
+      "source": "session",
+      "status": "open",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md"
+      ],
+      "next": "Волна 5c-B2: run-combat-demo ≥240 с до FINISHED на High, K2 1,6×/2,5×/3,5×/5×, K1/K3 трёх досок, perf пары по 30 FPS.",
+      "blocker": "ART-012…016.",
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-BOARD-COBBLE-001"
+      ],
+      "updated": "2026-09-30T07:15:00Z",
+      "note": "Новая задача: бывший T5.1 + повтор T5.2 с героями v2."
+    },
+    {
+      "id": "GD-058",
+      "title": "Ранний визуальный эталон перед серией (gate)",
+      "track": "closing",
+      "source": "backlog",
+      "status": "open",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/evidence/GD-058/acceptance-review-2026-09-28.md"
+      ],
+      "next": "Акт в волне 6: «визуально принято / perf-gate открыт» или «не принято».",
+      "blocker": "Волны 5c-B; ACC-022 на D-07 не измерить без целевого ПК.",
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-MARKERS-001",
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-DECOR-KIT-001",
+        "ASSET-PROPS-CARDS-001",
+        "ASSET-PLACEHOLDER-MANNEQUIN"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "ART-HUB",
+      "title": "Актуализация страницы ArtHub (админка :5480)",
+      "track": "closing",
+      "source": "session",
+      "status": "in_progress",
+      "art_status": null,
+      "evidence": [
+        "admin/art-hub/README.md",
+        "admin/art-hub/aggregate.ts"
+      ],
+      "next": "Трек hub этой сессии: разделы плана (plan-status.json), look-dev, библиотека материалов, слои UE, решения.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-MARKERS-001",
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-DECOR-KIT-001",
+        "ASSET-PROPS-CARDS-001",
+        "ASSET-PLACEHOLDER-MANNEQUIN"
+      ],
+      "updated": "2026-09-30T07:15:00Z"
+    },
+    {
+      "id": "PLAN-SYNC",
+      "title": "Сверка плана реализации с фактом (эта задача)",
+      "track": "closing",
+      "source": "session",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "docs/art-pipeline/plan-status.json",
+        "docs/art-pipeline/PLAN-STATUS.md"
+      ],
+      "next": "Обновлять при каждой интеграции волны.",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-09-30T07:15:00Z"
+    }
+  ],
+  "waves": [
+    {
+      "id": "W0",
+      "title": "Gate старта",
+      "status": "done",
+      "tasks": [
+        "T0"
+      ]
+    },
+    {
+      "id": "W1",
+      "title": "Де-риск packaged, v3.1 в Blender, инструменты QA-010",
+      "status": "done",
+      "tasks": [
+        "T1.1",
+        "T1.2",
+        "T1.3"
+      ]
+    },
+    {
+      "id": "W2",
+      "title": "P1 в живой UE; код HUD/ввода",
+      "status": "done",
+      "tasks": [
+        "T2.1",
+        "T2.2"
+      ]
+    },
+    {
+      "id": "W3",
+      "title": "Контрольная сцена; данные и код карт",
+      "status": "done",
+      "tasks": [
+        "T3.1",
+        "T3.2"
+      ]
+    },
+    {
+      "id": "W4",
+      "title": "U-линия: v3.1 в UE, контент карт, реальный ввод",
+      "status": "in_progress",
+      "tasks": [
+        "T4.1",
+        "T4.2",
+        "T4.3"
+      ]
+    },
+    {
+      "id": "HEROES-V1",
+      "title": "Серия героев v1 (2026-09-28, вне плана): Tripo H3.1 → Blender → UE; заменена H2",
+      "status": "superseded",
+      "tasks": [
+        "HEROES-V1"
+      ]
+    },
+    {
+      "id": "W4x",
+      "title": "Волна 4 фактическая: рендер, мастера, UMG, риг v2",
+      "status": "done",
+      "tasks": [
+        "W4-A",
+        "W4-B",
+        "W4-C",
+        "W4-D"
+      ]
+    },
+    {
+      "id": "W5",
+      "title": "P-линия: длинный K2, 3 доски, подготовка ассетов",
+      "status": "in_progress",
+      "tasks": [
+        "T5.1",
+        "T5.2",
+        "T5.3"
+      ]
+    },
+    {
+      "id": "5a",
+      "title": "Волна 5a: редактор DX12, контент карт, 3 доски live",
+      "status": "done",
+      "tasks": [
+        "W5-EDITOR",
+        "T4.2",
+        "T5.2"
+      ]
+    },
+    {
+      "id": "5b-R",
+      "title": "Читаемость доски",
+      "status": "done",
+      "tasks": [
+        "W5b-R"
+      ]
+    },
+    {
+      "id": "H2",
+      "title": "Качество героев H2/H2.1/H2.2/H3",
+      "status": "done",
+      "tasks": [
+        "H2",
+        "H2.1-H2.2",
+        "H3-HARPY"
+      ]
+    },
+    {
+      "id": "LD",
+      "title": "Look-dev v2: библиотека, A, B, маски, мастер v2.1, C",
+      "status": "done",
+      "tasks": [
+        "MATLIB",
+        "LD-A",
+        "LD-B",
+        "ACC-MASK-MM",
+        "MASTER-V21",
+        "LD-C"
+      ]
+    },
+    {
+      "id": "ANIM",
+      "title": "Библиотека клипов rig v2",
+      "status": "done",
+      "tasks": [
+        "ANIM-V2"
+      ]
+    },
+    {
+      "id": "5c-A",
+      "title": "Arthur и Merlin H2.1 в UE",
+      "status": "done",
+      "tasks": [
+        "5c-A"
+      ]
+    },
+    {
+      "id": "5c-B0",
+      "title": "Код героев v2 и клипов в S08, Blender-правки акцентов, план света и остатков 5b-R; сессия: план/реестр/ArtHub",
+      "status": "in_progress",
+      "tasks": [
+        "ART-012",
+        "ART-013",
+        "ART-016",
+        "ART-014",
+        "ART-015",
+        "ART-017",
+        "ART-HUB",
+        "PLAN-SYNC"
+      ]
+    },
+    {
+      "id": "5c-B1",
+      "title": "UE: переимпорт текстур, свет доски, остатки 5b-R, MI Medusa, sha реестра",
+      "status": "open",
+      "tasks": [
+        "ART-014",
+        "ART-015",
+        "ART-016",
+        "ART-017",
+        "ART-009"
+      ]
+    },
+    {
+      "id": "5c-B2",
+      "title": "Packaged: пересъёмка 3 досок с героями v2, длинный K2 ≥240 с на High",
+      "status": "open",
+      "tasks": [
+        "ART-018",
+        "T5.1",
+        "ART-2"
+      ]
+    },
+    {
+      "id": "W6",
+      "title": "Приёмка: K1–K3, QA-009/010, GD-058 (делегировано)",
+      "status": "open",
+      "tasks": [
+        "T6",
+        "ART-5",
+        "GD-058",
+        "T4.3",
+        "GEN-REQ"
+      ]
+    },
+    {
+      "id": "W7",
+      "title": "Закрытие: реестр, карта каталогов, ArtHub, процессы, memory",
+      "status": "open",
+      "tasks": [
+        "T7.2",
+        "T7.1"
+      ]
+    }
+  ],
+  "mvp_assets": [
+    {
+      "asset": "ASSET-MEDUSA-001",
+      "scope": "герой + лук (weapon.L, 5 000 tris в SK) + корона/колчан в теле",
+      "candidate": "/Game/PipelineCandidates/Medusa/H2LD",
+      "art_status": "технически импортировано",
+      "gap": "в игре ещё v2; золото и кожа в свете доски (ART-014)",
+      "action": "ART-012/013/014",
+      "tripo": false
+    },
+    {
+      "asset": "ASSET-KING-ARTHUR-001",
+      "scope": "герой + Excalibur (2 215 tris, weapon.R) + корона/плащ",
+      "candidate": "/Game/PipelineCandidates/KingArthur/H2LD",
+      "art_status": "технически импортировано",
+      "gap": "маска акцента через мипы, пояс; акцент спереди 2,8 % пикселей",
+      "action": "ART-016",
+      "tripo": false
+    },
+    {
+      "asset": "ASSET-MERLIN-001",
+      "scope": "помощник + посох с кристаллом",
+      "candidate": "/Game/PipelineCandidates/Merlin/H2LD",
+      "art_status": "технически импортировано",
+      "gap": "кожа (насыщенность)",
+      "action": "ART-016",
+      "tripo": false
+    },
+    {
+      "asset": "ASSET-HARPY-001",
+      "scope": "один тип × 3 экземпляра, крылья, браслет, метки экземпляров",
+      "candidate": "/Game/PipelineCandidates/Harpy/H3LD",
+      "art_status": "технически импортировано",
+      "gap": "тёмные первичные +0,16; носитель номера AD-OPEN-06; швы в деформации",
+      "action": "ART-016, ART-008",
+      "tripo": false
+    },
+    {
+      "asset": "ASSET-MARKERS-001",
+      "scope": "подставки P1/P2, кольца выбора/цели, кольца команды",
+      "candidate": "blender/ASSET-MARKERS-001 + TeamRing 5b-R",
+      "art_status": "технически импортировано",
+      "gap": "кейлайн <3:1 на Cobble, классификатор 20/54; дубль подставок (у героев свои SM_<Hero>_Base)",
+      "action": "ART-015",
+      "tripo": false
+    },
+    {
+      "asset": "ASSET-BOARD-COBBLE-001",
+      "scope": "доска 5×6 + угловые накладки (модульные элементы)",
+      "candidate": "blender/ASSET-BOARD-COBBLE-001",
+      "art_status": "технически импортировано",
+      "gap": "полный PBR камня/дерева; финальный габарит AD-OPEN-36; красная зона в сером",
+      "action": "ART-005/015",
+      "tripo": false
+    },
+    {
+      "asset": "ASSET-TABLE-BASE-001",
+      "scope": "основание-поднос диорамы",
+      "candidate": "нет меша (есть блок-аут S05 и входы Tripo)",
+      "art_status": "предложено",
+      "gap": "единственный обязательный 3D-ассет без кандидата",
+      "action": "tripo_requests[0]",
+      "tripo": true
+    },
+    {
+      "asset": "ASSET-DECOR-KIT-001.BARREL",
+      "scope": "бочка",
+      "candidate": "/Game/PipelineCandidates/DecorBarrel",
+      "art_status": "технически импортировано",
+      "gap": "утоплена в раму в P1.7 (расстановка, не модель)",
+      "action": "ART-009",
+      "tripo": false
+    },
+    {
+      "asset": "ASSET-DECOR-KIT-001.LANTERN",
+      "scope": "фонарь",
+      "candidate": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-lantern-tripo-h31",
+      "art_status": "измерено",
+      "gap": "нет UE-импорта",
+      "action": "ART-009 (CLI static-candidate)",
+      "tripo": false
+    },
+    {
+      "asset": "ASSET-DECOR-KIT-001.FACADES",
+      "scope": "фасады A/B/C (плоские кулисы)",
+      "candidate": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1",
+      "art_status": "измерено",
+      "gap": "нет UE-импорта; норма 04 — плоские кулисы, Tripo не нужен",
+      "action": "ART-009",
+      "tripo": false
+    },
+    {
+      "asset": "ASSET-DECOR-KIT-001.CRATE",
+      "scope": "ящик",
+      "candidate": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1",
+      "art_status": "измерено",
+      "gap": "нет UE-импорта",
+      "action": "ART-009",
+      "tripo": false
+    },
+    {
+      "asset": "ASSET-PROPS-CARDS-001",
+      "scope": "физические карты CardFace/CardBack",
+      "candidate": "нет (плоскости)",
+      "art_status": "предложено",
+      "gap": "ждёт HUD 02 и синка cardArt (AD-OPEN-28)",
+      "action": "ART-009 после GD-058",
+      "tripo": false
+    },
+    {
+      "asset": "ASSET-PLACEHOLDER-MANNEQUIN",
+      "scope": "серый fallback",
+      "candidate": "art/pipeline-candidates/ASSET-PLACEHOLDER-MANNEQUIN/20260928-blender-um-fbx-v1",
+      "art_status": "измерено",
+      "gap": "нет UE-импорта и подмены (QA-012)",
+      "action": "GD-053",
+      "tripo": false
+    }
+  ],
+  "tripo_requests": [
+    {
+      "id": "TR-1",
+      "asset": "ASSET-TABLE-BASE-001",
+      "why": "Единственный обязательный 3D-ассет MVP без меша: основание-поднос входит в ART-009 и в таблицу QA-010 («поднос»); все бесплатные шаги и Blender-этап подготовлены, заблокирован только платный шаг.",
+      "inputs": [
+        "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-front-rock-white.png",
+        "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-left-rock-white.png"
+      ],
+      "fallback_inputs": [
+        "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-front-full-white.png",
+        "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/table-base-v3-left-full-white.png"
+      ],
+      "mode": "Изображение → несколько видов (front + left; back/right пусто), H3.1, «Приватный», Triangle, без «по частям» и без 8K; затем Quad-ретопология ≈7 000 граней, Smart UV, текстура 2K (удалить освещение), PBR",
+      "expected_credits": 130,
+      "cap_credits": 250,
+      "cost_basis": "журнал credits-ledger.json: multi-view H3.1 55 + ретопология 40 + Smart UV 20 + текстура 2K 10 + PBR 5 = 130 (как фонарь 26bb832e); повтор с full-white только при срезанной кромке → ≤185",
+      "runbook": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/tripo-stage-plan.json",
+      "after": "Blender-этап одной командой (reports/blender-stage-plan.json): срез верха на Z=−3, XY 756×656 uu, экспорт SM_TableBase 2K; UE через CLI static-candidate."
+    }
+  ]
+}

@@ -10,8 +10,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-/** Whitelisted roots (repo-relative, POSIX). Keep in sync with README.md. */
-export const ALLOWED_PREFIXES = ['art/', 'docs/art-pipeline/', 'docs/game-design/evidence/'] as const;
+/**
+ * Whitelisted roots (repo-relative, POSIX). Keep in sync with README.md.
+ * `docs/game-design/decisions/` — decision logs (markdown only, see ALLOWED_EXT_BY_PREFIX).
+ */
+export const ALLOWED_PREFIXES = ['art/', 'docs/art-pipeline/', 'docs/game-design/evidence/', 'docs/game-design/decisions/'] as const;
+
+/** Prefixes that serve only the listed extensions (everything else under them → 403). */
+const ALLOWED_EXT_BY_PREFIX: Record<string, RegExp> = {
+  'docs/game-design/decisions/': /\.md$/i,
+};
 
 /** blender/<ASSET>/<subdir>/… — only these subdirectories of blender asset folders are served. */
 export const ALLOWED_BLENDER_SUBDIRS = ['preview', 'export', 'textures', 'variants', 'tripo-source'] as const;
@@ -52,7 +60,8 @@ export function normalizeRelPath(input: unknown): string | null {
 export function isAllowedRelPath(rel: string): boolean {
   const p = normalizeRelPath(rel);
   if (p === null) return false;
-  if (ALLOWED_PREFIXES.some((prefix) => p.startsWith(prefix) && p.length > prefix.length)) return true;
+  const prefix = ALLOWED_PREFIXES.find((pre) => p.startsWith(pre) && p.length > pre.length);
+  if (prefix) return ALLOWED_EXT_BY_PREFIX[prefix]?.test(p) ?? true;
   return BLENDER_RE.test(p);
 }
 

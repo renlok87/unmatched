@@ -14,6 +14,7 @@
  *   docs/art-pipeline/*-report.{md,json}, docs/game-design/evidence/ART-* acts
  *   blender/<ASSET>/{preview,export,textures,variants,tripo-source}
  *   docs/game-design/07-animation-vfx-audio.csv         — planned sound cues
+ * Overview sections (plan, look-dev, material library, decisions, UE layers): see overview.ts.
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -35,6 +36,19 @@ import {
   walkFiles,
   type WalkEntry,
 } from './fs-utils';
+import {
+  OVERVIEW_SOURCES,
+  buildDecisions,
+  buildLookdev,
+  buildMaterials,
+  buildMentionIndex,
+  buildPlan,
+  buildUeLayers,
+  latestLayerOf,
+  newestDate,
+  ueTreeFingerprint,
+  type OverviewHelpers,
+} from './overview';
 import { isAllowedRelPath } from './path-guard';
 import type {
   ActView,
@@ -496,6 +510,7 @@ function newPage(id: string, kind: AssetPage['kind'], e?: RegEntry): AssetPage {
     videoToMotion: null,
     sounds: null,
     credits: emptyCredits(),
+    ueLayers: null,
   };
 }
 
@@ -617,6 +632,8 @@ export class ArtHubAggregator {
     for (const s of sounds) fp.update(`S${s}\n`);
     const cueSt = this.cache.stat(path.join(this.repoRoot, ...SOURCES.cueTable.split('/')));
     fp.update(`C${cueSt.mtimeMs ?? 0}:${cueSt.bytes ?? 0}`);
+    // UE layer folders are only stat-ed (not walked): two levels of directory mtimes
+    fp.update(`U${ueTreeFingerprint(this.repoRoot)}`);
     const fingerprint = fp.digest('hex');
     if (this.last && this.last.fingerprint === fingerprint) {
       return { ...this.last.data, checkedAt: new Date().toISOString() } as ArtHubData;
@@ -634,6 +651,7 @@ export class ArtHubAggregator {
     for (const d of listDirs(root, SOURCES.evidence)) {
       if (/^(ART|GD)-/.test(d)) out.push(...walkFiles(root, `${SOURCES.evidence}/${d}`));
     }
+    out.push(...walkFiles(root, OVERVIEW_SOURCES.decisions).filter((f) => /\.md$/i.test(f.rel)));
     for (const asset of listDirs(root, 'blender')) {
       for (const sub of BLENDER_SUBDIRS) out.push(...walkFiles(root, `blender/${asset}/${sub}`));
     }
@@ -956,6 +974,18 @@ function build(
   // ---- sound cue table
   const cueRows = cueCsv ? csvToObjects(cueCsv) : [];
 
+  // ---- overview helpers (plan, look-dev, materials, decisions, UE layers)
+  const overviewHelpers: OverviewHelpers = {
+    root: repoRoot,
+    cache,
+    watched,
+    warnings: ctx.warnings,
+    vocabNames,
+    makeRef: (p, o) => makeRef(ctx, p, o ?? {}),
+    readJson: (rel) => readJson(ctx, rel),
+  };
+  const mentionIndex = buildMentionIndex(overviewHelpers);
+
   // ---- per page sections
   for (const b of builds.values()) {
     const page = b.page;
@@ -1041,6 +1071,17 @@ function build(
       page.sounds = buildSounds(ctx, b, soundFiles, cueRows);
     }
     page.credits = buildPageCredits(b, ledgerEntries, attributed);
+    page.latestLayer = latestLayerOf(page.layers, page.id, page.status);
+    if (page.kind === 'character' && page.inRegistry) {
+      page.ueLayers = buildUeLayers(overviewHelpers, {
+        assetId: page.id,
+        shortName: page.shortName,
+        entriesRaw: b.entries.map((e) => e.raw),
+        layers: page.layers,
+        clips,
+        mentions: mentionIndex,
+      });
+    }
     discoverNotes(b);
     const mt = Math.max(0, ...b.files.map((f) => f.mtimeMs), ...b.runs.map((r) => (r.lastModified ? Date.parse(r.lastModified) : 0)));
     if (mt > 0) page.lastModified = isoTime(mt);
@@ -1064,6 +1105,17 @@ function build(
     vocab,
   });
 
+  const plan = buildPlan(overviewHelpers);
+  trackSource(ctx, OVERVIEW_SOURCES.planStatus, plan.exists ? plan.error : 'нет файла (трек plan ещё не записал)');
+  const materials = buildMaterials(overviewHelpers);
+  trackSource(ctx, OVERVIEW_SOURCES.materialPresets, materials.presets ? undefined : 'нет или не разобран');
+  trackSource(ctx, OVERVIEW_SOURCES.materialSources, materials.sources ? undefined : 'нет или не разобран');
+  const lookdev = buildLookdev(
+    overviewHelpers,
+    characters.filter((c) => c.inRegistry).map((c) => ({ id: c.id, shortName: c.shortName })),
+  );
+  const decisions = buildDecisions(overviewHelpers);
+
   return {
     schema: 'unmatched.art-hub/1',
     generatedAt: new Date().toISOString(),
@@ -1075,6 +1127,10 @@ function build(
     props,
     credits,
     pipelineHealth: health,
+    plan,
+    lookdev,
+    materials,
+    decisions,
     warnings: ctx.warnings,
   };
 }
@@ -2003,6 +2059,14 @@ function buildHealth(
     registry: {
       file: makeRef(ctx, SOURCES.registry, { role: 'реестр ассетов' }),
       snapshotDate: asStr(a.registry?.snapshotDate),
+      fileMtime: isoTime(ctx.cache.stat(absOf(ctx, SOURCES.registry)).mtimeMs),
+      latestLayerDate: newestDate(
+        a.entries.flatMap((e) =>
+          asArr(e.raw.layers)
+            .filter(isObj)
+            .flatMap((l) => [asStr(l.layer), ...asArr(l.paths).map((p) => asStr(asObj(p).path))]),
+        ),
+      ),
       total: a.entries.length,
       byStatus: [...byStatus.entries()]
         .map(([status, count]) => ({ status, count }))
