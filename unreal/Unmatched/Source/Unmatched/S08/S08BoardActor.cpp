@@ -129,6 +129,8 @@ void AS08BoardActor::BeginPlay() {
   if (!FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) return;
   // Wave 5c-B: the diorama tray only with -ArtPreviewDiorama (hidden until an art profile is active).
   EnsureDioramaTray(true);
+  // ENV-MAPS track C: the environment around map-image boards (same flags; nothing is created here).
+  EnsureEnvLayout(true);
 
   // T3.2 board data: zone palette/glyphs per key, light profiles, board
   // profiles. Without valid data no board gets art (grey board, traced).
@@ -807,6 +809,8 @@ void AS08BoardActor::PlaceDioramaTray(bool bVisible, const FVector2D& BoardHalf,
 }
 
 void AS08BoardActor::UpdateDioramaTray(const FS08BoardModel& Board) {
+  // ENV-MAPS track C: the environment first (it does not need the tray mesh; its layout may carry the tray extents).
+  UpdateEnvLayout();
   if (!DioramaTray) return;
   if (!bArtActive) {
     PlaceDioramaTray(false, FVector2D::ZeroVector, TEXT("grey"));
@@ -816,8 +820,13 @@ void AS08BoardActor::UpdateDioramaTray(const FS08BoardModel& Board) {
     // ENV-O8 T1 placeholder (explicit waiver, S08Diorama.h): the Cobble-sized SM_TableBase is stretched
     // non-uniformly (~1.37 x 1.11) around the map + wooden frame until the T2 modular skirt replaces it. The
     // <= 5 % non-uniformity rule of the tray is waived for this placeholder only, and the trace line says so.
-    PlaceDioramaTray(true, ActiveProfile.Map.FrameHalfUU(), S08BoardSurfaceName(ES08BoardSurface::MapImage),
-                     ActiveProfile.Map.TrayOffsetUU, S08MapSurfaceSpec::TrayWaiver);
+    // ENV-MAPS track C: an applied env layout with a tray / apron that covers the frame sets the outer tray instead
+    // (S08EnvLayout::ApplyTray, traced 'ARTPREVIEW envlayout tray'); still the same placeholder mesh and waiver.
+    FVector2D TrayHalf = ActiveProfile.Map.FrameHalfUU();
+    FVector2D TrayOffset = ActiveProfile.Map.TrayOffsetUU;
+    S08EnvLayout::ApplyTray(EnvRuntime, ActiveProfile.Map.FrameHalfUU(), TrayHalf, TrayOffset);
+    PlaceDioramaTray(true, TrayHalf, S08BoardSurfaceName(ES08BoardSurface::MapImage), TrayOffset,
+                     S08MapSurfaceSpec::TrayWaiver);
     return;
   }
   FVector2D Half = S08Diorama::TilesFrameHalf(Board.Width, Board.Height, FS08BoardModel::CellSizeUU, ArtFrameUU);
@@ -827,6 +836,29 @@ void AS08BoardActor::UpdateDioramaTray(const FS08BoardModel& Board) {
     Half = FVector2D(FMath::Max(-B.Min.X, B.Max.X), FMath::Max(-B.Min.Y, B.Max.Y));
   }
   PlaceDioramaTray(true, Half, S08BoardSurfaceName(ActiveProfile.Surface));
+}
+
+bool AS08BoardActor::EnsureEnvLayout(bool bArtPreview) {
+  bEnvLayoutEnabled = S08EnvLayout::Arm(bArtPreview);
+  return bEnvLayoutEnabled;
+}
+
+void AS08BoardActor::UpdateEnvLayout() {
+  // Without the flags nothing was ever created: a grid board (and every run without -ArtPreviewDiorama) is untouched.
+  if (!bEnvLayoutEnabled && !EnvRuntime.bApplied && EnvProps.IsEmpty() && EnvLights.IsEmpty()) return;
+  FS08EnvLayoutRequest Request;
+  Request.bEnabled = bEnvLayoutEnabled;
+  Request.bMapImageActive = bMapImageActive;  // false on every grid board and on a refused map profile
+  Request.ProfileId = ActiveProfile.Id;
+  Request.MapKey = S08EnvLayout::MapKeyOf(ActiveProfile.Map.Name);
+  Request.RoomBoardId = RoomBoardId;
+  Request.ProfileBoardIds = ActiveProfile.MatchBoardIds;
+  Request.MapHalf = ActiveProfile.Map.HalfUU();
+  Request.FrameHalf = ActiveProfile.Map.FrameHalfUU();
+  Request.ProfileTrayOffset = ActiveProfile.Map.TrayOffsetUU;
+  const FS08LightProfile* Light = bMapImageActive ? ArtData.LightFor(ActiveProfile) : nullptr;
+  Request.ProfilePointLights = Light ? Light->Points.Num() : 0;
+  S08EnvLayout::Update(Request, *this, RootComponent, EnvRuntime, EnvProps, EnvLights);
 }
 
 bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {

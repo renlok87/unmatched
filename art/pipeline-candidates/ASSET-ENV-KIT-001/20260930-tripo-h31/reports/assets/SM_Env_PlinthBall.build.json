@@ -1,0 +1,887 @@
+{
+  "schema": "unmatched.env-kit.asset-build/1",
+  "status": "measured",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  },
+  "asset_id": "ENV-M-PLINTH-BALL",
+  "ue_mesh": "SM_Env_PlinthBall",
+  "board": "Marmoreal",
+  "blender_version": "5.2.2 LTS",
+  "scripts_sha256_lf": {
+    "tools/art/env_kit/env_kit_build.py": "cf9b65c6706f2313674a6a29855ee13a8c4bbeb2e0e025cd57407dead242173f",
+    "tools/tripo-pipeline/blender/static_prop_candidate.py": "b1e67b69c41abf19aa053f3d7126fa507f7d96ebfb1d144ca28b334623a28af6"
+  },
+  "source": {
+    "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/source/ENV-M-PLINTH-BALL.glb",
+    "sha256": "8bca70a8aba95bdfc7271eb3ba5c13627dcc96e7560bd7cc1659485ddb0ace8d",
+    "bytes": 8602740,
+    "sha256_matches_tripo_run": true,
+    "tripo_task": "8650af26-c3f7-4764-a5b3-5a1be5b82ca5",
+    "gltf_generator": "Tripo",
+    "gltf_extensions_used": [
+      "KHR_materials_specular",
+      "KHR_materials_volume",
+      "FB_ngon_encoding"
+    ]
+  },
+  "no_render_policy": "no Eevee/Cycles/Workbench render, no bake, no viewport: GPU measurements in progress",
+  "import": {
+    "mesh_objects": 1,
+    "faces": 2204,
+    "triangles": 2204,
+    "materials": [
+      "tripo_node_ca264d8c-a660-42f9-95f5-e338f5109876_material.001"
+    ],
+    "images": [
+      {
+        "name": "ENV-M-PLINTH-BALL_basecolor.jpg",
+        "size": [
+          2048,
+          2048
+        ],
+        "colorspace": "sRGB"
+      },
+      {
+        "name": "ENV-M-PLINTH-BALL_normal.png",
+        "size": [
+          2048,
+          2048
+        ],
+        "colorspace": "Non-Color"
+      },
+      {
+        "name": "ENV-M-PLINTH-BALL_rm.png",
+        "size": [
+          2048,
+          2048
+        ],
+        "colorspace": "Non-Color"
+      }
+    ],
+    "bounds_min_m": [
+      -0.20952,
+      -0.20952,
+      0.0
+    ],
+    "bounds_max_m": [
+      0.20952,
+      0.20952,
+      0.977762
+    ],
+    "dimensions_m": [
+      0.419041,
+      0.419041,
+      0.977762
+    ]
+  },
+  "geometry": {
+    "policy": "measured only; no clean-up, repair or winding change (task rule: fix orientation/scale/pivot only)",
+    "stats_welded_1e-6m_prescale": {
+      "vertices_as_stored": 2651,
+      "vertices_welded_1e-6m": 1104,
+      "faces": 2204,
+      "triangles": 2204,
+      "welded_boundary_edges": 0,
+      "welded_non_manifold_edges": 0,
+      "wire_edges": 0,
+      "loose_vertices": 0,
+      "degenerate_faces_area_lt_1e-12": 6,
+      "faces_with_inconsistent_winding": 0,
+      "connected_shells": 1,
+      "signed_volume_m3": 0.078508893,
+      "raw_vertex_count_before_weld": 2651
+    },
+    "corner_normals": {
+      "has_custom_normals": true,
+      "corners_pointing_into_surface": 97,
+      "corner_vs_face_normal_angle_deg_p50_p99_max": [
+        24.14,
+        105.79,
+        168.49
+      ]
+    },
+    "inconsistent_winding_face_centres_uu_prescale_frame": [],
+    "shells_and_holes": {
+      "weld_m_prescale": 1e-06,
+      "shells": 1,
+      "shells_isolated_gap_gt_uu": 0.5,
+      "shells_isolated": 0,
+      "shells_isolated_off_ground": 0,
+      "shells_inverted_closed": 0,
+      "shell_list_top20_by_faces": [
+        {
+          "shell": 0,
+          "faces": 2204,
+          "triangles": 2204,
+          "area_uu2": 6018.33,
+          "signed_volume_uu3": 18141.5,
+          "open_edges": 0,
+          "bounds_min_uu_prescale_frame": [
+            -12.86,
+            -12.86,
+            0.0
+          ],
+          "bounds_max_uu_prescale_frame": [
+            12.86,
+            12.86,
+            60.0
+          ],
+          "gap_to_nearest_other_shell_uu": null,
+          "isolated": false,
+          "off_ground_uu": 0.0,
+          "inverted_if_closed": false
+        }
+      ],
+      "open_edge_loops": 0,
+      "open_edges": 0,
+      "open_edge_loops_by_kind": {
+        "crack (zero-width T-junction/sliver)": 0,
+        "hole": 0
+      },
+      "crack_rule": "mean width 2A/P <= 0.10 uu (A = Newell area of the directed loop, P = rim length)",
+      "open_edge_loops_top10_by_length": [],
+      "holes_top10_by_area": [],
+      "hole_area_uu2_total": 0.0,
+      "non_manifold_edges": 0
+    },
+    "ray_escape_facing": {
+      "method": "7+7 ray escape per face (50 deg cone), BVH ray cast, CPU; see facing_stats docstring",
+      "faces": {
+        "outward": 2056,
+        "inward": 11,
+        "sheet": 0,
+        "enclosed": 137
+      },
+      "area_fraction": {
+        "outward": 0.9812,
+        "inward": 0.0002,
+        "sheet": 0.0,
+        "enclosed": 0.0185
+      },
+      "inward_face_centres_uu_prescale_frame_first12": [
+        [
+          7.77,
+          12.86,
+          1.14
+        ],
+        [
+          -1.31,
+          12.86,
+          1.06
+        ],
+        [
+          -5.11,
+          -7.34,
+          19.41
+        ],
+        [
+          -6.05,
+          -12.86,
+          0.35
+        ],
+        [
+          7.34,
+          1.78,
+          31.12
+        ],
+        [
+          -7.34,
+          -1.74,
+          29.28
+        ],
+        [
+          -9.37,
+          -11.8,
+          39.22
+        ],
+        [
+          5.11,
+          -7.42,
+          28.92
+        ],
+        [
+          1.74,
+          -7.42,
+          31.12
+        ],
+        [
+          -10.51,
+          -12.86,
+          1.37
+        ],
+        [
+          -3.42,
+          7.34,
+          31.12
+        ]
+      ]
+    },
+    "winding_note": "faces_with_inconsistent_winding comes from bmesh recalc_face_normals on the welded mesh; on open/non-manifold meshes (foliage, overlapping Tripo shells) it splits regions arbitrarily, so ray_escape_facing.inward is the flipped-face measure",
+    "closed_manifold_consistent": true
+  },
+  "orientation": {
+    "yaw_deg_about_plus_z_applied": 0.0,
+    "yaw_source": "reports/orientation-check.json",
+    "orientation_check": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-PLINTH-BALL/front.png",
+          "sha256": "adc2c7170affe454c5fda047cd5f5220c257285529b5c2bea1884371e5f84e3b",
+          "fg_fraction": 0.1798
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-PLINTH-BALL/left.png",
+          "sha256": "f8a57971137a6b0aa131c2312268d0aeba7c5d05fc99fab3d4b71b71f79f5003",
+          "fg_fraction": 0.1819
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-PLINTH-BALL/right.png",
+          "sha256": "e8982d4e21cf87e840b34bc1100e75286a5d55f9dcac13ffe88fa3a8c0436222",
+          "fg_fraction": 0.1934
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-PLINTH-BALL/back.png",
+          "sha256": "3dbd9b142c04c606d3914fe2055da4c6b2f6894eff93f4611ebbe9335c25171d",
+          "fg_fraction": 0.1808
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.9397,
+          "views": {
+            "front": {
+              "iou": 0.9402,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            },
+            "left": {
+              "iou": 0.9403,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.437
+            },
+            "right": {
+              "iou": 0.9382,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.44
+            },
+            "back": {
+              "iou": 0.94,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            }
+          },
+          "colour_l1": 0.0336,
+          "facing_colour_rel": {
+            "front": [
+              1.002,
+              1.004,
+              1.001
+            ],
+            "left": [
+              1.006,
+              1.005,
+              1.002
+            ],
+            "right": [
+              1.015,
+              1.018,
+              1.018
+            ],
+            "back": [
+              1.019,
+              1.022,
+              1.023
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.9397,
+          "views": {
+            "front": {
+              "iou": 0.9386,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            },
+            "left": {
+              "iou": 0.9424,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.437
+            },
+            "right": {
+              "iou": 0.9399,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.44
+            },
+            "back": {
+              "iou": 0.9379,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            }
+          },
+          "colour_l1": 0.0409,
+          "facing_colour_rel": {
+            "front": [
+              1.015,
+              1.018,
+              1.018
+            ],
+            "left": [
+              1.002,
+              1.004,
+              1.001
+            ],
+            "right": [
+              1.019,
+              1.022,
+              1.023
+            ],
+            "back": [
+              1.006,
+              1.005,
+              1.002
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.9397,
+          "views": {
+            "front": {
+              "iou": 0.94,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            },
+            "left": {
+              "iou": 0.9407,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.437
+            },
+            "right": {
+              "iou": 0.9379,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.44
+            },
+            "back": {
+              "iou": 0.9403,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            }
+          },
+          "colour_l1": 0.0496,
+          "facing_colour_rel": {
+            "front": [
+              1.019,
+              1.022,
+              1.023
+            ],
+            "left": [
+              1.015,
+              1.018,
+              1.018
+            ],
+            "right": [
+              1.006,
+              1.005,
+              1.002
+            ],
+            "back": [
+              1.002,
+              1.004,
+              1.001
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.9397,
+          "views": {
+            "front": {
+              "iou": 0.9381,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            },
+            "left": {
+              "iou": 0.9422,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.437
+            },
+            "right": {
+              "iou": 0.9403,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.44
+            },
+            "back": {
+              "iou": 0.9382,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            }
+          },
+          "colour_l1": 0.042,
+          "facing_colour_rel": {
+            "front": [
+              1.006,
+              1.005,
+              1.002
+            ],
+            "left": [
+              1.019,
+              1.022,
+              1.023
+            ],
+            "right": [
+              1.002,
+              1.004,
+              1.001
+            ],
+            "back": [
+              1.015,
+              1.018,
+              1.018
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.0,
+      "colour_margin_0_vs_180": -0.016,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU",
+          "front/back silhouettes nearly mirror-equal (IoU margin 0.000): colour cue prefers 0 deg"
+        ]
+      }
+    },
+    "front_convention": "Tripo 'front' reference view = glTF +Z = .blend -Y = UE +X (UM_FBX_v1). Tripo 'left' view = seen from .blend +X, 'right' = from -X, 'back' = from +Y. K1 camera looks along -Y: actor yaw +90 turns the front to the camera"
+  },
+  "scale_pivot": {
+    "target": {
+      "dimension": "height",
+      "uu": 60
+    },
+    "measured_source_m": 0.977762,
+    "uniform_scale_applied": 0.613646,
+    "uu_per_source_metre": 61.3646,
+    "dimensions_m_blend": [
+      0.257143,
+      0.257143,
+      0.6
+    ],
+    "bounds_min_m": [
+      -0.128571,
+      -0.128571,
+      0.0
+    ],
+    "bounds_max_m": [
+      0.128571,
+      0.128571,
+      0.6
+    ],
+    "dimensions_uu_ue_xyz": [
+      25.714,
+      25.714,
+      60.0
+    ],
+    "ue_axes_note": "UE X = depth (front-back, .blend Y), UE Y = width (.blend X), UE Z = height",
+    "pivot": "object origin = (0,0,0) = centre of the XY bounds at min Z"
+  },
+  "textures": {
+    "source_images": {
+      "basecolor": "ENV-M-PLINTH-BALL_basecolor.jpg",
+      "metallic_roughness": "ENV-M-PLINTH-BALL_rm.png",
+      "normal": "ENV-M-PLINTH-BALL_normal.png",
+      "occlusion": null,
+      "factors": {
+        "metallic": 1.0,
+        "roughness": 1.0,
+        "basecolor": [
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          1.0
+        ]
+      }
+    },
+    "source_size_px": 2048,
+    "target_size_px": 2048,
+    "downscale": "none (source already 2048 px)",
+    "normal_padding": {
+      "background_fraction_source": 0.0005,
+      "dilated_px_at_source": 32,
+      "flat_filled_fraction_source": 0.0
+    },
+    "channel_stats": {
+      "roughness_mean": 0.167,
+      "metallic_mean": 0.009,
+      "metallic_fraction_gt_0.5": 0.0,
+      "normal_mean_rgb_dx": [
+        0.5,
+        0.499,
+        0.972
+      ],
+      "bc_mean_srgb": [
+        0.645,
+        0.592,
+        0.545
+      ]
+    },
+    "base_color_factor_applied": {
+      "factor_rgb": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
+      ],
+      "space": "linear (glTF semantics)",
+      "note": "same rule as the lantern candidate (Tripo Studio export 0.8)"
+    },
+    "outputs": {
+      "BC": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/export/T_Env_PlinthBall_BC.png",
+        "colorspace": "sRGB",
+        "png_color_chunks": [
+          "cHRM",
+          "gAMA",
+          "sRGB"
+        ],
+        "sha256": "08835046991c0386a557b8f2bc6fcd006c96616aa7425be932dab99e4f82515c",
+        "bytes": 4734695
+      },
+      "N": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/export/T_Env_PlinthBall_N.png",
+        "colorspace": "Linear (Non-Color)",
+        "convention": "DirectX (G flipped from glTF OpenGL); UE: TC_Normalmap, flip_green false",
+        "png_color_chunks": [],
+        "note": "Linear is an import setting (UE: sRGB off); no sRGB/gAMA/cHRM/iCCP chunk in the file",
+        "sha256": "62a8a42b924cd3033f3289c1f3782bd1292f1067975efc2edcac64e3d4c45c90",
+        "bytes": 4867870
+      },
+      "ORM": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/export/T_Env_PlinthBall_ORM.png",
+        "colorspace": "Linear (Non-Color)",
+        "channels": {
+          "R": "1.0 (no AO: Tripo has no occlusion map; Cycles bake not run)",
+          "G": "roughness from glTF metallicRoughness.G",
+          "B": "metallic from glTF metallicRoughness.B"
+        },
+        "png_color_chunks": [],
+        "note": "Linear is an import setting (UE: sRGB off); no sRGB/gAMA/cHRM/iCCP chunk in the file",
+        "sha256": "0ef9e1cdad7328a43b2f27cf45fbb55c8c7143b7c5277fcf961870bfed7aba4d",
+        "bytes": 1678399
+      }
+    },
+    "ao_bake": null,
+    "bc_gutters": {
+      "raster_px": 512,
+      "uncovered_fraction": 0.365,
+      "uncovered_mean_bc_srgb": [
+        0.631,
+        0.579,
+        0.534
+      ],
+      "note": "Tripo BC gutters; the lantern/barrel pipeline pads only N, BC/ORM are written as delivered"
+    }
+  },
+  "uv0": {
+    "uv_layers": [
+      "UVMap"
+    ],
+    "raster_size_px": 1024,
+    "islands": 334,
+    "triangles_out_of_0_1": 0,
+    "uv_bounds": [
+      0.001321,
+      0.001321,
+      0.998691,
+      0.995817
+    ],
+    "uv_area_used_fraction": 0.6339,
+    "raster_coverage_fraction": 0.6326,
+    "overlap_pixels_between_islands": 0,
+    "overlap_fraction_of_covered": 0.0,
+    "overlap_pixels_inside_islands_strict": 53,
+    "flipped_uv_triangles_vs_island_majority": 5,
+    "zero_area_uv_triangles": 5,
+    "texel_density_px_per_m_at_raster": 1050.9,
+    "stretch_area_ratio_p05_p50_p95": [
+      0.859,
+      1.014,
+      1.099
+    ],
+    "stretch_anisotropy_sigma_max_over_min_p50_p95_max": [
+      1.084,
+      1.279,
+      544.689
+    ],
+    "stretch_sigma_max_norm_p95": 1.048,
+    "stretch_sigma_min_norm_p05": 0.82,
+    "min_gutter_px_estimate": 3,
+    "island_pairs_closer_than_4px": 85,
+    "note": "min_gutter_px_estimate / island_pairs_closer_than_4px: 4-neighbour growth at raster_size_px (odd/even estimate +-1 px). raster_metrics: Euclidean distance between centres of pixels of different islands (another metric, counts differ), plus strict in-island overlap from flipped UV triangles; at raster_size_px and 2x.",
+    "raster_metrics": [
+      {
+        "raster_size_px": 1024,
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 53,
+        "raster_coverage_fraction": 0.6326,
+        "min_island_centre_distance_px": 3.0,
+        "island_pairs_centre_distance_lt_4px": 16,
+        "island_pairs_centre_distance_lt_8px": 649,
+        "mip_where_min_distance_drops_below_1_texel": 2
+      },
+      {
+        "raster_size_px": 2048,
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 165,
+        "raster_coverage_fraction": 0.6341,
+        "min_island_centre_distance_px": 5.831,
+        "island_pairs_centre_distance_lt_4px": 0,
+        "island_pairs_centre_distance_lt_8px": 161,
+        "mip_where_min_distance_drops_below_1_texel": 3
+      }
+    ]
+  },
+  "material_slots": 1,
+  "material_names": [
+    "M_Env_PlinthBall"
+  ],
+  "export": {
+    "fbx": "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/export/SM_Env_PlinthBall.fbx",
+    "sha256": "7c1aa22dc00e6eaaf54d57ab789d062bd8e73c6570aceeac1f2b6a1dd126ce10",
+    "bytes": 131564,
+    "preset": "UM_FBX_v1.json",
+    "settings": {
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "export_space_rotation_z_degrees": 90.0,
+      "temporary_data_scale": 100.0,
+      "patch_fbx_unit_scale_to": 1.0,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "use_triangles": true,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "AUTO"
+    },
+    "exporter_kwargs": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bake_space_transform": false,
+      "embed_textures": false,
+      "mesh_smooth_type": "FACE",
+      "object_types": [
+        "ARMATURE",
+        "MESH"
+      ],
+      "path_mode": "AUTO",
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "use_custom_props": false,
+      "use_mesh_edges": false,
+      "use_selection": true,
+      "use_triangles": true
+    },
+    "textures_embedded": false,
+    "texture_paths": "relative to the FBX (absolute checkout path is never written)",
+    "um_fbx_v1_conformance": [
+      {
+        "setting": "Forward / Up (04 1.1)",
+        "standard": [
+          "-Y",
+          "Z"
+        ],
+        "used": [
+          "-Y",
+          "Z"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Apply Scalings (04 1.1)",
+        "standard": "FBX_SCALE_UNITS",
+        "used": "FBX_SCALE_UNITS",
+        "conforms": true
+      },
+      {
+        "setting": "Apply Unit (04 1.1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Apply Transform (04 1.1)",
+        "standard": false,
+        "used": false,
+        "conforms": true
+      },
+      {
+        "setting": "Triangulate Faces (04 1.1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Smoothing (04 1.1)",
+        "standard": "FACE",
+        "used": "FACE",
+        "conforms": true
+      },
+      {
+        "setting": "Object Types (04 1.1)",
+        "standard": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "used": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Loose Edges / Custom Properties (04 1.1)",
+        "standard": [
+          false,
+          false
+        ],
+        "used": [
+          false,
+          false
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Leaf bones / bone axes (04 1.1, preset)",
+        "standard": [
+          false,
+          "Y",
+          "X"
+        ],
+        "used": [
+          false,
+          "Y",
+          "X"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Bake Animation (04 1.1: skeletal clips only)",
+        "standard": false,
+        "used": false,
+        "conforms": true
+      },
+      {
+        "setting": "Path Mode, textures not embedded (04 1.1)",
+        "standard": [
+          "AUTO",
+          false
+        ],
+        "used": [
+          "AUTO",
+          false
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+        "standard": [
+          90.0,
+          100.0,
+          1.0
+        ],
+        "used": [
+          90.0,
+          100.0,
+          1.0
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+        "standard": [
+          "METRIC",
+          1.0
+        ],
+        "used": [
+          "METRIC",
+          1.0
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Transforms applied: object matrix identity (04 1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Pivot: base centre, min Z = 0 (04 1, decor: centre of base)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Front (Tripo front view) along -Y in .blend (04 1: face -Y -> +X in UE)",
+        "standard": "-Y",
+        "used": "-Y after yaw +0 deg",
+        "conforms": true,
+        "measured": "silhouette/colour check vs the four Tripo reference views, see orientation"
+      }
+    ],
+    "um_fbx_v1_conforms": true,
+    "ue_import": "legacy FBX, import_uniform_scale 1.0 (UM_FBX_v1 patches UnitScaleFactor to 1.0; the S05 'FBX_SCALE_UNITS + import 100' note is another profile without the patch, see RIG-CONTRACT.md)"
+  },
+  "work_blend_scratch": "C:\\tmp\\envmaps-research\\p1b\\envkit\\work\\SM_Env_PlinthBall.blend",
+  "roundtrip": {
+    "mesh_objects": 1,
+    "object_names": [
+      "SM_Env_PlinthBall"
+    ],
+    "triangles": 2204,
+    "expected_triangles_blend_faces": 2204,
+    "material_slots": 1,
+    "uv_layers": 1,
+    "armatures": 0,
+    "dimensions_uu": [
+      25.714,
+      25.714,
+      60.0
+    ],
+    "bounds_min_uu": [
+      -12.857,
+      -12.857,
+      0.0
+    ],
+    "bounds_max_uu": [
+      12.857,
+      12.857,
+      60.0
+    ],
+    "object_scale": [
+      0.01,
+      0.01,
+      0.01
+    ],
+    "note": "Blender reads UnitScaleFactor 1.0 as cm and scales x0.01; readback frame: .blend -Y -> +X"
+  },
+  "checks": {
+    "source_sha256_matches_tripo_run": true,
+    "single_mesh": true,
+    "triangles_preserved": true,
+    "triangles_le_budget": true,
+    "one_material_slot": true,
+    "uv0_present": true,
+    "uv0_inside_0_1": true,
+    "no_armature": true,
+    "target_dimension_1pct": true,
+    "base_at_zero": true,
+    "centred_xy": true,
+    "source_unchanged": true,
+    "um_fbx_v1_conforms": true
+  },
+  "checks_passed": true
+}

@@ -27,6 +27,11 @@ public class Unmatched : ModuleRules {
     // runtime from <Project>/Config/ArtBoards; staged into the pak (UFS) so
     // the packaged client reads the same file (S08BoardArt.h).
     RuntimeDependencies.Add("$(ProjectDir)/Config/ArtBoards/S08ArtBoardProfiles.json", StagedFileType.UFS);
+    // ENV-MAPS track C: the environment layouts of the original-map boards (S08EnvLayout.h), read at runtime
+    // from <Project>/Config/ArtBoards/EnvLayouts/<map>.layout.json. The wildcard is resolved by UBT on every
+    // build (FileFilter.ResolveWildcard; an absent folder stages nothing): a layout added later needs a
+    // rebuild of the target before packaging.
+    RuntimeDependencies.Add("$(ProjectDir)/Config/ArtBoards/EnvLayouts/*.layout.json", StagedFileType.UFS);
     // W4-A -Bench: the captured Cobble 5x6 game state the backend-less render
     // bench replays (S08FlowGameMode.cpp RunRenderBench).
     RuntimeDependencies.Add("$(ProjectDir)/Config/Bench/S08BenchCobble.json", StagedFileType.UFS);

@@ -9,6 +9,7 @@
 #include "GameFramework/Actor.h"
 #include "S08BoardModel.h"
 #include "S08BoardArt.h"
+#include "S08EnvLayout.h"
 #include "S08ArtHud.h"
 #include "S08HeroesV2.h"
 #include "S08Render.h"
@@ -20,6 +21,7 @@ class UStaticMeshComponent;
 class UStaticMesh;
 class UTextRenderComponent;
 class UBoxComponent;
+class UPointLightComponent;
 class AS08FighterActor;
 class UMaterialInterface;
 class UMaterialInstanceDynamic;
@@ -56,6 +58,15 @@ public:
    *  placeholder stretch runs under ('T1-placeholder' on the map-image surface; nullptr = the old line). */
   void PlaceDioramaTray(bool bVisible, const FVector2D& BoardHalf, const TCHAR* Surface,
                         const FVector2D& Offset = FVector2D::ZeroVector, const TCHAR* Waiver = nullptr);
+  /** ENV-MAPS track C (S08EnvLayout.h): arms the environment around map-image boards when
+   *  S08EnvLayout::Enabled(bArtPreview) (-ArtPreview -ArtPreviewDiorama, no -ArtPreviewNoEnv); creates nothing by
+   *  itself (called from BeginPlay; a grid board never gets a component). Returns the gate. */
+  bool EnsureEnvLayout(bool bArtPreview);
+  /** Environment components spawned from Config/ArtBoards/EnvLayouts/<map>.layout.json for the active map-image
+   *  board (empty on grids, without the flags, or when the layout is absent / invalid). */
+  const TArray<TObjectPtr<UStaticMeshComponent>>& GetEnvProps() const { return EnvProps; }
+  const TArray<TObjectPtr<UPointLightComponent>>& GetEnvLights() const { return EnvLights; }
+  const FS08EnvLayoutRuntime& GetEnvLayoutRuntime() const { return EnvRuntime; }
 
   // ---- ENV-MAPS track S (topology boards, 'map-image' surface) ----
   /** True when the last Rebuild got a topology board (FS08BoardModel::bHasTopology). */
@@ -264,6 +275,9 @@ private:
   void ApplySurfaceMaterials();
   /** Wave 5c-B -ArtPreviewDiorama: shows / hides and fits the tray under the active art board (traced). */
   void UpdateDioramaTray(const FS08BoardModel& Board);
+  /** ENV-MAPS track C: spawns / keeps / clears the environment of the active map-image board (S08EnvLayout::Update);
+   *  called first thing in UpdateDioramaTray, whose map-image fit then takes the layout's tray (S08EnvLayout::ApplyTray). */
+  void UpdateEnvLayout();
 
   UPROPERTY()
   TObjectPtr<AActor> IllegalCell;
@@ -284,6 +298,14 @@ private:
   // Wave 5c-B -ArtPreviewDiorama (S08Diorama.h): created at runtime only with the flag, nullptr otherwise.
   UPROPERTY()
   TObjectPtr<UStaticMeshComponent> DioramaTray;
+  // ENV-MAPS track C (S08EnvLayout.h): environment props / point lights of the active map-image board, created at
+  // runtime only with -ArtPreview -ArtPreviewDiorama; destroyed on a board change.
+  UPROPERTY()
+  TArray<TObjectPtr<UStaticMeshComponent>> EnvProps;
+  UPROPERTY()
+  TArray<TObjectPtr<UPointLightComponent>> EnvLights;
+  FS08EnvLayoutRuntime EnvRuntime;
+  bool bEnvLayoutEnabled = false;
 
   // ENV-MAPS track S: created on demand by the first topology board (a grid board creates none of them).
   UPROPERTY()

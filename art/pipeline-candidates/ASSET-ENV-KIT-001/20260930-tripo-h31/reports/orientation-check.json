@@ -1,0 +1,3234 @@
+{
+  "schema": "unmatched.env-kit.orientation-check/1",
+  "status": "measured",
+  "script": {
+    "path": "tools/art/env_kit/orientation_check.py",
+    "sha256_lf": "23df62cd21c6202e5dd906e315d6a36b2122060f2887d05ecf0ed92c531553fd"
+  },
+  "method": "silhouette IoU of the mesh (PIL polygon fill of orthographic projections) against the reference foreground masks, per candidate turn about +Z; colour cue from face statistics; CPU only, no renderer",
+  "view_frames_blend": {
+    "front": "camera -Y, frame x +X",
+    "back": "camera +Y, frame x -X",
+    "left": "camera +X, frame x +Y",
+    "right": "camera -X, frame x -Y"
+  },
+  "params": {
+    "raster_px": 192,
+    "apply_min_iou_gain": 0.05,
+    "note": "A yaw other than 0 is applied only when a 90/180/270 deg turn beats the Tripo front by >= apply_min_iou_gain mean silhouette IoU over the four reference views; smaller differences keep the Tripo front (the Tripo H3.1 multiview contract) and are reported"
+  },
+  "assets": {
+    "ENV-M-ARCADE-BAY": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-ARCADE-BAY/front.png",
+          "sha256": "554af93e73cc40c369a513e5f4e8082a308935b637aa6a1be3b7a14aca76f4ee",
+          "fg_fraction": 0.2628
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-ARCADE-BAY/left.png",
+          "sha256": "fc81c4d0f07eca8b44325dc03c887577552d93863417297f9a5ceed8185c4afa",
+          "fg_fraction": 0.0783
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-ARCADE-BAY/right.png",
+          "sha256": "38f7c57f86b1fee2c52ff3494d13f5b8c3d7a4b0c062a506a93f23de4e87b6c2",
+          "fg_fraction": 0.0729
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-ARCADE-BAY/back.png",
+          "sha256": "036370de38fc312c987a2c905100c9d8444f11e35b220198b9b019f89b847fb9",
+          "fg_fraction": 0.264
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.8409,
+          "views": {
+            "front": {
+              "iou": 0.9035,
+              "aspect_w_over_h_mesh": 0.808,
+              "aspect_w_over_h_ref": 0.782
+            },
+            "left": {
+              "iou": 0.8197,
+              "aspect_w_over_h_mesh": 0.237,
+              "aspect_w_over_h_ref": 0.183
+            },
+            "right": {
+              "iou": 0.7424,
+              "aspect_w_over_h_mesh": 0.237,
+              "aspect_w_over_h_ref": 0.163
+            },
+            "back": {
+              "iou": 0.8982,
+              "aspect_w_over_h_mesh": 0.808,
+              "aspect_w_over_h_ref": 0.782
+            }
+          },
+          "colour_l1": 0.122,
+          "facing_colour_rel": {
+            "front": [
+              0.966,
+              0.968,
+              0.948
+            ],
+            "left": [
+              0.969,
+              0.965,
+              0.947
+            ],
+            "right": [
+              0.978,
+              0.976,
+              0.962
+            ],
+            "back": [
+              0.997,
+              0.998,
+              0.984
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.0377,
+          "views": {
+            "front": {
+              "iou": 0.0417,
+              "aspect_w_over_h_mesh": 0.237,
+              "aspect_w_over_h_ref": 0.782
+            },
+            "left": {
+              "iou": 0.0351,
+              "aspect_w_over_h_mesh": 0.808,
+              "aspect_w_over_h_ref": 0.183
+            },
+            "right": {
+              "iou": 0.0332,
+              "aspect_w_over_h_mesh": 0.808,
+              "aspect_w_over_h_ref": 0.163
+            },
+            "back": {
+              "iou": 0.0406,
+              "aspect_w_over_h_mesh": 0.237,
+              "aspect_w_over_h_ref": 0.782
+            }
+          },
+          "colour_l1": 0.1247,
+          "facing_colour_rel": {
+            "front": [
+              0.978,
+              0.976,
+              0.962
+            ],
+            "left": [
+              0.966,
+              0.968,
+              0.948
+            ],
+            "right": [
+              0.997,
+              0.998,
+              0.984
+            ],
+            "back": [
+              0.969,
+              0.965,
+              0.947
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.8068,
+          "views": {
+            "front": {
+              "iou": 0.8513,
+              "aspect_w_over_h_mesh": 0.808,
+              "aspect_w_over_h_ref": 0.782
+            },
+            "left": {
+              "iou": 0.8022,
+              "aspect_w_over_h_mesh": 0.237,
+              "aspect_w_over_h_ref": 0.183
+            },
+            "right": {
+              "iou": 0.7377,
+              "aspect_w_over_h_mesh": 0.237,
+              "aspect_w_over_h_ref": 0.163
+            },
+            "back": {
+              "iou": 0.836,
+              "aspect_w_over_h_mesh": 0.808,
+              "aspect_w_over_h_ref": 0.782
+            }
+          },
+          "colour_l1": 0.1612,
+          "facing_colour_rel": {
+            "front": [
+              0.997,
+              0.998,
+              0.984
+            ],
+            "left": [
+              0.978,
+              0.976,
+              0.962
+            ],
+            "right": [
+              0.969,
+              0.965,
+              0.947
+            ],
+            "back": [
+              0.966,
+              0.968,
+              0.948
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.0375,
+          "views": {
+            "front": {
+              "iou": 0.0415,
+              "aspect_w_over_h_mesh": 0.237,
+              "aspect_w_over_h_ref": 0.782
+            },
+            "left": {
+              "iou": 0.035,
+              "aspect_w_over_h_mesh": 0.808,
+              "aspect_w_over_h_ref": 0.183
+            },
+            "right": {
+              "iou": 0.033,
+              "aspect_w_over_h_mesh": 0.808,
+              "aspect_w_over_h_ref": 0.163
+            },
+            "back": {
+              "iou": 0.0405,
+              "aspect_w_over_h_mesh": 0.237,
+              "aspect_w_over_h_ref": 0.782
+            }
+          },
+          "colour_l1": 0.1713,
+          "facing_colour_rel": {
+            "front": [
+              0.969,
+              0.965,
+              0.947
+            ],
+            "left": [
+              0.997,
+              0.998,
+              0.984
+            ],
+            "right": [
+              0.966,
+              0.968,
+              0.948
+            ],
+            "back": [
+              0.978,
+              0.976,
+              0.962
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.0341,
+      "colour_margin_0_vs_180": -0.0392,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU"
+        ]
+      }
+    },
+    "ENV-M-CHERRY": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-CHERRY/front.png",
+          "sha256": "57cdb5738e8cd0d4de51f703e722d96fd74d7ff423f07c9fce1ea26e1e8dae7e",
+          "fg_fraction": 0.3755
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-CHERRY/left.png",
+          "sha256": "3dfa2330246fcf37d375bf5f8074676af914e83dbbb09b62b64f6ad2ccdf1d99",
+          "fg_fraction": 0.2835
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-CHERRY/right.png",
+          "sha256": "50db9d0490d06a0699d5ec41aa9db457502020803e9328660c6967de035d2ba9",
+          "fg_fraction": 0.3126
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-CHERRY/back.png",
+          "sha256": "2cb911f68ead1f2bd63b7d98696da8ce7404733d8f43dc78e385062de3bbe7d9",
+          "fg_fraction": 0.3736
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.7722,
+          "views": {
+            "front": {
+              "iou": 0.7668,
+              "aspect_w_over_h_mesh": 1.02,
+              "aspect_w_over_h_ref": 1.011
+            },
+            "left": {
+              "iou": 0.7997,
+              "aspect_w_over_h_mesh": 0.788,
+              "aspect_w_over_h_ref": 0.787
+            },
+            "right": {
+              "iou": 0.7613,
+              "aspect_w_over_h_mesh": 0.788,
+              "aspect_w_over_h_ref": 0.841
+            },
+            "back": {
+              "iou": 0.7612,
+              "aspect_w_over_h_mesh": 1.02,
+              "aspect_w_over_h_ref": 0.981
+            }
+          },
+          "colour_l1": 0.0711,
+          "facing_colour_rel": {
+            "front": [
+              1.034,
+              1.017,
+              1.041
+            ],
+            "left": [
+              0.986,
+              0.993,
+              0.983
+            ],
+            "right": [
+              0.982,
+              0.986,
+              0.979
+            ],
+            "back": [
+              1.03,
+              1.022,
+              1.039
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.5321,
+          "views": {
+            "front": {
+              "iou": 0.5171,
+              "aspect_w_over_h_mesh": 0.788,
+              "aspect_w_over_h_ref": 1.011
+            },
+            "left": {
+              "iou": 0.5445,
+              "aspect_w_over_h_mesh": 1.02,
+              "aspect_w_over_h_ref": 0.787
+            },
+            "right": {
+              "iou": 0.5494,
+              "aspect_w_over_h_mesh": 1.02,
+              "aspect_w_over_h_ref": 0.841
+            },
+            "back": {
+              "iou": 0.5176,
+              "aspect_w_over_h_mesh": 0.788,
+              "aspect_w_over_h_ref": 0.981
+            }
+          },
+          "colour_l1": 0.1788,
+          "facing_colour_rel": {
+            "front": [
+              0.982,
+              0.986,
+              0.979
+            ],
+            "left": [
+              1.034,
+              1.017,
+              1.041
+            ],
+            "right": [
+              1.03,
+              1.022,
+              1.039
+            ],
+            "back": [
+              0.986,
+              0.993,
+              0.983
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.5656,
+          "views": {
+            "front": {
+              "iou": 0.6716,
+              "aspect_w_over_h_mesh": 1.02,
+              "aspect_w_over_h_ref": 1.011
+            },
+            "left": {
+              "iou": 0.4632,
+              "aspect_w_over_h_mesh": 0.788,
+              "aspect_w_over_h_ref": 0.787
+            },
+            "right": {
+              "iou": 0.4474,
+              "aspect_w_over_h_mesh": 0.788,
+              "aspect_w_over_h_ref": 0.841
+            },
+            "back": {
+              "iou": 0.6802,
+              "aspect_w_over_h_mesh": 1.02,
+              "aspect_w_over_h_ref": 0.981
+            }
+          },
+          "colour_l1": 0.0682,
+          "facing_colour_rel": {
+            "front": [
+              1.03,
+              1.022,
+              1.039
+            ],
+            "left": [
+              0.982,
+              0.986,
+              0.979
+            ],
+            "right": [
+              0.986,
+              0.993,
+              0.983
+            ],
+            "back": [
+              1.034,
+              1.017,
+              1.041
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.5375,
+          "views": {
+            "front": {
+              "iou": 0.5256,
+              "aspect_w_over_h_mesh": 0.788,
+              "aspect_w_over_h_ref": 1.011
+            },
+            "left": {
+              "iou": 0.545,
+              "aspect_w_over_h_mesh": 1.02,
+              "aspect_w_over_h_ref": 0.787
+            },
+            "right": {
+              "iou": 0.5432,
+              "aspect_w_over_h_mesh": 1.02,
+              "aspect_w_over_h_ref": 0.841
+            },
+            "back": {
+              "iou": 0.5364,
+              "aspect_w_over_h_mesh": 0.788,
+              "aspect_w_over_h_ref": 0.981
+            }
+          },
+          "colour_l1": 0.1788,
+          "facing_colour_rel": {
+            "front": [
+              0.986,
+              0.993,
+              0.983
+            ],
+            "left": [
+              1.03,
+              1.022,
+              1.039
+            ],
+            "right": [
+              1.034,
+              1.017,
+              1.041
+            ],
+            "back": [
+              0.982,
+              0.986,
+              0.979
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.2066,
+      "colour_margin_0_vs_180": 0.0029,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU"
+        ]
+      }
+    },
+    "ENV-M-CYPRESS": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-CYPRESS/front.png",
+          "sha256": "c2b6901631774a27a6186d866cb3657848ae47011395ee86d93b3e816f02b010",
+          "fg_fraction": 0.1391
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-CYPRESS/left.png",
+          "sha256": "8a7ff66962ae6e3f7991dd512a6a1dfe23d9a9fdebaea6375296f0d721b7f433",
+          "fg_fraction": 0.1169
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-CYPRESS/right.png",
+          "sha256": "3ec31173841144ec2eeb9cc6006cb2b0ad0f08d4ad01ecba83f56e4a5609688c",
+          "fg_fraction": 0.1188
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-CYPRESS/back.png",
+          "sha256": "dccb3002ffa9243afba55cc70c9b9fc602940fe9225b573a4e8d86315098064c",
+          "fg_fraction": 0.1313
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.9048,
+          "views": {
+            "front": {
+              "iou": 0.9272,
+              "aspect_w_over_h_mesh": 0.319,
+              "aspect_w_over_h_ref": 0.328
+            },
+            "left": {
+              "iou": 0.8914,
+              "aspect_w_over_h_mesh": 0.288,
+              "aspect_w_over_h_ref": 0.257
+            },
+            "right": {
+              "iou": 0.8862,
+              "aspect_w_over_h_mesh": 0.288,
+              "aspect_w_over_h_ref": 0.293
+            },
+            "back": {
+              "iou": 0.9145,
+              "aspect_w_over_h_mesh": 0.319,
+              "aspect_w_over_h_ref": 0.304
+            }
+          },
+          "colour_l1": 0.1016,
+          "facing_colour_rel": {
+            "front": [
+              0.957,
+              0.997,
+              1.014
+            ],
+            "left": [
+              0.973,
+              0.994,
+              0.991
+            ],
+            "right": [
+              0.998,
+              1.0,
+              1.009
+            ],
+            "back": [
+              1.006,
+              1.0,
+              0.979
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.8472,
+          "views": {
+            "front": {
+              "iou": 0.8577,
+              "aspect_w_over_h_mesh": 0.288,
+              "aspect_w_over_h_ref": 0.328
+            },
+            "left": {
+              "iou": 0.8256,
+              "aspect_w_over_h_mesh": 0.319,
+              "aspect_w_over_h_ref": 0.257
+            },
+            "right": {
+              "iou": 0.8366,
+              "aspect_w_over_h_mesh": 0.319,
+              "aspect_w_over_h_ref": 0.293
+            },
+            "back": {
+              "iou": 0.869,
+              "aspect_w_over_h_mesh": 0.288,
+              "aspect_w_over_h_ref": 0.304
+            }
+          },
+          "colour_l1": 0.1239,
+          "facing_colour_rel": {
+            "front": [
+              0.998,
+              1.0,
+              1.009
+            ],
+            "left": [
+              0.957,
+              0.997,
+              1.014
+            ],
+            "right": [
+              1.006,
+              1.0,
+              0.979
+            ],
+            "back": [
+              0.973,
+              0.994,
+              0.991
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.8943,
+          "views": {
+            "front": {
+              "iou": 0.9247,
+              "aspect_w_over_h_mesh": 0.319,
+              "aspect_w_over_h_ref": 0.328
+            },
+            "left": {
+              "iou": 0.8828,
+              "aspect_w_over_h_mesh": 0.288,
+              "aspect_w_over_h_ref": 0.257
+            },
+            "right": {
+              "iou": 0.8596,
+              "aspect_w_over_h_mesh": 0.288,
+              "aspect_w_over_h_ref": 0.293
+            },
+            "back": {
+              "iou": 0.9103,
+              "aspect_w_over_h_mesh": 0.319,
+              "aspect_w_over_h_ref": 0.304
+            }
+          },
+          "colour_l1": 0.1173,
+          "facing_colour_rel": {
+            "front": [
+              1.006,
+              1.0,
+              0.979
+            ],
+            "left": [
+              0.998,
+              1.0,
+              1.009
+            ],
+            "right": [
+              0.973,
+              0.994,
+              0.991
+            ],
+            "back": [
+              0.957,
+              0.997,
+              1.014
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.8504,
+          "views": {
+            "front": {
+              "iou": 0.8384,
+              "aspect_w_over_h_mesh": 0.288,
+              "aspect_w_over_h_ref": 0.328
+            },
+            "left": {
+              "iou": 0.8271,
+              "aspect_w_over_h_mesh": 0.319,
+              "aspect_w_over_h_ref": 0.257
+            },
+            "right": {
+              "iou": 0.8413,
+              "aspect_w_over_h_mesh": 0.319,
+              "aspect_w_over_h_ref": 0.293
+            },
+            "back": {
+              "iou": 0.8949,
+              "aspect_w_over_h_mesh": 0.288,
+              "aspect_w_over_h_ref": 0.304
+            }
+          },
+          "colour_l1": 0.095,
+          "facing_colour_rel": {
+            "front": [
+              0.973,
+              0.994,
+              0.991
+            ],
+            "left": [
+              1.006,
+              1.0,
+              0.979
+            ],
+            "right": [
+              0.957,
+              0.997,
+              1.014
+            ],
+            "back": [
+              0.998,
+              1.0,
+              1.009
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.0105,
+      "colour_margin_0_vs_180": -0.0157,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU",
+          "front/back silhouettes nearly mirror-equal (IoU margin 0.011): colour cue prefers 0 deg"
+        ]
+      }
+    },
+    "ENV-M-LANTERN-PLINTH": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-LANTERN-PLINTH/front.png",
+          "sha256": "329f22d1c183a8b89b11f631cad6560c7ec6b450d1d49828347590c6cd6c7613",
+          "fg_fraction": 0.1631
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-LANTERN-PLINTH/left.png",
+          "sha256": "e3a0bc5ff588e4774259ac7c4d42905131a16ac210fcaf9f73a00f032fcef3e2",
+          "fg_fraction": 0.1637
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-LANTERN-PLINTH/right.png",
+          "sha256": "3ee80f24d8db2e0bacb0e5ff2e5191b7d7c005ab172af56567f38a9c9cf19659",
+          "fg_fraction": 0.1515
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-LANTERN-PLINTH/back.png",
+          "sha256": "9c28579e2cd563dbb79991f2f737ae0b6db9fe87cc10d7a9ed987fb6bbc1e207",
+          "fg_fraction": 0.164
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.9046,
+          "views": {
+            "front": {
+              "iou": 0.8947,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.372
+            },
+            "left": {
+              "iou": 0.9085,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.373
+            },
+            "right": {
+              "iou": 0.909,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.365
+            },
+            "back": {
+              "iou": 0.9063,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.369
+            }
+          },
+          "colour_l1": 0.1045,
+          "facing_colour_rel": {
+            "front": [
+              1.029,
+              1.01,
+              0.939
+            ],
+            "left": [
+              1.022,
+              1.004,
+              0.939
+            ],
+            "right": [
+              1.017,
+              1.001,
+              0.931
+            ],
+            "back": [
+              1.015,
+              0.994,
+              0.922
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.9046,
+          "views": {
+            "front": {
+              "iou": 0.9,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.372
+            },
+            "left": {
+              "iou": 0.9034,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.373
+            },
+            "right": {
+              "iou": 0.9036,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.365
+            },
+            "back": {
+              "iou": 0.9115,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.369
+            }
+          },
+          "colour_l1": 0.1094,
+          "facing_colour_rel": {
+            "front": [
+              1.017,
+              1.001,
+              0.931
+            ],
+            "left": [
+              1.029,
+              1.01,
+              0.939
+            ],
+            "right": [
+              1.015,
+              0.994,
+              0.922
+            ],
+            "back": [
+              1.022,
+              1.004,
+              0.939
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.9046,
+          "views": {
+            "front": {
+              "iou": 0.8945,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.372
+            },
+            "left": {
+              "iou": 0.9087,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.373
+            },
+            "right": {
+              "iou": 0.9089,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.365
+            },
+            "back": {
+              "iou": 0.9063,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.369
+            }
+          },
+          "colour_l1": 0.1022,
+          "facing_colour_rel": {
+            "front": [
+              1.015,
+              0.994,
+              0.922
+            ],
+            "left": [
+              1.017,
+              1.001,
+              0.931
+            ],
+            "right": [
+              1.022,
+              1.004,
+              0.939
+            ],
+            "back": [
+              1.029,
+              1.01,
+              0.939
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.9046,
+          "views": {
+            "front": {
+              "iou": 0.8997,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.372
+            },
+            "left": {
+              "iou": 0.9034,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.373
+            },
+            "right": {
+              "iou": 0.9036,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.365
+            },
+            "back": {
+              "iou": 0.9116,
+              "aspect_w_over_h_mesh": 0.358,
+              "aspect_w_over_h_ref": 0.369
+            }
+          },
+          "colour_l1": 0.103,
+          "facing_colour_rel": {
+            "front": [
+              1.022,
+              1.004,
+              0.939
+            ],
+            "left": [
+              1.015,
+              0.994,
+              0.922
+            ],
+            "right": [
+              1.029,
+              1.01,
+              0.939
+            ],
+            "back": [
+              1.017,
+              1.001,
+              0.931
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.0,
+      "colour_margin_0_vs_180": 0.0023,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU",
+          "front/back silhouettes nearly mirror-equal (IoU margin 0.000): colour cue prefers 180 deg by 0.002"
+        ]
+      }
+    },
+    "ENV-M-PLINTH-BALL": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-PLINTH-BALL/front.png",
+          "sha256": "adc2c7170affe454c5fda047cd5f5220c257285529b5c2bea1884371e5f84e3b",
+          "fg_fraction": 0.1798
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-PLINTH-BALL/left.png",
+          "sha256": "f8a57971137a6b0aa131c2312268d0aeba7c5d05fc99fab3d4b71b71f79f5003",
+          "fg_fraction": 0.1819
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-PLINTH-BALL/right.png",
+          "sha256": "e8982d4e21cf87e840b34bc1100e75286a5d55f9dcac13ffe88fa3a8c0436222",
+          "fg_fraction": 0.1934
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-PLINTH-BALL/back.png",
+          "sha256": "3dbd9b142c04c606d3914fe2055da4c6b2f6894eff93f4611ebbe9335c25171d",
+          "fg_fraction": 0.1808
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.9397,
+          "views": {
+            "front": {
+              "iou": 0.9402,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            },
+            "left": {
+              "iou": 0.9403,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.437
+            },
+            "right": {
+              "iou": 0.9382,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.44
+            },
+            "back": {
+              "iou": 0.94,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            }
+          },
+          "colour_l1": 0.0336,
+          "facing_colour_rel": {
+            "front": [
+              1.002,
+              1.004,
+              1.001
+            ],
+            "left": [
+              1.006,
+              1.005,
+              1.002
+            ],
+            "right": [
+              1.015,
+              1.018,
+              1.018
+            ],
+            "back": [
+              1.019,
+              1.022,
+              1.023
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.9397,
+          "views": {
+            "front": {
+              "iou": 0.9386,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            },
+            "left": {
+              "iou": 0.9424,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.437
+            },
+            "right": {
+              "iou": 0.9399,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.44
+            },
+            "back": {
+              "iou": 0.9379,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            }
+          },
+          "colour_l1": 0.0409,
+          "facing_colour_rel": {
+            "front": [
+              1.015,
+              1.018,
+              1.018
+            ],
+            "left": [
+              1.002,
+              1.004,
+              1.001
+            ],
+            "right": [
+              1.019,
+              1.022,
+              1.023
+            ],
+            "back": [
+              1.006,
+              1.005,
+              1.002
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.9397,
+          "views": {
+            "front": {
+              "iou": 0.94,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            },
+            "left": {
+              "iou": 0.9407,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.437
+            },
+            "right": {
+              "iou": 0.9379,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.44
+            },
+            "back": {
+              "iou": 0.9403,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            }
+          },
+          "colour_l1": 0.0496,
+          "facing_colour_rel": {
+            "front": [
+              1.019,
+              1.022,
+              1.023
+            ],
+            "left": [
+              1.015,
+              1.018,
+              1.018
+            ],
+            "right": [
+              1.006,
+              1.005,
+              1.002
+            ],
+            "back": [
+              1.002,
+              1.004,
+              1.001
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.9397,
+          "views": {
+            "front": {
+              "iou": 0.9381,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            },
+            "left": {
+              "iou": 0.9422,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.437
+            },
+            "right": {
+              "iou": 0.9403,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.44
+            },
+            "back": {
+              "iou": 0.9382,
+              "aspect_w_over_h_mesh": 0.429,
+              "aspect_w_over_h_ref": 0.436
+            }
+          },
+          "colour_l1": 0.042,
+          "facing_colour_rel": {
+            "front": [
+              1.006,
+              1.005,
+              1.002
+            ],
+            "left": [
+              1.019,
+              1.022,
+              1.023
+            ],
+            "right": [
+              1.002,
+              1.004,
+              1.001
+            ],
+            "back": [
+              1.015,
+              1.018,
+              1.018
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.0,
+      "colour_margin_0_vs_180": -0.016,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU",
+          "front/back silhouettes nearly mirror-equal (IoU margin 0.000): colour cue prefers 0 deg"
+        ]
+      }
+    },
+    "ENV-M-PORTAL": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-PORTAL/front.png",
+          "sha256": "a9338470cea4f3470ad878e9536dfc12a92edd8f83290d5a83eb8aa720da8862",
+          "fg_fraction": 0.4372
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-PORTAL/left.png",
+          "sha256": "f5a6126efe0681ce073e5378a1693ab53f161c682615dde09d356f85193c503b",
+          "fg_fraction": 0.0999
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-PORTAL/right.png",
+          "sha256": "05b13c7d3479c7e1adee871c8b5e5f161549292cbdf40003f1140f3e08efabe2",
+          "fg_fraction": 0.0976
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-PORTAL/back.png",
+          "sha256": "08b2a98424681c9029c909b58f8936b6ebc2373886b6452c498e3571f7f6f311",
+          "fg_fraction": 0.4367
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.9087,
+          "views": {
+            "front": {
+              "iou": 0.9498,
+              "aspect_w_over_h_mesh": 0.855,
+              "aspect_w_over_h_ref": 0.833
+            },
+            "left": {
+              "iou": 0.8846,
+              "aspect_w_over_h_mesh": 0.331,
+              "aspect_w_over_h_ref": 0.315
+            },
+            "right": {
+              "iou": 0.8495,
+              "aspect_w_over_h_mesh": 0.331,
+              "aspect_w_over_h_ref": 0.317
+            },
+            "back": {
+              "iou": 0.9508,
+              "aspect_w_over_h_mesh": 0.855,
+              "aspect_w_over_h_ref": 0.83
+            }
+          },
+          "colour_l1": 0.0855,
+          "facing_colour_rel": {
+            "front": [
+              0.919,
+              0.865,
+              0.816
+            ],
+            "left": [
+              0.983,
+              0.972,
+              0.954
+            ],
+            "right": [
+              0.985,
+              0.974,
+              0.954
+            ],
+            "back": [
+              1.058,
+              1.088,
+              1.121
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.2245,
+          "views": {
+            "front": {
+              "iou": 0.2372,
+              "aspect_w_over_h_mesh": 0.331,
+              "aspect_w_over_h_ref": 0.833
+            },
+            "left": {
+              "iou": 0.2152,
+              "aspect_w_over_h_mesh": 0.855,
+              "aspect_w_over_h_ref": 0.315
+            },
+            "right": {
+              "iou": 0.2086,
+              "aspect_w_over_h_mesh": 0.855,
+              "aspect_w_over_h_ref": 0.317
+            },
+            "back": {
+              "iou": 0.2369,
+              "aspect_w_over_h_mesh": 0.331,
+              "aspect_w_over_h_ref": 0.83
+            }
+          },
+          "colour_l1": 0.2686,
+          "facing_colour_rel": {
+            "front": [
+              0.985,
+              0.974,
+              0.954
+            ],
+            "left": [
+              0.919,
+              0.865,
+              0.816
+            ],
+            "right": [
+              1.058,
+              1.088,
+              1.121
+            ],
+            "back": [
+              0.983,
+              0.972,
+              0.954
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.547,
+          "views": {
+            "front": {
+              "iou": 0.9498,
+              "aspect_w_over_h_mesh": 0.855,
+              "aspect_w_over_h_ref": 0.833
+            },
+            "left": {
+              "iou": 0.1406,
+              "aspect_w_over_h_mesh": 0.331,
+              "aspect_w_over_h_ref": 0.315
+            },
+            "right": {
+              "iou": 0.1469,
+              "aspect_w_over_h_mesh": 0.331,
+              "aspect_w_over_h_ref": 0.317
+            },
+            "back": {
+              "iou": 0.9508,
+              "aspect_w_over_h_mesh": 0.855,
+              "aspect_w_over_h_ref": 0.83
+            }
+          },
+          "colour_l1": 0.4048,
+          "facing_colour_rel": {
+            "front": [
+              1.058,
+              1.088,
+              1.121
+            ],
+            "left": [
+              0.985,
+              0.974,
+              0.954
+            ],
+            "right": [
+              0.983,
+              0.972,
+              0.954
+            ],
+            "back": [
+              0.919,
+              0.865,
+              0.816
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.2245,
+          "views": {
+            "front": {
+              "iou": 0.2371,
+              "aspect_w_over_h_mesh": 0.331,
+              "aspect_w_over_h_ref": 0.833
+            },
+            "left": {
+              "iou": 0.2152,
+              "aspect_w_over_h_mesh": 0.855,
+              "aspect_w_over_h_ref": 0.315
+            },
+            "right": {
+              "iou": 0.2086,
+              "aspect_w_over_h_mesh": 0.855,
+              "aspect_w_over_h_ref": 0.317
+            },
+            "back": {
+              "iou": 0.2369,
+              "aspect_w_over_h_mesh": 0.331,
+              "aspect_w_over_h_ref": 0.83
+            }
+          },
+          "colour_l1": 0.3837,
+          "facing_colour_rel": {
+            "front": [
+              0.983,
+              0.972,
+              0.954
+            ],
+            "left": [
+              1.058,
+              1.088,
+              1.121
+            ],
+            "right": [
+              0.919,
+              0.865,
+              0.816
+            ],
+            "back": [
+              0.985,
+              0.974,
+              0.954
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.3617,
+      "colour_margin_0_vs_180": -0.3193,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU"
+        ]
+      }
+    },
+    "ENV-M-URN": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-URN/front.png",
+          "sha256": "50c33f8cebc5641b3a01b314c9f591440b2d2273db3a637ed0a05fa663014034",
+          "fg_fraction": 0.3596
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-URN/left.png",
+          "sha256": "b090c8fcb0c6357973c040c18fe1f9904bbe51d2266bb8e1ba87bbd2fd0744e9",
+          "fg_fraction": 0.2692
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-URN/right.png",
+          "sha256": "f099a2972dcfd90a929e1f14f5739ce20c76d9e71f2a1c0e4b87d6c9d2a138fd",
+          "fg_fraction": 0.2998
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-M-URN/back.png",
+          "sha256": "7813142ec90de1963fb26d4f50578c8b40d45675219bfb35c29e90d2f86bb261",
+          "fg_fraction": 0.358
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.8667,
+          "views": {
+            "front": {
+              "iou": 0.856,
+              "aspect_w_over_h_mesh": 0.98,
+              "aspect_w_over_h_ref": 0.946
+            },
+            "left": {
+              "iou": 0.8666,
+              "aspect_w_over_h_mesh": 0.675,
+              "aspect_w_over_h_ref": 0.677
+            },
+            "right": {
+              "iou": 0.8961,
+              "aspect_w_over_h_mesh": 0.675,
+              "aspect_w_over_h_ref": 0.69
+            },
+            "back": {
+              "iou": 0.848,
+              "aspect_w_over_h_mesh": 0.98,
+              "aspect_w_over_h_ref": 0.93
+            }
+          },
+          "colour_l1": 0.0669,
+          "facing_colour_rel": {
+            "front": [
+              1.009,
+              0.958,
+              0.97
+            ],
+            "left": [
+              0.996,
+              0.985,
+              0.969
+            ],
+            "right": [
+              1.01,
+              0.992,
+              0.994
+            ],
+            "back": [
+              0.996,
+              0.975,
+              0.964
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.6367,
+          "views": {
+            "front": {
+              "iou": 0.6357,
+              "aspect_w_over_h_mesh": 0.675,
+              "aspect_w_over_h_ref": 0.946
+            },
+            "left": {
+              "iou": 0.6131,
+              "aspect_w_over_h_mesh": 0.98,
+              "aspect_w_over_h_ref": 0.677
+            },
+            "right": {
+              "iou": 0.6567,
+              "aspect_w_over_h_mesh": 0.98,
+              "aspect_w_over_h_ref": 0.69
+            },
+            "back": {
+              "iou": 0.6413,
+              "aspect_w_over_h_mesh": 0.675,
+              "aspect_w_over_h_ref": 0.93
+            }
+          },
+          "colour_l1": 0.0793,
+          "facing_colour_rel": {
+            "front": [
+              1.01,
+              0.992,
+              0.994
+            ],
+            "left": [
+              1.009,
+              0.958,
+              0.97
+            ],
+            "right": [
+              0.996,
+              0.975,
+              0.964
+            ],
+            "back": [
+              0.996,
+              0.985,
+              0.969
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.7742,
+          "views": {
+            "front": {
+              "iou": 0.8314,
+              "aspect_w_over_h_mesh": 0.98,
+              "aspect_w_over_h_ref": 0.946
+            },
+            "left": {
+              "iou": 0.6961,
+              "aspect_w_over_h_mesh": 0.675,
+              "aspect_w_over_h_ref": 0.677
+            },
+            "right": {
+              "iou": 0.7404,
+              "aspect_w_over_h_mesh": 0.675,
+              "aspect_w_over_h_ref": 0.69
+            },
+            "back": {
+              "iou": 0.8291,
+              "aspect_w_over_h_mesh": 0.98,
+              "aspect_w_over_h_ref": 0.93
+            }
+          },
+          "colour_l1": 0.0772,
+          "facing_colour_rel": {
+            "front": [
+              0.996,
+              0.975,
+              0.964
+            ],
+            "left": [
+              1.01,
+              0.992,
+              0.994
+            ],
+            "right": [
+              0.996,
+              0.985,
+              0.969
+            ],
+            "back": [
+              1.009,
+              0.958,
+              0.97
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.6469,
+          "views": {
+            "front": {
+              "iou": 0.6546,
+              "aspect_w_over_h_mesh": 0.675,
+              "aspect_w_over_h_ref": 0.946
+            },
+            "left": {
+              "iou": 0.6114,
+              "aspect_w_over_h_mesh": 0.98,
+              "aspect_w_over_h_ref": 0.677
+            },
+            "right": {
+              "iou": 0.6569,
+              "aspect_w_over_h_mesh": 0.98,
+              "aspect_w_over_h_ref": 0.69
+            },
+            "back": {
+              "iou": 0.6646,
+              "aspect_w_over_h_mesh": 0.675,
+              "aspect_w_over_h_ref": 0.93
+            }
+          },
+          "colour_l1": 0.0945,
+          "facing_colour_rel": {
+            "front": [
+              0.996,
+              0.985,
+              0.969
+            ],
+            "left": [
+              0.996,
+              0.975,
+              0.964
+            ],
+            "right": [
+              1.009,
+              0.958,
+              0.97
+            ],
+            "back": [
+              1.01,
+              0.992,
+              0.994
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.0925,
+      "colour_margin_0_vs_180": -0.0103,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU"
+        ]
+      }
+    },
+    "ENV-S-CAMPFIRE": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-CAMPFIRE/front.png",
+          "sha256": "1b3d73016ee0c5dee7e7c45a0750a6818e75a6239fba6c7dc06d697a31a08b78",
+          "fg_fraction": 0.2347
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-CAMPFIRE/left.png",
+          "sha256": "4f4e15be063580b4c43d99297e9f9597f926a1302ccd42d5ad65f98c21f67f08",
+          "fg_fraction": 0.2249
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-CAMPFIRE/right.png",
+          "sha256": "f8f4bf6113ad53d7f7b87041e4ba4e610aa62014e38424919cbac03b5d90d019",
+          "fg_fraction": 0.2186
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-CAMPFIRE/back.png",
+          "sha256": "2323f1a8107109dc3e947e6fa6003ccddee007c35e83767f7fc3179c962cb226",
+          "fg_fraction": 0.2357
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.8632,
+          "views": {
+            "front": {
+              "iou": 0.8277,
+              "aspect_w_over_h_mesh": 2.368,
+              "aspect_w_over_h_ref": 2.201
+            },
+            "left": {
+              "iou": 0.8851,
+              "aspect_w_over_h_mesh": 2.376,
+              "aspect_w_over_h_ref": 2.262
+            },
+            "right": {
+              "iou": 0.9057,
+              "aspect_w_over_h_mesh": 2.376,
+              "aspect_w_over_h_ref": 2.257
+            },
+            "back": {
+              "iou": 0.8344,
+              "aspect_w_over_h_mesh": 2.368,
+              "aspect_w_over_h_ref": 2.198
+            }
+          },
+          "colour_l1": 0.0964,
+          "facing_colour_rel": {
+            "front": [
+              1.016,
+              0.983,
+              0.95
+            ],
+            "left": [
+              1.009,
+              0.98,
+              0.951
+            ],
+            "right": [
+              1.015,
+              0.977,
+              0.942
+            ],
+            "back": [
+              0.995,
+              0.962,
+              0.932
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.8587,
+          "views": {
+            "front": {
+              "iou": 0.844,
+              "aspect_w_over_h_mesh": 2.376,
+              "aspect_w_over_h_ref": 2.201
+            },
+            "left": {
+              "iou": 0.8692,
+              "aspect_w_over_h_mesh": 2.368,
+              "aspect_w_over_h_ref": 2.262
+            },
+            "right": {
+              "iou": 0.8766,
+              "aspect_w_over_h_mesh": 2.368,
+              "aspect_w_over_h_ref": 2.257
+            },
+            "back": {
+              "iou": 0.8451,
+              "aspect_w_over_h_mesh": 2.376,
+              "aspect_w_over_h_ref": 2.198
+            }
+          },
+          "colour_l1": 0.1047,
+          "facing_colour_rel": {
+            "front": [
+              1.015,
+              0.977,
+              0.942
+            ],
+            "left": [
+              1.016,
+              0.983,
+              0.95
+            ],
+            "right": [
+              0.995,
+              0.962,
+              0.932
+            ],
+            "back": [
+              1.009,
+              0.98,
+              0.951
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.8542,
+          "views": {
+            "front": {
+              "iou": 0.8279,
+              "aspect_w_over_h_mesh": 2.368,
+              "aspect_w_over_h_ref": 2.201
+            },
+            "left": {
+              "iou": 0.8721,
+              "aspect_w_over_h_mesh": 2.376,
+              "aspect_w_over_h_ref": 2.262
+            },
+            "right": {
+              "iou": 0.8822,
+              "aspect_w_over_h_mesh": 2.376,
+              "aspect_w_over_h_ref": 2.257
+            },
+            "back": {
+              "iou": 0.8345,
+              "aspect_w_over_h_mesh": 2.368,
+              "aspect_w_over_h_ref": 2.198
+            }
+          },
+          "colour_l1": 0.0974,
+          "facing_colour_rel": {
+            "front": [
+              0.995,
+              0.962,
+              0.932
+            ],
+            "left": [
+              1.015,
+              0.977,
+              0.942
+            ],
+            "right": [
+              1.009,
+              0.98,
+              0.951
+            ],
+            "back": [
+              1.016,
+              0.983,
+              0.95
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.8599,
+          "views": {
+            "front": {
+              "iou": 0.834,
+              "aspect_w_over_h_mesh": 2.376,
+              "aspect_w_over_h_ref": 2.201
+            },
+            "left": {
+              "iou": 0.8707,
+              "aspect_w_over_h_mesh": 2.368,
+              "aspect_w_over_h_ref": 2.262
+            },
+            "right": {
+              "iou": 0.8862,
+              "aspect_w_over_h_mesh": 2.368,
+              "aspect_w_over_h_ref": 2.257
+            },
+            "back": {
+              "iou": 0.8487,
+              "aspect_w_over_h_mesh": 2.376,
+              "aspect_w_over_h_ref": 2.198
+            }
+          },
+          "colour_l1": 0.1028,
+          "facing_colour_rel": {
+            "front": [
+              1.009,
+              0.98,
+              0.951
+            ],
+            "left": [
+              0.995,
+              0.962,
+              0.932
+            ],
+            "right": [
+              1.016,
+              0.983,
+              0.95
+            ],
+            "back": [
+              1.015,
+              0.977,
+              0.942
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.009,
+      "colour_margin_0_vs_180": -0.001,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU",
+          "front/back silhouettes nearly mirror-equal (IoU margin 0.009): colour cue prefers 0 deg"
+        ]
+      }
+    },
+    "ENV-S-CANNON": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-CANNON/front.png",
+          "sha256": "73a7f36c8039536815a0d20be0463cddbdf6a7357dd54913e85d136ff0678597",
+          "fg_fraction": 0.4289
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-CANNON/left.png",
+          "sha256": "618ca63318e5531dccd2e705b309bc940aac5d934776d2f8d362eede26089f8c",
+          "fg_fraction": 0.3853
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-CANNON/right.png",
+          "sha256": "55fc4633fb9fec4c3a3e2070ffe22a158cb72d73b9443b35a8f3438b04290be7",
+          "fg_fraction": 0.3854
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-CANNON/back.png",
+          "sha256": "9d11bef35db1bab3f35151e8de1878821f52a49b4f34807abd48c8901721d509",
+          "fg_fraction": 0.4288
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.9071,
+          "views": {
+            "front": {
+              "iou": 0.8838,
+              "aspect_w_over_h_mesh": 1.179,
+              "aspect_w_over_h_ref": 1.107
+            },
+            "left": {
+              "iou": 0.9329,
+              "aspect_w_over_h_mesh": 1.678,
+              "aspect_w_over_h_ref": 1.613
+            },
+            "right": {
+              "iou": 0.9279,
+              "aspect_w_over_h_mesh": 1.678,
+              "aspect_w_over_h_ref": 1.61
+            },
+            "back": {
+              "iou": 0.8836,
+              "aspect_w_over_h_mesh": 1.179,
+              "aspect_w_over_h_ref": 1.105
+            }
+          },
+          "colour_l1": 0.0877,
+          "facing_colour_rel": {
+            "front": [
+              0.966,
+              0.983,
+              0.99
+            ],
+            "left": [
+              1.037,
+              1.052,
+              1.057
+            ],
+            "right": [
+              1.044,
+              1.056,
+              1.062
+            ],
+            "back": [
+              1.022,
+              1.034,
+              1.039
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.5497,
+          "views": {
+            "front": {
+              "iou": 0.5154,
+              "aspect_w_over_h_mesh": 1.678,
+              "aspect_w_over_h_ref": 1.107
+            },
+            "left": {
+              "iou": 0.5869,
+              "aspect_w_over_h_mesh": 1.179,
+              "aspect_w_over_h_ref": 1.613
+            },
+            "right": {
+              "iou": 0.5811,
+              "aspect_w_over_h_mesh": 1.179,
+              "aspect_w_over_h_ref": 1.61
+            },
+            "back": {
+              "iou": 0.5156,
+              "aspect_w_over_h_mesh": 1.678,
+              "aspect_w_over_h_ref": 1.105
+            }
+          },
+          "colour_l1": 0.1385,
+          "facing_colour_rel": {
+            "front": [
+              1.044,
+              1.056,
+              1.062
+            ],
+            "left": [
+              0.966,
+              0.983,
+              0.99
+            ],
+            "right": [
+              1.022,
+              1.034,
+              1.039
+            ],
+            "back": [
+              1.037,
+              1.052,
+              1.057
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.7525,
+          "views": {
+            "front": {
+              "iou": 0.8838,
+              "aspect_w_over_h_mesh": 1.179,
+              "aspect_w_over_h_ref": 1.107
+            },
+            "left": {
+              "iou": 0.624,
+              "aspect_w_over_h_mesh": 1.678,
+              "aspect_w_over_h_ref": 1.613
+            },
+            "right": {
+              "iou": 0.6184,
+              "aspect_w_over_h_mesh": 1.678,
+              "aspect_w_over_h_ref": 1.61
+            },
+            "back": {
+              "iou": 0.8837,
+              "aspect_w_over_h_mesh": 1.179,
+              "aspect_w_over_h_ref": 1.105
+            }
+          },
+          "colour_l1": 0.1374,
+          "facing_colour_rel": {
+            "front": [
+              1.022,
+              1.034,
+              1.039
+            ],
+            "left": [
+              1.044,
+              1.056,
+              1.062
+            ],
+            "right": [
+              1.037,
+              1.052,
+              1.057
+            ],
+            "back": [
+              0.966,
+              0.983,
+              0.99
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.5498,
+          "views": {
+            "front": {
+              "iou": 0.5162,
+              "aspect_w_over_h_mesh": 1.678,
+              "aspect_w_over_h_ref": 1.107
+            },
+            "left": {
+              "iou": 0.5869,
+              "aspect_w_over_h_mesh": 1.179,
+              "aspect_w_over_h_ref": 1.613
+            },
+            "right": {
+              "iou": 0.581,
+              "aspect_w_over_h_mesh": 1.179,
+              "aspect_w_over_h_ref": 1.61
+            },
+            "back": {
+              "iou": 0.5152,
+              "aspect_w_over_h_mesh": 1.678,
+              "aspect_w_over_h_ref": 1.105
+            }
+          },
+          "colour_l1": 0.1266,
+          "facing_colour_rel": {
+            "front": [
+              1.037,
+              1.052,
+              1.057
+            ],
+            "left": [
+              1.022,
+              1.034,
+              1.039
+            ],
+            "right": [
+              0.966,
+              0.983,
+              0.99
+            ],
+            "back": [
+              1.044,
+              1.056,
+              1.062
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.1546,
+      "colour_margin_0_vs_180": -0.0497,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU"
+        ]
+      }
+    },
+    "ENV-S-FORT-RUIN": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-FORT-RUIN/front.png",
+          "sha256": "02868aca1aa3b667d14d70272ca5d92158b0d79e46259b7f80f93c0e1e375052",
+          "fg_fraction": 0.3435
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-FORT-RUIN/left.png",
+          "sha256": "e44052187f42bf5818818ee90eec13fe533468ff22410fdaf14d387d6e815579",
+          "fg_fraction": 0.1475
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-FORT-RUIN/right.png",
+          "sha256": "ac31b1097a60b17004d4a34b8d05bb4ba6d2b7941895c09b2a2ba36ffa556a36",
+          "fg_fraction": 0.1377
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-FORT-RUIN/back.png",
+          "sha256": "6e15621d0471cd519f94916c0203a05c69c6b9adde0d38bf23bb793e6ba03aee",
+          "fg_fraction": 0.3413
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.7925,
+          "views": {
+            "front": {
+              "iou": 0.9646,
+              "aspect_w_over_h_mesh": 1.491,
+              "aspect_w_over_h_ref": 1.491
+            },
+            "left": {
+              "iou": 0.6048,
+              "aspect_w_over_h_mesh": 0.464,
+              "aspect_w_over_h_ref": 0.459
+            },
+            "right": {
+              "iou": 0.6493,
+              "aspect_w_over_h_mesh": 0.464,
+              "aspect_w_over_h_ref": 0.343
+            },
+            "back": {
+              "iou": 0.9514,
+              "aspect_w_over_h_mesh": 1.491,
+              "aspect_w_over_h_ref": 1.463
+            }
+          },
+          "colour_l1": 0.2284,
+          "facing_colour_rel": {
+            "front": [
+              1.044,
+              1.042,
+              1.07
+            ],
+            "left": [
+              0.948,
+              0.953,
+              0.903
+            ],
+            "right": [
+              0.937,
+              0.952,
+              0.898
+            ],
+            "back": [
+              1.045,
+              1.042,
+              1.039
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.2101,
+          "views": {
+            "front": {
+              "iou": 0.2034,
+              "aspect_w_over_h_mesh": 0.464,
+              "aspect_w_over_h_ref": 1.491
+            },
+            "left": {
+              "iou": 0.2224,
+              "aspect_w_over_h_mesh": 1.491,
+              "aspect_w_over_h_ref": 0.459
+            },
+            "right": {
+              "iou": 0.2065,
+              "aspect_w_over_h_mesh": 1.491,
+              "aspect_w_over_h_ref": 0.343
+            },
+            "back": {
+              "iou": 0.2081,
+              "aspect_w_over_h_mesh": 0.464,
+              "aspect_w_over_h_ref": 1.463
+            }
+          },
+          "colour_l1": 0.1166,
+          "facing_colour_rel": {
+            "front": [
+              0.937,
+              0.952,
+              0.898
+            ],
+            "left": [
+              1.044,
+              1.042,
+              1.07
+            ],
+            "right": [
+              1.045,
+              1.042,
+              1.039
+            ],
+            "back": [
+              0.948,
+              0.953,
+              0.903
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.6341,
+          "views": {
+            "front": {
+              "iou": 0.6453,
+              "aspect_w_over_h_mesh": 1.491,
+              "aspect_w_over_h_ref": 1.491
+            },
+            "left": {
+              "iou": 0.6085,
+              "aspect_w_over_h_mesh": 0.464,
+              "aspect_w_over_h_ref": 0.459
+            },
+            "right": {
+              "iou": 0.6456,
+              "aspect_w_over_h_mesh": 0.464,
+              "aspect_w_over_h_ref": 0.343
+            },
+            "back": {
+              "iou": 0.637,
+              "aspect_w_over_h_mesh": 1.491,
+              "aspect_w_over_h_ref": 1.463
+            }
+          },
+          "colour_l1": 0.2284,
+          "facing_colour_rel": {
+            "front": [
+              1.045,
+              1.042,
+              1.039
+            ],
+            "left": [
+              0.937,
+              0.952,
+              0.898
+            ],
+            "right": [
+              0.948,
+              0.953,
+              0.903
+            ],
+            "back": [
+              1.044,
+              1.042,
+              1.07
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.2084,
+          "views": {
+            "front": {
+              "iou": 0.2029,
+              "aspect_w_over_h_mesh": 0.464,
+              "aspect_w_over_h_ref": 1.491
+            },
+            "left": {
+              "iou": 0.2371,
+              "aspect_w_over_h_mesh": 1.491,
+              "aspect_w_over_h_ref": 0.459
+            },
+            "right": {
+              "iou": 0.1871,
+              "aspect_w_over_h_mesh": 1.491,
+              "aspect_w_over_h_ref": 0.343
+            },
+            "back": {
+              "iou": 0.2065,
+              "aspect_w_over_h_mesh": 0.464,
+              "aspect_w_over_h_ref": 1.463
+            }
+          },
+          "colour_l1": 0.1166,
+          "facing_colour_rel": {
+            "front": [
+              0.948,
+              0.953,
+              0.903
+            ],
+            "left": [
+              1.045,
+              1.042,
+              1.039
+            ],
+            "right": [
+              1.044,
+              1.042,
+              1.07
+            ],
+            "back": [
+              0.937,
+              0.952,
+              0.898
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.1584,
+      "colour_margin_0_vs_180": 0.0,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU"
+        ]
+      }
+    },
+    "ENV-S-HULL": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-HULL/front.png",
+          "sha256": "92ff6df83b7405f394aac6d5b421fd9581445dd96b2166cd90020695ecd38b95",
+          "fg_fraction": 0.3571
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-HULL/left.png",
+          "sha256": "2c578c259e5aa988c04ee29cbc2213831e3a7c16504e6e2326c2598c2eb6442d",
+          "fg_fraction": 0.1071
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-HULL/right.png",
+          "sha256": "f010d6467b7bc067d4a6b0e49e7e86fb0c5a269a97cc4737e589960960dcbfc9",
+          "fg_fraction": 0.1053
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-HULL/back.png",
+          "sha256": "9f062e2fc5efe98ea548297ce797773b081df8d73a5e5b6adf0653d7a4698330",
+          "fg_fraction": 0.3603
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.8838,
+          "views": {
+            "front": {
+              "iou": 0.8659,
+              "aspect_w_over_h_mesh": 1.172,
+              "aspect_w_over_h_ref": 1.183
+            },
+            "left": {
+              "iou": 0.9063,
+              "aspect_w_over_h_mesh": 0.251,
+              "aspect_w_over_h_ref": 0.245
+            },
+            "right": {
+              "iou": 0.8868,
+              "aspect_w_over_h_mesh": 0.251,
+              "aspect_w_over_h_ref": 0.245
+            },
+            "back": {
+              "iou": 0.8762,
+              "aspect_w_over_h_mesh": 1.172,
+              "aspect_w_over_h_ref": 1.175
+            }
+          },
+          "colour_l1": 0.1221,
+          "facing_colour_rel": {
+            "front": [
+              1.097,
+              1.066,
+              1.058
+            ],
+            "left": [
+              1.009,
+              1.029,
+              0.96
+            ],
+            "right": [
+              1.008,
+              1.028,
+              0.961
+            ],
+            "back": [
+              1.101,
+              1.068,
+              1.061
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.1975,
+          "views": {
+            "front": {
+              "iou": 0.2091,
+              "aspect_w_over_h_mesh": 0.251,
+              "aspect_w_over_h_ref": 1.183
+            },
+            "left": {
+              "iou": 0.1889,
+              "aspect_w_over_h_mesh": 1.172,
+              "aspect_w_over_h_ref": 0.245
+            },
+            "right": {
+              "iou": 0.1829,
+              "aspect_w_over_h_mesh": 1.172,
+              "aspect_w_over_h_ref": 0.245
+            },
+            "back": {
+              "iou": 0.209,
+              "aspect_w_over_h_mesh": 0.251,
+              "aspect_w_over_h_ref": 1.175
+            }
+          },
+          "colour_l1": 0.2063,
+          "facing_colour_rel": {
+            "front": [
+              1.008,
+              1.028,
+              0.961
+            ],
+            "left": [
+              1.097,
+              1.066,
+              1.058
+            ],
+            "right": [
+              1.101,
+              1.068,
+              1.061
+            ],
+            "back": [
+              1.009,
+              1.029,
+              0.96
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.8838,
+          "views": {
+            "front": {
+              "iou": 0.8659,
+              "aspect_w_over_h_mesh": 1.172,
+              "aspect_w_over_h_ref": 1.183
+            },
+            "left": {
+              "iou": 0.9062,
+              "aspect_w_over_h_mesh": 0.251,
+              "aspect_w_over_h_ref": 0.245
+            },
+            "right": {
+              "iou": 0.8866,
+              "aspect_w_over_h_mesh": 0.251,
+              "aspect_w_over_h_ref": 0.245
+            },
+            "back": {
+              "iou": 0.8763,
+              "aspect_w_over_h_mesh": 1.172,
+              "aspect_w_over_h_ref": 1.175
+            }
+          },
+          "colour_l1": 0.1209,
+          "facing_colour_rel": {
+            "front": [
+              1.101,
+              1.068,
+              1.061
+            ],
+            "left": [
+              1.008,
+              1.028,
+              0.961
+            ],
+            "right": [
+              1.009,
+              1.029,
+              0.96
+            ],
+            "back": [
+              1.097,
+              1.066,
+              1.058
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.1975,
+          "views": {
+            "front": {
+              "iou": 0.2087,
+              "aspect_w_over_h_mesh": 0.251,
+              "aspect_w_over_h_ref": 1.183
+            },
+            "left": {
+              "iou": 0.1889,
+              "aspect_w_over_h_mesh": 1.172,
+              "aspect_w_over_h_ref": 0.245
+            },
+            "right": {
+              "iou": 0.1828,
+              "aspect_w_over_h_mesh": 1.172,
+              "aspect_w_over_h_ref": 0.245
+            },
+            "back": {
+              "iou": 0.2094,
+              "aspect_w_over_h_mesh": 0.251,
+              "aspect_w_over_h_ref": 1.175
+            }
+          },
+          "colour_l1": 0.2059,
+          "facing_colour_rel": {
+            "front": [
+              1.009,
+              1.029,
+              0.96
+            ],
+            "left": [
+              1.101,
+              1.068,
+              1.061
+            ],
+            "right": [
+              1.097,
+              1.066,
+              1.058
+            ],
+            "back": [
+              1.008,
+              1.028,
+              0.961
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.0,
+      "colour_margin_0_vs_180": 0.0012,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU",
+          "front/back silhouettes nearly mirror-equal (IoU margin 0.000): colour cue prefers 180 deg by 0.001"
+        ]
+      }
+    },
+    "ENV-S-PALISADE": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-PALISADE/front.png",
+          "sha256": "c161f8702842702c04eb37810b2ff8156879fe6e5d52e6b75cc7a3dace6ba189",
+          "fg_fraction": 0.5048
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-PALISADE/left.png",
+          "sha256": "740b522114b6fc34582fac36882f9aa367eb644ec7b19f9a7c9d0e98bec3a77c",
+          "fg_fraction": 0.1113
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-PALISADE/right.png",
+          "sha256": "d7ac4261d0fc48c4b75749f797d09f4bc7f729cc4a6a2f46a3e3fbe3c826fece",
+          "fg_fraction": 0.1068
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-PALISADE/back.png",
+          "sha256": "b420dca7be7017858ff0424fe6e2d216845af52f4e8b5930318483df3c58f5de",
+          "fg_fraction": 0.4966
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.8909,
+          "views": {
+            "front": {
+              "iou": 0.9341,
+              "aspect_w_over_h_mesh": 1.037,
+              "aspect_w_over_h_ref": 1.086
+            },
+            "left": {
+              "iou": 0.8475,
+              "aspect_w_over_h_mesh": 0.209,
+              "aspect_w_over_h_ref": 0.18
+            },
+            "right": {
+              "iou": 0.8401,
+              "aspect_w_over_h_mesh": 0.209,
+              "aspect_w_over_h_ref": 0.178
+            },
+            "back": {
+              "iou": 0.942,
+              "aspect_w_over_h_mesh": 1.037,
+              "aspect_w_over_h_ref": 1.059
+            }
+          },
+          "colour_l1": 0.4543,
+          "facing_colour_rel": {
+            "front": [
+              1.055,
+              1.06,
+              1.068
+            ],
+            "left": [
+              0.953,
+              0.949,
+              0.953
+            ],
+            "right": [
+              0.921,
+              0.916,
+              0.92
+            ],
+            "back": [
+              1.078,
+              1.069,
+              1.058
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.179,
+          "views": {
+            "front": {
+              "iou": 0.188,
+              "aspect_w_over_h_mesh": 0.209,
+              "aspect_w_over_h_ref": 1.086
+            },
+            "left": {
+              "iou": 0.1719,
+              "aspect_w_over_h_mesh": 1.037,
+              "aspect_w_over_h_ref": 0.18
+            },
+            "right": {
+              "iou": 0.1702,
+              "aspect_w_over_h_mesh": 1.037,
+              "aspect_w_over_h_ref": 0.178
+            },
+            "back": {
+              "iou": 0.186,
+              "aspect_w_over_h_mesh": 0.209,
+              "aspect_w_over_h_ref": 1.059
+            }
+          },
+          "colour_l1": 0.0664,
+          "facing_colour_rel": {
+            "front": [
+              0.921,
+              0.916,
+              0.92
+            ],
+            "left": [
+              1.055,
+              1.06,
+              1.068
+            ],
+            "right": [
+              1.078,
+              1.069,
+              1.058
+            ],
+            "back": [
+              0.953,
+              0.949,
+              0.953
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.7867,
+          "views": {
+            "front": {
+              "iou": 0.809,
+              "aspect_w_over_h_mesh": 1.037,
+              "aspect_w_over_h_ref": 1.086
+            },
+            "left": {
+              "iou": 0.7782,
+              "aspect_w_over_h_mesh": 0.209,
+              "aspect_w_over_h_ref": 0.18
+            },
+            "right": {
+              "iou": 0.7448,
+              "aspect_w_over_h_mesh": 0.209,
+              "aspect_w_over_h_ref": 0.178
+            },
+            "back": {
+              "iou": 0.8147,
+              "aspect_w_over_h_mesh": 1.037,
+              "aspect_w_over_h_ref": 1.059
+            }
+          },
+          "colour_l1": 0.4543,
+          "facing_colour_rel": {
+            "front": [
+              1.078,
+              1.069,
+              1.058
+            ],
+            "left": [
+              0.921,
+              0.916,
+              0.92
+            ],
+            "right": [
+              0.953,
+              0.949,
+              0.953
+            ],
+            "back": [
+              1.055,
+              1.06,
+              1.068
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.1798,
+          "views": {
+            "front": {
+              "iou": 0.1996,
+              "aspect_w_over_h_mesh": 0.209,
+              "aspect_w_over_h_ref": 1.086
+            },
+            "left": {
+              "iou": 0.1642,
+              "aspect_w_over_h_mesh": 1.037,
+              "aspect_w_over_h_ref": 0.18
+            },
+            "right": {
+              "iou": 0.1581,
+              "aspect_w_over_h_mesh": 1.037,
+              "aspect_w_over_h_ref": 0.178
+            },
+            "back": {
+              "iou": 0.1974,
+              "aspect_w_over_h_mesh": 0.209,
+              "aspect_w_over_h_ref": 1.059
+            }
+          },
+          "colour_l1": 0.0788,
+          "facing_colour_rel": {
+            "front": [
+              0.953,
+              0.949,
+              0.953
+            ],
+            "left": [
+              1.078,
+              1.069,
+              1.058
+            ],
+            "right": [
+              1.055,
+              1.06,
+              1.068
+            ],
+            "back": [
+              0.921,
+              0.916,
+              0.92
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.1042,
+      "colour_margin_0_vs_180": 0.0,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU"
+        ]
+      }
+    },
+    "ENV-S-ROPE": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-ROPE/front.png",
+          "sha256": "8cf9325d395b4051971452ac42028252482189efca823685aa84392547fd6cb9",
+          "fg_fraction": 0.3518
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-ROPE/left.png",
+          "sha256": "975acfcd0a59449f16d6429adb3de579bbeb8d9e92fd9e69a5feb314eb14fd2f",
+          "fg_fraction": 0.3016
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-ROPE/right.png",
+          "sha256": "5d542068e545addf34d2a3b5f8f2be1f87650e733962fdd0e16c9a8bf7eb7fd4",
+          "fg_fraction": 0.3455
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-ROPE/back.png",
+          "sha256": "f2b2f33aafd7ed13bc741bb5fe2a2971d65e953d40e9a964f3a6824139a57e80",
+          "fg_fraction": 0.3245
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.8472,
+          "views": {
+            "front": {
+              "iou": 0.8501,
+              "aspect_w_over_h_mesh": 2.102,
+              "aspect_w_over_h_ref": 1.816
+            },
+            "left": {
+              "iou": 0.8082,
+              "aspect_w_over_h_mesh": 2.035,
+              "aspect_w_over_h_ref": 1.783
+            },
+            "right": {
+              "iou": 0.8655,
+              "aspect_w_over_h_mesh": 2.035,
+              "aspect_w_over_h_ref": 1.84
+            },
+            "back": {
+              "iou": 0.8651,
+              "aspect_w_over_h_mesh": 2.102,
+              "aspect_w_over_h_ref": 1.902
+            }
+          },
+          "colour_l1": 0.0711,
+          "facing_colour_rel": {
+            "front": [
+              0.982,
+              0.976,
+              0.967
+            ],
+            "left": [
+              1.038,
+              1.04,
+              1.041
+            ],
+            "right": [
+              1.007,
+              1.004,
+              1.0
+            ],
+            "back": [
+              1.043,
+              1.044,
+              1.039
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.8384,
+          "views": {
+            "front": {
+              "iou": 0.8342,
+              "aspect_w_over_h_mesh": 2.035,
+              "aspect_w_over_h_ref": 1.816
+            },
+            "left": {
+              "iou": 0.7957,
+              "aspect_w_over_h_mesh": 2.102,
+              "aspect_w_over_h_ref": 1.783
+            },
+            "right": {
+              "iou": 0.8565,
+              "aspect_w_over_h_mesh": 2.102,
+              "aspect_w_over_h_ref": 1.84
+            },
+            "back": {
+              "iou": 0.8673,
+              "aspect_w_over_h_mesh": 2.035,
+              "aspect_w_over_h_ref": 1.902
+            }
+          },
+          "colour_l1": 0.116,
+          "facing_colour_rel": {
+            "front": [
+              1.007,
+              1.004,
+              1.0
+            ],
+            "left": [
+              0.982,
+              0.976,
+              0.967
+            ],
+            "right": [
+              1.043,
+              1.044,
+              1.039
+            ],
+            "back": [
+              1.038,
+              1.04,
+              1.041
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.8475,
+          "views": {
+            "front": {
+              "iou": 0.8489,
+              "aspect_w_over_h_mesh": 2.102,
+              "aspect_w_over_h_ref": 1.816
+            },
+            "left": {
+              "iou": 0.8205,
+              "aspect_w_over_h_mesh": 2.035,
+              "aspect_w_over_h_ref": 1.783
+            },
+            "right": {
+              "iou": 0.8557,
+              "aspect_w_over_h_mesh": 2.035,
+              "aspect_w_over_h_ref": 1.84
+            },
+            "back": {
+              "iou": 0.8649,
+              "aspect_w_over_h_mesh": 2.102,
+              "aspect_w_over_h_ref": 1.902
+            }
+          },
+          "colour_l1": 0.1138,
+          "facing_colour_rel": {
+            "front": [
+              1.043,
+              1.044,
+              1.039
+            ],
+            "left": [
+              1.007,
+              1.004,
+              1.0
+            ],
+            "right": [
+              1.038,
+              1.04,
+              1.041
+            ],
+            "back": [
+              0.982,
+              0.976,
+              0.967
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.8406,
+          "views": {
+            "front": {
+              "iou": 0.8437,
+              "aspect_w_over_h_mesh": 2.035,
+              "aspect_w_over_h_ref": 1.816
+            },
+            "left": {
+              "iou": 0.7993,
+              "aspect_w_over_h_mesh": 2.102,
+              "aspect_w_over_h_ref": 1.783
+            },
+            "right": {
+              "iou": 0.8517,
+              "aspect_w_over_h_mesh": 2.102,
+              "aspect_w_over_h_ref": 1.84
+            },
+            "back": {
+              "iou": 0.8675,
+              "aspect_w_over_h_mesh": 2.035,
+              "aspect_w_over_h_ref": 1.902
+            }
+          },
+          "colour_l1": 0.0797,
+          "facing_colour_rel": {
+            "front": [
+              1.038,
+              1.04,
+              1.041
+            ],
+            "left": [
+              1.043,
+              1.044,
+              1.039
+            ],
+            "right": [
+              0.982,
+              0.976,
+              0.967
+            ],
+            "back": [
+              1.007,
+              1.004,
+              1.0
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 180,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": -0.0003,
+      "colour_margin_0_vs_180": -0.0427,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front kept: best turn 180 deg, gain over 0 deg 0.000 < 0.050",
+          "front/back silhouettes nearly mirror-equal (IoU margin -0.000): colour cue prefers 0 deg"
+        ]
+      }
+    },
+    "ENV-S-TREE": {
+      "refs": {
+        "front": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-TREE/front.png",
+          "sha256": "7e8bfb09b76cb46d0b890260dbca92b03f12be77bba4e9196345a4e13c0a347a",
+          "fg_fraction": 0.4605
+        },
+        "left": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-TREE/left.png",
+          "sha256": "294086aa15fd7267322db6c066d7725c4c8e482547828983009779cb3a114d93",
+          "fg_fraction": 0.376
+        },
+        "right": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-TREE/right.png",
+          "sha256": "43ea1c5e552bf25a2ebb956e893c34591d61085cb6a9edb7f78e3b7cca1b7782",
+          "fg_fraction": 0.3576
+        },
+        "back": {
+          "path": "C:/tmp/envmaps-research/tripo-inputs/ENV-S-TREE/back.png",
+          "sha256": "91aa24e0b27c0a633689f004bf16a25cfe5866eea26b5d771ed7f5decf708194",
+          "fg_fraction": 0.4432
+        }
+      },
+      "turns_deg": {
+        "0": {
+          "mean_iou": 0.8252,
+          "views": {
+            "front": {
+              "iou": 0.8764,
+              "aspect_w_over_h_mesh": 1.045,
+              "aspect_w_over_h_ref": 1.031
+            },
+            "left": {
+              "iou": 0.8769,
+              "aspect_w_over_h_mesh": 0.762,
+              "aspect_w_over_h_ref": 0.802
+            },
+            "right": {
+              "iou": 0.6719,
+              "aspect_w_over_h_mesh": 0.762,
+              "aspect_w_over_h_ref": 0.851
+            },
+            "back": {
+              "iou": 0.8758,
+              "aspect_w_over_h_mesh": 1.045,
+              "aspect_w_over_h_ref": 1.013
+            }
+          },
+          "colour_l1": 0.094,
+          "facing_colour_rel": {
+            "front": [
+              1.0,
+              0.991,
+              0.996
+            ],
+            "left": [
+              1.042,
+              0.975,
+              0.995
+            ],
+            "right": [
+              1.011,
+              1.0,
+              0.995
+            ],
+            "back": [
+              1.037,
+              0.997,
+              0.995
+            ]
+          }
+        },
+        "90": {
+          "mean_iou": 0.6926,
+          "views": {
+            "front": {
+              "iou": 0.7059,
+              "aspect_w_over_h_mesh": 0.762,
+              "aspect_w_over_h_ref": 1.031
+            },
+            "left": {
+              "iou": 0.7259,
+              "aspect_w_over_h_mesh": 1.045,
+              "aspect_w_over_h_ref": 0.802
+            },
+            "right": {
+              "iou": 0.6056,
+              "aspect_w_over_h_mesh": 1.045,
+              "aspect_w_over_h_ref": 0.851
+            },
+            "back": {
+              "iou": 0.733,
+              "aspect_w_over_h_mesh": 0.762,
+              "aspect_w_over_h_ref": 1.013
+            }
+          },
+          "colour_l1": 0.1106,
+          "facing_colour_rel": {
+            "front": [
+              1.011,
+              1.0,
+              0.995
+            ],
+            "left": [
+              1.0,
+              0.991,
+              0.996
+            ],
+            "right": [
+              1.037,
+              0.997,
+              0.995
+            ],
+            "back": [
+              1.042,
+              0.975,
+              0.995
+            ]
+          }
+        },
+        "180": {
+          "mean_iou": 0.7428,
+          "views": {
+            "front": {
+              "iou": 0.7649,
+              "aspect_w_over_h_mesh": 1.045,
+              "aspect_w_over_h_ref": 1.031
+            },
+            "left": {
+              "iou": 0.7435,
+              "aspect_w_over_h_mesh": 0.762,
+              "aspect_w_over_h_ref": 0.802
+            },
+            "right": {
+              "iou": 0.682,
+              "aspect_w_over_h_mesh": 0.762,
+              "aspect_w_over_h_ref": 0.851
+            },
+            "back": {
+              "iou": 0.7807,
+              "aspect_w_over_h_mesh": 1.045,
+              "aspect_w_over_h_ref": 1.013
+            }
+          },
+          "colour_l1": 0.1065,
+          "facing_colour_rel": {
+            "front": [
+              1.037,
+              0.997,
+              0.995
+            ],
+            "left": [
+              1.011,
+              1.0,
+              0.995
+            ],
+            "right": [
+              1.042,
+              0.975,
+              0.995
+            ],
+            "back": [
+              1.0,
+              0.991,
+              0.996
+            ]
+          }
+        },
+        "270": {
+          "mean_iou": 0.7098,
+          "views": {
+            "front": {
+              "iou": 0.7071,
+              "aspect_w_over_h_mesh": 0.762,
+              "aspect_w_over_h_ref": 1.031
+            },
+            "left": {
+              "iou": 0.7336,
+              "aspect_w_over_h_mesh": 1.045,
+              "aspect_w_over_h_ref": 0.802
+            },
+            "right": {
+              "iou": 0.6681,
+              "aspect_w_over_h_mesh": 1.045,
+              "aspect_w_over_h_ref": 0.851
+            },
+            "back": {
+              "iou": 0.7306,
+              "aspect_w_over_h_mesh": 0.762,
+              "aspect_w_over_h_ref": 1.013
+            }
+          },
+          "colour_l1": 0.0914,
+          "facing_colour_rel": {
+            "front": [
+              1.042,
+              0.975,
+              0.995
+            ],
+            "left": [
+              1.037,
+              0.997,
+              0.995
+            ],
+            "right": [
+              1.0,
+              0.991,
+              0.996
+            ],
+            "back": [
+              1.011,
+              1.0,
+              0.995
+            ]
+          }
+        }
+      },
+      "best_silhouette_turn_deg": 0,
+      "colour_note": "colour_l1 compares lit reference art with albedo face statistics; it is used only as the 0 vs 180 deg tie-break (narrow side views make it unreliable for 90/270)",
+      "silhouette_margin_0_vs_180": 0.0824,
+      "colour_margin_0_vs_180": -0.0125,
+      "decision": {
+        "yaw_deg": 0,
+        "consistent": true,
+        "reasons": [
+          "Tripo front (0 deg) has the best mean silhouette IoU"
+        ]
+      }
+    }
+  }
+}

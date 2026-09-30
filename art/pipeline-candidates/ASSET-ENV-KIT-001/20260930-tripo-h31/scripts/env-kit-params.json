@@ -1,0 +1,43 @@
+{
+  "schema": "unmatched.env-kit.params/1",
+  "_purpose": "Params of tools/art/env_kit (run_env_kit.py -> env_kit_build.py / orientation_check.py) for the 14 Tripo ENV props of run 20260930-tripo-h31. Target sizes are the proposal of the ENV-MAPS task (uu = cm); they are measured against, not accepted values.",
+  "_hull": "ENV-S-HULL: the task proposes length 300 and height ~130. Tripo's hull section (with its rigging pyramid) has height/length 0.855, so a uniform scale cannot meet both; length 300 is kept (explicit 'length' target; gun ports then match the 45 uu cannon) and the resulting height is reported. A lower wall is an actor scale in UE, not a mesh change.",
+  "run_dir": "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31",
+  "scratch_dir": "C:/tmp/envmaps-research/p1b/envkit",
+  "refs_dir": "C:/tmp/envmaps-research/tripo-inputs",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "texture_size": 2048,
+  "uv_raster_size": 1024,
+  "normal_padding_px_source": 32,
+  "bake_ao": false,
+  "max_triangles": 12000,
+  "isolated_gap_uu": 0.5,
+  "orientation": {
+    "raster_px": 192,
+    "apply_min_iou_gain": 0.05,
+    "note": "A yaw other than 0 is applied only when a 90/180/270 deg turn beats the Tripo front by >= apply_min_iou_gain mean silhouette IoU over the four reference views; smaller differences keep the Tripo front (the Tripo H3.1 multiview contract) and are reported"
+  },
+  "ue": {
+    "folders": "/Game/EnvKit/<board>/{Meshes,Textures,Materials} (proposal inside the fixed /Game/EnvKit/<board>/ contract)",
+    "mesh": "SM_Env_<Name>", "textures": "T_Env_<Name>_{BC,N,ORM}", "material_instance": "MI_Env_<Name>",
+    "fbx_material_slot": "M_Env_<Name> (slot 0; the MI is assigned to it in UE)",
+    "import": "legacy FBX, import_uniform_scale 1.0, import_materials false, import_textures false, collision none (decor, not interactive), build_nanite false",
+    "textures": {"BC": "sRGB, TC_Default", "N": "sRGB off, TC_Normalmap, flip_green false (PNG is DirectX already)", "ORM": "sRGB off, TC_Masks"}
+  },
+  "assets": {
+    "ENV-M-ARCADE-BAY":     {"name": "ArcadeBay",     "board": "Marmoreal", "target": {"dimension": "height",   "uu": 130}},
+    "ENV-M-PORTAL":         {"name": "Portal",        "board": "Marmoreal", "target": {"dimension": "height",   "uu": 150}},
+    "ENV-M-CHERRY":         {"name": "Cherry",        "board": "Marmoreal", "target": {"dimension": "height",   "uu": 180}},
+    "ENV-M-PLINTH-BALL":    {"name": "PlinthBall",    "board": "Marmoreal", "target": {"dimension": "height",   "uu": 60}},
+    "ENV-M-LANTERN-PLINTH": {"name": "LanternPlinth", "board": "Marmoreal", "target": {"dimension": "height",   "uu": 70}},
+    "ENV-M-URN":            {"name": "Urn",           "board": "Marmoreal", "target": {"dimension": "height",   "uu": 35}},
+    "ENV-M-CYPRESS":        {"name": "Cypress",       "board": "Marmoreal", "target": {"dimension": "height",   "uu": 110}},
+    "ENV-S-FORT-RUIN":      {"name": "FortRuin",      "board": "Sarpedon",  "target": {"dimension": "height",   "uu": 110}},
+    "ENV-S-TREE":           {"name": "Tree",          "board": "Sarpedon",  "target": {"dimension": "height",   "uu": 190}},
+    "ENV-S-HULL":           {"name": "Hull",          "board": "Sarpedon",  "target": {"dimension": "length",   "uu": 300}},
+    "ENV-S-CANNON":         {"name": "Cannon",        "board": "Sarpedon",  "target": {"dimension": "length",   "uu": 45}},
+    "ENV-S-CAMPFIRE":       {"name": "Campfire",      "board": "Sarpedon",  "target": {"dimension": "diameter", "uu": 40}},
+    "ENV-S-PALISADE":       {"name": "Palisade",      "board": "Sarpedon",  "target": {"dimension": "height",   "uu": 70}},
+    "ENV-S-ROPE":           {"name": "Rope",          "board": "Sarpedon",  "target": {"dimension": "diameter", "uu": 22}}
+  }
+}
