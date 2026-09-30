@@ -1,0 +1,36 @@
+{
+  "schema": "unmatched.tripo-run/1",
+  "asset": "ASSET-TABLE-BASE-001",
+  "runId": "20260928-table-base-tripo-h31",
+  "executedAt": "2026-09-30 12:40–12:56 (local)",
+  "executedBy": "orchestrator in the user's Chrome Tripo Studio tab (user: «не забываю использовать Tripo», /goal 2026-09-30)",
+  "taskId": "c2e5e3bf-e846-41ec-b218-67069b809b5e",
+  "inputs": {
+    "front": {"path": "inputs/table-base-v3-front-rock-white.png", "sha256": "0129a50cf3fe644866b22f4a4d61bc04826d2f798429fb9a13de774d43063236"},
+    "left": {"path": "inputs/table-base-v3-left-rock-white.png", "sha256": "048b3f90e994b6430eb3a777dad2ad1c9955b17786fbe2e9349f72ca7e30dc0c"},
+    "back": null, "right": null
+  },
+  "stages": [
+    {"op": "multiview generate H3.1 Макс.кач, ultra geometry, Triangle 2 000 000, no texture, no parts, private", "quoted": 30, "balanceBefore": 23755, "balanceAfter": 23725, "result": "1 958 872 faces; flat top, rock spikes down, rim intact"},
+    {"op": "retopology Quad, smart mesh, 7000", "quoted": 40, "balanceBefore": 23725, "balanceAfter": 23685, "result": "Quad 6 984 faces / 6 269 verts"},
+    {"op": "Smart UV", "quoted": 20, "balanceBefore": 23685, "balanceAfter": 23665, "result": "UV fill 73.5 % (auto UV before: 56.5 %)"},
+    {"op": "texture 2K multiview (front+left from generation), remove lighting", "quoted": 10, "balanceBefore": 23665, "balanceAfter": 23655},
+    {"op": "PBR", "quoted": 5, "balanceBefore": 23655, "balanceAfter": 23650}
+  ],
+  "creditsSpent": 105,
+  "plannedCredits": 130,
+  "export": {
+    "path": "source/table-base-tripo-c2e5e3bf-smartuv-tex2k-pbr.glb",
+    "sha256": "5193fad469675a27a5099a0fd6443c013fb8226708251c9d9807f8ab2a8ca429",
+    "bytes": 11569308,
+    "glbHeaderLengthMatches": true,
+    "chunks": ["JSON 2508", "BIN 11566772"],
+    "meshes": 1, "materials": 1, "images": 3, "vertices": 7280, "triangles": 12774,
+    "boundsTripoUnits": {"min": [-0.4587, 0.0, -0.4894], "max": [0.4587, 0.2011, 0.4894]}
+  },
+  "notes": [
+    "Raw 2M source and retopo-only GLB were not exported separately; the task id keeps them in Studio history.",
+    "Plan proportions: input front width 655 px vs side 787 px (1.20); generated depth/width = 0.979/0.917 = 1.07 → Blender stage must decide XY scaling to 756×656 uu (non-uniform ~12 %, more than the 4 % the plan allowed) and record it.",
+    "Status: предложено → measured after Blender/UE stages; not artistically accepted."
+  ]
+}

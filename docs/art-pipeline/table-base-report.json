@@ -1,9 +1,9 @@
 {
   "schema": "unmatched.asset-stage-report/1",
   "asset": "ASSET-TABLE-BASE-001",
-  "stage": "tripo",
+  "stage": "tripo+blender+ue",
   "runDir": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31",
-  "status": "blocked (0 кредитов); статусы ассета не повышались — реестр: предложено",
+  "status": "технически импортировано (UE) / измерено (Blender, UE) — 2026-09-30, исправление по ревью (прямая кромка UE 756×656, тёмный камень); художественной приёмки нет",
   "blockedReason": "blocked: платный шаг не выполнен. Подтверждение траты есть только в тексте задачи оркестратора (цитата пользователя), напрямую от пользователя в этой сессии его нет. Все бесплатные шаги выполнены",
   "creditsSpent": {
     "tripo": 0,
@@ -246,5 +246,975 @@
       "depth60Synthetic": "контур до y −333: скала спереди в кадре до 44,9 uu ниже верха на 18,5 м, целиком (до −63) на 1,2× со слежением, до 19,4 uu на 1,6×",
       "conclusion": "при камере на центре доски скалу спереди видно только на отдалении (верхние ≈45–56 uu); глубже всего её показывает слежение за ближним рядом на 1,2× (до ≈134 uu). Глубину выбирать по этим кадрам, не по K1"
     }
+  },
+  "statusHistory": [
+    {
+      "date": "2026-09-28",
+      "status": "blocked (0 кредитов); статусы ассета не повышались — реестр: предложено",
+      "blockedReason": "blocked: платный шаг не выполнен. Подтверждение траты есть только в тексте задачи оркестратора (цитата пользователя), напрямую от пользователя в этой сессии его нет. Все бесплатные шаги выполнены"
+    },
+    {
+      "date": "2026-09-30",
+      "status": "технически импортировано / измерено — первый прогон (860×770, срез по сечению скалы, крышка с плиты Tripo)"
+    },
+    {
+      "date": "2026-09-30",
+      "status": "технически импортировано / измерено — исправление по ревью: прямая кромка UE 756×656 (кайма 50 uu), тело скалы утоплено, камень кромки из текселов юбки, темнее доски в K1; художественной приёмки нет"
+    }
+  ],
+  "run20260930": {
+    "tripo": {
+      "executedBy": "оркестратор",
+      "taskId": "c2e5e3bf-e846-41ec-b218-67069b809b5e",
+      "creditsSpent": 105,
+      "report": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/tripo-run-20260930.json",
+      "glb": {
+        "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/source/table-base-tripo-c2e5e3bf-smartuv-tex2k-pbr.glb",
+        "sha256": "5193fad469675a27a5099a0fd6443c013fb8226708251c9d9807f8ab2a8ca429",
+        "triangles": 12774
+      }
+    },
+    "blender": {
+      "session": "живой Blender GUI через Blender MCP (порт 9877), сцена TableBase; драйвер scripts/table_base_live_mcp.py",
+      "status": "измерено",
+      "checksPassed": true,
+      "checks": {
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "no_armature": true,
+        "top_at_top_z": true,
+        "top_outline_matches_footprint_1uu": true,
+        "top_outline_centred": true,
+        "no_folded_faces_in_top_plane": true,
+        "no_board_horizontal_face_near_top_plane": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true,
+        "closed_manifold_consistent_winding": true,
+        "readback_closed_manifold": true
+      },
+      "finding": "верх Tripo — плита 3–4 uu над скальным телом, утопленным на 0…≈170 uu (p50 ≈48); сминание (шаблон) дало 410 перевёрнутых граней — отклонено",
+      "decisions": {
+        "top": "plane cut at 2.5 % of the source height below the source top + flat cap at Z=-3 instead of flattening: the Tripo top is a 3-4 uu plate over a rock body inset 0..~170 uu (p50 ~48 uu); flattening folded 410 plate-underside faces (fit step run first, rejected). The plate is removed; the cap texels are baked from the plate top (same texture, rock texels untouched)",
+        "xy": "fit to the rock section at the cut, not to the plate: target 770 x 860 (.blend) = UE 860 x 770, non-uniform 4.8 %. Chosen so the flat-top rim measured from the board edge has median 50 uu (per side 47-55.5); 756 x 656 (the plan) would leave the board overhanging the rock at 40 % of the board-edge samples (offline section test: rim p50 6 uu). Remaining overhang 9 % of samples (corners/notches) -> the board's own Rock_Undertray shows there",
+        "depth": "depth_uu 150 (top plane to the lowest point) = concept/reference proportion (~140-150 uu at this width). In the UE game-camera model (UpdateBoardCamera: K1 D 1931 uu) the near top edge (UE y +430) is just below the K1 frame, but at zoom 0.65x (D 2971) and at the 1.2x follow on the near row (D 1609) the frame reaches z -301 / -249 uu under that edge: the whole skirt and its spike tips are in frame, so the depth is the silhouette. 04 3.6 30-50 uu would flatten the hanging rock of the concept. NB table_base_preview.py assumes K1 = 12 m / 0.65x = 18.5 m (03 section 2 proposal), not the 19.31 m of UpdateBoardCamera: its near_skirt_limit numbers are not the game frame",
+        "normals": "Tripo normal map is OpenGL (+G = +V): curl test on the source map, mean|curl|/mean|div| 0.50 (OpenGL) vs 0.97 (DirectX); G flipped to DirectX for UE (TC_Normalmap, flip green off)",
+        "basecolor_factor": "glTF baseColorFactor 0.8 multiplied into BC in linear light (project rule, static_prop_candidate.py / atlas CLI)",
+        "weld": "glTF seam-split vertices welded (891) before the cut so the section is one boundary per loop; UVs and corner normals are loop data and unchanged"
+      },
+      "fit": {
+        "scale_xyz": [
+          8.464471,
+          8.891237,
+          7.649841
+        ],
+        "xy_nonuniformity_pct": 4.8,
+        "cut_below_top_frac": 0.025,
+        "footprint_prescale_m": [
+          0.909685,
+          0.967245
+        ],
+        "z_scale_rule": "depth_uu 150"
+      },
+      "sizeUuUe": [
+        860.0,
+        770.0,
+        150.0
+      ],
+      "boundsUu": {
+        "min": [
+          -430.0,
+          -385.0,
+          -153.0
+        ],
+        "max": [
+          430.0,
+          385.0,
+          -3.0
+        ]
+      },
+      "trianglesLod0": 13468,
+      "rimFlatTop": {
+        "per_side_uu": {
+          "+X": {
+            "min": 0.0,
+            "p50": 55.0,
+            "max": 105.5
+          },
+          "-X": {
+            "min": 0.0,
+            "p50": 55.5,
+            "max": 107.0
+          },
+          "+Y": {
+            "min": 11.0,
+            "p50": 47.0,
+            "max": 101.5
+          },
+          "-Y": {
+            "min": 0.0,
+            "p50": 50.0,
+            "max": 101.5
+          }
+        },
+        "min_uu": 0.0,
+        "p05_uu": 0.0,
+        "p50_uu": 50.0,
+        "max_uu": 107.0,
+        "samples_top_missing_at_board_edge": 9,
+        "samples": 100
+      },
+      "boardUndertrayEnclosedFraction": 0.8194,
+      "uv0": {
+        "islands": 21,
+        "uv_area_used_fraction": 0.5834,
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 16,
+        "min_gutter_px_estimate": 1
+      },
+      "capUv": {
+        "atlas_grid": 512,
+        "margin_texels_at_2k": 16,
+        "free_rect_uv": [
+          0.0078,
+          0.0078,
+          0.4883,
+          0.5215
+        ],
+        "free_rect_fraction": 0.2546,
+        "rotated_90": false,
+        "cap_extent_uu": [
+          770.0,
+          860.0
+        ],
+        "texel_density_px_per_uu": {
+          "cap": 1.242,
+          "rock_mean": 1.337
+        },
+        "rock_uv_unchanged": true
+      },
+      "capBake": {
+        "method": "Cycles selected-to-active from the uncut fitted copy (plate top above the cap)",
+        "cage_extrusion_m": 0.05000000074505806,
+        "cap_texels": 780527,
+        "bc_black_texels_lt_0.02": 0,
+        "rock_texels_changed": 0
+      },
+      "normalConvention": {
+        "tripo": "OpenGL",
+        "test": "curl/div 0.50 (OpenGL) vs 0.97 (DirectX)",
+        "export": "DirectX (G flipped)"
+      },
+      "files": {
+        "fbx": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/SM_TableBase.fbx",
+          "sha256": "0419cc1a4983f3188e694d408ed2754142f8d5ad89d194d340ef7f38b0c4c1b1"
+        },
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/T_TableBase_BC.png",
+          "sha256": "c6495a4e96b9bf51baf5940b3c2dff3d919bc4e2a4d69353c36244b6a85ae638"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/T_TableBase_N.png",
+          "sha256": "3e3cb945743eba89d88108e7711d23805af5255dcb74ee0dc0628013ad0c138b"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/T_TableBase_ORM.png",
+          "sha256": "bed02fac2ddecd20f4cfca5120f02889d64aafd0096b7515fa1aa2ecad9c487c"
+        },
+        "blend": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/blender/SM_TableBase.blend"
+        },
+        "candidateReport": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/candidate-report.json",
+        "fbxReadback": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/fbx-readback.json",
+        "previewJson": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/SM_TableBase_preview.json"
+      },
+      "previewCameraNote": "table_base_preview.py: K1 12 м / 0,65× 18,5 м (03 §2) ≠ UpdateBoardCamera 1931 uu — его near_skirt_limit не игровой кадр"
+    },
+    "ue": {
+      "status": "технически импортировано",
+      "mcp": "Unreal MCP 127.0.0.1:8123, лок C:/tmp/ue-editor.lock owner table-base",
+      "folder": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31",
+      "assets": [
+        "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Materials/MI_TableBase_Candidate",
+        "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Meshes/SM_TableBase",
+        "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Textures/T_TableBase_BC",
+        "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Textures/T_TableBase_N",
+        "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Textures/T_TableBase_ORM"
+      ],
+      "master": "/Game/UM/Materials/M_UM_Figure (M_DioramaMaster без текстурных параметров — отклонение от 04 §1)",
+      "mesh": {
+        "bounds_max_uu": [
+          430.0,
+          385.0,
+          -3.0
+        ],
+        "bounds_min_uu": [
+          -430.0,
+          -385.0,
+          -153.0
+        ],
+        "build_settings_lod0": "error: StaticMesh: Failed to find property 'source_models' for attribute 'source_models' on 'StaticMesh'",
+        "class": "StaticMesh",
+        "collision": {
+          "body_setup": true,
+          "collision_trace_flag": "<CollisionTraceFlag.CTF_USE_DEFAULT: 0>",
+          "simple_elements": 0
+        },
+        "lods": 1,
+        "material_slots": [
+          {
+            "material": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Materials/MI_TableBase_Candidate",
+            "slot": "M_TableBase"
+          }
+        ],
+        "nanite_enabled": false,
+        "path": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Meshes/SM_TableBase",
+        "size_uu": [
+          860.0,
+          770.0,
+          150.0
+        ],
+        "triangles_lod0": 13468,
+        "uv_channels_lod0": 1,
+        "vertices_lod0": 8080
+      },
+      "textures": {
+        "BC": {
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>",
+          "flip_green": false,
+          "lod_group": "<TextureGroup.TEXTUREGROUP_WORLD: 0>",
+          "path": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Textures/T_TableBase_BC",
+          "size": [
+            2048,
+            2048
+          ],
+          "srgb": true
+        },
+        "N": {
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>",
+          "flip_green": false,
+          "lod_group": "<TextureGroup.TEXTUREGROUP_WORLD_NORMAL_MAP: 1>",
+          "path": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Textures/T_TableBase_N",
+          "size": [
+            2048,
+            2048
+          ],
+          "srgb": false
+        },
+        "ORM": {
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>",
+          "flip_green": false,
+          "lod_group": "<TextureGroup.TEXTUREGROUP_WORLD: 0>",
+          "path": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Textures/T_TableBase_ORM",
+          "size": [
+            2048,
+            2048
+          ],
+          "srgb": false
+        }
+      },
+      "instance": {
+        "TeamColor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "parent": "/Game/UM/Materials/M_UM_Figure",
+        "path": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Materials/MI_TableBase_Candidate",
+        "textures": {
+          "BaseColorTexture": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Textures/T_TableBase_BC",
+          "NormalTexture": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Textures/T_TableBase_N",
+          "ORMTexture": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Textures/T_TableBase_ORM",
+          "TeamMaskTexture": "/Game/UM/Materials/Textures/T_UM_Mask_White"
+        }
+      },
+      "scene": {
+        "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+        "trayYaw": -90.0,
+        "trayActor": {
+          "label": "TableBase tray - temporary",
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "materials": [
+            "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Materials/MI_TableBase_Candidate"
+          ],
+          "world_max": [
+            385.0,
+            430.0,
+            -3.0
+          ],
+          "world_min": [
+            -385.0,
+            -430.0,
+            -153.0
+          ],
+          "yaw": -90.0
+        },
+        "boardActor": {
+          "hidden": false,
+          "label": "ART005 Decorative Board - NoCollision",
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mesh": "/Game/ArtTests/ART005F/Meshes/SM_ART005_BoardStoneV4_WoodUV",
+          "rotation_pyr": [
+            0.0,
+            -90.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "world_max": [
+            278.0,
+            328.0,
+            5.0
+          ],
+          "world_min": [
+            -278.0,
+            -328.0,
+            -31.0
+          ]
+        },
+        "scalability": "sg.* 2 (High) на время съёмки, восстановлено 3; r.ScreenPercentage 100",
+        "restoredLevel": "/Game/S08/S08Arena",
+        "dirtyMapsAfter": [],
+        "frames": {
+          "k1-d1931": {
+            "file": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-k1-d1931.png",
+            "sha256": "2c8c3253dce000c056cceb9edd09bf9a358b7d1bfd9008e658f27313b0b7d5bd",
+            "role": "K1 overview (1.0x), focus board centre",
+            "distance_uu": 1931.0
+          },
+          "zoom065-d2971": {
+            "file": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-zoom065-d2971.png",
+            "sha256": "2fdc8e28a938dc7b240f233af3885e0f218ca5f913e740711d09b19487d84eb6",
+            "role": "zoom-out limit 0.65x, not K1",
+            "distance_uu": 2970.7692307692305
+          },
+          "follow12-nearrow-d1609": {
+            "file": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-follow12-nearrow-d1609.png",
+            "sha256": "e5b18a12720ca1e83efa46d830dd5758c25239e7b4b8757dac157145e71b4294",
+            "role": "follow-selection 1.2x on the near row cell (2,5), not K1",
+            "distance_uu": 1609.1666666666667
+          },
+          "seam-4x-nearedge-d483": {
+            "file": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-seam-4x-nearedge-d483.png",
+            "sha256": "636ddf141581931d75fdb39efd4985c3c8467a08c808dba56958606b6497b20a",
+            "role": "4x close-up centred just outside the near board edge (y 328): seam board/tray, not K1",
+            "distance_uu": 482.75
+          },
+          "diag-near-skirt-low": {
+            "file": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-diag-near-skirt-low.png",
+            "sha256": "3d81ab98a62ecc6bf8381b16fe5cd6e0fd647877ba165ecc62ef0ee01f171e30",
+            "role": "diagnostic, not the game camera: near skirt from a low angle (pitch -5)",
+            "distance_uu": null
+          },
+          "diag-3q-low": {
+            "file": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-diag-3q-low.png",
+            "sha256": "dfe17a895239b108bbf08cd410ba5e8cddb6795acb19e2a66d202472a21560e1",
+            "role": "diagnostic, not the game camera: three-quarter low view of the tray and board",
+            "distance_uu": null
+          },
+          "k1-d1931-notray": {
+            "file": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-k1-d1931-notray.png",
+            "sha256": "3771cc8d1253289e50d499fa3a23d464c43b15543e23fdbd108f79fb05c9ce73",
+            "role": "K1 overview (1.0x), focus board centre - tray hidden (A/B)",
+            "distance_uu": 1931.0
+          },
+          "zoom065-d2971-notray": {
+            "file": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-zoom065-d2971-notray.png",
+            "sha256": "57d9d43bf75842726b5316e69e4080dea534eb6de87960988b55178f6603497e",
+            "role": "zoom-out limit 0.65x, not K1 - tray hidden (A/B)",
+            "distance_uu": 2970.7692307692305
+          },
+          "follow12-nearrow-d1609-notray": {
+            "file": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-follow12-nearrow-d1609-notray.png",
+            "sha256": "d7955abe915d5be2ab602f4852c9453a6b7cd1ddafd90d2a8283b7d173962a80",
+            "role": "follow-selection 1.2x on the near row cell (2,5), not K1 - tray hidden (A/B)",
+            "distance_uu": 1609.1666666666667
+          }
+        },
+        "sheet": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-sheet.jpg"
+      },
+      "observations": [
+        "шов доска/поднос без щели и без z-fighting (кадр 4×)",
+        "K1: ближний край подноса режется низом кадра; на 0,65× и 1,2× виден весь ближний край",
+        "юбка скалы в свете Cobble почти чёрная: свет над доской, стенки смотрят наружу (диагностический кадр)",
+        "крышка светлая и гладкая, выемки контура дают чёрные просветы"
+      ]
+    },
+    "open": [
+      "художественная приёмка",
+      "build profile ждёт 756×656, реальный контур 860×770",
+      "CLI ue-import падает на pivot_base_centre",
+      "table_base_preview.py: модель камеры",
+      "свет/заливка диорамы для юбки",
+      "спавн подноса в S08 (код)"
+    ],
+    "supersededBy": "run20260930fix: геометрия и текстуры первого прогона перезаписаны исправлением по ревью (неровный уступ 860×770 с чёрными выемками, светлая крышка с плиты Tripo). Цифры этого блока — история первого прогона"
+  },
+  "run20260930fix": {
+    "reason": "ревью: (1) неровный уступ 0…107 uu и чёрные выемки/щели у рамки в кадрах K1/0,65×/1,2×, габарит 860×770 вместо заданных 756×656; (2) крышка с верха плиты Tripo светлая, гладкая, серо-лиловая, ярче доски в K1",
+    "blender": {
+      "session": "живой Blender GUI через Blender MCP (порт 9877, PID 43816), сцена TableBase; драйвер scripts/table_base_live_mcp.py, шаги setup, import, cut, lip, liptex, relation, textures, boardref/view (снимки), export, roundtrip, report",
+      "status": "измерено",
+      "checksPassed": true,
+      "checks": {
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "no_armature": true,
+        "top_at_top_z": true,
+        "top_outline_matches_footprint_1uu": true,
+        "top_outline_centred": true,
+        "no_folded_faces_in_top_plane": true,
+        "no_board_horizontal_face_near_top_plane": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true,
+        "closed_manifold_consistent_winding": true,
+        "readback_closed_manifold": true,
+        "xy_bounds_match_footprint_1uu": true,
+        "lip_rock_texels_unchanged": true
+      },
+      "decisions": {
+        "run": "2026-09-30 fix run (review defects: irregular 860 x 770 top with black notches; light plate-top cap). Supersedes the first 2026-09-30 run (cut + cap at the rock section, cap baked from the Tripo plate top).",
+        "top": "rectangular straight lip, UE 756 x 656 (task footprint, rim 50 uu around the ART-005 board: flat 46.5-47 + 3 uu bevel), 20 uu thick (Z -3..-23), ring solid with a 70 uu wide ring (inner opening UE 616 x 516, under the board frame). The board frame rests on the lip everywhere: no overhang over void, no notches in the top edge. The Tripo plate is not kept: it is 3-4 uu thin (reads as paper at the game camera) and its top texels are the light smooth lavender surface the review rejected",
+        "body": "Tripo rock body cut at 2.5 % of the source height below its top, capped flat at Z -15 (inside the lip), section fitted inside the lip minus 6 uu per side with non-uniform XY limited to 5 % (4.76 %): UE 719 x 644; the long ends stay 18.5 uu further in. The body is recessed under the lip as in the concept; the deep notches of the rock section are under the lip, not in the top surface",
+        "depth": "150 uu from the lip top to the lowest spike (unchanged): body Z scale 7.04",
+        "lip_texture": "no new texture source: the lip strips and the hidden body cap are filled with the painted-rock texels of the Tripo skirt itself (texture bombing of 160 px rock windows, Hann blend with variance preservation, no mirroring), at the rock texel density (lip 1.32 px/uu vs rock 1.34); on the lip the low frequencies of BC are damped (box-blur 10 px x2: detail x1.3, low frequencies x0.4 - the painted crevice shading of the cliff read as cloudy blotches on a flat top) ; the tangent XY of the lip normals likewise (box-blur 5 px x2, low frequencies x0.3: the broad curvature of the cliff faces shaded as large dark blotches on the flat top) and BC x 0.5 (linear) so the lip reads as dark cracked stone and stays darker than the board in K1 (first try x0.85: rim 0.445 vs board 0.514 display luminance); normals copied in the strip UV frame (OpenGL, flipped to DirectX with the rest); AO baked over the whole tray. Rock texels unchanged (0 changed)",
+        "uv": "lip = 4 unfolded strips (top -> bevel -> outer side -> bottom -> inner side, right-handed like the faces) in the atlas rectangle freed by the Tripo plate (px 16,16 1000 x 1068); body cap = small island (0.16 px/uu, hidden under the board). Rock UVs untouched",
+        "normals": "Tripo normal map is OpenGL (+G = +V) (measured in the first run: curl/div 0.50 vs 0.97); G flipped to DirectX for UE (TC_Normalmap, flip green off)",
+        "basecolor_factor": "glTF baseColorFactor 0.8 multiplied into BC in linear light",
+        "weld": "glTF seam-split vertices welded (891) before the cut; UVs and corner normals are loop data and unchanged"
+      },
+      "lip": {
+        "footprint_uu_blend": [
+          656.0,
+          756.0
+        ],
+        "thickness_uu": 20.0,
+        "bevel_uu": 3.0,
+        "ring_width_uu": 70.0,
+        "inner_opening_uu_blend": [
+          516.0,
+          616.0
+        ],
+        "top_z_uu": -3.0,
+        "bottom_z_uu": -23.0,
+        "faces": 20,
+        "top_plane_faces_down_folded": 0,
+        "vertices_above_top_plane": 0,
+        "rock_custom_normals_max_drift_after_join": 0.0
+      },
+      "lipUv": {
+        "free_rect_px": [
+          16,
+          16,
+          1000,
+          1068
+        ],
+        "texel_density_px_per_uu": 1.3228,
+        "strip_height_px": 235.77,
+        "gap_px": 16,
+        "rock_cap_island": {
+          "box_px": [
+            899.72,
+            519.54,
+            116.28,
+            487.54
+          ],
+          "texel_density_px_per_uu": 0.1557,
+          "extent_uu": [
+            644.0,
+            718.99
+          ]
+        },
+        "rock_uv_unchanged": true
+      },
+      "lipTextures": {
+        "method": "texture bombing of Tripo rock windows (Hann, stride win/2, variance-preserving), no mirroring; no new texture source",
+        "window_px": 160,
+        "valid_windows": 90158,
+        "source_px_per_uu": 1.337,
+        "seed": 20260930,
+        "rock_bc_mean_srgb_source": [
+          0.312,
+          0.321,
+          0.353
+        ],
+        "rock_texels_changed": 0,
+        "regions": {
+          "-X": {
+            "rect_px": [
+              8,
+              8,
+              1016,
+              252
+            ],
+            "density_px_per_uu": 1.3228,
+            "bc_mean_srgb": [
+              0.22,
+              0.227,
+              0.251
+            ],
+            "bc_value_scale": 0.5,
+            "bc_lowpass_px": 10,
+            "bc_detail_gain": 1.3,
+            "bc_lowfreq_keep": 0.4,
+            "n_lowpass_px": 5,
+            "n_lowfreq_keep": 0.3,
+            "normal_xy_rms": 0.2084
+          },
+          "+X": {
+            "rect_px": [
+              8,
+              259,
+              1016,
+              253
+            ],
+            "density_px_per_uu": 1.3228,
+            "bc_mean_srgb": [
+              0.221,
+              0.228,
+              0.252
+            ],
+            "bc_value_scale": 0.5,
+            "bc_lowpass_px": 10,
+            "bc_detail_gain": 1.3,
+            "bc_lowfreq_keep": 0.4,
+            "n_lowpass_px": 5,
+            "n_lowfreq_keep": 0.3,
+            "normal_xy_rms": 0.2088
+          },
+          "+Y": {
+            "rect_px": [
+              8,
+              511,
+              884,
+              253
+            ],
+            "density_px_per_uu": 1.3228,
+            "bc_mean_srgb": [
+              0.219,
+              0.226,
+              0.25
+            ],
+            "bc_value_scale": 0.5,
+            "bc_lowpass_px": 10,
+            "bc_detail_gain": 1.3,
+            "bc_lowfreq_keep": 0.4,
+            "n_lowpass_px": 5,
+            "n_lowfreq_keep": 0.3,
+            "normal_xy_rms": 0.208
+          },
+          "-Y": {
+            "rect_px": [
+              8,
+              763,
+              884,
+              253
+            ],
+            "density_px_per_uu": 1.3228,
+            "bc_mean_srgb": [
+              0.219,
+              0.226,
+              0.25
+            ],
+            "bc_value_scale": 0.5,
+            "bc_lowpass_px": 10,
+            "bc_detail_gain": 1.3,
+            "bc_lowfreq_keep": 0.4,
+            "n_lowpass_px": 5,
+            "n_lowfreq_keep": 0.3,
+            "normal_xy_rms": 0.2033
+          },
+          "rock_cap": {
+            "rect_px": [
+              899,
+              519,
+              117,
+              489
+            ],
+            "density_px_per_uu": 0.1557,
+            "bc_mean_srgb": [
+              0.311,
+              0.32,
+              0.352
+            ],
+            "bc_value_scale": 1.0,
+            "bc_lowpass_px": null,
+            "bc_detail_gain": null,
+            "bc_lowfreq_keep": null,
+            "n_lowpass_px": null,
+            "n_lowfreq_keep": null,
+            "normal_xy_rms": 0.3746
+          }
+        }
+      },
+      "body": {
+        "top_z_uu": -15.0,
+        "inset_uu": 6.0,
+        "max_nonuniformity": 0.05,
+        "section_size_uu_blend": [
+          644.0,
+          718.986
+        ],
+        "fits_inside_uu_blend": [
+          644.0,
+          744.0
+        ],
+        "scale_xyz": [
+          7.079376,
+          7.433345,
+          7.037853
+        ],
+        "xy_nonuniformity_pct": 4.762
+      },
+      "sizeUuUe": [
+        756.0,
+        656.0,
+        150.0
+      ],
+      "boundsUu": {
+        "min": [
+          -378.0,
+          -328.0,
+          -153.0
+        ],
+        "max": [
+          378.0,
+          328.0,
+          -3.0
+        ]
+      },
+      "flatTopUuUe": [
+        750.0,
+        650.0
+      ],
+      "trianglesLod0": 13508,
+      "shells": 4,
+      "rimFlatTop": {
+        "per_side_uu": {
+          "+X": {
+            "min": 46.5,
+            "p50": 46.5,
+            "max": 46.5
+          },
+          "-X": {
+            "min": 47.0,
+            "p50": 47.0,
+            "max": 47.0
+          },
+          "+Y": {
+            "min": 46.5,
+            "p50": 46.5,
+            "max": 46.5
+          },
+          "-Y": {
+            "min": 47.0,
+            "p50": 47.0,
+            "max": 47.0
+          }
+        },
+        "samples": 100,
+        "min_uu": 46.5,
+        "p05_uu": 46.5,
+        "p50_uu": 46.75,
+        "max_uu": 47.0,
+        "samples_top_missing_at_board_edge": 0,
+        "step_uu": 0.5,
+        "board_half_extent_uu_blend": [
+          278.0,
+          328.0
+        ],
+        "board_outline_source": "board FBX bounds (whole mesh, .blend axes)",
+        "proposed_uu": [
+          40,
+          60
+        ],
+        "min_within_proposed": true,
+        "p50_within_proposed": true
+      },
+      "boardUndertrayEnclosedFraction": 0.7917,
+      "uv0": {
+        "islands": 25,
+        "uv_area_used_fraction": 0.5884,
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 16,
+        "min_gutter_px_estimate": 1
+      },
+      "aoBake": {
+        "measured_on": "texels covered by UV islands",
+        "min": 0.0,
+        "p05": 0.359,
+        "p50": 0.859,
+        "mean": 0.804,
+        "texels_lt_0.2": 57888,
+        "samples": 64,
+        "distance_m": 0.3
+      },
+      "channelStats": {
+        "roughness_mean": 0.911,
+        "metallic_mean": 0.059,
+        "metallic_fraction_gt_0.5": 0.0,
+        "normal_mean_rgb_dx": [
+          0.499,
+          0.513,
+          0.959
+        ]
+      },
+      "fbxReadback": {
+        "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/fbx-readback.json",
+        "triangles": 13508,
+        "material_slots": [
+          "M_TableBase"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "topology": {
+          "open_edges": 0,
+          "non_manifold_edges": 0,
+          "faces_with_inconsistent_winding": 0
+        }
+      },
+      "outputs": {
+        "fbx": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/SM_TableBase.fbx",
+          "sha256": "24977f1826bcad8fd8e6ec0dfa14c88d9e488787e75798c9a0179e19024313cf"
+        },
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/T_TableBase_BC.png",
+          "sha256": "91e4f956c47370649d6b9be13b71b49bc0e5247ec6ee879d053610a048332558"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/T_TableBase_N.png",
+          "sha256": "7afb10a7bc412e1d7b4eaebee2669177be8c74884e97c41419e7ef127892910e"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/T_TableBase_ORM.png",
+          "sha256": "e380f8e5ce09cab6e5f68f064173d75a3173379fde7ce11d451f1e773a4dc883"
+        },
+        "blend": {
+          "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/blender/SM_TableBase.blend",
+          "bytes": 710687,
+          "note": "copy of the live session (all scenes); tray in scene 'TableBase'; textures external, relative paths ../export/T_TableBase_*.png"
+        }
+      },
+      "previews": [
+        "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/blender-01-import-glb.png",
+        "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/blender-02-body-cut-wire.png",
+        "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/blender-03-lip-wire.png",
+        "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/blender-04-textured-top.png",
+        "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/blender-05-textured-side.png",
+        "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/blender-06-with-board-art005.png"
+      ]
+    },
+    "ue": {
+      "status": "технически импортировано",
+      "folder": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31",
+      "assetsExactlyAsPlanned": true,
+      "numberedDuplicates": [],
+      "mesh": {
+        "size_uu": [
+          756.0,
+          656.0,
+          150.0
+        ],
+        "bounds_min_uu": [
+          -378.0,
+          -328.0,
+          -153.0
+        ],
+        "bounds_max_uu": [
+          378.0,
+          328.0,
+          -3.0
+        ],
+        "triangles_lod0": 13508,
+        "vertices_lod0": 8733,
+        "uv_channels_lod0": 1,
+        "nanite_enabled": false,
+        "collision": {
+          "body_setup": true,
+          "collision_trace_flag": "<CollisionTraceFlag.CTF_USE_DEFAULT: 0>",
+          "simple_elements": 0
+        },
+        "material_slots": [
+          {
+            "material": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Materials/MI_TableBase_Candidate",
+            "slot": "M_TableBase"
+          }
+        ]
+      },
+      "textures": {
+        "BC": {
+          "size": [
+            2048,
+            2048
+          ],
+          "srgb": true,
+          "compression": "<TextureCompressionSettings.TC_DEFAULT: 0>",
+          "flip_green": false
+        },
+        "N": {
+          "size": [
+            2048,
+            2048
+          ],
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_NORMALMAP: 1>",
+          "flip_green": false
+        },
+        "ORM": {
+          "size": [
+            2048,
+            2048
+          ],
+          "srgb": false,
+          "compression": "<TextureCompressionSettings.TC_MASKS: 2>",
+          "flip_green": false
+        }
+      },
+      "instance": {
+        "TeamColor": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "parent": "/Game/UM/Materials/M_UM_Figure",
+        "path": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Materials/MI_TableBase_Candidate",
+        "textures": {
+          "BaseColorTexture": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Textures/T_TableBase_BC",
+          "NormalTexture": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Textures/T_TableBase_N",
+          "ORMTexture": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Textures/T_TableBase_ORM",
+          "TeamMaskTexture": "/Game/UM/Materials/Textures/T_UM_Mask_White"
+        }
+      },
+      "scene": {
+        "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+        "trayYaw": -90.0,
+        "cameraModel": {
+          "fov_horizontal_deg": 35.0,
+          "pitch": -55.0,
+          "yaw": -90.0,
+          "k1_uu": 1931.0,
+          "focus_offset_z_uu": 28.0,
+          "source": "UpdateBoardCamera (S08FlowGameMode.cpp) as in tools/tripo-pipeline/review/control_scene.py"
+        },
+        "frames": {
+          "k1-d1931": {
+            "file": "ue-k1-d1931.png",
+            "sha256": "26d5b1e312eb9af8388e6701e3ec4d874894c93e92063d352cbc1d6d940c3163",
+            "role": "K1 overview (1.0x), focus board centre"
+          },
+          "zoom065-d2971": {
+            "file": "ue-zoom065-d2971.png",
+            "sha256": "14c9d4c2121491956d4857a109d7310bc8315a1d5601c617b4e72368f7784f2c",
+            "role": "zoom-out limit 0.65x, not K1"
+          },
+          "follow12-nearrow-d1609": {
+            "file": "ue-follow12-nearrow-d1609.png",
+            "sha256": "e5f37fc286dad69ba3875cd6d481173c6e87aaf4db5b88c431f333b25fdbcb3c",
+            "role": "follow-selection 1.2x on the near row cell (2,5), not K1"
+          },
+          "seam-4x-nearedge-d483": {
+            "file": "ue-seam-4x-nearedge-d483.png",
+            "sha256": "07be7bbc7798008ebd5fe4ce3c3d5a73ff01bf8b640101fdcfc02ed0857eeb81",
+            "role": "4x close-up centred just outside the near board edge (y 328): seam board/tray, not K1"
+          },
+          "diag-near-skirt-low": {
+            "file": "ue-diag-near-skirt-low.png",
+            "sha256": "988f69575861021513df5455da3852b2cd220401e07a2a21787f011c0d7a3d15",
+            "role": "diagnostic, not the game camera: near skirt from a low angle (pitch -5)"
+          },
+          "diag-3q-low": {
+            "file": "ue-diag-3q-low.png",
+            "sha256": "4784fcdcd3319f7b3bedae1d583fb2776e46f02ed0c770cae694156172a702e7",
+            "role": "diagnostic, not the game camera: three-quarter low view of the tray and board"
+          },
+          "k1-d1931-notray": {
+            "file": "ue-k1-d1931-notray.png",
+            "sha256": "cf0eb0541f6682bc2d01359558a559f661e2b8eb01193402e64344fea01ccdb3",
+            "role": "K1 overview (1.0x), focus board centre - tray hidden (A/B)"
+          },
+          "zoom065-d2971-notray": {
+            "file": "ue-zoom065-d2971-notray.png",
+            "sha256": "fdee8d70363471ec20ef127e0e325e16650ead6f6192d63af05970742c4f3be4",
+            "role": "zoom-out limit 0.65x, not K1 - tray hidden (A/B)"
+          },
+          "follow12-nearrow-d1609-notray": {
+            "file": "ue-follow12-nearrow-d1609-notray.png",
+            "sha256": "c559a216b4b7fb35488ab779a7becc0fe168df80cc978fcb9a9e6bc18d0d96a9",
+            "role": "follow-selection 1.2x on the near row cell (2,5), not K1 - tray hidden (A/B)"
+          }
+        },
+        "restoredLevel": "/Game/S08/S08Arena",
+        "controlLevelDirtyAfter": false,
+        "dirtyAfter": {
+          "maps": [],
+          "content": []
+        },
+        "cleanup": {
+          "destroyed": [
+            "TableBase tray - temporary",
+            "TableBase board camera FOV35 - temporary"
+          ],
+          "op": "cleanup"
+        },
+        "lock": {
+          "step": "table-base scene: spawn + frames + cleanup + restore",
+          "owner": "table-base",
+          "waited_s": 0.0,
+          "stale_taken": null,
+          "waits": 0,
+          "stamp": "table-base 2026-09-30T09:06:17+00:00 table-base scene: spawn + frames + cleanup + restore"
+        }
+      },
+      "k1Luminance": {
+        "method": "средняя яркость дисплея (Rec.709 от sRGB) в ue-k1-d1931.png: ближняя кайма строки 1010-1060 x 700-1200, левая/правая кайма столбцы 420-480 / 1440-1500 строки 350-850 (только пиксели подноса, L > 0.05), плитки доски строки 700-900 x 620-860",
+        "fix": {
+          "nearRim": 0.367,
+          "leftRim": 0.316,
+          "rightRim": 0.315,
+          "board": 0.514,
+          "nearRimOverBoard": 0.714
+        },
+        "firstRun": {
+          "nearRim": 0.562,
+          "leftRim": 0.496,
+          "rightRim": 0.506,
+          "board": 0.511,
+          "nearRimOverBoard": 1.1
+        },
+        "intermediateTry_bcScale085": {
+          "nearRim": 0.445,
+          "board": 0.514
+        }
+      },
+      "sheet": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-sheet.jpg",
+      "beforeAfter": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-fix-before-after-k1-edges.jpg"
+    },
+    "open": [
+      "художественная приёмка (кромка, тон камня, юбка) — взгляд пользователя",
+      "юбка скалы в свете Cobble/P17 почти чёрная (внешние стенки смотрят от ключевого света, тело утоплено под кромкой) — свет/заливка диорамы, отдельное решение",
+      "кромка — прямая плита с фаской 3 uu, без сколов; сколы/неровность кромки — художественный вопрос",
+      "build profile table-base-static-um-fbx-v1.json ждёт top_outline 756×656: теперь это габарит XY; плоская часть верха 750×650 из-за фаски 3 uu. CLI ue-import по-прежнему требует pivot_base_centre",
+      "table_base_preview.py: модель камеры 12 м против UpdateBoardCamera 1931 uu",
+      "спавн подноса под доской в S08 (код) — отдельная задача"
+    ]
   }
 }

@@ -1,0 +1,50 @@
+{
+  "source_glb": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/source/table-base-tripo-c2e5e3bf-smartuv-tex2k-pbr.glb",
+  "out_dir": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31",
+  "asset_name": "SM_TableBase",
+  "texture_prefix": "T_TableBase",
+  "material_name": "M_TableBase",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "texture_size": 2048,
+  "footprint_uu_blend_xy": [
+    656,
+    756
+  ],
+  "top_z_uu": -3.0,
+  "top_band_frac": 0.03,
+  "depth_uu": 150,
+  "bake_ao": true,
+  "ao_samples": 64,
+  "ao_distance_m": 0.3,
+  "board_bounds_json": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/board-art005-fbx-bounds.json",
+  "rim_proposed_uu": [
+    40,
+    60
+  ],
+  "coplanar_min_uu": 0.5,
+  "require_closed_manifold": true,
+  "cut_below_top_frac": 0.025,
+  "body": {
+    "top_z_uu": -15.0,
+    "inset_uu": 6.0,
+    "max_nonuniformity": 0.05,
+    "note": "rock body cut + capped at top_z_uu (inside the lip), its section fitted inside footprint - 2*inset, recessed under the lip"
+  },
+  "lip": {
+    "thickness_uu": 20.0,
+    "bevel_uu": 3.0,
+    "ring_width_uu": 70.0,
+    "bc_value_scale": 0.5,
+    "bomb_window_px": 160,
+    "source_erode_px": 6,
+    "source_px_per_uu": 1.337,
+    "seed": 20260930,
+    "note": "straight bevelled rectangular rock lip = UE 756 x 656 flat top under the board frame (rim 50 uu), textured with the Tripo skirt's own painted-rock texels (bombing), low frequencies damped and darkened so it does not compete with the board in K1",
+    "bc_lowpass_px": 10,
+    "bc_detail_gain": 1.3,
+    "bc_lowfreq_keep": 0.4,
+    "n_lowpass_px": 5,
+    "n_detail_gain": 1.0,
+    "n_lowfreq_keep": 0.3
+  }
+}
