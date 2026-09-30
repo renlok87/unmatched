@@ -1,0 +1,1762 @@
+{
+ "anti_aliasing_method": 4,
+ "assets": {
+  "base": "/Game/PipelineCandidates/Medusa/H2LD/Meshes/SM_Medusa_H2LD_Base",
+  "base_instance": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base",
+  "extra:MI_Medusa_H2LD_DebugClass": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_DebugClass",
+  "extra:MI_Medusa_H2LD_Neutral": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral",
+  "figure_instance": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD",
+  "skeletal": "/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD",
+  "team:base:P1": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base_P1",
+  "team:base:P2": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base_P2",
+  "team:figure:P1": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P1",
+  "team:figure:P2": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P2",
+  "texture:BC": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_BC",
+  "texture:Edge": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_Edge",
+  "texture:LUT": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_UM_MatLUT_Medusa",
+  "texture:MatID": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_MatID",
+  "texture:N": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_N",
+  "texture:ORM": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_ORM",
+  "texture:TeamAccent": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_TeamAccent"
+ },
+ "cell": [
+  0.0,
+  50.0,
+  0.0
+ ],
+ "cleanup": {
+  "destroyed": [
+   "LDue figure - temporary",
+   "LDue base - temporary",
+   "LDue sky - temporary",
+   "LDue camera - temporary"
+  ],
+  "op": "cleanup"
+ },
+ "config": {
+  "anchor_zone": "linen",
+  "base_mi": {
+   "P1": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base_P1",
+   "P2": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base_P2",
+   "debug": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base",
+   "neutral": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base"
+  },
+  "concept": {
+   "back": "art/imagegen/hero-quality-v1/medusa/medusa-back.png",
+   "front": "art/imagegen/hero-quality-v1/medusa/medusa-front.png",
+   "side": "art/imagegen/hero-quality-v1/medusa/medusa-side.png"
+  },
+  "concept_zones": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/measure-report.json",
+  "hero": "Medusa",
+  "key_zones": [
+   "gold_antique",
+   "linen",
+   "skin"
+  ],
+  "min_px": 150,
+  "never_dye_zones": [
+   "gold_antique",
+   "skin",
+   "wood",
+   "leather_worn"
+  ],
+  "note": "look-dev C group A (2026-09-30): H2LD rev 2 on the canonical skeleton, M_UM_Figure_v2.1 UseTeamAccent, teams P1/P2 of the active C-11 palette. Frames: P1.7 Cobble control level, light profile cobble-probe, High, SP 100; neutral / P1 / P2 / DebugClass / plate, reading exposure -1.0 EV. Editor frames (diagnostic), not K1/K2 acceptance",
+  "reading_bias_ev": -0.75,
+  "render_gates": {
+   "legacy_bake": {
+    "hue_deg": [
+     [
+      38,
+      110
+     ]
+    ],
+    "s_min": 0.15
+   }
+  },
+  "restore_level": "/Game/S08/S08Arena",
+  "run_dir": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2ld-ue-import",
+  "side_camera": "+X",
+  "teams": [
+   "P1",
+   "P2"
+  ],
+  "tolerance": {
+   "hue_deg": 12.0,
+   "luma_ratio": 0.15,
+   "sat": 0.1
+  },
+  "tolerance_zones": [
+   "gold_antique",
+   "linen",
+   "skin",
+   "leather_smooth",
+   "leather_worn"
+  ],
+  "variants": {
+   "P1": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P1",
+   "P2": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P2",
+   "debug": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_DebugClass",
+   "neutral": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral"
+  },
+  "verify": {
+   "clips_folder": "/Game/PipelineCandidates/Medusa/H2Anim",
+   "clips_reference": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/reports/ue-measure-clips.json",
+   "default_mi_key": "team:figure:P1",
+   "expect": {
+    "base_uv_channels": 2,
+    "bone_names": [
+     "SKEL_UM_Humanoid",
+     "root",
+     "hips",
+     "spine",
+     "head",
+     "arm_upper_L",
+     "arm_lower_L",
+     "hand_L",
+     "weapon_L",
+     "arm_upper_R",
+     "arm_lower_R",
+     "hand_R",
+     "leg_upper_L",
+     "leg_lower_L",
+     "foot_L",
+     "leg_upper_R",
+     "leg_lower_R",
+     "foot_R"
+    ],
+    "bones": 18,
+    "clips": 4,
+    "triangles": 43054
+   },
+   "folder": "/Game/PipelineCandidates/Medusa/H2LD",
+   "height_uu": 55.0,
+   "hero_root": "/Game/PipelineCandidates/Medusa",
+   "instances": {
+    "extra:MI_Medusa_H2LD_DebugClass": {
+     "parent": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD",
+     "scalars": {
+      "DebugView": 1.0
+     }
+    },
+    "extra:MI_Medusa_H2LD_Neutral": {
+     "parent": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD",
+     "scalars": {
+      "TeamDye": 0.0
+     },
+     "vectors": {
+      "TeamColor": [
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    },
+    "figure_instance": {
+     "parent": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+     "scalars": {
+      "TeamDye": 1.0,
+      "TeamDyeCeiling": 15.5387,
+      "TeamDyeGain": 22.9292
+     },
+     "switches": {
+      "UseTeamAccent": true,
+      "UseUV1Metres": true
+     },
+     "textures": {
+      "EdgeMaskTexture": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_Edge",
+      "MatIDTexture": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_MatID",
+      "MatLUT": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_UM_MatLUT_Medusa",
+      "TeamAccentTexture": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_TeamAccent",
+      "TeamMaskTexture": "/Game/UM/Materials/Textures/T_UM_Mask_Black"
+     }
+    },
+    "team:base:P1": {
+     "parent": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:base:P2": {
+     "parent": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P1": {
+     "parent": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P2": {
+     "parent": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    }
+   },
+   "skeleton": "/Game/PipelineCandidates/Medusa/Rig/SK_Medusa_Skeleton",
+   "textures": {
+    "BC": {
+     "compression_settings": "TC_DEFAULT",
+     "srgb": "True"
+    },
+    "Edge": {
+     "compression_settings": "TC_GRAYSCALE",
+     "srgb": "False"
+    },
+    "LUT": {
+     "compression_settings": "TC_HDR",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "size": [
+      16,
+      16
+     ],
+     "srgb": "False"
+    },
+    "MatID": {
+     "compression_settings": "TC_GRAYSCALE",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "srgb": "False"
+    },
+    "N": {
+     "compression_settings": "TC_NORMALMAP",
+     "srgb": "False"
+    },
+    "ORM": {
+     "compression_settings": "TC_MASKS",
+     "srgb": "False"
+    },
+    "TeamAccent": {
+     "compression_settings": "TC_GRAYSCALE",
+     "mip_gen_settings": "TMGS_FROM_TEXTURE_GROUP",
+     "size": [
+      2048,
+      2048
+     ],
+     "srgb": "False"
+    }
+   }
+  },
+  "zones": [
+   "gold_antique",
+   "linen",
+   "skin",
+   "leather_smooth",
+   "leather_worn",
+   "wood",
+   "legacy_bake"
+  ]
+ },
+ "console": [
+  "sg.ViewDistanceQuality 2",
+  "sg.AntiAliasingQuality 2",
+  "sg.ShadowQuality 2",
+  "sg.GlobalIlluminationQuality 2",
+  "sg.ReflectionQuality 2",
+  "sg.PostProcessQuality 2",
+  "sg.TextureQuality 2",
+  "sg.EffectsQuality 2",
+  "sg.FoliageQuality 2",
+  "sg.ShadingQuality 2",
+  "ShowFlag.Grid 0",
+  "ShowFlag.BillboardSprites 0",
+  "ShowFlag.Volumes 0",
+  "ShowFlag.Bloom 0",
+  "ShowFlag.Bloom 2",
+  "sg.ViewDistanceQuality 3",
+  "sg.AntiAliasingQuality 3",
+  "sg.ShadowQuality 3",
+  "sg.GlobalIlluminationQuality 3",
+  "sg.ReflectionQuality 3",
+  "sg.PostProcessQuality 3",
+  "sg.TextureQuality 3",
+  "sg.EffectsQuality 3",
+  "sg.FoliageQuality 3",
+  "sg.ShadingQuality 3",
+  "ShowFlag.Grid 2",
+  "ShowFlag.BillboardSprites 2",
+  "ShowFlag.Volumes 2",
+  "ShowFlag.Bloom 2"
+ ],
+ "editor_lock": {
+  "owner": "lookdev-r2",
+  "stale_taken": null,
+  "stamp": "lookdev-r2 2026-09-30T13:39:00+00:00 h5cb1 review Medusa b2",
+  "step": "h5cb1 review Medusa b2",
+  "waited_s": 0.0
+ },
+ "exposure_reading": {
+  "exposure": {
+   "auto_exposure_bias": -0.75,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "exposure_restored": {
+  "exposure": {
+   "auto_exposure_bias": 0.0,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "finished_at": "2026-09-30T13:43:21+00:00",
+ "frames": {
+  "back-debug": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-back-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4264,
+    0.4009,
+    0.3783
+   ],
+   "sha256": "dfa50d30e2481a8110ac29419c1aedaadee83b076e170bd990d318a5e3738b0a",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-back-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4516,
+    0.4335,
+    0.4172
+   ],
+   "sha256": "878e129417a7c60c99438daae13fa25b2ce300b06e9225cf0ba6dc21b8a11c22",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-back-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4721,
+    0.4225,
+    0.4377
+   ],
+   "sha256": "dc359f99369ddb3538c8d331aac5ef3de9409e1740b633b5b529f142d59a88c6",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-back-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4643,
+    0.4406,
+    0.449
+   ],
+   "sha256": "319fd28918cc984c113621c1cf6979968893ead22f91758ee2b09498032047d5",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-plate": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-back-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4009,
+    0.3686,
+    0.3908
+   ],
+   "sha256": "5e4835bd29578af183e78b12c37e76febbc6ff5783b40be8d79367a1b3a221b0",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "medusa-b2-back-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3898,
+    0.3508,
+    0.3495
+   ],
+   "sha256": "1066715df7e47900771f0c6cbe393b0a3f031e951778ca52f745c8d606e19254",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-debug": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-front-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4694,
+    0.4148,
+    0.4171
+   ],
+   "sha256": "cb1b483de14810040b08bf48bfc23af02e6fee958b2869b19971a2cf7d378b96",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-front-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4768,
+    0.4505,
+    0.4685
+   ],
+   "sha256": "4c12ea17279364be4ebfe0a69ef6faa802aa7578cb282c09ea5c25b0f565f1a4",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-front-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4863,
+    0.478,
+    0.4635
+   ],
+   "sha256": "28d285117a5dcfcdeca7fd28596be755d572b1e41ef8186ed84dfb5d1b12d0a2",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-front-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5292,
+    0.4748,
+    0.4791
+   ],
+   "sha256": "f76496a72d849ebe2d76937f4a48433efa53e547086efe6a5f91a749150f3933",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-plate": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-front-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4276,
+    0.399,
+    0.4123
+   ],
+   "sha256": "34646afbb2af32219325f27a0e5bfa4fb1e1e0c19f9c411f016cd8fc5672a7ff",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "medusa-b2-front-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4329,
+    0.4061,
+    0.3904
+   ],
+   "sha256": "e0a32d27fa4b959e3a021120d31c56b0aba01647fd4400f52b793c8c4a6e02cc",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-1p6-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-k2-1p6-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5128,
+    0.524,
+    0.524
+   ],
+   "sha256": "f45b7bf106177ed785931bfcc7a56911720dc89139d92b181791c9a76b6bcfea",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-1p6-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-k2-1p6-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5571,
+    0.5286,
+    0.5399
+   ],
+   "sha256": "02c93fed7409b9816193c4e9e59188692b133d8c968955965a655d8b5172eb8a",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-1p6-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-k2-1p6-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5467,
+    0.5312,
+    0.5337
+   ],
+   "sha256": "6b5bbce7491356ad2a29fdd287c0481cc2ecc63a43a4917e5bb1342fe8e3b9c3",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-k2-5x-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.719,
+    0.6996,
+    0.694
+   ],
+   "sha256": "1eabad7487e6141033d65280fd8faaafda2d175dec9dede0b7e3c3693002f0c7",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-k2-5x-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.661,
+    0.7002,
+    0.7021
+   ],
+   "sha256": "846b673b469eaee957ad273b039bdb91eb47af8e8e58c8e641af6da92770a7a4",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-k2-5x-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7234,
+    0.7061,
+    0.7009
+   ],
+   "sha256": "3c2e4d83032cb6b4d9406f23a5cf71bc1474f75894da15fc0b145a212d09c461",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "medusa-b2-k2-5x-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4825,
+    0.5258,
+    0.4645
+   ],
+   "sha256": "03741e0e390fb463e4ef3b14e030d71075faf741294f225841a1e550caf8890a",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-debug": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-side-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3547,
+    0.3299,
+    0.3296
+   ],
+   "sha256": "eab1d0a231053652006751116f81db06ecbaba5a6ef976513d7324e22392bdf7",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-side-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3942,
+    0.3702,
+    0.3493
+   ],
+   "sha256": "40a15aa4808787efc1f989e53e5e4389327bc7ddd4ab3e493147ace206e4d508",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-side-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3948,
+    0.3836,
+    0.3599
+   ],
+   "sha256": "b4bcf1d4284ae051cbe5432a4bdd1813d69733f3bf7af872757f694db68e805e",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-side-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4007,
+    0.3601,
+    0.3781
+   ],
+   "sha256": "99011f6509d065f638eccdb1a5aebd2a7eb11c387f2fb669062db9b0f921290b",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-plate": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "medusa-b2-side-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3268,
+    0.3163,
+    0.2917
+   ],
+   "sha256": "90fb7a81efe51599f15ed4daffdc59b87b7b28f7e241a96b30b9ffe58fa0fde4",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "medusa-b2-side-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3467,
+    0.3093,
+    0.3054
+   ],
+   "sha256": "e7f5023d6595ef091c8032c288762518b53128f04fd68dcccb618ae9bf83237b",
+   "subject": "Medusa (/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  }
+ },
+ "gi_reflections": {
+  "r.DynamicGlobalIlluminationMethod": 1,
+  "r.ReflectionMethod": 1
+ },
+ "key_rotation_pitch_yaw_roll": [
+  -55.0,
+  30.0,
+  0.0
+ ],
+ "kind": "EDITOR review frames (live UnrealEditor via MCP): not packaged, no HUD, no RENDER fingerprint, not K1/K2 acceptance",
+ "light_profile": {
+  "data": {
+   "directional": {
+    "castShadows": true,
+    "intensity": 4.5,
+    "name": "key",
+    "posUU": [
+     -350,
+     -150,
+     600
+    ],
+    "rotation": [
+     -55,
+     30,
+     0
+    ],
+    "shadow": {
+     "cascades": 2,
+     "contactShadowLength": 0.0,
+     "distanceUU": 3000
+    }
+   },
+   "exposure": {
+    "bias": 0.0,
+    "ev100": 2.05,
+    "maxBrightness": 4.14106,
+    "method": "histogram-fixed",
+    "minBrightness": 4.14106
+   },
+   "points": [
+    {
+     "intensity": 85,
+     "name": "warm",
+     "posUU": [
+      260,
+      -300,
+      250
+     ],
+     "radiusUU": 450,
+     "role": "warm"
+    }
+   ],
+   "sky": {
+    "calibration": "W4-A bench: K1 board ROI median luma of the packaged DX12 + Lumen frame matched to the P17 editor K1 (131.2): sky 8 -> 112.1, 12 -> 139.4, 16 -> 159.5; 11.2 = x1.4 (K2 5x cobble corner 105.2 in P17 matched at x1.5)",
+    "colorLinear": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "intensity": 11.2,
+    "lowerHemisphereIsBlack": false,
+    "replaces": "point fill 700 cd at (0,-100,550), radius 1800 (pre-W4)",
+    "source": "cubemap"
+   },
+   "source": "ART-005 editor probe reproduced for the opt-in Cobble review (S08BoardActor before T3.2); measured candidate, not a lighting norm",
+   "units": {
+    "directional": "lux",
+    "point": "candelas"
+   }
+  },
+  "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json lightProfiles.cobble-probe"
+ },
+ "original_level": "/Game/S08/S08Arena",
+ "restored_level": "/Game/S08/S08Arena",
+ "restored_level_dirty": false,
+ "review_level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+ "review_level_dirty_after_reload": false,
+ "run_assets_dirty": {
+  "base": false,
+  "base_instance": false,
+  "extra:MI_Medusa_H2LD_DebugClass": false,
+  "extra:MI_Medusa_H2LD_Neutral": false,
+  "figure_instance": false,
+  "skeletal": false,
+  "team:base:P1": false,
+  "team:base:P2": false,
+  "team:figure:P1": false,
+  "team:figure:P2": false,
+  "texture:BC": false,
+  "texture:Edge": false,
+  "texture:LUT": false,
+  "texture:MatID": false,
+  "texture:N": false,
+  "texture:ORM": false,
+  "texture:TeamAccent": false
+ },
+ "scalability_after": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_before": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_during": {
+  "sg.AntiAliasingQuality": 2,
+  "sg.EffectsQuality": 2,
+  "sg.FoliageQuality": 2,
+  "sg.GlobalIlluminationQuality": 2,
+  "sg.PostProcessQuality": 2,
+  "sg.ReflectionQuality": 2,
+  "sg.ShadingQuality": 2,
+  "sg.ShadowQuality": 2,
+  "sg.TextureQuality": 2,
+  "sg.ViewDistanceQuality": 2
+ },
+ "schema": "unmatched.um-v2-hero-lookdev/1",
+ "screen_percentage": {
+  "r.Editor.Viewport.ScreenPercentage": 100,
+  "r.ScreenPercentage": 100
+ },
+ "setup": {
+  "hidden_review_actors": [
+   "P17 arthur base",
+   "P17 arthur figure",
+   "P17 barrel",
+   "P17 harpy1 base",
+   "P17 harpy1 figure",
+   "P17 harpy2 base",
+   "P17 harpy2 figure",
+   "P17 harpy3 base",
+   "P17 harpy3 figure",
+   "P17 medusa base",
+   "P17 medusa figure",
+   "P17 merlin base",
+   "P17 merlin figure"
+  ],
+  "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+  "lights_after": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "LDue sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "lights_before": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 4,
+    "dynamic_shadow_distance_movable_light": 40000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 700.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "op": "setup"
+ },
+ "started_at": "2026-09-30T13:39:01+00:00",
+ "tag": "b2",
+ "throttle_cpu_when_not_foreground": {
+  "restored": {
+   "after": {
+    "bThrottleCPUWhenNotForeground": true
+   },
+   "before": {
+    "bThrottleCPUWhenNotForeground": false
+   }
+  },
+  "set": {
+   "after": {
+    "bThrottleCPUWhenNotForeground": false
+   },
+   "before": {
+    "bThrottleCPUWhenNotForeground": true
+   }
+  }
+ },
+ "tool": "tools/art/material_library/ue_hero_lookdev.py",
+ "warmup_mean_abs_diff": [
+  0.6172,
+  0.51,
+  0.5111,
+  0.5152,
+  0.5121,
+  0.5167,
+  0.4866,
+  0.511,
+  0.5121,
+  0.51,
+  0.5143,
+  0.5113,
+  0.5143,
+  0.5164,
+  0.5151,
+  0.5077,
+  0.5154,
+  0.5159,
+  0.5129,
+  0.5182,
+  0.5149,
+  0.5138,
+  0.5095,
+  0.5103,
+  0.5141,
+  0.512,
+  0.5152,
+  0.5169,
+  0.5141,
+  0.5126,
+  0.5109,
+  0.5144,
+  0.5123,
+  0.5187,
+  0.5166,
+  0.4895,
+  0.5102,
+  0.5107,
+  0.5163
+ ]
+}

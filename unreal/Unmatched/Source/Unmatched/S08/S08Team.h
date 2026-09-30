@@ -75,8 +75,16 @@ constexpr float P1KeylineIn0 = 22.0f, P1Fill0 = 23.5f, P1Fill1 = 26.0f, P1Keylin
 // P2 hexagon (apothem, uu; corners at 0/60/.../300 deg from +X) + a gap across each corner through every band
 constexpr float P2KeylineIn0 = 21.5f, P2Fill0 = 23.0f, P2Fill1 = 25.25f, P2KeylineOut1 = 26.25f, P2RimOut1 = 27.25f;
 constexpr float P2CornerGapUU = 2.0f;
-/** SM_Marker_TargetRing arcs: outer radius (blender/ASSET-MARKERS-001/build_markers.py: inner 20.9, outer 23). */
-constexpr float TargetArcOuterUU = 23.0f;
+/** SM_Marker_TargetRing arcs at mesh scale 1 (blender/ASSET-MARKERS-001/build_markers.py: inner 20.9, outer 23). */
+constexpr float TargetArcMeshInnerUU = 20.9f, TargetArcMeshOuterUU = 23.0f;
+/** 5c-B3 (after 5c-B2 B1-8, act art3-live-3boards-r3 section 4.2): the arcs are drawn at 0.92 of the mesh in XY
+ *  (hero 19.23-21.16 uu), so the ring's inner keyline stays visible between the arcs and the fill on the P2 flats
+ *  (>= 1.5 uu) and outlines the arcs in every variant. At scale 1 they touched the P2 fill there and, in grey, were
+ *  as light as the silver fill (dE76 11 < pixelDeltaE 15): the fill centre line moved in and the hexagon of the K3
+ *  target was not recognised. Colour and hue unchanged (forecast: tools/art/t5cb3_target_arcs.py redraw). */
+constexpr float TargetArcScale = 0.92f;
+constexpr float TargetArcOuterUU = TargetArcMeshOuterUU * TargetArcScale;  // 21.16
+constexpr float TargetArcInnerUU = TargetArcMeshInnerUU * TargetArcScale;  // 19.23
 /** SM_Marker_SelectionRing: inner 17.8, outer 20. */
 constexpr float SelectionRingOuterUU = 20.0f;
 /** FigureScreenRect half-size with the ring (hero / sidekick): the outer ring edge (5c-B1: the rim, was 28.0). */

@@ -781,12 +781,24 @@ bool FS08BoardArtTeamRingTest::RunTest(const FString&) {
   TestTrue(FString::Printf(TEXT("ring zMin %.2f >= 0.5"), ZMin), ZMin >= 0.5f);
   TestTrue(FString::Printf(TEXT("ring zMin %.2f above the glyph fill top %.2f"), ZMin, GlyphTop), ZMin > GlyphTop);
   TestTrue("ring zMax 1.2 below the L-corners (1.8) and the selection/target rings (2.2)", ZMax < 1.8f);
-  // 2) fill band vs the target arcs (outer 23 uu) and the selection ring (outer 20 uu), both scaled like the ring
-  TestTrue(FString::Printf(TEXT("P1 fill inner %.1f > target arcs outer %.1f"), P1Fill0, TargetArcOuterUU),
+  // 2) fill band vs the target arcs (5c-B3: 0.92 of the mesh, outer 21.16 uu) and the selection ring (outer 20 uu),
+  //    both scaled like the ring
+  TestTrue(FString::Printf(TEXT("target arcs outer %.2f = mesh outer %.1f x scale %.2f"), TargetArcOuterUU,
+                           TargetArcMeshOuterUU, TargetArcScale),
+           FMath::IsNearlyEqual(TargetArcOuterUU, TargetArcMeshOuterUU * TargetArcScale) && TargetArcScale < 1.0f);
+  TestTrue(FString::Printf(TEXT("P1 fill inner %.1f > target arcs outer %.2f"), P1Fill0, TargetArcOuterUU),
            P1Fill0 > TargetArcOuterUU);
-  TestTrue(FString::Printf(TEXT("P2 fill inner apothem %.1f >= target arcs outer %.1f (touch at the flats only)"), P2Fill0,
-                           TargetArcOuterUU),
-           P2Fill0 >= TargetArcOuterUU);
+  TestTrue(FString::Printf(TEXT("P2 fill inner apothem %.1f > target arcs outer %.2f"), P2Fill0, TargetArcOuterUU),
+           P2Fill0 > TargetArcOuterUU);
+  // 5c-B3 (B1-8 FAIL, act art3-live-3boards-r3 4.2): >= 1 uu of the inner keyline stays visible between the arcs and
+  // the fill (P2: on the flats; P1: everywhere), so the arcs never touch the fill in any colour variant
+  TestTrue(FString::Printf(TEXT("visible inner keyline between the arcs and the fill: P1 %.2f, P2 %.2f uu >= 1.0"),
+                           P1Fill0 - FMath::Max(TargetArcOuterUU, P1KeylineIn0),
+                           P2Fill0 - FMath::Max(TargetArcOuterUU, P2KeylineIn0)),
+           P1Fill0 - FMath::Max(TargetArcOuterUU, P1KeylineIn0) >= 1.0f &&
+               P2Fill0 - FMath::Max(TargetArcOuterUU, P2KeylineIn0) >= 1.0f);
+  TestTrue(FString::Printf(TEXT("target arcs inner %.2f outside the 30-uu pedestal (15)"), TargetArcInnerUU),
+           TargetArcInnerUU > 15.0f);
   TestTrue("selection ring outer inside the keyline", SelectionRingOuterUU < FMath::Min(P1KeylineIn0, P2KeylineIn0));
   // 5c-B1 B1-3 (plan rev 2): outer keyline as wide as r3 (P1 1.5, P2 1.0), rim 1.0, the fill pays for the rim
   // (P1 2.5, P2 2.25); tools/art/t5cb1_ring_sim.py check holds the same rules
