@@ -399,6 +399,23 @@ def run_maps(run_dir, ld, repo):
             clamp_stats[c["id"]] = {"raised_below_min": round(float((y < lo).mean()), 4),
                                     "in_toe_below_2lo": round(float((y < 2 * lo).mean()), 4),
                                     "lowered_above_max": round(float((y > hi).mean()), 4)}
+    # look-dev round 2 (2026-09-30, after 5c-B1): final linear BC gains per class AFTER the clamp (profile
+    # grade.final_gains_r2: {class: {"bc_gain": [r, g, b], ...}}), fitted on the converged UE frames b1 against the
+    # concept (tools/art/material_library/lookdev_r2.py fit -> ratio of the effective albedo; ue_bc_feedback.solve_gain
+    # against the UE LUT column of the class -> bc_gain, which differs from the ratio where the UE floor binds)
+    final_stats = {}
+    for cid, fg in (gcfg.get("final_gains_r2") or {}).items():
+        if not isinstance(fg, dict):   # "note"
+            continue
+        c = byid[cid]
+        m = lab_g == c["index"]
+        if not m.any():
+            continue
+        x0 = bc_lin[m]
+        x = np.minimum(x0 * np.array(fg["bc_gain"], np.float32), float(c["baseColor"].get("maxChannel", 0.9)))
+        bc_lin[m] = x
+        final_stats[cid] = {"bc_gain": fg["bc_gain"], "texels_4k": int(m.sum()),
+                            "Y_median_before_after": [round(float(np.median(luma(x0))), 5), round(float(np.median(luma(x))), 5)]}
     bc_lin = np.clip(bc_lin, 0.0, 1.0)
     bc8 = tx.to8(srgb(bc_lin))
     # ---- TeamMask: R only on the cloth classes (G, B, A as in H2.1); EdgeMask: own texture (v2 EdgeMaskTexture)
@@ -526,7 +543,7 @@ def run_maps(run_dir, ld, repo):
     report = {"stage": "ld_maps", "prefix": prefix, "pins": pins, "classify_steps": steps,
               "small_components_relabelled": {byidx[k]: v for k, v in removed.items()},
               "reclass_from_baseline_texels": int(reclass.sum()),
-              "classes": area, "edge_mask": dict(estats, config=ld["edge"]), "grade": dict(gcfg, luminance_clamp=clamp_stats, median_floor_applied=floor_stats), "lut": lut_rep,
+              "classes": area, "edge_mask": dict(estats, config=ld["edge"]), "grade": dict(gcfg, luminance_clamp=clamp_stats, median_floor_applied=floor_stats, **({"final_gains_r2_applied": final_stats} if final_stats else {})), "lut": lut_rep,
               "matid": {"encoding": "R8 unorm, index * 16 + 8, decode floor(v * 255 / 16)", "master_px": int(matid4.shape[0]),
                         "runtime_px": int(matid2.shape[0]), "gutter_px_4k": edge_px, "downsample": "2x2 majority"},
               "team_mask": {"R": "одежда (TeamColor) только в классах %s" % ld["team_dye_classes"],

@@ -309,6 +309,29 @@ def main():
         yy = y[cov[m]]   # before the clamp (the cord: after its darkening), covered texels
         clamp_stats[c["id"]] = {"raised_below_lo": r((yy < lo).mean(), 4), "in_toe_below_2lo": r((yy < 2 * lo).mean(), 4),
                                 "lowered_above_hi": r((yy > hi).mean(), 4)}
+    # look-dev round 2 (2026-09-30, after 5c-B1): ratios of the EFFECTIVE albedo (after the class clamp above, i.e.
+    # what the v2 core shows in UE when the hero LUT floor does not bind) fitted on the converged UE frames b1 against
+    # the concept (tools/art/material_library/lookdev_r2.py fit); profile lookdev.ue_feedback_r2: [{"name", "class",
+    # "mask": "dark_primaries" (H3 W4-B dark-primary mask, weighted) | null, "ratio_effective": [r, g, b]}]. A ratio
+    # below 1 on texels at the preset floor needs a lower hero floor (classes.luminance_range_hero + lut_overrides
+    # luminanceMin): the texture then carries the albedo below the preset floor on purpose
+    r2_info = []
+    for e2 in ld.get("ue_feedback_r2") or []:
+        w2 = (lab == col[e2["class"]]).astype(np.float64)
+        if e2.get("mask") == "dark_primaries":
+            w2 = w2 * dark
+        elif e2.get("mask"):
+            raise ValueError("ue_feedback_r2 %s: unknown mask %s" % (e2["name"], e2["mask"]))
+        sel2 = (w2 >= 0.5) & cov
+        b0 = bc[sel2].copy()
+        bc = bc * (1.0 + w2[..., None] * (np.asarray(e2["ratio_effective"], np.float64) - 1.0))
+        c2 = allc[e2["class"]]
+        bc = np.where((lab == col[e2["class"]])[..., None], np.minimum(bc, float(c2["baseColor"].get("maxChannel", 0.9))), bc)
+        r2_info.append({"name": e2["name"], "class": e2["class"], "mask": e2.get("mask"),
+                        "ratio_effective": e2["ratio_effective"], "texels_4k_weight_ge_0_5": int(sel2.sum()),
+                        "bc_median_linear_before": [r(v, 5) for v in np.median(b0, 0)],
+                        "bc_median_linear_after": [r(v, 5) for v in np.median(bc[sel2], 0)],
+                        "Y_median_before_after": [r(float(np.median(b0 @ LUMA)), 5), r(float(np.median(bc[sel2] @ LUMA)), 5)]})
     # metallic per column from the class that OCCUPIES the column (col_class: a hero slot carries its extension
     # class, e.g. horn_claw in the brass column 5 is a dielectric), never from the library class of the column index
     metal_cols = [ci for ci in sorted(set(np.unique(lab).tolist())) if allc[col_class[ci]]["metallic"] == 1]
@@ -352,7 +375,7 @@ def main():
     diff = np.any(h3bc != newbc, -1)
     changed_cls = {col_class[int(c)]: int((diff & (lab == c)).sum()) for c in np.unique(lab[diff])} if diff.any() else {}
     check("bc_changed_only_by_rules", True, {"changed_texels_4k": int(diff.sum()), "by_class": changed_cls},
-          "H3 BC except the cord texels and the dielectric luminance clamp")
+          "H3 BC except the cord texels, the dielectric luminance clamp and the UE feedback gains (5c-B0, round 2)")
     # ---------------------------------------------------------------- class statistics, LUT
     area = {}
     ymed = {}
@@ -444,7 +467,7 @@ def main():
         c = allc[cid]
         if c["metallic"] == 1:
             continue
-        lo, hi = c["baseColor"]["luminanceRange"]
+        lo, hi = (cc.get("luminance_range_hero") or {}).get(cid) or c["baseColor"]["luminanceRange"]
         yy = q8(srgb(bc[(lab == col[cid]) & cov])).astype(np.float64) / 255.0
         yy = lin(yy) @ LUMA
         lum_ok[cid] = {"range": [lo, hi], "share_outside": r(((yy < lo * 0.93) | (yy > hi * 1.03)).mean(), 4)}
@@ -535,6 +558,7 @@ def main():
                               "edge_width_final_m": r(W * scale, 4), "silhouette": {"px_m": res_m, "grid": [nz, nx]},
                               "tripo_wing_accent_Y_median": r(y_acc, 4)},
               "edge_mask": dict(estats, config=ld["edge"]), "luminance_clamp": clamp_stats, "ue_feedback_dark_primaries": fb_info,
+              "ue_feedback_r2": r2_info,
               "lut": {"dds": rel(dds), "dds_sha256": S.sha256(dds), "overrides_json": rel(ov_path),
                       "overrides_sha256": S.sha256(ov_path), "applied": applied, "gold_antique_f0_hero": [r(v, 4) for v in gold_f0],
                       "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index (hero slot 5 = horn_claw)",

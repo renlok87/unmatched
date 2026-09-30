@@ -196,6 +196,15 @@ def main():
         per_zone[z]["gain_before_ue_feedback"] = per_zone[z].get("gain")
         per_zone[z]["gain"] = C.rv(g, 4)
         per_zone[z]["ue_feedback_gain"] = C.rv(np.asarray(fb_gain), 4)
+    # look-dev round 2 (2026-09-30, after 5c-B1): a second UE feedback (profile lookdev.tone.ue_feedback_r2), fitted on
+    # the CONVERGED UE frames b1 (tools/art/material_library/lookdev_r2.py fit), multiplied onto the gain above
+    fb2 = tone.get("ue_feedback_r2") or {}
+    for z in fb2.get("zones", []) if fb2.get("gain") else []:
+        g = np.asarray(gains[z], np.float64) * np.asarray(fb2["gain"], np.float64)
+        gains[z] = [round(float(x), 4) for x in g]
+        per_zone[z]["gain_before_ue_feedback_r2"] = per_zone[z].get("gain")
+        per_zone[z]["gain"] = C.rv(g, 4)
+        per_zone[z]["ue_feedback_r2_gain"] = C.rv(np.asarray(fb2["gain"]), 4)
     # ---------------------------------------------------------------- BC
     stt = np.load(prof.work / "lookdev" / "state.npz")
     zone_id = stt["zone_id"]

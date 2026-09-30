@@ -6,7 +6,8 @@ concept with boxes + HSV filters (King Arthur, Harpy; look-dev C, 2026-09-30).
 Spec (JSON): {"hero", "concept": {"front"|"side"|"back": png}, "sources": [{"profile": <look-dev profile>,
 "pointer": "/lookdev/concept_zones", "as_zone": <optional: every region of this source is that zone>, "gate": <optional
 HSV filter of regions without one>}, ...] (boxes [x0, y0, x1, y1] or polygons, with a named HSV filter of the same
-block), "zones": {<zone>: {"class": <preset class id>, "from": [<zone name in the sources>, ...]}}}.
+block), "zones": {<zone>: {"class": <preset class id>, "from": [<zone name in the sources>, ...], "exclude": <optional
+HSV filter: concept pixels passing it are dropped, e.g. the studio backdrop>}}}.
 
 Per zone: the concept pixels of every box / polygon of the source zones that pass the box's HSV filter, pooled over
 the three views; statistics = ue_hero_lookdev.hsv_stats (per-channel median of sRGB, HSV and Y of the median: the
@@ -107,6 +108,10 @@ def main() -> int:
                     rm = region_mask(img.shape[:2], item)
                     fm = filter_mask(img, flt)
                     vm |= rm & fm
+            if zspec.get("exclude"):
+                # look-dev round 2: pixels of the concept backdrop that pass the zone's filter (e.g. the grey-blue
+                # studio backdrop between Harpy's primaries under "dark" v <= 0.3) are not the class: dropped
+                vm &= ~filter_mask(img, zspec["exclude"])
             n = int(vm.sum())
             if n:
                 px = img[vm]
@@ -117,6 +122,8 @@ def main() -> int:
         px = np.concatenate(pooled, 0)
         out["zones"][zone] = {"class": zspec["class"], "from": zspec["from"], "concept": hsv_stats(px),
                               "pixels": int(len(px)), "per_view": per_view}
+        if zspec.get("exclude"):
+            out["zones"][zone]["exclude"] = zspec["exclude"]
     write_json(Path(a.out), out)
     for z, r in out["zones"].items():
         c = r["concept"]

@@ -22,14 +22,14 @@
    "normalStrength": 0.3,
    "roughHi": 0.5,
    "roughLo": 0.22,
-   "roughTypical": 0.33,
+   "roughTypical": 0.28,
    "roughVariation": 0.06,
    "shadingModel": 0.0,
    "sheenIntensity": 0.0,
    "sheenRoughness": 0.0,
    "sheenTint": 0.0,
    "slice": 14.0,
-   "specular": 0.575,
+   "specular": 0.35,
    "teamDyeAllowed": 0.0,
    "tilesPerMeter": 12.0,
    "wearStrength": 0.25,
@@ -44,19 +44,22 @@
   },
   "feathers": {
    "bc": [
-    0.0808,
-    0.0414,
-    0.0254
+    0.0816,
+    0.0418,
+    0.026
    ],
    "luminanceMin": 0.008,
-   "ymedClassHero": 0.04904
+   "ymedClassHero": 0.04946
   },
   "gold_antique": {
    "bc": [
-    1.0,
-    0.4371,
-    0.1032
+    0.66,
+    0.27,
+    0.06
    ],
+   "roughHi": 0.42,
+   "roughLo": 0.2,
+   "roughTypical": 0.3,
    "ymedClassHero": 0.63156
   },
   "leather_smooth": {
@@ -69,11 +72,13 @@
   },
   "skin": {
    "bc": [
-    0.4811,
-    0.3246,
-    0.2117
+    0.3645,
+    0.2319,
+    0.143
    ],
-   "ymedClassHero": 0.34949
+   "luminanceMin": 0.08,
+   "specular": 0.5,
+   "ymedClassHero": 0.25347
   }
  },
  "generator": "tools/tripo-pipeline/blender/h2_bake_harpy/lookdev_maps.py (ld_maps)",
@@ -84,6 +89,21 @@
  "heroSlotsNote": "column of the library class brass (5) carries the extension class horn_claw (all fields, detail slice 14 = stone_base); MatID of the talons = 88 (README §3a)",
  "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero Harpy --overrides <this file>",
  "schema": "unmatched.um-v2-hero-overrides/1",
+ "ue_lookdev_c": {
+  "iteration": "i3",
+  "why": {
+   "kept_from_i2": "gold F0 (0.66, 0.27, 0.06) at the preset roughness 0.30 [0.20, 0.42] (-1 EV in tolerance); horn_claw specular 0.35 / roughness 0.28 (both exposures in tolerance)",
+   "skin": "i2: face 0.76 (Cobble) / 0.83 (-1 EV), the only zone outside at both exposures apart from the feather saturation: specular 0.35 -> 0.5 (more of the dome on the cheeks), floor of the bake-clamped luminance 0.03 -> 0.08 (lifts the painted shadow side of the face; brows / lips are filled with skin in ld_maps, eyes stay above 0.08)"
+  }
+ },
+ "ue_lookdev_r2": {
+  "base": "T_UM_MatLUT_Harpy_UE_i3.overrides.json (i3, look-dev C)",
+  "iteration": "r2",
+  "unchanged": "all other fields of i3 (skin specular 0.5 / luminanceMin 0.08, gold F0, horn_claw)",
+  "why": {
+   "feathers": "look-dev round 2 (2026-09-30): luminanceMin 0.02 -> 0.008. The dark primaries of the round-2 BC (profile harpy-h3-lookdev.json ue_feedback_r2 dark_primaries_r2: effective albedo x (0.70, 0.67, 0.68), Y p50 0.0200 -> 0.0145) lie below the preset floor; with 0.02 the v2 core would lift them back (5c-B1: 89 % of the primary texels on the floor, the BC edit of 5c-B0 could not darken them). Every other feather texel is >= 0.02 in the texture (clamped by ld_maps), so nothing else moves."
+  }
+ },
  "why": {
   "bc": "медиана класса в BC героя (DebugBakeFromLUT); у gold_antique — F0 героя, тон концепта",
   "ymedClassHero": "медиана яркости BC героя в классе (README §4)"

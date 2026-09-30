@@ -77,6 +77,9 @@ def select_pixels(cfg, frames, tag, masks, cls_of, zone, select, sat_max=0.38):
     gates = cfg.get("render_gates") or {}
     for view, cls in masks.items():
         m = cls == cls_of[zone]
+        reg = U.zone_region(cfg, zone, view, cls)
+        if reg is not None:
+            m &= reg
         if select in ("gate", "gate_lowsat") and zone in gates:
             ref = U.load_frame(frames, cfg["hero"], tag, "%s-%s" % (view, (cfg.get("gate_on_variant") or "neutral").lower()))
             g = np.zeros(m.shape, bool)
@@ -134,6 +137,9 @@ class Fast:
         for view, cls in masks.items():
             for zone in cfg["zones"]:
                 m = U.erode(cls == cls_of[zone], 1)
+                reg = U.zone_region(cfg, zone, view, cls)
+                if reg is not None:
+                    m &= reg
                 gm = None
                 if gate_on and zone in gates:
                     ref = U.load_frame(frames, cfg["hero"], tag, "%s-%s" % (view, gate_on.lower()))

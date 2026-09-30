@@ -1,0 +1,233 @@
+{
+ "hero": "Harpy",
+ "run_dir": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue-import",
+ "concept": {
+  "front": "art/imagegen/hero-quality-v1/harpy/harpy-front.png",
+  "side": "art/imagegen/hero-quality-v1/harpy/harpy-side.png",
+  "back": "art/imagegen/hero-quality-v1/harpy/harpy-back.png"
+ },
+ "concept_zones": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/concept-zones-r2.json",
+ "variants": {
+  "neutral": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Neutral",
+  "P1": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1",
+  "P2": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P2",
+  "debug": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_DebugClass"
+ },
+ "base_mi": {
+  "neutral": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base",
+  "P1": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base_P1",
+  "P2": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base_P2",
+  "debug": "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base"
+ },
+ "zones": [
+  "orange",
+  "dark",
+  "skin",
+  "gold",
+  "claw"
+ ],
+ "zone_class": {
+  "orange": "feathers",
+  "dark": "feathers",
+  "skin": "skin",
+  "gold": "gold_antique",
+  "claw": "brass"
+ },
+ "decode_classes": [
+  "feathers",
+  "skin",
+  "brass",
+  "gold_antique",
+  "leather_smooth"
+ ],
+ "key_zones": [
+  "orange",
+  "dark",
+  "skin"
+ ],
+ "tolerance_zones": [
+  "orange",
+  "dark",
+  "skin",
+  "gold",
+  "claw"
+ ],
+ "anchor_zone": "orange",
+ "tolerance": {
+  "luma_ratio": 0.15,
+  "hue_deg": 12.0,
+  "sat": 0.1,
+  "hue_min_sat": 0.1
+ },
+ "render_gates": {
+  "orange": {
+   "hue_deg": [
+    [
+     10,
+     45
+    ]
+   ],
+   "s_min": 0.3,
+   "v_min": 0.5
+  },
+  "dark": {
+   "v_max": 0.45
+  }
+ },
+ "gate_on_variant": "neutral",
+ "min_px": 150,
+ "reading_bias_ev": -0.75,
+ "team_variants": [
+  "P1",
+  "P2"
+ ],
+ "sheet_label": "UE H3LD",
+ "shots": {
+  "neutral": [
+   "front",
+   "side",
+   "back",
+   "k2-5x",
+   "k2-1p6"
+  ],
+  "P1": [
+   "front",
+   "side",
+   "back",
+   "k2-5x",
+   "k2-1p6"
+  ],
+  "P2": [
+   "front",
+   "side",
+   "back",
+   "k2-5x",
+   "k2-1p6"
+  ],
+  "debug": [
+   "front",
+   "side",
+   "back"
+  ],
+  "plate": [
+   "front",
+   "side",
+   "back"
+  ],
+  "reading": [
+   "front",
+   "side",
+   "back",
+   "k2-5x"
+  ]
+ },
+ "previous": [
+  {
+   "config": "review-config.json",
+   "note": "5c-B1 definition (whole-frame dark zone, concept with the backdrop); b1 measured with it: measure-b1.json"
+  }
+ ],
+ "debug_calibration": {
+  "0": [
+   16.1,
+   16.4,
+   16.3
+  ],
+  "1": [
+   145.9,
+   186.9,
+   219.2
+  ],
+  "10": [
+   219.9,
+   224.0,
+   159.6
+  ],
+  "11": [
+   220.9,
+   153.8,
+   220.2
+  ],
+  "12": [
+   165.0,
+   220.0,
+   202.0
+  ],
+  "13": [
+   223.9,
+   177.7,
+   146.8
+  ],
+  "14": [
+   145.1,
+   164.7,
+   219.3
+  ],
+  "15": [
+   187.9,
+   220.5,
+   149.7
+  ],
+  "2": [
+   203.3,
+   222.2,
+   154.1
+  ],
+  "3": [
+   227.7,
+   148.4,
+   214.8
+  ],
+  "4": [
+   168.0,
+   220.0,
+   214.0
+  ],
+  "5": [
+   224.5,
+   205.9,
+   154.9
+  ],
+  "6": [
+   185.3,
+   155.9,
+   221.9
+  ],
+  "7": [
+   158.1,
+   223.7,
+   152.2
+  ],
+  "8": [
+   228.6,
+   147.7,
+   188.0
+  ],
+  "9": [
+   158.8,
+   209.9,
+   221.2
+  ]
+ },
+ "debug_calibration_source": "docs/art-pipeline/material-library/evidence/v2.1-accent/wall/um-v2-accent-report.json measurements.debug_class_calibration_srgb (look-dev C, M_UM_Figure_v2.1 DebugView 1 on the P1.7 Cobble scene, EV100 1.3; the hue decode cannot split steel_blued 1 from wool_coarse 9)",
+ "debug_calibration_note": "12 (feathers) and 4 (gold_antique) re-measured on harpy-i0-front-debug.png (mode of the wing / bracelet rim pixels): the wall values (159,218,198) / (166,220,215) are 12 levels apart and split the wing between the two classes",
+ "render_gates_note": "feathers split on the NEUTRAL Cobble frame (gate_on_variant): the value histogram of the feather class is bimodal (peaks v ~0.33 and ~0.70); concept gates orange v>=0.35 s>=0.35 hue 15-38 / dark v<=0.3 at the concept exposure; UE boundary at the gap 0.45-0.50 (UE Cobble frame ~1.6x brighter), the gap pixels are left out",
+ "render_regions": {
+  "dark": {
+   "views": [
+    "front",
+    "back"
+   ],
+   "x_outer": [
+    0.59,
+    0.985
+   ],
+   "y": [
+    0.105,
+    0.601
+   ]
+  }
+ },
+ "render_regions_note": "look-dev round 2 (2026-09-30): the concept dark zone is the two outer-wing boxes of the look-dev profile (concept x 60-330 / 1140-1410, y 180-560 of 1470 x 1070; figure extent x 48-1418, y 100-865 to the feet) with v <= 0.3; the UE side took every feather pixel with v <= 0.45 of the whole figure (shaded body, legs and covert undersides: 22 % of the zone pixels with sat >= 0.38, 13 % >= 0.5 on b1), so its per-channel median was pulled to sat 0.27. The region mirrors the boxes in figure-relative coordinates (ue_hero_lookdev.zone_region: x_outer = |x - centre| / half-width, y = (y - top) / (feet - top)); front and back only, as the concept boxes (side has none)",
+ "concept_zones_note": "concept-zones-r2.json (spec concept-zones-spec-r2.json): the dark zone without the grey-blue studio backdrop (hue 185-265) that its v <= 0.3 filter let in: 25 % of the zone pixels, concept dark (50 45 43, sat 0.14, Y 0.0273) -> (46 39 37, sat 0.196, Y 0.0217); other zones byte-identical to concept-zones.json"
+}

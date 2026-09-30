@@ -1,0 +1,144 @@
+{
+ "schema": "unmatched.lookdev-r2-reimport-plan/1",
+ "date": "2026-09-30",
+ "status": "подготовлено, НЕ импортировано (UE не запускался: идёт 5c-B2)",
+ "how": "после 5c-B2, в живом редакторе под C:/tmp/ue-editor.lock, как ue_h5cb1.py reimport (AssetImportTask replace_existing поверх ассетов прогона, настройки прочитать обратно, копий _1 нет, после сохранения ничего не dirty); затем съёмка review --tag b2 и замер обеими конфигурациями Harpy (review-config.json и review-config-r2.json)",
+ "heroes": {
+  "harpy": {
+   "textures": [
+    {
+     "asset": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_BC",
+     "file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_BC.png",
+     "sha256": "dae99d8ff44524db409eb8963cde59fd914077a330fd1c5c4024cf0b28c2dde2",
+     "was_sha256": "980ecbf34b7234c8723e26bd4d189f851ead1ead1d33f35f52346c7f55dafa0d",
+     "settings": {
+      "srgb": true,
+      "compression_settings": "TC_DEFAULT",
+      "mip_gen_settings": "FromTextureGroup",
+      "px": [
+       2048,
+       2048
+      ]
+     }
+    },
+    {
+     "asset": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_UM_MatLUT_Harpy",
+     "file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/lut/T_UM_MatLUT_Harpy_UE_r2.dds",
+     "sha256": "60d5b91298c0bcaef494d320674c9e1827dafb4946da3a5ce3ea03c71c5286b5",
+     "was_sha256": "e98447bd48ec9d7d5617088005365bc340e746edfd7a1b181a772706acd95780",
+     "settings": {
+      "srgb": false,
+      "compression_settings": "TC_HDR",
+      "filter": "TF_NEAREST",
+      "mip_gen_settings": "TMGS_NO_MIPMAPS",
+      "never_stream": true,
+      "px": [
+       16,
+       16
+      ]
+     },
+     "note": "отличие от i3 — одна ячейка: строка 7, столбец 12 (feathers), R = luminanceMin 0.02 -> 0.008"
+    }
+   ],
+   "mi": {
+    "/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD": {
+     "scalars": {
+      "TeamDyeGain": 56.7376,
+      "TeamDyeCeiling": 45.0
+     },
+     "was": {
+      "TeamDyeGain": 40.0,
+      "TeamDyeCeiling": 37.037
+     },
+     "rule": "LDV-13: 0.8 / Y_p50, 0.9 / Y_p95 акцента (ld-maps-report team_accent 0.0141 / 0.0200); эффективно P1/P2 55.76 / 56.74 (было 40 / 40)"
+    }
+   },
+   "unchanged": "MatID, N, ORM, Edge, TeamAccent, FBX, подставка"
+  },
+  "medusa": {
+   "textures": [
+    {
+     "asset": "/Game/PipelineCandidates/Medusa/H2LD/Textures/T_Medusa_H2LD_BC",
+     "file": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/textures/T_Medusa_H2LD_2K_BC.png",
+     "sha256": "31f62322def1a2ac70146f11aa301625e4d355ee90fe266de6315bbde1e304c9",
+     "was_sha256": "385e22df672b909091329d9909b5c06214d95e4e2b1ee4edd9d70e3634334bd2",
+     "settings": {
+      "srgb": true,
+      "compression_settings": "TC_DEFAULT",
+      "mip_gen_settings": "FromTextureGroup",
+      "px": [
+       2048,
+       2048
+      ]
+     }
+    }
+   ],
+   "mi": {
+    "/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD": {
+     "scalars": {
+      "TeamDyeGain": 21.4821,
+      "TeamDyeCeiling": 11.0741
+     },
+     "was": {
+      "TeamDyeGain": 22.9292,
+      "TeamDyeCeiling": 15.5387
+     },
+     "rule": "LDV-13, пересчёт отношением p50/p95 акцента 2K (0.03495/0.06049 -> 0.0373/0.08488: перевязь leather_smooth под акцентом стала светлее); эффективно P1/P2 13.72 / 21.48 (было 19.26 / 22.93). Со старыми значениями 10.6 % текселей акцента P1 получили бы окрашенное альбедо > 1"
+    }
+   },
+   "unchanged": "LUT c3 (T_UM_MatLUT_Medusa_UE_c3.dds e650565d), MatID, N, ORM, Edge, TeamAccent, FBX, подставка"
+  },
+  "merlin": {
+   "textures": [
+    {
+     "asset": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_BC",
+     "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_BC_2K.png",
+     "sha256": "5fa2eb5d8f21d957f0584602a6ce6a2859aaed3fe0b131ecb6e4cbb5781d2073",
+     "was_sha256": "a99630dcb69e153cdf1a8ab37c94fb4a14eb341ab32c0c2f5fd5247d47e3db77",
+     "settings": {
+      "srgb": true,
+      "compression_settings": "TC_DEFAULT",
+      "mip_gen_settings": "FromTextureGroup",
+      "px": [
+       2048,
+       2048
+      ]
+     }
+    },
+    {
+     "asset": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_UM_MatLUT_Merlin",
+     "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_UM_MatLUT_Merlin.dds",
+     "sha256": "6227033e1d2f0dba24720fd3273597081d4fcaed5db3d4a2cfb7808573cdddf6",
+     "was_sha256": "8cf5b424044827fe9871eab9b5dbd5b3efd447e65d3b9fa462b67a0793299a6d",
+     "settings": {
+      "srgb": false,
+      "compression_settings": "TC_HDR",
+      "filter": "TF_NEAREST",
+      "mip_gen_settings": "TMGS_NO_MIPMAPS",
+      "never_stream": true,
+      "px": [
+       16,
+       16
+      ]
+     },
+     "note": "отличие — только строка 0 (типичное BC leather_worn, работает лишь при DebugBakeFromLUT) и дрейф silk.B 1e-4; в обычном кадре без изменений, переимпорт нужен для проверки adopt ue_inputs_current"
+    }
+   ],
+   "mi": {
+    "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD": {
+     "scalars": {
+      "TeamDyeGain": 26.8106,
+      "TeamDyeCeiling": 5.5305
+     },
+     "was": {
+      "TeamDyeGain": 27.027,
+      "TeamDyeCeiling": 8.2949
+     },
+     "rule": "LDV-13, пересчёт отношением p50/p95 акцента 2K (0.0296/0.1085 -> 0.02984/0.16273: пояс leather_worn под акцентом вдвое светлее); эффективно P1/P2 6.85 / 15.94 (было 10.28 / 23.90). Со старыми значениями 11 % текселей акцента получили бы окрашенное альбедо > 1"
+    }
+   },
+   "unchanged": "MatID, N, ORM, TeamAccent, EdgeMask, ZoneID, ZoneLUT, FBX"
+  }
+ },
+ "forecast": "docs/art-pipeline/evidence/lookdev-r2-2026-09-30/{harpy,medusa,merlin}-forecast*.json"
+}

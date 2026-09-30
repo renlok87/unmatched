@@ -41,7 +41,9 @@
                 "cord_tone": "dark leather: the Tripo BC of the braid texels scaled so the cord median luminance = the median luminance of the wing accent texels (one TeamDyeGain gives both the same team colour)"},
    "min_component_px": 12,
    "dielectric_clamp": "shader",
-   "dielectric_clamp_note": "clamp(Y, lo, hi) of the v2 core applied in the texture (not the Medusa toe): measured 2026-09-29, the toe lifted every feather texel below Y 0.04 (41 % of the feathers) and the Cobble K2 dark share of the body fell from 17 % (H3) to 11 % against 34 % of the concept; the hard clamp moves only the texels below the albedo floor 0.02"
+   "dielectric_clamp_note": "clamp(Y, lo, hi) of the v2 core applied in the texture (not the Medusa toe): measured 2026-09-29, the toe lifted every feather texel below Y 0.04 (41 % of the feathers) and the Cobble K2 dark share of the body fell from 17 % (H3) to 11 % against 34 % of the concept; the hard clamp moves only the texels below the albedo floor 0.02",
+   "luminance_range_hero": {"feathers": [0.008, 0.7],
+                            "note": "look-dev round 2 (2026-09-30): the dark primaries carry an effective albedo below the preset feather floor 0.02 (ue_feedback_r2 dark_primaries, Y p50 0.0201 -> 0.0138); the hero LUT feathers luminanceMin (lut_overrides) is 0.008, so the v2 core does not lift them back; the texture clamp itself stays the preset one (the other feather texels are unchanged); used by the check dielectric_bc_in_class_range"}
   },
   "ue_feedback": {
    "dark_primaries": {"gain": [0.63, 0.8686, 0.8948],
@@ -49,6 +51,14 @@
                       "why": "UE i3: the dark primaries read brown-rust (sat +0.16 on the reading exposure -1 EV, +0.12 on the board), the concept is near grey (50 45 43, sat 0.14); rufous coverts and dark primaries share the feathers class, so the LUT has no separate lever. Predicted after: -1 EV Y 1.06 / sat +0.02 / hue within (in tolerance), board Y 1.23 / sat +0.005 (luminance = board light, as before 1.24); rufous feathers, skin, gold, claws keep their verdicts (reports/ld-5cb0-ue-feedback.json)"},
    "note": "BC gain of the H3 dark-primary mask texels of the feather class (lookdev_maps.py, before the class luminance clamp)"
   },
+  "ue_feedback_r2": [
+   {"name": "dark_primaries_r2", "class": "feathers", "mask": "dark_primaries", "ratio_effective": [0.674, 0.634, 0.661],
+    "source": "look-dev round 2 (2026-09-30): converged UE frames b1 of 5c-B1 (art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b1, warm-up 0.55, rev 5, reading -0.75 EV), review config r2 (concept dark zone without the grey-blue studio backdrop: concept-zones-r2.json; UE dark zone = the outer-wing region of the concept boxes: render_regions.dark); tools/art/material_library/lookdev_r2.py fit --zones dark,skin (weights reading 1 / neutral 0.5) -> ratio of the effective albedo (0.703, 0.6689, 0.6765); requested (0.674, 0.634, 0.661) so that the 8-bit sRGB 2K BC realises it (at Y ~0.014 one sRGB level is ~7 % linear; first pass 0.70/0.67/0.68 realised 0.730/0.707/0.696): realised on the 2K texels under the H3 dark mask (0.6957, 0.6698, 0.6964), Y p50 0.0201 -> 0.0138",
+    "why": "b1 with the aligned zone definition: the dark primaries match the concept in saturation (-0.006) but are 1.47x too bright relative to the rufous feathers and skin; 89 % of their texels sit on the preset floor 0.02 (5c-B0), so only a lower hero floor lets the albedo go down (luminance_range_hero, lut_overrides feathers luminanceMin 0.008)"},
+   {"name": "skin_r2", "class": "skin", "mask": null, "ratio_effective": [1.32, 1.40, 1.48],
+    "source": "same fit (skin 1.3234, 1.3987, 1.4821), rounded; realised on the 2K skin texels (1.3246, 1.3975, 1.4725)",
+    "why": "b1: the face 0.83 (old zone definition) / 0.73 (aligned) of the concept at -0.75 EV and 0.77 / 0.67 at EV100 1.3, sat +0.06: lighter and less red (concept 158 133 108); skin texels are above the floor 0.08 (2 %), so the ratio acts 1:1"}
+  ],
   "team_accent": {
    "wing_parts": ["tripo_part_0", "tripo_part_1", "tripo_part_3", "tripo_part_7"],
    "dark_mask": "the W4-B TeamMask of H3 (dark flight feathers, v <= 0.22, ramp 0.05, blur 3 x 3)",
@@ -65,6 +75,7 @@
   },
   "edge": {"curvature_per_m": [150, 600], "smooth_px": 3, "note": "as Medusa look-dev: convexity of the baked tangent normal (div n.xy / metres per texel, final frame), smoothstep"},
   "lut_overrides": {
+   "feathers": {"luminanceMin": 0.008, "note": "look-dev round 2 (2026-09-30): hero floor below the preset 0.02 for the dark primaries (classes.luminance_range_hero, ue_feedback_r2 dark_primaries_r2); every other feather texel is >= 0.02 in the texture, so the v2 core shows the texture"},
    "gold_antique": {"bc": [1.0, 0.4371, 0.1032], "note": "hero F0 = concept tone (ld_compose gold_tone). Iteration 0 = preset F0 (1.0, 0.766, 0.336): LD render gold hue 47 deg / S 0.36 / luma 132 against the concept 33 deg / 0.66 / 124 (front + back framing, preview light); suggestion iteration 1 = (1.0, 0.4371, 0.1032), Y 0.533"}
   },
   "uv1": {"layer_name": "UV1_m", "density_tolerance": 0.02,

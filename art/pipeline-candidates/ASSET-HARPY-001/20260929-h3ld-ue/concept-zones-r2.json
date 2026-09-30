@@ -1,0 +1,233 @@
+{
+ "concept": {
+  "back": {
+   "path": "art/imagegen/hero-quality-v1/harpy/harpy-back.png",
+   "sha256": "af82978b804dbbf31e92d469ec4a604308acc6b9d74fc080b56fdd2d22d1e086"
+  },
+  "front": {
+   "path": "art/imagegen/hero-quality-v1/harpy/harpy-front.png",
+   "sha256": "1a93e22efb138ec0ef48fc1dcd387ec823bc836639772475f073d7bc95780b1f"
+  },
+  "side": {
+   "path": "art/imagegen/hero-quality-v1/harpy/harpy-side.png",
+   "sha256": "44fd58066ffb310f6768eb1e326ef42a99ab7a905252bc41da78740ecd25844f"
+  }
+ },
+ "hero": "Harpy",
+ "method": "concept pixels of the look-dev boxes / polygons of each zone that pass the box's HSV filter (sRGB HSV), pooled over front/side/back; per-channel median of sRGB, then HSV and Y (linear) of the median (ue_hero_lookdev.hsv_stats, the definition of the UE side)",
+ "schema": "unmatched.um-v2-hero-concept-zones/1",
+ "sources": [
+  {
+   "pointer": "/lookdev/concept_zones",
+   "profile": "art/pipeline-candidates/ASSET-HARPY-001/build-profiles/harpy-h3-lookdev.json",
+   "sha256": "df324a9b16a432b626445f302a9f52b71b0194b20c842bc4774bff4e6e7558d2"
+  }
+ ],
+ "spec": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/concept-zones-spec-r2.json",
+ "spec_sha256": "e3b54757d47b1b354cc1045dd88b0e26ca544df46b86603ad4592ca70052b131",
+ "tool": "tools/art/material_library/ue_hero_concept_zones.py",
+ "zones": {
+  "claw": {
+   "class": "horn_claw",
+   "concept": {
+    "hue_deg": 240.0,
+    "luma_Y_linear": 0.0499,
+    "median_srgb": [
+     63.0,
+     63.0,
+     65.0
+    ],
+    "sat": 0.031,
+    "value": 0.255
+   },
+   "from": [
+    "claw"
+   ],
+   "per_view": {
+    "front": {
+     "hue_deg": 240.0,
+     "luma_Y_linear": 0.0499,
+     "median_srgb": [
+      63.0,
+      63.0,
+      65.0
+     ],
+     "pixels": 5831,
+     "sat": 0.031,
+     "value": 0.255
+    }
+   },
+   "pixels": 5831
+  },
+  "dark": {
+   "class": "feathers",
+   "concept": {
+    "hue_deg": 13.3,
+    "luma_Y_linear": 0.0217,
+    "median_srgb": [
+     46.0,
+     39.0,
+     37.0
+    ],
+    "sat": 0.196,
+    "value": 0.18
+   },
+   "exclude": {
+    "hue": [
+     185,
+     265
+    ]
+   },
+   "from": [
+    "dark"
+   ],
+   "per_view": {
+    "back": {
+     "hue_deg": 18.0,
+     "luma_Y_linear": 0.0207,
+     "median_srgb": [
+      45.0,
+      38.0,
+      35.0
+     ],
+     "pixels": 140231,
+     "sat": 0.222,
+     "value": 0.176
+    },
+    "front": {
+     "hue_deg": 15.0,
+     "luma_Y_linear": 0.0224,
+     "median_srgb": [
+      46.0,
+      40.0,
+      38.0
+     ],
+     "pixels": 136160,
+     "sat": 0.174,
+     "value": 0.18
+    }
+   },
+   "pixels": 276391
+  },
+  "gold": {
+   "class": "gold_antique",
+   "concept": {
+    "hue_deg": 33.2,
+    "luma_Y_linear": 0.2167,
+    "median_srgb": [
+     169.0,
+     118.0,
+     55.0
+    ],
+    "sat": 0.675,
+    "value": 0.663
+   },
+   "from": [
+    "gold"
+   ],
+   "per_view": {
+    "back": {
+     "hue_deg": 33.4,
+     "luma_Y_linear": 0.209,
+     "median_srgb": [
+      169.0,
+      115.0,
+      47.0
+     ],
+     "pixels": 868,
+     "sat": 0.722,
+     "value": 0.663
+    },
+    "front": {
+     "hue_deg": 32.8,
+     "luma_Y_linear": 0.2247,
+     "median_srgb": [
+      169.0,
+      121.0,
+      63.0
+     ],
+     "pixels": 716,
+     "sat": 0.627,
+     "value": 0.663
+    }
+   },
+   "pixels": 1584
+  },
+  "orange": {
+   "class": "feathers",
+   "concept": {
+    "hue_deg": 23.3,
+    "luma_Y_linear": 0.1326,
+    "median_srgb": [
+     136.0,
+     92.0,
+     64.0
+    ],
+    "sat": 0.529,
+    "value": 0.533
+   },
+   "from": [
+    "orange"
+   ],
+   "per_view": {
+    "back": {
+     "hue_deg": 23.2,
+     "luma_Y_linear": 0.1288,
+     "median_srgb": [
+      136.0,
+      90.0,
+      61.0
+     ],
+     "pixels": 80295,
+     "sat": 0.551,
+     "value": 0.533
+    },
+    "front": {
+     "hue_deg": 24.7,
+     "luma_Y_linear": 0.1374,
+     "median_srgb": [
+      135.0,
+      95.0,
+      67.0
+     ],
+     "pixels": 72496,
+     "sat": 0.504,
+     "value": 0.529
+    }
+   },
+   "pixels": 152791
+  },
+  "skin": {
+   "class": "skin",
+   "concept": {
+    "hue_deg": 30.0,
+    "luma_Y_linear": 0.2513,
+    "median_srgb": [
+     158.0,
+     133.0,
+     108.0
+    ],
+    "sat": 0.316,
+    "value": 0.62
+   },
+   "from": [
+    "skin"
+   ],
+   "per_view": {
+    "front": {
+     "hue_deg": 30.0,
+     "luma_Y_linear": 0.2513,
+     "median_srgb": [
+      158.0,
+      133.0,
+      108.0
+     ],
+     "pixels": 6802,
+     "sat": 0.316,
+     "value": 0.62
+    }
+   },
+   "pixels": 6802
+  }
+ }
+}

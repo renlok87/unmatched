@@ -690,6 +690,36 @@ def cmd_verify(a, cfg) -> dict:
 
 
 # ------------------------------------------------------------------ measure
+def zone_region(cfg, zone: str, view: str, cls):
+    """Screen region of a zone (look-dev round 2, 2026-09-30): None = the whole frame (default, every zone without
+    cfg["render_regions"][zone]). A region mirrors the concept boxes of the zone on the UE frame in figure-relative
+    coordinates: the figure extents = the pixels decoded to a library class (>= 1; class 0 also takes the base top);
+    x_outer = |x - centre| / half-width (the outer wing = [0.59, 0.985]), x = (x - left) / width, y = (y - top) /
+    (bottom - top); "views" limits the zone to the views the concept measures (views not listed -> empty mask)."""
+    reg = (cfg.get("render_regions") or {}).get(zone)
+    if not reg:
+        return None
+    if reg.get("views") and view not in reg["views"]:
+        return np.zeros(cls.shape, bool)
+    ys, xs = np.nonzero(cls >= 1)
+    if not len(xs):
+        return np.zeros(cls.shape, bool)
+    x0, x1, y0, y1 = xs.min(), xs.max(), ys.min(), ys.max()
+    yy, xx = np.mgrid[0:cls.shape[0], 0:cls.shape[1]].astype(np.float32)
+    m = np.ones(cls.shape, bool)
+    if "x_outer" in reg:
+        cx, hw = 0.5 * (x0 + x1), max(0.5 * (x1 - x0), 1.0)
+        t = np.abs(xx - cx) / hw
+        m &= (t >= reg["x_outer"][0]) & (t <= reg["x_outer"][1])
+    if "x" in reg:
+        t = (xx - x0) / max(x1 - x0, 1)
+        m &= (t >= reg["x"][0]) & (t <= reg["x"][1])
+    if "y" in reg:
+        t = (yy - y0) / max(y1 - y0, 1)
+        m &= (t >= reg["y"][0]) & (t <= reg["y"][1])
+    return m
+
+
 def load_frame(out: Path, hero: str, tag: str, name: str):
     p = out / "frames" / ("%s-%s-%s.png" % (hero.lower(), tag, name))
     return np.asarray(Image.open(p).convert("RGB")) if p.is_file() else None
@@ -727,6 +757,9 @@ def cmd_measure(a, cfg) -> dict:
         for zone in zones_cfg:
             c = cls_of[zone]
             m = erode(cls == c, 1)
+            reg = zone_region(cfg, zone, view, cls)
+            if reg is not None:
+                m &= reg
             per_view[view][zone] = {"pixels": int(m.sum())}
             gm = None
             if gate_on and zone in gates:
@@ -759,6 +792,8 @@ def cmd_measure(a, cfg) -> dict:
                      "median sRGB per channel over the pixels of the three concept views (front/side/back) pooled, "
                      "HSV and Y of the median (as ld_measure); concept = ld measure-report zones.*.concept "
                      "(class mask + colour gates on the concept, same definition)"}
+    if cfg.get("render_regions"):
+        res["render_regions"] = cfg["render_regions"]
     for var in variants:
         key = [z for z in cfg["key_zones"] if var in zones.get(z, {}) and zones[z].get("concept")]
         if not key:

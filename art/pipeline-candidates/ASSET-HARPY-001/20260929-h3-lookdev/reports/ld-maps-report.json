@@ -58,15 +58,15 @@
  },
  "checks": {
   "bc_changed_only_by_rules": {
-   "expected": "H3 BC except the cord texels and the dielectric luminance clamp",
+   "expected": "H3 BC except the cord texels, the dielectric luminance clamp and the UE feedback gains (5c-B0, round 2)",
    "measured": {
     "by_class": {
-     "feathers": 4759370,
+     "feathers": 4846746,
      "horn_claw": 86031,
      "leather_smooth": 48113,
-     "skin": 9582
+     "skin": 637056
     },
-    "changed_texels_4k": 4903096
+    "changed_texels_4k": 5617946
    },
    "passed": true
   },
@@ -75,7 +75,7 @@
    "measured": {
     "feathers": {
      "range": [
-      0.02,
+      0.008,
       0.7
      ],
      "share_outside": 0.0
@@ -99,7 +99,7 @@
       0.03,
       0.6
      ],
-     "share_outside": 0.0
+     "share_outside": 0.0022
     }
    },
    "passed": true
@@ -164,7 +164,7 @@
    "expected": "half values equal",
    "measured": {
     "bytes": 2196,
-    "dds_sha256": "2d2d8af2709118c43a542b5000c1b2bdd40969a9375da1543f6087b2b4955d78"
+    "dds_sha256": "7a1d3e68361649225aff4d525004f793fb654bd83d35e1973e9ac9a27307b65b"
    },
    "passed": true
   },
@@ -316,14 +316,14 @@
  "classes": {
   "feathers": {
    "Y_p5_p50_p95": [
-    0.02,
-    0.0493,
+    0.0132,
+    0.049,
     0.2021
    ],
    "bc_linear_median": [
-    0.0811,
-    0.0417,
-    0.0258
+    0.0808,
+    0.0414,
+    0.0254
    ],
    "column": 12,
    "edge_mask_mean": 0.1196,
@@ -388,14 +388,14 @@
   },
   "skin": {
    "Y_p5_p50_p95": [
-    0.1415,
-    0.2535,
-    0.3267
+    0.195,
+    0.3495,
+    0.4508
    ],
    "bc_linear_median": [
-    0.3645,
-    0.2319,
-    0.143
+    0.4811,
+    0.3246,
+    0.2117
    ],
    "column": 13,
    "edge_mask_mean": 0.0617,
@@ -693,15 +693,20 @@
     "class": "feathers",
     "field": "bc",
     "value": [
-     0.0811,
-     0.0417,
-     0.0258
+     0.0808,
+     0.0414,
+     0.0254
     ]
    },
    {
     "class": "feathers",
+    "field": "luminanceMin",
+    "value": 0.008
+   },
+   {
+    "class": "feathers",
     "field": "ymedClassHero",
-    "value": 0.0493
+    "value": 0.04904
    },
    {
     "class": "gold_antique",
@@ -735,20 +740,20 @@
     "class": "skin",
     "field": "bc",
     "value": [
-     0.3645,
-     0.2319,
-     0.143
+     0.4811,
+     0.3246,
+     0.2117
     ]
    },
    {
     "class": "skin",
     "field": "ymedClassHero",
-    "value": 0.25347
+    "value": 0.34949
    }
   ],
   "builder": "tools/art/material_library/build_ue_inputs.py 2.0.0 (imported, main() not run)",
   "dds": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/T_UM_MatLUT_Harpy.dds",
-  "dds_sha256": "2d2d8af2709118c43a542b5000c1b2bdd40969a9375da1543f6087b2b4955d78",
+  "dds_sha256": "7a1d3e68361649225aff4d525004f793fb654bd83d35e1973e9ac9a27307b65b",
   "gold_antique_f0_hero": [
    1.0,
    0.437,
@@ -756,35 +761,35 @@
   ],
   "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index (hero slot 5 = horn_claw)",
   "overrides_json": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/T_UM_MatLUT_Harpy.overrides.json",
-  "overrides_sha256": "a886dfb43982a7cfce2b739969abdea506043ca9d3abedbee17e30daa47533a8"
+  "overrides_sha256": "f91a739a4ceef32047179d8085080cce22033745222c817a280ba1610518f521"
  },
  "passed": true,
  "preview_textures": {
   "BC_P1": {
-   "bytes": 5218291,
+   "bytes": 5304128,
    "mode": "RGB",
    "path": "work/lookdev/preview/LD_BC_P1.png",
-   "sha256": "33aa39411dd8b73e63d5ecf61f7525f74ef90444616cf4c10aeba890ea742dac",
+   "sha256": "9f76ff28ee00ec98109d3bb377df363223dbd4d518406ea63d8cae3753e049f0",
    "size": [
     2048,
     2048
    ]
   },
   "BC_P2": {
-   "bytes": 5161515,
+   "bytes": 5245172,
    "mode": "RGB",
    "path": "work/lookdev/preview/LD_BC_P2.png",
-   "sha256": "16b38e81c3cc64d0556e241951f9aedf1174480940598151b2d7f664f44d295d",
+   "sha256": "6e0fc1301e44cfb54e071c3cc44dfca0e08259255c9323329eed1bb4cfcff4d2",
    "size": [
     2048,
     2048
    ]
   },
   "BC_none": {
-   "bytes": 5118222,
+   "bytes": 5209834,
    "mode": "RGB",
    "path": "work/lookdev/preview/LD_BC_none.png",
-   "sha256": "45708d4017dd4264a5488ad5598af6054ebf4d2c2cf27612b0d44e094b1c782b",
+   "sha256": "03e17ec2cc5f65efcec92d9f5b90254d591cc75725f0157f80ee742043de6a32",
    "size": [
     2048,
     2048
@@ -832,13 +837,13 @@
  "status": "измерено",
  "team_accent": {
   "TeamDye": 1.0,
-  "accent_median_Y_bc": 0.02,
-  "accent_p95_Y_bc": 0.0243,
+  "accent_median_Y_bc": 0.0141,
+  "accent_p95_Y_bc": 0.02,
   "cord_share": 0.0024,
   "edge_width_final_m": 0.0163,
   "edge_width_source_m": 0.025,
-  "gain_cap_p95": 45.97,
-  "gain_for_median": 40.0,
+  "gain_cap_p95": 55.77,
+  "gain_for_median": 56.94,
   "old_teammask_share": 0.1594,
   "share_of_figure_area": 0.0619,
   "silhouette": {
@@ -848,17 +853,17 @@
    ],
    "px_m": 0.002
   },
-  "suggested_TeamDyeGain": 40.0,
+  "suggested_TeamDyeGain": 55.77,
   "tripo_wing_accent_Y_median": 0.0173,
   "wing_tips_share": 0.0594
  },
  "textures": {
   "2k": {
    "BC": {
-    "bytes": 5125253,
+    "bytes": 5216820,
     "mode": "RGB",
     "path": "textures/2k/T_Harpy_H3LD_BC.png",
-    "sha256": "980ecbf34b7234c8723e26bd4d189f851ead1ead1d33f35f52346c7f55dafa0d",
+    "sha256": "dae99d8ff44524db409eb8963cde59fd914077a330fd1c5c4024cf0b28c2dde2",
     "size": [
      2048,
      2048
@@ -928,10 +933,10 @@
   },
   "4k": {
    "BC": {
-    "bytes": 14645228,
+    "bytes": 14909802,
     "mode": "RGB",
     "path": "textures/4k/T_Harpy_H3LD_BC.png",
-    "sha256": "0d0f674325c6c442d3da7e91d9f26acebbfe1392a76f5bf37e4a9fe068e1002b",
+    "sha256": "cefcd805ec20538d32f17f7e3808188f53fda66d3c00ecde0ff5e71af5e13a4f",
     "size": [
      4096,
      4096
@@ -1017,5 +1022,57 @@
    0.8948
   ],
   "texels_4k_weight_ge_0_5": 1118988
- }
+ },
+ "ue_feedback_r2": [
+  {
+   "Y_median_before_after": [
+    0.02,
+    0.01399
+   ],
+   "bc_median_linear_after": [
+    0.01736,
+    0.01321,
+    0.01237
+   ],
+   "bc_median_linear_before": [
+    0.02403,
+    0.01926,
+    0.01774
+   ],
+   "class": "feathers",
+   "mask": "dark_primaries",
+   "name": "dark_primaries_r2",
+   "ratio_effective": [
+    0.674,
+    0.634,
+    0.661
+   ],
+   "texels_4k_weight_ge_0_5": 1118988
+  },
+  {
+   "Y_median_before_after": [
+    0.25347,
+    0.34949
+   ],
+   "bc_median_linear_after": [
+    0.48112,
+    0.32465,
+    0.21165
+   ],
+   "bc_median_linear_before": [
+    0.36448,
+    0.23189,
+    0.14301
+   ],
+   "class": "skin",
+   "mask": null,
+   "name": "skin_r2",
+   "ratio_effective": [
+    1.32,
+    1.4,
+    1.48
+   ],
+   "texels_4k_weight_ge_0_5": 443739
+  }
+ ]
 }
