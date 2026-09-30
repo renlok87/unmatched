@@ -12,11 +12,13 @@ Source data: scraped-data/api/maps.json (SvelteKit devalue payload, gitignored, 
 in the main checkout). Per zone, `svgGroup` holds the zone's shapes on the map image:
 a <circle> is a single-zone space; a <path> is the zone's share of a multizone space
 (a half disk for two zones, a 1/3 wedge for three). Space centres:
-  circle          -> (cx, cy)
-  half disk path  -> midpoint of its only straight segment (the diameter)
-  wedge path      -> vertex between its two straight segments (the disk centre)
-Pieces of different zones within 20 px are one space. The counts are checked against
-the map's `spacesCount`.
+  circle / ellipse -> (cx, cy)
+  disk path        -> mean of its anchors (closed, cubic curves only, anchors on one
+                      circle of a space-sized radius: a whole single-zone space)
+  half disk path   -> midpoint of its only straight segment (the diameter)
+  wedge path       -> vertex between its two straight segments (the disk centre)
+A shape repeated verbatim within one zone counts once. Pieces of different zones within
+20 px are one space. The counts are checked against the map's `spacesCount`.
 
 Grid choice (deterministic): for W in 6..10, H in 4..6 (W*H >= spaces) the space
 centres are assigned to the cell centres of a W x H lattice spanning their bounding box
@@ -111,15 +113,40 @@ def decode_devalue_maps(doc: dict) -> list[dict]:
 
 
 _TOKEN = re.compile(r"[MCLZmclz]|-?\d+(?:\.\d+)?(?:e-?\d+)?")
+# A closed path of cubic curves only is a whole disk drawn as a path (Sarpedon, yellow):
+# its distinct anchor points must lie on one circle of a space-sized radius.
+DISK_PATH_RADIUS_PX = (40.0, 90.0)
+DISK_PATH_TOLERANCE_PX = 1.0
+
+
+def _disk_path_center(anchors: list[tuple[float, float]]) -> tuple[float, float] | None:
+    pts = []
+    for p in anchors:
+        if all(math.hypot(p[0] - q[0], p[1] - q[1]) > 1e-6 for q in pts):
+            pts.append(p)
+    if len(pts) < 3:
+        return None
+    cx = sum(p[0] for p in pts) / len(pts)
+    cy = sum(p[1] for p in pts) / len(pts)
+    radii = [math.hypot(p[0] - cx, p[1] - cy) for p in pts]
+    r = sum(radii) / len(radii)
+    if not (DISK_PATH_RADIUS_PX[0] <= r <= DISK_PATH_RADIUS_PX[1]):
+        return None
+    if max(abs(x - r) for x in radii) > DISK_PATH_TOLERANCE_PX:
+        return None
+    return cx, cy
 
 
 def path_center(d: str) -> tuple[tuple[float, float], str]:
-    """Centre of a zone's share of a multizone space (see module docstring)."""
+    """Centre of a zone's share of a multizone space (see module docstring); a closed
+    curve-only path whose anchors lie on one space-sized circle is a whole single-zone
+    space ("circle")."""
     toks = _TOKEN.findall(d)
     i = 0
     cmd = None
     pos = None
     lines = []  # (from, to) of every straight segment
+    anchors = []  # every segment end point (the M start included)
     arity = {"M": 2, "C": 6, "L": 2}
     while i < len(toks):
         t = toks[i]
@@ -140,26 +167,40 @@ def path_center(d: str) -> tuple[tuple[float, float], str]:
         if cmd == "L":
             lines.append((pos, end))
         pos = end
+        anchors.append(end)
     if len(lines) == 1:
         (a, b) = lines[0]
         return ((a[0] + b[0]) / 2.0, (a[1] + b[1]) / 2.0), "half"
     if len(lines) >= 2:
         return lines[0][1], "wedge"
+    disk = _disk_path_center(anchors)
+    if disk is not None:
+        return disk, "circle"
     raise ValueError(f"path without a straight segment: {d[:60]}")
 
 
-_CIRCLE = re.compile(r'<circle\b[^>]*\bcx="(-?[\d.]+)"[^>]*\bcy="(-?[\d.]+)"')
+# <circle cx cy r> and <ellipse cx cy rx ry> (Sarpedon draws its whole spaces as ellipses
+# with rx ~= ry ~= 62.7) are both a whole single-zone space.
+_CIRCLE = re.compile(r'<(?:circle|ellipse)\b[^>]*\bcx="(-?[\d.]+)"[^>]*\bcy="(-?[\d.]+)"')
 _PATH = re.compile(r'<path\b[^>]*\bd="([^"]+)"')
 
 
 def extract_spaces(m: dict) -> list[dict]:
-    """Real spaces of one map with their zone keys (map zone order kept)."""
+    """Real spaces of one map with their zone keys (map zone order kept). A shape repeated
+    verbatim within one zone (Sarpedon, brown: two wedges drawn twice each) is one piece."""
     pieces = []
     for zone in m.get("zones") or []:
         svg = zone.get("svgGroup") or ""
+        seen = set()
         for cx, cy in _CIRCLE.findall(svg):
+            if ("c", cx, cy) in seen:
+                continue
+            seen.add(("c", cx, cy))
             pieces.append((float(cx), float(cy), zone["key"], "circle"))
         for d in _PATH.findall(svg):
+            if ("p", d) in seen:
+                continue
+            seen.add(("p", d))
             (x, y), kind = path_center(d)
             pieces.append((x, y, zone["key"], kind))
     spaces: list[dict] = []

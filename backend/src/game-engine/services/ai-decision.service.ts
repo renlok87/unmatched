@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { GameState, Fighter, Card, PendingEffect, Position } from '../models';
 import { CardType, GamePhase, getActionsRemaining, getFighterMovement } from '../models';
 import { AdjacencyService } from '../engine/adjacency.service';
+import { distanceField, isAdjacent, posKey } from '../engine/board-topology';
 import { isCellPassable } from '../movement/traversal';
 import { bannerAllows } from '../validators/game-rules.validator';
 import { fighterNameMatches } from '../effects/card-effect-executor.service';
@@ -101,7 +102,8 @@ export class AiDecisionService {
     if (!enemy) return null;
 
     // Атака при досягаемости: melee — смежно, ranged — смежно или одна зона
-    const adjacent = this.manhattan(heroF.position, enemy.position) === 1;
+    // (смежность — board-topology: связь линией либо манхэттен 1 на сетке)
+    const adjacent = isAdjacent(state.boardState, heroF.position, enemy.position);
     const reach = adjacent || (heroF.attackType === 'ranged' && this.shareZone(state, heroF, enemy));
     if (reach) {
       const atk = this.bestAttackCard(state, aiUserId, heroF);
@@ -352,9 +354,8 @@ export class AiDecisionService {
     const anchor =
       this.aiHero(state, uid) ?? this.living(state).find((f) => f.ownerId === uid) ?? state.fighters[0];
     if (!anchor) return candidates[0] ?? null;
-    return candidates.reduce((a, b) =>
-      this.manhattan(anchor.position, a.position) <= this.manhattan(anchor.position, b.position) ? a : b,
-    );
+    const dist = distanceField(state.boardState, anchor.position);
+    return candidates.reduce((a, b) => (dist(a.position) <= dist(b.position) ? a : b));
   }
 
   private living(state: GameState): Fighter[] {
@@ -371,25 +372,24 @@ export class AiDecisionService {
     if (enemies.length === 0) return null;
     const heroes = enemies.filter((f) => f.type === ('HERO' as Fighter['type']));
     const pool = heroes.length > 0 ? heroes : enemies;
-    return pool.reduce((a, b) => (this.manhattan(from.position, a.position) <= this.manhattan(from.position, b.position) ? a : b));
-  }
-
-  private manhattan(a: { x: number; y: number }, b: { x: number; y: number }): number {
-    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+    // Дистанция — board-topology (сетка: манхэттен; топология: по линиям)
+    const dist = distanceField(state.boardState, from.position);
+    return pool.reduce((a, b) => (dist(a.position) <= dist(b.position) ? a : b));
   }
 
   /** Свободная клетка в зоне anchor-бойца, ближайшая к нему (для revive-PLACE).
-   *  Свободная = проходимая и без живых бойцов. */
+   *  Свободная = проходимая и без живых бойцов. Дистанция — board-topology. */
   private freeCellInZone(state: GameState, anchor: Fighter): { x: number; y: number } | null {
     const occupied = new Set(
       this.living(state).map((f) => `${f.position.x}:${f.position.y}`),
     );
+    const dist = distanceField(state.boardState, anchor.position);
     let best: { x: number; y: number; d: number } | null = null;
     for (let y = 0; y < state.boardState.height; y++) {
       for (let x = 0; x < state.boardState.width; x++) {
         if (occupied.has(`${x}:${y}`)) continue;
         if (!this.adjacency.isInSameZone(state, anchor.position, { x, y })) continue;
-        const d = this.manhattan(anchor.position, { x, y });
+        const d = dist({ x, y });
         if (!best || d < best.d) best = { x, y, d };
       }
     }
@@ -401,11 +401,13 @@ export class AiDecisionService {
   }
 
   /**
-   * BFS-путь до maxCost очков, СТРОГО приближающий к врагу по манхэттену.
-   * Живые враги блокируют прохождение (blockedPositions), живые союзники
-   * проходимы насквозь, но путь не может ЗАКАНЧИВАТЬСЯ на занятой клетке;
-   * побеждённые бойцы никого не блокируют (GD-015). Среди достижимых
-   * выбираем свободную клетку с минимальным манхэттеном до врага.
+   * BFS-путь до maxCost очков, СТРОГО приближающий к врагу по дистанции
+   * доски (board-topology: манхэттен на сетке, graph distance по линиям на
+   * топологической доске). Живые враги блокируют прохождение
+   * (blockedPositions), живые союзники проходимы насквозь, но путь не может
+   * ЗАКАНЧИВАТЬСЯ на занятой клетке; побеждённые бойцы никого не блокируют
+   * (GD-015). Среди достижимых выбираем свободную клетку с минимальной
+   * дистанцией до врага.
    */
   private stepToward(
     state: GameState,
@@ -430,10 +432,11 @@ export class AiDecisionService {
       this.living(state).map((f) => `${f.position.x}:${f.position.y}`),
     );
 
+    const distToEnemy = distanceField(state.boardState, enemy.position);
     const queue: Array<{ position: Position; path: Position[] }> = [{ position: mine.position, path: [] }];
-    const visited = new Set([`${mine.position.x}:${mine.position.y}`]);
+    const visited = new Set([posKey(mine.position)]);
     let best: Position[] = [];
-    let bestDist = this.manhattan(mine.position, enemy.position);
+    let bestDist = distToEnemy(mine.position);
     for (let index = 0; index < queue.length; index++) {
       const current = queue[index];
       if (current.path.length >= maxCost) continue;
@@ -443,7 +446,7 @@ export class AiDecisionService {
         visited.add(key);
         const path = [...current.path, cell.position];
         queue.push({ position: cell.position, path });
-        const distance = this.manhattan(cell.position, enemy.position);
+        const distance = distToEnemy(cell.position);
         // Финал пути — только на свободной клетке (не на живом бойце)
         if (distance < bestDist && !livingPositions.has(key)) {
           bestDist = distance;

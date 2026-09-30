@@ -8,6 +8,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { BoardState, Position } from '../models';
 import { getCellZones } from '../models';
+import * as topology from './board-topology';
 
 export interface AdjacentCell {
   readonly position: Position;
@@ -49,7 +50,11 @@ export class AdjacencyService {
   ];
 
   /**
-   * Получить соседние клетки для позиции
+   * Получить соседние клетки для позиции.
+   *
+   * Топологическая доска (engine/board-topology): соседи — РОВНО связанные
+   * линией клетки (links), includeDiagonal игнорируется, стоимость шага 1.
+   * Сеточная доска — прежние ортогональные (и опц. диагональные) соседи.
    */
   getAdjacentCells(
     boardState: BoardState,
@@ -57,6 +62,24 @@ export class AdjacencyService {
     options: { includeDiagonal?: boolean; ignoreBlocking?: boolean } = {},
   ): readonly AdjacentCell[] {
     const { includeDiagonal = false, ignoreBlocking = false } = options;
+
+    if (topology.hasTopology(boardState)) {
+      return topology
+        .neighbours(boardState, position)
+        .map((adjacentPos) => {
+          const cell = this.getCell(boardState, adjacentPos);
+          if (!cell) {
+            return null;
+          }
+          return {
+            position: adjacentPos,
+            direction: this.directionBetween(position, adjacentPos),
+            cost: 1,
+            isBlocked: !ignoreBlocking && this.isCellBlocked(cell),
+          };
+        })
+        .filter((c): c is AdjacentCell => c !== null);
+    }
 
     const offsets = includeDiagonal
       ? [...this.orthogonalOffsets, ...this.diagonalOffsets]
@@ -172,14 +195,52 @@ export class AdjacencyService {
    * Создать ключ для позиции
    */
   private posKey(pos: Position): string {
-    return `${pos.x}:${pos.y}`;
+    return topology.posKey(pos);
   }
 
   /**
-   * Вычислить Manhattan расстояние
+   * Грубое направление связи (для топологических связей, которые могут
+   * перекрывать несколько шагов решётки) — по знакам dx/dy.
+   */
+  private directionBetween(from: Position, to: Position): Direction {
+    const sx = Math.sign(to.x - from.x);
+    const sy = Math.sign(to.y - from.y);
+    if (sx === 0) return sy < 0 ? Direction.NORTH : Direction.SOUTH;
+    if (sy === 0) return sx > 0 ? Direction.EAST : Direction.WEST;
+    if (sy < 0) return sx > 0 ? Direction.NORTHEAST : Direction.NORTHWEST;
+    return sx > 0 ? Direction.SOUTHEAST : Direction.SOUTHWEST;
+  }
+
+  /**
+   * Вычислить Manhattan расстояние (метрика СЕТКИ, без учёта доски).
+   * Тонкая обёртка над board-topology.manhattanDistance; для дальности на
+   * произвольной доске используйте boardDistance.
    */
   manhattanDistance(a: Position, b: Position): number {
-    return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+    return topology.manhattanDistance(a, b);
+  }
+
+  /**
+   * «Сколько пространств между» с учётом доски: топология — graph distance
+   * по линиям; сетка — манхэттен (как раньше).
+   */
+  boardDistance(
+    state: { boardState?: BoardState } | null | undefined,
+    a: Position,
+    b: Position,
+  ): number {
+    return topology.boardDistance(state?.boardState, a, b);
+  }
+
+  /**
+   * Синхронная смежность с учётом доски (см. isAdjacent).
+   */
+  isAdjacentOnBoard(
+    state: { boardState?: BoardState } | null | undefined,
+    a: Position,
+    b: Position,
+  ): boolean {
+    return topology.isAdjacent(state?.boardState, a, b);
   }
 
   /**
@@ -193,14 +254,16 @@ export class AdjacencyService {
    * Проверить, являются ли две позиции смежными
    * Используется для проверки возможности атаки
    *
+   * Топологическая доска (state.boardState с links): смежны ⟺ соединены
+   * линией; иначе (сетка или нет доски) — манхэттен === 1, как раньше.
+   *
    * @param state - Состояние игры
    * @param a - Первая позиция
    * @param b - Вторая позиция
    * @returns true если позиции смежные
    */
   async isAdjacent(state: any, a: Position, b: Position): Promise<boolean> {
-    const distance = this.manhattanDistance(a, b);
-    return distance === 1;
+    return this.isAdjacentOnBoard(state as { boardState?: BoardState } | null | undefined, a, b);
   }
 
   /**

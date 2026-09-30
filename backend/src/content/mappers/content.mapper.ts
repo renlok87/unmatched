@@ -17,6 +17,36 @@ import { FighterType, Zone, CardType } from '../interfaces';
 import type { Hero, Card, Board as PrismaBoard } from '@prisma/client';
 
 /**
+ * ENV-MAPS: Board.cells несёт топологию оригинальной карты (граф клеток со
+ * связями) ⟺ хотя бы одна клетка несёт массив `links` (тот же признак, что
+ * game-engine/engine/board-topology.hasTopology). Терпит строковый JSON и
+ * двойную сериализацию, как parsePrismaCells / buildBoardState.
+ *
+ * Такие доски играются только UE-клиентом по графу из состояния игры;
+ * публичный контентный каталог (web-лобби, web-рендер) их не отдаёт —
+ * см. ContentDbService.
+ */
+export function boardCellsHaveTopology(raw: unknown): boolean {
+  let value: unknown = raw;
+  for (let i = 0; i < 2 && typeof value === 'string'; i++) {
+    try {
+      value = JSON.parse(value);
+    } catch {
+      return false;
+    }
+  }
+  return (
+    Array.isArray(value) &&
+    value.some(
+      (cell) =>
+        cell !== null &&
+        typeof cell === 'object' &&
+        Array.isArray((cell as { links?: unknown }).links),
+    )
+  );
+}
+
+/**
  * Content Mapper
  * Transforms Domain models to DTOs for API responses
  * Provides separation between internal data structure and API contract
@@ -423,9 +453,20 @@ export class ContentMapper {
 
   /**
    * Алиасы zone-ключей scraped-data → базовый Zone enum.
-   * Покрывает синонимы ("violet"→purple, "grey"→gray) и опечатки источника
-   * ("biege"→beige). Варианты оттенков ("blue-dark", "green-light",
-   * "brown-ligt") сводятся к базовому цвету по токенам в normalizeZone.
+   * Покрывает синонимы ("grey"→gray) и опечатки источника ("biege"→beige).
+   * Варианты оттенков ("blue-dark", "green-light", "brown-ligt",
+   * "violet-dark") сводятся к базовому цвету по токенам в normalizeZone.
+   *
+   * ENV-MAPS (2026-09-30): алиас violet→purple УДАЛЁН, violet — своя зона.
+   * Проверка всех 29 карт scraped-data/api/maps.json: violet встречается на
+   * 16 картах; на 3 из них (marmoreal, globe-theatre, azuchi-castle) рядом
+   * есть и purple — алиас сливал две разные зоны карты в одну (ranged «по
+   * зоне» бил бы через всю карту). На остальных 13 картах purple нет —
+   * меняется только метка зоны (PURPLE→VIOLET), разбиение на зоны прежнее;
+   * the-bronze (violet + violet-dark) сводится к VIOLET, как раньше к PURPLE.
+   * Движок (buildBoardState) всегда брал сырые ключи клеток, так что
+   * контентный API теперь совпадает с правилами. Регрессия зафиксирована в
+   * content.mapper.zones.spec.ts (ни одна карта не получила новых слияний).
    */
   private static readonly ZONE_ALIASES: Record<string, Zone> = {
     blue: Zone.BLUE,
@@ -433,7 +474,7 @@ export class ContentMapper {
     yellow: Zone.YELLOW,
     red: Zone.RED,
     purple: Zone.PURPLE,
-    violet: Zone.PURPLE,
+    violet: Zone.VIOLET,
     brown: Zone.BROWN,
     gray: Zone.GRAY,
     grey: Zone.GRAY,

@@ -9,6 +9,7 @@ import type { GameState, Fighter, Position } from '../models';
 import { getFighterMovement, positionEqual, getActionsRemaining } from '../models';
 import { AdjacencyService } from '../engine/adjacency.service';
 import { isCellPassable, isFreeEndpoint, isLivingFighter, isTraversable } from '../movement/traversal';
+import { isAdjacent, isWithinDistance } from '../engine/board-topology';
 
 export interface ValidationResult {
   readonly valid: boolean;
@@ -119,11 +120,9 @@ export class GameRulesValidator {
       return { valid: false, error: 'Target is dead', code: 'TARGET_DEAD' };
     }
 
-    // Проверяем, что цель в радиусе атаки
-    const distance =
-      Math.abs(attacker.position.x - target.position.x) +
-      Math.abs(attacker.position.y - target.position.y);
-    if (distance > 1) {
+    // Проверяем, что цель в радиусе атаки (≤ 1 пространства: сетка —
+    // манхэттен, топологическая доска — связь линией; board-topology)
+    if (!isWithinDistance(state.boardState, attacker.position, target.position, 1)) {
       return { valid: false, error: 'Target out of range', code: 'OUT_OF_RANGE' };
     }
 
@@ -351,11 +350,13 @@ export class GameRulesValidator {
       };
     }
 
-    // Пошаговая смежность: каждый шаг — на соседнюю клетку (manhattan === 1,
-    // та же метрика, что isAdjacent в adjacency.service); заодно исключает дубли позиции
+    // Пошаговая смежность: каждый шаг — на соседнюю клетку (board-topology
+    // isAdjacent: связь линией на топологической доске, manhattan === 1 на
+    // сетке — та же метрика, что isAdjacent в adjacency.service); заодно
+    // исключает дубли позиции
     let prev = fighter.position;
     for (const pos of path) {
-      if (Math.abs(pos.x - prev.x) + Math.abs(pos.y - prev.y) !== 1) {
+      if (!isAdjacent(state.boardState, prev, pos)) {
         return {
           valid: false,
           error: `Шаг (${prev.x},${prev.y})→(${pos.x},${pos.y}) не является ходом на соседнюю клетку`,
@@ -441,7 +442,7 @@ export class GameRulesValidator {
     }
 
     // Проверка очков движения: цель должна быть достижима BFS по проходимым
-    // клеткам (4-связно, как isAdjacent); живые ВРАГИ блокируют прохождение,
+    // клеткам (соседи board-topology, как isAdjacent); живые ВРАГИ блокируют прохождение,
     // живые союзники проходимы насквозь (GD-015), побеждённые не блокируют
     const allowance = getFighterMovement(fighter);
     const blockedPositions = new Set(

@@ -4,6 +4,10 @@
  * Типы для бойцов (героев, миньонов, huge)
  */
 
+// Только чистая функция; board-topology импортирует из models лишь типы —
+// рантайм-цикла модулей нет
+import { manhattanDistance as latticeManhattan } from '../engine/board-topology';
+
 /**
  * Тип бойца
  */
@@ -131,8 +135,10 @@ export function positionEqual(a: Position, b: Position): boolean {
 }
 
 /**
- * Вычисляет расстояние между двумя позициями (Manhattan distance)
+ * Вычисляет расстояние между двумя позициями (Manhattan distance решётки,
+ * БЕЗ учёта доски). Не годится для смежности/дальности на топологических
+ * досках — там используйте engine/board-topology (isAdjacent/boardDistance).
  */
 export function positionDistance(a: Position, b: Position): number {
-  return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+  return latticeManhattan(a, b);
 }

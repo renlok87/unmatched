@@ -12,6 +12,13 @@
  * указывающие на соседнюю клетку. Реципрокность: если A связана 'right' с B,
  * то B обязана быть связана 'left' с A.
  *
+ * ENV-MAPS (контракт unmatched.board-topology/1): клетка оригинальной карты
+ * несёт links — позиции решётки связанных пространств ({x, y}, связь может
+ * перекрывать несколько шагов решётки). Если links есть хотя бы у одной
+ * клетки, соседи клетки в движке — РОВНО её links, поэтому они проверяются
+ * жёстко: целые координаты, существующая проходимая клетка-цель, без петель
+ * и повторов, симметричность, у непроходимой клетки связей нет.
+ *
  * Возвращает список человекочитаемых строк ошибок. Предупреждения (мягкие
  * замечания, не делающие доску невалидной) имеют префикс "warn:".
  */
@@ -23,6 +30,8 @@ const ALLOWED_ZONES: ReadonlySet<string> = new Set([
   'yellow',
   'red',
   'purple',
+  // ENV-MAPS: violet — своя зона (Marmoreal: violet ≠ purple), не синоним
+  'violet',
   'brown',
   'gray',
   'orange',
@@ -55,6 +64,9 @@ export interface BoardGeometryCellInput {
   zone?: string;
   zones?: string[];
   connections?: string[];
+  isObstacle?: boolean;
+  /** ENV-MAPS: позиции решётки связанных клеток (топология оригинальной карты) */
+  links?: BoardGeometryPositionRef[];
   [key: string]: unknown;
 }
 
@@ -196,6 +208,8 @@ export function validateBoardGeometry(
     }
   }
 
+  validateTopologyLinks(cellIndex, errors);
+
   // Features: doors / secretPassages / highGround должны ссылаться на клетки.
   const features = input?.features;
   if (features && typeof features === 'object') {
@@ -208,6 +222,64 @@ export function validateBoardGeometry(
   const hardErrors = errors.filter((e) => !e.startsWith('warn:'));
 
   return { valid: hardErrors.length === 0, errors };
+}
+
+function isBlockedCell(cell: BoardGeometryCellInput): boolean {
+  return cell.isObstacle === true || cell.type === 'obstacle' || cell.type === 'wall';
+}
+
+/**
+ * ENV-MAPS: связи топологической доски (cells[].links). Жёсткие ошибки:
+ * не массив / не целые координаты / цель не существует / петля / повтор /
+ * связь у непроходимой клетки или в непроходимую клетку / асимметрия.
+ */
+function validateTopologyLinks(
+  cellIndex: Map<string, BoardGeometryCellInput>,
+  errors: string[],
+): void {
+  for (const cell of cellIndex.values()) {
+    if (cell.links === undefined) continue;
+    const at = `(${cell.x},${cell.y})`;
+    if (!Array.isArray(cell.links)) {
+      errors.push(`Cell ${at} links must be an array of {x, y} positions.`);
+      continue;
+    }
+    if (cell.links.length > 0 && isBlockedCell(cell)) {
+      errors.push(`Obstacle cell ${at} must not carry links.`);
+    }
+    const seen = new Set<string>();
+    cell.links.forEach((link, i) => {
+      if (!isInteger(link?.x) || !isInteger(link?.y)) {
+        errors.push(`Cell ${at} link #${i} has non-integer coordinates.`);
+        return;
+      }
+      const k = key(link.x, link.y);
+      if (link.x === cell.x && link.y === cell.y) {
+        errors.push(`Cell ${at} links to itself.`);
+        return;
+      }
+      if (seen.has(k)) {
+        errors.push(`Cell ${at} has a duplicate link to (${link.x},${link.y}).`);
+        return;
+      }
+      seen.add(k);
+      const target = cellIndex.get(k);
+      if (!target) {
+        errors.push(`Cell ${at} links to a missing cell (${link.x},${link.y}).`);
+        return;
+      }
+      if (isBlockedCell(target)) {
+        errors.push(`Cell ${at} links to an obstacle cell (${link.x},${link.y}).`);
+        return;
+      }
+      const back = Array.isArray(target.links) ? target.links : [];
+      if (!back.some((b) => b?.x === cell.x && b?.y === cell.y)) {
+        errors.push(
+          `Asymmetric link: cell ${at} links to (${link.x},${link.y}), but (${link.x},${link.y}) does not link back.`,
+        );
+      }
+    });
+  }
 }
 
 function validateLinkRefs(

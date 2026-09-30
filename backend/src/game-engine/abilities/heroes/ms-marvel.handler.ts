@@ -9,7 +9,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { GameState } from '../../models/game-state.model';
 import type { Fighter, Position } from '../../models/fighter.model';
-import { positionDistance, positionEqual } from '../../models/fighter.model';
+import { positionEqual } from '../../models/fighter.model';
+import {
+  boardDistance,
+  hasTopology,
+  neighbours,
+  orthogonalPositions,
+  ORTHOGONAL_WENS,
+} from '../../engine/board-topology';
+import { isCellPassable } from '../../movement/traversal';
 import {
   IHeroAbilityHandler,
   ExtendedCombatContext,
@@ -122,7 +130,8 @@ export class MsMarvelHandler implements IHeroAbilityHandler, AbilityChecker {
       return false;
     }
 
-    const distance = positionDistance(attacker.position, defender.position);
+    // Дистанция в пространствах: сетка — манхэттен, топология — по линиям
+    const distance = boardDistance(state.boardState, attacker.position, defender.position);
     return this.canAttackAtRange(attackerId, defenderId, distance);
   }
 
@@ -150,8 +159,8 @@ export class MsMarvelHandler implements IHeroAbilityHandler, AbilityChecker {
       return state;
     }
 
-    // Проверяем дистанцию (только 1 клетка)
-    const distance = positionDistance(fighter.position, targetPosition);
+    // Проверяем дистанцию (только 1 клетка; сетка — манхэттен, топология — по линиям)
+    const distance = boardDistance(state.boardState, fighter.position, targetPosition);
     if (distance > TURN_START_MOVE_BONUS) {
       this.logger.warn(
         `Ms. Marvel can only move ${TURN_START_MOVE_BONUS} space at turn start, requested ${distance}`,
@@ -196,15 +205,19 @@ export class MsMarvelHandler implements IHeroAbilityHandler, AbilityChecker {
     }
 
     const positions: Position[] = [];
-    const { x, y } = fighter.position;
+
+    // Топологическая доска: соседи — связанные линией пространства;
+    // проходимые и свободные от бойцов
+    if (hasTopology(state.boardState)) {
+      return neighbours(state.boardState, fighter.position).filter(
+        (pos) =>
+          isCellPassable(state.boardState.cells[pos.y]?.[pos.x]) &&
+          !state.fighters.some((f) => positionEqual(f.position, pos)),
+      );
+    }
 
     // 4 соседние клетки (без диагоналей для Unmatched)
-    const adjacentPositions: Position[] = [
-      { x: x - 1, y },
-      { x: x + 1, y },
-      { x, y: y - 1 },
-      { x, y: y + 1 },
-    ];
+    const adjacentPositions: Position[] = orthogonalPositions(fighter.position, ORTHOGONAL_WENS);
 
     // Фильтруем позиции с учётом границ доски и препятствий
     // (здесь упрощённая версия - полная проверка должна учитывать состояние доски)

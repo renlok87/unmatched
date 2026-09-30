@@ -43,6 +43,7 @@ import { MovementService } from '../engine/movement.service';
 import { isCellPassable, isLivingFighter } from '../movement/traversal';
 import { ValueModifierService } from '../engine/value-modifier.service';
 import { AdjacencyService } from '../engine/adjacency.service';
+import { boardDistance, hasTopology } from '../engine/board-topology';
 import { DeckManagementService } from './deck-management.service';
 import { applyTerminalState } from '../engine/terminal-state';
 import type { CombatResolutionProgress } from '../engine/combat-progress';
@@ -1932,10 +1933,12 @@ export class GameActionExecutorService {
         // если обычные melee/ranged-правила цель НЕ достают — спрашиваем реестр.
         // Хук ТОЛЬКО добавляет разрешение, никогда не отнимает уже выданное.
         if (!inRange) {
-          const range = this.adjacencyService.manhattanDistance(
-            attacker.position,
-            target.position,
-          );
+          // Дистанция в пространствах: топологическая доска — число переходов
+          // по линиям (board-topology graph distance); сетка — манхэттен
+          // (прежний контракт AdjacencyService.manhattanDistance).
+          const range = hasTopology(currentState.boardState)
+            ? boardDistance(currentState.boardState, attacker.position, target.position)
+            : this.adjacencyService.manhattanDistance(attacker.position, target.position);
           const attackerSlug = attacker.heroSlug ?? attacker.heroId;
           // STANCE: текущая стойка атакующего — для stance-aware дальности
           // (Muhammad Ali FLOAT: range 2; STING — нет дальней атаки).

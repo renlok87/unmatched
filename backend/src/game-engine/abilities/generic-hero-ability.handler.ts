@@ -13,6 +13,7 @@
 import type { GameState } from '../models/game-state.model';
 import { getActionsRemaining, GamePhase } from '../models/game-state.model';
 import { applyTerminalState } from '../engine/terminal-state';
+import { hasTopology, isAdjacent as isAdjacentOnTopology } from '../engine/board-topology';
 import type { Fighter } from '../models/fighter.model';
 import { FighterType } from '../models/fighter.model';
 import type { BoardState } from '../models/board.model';
@@ -55,6 +56,8 @@ export interface GenericHeroAbilityDeps {
    * AdjacencyService, поэтому достаточно объявить нужные методы:
    *  - isInSameZone    — для 'no-enemy-in-own-zone' и turn-damage 'enemy-in-zone'
    *  - manhattanDistance — для turn-damage 'enemy-adjacent' (смежность == 1)
+   *    на СЕТОЧНЫХ досках; на топологических досках смежность считает
+   *    engine/board-topology (связи links), см. areAdjacent.
    */
   readonly zone: {
     isInSameZone(
@@ -286,7 +289,7 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
             f.ownerId === fighter.ownerId && // только свои
             f.id !== fighter.id && // excl-self
             f.isDefeated !== true && // живые
-            this.deps.zone.manhattanDistance(f.position, defender.position) === 1, // смежные
+            this.areAdjacent(state, f.position, defender.position), // смежные
         ).length;
       default:
         return 0;
@@ -784,8 +787,9 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       if (effect.targetScope === 'enemy-in-zone') {
         return this.deps.zone.isInSameZone(state, hero.position, f.position);
       }
-      // 'enemy-adjacent' — смежность (Manhattan distance === 1)
-      return this.deps.zone.manhattanDistance(hero.position, f.position) === 1;
+      // 'enemy-adjacent' — смежность (сетка: Manhattan distance === 1;
+      // топологическая доска: связь линией)
+      return this.areAdjacent(state, hero.position, f.position);
     });
 
     if (!target) return state; // нет цели → no-op (без добора)
@@ -1120,6 +1124,22 @@ export class GenericHeroAbilityHandler implements ExtendedHeroAbilityHandler {
       }
     }
     return true;
+  }
+
+  /**
+   * Смежность двух позиций на доске состояния. Топологическая доска —
+   * board-topology (связь линией). Сетка — прежний контракт deps.zone
+   * (manhattanDistance === 1), чтобы стабы deps в тестах вели себя как раньше.
+   */
+  private areAdjacent(
+    state: { boardState?: BoardState },
+    a: { x: number; y: number },
+    b: { x: number; y: number },
+  ): boolean {
+    if (hasTopology(state?.boardState)) {
+      return isAdjacentOnTopology(state.boardState, a, b);
+    }
+    return this.deps.zone.manhattanDistance(a, b) === 1;
   }
 
   /** Найти бойца-героя игрока (type === HERO). */

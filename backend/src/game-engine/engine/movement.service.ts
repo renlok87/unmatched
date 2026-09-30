@@ -9,6 +9,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import type { GameState, Fighter, Position } from '../models';
 import { AStarService, PathCacheService } from '../movement';
 import { isCellPassable, isFreeEndpoint, isTraversable } from '../movement/traversal';
+import { isAdjacent, neighbours, ORTHOGONAL_NESW } from './board-topology';
 
 export interface MovementResult {
   readonly success: boolean;
@@ -104,7 +105,8 @@ export class MovementService {
   }
 
   /**
-   * Получить допустимые позиции для перемещения (BFS, 4-связно).
+   * Получить допустимые позиции для перемещения (BFS по соседям
+   * board-topology: связи топологической доски либо 4-связная сетка).
    * Живые враги блокируют прохождение, живые союзники проходимы, но ни на
    * какого живого бойца нельзя закончить путь; побеждённые не блокируют.
    */
@@ -127,7 +129,7 @@ export class MovementService {
         continue;
       }
 
-      for (const neighbor of this.orthogonalNeighbors(current.position)) {
+      for (const neighbor of neighbours(state.boardState, current.position, ORTHOGONAL_NESW)) {
         const key = this.posKey(neighbor);
         if (visited.has(key)) {
           continue;
@@ -148,15 +150,6 @@ export class MovementService {
     }
 
     return targets;
-  }
-
-  private orthogonalNeighbors(pos: Position): Position[] {
-    return [
-      { x: pos.x, y: pos.y - 1 },
-      { x: pos.x + 1, y: pos.y },
-      { x: pos.x, y: pos.y + 1 },
-      { x: pos.x - 1, y: pos.y },
-    ];
   }
 
   private posKey(pos: Position): string {
@@ -212,7 +205,8 @@ export class MovementService {
     }
 
     // Проверяем валидность каждой позиции в пути. Путь без телепортов:
-    // каждый шаг — на соседнюю клетку (manhattan === 1). Путь в конвенции
+    // каждый шаг — на соседнюю клетку (board-topology.isAdjacent: связь на
+    // топологической доске, manhattan === 1 на сетке). Путь в конвенции
     // AStar может начинаться со стартовой клетки бойца — её пропускаем.
     let prev = fighter.position;
     for (let i = 0; i < path.length; i++) {
@@ -226,7 +220,7 @@ export class MovementService {
         continue;
       }
 
-      if (Math.abs(pos.x - prev.x) + Math.abs(pos.y - prev.y) !== 1) {
+      if (!isAdjacent(state.boardState, prev, pos)) {
         return {
           success: false,
           error: `Step (${prev.x},${prev.y})→(${pos.x},${pos.y}) is not a move to an adjacent cell`,
