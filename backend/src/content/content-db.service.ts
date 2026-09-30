@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { RedisService } from '../redis';
 import { PrismaService } from '../database/prisma.service';
 import type { HeroDefinition, CardDefinition, BoardDefinition, ContentDiff } from './interfaces';
-import { ContentMapper } from './mappers/content.mapper';
+import { ContentMapper, boardCellsHaveTopology } from './mappers/content.mapper';
 import type { PaginatedHeroesDto, PaginatedBoardsDto, PaginationInfoDto } from './dto/content.dto';
 
 /**
@@ -247,6 +247,21 @@ export class ContentDbService {
   // ==================== Boards ====================
 
   /**
+   * ENV-MAPS: публичный контентный каталог досок (web-лобби, web-рендер)
+   * НЕ отдаёт доски с топологией оригинальной карты (Board.cells с links):
+   * web-клиент рисует и валидирует ходы по сетке, а BoardDto не несёт
+   * связей — такая доска была бы отрисована и сыграна неверно. Эти доски
+   * играются UE-клиентом по графу из состояния игры (boardState), их
+   * создают по id (seed-env-map-boards.ts); админка видит их через adminBoards.
+   */
+  private async findCatalogBoards() {
+    const boards = await this.prisma.board.findMany({
+      orderBy: { name: 'asc' },
+    });
+    return boards.filter((b) => !boardCellsHaveTopology(b.cells));
+  }
+
+  /**
    * Get all available boards from database (with cache)
    */
   async getAllBoards(): Promise<BoardDefinition[]> {
@@ -256,9 +271,7 @@ export class ContentDbService {
       return cached;
     }
 
-    const boards = await this.prisma.board.findMany({
-      orderBy: { name: 'asc' },
-    });
+    const boards = await this.findCatalogBoards();
 
     const boardDefinitions = boards.map((b) => this.mapper.prismaBoardToBoardDefinition(b));
     await this.setCache(cacheKey, boardDefinitions);
@@ -272,14 +285,10 @@ export class ContentDbService {
     page: number = 1,
     limit: number = 10,
   ): Promise<PaginatedBoardsDto> {
-    const [boards, total] = await Promise.all([
-      this.prisma.board.findMany({
-        skip: (page - 1) * limit,
-        take: limit,
-        orderBy: { name: 'asc' },
-      }),
-      this.prisma.board.count(),
-    ]);
+    // Фильтр каталога (топология) — в памяти: досок единицы-десятки
+    const catalog = await this.findCatalogBoards();
+    const total = catalog.length;
+    const boards = catalog.slice((page - 1) * limit, (page - 1) * limit + limit);
 
     const totalPages = Math.ceil(total / limit);
 
@@ -313,7 +322,8 @@ export class ContentDbService {
       where: { id },
     });
 
-    if (!board) {
+    // ENV-MAPS: доска с топологией вне публичного каталога (см. findCatalogBoards)
+    if (!board || boardCellsHaveTopology(board.cells)) {
       throw new NotFoundException(`Board not found: ${id}`);
     }
 
@@ -332,7 +342,8 @@ export class ContentDbService {
       },
     });
 
-    if (!board) {
+    // ENV-MAPS: доска с топологией вне публичного каталога (см. findCatalogBoards)
+    if (!board || boardCellsHaveTopology(board.cells)) {
       throw new NotFoundException(`Board not found: ${slug}`);
     }
 
@@ -405,7 +416,8 @@ export class ContentDbService {
 
     const [heroesCount, boardsCount, sets] = await Promise.all([
       this.prisma.hero.count(),
-      this.prisma.board.count(),
+      // каталог без досок с топологией (см. findCatalogBoards)
+      this.findCatalogBoards().then((boards) => boards.length),
       this.getAllSets(),
     ]);
 

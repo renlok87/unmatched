@@ -1,0 +1,723 @@
+{
+ "schema": "unmatched.map-surface-manifest/1",
+ "map": "marmoreal",
+ "generator": "tools/art/map_surface/build_map_textures.py",
+ "status": "technical candidate (no art acceptance); textures and mocks are OUT of git (ENV-U3)",
+ "roots": {
+  "scraped-data/derived/maps": "main checkout, gitignored (ENV-U3); textures imported into UE by script",
+  "<mocks>": "K1 review artefacts (mocks, a|b split, EV map, logo before/after, SDF overlay crops), out of git, not imported anywhere; default --mocks C:/tmp/envmaps-research/k1-mocks"
+ },
+ "environment": {
+  "python": "3.13.4",
+  "numpy": "2.4.0",
+  "scipy": "1.17.0",
+  "pillow": "12.1.0",
+  "libwebp": "1.6.0"
+ },
+ "inputs": {
+  "image": {
+   "path": "scraped-data/images/maps/marmoreal.webp",
+   "sha256": "07d4a8eb350c7db43e9c5e7699196173101eb5eff981d7befe3d30e5c35631a0",
+   "bytes": 386116,
+   "size": [
+    1337,
+    866
+   ]
+  },
+  "topology": {
+   "path": "docs/game-design/evidence/ENV-MAPS/2026-09-30-research/marmoreal.topology.json",
+   "sha256": "059df3d78723b79e186ee0c0f10c783958a424a6ed177721cadb6a1bbacd1cfb",
+   "sha256_of": "text with LF line ends (git content)"
+  },
+  "maps_json": {
+   "path": "scraped-data/api/maps.json",
+   "sha256": "476eb21b5d3d62a4eb3ad963941c6dd3dcb02f8467557b1f2869948e4ce7cd6e"
+  }
+ },
+ "uv": {
+  "texture_size": [
+   4096,
+   4096
+  ],
+  "mapping": "UV (0,0)-(1,1) = the whole 1337x866 illustration (stretched to the square); texel (i,j) centre = source px ((j+0.5)*1337/4096, (i+0.5)*866/4096)",
+  "texels_per_src_px": [
+   3.063575,
+   4.729792
+  ],
+  "src_px_per_texel": [
+   0.326416,
+   0.211426
+  ],
+  "board_uu": [
+   891.333,
+   577.333
+  ],
+  "uu_per_src_px": 0.666667,
+  "texels_per_uu": [
+   4.5954,
+   7.0947
+  ],
+  "world": "UE: X = (u - 0.5) * 891.333, Y = (v - 0.5) * 577.333, Z = 0 (u right, v down = towards the K1 camera)"
+ },
+ "params": {
+  "bc": {
+   "resample": "PIL LANCZOS (float32 per channel), 1337x866 -> 4096x4096 in one step",
+   "unsharp_sigma_src_px": 0.7,
+   "unsharp_amount": 0.35
+  },
+  "sdf": {
+   "codes_per_src_px": 512.0,
+   "clamp_src_px": 64.0,
+   "zero_code": 32768,
+   "ring_center_r_px": 62.41,
+   "ring_half_width_px": 1.021,
+   "line_half_width_px": 3.875,
+   "decode": "d_src_px = (code - 32768) / 512"
+  },
+  "id": {
+   "r_id_px": 63.431,
+   "centres": "painted ring centres"
+  },
+  "mask": {
+   "dilate_src_px": 6.0,
+   "soft_src_px": 1.0
+  }
+ },
+ "logo_paint_out": {
+  "pass1": {
+   "iterations": 274,
+   "hole_px": 8379,
+   "median_copy_offset_px": 61.3,
+   "seam_pairs": 5096,
+   "crop": [
+    0,
+    688,
+    312,
+    866
+   ]
+  },
+  "params": {
+   "data_term_floor": 0.02,
+   "protect_disc_r_px": 72.0,
+   "protect_line_w_px": 18,
+   "source_exclude": [],
+   "class_rule": null,
+   "band_refill_px": 0,
+   "rect_src_px": [
+    22,
+    807,
+    193,
+    856
+   ],
+   "patch_px": 9,
+   "search_px": 110,
+   "poisson_seams": true
+  },
+  "before_after": "<mocks>/marmoreal-logo-before-after.png"
+ },
+ "outputs": {
+  "bc": {
+   "path": "scraped-data/derived/maps/marmoreal/T_Marmoreal_Map_BC_4K.png",
+   "bytes": 18372217,
+   "sha256": "bdc8f68eddb42f8f82b402d7133262b7db699d8dcc413f40b0956e39e8d78094",
+   "width": 4096,
+   "height": 4096,
+   "format": "PNG RGB8 sRGB"
+  },
+  "sdf": {
+   "path": "scraped-data/derived/maps/marmoreal/T_Marmoreal_Map_GameSDF_4K.png",
+   "bytes": 39940825,
+   "sha256": "3dcf10bc69aff319d86d9774f255a1b11ca1c7d2dd37332c83bd4ae6548a7da7",
+   "width": 4096,
+   "height": 4096,
+   "format": "PNG RGBA16 linear",
+   "channels": {
+    "R": "signed distance to the union of ring discs (radius = ring centre-line); negative inside",
+    "G": "distance to the nearest zone-divider ray (apex -> painted ring); use where R < 0",
+    "B": "distance to the nearest connection centre-line (ring to ring)",
+    "A": "signed distance to the game-layer union: discs to the ring outer edge, connection strokes (core width), start diamonds"
+   }
+  },
+  "id": {
+   "path": "scraped-data/derived/maps/marmoreal/T_Marmoreal_Map_SpaceID_4K.png",
+   "bytes": 93958,
+   "sha256": "a3fede4efc54db0a24204ac3b6719ee0fd12b8cca4f51fdec664a3059284ad6e",
+   "width": 4096,
+   "height": 4096,
+   "format": "PNG Gray16, no filtering",
+   "values": "0 = none, k = k-th space of the topology in id order (M01 = 1 ...)"
+  },
+  "mask": {
+   "path": "scraped-data/derived/maps/marmoreal/T_Marmoreal_Map_GameMask_4K.png",
+   "bytes": 332105,
+   "sha256": "aa8cb37ed081134a3f3594dc6dd67f48f14290427d8c81f3749c803fdabc9cd5",
+   "width": 4096,
+   "height": 4096,
+   "format": "PNG Gray8 linear",
+   "values": "255 inside the game layer dilated by 6 src px (1 px soft edge)"
+  }
+ },
+ "vector_layer": {
+  "path": "tools/art/map_surface/marmoreal.vector-layer.json",
+  "sha256": "361d62b24d0edd7d6212ec7a864e19f61e6d0c210e1bdf9f9e15e82156c70345"
+ },
+ "k1": {
+  "camera": {
+   "hfov_deg": 35.0,
+   "aspect": 1.7777777777777777,
+   "pitch_deg": 55.0,
+   "yaw_deg": -90.0,
+   "fit_margin_uu": 60.0,
+   "fit_mul": 1.12,
+   "distance_uu": 1872.156,
+   "location_uu": [
+    0.0,
+    1073.825,
+    1533.581
+   ],
+   "formula": "SetupCameraForBoard with extents 445.67 x 288.67 uu (891.33 x 577.33 board)",
+   "orientation": "yaw -90 as S08: image upright, long side horizontal, north (image top) far; starts 1/2 end up left/right, not bottom/top as on S08 grids"
+  },
+  "scene": {
+   "tray_rim_uu": 60.0,
+   "tray_height_uu": 150.0,
+   "rock_srgb": [
+    0.235,
+    0.225,
+    0.215
+   ],
+   "key_light_rot": [
+    -55.0,
+    30.0,
+    0.0
+   ],
+   "ring": {
+    "outer_r_uu": 28.5,
+    "inner_r_uu": 23.0,
+    "rim_uu": 1.2,
+    "intensity": 0.95,
+    "gold_srgb": [
+     0.95,
+     0.74,
+     0.28
+    ],
+    "silver_blue_srgb": [
+     0.66,
+     0.78,
+     0.93
+    ]
+   },
+   "hero": {
+    "height_uu": 50.0,
+    "base_diameter_uu": 40.0,
+    "albedo_lin": 0.3
+   },
+   "rings_on": [
+    {
+     "space": "M13",
+     "start": 1
+    },
+    {
+     "space": "M31",
+     "start": 2
+    }
+   ]
+  },
+  "grade_b_c": {
+   "ev": -0.7,
+   "saturation": 0.7,
+   "tint_srgb_mul": [
+    0.9,
+    0.97,
+    1.12
+   ],
+   "lift": 0.35,
+   "tint_lin_luma_normalised": [
+    0.9317,
+    1.0042,
+    1.1595
+   ],
+   "formula": "lit = albedo * 2^ev * tint; outside = desaturate(lit, saturation); inside = lit + lift * albedo (unlit / emissive share); mix by GameMask"
+  },
+  "render": {
+   "supersampling": 3,
+   "texture_filter": "trilinear, lod = log2(sqrt(|dUV/dx| |dUV/dy|))"
+  },
+  "mocks": {
+   "a": {
+    "path": "<mocks>/marmoreal-a.png",
+    "bytes": 2375280,
+    "sha256": "1dc14d92bdc657c4d2ee8e049bb1894edf2c390669232db2e4f10740e0d8392e",
+    "width": 1920,
+    "height": 1080
+   },
+   "b": {
+    "path": "<mocks>/marmoreal-b.png",
+    "bytes": 2264752,
+    "sha256": "d0aa29455f8a7ec52ca618ea2315eafec4c0656575410cf36ddcb1ed86ba1030",
+    "width": 1920,
+    "height": 1080
+   },
+   "c": {
+    "path": "<mocks>/marmoreal-c.png",
+    "bytes": 2261296,
+    "sha256": "a800b34ad4814a55058f8215748c7b645bd6fe600a824ce06eccb29ba70a7f94",
+    "width": 1920,
+    "height": 1080
+   },
+   "ab_split": {
+    "path": "<mocks>/marmoreal-ab-split.png",
+    "bytes": 2323940,
+    "sha256": "d81cfa62591d95a6a5b99c1fa2c67fc89f49f317dea8a3adbd9acb38f20e24fc"
+   },
+   "ab_ev": {
+    "path": "<mocks>/marmoreal-ab-ev.png",
+    "legend": "log2(b/a) luminance: blue = -1 EV, red = +0.2 EV",
+    "bytes": 1400258,
+    "sha256": "3fd96f0bbd8f7426a96927834231a601423a2a7413847c361528ce49b43e971f"
+   }
+  },
+  "measurement": {
+   "method": "space ID map rendered through the K1 camera at 1920x1080 (nearest), bbox of each disc / diameter 126.86 src px",
+   "h_per_src_px": {
+    "min": 1.009,
+    "median": 1.08,
+    "max": 1.175
+   },
+   "v_per_src_px": {
+    "min": 0.772,
+    "median": 0.867,
+    "max": 1.033
+   },
+   "far_row_h_v": [
+    1.017,
+    0.772
+   ],
+   "near_row_h_v": [
+    1.167,
+    1.017
+   ],
+   "analytic_check": {
+    "centre": {
+     "h": 1.084,
+     "v": 0.888
+    },
+    "far_edge_mid": {
+     "h": 0.996,
+     "v": 0.75
+    },
+    "near_edge_mid": {
+     "h": 1.189,
+     "v": 1.069
+    }
+   },
+   "map_corners_screen_px": {
+    "far_left": [
+     294.1,
+     186.7
+    ],
+    "far_right": [
+     1625.9,
+     186.7
+    ],
+    "near_left": [
+     164.9,
+     961.9
+    ],
+    "near_right": [
+     1755.1,
+     961.9
+    ]
+   },
+   "tray_corners_screen_px": {
+    "far_left": [
+     217.0,
+     120.3
+    ],
+    "far_right": [
+     1703.0,
+     120.3
+    ],
+    "near_left_top": [
+     39.3,
+     1060.0
+    ],
+    "near_right_top": [
+     1880.7,
+     1060.0
+    ],
+    "near_left_bottom": [
+     102.3,
+     1170.4
+    ],
+    "near_right_bottom": [
+     1817.7,
+     1170.4
+    ]
+   },
+   "per_space": [
+    {
+     "id": "M01",
+     "screen_centre": [
+      474.5,
+      255.2
+     ],
+     "w_px": 130,
+     "h_px": 99,
+     "h_per_src_px": 1.025,
+     "v_per_src_px": 0.78
+    },
+    {
+     "id": "M02",
+     "screen_centre": [
+      643.9,
+      242.9
+     ],
+     "w_px": 129,
+     "h_px": 98,
+     "h_per_src_px": 1.017,
+     "v_per_src_px": 0.772
+    },
+    {
+     "id": "M03",
+     "screen_centre": [
+      806.3,
+      241.5
+     ],
+     "w_px": 128,
+     "h_px": 98,
+     "h_per_src_px": 1.009,
+     "v_per_src_px": 0.772
+    },
+    {
+     "id": "M04",
+     "screen_centre": [
+      963.8,
+      275.9
+     ],
+     "w_px": 129,
+     "h_px": 99,
+     "h_per_src_px": 1.017,
+     "v_per_src_px": 0.78
+    },
+    {
+     "id": "M05",
+     "screen_centre": [
+      1137.4,
+      242.7
+     ],
+     "w_px": 128,
+     "h_px": 98,
+     "h_per_src_px": 1.009,
+     "v_per_src_px": 0.772
+    },
+    {
+     "id": "M06",
+     "screen_centre": [
+      1306.9,
+      242.5
+     ],
+     "w_px": 129,
+     "h_px": 98,
+     "h_per_src_px": 1.017,
+     "v_per_src_px": 0.772
+    },
+    {
+     "id": "M07",
+     "screen_centre": [
+      426.1,
+      371.2
+     ],
+     "w_px": 133,
+     "h_px": 104,
+     "h_per_src_px": 1.048,
+     "v_per_src_px": 0.82
+    },
+    {
+     "id": "M08",
+     "screen_centre": [
+      591.4,
+      385.8
+     ],
+     "w_px": 134,
+     "h_px": 105,
+     "h_per_src_px": 1.056,
+     "v_per_src_px": 0.828
+    },
+    {
+     "id": "M09",
+     "screen_centre": [
+      774.1,
+      393.7
+     ],
+     "w_px": 133,
+     "h_px": 105,
+     "h_per_src_px": 1.048,
+     "v_per_src_px": 0.828
+    },
+    {
+     "id": "M10",
+     "screen_centre": [
+      1148.6,
+      396.9
+     ],
+     "w_px": 134,
+     "h_px": 105,
+     "h_per_src_px": 1.056,
+     "v_per_src_px": 0.828
+    },
+    {
+     "id": "M11",
+     "screen_centre": [
+      1327.7,
+      387.9
+     ],
+     "w_px": 133,
+     "h_px": 105,
+     "h_per_src_px": 1.048,
+     "v_per_src_px": 0.828
+    },
+    {
+     "id": "M12",
+     "screen_centre": [
+      1487.6,
+      332.5
+     ],
+     "w_px": 132,
+     "h_px": 102,
+     "h_per_src_px": 1.041,
+     "v_per_src_px": 0.804
+    },
+    {
+     "id": "M13",
+     "screen_centre": [
+      411.9,
+      494.9
+     ],
+     "w_px": 137,
+     "h_px": 111,
+     "h_per_src_px": 1.08,
+     "v_per_src_px": 0.875
+    },
+    {
+     "id": "M14",
+     "screen_centre": [
+      667.2,
+      494.6
+     ],
+     "w_px": 137,
+     "h_px": 110,
+     "h_per_src_px": 1.08,
+     "v_per_src_px": 0.867
+    },
+    {
+     "id": "M15",
+     "screen_centre": [
+      963.7,
+      437.1
+     ],
+     "w_px": 134,
+     "h_px": 107,
+     "h_per_src_px": 1.056,
+     "v_per_src_px": 0.843
+    },
+    {
+     "id": "M16",
+     "screen_centre": [
+      1506.4,
+      469.9
+     ],
+     "w_px": 136,
+     "h_px": 109,
+     "h_per_src_px": 1.072,
+     "v_per_src_px": 0.859
+    },
+    {
+     "id": "M17",
+     "screen_centre": [
+      837.8,
+      543.3
+     ],
+     "w_px": 138,
+     "h_px": 113,
+     "h_per_src_px": 1.088,
+     "v_per_src_px": 0.891
+    },
+    {
+     "id": "M18",
+     "screen_centre": [
+      1092.3,
+      543.5
+     ],
+     "w_px": 138,
+     "h_px": 112,
+     "h_per_src_px": 1.088,
+     "v_per_src_px": 0.883
+    },
+    {
+     "id": "M19",
+     "screen_centre": [
+      1260.7,
+      498.5
+     ],
+     "w_px": 137,
+     "h_px": 110,
+     "h_per_src_px": 1.08,
+     "v_per_src_px": 0.867
+    },
+    {
+     "id": "M20",
+     "screen_centre": [
+      415.6,
+      625.7
+     ],
+     "w_px": 142,
+     "h_px": 117,
+     "h_per_src_px": 1.119,
+     "v_per_src_px": 0.922
+    },
+    {
+     "id": "M21",
+     "screen_centre": [
+      584.0,
+      640.6
+     ],
+     "w_px": 141,
+     "h_px": 118,
+     "h_per_src_px": 1.111,
+     "v_per_src_px": 0.93
+    },
+    {
+     "id": "M22",
+     "screen_centre": [
+      964.7,
+      624.1
+     ],
+     "w_px": 140,
+     "h_px": 117,
+     "h_per_src_px": 1.104,
+     "v_per_src_px": 0.922
+    },
+    {
+     "id": "M23",
+     "screen_centre": [
+      1382.1,
+      664.9
+     ],
+     "w_px": 142,
+     "h_px": 119,
+     "h_per_src_px": 1.119,
+     "v_per_src_px": 0.938
+    },
+    {
+     "id": "M24",
+     "screen_centre": [
+      1518.7,
+      601.0
+     ],
+     "w_px": 141,
+     "h_px": 115,
+     "h_per_src_px": 1.111,
+     "v_per_src_px": 0.906
+    },
+    {
+     "id": "M25",
+     "screen_centre": [
+      783.3,
+      728.0
+     ],
+     "w_px": 144,
+     "h_px": 123,
+     "h_per_src_px": 1.135,
+     "v_per_src_px": 0.97
+    },
+    {
+     "id": "M26",
+     "screen_centre": [
+      1140.3,
+      730.8
+     ],
+     "w_px": 144,
+     "h_px": 123,
+     "h_per_src_px": 1.135,
+     "v_per_src_px": 0.97
+    },
+    {
+     "id": "M27",
+     "screen_centre": [
+      472.2,
+      836.0
+     ],
+     "w_px": 148,
+     "h_px": 129,
+     "h_per_src_px": 1.167,
+     "v_per_src_px": 1.017
+    },
+    {
+     "id": "M28",
+     "screen_centre": [
+      674.0,
+      875.9
+     ],
+     "w_px": 149,
+     "h_px": 131,
+     "h_per_src_px": 1.175,
+     "v_per_src_px": 1.033
+    },
+    {
+     "id": "M29",
+     "screen_centre": [
+      879.0,
+      865.7
+     ],
+     "w_px": 149,
+     "h_px": 130,
+     "h_per_src_px": 1.175,
+     "v_per_src_px": 1.025
+    },
+    {
+     "id": "M30",
+     "screen_centre": [
+      1052.9,
+      878.1
+     ],
+     "w_px": 149,
+     "h_px": 131,
+     "h_per_src_px": 1.175,
+     "v_per_src_px": 1.033
+    },
+    {
+     "id": "M31",
+     "screen_centre": [
+      1301.3,
+      817.4
+     ],
+     "w_px": 147,
+     "h_px": 128,
+     "h_per_src_px": 1.159,
+     "v_per_src_px": 1.009
+    }
+   ],
+   "grade_b_vs_a_ev": {
+    "inside_mask_median": -0.05,
+    "outside_mask_median": -0.708,
+    "inside_minus_outside": 0.657,
+    "screen_px_inside": 479794,
+    "screen_px_outside": 638133
+   }
+  }
+ },
+ "checks": {
+  "overlays": [
+   "<mocks>/checks/marmoreal-sdf-M06-M12.png",
+   "<mocks>/checks/marmoreal-sdf-M16-M19.png",
+   "<mocks>/checks/marmoreal-sdf-M20-M27.png",
+   "<mocks>/checks/marmoreal-sdf-M21-M25.png",
+   "<mocks>/checks/marmoreal-sdf-M22-M29.png",
+   "<mocks>/checks/marmoreal-sdf-M22-M30.png",
+   "<mocks>/checks/marmoreal-sdf-start3.png",
+   "<mocks>/checks/marmoreal-sdf-start4.png"
+  ],
+  "png16_roundtrip": true
+ }
+}

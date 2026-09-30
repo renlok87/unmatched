@@ -143,7 +143,8 @@ export type Zone =
   | 'pink'
   | 'white'
   | 'gold'
-  | 'beige';
+  | 'beige'
+  | 'violet';
 
 export interface BoardDefinition {
   id: string;

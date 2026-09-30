@@ -43,6 +43,15 @@ def mini_map() -> dict:
     }
 
 
+def disk_path(cx: float, cy: float, r: float) -> str:
+    """A whole disk as a closed path of four cubic arcs (the shape Sarpedon uses once)."""
+    k = 0.5523 * r
+    return (f"M{cx + r} {cy}C{cx + r} {cy + k} {cx + k} {cy + r} {cx} {cy + r}"
+            f"C{cx - k} {cy + r} {cx - r} {cy + k} {cx - r} {cy}"
+            f"C{cx - r} {cy - k} {cx - k} {cy - r} {cx} {cy - r}"
+            f"C{cx + k} {cy - r} {cx + r} {cy - k} {cx + r} {cy}Z")
+
+
 class PurePieces(unittest.TestCase):
     def test_half_disk_centre_is_diameter_midpoint(self):
         (x, y), kind = F.path_center("M100 160C90 190 90 170 100 160L100 240C90 230 90 210 100 200Z")
@@ -60,6 +69,52 @@ class PurePieces(unittest.TestCase):
     def test_path_without_straight_segment_is_refused(self):
         with self.assertRaises(ValueError):
             F.path_center("M0 0C1 1 2 2 3 3Z")
+
+    def test_curve_only_path_on_a_circle_is_a_whole_space(self):
+        # Sarpedon (yellow) draws one whole space as a closed path of four cubic arcs.
+        (x, y), kind = F.path_center(disk_path(766.048, 203.164, 62.697))
+        self.assertEqual(kind, "circle")
+        self.assertAlmostEqual(x, 766.048, places=3)
+        self.assertAlmostEqual(y, 203.164, places=3)
+
+    def test_curve_only_path_off_a_circle_is_refused(self):
+        with self.assertRaisesRegex(ValueError, "without a straight segment"):
+            F.path_center("M0 0C10 0 20 0 30 0C30 10 30 20 30 30C20 30 10 30 5 12C3 8 1 4 0 0Z")
+        with self.assertRaisesRegex(ValueError, "without a straight segment"):
+            F.path_center(disk_path(0, 0, 10))  # a circle, but far smaller than a space
+
+    def test_ellipse_is_a_whole_space(self):
+        m = mini_map()
+        m["zones"][2]["svgGroup"] += '<ellipse cx="700.5" cy="80.25" rx="62.6973" ry="62.7133"/>'
+        m["spacesCount"] = 4
+        spaces = F.extract_spaces(m)
+        self.assertEqual(len(spaces), 4)
+        s = next(s for s in spaces if s["px"] == [700.5, 80.25])
+        self.assertEqual((s["zones"], s["pieces"]), (["c"], ["circle"]))
+
+    def test_disk_path_is_a_whole_space_in_extract_spaces(self):
+        m = mini_map()
+        m["zones"][1]["svgGroup"] += f'<path d="{disk_path(900, 400, 62.7)}"/>'
+        spaces = F.extract_spaces(m)
+        self.assertEqual(len(spaces), 4)
+        s = next(s for s in spaces if abs(s["px"][0] - 900) < 1e-6)
+        self.assertEqual((s["zones"], s["pieces"]), (["b"], ["circle"]))
+
+    def test_identical_pieces_in_one_zone_count_once(self):
+        # Sarpedon (brown) repeats two wedge paths verbatim; that is one piece each.
+        m = mini_map()
+        m["zones"][2]["svgGroup"] *= 2
+        m["zones"][0]["svgGroup"] += '<circle cx="500" cy="200" r="63" fill="#111"/>'
+        spaces = F.extract_spaces(m)
+        self.assertEqual(sorted(tuple(s["zones"]) for s in spaces), [("a",), ("a", "b"), ("a", "b", "c")])
+        self.assertTrue(all(len(s["pieces"]) == len(s["zones"]) for s in spaces))
+
+    def test_same_zone_twice_at_one_space_still_refused(self):
+        # a genuinely different second piece of the same zone at one space stays an error
+        m = mini_map()
+        m["zones"][2]["svgGroup"] += '<path d="M300 150C305 160 318 170 320 171L300 200L280 170C290 160 300 150 300 150Z"/>'
+        with self.assertRaisesRegex(ValueError, "duplicate zone piece"):
+            F.extract_spaces(m)
 
     def test_extract_spaces_keeps_every_zone_of_a_multizone_space(self):
         spaces = F.extract_spaces(mini_map())
@@ -209,6 +264,71 @@ class CommittedFixtures(unittest.TestCase):
             m = next(x for x in maps if x["key"] == fx["key"])
             with self.subTest(p.name):
                 self.assertEqual(F.dump(F.build_fixture(m, sha)), p.read_text(encoding="utf-8"))
+
+
+EVIDENCE = F.REPO / "docs" / "game-design" / "evidence" / "ENV-MAPS" / "2026-09-30-research"
+
+
+class OriginalMapsFromMapsJson(unittest.TestCase):
+    """Battle of Legends Vol. 1 maps (ENV-MAPS): both extract from the zone SVG and agree with
+    the committed research numbers. Needs the gitignored maps.json; skipped without it."""
+
+    EXPECT = {"marmoreal": (31, 8, 21, 7, (7, 6)), "sarpedon": (38, 6, 4, 2, (9, 6))}
+
+    @classmethod
+    def setUpClass(cls):
+        if not F.MAIN_CHECKOUT_MAPS.is_file():
+            raise unittest.SkipTest(f"maps.json not present at {F.MAIN_CHECKOUT_MAPS} (gitignored, main checkout only)")
+        maps, _ = F.load_maps(F.MAIN_CHECKOUT_MAPS)
+        cls.maps = {m["key"]: m for m in maps}
+
+    def test_spaces_zones_and_multizone_counts(self):
+        for key, (n, zones, multi, triple, _) in self.EXPECT.items():
+            m = self.maps[key]
+            with self.subTest(key):
+                spaces = F.extract_spaces(m)
+                self.assertEqual(len(spaces), n)
+                self.assertEqual(m["spacesCount"], n)
+                self.assertEqual(len(m["zones"]), zones)
+                self.assertEqual(sum(len(s["zones"]) > 1 for s in spaces), multi)
+                self.assertEqual(sum(len(s["zones"]) > 2 for s in spaces), triple)
+
+    def test_sarpedon_shapes(self):
+        spaces = F.extract_spaces(self.maps["sarpedon"])
+        # the curve-only yellow disk path is a single-zone space at its centre
+        disk = next(s for s in spaces if abs(s["px"][0] - 766.048) < 0.01)
+        self.assertEqual((disk["zones"], disk["pieces"]), (["yellow"], ["circle"]))
+        # the brown wedges drawn twice are single pieces of the two triple-zone spaces
+        triples = [s for s in spaces if len(s["zones"]) == 3]
+        self.assertEqual(len(triples), 2)
+        for s in triples:
+            self.assertEqual(sorted(s["zones"]), ["brown", "purple", "yellow"])
+            self.assertEqual(s["pieces"], ["wedge"] * 3)
+        # all 11 ellipses (8 green + 3 yellow) are whole spaces
+        green = [s for s in spaces if s["zones"] == ["green"]]
+        self.assertEqual(len(green), 8)
+
+    def test_centres_and_zones_match_the_research(self):
+        import math
+        for key in self.EXPECT:
+            ev = json.loads((EVIDENCE / f"{key}.topology.json").read_text(encoding="utf-8"))
+            spaces = F.extract_spaces(self.maps[key])
+            with self.subTest(key):
+                for e in ev["spaces"]:
+                    s = min(spaces, key=lambda s: math.dist(s["px"], e["px"]))
+                    self.assertLess(math.dist(s["px"], e["px"]), 0.5, e["id"])
+                    self.assertEqual(sorted(s["zones"]), sorted(e["zones"]), e["id"])
+
+    def test_grid_choice(self):
+        for key, (*_, grid) in self.EXPECT.items():
+            with self.subTest(key):
+                g, _ = F.choose_grid(F.extract_spaces(self.maps[key]))
+                self.assertEqual((g["width"], g["height"]), grid)
+
+    def test_every_other_map_extracts(self):
+        for key, m in self.maps.items():
+            with self.subTest(key):
+                self.assertEqual(len(F.extract_spaces(m)), m["spacesCount"])
 
 
 if __name__ == "__main__":

@@ -36,9 +36,13 @@ export interface Position {
  * Color zones on the board.
  *
  * Базовые цвета зон Unmatched. Scraped-data (maps.json) содержит варианты
- * оттенков ("blue-dark", "green-light"), синоним "violet" и опечатки
- * ("biege", "brown-ligt") — все они нормализуются к этим базовым цветам
- * в ContentMapper.normalizeZone (неизвестное отбрасывается).
+ * оттенков ("blue-dark", "green-light") и опечатки ("biege", "brown-ligt") —
+ * они нормализуются к этим базовым цветам в ContentMapper.normalizeZone
+ * (неизвестное отбрасывается).
+ *
+ * VIOLET (ENV-MAPS, 2026-09-30) — САМОСТОЯТЕЛЬНАЯ зона, не синоним PURPLE:
+ * на Marmoreal, Globe Theatre и Azuchi Castle violet и purple — две разные
+ * зоны одной карты (Marmoreal M16 blue+violet, M17 green+blue+purple).
  */
 export enum Zone {
   BLUE = 'blue',
@@ -46,6 +50,7 @@ export enum Zone {
   YELLOW = 'yellow',
   RED = 'red',
   PURPLE = 'purple',
+  VIOLET = 'violet',
   BROWN = 'brown',
   GRAY = 'gray',
   ORANGE = 'orange',
@@ -65,6 +70,7 @@ export type ZoneType =
   | 'yellow'
   | 'red'
   | 'purple'
+  | 'violet'
   | 'brown'
   | 'gray'
   | 'orange'

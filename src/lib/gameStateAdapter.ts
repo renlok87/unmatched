@@ -109,7 +109,8 @@ export interface WireGameState {
   boardState: {
     width: number;
     height: number;
-    cells?: Array<Array<{ type?: string; zone?: string }>>;
+    /** links — ENV-MAPS: связи клетки оригинальной карты (см. isTopologyWireBoard) */
+    cells?: Array<Array<{ type?: string; zone?: string; links?: WirePosition[] }>>;
     doors?: Record<string, boolean>;
   };
   metadata: {
@@ -250,6 +251,37 @@ export function parseSubscriptionState(payload: {
 }
 
 // ---------------------------------------------------------------------------
+// ENV-MAPS guard: доски с топологией оригинальной карты
+// ---------------------------------------------------------------------------
+
+/**
+ * Доска несёт топологию оригинальной карты (Marmoreal/Sarpedon): хотя бы одна
+ * клетка с массивом links — тот же признак, что у движка бэка
+ * (game-engine/engine/board-topology.hasTopology).
+ */
+export function isTopologyWireBoard(boardState: WireGameState['boardState'] | null | undefined): boolean {
+  const rows = boardState?.cells;
+  if (!Array.isArray(rows)) return false;
+  return rows.some(
+    (row) => Array.isArray(row) && row.some((cell) => Array.isArray(cell?.links)),
+  );
+}
+
+/**
+ * Web-клиент рисует доску и подсвечивает ходы по СЕТКЕ; на графе
+ * оригинальной карты (связи через несколько клеток решётки, соседи по
+ * решётке без линии) это была бы неверная отрисовка. Такие игры идут только
+ * в UE-клиенте: адаптер отказывается их рендерить (store показывает ошибку
+ * синхронизации), контентный каталог бэка их web-лобби не отдаёт.
+ */
+export class UnsupportedBoardTopologyError extends Error {
+  constructor() {
+    super('Эта партия идёт на оригинальной карте (граф клеток) — она доступна только в UE-клиенте');
+    this.name = 'UnsupportedBoardTopologyError';
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Адаптация wire → локальный формат
 // ---------------------------------------------------------------------------
 
@@ -279,6 +311,10 @@ export function adaptToLocal(
   refs: AdapterRefs,
   localUserId: string,
 ): LocalGameState {
+  // ENV-MAPS: граф оригинальной карты web-клиент не рисует (см. выше)
+  if (isTopologyWireBoard(wire.boardState)) {
+    throw new UnsupportedBoardTopologyError();
+  }
   // Имя героя игрока — из его HERO-бойца (контентные арты ключуются именем)
   const heroNameOf = (userId: string): string | undefined =>
     wire.fighters.find((f) => f.ownerId === userId && f.type === 'HERO')?.name;

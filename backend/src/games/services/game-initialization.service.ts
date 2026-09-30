@@ -34,8 +34,9 @@ import {
   normalizeCardEffects,
   slugifyHeroName,
 } from '../../game-engine/models';
-import type { AttackType, BoardState, CardEffect, Cell } from '../../game-engine/models';
+import type { AttackType, BoardState, CardEffect, Cell, Position } from '../../game-engine/models';
 import { parseCardEffectTexts, upgradeStaleParserEffects } from '../../game-engine/effects/effect-text-parser';
+import { distancesFrom, hasTopology, posKey } from '../../game-engine/engine/board-topology';
 import type { Board } from '@prisma/client';
 
 const STARTING_HAND_SIZE = 5;
@@ -55,6 +56,16 @@ function shuffle<T>(array: readonly T[]): T[] {
   }
   return result;
 }
+
+/** Клетка Board.cells как она лежит в БД (JSON): поля топологии не доверенные */
+interface RawTopologyCell {
+  readonly spaceId?: unknown;
+  readonly layout?: { readonly x?: unknown; readonly y?: unknown } | null;
+  readonly start?: unknown;
+  readonly links?: unknown;
+}
+
+const isInt = (v: unknown): v is number => typeof v === 'number' && Number.isInteger(v);
 
 function clampCoord(v: number, max: number): number {
   return Math.max(0, Math.min(max, v));
@@ -106,6 +117,10 @@ export class GameInitializationService {
 
     // Стартовые углы от фактических размеров доски + занятые клетки
     const startPositions = this.computeStartPositions(boardState);
+    // ENV-MAPS: доска оригинальной карты (граф клеток со связями) — старты из
+    // пронумерованных стартовых пространств (Cell.start), а не из углов сетки
+    const topology = hasTopology(boardState);
+    const topologyStarts = topology ? this.computeTopologyStarts(boardState, players.length) : [];
     const occupied = new Set<string>();
 
     for (let seat = 0; seat < players.length; seat++) {
@@ -126,11 +141,13 @@ export class GameInitializationService {
       }
 
       // --- Бойцы: герой + sidekicks ---
-      // Если угол занят/obstacle — findFreeCell ищет ближайшую свободную клетку
+      // Если угол занят/obstacle — findFreeCell ищет ближайшую свободную клетку.
+      // Топология: стартовое пространство seat+1; нет такого номера на карте —
+      // прежний угол (документированный fallback).
       const basePos = this.findFreeCell(
         boardState,
         occupied,
-        startPositions[seat] ?? startPositions[0],
+        topologyStarts[seat] ?? startPositions[seat] ?? startPositions[0],
       );
       occupied.add(`${basePos.x}:${basePos.y}`);
       const heroFighterId = `f-${seat}-hero`;
@@ -138,11 +155,27 @@ export class GameInitializationService {
       // Слаг для HeroAbilityRegistry: handlers ключуются 'daredevil'/'ms-marvel',
       // heroId — cuid. Пишем и герою, и сайдкикам (handler ищет бойцов героя)
       const heroSlug = slugifyHeroName(hero.name);
+      // Топология: сайдкики не занимают стартовые пространства героев
+      // следующих мест (их герои ещё не выставлены)
+      const reservedStarts = topology
+        ? new Set(
+            topologyStarts
+              .slice(seat + 1)
+              .filter((p): p is Position => p !== undefined)
+              .map(posKey),
+          )
+        : null;
 
       const sidekickFighters: Fighter[] = sidekicks.map((sk, i) => {
         // GD-016: легальная серверная расстановка — сайдкик на отдельной
         // свободной клетке, разделяющей хотя бы одну зону с героем
-        const position = this.findSidekickCell(boardState, occupied, basePos);
+        const position = reservedStarts
+          ? this.findTopologySidekickSpace(
+              boardState,
+              new Set([...occupied, ...reservedStarts]),
+              basePos,
+            )
+          : this.findSidekickCell(boardState, occupied, basePos);
         occupied.add(`${position.x}:${position.y}`);
         return {
           id: `f-${seat}-sk${i}`,
@@ -337,6 +370,15 @@ export class GameInitializationService {
    * в grid-координатах. Любая невалидность (нет доски, cells=[], кривой JSON,
    * пиксельные координаты) → fallback на пустую сетку 20×20 — поведение
    * бит-в-бит как до фикса, регресса нет.
+   *
+   * ENV-MAPS (контракт unmatched.board-topology/1): клетка может нести
+   * spaceId / layout / start / links — они копируются ЯВНО (только если есть,
+   * у сеточных досок клетки остаются {type,x,y,zones,zone} бит-в-бит).
+   * Доска «топологическая», если хотя бы одна клетка несёт массив links
+   * (правила смежности — game-engine/engine/board-topology.ts). У такой доски
+   * позиция решётки БЕЗ данных — дыра между пространствами, её нельзя
+   * заполнять 'normal' (движок/AI могли бы поставить туда бойца):
+   * она становится 'obstacle'.
    */
   private buildBoardState(board: Board | null): BoardState {
     if (!board) {
@@ -379,17 +421,27 @@ export class GameInitializationService {
       return createEmptyBoardState(FALLBACK_BOARD_SIZE, FALLBACK_BOARD_SIZE);
     }
 
-    // Полная матрица h×w: дыры в данных заполняем normal —
+    // Топология оригинальной карты: хотя бы одна клетка несёт массив links
+    const topology = (rawCells as (RawTopologyCell | null)[]).some((cell) =>
+      Array.isArray(cell?.links),
+    );
+
+    // Полная матрица h×w: дыры в данных заполняем normal (сеточные доски —
+    // как было) или obstacle (топология: дыра — не пространство) —
     // движок читает cells[y][x] и не переживёт undefined-строк/клеток
+    const holeType: Cell['type'] = topology ? 'obstacle' : 'normal';
     const cells: Cell[][] = [];
     for (let y = 0; y < height; y++) {
       const row: Cell[] = [];
       for (let x = 0; x < width; x++) {
-        row.push({ type: 'normal', x, y });
+        row.push({ type: holeType, x, y });
       }
       cells.push(row);
     }
+    let droppedLinks = 0;
     for (const cell of rawCells as any[]) {
+      const extra = this.topologyCellFields(cell as RawTopologyCell, width, height);
+      droppedLinks += extra.droppedLinks;
       cells[cell.y][cell.x] = {
         type: cell.isObstacle ? 'obstacle' : 'normal',
         x: cell.x,
@@ -404,13 +456,80 @@ export class GameInitializationService {
           Array.isArray(cell.zones) && cell.zones.length > 0
             ? String(cell.zones[0])
             : undefined,
+        ...extra.fields,
       };
     }
 
-    this.logger.log(
-      `Доска «${board.name}»: загружена сетка ${width}×${height} из БД (${rawCells.length} клеток в данных)`,
-    );
+    if (topology) {
+      const spaces = cells.flat().filter((c) => c.type !== 'obstacle' && c.type !== 'wall');
+      const badTargets = cells
+        .flat()
+        .flatMap((c) => (c.links ?? []).map((l) => cells[l.y][l.x]))
+        .filter((t) => t.type === 'obstacle' || t.type === 'wall').length;
+      if (droppedLinks > 0 || badTargets > 0) {
+        this.logger.warn(
+          `Доска «${board.name}»: ${droppedLinks} связей вне решётки отброшено, ` +
+            `${badTargets} связей ведут в непроходимую клетку`,
+        );
+      }
+      this.logger.log(
+        `Доска «${board.name}»: топология оригинальной карты, решётка ${width}×${height}, ` +
+          `${spaces.length} пространств`,
+      );
+    } else {
+      this.logger.log(
+        `Доска «${board.name}»: загружена сетка ${width}×${height} из БД (${rawCells.length} клеток в данных)`,
+      );
+    }
     return { width, height, cells, doors: {}, fog: {}, tokens: {} };
+  }
+
+  /**
+   * ENV-MAPS: поля топологии клетки из Board.cells — копируются явно и
+   * только при валидном значении (иначе ключа нет вовсе: клетки сеточных
+   * досок не меняются):
+   *  - spaceId: непустая строка (M01..M31, S01..S38);
+   *  - layout: центр пространства в пикселях иллюстрации карты {x, y};
+   *  - start: номер стартового пространства 1..4;
+   *  - links: позиции решётки связанных клеток; массив сохраняется даже
+   *    пустым (он и делает доску топологической), записи вне решётки
+   *    отбрасываются (счётчик droppedLinks → warn).
+   */
+  private topologyCellFields(
+    cell: RawTopologyCell,
+    width: number,
+    height: number,
+  ): {
+    fields: Pick<Cell, 'spaceId' | 'layout' | 'start' | 'links'>;
+    droppedLinks: number;
+  } {
+    const fields: { spaceId?: string; layout?: Position; start?: number; links?: Position[] } = {};
+    let droppedLinks = 0;
+    if (typeof cell.spaceId === 'string' && cell.spaceId.length > 0) {
+      fields.spaceId = cell.spaceId;
+    }
+    const lx = cell.layout?.x;
+    const ly = cell.layout?.y;
+    const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+    if (finite(lx) && finite(ly)) {
+      fields.layout = { x: lx, y: ly };
+    }
+    if (isInt(cell.start) && cell.start >= 1 && cell.start <= 4) {
+      fields.start = cell.start;
+    }
+    if (Array.isArray(cell.links)) {
+      fields.links = [];
+      for (const link of cell.links as ({ x?: unknown; y?: unknown } | null)[]) {
+        const x = link?.x;
+        const y = link?.y;
+        if (isInt(x) && isInt(y) && x >= 0 && y >= 0 && x < width && y < height) {
+          fields.links.push({ x, y });
+        } else {
+          droppedLinks++;
+        }
+      }
+    }
+    return { fields, droppedLinks };
   }
 
   /**
@@ -440,6 +559,80 @@ export class GameInitializationService {
       x: clampCoord(p.x, w - 1),
       y: clampCoord(p.y, h - 1),
     }));
+  }
+
+  /**
+   * ENV-MAPS: стартовые пространства топологической доски по местам.
+   * Место seat (seatOrder) ставит героя на пространство со start = seat + 1:
+   * дуэль — хост (seat 0, ходит первым) на 1, соперник (seat 1) на 2; при
+   * 3–4 игроках — 1..4 в порядке мест. Непроходимые клетки и повторы номера
+   * игнорируются (первое по порядку решётки). Нет номера — undefined, тогда
+   * вызывающий берёт прежний угол сетки (computeStartPositions).
+   */
+  private computeTopologyStarts(boardState: BoardState, seats: number): (Position | undefined)[] {
+    const byNumber = new Map<number, Position>();
+    for (const row of boardState.cells) {
+      for (const cell of row) {
+        if (cell.start == null || cell.type === 'obstacle' || cell.type === 'wall') continue;
+        if (byNumber.has(cell.start)) {
+          this.logger.warn(`Стартовое пространство ${cell.start} повторяется — беру первое`);
+          continue;
+        }
+        byNumber.set(cell.start, { x: cell.x, y: cell.y });
+      }
+    }
+    return Array.from({ length: seats }, (_, seat) => {
+      const start = byNumber.get(seat + 1);
+      if (!start) {
+        this.logger.warn(
+          `На карте нет стартового пространства ${seat + 1} — место ${seat} ставится в угол сетки`,
+        );
+      }
+      return start;
+    });
+  }
+
+  /**
+   * ENV-MAPS: пространство для сайдкика на топологической доске (правила
+   * BoL Vol.1: отдельное свободное пространство в зоне героя; герой на
+   * многозонном пространстве — в ЛЮБОЙ из его зон).
+   * Порядок детерминирован: BFS-дистанция по линиям от героя (бойцы не
+   * мешают подсчёту), при равенстве — spaceId (затем y, x).
+   * Fallback (в зонах героя нет свободного пространства, или у героя нет
+   * зон): ближайшее по тому же порядку свободное пространство вне зоны +
+   * warn; вообще нет свободных — прежний findFreeCell (кламп).
+   * `blocked` — занятые бойцами клетки и зарезервированные старты.
+   */
+  private findTopologySidekickSpace(
+    boardState: BoardState,
+    blocked: ReadonlySet<string>,
+    heroPos: Position,
+  ): Position {
+    const heroZones = new Set(getCellZones(boardState.cells[heroPos.y]?.[heroPos.x]));
+    const dist = distancesFrom(boardState, heroPos);
+    const free: { cell: Cell; d: number }[] = [];
+    for (const row of boardState.cells) {
+      for (const cell of row) {
+        if (cell.type === 'obstacle' || cell.type === 'wall') continue;
+        if (blocked.has(posKey(cell))) continue;
+        free.push({ cell, d: dist.get(posKey(cell)) ?? Infinity });
+      }
+    }
+    const order = (a: { cell: Cell; d: number }, b: { cell: Cell; d: number }): number => {
+      if (a.d !== b.d) return a.d < b.d ? -1 : 1;
+      const ia = a.cell.spaceId ?? '';
+      const ib = b.cell.spaceId ?? '';
+      if (ia !== ib) return ia < ib ? -1 : 1;
+      return a.cell.y - b.cell.y || a.cell.x - b.cell.x;
+    };
+    free.sort(order);
+    const inZone = free.find(({ cell }) => getCellZones(cell).some((z) => heroZones.has(z)));
+    if (inZone) return { x: inZone.cell.x, y: inZone.cell.y };
+    this.logger.warn(
+      `findTopologySidekickSpace: у героя (${heroPos.x},${heroPos.y}) нет свободного пространства его зоны — ближайшее свободное`,
+    );
+    if (free.length > 0) return { x: free[0].cell.x, y: free[0].cell.y };
+    return this.findFreeCell(boardState, blocked, heroPos);
   }
 
   /**
@@ -488,8 +681,8 @@ export class GameInitializationService {
    * Найти свободную проходимую клетку, ближайшую к preferred (манхэттен-скан).
    * Свободная = в границах, не obstacle/wall, не занята другим бойцом.
    *
-   * TODO: если в Board.cells когда-нибудь появятся startingPositions или
-   * зона "start" — брать спавны оттуда (точка расширения именно здесь).
+   * Старты оригинальных карт (Board.cells[].start) выбирает
+   * computeTopologyStarts; сюда они приходят как preferred.
    */
   private findFreeCell(
     boardState: BoardState,

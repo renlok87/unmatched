@@ -32,6 +32,19 @@ export interface Cell {
   readonly zones?: readonly string[];
   readonly isOpen?: boolean; // Для дверей
   readonly isHighGround?: boolean;
+  /**
+   * Топология оригинальной карты (граф клеток со связями). Доска «имеет
+   * топологию», если хотя бы одна её клетка несёт массив links; тогда соседи
+   * клетки — РОВНО её links (симметрично), а не ортогональная сетка.
+   * Единственная точка чтения — engine/board-topology.ts.
+   */
+  readonly links?: readonly Position[];
+  /** Центр пространства в пикселях иллюстрации карты (1337x866) — для клиента */
+  readonly layout?: { readonly x: number; readonly y: number };
+  /** Номер стартового пространства (1..4) оригинальной карты */
+  readonly start?: number;
+  /** Id пространства оригинальной карты (M01..M31, S01..S38) */
+  readonly spaceId?: string;
 }
 
 /**

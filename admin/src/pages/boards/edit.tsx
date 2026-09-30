@@ -1,6 +1,6 @@
 import React from 'react';
 import { IResourceComponentsProps, useGo, useInvalidate } from '@refinedev/core';
-import { Form, Input, InputNumber, Select, Divider, message, Typography, Space, Button, Spin, Tabs } from 'antd';
+import { Form, Input, InputNumber, Select, Divider, message, Typography, Space, Button, Spin, Tabs, Alert } from 'antd';
 import { useParams } from 'react-router-dom';
 import { client } from '../../providers/dataProvider';
 import { JsonEditor } from '../../components/common/JsonEditor';
@@ -63,6 +63,28 @@ const toPretty = (value: unknown, fallback: string): string => {
   }
 };
 
+/**
+ * ENV-MAPS: доска с топологией оригинальной карты (хотя бы одна клетка несёт
+ * массив links — граф пространств, по которому играет движок). Её клетки
+ * генерируются tools/art/board_topology.py и сидятся
+ * backend/prisma/seed-env-map-boards.ts; ручная правка в этом редакторе
+ * (шаблон, width/height, JSON) рвёт граф — такая доска только для чтения.
+ */
+const boardHasTopology = (cells: unknown): boolean => {
+  let value: unknown = cells;
+  for (let i = 0; i < 2 && typeof value === 'string'; i++) {
+    try {
+      value = JSON.parse(value);
+    } catch {
+      return false;
+    }
+  }
+  return (
+    Array.isArray(value) &&
+    value.some((cell) => cell !== null && typeof cell === 'object' && Array.isArray((cell as { links?: unknown }).links))
+  );
+};
+
 export const BoardEdit: React.FC<IResourceComponentsProps> = () => {
   const [form] = Form.useForm();
   const go = useGo();
@@ -76,6 +98,8 @@ export const BoardEdit: React.FC<IResourceComponentsProps> = () => {
 
   const [cellsValue, setCellsValue] = React.useState('[]');
   const [featuresValue, setFeaturesValue] = React.useState('{}');
+  // ENV-MAPS: топологическая доска — только чтение (см. boardHasTopology)
+  const topologyLocked = boardHasTopology(boardData?.cells);
 
   // Fetch board data directly
   React.useEffect(() => {
@@ -117,6 +141,10 @@ export const BoardEdit: React.FC<IResourceComponentsProps> = () => {
   const onFinish = (values: any) => {
     if (!id) {
       message.error('No board ID provided');
+      return;
+    }
+    if (topologyLocked) {
+      message.error('Original-map topology board is read-only');
       return;
     }
 
@@ -205,7 +233,16 @@ export const BoardEdit: React.FC<IResourceComponentsProps> = () => {
   return (
     <div style={{ padding: 24 }}>
       <h1>Edit Board</h1>
-      <Form form={form} layout="vertical" onFinish={onFinish}>
+      {topologyLocked && (
+        <Alert
+          type="warning"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="Original-map topology board — read-only"
+          description="Cells carry links (the graph of spaces the game engine plays on). Editing here would break the graph: regenerate the fixture with tools/art/board_topology.py and reseed with backend/prisma/seed-env-map-boards.ts."
+        />
+      )}
+      <Form form={form} layout="vertical" onFinish={onFinish} disabled={topologyLocked}>
         <Form.Item
           label="Name"
           name="name"
@@ -274,17 +311,27 @@ export const BoardEdit: React.FC<IResourceComponentsProps> = () => {
                     <div>
                       <Typography.Text strong>Cells (JSON Array)</Typography.Text>
                       <div style={{ marginTop: 8 }}>
-                        <button type="button" onClick={loadTemplate}>
+                        <button type="button" onClick={loadTemplate} disabled={topologyLocked}>
                           Load Template
                         </button>
                       </div>
-                      <JsonEditor value={cellsValue} onChange={handleCellsChange} height="400px" />
+                      <JsonEditor
+                        value={cellsValue}
+                        onChange={handleCellsChange}
+                        height="400px"
+                        readOnly={topologyLocked}
+                      />
                     </div>
 
                     <div>
                       <Typography.Text strong>Features (JSON)</Typography.Text>
                       <div style={{ marginTop: 8 }}>
-                        <JsonEditor value={featuresValue} onChange={handleFeaturesChange} height="300px" />
+                        <JsonEditor
+                          value={featuresValue}
+                          onChange={handleFeaturesChange}
+                          height="300px"
+                          readOnly={topologyLocked}
+                        />
                       </div>
                     </div>
                   </Space>
@@ -306,10 +353,10 @@ export const BoardEdit: React.FC<IResourceComponentsProps> = () => {
 
         <Form.Item>
           <Space>
-            <Button type="primary" htmlType="submit" loading={isUpdating}>
+            <Button type="primary" htmlType="submit" loading={isUpdating} disabled={topologyLocked}>
               Save
             </Button>
-            <Button onClick={() => go({ to: { resource: 'boards', action: 'list' } })}>
+            <Button disabled={false} onClick={() => go({ to: { resource: 'boards', action: 'list' } })}>
               Cancel
             </Button>
           </Space>

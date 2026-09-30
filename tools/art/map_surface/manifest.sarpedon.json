@@ -1,0 +1,817 @@
+{
+ "schema": "unmatched.map-surface-manifest/1",
+ "map": "sarpedon",
+ "generator": "tools/art/map_surface/build_map_textures.py",
+ "status": "technical candidate (no art acceptance); textures and mocks are OUT of git (ENV-U3)",
+ "roots": {
+  "scraped-data/derived/maps": "main checkout, gitignored (ENV-U3); textures imported into UE by script",
+  "<mocks>": "K1 review artefacts (mocks, a|b split, EV map, logo before/after, SDF overlay crops), out of git, not imported anywhere; default --mocks C:/tmp/envmaps-research/k1-mocks"
+ },
+ "environment": {
+  "python": "3.13.4",
+  "numpy": "2.4.0",
+  "scipy": "1.17.0",
+  "pillow": "12.1.0",
+  "libwebp": "1.6.0"
+ },
+ "inputs": {
+  "image": {
+   "path": "scraped-data/images/maps/sarpedon.webp",
+   "sha256": "9015b9cf102bbcc48de1958acb5468c838a588013a6ada2f74ce2f5c57effa84",
+   "bytes": 394562,
+   "size": [
+    1337,
+    866
+   ]
+  },
+  "topology": {
+   "path": "docs/game-design/evidence/ENV-MAPS/2026-09-30-research/sarpedon.topology.json",
+   "sha256": "ed22cfd187680a04a79933f411b448b28e685bf2d8c78655f0aee0e1de51b1f7",
+   "sha256_of": "text with LF line ends (git content)"
+  },
+  "maps_json": {
+   "path": "scraped-data/api/maps.json",
+   "sha256": "476eb21b5d3d62a4eb3ad963941c6dd3dcb02f8467557b1f2869948e4ce7cd6e"
+  }
+ },
+ "uv": {
+  "texture_size": [
+   4096,
+   4096
+  ],
+  "mapping": "UV (0,0)-(1,1) = the whole 1337x866 illustration (stretched to the square); texel (i,j) centre = source px ((j+0.5)*1337/4096, (i+0.5)*866/4096)",
+  "texels_per_src_px": [
+   3.063575,
+   4.729792
+  ],
+  "src_px_per_texel": [
+   0.326416,
+   0.211426
+  ],
+  "board_uu": [
+   891.333,
+   577.333
+  ],
+  "uu_per_src_px": 0.666667,
+  "texels_per_uu": [
+   4.5954,
+   7.0947
+  ],
+  "world": "UE: X = (u - 0.5) * 891.333, Y = (v - 0.5) * 577.333, Z = 0 (u right, v down = towards the K1 camera)"
+ },
+ "params": {
+  "bc": {
+   "resample": "PIL LANCZOS (float32 per channel), 1337x866 -> 4096x4096 in one step",
+   "unsharp_sigma_src_px": 0.7,
+   "unsharp_amount": 0.35
+  },
+  "sdf": {
+   "codes_per_src_px": 512.0,
+   "clamp_src_px": 64.0,
+   "zero_code": 32768,
+   "ring_center_r_px": 62.151,
+   "ring_half_width_px": 1.016,
+   "line_half_width_px": 3.625,
+   "decode": "d_src_px = (code - 32768) / 512"
+  },
+  "id": {
+   "r_id_px": 63.167,
+   "centres": "painted ring centres"
+  },
+  "mask": {
+   "dilate_src_px": 6.0,
+   "soft_src_px": 1.0
+  }
+ },
+ "logo_paint_out": {
+  "pass1": {
+   "iterations": 319,
+   "hole_px": 7840,
+   "median_copy_offset_px": 44.0,
+   "seam_pairs": 5310,
+   "crop": [
+    0,
+    688,
+    301,
+    866
+   ]
+  },
+  "band_refill": {
+   "iterations": 95,
+   "hole_px": 1999,
+   "median_copy_offset_px": 26.4,
+   "seam_pairs": 2038,
+   "crop": [
+    0,
+    688,
+    301,
+    866
+   ]
+  },
+  "params": {
+   "data_term_floor": 0.3,
+   "protect_disc_r_px": 67.0,
+   "protect_line_w_px": 12,
+   "source_exclude": [
+    "warm",
+    "lowsat:0.25"
+   ],
+   "class_rule": "b_gt_r",
+   "class_noise": [
+    0.25,
+    4.0
+   ],
+   "band_refill_px": 6,
+   "rect_src_px": [
+    22,
+    807,
+    182,
+    856
+   ],
+   "patch_px": 9,
+   "search_px": 110,
+   "poisson_seams": true
+  },
+  "before_after": "<mocks>/sarpedon-logo-before-after.png"
+ },
+ "outputs": {
+  "bc": {
+   "path": "scraped-data/derived/maps/sarpedon/T_Sarpedon_Map_BC_4K.png",
+   "bytes": 18807554,
+   "sha256": "7747d3d40c879c2d7ea32a468f30e7b8890c44156d814b1cdd7d344b80349e56",
+   "width": 4096,
+   "height": 4096,
+   "format": "PNG RGB8 sRGB"
+  },
+  "sdf": {
+   "path": "scraped-data/derived/maps/sarpedon/T_Sarpedon_Map_GameSDF_4K.png",
+   "bytes": 38502843,
+   "sha256": "42856736a75395c1042364ea20021862dc347cd042de4f04977ff1b611b4d0e6",
+   "width": 4096,
+   "height": 4096,
+   "format": "PNG RGBA16 linear",
+   "channels": {
+    "R": "signed distance to the union of ring discs (radius = ring centre-line); negative inside",
+    "G": "distance to the nearest zone-divider ray (apex -> painted ring); use where R < 0",
+    "B": "distance to the nearest connection centre-line (ring to ring)",
+    "A": "signed distance to the game-layer union: discs to the ring outer edge, connection strokes (core width), start diamonds"
+   }
+  },
+  "id": {
+   "path": "scraped-data/derived/maps/sarpedon/T_Sarpedon_Map_SpaceID_4K.png",
+   "bytes": 106874,
+   "sha256": "362d5fbacbbcc36a512c770f3c5ed103356e0d31af2099c610ce434534e0cb9d",
+   "width": 4096,
+   "height": 4096,
+   "format": "PNG Gray16, no filtering",
+   "values": "0 = none, k = k-th space of the topology in id order (M01 = 1 ...)"
+  },
+  "mask": {
+   "path": "scraped-data/derived/maps/sarpedon/T_Sarpedon_Map_GameMask_4K.png",
+   "bytes": 364429,
+   "sha256": "0c047cd9852d7e2627062aa0346aa8c84e7cdf28001a5adcba62d9103830eef1",
+   "width": 4096,
+   "height": 4096,
+   "format": "PNG Gray8 linear",
+   "values": "255 inside the game layer dilated by 6 src px (1 px soft edge)"
+  }
+ },
+ "vector_layer": {
+  "path": "tools/art/map_surface/sarpedon.vector-layer.json",
+  "sha256": "636d7f7b75f0b3fde8b7e86d65b9b50ba75eac59ca06c1437db15073e876a136"
+ },
+ "k1": {
+  "camera": {
+   "hfov_deg": 35.0,
+   "aspect": 1.7777777777777777,
+   "pitch_deg": 55.0,
+   "yaw_deg": -90.0,
+   "fit_margin_uu": 60.0,
+   "fit_mul": 1.12,
+   "distance_uu": 1872.156,
+   "location_uu": [
+    0.0,
+    1073.825,
+    1533.581
+   ],
+   "formula": "SetupCameraForBoard with extents 445.67 x 288.67 uu (891.33 x 577.33 board)",
+   "orientation": "yaw -90 as S08: image upright, long side horizontal, north (image top) far; starts 1/2 end up left/right, not bottom/top as on S08 grids"
+  },
+  "scene": {
+   "tray_rim_uu": 60.0,
+   "tray_height_uu": 150.0,
+   "rock_srgb": [
+    0.235,
+    0.225,
+    0.215
+   ],
+   "key_light_rot": [
+    -55.0,
+    30.0,
+    0.0
+   ],
+   "ring": {
+    "outer_r_uu": 28.5,
+    "inner_r_uu": 23.0,
+    "rim_uu": 1.2,
+    "intensity": 0.95,
+    "gold_srgb": [
+     0.95,
+     0.74,
+     0.28
+    ],
+    "silver_blue_srgb": [
+     0.66,
+     0.78,
+     0.93
+    ]
+   },
+   "hero": {
+    "height_uu": 50.0,
+    "base_diameter_uu": 40.0,
+    "albedo_lin": 0.3
+   },
+   "rings_on": [
+    {
+     "space": "S20",
+     "start": 1
+    },
+    {
+     "space": "S32",
+     "start": 2
+    }
+   ]
+  },
+  "grade_b_c": {
+   "ev": -0.7,
+   "saturation": 0.7,
+   "tint_srgb_mul": [
+    0.9,
+    0.97,
+    1.12
+   ],
+   "lift": 0.35,
+   "tint_lin_luma_normalised": [
+    0.9317,
+    1.0042,
+    1.1595
+   ],
+   "formula": "lit = albedo * 2^ev * tint; outside = desaturate(lit, saturation); inside = lit + lift * albedo (unlit / emissive share); mix by GameMask"
+  },
+  "render": {
+   "supersampling": 3,
+   "texture_filter": "trilinear, lod = log2(sqrt(|dUV/dx| |dUV/dy|))"
+  },
+  "mocks": {
+   "a": {
+    "path": "<mocks>/sarpedon-a.png",
+    "bytes": 2415744,
+    "sha256": "3e3574f48bd648a298bf1e1ee081ae7a32b424283ccca0fb99c044da991c7c46",
+    "width": 1920,
+    "height": 1080
+   },
+   "b": {
+    "path": "<mocks>/sarpedon-b.png",
+    "bytes": 2312958,
+    "sha256": "7e0a256825c3e5621ecb6ae93abef05c1bea884981eb3a6af6e416fd19bbda00",
+    "width": 1920,
+    "height": 1080
+   },
+   "c": {
+    "path": "<mocks>/sarpedon-c.png",
+    "bytes": 2309452,
+    "sha256": "4c3f216b6ba93888f634fa6b3a47632a2138aa5b00c6e73cfa02d02b93d042f5",
+    "width": 1920,
+    "height": 1080
+   },
+   "ab_split": {
+    "path": "<mocks>/sarpedon-ab-split.png",
+    "bytes": 2361272,
+    "sha256": "842ee7d9e13f2f436c2629f157482c41737835e24d8561e2075151a72ec16c5f"
+   },
+   "ab_ev": {
+    "path": "<mocks>/sarpedon-ab-ev.png",
+    "legend": "log2(b/a) luminance: blue = -1 EV, red = +0.2 EV",
+    "bytes": 1390969,
+    "sha256": "82097516dae32ecaf55a37de954a79f2fd1c635067d8fef097678f2f7eb33e23"
+   }
+  },
+  "measurement": {
+   "method": "space ID map rendered through the K1 camera at 1920x1080 (nearest), bbox of each disc / diameter 126.33 src px",
+   "h_per_src_px": {
+    "min": 1.013,
+    "median": 1.084,
+    "max": 1.179
+   },
+   "v_per_src_px": {
+    "min": 0.768,
+    "median": 0.879,
+    "max": 1.037
+   },
+   "far_row_h_v": [
+    1.021,
+    0.78
+   ],
+   "near_row_h_v": [
+    1.167,
+    1.013
+   ],
+   "analytic_check": {
+    "centre": {
+     "h": 1.084,
+     "v": 0.888
+    },
+    "far_edge_mid": {
+     "h": 0.996,
+     "v": 0.75
+    },
+    "near_edge_mid": {
+     "h": 1.189,
+     "v": 1.069
+    }
+   },
+   "map_corners_screen_px": {
+    "far_left": [
+     294.1,
+     186.7
+    ],
+    "far_right": [
+     1625.9,
+     186.7
+    ],
+    "near_left": [
+     164.9,
+     961.9
+    ],
+    "near_right": [
+     1755.1,
+     961.9
+    ]
+   },
+   "tray_corners_screen_px": {
+    "far_left": [
+     217.0,
+     120.3
+    ],
+    "far_right": [
+     1703.0,
+     120.3
+    ],
+    "near_left_top": [
+     39.3,
+     1060.0
+    ],
+    "near_right_top": [
+     1880.7,
+     1060.0
+    ],
+    "near_left_bottom": [
+     102.3,
+     1170.4
+    ],
+    "near_right_bottom": [
+     1817.7,
+     1170.4
+    ]
+   },
+   "per_space": [
+    {
+     "id": "S01",
+     "screen_centre": [
+      361.2,
+      266.2
+     ],
+     "w_px": 129,
+     "h_px": 99,
+     "h_per_src_px": 1.021,
+     "v_per_src_px": 0.784
+    },
+    {
+     "id": "S02",
+     "screen_centre": [
+      520.6,
+      240.1
+     ],
+     "w_px": 128,
+     "h_px": 97,
+     "h_per_src_px": 1.013,
+     "v_per_src_px": 0.768
+    },
+    {
+     "id": "S03",
+     "screen_centre": [
+      654.6,
+      280.7
+     ],
+     "w_px": 130,
+     "h_px": 99,
+     "h_per_src_px": 1.029,
+     "v_per_src_px": 0.784
+    },
+    {
+     "id": "S04",
+     "screen_centre": [
+      797.2,
+      242.4
+     ],
+     "w_px": 128,
+     "h_px": 98,
+     "h_per_src_px": 1.013,
+     "v_per_src_px": 0.776
+    },
+    {
+     "id": "S05",
+     "screen_centre": [
+      971.8,
+      251.2
+     ],
+     "w_px": 128,
+     "h_px": 98,
+     "h_per_src_px": 1.013,
+     "v_per_src_px": 0.776
+    },
+    {
+     "id": "S06",
+     "screen_centre": [
+      1427.1,
+      292.7
+     ],
+     "w_px": 130,
+     "h_px": 100,
+     "h_per_src_px": 1.029,
+     "v_per_src_px": 0.792
+    },
+    {
+     "id": "S07",
+     "screen_centre": [
+      1556.3,
+      246.1
+     ],
+     "w_px": 129,
+     "h_px": 97,
+     "h_per_src_px": 1.021,
+     "v_per_src_px": 0.768
+    },
+    {
+     "id": "S08",
+     "screen_centre": [
+      336.3,
+      390.7
+     ],
+     "w_px": 134,
+     "h_px": 105,
+     "h_per_src_px": 1.061,
+     "v_per_src_px": 0.831
+    },
+    {
+     "id": "S09",
+     "screen_centre": [
+      486.6,
+      352.6
+     ],
+     "w_px": 132,
+     "h_px": 102,
+     "h_per_src_px": 1.045,
+     "v_per_src_px": 0.807
+    },
+    {
+     "id": "S10",
+     "screen_centre": [
+      614.1,
+      401.1
+     ],
+     "w_px": 133,
+     "h_px": 105,
+     "h_per_src_px": 1.053,
+     "v_per_src_px": 0.831
+    },
+    {
+     "id": "S11",
+     "screen_centre": [
+      761.1,
+      373.3
+     ],
+     "w_px": 132,
+     "h_px": 104,
+     "h_per_src_px": 1.045,
+     "v_per_src_px": 0.823
+    },
+    {
+     "id": "S12",
+     "screen_centre": [
+      923.2,
+      394.3
+     ],
+     "w_px": 133,
+     "h_px": 105,
+     "h_per_src_px": 1.053,
+     "v_per_src_px": 0.831
+    },
+    {
+     "id": "S13",
+     "screen_centre": [
+      1061.0,
+      345.2
+     ],
+     "w_px": 131,
+     "h_px": 103,
+     "h_per_src_px": 1.037,
+     "v_per_src_px": 0.815
+    },
+    {
+     "id": "S14",
+     "screen_centre": [
+      1357.2,
+      393.0
+     ],
+     "w_px": 133,
+     "h_px": 105,
+     "h_per_src_px": 1.053,
+     "v_per_src_px": 0.831
+    },
+    {
+     "id": "S15",
+     "screen_centre": [
+      1583.4,
+      372.1
+     ],
+     "w_px": 132,
+     "h_px": 103,
+     "h_per_src_px": 1.045,
+     "v_per_src_px": 0.815
+    },
+    {
+     "id": "S16",
+     "screen_centre": [
+      1198.1,
+      407.3
+     ],
+     "w_px": 133,
+     "h_px": 106,
+     "h_per_src_px": 1.053,
+     "v_per_src_px": 0.839
+    },
+    {
+     "id": "S17",
+     "screen_centre": [
+      1591.0,
+      491.0
+     ],
+     "w_px": 137,
+     "h_px": 109,
+     "h_per_src_px": 1.084,
+     "v_per_src_px": 0.863
+    },
+    {
+     "id": "S18",
+     "screen_centre": [
+      312.1,
+      536.5
+     ],
+     "w_px": 138,
+     "h_px": 112,
+     "h_per_src_px": 1.092,
+     "v_per_src_px": 0.887
+    },
+    {
+     "id": "S19",
+     "screen_centre": [
+      451.7,
+      585.1
+     ],
+     "w_px": 139,
+     "h_px": 115,
+     "h_per_src_px": 1.1,
+     "v_per_src_px": 0.91
+    },
+    {
+     "id": "S20",
+     "screen_centre": [
+      607.4,
+      524.2
+     ],
+     "w_px": 137,
+     "h_px": 111,
+     "h_per_src_px": 1.084,
+     "v_per_src_px": 0.879
+    },
+    {
+     "id": "S21",
+     "screen_centre": [
+      816.8,
+      512.1
+     ],
+     "w_px": 136,
+     "h_px": 111,
+     "h_per_src_px": 1.077,
+     "v_per_src_px": 0.879
+    },
+    {
+     "id": "S22",
+     "screen_centre": [
+      1308.5,
+      506.5
+     ],
+     "w_px": 136,
+     "h_px": 110,
+     "h_per_src_px": 1.077,
+     "v_per_src_px": 0.871
+    },
+    {
+     "id": "S23",
+     "screen_centre": [
+      299.3,
+      666.4
+     ],
+     "w_px": 142,
+     "h_px": 118,
+     "h_per_src_px": 1.124,
+     "v_per_src_px": 0.934
+    },
+    {
+     "id": "S24",
+     "screen_centre": [
+      706.0,
+      632.4
+     ],
+     "w_px": 141,
+     "h_px": 117,
+     "h_per_src_px": 1.116,
+     "v_per_src_px": 0.926
+    },
+    {
+     "id": "S25",
+     "screen_centre": [
+      1221.9,
+      611.3
+     ],
+     "w_px": 139,
+     "h_px": 116,
+     "h_per_src_px": 1.1,
+     "v_per_src_px": 0.918
+    },
+    {
+     "id": "S26",
+     "screen_centre": [
+      1398.5,
+      617.2
+     ],
+     "w_px": 140,
+     "h_px": 116,
+     "h_per_src_px": 1.108,
+     "v_per_src_px": 0.918
+    },
+    {
+     "id": "S27",
+     "screen_centre": [
+      1618.9,
+      620.1
+     ],
+     "w_px": 141,
+     "h_px": 117,
+     "h_per_src_px": 1.116,
+     "v_per_src_px": 0.926
+    },
+    {
+     "id": "S28",
+     "screen_centre": [
+      294.0,
+      806.0
+     ],
+     "w_px": 147,
+     "h_px": 127,
+     "h_per_src_px": 1.164,
+     "v_per_src_px": 1.005
+    },
+    {
+     "id": "S29",
+     "screen_centre": [
+      449.3,
+      737.1
+     ],
+     "w_px": 144,
+     "h_px": 123,
+     "h_per_src_px": 1.14,
+     "v_per_src_px": 0.974
+    },
+    {
+     "id": "S30",
+     "screen_centre": [
+      622.0,
+      764.9
+     ],
+     "w_px": 145,
+     "h_px": 124,
+     "h_per_src_px": 1.148,
+     "v_per_src_px": 0.982
+    },
+    {
+     "id": "S31",
+     "screen_centre": [
+      854.1,
+      724.9
+     ],
+     "w_px": 143,
+     "h_px": 122,
+     "h_per_src_px": 1.132,
+     "v_per_src_px": 0.966
+    },
+    {
+     "id": "S32",
+     "screen_centre": [
+      1163.6,
+      737.0
+     ],
+     "w_px": 144,
+     "h_px": 123,
+     "h_per_src_px": 1.14,
+     "v_per_src_px": 0.974
+    },
+    {
+     "id": "S33",
+     "screen_centre": [
+      1523.1,
+      719.6
+     ],
+     "w_px": 143,
+     "h_px": 122,
+     "h_per_src_px": 1.132,
+     "v_per_src_px": 0.966
+    },
+    {
+     "id": "S34",
+     "screen_centre": [
+      473.4,
+      879.0
+     ],
+     "w_px": 148,
+     "h_px": 131,
+     "h_per_src_px": 1.171,
+     "v_per_src_px": 1.037
+    },
+    {
+     "id": "S35",
+     "screen_centre": [
+      989.0,
+      809.3
+     ],
+     "w_px": 145,
+     "h_px": 126,
+     "h_per_src_px": 1.148,
+     "v_per_src_px": 0.997
+    },
+    {
+     "id": "S36",
+     "screen_centre": [
+      1142.2,
+      881.3
+     ],
+     "w_px": 148,
+     "h_px": 131,
+     "h_per_src_px": 1.171,
+     "v_per_src_px": 1.037
+    },
+    {
+     "id": "S37",
+     "screen_centre": [
+      1356.1,
+      890.1
+     ],
+     "w_px": 149,
+     "h_px": 131,
+     "h_per_src_px": 1.179,
+     "v_per_src_px": 1.037
+    },
+    {
+     "id": "S38",
+     "screen_centre": [
+      1515.4,
+      858.9
+     ],
+     "w_px": 148,
+     "h_px": 129,
+     "h_per_src_px": 1.171,
+     "v_per_src_px": 1.021
+    }
+   ],
+   "grade_b_vs_a_ev": {
+    "inside_mask_median": -0.057,
+    "outside_mask_median": -0.708,
+    "inside_minus_outside": 0.651,
+    "screen_px_inside": 567060,
+    "screen_px_outside": 549881
+   }
+  }
+ },
+ "checks": {
+  "overlays": [
+   "<mocks>/checks/sarpedon-sdf-S06-S15.png",
+   "<mocks>/checks/sarpedon-sdf-S11-S21.png",
+   "<mocks>/checks/sarpedon-sdf-S20-S21.png",
+   "<mocks>/checks/sarpedon-sdf-S21-S31.png",
+   "<mocks>/checks/sarpedon-sdf-start3.png",
+   "<mocks>/checks/sarpedon-sdf-start4.png"
+  ],
+  "png16_roundtrip": true
+ }
+}

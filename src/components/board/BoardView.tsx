@@ -91,6 +91,7 @@ export const BoardView: React.FC<BoardViewProps> = ({
       white: '#e5e7eb',
       gold: '#d4af37',
       beige: '#d6c8a8',
+      violet: '#9f91d0',
     };
 
     if (zones.length === 1) {

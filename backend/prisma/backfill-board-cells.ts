@@ -20,7 +20,8 @@
  * с --force даёт ту же сетку.
  *
  * Идемпотентность: перезаписываются ТОЛЬКО доски с пустыми/отсутствующими
- * cells; --force перезаписывает все.
+ * cells; --force перезаписывает все, кроме досок с топологией оригинальной
+ * карты (ENV-MAPS: cells с links / features.topology) — они не трогаются никогда.
  *
  * Запуск: cd backend && npx ts-node --transpile-only prisma/backfill-board-cells.ts [--force]
  */
@@ -119,6 +120,23 @@ function parseCellsTolerant(raw: unknown): unknown[] {
   // Двойная сериализация import-content: после первого parse снова строка
   if (typeof value === 'string') value = tryParse(value);
   return Array.isArray(value) ? value : [];
+}
+
+/**
+ * ENV-MAPS: доска с топологией оригинальной карты (граф клеток со связями —
+ * хоть одна клетка несёт массив `links`, или features.topology === true от
+ * seed-env-map-boards.ts). Сгенерированная сетка стёрла бы граф, поэтому такие
+ * доски не перезаписываются никогда, даже с --force.
+ */
+export function isTopologyBoard(board: { cells: unknown; features: unknown }): boolean {
+  const features = (board.features ?? {}) as Record<string, unknown>;
+  if (features.topology === true) return true;
+  return parseCellsTolerant(board.cells).some(
+    (cell) =>
+      cell !== null &&
+      typeof cell === 'object' &&
+      Array.isArray((cell as { links?: unknown }).links),
+  );
 }
 
 // ---------- Детерминированный PRNG ----------
@@ -322,9 +340,17 @@ async function main() {
 
   let updated = 0;
   let skippedNonEmpty = 0;
+  let skippedTopology = 0;
   let noMapping = 0;
 
   for (const board of boards) {
+    if (isTopologyBoard(board)) {
+      skippedTopology++;
+      console.log(
+        `   ⏭️  ${board.name}: топология оригинальной карты (links) — пропуск${force ? ' даже с --force' : ''}`,
+      );
+      continue;
+    }
     const existing = parseCellsTolerant(board.cells);
     if (existing.length > 0 && !force) {
       skippedNonEmpty++;
@@ -359,14 +385,17 @@ async function main() {
     );
   }
 
-  console.log(`\n📊 Итог: обновлено ${updated}, пропущено (cells непустые) ${skippedNonEmpty}, без маппинга в maps.json ${noMapping}, всего досок ${boards.length}`);
+  console.log(`\n📊 Итог: обновлено ${updated}, пропущено (cells непустые) ${skippedNonEmpty}, пропущено (топология) ${skippedTopology}, без маппинга в maps.json ${noMapping}, всего досок ${boards.length}`);
 }
 
-main()
-  .catch((e) => {
-    console.error('❌ Backfill error:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+// Specs import isTopologyBoard without running the backfill.
+if (require.main === module) {
+  main()
+    .catch((e) => {
+      console.error('❌ Backfill error:', e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

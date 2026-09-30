@@ -16,6 +16,7 @@ import { MatchmakingPubSubService } from '../resolvers/matchmaking.subscription'
 import { MatchmakingMetricsService } from './matchmaking-metrics.service';
 import { PrismaService } from '../../database/prisma.service';
 import { RedisService } from '../../redis/redis.service';
+import { boardCellsHaveTopology } from '../../content/mappers/content.mapper';
 import { GameStatus, GameMode } from '@prisma/client';
 import { MatchResult } from '../models';
 import { CONFIRMATION_TTL_SECONDS } from '../models/match-confirmation.model';
@@ -246,10 +247,17 @@ export class MatchmakingSchedulerService implements OnModuleInit, OnModuleDestro
   }
 
   /**
-   * Получить ID доски по умолчанию
+   * Получить ID доски по умолчанию: та же доска, что у GameService.createGame
+   * (самая старая по createdAt). Доски с топологией оригинальной карты
+   * (ENV-MAPS, cells с links) играются только UE-клиентом — дефолтом матчмейкинга
+   * они не становятся (web-клиент такую игру не отрисует).
    */
   private async getDefaultBoardId(): Promise<string> {
-    const board = await this.prisma.board.findFirst();
+    const boards = await this.prisma.board.findMany({
+      orderBy: { createdAt: 'asc' },
+      select: { id: true, cells: true },
+    });
+    const board = boards.find((b) => !boardCellsHaveTopology(b.cells));
     return board?.id || 'default-board';
   }
 

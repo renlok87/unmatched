@@ -12,7 +12,9 @@
  */
 
 import { Injectable, Logger } from '@nestjs/common';
-import { Position, positionEqual, positionDistance } from '../models';
+import { Position, positionEqual } from '../models';
+import type { BoardState } from '../models';
+import { distanceField, neighbours, ORTHOGONAL_NESW } from '../engine/board-topology';
 import { isCellPassable, isFreeEndpoint, isInBoardBounds, isTraversable } from './traversal';
 
 /**
@@ -75,12 +77,21 @@ export class AStarService {
     const closedSet = new Set<string>();
     const cameFrom = new Map<string, Position>();
 
+    // Эвристика: сетка — манхэттен; топологическая доска — статическая
+    // graph distance до цели (связь может перекрывать >1 шага решётки, поэтому
+    // манхэттен там недопустим). Недостижимая по графу цель — пути нет.
+    const heuristic = distanceField(this.boardOf(state), end);
+    const startH = heuristic(start);
+    if (!Number.isFinite(startH)) {
+      return { path: [], cost: 0, exists: false };
+    }
+
     // Начальная нода
     const startNode: AStarNode = {
       pos: start,
       g: 0,
-      h: this.heuristic(start, end),
-      f: this.heuristic(start, end),
+      h: startH,
+      f: startH,
     };
 
     openSet.push(startNode);
@@ -122,11 +133,12 @@ export class AStarService {
 
         if (!existingNode) {
           // Новая нода
+          const h = heuristic(neighbor);
           const newNode: AStarNode = {
             pos: neighbor,
             g: tentativeG,
-            h: this.heuristic(neighbor, end),
-            f: tentativeG + this.heuristic(neighbor, end),
+            h,
+            f: tentativeG + h,
             parent: current.pos,
           };
 
@@ -172,29 +184,15 @@ export class AStarService {
   }
 
   /**
-   * Manhattan distance как эвристика
-   * Для сетки с 4 направлениями это admissible эвристика
-   */
-  private heuristic(a: Position, b: Position): number {
-    return positionDistance(a, b);
-  }
-
-  /**
-   * Получить соседние клетки: границы реальной доски, стены/закрытые двери
-   * и живые враги блокируют шаг; живые союзники проходимы (GD-015)
+   * Получить соседние клетки (board-topology: связи топологической доски
+   * либо 4 ортогональных соседа сетки в порядке N, E, S, W): границы
+   * реальной доски, стены/закрытые двери и живые враги блокируют шаг;
+   * живые союзники проходимы (GD-015)
    */
   private getNeighbors(state: any, fighterId: string, pos: Position): Position[] {
     const neighbors: Position[] = [];
-    const directions = [
-      { dx: 0, dy: -1 }, // north
-      { dx: 1, dy: 0 }, // east
-      { dx: 0, dy: 1 }, // south
-      { dx: -1, dy: 0 }, // west
-    ];
 
-    for (const dir of directions) {
-      const newPos = { x: pos.x + dir.dx, y: pos.y + dir.dy };
-
+    for (const newPos of neighbours(this.boardOf(state), pos, ORTHOGONAL_NESW)) {
       if (!isInBoardBounds(state?.boardState, newPos)) {
         continue;
       }
@@ -208,6 +206,11 @@ export class AStarService {
     }
 
     return neighbors;
+  }
+
+  /** Доска из нетипизированного state (легаси-сигнатура findPath(state: any)) */
+  private boardOf(state: unknown): BoardState | undefined {
+    return (state as { boardState?: BoardState } | null | undefined)?.boardState;
   }
 
   /**
